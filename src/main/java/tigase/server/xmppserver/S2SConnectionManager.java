@@ -545,7 +545,9 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 				// or cluster connection it may be quite problematic.
 				// Let's force jabber:client xmlns for all packets received from s2s
 				// connection
-				if (p.getXMLNS() == XMLNS_SERVER_VAL) {
+				// In theory null does not hurt, but if the packet goes through the cluster
+				// connection is gets cluster XMLNS
+				if (p.getXMLNS() == XMLNS_SERVER_VAL || p.getXMLNS() == null) {
 					p.setXMLNS(XMLNS_CLIENT_VAL);
 				}
 
