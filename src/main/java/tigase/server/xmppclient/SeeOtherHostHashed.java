@@ -24,6 +24,8 @@ package tigase.server.xmppclient;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.ArrayList;
+import java.util.Collections;
 import tigase.xmpp.BareJID;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -45,16 +47,21 @@ import tigase.util.TigaseStringprepException;
  */
 public class SeeOtherHostHashed implements SeeOtherHostIfc {
 
-	BareJID defaulHost = null;
-	private List<BareJID> connectedNodes = new CopyOnWriteArrayList<BareJID>();
+	protected List<BareJID> defaulHost = null;
+	protected List<BareJID> connectedNodes = new CopyOnWriteArrayList<BareJID>();
 	private static final Logger log = Logger.getLogger(SeeOtherHostHashed.class.getName());
 
 	@Override
 	public BareJID findHostForJID(BareJID jid, BareJID host) {
-		if (defaulHost != null) {
-			return defaulHost;
+		int hash = Math.abs(jid.hashCode());
+		if (defaulHost !=null
+			&& !defaulHost.isEmpty()
+			&& connectedNodes.contains( defaulHost.get( hash % defaulHost.size() ) ) ) {
+				return defaulHost.get( hash % defaulHost.size() );
+		} else if (connectedNodes.size() > 0 ) {
+			return connectedNodes.get( hash % connectedNodes.size());
 		} else {
-			return connectedNodes.get(Math.abs(jid.hashCode()) % connectedNodes.size());
+			return host;
 		}
 	}
 
@@ -63,14 +70,18 @@ public class SeeOtherHostHashed implements SeeOtherHostIfc {
 	}
 
 	@Override
-	public void setProperties(Map<String, Object> props) {
+	public void setProperties(final Map<String, Object> props) {
 		if ((props.containsKey(SeeOtherHostIfc.CM_SEE_OTHER_HOST_DEFAULT_HOST))
 			&& !props.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_DEFAULT_HOST).toString().trim().isEmpty()) {
-			try {
-				defaulHost = BareJID.bareJIDInstance((String) props.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_DEFAULT_HOST));
-			} catch (TigaseStringprepException ex) {
-				log.log(Level.CONFIG, "From JID violates RFC6122 (XMPP:Address Format): ", ex);
+			defaulHost = new ArrayList<BareJID>();
+			for (String host : ((String) props.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_DEFAULT_HOST)).split(",")) {
+				try {
+					defaulHost.add(BareJID.bareJIDInstance(host));
+				} catch (TigaseStringprepException ex) {
+					log.log(Level.CONFIG, "From JID violates RFC6122 (XMPP:Address Format): ", ex);
+				}
 			}
+			Collections.sort(defaulHost);
 		} else {
 			defaulHost = null;
 		}
