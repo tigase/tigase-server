@@ -1137,9 +1137,3 @@ public abstract class RosterAbstract {
 		session.putCommonSessionData(ROSTERHASH, roster_hash);
 	}
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

@@ -192,10 +192,17 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 			if (host == null) {
 				host = (String) sessionData.get("remote-host");
 			}
+			
+			String sock_str = null;
+			try {
+				sock_str = socketChannel.socket().toString();
+			} catch (Exception ex) {
+				sock_str = ex.toString();
+			}
 
 			log.log(Level.INFO,
-					"Problem connecting to remote host: {0}, address: {1} - exception: {2}",
-					new Object[] { host, remote_address, e });
+					"Problem connecting to remote host: {0}, address: {1}, socket: {2} - exception: {3}, session data: {4}",
+					new Object[] { host, remote_address, sock_str, e, sessionData });
 
 			throw e;
 		}
