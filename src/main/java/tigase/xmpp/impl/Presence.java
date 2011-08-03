@@ -72,10 +72,10 @@ import java.util.logging.Logger;
 
 /**
  * Describe class Presence here.
- * 
- * 
+ *
+ *
  * Created: Wed Feb 22 07:30:03 2006
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -122,8 +122,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param jid
 	 * @param session
 	 */
@@ -146,7 +146,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	/**
 	 * <code>sendPresenceBroadcast</code> method broadcasts given presence to all
 	 * buddies from roster and to all users to which direct presence was sent.
-	 * 
+	 *
 	 * @param session
 	 *          a <code>XMPPResourceConnection</code> value
 	 * @param results
@@ -211,8 +211,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param jid
 	 * @param session
 	 */
@@ -231,8 +231,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param t
 	 * @param from
 	 * @param to
@@ -312,7 +312,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	/**
 	 * <code>sendPresenceBroadcast</code> method broadcasts given presence to all
 	 * buddies from roster and to all users to which direct presence was sent.
-	 * 
+	 *
 	 * @param t
 	 *          a <code>StanzaType</code> value
 	 * @param session
@@ -375,7 +375,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	 * availability presence, subscription presence and so on... Initial presences
 	 * are however sent only to those resources which already have sent initial
 	 * presence.
-	 * 
+	 *
 	 * @param presence
 	 *          an <code>Element</code> presence received from other users, we
 	 *          have to change 'to' attribute to full resource JID.
@@ -435,7 +435,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	 * <strong>other</strong> resources presence stanza from one user resource. So
 	 * if new resource connects this method updates presence information about new
 	 * resource to old resources and about old resources to new resource.
-	 * 
+	 *
 	 * @param presence
 	 *          an <code>Element</code> presence received from other users, we
 	 *          have to change 'to' attribute to full resource JID.
@@ -541,7 +541,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	/**
 	 * <code>updateOfflineChange</code> method broadcast off-line presence to all
 	 * other user active resources.
-	 * 
+	 *
 	 * @param session
 	 *          a <code>XMPPResourceConnection</code> value
 	 * @param results
@@ -611,7 +611,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	/**
 	 * <code>sendPresenceBroadcast</code> method broadcasts given presence to all
 	 * budies from roster and to all users to which direct presence was sent.
-	 * 
+	 *
 	 * @param session
 	 *          a <code>XMPPResourceConnection</code> value
 	 * @param results
@@ -693,8 +693,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -704,8 +704,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -715,10 +715,10 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param settings
-	 * 
+	 *
 	 * @throws TigaseDBException
 	 */
 	@Override
@@ -730,14 +730,14 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param packet
 	 * @param session
 	 * @param repo
 	 * @param results
 	 * @param settings
-	 * 
+	 *
 	 * @throws XMPPException
 	 */
 	@SuppressWarnings({ "unchecked", "fallthrough" })
@@ -932,11 +932,11 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param session
 	 * @param results
-	 * 
+	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
@@ -963,7 +963,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * <code>stopped</code> method is called when user disconnects or logs-out.
-	 * 
+	 *
 	 * @param session
 	 *          a <code>XMPPResourceConnection</code> value
 	 * @param results
@@ -1007,8 +1007,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -1018,8 +1018,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -1268,15 +1268,17 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	protected void processInUnsubscribe(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
 			throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
-		// First forward the request to the client to make sure it stays in sync
-		// with the server.
-		Packet forward_p = packet.copyElementOnly();
-		forward_p.setPacketTo(session.getConnectionId());
-		results.offer(forward_p);
+
 		boolean subscr_changed =
 				roster_util.updateBuddySubscription(session, pres_type, packet.getStanzaFrom());
 
 		if (subscr_changed) {
+			// First forward the request to the client to make sure it stays in sync
+			// with the server.
+			// this should be done only in the case of actual change of the state
+			Packet forward_p = packet.copyElementOnly();
+			forward_p.setPacketTo(session.getConnectionId());
+			results.offer(forward_p);
 
 			// No longer needed according to RFC-3921-bis5
 			// sendPresence(StanzaType.unsubscribed, session.getJID(),

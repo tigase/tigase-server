@@ -1026,7 +1026,7 @@ public abstract class RosterAbstract {
 			final Element item)
 			throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
 		Element update = new Element("iq");
-		
+
 		update.setXMLNS(CLIENT_XMLNS);
 
 		update.setAttribute("type", StanzaType.set.toString());
@@ -1076,7 +1076,10 @@ public abstract class RosterAbstract {
 		}
 
 		if (current_subscription == null) {
-			addBuddy(session, jid, null, null, null);
+			// don't create new roster item for incomming unsubscribe presence #219 / #210
+			if (presence != PresenceType.in_unsubscribe && presence != PresenceType.out_unsubscribe) {
+				addBuddy(session, jid, null, null, null);
+			}
 			current_subscription = SubscriptionType.none;
 		}
 
