@@ -24,6 +24,7 @@ package tigase.server.xmppclient;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.util.TigaseStringprepException;
 import tigase.xmpp.BareJID;
 
 import tigase.db.DBInitException;
@@ -85,7 +86,7 @@ public class SeeOtherHostDB extends SeeOtherHostHashed {
 			see_other_host = queryDB( jid );
 		} catch ( Exception ex ) {
 			see_other_host = super.findHostForJID( jid, host );
-			log.log(Level.SEVERE, "Cannot perform DB lookup, fallback to SeeOtherHostHashed: ", ex);
+			log.log(Level.SEVERE, "DB lookup failed, fallback to SeeOtherHostHashed: ", ex);
 		}
 
 		return see_other_host;
@@ -100,7 +101,6 @@ public class SeeOtherHostDB extends SeeOtherHostHashed {
 		}
 		defs.put( SEE_OTHER_HOST_DB_URL_KEY , get_host_DB_url );
 		defs.put( SEE_OTHER_HOST_DB_QUERY_KEY , get_host_query );
-		System.out.println("-----getDefaults------get_host_DB_url: " + get_host_DB_url);
 	}
 
 	@Override
@@ -142,7 +142,7 @@ public class SeeOtherHostDB extends SeeOtherHostHashed {
 //	}
 
 
-	private BareJID queryDB( BareJID user ) throws UserNotFoundException, SQLException {
+	private BareJID queryDB( BareJID user ) throws UserNotFoundException, SQLException, TigaseStringprepException {
 
 		PreparedStatement get_host = data_repo.getPreparedStatement( null, get_host_query );
 
@@ -154,7 +154,7 @@ public class SeeOtherHostDB extends SeeOtherHostHashed {
 			rs = get_host.executeQuery();
 
 			if ( rs.next() ) {
-				return BareJID.bareJIDInstanceNS( rs.getString( NODE_ID ) );
+				return BareJID.bareJIDInstance( rs.getString( NODE_ID ) );
 			} else {
 				throw new UserNotFoundException( "Item does not exist for user: " + user );
 			} // end of if (isnext) else
