@@ -43,7 +43,7 @@ import java.util.logging.Logger;
 
 /**
  * Created: Jun 8, 2009 1:47:31 PM
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -55,18 +55,19 @@ public class PacketCounter implements PacketFilterIfc {
 	private long msgCounter = 0;
 	private String name = null;
 	private long presCounter = 0;
+	private long otherCounter = 0;
 	private QueueType qType = null;
-	private ConcurrentHashMap<String, Integer> iqCounterIdx = new ConcurrentHashMap<String,
-		Integer>();
+	private ConcurrentHashMap<String, Integer> iqCounterIdx =
+			new ConcurrentHashMap<String, Integer>();
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -88,48 +89,23 @@ public class PacketCounter implements PacketFilterIfc {
 
 			return packet;
 		}
+		
+		++otherCounter;
 
 		if (packet.getElemName() == "iq") {
 			String xmlns = ((Iq) packet).getIQXMLNS();
 
 			incIQCounter((xmlns != null) ? xmlns : ((Iq) packet).getIQChildName());
 		}
-
-		// TESTING ONLY START
-//  try {
-//    String node_name = null;
-//    List<Element> children = packet.getElemChildren("/iq/pubsub");
-//    if (children != null) {
-//      for (Element elem : children) {
-//        node_name = elem.getAttribute("node");
-//        if (node_name != null) {
-//          break;
-//        }
-//      }
-//    }
-//    if (node_name != null) {
-//      String node_no = node_name.substring("node-".length());
-//      int no = Integer.parseInt(node_no);
-//      if ((lastNodeNo + 1 != no) && (lastNodeNo != no)) {
-//        log.warning(name + ":" + qType.name() +
-//                ": Incorrect node number, lastNodeNo = " + lastNodeNo +
-//                ", current number: " + no + ", or packet: " + packet.toString());
-//      }
-//      lastNodeNo = no;
-//    }
-//  } catch (Exception e) {
-//    //e.printStackTrace();
-//  }
-		// TESTING ONLY END
 		return packet;
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param list
 	 */
 	@Override
@@ -137,25 +113,26 @@ public class PacketCounter implements PacketFilterIfc {
 		list.add(name, qType.name() + " messages", msgCounter, Level.FINER);
 		list.add(name, qType.name() + " presences", presCounter, Level.FINER);
 		list.add(name, qType.name() + " cluster", clusterCounter, Level.FINER);
+		list.add(name, qType.name() + " other", otherCounter, Level.FINER);
 		list.add(name, qType.name() + " IQ no XMLNS", iqCounters[0], Level.FINER);
 
 		long iqs = iqCounters[0];
 
 		for (Entry<String, Integer> iqCounter : iqCounterIdx.entrySet()) {
-			list.add(name, qType.name() + " IQ " + iqCounter.getKey(), iqCounters[iqCounter.getValue()],
-					Level.FINER);
+			list.add(name, qType.name() + " IQ " + iqCounter.getKey(),
+					iqCounters[iqCounter.getValue()], Level.FINER);
 			iqs += iqCounters[iqCounter.getValue()];
 		}
 
 		list.add(name, qType.name() + " IQ", iqs, Level.FINER);
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param name
 	 * @param qType
 	 */
@@ -181,9 +158,3 @@ public class PacketCounter implements PacketFilterIfc {
 		}
 	}
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
