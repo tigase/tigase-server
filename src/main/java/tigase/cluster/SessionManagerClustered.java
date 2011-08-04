@@ -132,6 +132,9 @@ public class SessionManagerClustered extends SessionManager implements
 	private static final String PRESENCE_TYPE_INITIAL = "initial";
 	private static final String PRESENCE_TYPE_UPDATE = "update";
 
+	private long clusterSyncInTraffic = 0;
+	private long clusterSyncOutTraffic = 0;
+	
 	private JID my_address = null;
 	private JID my_hostname = null;
 	private int nodesNo = 0;
@@ -267,6 +270,11 @@ public class SessionManagerClustered extends SessionManager implements
 		super.getStatistics(list);
 		strategy.getStatistics(list);
 
+		list.add(getName(), "Cluster sync IN traffic",
+				clusterSyncInTraffic, Level.FINE);
+		list.add(getName(), "Cluster sync OUT traffic",
+				clusterSyncOutTraffic, Level.FINE);
+
 		// list.add(getName(), "Average commandTime on last " + commandTime.length
 		// + " runs [ms]", calcAverage(commandTime), Level.FINE);
 		// list.add(getName(), "Average clusterTime on last " + clusterTime.length
@@ -323,6 +331,7 @@ public class SessionManagerClustered extends SessionManager implements
 					strategy.getNodesForPacketForward(getComponentId(), null,
 							Packet.packetInstance(presence));
 			if (cl_nodes != null && cl_nodes.size() > 0) {
+				++clusterSyncOutTraffic;
 				clusterController.sendToNodes(USER_PRESENCE_CMD, params, presence,
 						getComponentId(), null, cl_nodes.toArray(new JID[cl_nodes.size()]));
 			}
@@ -350,6 +359,7 @@ public class SessionManagerClustered extends SessionManager implements
 		try {
 			Map<String, String> params = prepareConnectionParams(conn);
 			List<JID> cl_nodes = strategy.getNodesForUserConnect(conn.getJID());
+			++clusterSyncOutTraffic;
 			clusterController.sendToNodes(USER_CONNECTED_CMD, params, getComponentId(),
 					cl_nodes.toArray(new JID[cl_nodes.size()]));
 		} catch (Exception e) {
@@ -688,6 +698,7 @@ public class SessionManagerClustered extends SessionManager implements
 			if (conn.isAuthorized() && conn.isResourceSet()) {
 				Map<String, String> params = prepareConnectionParams(conn);
 				List<JID> cl_nodes = strategy.getNodesForUserDisconnect(conn.getJID());
+				++clusterSyncOutTraffic;
 				clusterController.sendToNodes(USER_DISCONNECTED_CMD, params, getComponentId(),
 						cl_nodes.toArray(new JID[cl_nodes.size()]));
 			}
@@ -735,6 +746,7 @@ public class SessionManagerClustered extends SessionManager implements
 	 *          is a JID of the target cluster node.
 	 */
 	protected void requestSync(JID node) {
+		++clusterSyncOutTraffic;
 		clusterController.sendToNodes(REQUEST_SYNCONLINE_CMD, getComponentId(), node);
 	}
 
@@ -766,6 +778,7 @@ public class SessionManagerClustered extends SessionManager implements
 		@Override
 		public void executeCommand(JID fromNode, Set<JID> visitedNodes,
 				Map<String, String> data, Queue<Element> elements) throws ClusterCommandException {
+			++clusterSyncInTraffic;
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST,
 						"Called fromNode: {0}, visitedNodes: {1}, data: {2}, packets: {3}",
@@ -792,6 +805,7 @@ public class SessionManagerClustered extends SessionManager implements
 		@Override
 		public void executeCommand(JID fromNode, Set<JID> visitedNodes,
 				Map<String, String> data, Queue<Element> packets) throws ClusterCommandException {
+			++clusterSyncInTraffic;
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST,
 						"Called fromNode: {0}, visitedNodes: {1}, data: {2}, packets: {3}",
@@ -838,6 +852,7 @@ public class SessionManagerClustered extends SessionManager implements
 		@Override
 		public void executeCommand(JID fromNode, Set<JID> visitedNodes,
 				Map<String, String> data, Queue<Element> packets) throws ClusterCommandException {
+			++clusterSyncInTraffic;
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST,
 						"Called fromNode: {0}, visitedNodes: {1}, data: {2}, packets: {3}",
@@ -901,6 +916,7 @@ public class SessionManagerClustered extends SessionManager implements
 		@Override
 		public void executeCommand(JID fromNode, Set<JID> visitedNodes,
 				Map<String, String> data, Queue<Element> packets) throws ClusterCommandException {
+			++clusterSyncInTraffic;
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST,
 						"Called fromNode: {0}, visitedNodes: {1}, data: {2}, packets: {3}",
@@ -952,6 +968,7 @@ public class SessionManagerClustered extends SessionManager implements
 		@Override
 		public void executeCommand(JID fromNode, Set<JID> visitedNodes,
 				Map<String, String> data, Queue<Element> packets) throws ClusterCommandException {
+			++clusterSyncInTraffic;
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST,
 						"Called fromNode: {0}, visitedNodes: {1}, data: {2}, packets: {3}",
