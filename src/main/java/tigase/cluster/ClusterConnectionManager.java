@@ -647,13 +647,28 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
-		identity_type = (String) props.get(IDENTITY_TYPE_KEY);
-		compress_stream = (Boolean) props.get(COMPRESS_STREAM_PROP_KEY);
-		connect_all = (Boolean) props.get(CONNECT_ALL_PROP_KEY);
+		if (props.get(IDENTITY_TYPE_KEY) != null) {
+			identity_type = (String) props.get(IDENTITY_TYPE_KEY);
+		}
+		if (props.get(COMPRESS_STREAM_PROP_KEY) != null) {
+			compress_stream = (Boolean) props.get(COMPRESS_STREAM_PROP_KEY);
+		}
+		if (props.get(CONNECT_ALL_PROP_KEY) != null) {
+			connect_all = (Boolean) props.get(CONNECT_ALL_PROP_KEY);
+		}
 		// cluster_controller_id = (String) props.get(CLUSTER_CONTR_ID_PROP_KEY);
-		per_node_conns = (Integer) props.get(CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY);
+		if (props.get(CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY) != null) {
+			per_node_conns = (Integer) props.get(CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY);
+		}
 		connectionDelay = 5 * SECOND;
 
+		if (props.size() == 1) {
+			// If props.size() == 1, it means this is a single property update
+			// and this component does not support single property change for the rest
+			// of it's settings
+			return;
+		}
+		
 		String[] cl_nodes = (String[]) props.get(CLUSTER_NODES_PROP_KEY);
 		int[] ports = (int[]) props.get(PORTS_PROP_KEY);
 
