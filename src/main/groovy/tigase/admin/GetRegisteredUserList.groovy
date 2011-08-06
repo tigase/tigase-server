@@ -90,7 +90,8 @@ try {
 	if (isServiceAdmin ||
 	(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
 		def users_list = [];
-		def users = user_repo.getUsers();
+		def domain_user_repo = (user_repo instanceof tigase.db.UserRepositoryMDImpl) ? user_repo.getRepo(bareJID.getDomain()) : user_repo;
+		def users =  domain_user_repo.getUsers();
 		for (user in users) {
 			if (!user.getDomain().equals(bareJID.getDomain()))
 				continue;
