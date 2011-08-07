@@ -39,6 +39,7 @@ import tigase.xmpp.*
 import tigase.db.*
 import tigase.xmpp.impl.roster.*
 import tigase.xml.*
+import tigase.vhosts.*
 
 def ROSTER_OWNER_JID = "roster-owner-jid"
 def ROSTER_OWNER_NAME = "roster-owner-name"
@@ -62,6 +63,11 @@ def actions_descr = ["Add/Update item", "Remove item",
 def p = (Packet)packet
 def repository = (UserRepository)userRepository
 def sessions = (Map<BareJID, XMPPSession>)userSessions
+def vhost_man = (VHostManagerIfc)vhostMan
+def admins = (Set)adminsSet
+
+def stanzaFromBare = p.getStanzaFrom().getBareJID();
+def isServiceAdmin = admins.contains(stanzaFromBare);
 
 def rosterOwnerJid = Command.getFieldValue(packet, ROSTER_OWNER_JID)
 def rosterOwnerName = Command.getFieldValue(packet, ROSTER_OWNER_NAME)
@@ -101,7 +107,8 @@ def Queue<Packet> results = new LinkedList<Packet>()
 
 def updateRoster = { jid, i_jid, i_name, i_groups, i_subscr ->
 
-	def XMPPResourceConnection conn = sessions.get(jid)?.getResourceConnection(jid.getBareJID())
+	def XMPPResourceConnection conn = sessions.get(jid.getBareJID())?.getResourceConnection(jid)
+
 	if ( conn != null ) {
 		// Update online
 		RosterAbstract rosterUtil = RosterFactory.getRosterImplementation(true)
@@ -111,7 +118,7 @@ def updateRoster = { jid, i_jid, i_name, i_groups, i_subscr ->
 			rosterUtil.removeBuddy(conn, i_jid)
 		} else {
 			rosterUtil.addBuddy(conn, i_jid, i_name ?: i_jid.getLocalpart(),
-				i_groups ? i_groups.split(",") : null)
+				i_groups ? i_groups.split(",") : null, null)
 			rosterUtil.setBuddySubscription(conn,
 				RosterAbstract.SubscriptionType.valueOf(i_subscr), i_jid)
 			item = rosterUtil.getBuddyItem(conn, i_jid)
@@ -124,7 +131,7 @@ def updateRoster = { jid, i_jid, i_name, i_groups, i_subscr ->
 		Map<BareJID, RosterElement> roster = new LinkedHashMap<BareJID, RosterElement>()
 		RosterFlat.parseRosterUtil(rosterStr, roster, null)
 		if (remove_item) {
-			roster.remove(i_jid)
+			roster.remove(i_jid.getBareJID())
 		} else {
 			RosterElement rel = new RosterElement(i_jid, i_name,
 					i_groups ? i_groups.split(",") : null, null)
@@ -138,7 +145,18 @@ def updateRoster = { jid, i_jid, i_name, i_groups, i_subscr ->
 	}
 }
 
-updateRoster(JID.jidInstanceNS(rosterOwnerJid), JID.jidInstanceNS(rosterItemJid), rosterItemName,
+def jidRosterOwnerJid = JID.jidInstanceNS(rosterOwnerJid);
+def jidRosterItemJid = JID.jidInstanceNS(rosterItemJid);
+
+Packet result = p.commandResult(Command.DataType.result)
+def vhost = vhost_man.getVHostItem(jidRosterOwnerJid.getDomain());
+if (vhost == null || (!isServiceAdmin || vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString()))) {
+	Command.addTextField(result, "Error", "You do not have enough permissions to modify roster of "+rosterOwnerJid);
+	results.add(result);
+	return results;
+}
+
+updateRoster(jidRosterOwnerJid, jidRosterItemJid, rosterItemName,
 	rosterItemGroups, rosterItemSubscr)
 
 if (rosterAction == UPDATE_EXT || rosterAction == REMOVE_EXT) {
@@ -147,11 +165,20 @@ if (rosterAction == UPDATE_EXT || rosterAction == REMOVE_EXT) {
 		case "to" : subscr = "from"; break;
 		case "from" : subscr = "to"; break;
 	}
-	updateRoster(JID.jidInstanceNS(rosterItemJid), JID.jidInstanceNS(rosterOwnerJid), rosterOwnerName,
+
+	vhost = vhost_man.getVHostItem(jidRosterItemJid.getDomain());
+	if (vhost == null || (!isServiceAdmin || vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString()))) {
+		Command.addTextField(result, "Error", "You do not have enough permissions to modify roster of "+rosterItemJid);
+		results.add(result);
+		return results;
+	}
+
+	updateRoster(jidRosterItemJid, jidRosterOwnerJid, rosterOwnerName,
 		rosterItemGroups, subscr)
 }
 
 if (!remove_item) {
+
 	Element pres = new Element("presence",
 		(String[])["from", "to", "type"], (String[])[rosterOwnerJid, rosterItemJid,
       "probe"])
@@ -162,7 +189,6 @@ if (!remove_item) {
   results.offer(Packet.packetInstance(pres))
 }
 
-Packet result = p.commandResult(Command.DataType.result)
 Command.addTextField(result, "Note", "Operation successful");
 results.add(result)
 
