@@ -339,8 +339,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				// Hm, receiver is not set yet..., ignoring
 				if (log.isLoggable(Level.INFO)) {
 					log.log(Level.INFO,
-							"Hm, receiver is not set yet (misconfiguration error)..., ignoring: {0}",
-							p.toStringSecure());
+							"Hm, receiver is not set yet (misconfiguration error)..., ignoring: {0}, connection: {1}",
+							new Object[] {p.toStringSecure(), serv});
 				}
 			}
 
@@ -586,6 +586,11 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 					see_other_host_strategy.findHostForJID(fromJID, getDefHostName());
 
 			if (see_other_host != null && !see_other_host.equals(getDefHostName())) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Sending redirect for {0} to host {1}, connection {2}.", new Object[] {
+							fromJID, see_other_host, serv });
+				}
+
 				return "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
 						+ " xmlns:stream='http://etherx.jabber.org/streams'"
 						+ " id='tigase-error-tigase'" + " from='" + getDefHostName() + "'"
