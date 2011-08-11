@@ -572,12 +572,19 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		if (result) {
 			Map<String, Object> sessionData = service.getSessionData();
 			String[] routings = (String[]) sessionData.get(PORT_ROUTING_TABLE_PROP_KEY);
-			String ip = service.getRemoteAddress();
-			CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(ip);
+//			String ip = service.getRemoteAddress();
+//			CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(ip);
+//
+//			if (conns == null) {
+//				conns = new CopyOnWriteArrayList<XMPPIOService<Object>>();
+//				connectionsPool.put(ip, conns);
+//			}
+			String addr = (String) sessionData.get(PORT_REMOTE_HOST_PROP_KEY);
+			CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(addr);
 
 			if (conns == null) {
 				conns = new CopyOnWriteArrayList<XMPPIOService<Object>>();
-				connectionsPool.put(ip, conns);
+				connectionsPool.put(addr, conns);
 			}
 
 			int size = conns.size();
@@ -589,7 +596,6 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 					updateRoutings(routings, false);
 				}
 
-				String addr = (String) sessionData.get(PORT_REMOTE_HOST_PROP_KEY);
 
 				// removeRouting(serv.getRemoteHost());
 				log.log(Level.INFO, "Disonnected from: {0}", addr);
@@ -840,12 +846,19 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 
 	protected void serviceConnected(XMPPIOService<Object> serv) {
 		String[] routings = (String[]) serv.getSessionData().get(PORT_ROUTING_TABLE_PROP_KEY);
-		String ip = serv.getRemoteAddress();
-		CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(ip);
+		String addr = (String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
+//		String ip = serv.getRemoteAddress();
+//		CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(ip);
+//
+//		if (conns == null) {
+//			conns = new CopyOnWriteArrayList<XMPPIOService<Object>>();
+//			connectionsPool.put(ip, conns);
+//		}
+		CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(addr);
 
 		if (conns == null) {
 			conns = new CopyOnWriteArrayList<XMPPIOService<Object>>();
-			connectionsPool.put(ip, conns);
+			connectionsPool.put(addr, conns);
 		}
 
 		int size = conns.size();
@@ -855,7 +868,6 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		if (size == 0) {
 			updateRoutings(routings, true);
 
-			String addr = (String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 
 			log.log(Level.INFO, "Connected to: {0}", addr);
 			updateServiceDiscoveryItem(addr, addr, XMLNS + " connected", true);
@@ -877,11 +889,11 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		// ++packetsSent;
 		String ip = p.getTo().getDomain();
 
-		try {
-			ip = DNSResolver.getHostIP(p.getTo().getDomain());
-		} catch (UnknownHostException ex) {
-			ip = p.getTo().getDomain();
-		}
+//		try {
+//			ip = DNSResolver.getHostIP(p.getTo().getDomain());
+//		} catch (UnknownHostException ex) {
+//			ip = p.getTo().getDomain();
+//		}
 
 		int code = Math.abs(hashCodeForPacket(p));
 		CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(ip);
