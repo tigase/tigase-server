@@ -442,7 +442,3 @@ public class RosterElement {
 		this.persistent = persistent;
 	}
 }
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
