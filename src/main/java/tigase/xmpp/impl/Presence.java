@@ -67,15 +67,16 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.xmpp.BareJID;
 
 //~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class Presence here.
- * 
- * 
+ *
+ *
  * Created: Wed Feb 22 07:30:03 2006
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -122,8 +123,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param jid
 	 * @param session
 	 */
@@ -146,7 +147,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	/**
 	 * <code>sendPresenceBroadcast</code> method broadcasts given presence to all
 	 * buddies from roster and to all users to which direct presence was sent.
-	 * 
+	 *
 	 * @param session
 	 *          a <code>XMPPResourceConnection</code> value
 	 * @param results
@@ -211,8 +212,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param jid
 	 * @param session
 	 */
@@ -229,10 +230,14 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 		}
 	}
 
+	public static void sendPresence(StanzaType t, BareJID from, BareJID to, Queue<Packet> results, Element pres) {
+		sendPresence( t, JID.jidInstance( from ), JID.jidInstance( to ), results, pres);
+	}
+
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param t
 	 * @param from
 	 * @param to
@@ -312,7 +317,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	/**
 	 * <code>sendPresenceBroadcast</code> method broadcasts given presence to all
 	 * buddies from roster and to all users to which direct presence was sent.
-	 * 
+	 *
 	 * @param t
 	 *          a <code>StanzaType</code> value
 	 * @param session
@@ -375,7 +380,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	 * availability presence, subscription presence and so on... Initial presences
 	 * are however sent only to those resources which already have sent initial
 	 * presence.
-	 * 
+	 *
 	 * @param presence
 	 *          an <code>Element</code> presence received from other users, we
 	 *          have to change 'to' attribute to full resource JID.
@@ -435,7 +440,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	 * <strong>other</strong> resources presence stanza from one user resource. So
 	 * if new resource connects this method updates presence information about new
 	 * resource to old resources and about old resources to new resource.
-	 * 
+	 *
 	 * @param presence
 	 *          an <code>Element</code> presence received from other users, we
 	 *          have to change 'to' attribute to full resource JID.
@@ -541,7 +546,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	/**
 	 * <code>updateOfflineChange</code> method broadcast off-line presence to all
 	 * other user active resources.
-	 * 
+	 *
 	 * @param session
 	 *          a <code>XMPPResourceConnection</code> value
 	 * @param results
@@ -611,7 +616,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	/**
 	 * <code>sendPresenceBroadcast</code> method broadcasts given presence to all
 	 * budies from roster and to all users to which direct presence was sent.
-	 * 
+	 *
 	 * @param session
 	 *          a <code>XMPPResourceConnection</code> value
 	 * @param results
@@ -693,8 +698,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -704,8 +709,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -715,10 +720,10 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param settings
-	 * 
+	 *
 	 * @throws TigaseDBException
 	 */
 	@Override
@@ -730,14 +735,14 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param packet
 	 * @param session
 	 * @param repo
 	 * @param results
 	 * @param settings
-	 * 
+	 *
 	 * @throws XMPPException
 	 */
 	@SuppressWarnings({ "unchecked", "fallthrough" })
@@ -913,7 +918,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 						}
 
 						processInProbe(packet, session, results, settings, pres_type);
-						buddyOnline(session, packet.getStanzaFrom(), results);
+						// this is actually already handled in processInProbe
+						// buddyOnline(session, packet.getStanzaFrom(), results);
 
 						break;
 
@@ -943,11 +949,11 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param session
 	 * @param results
-	 * 
+	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
@@ -974,7 +980,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * <code>stopped</code> method is called when user disconnects or logs-out.
-	 * 
+	 *
 	 * @param session
 	 *          a <code>XMPPResourceConnection</code> value
 	 * @param results
@@ -1018,8 +1024,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -1029,8 +1035,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -1161,27 +1167,6 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 			buddy_subscr = SubscriptionType.none;
 		} // end of if (buddy_subscr == null)
 
-		switch (buddy_subscr) {
-			case none:
-			case none_pending_out:
-			case to:
-				results.offer(Authorization.FORBIDDEN.getResponseMessage(packet,
-						"Presence information is forbidden.", false));
-
-				break;
-
-			case none_pending_in:
-			case none_pending_out_in:
-			case to_pending_in:
-				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-						"You are not authorized to get presence information.", false));
-
-				break;
-
-			default:
-				break;
-		} // end of switch (buddy_subscr)
-
 		if (roster_util.isSubscribedFrom(buddy_subscr)) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Received probe, setting buddy: {0} as online.",
@@ -1212,6 +1197,19 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 					// notification.
 				}
 			}
+		}
+		// acording to spec 4.3.2.  Server Processing of Inbound Presence Probe
+		// http://xmpp.org/rfcs/rfc6121.html#presence-probe-inbound
+		// If the user's bare JID is in the contact's roster with a subscription state other
+		// than "From", "From + Pending Out", or "Both", then the contact's server
+		// SHOULD return a presence stanza of type "unsubscribed"
+		else
+		{
+			if ( log.isLoggable( Level.FINEST ) ) {
+				log.log( Level.FINEST, "Received probe, users bare JID: {0} is not in the roster. Responding with unsubscribed",
+						 packet.getStanzaFrom().getBareJID() );
+			}
+			sendPresence( StanzaType.unsubscribed, session.getBareJID(), packet.getStanzaFrom().getBareJID(), results, null );
 		} // end of if (roster_util.isSubscribedFrom(session, packet.getElemFrom()))
 	}
 

@@ -437,8 +437,8 @@ public abstract class RosterAbstract {
 	 *
 	 */
 	public enum PresenceType {
-		out_initial, out_subscribe, out_unsubscribe, out_subscribed, out_unsubscribed, in_initial,
-		in_subscribe, in_unsubscribe, in_subscribed, in_unsubscribed, in_probe, error;
+		out_initial, out_subscribe, out_unsubscribe, out_subscribed, out_unsubscribed, out_probe,
+		in_initial, in_subscribe, in_unsubscribe, in_subscribed, in_unsubscribed, in_probe, error;
 	}
 
 	//~--- static initializers --------------------------------------------------
@@ -824,6 +824,9 @@ public abstract class RosterAbstract {
 			}    // end of if (type == StanzaType.unsubscribed)
 
 			// StanzaType.probe is invalid here....
+			//if (type == StanzaType.probe) {
+			//	return PresenceType.out_probe;
+			//}    // if (type == StanzaType.probe)
 		}      // end of if (to == null || to.equals(session.getUserId()))
 
 		if ((to != null) && session.isUserId(to)) {
