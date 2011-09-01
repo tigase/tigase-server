@@ -838,7 +838,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 					List<Element> err_el = packet.getElement().getChildren("/iq/command");
 					boolean moreToSend = false;
 					if (err_el != null && err_el.size() > 0) {
-						streamClose = err_el.get(0).toString() + streamClose;
+						streamClose = "<stream:error>" + err_el.get(0).toString() 
+                                                        + "</stream:error>" + streamClose;
 						moreToSend = true;
 					}
 					try {
