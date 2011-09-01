@@ -211,6 +211,11 @@ public class VHostJDBCRepository extends UserRepoRepository<VHostItem> {
 	 */
 	@Override
 	public String validateItem(VHostItem item) {
+                if (item.getVhost() == null || item.getVhost().getDomain() == null
+                                || item.getVhost().getDomain().isEmpty() ) {
+                        return "Domain name not specified";
+                }
+                
 		int vhost_count = 0;
 
 		for (VHostItem it : allItems()) {

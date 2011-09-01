@@ -296,7 +296,10 @@ public class VHostItem extends RepositoryItemAbstract {
 	@Override
 	public void initFromCommand(Packet packet) {
 		super.initFromCommand(packet);
-		vhost = JID.jidInstanceNS(Command.getFieldValue(packet, HOSTNAME_LABEL));
+                String domain = Command.getFieldValue(packet, HOSTNAME_LABEL);
+                if (domain == null)
+                        domain = "";
+                vhost = JID.jidInstanceNS(domain);
 		enabled = Command.getCheckBoxFieldValue(packet, ENABLED_LABEL);
 		anonymousEnabled = Command.getCheckBoxFieldValue(packet, ANONYMOUS_ENABLED_LABEL);
 		registerEnabled = Command.getCheckBoxFieldValue(packet, REGISTER_ENABLED_LABEL);
