@@ -530,8 +530,26 @@ public class JabberIqPrivacy extends XMPPProcessor
 					child.setAttribute(NAME, "default");
 				}    // end of if (name == null || name.length() == 0)
 
-				Privacy.addList(session, child);
-				results.offer(packet.okResult((String) null, 0));
+                                List<Element> items = child.getChildren();
+                                if (items == null || items.isEmpty()) {
+                                        boolean inUse = name.equals(getDefaultList(session));
+                                        if (!inUse) {
+                                                for (XMPPResourceConnection activeSession : session.getActiveSessions()) {
+                                                        inUse |= name.equals(Privacy.getActiveList(session));
+                                                }
+                                        }
+                                        if (inUse) {                        
+                                                results.offer(Authorization.CONFLICT.getResponseMessage(packet, null, true));                                                
+                                        }
+                                        else {
+                                                Privacy.removeList(session, child);
+                				results.offer(packet.okResult((String) null, 0));                                                
+                                        }
+                                }
+                                else {
+                                        Privacy.addList(session, child);
+        				results.offer(packet.okResult((String) null, 0));
+                                }
 			}      // end of if (child.getName().equals("list))
 
 			if (child.getName() == DEFAULT_EL_NAME) {

@@ -114,7 +114,28 @@ public class Privacy {
 		session.setData(lNode, PRIVACY_LIST, list.toString());
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param list
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public static void removeList(XMPPResourceConnection session, Element list)
+			throws NotAuthorizedException, TigaseDBException {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Removing privacy list: {0}", list);
+		}
+                
+		String lNode = listNode(list.getAttribute(NAME));
+
+		session.removeData(lNode, PRIVACY_LIST);
+	}
+
+        //~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -334,7 +355,7 @@ public class Privacy {
 	 */
 	public static void setDefaultList(XMPPResourceConnection session, Element list)
 			throws NotAuthorizedException, TigaseDBException {
-		if (list.getAttribute(NAME) != null) {
+		if (list != null && list.getAttribute(NAME) != null) {
 			session.setData(PRIVACY, DEFAULT, list.getAttribute(NAME));
 		} else {
 			session.removeData(PRIVACY, DEFAULT);
