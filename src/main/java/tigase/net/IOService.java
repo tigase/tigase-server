@@ -514,7 +514,15 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 	 * @param props
 	 */
 	public void setSessionData(Map<String, Object> props) {
-		sessionData = new ConcurrentHashMap<String, Object>(props);
+		// Sometimes, some values are null which is allowed in the original Map
+		// however, ConcurrentHashMap does not allow nulls as value so we have
+		// to copy Maps carefully.
+		sessionData = new ConcurrentHashMap<String, Object>(props.size());
+		for (Map.Entry<String, Object> entry: props.entrySet()) {
+			if (entry.getValue() != null) {
+				sessionData.put(entry.getKey(), entry.getValue());
+			}
+		}
 		connectionType =
 				ConnectionType.valueOf(sessionData.get(PORT_TYPE_PROP_KEY).toString());
 	}
