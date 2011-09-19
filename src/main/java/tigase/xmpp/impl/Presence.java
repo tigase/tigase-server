@@ -773,7 +773,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 				PresenceType pres_type = roster_util.getPresenceType(session, packet);
 
 				if (pres_type == null) {
-					log.log(Level.WARNING, "Invalid presence found: {0}", packet);
+					log.log(Level.INFO, "Invalid presence found: {0}", packet);
 
 					return;
 				} // end of if (type == null)
