@@ -307,7 +307,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 			results.offer(packet);
 		} catch (TigaseStringprepException ex) {
-			log.log(Level.WARNING,
+			log.log(Level.FINE,
 					"Packet stringprep addressing problem, skipping presence send: {0}", presence);
 		}
 
