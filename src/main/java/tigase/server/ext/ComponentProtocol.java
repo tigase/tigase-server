@@ -677,7 +677,7 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 		// Activate all connections for which parameters are defined in the
 		// repository
 		for (CompRepoItem repoItem : repo) {
-			log.info("Loaded repoItem: " + repoItem.toString());
+			log.config("Loaded repoItem: " + repoItem.toString());
 
 			if (repoItem.getPort() > 0) {
 				String[] remote_host = PORT_IFC_PROP_VAL;
@@ -715,7 +715,7 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 					port_props.put(PORT_IFC_PROP_KEY, new String[] { r_host });
 					port_props.put(MAX_RECONNECTS_PROP_KEY, (int) (120 * MINUTE));
 					port_props.put(REPO_ITEM_KEY, repoItem);
-					log.info("Starting connection: " + port_props);
+					log.config("Starting connection: " + port_props);
 					addWaitingTask(port_props);
 				}
 			}
