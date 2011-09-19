@@ -823,6 +823,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 	}
 
 	private void startService(Map<String, Object> port_props) {
+		if (port_props == null) {
+			throw new NullPointerException("port_props cannot be null.");
+		}
 		ConnectionListenerImpl cli = new ConnectionListenerImpl(port_props);
 
 		if (cli.getConnectionType() == ConnectionType.accept) {
