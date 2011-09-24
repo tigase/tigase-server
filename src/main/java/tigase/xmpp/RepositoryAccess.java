@@ -586,7 +586,7 @@ public abstract class RepositoryAccess {
 
 			return authState;
 		} catch (UserNotFoundException e) {
-			log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
+			log.log(Level.FINEST, "User not found: ", e);
 
 			throw new NotAuthorizedException("Authorization failed", e);
 
