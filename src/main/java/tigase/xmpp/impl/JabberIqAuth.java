@@ -236,6 +236,10 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 
 					} catch (Exception e) {
 						log.info("Authentication failed: " + user_name);
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "Authorization exception: ", e);
+						}
+
 						Packet response =
 								Authorization.NOT_AUTHORIZED.getResponseMessage(packet, e.getMessage(),
 										false);
