@@ -57,6 +57,7 @@ public class BoshIOService extends XMPPIOService<Object> {
 	 * Variable <code>log</code> is a class logger.
 	 */
 	private static final Logger log = Logger.getLogger(BoshIOService.class.getName());
+	public static final String BOSH_CLOSE_CONNECTION_PROP_KEY = "bosh-close-connection";
 	public static final String BOSH_EXTRA_HEADERS_FILE_PROP_KEY = "bosh-extra-headers-file";
 	public static final String BOSH_EXTRA_HEADERS_FILE_PROP_VAL =
 			"etc/bosh-extra-headers.txt";
@@ -75,8 +76,13 @@ public class BoshIOService extends XMPPIOService<Object> {
 	private long rid = -1;
 	private UUID sid = null;
 
+	private static Boolean closeConnections;
+	
 	public BoshIOService() {
 		super();
+		if (closeConnections == null) {
+			closeConnections = Boolean.parseBoolean(System.getProperty(BOSH_CLOSE_CONNECTION_PROP_KEY, "false"));
+		}
 		if (extra_headers == null) {
 			String file_name =
 					System.getProperty(BOSH_EXTRA_HEADERS_FILE_PROP_KEY,
@@ -235,6 +241,8 @@ public class BoshIOService extends XMPPIOService<Object> {
 		} else {
 			super.writeRawData(data);
 		}
+		if (closeConnections)
+			stop();
 	}
 }
 
