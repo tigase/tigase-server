@@ -24,6 +24,7 @@ package tigase.server.bosh;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.io.IOException;
 import tigase.server.Command;
 import tigase.server.Packet;
 

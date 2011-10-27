@@ -119,6 +119,11 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 		packet.setPacketTo(bs.getDataReceiver());
 		packet.initVars(packet.getPacketFrom(), packet.getPacketTo());
 
+                bs.close();
+                if (log.isLoggable(Level.FINEST))
+                        log.finest("closing BOSH session with sid = "+bs.getSid().toString());
+                sessions.remove(bs.getSid());
+                
 		return addOutPacketWithTimeout(packet, stoppedHandler, 15l, TimeUnit.SECONDS);
 	}
 
