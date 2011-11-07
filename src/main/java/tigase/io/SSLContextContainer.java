@@ -258,28 +258,6 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 
 	}
 
-	// ~--- methods
-	// --------------------------------------------------------------
-
-	private String getCertAlias(X509Certificate cert, File file) {
-		String name = CertificateUtil.getCertCName(cert);
-
-		if (name != null) {
-			return name;
-		}
-
-		// Cannot get alias from certificate, let's try to get it from file name
-		if (file != null) {
-			String alias = file.getName();
-			if (alias.endsWith(".pem"))
-				alias = alias.substring(0, alias.length() - 4);
-			return alias;
-		}
-
-		return cert.getSerialNumber().toString();
-
-	}
-
 	// ~--- inner classes
 	// --------------------------------------------------------
 
