@@ -166,22 +166,25 @@ public class JavaJMXProxyOpt implements NotificationListener {
 						MBeanServerInvocationHandler.newProxyInstance(server, obn,
 								StatisticsProviderMBean.class, false);
 
-				if (loadHistory) {
-					String[] metrics_arr = metrics.toArray(new String[metrics.size()]);
-					history = tigBean.getStatsHistory(metrics_arr);
-					System.out.println(hostname
-							+ " loaded history, size: "
-							+ (history != null && history.get(metrics_arr[0]) != null ? history.get(
-									metrics_arr[0]).size() : "null"));
-				} else {
-					System.out.println(hostname + " loading history switched off.");
-				}
 				if (history == null) {
-					history = new LinkedHashMap<String, LinkedList<Object>>();
-					for (String m : metrics) {
-						LinkedList<Object> list = new LinkedList<Object>();
-						history.put(m, list);
+					if (loadHistory) {
+						String[] metrics_arr = metrics.toArray(new String[metrics.size()]);
+						history = tigBean.getStatsHistory(metrics_arr);
+						System.out.println(hostname
+								+ " loaded history, size: "
+								+ (history != null && history.get(metrics_arr[0]) != null ? history.get(
+										metrics_arr[0]).size() : "null"));
+					} else {
+						System.out.println(hostname + " loading history switched off.");
+						history = new LinkedHashMap<String, LinkedList<Object>>();
+						for (String m : metrics) {
+							LinkedList<Object> list = new LinkedList<Object>();
+							history.put(m, list);
+							
+						}
 					}
+				} else {
+					System.out.println(hostname + " history already loaded, skipping.");
 				}
 
 				for (JMXProxyListenerOpt jMXProxyListener : listeners) {
@@ -274,7 +277,7 @@ public class JavaJMXProxyOpt implements NotificationListener {
 
 						log.log(Level.WARNING, "{0}, {1}, retrying in {2} seconds.", new Object[] {
 								cause.getMessage(), hostname, interval / 1000 });
-						//log.log(Level.FINEST, e.getMessage(), e);
+						// log.log(Level.FINEST, e.getMessage(), e);
 					} catch (Exception e) {
 						log.log(Level.WARNING, "Problem retrieving statistics: ", e);
 					}
