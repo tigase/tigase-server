@@ -23,6 +23,7 @@
 package tigase.stats;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -73,6 +74,7 @@ public class JavaJMXProxyOpt implements NotificationListener {
 	private StatisticsProviderMBean tigBean = null;
 	private MBeanServerConnection server = null;
 	private StatisticsUpdater updater = null;
+	private Date lastDisconnectTime = null;
 
 	private int cpuNo = 0;
 
@@ -180,7 +182,7 @@ public class JavaJMXProxyOpt implements NotificationListener {
 						for (String m : metrics) {
 							LinkedList<Object> list = new LinkedList<Object>();
 							history.put(m, list);
-							
+
 						}
 					}
 				} else {
@@ -202,6 +204,7 @@ public class JavaJMXProxyOpt implements NotificationListener {
 		if (notification.getType().equals(JMXConnectionNotification.CLOSED)) {
 			server = null;
 			tigBean = null;
+			lastDisconnectTime = new Date();
 
 			for (JMXProxyListenerOpt jMXProxyListener : listeners) {
 				jMXProxyListener.disconnected(id);
@@ -257,7 +260,8 @@ public class JavaJMXProxyOpt implements NotificationListener {
 
 		private StatisticsUpdater() {
 			updateTimer = new Timer("stats-updater", true);
-			updateTimer.scheduleAtFixedRate(new TimerTask() {
+			// updateTimer.scheduleAtFixedRate(new TimerTask() {
+			updateTimer.schedule(new TimerTask() {
 				@Override
 				public void run() {
 					try {
@@ -275,8 +279,18 @@ public class JavaJMXProxyOpt implements NotificationListener {
 							cause = cause.getCause();
 						}
 
-						log.log(Level.WARNING, "{0}, {1}, retrying in {2} seconds.", new Object[] {
-								cause.getMessage(), hostname, interval / 1000 });
+						String disconnected = "";
+						if (lastDisconnectTime != null) {
+							long disconnectedInterval =
+									(System.currentTimeMillis() - lastDisconnectTime.getTime())
+											/ (1000 * 60);
+							disconnected =
+									", disconnected: " + lastDisconnectTime + ", " + disconnectedInterval
+											+ " minutes ago.";
+						}
+
+						log.log(Level.WARNING, "{0}, {1}, retrying in {2} seconds{3}", new Object[] {
+								cause.getMessage(), hostname, interval / 1000, disconnected });
 						// log.log(Level.FINEST, e.getMessage(), e);
 					} catch (Exception e) {
 						log.log(Level.WARNING, "Problem retrieving statistics: ", e);
