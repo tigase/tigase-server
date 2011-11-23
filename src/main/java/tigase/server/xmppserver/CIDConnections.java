@@ -631,16 +631,20 @@ public class CIDConnections {
 			outgoingOpenTasks.schedule(new TimerTask() {
 				@Override
 				public void run() {
+                                        boolean result = false;
 					try {
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST,
 									"Running scheduled task for openning a new connection for: {0}", cid);
 						}
 
-						openOutgoingConnections();
+						result = openOutgoingConnections();
 					} catch (Exception e) {
 						log.log(Level.WARNING, "uncaughtException in the connection opening thread: ", e);
 					} finally {}
+                                        if (!result) {
+                                                outgoingOpenInProgress.set(false);
+                                        }
 				}
 			}, 0);
 		} else {
@@ -696,7 +700,8 @@ public class CIDConnections {
 		handler.initNewConnection(port_props);
 	}
 
-	private void openOutgoingConnections() {
+	private boolean openOutgoingConnections() {
+                boolean result = false;
 		try {
 
 			// Check whether all active connections are still active
@@ -718,7 +723,7 @@ public class CIDConnections {
 					log.log(Level.FINEST, "S2S Timeout expired, sending back: {0}", waitingPackets);
 				}
 
-				return;
+				return result;
 			}
 
 			int all_outgoing = outgoing.size() + outgoing_handshaking.size();
@@ -729,7 +734,7 @@ public class CIDConnections {
 							"Exceeded max number of outgoing connections, not doing anything: {0}", all_outgoing);
 				}
 
-				return;
+				return result;
 			}
 
 			if (log.isLoggable(Level.FINEST)) {
@@ -759,22 +764,25 @@ public class CIDConnections {
 						throw new UnknownHostException("DNS misconfiguration for domain: "
 								+ cid.getRemoteHost());
 					}
-
+                                        
 					// Create a new connection
 					S2SConnection s2s_conn = new S2SConnection(handler, dNSEntry.getIp());
 					Map<String, Object> port_props = new TreeMap<String, Object>();
 
 					initNewConnection(dNSEntry.getIp(), dNSEntry.getPort(), s2s_conn, port_props);
 
+                                        result = true;
+                                        
 					if (++all_outgoing >= max_out_conns) {
-						return;
+						return result;
 					}
 				}
 			}
 		} catch (UnknownHostException ex) {
 			log.log(Level.INFO, "Remote host not found: " + cid.getRemoteHost() + ", for: " + cid, ex);
-			sendPacketsBack();
+			sendPacketsBack();                        
 		}
+                return result;
 	}
 
 	private void sendPacketsBack() {
