@@ -64,6 +64,11 @@ public class RosterElement {
 	private static final String GRP_ATT = "groups";
 	private static final String OTHER_ATT = "other";
 	private static final String STRINGPREP_ATT = "preped";
+	private static final String ACTIVITY_ATT = "activity";
+	private static final String WEIGHT_ATT = "weight";
+
+	private static final double INITIAL_ACTIVITY_VAL = 1d;
+	private static final double INITIAL_WEIGHT_VAL = 1d;
 
 	// ~--- fields ---------------------------------------------------------------
 
@@ -71,6 +76,8 @@ public class RosterElement {
 	private JID jid = null;
 	private String name = null;
 	private String otherData = null;
+	private double activity = INITIAL_ACTIVITY_VAL;
+	private double weight = INITIAL_WEIGHT_VAL;
 	private XMPPResourceConnection session = null;
 	private String stringpreped = null;
 	private SubscriptionType subscription = null;
@@ -78,7 +85,7 @@ public class RosterElement {
 	private Map<String, Boolean> onlineMap = new HashMap<String, Boolean>();
 
 	// private Element item = null;
-	//private boolean online = false;
+	// private boolean online = false;
 	private boolean modified = false;
 	private boolean persistent = true;
 
@@ -118,6 +125,27 @@ public class RosterElement {
 			if ((other_data != null) && !other_data.trim().isEmpty()) {
 				otherData = other_data;
 			}
+
+			String num_str = roster_el.getAttribute(ACTIVITY_ATT);
+			if (num_str != null) {
+				try {
+					activity = Double.parseDouble(num_str);
+					log.warning("Incorrect activity field: " + num_str);
+				} catch (NumberFormatException nfe) {
+					activity = INITIAL_ACTIVITY_VAL;
+				}
+			}
+
+			num_str = roster_el.getAttribute(WEIGHT_ATT);
+			if (num_str != null) {
+				try {
+					weight = Double.parseDouble(num_str);
+					log.warning("Incorrect activity field: " + num_str);
+				} catch (NumberFormatException nfe) {
+					weight = INITIAL_WEIGHT_VAL;
+				}
+			}
+
 		} else {
 			log.warning("Incorrect roster data: " + roster_el.toString());
 		}
@@ -242,6 +270,9 @@ public class RosterElement {
 		if (otherData != null) {
 			elem.setAttribute(OTHER_ATT, otherData);
 		}
+
+		elem.setAttribute(ACTIVITY_ATT, Double.toString(activity));
+		elem.setAttribute(WEIGHT_ATT, Double.toString(weight));
 
 		modified = false;
 
@@ -441,4 +472,41 @@ public class RosterElement {
 	public void setPersistent(boolean persistent) {
 		this.persistent = persistent;
 	}
+
+	/**
+	 * @return the activity
+	 */
+	public double getActivity() {
+		return activity;
+	}
+
+	/**
+	 * @param activity
+	 *          the activity to set
+	 */
+	public void setActivity(double activity) {
+		this.activity = activity;
+		if (activity != 0) {
+			weight = 1 / activity;
+		}
+		modified = true;
+	}
+
+	/**
+	 * @return the weight
+	 */
+	public double getWeight() {
+		return weight;
+	}
+
+	/**
+	 * @param weight
+	 *          the weight to set
+	 */
+	public void setWeight(double weight) {
+		this.weight = weight;
+		modified = true;
+
+	}
+
 }
