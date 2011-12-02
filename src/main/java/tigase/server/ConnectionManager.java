@@ -1039,6 +1039,13 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 					// Sleep...
 					Thread.sleep(10 * MINUTE);
 					++watchdogRuns;
+					// This variable used to provide statistics gets off on a busy
+					// services as it is handled in methods called concurrently by 
+					// many threads. While accuracy of this variable is not critical
+					// for the server functions, statistics should be as accurate as
+					// possible to provide valuable metrics data.
+					// So in the watchdog thread we re-synchronize this number
+					services_size = services.size();
 
 					// Walk through all connections and check whether they are
 					// really alive...., try to send space for each service which
