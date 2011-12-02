@@ -35,6 +35,7 @@ public enum Priority {
 	HIGH,
 	NORMAL,
 	LOW,
-	PRESENCE;
+	PRESENCE,
+	LOWEST;
 
 }
