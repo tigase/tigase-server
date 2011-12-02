@@ -28,7 +28,9 @@ import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 
 import tigase.server.Packet;
+import tigase.server.Priority;
 
+import tigase.stats.StatisticsList;
 import tigase.sys.TigaseRuntime;
 
 import tigase.util.TigaseStringprepException;
@@ -73,10 +75,10 @@ import tigase.xmpp.BareJID;
 
 /**
  * Describe class Presence here.
- *
- *
+ * 
+ * 
  * Created: Wed Feb 22 07:30:03 2006
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -96,6 +98,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	/** Field description */
 	public static final String SKIP_OFFLINE_PROP_KEY = "skip-offline";
 	protected static final String XMLNS = CLIENT_XMLNS;
+	public static final String USERS_STATUS_CHANGES = "Users status changes";
 
 	/**
 	 * Private logger for class instance.
@@ -114,17 +117,19 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	/** Field description */
 	public static final String OFFLINE_BUD_SENT = "offline-bud-sent";
 	private static boolean skipOffline = false;
+	private static int HIGH_PRIORITY_PRESENCES_NO = 10;
 
 	// ~--- fields ---------------------------------------------------------------
 
 	protected RosterAbstract roster_util = getRosterUtil();
+	private long usersStatusChanges = 0;
 
 	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param jid
 	 * @param session
 	 */
@@ -147,7 +152,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	/**
 	 * <code>sendPresenceBroadcast</code> method broadcasts given presence to all
 	 * buddies from roster and to all users to which direct presence was sent.
-	 *
+	 * 
 	 * @param session
 	 *          a <code>XMPPResourceConnection</code> value
 	 * @param results
@@ -212,8 +217,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param jid
 	 * @param session
 	 */
@@ -230,23 +235,25 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 		}
 	}
 
-	public static void sendPresence(StanzaType t, BareJID from, BareJID to, Queue<Packet> results, Element pres) {
-		sendPresence( t, JID.jidInstance( from ), JID.jidInstance( to ), results, pres);
+	public static void sendPresence(StanzaType t, BareJID from, BareJID to,
+			Queue<Packet> results, Element pres) {
+		sendPresence(t, JID.jidInstance(from), JID.jidInstance(to), results, pres);
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param t
 	 * @param from
 	 * @param to
 	 * @param results
 	 * @param pres
 	 */
-	public static void sendPresence(StanzaType t, JID from, JID to, Queue<Packet> results,
-			Element pres) {
+	public static Packet sendPresence(StanzaType t, JID from, JID to,
+			Queue<Packet> results, Element pres) {
 		Element presence = null;
+		Packet result = null;
 
 		if (pres == null) {
 			presence = new Element(PRESENCE_ELEMENT_NAME);
@@ -299,25 +306,26 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 		try {
 
 			// Connection IDs are not available so let's send it a normal way
-			Packet packet = Packet.packetInstance(presence);
+			result = Packet.packetInstance(presence);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Sending presence info: {0}", packet);
+				log.log(Level.FINEST, "Sending presence info: {0}", result);
 			}
 
-			results.offer(packet);
+			results.offer(result);
 		} catch (TigaseStringprepException ex) {
 			log.log(Level.FINE,
 					"Packet stringprep addressing problem, skipping presence send: {0}", presence);
 		}
 
 		// }
+		return result;
 	}
 
 	/**
 	 * <code>sendPresenceBroadcast</code> method broadcasts given presence to all
 	 * buddies from roster and to all users to which direct presence was sent.
-	 *
+	 * 
 	 * @param t
 	 *          a <code>StanzaType</code> value
 	 * @param session
@@ -339,6 +347,9 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 			Map<String, Object> settings, RosterAbstract roster_util)
 			throws NotAuthorizedException, TigaseDBException {
 
+		// Direct presence if any should be sent first
+		broadcastDirectPresences(t, session, results, pres);
+
 		// String from = session.getJID();
 		// String[] buddies = roster_util.getBuddies(session, subscrs, onlineOnly);
 		RosterAbstract roster = roster_util;
@@ -355,9 +366,16 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Buddies found: " + Arrays.toString(buddies));
 			}
+			Priority pack_priority = Priority.PRESENCE;
+			int pres_cnt = 0;
 			for (JID buddy : buddies) {
 				if (requiresPresenceSending(roster, buddy, session)) {
-					sendPresence(t, session.getJID(), buddy, results, pres);
+					Packet pack = sendPresence(t, session.getJID(), buddy, results, pres);
+					if (pres_cnt == HIGH_PRIORITY_PRESENCES_NO) {
+						++pres_cnt;
+						pack_priority = Priority.LOWEST;
+					}
+					pack.setPriority(pack_priority);
 					roster.setPresenceSent(session, buddy, true);
 				} else {
 					if (log.isLoggable(Level.FINEST)) {
@@ -371,7 +389,6 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 			}
 		}
 
-		broadcastDirectPresences(t, session, results, pres);
 	}
 
 	/**
@@ -380,7 +397,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	 * availability presence, subscription presence and so on... Initial presences
 	 * are however sent only to those resources which already have sent initial
 	 * presence.
-	 *
+	 * 
 	 * @param presence
 	 *          an <code>Element</code> presence received from other users, we
 	 *          have to change 'to' attribute to full resource JID.
@@ -435,12 +452,18 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 		} // end of for (XMPPResourceConnection conn: sessions)
 	}
 
+	@Override
+	public void getStatistics(StatisticsList list) {
+		super.getStatistics(list);
+		list.add(id(), USERS_STATUS_CHANGES, usersStatusChanges, Level.INFO);
+	}
+
 	/**
 	 * <code>updateUserResources</code> method is used to broadcast to all
 	 * <strong>other</strong> resources presence stanza from one user resource. So
 	 * if new resource connects this method updates presence information about new
 	 * resource to old resources and about old resources to new resource.
-	 *
+	 * 
 	 * @param presence
 	 *          an <code>Element</code> presence received from other users, we
 	 *          have to change 'to' attribute to full resource JID.
@@ -522,7 +545,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 					log.log(Level.FINEST, "Updating direct presence for: {0}", buddy);
 				}
 
-				sendPresence(t, session.getJID(), buddy, results, pres);
+				Packet pack = sendPresence(t, session.getJID(), buddy, results, pres);
+				pack.setPriority(Priority.LOW);
 			} // end of for (String buddy: buddies)
 		} // end of if (direct_presence != null)
 	}
@@ -546,7 +570,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	/**
 	 * <code>updateOfflineChange</code> method broadcast off-line presence to all
 	 * other user active resources.
-	 *
+	 * 
 	 * @param session
 	 *          a <code>XMPPResourceConnection</code> value
 	 * @param results
@@ -616,7 +640,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	/**
 	 * <code>sendPresenceBroadcast</code> method broadcasts given presence to all
 	 * budies from roster and to all users to which direct presence was sent.
-	 *
+	 * 
 	 * @param session
 	 *          a <code>XMPPResourceConnection</code> value
 	 * @param results
@@ -679,7 +703,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 		} // end of if (buddies == null)
 
 		// TODO: It might be a marginal number of cases here but just make it clear
-		// we send a presence here regardles
+		// we send a presence here regardless
 		JID[] buddies_from = roster_util.getBuddies(session, SUB_FROM);
 
 		if (buddies_from != null) {
@@ -698,8 +722,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -709,8 +733,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -720,10 +744,10 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param settings
-	 *
+	 * 
 	 * @throws TigaseDBException
 	 */
 	@Override
@@ -735,14 +759,14 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param session
 	 * @param repo
 	 * @param results
 	 * @param settings
-	 *
+	 * 
 	 * @throws XMPPException
 	 */
 	@SuppressWarnings({ "unchecked", "fallthrough" })
@@ -949,11 +973,11 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param session
 	 * @param results
-	 *
+	 * 
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
@@ -980,7 +1004,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * <code>stopped</code> method is called when user disconnects or logs-out.
-	 *
+	 * 
 	 * @param session
 	 *          a <code>XMPPResourceConnection</code> value
 	 * @param results
@@ -1024,8 +1048,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -1035,8 +1059,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -1198,18 +1222,21 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 				}
 			}
 		}
-		// acording to spec 4.3.2.  Server Processing of Inbound Presence Probe
+		// acording to spec 4.3.2. Server Processing of Inbound Presence Probe
 		// http://xmpp.org/rfcs/rfc6121.html#presence-probe-inbound
-		// If the user's bare JID is in the contact's roster with a subscription state other
+		// If the user's bare JID is in the contact's roster with a subscription
+		// state other
 		// than "From", "From + Pending Out", or "Both", then the contact's server
 		// SHOULD return a presence stanza of type "unsubscribed"
-		else
-		{
-			if ( log.isLoggable( Level.FINEST ) ) {
-				log.log( Level.FINEST, "Received probe, users bare JID: {0} is not in the roster. Responding with unsubscribed",
-						 packet.getStanzaFrom().getBareJID() );
+		else {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(
+						Level.FINEST,
+						"Received probe, users bare JID: {0} is not in the roster. Responding with unsubscribed",
+						packet.getStanzaFrom().getBareJID());
 			}
-			sendPresence( StanzaType.unsubscribed, session.getBareJID(), packet.getStanzaFrom().getBareJID(), results, null );
+			sendPresence(StanzaType.unsubscribed, session.getBareJID(), packet.getStanzaFrom()
+					.getBareJID(), results, null);
 		} // end of if (roster_util.isSubscribedFrom(session, packet.getElemFrom()))
 	}
 
@@ -1362,6 +1389,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 				addDirectPresenceJID(packet.getStanzaTo(), session);
 			}
 		} else {
+			++usersStatusChanges;
 			boolean first = false;
 
 			if (session.getPresence() == null) {
