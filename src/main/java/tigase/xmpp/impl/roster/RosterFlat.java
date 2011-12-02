@@ -38,6 +38,8 @@ import tigase.xmpp.XMPPResourceConnection;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -267,6 +269,8 @@ public class RosterFlat extends RosterAbstract {
 		for (RosterElement rosterElement : roster.values()) {
 			result[idx++] = rosterElement.getJid();
 		}
+		// TODO: this sorting should be optional as it may impact performance
+		Arrays.sort(result, new RosterElemComparator(roster));
 
 		return result;
 
@@ -750,6 +754,27 @@ public class RosterFlat extends RosterAbstract {
 	// }
 	// return false;
 	// }
+	
+	private class RosterElemComparator implements Comparator<JID> {
+
+		private Map<BareJID, RosterElement> roster = null;
+		
+		private RosterElemComparator(Map<BareJID, RosterElement> roster) {
+			this.roster = roster;
+		}
+		
+		/* (non-Javadoc)
+		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+		 */
+		@Override
+		public int compare(JID arg0, JID arg1) {
+      double w0 = roster.get(arg0.getBareJID()).getWeight();
+      double w1 = roster.get(arg1.getBareJID()).getWeight();
+			return Double.compare(w0, w1);
+		}
+		
+	}
+	
 } // RosterFlat
 
 // ~ Formatted in Sun Code Convention
