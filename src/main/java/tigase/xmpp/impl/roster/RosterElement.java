@@ -55,8 +55,7 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class RosterElement {
-	private static final Logger log = Logger
-			.getLogger("tigase.xmpp.impl.roster.RosterElement");
+	private static final Logger log = Logger.getLogger(RosterElement.class.getName());
 	private static final String ELEM_NAME = "contact";
 	private static final String JID_ATT = "jid";
 	private static final String NAME_ATT = "name";
