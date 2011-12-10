@@ -89,6 +89,14 @@ public class CIDConnections {
 			new ConcurrentLinkedQueue<Packet>();
 
 	// ~--- constructors ---------------------------------------------------------
+	
+	public void resetOutgoingInProgress() {
+		outgoingOpenInProgress.set(false);
+	}
+	
+	public boolean getOutgoingInProgress() {
+		return outgoingOpenInProgress.get();
+	}
 
 	/**
 	 * Constructs ...
