@@ -26,6 +26,7 @@ package tigase.server.xmppserver;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.server.Permissions;
+import tigase.server.script.CommandIfc;
 import tigase.server.xmppserver.proc.Dialback;
 import tigase.server.xmppserver.proc.PacketChecker;
 import tigase.server.xmppserver.proc.StartTLS;
@@ -55,6 +56,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.script.Bindings;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -114,6 +117,8 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 
 	/** Field description */
 	public static final long MAX_CONNECTION_INACTIVITY_TIME_PROP_VAL = 15 * MINUTE;
+	
+	public static final String CID_CONNECTIONS_BIND = "cidConnections";
 
 	// ~--- fields ---------------------------------------------------------------
 
@@ -152,6 +157,18 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 			10);
 
 	// ~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 * 
+	 * 
+	 * @param binds
+	 */
+	@Override
+	public void initBindings(Bindings binds) {
+		super.initBindings(binds);
+		binds.put(CID_CONNECTIONS_BIND, cidConnections);
+	}
 
 	/**
 	 * Method description
