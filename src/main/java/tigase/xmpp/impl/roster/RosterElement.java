@@ -129,8 +129,8 @@ public class RosterElement {
 			if (num_str != null) {
 				try {
 					activity = Double.parseDouble(num_str);
-					log.warning("Incorrect activity field: " + num_str);
 				} catch (NumberFormatException nfe) {
+					log.warning("Incorrect activity field: " + num_str);
 					activity = INITIAL_ACTIVITY_VAL;
 				}
 			}
@@ -139,8 +139,8 @@ public class RosterElement {
 			if (num_str != null) {
 				try {
 					weight = Double.parseDouble(num_str);
-					log.warning("Incorrect activity field: " + num_str);
 				} catch (NumberFormatException nfe) {
+					log.warning("Incorrect weight field: " + num_str);
 					weight = INITIAL_WEIGHT_VAL;
 				}
 			}
