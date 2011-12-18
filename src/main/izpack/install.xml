@@ -311,7 +311,6 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 					<include name="libs/tigase-pubsub.jar"/>
 					<include name="libs/tigase-extras.jar"/>
 					<include name="libs/jdmkrt.jar"/>
-					<include name="libs/bcprov-jdk16-136.jar"/>
 				</fileset>
 			</pack>
 			

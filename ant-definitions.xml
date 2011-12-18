@@ -142,7 +142,6 @@
           <file name="tigase-extras.jar"/>
           <file name="tigase-muc.jar"/>
           <file name="tigase-pubsub.jar"/>
-          <file name="bcprov-jdk16-136.jar"/>
         </filelist>
       </copy>
       <mkdir dir="${dist}/@{packagename}-${version}/certs"/>
