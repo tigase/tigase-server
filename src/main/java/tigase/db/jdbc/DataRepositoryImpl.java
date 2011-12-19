@@ -61,11 +61,13 @@ public class DataRepositoryImpl implements DataRepository {
 	/** Field description */
 	public static final String SP_STARTS_WITH = "{ call";
 
+	public static final String QUERY_TIMEOUT_PROP_KEY = "sql-query-timeout";
 	/** Field description */
-	public static final int QUERY_TIMEOUT = 2;
+	public static final int QUERY_TIMEOUT = 10;
 
+	public static final String DB_CONN_TIMEOUT_PROP_KEY = "db-conn-timeout";
 	/** Field description */
-	public static final int DB_CONN_TIMEOUT = 5;
+	public static final int DB_CONN_TIMEOUT = 15;
 
 	private Connection conn = null;
 	private PreparedStatement conn_valid_st = null;
@@ -78,6 +80,8 @@ public class DataRepositoryImpl implements DataRepository {
 	private Map<String, String> db_queries = new ConcurrentSkipListMap<String, String>();
 	private String check_table_query = MYSQL_CHECK_TABLE_QUERY;
 	private String table_schema = null;
+	private int query_timeout = QUERY_TIMEOUT;
+	private int db_conn_timeout = DB_CONN_TIMEOUT;
 
 	/**
 	 * Method description
@@ -226,6 +230,9 @@ public class DataRepositoryImpl implements DataRepository {
 	public void initRepository(String resource_uri, Map<String, String> params)
 			throws SQLException {
 		db_conn = resource_uri;
+		db_conn_timeout = getParam(DB_CONN_TIMEOUT_PROP_KEY, params, DB_CONN_TIMEOUT);
+		query_timeout = getParam(QUERY_TIMEOUT_PROP_KEY, params, QUERY_TIMEOUT);
+
 		if (db_conn != null) {
 			String[] slashes = db_conn.split("/");
 			table_schema = slashes[slashes.length - 1].split("\\?")[0];
@@ -242,6 +249,27 @@ public class DataRepositoryImpl implements DataRepository {
 		}
 
 		log.log(Level.INFO, "Initialized database connection: {0}", resource_uri);
+	}
+	
+	protected int getParam(String key, Map<String, String> params, int def) {
+		int result = def;
+		String temp = System.getProperty(key);
+		if (temp != null) {
+			try {
+				result = Integer.parseInt(temp);
+			} catch (NumberFormatException e) {
+				result = def;
+			}
+		}
+		temp = params.get(key);
+		if (temp != null) {
+			try {
+				result = Integer.parseInt(temp);
+			} catch (NumberFormatException e) {
+				result = def;
+			}
+		}		
+		return result;
 	}
 
 	/**
@@ -318,7 +346,7 @@ public class DataRepositoryImpl implements DataRepository {
 
 		conn_valid_st = prepareQuery(query);
 		try {
-			conn_valid_st.setQueryTimeout(QUERY_TIMEOUT);
+			conn_valid_st.setQueryTimeout(query_timeout);
 		} catch (SQLException ex) {
 			// Ignore for now, it seems that PostgreSQL does not support this method
 			// call yet
@@ -335,7 +363,7 @@ public class DataRepositoryImpl implements DataRepository {
 		PreparedStatement st = prepareQuery(query);
 
 		try {
-			st.setQueryTimeout(QUERY_TIMEOUT);
+			st.setQueryTimeout(query_timeout);
 		} catch (SQLException ex) {
 			// Ignore for now, it seems that PostgreSQL does not support this method
 			// call yet
@@ -358,7 +386,7 @@ public class DataRepositoryImpl implements DataRepository {
 		try {
 			synchronized (db_statements) {
 				db_statements.clear();
-				DriverManager.setLoginTimeout(DB_CONN_TIMEOUT);
+				DriverManager.setLoginTimeout(db_conn_timeout);
 				conn = DriverManager.getConnection(db_conn);
 				conn.setAutoCommit(true);
 				derby_mode = db_conn.startsWith("jdbc:derby");
