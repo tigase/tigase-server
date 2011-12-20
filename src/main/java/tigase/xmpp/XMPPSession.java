@@ -58,6 +58,8 @@ public class XMPPSession {
 	 * User name - part of user's JID
 	 */
 	private String username = null;
+	private long packets_counter = 0;
+
 
 	/**
 	 * Creates a new <code>XMPPSession</code> instance.
@@ -431,5 +433,16 @@ public class XMPPSession {
 		sb.append("]");
 		return sb.toString();
 	}
+
+	/**
+	 * 
+	 */
+	public void incPacketsCounter() {
+		++packets_counter;
+	}
 	
+	public long getPacketsCounter() {
+		return packets_counter;
+	}
+
 }    // XMPPSession

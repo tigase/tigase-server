@@ -75,6 +75,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	private long creationTime = 0;
 	private String defLang = "en";
 	private long id_counter = 0;
+	private long packets_counter = 0;
 
 	/**
 	 * Value of <code>System.currentTimeMillis()</code> from the time when this
@@ -103,6 +104,14 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	private String sessionId = null;
 
 	private JID userJid = null;
+	
+	public void incPacketsCounter() {
+		++packets_counter;
+	}
+	
+	public long getPacketsCounter() {
+		return packets_counter;
+	}
 
 	/**
 	 * Creates a new <code>XMPPResourceConnection</code> instance.
@@ -827,7 +836,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 */
 	@Override
 	public String toString() {
-		return "user_jid=" + userJid + ", connectioId=" + connectionId + ", domain="
+		return "user_jid=" + userJid + ", packets=" + packets_counter + ", connectioId=" + connectionId + ", domain="
 				+ domain.getVhost().getDomain() + ", authState=" + getAuthState().name()
 				+ ", isAnon=" + isAnonymous();
 	}
