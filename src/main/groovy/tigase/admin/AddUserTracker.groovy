@@ -22,6 +22,7 @@
  */
 /*
  Activate on the server user tracking mechanisms to aid in problem resolution.
+ 
  AS:Description: Activate log tracker for a user
  AS:CommandId: http://jabber.org/protocol/admin#add-user-tracker
  AS:Component: sess-man
@@ -80,7 +81,7 @@ if (session != null) {
 	Logger.getLogger("").addHandler(handler)
 
 	Command.addTextField(result, "Note", "Operation successful");
-	Command.addFieldMultiValue(result, "Tracking elements: "+trackers.size(), trackers)
+	Command.addFieldMultiValue(result, "Tracking elements "+trackers.size(), trackers)
 } else {
 	Command.addTextField(result, "Note", "User: " + userJid + " is not logged in.")
 }
