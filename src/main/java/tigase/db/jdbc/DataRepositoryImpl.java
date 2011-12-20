@@ -250,7 +250,7 @@ public class DataRepositoryImpl implements DataRepository {
 
 		log.log(Level.INFO, "Initialized database connection: {0}", resource_uri);
 	}
-	
+
 	protected int getParam(String key, Map<String, String> params, int def) {
 		int result = def;
 		String temp = System.getProperty(key);
@@ -261,14 +261,16 @@ public class DataRepositoryImpl implements DataRepository {
 				result = def;
 			}
 		}
-		temp = params.get(key);
-		if (temp != null) {
-			try {
-				result = Integer.parseInt(temp);
-			} catch (NumberFormatException e) {
-				result = def;
+		if (params != null) {
+			temp = params.get(key);
+			if (temp != null) {
+				try {
+					result = Integer.parseInt(temp);
+				} catch (NumberFormatException e) {
+					result = def;
+				}
 			}
-		}		
+		}
 		return result;
 	}
 
