@@ -21,14 +21,12 @@
  */
 
 /*
-
-Obtaining User Statistics as described in in XEP-0133:
-http://xmpp.org/extensions/xep-0133.html#get-user-stats
-
-AS:Description: Get User Statistics
-AS:CommandId: http://jabber.org/protocol/admin#user-stats
-AS:Component: sess-man
-*/
+ Obtaining User Statistics as described in in XEP-0133:
+ http://xmpp.org/extensions/xep-0133.html#get-user-stats
+ AS:Description: Get User Statistics
+ AS:CommandId: http://jabber.org/protocol/admin#user-stats
+ AS:Component: sess-man
+ */
 
 package tigase.admin
 
@@ -53,11 +51,11 @@ def userJid = Command.getFieldValue(packet, JID)
 if (userJid == null) {
 	def result = p.commandResult(Command.DataType.form);
 
-        Command.addTitle(result, "Get User Statistics")
-        Command.addInstructions(result, "Fill out this form to gather user statistics.")
+	Command.addTitle(result, "Get User Statistics")
+	Command.addInstructions(result, "Fill out this form to gather user statistics.")
 
 	Command.addFieldValue(result, "FORM_TYPE", "http://jabber.org/protocol/admin", "hidden")
-        Command.addFieldValue(result, JID, userJid ?: "", "jid-single","The Jabber ID for statistics")
+	Command.addFieldValue(result, JID, userJid ?: "", "jid-single","The Jabber ID for statistics")
 
 	return result
 }
@@ -67,21 +65,21 @@ VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
 def result = p.commandResult(Command.DataType.result)
 
 if (isServiceAdmin ||
-	(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
-        XMPPSession session = sessions.get(BareJID.bareJIDInstanceNS(userJid))
+(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
+	XMPPSession session = sessions.get(BareJID.bareJIDInstanceNS(userJid))
 
-        if (session == null) {
-            return "There is no user's ${userJid} active session on the server"
-        } else {
-          List<XMPPResourceConnection> conns = session.getActiveResources()
-            String conns_str = "Connections: "
-            for (XMPPResourceConnection con: conns)
-              conns_str += con.toString() + "###\n"
-            return "There is an active user's ${userJid} session on the server with ${conns?.size()} " +
-            "user connections: " + conns_str
-        }
+	if (session == null) {
+		return "There is no user's ${userJid} active session on the server"
 	} else {
-	    Command.addTextField(result, "Error", "You do not have enough permissions to obtain statistics for user in this domain.");
+		List<XMPPResourceConnection> conns = session.getActiveResources()
+		String conns_str = "Connections: "
+		for (XMPPResourceConnection con: conns)
+			conns_str += con.toString() + "###\n"
+		return "There is ${conns?.size()} active user's ${userJid} sessions, packets: ${session.getPacketsCounter()}\n" +
+		"user connections:\n" + conns_str
 	}
+} else {
+	Command.addTextField(result, "Error", "You do not have enough permissions to obtain statistics for user in this domain.");
+}
 
 return result
