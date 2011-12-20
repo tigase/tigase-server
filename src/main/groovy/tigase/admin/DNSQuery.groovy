@@ -67,7 +67,7 @@ try {
 	response_data += "Selected SRV IP: " + DNSResolver.getHostSRV_IP(domain)
 	
 	
-	Command.addFieldMultiValue(result, "DNS Response: ", response_data);
+	Command.addFieldMultiValue(result, "DNS Response ", response_data);
 } catch (Exception ex) {
 	Command.addTextField(result, "Note", "Problem querying DNS for domain: " + domain);
 	Command.addFieldMultiValue(result, "Exception: ", ex.getStackTrace());
