@@ -36,6 +36,7 @@ import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.XMPPSession;
 
 import java.util.Queue;
 import java.util.logging.Level;
@@ -156,6 +157,15 @@ public class PacketDefaultHandler {
 	 */
 	public boolean preprocess(final Packet packet, final XMPPResourceConnection session,
 			final NonAuthUserRepository repo, final Queue<Packet> results) {
+		
+		if (session != null) {
+			session.incPacketsCounter();
+			XMPPSession parent = session.getParentSession();
+			if (parent != null) {
+				parent.incPacketsCounter();
+			}
+		}
+		
 		for (int i = 0; i < IGNORE_PACKETS.length; i++) {
 			if ((packet.getElemName() == IGNORE_PACKETS[i])
 					&& (packet.getType() == IGNORE_TYPES[i])) {
