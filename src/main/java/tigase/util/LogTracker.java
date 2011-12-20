@@ -51,7 +51,9 @@ public class LogTracker extends Handler {
 		if (msg != null) {
 			boolean matchTracker = false;
 			int i = 0;
-			while (!(matchTracker = msg.contains(trackers[i++])) && i < trackers.length);
+			while (!matchTracker && i < trackers.length) {
+				matchTracker = msg.contains(trackers[i++]);
+			}
 			if (matchTracker) {
 				writer.print(formatter.format(record));
 			}
