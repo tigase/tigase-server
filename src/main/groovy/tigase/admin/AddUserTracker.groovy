@@ -22,7 +22,6 @@
  */
 /*
  Activate on the server user tracking mechanisms to aid in problem resolution.
- 
  AS:Description: Activate log tracker for a user
  AS:CommandId: http://jabber.org/protocol/admin#add-user-tracker
  AS:Component: sess-man
@@ -60,6 +59,23 @@ if (userJid == null) {
 	return result
 }
 
+// Remove the old tracker if there is any active for that user
+def hand = null
+
+Handler[] handlers = Logger.getLogger("").getHandlers()
+handlers.each {
+	Filter filt = it.getFilter()
+	if (filt != null && filt.class == LogFilter && ((LogFilter)filt).getId() == userJid) {
+		hand = it
+	}
+}
+if (hand != null) {
+	Logger.getLogger("").removeHandler(hand)
+	hand.close()
+	Command.addTextField(result, "Note", "Operation successful, tracker removed for " + userJid);
+}
+
+// Ok now we can setup a new tracker
 def result = p.commandResult(Command.DataType.result)
 
 def users_sessions = (Map)userSessions
@@ -74,7 +90,7 @@ if (session != null) {
 	def trackers = [userJid]
 	session.getConnectionIds().each { trackers += it.toString() }
 
-	LogFilter filter = new LogFilter(trackers.toArray(new String[trackers.size()]))
+	LogFilter filter = new LogFilter(userJid, trackers.toArray(new String[trackers.size()]))
 	FileHandler handler = new FileHandler(fileName, FILE_LIMIT, FILE_COUNT)
 	handler.setLevel(Level.ALL)
 	handler.setFilter(filter)
