@@ -31,9 +31,15 @@ import java.util.logging.LogRecord;
 public class LogFilter implements Filter {
 
 	private String[] trackers = null;
+	private String id = null;
 
-	public LogFilter(String ... trackers) {
+	public LogFilter(String id, String ... trackers) {
+		this.id = id;
 		this.trackers = trackers;
+	}
+	
+	public String getId() {
+		return id;
 	}
 
 	@Override
