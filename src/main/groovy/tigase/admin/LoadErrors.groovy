@@ -21,7 +21,7 @@
  */
 
 /*
-Load errors catched by the server during execution:
+Load errors caught by the server during execution:
 
 AS:Description: Load errors
 AS:CommandId: load-errors
