@@ -92,6 +92,8 @@ public abstract class ConfiguratorAbstract extends
 	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_VAL =
 			"tigase.db.AuthRepositoryMDImpl";
 	private static final String LOGGING_KEY = "logging/";
+	
+	public static final String INIT_PROPERTIES_MAP_BIND = "initProperties";
 
 	/** Field description */
 	public static final String PROPERTY_FILENAME_PROP_KEY = "--property-file";
@@ -537,6 +539,7 @@ public abstract class ConfiguratorAbstract extends
 	public void initBindings(Bindings binds) {
 		super.initBindings(binds);
 		binds.put(ComponentRepository.COMP_REPO_BIND, configRepo);
+		binds.put(INIT_PROPERTIES_MAP_BIND, initProperties);
 	}
 
 	/**
