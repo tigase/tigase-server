@@ -555,8 +555,8 @@ public class TigaseCustomAuth implements AuthRepository {
 				data_repo.initPreparedStatement(updatepassword_query, updatepassword_query);
 			}
 
-			if ((getpassword_query == null) || ((params.get(DEF_USERLOGIN_KEY) != null))) {
-				userlogin_query = getParamWithDef(params, DEF_USERLOGIN_KEY, DEF_USERLOGIN_QUERY);
+			userlogin_query = getParamWithDef(params, DEF_USERLOGIN_KEY, DEF_USERLOGIN_QUERY);
+			if (userlogin_query  != null) {
 				data_repo.initPreparedStatement(userlogin_query, userlogin_query);
 				userlogin_active = true;
 			}
@@ -802,6 +802,7 @@ public class TigaseCustomAuth implements AuthRepository {
 			log.log(Level.CONFIG, "Custom query loaded for ''{0}'': ''{1}''", new Object[] {
 					key, result });
 		} else {
+			result = def;
 			log.log(Level.CONFIG, "Default query loaded for ''{0}'': ''{1}''", new Object[] {
 					key, def });
 		}
