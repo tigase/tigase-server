@@ -710,6 +710,7 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 			if ((Boolean) props.get(UPDATES_CHECKING_PROP_KEY)) {
 				installUpdatesChecker((Long) props.get(UPDATES_CHECKING_INTERVAL_PROP_KEY));
 			} else {
+				log.log(Level.INFO, "Disabling updates checker.");
 				stopUpdatesChecker();
 			}
 		} finally {
