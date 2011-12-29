@@ -24,7 +24,6 @@ package tigase.server.bosh;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.io.IOException;
 import tigase.server.Command;
 import tigase.server.Packet;
 
@@ -157,14 +156,14 @@ public class BoshSession {
 	}
 
 	private void closeAllConnections() {
-		for (BoshIOService conn: old_connections) {
+		for (BoshIOService conn : old_connections) {
 			conn.stop();
 		}
-		for (BoshIOService conn: connections) {
+		for (BoshIOService conn : connections) {
 			conn.stop();
 		}
 	}
-	
+
 	/**
 	 * Method description
 	 * 
@@ -838,7 +837,7 @@ public class BoshSession {
 
 			case get_all:
 				cache_res = cache.getAll();
-
+				retireAllOldConnections();
 				break;
 
 			default:
@@ -931,25 +930,11 @@ public class BoshSession {
 
 			handler.writeRawData(serv, body.toString());
 
+			retireConnectionService(serv);
+
 			// serv.writeRawData(body.toString());
 			// waiting_packets.clear();
 			// serv.stop();
-			if (!old_connections.contains(serv)) {
-				while (!old_connections.offer(serv)) {
-					BoshIOService old_serv = old_connections.poll();
-
-					if (old_serv != null) {
-						old_serv.stop();
-					} else {
-						if (log.isLoggable(Level.WARNING)) {
-							log.warning("old_connections queue is empty but can not add new element!: "
-									+ getSid());
-						}
-
-						break;
-					}
-				}
-			}
 
 			// } catch (IOException e) {
 			// // I call it anyway at the end of method call
@@ -961,15 +946,49 @@ public class BoshSession {
 					+ "] Exception during writing to socket", e);
 		}
 
-		serv.setSid(null);
-		disconnected(serv);
-
 		if (waitTimer != null) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Canceling waitTimer: " + getSid());
 			}
 
 			handler.cancelTask(waitTimer);
+		}
+	}
+
+	private void retireConnectionService(BoshIOService serv) {
+		if (!old_connections.contains(serv)) {
+			while (!old_connections.offer(serv)) {
+				BoshIOService old_serv = old_connections.poll();
+
+				if (old_serv != null) {
+					old_serv.stop();
+				} else {
+					if (log.isLoggable(Level.WARNING)) {
+						log.warning("old_connections queue is empty but can not add new element!: "
+								+ getSid());
+					}
+
+					break;
+				}
+			}
+		}
+
+		serv.setSid(null);
+		disconnected(serv);
+	}
+
+	private void retireAllOldConnections() {
+		while (connections.size() > 1) {
+			BoshIOService serv = connections.poll();
+			if (serv != null) {
+				retireConnectionService(serv);
+			} else {
+				if (log.isLoggable(Level.WARNING)) {
+					log.warning("connections queue size is greater than 1 but poll returns null"
+							+ getSid());
+				}
+			}
+
 		}
 	}
 
