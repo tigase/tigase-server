@@ -1092,15 +1092,18 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 			// returning error back...
 			log.log(Level.FINE, "Broken packet: {0}", p.toStringSecure());
 
-			try {
-				Packet error =
-						Authorization.SERVICE_UNAVAILABLE.getResponseMessage(p,
-								"Service not available.", true);
+			// we do not want to send presence error packets here...
+			if ((p.getElemName() == Iq.ELEM_NAME) || (p.getElemName() == Message.ELEM_NAME)) {
+				try {
+					Packet error =
+							Authorization.SERVICE_UNAVAILABLE.getResponseMessage(p,
+									"Service not available.", true);
 
-				error.setPacketTo(p.getFrom());
-				fastAddOutPacket(error);
-			} catch (PacketErrorTypeException e) {
-				log.log(Level.FINE, "Packet is error type already: {0}", p.toStringSecure());
+					error.setPacketTo(p.getFrom());
+					fastAddOutPacket(error);
+				} catch (PacketErrorTypeException e) {
+					log.log(Level.FINE, "Packet is error type already: {0}", p.toStringSecure());
+				}
 			}
 
 			return true;
