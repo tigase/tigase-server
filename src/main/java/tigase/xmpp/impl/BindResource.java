@@ -25,6 +25,7 @@ package tigase.xmpp.impl;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.NonAuthUserRepository;
+import tigase.db.TigaseDBException;
 
 import tigase.server.Packet;
 
@@ -59,6 +60,8 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class BindResource extends XMPPProcessor implements XMPPProcessorIfc {
+	public static final String DEF_RESOURCE_PREFIX_PROP_KEY = "def-resource-prefix";
+
 	private static final Logger log = Logger.getLogger(BindResource.class.getName());
 	// protected static final String RESOURCE_KEY = "Resource-Binded";
 	private static final String XMLNS = "urn:ietf:params:xml:ns:xmpp-bind";
@@ -70,6 +73,7 @@ public class BindResource extends XMPPProcessor implements XMPPProcessorIfc {
 	private static final Element[] DISCO_FEATURES = { new Element("feature",
 			new String[] { "var" }, new String[] { XMLNS }) };
 	private static int resGenerator = 0;
+	private String resourceDefPrefix = "tigase-";
 
 	// ~--- methods --------------------------------------------------------------
 
@@ -82,6 +86,15 @@ public class BindResource extends XMPPProcessor implements XMPPProcessorIfc {
 	@Override
 	public String id() {
 		return ID;
+	}
+
+	@Override
+	public void init(Map<String, Object> settings) throws TigaseDBException {
+
+		// Init plugin configuration
+		if (settings.get(DEF_RESOURCE_PREFIX_PROP_KEY) != null) {
+			resourceDefPrefix = settings.get(DEF_RESOURCE_PREFIX_PROP_KEY).toString();
+		}
 	}
 
 	/**
@@ -124,7 +137,7 @@ public class BindResource extends XMPPProcessor implements XMPPProcessorIfc {
 
 					try {
 						if ((resource == null) || resource.trim().isEmpty()) {
-							resource = "tigase-" + (++resGenerator);
+							resource = resourceDefPrefix + (++resGenerator);
 							session.setResource(resource);
 						} else {
 							try {
@@ -136,7 +149,7 @@ public class BindResource extends XMPPProcessor implements XMPPProcessorIfc {
 								log.log(Level.INFO,
 										"Incrrect resource provided by the user: {0}, generating a "
 												+ "different one by the server.", resource);
-								resource = "tigase-" + (++resGenerator);
+								resource = resourceDefPrefix + (++resGenerator);
 								session.setResource(resource);
 							}
 						} // end of if (resource == null) else
