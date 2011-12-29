@@ -258,6 +258,8 @@ public class TigaseCustomAuth implements AuthRepository {
 	 * in plain text format in the database.
 	 */
 	public static final String DEF_SASL_MECHS_KEY = "sasl-mechs";
+	
+	public static final String NO_QUERY = "none";
 
 	/** Field description */
 	public static final String DEF_INITDB_QUERY = "{ call TigInitdb() }";
@@ -807,12 +809,12 @@ public class TigaseCustomAuth implements AuthRepository {
 		if (result != null) {
 			result = result.trim();
 
-			if (result.isEmpty()) {
+			if (result.isEmpty() || result.equals(NO_QUERY)) {
 				result = null;
 			}
 		}
 
-		return (result != null) ? result : def;
+		return result;
 	}
 
 	private String getPassword(BareJID user) throws TigaseDBException,
