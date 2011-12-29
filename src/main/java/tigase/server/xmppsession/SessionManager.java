@@ -469,8 +469,9 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 		try {
 			connectionsByFrom.remove(conn.getConnectionId());
-			Packet cmd = Command.CLOSE.getPacket(getComponentId(), conn.getConnectionId(),
-					StanzaType.set, conn.nextStanzaId());
+			Packet cmd =
+					Command.CLOSE.getPacket(getComponentId(), conn.getConnectionId(),
+							StanzaType.set, conn.nextStanzaId());
 			String error = (String) conn.getSessionData(XMPPResourceConnection.ERROR_KEY);
 			if (error != null) {
 				Element err_el = new Element(error);
@@ -1423,9 +1424,41 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 				break;
 
 			case OTHER:
+				if (getComponentId().equals(iqc.getStanzaTo())
+						&& getComponentId().equals(iqc.getPacketFrom())) {
+					// No such command available. This prevents from an infinite loop in
+					// case there is no implementation to hadle such a command
+					try {
+						addOutPacket(Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(iqc,
+								"There is no implementation for such command on the server.", true));
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+
+					log.log(Level.WARNING,
+							"There is no implementation for such command on the server: " + iqc);
+
+					processing_result = true;
+				}
 				break;
 
 			default:
+				if (getComponentId().equals(iqc.getStanzaTo())
+						&& getComponentId().equals(iqc.getPacketFrom())) {
+					// No such command available. This prevents from an infinite loop in
+					// case there is no implementation to hadle such a command
+					try {
+						addOutPacket(Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(iqc,
+								"There is no implementation for such command on the server.", true));
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+
+					log.log(Level.WARNING,
+							"There is no implementation for such command on the server: " + iqc);
+
+					processing_result = true;
+				}
 				break;
 		} // end of switch (pc.getCommand())
 
