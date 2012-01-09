@@ -65,9 +65,11 @@ public class RosterElement {
 	private static final String STRINGPREP_ATT = "preped";
 	private static final String ACTIVITY_ATT = "activity";
 	private static final String WEIGHT_ATT = "weight";
+	private static final String LAST_SEEN_ATT = "last-seen";
 
 	private static final double INITIAL_ACTIVITY_VAL = 1d;
 	private static final double INITIAL_WEIGHT_VAL = 1d;
+	private static final long INITIAL_LAST_SEEN_VAL = 1000l;
 
 	// ~--- fields ---------------------------------------------------------------
 
@@ -75,6 +77,7 @@ public class RosterElement {
 	private JID jid = null;
 	private String name = null;
 	private String otherData = null;
+	private long lastSeen = INITIAL_LAST_SEEN_VAL;
 	private double activity = INITIAL_ACTIVITY_VAL;
 	private double weight = INITIAL_WEIGHT_VAL;
 	private XMPPResourceConnection session = null;
@@ -142,6 +145,16 @@ public class RosterElement {
 				} catch (NumberFormatException nfe) {
 					log.warning("Incorrect weight field: " + num_str);
 					weight = INITIAL_WEIGHT_VAL;
+				}
+			}
+
+			num_str = roster_el.getAttribute(LAST_SEEN_ATT);
+			if (num_str != null) {
+				try {
+					setLastSeen(Long.parseLong(num_str));
+				} catch (NumberFormatException nfe) {
+					log.warning("Incorrect last seen field: " + num_str);
+					setLastSeen(INITIAL_LAST_SEEN_VAL);
 				}
 			}
 
@@ -272,6 +285,7 @@ public class RosterElement {
 
 		elem.setAttribute(ACTIVITY_ATT, Double.toString(activity));
 		elem.setAttribute(WEIGHT_ATT, Double.toString(weight));
+		elem.setAttribute(LAST_SEEN_ATT, Long.toString(lastSeen));
 
 		modified = false;
 
@@ -506,6 +520,20 @@ public class RosterElement {
 		this.weight = weight;
 		modified = true;
 
+	}
+
+	/**
+	 * @return the lastSeen
+	 */
+	public long getLastSeen() {
+		return lastSeen;
+	}
+
+	/**
+	 * @param lastSeen the lastSeen to set
+	 */
+	public void setLastSeen(long lastSeen) {
+		this.lastSeen = lastSeen;
 	}
 
 }
