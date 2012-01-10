@@ -781,10 +781,12 @@ public class RosterFlat extends RosterAbstract {
 	public String getCustomStatus(XMPPResourceConnection session, JID buddy)
 			throws NotAuthorizedException, TigaseDBException {
 		RosterElement rel = getRosterElement(session, buddy);
-		String result = "";
-		result =
-				"Buddy last seen on: " + new Date(rel.getLastSeen()) + ", weight: "
-						+ rel.getWeight();
+		String result = null;
+		if (rel != null && rel.getLastSeen() > 1) {
+			result =
+					"Buddy last seen on: " + new Date(rel.getLastSeen()) + ", weight: "
+							+ rel.getWeight();
+		}
 		return result;
 	}
 
