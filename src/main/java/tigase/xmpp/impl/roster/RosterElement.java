@@ -69,7 +69,7 @@ public class RosterElement implements RosterElementIfc {
 
 	private static final double INITIAL_ACTIVITY_VAL = 1d;
 	private static final double INITIAL_WEIGHT_VAL = 1d;
-	private static final long INITIAL_LAST_SEEN_VAL = 1000l;
+	protected static final long INITIAL_LAST_SEEN_VAL = 1000l;
 
 	// ~--- fields ---------------------------------------------------------------
 

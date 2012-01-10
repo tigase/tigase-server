@@ -782,7 +782,7 @@ public class RosterFlat extends RosterAbstract {
 			throws NotAuthorizedException, TigaseDBException {
 		RosterElement rel = getRosterElement(session, buddy);
 		String result = null;
-		if (rel != null && rel.getLastSeen() > 1) {
+		if (rel != null && rel.getLastSeen() > RosterElement.INITIAL_LAST_SEEN_VAL) {
 			result =
 					"Buddy last seen on: " + new Date(rel.getLastSeen()) + ", weight: "
 							+ rel.getWeight();
