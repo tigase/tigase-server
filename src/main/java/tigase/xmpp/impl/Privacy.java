@@ -133,8 +133,9 @@ public class Privacy {
 		String lNode = listNode(list.getAttribute(NAME));
 
 		session.removeData(lNode, PRIVACY_LIST);
-	}
-
+                session.removeDataGroup(lNode);
+ 	}
+ 
         //~--- get methods ----------------------------------------------------------
 
 	/**
@@ -255,6 +256,10 @@ public class Privacy {
 				String value = session.getData(iNode, VALUE, null);
 				String action = session.getData(iNode, ACTION, null);
 				String[] stanzas = session.getDataList(iNode, STANZAS);
+                                
+                                if (item == null || action == null)
+                                        continue;
+                                
 				Element eItem = new Element(ITEM, new String[] { ORDER, ACTION }, new String[] { item,
 						action });
 
