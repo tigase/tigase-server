@@ -894,6 +894,46 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 		return null;
 	}
 
+        protected ByteBuffer readBytes() throws IOException {
+                setLastTransferTime();
+
+		if (log.isLoggable(Level.FINEST) && (empty_read_call_count > 10)) {
+			Throwable thr = new Throwable();
+
+			thr.fillInStackTrace();
+			log.log(Level.FINEST, "Socket: " + socketIO, thr);
+		}
+
+                try {
+                        ByteBuffer tmpBuffer = socketIO.read(socketInput);
+                        if (socketIO.bytesRead() > 0) {
+                                empty_read_call_count = 0;
+                                
+                                return tmpBuffer;
+                        }
+                        else {
+				if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS
+						&& (!writeInProgress.isLocked())) {
+					log.log(Level.WARNING,
+							"Socket: {0}, Max allowed empty calls excceeded, closing connection.",
+							socketIO);
+					forceStop();
+				}                                
+                        }
+        
+                }
+                catch (Exception eof) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Socket: " + socketIO + ", Exception reading data", eof);
+			}
+
+			// eof.printStackTrace();
+			forceStop();                        
+                }
+                
+                return null;
+        }
+        
 	/**
 	 * Describe <code>writeData</code> method here.
 	 * 
@@ -979,6 +1019,59 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 		}
 	}
 
+        protected void writeBytes(ByteBuffer data) {
+
+                // Try to lock the data writing method
+		boolean locked = writeInProgress.tryLock();
+
+		// If cannot lock and nothing to send, just leave
+		if (!locked && (data == null)) {
+			return;
+		}
+
+		// Otherwise wait.....
+		if (!locked) {
+			writeInProgress.lock();
+		}
+
+		// Avoid concurrent calls here (one from call() and another from
+		// application)
+		try {
+                        if (data != null && data.hasRemaining()) {
+                                int length = data.remaining();
+                                
+				socketIO.write(data);
+
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Socket: {0}, wrote: {1}",
+							new Object[] { socketIO, length });
+				}
+
+				// idx_start = idx_offset;
+				// idx_offset = Math.min(idx_start + out_buff_size, data.length());
+				// }
+				setLastTransferTime();
+
+				// addWritten(data.length());
+				empty_read_call_count = 0;
+			} else {
+				if (socketIO.waitingToSend()) {
+					socketIO.write(null);
+					setLastTransferTime();
+					empty_read_call_count = 0;
+				}
+			}
+		} catch (Exception e) {
+			if (log.isLoggable(Level.FINER)) {
+				log.log(Level.FINER, "Data writing exception", e);
+			}
+
+			forceStop();
+		} finally {
+			writeInProgress.unlock();
+		}
+        }
+        
 	private void resizeInputBuffer() throws IOException {
 		int netSize = socketIO.getInputPacketSize();
 
