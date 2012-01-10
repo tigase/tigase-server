@@ -40,6 +40,7 @@ import tigase.xmpp.XMPPResourceConnection;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -636,7 +637,7 @@ public class RosterFlat extends RosterAbstract {
 
 	// ~--- get methods ----------------------------------------------------------
 
-	protected RosterElement getRosterElement(XMPPResourceConnection session, JID buddy)
+	public RosterElement getRosterElement(XMPPResourceConnection session, JID buddy)
 			throws NotAuthorizedException, TigaseDBException {
 		Map<BareJID, RosterElement> roster = getUserRoster(session);
 
@@ -754,27 +755,77 @@ public class RosterFlat extends RosterAbstract {
 	// }
 	// return false;
 	// }
-	
+
 	private class RosterElemComparator implements Comparator<JID> {
 
 		private Map<BareJID, RosterElement> roster = null;
-		
+
 		private RosterElemComparator(Map<BareJID, RosterElement> roster) {
 			this.roster = roster;
 		}
-		
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
 		@Override
 		public int compare(JID arg0, JID arg1) {
-      double w0 = roster.get(arg0.getBareJID()).getWeight();
-      double w1 = roster.get(arg1.getBareJID()).getWeight();
+			double w0 = roster.get(arg0.getBareJID()).getWeight();
+			double w1 = roster.get(arg1.getBareJID()).getWeight();
 			return Double.compare(w0, w1);
 		}
-		
+
 	}
-	
+
+	public String getCustomStatus(XMPPResourceConnection session, JID buddy)
+			throws NotAuthorizedException, TigaseDBException {
+		RosterElement rel = getRosterElement(session, buddy);
+		String result = "";
+		result =
+				"Buddy last seen on: " + new Date(rel.getLastSeen()) + ", weight: "
+						+ rel.getWeight();
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see tigase.xmpp.impl.roster.RosterAbstract#logout()
+	 */
+	@Override
+	public void logout(XMPPResourceConnection session) {
+		try {
+			if (isModified(session)) {
+				saveUserRoster(session);
+			}
+		} catch (NotAuthorizedException ex) {
+			// TODO Auto-generated catch block
+			ex.printStackTrace();
+		} catch (TigaseDBException ex) {
+			// TODO Auto-generated catch block
+			ex.printStackTrace();
+		}
+	}
+
+	/**
+	 * @param session
+	 * @return
+	 * @throws TigaseDBException
+	 * @throws NotAuthorizedException
+	 */
+	public boolean isModified(XMPPResourceConnection session)
+			throws NotAuthorizedException, TigaseDBException {
+		Map<BareJID, RosterElement> roster = getUserRoster(session);
+		boolean result = false;
+		if (roster != null) {
+			for (RosterElement rel : roster.values()) {
+				result |= rel.isModified();
+			}
+		}
+		return result;
+	}
+
 } // RosterFlat
 
 // ~ Formatted in Sun Code Convention

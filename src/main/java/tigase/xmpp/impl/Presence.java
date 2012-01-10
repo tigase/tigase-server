@@ -49,9 +49,12 @@ import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPStopListenerIfc;
 import tigase.xmpp.impl.roster.RosterAbstract;
+import tigase.xmpp.impl.roster.RosterElement;
+import tigase.xmpp.impl.roster.RosterElementIfc;
 import tigase.xmpp.impl.roster.RosterFactory;
 
 import static tigase.xmpp.impl.roster.RosterAbstract.FROM_SUBSCRIBED;
+import static tigase.xmpp.impl.roster.RosterAbstract.TO_SUBSCRIBED;
 import static tigase.xmpp.impl.roster.RosterAbstract.PresenceType;
 import static tigase.xmpp.impl.roster.RosterAbstract.SUB_BOTH;
 import static tigase.xmpp.impl.roster.RosterAbstract.SUB_FROM;
@@ -1034,6 +1037,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 				} else {
 					broadcastDirectPresences(StanzaType.unavailable, session, results, null);
 				}
+				roster_util.logout(session);
 			} catch (NotAuthorizedException e) {
 
 				// Do nothing, it may happen quite often when the user disconnects
@@ -1152,6 +1156,13 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 		// (roster_util.isBuddyOnline(session, presBuddy))
 		) {
 			boolean online = StanzaType.unavailable != packet.getType();
+
+			if (online) {
+				RosterElementIfc rel = roster_util.getRosterElement(session, presBuddy);
+				if (rel != null && rel instanceof RosterElement) {
+					((RosterElement) rel).setLastSeen(System.currentTimeMillis());
+				}
+			}
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST,
@@ -1365,6 +1376,43 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 		}
 	}
 
+	/**
+	 * Method sends server generated presence unavailable for all buddies from the
+	 * roster with a custom status message.
+	 * 
+	 * @param session
+	 * @throws TigaseDBException
+	 * @throws NotAuthorizedException
+	 * @throws NoConnectionIdException
+	 */
+	protected void sendRosterOfflinePresence(XMPPResourceConnection session,
+			Queue<Packet> results) throws NotAuthorizedException, TigaseDBException,
+			NoConnectionIdException {
+		JID[] buddies = roster_util.getBuddies(session, TO_SUBSCRIBED);
+
+		if (buddies != null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Buddies found: " + Arrays.toString(buddies));
+			}
+			Priority pack_priority = Priority.PRESENCE;
+			int pres_cnt = 0;
+			for (JID buddy : buddies) {
+				String status = roster_util.getCustomStatus(session, buddy);
+				if (status != null) {
+					Packet pack =
+							sendPresence(StanzaType.unavailable, buddy, session.getJID(), results, null);
+					if (pres_cnt == HIGH_PRIORITY_PRESENCES_NO) {
+						++pres_cnt;
+						pack_priority = Priority.LOWEST;
+					}
+					pack.setPriority(pack_priority);
+					pack.setPacketTo(session.getConnectionId());
+					pack.getElement().addChild(new Element("status", status));
+				}
+			} // end of for (String buddy: buddies)
+		}
+	}
+
 	protected void processOutInitial(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, PresenceType type)
 			throws NotAuthorizedException, TigaseDBException {
@@ -1394,6 +1442,11 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 			if (session.getPresence() == null) {
 				first = true;
+				try {
+					sendRosterOfflinePresence(session, results);
+				} catch (Exception ex) {
+					log.log(Level.INFO, "Experimental code throws exception: ", ex);
+				}
 			}
 
 			// Set a correct from attribute

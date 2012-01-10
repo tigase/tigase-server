@@ -348,6 +348,30 @@ public class Roster extends RosterAbstract {
 	public void setPresenceSent(XMPPResourceConnection session, JID jid, boolean sent)
 			throws NotAuthorizedException, TigaseDBException {}
 
+	/* (non-Javadoc)
+	 * @see tigase.xmpp.impl.roster.RosterAbstract#getRosterElement(tigase.xmpp.XMPPResourceConnection, tigase.xmpp.JID)
+	 */
+	@Override
+	public RosterElementIfc getRosterElement(XMPPResourceConnection session, JID jid)
+			throws NotAuthorizedException, TigaseDBException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see tigase.xmpp.impl.roster.RosterAbstract#logout()
+	 */
+	@Override
+	public void logout(XMPPResourceConnection session) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public String getCustomStatus(XMPPResourceConnection session, JID buddy) {
+		return null;
+	}
+
+
 //@Override
 //public String[] getBuddies(XMPPResourceConnection session, boolean onlineOnly)
 //        throws NotAuthorizedException, TigaseDBException {

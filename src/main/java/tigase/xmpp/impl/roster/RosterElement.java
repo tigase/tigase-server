@@ -54,7 +54,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class RosterElement {
+public class RosterElement implements RosterElementIfc {
 	private static final Logger log = Logger.getLogger(RosterElement.class.getName());
 	private static final String ELEM_NAME = "contact";
 	private static final String JID_ATT = "jid";
@@ -151,10 +151,10 @@ public class RosterElement {
 			num_str = roster_el.getAttribute(LAST_SEEN_ATT);
 			if (num_str != null) {
 				try {
-					setLastSeen(Long.parseLong(num_str));
+					lastSeen = Long.parseLong(num_str);
 				} catch (NumberFormatException nfe) {
 					log.warning("Incorrect last seen field: " + num_str);
-					setLastSeen(INITIAL_LAST_SEEN_VAL);
+					lastSeen = INITIAL_LAST_SEEN_VAL;
 				}
 			}
 
@@ -534,6 +534,7 @@ public class RosterElement {
 	 */
 	public void setLastSeen(long lastSeen) {
 		this.lastSeen = lastSeen;
+		modified = true;
 	}
 
 }
