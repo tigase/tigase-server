@@ -87,17 +87,15 @@ if (session != null) {
 	if (fileName == null || fileName == "") {
 		fileName = "logs/" + userJid
 	}
-	def trackers = [userJid]
-	session.getConnectionIds().each { trackers += it.toString() }
+	LogUserFilter filter = new LogUserFilter(userJid, session)
 
-	LogFilter filter = new LogFilter(userJid, trackers.toArray(new String[trackers.size()]))
 	FileHandler handler = new FileHandler(fileName, FILE_LIMIT, FILE_COUNT)
 	handler.setLevel(Level.ALL)
 	handler.setFilter(filter)
 	Logger.getLogger("").addHandler(handler)
 
 	Command.addTextField(result, "Note", "Operation successful");
-	Command.addFieldMultiValue(result, "Tracking elements "+trackers.size(), trackers)
+	Command.addTextField(result, "Note", "Tracking user " + userJid)
 } else {
 	Command.addTextField(result, "Note", "User: " + userJid + " is not logged in.")
 }
