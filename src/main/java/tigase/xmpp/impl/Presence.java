@@ -378,8 +378,10 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 						++pres_cnt;
 						pack_priority = Priority.LOWEST;
 					}
-					pack.setPriority(pack_priority);
-					roster.setPresenceSent(session, buddy, true);
+					if (pack != null) {
+						pack.setPriority(pack_priority);
+						roster.setPresenceSent(session, buddy, true);
+					}
 				} else {
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Not sending presence to buddy: " + buddy);
