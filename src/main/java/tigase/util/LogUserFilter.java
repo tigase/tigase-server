@@ -22,9 +22,12 @@
  */
 package tigase.util;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Filter;
 import java.util.logging.LogRecord;
 
+import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.XMPPSession;
 
@@ -34,35 +37,41 @@ import tigase.xmpp.XMPPSession;
 public class LogUserFilter implements Filter {
 
 	private XMPPSession tracker = null;
-	private String id = null;
+	Map<BareJID, XMPPSession> sessionsByNodeId = null;
+	private BareJID jid = null;
 
-	public LogUserFilter(String id, XMPPSession tracker) {
-		this.id = id;
-		this.tracker = tracker;
+	public LogUserFilter(BareJID jid, Map<BareJID, XMPPSession> sessionsByNodeId) {
+		this.jid = jid;
+		this.sessionsByNodeId = sessionsByNodeId;
 	}
 
 	public String getId() {
-		return id;
+		return jid.toString();
 	}
 
 	@Override
 	public boolean isLoggable(LogRecord record) {
 		boolean matchTracker = false;
-		String msg = record.getMessage();
-		if (msg != null) {
-			JID[] trackers = tracker.getJIDs();
-			if (trackers != null && trackers.length > 0) {
-				int i = 0;
-				while (!matchTracker && i < trackers.length) {
-					matchTracker = msg.contains(trackers[i++].toString());
-				}
-			}
-			if (!matchTracker) {
-				trackers = tracker.getConnectionIds();
+		if (tracker == null || tracker.getActiveResourcesSize() == 0) {
+			tracker = sessionsByNodeId.get(jid);
+		}
+		if (tracker != null) {
+			String msg = record.getMessage();
+			if (msg != null) {
+				JID[] trackers = tracker.getJIDs();
 				if (trackers != null && trackers.length > 0) {
 					int i = 0;
 					while (!matchTracker && i < trackers.length) {
 						matchTracker = msg.contains(trackers[i++].toString());
+					}
+				}
+				if (!matchTracker) {
+					trackers = tracker.getConnectionIds();
+					if (trackers != null && trackers.length > 0) {
+						int i = 0;
+						while (!matchTracker && i < trackers.length) {
+							matchTracker = msg.contains(trackers[i++].toString());
+						}
 					}
 				}
 			}

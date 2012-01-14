@@ -83,21 +83,17 @@ bareJID = BareJID.bareJIDInstance(userJid)
 
 XMPPSession session = users_sessions.get(bareJID)
 
-if (session != null) {
-	if (fileName == null || fileName == "") {
-		fileName = "logs/" + userJid
-	}
-	LogUserFilter filter = new LogUserFilter(userJid, session)
-
-	FileHandler handler = new FileHandler(fileName, FILE_LIMIT, FILE_COUNT)
-	handler.setLevel(Level.ALL)
-	handler.setFilter(filter)
-	Logger.getLogger("").addHandler(handler)
-
-	Command.addTextField(result, "Note", "Operation successful");
-	Command.addTextField(result, "Note", "Tracking user " + userJid)
-} else {
-	Command.addTextField(result, "Note", "User: " + userJid + " is not logged in.")
+if (fileName == null || fileName == "") {
+	fileName = "logs/" + userJid
 }
+LogUserFilter filter = new LogUserFilter(bareJID, users_sessions)
+
+FileHandler handler = new FileHandler(fileName, FILE_LIMIT, FILE_COUNT)
+handler.setLevel(Level.ALL)
+handler.setFilter(filter)
+Logger.getLogger("").addHandler(handler)
+
+Command.addTextField(result, "Note", "Operation successful");
+Command.addTextField(result, "Note", "Tracking user " + userJid)
 
 return result
