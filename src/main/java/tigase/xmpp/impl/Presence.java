@@ -100,6 +100,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	/** Field description */
 	public static final String SKIP_OFFLINE_PROP_KEY = "skip-offline";
+	public static final String OFFLINE_ROSTER_LAST_SEEN_PROP_KEY =
+			"offline-roster-last-seen";
 	protected static final String XMLNS = CLIENT_XMLNS;
 	public static final String USERS_STATUS_CHANGES = "Users status changes";
 
@@ -126,6 +128,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 	protected RosterAbstract roster_util = getRosterUtil();
 	private long usersStatusChanges = 0;
+	private String[] offlineRosterLastSeen = null;
 
 	// ~--- methods --------------------------------------------------------------
 
@@ -760,6 +763,13 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 		// Init plugin configuration
 		skipOffline = Boolean.parseBoolean((String) settings.get(SKIP_OFFLINE_PROP_KEY));
+		String tmp = (String) settings.get(OFFLINE_ROSTER_LAST_SEEN_PROP_KEY);
+		if (tmp != null) {
+			offlineRosterLastSeen = tmp.split(",");
+			log.config("Loaded roster offline last seen config: " + tmp);
+		} else {
+			log.config("No configuration found for Loaded roster offline last seen.");
+		}
 	}
 
 	/**
@@ -1390,6 +1400,28 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	protected void sendRosterOfflinePresence(XMPPResourceConnection session,
 			Queue<Packet> results) throws NotAuthorizedException, TigaseDBException,
 			NoConnectionIdException {
+		if (offlineRosterLastSeen == null) {
+			log.finest("No clients specified in config, skipping...");
+			return;
+		}
+		Element pres = session.getPresence();
+		if (pres == null) {
+			log.finest("Presence not set yet, skipping...");
+			return;
+		}
+		String node = pres.getAttribute("/presence/c", "node");
+		if (node == null) {
+			log.finest("Presence node not set, skipping...");
+			return;
+		}
+		boolean validClient = false;
+		int i = 0;
+		while (!(validClient |= node.contains(offlineRosterLastSeen[i++])));
+		if (!validClient) {
+			log.finest("Client does not match, skipping...");
+			return;
+		}
+
 		JID[] buddies = roster_util.getBuddies(session, TO_SUBSCRIBED);
 
 		if (buddies != null) {
@@ -1444,11 +1476,6 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 			if (session.getPresence() == null) {
 				first = true;
-				try {
-					sendRosterOfflinePresence(session, results);
-				} catch (Exception ex) {
-					log.log(Level.INFO, "Experimental code throws exception: ", ex);
-				}
 			}
 
 			// Set a correct from attribute
@@ -1466,6 +1493,12 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 				session.removeSessionData(OFFLINE_RES_SENT);
 
 				if (first) {
+
+					try {
+						sendRosterOfflinePresence(session, results);
+					} catch (Exception ex) {
+						log.log(Level.INFO, "Experimental code throws exception: ", ex);
+					}
 
 					// Send presence probes to 'to' or 'both' contacts
 					broadcastProbe(session, results, settings);
