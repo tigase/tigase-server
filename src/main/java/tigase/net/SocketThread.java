@@ -187,7 +187,9 @@ public class SocketThread implements Runnable {
 		// dead-lock. Let's make sure the service is always processed
 		// by the same thread thus the same Selector.
 		// socketReadThread[incrementAndGet()].addSocketServicePriv(s);
-		socketReadThread[s.hashCode() % socketReadThread.length].addSocketServicePriv(s);
+                if (s.waitingToRead()) {
+                        socketReadThread[s.hashCode() % socketReadThread.length].addSocketServicePriv(s);
+                }
 
 		if (s.waitingToSend()) {
 			socketWriteThread[s.hashCode() % socketWriteThread.length].addSocketServicePriv(s);

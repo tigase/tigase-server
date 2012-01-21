@@ -640,6 +640,16 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 	 * 
 	 * @return
 	 */
+        public boolean waitingToRead() {                
+                return true;
+        }
+        
+	/**
+	 * Method description
+	 * 
+	 * 
+	 * @return
+	 */
 	public boolean waitingToSend() {
 		return socketIO.waitingToSend();
 	}
@@ -654,6 +664,16 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 		return socketIO.waitingToSendSize();
 	}
 
+        /**
+         * Method description
+         * 
+         * @return 
+         */
+        protected boolean isInputBufferEmpty() {
+                return socketInput != null && socketInput.remaining() == socketInput.capacity();
+        }
+
+        
 	/**
 	 * Describe <code>debug</code> method here.
 	 * 
