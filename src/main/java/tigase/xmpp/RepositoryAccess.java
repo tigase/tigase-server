@@ -1153,6 +1153,7 @@ public abstract class RepositoryAccess {
 		if (getUserName().equals(user_name)) {
 			try {
 				authRepo.removeUser(BareJID.bareJIDInstance(user_name, getDomain().getVhost().getDomain()));
+				repo.removeUser(BareJID.bareJIDInstance(user_name, getDomain().getVhost().getDomain()));
 
 				return Authorization.AUTHORIZED;
 			} catch (UserNotFoundException e) {
