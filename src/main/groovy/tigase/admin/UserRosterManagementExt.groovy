@@ -107,9 +107,8 @@ def Queue<Packet> results = new LinkedList<Packet>()
 
 def updateRoster = { jid, i_jid, i_name, i_groups, i_subscr ->
 
-	def XMPPResourceConnection conn = sessions.get(jid.getBareJID())?.getResourceConnection(jid)
-
-	if ( conn != null ) {
+	def conn = sessions.get(jid.getBareJID())?.getActiveResources().get(0);
+	if (conn) {
 		// Update online
 		RosterAbstract rosterUtil = RosterFactory.getRosterImplementation(true)
 		Element item = new Element("item",
