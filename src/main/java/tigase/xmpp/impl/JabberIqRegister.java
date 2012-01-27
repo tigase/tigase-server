@@ -136,9 +136,8 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 			// id.equals(session.getUserId().toString()))
 			// && packet.getFrom().equals(session.getConnectionId())) {
 			// Wrong thinking. The user may send an request from his own account
-			// to register with a transport or any other sevice, then the connection
-			// ID
-			// matches the session id but this is still not a request to the local
+			// to register with a transport or any other service, then the connection
+			// ID matches the session id but this is still not a request to the local
 			// server. The TO address must be checked too.....
 			// if (packet.getPacketFrom().equals(session.getConnectionId())) {
 			if ((packet.getPacketFrom() != null)
@@ -146,7 +145,12 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 					&& (!session.isAuthorized() || (session.isUserId(id) || session.isLocalDomain(
 							id.toString(), false)))) {
 
-				if (!session.getDomain().isRegisterEnabled()) {
+				// We want to allow password change but not user registration if
+				// registration is disabled. The only way to tell apart registration
+				// from password change is to check whether the user is authenticated.
+				// For authenticated user the request means password change, otherwise
+				// registration attempt.
+				if (!session.isAuthorized() && !session.getDomain().isRegisterEnabled()) {
 					results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
 							"Registration is not allowed for this domain.", true));
 					return;
@@ -166,7 +170,7 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 
 							// Yes this is registration cancel request
 							// According to JEP-0077 there must not be any
-							// more subelemets apart from <remove/>
+							// more subelements apart from <remove/>
 							elem = request.findChild("/iq/query");
 
 							if (elem.getChildren().size() > 1) {
