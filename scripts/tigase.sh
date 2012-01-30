@@ -88,12 +88,16 @@ if [ -z ${TIGASE_JAR} ] ; then
 	exit 1
 fi
 if [ -z "${TIGASE_CONSOLE_LOG}" ] ; then
+  if [ ! -d "logs" ] ; then
+    mkdir logs
+  fi
   if [ -w "${TIGASE_HOME}/logs/" ] ; then
 		TIGASE_CONSOLE_LOG="${TIGASE_HOME}/logs/tigase-console.log"
   else
 		TIGASE_CONSOLE_LOG="/dev/null"
   fi
 fi
+
 if [ -z "${TIGASE_PID}" ] ; then
   if [ -w "${TIGASE_HOME}/logs/" ] ; then
 		TIGASE_PID="${TIGASE_HOME}/logs/tigase.pid"

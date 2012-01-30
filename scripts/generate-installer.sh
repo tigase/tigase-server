@@ -10,6 +10,11 @@ if [ ! -e packages ] ; then
 	mkdir packages || exit -1
 fi
 
+# create logs directory
+if [ ! -e logs ] ; then
+	mkdir logs || exit -1
+fi
+
 # insert appropriate version information
 export TIGVER=`grep -m 1 "Tigase-Version:" MANIFEST.MF | sed -e "s/Tigase-Version: \(.*\)/\\1/"`
 sed -e "s/<appversion>\([^<]*\)<\/appversion>/<appversion>$TIGVER<\/appversion>/" \

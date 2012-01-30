@@ -320,8 +320,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 					<include name="*.*"/>
 				</fileset>
 				<fileset dir="libs" targetdir="$INSTALL_PATH/libs">
-					<include name="groovy-engine.jar"/>
-					<include name="groovy-all-1.5.7.jar"/>
+					<include name="groovy-all-1.8.5.jar"/>
 				</fileset>
 			</pack>
 						
