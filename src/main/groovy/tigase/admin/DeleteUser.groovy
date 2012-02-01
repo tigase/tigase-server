@@ -84,7 +84,7 @@ for (userJid in userJids) {
 				msgs.add("Operation successful for user "+userJid);
 			}
 			else {
-				errors.add("User "+userJid+" not exists, can't be deleted.");
+				errors.add("User "+userJid+" not found, can't be deleted.");
 			}
 		} else {
 			errors.add("You do not have enough permissions to delete accounts for domain "+userJid.getDomain()+".");
