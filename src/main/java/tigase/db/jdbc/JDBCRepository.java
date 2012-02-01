@@ -975,6 +975,9 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 		ResultSet rs = null;
 		String query = null;
 
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Removing user: {0}", user_id);
+		}
 		try {
 			stmt = data_repo.createStatement(user_id);
 
