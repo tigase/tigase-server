@@ -802,7 +802,7 @@ public class RosterFlat extends RosterAbstract {
 	@Override
 	public void logout(XMPPResourceConnection session) {
 		try {
-			if (isModified(session)) {
+			if (session.isAuthorized() && isModified(session)) {
 				saveUserRoster(session);
 			}
 		} catch (NotAuthorizedException ex) {
