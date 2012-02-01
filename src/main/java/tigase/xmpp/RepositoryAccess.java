@@ -1189,6 +1189,10 @@ public abstract class RepositoryAccess {
 					// fine.
 				}
 
+				// We mark the session as no longer authorized to prevent data access through
+				// this session.
+				logout();
+				// Session authorized is returned only to indicate successful operation.
 				return Authorization.AUTHORIZED;
 			} catch (UserNotFoundException e) {
 				return Authorization.REGISTRATION_REQUIRED;
