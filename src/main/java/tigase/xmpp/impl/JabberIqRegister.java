@@ -150,14 +150,18 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 				// from password change is to check whether the user is authenticated.
 				// For authenticated user the request means password change, otherwise
 				// registration attempt.
-				if (!session.isAuthorized() && !session.getDomain().isRegisterEnabled()) {
+				// Account deregistration is also called under authenticated session, so
+				// it should be blocked here if registration for domain is disabled.
+				// Assuming if user cannot register account he cannot also deregister account
+				Element request = packet.getElement();
+				boolean remove = request.findChild("/iq/query/remove") != null;
+				if ((!session.isAuthorized() || remove) && !session.getDomain().isRegisterEnabled()) {
 					results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
 							"Registration is not allowed for this domain.", true));
 					return;
 				}
 
 				Authorization result = Authorization.NOT_AUTHORIZED;
-				Element request = packet.getElement();
 				StanzaType type = packet.getType();
 
 				switch (type) {
