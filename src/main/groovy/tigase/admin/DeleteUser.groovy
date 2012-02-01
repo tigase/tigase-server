@@ -74,6 +74,13 @@ for (userJid in userJids) {
 		(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
 			if (user_repo.userExists(bareJID)) {
 				auth_repo.removeUser(bareJID)
+				try {
+					user_repo.removeUser(bareJID)
+				} catch (UserNotFoundException ex) {
+					// We ignore this error here. If auth_repo and user_repo are in fact the same
+					// database, then user has been already removed with the auth_repo.removeUser(...)
+					// then the second call to user_repo may throw the exception which is fine.
+				}
 				msgs.add("Operation successful for user "+userJid);
 			}
 			else {
