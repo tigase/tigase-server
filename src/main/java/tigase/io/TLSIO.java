@@ -41,10 +41,10 @@ import java.util.logging.Logger;
 
 /**
  * Describe class TLSIO here.
- *
- *
+ * 
+ * 
  * Created: Sat May 14 07:43:30 2005
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -58,7 +58,7 @@ public class TLSIO implements IOInterface {
 	 */
 	private static final Logger log = Logger.getLogger(TLSIO.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
+	// ~--- fields ---------------------------------------------------------------
 
 	private IOInterface io = null;
 
@@ -73,25 +73,25 @@ public class TLSIO implements IOInterface {
 	 */
 	private TLSWrapper tlsWrapper = null;
 
-	//~--- constructors ---------------------------------------------------------
+	// ~--- constructors ---------------------------------------------------------
 
-///**
-// * Creates a new <code>TLSIO</code> instance.
-// *
-// */
-//public TLSIO(final SocketChannel sock) {
-//  io = new SocketIO(sock);
-//  tlsWrapper = new TLSWrapper("TLS");
-//  tlsInput = ByteBuffer.allocate(tlsWrapper.getAppBuffSize());
-//}
+	// /**
+	// * Creates a new <code>TLSIO</code> instance.
+	// *
+	// */
+	// public TLSIO(final SocketChannel sock) {
+	// io = new SocketIO(sock);
+	// tlsWrapper = new TLSWrapper("TLS");
+	// tlsInput = ByteBuffer.allocate(tlsWrapper.getAppBuffSize());
+	// }
 
 	/**
 	 * Constructs ...
-	 *
-	 *
+	 * 
+	 * 
 	 * @param ioi
 	 * @param wrapper
-	 *
+	 * 
 	 * @throws IOException
 	 */
 	public TLSIO(final IOInterface ioi, final TLSWrapper wrapper) throws IOException {
@@ -110,15 +110,15 @@ public class TLSIO implements IOInterface {
 			}
 
 			write(ByteBuffer.allocate(0));
-		}    // end of if (tlsWrapper.isClientMode())
+		} // end of if (tlsWrapper.isClientMode())
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -128,10 +128,10 @@ public class TLSIO implements IOInterface {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param caps
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -139,14 +139,14 @@ public class TLSIO implements IOInterface {
 		return caps.contains(TLS_CAPS) || io.checkCapabilities(caps);
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
-	 *
+	 * 
 	 * @throws IOException
 	 */
 	@Override
@@ -156,8 +156,8 @@ public class TLSIO implements IOInterface {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -167,8 +167,8 @@ public class TLSIO implements IOInterface {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param list
 	 * @param reset
 	 */
@@ -181,8 +181,8 @@ public class TLSIO implements IOInterface {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -192,10 +192,10 @@ public class TLSIO implements IOInterface {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param addr
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -203,50 +203,51 @@ public class TLSIO implements IOInterface {
 		return io.isRemoteAddress(addr);
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param buff
-	 *
+	 * 
 	 * @return
-	 *
+	 * 
 	 * @throws IOException
 	 */
 	@Override
 	public ByteBuffer read(ByteBuffer buff) throws IOException {
 
-//  if (log.isLoggable(Level.FINER)) {
-//    log.finer("input.capacity()=" + buff.capacity());
-//    log.finer("input.remaining()=" + buff.remaining());
-//    log.finer("input.limit()=" + buff.limit());
-//    log.finer("input.position()=" + buff.position());
-//  }
+		// if (log.isLoggable(Level.FINER)) {
+		// log.finer("input.capacity()=" + buff.capacity());
+		// log.finer("input.remaining()=" + buff.remaining());
+		// log.finer("input.limit()=" + buff.limit());
+		// log.finer("input.position()=" + buff.position());
+		// }
 		ByteBuffer tmpBuffer = io.read(buff);
 
 		if (io.bytesRead() > 0) {
 			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER, "Read bytes: {0}, {1}", new Object[] { io.bytesRead(), toString() });
+				log.log(Level.FINER, "Read bytes: {0}, {1}", new Object[] { io.bytesRead(),
+						toString() });
 			}
 
 			return decodeData(tmpBuffer);
 		} else {
 			return null;
-		}    // end of else
+		} // end of else
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @throws IOException
 	 */
 	@Override
 	public void stop() throws IOException {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Stop called...");
+			log.finest("Stop called..." + toString());
 
 			// Thread.dumpStack();
 		}
@@ -257,8 +258,8 @@ public class TLSIO implements IOInterface {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -268,8 +269,8 @@ public class TLSIO implements IOInterface {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -279,8 +280,8 @@ public class TLSIO implements IOInterface {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -290,12 +291,12 @@ public class TLSIO implements IOInterface {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param buff
-	 *
+	 * 
 	 * @return
-	 *
+	 * 
 	 * @throws IOException
 	 */
 	@Override
@@ -304,7 +305,8 @@ public class TLSIO implements IOInterface {
 
 		// The loop below falls into infinite loop for some reason.
 		// Let's try to detect it here and recover.
-		// Looks like for some reason tlsWrapper.getStatus() sometimes starts to return
+		// Looks like for some reason tlsWrapper.getStatus() sometimes starts to
+		// return
 		// NEED_READ status all the time and the loop never ends.
 		int loop_cnt = 0;
 		int max_loop_runs = 1000;
@@ -312,28 +314,29 @@ public class TLSIO implements IOInterface {
 		while (((stat == TLSStatus.NEED_WRITE) || (stat == TLSStatus.NEED_READ))
 				&& (++loop_cnt < max_loop_runs)) {
 			switch (stat) {
-				case NEED_WRITE :
+				case NEED_WRITE:
 					writeBuff(ByteBuffer.allocate(0));
 
 					break;
 
-				case NEED_READ :
+				case NEED_READ:
 
-					// I wonder if some real data can be read from the socket here (and we would
+					// I wonder if some real data can be read from the socket here (and we
+					// would
 					// loose the data) or this is just TLS stuff here.....
 					ByteBuffer rbuff = read(ByteBuffer.allocate(tlsWrapper.getNetBuffSize()));
 
 					break;
 
-//      case CLOSED:
-//        if (tlsWrapper.getStatus() == TLSStatus.CLOSED) {
-//          if (log.isLoggable(Level.FINER)) {
-//            log.finer("TLS Socket closed...");
-//          }
-//          throw new EOFException("Socket has been closed.");
-//        } // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
-//        break;
-				default :
+				// case CLOSED:
+				// if (tlsWrapper.getStatus() == TLSStatus.CLOSED) {
+				// if (log.isLoggable(Level.FINER)) {
+				// log.finer("TLS Socket closed...");
+				// }
+				// throw new EOFException("Socket has been closed.");
+				// } // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
+				// break;
+				default:
 			}
 
 			stat = tlsWrapper.getStatus();
@@ -342,7 +345,7 @@ public class TLSIO implements IOInterface {
 		if (loop_cnt > (max_loop_runs / 2)) {
 			log.log(Level.WARNING,
 					"Infinite loop detected in write(buff) TLS code, tlsWrapper.getStatus(): {0}",
-						tlsWrapper.getStatus());
+					tlsWrapper.getStatus());
 
 			// Let's close the connection now
 			throw new EOFException("Socket has been closed due to TLS problems.");
@@ -354,7 +357,7 @@ public class TLSIO implements IOInterface {
 			}
 
 			throw new EOFException("Socket has been closed.");
-		}    // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
+		} // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
 
 		int result = -1;
 
@@ -362,20 +365,19 @@ public class TLSIO implements IOInterface {
 			result = io.write(null);
 		} else {
 			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER, "TLS - Writing data, remaining: {0}, {1}",
-						new Object[] { buff.remaining(),
-						toString() });
+				log.log(Level.FINER, "TLS - Writing data, remaining: {0}, {1}", new Object[] {
+						buff.remaining(), toString() });
 			}
 
 			result = writeBuff(buff);
 		}
 
-//  if (isRemoteAddress("81.142.228.219")) {
-//    log.warning("TLS - Writing data, remaining: " + buff.remaining());
-//  }
-//  if (isRemoteAddress("81.142.228.219")) {
-//    log.warning("TLS - written: " + result);
-//  }
+		// if (isRemoteAddress("81.142.228.219")) {
+		// log.warning("TLS - Writing data, remaining: " + buff.remaining());
+		// }
+		// if (isRemoteAddress("81.142.228.219")) {
+		// log.warning("TLS - written: " + result);
+		// }
 		return result;
 	}
 
@@ -387,60 +389,61 @@ public class TLSIO implements IOInterface {
 		// do_loop:
 		do {
 
-//    if (log.isLoggable(Level.FINER)) {
-//      log.finer("Decoding data: " + input.remaining());
-//      log.finer("input.capacity()=" + input.capacity());
-//      log.finer("input.remaining()=" + input.remaining());
-//      log.finer("input.limit()=" + input.limit());
-//      log.finer("input.position()=" + input.position());
-//      log.finer("tlsInput.capacity()=" + tlsInput.capacity());
-//      log.finer("tlsInput.remaining()=" + tlsInput.remaining());
-//      log.finer("tlsInput.limit()=" + tlsInput.limit());
-//      log.finer("tlsInput.position()=" + tlsInput.position());
-//    }
+			// if (log.isLoggable(Level.FINER)) {
+			// log.finer("Decoding data: " + input.remaining());
+			// log.finer("input.capacity()=" + input.capacity());
+			// log.finer("input.remaining()=" + input.remaining());
+			// log.finer("input.limit()=" + input.limit());
+			// log.finer("input.position()=" + input.position());
+			// log.finer("tlsInput.capacity()=" + tlsInput.capacity());
+			// log.finer("tlsInput.remaining()=" + tlsInput.remaining());
+			// log.finer("tlsInput.limit()=" + tlsInput.limit());
+			// log.finer("tlsInput.position()=" + tlsInput.position());
+			// }
 			tlsInput = tlsWrapper.unwrap(input, tlsInput);
 
-//    if (log.isLoggable(Level.FINEST)) {
-//      int netSize = tlsWrapper.getPacketBuffSize();
-//
-//      log.finer("tlsWrapper.getStatus() = " + tlsWrapper.getStatus().name());
-//      log.finer("PacketBuffSize=" + netSize);
-//      log.finer("input.capacity()=" + input.capacity());
-//      log.finer("input.remaining()=" + input.remaining());
-//      log.finer("input.limit()=" + input.limit());
-//      log.finer("input.position()=" + input.position());
-//      log.finer("tlsInput.capacity()=" + tlsInput.capacity());
-//      log.finer("tlsInput.remaining()=" + tlsInput.remaining());
-//      log.finer("tlsInput.limit()=" + tlsInput.limit());
-//      log.finer("tlsInput.position()=" + tlsInput.position());
-//    }
-//    if (input.hasRemaining()) {
-//    input.compact();
-//    }// end of if (input.hasRemaining())
+			// if (log.isLoggable(Level.FINEST)) {
+			// int netSize = tlsWrapper.getPacketBuffSize();
+			//
+			// log.finer("tlsWrapper.getStatus() = " + tlsWrapper.getStatus().name());
+			// log.finer("PacketBuffSize=" + netSize);
+			// log.finer("input.capacity()=" + input.capacity());
+			// log.finer("input.remaining()=" + input.remaining());
+			// log.finer("input.limit()=" + input.limit());
+			// log.finer("input.position()=" + input.position());
+			// log.finer("tlsInput.capacity()=" + tlsInput.capacity());
+			// log.finer("tlsInput.remaining()=" + tlsInput.remaining());
+			// log.finer("tlsInput.limit()=" + tlsInput.limit());
+			// log.finer("tlsInput.position()=" + tlsInput.position());
+			// }
+			// if (input.hasRemaining()) {
+			// input.compact();
+			// }// end of if (input.hasRemaining())
 			switch (tlsWrapper.getStatus()) {
-				case NEED_WRITE :
+				case NEED_WRITE:
 					writeBuff(ByteBuffer.allocate(0));
 
 					break;
 
-				case UNDERFLOW :
+				case UNDERFLOW:
 
-//        if (log.isLoggable(Level.FINER) && !log.isLoggable(Level.FINEST)) {
-//          int netSize = tlsWrapper.getPacketBuffSize();
-//          log.finer("tlsWrapper.getStatus() = UNDERFLOW");
-//          log.finer("PacketBuffSize=" + netSize);
-//          log.finer("input.capacity()=" + input.capacity());
-//          log.finer("input.remaining()=" + input.remaining());
-//          log.finer("input.limit()=" + input.limit());
-//          log.finer("input.position()=" + input.position());
-//          log.finer("tlsInput.capacity()=" + tlsInput.capacity());
-//          log.finer("tlsInput.remaining()=" + tlsInput.remaining());
-//          log.finer("tlsInput.limit()=" + tlsInput.limit());
-//          log.finer("tlsInput.position()=" + tlsInput.position());
-//        }
+					// if (log.isLoggable(Level.FINER) && !log.isLoggable(Level.FINEST)) {
+					// int netSize = tlsWrapper.getPacketBuffSize();
+					// log.finer("tlsWrapper.getStatus() = UNDERFLOW");
+					// log.finer("PacketBuffSize=" + netSize);
+					// log.finer("input.capacity()=" + input.capacity());
+					// log.finer("input.remaining()=" + input.remaining());
+					// log.finer("input.limit()=" + input.limit());
+					// log.finer("input.position()=" + input.position());
+					// log.finer("tlsInput.capacity()=" + tlsInput.capacity());
+					// log.finer("tlsInput.remaining()=" + tlsInput.remaining());
+					// log.finer("tlsInput.limit()=" + tlsInput.limit());
+					// log.finer("tlsInput.position()=" + tlsInput.position());
+					// }
 					// Obtain more inbound network data for src,
 					// then retry the operation.
-					// If there is some data ready to read, let's try to read it before we increase
+					// If there is some data ready to read, let's try to read it before we
+					// increase
 					// the buffer size
 					// throw new BufferUnderflowException();
 					if (tlsInput.capacity() == tlsInput.remaining()) {
@@ -452,21 +455,21 @@ public class TLSIO implements IOInterface {
 
 					break;
 
-				case CLOSED :
+				case CLOSED:
 
-//        if (tlsWrapper.getStatus() == TLSStatus.CLOSED) {
+					// if (tlsWrapper.getStatus() == TLSStatus.CLOSED) {
 					if (log.isLoggable(Level.FINER)) {
-						log.finer("TLS Socket closed...");
+						log.finer("TLS Socket closed..." + toString());
 					}
 
 					throw new EOFException("Socket has been closed.");
 
-//      } // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
-//      break do_loop;
-//      break;
-				default :
+					// } // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
+					// break do_loop;
+					// break;
+				default:
 					break;
-			}    // end of switch (tlsWrapper.getStatus())
+			} // end of switch (tlsWrapper.getStatus())
 
 			stat = tlsWrapper.getStatus();
 		} while (continueLoop && ((stat == TLSStatus.NEED_READ) || (stat == TLSStatus.OK))
@@ -507,7 +510,8 @@ public class TLSIO implements IOInterface {
 		do {
 			if (tlsWrapper.getStatus() == TLSStatus.NEED_READ) {
 
-				// I wonder if some real data can be read from the socket here (and we would
+				// I wonder if some real data can be read from the socket here (and we
+				// would
 				// loose the data) or this is just TLS stuff here.....
 				ByteBuffer rbuff = read(ByteBuffer.allocate(tlsWrapper.getNetBuffSize()));
 			}
@@ -520,7 +524,7 @@ public class TLSIO implements IOInterface {
 
 			if (tlsWrapper.getStatus() == TLSStatus.CLOSED) {
 				throw new EOFException("Socket has been closed.");
-			}    // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
+			} // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
 
 			tlsOutput.flip();
 			wr = io.write(tlsOutput);
@@ -537,14 +541,22 @@ public class TLSIO implements IOInterface {
 
 		if (tlsWrapper.getStatus() == TLSStatus.NEED_WRITE) {
 			writeBuff(ByteBuffer.allocate(0));
-		}    // end of if ()
+		} // end of if ()
 
 		return result;
 	}
-}    // TLSIO
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see tigase.io.IOInterface#setLogId(java.lang.String)
+	 */
+	@Override
+	public void setLogId(String logId) {
+		io.setLogId(logId);
+	}
+} // TLSIO
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com

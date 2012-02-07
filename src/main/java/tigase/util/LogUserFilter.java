@@ -23,7 +23,6 @@
 package tigase.util;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Filter;
 import java.util.logging.LogRecord;
 
@@ -39,6 +38,7 @@ public class LogUserFilter implements Filter {
 	private XMPPSession tracker = null;
 	Map<BareJID, XMPPSession> sessionsByNodeId = null;
 	private BareJID jid = null;
+	private LogFormatter format = new LogFormatter();
 
 	public LogUserFilter(BareJID jid, Map<BareJID, XMPPSession> sessionsByNodeId) {
 		this.jid = jid;
@@ -56,17 +56,19 @@ public class LogUserFilter implements Filter {
 			tracker = sessionsByNodeId.get(jid);
 		}
 		if (tracker != null) {
-			String msg = record.getMessage();
+			String msg = format.format(record);
 			if (msg != null) {
-				JID[] trackers = tracker.getJIDs();
-				if (trackers != null && trackers.length > 0) {
-					int i = 0;
-					while (!matchTracker && i < trackers.length) {
-						matchTracker = msg.contains(trackers[i++].toString());
+				if (!matchTracker) {
+					JID[] trackers = tracker.getConnectionIds();
+					if (trackers != null && trackers.length > 0) {
+						int i = 0;
+						while (!matchTracker && i < trackers.length) {
+							matchTracker = msg.contains(trackers[i++].toString());
+						}
 					}
 				}
 				if (!matchTracker) {
-					trackers = tracker.getConnectionIds();
+					JID[] trackers = tracker.getJIDs();
 					if (trackers != null && trackers.length > 0) {
 						int i = 0;
 						while (!matchTracker && i < trackers.length) {

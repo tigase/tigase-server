@@ -209,7 +209,7 @@ public class ZLibIO implements IOInterface {
 	@Override
 	public void stop() throws IOException {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Stop called...");
+			log.finest("Stop called..." + toString());
 		}
 
 		io.stop();
@@ -273,6 +273,14 @@ public class ZLibIO implements IOInterface {
 
 		// System.out.println("Compression rate: " + zlib.lastCompressionRate());
 		return io.write(compressed_buff);
+	}
+
+	/* (non-Javadoc)
+	 * @see tigase.io.IOInterface#setLogId(java.lang.String)
+	 */
+	@Override
+	public void setLogId(String logId) {
+		io.setLogId(logId);
 	}
 }
 

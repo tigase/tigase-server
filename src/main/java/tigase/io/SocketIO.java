@@ -45,17 +45,17 @@ import java.util.logging.Logger;
 
 /**
  * Describe class SocketIO here.
- *
- *
+ * 
+ * 
  * Created: Sat May 14 07:18:30 2005
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class SocketIO implements IOInterface {
 	private static final Logger log = Logger.getLogger(SocketIO.class.getName());
 
-	//~--- fields ---------------------------------------------------------------
+	// ~--- fields ---------------------------------------------------------------
 
 	private long buffOverflow = 0;
 	private int bytesRead = 0;
@@ -64,12 +64,13 @@ public class SocketIO implements IOInterface {
 	private SocketChannel channel = null;
 	private Queue<ByteBuffer> dataToSend = null;
 	private String remoteAddress = null;
+	private String logId = null;
 
-	//~--- constructors ---------------------------------------------------------
+	// ~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>SocketIO</code> instance.
-	 *
+	 * 
 	 * @param sock
 	 * @throws IOException
 	 */
@@ -87,12 +88,12 @@ public class SocketIO implements IOInterface {
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -102,10 +103,10 @@ public class SocketIO implements IOInterface {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param caps
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -113,14 +114,14 @@ public class SocketIO implements IOInterface {
 		return false;
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
-	 *
+	 * 
 	 * @throws IOException
 	 */
 	@Override
@@ -130,8 +131,8 @@ public class SocketIO implements IOInterface {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -141,8 +142,8 @@ public class SocketIO implements IOInterface {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param list
 	 * @param reset
 	 */
@@ -161,8 +162,8 @@ public class SocketIO implements IOInterface {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -176,10 +177,10 @@ public class SocketIO implements IOInterface {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param addr
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -187,16 +188,16 @@ public class SocketIO implements IOInterface {
 		return remoteAddress.equals(addr);
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param buff
-	 *
+	 * 
 	 * @return
-	 *
+	 * 
 	 * @throws IOException
 	 */
 	@Override
@@ -210,7 +211,7 @@ public class SocketIO implements IOInterface {
 
 		if (bytesRead == -1) {
 			throw new EOFException("Channel has been closed.");
-		}    // end of if (result == -1)
+		} // end of if (result == -1)
 
 		if (bytesRead > 0) {
 			buff.flip();
@@ -222,37 +223,37 @@ public class SocketIO implements IOInterface {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @throws IOException
 	 */
 	@Override
 	public void stop() throws IOException {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Stop called.");
+			log.finest("Stop called " + toString());
 		}
 
-//  if (isRemoteAddress("81.142.228.219")) {
-//    log.warning("Stop called.");
-//  }
+		// if (isRemoteAddress("81.142.228.219")) {
+		// log.warning("Stop called.");
+		// }
 		channel.close();
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
 	public String toString() {
-		return "" + ((channel == null) ? null : channel.socket());
+		return logId + ((channel == null) ? null : channel.socket());
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -262,8 +263,8 @@ public class SocketIO implements IOInterface {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -273,35 +274,34 @@ public class SocketIO implements IOInterface {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param buff
-	 *
+	 * 
 	 * @return
-	 *
+	 * 
 	 * @throws IOException
 	 */
 	@Override
 	public int write(final ByteBuffer buff) throws IOException {
 
-//  int result = 0;
-//  while (buff.hasRemaining()) {
-//    final int res = channel.write(buff);
-//    if (res == -1) {
-//      throw new EOFException("Channel has been closed.");
-//    } // end of if (res == -1)
-//    result += res;
-//  } // end of while (out.hasRemaining())
-//  log.finer("Wrote to channel " + result + " bytes.");
-//  return result;
+		// int result = 0;
+		// while (buff.hasRemaining()) {
+		// final int res = channel.write(buff);
+		// if (res == -1) {
+		// throw new EOFException("Channel has been closed.");
+		// } // end of if (res == -1)
+		// result += res;
+		// } // end of while (out.hasRemaining())
+		// log.finer("Wrote to channel " + result + " bytes.");
+		// return result;
 		if (buff != null) {
 			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER, "SOCKET - Writing data, remaining: {0}, {1}",
-						new Object[] { buff.remaining(),
-						toString() });
+				log.log(Level.FINER, "SOCKET - Writing data, remaining: {0}, {1}", new Object[] {
+						buff.remaining(), toString() });
 			}
 
-			if ( !dataToSend.offer(buff)) {
+			if (!dataToSend.offer(buff)) {
 				++buffOverflow;
 			}
 		}
@@ -321,7 +321,7 @@ public class SocketIO implements IOInterface {
 				result += res;
 
 				for (ByteBuffer byteBuffer : buffs) {
-					if ( !byteBuffer.hasRemaining()) {
+					if (!byteBuffer.hasRemaining()) {
 						dataToSend.poll();
 					} else {
 						break;
@@ -338,27 +338,36 @@ public class SocketIO implements IOInterface {
 					result += res;
 				}
 
-				if ( !dataBuffer.hasRemaining()) {
+				if (!dataBuffer.hasRemaining()) {
 					dataToSend.poll();
 				}
 			}
 		}
 
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "Wrote to channel {0} bytes, {1}", new Object[] { result, toString() });
+			log.log(Level.FINER, "Wrote to channel {0} bytes, {1}", new Object[] { result,
+					toString() });
 		}
 
-//  if (isRemoteAddress("81.142.228.219")) {
-//    log.warning("Wrote to channel " + result + " bytes.");
-//  }
+		// if (isRemoteAddress("81.142.228.219")) {
+		// log.warning("Wrote to channel " + result + " bytes.");
+		// }
 		bytesSent += result;
 
 		return result;
 	}
-}    // SocketIO
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see tigase.io.IOInterface#setLogId(java.lang.String)
+	 */
+	@Override
+	public void setLogId(String logId) {
+		this.logId = logId + " ";
+	}
+} // SocketIO
 
-//~ Formatted in Sun Code Convention
+// ~ Formatted in Sun Code Convention
 
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com

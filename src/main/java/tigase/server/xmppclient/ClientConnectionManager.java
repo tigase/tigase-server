@@ -299,7 +299,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	@Override
 	public Queue<Packet> processSocketData(XMPPIOService<Object> serv) {
 
-		String id = getUniqueId(serv);
+		// String id = getUniqueId(serv);
+		JID id = serv.getConnectionId();
 
 		// String hostname =
 		// (String)serv.getSessionData().get(serv.HOSTNAME_KEY);
@@ -327,7 +328,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				}
 			}
 
-			p.setPacketFrom(getFromAddress(id));
+			// p.setPacketFrom(getFromAddress(id));
+			p.setPacketFrom(id);
 
 			JID receiver = serv.getDataReceiver();
 
@@ -338,9 +340,10 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 				// Hm, receiver is not set yet..., ignoring
 				if (log.isLoggable(Level.INFO)) {
-					log.log(Level.INFO,
+					log.log(
+							Level.INFO,
 							"Hm, receiver is not set yet (misconfiguration error)..., ignoring: {0}, connection: {1}",
-							new Object[] {p.toStringSecure(), serv});
+							new Object[] { p.toStringSecure(), serv });
 				}
 			}
 
@@ -409,6 +412,14 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		xmppStreamClosed(service);
 
 		return result;
+	}
+
+	@Override
+	public void serviceStarted(XMPPIOService<Object> service) {
+		super.serviceStarted(service);
+		String id = getUniqueId(service);
+		JID connectionId = getFromAddress(id);
+		service.setConnectionId(connectionId);
 	}
 
 	/**
@@ -490,7 +501,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	@Override
 	public void xmppStreamClosed(XMPPIOService<Object> serv) {
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "Stream closed: {0}", serv.getUniqueId());
+			log.log(Level.FINER, "Stream closed: {0}", serv.getConnectionId());
 		}
 
 		// It might be a Bosh service in which case it is ignored here.
@@ -503,7 +514,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 			if (serv.getDataReceiver() != null) {
 				Packet command =
-						Command.STREAM_CLOSED.getPacket(getFromAddress(getUniqueId(serv)),
+						Command.STREAM_CLOSED.getPacket(serv.getConnectionId(),
 								serv.getDataReceiver(), StanzaType.set, UUID.randomUUID().toString());
 
 				// In case of mass-disconnects, adjust the timeout properly
@@ -535,7 +546,9 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 */
 	@Override
 	public String xmppStreamOpened(XMPPIOService<Object> serv, Map<String, String> attribs) {
-		log.log(Level.FINER, "Stream opened: {0}", attribs);
+		if (log.isLoggable(Level.FINER)) {
+			log.log(Level.FINER, "Stream opened: {0}", attribs);
+		}
 
 		String lang = attribs.get("xml:lang");
 		final String hostname = attribs.get("to");
@@ -587,8 +600,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 			if (see_other_host != null && !see_other_host.equals(getDefHostName())) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Sending redirect for {0} to host {1}, connection {2}.", new Object[] {
-							fromJID, see_other_host, serv });
+					log.log(Level.FINEST, "Sending redirect for {0} to host {1}, connection {2}.",
+							new Object[] { fromJID, see_other_host, serv });
 				}
 
 				return "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
@@ -605,7 +618,9 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 		if (id == null) {
 			id = UUID.randomUUID().toString();
-			log.log(Level.FINER, "No Session ID, generating a new one: {0}", id);
+			if (log.isLoggable(Level.FINER)) {
+				log.log(Level.FINER, "No Session ID, generating a new one: {0}", id);
+			}
 			serv.getSessionData().put(IOService.SESSION_ID_KEY, id);
 			serv.setXMLNS(XMLNS);
 			serv.getSessionData().put(IOService.HOSTNAME_KEY, hostname);
@@ -615,28 +630,34 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 					"<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
 							+ " xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + hostname
 							+ "'" + " id='" + id + "'" + " version='1.0' xml:lang='en'>";
-
-			log.log(Level.FINER, "Writing raw data to the socket: {0}", streamOpenData);
+			if (log.isLoggable(Level.FINER)) {
+				log.log(Level.FINER, "Writing raw data to the socket: {0}", streamOpenData);
+			}
 			writeRawData(serv, streamOpenData);
-			log.log(Level.FINER, "DONE");
+			if (log.isLoggable(Level.FINER)) {
+				log.log(Level.FINER, "DONE");
+			}
 
 			Packet streamOpen =
-					Command.STREAM_OPENED.getPacket(getFromAddress(getUniqueId(serv)),
-							serv.getDataReceiver(), StanzaType.set, this.newPacketId("c2s-"),
-							Command.DataType.submit);
+					Command.STREAM_OPENED.getPacket(serv.getConnectionId(), serv.getDataReceiver(),
+							StanzaType.set, this.newPacketId("c2s-"), Command.DataType.submit);
 
 			Command.addFieldValue(streamOpen, "session-id", id);
 			Command.addFieldValue(streamOpen, "hostname", hostname);
 			Command.addFieldValue(streamOpen, "xml:lang", lang);
-			log.log(Level.FINER, "Sending a system command to SM: {0}", streamOpen);
+			if (log.isLoggable(Level.FINER)) {
+				log.log(Level.FINER, "Sending a system command to SM: {0}", streamOpen);
+			}
 			addOutPacketWithTimeout(streamOpen, startedHandler, 45l, TimeUnit.SECONDS);
 			log.log(Level.FINER, "DOEN 2");
 		} else {
-			log.log(Level.FINER, "Session ID is: {0}", id);
+			if (log.isLoggable(Level.FINER)) {
+				log.log(Level.FINER, "Session ID is: {0}", id);
+			}
 			writeRawData(serv, "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
 					+ " xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + hostname
 					+ "'" + " id='" + id + "'" + " version='1.0' xml:lang='en'>");
-			addOutPacket(Command.GETFEATURES.getPacket(getFromAddress(getUniqueId(serv)),
+			addOutPacket(Command.GETFEATURES.getPacket(serv.getConnectionId(),
 					serv.getDataReceiver(), StanzaType.get, UUID.randomUUID().toString(), null));
 		}
 
@@ -732,7 +753,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 			case STARTZLIB:
 				if (serv != null) {
 					if (log.isLoggable(Level.FINER)) {
-						log.log(Level.FINER, "Starting zlib compression: {0}", serv.getUniqueId());
+						log.log(Level.FINER, "Starting zlib compression: {0}", serv);
 					}
 
 					try {
@@ -762,7 +783,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 			case STARTTLS:
 				if (serv != null) {
 					if (log.isLoggable(Level.FINER)) {
-						log.log(Level.FINER, "Starting TLS for connection: {0}", serv.getUniqueId());
+						log.log(Level.FINER, "Starting TLS for connection: {0}", serv);
 					}
 
 					try {
@@ -838,8 +859,9 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 					List<Element> err_el = packet.getElement().getChildren("/iq/command");
 					boolean moreToSend = false;
 					if (err_el != null && err_el.size() > 0) {
-						streamClose = "<stream:error>" + err_el.get(0).toString() 
-                                                        + "</stream:error>" + streamClose;
+						streamClose =
+								"<stream:error>" + err_el.get(0).toString() + "</stream:error>"
+										+ streamClose;
 						moreToSend = true;
 					}
 					try {

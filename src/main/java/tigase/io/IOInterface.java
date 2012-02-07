@@ -72,6 +72,9 @@ public interface IOInterface {
 	int waitingToSendSize();
 
 	int write(final ByteBuffer buff) throws IOException;
+	
+	void setLogId(String logId);
+	
 }    // IOInterface
 
 

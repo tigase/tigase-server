@@ -393,7 +393,7 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 							+ elem.toString(), ex);
 				} catch (Exception ex) {
 					log.log(Level.INFO, toString() + ", Incorrect XML data: " + new String(data)
-							+ ", stopping connection: " + getUniqueId() + ", exception: ", ex);
+							+ ", stopping connection: " + getConnectionId() + ", exception: ", ex);
 					forceStop();
 				} // end of try-catch
 

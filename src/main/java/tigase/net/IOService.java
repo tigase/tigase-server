@@ -24,27 +24,8 @@ package tigase.net;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.cert.CertCheckResult;
-
-import tigase.io.BufferUnderflowException;
-import tigase.io.IOInterface;
-import tigase.io.SocketIO;
-import tigase.io.TLSEventHandler;
-import tigase.io.TLSIO;
-import tigase.io.TLSUtil;
-import tigase.io.TLSWrapper;
-import tigase.io.ZLibIO;
-
-import tigase.stats.StatisticsList;
-
-import tigase.xmpp.JID;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.io.IOException;
-
 import java.net.Socket;
-
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.SocketChannel;
@@ -53,16 +34,25 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.MalformedInputException;
-
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import tigase.cert.CertCheckResult;
+import tigase.io.BufferUnderflowException;
+import tigase.io.IOInterface;
+import tigase.io.SocketIO;
+import tigase.io.TLSEventHandler;
+import tigase.io.TLSIO;
+import tigase.io.TLSUtil;
+import tigase.io.TLSWrapper;
+import tigase.io.ZLibIO;
+import tigase.stats.StatisticsList;
+import tigase.xmpp.JID;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -127,6 +117,7 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 	/** Field description */
 	private long empty_read_call_count = 0;
 	private String id = null;
+	private JID connectionId = null;
 
 	/**
 	 * This variable keeps the time of last transfer in any direction it is used
@@ -192,7 +183,7 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 			if (host == null) {
 				host = (String) sessionData.get("remote-host");
 			}
-			
+
 			String sock_str = null;
 			try {
 				sock_str = socketChannel.socket().toString();
@@ -200,7 +191,8 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 				sock_str = ex.toString();
 			}
 
-			log.log(Level.INFO,
+			log.log(
+					Level.INFO,
 					"Problem connecting to remote host: {0}, address: {1}, socket: {2} - exception: {3}, session data: {4}",
 					new Object[] { host, remote_address, sock_str, e, sessionData });
 
@@ -288,7 +280,7 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 			// Well, do nothing, we are closing the connection anyway....
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Socket: " + socketIO
-						+ ", Exception while stopping service: " + getUniqueId(), e);
+						+ ", Exception while stopping service: " + connectionId, e);
 			}
 		} finally {
 			if (serviceListener != null) {
@@ -468,7 +460,7 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 			// thr);
 			// }
 			log.log(Level.FINEST, "Socket: {0}, Connected: {1}, id: {2}", new Object[] {
-					socketIO, result, id });
+					socketIO, result, connectionId });
 		}
 
 		return result;
@@ -518,7 +510,7 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 		// however, ConcurrentHashMap does not allow nulls as value so we have
 		// to copy Maps carefully.
 		sessionData = new ConcurrentHashMap<String, Object>(props.size());
-		for (Map.Entry<String, Object> entry: props.entrySet()) {
+		for (Map.Entry<String, Object> entry : props.entrySet()) {
 			if (entry.getValue() != null) {
 				sessionData.put(entry.getKey(), entry.getValue());
 			}
@@ -562,7 +554,7 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 	 */
 	public void startTLS(boolean clientMode) throws IOException {
 		if (socketIO.checkCapabilities(TLSIO.TLS_CAPS)) {
-			throw new IllegalStateException("TLS mode is already activated.");
+			throw new IllegalStateException("TLS mode is already activated " + connectionId);
 		}
 
 		// This should not take more then 100ms
@@ -631,7 +623,7 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 	 */
 	@Override
 	public String toString() {
-		return this.getUniqueId() + ", type: " + connectionType + ", Socket: " + socketIO;
+		return getConnectionId() + ", type: " + connectionType + ", Socket: " + socketIO;
 	}
 
 	/**
@@ -640,10 +632,10 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 	 * 
 	 * @return
 	 */
-        public boolean waitingToRead() {                
-                return true;
-        }
-        
+	public boolean waitingToRead() {
+		return true;
+	}
+
 	/**
 	 * Method description
 	 * 
@@ -664,16 +656,15 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 		return socketIO.waitingToSendSize();
 	}
 
-        /**
-         * Method description
-         * 
-         * @return 
-         */
-        protected boolean isInputBufferEmpty() {
-                return socketInput != null && socketInput.remaining() == socketInput.capacity();
-        }
+	/**
+	 * Method description
+	 * 
+	 * @return
+	 */
+	protected boolean isInputBufferEmpty() {
+		return socketInput != null && socketInput.remaining() == socketInput.capacity();
+	}
 
-        
 	/**
 	 * Describe <code>debug</code> method here.
 	 * 
@@ -914,8 +905,8 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 		return null;
 	}
 
-        protected ByteBuffer readBytes() throws IOException {
-                setLastTransferTime();
+	protected ByteBuffer readBytes() throws IOException {
+		setLastTransferTime();
 
 		if (log.isLoggable(Level.FINEST) && (empty_read_call_count > 10)) {
 			Throwable thr = new Throwable();
@@ -924,36 +915,34 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 			log.log(Level.FINEST, "Socket: " + socketIO, thr);
 		}
 
-                try {
-                        ByteBuffer tmpBuffer = socketIO.read(socketInput);
-                        if (socketIO.bytesRead() > 0) {
-                                empty_read_call_count = 0;
-                                
-                                return tmpBuffer;
-                        }
-                        else {
+		try {
+			ByteBuffer tmpBuffer = socketIO.read(socketInput);
+			if (socketIO.bytesRead() > 0) {
+				empty_read_call_count = 0;
+
+				return tmpBuffer;
+			} else {
 				if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS
 						&& (!writeInProgress.isLocked())) {
 					log.log(Level.WARNING,
 							"Socket: {0}, Max allowed empty calls excceeded, closing connection.",
 							socketIO);
 					forceStop();
-				}                                
-                        }
-        
-                }
-                catch (Exception eof) {
+				}
+			}
+
+		} catch (Exception eof) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Socket: " + socketIO + ", Exception reading data", eof);
 			}
 
 			// eof.printStackTrace();
-			forceStop();                        
-                }
-                
-                return null;
-        }
-        
+			forceStop();
+		}
+
+		return null;
+	}
+
 	/**
 	 * Describe <code>writeData</code> method here.
 	 * 
@@ -1030,7 +1019,7 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 			}
 		} catch (Exception e) {
 			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER, "Data writing exception", e);
+				log.log(Level.FINER, "Data writing exception " + connectionId, e);
 			}
 
 			forceStop();
@@ -1039,9 +1028,9 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 		}
 	}
 
-        protected void writeBytes(ByteBuffer data) {
+	protected void writeBytes(ByteBuffer data) {
 
-                // Try to lock the data writing method
+		// Try to lock the data writing method
 		boolean locked = writeInProgress.tryLock();
 
 		// If cannot lock and nothing to send, just leave
@@ -1057,14 +1046,14 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 		// Avoid concurrent calls here (one from call() and another from
 		// application)
 		try {
-                        if (data != null && data.hasRemaining()) {
-                                int length = data.remaining();
-                                
+			if (data != null && data.hasRemaining()) {
+				int length = data.remaining();
+
 				socketIO.write(data);
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Socket: {0}, wrote: {1}",
-							new Object[] { socketIO, length });
+					log.log(Level.FINEST, "Socket: {0}, wrote: {1}", new Object[] { socketIO,
+							length });
 				}
 
 				// idx_start = idx_offset;
@@ -1083,15 +1072,15 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 			}
 		} catch (Exception e) {
 			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER, "Data writing exception", e);
+				log.log(Level.FINER, "Data writing exception " + connectionId, e);
 			}
 
 			forceStop();
 		} finally {
 			writeInProgress.unlock();
 		}
-        }
-        
+	}
+
 	private void resizeInputBuffer() throws IOException {
 		int netSize = socketIO.getInputPacketSize();
 
@@ -1149,6 +1138,23 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 	private void setLastTransferTime() {
 		lastTransferTime = System.currentTimeMillis();
 	}
+
+	/**
+	 * @return the connectionId
+	 */
+	public JID getConnectionId() {
+		return connectionId;
+	}
+
+	/**
+	 * @param connectionId
+	 *          the connectionId to set
+	 */
+	public void setConnectionId(JID connectionId) {
+		this.connectionId = connectionId;
+		socketIO.setLogId(connectionId.toString());
+	}
+
 } // IOService
 
 // ~ Formatted in Sun Code Convention
