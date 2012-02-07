@@ -77,6 +77,8 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	private static final boolean WHITE_CHAR_ACK_PROP_VAL = false;
 	private static final String XMPP_ACK_PROP_KEY = "xmpp-ack";
 	private static final boolean XMPP_ACK_PROP_VAL = false;
+	private static final String SOCKET_CLOSE_WAIT_PROP_KEY = "socket-close-wait";
+	private static final long SOCKET_CLOSE_WAIT_PROP_DEF = 1;
 
 	private SeeOtherHostIfc see_other_host_strategy = null;
 
@@ -87,6 +89,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	private final ReceiverTimeoutHandler startedHandler = newStartedHandler();
 	private boolean white_char_ack = WHITE_CHAR_ACK_PROP_VAL;
 	private boolean xmpp_ack = XMPP_ACK_PROP_VAL;
+	private long socket_close_wait_time = SOCKET_CLOSE_WAIT_PROP_DEF;
 
 	/**
 	 * This is mostly for testing purpose. We want to investigate massive (10k per
@@ -154,6 +157,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		}
 		props.put(WHITE_CHAR_ACK_PROP_KEY, white_char_ack);
 		props.put(XMPP_ACK_PROP_KEY, xmpp_ack);
+		props.put(SOCKET_CLOSE_WAIT_PROP_KEY, SOCKET_CLOSE_WAIT_PROP_DEF);
 
 		return props;
 	}
@@ -436,6 +440,10 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		}
 		if (props.get(XMPP_ACK_PROP_KEY) != null) {
 			xmpp_ack = (Boolean) props.get(XMPP_ACK_PROP_KEY);
+		}
+		
+		if (props.get(SOCKET_CLOSE_WAIT_PROP_KEY) != null) {
+			socket_close_wait_time = (Long) props.get(SOCKET_CLOSE_WAIT_PROP_KEY);
 		}
 
 		if (props.size() == 1) {
@@ -875,7 +883,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 							// until all data are sent to the client, however, even then there
 							// is still a chance, that the connection is closed before data
 							// reached the client
-							Thread.currentThread().sleep(1);
+							Thread.sleep(socket_close_wait_time);
 						}
 					} catch (Exception e) {
 					}
