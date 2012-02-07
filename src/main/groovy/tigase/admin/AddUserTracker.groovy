@@ -65,7 +65,7 @@ def hand = null
 Handler[] handlers = Logger.getLogger("").getHandlers()
 handlers.each {
 	Filter filt = it.getFilter()
-	if (filt != null && filt.class == LogFilter && ((LogFilter)filt).getId() == userJid) {
+	if (filt != null && filt.class == LogUserFilter && ((LogUserFilter)filt).getId() == userJid) {
 		hand = it
 	}
 }
