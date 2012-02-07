@@ -295,7 +295,7 @@ public class SocketIO implements IOInterface {
 		// } // end of while (out.hasRemaining())
 		// log.finer("Wrote to channel " + result + " bytes.");
 		// return result;
-		if (buff != null) {
+		if (buff != null && buff.hasRemaining()) {
 			if (log.isLoggable(Level.FINER)) {
 				log.log(Level.FINER, "SOCKET - Writing data, remaining: {0}, {1}", new Object[] {
 						buff.remaining(), toString() });
