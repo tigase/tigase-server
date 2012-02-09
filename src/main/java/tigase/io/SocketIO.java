@@ -57,6 +57,8 @@ public class SocketIO implements IOInterface {
 
 	// ~--- fields ---------------------------------------------------------------
 
+	private static final String MAX_USER_IO_QUEUE_SIZE_PROP_KEY = "max-user-io-queue-size";
+	private static final int MAX_USER_IO_QUEUE_SIZE_PROP_DEF = 1000;
 	private long buffOverflow = 0;
 	private int bytesRead = 0;
 	private long bytesReceived = 0;
@@ -84,7 +86,10 @@ public class SocketIO implements IOInterface {
 		if (channel.socket().getTrafficClass() == ConnectionOpenListener.IPTOS_THROUGHPUT) {
 			dataToSend = new LinkedBlockingQueue<ByteBuffer>(100000);
 		} else {
-			dataToSend = new LinkedBlockingQueue<ByteBuffer>(1000);
+			int queue_size =
+					Integer.getInteger(MAX_USER_IO_QUEUE_SIZE_PROP_KEY,
+							MAX_USER_IO_QUEUE_SIZE_PROP_DEF);
+			dataToSend = new LinkedBlockingQueue<ByteBuffer>(queue_size);
 		}
 	}
 
