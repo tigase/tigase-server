@@ -84,7 +84,7 @@ public class SocketIO implements IOInterface {
 		if (channel.socket().getTrafficClass() == ConnectionOpenListener.IPTOS_THROUGHPUT) {
 			dataToSend = new LinkedBlockingQueue<ByteBuffer>(100000);
 		} else {
-			dataToSend = new LinkedBlockingQueue<ByteBuffer>(100);
+			dataToSend = new LinkedBlockingQueue<ByteBuffer>(1000);
 		}
 	}
 
