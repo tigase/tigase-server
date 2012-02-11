@@ -94,7 +94,7 @@ public class JavaJMXProxyOpt implements NotificationListener {
 		this.interval = interval;
 		this.urlPath = "/jndi/rmi://" + this.hostname + ":" + this.port + "/jmxrmi";
 		this.loadHistory = loadHistory;
-		System.out.println("Created: " + hostname + ":" + port);
+		System.out.println("Created: " + id + ":" + hostname + ":" + port);
 	}
 
 	public void addJMXProxyListener(JMXProxyListenerOpt listener) {
@@ -150,14 +150,14 @@ public class JavaJMXProxyOpt implements NotificationListener {
 	public void start() {
 		if (updater == null) {
 			updater = new StatisticsUpdater();
-			System.out.println("Started: " + hostname + ":" + port);
+			System.out.println("Started: " + id + ":" + hostname + ":" + port);
 		}
 	}
 
 	@Override
 	public void handleNotification(Notification notification, Object handback) {
 		if (notification.getType().equals(JMXConnectionNotification.OPENED)) {
-			System.out.println("Connected: " + hostname + ":" + port);
+			System.out.println("Connected: " + id + ":" + hostname + ":" + port);
 
 			try {
 				server = jmxc.getMBeanServerConnection();
