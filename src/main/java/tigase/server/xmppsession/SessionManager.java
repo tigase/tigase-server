@@ -380,7 +380,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		list.add(getName(), "Maximum user connections", maxUserConnections, Level.INFO);
 		list.add(getName(), "Total user connections", totalUserConnections, Level.FINER);
 		list.add(getName(), "Closed user connections", closedConnections, Level.FINER);
-		list.add(getName(), "Open user sessions", sessionsByNodeId.size(), Level.FINE);
+		list.add(getName(), "Open user sessions", sessionsByNodeId.size(), Level.INFO);
 		list.add(getName(), "Maximum user sessions", maxUserSessions, Level.FINE);
 		list.add(getName(), "Total user sessions", totalUserSessions, Level.FINER);
 		list.add(getName(), "Authentication timouts", authTimeouts, Level.INFO);
