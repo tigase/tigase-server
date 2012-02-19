@@ -140,6 +140,10 @@ public class ClientConnectionClustered extends ClientConnectionManager implement
 
 	@Override
 	public SeeOtherHostIfc getSeeOtherHostInstance(String see_other_host_class) {
+		if ( log.isLoggable( Level.FINEST ) ){
+			log.finest( "Configuring see_other_host clustered strategy for: " + see_other_host_class );
+		}
+
 		if (see_other_host_class == null) {
 			see_other_host_class = SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_DEF_VAL_CLUSTER;
 		}

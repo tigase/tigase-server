@@ -119,10 +119,11 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 		see_other_host_strategy = getSeeOtherHostInstance(see_other_host_class);
 
-		props.put(SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_KEY, see_other_host_strategy
-				.getClass().getName());
-
-		see_other_host_strategy.getDefaults(props, params);
+		props.put( SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_KEY, see_other_host_class );
+		
+		if ( see_other_host_strategy != null ){
+			see_other_host_strategy.getDefaults( props, params );
+		}
 
 		if (r_mode == null) {
 			props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY, ROUTING_MODE_PROP_VAL);
@@ -183,8 +184,15 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	}
 
 	public SeeOtherHostIfc getSeeOtherHostInstance(String see_other_host_class) {
+		if ( log.isLoggable( Level.FINEST ) ){
+			log.finest( "Configuring see_other_host strategy for: " + see_other_host_class );
+		}
+
 		if (see_other_host_class == null)
 			see_other_host_class = SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_DEF_VAL;
+
+		if (see_other_host_class.equals("none"))
+			return null;
 
 		try {
 			see_other_host_strategy =
@@ -456,7 +464,9 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		String see_other_host_class =
 				(String) props.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_KEY);
 		see_other_host_strategy = getSeeOtherHostInstance(see_other_host_class);
-		see_other_host_strategy.setProperties(props);
+		if ( see_other_host_strategy != null ){
+			see_other_host_strategy.setProperties( props );
+		}
 
 		boolean routing_mode =
 				(Boolean) props.get(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY);
