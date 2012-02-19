@@ -102,6 +102,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	public static final String SKIP_OFFLINE_PROP_KEY = "skip-offline";
 	public static final String OFFLINE_ROSTER_LAST_SEEN_PROP_KEY =
 			"offline-roster-last-seen";
+	public static final String PRESENCE_GLOBAL_FORWARD = "presence-global-forward";
 	protected static final String XMLNS = CLIENT_XMLNS;
 	public static final String USERS_STATUS_CHANGES = "Users status changes";
 
@@ -112,6 +113,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	private static final String[] XMLNSS = { XMLNS };
 	private static final String[] ELEMENTS = { PRESENCE_ELEMENT_NAME };
 	private static final String ID = PRESENCE_ELEMENT_NAME;
+	private static final long MAX_DIRECT_PRESENCES_NO = 1000;
 	private static long requiredNo = 0;
 	private static long requiredYes = 0;
 	private static TigaseRuntime runtime = TigaseRuntime.getTigaseRuntime();
@@ -129,6 +131,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 	protected RosterAbstract roster_util = getRosterUtil();
 	private long usersStatusChanges = 0;
 	private String[] offlineRosterLastSeen = null;
+	private JID presenceGLobalForward = null;
 
 	// ~--- methods --------------------------------------------------------------
 
@@ -148,7 +151,9 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 			session.putSessionData(DIRECT_PRESENCE, direct_presences);
 		} // end of if (direct_presences == null)
 
-		direct_presences.add(jid);
+		if (direct_presences.size() < MAX_DIRECT_PRESENCES_NO) {
+			direct_presences.add(jid);
+		}
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Added direct presence jid: {0}", jid);
@@ -769,6 +774,15 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 			log.config("Loaded roster offline last seen config: " + tmp);
 		} else {
 			log.config("No configuration found for Loaded roster offline last seen.");
+		}
+		tmp = (String) settings.get(PRESENCE_GLOBAL_FORWARD);
+		if (tmp != null) {
+			try {
+				presenceGLobalForward = JID.jidInstance(tmp);
+			} catch (TigaseStringprepException ex) {
+				presenceGLobalForward = null;
+				log.warning("Presence global forward misconfiguration, cannot parse JID " + tmp);
+			}
 		}
 	}
 
@@ -1530,6 +1544,15 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 			} else {
 				stopped(session, results, settings);
 			}
+			// Presence forwarding
+			JID forwardTo = session.getDomain().getPresenceForward();
+			if (forwardTo == null) {
+				forwardTo = presenceGLobalForward;
+			}
+			if (forwardTo != null) {
+				sendPresence(null, session.getJID(), forwardTo, results, packet.getElement());
+			}
+
 		}
 	}
 
