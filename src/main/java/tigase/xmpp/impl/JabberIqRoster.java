@@ -439,6 +439,9 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc, X
 		// Retrieve standard roster items.
 		List<Element> ritems = roster_util.getRosterItems(session);
 
+		// Recalculate the roster hash again with dynamic roster content
+		StringBuilder roster_str = new StringBuilder(5000);
+
 		// Retrieve all Dynamic roster elements from the roster repository
 		List<Element> its = DynamicRoster.getRosterItems(session, settings);
 
@@ -473,23 +476,22 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc, X
 				}
 			}
 
-			// Recalculate the roster hash again with dynamic roster content
-			StringBuilder roster_str = new StringBuilder(5000);
-
 			// This may seem to be redundant as this call has already been made
-			// but the roster could have been changed.
+			// but the roster could have been changed during above dynamic roster merge
 			ritems = roster_util.getRosterItems(session);
 
-			for (Element ritem : ritems) {
-				roster_str.append(ritem.toString());
-			}
 
 			for (Element ritem : its) {
 				roster_str.append(ritem.toString());
 			}
 
-			roster_util.updateRosterHash(roster_str.toString(), session);
 		}
+
+		for (Element ritem : ritems) {
+			roster_str.append(ritem.toString());
+		}
+		
+		roster_util.updateRosterHash(roster_str.toString(), session);
 
 		// Check roster version hash.
 		String incomingHash = packet.getElement().getAttribute("/iq/query", "ver");
