@@ -374,6 +374,8 @@ public abstract class RosterAbstract {
 
 	/** Field description */
 	public static final String XMLNS_DYNAMIC = "jabber:iq:roster-dynamic";
+	
+	public static final String VER_ATT = "ver";
 
 	/** Field description */
 	public static final Element[] DISCO_FEATURES = {
@@ -1040,6 +1042,7 @@ public abstract class RosterAbstract {
 		Element query = new Element("query");
 
 		query.setXMLNS(ROSTER_XMLNS);
+		query.addAttribute(VER_ATT, getBuddiesHash(session));
 		query.addChild(item);
 		update.addChild(query);
 
@@ -1146,16 +1149,17 @@ public abstract class RosterAbstract {
 
 		session.putCommonSessionData(ROSTERHASH, roster_hash);
 	}
-	
+
 	public abstract void logout(XMPPResourceConnection session);
 
 	/**
 	 * @param session
 	 * @param buddy
 	 * @return
-	 * @throws TigaseDBException 
-	 * @throws NotAuthorizedException 
+	 * @throws TigaseDBException
+	 * @throws NotAuthorizedException
 	 */
-	public abstract String getCustomStatus(XMPPResourceConnection session, JID buddy) throws NotAuthorizedException, TigaseDBException;
-	
+	public abstract String getCustomStatus(XMPPResourceConnection session, JID buddy)
+			throws NotAuthorizedException, TigaseDBException;
+
 }
