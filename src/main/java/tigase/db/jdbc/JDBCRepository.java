@@ -141,6 +141,12 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 			// OK
 			nid = getNodeNID(repo, uid, subnode);
 
+			if ( log.isLoggable( Level.FINEST ) ){
+				log.log( Level.FINEST,
+						 "Saving data adding data list, user_id: {0}, subnode: {1}, key: {2}, uid: {3}, nid: {4}, list: {5}",
+						 new Object[] { user_id, subnode, key, uid, nid, Arrays.toString( list ) } );
+			}
+
 			if (nid < 0) {
 				try {
 					// OK
@@ -404,6 +410,13 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 
 		try {
 			long nid = getNodeNID(null, user_id, subnode);
+
+			if ( log.isLoggable( Level.FINEST ) ){
+				log.log( Level.FINEST,
+						 "Loading data for key: {0}, user: {1}, node: {2}, found nid: {3}",
+						 new Object[] { key, user_id, subnode, nid } );
+			}
+
 			PreparedStatement data_for_node_st =
 					data_repo.getPreparedStatement(user_id, DATA_FOR_NODE_QUERY);
 
@@ -417,6 +430,10 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 
 					while (rs.next()) {
 						results.add(rs.getString(1));
+
+						if ( log.isLoggable( Level.FINEST ) ){
+							log.log( Level.FINEST, "Found data: {0}", rs.getString(1) );
+						}
 					}
 
 					String[] result =
