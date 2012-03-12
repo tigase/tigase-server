@@ -28,8 +28,13 @@ create database ${dbName};
 create user ${dbUser} with password '${dbPass}';
 -- QUERY END: add user
 
--- QUERY START: add user
+-- QUERY START: GRANT ALL
 GRANT ALL ON database ${dbName} TO ${dbUser};
--- QUERY END: add user
+-- QUERY END: GRANT ALL
 
+-- QUERY START: ALTER DATABASE
 ALTER DATABASE ${dbName} OWNER TO ${dbUser};
+-- QUERY END: ALTER DATABASE
+
+
+
