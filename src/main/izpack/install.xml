@@ -57,6 +57,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 	<jar src="libs/tigase-utils.jar"/>
 
 	<native type="izpack" name="ShellLink.dll"/>
+	<native type="izpack" name="ShellLink_x64.dll"/>
 
 	<variables>
 		<variable name="InstallerFrame.logfilePath" value="$INSTALL_PATH/install.log"/>
