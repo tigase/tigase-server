@@ -44,10 +44,8 @@ import java.sql.SQLException;
 
 import java.text.SimpleDateFormat;
 
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -187,7 +185,15 @@ public class Store extends ActionAbstract {
 			repo = MsgRepository.getInstance(db_uri);
 
 			try {
-				repo.initRepository(db_uri, null);
+                                Map<String,String> db_props = new HashMap<String,String>(4);
+                                for (Map.Entry<String,Object> entry : props.entrySet()) {
+                                        db_props.put(entry.getKey(), entry.getValue().toString());
+                                }
+                                
+                                // Initialization of repository can be done here and in MessageAmp 
+                                // class so repository related parameters for MsgRepository 
+                                // should be specified for AMP plugin and AMP component
+				repo.initRepository(db_uri, db_props);
 			} catch (SQLException ex) {
 				repo = null;
 				log.log(Level.WARNING, "Problem initializing connection to DB: ", ex);

@@ -46,6 +46,7 @@ import tigase.xmpp.XMPPResourceConnection;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.sql.SQLException;
+import java.util.HashMap;
 
 import java.util.Map;
 import java.util.Queue;
@@ -134,10 +135,18 @@ public class MessageAmp extends XMPPProcessor implements XMPPPostprocessorIfc, X
 		}
 
 		if (msg_repo_uri != null) {
+                        Map<String, String> db_props = new HashMap<String, String>(4);
+                        for (Map.Entry<String, Object> entry : settings.entrySet()) {
+                                db_props.put(entry.getKey(), entry.getValue().toString());
+                        }
+                        
+                        // Initialization of repository can be done here and in Store
+                        // class so repository related parameters for MsgRepository 
+                        // should be specified for AMP plugin and AMP component                        
 			msg_repo = MsgRepository.getInstance(msg_repo_uri);
 
 			try {
-				msg_repo.initRepository(msg_repo_uri, null);
+				msg_repo.initRepository(msg_repo_uri, db_props);
 			} catch (SQLException ex) {
 				msg_repo = null;
 				log.log(Level.WARNING, "Problem initializing connection to DB: ", ex);
