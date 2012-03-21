@@ -56,13 +56,15 @@ public class DataRepositoryImpl implements DataRepository {
 			"select * from information_schema.tables where table_name = ? and table_schema = ?";
 
 	/** Field description */
-	public static final String PGSQL_CHECK_TABLE_QUERY = "select * from pg_tables where tablename = ? and schemaname = ?";
-        
-        /** Field description */
-	public static final String DERBY_CHECK_TABLE_QUERY = "select * from SYS.SYSTABLES where tablename = UPPER(?) and ? is not null";
-        
+	public static final String PGSQL_CHECK_TABLE_QUERY =
+			"select * from pg_tables where tablename = ? and schemaname = ?";
+
 	/** Field description */
-        public static final String OTHER_CHECK_TABLE_QUERY = "";
+	public static final String DERBY_CHECK_TABLE_QUERY =
+			"select * from SYS.SYSTABLES where tablename = UPPER(?) and ? is not null";
+
+	/** Field description */
+	public static final String OTHER_CHECK_TABLE_QUERY = "";
 
 	/** Field description */
 	public static final String SP_STARTS_WITH = "{ call";
@@ -141,19 +143,18 @@ public class DataRepositoryImpl implements DataRepository {
 				log.log(Level.INFO, "Table {0} not found in database, creating: {1}",
 						new Object[] { tableName, createTableQuery });
 				st = createStatement(null);
-                                if (!db_conn.contains("derby")) {
-                                        st.executeUpdate(createTableQuery);
-                                }
-                                else {
-                                        String[] queries = createTableQuery.split(";");
-                                        for (String query : queries) {
-                                                query = query.trim();
-                                                if (query.isEmpty())
-                                                        continue;
-                                                
-                                                st.executeUpdate(query);
-                                        }
-                                }
+				if (!db_conn.contains("derby")) {
+					st.executeUpdate(createTableQuery);
+				} else {
+					String[] queries = createTableQuery.split(";");
+					for (String query : queries) {
+						query = query.trim();
+						if (query.isEmpty())
+							continue;
+
+						st.executeUpdate(query);
+					}
+				}
 				result = true;
 			} else {
 				log.log(Level.INFO, "OK table {0} found in database.", tableName);
@@ -259,17 +260,14 @@ public class DataRepositoryImpl implements DataRepository {
 		initRepo();
 
 		if (db_conn.contains("mysql")) {
-                        check_table_query = MYSQL_CHECK_TABLE_QUERY;
-                }
-                else if (db_conn.contains("postgresql")) {
-                        check_table_query = PGSQL_CHECK_TABLE_QUERY;                                
-                        table_schema = "public";        
-                }
-                else if (db_conn.contains("derby")) {
-                        check_table_query = DERBY_CHECK_TABLE_QUERY;
-                }
-                else {
-                        check_table_query = OTHER_CHECK_TABLE_QUERY;
+			check_table_query = MYSQL_CHECK_TABLE_QUERY;
+		} else if (db_conn.contains("postgresql")) {
+			check_table_query = PGSQL_CHECK_TABLE_QUERY;
+			table_schema = "public";
+		} else if (db_conn.contains("derby")) {
+			check_table_query = DERBY_CHECK_TABLE_QUERY;
+		} else {
+			check_table_query = OTHER_CHECK_TABLE_QUERY;
 		}
 
 		if (!check_table_query.isEmpty()) {
