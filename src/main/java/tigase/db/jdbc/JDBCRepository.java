@@ -91,7 +91,8 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 	private static final String USER_STR = "User: ";
 	private static final String GET_USER_DB_UID_QUERY = "{ call TigGetUserDBUid(?) }";
 	private static final String GET_USERS_COUNT_QUERY = "{ call TigAllUsersCount() }";
-	private static final String GET_USERS_QUERY = "{ call TigAllUsers() }";
+	private static final String DEF_GET_USERS_QUERY = "{ TigAllUsers() }";
+	private static final String PGSQL_GET_USERS_QUERY = "select TigAllUsers()";
 	private static final String ADD_USER_PLAIN_PW_QUERY =
 			"{ call TigAddUserPlainPw(?, ?) }";
 	private static final String REMOVE_USER_QUERY = "{ call TigRemoveUser(?) }";
@@ -124,6 +125,7 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 	// Cache moved to connection pool
 	private Map<String, Object> cache = null;
 	private DataRepository data_repo = null;
+        private String get_users_query = null;
 	private boolean derby_mode = false;
 	private boolean autoCreateUser = false;
 
@@ -661,7 +663,7 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 
 		try {
 			PreparedStatement all_users_sp =
-					data_repo.getPreparedStatement(null, GET_USERS_QUERY);
+					data_repo.getPreparedStatement(null, get_users_query);
 
 			synchronized (all_users_sp) {
 
@@ -792,7 +794,15 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 
 			data_repo.initPreparedStatement(GET_USER_DB_UID_QUERY, GET_USER_DB_UID_QUERY);
 			data_repo.initPreparedStatement(GET_USERS_COUNT_QUERY, GET_USERS_COUNT_QUERY);
-			data_repo.initPreparedStatement(GET_USERS_QUERY, GET_USERS_QUERY);
+                        
+                        if (connection_str.startsWith("jdbc:postgresql")) {
+                                get_users_query = PGSQL_GET_USERS_QUERY;
+                        }
+                        else {
+                                get_users_query = DEF_GET_USERS_QUERY;
+                        }
+			data_repo.initPreparedStatement(get_users_query, get_users_query);
+                        
 			data_repo.initPreparedStatement(ADD_USER_PLAIN_PW_QUERY, ADD_USER_PLAIN_PW_QUERY);
 			data_repo.initPreparedStatement(REMOVE_USER_QUERY, REMOVE_USER_QUERY);
 			data_repo.initPreparedStatement(ADD_NODE_QUERY, ADD_NODE_QUERY);

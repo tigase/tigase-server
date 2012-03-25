@@ -249,13 +249,16 @@ end;
 
 -- QUERY START:
 -- List of all users in database
-create or replace function TigAllUsers() returns void as '
-begin
-  return;
-	select user_id, last_login, last_logout, online_status, failed_logins, account_status
-		from tig_users;
-end;
-' LANGUAGE 'plpgsql';
+create or replace function TigAllUsers() returns setof varchar(2049) as 
+	'select user_id from tig_users;'
+LANGUAGE 'sql';
+-- create or replace function TigAllUsers() returns void as '
+-- begin
+--  return;
+--	select user_id, last_login, last_logout, online_status, failed_logins, account_status
+--		from tig_users;
+-- end;
+-- ' LANGUAGE 'plpgsql';
 -- QUERY END:
 
 -- QUERY START:
