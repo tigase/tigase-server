@@ -91,7 +91,7 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 	private static final String USER_STR = "User: ";
 	private static final String GET_USER_DB_UID_QUERY = "{ call TigGetUserDBUid(?) }";
 	private static final String GET_USERS_COUNT_QUERY = "{ call TigAllUsersCount() }";
-	private static final String DEF_GET_USERS_QUERY = "{ TigAllUsers() }";
+	private static final String DEF_GET_USERS_QUERY = "{ call TigAllUsers() }";
 	private static final String PGSQL_GET_USERS_QUERY = "select TigAllUsers()";
 	private static final String ADD_USER_PLAIN_PW_QUERY =
 			"{ call TigAddUserPlainPw(?, ?) }";
