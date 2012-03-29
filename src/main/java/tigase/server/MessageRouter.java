@@ -307,7 +307,7 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 		// We do not process packets with not destination address
 		// Just dropping them and writing a log message
 		if (packet.getTo() == null) {
-			log.warning("Packet with TO attribute set to NULL: " + packet.toString());
+			log.warning("Packet with TO attribute set to NULL: " + packet);
 
 			return;
 		} // end of if (packet.getTo() == null)
@@ -337,7 +337,7 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 		// + ", type: " + packet.getType());
 		// }
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Processing packet: " + packet.toStringSecure());
+			log.finest("Processing packet: " + packet);
 		}
 
 		// Detect inifinite loop if from == to
@@ -348,7 +348,7 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 		if (((packet.getType() == StanzaType.error) && (packet.getFrom() != null) && packet
 				.getFrom().equals(packet.getTo()))) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Possible infinite loop, dropping packet: " + packet.toStringSecure());
+				log.finest("Possible infinite loop, dropping packet: " + packet);
 			}
 
 			return;
@@ -394,7 +394,8 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 
 		if (comp != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Packet will be processed by: " + comp.getComponentId());
+				log.finest("1. Packet will be processed by: " + comp.getComponentId() + ", "
+						+ packet);
 			}
 
 			Queue<Packet> results = new ArrayDeque<Packet>();
@@ -458,7 +459,8 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 
 			for (ServerComponent serverComponent : comps) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Packet will be processed by: " + serverComponent.getComponentId());
+					log.finest("2. Packet will be processed by: "
+							+ serverComponent.getComponentId() + ", " + packet);
 				}
 
 				serverComponent.processPacket(packet, results);
@@ -760,8 +762,7 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 		// virtual hosts and the packet can be addressed to the component by
 		// the component name + virtual host name
 		// Code below, tries to find a destination by the component name + any
-		// active
-		// virtual hostname.
+		// active virtual hostname.
 		if (jid.getLocalpart() != null) {
 			comp = components.get(jid.getLocalpart());
 
