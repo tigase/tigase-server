@@ -1,30 +1,27 @@
-
 /*
-* Tigase Jabber/XMPP Server
-* Copyright (C) 2004-2010 "Artur Hefczyc" <artur.hefczyc@tigase.org>
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, version 3 of the License.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. Look for COPYING file in the top folder.
-* If not, see http://www.gnu.org/licenses/.
-*
-* $Rev$
-* Last modified by $Author$
-* $Date$
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2010 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ *
+ * $Rev$
+ * Last modified by $Author$
+ * $Date$
  */
 package tigase.server.amp;
 
 //~--- non-JDK imports --------------------------------------------------------
-
-import tigase.db.UserRepository;
 
 import tigase.disco.XMPPService;
 
@@ -55,31 +52,32 @@ import java.util.logging.Logger;
 
 /**
  * Created: Apr 26, 2010 3:22:06 PM
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class AmpComponent extends AbstractMessageReceiver implements ActionResultsHandlerIfc {
+public class AmpComponent extends AbstractMessageReceiver implements
+		ActionResultsHandlerIfc {
 	private static final Logger log = Logger.getLogger(AmpComponent.class.getName());
 	private static final String AMP_NODE = "http://jabber.org/protocol/amp";
 	private static final String AMP_XMLNS = AMP_NODE;
-	private static final Element top_feature = new Element("feature", new String[] { "var" },
-		new String[] { AMP_NODE });
+	private static final Element top_feature = new Element("feature",
+			new String[] { "var" }, new String[] { AMP_NODE });
 
-	//~--- fields ---------------------------------------------------------------
+	// ~--- fields ---------------------------------------------------------------
 
 	private Map<String, ActionIfc> actions = new ConcurrentSkipListMap<String, ActionIfc>();
-	private Map<String, ConditionIfc> conditions = new ConcurrentSkipListMap<String,
-		ConditionIfc>();
+	private Map<String, ConditionIfc> conditions =
+			new ConcurrentSkipListMap<String, ConditionIfc>();
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -89,10 +87,10 @@ public class AmpComponent extends AbstractMessageReceiver implements ActionResul
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packets
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -100,14 +98,14 @@ public class AmpComponent extends AbstractMessageReceiver implements ActionResul
 		return super.addOutPackets(packets);
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param params
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -143,20 +141,20 @@ public class AmpComponent extends AbstractMessageReceiver implements ActionResul
 			}
 		}
 
-//  for (ConditionIfc c : conditions.values()) {
-//    Map<String, Object> d = c.getDefaults(params);
-//
-//    if (d != null) {
-//      defs.putAll(d);
-//    }
-//  }
+		// for (ConditionIfc c : conditions.values()) {
+		// Map<String, Object> d = c.getDefaults(params);
+		//
+		// if (d != null) {
+		// defs.putAll(d);
+		// }
+		// }
 		return defs;
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -166,8 +164,8 @@ public class AmpComponent extends AbstractMessageReceiver implements ActionResul
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -177,12 +175,12 @@ public class AmpComponent extends AbstractMessageReceiver implements ActionResul
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param node
 	 * @param jid
 	 * @param from
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -191,15 +189,14 @@ public class AmpComponent extends AbstractMessageReceiver implements ActionResul
 
 		if ((jid != null)
 				&& (getName().equals(jid.getLocalpart()) || isLocalDomain(jid.toString()))
-					&& (AMP_NODE.equals(node))) {
+				&& (AMP_NODE.equals(node))) {
 			if (query == null) {
 				query = new Element("query");
 				query.setXMLNS(XMPPService.INFO_XMLNS);
 			}
 
 			query.addChild(new Element("identity", new String[] { "name", "category", "type" },
-					new String[] { getDiscoDescription(),
-					"im", getDiscoCategoryType() }));
+					new String[] { getDiscoDescription(), "im", getDiscoCategoryType() }));
 			query.addChild(top_feature);
 
 			for (ActionIfc action : actions.values()) {
@@ -212,13 +209,15 @@ public class AmpComponent extends AbstractMessageReceiver implements ActionResul
 						new String[] { AMP_NODE + "?condition=" + cond.getName() }));
 			}
 
-//    for (ProcessingThreads<ProcessorWorkerThread> proc_t : processors.values()) {
-//      Element[] discoFeatures = proc_t.getWorkerThread().processor.supDiscoFeatures(null);
-//
-//      if (discoFeatures != null) {
-//        query.addChildren(Arrays.asList(discoFeatures));
-//      }    // end of if (discoFeatures != null)
-//    }
+			// for (ProcessingThreads<ProcessorWorkerThread> proc_t :
+			// processors.values()) {
+			// Element[] discoFeatures =
+			// proc_t.getWorkerThread().processor.supDiscoFeatures(null);
+			//
+			// if (discoFeatures != null) {
+			// query.addChildren(Arrays.asList(discoFeatures));
+			// } // end of if (discoFeatures != null)
+			// }
 		}
 
 		if (log.isLoggable(Level.FINEST)) {
@@ -228,17 +227,19 @@ public class AmpComponent extends AbstractMessageReceiver implements ActionResul
 		return query;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 */
 	@Override
 	public void processPacket(Packet packet) {
-		log.finest("My packet: " + packet);
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("My packet: " + packet);
+		} 
 
 		ActionIfc def = null;
 
@@ -282,12 +283,12 @@ public class AmpComponent extends AbstractMessageReceiver implements ActionResul
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
+	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param props
 	 */
 	@Override
@@ -295,7 +296,7 @@ public class AmpComponent extends AbstractMessageReceiver implements ActionResul
 		super.setProperties(props);
 
 		if (props.size() == 1) {
-			// If props.size() == 1, it means this is a single property update 
+			// If props.size() == 1, it means this is a single property update
 			// and this component does not support single property change for the rest
 			// of it's settings
 			return;
@@ -305,12 +306,12 @@ public class AmpComponent extends AbstractMessageReceiver implements ActionResul
 			a.setProperties(props, this);
 		}
 
-//  for (ConditionIfc c : conditions.values()) {
-//    c.setProperties(props, this);
-//  }
+		// for (ConditionIfc c : conditions.values()) {
+		// c.setProperties(props, this);
+		// }
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	private boolean executeAction(Packet packet, Element rule) {
 		String act = rule.getAttribute(AmpFeatureIfc.ACTION_ATT);
@@ -361,8 +362,6 @@ public class AmpComponent extends AbstractMessageReceiver implements ActionResul
 	}
 }
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com
