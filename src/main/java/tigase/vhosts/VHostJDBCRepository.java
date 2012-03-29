@@ -41,21 +41,21 @@ import java.util.logging.Logger;
 //~--- classes ----------------------------------------------------------------
 
 /**
- * This implementation stores virtual domains in the UserRepository database.
- * It loads initial settings and virtual hosts from the configuration file
- * and then loads more vhosts from the database. Virtual domains from the
- * database can overwrite (disable) vhosts loaded from the configuration file.
- *
+ * This implementation stores virtual domains in the UserRepository database. It
+ * loads initial settings and virtual hosts from the configuration file and then
+ * loads more vhosts from the database. Virtual domains from the database can
+ * overwrite (disable) vhosts loaded from the configuration file.
+ * 
  * This implementation keeps all virtual hosts and their parameters in a single
  * database field. This might not be very efficient if you want to manager big
  * number of virtual domains. It is sufficient for hundreds of vhosts. If you
- * need thousands of VHosts support I advice to implement this storage in
- * more efficient way using separate database tables instead of UserRepository.
+ * need thousands of VHosts support I advice to implement this storage in more
+ * efficient way using separate database tables instead of UserRepository.
  * Please note there is a limit of about 300 vhosts if you use Derby database.
- *
- *
+ * 
+ * 
  * Created: Nov 29, 2008 2:32:48 PM
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -80,18 +80,18 @@ public class VHostJDBCRepository extends UserRepoRepository<VHostItem> {
 	/** Field description */
 	public static String DNS_SRV_DEF_ADDR_PROP_VAL = null;
 
-	//~--- fields ---------------------------------------------------------------
+	// ~--- fields ---------------------------------------------------------------
 
 	private String def_ip_address = null;
 	private String def_srv_address = null;
 	private int max_domains_per_user = DOMAINS_PER_USER_LIMIT_PROP_VAL;
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -101,8 +101,8 @@ public class VHostJDBCRepository extends UserRepoRepository<VHostItem> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -112,8 +112,8 @@ public class VHostJDBCRepository extends UserRepoRepository<VHostItem> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param defs
 	 * @param params
 	 */
@@ -138,8 +138,8 @@ public class VHostJDBCRepository extends UserRepoRepository<VHostItem> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -149,8 +149,8 @@ public class VHostJDBCRepository extends UserRepoRepository<VHostItem> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -160,8 +160,8 @@ public class VHostJDBCRepository extends UserRepoRepository<VHostItem> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -171,8 +171,8 @@ public class VHostJDBCRepository extends UserRepoRepository<VHostItem> {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -180,12 +180,12 @@ public class VHostJDBCRepository extends UserRepoRepository<VHostItem> {
 		return VHostRepoDefaults.getRepoUser();
 	}
 
-	//~--- set methods ----------------------------------------------------------
+	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param properties
 	 */
 	@Override
@@ -199,23 +199,23 @@ public class VHostJDBCRepository extends UserRepoRepository<VHostItem> {
 		max_domains_per_user = (Integer) properties.get(DOMAINS_PER_USER_LIMIT_PROP_KEY);
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param item
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
 	public String validateItem(VHostItem item) {
-                if (item.getVhost() == null || item.getVhost().getDomain() == null
-                                || item.getVhost().getDomain().isEmpty() ) {
-                        return "Domain name not specified";
-                }
-                
+		if (item.getVhost() == null || item.getVhost().getDomain() == null
+				|| item.getVhost().getDomain().isEmpty()) {
+			return "Domain name not specified";
+		}
+
 		int vhost_count = 0;
 
 		for (VHostItem it : allItems()) {
@@ -225,7 +225,8 @@ public class VHostJDBCRepository extends UserRepoRepository<VHostItem> {
 		}
 
 		if (vhost_count >= max_domains_per_user) {
-			return "Maximum number of domains exceeded for the user! Current number is: " + vhost_count;
+			return "Maximum number of domains exceeded for the user! Current number is: "
+					+ vhost_count;
 		}
 
 		try {
@@ -252,8 +253,8 @@ public class VHostJDBCRepository extends UserRepoRepository<VHostItem> {
 				if (ipAddress.equals(def_ip_address)) {
 					return null;
 				} else {
-					return "Incorrect IP address: '" + ipAddress + "' found in DNS for the given host: "
-							+ item.getKey();
+					return "Incorrect IP address: '" + ipAddress
+							+ "' found in DNS for the given host: " + item.getKey();
 				}
 			} else {
 				return "No DNS settings found for given host: " + item.getKey();
@@ -264,8 +265,6 @@ public class VHostJDBCRepository extends UserRepoRepository<VHostItem> {
 	}
 }
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com
