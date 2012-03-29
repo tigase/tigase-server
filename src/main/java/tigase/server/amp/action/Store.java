@@ -1,24 +1,23 @@
-
 /*
-* Tigase Jabber/XMPP Server
-* Copyright (C) 2004-2010 "Artur Hefczyc" <artur.hefczyc@tigase.org>
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, version 3 of the License.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. Look for COPYING file in the top folder.
-* If not, see http://www.gnu.org/licenses/.
-*
-* $Rev$
-* Last modified by $Author$
-* $Date$
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2010 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ *
+ * $Rev$
+ * Last modified by $Author$
+ * $Date$
  */
 package tigase.server.amp.action;
 
@@ -53,7 +52,7 @@ import java.util.logging.Logger;
 
 /**
  * Created: May 1, 2010 11:32:59 AM
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -61,22 +60,23 @@ public class Store extends ActionAbstract {
 	private static final Logger log = Logger.getLogger(Store.class.getName());
 	private static final String name = "store";
 
-	//~--- fields ---------------------------------------------------------------
+	// ~--- fields ---------------------------------------------------------------
 
 	private Thread expiredProcessor = null;
 	private MsgRepository repo = null;
-	private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+	private final SimpleDateFormat formatter =
+			new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param rule
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -99,7 +99,8 @@ public class Store extends ActionAbstract {
 					try {
 						expired = formatter.parse(rule.getAttribute("value"));
 					} catch (Exception e) {
-						log.log(Level.INFO, "Incorrect expire-at value: " + rule.getAttribute("value"), e);
+						log.log(Level.INFO,
+								"Incorrect expire-at value: " + rule.getAttribute("value"), e);
 						expired = null;
 					}
 				}
@@ -113,9 +114,10 @@ public class Store extends ActionAbstract {
 				Element elem = packet.getElement();
 
 				if (elem.getChild("delay", "urn:xmpp:delay") == null) {
-					Element x = new Element("delay", "Offline Storage", new String[] { "from", "stamp",
-							"xmlns" }, new String[] { packet.getStanzaTo().getDomain(), stamp,
-							"urn:xmpp:delay" });
+					Element x =
+							new Element("delay", "Offline Storage", new String[] { "from", "stamp",
+									"xmlns" }, new String[] { packet.getStanzaTo().getDomain(), stamp,
+									"urn:xmpp:delay" });
 
 					elem.addChild(x);
 				}
@@ -129,14 +131,14 @@ public class Store extends ActionAbstract {
 		return false;
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param params
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -157,8 +159,8 @@ public class Store extends ActionAbstract {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -166,12 +168,12 @@ public class Store extends ActionAbstract {
 		return name;
 	}
 
-	//~--- set methods ----------------------------------------------------------
+	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param props
 	 * @param handler
 	 */
@@ -185,14 +187,21 @@ public class Store extends ActionAbstract {
 			repo = MsgRepository.getInstance(db_uri);
 
 			try {
-                                Map<String,String> db_props = new HashMap<String,String>(4);
-                                for (Map.Entry<String,Object> entry : props.entrySet()) {
-                                        db_props.put(entry.getKey(), entry.getValue().toString());
-                                }
-                                
-                                // Initialization of repository can be done here and in MessageAmp 
-                                // class so repository related parameters for MsgRepository 
-                                // should be specified for AMP plugin and AMP component
+				Map<String, String> db_props = new HashMap<String, String>(4);
+				for (Map.Entry<String, Object> entry : props.entrySet()) {
+					
+					// Entry happens to be null for (shared-user-repo-params, null)
+					// TODO: Not sure if this is supposed to happen, more investigation is needed.
+					if (entry.getValue() != null) {
+						log.log(Level.WARNING, "Reading properties: (" + entry.getKey() + ", "
+								+ entry.getValue() + ")");
+						db_props.put(entry.getKey(), entry.getValue().toString());
+					}
+				}
+
+				// Initialization of repository can be done here and in MessageAmp
+				// class so repository related parameters for MsgRepository
+				// should be specified for AMP plugin and AMP component
 				repo.initRepository(db_uri, db_props);
 			} catch (SQLException ex) {
 				repo = null;
@@ -225,7 +234,7 @@ public class Store extends ActionAbstract {
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	private Element getExpireAtRule(Packet packet) {
 		Element amp = packet.getElement().getChild("amp", AMP_XMLNS);
@@ -247,7 +256,7 @@ public class Store extends ActionAbstract {
 		return rule;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	private void removeExpireAtRule(Packet packet) {
 		Element amp = packet.getElement().getChild("amp", AMP_XMLNS);
@@ -273,8 +282,6 @@ public class Store extends ActionAbstract {
 	}
 }
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com
