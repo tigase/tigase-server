@@ -1259,8 +1259,7 @@ public class Packet {
 	 *
 	 * @return a <code>String</code> representation of the packet instance.
 	 */
-	@Override
-	public String toString() {
+	public String toStringFull() {
 		if (packetToString == null) {
 			String elemData = elemToString(elem);
 
@@ -1271,6 +1270,11 @@ public class Packet {
 		}
 
 		return "from=" + packetFrom + ", to=" + packetTo + packetToString;
+	}
+
+	@Override
+	public String toString() {
+		return toString(FULL_DEBUG);
 	}
 
 	/**
@@ -1290,7 +1294,7 @@ public class Packet {
 		if (secure) {
 			result = toStringSecure();
 		} else {
-			result = toString();
+			result = toStringFull();
 		}
 
 		return result;
