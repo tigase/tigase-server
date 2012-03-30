@@ -3,6 +3,7 @@ package tigase.db.ldap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.naming.Context;
 import javax.naming.directory.DirContext;
@@ -10,19 +11,23 @@ import javax.naming.directory.InitialDirContext;
 import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
 
-import tigase.db.AuthRepositoryImpl;
+import tigase.db.AuthRepository;
 import tigase.db.AuthorizationException;
+import tigase.db.DBInitException;
 import tigase.db.TigaseDBException;
+import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
-import tigase.db.UserRepository;
 import tigase.util.Base64;
+import tigase.util.TigaseStringprepException;
 import tigase.xmpp.BareJID;
 
-public class LdapAuthProvider extends AuthRepositoryImpl {
+public class LdapAuthProvider implements AuthRepository {
 
 	private class SaslPLAINLdap implements SaslServer {
 
 		private boolean authOk = false;
+
+		private String user_id;
 
 		@Override
 		public void dispose() throws SaslException {
@@ -43,7 +48,7 @@ public class LdapAuthProvider extends AuthRepositoryImpl {
 				++user_idx;
 			}
 
-			final String user_id = new String(byteArray, auth_idx, user_idx - auth_idx);
+			user_id = new String(byteArray, auth_idx, user_idx - auth_idx);
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("SASL userId: " + user_id);
@@ -58,7 +63,7 @@ public class LdapAuthProvider extends AuthRepositoryImpl {
 			}
 
 			try {
-				authOk = ldapAuth(user_id, passwd);
+				authOk = doBindAuthentication(user_id, passwd);
 			} catch (Exception e) {
 				log.log(Level.WARNING, "Can't authenticate user", e);
 				authOk = false;
@@ -82,6 +87,10 @@ public class LdapAuthProvider extends AuthRepositoryImpl {
 			return null;
 		}
 
+		public String getUser_id() {
+			return user_id;
+		}
+
 		@Override
 		public boolean isComplete() {
 			return authOk;
@@ -97,11 +106,11 @@ public class LdapAuthProvider extends AuthRepositoryImpl {
 			return null;
 		}
 
-	};
+	}
+
+	private static final Logger log = Logger.getLogger(LdapAuthProvider.class.getName());
 
 	protected static final String[] non_sasl_mechs = { "password" };
-
-	public static final String PROVIDER_URL_KEY = "ldap-url";
 
 	protected static final String[] sasl_mechs = { "PLAIN" };
 
@@ -114,23 +123,19 @@ public class LdapAuthProvider extends AuthRepositoryImpl {
 
 	private String userDnPattern;
 
-	public LdapAuthProvider(UserRepository repo) {
-		super(repo);
+	@Override
+	public void addUser(BareJID user, String password) throws UserExistsException, TigaseDBException {
+		throw new TigaseDBException("Not available");
 	}
 
 	@Override
-	public void initRepository(String string, java.util.Map<String, String> params) throws tigase.db.DBInitException {
-		super.initRepository(string, params);
-		this.userDnPattern = params.get(USER_DN_PATTERN_KEY);
-		this.providerUrl = params.get(PROVIDER_URL_KEY);
-		if (log.isLoggable(Level.CONFIG)) {
-			log.config("User DN Pattern: " + this.userDnPattern);
-			log.config("LDAP URL: " + this.providerUrl);
-		}
+	public boolean digestAuth(BareJID user, String digest, String id, String alg) throws UserNotFoundException,
+			TigaseDBException, AuthorizationException {
+		throw new AuthorizationException("Not supported.");
 	}
 
-	private boolean ldapAuth(final String username, final String password) throws UserNotFoundException, TigaseDBException,
-			AuthorizationException {
+	private boolean doBindAuthentication(final String username, final String password) throws UserNotFoundException,
+			TigaseDBException, AuthorizationException {
 		try {
 			Hashtable<Object, Object> env = new Hashtable<Object, Object>();
 			env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
@@ -167,25 +172,64 @@ public class LdapAuthProvider extends AuthRepositoryImpl {
 	}
 
 	@Override
+	public String getResourceUri() {
+		return providerUrl;
+	}
+
+	@Override
+	public long getUsersCount() {
+		return -1;
+	};
+
+	@Override
+	public long getUsersCount(String domain) {
+		return -1;
+	}
+
+	@Override
+	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
+		this.userDnPattern = params.get(USER_DN_PATTERN_KEY);
+		this.providerUrl = resource_uri;
+		if (log.isLoggable(Level.CONFIG)) {
+			log.config("User DN Pattern: " + this.userDnPattern);
+			log.config("LDAP URL: " + this.providerUrl);
+		}
+	}
+
+	@Override
+	public void logout(BareJID user) throws UserNotFoundException, TigaseDBException {
+	}
+
+	@Override
 	public boolean otherAuth(Map<String, Object> props) throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		String proto = (String) props.get(PROTOCOL_KEY);
 
 		if (proto.equals(PROTOCOL_VAL_SASL)) {
 			if (props.get(MACHANISM_KEY).equals("PLAIN")) {
-				saslAuth(props);
+				return saslAuth(props);
 			}
 		} else if (proto.equals(PROTOCOL_VAL_NONSASL)) {
 			String password = (String) props.get(PASSWORD_KEY);
 			BareJID user_id = (BareJID) props.get(USER_ID_KEY);
-
-			return ldapAuth(user_id.getLocalpart(), password);
+			boolean auth = doBindAuthentication(user_id.getLocalpart(), password);
+			if (auth) {
+				props.put(USER_ID_KEY, user_id);
+			}
+			return auth;
 		}
 
 		throw new AuthorizationException("Protocol is not supported.");
 	}
 
 	@Override
-	public void queryAuth(final Map<String, Object> authProps) {
+	public boolean plainAuth(BareJID user, String password) throws UserNotFoundException, TigaseDBException,
+			AuthorizationException {
+		boolean auth = doBindAuthentication(user.getLocalpart(), password);
+		return auth;
+	}
+
+	@Override
+	public void queryAuth(Map<String, Object> authProps) {
 		String protocol = (String) authProps.get(PROTOCOL_KEY);
 
 		if (protocol.equals(PROTOCOL_VAL_NONSASL)) {
@@ -197,9 +241,14 @@ public class LdapAuthProvider extends AuthRepositoryImpl {
 		}
 	}
 
+	@Override
+	public void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException {
+		throw new TigaseDBException("Not available");
+	}
+
 	private boolean saslAuth(final Map<String, Object> props) throws AuthorizationException {
 		try {
-			SaslServer ss = new SaslPLAINLdap();
+			SaslPLAINLdap ss = new SaslPLAINLdap();
 
 			String data_str = (String) props.get(DATA_KEY);
 			byte[] in_data = ((data_str != null) ? Base64.decode(data_str) : new byte[0]);
@@ -219,13 +268,23 @@ public class LdapAuthProvider extends AuthRepositoryImpl {
 			props.put(RESULT_KEY, challenge_str);
 
 			if (ss.isComplete()) {
+				BareJID jid = BareJID.bareJIDInstance(ss.getUser_id(), (String) props.get(SERVER_NAME_KEY));
+
+				props.put(USER_ID_KEY, jid);
 				return true;
 			} else {
 				return false;
 			} // end of if (ss.isComplete()) else
 		} catch (SaslException e) {
 			throw new AuthorizationException("Sasl exception.", e);
-		} // end of try-catch
+		} catch (TigaseStringprepException e) {
+			throw new AuthorizationException("Invalid JID exception.", e);
+		}
+	}
+
+	@Override
+	public void updatePassword(BareJID user, String password) throws UserNotFoundException, TigaseDBException {
+		throw new TigaseDBException("Not available");
 	}
 
 }
