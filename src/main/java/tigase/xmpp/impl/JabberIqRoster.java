@@ -515,6 +515,10 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc,
 		// No need to send the whole roster to the client.
 		if (incomingHash != null) {
 			storedHash = roster_util.getBuddiesHash(session);
+			if (storedHash == null) {
+				updateHash(session, settings);
+				storedHash = roster_util.getBuddiesHash(session);
+			}
 
 			if (incomingHash.equals(storedHash)) {
 				results.offer(packet.okResult((String) null, 0));
