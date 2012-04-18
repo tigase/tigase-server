@@ -1309,7 +1309,7 @@ public class Packet {
 	 */
 	public String toStringSecure() {
 		if (FULL_DEBUG) {
-			return toString();
+			return toStringFull();
 		} else {
 			if (packetToStringSecure == null) {
 				String elemData = elemToStringSecure(elem);
