@@ -588,6 +588,59 @@ public class StoredProcedures {
 		}
 	}
 
+        /**
+         * 
+         * @param nid
+         * @param uid
+         * @param key
+         * @param value
+         * @throws SQLException 
+         */
+        public static void tigUpdatePairs(long nid, long uid, String key, String value) throws SQLException {
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
+		try {
+			PreparedStatement ps = conn.prepareStatement("select 1 from tig_pairs where nid = ? and uid = ? and pkey = ?");
+                        
+                        ps.setLong(1, nid);
+                        ps.setLong(2, uid);
+                        ps.setString(3, key);
+                        
+                        ResultSet rs = ps.executeQuery();
+                        if (rs.next()) {
+                                PreparedStatement ps1 = conn.prepareStatement("update tig_pairs set pval = ? where nid = ? and uid = ? and pkey = ?");
+                                
+                                ps1.setString(1, value);
+                                ps1.setLong(2, nid);
+                                ps1.setLong(3, uid);
+                                ps1.setString(4, key);
+                                
+                                ps1.executeUpdate();
+                        }
+                        else {
+                                PreparedStatement ps1 = conn.prepareStatement("insert into tig_pairs (nid, uid, pkey, pval) values (?, ?, ?, ?)");
+                                
+                                ps1.setLong(1, nid);
+                                ps1.setLong(2, uid);
+                                ps1.setString(3, key);
+                                ps1.setString(4, value);
+                                
+                                ps1.executeUpdate();                                
+                        }
+                        
+		} catch (SQLException e) {
+
+			// e.printStackTrace();
+			// log.log(Level.SEVERE, "SP error", e);
+			throw e;
+		} finally {
+			conn.close();
+		}                
+        }
+        
+        
 	/**
 	 * Method description
 	 *
