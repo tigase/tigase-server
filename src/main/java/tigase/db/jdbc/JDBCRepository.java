@@ -110,6 +110,9 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 	private static final String REMOVE_KEY_DATA_QUERY = "delete from " + DEF_PAIRS_TBL
 			+ " where (nid = ?) AND (pkey = ?)";
 
+	public static final String CURRENT_DB_SCHEMA_VER = "5.1";
+	public static final String SCHEMA_UPGRADE_LINK = "http://www.tigase.org/content/mysql-database-schema-upgrade-tigase-51";
+	
 	/** Field description */
 	public static final String DERBY_GETSCHEMAVER_QUERY =
 			"values TigGetDBProperty('schema-version')";
@@ -1108,7 +1111,7 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 				try {
 					addDataList(repo, user_id, subnode, key, list);
 				} catch (SQLException ex) {
-					throw new TigaseDBException("Problem adding data to DBt, user_id: " + user_id
+					throw new TigaseDBException("Problem adding data to DB, user_id: " + user_id
 							+ ", subnode: " + subnode + ", key: " + key + ", list: "
 							+ Arrays.toString(list), ex);
 				}
@@ -1310,12 +1313,12 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 			if (rs.next()) {
 				schema_version = rs.getString(1);
 
-				if (false == "4.0".equals(schema_version)) {
+				if (false == CURRENT_DB_SCHEMA_VER.equals(schema_version)) {
 					System.err.println("\n\nPlease upgrade database schema now.");
 					System.err.println("Current scheme version is: " + schema_version
-							+ ", expected: 4.0");
+							+ ", expected: " + CURRENT_DB_SCHEMA_VER);
 					System.err.println("Check the schema upgrade guide at the address:");
-					System.err.println("http://www.tigase.org/en/mysql-db-schema-upgrade-4-0");
+					System.err.println(SCHEMA_UPGRADE_LINK);
 					System.err.println("----");
 					System.err.println("If you have upgraded your schema and you are still");
 					System.err.println("experiencing this problem please contact support at");
