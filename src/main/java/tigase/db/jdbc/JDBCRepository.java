@@ -109,6 +109,7 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 			+ " (nid, uid, pkey, pval) " + " values (?, ?, ?, ?)";
 	private static final String REMOVE_KEY_DATA_QUERY = "delete from " + DEF_PAIRS_TBL
 			+ " where (nid = ?) AND (pkey = ?)";
+        private static final String UPDATE_PAIRS_QUERY = "{ call TigUpdatePairs(?, ?, ?, ?) }";
 
 	public static final String CURRENT_DB_SCHEMA_VER = "5.1";
 	public static final String SCHEMA_UPGRADE_LINK = "http://www.tigase.org/content/mysql-database-schema-upgrade-tigase-51";
@@ -816,6 +817,7 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 			data_repo.initPreparedStatement(NODES_FOR_NODE_QUERY, NODES_FOR_NODE_QUERY);
 			data_repo.initPreparedStatement(INSERT_KEY_VAL_QUERY, INSERT_KEY_VAL_QUERY);
 			data_repo.initPreparedStatement(REMOVE_KEY_DATA_QUERY, REMOVE_KEY_DATA_QUERY);
+                        data_repo.initPreparedStatement(UPDATE_PAIRS_QUERY, UPDATE_PAIRS_QUERY);
 			auth = new AuthRepositoryImpl(this);
 
 			// initRepo();
@@ -1061,7 +1063,51 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 	@Override
 	public void setData(BareJID user_id, final String subnode, final String key,
 			final String value) throws UserNotFoundException, TigaseDBException {
-		setDataList(user_id, subnode, key, new String[] { value });
+
+                long uid = -2;
+                long nid = -2;
+                
+                DataRepository repo = data_repo.takeRepoHandle(user_id);
+		synchronized (repo) {
+                        try {
+                                uid = getUserUID(repo, user_id, autoCreateUser);
+                                nid = getNodeNID(repo, uid, subnode);
+                                
+        			if ( log.isLoggable( Level.FINEST ) ){
+                			log.log( Level.FINEST,
+						 "Saving data setting data, user_id: {0}, subnode: {1}, key: {2}, uid: {3}, nid: {4}, value: {5}",
+						 new Object[] { user_id, subnode, key, uid, nid, value } );
+                        	}
+
+                                if (nid < 0) {
+                                        try {
+                                                // OK
+                                                nid = createNodePath(repo, user_id, subnode);
+                                        } catch (SQLException e) {
+
+                                                // This may happen in cluster node, when 2 nodes at the same
+                                                // time write data to the same location, like offline messages....
+                                                // Let's try to get the nid again.
+                                                // OK
+                                                nid = getNodeNID(repo, uid, subnode);
+                                        }
+                                }
+                                                             
+                                PreparedStatement update_pairs_sp = repo.getPreparedStatement(user_id, UPDATE_PAIRS_QUERY);
+                                
+                                update_pairs_sp.setLong(1, nid);
+                                update_pairs_sp.setLong(2, uid);
+                                update_pairs_sp.setString(3, key);
+                                update_pairs_sp.setString(4, value);
+                                
+                                update_pairs_sp.executeUpdate();
+                                
+                        } catch (SQLException e) {
+        			log.log(Level.WARNING, "Error setting data , user_id: " + user_id
+					+ ", subnode: " + subnode + ", key: " + key + ", uid: " + uid + ", nid: " + nid
+					+ ", value: " + value, e);
+                        }
+                }                
 	}
 
 	/**
