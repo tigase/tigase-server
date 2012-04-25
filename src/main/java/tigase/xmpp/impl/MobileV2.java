@@ -200,11 +200,16 @@ public class MobileV2 extends XMPPProcessor implements XMPPProcessorIfc, XMPPPac
                                         if (log.isLoggable(Level.FINEST)) {
                                                 log.finest("sending packets from queue (OVERFLOW)");
                                         }
+                                        
                                         for (Packet p : queue.values()) {
                                                 results.offer(res);
                                         }
 
                                         queue.clear();
+                                        
+                                        // we are sending all items from map so there is no need
+                                        // to filter it (fix for ConcurrentModificationException)
+                                        break;
                                 }
                         }
                 }
