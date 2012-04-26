@@ -731,7 +731,8 @@ public abstract class RosterAbstract {
 	 * @return
 	 */
 	public String getBuddiesHash(final XMPPResourceConnection session) {
-		return (String) session.getCommonSessionData(ROSTERHASH);
+		String hash = (String) session.getCommonSessionData(ROSTERHASH); 
+		return (hash != null ? hash : "");
 	}
 
 	/**
