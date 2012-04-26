@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,7 +47,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 		implements ComponentRepository<Item> {
 	private static final Logger log = Logger.getLogger(ConfigRepository.class.getName());
 
-	protected LinkedHashMap<String, Item> items = new LinkedHashMap<String, Item>(100);
+	protected ConcurrentSkipListMap<String, Item> items = new ConcurrentSkipListMap<String, Item>();
 	private RepositoryChangeListenerIfc<Item> repoChangeList = null;
 
 	@Override
