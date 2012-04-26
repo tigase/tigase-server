@@ -32,6 +32,7 @@ class TigaseInstallerDBHelper {
 	private String schema_ver_query = TigaseConfigConst.DERBY_GETSCHEMAVER_QUERY;
 	private String res_prefix = "";
 	private boolean schema_exists = false;
+	private String schema_version;
 
 
 	static final int DB_CONNEC_POS = 0;
@@ -228,11 +229,23 @@ class TigaseInstallerDBHelper {
 
 			Connection conn = DriverManager.getConnection(db_conn);
 			Statement stmt = conn.createStatement();
-			ArrayList<String> queries = loadSQLQueries(res_prefix + ".upgrade", res_prefix, variables);
-			for (String query: queries) {
-				Debug.trace("Executing query: " + query);
-				stmt.execute(query);
+
+			if ( schema_version == null ){
+				ArrayList<String> queries = loadSQLQueries( res_prefix + ".upgrade", res_prefix, variables );
+				for ( String query : queries ) {
+					Debug.trace( "Executing query: " + query );
+					stmt.execute( query );
+				}
 			}
+
+			if ( "4.0".equals( schema_version ) ){
+				ArrayList<String> queries = loadSQLQueries( res_prefix + ".upgrade5", res_prefix, variables );
+				for ( String query : queries ) {
+					Debug.trace( "Executing query: " + query );
+					stmt.execute( query );
+				}
+			}
+
 			stmt.close();
 			conn.close();
 			schema_ok = true;
@@ -272,8 +285,8 @@ class TigaseInstallerDBHelper {
 			query = schema_ver_query;
 			rs = stmt.executeQuery(query);
 			if (rs.next()) {
-				String schema_version = rs.getString(1);
-				if ("4.0".equals(schema_version)) {
+				schema_version = rs.getString(1);
+				if ("5.1".equals(schema_version)) {
 					schema_ok = true;
 				}
 			}

@@ -161,15 +161,18 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<res id="mysql.sp" src="database/mysql-schema-4-sp.schema"/>
 		<res id="mysql.props" src="database/mysql-schema-4-props.sql"/>
 		<res id="mysql.upgrade" src="database/mysql-schema-upgrade-to-4.sql"/>
+		<res id="mysql.upgrade5" src="database/mysql-schema-upgrade-to-5-1.sql"/>
 		<res id="pgsql.create" src="database/postgresql-create-db.sql"/>
 		<res id="pgsql.schema" src="database/postgresql-schema-4.sql"/>
 		<res id="pgsql.sp" src="database/postgresql-schema-4-sp.schema"/>
 		<res id="pgsql.props" src="database/postgresql-schema-4-props.sql"/>
 		<res id="pgsql.upgrade" src="database/postgresql-schema-upgrade-to-4.sql"/>
+		<res id="pgsql.upgrade5" src="database/postgresql-schema-upgrade-to-5-1.sql"/>
 		<res id="derby.create" src="database/derby-create-db.sql"/>
 		<res id="derby.schema" src="database/derby-schema-4.sql"/>
 		<res id="derby.sp" src="database/derby-schema-4-sp.schema"/>
 		<res id="derby.props" src="database/derby-schema-4-props.sql"/>
+		<res id="derby.upgrade5" src="database/derby-schema-upgrade-to-5-1.sql"/>
 	</resources>
 
 	<!--
