@@ -26,13 +26,10 @@ package tigase.db.comp;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import tigase.conf.ConfigItem;
 
 //~--- classes ----------------------------------------------------------------
 
