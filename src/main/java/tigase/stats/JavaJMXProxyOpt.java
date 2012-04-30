@@ -178,13 +178,15 @@ public class JavaJMXProxyOpt implements NotificationListener {
 										metrics_arr[0]).size() : "null"));
 					} else {
 						System.out.println(hostname + " loading history switched off.");
+					}
+					if (history == null) {
 						history = new LinkedHashMap<String, LinkedList<Object>>();
 						for (String m : metrics) {
 							LinkedList<Object> list = new LinkedList<Object>();
 							history.put(m, list);
 
 						}
-					}
+					}					
 				} else {
 					System.out.println(hostname + " history already loaded, skipping.");
 				}
