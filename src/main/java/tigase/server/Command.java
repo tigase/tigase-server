@@ -32,6 +32,7 @@ import tigase.xmpp.StanzaType;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -39,27 +40,27 @@ import java.util.logging.Logger;
 //~--- enums ------------------------------------------------------------------
 
 /**
- * Helper enum to make it easier to operate on packets with ad-hoc commands.
- * It allows to create a packet with command, add and retrieve command data
- * field values, set actions and so on.
- *
+ * Helper enum to make it easier to operate on packets with ad-hoc commands. It
+ * allows to create a packet with command, add and retrieve command data field
+ * values, set actions and so on.
+ * 
  * It contains predefined set of commands used internally by the Tigase server
  * and also 'OTHER' command which refers all other not predefined commands.
- *
- * Most of the implementation details, constants and parameters is based
- * on the <a href="http://xmpp.org/extensions/xep-0050.html">XEP-0050</a>
- * for ad-hoc commands protocol. Please refer to the XEP for more details.
- *
- * Created: Thu Feb  9 20:52:02 2006
- *
+ * 
+ * Most of the implementation details, constants and parameters is based on the
+ * <a href="http://xmpp.org/extensions/xep-0050.html">XEP-0050</a> for ad-hoc
+ * commands protocol. Please refer to the XEP for more details.
+ * 
+ * Created: Thu Feb 9 20:52:02 2006
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public enum Command {
 
 	/**
-	 * Command sent from a connection manager to the session manager when a
-	 * new stream from the client has been opened.
+	 * Command sent from a connection manager to the session manager when a new
+	 * stream from the client has been opened.
 	 */
 	STREAM_OPENED(Priority.SYSTEM),
 
@@ -71,20 +72,20 @@ public enum Command {
 
 	/**
 	 * Sends a command from SM to the connection holder to confirm whether the
-	 * connection is still active. Expects result for ok, error or timeout
-	 * if the connection is no longer active.
+	 * connection is still active. Expects result for ok, error or timeout if the
+	 * connection is no longer active.
 	 */
 	CHECK_USER_CONNECTION(Priority.SYSTEM),
 
 	/**
-	 * Command sent from the session manager to a connection manager to start
-	 * TLS handshaking over the client connection.
+	 * Command sent from the session manager to a connection manager to start TLS
+	 * handshaking over the client connection.
 	 */
 	STARTTLS(Priority.NORMAL),
 
 	/**
-	 * Command sent from the session manager to a connection manager to start
-	 * zlib compression on the connection stream.
+	 * Command sent from the session manager to a connection manager to start zlib
+	 * compression on the connection stream.
 	 */
 	STARTZLIB(Priority.NORMAL),
 
@@ -113,8 +114,8 @@ public enum Command {
 	GETSTATS(Priority.HIGH),
 
 	/**
-	 * Command sent to the session manager from an external entity to activate
-	 * a user session with the connection end-point at the given address.
+	 * Command sent to the session manager from an external entity to activate a
+	 * user session with the connection end-point at the given address.
 	 */
 	USER_STATUS(Priority.NORMAL),
 
@@ -129,8 +130,8 @@ public enum Command {
 	BROADCAST_TO_ALL(Priority.NORMAL),
 
 	/**
-	 * Command used to redirect packets from a connection manager to other
-	 * than default session manager. (Mostly used in the clustering.)
+	 * Command used to redirect packets from a connection manager to other than
+	 * default session manager. (Mostly used in the clustering.)
 	 */
 	REDIRECT(Priority.SYSTEM),
 
@@ -165,7 +166,7 @@ public enum Command {
 	/** Field description */
 	public static final String COMMAND_EL = "command";
 
-	//~--- constant enums -------------------------------------------------------
+	// ~--- constant enums -------------------------------------------------------
 
 	/**
 	 * Ad-hoc command actions ad defined in the XEP-0050.
@@ -173,8 +174,8 @@ public enum Command {
 	public enum Action {
 
 		/**
-		 * The command should be executed or continue to be executed.
-		 * This is the default value.
+		 * The command should be executed or continue to be executed. This is the
+		 * default value.
 		 */
 		execute,
 
@@ -251,22 +252,22 @@ public enum Command {
 		other;
 	}
 
-	//~--- fields ---------------------------------------------------------------
+	// ~--- fields ---------------------------------------------------------------
 
 	private Priority priority = Priority.NORMAL;
 
-	//~--- constructors ---------------------------------------------------------
+	// ~--- constructors ---------------------------------------------------------
 
 	private Command(Priority priority) {
 		this.priority = priority;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param action
 	 */
@@ -276,8 +277,8 @@ public enum Command {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param f_name
 	 * @param f_value
@@ -288,16 +289,19 @@ public enum Command {
 
 	/**
 	 * A simple method for adding a multi-line (text-multi) data field to the
-	 * command data form. Only field name (variable name) and field default
-	 * value can be set.
-	 *
-	 * @param packet is a <code>Packet</code> instance of the ad-hoc command
-	 * request to be modified.
-	 * @param f_name is a <code>String</code> instance with the field name.
-	 * In ad-hoc command terms this is a variable name. This field name (variable
-	 * name) will be also displayed as the field label.
-	 * @param f_value is a list with lines of text to be displayed as a
-	 * multi-line field content.
+	 * command data form. Only field name (variable name) and field default value
+	 * can be set.
+	 * 
+	 * @param packet
+	 *          is a <code>Packet</code> instance of the ad-hoc command request to
+	 *          be modified.
+	 * @param f_name
+	 *          is a <code>String</code> instance with the field name. In ad-hoc
+	 *          command terms this is a variable name. This field name (variable
+	 *          name) will be also displayed as the field label.
+	 * @param f_value
+	 *          is a list with lines of text to be displayed as a multi-line field
+	 *          content.
 	 */
 	public static void addFieldMultiValue(final Packet packet, final String f_name,
 			final List<String> f_value) {
@@ -310,9 +314,45 @@ public enum Command {
 		}
 
 		if ((f_value != null) && (f_value.size() > 0)) {
-			Element field = new Element("field", new String[] { "var", "type" },
-				new String[] { XMLUtils.escape(f_name),
-					"text-multi" });
+			Element field =
+					new Element("field", new String[] { "var", "type" }, new String[] {
+							XMLUtils.escape(f_name), "text-multi" });
+
+			for (String val : f_value) {
+				if (val != null) {
+					Element value = new Element("value", XMLUtils.escape(val));
+
+					field.addChild(value);
+				}
+			}
+
+			x.addChild(field);
+		}
+	}
+
+	public static void addFieldMultiValue(final Packet packet, final String f_name,
+			final Throwable ex) {
+		Element iq = packet.getElement();
+		Element command = iq.getChild(COMMAND_EL);
+		Element x = command.getChild("x", "jabber:x:data");
+
+		if (x == null) {
+			x = addDataForm(command, DataType.submit);
+		}
+
+		List<String> f_value = null;
+		if (ex != null) {
+			f_value = new ArrayList<String>(100);
+			f_value.add(ex.getLocalizedMessage());
+			for (StackTraceElement ste : ex.getStackTrace()) {
+				f_value.add("  " + ste.toString());
+			}
+		}
+
+		if ((f_value != null) && (f_value.size() > 0)) {
+			Element field =
+					new Element("field", new String[] { "var", "type" }, new String[] {
+							XMLUtils.escape(f_name), "text-multi" });
 
 			for (String val : f_value) {
 				if (val != null) {
@@ -329,103 +369,19 @@ public enum Command {
 	/**
 	 * Simple method for adding a new field to the command data form. Only field
 	 * name (variable name) and field default value can be set.
-	 *
-	 * @param packet is a <code>Packet</code> instance of the ad-hoc command
-	 * request to be modified.
-	 * @param f_name is a <code>String</code> instance with the field name.
-	 * In ad-hoc command terms this is a variable name. This field name (variable
-	 * name) will be also displayed as the field label.
-	 * @param f_value is a <code>String</code> instance with the field default
-	 * value.
-	 */
-	public static void addFieldValue(final Packet packet, final String f_name, final String f_value) {
-		Element iq = packet.getElement();
-		Element command = iq.getChild(COMMAND_EL);
-		Element x = command.getChild("x", "jabber:x:data");
-
-		if (x == null) {
-			x = addDataForm(command, DataType.submit);
-		}
-
-		Element field = new Element("field",
-			new Element[] { new Element("value", XMLUtils.escape(f_value)) }, new String[] { "var" },
-			new String[] { XMLUtils.escape(f_name) });
-
-		x.addChild(field);
-	}
-
-	/**
-	 * This method allows to add a new multi-option-select-one data field to
-	 * the command data form. This is much more complex implementation allowing
-	 * to set a field label and labels for all provided field options.
-	 * It allows the end-user to select a single option from a given list.
-	 *
-	 * @param packet is a <code>Packet</code> instance of the ad-hoc command
-	 * request to be modified.
-	 * @param f_name is a <code>String</code> instance with the field name.
-	 * In ad-hoc command terms this is a variable name.
-	 * @param f_value is a <code>String</code> instance with the field default
-	 * value. It must match one of the options vaulues provided as a list in
-	 * 'options' parameter.
-	 * @param label is a <code>String</code> instance with the field label.
-	 * This time a label set here is displayed to the user instead of the field
-	 * name (variable name). This is useful if the variable name is not suitable
-	 * or clear enough to the end-user.
-	 * @param labels is an array with options labels which are displayed to the
-	 * end-user upon presenting the selection options.
-	 * @param options is an array with options values to be selected by the
-	 * end-user. Normally these values are not displayed to the end-user. Only
-	 * options labels are.
-	 */
-	public static void addFieldValue(final Packet packet, final String f_name, final String f_value,
-			final String label, final String[] labels, final String[] options) {
-		Element iq = packet.getElement();
-		Element command = iq.getChild(COMMAND_EL);
-		Element x = command.getChild("x", "jabber:x:data");
-
-		if (x == null) {
-			x = addDataForm(command, DataType.submit);
-		}
-
-		Element field = new Element("field",
-			new Element[] { new Element("value", XMLUtils.escape(f_value)) }, new String[] { "var",
-				"type", "label" }, new String[] { XMLUtils.escape(f_name), "list-single",
-				XMLUtils.escape(label) });
-
-		for (int i = 0; i < labels.length; i++) {
-			field.addChild(new Element("option",
-					new Element[] { new Element("value", XMLUtils.escape(options[i])) },
-						new String[] { "label" }, new String[] { XMLUtils.escape(labels[i]) }));
-		}
-
-		x.addChild(field);
-	}
-
-	/**
-	 * This method allows to add a new multi-option-select-many data field to
-	 * the command data form. This is much more complex implementation allowing
-	 * to set a field label and labels for all provided field options.
-	 * It allows the end-user to select many options from the given list.
-	 *
-	 * @param packet is a <code>Packet</code> instance of the ad-hoc command
-	 * request to be modified.
-	 * @param f_name is a <code>String</code> instance with the field name.
-	 * In ad-hoc command terms this is a variable name.
-	 * @param f_values is an array of default values which are presented to the
-	 * end user as preselected options. They must match options vaulues provided
-	 * as a list in 'options' parameter.
-	 * @param label is a <code>String</code> instance with the field label.
-	 * This time a label set here is displayed to the user instead of the field
-	 * name (variable name). This is useful if the variable name is not suitable
-	 * or clear enough to the end-user.
-	 * @param labels is an array with options labels which are displayed to the
-	 * end-user upon presenting the selection options.
-	 * @param options is an array with options values to be selected by the
-	 * end-user. Normally these values are not displayed to the end-user. Only
-	 * options labels are.
+	 * 
+	 * @param packet
+	 *          is a <code>Packet</code> instance of the ad-hoc command request to
+	 *          be modified.
+	 * @param f_name
+	 *          is a <code>String</code> instance with the field name. In ad-hoc
+	 *          command terms this is a variable name. This field name (variable
+	 *          name) will be also displayed as the field label.
+	 * @param f_value
+	 *          is a <code>String</code> instance with the field default value.
 	 */
 	public static void addFieldValue(final Packet packet, final String f_name,
-			final String[] f_values, final String label, final String[] labels, final String[] options) {
+			final String f_value) {
 		Element iq = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL);
 		Element x = command.getChild("x", "jabber:x:data");
@@ -434,14 +390,118 @@ public enum Command {
 			x = addDataForm(command, DataType.submit);
 		}
 
-		Element field = new Element("field", new String[] { "var", "type", "label" },
-			new String[] { XMLUtils.escape(f_name),
-				"list-multi", XMLUtils.escape(label) });
+		Element field =
+				new Element("field", new Element[] { new Element("value",
+						XMLUtils.escape(f_value)) }, new String[] { "var" },
+						new String[] { XMLUtils.escape(f_name) });
+
+		x.addChild(field);
+	}
+
+	/**
+	 * This method allows to add a new multi-option-select-one data field to the
+	 * command data form. This is much more complex implementation allowing to set
+	 * a field label and labels for all provided field options. It allows the
+	 * end-user to select a single option from a given list.
+	 * 
+	 * @param packet
+	 *          is a <code>Packet</code> instance of the ad-hoc command request to
+	 *          be modified.
+	 * @param f_name
+	 *          is a <code>String</code> instance with the field name. In ad-hoc
+	 *          command terms this is a variable name.
+	 * @param f_value
+	 *          is a <code>String</code> instance with the field default value. It
+	 *          must match one of the options vaulues provided as a list in
+	 *          'options' parameter.
+	 * @param label
+	 *          is a <code>String</code> instance with the field label. This time
+	 *          a label set here is displayed to the user instead of the field
+	 *          name (variable name). This is useful if the variable name is not
+	 *          suitable or clear enough to the end-user.
+	 * @param labels
+	 *          is an array with options labels which are displayed to the
+	 *          end-user upon presenting the selection options.
+	 * @param options
+	 *          is an array with options values to be selected by the end-user.
+	 *          Normally these values are not displayed to the end-user. Only
+	 *          options labels are.
+	 */
+	public static void addFieldValue(final Packet packet, final String f_name,
+			final String f_value, final String label, final String[] labels,
+			final String[] options) {
+		Element iq = packet.getElement();
+		Element command = iq.getChild(COMMAND_EL);
+		Element x = command.getChild("x", "jabber:x:data");
+
+		if (x == null) {
+			x = addDataForm(command, DataType.submit);
+		}
+
+		Element field =
+				new Element(
+						"field",
+						new Element[] { new Element("value", XMLUtils.escape(f_value)) },
+						new String[] { "var", "type", "label" },
+						new String[] { XMLUtils.escape(f_name), "list-single", XMLUtils.escape(label) });
 
 		for (int i = 0; i < labels.length; i++) {
-			field.addChild(new Element("option",
-					new Element[] { new Element("value", XMLUtils.escape(options[i])) },
-						new String[] { "label" }, new String[] { XMLUtils.escape(labels[i]) }));
+			field.addChild(new Element("option", new Element[] { new Element("value", XMLUtils
+					.escape(options[i])) }, new String[] { "label" }, new String[] { XMLUtils
+					.escape(labels[i]) }));
+		}
+
+		x.addChild(field);
+	}
+
+	/**
+	 * This method allows to add a new multi-option-select-many data field to the
+	 * command data form. This is much more complex implementation allowing to set
+	 * a field label and labels for all provided field options. It allows the
+	 * end-user to select many options from the given list.
+	 * 
+	 * @param packet
+	 *          is a <code>Packet</code> instance of the ad-hoc command request to
+	 *          be modified.
+	 * @param f_name
+	 *          is a <code>String</code> instance with the field name. In ad-hoc
+	 *          command terms this is a variable name.
+	 * @param f_values
+	 *          is an array of default values which are presented to the end user
+	 *          as preselected options. They must match options vaulues provided
+	 *          as a list in 'options' parameter.
+	 * @param label
+	 *          is a <code>String</code> instance with the field label. This time
+	 *          a label set here is displayed to the user instead of the field
+	 *          name (variable name). This is useful if the variable name is not
+	 *          suitable or clear enough to the end-user.
+	 * @param labels
+	 *          is an array with options labels which are displayed to the
+	 *          end-user upon presenting the selection options.
+	 * @param options
+	 *          is an array with options values to be selected by the end-user.
+	 *          Normally these values are not displayed to the end-user. Only
+	 *          options labels are.
+	 */
+	public static void addFieldValue(final Packet packet, final String f_name,
+			final String[] f_values, final String label, final String[] labels,
+			final String[] options) {
+		Element iq = packet.getElement();
+		Element command = iq.getChild(COMMAND_EL);
+		Element x = command.getChild("x", "jabber:x:data");
+
+		if (x == null) {
+			x = addDataForm(command, DataType.submit);
+		}
+
+		Element field =
+				new Element("field", new String[] { "var", "type", "label" }, new String[] {
+						XMLUtils.escape(f_name), "list-multi", XMLUtils.escape(label) });
+
+		for (int i = 0; i < labels.length; i++) {
+			field.addChild(new Element("option", new Element[] { new Element("value", XMLUtils
+					.escape(options[i])) }, new String[] { "label" }, new String[] { XMLUtils
+					.escape(labels[i]) }));
 		}
 
 		for (int i = 0; i < f_values.length; i++) {
@@ -453,8 +513,8 @@ public enum Command {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param f_name
 	 * @param f_value
@@ -463,8 +523,9 @@ public enum Command {
 	 * @param options
 	 * @param type
 	 */
-	public static void addFieldValue(final Packet packet, final String f_name, final String f_value,
-			final String label, final String[] labels, final String[] options, final String type) {
+	public static void addFieldValue(final Packet packet, final String f_name,
+			final String f_value, final String label, final String[] labels,
+			final String[] options, final String type) {
 		Element iq = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL);
 		Element x = command.getChild("x", "jabber:x:data");
@@ -473,14 +534,15 @@ public enum Command {
 			x = addDataForm(command, DataType.submit);
 		}
 
-		Element field = new Element("field",
-			new Element[] { new Element("value", XMLUtils.escape(f_value)) }, new String[] { "var",
-				"type", "label" }, new String[] { XMLUtils.escape(f_name), type, XMLUtils.escape(label) });
+		Element field =
+				new Element("field", new Element[] { new Element("value",
+						XMLUtils.escape(f_value)) }, new String[] { "var", "type", "label" },
+						new String[] { XMLUtils.escape(f_name), type, XMLUtils.escape(label) });
 
 		for (int i = 0; i < labels.length; i++) {
-			field.addChild(new Element("option",
-					new Element[] { new Element("value", XMLUtils.escape(options[i])) },
-						new String[] { "label" }, new String[] { XMLUtils.escape(labels[i]) }));
+			field.addChild(new Element("option", new Element[] { new Element("value", XMLUtils
+					.escape(options[i])) }, new String[] { "label" }, new String[] { XMLUtils
+					.escape(labels[i]) }));
 		}
 
 		x.addChild(field);
@@ -488,15 +550,15 @@ public enum Command {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param f_name
 	 * @param f_value
 	 * @param type
 	 */
-	public static void addFieldValue(final Packet packet, final String f_name, final String f_value,
-			final String type) {
+	public static void addFieldValue(final Packet packet, final String f_name,
+			final String f_value, final String type) {
 		Element iq = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL);
 		Element x = command.getChild("x", "jabber:x:data");
@@ -505,25 +567,26 @@ public enum Command {
 			x = addDataForm(command, DataType.submit);
 		}
 
-		Element field = new Element("field",
-			new Element[] { new Element("value", XMLUtils.escape(f_value)) }, new String[] { "var",
-				"type" }, new String[] { XMLUtils.escape(f_name), type });
+		Element field =
+				new Element("field", new Element[] { new Element("value",
+						XMLUtils.escape(f_value)) }, new String[] { "var", "type" }, new String[] {
+						XMLUtils.escape(f_name), type });
 
 		x.addChild(field);
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param f_name
 	 * @param f_value
 	 * @param type
 	 * @param label
 	 */
-	public static void addFieldValue(final Packet packet, final String f_name, final String f_value,
-			final String type, final String label) {
+	public static void addFieldValue(final Packet packet, final String f_name,
+			final String f_value, final String type, final String label) {
 		Element iq = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL);
 		Element x = command.getChild("x", "jabber:x:data");
@@ -532,17 +595,18 @@ public enum Command {
 			x = addDataForm(command, DataType.submit);
 		}
 
-		Element field = new Element("field",
-			new Element[] { new Element("value", XMLUtils.escape(f_value)) }, new String[] { "var",
-				"type", "label" }, new String[] { XMLUtils.escape(f_name), type, XMLUtils.escape(label) });
+		Element field =
+				new Element("field", new Element[] { new Element("value",
+						XMLUtils.escape(f_value)) }, new String[] { "var", "type", "label" },
+						new String[] { XMLUtils.escape(f_name), type, XMLUtils.escape(label) });
 
 		x.addChild(field);
 	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param f_name
 	 * @param f_value
@@ -553,8 +617,8 @@ public enum Command {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param instructions
 	 */
@@ -572,8 +636,8 @@ public enum Command {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param note
 	 */
@@ -592,8 +656,8 @@ public enum Command {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param f_name
 	 * @param f_value
@@ -604,8 +668,8 @@ public enum Command {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param title
 	 */
@@ -623,32 +687,32 @@ public enum Command {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param from
 	 * @param to
 	 * @param type
 	 * @param id
 	 * @param node
 	 * @param data_type
-	 *
+	 * 
 	 * @return
 	 */
-	public static Element createIqCommand(JID from, JID to, final StanzaType type, final String id,
-			final String node, final DataType data_type) {
+	public static Element createIqCommand(JID from, JID to, final StanzaType type,
+			final String id, final String node, final DataType data_type) {
 		Element iq = createCommandEl(from, to, type, id, node, data_type);
 
 		return iq;
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
-	 *
+	 * 
 	 * @return
 	 */
 	public static Action getAction(final Packet packet) {
@@ -663,11 +727,11 @@ public enum Command {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param f_name
-	 *
+	 * 
 	 * @return
 	 */
 	public static boolean getCheckBoxFieldValue(Packet packet, String f_name) {
@@ -684,10 +748,10 @@ public enum Command {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
-	 *
+	 * 
 	 * @return
 	 */
 	public static List<Element> getData(final Packet packet) {
@@ -699,15 +763,16 @@ public enum Command {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param el_name
 	 * @param xmlns
-	 *
+	 * 
 	 * @return
 	 */
-	public static Element getData(final Packet packet, final String el_name, final String xmlns) {
+	public static Element getData(final Packet packet, final String el_name,
+			final String xmlns) {
 		Element iq = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL);
 
@@ -716,11 +781,11 @@ public enum Command {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param f_name
-	 *
+	 * 
 	 * @return
 	 */
 	public static String getFieldValue(Packet packet, String f_name) {
@@ -749,15 +814,16 @@ public enum Command {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param f_name
 	 * @param debug
-	 *
+	 * 
 	 * @return
 	 */
-	public static String getFieldValue(final Packet packet, final String f_name, boolean debug) {
+	public static String getFieldValue(final Packet packet, final String f_name,
+			boolean debug) {
 		Element iq = packet.getElement();
 
 		log.info("Command iq: " + iq.toString());
@@ -800,11 +866,11 @@ public enum Command {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param f_name
-	 *
+	 * 
 	 * @return
 	 */
 	public static String[] getFieldValues(final Packet packet, final String f_name) {
@@ -840,15 +906,15 @@ public enum Command {
 		return null;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param f_name
-	 *
+	 * 
 	 * @return
 	 */
 	public static boolean removeFieldValue(final Packet packet, final String f_name) {
@@ -870,7 +936,7 @@ public enum Command {
 
 		return false;
 	}
-	
+
 	public static String getFieldKeyStartingWith(Packet packet, String f_name) {
 		Element iq = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL, XMLNS);
@@ -881,7 +947,8 @@ public enum Command {
 
 			if (children != null) {
 				for (Element child : children) {
-					if (child.getName().equals("field") && child.getAttribute("var").startsWith(f_name)) {
+					if (child.getName().equals("field")
+							&& child.getAttribute("var").startsWith(f_name)) {
 						return child.getAttribute("var");
 					}
 				}
@@ -893,8 +960,8 @@ public enum Command {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param data
 	 */
@@ -907,8 +974,8 @@ public enum Command {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param data
 	 */
@@ -921,8 +988,8 @@ public enum Command {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param status
 	 */
@@ -933,14 +1000,14 @@ public enum Command {
 		command.setAttribute("status", status.toString());
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param cmd
-	 *
+	 * 
 	 * @return
 	 */
 	public static Command valueof(String cmd) {
@@ -948,7 +1015,7 @@ public enum Command {
 			return Command.valueOf(cmd);
 		} catch (Exception e) {
 			return OTHER;
-		}    // end of try-catch
+		} // end of try-catch
 	}
 
 	private static void addActionEl(Element iq, Action action) {
@@ -956,8 +1023,9 @@ public enum Command {
 		Element actions = command.getChild("actions");
 
 		if (actions == null) {
-			actions = new Element("actions", new String[] { Action.execute.toString() },
-					new String[] { action.toString() });
+			actions =
+					new Element("actions", new String[] { Action.execute.toString() },
+							new String[] { action.toString() });
 			command.addChild(actions);
 		}
 
@@ -965,17 +1033,19 @@ public enum Command {
 	}
 
 	private static Element addDataForm(Element command, DataType data_type) {
-		Element x = new Element("x", new String[] { "xmlns", "type" }, new String[] { "jabber:x:data",
-				data_type.name() });
+		Element x =
+				new Element("x", new String[] { "xmlns", "type" }, new String[] {
+						"jabber:x:data", data_type.name() });
 
 		command.addChild(x);
 
 		return x;
 	}
 
-	private static Element createCommandEl(JID from, JID to, StanzaType type, String id, String node,
-			DataType data_type) {
-		Element iq = new Element("iq", new String[] { "type" }, new String[] { type.toString() });
+	private static Element createCommandEl(JID from, JID to, StanzaType type, String id,
+			String node, DataType data_type) {
+		Element iq =
+				new Element("iq", new String[] { "type" }, new String[] { type.toString() });
 
 		if (from != null) {
 			iq.setAttribute("from", from.toString());
@@ -983,17 +1053,17 @@ public enum Command {
 
 		// The IQ packet (and command for that matter) should have the id attribute
 		// therefore if it is not set then NPE should be thrown.
-//  if (id != null) {
+		// if (id != null) {
 		iq.setAttribute("id", id);
 
-//  }
+		// }
 		if (to != null) {
 			iq.setAttribute("to", to.toString());
 		}
 
-		Element command = new Element(COMMAND_EL, new String[] { "xmlns", "node" },
-			new String[] { XMLNS,
-				node });
+		Element command =
+				new Element(COMMAND_EL, new String[] { "xmlns", "node" }, new String[] { XMLNS,
+						node });
 
 		iq.addChild(command);
 
@@ -1021,13 +1091,13 @@ public enum Command {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param from
 	 * @param to
 	 * @param type
 	 * @param id
-	 *
+	 * 
 	 * @return
 	 */
 	public Packet getPacket(JID from, JID to, final StanzaType type, final String id) {
@@ -1041,17 +1111,18 @@ public enum Command {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param from
 	 * @param to
 	 * @param type
 	 * @param id
 	 * @param data_type
-	 *
+	 * 
 	 * @return
 	 */
-	public Packet getPacket(JID from, JID to, StanzaType type, String id, DataType data_type) {
+	public Packet
+			getPacket(JID from, JID to, StanzaType type, String id, DataType data_type) {
 		Element elem = createIqCommand(from, to, type, id, this.toString(), data_type);
 		Packet result = Packet.packetInstance(elem, from, to);
 
@@ -1059,4 +1130,4 @@ public enum Command {
 
 		return result;
 	}
-}    // Command
+} // Command
