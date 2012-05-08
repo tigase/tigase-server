@@ -27,6 +27,7 @@ package tigase.xmpp.impl;
 import tigase.db.AuthRepository;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
+import tigase.db.UserNotFoundException;
 
 import tigase.server.Command;
 import tigase.server.Packet;
@@ -128,7 +129,7 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 			if (session.getSessionData(XMPPResourceConnection.AUTHENTICATION_TIMEOUT_KEY) != null) {
 				return;
 			}
-			
+
 			if (session.isAuthorized()) {
 
 				// Multiple authentication attempts....
@@ -207,6 +208,31 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 				} else {
 					results.offer(packet.swapFromTo(
 							createReply(ElementType.challenge, challenge_data), null, null));
+				}
+			} catch (UserNotFoundException e) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "User not found: {0}", e.getMessage());
+				}
+
+				// e.printStackTrace();
+				session.removeSessionData(XMLNS + "-authProps");
+				Packet response =
+						packet.swapFromTo(createReply(ElementType.failure, "<not-authorized/>"),
+								null, null);
+				response.setPriority(Priority.SYSTEM);
+				results.offer(response);
+
+				Integer retries = (Integer) session.getSessionData("auth-retries");
+
+				if (retries == null) {
+					retries = new Integer(0);
+				}
+
+				if (retries.intValue() < 3) {
+					session.putSessionData("auth-retries", new Integer(retries.intValue() + 1));
+				} else {
+					results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
+							StanzaType.set, session.nextStanzaId()));
 				}
 			} catch (Exception e) {
 				log.log(Level.INFO, "Authentication failed: ", e);
