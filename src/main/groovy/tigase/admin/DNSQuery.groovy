@@ -23,7 +23,6 @@
 /*
  User add script as described in XEP-0133:
  http://xmpp.org/extensions/xep-0133.html#add-user
- 
  AS:Description: DNS Query
  AS:CommandId: query-dns
  AS:Component: vhost-man
@@ -58,20 +57,31 @@ def result = p.commandResult(Command.DataType.result)
 def response_data = []
 try {
 	response_data += "IP: " + DNSResolver.getHostIP(domain)
+} catch (Exception ex) {
+	response_data += "IP: " + ex.toString()
+}
+try {
 	DNSEntry[] entries = DNSResolver.getHostSRV_Entries(domain)
 	int cnt = 1
 	entries.each {
-		response_data += "SRV " + (cnt++) + ": " + it.toString() 
+		response_data += "SRV " + (cnt++) + ": " + it.toString()
 	}
 	response_data += "Selected SRV: " + DNSResolver.getHostSRV_Entry(domain).toString()
 	response_data += "Selected SRV IP: " + DNSResolver.getHostSRV_IP(domain)
-	
-	
+
+
 	Command.addFieldMultiValue(result, "DNS Response ", response_data);
 } catch (Exception ex) {
 	Command.addTextField(result, "Note", "Problem querying DNS for domain: " + domain);
-	Command.addFieldMultiValue(result, "Exception: ", ex.getStackTrace());
-	
+	// There is a new API to pass exception, for now we have to do it manually
+	//Command.addFieldMultiValue(result, "Exception: ", ex)
+	def stes = []
+	stes += ex.toString()
+	ex.getStackTrace().each {
+		stes += it.toString()
+	}
+	Command.addFieldMultiValue(result, "Exception: ", stes);
+
 }
 
 return result
