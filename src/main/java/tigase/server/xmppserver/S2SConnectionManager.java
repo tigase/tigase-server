@@ -26,7 +26,6 @@ package tigase.server.xmppserver;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.server.Permissions;
-import tigase.server.script.CommandIfc;
 import tigase.server.xmppserver.proc.Dialback;
 import tigase.server.xmppserver.proc.PacketChecker;
 import tigase.server.xmppserver.proc.StartTLS;
@@ -117,7 +116,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 
 	/** Field description */
 	public static final long MAX_CONNECTION_INACTIVITY_TIME_PROP_VAL = 15 * MINUTE;
-	
+
 	public static final String CID_CONNECTIONS_BIND = "cidConnections";
 
 	// ~--- fields ---------------------------------------------------------------
@@ -562,7 +561,8 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 				// or cluster connection it may be quite problematic.
 				// Let's force jabber:client xmlns for all packets received from s2s
 				// connection
-				// In theory null does not hurt, but if the packet goes through the cluster
+				// In theory null does not hurt, but if the packet goes through the
+				// cluster
 				// connection is gets cluster XMLNS
 				if (p.getXMLNS() == XMLNS_SERVER_VAL || p.getXMLNS() == null) {
 					p.setXMLNS(XMLNS_CLIENT_VAL);
