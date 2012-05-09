@@ -6,6 +6,11 @@
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: Start the Tigase XMPP server
+#
+### management instructions
+##
+## to install: update-rc.d tigase defaults
+##
 ### END INIT INFO
 
 # Settings paths and other variables
@@ -76,17 +81,17 @@ if [ -z "${TIGASE_CONSOLE_LOG}" ] ; then
 fi
 
 if [ -z "${PIDFILE}" ] ; then
-    if [ ! -d "/var/run/$USERNAME/" ] ; then
-        mkdir "/var/run/$USERNAME/"
-        chown -R "$USERNAME":"$USERGROUP" "/var/run/$USERNAME/"
+    if [ ! -d "/var/run/$NAME/" ] ; then
+        mkdir "/var/run/$NAME/"
+        chown -R "$USERNAME":"$USERGROUP" "/var/run/$NAME/"
     fi
 
     if [ -w "/var/run/$USERNAME/" ] ; then
-        PIDFILE="/var/run/$USERNAME/$USERNAME.pid"
+        PIDFILE="/var/run/$NAME/$NAME.pid"
     elif [ -w "${TIGASE_HOME}/logs/" ] ; then
         PIDFILE="${TIGASE_HOME}/logs/$USERNAME.pid"
     else
-        PIDFILE="/var/tmp/$USERNAME.pid"
+        PIDFILE="/var/tmp/$NAME.pid"
     fi
 fi
 
