@@ -322,11 +322,11 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 				log.log(Level.FINEST, "No visited nodes yet, trying random idx: " + idx);
 			}
 			try {
-				result = cl_nodes_list.subList(idx, idx+1);
+				result = Collections.singletonList(cl_nodes_list.get(idx));
 			} catch (IndexOutOfBoundsException ioobe) {
 				// This may happen if the node disconnected in the meantime....
 				try {
-					result = cl_nodes_list.subList(0, 1);
+					result = Collections.singletonList(cl_nodes_list.get(0));
 				} catch (IndexOutOfBoundsException ioobe2) {
 					// Yes, this may happen too if there were only 2 nodes before
 					// disconnect....
