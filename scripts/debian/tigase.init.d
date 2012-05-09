@@ -86,10 +86,10 @@ if [ -z "${PIDFILE}" ] ; then
         chown -R "$USERNAME":"$USERGROUP" "/var/run/$NAME/"
     fi
 
-    if [ -w "/var/run/$USERNAME/" ] ; then
+    if [ -w "/var/run/$NAME/" ] ; then
         PIDFILE="/var/run/$NAME/$NAME.pid"
     elif [ -w "${TIGASE_HOME}/logs/" ] ; then
-        PIDFILE="${TIGASE_HOME}/logs/$USERNAME.pid"
+        PIDFILE="${TIGASE_HOME}/logs/$NAME.pid"
     else
         PIDFILE="/var/tmp/$NAME.pid"
     fi
