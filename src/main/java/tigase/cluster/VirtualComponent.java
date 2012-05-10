@@ -55,34 +55,39 @@ import java.util.logging.Logger;
 //~--- classes ----------------------------------------------------------------
 
 /**
- * The purpose of this component implementation is to forward packets to a target
- * real component implementation in the cluster installation. Let's say you have
- * a cluster installation with full Tigase server installed on each node and you
- * also want to use a component which doesn't have clustered implementation yet.
- * In such case you deploy the component on one of the cluster nodes and put the
- * virtual component on all other nodes. With proper configuration they pretend
- * to be the component returning a correct service disco information and forward
- * all packets for this component to a cluster node with real component running.
- *
+ * The purpose of this component implementation is to forward packets to a
+ * target real component implementation in the cluster installation. Let's say
+ * you have a cluster installation with full Tigase server installed on each
+ * node and you also want to use a component which doesn't have clustered
+ * implementation yet. In such case you deploy the component on one of the
+ * cluster nodes and put the virtual component on all other nodes. With proper
+ * configuration they pretend to be the component returning a correct service
+ * disco information and forward all packets for this component to a cluster
+ * node with real component running.
+ * 
  * This is a very lightweight implementation which doesn't use much resources
  * either memory or CPU.
- *
+ * 
  * It can work well for any kind of a component: MUC, PubSub, transport either
  * native Tigase components or third-party components connected via XEP-0114 -
  * external protocol component.
- *
+ * 
  * Basic configuration parameters are actually the same as for a real component.
- * You set a real component name as a name for the virtual component and a vritual
- * component class name to load. Let's say we want to deploy MUC component this
- * way. The MUC component is visible as <code>muc.domain.our</code> in our
- * installation. Thus the name of the component is: <code>muc</code>:
+ * You set a real component name as a name for the virtual component and a
+ * vritual component class name to load. Let's say we want to deploy MUC
+ * component this way. The MUC component is visible as
+ * <code>muc.domain.our</code> in our installation. Thus the name of the
+ * component is: <code>muc</code>:
+ * 
  * <pre>
  * --comp-name-1=muc
  * --comp-class-1=tigase.cluster.VirtualComponent
  * </pre>
+ * 
  * This is pretty much all you need to load a virtual component. A few other
  * options are needed to point to correct destination addresses for forwarded
  * packets and to set correct service discovery parameters:
+ * 
  * <pre>
  * muc/redirect-to=muc@cluster-node-with-real-muc.domain.our
  * muc/disco-name=Multi User Chat
@@ -91,14 +96,15 @@ import java.util.logging.Logger;
  * muc/disco-category=conference
  * muc/disco-features=http://jabber.org/protocol/muc
  * </pre>
+ * 
  * Above options set all possible parameters to setup virtual MUC component.
  * Created: Dec 13, 2008 7:44:35 PM
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class VirtualComponent
-				implements ServerComponent, XMPPService, Configurable, DisableDisco {
+public class VirtualComponent implements ServerComponent, XMPPService, Configurable,
+		DisableDisco {
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -121,8 +127,8 @@ public class VirtualComponent
 	public static final String DISCO_NAME_PROP_VAL = "Multi User Chat";
 
 	/**
-	 * Parameter to set service discovery node name. In most cases you should leave
-	 * it empty unless you really know what you are doing.
+	 * Parameter to set service discovery node name. In most cases you should
+	 * leave it empty unless you really know what you are doing.
 	 */
 	public static final String DISCO_NODE_PROP_KEY = "disco-node";
 
@@ -130,10 +136,10 @@ public class VirtualComponent
 	public static final String DISCO_NODE_PROP_VAL = "";
 
 	/**
-	 * Parameter to set service discovery item type for the virtual component.
-	 * You should refer to a service discovery documentation for a correct type
-	 * for your component. Or, alternatively you can have a look what returns
-	 * your real component.
+	 * Parameter to set service discovery item type for the virtual component. You
+	 * should refer to a service discovery documentation for a correct type for
+	 * your component. Or, alternatively you can have a look what returns your
+	 * real component.
 	 */
 	public static final String DISCO_TYPE_PROP_KEY = "disco-type";
 
@@ -151,16 +157,16 @@ public class VirtualComponent
 	public static final String DISCO_CATEGORY_PROP_VAL = "conference";
 
 	/**
-	 * Comma separated list of features for the service discovery item
-	 * reprezented by this virtual component. Please check with the real component
-	 * to obtain a correct list of features.
+	 * Comma separated list of features for the service discovery item reprezented
+	 * by this virtual component. Please check with the real component to obtain a
+	 * correct list of features.
 	 */
 	public static final String DISCO_FEATURES_PROP_KEY = "disco-features";
 
 	/** Field description */
 	public static final String DISCO_FEATURES_PROP_VAL = "http://jabber.org/protocol/muc";
 
-	//~--- fields ---------------------------------------------------------------
+	// ~--- fields ---------------------------------------------------------------
 
 	private JID componentId = null;
 	private String discoCategory = null;
@@ -172,12 +178,12 @@ public class VirtualComponent
 	private JID redirectTo = null;
 	private ServiceEntity serviceEntity = null;
 
-	//~--- get methods ----------------------------------------------------------
+	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -187,10 +193,10 @@ public class VirtualComponent
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param params
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -203,7 +209,7 @@ public class VirtualComponent
 			String[] cl_nodes = ((String) params.get(CLUSTER_NODES)).split(",");
 
 			for (String node : cl_nodes) {
-				if ( !node.equals(DNSResolver.getDefaultHostname())) {
+				if (!node.equals(DNSResolver.getDefaultHostname())) {
 					defs.put(REDIRECT_TO_PROP_KEY, BareJID.toString(getName(), node));
 
 					break;
@@ -222,10 +228,10 @@ public class VirtualComponent
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param from
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -235,12 +241,12 @@ public class VirtualComponent
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param node
 	 * @param jid
 	 * @param from
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -250,12 +256,12 @@ public class VirtualComponent
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param node
 	 * @param jid
 	 * @param from
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -267,8 +273,8 @@ public class VirtualComponent
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -276,19 +282,20 @@ public class VirtualComponent
 		return name;
 	}
 
-	//~--- methods --------------------------------------------------------------
+	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
+	 * 
 	 */
 	@Override
-	public void initializationCompleted() {}
+	public void initializationCompleted() {
+	}
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param packet
 	 * @param results
 	 */
@@ -304,17 +311,18 @@ public class VirtualComponent
 
 	/**
 	 * Method description
-	 *
+	 * 
 	 */
 	@Override
-	public void release() {}
+	public void release() {
+	}
 
-	//~--- set methods ----------------------------------------------------------
+	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param name
 	 */
 	@Override
@@ -325,46 +333,61 @@ public class VirtualComponent
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param properties
 	 */
 	@Override
 	public void setProperties(Map<String, Object> properties) {
 		String redirect = (String) properties.get(REDIRECT_TO_PROP_KEY);
 
-		if ((redirect == null) || redirect.isEmpty()) {
-			redirectTo = null;
-		} else {
-			try {
-				redirectTo = JID.jidInstance(redirect);
-			} catch (TigaseStringprepException ex) {
+		if (redirect != null) {
+			if (redirect.isEmpty()) {
 				redirectTo = null;
-				log.warning("stringprep processing failed for given redirect address: " + redirect);
+			} else {
+				try {
+					redirectTo = JID.jidInstance(redirect);
+				} catch (TigaseStringprepException ex) {
+					redirectTo = null;
+					log.warning("stringprep processing failed for given redirect address: "
+							+ redirect);
+				}
 			}
 		}
 
-		discoName = (String) properties.get(DISCO_NAME_PROP_KEY);
-		discoNode = (String) properties.get(DISCO_NODE_PROP_KEY);
-
-		if (discoNode.isEmpty()) {
-			discoNode = null;
+		if (properties.get(DISCO_NAME_PROP_KEY) != null) {
+			discoName = (String) properties.get(DISCO_NAME_PROP_KEY);
+		}
+		if (properties.get(DISCO_NODE_PROP_KEY) != null) {
+			discoNode = (String) properties.get(DISCO_NODE_PROP_KEY);
+			if (discoNode.isEmpty()) {
+				discoNode = null;
+			}
 		}
 
-		discoCategory = (String) properties.get(DISCO_CATEGORY_PROP_KEY);
-		discoType = (String) properties.get(DISCO_TYPE_PROP_KEY);
-		discoFeatures = ((String) properties.get(DISCO_TYPE_PROP_KEY)).split(",");
-		serviceEntity = new ServiceEntity(getName(), null, discoName);
-		serviceEntity.addIdentities(new ServiceIdentity(discoCategory, discoType, discoName));
+		if (properties.get(DISCO_CATEGORY_PROP_KEY) != null) {
+			discoCategory = (String) properties.get(DISCO_CATEGORY_PROP_KEY);
+		}
+		if (properties.get(DISCO_TYPE_PROP_KEY) != null) {
+			discoType = (String) properties.get(DISCO_TYPE_PROP_KEY);
+		}
+		if (properties.get(DISCO_TYPE_PROP_KEY) != null) {
+			discoFeatures = ((String) properties.get(DISCO_TYPE_PROP_KEY)).split(",");
+		}
 
-		for (String feature : discoFeatures) {
-			serviceEntity.addFeatures(feature);
+		if (discoName != null && discoCategory != null && discoType != null
+				&& discoFeatures != null) {
+			serviceEntity = new ServiceEntity(getName(), null, discoName);
+			serviceEntity
+					.addIdentities(new ServiceIdentity(discoCategory, discoType, discoName));
+
+			for (String feature : discoFeatures) {
+				serviceEntity.addFeatures(feature);
+			}
 		}
 	}
 }
 
+// ~ Formatted in Sun Code Convention
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+// ~ Formatted by Jindent --- http://www.jindent.com
