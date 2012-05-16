@@ -346,6 +346,22 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 					log.log(Level.FINEST, "{0}, READ:\n{1}", new Object[] { toString(),
 							new String(data) });
 				}
+				
+				boolean disconnect = checkData(data);
+				if (disconnect) {
+					if (log.isLoggable(Level.FINE)) {
+						log.log(Level.FINE, "{0}, checkData says disconnect: {1}", new Object[] {
+								toString(), new String(data) });
+					} else {
+						log.log(Level.WARNING, "{0}, checkData says disconnect",
+								toString());
+					}
+
+					forceStop();
+					return;
+
+					// domHandler = new XMPPDomBuilderHandler<RefObject>(this);
+				}
 
 				// This is log for debugging only,
 				// in normal mode don't even call below code
@@ -366,6 +382,7 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 						}
 
 						forceStop();
+						return;
 
 						// domHandler = new XMPPDomBuilderHandler<RefObject>(this);
 					}
@@ -412,6 +429,15 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 		// } finally {
 		// readLock.unlock();
 		// }
+	}
+
+/**
+	 * @param dat
+	 * @return
+	 */
+	public boolean checkData(char[] data) throws IOException {
+		// by default do nothing and return false
+		return false;
 	}
 
 	@Override

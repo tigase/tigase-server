@@ -77,11 +77,13 @@ public class BoshIOService extends XMPPIOService<Object> {
 	private UUID sid = null;
 
 	private static Boolean closeConnections;
-	
+
 	public BoshIOService() {
 		super();
 		if (closeConnections == null) {
-			closeConnections = Boolean.parseBoolean(System.getProperty(BOSH_CLOSE_CONNECTION_PROP_KEY, "false"));
+			closeConnections =
+					Boolean.parseBoolean(System
+							.getProperty(BOSH_CLOSE_CONNECTION_PROP_KEY, "false"));
 		}
 		if (extra_headers == null) {
 			String file_name =
@@ -208,7 +210,22 @@ public class BoshIOService extends XMPPIOService<Object> {
 		this.sid = sid;
 	}
 
-	// ~--- methods --------------------------------------------------------------
+	public StringBuilder prepareHeaders(String data) {
+		StringBuilder sb = new StringBuilder(200);
+
+		sb.append(HTTP_OK_RESPONSE);
+		sb.append(CONTENT_TYPE_HEADER).append(content_type).append(EOL);
+		if (data != null) {
+			sb.append(CONTENT_TYPE_LENGTH).append(data.getBytes().length).append(EOL);
+		}
+		if (extra_headers != null) {
+			sb.append(extra_headers);
+		}
+		sb.append(SERVER).append(EOL);
+		sb.append(EOL);
+
+		return sb;
+	}
 
 	/**
 	 * Method description
@@ -221,16 +238,7 @@ public class BoshIOService extends XMPPIOService<Object> {
 	@Override
 	public void writeRawData(String data) throws IOException {
 		if ((data != null) && data.startsWith("<body")) {
-			StringBuilder sb = new StringBuilder(200);
-
-			sb.append(HTTP_OK_RESPONSE);
-			sb.append(CONTENT_TYPE_HEADER).append(content_type).append(EOL);
-			sb.append(CONTENT_TYPE_LENGTH).append(data.getBytes().length).append(EOL);
-			if (extra_headers != null) {
-				sb.append(extra_headers);
-			}
-			sb.append(SERVER).append(EOL);
-			sb.append(EOL);
+			StringBuilder sb = prepareHeaders(data);
 			sb.append(data);
 
 			if (log.isLoggable(Level.FINEST)) {
@@ -244,6 +252,21 @@ public class BoshIOService extends XMPPIOService<Object> {
 		if (closeConnections)
 			stop();
 	}
+
+	@Override
+	public boolean checkData(char[] data) throws IOException {
+		if (data != null && data.length > 7 && data[0] == 'O') {
+			if (data[1] == 'P' && data[2] == 'T' && data[3] == 'I' && data[4] == 'O'
+					&& data[5] == 'N' && data[6] == 'S') {
+
+				// responding with headers - needed for Chrome browser
+				this.writeRawData(prepareHeaders(null).toString());
+			}
+		}
+		// by default do nothing and return false
+		return false;
+	}
+
 }
 
 // ~ Formatted in Sun Code Convention
