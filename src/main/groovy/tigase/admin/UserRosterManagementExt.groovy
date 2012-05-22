@@ -107,7 +107,8 @@ def Queue<Packet> results = new LinkedList<Packet>()
 
 def updateRoster = { jid, i_jid, i_name, i_groups, i_subscr ->
 
-	def conn = sessions.get(jid.getBareJID())?.getActiveResources().get(0);
+	def sess = sessions == null ? null : sessions.get(jid.getBareJID());
+	def conn = sess != null ? sess.getActiveResources().get(0) : null;
 	if (conn) {
 		// Update online
 		RosterAbstract rosterUtil = RosterFactory.getRosterImplementation(true)
