@@ -328,10 +328,10 @@ public class AmpComponent extends AbstractMessageReceiver implements
 
 				return result;
 			} else {
-				log.warning("No action found for act: " + act);
+				log.fine("No action found for act: " + act);
 			}
 		} else {
-			log.warning("No actionset for rule: " + rule);
+			log.fine("No actionset for rule: " + rule);
 		}
 
 		return true;
@@ -352,10 +352,10 @@ public class AmpComponent extends AbstractMessageReceiver implements
 
 				return result;
 			} else {
-				log.warning("No condition found for cond: " + cond);
+				log.fine("No condition found for cond: " + cond);
 			}
 		} else {
-			log.warning("No condition set for rule: " + rule);
+			log.fine("No condition set for rule: " + rule);
 		}
 
 		return false;
