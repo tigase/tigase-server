@@ -232,7 +232,7 @@ public class OfflineMessages extends XMPPProcessor implements XMPPPostprocessorI
 		StanzaType type = pac.getType();
 
 		if ((pac.getElemName().equals("message")
-				&& (pac.getElement().findChild("/message/body") != null)
+				&& (pac.getElemCData("/message/body") != null)
 					&& ((type == null) || (type == StanzaType.normal)
 						|| (type == StanzaType.chat))) || (pac.getElemName().equals("presence")
 							&& ((type == StanzaType.subscribe) || (type == StanzaType.subscribed)
