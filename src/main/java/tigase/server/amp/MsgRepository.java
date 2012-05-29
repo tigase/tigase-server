@@ -176,9 +176,9 @@ public class MsgRepository implements MsgRepositoryIfc {
 		"insert into " + JID_TABLE + " ( " + JID_SHA_COLUMN + ", " + JID_COLUMN + ") values (?, ?)";
 	/* @formatter:on */
 	private static final String GET_USER_UID_PROP_KEY = "user-uid-query";
-        private static final String MSGS_STORE_LIMIT_KEY = "store-limit";
-        private static final String MSGS_COUNT_LIMIT_PROP_KEY = "count-limit-query";
-        private static final long MSGS_STORE_LIMIT_VAL = 100;
+	private static final String MSGS_STORE_LIMIT_KEY = "store-limit";
+	private static final String MSGS_COUNT_LIMIT_PROP_KEY = "count-limit-query";
+	private static final long MSGS_STORE_LIMIT_VAL = 100;
 	private static final int MAX_UID_CACHE_SIZE = 100000;
 	private static final long MAX_UID_CACHE_TIME = 3600000;
 	private static final Map<String, MsgRepository> repos =
@@ -191,8 +191,8 @@ public class MsgRepository implements MsgRepositoryIfc {
 	private long earliestOffline = Long.MAX_VALUE;
 	private SimpleParser parser = SingletonFactory.getParserInstance();
 	private String uid_query = GET_USER_UID_DEF_QUERY;
-        private String msg_count_for_limit_query = MSG_COUNT_FOR_TO_AND_FROM_QUERY_DEF;
-        private long msgs_store_limit = MSGS_STORE_LIMIT_VAL;
+	private String msg_count_for_limit_query = MSG_COUNT_FOR_TO_AND_FROM_QUERY_DEF;
+	private long msgs_store_limit = MSGS_STORE_LIMIT_VAL;
 	private boolean initialized = false;
 	private Map<BareJID, Long> uids_cache = Collections
 			.synchronizedMap(new SimpleCache<BareJID, Long>(MAX_UID_CACHE_SIZE,
@@ -282,25 +282,25 @@ public class MsgRepository implements MsgRepositoryIfc {
 
 		initialized = true;
 		log.log(Level.INFO, "Initializing dbAccess for db connection url: {0}", conn_str);
-                
+
 		if (map != null) {
 			String query = map.get(GET_USER_UID_PROP_KEY);
 
 			if (query != null) {
 				uid_query = query;
 			}
-                             
-                        query = map.get(MsgRepository.MSGS_COUNT_LIMIT_PROP_KEY);
-                        
-                        if (query != null) {
-                                msg_count_for_limit_query = query;
-                        }
-                        
-                        String msgs_store_limit_str = map.get(MSGS_STORE_LIMIT_KEY);
-                        
-                        if (msgs_store_limit_str != null) {
-                                msgs_store_limit = Long.parseLong(msgs_store_limit_str);
-                        }
+
+			query = map.get(MsgRepository.MSGS_COUNT_LIMIT_PROP_KEY);
+
+			if (query != null) {
+				msg_count_for_limit_query = query;
+			}
+
+			String msgs_store_limit_str = map.get(MSGS_STORE_LIMIT_KEY);
+
+			if (msgs_store_limit_str != null) {
+				msgs_store_limit = Long.parseLong(msgs_store_limit_str);
+			}
 		}
 
 		try {
@@ -316,11 +316,11 @@ public class MsgRepository implements MsgRepositoryIfc {
 			data_repo.initPreparedStatement(MSG_SELECT_EXPIRED_QUERY, MSG_SELECT_EXPIRED_QUERY);
 			data_repo.initPreparedStatement(MSG_SELECT_EXPIRED_BEFORE_QUERY,
 					MSG_SELECT_EXPIRED_BEFORE_QUERY);
-                        data_repo.initPreparedStatement(msg_count_for_limit_query,
-                                        msg_count_for_limit_query);
+			data_repo.initPreparedStatement(msg_count_for_limit_query,
+					msg_count_for_limit_query);
 			data_repo.initPreparedStatement(ADD_USER_JID_ID_QUERY, ADD_USER_JID_ID_QUERY);
 		} catch (Exception e) {
-                        log.log(Level.WARNING, "MsgRepository not initialized due to exception", e);
+			log.log(Level.WARNING, "MsgRepository not initialized due to exception", e);
 			// Ignore for now....
 		}
 	}
@@ -402,8 +402,8 @@ public class MsgRepository implements MsgRepositoryIfc {
 					Packet.elemToString(msg) });
 		}
 
-                ResultSet rs = null;
-                try {
+		ResultSet rs = null;
+		try {
 			long from_uid = getUserUID(from.getBareJID());
 
 			if (from_uid < 0) {
@@ -416,29 +416,29 @@ public class MsgRepository implements MsgRepositoryIfc {
 				to_uid = addUserJID(to.getBareJID());
 			}
 
-                        long count = 0;
-                        PreparedStatement count_msgs_st = 
-                                        data_repo.getPreparedStatement(to.getBareJID(), msg_count_for_limit_query);
-                        
-                        synchronized (count_msgs_st) {
-                                count_msgs_st.setLong(1, to_uid);
-                                count_msgs_st.setLong(2, from_uid);
-                                
-                                rs = count_msgs_st.executeQuery();
-                                
-                                if (rs.next()) {
-                                        count = rs.getLong(1);
-                                }
-                        }
-                        
-                        if (msgs_store_limit <= count) {
-                                if (log.isLoggable(Level.FINEST)) {
-                                        log.log(Level.FINEST, "Message store limit ({0}) exceeded for message: {1}",
-                                                new Object[]{msgs_store_limit, Packet.elemToString(msg)});
-                                }
-                                return;
-                        }
-                        
+			long count = 0;
+			PreparedStatement count_msgs_st =
+					data_repo.getPreparedStatement(to.getBareJID(), msg_count_for_limit_query);
+
+			synchronized (count_msgs_st) {
+				count_msgs_st.setLong(1, to_uid);
+				count_msgs_st.setLong(2, from_uid);
+
+				rs = count_msgs_st.executeQuery();
+
+				if (rs.next()) {
+					count = rs.getLong(1);
+				}
+			}
+
+			if (msgs_store_limit <= count) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Message store limit ({0}) exceeded for message: {1}",
+							new Object[] { msgs_store_limit, Packet.elemToString(msg) });
+				}
+				return;
+			}
+
 			PreparedStatement insert_msg_st =
 					data_repo.getPreparedStatement(to.getBareJID(), MSG_INSERT_QUERY);
 
@@ -475,8 +475,8 @@ public class MsgRepository implements MsgRepositoryIfc {
 		} catch (DataTruncation dte) {
 			log.log(Level.FINE, "Data truncated for message from {0} to {1}", new Object[] {
 					from, to });
-                        
-                        data_repo.release(null, rs);
+
+			data_repo.release(null, rs);
 		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem adding new entry to DB: ", e);
 		}
@@ -510,18 +510,16 @@ public class MsgRepository implements MsgRepositoryIfc {
 	}
 
 	private void checkDB() throws SQLException {
-                if (data_repo.getResourceUri().contains("mysql")) {
-                        data_repo.checkTable(JID_TABLE, MYSQL_CREATE_JID_TABLE);
-                        data_repo.checkTable(MSG_TABLE, MYSQL_CREATE_MSG_TABLE);
-                }
-                else if (data_repo.getResourceUri().contains("postgresql")) {
-                        data_repo.checkTable(JID_TABLE, PGSQL_CREATE_JID_TABLE);
-                        data_repo.checkTable(MSG_TABLE, PGSQL_CREATE_MSG_TABLE);
-                }
-                else if (data_repo.getResourceUri().contains("derby")) {
-                        data_repo.checkTable(JID_TABLE, DERBY_CREATE_JID_TABLE);
-                        data_repo.checkTable(MSG_TABLE, DERBY_CREATE_MSG_TABLE);
-                }
+		if (data_repo.getResourceUri().contains("mysql")) {
+			data_repo.checkTable(JID_TABLE, MYSQL_CREATE_JID_TABLE);
+			data_repo.checkTable(MSG_TABLE, MYSQL_CREATE_MSG_TABLE);
+		} else if (data_repo.getResourceUri().contains("postgresql")) {
+			data_repo.checkTable(JID_TABLE, PGSQL_CREATE_JID_TABLE);
+			data_repo.checkTable(MSG_TABLE, PGSQL_CREATE_MSG_TABLE);
+		} else if (data_repo.getResourceUri().contains("derby")) {
+			data_repo.checkTable(JID_TABLE, DERBY_CREATE_JID_TABLE);
+			data_repo.checkTable(MSG_TABLE, DERBY_CREATE_MSG_TABLE);
+		}
 	}
 
 	private void deleteMessage(long msg_id) {
