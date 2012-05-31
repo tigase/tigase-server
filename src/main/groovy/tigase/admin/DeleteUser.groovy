@@ -47,6 +47,8 @@ def admins = (Set)adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
+def user_sessions = (Map)userSessions;
+
 def userJids = Command.getFieldValues(packet, JIDS)
 
 if (userJids == null) {
@@ -64,11 +66,13 @@ if (userJids == null) {
 }
 
 def result = p.commandResult(Command.DataType.result)
+def results = new LinkedList<Packet>();
+results.offer(result);
 def msgs = [];
 def errors = [];
 for (userJid in userJids) {
 	try {
-		bareJID = BareJID.bareJIDInstance(userJid)
+		def bareJID = BareJID.bareJIDInstance(userJid)
 		VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
 		if (isServiceAdmin ||
 		(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
@@ -80,6 +84,17 @@ for (userJid in userJids) {
 					// We ignore this error here. If auth_repo and user_repo are in fact the same
 					// database, then user has been already removed with the auth_repo.removeUser(...)
 					// then the second call to user_repo may throw the exception which is fine.
+				}
+				def sess = user_sessions.get(bareJID);
+				if (sess != null) {
+					def conns = sess.getConnectionIds();
+					for (conn in conns) {
+						def res = sess.getResourceForConnectionId(conn);
+						if (res != null) {
+							def commandClose = Command.CLOSE.getPacket(p.getStanzaTo(), conn, StanzaType.set, res.nextStanzaId());
+							results.offer(commandClose);
+						}							
+					}
 				}
 				msgs.add("Operation successful for user "+userJid);
 			}
@@ -101,4 +116,6 @@ if (!msgs.isEmpty())
 
 if (!errors.isEmpty())
 	Command.addFieldMultiValue(result, "Errors", errors);
-return result
+return results
+
+
