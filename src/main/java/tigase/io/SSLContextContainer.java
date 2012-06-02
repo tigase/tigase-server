@@ -26,7 +26,10 @@ package tigase.io;
 import java.io.CharArrayReader;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -36,6 +39,8 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;
+import java.security.cert.PKIXBuilderParameters;
+import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -409,8 +414,23 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 
 		try {
 			log.log(Level.CONFIG, "Loading trustKeyStore from locations: {0}", Arrays.toString(trustLocations));
-			trustKeyStore = KeyStore.getInstance("JKS");
+			trustKeyStore = KeyStore.getInstance(KeyStore.getDefaultType());
 			trustKeyStore.load(null, emptyPass);
+
+			final File trustStoreFile = new File(System.getProperty("java.home")
+					+ "/lib/security/cacerts".replace('/', File.separatorChar));
+			final File userStoreFile = new File("~/.keystore");
+
+			if (trustStoreFile.exists()) {
+				InputStream in = new FileInputStream(trustStoreFile);
+				trustKeyStore.load(in, null);
+				in.close();
+			}
+			if (userStoreFile.exists()) {
+				InputStream in = new FileInputStream(userStoreFile);
+				trustKeyStore.load(in, null);
+				in.close();
+			}
 
 			for (String location : trustLocations) {
 				File root = new File(location);
@@ -440,6 +460,14 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 						}
 					}
 				}
+			}
+
+			if (!trustKeyStore.aliases().hasMoreElements()) {
+				log.log(Level.CONFIG, "No Trusted Anchors!!! Creating temporary trusted CA cert!");
+				KeyPair keyPair = CertificateUtil.createKeyPair(1024, "secret");
+				X509Certificate cert = CertificateUtil.createSelfSignedCertificate("fake_local@tigase", "fake one", "none",
+						"none", "none", "none", "US", keyPair);
+				trustKeyStore.setCertificateEntry("generated fake CA", cert);
 			}
 		} catch (Exception ex) {
 			log.log(Level.WARNING, "An error loading trusted certificates from locations: " + Arrays.toString(trustLocations),
