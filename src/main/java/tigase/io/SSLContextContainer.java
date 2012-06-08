@@ -29,7 +29,6 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -39,8 +38,6 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;
-import java.security.cert.PKIXBuilderParameters;
-import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -413,7 +410,6 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		long start = System.currentTimeMillis();
 
 		try {
-			log.log(Level.CONFIG, "Loading trustKeyStore from locations: {0}", Arrays.toString(trustLocations));
 			trustKeyStore = KeyStore.getInstance(KeyStore.getDefaultType());
 			trustKeyStore.load(null, emptyPass);
 
@@ -421,17 +417,27 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 					+ "/lib/security/cacerts".replace('/', File.separatorChar));
 			final File userStoreFile = new File("~/.keystore");
 
+			if (log.isLoggable(Level.FINE))
+				log.log(Level.FINE, "Looking for trusted certs in: {0}", trustStoreFile);
+
 			if (trustStoreFile.exists()) {
+				log.log(Level.CONFIG, "Loading trustKeyStore from location: {0}", trustStoreFile);
 				InputStream in = new FileInputStream(trustStoreFile);
 				trustKeyStore.load(in, null);
 				in.close();
 			}
+
+			if (log.isLoggable(Level.FINE))
+				log.log(Level.FINE, "Looking for trusted certs in: {0}", userStoreFile);
+
 			if (userStoreFile.exists()) {
+				log.log(Level.CONFIG, "Loading trustKeyStore from location: {0}", userStoreFile);
 				InputStream in = new FileInputStream(userStoreFile);
 				trustKeyStore.load(in, null);
 				in.close();
 			}
 
+			log.log(Level.CONFIG, "Loading trustKeyStore from locations: {0}", Arrays.toString(trustLocations));
 			for (String location : trustLocations) {
 				File root = new File(location);
 				File[] files = root.listFiles(new PEMFileFilter());
@@ -462,6 +468,11 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 				}
 			}
 
+		} catch (Exception ex) {
+			log.log(Level.WARNING, "An error loading trusted certificates", ex);
+		}
+
+		try {
 			if (!trustKeyStore.aliases().hasMoreElements()) {
 				log.log(Level.CONFIG, "No Trusted Anchors!!! Creating temporary trusted CA cert!");
 				KeyPair keyPair = CertificateUtil.createKeyPair(1024, "secret");
@@ -469,9 +480,8 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 						"none", "none", "none", "US", keyPair);
 				trustKeyStore.setCertificateEntry("generated fake CA", cert);
 			}
-		} catch (Exception ex) {
-			log.log(Level.WARNING, "An error loading trusted certificates from locations: " + Arrays.toString(trustLocations),
-					ex);
+		} catch (Exception e) {
+			log.log(Level.WARNING, "Can't generate fake trusted CA certificate", e);
 		}
 
 		tms = new X509TrustManager[] { new FakeTrustManager(
