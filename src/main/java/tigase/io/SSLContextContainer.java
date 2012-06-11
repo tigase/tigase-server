@@ -152,7 +152,10 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		 */
 		@Override
 		public boolean accept(File pathname) {
-			if (pathname.isFile() && (pathname.getName().endsWith(".pem") || pathname.getName().endsWith(".PEM"))) {
+			if (pathname.isFile()
+					&& (pathname.getName().endsWith(".pem") || pathname.getName().endsWith(".PEM")
+							|| pathname.getName().endsWith(".crt") || pathname.getName().endsWith(".CRT")
+							|| pathname.getName().endsWith(".cer") || pathname.getName().endsWith(".CER"))) {
 				return true;
 			}
 
