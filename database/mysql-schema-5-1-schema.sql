@@ -20,11 +20,8 @@
 --  $Date: $
 --
 
--- This is a dummy user who keeps all the database-properties
--- QUERY START:
-call TigAddUserPlainPw('db-properties', NULL);
--- QUERY END:
+-- Database stored procedures and functions for Tigase schema version 5.1
 
 -- QUERY START:
-call TigPutDBProperty('schema-version', '4.0');
+source database/mysql-schema-4-schema.sql;
 -- QUERY END:

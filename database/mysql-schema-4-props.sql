@@ -1,4 +1,3 @@
-
 --
 --  Tigase Jabber/XMPP Server
 --  Copyright (C) 2004-2007 "Artur Hefczyc" <artur.hefczyc@tigase.org>
@@ -22,9 +21,12 @@
 --
 
 -- QUERY START:
-
+-- This is a dummy user who keeps all the database-properties
 call TigAddUserPlainPw('db-properties', NULL);
 -- QUERY END:
+
+select NOW(), ' - Setting schema version to 4.0';
+
 -- QUERY START:
 call TigPutDBProperty('schema-version', '4.0');
 -- QUERY END:

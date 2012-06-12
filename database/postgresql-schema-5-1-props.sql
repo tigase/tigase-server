@@ -18,13 +18,15 @@
 --  $Rev: $
 --  Last modified by $Author: $
 --  $Date: $
---
 
+-- QUERY START:
 -- This is a dummy user who keeps all the database-properties
--- QUERY START:
-call TigAddUserPlainPw('db-properties', NULL);
+select TigAddUserPlainPw('db-properties', NULL);
 -- QUERY END:
 
+select now(), ' - Setting schema version to 5.1';
+
 -- QUERY START:
-call TigPutDBProperty('schema-version', '4.0');
+select TigPutDBProperty('schema-version', '5.1');
 -- QUERY END:
+

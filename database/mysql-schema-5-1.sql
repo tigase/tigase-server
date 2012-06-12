@@ -20,11 +20,14 @@
 --  $Date: $
 --
 
--- This is a dummy user who keeps all the database-properties
 -- QUERY START:
-call TigAddUserPlainPw('db-properties', NULL);
+source database/mysql-schema-4-schema.sql;
 -- QUERY END:
 
 -- QUERY START:
-call TigPutDBProperty('schema-version', '4.0');
+source database/mysql-schema-5-1-sp.sql;
+-- QUERY END:
+
+-- QUERY START:
+source database/mysql-schema-5-1-props.sql;
 -- QUERY END:

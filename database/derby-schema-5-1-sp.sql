@@ -20,11 +20,7 @@
 --  $Date: $
 --
 
--- This is a dummy user who keeps all the database-properties
 -- QUERY START:
-call TigAddUserPlainPw('db-properties', NULL);
+run 'database/derby-schema-4-sp.sql';
 -- QUERY END:
 
--- QUERY START:
-call TigPutDBProperty('schema-version', '4.0');
--- QUERY END:

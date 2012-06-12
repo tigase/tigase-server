@@ -26,5 +26,5 @@ call TigAddUserPlainPw('db-properties', NULL);
 -- QUERY END:
 
 -- QUERY START:
-call TigPutDBProperty('schema-version', '4.0');
+call TigPutDBProperty('schema-version', '5.1');
 -- QUERY END:

@@ -20,11 +20,22 @@
 --  $Date: $
 --
 
--- This is a dummy user who keeps all the database-properties
--- QUERY START:
-call TigAddUserPlainPw('db-properties', NULL);
--- QUERY END:
+-- Permissions fix
 
--- QUERY START:
-call TigPutDBProperty('schema-version', '4.0');
--- QUERY END:
+-- QUERY START: ALTER SCHEMA
+ALTER SCHEMA public OWNER TO ${dbUser};
+-- QUERY END: ALTER SCHEMA
+
+-- QUERY START: GRANT ALL ON ALL TABLES
+GRANT ALL ON ALL TABLES IN SCHEMA public TO ${dbUser};
+-- QUERY END: GRANT ALL ON ALL TABLES
+
+-- QUERY START: GRANT ALL ON ALL FUNCTIONS
+GRANT ALL ON ALL FUNCTIONS IN SCHEMA public TO ${dbUser};
+-- QUERY END: GRANT ALL ON ALL FUNCTIONS
+
+-- QUERY START: GRANT ALL ON ALL SEQUENCES
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO ${dbUser};
+-- QUERY END: GRANT ALL ON ALL SEQUENCES
+
+

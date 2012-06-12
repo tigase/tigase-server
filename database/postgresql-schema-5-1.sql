@@ -20,11 +20,20 @@
 --  $Date: $
 --
 
--- This is a dummy user who keeps all the database-properties
+--  To load schema to PostgreSQL database execute following commands:
+--
+--  createuser tigase
+--  createdb -U tigase tigase
+--  psql -q -U tigase -d tigase -f postgresql-schema.sql
+
 -- QUERY START:
-call TigAddUserPlainPw('db-properties', NULL);
+\i database/postgresql-schema-4-schema.sql
 -- QUERY END:
 
 -- QUERY START:
-call TigPutDBProperty('schema-version', '4.0');
+\i database/postgresql-schema-5-1-sp.sql
+-- QUERY END:
+
+-- QUERY START:
+\i database/postgresql-schema-5-1-props.sql
 -- QUERY END:

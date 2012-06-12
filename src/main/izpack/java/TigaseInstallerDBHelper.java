@@ -23,6 +23,9 @@ import com.izforge.izpack.installer.ResourceManager;
 import com.izforge.izpack.installer.ResourceNotFoundException;
 import com.izforge.izpack.util.Debug;
 import com.izforge.izpack.util.VariableSubstitutor;
+import java.io.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class TigaseInstallerDBHelper {
 
@@ -83,6 +86,16 @@ class TigaseInstallerDBHelper {
 					}
 					results.add(vs.substitute(sql_query, null));
 				}
+                                if ((line.trim().startsWith("source") || line.trim().startsWith("run") || line.trim().startsWith("\\i"))
+                                        && line.trim().contains("sql")) {
+
+                                        Matcher matcher = Pattern.compile(res_prefix + "-(.*).sql").matcher(line);
+                                        if (matcher.find()) {
+                                            Debug.trace(String.format("\n\n *** trying to load schema: %1$s \t", matcher.group(1)));
+                                            results.addAll(loadSQLQueries(res_prefix + "-" + matcher.group(1), res_prefix, variables));
+                                        }
+                                        continue;
+                                }
 				if (line.isEmpty() || line.trim().startsWith("--")) {
 					continue;
 				} else {
@@ -103,18 +116,19 @@ class TigaseInstallerDBHelper {
 		return ResourceManager.getInstance().getInputStream(resource);
 	}
 
-	private ArrayList<String> loadSchemaQueries(
-			String res_prefix, 
-			Properties variables) 
-			throws Exception 
-			{
-		ArrayList<String> queries = loadSQLQueries(res_prefix + ".schema", res_prefix, variables);
-		queries.addAll(loadSQLQueries(res_prefix + ".sp", res_prefix, variables));
-		queries.addAll(loadSQLQueries(res_prefix + ".props", res_prefix, variables));
-		return queries;
-			}	
+        private ArrayList<String> loadSchemaQueries(
+                String res_prefix,
+                Properties variables)
+                throws Exception {
+            
+            ArrayList<String> queries = new ArrayList<String>();
+            queries.addAll(loadSQLQueries(res_prefix + "-schema-5-1-schema", res_prefix, variables));
+            queries.addAll(loadSQLQueries(res_prefix + "-schema-5-1-sp", res_prefix, variables));
+            queries.addAll(loadSQLQueries(res_prefix + "-schema-5-1-props", res_prefix, variables));
+            return queries;
+        }
 
-	public void validateDBConnection(MsgTarget msgTarget) {
+	public void validateDBConnection(TigaseInstallerDBHelper.MsgTarget msgTarget) {
 		connection_ok = false;
 		String db_conn = TigaseConfigConst.props.getProperty("root-db-uri");
 		if (db_conn == null) {
@@ -140,7 +154,7 @@ class TigaseInstallerDBHelper {
 		schema_ver_query = TigaseConfigConst.JDBC_GETSCHEMAVER_QUERY;
 		if (db_uri.startsWith("jdbc:postgresql")) {
 			System.setProperty("jdbc.drivers", TigaseConfigConst.PGSQL_DRIVER);
-			res_prefix = "pgsql";
+			res_prefix = "postgresql";
 		}
 		if (db_uri.startsWith("jdbc:mysql")) {
 			System.setProperty("jdbc.drivers", TigaseConfigConst.MYSQL_DRIVER);
@@ -179,32 +193,34 @@ class TigaseInstallerDBHelper {
 
 				db_conn = TigaseConfigConst.props.getProperty("root-db-uri");
 				try {
-					conn = DriverManager.getConnection(db_conn);
-					ArrayList<String> queries = loadSQLQueries(res_prefix + ".create", res_prefix, variables);
-					queries.add("commit");
-					for (String query: queries) {
-						Debug.trace("Executing query: " + query);
-						Statement stmt = conn.createStatement();
-						// Some queries may fail and this is still fine
-						// the user or the database may already exist
-						try {
-							stmt.execute(query);
-							stmt.close();
-						} catch (Exception ex) {
-							Debug.trace("Query failed: " + ex.getMessage());
-						}
-					}
-					conn.close();
-					resulMessage.append(" OK");
-					db_ok = true;
+                                    conn = DriverManager.getConnection(db_conn);
+                                    ArrayList<String> queries = loadSQLQueries(res_prefix + "-installer-create-db", res_prefix, variables);
+                                    queries.add("commit");
+                                    for (String query : queries) {
+                                        Debug.trace("validateDBExists -- Executing query: " + query);
+                                        if (!query.isEmpty()) {
+                                            Statement stmt = conn.createStatement();
+                                            // Some queries may fail and this is still fine
+                                            // the user or the database may already exist
+                                            try {
+                                                stmt.execute(query);
+                                                stmt.close();
+                                            } catch (Exception ex) {
+                                                Debug.trace("Query failed: " + ex.getMessage());
+                                            }
+                                        }
+                                    }
+                                    conn.close();
+                                    resulMessage.append(" OK");
+                                    db_ok = true;
 				} catch (Exception ex) {
-					resulMessage.append(ex.getMessage());
+                                    resulMessage.append(ex.getMessage());
 				}
 			}
 		}
 	}
 
-	public void validateDBConversion(Properties variables, MsgTarget msgTarget) {
+	public void validateDBConversion(Properties variables, TigaseInstallerDBHelper.MsgTarget msgTarget) {
 		if (!connection_ok) {
 			msgTarget.addResultMessage().append("Connection not validated");
 			return;
@@ -224,27 +240,27 @@ class TigaseInstallerDBHelper {
 		String db_conn = TigaseConfigConst.props.getProperty("root-tigase-db-uri");
 		try {
 			//conn.close();
-			ResultMessage resultMessage = msgTarget.addResultMessage();
-			resultMessage.append("Converting...");
+                        ResultMessage resultMessage = msgTarget.addResultMessage();
+                        resultMessage.append("Converting...");
 
-			Connection conn = DriverManager.getConnection(db_conn);
-			Statement stmt = conn.createStatement();
+                        Connection conn = DriverManager.getConnection(db_conn);
+                        Statement stmt = conn.createStatement();
 
-			if ( schema_version == null ){
-				ArrayList<String> queries = loadSQLQueries( res_prefix + ".upgrade", res_prefix, variables );
-				for ( String query : queries ) {
-					Debug.trace( "Executing query: " + query );
-					stmt.execute( query );
-				}
-			}
+                        ArrayList<String> queries = null;
 
-			if ( "4.0".equals( schema_version ) ){
-				ArrayList<String> queries = loadSQLQueries( res_prefix + ".upgrade5", res_prefix, variables );
-				for ( String query : queries ) {
-					Debug.trace( "Executing query: " + query );
-					stmt.execute( query );
-				}
-			}
+                        if (schema_version == null) {
+                            queries = loadSQLQueries(res_prefix + "-schema-upgrade-to-4", res_prefix, variables);
+                        }
+
+                        if ("4.0".equals(schema_version)) {
+                            queries = loadSQLQueries(res_prefix + "-schema-upgrade-to-5-1", res_prefix, variables);
+                        }
+                        for (String query : queries) {
+                            if (!query.isEmpty()) {
+                                Debug.trace("validateDBConversion :: Executing query: " + query);
+                                stmt.execute(query);
+                            }
+                        }
 
 			stmt.close();
 			conn.close();
@@ -301,29 +317,77 @@ class TigaseInstallerDBHelper {
 			Debug.trace("DB schema doesn't exists, creating one...");
 			db_conn = TigaseConfigConst.props.getProperty("root-tigase-db-uri");
 			try {
-				//conn.close();
-				conn = DriverManager.getConnection(db_conn);
-				Statement stmt = conn.createStatement();
-				ArrayList<String> queries = loadSchemaQueries(res_prefix, variables);
-				for (String query: queries) {
-					Debug.trace("Executing query: " + query);
-					stmt.execute(query);
-				}
-				stmt.close();
-				conn.close();
-				schema_ok = true;
-				msgTarget.addResultMessage().append("New schema loaded OK");
-				return;
-			} catch (Exception ex) {
-				msgTarget.addResultMessage().append("Can't load schema: " + ex.getMessage());
-				return;
-			}
+                            //conn.close();
+                            conn = DriverManager.getConnection(db_conn);
+                            Statement stmt = conn.createStatement();
+                            ArrayList<String> queries = loadSchemaQueries(res_prefix, variables);
+
+                            for (String query : queries) {
+                                if (!query.isEmpty()) {
+                                    Debug.trace("validateDBSchema -- Executing query: " + query);
+                                    stmt.execute(query);
+                                }
+                            }
+                            stmt.close();
+                            conn.close();
+                            schema_ok = true;
+                            msgTarget.addResultMessage().append("New schema loaded OK");
+                            return;
+                    } catch (Exception ex) {
+                        msgTarget.addResultMessage().append("Can't load schema: " + ex.getMessage());
+                        return;
+                    }
 		} else {
 			msgTarget.addResultMessage().append("Old schema, accounts number: " + users);
 			return;
 		}
 	}
 
+	public void postInstallation(Properties variables, TigaseInstallerDBHelper.MsgTarget msgTarget) {
+		
+		// part 1, check db preconditions
+		if (!connection_ok) {
+			msgTarget.addResultMessage().append("Connection not validated");
+			return;
+		}
+		if (!db_ok) {
+			msgTarget.addResultMessage().append("Database not validated");
+			return;
+		}
+
+		if (!schema_ok) {
+			msgTarget.addResultMessage().append("Database schema is invalid");
+			return;
+		}
+
+		// part 2, acquire reqired fields and validate them
+                String db_conn = TigaseConfigConst.props.getProperty("root-tigase-db-uri");
+                try {
+                    //conn.close();
+                    TigaseInstallerDBHelper.ResultMessage resultMessage = msgTarget.addResultMessage();
+                    resultMessage.append("Finalizing...");
+
+                    Connection conn = DriverManager.getConnection(db_conn);
+                    Statement stmt = conn.createStatement();
+
+                    ArrayList<String> queries = loadSQLQueries(res_prefix + "-installer-post", res_prefix, variables);
+                    for (String query : queries) {
+                        if (!query.isEmpty()) {
+                            Debug.trace("postInstallation :: Executing query: " + query);
+                            stmt.execute(query);
+                        }
+                    }
+
+                    stmt.close();
+                    conn.close();
+                    schema_ok = true;
+                    resultMessage.append(" completed OK");
+                } catch (Exception ex) {
+                    msgTarget.addResultMessage().append("Can't finalize: " + ex.getMessage());
+                    return;
+                }
+	}
+        
 	protected void addXmppAdminAccount(Properties variables,
 			MsgTarget msgTarget) {
 
@@ -427,6 +491,11 @@ class TigaseInstallerDBHelper {
 		ADD_ADMIN_XMPP_ACCOUNT("Adding XMPP admin accounts") {
 			public void execute(TigaseInstallerDBHelper helper, Properties variables, MsgTarget msgTarget) {
 				helper.addXmppAdminAccount(variables, msgTarget);
+			}
+		},
+		POST_INSTALLATION("Post installation actions") {
+			public void execute(TigaseInstallerDBHelper helper, Properties variables, MsgTarget msgTarget) {
+				helper.postInstallation(variables, msgTarget);
 			}
 		};
 
