@@ -37,4 +37,4 @@ python $IZPACK_DIR/utils/wrappers/izpack2exe/izpack2exe.py \
      --file=./packages/tigase-server-$TIGVER.jar --no-upx \
      --output=./packages/tigase-server-$TIGVER.exe
 
-rm -f src/main/izpack/install_copy.xml
+#rm -f src/main/izpack/install_copy.xml
