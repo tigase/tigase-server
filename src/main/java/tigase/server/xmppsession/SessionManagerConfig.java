@@ -79,7 +79,7 @@ public abstract class SessionManagerConfig {
 		"http://jabber.org/protocol/commands", "jabber:iq:private", "urn:xmpp:ping", "presence",
 
 		// "basic-filter",
-		"domain-filter", "disco"
+		"domain-filter", "disco", "pep"
 	};
 
 	/**
@@ -94,7 +94,7 @@ public abstract class SessionManagerConfig {
 		"http://jabber.org/protocol/commands", "jabber:iq:private", "urn:xmpp:ping", "presence",
 
 		// "basic-filter",
-		"domain-filter", "disco"
+		"domain-filter", "disco", "pep"
 	};
 	private static final String[] PLUGINS_FULL_PROP_VAL = {
 		sessionCloseProcId, sessionOpenProcId, defaultHandlerProcId, "jabber:iq:register",
@@ -104,7 +104,7 @@ public abstract class SessionManagerConfig {
 		"http://jabber.org/protocol/commands", "jabber:iq:private", "urn:xmpp:ping", "presence",
 
 		// "basic-filter",
-		"domain-filter", "disco"
+		"domain-filter", "disco", "pep"
 	};
 	private static String[] HOSTNAMES_PROP_VAL = { "localhost", "hostname" };
 	private static String[] ANONYMOUS_DOMAINS_PROP_VAL = { "localhost", "hostname" };
