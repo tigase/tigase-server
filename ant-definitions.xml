@@ -182,8 +182,17 @@
         file="scripts/config.sh"
         tofile="${dist}/@{packagename}-${version}/scripts/config.sh"/>
       <copy
-        file="scripts/derby-db-create.sh"
-        tofile="${dist}/@{packagename}-${version}/scripts/derby-db-create.sh"/>
+      file="scripts/db-create-derby.sh"
+        tofile="${dist}/@{packagename}-${version}/scripts/db-create-derby.sh"/>
+      <copy
+      file="scripts/db-create-mysql.sh"
+          tofile="${dist}/@{packagename}-${version}/scripts/db-create-mysql.sh"/>
+      <copy
+      file="scripts/db-create-postgresql.sh"
+        tofile="${dist}/@{packagename}-${version}/scripts/db-create-postgresql.sh"/>
+      <copy
+      file="scripts/db-create.sh"
+        tofile="${dist}/@{packagename}-${version}/scripts/db-create.sh"/>
       <copy
         file="scripts/repo.sh"
         tofile="${dist}/@{packagename}-${version}/scripts/repo.sh"/>
@@ -240,18 +249,18 @@
       <delete dir="@{packagename}-${version}.src"/>
     </sequential>
   </macrodef>
-  
+
   <macrodef name="distdeb">
   	<attribute name="version"/>
     <attribute name="build" />
   	<attribute name="cvsroot"/>
-  	<sequential>  
+  	<sequential>
   	  <property name="deb.work" value="debian/build"/>
   	  <property name="deb.src" value="${deb.work}/tigase-@{version}"/>
   	  <property name="deb.conf" value="${deb.src}/debian"/>
   	  <property name="deb.conf.src" value="scripts/debian"/>
   	  <property name="deb.version" value="@{version}-b@{build}"/>
-  	  
+
   	  <tstamp>
   	    <format property="deb.builddate" pattern="EEE, dd MMM yyyy HH:mm:ss Z" locale="en"/>
   	  </tstamp>
@@ -273,8 +282,8 @@
   	  <!-- FIXME: Remove after adding etc/init-debian.properties to SVN -->
   	  <copy todir="${deb.src}/etc">
   	    <fileset dir="etc">
-  	  	  <include name="init-debian.properties" />      
-  	  	</fileset>  
+  	  	  <include name="init-debian.properties" />
+  	  	</fileset>
   	  </copy>
   	  <!-- END FIXME -->
   	  <mkdir dir="${deb.conf}" />
