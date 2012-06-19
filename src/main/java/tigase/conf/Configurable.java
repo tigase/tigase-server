@@ -400,6 +400,12 @@ public interface Configurable extends ServerComponent {
 	/** Field description */
 	public static final String CLUSTER_NODES_PROP_KEY = "cluster-nodes";
 
+	/** Field description */
+	public static final String DEF_AMP_NAME = "amp";
+
+	/** Field description */
+	public static final String AMP_CLASS_NAME = "tigase.server.amp.AmpComponent";
+
 	//~--- get methods ----------------------------------------------------------
 
 	/**

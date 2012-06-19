@@ -52,6 +52,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.util.DNSResolver;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -83,6 +84,7 @@ public class MessageAmp extends XMPPProcessor implements XMPPPostprocessorIfc, X
 	private MsgRepository msg_repo = null;
 	private OfflineMessages offlineProcessor = new OfflineMessages();
 	private Message messageProcessor = new Message();
+	private static final String defHost = DNSResolver.getDefaultHostname();
 
 	//~--- methods --------------------------------------------------------------
 
@@ -108,7 +110,16 @@ public class MessageAmp extends XMPPProcessor implements XMPPPostprocessorIfc, X
 	@Override
 	public void init(Map<String, Object> settings) throws TigaseDBException {
 		super.init(settings);
-		ampJID = JID.jidInstanceNS((String) settings.get(AMP_JID_PROP_KEY));
+		String ampJIDstr = (String) settings.get(AMP_JID_PROP_KEY);
+
+		if ( null != ampJIDstr ) {
+			ampJID = JID.jidInstanceNS(ampJIDstr);
+		}
+		else
+		{
+			ampJID = JID.jidInstanceNS("amp@" + defHost);
+		}
+
 		log.log(Level.CONFIG, "Loaded AMP_JID option: {0} = {1}", new Object[] { AMP_JID_PROP_KEY,
 				ampJID });
 
@@ -139,10 +150,10 @@ public class MessageAmp extends XMPPProcessor implements XMPPPostprocessorIfc, X
                         for (Map.Entry<String, Object> entry : settings.entrySet()) {
                                 db_props.put(entry.getKey(), entry.getValue().toString());
                         }
-                        
+
                         // Initialization of repository can be done here and in Store
-                        // class so repository related parameters for MsgRepository 
-                        // should be specified for AMP plugin and AMP component                        
+                        // class so repository related parameters for MsgRepository
+                        // should be specified for AMP plugin and AMP component
 			msg_repo = MsgRepository.getInstance(msg_repo_uri);
 
 			try {

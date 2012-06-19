@@ -63,6 +63,7 @@ public abstract class ActionAbstract implements ActionIfc {
 
 	/** Field description */
 	public static final String SECURITY_PROP_KEY = "security-level";
+	public static final String AMP_SECURITY_LEVEL_DEFAULT = "STRICT";
 
 	//~--- constant enums -------------------------------------------------------
 
@@ -91,6 +92,10 @@ public abstract class ActionAbstract implements ActionIfc {
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defs = new LinkedHashMap<String, Object>();
 		String sec_str = (String) params.get(AMP_SECURITY_LEVEL);
+
+		if ( null == sec_str ) {
+			sec_str = AMP_SECURITY_LEVEL_DEFAULT;
+		}
 
 		try {
 			SECURITY sec = SECURITY.valueOf(sec_str.toUpperCase());

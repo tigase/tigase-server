@@ -74,12 +74,13 @@ public abstract class SessionManagerConfig {
 	private static final String[] PLUGINS_NO_REG_PROP_VAL = {
 		sessionCloseProcId, sessionOpenProcId, defaultHandlerProcId, "jabber:iq:auth",
 		"urn:ietf:params:xml:ns:xmpp-sasl", "urn:ietf:params:xml:ns:xmpp-bind",
-		"urn:ietf:params:xml:ns:xmpp-session", "jabber:iq:roster", "jabber:iq:privacy", "msgoffline",
+		"urn:ietf:params:xml:ns:xmpp-session", "jabber:iq:roster", "jabber:iq:privacy",
 		"jabber:iq:version", "http://jabber.org/protocol/stats", "starttls", "vcard-temp",
 		"http://jabber.org/protocol/commands", "jabber:iq:private", "urn:xmpp:ping", "presence",
 
 		// "basic-filter",
-		"domain-filter", "disco", "pep"
+		"domain-filter", "disco", "pep",
+		"amp"
 	};
 
 	/**
@@ -94,17 +95,19 @@ public abstract class SessionManagerConfig {
 		"http://jabber.org/protocol/commands", "jabber:iq:private", "urn:xmpp:ping", "presence",
 
 		// "basic-filter",
-		"domain-filter", "disco", "pep"
+		"domain-filter", "disco", "pep",
+		"amp"
 	};
 	private static final String[] PLUGINS_FULL_PROP_VAL = {
 		sessionCloseProcId, sessionOpenProcId, defaultHandlerProcId, "jabber:iq:register",
 		"jabber:iq:auth", "urn:ietf:params:xml:ns:xmpp-sasl", "urn:ietf:params:xml:ns:xmpp-bind",
 		"urn:ietf:params:xml:ns:xmpp-session", "jabber:iq:roster", "jabber:iq:privacy",
-		"jabber:iq:version", "http://jabber.org/protocol/stats", "starttls", "msgoffline", "vcard-temp",
+		"jabber:iq:version", "http://jabber.org/protocol/stats", "starttls", "vcard-temp",
 		"http://jabber.org/protocol/commands", "jabber:iq:private", "urn:xmpp:ping", "presence",
 
 		// "basic-filter",
-		"domain-filter", "disco", "pep"
+		"domain-filter", "disco", "pep",
+		"amp"
 	};
 	private static String[] HOSTNAMES_PROP_VAL = { "localhost", "hostname" };
 	private static String[] ANONYMOUS_DOMAINS_PROP_VAL = { "localhost", "hostname" };
