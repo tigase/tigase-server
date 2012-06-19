@@ -52,7 +52,7 @@ declare
 begin
 
 	select pval into _result from tig_pairs, tig_users
-		where (pkey = _tkey) AND (user_id = ''db-properties'')
+		where (pkey = _tkey) AND (lower(user_id) = lower(''db-properties''))
 					AND (tig_pairs.uid = tig_users.uid);
 
 	return _result;
@@ -68,17 +68,17 @@ declare
   _tval alias for $2;
 begin
   if exists( select pval from tig_pairs, tig_users where
-		(user_id = ''db-properties'') AND (tig_users.uid = tig_pairs.uid)
+		(lower(user_id) = lower(''db-properties'')) AND (tig_users.uid = tig_pairs.uid)
 		AND (pkey = _tkey))
   then
 	  update tig_pairs set pval = _tval from tig_users
-      where (tig_users.user_id = ''db-properties'')
+      where (lower(tig_users.user_id) = lower(''db-properties''))
         AND (tig_users.uid = tig_pairs.uid)
         AND (pkey = _tkey);
   else
     insert into tig_pairs (pkey, pval, uid)
 		  select _tkey, _tval, uid from tig_users
-			  where (user_id = ''db-properties'');
+			  where (lower(user_id) = lower(''db-properties''));
   end if;
   return;
 end;
@@ -111,14 +111,20 @@ declare
   _user_pw alias for $2;
   _res_uid bigint;
 begin
-	insert into tig_users (user_id, user_pw)
-		values (_user_id, _user_pw);
-  select currval(''tig_users_uid_seq'') into _res_uid;
+	if exists( select uid from tig_users where
+		(lower(user_id) = lower(_user_id)) AND (user_pw = _user_pw) )
+	then
+		return null;
+	else
+		insert into tig_users (user_id, user_pw)
+			values (_user_id, _user_pw);
+		select currval(''tig_users_uid_seq'') into _res_uid;
 
-	insert into tig_nodes (parent_nid, uid, node)
+		insert into tig_nodes (parent_nid, uid, node)
 		values (NULL, _res_uid, ''root'');
 
-	return _res_uid as uid;
+		return _res_uid as uid;
+	end if;
 end;
 ' LANGUAGE 'plpgsql';
 -- QUERY END:
@@ -156,7 +162,7 @@ declare
   _user_id alias for $1;
   res_uid bigint;
 begin
-	select uid into res_uid from tig_users where user_id = _user_id;
+	select uid into res_uid from tig_users where lower(user_id) = lower(_user_id);
   return res_uid;
 end;
 ' LANGUAGE 'plpgsql';
@@ -169,7 +175,7 @@ declare
   _user_id alias for $1;
   res_uid bigint;
 begin
-	select uid into res_uid from tig_users where user_id = _user_id;
+	select uid into res_uid from tig_users where lower(user_id) = lower(_user_id);
 
 	delete from tig_pairs where uid = res_uid;
 	delete from tig_nodes where uid = res_uid;
@@ -186,7 +192,7 @@ declare
   _user_id alias for $1;
   res_pw varchar(255);
 begin
-	select user_pw into res_pw from tig_users where user_id = _user_id;
+	select user_pw into res_pw from tig_users where lower(user_id) = lower(_user_id);
   return res_pw;
 end;
 ' LANGUAGE 'plpgsql';
@@ -240,7 +246,7 @@ declare
   _user_id alias for $1;
   _user_pw alias for $2;
 begin
-	update tig_users set user_pw = _user_pw where user_id = _user_id;
+	update tig_users set user_pw = _user_pw where lower(user_id) = lower(_user_id);
   return;
 end;
 ' LANGUAGE 'plpgsql';
@@ -270,7 +276,7 @@ end;
 
 -- QUERY START:
 -- List of all users in database
-create or replace function TigAllUsers() returns setof varchar(2049) as 
+create or replace function TigAllUsers() returns setof varchar(2049) as
 	'select user_id from tig_users;'
 LANGUAGE 'sql';
 -- create or replace function TigAllUsers() returns void as '
@@ -333,7 +339,7 @@ declare
   res_user_id varchar(2049);
 begin
 	if exists(select user_id from tig_users
-		where (account_status > 0) AND (user_id = _user_id) AND (user_pw = _user_pw))
+		where (account_status > 0) AND (lower(user_id) = lower(_user_id)) AND (user_pw = _user_pw))
 	then
 		update tig_users
 			set online_status = online_status + 1, last_login = now()
@@ -369,7 +375,7 @@ create or replace function TigDisableAccount(varchar(2049)) returns void as '
 declare
   _user_id alias for $1;
 begin
-	update tig_users set account_status = 0 where user_id = _user_id;
+	update tig_users set account_status = 0 where lower(user_id) = lower(_user_id);
   return;
 end;
 ' LANGUAGE 'plpgsql';
@@ -381,7 +387,7 @@ create or replace function TigEnableAccount(varchar(2049)) returns void as '
 declare
   _user_id alias for $1;
 begin
-	update tig_users set account_status = 1 where user_id = _user_id;
+	update tig_users set account_status = 1 where lower(user_id) = lower(_user_id);
   return;
 end;
 ' LANGUAGE 'plpgsql';
