@@ -37,39 +37,39 @@
 -- QUERY START:
 
 create table if not exists tig_users (
-			 uid bigint unsigned NOT NULL auto_increment,
+	uid bigint unsigned NOT NULL auto_increment,
 
-			 -- Jabber User ID
-			 user_id varchar(2049) NOT NULL,
-			 -- UserID SHA1 hash to prevent duplicate user_ids
-			 sha1_user_id char(128) NOT NULL,
-			 -- User password encrypted or not
-			 user_pw varchar(255) default NULL,
-       -- Time the account has been created
-       acc_create_time timestamp DEFAULT CURRENT_TIMESTAMP,
-			 -- Time of the last user login
-			 last_login timestamp DEFAULT 0,
-			 -- Time of the last user logout
-			 last_logout timestamp DEFAULT 0,
-			 -- User online status, if > 0 then user is online, the value
-			 -- indicates the number of user connections.
-			 -- It is incremented on each user login and decremented on each
-			 -- user logout.
-			 online_status int default 0,
-			 -- Number of failed login attempts
-			 failed_logins int default 0,
-			 -- User status, whether the account is active or disabled
-			 -- >0 - account active, 0 - account disabled
-			 account_status int default 1,
+	-- Jabber User ID
+	user_id varchar(2049) NOT NULL,
+	-- UserID SHA1 hash to prevent duplicate user_ids
+	sha1_user_id char(128) NOT NULL,
+	-- User password encrypted or not
+	user_pw varchar(255) default NULL,
+	-- Time the account has been created
+	acc_create_time timestamp DEFAULT CURRENT_TIMESTAMP,
+	-- Time of the last user login
+	last_login timestamp DEFAULT 0,
+	-- Time of the last user logout
+	last_logout timestamp DEFAULT 0,
+	-- User online status, if > 0 then user is online, the value
+	-- indicates the number of user connections.
+	-- It is incremented on each user login and decremented on each
+	-- user logout.
+	online_status int default 0,
+	-- Number of failed login attempts
+	failed_logins int default 0,
+	-- User status, whether the account is active or disabled
+	-- >0 - account active, 0 - account disabled
+	account_status int default 1,
 
-			 primary key (uid),
-			 unique key sha1_user_id (sha1_user_id),
-			 key user_pw (user_pw),
-			 key user_id (user_id(765)),
-			 key last_login (last_login),
-			 key last_logout (last_logout),
-			 key account_status (account_status),
-			 key online_status (online_status)
+	primary key (uid),
+	unique key sha1_user_id (sha1_user_id),
+	key user_pw (user_pw),
+	key user_id (user_id(765)),
+	key last_login (last_login),
+	key last_logout (last_logout),
+	key account_status (account_status),
+	key online_status (online_status)
 )
 ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
 

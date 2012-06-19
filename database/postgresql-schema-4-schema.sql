@@ -22,28 +22,30 @@
 
 -- QUERY START:
 create table tig_users (
-       uid bigserial,
+	uid bigserial,
 
-			 -- Jabber User ID
-       user_id varchar(2049) NOT NULL,
-			 -- User password encrypted or not
-			 user_pw varchar(255) default NULL,
-			 -- Time of the last user login
-			 last_login timestamp,
-			 -- Time of the last user logout
-			 last_logout timestamp,
-			 -- User online status, if > 0 then user is online, the value
-			 -- indicates the number of user connections.
-			 -- It is incremented on each user login and decremented on each
-			 -- user logout.
-			 online_status int default 0,
-			 -- Number of failed login attempts
-			 failed_logins int default 0,
-			 -- User status, whether the account is active or disabled
-			 -- >0 - account active, 0 - account disabled
-			 account_status int default 1,
+	-- Jabber User ID
+	user_id varchar(2049) NOT NULL,
+	-- User password encrypted or not
+	user_pw varchar(255) default NULL,
+	-- Time the account has been created
+	acc_create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	-- Time of the last user login
+	last_login timestamp,
+	-- Time of the last user logout
+	last_logout timestamp,
+	-- User online status, if > 0 then user is online, the value
+	-- indicates the number of user connections.
+	-- It is incremented on each user login and decremented on each
+	-- user logout.
+	online_status int default 0,
+	-- Number of failed login attempts
+	failed_logins int default 0,
+	-- User status, whether the account is active or disabled
+	-- >0 - account active, 0 - account disabled
+	account_status int default 1,
 
-       primary key (uid)
+	primary key (uid)
 );
 -- QUERY END:
 -- QUERY START:

@@ -95,12 +95,6 @@ drop procedure if exists TigUsers2Ver4Convert;
 drop procedure if exists TigPutDBProperty;
 -- QUERY END:
 -- QUERY START:
-drop procedure if exists TigGetUserUIDProc;
--- QUERY END:
--- QUERY START:
-drop function if exists TigGetUserUID;
--- QUERY END:
--- QUERY START:
 drop function if exists TigGetDBProperty;
 -- QUERY END:
 -- QUERY START:
@@ -108,27 +102,6 @@ drop procedure if exists TigUpdatePairs;
 -- QUERY END:
 
 delimiter //
-
--- QUERY START:
--- Get user uid function to make it easier to use it in SQL queries.
-create function TigGetUserUID(_user_id varchar(2049) CHARSET utf8) returns bigint unsigned
-READS SQL DATA
-begin
-	declare _result bigint unsigned;
-
-	select uid into _result from tig_users where sha1_user_id = sha1(lower(_user_id));
-
-	return (_result);
-end //
--- QUERY END:
-
--- QUERY START:
--- Returns user's UID for an account in the database.
-create procedure TigGetUserUIDProc(_user_id varchar(2049) CHARSET utf8)
-begin
-	select uid from tig_users where sha1_user_id = sha1(lower(_user_id));
-end //
--- QUERY END:
 
 -- QUERY START:
 -- Database properties get - function
@@ -192,7 +165,7 @@ begin
 
 	insert into tig_nodes (parent_nid, uid, node)
 		values (NULL, res_uid, 'root');
-		
+
 	if _user_pw is NULL then
 		update tig_users set account_status = -1 where uid = res_uid;
 	end if;
