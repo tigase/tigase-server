@@ -44,7 +44,7 @@ import java.util.logging.Logger;
 
 /**
  * Created: May 13, 2009 9:53:44 AM
- *
+ * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -68,10 +68,10 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param jid
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -81,8 +81,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -92,10 +92,10 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param jid
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -105,10 +105,10 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param params
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -118,10 +118,10 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param jid
-	 *
+	 * 
 	 * @return
 	 */
 	@Override
@@ -131,8 +131,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param list
 	 */
 	@Override
@@ -142,8 +142,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -153,8 +153,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @return
 	 */
 	@Override
@@ -164,8 +164,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param jid
 	 */
 	@Override
@@ -178,8 +178,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param jid
 	 */
 	@Override
@@ -192,8 +192,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param props
 	 */
 	@Override
@@ -202,8 +202,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param sm
 	 * @param results
 	 * @param jid
@@ -214,8 +214,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 *
-	 *
+	 * 
+	 * 
 	 * @param sm
 	 * @param results
 	 * @param jid
@@ -226,7 +226,7 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * tigase.cluster.strategy.ClusteringStrategyIfc#getNodesForPacket(tigase.
 	 * xml.Element)
@@ -234,12 +234,14 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	@Override
 	public List<JID> getNodesForPacketForward(JID fromNode, Set<JID> visitedNodes,
 			Packet packet) {
-		// If the packet visited other nodes already it means it went through other checking
+		// If the packet visited other nodes already it means it went through other
+		// checking
 		// like isSuitableForForward, etc... so there is no need for doing it again
 		if (visitedNodes != null) {
 			List<JID> result = selectNodes(fromNode, visitedNodes);
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Visited nodes not null: {0}, selecting new node: {1}, for packet: {2}",
+				log.log(Level.FINEST,
+						"Visited nodes not null: {0}, selecting new node: {1}, for packet: {2}",
 						new Object[] { visitedNodes, result, packet });
 			}
 			return result;
@@ -259,8 +261,9 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 		if (isSuitableForForward(packet)) {
 			List<JID> result = selectNodes(fromNode, visitedNodes);
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Visited nodes null, selecting new node: {0}, for packet: {1}",
-						new Object[] { result, packet });
+				log.log(Level.FINEST,
+						"Visited nodes null, selecting new node: {0}, for packet: {1}", new Object[] {
+								result, packet });
 			}
 			return result;
 		} else {
@@ -275,6 +278,13 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	protected boolean isSuitableForForward(Packet packet) {
 		// Do not forward any error packets for now.
 		if (packet.getType() == StanzaType.error) {
+			return false;
+		}
+
+		// Artur: Moved it to the front of the method for performance reasons.
+		// TODO: make sure it does not affect logic.
+		if (packet.getPacketFrom() != null
+				&& !sm.getComponentId().equals(packet.getPacketFrom())) {
 			return false;
 		}
 
@@ -297,10 +307,6 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 		// nodes either. It is also not forwarded if it is addressed to some
 		// component.
 		if (!sm.isLocalDomain(packet.getStanzaTo().getDomain(), false)) {
-			return false;
-		}
-
-		if ( packet.getPacketFrom() != null && !sm.getComponentId().equals( packet.getPacketFrom() ) ){
 			return false;
 		}
 
@@ -336,7 +342,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 					// Yes, this may happen too if there were only 2 nodes before
 					// disconnect....
 					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE, "IndexOutOfBoundsException twice! Should not happen very often, returning null");
+						log.log(Level.FINE,
+								"IndexOutOfBoundsException twice! Should not happen very often, returning null");
 					}
 				}
 			}
@@ -347,12 +354,14 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 					break;
 				}
 			}
-			// If all nodes visited already. We have to either send it back to the first node
+			// If all nodes visited already. We have to either send it back to the
+			// first node
 			// or if this is the first node return null
 			if (result == null && !sm.getComponentId().equals(fromNode)) {
 				result = Collections.singletonList(fromNode);
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "All nodes visited, sending it back to the first node: " + result);
+					log.log(Level.FINEST, "All nodes visited, sending it back to the first node: "
+							+ result);
 				}
 			}
 		}
@@ -364,7 +373,7 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see tigase.cluster.strategy.ClusteringStrategyIfc#getNodesForUserConnect()
 	 */
 	@Override
@@ -374,7 +383,7 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * tigase.cluster.strategy.ClusteringStrategyIfc#getNodesForUserDisconnect()
 	 */
@@ -385,7 +394,7 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see tigase.cluster.strategy.ClusteringStrategyIfc#getInternalCache()
 	 */
 	@Override
@@ -396,7 +405,7 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * tigase.cluster.strategy.ClusteringStrategyIfc#getConnectionRecords(tigase
 	 * .xmpp.BareJID)
@@ -408,7 +417,7 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * tigase.cluster.strategy.ClusteringStrategyIfc#getConnectionRecord(tigase
 	 * .xmpp.JID)
@@ -420,7 +429,7 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * tigase.cluster.strategy.ClusteringStrategyIfc#presenceUpdate(tigase.server
 	 * .Packet, tigase.cluster.strategy.ConnectionRecord)
