@@ -97,6 +97,14 @@ public class StreamFeatures extends S2SAbstractProcessor {
 
 				featuresElement.addChildren(features);
 
+                                // do not send stattls feature to hosts in skip tls list
+                                if (attribs.containsKey("from")) {
+                                        if (skipTLSForHost(attribs.get("from"))) {
+                                                Element startTls = featuresElement.getChild(START_TLS_EL, START_TLS_NS);
+                                                featuresElement.removeChild(startTls);
+                                        }
+                                }                                
+
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "{0}, Sending stream features: {1}", new Object[] { serv,
 							featuresElement });
