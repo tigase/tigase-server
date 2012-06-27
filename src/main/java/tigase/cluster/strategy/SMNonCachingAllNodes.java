@@ -44,7 +44,7 @@ import java.util.logging.Logger;
 
 /**
  * Created: May 13, 2009 9:53:44 AM
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -68,10 +68,10 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param jid
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -81,8 +81,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -92,10 +92,10 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param jid
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -105,10 +105,10 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param params
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -118,10 +118,10 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param jid
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -131,8 +131,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param list
 	 */
 	@Override
@@ -142,8 +142,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -153,8 +153,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -164,8 +164,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param jid
 	 */
 	@Override
@@ -178,8 +178,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param jid
 	 */
 	@Override
@@ -192,8 +192,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param props
 	 */
 	@Override
@@ -202,8 +202,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param sm
 	 * @param results
 	 * @param jid
@@ -214,8 +214,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param sm
 	 * @param results
 	 * @param jid
@@ -226,7 +226,7 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * tigase.cluster.strategy.ClusteringStrategyIfc#getNodesForPacket(tigase.
 	 * xml.Element)
@@ -299,6 +299,11 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 		if (!sm.isLocalDomain(packet.getStanzaTo().getDomain(), false)) {
 			return false;
 		}
+
+		if ( packet.getPacketFrom() != null && !sm.getComponentId().equals( packet.getPacketFrom() ) ){
+			return false;
+		}
+
 		return true;
 	}
 
@@ -359,7 +364,7 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see tigase.cluster.strategy.ClusteringStrategyIfc#getNodesForUserConnect()
 	 */
 	@Override
@@ -369,7 +374,7 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * tigase.cluster.strategy.ClusteringStrategyIfc#getNodesForUserDisconnect()
 	 */
@@ -380,7 +385,7 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see tigase.cluster.strategy.ClusteringStrategyIfc#getInternalCache()
 	 */
 	@Override
@@ -391,7 +396,7 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * tigase.cluster.strategy.ClusteringStrategyIfc#getConnectionRecords(tigase
 	 * .xmpp.BareJID)
@@ -403,7 +408,7 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * tigase.cluster.strategy.ClusteringStrategyIfc#getConnectionRecord(tigase
 	 * .xmpp.JID)
@@ -415,7 +420,7 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * tigase.cluster.strategy.ClusteringStrategyIfc#presenceUpdate(tigase.server
 	 * .Packet, tigase.cluster.strategy.ConnectionRecord)
