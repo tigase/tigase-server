@@ -264,6 +264,11 @@ public class RosterFlat extends RosterAbstract {
 			JID[] getBuddies(XMPPResourceConnection session) throws NotAuthorizedException,
 					TigaseDBException {
 		Map<BareJID, RosterElement> roster = getUserRoster(session);
+		
+		if (roster.size() == 0) {
+			return null;
+		}
+		
 		JID[] result = new JID[roster.size()];
 		int idx = 0;
 
