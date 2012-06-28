@@ -1,23 +1,24 @@
+
 /*
- * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2010 "Artur Hefczyc" <artur.hefczyc@tigase.org>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, version 3 of the License.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. Look for COPYING file in the top folder.
- * If not, see http://www.gnu.org/licenses/.
- *
- * $Rev$
- * Last modified by $Author$
- * $Date$
+* Tigase Jabber/XMPP Server
+* Copyright (C) 2004-2010 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, version 3 of the License.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. Look for COPYING file in the top folder.
+* If not, see http://www.gnu.org/licenses/.
+*
+* $Rev$
+* Last modified by $Author$
+* $Date$
  */
 package tigase.xmpp.impl;
 
@@ -51,17 +52,17 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.util.DNSResolver;
 
 //~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Apr 29, 2010 5:00:25 PM
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class MessageAmp extends XMPPProcessor implements XMPPPostprocessorIfc,
-		XMPPProcessorIfc {
+public class MessageAmp extends XMPPProcessor implements XMPPPostprocessorIfc, XMPPProcessorIfc {
 	private static Logger log = Logger.getLogger(MessageAmp.class.getName());
 	private static final String FROM_CONN_ID = "from-conn-id";
 	private static final String TO_CONN_ID = "to-conn-id";
@@ -74,22 +75,23 @@ public class MessageAmp extends XMPPProcessor implements XMPPPostprocessorIfc,
 	private static final String[] ELEMENTS = { "message", "presence" };
 	private static final String[] XMLNSS = { "jabber:client", "jabber:client" };
 	private static Element[] DISCO_FEATURES = {
-			new Element("feature", new String[] { "var" }, new String[] { XMLNS }),
-			new Element("feature", new String[] { "var" }, new String[] { "msgoffline" }) };
+		new Element("feature", new String[] { "var" }, new String[] { XMLNS }),
+		new Element("feature", new String[] { "var" }, new String[] { "msgoffline" }) };
 
-	// ~--- fields ---------------------------------------------------------------
+	//~--- fields ---------------------------------------------------------------
 
 	private JID ampJID = null;
 	private MsgRepository msg_repo = null;
 	private OfflineMessages offlineProcessor = new OfflineMessages();
 	private Message messageProcessor = new Message();
+	private static final String defHost = DNSResolver.getDefaultHostname();
 
-	// ~--- methods --------------------------------------------------------------
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -99,18 +101,27 @@ public class MessageAmp extends XMPPProcessor implements XMPPPostprocessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param settings
-	 * 
+	 *
 	 * @throws TigaseDBException
 	 */
 	@Override
 	public void init(Map<String, Object> settings) throws TigaseDBException {
 		super.init(settings);
-		ampJID = JID.jidInstanceNS((String) settings.get(AMP_JID_PROP_KEY));
-		log.log(Level.CONFIG, "Loaded AMP_JID option: {0} = {1}", new Object[] {
-				AMP_JID_PROP_KEY, ampJID });
+		String ampJIDstr = (String) settings.get(AMP_JID_PROP_KEY);
+
+		if ( null != ampJIDstr ) {
+			ampJID = JID.jidInstanceNS(ampJIDstr);
+		}
+		else
+		{
+			ampJID = JID.jidInstanceNS("amp@" + defHost);
+		}
+
+		log.log(Level.CONFIG, "Loaded AMP_JID option: {0} = {1}", new Object[] { AMP_JID_PROP_KEY,
+				ampJID });
 
 		String off_val = (String) settings.get(MSG_OFFLINE_PROP_KEY);
 
@@ -118,11 +129,10 @@ public class MessageAmp extends XMPPProcessor implements XMPPPostprocessorIfc,
 			off_val = System.getProperty(MSG_OFFLINE_PROP_KEY);
 		}
 
-		if ((off_val != null) && !Boolean.parseBoolean(off_val)) {
+		if ((off_val != null) &&!Boolean.parseBoolean(off_val)) {
 			offlineProcessor = null;
-			DISCO_FEATURES =
-					new Element[] { new Element("feature", new String[] { "var" },
-							new String[] { XMLNS }) };
+			DISCO_FEATURES = new Element[] {
+				new Element("feature", new String[] { "var" }, new String[] { XMLNS }) };
 		}
 
 		String msg_repo_uri = (String) settings.get(AmpFeatureIfc.AMP_MSG_REPO_URI_PROP_KEY);
@@ -136,14 +146,14 @@ public class MessageAmp extends XMPPProcessor implements XMPPPostprocessorIfc,
 		}
 
 		if (msg_repo_uri != null) {
-			Map<String, String> db_props = new HashMap<String, String>(4);
-			for (Map.Entry<String, Object> entry : settings.entrySet()) {
-				db_props.put(entry.getKey(), entry.getValue().toString());
-			}
+                        Map<String, String> db_props = new HashMap<String, String>(4);
+                        for (Map.Entry<String, Object> entry : settings.entrySet()) {
+                                db_props.put(entry.getKey(), entry.getValue().toString());
+                        }
 
-			// Initialization of repository can be done here and in Store
-			// class so repository related parameters for MsgRepository
-			// should be specified for AMP plugin and AMP component
+                        // Initialization of repository can be done here and in Store
+                        // class so repository related parameters for MsgRepository
+                        // should be specified for AMP plugin and AMP component
 			msg_repo = MsgRepository.getInstance(msg_repo_uri);
 
 			try {
@@ -157,8 +167,8 @@ public class MessageAmp extends XMPPProcessor implements XMPPPostprocessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param packet
 	 * @param session
 	 * @param repo
@@ -171,8 +181,7 @@ public class MessageAmp extends XMPPProcessor implements XMPPPostprocessorIfc,
 		if ((offlineProcessor != null) && (session == null)) {
 			Element amp = packet.getElement().getChild("amp");
 
-			if ((amp == null) || (amp.getXMLNS() != XMLNS)
-					|| (amp.getAttribute("status") != null)) {
+			if ((amp == null) || (amp.getXMLNS() != XMLNS) || (amp.getAttribute("status") != null)) {
 				try {
 					offlineProcessor.savePacketForOffLineUser(packet, msg_repo);
 				} catch (UserNotFoundException ex) {
@@ -187,26 +196,24 @@ public class MessageAmp extends XMPPProcessor implements XMPPPostprocessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param packet
 	 * @param session
 	 * @param repo
 	 * @param results
 	 * @param settings
-	 * 
+	 *
 	 * @throws XMPPException
 	 */
 	@Override
-	public void process(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
+	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
+			Queue<Packet> results, Map<String, Object> settings)
 			throws XMPPException {
 		if (packet.getElemName() == "presence") {
-			if ((offlineProcessor != null)
-					&& offlineProcessor.loadOfflineMessages(packet, session)) {
+			if ((offlineProcessor != null) && offlineProcessor.loadOfflineMessages(packet, session)) {
 				try {
-					Queue<Packet> packets =
-							offlineProcessor.restorePacketForOffLineUser(session, msg_repo);
+					Queue<Packet> packets = offlineProcessor.restorePacketForOffLineUser(session, msg_repo);
 
 					if (packets != null) {
 						if (log.isLoggable(Level.FINER)) {
@@ -214,10 +221,10 @@ public class MessageAmp extends XMPPProcessor implements XMPPPostprocessorIfc,
 						}
 
 						results.addAll(packets);
-					} // end of if (packets != null)
+					}    // end of if (packets != null)
 				} catch (UserNotFoundException e) {
 					log.info("Something wrong, DB problem, cannot load offline messages. " + e);
-				} // end of try-catch
+				}      // end of try-catch
 			}
 		} else {
 			Element amp = packet.getElement().getChild("amp", XMLNS);
@@ -237,8 +244,7 @@ public class MessageAmp extends XMPPProcessor implements XMPPPostprocessorIfc,
 				}
 
 				if (session.isUserId(packet.getStanzaTo().getBareJID())) {
-					result.getElement().addAttribute(TO_CONN_ID,
-							session.getConnectionId().toString());
+					result.getElement().addAttribute(TO_CONN_ID, session.getConnectionId().toString());
 					result.getElement().addAttribute(TO_RES, session.getResource());
 				} else {
 					JID connectionId = session.getConnectionId();
@@ -253,10 +259,10 @@ public class MessageAmp extends XMPPProcessor implements XMPPPostprocessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param session
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -266,8 +272,8 @@ public class MessageAmp extends XMPPProcessor implements XMPPPostprocessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -277,8 +283,8 @@ public class MessageAmp extends XMPPProcessor implements XMPPPostprocessorIfc,
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -287,6 +293,8 @@ public class MessageAmp extends XMPPProcessor implements XMPPPostprocessorIfc,
 	}
 }
 
-// ~ Formatted in Sun Code Convention
 
-// ~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Sun Code Convention
+
+
+//~ Formatted by Jindent --- http://www.jindent.com
