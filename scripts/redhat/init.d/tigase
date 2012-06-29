@@ -7,8 +7,8 @@
 # description: Tigase is a XMPP server.
 #
 # processname: tigase
-# pidfile: /var/run/tigase.pid
-# config: /home/callsvr/tigase-5.1.0/etc/tigase.conf
+# pidfile: /var/run/tigase/tigase.pid
+# config: /home/tigase/tigase-server/etc/tigase.conf
 #
 ### management instructions
 ##
@@ -20,14 +20,14 @@
 
 # Settings paths and other variables
 
-JAVA_HOME=/opt/jdk1.6
+JAVA_HOME=/usr/java/default/
 
-USERNAME=callsvr
-USERGROUP=callsvr
+USERNAME=tigase
+USERGROUP=tigase
 NAME=tigase
 DESC="Tigase XMPP server"
 
-TIGASE_HOME=/home/callsvr/tigase-5.1.0
+TIGASE_HOME=/home/tigase/tigase-server
 TIGASE_LIB=${TIGASE_HOME}/libs
 TIGASE_CONFIG=/etc/tigase/tigase-server.xml
 TIGASE_OPTIONS=
@@ -61,19 +61,19 @@ fi
 [[ -f "${TIGASE_PARAMS}" ]] && . ${TIGASE_PARAMS}
 
 if [ -z "${JAVA_HOME}" ] ; then
-  echo "JAVA_HOME is not set."
-  echo "Please set it to correct value before starting the sever."
-  exit 1
+	echo "JAVA_HOME is not set."
+	echo "Please set it to correct value before starting the sever."
+	exit 1
 fi
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin:${JAVA_HOME}/bin
 
 # Find tigase-server jar
 for j in ${TIGASE_HOME}/jars/tigase-server*.jar ; do
-        if [ -f ${j} ] ; then
-          TIGASE_JAR=${j}
-          break
-        fi
+	if [ -f ${j} ] ; then
+		TIGASE_JAR=${j}
+		break
+	fi
 done
 
 if [ -z "${TIGASE_CONSOLE_LOG}" ] ; then
@@ -88,7 +88,10 @@ fi
 
 if [ -z "${PIDFILE}" ] ; then
     if [ -w "/var/run/" ] ; then
-    	if [ ! -d "/var/run/$NAME/" ]; then mkdir "/var/run/$NAME/"; chown $USERNAME:$USERGROUP "/var/run/$NAME/"; fi
+    	if [ ! -d "/var/run/$NAME/" ]; then
+    		mkdir "/var/run/$NAME/";
+    		chown $USERNAME:$USERGROUP "/var/run/$NAME/";
+    	fi
         PIDFILE="/var/run/$NAME/$NAME.pid"
     elif [ -w "${TIGASE_HOME}/logs/" ] ; then
         PIDFILE="${TIGASE_HOME}/logs/$NAME.pid"
@@ -98,7 +101,7 @@ if [ -z "${PIDFILE}" ] ; then
 fi
 
 [[ -z "${TIGASE_RUN}" ]] && \
-  TIGASE_RUN="tigase.server.XMPPServer -c ${TIGASE_CONFIG} ${TIGASE_OPTIONS}"
+	TIGASE_RUN="tigase.server.XMPPServer -c ${TIGASE_CONFIG} ${TIGASE_OPTIONS}"
 
 [[ -z "${JAVA}" ]] && JAVA="${JAVA_HOME}/bin/java"
 
@@ -107,17 +110,17 @@ fi
 CLASSPATH="${CLASSPATH}${TIGASE_JAR}"
 
 for lib in ${TIGASE_LIB}/*.jar ; do
-  CLASSPATH="${CLASSPATH}:$lib"
+	CLASSPATH="${CLASSPATH}:$lib"
 done
 
 TIGASE_CMD="${JAVA_OPTIONS} -cp ${CLASSPATH} ${TIGASE_RUN}"
 
 if [ -d "${TIGASE_HOME}" ] ; then
-        cd ${TIGASE_HOME}
+	cd ${TIGASE_HOME}
 else
-  echo "${TIGASE_HOME} is not set to correct value"
-  echo "Please set it to correct value before starting the sever."
-  exit 1
+	echo "${TIGASE_HOME} is not set to correct value"
+	echo "Please set it to correct value before starting the sever."
+	exit 1
 fi
 
 
@@ -127,38 +130,46 @@ fi
 
 #Helper functions
 function checkRunning {
-   local pid="$1"
-   if [ -z "$pid" -o "$pid" == " " ]; then return 1; fi
-   if [ ! -e /proc/$pid ]; then rm -f $PIDFILE; return 1; fi
-   return 0; }
-   
+	local pid="$1"
+	if [ -z "$pid" -o "$pid" == " " ]; then
+		return 1;
+	fi
+	
+	if [ ! -e /proc/$pid ]; then
+		rm -f $PIDFILE; return 1;
+	fi
+return 0;
+}
+
 function getPid {
-   if [ ! -f $PIDFILE ]; then return 1; fi
-   PID="$(<$PIDFILE)"
-   checkRunning $PID || return 1
-   return 0; }   
+	if [ ! -f $PIDFILE ]; then
+		return 1;
+	fi
+	PID="$(<$PIDFILE)"
+	checkRunning $PID || return 1
+return 0;
+}
 
 start() {
-
-    getPid
-    if [ $? -eq 0 ]; then
-	echo -ne "Tigase is already running!"
+	getPid
+	if [ $? -eq 0 ]; then
+		echo -ne "Tigase is already running!"
 	return 1
-    fi
-
-    cd ${TIGASE_HOME} || return 1
-    rm -f $PIDFILE
-    local cmd="setsid $JAVA $TIGASE_CMD >>${TIGASE_CONSOLE_LOG} 2>&1 & echo \$! >$PIDFILE"
-    sudo -u ${USERNAME} $SHELL -c "$cmd" || return 1
-    sleep 0.1
-    PID="$(<$PIDFILE)"
-    if checkRunning $PID; then :; else
-        echo -ne "Tigase start failed, see logfile."
-        return 1
-    fi
-    
-    echo -ne "Tigase started"
-    return 0
+	fi
+	
+	rm -f $PIDFILE
+	local cmd="cd ${TIGASE_HOME}; setsid $JAVA $TIGASE_CMD >>${TIGASE_CONSOLE_LOG} 2>&1 & echo \$! >$PIDFILE"
+	su - ${USERNAME} -c "$cmd" || return 1
+	
+	sleep 1
+	PID="$(<$PIDFILE)"
+	if checkRunning $PID; then :; else
+		echo -ne "Tigase start failed, see logfile."
+		return 1
+	fi
+	
+	echo -ne "Tigase started"
+	return 0
 }
 
 stop() {
@@ -167,7 +178,7 @@ stop() {
         echo -ne "Tigase is not running!"
         return 1
     fi
-    
+
     kill $PID || return 1
     for ((i=0; i<15*10; i++)); do
         checkRunning $PID
@@ -175,11 +186,11 @@ stop() {
                 rm -f $PIDFILE
                 return 0
             fi
-        sleep 0.1
+        sleep 1
         done
-    
+
     echo -ne "Tigase did not terminate within 15 seconds, sending SIGKILL..."
-    
+
     kill -s KILL $PID || return 1
     for ((i=0; i<15*10; i++)); do
         checkRunning $PID
@@ -194,7 +205,7 @@ stop() {
 }
 
 case "$1" in
-  start)
+	start)
 	echo "Starting $DESC"
 	if start; then
 		success
@@ -204,8 +215,8 @@ case "$1" in
 	echo
 	exit 1
 	;;
-	
-  stop)
+
+	stop)
 	echo "Stopping $DESC"
 	if stop; then
 		success
@@ -215,8 +226,8 @@ case "$1" in
 	echo
 	exit 1
 	;;
-	
-  restart|force-reload)
+
+	restart|force-reload)
 	echo "Restarting $DESC"
 	stop
 	sleep 1
@@ -229,8 +240,8 @@ case "$1" in
 	exit 1
 	;;
 
-  check)
-  	getPid
+	check)
+	getPid
 	echo "Checking arguments to Tigase: "
 	echo
 	echo "USERNAME            =  $USERNAME"
@@ -260,7 +271,7 @@ case "$1" in
 	exit 1
 	;;
 
-  *)
+	*)
 	N=/etc/init.d/$NAME
 	echo "Usage: $N {start|stop|restart|force-reload|check}" >&2
 	exit 1
