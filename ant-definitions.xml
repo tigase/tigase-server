@@ -205,6 +205,9 @@
       <copy todir="${dist}/@{packagename}-${version}/scripts/debian">
         <fileset dir="scripts/debian"/>
       </copy>
+      <copy todir="${dist}/@{packagename}-${version}/scripts/redhat">
+        <fileset dir="scripts/redhat"/>
+      </copy>
       <move todir="${dist}/@{packagename}-${version}/docs">
         <fileset dir="@{docsdir}"/>
       </move>

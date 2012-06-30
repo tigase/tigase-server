@@ -282,6 +282,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 					<include name="scripts/tigase.sh"/>
 					<include name="scripts/mandriva/**/*"/>
 					<include name="scripts/gentoo/**/*"/>
+					<include name="scripts/redhat/**/*"/>
 				</fileset>
 				<executable targetfile="${INSTALL_PATH}/scripts/tigase.sh"/>
 				<executable targetfile="${INSTALL_PATH}/scripts/repo.sh"/>
