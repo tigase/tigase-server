@@ -42,6 +42,8 @@ function usage()
   exit 1
 }
 
+TIGASE_DEF_HOME="$(readlink -e "$(dirname "$0")/..")"
+
 if [ -z "${2}" ] ; then
   DEF_PARAMS="tigase.conf"
   # Gentoo style config location
@@ -52,7 +54,7 @@ if [ -z "${2}" ] ; then
   elif [ -f "/etc/tigase/${DEF_PARAMS}" ] ; then
 		TIGASE_PARAMS="/etc/tigase/${DEF_PARAMS}"
   else
-		TIGASE_PARAMS=""
+		TIGASE_PARAMS="${TIGASE_DEF_HOME}/etc/${DEF_PARAMS}"
   fi
   echo "No params-file.conf given. Using: '$TIGASE_PARAMS'"
 else
@@ -67,24 +69,17 @@ if [ -z "${JAVA_HOME}" ] ; then
   exit 1
 fi
 if [ -z "${TIGASE_HOME}" ] ; then
-  if [ ${0:0:1} = '/' ] ; then
-    TIGASE_HOME=${0}
-  else
-    TIGASE_HOME=${PWD}/${0}
-  fi
-  TIGASE_HOME=`dirname ${TIGASE_HOME}`
-  TIGASE_HOME=`dirname ${TIGASE_HOME}`
-  TIGASE_JAR=""
+    TIGASE_HOME="${TIGASE_DEF_HOME}"
 fi
-for j in ${TIGASE_HOME}/jars/tigase-server*.jar ; do
-	if [ -f ${j} ] ; then
-	  TIGASE_JAR=${j}
+for j in "${TIGASE_HOME}"/jars/tigase-server*.jar ; do
+	if [ -f "${j}" ] ; then
+	  TIGASE_JAR="${j}"
 	  break
 	fi
 done
-if [ -z ${TIGASE_JAR} ] ; then
-	echo "TIGASE_HOME is not set."
-	echo "Please set it to correct value before starting the sever."
+if [ -z "${TIGASE_JAR}" ] ; then
+	echo "Tigase jar not found at ${TIGASE_HOME}/jars/" 
+	echo "Please set variable TIGASE_HOME correctly before starting the server."
 	exit 1
 fi
 if [ -z "${TIGASE_CONSOLE_LOG}" ] ; then
