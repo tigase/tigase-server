@@ -50,6 +50,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.xmpp.*;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -424,6 +425,22 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 				+ "</stream:error>" + "</stream:stream>";
 	}
 
+	@Override
+        public BareJID getSeeOtherHostForJID(BareJID fromJID) {
+                if (see_other_host_strategy == null) {
+                        if (log.isLoggable(Level.FINEST)) {
+                                log.finest("no see-other-host implementation set");
+                        }
+                        return null;
+                }
+                
+                BareJID see_other_host = see_other_host_strategy.findHostForJID(fromJID, getDefHostName());
+                if (log.isLoggable(Level.FINEST)) {
+                        log.finest("using = " + see_other_host_strategy.getClass().getCanonicalName() + "for jid = " + fromJID.toString() + " got = " + (see_other_host != null ? see_other_host.toString() : "null"));
+                }
+                return (see_other_host != null && !see_other_host.equals(getDefHostName())) ? see_other_host : null;
+        }
+        
 	@Override
 	protected JID changeDataReceiver(Packet packet, JID newAddress,
 			String command_sessionId, XMPPIOService<Object> serv) {

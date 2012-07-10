@@ -353,6 +353,9 @@ public interface Configurable extends ServerComponent {
 	public static final String BOSH_COMP_CLASS_NAME = "tigase.server.bosh.BoshConnectionManager";
 
 	/** Field description */
+	public static final String BOSH_CLUST_COMP_CLASS_NAME = "tigase.cluster.BoshConnectionClustered";
+
+        /** Field description */
 	public static final String STATS_CLASS_NAME = "tigase.stats.StatisticsCollector";
 
 	/** Field description */

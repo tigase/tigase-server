@@ -80,7 +80,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	private static final String SOCKET_CLOSE_WAIT_PROP_KEY = "socket-close-wait";
 	private static final long SOCKET_CLOSE_WAIT_PROP_DEF = 1;
 
-	private SeeOtherHostIfc see_other_host_strategy = null;
+	protected SeeOtherHostIfc see_other_host_strategy = null;
 
 	protected RoutingsContainer routings = null;
 	private final Map<String, XMPPProcessorIfc> processors =

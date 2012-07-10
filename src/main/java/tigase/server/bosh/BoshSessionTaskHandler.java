@@ -22,6 +22,7 @@ package tigase.server.bosh;
 
 import java.util.TimerTask;
 import tigase.server.Packet;
+import tigase.xmpp.BareJID;
 
 /**
  * Describe interface BoshSessionTaskHandler here.
@@ -44,4 +45,5 @@ public interface BoshSessionTaskHandler {
 
 	boolean addOutStreamClosed(Packet packet, BoshSession bs);
 
+        BareJID getSeeOtherHostForJID(BareJID userId);        
 }

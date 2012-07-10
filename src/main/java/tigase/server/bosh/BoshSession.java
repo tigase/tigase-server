@@ -50,6 +50,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import tigase.xmpp.*;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -350,6 +351,21 @@ public class BoshSession {
 		if (getCurrentRidTail() > 0) {
 			body.setAttribute(ACK_ATTR, "" + takeCurrentRidTail());
 		}
+                try {
+                        BareJID userId = packet.getAttribute("from") != null ? BareJID.bareJIDInstance(packet.getAttribute("from")) : null;
+                        if (userId != null) {
+                                BareJID hostJid = handler.getSeeOtherHostForJID(userId);
+                                if (hostJid != null) {
+                                        Element error = new Element("stream:error");
+                                        Element seeOtherHost = new Element("see-other-host", hostJid.toString());
+                                        seeOtherHost.setXMLNS("urn:ietf:params:xml:ns:xmpp-streams");
+                                        error.addChild(seeOtherHost);
+                                        body.addChild(error);
+                                }
+                        }
+                } catch (TigaseStringprepException ex) {
+                        Logger.getLogger(BoshSession.class.getName()).log(Level.SEVERE, null, ex);
+                }
 
 		body.setXMLNS(BOSH_XMLNS);
 		sendBody(service, body);
