@@ -35,7 +35,7 @@ create_derby() {
 create_mysql() {
   echo -e "database type:\t\t ${DB_TYPE}"
   echo -e "schema_version:\t\t ${VERSION}"
-  echo -e "schema_file:\t\t mysql/postgresql-schema-${FILE_VERSION}.sql"
+  echo -e "schema_file:\t\t database/mysql-schema-${FILE_VERSION}.sql"
   echo -e "database_name:\t\t ${DB_NAME}"
   echo -e "database_hostname:\t ${DB_HOST}"
   echo -e "tigase_username:\t ${USER_NAME}"

@@ -73,7 +73,7 @@ echo "FLUSH PRIVILEGES;" | mysql -h $DB_HOST -u $DB_USER -p$DB_PASS $DB_NAME
 
 echo "Loading schema"
 
-mysql -h $DB_HOST -u $DB_USER -p$DB_PASS $DB_NAME < database/mysql-schema-5.1.sql
+mysql -h $DB_HOST -u $DB_USER -p$DB_PASS $DB_NAME < database/mysql-schema-5-1.sql
 
 
 echo -e "\n\n\nconfiguration:\n\n--user-db=mysql\n--user-db-uri=jdbc:mysql://$DB_HOST:3306/$DB_NAME?user=$DB_USER&password=$DB_PASS&useUnicode=true&characterEncoding=UTF-8&autoCreateUser=true\n\n"

@@ -42,6 +42,6 @@ read -p "Press [Enter] key to start, otherwise abort..."
 
 createuser -d -h $DB_HOST -U postgres ${USR_NAME}
 createdb -h $DB_HOST -U ${USR_NAME} ${DB_NAME}
-psql -h $DB_HOST -q -U ${USR_NAME} -d $DB_NAME -f database/postgresql-schema-5.1.sql
+psql -h $DB_HOST -q -U ${USR_NAME} -d $DB_NAME -f database/postgresql-schema-5-1.sql
 
 echo -e "\n\n\nconfiguration:\n\n--user-db=pgsql\n--user-db-uri=jdbc:postgresql://$DB_HOST/$DB_NAME?user=$USR_NAME&password=$USR_PASS&useUnicode=true&characterEncoding=UTF-8&autoCreateUser=true\n\n"
