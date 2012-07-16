@@ -112,7 +112,7 @@ public class JDBCRepository implements AuthRepository, UserRepository {
         private static final String UPDATE_PAIRS_QUERY = "{ call TigUpdatePairs(?, ?, ?, ?) }";
 
 	public static final String CURRENT_DB_SCHEMA_VER = "5.1";
-	public static final String SCHEMA_UPGRADE_LINK = "http://www.tigase.org/content/mysql-database-schema-upgrade-tigase-51";
+	public static final String SCHEMA_UPGRADE_LINK = "http://www.tigase.org/content/tigase-51-database-schema-upgrade";
 	
 	/** Field description */
 	public static final String DERBY_GETSCHEMAVER_QUERY =
@@ -923,6 +923,13 @@ public class JDBCRepository implements AuthRepository, UserRepository {
 		// cache.remove(user_id+"/"+subnode+"/"+key);
 		try {
 			long nid = getNodeNID(repo, user_id, subnode);
+
+			if ( log.isLoggable( Level.FINEST ) ){
+				log.log( Level.FINEST,
+						 "Removing data, user_id: {0}, subnode: {1}, key: {2}, nid: {3}",
+						 new Object[] { user_id, subnode, key, nid } );
+			}
+
 			PreparedStatement remove_key_data_st = null;
 			if (repo == null) {
 				remove_key_data_st =
