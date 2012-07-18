@@ -58,7 +58,7 @@ public class ExpireAt implements ConditionIfc {
 
 	//~--- fields ---------------------------------------------------------------
 
-	private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+	private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
 	//~--- get methods ----------------------------------------------------------
 

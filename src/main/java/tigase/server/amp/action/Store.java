@@ -65,7 +65,7 @@ public class Store extends ActionAbstract {
 	private Thread expiredProcessor = null;
 	private MsgRepository repo = null;
 	private final SimpleDateFormat formatter =
-			new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+			new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
 	// ~--- methods --------------------------------------------------------------
 

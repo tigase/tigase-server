@@ -64,7 +64,7 @@ public class BoshSessionCache {
 
 	/** Field description */
 	public static final String MESSAGE_ID = "bosh-message";
-	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
 	//~--- fields ---------------------------------------------------------------
 

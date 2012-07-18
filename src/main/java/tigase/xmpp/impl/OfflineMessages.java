@@ -81,7 +81,7 @@ public class OfflineMessages extends XMPPProcessor implements XMPPPostprocessorI
 	private static final String defHost = DNSResolver.getDefaultHostname();
 
 	private final SimpleDateFormat formatter =
-			new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+			new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
 	/**
 	 * Method description
