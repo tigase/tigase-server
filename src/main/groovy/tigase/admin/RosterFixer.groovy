@@ -181,7 +181,10 @@ if (conn) {
 }
 	 
 rosterBuddyList.each {
-	buddy = it.split(",")
+  def	buddy = it.split(",")
+	if (it.contains(';')) {
+  	buddy = it.split(";")
+	}
 	rosterItemJid = buddy[0]
 	def jidRosterItemJid = JID.jidInstanceNS(rosterItemJid)
 	def rosterItemName = (buddy as List)[1] ?: jidRosterItemJid.getLocalpart()
