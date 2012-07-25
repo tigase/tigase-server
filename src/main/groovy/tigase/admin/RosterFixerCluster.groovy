@@ -33,7 +33,6 @@
  buddy_jid is a JID (bare JID)
  buddy_name is just a string, it is optional, if omit, localpart of the JID is used
  subscription is one of following (none, from, to, both), it is optional, if omit 'both' is used
- 
  AS:Description: Fixes user's roster on Tigase cluster
  AS:CommandId: roster-fixer-cluster
  AS:Component: sess-man
@@ -136,27 +135,31 @@ if (!disconnected) {
 		}
 		online = true
 	}
-	
+
 	Set<ConnectionRecord> cl_conns = cluster.getConnectionRecords(jidRosterOwnerJid.getBareJID())
 	if (cl_conns && cl_conns.size() > 0) {
 		cl_conns.each {
 			def commandClose = Command.CLOSE.getPacket(p.getStanzaTo(), it.getConnectionId(),
-				StanzaType.set, "77")
-		results.offer(commandClose)
-		res_report += "User: " + it.getUserJid() + " is online on node: " + it.getNode() + ", disconnected."
+					StanzaType.set, "77")
+			results.offer(commandClose)
+			res_report += "User: " + it.getUserJid() + " is online on node: " + it.getNode() + ", disconnected."
 
 		}
+		online = true
 	}
 
-	Command.addFieldMultiValue(p, "Report: ", res_report)
-	Command.addHiddenField(p, DISCONNECTED_PHASE, DISCONNECTED_PHASE)
-	results.offer(p)
+	if (online) {
+		Command.addFieldMultiValue(p, "Report: ", res_report)
+		Command.addHiddenField(p, DISCONNECTED_PHASE, DISCONNECTED_PHASE)
+		results.offer(p)
 
-	return results
-}
+		return results
+	}
+} else {
 
-Command.getFieldValues(packet, "Report: ").each {
-	res_report += it
+	Command.getFieldValues(packet, "Report: ").each {
+		res_report += it
+	}
 }
 
 // Waiting 2 secs
