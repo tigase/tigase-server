@@ -102,12 +102,12 @@ for (userJid in userJids) {
 				errors.add("User "+userJid+" not found, can't be deleted.");
 			}
 		} else {
-			errors.add("You do not have enough permissions to delete accounts for domain "+userJid.getDomain()+".");
+			errors.add("You do not have enough permissions to delete accounts for domain "+bareJID.getDomain()+".");
 		}
 	} catch (UserNotFoundException ex) {
 		errors.add("User "+userJid+" not exists, can't be deleted.");
 	} catch (TigaseDBException ex) {
-		errors.add("Problem accessing database, user "+userJid.toString()+" not deleted.");
+		errors.add("Problem accessing database, user "+userJid+" not deleted.");
 	}
 }
 
