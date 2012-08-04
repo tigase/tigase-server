@@ -397,14 +397,14 @@ public class Dialback extends S2SAbstractProcessor {
 							local_key.equals(remote_key), p.getStanzaId(), serv.getSessionId(), null, false);
 				}
 			} else {
-                                if (wasVerifyRequested(serv, p.getPacketFrom().toString())) {
+                                if (wasVerifyRequested(serv, p.getStanzaFrom().toString())) {
                                         handler.sendVerifyResult(DB_RESULT_EL_NAME, cid_main, cid_packet,
 						(p.getType() == StanzaType.valid), null, p.getStanzaId(), null, false);
                                         cid_conns.connectionAuthenticated(p.getStanzaId());
                                 }
                                 else {
                                         if (log.isLoggable(Level.FINE)) {
-                                                log.log(Level.FINE, "received verify for {0} but it was not requested!", p.getPacketFrom());
+                                                log.log(Level.FINE, "received verify for {0} but it was not requested!", p.getStanzaFrom());
                                         }
                                 }
 				if (serv.isHandshakingOnly()) {
@@ -453,8 +453,11 @@ public class Dialback extends S2SAbstractProcessor {
                 Set<String> requested = (Set<String>) serv.getSessionData().get(REQUESTED_RESULT_DOMAINS_KEY);
                 
                 if (requested == null) {
-                        requested = new CopyOnWriteArraySet<String>();
-                        requested = (Set<String>) serv.getSessionData().putIfAbsent(REQUESTED_RESULT_DOMAINS_KEY, requested);
+                        Set<String> requested_tmp = new CopyOnWriteArraySet<String>();
+                        requested = (Set<String>) serv.getSessionData().putIfAbsent(REQUESTED_RESULT_DOMAINS_KEY, requested_tmp);
+                        if (requested == null) {
+                                requested = requested_tmp;
+                        }
                 }
                 
                 requested.add(domain);
