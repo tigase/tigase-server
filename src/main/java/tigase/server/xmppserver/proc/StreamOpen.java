@@ -124,9 +124,10 @@ public class StreamOpen extends S2SAbstractProcessor {
 			CIDConnections cid_conns = handler.getCIDConnections(cid, false);
 
 			if (cid_conns == null) {
-				log.log(Level.WARNING,
+                                if (log.isLoggable(Level.FINE)) {
+                                        log.log(Level.FINE,
 						"Protocol error cid_conns not found for outgoing connection: {0}", serv);
-
+                                }
 				return;
 			} else {
 				cid_conns.connectionStopped(serv);

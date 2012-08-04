@@ -484,13 +484,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 			if (result) {
 				--services_size;
-			} else {
-
+			} else if (log.isLoggable(Level.FINER)) {                                
 				// Is it at all possible to happen???
 				// let's log it for now....
-				log.log(Level.WARNING, "[[{0}]] Attempt to stop incorrect service: {1}",
+				log.log(Level.FINER, "[[{0}]] Attempt to stop incorrect service: {1}",
 						new Object[] { getName(), service });
-				Thread.dumpStack();
 			}
 
 			return result;
