@@ -46,6 +46,7 @@ public class S2SIOService extends XMPPIOService<Object> {
 
 	/** Field description */
 	public static final String S2S_CONNECTION_KEY = "s2s-connection-key";
+        public static final String HANDSHAKING_DOMAIN_KEY = "handshaking-domain-key";
 	protected static final String HANDSHAKING_ONLY_KEY = "handshaking-only-key";
 
 	//~--- fields ---------------------------------------------------------------

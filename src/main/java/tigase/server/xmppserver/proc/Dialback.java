@@ -46,11 +46,8 @@ import tigase.xmpp.StanzaType;
 
 import java.security.NoSuchAlgorithmException;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.TimerTask;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -77,6 +74,8 @@ public class Dialback extends S2SAbstractProcessor {
 
 	// Ejabberd does not request dialback after TLS (at least some versions don't)
 	private boolean ejabberd_bug_workaround_active = false;
+        
+        private static final String REQUESTED_RESULT_DOMAINS_KEY = "requested-result-domains-key";
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -271,7 +270,7 @@ public class Dialback extends S2SAbstractProcessor {
 		try {
 			CID cid = (CID) serv.getSessionData().get("cid");
 			CIDConnections cid_conns = handler.getCIDConnections(cid, false);
-
+                        
 			// It must be always set for connect connection type
 			String uuid = UUID.randomUUID().toString();
 			String key = null;
@@ -289,6 +288,8 @@ public class Dialback extends S2SAbstractProcessor {
 				Element elem = new Element(DB_RESULT_EL_NAME, key, new String[] { XMLNS_DB_ATT },
 					new String[] { XMLNS_DB_VAL });
 
+                                addToResultRequested(serv, cid.getRemoteHost());
+                                
 				serv.getS2SConnection().addControlPacket(Packet.packetInstance(elem,
 						JID.jidInstanceNS(cid.getLocalHost()), JID.jidInstanceNS(cid.getRemoteHost())));
 			}
@@ -358,9 +359,14 @@ public class Dialback extends S2SAbstractProcessor {
 						null, p.getElemCData(), true);
 			} else {
 				if (p.getType() == StanzaType.valid) {
-
-					// serv.addCID(new CID(p.getStanzaTo().getDomain(), p.getStanzaFrom().getDomain()));
-					cid_conns.connectionAuthenticated(serv);
+                                        if (wasResultRequested(serv, p.getStanzaFrom().toString())) {
+                                                // serv.addCID(new CID(p.getStanzaTo().getDomain(), p.getStanzaFrom().getDomain()));
+                                                cid_conns.connectionAuthenticated(serv);
+                                        }
+                                        else if (log.isLoggable(Level.FINE)) {
+                                                log.log(Level.FINE, "Received result with type valid for {0} but it was not requested!",
+                                                        p.getStanzaFrom());
+                                        }
 				} else {
 					if (log.isLoggable(Level.FINE)) {
 						log.log(Level.FINE,
@@ -391,10 +397,16 @@ public class Dialback extends S2SAbstractProcessor {
 							local_key.equals(remote_key), p.getStanzaId(), serv.getSessionId(), null, false);
 				}
 			} else {
-				handler.sendVerifyResult(DB_RESULT_EL_NAME, cid_main, cid_packet,
+                                if (wasVerifyRequested(serv, p.getPacketFrom().toString())) {
+                                        handler.sendVerifyResult(DB_RESULT_EL_NAME, cid_main, cid_packet,
 						(p.getType() == StanzaType.valid), null, p.getStanzaId(), null, false);
-				cid_conns.connectionAuthenticated(p.getStanzaId());
-
+                                        cid_conns.connectionAuthenticated(p.getStanzaId());
+                                }
+                                else {
+                                        if (log.isLoggable(Level.FINE)) {
+                                                log.log(Level.FINE, "received verify for {0} but it was not requested!", p.getPacketFrom());
+                                        }
+                                }
 				if (serv.isHandshakingOnly()) {
 					serv.stop();
 				}
@@ -429,7 +441,49 @@ public class Dialback extends S2SAbstractProcessor {
 				serv.stop();
 			}
 		}
-	}
+	}        
+        
+        /**
+         * Adds domain to list of domains requested for result by service
+         * 
+         * @param serv
+         * @param domain 
+         */
+        private void addToResultRequested(S2SIOService serv, String domain) {
+                Set<String> requested = (Set<String>) serv.getSessionData().get(REQUESTED_RESULT_DOMAINS_KEY);
+                
+                if (requested == null) {
+                        requested = new CopyOnWriteArraySet<String>();
+                        requested = (Set<String>) serv.getSessionData().putIfAbsent(REQUESTED_RESULT_DOMAINS_KEY, requested);
+                }
+                
+                requested.add(domain);
+        }
+
+        /**
+         * Checks if result request for received domain was sent by service
+         * 
+         * @param serv
+         * @param domain
+         * @return 
+         */
+        private boolean wasResultRequested(S2SIOService serv, String domain) {
+                Set<String> requested = (Set<String>) serv.getSessionData().get(REQUESTED_RESULT_DOMAINS_KEY);
+                return requested != null && requested.contains(domain);
+        }
+        
+        /**
+         * Checks if verify request for received domain was sent by service
+         * @see CIDConnections#sendHandshakingOnly
+         * @param serv
+         * @param domain
+         * @return 
+         */
+        private boolean wasVerifyRequested(S2SIOService serv, String domain) {
+                String requested = (String) serv.getSessionData().get(S2SIOService.HANDSHAKING_DOMAIN_KEY);
+                return requested != null && requested.contains(domain);
+        }
+        
 }
 
 

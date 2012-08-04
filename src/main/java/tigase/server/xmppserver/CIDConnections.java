@@ -555,6 +555,11 @@ public class CIDConnections {
 
 					port_props.put(S2SIOService.HANDSHAKING_ONLY_KEY,
 							S2SIOService.HANDSHAKING_ONLY_KEY);
+                                       
+                                        // it looks like we are sending verify requests only on handshaking-only connection
+                                        // so there is only one domain for verification
+                                        port_props.put(S2SIOService.HANDSHAKING_DOMAIN_KEY, verify_req.getStanzaTo().toString());
+                                        
 					initNewConnection(dns_entry.getIp(), dns_entry.getPort(), s2s_conn, port_props);
 				} catch (UnknownHostException ex) {
 					log.log(Level.INFO, "Remote host not found: " + cid.getRemoteHost(), ex);
