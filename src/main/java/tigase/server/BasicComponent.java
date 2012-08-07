@@ -95,7 +95,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 	private JID compId = null;
 	private String name = null;
 	private BareJID defHostname = BareJID.bareJIDInstanceNS(DEF_HOSTNAME_PROP_VAL);
-	private Map<String, CommandIfc> scriptCommands =
+	protected Map<String, CommandIfc> scriptCommands =
 			new ConcurrentHashMap<String, CommandIfc>(20);
 	private boolean nonAdminCommands = false;
 	private Map<String, EnumSet<CmdAcl>> commandsACL =
@@ -268,6 +268,10 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 		return "generic";
 	}
 
+	public String getDiscoCategory() {
+		return "component";
+	}
+
 	/**
 	 * Method description
 	 * 
@@ -357,6 +361,24 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 		return null;
 	}
 
+	public List<Element> getScriptItems(String node, JID jid, JID from) {
+		LinkedList<Element>  result = null; 
+		boolean isAdminFrom = isAdmin(from);
+		if (node.equals("http://jabber.org/protocol/commands")
+				&& (isAdminFrom || nonAdminCommands)) {
+			result = new LinkedList<Element>();
+
+			for (CommandIfc comm : scriptCommands.values()) {
+				if (!comm.isAdminOnly() || isAdminFrom) {
+					result.add(new Element("item", new String[] { "node", "name", "jid" },
+							new String[] { comm.getCommandId(), comm.getDescription(),
+									jid.toString() }));
+				}
+			}
+		}
+		return result;
+	}
+	
 	/**
 	 * Method description
 	 * 
@@ -382,21 +404,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 
 		if (getName().equals(jid.getLocalpart())) {
 			if (node != null) {
-
-				// result = serviceEntity.getDiscoItems(null, null, isAdmin(from));
-				// }else {
-				if (node.equals("http://jabber.org/protocol/commands")
-						&& (isAdminFrom || nonAdminCommands)) {
-					result = new LinkedList<Element>();
-
-					for (CommandIfc comm : scriptCommands.values()) {
-						if (!comm.isAdminOnly() || isAdminFrom) {
-							result.add(new Element("item", new String[] { "node", "name", "jid" },
-									new String[] { comm.getCommandId(), comm.getDescription(),
-											jid.toString() }));
-						}
-					}
-				}
+				result = getScriptItems(node, jid, from);
 			} else {
 				result =
 						serviceEntity.getDiscoItems(null, jid.toString(), isAdminFrom
@@ -710,7 +718,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 		}
 
 		serviceEntity = new ServiceEntity(name, null, getDiscoDescription(), true);
-		serviceEntity.addIdentities(new ServiceIdentity("component", getDiscoCategoryType(),
+		serviceEntity.addIdentities(new ServiceIdentity(getDiscoCategory(), getDiscoCategoryType(),
 				getDiscoDescription()));
 		serviceEntity.addFeatures("http://jabber.org/protocol/commands");
 
