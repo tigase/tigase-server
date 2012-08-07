@@ -146,7 +146,6 @@
       <mkdir dir="${dist}/@{packagename}-${version}/certs"/>
       <copy todir="${dist}/@{packagename}-${version}/certs">
         <filelist dir="certs">
-          <file name="dummy.cer"/>
           <file name="rsa-keystore"/>
           <file name="truststore"/>
         </filelist>

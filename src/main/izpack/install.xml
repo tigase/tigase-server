@@ -156,7 +156,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<res id="RegistrySpec.xml" src="src/main/izpack/RegistrySpec.xml"/>
 		<res id="TargetPanel.dir.windows"
 				 src="src/main/izpack/resources/target_windows.dir"/>
-                                 
+
 		<res id="mysql-installer-create-db" src="database/mysql-installer-create-db.sql"/>
 		<res id="mysql-installer-post" src="database/mysql-installer-post.sql"/>
 		<res id="mysql-schema-4-schema" src="database/mysql-schema-4-schema.sql"/>
@@ -167,7 +167,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<res id="mysql-schema-5-1-props" src="database/mysql-schema-5-1-props.sql"/>
 		<res id="mysql-schema-upgrade-to-4" src="database/mysql-schema-upgrade-to-4.sql"/>
 		<res id="mysql-schema-upgrade-to-5-1" src="database/mysql-schema-upgrade-to-5-1.sql"/>
-                
+
 		<res id="postgresql-installer-create-db" src="database/postgresql-installer-create-db.sql"/>
 		<res id="postgresql-installer-post" src="database/postgresql-installer-post.sql"/>
 		<res id="postgresql-schema-4-schema" src="database/postgresql-schema-4-schema.sql"/>
@@ -178,7 +178,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<res id="postgresql-schema-5-1-props" src="database/postgresql-schema-5-1-props.sql"/>
 		<res id="postgresql-schema-upgrade-to-4" src="database/postgresql-schema-upgrade-to-4.sql"/>
 		<res id="postgresql-schema-upgrade-to-5-1" src="database/postgresql-schema-upgrade-to-5-1.sql"/>
-                
+
 		<res id="derby-installer-create-db" src="database/derby-installer-create-db.sql"/>
 		<res id="derby-installer-post" src="database/derby-installer-post.sql"/>
 		<res id="derby-schema-4-schema" src="database/derby-schema-4-schema.sql"/>
@@ -255,7 +255,6 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 					<include name="libs/tigase-utils.jar"/>
 					<include name="libs/tigase-xmltools.jar"/>
 					<include name="etc/tigase.conf"/>
-					<include name="certs/dummy.cer"/>
 					<include name="certs/rsa-keystore"/>
 					<include name="certs/truststore"/>
 					<include name="certs/localhost.pem"/>
@@ -271,7 +270,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 				<parsable targetfile="$INSTALL_PATH/etc/init.properties"/>
 				<parsable targetfile="$INSTALL_PATH/etc/tigase.conf"/>
 			</pack>
-			
+
 
 			<pack name="Unix Files" required="yes">
 				<os family="unix"/>
@@ -333,7 +332,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 					<include name="libs/jdmkrt.jar"/>
 				</fileset>
 			</pack>
-			
+
 			<pack name="Groovy scripting" required="no">
 				<description>Various Groovy scripts extending server functionality</description>
 				<fileset dir="src/main/groovy/tigase/admin" targetdir="$INSTALL_PATH/scripts/admin">
@@ -343,7 +342,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 					<include name="groovy-all-1.8.5.jar"/>
 				</fileset>
 			</pack>
-						
+
 			<pack name="Derby Database (DB included)" required="no" preselected="yes">
 <!-- 						installGroups="Derby Database"> -->
 				<description>Derby database (included) and JDBC driver</description>
