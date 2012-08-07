@@ -22,10 +22,10 @@
 
 /*
  Get registered user list script as described in XEP-0133:
- http://xmpp.org/extensions/xep-0133.html#get-registered-user-list
- 
+ http://xmpp.org/extensions/xep-0133.html#get-registered-users-list
+
  AS:Description: Get registered user list
- AS:CommandId: http://jabber.org/protocol/admin#get-registered-user-list
+ AS:CommandId: http://jabber.org/protocol/admin#get-registered-users-list
  AS:Component: sess-man
  */
 
@@ -64,7 +64,7 @@ if (domainJid == null || maxItemsStr == null) {
 	//Command.addFieldValue(result, JID, domainJid ?: "", "jid-single",
 	//		"The domain for the list of online users")
 //	}
-//	else {		
+//	else {
 		def vhosts = [];
 		vhost_man.repo.allItems().each {
 			if (it.isOwner(stanzaFromBare.toString()) || it.isAdmin(stanzaFromBare.toString()) || isServiceAdmin) {
@@ -73,7 +73,7 @@ if (domainJid == null || maxItemsStr == null) {
 		}
 		vhosts = vhosts.sort();
 		def vhostsArr = vhosts.toArray(new String[vhosts.size()]);
-		Command.addFieldValue(result, JID, "", "The domain for the list of online users", vhostsArr, vhostsArr);
+		Command.addFieldValue(result, JID, "", "The domain for the list of registered users", vhostsArr, vhostsArr);
 //	}
 
 	Command.addFieldValue(result, MAX_ITEMS, maxItemsStr ?: "", "Maximum number of items to show", ["25", "50", "75", "100", "150", "200", "None"].toArray(new String[7]),  ["25", "50", "75", "100", "150", "200", "None"].toArray(new String[7]));
