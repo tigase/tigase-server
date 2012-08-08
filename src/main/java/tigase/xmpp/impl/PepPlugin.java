@@ -276,13 +276,14 @@ public class PepPlugin extends XMPPProcessorAbstract {
 
 		JID from = packet.getStanzaFrom();
 
-		for (JID buddy : buddies) {
-			Element message = new Element("message", new String[] { "from", "to", "type", "id" }, new String[] {
-					from.toString(), buddy.toString(), "headline", packet.getStanzaId() });
+		if (buddies != null)
+			for (JID buddy : buddies) {
+				Element message = new Element("message", new String[] { "from", "to", "type", "id" }, new String[] {
+						from.toString(), buddy.toString(), "headline", packet.getStanzaId() });
 
-			message.addChild(event);
-			results.offer(Packet.packetInstance(message, from, buddy));
-		}
+				message.addChild(event);
+				results.offer(Packet.packetInstance(message, from, buddy));
+			}
 
 		Element message = new Element("message", new String[] { "from", "to", "type", "id" }, new String[] { from.toString(),
 				from.toString(), "headline", packet.getStanzaId() });
