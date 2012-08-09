@@ -154,6 +154,8 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	 */
 	private Map<String, S2SProcessor> processors = new LinkedHashMap<String, S2SProcessor>(
 			10);
+	private Map<String, S2SProcessor> filters = new LinkedHashMap<String, S2SProcessor>(
+			10);
 
 	// ~--- methods --------------------------------------------------------------
 
@@ -547,6 +549,10 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 				log.log(Level.FINEST, "Processing socket data: {0}", p);
 			}
 
+                        if (p.getXMLNS() == null) {
+                                p.setXMLNS(XMLNS_SERVER_VAL);
+                        }
+                        
 			boolean processed = false;
 
 			for (S2SProcessor proc : processors.values()) {
@@ -554,8 +560,14 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 				writePacketsToSocket(serv, results);
 			}
 
-			if (!processed) {
-
+                        if (!processed) {
+                                for (S2SProcessor filter : filters.values()) {
+                                        processed |= filter.process(p, serv, results);
+                                        writePacketsToSocket(serv, results);                                        
+                                }                                
+                        }
+                        
+			if (!processed) {                                
 				// Sometimes xmlns is not set for the packet. Usually it does not
 				// cause any problems but when the packet is sent over the s2s, ext
 				// or cluster connection it may be quite problematic.
@@ -719,7 +731,6 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 		// TODO: Make used processors list a configurarble thing
 		processors.clear();
 		processors.put(Dialback.class.getName(), new Dialback());
-		processors.put(PacketChecker.class.getName(), new PacketChecker());
 		processors.put(StartTLS.class.getName(), new StartTLS());
 		processors.put(StartZlib.class.getName(), new StartZlib());
 		processors.put(StreamError.class.getName(), new StreamError());
@@ -729,7 +740,14 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 		for (S2SProcessor proc : processors.values()) {
 			proc.init(this);
 		}
-
+                
+                filters.clear();
+		filters.put(PacketChecker.class.getName(), new PacketChecker());
+                
+		for (S2SProcessor filter : filters.values()) {
+			filter.init(this);
+		}
+                
 		maxPacketWaitingTime = (Long) props.get(MAX_PACKET_WAITING_TIME_PROP_KEY) * SECOND;
 		maxInactivityTime =
 				(Long) props.get(MAX_CONNECTION_INACTIVITY_TIME_PROP_KEY) * SECOND;
