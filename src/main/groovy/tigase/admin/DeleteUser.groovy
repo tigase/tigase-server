@@ -91,7 +91,8 @@ for (userJid in userJids) {
 					for (conn in conns) {
 						def res = sess.getResourceForConnectionId(conn);
 						if (res != null) {
-							def commandClose = Command.CLOSE.getPacket(p.getStanzaTo(), conn, StanzaType.set, res.nextStanzaId());
+							def commandClose = Command.CLOSE.getPacket(p.getStanzaTo(), conn,
+								 StanzaType.set, res.nextStanzaId());
 							results.offer(commandClose);
 						}
 					}
