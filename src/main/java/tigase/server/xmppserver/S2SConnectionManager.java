@@ -730,24 +730,31 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 
 		// TODO: Make used processors list a configurarble thing
 		processors.clear();
-		processors.put(Dialback.class.getName(), new Dialback());
-		processors.put(StartTLS.class.getName(), new StartTLS());
-		processors.put(StartZlib.class.getName(), new StartZlib());
-		processors.put(StreamError.class.getName(), new StreamError());
-		processors.put(StreamFeatures.class.getName(), new StreamFeatures());
-		processors.put(StreamOpen.class.getName(), new StreamOpen());
+		processors.put( Dialback.class.getName(), new Dialback() );
+		processors.put( StartTLS.class.getName(), new StartTLS() );
+		processors.put( StartZlib.class.getName(), new StartZlib() );
+		processors.put( StreamError.class.getName(), new StreamError() );
+		processors.put( StreamFeatures.class.getName(), new StreamFeatures() );
+		processors.put( StreamOpen.class.getName(), new StreamOpen() );
 
-		for (S2SProcessor proc : processors.values()) {
-			proc.init(this);
+		for ( S2SProcessor proc : processors.values() ) {
+			proc.init( this );
 		}
-                
-                filters.clear();
-		filters.put(PacketChecker.class.getName(), new PacketChecker());
-                
-		for (S2SProcessor filter : filters.values()) {
-			filter.init(this);
+
+		filters.clear();
+		filters.put( PacketChecker.class.getName(), new PacketChecker() );
+
+		for ( S2SProcessor filter : filters.values() ) {
+			filter.init( this );
 		}
-                
+
+		if ( props.size() == 1 ){
+			// If props.size() == 1, it means this is a single property update
+			// and this component does not support single property change for the rest
+			// of it's settings
+			return;
+		}
+
 		maxPacketWaitingTime = (Long) props.get(MAX_PACKET_WAITING_TIME_PROP_KEY) * SECOND;
 		maxInactivityTime =
 				(Long) props.get(MAX_CONNECTION_INACTIVITY_TIME_PROP_KEY) * SECOND;
