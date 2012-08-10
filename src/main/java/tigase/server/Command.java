@@ -313,7 +313,7 @@ public enum Command {
 			x = addDataForm(command, DataType.submit);
 		}
 
-		if ((f_value != null) && (f_value.size() > 0)) {
+		if ( f_value != null ){
 			Element field =
 					new Element("field", new String[] { "var", "type" }, new String[] {
 							XMLUtils.escape(f_name), "text-multi" });
@@ -349,7 +349,7 @@ public enum Command {
 			}
 		}
 
-		if ((f_value != null) && (f_value.size() > 0)) {
+		if ( f_value != null ){
 			Element field =
 					new Element("field", new String[] { "var", "type" }, new String[] {
 							XMLUtils.escape(f_name), "text-multi" });
