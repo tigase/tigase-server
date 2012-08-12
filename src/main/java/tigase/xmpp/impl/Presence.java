@@ -928,9 +928,13 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 						break;
 
 					case in_initial:
-						if (session.getPresence() == null) {
+						String resource = packet.getStanzaTo().getResource();
+
+						if (session.getPresence() == null || (resource == null) || resource.isEmpty()) {
 							// If the user has not yet sent initial presence then ignore the
-							// probe.
+							// presence. I am not actually certain whether direct presence should be
+							// allowed here.
+							// TODO: check if the direct presence should be allowed here
 							return;
 						}
 						if (type == StanzaType.unavailable) {
