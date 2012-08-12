@@ -143,6 +143,7 @@ public class MobileV2 extends XMPPProcessor implements XMPPProcessorIfc,
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void filter(Packet _packet, XMPPResourceConnection sessionFromSM,
 			NonAuthUserRepository repo, Queue<Packet> results) {
 

@@ -160,107 +160,111 @@ public class MobileV1 extends XMPPProcessor implements XMPPProcessorIfc,
 		return SUP_FEATURES;
 	}
 
-        @Override
-        public void filter(Packet _packet, XMPPResourceConnection sessionFromSM, NonAuthUserRepository repo, Queue<Packet> results) {
+	@Override
+	@SuppressWarnings("unchecked")
+	public void filter(Packet _packet, XMPPResourceConnection sessionFromSM,
+			NonAuthUserRepository repo, Queue<Packet> results) {
 
-                if ((sessionFromSM == null) || !sessionFromSM.isAuthorized() || (results == null) || (results.size() == 0)) {
-                        return;
-                }
+		if ((sessionFromSM == null) || !sessionFromSM.isAuthorized() || (results == null)
+				|| (results.size() == 0)) {
+			return;
+		}
 
-                for (Iterator<Packet> it = results.iterator(); it.hasNext();) {
-                        Packet res = it.next();
+		for (Iterator<Packet> it = results.iterator(); it.hasNext();) {
+			Packet res = it.next();
 
-                        // check if packet contains destination
-                        if (res == null || res.getPacketTo() == null) {
-                                if (log.isLoggable(Level.FINEST)) {
-                                        log.finest("packet without destination");
-                                }
-                                continue;
-                        }
+			// check if packet contains destination
+			if (res == null || res.getPacketTo() == null) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("packet without destination");
+				}
+				continue;
+			}
 
-                        // get resource connection for destination
-                        XMPPResourceConnection session = sessionFromSM.getParentSession().getResourceForConnectionId(res.getPacketTo());
-                        if (session == null) {
-                                if (log.isLoggable(Level.FINEST)) {
-                                        log.log(Level.FINEST, "no session for destination {0} for packet {1}",
-                                                new Object[] { res.getPacketTo().toString(), res.toString() });
-                                }
-                                // if there is no session we should not queue
-                                continue;
-                        }
+			// get resource connection for destination
+			XMPPResourceConnection session =
+					sessionFromSM.getParentSession().getResourceForConnectionId(res.getPacketTo());
+			if (session == null) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "no session for destination {0} for packet {1}",
+							new Object[] { res.getPacketTo().toString(), res.toString() });
+				}
+				// if there is no session we should not queue
+				continue;
+			}
 
-                        Queue<Packet> queue = (Queue<Packet>) session.getSessionData(QUEUE_KEY);
+			Queue<Packet> queue = (Queue<Packet>) session.getSessionData(QUEUE_KEY);
 
-                        // if queue is not enabled we do nothing
-                        if (!isQueueEnabled(session)) {
-                                if (log.isLoggable(Level.FINEST)) {
-                                        log.finest("queue is no enabled");
-                                }
-                                if (queue != null && !queue.isEmpty()) {
-                                                if (log.isLoggable(Level.FINEST)) {
-                                                log.finest("sending packets from queue (DISABLED)");
-                                        }
+			// if queue is not enabled we do nothing
+			if (!isQueueEnabled(session)) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("queue is no enabled");
+				}
+				if (queue != null && !queue.isEmpty()) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("sending packets from queue (DISABLED)");
+					}
 
-                                        Packet p;
-                                        while ((p = queue.poll()) != null) {
-                                                results.offer(p);
-                                        }
+					Packet p;
+					while ((p = queue.poll()) != null) {
+						results.offer(p);
+					}
 
-                                }
-                                continue;
-                        }
+				}
+				continue;
+			}
 
-                        // lets check if packet should be queued
-                        if (filter(session, res, queue)) {
-                                if (log.isLoggable(Level.FINEST)) {
-                                        log.log(Level.FINEST, "queuing packet = {0}", res.toString());
-                                }
-                                it.remove();
+			// lets check if packet should be queued
+			if (filter(session, res, queue)) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "queuing packet = {0}", res.toString());
+				}
+				it.remove();
 
-                                if (queue.size() > maxQueueSize) {
-                                        if (log.isLoggable(Level.FINEST)) {
-                                                log.finest("sending packets from queue (OVERFLOW)");
-                                        }
+				if (queue.size() > maxQueueSize) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("sending packets from queue (OVERFLOW)");
+					}
 
-                                        Packet p;
-                                        while ((p = queue.poll()) != null) {
-                                                results.offer(p);
-                                        }
+					Packet p;
+					while ((p = queue.poll()) != null) {
+						results.offer(p);
+					}
 
-                                        queue.clear();
-                                }
-                        }
-                }
-        }
-        
-        public boolean filter(XMPPResourceConnection session, Packet res, Queue<Packet> queue) {
+					queue.clear();
+				}
+			}
+		}
+	}
 
-                if (log.isLoggable(Level.FINEST)) {
-                        log.log(Level.FINEST, "checking if packet should be queued {0}", res.toString());
-                }
+	public boolean filter(XMPPResourceConnection session, Packet res, Queue<Packet> queue) {
 
-                if (res.getElemName() != "presence") {
-                        if (log.isLoggable(Level.FINEST)) {
-                                log.log(Level.FINEST, "ignoring packet, packet is not presence:  {0}", res.toString());
-                        }
-                        return false;
-                }
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "checking if packet should be queued {0}", res.toString());
+		}
 
-                StanzaType type = res.getType();
-                if (type != null && type != StanzaType.unavailable && type != StanzaType.available) {
-                        return false;
-                }
+		if (res.getElemName() != "presence") {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "ignoring packet, packet is not presence:  {0}",
+						res.toString());
+			}
+			return false;
+		}
 
+		StanzaType type = res.getType();
+		if (type != null && type != StanzaType.unavailable && type != StanzaType.available) {
+			return false;
+		}
 
-                if (log.isLoggable(Level.FINEST)) {
-                        log.log(Level.FINEST, "queuing packet {0}", res.toString());
-                }
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "queuing packet {0}", res.toString());
+		}
 
-                queue.offer(res);
+		queue.offer(res);
 
-                return true;
-        }
-        
+		return true;
+	}
+
 	/**
 	 * Check if queuing is enabled
 	 * 
