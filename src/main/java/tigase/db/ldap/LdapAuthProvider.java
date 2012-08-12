@@ -134,12 +134,6 @@ public class LdapAuthProvider implements AuthRepository {
 		throw new TigaseDBException("Not available");
 	}
 
-	@Override
-	public boolean digestAuth(BareJID user, String digest, String id, String alg) throws UserNotFoundException,
-			TigaseDBException, AuthorizationException {
-		throw new AuthorizationException("Not supported.");
-	}
-
 	private boolean doBindAuthentication(BareJID userId, final String password) throws UserNotFoundException,
 			TigaseDBException, AuthorizationException {
 		try {
@@ -225,12 +219,6 @@ public class LdapAuthProvider implements AuthRepository {
 		}
 
 		throw new AuthorizationException("Protocol is not supported.");
-	}
-
-	@Override
-	public boolean plainAuth(BareJID user, String password) throws UserNotFoundException, TigaseDBException,
-			AuthorizationException {
-		throw new AuthorizationException("Not supported.");
 	}
 
 	@Override
