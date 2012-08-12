@@ -46,7 +46,6 @@ public class LdapAuthProvider implements AuthRepository {
 				++auth_idx;
 			}
 
-			final String authoriz = new String(byteArray, 0, auth_idx);
 			int user_idx = ++auth_idx;
 
 			while ((byteArray[user_idx] != 0) && (user_idx < byteArray.length)) {
@@ -134,6 +133,13 @@ public class LdapAuthProvider implements AuthRepository {
 		throw new TigaseDBException("Not available");
 	}
 
+	@Override
+	@Deprecated
+	public boolean digestAuth(BareJID user, String digest, String id, String alg) throws UserNotFoundException,
+			TigaseDBException, AuthorizationException {
+		throw new AuthorizationException("Not supported.");
+	}
+
 	private boolean doBindAuthentication(BareJID userId, final String password) throws UserNotFoundException,
 			TigaseDBException, AuthorizationException {
 		try {
@@ -219,6 +225,13 @@ public class LdapAuthProvider implements AuthRepository {
 		}
 
 		throw new AuthorizationException("Protocol is not supported.");
+	}
+
+	@Override
+	@Deprecated
+	public boolean plainAuth(BareJID user, String password) throws UserNotFoundException, TigaseDBException,
+			AuthorizationException {
+		throw new AuthorizationException("Not supported.");
 	}
 
 	@Override
