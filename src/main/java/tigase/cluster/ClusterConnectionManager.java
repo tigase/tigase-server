@@ -328,7 +328,9 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 					if (stanzaAdd != null) {
 						return stanzaAdd.hashCode();
 					} else {
-						log.log(Level.WARNING, "No stanzaTo or from for cluster packet: {0}", packet);
+						// This may happen for some cluster packets, like: 
+						// resp-sync-online-sm-cmd and this is correct
+						log.log(Level.FINE, "No stanzaTo or from for cluster packet: {0}", packet);
 					}
 				}
 			}
