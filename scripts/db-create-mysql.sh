@@ -2,6 +2,11 @@
 
 echo -e "\n\nusage: db-create-mysql.sh tigase_username tigase_password database_name root_username root_password database_host \n\n"
 
+if [ "${1}" = "-y" ] ; then
+  NONINTERACTIVE=yes
+  shift
+fi
+
 if [ -z "${1}" ] ; then
   echo "No username given. Using: tigase_user"
   USR_NAME=tigase_user
@@ -45,14 +50,14 @@ else
   DB_HOST="${6}"
 fi
 
-echo ""
 
-echo "creating ${DB_NAME} database for user ${USR_NAME} identified by ${USR_PASS} password:"
+if [ -z "$NONINTERACTIVE" ] ; then
+  echo ""
+  echo "creating ${DB_NAME} database for user ${USR_NAME} identified by ${USR_PASS} password:"
+  echo ""
 
-echo ""
-
-read -p "Press [Enter] key to start, otherwise abort..."
-
+  read -p "Press [Enter] key to start, otherwise abort..."
+fi
 
 echo "DROP DATABASE IF EXISTS ${DB_NAME}" | mysql -h $DB_HOST -u $DB_USER -p$DB_PASS
 echo "CREATE DATABASE ${DB_NAME}" | mysql -h $DB_HOST -u $DB_USER -p$DB_PASS
