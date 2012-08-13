@@ -728,7 +728,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 
-		// TODO: Make used processors list a configurarble thing
+		// TODO: Make used processors list a configurable thing
 		processors.clear();
 		processors.put( Dialback.class.getName(), new Dialback() );
 		processors.put( StartTLS.class.getName(), new StartTLS() );
