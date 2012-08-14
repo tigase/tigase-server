@@ -932,7 +932,8 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 						if (session.getPresence() == null
 								&& ((resource == null) || resource.isEmpty())) {
-							// If the user has not yet sent initial presence then ignore all incoming
+							// If the user has not yet sent initial presence then ignore all
+							// incoming
 							// presences except direct presences.
 							return;
 						}
@@ -1566,6 +1567,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 		// According to RFC-3921 I must forward all these kind presence
 		// requests, it allows to resynchronize
 		// subscriptions in case of synchronization loss
+		boolean subscr_changed = false;
 		forwardPresence(results, packet, session.getJID().copyWithoutResource());
 
 		SubscriptionType current_subscription =
@@ -1575,7 +1577,7 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 			if (current_subscription == null) {
 				roster_util.addBuddy(session, packet.getStanzaTo(), null, null, null);
 			} // end of if (current_subscription == null)
-			boolean subscr_changed =
+			subscr_changed =
 					roster_util.updateBuddySubscription(session, pres_type, packet.getStanzaTo());
 
 			if (subscr_changed) {
@@ -1583,9 +1585,24 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 						roster_util.getBuddyItem(session, packet.getStanzaTo()));
 			} // end of if (subscr_changed)
 		} else {
-			if (SUB_NONE.contains(current_subscription)) {
-				roster_util.removeBuddy(session, packet.getStanzaTo());
-			} // end of if (current_subscription == null)
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "out_subscribe: current_subscription = "
+						+ current_subscription);
+			}
+
+			if (current_subscription != null) {
+				subscr_changed =
+						roster_util.updateBuddySubscription(session, pres_type, packet.getStanzaTo());
+				current_subscription =
+						roster_util.getBuddySubscription(session, packet.getStanzaTo());
+				if (subscr_changed) {
+					roster_util.updateBuddyChange(session, results,
+							roster_util.getBuddyItem(session, packet.getStanzaTo()));
+				} // end of if (subscr_changed)
+				if (SUB_NONE.contains(current_subscription)) {
+					roster_util.removeBuddy(session, packet.getStanzaTo());
+				} // end of if (current_subscription == null)
+			}
 		}
 
 	}
