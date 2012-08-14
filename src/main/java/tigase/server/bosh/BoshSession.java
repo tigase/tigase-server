@@ -898,6 +898,10 @@ public class BoshSession {
 			}
 		}
 	}
+	
+	public void terminateBoshSession() {
+		terminate = true;
+	}
 
 	private synchronized void sendBody(BoshIOService serv, Element body_par) {
 		Element body = body_par;
