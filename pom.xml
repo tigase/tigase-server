@@ -49,9 +49,7 @@
 				<artifactId>buildnumber-maven-plugin</artifactId>
 				<version>1.1</version>
 				<configuration>
-					<configuration>
-						<timestampFormat>{0,date} {0,time}</timestampFormat>
-					</configuration>
+					<timestampFormat>{0,date} {0,time}</timestampFormat>
 					<doCheck>false</doCheck>
 					<doUpdate>false</doUpdate>
 				</configuration>
@@ -85,7 +83,7 @@
 							<mainClass>tigase.server.XMPPServer</mainClass>
 						</manifest>
 						<manifestEntries>
-							<Implementation-Version>${project.version}</Implementation-Version>
+							<Implementation-Version>${project.version} build ${buildNumber} (${timestamp})</Implementation-Version>
 							<Implementation-Build>${buildNumber} (${timestamp})</Implementation-Build>
 						</manifestEntries>
 						<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
