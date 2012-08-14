@@ -192,7 +192,7 @@ case "${1}" in
     echo "TIGASE_PARAMS   =  $TIGASE_PARAMS"
     echo "TIGASE_RUN      =  $TIGASE_RUN"
     echo "TIGASE_PID      =  $TIGASE_PID"
-		echo "TIGASE_OPTIONS  =  $TIGASE_OPTIONS"
+    echo "TIGASE_OPTIONS  =  $TIGASE_OPTIONS"
     echo "JAVA_OPTIONS    =  $JAVA_OPTIONS"
     echo "JAVA            =  $JAVA"
     echo "JAVA_CMD        =  $JAVA_CMD"
