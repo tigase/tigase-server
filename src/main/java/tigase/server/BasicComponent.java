@@ -362,7 +362,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 	}
 
 	public List<Element> getScriptItems(String node, JID jid, JID from) {
-		LinkedList<Element>  result = null; 
+		LinkedList<Element> result = null;
 		boolean isAdminFrom = isAdmin(from);
 		if (node.equals("http://jabber.org/protocol/commands")
 				&& (isAdminFrom || nonAdminCommands)) {
@@ -370,15 +370,16 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 
 			for (CommandIfc comm : scriptCommands.values()) {
 				if (!comm.isAdminOnly() || isAdminFrom) {
-					result.add(new Element("item", new String[] { "node", "name", "jid" },
-							new String[] { comm.getCommandId(), comm.getDescription(),
-									jid.toString() }));
+					result
+							.add(new Element("item", new String[] { "node", "name", "jid" },
+									new String[] { comm.getCommandId(), comm.getDescription(),
+											jid.toString() }));
 				}
 			}
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Method description
 	 * 
@@ -606,6 +607,10 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 	public void processPacket(Packet packet, Queue<Packet> results) {
 		if (packet.isCommand() && getName().equals(packet.getStanzaTo().getLocalpart())
 				&& isLocalDomain(packet.getStanzaTo().getDomain())) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Command addressed to: {0}, command: {1}", new Object[] {
+						getName(), packet });
+			}
 			processScriptCommand(packet, results);
 		}
 	}
@@ -718,8 +723,8 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 		}
 
 		serviceEntity = new ServiceEntity(name, null, getDiscoDescription(), true);
-		serviceEntity.addIdentities(new ServiceIdentity(getDiscoCategory(), getDiscoCategoryType(),
-				getDiscoDescription()));
+		serviceEntity.addIdentities(new ServiceIdentity(getDiscoCategory(),
+				getDiscoCategoryType(), getDiscoDescription()));
 		serviceEntity.addFeatures("http://jabber.org/protocol/commands");
 
 		CommandIfc command = new AddScriptCommand();
@@ -892,6 +897,11 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 			}
 
 			return true;
+		} else {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "No such command: {0}, ignoring packet: {1}", new Object[] {
+						strCommand, pc });
+			}
 		}
 
 		return false;
