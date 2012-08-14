@@ -596,6 +596,18 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc,
 				for (Element item : items) {
 					JID buddy = JID.jidInstance(item.getAttribute("jid"));
 
+					if (DynamicRoster.getBuddyItem(session, settings, buddy) != null) {
+						// Let's return an error. Dynamic roster cannot be modified via
+						// XMPP.
+						results
+								.offer(Authorization.FEATURE_NOT_IMPLEMENTED
+										.getResponseMessage(
+												packet,
+												"You cannot modify this contact. It is controlled by an external service.",
+												true));
+						return;
+					}
+
 					if (session.isUserId(buddy.getBareJID())) {
 						results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
 								"User can't add himself to the roster, RFC says NO.", true));
@@ -617,8 +629,7 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc,
 						if ((sub != SubscriptionType.none) && ((type == null) || !type.equals(ANON))) {
 
 							// Unavailable presence should be sent first, otherwise it will be
-							// blocked by
-							// the server after the subscription is canceled
+							// blocked by the server after the subscription is canceled
 							Element pres = new Element("presence");
 							pres.setXMLNS(CLIENT_XMLNS);
 
@@ -657,7 +668,6 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc,
 						roster_util.removeBuddy(session, buddy);
 						roster_util.updateBuddyChange(session, results, it);
 					} else {
-						Element dynamicItem = DynamicRoster.getBuddyItem(session, settings, buddy);
 						String name = item.getAttribute("name");
 
 						// if (name == null) {
@@ -709,16 +719,6 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc,
 						if (roster_util.getBuddySubscription(session, buddy) == null) {
 							roster_util.setBuddySubscription(session, SubscriptionType.none, buddy);
 						} // end of if (getBuddySubscription(session, buddy) == null)
-
-						if (dynamicItem != null) {
-							roster_util.setBuddySubscription(session, SubscriptionType.both, buddy);
-
-							String[] itemGroups = getItemGroups(dynamicItem);
-
-							if (itemGroups != null) {
-								roster_util.addBuddyGroup(session, buddy, itemGroups);
-							}
-						}
 
 						new_buddy = roster_util.getBuddyItem(session, buddy);
 
