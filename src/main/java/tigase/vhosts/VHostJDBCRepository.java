@@ -228,6 +228,10 @@ public class VHostJDBCRepository extends UserRepoRepository<VHostItem> {
 			return "Maximum number of domains exceeded for the user! Current number is: "
 					+ vhost_count;
 		}
+		
+		if (System.getProperty("vhost-disable-dns-check") != null) {
+			return null;
+		}
 
 		try {
 			DNSEntry dnsEntry = DNSResolver.getHostSRV_Entry(item.getKey());
