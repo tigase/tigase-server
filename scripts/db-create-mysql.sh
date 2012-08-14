@@ -57,6 +57,8 @@ if [ -z "$NONINTERACTIVE" ] ; then
   echo ""
 
   read -p "Press [Enter] key to start, otherwise abort..."
+else
+  echo "User: $USR_NAME, Pass: $USR_PASS, Db: $DB_NAME, Db Admin: $DB_USER, Admin Pass: $DB_PASS, Host: $DB_HOST"
 fi
 
 echo "DROP DATABASE IF EXISTS ${DB_NAME}" | mysql -h $DB_HOST -u $DB_USER -p$DB_PASS

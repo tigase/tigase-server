@@ -52,21 +52,21 @@ def body = Command.getFieldValues(p, MSG_BODY)
 
 if (fromJid == null || subject == null || msg_type == null || body == null) {
 	def res = (Iq)p.commandResult(Command.DataType.form);
-        Command.addTitle(res, "Message to online users")
-        Command.addInstructions(res, "Fill out this form to make an announcement to all active users of this service.")
+  Command.addTitle(res, "Message to online users")
+  Command.addInstructions(res, "Fill out this form to make an announcement to all active users of this service.")
 
-        Command.addFieldValue(res, "FORM_TYPE", "http://jabber.org/protocol/admin", "hidden")
+  Command.addFieldValue(res, "FORM_TYPE", "http://jabber.org/protocol/admin", "hidden")
 
-        Command.addFieldValue(res, FROM_JID, fromJid ?: p.getStanzaFrom().getDomain().toString(), "jid-single", "From address")
+  Command.addFieldValue(res, FROM_JID, fromJid ?: p.getStanzaFrom().getDomain().toString(), "jid-single", "From address")
 
-        Command.addFieldValue(res, SUBJECT, subject ?: "Message from administrators", "Subject")
+  Command.addFieldValue(res, SUBJECT, subject ?: "Message from administrators", "Subject")
 
-        def msg_types = ["normal", "headline", "chat" ]
-        Command.addFieldValue(res, MSG_TYPE, msg_type ?: msg_types[0], "Type", (String[])msg_types, (String[])msg_types)
+  def msg_types = ["normal", "headline", "chat" ]
+  Command.addFieldValue(res, MSG_TYPE, msg_type ?: msg_types[0], "Type", (String[])msg_types, (String[])msg_types)
 
-        if (body == null) {
-          body = [""]
-        }
+  if (body == null) {
+     body = [""]
+  }
 
 	Command.addFieldMultiValue(res, MSG_BODY, body)
 

@@ -1,6 +1,11 @@
 #!/bin/bash
 
-echo -e "\n\nusage: db-create-postgresql.sh tigase_username tigase_password database_name database_host \n\n"
+echo -e "\n\nusage: db-create-mysql.sh tigase_username tigase_password database_name database_host \n\n"
+ 
+if [ "${1}" = "-y" ] ; then
+  NONINTERACTIVE=yes
+  shift
+fi
 
 if [ -z "${1}" ] ; then
   echo "No username given. Using: tigase_user"
@@ -28,20 +33,25 @@ if [ -z "${4}" ] ; then
   echo "No DB hostname given. Using: localhost"
   DB_HOST=localhost
 else
-  DB_HOST="${6}"
+  DB_HOST="${4}"
 fi
 
-echo ""
 
-echo "creating ${DB_NAME} database for user ${USR_NAME} identified by ${USR_PASS} password:"
+if [ -z "$NONINTERACTIVE" ] ; then
+  echo ""
+  echo "creating ${DB_NAME} database for user ${USR_NAME} identified by ${USR_PASS} password:"
+  echo ""
+ 
+  read -p "Press [Enter] key to start, otherwise abort..."
+else
+  echo "User: $USR_NAME, Pass: $USR_PASS, Db: $DB_NAME, Host: $DB_HOST"
+fi
 
-echo ""
-
-read -p "Press [Enter] key to start, otherwise abort..."
-
-
-createuser -d -h $DB_HOST -U postgres ${USR_NAME}
+echo "Creating user"
+createuser -d -S -R -h $DB_HOST -U postgres ${USR_NAME}
+echo "Creating database"
 createdb -h $DB_HOST -U ${USR_NAME} ${DB_NAME}
+echo "Loading DB schema"
 psql -h $DB_HOST -q -U ${USR_NAME} -d $DB_NAME -f database/postgresql-schema-5-1.sql
 
 echo -e "\n\n\nconfiguration:\n\n--user-db=pgsql\n--user-db-uri=jdbc:postgresql://$DB_HOST/$DB_NAME?user=$USR_NAME&password=$USR_PASS&useUnicode=true&characterEncoding=UTF-8&autoCreateUser=true\n\n"
