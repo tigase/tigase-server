@@ -18,7 +18,7 @@
  * $Rev: 2411 $
  * Last modified by $Author: kobit $
  * $Date: 2010-10-27 20:27:58 -0600 (Wed, 27 Oct 2010) $
- * 
+ *
  */
 /*
  Retrieves from the server specified number of top active users

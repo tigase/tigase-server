@@ -70,21 +70,21 @@ def result = p.commandResult(Command.DataType.result)
 
 if (isServiceAdmin ||
 	(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
-            
+
             Command.addFieldValue(result, JID, userJid ?: "", "jid-single","The Jabber ID for which to retrieve roster")
 
-            XMPPSession session = sessions.get(BareJID.bareJIDInstanceNS(userJid))	    
+            XMPPSession session = sessions.get(BareJID.bareJIDInstanceNS(userJid))
 
 	    Element query = new Element("query");
 	    query.setXMLNS("jabber:iq:roster");
 	    if (session == null) {
 		String rosterStr = repository.getData(bareJID, null,
-			RosterAbstract.ROSTER, null) ?: ""		
+			RosterAbstract.ROSTER, null) ?: ""
 		Map<BareJID, RosterElement> roster = new LinkedHashMap<BareJID, RosterElement>()
-		RosterFlat.parseRosterUtil(rosterStr, roster, null)		
+		RosterFlat.parseRosterUtil(rosterStr, roster, null)
 		roster.values().each {
 		    query.addChild(it.getRosterItem());
-		}		
+		}
     	    } else {
 		RosterAbstract rosterUtil = RosterFactory.getRosterImplementation(true)
 		query.addChildren(rosterUtil.getRosterItems(session.getActiveResources().get(0)));

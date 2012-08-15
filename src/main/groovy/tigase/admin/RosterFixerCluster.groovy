@@ -22,12 +22,12 @@
 
 
 /*
- The roster fixer scripts is used in a case if for whatever reason user's roster got 
+ The roster fixer scripts is used in a case if for whatever reason user's roster got
  broken, lost or otherwise messed up. If we know the user's contact list, this script
  can be used to restore the contact list. It adds missing entries to the user's roster.
  If the user is online, he gets a roster push with updated entries to make sure
  he is up to date with all the changes.
- The script accepts a user JID, action (update or remove) and a list of buddies in 
+ The script accepts a user JID, action (update or remove) and a list of buddies in
  a following format:
  buddy_jid,buddy_name,subscription
  buddy_jid is a JID (bare JID)

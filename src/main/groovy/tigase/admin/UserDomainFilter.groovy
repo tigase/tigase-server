@@ -1,20 +1,20 @@
 /*
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2008 "Artur Hefczyc" <artur.hefczyc@tigase.org>
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- * 
+ *
  * $Rev: $
  * Last modified by $Author: $
  * $Date: $
@@ -35,6 +35,10 @@ import tigase.xmpp.impl.DomainFilter
 import tigase.db.UserRepository
 import tigase.db.UserNotFoundException
 
+import tigase.vhosts.*
+
+def vhost_man = (VHostManagerIfc)vhostMan
+
 def JID = "jid"
 def DOMAIN = "domain"
 def DOMAIN_LIST = "domainList"
@@ -44,7 +48,7 @@ def jid = Command.getFieldValue(p, JID)
 def domain = Command.getFieldValue(p, DOMAIN)
 def domainList = Command.getFieldValue(p, DOMAIN_LIST)
 
-if (jid == null || domain == null || 
+if (jid == null || domain == null ||
 	(domain == DomainFilter.DOMAINS.LIST.name() && domainList == null)) {
 	def res = (Iq)p.commandResult(Command.DataType.form);
 	Command.addFieldValue(res, JID, jid ?: "", "jid-single", "User JID")
@@ -61,6 +65,20 @@ jid = JIDUtils.getNodeID(jid)
 bareJID = BareJID.bareJIDInstance(jid)
 
 def repo = (UserRepository)userRepository
+
+
+def admins = (Set)adminsSet
+def stanzaFromBare = p.getStanzaFrom().getBareJID()
+def isServiceAdmin = admins.contains(stanzaFromBare)
+
+VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
+
+if ( !(isServiceAdmin || (vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) ) {
+	def result = p.commandResult(Command.DataType.result);
+	Command.addTextField(result, "Error", "You do not have enough permissions to manage this domain");
+	return result
+}
+
 
 try {
 	def old_value = repo.getData(bareJID, null,

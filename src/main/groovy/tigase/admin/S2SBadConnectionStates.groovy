@@ -18,7 +18,7 @@
  * $Rev: 2411 $
  * Last modified by $Author: kobit $
  * $Date: 2010-10-27 20:27:58 -0600 (Wed, 27 Oct 2010) $
- * 
+ *
  */
 
 /*
@@ -35,6 +35,16 @@ import tigase.server.xmppserver.*
 
 def p = (Packet)packet
 def cidConns = (Map)cidConnections
+
+def admins = (Set)adminsSet
+def stanzaFromBare = p.getStanzaFrom().getBareJID()
+def isServiceAdmin = admins.contains(stanzaFromBare)
+
+if (!isServiceAdmin) {
+	def result = p.commandResult(Command.DataType.result);
+	Command.addTextField(result, "Error", "You are not service administrator");
+	return result
+}
 
 def conns = []
 

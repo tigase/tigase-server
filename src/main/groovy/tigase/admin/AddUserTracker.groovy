@@ -18,7 +18,7 @@
  * $Rev: 2411 $
  * Last modified by $Author: kobit $
  * $Date: 2010-10-27 20:27:58 -0600 (Wed, 27 Oct 2010) $
- * 
+ *
  */
 /*
  Activate on the server user tracking mechanisms to aid in problem resolution.
@@ -42,6 +42,17 @@ def p = (Packet)packet
 
 def userJid = Command.getFieldValue(packet, JID)
 def fileName = Command.getFieldValue(packet, FILE_NAME)
+
+def admins = (Set)adminsSet
+def stanzaFromBare = p.getStanzaFrom().getBareJID()
+def isServiceAdmin = admins.contains(stanzaFromBare)
+
+if (!isServiceAdmin) {
+	def result = p.commandResult(Command.DataType.result);
+	Command.addTextField(result, "Error", "You are not service administrator");
+	return result
+}
+
 
 if (userJid == null) {
 	def result = p.commandResult(Command.DataType.form);

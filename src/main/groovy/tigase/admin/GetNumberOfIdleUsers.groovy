@@ -22,7 +22,7 @@
 /*
  Get list of online users script as described in XEP-0133:
  http://xmpp.org/extensions/xep-0133.html#get-idle-users-num
- 
+
  AS:Description: Get number of idle users
  AS:CommandId: http://jabber.org/protocol/admin#get-idle-users-num
  AS:Component: sess-man
@@ -58,7 +58,7 @@ if (domainJid == null) {
 	//Command.addFieldValue(result, JID, domainJid ?: "", "jid-single",
 	//		"The domain for the list of active users")
 //	}
-//	else {		
+//	else {
 		def vhosts = [];
 		vhost_man.repo.allItems().each {
 			if (it.isOwner(stanzaFromBare.toString()) || it.isAdmin(stanzaFromBare.toString()) || isServiceAdmin) {
@@ -78,10 +78,10 @@ try {
 	(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
 		def users_list = [];
 		users_sessions.entrySet().each {
-			if (!it.getKey().toString().startsWith("sess-man") && it.getKey().getDomain().equals(bareJID.getDomain())) { 
-				//if (!maxItems || users_list.size() < maxItems) {				
+			if (!it.getKey().toString().startsWith("sess-man") && it.getKey().getDomain().equals(bareJID.getDomain())) {
+				//if (!maxItems || users_list.size() < maxItems) {
 					def user = it.getKey().toString();
-					def session = it.getValue();	
+					def session = it.getValue();
 					def active = false;
 					session.getActiveResources().each {
 						active = active || ((System.currentTimeMillis() - it.getLastAccessed()) < TIME_BEFORE_IDLE);
@@ -89,7 +89,7 @@ try {
 					if (active == false) {
 //						user += " (" + session.getActiveResourcesSize() + ":";
 //						session.getJIDs().each { user += it.getResource() + ", "; }
-//						user = user[0..user.size() - 3] + ")"; 
+//						user = user[0..user.size() - 3] + ")";
 						users_list += user;
 					}
 				//}

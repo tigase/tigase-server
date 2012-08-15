@@ -23,12 +23,12 @@
 
 /*
 
-The roster fixer scripts is used in a case if for whatever reason user's roster got 
+The roster fixer scripts is used in a case if for whatever reason user's roster got
 broken, lost or otherwise messed up. If we know the user's contact list, this script
 can be used to restore the contact list. It adds missing entries to the user's roster.
 If the user is online, he gets a roster push with updated entries to make sure
 he is up to date with all the changes.
-The script accepts a user JID, action (update or remove) and a list of buddies in 
+The script accepts a user JID, action (update or remove) and a list of buddies in
 a following format:
 buddy_jid,buddy_name,subscription
 buddy_jid is a JID (bare JID)
@@ -86,12 +86,12 @@ if (rosterOwnerJid == null || rosterBuddyList == null ||
     "jid-single", "Roster owner JID")
 	Command.addFieldValue(res, ROSTER_ACTION, actions[0],
     "Action", (String[])actions_descr, (String[])actions)
-	
+
 	if (rosterBuddyList == null) {
 		rosterBuddyList = [""]
 	}
 	Command.addFieldMultiValue(res, ROSTER_BUDDY_LIST, rosterBuddyList)
-	
+
 //	Command.addFieldValue(res, ROSTER_NOTIFY_CLUSTER, notify_cluster[0],
 //    "Notify cluster", (String[])notify_cluster, (String[])notify_cluster)
 
@@ -102,7 +102,7 @@ def remove_item = rosterAction == REMOVE
 
 def Queue<Packet> results = new LinkedList<Packet>()
 
-def res_report = [] 
+def res_report = []
 
 def updateRoster = { sess, online, jid, i_jid, i_name, i_subscr ->
 
@@ -160,9 +160,9 @@ def jidRosterOwnerJid = JID.jidInstanceNS(rosterOwnerJid);
 
 Packet result = p.commandResult(Command.DataType.result)
 def vhost = vhost_man.getVHostItem(jidRosterOwnerJid.getDomain());
-if (vhost == null || 
-	(!isServiceAdmin && 
-	 !vhost.isOwner(stanzaFromBare.toString()) && 
+if (vhost == null ||
+	(!isServiceAdmin &&
+	 !vhost.isOwner(stanzaFromBare.toString()) &&
 	 !vhost.isAdmin(stanzaFromBare.toString()))) {
 	Command.addTextField(result, "Error", "You do not have enough permissions to modify roster of "+rosterOwnerJid);
 	results.add(result);
@@ -179,7 +179,7 @@ if (conn) {
 	res_report += "User: " + jidRosterOwnerJid + " is offline, updating database only"
 	online = false
 }
-	 
+
 rosterBuddyList.each {
   def	buddy = it.split(",")
 	if (it.contains(';')) {
@@ -189,11 +189,11 @@ rosterBuddyList.each {
 	def jidRosterItemJid = JID.jidInstanceNS(rosterItemJid)
 	def rosterItemName = (buddy as List)[1] ?: jidRosterItemJid.getLocalpart()
 	def rosterItemSubscr = (buddy as List)[2] ?: "both"
-	
+
   updateRoster(sess, online, jidRosterOwnerJid, jidRosterItemJid, rosterItemName, rosterItemSubscr)
 
 		if (!remove_item) {
-		
+
 			Element pres = new Element("presence",
 				(String[])["from", "to", "type"], (String[])[rosterOwnerJid, rosterItemJid,
 					"probe"])
@@ -203,7 +203,7 @@ rosterBuddyList.each {
 					"probe"])
 			results.offer(Packet.packetInstance(pres))
 		}
-		
+
 }
 
 
