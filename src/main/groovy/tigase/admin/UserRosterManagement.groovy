@@ -36,11 +36,16 @@ import tigase.xmpp.*
 import tigase.xmpp.impl.roster.*
 import tigase.xml.*
 import tigase.db.UserRepository
+import tigase.vhosts.*
 
 class Field { String name; String label; String type; String defVal = ""}
 
 class RosterChangesControler {
 	UserRepository repository
+	VHostManagerIfc vhost_man
+	Set<BareJID> admins
+
+
 	Map<String, XMPPSession> sessions
 
 	Field addOperation = new Field(name: "addJid", label: "Add")
@@ -82,13 +87,39 @@ class RosterChangesControler {
 			String operationTypeStr = getFieldValue(p, operationType)
 			String subscriptionTypeStr = getFieldValue(p, subscriptionType)
 
+			Packet result = p.commandResult(Command.DataType.result)
+
+			BareJID stanzaFromBare = p.getStanzaFrom().getBareJID();
+			boolean isServiceAdmin = admins.contains( stanzaFromBare );
+
+			JID jidRosterOwnerJid = JID.jidInstanceNS(ownerJidStr);
+			JID jidRosterItemJid = JID.jidInstanceNS(jidToManipulate);
+
+			VHostItem vhost = vhost_man.getVHostItem(jidRosterOwnerJid.getDomain());
+
+			if (!isServiceAdmin && vhost != null && !(vhost.isOwner(stanzaFromBare.toString())) && !(vhost.isAdmin(stanzaFromBare.toString()))) {
+
+			//if ( !(isServiceAdmin || (vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) ) {
+				Command.addTextField(result, "Error", "You do not have enough permissions to modify roster of "+ownerJidStr);
+				return result;
+			}
+
+			vhost = vhost_man.getVHostItem(jidRosterItemJid.getDomain());
+
+			if (!isServiceAdmin && vhost != null && !(vhost.isOwner(stanzaFromBare.toString())) && !(vhost.isAdmin(stanzaFromBare.toString()))) {
+
+			//if ( !(isServiceAdmin || (vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) ) {
+
+				Command.addTextField(result, "Error", "You do not have enough permissions to modify roster of "+jidToManipulate);
+				return result;
+			}
+
 			Queue<Packet> results;
 			if (operationTypeStr == addOperation.name)
 				results = addJidToRoster(ownerJidStr, jidToManipulate, groups, subscriptionTypeStr)
 			else
 				results = removeJidFromRoster(ownerJidStr, jidToManipulate)
 
-			Packet result = p.commandResult(Command.DataType.result)
 			Command.addTextField(result, "Note", "Operation successful");
 			results.add(result)
 			return results
@@ -105,7 +136,8 @@ class RosterChangesControler {
 	}
 
 	def getActiveConnections(String ownerJid) {
-		XMPPSession session = sessions.get(ownerJid)
+		BareJID ownerBareJID = BareJID.bareJIDInstance(ownerJid)
+		XMPPSession session = sessions.get(ownerBareJID)
 		return (session == null) ? [] : session.getActiveResources()
 	}
 
@@ -115,19 +147,20 @@ class RosterChangesControler {
 			String[] groups = null, String subStr = null) {
 		RosterAbstract rosterUtil = RosterFactory.getRosterImplementation(true)
 		Queue<Packet> packets = new LinkedList<Packet>()
+		JID jidToChangeJID = JID.jidInstance(jidToChange)
 		List<XMPPResourceConnection> activeConnections = getActiveConnections(jid)
 		for (XMPPResourceConnection conn : activeConnections) {
 			if (remove == false) {
-				rosterUtil.addBuddy(conn, jidToChange, jidToChange, groups)
-				rosterUtil.setBuddySubscription(conn, subscription(subStr), jidToChange)
+				rosterUtil.addBuddy(conn, jidToChangeJID, jidToChange, groups, null)
+				rosterUtil.setBuddySubscription(conn, subscription(subStr), jidToChangeJID)
 				rosterUtil.updateBuddyChange(conn, packets,
-						rosterUtil.getBuddyItem(conn, jidToChange))
+						rosterUtil.getBuddyItem(conn, jidToChangeJID))
 			} else {
 				Element it = new Element("item")
 				it.setAttribute("jid", jidToChange)
 				it.setAttribute("subscription", "remove")
 				rosterUtil.updateBuddyChange(conn, packets, it)
-				rosterUtil.removeBuddy(conn, jidToChange)
+				rosterUtil.removeBuddy(conn, jidToChangeJID)
 			}
 		}
 		return packets
@@ -149,13 +182,16 @@ class RosterChangesControler {
 
 	Queue<Packet> addJidToRoster(ownerJid, jidToAdd, groups, subscriptionType) {
 		JID ownerBareJID = JID.jidInstance(ownerJid)
+		JID jidToAddJID = JID.jidInstance(jidToAdd)
 		List<XMPPResourceConnection> activeConnections = getActiveConnections(ownerJid)
 		if (activeConnections.size() == 0) {
+			println (["activeConnections.size() == 0"])
+
 			modifyDbRoster(ownerJid, { roster ->
 				RosterElement userToAdd = roster.get(jidToAdd)
 				if (userToAdd == null) {
 					userToAdd = new RosterElement(
-							ownerBareJID, jidToAdd, groups, null)
+						jidToAddJID, jidToAdd, groups, null)
 				}
 				userToAdd.setSubscription(subscription(subscriptionType))
 				userToAdd.setGroups(groups)
@@ -184,5 +220,5 @@ class RosterChangesControler {
 	}
 }
 
-new RosterChangesControler(repository: userRepository,
+new RosterChangesControler(repository: userRepository, admins: adminsSet, vhost_man: vhostMan,
 		sessions: userSessions).processPacket((Packet)packet)
