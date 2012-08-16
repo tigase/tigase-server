@@ -63,7 +63,7 @@ else {
 	def filepath = null;
 	switch (cfgfile) {
 		case "init.properties":
-			filepath = initProperties.get(ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY);
+			filepath = initProperties.get(ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY).tokenize(',');
 			break;
 
 		case "tigase.conf":
@@ -84,10 +84,12 @@ else {
 		Command.addTextField(result, "Error", "Config file not specified");
 	}
 	else {
-		def file = new File(filepath);
-		def lines = [];
-		file.eachLine { line -> lines += line; };
-		Command.addFieldMultiValue(result, "Content", lines);
+		filepath.each{ it ->
+			def file = new File(it);
+			def lines = [];
+			file.eachLine { line -> lines += line; };
+			Command.addFieldMultiValue(result, "Content", lines);
+		}
 	}
 }
 
