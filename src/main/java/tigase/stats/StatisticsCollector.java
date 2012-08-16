@@ -372,6 +372,16 @@ public class StatisticsCollector extends
 
 		Iq iqc = (Iq) packet;
 
+		BareJID stanzaFromBare = iqc.getStanzaFrom().getBareJID();
+		JID stanzaFrom = JID.jidInstance( stanzaFromBare );
+
+		if ( !isAdmin( stanzaFrom ) ){
+			Packet result = iqc.commandResult( Command.DataType.result );
+			Command.addTextField( result, "Error", "You do not have enough permissions to manage this domain" );
+			results.offer( result );
+			return;
+		}
+		
 		switch (iqc.getCommand()) {
 			case GETSTATS: {
 

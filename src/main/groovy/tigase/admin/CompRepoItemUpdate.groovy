@@ -66,7 +66,7 @@ if (itemKey == null) {
 		return result
 	} else {
 		def result = p.commandResult(Command.DataType.result)
-		Command.addTextField(result, "Note", "There are no items on the list");
+		Command.addTextField(result, "Error", "There are no items on the list");
 		return result
 	}
 }
