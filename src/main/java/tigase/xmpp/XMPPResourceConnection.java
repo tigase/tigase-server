@@ -235,7 +235,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * @throws NoConnectionIdException
 	 */
 	public JID getConnectionId(JID jid) throws NoConnectionIdException {
-		return (((parentSession == null) || (jid == null)) ? this.connectionId
+		return (((parentSession == null) || (jid == null)) ? this.getConnectionId()
 				: parentSession.getResourceConnection(jid).getConnectionId());
 	}
 
