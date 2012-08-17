@@ -41,7 +41,6 @@ import static tigase.server.bosh.Constants.*;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.ArrayDeque;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TimerTask;
@@ -71,11 +70,11 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 	 */
 	private static final Logger log = Logger
 			.getLogger("tigase.server.bosh.BoshConnectionManager");
-	private static final String ROUTINGS_PROP_KEY = "routings";
-	private static final String ROUTING_MODE_PROP_KEY = "multi-mode";
-	private static final boolean ROUTING_MODE_PROP_VAL = true;
-	private static final String ROUTING_ENTRY_PROP_KEY = ".+";
-	private static final String ROUTING_ENTRY_PROP_VAL = DEF_SM_NAME + "@localhost";
+//	private static final String ROUTINGS_PROP_KEY = "routings";
+//	private static final String ROUTING_MODE_PROP_KEY = "multi-mode";
+//	private static final boolean ROUTING_MODE_PROP_VAL = true;
+//	private static final String ROUTING_ENTRY_PROP_KEY = ".+";
+//	private static final String ROUTING_ENTRY_PROP_VAL = DEF_SM_NAME + "@localhost";
 	private static final int DEF_PORT_NO = 5280;
 
 	private int[] PORTS = { DEF_PORT_NO };
