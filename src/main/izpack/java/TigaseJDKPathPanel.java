@@ -1,6 +1,6 @@
 /*
  * $Id: JDKPathPanel.java 2163 2008-05-18 13:48:36Z jponge $
- * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2012 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
  * http://izpack.codehaus.org/

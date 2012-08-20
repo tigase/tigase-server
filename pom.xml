@@ -29,7 +29,7 @@
 	</developers>
 	<licenses>
 		<license>
-			<name>GNU General Public License GPLv3</name>
+			<name>GNU Affero General Public License GPLv3</name>
 			<url>https://svn.tigase.org/reps/tigase-server/trunk/COPYING</url>
 		</license>
 	</licenses>
