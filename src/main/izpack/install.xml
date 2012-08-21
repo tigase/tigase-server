@@ -142,7 +142,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 
 		<!--images-->
 		<res id="Installer.image"
-				 src="src/main/izpack/resources/pics/tigase-install-logo.png"/>
+				 src="src/main/izpack/resources/pics/tigase-5-1-0-install-logo.png"/>
 		<res id="Heading.image" src="src/main/izpack/resources/pics/tiger.png"/>
 		<res id="JavaPowered.image" src="src/main/izpack/resources/pics/Java_powered_logo_rgb.png"/>
 		<res id="SolarisReady.image" src="src/main/izpack/resources/pics/solaris_ready.png"/>
