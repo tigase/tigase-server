@@ -33,6 +33,7 @@ import tigase.xml.Element;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -64,7 +65,7 @@ public class UpdatesChecker extends Thread {
 	private static final long HOUR = 60 * MINUTE;
 	private static final long DAY = 24 * HOUR;
 	private static final String VERSION_URL =
-		"http://www.tigase.org/files/downloads/tigase-server/descript.ion";
+		"http://www.tigase.org/files/downloads/tigase-server/descript-redmine.ion";
 	private static final String FILE_START = "tigase-server-";
 
 	//~--- fields ---------------------------------------------------------------
@@ -209,6 +210,8 @@ public class UpdatesChecker extends Thread {
 				}
 			} catch (TigaseStringprepException e) {
 				log.log(Level.WARNING, "Incorrect stanza address settings: " + message.toString(), e);
+			} catch (FileNotFoundException e) {
+				log.log(Level.WARNING, "Can not check the server updates");
 			} catch (IOException e) {
 				log.log(Level.WARNING, "Can not check updates for URL: " + VERSION_URL, e);
 			} catch (InterruptedException e) {
