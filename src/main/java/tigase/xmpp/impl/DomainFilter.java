@@ -385,7 +385,7 @@ public class DomainFilter extends XMPPProcessor
 
 	//~--- get methods ----------------------------------------------------------
 
-	private DOMAINS getDomains(XMPPResourceConnection session)
+	public DOMAINS getDomains(XMPPResourceConnection session)
 			throws NotAuthorizedException, TigaseDBException {
 		DOMAINS domains = (DOMAINS) session.getCommonSessionData(ALLOWED_DOMAINS_KEY);
 
@@ -416,7 +416,7 @@ public class DomainFilter extends XMPPProcessor
 		return domains;
 	}
 
-	private String[] getDomainsList(XMPPResourceConnection session)
+	public String[] getDomainsList(XMPPResourceConnection session)
 			throws NotAuthorizedException, TigaseDBException {
 		String[] allowedDomains = (String[]) session.getCommonSessionData(ALLOWED_DOMAINS_LIST_KEY);
 
