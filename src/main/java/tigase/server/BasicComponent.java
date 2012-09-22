@@ -501,6 +501,11 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 		return (vHostManager != null) ? vHostManager.getVHostItem(domain) : null;
 	}
 
+	public BareJID getDefVHostItem() {
+		return (vHostManager != null) ? vHostManager.getDefVHostItem() :
+			getDefHostName();
+	}
+
 	/**
 	 * Method description
 	 * 
