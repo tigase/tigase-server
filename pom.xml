@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>tigase</groupId>
 	<artifactId>tigase-server</artifactId>
-	<name>Tigase XMPP Server 5.1.0</name>
+	<name>Tigase XMPP Server</name>
 	<version>5.2.0-SNAPSHOT</version>
 	<description>Tigase XMPP Server</description>
 	<url>http://www.tigase.org/</url>
@@ -19,7 +19,7 @@
 			<id>kobit</id>
 			<name>Artur Hefczyc</name>
 			<email>kobit@tigase.org</email>
-			<url>http://artur.hefczyc.net/</url>
+			<url>http://www.tigase.org/</url>
 			<roles>
 				<role>architect</role>
 				<role>developer</role>
@@ -141,7 +141,7 @@
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-xmltools</artifactId>
-			<version>3.3.6</version>
+			<version>3.4.1-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
