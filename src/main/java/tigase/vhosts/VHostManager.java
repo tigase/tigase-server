@@ -24,6 +24,7 @@ package tigase.vhosts;
 
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,6 +36,8 @@ import tigase.server.AbstractComponentRegistrator;
 import tigase.server.ServerComponent;
 import tigase.stats.StatisticsContainer;
 import tigase.stats.StatisticsList;
+
+import tigase.xmpp.BareJID;
 
 /**
  * Describe class VHostManager here.
@@ -283,6 +286,15 @@ public class VHostManager extends AbstractComponentRegistrator<VHostListener> im
 	@Override
 	public VHostItem getVHostItem(String domain) {
 		return repo.getItem(domain);
+	}
+
+	@Override
+	public BareJID getDefVHostItem() {
+		Iterator<VHostItem> vhosts = repo.iterator();
+		if (vhosts != null && vhosts.hasNext()) {
+			return vhosts.next().getVhost().getBareJID();
+		}
+		return getDefHostName();
 	}
 
 	/**

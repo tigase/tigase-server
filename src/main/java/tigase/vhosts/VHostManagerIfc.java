@@ -22,6 +22,7 @@
 package tigase.vhosts;
 
 import tigase.server.ServerComponent;
+import tigase.xmpp.BareJID;
 
 /**
  * This is VHostManagerIfc interface which allows to access data for
@@ -114,5 +115,13 @@ public interface VHostManagerIfc {
 	 * @param domain is a component domain name being removed from the collection.
 	 */
 	void removeComponentDomain(String domain);
+
+	/**
+	 * Method <code>getDefVHostItem</code> returns a default VHost for the installation.
+	 * In most cases this is the first VHost defined in the server configuration.
+	 *
+	 * @return a <code>BareJID</code> value of the default VHost for the installation.
+	 */
+	BareJID getDefVHostItem();
 
 }
