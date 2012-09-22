@@ -67,7 +67,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 * Variable <code>log</code> is a class logger.
 	 */
 	private static final Logger log = Logger.getLogger(ClientConnectionManager.class
-			.getName());
+																										 .getName());
 	private static final String XMLNS = "jabber:client";
 	private static final String ROUTINGS_PROP_KEY = "routings";
 	private static final String ROUTING_MODE_PROP_KEY = "multi-mode";
@@ -84,7 +84,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	protected RoutingsContainer routings = null;
 	private final Map<String, XMPPProcessorIfc> processors =
-			new ConcurrentHashMap<String, XMPPProcessorIfc>();
+		new ConcurrentHashMap<String, XMPPProcessorIfc>();
 	private final ReceiverTimeoutHandler stoppedHandler = newStoppedHandler();
 	private final ReceiverTimeoutHandler startedHandler = newStartedHandler();
 	private boolean white_char_ack = WHITE_CHAR_ACK_PROP_VAL;
@@ -103,7 +103,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	/**
 	 * Method description
-	 * 
+	 *
 	 * @param params
 	 * @return
 	 */
@@ -111,16 +111,16 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
 		Boolean r_mode =
-				(Boolean) params.get(getName() + "/" + ROUTINGS_PROP_KEY + "/"
-						+ ROUTING_MODE_PROP_KEY);
+			(Boolean) params.get(getName() + "/" + ROUTINGS_PROP_KEY + "/"
+													 + ROUTING_MODE_PROP_KEY);
 
 		String see_other_host_class =
-				(String) params.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROPERTY);
+			(String) params.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROPERTY);
 
 		see_other_host_strategy = getSeeOtherHostInstance(see_other_host_class);
 
 		props.put( SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_KEY, see_other_host_class );
-		
+
 		if ( see_other_host_strategy != null ){
 			see_other_host_strategy.getDefaults( props, params );
 		}
@@ -137,10 +137,10 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				String[] comp_params = ((String) params.get(GEN_EXT_COMP)).split(",");
 
 				props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY, DEF_SM_NAME + "@"
-						+ comp_params[1]);
+									+ comp_params[1]);
 			} else {
 				props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY, DEF_SM_NAME + "@"
-						+ DNSResolver.getDefaultHostname());
+									+ DNSResolver.getDefaultHostname());
 			}
 		}
 
@@ -353,53 +353,17 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 				// Hm, receiver is not set yet..., ignoring
 				if (log.isLoggable(Level.INFO)) {
 					log.log(
-							Level.INFO,
-							"Hm, receiver is not set yet (misconfiguration error)..., ignoring: {0}, connection: {1}",
-							new Object[] { p.toStringSecure(), serv });
+						Level.INFO,
+						"Hm, receiver is not set yet (misconfiguration error)..., ignoring: {0}, connection: {1}",
+						new Object[] { p.toStringSecure(), serv });
 				}
 			}
 
-			sendAck(serv, p);
 			// TODO: Implement sending 'req' attributes by the server too
 
 		} // end of while ()
 
 		return null;
-	}
-
-	private void sendAck(XMPPIOService<Object> serv, Packet packet) {
-		// If stanza receiving confirmation is configured, try to send confirmation
-		// back
-		if (white_char_ack || xmpp_ack) {
-			String ack = null;
-			if (white_char_ack) {
-				// If confirming via white space is enabled then prepare space ack.
-				ack = " ";
-			}
-			if (xmpp_ack) {
-				// If confirmation using XMPP is enabled prepare XMPP ack which may
-				// overwrite white space ACK.
-				// TODO: Write documentation about the stuff implemented here.
-				// If the stanza contains 'req' attribute, the server sends 'ack'
-				// response.
-				String req_val = packet.getAttribute("req");
-				if (req_val != null) {
-					// XMPP ack might be enabled in configuration but the client may not
-					// support it. In such a case we do not send XMPP ack.
-					ack = "<ack val=\"" + req_val + "\"/>";
-				}
-			}
-			if (ack != null) {
-				try {
-					serv.writeRawData(ack);
-					log.log(Level.FINEST, "Sent ack confirmation: '" + ack + "'");
-				} catch (Exception ex) {
-					serv.forceStop();
-					log.log(Level.FINE, "Can't send ack confirmation: '" + ack + "'", ex);
-				}
-			}
-		}
-
 	}
 
 	/**
@@ -582,7 +546,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 				return "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
 						+ " xmlns:stream='http://etherx.jabber.org/streams'"
-						+ " id='tigase-error-tigase'" + " from='" + getDefHostName() + "'"
+						+ " id='tigase-error-tigase'" + " from='" + getDefVHostItem() + "'"
 						+ " version='1.0' xml:lang='en'>" + "<stream:error>"
 						+ "<improper-addressing xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
 						+ "</stream:error>" + "</stream:stream>";
@@ -596,7 +560,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		if (hostname == null) {
 			return "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
 					+ " xmlns:stream='http://etherx.jabber.org/streams'"
-					+ " id='tigase-error-tigase'" + " from='" + getDefHostName() + "'"
+					+ " id='tigase-error-tigase'" + " from='" + getDefVHostItem() + "'"
 					+ " version='1.0' xml:lang='en'>" + "<stream:error>"
 					+ "<improper-addressing xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
 					+ "</stream:error>" + "</stream:stream>";
@@ -605,7 +569,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		if (!isLocalDomain(hostname)) {
 			return "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
 					+ " xmlns:stream='http://etherx.jabber.org/streams'"
-					+ " id='tigase-error-tigase'" + " from='" + getDefHostName() + "'"
+					+ " id='tigase-error-tigase'" + " from='" + getDefVHostItem() + "'"
 					+ " version='1.0' xml:lang='en'>" + "<stream:error>"
 					+ "<host-unknown xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
 					+ "</stream:error>" + "</stream:stream>";
@@ -624,7 +588,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 				return "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
 						+ " xmlns:stream='http://etherx.jabber.org/streams'"
-						+ " id='tigase-error-tigase'" + " from='" + getDefHostName() + "'"
+						+ " id='tigase-error-tigase'" + " from='" + getDefVHostItem() + "'"
 						+ " version='1.0' xml:lang='en'>" + "<stream:error>"
 						+ "<see-other-host xmlns='urn:ietf:params:xml:ns:xmpp-streams'>"
 						+ see_other_host + "</see-other-host>" + "</stream:error>"
@@ -734,7 +698,9 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	@Override
 	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
-		return new XMPPIOService<Object>();
+		XMPPIOService<Object> result = new XMPPIOService<Object>();
+		result.setAckMode(white_char_ack, xmpp_ack, false);
+		return result;
 	}
 
 	protected ReceiverTimeoutHandler newStartedHandler() {

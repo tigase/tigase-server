@@ -234,7 +234,7 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 
 					if ((hostname != null) && isLocalDomain(hostname)) {
 						bs =
-								new BoshSession(getDefHostName().getDomain(), JID.jidInstanceNS(routings
+								new BoshSession(getDefVHostItem().getDomain(), JID.jidInstanceNS(routings
 										.computeRouting(hostname)), this);
 						sid = bs.getSid();
 						sessions.put(sid, bs);
@@ -413,7 +413,7 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
 				+ " id='1'"
 				+ " from='"
-				+ getDefHostName()
+				+ getDefVHostItem()
 				+ "'"
 				+ " version='1.0' xml:lang='en'>"
 				+ "<stream:error>"
