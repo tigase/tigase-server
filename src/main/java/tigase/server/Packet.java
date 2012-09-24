@@ -419,9 +419,9 @@ public class Packet {
 		error.addChild(cond);
 
 		if (errorText != null) {
-			Element t = new Element("text", errorText, new String[] { "xml:lang", "xmlns" },
-				new String[] { "en",
-					ERROR_NS });
+			Element t = new Element("text", errorText,
+				new String[] { "xml:lang", "xmlns" },
+				new String[] { "en", ERROR_NS });
 
 			error.addChild(t);
 		}    // end of if (text != null && text.length() > 0)

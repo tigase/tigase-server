@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -75,6 +76,10 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 	public static final String CROSS_DOMAIN_POLICY_FILE_PROP_VAL =
 			"etc/cross-domain-policy.xml";
 
+	public static final String REQ_NAME = "req";
+	public static final String ID_ATT = "id";
+	public static final String ACK_NAME = "ack";
+
 	private XMPPDomBuilderHandler<RefObject> domHandler = null;
 	protected SimpleParser parser = SingletonFactory.getParserInstance();
 	@SuppressWarnings("rawtypes")
@@ -86,7 +91,13 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 	 * processed.
 	 */
 	private ConcurrentLinkedQueue<Packet> waitingPackets =
-			new ConcurrentLinkedQueue<Packet>();
+		new ConcurrentLinkedQueue<Packet>();
+	private ConcurrentSkipListMap<String, Packet> waitingForAck =
+		new ConcurrentSkipListMap<String, Packet>();
+	private boolean white_char_ack = false;
+	private boolean xmpp_ack = false;
+	private boolean strict_ack = false;
+	private long req_idx = 0;
 
 	/**
 	 * The <code>readyPackets</code> queue keeps data which have been already
@@ -143,6 +154,12 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 		}
 	}
 
+	public void setAckMode(boolean white_char_ack, boolean xmpp_ack, boolean strict) {
+		this.white_char_ack = white_char_ack;
+		this.xmpp_ack = xmpp_ack;
+		this.strict_ack = strict;
+	}
+
 	// ~--- methods --------------------------------------------------------------
 
 	/**
@@ -153,7 +170,15 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 	 *          a <code>Packet</code> value of data to process.
 	 */
 	public void addPacketToSend(Packet packet) {
+
+		if (xmpp_ack) {
+			String req = "" + (++req_idx);
+			packet.getElement().addChild(new Element(REQ_NAME,
+					new String[] {ID_ATT}, new String[] {req}));
+			waitingForAck.put(req, packet);
+		}
 		waitingPackets.offer(packet);
+
 	}
 
 	// ~--- get methods ----------------------------------------------------------
@@ -300,22 +325,29 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 	 *          a <code>Packet</code> value of processing results.
 	 */
 	protected void addReceivedPacket(final Packet packet) {
-		if (firstPacket && "policy-file-request".equals(packet.getElemName())) {
-			log.fine("Got flash cross-domain request" + packet);
-			if (cross_domain_policy != null) {
-				try {
-					writeRawData(cross_domain_policy);
-				} catch (Exception ex) {
-					log.log(Level.INFO, "Can't send cross-domain policy: ", ex);
+		if (firstPacket) {
+			if ("policy-file-request" == packet.getElemName()) {
+				log.fine("Got flash cross-domain request" + packet);
+				if (cross_domain_policy != null) {
+					try {
+						writeRawData(cross_domain_policy);
+					} catch (Exception ex) {
+						log.log(Level.INFO, "Can't send cross-domain policy: ", ex);
+					}
+					log.log(Level.FINER, "Cross-domain policy sent: {1}", cross_domain_policy);
+				} else {
+					log.log(Level.FINER, "No cross-domain policy defined to sent.");
 				}
-				log.log(Level.FINER, "Cross-domain policy sent: {1}", cross_domain_policy);
-			} else {
-				log.log(Level.FINER, "No cross-domain policy defined to sent.");
+				return;
 			}
+			firstPacket = false;
+		}
+		if (packet.getElemName() == ACK_NAME) {
+
 		} else {
+			sendAck(packet);
 			receivedPackets.offer(packet);
 		}
-		firstPacket = false;
 	}
 
 	/**
@@ -346,7 +378,7 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 					log.log(Level.FINEST, "{0}, READ:\n{1}", new Object[] { toString(),
 							new String(data) });
 				}
-				
+
 				boolean disconnect = checkData(data);
 				if (disconnect) {
 					if (log.isLoggable(Level.FINE)) {
@@ -403,7 +435,9 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 						}
 
 						// System.out.print(elem.toString());
-						addReceivedPacket(Packet.packetInstance(elem));
+						Packet pack = Packet.packetInstance(elem);
+						addReceivedPacket(pack);
+						sendAck(pack);
 					} // end of while ((elem = elems.poll()) != null)
 				} catch (TigaseStringprepException ex) {
 					log.log(Level.INFO, toString() + ", Incorrect to/from JID format for stanza: "
@@ -429,6 +463,47 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 		// } finally {
 		// readLock.unlock();
 		// }
+	}
+
+	private void sendAck(Packet packet) {
+		// If stanza receiving confirmation is configured, try to send confirmation
+		// back
+		if (white_char_ack || xmpp_ack) {
+			String ack = null;
+			if (white_char_ack) {
+				// If confirming via white space is enabled then prepare space ack.
+				ack = " ";
+			}
+			if (xmpp_ack) {
+				// If confirmation using XMPP is enabled prepare XMPP ack which may
+				// overwrite white space ACK.
+				// TODO: Write documentation about the stuff implemented here.
+				// If the stanza contains 'req' attribute, the server sends 'ack'
+				// response.
+				// Storing ack/req information in attribute might be more efficient, faster and less resources
+				// consuming, however it may also break the spec.
+				String req_val = packet.getAttribute(REQ_NAME);
+				// If the req is not in an attribute, let's check the extra payload
+				if (req_val == null) {
+					req_val = packet.getElement().getChildAttribute(REQ_NAME, ID_ATT);
+				}
+				if (req_val != null) {
+					// XMPP ack might be enabled in configuration but the client may not
+					// support it. In such a case we do not send XMPP ack.
+					ack = "<" + ACK_NAME + " " + ID_ATT + "=\"" + req_val + "\"/>";
+				}
+			}
+			if (ack != null) {
+				try {
+					writeRawData(ack);
+					log.log(Level.FINEST, "Sent ack confirmation: '" + ack + "'");
+				} catch (Exception ex) {
+					forceStop();
+					log.log(Level.FINE, "Can't send ack confirmation: '" + ack + "'", ex);
+				}
+			}
+		}
+
 	}
 
 /**
