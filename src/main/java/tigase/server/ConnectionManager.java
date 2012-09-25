@@ -99,6 +99,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 	protected static final String NET_BUFFER_PROP_KEY = "net-buffer";
 	protected static final int NET_BUFFER_ST_PROP_VAL = 2 * 1024;
 	protected static final int NET_BUFFER_HT_PROP_VAL = 64 * 1024;
+	protected static final String WHITE_CHAR_ACK_PROP_KEY = "white-char-ack";
+	protected static final boolean WHITE_CHAR_ACK_PROP_VAL = false;
+	protected static final String XMPP_ACK_PROP_KEY = "xmpp-ack";
+	protected static final boolean XMPP_ACK_PROP_VAL = false;
+	protected static final String MAX_INACTIVITY_TIME = "max-inactivity-time";
 
 	/** Field description */
 	public static final String PORT_LOCAL_HOST_PROP_KEY = "local-host";
@@ -108,6 +113,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 	public String[] PORT_IFC_PROP_VAL = { "*" };
 	private long bytesReceived = 0;
 	private long bytesSent = 0;
+	private boolean white_char_ack = WHITE_CHAR_ACK_PROP_VAL;
+	private boolean xmpp_ack = XMPP_ACK_PROP_VAL;
 
 	private int services_size = 0;
 	private long socketOverflow = 0;
@@ -124,6 +131,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 	private IOServiceStatisticsGetter ioStatsGetter = new IOServiceStatisticsGetter();
 	private boolean initializationCompleted = false;
 	protected long connectionDelay = 2 * SECOND;
+	private long maxInactivityTime = getMaxInactiveTime();
 
 	/**
 	 * Method description
@@ -265,6 +273,22 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 				props.put(PORTS_PROP_KEY, ports);
 			} // end of if (ports != null)
 		}
+
+		String acks = (String) params.get(XMPP_STANZA_ACK);
+		if (acks != null) {
+			String[] acks_arr = acks.split(",");
+			for (String ack_type : acks_arr) {
+				if (STANZA_WHITE_CHAR_ACK.equals(ack_type)) {
+					white_char_ack = true;
+				}
+				if (STANZA_XMPP_ACK.equals(ack_type)) {
+					xmpp_ack = true;
+				}
+			}
+		}
+		props.put(WHITE_CHAR_ACK_PROP_KEY, white_char_ack);
+		props.put(XMPP_ACK_PROP_KEY, xmpp_ack);
+		props.put(MAX_INACTIVITY_TIME, getMaxInactiveTime()/SECOND);
 
 		return props;
 	}
@@ -522,16 +546,28 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
+
+		if (props.get(MAX_INACTIVITY_TIME) != null) {
+			maxInactivityTime = (Long)props.get(MAX_INACTIVITY_TIME) * SECOND;
+		}
+
+		if (props.get(WHITE_CHAR_ACK_PROP_KEY) != null) {
+			white_char_ack = (Boolean) props.get(WHITE_CHAR_ACK_PROP_KEY);
+		}
+		if (props.get(XMPP_ACK_PROP_KEY) != null) {
+			xmpp_ack = (Boolean) props.get(XMPP_ACK_PROP_KEY);
+		}
+
 		if (props.get(NET_BUFFER_PROP_KEY) != null) {
 			net_buffer = (Integer) props.get(NET_BUFFER_PROP_KEY);
 		}
-		
+
 		if (props.size() == 1) {
 			// If props.size() == 1, it means this is a single property update and 
 			// ConnectionManager does not support it yet.
 			return;
 		}
-		
+
 		releaseListeners();
 
 		int[] ports = (int[]) props.get(PORTS_PROP_KEY);
@@ -1060,7 +1096,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 									long curr_time = System.currentTimeMillis();
 									long lastTransfer = service.getLastTransferTime();
 
-									if (curr_time - lastTransfer >= getMaxInactiveTime()) {
+									if (curr_time - lastTransfer >= maxInactivityTime) {
 
 										// Stop the service is max keep-alive time is exceeded
 										// for non-active connections.

@@ -73,10 +73,6 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	private static final String ROUTING_MODE_PROP_KEY = "multi-mode";
 	private static final boolean ROUTING_MODE_PROP_VAL = true;
 	private static final String ROUTING_ENTRY_PROP_KEY = ".+";
-	private static final String WHITE_CHAR_ACK_PROP_KEY = "white-char-ack";
-	private static final boolean WHITE_CHAR_ACK_PROP_VAL = false;
-	private static final String XMPP_ACK_PROP_KEY = "xmpp-ack";
-	private static final boolean XMPP_ACK_PROP_VAL = false;
 	private static final String SOCKET_CLOSE_WAIT_PROP_KEY = "socket-close-wait";
 	private static final long SOCKET_CLOSE_WAIT_PROP_DEF = 1;
 
@@ -87,8 +83,6 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		new ConcurrentHashMap<String, XMPPProcessorIfc>();
 	private final ReceiverTimeoutHandler stoppedHandler = newStoppedHandler();
 	private final ReceiverTimeoutHandler startedHandler = newStartedHandler();
-	private boolean white_char_ack = WHITE_CHAR_ACK_PROP_VAL;
-	private boolean xmpp_ack = XMPP_ACK_PROP_VAL;
 	private long socket_close_wait_time = SOCKET_CLOSE_WAIT_PROP_DEF;
 
 	/**
@@ -144,20 +138,6 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 			}
 		}
 
-		String acks = (String) params.get(XMPP_STANZA_ACK);
-		if (acks != null) {
-			String[] acks_arr = acks.split(",");
-			for (String ack_type : acks_arr) {
-				if (STANZA_WHITE_CHAR_ACK.equals(ack_type)) {
-					white_char_ack = true;
-				}
-				if (STANZA_XMPP_ACK.equals(ack_type)) {
-					xmpp_ack = true;
-				}
-			}
-		}
-		props.put(WHITE_CHAR_ACK_PROP_KEY, white_char_ack);
-		props.put(XMPP_ACK_PROP_KEY, xmpp_ack);
 		props.put(SOCKET_CLOSE_WAIT_PROP_KEY, SOCKET_CLOSE_WAIT_PROP_DEF);
 
 		return props;
@@ -407,13 +387,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 
-		if (props.get(WHITE_CHAR_ACK_PROP_KEY) != null) {
-			white_char_ack = (Boolean) props.get(WHITE_CHAR_ACK_PROP_KEY);
-		}
-		if (props.get(XMPP_ACK_PROP_KEY) != null) {
-			xmpp_ack = (Boolean) props.get(XMPP_ACK_PROP_KEY);
-		}
-		
+
 		if (props.get(SOCKET_CLOSE_WAIT_PROP_KEY) != null) {
 			socket_close_wait_time = (Long) props.get(SOCKET_CLOSE_WAIT_PROP_KEY);
 		}
@@ -698,9 +672,7 @@ public class ClientConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	@Override
 	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
-		XMPPIOService<Object> result = new XMPPIOService<Object>();
-		result.setAckMode(white_char_ack, xmpp_ack, false);
-		return result;
+		return new XMPPIOService<Object>();
 	}
 
 	protected ReceiverTimeoutHandler newStartedHandler() {
