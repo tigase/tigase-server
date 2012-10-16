@@ -1,6 +1,11 @@
 #!/bin/bash
 
-SERVERS=`cat all-servers.txt`
+
+if [ "$1" == "" ] ; then
+  SERVERS=`cat all-servers.txt`
+else
+  SERVERS=`cat $1`
+fi
 DIR="tigase-server"
 
 for s in ${SERVERS} ; do 
