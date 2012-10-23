@@ -39,6 +39,8 @@ import tigase.xmpp.JID;
  */
 public abstract class TigaseRuntime {
 
+	private static final Logger log = Logger.getLogger(TigaseRuntime.class.getName());
+
 	protected static final long SECOND = 1000;
 	protected static final long MINUTE = 60*SECOND;
 	protected static final long HOUR = 60*MINUTE;
@@ -72,6 +74,7 @@ public abstract class TigaseRuntime {
 		for (MemoryPoolMXBean memoryPoolMXBean : memPools) {
 			if (memoryPoolMXBean.getName().toLowerCase().contains("old")) {
 				oldMemPool = memoryPoolMXBean;
+				log.info("Using OldGen memory pool for reporting memory usage.");
 				break;
 			}
 		}
