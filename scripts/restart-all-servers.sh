@@ -2,7 +2,7 @@
 
 
 if [ "$1" == "" ] ; then
-  SERVERS=`cat all-servers.txt`
+  SERVERS=`cat all-production-servers.txt`
 else
   SERVERS=`cat $1`
 fi

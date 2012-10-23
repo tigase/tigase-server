@@ -176,6 +176,10 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 			packet.getElement().addChild(new Element(REQ_NAME,
 					new String[] {ID_ATT}, new String[] {req}));
 			waitingForAck.put(req, packet);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "{0}, Added req {1} for packet: {2}",
+					new Object[] { toString(), req, packet });
+			}
 		}
 		waitingPackets.offer(packet);
 
@@ -191,6 +195,22 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 	 */
 	public Queue<Packet> getReceivedPackets() {
 		return receivedPackets;
+	}
+
+	public Map<String, Packet> getWaitingForAct() {
+		for (Packet p: waitingForAck.values()) {
+			Element req = p.getElement().getChild(REQ_NAME);
+			if (req == null) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "{0}, Missing req element in waiting for ACK packet: {1}",
+						new Object[] { toString(), p });
+				}
+			} else {
+				p.getElement().removeChild(req);
+			}
+		}
+
+		return waitingForAck;
 	}
 
 	/**
@@ -343,7 +363,7 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 			firstPacket = false;
 		}
 		if (packet.getElemName() == ACK_NAME) {
-
+			String ack_id = packet.getAttribute(ID_ATT);
 		} else {
 			sendAck(packet);
 			receivedPackets.offer(packet);
@@ -475,22 +495,15 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 				ack = " ";
 			}
 			if (xmpp_ack) {
-				// If confirmation using XMPP is enabled prepare XMPP ack which may
-				// overwrite white space ACK.
-				// TODO: Write documentation about the stuff implemented here.
-				// If the stanza contains 'req' attribute, the server sends 'ack'
-				// response.
-				// Storing ack/req information in attribute might be more efficient, faster and less resources
-				// consuming, however it may also break the spec.
-				String req_val = packet.getAttribute(REQ_NAME);
-				// If the req is not in an attribute, let's check the extra payload
-				if (req_val == null) {
-					req_val = packet.getElement().getChildAttribute(REQ_NAME, ID_ATT);
-				}
-				if (req_val != null) {
-					// XMPP ack might be enabled in configuration but the client may not
-					// support it. In such a case we do not send XMPP ack.
-					ack = "<" + ACK_NAME + " " + ID_ATT + "=\"" + req_val + "\"/>";
+				Element req = packet.getElement().getChild(REQ_NAME);
+				if (req != null) {
+					packet.getElement().removeChild(req);
+					String req_val = req.getAttribute(ID_ATT);
+					if (req_val != null) {
+						// XMPP ack might be enabled in configuration but the client may not
+						// support it. In such a case we do not send XMPP ack.
+						ack = "<" + ACK_NAME + " " + ID_ATT + "=\"" + req_val + "\"/>";
+					}
 				}
 			}
 			if (ack != null) {
