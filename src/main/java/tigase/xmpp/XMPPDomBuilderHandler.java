@@ -135,12 +135,9 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 			log.finest("Element CDATA: " + cdata);
 		}
 
-		try {
-			el_stack.peek().setCData(cdata.toString());
-		} catch (EmptyStackException e) {
-
-			// Do nothing here, it happens sometimes that client sends
-			// some white characters after sending open stream data....
+		Element elem = el_stack.peek();
+		if (elem != null) {
+			elem.setCData(cdata.toString());
 		}
 	}
 
