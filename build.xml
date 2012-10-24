@@ -17,7 +17,10 @@
 
  <target name="prepare-dist" description="Calculate build version">
   <!-- Get revision number -->
-  <exec executable="svnversion">
+  <exec executable="git">
+   <arg value="rev-list"/>
+   <arg value="head"/>
+   <arg value="--count"/>
    <redirector outputproperty="build-no" errorproperty="error-property">
     <outputfilterchain>
      <tokenfilter>
