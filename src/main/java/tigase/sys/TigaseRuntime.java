@@ -28,6 +28,7 @@ import java.lang.management.MemoryUsage;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.ThreadMXBean;
 import java.util.List;
+import java.util.logging.Logger;
 import tigase.server.monitor.MonitorRuntime;
 import tigase.xmpp.JID;
 
