@@ -19,7 +19,7 @@
   <!-- Get revision number -->
   <exec executable="git">
    <arg value="rev-list"/>
-   <arg value="head"/>
+   <arg value="master"/>
    <arg value="--count"/>
    <redirector outputproperty="build-no" errorproperty="error-property">
     <outputfilterchain>
