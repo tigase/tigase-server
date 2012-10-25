@@ -969,7 +969,10 @@ public abstract class ConfiguratorAbstract extends
 				String[] nodes = entry.getKey().split("/");
 
 				// The plugin ID part may contain many IDs separated with comma ','
-				if (nodes.length > 1) {
+				// We have to make sure that the default repository does not pick up properties set
+				// for a specific domain
+				if ((domain == null && nodes.length == 2) || (domain != null && nodes.length == 3)) {
+					//				if (nodes.length > 1) {
 					result.put(nodes[nodes.length - 1], entry.getValue().toString());
 				}
 			}
