@@ -67,7 +67,7 @@ import java.util.logging.Logger;
 public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 	private static Logger log = Logger.getLogger(XMPPDomBuilderHandler.class.getName());
 
-	public static int ELEMENTS_NUMBER_LIMIT = 100;
+	public static int ELEMENTS_NUMBER_LIMIT = 1000;
 	public static final String ELEMENTS_NUMBER_LIMIT_PROP_KEY =
 		"tigase.xmpp.elements_number_limit";
 
