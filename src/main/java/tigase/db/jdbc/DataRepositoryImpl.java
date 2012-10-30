@@ -248,6 +248,26 @@ public class DataRepositoryImpl implements DataRepository {
 	@Override
 	public void initRepository(String resource_uri, Map<String, String> params)
 			throws SQLException {
+                String driverClass = null;
+
+                if (resource_uri.startsWith("jdbc:postgresql")) {
+                        driverClass = "org.postgresql.Driver";
+                }
+                else if (resource_uri.startsWith("jdbc:mysql")) {
+                        driverClass = "com.mysql.jdbc.Driver";
+                }
+                else if (resource_uri.startsWith("jdbc:derby")) {
+                        driverClass = "org.apache.derby.jdbc.ClientDriver";
+                }
+
+                try {
+                        Class.forName(driverClass, true, this.getClass().getClassLoader());
+                }
+                catch (ClassNotFoundException ex) {
+                        Logger.getLogger(DataRepositoryImpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                
 		db_conn = resource_uri;
 		db_conn_timeout = getParam(DB_CONN_TIMEOUT_PROP_KEY, params, DB_CONN_TIMEOUT);
 		query_timeout = getParam(QUERY_TIMEOUT_PROP_KEY, params, QUERY_TIMEOUT);

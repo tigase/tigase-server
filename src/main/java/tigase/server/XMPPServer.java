@@ -51,6 +51,10 @@ public final class XMPPServer {
 	public static final String NAME       = "Tigase";
 	private static String      serverName = "message-router";
 
+        private static MessageRouterIfc router = null;
+        private static ConfiguratorAbstract config = null;
+        private static boolean inOSGi = false;
+        
 	//~--- constructors ---------------------------------------------------------
 
 //private static boolean     monit         = false;
@@ -103,33 +107,37 @@ public final class XMPPServer {
 	@SuppressWarnings("PMD")
 	public static void main(final String[] args) {
 
-		// getImplementationVersion();
-		Thread.setDefaultUncaughtExceptionHandler(new ThreadExceptionHandler());
 		parseParams(args);
 
-		String initial_config =
-			"tigase.level=ALL\n" + "tigase.xml.level=INFO\n"
-			+ "handlers=java.util.logging.ConsoleHandler\n"
-			+ "java.util.logging.ConsoleHandler.level=ALL\n"
-			+ "java.util.logging.ConsoleHandler.formatter=tigase.util.LogFormatter\n"
-		;
+                start(args);
+	}
 
-		ConfiguratorAbstract.loadLogManagerConfig(initial_config);
+        public static void start(String[] args) {
+		Thread.setDefaultUncaughtExceptionHandler(new ThreadExceptionHandler());
 
+                if (!isOSGi()) {
+                        String initial_config =
+                                "tigase.level=ALL\n" + "tigase.xml.level=INFO\n"
+                                + "handlers=java.util.logging.ConsoleHandler\n"
+                                + "java.util.logging.ConsoleHandler.level=ALL\n"
+                                + "java.util.logging.ConsoleHandler.formatter=tigase.util.LogFormatter\n"
+                        ;
+
+                        ConfiguratorAbstract.loadLogManagerConfig(initial_config);
+                }
 
 		try {
 			String config_class_name = System.getProperty(CONFIGURATOR_PROP_KEY,
 							DEF_CONFIGURATOR);
 
-			ConfiguratorAbstract config = (ConfiguratorAbstract) Class.forName(config_class_name).newInstance();
+			config = (ConfiguratorAbstract) Class.forName(config_class_name).newInstance();
 			config.init(args);
 
 			// config = new ConfiguratorOld(config_file, args);
 			config.setName("basic-conf");
 
 			String mr_class_name = config.getMessageRouterClassName();
-			MessageRouterIfc router =
-				(MessageRouterIfc) Class.forName(mr_class_name).newInstance();
+			router = (MessageRouterIfc) Class.forName(mr_class_name).newInstance();
 
 			router.setName(serverName);
 			router.setConfig(config);
@@ -149,9 +157,29 @@ public final class XMPPServer {
 			System.err.println("  Please fix the problem and start the server again.");
 			e.printStackTrace();
 			System.exit(1);
-		}
-	}
+		}                
+        }
 
+        public static void setOSGi(boolean val) {
+                inOSGi = val;
+        }
+        
+        public static boolean isOSGi() {
+                return inOSGi;
+        }
+        
+        public static void stop() {
+                ((AbstractMessageReceiver) router).stop();
+        }
+
+        public static ConfiguratorAbstract getConfigurator() {
+                return config;
+        }
+
+        public static MessageReceiver getComponent(String name) {
+                return (MessageReceiver) config.getComponent(name);
+        }
+        
 	/**
 	 * Method description
 	 *

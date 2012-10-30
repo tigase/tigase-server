@@ -2,13 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+                <slf4j.version>1.6.4</slf4j.version>                
+                <packet.version>5.2.0</packet.version>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>tigase</groupId>
-	<artifactId>tigase-server</artifactId>
-	<name>Tigase XMPP Server</name>
+	<artifactId>tigase-server-osgi</artifactId>
+	<name>Tigase XMPP Server OSGi bundle</name>
 	<version>5.2.0-SNAPSHOT</version>
-	<description>Tigase XMPP Server</description>
+        <packaging>bundle</packaging>        
+	<description>Tigase XMPP Server - OSGi bundle</description>
 	<url>http://www.tigase.org/</url>
 	<issueManagement>
 		<system>Redmine</system>
@@ -104,6 +107,27 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
 			</plugin>
+                        <plugin>
+                                <groupId>org.apache.felix</groupId>
+                                <artifactId>maven-bundle-plugin</artifactId>
+                                <version>2.2.0</version>
+                                <extensions>true</extensions>
+                                <configuration>
+                                        <instructions>
+                                                <Bundle-Activator>tigase.osgi.Activator</Bundle-Activator>
+                                                <Export-Package>gnu.inet.encoding.*;version=${packet.version},tigase.*;version=${packet.version};-split-package:=merge-first</Export-Package>
+                                                <Import-Package>!junit.*,!sun.*,!com.sun.*,*</Import-Package>
+                                                <DynamicImport-Package>*</DynamicImport-Package>
+                                                <inlinedArtifacts>
+                                                        <inlinedArtifact>tigase-utils</inlinedArtifact>
+                                                        <inlinedArtifact>tigase-xmltools</inlinedArtifact>
+                                                </inlinedArtifacts>
+                                                <Embed-Dependency>*;scope=compile|runtime;artifactId=!junit|org.osgi.core|slf4j-api|tigase-utils|tigase-xmltools</Embed-Dependency>
+                                                <Bundle-SymbolicName>${pom.artifactId};singleton=true</Bundle-SymbolicName>
+                                                <Private-Package>tigase.annotations.*,tigase.auth.*,tigase.cluster.*,tigase.conf.*,tigase.db.*,tigase.disco.*,tigase.http.*,tigase.io.*,tigase.net.*,tigase.server.*,tigase.stats.*,tigase.sys.*,tigase.util.*,tigase.vhosts.*,tigase.xmpp.*</Private-Package>
+                                        </instructions>
+                                </configuration>
+                        </plugin>                        
 		</plugins>
 		<extensions>
 			<extension>
@@ -131,6 +155,19 @@
 			<version>3.4.2-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
+                <dependency>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>org.osgi.core</artifactId>
+                        <version>1.4.0</version>
+                        <scope>provided</scope>
+                </dependency>                
+                <dependency>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>jul-to-slf4j</artifactId>
+                        <version>${slf4j.version}</version>
+                        <scope>provided</scope>
+                        <optional>true</optional>
+                </dependency>
 	</dependencies>
 	<repositories>
 		<repository>

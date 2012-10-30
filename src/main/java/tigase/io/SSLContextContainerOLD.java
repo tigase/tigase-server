@@ -106,7 +106,7 @@ public class SSLContextContainerOLD implements SSLContextContainerIfc {
 	 * @return
 	 */
 	@Override
-	public SSLContext getSSLContext(final String protocol, String hostname) {
+	public SSLContext getSSLContext(final String protocol, String hostname, boolean clientMode) {
 		if (hostname == null) {
 			hostname = def_cert_alias;
 		}    // end of if (hostname == null)

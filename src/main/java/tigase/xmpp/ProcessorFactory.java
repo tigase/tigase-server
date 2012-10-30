@@ -210,6 +210,17 @@ public class ProcessorFactory {
 
 		return null;
 	}
+        
+        /**
+         * Check if plugin implementation is in server jar
+         * 
+         * @param id
+         * @return 
+         */
+        public static boolean hasImplementation(String id) {
+                return processors.containsKey(id);
+        }
+        
 }    // ProcessorFactory
 
 

@@ -24,6 +24,7 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.osgi.ModulesManagerImpl;
 import tigase.util.DNSResolver;
 
 import static tigase.conf.Configurable.*;
@@ -33,7 +34,9 @@ import static tigase.conf.Configurable.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
@@ -318,35 +321,79 @@ public class MessageRouterConfig {
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
 	 */
-	public ServerComponent getMsgRcvInstance(String name)
-			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-		String cls_name = (String) props.get(MSG_RECEIVERS_PROP_KEY + name + ".class");
+        public ServerComponent getMsgRcvInstance(String name) throws
+                ClassNotFoundException, InstantiationException, IllegalAccessException {
 
-		return (ServerComponent) Class.forName(cls_name).newInstance();
-	}
+                String cls_name = (String) props.get(MSG_RECEIVERS_PROP_KEY + name + ".class");
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public String[] getMsgRcvNames() {
-		String[] names = (String[]) props.get(MSG_RECEIVERS_NAMES_PROP_KEY);
+                ServerComponent cls = null;
 
-		log.config(Arrays.toString(names));
+                cls = ModulesManagerImpl.getInstance().getServerComponent(cls_name);
+                if (cls == null) {
+                        cls = (ServerComponent) Class.forName(cls_name).newInstance();
+                }
 
-		ArrayList<String> al = new ArrayList<String>();
+                return cls;
+        }
 
-		for (String name : names) {
-			if ((props.get(MSG_RECEIVERS_PROP_KEY + name + ".active") != null)
-					&& (Boolean) props.get(MSG_RECEIVERS_PROP_KEY + name + ".active")) {
-				al.add(name);
-			}
-		}    // end of for (String name: names)
+        /**
+         * Method description
+         *
+         *
+         * @return
+         */
+        public String[] getMsgRcvActiveNames() {
+                String[] names = (String[]) props.get(MSG_RECEIVERS_NAMES_PROP_KEY);
 
-		return al.toArray(new String[al.size()]);
-	}
+                List<String> availableNames = new ArrayList<String>();
+                
+                for (String name : names) {
+                        if (hasClassForServerComponent(name)
+                                && (props.get(MSG_RECEIVERS_PROP_KEY + name + ".active") != null
+                                && (Boolean) props.get(MSG_RECEIVERS_PROP_KEY + name + ".active"))) {                                
+                                availableNames.add(name);
+                        }
+                }
+
+                names = availableNames.toArray(new String[availableNames.size()]);
+                
+                if (log.isLoggable(Level.FINE)) {
+                        log.log(Level.FINE, "active message receivers = {0}", Arrays.toString(names));
+                }
+                
+                return names;
+        }
+
+        /**
+         * Method description
+         *
+         *
+         * @return
+         */
+        public String[] getMsgRcvInactiveNames() {
+                String[] names = (String[]) props.get(MSG_RECEIVERS_NAMES_PROP_KEY);
+
+                ArrayList<String> al = new ArrayList<String>();
+
+                for (String name : names) {
+                        if (props.get(MSG_RECEIVERS_PROP_KEY + name + ".active") == null
+                                || !(Boolean) props.get(MSG_RECEIVERS_PROP_KEY + name + ".active")) {
+                                al.add(name);
+                        }
+                        
+                        if (hasClassForServerComponent(name)) {
+                                al.add(name);
+                        }
+                } // end of for (String name: names)
+
+                names = al.toArray(new String[al.size()]); 
+
+                if (log.isLoggable(Level.FINE)) {
+                        log.log(Level.FINE, "inactive message receivers = {0}", Arrays.toString(names));
+                }
+                
+                return names;
+        }
 
 	/**
 	 * Method description
@@ -400,6 +447,36 @@ public class MessageRouterConfig {
 
 		return al.toArray(new String[al.size()]);
 	}
+
+        /**
+         * Check if class exists for server component
+         * 
+         * @param name
+         * @return 
+         */
+        private boolean hasClassForServerComponent(String name) {
+                try {
+                        String cls_name = (String) props.get(MSG_RECEIVERS_PROP_KEY + name + ".class");
+                        
+                        if (cls_name == null) {
+                                return false;
+                        }
+                        
+                        // first check if there is registered class in ModuleManagerImpl as it is easy
+                        if (ModulesManagerImpl.getInstance().hasClassForServerComponent(cls_name)) {
+                                return true;
+                        }
+                        
+                        // it is dirty but should work
+                        Class.forName(cls_name);
+                        
+                        return true;
+                }
+                catch (Exception ex) {
+                        return false;
+                }
+        }
+        
 }    // MessageRouterConfig
 
 

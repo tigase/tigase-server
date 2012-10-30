@@ -906,7 +906,11 @@ public abstract class RosterAbstract {
 	 */
 	public SubscriptionType getStateTransition(final SubscriptionType subscription,
 			final PresenceType presence) {
-		return subsToStateMap.get(subscription).getStateTransition(presence);
+                StateTransition transition = subsToStateMap.get(subscription);
+                if (transition == null) {
+                        return getStateTransition(SubscriptionType.none, presence);
+                }
+		return transition.getStateTransition(presence);
 	}
 
 	// ~--- methods --------------------------------------------------------------

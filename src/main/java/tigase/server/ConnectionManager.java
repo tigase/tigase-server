@@ -41,6 +41,7 @@ import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.XMPPIOServiceListener;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 
 import java.net.SocketException;
 
@@ -104,7 +105,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 	protected static final String XMPP_ACK_PROP_KEY = "xmpp-ack";
 	protected static final boolean XMPP_ACK_PROP_VAL = false;
 	protected static final String MAX_INACTIVITY_TIME = "max-inactivity-time";
-
 	/** Field description */
 	public static final String PORT_LOCAL_HOST_PROP_KEY = "local-host";
 	private static ConnectionOpenThread connectThread = ConnectionOpenThread.getInstance();
@@ -113,9 +113,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 	public String[] PORT_IFC_PROP_VAL = { "*" };
 	private long bytesReceived = 0;
 	private long bytesSent = 0;
-	private boolean white_char_ack = WHITE_CHAR_ACK_PROP_VAL;
+	private boolean white_char_ack = WHITE_CHAR_ACK_PROP_VAL;	
 	private boolean xmpp_ack = XMPP_ACK_PROP_VAL;
-
+        
 	private int services_size = 0;
 	private long socketOverflow = 0;
 	private Thread watchdog = null;
@@ -131,7 +131,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 	private IOServiceStatisticsGetter ioStatsGetter = new IOServiceStatisticsGetter();
 	private boolean initializationCompleted = false;
 	protected long connectionDelay = 2 * SECOND;
-	private long maxInactivityTime = getMaxInactiveTime();
+        private long maxInactivityTime = getMaxInactiveTime();
 
 	/**
 	 * Method description
@@ -289,7 +289,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 		props.put(WHITE_CHAR_ACK_PROP_KEY, white_char_ack);
 		props.put(XMPP_ACK_PROP_KEY, xmpp_ack);
 		props.put(MAX_INACTIVITY_TIME, getMaxInactiveTime()/SECOND);
-
+                
 		return props;
 	}
 
@@ -551,23 +551,23 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 			maxInactivityTime = (Long)props.get(MAX_INACTIVITY_TIME) * SECOND;
 		}
 
-		if (props.get(WHITE_CHAR_ACK_PROP_KEY) != null) {
+                if (props.get(WHITE_CHAR_ACK_PROP_KEY) != null) {
 			white_char_ack = (Boolean) props.get(WHITE_CHAR_ACK_PROP_KEY);
 		}
 		if (props.get(XMPP_ACK_PROP_KEY) != null) {
 			xmpp_ack = (Boolean) props.get(XMPP_ACK_PROP_KEY);
 		}
-
-		if (props.get(NET_BUFFER_PROP_KEY) != null) {
+                
+                if (props.get(NET_BUFFER_PROP_KEY) != null) {
 			net_buffer = (Integer) props.get(NET_BUFFER_PROP_KEY);
 		}
-
+		
 		if (props.size() == 1) {
 			// If props.size() == 1, it means this is a single property update and 
 			// ConnectionManager does not support it yet.
 			return;
 		}
-
+		
 		releaseListeners();
 
 		int[] ports = (int[]) props.get(PORTS_PROP_KEY);
@@ -1014,6 +1014,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 		 * 
 		 * @return
 		 */
+                @Override
 		public SocketType getSocketType() {
 			return SocketType.valueOf(port_props.get(PORT_SOCKET_PROP_KEY).toString());
 		}
@@ -1043,6 +1044,30 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 		public String toString() {
 			return port_props.toString();
 		}
+
+                @Override
+                public String getSRVType() {
+                        String type = (String) this.port_props.get("srv-type");
+
+                        if (type == null || type.isEmpty()) {
+                                return null;
+                        }
+
+                        return type;
+                }
+
+                @Override
+                public String getRemoteHostname() {
+                        if (port_props.containsKey(PORT_REMOTE_HOST_PROP_KEY)) {
+                                return (String) port_props.get(PORT_REMOTE_HOST_PROP_KEY);
+                        }
+                        return (String) port_props.get("remote-hostname");
+                }
+
+                @Override
+                public InetSocketAddress getRemoteAddress() {
+                        return (InetSocketAddress) port_props.get("remote-address");
+                }
 	}
 
 	private class IOServiceStatisticsGetter implements ServiceChecker<IO> {

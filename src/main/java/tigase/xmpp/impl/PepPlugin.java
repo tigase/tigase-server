@@ -48,7 +48,7 @@ public class PepPlugin extends XMPPProcessorAbstract {
 			new Element("feature", new String[] { "var" }, new String[] { _XMLNS + "#publish" }),
 			new Element("identity", new String[] { "category", "type" }, new String[] { "pubsub", "pep" }), };
 	private static final String[] ELEMENTS = { "pubsub" };
-	private static final String ID = "pep";
+	private static final String ID = "pep-simple";
 	private static final Logger log = Logger.getLogger("tigase.xmpp.impl.PepPlugin");
 	private static final String PUBSUB_COMPONENT_URL = "pubsub-component";
 	private static RosterAbstract roster = RosterFactory.getRosterImplementation(true);

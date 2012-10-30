@@ -21,6 +21,7 @@
  */
 package tigase.net;
 
+import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 
 /**
@@ -53,7 +54,15 @@ public interface ConnectionOpenListener {
 
 	String[] getIfcs();
 
+        String getSRVType();
+        
+        String getRemoteHostname();
+
+        InetSocketAddress getRemoteAddress();
+        
 	ConnectionType getConnectionType();
+        
+        SocketType getSocketType();
 
 	int getReceiveBufferSize();
 

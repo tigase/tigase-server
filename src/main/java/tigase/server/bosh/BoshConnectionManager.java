@@ -41,6 +41,7 @@ import static tigase.server.bosh.Constants.*;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.ArrayDeque;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TimerTask;
@@ -70,11 +71,11 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 	 */
 	private static final Logger log = Logger
 			.getLogger("tigase.server.bosh.BoshConnectionManager");
-//	private static final String ROUTINGS_PROP_KEY = "routings";
-//	private static final String ROUTING_MODE_PROP_KEY = "multi-mode";
-//	private static final boolean ROUTING_MODE_PROP_VAL = true;
-//	private static final String ROUTING_ENTRY_PROP_KEY = ".+";
-//	private static final String ROUTING_ENTRY_PROP_VAL = DEF_SM_NAME + "@localhost";
+	private static final String ROUTINGS_PROP_KEY = "routings";
+	private static final String ROUTING_MODE_PROP_KEY = "multi-mode";
+	private static final boolean ROUTING_MODE_PROP_VAL = true;
+	private static final String ROUTING_ENTRY_PROP_KEY = ".+";
+	private static final String ROUTING_ENTRY_PROP_VAL = DEF_SM_NAME + "@localhost";
 	private static final int DEF_PORT_NO = 5280;
 
 	private int[] PORTS = { DEF_PORT_NO };
@@ -119,11 +120,11 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 		packet.setPacketTo(bs.getDataReceiver());
 		packet.initVars(packet.getPacketFrom(), packet.getPacketTo());
 
-		bs.close();
-		if (log.isLoggable(Level.FINEST))
-			log.finest("closing BOSH session with sid = " + bs.getSid().toString());
-		sessions.remove(bs.getSid());
-
+                bs.close();
+                if (log.isLoggable(Level.FINEST))
+                        log.finest("closing BOSH session with sid = "+bs.getSid().toString());
+                sessions.remove(bs.getSid());
+                
 		return addOutPacketWithTimeout(packet, stoppedHandler, 15l, TimeUnit.SECONDS);
 	}
 
@@ -424,26 +425,22 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 				+ "</stream:error>" + "</stream:stream>";
 	}
 
-	@Override
-	public BareJID getSeeOtherHostForJID(BareJID fromJID) {
-		if (see_other_host_strategy == null) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("no see-other-host implementation set");
-			}
-			return null;
-		}
-
-		BareJID see_other_host =
-				see_other_host_strategy.findHostForJID(fromJID, getDefHostName());
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("using = " + see_other_host_strategy.getClass().getCanonicalName()
-					+ "for jid = " + fromJID.toString() + " got = "
-					+ (see_other_host != null ? see_other_host.toString() : "null"));
-		}
-		return (see_other_host != null && !see_other_host.equals(getDefHostName())) ? see_other_host
-				: null;
-	}
-
+        @Override
+        public BareJID getSeeOtherHostForJID(BareJID fromJID) {
+                if (see_other_host_strategy == null) {
+                        if (log.isLoggable(Level.FINEST)) {
+                                log.finest("no see-other-host implementation set");
+                        }
+                        return null;
+                }
+                
+                BareJID see_other_host = see_other_host_strategy.findHostForJID(fromJID, getDefHostName());
+                if (log.isLoggable(Level.FINEST)) {
+                        log.finest("using = " + see_other_host_strategy.getClass().getCanonicalName() + "for jid = " + fromJID.toString() + " got = " + (see_other_host != null ? see_other_host.toString() : "null"));
+                }
+                return (see_other_host != null && !see_other_host.equals(getDefHostName())) ? see_other_host : null;
+        }
+                
 	@Override
 	protected JID changeDataReceiver(Packet packet, JID newAddress,
 			String command_sessionId, XMPPIOService<Object> serv) {
@@ -532,12 +529,9 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 		switch (packet.getCommand()) {
 			case CLOSE:
 				if (session != null) {
-					// log.log(Level.FINE, "Closing session for command CLOSE: {0}",
-					// session.getSid());
-					// session.close();
-					// sessions.remove(session.getSid());
-					log.log(Level.FINE, "Terminating session for command CLOSE: {0}", session.getSid());
-					session.terminateBoshSession();
+					log.log(Level.FINE, "Closing session for command CLOSE: {0}", session.getSid());
+					session.close();
+					sessions.remove(session.getSid());
 				} else {
 					log.log(Level.INFO, "Session does not exist for packet: {0}", packet);
 				}

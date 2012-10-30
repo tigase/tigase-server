@@ -22,7 +22,9 @@
 
 package tigase.vhosts;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -30,6 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.script.Bindings;
+import tigase.db.TigaseDBException;
 
 import tigase.db.comp.ComponentRepository;
 import tigase.server.AbstractComponentRegistrator;
@@ -37,6 +40,7 @@ import tigase.server.ServerComponent;
 import tigase.stats.StatisticsContainer;
 import tigase.stats.StatisticsList;
 
+import tigase.xmpp.JID;
 import tigase.xmpp.BareJID;
 
 /**
@@ -275,6 +279,27 @@ public class VHostManager extends AbstractComponentRegistrator<VHostListener> im
 				getComponentsForNonLocalDomainCalls, Level.FINER);
 	}
 
+        /**
+	 * Method description
+	 * 
+         *
+         * @return
+         */
+        @Override
+        public List<JID> getAllVHosts() {
+                List<JID> list = new ArrayList<JID>();
+                
+                try {
+                        for (VHostItem item : repo.allItems()) {
+                                list.add(item.getVhost());
+                        }
+                } catch (TigaseDBException ex) {
+                        Logger.getLogger(VHostManager.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                return list;
+        }
+        
 	/**
 	 * Method description
 	 * 
@@ -286,15 +311,15 @@ public class VHostManager extends AbstractComponentRegistrator<VHostListener> im
 	@Override
 	public VHostItem getVHostItem(String domain) {
 		return repo.getItem(domain);
-	}
+        }
 
-	@Override
+        @Override
 	public BareJID getDefVHostItem() {
 		Iterator<VHostItem> vhosts = repo.iterator();
 		if (vhosts != null && vhosts.hasNext()) {
 			return vhosts.next().getVhost().getBareJID();
 		}
-		return getDefHostName();
+		return getDefHostName();        
 	}
 
 	/**

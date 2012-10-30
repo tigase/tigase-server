@@ -32,6 +32,6 @@ package tigase.net;
  */
 public enum SocketType {
 
-	plain, ssl;
+	plain, ssl, tls;
 
 } // SocketType

@@ -21,8 +21,11 @@
 
 package tigase.vhosts;
 
+import java.util.List;
 import tigase.server.ServerComponent;
+
 import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 
 /**
  * This is VHostManagerIfc interface which allows to access data for
@@ -123,5 +126,6 @@ public interface VHostManagerIfc {
 	 * @return a <code>BareJID</code> value of the default VHost for the installation.
 	 */
 	BareJID getDefVHostItem();
-
+        
+        List<JID> getAllVHosts();
 }

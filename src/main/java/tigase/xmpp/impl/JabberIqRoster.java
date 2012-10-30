@@ -241,11 +241,16 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc,
 
 			// Packet probably to the user, let's check where it came from
 			if (session.isUserId(packet.getStanzaTo().getBareJID())) {
-				Packet result = packet.copyElementOnly();
+                                if (packet.getStanzaTo().getResource() != null) {
+                                        Packet result = packet.copyElementOnly();
 
-				result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
-				result.setPacketFrom(packet.getTo());
-				results.offer(result);
+                                        result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
+                                        result.setPacketFrom(packet.getTo());
+                                        results.offer(result);
+                                }
+                                else {
+                                        processRemoteRosterManagementRequest(packet, session, results, settings);
+                                }
 
 				return;
 			} else {
@@ -599,15 +604,13 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc,
 					if (DynamicRoster.getBuddyItem(session, settings, buddy) != null) {
 						// Let's return an error. Dynamic roster cannot be modified via
 						// XMPP.
-						results
-								.offer(Authorization.FEATURE_NOT_IMPLEMENTED
-										.getResponseMessage(
+						results.offer(Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(
 												packet,
 												"You cannot modify this contact. It is controlled by an external service.",
 												true));
 						return;
 					}
-
+                                        
 					if (session.isUserId(buddy.getBareJID())) {
 						results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
 								"User can't add himself to the roster, RFC says NO.", true));
@@ -743,7 +746,75 @@ public class JabberIqRoster extends XMPPProcessor implements XMPPProcessorIfc,
 					"No items found in the roster set request", true));
 		}
 	}
-} // JabberIqRoster
+        
+        private void processRemoteRosterManagementRequest(Packet packet, XMPPResourceConnection session,
+			Queue<Packet> results, final Map<String, Object> settings) throws PacketErrorTypeException {
+                if (!RemoteRosterManagement.isRemoteAllowed(packet.getStanzaFrom(), session)) {
+                        results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet, "Not authorized for remote roster management", true));
+                        return;
+                }
+                try {
+                        switch (packet.getType()) {
+                                case get:
+                                        List<Element> ritems = roster_util.getRosterItems(session);
+                                        if (ritems != null && !ritems.isEmpty()) {
+                                                Element query = new Element("query");
+                                                query.setXMLNS(RosterAbstract.XMLNS);
+                                                String jidStr = "@" + packet.getStanzaFrom().getBareJID().toString();
+                                                for (Element ritem : ritems) {
+                                                        if (ritem.getAttribute("jid").endsWith(jidStr)) {
+                                                                query.addChild(ritem);
+                                                        }
+                                                }
+                                                results.offer(packet.okResult(query, 0));
+                                        } else {
+                                                results.offer(packet.okResult((String) null, 1));
+                                        }
+                                        break;
+
+                                case set:
+//                                                        processSetMethod.invoke(rosterProc, new Object[]{
+//                                                                        packet, session, results, settings
+//                                                                });
+/*                                        List<Element> nitems = packet.getElemChildren("/iq/query");
+                                        if (nitems != null) {
+                                                for (Element nitem : nitems) {
+                                                        JID buddy = JID.jidInstanceNS(nitem.getAttribute("jid"));
+                                                        String name = nitem.getAttribute("name");
+                                                        String subscrStr = nitem.getAttribute("subscription");
+                                                        RosterAbstract.SubscriptionType subscr = subscrStr == null ? null : RosterAbstract.SubscriptionType.valueOf(subscrStr);
+                                                        String[] groups = null;
+                                                        List<Element> ngroups = nitem.getChildren();
+                                                        if (ngroups != null && !ngroups.isEmpty()) {
+                                                                int i = 0;
+                                                                groups = new String[ngroups.size()];
+                                                                for (Element group : nitem.getChildren()) {
+                                                                        groups[i++] = group.getCData() == null ? "" : group.getCData();
+                                                                }
+                                                        }
+                                                        roster_util.addBuddy(session, buddy, name, groups, null);
+                                                        roster_util.setBuddySubscription(session, subscr, buddy);
+
+                                                        Element item = roster_util.getBuddyItem(session, buddy);
+                                                        roster_util.updateBuddyChange(session, results, item);
+                                                }
+                                        }
+
+                                        results.offer(packet.okResult((String) null, 0));*/
+                                        processSetRequest(packet, session, results, settings);
+                                        break;
+
+                                default:
+                                        results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Bad stanza type", true));
+                                        break;
+                        }
+                } catch (Throwable ex) {
+                        log.log(Level.WARNING, "Reflection execution exception", ex);
+                        results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet, "Internal server error", true));
+                }
+                
+        }
+}    // JabberIqRoster
 
 // ~ Formatted in Sun Code Convention
 

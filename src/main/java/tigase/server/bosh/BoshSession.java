@@ -621,6 +621,8 @@ public class BoshSession {
 	 */
 	public boolean task(Queue<Packet> out_results, TimerTask tt) {
 		if (tt == inactivityTimer) {
+                        if (connections.size() > 0)
+                                return false;
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("inactivityTimer fired: " + getSid());
 			}
@@ -897,8 +899,8 @@ public class BoshSession {
 				rids_head = 0;
 			}
 		}
-	}
-	
+        }
+        
 	public void terminateBoshSession() {
 		terminate = true;
 	}

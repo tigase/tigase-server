@@ -22,6 +22,7 @@
 
 package tigase.server;
 
+import tigase.osgi.OSGiScriptEngineManager;
 import tigase.conf.Configurable;
 
 import tigase.disco.ServiceEntity;
@@ -105,7 +106,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 	 * List of the component administrators
 	 */
 	protected Set<BareJID> admins = new ConcurrentSkipListSet<BareJID>();
-	private ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
+	private ScriptEngineManager scriptEngineManager = null;                
 	private String scriptsBaseDir = null;
 	private String scriptsCompDir = null;
 	private ServiceEntity serviceEntity = null;
@@ -362,7 +363,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 	}
 
 	public List<Element> getScriptItems(String node, JID jid, JID from) {
-		LinkedList<Element> result = null;
+		LinkedList<Element>  result = null; 
 		boolean isAdminFrom = isAdmin(from);
 		if (node.equals("http://jabber.org/protocol/commands")
 				&& (isAdminFrom || nonAdminCommands)) {
@@ -370,16 +371,15 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 
 			for (CommandIfc comm : scriptCommands.values()) {
 				if (!comm.isAdminOnly() || isAdminFrom) {
-					result
-							.add(new Element("item", new String[] { "node", "name", "jid" },
-									new String[] { comm.getCommandId(), comm.getDescription(),
-											jid.toString() }));
+					result.add(new Element("item", new String[] { "node", "name", "jid" },
+							new String[] { comm.getCommandId(), comm.getDescription(),
+									jid.toString() }));
 				}
 			}
 		}
 		return result;
 	}
-
+	
 	/**
 	 * Method description
 	 * 
@@ -504,8 +504,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 	public BareJID getDefVHostItem() {
 		return (vHostManager != null) ? vHostManager.getDefVHostItem() :
 			getDefHostName();
-	}
-
+	}        
 	/**
 	 * Method description
 	 * 
@@ -601,6 +600,15 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 		return (vHostManager != null) ? vHostManager.isLocalDomainOrComponent(domain) : false;
 	}
 
+        /**
+         * Method returns true is component should be represented as subdomain
+         * 
+         * @return 
+         */
+        public boolean isSubdomain() {
+                return false;
+        }
+        
 	/**
 	 * Method description
 	 * 
@@ -612,10 +620,6 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 	public void processPacket(Packet packet, Queue<Packet> results) {
 		if (packet.isCommand() && getName().equals(packet.getStanzaTo().getLocalpart())
 				&& isLocalDomain(packet.getStanzaTo().getDomain())) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Command addressed to: {0}, command: {1}", new Object[] {
-						getName(), packet });
-			}
 			processScriptCommand(packet, results);
 		}
 	}
@@ -683,6 +687,15 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 	 */
 	@Override
 	public void setProperties(Map<String, Object> props) {
+                if (scriptEngineManager == null) {
+                        if (XMPPServer.isOSGi()) {
+                                scriptEngineManager = new OSGiScriptEngineManager();
+                        }
+                        else {
+                                scriptEngineManager = new ScriptEngineManager();
+                        }
+                }
+                
 		if (props.get(COMPONENT_ID_PROP_KEY) != null) {
 			try {
 				compId = JID.jidInstance((String) props.get(COMPONENT_ID_PROP_KEY));
@@ -728,8 +741,8 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 		}
 
 		serviceEntity = new ServiceEntity(name, null, getDiscoDescription(), true);
-		serviceEntity.addIdentities(new ServiceIdentity(getDiscoCategory(),
-				getDiscoCategoryType(), getDiscoDescription()));
+		serviceEntity.addIdentities(new ServiceIdentity(getDiscoCategory(), getDiscoCategoryType(),
+				getDiscoDescription()));
 		serviceEntity.addFeatures("http://jabber.org/protocol/commands");
 
 		CommandIfc command = new AddScriptCommand();
@@ -835,6 +848,18 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 		}
 	}
 
+        protected ServiceEntity getServiceEntity() {
+                return serviceEntity;
+        }
+
+        protected Map<String, CommandIfc> getScriptCommands() {
+                return scriptCommands;
+        }
+
+        protected boolean isNonAdminCommands() {
+                return nonAdminCommands;
+        }
+        
 	protected boolean processScriptCommand(Packet pc, Queue<Packet> results) {
 
 		// TODO: test if this is right
@@ -902,11 +927,6 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 			}
 
 			return true;
-		} else {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "No such command: {0}, ignoring packet: {1}", new Object[] {
-						strCommand, pc });
-			}
 		}
 
 		return false;

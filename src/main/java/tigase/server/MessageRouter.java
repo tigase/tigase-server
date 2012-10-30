@@ -53,19 +53,12 @@ import java.lang.management.MemoryUsage;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
-import java.util.ArrayDeque;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.util.TigaseStringprepException;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -95,7 +88,6 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 	// private Set<String> localAddresses = new CopyOnWriteArraySet<String>();
 	private String disco_name = DISCO_NAME_PROP_VAL;
 	private boolean disco_show_version = DISCO_SHOW_VERSION_PROP_VAL;
-	private ServiceEntity serviceEntity = null;
 	private UpdatesChecker updates_checker = null;
 	private Map<String, XMPPService> xmppServices =
 			new ConcurrentHashMap<String, XMPPService>();
@@ -140,6 +132,32 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 		}
 	}
 
+        /**
+         * Method description
+         * 
+         * 
+         * @param component 
+         */
+        public void removeComponent(ServerComponent component) {
+
+                for (ComponentRegistrator registr : registrators.values()) {
+                        if (registr != component) {
+                                if (log.isLoggable(Level.FINER)) {
+                                        log.log(Level.FINER, "Adding: {0} component to {1} registrator.", 
+                                                new Object[] { component.getName(), registr.getName()});
+                                }
+
+                                registr.deleteComponent(component);
+                        }    // end of if (reg != component)
+                }      // end of for ()
+
+                components.remove(component.getName());
+                components_byId.remove(component.getComponentId());
+                
+                if (component instanceof XMPPService) {
+                        xmppServices.remove(component.getName());
+                }
+        }
 	/**
 	 * Method description
 	 * 
@@ -172,6 +190,12 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 		receivers.put(receiver.getName(), receiver);
 	}
 
+        public void removeRouter(MessageReceiver receiver) {
+                log.info("Removing receiver: " + receiver.getClass().getSimpleName());
+                receivers.remove(receiver.getName());
+                removeComponent(receiver);
+        }
+                
 	// ~--- get methods ----------------------------------------------------------
 
 	/**
@@ -191,27 +215,19 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 		return defs;
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param node
-	 * @param jid
-	 * @param from
-	 * 
-	 * @return
-	 */
-	@Override
-	public Element getDiscoInfo(String node, JID jid, JID from) {
-		Element query = serviceEntity.getDiscoInfo(null);
-
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Returing disco-info: " + query.toString());
-		}
-
-		return query;
-	}
-
+        @Override
+        public String getDiscoCategoryType() {
+                return "im";
+        }
+        
+        @Override
+        public String getDiscoDescription() {
+                return disco_name
+                        + (disco_show_version
+                        ? (" ver. " + XMPPServer.getImplementationVersion())
+                        : "");
+        }
+        
 	// public List<Element> getDiscoItems(String node, String jid) {
 	// return null;
 	// }
@@ -625,16 +641,17 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 		}
 		if (props.get(DISCO_NAME_PROP_KEY) != null) {
 			disco_name = (String) props.get(DISCO_NAME_PROP_KEY);
-			serviceEntity = new ServiceEntity("Tigase", "server", "Session manager");
-			serviceEntity.addIdentities(new ServiceIdentity[] { new ServiceIdentity("server",
-					"im", disco_name
-							+ (disco_show_version ? (" ver. " + tigase.server.XMPPServer
-									.getImplementationVersion()) : "")) });
-			serviceEntity.addFeatures(XMPPService.DEF_FEATURES);
+//			serviceEntity = new ServiceEntity("Tigase", "server", "Session manager");
+//			serviceEntity.addIdentities(new ServiceIdentity[] { new ServiceIdentity("server",
+//					"im", disco_name
+//							+ (disco_show_version ? (" ver. " + tigase.server.XMPPServer
+//									.getImplementationVersion()) : "")) });
+//			serviceEntity.addFeatures(XMPPService.DEF_FEATURES);
 		}
 
 		try {
 			super.setProperties(props);
+                        updateServiceDiscoveryItem(getName(), null, getDiscoDescription(), "server", "im", false);
 			if (props.size() == 1) {
 				// If props.size() == 1, it means this is a single property update and
 				// MR does
@@ -642,11 +659,15 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 				return;
 			}
 
+                        HashSet<String> inactive_msgrec = new HashSet<String>(receivers.keySet());
+                        
 			MessageRouterConfig conf = new MessageRouterConfig(props);
 			String[] reg_names = conf.getRegistrNames();
 
 			for (String name : reg_names) {
 
+                                inactive_msgrec.remove(name);
+                                
 				// First remove it and later, add it again if still active
 				ComponentRegistrator cr = registrators.remove(name);
 				String cls_name = (String) props.get(REGISTRATOR_PROP_KEY + name + ".class");
@@ -667,20 +688,32 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 				} // end of try-catch
 			} // end of for (String name: reg_names)
 
-			String[] msgrcv_names = conf.getMsgRcvNames();
+			String[] msgrcv_names = conf.getMsgRcvActiveNames();
 
 			for (String name : msgrcv_names) {
 				if (log.isLoggable(Level.FINER)) {
 					log.log(Level.FINER, "Loading and registering message receiver: {0}", name);
 				}
 
+                                inactive_msgrec.remove(name);
+                                
 				// First remove it and later, add it again if still active
 				ServerComponent mr = receivers.remove(name);
+                                xmppServices.remove(name);
 				String cls_name = (String) props.get(MSG_RECEIVERS_PROP_KEY + name + ".class");
 
 				try {
+                                        boolean start = false;
+                                        
 					if ((mr == null) || !mr.getClass().getName().equals(cls_name)) {
 						if (mr != null) {
+                                                        if (mr instanceof MessageReceiver) {
+                                                                removeRouter((MessageReceiver) mr);
+                                                        }
+                                                        else {
+                                                                removeComponent(mr);
+                                                        }
+                                                        
 							mr.release();
 						}
 
@@ -689,7 +722,7 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 
 						if (mr instanceof MessageReceiver) {
 							((MessageReceiver) mr).setParent(this);
-							((MessageReceiver) mr).start();
+							start = true;
 						}
 					} // end of if (cr == null)
 
@@ -698,12 +731,43 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 					} else {
 						addComponent(mr);
 					}
+                                        
+                                        if (start) {
+                                                ((MessageReceiver) mr).start();
+                                        }
+
+                                }   // end of try
+                                catch (ClassNotFoundException e) {
+                                        log.log(Level.WARNING, "class for component = {0} could not be found "
+                                                + "- disabling component", name);
+//                                        conf.setComponentActive(name, false);
 				} // end of try
 				catch (Exception e) {
 					e.printStackTrace();
 				} // end of try-catch
 			} // end of for (String name: reg_names)
 
+//                        String[] inactive_msgrec = conf.getMsgRcvInactiveNames();
+                        for (String name : inactive_msgrec) {
+                                ServerComponent mr = receivers.remove(name);
+                                xmppServices.remove(name);
+
+                                if (mr != null) {
+                                        try {
+                                                if (mr instanceof MessageReceiver) {
+                                                        removeRouter((MessageReceiver) mr);
+                                                } else {
+                                                        removeComponent(mr);
+                                                }
+                                                        
+                                                mr.release();
+                                        }
+                                        catch (Exception ex) {
+                                                log.log(Level.WARNING, "exception releasing component:", ex);
+                                        }
+                                }
+                        }
+                        
 			// for (MessageReceiver mr : tmp_rec.values()) {
 			// mr.release();
 			// } // end of for ()
@@ -729,6 +793,24 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 		// config.initializationCompleted();
 	}
 
+        @Override
+        public void start() {
+                super.start();
+        }
+
+        @Override
+        public void stop() {
+                Set<String> comp_names = new TreeSet<String>();
+                comp_names.addAll(components.keySet());
+                for (String name : comp_names) {
+                        ServerComponent comp = components.remove(name);
+                        if (comp != this && comp != null) {
+                                comp.release();
+                        }
+                }
+                super.stop();
+        }
+        
 	// ~--- get methods ----------------------------------------------------------
 
 	@Override
@@ -885,7 +967,14 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 
 		if (packet.isXMLNS("/iq/query", INFO_XMLNS)) {
 			if (isLocalDomain(toJid.toString()) && (node == null)) {
-				query = getDiscoInfo(node, toJid, fromJid);
+                                try {
+                                        query = getDiscoInfo(node, (toJid.getLocalpart() == null) 
+                                                ? JID.jidInstance(getName(), toJid.toString(), null) : toJid, fromJid);
+                                }
+                                catch (TigaseStringprepException e) {
+                                        log.log(Level.WARNING, "processing by stringprep throw exception for = {0}@{1}",
+                                                new Object[]{getName(), toJid.toString()});
+                                }
 
 				for (XMPPService comp : xmppServices.values()) {
 

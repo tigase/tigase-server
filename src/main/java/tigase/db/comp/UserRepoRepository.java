@@ -200,6 +200,9 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 			// If this is the first run of the Items manager the database might not
 			// be properly initialized yet....
 			try {
+                                if (!repo.userExists(getRepoUser())) {
+                                        repo.addUser(getRepoUser());
+                                }
 				repo.addUser(getRepoUser());
 			} catch (UserExistsException e) {
 

@@ -262,6 +262,11 @@ public class ProcessingThreads<E extends WorkerThread> {
 		return ret;
 	}
 
+        public void shutdown() {
+                for (WorkerThread workerThread : workerThreads) {
+                        workerThread.shutdown();
+                }
+        }
 ///**
 // * Method description
 // *

@@ -83,14 +83,18 @@ public class TLSWrapper {
 	 * @param eventHandler
 	 * @param clientMode
 	 */
-	public TLSWrapper(SSLContext sslc, TLSEventHandler eventHandler, boolean clientMode) {
+	public TLSWrapper(SSLContext sslc, TLSEventHandler eventHandler, String[] sslProtocols, boolean clientMode) {
 		tlsEngine = sslc.createSSLEngine();
 
 		if ( !clientMode) {
 			tlsEngine.getSSLParameters().setWantClientAuth(true);
 		}
-
+                
 		tlsEngine.setUseClientMode(clientMode);
+                if (sslProtocols != null) {
+                        tlsEngine.setEnabledProtocols(sslProtocols);
+                }
+
 		netBuffSize = tlsEngine.getSession().getPacketBufferSize();
 		appBuffSize = tlsEngine.getSession().getApplicationBufferSize();
 		this.eventHandler = eventHandler;
@@ -194,7 +198,7 @@ public class TLSWrapper {
 		if ((tlsEngineResult != null) && (tlsEngineResult.getStatus() == Status.BUFFER_UNDERFLOW)) {
 			status = TLSStatus.UNDERFLOW;
 
-			// status = TLSStatus.NEED_READ;
+//			 status = TLSStatus.NEED_READ;
 		}        // end of if (tlsEngine.getStatus() == Status.BUFFER_UNDERFLOW)
 				else {
 			if ((tlsEngineResult != null) && (tlsEngineResult.getStatus() == Status.CLOSED)) {
@@ -261,6 +265,7 @@ public class TLSWrapper {
 	public ByteBuffer unwrap(ByteBuffer net, ByteBuffer app) throws SSLException {
 		ByteBuffer out = app;
 
+                out.order(app.order());
 		tlsEngineResult = tlsEngine.unwrap(net, out);
 
 		if (log.isLoggable(Level.FINEST)) {
@@ -276,7 +281,7 @@ public class TLSWrapper {
 			}
 		}
 
-		if (tlsEngineResult.getStatus() == Status.BUFFER_OVERFLOW) {
+                if (tlsEngineResult.getStatus() == Status.BUFFER_OVERFLOW) {
 			out = resizeApplicationBuffer(net, out);
 			tlsEngineResult = tlsEngine.unwrap(net, out);
 		}
@@ -359,6 +364,7 @@ public class TLSWrapper {
 		ByteBuffer bb = ByteBuffer.allocate(app.capacity() + 2048);
 
 		// bb.clear();
+                bb.order(app.order());
 		app.flip();
 		bb.put(app);
 

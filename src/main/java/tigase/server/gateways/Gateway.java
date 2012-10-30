@@ -464,7 +464,9 @@ public class Gateway extends AbstractMessageReceiver implements Configurable,
 			repository = RepositoryFactory.getUserRepository(cls_name, res_uri, null);
 
 			try {
-				repository.addUser(getComponentId().getBareJID());
+                                if (!repository.userExists(getComponentId().getBareJID())) {
+                                        repository.addUser(getComponentId().getBareJID());
+                                }
 			} catch (UserExistsException e) { /* Ignore, this is correct and expected */
 			}
 		} catch (Exception e) {

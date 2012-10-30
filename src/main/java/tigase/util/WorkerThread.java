@@ -175,6 +175,11 @@ public abstract class WorkerThread extends Thread {
 	public int size() {
 		return queue.size();
 	}
+        
+        public void shutdown() {
+                stopped = true;
+        }
+        
 }
 
 

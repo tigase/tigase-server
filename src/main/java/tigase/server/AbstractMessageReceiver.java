@@ -24,6 +24,7 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.*;
 import tigase.annotations.TODO;
 
 import tigase.stats.StatisticType;
@@ -37,14 +38,6 @@ import tigase.xml.Element;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -52,6 +45,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import tigase.disco.ServiceEntity;
+import tigase.server.script.CommandIfc;
+import tigase.xmpp.JID;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -564,6 +560,125 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 		return defs;
 	}
 
+       /**
+         * Method description
+         *
+         *
+         * @param node
+         * @param jid
+         * @param from
+         *
+         * @return
+         */
+        @Override
+        public Element getDiscoInfo(String node, JID jid, JID from) {
+                ServiceEntity serviceEntity = getServiceEntity();
+                boolean nonAdminCommands = isNonAdminCommands();
+
+                if (getName().equals(jid.getLocalpart()) || jid.toString().startsWith(getName() + ".")) {
+                        return serviceEntity.getDiscoInfo(node, isAdmin(from) || nonAdminCommands);
+                }
+                return null;
+        }
+
+        /**
+         * Method description
+         *
+         *
+         * @param node
+         * @param jid
+         * @param from
+         *
+         * @return
+         */
+        @Override
+        public List<Element> getDiscoItems(String node, JID jid, JID from) {
+                ServiceEntity serviceEntity = getServiceEntity();
+                Map<String, CommandIfc> scriptCommands = getScriptCommands();
+                boolean nonAdminCommands = isNonAdminCommands();
+                List<Element> result = null;
+                boolean isAdminFrom = isAdmin(from);
+
+                if (getName().equals(jid.getLocalpart()) || jid.toString().startsWith(getName() + ".")) {
+                        if (node != null) {
+                                if (node.equals("http://jabber.org/protocol/commands") && (isAdminFrom || nonAdminCommands)) {
+                                        result = new LinkedList<Element>();
+
+                                        for (CommandIfc comm : scriptCommands.values()) {
+                                                if (!comm.isAdminOnly() || isAdminFrom) {
+                                                        result.add(new Element("item",
+                                                                new String[]{"node", "name", "jid"},
+                                                                new String[]{comm.getCommandId(), comm.getDescription(),
+                                                                        jid.toString()}));
+                                                }
+                                        }
+                                }
+                                else {
+                                        result = serviceEntity.getDiscoItems(node, jid.toString(), (isAdminFrom || nonAdminCommands));
+
+                                }
+                        }
+                        else {
+                                result = serviceEntity.getDiscoItems(null, jid.toString(), (isAdminFrom || nonAdminCommands));
+
+                                if (result != null) {
+                                        for (Iterator<Element> it = result.iterator(); it.hasNext();) {
+                                                Element element = it.next();
+
+                                                if (element.getAttribute("node") == null) {
+                                                        it.remove();
+                                                }
+                                        }
+                                }
+                        }
+
+                        //Element result = serviceEntity.getDiscoItem(null, getName() + "." + jid);
+                        if (log.isLoggable(Level.FINEST)) {
+                                log.log(Level.FINEST, "Found disco items: {0}", (result != null ? result.toString() : null));
+                        }
+
+                        return result;
+                }
+                else {
+                        if (log.isLoggable(Level.FINEST)) {
+                                log.log(Level.FINEST, "{0} General disco items request, node: {1}",
+                                        new Object[]{getName(),
+                                                node});
+                        }
+                        if (node == null) {
+                                if (log.isLoggable(Level.FINEST)) {
+                                        log.log(Level.FINEST, "{0} Disco items request for null node",
+                                                new Object[]{getName()});
+                                }
+                                Element res = null;
+                                if (!serviceEntity.isAdminOnly() || isAdmin(from)) {
+                                        res = serviceEntity.getDiscoItem(null, isSubdomain() ? (getName() + "." + jid) : getName() + "@" + jid.toString());
+                                }
+
+                                result = serviceEntity.getDiscoItems(null, null, (isAdminFrom || nonAdminCommands));
+
+                                if (res != null) {
+                                        if (result != null) {
+                                                for (Iterator<Element> it = result.iterator(); it.hasNext();) {
+                                                        Element element = it.next();
+
+                                                        if (element.getAttribute("node") != null) {
+                                                                it.remove();
+                                                        }
+                                                }
+
+                                                result.add(0, res);
+                                        }
+                                        else {
+                                                result = Arrays.asList(res);
+                                        }
+                                }
+                        }
+
+                        return result;
+                }
+        }
+        
 	/**
 	 * Method returns a <code>Set</code> with all component's routings as a
 	 * compiled regular expression patterns. The <code>Set</code> can be empty but
@@ -1092,7 +1207,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 		receiverTasks.schedule(task, unit.toMillis(delay));
 	}
 
-	protected void addTimerTask(TimerTask task, long delay) {
+	public void addTimerTask(TimerTask task, long delay) {
 		receiverTasks.schedule(task, delay);
 	}
 

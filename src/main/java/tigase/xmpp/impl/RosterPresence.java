@@ -24,6 +24,7 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.List;
 import tigase.db.NonAuthUserRepository;
 
 import tigase.server.Packet;
@@ -43,6 +44,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.xmpp.*;
+import tigase.xmpp.impl.roster.RosterFactory;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -73,6 +76,7 @@ public class RosterPresence extends XMPPProcessor implements XMPPProcessorIfc, X
 
 	private JabberIqRoster rosterProc = new JabberIqRoster();
 	private Presence presenceProc = new Presence();
+        private static final RosterAbstract roster_util = RosterFactory.getRosterImplementation(true);
 
 	//~--- methods --------------------------------------------------------------
 
@@ -131,11 +135,83 @@ public class RosterPresence extends XMPPProcessor implements XMPPProcessorIfc, X
 			return;
 		}
 
-		if (packet.getElemName().equals(PRESENCE)) {
-			presenceProc.process(packet, session, repo, results, settings);
-		} else {
-			rosterProc.process(packet, session, repo, results, settings);
-		}
+                if (packet.getElemName().equals(PRESENCE)) {
+                        presenceProc.process(packet, session, repo, results, settings);
+                }
+                else {
+                        if (packet.getStanzaTo() != null && packet.getStanzaFrom() != null
+                                && session.isUserId(packet.getStanzaTo().getBareJID())
+                                && !session.isUserId(packet.getStanzaFrom().getBareJID())) {
+                                if (!RemoteRosterManagement.isRemoteAllowed(packet.getStanzaFrom(), session)) {
+                                        results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet, "Not authorized for remote roster management", true));
+                                        return;
+                                }
+                                try {
+                                        switch (packet.getType()) {
+                                                case get:
+                                                        List<Element> ritems = roster_util.getRosterItems(session);
+                                                        if (ritems != null && !ritems.isEmpty()) {
+                                                                Element query = new Element("query");
+                                                                query.setXMLNS(RosterAbstract.XMLNS);
+                                                                String jidStr = "@"+packet.getStanzaFrom().getBareJID().toString();
+                                                                for (Element ritem : ritems) {
+                                                                        if (ritem.getAttribute("jid").endsWith(jidStr)) {
+                                                                                query.addChild(ritem);
+                                                                        }
+                                                                }
+                                                                results.offer(packet.okResult(query, 0));
+                                                        }
+                                                        else {
+                                                                results.offer(packet.okResult((String) null, 1));
+                                                        }
+                                                        break;
+
+                                                case set:
+//                                                        processSetMethod.invoke(rosterProc, new Object[]{
+//                                                                        packet, session, results, settings
+//                                                                });
+//                                                        List<Element> nitems = packet.getElemChildren("/iq/query");
+//                                                        if (nitems != null) {
+//                                                                for (Element nitem : nitems) {
+//                                                                        JID buddy = JID.jidInstanceNS(nitem.getAttribute("jid"));
+//                                                                        String name = nitem.getAttribute("name");
+//                                                                        String subscrStr = nitem.getAttribute("subscription");
+//                                                                        RosterAbstract.SubscriptionType subscr = subscrStr == null ? null : RosterAbstract.SubscriptionType.valueOf(subscrStr);
+//                                                                        String[] groups = null;
+//                                                                        List<Element> ngroups = nitem.getChildren();
+//                                                                        if (ngroups != null && !ngroups.isEmpty()) {
+//                                                                                int i = 0;
+//                                                                                groups = new String[ngroups.size()];
+//                                                                                for (Element group : nitem.getChildren()) {
+//                                                                                        groups[i++] = group.getCData() == null ? "" : group.getCData();
+//                                                                                }
+//                                                                        }
+//                                                                        roster_util.addBuddy(session, buddy, name, groups, null);
+//                                                                        roster_util.setBuddySubscription(session, subscr, buddy);
+//                                                                        
+//                                                                        Element item = roster_util.getBuddyItem(session, buddy);
+//                                                                        roster_util.updateBuddyChange(session, results, item);
+//                                                                }
+//                                                        }
+//                                                        
+//                                                        results.offer(packet.okResult((String) null, 0));
+                                                        rosterProc.processSetRequest(packet, session, results, settings);
+                                                        break;
+
+                                                default:
+                                                        results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Bad stanza type", true));
+                                                        break;
+                                        }
+                                }
+                                catch (Throwable ex) {
+                                        log.log(Level.WARNING, "Reflection execution exception", ex);
+                                        results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet, "Internal server error", true));
+                                }
+                        }
+                        else {
+                                rosterProc.process(packet, session, repo, results, settings);
+                        }
+                }                
 	}
 
 	/**

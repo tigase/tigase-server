@@ -226,7 +226,7 @@ public interface SSLContextContainerIfc {
 	 *            SSLContext.
 	 * @return a <code>SSLContext</code> value
 	 */
-	SSLContext getSSLContext(String protocol, String hostname);
+	SSLContext getSSLContext(String protocol, String hostname, boolean clientMode);
 
 	/**
 	 * Returns a trust store with all trusted certificates.

@@ -83,17 +83,7 @@ import static tigase.server.xmppsession.SessionManagerConfig.*;
 
 import java.security.Security;
 
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.TimerTask;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -102,6 +92,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.script.Bindings;
+import tigase.xmpp.impl.PresenceCapabilitiesManager;
 
 /**
  * Class SessionManager
@@ -749,7 +740,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 			}
 		}
 
-		try {
+                Set<String> keys = new HashSet<String>(processors.keySet());
+                try {
 			String sm_threads_pool = (String) props.get(SM_THREADS_POOL_PROP_KEY);
 
 			if (!sm_threads_pool.equals(SM_THREADS_POOL_PROP_VAL)) {
@@ -776,14 +768,16 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 				log.log(Level.CONFIG, "Created a default thread pool: {0}", def_pool_size);
 			}
 
-			String[] plugins = (String[]) props.get(PLUGINS_PROP_KEY);
+			String[] plugins = SessionManagerConfig.getActivePlugins(props);
 
 			log.log(Level.CONFIG, "Loaded plugins list: {0}", Arrays.toString(plugins));
 
 			// maxPluginsNo = plugins.length;
-			processors.clear();
+			//processors.clear();
 
 			for (String plug_id : plugins) {
+                                keys.remove(plug_id);
+                                
 				log.log(Level.CONFIG, "Loading and configuring plugin: {0}", plug_id);
 
 				XMPPImplIfc plugin = addPlugin(plug_id, plugins_concurrency.get(plug_id));
@@ -804,13 +798,16 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 					} catch (TigaseDBException ex) {
 						log.log(Level.SEVERE, "Problem initializing plugin: " + plugin.id(), ex);
 					}
-					allPlugins.add(plugin);
 				}
 			} // end of for (String comp_id: plugins)
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Problem with component initialization: " + getName(), e);
 		}
 
+                for (String key : keys) {
+                        removePlugin(key);
+                }
+                
 		smResourceConnection =
 				new SMResourceConnection(null, user_repository, auth_repository, this);
 		registerNewSession(getComponentId().getBareJID(), smResourceConnection);
@@ -914,7 +911,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 							}
 						} // end of else
 
-						auth_repository.logout(userJid.getBareJID());
+        						auth_repository.logout(userJid.getBareJID());
 					} else {
 						if (log.isLoggable(Level.FINER)) {
 							StringBuilder sb = new StringBuilder(100);
@@ -1737,7 +1734,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		}
 	}
 
-	private XMPPImplIfc addPlugin(String plug_id, Integer conc)
+	public XMPPImplIfc addPlugin(String plug_id, Integer conc)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		XMPPImplIfc result = null;
 		XMPPProcessorIfc proc = null;
@@ -1758,7 +1755,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		}
 
 		if (proc == null) {
-			proc = ProcessorFactory.getProcessor(plug_id);
+			proc = SessionManagerConfig.getProcessor(plug_id);
 		}
 
 		boolean loaded = false;
@@ -1790,7 +1787,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 			result = proc;
 		}
 
-		XMPPPreprocessorIfc preproc = ProcessorFactory.getPreprocessor(plug_id);
+		XMPPPreprocessorIfc preproc = SessionManagerConfig.getPreprocessor(plug_id);
 
 		if (preproc != null) {
 			preProcessors.put(plug_id, preproc);
@@ -1800,7 +1797,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 			result = preproc;
 		}
 
-		XMPPPostprocessorIfc postproc = ProcessorFactory.getPostprocessor(plug_id);
+		XMPPPostprocessorIfc postproc = SessionManagerConfig.getPostprocessor(plug_id);
 
 		if (postproc != null) {
 			postProcessors.put(plug_id, postproc);
@@ -1810,7 +1807,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 			result = postproc;
 		}
 
-		XMPPStopListenerIfc stoplist = ProcessorFactory.getStopListener(plug_id);
+		XMPPStopListenerIfc stoplist = SessionManagerConfig.getStopListener(plug_id);
 
 		if (stoplist != null) {
 			stopListeners.put(plug_id, stoplist);
@@ -1820,7 +1817,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 			result = stoplist;
 		}
 
-		XMPPPacketFilterIfc filterproc = ProcessorFactory.getPacketFilter(plug_id);
+		XMPPPacketFilterIfc filterproc = SessionManagerConfig.getPacketFilter(plug_id);
 
 		if (filterproc != null) {
 			outFilters.put(plug_id, filterproc);
@@ -1834,9 +1831,48 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 			log.log(Level.WARNING, "No implementation found for plugin id: {0}", plug_id);
 		} // end of if (!loaded)
 
+                if (result != null) {
+                        allPlugins.add(result);
+                        
+                        if (result instanceof PresenceCapabilitiesManager.PresenceCapabilitiesListener) {
+                                PresenceCapabilitiesManager.registerPresenceHandler((PresenceCapabilitiesManager.PresenceCapabilitiesListener) result);
+                        }
+                }
+                
 		return result;
 	}
 
+        public void removePlugin(String plug_id) {
+                if (log.isLoggable(Level.FINEST)) {
+                        log.log(Level.FINEST, "Removing plugin {0}", plug_id);
+                }
+                XMPPImplIfc p = null;
+                ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.remove(plug_id);
+                if (pt != null) {
+                        p = processors.remove(plug_id);
+                        pt.shutdown();
+                        if (p != null) {
+                                allPlugins.remove(p);
+                        }
+                }
+                if (preProcessors.get(plug_id) != null) {
+                        p = preProcessors.remove(plug_id);
+                        allPlugins.remove(p);
+                }
+                if (postProcessors.get(plug_id) != null) {
+                        p = postProcessors.remove(plug_id);
+                        allPlugins.remove(p);
+                }
+                if (stopListeners.get(plug_id) != null) {
+                        p = stopListeners.remove(plug_id);
+                        allPlugins.remove(p);
+                }
+                
+                if (p != null && p instanceof PresenceCapabilitiesManager.PresenceCapabilitiesListener) {
+                        PresenceCapabilitiesManager.unregisterPresenceHandler((PresenceCapabilitiesManager.PresenceCapabilitiesListener) p);
+                }
+        }
+        
 	private List<Element> getFeatures(XMPPResourceConnection session) {
 		List<Element> results = new LinkedList<Element>();
 
@@ -1894,6 +1930,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 				}
 			}
 		}
+                
+                plugin_settings.put("sm-jid", getComponentId());
 
 		return plugin_settings;
 	}

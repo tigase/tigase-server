@@ -25,8 +25,7 @@ package tigase.net;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.IOException;
-
-import java.net.InetSocketAddress;
+import java.net.*;
 
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
@@ -42,6 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.util.DNSEntry;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -368,7 +368,22 @@ public class ConnectionOpenThread implements Runnable {
 	}
 
 	private void addPort(ConnectionOpenListener al) throws IOException {
-		if ((al.getIfcs() == null) || (al.getIfcs().length == 0) || al.getIfcs()[0].equals("ifc")
+            if (al.getConnectionType() == ConnectionType.connect) {
+
+                if (al.getRemoteAddress() != null) {
+                    addISA(al.getRemoteAddress(), al);
+                    return;
+                }
+
+                DNSEntry entry = DNSResolver.getHostSRV_Entry(al.getRemoteHostname(), al.getSRVType(), al.getPort());
+
+                if (entry != null) {
+                    InetSocketAddress addr = new InetSocketAddress(entry.getIp(), entry.getPort());
+
+                    addISA(addr, al);
+                }
+            } else {
+                if ((al.getIfcs() == null) || (al.getIfcs().length == 0) || al.getIfcs()[0].equals("ifc")
 				|| al.getIfcs()[0].equals("*")) {
 			addISA(new InetSocketAddress(al.getPort()), al);
 		} else {
@@ -376,6 +391,7 @@ public class ConnectionOpenThread implements Runnable {
 				addISA(new InetSocketAddress(ifc, al.getPort()), al);
 			}    // end of for ()
 		}      // end of if (ip == null || ip.equals("")) else
+            }
 	}
 
 	//~--- get methods ----------------------------------------------------------

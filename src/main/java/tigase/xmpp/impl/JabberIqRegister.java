@@ -67,6 +67,7 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 
 	/**
 	 * Private logger for class instances.
+>>>>>>> tigase/master
 	 */
 	private static Logger log = Logger.getLogger(JabberIqRegister.class.getName());
 	private static final String ID = "jabber:iq:register";

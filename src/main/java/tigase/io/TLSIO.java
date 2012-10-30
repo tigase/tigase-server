@@ -32,6 +32,7 @@ import java.io.EOFException;
 import java.io.IOException;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.SocketChannel;
 
 import java.util.logging.Level;
@@ -94,11 +95,12 @@ public class TLSIO implements IOInterface {
 	 * 
 	 * @throws IOException
 	 */
-	public TLSIO(final IOInterface ioi, final TLSWrapper wrapper) throws IOException {
+	public TLSIO(final IOInterface ioi, final TLSWrapper wrapper, final ByteOrder order) throws IOException {
 		io = ioi;
 		tlsWrapper = wrapper;
 		tlsWrapper.setDebugId(toString());
 		tlsInput = ByteBuffer.allocate(tlsWrapper.getAppBuffSize());
+                tlsInput.order(order);
 
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "TLS Socket created: {0}", io.toString());

@@ -709,6 +709,7 @@ public class CIDConnections {
 		port_props.put("ifc", new String[] { ip });
 		port_props.put("socket", SocketType.plain);
 		port_props.put("type", ConnectionType.connect);
+                port_props.put("srv-type", "_xmpp-server._tcp");
 		port_props.put("port-no", port);
 		port_props.put("cid", cid);
 

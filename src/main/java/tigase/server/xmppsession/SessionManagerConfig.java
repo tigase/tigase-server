@@ -1,6 +1,6 @@
 /*
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+* Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,15 +24,17 @@ package tigase.server.xmppsession;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.osgi.ModulesManagerImpl;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import tigase.util.DNSResolver;
 
 import static tigase.conf.Configurable.*;
+import tigase.xmpp.*;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Map;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -79,8 +81,7 @@ public abstract class SessionManagerConfig {
 		"http://jabber.org/protocol/commands", "jabber:iq:private", "urn:xmpp:ping", "presence",
 
 		// "basic-filter",
-		"domain-filter", "disco", "pep",
-		"amp"
+                "disco", "domain-filter", "zlib", "amp"
 	};
 
 	/**
@@ -95,8 +96,7 @@ public abstract class SessionManagerConfig {
 		"http://jabber.org/protocol/commands", "jabber:iq:private", "urn:xmpp:ping", "presence",
 
 		// "basic-filter",
-		"domain-filter", "disco", "pep",
-		"amp"
+                "disco", "domain-filter", "zlib", "amp"
 	};
 	private static final String[] PLUGINS_FULL_PROP_VAL = {
 		sessionCloseProcId, sessionOpenProcId, defaultHandlerProcId, "jabber:iq:register",
@@ -106,8 +106,7 @@ public abstract class SessionManagerConfig {
 		"http://jabber.org/protocol/commands", "jabber:iq:private", "urn:xmpp:ping", "presence",
 
 		// "basic-filter",
-		"domain-filter", "disco", "pep",
-		"amp"
+                "disco", "domain-filter", "zlib", "amp"
 	};
 	private static String[] HOSTNAMES_PROP_VAL = { "localhost", "hostname" };
 	private static String[] ANONYMOUS_DOMAINS_PROP_VAL = { "localhost", "hostname" };
@@ -234,6 +233,29 @@ public abstract class SessionManagerConfig {
 		props.put(SM_THREADS_POOL_PROP_KEY, sm_threads_pool);
 	}
 
+        /**
+         * Returns list of active plugins with implementation available
+         * 
+         * @param props
+         * @return 
+         */
+        public static String[] getActivePlugins(Map<String, Object> props) {
+                String[] allPlugins = (String[]) props.get(PLUGINS_PROP_KEY);
+                List<String> plugins = new ArrayList<String>();
+                for (String plugin_id : allPlugins) {
+                        // this plugins are not in ModulesManager and not in ProcessorFactory
+                        if (sessionCloseProcId.equals(plugin_id) || sessionOpenProcId.equals(plugin_id) 
+                                || defaultHandlerProcId.equals(plugin_id)) {
+                                plugins.add(plugin_id);
+                        }
+                        else if (ModulesManagerImpl.getInstance().hasPluginForId(plugin_id)
+                                || ProcessorFactory.hasImplementation(plugin_id)) {
+                                plugins.add(plugin_id);
+                        }
+                }
+                return plugins.toArray(new String[plugins.size()]);
+        }
+        
 	//~--- methods --------------------------------------------------------------
 
 	private static boolean addPlugin(LinkedHashSet<String> plugins, String plugin) {
@@ -243,6 +265,121 @@ public abstract class SessionManagerConfig {
 
 		return pla.length > 1;
 	}
+
+        /**
+         * Get processor instance
+         * 
+         * @param plug_id
+         * @return 
+         */
+        public static XMPPProcessorIfc getProcessor(String plug_id) {
+                XMPPImplIfc proc = getXMPPImplIfc(plug_id);
+
+                if (proc == null) {
+                        return ProcessorFactory.getProcessor(plug_id);
+                }
+
+                if (proc instanceof XMPPProcessorIfc) {
+                        return (XMPPProcessorIfc) proc;
+                }
+
+                return null;
+        }
+
+        /**
+         * Get preprocessor instance
+         * 
+         * @param plug_id
+         * @return 
+         */
+        public static XMPPPreprocessorIfc getPreprocessor(String plug_id) {
+                XMPPImplIfc proc = getXMPPImplIfc(plug_id);
+
+                if (proc == null) {
+                        return ProcessorFactory.getPreprocessor(plug_id);
+                }
+
+                if (proc instanceof XMPPPreprocessorIfc) {
+                        return (XMPPPreprocessorIfc) proc;
+                }
+
+                return null;
+        }
+
+        /**
+         * Get postprocessor instance
+         * 
+         * @param plug_id
+         * @return 
+         */
+        public static XMPPPostprocessorIfc getPostprocessor(String plug_id) {
+                XMPPImplIfc proc = getXMPPImplIfc(plug_id);
+
+                if (proc == null) {
+                        return ProcessorFactory.getPostprocessor(plug_id);
+                }
+
+                if (proc instanceof XMPPPostprocessorIfc) {
+                        return (XMPPPostprocessorIfc) proc;
+                }
+
+                return null;
+        }
+
+        /**
+         * Get packetfilter instance
+         * 
+         * @param plug_id
+         * @return 
+         */
+        public static XMPPPacketFilterIfc getPacketFilter(String plug_id) {
+                XMPPImplIfc proc = getXMPPImplIfc(plug_id);
+
+                if (proc == null) {
+                        return ProcessorFactory.getPacketFilter(plug_id);
+                }
+
+                if (proc instanceof XMPPPacketFilterIfc) {
+                        return (XMPPPacketFilterIfc) proc;
+                }
+
+                return null;
+        }
+
+        /**
+         * Get stoplistener instance
+         * 
+         * @param plug_id
+         * @return 
+         */
+        public static XMPPStopListenerIfc getStopListener(String plug_id) {
+                XMPPImplIfc proc = getXMPPImplIfc(plug_id);
+
+                if (proc == null) {
+                        return ProcessorFactory.getStopListener(plug_id);
+                }
+
+                if (proc instanceof XMPPStopListenerIfc) {
+                        return (XMPPStopListenerIfc) proc;
+                }
+
+                return null;
+        }
+        
+        private static XMPPImplIfc getXMPPImplIfc(String plug_id) {
+                XMPPImplIfc proc = null;
+                
+                try {
+                        proc = ModulesManagerImpl.getInstance().getPlugin(plug_id);
+                } catch (InstantiationException ex) {
+                        Logger.getLogger(SessionManagerConfig.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalAccessException ex) {
+                        Logger.getLogger(SessionManagerConfig.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                return proc;
+        }
+        
 }    // SessionManagerConfig
 
 
