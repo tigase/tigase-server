@@ -919,7 +919,7 @@ public class BoshSession {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Canceling waitTimer: " + getSid());
 			}
-			handler.cancelTask();
+			handler.cancelTask(timer);
 		} else {
 			log.info("No waitTimer for the Bosh connection! " + serv);
 		}
