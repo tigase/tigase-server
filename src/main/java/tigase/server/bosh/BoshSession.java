@@ -914,9 +914,14 @@ public class BoshSession {
 	}
 
 	private synchronized void sendBody(BoshIOService serv, Element body_par) {
-		handler.cancelTask(serv.getWaitTimer());
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Canceling waitTimer: " + getSid());
+		BoshTask timer = serv.getWaitTimer();
+		if (timer != null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Canceling waitTimer: " + getSid());
+			}
+			handler.cancelTask();
+		} else {
+			log.info("No waitTimer for the Bosh connection! " + serv);
 		}
 
 		Element body = body_par;
