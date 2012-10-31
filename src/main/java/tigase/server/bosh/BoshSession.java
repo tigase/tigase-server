@@ -184,8 +184,9 @@ public class BoshSession {
 			log.finest("Disconnected called for: " + bios.getUniqueId());
 		}
 
-		if (bios != null) {
-			connections.remove(bios);
+		if (bios != null && bios.getWaitTimer() != null) {
+			handler.cancelTask(bios.getWaitTimer());
+			connections.remove(bios.getWaitTimer());
 		}
 
 		if (inactivityTimer != null) {
