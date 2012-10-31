@@ -32,6 +32,7 @@ import tigase.stats.StatisticsList;
 
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
+import tigase.xmpp.BareJID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
@@ -49,7 +50,6 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.xmpp.*;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -93,7 +93,7 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 	private ReceiverTimeoutHandler startedHandler = newStartedHandler();
 	// This should be actually a multi-thread save variable.
 	// Changing it to
-	private final Map<UUID, BoshSession> sessions =
+	protected final Map<UUID, BoshSession> sessions =
 			new ConcurrentSkipListMap<UUID, BoshSession>();
 
 	@Override
@@ -147,7 +147,7 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 	 * @param tt
 	 */
 	@Override
-	public void cancelTask(TimerTask tt) {
+	public void cancelTask(BoshTask tt) {
 		tt.cancel();
 	}
 
@@ -290,8 +290,8 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 	 * @return
 	 */
 	@Override
-	public TimerTask scheduleTask(BoshSession bs, long delay) {
-		BoshTask bt = new BoshTask(bs);
+	public BoshTask scheduleTask(BoshSession bs, long delay) {
+		BoshTask bt = new BoshTask(bs, this);
 
 		addTimerTask(bt, delay);
 
@@ -591,7 +591,7 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 		}
 	}
 
-	private void addOutPackets(Queue<Packet> out_results, BoshSession bs) {
+	protected void addOutPackets(Queue<Packet> out_results, BoshSession bs) {
 		for (Packet res : out_results) {
 			res.setPacketFrom(getFromAddress(bs.getSid().toString()));
 			res.setPacketTo(bs.getDataReceiver());
@@ -618,40 +618,6 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 	}
 
 	// ~--- inner classes --------------------------------------------------------
-
-	private class BoshTask extends TimerTask {
-		private BoshSession bs = null;
-
-		// ~--- constructors -------------------------------------------------------
-
-		/**
-		 * Constructs ...
-		 * 
-		 * 
-		 * @param bs
-		 */
-		public BoshTask(BoshSession bs) {
-			this.bs = bs;
-		}
-
-		// ~--- methods ------------------------------------------------------------
-
-		/**
-		 * Method description
-		 * 
-		 */
-		@Override
-		public void run() {
-			Queue<Packet> out_results = new ArrayDeque<Packet>();
-
-			if (bs.task(out_results, this)) {
-				log.fine("Closing session for BS task: " + bs.getSid());
-				sessions.remove(bs.getSid());
-			}
-
-			addOutPackets(out_results, bs);
-		}
-	}
 
 	private class StartedHandler implements ReceiverTimeoutHandler {
 
