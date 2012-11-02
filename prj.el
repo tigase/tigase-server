@@ -5,6 +5,9 @@
  '(jde-gen-k&r t)
  '(indent-tabs-mode t)
  '(user-mail-address "artur.hefczyc@tigase.org")
+ '(jde-import-auto-collapse-imports nil)
+ '(jde-import-auto-sort t)
+ '(jde-auto-parse-buffer-interval 600)
  '(jde-global-classpath
 	 (quote
 		(

@@ -398,6 +398,30 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 		}
 	}
 
+	public long getBytesSent(boolean reset) {
+		return socketIO.getBytesSent(reset);
+	}
+
+	public long getTotalBytesSent() {
+		return socketIO.getTotalBytesSent();
+	}
+
+	public long getBytesReceived(boolean reset) {
+		return socketIO.getBytesReceived(reset);
+	}
+
+	public long getTotalBytesReceived() {
+		return socketIO.getTotalBytesReceived();
+	}
+
+	public long getBuffOverflow(boolean reset) {
+		return socketIO.getBuffOverflow(reset);
+	}
+
+	public long getTotalBuffOverflow() {
+		return socketIO.getTotalBuffOverflow();
+	}
+
 	/**
 	 * Method description
 	 * 

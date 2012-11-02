@@ -88,6 +88,36 @@ public class ZLibIO implements IOInterface {
 		return io.bytesRead();
 	}
 
+	@Override
+	public long getBytesSent(boolean reset) {
+		return io.getBytesSent(reset);
+	}
+
+	@Override
+	public long getTotalBytesSent() {
+		return io.getTotalBytesSent();
+	}
+
+	@Override
+	public long getBytesReceived(boolean reset) {
+		return io.getBytesReceived(reset);
+	}
+
+	@Override
+	public long getTotalBytesReceived() {
+		return io.getTotalBytesReceived();
+	}
+
+	@Override
+	public long getBuffOverflow(boolean reset) {
+		return io.getBuffOverflow(reset);
+	}
+
+	@Override
+	public long getTotalBuffOverflow() {
+		return io.getTotalBuffOverflow();
+	}
+
 	/**
 	 * Method description
 	 *
