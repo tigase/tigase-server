@@ -59,36 +59,40 @@ public class DataTypes {
 
 	// public static char[] sizeChars = {'k', 'K', 'm', 'M', 'g', 'G', 't', 'T'};
 
-	public static int parseSizeInt(String size, int def) {
-		if (size == null) {
+	public static <T extends Number> T parseNum(String num, Class<T> cls, T def) {
+		if (num == null) {
 			return def;
 		}
-		int result = def;
-		String toParse = size;
-		int multiplier = 1;
+		T result = def;
+		String toParse = num;
+		long multiplier = 1;
 		try {
-			switch (size.charAt(size.length() - 1)) {
+			switch (num.charAt(num.length() - 1)) {
 				case 'k':
 				case 'K':
 					multiplier = 1024;
-					toParse = size.substring(0, size.length() - 1);
+					toParse = num.substring(0, num.length() - 1);
 					break;
 				case 'm':
 				case 'M':
 					multiplier = 1024 * 1024;
-					toParse = size.substring(0, size.length() - 1);
+					toParse = num.substring(0, num.length() - 1);
 					break;
 				case 'g':
 				case 'G':
 					multiplier = 1024 * 1024 * 1024;
-					toParse = size.substring(0, size.length() - 1);
+					toParse = num.substring(0, num.length() - 1);
 					break;
 			}
-			result = Integer.parseInt(toParse) * multiplier;
+			result = cls.cast(Long.valueOf(Long.parseLong(toParse) * multiplier));
 		} catch (Exception e) {
 			return def;
 		}
 		return result;
+	}
+
+	public static int parseSizeInt(String size, int def) {
+		return parseNum(size, Integer.class, def);
 	}
 
 	public static boolean parseBool(final String val) {

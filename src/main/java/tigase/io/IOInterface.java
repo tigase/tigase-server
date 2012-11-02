@@ -57,6 +57,18 @@ public interface IOInterface {
 
 	void getStatistics(StatisticsList list, boolean reset);
 
+	long getBytesSent(boolean reset);
+
+	long getTotalBytesSent();
+
+	long getBytesReceived(boolean reset);
+
+	long getTotalBytesReceived();
+
+	long getBuffOverflow(boolean reset);
+
+	long getTotalBuffOverflow();
+
 	boolean isConnected();
 
 	boolean isRemoteAddress(String addr);

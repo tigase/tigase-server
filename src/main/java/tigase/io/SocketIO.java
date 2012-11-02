@@ -59,14 +59,19 @@ public class SocketIO implements IOInterface {
 
 	private static final String MAX_USER_IO_QUEUE_SIZE_PROP_KEY = "max-user-io-queue-size";
 	private static final int MAX_USER_IO_QUEUE_SIZE_PROP_DEF = 1000;
-	private long buffOverflow = 0;
 	private int bytesRead = 0;
-	private long bytesReceived = 0;
-	private long bytesSent = 0;
 	private SocketChannel channel = null;
 	private Queue<ByteBuffer> dataToSend = null;
 	private String remoteAddress = null;
 	private String logId = null;
+
+	private long totalBuffOverflow = 0;
+	private long totalBytesSent = 0;
+	private long totalBytesReceived = 0;
+	private long buffOverflow = 0;
+	private long bytesSent = 0;
+	private long bytesReceived = 0;
+
 
 	// ~--- constructors ---------------------------------------------------------
 
@@ -157,12 +162,51 @@ public class SocketIO implements IOInterface {
 		list.add("socketio", "Bytes sent", bytesSent, Level.FINE);
 		list.add("socketio", "Bytes received", bytesReceived, Level.FINE);
 		list.add("socketio", "Buffers overflow", buffOverflow, Level.FINE);
+		list.add("socketio", "Total bytes sent", totalBytesSent, Level.FINE);
+		list.add("socketio", "Total bytes received", totalBytesReceived, Level.FINE);
+		list.add("socketio", "Ttoal buffers overflow", totalBuffOverflow, Level.FINE);
 
 		if (reset) {
 			bytesSent = 0;
 			bytesReceived = 0;
 			buffOverflow = 0;
 		}
+	}
+
+	public long getBytesSent(boolean reset) {
+		long tmp = bytesSent;
+		if (reset) {
+			bytesSent = 0;
+		}
+		return tmp;
+	}
+
+	public long getTotalBytesSent() {
+		return totalBytesSent;
+	}
+
+	public long getBytesReceived(boolean reset) {
+		long tmp = bytesReceived;
+		if (reset) {
+			bytesReceived = 0;
+		}
+		return tmp;
+	}
+
+	public long getTotalBytesReceived() {
+		return totalBytesReceived;
+	}
+
+	public long getBuffOverflow(boolean reset) {
+		long tmp = buffOverflow;
+		if (reset) {
+			buffOverflow = 0;
+		}
+		return tmp;
+	}
+
+	public long getTotalBuffOverflow() {
+		return totalBuffOverflow;
 	}
 
 	/**
@@ -221,6 +265,7 @@ public class SocketIO implements IOInterface {
 		if (bytesRead > 0) {
 			buff.flip();
 			bytesReceived += bytesRead;
+			totalBytesReceived += bytesRead;
 		}
 
 		return buff;
@@ -308,6 +353,7 @@ public class SocketIO implements IOInterface {
 
 			if (!dataToSend.offer(buff)) {
 				++buffOverflow;
+				++totalBuffOverflow;
 			}
 		}
 
@@ -358,6 +404,7 @@ public class SocketIO implements IOInterface {
 		// log.warning("Wrote to channel " + result + " bytes.");
 		// }
 		bytesSent += result;
+		totalBytesSent += result;
 
 		return result;
 	}

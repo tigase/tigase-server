@@ -111,6 +111,11 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 	/** Field description */
 	public ReentrantLock writeInProgress = new ReentrantLock();
 
+	private long packetsSent = 0;
+	private long totalPacketsSent = 0;
+	private long packetsReceived = 0;
+	private long totalPacketsReceived = 0;
+
 	// ~--- constructors ---------------------------------------------------------
 
 	// /**
@@ -160,6 +165,30 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 		this.strict_ack = strict;
 	}
 
+	public long getPacketsSent(boolean reset) {
+		long tmp = packetsSent;
+		if (reset) {
+			packetsSent = 0;
+		}
+		return tmp;
+	}
+
+	public long getTotalPacketsSent() {
+		return totalPacketsSent;
+	}
+
+	public long getPacketsReceived(boolean reset) {
+		long tmp = packetsReceived;
+		if (reset) {
+			packetsReceived = 0;
+		}
+		return tmp;
+	}
+
+	public long getTotalPacketsReceived() {
+		return totalPacketsReceived;
+	}
+
 	// ~--- methods --------------------------------------------------------------
 
 	/**
@@ -181,6 +210,7 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 					new Object[] { toString(), req, packet });
 			}
 		}
+		++packetsSent; ++totalPacketsSent;
 		waitingPackets.offer(packet);
 
 	}
@@ -366,6 +396,7 @@ public class XMPPIOService<RefObject> extends IOService<RefObject> {
 			String ack_id = packet.getAttribute(ID_ATT);
 		} else {
 			sendAck(packet);
+			++packetsReceived; ++totalPacketsReceived;
 			receivedPackets.offer(packet);
 		}
 	}
