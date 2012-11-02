@@ -228,7 +228,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		}
 
 		props.put(prop_key, tmp);
-		log.warning("Set property: (" + prop_key + ", " + tmp + ")");
+		//		log.warning("Set property: (" + prop_key + ", " + tmp + ")");
 	}
 
 	/**
@@ -459,16 +459,16 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		if (xmppLimitHit) {
 			switch (xmppLimitAction) {
 			case DROP_PACKETS:
-				if (log.isLoggable(Level.WARNING)) {
-					log.log(Level.WARNING,
+				if (log.isLoggable(Level.FINE)) {
+					log.log(Level.FINE,
 						"[[{0}]] XMPP Limits exceeded on connection {1} dropping pakcets: {2}",
 						new Object[] { getName(), serv, serv.getReceivedPackets() });
 				}
 				while (serv.getReceivedPackets().poll() != null) ;
 				break;
 			default:
-				if (log.isLoggable(Level.WARNING)) {
-					log.log(Level.WARNING,
+				if (log.isLoggable(Level.FINE)) {
+					log.log(Level.FINE,
 						"[[{0}]] XMPP Limits exceeded on connection {1} stopping, packets dropped: {2}",
 						new Object[] { getName(), serv, serv.getReceivedPackets() });
 				}
@@ -491,8 +491,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				totalSent >= total_bin_limit;
 		}
 		if (binLimitHit) {
-			if (log.isLoggable(Level.WARNING)) {
-				log.log(Level.WARNING,
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE,
 					"[[{0}]] Binary Limits exceeded ({1}:{2}:{3}:{4}) on connection {5} stopping, packets dropped: {6}",
 					new Object[] { getName(), bytesSent, bytesReceived, totalSent, totalReceived,
 												 serv, serv.getReceivedPackets() });
