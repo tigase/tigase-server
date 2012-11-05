@@ -7,7 +7,7 @@
 	<groupId>tigase</groupId>
 	<artifactId>tigase-server</artifactId>
 	<name>Tigase XMPP Server</name>
-	<version>5.1.3</version>
+	<version>5.2.0-SNAPSHOT</version>
 	<description>Tigase XMPP Server</description>
 	<url>http://www.tigase.org/</url>
 	<issueManagement>
@@ -122,13 +122,13 @@
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-utils</artifactId>
-			<version>3.4.0</version>
+			<version>3.4.1-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-xmltools</artifactId>
-			<version>3.4.2</version>
+			<version>3.4.3-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
