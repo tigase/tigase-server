@@ -64,23 +64,34 @@ import javax.script.Bindings;
 
 /**
  * Describe class ConnectionManager here.
- * 
- * 
+ *
+ *
  * Created: Sun Jan 22 22:52:58 2006
- * 
+ *
  * @param <IO>
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
-		AbstractMessageReceiver implements XMPPIOServiceListener<IO> {
-	private static final Logger log = Logger.getLogger(ConnectionManager.class.getName());
+public abstract class ConnectionManager<IO extends XMPPIOService<?>>
+	extends AbstractMessageReceiver implements XMPPIOServiceListener<IO> {
 
-	/** Field description */
+	private static final Logger log =
+		Logger.getLogger(ConnectionManager.class.getName());
+
+	/** Field description. */
 	public static final String NET_BUFFER_ST_PROP_KEY = "--net-buff-standard";
 
-	/** Field description */
+	/** Field description. */
 	public static final String NET_BUFFER_HT_PROP_KEY = "--net-buff-high-throughput";
+
+	public static final String ST_TRAFFIC_THROTTLING_PROP_KEY = "--cm-traffic-throttling";
+	public static final String ST_TRAFFIC_THROTTLING_PROP_VAL =
+		"xmpp:2500:0:disc,bin:20m:0:disc";
+	public static final String HT_TRAFFIC_THROTTLING_PROP_KEY =
+		"--cm-ht-traffic-throttling";
+	public static final String HT_TRAFFIC_THROTTLING_PROP_VAL =
+		"xmpp:25k:0:disc,bin:200m:0:disc";
+	public static final String TRAFFIC_THROTTLING_PROP_KEY = "traffic-throttling";
 	protected static final String PORT_KEY = "port-no";
 	protected static final String PROP_KEY = "connections/";
 	protected static final String PORTS_PROP_KEY = PROP_KEY + "ports";
@@ -105,11 +116,24 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 	protected static final String XMPP_ACK_PROP_KEY = "xmpp-ack";
 	protected static final boolean XMPP_ACK_PROP_VAL = false;
 	protected static final String MAX_INACTIVITY_TIME = "max-inactivity-time";
-	/** Field description */
+	protected static final long LAST_MINUTE_PACKETS_LIMIT_PROP_VAL = 2500L;
+	protected static final long TOTAL_PACKETS_LIMIT_PROP_VAL = 0L;
+	protected static final long LAST_MINUTE_BIN_LIMIT_PROP_VAL = 20000000L;
+	protected static final long TOTAL_BIN_LIMIT_PROP_VAL = 0L;
+
+	/** Field description. */
 	public static final String PORT_LOCAL_HOST_PROP_KEY = "local-host";
 	private static ConnectionOpenThread connectThread = ConnectionOpenThread.getInstance();
 
-	/** Field description */
+	/**
+	 * Describe class <code>LIMIT_ACTION</code> here.
+	 *
+	 */
+	public static enum LIMIT_ACTION {
+		DISCONNECT, DROP_PACKETS;
+	}
+
+	/** Field description. */
 	public String[] PORT_IFC_PROP_VAL = { "*" };
 	private long bytesReceived = 0;
 	private long bytesSent = 0;
@@ -123,30 +147,36 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 	private long watchdogStopped = 0;
 	private long watchdogTests = 0;
 	private LinkedList<Map<String, Object>> waitingTasks =
-			new LinkedList<Map<String, Object>>();
+		new LinkedList<Map<String, Object>>();
 	private ConcurrentHashMap<String, IO> services = new ConcurrentHashMap<String, IO>();
 	private Set<ConnectionListenerImpl> pending_open = Collections
-			.synchronizedSet(new HashSet<ConnectionListenerImpl>());;
+		.synchronizedSet(new HashSet<ConnectionListenerImpl>());;
 	protected int net_buffer = NET_BUFFER_ST_PROP_VAL;
 	private IOServiceStatisticsGetter ioStatsGetter = new IOServiceStatisticsGetter();
 	private boolean initializationCompleted = false;
 	protected long connectionDelay = 2 * SECOND;
         private long maxInactivityTime = getMaxInactiveTime();
 
+	private long last_minute_packets_limit = LAST_MINUTE_PACKETS_LIMIT_PROP_VAL;
+	private long total_packets_limit = TOTAL_PACKETS_LIMIT_PROP_VAL;
+	private long last_minute_bin_limit = LAST_MINUTE_BIN_LIMIT_PROP_VAL;
+	private long total_bin_limit = TOTAL_BIN_LIMIT_PROP_VAL;
+	private LIMIT_ACTION xmppLimitAction = LIMIT_ACTION.DISCONNECT;
+
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param serv
-	 * 
+	 *
 	 * @return
 	 */
 	public abstract Queue<Packet> processSocketData(IO serv);
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param port_props
 	 */
 	public abstract void reconnectionFailed(Map<String, Object> port_props);
@@ -157,53 +187,76 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 	/**
 	 * Method description
-	 * 
+	 *
 	 */
 	@Override
 	public synchronized void everyMinute() {
-		super.everyMinute();
-		// This variable used to provide statistics gets off on a busy
-		// services as it is handled in methods called concurrently by 
-		// many threads. While accuracy of this variable is not critical
-		// for the server functions, statistics should be as accurate as
-		// possible to provide valuable metrics data.
-		// So in the watchdog thread we re-synchronize this number
-		int tmp = services.size();
-		services_size = tmp;
+			super.everyMinute();
+			// This variable used to provide statistics gets off on a busy
+			// services as it is handled in methods called concurrently by
+			// many threads. While accuracy of this variable is not critical
+			// for the server functions, statistics should be as accurate as
+			// possible to provide valuable metrics data.
+			// So in the watchdog thread we re-synchronize this number
+			int tmp = services.size();
+			services_size = tmp;
 
-		doForAllServices(ioStatsGetter);
+			doForAllServices(ioStatsGetter);
+		}
+
+	protected <T> void checkHighThroughputProperty(
+		String ht_def_key, T ht_dev_val, String st_def_key, T st_def_val, String prop_key,
+		Class<T> prop_val_class, Map<String, Object> params,	Map<String, Object> props) {
+		T tmp = st_def_val;
+		String str_tmp = null;
+		if (isHighThroughput()) {
+			tmp = ht_dev_val;
+			str_tmp = (String) params.get(ht_def_key);
+		} else {
+			tmp = st_def_val;
+			str_tmp = (String) params.get(st_def_key);
+		}
+		if (prop_val_class.isAssignableFrom(Integer.class)) {
+			tmp = prop_val_class.cast(DataTypes.parseNum(str_tmp, Integer.class,
+					(Integer)tmp));
+		}
+		if (prop_val_class.isAssignableFrom(Long.class)) {
+			tmp = prop_val_class.cast(DataTypes.parseNum(str_tmp, Long.class,
+					(Long)tmp));
+		}
+		if (prop_val_class.isAssignableFrom(String.class)) {
+			tmp = prop_val_class.cast(str_tmp);
+		}
+
+		props.put(prop_key, tmp);
+		//		log.warning("Set property: (" + prop_key + ", " + tmp + ")");
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param params
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		log.log(Level.CONFIG, "{0} defaults: {1}",
-				new Object[] { getName(), params.toString() });
+			new Object[] { getName(), params.toString() });
 
 		Map<String, Object> props = super.getDefaults(params);
 
 		props.put(TLS_USE_PROP_KEY, TLS_USE_PROP_VAL);
 
-		int buffSize = NET_BUFFER_ST_PROP_VAL;
+		checkHighThroughputProperty(NET_BUFFER_HT_PROP_KEY, NET_BUFFER_HT_PROP_VAL,
+			NET_BUFFER_ST_PROP_KEY,	NET_BUFFER_ST_PROP_VAL, NET_BUFFER_PROP_KEY, Integer.class,
+			params, props);
 
-		if (isHighThroughput()) {
-			buffSize =
-					DataTypes.parseSizeInt((String) params.get(NET_BUFFER_HT_PROP_KEY),
-							NET_BUFFER_HT_PROP_VAL);
-		} else {
-			buffSize =
-					DataTypes.parseSizeInt((String) params.get(NET_BUFFER_ST_PROP_KEY),
-							NET_BUFFER_ST_PROP_VAL);
-		}
-
-		props.put(NET_BUFFER_PROP_KEY, buffSize);
+		checkHighThroughputProperty(
+			HT_TRAFFIC_THROTTLING_PROP_KEY, HT_TRAFFIC_THROTTLING_PROP_VAL,
+			ST_TRAFFIC_THROTTLING_PROP_KEY, ST_TRAFFIC_THROTTLING_PROP_VAL,
+			TRAFFIC_THROTTLING_PROP_KEY, String.class, params, props);
 
 		int[] ports = null;
 		String ports_str = (String) params.get("--" + getName() + "-ports");
@@ -295,7 +348,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 	/**
 	 * Generates the component statistics.
-	 * 
+	 *
 	 * @param list
 	 *          is a collection to put the component statistics in.
 	 */
@@ -328,7 +381,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 	 * packets distribution to different threads. For PubSub, probably better
 	 * packets distribution to different threads would be based on the sender
 	 * address rather then destination address.
-	 * 
+	 *
 	 * @param packet
 	 * @return
 	 */
@@ -347,8 +400,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param binds
 	 */
 	@Override
@@ -359,7 +412,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 	/**
 	 * Method description
-	 * 
+	 *
 	 */
 	@Override
 	public void initializationCompleted() {
@@ -375,10 +428,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param serv
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Override
@@ -388,14 +441,73 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 		// socketData and then another thread reads more packets which
 		// may take over earlier data depending on a thread scheduler used.
 		// synchronized (serv) {
-		writePacketsToSocket(serv, processSocketData(serv));
+		if (checkTrafficLimits(serv)) {
+			writePacketsToSocket(serv, processSocketData(serv));
+		}
 		// }
+	}
+
+	public boolean checkTrafficLimits(IO serv) {
+		boolean xmppLimitHit = false;
+		if (last_minute_packets_limit > 0) {
+			xmppLimitHit = serv.getPacketsReceived(false) >= last_minute_packets_limit ||
+				serv.getPacketsSent(false) >= last_minute_packets_limit;
+		}
+		if (!xmppLimitHit && total_packets_limit > 0) {
+			xmppLimitHit = serv.getTotalPacketsReceived() >= total_packets_limit ||
+				serv.getTotalPacketsSent() >= total_packets_limit;
+		}
+		if (xmppLimitHit) {
+			switch (xmppLimitAction) {
+			case DROP_PACKETS:
+				if (log.isLoggable(Level.FINE)) {
+					log.log(Level.FINE,
+						"[[{0}]] XMPP Limits exceeded on connection {1} dropping pakcets: {2}",
+						new Object[] { getName(), serv, serv.getReceivedPackets() });
+				}
+				while (serv.getReceivedPackets().poll() != null) ;
+				break;
+			default:
+				if (log.isLoggable(Level.FINE)) {
+					log.log(Level.FINE,
+						"[[{0}]] XMPP Limits exceeded on connection {1} stopping, packets dropped: {2}",
+						new Object[] { getName(), serv, serv.getReceivedPackets() });
+				}
+				serv.forceStop();
+				break;
+			}
+			return false;
+		}
+		boolean binLimitHit = false;
+		long bytesSent = serv.getBytesSent(false);
+		long bytesReceived = serv.getBytesReceived(false);
+		if (last_minute_bin_limit > 0) {
+			binLimitHit = bytesSent >= last_minute_bin_limit ||
+				bytesReceived >= last_minute_bin_limit;
+		}
+		long totalSent = serv.getTotalBytesSent();
+		long totalReceived = serv.getTotalBytesReceived();
+		if (!binLimitHit && total_bin_limit > 0) {
+			binLimitHit = totalReceived >= total_bin_limit ||
+				totalSent >= total_bin_limit;
+		}
+		if (binLimitHit) {
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE,
+					"[[{0}]] Binary Limits exceeded ({1}:{2}:{3}:{4}) on connection {5} stopping, packets dropped: {6}",
+					new Object[] { getName(), bytesSent, bytesReceived, totalSent, totalReceived,
+												 serv, serv.getReceivedPackets() });
+			}
+			serv.forceStop();
+			return false;
+		}
+		return true;
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param packet
 	 */
 	@Override
@@ -405,8 +517,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -421,7 +533,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 	/**
 	 * Method description
-	 * 
+	 *
 	 */
 	@Override
 	public void release() {
@@ -433,12 +545,12 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param service
 	 */
 	@TODO(note = "Do something if service with the same unique ID is already started, "
-			+ "possibly kill the old one...")
+		+ "possibly kill the old one...")
 	public void serviceStarted(final IO service) {
 
 		// synchronized(services) {
@@ -446,7 +558,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "[[{0}]] Connection started: {1}", new Object[] { getName(),
-					service });
+																																						 service });
 		}
 
 		IO serv = services.get(id);
@@ -454,15 +566,15 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 		if (serv != null) {
 			if (serv == service) {
 				log.log(Level.WARNING,
-						"{0}: That would explain a lot, adding the same service twice, ID: {1}",
-						new Object[] { getName(), serv });
+					"{0}: That would explain a lot, adding the same service twice, ID: {1}",
+					new Object[] { getName(), serv });
 			} else {
 
 				// Is it at all possible to happen???
 				// let's log it for now....
 				log.log(Level.WARNING,
-						"{0}: Attempt to add different service with the same ID: {1}", new Object[] {
-								getName(), service });
+					"{0}: Attempt to add different service with the same ID: {1}", new Object[] {
+						getName(), service });
 
 				// And stop the old service....
 				serv.stop();
@@ -476,7 +588,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 	}
 
 	/**
-	 * 
+	 *
 	 * @param service
 	 * @return
 	 */
@@ -489,7 +601,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 			ioStatsGetter.check(service);
 		} catch (Exception e) {
 			log.log(Level.INFO,
-					"Nothing serious to worry about but please notify the developer.", e);
+				"Nothing serious to worry about but please notify the developer.", e);
 		}
 
 		// synchronized(service) {
@@ -497,7 +609,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "[[{0}]] Connection stopped: {1}", new Object[] { getName(),
-					service });
+																																						 service });
 		}
 
 		// id might be null if service is stopped in accept method due to
@@ -508,11 +620,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 			if (result) {
 				--services_size;
-			} else if (log.isLoggable(Level.FINER)) {                                
+			} else if (log.isLoggable(Level.FINER)) {
 				// Is it at all possible to happen???
 				// let's log it for now....
 				log.log(Level.FINER, "[[{0}]] Attempt to stop incorrect service: {1}",
-						new Object[] { getName(), service });
+					new Object[] { getName(), service });
 			}
 
 			return result;
@@ -525,8 +637,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param name
 	 */
 	@Override
@@ -539,8 +651,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param props
 	 */
 	@Override
@@ -561,9 +673,38 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
                 if (props.get(NET_BUFFER_PROP_KEY) != null) {
 			net_buffer = (Integer) props.get(NET_BUFFER_PROP_KEY);
 		}
-		
+
+		if (props.get(TRAFFIC_THROTTLING_PROP_KEY) != null) {
+			String[] tmp = ((String)props.get(TRAFFIC_THROTTLING_PROP_KEY)).split(",");
+			for (String tmp_s: tmp) {
+				String[] tmp_thr = tmp_s.split(":");
+				if (tmp_thr[0].equalsIgnoreCase("xmpp")) {
+					last_minute_packets_limit = DataTypes.parseNum(tmp_thr[1], Long.class,
+						LAST_MINUTE_PACKETS_LIMIT_PROP_VAL);
+					log.warning(getName() + " last_minute_packets_limit = " + last_minute_packets_limit);
+					total_packets_limit = DataTypes.parseNum(tmp_thr[2], Long.class,
+						TOTAL_PACKETS_LIMIT_PROP_VAL);
+					log.warning(getName() + " total_packets_limit = " + total_packets_limit);
+					if (tmp_thr[3].equalsIgnoreCase("disc")) {
+						xmppLimitAction = LIMIT_ACTION.DISCONNECT;
+					}
+					if (tmp_thr[3].equalsIgnoreCase("drop")) {
+						xmppLimitAction = LIMIT_ACTION.DROP_PACKETS;
+					}
+				}
+				if (tmp_thr[0].equalsIgnoreCase("bin")) {
+					last_minute_bin_limit = DataTypes.parseNum(tmp_thr[1], Long.class,
+						LAST_MINUTE_BIN_LIMIT_PROP_VAL);
+					log.warning(getName() + " last_minute_bin_limit = " + last_minute_bin_limit);
+					total_bin_limit = DataTypes.parseNum(tmp_thr[2], Long.class,
+						TOTAL_BIN_LIMIT_PROP_VAL);
+					log.warning(getName() + " total_bin_limit = " + total_bin_limit);
+				}
+			}
+		}
+
 		if (props.size() == 1) {
-			// If props.size() == 1, it means this is a single property update and 
+			// If props.size() == 1, it means this is a single property update and
 			// ConnectionManager does not support it yet.
 			return;
 		}
@@ -597,11 +738,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param ios
 	 * @param p
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean writePacketToSocket(IO ios, Packet p) {
@@ -641,7 +782,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 		} else {
 			if (log.isLoggable(Level.FINE)) {
 				log.log(Level.FINE, "Can''t find service for packet: <{0}> {1}, service id: {2}",
-						new Object[] { p.getElemName(), p.getTo(), getServiceId(p) });
+					new Object[] { p.getElemName(), p.getTo(), getServiceId(p) });
 			}
 		} // end of if (ios != null) else
 
@@ -650,8 +791,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param serv
 	 * @param packets
 	 */
@@ -707,7 +848,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 	/**
 	 * Returns number of active network connections (IOServices).
-	 * 
+	 *
 	 * @return number of active network connections (IOServices).
 	 */
 	protected int countIOServices() {
@@ -717,7 +858,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 	/**
 	 * Perform a given action defined by ServiceChecker for all active IOService
 	 * objects (active network connections).
-	 * 
+	 *
 	 * @param checker
 	 *          is a <code>ServiceChecker</code> instance defining an action to
 	 *          perform for all IOService objects.
@@ -765,7 +906,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 	}
 
 	/**
-	 * 
+	 *
 	 * @param p
 	 * @return
 	 */
@@ -812,7 +953,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 		props.put(PROP_KEY + port + "/" + PORT_SOCKET_PROP_KEY, sock);
 		props.put(PROP_KEY + port + "/" + PORT_IFC_PROP_KEY, PORT_IFC_PROP_VAL);
 		props.put(PROP_KEY + port + "/" + PORT_REMOTE_HOST_PROP_KEY,
-				PORT_REMOTE_HOST_PROP_VAL);
+			PORT_REMOTE_HOST_PROP_VAL);
 		props.put(PROP_KEY + port + "/" + TLS_REQUIRED_PROP_KEY, TLS_REQUIRED_PROP_VAL);
 
 		Map<String, Object> extra = getParamsForPort(port);
@@ -827,34 +968,34 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 	private void reconnectService(final Map<String, Object> port_props, long delay) {
 		if (log.isLoggable(Level.FINER)) {
 			String cid =
-					"" + port_props.get("local-hostname") + "@" + port_props.get("remote-hostname");
+				"" + port_props.get("local-hostname") + "@" + port_props.get("remote-hostname");
 
 			log.log(Level.FINER,
-					"Reconnecting service for: {0}, scheduling next try in {1}secs, cid: {2}",
-					new Object[] { getName(), delay / 1000, cid });
+				"Reconnecting service for: {0}, scheduling next try in {1}secs, cid: {2}",
+				new Object[] { getName(), delay / 1000, cid });
 		}
 
 		addTimerTask(new TimerTask() {
-			@Override
-			public void run() {
-				String host = (String) port_props.get(PORT_REMOTE_HOST_PROP_KEY);
+				@Override
+				public void run() {
+					String host = (String) port_props.get(PORT_REMOTE_HOST_PROP_KEY);
 
-				if (host == null) {
-					host = (String) port_props.get("remote-hostname");
-				}
+					if (host == null) {
+						host = (String) port_props.get("remote-hostname");
+					}
 
-				int port = (Integer) port_props.get(PORT_KEY);
+					int port = (Integer) port_props.get(PORT_KEY);
 
-				if (log.isLoggable(Level.FINE)) {
-					log.log(
+					if (log.isLoggable(Level.FINE)) {
+						log.log(
 							Level.FINE,
 							"Reconnecting service for component: {0}, to remote host: {1} on port: {2}",
 							new Object[] { getName(), host, port });
-				}
+					}
 
-				startService(port_props);
-			}
-		}, delay);
+					startService(port_props);
+				}
+			}, delay);
 	}
 
 	private void releaseListeners() {
@@ -887,14 +1028,14 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 		/**
 		 * Method description
-		 * 
-		 * 
+		 *
+		 *
 		 * @param sc
 		 */
 		@Override
 		public void accept(SocketChannel sc) {
 			String cid =
-					"" + port_props.get("local-hostname") + "@" + port_props.get("remote-hostname");
+				"" + port_props.get("local-hostname") + "@" + port_props.get("remote-hostname");
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Accept called for service: {0}", cid);
@@ -921,7 +1062,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 					// Let's wait for a few secs and try again.
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Problem reconnecting the service: {0}, cid: {1}",
-								new Object[] { serv, cid });
+							new Object[] { serv, cid });
 					}
 
 					boolean reconnect = false;
@@ -957,8 +1098,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 		/**
 		 * Method description
-		 * 
-		 * 
+		 *
+		 *
 		 * @return
 		 */
 		@Override
@@ -967,7 +1108,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 			if (port_props.get(PORT_TYPE_PROP_KEY) == null) {
 				log.warning(getName() + ": connection type is null: "
-						+ port_props.get(PORT_KEY).toString());
+					+ port_props.get(PORT_KEY).toString());
 			} else {
 				type = port_props.get(PORT_TYPE_PROP_KEY).toString();
 			}
@@ -977,8 +1118,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 		/**
 		 * Method description
-		 * 
-		 * 
+		 *
+		 *
 		 * @return
 		 */
 		@Override
@@ -988,8 +1129,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 		/**
 		 * Method description
-		 * 
-		 * 
+		 *
+		 *
 		 * @return
 		 */
 		@Override
@@ -999,8 +1140,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 		/**
 		 * Method description
-		 * 
-		 * 
+		 *
+		 *
 		 * @return
 		 */
 		@Override
@@ -1010,8 +1151,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 		/**
 		 * Method description
-		 * 
-		 * 
+		 *
+		 *
 		 * @return
 		 */
                 @Override
@@ -1021,8 +1162,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 		/**
 		 * Method description
-		 * 
-		 * 
+		 *
+		 *
 		 * @return
 		 */
 		@Override
@@ -1036,8 +1177,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 		/**
 		 * Method description
-		 * 
-		 * 
+		 *
+		 *
 		 * @return
 		 */
 		@Override
@@ -1075,29 +1216,35 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 
 		/**
 		 * Method description
-		 * 
-		 * 
+		 *
+		 *
 		 * @param service
 		 */
 		@Override
 		public synchronized void check(IO service) {
-			service.getStatistics(list, true);
-			bytesReceived += list.getValue("socketio", "Bytes received", -1l);
-			bytesSent += list.getValue("socketio", "Bytes sent", -1l);
-			socketOverflow += list.getValue("socketio", "Buffers overflow", -1l);
-		}
+				bytesReceived += service.getBytesReceived(true);
+				bytesSent += service.getBytesSent(true);
+				socketOverflow += service.getBuffOverflow(true);
+				service.getPacketsReceived(true);
+				service.getPacketsSent(true);
+
+				// service.getStatistics(list, true);
+				// bytesReceived += list.getValue("socketio", "Bytes received", -1l);
+				// bytesSent += list.getValue("socketio", "Bytes sent", -1l);
+				// socketOverflow += list.getValue("socketio", "Buffers overflow", -1l);
+			}
 	}
 
 	/**
 	 * Looks in all established connections and checks whether any of them is
 	 * dead....
-	 * 
+	 *
 	 */
 	private class Watchdog implements Runnable {
 
 		/**
 		 * Method description
-		 * 
+		 *
 		 */
 		@Override
 		public void run() {
@@ -1113,53 +1260,53 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>> extends
 					// is inactive for hour or more and close the service
 					// on Exception
 					doForAllServices(new ServiceChecker<IO>() {
-						@Override
-						public void check(final XMPPIOService service) {
+							@Override
+							public void check(final XMPPIOService service) {
 
-							try {
-								if (null != service) {
-									long curr_time = System.currentTimeMillis();
-									long lastTransfer = service.getLastTransferTime();
-
-									if (curr_time - lastTransfer >= maxInactivityTime) {
-
-										// Stop the service is max keep-alive time is exceeded
-										// for non-active connections.
-										if (log.isLoggable(Level.INFO)) {
-											log.log(Level.INFO,
-													"{0}: Max inactive time exceeded, stopping: {1}", new Object[] {
-															getName(), service });
-										}
-
-										++watchdogStopped;
-										service.stop();
-									} else {
-										if (curr_time - lastTransfer >= (29 * MINUTE)) {
-
-											// At least once an hour check if the connection is
-											// still alive.
-											service.writeRawData(" ");
-											++watchdogTests;
-										}
-									}
-								}
-							} catch (Exception e) {
-
-								// Close the service....
 								try {
-									if (service != null) {
-										log.info(getName() + "Found dead connection, stopping: " + service);
-										++watchdogStopped;
-										service.forceStop();
+									if (null != service) {
+										long curr_time = System.currentTimeMillis();
+										long lastTransfer = service.getLastTransferTime();
+
+										if (curr_time - lastTransfer >= maxInactivityTime) {
+
+											// Stop the service is max keep-alive time is exceeded
+											// for non-active connections.
+											if (log.isLoggable(Level.INFO)) {
+												log.log(Level.INFO,
+													"{0}: Max inactive time exceeded, stopping: {1}", new Object[] {
+														getName(), service });
+											}
+
+											++watchdogStopped;
+											service.stop();
+										} else {
+											if (curr_time - lastTransfer >= (29 * MINUTE)) {
+
+												// At least once an hour check if the connection is
+												// still alive.
+												service.writeRawData(" ");
+												++watchdogTests;
+											}
+										}
 									}
-								} catch (Exception ignore) {
+								} catch (Exception e) {
 
-									// Do nothing here as we expect Exception to be thrown here...
+									// Close the service....
+									try {
+										if (service != null) {
+											log.info(getName() + "Found dead connection, stopping: " + service);
+											++watchdogStopped;
+											service.forceStop();
+										}
+									} catch (Exception ignore) {
+
+										// Do nothing here as we expect Exception to be thrown here...
+									}
 								}
-							}
 
-						}
-					});
+							}
+						});
 				} catch (InterruptedException e) { /* Do nothing here */
 				}
 			}

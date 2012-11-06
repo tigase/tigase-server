@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.TimerTask;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -75,6 +76,7 @@ public class BoshIOService extends XMPPIOService<Object> {
 	private static String extra_headers = null;
 	private long rid = -1;
 	private UUID sid = null;
+	private BoshTask waitTimer = null;
 
 	private static Boolean closeConnections;
 
@@ -126,6 +128,14 @@ public class BoshIOService extends XMPPIOService<Object> {
 	 */
 	public UUID getSid() {
 		return this.sid;
+	}
+
+	public void setWaitTimer(BoshTask timer) {
+		waitTimer = timer;
+	}
+
+	public BoshTask getWaitTimer() {
+		return waitTimer;
 	}
 
 	// ~--- methods --------------------------------------------------------------

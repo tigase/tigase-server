@@ -512,8 +512,8 @@ public class JabberIqPrivacy extends XMPPProcessor
 	}
 
 	private void processSetRequest(final Packet packet, final XMPPResourceConnection session,
-			final Queue<Packet> results)
-			throws NotAuthorizedException, XMPPException, TigaseDBException {
+		final Queue<Packet> results)
+		throws NotAuthorizedException, XMPPException, TigaseDBException {
 		List<Element> children = packet.getElemChildren("/iq/query");
 
 		if ((children != null) && (children.size() == 1)) {
@@ -530,26 +530,24 @@ public class JabberIqPrivacy extends XMPPProcessor
 					child.setAttribute(NAME, "default");
 				}    // end of if (name == null || name.length() == 0)
 
-                                List<Element> items = child.getChildren();
-                                if (items == null || items.isEmpty()) {
-                                        boolean inUse = name.equals(getDefaultList(session));
-                                        if (!inUse) {
-                                                for (XMPPResourceConnection activeSession : session.getActiveSessions()) {
-                                                        inUse |= name.equals(Privacy.getActiveList(session));
-                                                }
-                                        }
-                                        if (inUse) {                        
-                                                results.offer(Authorization.CONFLICT.getResponseMessage(packet, null, true));                                                
-                                        }
-                                        else {
-                                                Privacy.removeList(session, child);
-                				results.offer(packet.okResult((String) null, 0));                                                
-                                        }
-                                }
-                                else {
-                                        Privacy.addList(session, child);
-        				results.offer(packet.okResult((String) null, 0));
-                                }
+				List<Element> items = child.getChildren();
+				if (items == null || items.isEmpty()) {
+					boolean inUse = name.equals(getDefaultList(session));
+					if (!inUse) {
+						for (XMPPResourceConnection activeSession : session.getActiveSessions()) {
+							inUse |= name.equals(Privacy.getActiveList(session));
+						}
+					}
+					if (inUse) {
+						results.offer(Authorization.CONFLICT.getResponseMessage(packet, null, true));
+					}	else {
+						Privacy.removeList(session, child);
+						results.offer(packet.okResult((String) null, 0));
+					}
+				}	else {
+					Privacy.addList(session, child);
+					results.offer(packet.okResult((String) null, 0));
+				}
 			}      // end of if (child.getName().equals("list))
 
 			if (child.getName() == DEFAULT_EL_NAME) {

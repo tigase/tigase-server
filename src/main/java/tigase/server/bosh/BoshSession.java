@@ -33,6 +33,7 @@ import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
+import tigase.xmpp.BareJID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 
@@ -47,10 +48,15 @@ import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import tigase.xmpp.*;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.Map;
+import java.util.concurrent.ConcurrentSkipListMap;
+//import tigase.xmpp.*;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -68,7 +74,7 @@ public class BoshSession {
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log = Logger.getLogger("tigase.server.bosh.BoshSession");
+	private static final Logger log = Logger.getLogger(BoshSession.class.getName());
 	private static final long SECOND = 1000;
 	private static final String PRESENCE_ELEMENT_NAME = "presence";
 	private static final String MESSAGE_ELEMENT_NAME = "message";
@@ -87,7 +93,7 @@ public class BoshSession {
 	private String domain = null;
 	private BoshSessionTaskHandler handler = null;
 	private int[] hashCodes = null;
-	private TimerTask inactivityTimer = null;
+	private BoshTask inactivityTimer = null;
 	private long previous_received_rid = -1;
 	private String[] replace_with = {
 			"$1&lt;a href=\"http://$2\" target=\"_blank\"&gt;$2&lt;/a&gt;",
@@ -104,15 +110,17 @@ public class BoshSession {
 	private Queue<BoshIOService> old_connections =
 			new LinkedBlockingQueue<BoshIOService>(4);
 
+	private static final TimerTaskComparator timerTaskComparator = new TimerTaskComparator();
 	// Active connections with pending requests received
-	private Queue<BoshIOService> connections = new ConcurrentLinkedQueue<BoshIOService>();
-
+	private ConcurrentSkipListMap<BoshTask, BoshIOService> connections =
+		new ConcurrentSkipListMap<BoshTask, BoshIOService>(timerTaskComparator);
 	// private enum TimedTask { EMPTY_RESP, STOP };
 	// private Map<TimerTask, TimedTask> task_enum =
 	// new LinkedHashMap<TimerTask, TimedTask>();
 	// private EnumMap<TimedTask, TimerTask> enum_task =
 	// new EnumMap<TimedTask, TimerTask>(TimedTask.class);
-	private TimerTask waitTimer = null;
+	private Set<BoshTask> waitTimerSet =
+		new ConcurrentSkipListSet<BoshTask>(timerTaskComparator);
 	private Queue<Element> waiting_packets = new ConcurrentLinkedQueue<Element>();
 	private boolean terminate = false;
 	private long min_polling = MIN_POLLING_PROP_VAL;
@@ -160,7 +168,7 @@ public class BoshSession {
 		for (BoshIOService conn : old_connections) {
 			conn.stop();
 		}
-		for (BoshIOService conn : connections) {
+		for (BoshIOService conn : connections.values()) {
 			conn.stop();
 		}
 	}
@@ -176,8 +184,9 @@ public class BoshSession {
 			log.finest("Disconnected called for: " + bios.getUniqueId());
 		}
 
-		if (bios != null) {
-			connections.remove(bios);
+		if (bios != null && bios.getWaitTimer() != null) {
+			handler.cancelTask(bios.getWaitTimer());
+			connections.remove(bios.getWaitTimer());
 		}
 
 		if (inactivityTimer != null) {
@@ -188,7 +197,7 @@ public class BoshSession {
 			handler.cancelTask(inactivityTimer);
 		}
 
-		if (connections.size() == 0) {
+		if (connections.isEmpty()) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Setting inactivityTimer for " + max_inactivity + ": " + getSid());
 			}
@@ -333,17 +342,19 @@ public class BoshSession {
 		service.setContentType(content_type);
 
 		Element body =
-				new Element(BODY_EL_NAME, new String[] { WAIT_ATTR, INACTIVITY_ATTR,
-						POLLING_ATTR, REQUESTS_ATTR, HOLD_ATTR, MAXPAUSE_ATTR, SID_ATTR, VER_ATTR,
-						FROM_ATTR, SECURE_ATTR, "xmpp:version", "xmlns:xmpp", "xmlns:stream" },
-						new String[] { Long.valueOf(this.max_wait).toString(),
-								Long.valueOf(this.max_inactivity).toString(),
-								Long.valueOf(this.min_polling).toString(),
-								Integer.valueOf(this.concurrent_requests).toString(),
-								Integer.valueOf(this.hold_requests).toString(),
-								Long.valueOf(this.max_pause).toString(), this.sid.toString(),
-								BOSH_VERSION, this.domain, "true", "1.0", "urn:xmpp:xbosh",
-								"http://etherx.jabber.org/streams" });
+			new Element(BODY_EL_NAME, new String[] { WAIT_ATTR, INACTIVITY_ATTR,
+																							 POLLING_ATTR, REQUESTS_ATTR, HOLD_ATTR,
+																							 MAXPAUSE_ATTR, SID_ATTR, VER_ATTR,
+																							 FROM_ATTR, SECURE_ATTR, "xmpp:version",
+																							 "xmlns:xmpp", "xmlns:stream" },
+				new String[] { Long.valueOf(this.max_wait).toString(),
+											 Long.valueOf(this.max_inactivity).toString(),
+											 Long.valueOf(this.min_polling).toString(),
+											 Integer.valueOf(this.concurrent_requests).toString(),
+											 Integer.valueOf(this.hold_requests).toString(),
+											 Long.valueOf(this.max_pause).toString(), this.sid.toString(),
+											 BOSH_VERSION, this.domain, "true", "1.0", "urn:xmpp:xbosh",
+											 "http://etherx.jabber.org/streams" });
 
 		sessionId = UUID.randomUUID().toString();
 		body.setAttribute(AUTHID_ATTR, sessionId);
@@ -351,29 +362,30 @@ public class BoshSession {
 		if (getCurrentRidTail() > 0) {
 			body.setAttribute(ACK_ATTR, "" + takeCurrentRidTail());
 		}
-                try {
-                        BareJID userId = packet.getAttribute("from") != null ? BareJID.bareJIDInstance(packet.getAttribute("from")) : null;
-                        if (userId != null) {
-                                BareJID hostJid = handler.getSeeOtherHostForJID(userId);
-                                if (hostJid != null) {
-                                        Element error = new Element("stream:error");
-                                        Element seeOtherHost = new Element("see-other-host", hostJid.toString());
-                                        seeOtherHost.setXMLNS("urn:ietf:params:xml:ns:xmpp-streams");
-                                        error.addChild(seeOtherHost);
-                                        body.addChild(error);
-                                }
-                        }
-                } catch (TigaseStringprepException ex) {
-                        Logger.getLogger(BoshSession.class.getName()).log(Level.SEVERE, null, ex);
-                }
+		try {
+			BareJID userId = packet.getAttribute("from") != null ?
+				BareJID.bareJIDInstance(packet.getAttribute("from")) : null;
+			if (userId != null) {
+				BareJID hostJid = handler.getSeeOtherHostForJID(userId);
+				if (hostJid != null) {
+					Element error = new Element("stream:error");
+					Element seeOtherHost = new Element("see-other-host", hostJid.toString());
+					seeOtherHost.setXMLNS("urn:ietf:params:xml:ns:xmpp-streams");
+					error.addChild(seeOtherHost);
+					body.addChild(error);
+				}
+			}
+		} catch (TigaseStringprepException ex) {
+			Logger.getLogger(BoshSession.class.getName()).log(Level.SEVERE, null, ex);
+		}
 
 		body.setXMLNS(BOSH_XMLNS);
 		sendBody(service, body);
 
 		// service.writeRawData(body.toString());
 		Packet streamOpen =
-				Command.STREAM_OPENED.getPacket(null, null, StanzaType.set, UUID.randomUUID()
-						.toString(), Command.DataType.submit);
+			Command.STREAM_OPENED.getPacket(null, null, StanzaType.set, UUID.randomUUID()
+				.toString(), Command.DataType.submit);
 
 		Command.addFieldValue(streamOpen, "session-id", sessionId);
 		Command.addFieldValue(streamOpen, "hostname", domain);
@@ -406,8 +418,9 @@ public class BoshSession {
 			}
 		}
 
-		if ((connections.size() > 0) && ((waiting_packets.size() > 0) || terminate)) {
-			BoshIOService serv = connections.poll();
+		if ((!connections.isEmpty()) && ((!waiting_packets.isEmpty()) || terminate)) {
+			Map.Entry<BoshTask, BoshIOService> entry =  connections.pollFirstEntry();
+			BoshIOService serv = entry.getValue();
 
 			sendBody(serv, null);
 		}
@@ -428,6 +441,8 @@ public class BoshSession {
 					+ packet.toString());
 		}
 
+
+		BoshTask waitTimer = service.getWaitTimer();
 		if (waitTimer != null) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Canceling waitTimer: " + getSid());
@@ -477,7 +492,12 @@ public class BoshSession {
 
 			service.setContentType(content_type);
 			service.setSid(sid);
-			connections.offer(service);
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Setting waitTimer for " + max_wait + ": " + getSid());
+			}
+			waitTimer = handler.scheduleTask(this, max_wait * SECOND);
+			service.setWaitTimer(waitTimer);
+			connections.put(waitTimer, service);
 
 			if (!duplicate) {
 				if ((packet.getType() != null) && (packet.getType() == StanzaType.terminate)) {
@@ -582,17 +602,9 @@ public class BoshSession {
 		processPacket(null, out_results);
 
 		if (connections.size() > hold_requests) {
-			BoshIOService serv = connections.poll();
+			BoshIOService serv = connections.pollFirstEntry().getValue();
 
 			sendBody(serv, null);
-		}
-
-		if ((connections.size() > 0) && (waiting_packets.size() == 0)) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Setting waitTimer for " + max_wait + ": " + getSid());
-			}
-
-			waitTimer = handler.scheduleTask(this, max_wait * SECOND);
 		}
 	}
 
@@ -627,12 +639,14 @@ public class BoshSession {
 				log.finest("inactivityTimer fired: " + getSid());
 			}
 
-			if (waitTimer != null) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Canceling waitTimer: " + getSid());
-				}
+			for (BoshTask waitTimer: waitTimerSet) {
+				if (waitTimer != null) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("Canceling waitTimer: " + getSid());
+					}
 
-				handler.cancelTask(waitTimer);
+					handler.cancelTask(waitTimer);
+				}
 			}
 
 			for (Element packet : waiting_packets) {
@@ -665,16 +679,13 @@ public class BoshSession {
 			return true;
 		}
 
-		if (tt == waitTimer) {
+		BoshIOService serv = connections.remove(tt);
+		if (serv != null) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("waitTimer fired: " + getSid());
 			}
 
-			BoshIOService serv = connections.poll();
-
-			if (serv != null) {
-				sendBody(serv, null);
-			}
+			sendBody(serv, null);
 		}
 
 		return false;
@@ -738,7 +749,7 @@ public class BoshSession {
 		synchronized (currentRids) {
 			int hashCode = -1;
 
-			if ((packets != null) && (packets.size() > 0)) {
+			if ((packets != null) && (!packets.isEmpty())) {
 				StringBuilder sb = new StringBuilder();
 
 				for (Element elem : packets) {
@@ -766,7 +777,7 @@ public class BoshSession {
 		synchronized (currentRids) {
 			int hashCode = -1;
 
-			if ((packets != null) && (packets.size() > 0)) {
+			if ((packets != null) && (!packets.isEmpty())) {
 				StringBuilder sb = new StringBuilder();
 
 				for (Element elem : packets) {
@@ -880,7 +891,7 @@ public class BoshSession {
 						+ ", current_rid=" + rid);
 			}
 
-			if ((packets != null) && (packets.size() > 0)) {
+			if ((packets != null) && (!packets.isEmpty())) {
 				StringBuilder sb = new StringBuilder();
 
 				for (Element elem : packets) {
@@ -906,6 +917,16 @@ public class BoshSession {
 	}
 
 	private synchronized void sendBody(BoshIOService serv, Element body_par) {
+		BoshTask timer = serv.getWaitTimer();
+		if (timer != null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Canceling waitTimer: " + getSid());
+			}
+			handler.cancelTask(timer);
+		} else {
+			log.info("No waitTimer for the Bosh connection! " + serv);
+		}
+
 		Element body = body_par;
 
 		if (body == null) {
@@ -917,7 +938,7 @@ public class BoshSession {
 				body.setAttribute(ACK_ATTR, "" + rid);
 			}
 
-			if (waiting_packets.size() > 0) {
+			if (!waiting_packets.isEmpty()) {
 
 				// body.addChild(applyFilters(waiting_packets.poll()));
 				// Make sure the XMLNS is set correctly for all stanzas to avoid
@@ -931,7 +952,7 @@ public class BoshSession {
 
 				body.addChild(stanza);
 
-				while ((waiting_packets.size() > 0) && (body.getChildren().size() < MAX_PACKETS)) {
+				while ((!waiting_packets.isEmpty()) && (body.getChildren().size() < MAX_PACKETS)) {
 
 					// body.addChild(applyFilters(waiting_packets.poll()));
 					stanza = waiting_packets.poll();
@@ -968,13 +989,6 @@ public class BoshSession {
 					+ "] Exception during writing to socket", e);
 		}
 
-		if (waitTimer != null) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Canceling waitTimer: " + getSid());
-			}
-
-			handler.cancelTask(waitTimer);
-		}
 	}
 
 	private void retireConnectionService(BoshIOService serv) {
@@ -1001,7 +1015,9 @@ public class BoshSession {
 
 	private void retireAllOldConnections() {
 		while (connections.size() > 1) {
-			BoshIOService serv = connections.poll();
+			Map.Entry<BoshTask, BoshIOService> entry =  connections.pollFirstEntry();
+			handler.cancelTask(entry.getKey());
+			BoshIOService serv = entry.getValue();
 			if (serv != null) {
 				retireConnectionService(serv);
 			} else {
@@ -1025,6 +1041,20 @@ public class BoshSession {
 			return currentRids[idx];
 		}
 	}
+
+	private static class TimerTaskComparator implements Comparator<BoshTask> {
+			public int compare(BoshTask o1, BoshTask o2) {
+			if (o1.timerOrder > o2.timerOrder) {
+				return 1;
+			}
+			if (o1.timerOrder < o2.timerOrder) {
+				return -1;
+			}
+			return 0;
+		}
+	}
+
+	
 }
 
 // ~ Formatted in Sun Code Convention

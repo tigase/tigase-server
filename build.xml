@@ -15,9 +15,30 @@
   <tstamp/>
  </target>
 
+ <target name="prepare-dist-describe" description="Gets build version from git describe">
+ 	<exec executable="git" outputproperty="git.revision" failifexecutionfails="false" errorproperty="">
+		<arg value="describe" />
+		<arg value="--tags" />
+		<arg value="--always" />
+		<arg value="HEAD" />
+	</exec>
+	<condition property="repository.version" value="${git.revision}" else="unknown">
+		<and>
+			<isset property="git.revision" />
+			<length string="${git.revision}" trim="yes" length="0" when="greater" />
+		</and>
+	</condition>
+
+  	<property name="version" value="${git.revision}"/>
+	<property name="dist" value="dist/${projectname}-${jarfile}-${version}"/>
+  </target>
+ 
  <target name="prepare-dist" description="Calculate build version">
   <!-- Get revision number -->
-  <exec executable="svnversion">
+  <exec executable="git">
+   <arg value="rev-list"/>
+   <arg value="master"/>
+   <arg value="--count"/>
    <redirector outputproperty="build-no" errorproperty="error-property">
     <outputfilterchain>
      <tokenfilter>
