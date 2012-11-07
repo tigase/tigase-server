@@ -95,26 +95,29 @@ def getConfigFromAdHoc = { p, comp_name, comp_class ->
 
                 if (val && !val.equals(tmpVal)) {
                         def cls = defVal.getClass();
-                        if (cls instanceof Long[]) {
+                        if (cls == Long[].class) {
                                 def out = [];
                                 val.split(',').each { out.add(Long.parseLong(it))};
                                 val = (out as Long[]);
                         }
-                        else if (cls instanceof Integer[]) {
+                        else if (cls == Integer[].class) {
                                 def out = [];
                                 val.split(',').each { out.add(Integer.parseInt(it))};
                                 val = (out as Integer[]);
                         }
-                        else if (cls instanceof String[]) {
+                        else if (cls == String[].class) {
                                 def out = [];
                                 val.split(',').each { out.add(it)};
                                 val = (out as String[]);
                         }
-                        else if (cls instanceof Long) {
+                        else if (cls == Long.class) {
                                 val = Long.parseLong(val);
                         }
-                        else if (cls instanceof Integer) {
+                        else if (cls == Integer.class) {
                                 val = Integer.parseInt(val);
+                        }
+                        else {
+                                println "unknown convertion for key = " + key + " , " + cls.getName()
                         }
                                                 
                         props.put(key, val);
@@ -181,6 +184,17 @@ else {
                 conf.getDefConfigParams().remove(Configurable.GEN_COMP_NAME + suffix);
                 conf.getDefConfigParams().remove(Configurable.GEN_COMP_CLASS + suffix);
 
+                def mrProps = conf.getProperties("message-router");                
+                def compNames = mrProps.get(MessageRouterConfig.MSG_RECEIVERS_NAMES_PROP_KEY).toList();
+                        
+                if (compNames.contains(comp_name)) {
+                        compNames.remove(comp_name);
+                }
+                        
+                mrProps = [:];
+                mrProps.put(MessageRouterConfig.MSG_RECEIVERS_NAMES_PROP_KEY, (compNames as String[]));
+                conf.putProperties("message-router", mrProps);                        
+                        
                 ((Configurator) XMPPServer.getConfigurator()).updateMessageRouter();
 		Command.addTextField(result, "Note", "Operation successful.")
                 return res;                
@@ -227,7 +241,19 @@ else {
                         conf.getDefConfigParams().put(Configurable.GEN_COMP_NAME+"-"+suffix, comp_name);
                         conf.getDefConfigParams().put(Configurable.GEN_COMP_CLASS+"-"+suffix, comp_class);
                 }
-                
+
+                def mrProps = conf.getProperties("message-router");                
+                def compNames = mrProps.get(MessageRouterConfig.MSG_RECEIVERS_NAMES_PROP_KEY).toList();
+                        
+                if (!compNames.contains(comp_name)) {
+                        compNames.add(comp_name);
+                }
+                        
+                mrProps = [:];
+                mrProps.put(MessageRouterConfig.MSG_RECEIVERS_NAMES_PROP_KEY, (compNames as String[]));
+                mrProps.put(MessageRouterConfig.MSG_RECEIVERS_PROP_KEY + comp_name + ".class", comp_class)
+                conf.putProperties("message-router", mrProps);
+                        
                 ((Configurator) XMPPServer.getConfigurator()).updateMessageRouter();
 		Command.addTextField(res, "Note", "Operation successful.");
                 return res;

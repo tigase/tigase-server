@@ -406,16 +406,6 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
          *
          * @return
          */
-        public String getUniqueId() {
-                return id;
-        }
-
-        /**
-         * Method description
-         *
-         *
-         * @return
-         */
         public long[] getWriteCounters() {
                 return wrData;
         }
@@ -479,7 +469,18 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
                 this.dataReceiver = address;
         }
 
-	public long getBytesSent(boolean reset) {
+        /**
+         * Method description
+         *
+         *
+         * @param sl
+         */
+        // @SuppressWarnings("unchecked")
+        public void setIOServiceListener(IOServiceListener<IOService<RefObject>> sl) {
+                this.serviceListener = sl;
+        }
+
+        public long getBytesSent(boolean reset) {
 		return socketIO.getBytesSent(reset);
 	}
 
