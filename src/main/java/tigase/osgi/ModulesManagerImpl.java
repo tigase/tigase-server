@@ -38,7 +38,7 @@ import tigase.xmpp.XMPPImplIfc;
 public class ModulesManagerImpl implements ModulesManager {
 
         private static ModulesManagerImpl instance = null;
-        private Map<String, Class<? extends XMPPImplIfc>> pluginsClasses = null;
+        private Map<String, XMPPImplIfc> plugins = null;
         private Map<String, Class<? extends Configurable>> componentsClasses = null;
 
         public static ModulesManagerImpl getInstance() {
@@ -49,7 +49,7 @@ public class ModulesManagerImpl implements ModulesManager {
         }
 
         private ModulesManagerImpl() {
-                pluginsClasses = new ConcurrentHashMap<String, Class<? extends XMPPImplIfc>>();
+                plugins = new ConcurrentHashMap<String, XMPPImplIfc>();
                 componentsClasses = new ConcurrentHashMap<String, Class<? extends Configurable>>();
         }
 
@@ -70,7 +70,7 @@ public class ModulesManagerImpl implements ModulesManager {
 //                                        }
 //                                }
                                 
-                                pluginsClasses.put(plugin.id(), pluginCls);
+                                plugins.put(plugin.id(), plugin);
                         } catch (InstantiationException ex) {
                                 Logger.getLogger(ModulesManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
                         } catch (IllegalAccessException ex) {
@@ -84,15 +84,15 @@ public class ModulesManagerImpl implements ModulesManager {
                 synchronized (this) {
                         String key = null;
                         
-                        for (Iterator<Entry<String, Class<? extends XMPPImplIfc>>> it = pluginsClasses.entrySet().iterator(); it.hasNext();) {
-                                Entry<String,Class<? extends XMPPImplIfc>> entry = it.next();
+                        for (Iterator<Entry<String, XMPPImplIfc>> it = plugins.entrySet().iterator(); it.hasNext();) {
+                                Entry<String,XMPPImplIfc> entry = it.next();
                                 if(pluginClass.equals(entry.getValue())) {
                                         key = entry.getKey();
                                 }
                         }
                         
                         if (key != null) {
-                                pluginsClasses.remove(key);
+                                plugins.remove(key);
                         }
                 }
         }
@@ -143,17 +143,11 @@ public class ModulesManagerImpl implements ModulesManager {
         }
 
         public XMPPImplIfc getPlugin(String plug_id) throws InstantiationException, IllegalAccessException {
-                Class<? extends XMPPImplIfc> pluginCls = pluginsClasses.get(plug_id);
-                
-                if (pluginCls == null) {
-                        return null;
-                }
-                
-                return pluginCls.newInstance();
+                return plugins.get(plug_id);                
         }
         
         public boolean hasPluginForId(String plug_id) {
-                return pluginsClasses.containsKey(plug_id);
+                return plugins.containsKey(plug_id);
         }
         
         public ServerComponent getServerComponent(String className) throws InstantiationException, IllegalAccessException {
