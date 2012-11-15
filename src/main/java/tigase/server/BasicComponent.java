@@ -340,9 +340,9 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 		}
 
 		// OLD API support end
-		if (getName().equals(jid.getLocalpart())) {
-			return serviceEntity.getDiscoInfo(node, isAdmin(from) || nonAdminCommands);
-		}
+                if (getName().equals(jid.getLocalpart()) || jid.toString().startsWith(getName() + ".")) {
+                        return serviceEntity.getDiscoInfo(node, isAdmin(from) || nonAdminCommands);
+                }
 
 		return null;
 	}
@@ -401,82 +401,89 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 		}
 
 		// OLD API support end
-		boolean isAdminFrom = isAdmin(from);
+                boolean isAdminFrom = isAdmin(from);
 
-		if (getName().equals(jid.getLocalpart())) {
-			if (node != null) {
-				result = getScriptItems(node, jid, from);
-			} else {
-				result =
-						serviceEntity.getDiscoItems(null, jid.toString(), isAdminFrom
-								|| nonAdminCommands);
+                if (getName().equals(jid.getLocalpart()) || jid.toString().startsWith(getName() + ".")) {
+                        if (node != null) {
+                                if (node.equals("http://jabber.org/protocol/commands") && (isAdminFrom || nonAdminCommands)) {
+                                        result = new LinkedList<Element>();
 
-				if (result != null) {
-					for (Iterator<Element> it = result.iterator(); it.hasNext();) {
-						Element element = it.next();
+                                        for (CommandIfc comm : scriptCommands.values()) {
+                                                if (!comm.isAdminOnly() || isAdminFrom) {
+                                                        result.add(new Element("item",
+                                                                new String[]{"node", "name", "jid"},
+                                                                new String[]{comm.getCommandId(), comm.getDescription(),
+                                                                        jid.toString()}));
+                                                }
+                                        }
+                                }
+                                else {
+                                        result = serviceEntity.getDiscoItems(node, jid.toString(), (isAdminFrom || nonAdminCommands));
 
-						if (element.getAttribute("node") == null) {
-							it.remove();
-						}
-					}
-				}
-			}
+                                }
+                        }
+                        else {
+                                result = serviceEntity.getDiscoItems(null, jid.toString(), (isAdminFrom || nonAdminCommands));
 
-			// Element result = serviceEntity.getDiscoItem(null, getName() + "." +
-			// jid);
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0} Found disco items: {1}", new Object[] { getName(),
-						((result != null) ? result.toString() : null) });
-			}
+                                if (result != null) {
+                                        for (Iterator<Element> it = result.iterator(); it.hasNext();) {
+                                                Element element = it.next();
 
-			return result;
-		} else {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0} General disco items request, node: {1}", new Object[] {
-						getName(), node });
-			}
+                                                if (element.getAttribute("node") == null) {
+                                                        it.remove();
+                                                }
+                                        }
+                                }
+                        }
 
-			if (node == null) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0} Disco items request for null node",
-							new Object[] { getName() });
-				}
+                        //Element result = serviceEntity.getDiscoItem(null, getName() + "." + jid);
+                        if (log.isLoggable(Level.FINEST)) {
+                                log.log(Level.FINEST, "Found disco items: {0}", (result != null ? result.toString() : null));
+                        }
 
-				Element res = null;
+                        return result;
+                }
+                else {
+                        if (log.isLoggable(Level.FINEST)) {
+                                log.log(Level.FINEST, "{0} General disco items request, node: {1}",
+                                        new Object[]{getName(),
+                                                node});
+                        }
+                 
+                        if (node == null) {
+                                if (log.isLoggable(Level.FINEST)) {
+                                        log.log(Level.FINEST, "{0} Disco items request for null node",
+                                                new Object[]{getName()});
+                                }
+                        
+                                Element res = null;
+                                if (!serviceEntity.isAdminOnly() || isAdmin(from) || nonAdminCommands) {
+                                        res = serviceEntity.getDiscoItem(null, isSubdomain() ? (getName() + "." + jid) : getName() + "@" + jid.toString());
+                                }
 
-				if (!serviceEntity.isAdminOnly() || isAdminFrom || nonAdminCommands) {
-					res =
-							serviceEntity.getDiscoItem(null,
-									BareJID.toString(getName(), jid.toString()));
+                                result = serviceEntity.getDiscoItems(null, null, (isAdminFrom || nonAdminCommands));
 
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "{0} not admin only or isAdmin, result: {1}",
-								new Object[] { getName(), res });
-					}
-				}
+                                if (res != null) {
+                                        if (result != null) {
+                                                for (Iterator<Element> it = result.iterator(); it.hasNext();) {
+                                                        Element element = it.next();
 
-				result = serviceEntity.getDiscoItems(null, null, isAdminFrom || nonAdminCommands);
+                                                        if (element.getAttribute("node") != null) {
+                                                                it.remove();
+                                                        }
+                                                }
 
-				if (res != null) {
-					if (result != null) {
-						for (Iterator<Element> it = result.iterator(); it.hasNext();) {
-							Element element = it.next();
+                                                result.add(0, res);
+                                        }
+                                        else {
+                                                result = Arrays.asList(res);
+                                        }
+                                }
+                        }
 
-							if (element.getAttribute("node") != null) {
-								it.remove();
-							}
-						}
-
-						result.add(0, res);
-					} else {
-						result = Arrays.asList(res);
-					}
-				}
-			}
-
-			return result;
-		}
-	}
+                        return result;
+                }
+        }
 
 	/**
 	 * Method description
