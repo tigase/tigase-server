@@ -184,8 +184,6 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 	private JID redirectTo = null;
 	private ServiceEntity serviceEntity = null;
 
-	// ~--- get methods ----------------------------------------------------------
-
 	@Override
 	public void setVHostManager(VHostManagerIfc manager) {
 		this.vHostManager = manager;
