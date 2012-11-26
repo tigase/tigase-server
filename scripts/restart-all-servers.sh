@@ -6,12 +6,25 @@ if [ "$1" == "" ] ; then
 else
   SERVERS=`cat $1`
 fi
-DIR="tigase-server"
 
-for s in ${SERVERS} ; do 
+DIR="/home/tigase/tigase-server"
 
-  if [[ ${s} != "#"* ]] ; then 
-    ssh root@${s} "/etc/init.d/tigase stop ; sleep 10 ; rm -f /home/tigase/${DIR}/logs/* ;  /etc/init.d/tigase start"
+echo -e "=== SERVERS:\n${SERVERS}"
+echo -e "=== DIR:\n${DIR}"
+
+read -p "Press [Enter] key to start restart..."
+
+for s in ${SERVERS} ; do
+
+  if [[ ${s} != "#"* ]] ; then
+
+	echo -e "\n\n===\trestarting ${s} ==="
+
+    ssh root@${s} "service tigase stop ; sleep 10 ; rm -f ${DIR}/logs/* ; service tigase start"
+
+	echo -e "===\trestart of ${s} FINISHED ==="
+
   fi
 
 done
+
