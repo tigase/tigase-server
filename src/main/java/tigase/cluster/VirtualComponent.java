@@ -37,6 +37,10 @@ import tigase.server.ServerComponent;
 import tigase.util.DNSResolver;
 import tigase.util.TigaseStringprepException;
 
+import tigase.vhosts.VHostItem;
+import tigase.vhosts.VHostListener;
+import tigase.vhosts.VHostManagerIfc;
+
 import tigase.xml.Element;
 
 import tigase.xmpp.BareJID;
@@ -64,30 +68,30 @@ import java.util.logging.Logger;
  * configuration they pretend to be the component returning a correct service
  * disco information and forward all packets for this component to a cluster
  * node with real component running.
- * 
+ *
  * This is a very lightweight implementation which doesn't use much resources
  * either memory or CPU.
- * 
+ *
  * It can work well for any kind of a component: MUC, PubSub, transport either
  * native Tigase components or third-party components connected via XEP-0114 -
  * external protocol component.
- * 
+ *
  * Basic configuration parameters are actually the same as for a real component.
  * You set a real component name as a name for the virtual component and a
  * vritual component class name to load. Let's say we want to deploy MUC
  * component this way. The MUC component is visible as
  * <code>muc.domain.our</code> in our installation. Thus the name of the
  * component is: <code>muc</code>:
- * 
+ *
  * <pre>
  * --comp-name-1=muc
  * --comp-class-1=tigase.cluster.VirtualComponent
  * </pre>
- * 
+ *
  * This is pretty much all you need to load a virtual component. A few other
  * options are needed to point to correct destination addresses for forwarded
  * packets and to set correct service discovery parameters:
- * 
+ *
  * <pre>
  * muc/redirect-to=muc@cluster-node-with-real-muc.domain.our
  * muc/disco-name=Multi User Chat
@@ -96,15 +100,17 @@ import java.util.logging.Logger;
  * muc/disco-category=conference
  * muc/disco-features=http://jabber.org/protocol/muc
  * </pre>
- * 
+ *
  * Above options set all possible parameters to setup virtual MUC component.
  * Created: Dec 13, 2008 7:44:35 PM
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class VirtualComponent implements ServerComponent, XMPPService, Configurable,
-		DisableDisco {
+		DisableDisco, VHostListener {
+
+	protected VHostManagerIfc vHostManager = null;
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -178,12 +184,48 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 	private JID redirectTo = null;
 	private ServiceEntity serviceEntity = null;
 
-	// ~--- get methods ----------------------------------------------------------
+	@Override
+	public void setVHostManager(VHostManagerIfc manager) {
+		this.vHostManager = manager;
+	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean handlesLocalDomains() {
+		return false;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean handlesNameSubdomains() {
+		return true;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean handlesNonLocalDomains() {
+		return false;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -193,10 +235,10 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param params
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -228,10 +270,10 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param from
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -241,12 +283,12 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param node
 	 * @param jid
 	 * @param from
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -256,12 +298,12 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param node
 	 * @param jid
 	 * @param from
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -273,8 +315,8 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -286,7 +328,7 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 
 	/**
 	 * Method description
-	 * 
+	 *
 	 */
 	@Override
 	public void initializationCompleted() {
@@ -294,8 +336,8 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param packet
 	 * @param results
 	 */
@@ -311,7 +353,7 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 
 	/**
 	 * Method description
-	 * 
+	 *
 	 */
 	@Override
 	public void release() {
@@ -321,8 +363,8 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param name
 	 */
 	@Override
@@ -333,8 +375,8 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param properties
 	 */
 	@Override
