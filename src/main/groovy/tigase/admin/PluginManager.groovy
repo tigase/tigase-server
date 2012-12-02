@@ -61,7 +61,7 @@ if (!submit) {
         def res = (Iq)p.commandResult(Command.DataType.form)
                 
         def pluginsAll = [];
-        pluginsAll.addAll(ModulesManagerImpl.getInstance().pluginsClasses.keySet());
+        pluginsAll.addAll(ModulesManagerImpl.getInstance().plugins.keySet());
         def conf = XMPPServer.getConfigurator();
         def pluginsEnabled = [];
         pluginsEnabled.addAll(tigase.server.xmppsession.SessionManagerConfig.PLUGINS_FULL_PROP_VAL);
