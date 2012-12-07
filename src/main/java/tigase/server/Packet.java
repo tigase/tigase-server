@@ -113,6 +113,10 @@ public class Packet {
 	 */
 	public static boolean FULL_DEBUG = Boolean.getBoolean("packet.debug.full");
 	public static final String CLIENT_XMLNS = "jabber:client";
+	public static final String FROM_ATT = "from";
+	public static final String TO_ATT = "to";
+	public static final String PRIORITY_ATT = "pr";
+	public static final String PERM_ATT = "perm";
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -765,9 +769,9 @@ public class Packet {
 			this.stanzaFrom = stanzaFrom;
 
 			if (stanzaFrom == null) {
-				elem.removeAttribute("from");
+				elem.removeAttribute(FROM_ATT);
 			} else {
-				elem.setAttribute("from", stanzaFrom.toString());
+				elem.setAttribute(FROM_ATT, stanzaFrom.toString());
 			}
 		}
 
@@ -775,9 +779,9 @@ public class Packet {
 			this.stanzaTo = stanzaTo;
 
 			if (stanzaTo == null) {
-				elem.removeAttribute("to");
+				elem.removeAttribute(TO_ATT);
 			} else {
-				elem.setAttribute("to", stanzaTo.toString());
+				elem.setAttribute(TO_ATT, stanzaTo.toString());
 			}
 		}
 
@@ -804,7 +808,7 @@ public class Packet {
 	 * JIDs parsing.
 	 */
 	public void initVars() throws TigaseStringprepException {
-		String tmp = elem.getAttribute("to");
+		String tmp = elem.getAttribute(TO_ATT);
 
 		if (tmp != null) {
 			stanzaTo = JID.jidInstance(tmp);
@@ -812,7 +816,7 @@ public class Packet {
 			stanzaTo = null;
 		}
 
-		tmp = elem.getAttribute("from");
+		tmp = elem.getAttribute(FROM_ATT);
 
 		if (tmp != null) {
 			stanzaFrom = JID.jidInstance(tmp);
@@ -823,6 +827,16 @@ public class Packet {
 		stanzaId = elem.getAttribute("id");
 		packetToString = null;
 		packetToStringSecure = null;
+		tmp = elem.getAttribute(PRIORITY_ATT);
+		if (tmp != null) {
+			priority = Priority.valueOf(tmp);
+		}
+		tmp = elem.getAttribute(PERM_ATT);
+		if (tmp != null) {
+			permissions = Permissions.valueOf(tmp);
+		}
+
+
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -913,11 +927,11 @@ public class Packet {
 
 		return false;
 	}
-	
+
 	public void setXMLNS(String xmlns) {
 		elem.setXMLNS(xmlns);
 		packetToString = null;
-		packetToStringSecure = null;		
+		packetToStringSecure = null;
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -939,7 +953,7 @@ public class Packet {
 	 */
 	public Packet okResult(final String includeXML, final int originalXML) {
 		Element reply = new Element(elem.getName());
-		
+
 		if (getXMLNS() != null) {
 			reply.setXMLNS(getXMLNS());
 		}
@@ -1058,9 +1072,10 @@ public class Packet {
 	 * @return a new <code>Packet</code> instance with <code>route</code> stanza.
 	 */
 	public Packet packRouted() {
-		Element routedp = new Element("route", new String[] { "to", "from" },
-			new String[] { getTo().toString(),
-				getFrom().toString() });
+		Element routedp = new Element("route",
+			new String[] { TO_ATT, FROM_ATT, PRIORITY_ATT, PERM_ATT },
+			new String[] { getTo().toString(),	getFrom().toString(),
+										 priority.toString(), permissions.toString() });
 
 		routedp.addChild(elem);
 
@@ -1342,6 +1357,8 @@ public class Packet {
 
 		result.setPacketTo(getTo());
 		result.setPacketFrom(getFrom());
+		result.setPriority(priority);
+		result.setPermissions(permissions);
 
 		return result;
 	}
