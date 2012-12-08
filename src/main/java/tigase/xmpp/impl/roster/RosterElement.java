@@ -37,7 +37,7 @@ import static tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.HashMap;
+import java.util.ConcurrentHashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -47,10 +47,10 @@ import java.util.logging.Logger;
 
 /**
  * Describe class RosterElement here.
- * 
- * 
+ *
+ *
  * Created: Wed Oct 29 14:21:16 2008
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -84,7 +84,7 @@ public class RosterElement implements RosterElementIfc {
 	private String stringpreped = null;
 	private SubscriptionType subscription = null;
 	private boolean presence_sent = false;
-	private Map<String, Boolean> onlineMap = new HashMap<String, Boolean>();
+	private Map<String, Boolean> onlineMap = new ConcurrentHashMap<String, Boolean>();
 
 	// private Element item = null;
 	// private boolean online = false;
@@ -95,8 +95,8 @@ public class RosterElement implements RosterElementIfc {
 
 	/**
 	 * Creates a new <code>RosterElement</code> instance.
-	 * 
-	 * 
+	 *
+	 *
 	 * @param roster_el
 	 * @param session
 	 * @throws TigaseStringprepException
@@ -165,8 +165,8 @@ public class RosterElement implements RosterElementIfc {
 
 	/**
 	 * Constructs ...
-	 * 
-	 * 
+	 *
+	 *
 	 * @param jid
 	 * @param name
 	 * @param groups
@@ -186,8 +186,8 @@ public class RosterElement implements RosterElementIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param groups
 	 */
 	public void addGroups(String[] groups) {
@@ -218,8 +218,8 @@ public class RosterElement implements RosterElementIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public String[] getGroups() {
@@ -228,8 +228,8 @@ public class RosterElement implements RosterElementIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public JID getJid() {
@@ -238,8 +238,8 @@ public class RosterElement implements RosterElementIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public String getName() {
@@ -248,8 +248,8 @@ public class RosterElement implements RosterElementIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public String getOtherData() {
@@ -258,8 +258,8 @@ public class RosterElement implements RosterElementIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public Element getRosterElement() {
@@ -294,8 +294,8 @@ public class RosterElement implements RosterElementIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public Element getRosterItem() {
@@ -332,8 +332,8 @@ public class RosterElement implements RosterElementIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public SubscriptionType getSubscription() {
@@ -342,8 +342,8 @@ public class RosterElement implements RosterElementIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public boolean isModified() {
@@ -352,8 +352,8 @@ public class RosterElement implements RosterElementIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public boolean isOnline() {
@@ -362,8 +362,8 @@ public class RosterElement implements RosterElementIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public boolean isPresence_sent() {
@@ -374,8 +374,8 @@ public class RosterElement implements RosterElementIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param groups
 	 */
 	public void setGroups(String[] groups) {
@@ -387,8 +387,8 @@ public class RosterElement implements RosterElementIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param name
 	 */
 	public void setName(String name) {
@@ -407,12 +407,12 @@ public class RosterElement implements RosterElementIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param online
 	 */
 	public void setOnline(String resource, boolean online) {
-		if (onlineMap != null) {
+		if (onlineMap != null && resource != null) {
 			if (online) {
 				onlineMap.put(resource, Boolean.TRUE);
 			} else {
@@ -423,8 +423,8 @@ public class RosterElement implements RosterElementIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param other_data
 	 */
 	public void setOtherData(String other_data) {
@@ -433,8 +433,8 @@ public class RosterElement implements RosterElementIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param presence_sent
 	 */
 	public void setPresence_sent(boolean presence_sent) {
@@ -443,8 +443,8 @@ public class RosterElement implements RosterElementIfc {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param subscription
 	 */
 	public void setSubscription(SubscriptionType subscription) {
