@@ -37,7 +37,7 @@ import static tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
