@@ -36,8 +36,12 @@ import tigase.xmpp.BareJID;
 public interface BoshSessionTaskHandler {
 
 	BoshTask scheduleTask(BoshSession bs, long delay);
+        
+        BoshSendQueueTask scheduleSendQueueTask(BoshSession tt, long delay);
 
 	void cancelTask(BoshTask bs);
+        
+        void cancelSendQueueTask(BoshSendQueueTask bt);
 
 	void writeRawData(BoshIOService ios, String data);
 
