@@ -37,7 +37,7 @@ public abstract class Constants {
 
 	/** Field description */
 	public static final String BOSH_VERSION = "1.6";
-	protected static final int MAX_PACKETS = 2;
+	protected static final int MAX_PACKETS = 15;
 	protected static final String XMLNS_CLIENT_VAL = "jabber:client";
 	protected static final String MAX_WAIT_DEF_PROP_KEY = "max-wait";
 	protected static final long MAX_WAIT_DEF_PROP_VAL = 30;
@@ -51,6 +51,10 @@ public abstract class Constants {
 	protected static final int HOLD_REQUESTS_PROP_VAL = 1;
 	protected static final String MAX_PAUSE_PROP_KEY = "max-inactivity";
 	protected static final long MAX_PAUSE_PROP_VAL = 10;
+        protected static final int MAX_BATCH_SIZE_VAL = MAX_PACKETS;
+        protected static final String MAX_BATCH_SIZE_KEY = "max-batch-size";
+        protected static final String BATCH_QUEUE_TIMEOUT_KEY = "batch-queue-timeout";
+        protected static final long BATCH_QUEUE_TIMEOUT_VAL = 100;
 	protected static final String BOSH_XMLNS = "http://jabber.org/protocol/httpbind";
 	protected static final String BODY_EL_NAME = "body";
 	protected static final String CONTENT_ATTR = "content";
