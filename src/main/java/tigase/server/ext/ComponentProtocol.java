@@ -56,6 +56,7 @@ import tigase.xmpp.PacketErrorTypeException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -959,22 +960,39 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 		if (refObject == null) {
 			refObject = new CopyOnWriteArrayList<ComponentConnection>();
-			s.setRefObject(refObject);
 		}
 
-		refObject.add(conn);
+		// keep all connections sorted, fix for #983
+		synchronized ( refObject ) {
+			refObject.add( conn );
+			// workaround to sort CopyOnWriteArrayList
+			ComponentConnection[] arr_list = refObject.toArray( new ComponentConnection[ refObject.size() ] );
+			Arrays.sort( arr_list );
+			refObject = new CopyOnWriteArrayList<ComponentConnection>( arr_list );
+		}
+		s.setRefObject(refObject);
 
 		CopyOnWriteArrayList<ComponentConnection> conns = connections.get(hostname);
 
 		if (conns == null) {
 			conns = new CopyOnWriteArrayList<ComponentConnection>();
-			connections.put(hostname, conns);
 		}
 
 		// Not very optimal, however this does not happen (should not) very often
 		// and the data collections is optimized for fast object retrieval
 		// by index (round robin balance for example)
-		boolean result = conns.add(conn);
+
+		// keep all connections sorted, fix for #983
+		boolean result;
+		synchronized (conns) {
+			result = conns.add(conn);
+			// workaround to sort CopyOnWriteArrayList
+			ComponentConnection[] arr_list = conns.toArray( new ComponentConnection[ conns.size() ] );
+			Arrays.sort( arr_list );
+			conns = new CopyOnWriteArrayList<ComponentConnection>( arr_list );
+		}
+
+		connections.put(hostname, conns);
 
 		if (result) {
 			log.finer("A new component connection added for: " + hostname);
