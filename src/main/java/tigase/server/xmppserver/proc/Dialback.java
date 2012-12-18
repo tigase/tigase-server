@@ -276,18 +276,9 @@ public class Dialback extends S2SAbstractProcessor {
 			CID cid = (CID) serv.getSessionData().get("cid");
 			CIDConnections cid_conns = handler.getCIDConnections(cid, false);
 
-			// It must be always set for connect connection type
-			String uuid = UUID.randomUUID().toString();
-			String key = null;
-
-			try {
-				key = Algorithms.hexDigest(remote_id, uuid, "SHA");
-			} catch (NoSuchAlgorithmException e) {
-				key = uuid;
-			} // end of try-catch
-
-			serv.setDBKey(key);
-			cid_conns.addDBKey(remote_id, key);
+                        String secret = handler.getSecretForDomain(cid.getLocalHost());
+			String key = Algorithms.generateDialbackKey(cid.getLocalHost(), cid.getRemoteHost(), 
+                                        secret, remote_id);
 
 			if (!serv.isHandshakingOnly()) {
 				Element elem =
@@ -391,22 +382,21 @@ public class Dialback extends S2SAbstractProcessor {
 		}
 
 		if ((p.getElemName() == VERIFY_EL_NAME) || (p.getElemName() == DB_VERIFY_EL_NAME)) {
-			if (p.getType() == null) {
-				String local_key =
-						handler.getLocalDBKey(cid_main, cid_packet, remote_key, p.getStanzaId(),
-								serv.getSessionId());
+			if (p.getType() == null) {                                
+                                String secret = handler.getSecretForDomain(cid_packet.getLocalHost());                                
+				String local_key = Algorithms.generateDialbackKey(cid_packet.getLocalHost(), 
+                                                cid_packet.getRemoteHost(), secret, p.getStanzaId());
 
 				if (local_key == null) {
 					if (log.isLoggable(Level.FINER)) {
 						log.log(Level.FINER, "The key is not available for connection CID: {0}, "
-								+ "or the packet CID: {1} maybe it is "
-								+ "located on a different node...", new Object[] { cid_main, cid_packet });
+								+ "or the packet CID: {1} ", new Object[] { cid_main, cid_packet });
 					}
-				} else {
-					handler.sendVerifyResult(DB_VERIFY_EL_NAME, cid_main, cid_packet,
-							local_key.equals(remote_key), p.getStanzaId(), serv.getSessionId(), null,
-							false);
-				}
+                                }
+				handler.sendVerifyResult(DB_VERIFY_EL_NAME, cid_main, cid_packet,
+						local_key != null && local_key.equals(remote_key), p.getStanzaId(), 
+                                                serv.getSessionId(), null, false);
+				
 			} else {
 				if (wasVerifyRequested(serv, p.getStanzaFrom().toString())) {
 					handler.sendVerifyResult(DB_RESULT_EL_NAME, cid_main, cid_packet,

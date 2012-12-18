@@ -69,7 +69,9 @@ public class S2SConnectionClustered extends S2SConnectionManager implements
 	private static final Logger log = Logger.getLogger(S2SConnectionClustered.class
 			.getName());
 
-	private static final String CHECK_DB_KEY_CMD = "check-db-key-s2s-cmd";
+	@Deprecated
+        private static final String CHECK_DB_KEY_CMD = "check-db-key-s2s-cmd";
+	@Deprecated
 	private static final String CHECK_DB_KEY_RESULT_CMD = "check-db-key-result-s2s-cmd";
 
 	private static final String CONN_CID = "connection-cid";
@@ -80,7 +82,10 @@ public class S2SConnectionClustered extends S2SConnectionManager implements
 	private static final String VALID = "valid";
 
 	private ClusterControllerIfc clusterController = null;
-	private CommandListener checkDBKey = new CheckDBKey();
+
+	@Deprecated
+        private CommandListener checkDBKey = new CheckDBKey();
+	@Deprecated
 	private CommandListener checkDBKeyResult = new CheckDBKeyResult();
 
 	// ~--- fields ---------------------------------------------------------------
@@ -102,6 +107,7 @@ public class S2SConnectionClustered extends S2SConnectionManager implements
 	 * @return
 	 */
 	@Override
+	@Deprecated
 	public String getLocalDBKey(CID connectionCid, CID keyCid, String key,
 			String key_sessionId, String asking_sessionId) {
 		String local_key =
@@ -189,6 +195,7 @@ public class S2SConnectionClustered extends S2SConnectionManager implements
 		return cluster_node;
 	}
 
+	@Deprecated
 	private class CheckDBKey implements CommandListener {
 
 		/*
@@ -267,6 +274,7 @@ public class S2SConnectionClustered extends S2SConnectionManager implements
 
 	}
 
+	@Deprecated
 	private class CheckDBKeyResult implements CommandListener {
 
 		/*

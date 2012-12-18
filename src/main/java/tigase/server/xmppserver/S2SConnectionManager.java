@@ -269,6 +269,18 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 		return "S2S connection manager";
 	}
 
+        /**
+         * Method returns secret used for domain for generation of dialback key
+         * 
+         * @param domain
+         * @return 
+         */
+        @Override
+        public String getSecretForDomain(String domain) {
+                // TODO: #979 - https://projects.tigase.org/issues/979
+                return "s3cr3tf0rd14lb4ck";
+        }
+        
 	/**
 	 * 
 	 * @param connectionCid
@@ -279,6 +291,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	 * @return
 	 */
 	@Override
+	@Deprecated
 	public String getLocalDBKey(CID connectionCid, CID keyCid, String key,
 			String key_sessionId, String asking_sessionId) {
 		CIDConnections cid_conns = getCIDConnections(keyCid);

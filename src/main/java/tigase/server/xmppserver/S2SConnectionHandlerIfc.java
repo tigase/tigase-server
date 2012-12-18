@@ -75,7 +75,10 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 			throws NotLocalhostException, LocalhostException;
 
 	BareJID getDefHostName();
-
+       
+        String getSecretForDomain(String domain);
+        
+        @Deprecated
 	String getLocalDBKey(CID cid, CID keyCid, String remote_key, String stanzaId, String sessionId);
 
 	//~--- methods --------------------------------------------------------------
