@@ -18,11 +18,11 @@
  * $Rev: 2411 $
  * Last modified by $Author: kobit $
  * $Date: 2010-10-27 20:27:58 -0600 (Wed, 27 Oct 2010) $
- * 
+ *
  */
 package tigase.server.ext.lb;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import tigase.server.Packet;
 import tigase.server.ext.ComponentConnection;
@@ -33,8 +33,7 @@ import tigase.server.ext.ComponentIOService;
  */
 public class ReceiverBareJidLB implements LoadBalancerIfc {
 
-	public ComponentIOService selectConnection(Packet p,
-			ArrayList<ComponentConnection> conns) {
+	public ComponentIOService selectConnection(Packet p, List<ComponentConnection> conns) {
 		ComponentIOService result = null;
 		int idx = Math.abs(p.getStanzaTo().getBareJID().hashCode() % conns.size());
 		ComponentConnection conn = conns.get(idx);

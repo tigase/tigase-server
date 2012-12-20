@@ -56,6 +56,7 @@ import tigase.xmpp.PacketErrorTypeException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -74,7 +75,7 @@ import javax.script.Bindings;
 
 /**
  * Created: Sep 30, 2009 8:28:13 PM
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -134,8 +135,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 	 * Since for each domain we can have 1..N connections the Map value is a List
 	 * of connections.
 	 */
-	private Map<String, ArrayList<ComponentConnection>> connections =
-			new ConcurrentHashMap<String, ArrayList<ComponentConnection>>();
+	private Map<String, CopyOnWriteArrayList<ComponentConnection>> connections =
+			new ConcurrentHashMap<String, CopyOnWriteArrayList<ComponentConnection>>();
 	private String[] hostnamesToBind = null;
 	private int maxAuthenticationAttempts = 1;
 	private ComponentRepository<CompRepoItem> repo = null;
@@ -159,7 +160,7 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 	/**
 	 * Constructs ...
-	 * 
+	 *
 	 */
 	public ComponentProtocol() {
 		super();
@@ -193,8 +194,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param serv
 	 */
 	@Override
@@ -221,8 +222,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param serv
 	 * @param packet
 	 */
@@ -245,8 +246,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param hostname
 	 * @param serv
 	 */
@@ -293,10 +294,10 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param hostname
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -306,10 +307,10 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param params
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -356,8 +357,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -367,8 +368,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -378,10 +379,10 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param key
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -391,8 +392,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param list
 	 */
 	@Override
@@ -405,7 +406,7 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 		int size = 0;
 
-		for (ArrayList<ComponentConnection> conns : connections.values()) {
+		for (CopyOnWriteArrayList<ComponentConnection> conns : connections.values()) {
 			size += conns.size();
 		}
 
@@ -414,10 +415,10 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param serv
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -437,10 +438,10 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param xmlns
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -452,8 +453,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param binds
 	 */
 	@Override
@@ -464,10 +465,10 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param serv
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -539,8 +540,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param port_props
 	 */
 	@Override
@@ -551,8 +552,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param serv
 	 */
 	@Override
@@ -590,10 +591,10 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param service
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -644,8 +645,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param properties
 	 */
 	@Override
@@ -745,8 +746,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param service
 	 */
 	@Override
@@ -755,14 +756,14 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param hostname
 	 * @param serv
 	 */
 	@Override
 	public void unbindHostname(String hostname, ComponentIOService serv) {
-		ArrayList<ComponentConnection> conns = connections.get(hostname);
+		CopyOnWriteArrayList<ComponentConnection> conns = connections.get(hostname);
 
 		if (conns != null) {
 			ComponentConnection conn = null;
@@ -785,11 +786,11 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param ios
 	 * @param p
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -806,8 +807,8 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param serv
 	 */
 	@Override
@@ -816,11 +817,11 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param serv
 	 * @param attribs
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -872,10 +873,10 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 		ComponentIOService result = null;
 		String hostname = p.getStanzaTo().getDomain();
-		ArrayList<ComponentConnection> conns = connections.get(hostname);
+		CopyOnWriteArrayList<ComponentConnection> conns = connections.get(hostname);
 		// If there is no connections list for this domain and routings are set to *
 		// we use the first available list.
-		for (ArrayList<ComponentConnection> c : connections.values()) {
+		for (CopyOnWriteArrayList<ComponentConnection> c : connections.values()) {
 			// Is there a better way to take the first available element?
 			if (c.size() > 0 && ".*".equals(c.get(0).getService().getRoutings())) {
 				conns = c;
@@ -893,7 +894,7 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 					break;
 				}
 			}
-			
+
 			// Now, load balancer selects the best connection to send the packet
 			if (result == null && conns.size() > 1) {
 				CompRepoItem cmp_repo_item = getCompRepoItem(hostname);
@@ -959,22 +960,39 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 		if (refObject == null) {
 			refObject = new CopyOnWriteArrayList<ComponentConnection>();
-			s.setRefObject(refObject);
 		}
 
-		refObject.add(conn);
+		// keep all connections sorted, fix for #983
+		synchronized ( refObject ) {
+			refObject.add( conn );
+			// workaround to sort CopyOnWriteArrayList
+			ComponentConnection[] arr_list = refObject.toArray( new ComponentConnection[ refObject.size() ] );
+			Arrays.sort( arr_list );
+			refObject = new CopyOnWriteArrayList<ComponentConnection>( arr_list );
+		}
+		s.setRefObject(refObject);
 
-		ArrayList<ComponentConnection> conns = connections.get(hostname);
+		CopyOnWriteArrayList<ComponentConnection> conns = connections.get(hostname);
 
 		if (conns == null) {
-			conns = new ArrayList<ComponentConnection>();
-			connections.put(hostname, conns);
+			conns = new CopyOnWriteArrayList<ComponentConnection>();
 		}
 
 		// Not very optimal, however this does not happen (should not) very often
 		// and the data collections is optimized for fast object retrieval
 		// by index (round robin balance for example)
-		boolean result = conns.add(conn);
+
+		// keep all connections sorted, fix for #983
+		boolean result;
+		synchronized (conns) {
+			result = conns.add(conn);
+			// workaround to sort CopyOnWriteArrayList
+			ComponentConnection[] arr_list = conns.toArray( new ComponentConnection[ conns.size() ] );
+			Arrays.sort( arr_list );
+			conns = new CopyOnWriteArrayList<ComponentConnection>( arr_list );
+		}
+
+		connections.put(hostname, conns);
 
 		if (result) {
 			log.finer("A new component connection added for: " + hostname);
@@ -986,7 +1004,7 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 	private synchronized boolean removeComponentConnection(String hostname,
 			ComponentConnection conn) {
 		boolean result = false;
-		ArrayList<ComponentConnection> conns = connections.get(hostname);
+		CopyOnWriteArrayList<ComponentConnection> conns = connections.get(hostname);
 
 		if (conns != null) {
 
@@ -1074,7 +1092,7 @@ public class ComponentProtocol extends ConnectionManager<ComponentIOService> imp
 
 		/**
 		 * Method description
-		 * 
+		 *
 		 */
 		@Override
 		public void run() {
