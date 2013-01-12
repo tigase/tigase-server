@@ -117,7 +117,7 @@ public abstract class S2SAbstractProcessor implements S2SProcessor {
 	 * @param handler
 	 */
 	@Override
-	public void init(S2SConnectionHandlerIfc<S2SIOService> handler) {
+	public void init(S2SConnectionHandlerIfc<S2SIOService> handler, Map<String,Object> props) {
 		this.handler = handler;
 	}
 

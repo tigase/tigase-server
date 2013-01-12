@@ -70,7 +70,7 @@ public interface S2SProcessor {
 	 */
 	public void streamFeatures(S2SIOService serv, List<Element> results);
 
-	void init(S2SConnectionHandlerIfc<S2SIOService> handler);
+	void init(S2SConnectionHandlerIfc<S2SIOService> handler, Map<String,Object> props);
 
 	boolean process(Packet p, S2SIOService serv, Queue<Packet> results);
 
