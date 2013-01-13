@@ -92,6 +92,9 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 	private int concurrent_requests = CONCURRENT_REQUESTS_PROP_VAL;
 	private ReceiverTimeoutHandler stoppedHandler = newStoppedHandler();
 	private ReceiverTimeoutHandler startedHandler = newStartedHandler();
+        
+        private int max_batch_size = MAX_BATCH_SIZE_VAL;
+        private long batch_queue_timeout = BATCH_QUEUE_TIMEOUT_VAL;
 	// This should be actually a multi-thread save variable.
 	// Changing it to
 	protected final Map<UUID, BoshSession> sessions =
@@ -156,6 +159,17 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 	 * Method description
 	 * 
 	 * 
+	 * @param tt
+	 */
+	@Override
+	public void cancelSendQueueTask(BoshSendQueueTask tt) {
+		tt.cancel();
+	}        
+        
+	/**
+	 * Method description
+	 * 
+	 * 
 	 * @param params
 	 * 
 	 * @return
@@ -170,7 +184,9 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 		props.put(CONCURRENT_REQUESTS_PROP_KEY, CONCURRENT_REQUESTS_PROP_VAL);
 		props.put(HOLD_REQUESTS_PROP_KEY, HOLD_REQUESTS_PROP_VAL);
 		props.put(MAX_PAUSE_PROP_KEY, MAX_PAUSE_PROP_VAL);
-
+                props.put(MAX_BATCH_SIZE_KEY, MAX_BATCH_SIZE_VAL);
+                props.put(BATCH_QUEUE_TIMEOUT_KEY, BATCH_QUEUE_TIMEOUT_VAL);
+                
 		return props;
 	}
 
@@ -260,7 +276,8 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 					synchronized (bs) {
 						if (sid_str == null) {
 							bs.init(p, serv, max_wait, min_polling, max_inactivity,
-									concurrent_requests, hold_requests, max_pause, out_results);
+									concurrent_requests, hold_requests, max_pause,
+                                                                        max_batch_size, batch_queue_timeout, out_results);
 						} else {
 							bs.processSocketPacket(p, serv, out_results);
 						}
@@ -301,6 +318,25 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 	}
 
 	/**
+	 * Method description
+	 * 
+	 * 
+	 * @param bs
+	 * @param delay
+	 * 
+	 * @return
+	 */
+	@Override
+	public BoshSendQueueTask scheduleSendQueueTask(final BoshSession bs, long delay) {
+		BoshSendQueueTask bt = new BoshSendQueueTask(bs);
+
+		addTimerTask(bt, delay);
+
+		// boshTasks.schedule(bt, delay);
+		return bt;
+	}
+
+        /**
 	 * Method description
 	 * 
 	 * 
@@ -366,6 +402,14 @@ public class BoshConnectionManager extends ClientConnectionManager implements
 			max_pause = (Long) props.get(MAX_PAUSE_PROP_KEY);
 			log.info("Setting max_pause to: " + max_pause);
 		}
+                if (props.get(MAX_BATCH_SIZE_KEY) != null) {
+                        max_batch_size = (Integer) props.get(MAX_BATCH_SIZE_KEY);
+                        log.info("Setting max_batch_size to: " + max_batch_size);
+                }
+                if (props.get(BATCH_QUEUE_TIMEOUT_KEY) != null) {
+                        batch_queue_timeout = (Long) props.get(BATCH_QUEUE_TIMEOUT_KEY);
+                        log.info("Setting batch_queue_timeout to: " + batch_queue_timeout);
+                }
 	}
 
 	// ~--- methods --------------------------------------------------------------

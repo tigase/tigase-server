@@ -135,6 +135,11 @@ public class BoshSession {
 	private int concurrent_requests = CONCURRENT_REQUESTS_PROP_VAL;
 	private boolean cache_on = false;
 
+        private int max_batch_size = MAX_BATCH_SIZE_VAL;
+        private long batch_queue_timeout = BATCH_QUEUE_TIMEOUT_VAL;
+        private BoshSendQueueTask queueTask = null;
+        private long last_send_time;
+        
 	// ~--- constructors ---------------------------------------------------------
 
 	/**
@@ -150,6 +155,8 @@ public class BoshSession {
 		this.domain = def_domain;
 		this.dataReceiver = dataReceiver;
 		this.handler = handler;
+                
+                this.last_send_time = System.currentTimeMillis();
 	}
 
 	// ~--- methods --------------------------------------------------------------
@@ -266,6 +273,7 @@ public class BoshSession {
 	 */
 	public void init(Packet packet, BoshIOService service, long max_wait, long min_polling,
 			long max_inactivity, int concurrent_requests, int hold_requests, long max_pause,
+                        int max_batch_size, long batch_queue_timeout,
 			Queue<Packet> out_results) {
 		String cache_action = packet.getAttribute(CACHE_ATTR);
 
@@ -324,6 +332,9 @@ public class BoshSession {
 			this.domain = packet.getAttribute(TO_ATTR);
 		}
 
+                this.max_batch_size = max_batch_size;
+                this.batch_queue_timeout = batch_queue_timeout;
+                
 		this.min_polling = min_polling;
 		this.max_inactivity = max_inactivity;
 		this.concurrent_requests = concurrent_requests;
@@ -419,10 +430,19 @@ public class BoshSession {
 		}
 
 		if ((!connections.isEmpty()) && ((!waiting_packets.isEmpty()) || terminate)) {
-			Map.Entry<BoshTask, BoshIOService> entry =  connections.pollFirstEntry();
-			BoshIOService serv = entry.getValue();
-
-			sendBody(serv, null);
+                        long currentTime = System.currentTimeMillis();
+                        if (terminate || waiting_packets.size() >= max_batch_size || (currentTime - last_send_time) > batch_queue_timeout) {
+                                Map.Entry<BoshTask, BoshIOService> entry =  connections.pollFirstEntry();
+                                BoshIOService serv = entry.getValue();
+                                                        
+                                sendBody(serv, null);                                
+                        }
+                        else {
+                                // @todo - change it to use value from settings
+                                if (queueTask == null) {                                
+                                        queueTask = handler.scheduleSendQueueTask(this, batch_queue_timeout);
+                                }
+                        }
 		}
 	}
 
@@ -916,7 +936,31 @@ public class BoshSession {
 		terminate = true;
 	}
 
+        public synchronized void sendWaitingPackets() {
+                if (log.isLoggable(Level.FINEST)) {
+                        log.finest("trying to send waiting packets from queue of " + getSid() +" after timer = " + waiting_packets.size());
+                }
+                if (!waiting_packets.isEmpty()) {
+                        Map.Entry<BoshTask, BoshIOService> entry =  connections.pollFirstEntry();
+                        if (entry == null) return;
+                        
+                        BoshIOService serv = entry.getValue();
+                        
+                        sendBody(serv, null);
+                }
+        }
+        
 	private synchronized void sendBody(BoshIOService serv, Element body_par) {
+                if (queueTask != null) {
+                        if (log.isLoggable(Level.FINEST)) {
+                                log.finest("Canceling queue timer: " + getSid());
+                        }
+                        handler.cancelSendQueueTask(queueTask);
+                        queueTask = null;
+                }
+                
+                last_send_time = System.currentTimeMillis();
+                
 		BoshTask timer = serv.getWaitTimer();
 		if (timer != null) {
 			if (log.isLoggable(Level.FINEST)) {
@@ -952,7 +996,7 @@ public class BoshSession {
 
 				body.addChild(stanza);
 
-				while ((!waiting_packets.isEmpty()) && (body.getChildren().size() < MAX_PACKETS)) {
+				while ((!waiting_packets.isEmpty()) && (body.getChildren().size() < max_batch_size)) {
 
 					// body.addChild(applyFilters(waiting_packets.poll()));
 					stanza = waiting_packets.poll();
