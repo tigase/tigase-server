@@ -207,15 +207,24 @@ public interface AuthRepository {
 
 	/**
 	 * Describe <code>otherAuth</code> method here.
-	 *
-	 * @param authProps a <code>Map</code> value
+	 * 
+	 * @param authProps
+	 *            a <code>Map</code> value
 	 * @return a <code>boolean</code> value
-	 * @exception UserNotFoundException if an error occurs
-	 * @exception TigaseDBException if an error occurs
-	 * @exception AuthorizationException if an error occurs
+	 * @exception UserNotFoundException
+	 *                if an error occurs
+	 * @exception TigaseDBException
+	 *                if an error occurs
+	 * @exception AuthorizationException
+	 *                if an error occurs
+	 * 
+	 * @deprecated use method
+	 *             {@linkplain AuthRepository#plainAuth(BareJID, String)}
+	 *             because this method is used by default CallbackHandler with
+	 *             SASL.
 	 */
-	boolean otherAuth(Map<String, Object> authProps)
-			throws UserNotFoundException, TigaseDBException, AuthorizationException;
+	@Deprecated
+	boolean otherAuth(Map<String, Object> authProps) throws UserNotFoundException, TigaseDBException, AuthorizationException;
 
 	/**
 	 * <code>plainAuth</code> method performs non-sasl, plain authentication
@@ -233,7 +242,6 @@ public interface AuthRepository {
 	 * @exception AuthorizationException if an error occurs during authentication
 	 * process.
 	 */
-	@Deprecated
 	boolean plainAuth(BareJID user, String password)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException;
 

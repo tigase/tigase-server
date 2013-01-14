@@ -524,6 +524,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * @throws TigaseDBException
 	 */
 	@Override
+	@Deprecated
 	public final Authorization loginOther(Map<String, Object> props)
 			throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		Authorization result = super.loginOther(props);
@@ -874,6 +875,17 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	@Override
 	protected void login() {
 		authenticationTime = System.currentTimeMillis();
+	}
+
+	public void authorizeJID(BareJID jid, boolean anonymous) {
+		loginHandler.handleLogin(jid, this);
+		authState = Authorization.AUTHORIZED; 
+		is_anonymous = anonymous;
+		login();
+	}
+
+	public AuthRepository getAuthRepository() {
+		return authRepo;
 	}
 } // XMPPResourceConnection
 
