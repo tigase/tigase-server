@@ -25,6 +25,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
@@ -70,6 +72,9 @@ import org.osgi.framework.BundleContext;
  * 
  */
 public class OSGiScriptEngineManager extends ScriptEngineManager{
+        
+        private static final Logger log = Logger.getLogger(OSGiScriptEngineManager.class.getCanonicalName());
+        
 	private Bindings bindings;
 	private Map <ScriptEngineManager, ClassLoader> classLoaders;
 	private BundleContext context;
@@ -224,8 +229,12 @@ public class OSGiScriptEngineManager extends ScriptEngineManager{
 		Bundle[] bundles = context.getBundles();
 		List<String> factoryCandidates = new ArrayList<String>();
 		for (Bundle bundle : bundles) {
-			System.out.println(bundle.getSymbolicName());
-			if(bundle.getSymbolicName().equals("system.bundle")) continue;
+                        if (log.isLoggable(Level.FINEST)) {
+                                log.log(Level.FINEST, "checking bundle for script engine manager - Id: {0} Bundle: {1}  Version: {2}", 
+                                        new Object[]{bundle.getBundleId(), bundle.getSymbolicName(), bundle.getVersion().toString()});
+                        }
+			if(bundle.getSymbolicName() == null 
+                                || bundle.getSymbolicName().equals("system.bundle")) continue;
 			Enumeration urls = bundle.findEntries("META-INF/services",
 					"javax.script.ScriptEngineFactory", false);
 			if (urls == null)
