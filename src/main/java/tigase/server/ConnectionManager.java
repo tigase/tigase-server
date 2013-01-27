@@ -1019,6 +1019,18 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		connectThread.addConnectionOpenListener(cli);
 	}
 
+        @Override
+        public void stop() {
+                this.releaseListeners();
+                
+                // when stopping connection manager we need to stop all active connections as well
+		for (IO service : services.values()) {
+			service.forceStop();
+		}
+                
+                super.stop();
+        }
+        
 	private class ConnectionListenerImpl implements ConnectionOpenListener {
 		private Map<String, Object> port_props = null;
 

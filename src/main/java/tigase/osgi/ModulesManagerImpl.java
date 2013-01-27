@@ -40,6 +40,7 @@ public class ModulesManagerImpl implements ModulesManager {
         private static ModulesManagerImpl instance = null;
         private Map<String, XMPPImplIfc> plugins = null;
         private Map<String, Class<? extends Configurable>> componentsClasses = null;
+        private boolean active = false;
 
         public static ModulesManagerImpl getInstance() {
                 if (instance == null) {
@@ -138,7 +139,9 @@ public class ModulesManagerImpl implements ModulesManager {
         @Override
         public void update() {
                 //synchronized (this) {
-                ((Configurator) XMPPServer.getConfigurator()).updateMessageRouter();
+                if (active) {
+                        ((Configurator) XMPPServer.getConfigurator()).updateMessageRouter();
+                }
                 //}
         }
 
@@ -148,6 +151,10 @@ public class ModulesManagerImpl implements ModulesManager {
         
         public boolean hasPluginForId(String plug_id) {
                 return plugins.containsKey(plug_id);
+        }
+        
+        public Class<? extends ServerComponent> getServerComponentClass(String className) {
+                return componentsClasses.get(className);
         }
         
         public ServerComponent getServerComponent(String className) throws InstantiationException, IllegalAccessException {
@@ -162,5 +169,9 @@ public class ModulesManagerImpl implements ModulesManager {
         
         public boolean hasClassForServerComponent(String className) {
                 return componentsClasses.containsKey(className);
+        }
+        
+        public void setActive(boolean active) {
+                this.active = active;
         }
 }

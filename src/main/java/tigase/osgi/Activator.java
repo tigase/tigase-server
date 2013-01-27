@@ -79,6 +79,7 @@ public class Activator implements BundleActivator {
                         // if it is not too late
                         SLF4JBridgeHandler.install();
 
+                        ModulesManagerImpl.getInstance().setActive(true);
                         bc.registerService(ModulesManager.class.getName(), ModulesManagerImpl.getInstance(), new Hashtable());
                 }
                 catch (Exception ex) {
@@ -90,6 +91,7 @@ public class Activator implements BundleActivator {
         @Override
         public void stop(BundleContext bc) throws Exception {
                 try {
+                        ModulesManagerImpl.getInstance().setActive(false);
                         XMPPServer.stop();
                 }
                 catch (Exception ex) {

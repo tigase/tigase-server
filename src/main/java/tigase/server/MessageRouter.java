@@ -703,9 +703,9 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 				String cls_name = (String) props.get(MSG_RECEIVERS_PROP_KEY + name + ".class");
 
 				try {
-                                        boolean start = false;
+                                        //boolean start = false;
                                         
-					if ((mr == null) || !mr.getClass().getName().equals(cls_name)) {
+					if ((mr == null) || (mr != null && !conf.componentClassEquals(cls_name, mr.getClass()))) {
 						if (mr != null) {
                                                         if (mr instanceof MessageReceiver) {
                                                                 removeRouter((MessageReceiver) mr);
@@ -722,7 +722,8 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 
 						if (mr instanceof MessageReceiver) {
 							((MessageReceiver) mr).setParent(this);
-							start = true;
+                                                        ((MessageReceiver) mr).start();
+//							start = true;
 						}
 					} // end of if (cr == null)
 
@@ -732,9 +733,9 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 						addComponent(mr);
 					}
                                         
-                                        if (start) {
-                                                ((MessageReceiver) mr).start();
-                                        }
+//                                        if (start) {
+//                                                ((MessageReceiver) mr).start();
+//                                        }
 
                                 }   // end of try
                                 catch (ClassNotFoundException e) {

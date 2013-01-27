@@ -336,6 +336,20 @@ public class MessageRouterConfig {
                 return cls;
         }
 
+        public boolean componentClassEquals(String cls_name, Class<? extends ServerComponent> currCls) {
+                Class<? extends ServerComponent> cls = null;
+
+                try {
+                        cls = ModulesManagerImpl.getInstance().getServerComponentClass(cls_name);
+                        if (cls == null) {
+                                cls = (Class<? extends ServerComponent>) Class.forName(cls_name);
+                        }
+                }
+                catch (Exception ex) {}
+                
+                return cls != null && currCls.equals(cls);
+        }
+        
         /**
          * Method description
          *
