@@ -24,16 +24,33 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.AuthRepository;
+import java.security.Security;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.security.sasl.AuthorizeCallback;
+import javax.security.sasl.Sasl;
+
+import tigase.auth.CallbackHandlerFactory;
+import tigase.auth.MechanismSelector;
+import tigase.auth.MechanismSelectorFactory;
+import tigase.auth.TigaseSaslProvider;
+import tigase.auth.callbacks.VerifyPasswordCallback;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
-
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.Priority;
-
+import tigase.util.PasswordHash;
 import tigase.xml.Element;
-
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.NotAuthorizedException;
@@ -42,16 +59,7 @@ import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.impl.SaslAuth.ElementType;
-
 //~--- JDK imports ------------------------------------------------------------
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -74,12 +82,12 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 	private static final String ID = XMLNS;
 	private static final String[] ELEMENTS = { "query" };
 	private static final String[] XMLNSS = { XMLNS };
-	private static final Element[] FEATURES = { new Element("auth",
-			new String[] { "xmlns" }, new String[] { "http://jabber.org/features/iq-auth" }) };
-	private static final Element[] DISCO_FEATURES = { new Element("feature",
-			new String[] { "var" }, new String[] { XMLNS }) };
+	private static final Element[] FEATURES = { new Element("auth", new String[] { "xmlns" },
+			new String[] { "http://jabber.org/features/iq-auth" }) };
+	private static final Element[] DISCO_FEATURES = { new Element("feature", new String[] { "var" }, new String[] { XMLNS }) };
 
-	// ~--- methods --------------------------------------------------------------
+	// ~--- methods
+	// --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -91,6 +99,23 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 	public int concurrentQueuesNo() {
 		return Runtime.getRuntime().availableProcessors();
 	}
+
+	@Override
+	public void init(Map<String, Object> settings) throws TigaseDBException {
+		Security.insertProviderAt(new TigaseSaslProvider(settings), 1);
+		super.init(settings);
+
+		MechanismSelectorFactory mechanismSelectorFactory = new MechanismSelectorFactory();
+		try {
+			mechanismSelector = mechanismSelectorFactory.create(settings);
+		} catch (Exception e) {
+			log.severe("Can't create SASL Mechanism Selector");
+			throw new RuntimeException("Can't create SASL Mechanism Selector", e);
+		}
+
+	}
+
+	private MechanismSelector mechanismSelector;
 
 	/**
 	 * Method description
@@ -116,9 +141,8 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 	 * @throws XMPPException
 	 */
 	@Override
-	public void process(final Packet packet, final XMPPResourceConnection session,
-			final NonAuthUserRepository repo, final Queue<Packet> results,
-			final Map<String, Object> settings) throws XMPPException {
+	public void process(final Packet packet, final XMPPResourceConnection session, final NonAuthUserRepository repo,
+			final Queue<Packet> results, final Map<String, Object> settings) throws XMPPException {
 		if (session == null) {
 			return;
 		} // end of if (session == null)
@@ -132,11 +156,11 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 			if (session.isAuthorized()) {
 
 				// Multiple authentication attempts....
-				// Another authentication request on already authenticated connection
+				// Another authentication request on already authenticated
+				// connection
 				// This is not allowed and must be forbidden.
-				Packet res =
-						Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-								"Cannot authenticate twice on the same stream.", false);
+				Packet res = Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+						"Cannot authenticate twice on the same stream.", false);
 
 				// Make sure it gets delivered before stream close
 				res.setPriority(Priority.SYSTEM);
@@ -144,13 +168,11 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 
 				// Optionally close the connection to make sure there is no
 				// confusion about the connection state.
-				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-						StanzaType.set, session.nextStanzaId()));
+				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set, session.nextStanzaId()));
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST,
-							"Discovered second authentication attempt: {0}, packet: {1}", new Object[] {
-									session.toString(), packet.toString() });
+					log.log(Level.FINEST, "Discovered second authentication attempt: {0}, packet: {1}",
+							new Object[] { session.toString(), packet.toString() });
 				}
 
 				try {
@@ -168,112 +190,129 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 			StanzaType type = packet.getType();
 
 			switch (type) {
-				case get:
-					Map<String, Object> query = new HashMap<String, Object>();
+			case get:
+				try {
+					StringBuilder response = new StringBuilder("<username/>");
 
-					query.put(AuthRepository.PROTOCOL_KEY, AuthRepository.PROTOCOL_VAL_NONSASL);
-					try {
-						session.queryAuth(query);
-						String[] auth_mechs = (String[]) query.get(AuthRepository.RESULT_KEY);
-						StringBuilder response = new StringBuilder("<username/>");
+					final Collection<String> auth_mechs = mechanismSelector.filterMechanisms(Sasl.getSaslServerFactories(),
+							session);
 
-						for (String mech : auth_mechs) {
-							response.append("<").append(mech).append("/>");
-						} // end of for (String mech: auth_mechs)
-
-						response.append("<resource/>");
-						results.offer(packet.okResult(response.toString(), 1));
-					} catch (NullPointerException ex) {
-						log.warning("Database problem, most likely misconfiguration error: " + ex);
-						results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
-								"Database access problem, please contact administrator.", true));
-					} catch (TigaseDBException ex) {
-						// TODO Auto-generated catch block
-						log.warning("Database problem: " + ex);
-						results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
-								"Database access problem, please contact administrator.", true));
+					if (auth_mechs.contains("PLAIN") || auth_mechs.contains("DIGEST-MD5")) {
+						response.append("<password/>");
 					}
 
-					break;
+					// response.append("<digest/>");
 
-				case set:
-					// Now we use loginOther() instead to make it easier to customize
-					// the authentication protocol without a need to replace the
-					// authentication plug-in. The authentication takes place on the
-					// AuthRepository
-					// level so we do not really care here what the user has sent.
+					response.append("<resource/>");
+					results.offer(packet.okResult(response.toString(), 1));
+				} catch (NullPointerException ex) {
+					log.warning("Database problem, most likely misconfiguration error: " + ex);
+					results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
+							"Database access problem, please contact administrator.", true));
+				}
 
-					String user_name = request.getChildCData("/iq/query/username");
-					String resource = request.getChildCData("/iq/query/resource");
-					try {
+				break;
 
-						List<Element> children = request.getChildren("/iq/query");
-						Map<String, Object> authProps = new HashMap<String, Object>(10, 0.75f);
-						authProps.put(AuthRepository.PROTOCOL_KEY, AuthRepository.PROTOCOL_VAL_NONSASL);
-						authProps.put(AuthRepository.REALM_KEY, session.getDomain().getVhost()
-								.getDomain());
-						authProps.put(AuthRepository.SERVER_NAME_KEY, session.getDomain().getVhost()
-								.getDomain());
-						authProps.put(AuthRepository.DIGEST_ID_KEY, session.getSessionId());
-						BareJID user_id =
-								BareJID.bareJIDInstance(user_name, session.getDomain().getVhost()
-										.getDomain());
-						authProps.put(AuthRepository.USER_ID_KEY, user_id);
-						for (Element child : children) {
-							authProps.put(child.getName(), child.getCData());
+			case set:
+				// Now we use loginOther() instead to make it easier to
+				// customize
+				// the authentication protocol without a need to replace the
+				// authentication plug-in. The authentication takes place on the
+				// AuthRepository
+				// level so we do not really care here what the user has sent.
+
+				String user_name = request.getChildCData("/iq/query/username");
+				String resource = request.getChildCData("/iq/query/resource");
+				String password = request.getChildCData("/iq/query/password");
+				String digest = request.getChildCData("/iq/query/digest");
+
+				try {
+					BareJID user_id = BareJID.bareJIDInstance(user_name, session.getDomain().getVhost().getDomain());
+
+					Authorization result = doAuth(repo, settings, session, user_id, password, digest);
+					if (result == Authorization.AUTHORIZED) {
+						// Some clients don't send resource here, instead they
+						// send it later
+						// in resource bind packet.
+						if (resource != null && !resource.isEmpty()) {
+							session.setResource(resource);
 						}
-						Authorization result = session.loginOther(authProps);
-						if (result == Authorization.AUTHORIZED) {
-							// Some clients don't send resource here, instead they send it later
-							// in resource bind packet.
-							if (resource != null && !resource.isEmpty()) {
-								session.setResource(resource);
-							}
-							results.offer(session.getAuthState().getResponseMessage(packet,
-									"Authentication successful.", false));
-						} else {
-							results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-									"Authentication failed", false));
-							results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-									StanzaType.set, session.nextStanzaId()));
-						} // end of else
+						results.offer(session.getAuthState().getResponseMessage(packet, "Authentication successful.", false));
+					} else {
+						results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet, "Authentication failed", false));
+						results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
+								session.nextStanzaId()));
+					} // end of else
 
-					} catch (Exception e) {
-						log.info("Authentication failed: " + user_name);
-						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "Authorization exception: ", e);
-						}
-
-						Packet response =
-								Authorization.NOT_AUTHORIZED.getResponseMessage(packet, e.getMessage(),
-										false);
-						response.setPriority(Priority.SYSTEM);
-						results.offer(response);
-
-						Integer retries = (Integer) session.getSessionData("auth-retries");
-
-						if (retries == null) {
-							retries = new Integer(0);
-						}
-
-						if (retries.intValue() < 3) {
-							session.putSessionData("auth-retries", new Integer(retries.intValue() + 1));
-						} else {
-							results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-									StanzaType.set, session.nextStanzaId()));
-						}
+				} catch (Exception e) {
+					log.info("Authentication failed: " + user_name);
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Authorization exception: ", e);
 					}
 
-					break;
+					Packet response = Authorization.NOT_AUTHORIZED.getResponseMessage(packet, e.getMessage(), false);
+					response.setPriority(Priority.SYSTEM);
+					results.offer(response);
 
-				default:
-					results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-							"Message type is incorrect", false));
-					results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-							StanzaType.set, session.nextStanzaId()));
+					Integer retries = (Integer) session.getSessionData("auth-retries");
 
-					break;
-			} // end of switch (type)			
+					if (retries == null) {
+						retries = new Integer(0);
+					}
+
+					if (retries.intValue() < 3) {
+						session.putSessionData("auth-retries", new Integer(retries.intValue() + 1));
+					} else {
+						results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
+								session.nextStanzaId()));
+					}
+				}
+
+				break;
+
+			default:
+				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Message type is incorrect", false));
+				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set, session.nextStanzaId()));
+
+				break;
+			} // end of switch (type)
+		}
+	}
+
+	private CallbackHandlerFactory callbackHandlerFactory = new CallbackHandlerFactory();
+
+	protected Authorization doAuth(NonAuthUserRepository repo, Map<String, Object> settings, XMPPResourceConnection session,
+			BareJID user_id, String password, String digest) {
+		try {
+			CallbackHandler cbh = callbackHandlerFactory.create("PLAIN", session, repo, settings);
+
+			final NameCallback nc = new NameCallback("Authentication identity", user_id.getLocalpart());
+			final VerifyPasswordCallback vpc = new VerifyPasswordCallback(password);
+
+			cbh.handle(new Callback[] { nc });
+
+			try {
+				cbh.handle(new Callback[] { vpc });
+				if (vpc.isVerified()) {
+					session.authorizeJID(user_id, false);
+					return Authorization.AUTHORIZED;
+				}
+			} catch (UnsupportedCallbackException e) {
+				final PasswordCallback pc = new PasswordCallback("Password", false);
+				cbh.handle(new Callback[] { pc });
+
+				char[] p = pc.getPassword();
+
+				if (p != null && password.equals(new String(p))) {
+					session.authorizeJID(user_id, false);
+					return Authorization.AUTHORIZED;
+				}
+			}
+
+			return Authorization.NOT_AUTHORIZED;
+		} catch (Exception e) {
+			log.log(Level.WARNING, "Can't authenticate with given CallbackHandler", e);
+			return Authorization.INTERNAL_SERVER_ERROR;
 		}
 	}
 

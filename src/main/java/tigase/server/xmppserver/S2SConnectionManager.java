@@ -46,6 +46,7 @@ import tigase.xmpp.PacketErrorTypeException;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,6 +120,8 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 
 	public static final String CID_CONNECTIONS_BIND = "cidConnections";
 
+        private static final String PROCESSORS_CONF_PROP_KEY = "processors-conf";
+        
 	// ~--- fields ---------------------------------------------------------------
 
 	private S2SConnectionSelector connSelector = null;
@@ -728,26 +731,6 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 
-		// TODO: Make used processors list a configurarble thing
-		processors.clear();
-		processors.put(Dialback.class.getName(), new Dialback());
-		processors.put(StartTLS.class.getName(), new StartTLS());
-		processors.put(StartZlib.class.getName(), new StartZlib());
-		processors.put(StreamError.class.getName(), new StreamError());
-		processors.put(StreamFeatures.class.getName(), new StreamFeatures());
-		processors.put(StreamOpen.class.getName(), new StreamOpen());
-
-		for (S2SProcessor proc : processors.values()) {
-			proc.init(this);
-		}
-                
-                filters.clear();
-		filters.put(PacketChecker.class.getName(), new PacketChecker());
-                
-		for (S2SProcessor filter : filters.values()) {
-			filter.init(this);
-		}
-                
 		if ( props.size() == 1 ){
 			// If props.size() == 1, it means this is a single property update
 			// and this component does not support single property change for the rest
@@ -755,6 +738,54 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 			return;
 		}
 
+                // it needs to be here as we need properties for plugins
+		// TODO: Make used processors list a configurable thing
+		processors.clear();
+		processors.put( Dialback.class.getSimpleName(), new Dialback() );
+		processors.put( StartTLS.class.getSimpleName(), new StartTLS() );
+		processors.put( StartZlib.class.getSimpleName(), new StartZlib() );
+		processors.put( StreamError.class.getSimpleName(), new StreamError() );
+		processors.put( StreamFeatures.class.getSimpleName(), new StreamFeatures() );
+		processors.put( StreamOpen.class.getSimpleName(), new StreamOpen() );
+
+		for ( S2SProcessor proc : processors.values() ) {
+                        Map<String,Object> proc_props = new ConcurrentHashMap<String,Object>(4);
+                        for (Map.Entry<String,Object> entry : props.entrySet()) {
+                                if (entry.getKey().startsWith(PROCESSORS_CONF_PROP_KEY)) {
+                                        String[] nodes = entry.getKey().split("/");
+                                        if (nodes.length > 2) {
+                                                String[] ids = nodes[1].split(",");
+                                                if (Arrays.binarySearch(ids, proc.getClass().getSimpleName()) >= 0) {
+                                                        proc_props.put(nodes[2], entry.getValue());
+                                                }
+                                        }
+                                }
+                        }
+
+                        proc.init( this, proc_props );
+		}
+
+		filters.clear();
+		filters.put( PacketChecker.class.getSimpleName(), new PacketChecker() );
+
+		for ( S2SProcessor filter : filters.values() ) {
+                        Map<String,Object> proc_props = new ConcurrentHashMap<String,Object>(4);
+                        for (Map.Entry<String,Object> entry : props.entrySet()) {
+                                if (entry.getKey().startsWith(PROCESSORS_CONF_PROP_KEY)) {
+                                        String[] nodes = entry.getKey().split("/");
+                                        if (nodes.length > 2) {
+                                                String[] ids = nodes[1].split(",");
+                                                if (Arrays.binarySearch(ids, filter.getClass().getSimpleName()) >= 0) {
+                                                        proc_props.put(nodes[2], entry.getValue());
+                                                }
+                                        }
+                                }
+                        }
+
+                        filter.init( this, proc_props );
+		}
+
+                
 		maxPacketWaitingTime = (Long) props.get(MAX_PACKET_WAITING_TIME_PROP_KEY) * SECOND;
 		maxInactivityTime =
 				(Long) props.get(MAX_CONNECTION_INACTIVITY_TIME_PROP_KEY) * SECOND;

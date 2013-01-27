@@ -615,7 +615,6 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
-		Security.insertProviderAt(new TigaseSaslProvider(), 6);
 		if (props.get(SKIP_PRIVACY_PROP_KEY) != null) {
 			skipPrivacy = (Boolean) props.get(SKIP_PRIVACY_PROP_KEY);
 		}

@@ -70,7 +70,7 @@ public abstract class RepositoryAccess {
 
 	// ~--- fields ---------------------------------------------------------------
 
-	private AuthRepository authRepo = null;
+	protected AuthRepository authRepo = null;
 	protected VHostItem domain = null;
 
 	/**
@@ -79,13 +79,13 @@ public abstract class RepositoryAccess {
 	private UserRepository repo = null;
 
 	// private boolean anon_allowed = false;
-	private boolean is_anonymous = false;
+	protected boolean is_anonymous = false;
 
 	/**
 	 * Current authorization state - initialy session i
 	 * <code>NOT_AUTHORIZED</code>. It becomes <code>AUTHORIZED</code>
 	 */
-	private Authorization authState = Authorization.NOT_AUTHORIZED;
+	protected Authorization authState = Authorization.NOT_AUTHORIZED;
 
 	// ~--- constructors ---------------------------------------------------------
 
@@ -573,7 +573,7 @@ public abstract class RepositoryAccess {
 	 * @throws AuthorizationException
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
-	 */
+	 */ @Deprecated
 	public Authorization loginOther(Map<String, Object> props)
 			throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		isLoginAllowed();
@@ -658,7 +658,7 @@ public abstract class RepositoryAccess {
 	 * @throws AuthorizationException
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
-	 */
+	 */ @Deprecated
 	public Authorization loginToken(BareJID userId, String xmpp_sessionId, String token)
 			throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		isLoginAllowed();

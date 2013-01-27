@@ -129,10 +129,6 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
         private IOServiceListener<IOService<RefObject>> serviceListener = null;
         private IOInterface socketIO = null;
         /**
-         * The saved partial bytes for multi-byte UTF-8 characters between reads
-         */
-        private byte[] partialCharacterBytes = null;
-        /**
          * <code>socketInput</code> buffer keeps data read from socket.
          */
         private ByteBuffer socketInput = null;
@@ -141,9 +137,18 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
         private long[] wrData = new long[60];
         private ConcurrentMap<String, Object> sessionData =
                 new ConcurrentHashMap<String, Object>(4, 0.75f, 4);
-        private CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
-        private CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
-        private CharBuffer cb = CharBuffer.allocate(2048);
+  
+        // properties from block below should not be used without proper knowledge
+        // ----- BEGIN ---------------------------------------------------------------
+	protected CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
+	protected CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
+	protected CharBuffer cb = CharBuffer.allocate(2048);
+        /**
+         * The saved partial bytes for multi-byte UTF-8 characters between reads
+         */
+	protected byte[] partialCharacterBytes = null;
+        // ----- END -----------------------------------------------------------------
+
         private final ReentrantLock writeInProgress = new ReentrantLock();
         private final ReentrantLock readInProgress = new ReentrantLock();
 

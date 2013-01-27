@@ -7,8 +7,8 @@
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>tigase</groupId>
-	<artifactId>tigase-server-osgi</artifactId>
-	<name>Tigase XMPP Server OSGi bundle</name>
+	<artifactId>tigase-server</artifactId>
+	<name>Tigase XMPP Server</name>
 	<version>5.2.0-SNAPSHOT</version>
         <packaging>bundle</packaging>        
 	<description>Tigase XMPP Server - OSGi bundle</description>
@@ -167,6 +167,12 @@
                         <version>${slf4j.version}</version>
                         <scope>provided</scope>
                         <optional>true</optional>
+		</dependency>
+                <dependency>
+                        <groupId>junit</groupId>
+                        <artifactId>junit</artifactId>
+                        <version>4.11</version>
+                        <scope>test</scope>
                 </dependency>
 	</dependencies>
 	<repositories>
