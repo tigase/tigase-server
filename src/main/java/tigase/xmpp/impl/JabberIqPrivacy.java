@@ -388,14 +388,20 @@ public class JabberIqPrivacy extends XMPPProcessor
 
 								case all :
 								default :
-									type_matched = true;
+                                                                        // blocks all communication with server making it unable 
+                                                                        // for user to connect to server and change policy
+                                                                        if (packet.getStanzaFrom() != null) {
+                                                                                type_matched = true;
+                                                                        }
 
 									break;
 							}        // end of switch (type)
 						} else {
-							if (type == ITEM_TYPE.all) {
-								type_matched = true;
-							}
+                                                        // blocks all communication with server making it unable 
+                                                        // for user to connect to server and change policy
+//							if (type == ITEM_TYPE.all) {
+//								type_matched = true;
+//							}
 						}          // end of if (from != null) else
 
 						if ( !type_matched) {
