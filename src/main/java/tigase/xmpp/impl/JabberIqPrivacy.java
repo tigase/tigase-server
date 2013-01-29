@@ -288,6 +288,18 @@ public class JabberIqPrivacy extends XMPPProcessor
 				return true;
 			}
 
+                        // allow packets without from attribute and packets with from attribute same as domain name
+                        if (packet.getStanzaFrom() == null 
+                                || (packet.getStanzaFrom().getLocalpart() == null && session.getBareJID().getDomain().equals(packet.getStanzaFrom().getDomain()))) {
+                                return true;
+                        }
+
+                        // allow packets without to attribute and packets with to attribute same as domain name
+                        if (packet.getStanzaTo() == null 
+                                || (packet.getStanzaTo().getLocalpart() == null && session.getBareJID().getDomain().equals(packet.getStanzaTo().getDomain()))) {
+                                return true;
+                        }
+                        
 			Element list = Privacy.getActiveList(session);
 
 			if ((list == null) && (session.getSessionData(PRIVACY_INIT_KEY) == null)) {
@@ -334,6 +346,8 @@ public class JabberIqPrivacy extends XMPPProcessor
 							packetIn = false;
 						}
 
+                                                log.log(Level.WARNING, "jid = {0}", jid);
+                                                
 						if (jid != null) {
 							switch (type) {
 								case jid :
@@ -387,21 +401,14 @@ public class JabberIqPrivacy extends XMPPProcessor
 									break;
 
 								case all :
-								default :
-                                                                        // blocks all communication with server making it unable 
-                                                                        // for user to connect to server and change policy
-                                                                        if (packet.getStanzaFrom() != null) {
-                                                                                type_matched = true;
-                                                                        }
-
+								default :                                                                        
+									type_matched = true;
 									break;
 							}        // end of switch (type)
 						} else {
-                                                        // blocks all communication with server making it unable 
-                                                        // for user to connect to server and change policy
-//							if (type == ITEM_TYPE.all) {
-//								type_matched = true;
-//							}
+							if (type == ITEM_TYPE.all) {
+								type_matched = true;
+							}
 						}          // end of if (from != null) else
 
 						if ( !type_matched) {
