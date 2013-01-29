@@ -548,7 +548,7 @@ public class JabberIqPrivacy extends XMPPProcessor
 					boolean inUse = name.equals(getDefaultList(session));
 					if (!inUse) {
 						for (XMPPResourceConnection activeSession : session.getActiveSessions()) {
-							inUse |= name.equals(Privacy.getActiveList(session));
+							inUse |= name.equals(Privacy.getActiveListName(activeSession));
 						}
 					}
 					if (inUse) {
@@ -559,6 +559,14 @@ public class JabberIqPrivacy extends XMPPProcessor
 					}
 				}	else {
 					Privacy.addList(session, child);
+                                        
+                                        // updating active list if it's name matches name of updated list
+					for (XMPPResourceConnection activeSession : session.getActiveSessions()) {
+                                                if (name.equals(Privacy.getActiveListName(activeSession))) {
+                                                        Privacy.setActiveList(activeSession, name);
+                                                }
+					}
+                                        
 					results.offer(packet.okResult((String) null, 0));
 				}
 			}      // end of if (child.getName().equals("list))
