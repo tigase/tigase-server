@@ -52,6 +52,7 @@ import static tigase.xmpp.impl.Privacy.*;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -346,8 +347,6 @@ public class JabberIqPrivacy extends XMPPProcessor
 							packetIn = false;
 						}
 
-                                                log.log(Level.WARNING, "jid = {0}", jid);
-                                                
 						if (jid != null) {
 							switch (type) {
 								case jid :
@@ -558,16 +557,22 @@ public class JabberIqPrivacy extends XMPPProcessor
 						results.offer(packet.okResult((String) null, 0));
 					}
 				}	else {
-					Privacy.addList(session, child);
-                                        
-                                        // updating active list if it's name matches name of updated list
-					for (XMPPResourceConnection activeSession : session.getActiveSessions()) {
-                                                if (name.equals(Privacy.getActiveListName(activeSession))) {
-                                                        Privacy.setActiveList(activeSession, name);
+                                        Authorization error = validateList(session, items);
+                                        if (error == null) {
+                                                Privacy.addList(session, child);
+
+                                                // updating active list if it's name matches name of updated list
+                                                for (XMPPResourceConnection activeSession : session.getActiveSessions()) {
+                                                        if (name.equals(Privacy.getActiveListName(activeSession))) {
+                                                                Privacy.setActiveList(activeSession, name);
+                                                        }
                                                 }
-					}
-                                        
-					results.offer(packet.okResult((String) null, 0));
+
+                                                results.offer(packet.okResult((String) null, 0));
+                                        }
+                                        else {
+                                                results.offer(error.getResponseMessage(packet, null, true));
+                                        }
 				}
 			}      // end of if (child.getName().equals("list))
 
@@ -597,6 +602,78 @@ public class JabberIqPrivacy extends XMPPProcessor
 					"Only 1 element is allowed in privacy set request.", true));
 		}    // end of else
 	}
+        
+        public static Authorization validateList(final XMPPResourceConnection session, final List<Element> items) {
+                Authorization result = null;
+                try {
+                        HashSet<Integer> orderSet = new HashSet<Integer>();
+                        String[] groups = session != null ? roster_util.getBuddyGroups(session, session.getJID()) : null;
+                        
+                        for (Element item : items) {
+                                ITEM_TYPE type = ITEM_TYPE.all;
+
+                                if (item.getAttribute(TYPE) != null) {
+                                        type = ITEM_TYPE.valueOf(item.getAttribute(TYPE));
+                                }              // end of if (item.getAttribute(TYPE) != null)
+                                
+				String value = item.getAttribute(VALUE);
+
+                                switch (type) {
+                                        case jid:
+                                                // if jid is not valid it will throw exception
+                                                JID.jidInstance(value);
+                                                break;
+                                                       
+                                        case group:
+                                                boolean matched = false;
+                                                
+                                                if (groups != null) {
+                                                        for (String group : groups) {
+                                                                if (matched = group.equals(value)) {
+                                                                        break;
+                                                                }    // end of if (group.equals(value))
+                                                        }      // end of for (String group: groups)
+                                                }
+                                                
+                                                if (!matched) {
+                                                        result = Authorization.ITEM_NOT_FOUND;                                                        
+                                                }
+                                                break;
+                                                
+                                        case subscription:
+                                                // if subscription is not valid it will throw exception
+                                                ITEM_SUBSCRIPTIONS.valueOf(value);                                                
+                                                break;
+                                                
+                                        case all:
+                                        default:
+                                                break;
+                                }
+                                
+                                if (result != null) 
+                                        break;
+                                
+                                // if action is not valid it will throw exception
+                                ITEM_ACTION.valueOf(item.getAttribute(ACTION));
+                                
+                                // checking unique order attribute value
+                                Integer order = Integer.parseInt(item.getAttribute(ORDER));
+                                if (order == null || order < 0 || !orderSet.add(order)) {
+                                        result = Authorization.BAD_REQUEST;
+                                }
+                                
+                                if (result != null) 
+                                        break;
+                        }
+                }
+                catch (Exception ex) {
+                        // if we get exception list is not valid
+                        result = Authorization.BAD_REQUEST;
+                }
+                
+                return result;
+        }
+        
 }    // JabberIqPrivacy
 
 
