@@ -347,7 +347,7 @@ public class JabberIqPrivacy extends XMPPProcessor
 							packetIn = false;
 						}
 
-						if (jid != null) {
+                                                if (jid != null) {
 							switch (type) {
 								case jid :
 									type_matched = jid.toString().contains(value);
