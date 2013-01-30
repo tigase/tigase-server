@@ -345,8 +345,6 @@ public class JabberIqPrivacy extends XMPPProcessor
 							jid = packet.getStanzaTo();
 							packetIn = false;
 						}
-
-                                                log.log(Level.WARNING, "jid = {0}", jid);
                                                 
 						if (jid != null) {
 							switch (type) {
