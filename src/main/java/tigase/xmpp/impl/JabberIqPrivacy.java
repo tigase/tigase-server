@@ -607,7 +607,22 @@ public class JabberIqPrivacy extends XMPPProcessor
                 Authorization result = null;
                 try {
                         HashSet<Integer> orderSet = new HashSet<Integer>();
-                        String[] groups = session != null ? roster_util.getBuddyGroups(session, session.getJID()) : null;
+
+                        // creating set of all known groups in roster
+                        HashSet<String> groups = new HashSet<String>();
+                        if (session != null) {
+                                JID[] jids = roster_util.getBuddies(session);
+                                if (jids != null) {
+                                        for (JID jid : jids) {
+                                                String[] buddyGroups = roster_util.getBuddyGroups(session, jid);
+                                                if (buddyGroups != null) {
+                                                        for (String group : buddyGroups) {
+                                                                groups.add(group);
+                                                        }
+                                                }
+                                        }
+                                }
+                        }
                         
                         for (Element item : items) {
                                 ITEM_TYPE type = ITEM_TYPE.all;
@@ -625,15 +640,7 @@ public class JabberIqPrivacy extends XMPPProcessor
                                                 break;
                                                        
                                         case group:
-                                                boolean matched = false;
-                                                
-                                                if (groups != null) {
-                                                        for (String group : groups) {
-                                                                if (matched = group.equals(value)) {
-                                                                        break;
-                                                                }    // end of if (group.equals(value))
-                                                        }      // end of for (String group: groups)
-                                                }
+                                                boolean matched = groups.contains(value);
                                                 
                                                 if (!matched) {
                                                         result = Authorization.ITEM_NOT_FOUND;                                                        
