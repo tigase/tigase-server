@@ -25,7 +25,6 @@ package tigase.xmpp;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.net.IOService;
-import tigase.net.IOServiceListener;
 
 import tigase.server.Packet;
 
@@ -58,7 +57,7 @@ import java.util.logging.Logger;
  * Created: Tue Feb 7 07:15:02 2006
  * 
  * @param <RefObject>
- *          is a refrence object stored by this service. This is e reference to
+ *          is a reference object stored by this service. This is e reference to
  *          higher level data object keeping more information about the
  *          connection.
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
