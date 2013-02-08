@@ -84,10 +84,11 @@ public class XMPPResourceConnection
 	/**
 	 * This variable is to keep relates XMPPIOService ID only.
 	 */
-	private JID connectionId  = null;
-	private long creationTime = 0;
-	private String defLang    = "en";
-	private long id_counter   = 0;
+	private JID connectionId       = null;
+	private String connectionState = null;
+	private long creationTime      = 0;
+	private String defLang         = "en";
+	private long id_counter        = 0;
 
 	/**
 	 * Value of <code>System.currentTimeMillis()</code> from the time when this

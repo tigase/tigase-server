@@ -27,6 +27,8 @@ package tigase.xmpp;
 
 import tigase.db.TigaseDBException;
 
+import tigase.server.Packet;
+
 import tigase.stats.StatisticsList;
 
 import tigase.xml.Element;
@@ -108,9 +110,21 @@ public interface XMPPImplIfc
 	 *          a <code>String</code> value
 	 * @return a <code>boolean</code> value
 	 */
+	@Deprecated
 	boolean isSupporting(String elem, String ns);
 
 	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param conn
+	 *
+	 * @return
+	 */
+	Authorization canHandle(Packet packet, XMPPResourceConnection conn);
 
 	/**
 	 * Method <code>supDiscoFeatures</code> returns an array of XML
@@ -129,19 +143,46 @@ public interface XMPPImplIfc
 	 * stanzas which can be processed by this plugin. Each element name
 	 * corresponds to XMLNS returned in array by <code>supNamespaces()</code>
 	 * method.
+	 * This method has been deprecated in favor of <code>supElementNamePaths</code>.
 	 *
 	 * @return a <code>String[]</code> value
+	 * @see supElementNamePaths
 	 */
+	@Deprecated
 	String[] supElements();
 
 	/**
+	 * Method <code>supElementNamePaths</code> returns an array of element
+	 * names in form of a full path to the XML element for
+	 * stanzas which can be processed by this plugin. Each element name path
+	 * corresponds to XMLNS returned in array by <code>supNamespaces()</code>
+	 * method.
+	 *
+	 * @return a <code>String[]</code> value
+	 */
+	String[] supElementNamePaths();
+
+	/**
 	 * Method <code>supNamespaces</code> returns an array of namespaces for
-	 * stanzas which can be processed by this pluing. Each namespace corresponds
-	 * to element name returned in array by <code>supElemenets()</code> method.
+	 * stanzas which can be processed by this plugin. Each namespace
+	 * corresponds to element name returned in array by
+	 * <code>supElemenets()</code> method.
 	 *
 	 * @return a <code>String[]</code> value
 	 */
 	String[] supNamespaces();
+
+	/**
+	 * Method returns an array of all stanza types which the plugin is able
+	 * to handle. If the method returns NULL, then all stanzas of all types
+	 * will be passed to the plugin for processing.
+	 * Otherwise only stanzas with selected types, assuming that
+	 * element names and namespaces match as well.
+	 *
+	 *
+	 * @return a <code>StanzaType[]</code> array of supported stanza types.
+	 */
+	StanzaType[] supTypes();
 
 	/**
 	 * Method <code>supStreamFeatures</code> returns an array of XML
