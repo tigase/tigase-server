@@ -73,6 +73,26 @@ public class TLSWrapper {
 	private SSLEngine tlsEngine = null;
 	private SSLEngineResult tlsEngineResult = null;
 
+        // TLS/SSL issue with JDK and NSS - bug workaround
+        private static final boolean tls_jdk_nss_workaround = Boolean.getBoolean("tls-jdk-nss-bug-workaround-active");
+        private static final String[] tls_workaround_ciphers = new String[] {
+                "SSL_RSA_WITH_RC4_128_MD5",
+                "SSL_RSA_WITH_RC4_128_SHA",
+                "TLS_RSA_WITH_AES_128_CBC_SHA",
+                "TLS_DHE_RSA_WITH_AES_128_CBC_SHA",
+                "TLS_DHE_DSS_WITH_AES_128_CBC_SHA",
+                "SSL_RSA_WITH_3DES_EDE_CBC_SHA",
+                "SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA",
+                "SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA",
+                "SSL_RSA_WITH_DES_CBC_SHA",
+                "SSL_DHE_RSA_WITH_DES_CBC_SHA",
+                "SSL_DHE_DSS_WITH_DES_CBC_SHA",
+                "SSL_RSA_EXPORT_WITH_RC4_40_MD5",
+                "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA",
+                "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA",
+                "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA",
+                "TLS_EMPTY_RENEGOTIATION_INFO_SCSV"};
+                
 	//~--- constructors ---------------------------------------------------------
 
 	/**
@@ -91,6 +111,14 @@ public class TLSWrapper {
 		}
                 
 		tlsEngine.setUseClientMode(clientMode);
+
+                if (tls_jdk_nss_workaround) {
+                        // Workaround for TLS/SSL bug in new JDK used with new version of nss library see also:
+                        // http://stackoverflow.com/q/10687200/427545
+                        // http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=b509d9cb5d8164d90e6731f5fc44?bug_id=6928796
+                        tlsEngine.setEnabledCipherSuites(tls_workaround_ciphers);
+                }
+                
                 if (sslProtocols != null) {
                         tlsEngine.setEnabledProtocols(sslProtocols);
                 }
