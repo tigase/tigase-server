@@ -327,4 +327,4 @@ public abstract class XMPPProcessor
 }    // XMPPProcessor
 
 
-//~ Formatted in Tigase Code Convention on 13/02/11
+//~ Formatted in Tigase Code Convention on 13/02/13
