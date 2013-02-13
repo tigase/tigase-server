@@ -206,4 +206,4 @@ public interface XMPPImplIfc
 }    // XMPPImplIfc
 
 
-//~ Formatted in Tigase Code Convention on 13/02/09
+//~ Formatted in Tigase Code Convention on 13/02/13
