@@ -173,9 +173,10 @@ public abstract class XMPPProcessor
 	@Override
 	public Authorization canHandle(Packet packet, XMPPResourceConnection conn) {
 		Authorization result = null;
+		String[] elemPats    = supElementNamePaths();
 
-		if (supElementNamePaths() != null) {
-			result = canHandle(packet, conn);
+		if (elemPats != null) {
+			result = checkPacket(packet, conn, elemPats);
 		} else {
 			if (walk(packet.getElement())) {
 				result = Authorization.AUTHORIZED;
@@ -190,6 +191,11 @@ public abstract class XMPPProcessor
 		}
 
 		return result;
+	}
+
+	private Authorization checkPacket(Packet packet, XMPPResourceConnection conn,
+																		String[] elemPaths) {
+		return null;
 	}
 
 	private boolean walk(Element elem) {
@@ -321,4 +327,4 @@ public abstract class XMPPProcessor
 }    // XMPPProcessor
 
 
-//~ Formatted in Tigase Code Convention on 13/02/08
+//~ Formatted in Tigase Code Convention on 13/02/11
