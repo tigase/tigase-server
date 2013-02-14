@@ -1,4 +1,6 @@
 /*
+ * XMPPResourceConnection.java
+ * 
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
@@ -15,16 +17,17 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.xmpp;
 
+//~--- non-JDK imports --------------------------------------------------------
+
 import tigase.db.AuthorizationException;
-import tigase.db.TigaseDBException;
 import tigase.db.AuthRepository;
+import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
 
 import tigase.server.xmppsession.SessionManagerHandler;
@@ -33,28 +36,33 @@ import tigase.util.TigaseStringprepException;
 
 import tigase.xml.Element;
 
-import java.util.List;
-import java.util.Map;
+//~--- JDK imports ------------------------------------------------------------
+
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Map;
 
 /**
  * Describe class XMPPResourceConnection here.
- * 
- * 
+ *
+ *
  * Created: Wed Feb 8 22:30:37 2006
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class XMPPResourceConnection extends RepositoryAccess {
+public class XMPPResourceConnection
+				extends RepositoryAccess {
+	/** Field description */
+	public static final String AUTHENTICATION_TIMEOUT_KEY = "authentication-timeout";
 
-	/**
-	 * Private logger for class instances.
-	 */
-	private static final Logger log = Logger.getLogger(XMPPResourceConnection.class
-			.getName());
+	/** Field description */
+	public static final String CLOSING_KEY = "closing-conn";
+
+	/** Field description */
+	public static final String ERROR_KEY = "error-key";
 
 	/**
 	 * Constant <code>PRESENCE_KEY</code> is a key in temporary session data where
@@ -62,29 +70,34 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * presence or off-line presence before disconnecting.
 	 */
 	public static final String PRESENCE_KEY = "user-presence";
-	public static final String CLOSING_KEY = "closing-conn";
-	public static final String AUTHENTICATION_TIMEOUT_KEY = "authentication-timeout";
-	public static final String ERROR_KEY = "error-key";
+
+	/**
+	 * Private logger for class instances.
+	 */
+	private static final Logger log =
+		Logger.getLogger(XMPPResourceConnection.class.getName());
+
+	//~--- fields ---------------------------------------------------------------
 
 	private long authenticationTime = 0;
 
 	/**
 	 * This variable is to keep relates XMPPIOService ID only.
 	 */
-	private JID connectionId = null;
+	private JID connectionId  = null;
 	private long creationTime = 0;
-	private String defLang = "en";
-	private long id_counter = 0;
-	private long packets_counter = 0;
+	private String defLang    = "en";
+	private long id_counter   = 0;
 
 	/**
 	 * Value of <code>System.currentTimeMillis()</code> from the time when this
 	 * session last active from user side.
 	 */
-	private long lastAccessed = 0;
+	private long lastAccessed                  = 0;
 	private SessionManagerHandler loginHandler = null;
-	private XMPPSession parentSession = null;
-	private int priority = 0;
+	private long packets_counter               = 0;
+	private XMPPSession parentSession          = null;
+	private int priority                       = 0;
 
 	/**
 	 * Session resource - part of user's JID for this session
@@ -102,28 +115,22 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * initialization time.
 	 */
 	private String sessionId = null;
+	private JID userJid      = null;
 
-	private JID userJid = null;
-	
-	public void incPacketsCounter() {
-		++packets_counter;
-	}
-	
-	public long getPacketsCounter() {
-		return packets_counter;
-	}
+	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>XMPPResourceConnection</code> instance.
-	 * 
-	 * 
+	 *
+	 *
 	 * @param connectionId
 	 * @param rep
 	 * @param authRepo
 	 * @param loginHandler
 	 */
 	public XMPPResourceConnection(JID connectionId, UserRepository rep,
-			AuthRepository authRepo, SessionManagerHandler loginHandler) {
+																AuthRepository authRepo,
+																SessionManagerHandler loginHandler) {
 		super(rep, authRepo);
 
 		long currTime = System.currentTimeMillis();
@@ -132,40 +139,64 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		this.loginHandler = loginHandler;
 		this.creationTime = currTime;
 		this.lastAccessed = currTime;
-		sessionData = new ConcurrentHashMap<String, Object>(4, 0.9f);
+		sessionData       = new ConcurrentHashMap<String, Object>(4, 0.9f);
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 */
+	public void incPacketsCounter() {
+		++packets_counter;
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long getPacketsCounter() {
+		return packets_counter;
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
-	 * 
+	 *
 	 * @throws NotAuthorizedException
 	 */
 	public List<XMPPResourceConnection> getActiveSessions() throws NotAuthorizedException {
 		if (!isAuthorized()) {
 			throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
-		} // end of if (username == null)
+		}    // end of if (username == null)
 
 		return parentSession.getActiveResources();
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
-	 * 
+	 *
 	 */
 	public JID[] getAllResourcesJIDs() {
-		return (parentSession == null) ? null : parentSession.getJIDs();
+		return (parentSession == null)
+					 ? null
+					 : parentSession.getJIDs();
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public long getAuthTime() {
@@ -178,7 +209,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * <code>getJID()</code> method.<br/>
 	 * If session has not been authorized yet this method throws
 	 * <code>NotAuthorizedException</code>.
-	 * 
+	 *
 	 * @return a <code>String</code> value of user ID - this is user JID without
 	 *         resource part. To obtain full user JID please refer to
 	 *         <code>getJID</code> method.
@@ -191,34 +222,35 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	public final BareJID getBareJID() throws NotAuthorizedException {
 		if (!isAuthorized()) {
 			throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
-		} // end of if (username == null)
+		}    // end of if (username == null)
 
 		return userJid.getBareJID();
 	}
 
 	/**
-	 * 
+	 *
 	 * @param key
 	 * @return
 	 */
 	public Object getCommonSessionData(String key) {
-		return (parentSession == null) ? null : parentSession.getCommonSessionData(key);
+		return (parentSession == null)
+					 ? null
+					 : parentSession.getCommonSessionData(key);
 	}
 
 	/**
 	 * Gets the value of connectionId
-	 * 
+	 *
 	 * @return the value of connectionId
 	 * @throws NoConnectionIdException
 	 */
 	public JID getConnectionId() throws NoConnectionIdException {
 		lastAccessed = System.currentTimeMillis();
-
 		if (this.connectionId == null) {
 			throw new NoConnectionIdException(
-					"Connection ID not set for this session. "
-							+ "This is probably the SM session to handle traffic addressed to the server itself."
-							+ " Or maybe it's a bug.");
+					"Connection ID not set for this session. " +
+					"This is probably the SM session to handle traffic addressed to the server itself." +
+					" Or maybe it's a bug.");
 		}
 
 		return this.connectionId;
@@ -226,23 +258,24 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param jid
-	 * 
+	 *
 	 * @return
-	 * 
+	 *
 	 * @throws NoConnectionIdException
 	 */
 	public JID getConnectionId(JID jid) throws NoConnectionIdException {
-		return (((parentSession == null) || (jid == null)) ? this.getConnectionId()
-				: parentSession.getResourceConnection(jid).getConnectionId());
+		return (((parentSession == null) || (jid == null))
+						? this.getConnectionId()
+						: parentSession.getResourceConnection(jid).getConnectionId());
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public long getCreationTime() {
@@ -251,8 +284,8 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public String getDefLang() {
@@ -263,7 +296,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * Returns full user JID for this session or throws
 	 * <code>NotAuthorizedException</code> if session is not authorized yet and
 	 * therefore user name and resource is not known yet.
-	 * 
+	 *
 	 * @return a <code>String</code> value of calculated user full JID for this
 	 *         session including resource name.
 	 * @throws NotAuthorizedException
@@ -271,14 +304,14 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	public final JID getJID() throws NotAuthorizedException {
 		if (!isAuthorized()) {
 			throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
-		} // end of if (username == null)
+		}    // end of if (username == null)
 
 		return userJid;
 	}
 
 	/**
 	 * Gets the value of lastAccessed
-	 * 
+	 *
 	 * @return the value of lastAccessed
 	 */
 	public long getLastAccessed() {
@@ -287,8 +320,8 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public XMPPSession getParentSession() {
@@ -298,7 +331,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	/**
 	 * Returns last presence packet with the user presence status or
 	 * <code>null</code> if the user has not yet sent an initial presence.
-	 * 
+	 *
 	 * @return an <code>Element</code> with last presence status received from the
 	 *         user.
 	 */
@@ -308,8 +341,8 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public int getPriority() {
@@ -318,7 +351,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	/**
 	 * Gets the value of resource
-	 * 
+	 *
 	 * @return the value of resource
 	 */
 	public String getResource() {
@@ -327,8 +360,8 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public JID getSMComponentId() {
@@ -339,7 +372,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * Retrieves session data. This method gives access to temporary session data
 	 * only. You can retrieve earlier saved data giving key ID to receive needed
 	 * value. Please see <code>putSessionData</code> description for more details.
-	 * 
+	 *
 	 * @param key
 	 *          a <code>String</code> value of stored data ID.
 	 * @return a <code>Object</code> value of data for given key.
@@ -353,7 +386,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	/**
 	 * Gets the value of sessionId
-	 * 
+	 *
 	 * @return the value of sessionId
 	 */
 	public String getSessionId() {
@@ -366,12 +399,12 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * please use method <code>isUserId(...)</code>. From now one the user session
 	 * may handle more than a single userId, hence getting just userId is not
 	 * enough to check whether the user Id belongs to the session.
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
-	 * 
+	 *
 	 * @throws NotAuthorizedException
-	 * 
+	 *
 	 * @deprecated
 	 */
 	@Deprecated
@@ -381,20 +414,22 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
-	 * 
+	 *
 	 * @throws NotAuthorizedException
 	 */
 	@Override
 	public final String getUserName() throws NotAuthorizedException {
 		if (!isAuthorized()) {
 			throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
-		} // end of if (username == null)
+		}    // end of if (username == null)
 
 		return parentSession.getUserName();
 	}
+
+	//~--- methods --------------------------------------------------------------
 
 	// ~--- methods --------------------------------------------------------------
 
@@ -404,7 +439,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * yet and therefore user name and resource is not known yet. Please note this
 	 * method is for logging using only to avoid excessive use of try/catch for
 	 * debugging code. It may return null.
-	 * 
+	 *
 	 * @return a <code>String</code> value of calculated user full JID for this
 	 *         session including resource name.
 	 */
@@ -412,12 +447,14 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		return userJid;
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -427,11 +464,11 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param outDomain
 	 * @param includeComponents
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean isLocalDomain(String outDomain, boolean includeComponents) {
@@ -440,8 +477,8 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public boolean isResourceSet() {
@@ -452,7 +489,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * Returns information whether this is a server (SessionManager) session or
 	 * normal user session. The server session is used to handle packets addressed
 	 * to the server itself (local domain name).
-	 * 
+	 *
 	 * @return a <code>boolean</code> value of <code>true</code> if this is the
 	 *         server session and <code>false</code> otherwise.
 	 */
@@ -462,63 +499,66 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param bareJID
-	 * 
+	 *
 	 * @return
-	 * 
+	 *
 	 * @throws NotAuthorizedException
 	 */
 	public boolean isUserId(BareJID bareJID) throws NotAuthorizedException {
 		if (!isAuthorized()) {
 			throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
-		} // end of if (username == null)
+		}    // end of if (username == null)
 
 		return userJid.getBareJID().equals(bareJID);
 	}
+
+	//~--- methods --------------------------------------------------------------
 
 	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param user
 	 * @param digest
 	 * @param id
 	 * @param alg
-	 * 
+	 *
 	 * @return
-	 * 
+	 *
 	 * @throws AuthorizationException
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 * @throws TigaseStringprepException
 	 */
 	@Deprecated
-	public final Authorization
-			loginDigest(String user, String digest, String id, String alg)
+	public final Authorization loginDigest(String user, String digest, String id,
+					String alg)
 					throws NotAuthorizedException, AuthorizationException, TigaseDBException,
-					TigaseStringprepException {
-		BareJID userId = BareJID.bareJIDInstance(user, getDomain().getVhost().getDomain());
+								 TigaseStringprepException {
+		BareJID userId       = BareJID.bareJIDInstance(user,
+														 getDomain().getVhost().getDomain());
 		Authorization result = super.loginDigest(userId, digest, id, alg);
 
 		if (result == Authorization.AUTHORIZED) {
 			loginHandler.handleLogin(userId, this);
-		} // end of if (result == Authorization.AUTHORIZED)
+		}    // end of if (result == Authorization.AUTHORIZED)
 
 		return result;
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param props
-	 * 
+	 *
 	 * @return
-	 * 
+	 *
 	 * @throws AuthorizationException
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -526,7 +566,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	@Override
 	@Deprecated
 	public final Authorization loginOther(Map<String, Object> props)
-			throws NotAuthorizedException, AuthorizationException, TigaseDBException {
+					throws NotAuthorizedException, AuthorizationException, TigaseDBException {
 		Authorization result = super.loginOther(props);
 
 		if (result == Authorization.AUTHORIZED) {
@@ -535,22 +575,21 @@ public class XMPPResourceConnection extends RepositoryAccess {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("UserAuthRepository.USER_ID_KEY: " + user);
 			}
-
 			loginHandler.handleLogin(user, this);
-		} // end of if (result == Authorization.AUTHORIZED)
+		}    // end of if (result == Authorization.AUTHORIZED)
 
 		return result;
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param user
 	 * @param password
-	 * 
+	 *
 	 * @return
-	 * 
+	 *
 	 * @throws AuthorizationException
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -558,22 +597,23 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 */
 	@Deprecated
 	public final Authorization loginPlain(String user, String password)
-			throws NotAuthorizedException, AuthorizationException, TigaseDBException,
-			TigaseStringprepException {
-		BareJID userId = BareJID.bareJIDInstance(user, getDomain().getVhost().getDomain());
+					throws NotAuthorizedException, AuthorizationException, TigaseDBException,
+								 TigaseStringprepException {
+		BareJID userId       = BareJID.bareJIDInstance(user,
+														 getDomain().getVhost().getDomain());
 		Authorization result = super.loginPlain(userId, password);
 
 		if (result == Authorization.AUTHORIZED) {
 			loginHandler.handleLogin(userId, this);
-		} // end of if (result == Authorization.AUTHORIZED)
+		}    // end of if (result == Authorization.AUTHORIZED)
 
 		return result;
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @throws NotAuthorizedException
 	 */
 	@Override
@@ -592,8 +632,8 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public String nextStanzaId() {
@@ -602,8 +642,8 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param key
 	 * @param value
 	 */
@@ -631,7 +671,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 	 * access to hierachical permanent data base. Permanent data base however can
 	 * be accessed after successuf authorization while session storage is availble
 	 * all the time.
-	 * 
+	 *
 	 * @param key
 	 *          a <code>String</code> value of stored data key ID.
 	 * @param value
@@ -645,8 +685,8 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param authProps
 	 * @throws TigaseDBException
 	 */
@@ -657,20 +697,22 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param key
-	 * 
+	 *
 	 * @return
 	 */
 	public Object removeCommonSessionData(String key) {
-		return (parentSession == null) ? null : parentSession.removeCommonSessionData(key);
+		return (parentSession == null)
+					 ? null
+					 : parentSession.removeCommonSessionData(key);
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param parent
 	 */
 	public void removeParentSession(final XMPPSession parent) {
@@ -681,8 +723,8 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param key
 	 */
 	public final void removeSessionData(final String key) {
@@ -690,10 +732,12 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		sessionData.remove(key);
 	}
 
+	//~--- set methods ----------------------------------------------------------
+
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param lang
 	 */
 	public void setDefLang(String lang) {
@@ -702,7 +746,7 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	/**
 	 * Sets the value of lastAccessed
-	 * 
+	 *
 	 * @param argLastAccessed
 	 *          Value to assign to this.lastAccessed
 	 */
@@ -712,28 +756,29 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param parent
-	 * 
+	 *
 	 * @throws TigaseStringprepException
 	 */
-	public void setParentSession(final XMPPSession parent) throws TigaseStringprepException {
+	public void setParentSession(final XMPPSession parent)
+					throws TigaseStringprepException {
 		synchronized (this) {
 			if (parent != null) {
-				userJid =
-						JID.jidInstance(parent.getUserName(), domain.getVhost().getDomain(),
-								((resource != null) ? resource : sessionId));
+				userJid = JID.jidInstance(parent.getUserName(), domain.getVhost().getDomain(),
+																	((resource != null)
+																	 ? resource
+																	 : sessionId));
 			}
-
 			this.parentSession = parent;
 		}
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param packet
 	 */
 	public void setPresence(Element packet) {
@@ -751,20 +796,17 @@ public class XMPPResourceConnection extends RepositoryAccess {
 				if (log.isLoggable(Level.FINER)) {
 					log.finer("Incorrect priority value: " + pr_str + ", setting 1 as default.");
 				}
-
 				pr = 1;
 			}
-
 			setPriority(pr);
 		}
-
 		loginHandler.handlePresenceSet(this);
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param priority
 	 */
 	public void setPriority(final int priority) {
@@ -773,18 +815,17 @@ public class XMPPResourceConnection extends RepositoryAccess {
 
 	/**
 	 * Sets the connection resource
-	 * 
+	 *
 	 * @param argResource
 	 *          Value to assign to this.resource
 	 * @throws NotAuthorizedException
 	 * @throws TigaseStringprepException
 	 */
-	public void setResource(final String argResource) throws NotAuthorizedException,
-			TigaseStringprepException {
+	public void setResource(final String argResource)
+					throws NotAuthorizedException, TigaseStringprepException {
 		if (!isAuthorized()) {
 			throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
-		} // end of if (username == null)
-
+		}    // end of if (username == null)
 		this.resource = argResource;
 
 		// This is really unlikely a parent session would be null here but it may
@@ -796,14 +837,15 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		if (parentSession != null) {
 			parentSession.addResourceConnection(this);
 		}
-
-		userJid = userJid.copyWithResource((resource == null) ? sessionId : resource);
+		userJid = userJid.copyWithResource((resource == null)
+																			 ? sessionId
+																			 : resource);
 		loginHandler.handleResourceBind(this);
 	}
 
 	/**
 	 * Sets the value of sessionId
-	 * 
+	 *
 	 * @param argSessionId
 	 *          Value to assign to this.sessionId
 	 */
@@ -811,11 +853,13 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		this.sessionId = argSessionId;
 	}
 
+	//~--- methods --------------------------------------------------------------
+
 	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
+	 *
 	 */
 	public void streamClosed() {
 		synchronized (this) {
@@ -823,40 +867,39 @@ public class XMPPResourceConnection extends RepositoryAccess {
 				parentSession.streamClosed(this);
 				parentSession = null;
 			}
-		} // end of if (parentSession != null)
-
-		resource = null;
+		}    // end of if (parentSession != null)
+		resource  = null;
 		sessionId = null;
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
 	public String toString() {
-		return "user_jid=" + userJid + ", packets=" + packets_counter + ", connectioId=" + connectionId + ", domain="
-				+ domain.getVhost().getDomain() + ", authState=" + getAuthState().name()
-				+ ", isAnon=" + isAnonymous();
+		return "user_jid=" + userJid + ", packets=" + packets_counter + ", connectioId=" +
+					 connectionId + ", domain=" + domain.getVhost().getDomain() + ", authState=" +
+					 getAuthState().name() + ", isAnon=" + isAnonymous();
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param name_param
-	 * 
+	 *
 	 * @return
-	 * 
+	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 * @throws TigaseStringprepException
 	 */
 	@Override
-	public Authorization unregister(String name_param) throws NotAuthorizedException,
-			TigaseDBException, TigaseStringprepException {
+	public Authorization unregister(String name_param)
+					throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
 		Authorization auth_res = super.unregister(name_param);
 
 		// if (auth_res == Authorization.AUTHORIZED) {
@@ -872,23 +915,47 @@ public class XMPPResourceConnection extends RepositoryAccess {
 		return auth_res;
 	}
 
+	/**
+	 * Method description
+	 *
+	 */
 	@Override
 	protected void login() {
 		authenticationTime = System.currentTimeMillis();
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param jid
+	 * @param anonymous
+	 */
 	public void authorizeJID(BareJID jid, boolean anonymous) {
 		loginHandler.handleLogin(jid, this);
-		authState = Authorization.AUTHORIZED; 
+		authState    = Authorization.AUTHORIZED;
 		is_anonymous = anonymous;
 		login();
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	public AuthRepository getAuthRepository() {
 		return authRepo;
 	}
-} // XMPPResourceConnection
+}    // XMPPResourceConnection
+
+
 
 // ~ Formatted in Sun Code Convention
 
 // ~ Formatted by Jindent --- http://www.jindent.com
+
+
+//~ Formatted in Tigase Code Convention on 13/02/13

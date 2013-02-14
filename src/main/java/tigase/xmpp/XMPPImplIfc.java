@@ -1,4 +1,6 @@
 /*
+ * XMPPImplIfc.java
+ * 
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
@@ -15,17 +17,21 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
 
+
+
 package tigase.xmpp;
+
+//~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.TigaseDBException;
 
 import tigase.stats.StatisticsList;
+
 import tigase.xml.Element;
+
+//~--- JDK imports ------------------------------------------------------------
 
 import java.util.Map;
 
@@ -33,19 +39,34 @@ import java.util.Map;
  * This is a base interface for all session manager plugins. There are packet
  * processing plugins, preprocesing, postprocessing and packet filters. They all
  * have a common basic methods which are defined here.
- * 
- * 
+ *
+ *
  * Created: Sat Oct 14 16:11:22 2006
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface XMPPImplIfc extends Comparable<XMPPImplIfc> {
-
+public interface XMPPImplIfc
+				extends Comparable<XMPPImplIfc> {
+	/** Field description */
 	public static final String CLIENT_XMLNS = "jabber:client";
 
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	int concurrentQueuesNo();
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	@Deprecated
 	int concurrentThreadsPerQueue();
 
@@ -54,7 +75,7 @@ public interface XMPPImplIfc extends Comparable<XMPPImplIfc> {
 	 * own, unique ID which is used in the configuration file to determine whether
 	 * it needs to be loaded or not. In most cases the ID can be equal to XMLNS of
 	 * the packages processed by the plugin.
-	 * 
+	 *
 	 * @return a <code>String</code> value
 	 */
 	String id();
@@ -64,7 +85,7 @@ public interface XMPPImplIfc extends Comparable<XMPPImplIfc> {
 	 * into memory. The idea behind this is to allow it to initialize or check the
 	 * database. This might be especially useful for plugins which want to have a
 	 * database access via non-standard stored procedures or need schema upgrade.
-	 * 
+	 *
 	 * @param settings
 	 *          is a Map with initial processor settings from the configuration
 	 *          file.
@@ -72,13 +93,15 @@ public interface XMPPImplIfc extends Comparable<XMPPImplIfc> {
 	 */
 	void init(Map<String, Object> settings) throws TigaseDBException;
 
+	//~--- get methods ----------------------------------------------------------
+
 	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method <code>isSupporting</code> takes element name and namespace for this
 	 * element and determines whether this element can be processed by this
 	 * plugin.
-	 * 
+	 *
 	 * @param elem
 	 *          a <code>String</code> value
 	 * @param ns
@@ -87,12 +110,14 @@ public interface XMPPImplIfc extends Comparable<XMPPImplIfc> {
 	 */
 	boolean isSupporting(String elem, String ns);
 
+	//~--- methods --------------------------------------------------------------
+
 	/**
 	 * Method <code>supDiscoFeatures</code> returns an array of XML
 	 * <code>Element</code>s with service discovery features which have to be
 	 * returned to the client uppon request. Service discovery features returned
 	 * by this method correspond to services supported by this plugin.
-	 * 
+	 *
 	 * @param session
 	 *          a <code>XMPPResourceConnection</code> value
 	 * @return an <code>Element[]</code> value
@@ -104,7 +129,7 @@ public interface XMPPImplIfc extends Comparable<XMPPImplIfc> {
 	 * stanzas which can be processed by this plugin. Each element name
 	 * corresponds to XMLNS returned in array by <code>supNamespaces()</code>
 	 * method.
-	 * 
+	 *
 	 * @return a <code>String[]</code> value
 	 */
 	String[] supElements();
@@ -113,7 +138,7 @@ public interface XMPPImplIfc extends Comparable<XMPPImplIfc> {
 	 * Method <code>supNamespaces</code> returns an array of namespaces for
 	 * stanzas which can be processed by this pluing. Each namespace corresponds
 	 * to element name returned in array by <code>supElemenets()</code> method.
-	 * 
+	 *
 	 * @return a <code>String[]</code> value
 	 */
 	String[] supNamespaces();
@@ -123,17 +148,21 @@ public interface XMPPImplIfc extends Comparable<XMPPImplIfc> {
 	 * <code>Element</code>s with stream features which have to be returned to the
 	 * client uppon request. Stream features returned by this method correspond to
 	 * features supported by this plugin.
-	 * 
+	 *
 	 * @param session
 	 *          a <code>XMPPResourceConnection</code> value
 	 * @return an <code>Element[]</code> value
 	 */
 	Element[] supStreamFeatures(XMPPResourceConnection session);
 
+	//~--- get methods ----------------------------------------------------------
+
 	/**
 	 * The method allows to retrieve plugin own statistics if it generates any.
 	 * @param list is a statistics collection to which plugins own metrics can be added.
 	 */
 	void getStatistics(StatisticsList list);
-} // XMPPImplIfc
+}    // XMPPImplIfc
 
+
+//~ Formatted in Tigase Code Convention on 13/02/13
