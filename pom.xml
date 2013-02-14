@@ -2,15 +2,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-                <slf4j.version>1.6.4</slf4j.version>                
-                <packet.version>5.2.0</packet.version>
+		<slf4j.version>1.6.4</slf4j.version>
+		<packet.version>5.2.0</packet.version>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>tigase</groupId>
 	<artifactId>tigase-server</artifactId>
 	<name>Tigase XMPP Server</name>
 	<version>5.2.0-SNAPSHOT</version>
-        <packaging>bundle</packaging>        
+	<packaging>bundle</packaging>    
 	<description>Tigase XMPP Server - OSGi bundle</description>
 	<url>http://www.tigase.org/</url>
 	<issueManagement>
@@ -54,7 +54,7 @@
 					<timestampFormat>{0,date} {0,time}</timestampFormat>
 					<doCheck>false</doCheck>
 					<doUpdate>false</doUpdate>
-					 <shortRevisionLength>8</shortRevisionLength>
+					<shortRevisionLength>8</shortRevisionLength>
 				</configuration>
 				<executions>
 					<execution>
@@ -76,24 +76,6 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<packageName>tigase/</packageName>
-							<mainClass>tigase.server.XMPPServer</mainClass>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-						</manifest>
-						<manifestEntries>
-							<Implementation-Version>${project.version} build ${buildNumber} (${timestamp})</Implementation-Version>
-							<Implementation-Build>${buildNumber} (${timestamp})</Implementation-Build>
-						</manifestEntries>
-						<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
-					</archive>
-				</configuration>
-			</plugin>
-			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.3</version>
 				<configuration>
@@ -107,27 +89,29 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
 			</plugin>
-                        <plugin>
-                                <groupId>org.apache.felix</groupId>
-                                <artifactId>maven-bundle-plugin</artifactId>
-                                <version>2.2.0</version>
-                                <extensions>true</extensions>
-                                <configuration>
-                                        <instructions>
-                                                <Bundle-Activator>tigase.osgi.Activator</Bundle-Activator>
-                                                <Export-Package>gnu.inet.encoding.*;version=${packet.version},tigase.*;version=${packet.version};-split-package:=merge-first</Export-Package>
-                                                <Import-Package>!junit.*,!sun.*,!com.sun.*,*</Import-Package>
-                                                <DynamicImport-Package>*</DynamicImport-Package>
-                                                <inlinedArtifacts>
-                                                        <inlinedArtifact>tigase-utils</inlinedArtifact>
-                                                        <inlinedArtifact>tigase-xmltools</inlinedArtifact>
-                                                </inlinedArtifacts>
-                                                <Embed-Dependency>*;scope=compile|runtime;artifactId=!junit|org.osgi.core|slf4j-api|tigase-utils|tigase-xmltools</Embed-Dependency>
-                                                <Bundle-SymbolicName>${pom.artifactId};singleton=true</Bundle-SymbolicName>
-                                                <Private-Package>tigase.annotations.*,tigase.auth.*,tigase.cluster.*,tigase.conf.*,tigase.db.*,tigase.disco.*,tigase.http.*,tigase.io.*,tigase.net.*,tigase.server.*,tigase.stats.*,tigase.sys.*,tigase.util.*,tigase.vhosts.*,tigase.xmpp.*</Private-Package>
-                                        </instructions>
-                                </configuration>
-                        </plugin>                        
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.2.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Implementation-Version>${project.version} build ${buildNumber} (${timestamp})</Implementation-Version>
+						<Implementation-Build>${buildNumber} (${timestamp})</Implementation-Build>
+						<Bundle-Activator>tigase.osgi.Activator</Bundle-Activator>
+						<Export-Package>gnu.inet.encoding.*;version=${packet.version},tigase.*;version=${packet.version};-split-package:=merge-first</Export-Package>
+						<Import-Package>!junit.*,!sun.*,!com.sun.*,*</Import-Package>
+						<DynamicImport-Package>*</DynamicImport-Package>
+						<inlinedArtifacts>
+							<inlinedArtifact>tigase-utils</inlinedArtifact>
+							<inlinedArtifact>tigase-xmltools</inlinedArtifact>
+						</inlinedArtifacts>
+						<Embed-Dependency>*;scope=compile|runtime;artifactId=!junit|org.osgi.core|slf4j-api|tigase-utils|tigase-xmltools</Embed-Dependency>
+						<Bundle-SymbolicName>${project.artifactId};singleton=true</Bundle-SymbolicName>
+						<Private-Package>tigase.annotations.*,tigase.auth.*,tigase.cluster.*,tigase.conf.*,tigase.db.*,tigase.disco.*,tigase.http.*,tigase.io.*,tigase.net.*,tigase.server.*,tigase.stats.*,tigase.sys.*,tigase.util.*,tigase.vhosts.*,tigase.xmpp.*</Private-Package>
+					</instructions>
+				</configuration>
+			</plugin>
 		</plugins>
 		<extensions>
 			<extension>
@@ -155,25 +139,25 @@
 			<version>3.4.3-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
-                <dependency>
-                        <groupId>org.apache.felix</groupId>
-                        <artifactId>org.osgi.core</artifactId>
-                        <version>1.4.0</version>
-                        <scope>provided</scope>
-                </dependency>                
-                <dependency>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>jul-to-slf4j</artifactId>
-                        <version>${slf4j.version}</version>
-                        <scope>provided</scope>
-                        <optional>true</optional>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>1.4.0</version>
+			<scope>provided</scope>
 		</dependency>
-                <dependency>
-                        <groupId>junit</groupId>
-                        <artifactId>junit</artifactId>
-                        <version>4.11</version>
-                        <scope>test</scope>
-                </dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jul-to-slf4j</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<repositories>
 		<repository>
