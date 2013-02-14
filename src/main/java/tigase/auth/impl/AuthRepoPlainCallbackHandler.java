@@ -96,7 +96,7 @@ public class AuthRepoPlainCallbackHandler implements CallbackHandler, AuthReposi
 					log.log(Level.FINEST, "AuthorizeCallback: authorId: {0}", authorId);
 				}
 
-				if (authenId.equals(authorId) || authenId.equals(authorId + "@" + domain)) {
+				if (authenId.equals(authorId) || authorId.equals(authenId + "@" + domain)) {
 					authCallback.setAuthorized(true);
 				}
 			} else {
