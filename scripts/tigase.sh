@@ -32,6 +32,7 @@
 # TIGASE_HOME
 # TIGASE_CONSOLE_LOG
 # TIGASE_PID
+# OSGI=true
 #
 # If not given the script will try to search for the file and if
 # not found default parameters will be used.
@@ -66,6 +67,7 @@ if [ -z "${JAVA_HOME}" ] ; then
   echo "Please set it to correct value before starting the sever."
   exit 1
 fi
+
 if [ -z "${TIGASE_HOME}" ] ; then
   if [ ${0:0:1} = '/' ] ; then
     TIGASE_HOME=${0}
@@ -74,19 +76,31 @@ if [ -z "${TIGASE_HOME}" ] ; then
   fi
   TIGASE_HOME=`dirname ${TIGASE_HOME}`
   TIGASE_HOME=`dirname ${TIGASE_HOME}`
+
   TIGASE_JAR=""
 fi
-for j in ${TIGASE_HOME}/jars/tigase-server*.jar ; do
+
+if ! [ $OSGI ] ; then
+	LIB_DIR=jars
+	JAR_FILE=${LIB_DIR}/tigase-server*.jar
+else
+	LIB_DIR=bundle
+	JAR_FILE=${LIB_DIR}/org.apache.felix.main*.jar
+fi
+
+for j in ${TIGASE_HOME}/${JAR_FILE} ; do
 	if [ -f ${j} ] ; then
 	  TIGASE_JAR=${j}
 	  break
 	fi
 done
+
 if [ -z ${TIGASE_JAR} ] ; then
 	echo "TIGASE_HOME is not set."
 	echo "Please set it to correct value before starting the sever."
 	exit 1
 fi
+
 if [ -z "${TIGASE_CONSOLE_LOG}" ] ; then
   if [ ! -d "logs" ] ; then
     mkdir logs
@@ -119,9 +133,15 @@ fi
 
 CLASSPATH="${CLASSPATH}${TIGASE_JAR}"
 
-CLASSPATH="`ls -d ${TIGASE_HOME}/libs/*.jar 2>/dev/null | grep -v wrapper | tr '\n' :`${CLASSPATH}"
+CLASSPATH="`ls -d ${TIGASE_HOME}/${LIB_DIR}/*.jar 2>/dev/null | grep -v wrapper | tr '\n' :`${CLASSPATH}"
 
-TIGASE_CMD="${JAVA} ${JAVA_OPTIONS} -cp ${CLASSPATH} ${TIGASE_RUN}"
+LOGBACK="-Dlogback.configurationFile=$TIGASE_HOME/etc/logback.xml"
+
+if [ $OSGI ] ; then
+	TIGASE_CMD="${JAVA} ${JAVA_OPTIONS} ${LOGBACK} -jar ${JAR_FILE}"
+else
+	TIGASE_CMD="${JAVA} ${JAVA_OPTIONS} ${LOGBACK} -cp ${CLASSPATH} ${TIGASE_RUN}"
+fi
 
 cd "${TIGASE_HOME}"
 
@@ -149,17 +169,21 @@ case "${1}" in
       exit 0
     fi
     echo "Shutting down Tigase: $PID"
-    kill $PID 2>/dev/null
-    for ((i=1; i <= 30; i++)) ; do
-      if ps -p $PID > /dev/null ; then
-        echo "$i. Waiting for the server to terminate..."
-        sleep 1
-      else
-        echo "$i. Tigase terminated."
-        break
-      fi
-    done
-    if ps -p $PID > /dev/null ; then
+
+	if ! [ $OSGI ] ; then
+		kill $PID 2>/dev/null
+		for ((i=1; i <= 30; i++)) ; do
+		  if ps -p $PID > /dev/null ; then
+			echo "$i. Waiting for the server to terminate..."
+			sleep 1
+		  else
+			echo "$i. Tigase terminated."
+			break
+		  fi
+		done
+	fi
+	
+	if ps -p $PID > /dev/null ; then
       echo "Forcing the server to terminate."
       kill -9 $PID 2>/dev/null
     fi
@@ -171,6 +195,15 @@ case "${1}" in
     $0 stop $2
     sleep 5
     $0 start $2
+    ;;
+
+  clear)
+	echo "Clearing logs"
+	rm -rf "${TIGASE_HOME}/logs"/*;
+	if ! [ $OSGI ] ; then
+		echo "Clearing osgi cache"
+		rm -rf "${TIGASE_HOME}/felix-cache"/*;
+	fi
     ;;
 
   run)
@@ -187,6 +220,7 @@ case "${1}" in
 
   check)
     echo "Checking arguments to Tigase: "
+    echo "OSGI            =  $OSGI"
     echo "TIGASE_HOME     =  $TIGASE_HOME"
     echo "TIGASE_JAR      =  $TIGASE_JAR"
     echo "TIGASE_PARAMS   =  $TIGASE_PARAMS"
