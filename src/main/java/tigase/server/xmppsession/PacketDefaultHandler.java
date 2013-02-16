@@ -1,6 +1,6 @@
 /*
  * PacketDefaultHandler.java
- * 
+ *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
@@ -27,9 +27,8 @@ package tigase.server.xmppsession;
 
 import tigase.db.NonAuthUserRepository;
 
+import tigase.server.Iq;
 import tigase.server.Packet;
-
-import tigase.sys.TigaseRuntime;
 
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
@@ -70,6 +69,7 @@ public class PacketDefaultHandler {
 	// private RosterAbstract roster_util =
 	// RosterFactory.getRosterImplementation(true);
 	private String[] AUTH_ONLY_ELEMS  = { "message", "presence" };
+	private String[] COMPRESS_PATH    = { "compress" };
 	private String[] IGNORE_PACKETS   = { "stream:features" };
 	private StanzaType[] IGNORE_TYPES = { StanzaType.error };
 
@@ -222,8 +222,8 @@ public class PacketDefaultHandler {
 				// stream compression might occur between authentication and resource
 				// binding
 				if (session.isResourceSet() ||
-						packet.isXMLNS("/iq/bind", "urn:ietf:params:xml:ns:xmpp-bind") ||
-						packet.isXMLNS("compress", "http://jabber.org/protocol/compress")) {
+						packet.isXMLNS(Iq.IQ_BIND_PATH, "urn:ietf:params:xml:ns:xmpp-bind") ||
+						packet.isXMLNS(COMPRESS_PATH, "http://jabber.org/protocol/compress")) {
 					JID from_jid = session.getJID();
 
 					if (from_jid != null) {
@@ -390,4 +390,4 @@ public class PacketDefaultHandler {
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/08
+//~ Formatted in Tigase Code Convention on 13/02/15

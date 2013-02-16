@@ -1,10 +1,12 @@
 /*
+ * BindProcessor.java
+ *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,20 +17,20 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.server.ext.handlers;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.server.Packet;
 import tigase.server.ext.ComponentConnection;
 import tigase.server.ext.ComponentIOService;
 import tigase.server.ext.ComponentProtocolHandler;
 import tigase.server.ext.ExtProcessor;
+import tigase.server.Iq;
+import tigase.server.Packet;
 
 import tigase.xml.Element;
 
@@ -40,10 +42,8 @@ import static tigase.server.ext.ComponentProtocolHandler.*;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Queue;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Queue;
 
 /**
  * Created: Nov 2, 2009 2:37:18 PM
@@ -51,17 +51,20 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class BindProcessor implements ExtProcessor {
+public class BindProcessor
+				implements ExtProcessor {
+	private static final String EL_NAME                 = "bind";
+	private static final String[] IQ_BIND_HOSTNAME_PATH = { "iq", "bind", "hostname" };
+	private static final String[] IQ_UNBIND_PATH        = { "iq", "unbind" };
 
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log = Logger.getLogger(BindProcessor.class.getName());
-	private static final String EL_NAME = "bind";
-	private static final String XMLNS = "urn:xmpp:component:0";
-	private static final String ID = EL_NAME;
+	private static final Logger log       = Logger.getLogger(BindProcessor.class.getName());
+	private static final String XMLNS     = "urn:xmpp:component:0";
+	private static final String ID        = EL_NAME;
 	private static final Element FEATURES = new Element(EL_NAME, new String[] { "xmlns" },
-		new String[] { XMLNS });
+																						new String[] { XMLNS });
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -87,7 +90,7 @@ public class BindProcessor implements ExtProcessor {
 	 */
 	@Override
 	public List<Element> getStreamFeatures(ComponentIOService serv,
-			ComponentProtocolHandler handler) {
+					ComponentProtocolHandler handler) {
 		return Arrays.asList(FEATURES);
 	}
 
@@ -105,11 +108,11 @@ public class BindProcessor implements ExtProcessor {
 	 * @return
 	 */
 	@Override
-	public boolean process(Packet p, ComponentIOService serv, ComponentProtocolHandler handler,
-			Queue<Packet> results) {
-		if (p.isXMLNS("/iq/bind", XMLNS)) {
+	public boolean process(Packet p, ComponentIOService serv,
+												 ComponentProtocolHandler handler, Queue<Packet> results) {
+		if (p.isXMLNS(Iq.IQ_BIND_PATH, XMLNS)) {
 			if ((p.getType() == StanzaType.set) && serv.isAuthenticated()) {
-				String hostname = p.getElemCData("/iq/bind/hostname");
+				String hostname = p.getElemCData(IQ_BIND_HOSTNAME_PATH);
 
 				handler.bindHostname(hostname, serv);
 				results.offer(Packet.packetInstance(okResult(p.getElement()), null, null));
@@ -119,10 +122,9 @@ public class BindProcessor implements ExtProcessor {
 
 			return true;
 		}
-
-		if (p.isXMLNS("/iq/unbind", XMLNS)) {
+		if (p.isXMLNS(IQ_UNBIND_PATH, XMLNS)) {
 			if ((p.getType() == StanzaType.set) && serv.isAuthenticated()) {
-				String hostname = p.getElemCData("/iq/unbind/hostname");
+				String hostname = p.getElemCData(IQ_BIND_HOSTNAME_PATH);
 
 				handler.unbindHostname(hostname, serv);
 				results.offer(Packet.packetInstance(okResult(p.getElement()), null, null));
@@ -147,13 +149,15 @@ public class BindProcessor implements ExtProcessor {
 	 */
 	@Override
 	public void startProcessing(Packet p, ComponentIOService serv,
-			ComponentProtocolHandler handler, Queue<Packet> results) {
-		String[] hostnames = (String[]) serv.getSessionData().get(EXTCOMP_BIND_HOSTNAMES_PROP_KEY);
+															ComponentProtocolHandler handler, Queue<Packet> results) {
+		String[] hostnames =
+			(String[]) serv.getSessionData().get(EXTCOMP_BIND_HOSTNAMES_PROP_KEY);
 
 		if (hostnames != null) {
 			for (String host : hostnames) {
-				if ( !host.isEmpty()) {
-					Packet bind_p = Packet.packetInstance(newBindElement(host, handler), null, null);
+				if (!host.isEmpty()) {
+					Packet bind_p = Packet.packetInstance(newBindElement(host, handler), null,
+														null);
 
 					log.info("Generating hostname bind packet: " + bind_p.toString());
 					results.offer(bind_p);
@@ -165,10 +169,11 @@ public class BindProcessor implements ExtProcessor {
 	}
 
 	private Element newBindElement(String host, ComponentProtocolHandler handler) {
-		Element result = new Element("iq", new String[] { "type", "id" }, new String[] { "set",
-				handler.newPacketId("bind") });
+		Element result = new Element("iq", new String[] { "type", "id" },
+																 new String[] { "set",
+						handler.newPacketId("bind") });
 		Element bind = new Element(EL_NAME, new Element[] { new Element("hostname", host) },
-			new String[] { "xmlns" }, new String[] { XMLNS });
+															 new String[] { "xmlns" }, new String[] { XMLNS });
 
 		result.addChild(bind);
 
@@ -185,7 +190,4 @@ public class BindProcessor implements ExtProcessor {
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/02/15

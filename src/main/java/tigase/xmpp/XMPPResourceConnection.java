@@ -1,6 +1,6 @@
 /*
  * XMPPResourceConnection.java
- * 
+ *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
@@ -30,6 +30,7 @@ import tigase.db.AuthRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
 
+import tigase.server.Presence;
 import tigase.server.xmppsession.SessionManagerHandler;
 
 import tigase.util.TigaseStringprepException;
@@ -786,7 +787,7 @@ public class XMPPResourceConnection
 		putSessionData(PRESENCE_KEY, packet);
 
 		// Parse resource priority:
-		String pr_str = packet.getCData("/presence/priority");
+		String pr_str = packet.getCData(Presence.PRESENCE_PRIORITY_PATH);
 
 		if (pr_str != null) {
 			int pr = 1;
@@ -959,4 +960,4 @@ public class XMPPResourceConnection
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/13
+//~ Formatted in Tigase Code Convention on 13/02/15

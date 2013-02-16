@@ -1,27 +1,26 @@
-
 /*
-* @(#)Packet.java   2010.01.16 at 07:05:30 GMT
-*
-* Tigase Jabber/XMPP Server
-* Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU Affero General Public License as published by
-* the Free Software Foundation, version 3 of the License.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU Affero General Public License for more details.
-*
-* You should have received a copy of the GNU Affero General Public License
-* along with this program. Look for COPYING file in the top folder.
-* If not, see http://www.gnu.org/licenses/.
-*
-* $Rev$
-* Last modified by $Author$
-* $Date$
+ * Packet.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ *
  */
+
+
+
 package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -38,8 +37,6 @@ import tigase.xmpp.StanzaType;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Objects of this class carry a single XMPP packet (stanza).
@@ -99,6 +96,20 @@ import java.util.Set;
  * @version $Rev$
  */
 public class Packet {
+	/** Field description */
+	public static final String CLIENT_XMLNS = "jabber:client";
+
+	/** Field description */
+	public static final String FROM_ATT = "from";
+
+	/** Field description */
+	public static final String PERM_ATT = "perm";
+
+	/** Field description */
+	public static final String PRIORITY_ATT = "pr";
+
+	/** Field description */
+	public static final String TO_ATT    = "to";
 	private static final String ERROR_NS = "urn:ietf:params:xml:ns:xmpp-stanzas";
 
 	/**
@@ -112,13 +123,11 @@ public class Packet {
 	 * <code>'packet.debug.full'</code> to <code>'true'</code>.
 	 */
 	public static boolean FULL_DEBUG = Boolean.getBoolean("packet.debug.full");
-	public static final String CLIENT_XMLNS = "jabber:client";
-	public static final String FROM_ATT = "from";
-	public static final String TO_ATT = "to";
-	public static final String PRIORITY_ATT = "pr";
-	public static final String PERM_ATT = "perm";
 
 	//~--- fields ---------------------------------------------------------------
+
+	/** Field description */
+	protected Element elem;
 
 ///**
 // * For internal Tigase use only. The session manager stores in stanza the old, original
@@ -141,17 +150,16 @@ public class Packet {
 // *
 // */
 //public static final String OLDTO = "oldto";
-	private JID packetFrom = null;
-	private JID packetTo = null;
-	private String packetToString = null;
+	private JID packetFrom              = null;
+	private JID packetTo                = null;
+	private String packetToString       = null;
 	private String packetToStringSecure = null;
-	private Set<String> processorsIds = new LinkedHashSet<String>(4, 0.9f);
-	private JID stanzaFrom = null;
-	private String stanzaId = null;
-	private JID stanzaTo = null;
-	private Priority priority = Priority.NORMAL;
-	private Permissions permissions = Permissions.NONE;
-	protected Element elem;
+	private Set<String> processorsIds   = new LinkedHashSet<String>(4, 0.9f);
+	private JID stanzaFrom              = null;
+	private String stanzaId             = null;
+	private JID stanzaTo                = null;
+	private Priority priority           = Priority.NORMAL;
+	private Permissions permissions     = Permissions.NONE;
 	private boolean routed;
 	private StanzaType type;
 
@@ -197,7 +205,7 @@ public class Packet {
 	 */
 	public static String elemToString(Element el) {
 		String elemData = el.toString();
-		int size = elemData.length();
+		int size        = elemData.length();
 
 		if (size > 1024) {
 			elemData = elemData.substring(0, 1024) + " ... ";
@@ -216,7 +224,7 @@ public class Packet {
 	 */
 	public static String elemToStringSecure(Element el) {
 		String elemData = el.toStringSecure();
-		int size = elemData.length();
+		int size        = elemData.length();
 
 		if (size > 1024) {
 			elemData = elemData.substring(0, 1024) + " ... ";
@@ -244,11 +252,9 @@ public class Packet {
 		if (elem.getName() == Message.ELEM_NAME) {
 			return new Message(elem);
 		}
-
 		if (elem.getName() == Presence.ELEM_NAME) {
 			return new Presence(elem);
 		}
-
 		if (elem.getName() == Iq.ELEM_NAME) {
 			return new Iq(elem);
 		}
@@ -282,11 +288,9 @@ public class Packet {
 		if (elem.getName() == Message.ELEM_NAME) {
 			return new Message(elem, stanzaFrom, stanzaTo);
 		}
-
 		if (elem.getName() == Presence.ELEM_NAME) {
 			return new Presence(elem, stanzaFrom, stanzaTo);
 		}
-
 		if (elem.getName() == Iq.ELEM_NAME) {
 			return new Iq(elem, stanzaFrom, stanzaTo);
 		}
@@ -313,10 +317,12 @@ public class Packet {
 	 * @throws TigaseStringprepException if there is stanza from or to address parsing
 	 * error.
 	 */
-	public static Packet packetInstance(String el_name, String from, String to, StanzaType type)
-			throws TigaseStringprepException {
-		Element elem = new Element(el_name, new String[] { "from", "to", "type" }, new String[] { from,
-				to, type.toString() });
+	public static Packet packetInstance(String el_name, String from, String to,
+					StanzaType type)
+					throws TigaseStringprepException {
+		Element elem = new Element(el_name, new String[] { "from", "to", "type" },
+															 new String[] { from,
+						to, type.toString() });
 
 		return packetInstance(elem);
 	}
@@ -332,7 +338,7 @@ public class Packet {
 	 */
 	public Packet copyElementOnly() {
 		Element res_elem = elem.clone();
-		Packet result = packetInstance(res_elem, getStanzaFrom(), getStanzaTo());
+		Packet result    = packetInstance(res_elem, getStanzaFrom(), getStanzaTo());
 
 		result.setPriority(priority);
 
@@ -381,7 +387,8 @@ public class Packet {
 	 * is a response to this <code>Packet</code> instance.
 	 */
 	public Packet errorResult(final String errorType, final Integer errorCode,
-			final String errorCondition, final String errorText, final boolean includeOriginalXML) {
+														final String errorCondition, final String errorText,
+														final boolean includeOriginalXML) {
 		Element reply = new Element(elem.getName());
 
 		reply.setAttribute("type", StanzaType.error.toString());
@@ -397,7 +404,6 @@ public class Packet {
 		if (getStanzaId() != null) {
 			reply.setAttribute("id", getStanzaId());
 		}    // end of if (getElemId() != null)
-
 		if (includeOriginalXML) {
 			reply.addChildren(elem.getChildren());
 		}    // end of if (includeOriginalXML)
@@ -414,22 +420,19 @@ public class Packet {
 		if (errorCode != null) {
 			error.setAttribute("code", errorCode.toString());
 		}
-
 		error.setAttribute("type", errorType);
 
 		Element cond = new Element(errorCondition);
 
 		cond.setXMLNS(ERROR_NS);
 		error.addChild(cond);
-
 		if (errorText != null) {
-			Element t = new Element("text", errorText,
-				new String[] { "xml:lang", "xmlns" },
-				new String[] { "en", ERROR_NS });
+			Element t = new Element("text", errorText, new String[] { "xml:lang", "xmlns" },
+															new String[] { "en",
+							ERROR_NS });
 
 			error.addChild(t);
 		}    // end of if (text != null && text.length() > 0)
-
 		reply.addChild(error);
 
 		return swapFromTo(reply, getStanzaTo(), getStanzaFrom());
@@ -466,9 +469,22 @@ public class Packet {
 	 *
 	 * @return
 	 */
-	public String getAttribute(String path, String key) {
+	public String getAttribute(String[] path, String key) {
 		return elem.getAttribute(path, key);
 	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 * @return
+	 */
+
+//@Deprecated
+//public String getAttribute(String path, String key) {
+//  return elem.getAttribute(path, key);
+//}
 
 	/**
 	 * The method alwats returns NULL. It is overwritten in the <code>Iq</code> class
@@ -496,7 +512,7 @@ public class Packet {
 	 * @return CData for a given element or NULL if the element does not exist or there is
 	 * no CData for the element.
 	 */
-	public String getElemCData(String xmlPath) {
+	public String getElemCData(String[] xmlPath) {
 		return elem.getCData(xmlPath);
 	}
 
@@ -529,7 +545,7 @@ public class Packet {
 	 * @return children list for a given element or NULL if the element does not exist
 	 * or there is no children for the element.
 	 */
-	public List<Element> getElemChildren(String xmlPath) {
+	public List<Element> getElemChildren(String[] xmlPath) {
 		return elem.getChildren(xmlPath);
 	}
 
@@ -543,7 +559,9 @@ public class Packet {
 	 */
 	@Deprecated
 	public String getElemFrom() {
-		return (stanzaFrom != null) ? stanzaFrom.toString() : null;
+		return (stanzaFrom != null)
+					 ? stanzaFrom.toString()
+					 : null;
 	}
 
 	/**
@@ -570,7 +588,9 @@ public class Packet {
 	 */
 	@Deprecated
 	public String getElemTo() {
-		return (stanzaTo != null) ? stanzaTo.toString() : null;
+		return (stanzaTo != null)
+					 ? stanzaTo.toString()
+					 : null;
 	}
 
 	/**
@@ -590,17 +610,27 @@ public class Packet {
 	 * @return parsed stanza error condition or NULL if there is not error condition.
 	 */
 	public String getErrorCondition() {
-		List<Element> children = elem.getChildren(elem.getName() + "/error");
+		List<Element> children = elem.getChildren(getElNameErrorPath());
 
 		if (children != null) {
 			for (Element cond : children) {
-				if ( !cond.getName().equals("text")) {
+				if (!cond.getName().equals("text")) {
 					return cond.getName();
 				}    // end of if (!cond.getName().equals("text"))
 			}      // end of for (Element cond: children)
 		}        // end of if (children == null) else
 
 		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	protected String[] getElNameErrorPath() {
+		return new String[] { elem.getName(), "/error" };
 	}
 
 	/**
@@ -613,7 +643,9 @@ public class Packet {
 	 * neither the packet source address is set nor the stanza source address is set.
 	 */
 	public JID getFrom() {
-		return (packetFrom != null) ? packetFrom : stanzaFrom;
+		return (packetFrom != null)
+					 ? packetFrom
+					 : stanzaFrom;
 	}
 
 	/**
@@ -715,7 +747,9 @@ public class Packet {
 	 * is set.
 	 */
 	public JID getTo() {
-		return (packetTo != null) ? packetTo : stanzaTo;
+		return (packetTo != null)
+					 ? packetTo
+					 : stanzaTo;
 	}
 
 	/**
@@ -767,26 +801,22 @@ public class Packet {
 	public void initVars(JID stanzaFrom, JID stanzaTo) {
 		if (this.stanzaFrom != stanzaFrom) {
 			this.stanzaFrom = stanzaFrom;
-
 			if (stanzaFrom == null) {
 				elem.removeAttribute(FROM_ATT);
 			} else {
 				elem.setAttribute(FROM_ATT, stanzaFrom.toString());
 			}
 		}
-
 		if (this.stanzaTo != stanzaTo) {
 			this.stanzaTo = stanzaTo;
-
 			if (stanzaTo == null) {
 				elem.removeAttribute(TO_ATT);
 			} else {
 				elem.setAttribute(TO_ATT, stanzaTo.toString());
 			}
 		}
-
-		stanzaId = elem.getAttribute("id");
-		packetToString = null;
+		stanzaId             = elem.getAttribute("id");
+		packetToString       = null;
 		packetToStringSecure = null;
 	}
 
@@ -815,19 +845,16 @@ public class Packet {
 		} else {
 			stanzaTo = null;
 		}
-
 		tmp = elem.getAttribute(FROM_ATT);
-
 		if (tmp != null) {
 			stanzaFrom = JID.jidInstance(tmp);
 		} else {
 			stanzaFrom = null;
 		}
-
-		stanzaId = elem.getAttribute("id");
-		packetToString = null;
+		stanzaId             = elem.getAttribute("id");
+		packetToString       = null;
 		packetToStringSecure = null;
-		tmp = elem.getAttribute(PRIORITY_ATT);
+		tmp                  = elem.getAttribute(PRIORITY_ATT);
 		if (tmp != null) {
 			priority = Priority.valueOf(tmp);
 		}
@@ -835,8 +862,6 @@ public class Packet {
 		if (tmp != null) {
 			permissions = Permissions.valueOf(tmp);
 		}
-
-
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -918,7 +943,7 @@ public class Packet {
 	 *
 	 * @return
 	 */
-	public boolean isXMLNS(String elementPath, String xmlns) {
+	public boolean isXMLNS(String[] elementPath, String xmlns) {
 		String this_xmlns = elem.getXMLNS(elementPath);
 
 		if (this_xmlns == xmlns) {
@@ -928,9 +953,27 @@ public class Packet {
 		return false;
 	}
 
+	//~--- set methods ----------------------------------------------------------
+
+//public boolean isXMLNS(String elementPath, String xmlns) {
+//  String this_xmlns = elem.getXMLNS(elementPath);
+//
+//  if (this_xmlns == xmlns) {
+//    return true;
+//  }
+//
+//  return false;
+//}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param xmlns
+	 */
 	public void setXMLNS(String xmlns) {
 		elem.setXMLNS(xmlns);
-		packetToString = null;
+		packetToString       = null;
 		packetToStringSecure = null;
 	}
 
@@ -957,7 +1000,6 @@ public class Packet {
 		if (getXMLNS() != null) {
 			reply.setXMLNS(getXMLNS());
 		}
-
 		reply.setAttribute("type", StanzaType.result.toString());
 
 		// Not needed anymore, initVars(...) takes care of that
@@ -988,7 +1030,6 @@ public class Packet {
 			new_child.addChild(tmp);
 			new_child = tmp;
 		}    // end of for (int i = 0; i < originalXML; i++)
-
 		if (includeXML != null) {
 			new_child.setCData(includeXML);
 		}    // end of if (includeOriginalXML)
@@ -1020,7 +1061,6 @@ public class Packet {
 		if (getXMLNS() != null) {
 			reply.setXMLNS(getXMLNS());
 		}
-
 		reply.setAttribute("type", StanzaType.result.toString());
 
 		// Not needed anymore, initVars(...) takes care of that
@@ -1051,7 +1091,6 @@ public class Packet {
 			new_child.addChild(tmp);
 			new_child = tmp;
 		}    // end of for (int i = 0; i < originalXML; i++)
-
 		if (includeXML != null) {
 			new_child.addChild(includeXML);
 		}    // end of if (includeOriginalXML)
@@ -1072,10 +1111,9 @@ public class Packet {
 	 * @return a new <code>Packet</code> instance with <code>route</code> stanza.
 	 */
 	public Packet packRouted() {
-		Element routedp = new Element("route",
-			new String[] { TO_ATT, FROM_ATT, PRIORITY_ATT, PERM_ATT },
-			new String[] { getTo().toString(),	getFrom().toString(),
-										 priority.toString(), permissions.toString() });
+		Element routedp = new Element("route", new String[] { TO_ATT, FROM_ATT, PRIORITY_ATT,
+						PERM_ATT }, new String[] { getTo().toString(), getFrom().toString(),
+																			 priority.toString(), permissions.toString() });
 
 		routedp.addChild(elem);
 
@@ -1123,9 +1161,9 @@ public class Packet {
 	 * permissions calculated by the session manager.
 	 */
 	public void setPermissions(Permissions perm) {
-		packetToString = null;
+		packetToString       = null;
 		packetToStringSecure = null;
-		permissions = perm;
+		permissions          = perm;
 	}
 
 	/**
@@ -1206,7 +1244,7 @@ public class Packet {
 	 * @return a new <code>Packet>/code> instance.
 	 */
 	public Packet swapFromTo() {
-		Element el = elem.clone();
+		Element el    = elem.clone();
 		Packet packet = packetInstance(el, getStanzaFrom(), getStanzaTo());
 
 		packet.setPacketTo(getFrom());
@@ -1287,6 +1325,12 @@ public class Packet {
 		return "from=" + packetFrom + ", to=" + packetTo + packetToString;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	@Override
 	public String toString() {
 		return toString(FULL_DEBUG);
@@ -1390,9 +1434,9 @@ public class Packet {
 	}
 
 	private String calcToString(String elemData) {
-		return ", DATA=" + elemData + ", SIZE=" + elem.toString().length() + ", XMLNS="
-				+ elem.getXMLNS() + ", PRIORITY=" + priority + ", PERMISSION=" + permissions + ", TYPE="
-					+ type;
+		return ", DATA=" + elemData + ", SIZE=" + elem.toString().length() + ", XMLNS=" +
+					 elem.getXMLNS() + ", PRIORITY=" + priority + ", PERMISSION=" + permissions +
+					 ", TYPE=" + type;
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -1401,21 +1445,18 @@ public class Packet {
 		if (elem == null) {
 			throw new NullPointerException();
 		}    // end of if (elem == null)
-
 		this.elem = elem;
-
 		if (elem.getAttribute("type") != null) {
 			type = StanzaType.valueof(elem.getAttribute("type"));
 		} else {
 			type = null;
 		}    // end of if (elem.getAttribute("type") != null) else
-
 		if (elem.getName() == "cluster") {
 			setPriority(Priority.CLUSTER);
 		} else {
-			if ((elem.getName() == "presence")
-					&& ((type == null) || (type == StanzaType.available) || (type == StanzaType.unavailable)
-						|| (type == StanzaType.probe))) {
+			if ((elem.getName() == "presence") &&
+					((type == null) || (type == StanzaType.available) ||
+					 (type == StanzaType.unavailable) || (type == StanzaType.probe))) {
 				setPriority(Priority.PRESENCE);
 			} else {
 				if (elem.getName() == "route") {
@@ -1429,7 +1470,4 @@ public class Packet {
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/02/15

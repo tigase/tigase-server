@@ -1,6 +1,6 @@
 /*
  * XMPPImplIfc.java
- * 
+ *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
@@ -36,6 +36,7 @@ import tigase.xml.Element;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This is a base interface for all session manager plugins. There are packet
@@ -156,11 +157,14 @@ public interface XMPPImplIfc
 	 * names in form of a full path to the XML element for
 	 * stanzas which can be processed by this plugin. Each element name path
 	 * corresponds to XMLNS returned in array by <code>supNamespaces()</code>
-	 * method.
+	 * method. The element path itself is represented by a String array with each path
+	 * element as a separate String.
 	 *
-	 * @return a <code>String[]</code> value
+	 * @return a <code>String[][]</code> value is an array for element paths for which the plugin
+	 * offers processing capabilities. Each path is in form of a String array in order to reduce
+	 * parsing overhead.
 	 */
-	String[] supElementNamePaths();
+	String[][] supElementNamePaths();
 
 	/**
 	 * Method <code>supNamespaces</code> returns an array of namespaces for
@@ -182,7 +186,7 @@ public interface XMPPImplIfc
 	 *
 	 * @return a <code>StanzaType[]</code> array of supported stanza types.
 	 */
-	StanzaType[] supTypes();
+	Set<StanzaType> supTypes();
 
 	/**
 	 * Method <code>supStreamFeatures</code> returns an array of XML
@@ -206,4 +210,4 @@ public interface XMPPImplIfc
 }    // XMPPImplIfc
 
 
-//~ Formatted in Tigase Code Convention on 13/02/13
+//~ Formatted in Tigase Code Convention on 13/02/15

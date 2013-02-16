@@ -1,6 +1,6 @@
 /*
  * XMPPProcessor.java
- * 
+ *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
@@ -39,6 +39,7 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * <code>XMPPProcessor</code> abstract class contains basic definition for
@@ -173,11 +174,19 @@ public abstract class XMPPProcessor
 	@Override
 	public Authorization canHandle(Packet packet, XMPPResourceConnection conn) {
 		Authorization result = null;
-		String[] elemPats    = supElementNamePaths();
+		String[][] elemPaths = supElementNamePaths();
 
-		if (elemPats != null) {
-			result = checkPacket(packet, conn, elemPats);
+		if (elemPaths != null) {
+
+			// This is the new API style
+			String[] elemXMLNS    = supNamespaces();
+			Set<StanzaType> types = supTypes();
+
+			result = checkPacket(packet, conn, elemPaths, elemXMLNS, types);
 		} else {
+
+			// And this is the old API left for backward compatibility with plugins
+			// from earlier versions
 			if (walk(packet.getElement())) {
 				result = Authorization.AUTHORIZED;
 			}
@@ -194,13 +203,26 @@ public abstract class XMPPProcessor
 	}
 
 	private Authorization checkPacket(Packet packet, XMPPResourceConnection conn,
-																		String[] elemPaths) {
-		return null;
+																		String[][] elemPaths, String[] elemXMLNS,
+																		Set<StanzaType> types) {
+		Authorization result = null;
+
+		for (int i = 0; i < elemPaths.length; i++) {
+			if (packet.isXMLNS(elemPaths[i], elemXMLNS[i])) {
+				if ((types == null) || types.contains(packet.getType())) {
+					result = Authorization.AUTHORIZED;
+
+					break;
+				}
+			}
+		}
+
+		return result;
 	}
 
 	private boolean walk(Element elem) {
-		boolean result = false;
-		String xmlns   = elem.getXMLNS();
+		boolean result;
+		String xmlns = elem.getXMLNS();
 
 		if (xmlns == null) {
 			xmlns = "jabber:client";
@@ -226,7 +248,7 @@ public abstract class XMPPProcessor
 	 * @return
 	 */
 	@Override
-	public StanzaType[] supTypes() {
+	public Set<StanzaType> supTypes() {
 		return null;
 	}
 
@@ -237,7 +259,7 @@ public abstract class XMPPProcessor
 	 * @return
 	 */
 	@Override
-	public String[] supElementNamePaths() {
+	public String[][] supElementNamePaths() {
 		return null;
 	}
 
@@ -327,4 +349,4 @@ public abstract class XMPPProcessor
 }    // XMPPProcessor
 
 
-//~ Formatted in Tigase Code Convention on 13/02/13
+//~ Formatted in Tigase Code Convention on 13/02/15

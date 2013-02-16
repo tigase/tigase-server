@@ -1,4 +1,6 @@
 /*
+ * ShortNewsPublisher.java
+ *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
@@ -15,10 +17,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.server.sreceiver;
 
@@ -40,12 +41,10 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import java.util.Map;
-import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Map;
+import java.util.Queue;
 
 /**
  * This subscription tasks allows you to publish short news on your site.
@@ -80,27 +79,28 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ShortNewsPublisher extends RepoRosterTask {
+public class ShortNewsPublisher
+				extends RepoRosterTask {
 	private static final String DB_CONNECTION_DISPL_NAME = "Database connection string";
-	private static final String DB_CONNECTION_PROP_KEY = "db-connection-string";
-	private static final String DB_CONNECTION_PROP_VAL =
+	private static final String DB_CONNECTION_PROP_KEY   = "db-connection-string";
+	private static final String DB_CONNECTION_PROP_VAL   =
 		"jdbc:mysql://localhost/tigase?user=root&password=mypass";
-	private static final String DB_TABLE_DISPL_NAME = "Database table name";
-	private static final String DB_TABLE_PROP_KEY = "db-table";
-	private static final String DB_TABLE_PROP_VAL = "short_news";
+	private static final String DB_TABLE_DISPL_NAME  = "Database table name";
+	private static final String DB_TABLE_PROP_KEY    = "db-table";
+	private static final String DB_TABLE_PROP_VAL    = "short_news";
 	private static final String NEWS_TYPE_DISPL_NAME = "News type";
-	private static final String NEWS_TYPE_PROP_KEY = "news-type";
-	private static final String NEWS_TYPE_PROP_VAL = "minis";
-	private static final String TASK_HELP =
-		"This tasks writes all messages to special table in database"
-		+ " called 'short_news' and notifies all subscribed users about"
-		+ " new post. Table in database keeps following information about"
-		+ " post: publishing_time, author, subject, body. This subscription"
-		+ " task is ideal for publish short news on your Web site."
-		+ " Users can subscribe to the news just by adding task JID"
-		+ " to their roster, unsubscribing is equally simple - remove"
-		+ " JID from roster to stop receiving news. By default subscription"
-		+ " to this task is moderated."
+	private static final String NEWS_TYPE_PROP_KEY   = "news-type";
+	private static final String NEWS_TYPE_PROP_VAL   = "minis";
+	private static final String TASK_HELP            =
+		"This tasks writes all messages to special table in database" +
+		" called 'short_news' and notifies all subscribed users about" +
+		" new post. Table in database keeps following information about" +
+		" post: publishing_time, author, subject, body. This subscription" +
+		" task is ideal for publish short news on your Web site." +
+		" Users can subscribe to the news just by adding task JID" +
+		" to their roster, unsubscribing is equally simple - remove" +
+		" JID from roster to stop receiving news. By default subscription" +
+		" to this task is moderated."
 	;
 	private static final String TASK_TYPE = "Short news publisher";
 
@@ -108,10 +108,6 @@ public class ShortNewsPublisher extends RepoRosterTask {
 	 * Variable <code>log</code> is a class logger.
 	 */
 	private static final Logger log = Logger.getLogger("tigase.server.ssender.JDBCTask");
-
-	//~--- constant enums -------------------------------------------------------
-
-	private enum command { help, delete, update; }
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -174,6 +170,10 @@ public class ShortNewsPublisher extends RepoRosterTask {
 	private PreparedStatement update_post = null;
 	;
 
+	//~--- constant enums -------------------------------------------------------
+
+	private enum command { help, delete, update; }
+
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -184,7 +184,6 @@ public class ShortNewsPublisher extends RepoRosterTask {
 	 */
 	public void destroy(Queue<Packet> results) {
 		super.destroy(results);
-
 		try {
 			conn_valid_st.close();
 			insert_post.close();
@@ -207,26 +206,22 @@ public class ShortNewsPublisher extends RepoRosterTask {
 		Map<String, PropertyItem> defs = super.getDefaultParams();
 
 		defs.put(MESSAGE_TYPE_PROP_KEY,
-						 new PropertyItem(MESSAGE_TYPE_PROP_KEY,
-															MESSAGE_TYPE_DISPL_NAME,
+						 new PropertyItem(MESSAGE_TYPE_PROP_KEY, MESSAGE_TYPE_DISPL_NAME,
 															MessageType.NORMAL));
 		defs.put(SUBSCR_RESTRICTIONS_PROP_KEY,
 						 new PropertyItem(SUBSCR_RESTRICTIONS_PROP_KEY,
 															SUBSCR_RESTRICTIONS_DISPL_NAME,
 															SubscrRestrictions.MODERATED));
 		defs.put(DESCRIPTION_PROP_KEY,
-						 new PropertyItem(DESCRIPTION_PROP_KEY,
-															DESCRIPTION_DISPL_NAME,
+						 new PropertyItem(DESCRIPTION_PROP_KEY, DESCRIPTION_DISPL_NAME,
 															"Short news for the Web site..."));
 		defs.put(DB_CONNECTION_PROP_KEY,
-						 new PropertyItem(DB_CONNECTION_PROP_KEY,
-															DB_CONNECTION_DISPL_NAME,
+						 new PropertyItem(DB_CONNECTION_PROP_KEY, DB_CONNECTION_DISPL_NAME,
 															DB_CONNECTION_PROP_VAL));
 		defs.put(DB_TABLE_PROP_KEY,
 						 new PropertyItem(DB_TABLE_PROP_KEY, DB_TABLE_DISPL_NAME, DB_TABLE_PROP_VAL));
 		defs.put(NEWS_TYPE_PROP_KEY,
-						 new PropertyItem(NEWS_TYPE_PROP_KEY,
-															NEWS_TYPE_DISPL_NAME,
+						 new PropertyItem(NEWS_TYPE_PROP_KEY, NEWS_TYPE_DISPL_NAME,
 															NEWS_TYPE_PROP_VAL));
 
 		return defs;
@@ -270,20 +265,16 @@ public class ShortNewsPublisher extends RepoRosterTask {
 			props.put(DB_TABLE_PROP_KEY,
 								new PropertyItem(DB_TABLE_PROP_KEY, DB_TABLE_DISPL_NAME, tableName));
 		}
-
 		if (map.get(NEWS_TYPE_PROP_KEY) != null) {
 			newsType = (String) map.get(NEWS_TYPE_PROP_KEY);
 			props.put(NEWS_TYPE_PROP_KEY,
 								new PropertyItem(NEWS_TYPE_PROP_KEY, NEWS_TYPE_DISPL_NAME, newsType));
 		}
-
 		if (map.get(DB_CONNECTION_PROP_KEY) != null) {
 			db_conn = (String) map.get(DB_CONNECTION_PROP_KEY);
 			props.put(DB_CONNECTION_PROP_KEY,
-								new PropertyItem(DB_CONNECTION_PROP_KEY,
-																 DB_CONNECTION_DISPL_NAME,
+								new PropertyItem(DB_CONNECTION_PROP_KEY, DB_CONNECTION_DISPL_NAME,
 																 db_conn));
-
 			try {
 				initRepo();
 			} catch (SQLException e) {
@@ -294,6 +285,13 @@ public class ShortNewsPublisher extends RepoRosterTask {
 
 	//~--- methods --------------------------------------------------------------
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param results
+	 */
 	@Override
 	protected void processMessage(Packet packet, Queue<Packet> results) {
 		if (isPostCommand(packet)) {
@@ -308,9 +306,9 @@ public class ShortNewsPublisher extends RepoRosterTask {
 		try {
 			checkConnection();
 
-			String author = packet.getStanzaFrom().getBareJID().toString();
-			String subject = packet.getElemCData("/message/subject");
-			String body = packet.getElemCData("/message/body");
+			String author  = packet.getStanzaFrom().getBareJID().toString();
+			String subject = packet.getElemCData(Message.MESSAGE_SUBJECT_PATH);
+			String body    = packet.getElemCData(Message.MESSAGE_BODY_PATH);
 
 			if (body != null) {
 				if ((subject == null) || (subject.length() == 0)) {
@@ -322,7 +320,6 @@ public class ShortNewsPublisher extends RepoRosterTask {
 						subject = "--";
 					}
 				}
-
 				insert_post.setString(1, author);
 				insert_post.setString(2, XMLUtils.unescape(subject));
 				insert_post.setString(3, XMLUtils.unescape(body));
@@ -377,10 +374,10 @@ public class ShortNewsPublisher extends RepoRosterTask {
 	}
 
 	private String commandsHelp() {
-		return "Available commands are:\n" + "//help - display this help info\n"
-					 + "//update N - update post number N, posts content to update\n"
-					 + "             starts from the next line\n"
-					 + "//delete N - remove post number N";
+		return "Available commands are:\n" + "//help - display this help info\n" +
+					 "//update N - update post number N, posts content to update\n" +
+					 "             starts from the next line\n" +
+					 "//delete N - remove post number N";
 	}
 
 	private void deletePost(long snid) throws SQLException {
@@ -402,26 +399,25 @@ public class ShortNewsPublisher extends RepoRosterTask {
 		String query = "select 1;";
 
 		conn_valid_st = conn.prepareStatement(query);
-
 		if ((newsType == null) || (newsType.length() == 0)) {
-			query = "insert into " + tableName + " (news_type, author, subject, body) "
-							+ " values (null, ?, ?, ?)";
+			query = "insert into " + tableName + " (news_type, author, subject, body) " +
+							" values (null, ?, ?, ?)";
 		} else {
-			query = "insert into " + tableName + " (news_type, author, subject, body) "
-							+ " values ('" + newsType + "', ?, ?, ?)";
+			query = "insert into " + tableName + " (news_type, author, subject, body) " +
+							" values ('" + newsType + "', ?, ?, ?)";
 		}
-
 		insert_post = conn.prepareStatement(query);
-		query = "delete from " + tableName + " where snid = ?";
+		query       = "delete from " + tableName + " where snid = ?";
 		delete_post = conn.prepareStatement(query);
-		query = "update " + tableName + " set subject = ?, body = ?" + " where snid = ? ";
+		query       = "update " + tableName + " set subject = ?, body = ?" +
+									" where snid = ? ";
 		update_post = conn.prepareStatement(query);
 	}
 
 	//~--- get methods ----------------------------------------------------------
 
 	private boolean isPostCommand(Packet packet) {
-		String body = packet.getElemCData("/message/body");
+		String body = packet.getElemCData(Message.MESSAGE_BODY_PATH);
 
 		if (body != null) {
 			for (command comm : command.values()) {
@@ -437,43 +433,47 @@ public class ShortNewsPublisher extends RepoRosterTask {
 	//~--- methods --------------------------------------------------------------
 
 	private void runCommand(Packet packet, Queue<Packet> results) {
-		String body = packet.getElemCData("/message/body");
+		String body         = packet.getElemCData(Message.MESSAGE_BODY_PATH);
 		String[] body_split = body.split(" |\n|\r");
 
 		try {
 			command comm = command.valueOf(body_split[0].substring(2));
 
 			switch (comm) {
-				case help :
-					results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
-																					 StanzaType.chat, commandsHelp(),
-																					 "Commands description", null,
-																					 packet.getStanzaId()));
+			case help :
+				results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+																				 StanzaType.chat, commandsHelp(),
+																				 "Commands description", null,
+																				 packet.getStanzaId()));
 
-					break;
+				break;
 
-				case update :
-					updatePost(packet, Long.parseLong(body_split[1]));
-					results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
-									StanzaType.normal, "Post " + body_split[1] + " successfuly updated.",
-									"Command execution result", null, packet.getStanzaId()));
+			case update :
+				updatePost(packet, Long.parseLong(body_split[1]));
+				results.offer(
+						Message.getMessage(
+							packet.getStanzaTo(), packet.getStanzaFrom(), StanzaType.normal,
+							"Post " + body_split[1] + " successfuly updated.",
+							"Command execution result", null, packet.getStanzaId()));
 
-					break;
+				break;
 
-				case delete :
-					deletePost(Long.parseLong(body_split[1]));
-					results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
-									StanzaType.normal, "Post " + body_split[1] + " successfuly deleted.",
-									"Command execution result", null, packet.getStanzaId()));
+			case delete :
+				deletePost(Long.parseLong(body_split[1]));
+				results.offer(
+						Message.getMessage(
+							packet.getStanzaTo(), packet.getStanzaFrom(), StanzaType.normal,
+							"Post " + body_split[1] + " successfuly deleted.",
+							"Command execution result", null, packet.getStanzaId()));
 
-					break;
+				break;
 
-				default :
-					break;
+			default :
+				break;
 			}
 		} catch (Exception e) {
-			String error_text = "Hm, something wrong with command executing...: "
-													+ body_split[0] + ", " + body_split[1] + ", " + e;
+			String error_text = "Hm, something wrong with command executing...: " +
+													body_split[0] + ", " + body_split[1] + ", " + e;
 
 			log.log(Level.WARNING, error_text, e);
 			results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
@@ -486,8 +486,8 @@ public class ShortNewsPublisher extends RepoRosterTask {
 	private void updatePost(Packet packet, long snid) throws SQLException {
 		checkConnection();
 
-		String subject = packet.getElemCData("/message/subject");
-		String body = packet.getElemCData("/message/body");
+		String subject = packet.getElemCData(Message.MESSAGE_SUBJECT_PATH);
+		String body    = packet.getElemCData(Message.MESSAGE_BODY_PATH);
 
 		if ((body != null) && (subject != null)) {
 			int idx = body.indexOf('\n');
@@ -495,7 +495,6 @@ public class ShortNewsPublisher extends RepoRosterTask {
 			if ((idx > 0) && (idx < body.length() - 1) && (body.charAt(idx + 1) == '\r')) {
 				++idx;
 			}
-
 			update_post.setString(1, XMLUtils.unescape(subject));
 			update_post.setString(2, XMLUtils.unescape(body.substring(idx)));
 			update_post.setLong(3, snid);
@@ -505,7 +504,4 @@ public class ShortNewsPublisher extends RepoRosterTask {
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/02/15

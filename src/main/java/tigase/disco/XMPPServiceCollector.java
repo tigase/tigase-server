@@ -1,4 +1,6 @@
 /*
+ * XMPPServiceCollector.java
+ *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
@@ -15,16 +17,16 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.disco;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.AbstractComponentRegistrator;
+import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
 
@@ -35,10 +37,8 @@ import tigase.xmpp.JID;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.List;
-import java.util.Queue;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Queue;
 
 /**
  * Class XMPPServiceCollector
@@ -48,13 +48,14 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class XMPPServiceCollector extends AbstractComponentRegistrator<XMPPService> {
-
+public abstract class XMPPServiceCollector
+				extends AbstractComponentRegistrator<XMPPService> {
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(XMPPServiceCollector.class.getName());
+	private static final Logger log =
+		Logger.getLogger(XMPPServiceCollector.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -70,8 +71,8 @@ public abstract class XMPPServiceCollector extends AbstractComponentRegistrator<
 		serviceEntity = new ServiceEntity("Tigase", "server", "Session manager");
 		serviceEntity.addIdentities(new ServiceIdentity[] {
 			new ServiceIdentity("server", "im",
-				tigase.server.XMPPServer.NAME + " ver. "
-					+ tigase.server.XMPPServer.getImplementationVersion()) });
+													tigase.server.XMPPServer.NAME + " ver. " +
+													tigase.server.XMPPServer.getImplementationVersion()) });
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -120,13 +121,14 @@ public abstract class XMPPServiceCollector extends AbstractComponentRegistrator<
 	 */
 	@Override
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
-		if (packet.isXMLNS("/iq/query", INFO_XMLNS) || packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
-			JID jid = packet.getStanzaTo();
-			JID from = packet.getStanzaFrom();
-			String node = packet.getAttribute("/iq/query", "node");
+		if (packet.isXMLNS(Iq.IQ_QUERY_PATH, INFO_XMLNS) ||
+				packet.isXMLNS(Iq.IQ_QUERY_PATH, ITEMS_XMLNS)) {
+			JID jid       = packet.getStanzaTo();
+			JID from      = packet.getStanzaFrom();
+			String node   = packet.getAttribute(Iq.IQ_QUERY_PATH, "node");
 			Element query = packet.getElement().getChild("query").clone();
 
-			if (packet.isXMLNS("/iq/query", INFO_XMLNS)) {
+			if (packet.isXMLNS(Iq.IQ_QUERY_PATH, INFO_XMLNS)) {
 				for (XMPPService comp : components.values()) {
 					Element resp = comp.getDiscoInfo(node, jid, from);
 
@@ -137,8 +139,7 @@ public abstract class XMPPServiceCollector extends AbstractComponentRegistrator<
 					}
 				}      // end of for ()
 			}
-
-			if (packet.isXMLNS("/iq/query", ITEMS_XMLNS)) {
+			if (packet.isXMLNS(Iq.IQ_QUERY_PATH, ITEMS_XMLNS)) {
 				for (XMPPService comp : components.values()) {
 					List<Element> items = comp.getDiscoItems(node, jid, from);
 
@@ -147,14 +148,10 @@ public abstract class XMPPServiceCollector extends AbstractComponentRegistrator<
 					}    // end of if (stats != null && stats.count() > 0)
 				}      // end of for ()
 			}
-
 			results.offer(packet.okResult(query, 0));
 		}
 	}
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/02/15
