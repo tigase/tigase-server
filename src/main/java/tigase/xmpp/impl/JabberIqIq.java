@@ -177,8 +177,9 @@ public class JabberIqIq
 			if ((session != null) && (packet.getFrom() != null) &&
 					packet.getFrom().equals(session.getConnectionId()) &&
 					(packet.getElemName() == tigase.server.Message.ELEM_NAME)) {
-				evaluateMessage(session,
-												packet.getElemCData(tigase.server.Message.MESSAGE_BODY_PATH));
+				evaluateMessage(
+						session,
+						packet.getElemCDataStaticStr(tigase.server.Message.MESSAGE_BODY_PATH));
 			}
 		} catch (Exception e) {
 
@@ -408,4 +409,4 @@ public class JabberIqIq
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

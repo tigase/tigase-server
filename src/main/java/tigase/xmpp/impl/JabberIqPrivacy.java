@@ -146,7 +146,7 @@ public class JabberIqPrivacy
 			// Always allow presence unavailable to go, privacy lists packets and
 			// all other which are allowed by privacy rules
 			if ((res.getType() == StanzaType.unavailable) ||
-					res.isXMLNS(Iq.IQ_QUERY_PATH, XMLNS) || allowed(res, session)) {
+					res.isXMLNSStaticStr(Iq.IQ_QUERY_PATH, XMLNS) || allowed(res, session)) {
 				continue;
 			}
 			if (log.isLoggable(Level.FINEST)) {
@@ -183,7 +183,7 @@ public class JabberIqPrivacy
 														NonAuthUserRepository repo, Queue<Packet> results,
 														Map<String, Object> settings) {
 		if ((session == null) ||!session.isAuthorized() ||
-				packet.isXMLNS(Iq.IQ_QUERY_PATH, XMLNS)) {
+				packet.isXMLNSStaticStr(Iq.IQ_QUERY_PATH, XMLNS)) {
 			return false;
 		}    // end of if (session == null)
 
@@ -475,7 +475,7 @@ public class JabberIqPrivacy
 																 final XMPPResourceConnection session,
 																 final Queue<Packet> results)
 					throws NotAuthorizedException, XMPPException, TigaseDBException {
-		List<Element> children = packet.getElemChildren(Iq.IQ_QUERY_PATH);
+		List<Element> children = packet.getElemChildrenStaticStr(Iq.IQ_QUERY_PATH);
 
 		if ((children == null) || (children.size() == 0)) {
 			String[] lists = Privacy.getLists(session);
@@ -521,7 +521,7 @@ public class JabberIqPrivacy
 																 final XMPPResourceConnection session,
 																 final Queue<Packet> results)
 					throws NotAuthorizedException, XMPPException, TigaseDBException {
-		List<Element> children = packet.getElemChildren(Iq.IQ_QUERY_PATH);
+		List<Element> children = packet.getElemChildrenStaticStr(Iq.IQ_QUERY_PATH);
 
 		if ((children != null) && (children.size() == 1)) {
 			Element child = children.get(0);
@@ -696,4 +696,4 @@ public class JabberIqPrivacy
 }    // JabberIqPrivacy
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

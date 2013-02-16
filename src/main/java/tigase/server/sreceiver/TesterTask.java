@@ -100,7 +100,7 @@ public class TesterTask
 		if (isPostCommand(packet)) {
 			runCommand(packet, results);
 		} else {
-			String body = packet.getElemCData(Message.MESSAGE_BODY_PATH);
+			String body = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
 
 			results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
 																			 StanzaType.normal,
@@ -122,7 +122,7 @@ public class TesterTask
 	//~--- get methods ----------------------------------------------------------
 
 	private boolean isPostCommand(Packet packet) {
-		String body = packet.getElemCData(Message.MESSAGE_BODY_PATH);
+		String body = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
 
 		if (body != null) {
 			for (command comm : command.values()) {
@@ -138,7 +138,7 @@ public class TesterTask
 	//~--- methods --------------------------------------------------------------
 
 	private void runCommand(Packet packet, Queue<Packet> results) {
-		String body         = packet.getElemCData(Message.MESSAGE_BODY_PATH);
+		String body         = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
 		String[] body_split = body.split(" |\n|\r");
 		command comm        = command.valueOf(body_split[0].substring(2));
 
@@ -183,4 +183,4 @@ public class TesterTask
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

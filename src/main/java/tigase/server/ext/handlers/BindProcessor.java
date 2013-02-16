@@ -110,9 +110,9 @@ public class BindProcessor
 	@Override
 	public boolean process(Packet p, ComponentIOService serv,
 												 ComponentProtocolHandler handler, Queue<Packet> results) {
-		if (p.isXMLNS(Iq.IQ_BIND_PATH, XMLNS)) {
+		if (p.isXMLNSStaticStr(Iq.IQ_BIND_PATH, XMLNS)) {
 			if ((p.getType() == StanzaType.set) && serv.isAuthenticated()) {
-				String hostname = p.getElemCData(IQ_BIND_HOSTNAME_PATH);
+				String hostname = p.getElemCDataStaticStr(IQ_BIND_HOSTNAME_PATH);
 
 				handler.bindHostname(hostname, serv);
 				results.offer(Packet.packetInstance(okResult(p.getElement()), null, null));
@@ -122,9 +122,9 @@ public class BindProcessor
 
 			return true;
 		}
-		if (p.isXMLNS(IQ_UNBIND_PATH, XMLNS)) {
+		if (p.isXMLNSStaticStr(IQ_UNBIND_PATH, XMLNS)) {
 			if ((p.getType() == StanzaType.set) && serv.isAuthenticated()) {
-				String hostname = p.getElemCData(IQ_BIND_HOSTNAME_PATH);
+				String hostname = p.getElemCDataStaticStr(IQ_BIND_HOSTNAME_PATH);
 
 				handler.unbindHostname(hostname, serv);
 				results.offer(Packet.packetInstance(okResult(p.getElement()), null, null));
@@ -190,4 +190,4 @@ public class BindProcessor
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

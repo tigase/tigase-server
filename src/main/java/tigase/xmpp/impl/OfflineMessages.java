@@ -246,7 +246,7 @@ public class OfflineMessages
 		StanzaType type = pac.getType();
 
 		if ((pac.getElemName().equals("message") &&
-				 (pac.getElemCData(tigase.server.Message.MESSAGE_BODY_PATH) != null) &&
+				 (pac.getElemCDataStaticStr(tigase.server.Message.MESSAGE_BODY_PATH) != null) &&
 				 ((type == null) || (type == StanzaType.normal) ||
 					(type == StanzaType.chat))) || (pac.getElemName().equals("presence") &&
 						((type == StanzaType.subscribe) || (type == StanzaType.subscribed) ||
@@ -368,7 +368,7 @@ public class OfflineMessages
 			// Should we send off-line messages now?
 			// Let's try to do it here and maybe later I find better place.
 			String priority_str =
-				packet.getElemCData(tigase.server.Presence.PRESENCE_PRIORITY_PATH);
+				packet.getElemCDataStaticStr(tigase.server.Presence.PRESENCE_PRIORITY_PATH);
 			int priority = 0;
 
 			if (priority_str != null) {
@@ -541,4 +541,4 @@ public class OfflineMessages
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

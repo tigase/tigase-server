@@ -257,10 +257,10 @@ public class JabberIqAuth
 				// authentication plug-in. The authentication takes place on the
 				// AuthRepository
 				// level so we do not really care here what the user has sent.
-				String user_name = request.getChildCData(IQ_QUERY_USERNAME_PATH);
-				String resource  = request.getChildCData(IQ_QUERY_RESOURCE_PATH);
-				String password  = request.getChildCData(IQ_QUERY_PASSWORD_PATH);
-				String digest    = request.getChildCData(IQ_QUERY_DIGEST_PATH);
+				String user_name = request.getChildCDataStaticStr(IQ_QUERY_USERNAME_PATH);
+				String resource  = request.getChildCDataStaticStr(IQ_QUERY_RESOURCE_PATH);
+				String password  = request.getChildCDataStaticStr(IQ_QUERY_PASSWORD_PATH);
+				String digest    = request.getChildCDataStaticStr(IQ_QUERY_DIGEST_PATH);
 
 				try {
 					BareJID user_id = BareJID.bareJIDInstance(user_name,
@@ -436,4 +436,4 @@ public class JabberIqAuth
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

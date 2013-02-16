@@ -148,7 +148,7 @@ public class JabberIqRoster
 					Queue<Packet> results, Map<String, Object> settings)
 					throws NotAuthorizedException {
 		Element request = packet.getElement();
-		Element item    = request.findChild(IQ_QUERY_ITEM_PATH);
+		Element item    = request.findChildStaticStr(IQ_QUERY_ITEM_PATH);
 
 		if (item != null) {
 			Element new_item = DynamicRoster.getItemExtraData(session, settings, item);
@@ -179,7 +179,7 @@ public class JabberIqRoster
 	protected static void dynamicSetRequest(Packet packet, XMPPResourceConnection session,
 					Queue<Packet> results, Map<String, Object> settings) {
 		Element request     = packet.getElement();
-		List<Element> items = request.getChildren(Iq.IQ_QUERY_PATH);
+		List<Element> items = request.getChildrenStaticStr(Iq.IQ_QUERY_PATH);
 
 		if ((items != null) && (items.size() > 0)) {
 			for (Element item : items) {
@@ -300,7 +300,7 @@ public class JabberIqRoster
 			// &&
 			// !session.getUserId().equals(JIDUtils.getNodeID(packet.getElemFrom())))
 			StanzaType type = packet.getType();
-			String xmlns    = packet.getElement().getXMLNS(Iq.IQ_QUERY_PATH);
+			String xmlns    = packet.getElement().getXMLNSStaticStr(Iq.IQ_QUERY_PATH);
 
 			if (xmlns == RosterAbstract.XMLNS) {
 				switch (type) {
@@ -569,8 +569,9 @@ public class JabberIqRoster
 		}
 
 		// Check roster version hash.
-		String incomingHash = packet.getAttribute(Iq.IQ_QUERY_PATH, RosterAbstract.VER_ATT);
-		String storedHash   = "";
+		String incomingHash = packet.getAttributeStaticStr(Iq.IQ_QUERY_PATH,
+														RosterAbstract.VER_ATT);
+		String storedHash = "";
 
 		// If client provided hash and the server calculated hash are the same
 		// return the success result and abort further roster processing.
@@ -661,7 +662,7 @@ public class JabberIqRoster
 					throws XMPPException, NotAuthorizedException, TigaseDBException {
 
 		// Element request = packet.getElement();
-		List<Element> items = packet.getElemChildren(Iq.IQ_QUERY_PATH);
+		List<Element> items = packet.getElemChildrenStaticStr(Iq.IQ_QUERY_PATH);
 
 		if (items != null) {
 			try {
@@ -905,4 +906,4 @@ public class JabberIqRoster
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

@@ -118,7 +118,7 @@ public class StartTLS
 												? false
 												: skipTLSForHost(cid.getRemoteHost());
 
-			if (p.isXMLNS(FEATURES_STARTTLS_PATH, START_TLS_NS) &&!skipTLS) {
+			if (p.isXMLNSStaticStr(FEATURES_STARTTLS_PATH, START_TLS_NS) &&!skipTLS) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "{0}, Sending packet: {1}", new Object[] { serv,
 									starttls_el });
@@ -149,4 +149,4 @@ public class StartTLS
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

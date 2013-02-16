@@ -222,8 +222,10 @@ public class PacketDefaultHandler {
 				// stream compression might occur between authentication and resource
 				// binding
 				if (session.isResourceSet() ||
-						packet.isXMLNS(Iq.IQ_BIND_PATH, "urn:ietf:params:xml:ns:xmpp-bind") ||
-						packet.isXMLNS(COMPRESS_PATH, "http://jabber.org/protocol/compress")) {
+						packet.isXMLNSStaticStr(
+							Iq.IQ_BIND_PATH,
+							"urn:ietf:params:xml:ns:xmpp-bind") || packet.isXMLNSStaticStr(
+								COMPRESS_PATH, "http://jabber.org/protocol/compress")) {
 					JID from_jid = session.getJID();
 
 					if (from_jid != null) {

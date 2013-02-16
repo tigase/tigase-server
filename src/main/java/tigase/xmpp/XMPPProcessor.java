@@ -208,7 +208,7 @@ public abstract class XMPPProcessor
 		Authorization result = null;
 
 		for (int i = 0; i < elemPaths.length; i++) {
-			if (packet.isXMLNS(elemPaths[i], elemXMLNS[i])) {
+			if (packet.isXMLNSStaticStr(elemPaths[i], elemXMLNS[i])) {
 				if ((types == null) || types.contains(packet.getType())) {
 					result = Authorization.AUTHORIZED;
 

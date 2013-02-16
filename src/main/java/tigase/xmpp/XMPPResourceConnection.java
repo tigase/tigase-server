@@ -787,7 +787,7 @@ public class XMPPResourceConnection
 		putSessionData(PRESENCE_KEY, packet);
 
 		// Parse resource priority:
-		String pr_str = packet.getCData(Presence.PRESENCE_PRIORITY_PATH);
+		String pr_str = packet.getCDataStaticStr(Presence.PRESENCE_PRIORITY_PATH);
 
 		if (pr_str != null) {
 			int pr = 1;

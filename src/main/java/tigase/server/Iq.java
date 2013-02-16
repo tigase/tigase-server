@@ -265,7 +265,7 @@ public class Iq
 	 */
 	public String getIQXMLNS() {
 		if (iqQueryXMLNS == null) {
-			iqQueryXMLNS = elem.getXMLNS(IQ_QUERY_PATH);
+			iqQueryXMLNS = elem.getXMLNSStaticStr(IQ_QUERY_PATH);
 		}
 
 		return iqQueryXMLNS;
@@ -324,10 +324,10 @@ public class Iq
 			strCommand = child.getAttribute("node");
 			command    = Command.valueof(strCommand);
 		}
-		serviceDisco = (isXMLNS(IQ_QUERY_PATH, XMPPService.INFO_XMLNS) ||
-										isXMLNS(IQ_QUERY_PATH, XMPPService.ITEMS_XMLNS));
+		serviceDisco = (isXMLNSStaticStr(IQ_QUERY_PATH, XMPPService.INFO_XMLNS) ||
+										isXMLNSStaticStr(IQ_QUERY_PATH, XMPPService.ITEMS_XMLNS));
 	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

@@ -991,10 +991,10 @@ public class MessageRouter
 
 		JID toJid     = packet.getStanzaTo();
 		JID fromJid   = packet.getStanzaFrom();
-		String node   = packet.getAttribute(Iq.IQ_QUERY_PATH, "node");
+		String node   = packet.getAttributeStaticStr(Iq.IQ_QUERY_PATH, "node");
 		Element query = packet.getElement().getChild("query").clone();
 
-		if (packet.isXMLNS(Iq.IQ_QUERY_PATH, INFO_XMLNS)) {
+		if (packet.isXMLNSStaticStr(Iq.IQ_QUERY_PATH, INFO_XMLNS)) {
 			if (isLocalDomain(toJid.toString()) && (node == null)) {
 				try {
 					query = getDiscoInfo(node, (toJid.getLocalpart() == null)
@@ -1047,7 +1047,7 @@ public class MessageRouter
 				}
 			}
 		}
-		if (packet.isXMLNS(Iq.IQ_QUERY_PATH, ITEMS_XMLNS)) {
+		if (packet.isXMLNSStaticStr(Iq.IQ_QUERY_PATH, ITEMS_XMLNS)) {
 			boolean localDomain = isLocalDomain(toJid.toString());
 
 			if (localDomain) {
@@ -1116,4 +1116,4 @@ public class MessageRouter
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

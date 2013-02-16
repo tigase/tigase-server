@@ -307,8 +307,8 @@ public class ShortNewsPublisher
 			checkConnection();
 
 			String author  = packet.getStanzaFrom().getBareJID().toString();
-			String subject = packet.getElemCData(Message.MESSAGE_SUBJECT_PATH);
-			String body    = packet.getElemCData(Message.MESSAGE_BODY_PATH);
+			String subject = packet.getElemCDataStaticStr(Message.MESSAGE_SUBJECT_PATH);
+			String body    = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
 
 			if (body != null) {
 				if ((subject == null) || (subject.length() == 0)) {
@@ -417,7 +417,7 @@ public class ShortNewsPublisher
 	//~--- get methods ----------------------------------------------------------
 
 	private boolean isPostCommand(Packet packet) {
-		String body = packet.getElemCData(Message.MESSAGE_BODY_PATH);
+		String body = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
 
 		if (body != null) {
 			for (command comm : command.values()) {
@@ -433,7 +433,7 @@ public class ShortNewsPublisher
 	//~--- methods --------------------------------------------------------------
 
 	private void runCommand(Packet packet, Queue<Packet> results) {
-		String body         = packet.getElemCData(Message.MESSAGE_BODY_PATH);
+		String body         = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
 		String[] body_split = body.split(" |\n|\r");
 
 		try {
@@ -486,8 +486,8 @@ public class ShortNewsPublisher
 	private void updatePost(Packet packet, long snid) throws SQLException {
 		checkConnection();
 
-		String subject = packet.getElemCData(Message.MESSAGE_SUBJECT_PATH);
-		String body    = packet.getElemCData(Message.MESSAGE_BODY_PATH);
+		String subject = packet.getElemCDataStaticStr(Message.MESSAGE_SUBJECT_PATH);
+		String body    = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
 
 		if ((body != null) && (subject != null)) {
 			int idx = body.indexOf('\n');
@@ -504,4 +504,4 @@ public class ShortNewsPublisher
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

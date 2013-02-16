@@ -121,14 +121,14 @@ public abstract class XMPPServiceCollector
 	 */
 	@Override
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
-		if (packet.isXMLNS(Iq.IQ_QUERY_PATH, INFO_XMLNS) ||
-				packet.isXMLNS(Iq.IQ_QUERY_PATH, ITEMS_XMLNS)) {
+		if (packet.isXMLNSStaticStr(Iq.IQ_QUERY_PATH, INFO_XMLNS) ||
+				packet.isXMLNSStaticStr(Iq.IQ_QUERY_PATH, ITEMS_XMLNS)) {
 			JID jid       = packet.getStanzaTo();
 			JID from      = packet.getStanzaFrom();
-			String node   = packet.getAttribute(Iq.IQ_QUERY_PATH, "node");
+			String node   = packet.getAttributeStaticStr(Iq.IQ_QUERY_PATH, "node");
 			Element query = packet.getElement().getChild("query").clone();
 
-			if (packet.isXMLNS(Iq.IQ_QUERY_PATH, INFO_XMLNS)) {
+			if (packet.isXMLNSStaticStr(Iq.IQ_QUERY_PATH, INFO_XMLNS)) {
 				for (XMPPService comp : components.values()) {
 					Element resp = comp.getDiscoInfo(node, jid, from);
 
@@ -139,7 +139,7 @@ public abstract class XMPPServiceCollector
 					}
 				}      // end of for ()
 			}
-			if (packet.isXMLNS(Iq.IQ_QUERY_PATH, ITEMS_XMLNS)) {
+			if (packet.isXMLNSStaticStr(Iq.IQ_QUERY_PATH, ITEMS_XMLNS)) {
 				for (XMPPService comp : components.values()) {
 					List<Element> items = comp.getDiscoItems(node, jid, from);
 
@@ -154,4 +154,4 @@ public abstract class XMPPServiceCollector
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

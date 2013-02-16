@@ -55,6 +55,11 @@ import java.util.Queue;
  */
 public class PubSubTestsTask
 				extends RepoRosterTask {
+	private static final String[] IQ_PUBSUB_CONFIGURE_PATH = { "iq", "pubsub",
+																														 "configure" };
+	private static final String[] IQ_PUBSUB_PATH               = { "iq", "pubsub" };
+	private static final String[] IQ_PUBSUB_SUBSCRIPTIONS_PATH = { "iq", "pubsub",
+					"subscriptions" };
 	private static final String TASK_HELP =
 		"This is a PubSub component testing task." +
 		" Only for testing and only to be run by an admnistrator.";
@@ -208,7 +213,7 @@ public class PubSubTestsTask
 																 new String[] { "frank-" + i + "@" + getJID().getDomain(),
 							"subscribed" });
 
-			el.findChild("iq/pubsub/subscriptions".split("/")).addChild(subs);
+			el.findChildStaticStr(IQ_PUBSUB_SUBSCRIPTIONS_PATH).addChild(subs);
 			if (i % 100 == 0) {
 				addOutPacket(Packet.packetInstance(el, from, to));
 				el = createPubSubEl(from, to, "ids-" + (++j), node, "subscriptions",
@@ -249,8 +254,8 @@ public class PubSubTestsTask
 			Element el = createPubSubEl(from, to, "id-" + i, node, "create",
 																	"http://jabber.org/protocol/pubsub");
 
-			el.findChild("/iq/pubsub".split("/")).addChild(new Element("configure"));
-			el.findChild("/iq/pubsub/configure".split("/")).addChild(conf);
+			el.findChildStaticStr(IQ_PUBSUB_PATH).addChild(new Element("configure"));
+			el.findChildStaticStr(IQ_PUBSUB_CONFIGURE_PATH).addChild(conf);
 			addOutPacket(Packet.packetInstance(el, from, to));
 			if ((nums.length > 1) && (nums[1] > 0)) {
 				addSubscriptionsForNode(from, to, node, nums[1]);
@@ -289,7 +294,7 @@ public class PubSubTestsTask
 	//~--- get methods ----------------------------------------------------------
 
 	private boolean isPostCommand(Packet packet) {
-		String body = packet.getElemCData(Message.MESSAGE_BODY_PATH);
+		String body = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
 
 		if (body != null) {
 			for (command comm : command.values()) {
@@ -329,7 +334,7 @@ public class PubSubTestsTask
 	}
 
 	private void runCommand(final Packet packet, Queue<Packet> results) {
-		String body               = packet.getElemCData(Message.MESSAGE_BODY_PATH);
+		String body               = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
 		final String[] body_split = body.split("\\s");
 		command comm              = command.valueOf(body_split[0].substring(2));
 		final int[] pars;
@@ -476,4 +481,4 @@ public class PubSubTestsTask
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

@@ -145,7 +145,7 @@ public class PepPlugin
 					Queue<Packet> results, Map<String, Object> settings)
 					throws PacketErrorTypeException {
 		try {
-			List<Element> x   = packet.getElemChildren(IQ_PUBSUB_PATH);
+			List<Element> x   = packet.getElemChildrenStaticStr(IQ_PUBSUB_PATH);
 			boolean processed = false;
 
 			for (Element element : x) {

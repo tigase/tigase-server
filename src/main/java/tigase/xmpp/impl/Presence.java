@@ -127,11 +127,9 @@ public class Presence
 	private static final Logger log                   =
 		Logger.getLogger(Presence.class.getName());
 	private static final long MAX_DIRECT_PRESENCES_NO = 1000;
-	private static long requiredNo                    = 0;
-	private static long requiredYes                   = 0;
 	private static final String[] XMLNSS              = { XMLNS };
 	private static boolean skipOffline                = false;
-	private static TigaseRuntime runtime              = TigaseRuntime.getTigaseRuntime();
+	private static final String[] PRESENCE_C_PATH     = { PRESENCE_ELEMENT_NAME, "c" };
 	private static final String ID                    = PRESENCE_ELEMENT_NAME;
 	private static final String[] ELEMENTS            = { PRESENCE_ELEMENT_NAME };
 
@@ -1017,7 +1015,6 @@ public class Presence
 
 					// this is actually already handled in processInProbe
 					// buddyOnline(session, packet.getStanzaFrom(), results);
-
 					break;
 
 				case error :
@@ -1600,7 +1597,7 @@ public class Presence
 			return;
 		}
 
-		String node = pres.getAttribute("presence/c".split("/"), "node");
+		String node = pres.getAttributeStaticStr(PRESENCE_C_PATH, "node");
 
 		if (node == null) {
 			log.finest("Presence node not set, skipping...");

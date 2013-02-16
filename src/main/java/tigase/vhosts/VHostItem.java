@@ -466,12 +466,12 @@ public class VHostItem
 			messageForward = JID.jidInstanceNS(tmp);
 		}
 
-		String comps_str = elem.getCData(VHOST_COMPONENTS_PATH);
+		String comps_str = elem.getCDataStaticStr(VHOST_COMPONENTS_PATH);
 
 		if ((comps_str != null) &&!comps_str.isEmpty()) {
 			comps = comps_str.split(",");
 		}
-		otherDomainParams = elem.getCData(VHOST_OTHER_PARAMS_PATH);
+		otherDomainParams = elem.getCDataStaticStr(VHOST_OTHER_PARAMS_PATH);
 	}
 
 	/**
@@ -1108,4 +1108,4 @@ public class VHostItem
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

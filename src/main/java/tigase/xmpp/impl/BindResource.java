@@ -152,7 +152,7 @@ public class BindResource
 		try {
 			switch (type) {
 			case set :
-				String resource = request.getChildCData(Iq.IQ_BIND_RESOURCE_PATH);
+				String resource = request.getChildCDataStaticStr(Iq.IQ_BIND_RESOURCE_PATH);
 
 				try {
 					if ((resource == null) || resource.trim().isEmpty()) {
@@ -256,4 +256,4 @@ public class BindResource
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

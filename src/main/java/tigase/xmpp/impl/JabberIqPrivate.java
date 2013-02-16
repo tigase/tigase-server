@@ -127,7 +127,7 @@ public class JabberIqPrivate
 				return;
 			}
 			if (packet.getFrom().equals(session.getConnectionId())) {
-				List<Element> elems = packet.getElemChildren(Iq.IQ_QUERY_PATH);
+				List<Element> elems = packet.getElemChildrenStaticStr(Iq.IQ_QUERY_PATH);
 
 				if ((elems != null) && (elems.size() > 0)) {
 					Element elem    = elems.get(0);
@@ -230,7 +230,7 @@ public class JabberIqPrivate
 
 		Queue<Element> elems = domHandler.getParsedElements();
 		Packet result        = packet.okResult((Element) null, 1);
-		Element query        = result.getElement().findChild(Iq.IQ_QUERY_PATH);
+		Element query        = result.getElement().findChildStaticStr(Iq.IQ_QUERY_PATH);
 
 		for (Element el : elems) {
 			query.addChild(el);
@@ -241,4 +241,4 @@ public class JabberIqPrivate
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

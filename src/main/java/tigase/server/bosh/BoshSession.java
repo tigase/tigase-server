@@ -475,7 +475,7 @@ public class BoshSession {
 			handler.cancelTask(inactivityTimer);
 		}
 		if ((packet.getElemName() == BODY_EL_NAME) && (packet.getXMLNS() == BOSH_XMLNS)) {
-			List<Element> children = packet.getElemChildren(BODY_EL_PATH);
+			List<Element> children = packet.getElemChildrenStaticStr(BODY_EL_PATH);
 			boolean duplicate      = false;
 
 			if (packet.getAttribute(RID_ATTR) != null) {
@@ -702,7 +702,7 @@ public class BoshSession {
 		Element result = packet.clone();
 
 		if (result.getName() == MESSAGE_ELEMENT_NAME) {
-			String body = result.getCData(Message.MESSAGE_BODY_PATH);
+			String body = result.getCDataStaticStr(Message.MESSAGE_BODY_PATH);
 
 			if (body != null) {
 				int count = 0;
@@ -809,10 +809,10 @@ public class BoshSession {
 		if (packet.getElemName() == MESSAGE_ELEMENT_NAME) {
 			cache.addFromMessage(packet.getElement());
 		}
-		if (packet.isXMLNS(Iq.IQ_QUERY_PATH, "jabber:iq:roster")) {
+		if (packet.isXMLNSStaticStr(Iq.IQ_QUERY_PATH, "jabber:iq:roster")) {
 			cache.addRoster(packet.getElement());
 		}
-		if (packet.isXMLNS(Iq.IQ_BIND_PATH, "urn:ietf:params:xml:ns:xmpp-bind")) {
+		if (packet.isXMLNSStaticStr(Iq.IQ_BIND_PATH, "urn:ietf:params:xml:ns:xmpp-bind")) {
 			cache.set(BoshSessionCache.RESOURCE_BIND_ID,
 								Collections.singletonList(packet.getElement()));
 		}
@@ -822,7 +822,7 @@ public class BoshSession {
 		++cache_reload_counter;
 
 		int packet_counter      = 0;
-		List<Element> children  = packet.getElemChildren(BODY_EL_PATH);
+		List<Element> children  = packet.getElemChildrenStaticStr(BODY_EL_PATH);
 		String cache_id         = packet.getAttribute(CACHE_ID_ATTR);
 		List<Element> cache_res = null;
 
@@ -1097,4 +1097,4 @@ public class BoshSession {
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

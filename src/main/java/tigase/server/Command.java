@@ -741,7 +741,7 @@ public enum Command {
 	 * @return
 	 */
 	public static Action getAction(final Packet packet) {
-		String action = packet.getAttribute(Iq.IQ_COMMAND_PATH, "action");
+		String action = packet.getAttributeStaticStr(Iq.IQ_COMMAND_PATH, "action");
 
 		try {
 			return Action.valueOf(action);
@@ -824,7 +824,7 @@ public enum Command {
 				for (Element child : children) {
 					if (child.getName().equals("field") &&
 							child.getAttribute("var").equals(f_name)) {
-						String value = child.getChildCData(FIELD_VALUE_PATH);
+						String value = child.getChildCDataStaticStr(FIELD_VALUE_PATH);
 
 						if (value != null) {
 							return XMLUtils.unescape(value);
@@ -871,7 +871,7 @@ public enum Command {
 		for (Element child : children) {
 			log.info("Command form child: " + child.toString());
 			if (child.getName().equals("field") && child.getAttribute("var").equals(f_name)) {
-				String value = child.getChildCData(FIELD_VALUE_PATH);
+				String value = child.getChildCDataStaticStr(FIELD_VALUE_PATH);
 
 				log.info("Command found: field=" + f_name + ", value=" + value);
 				if (value != null) {
@@ -879,7 +879,7 @@ public enum Command {
 				}
 			} else {
 				log.info("Command not found: field=" + f_name + ", value=" +
-								 child.getChildCData(FIELD_VALUE_PATH));
+								 child.getChildCDataStaticStr(FIELD_VALUE_PATH));
 			}
 		}
 
@@ -1173,4 +1173,4 @@ public enum Command {
 }    // Command
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

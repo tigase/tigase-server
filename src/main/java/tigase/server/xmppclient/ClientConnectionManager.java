@@ -903,8 +903,9 @@ public class ClientConnectionManager
 		case CLOSE :
 			if (serv != null) {
 				String streamClose   = "</stream:stream>";
-				List<Element> err_el = packet.getElement().getChildren(Iq.IQ_COMMAND_PATH);
-				boolean moreToSend   = false;
+				List<Element> err_el =
+					packet.getElement().getChildrenStaticStr(Iq.IQ_COMMAND_PATH);
+				boolean moreToSend = false;
 
 				if ((err_el != null) && (err_el.size() > 0)) {
 					streamClose = "<stream:error>" + err_el.get(0).toString() + "</stream:error>" +
@@ -1074,4 +1075,4 @@ public class ClientConnectionManager
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

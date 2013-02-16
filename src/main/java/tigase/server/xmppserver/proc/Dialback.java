@@ -151,8 +151,8 @@ public class Dialback
 			// the right time for dialback yet
 			// Some servers send starttls in stream features, even if TLS is already
 			// initialized....
-			if (p.isXMLNS(FEATURES_STARTTLS_PATH, START_TLS_NS) && (certCheckResult == null) &&
-					!skipTLS) {
+			if (p.isXMLNSStaticStr(FEATURES_STARTTLS_PATH, START_TLS_NS) &&
+					(certCheckResult == null) &&!skipTLS) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "{0}, Waiting for starttls, packet: {1}",
 									new Object[] { serv,
@@ -168,7 +168,7 @@ public class Dialback
 			// especially if they
 			// do not trust us.
 			if ((certCheckResult == CertCheckResult.trusted) &&
-					!(p.isXMLNS(FEATURES_DIALBACK_PATH, DIALBACK_NS))) {
+					!(p.isXMLNSStaticStr(FEATURES_DIALBACK_PATH, DIALBACK_NS))) {
 				if (ejabberd_bug_workaround_active) {
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(
@@ -533,4 +533,4 @@ public class Dialback
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

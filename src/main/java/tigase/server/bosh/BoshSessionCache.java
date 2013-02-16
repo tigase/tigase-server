@@ -135,7 +135,7 @@ public class BoshSessionCache {
 	 * @param message
 	 */
 	public void addFromMessage(Element message) {
-		Element body = message.findChild(Message.MESSAGE_BODY_PATH);
+		Element body = message.findChildStaticStr(Message.MESSAGE_BODY_PATH);
 
 		if (body == null) {
 			return;
@@ -186,7 +186,7 @@ public class BoshSessionCache {
 	 * @param message
 	 */
 	public void addToMessage(Element message) {
-		Element body = message.findChild(Message.MESSAGE_BODY_PATH);
+		Element body = message.findChildStaticStr(Message.MESSAGE_BODY_PATH);
 
 		if (body == null) {
 			return;
@@ -336,7 +336,7 @@ public class BoshSessionCache {
 
 		long current_secs = (System.currentTimeMillis() / 1000) - start_time;
 
-		msg_history.findChild(Iq.IQ_CHAT_PATH).addChild(new Element(direction,
+		msg_history.findChildStaticStr(Iq.IQ_CHAT_PATH).addChild(new Element(direction,
 						new Element[] { body }, new String[] { "secs" },
 						new String[] { "" + current_secs }));
 	}
@@ -369,4 +369,4 @@ public class BoshSessionCache {
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

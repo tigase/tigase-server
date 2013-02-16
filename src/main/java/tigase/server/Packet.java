@@ -469,8 +469,8 @@ public class Packet {
 	 *
 	 * @return
 	 */
-	public String getAttribute(String[] path, String key) {
-		return elem.getAttribute(path, key);
+	public String getAttributeStaticStr(String[] path, String key) {
+		return elem.getAttributeStaticStr(path, key);
 	}
 
 	/**
@@ -512,8 +512,8 @@ public class Packet {
 	 * @return CData for a given element or NULL if the element does not exist or there is
 	 * no CData for the element.
 	 */
-	public String getElemCData(String[] xmlPath) {
-		return elem.getCData(xmlPath);
+	public String getElemCDataStaticStr(String[] xmlPath) {
+		return elem.getCDataStaticStr(xmlPath);
 	}
 
 	/**
@@ -545,8 +545,8 @@ public class Packet {
 	 * @return children list for a given element or NULL if the element does not exist
 	 * or there is no children for the element.
 	 */
-	public List<Element> getElemChildren(String[] xmlPath) {
-		return elem.getChildren(xmlPath);
+	public List<Element> getElemChildrenStaticStr(String[] xmlPath) {
+		return elem.getChildrenStaticStr(xmlPath);
 	}
 
 	/**
@@ -610,7 +610,7 @@ public class Packet {
 	 * @return parsed stanza error condition or NULL if there is not error condition.
 	 */
 	public String getErrorCondition() {
-		List<Element> children = elem.getChildren(getElNameErrorPath());
+		List<Element> children = elem.getChildrenStaticStr(getElNameErrorPath());
 
 		if (children != null) {
 			for (Element cond : children) {
@@ -630,7 +630,7 @@ public class Packet {
 	 * @return
 	 */
 	protected String[] getElNameErrorPath() {
-		return new String[] { elem.getName(), "/error" };
+		return new String[] { elem.getName(), "error" };
 	}
 
 	/**
@@ -943,8 +943,8 @@ public class Packet {
 	 *
 	 * @return
 	 */
-	public boolean isXMLNS(String[] elementPath, String xmlns) {
-		String this_xmlns = elem.getXMLNS(elementPath);
+	public boolean isXMLNSStaticStr(String[] elementPath, String xmlns) {
+		String this_xmlns = elem.getXMLNSStaticStr(elementPath);
 
 		if (this_xmlns == xmlns) {
 			return true;
@@ -1470,4 +1470,4 @@ public class Packet {
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

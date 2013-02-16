@@ -363,7 +363,7 @@ public class SystemMonitorTask
 			if (monitor != null) {
 				runMonitorCommand(monitor, packet, results);
 			} else {
-				String body = packet.getElemCData(Message.MESSAGE_BODY_PATH);
+				String body = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
 
 				results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
 																				 StanzaType.normal,
@@ -429,7 +429,7 @@ public class SystemMonitorTask
 	//~--- get methods ----------------------------------------------------------
 
 	private boolean isPostCommand(Packet packet) {
-		String body = packet.getElemCData(Message.MESSAGE_BODY_PATH);
+		String body = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
 
 		if (body != null) {
 			for (command comm : command.values()) {
@@ -481,7 +481,7 @@ public class SystemMonitorTask
 	}
 
 	private ResourceMonitorIfc monitorForCommand(Packet packet) {
-		String body = packet.getElemCData(Message.MESSAGE_BODY_PATH);
+		String body = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
 
 		if (body != null) {
 			for (ResourceMonitorIfc monitor : monitors.values()) {
@@ -495,7 +495,7 @@ public class SystemMonitorTask
 	}
 
 	private void runCommand(Packet packet, Queue<Packet> results) {
-		String body         = packet.getElemCData(Message.MESSAGE_BODY_PATH);
+		String body         = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
 		String[] body_split = body.split("\\s");
 		command comm        = command.valueOf(body_split[0].substring(2));
 
@@ -565,7 +565,7 @@ public class SystemMonitorTask
 
 	private void runMonitorCommand(ResourceMonitorIfc monitor, Packet packet,
 																 Queue<Packet> results) {
-		String body         = packet.getElemCData(Message.MESSAGE_BODY_PATH);
+		String body         = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
 		String[] body_split = body.split("\\s");
 		String result       = monitor.runCommand(body_split);
 
@@ -581,4 +581,4 @@ public class SystemMonitorTask
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

@@ -170,7 +170,7 @@ public class JabberIqRegister
 				// it should be blocked here if registration for domain is disabled.
 				// Assuming if user cannot register account he cannot also deregister account
 				Element request = packet.getElement();
-				boolean remove  = request.findChild(IQ_QUERY_REMOVE_PATH) != null;
+				boolean remove  = request.findChildStaticStr(IQ_QUERY_REMOVE_PATH) != null;
 
 				if ((!session.isAuthorized() || remove) &&
 						!session.getDomain().isRegisterEnabled()) {
@@ -187,14 +187,14 @@ public class JabberIqRegister
 				case set :
 
 					// Is it registration cancel request?
-					Element elem = request.findChild(IQ_QUERY_REMOVE_PATH);
+					Element elem = request.findChildStaticStr(IQ_QUERY_REMOVE_PATH);
 
 					if (elem != null) {
 
 						// Yes this is registration cancel request
 						// According to JEP-0077 there must not be any
 						// more subelements apart from <remove/>
-						elem = request.findChild(Iq.IQ_QUERY_PATH);
+						elem = request.findChildStaticStr(Iq.IQ_QUERY_PATH);
 						if (elem.getChildren().size() > 1) {
 							result = Authorization.BAD_REQUEST;
 						} else {
@@ -225,10 +225,11 @@ public class JabberIqRegister
 						// No, so assuming this is registration of a new
 						// user or change registration details for existing user
 						String user_name               =
-							request.getChildCData(IQ_QUERY_USERNAME_PATH);
+							request.getChildCDataStaticStr(IQ_QUERY_USERNAME_PATH);
 						String password                =
-							request.getChildCData(IQ_QUERY_PASSWORD_PATH);
-						String email                   = request.getChildCData(IQ_QUERY_EMAIL_PATH);
+							request.getChildCDataStaticStr(IQ_QUERY_PASSWORD_PATH);
+						String email                   =
+							request.getChildCDataStaticStr(IQ_QUERY_EMAIL_PATH);
 						Map<String, String> reg_params = null;
 
 						if ((email != null) &&!email.trim().isEmpty()) {
@@ -368,4 +369,4 @@ public class JabberIqRegister
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

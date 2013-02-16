@@ -242,7 +242,7 @@ public class TestComponent
 			if (!whiteList.contains(from.getBareJID().toString())) {
 
 				// The sender is not on whitelist so let's check the content
-				String body = packet.getElemCData(Message.MESSAGE_BODY_PATH);
+				String body = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
 
 				if ((body != null) &&!body.isEmpty()) {
 					body = body.toLowerCase();
@@ -318,4 +318,4 @@ public class TestComponent
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

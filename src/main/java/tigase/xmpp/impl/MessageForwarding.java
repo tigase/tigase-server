@@ -125,13 +125,13 @@ public class MessageForwarding
 		}    // end of if (session == null)
 
 		// We only want to forward messages which do contain body element
-		if (packet.getElemCData(tigase.server.Message.MESSAGE_BODY_PATH) == null) {
+		if (packet.getElemCDataStaticStr(tigase.server.Message.MESSAGE_BODY_PATH) == null) {
 			return;
 		}
 
 		// If the message contains forward payload already we drop it to prevent
 		// infinite loop due to some misconfiguration
-		if (packet.isXMLNS(MESSAGE_FORWARD_PATH, FORWARD_XMLNS)) {
+		if (packet.isXMLNSStaticStr(MESSAGE_FORWARD_PATH, FORWARD_XMLNS)) {
 			return;
 		}
 
@@ -219,4 +219,4 @@ public class MessageForwarding
 }    // Message
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16
