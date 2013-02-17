@@ -582,6 +582,12 @@ public class StatisticsCollector extends
 		}
 	}
 
+        @Override
+        public void release() {
+                super.release();
+                sp.stop();
+        }
+        
 	// ~--- get methods ----------------------------------------------------------
 
 	private Map<String, Object> getArchivizerConf(String name, Map<String, Object> props) {

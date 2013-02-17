@@ -921,6 +921,12 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 		return result;
 	}
 
+        public void stop() {
+                if (cache != null) {
+                        cache.stop();
+                }
+        }
+        
 	// ~--- inner classes --------------------------------------------------------
 
 	private class StatisticsCache {
@@ -1244,5 +1250,9 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 
 			systemDetails = sb.toString();
 		}
+                
+                public void stop() {
+                        updateTimer.cancel();
+                }
 	}
 }
