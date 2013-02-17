@@ -127,7 +127,7 @@ public class ClusterElement {
 			+ CLUSTER_CONTROL_EL_NAME;
 
 	/** Field description */
-	public static final String CLUSTER_METHOD_PATH = "/" + CLUSTER_CONTROL_PATH + "/"
+	public static final String CLUSTER_METHOD_PATH = CLUSTER_CONTROL_PATH + "/"
 			+ CLUSTER_METHOD_EL_NAME;
 
 	/** Field description */
