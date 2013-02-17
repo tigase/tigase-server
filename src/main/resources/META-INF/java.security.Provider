@@ -1,0 +1,2 @@
+# our security providers
+tigase.auth.TigaseSaslProvider

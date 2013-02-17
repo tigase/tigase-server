@@ -141,6 +141,13 @@ public class SaslAuth extends XMPPProcessor implements XMPPProcessorIfc {
 		if (settings != null)
 			props.putAll(settings);
 		super.init(settings);
+
+                // we should remove existing tigase.sasl provider if it is not instance of TigaseSaslProvider
+                // as it can be loaded from other bundle in OSGi which will cause many issues with instanceof
+                // and casting and it is NOT possible to update implementation without removing it first
+                if (!(Security.getProvider("tigase.sasl") instanceof TigaseSaslProvider)) {
+                        Security.removeProvider("tigase.sasl");                        
+                }
 		Security.insertProviderAt(new TigaseSaslProvider(settings), 1);
 
 		MechanismSelectorFactory mechanismSelectorFactory = new MechanismSelectorFactory();

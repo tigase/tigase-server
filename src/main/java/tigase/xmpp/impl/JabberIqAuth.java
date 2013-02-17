@@ -102,8 +102,15 @@ public class JabberIqAuth extends XMPPProcessor implements XMPPProcessorIfc {
 
 	@Override
 	public void init(Map<String, Object> settings) throws TigaseDBException {
+                // we should remove existing tigase.sasl provider if it is not instance of TigaseSaslProvider
+                // as it can be loaded from other bundle in OSGi which will cause many issues with instanceof
+                // and casting and it is NOT possible to update implementation without removing it first
+                if (!(Security.getProvider("tigase.sasl") instanceof TigaseSaslProvider)) {
+                        Security.removeProvider("tigase.sasl");                        
+                }
 		Security.insertProviderAt(new TigaseSaslProvider(settings), 1);
-		super.init(settings);
+                
+                super.init(settings);
 
 		MechanismSelectorFactory mechanismSelectorFactory = new MechanismSelectorFactory();
 		try {
