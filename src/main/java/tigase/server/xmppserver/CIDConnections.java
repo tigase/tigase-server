@@ -1,10 +1,13 @@
 /*
+ * CIDConnections.java
+ *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,10 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
+
 package tigase.server.xmppserver;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -38,70 +41,63 @@ import tigase.xmpp.PacketErrorTypeException;
 
 import java.net.UnknownHostException;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Jun 14, 2010 12:32:49 PM
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class CIDConnections {
-	private static final Logger log = Logger.getLogger(CIDConnections.class.getName());
+	private static final Logger log              =
+		Logger.getLogger(CIDConnections.class.getName());
 	private static final Timer outgoingOpenTasks = new Timer("S2S outgoing open tasks",
-			true);
+																									 true);
 
-	// ~--- fields ---------------------------------------------------------------
+	//~--- fields ---------------------------------------------------------------
 
-	private CID cid = null;
-	private S2SConnectionSelector connectionSelector = null;
-	private long firstWaitingTime = 0;
+	private CID cid                                       = null;
+	private S2SConnectionSelector connectionSelector      = null;
+	private long firstWaitingTime                         = 0;
 	private S2SConnectionHandlerIfc<S2SIOService> handler = null;
-	private int max_in_conns = 4;
-	private int max_out_conns = 4;
-	private int max_out_conns_per_ip = 2;
-	private long max_waiting_time = 15 * 60 * 1000;
-	private AtomicBoolean outgoingOpenInProgress = new AtomicBoolean(false);
-	private ReentrantLock sendInProgress = new ReentrantLock();
-	private Set<S2SConnection> outgoing_handshaking =
-			new ConcurrentSkipListSet<S2SConnection>();
+	private int max_in_conns                              = 4;
+	private int max_out_conns                             = 4;
+	private int max_out_conns_per_ip                      = 2;
+	private long max_waiting_time                         = 15 * 60 * 1000;
+	private boolean testMode                              = Boolean.getBoolean("test");
+	private ReentrantLock sendInProgress                  = new ReentrantLock();
+	private AtomicBoolean outgoingOpenInProgress          = new AtomicBoolean(false);
+	private Set<S2SConnection> outgoing_handshaking       =
+		new ConcurrentSkipListSet<S2SConnection>();
 	private Set<S2SConnection> outgoing = new ConcurrentSkipListSet<S2SConnection>();
 	private Set<S2SConnection> incoming = new ConcurrentSkipListSet<S2SConnection>();
 
 	/**
 	 * (SessionID, dbKey) pairs
 	 */
-	private Map<String, String> dbKeys = new ConcurrentSkipListMap<String, String>();
+	private Map<String, String> dbKeys                   =
+		new ConcurrentSkipListMap<String, String>();
 	private ConcurrentLinkedQueue<Packet> waitingPackets =
-			new ConcurrentLinkedQueue<Packet>();
+		new ConcurrentLinkedQueue<Packet>();
 
-	// ~--- constructors ---------------------------------------------------------
-	
-	public void resetOutgoingInProgress() {
-		outgoingOpenInProgress.set(false);
-	}
-	
-	public boolean getOutgoingInProgress() {
-		return outgoingOpenInProgress.get();
-	}
+	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Constructs ...
-	 * 
-	 * 
+	 *
+	 *
 	 * @param cid
 	 * @param handler
 	 * @param selector
@@ -111,23 +107,45 @@ public class CIDConnections {
 	 * @param max_waiting_time
 	 */
 	public CIDConnections(CID cid, S2SConnectionHandlerIfc<S2SIOService> handler,
-			S2SConnectionSelector selector, int maxInConns, int maxOutConns,
-			int maxOutConnsPerIP, long max_waiting_time) {
-		this.cid = cid;
-		this.handler = handler;
-		this.connectionSelector = selector;
-		this.max_in_conns = maxInConns;
-		this.max_out_conns = maxOutConns;
+												S2SConnectionSelector selector, int maxInConns, int maxOutConns,
+												int maxOutConnsPerIP, long max_waiting_time) {
+		this.cid                  = cid;
+		this.handler              = handler;
+		this.connectionSelector   = selector;
+		this.max_in_conns         = maxInConns;
+		this.max_out_conns        = maxOutConns;
 		this.max_out_conns_per_ip = maxOutConnsPerIP;
-		this.max_waiting_time = max_waiting_time;
+		this.max_waiting_time     = max_waiting_time;
 	}
 
-	// ~--- methods --------------------------------------------------------------
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 */
+	public void resetOutgoingInProgress() {
+		outgoingOpenInProgress.set(false);
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public boolean getOutgoingInProgress() {
+		return outgoingOpenInProgress.get();
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param sessId
 	 * @param key
 	 */
@@ -137,8 +155,8 @@ public class CIDConnections {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param serv
 	 */
 	public void addIncoming(S2SIOService serv) {
@@ -156,17 +174,15 @@ public class CIDConnections {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param serv
 	 */
 	public void connectionAuthenticated(S2SIOService serv) {
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "{0}, connection is authenticated.", serv);
 		}
-
 		serv.addCID(cid);
-
 		if (serv.connectionType() == ConnectionType.connect) {
 
 			// Release the 'lock'
@@ -182,9 +198,9 @@ public class CIDConnections {
 
 	/**
 	 * Method description
-	 * 
-	 * 
-	 * 
+	 *
+	 *
+	 *
 	 * @param sessionId
 	 */
 	public void connectionAuthenticated(String sessionId) {
@@ -197,8 +213,8 @@ public class CIDConnections {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param serv
 	 */
 	public void connectionStopped(S2SIOService serv) {
@@ -209,42 +225,39 @@ public class CIDConnections {
 
 			return;
 		}
-
 		if (serv.getSessionId() != null) {
 			dbKeys.remove(serv.getSessionId());
 		}
-
 		switch (serv.connectionType()) {
-			case connect:
+		case connect :
 
-				// Release the 'lock'
-				outgoingOpenInProgress.set(false);
-				outgoing.remove(s2s_conn);
-				outgoing_handshaking.remove(s2s_conn);
+			// Release the 'lock'
+			outgoingOpenInProgress.set(false);
+			outgoing.remove(s2s_conn);
+			outgoing_handshaking.remove(s2s_conn);
+			if (!waitingPackets.isEmpty()) {
+				checkOpenConnections();
+			}
 
-				if (!waitingPackets.isEmpty()) {
-					checkOpenConnections();
-				}
+			break;
 
-				break;
+		case accept :
+			incoming.remove(s2s_conn);
 
-			case accept:
-				incoming.remove(s2s_conn);
+			break;
 
-				break;
-
-			default:
+		default :
 		}
 	}
 
-	// ~--- get methods ----------------------------------------------------------
+	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param key_sessionId
-	 * 
+	 *
 	 * @return
 	 */
 	public String getDBKey(String key_sessionId) {
@@ -253,8 +266,8 @@ public class CIDConnections {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public int getDBKeysCount() {
@@ -263,8 +276,8 @@ public class CIDConnections {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public int getIncomingCount() {
@@ -281,8 +294,8 @@ public class CIDConnections {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public int getIncomingTLSCount() {
@@ -291,8 +304,8 @@ public class CIDConnections {
 		for (S2SConnection s2SConnection : incoming) {
 			S2SIOService serv = s2SConnection.getS2SIOService();
 
-			if (serv.isConnected()
-					&& (serv.getSessionData().get(S2SIOService.CERT_CHECK_RESULT) != null)) {
+			if (serv.isConnected() &&
+					(serv.getSessionData().get(S2SIOService.CERT_CHECK_RESULT) != null)) {
 				++result;
 			}
 		}
@@ -302,8 +315,8 @@ public class CIDConnections {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public int getMaxOutConns() {
@@ -312,8 +325,8 @@ public class CIDConnections {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public int getMaxOutConnsPerIP() {
@@ -322,8 +335,8 @@ public class CIDConnections {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public int getOutgoingCount() {
@@ -340,8 +353,8 @@ public class CIDConnections {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public int getOutgoingHandshakingCount() {
@@ -358,8 +371,8 @@ public class CIDConnections {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public int getOutgoingTLSCount() {
@@ -368,8 +381,8 @@ public class CIDConnections {
 		for (S2SConnection s2SConnection : outgoing) {
 			S2SIOService serv = s2SConnection.getS2SIOService();
 
-			if (serv.isConnected()
-					&& (serv.getSessionData().get(S2SIOService.CERT_CHECK_RESULT) != null)) {
+			if (serv.isConnected() &&
+					(serv.getSessionData().get(S2SIOService.CERT_CHECK_RESULT) != null)) {
 				++result;
 			}
 		}
@@ -379,39 +392,37 @@ public class CIDConnections {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param sessionId
-	 * 
+	 *
 	 * @return
 	 */
 	public S2SConnection getS2SConnectionForSessionId(String sessionId) {
 		S2SConnection s2s_conn = null;
 
 		for (S2SConnection s2sc : incoming) {
-			if ((s2sc.getS2SIOService() != null)
-					&& sessionId.equals(s2sc.getS2SIOService().getSessionId())) {
+			if ((s2sc.getS2SIOService() != null) &&
+					sessionId.equals(s2sc.getS2SIOService().getSessionId())) {
 				s2s_conn = s2sc;
 
 				break;
 			}
 		}
-
 		if (s2s_conn == null) {
 			for (S2SConnection s2sc : outgoing) {
-				if ((s2sc.getS2SIOService() != null)
-						&& sessionId.equals(s2sc.getS2SIOService().getSessionId())) {
+				if ((s2sc.getS2SIOService() != null) &&
+						sessionId.equals(s2sc.getS2SIOService().getSessionId())) {
 					s2s_conn = s2sc;
 
 					break;
 				}
 			}
 		}
-
 		if (s2s_conn == null) {
 			for (S2SConnection s2sc : outgoing_handshaking) {
-				if ((s2sc.getS2SIOService() != null)
-						&& sessionId.equals(s2sc.getS2SIOService().getSessionId())) {
+				if ((s2sc.getS2SIOService() != null) &&
+						sessionId.equals(s2sc.getS2SIOService().getSessionId())) {
 					s2s_conn = s2sc;
 
 					break;
@@ -424,8 +435,8 @@ public class CIDConnections {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public int getWaitingControlCount() {
@@ -434,11 +445,9 @@ public class CIDConnections {
 		for (S2SConnection s2sc : incoming) {
 			result += s2sc.getWaitingControlCount();
 		}
-
 		for (S2SConnection s2sc : outgoing) {
 			result += s2sc.getWaitingControlCount();
 		}
-
 		for (S2SConnection s2sc : outgoing_handshaking) {
 			result += s2sc.getWaitingControlCount();
 		}
@@ -448,25 +457,25 @@ public class CIDConnections {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public int getWaitingCount() {
 		return waitingPackets.size();
 	}
 
-	// ~--- methods --------------------------------------------------------------
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param port_props
 	 */
 	public void reconnectionFailed(Map<String, Object> port_props) {
 		S2SConnection s2s_conn =
-				(S2SConnection) port_props.get(S2SIOService.S2S_CONNECTION_KEY);
+			(S2SConnection) port_props.get(S2SIOService.S2S_CONNECTION_KEY);
 
 		if (s2s_conn == null) {
 			log.log(Level.INFO, "s2s_conn not set for serv: {0}", port_props);
@@ -478,25 +487,24 @@ public class CIDConnections {
 
 		if (type != null) {
 			switch (type) {
-				case connect:
+			case connect :
 
-					// Release the 'lock'
-					outgoingOpenInProgress.set(false);
-					outgoing.remove(s2s_conn);
-					outgoing_handshaking.remove(s2s_conn);
+				// Release the 'lock'
+				outgoingOpenInProgress.set(false);
+				outgoing.remove(s2s_conn);
+				outgoing_handshaking.remove(s2s_conn);
+				if (!this.waitingPackets.isEmpty()) {
+					checkOpenConnections();
+				}
 
-					if (!this.waitingPackets.isEmpty()) {
-						checkOpenConnections();
-					}
+				break;
 
-					break;
+			case accept :
+				this.incoming.remove(s2s_conn);
 
-				case accept:
-					this.incoming.remove(s2s_conn);
+				break;
 
-					break;
-
-				default:
+			default :
 			}
 		} else {
 			log.log(Level.INFO, "ConnectionType not set for serv: {0}", port_props);
@@ -505,9 +513,9 @@ public class CIDConnections {
 
 	/**
 	 * Method description
-	 * 
-	 * 
-	 * 
+	 *
+	 *
+	 *
 	 * @param sessionId
 	 * @param packet
 	 * @return
@@ -527,8 +535,9 @@ public class CIDConnections {
 		} else {
 			if (log.isLoggable(Level.FINE)) {
 				log.log(Level.FINE,
-						"Control packet: {0} could not be sent as there is no connection "
-								+ "for the session id: {1}", new Object[] { packet, sessionId });
+								"Control packet: {0} could not be sent as there is no connection " +
+								"for the session id: {1}", new Object[] { packet,
+								sessionId });
 			}
 
 			return false;
@@ -537,8 +546,8 @@ public class CIDConnections {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param verify_req
 	 */
 	public void sendHandshakingOnly(final Packet verify_req) {
@@ -546,7 +555,7 @@ public class CIDConnections {
 			@Override
 			public void run() {
 				try {
-					DNSEntry dns_entry = DNSResolver.getHostSRV_Entry(cid.getRemoteHost());
+					DNSEntry dns_entry     = DNSResolver.getHostSRV_Entry(cid.getRemoteHost());
 					S2SConnection s2s_conn = new S2SConnection(handler, dns_entry.getIp());
 
 					s2s_conn.addControlPacket(verify_req);
@@ -554,12 +563,12 @@ public class CIDConnections {
 					Map<String, Object> port_props = new TreeMap<String, Object>();
 
 					port_props.put(S2SIOService.HANDSHAKING_ONLY_KEY,
-							S2SIOService.HANDSHAKING_ONLY_KEY);
-                                       
-                                        // it looks like we are sending verify requests only on handshaking-only connection
-                                        // so there is only one domain for verification
-                                        port_props.put(S2SIOService.HANDSHAKING_DOMAIN_KEY, verify_req.getStanzaTo().toString());
-                                        
+												 S2SIOService.HANDSHAKING_ONLY_KEY);
+
+					// it looks like we are sending verify requests only on handshaking-only
+					// connection so there is only one domain for verification
+					port_props.put(S2SIOService.HANDSHAKING_DOMAIN_KEY,
+												 verify_req.getStanzaTo().toString());
 					initNewConnection(dns_entry.getIp(), dns_entry.getPort(), s2s_conn, port_props);
 				} catch (UnknownHostException ex) {
 					log.log(Level.INFO, "Remote host not found: " + cid.getRemoteHost(), ex);
@@ -570,27 +579,24 @@ public class CIDConnections {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param packet
 	 */
 	public void sendPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Sending packets.");
 		}
-
 		if (packet != null) {
 			if ((firstWaitingTime == 0) || waitingPackets.isEmpty()) {
 				firstWaitingTime = System.currentTimeMillis();
 			}
-
 			waitingPackets.offer(packet);
 		}
-
 		if (sendInProgress.tryLock()) {
 			try {
 				boolean packetSent = false;
-				Packet waiting = null;
+				Packet waiting     = null;
 
 				while ((waiting = waitingPackets.peek()) != null) {
 					S2SConnection s2s_conn = getOutgoingConnection(waiting);
@@ -599,37 +605,37 @@ public class CIDConnections {
 						try {
 							packetSent = s2s_conn.sendPacket(waiting);
 							waitingPackets.poll();
-
 							if (log.isLoggable(Level.FINEST)) {
 								log.log(Level.FINEST, "Packet: {0} sent over connection: {1}",
-										new Object[] { waiting, s2s_conn.getS2SIOService() });
+												new Object[] { waiting,
+																			 s2s_conn.getS2SIOService() });
 							}
 						} catch (Exception ex) {
 							log.log(Level.FINE,
-									"A problem sending packet, connection broken? Retrying later. {0}",
-									waiting);
+											"A problem sending packet, connection broken? Retrying later. {0}",
+											waiting);
 						}
 					} else {
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST,
-									"There is no connection available to send the packet: {0}", waiting);
+											"There is no connection available to send the packet: {0}",
+											waiting);
 						}
 
 						break;
 					}
 				}
-
 				if (!packetSent) {
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST,
-								"No packet could be sent, trying to open more connections: {0}", cid);
+										"No packet could be sent, trying to open more connections: {0}", cid);
 					}
-
 					checkOpenConnections();
 				} else {
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST,
-								"Some packets were sent, not trying to open more connections: {0}", cid);
+										"Some packets were sent, not trying to open more connections: {0}",
+										cid);
 					}
 				}
 			} finally {
@@ -642,25 +648,24 @@ public class CIDConnections {
 		if (outgoingOpenInProgress.compareAndSet(false, true)) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Scheduling task for openning a new connection for: {0}",
-						cid);
+								cid);
 			}
-
 			outgoingOpenTasks.schedule(new TimerTask() {
 				@Override
 				public void run() {
 					boolean result = false;
+
 					try {
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST,
-									"Running scheduled task for openning a new connection for: {0}", cid);
+											"Running scheduled task for openning a new connection for: {0}",
+											cid);
 						}
-
 						result = openOutgoingConnections();
 					} catch (Exception e) {
 						log.log(Level.WARNING,
-								"uncaughtException in the connection opening thread: ", e);
-					} finally {
-					}
+										"uncaughtException in the connection opening thread: ", e);
+					} finally {}
 					if (!result) {
 						outgoingOpenInProgress.set(false);
 					}
@@ -673,7 +678,7 @@ public class CIDConnections {
 		}
 	}
 
-	// ~--- get methods ----------------------------------------------------------
+	//~--- get methods ----------------------------------------------------------
 
 	private int getOpenForIP(String ip) {
 		int result = 0;
@@ -683,7 +688,6 @@ public class CIDConnections {
 				++result;
 			}
 		}
-
 		for (S2SConnection s2SConnection : outgoing_handshaking) {
 			if (ip.equals(s2SConnection.getIPAddress())) {
 				++result;
@@ -697,10 +701,10 @@ public class CIDConnections {
 		return connectionSelector.selectConnection(packet, outgoing);
 	}
 
-	// ~--- methods --------------------------------------------------------------
+	//~--- methods --------------------------------------------------------------
 
 	private void initNewConnection(String ip, int port, S2SConnection s2s_conn,
-			Map<String, Object> port_props) {
+																 Map<String, Object> port_props) {
 		outgoing_handshaking.add(s2s_conn);
 		port_props.put(S2SIOService.S2S_CONNECTION_KEY, s2s_conn);
 		port_props.put("remote-ip", ip);
@@ -709,38 +713,34 @@ public class CIDConnections {
 		port_props.put("ifc", new String[] { ip });
 		port_props.put("socket", SocketType.plain);
 		port_props.put("type", ConnectionType.connect);
-                port_props.put("srv-type", "_xmpp-server._tcp");
+		port_props.put("srv-type", "_xmpp-server._tcp");
 		port_props.put("port-no", port);
 		port_props.put("cid", cid);
-
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "STARTING new connection: {0}", cid);
 			log.log(Level.FINEST, "{0} connection params: {1}",
-					new Object[] { cid, port_props });
+							new Object[] { cid, port_props });
 		}
-
 		handler.initNewConnection(port_props);
 	}
 
 	private boolean openOutgoingConnections() {
 		boolean result = false;
+
 		try {
 
 			// Check whether all active connections are still active
 			for (S2SConnection out_conn : outgoing) {
 				if (!out_conn.isConnected()) {
 					outgoing.remove(out_conn);
-
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Removing inactive connection: {0}", out_conn);
 					}
 				}
 			}
-
 			if (firstWaitingTime + max_waiting_time <= System.currentTimeMillis()) {
 				sendPacketsBack();
 				firstWaitingTime = 0;
-
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "S2S Timeout expired, sending back: {0}", waitingPackets);
 				}
@@ -753,16 +753,28 @@ public class CIDConnections {
 			if (all_outgoing >= max_out_conns) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST,
-							"Exceeded max number of outgoing connections, not doing anything: {0}",
-							all_outgoing);
+									"Exceeded max number of outgoing connections, not doing anything: {0}",
+									all_outgoing);
 				}
 
 				return result;
 			}
-
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Checking DNS for host: {0} for: {1}",
-						new Object[] { cid.getRemoteHost(), cid });
+								new Object[] { cid.getRemoteHost(),
+															 cid });
+			}
+
+			// During TTS automated tests we send ping for 200 non-existen domains. On some
+			// configurations DNS check for 200 non-existen domains takes forever, so here we
+			// have a shortcut to speed the test up.
+			// To be sure we do this only for vhosts without a '.' character which are used
+			// during TTS tests.
+			if (testMode) {
+				if (cid.getRemoteHost().startsWith("vhost-") &&
+						!cid.getRemoteHost().contains(".")) {
+					throw new UnknownHostException(cid.getRemoteHost());
+				}
 			}
 
 			// Check DNS entries
@@ -780,31 +792,31 @@ public class CIDConnections {
 						// Now we assume: UnknownHostException
 						if (log.isLoggable(Level.INFO)) {
 							log.log(Level.INFO, "DNS misconfiguration for domain: {0}, for: {1}",
-									new Object[] { cid.getRemoteHost(), cid });
+											new Object[] { cid.getRemoteHost(),
+																		 cid });
 						}
 
-						throw new UnknownHostException("DNS misconfiguration for domain: "
-								+ cid.getRemoteHost());
+						throw new UnknownHostException("DNS misconfiguration for domain: " +
+																					 cid.getRemoteHost());
 					}
 
 					// Create a new connection
-					S2SConnection s2s_conn = new S2SConnection(handler, dNSEntry.getIp());
+					S2SConnection s2s_conn         = new S2SConnection(handler, dNSEntry.getIp());
 					Map<String, Object> port_props = new TreeMap<String, Object>();
 
 					initNewConnection(dNSEntry.getIp(), dNSEntry.getPort(), s2s_conn, port_props);
-
 					result = true;
-
 					if (++all_outgoing >= max_out_conns) {
 						return result;
 					}
 				}
 			}
 		} catch (UnknownHostException ex) {
-			log.log(Level.INFO, "Remote host not found: " + cid.getRemoteHost() + ", for: "
-					+ cid, ex);
+			log.log(Level.INFO,
+							"Remote host not found: " + cid.getRemoteHost() + ", for: " + cid, ex);
 			sendPacketsBack();
 		}
+
 		return result;
 	}
 
@@ -814,15 +826,15 @@ public class CIDConnections {
 		while ((p = waitingPackets.poll()) != null) {
 			try {
 				handler.addOutPacket(Authorization.REMOTE_SERVER_NOT_FOUND.getResponseMessage(p,
-						"S2S - destination host not found", true));
+								"S2S - destination host not found", true));
 			} catch (PacketErrorTypeException e) {
 				log.log(Level.WARNING, "Packet: {0} processing exception: {1}",
-						new Object[] { p.toString(), e });
+								new Object[] { p.toString(),
+															 e });
 			}
 		}
 	}
 }
 
-// ~ Formatted in Sun Code Convention
 
-// ~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/02/18
