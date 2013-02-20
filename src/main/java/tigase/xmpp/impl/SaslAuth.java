@@ -299,8 +299,15 @@ public class SaslAuth
 				byte[] data  = new byte[] {};
 				String cdata = request.getCData();
 
+				// TODO Przeniesc to do mechanizmow!
 				if ((cdata != null) && (cdata.length() > 0)) {
-					data = Base64.decode(cdata);
+					try {
+						if ((cdata != null) && (cdata.length() > 0)) {
+							data = Base64.decode(cdata);
+						}
+					} catch (Exception e) {
+						data = cdata.getBytes();
+					}
 				}
 
 				byte[] challenge = ss.evaluateResponse(data);

@@ -43,6 +43,8 @@ public class TigaseSaslServerFactory implements SaslServerFactory {
 			return new SaslPLAIN(props, callbackHandler);
 		} else if (mechanism.equals("ANONYMOUS")) {
 			return new SaslANONYMOUS(props, callbackHandler);
+		} else if (mechanism.equals("EXTERNAL")) {
+			return new SaslEXTERNAL(props, callbackHandler);
 		} else
 			// if (mechanism.equals("DIGEST-MD5")) {
 			// return new SaslDigestMD5(props, callbackHandler);
@@ -52,7 +54,7 @@ public class TigaseSaslServerFactory implements SaslServerFactory {
 
 	@Override
 	public String[] getMechanismNames(Map<String, ?> props) {
-		return new String[] { "PLAIN", "ANONYMOUS" };
+		return new String[] { "PLAIN", "ANONYMOUS", "EXTERNAL" };
 	}
 
 }

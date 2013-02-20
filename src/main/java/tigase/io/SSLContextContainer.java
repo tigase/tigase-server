@@ -51,6 +51,7 @@ import java.util.logging.Logger;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import tigase.cert.CertificateEntry;
@@ -266,6 +267,10 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 	// ~--- inner classes
 	// --------------------------------------------------------
 
+	public SSLContext getSSLContext(String protocol, String hostname, boolean clientMode) {
+		return getSSLContext(protocol, hostname, clientMode, tms);
+	}
+	
 	/**
 	 * Method description
 	 * 
@@ -276,7 +281,7 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 	 * @return
 	 */
 	@Override
-	public SSLContext getSSLContext(String protocol, String hostname, boolean clientMode) {
+	public SSLContext getSSLContext(String protocol, String hostname, boolean clientMode, TrustManager... tms) {
 		SSLContext sslContext = null;
 
 		String alias = hostname;
