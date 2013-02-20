@@ -1206,4 +1206,4 @@ public class ClusterConnectionManager
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/19
+//~ Formatted in Tigase Code Convention on 13/02/20
