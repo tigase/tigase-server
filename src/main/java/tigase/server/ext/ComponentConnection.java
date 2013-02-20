@@ -1,10 +1,13 @@
 /*
+ * ComponentConnection.java
+ *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.server.ext;
 
@@ -27,17 +29,16 @@ package tigase.server.ext;
 import java.util.ArrayList;
 import java.util.List;
 
-//~--- classes ----------------------------------------------------------------
-
 /**
  * Created: Sep 30, 2009 9:20:22 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ComponentConnection implements Comparable<ComponentConnection> {
-	private String domain = null;
-	private List<String> resources = new ArrayList<String>();
+public class ComponentConnection
+				implements Comparable<ComponentConnection> {
+	private String domain              = null;
+	private List<String> resources     = new ArrayList<String>();
 	private ComponentIOService service = null;
 
 	//~--- constructors ---------------------------------------------------------
@@ -50,7 +51,7 @@ public class ComponentConnection implements Comparable<ComponentConnection> {
 	 * @param service
 	 */
 	public ComponentConnection(String domain, ComponentIOService service) {
-		this.domain = domain;
+		this.domain  = domain;
 		this.service = service;
 	}
 
@@ -97,7 +98,4 @@ public class ComponentConnection implements Comparable<ComponentConnection> {
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/02/19
