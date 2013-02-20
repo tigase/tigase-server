@@ -214,6 +214,7 @@ public class JabberIqRegister
 																		 session.nextStanzaId());
 
 								close_cmd.setPacketTo(session.getConnectionId());
+								close_cmd.setPriority(Priority.LOWEST);
 								results.offer(close_cmd);
 							} catch (NotAuthorizedException e) {
 								results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,

@@ -6,7 +6,8 @@
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -789,8 +790,8 @@ public class ClientConnectionManager
 
 				Packet result = Packet.packetInstance(elem_features, null, null);
 
-				// Is it actually needed??
-				// TODO: check it out and remove the line
+				// Is it actually needed?? Yes, it is needed, IOService is
+				// looked up based on this.
 				result.setPacketTo(iqc.getTo());
 				writePacketToSocket(result);
 			}    // end of if (packet.getType() == StanzaType.get)
@@ -1075,4 +1076,4 @@ public class ClientConnectionManager
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/16
+//~ Formatted in Tigase Code Convention on 13/02/19

@@ -407,7 +407,7 @@ public class MessageRouter
 			return;
 		}
 
-		// It it is not a service discovery packet, we have to find a component to
+		// It is not a service discovery packet, we have to find a component to
 		// process
 		// the packet. The below block of code is to "quickly" find a component if
 		// the
@@ -422,8 +422,9 @@ public class MessageRouter
 		comp = getLocalComponent(packet.getTo());
 		if (comp != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("1. Packet will be processed by: " + comp.getComponentId() + ", " +
-									 packet);
+				log.log(Level.FINEST, "1. Packet will be processed by: {0}, {1}",
+								new Object[] { comp.getComponentId(),
+															 packet });
 			}
 
 			Queue<Packet> results = new ArrayDeque<Packet>();
@@ -485,8 +486,9 @@ public class MessageRouter
 
 			for (ServerComponent serverComponent : comps) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("2. Packet will be processed by: " +
-										 serverComponent.getComponentId() + ", " + packet);
+					log.log(Level.FINEST, "2. Packet will be processed by: {0}, {1}",
+									new Object[] { serverComponent.getComponentId(),
+																 packet });
 				}
 				serverComponent.processPacket(packet, results);
 				if (results.size() > 0) {
@@ -850,6 +852,9 @@ public class MessageRouter
 	}
 
 	private ServerComponent getLocalComponent(JID jid) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Called for : {0}", jid);
+		}
 
 		// Fast lookup in the server components to find a candidate
 		// by the component ID (JID). If the packet is addressed directly
@@ -860,6 +865,10 @@ public class MessageRouter
 
 		if (comp != null) {
 			return comp;
+		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "None compId matches: {0}, for map: {1}", new Object[] { jid,
+							components_byId });
 		}
 
 		// Note, component ID consists of the component name + default hostname
@@ -875,6 +884,12 @@ public class MessageRouter
 					 jid.getDomain().equals(getDefHostName().getDomain()))) {
 				return comp;
 			}
+		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST,
+							"Still no comp name matches: {0}, for map: {1}, for all VHosts: {3}",
+							new Object[] { jid,
+														 components, vHostManager.getAllVHosts() });
 		}
 
 		// Instead of a component ID built of: component name + "@" domain name
@@ -1116,4 +1131,4 @@ public class MessageRouter
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/16
+//~ Formatted in Tigase Code Convention on 13/02/18

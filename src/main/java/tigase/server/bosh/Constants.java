@@ -58,6 +58,13 @@ public abstract class Constants {
 	protected static final String[] BODY_EL_PATH = { "body" };
 
 	/** Field description */
+	protected static final long BOSH_SESSION_CLOSE_DELAY_DEF_VAL = 0;
+
+	/** Field description */
+	protected static final String BOSH_SESSION_CLOSE_DELAY_PROP_KEY =
+		"bosh-session-close-delay";
+
+	/** Field description */
 	protected static final String BOSH_XMLNS = "http://jabber.org/protocol/httpbind";
 
 	/** Field description */
@@ -188,4 +195,4 @@ public abstract class Constants {
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16

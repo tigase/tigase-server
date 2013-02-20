@@ -57,6 +57,9 @@ public class Iq
 	public static final String[] IQ_QUERY_PATH = { ELEM_NAME, QUERY_NAME };
 
 	/** Field description */
+	public static final String[] IQ_PUBSUB_PATH = { ELEM_NAME, "pubsub" };
+
+	/** Field description */
 	public static final String[] IQ_ERROR_PATH = { ELEM_NAME, "error" };
 
 	/** Field description */

@@ -52,6 +52,9 @@ public class Message
 	/** Field description */
 	public static final String[] MESSAGE_ERROR_PATH = { ELEM_NAME, "error" };
 
+	/** Field description */
+	public static final String[] MESSAGE_DELAY_PATH = { ELEM_NAME, "delay" };
+
 	//~--- constructors ---------------------------------------------------------
 
 	// ~--- constructors ---------------------------------------------------------
@@ -155,4 +158,4 @@ public class Message
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/15
+//~ Formatted in Tigase Code Convention on 13/02/16
