@@ -1,10 +1,12 @@
 /*
+ * ConfiguratorAbstract.java
+ *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,31 +17,36 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.conf;
 
+//~--- non-JDK imports --------------------------------------------------------
+
 import tigase.db.AuthRepository;
 import tigase.db.AuthRepositoryMDImpl;
+import tigase.db.comp.ComponentRepository;
+import tigase.db.comp.RepositoryChangeListenerIfc;
 import tigase.db.DBInitException;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
 import tigase.db.UserRepositoryMDImpl;
-import tigase.db.comp.ComponentRepository;
-import tigase.db.comp.RepositoryChangeListenerIfc;
 
 import tigase.io.TLSUtil;
 
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.ServerComponent;
 
+import tigase.util.DataTypes;
+
 import tigase.xmpp.BareJID;
 
 import static tigase.io.SSLContextContainerIfc.*;
+
+//~--- JDK imports ------------------------------------------------------------
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -52,25 +59,31 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.LogManager;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
 
 import javax.script.Bindings;
 
 /**
  * Created: Dec 7, 2009 4:15:31 PM
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class ConfiguratorAbstract extends
-		AbstractComponentRegistrator<Configurable> implements
-		RepositoryChangeListenerIfc<ConfigItem> {
+public abstract class ConfiguratorAbstract
+				extends AbstractComponentRegistrator<Configurable>
+				implements RepositoryChangeListenerIfc<ConfigItem> {
+	/** Field description */
+	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_KEY = "auth-domain-repo-pool";
+
+	/** Field description */
+	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_VAL =
+		"tigase.db.AuthRepositoryMDImpl";
 
 	/** Field description */
 	public static final String CONFIG_REPO_CLASS_INIT_KEY = "--tigase-config-repo-class";
@@ -79,43 +92,36 @@ public abstract class ConfiguratorAbstract extends
 	public static final String CONFIG_REPO_CLASS_PROP_KEY = "tigase-config-repo-class";
 
 	/** Field description */
+	public static final String INIT_PROPERTIES_MAP_BIND = "initProperties";
+
+	/** Field description */
+	public static String logManagerConfiguration = null;
+
+	/** Field description */
+	public static final String PROPERTY_FILENAME_PROP_KEY = "--property-file";
+
+	/** Field description */
 	public static final String USER_DOMAIN_POOL_CLASS_PROP_KEY = "user-domain-repo-pool";
 
 	/** Field description */
 	public static final String USER_DOMAIN_POOL_CLASS_PROP_VAL =
-			"tigase.db.UserRepositoryMDImpl";
-
-	/** Field description */
-	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_KEY = "auth-domain-repo-pool";
-
-	/** Field description */
-	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_VAL =
-			"tigase.db.AuthRepositoryMDImpl";
+		"tigase.db.UserRepositoryMDImpl";
 	private static final String LOGGING_KEY = "logging/";
-	
-	public static final String INIT_PROPERTIES_MAP_BIND = "initProperties";
-
-	/** Field description */
-	public static final String PROPERTY_FILENAME_PROP_KEY = "--property-file";
-	private static final Logger log = Logger
-			.getLogger(ConfiguratorAbstract.class.getName());
-
-	/** Field description */
-	public static String logManagerConfiguration = null;
+	private static final Logger log         =
+		Logger.getLogger(ConfiguratorAbstract.class.getName());
 	private static MonitoringSetupIfc monitoring = null;
 
-	private AuthRepositoryMDImpl auth_repo_impl = null;
+	//~--- fields ---------------------------------------------------------------
+
+	private AuthRepositoryMDImpl auth_repo_impl  = null;
 	private Map<String, String> auth_repo_params = null;
-	private AuthRepository auth_repository = null;
-	private UserRepositoryMDImpl user_repo_impl = null;
+	private AuthRepository auth_repository       = null;
+	private UserRepositoryMDImpl user_repo_impl  = null;
 	private Map<String, String> user_repo_params = null;
+
 	// Default user repository instance which can be shared among components
 	private UserRepository user_repository = null;
-
-	// Default user auth repository instance which can be shared among components
-	private ConfigRepositoryIfc configRepo = new ConfigurationCache();
-
-	private boolean setup_in_progress = false;
+	private boolean setup_in_progress      = false;
 
 	/**
 	 * Configuration settings read from the init.properties file or any other
@@ -130,35 +136,66 @@ public abstract class ConfiguratorAbstract extends
 	 */
 	private Map<String, Object> initProperties = new LinkedHashMap<String, Object>(100);
 
+	// Default user auth repository instance which can be shared among components
+	private ConfigRepositoryIfc configRepo = new ConfigurationCache();
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param item
+	 */
 	public void itemAdded(ConfigItem item) {
+
 		// Ignored, adding configuration settings does not make sense, for now...
 		// right now, just print a log message
-		//log.log(Level.INFO, "Adding configuration item not supported yet: {0}", item);
+		// log.log(Level.INFO, "Adding configuration item not supported yet: {0}", item);
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param item
+	 */
 	public void itemUpdated(ConfigItem item) {
 		log.log(Level.INFO, "Updating configuration item: {0}", item);
+
 		Configurable component = getComponent(item.getCompName());
+
 		if (component != null) {
-			Map<String, Object> prop = Collections.singletonMap(item.getConfigKey(), item.getConfigVal());
+			Map<String, Object> prop = Collections.singletonMap(item.getConfigKey(),
+																	 item.getConfigVal());
+
 			component.setProperties(prop);
 		} else {
 			log.log(Level.WARNING, "Cannot find component for configuration item: {0}", item);
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param item
+	 */
 	public void itemRemoved(ConfigItem item) {
+
 		// Ignored, removing configuration settings does not make sense, for now...
 		// right now, just print a log message
 		log.log(Level.INFO, "Removing configuration item not supported yet: {0}", item);
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param objName
-	 * 
+	 *
 	 * @return
 	 */
 	public static Object getMXBean(String objName) {
@@ -169,17 +206,18 @@ public abstract class ConfiguratorAbstract extends
 		}
 	}
 
+	//~--- methods --------------------------------------------------------------
+
 	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param config
 	 */
 	public static void loadLogManagerConfig(String config) {
 		logManagerConfiguration = config;
-
 		try {
 			final ByteArrayInputStream bis = new ByteArrayInputStream(config.getBytes());
 
@@ -187,13 +225,13 @@ public abstract class ConfiguratorAbstract extends
 			bis.close();
 		} catch (IOException e) {
 			log.log(Level.SEVERE, "Can not configure logManager", e);
-		} // end of try-catch
+		}    // end of try-catch
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param objName
 	 * @param bean
 	 */
@@ -205,8 +243,8 @@ public abstract class ConfiguratorAbstract extends
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param component
 	 */
 	@Override
@@ -214,26 +252,26 @@ public abstract class ConfiguratorAbstract extends
 		if (log.isLoggable(Level.CONFIG)) {
 			log.log(Level.CONFIG, " component: {0}", component.getName());
 		}
-
 		setup(component);
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param component
 	 */
 	@Override
-	public void componentRemoved(Configurable component) {
-	}
+	public void componentRemoved(Configurable component) {}
+
+	//~--- get methods ----------------------------------------------------------
 
 	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public Map<String, Object> getDefConfigParams() {
@@ -243,7 +281,7 @@ public abstract class ConfiguratorAbstract extends
 	/**
 	 * Returns default configuration settings in case if there is no configuration
 	 * file.
-	 * 
+	 *
 	 * @param params
 	 * @return
 	 */
@@ -256,36 +294,33 @@ public abstract class ConfiguratorAbstract extends
 		} else {
 			defaults.put(LOGGING_KEY + ".level", "CONFIG");
 		}
-
 		defaults.put(LOGGING_KEY + "handlers",
-				"java.util.logging.ConsoleHandler java.util.logging.FileHandler");
+								 "java.util.logging.ConsoleHandler java.util.logging.FileHandler");
 		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.formatter",
-				"tigase.util.LogFormatter");
+								 "tigase.util.LogFormatter");
 		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "WARNING");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.append", "true");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.count", "5");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.formatter",
-				"tigase.util.LogFormatter");
+								 "tigase.util.LogFormatter");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.limit", "10000000");
-		defaults
-				.put(LOGGING_KEY + "java.util.logging.FileHandler.pattern", "logs/tigase.log");
+		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.pattern",
+								 "logs/tigase.log");
 		defaults.put(LOGGING_KEY + "tigase.useParentHandlers", "true");
 		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "ALL");
-
 		if (params.get(GEN_DEBUG) != null) {
 			String[] packs = ((String) params.get(GEN_DEBUG)).split(",");
 
 			for (String pack : packs) {
 				defaults.put(LOGGING_KEY + "tigase." + pack + ".level", "ALL");
-			} // end of for (String pack: packs)
+			}    // end of for (String pack: packs)
 		}
-
 		if (params.get(GEN_DEBUG_PACKAGES) != null) {
 			String[] packs = ((String) params.get(GEN_DEBUG_PACKAGES)).split(",");
 
 			for (String pack : packs) {
 				defaults.put(LOGGING_KEY + pack + ".level", "ALL");
-			} // end of for (String pack: packs)
+			}    // end of for (String pack: packs)
 		}
 
 		String repo_pool = null;
@@ -299,11 +334,9 @@ public abstract class ConfiguratorAbstract extends
 		//
 		// defaults.put(USER_REPO_POOL_CLASS_PROP_KEY, repo_pool);
 		repo_pool = (String) params.get(USER_DOMAIN_POOL_CLASS);
-
 		if (repo_pool == null) {
 			repo_pool = USER_DOMAIN_POOL_CLASS_PROP_VAL;
 		}
-
 		defaults.put(USER_DOMAIN_POOL_CLASS_PROP_KEY, repo_pool);
 
 		// repo_pool = (String) params.get(AUTH_REPO_POOL_CLASS);
@@ -314,46 +347,40 @@ public abstract class ConfiguratorAbstract extends
 		//
 		// defaults.put(AUTH_REPO_POOL_CLASS_PROP_KEY, repo_pool);
 		repo_pool = (String) params.get(AUTH_DOMAIN_POOL_CLASS);
-
 		if (repo_pool == null) {
 			repo_pool = AUTH_DOMAIN_POOL_CLASS_PROP_VAL;
 		}
-
 		defaults.put(AUTH_DOMAIN_POOL_CLASS_PROP_KEY, repo_pool);
 
 		// System.out.println("Setting logging properties:\n" +
 		// defaults.toString());
 		// Default repository implementations
 		String user_repo_class = DUMMY_REPO_CLASS_PROP_VAL;
-		String user_repo_url = DERBY_REPO_URL_PROP_VAL;
+		String user_repo_url   = DERBY_REPO_URL_PROP_VAL;
 		String auth_repo_class = DUMMY_REPO_CLASS_PROP_VAL;
-		String auth_repo_url = DERBY_REPO_URL_PROP_VAL;
+		String auth_repo_url   = DERBY_REPO_URL_PROP_VAL;
 
 		if (params.get(GEN_USER_DB) != null) {
 			user_repo_class = (String) params.get(GEN_USER_DB);
+
 			// auth_repo_class = (String) params.get(GEN_USER_DB);
 			auth_repo_class = TIGASE_CUSTOM_AUTH_REPO_CLASS_PROP_VAL;
 		}
-
 		if (params.get(GEN_USER_DB_URI) != null) {
 			user_repo_url = (String) params.get(GEN_USER_DB_URI);
 			auth_repo_url = user_repo_url;
 		}
-
 		if (params.get(GEN_AUTH_DB) != null) {
 			auth_repo_class = (String) params.get(GEN_AUTH_DB);
 		}
-
 		if (params.get(GEN_AUTH_DB_URI) != null) {
 			auth_repo_url = (String) params.get(GEN_AUTH_DB_URI);
 		}
-
 		if (params.get(USER_REPO_POOL_SIZE) != null) {
 			defaults.put(USER_REPO_POOL_SIZE_PROP_KEY, params.get(USER_REPO_POOL_SIZE));
 		} else {
 			defaults.put(USER_REPO_POOL_SIZE_PROP_KEY, "" + 1);
 		}
-
 		defaults.put(RepositoryFactory.USER_REPO_CLASS_PROP_KEY, user_repo_class);
 		defaults.put(USER_REPO_URL_PROP_KEY, user_repo_url);
 
@@ -373,7 +400,6 @@ public abstract class ConfiguratorAbstract extends
 					user_repo_domains.add(domain);
 				}
 			}
-
 			if (entry.getKey().startsWith(GEN_AUTH_DB_URI)) {
 				String domain = parseAuthRepoParams(entry, params, auth_repo_class, defaults);
 
@@ -382,35 +408,31 @@ public abstract class ConfiguratorAbstract extends
 				}
 			}
 		}
-
 		if (user_repo_domains.size() > 0) {
 			defaults.put(USER_REPO_DOMAINS_PROP_KEY,
-					user_repo_domains.toArray(new String[user_repo_domains.size()]));
+									 user_repo_domains.toArray(new String[user_repo_domains.size()]));
 		}
-
 		if (auth_repo_domains.size() > 0) {
 			defaults.put(AUTH_REPO_DOMAINS_PROP_KEY,
-					auth_repo_domains.toArray(new String[auth_repo_domains.size()]));
+									 auth_repo_domains.toArray(new String[auth_repo_domains.size()]));
 		}
 
 		// TLS/SSL configuration
 		if (params.get("--" + SSL_CONTAINER_CLASS_KEY) != null) {
 			defaults.put(SSL_CONTAINER_CLASS_KEY,
-					(String) params.get("--" + SSL_CONTAINER_CLASS_KEY));
+									 (String) params.get("--" + SSL_CONTAINER_CLASS_KEY));
 		} else {
 			defaults.put(SSL_CONTAINER_CLASS_KEY, SSL_CONTAINER_CLASS_VAL);
 		}
-
 		if (params.get("--" + SERVER_CERTS_LOCATION_KEY) != null) {
 			defaults.put(SERVER_CERTS_LOCATION_KEY,
-					(String) params.get("--" + SERVER_CERTS_LOCATION_KEY));
+									 (String) params.get("--" + SERVER_CERTS_LOCATION_KEY));
 		} else {
 			defaults.put(SERVER_CERTS_LOCATION_KEY, SERVER_CERTS_LOCATION_VAL);
 		}
-
 		if (params.get("--" + DEFAULT_DOMAIN_CERT_KEY) != null) {
 			defaults.put(DEFAULT_DOMAIN_CERT_KEY,
-					(String) params.get("--" + DEFAULT_DOMAIN_CERT_KEY));
+									 (String) params.get("--" + DEFAULT_DOMAIN_CERT_KEY));
 		} else {
 			defaults.put(DEFAULT_DOMAIN_CERT_KEY, DEFAULT_DOMAIN_CERT_VAL);
 		}
@@ -435,8 +457,8 @@ public abstract class ConfiguratorAbstract extends
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public String getMessageRouterClassName() {
@@ -445,26 +467,28 @@ public abstract class ConfiguratorAbstract extends
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param nodeId
-	 * 
+	 *
 	 * @return
-	 * 
+	 *
 	 * @throws ConfigurationException
 	 */
 	public Map<String, Object> getProperties(String nodeId) throws ConfigurationException {
 		return configRepo.getProperties(nodeId);
 	}
 
+	//~--- methods --------------------------------------------------------------
+
 	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param args
-	 * 
+	 *
 	 * @throws ConfigurationException
 	 * @throws TigaseDBException
 	 */
@@ -482,9 +506,7 @@ public abstract class ConfiguratorAbstract extends
 		if (cnf_class_name != null) {
 			initProperties.put(CONFIG_REPO_CLASS_INIT_KEY, cnf_class_name);
 		}
-
 		cnf_class_name = (String) initProperties.get(CONFIG_REPO_CLASS_INIT_KEY);
-
 		if (cnf_class_name != null) {
 			try {
 				configRepo = (ConfigRepositoryIfc) Class.forName(cnf_class_name).newInstance();
@@ -501,7 +523,6 @@ public abstract class ConfiguratorAbstract extends
 		configRepo.addRepoChangeListener(this);
 		configRepo.setDefHostname(getDefHostName().getDomain());
 		configRepo.init(initProperties);
-
 		for (String prop : initSettings) {
 			ConfigItem item = configRepo.getItemInstance();
 
@@ -525,14 +546,14 @@ public abstract class ConfiguratorAbstract extends
 			String[] prop_files = property_filenames.split(",");
 
 			initMonitoring((String) initProperties.get(MONITORING),
-					new File(prop_files[0]).getParent());
+										 new File(prop_files[0]).getParent());
 		}
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param binds
 	 */
 	@Override
@@ -544,25 +565,26 @@ public abstract class ConfiguratorAbstract extends
 
 	/**
 	 * Method description
-	 * 
+	 *
 	 */
 	@Override
 	public void initializationCompleted() {
 		super.initializationCompleted();
-
 		if (monitoring != null) {
 			monitoring.initializationCompleted();
 		}
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param component
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -570,18 +592,19 @@ public abstract class ConfiguratorAbstract extends
 		return component instanceof Configurable;
 	}
 
+	//~--- methods --------------------------------------------------------------
+
 	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param args
 	 */
 	public void parseArgs(String[] args) {
 		initProperties.put(GEN_TEST, Boolean.FALSE);
 		initProperties.put("config-type", GEN_CONFIG_DEF);
-
 		if ((args != null) && (args.length > 0)) {
 			for (int i = 0; i < args.length; i++) {
 				String key = null;
@@ -591,25 +614,22 @@ public abstract class ConfiguratorAbstract extends
 					key = "config-type";
 					val = args[i];
 				}
-
 				if (args[i].startsWith(GEN_TEST)) {
 					key = args[i];
 					val = Boolean.TRUE;
 				}
-
-				if ((key == null) && args[i].startsWith("-") && !args[i].startsWith(GEN_CONFIG)) {
+				if ((key == null) && args[i].startsWith("-") &&!args[i].startsWith(GEN_CONFIG)) {
 					key = args[i];
 					val = args[++i];
 				}
-
 				if (key != null) {
 					initProperties.put(key, val);
 
 					// System.out.println("Setting defaults: " + key + "=" +
 					// val.toString());
 					log.config("Setting defaults: " + key + "=" + val.toString());
-				} // end of if (key != null)
-			} // end of for (int i = 0; i < args.length; i++)
+				}    // end of if (key != null)
+			}      // end of for (int i = 0; i < args.length; i++)
 		}
 
 		String property_filenames = (String) initProperties.get(PROPERTY_FILENAME_PROP_KEY);
@@ -619,8 +639,7 @@ public abstract class ConfiguratorAbstract extends
 
 			for (String property_filename : prop_files) {
 				log.log(Level.CONFIG, "Loading initial properties from property file: {0}",
-						property_filename);
-
+								property_filename);
 				try {
 					Properties defProps = new Properties();
 
@@ -632,18 +651,24 @@ public abstract class ConfiguratorAbstract extends
 						String value = defProps.getProperty(key).trim();
 
 						if (key.startsWith("-") || key.equals("config-type")) {
-							initProperties.put(key.trim(), value);
+							if (GEN_TEST.equalsIgnoreCase(key)) {
+								initProperties.put(key.trim().substring(2), DataTypes.parseBool(value));
+								initProperties.put(key.trim(), DataTypes.parseBool(value));
+							} else {
+								initProperties.put(key.trim(), value);
+							}
 
 							// defProperties.remove(key);
 							log.log(Level.CONFIG, "Added default config parameter: ({0}={1})",
-									new Object[] { key, value });
+											new Object[] { key,
+																		 value });
 						} else {
 							initSettings.add(key + "=" + value);
 						}
 					}
 				} catch (FileNotFoundException e) {
 					log.log(Level.WARNING, "Given property file was not found: {0}",
-							property_filename);
+									property_filename);
 				} catch (IOException e) {
 					log.log(Level.WARNING, "Can not read property file: " + property_filename, e);
 				}
@@ -654,8 +679,10 @@ public abstract class ConfiguratorAbstract extends
 		// the starting '-' characters.
 		for (Map.Entry<String, Object> entry : initProperties.entrySet()) {
 			if (entry.getKey().startsWith("--")) {
-				System.setProperty(entry.getKey().substring(2),
-						((entry.getValue() == null) ? null : entry.getValue().toString()));
+				System.setProperty(entry.getKey().substring(2), ((entry.getValue() == null)
+								? null
+								: entry.getValue().toString()));
+
 				// In cluster mode we switch DB cache off as this does not play well.
 				if (CLUSTER_MODE.equals(entry.getKey())) {
 					if ("true".equalsIgnoreCase(entry.getValue().toString())) {
@@ -668,23 +695,25 @@ public abstract class ConfiguratorAbstract extends
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param compId
 	 * @param props
-	 * 
+	 *
 	 * @throws ConfigurationException
 	 */
 	public void putProperties(String compId, Map<String, Object> props)
-			throws ConfigurationException {
+					throws ConfigurationException {
 		configRepo.putProperties(compId, props);
 	}
+
+	//~--- set methods ----------------------------------------------------------
 
 	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Sets all configuration properties for object.
-	 * 
+	 *
 	 * @param props
 	 */
 	@Override
@@ -703,41 +732,38 @@ public abstract class ConfiguratorAbstract extends
 
 		String[] user_repo_domains = (String[]) props.get(USER_REPO_DOMAINS_PROP_KEY);
 		String[] auth_repo_domains = (String[]) props.get(AUTH_REPO_DOMAINS_PROP_KEY);
-		String authRepoMDImpl = (String) props.get(AUTH_DOMAIN_POOL_CLASS_PROP_KEY);
-		String userRepoMDImpl = (String) props.get(USER_DOMAIN_POOL_CLASS_PROP_KEY);
+		String authRepoMDImpl      = (String) props.get(AUTH_DOMAIN_POOL_CLASS_PROP_KEY);
+		String userRepoMDImpl      = (String) props.get(USER_DOMAIN_POOL_CLASS_PROP_KEY);
 
 		try {
 
 			// Authentication multi-domain repository pool initialization
 			Map<String, String> params = getRepoParams(props, AUTH_REPO_PARAMS_NODE, null);
-			String conn_url = (String) props.get(AUTH_REPO_URL_PROP_KEY);
+			String conn_url            = (String) props.get(AUTH_REPO_URL_PROP_KEY);
 
 			auth_repo_impl = (AuthRepositoryMDImpl) Class.forName(authRepoMDImpl).newInstance();
 			auth_repo_impl.initRepository(conn_url, params);
 
 			// User multi-domain repository pool initialization
-			params = getRepoParams(props, USER_REPO_PARAMS_NODE, null);
-			conn_url = (String) props.get(USER_REPO_URL_PROP_KEY);
+			params         = getRepoParams(props, USER_REPO_PARAMS_NODE, null);
+			conn_url       = (String) props.get(USER_REPO_URL_PROP_KEY);
 			user_repo_impl = (UserRepositoryMDImpl) Class.forName(userRepoMDImpl).newInstance();
 			user_repo_impl.initRepository(conn_url, params);
 		} catch (Exception ex) {
 			log.log(Level.SEVERE, "An error initializing domain repository pool: ", ex);
 		}
-
 		user_repository = null;
 		auth_repository = null;
-
 		if (user_repo_domains != null) {
 			for (String domain : user_repo_domains) {
 				try {
 					addUserRepo(props, domain, repo_pool_size);
 				} catch (Exception e) {
 					log.log(Level.SEVERE, "Can't initialize user repository for domain: " + domain,
-							e);
+									e);
 				}
 			}
 		}
-
 		if (user_repository == null) {
 			try {
 				addUserRepo(props, null, repo_pool_size);
@@ -745,18 +771,16 @@ public abstract class ConfiguratorAbstract extends
 				log.log(Level.SEVERE, "Can't initialize user default repository: ", e);
 			}
 		}
-
 		if (auth_repo_domains != null) {
 			for (String domain : auth_repo_domains) {
 				try {
 					addAuthRepo(props, domain, repo_pool_size);
 				} catch (Exception e) {
 					log.log(Level.SEVERE, "Can't initialize user repository for domain: " + domain,
-							e);
+									e);
 				}
 			}
 		}
-
 		if (auth_repository == null) {
 			try {
 				addAuthRepo(props, null, repo_pool_size);
@@ -809,12 +833,14 @@ public abstract class ConfiguratorAbstract extends
 		// } // end of try-catch
 	}
 
+	//~--- methods --------------------------------------------------------------
+
 	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param component
 	 */
 	public void setup(Configurable component) {
@@ -829,16 +855,17 @@ public abstract class ConfiguratorAbstract extends
 		}
 
 		String compId = component.getName();
-		
+
 		log.log(Level.CONFIG, "Setting up component: {0}", compId);
-		
+
 		Map<String, Object> prop = null;
 
 		try {
 			prop = configRepo.getProperties(compId);
 		} catch (ConfigurationException ex) {
 			log.log(Level.WARNING,
-					"Propblem retrieving configuration properties for component: " + compId, ex);
+							"Propblem retrieving configuration properties for component: " + compId,
+							ex);
 
 			return;
 		}
@@ -848,28 +875,28 @@ public abstract class ConfiguratorAbstract extends
 		// }
 		Map<String, Object> defs = component.getDefaults(getDefConfigParams());
 
-		log.log(Level.CONFIG, "Component {0} defaults: {1}", new Object[] {compId, defs});
+		log.log(Level.CONFIG, "Component {0} defaults: {1}", new Object[] { compId, defs });
 
 		Set<Map.Entry<String, Object>> defs_entries = defs.entrySet();
-		boolean modified = false;
+		boolean modified                            = false;
 
 		for (Map.Entry<String, Object> entry : defs_entries) {
 			if (!prop.containsKey(entry.getKey())) {
 				prop.put(entry.getKey(), entry.getValue());
 				modified = true;
-			} // end of if ()
-		} // end of for ()
-
+			}    // end of if ()
+		}      // end of for ()
 		if (modified) {
 			try {
-				log.log(Level.CONFIG, "Component {0} configuration: {1}", new Object[] {compId, prop});
+				log.log(Level.CONFIG, "Component {0} configuration: {1}", new Object[] { compId,
+								prop });
 				configRepo.putProperties(compId, prop);
 			} catch (ConfigurationException ex) {
 				log.log(Level.WARNING,
-						"Propblem with saving configuration properties for component: " + compId, ex);
+								"Propblem with saving configuration properties for component: " + compId,
+								ex);
 			}
-		} // end of if (modified)
-
+		}    // end of if (modified)
 		prop.put(SHARED_USER_REPO_PROP_KEY, user_repo_impl);
 		prop.put(SHARED_USER_REPO_PARAMS_PROP_KEY, user_repo_params);
 		prop.put(SHARED_AUTH_REPO_PROP_KEY, auth_repo_impl);
@@ -878,22 +905,22 @@ public abstract class ConfiguratorAbstract extends
 		// prop.put(SHARED_USER_REPO_POOL_PROP_KEY, user_repo_impl);
 		// prop.put(SHARED_USER_AUTH_REPO_POOL_PROP_KEY, auth_repo_impl);
 		component.setProperties(prop);
-
 		if (component == this) {
 			setup_in_progress = false;
 		}
 	}
 
 	private void addAuthRepo(Map<String, Object> props, String domain, int pool_size)
-			throws DBInitException, ClassNotFoundException, InstantiationException,
-			IllegalAccessException {
+					throws DBInitException, ClassNotFoundException, InstantiationException,
+								 IllegalAccessException {
 		Map<String, String> params = getRepoParams(props, AUTH_REPO_PARAMS_NODE, domain);
-		String cls_name =
-				(String) props.get(RepositoryFactory.AUTH_REPO_CLASS_PROP_KEY
-						+ ((domain == null) ? "" : "/" + domain));
-		String conn_url =
-				(String) props.get(AUTH_REPO_URL_PROP_KEY
-						+ ((domain == null) ? "" : "/" + domain));
+		String cls_name            =
+			(String) props.get(RepositoryFactory.AUTH_REPO_CLASS_PROP_KEY + ((domain == null)
+						? ""
+						: "/" + domain));
+		String conn_url = (String) props.get(AUTH_REPO_URL_PROP_KEY + ((domain == null)
+						? ""
+						: "/" + domain));
 
 		// String authRepoPoolImpl = (String)
 		// props.get(AUTH_REPO_POOL_CLASS_PROP_KEY);
@@ -912,23 +939,24 @@ public abstract class ConfiguratorAbstract extends
 		} else {
 			auth_repo_impl.addRepo(domain, repo);
 		}
-
 		log.log(Level.INFO,
-				"[{0}] Initialized {1} as user auth repository pool: {2}, url: {3}",
-				new Object[] { ((domain != null) ? domain : "DEFAULT"), cls_name, pool_size,
-						conn_url });
+						"[{0}] Initialized {1} as user auth repository pool: {2}, url: {3}",
+						new Object[] { ((domain != null)
+														? domain
+														: "DEFAULT"), cls_name, pool_size, conn_url });
 	}
 
 	private void addUserRepo(Map<String, Object> props, String domain, int pool_size)
-			throws DBInitException, ClassNotFoundException, InstantiationException,
-			IllegalAccessException {
+					throws DBInitException, ClassNotFoundException, InstantiationException,
+								 IllegalAccessException {
 		Map<String, String> params = getRepoParams(props, USER_REPO_PARAMS_NODE, domain);
-		String cls_name =
-				(String) props.get(RepositoryFactory.USER_REPO_CLASS_PROP_KEY
-						+ ((domain == null) ? "" : "/" + domain));
-		String conn_url =
-				(String) props.get(USER_REPO_URL_PROP_KEY
-						+ ((domain == null) ? "" : "/" + domain));
+		String cls_name            =
+			(String) props.get(RepositoryFactory.USER_REPO_CLASS_PROP_KEY + ((domain == null)
+						? ""
+						: "/" + domain));
+		String conn_url = (String) props.get(USER_REPO_URL_PROP_KEY + ((domain == null)
+						? ""
+						: "/" + domain));
 
 		// String userRepoPoolImpl = (String)
 		// props.get(USER_REPO_POOL_CLASS_PROP_KEY);
@@ -949,18 +977,21 @@ public abstract class ConfiguratorAbstract extends
 		} else {
 			user_repo_impl.addRepo(domain, repo);
 		}
-
 		log.log(Level.INFO, "[{0}] Initialized {1} as user repository pool:, {2} url: {3}",
-				new Object[] { ((domain != null) ? domain : "DEFAULT"), cls_name, pool_size,
-						conn_url });
+						new Object[] { ((domain != null)
+														? domain
+														: "DEFAULT"), cls_name, pool_size, conn_url });
 	}
 
-	// ~--- get methods ----------------------------------------------------------
+	//~--- get methods ----------------------------------------------------------
 
+	// ~--- get methods ----------------------------------------------------------
 	private Map<String, String> getRepoParams(Map<String, Object> props, String repo_type,
-			String domain) {
+					String domain) {
 		Map<String, String> result = new LinkedHashMap<String, String>(10);
-		String prop_start = repo_type + ((domain == null) ? "" : "/" + domain);
+		String prop_start          = repo_type + ((domain == null)
+						? ""
+						: "/" + domain);
 
 		for (Map.Entry<String, Object> entry : props.entrySet()) {
 			if (entry.getKey().startsWith(prop_start)) {
@@ -971,8 +1002,10 @@ public abstract class ConfiguratorAbstract extends
 				// The plugin ID part may contain many IDs separated with comma ','
 				// We have to make sure that the default repository does not pick up properties set
 				// for a specific domain
-				if ((domain == null && nodes.length == 2) || (domain != null && nodes.length == 3)) {
-					//				if (nodes.length > 1) {
+				if (((domain == null) && (nodes.length == 2)) ||
+						((domain != null) && (nodes.length == 3))) {
+
+					// if (nodes.length > 1) {
 					result.put(nodes[nodes.length - 1], entry.getValue().toString());
 				}
 			}
@@ -981,8 +1014,9 @@ public abstract class ConfiguratorAbstract extends
 		return result;
 	}
 
-	// ~--- methods --------------------------------------------------------------
+	//~--- methods --------------------------------------------------------------
 
+	// ~--- methods --------------------------------------------------------------
 	private void initMonitoring(String settings, String configDir) {
 		if ((monitoring == null) && (settings != null)) {
 			try {
@@ -997,9 +1031,10 @@ public abstract class ConfiguratorAbstract extends
 	}
 
 	private String parseAuthRepoParams(Entry<String, Object> entry,
-			Map<String, Object> params, String auth_repo_class, Map<String, Object> defaults) {
-		String key = entry.getKey();
-		int br_open = key.indexOf('[');
+																		 Map<String, Object> params, String auth_repo_class,
+																		 Map<String, Object> defaults) {
+		String key   = entry.getKey();
+		int br_open  = key.indexOf('[');
 		int br_close = key.indexOf(']');
 
 		if ((br_open < 0) || (br_close < 0)) {
@@ -1009,8 +1044,8 @@ public abstract class ConfiguratorAbstract extends
 		}
 
 		String repo_class = auth_repo_class;
-		String options = key.substring(br_open + 1, br_close);
-		String domain = options.split(":")[0];
+		String options    = key.substring(br_open + 1, br_close);
+		String domain     = options.split(":")[0];
 
 		log.log(Level.INFO, "Found DB domain: {0}", domain);
 
@@ -1019,21 +1054,21 @@ public abstract class ConfiguratorAbstract extends
 		if (params.get(get_user_db) != null) {
 			repo_class = (String) params.get(get_user_db);
 		}
-
 		defaults.put(RepositoryFactory.AUTH_REPO_CLASS_PROP_KEY + "/" + domain, repo_class);
-		log.config("Setting defaults: " + RepositoryFactory.AUTH_REPO_CLASS_PROP_KEY + "/"
-				+ domain + "=" + repo_class);
+		log.config("Setting defaults: " + RepositoryFactory.AUTH_REPO_CLASS_PROP_KEY + "/" +
+							 domain + "=" + repo_class);
 		defaults.put(AUTH_REPO_URL_PROP_KEY + "/" + domain, entry.getValue());
-		log.config("Setting defaults: " + AUTH_REPO_URL_PROP_KEY + "/" + domain + "="
-				+ entry.getValue());
+		log.config("Setting defaults: " + AUTH_REPO_URL_PROP_KEY + "/" + domain + "=" +
+							 entry.getValue());
 
 		return domain;
 	}
 
 	private String parseUserRepoParams(Entry<String, Object> entry,
-			Map<String, Object> params, String user_repo_class, Map<String, Object> defaults) {
-		String key = entry.getKey();
-		int br_open = key.indexOf('[');
+																		 Map<String, Object> params, String user_repo_class,
+																		 Map<String, Object> defaults) {
+		String key   = entry.getKey();
+		int br_open  = key.indexOf('[');
 		int br_close = key.indexOf(']');
 
 		if ((br_open < 0) || (br_close < 0)) {
@@ -1043,8 +1078,8 @@ public abstract class ConfiguratorAbstract extends
 		}
 
 		String repo_class = user_repo_class;
-		String options = key.substring(br_open + 1, br_close);
-		String domain = options.split(":")[0];
+		String options    = key.substring(br_open + 1, br_close);
+		String domain     = options.split(":")[0];
 
 		log.log(Level.INFO, "Found DB domain: {0}", domain);
 
@@ -1053,35 +1088,33 @@ public abstract class ConfiguratorAbstract extends
 		if (params.get(get_user_db) != null) {
 			repo_class = (String) params.get(get_user_db);
 		}
-
 		defaults.put(RepositoryFactory.USER_REPO_CLASS_PROP_KEY + "/" + domain, repo_class);
-		log.config("Setting defaults: " + RepositoryFactory.USER_REPO_CLASS_PROP_KEY + "/"
-				+ domain + "=" + repo_class);
+		log.config("Setting defaults: " + RepositoryFactory.USER_REPO_CLASS_PROP_KEY + "/" +
+							 domain + "=" + repo_class);
 		defaults.put(USER_REPO_URL_PROP_KEY + "/" + domain, entry.getValue());
-		log.config("Setting defaults: " + USER_REPO_URL_PROP_KEY + "/" + domain + "="
-				+ entry.getValue());
+		log.config("Setting defaults: " + USER_REPO_URL_PROP_KEY + "/" + domain + "=" +
+							 entry.getValue());
 
 		return domain;
 	}
 
 	private void setupLogManager(Map<String, Object> properties) {
 		Set<Map.Entry<String, Object>> entries = properties.entrySet();
-		StringBuilder buff = new StringBuilder(200);
+		StringBuilder buff                     = new StringBuilder(200);
 
 		for (Map.Entry<String, Object> entry : entries) {
 			if (entry.getKey().startsWith(LOGGING_KEY)) {
 				String key = entry.getKey().substring(LOGGING_KEY.length());
 
 				buff.append(key).append("=").append(entry.getValue()).append("\n");
-
 				if (key.equals("java.util.logging.FileHandler.pattern")) {
 					File log_path = new File(entry.getValue().toString()).getParentFile();
 
 					if (!log_path.exists()) {
 						log_path.mkdirs();
 					}
-				} // end of if (key.equals())
-			} // end of if (entry.getKey().startsWith(LOGGING_KEY))
+				}    // end of if (key.equals())
+			}      // end of if (entry.getKey().startsWith(LOGGING_KEY))
 		}
 
 		// System.out.println("Setting logging: \n" + buff.toString());
@@ -1090,6 +1123,11 @@ public abstract class ConfiguratorAbstract extends
 	}
 }
 
+
+
 // ~ Formatted in Sun Code Convention
 
 // ~ Formatted by Jindent --- http://www.jindent.com
+
+
+//~ Formatted in Tigase Code Convention on 13/02/18
