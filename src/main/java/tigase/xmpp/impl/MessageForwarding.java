@@ -1,4 +1,6 @@
 /*
+ * MessageForwarding.java
+ *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
@@ -15,10 +17,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev: 2348 $
- * Last modified by $Author: kobit $
- * $Date: 2010-09-08 17:35:44 +0100 (Wed, 08 Sep 2010) $
  */
+
+
 
 package tigase.xmpp.impl;
 
@@ -41,41 +42,48 @@ import tigase.xmpp.XMPPResourceConnection;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.Map;
-import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Map;
+import java.util.Queue;
 
 /**
  * Message forwarder class. Forwards <code>Message</code> packet to it's
  * destination address.
- * 
+ *
  * Created: Tue Feb 21 15:49:08 2006
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev: 2348 $
  */
-public class MessageForwarding extends XMPPProcessor implements XMPPProcessorIfc {
+public class MessageForwarding
+				extends XMPPProcessor
+				implements XMPPProcessorIfc {
+	private static final String FORWARD_EL    = "forward";
+	private static final String FORWARD_XMLNS = "http://tigase.org/protocol/forward#v1";
+	private static final String ID            = "message-vhost-forward";
 
 	/** Class logger */
-	private static final Logger log = Logger.getLogger(MessageForwarding.class.getName());
-	private static final String XMLNS = "jabber:client";
-	private static final String ID = "message-vhost-forward";
-	private static final String[] ELEMENTS = { "message" };
-	private static final String[] XMLNSS = { XMLNS };
-	private static final String FORWARD_EL = "forward";
-	private static final String FORWARD_XMLNS = "http://tigase.org/protocol/forward#v1";
+	private static final Logger log                    =
+		Logger.getLogger(MessageForwarding.class.getName());
+	private static final String XMLNS                  = "jabber:client";
+	private static final String[] ELEMENTS             = { tigase.server.Message
+																												 .ELEM_NAME };
+	private static final String[] XMLNSS               = { XMLNS };
+	private static final String[] MESSAGE_FORWARD_PATH = { tigase.server.Message.ELEM_NAME,
+					FORWARD_EL };
 	private static final Element forw_el = new Element(FORWARD_EL,
-			new String[] { "xmlns" }, new String[] { FORWARD_XMLNS });
+																					 new String[] { "xmlns" },
+																					 new String[] { FORWARD_XMLNS });
+
+	//~--- methods --------------------------------------------------------------
 
 	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Returns plugin unique identifier.
-	 * 
-	 * 
+	 *
+	 *
 	 * @return pugin unique identifier.
 	 */
 	@Override
@@ -85,20 +93,21 @@ public class MessageForwarding extends XMPPProcessor implements XMPPProcessorIfc
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param packet
 	 * @param session
 	 * @param repo
 	 * @param results
 	 * @param settings
-	 * 
+	 *
 	 * @throws XMPPException
 	 */
 	@Override
 	public void process(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
-			throws XMPPException {
+											NonAuthUserRepository repo, Queue<Packet> results,
+											Map<String, Object> settings)
+					throws XMPPException {
 
 		// For performance reasons it is better to do the check
 		// before calling logging method.
@@ -113,45 +122,45 @@ public class MessageForwarding extends XMPPProcessor implements XMPPProcessorIfc
 		// from offline storage.
 		if (session == null) {
 			return;
-		} // end of if (session == null)
+		}    // end of if (session == null)
 
 		// We only want to forward messages which do contain body element
-		if (packet.getElemCData("/message/body") == null) {
+		if (packet.getElemCDataStaticStr(tigase.server.Message.MESSAGE_BODY_PATH) == null) {
 			return;
 		}
-		
+
 		// If the message contains forward payload already we drop it to prevent
 		// infinite loop due to some misconfiguration
-		if (packet.isXMLNS("/message/"+FORWARD_EL, FORWARD_XMLNS)){
+		if (packet.isXMLNSStaticStr(MESSAGE_FORWARD_PATH, FORWARD_XMLNS)) {
 			return;
 		}
 
 		JID forwardAddr = session.getDomain().getMessageForward();
+
 		// No forward address means no forwarding which means no further processing
 		// is required.
 		if (forwardAddr == null) {
 			return;
 		}
-
 		try {
 			JID user = null;
 
-
 			// Remember to cut the resource part off before comparing JIDs
-			BareJID id =
-					(packet.getStanzaTo() != null) ? packet.getStanzaTo().getBareJID() : null;
+			BareJID id = (packet.getStanzaTo() != null)
+									 ? packet.getStanzaTo().getBareJID()
+									 : null;
 
 			// Checking if this is a packet TO the owner of the session
 			if (session.isUserId(id)) {
 
 				// Yes this is message to 'this' client
 				user = packet.getStanzaTo();
-
 			} else {
 
 				// Remember to cut the resource part off before comparing JIDs
-				id =
-						(packet.getStanzaFrom() != null) ? packet.getStanzaFrom().getBareJID() : null;
+				id = (packet.getStanzaFrom() != null)
+						 ? packet.getStanzaFrom().getBareJID()
+						 : null;
 
 				// Checking if this is maybe packet FROM the client
 				if (session.isUserId(id)) {
@@ -169,25 +178,27 @@ public class MessageForwarding extends XMPPProcessor implements XMPPProcessorIfc
 			if (user == null) {
 				user = session.getJID();
 			}
-			
+
 			Element forward_payload = forw_el.clone();
+
 			forward_payload.addAttribute("from", packet.getStanzaFrom().toString());
 			forward_payload.addAttribute("to", packet.getStanzaTo().toString());
+
 			Packet result = Packet.packetInstance(packet.getElement(), user, forwardAddr);
+
 			result.getElement().addChild(forward_payload);
 			results.offer(result);
-			
 		} catch (NotAuthorizedException e) {
 			log.warning("NotAuthorizedException for packet: " + packet);
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-					"You must authorize session first.", true));
-		} // end of try-catch
+							"You must authorize session first.", true));
+		}    // end of try-catch
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -197,12 +208,15 @@ public class MessageForwarding extends XMPPProcessor implements XMPPProcessorIfc
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
 	}
-} // Message
+}    // Message
+
+
+//~ Formatted in Tigase Code Convention on 13/02/16

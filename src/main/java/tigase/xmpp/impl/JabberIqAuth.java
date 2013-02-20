@@ -36,6 +36,7 @@ import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 
 import tigase.server.Command;
+import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.Priority;
 
@@ -87,11 +88,19 @@ public class JabberIqAuth
 	/**
 	 * Private logger for class instancess.
 	 */
-	private static final Logger log         =
+	private static final Logger log                      =
 		Logger.getLogger("tigase.xmpp.impl.JabberIqAuth");
-	private static final String XMLNS       = "jabber:iq:auth";
-	private static final String ID          = XMLNS;
-	private static final String[] XMLNSS    = { XMLNS };
+	private static final String XMLNS                    = "jabber:iq:auth";
+	private static final String ID                       = XMLNS;
+	private static final String[] XMLNSS                 = { XMLNS };
+	private static final String[] IQ_QUERY_USERNAME_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME,
+					"username" };
+	private static final String[] IQ_QUERY_RESOURCE_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME,
+					"resource" };
+	private static final String[] IQ_QUERY_PASSWORD_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME,
+					"password" };
+	private static final String[] IQ_QUERY_DIGEST_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME,
+					"digest" };
 	private static final Element[] FEATURES = { new Element("auth",
 																							new String[] { "xmlns" },
 																							new String[] {
@@ -256,10 +265,10 @@ public class JabberIqAuth
 				// authentication plug-in. The authentication takes place on the
 				// AuthRepository
 				// level so we do not really care here what the user has sent.
-				String user_name = request.getChildCData("/iq/query/username");
-				String resource  = request.getChildCData("/iq/query/resource");
-				String password  = request.getChildCData("/iq/query/password");
-				String digest    = request.getChildCData("/iq/query/digest");
+				String user_name = request.getChildCDataStaticStr(IQ_QUERY_USERNAME_PATH);
+				String resource  = request.getChildCDataStaticStr(IQ_QUERY_RESOURCE_PATH);
+				String password  = request.getChildCDataStaticStr(IQ_QUERY_PASSWORD_PATH);
+				String digest    = request.getChildCDataStaticStr(IQ_QUERY_DIGEST_PATH);
 
 				try {
 					BareJID user_id = BareJID.bareJIDInstance(user_name,

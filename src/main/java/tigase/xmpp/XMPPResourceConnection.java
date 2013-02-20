@@ -1,12 +1,13 @@
 /*
  * XMPPResourceConnection.java
- * 
+ *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,6 +31,7 @@ import tigase.db.AuthRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
 
+import tigase.server.Presence;
 import tigase.server.xmppsession.SessionManagerHandler;
 
 import tigase.util.TigaseStringprepException;
@@ -84,10 +86,11 @@ public class XMPPResourceConnection
 	/**
 	 * This variable is to keep relates XMPPIOService ID only.
 	 */
-	private JID connectionId  = null;
-	private long creationTime = 0;
-	private String defLang    = "en";
-	private long id_counter   = 0;
+	private JID connectionId       = null;
+	private String connectionState = null;
+	private long creationTime      = 0;
+	private String defLang         = "en";
+	private long id_counter        = 0;
 
 	/**
 	 * Value of <code>System.currentTimeMillis()</code> from the time when this
@@ -170,6 +173,7 @@ public class XMPPResourceConnection
 	 *
 	 * @return
 	 *
+	 *
 	 * @throws NotAuthorizedException
 	 */
 	public List<XMPPResourceConnection> getActiveSessions() throws NotAuthorizedException {
@@ -249,8 +253,8 @@ public class XMPPResourceConnection
 		if (this.connectionId == null) {
 			throw new NoConnectionIdException(
 					"Connection ID not set for this session. " +
-					"This is probably the SM session to handle traffic addressed to the server itself." +
-					" Or maybe it's a bug.");
+					"This is probably the SM session to handle traffic " +
+					"addressed to the server itself. Or maybe it's a bug.");
 		}
 
 		return this.connectionId;
@@ -785,7 +789,7 @@ public class XMPPResourceConnection
 		putSessionData(PRESENCE_KEY, packet);
 
 		// Parse resource priority:
-		String pr_str = packet.getCData("/presence/priority");
+		String pr_str = packet.getCDataStaticStr(Presence.PRESENCE_PRIORITY_PATH);
 
 		if (pr_str != null) {
 			int pr = 1;
@@ -958,4 +962,4 @@ public class XMPPResourceConnection
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/13
+//~ Formatted in Tigase Code Convention on 13/02/19

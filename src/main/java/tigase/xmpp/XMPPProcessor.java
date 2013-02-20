@@ -1,4 +1,6 @@
 /*
+ * XMPPProcessor.java
+ *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
@@ -15,19 +17,29 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.xmpp;
 
+//~--- non-JDK imports --------------------------------------------------------
+
 import tigase.db.TigaseDBException;
 
+import tigase.server.Packet;
+
 import tigase.stats.StatisticsList;
+
 import tigase.xml.Element;
 
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * <code>XMPPProcessor</code> abstract class contains basic definition for
@@ -55,10 +67,25 @@ import java.util.Map;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class XMPPProcessor implements XMPPImplIfc {
+public abstract class XMPPProcessor
+				implements XMPPImplIfc {
+	/** Field description */
 	protected static final String ALL = "*";
 
+	/**
+	 * Variable <code>log</code> is a class logger.
+	 */
+	private static final Logger log = Logger.getLogger(XMPPProcessor.class.getName());
+
+	//~--- constructors ---------------------------------------------------------
+
+	/**
+	 * Constructs ...
+	 *
+	 */
 	protected XMPPProcessor() {}
+
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method <code>compareTo</code> is used to perform
@@ -96,6 +123,8 @@ public abstract class XMPPProcessor implements XMPPImplIfc {
 		return 1;
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	/**
 	 * Method description
 	 *
@@ -105,6 +134,8 @@ public abstract class XMPPProcessor implements XMPPImplIfc {
 	public XMPPProcessor getInstance() {
 		return this;
 	}
+
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -117,9 +148,122 @@ public abstract class XMPPProcessor implements XMPPImplIfc {
 	 */
 	@Override
 	public void init(Map<String, Object> settings) throws TigaseDBException {}
-	
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param list
+	 */
 	@Override
 	public void getStatistics(StatisticsList list) {}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param conn
+	 *
+	 * @return
+	 */
+	@Override
+	public Authorization canHandle(Packet packet, XMPPResourceConnection conn) {
+		Authorization result = null;
+		String[][] elemPaths = supElementNamePaths();
+
+		if (elemPaths != null) {
+
+			// This is the new API style
+			String[] elemXMLNS    = supNamespaces();
+			Set<StanzaType> types = supTypes();
+
+			result = checkPacket(packet, conn, elemPaths, elemXMLNS, types);
+		} else {
+
+			// And this is the old API left for backward compatibility with plugins
+			// from earlier versions
+			if (walk(packet.getElement())) {
+				result = Authorization.AUTHORIZED;
+			}
+		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST,
+							"XMPPProcessorIfc: {0} ({1}" + ")" + "\n Request: " +
+							"{2}, conn: {3}, authorization: {4}", new Object[] {
+								this.getClass().getSimpleName(),
+								id(), packet, conn, result });
+		}
+
+		return result;
+	}
+
+	private Authorization checkPacket(Packet packet, XMPPResourceConnection conn,
+																		String[][] elemPaths, String[] elemXMLNS,
+																		Set<StanzaType> types) {
+		Authorization result = null;
+
+		for (int i = 0; i < elemPaths.length; i++) {
+			if (packet.isXMLNSStaticStr(elemPaths[i], elemXMLNS[i])) {
+				if ((types == null) || types.contains(packet.getType())) {
+					result = Authorization.AUTHORIZED;
+
+					break;
+				}
+			}
+		}
+
+		return result;
+	}
+
+	private boolean walk(Element elem) {
+		boolean result;
+		String xmlns = elem.getXMLNS();
+
+		if (xmlns == null) {
+			xmlns = "jabber:client";
+		}
+		result = isSupporting(elem.getName(), xmlns);
+		if (!result) {
+			Collection<Element> children = elem.getChildren();
+
+			if (children != null) {
+				for (Element child : children) {
+					result = walk(child);
+				}    // end of for (Element child: children)
+			}      // end of if (children != null)
+		}
+
+		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public Set<StanzaType> supTypes() {
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String[][] supElementNamePaths() {
+		return null;
+	}
+
+	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -133,7 +277,7 @@ public abstract class XMPPProcessor implements XMPPImplIfc {
 	@Override
 	public boolean isSupporting(final String element, final String ns) {
 		String[] impl_elements = supElements();
-		String[] impl_xmlns = supNamespaces();
+		String[] impl_xmlns    = supNamespaces();
 
 		if ((impl_elements != null) && (impl_xmlns != null)) {
 			for (int i = 0; (i < impl_elements.length) && (i < impl_xmlns.length); i++) {
@@ -143,8 +287,8 @@ public abstract class XMPPProcessor implements XMPPImplIfc {
 				// This method is called very, very often and it is also very expensive
 				// therefore all XML element names and xmlns are created using
 				// String.intern()
-				if (((impl_elements[i] == element) || (impl_elements[i] == ALL))
-						&& ((impl_xmlns[i] == ns) || (impl_xmlns[i] == ALL))) {
+				if (((impl_elements[i] == element) || (impl_elements[i] == ALL)) &&
+						((impl_xmlns[i] == ns) || (impl_xmlns[i] == ALL))) {
 					return true;
 				}    // end of if (ELEMENTS[i].equals(element) && XMLNSS[i].equals(ns))
 			}      // end of for (int i = 0; i < ELEMENTS.length; i++)
@@ -152,6 +296,8 @@ public abstract class XMPPProcessor implements XMPPImplIfc {
 
 		return false;
 	}
+
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -201,3 +347,6 @@ public abstract class XMPPProcessor implements XMPPImplIfc {
 		return null;
 	}
 }    // XMPPProcessor
+
+
+//~ Formatted in Tigase Code Convention on 13/02/16

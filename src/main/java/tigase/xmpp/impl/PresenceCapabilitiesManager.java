@@ -1,6 +1,8 @@
 /*
+ * PresenceCapabilitiesManager.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -15,184 +17,352 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.xmpp.impl;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.CopyOnWriteArrayList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//~--- non-JDK imports --------------------------------------------------------
+
 import tigase.conf.Configurable;
+
 import tigase.server.Iq;
 import tigase.server.Packet;
+
 import tigase.xml.Element;
+
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.Arrays;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+
+/**
+ * Class description
+ *
+ *
+ * @version        Enter version here..., 13/02/16
+ * @author         Enter your name here...
+ */
 public class PresenceCapabilitiesManager {
+	private static long idCounter = 0;
+	private static Logger log     =
+		Logger.getLogger(PresenceCapabilitiesManager.class.getName());
 
-        private static long idCounter = 0;
-        private static Logger log = LoggerFactory.getLogger(PresenceCapabilitiesManager.class.getCanonicalName());
-        // Map<capsNode,Set<feature>>
-        private static Map<String, String[]> nodeFeatures = new ConcurrentHashMap<String, String[]>(250);
+	// Map<capsNode,Set<feature>>
+	private static Map<String, String[]> nodeFeatures = new ConcurrentHashMap<String,
+																												String[]>(250);
+	private static List<PresenceCapabilitiesListener> handlers =
+		new CopyOnWriteArrayList<PresenceCapabilitiesListener>();
 
-        private static List<PresenceCapabilitiesListener> handlers = new CopyOnWriteArrayList<PresenceCapabilitiesListener>();
-        
-        public static interface PresenceCapabilitiesListener {
-                
-                void handlePresence(JID owner, JID sender, String[] capsNodes, Queue<Packet> results);
-                
-        }
-        
-        public static void setNodeFeatures(String capsNode, String[] features) {
-                if (log.isTraceEnabled()) {
-                        log.trace("setting features for node = " + capsNode);
-                }
-                Arrays.sort(features);
-                nodeFeatures.put(capsNode, features);
-        }
+	//~--- set methods ----------------------------------------------------------
 
-        public static String[] getNodeFeatures(String capsNode) {
-                return nodeFeatures.get(capsNode);
-        }
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param capsNode
+	 * @param features
+	 */
+	public static void setNodeFeatures(String capsNode, String[] features) {
+		if (log.isLoggable(Level.FINER)) {
+			log.log(Level.FINER, "setting features for node = {0}", capsNode);
+		}
+		Arrays.sort(features);
+		nodeFeatures.put(capsNode, features);
+	}
 
-        public static String[] processPresence(Element c) {
-                Set<String> caps_nodes = null;
+	//~--- get methods ----------------------------------------------------------
 
-                if (c != null) {
-                        caps_nodes = new HashSet<String>();
-                        String caps_node = c.getAttribute("node") + "#" + c.getAttribute("ver");
-                        caps_nodes.add(caps_node);
-                        if (c.getAttribute("hash") == null && c.getAttribute("ext") != null) {
-                                for (String e : c.getAttribute("ext").split(" ")) {
-                                        caps_nodes.add(c.getAttribute("node") + "#" + e);
-                                }
-                        }
-                }
-                else {
-                        return null;
-                }
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param capsNode
+	 *
+	 * @return
+	 */
+	public static String[] getNodeFeatures(String capsNode) {
+		return nodeFeatures.get(capsNode);
+	}
 
-                return caps_nodes.toArray(new String[caps_nodes.size()]);
-        }
+	//~--- methods --------------------------------------------------------------
 
-        public static void prepareCapsQueries(JID compJid, JID to, String[] caps_nodes, Queue<Packet> results) {
-                if (caps_nodes != null) {
-                        for (String caps_node : caps_nodes) {
-                                if (!nodeFeatures.containsKey(caps_node)) {
-                                        results.offer(prepareCapsQuery(to, compJid, caps_node));
-                                }
-                        }
-                }
-        }
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param c
+	 *
+	 * @return
+	 */
+	public static String[] processPresence(Element c) {
+		Set<String> caps_nodes = null;
 
-        public static void prepareCapsQueriesEl(JID compJid, JID to, String[] caps_nodes, Queue<Element> results) {
-                if (caps_nodes != null) {
-                        for (String caps_node : caps_nodes) {
-                                if (!nodeFeatures.containsKey(caps_node)) {
-                                        results.offer(prepareCapsQueryEl(to, compJid, caps_node));
-                                }
-                        }
-                }
-        }
+		if (c != null) {
+			caps_nodes = new HashSet<String>();
 
-        public static String[] processPresence(JID compJid, Packet p, Queue<Packet> results) {
-                Element c = p.getElement().getChild("c");
-                Set<String> features = new HashSet<String>();
+			String caps_node = c.getAttribute("node") + "#" + c.getAttribute("ver");
 
-                if (c != null) {
-                        String caps_node = c.getAttribute("node") + "#" + c.getAttribute("ver");
-                        //String[] nFeatures = nodeFeatures.get(caps_node);
-                        if (!nodeFeatures.containsKey(caps_node)) {
-                                Set<String> caps_nodes = new HashSet<String>();
-                                caps_nodes.add(caps_node);
-                                if (c.getAttribute("hash") == null && c.getAttribute("ext") != null) {
-                                        for (String e : c.getAttribute("ext").split(" ")) {
-                                                caps_nodes.add(c.getAttribute("node") + "#" + e);
-                                        }
-                                }
-                                for (String node : caps_nodes) {
-                                        if (!nodeFeatures.containsKey(node)) {
-                                                results.offer(prepareCapsQuery(p.getFrom(), compJid, node));
-                                        }
-                                }
-                        }
-                }
-                return features.toArray(new String[features.size()]);
-        }
+			caps_nodes.add(caps_node);
+			if ((c.getAttribute("hash") == null) && (c.getAttribute("ext") != null)) {
+				for (String e : c.getAttribute("ext").split(" ")) {
+					caps_nodes.add(c.getAttribute("node") + "#" + e);
+				}
+			}
+		} else {
+			return null;
+		}
 
-        public static Packet prepareCapsQuery(JID to, JID from, String node) {
-                Element iq = prepareCapsQueryEl(to, from, node);
-                return new Iq(iq, from, to);
-        }
+		return caps_nodes.toArray(new String[caps_nodes.size()]);
+	}
 
-        public static Element prepareCapsQueryEl(JID to, JID from, String node) {
-                String id = String.valueOf(idCounter++);
-                Element iq = new Element("iq", new String[]{"from", "to", "id", "type"}, new String[]{from.toString(), to.toString(), id, "get"});
-                Element query = new Element("query", new String[]{"xmlns", "node"}, new String[]{"http://jabber.org/protocol/disco#info", node});
-                iq.addChild(query);
-                return iq;
-        }
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param compJid
+	 * @param to
+	 * @param caps_nodes
+	 * @param results
+	 */
+	public static void prepareCapsQueries(JID compJid, JID to, String[] caps_nodes,
+					Queue<Packet> results) {
+		if (caps_nodes != null) {
+			for (String caps_node : caps_nodes) {
+				if (!nodeFeatures.containsKey(caps_node)) {
+					results.offer(prepareCapsQuery(to, compJid, caps_node));
+				}
+			}
+		}
+	}
 
-        public static void processCapsQueryResponse(Packet packet) {
-                // No need for checking to domain - processors and components should do this
-//        if (VHostManager.isLocalDomainOrComponent(packet.getStanzaTo().getDomain())) {
-                String nick = packet.getStanzaTo().getLocalpart();
-                if (nick == null || Configurable.DEF_SM_NAME.equals(nick)) {
-                        Element query = packet.getElement().getChild("query", "http://jabber.org/protocol/disco#info");
-                        if (query != null) {
-                                if (packet.getType() == StanzaType.result) {
-                                        if (query.getAttribute("node") == null) {
-                                                log.debug("disco#info query without node attribute!");
-                                                return;
-                                        }
-                                        List<Element> ch = query.getChildren();
-                                        if (ch != null) {
-                                                Set<String> features = new ConcurrentSkipListSet<String>();
-                                                for (Element item : ch) {
-                                                        if (!"feature".equals(item.getName())) {
-                                                                continue;
-                                                        }
-                                                        features.add(item.getAttribute("var"));
-                                                }
-                                                setNodeFeatures(query.getAttribute("node"), features.toArray(new String[features.size()]));
-                                        }
-                                }
-//                    else if (packet.getType() == StanzaType.error && manager.getNodeFeatures(query.getAttribute("node")) == null) {
-//                        getInstance().setNodeFeatures(query.getAttribute("node"), NULL_NODES);
-//                    }
-//                    return;
-                        }
-                }
-//        }
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param compJid
+	 * @param to
+	 * @param caps_nodes
+	 * @param results
+	 */
+	public static void prepareCapsQueriesEl(JID compJid, JID to, String[] caps_nodes,
+					Queue<Element> results) {
+		if (caps_nodes != null) {
+			for (String caps_node : caps_nodes) {
+				if (!nodeFeatures.containsKey(caps_node)) {
+					results.offer(prepareCapsQueryEl(to, compJid, caps_node));
+				}
+			}
+		}
+	}
 
-        }
-        
-        public static void handlePresence(JID owner, JID from, String[] capsNodes, Queue<Packet> results) {
-                if (capsNodes == null) return;
-                
-                List<PresenceCapabilitiesListener> handlers = PresenceCapabilitiesManager.handlers;
-                for (PresenceCapabilitiesListener handler : handlers) {
-                        handler.handlePresence(owner, from, capsNodes, results);
-                }
-        }
-        
-        public static void registerPresenceHandler(PresenceCapabilitiesListener handler) {
-                handlers.add(handler);
-        }
-        
-        public static void unregisterPresenceHandler(PresenceCapabilitiesListener handler) {
-                handlers.remove(handler);
-        }
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param compJid
+	 * @param p
+	 * @param results
+	 *
+	 * @return
+	 */
+	public static String[] processPresence(JID compJid, Packet p, Queue<Packet> results) {
+		Element c            = p.getElement().getChild("c");
+		Set<String> features = new HashSet<String>();
+
+		if (c != null) {
+			String caps_node = c.getAttribute("node") + "#" + c.getAttribute("ver");
+
+			// String[] nFeatures = nodeFeatures.get(caps_node);
+			if (!nodeFeatures.containsKey(caps_node)) {
+				Set<String> caps_nodes = new HashSet<String>();
+
+				caps_nodes.add(caps_node);
+				if ((c.getAttribute("hash") == null) && (c.getAttribute("ext") != null)) {
+					for (String e : c.getAttribute("ext").split(" ")) {
+						caps_nodes.add(c.getAttribute("node") + "#" + e);
+					}
+				}
+				for (String node : caps_nodes) {
+					if (!nodeFeatures.containsKey(node)) {
+						results.offer(prepareCapsQuery(p.getFrom(), compJid, node));
+					}
+				}
+			}
+		}
+
+		return features.toArray(new String[features.size()]);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param to
+	 * @param from
+	 * @param node
+	 *
+	 * @return
+	 */
+	public static Packet prepareCapsQuery(JID to, JID from, String node) {
+		Element iq = prepareCapsQueryEl(to, from, node);
+
+		return new Iq(iq, from, to);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param to
+	 * @param from
+	 * @param node
+	 *
+	 * @return
+	 */
+	public static Element prepareCapsQueryEl(JID to, JID from, String node) {
+		String id  = String.valueOf(idCounter++);
+		Element iq = new Element("iq", new String[] { "from", "to", "id", "type" },
+														 new String[] { from.toString(),
+						to.toString(), id, "get" });
+		Element query = new Element("query", new String[] { "xmlns", "node" },
+																new String[] { "http://jabber.org/protocol/disco#info",
+						node });
+
+		iq.addChild(query);
+
+		return iq;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 */
+	public static void processCapsQueryResponse(Packet packet) {
+
+		// No need for checking to domain - processors and components should do this
+//  if (VHostManager.isLocalDomainOrComponent(packet.getStanzaTo().getDomain())) {
+		String nick = packet.getStanzaTo().getLocalpart();
+
+		if ((nick == null) || Configurable.DEF_SM_NAME.equals(nick)) {
+			Element query = packet.getElement().getChild("query",
+												"http://jabber.org/protocol/disco#info");
+
+			if (query != null) {
+				if (packet.getType() == StanzaType.result) {
+					if (query.getAttribute("node") == null) {
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("disco#info query without node attribute!");
+						}
+
+						return;
+					}
+
+					List<Element> ch = query.getChildren();
+
+					if (ch != null) {
+						Set<String> features = new ConcurrentSkipListSet<String>();
+
+						for (Element item : ch) {
+							if (!"feature".equals(item.getName())) {
+								continue;
+							}
+							features.add(item.getAttribute("var"));
+						}
+						setNodeFeatures(query.getAttribute("node"),
+														features.toArray(new String[features.size()]));
+					}
+				}
+
+//      else if (packet.getType() == StanzaType.error && manager.getNodeFeatures(query.getAttribute("node")) == null) {
+//          getInstance().setNodeFeatures(query.getAttribute("node"), NULL_NODES);
+//      }
+//      return;
+			}
+		}
+
+//  }
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param owner
+	 * @param from
+	 * @param capsNodes
+	 * @param results
+	 */
+	public static void handlePresence(JID owner, JID from, String[] capsNodes,
+																		Queue<Packet> results) {
+		if (capsNodes == null) {
+			return;
+		}
+
+		List<PresenceCapabilitiesListener> handlers = PresenceCapabilitiesManager.handlers;
+
+		for (PresenceCapabilitiesListener handler : handlers) {
+			handler.handlePresence(owner, from, capsNodes, results);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param handler
+	 */
+	public static void registerPresenceHandler(PresenceCapabilitiesListener handler) {
+		handlers.add(handler);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param handler
+	 */
+	public static void unregisterPresenceHandler(PresenceCapabilitiesListener handler) {
+		handlers.remove(handler);
+	}
+
+	//~--- inner interfaces -----------------------------------------------------
+
+	/**
+	 * Interface description
+	 *
+	 *
+	 * @version        Enter version here..., 13/02/16
+	 * @author         Enter your name here...
+	 */
+	public static interface PresenceCapabilitiesListener {
+		/**
+		 * Method description
+		 *
+		 *
+		 * @param owner
+		 * @param sender
+		 * @param capsNodes
+		 * @param results
+		 */
+		void handlePresence(JID owner, JID sender, String[] capsNodes, Queue<Packet> results);
+	}
 }
+
+
+//~ Formatted in Tigase Code Convention on 13/02/16

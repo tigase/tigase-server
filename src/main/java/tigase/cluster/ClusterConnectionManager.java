@@ -26,8 +26,6 @@ package tigase.cluster;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.annotations.TODO;
-
 import tigase.cluster.api.ClusterCommandException;
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
@@ -42,13 +40,11 @@ import tigase.net.SocketType;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.server.ServiceChecker;
-import tigase.server.xmppserver.CID;
 
 import tigase.stats.StatisticsList;
 import tigase.stats.StatisticType;
 
 import tigase.util.Algorithms;
-import tigase.util.DNSResolver;
 import tigase.util.TigaseStringprepException;
 import tigase.util.TimeUtils;
 
@@ -62,8 +58,6 @@ import tigase.xmpp.XMPPIOService;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.net.UnknownHostException;
-
 import java.security.NoSuchAlgorithmException;
 
 import java.util.Arrays;
@@ -71,7 +65,6 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
@@ -499,6 +492,7 @@ public class ClusterConnectionManager
 	 *
 	 * @return
 	 */
+	@Override
 	public int processingOutThreads() {
 
 		// TODO: The number of threads should be equal or greater to number of
@@ -1048,6 +1042,19 @@ public class ClusterConnectionManager
 				}
 			}
 		}
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	protected String getDefTrafficThrottling() {
+		return "xmpp:25m:0:disc,bin:20000m:0:disc";
 	}
 
 	//~--- inner classes --------------------------------------------------------
