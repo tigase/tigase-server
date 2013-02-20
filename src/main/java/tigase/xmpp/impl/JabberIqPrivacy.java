@@ -6,7 +6,8 @@
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -99,8 +100,8 @@ public class JabberIqPrivacy
 	private static final Comparator<Element> compar = new Comparator<Element>() {
 		@Override
 		public int compare(Element el1, Element el2) {
-			String or1 = el1.getAttribute(ORDER);
-			String or2 = el2.getAttribute(ORDER);
+			String or1 = el1.getAttributeStaticStr(ORDER);
+			String or2 = el2.getAttributeStaticStr(ORDER);
 
 			return or1.compareTo(or2);
 		}
@@ -336,11 +337,11 @@ public class JabberIqPrivacy
 						boolean elem_matched = false;
 						ITEM_TYPE type       = ITEM_TYPE.all;
 
-						if (item.getAttribute(TYPE) != null) {
-							type = ITEM_TYPE.valueOf(item.getAttribute(TYPE));
+						if (item.getAttributeStaticStr(TYPE) != null) {
+							type = ITEM_TYPE.valueOf(item.getAttributeStaticStr(TYPE));
 						}            // end of if (item.getAttribute(TYPE) != null)
 
-						String value          = item.getAttribute(VALUE);
+						String value          = item.getAttributeStaticStr(VALUE);
 						BareJID sessionUserId = session.getBareJID();
 						JID jid               = packet.getStanzaFrom();
 						boolean packetIn      = true;
@@ -442,7 +443,7 @@ public class JabberIqPrivacy
 							break;
 						}        // end of if (!elem_matched)
 
-						ITEM_ACTION action = ITEM_ACTION.valueOf(item.getAttribute(ACTION));
+						ITEM_ACTION action = ITEM_ACTION.valueOf(item.getAttributeStaticStr(ACTION));
 
 						switch (action) {
 						case allow :
@@ -505,7 +506,8 @@ public class JabberIqPrivacy
 				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
 								"You can retrieve only one list at a time.", true));
 			} else {
-				Element eList = Privacy.getList(session, children.get(0).getAttribute("name"));
+				Element eList = Privacy.getList(session,
+																				children.get(0).getAttributeStaticStr("name"));
 
 				if (eList != null) {
 					results.offer(packet.okResult(eList, 1));
@@ -531,7 +533,7 @@ public class JabberIqPrivacy
 				// Broken privacy implementation sends list without name set
 				// instead of sending BAD_REQUEST error I can just assign
 				// 'default' name here.
-				String name = child.getAttribute(NAME);
+				String name = child.getAttributeStaticStr(NAME);
 
 				if ((name == null) || (name.length() == 0)) {
 					child.setAttribute(NAME, "default");
@@ -578,7 +580,7 @@ public class JabberIqPrivacy
 			if (child.getName() == ACTIVE_EL_NAME) {
 
 				// User selects a different active list
-				String listName = child.getAttribute(NAME);
+				String listName = child.getAttributeStaticStr(NAME);
 				Element list    = Privacy.getList(session, listName);
 
 				if ((listName != null) && (list == null)) {
@@ -587,7 +589,7 @@ public class JabberIqPrivacy
 				} else {
 
 					// This is either declining of active list use or setting a new active list
-					Privacy.setActiveList(session, child.getAttribute(NAME));
+					Privacy.setActiveList(session, child.getAttributeStaticStr(NAME));
 					results.offer(packet.okResult((String) null, 0));
 				}
 			}    // end of if (child.getName().equals("list))
@@ -634,11 +636,11 @@ public class JabberIqPrivacy
 			for (Element item : items) {
 				ITEM_TYPE type = ITEM_TYPE.all;
 
-				if (item.getAttribute(TYPE) != null) {
-					type = ITEM_TYPE.valueOf(item.getAttribute(TYPE));
+				if (item.getAttributeStaticStr(TYPE) != null) {
+					type = ITEM_TYPE.valueOf(item.getAttributeStaticStr(TYPE));
 				}    // end of if (item.getAttribute(TYPE) != null)
 
-				String value = item.getAttribute(VALUE);
+				String value = item.getAttributeStaticStr(VALUE);
 
 				switch (type) {
 				case jid :
@@ -673,10 +675,10 @@ public class JabberIqPrivacy
 				}
 
 				// if action is not valid it will throw exception
-				ITEM_ACTION.valueOf(item.getAttribute(ACTION));
+				ITEM_ACTION.valueOf(item.getAttributeStaticStr(ACTION));
 
 				// checking unique order attribute value
-				Integer order = Integer.parseInt(item.getAttribute(ORDER));
+				Integer order = Integer.parseInt(item.getAttributeStaticStr(ORDER));
 
 				if ((order == null) || (order < 0) ||!orderSet.add(order)) {
 					result = Authorization.BAD_REQUEST;
@@ -696,4 +698,4 @@ public class JabberIqPrivacy
 }    // JabberIqPrivacy
 
 
-//~ Formatted in Tigase Code Convention on 13/02/16
+//~ Formatted in Tigase Code Convention on 13/02/20

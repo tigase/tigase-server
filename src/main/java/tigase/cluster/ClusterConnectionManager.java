@@ -318,7 +318,7 @@ public class ClusterConnectionManager
 
 			if ((children != null) && (children.size() > 0)) {
 				Element child    = children.peek();
-				String stanzaAdd = child.getAttribute("to");
+				String stanzaAdd = child.getAttributeStaticStr(Packet.TO_ATT);
 
 				if (stanzaAdd != null) {
 					return stanzaAdd.hashCode();
@@ -326,7 +326,7 @@ public class ClusterConnectionManager
 
 					// This might be user's initial presence. In such a case we take
 					// stanzaFrom instead
-					stanzaAdd = child.getAttribute("from");
+					stanzaAdd = child.getAttributeStaticStr(Packet.FROM_ATT);
 					if (stanzaAdd != null) {
 						return stanzaAdd.hashCode();
 					} else {
@@ -1206,4 +1206,4 @@ public class ClusterConnectionManager
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/19
+//~ Formatted in Tigase Code Convention on 13/02/20

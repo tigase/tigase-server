@@ -6,7 +6,8 @@
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -445,23 +446,25 @@ public class VHostItem
 																				 VHOST_ELEM);
 		}
 		super.initFromElement(elem);
-		setVHost(JID.jidInstanceNS(elem.getAttribute(HOSTNAME_ATT)));
-		enabled          = Boolean.parseBoolean(elem.getAttribute(ENABLED_ATT));
-		anonymousEnabled = Boolean.parseBoolean(elem.getAttribute(ANONYMOUS_ENABLED_ATT));
-		registerEnabled  = Boolean.parseBoolean(elem.getAttribute(REGISTER_ENABLED_ATT));
+		setVHost(JID.jidInstanceNS(elem.getAttributeStaticStr(HOSTNAME_ATT)));
+		enabled          = Boolean.parseBoolean(elem.getAttributeStaticStr(ENABLED_ATT));
+		anonymousEnabled =
+			Boolean.parseBoolean(elem.getAttributeStaticStr(ANONYMOUS_ENABLED_ATT));
+		registerEnabled =
+			Boolean.parseBoolean(elem.getAttributeStaticStr(REGISTER_ENABLED_ATT));
 		try {
-			maxUsersNumber = Long.parseLong(elem.getAttribute(MAX_USERS_NUMBER_ATT));
+			maxUsersNumber = Long.parseLong(elem.getAttributeStaticStr(MAX_USERS_NUMBER_ATT));
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Can not parse max users number: {0}",
-							elem.getAttribute(MAX_USERS_NUMBER_ATT));
+							elem.getAttributeStaticStr(MAX_USERS_NUMBER_ATT));
 		}
 
-		String tmp = elem.getAttribute(PRESENCE_FORWARD_ADDRESS_ATT);
+		String tmp = elem.getAttributeStaticStr(PRESENCE_FORWARD_ADDRESS_ATT);
 
 		if ((tmp != null) &&!tmp.trim().isEmpty()) {
 			presenceForward = JID.jidInstanceNS(tmp);
 		}
-		tmp = elem.getAttribute(MESSAGE_FORWARD_ADDRESS_ATT);
+		tmp = elem.getAttributeStaticStr(MESSAGE_FORWARD_ADDRESS_ATT);
 		if ((tmp != null) &&!tmp.trim().isEmpty()) {
 			messageForward = JID.jidInstanceNS(tmp);
 		}
@@ -1108,4 +1111,4 @@ public class VHostItem
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/16
+//~ Formatted in Tigase Code Convention on 13/02/20

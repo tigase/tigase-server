@@ -59,12 +59,12 @@ public class ClusterElementTest
 
 		Element elem = handler.getParsedElements().poll();
 
-		assertEquals("packet-forward-sm-cmd",
-								 elem.findChild("/cluster/control/method-call").getAttribute("name"));
+		assertEquals(
+				"packet-forward-sm-cmd",
+				elem.findChild("/cluster/control/method-call").getAttributeStaticStr("name"));
 
 //  assertEquals("cluster/control/method-call".split("/"),
 //               ClusterElement.CLUSTER_METHOD_PATH);
-
 		ClusterElement clElem = new ClusterElement(elem);
 
 		assertEquals("packet-forward-sm-cmd", clElem.getMethodName());

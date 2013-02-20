@@ -6,7 +6,8 @@
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -285,7 +286,7 @@ public class BoshSession {
 									 long max_inactivity, int concurrent_requests, int hold_requests,
 									 long max_pause, int max_batch_size, long batch_queue_timeout,
 									 Queue<Packet> out_results) {
-		String cache_action = packet.getAttribute(CACHE_ATTR);
+		String cache_action = packet.getAttributeStaticStr(CACHE_ATTR);
 
 		if ((cache_action != null) && cache_action.equals(CacheAction.on.toString())) {
 			cache    = new BoshSessionCache();
@@ -300,7 +301,7 @@ public class BoshSession {
 		}
 
 		long wait_l   = max_wait;
-		String wait_s = packet.getAttribute(WAIT_ATTR);
+		String wait_s = packet.getAttributeStaticStr(WAIT_ATTR);
 
 		if (wait_s != null) {
 			try {
@@ -313,7 +314,7 @@ public class BoshSession {
 
 		// this.max_wait = wait_l;
 		int hold_i     = hold_requests;
-		String tmp_str = packet.getAttribute(HOLD_ATTR);
+		String tmp_str = packet.getAttributeStaticStr(HOLD_ATTR);
 
 		if (tmp_str != null) {
 			try {
@@ -322,7 +323,7 @@ public class BoshSession {
 				hold_i = hold_requests;
 			}
 		}
-		tmp_str = packet.getAttribute(RID_ATTR);
+		tmp_str = packet.getAttributeStaticStr(RID_ATTR);
 		if (tmp_str != null) {
 			try {
 				previous_received_rid    = Long.parseLong(tmp_str);
@@ -330,8 +331,8 @@ public class BoshSession {
 			} catch (NumberFormatException e) {}
 		}
 		this.hold_requests = Math.max(hold_i, hold_requests);
-		if (packet.getAttribute(TO_ATTR) != null) {
-			this.domain = packet.getAttribute(TO_ATTR);
+		if (packet.getAttributeStaticStr(TO_ATTR) != null) {
+			this.domain = packet.getAttributeStaticStr(TO_ATTR);
 		}
 		this.max_batch_size      = max_batch_size;
 		this.batch_queue_timeout = batch_queue_timeout;
@@ -339,11 +340,11 @@ public class BoshSession {
 		this.max_inactivity      = max_inactivity;
 		this.concurrent_requests = concurrent_requests;
 		this.max_pause           = max_pause;
-		if (packet.getAttribute(CONTENT_ATTR) != null) {
-			content_type = packet.getAttribute(CONTENT_ATTR);
+		if (packet.getAttributeStaticStr(CONTENT_ATTR) != null) {
+			content_type = packet.getAttributeStaticStr(CONTENT_ATTR);
 		}
 
-		String lang = packet.getAttribute(LANG_ATTR);
+		String lang = packet.getAttributeStaticStr(LANG_ATTR);
 
 		if (lang == null) {
 			lang = "en";
@@ -370,8 +371,9 @@ public class BoshSession {
 			body.setAttribute(ACK_ATTR, "" + takeCurrentRidTail());
 		}
 		try {
-			BareJID userId = (packet.getAttribute("from") != null)
-											 ? BareJID.bareJIDInstance(packet.getAttribute("from"))
+			BareJID userId = (packet.getAttributeStaticStr(Packet.FROM_ATT) != null)
+											 ? BareJID.bareJIDInstance(
+													 packet.getAttributeStaticStr(Packet.FROM_ATT))
 											 : null;
 
 			if (userId != null) {
@@ -478,9 +480,9 @@ public class BoshSession {
 			List<Element> children = packet.getElemChildrenStaticStr(BODY_EL_PATH);
 			boolean duplicate      = false;
 
-			if (packet.getAttribute(RID_ATTR) != null) {
+			if (packet.getAttributeStaticStr(RID_ATTR) != null) {
 				try {
-					long rid = Long.parseLong(packet.getAttribute(RID_ATTR));
+					long rid = Long.parseLong(packet.getAttributeStaticStr(RID_ATTR));
 
 					if (isDuplicateRid(rid, children)) {
 						log.info("Discovered duplicate client connection, trying to close the " +
@@ -499,7 +501,7 @@ public class BoshSession {
 						processRid(rid, children);
 					}
 				} catch (NumberFormatException e) {
-					log.warning("Incorrect RID value: " + packet.getAttribute(RID_ATTR));
+					log.warning("Incorrect RID value: " + packet.getAttributeStaticStr(RID_ATTR));
 				}
 			}
 			service.setContentType(content_type);
@@ -527,21 +529,23 @@ public class BoshSession {
 
 					// out_results.offer(command);
 				}
-				if ((packet.getAttribute(RESTART_ATTR) != null) &&
-						packet.getAttribute(RESTART_ATTR).equals("true")) {
+				if ((packet.getAttributeStaticStr(RESTART_ATTR) != null) &&
+						packet.getAttributeStaticStr(RESTART_ATTR).equals("true")) {
 					log.fine("Found stream restart instruction: " + packet.toString());
 					out_results.offer(Command.GETFEATURES.getPacket(null, null, StanzaType.get,
 									"restart1", null));
 				}
-				if (packet.getAttribute(CACHE_ATTR) != null) {
+				if (packet.getAttributeStaticStr(CACHE_ATTR) != null) {
 					try {
-						CacheAction action = CacheAction.valueOf(packet.getAttribute(CACHE_ATTR));
+						CacheAction action =
+							CacheAction.valueOf(packet.getAttributeStaticStr(CACHE_ATTR));
 
 						if (cache_on || (action == CacheAction.on)) {
 							processCache(action, packet);
 						}
 					} catch (IllegalArgumentException e) {
-						log.warning("Incorrect cache action: " + packet.getAttribute(CACHE_ATTR));
+						log.warning("Incorrect cache action: " +
+												packet.getAttributeStaticStr(CACHE_ATTR));
 					}
 				} else {
 					if (children != null) {
@@ -823,7 +827,7 @@ public class BoshSession {
 
 		int packet_counter      = 0;
 		List<Element> children  = packet.getElemChildrenStaticStr(BODY_EL_PATH);
-		String cache_id         = packet.getAttribute(CACHE_ID_ATTR);
+		String cache_id         = packet.getAttributeStaticStr(CACHE_ID_ATTR);
 		List<Element> cache_res = null;
 
 		switch (action) {
@@ -1097,4 +1101,4 @@ public class BoshSession {
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/16
+//~ Formatted in Tigase Code Convention on 13/02/20

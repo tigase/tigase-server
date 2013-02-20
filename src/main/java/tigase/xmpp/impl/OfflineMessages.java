@@ -6,7 +6,8 @@
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -517,7 +518,7 @@ public class OfflineMessages
 				// XEP-0091 support - the old one...
 				stamp_el1 = p1.getElement().getChild("x", "jabber:x:delay");
 			}
-			stamp1 = stamp_el1.getAttribute("stamp");
+			stamp1 = stamp_el1.getAttributeStaticStr("stamp");
 
 			// Try XEP-0203 - the new XEP...
 			Element stamp_el2 = p2.getElement().getChild("delay", "urn:xmpp:delay");
@@ -527,7 +528,7 @@ public class OfflineMessages
 				// XEP-0091 support - the old one...
 				stamp_el2 = p2.getElement().getChild("x", "jabber:x:delay");
 			}
-			stamp2 = stamp_el2.getAttribute("stamp");
+			stamp2 = stamp_el2.getAttributeStaticStr("stamp");
 
 			return stamp1.compareTo(stamp2);
 		}
@@ -541,4 +542,4 @@ public class OfflineMessages
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/16
+//~ Formatted in Tigase Code Convention on 13/02/20

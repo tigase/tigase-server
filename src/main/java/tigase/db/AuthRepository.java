@@ -1,10 +1,13 @@
 /*
+ * AuthRepository.java
+ *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.db;
 
@@ -29,8 +31,6 @@ import tigase.xmpp.BareJID;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.Map;
-
-//~--- interfaces -------------------------------------------------------------
 
 /**
  * Interface <code>AuthRepository</code> defines a proxy bridge between user
@@ -46,6 +46,29 @@ import java.util.Map;
  * @version $Rev$
  */
 public interface AuthRepository {
+	/**
+	 * Property key name for <code>otherAuth</code> method call. It is used to provide an
+	 * extra authentication data by the client to the authentication logic.
+	 * Please note the <code>RESULT_KEY</code> property key is used to provide authentication
+	 * data from the server to the client. This property is used to provide authentication data
+	 * from the client to the server.
+	 */
+	public static final String DATA_KEY = "data";
+
+	/** Field description */
+	public static final String DIGEST_ID_KEY = "digest-id";
+
+	/** Field description */
+	public static final String DIGEST_KEY = "digest";
+
+	/**
+	 * Property key name for <code>otherAuth</code> method call. It is used to provide
+	 * desired authentication mechanism to the authentication logic.
+	 */
+	public static final String MACHANISM_KEY = "mechanism";
+
+	/** Field description */
+	public static final String PASSWORD_KEY = "password";
 
 	// Query params (and otherAuth)
 
@@ -57,15 +80,22 @@ public interface AuthRepository {
 
 	/**
 	 * Property value for <code>otherAuth</code> method call. It is used to provide
+	 * desired authentication NON-SASL protocol to the authentication logic.
+	 */
+	public static final String PROTOCOL_VAL_NONSASL = "nonsasl";
+
+	/**
+	 * Property value for <code>otherAuth</code> method call. It is used to provide
 	 * desired authentication SASL protocol to the authentication logic.
 	 */
 	public static final String PROTOCOL_VAL_SASL = "sasl";
 
 	/**
-	 * Property value for <code>otherAuth</code> method call. It is used to provide
-	 * desired authentication NON-SASL protocol to the authentication logic.
+	 * Property key name for <code>otherAuth</code> method call. It is used to provide
+	 * authentication realm to the authentication logic. In most cases, the realm is just
+	 * a domain name.
 	 */
-	public static final String PROTOCOL_VAL_NONSASL = "nonsasl";
+	public static final String REALM_KEY = "realm";
 
 	/**
 	 * Property key name for <code>otherAuth</code> method call. It is used to provide
@@ -77,38 +107,11 @@ public interface AuthRepository {
 
 	/**
 	 * Property key name for <code>otherAuth</code> method call. It is used to provide
-	 * desired authentication mechanism to the authentication logic.
-	 */
-	public static final String MACHANISM_KEY = "mechanism";
-
-	/**
-	 * Property key name for <code>otherAuth</code> method call. It is used to provide
-	 * authentication realm to the authentication logic. In most cases, the realm is just
-	 * a domain name.
-	 */
-	public static final String REALM_KEY = "realm";
-
-	/**
-	 * Property key name for <code>otherAuth</code> method call. It is used to provide
 	 * authentication domain to the authentication logic. It is highly recommended that this
 	 * property is always set, even if the authentication protocol/mechanism does not need it
 	 * strictly.
 	 */
 	public static final String SERVER_NAME_KEY = "server-name";
-	
-	public static final String USERNAME_KEY = "username";
-	public static final String PASSWORD_KEY = "password";
-	public static final String DIGEST_KEY = "digest";
-	public static final String DIGEST_ID_KEY = "digest-id";
-
-	/**
-	 * Property key name for <code>otherAuth</code> method call. It is used to provide an
-	 * extra authentication data by the client to the authentication logic.
-	 * Please note the <code>RESULT_KEY</code> property key is used to provide authentication
-	 * data from the server to the client. This property is used to provide authentication data
-	 * from the client to the server.
-	 */
-	public static final String DATA_KEY = "data";
 
 	/**
 	 * Property key name for <code>otherAuth</code> method call. It is used to provide a user
@@ -116,6 +119,9 @@ public interface AuthRepository {
 	 * <code>BareJID</code> type.
 	 */
 	public static final String USER_ID_KEY = "user-id";
+
+	/** Field description */
+	public static final String USERNAME_KEY = "username";
 
 	//~--- methods --------------------------------------------------------------
 
@@ -127,7 +133,8 @@ public interface AuthRepository {
 	 * @exception UserExistsException if an error occurs
 	 * @exception TigaseDBException if an error occurs
 	 */
-	void addUser(BareJID user, String password) throws UserExistsException, TigaseDBException;
+	void addUser(BareJID user, String password)
+					throws UserExistsException, TigaseDBException;
 
 	/**
 	 * <code>digestAuth</code> method performs non-sasl, digest authentication
@@ -153,7 +160,7 @@ public interface AuthRepository {
 	 */
 	@Deprecated
 	boolean digestAuth(BareJID user, String digest, String id, String alg)
-			throws UserNotFoundException, TigaseDBException, AuthorizationException;
+					throws UserNotFoundException, TigaseDBException, AuthorizationException;
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -194,7 +201,8 @@ public interface AuthRepository {
 	 * @exception DBInitException if an error occurs during access database. It won't
 	 * happen however as in this method we do simple variable assigment.
 	 */
-	void initRepository(String resource_uri, Map<String, String> params) throws DBInitException;
+	void initRepository(String resource_uri, Map<String, String> params)
+					throws DBInitException;
 
 	/**
 	 * Describe <code>logout</code> method here.
@@ -207,7 +215,7 @@ public interface AuthRepository {
 
 	/**
 	 * Describe <code>otherAuth</code> method here.
-	 * 
+	 *
 	 * @param authProps
 	 *            a <code>Map</code> value
 	 * @return a <code>boolean</code> value
@@ -217,14 +225,10 @@ public interface AuthRepository {
 	 *                if an error occurs
 	 * @exception AuthorizationException
 	 *                if an error occurs
-	 * 
-	 * @deprecated use method
-	 *             {@linkplain AuthRepository#plainAuth(BareJID, String)}
-	 *             because this method is used by default CallbackHandler with
-	 *             SASL.
+	 *
 	 */
-	@Deprecated
-	boolean otherAuth(Map<String, Object> authProps) throws UserNotFoundException, TigaseDBException, AuthorizationException;
+	boolean otherAuth(Map<String, Object> authProps)
+					throws UserNotFoundException, TigaseDBException, AuthorizationException;
 
 	/**
 	 * <code>plainAuth</code> method performs non-sasl, plain authentication
@@ -241,9 +245,14 @@ public interface AuthRepository {
 	 * database;
 	 * @exception AuthorizationException if an error occurs during authentication
 	 * process.
+	 * @deprecated use method
+	 *             {@linkplain AuthRepository#otherAuth(Map)}
+	 *             because this method is preferred. In a long term plans all authentication
+	 *             methods should use otherAuth(...) calls.
 	 */
+	@Deprecated
 	boolean plainAuth(BareJID user, String password)
-			throws UserNotFoundException, TigaseDBException, AuthorizationException;
+					throws UserNotFoundException, TigaseDBException, AuthorizationException;
 
 	/**
 	 * <code>queryAuth</code> returns mechanisms available for authentication.
@@ -270,5 +279,8 @@ public interface AuthRepository {
 	 * @exception TigaseDBException if an error occurs
 	 */
 	void updatePassword(BareJID user, String password)
-			throws UserNotFoundException, TigaseDBException;
+					throws UserNotFoundException, TigaseDBException;
 }    // AuthRepository
+
+
+//~ Formatted in Tigase Code Convention on 13/02/20

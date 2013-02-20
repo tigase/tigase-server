@@ -28,6 +28,7 @@ package tigase.server.bosh;
 
 import tigase.server.Iq;
 import tigase.server.Message;
+import tigase.server.Packet;
 
 import tigase.xml.Element;
 
@@ -142,9 +143,9 @@ public class BoshSessionCache {
 			return;
 		}
 
-		String jid = message.getAttribute("from");
+		String jid = message.getAttributeStaticStr(Packet.FROM_ATT);
 
-		addMsgBody(jid, "from", body);
+		addMsgBody(jid, Packet.FROM_ATT, body);
 	}
 
 	/**
@@ -154,7 +155,7 @@ public class BoshSessionCache {
 	 * @param presence
 	 */
 	public void addPresence(Element presence) {
-		String from = presence.getAttribute("from");
+		String from = presence.getAttributeStaticStr(Packet.FROM_ATT);
 
 		jid_presence.put(from, presence);
 		if (log.isLoggable(Level.FINEST)) {
@@ -173,7 +174,7 @@ public class BoshSessionCache {
 		// Pushing roster with 'result' packet type will not work
 		Element roster_mod = roster.clone();
 
-		roster_mod.setAttribute("type", "set");
+		roster_mod.setAttribute(Packet.TYPE_ATT, "set");
 		add(ROSTER_ID, Arrays.asList(roster_mod));
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("ADD_ROSTER, ROSTER: " + roster_mod.toString());
@@ -193,9 +194,9 @@ public class BoshSessionCache {
 			return;
 		}
 
-		String jid = message.getAttribute("to");
+		String jid = message.getAttributeStaticStr(Packet.TO_ATT);
 
-		addMsgBody(jid, "to", body);
+		addMsgBody(jid, Packet.TO_ATT, body);
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -370,4 +371,4 @@ public class BoshSessionCache {
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/19
+//~ Formatted in Tigase Code Convention on 13/02/20
