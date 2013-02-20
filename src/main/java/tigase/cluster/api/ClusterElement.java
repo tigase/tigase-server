@@ -1,10 +1,13 @@
 /*
- *   Tigase Jabber/XMPP Server
- *  Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * ClusterElement.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,12 +18,13 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
 
+
+
 package tigase.cluster.api;
+
+//~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.Packet;
 
@@ -29,22 +33,24 @@ import tigase.xml.Element;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
+//~--- JDK imports ------------------------------------------------------------
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Class ClusterElement is a utility class for handling tigase cluster specific
  * packets. The cluster packet has the following form:
- * 
+ *
  * <pre>
  * <cluster xmlns="tigase:cluster" from="source" to="dest" type="set">
  *   <data>
@@ -69,26 +75,17 @@ import java.util.logging.Logger;
  *   </control>
  * </cluster>
  * </pre>
- * 
+ *
  * If none of nodes could process the packet it goes back to the first node as
  * this node is the most likely to process the packet correctly.
- * 
- * 
+ *
+ *
  * Created: Fri May 2 09:40:40 2008
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class ClusterElement {
-
-	/** Field description */
-	public static final String XMLNS = "tigase:cluster";
-
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
-	private static final Logger log = Logger.getLogger("tigase.cluster.ClusterElement");
-
 	/** Field description */
 	public static final String CLUSTER_CONTROL_EL_NAME = "control";
 
@@ -123,65 +120,77 @@ public class ClusterElement {
 	public static final String VISITED_NODES_EL_NAME = "visited-nodes";
 
 	/** Field description */
-	public static final String CLUSTER_CONTROL_PATH = "/" + CLUSTER_EL_NAME + "/"
-			+ CLUSTER_CONTROL_EL_NAME;
+	public static final String XMLNS = "tigase:cluster";
+
+	/**
+	 * Variable <code>log</code> is a class logger.
+	 */
+	private static final Logger log = Logger.getLogger("tigase.cluster.ClusterElement");
 
 	/** Field description */
-	public static final String CLUSTER_METHOD_PATH = CLUSTER_CONTROL_PATH + "/"
-			+ CLUSTER_METHOD_EL_NAME;
-
-	/** Field description */
-	public static final String VISITED_NODES_PATH = CLUSTER_CONTROL_PATH + "/"
-			+ VISITED_NODES_EL_NAME;
+	public static final String VISITED_NODES_PATH = CLUSTER_CONTROL_PATH + "/" +
+																									VISITED_NODES_EL_NAME;
 
 	// public static final String PACKET_FROM_ATTR_NAME = "packet-from";
 
 	/** Field description */
-	public static final String FIRST_NODE_PATH = CLUSTER_CONTROL_PATH + "/"
-			+ FIRST_NODE_EL_NAME;
+	public static final String FIRST_NODE_PATH = CLUSTER_CONTROL_PATH + "/" +
+																							 FIRST_NODE_EL_NAME;
 
 	/** Field description */
-	public static final String CLUSTER_METHOD_RESULTS_PATH = CLUSTER_METHOD_PATH + "/"
-			+ CLUSTER_METHOD_RESULTS_EL_NAME;
+	public static final String CLUSTER_METHOD_RESULTS_PATH = CLUSTER_METHOD_PATH + "/" +
+																													 CLUSTER_METHOD_RESULTS_EL_NAME;
 
 	/** Field description */
-	public static final String CLUSTER_DATA_PATH = "/" + CLUSTER_EL_NAME + "/"
-			+ CLUSTER_DATA_EL_NAME;
+	public static final String CLUSTER_METHOD_PATH = CLUSTER_CONTROL_PATH + "/" +
+																									 CLUSTER_METHOD_EL_NAME;
 
-	private Element elem = null;
-	private JID first_node = null;
-	private String method_name = null;
-	private Map<String, String> method_params = null;
+	/** Field description */
+	public static final String CLUSTER_DATA_PATH = "/" + CLUSTER_EL_NAME + "/" +
+																								 CLUSTER_DATA_EL_NAME;
+
+	/** Field description */
+	public static final String CLUSTER_CONTROL_PATH = "/" + CLUSTER_EL_NAME + "/" +
+																										CLUSTER_CONTROL_EL_NAME;
+
+	//~--- fields ---------------------------------------------------------------
+
+	private Element elem                       = null;
+	private JID first_node                     = null;
+	private String method_name                 = null;
+	private Map<String, String> method_params  = null;
 	private Map<String, String> method_results = null;
-	private Queue<Element> packets = null;
-	private Set<JID> visited_nodes = null;
+	private Queue<Element> packets             = null;
+	private Set<JID> visited_nodes             = null;
+
+	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>ClusterElement</code> instance.
-	 * 
-	 * 
+	 *
+	 *
 	 * @param elem
 	 */
 	public ClusterElement(Element elem) {
 		this.elem = elem;
-
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Parsing cluster element: " + elem.toString());
 		}
 
 		List<Element> children = elem.getChildren(CLUSTER_DATA_PATH);
-		if (children != null && children.size() > 0) {
+
+		if ((children != null) && (children.size() > 0)) {
 			packets = new ArrayDeque<Element>(children);
 		}
+
 		String fNode = elem.getCData(FIRST_NODE_PATH);
+
 		if (fNode != null) {
 			first_node = JID.jidInstanceNS(fNode);
 		}
-
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("First node found: " + first_node);
 		}
-
 		visited_nodes = new LinkedHashSet<JID>();
 
 		List<Element> nodes = elem.getChildren(VISITED_NODES_PATH);
@@ -193,7 +202,6 @@ public class ClusterElement {
 				visited_nodes.add(JID.jidInstanceNS(node.getCData()));
 				++cnt;
 			}
-
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Found and added visited nodes: " + cnt);
 			}
@@ -212,8 +220,8 @@ public class ClusterElement {
 
 	/**
 	 * Constructs ...
-	 * 
-	 * 
+	 *
+	 *
 	 * @param from
 	 * @param to
 	 * @param type
@@ -221,53 +229,53 @@ public class ClusterElement {
 	 */
 	public ClusterElement(JID from, JID to, StanzaType type, Packet packet) {
 		if (packet != null) {
-			packets = new ArrayDeque<Element>();
+			packets       = new ArrayDeque<Element>();
 			visited_nodes = new LinkedHashSet<JID>();
-			elem = createClusterElement(from, to, type, packet.getFrom().toString());
-
+			elem          = createClusterElement(from, to, type, packet.getFrom().toString());
 			if (packet.getElement().getXMLNS() == null) {
 				packet.getElement().setXMLNS("jabber:client");
 			}
-
 			addDataPacket(packet);
 		}
 	}
 
+	//~--- methods --------------------------------------------------------------
+
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param from
 	 * @param to
 	 * @param type
-	 * 
+	 *
 	 * @return
 	 */
 	public static Element clusterElement(JID from, JID to, StanzaType type) {
-		Element cluster_el =
-				new Element(CLUSTER_EL_NAME, new String[] { "from", "to", "type" }, new String[] {
-						from.toString(), to.toString(), type.toString() });
+		Element cluster_el = new Element(CLUSTER_EL_NAME, new String[] { "from", "to",
+						"type" }, new String[] { from.toString(), to.toString(), type.toString() });
 
 		cluster_el.setXMLNS(XMLNS);
-		cluster_el.addChild(new Element(CLUSTER_CONTROL_EL_NAME, new Element[] { new Element(
-				VISITED_NODES_EL_NAME) }, null, null));
+		cluster_el.addChild(new Element(CLUSTER_CONTROL_EL_NAME,
+																		new Element[] { new Element(VISITED_NODES_EL_NAME) },
+																		null, null));
 
 		return cluster_el;
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param from
 	 * @param to
 	 * @param type
 	 * @param packet_from
-	 * 
+	 *
 	 * @return
 	 */
 	public static Element createClusterElement(JID from, JID to, StanzaType type,
-			String packet_from) {
+					String packet_from) {
 		Element cluster_el = clusterElement(from, to, type);
 
 		cluster_el.addChild(new Element(CLUSTER_DATA_EL_NAME));
@@ -278,30 +286,30 @@ public class ClusterElement {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param from
 	 * @param to
 	 * @param type
 	 * @param method_name
 	 * @param params
-	 * 
+	 *
 	 * @return
 	 */
 	public static ClusterElement createClusterMethodCall(JID from, JID to, StanzaType type,
-			String method_name, Map<String, String> params) {
-		Element cluster_el = clusterElement(from, to, type);
-		Element method_call =
-				new Element(CLUSTER_METHOD_EL_NAME, new String[] { CLUSTER_NAME_ATTR },
-						new String[] { method_name });
+					String method_name, Map<String, String> params) {
+		Element cluster_el  = clusterElement(from, to, type);
+		Element method_call = new Element(CLUSTER_METHOD_EL_NAME,
+																			new String[] { CLUSTER_NAME_ATTR },
+																			new String[] { method_name });
 
 		if (params != null) {
 			for (Map.Entry<String, String> entry : params.entrySet()) {
 				method_call.addChild(new Element(CLUSTER_METHOD_PAR_EL_NAME, entry.getValue(),
-						new String[] { CLUSTER_NAME_ATTR }, new String[] { entry.getKey() }));
+																				 new String[] { CLUSTER_NAME_ATTR },
+																				 new String[] { entry.getKey() }));
 			}
 		}
-
 		cluster_el.findChild(CLUSTER_CONTROL_PATH).addChild(method_call);
 
 		ClusterElement result_cl = new ClusterElement(cluster_el);
@@ -313,28 +321,27 @@ public class ClusterElement {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param clel
 	 * @param cluster_nodes
 	 * @param comp_id
-	 * 
+	 *
 	 * @return
 	 */
 	public static ClusterElement createForNextNode(ClusterElement clel,
-			List<JID> cluster_nodes, JID comp_id) {
+					List<JID> cluster_nodes, JID comp_id) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Calculating a next node from nodes: "
-					+ ((cluster_nodes != null) ? cluster_nodes.toString() : "null"));
+			log.finest("Calculating a next node from nodes: " + ((cluster_nodes != null)
+							? cluster_nodes.toString()
+							: "null"));
 		}
-
 		if ((cluster_nodes != null) && (cluster_nodes.size() > 0)) {
 			JID next_node = null;
 
 			for (JID cluster_node : cluster_nodes) {
-				if (!clel.isVisitedNode(cluster_node) && !cluster_node.equals(comp_id)) {
+				if (!clel.isVisitedNode(cluster_node) &&!cluster_node.equals(comp_id)) {
 					next_node = cluster_node;
-
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("Found next cluster node: " + next_node);
 					}
@@ -342,7 +349,6 @@ public class ClusterElement {
 					break;
 				}
 			}
-
 			if (next_node != null) {
 				ClusterElement result = clel.nextClusterNode(next_node);
 
@@ -357,8 +363,8 @@ public class ClusterElement {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param packet
 	 */
 	public void addDataPacket(Packet packet) {
@@ -367,24 +373,27 @@ public class ClusterElement {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param packet
 	 */
 	public void addDataPacket(Element packet) {
 		if (packets == null) {
 			packets = new ArrayDeque<Element>();
 		}
-
 		packets.offer(packet);
-
 		if (elem.findChild(CLUSTER_DATA_PATH) == null) {
 			elem.addChild(new Element(CLUSTER_DATA_EL_NAME));
 		}
-
 		elem.findChild(CLUSTER_DATA_PATH).addChild(packet);
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packets
+	 */
 	public void addDataPackets(Queue<Element> packets) {
 		if (packets != null) {
 			for (Element elem : packets) {
@@ -395,8 +404,8 @@ public class ClusterElement {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param key
 	 * @param val
 	 */
@@ -407,36 +416,38 @@ public class ClusterElement {
 			res = new Element(CLUSTER_METHOD_RESULTS_EL_NAME);
 			elem.findChild(CLUSTER_METHOD_PATH).addChild(res);
 		}
-
 		res.addChild(new Element(CLUSTER_METHOD_RESULTS_VAL_EL_NAME, val,
-				new String[] { CLUSTER_NAME_ATTR }, new String[] { key }));
-
+														 new String[] { CLUSTER_NAME_ATTR }, new String[] { key }));
 		if (method_results == null) {
 			method_results = new LinkedHashMap<String, String>();
 		}
-
 		method_results.put(key, val);
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param node_id
 	 */
 	public void addVisitedNode(JID node_id) {
 		if (visited_nodes.size() == 0) {
 			first_node = node_id;
-			elem.findChild(CLUSTER_CONTROL_PATH).addChild(
-					new Element(FIRST_NODE_EL_NAME, node_id.toString()));
+			elem.findChild(CLUSTER_CONTROL_PATH).addChild(new Element(FIRST_NODE_EL_NAME,
+							node_id.toString()));
 		}
-
 		if (visited_nodes.add(node_id)) {
-			elem.findChild(VISITED_NODES_PATH).addChild(
-					new Element(NODE_ID_EL_NAME, node_id.toString()));
+			elem.findChild(VISITED_NODES_PATH).addChild(new Element(NODE_ID_EL_NAME,
+							node_id.toString()));
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param nodes
+	 */
 	public void addVisitedNodes(Set<JID> nodes) {
 		if (nodes != null) {
 			for (JID node : nodes) {
@@ -447,36 +458,38 @@ public class ClusterElement {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param from
 	 * @param type
 	 * @param results
-	 * 
+	 *
 	 * @return
 	 */
 	public ClusterElement createMethodResponse(JID from, StanzaType type,
-			Map<String, String> results) {
+					Map<String, String> results) {
 		return createMethodResponse(from, null, type, results);
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param from
 	 * @param to
 	 * @param type
 	 * @param results
-	 * 
+	 *
 	 * @return
 	 */
 	public ClusterElement createMethodResponse(JID from, JID to, StanzaType type,
-			Map<String, String> results) {
+					Map<String, String> results) {
 		Element result_el = elem.clone();
 
 		result_el.setAttribute("from", from.toString());
-		result_el.setAttribute("to", ((to != null) ? to.toString() : first_node.toString()));
+		result_el.setAttribute("to", ((to != null)
+																	? to.toString()
+																	: first_node.toString()));
 		result_el.setAttribute("type", type.name());
 
 		Element res = new Element(CLUSTER_METHOD_RESULTS_EL_NAME);
@@ -494,10 +507,12 @@ public class ClusterElement {
 		return result_cl;
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public Map<String, String> getAllMethodParams() {
@@ -506,8 +521,8 @@ public class ClusterElement {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public Map<String, String> getAllMethodResults() {
@@ -516,19 +531,22 @@ public class ClusterElement {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
+	 *
+	 * @param id
 	 * @return
 	 */
 	public Element getClusterElement(String id) {
 		elem.setAttribute("id", id);
+
 		return elem;
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public Queue<Element> getDataPackets() {
@@ -537,8 +555,8 @@ public class ClusterElement {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public JID getFirstNode() {
@@ -547,8 +565,8 @@ public class ClusterElement {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public String getMethodName() {
@@ -557,23 +575,25 @@ public class ClusterElement {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param par_name
-	 * 
+	 *
 	 * @return
 	 */
 	public String getMethodParam(String par_name) {
-		return (method_params == null) ? null : method_params.get(par_name);
+		return (method_params == null)
+					 ? null
+					 : method_params.get(par_name);
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param par_name
 	 * @param def
-	 * 
+	 *
 	 * @return
 	 */
 	public long getMethodParam(String par_name, long def) {
@@ -592,23 +612,25 @@ public class ClusterElement {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param val_name
-	 * 
+	 *
 	 * @return
 	 */
 	public String getMethodResultVal(String val_name) {
-		return (method_results == null) ? null : method_results.get(val_name);
+		return (method_results == null)
+					 ? null
+					 : method_results.get(val_name);
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param val_name
 	 * @param def
-	 * 
+	 *
 	 * @return
 	 */
 	public long getMethodResultVal(String val_name, long def) {
@@ -627,8 +649,8 @@ public class ClusterElement {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public Set<JID> getVisitedNodes() {
@@ -637,27 +659,29 @@ public class ClusterElement {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param node_id
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean isVisitedNode(JID node_id) {
 		return visited_nodes.contains(node_id);
 	}
 
+	//~--- methods --------------------------------------------------------------
+
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param node_id
-	 * 
+	 *
 	 * @return
 	 */
 	public ClusterElement nextClusterNode(JID node_id) {
 		Element next_el = elem.clone();
-		String from = elem.getAttribute("to");
+		String from     = elem.getAttribute("to");
 
 		next_el.setAttribute("from", from);
 		next_el.setAttribute("to", node_id.toString());
@@ -668,13 +692,17 @@ public class ClusterElement {
 		return next_cl;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param method_call
+	 */
 	protected void parseMethodCall(Element method_call) {
 		method_name = method_call.getAttribute(CLUSTER_NAME_ATTR);
-
 		if (method_name != null) {
 			method_name = method_name.intern();
 		}
-
 		method_params = new LinkedHashMap<String, String>();
 
 		List<Element> children = method_call.getChildren();
@@ -686,7 +714,6 @@ public class ClusterElement {
 
 					method_params.put(par_name, child.getCData());
 				}
-
 				if (child.getName() == CLUSTER_METHOD_RESULTS_EL_NAME) {
 					if (method_results == null) {
 						method_results = new LinkedHashMap<String, String>();
@@ -708,3 +735,6 @@ public class ClusterElement {
 		}
 	}
 }
+
+
+//~ Formatted in Tigase Code Convention on 13/02/19
