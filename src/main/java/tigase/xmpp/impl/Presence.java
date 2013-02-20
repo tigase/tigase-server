@@ -6,7 +6,8 @@
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -442,9 +443,10 @@ public class Presence
 	public static void updatePresenceChange(Packet presence,
 					XMPPResourceConnection session, Queue<Packet> results)
 					throws NotAuthorizedException {
-		boolean initial_p = ((presence.getAttribute("type") == null) ||
-												 "available".equals(presence.getAttribute("type")) ||
-												 "unavailable".equals(presence.getAttribute("type")));
+		boolean initial_p =
+			((presence.getAttributeStaticStr(Packet.TYPE_ATT) == null) ||
+			 "available".equals(presence.getAttributeStaticStr(Packet.TYPE_ATT)) ||
+			 "unavailable".equals(presence.getAttributeStaticStr(Packet.TYPE_ATT)));
 
 		for (XMPPResourceConnection conn : session.getActiveSessions()) {
 
@@ -1098,8 +1100,9 @@ public class Presence
 					// we have to generate it on our own.
 					Element pres = session.getPresence();
 
-					if (!StanzaType.unavailable.toString().equals(pres.getAttribute("type"))) {
-						pres.setAttribute("type", StanzaType.unavailable.toString());
+					if (!StanzaType.unavailable.toString().equals(
+									pres.getAttributeStaticStr(Packet.TYPE_ATT))) {
+						pres.setAttribute(Packet.TYPE_ATT, StanzaType.unavailable.toString());
 						session.setPresence(pres);
 					}
 					broadcastOffline(session, results, settings, roster_util);
@@ -1886,4 +1889,4 @@ public class Presence
 }    // Presence
 
 
-//~ Formatted in Tigase Code Convention on 13/02/16
+//~ Formatted in Tigase Code Convention on 13/02/20

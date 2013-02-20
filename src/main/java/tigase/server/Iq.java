@@ -325,7 +325,7 @@ public class Iq
 
 		if (child != null) {
 			cmd        = true;
-			strCommand = child.getAttribute("node");
+			strCommand = child.getAttributeStaticStr("node");
 			command    = Command.valueof(strCommand);
 		}
 		serviceDisco = (isXMLNSStaticStr(IQ_QUERY_PATH, XMPPService.INFO_XMLNS) ||

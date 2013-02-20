@@ -96,10 +96,10 @@ import tigase.xmpp.impl.PresenceCapabilitiesManager;
 
 /**
  * Class SessionManager
- * 
- * 
+ *
+ *
  * Created: Tue Nov 22 07:07:11 2005
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
@@ -168,10 +168,10 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param jid
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -181,10 +181,10 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param jid
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -202,10 +202,10 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param params
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -219,8 +219,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -230,8 +230,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -241,10 +241,10 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param from
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -269,12 +269,12 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param node
 	 * @param jid
 	 * @param from
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -316,10 +316,10 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param jid
-	 * 
+	 *
 	 * @return
 	 */
 	public XMPPResourceConnection getResourceConnection(JID jid) {
@@ -354,8 +354,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param list
 	 */
 	@Override
@@ -427,8 +427,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param userId
 	 * @param conn
 	 */
@@ -445,8 +445,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param userId
 	 * @param conn
 	 */
@@ -477,8 +477,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param conn
 	 */
 	@Override
@@ -487,8 +487,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param conn
 	 */
 	@Override
@@ -497,8 +497,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -508,8 +508,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -519,8 +519,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param binds
 	 */
 	@Override
@@ -534,11 +534,11 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param domain
 	 * @param includeComponents
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -552,8 +552,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param packet
 	 */
 	@Override
@@ -580,8 +580,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	@Override
@@ -596,8 +596,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param name
 	 */
 	@Override
@@ -608,8 +608,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param props
 	 */
 	@Override
@@ -776,7 +776,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 			for (String plug_id : plugins) {
                                 keys.remove(plug_id);
-                                
+
 				log.log(Level.CONFIG, "Loading and configuring plugin: {0}", plug_id);
 
 				XMPPImplIfc plugin = addPlugin(plug_id, plugins_concurrency.get(plug_id));
@@ -806,7 +806,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
                 for (String key : keys) {
                         removePlugin(key);
                 }
-                
+
 		smResourceConnection =
 				new SMResourceConnection(null, user_repository, auth_repository, this);
 		registerNewSession(getComponentId().getBareJID(), smResourceConnection);
@@ -814,8 +814,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public boolean skipPrivacy() {
@@ -1124,6 +1124,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		return false;
 	}
 
+	@SuppressWarnings("deprecation")
 	protected XMPPResourceConnection loginUserSession(JID conn_id, String domain,
 			BareJID user_id, String resource, String xmpp_sessionId) {
 		try {
@@ -1832,12 +1833,12 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
                 if (result != null) {
                         allPlugins.add(result);
-                        
+
                         if (result instanceof PresenceCapabilitiesManager.PresenceCapabilitiesListener) {
                                 PresenceCapabilitiesManager.registerPresenceHandler((PresenceCapabilitiesManager.PresenceCapabilitiesListener) result);
                         }
                 }
-                
+
 		return result;
 	}
 
@@ -1866,12 +1867,12 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
                         p = stopListeners.remove(plug_id);
                         allPlugins.remove(p);
                 }
-                
+
                 if (p != null && p instanceof PresenceCapabilitiesManager.PresenceCapabilitiesListener) {
                         PresenceCapabilitiesManager.unregisterPresenceHandler((PresenceCapabilitiesManager.PresenceCapabilitiesListener) p);
                 }
         }
-        
+
 	private List<Element> getFeatures(XMPPResourceConnection session) {
 		List<Element> results = new LinkedList<Element>();
 
@@ -1929,7 +1930,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 				}
 			}
 		}
-                
+
                 plugin_settings.put("sm-jid", getComponentId());
 
 		return plugin_settings;
@@ -2025,7 +2026,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 		/**
 		 * Method description
-		 * 
+		 *
 		 */
 		@Override
 		public void run() {
@@ -2053,8 +2054,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 		/**
 		 * Method description
-		 * 
-		 * 
+		 *
+		 *
 		 * @param packet
 		 * @param response
 		 */
@@ -2074,8 +2075,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 		/**
 		 * Method description
-		 * 
-		 * 
+		 *
+		 *
 		 * @param packet
 		 */
 		@Override
@@ -2093,8 +2094,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 		/**
 		 * Method description
-		 * 
-		 * 
+		 *
+		 *
 		 * @return
 		 */
 		@Override
@@ -2104,8 +2105,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 		/**
 		 * Method description
-		 * 
-		 * 
+		 *
+		 *
 		 * @return
 		 */
 		@Override
@@ -2115,14 +2116,14 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 		/**
 		 * Method description
-		 * 
-		 * 
+		 *
+		 *
 		 * @param packet
 		 * @param session
 		 * @param repo
 		 * @param results
 		 * @param settings
-		 * 
+		 *
 		 * @throws XMPPException
 		 */
 		@Override
@@ -2144,9 +2145,9 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 		/**
 		 * Method description
-		 * 
-		 * 
-		 * 
+		 *
+		 *
+		 *
 		 * @return
 		 */
 		@Override
@@ -2160,8 +2161,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 		/**
 		 * Method description
-		 * 
-		 * 
+		 *
+		 *
 		 * @param item
 		 */
 		@Override
@@ -2191,8 +2192,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 		/**
 		 * Method description
-		 * 
-		 * 
+		 *
+		 *
 		 * @return
 		 */
 		@Override
@@ -2202,8 +2203,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 		/**
 		 * Method description
-		 * 
-		 * 
+		 *
+		 *
 		 * @return
 		 */
 		@Override
@@ -2213,14 +2214,14 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 		/**
 		 * Method description
-		 * 
-		 * 
+		 *
+		 *
 		 * @param packet
 		 * @param session
 		 * @param repo
 		 * @param results
 		 * @param settings
-		 * 
+		 *
 		 * @throws XMPPException
 		 */
 		@Override
@@ -2239,8 +2240,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 		/**
 		 * Method description
-		 * 
-		 * 
+		 *
+		 *
 		 * @return
 		 */
 		@Override
@@ -2250,8 +2251,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 		/**
 		 * Method description
-		 * 
-		 * 
+		 *
+		 *
 		 * @return
 		 */
 		@Override
@@ -2261,14 +2262,14 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 		/**
 		 * Method description
-		 * 
-		 * 
+		 *
+		 *
 		 * @param packet
 		 * @param session
 		 * @param repo
 		 * @param results
 		 * @param settings
-		 * 
+		 *
 		 * @throws XMPPException
 		 */
 		@Override

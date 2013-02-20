@@ -510,7 +510,7 @@ public class JabberIqRoster
 				Element element = it.next();
 
 				try {
-					JID jid = JID.jidInstance(element.getAttribute("jid"));
+					JID jid = JID.jidInstance(element.getAttributeStaticStr("jid"));
 
 					if (roster_util.containsBuddy(session, jid)) {
 						roster_util.setBuddySubscription(session, SubscriptionType.both, jid);
@@ -525,7 +525,7 @@ public class JabberIqRoster
 				} catch (TigaseStringprepException ex) {
 					log.log(Level.INFO,
 									"JID from dynamic roster is incorrect, stringprep failed for: {0}",
-									element.getAttribute("jid"));
+									element.getAttributeStaticStr("jid"));
 					it.remove();
 				}
 			}
@@ -672,7 +672,7 @@ public class JabberIqRoster
 				// This however seems to make no much sense and actually was
 				// requested by many users to allow for multiple items
 				for (Element item : items) {
-					JID buddy = JID.jidInstance(item.getAttribute("jid"));
+					JID buddy = JID.jidInstance(item.getAttributeStaticStr("jid"));
 
 					if (DynamicRoster.getBuddyItem(session, settings, buddy) != null) {
 
@@ -693,7 +693,7 @@ public class JabberIqRoster
 						return;
 					}
 
-					String subscription = item.getAttribute("subscription");
+					String subscription = item.getAttributeStaticStr("subscription");
 
 					if ((subscription != null) && subscription.equals("remove")) {
 						SubscriptionType sub = roster_util.getBuddySubscription(session, buddy);
@@ -702,18 +702,18 @@ public class JabberIqRoster
 							sub = SubscriptionType.none;
 						}
 
-						String type = item.getAttribute("type");
+						String type = item.getAttributeStaticStr(Packet.TYPE_ATT);
 
 						if ((sub != SubscriptionType.none) && ((type == null) ||!type.equals(ANON))) {
 
 							// Unavailable presence should be sent first, otherwise it will be
 							// blocked by the server after the subscription is canceled
-							Element pres = new Element("presence");
+							Element pres = new Element(Presence.PRESENCE_ELEMENT_NAME);
 
 							pres.setXMLNS(CLIENT_XMLNS);
-							pres.setAttribute("to", buddy.toString());
-							pres.setAttribute("from", session.getJID().toString());
-							pres.setAttribute("type", "unavailable");
+							pres.setAttribute(Packet.TO_ATT, buddy.toString());
+							pres.setAttribute(Packet.FROM_ATT, session.getJID().toString());
+							pres.setAttribute(Packet.TYPE_ATT, "unavailable");
 
 							Packet pres_packet = Packet.packetInstance(pres, session.getJID(), buddy);
 
@@ -722,18 +722,18 @@ public class JabberIqRoster
 							// to make sure it is delivered before subscription cancellation
 							pres_packet.setPriority(Priority.HIGH);
 							results.offer(pres_packet);
-							pres = new Element("presence");
+							pres = new Element(Presence.PRESENCE_ELEMENT_NAME);
 							pres.setXMLNS(CLIENT_XMLNS);
-							pres.setAttribute("to", buddy.toString());
-							pres.setAttribute("from", session.getBareJID().toString());
-							pres.setAttribute("type", "unsubscribe");
+							pres.setAttribute(Packet.TO_ATT, buddy.toString());
+							pres.setAttribute(Packet.FROM_ATT, session.getBareJID().toString());
+							pres.setAttribute(Packet.TYPE_ATT, "unsubscribe");
 							results.offer(Packet.packetInstance(pres,
 											session.getJID().copyWithoutResource(), buddy));
-							pres = new Element("presence");
+							pres = new Element(Presence.PRESENCE_ELEMENT_NAME);
 							pres.setXMLNS(CLIENT_XMLNS);
-							pres.setAttribute("to", buddy.toString());
-							pres.setAttribute("from", session.getBareJID().toString());
-							pres.setAttribute("type", "unsubscribed");
+							pres.setAttribute(Packet.TO_ATT, buddy.toString());
+							pres.setAttribute(Packet.FROM_ATT, session.getBareJID().toString());
+							pres.setAttribute(Packet.TYPE_ATT, "unsubscribed");
 							results.offer(Packet.packetInstance(pres,
 											session.getJID().copyWithoutResource(), buddy));
 						}    // is in the roster while he isn't. In such a case just ensure the
@@ -746,7 +746,7 @@ public class JabberIqRoster
 						roster_util.removeBuddy(session, buddy);
 						roster_util.updateBuddyChange(session, results, it);
 					} else {
-						String name = item.getAttribute("name");
+						String name = item.getAttributeStaticStr("name");
 
 						// if (name == null) {
 						// name = buddy;
@@ -769,7 +769,7 @@ public class JabberIqRoster
 						}
 						roster_util.addBuddy(session, buddy, name, gr, null);
 
-						String type = item.getAttribute("type");
+						String type = item.getAttributeStaticStr(Packet.TYPE_ATT);
 
 						if ((type != null) && type.equals(ANON)) {
 							roster_util.setBuddySubscription(session, SubscriptionType.both, buddy);
@@ -778,13 +778,13 @@ public class JabberIqRoster
 								(Element) session.getSessionData(XMPPResourceConnection.PRESENCE_KEY);
 
 							if (pres == null) {
-								pres = new Element("presence");
+								pres = new Element(Presence.PRESENCE_ELEMENT_NAME);
 								pres.setXMLNS(CLIENT_XMLNS);
 							} else {
 								pres = pres.clone();
 							}
-							pres.setAttribute("to", buddy.toString());
-							pres.setAttribute("from", session.getJID().toString());
+							pres.setAttribute(Packet.TO_ATT, buddy.toString());
+							pres.setAttribute(Packet.FROM_ATT, session.getJID().toString());
 							results.offer(Packet.packetInstance(pres, session.getJID(), buddy));
 						}
 
@@ -840,7 +840,7 @@ public class JabberIqRoster
 					String jidStr = "@" + packet.getStanzaFrom().getBareJID().toString();
 
 					for (Element ritem : ritems) {
-						if (ritem.getAttribute("jid").endsWith(jidStr)) {
+						if (ritem.getAttributeStaticStr("jid").endsWith(jidStr)) {
 							query.addChild(ritem);
 						}
 					}
@@ -907,4 +907,4 @@ public class JabberIqRoster
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/19
+//~ Formatted in Tigase Code Convention on 13/02/20
