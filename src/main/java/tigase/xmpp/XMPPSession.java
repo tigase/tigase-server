@@ -1,10 +1,13 @@
 /*
+ * XMPPSession.java
+ *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,24 +18,27 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.xmpp;
 
+//~--- non-JDK imports --------------------------------------------------------
+
 import tigase.util.TigaseStringprepException;
+
+//~--- JDK imports ------------------------------------------------------------
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Map;
 
 /**
  * Describe class XMPPSession here.
@@ -44,22 +50,24 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class XMPPSession {
-
 	/**
 	 * Private logger for class instances.
 	 */
-	private static Logger log = Logger.getLogger(XMPPSession.class.getName());
+	private static final Logger log = Logger.getLogger(XMPPSession.class.getName());
+
+	//~--- fields ---------------------------------------------------------------
 
 	private CopyOnWriteArrayList<XMPPResourceConnection> activeResources = null;
-	private long creationTime = 0;
-	private Map<String, Object> sessionData = null;
+	private long creationTime                                            = 0;
+	private long packets_counter                                         = 0;
+	private Map<String, Object> sessionData                              = null;
 
 	/**
 	 * User name - part of user's JID
 	 */
 	private String username = null;
-	private long packets_counter = 0;
 
+	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>XMPPSession</code> instance.
@@ -68,11 +76,13 @@ public class XMPPSession {
 	 * @param username
 	 */
 	public XMPPSession(final String username) {
-		sessionData = new ConcurrentHashMap<String, Object>();
-		activeResources = new CopyOnWriteArrayList<XMPPResourceConnection>();
-		this.username = username;
+		sessionData       = new ConcurrentHashMap<String, Object>();
+		activeResources   = new CopyOnWriteArrayList<XMPPResourceConnection>();
+		this.username     = username;
 		this.creationTime = System.currentTimeMillis();
 	}
+
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * This method is called each time the resource is set for connection.
@@ -81,9 +91,10 @@ public class XMPPSession {
 	 * @throws TigaseStringprepException
 	 */
 	public void addResourceConnection(XMPPResourceConnection conn)
-			throws TigaseStringprepException {
+					throws TigaseStringprepException {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Adding resource connection for username : " + username + ", id: " + conn);
+			log.finest("Adding resource connection for username : " + username + ", id: " +
+								 conn);
 		}
 
 		// There is a bug somewhere which causes to allow for 2 or more connections
@@ -91,14 +102,14 @@ public class XMPPSession {
 		String resource = conn.getResource();
 
 		if (resource != null) {
-			ArrayDeque<XMPPResourceConnection> old_ress = new ArrayDeque<XMPPResourceConnection>();
+			ArrayDeque<XMPPResourceConnection> old_ress =
+				new ArrayDeque<XMPPResourceConnection>();
 
 			for (XMPPResourceConnection act_conn : activeResources) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Resource checking: " + act_conn.getResource() + ", connectionID: "
-							+ act_conn);
+					log.finest("Resource checking: " + act_conn.getResource() +
+										 ", connectionID: " + act_conn);
 				}
-
 				if (resource.equalsIgnoreCase(act_conn.getResource())) {
 					old_ress.add(act_conn);
 				}    // end of if (resource.equals(conn.getResource()))
@@ -114,14 +125,12 @@ public class XMPPSession {
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("Found old resource connection, id: " + old_res);
 					}
-
 					try {
 						old_res.putSessionData(XMPPResourceConnection.ERROR_KEY, "conflict");
 						old_res.logout();
 					} catch (Exception e) {
 						log.log(Level.INFO, "Exception during closing old connection, ignoring.", e);
 					}
-
 					removeResourceConnection(old_res);
 				}
 			}
@@ -136,15 +145,12 @@ public class XMPPSession {
 		} catch (NoConnectionIdException ex) {
 			old_res = null;
 		}
-
 		if (old_res == null) {
 			activeResources.add(conn);
 			conn.setParentSession(this);
 		}
-
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Number of active resources is: " + activeResources.size());
-
 			if (activeResources.size() > 1) {
 				int i = 0;
 
@@ -155,6 +161,8 @@ public class XMPPSession {
 		}
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	/**
 	 * Method description
 	 *
@@ -162,8 +170,18 @@ public class XMPPSession {
 	 * @return
 	 */
 	@SuppressWarnings({ "unchecked" })
-	public List<XMPPResourceConnection> getActiveResources() {
+	public List<XMPPResourceConnection> getActiveResourcesClone() {
 		return (List<XMPPResourceConnection>) activeResources.clone();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public List<XMPPResourceConnection> getActiveResources() {
+		return (List<XMPPResourceConnection>) activeResources;
 	}
 
 	/**
@@ -194,7 +212,7 @@ public class XMPPSession {
 	 */
 	public JID[] getConnectionIds() {
 		JID[] result = new JID[activeResources.size()];
-		int idx = 0;
+		int idx      = 0;
 
 		for (XMPPResourceConnection conn : activeResources) {
 			try {
@@ -218,7 +236,7 @@ public class XMPPSession {
 	 */
 	public JID[] getJIDs() {
 		JID[] result = new JID[activeResources.size()];
-		int idx = 0;
+		int idx      = 0;
 
 		for (XMPPResourceConnection conn : activeResources) {
 			result[idx++] = conn.getjid();
@@ -249,11 +267,9 @@ public class XMPPSession {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Called for: " + jid);
 		}
-
 		if (activeResources.size() == 0) {
 			return null;
 		}    // end of if (activeResources.size() == 0)
-
 		if (activeResources.size() == 1) {
 			XMPPResourceConnection result = activeResources.get(0);
 
@@ -268,8 +284,8 @@ public class XMPPSession {
 
 		if (conn != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Number of resources: " + activeResources.size()
-						+ ", got resource for jid: " + jid);
+				log.finest("Number of resources: " + activeResources.size() +
+									 ", got resource for jid: " + jid);
 			}
 
 			return conn;
@@ -283,28 +299,26 @@ public class XMPPSession {
 //  int highest_priority = al.get(0).getPriority();
 		int highest_priority = 0;
 
-		for (Iterator<XMPPResourceConnection> it = activeResources.iterator(); it.hasNext(); ) {
+		for (Iterator<XMPPResourceConnection> it =
+						activeResources.iterator(); it.hasNext(); ) {
 			XMPPResourceConnection conn_tmp = it.next();
 
-			if ( !conn_tmp.isAuthorized()) {
-				log.info("Old XMPP connection which is not authorized anymore, removing..."
-						+ conn_tmp);
+			if (!conn_tmp.isAuthorized()) {
+				log.info("Old XMPP connection which is not authorized anymore, removing..." +
+								 conn_tmp);
 				activeResources.remove(conn_tmp);
 			}
-
 			if (conn_tmp.getPriority() == highest_priority) {
 				al.add(conn_tmp);
 
 				continue;
 			}    // end of if (conn_tmp.getPriority() == highest_priority)
-
 			if (conn_tmp.getPriority() > highest_priority) {
 				al.clear();
 				al.add(conn_tmp);
 				highest_priority = conn_tmp.getPriority();
 			}
 		}
-
 		if (al.size() == 1) {
 
 			// We found 1 connection with highest priority
@@ -314,12 +328,12 @@ public class XMPPSession {
 		// We have a few connections with the same highest priority
 		// Let's return the one which was the most recently used.
 		XMPPResourceConnection conn_last = al.get(0);
-		long time = conn_last.getLastAccessed();
+		long time                        = conn_last.getLastAccessed();
 
 		for (int i = 1; i < al.size(); ++i) {
 			if (al.get(i).getLastAccessed() > time) {
 				conn_last = al.get(i);
-				time = conn_last.getLastAccessed();
+				time      = conn_last.getLastAccessed();
 			}    // end of if (al.get(i).getLastAccessed() > time)
 		}
 
@@ -342,7 +356,8 @@ public class XMPPSession {
 				}    // end of if (resource.equals(conn.getResource()))
 			}      // end of for (XMPPResourceConnection conn: activeResources)
 		} catch (NoConnectionIdException ex) {
-			//Logger.getLogger(XMPPSession.class.getName()).log(Level.SEVERE, null, ex);
+
+			// Logger.getLogger(XMPPSession.class.getName()).log(Level.SEVERE, null, ex);
 		}
 
 		return null;
@@ -374,9 +389,9 @@ public class XMPPSession {
 		if ((resource != null) && (resource.length() > 0)) {
 			for (XMPPResourceConnection conn : activeResources) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Resource checking: " + conn.getResource() + ", connectionID: " + conn);
+					log.finest("Resource checking: " + conn.getResource() + ", connectionID: " +
+										 conn);
 				}
-
 				if (resource.equalsIgnoreCase(conn.getResource())) {
 					return conn;
 				}    // end of if (resource.equals(conn.getResource()))
@@ -395,6 +410,8 @@ public class XMPPSession {
 	public String getUserName() {
 		return username;
 	}
+
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -417,32 +434,65 @@ public class XMPPSession {
 		removeResourceConnection(conn);
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param key
+	 * @param value
+	 */
 	protected void putCommonSessionData(String key, Object value) {
 		sessionData.put(key, value);
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param key
+	 *
+	 * @return
+	 */
 	protected Object removeCommonSessionData(String key) {
 		return sessionData.remove(key);
 	}
-	
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
+
 		sb.append("XMPPSession=[");
 		sb.append("username: ").append(username);
 		sb.append(", resources: ").append(activeResources.toString());
 		sb.append("]");
+
 		return sb.toString();
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void incPacketsCounter() {
 		++packets_counter;
 	}
-	
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	public long getPacketsCounter() {
 		return packets_counter;
 	}
-
 }    // XMPPSession
+
+
+//~ Formatted in Tigase Code Convention on 13/02/19

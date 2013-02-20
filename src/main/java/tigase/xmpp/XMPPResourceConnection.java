@@ -6,7 +6,8 @@
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -172,6 +173,7 @@ public class XMPPResourceConnection
 	 *
 	 * @return
 	 *
+	 *
 	 * @throws NotAuthorizedException
 	 */
 	public List<XMPPResourceConnection> getActiveSessions() throws NotAuthorizedException {
@@ -251,8 +253,8 @@ public class XMPPResourceConnection
 		if (this.connectionId == null) {
 			throw new NoConnectionIdException(
 					"Connection ID not set for this session. " +
-					"This is probably the SM session to handle traffic addressed to the server itself." +
-					" Or maybe it's a bug.");
+					"This is probably the SM session to handle traffic " +
+					"addressed to the server itself. Or maybe it's a bug.");
 		}
 
 		return this.connectionId;
@@ -960,4 +962,4 @@ public class XMPPResourceConnection
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/16
+//~ Formatted in Tigase Code Convention on 13/02/19
