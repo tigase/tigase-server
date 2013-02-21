@@ -279,6 +279,9 @@ public interface Configurable extends ServerComponent {
 	public static final String DEF_S2S_NAME = "s2s";
 
 	/** Field description */
+	public static final String DEF_WS2S_NAME = "ws2s";	
+	
+	/** Field description */
 	public static final String DEF_EXT_COMP_NAME = "ext-comp";
 
 	/** Field description */
@@ -409,6 +412,12 @@ public interface Configurable extends ServerComponent {
 	/** Field description */
 	public static final String AMP_CLASS_NAME = "tigase.server.amp.AmpComponent";
 
+	/** Field description */
+	public static final String WS2S_CLASS_NAME = "tigase.server.websocket.WebSocketClientConnectionManager";
+		
+	/** Field description */
+	public static final String WS2S_CLUST_CLASS_NAME = "tigase.cluster.WebSocketClientConnectionClustered";
+		
 	//~--- get methods ----------------------------------------------------------
 
 	/**

@@ -81,11 +81,12 @@ public class MessageRouterConfig {
 	private static final Logger log                                =
 		Logger.getLogger("tigase.server.MessageRouterConfig");
 	private static final String[] DEF_MSG_RECEIVERS_NAMES_PROP_VAL = {
-		DEF_C2S_NAME, DEF_S2S_NAME, DEF_SM_NAME, DEF_BOSH_NAME, DEF_MONITOR_NAME, DEF_AMP_NAME
+		DEF_C2S_NAME, DEF_S2S_NAME, DEF_SM_NAME, DEF_BOSH_NAME, DEF_MONITOR_NAME, 
+		DEF_AMP_NAME, DEF_WS2S_NAME
 	};
 	private static final String[] ALL_MSG_RECEIVERS_NAMES_PROP_VAL = {
 		DEF_C2S_NAME, DEF_S2S_NAME, DEF_SM_NAME, DEF_SSEND_NAME, DEF_SRECV_NAME,
-		DEF_BOSH_NAME, DEF_MONITOR_NAME
+		DEF_BOSH_NAME, DEF_MONITOR_NAME, DEF_WS2S_NAME
 	};
 
 	/** Field description */
@@ -97,7 +98,7 @@ public class MessageRouterConfig {
 					DEF_STATS_NAME };
 	private static final String[] CS_MSG_RECEIVERS_NAMES_PROP_VAL = {
 		DEF_C2S_NAME, DEF_S2S_NAME, DEF_EXT_COMP_NAME, DEF_BOSH_NAME, DEF_MONITOR_NAME,
-		DEF_AMP_NAME
+		DEF_AMP_NAME, DEF_WS2S_NAME
 	};
 	private static final Map<String, String> COMPONENT_CLASSES = new LinkedHashMap<String,
 																																 String>();
@@ -131,18 +132,20 @@ public class MessageRouterConfig {
 		COMPONENT_CLASSES.put(DEF_CL_COMP_NAME, CL_COMP_CLASS_NAME);
 		COMPONENT_CLASSES.put(DEF_SM_NAME, SM_COMP_CLASS_NAME);
 		COMPONENT_CLASSES.put(DEF_SSEND_NAME, SSEND_COMP_CLASS_NAME);
-		COMPONENT_CLASSES.put(DEF_SRECV_NAME, SRECV_COMP_CLASS_NAME);
+		COMPONENT_CLASSES.put(DEF_SRECV_NAME, SRECV_COMP_CLASS_NAME);	
 		COMPONENT_CLASSES.put(DEF_BOSH_NAME, BOSH_COMP_CLASS_NAME);
 		COMPONENT_CLASSES.put(DEF_STATS_NAME, STATS_CLASS_NAME);
 		COMPONENT_CLASSES.put(DEF_CLUST_CONTR_NAME, CLUSTER_CONTR_CLASS_NAME);
 		COMPONENT_CLASSES.put(DEF_VHOST_MAN_NAME, VHOST_MAN_CLASS_NAME);
 		COMPONENT_CLASSES.put(DEF_MONITOR_NAME, MONITOR_CLASS_NAME);
 		COMPONENT_CLASSES.put(DEF_AMP_NAME, AMP_CLASS_NAME);
+		COMPONENT_CLASSES.put(DEF_WS2S_NAME, WS2S_CLASS_NAME);
 		COMP_CLUS_MAP.put(SM_COMP_CLASS_NAME, SM_CLUST_COMP_CLASS_NAME);
 		COMP_CLUS_MAP.put(S2S_COMP_CLASS_NAME, S2S_CLUST_COMP_CLASS_NAME);
 		COMP_CLUS_MAP.put(C2S_COMP_CLASS_NAME, C2S_CLUST_COMP_CLASS_NAME);
 		COMP_CLUS_MAP.put(BOSH_COMP_CLASS_NAME, BOSH_CLUST_COMP_CLASS_NAME);
 		COMP_CLUS_MAP.put(MONITOR_CLASS_NAME, MONITOR_CLUST_CLASS_NAME);
+		COMP_CLUS_MAP.put(DEF_WS2S_NAME, WS2S_CLUST_CLASS_NAME);
 	}
 
 	//~--- fields ---------------------------------------------------------------
@@ -274,7 +277,7 @@ public class MessageRouterConfig {
 			}
 		}
 
-		String[] registr = DEF_REGISTRATOR_NAMES_PROP_VAL;
+		String[] registr = DEF_REGISTRATOR_NAMES_PROP_VAL;	
 
 		if (cluster_mode) {
 			registr = CLUSTER_REGISTRATOR_NAMES_PROP_VAL;
@@ -325,8 +328,8 @@ public class MessageRouterConfig {
 		ServerComponent cls = null;
 
 		cls = ModulesManagerImpl.getInstance().getServerComponent(cls_name);
-		if (cls == null && (!XMPPServer.isOSGi() || COMPONENT_CLASSES.containsKey(cls_name)
-				|| COMP_CLUS_MAP.containsKey(cls_name)) || EXT_COMP_CLASS_NAME.equals(cls_name)) {
+		if (cls == null && (!XMPPServer.isOSGi() || COMPONENT_CLASSES.containsValue(cls_name)
+				|| COMP_CLUS_MAP.containsValue(cls_name)) || EXT_COMP_CLASS_NAME.equals(cls_name)) {
 			cls = (ServerComponent) this.getClass().getClassLoader().loadClass(cls_name).newInstance();
 		}
 
@@ -351,8 +354,8 @@ public class MessageRouterConfig {
 
 		try {
 			cls = ModulesManagerImpl.getInstance().getServerComponentClass(cls_name);
-			if (cls == null && (!XMPPServer.isOSGi() || COMPONENT_CLASSES.containsKey(cls_name)
-					|| COMP_CLUS_MAP.containsKey(cls_name)) || EXT_COMP_CLASS_NAME.equals(cls_name)) {
+			if (cls == null && (!XMPPServer.isOSGi() || COMPONENT_CLASSES.containsValue(cls_name)
+					|| COMP_CLUS_MAP.containsValue(cls_name)) || EXT_COMP_CLASS_NAME.equals(cls_name)) {
 				cls = (Class<? extends ServerComponent>) this.getClass().getClassLoader().loadClass(cls_name);
 			}
 		} catch (Exception ex) {}
@@ -487,7 +490,7 @@ public class MessageRouterConfig {
 				return true;
 			}
 
-                        if (XMPPServer.isOSGi() && !(COMPONENT_CLASSES.containsKey(cls_name) || COMP_CLUS_MAP.containsKey(cls_name)
+                        if (XMPPServer.isOSGi() && !(COMPONENT_CLASSES.containsValue(cls_name) || COMP_CLUS_MAP.containsValue(cls_name)
                                         || EXT_COMP_CLASS_NAME.equals(cls_name))) {
                                 return false;
                         }
