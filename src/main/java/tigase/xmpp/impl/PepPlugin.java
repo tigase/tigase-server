@@ -6,7 +6,8 @@
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -150,15 +151,16 @@ public class PepPlugin
 
 			for (Element element : x) {
 				String action = element.getName();
-				String node   = element.getAttribute("node");
+				String node   = element.getAttributeStaticStr("node");
 
 				if (this.supportedNodes.contains(node)) {
 					if (action == "retract") {
 						Element item    = element.getChild("item", null);
 						Element retract = new Element("retract");
 
-						if (item.getAttribute("id") != null) {
-							retract.addAttribute("id", item.getAttribute("id"));
+						if (item.getAttributeStaticStr(Packet.ID_ATT) != null) {
+							retract.addAttribute(Packet.ID_ATT,
+																	 item.getAttributeStaticStr(Packet.ID_ATT));
 						}
 						processed = true;
 						processPEPPublish(packet, node, retract, session, repo, results, settings);
@@ -349,4 +351,4 @@ public class PepPlugin
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/16
+//~ Formatted in Tigase Code Convention on 13/02/20

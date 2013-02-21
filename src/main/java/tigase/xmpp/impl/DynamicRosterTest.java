@@ -1,10 +1,13 @@
 /*
+ * DynamicRosterTest.java
+ *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.xmpp.impl;
 
@@ -36,11 +38,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Map;
 
 /**
  * Created: Nov 28, 2008 10:27:55 PM
@@ -48,7 +48,8 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class DynamicRosterTest implements DynamicRosterIfc {
+public class DynamicRosterTest
+				implements DynamicRosterIfc {
 	private static Logger log = Logger.getLogger(DynamicRosterTest.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
@@ -85,7 +86,7 @@ public class DynamicRosterTest implements DynamicRosterIfc {
 	 */
 	@Override
 	public Element getBuddyItem(XMPPResourceConnection session, JID buddy)
-			throws NotAuthorizedException {
+					throws NotAuthorizedException {
 		if ("dynrost@test-d".equals(buddy.getBareJID().toString())) {
 			return getBuddy();
 		} else {
@@ -103,11 +104,12 @@ public class DynamicRosterTest implements DynamicRosterIfc {
 	 */
 	@Override
 	public Element getItemExtraData(Element item) {
-		String jid = item.getAttribute("jid");
+		String jid     = item.getAttributeStaticStr("jid");
 		Element result = memStorage.get(jid);
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Retrieving item: {0}, for jid={1}", new Object[] { result, jid });
+			log.log(Level.FINEST, "Retrieving item: {0}, for jid={1}", new Object[] { result,
+							jid });
 		}
 
 		return result;
@@ -125,7 +127,7 @@ public class DynamicRosterTest implements DynamicRosterIfc {
 	 */
 	@Override
 	public List<Element> getRosterItems(XMPPResourceConnection session)
-			throws NotAuthorizedException {
+					throws NotAuthorizedException {
 		return new ArrayList<Element>(Arrays.asList(getBuddy()));
 	}
 
@@ -159,12 +161,11 @@ public class DynamicRosterTest implements DynamicRosterIfc {
 	 */
 	@Override
 	public void setItemExtraData(Element item) {
-		String jid = item.getAttribute("jid");
+		String jid = item.getAttributeStaticStr("jid");
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Storing item: {0}, for jid={1}", new Object[] { item, jid });
 		}
-
 		memStorage.put(jid, item);
 	}
 
@@ -172,13 +173,11 @@ public class DynamicRosterTest implements DynamicRosterIfc {
 
 	private Element getBuddy() {
 		return new Element("item", new Element[] { new Element("group", "test group") },
-				new String[] { "jid",
-				"name", "subscription" }, new String[] { "dynrost@test-d", "dynrost", "both" });
+											 new String[] { "jid",
+																			"name", "subscription" }, new String[] {
+																			"dynrost@test-d", "dynrost", "both" });
 	}
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/02/20

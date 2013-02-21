@@ -116,7 +116,10 @@ public class Packet {
 	public static final String TO_ATT = "to";
 
 	/** Field description */
-	public static final String TYPE_ATT  = "type";
+	public static final String TYPE_ATT = "type";
+
+	/** Field description */
+	public static final String XMLNS_ATT = "xmlns";
 	private static final String ERROR_NS = "urn:ietf:params:xml:ns:xmpp-stanzas";
 
 	/**
@@ -434,9 +437,23 @@ public class Packet {
 	 * @param key is an attribute key.
 	 *
 	 * @return an attribute value or NULL if there is no such attribute.
+	 * @deprecated Consider using {@link #getAttributeStaticStr(java.lang.String) } instead.
 	 */
+	@Deprecated
 	public String getAttribute(String key) {
 		return elem.getAttribute(key);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param key
+	 *
+	 * @return
+	 */
+	public String getAttributeStaticStr(String key) {
+		return elem.getAttributeStaticStr(key);
 	}
 
 	/**
@@ -471,10 +488,10 @@ public class Packet {
 	 * {@link #getAttributeStaticStr(java.lang.String[], java.lang.String) }
 	 * instead.</strong>
 	 *
-	 * @param path is XML path for the stanza element or stanza child for which attribute
-	 * is retrieved.
-	 * @param key is an attribute key.
 	 *
+	 *
+	 * @param path
+	 * @param key
 	 * @return value of the requested attribute or NULL if the attribute is not set.
 	 * @deprecated use {@link #getAttributeStaticStr(java.lang.String[], java.lang.String)}
 	 * instead, if possible, if not, contact us so we preserve the API.
@@ -930,7 +947,7 @@ public class Packet {
 				elem.setAttribute(TO_ATT, stanzaTo.toString());
 			}
 		}
-		stanzaId             = elem.getAttribute(ID_ATT);
+		stanzaId             = elem.getAttributeStaticStr(ID_ATT);
 		packetToString       = null;
 		packetToStringSecure = null;
 	}
@@ -953,27 +970,27 @@ public class Packet {
 	 * JIDs parsing.
 	 */
 	public void initVars() throws TigaseStringprepException {
-		String tmp = elem.getAttribute(TO_ATT);
+		String tmp = elem.getAttributeStaticStr(TO_ATT);
 
 		if (tmp != null) {
 			stanzaTo = JID.jidInstance(tmp);
 		} else {
 			stanzaTo = null;
 		}
-		tmp = elem.getAttribute(FROM_ATT);
+		tmp = elem.getAttributeStaticStr(FROM_ATT);
 		if (tmp != null) {
 			stanzaFrom = JID.jidInstance(tmp);
 		} else {
 			stanzaFrom = null;
 		}
-		stanzaId             = elem.getAttribute(ID_ATT);
+		stanzaId             = elem.getAttributeStaticStr(ID_ATT);
 		packetToString       = null;
 		packetToStringSecure = null;
-		tmp                  = elem.getAttribute(PRIORITY_ATT);
+		tmp                  = elem.getAttributeStaticStr(PRIORITY_ATT);
 		if (tmp != null) {
 			priority = Priority.valueOf(tmp);
 		}
-		tmp = elem.getAttribute(PERM_ATT);
+		tmp = elem.getAttributeStaticStr(PERM_ATT);
 		if (tmp != null) {
 			permissions = Permissions.valueOf(tmp);
 		}
@@ -1568,8 +1585,8 @@ public class Packet {
 			throw new NullPointerException();
 		}    // end of if (elem == null)
 		this.elem = elem;
-		if (elem.getAttribute(TYPE_ATT) != null) {
-			type = StanzaType.valueof(elem.getAttribute(TYPE_ATT));
+		if (elem.getAttributeStaticStr(TYPE_ATT) != null) {
+			type = StanzaType.valueof(elem.getAttributeStaticStr(TYPE_ATT));
 		} else {
 			type = null;
 		}    // end of if (elem.getAttribute("type") != null) else
@@ -1592,4 +1609,4 @@ public class Packet {
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/19
+//~ Formatted in Tigase Code Convention on 13/02/20

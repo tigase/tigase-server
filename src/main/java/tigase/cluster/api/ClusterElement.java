@@ -680,7 +680,7 @@ public class ClusterElement {
 	 */
 	public ClusterElement nextClusterNode(JID node_id) {
 		Element next_el = elem.clone();
-		String from     = elem.getAttribute("to");
+		String from     = elem.getAttributeStaticStr(Packet.TO_ATT);
 
 		next_el.setAttribute("from", from);
 		next_el.setAttribute("to", node_id.toString());
@@ -698,7 +698,7 @@ public class ClusterElement {
 	 * @param method_call
 	 */
 	protected void parseMethodCall(Element method_call) {
-		method_name = method_call.getAttribute(CLUSTER_NAME_ATTR);
+		method_name = method_call.getAttributeStaticStr(CLUSTER_NAME_ATTR);
 		if (method_name != null) {
 			method_name = method_name.intern();
 		}
@@ -709,7 +709,7 @@ public class ClusterElement {
 		if (children != null) {
 			for (Element child : children) {
 				if (child.getName() == CLUSTER_METHOD_PAR_EL_NAME) {
-					String par_name = child.getAttribute(CLUSTER_NAME_ATTR);
+					String par_name = child.getAttributeStaticStr(CLUSTER_NAME_ATTR);
 
 					method_params.put(par_name, child.getCData());
 				}
@@ -723,7 +723,7 @@ public class ClusterElement {
 					if (res_children != null) {
 						for (Element res_child : res_children) {
 							if (res_child.getName() == CLUSTER_METHOD_RESULTS_VAL_EL_NAME) {
-								String val_name = res_child.getAttribute(CLUSTER_NAME_ATTR);
+								String val_name = res_child.getAttributeStaticStr(CLUSTER_NAME_ATTR);
 
 								method_results.put(val_name, res_child.getCData());
 							}
@@ -736,4 +736,4 @@ public class ClusterElement {
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/19
+//~ Formatted in Tigase Code Convention on 13/02/20

@@ -336,7 +336,7 @@ public class ClientConnectionManager
 			// Ups, some packets like starttls or sasl-auth have own XMLNS,
 			// overwriting it here is not really a good idea. We have to check first
 			// if the xmlns is not set and then force it to jabber:client
-			if (p.getAttribute("xmlns") == null) {
+			if (p.getAttributeStaticStr(Packet.XMLNS_ATT) == null) {
 				p.setXMLNS(XMLNS);
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "XMLNS set for packet: {0} from connection: {1}",
@@ -1076,4 +1076,4 @@ public class ClientConnectionManager
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/19
+//~ Formatted in Tigase Code Convention on 13/02/20

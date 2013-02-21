@@ -6,7 +6,8 @@
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -114,12 +115,14 @@ public class PresenceCapabilitiesManager {
 		if (c != null) {
 			caps_nodes = new HashSet<String>();
 
-			String caps_node = c.getAttribute("node") + "#" + c.getAttribute("ver");
+			String caps_node = c.getAttributeStaticStr("node") + "#" +
+												 c.getAttributeStaticStr("ver");
 
 			caps_nodes.add(caps_node);
-			if ((c.getAttribute("hash") == null) && (c.getAttribute("ext") != null)) {
-				for (String e : c.getAttribute("ext").split(" ")) {
-					caps_nodes.add(c.getAttribute("node") + "#" + e);
+			if ((c.getAttributeStaticStr("hash") == null) &&
+					(c.getAttributeStaticStr("ext") != null)) {
+				for (String e : c.getAttributeStaticStr("ext").split(" ")) {
+					caps_nodes.add(c.getAttributeStaticStr("node") + "#" + e);
 				}
 			}
 		} else {
@@ -184,16 +187,18 @@ public class PresenceCapabilitiesManager {
 		Set<String> features = new HashSet<String>();
 
 		if (c != null) {
-			String caps_node = c.getAttribute("node") + "#" + c.getAttribute("ver");
+			String caps_node = c.getAttributeStaticStr("node") + "#" +
+												 c.getAttributeStaticStr("ver");
 
 			// String[] nFeatures = nodeFeatures.get(caps_node);
 			if (!nodeFeatures.containsKey(caps_node)) {
 				Set<String> caps_nodes = new HashSet<String>();
 
 				caps_nodes.add(caps_node);
-				if ((c.getAttribute("hash") == null) && (c.getAttribute("ext") != null)) {
-					for (String e : c.getAttribute("ext").split(" ")) {
-						caps_nodes.add(c.getAttribute("node") + "#" + e);
+				if ((c.getAttributeStaticStr("hash") == null) &&
+						(c.getAttributeStaticStr("ext") != null)) {
+					for (String e : c.getAttributeStaticStr("ext").split(" ")) {
+						caps_nodes.add(c.getAttributeStaticStr("node") + "#" + e);
 					}
 				}
 				for (String node : caps_nodes) {
@@ -265,7 +270,7 @@ public class PresenceCapabilitiesManager {
 
 			if (query != null) {
 				if (packet.getType() == StanzaType.result) {
-					if (query.getAttribute("node") == null) {
+					if (query.getAttributeStaticStr("node") == null) {
 						if (log.isLoggable(Level.FINEST)) {
 							log.finest("disco#info query without node attribute!");
 						}
@@ -282,9 +287,9 @@ public class PresenceCapabilitiesManager {
 							if (!"feature".equals(item.getName())) {
 								continue;
 							}
-							features.add(item.getAttribute("var"));
+							features.add(item.getAttributeStaticStr("var"));
 						}
-						setNodeFeatures(query.getAttribute("node"),
+						setNodeFeatures(query.getAttributeStaticStr("node"),
 														features.toArray(new String[features.size()]));
 					}
 				}
@@ -365,4 +370,4 @@ public class PresenceCapabilitiesManager {
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/16
+//~ Formatted in Tigase Code Convention on 13/02/20

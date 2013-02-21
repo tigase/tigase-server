@@ -6,7 +6,8 @@
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -254,12 +255,12 @@ public class BoshConnectionManager
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Processing socket data: {0}", p);
 				}
-				sid_str = p.getAttribute(SID_ATTR);
+				sid_str = p.getAttributeStaticStr(SID_ATTR);
 
 				UUID sid = null;
 
 				if (sid_str == null) {
-					String hostname = p.getAttribute("to");
+					String hostname = p.getAttributeStaticStr(Packet.TO_ATT);
 
 					if ((hostname != null) && isLocalDomain(hostname)) {
 						bs = new BoshSession(getDefVHostItem().getDomain(),
@@ -830,4 +831,4 @@ public class BoshConnectionManager
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/16
+//~ Formatted in Tigase Code Convention on 13/02/20

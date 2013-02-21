@@ -6,7 +6,8 @@
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -823,7 +824,7 @@ public enum Command {
 			if (children != null) {
 				for (Element child : children) {
 					if (child.getName().equals("field") &&
-							child.getAttribute("var").equals(f_name)) {
+							child.getAttributeStaticStr("var").equals(f_name)) {
 						String value = child.getChildCDataStaticStr(FIELD_VALUE_PATH);
 
 						if (value != null) {
@@ -870,7 +871,8 @@ public enum Command {
 
 		for (Element child : children) {
 			log.info("Command form child: " + child.toString());
-			if (child.getName().equals("field") && child.getAttribute("var").equals(f_name)) {
+			if (child.getName().equals("field") &&
+					child.getAttributeStaticStr("var").equals(f_name)) {
 				String value = child.getChildCDataStaticStr(FIELD_VALUE_PATH);
 
 				log.info("Command found: field=" + f_name + ", value=" + value);
@@ -906,7 +908,7 @@ public enum Command {
 			if (children != null) {
 				for (Element child : children) {
 					if (child.getName().equals("field") &&
-							child.getAttribute("var").equals(f_name)) {
+							child.getAttributeStaticStr("var").equals(f_name)) {
 						List<String> values        = new LinkedList<String>();
 						List<Element> val_children = child.getChildren();
 
@@ -953,7 +955,7 @@ public enum Command {
 			if (children != null) {
 				for (Element child : children) {
 					if (child.getName().equals("field") &&
-							child.getAttribute("var").equals(f_name)) {
+							child.getAttributeStaticStr("var").equals(f_name)) {
 						return x.removeChild(child);
 					}
 				}
@@ -985,8 +987,8 @@ public enum Command {
 			if (children != null) {
 				for (Element child : children) {
 					if (child.getName().equals("field") &&
-							child.getAttribute("var").startsWith(f_name)) {
-						return child.getAttribute("var");
+							child.getAttributeStaticStr("var").startsWith(f_name)) {
+						return child.getAttributeStaticStr("var");
 					}
 				}
 			}
@@ -1173,4 +1175,4 @@ public enum Command {
 }    // Command
 
 
-//~ Formatted in Tigase Code Convention on 13/02/16
+//~ Formatted in Tigase Code Convention on 13/02/20
