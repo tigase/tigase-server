@@ -329,8 +329,9 @@ public class MessageRouterConfig {
                 ServerComponent cls = null;
 
                 cls = ModulesManagerImpl.getInstance().getServerComponent(cls_name);
-                if (cls == null) {
-                        cls = (ServerComponent) Class.forName(cls_name).newInstance();
+                if (cls == null && (!XMPPServer.isOSGi() || COMPONENT_CLASSES.containsKey(cls_name) 
+                                || COMP_CLUS_MAP.containsKey(cls_name)) || EXT_COMP_CLASS_NAME.equals(cls_name)) {
+                        cls = (ServerComponent) this.getClass().getClassLoader().loadClass(cls_name).newInstance();
                 }
 
                 return cls;
@@ -341,8 +342,9 @@ public class MessageRouterConfig {
 
                 try {
                         cls = ModulesManagerImpl.getInstance().getServerComponentClass(cls_name);
-                        if (cls == null) {
-                                cls = (Class<? extends ServerComponent>) Class.forName(cls_name);
+                        if (cls == null && (!XMPPServer.isOSGi() || COMPONENT_CLASSES.containsKey(cls_name) 
+                                        || COMP_CLUS_MAP.containsKey(cls_name)) || EXT_COMP_CLASS_NAME.equals(cls_name)) {
+                                cls = (Class<? extends ServerComponent>) this.getClass().getClassLoader().loadClass(cls_name);
                         }
                 }
                 catch (Exception ex) {}
@@ -435,7 +437,7 @@ public class MessageRouterConfig {
 			return null;
 		}
 
-		return (ComponentRegistrator) Class.forName(cls_name).newInstance();
+                return (ComponentRegistrator) this.getClass().getClassLoader().loadClass(cls_name).newInstance();
 	}
 
 	/**
@@ -480,9 +482,14 @@ public class MessageRouterConfig {
                         if (ModulesManagerImpl.getInstance().hasClassForServerComponent(cls_name)) {
                                 return true;
                         }
-                        
+                                                
+                        if (XMPPServer.isOSGi() && !(COMPONENT_CLASSES.containsKey(cls_name) || COMP_CLUS_MAP.containsKey(cls_name)
+                                        || EXT_COMP_CLASS_NAME.equals(cls_name))) {
+                                return false;
+                        }
+
                         // it is dirty but should work
-                        Class.forName(cls_name);
+                        this.getClass().getClassLoader().loadClass(cls_name);
                         
                         return true;
                 }
