@@ -39,10 +39,10 @@ import tigase.db.comp.*
 def repo = (ComponentRepository)comp_repo
 repo.reload()
 
-def result = "Reloaded items: " + repo.size()
+def result = "Reloaded items - " + repo.size() + ":\n"
 def items = repo.allItems()
 if (items.size() > 0) {
-	items.each { result += it.getKey() + "," }
+	items.each { result += "\n" + it.getKey() }
 }
 
 return result
