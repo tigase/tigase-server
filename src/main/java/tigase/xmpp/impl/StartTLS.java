@@ -31,9 +31,12 @@ import tigase.db.NonAuthUserRepository;
 import tigase.server.Command;
 import tigase.server.Packet;
 
+import tigase.vhosts.VHostItem;
+
 import tigase.xml.Element;
 
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
@@ -56,15 +59,15 @@ import java.util.Queue;
  */
 public class StartTLS
 				extends XMPPProcessor
-				implements XMPPProcessorIfc {
+				implements XMPPProcessorIfc, XMPPPreprocessorIfc {
 	// private static final String TLS_STARTED_KEY = "TLS-Started";
 
 	/** Field description */
-	public static final String TLS_REQUIRED_KEY = "tls-required";
+	public static final String EL_NAME = "starttls";
 
 	/** Field description */
-	protected static final String ID          = "starttls";
-	private static final String[] ELEMENTS    = { "starttls", "proceed", "failure" };
+	protected static final String ID          = EL_NAME;
+	private static final String[] ELEMENTS    = { EL_NAME, "proceed", "failure" };
 	private static final Logger log           = Logger.getLogger(StartTLS.class.getName());
 	private static final String XMLNS         = "urn:ietf:params:xml:ns:xmpp-tls";
 	private static final String[] XMLNSS      = { XMLNS, XMLNS, XMLNS };
@@ -73,17 +76,17 @@ public class StartTLS
 																								new Element[] {
 																									new Element(
 																										"required") }, new String[] {
-																											"xmlns" }, new String[] {
+																											Packet.XMLNS_ATT }, new String[] {
 																											XMLNS }) };
-	private static final Element[] F_NOT_REQUIRED = { new Element("starttls",
-																										new String[] { "xmlns" },
+	private static final Element[] F_NOT_REQUIRED = { new Element(EL_NAME,
+																										new String[] { Packet.XMLNS_ATT },
 																										new String[] { XMLNS }) };
 
 	//~--- fields ---------------------------------------------------------------
 
-	private Element proceed = new Element("proceed", new String[] { "xmlns" },
+	private Element proceed = new Element("proceed", new String[] { Packet.XMLNS_ATT },
 															new String[] { XMLNS });
-	private Element failure = new Element("failure", new String[] { "xmlns" },
+	private Element failure = new Element("failure", new String[] { Packet.XMLNS_ATT },
 															new String[] { XMLNS });
 
 	//~--- methods --------------------------------------------------------------
@@ -181,18 +184,57 @@ public class StartTLS
 	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
 
 		// If session does not exist, just return null, we don't provide features
-		// for non-existen stream
+		// for non-existen stream, the second condition means that the TLS
+		// has not been yet completed for the user connection.
 		if ((session != null) && (session.getSessionData(ID) == null)) {
-			if ((session.getSessionData(TLS_REQUIRED_KEY) != null) &&
-					session.getSessionData(TLS_REQUIRED_KEY).equals("true")) {
+			VHostItem vhost = session.getDomain();
+
+			if ((vhost != null) && vhost.isTlsRequired()) {
 				return F_REQUIRED;
 			} else {
 				return F_NOT_REQUIRED;
 			}
-		}    // end of if (session.isAuthorized())
-						else {
+		} else {
 			return null;
 		}    // end of if (session.isAuthorized()) else
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param session
+	 * @param repo
+	 * @param results
+	 * @param settings
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean preProcess(Packet packet, XMPPResourceConnection session,
+														NonAuthUserRepository repo, Queue<Packet> results,
+														Map<String, Object> settings) {
+		boolean stop = false;
+
+		if ((session == null) || session.isServerSession()) {
+			return stop;
+		}
+
+		VHostItem vhost = session.getDomain();
+
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "VHost: {0}", new Object[] { vhost });
+		}
+
+		// Check whether the TLS has been completed
+		// and the packet is allowed to be processed.
+		if ((vhost != null) && vhost.isTlsRequired() &&
+				(session.getSessionData(ID) == null) &&!packet.isElement(EL_NAME, XMLNS)) {
+			stop = true;
+		}
+
+		return stop;
 	}
 }    // StartTLS
 

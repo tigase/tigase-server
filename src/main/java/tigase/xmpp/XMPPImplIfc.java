@@ -6,7 +6,8 @@
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -40,7 +41,7 @@ import java.util.Set;
 
 /**
  * This is a base interface for all session manager plugins. There are packet
- * processing plugins, preprocesing, postprocessing and packet filters. They all
+ * processing plugins, pre-processing, post-processing and packet filters. They all
  * have a common basic methods which are defined here.
  *
  *
@@ -57,15 +58,22 @@ public interface XMPPImplIfc
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * Method description
+	 * Methods returns a preferable number of threads/packets queues for the plugin.
+	 * This number can be overwritten through configuration settings, however, a default
+	 * value should be reasonably good for most standard installations.
+	 * It is recommended to assign at least as much as twice a number of CPUs cores for I/O
+	 * bound processing and number a number equal to CPUs cores for fast processing not
+	 * slowed down by any I/O.
 	 *
 	 *
-	 * @return
+	 * @return an integer preferred number of processing threads for the plugin.
 	 */
 	int concurrentQueuesNo();
 
 	/**
-	 * Method description
+	 * Number of threads per single packets queue. Not used anymore. At the moment only
+	 * one thread is always used for each queue. For a higher concurrency set more queues
+	 * using {@link #concurrentQueuesNo() }.
 	 *
 	 *
 	 * @return
@@ -98,10 +106,8 @@ public interface XMPPImplIfc
 
 	//~--- get methods ----------------------------------------------------------
 
-	// ~--- get methods ----------------------------------------------------------
-
 	/**
-	 * Method <code>isSupporting</code> takes element name and namespace for this
+	 * Method <code>isSupporting</code> takes element name and name-space for this
 	 * element and determines whether this element can be processed by this
 	 * plugin.
 	 *
@@ -117,13 +123,21 @@ public interface XMPPImplIfc
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * Method description
+	 * By default the method uses {@link #supElementNamePaths() } and
+	 * {@link #supTypes() } method results to determine whether the plugin would process
+	 * given packet. However, a plugin can implement own logic to determine packet
+	 * processing capabilities or conditions. Please note, this method must be very fast
+	 * and efficient. No I/O processing is recommended as it may impact performance of
+	 * the whole system.
 	 *
 	 *
-	 * @param packet
-	 * @param conn
+	 * @param packet is a <code>Packet</code> for processing.
+	 * @param conn is a user session object or null.
 	 *
-	 * @return
+	 * @return returns <code>Authorization</code> enum value or null. Null means the
+	 * plugin is simply not processing the packet. {@link Authorization#AUTHORIZED} means
+	 * the plugin can process the packet, any other {@link Authorization} enum value
+	 * means an error which has to be returned to the sender.
 	 */
 	Authorization canHandle(Packet packet, XMPPResourceConnection conn);
 
@@ -160,14 +174,14 @@ public interface XMPPImplIfc
 	 * method. The element path itself is represented by a String array with each path
 	 * element as a separate String.
 	 *
-	 * @return a <code>String[][]</code> value is an array for element paths for which the plugin
-	 * offers processing capabilities. Each path is in form of a String array in order to reduce
-	 * parsing overhead.
+	 * @return a <code>String[][]</code> value is an array for element paths for which
+	 * the plugin offers processing capabilities. Each path is in form of a String array
+	 * in order to reduce parsing overhead.
 	 */
 	String[][] supElementNamePaths();
 
 	/**
-	 * Method <code>supNamespaces</code> returns an array of namespaces for
+	 * Method <code>supNamespaces</code> returns an array of name-spaces for
 	 * stanzas which can be processed by this plugin. Each namespace
 	 * corresponds to element name returned in array by
 	 * <code>supElemenets()</code> method.
@@ -181,7 +195,7 @@ public interface XMPPImplIfc
 	 * to handle. If the method returns NULL, then all stanzas of all types
 	 * will be passed to the plugin for processing.
 	 * Otherwise only stanzas with selected types, assuming that
-	 * element names and namespaces match as well.
+	 * element names and name-spaces match as well.
 	 *
 	 *
 	 * @return a <code>StanzaType[]</code> array of supported stanza types.
@@ -210,4 +224,4 @@ public interface XMPPImplIfc
 }    // XMPPImplIfc
 
 
-//~ Formatted in Tigase Code Convention on 13/02/16
+//~ Formatted in Tigase Code Convention on 13/02/20

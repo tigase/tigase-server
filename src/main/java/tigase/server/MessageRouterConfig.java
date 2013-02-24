@@ -2,7 +2,7 @@
  * MessageRouterConfig.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -439,7 +439,8 @@ public class MessageRouterConfig {
 		if (cls_name.equals("tigase.server.XMPPServiceCollector") ||
 				cls_name.equals("tigase.disco.XMPPServiceCollector")) {
 			log.warning(
-					"This class is not used anymore. Correct your configuration please. Remove all references to class: XMPPServiceCollector.");
+					"This class is not used anymore. Correct your configuration please. Remove " +
+					"all references to class: XMPPServiceCollector.");
 
 			return null;
 		}
@@ -506,4 +507,4 @@ public class MessageRouterConfig {
 }    // MessageRouterConfig
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/02/21

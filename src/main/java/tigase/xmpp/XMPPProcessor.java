@@ -6,7 +6,8 @@
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -193,7 +194,7 @@ public abstract class XMPPProcessor
 		}
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST,
-							"XMPPProcessorIfc: {0} ({1}" + ")" + "\n Request: " +
+							"XMPPProcessorIfc: {0} ({1})\n Request: " +
 							"{2}, conn: {3}, authorization: {4}", new Object[] {
 								this.getClass().getSimpleName(),
 								id(), packet, conn, result });
@@ -349,4 +350,4 @@ public abstract class XMPPProcessor
 }    // XMPPProcessor
 
 
-//~ Formatted in Tigase Code Convention on 13/02/16
+//~ Formatted in Tigase Code Convention on 13/02/20
