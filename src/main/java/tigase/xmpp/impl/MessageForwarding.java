@@ -6,7 +6,8 @@
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -124,7 +125,7 @@ public class MessageForwarding
 			return;
 		}    // end of if (session == null)
 
-		// We only want to forward messages which do contain body element
+		// We only want to forward messages which contain body element
 		if (packet.getElemCDataStaticStr(tigase.server.Message.MESSAGE_BODY_PATH) == null) {
 			return;
 		}
@@ -219,4 +220,4 @@ public class MessageForwarding
 }    // Message
 
 
-//~ Formatted in Tigase Code Convention on 13/02/16
+//~ Formatted in Tigase Code Convention on 13/02/21
