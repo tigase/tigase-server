@@ -17,14 +17,9 @@ import tigase.xmpp.XMPPResourceConnection;
 
 public class CertBasedCallbackHandler implements CallbackHandler, SessionAware {
 
-	private XMPPResourceConnection session;
-
-	@Override
-	public void setSession(XMPPResourceConnection session) {
-		this.session = session;
-	}
-
 	protected Logger log = Logger.getLogger(this.getClass().getName());
+
+	private XMPPResourceConnection session;
 
 	@Override
 	public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
@@ -38,10 +33,19 @@ public class CertBasedCallbackHandler implements CallbackHandler, SessionAware {
 					ValidateCertificateData authCallback = ((ValidateCertificateData) callbacks[i]);
 
 					final String domain = session.getDomain().getVhost().getDomain();
+					final BareJID defaultAuthzid = authCallback.getDefaultAuthzid();
+					if (defaultAuthzid != null && !defaultAuthzid.getDomain().equals(domain)) {
+						return;
+					}
 					final String[] authJIDs = (String[]) session.getSessionData(SaslEXTERNAL.SESSION_AUTH_JIDS_KEY);
 
 					for (String string : authJIDs) {
-						if (BareJID.bareJIDInstance(string).getDomain().equals(domain)) {
+						if (defaultAuthzid != null) {
+							if (string.equals(defaultAuthzid.toString())) {
+								authCallback.setAuthorized(true);
+								authCallback.setAuthorizedID(string);
+							}
+						} else if (BareJID.bareJIDInstance(string).getDomain().equals(domain)) {
 							authCallback.setAuthorized(true);
 							authCallback.setAuthorizedID(string);
 						}
@@ -53,5 +57,10 @@ public class CertBasedCallbackHandler implements CallbackHandler, SessionAware {
 		} catch (TigaseStringprepException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Override
+	public void setSession(XMPPResourceConnection session) {
+		this.session = session;
 	}
 }

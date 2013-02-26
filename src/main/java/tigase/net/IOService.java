@@ -48,8 +48,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import tigase.cert.CertCheckResult;
 import tigase.cert.CertificateUtil;
@@ -487,6 +487,8 @@ public abstract class IOService<RefObject>
 				Certificate peerCert = certs[certs.length - 1];
 				List<String> xmppJIDs = CertificateUtil.extractXmppAddrs((X509Certificate) peerCert);
 				this.peersJIDsFromCert = xmppJIDs;
+			} catch (SSLPeerUnverifiedException e) {
+				this.peersJIDsFromCert = null;
 			} catch (Exception e) {
 				this.peersJIDsFromCert = null;
 				log.log(Level.WARNING, "Problem with extracting subjectAltName", e);

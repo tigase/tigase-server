@@ -296,18 +296,15 @@ public class SaslAuth
 																			"Unrecognized element " + request.getName());
 				}
 
-				byte[] data  = new byte[] {};
+				byte[] data;
 				String cdata = request.getCData();
 
-				// TODO Przeniesc to do mechanizmow!
-				if ((cdata != null) && (cdata.length() > 0)) {
-					try {
-						if ((cdata != null) && (cdata.length() > 0)) {
-							data = Base64.decode(cdata);
-						}
-					} catch (Exception e) {
-						data = cdata.getBytes();
-					}
+				if (cdata != null && cdata.length() == 1 && cdata.equals("=")) {
+					data = new byte[] {};
+				} else if (cdata != null && cdata.length() > 0) {
+					data = Base64.decode(cdata);
+				} else {
+					data = new byte[] {};
 				}
 
 				byte[] challenge = ss.evaluateResponse(data);

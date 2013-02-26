@@ -8,14 +8,16 @@ import javax.security.sasl.SaslException;
 import tigase.auth.XmppSaslException;
 import tigase.auth.XmppSaslException.SaslError;
 import tigase.auth.callbacks.ValidateCertificateData;
+import tigase.util.TigaseStringprepException;
+import tigase.xmpp.BareJID;
 
 public class SaslEXTERNAL extends AbstractSasl {
-
-	public static final String SESSION_AUTH_JIDS_KEY = "SESSION_AUTH_JIDS_KEY";
 
 	private static final String MECHANISM = "EXTERNAL";
 
 	public static final String SASL_EXTERNAL_ALLOWED = "SASL_EXTERNAL_ALLOWED";
+
+	public static final String SESSION_AUTH_JIDS_KEY = "SESSION_AUTH_JIDS_KEY";
 
 	SaslEXTERNAL(Map<? super String, ?> props, CallbackHandler callbackHandler) {
 		super(props, callbackHandler);
@@ -23,7 +25,18 @@ public class SaslEXTERNAL extends AbstractSasl {
 
 	@Override
 	public byte[] evaluateResponse(byte[] response) throws SaslException {
-		final ValidateCertificateData ac = new ValidateCertificateData();
+		BareJID jid;
+		try {
+			if (response != null && response.length > 0) {
+				jid = BareJID.bareJIDInstance(new String(response));
+			} else {
+				jid = null;
+			}
+		} catch (TigaseStringprepException e) {
+			throw new XmppSaslException(SaslError.malformed_request);
+		}
+
+		final ValidateCertificateData ac = new ValidateCertificateData(jid);
 		handleCallbacks(ac);
 
 		if (ac.isAuthorized() == true) {
