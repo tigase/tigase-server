@@ -180,7 +180,7 @@ public class MessageRouterConfig {
 																 String comp_name) {
 		boolean cluster_mode = isTrue((String) params.get(CLUSTER_MODE));
 
-		log.config("Cluster mode: " + params.get(CLUSTER_MODE));
+		log.log(Level.CONFIG, "Cluster mode: ", params.get(CLUSTER_MODE));
 		if (cluster_mode) {
 			log.config("Cluster mode is on, replacing known components with cluster" +
 								 " versions:");
@@ -188,7 +188,8 @@ public class MessageRouterConfig {
 				String cls = COMP_CLUS_MAP.get(entry.getValue());
 
 				if (cls != null) {
-					log.config("Replacing " + entry.getValue() + " with " + cls);
+					log.log(Level.CONFIG, "Replacing {0} with {1}", new Object[] { entry.getValue(),
+									cls });
 					entry.setValue(cls);
 				}
 			}
@@ -237,7 +238,11 @@ public class MessageRouterConfig {
 			if (key.startsWith(GEN_COMP_NAME)) {
 				String comp_name_suffix = key.substring(GEN_COMP_NAME.length());
 				String c_name           = (String) params.get(GEN_COMP_NAME + comp_name_suffix);
-				String c_class          = (String) params.get(GEN_COMP_CLASS + comp_name_suffix);
+
+				// Make sure the component name is converted to lowercase
+				c_name = c_name.toLowerCase();
+
+				String c_class = (String) params.get(GEN_COMP_CLASS + comp_name_suffix);
 
 				if (Arrays.binarySearch(rcv_names, c_name) < 0) {
 					defs.put(MSG_RECEIVERS_PROP_KEY + c_name + ".class", c_class);
@@ -250,7 +255,7 @@ public class MessageRouterConfig {
 					// System.out.println(Arrays.toString(rcv_names));
 				}
 			}
-		}      // end of for ()
+		}    // end of for ()
 
 		// Add XEP-0114 for cluster communication
 		if (cluster_mode) {

@@ -28,8 +28,6 @@ package tigase.server;
 
 import tigase.conf.ConfiguratorAbstract;
 
-import tigase.disco.ServiceEntity;
-import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
 
 import tigase.stats.StatisticsList;
@@ -83,7 +81,6 @@ public class MessageRouter
 
 	//~--- fields ---------------------------------------------------------------
 
-	// ~--- fields ---------------------------------------------------------------
 	private ConfiguratorAbstract config = null;
 
 	// private static final long startupTime = System.currentTimeMillis();
@@ -106,8 +103,6 @@ public class MessageRouter
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -115,12 +110,13 @@ public class MessageRouter
 	 * @param component
 	 */
 	public void addComponent(ServerComponent component) {
-		log.info("Adding component: " + component.getClass().getSimpleName());
+		log.log(Level.INFO, "Adding component: ", component.getClass().getSimpleName());
 		for (ComponentRegistrator registr : registrators.values()) {
 			if (registr != component) {
 				if (log.isLoggable(Level.FINER)) {
-					log.finer("Adding: " + component.getName() + " component to " +
-										registr.getName() + " registrator.");
+					log.log(Level.FINER, "Adding: {0} component to {1} registrator.",
+									new Object[] { component.getName(),
+																 registr.getName() });
 				}
 				registr.addComponent(component);
 			}    // end of if (reg != component)
@@ -648,13 +644,6 @@ public class MessageRouter
 		}
 		if (props.get(DISCO_NAME_PROP_KEY) != null) {
 			disco_name = (String) props.get(DISCO_NAME_PROP_KEY);
-
-//    serviceEntity = new ServiceEntity("Tigase", "server", "Session manager");
-//    serviceEntity.addIdentities(new ServiceIdentity[] { new ServiceIdentity("server",
-//        "im", disco_name
-//            + (disco_show_version ? (" ver. " + tigase.server.XMPPServer
-//                .getImplementationVersion()) : "")) });
-//    serviceEntity.addFeatures(XMPPService.DEF_FEATURES);
 		}
 		try {
 			super.setProperties(props);
