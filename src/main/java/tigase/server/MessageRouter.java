@@ -2,11 +2,12 @@
  * MessageRouter.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -27,8 +28,6 @@ package tigase.server;
 
 import tigase.conf.ConfiguratorAbstract;
 
-import tigase.disco.ServiceEntity;
-import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
 
 import tigase.stats.StatisticsList;
@@ -82,7 +81,6 @@ public class MessageRouter
 
 	//~--- fields ---------------------------------------------------------------
 
-	// ~--- fields ---------------------------------------------------------------
 	private ConfiguratorAbstract config = null;
 
 	// private static final long startupTime = System.currentTimeMillis();
@@ -105,8 +103,6 @@ public class MessageRouter
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -114,12 +110,13 @@ public class MessageRouter
 	 * @param component
 	 */
 	public void addComponent(ServerComponent component) {
-		log.info("Adding component: " + component.getClass().getSimpleName());
+		log.log(Level.INFO, "Adding component: ", component.getClass().getSimpleName());
 		for (ComponentRegistrator registr : registrators.values()) {
 			if (registr != component) {
 				if (log.isLoggable(Level.FINER)) {
-					log.finer("Adding: " + component.getName() + " component to " +
-										registr.getName() + " registrator.");
+					log.log(Level.FINER, "Adding: {0} component to {1} registrator.",
+									new Object[] { component.getName(),
+																 registr.getName() });
 				}
 				registr.addComponent(component);
 			}    // end of if (reg != component)
@@ -647,13 +644,6 @@ public class MessageRouter
 		}
 		if (props.get(DISCO_NAME_PROP_KEY) != null) {
 			disco_name = (String) props.get(DISCO_NAME_PROP_KEY);
-
-//    serviceEntity = new ServiceEntity("Tigase", "server", "Session manager");
-//    serviceEntity.addIdentities(new ServiceIdentity[] { new ServiceIdentity("server",
-//        "im", disco_name
-//            + (disco_show_version ? (" ver. " + tigase.server.XMPPServer
-//                .getImplementationVersion()) : "")) });
-//    serviceEntity.addFeatures(XMPPService.DEF_FEATURES);
 		}
 		try {
 			super.setProperties(props);
@@ -1131,4 +1121,4 @@ public class MessageRouter
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/18
+//~ Formatted in Tigase Code Convention on 13/02/25
