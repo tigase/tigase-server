@@ -105,10 +105,6 @@ public class TLSWrapper {
 	 */
 	public TLSWrapper(SSLContext sslc, TLSEventHandler eventHandler, String[] sslProtocols, boolean clientMode) {
 		tlsEngine = sslc.createSSLEngine();
-
-		if ( !clientMode) {
-			tlsEngine.getSSLParameters().setWantClientAuth(true);
-		}
                 
 		tlsEngine.setUseClientMode(clientMode);
 
@@ -126,6 +122,11 @@ public class TLSWrapper {
 		netBuffSize = tlsEngine.getSession().getPacketBufferSize();
 		appBuffSize = tlsEngine.getSession().getApplicationBufferSize();
 		this.eventHandler = eventHandler;
+
+		if ( !clientMode) {
+			tlsEngine.setWantClientAuth(true);
+		}
+
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -403,6 +404,11 @@ public class TLSWrapper {
 //    return app;
 //  }    // end of else
 	}
+
+	public SSLEngine getTlsEngine() {
+		return tlsEngine;
+	}
+
 }    // TLSWrapper
 
 

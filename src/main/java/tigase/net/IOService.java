@@ -25,8 +25,34 @@ package tigase.net;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.cert.CertCheckResult;
+import java.io.IOException;
+import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.CharBuffer;
+import java.nio.channels.SocketChannel;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CoderResult;
+import java.nio.charset.MalformedInputException;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.TrustManager;
+
+import tigase.cert.CertCheckResult;
+import tigase.cert.CertificateUtil;
 import tigase.io.BufferUnderflowException;
 import tigase.io.IOInterface;
 import tigase.io.SocketIO;
@@ -35,34 +61,9 @@ import tigase.io.TLSIO;
 import tigase.io.TLSUtil;
 import tigase.io.TLSWrapper;
 import tigase.io.ZLibIO;
-
 import tigase.stats.StatisticsList;
-
 import tigase.xmpp.JID;
-
 //~--- JDK imports ------------------------------------------------------------
-
-import java.io.IOException;
-
-import java.net.Socket;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.channels.SocketChannel;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.CoderResult;
-import java.nio.charset.MalformedInputException;
-
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
 
 /**
  * <code>IOService</code> offers thread safe
@@ -180,6 +181,8 @@ public abstract class IOService<RefObject>
 	protected CharBuffer cb                     = CharBuffer.allocate(2048);
 	private final ReentrantLock writeInProgress = new ReentrantLock();
 	private final ReentrantLock readInProgress  = new ReentrantLock();
+
+	private List<String> peersJIDsFromCert;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -475,9 +478,23 @@ public abstract class IOService<RefObject>
 
 		sessionData.put(CERT_CHECK_RESULT, certCheckResult);
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0}, TLS handshake completed: {1}", new Object[] { this,
-							certCheckResult });
+			log.log(Level.FINEST, "{0}, TLS handshake completed: {1}", new Object[] { this, certCheckResult });
 		}
+
+		if (!wrapper.getTlsEngine().getUseClientMode()) {
+			try {
+				Certificate[] certs = wrapper.getTlsEngine().getSession().getPeerCertificates();
+				Certificate peerCert = certs[certs.length - 1];
+				List<String> xmppJIDs = CertificateUtil.extractXmppAddrs((X509Certificate) peerCert);
+				this.peersJIDsFromCert = xmppJIDs;
+			} catch (SSLPeerUnverifiedException e) {
+				this.peersJIDsFromCert = null;
+			} catch (Exception e) {
+				this.peersJIDsFromCert = null;
+				log.log(Level.WARNING, "Problem with extracting subjectAltName", e);
+			}
+		}
+
 		serviceListener.tlsHandshakeCompleted(this);
 	}
 
@@ -710,15 +727,29 @@ public abstract class IOService<RefObject>
 								tls_hostname });
 			}
 
-			TLSWrapper wrapper = new TLSWrapper(TLSUtil.getSSLContext("TLS", tls_hostname,
-														 clientMode), this,
-															 (String[]) sessionData.get(SSL_PROTOCOLS_KEY), clientMode);
+			SSLContext sslContext;
+			if (x509TrustManagers != null) {
+				sslContext = TLSUtil.getSSLContext("TLS", tls_hostname, clientMode, x509TrustManagers);
+			} else {
+				sslContext = TLSUtil.getSSLContext("TLS", tls_hostname, clientMode);
+			}
+			TLSWrapper wrapper = new TLSWrapper(sslContext, this, (String[]) sessionData.get(SSL_PROTOCOLS_KEY), clientMode);
 
 			socketIO = new TLSIO(socketIO, wrapper, byteOrder());
 			setLastTransferTime();
 			encoder.reset();
 			decoder.reset();
 		}
+	}
+
+	private TrustManager[] x509TrustManagers;
+	
+	public TrustManager[] getX509TrustManagers() {
+		return x509TrustManagers;
+	}
+
+	public void setX509TrustManagers(TrustManager[] trustManager ) {
+		this.x509TrustManagers = trustManager;
 	}
 
 	/**
@@ -1329,6 +1360,10 @@ public abstract class IOService<RefObject>
 	public void setConnectionId(JID connectionId) {
 		this.connectionId = connectionId;
 		socketIO.setLogId(connectionId.toString());
+	}
+
+	public List<String> getPeersJIDsFromCert() {
+		return peersJIDsFromCert;
 	}
 }    // IOService
 

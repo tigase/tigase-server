@@ -63,6 +63,11 @@ public enum Command {
 	 * stream from the client has been opened.
 	 */
 	STREAM_OPENED(Priority.SYSTEM),
+	
+	/**
+	 * Command sent from connection manager to the session manager after TLS handshake if client sent certificate.
+	 */
+	CLIENT_AUTH(Priority.SYSTEM),
 
 	/**
 	 * Command sent from a connection manager to the session manager when a
@@ -912,6 +917,7 @@ public enum Command {
 						List<String> values        = new LinkedList<String>();
 						List<Element> val_children = child.getChildren();
 
+						if(val_children!=null)
 						for (Element val_child : val_children) {
 							if (val_child.getName().equals("value")) {
 								String value = val_child.getCData();
