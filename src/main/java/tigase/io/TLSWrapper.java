@@ -108,24 +108,25 @@ public class TLSWrapper {
                 
 		tlsEngine.setUseClientMode(clientMode);
 
-                if (tls_jdk_nss_workaround) {
-                        // Workaround for TLS/SSL bug in new JDK used with new version of nss library see also:
-                        // http://stackoverflow.com/q/10687200/427545
-                        // http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=b509d9cb5d8164d90e6731f5fc44?bug_id=6928796
-                        tlsEngine.setEnabledCipherSuites(tls_workaround_ciphers);
-                }
-                
-                if (sslProtocols != null) {
-                        tlsEngine.setEnabledProtocols(sslProtocols);
-                }
+		if (tls_jdk_nss_workaround) {
+			// Workaround for TLS/SSL bug in new JDK used with new version of nss library see also:
+			// http://stackoverflow.com/q/10687200/427545
+			// http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=b509d9cb5d8164d90e6731f5fc44?bug_id=6928796
+			tlsEngine.setEnabledCipherSuites(tls_workaround_ciphers);
+		}
+
+		if (sslProtocols != null) {
+			tlsEngine.setEnabledProtocols(sslProtocols);
+		}
 
 		netBuffSize = tlsEngine.getSession().getPacketBufferSize();
 		appBuffSize = tlsEngine.getSession().getApplicationBufferSize();
 		this.eventHandler = eventHandler;
 
-		if ( !clientMode) {
-			tlsEngine.setWantClientAuth(true);
-		}
+		// Commented as it kills tls_jdk_nss_workaround - maybe it is not handled properly
+//		if ( !clientMode) {
+//			tlsEngine.setWantClientAuth(true);
+//		}
 
 	}
 
