@@ -271,6 +271,21 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		return getSSLContext(protocol, hostname, clientMode, tms);
 	}
 	
+	public static <T> T find(Map<String, T> data, String key) {
+		if (data.containsKey(key)) {
+			return data.get(key);
+		}
+		for (Entry<String, T> entry : data.entrySet()) {
+			final String k = entry.getKey();
+			if (k.startsWith("*") && key.endsWith(k.substring(1))) {
+				data.put(key, entry.getValue());
+				return entry.getValue();
+			}
+		}
+
+		return null;
+	}
+
 	/**
 	 * Method description
 	 * 
@@ -299,10 +314,10 @@ public class SSLContextContainer implements SSLContextContainerIfc {
                                 alias = def_cert_alias;
                         } // end of if (hostname == null)
 
-                        sslContext = sslContexts.get(alias);
+                        sslContext = find(sslContexts, alias);
 
                         if (sslContext == null) {
-                                KeyManagerFactory kmf = kmfs.get(alias);
+                                KeyManagerFactory kmf = find(kmfs, alias);
 
                                 if (kmf == null) {
                                         KeyPair keyPair = CertificateUtil.createKeyPair(1024, "secret");
