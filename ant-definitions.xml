@@ -132,7 +132,7 @@
           <file name="tigase-utils.jar"/>
           <file name="tigase-xmltools.jar"/>
           <file name="jdbc-mysql.jar"/>
-          <file name="groovy-all-1.8.5.jar"/>
+          <file name="groovy-all-2.1.0.jar"/>
           <file name="jdbc-postgresql.jar"/>
           <file name="derby.jar"/>
           <file name="derbytools.jar"/>
