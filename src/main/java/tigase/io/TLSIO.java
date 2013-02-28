@@ -37,6 +37,7 @@ import java.nio.channels.SocketChannel;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.net.ssl.SSLEngineResult;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -343,6 +344,8 @@ public class TLSIO implements IOInterface {
 		int loop_cnt = 0;
 		int max_loop_runs = 1000;
 
+		boolean breakNow = true;
+		
 		while (((stat == TLSStatus.NEED_WRITE) || (stat == TLSStatus.NEED_READ))
 				&& (++loop_cnt < max_loop_runs)) {
 			switch (stat) {
@@ -352,7 +355,20 @@ public class TLSIO implements IOInterface {
 					break;
 
 				case NEED_READ:
-
+					// We can get NEED_READ TLS status while there are data awaiting to be
+					// sent thru network connection - we need to force sending data and to break
+					// from this loop
+					if (io.waitingToSend()) {
+						io.write(null);
+						
+						// it appears only during handshake so force break only in this case
+						if (tlsWrapper.getTlsEngine().getHandshakeStatus() == 
+								SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING 
+								&& (buff == null || !buff.hasRemaining())) {
+							breakNow = true;
+						}
+					}
+					
 					// I wonder if some real data can be read from the socket here (and we
 					// would
 					// loose the data) or this is just TLS stuff here.....
@@ -372,6 +388,13 @@ public class TLSIO implements IOInterface {
 			}
 
 			stat = tlsWrapper.getStatus();
+		
+			// We can get NEED_READ TLS status while there are data awaiting to be
+			// sent thru network connection - we need to force sending data and to break
+			// from this loop
+			if (breakNow) {
+				break;
+			}
 		}
 
 		if (loop_cnt > (max_loop_runs / 2)) {

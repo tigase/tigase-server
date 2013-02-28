@@ -123,10 +123,10 @@ public class TLSWrapper {
 		appBuffSize = tlsEngine.getSession().getApplicationBufferSize();
 		this.eventHandler = eventHandler;
 
-		// Commented as it kills tls_jdk_nss_workaround - maybe it is not handled properly
-//		if ( !clientMode) {
-//			tlsEngine.setWantClientAuth(true);
-//		}
+		if ( !clientMode) {
+			System.out.println("WANT CLIENT AUTH");
+			tlsEngine.setWantClientAuth(true);
+		}
 
 	}
 
@@ -234,7 +234,7 @@ public class TLSWrapper {
 			if ((tlsEngineResult != null) && (tlsEngineResult.getStatus() == Status.CLOSED)) {
 				status = TLSStatus.CLOSED;
 			}      // end of if (tlsEngine.getStatus() == Status.BUFFER_UNDERFLOW)
-					else {
+			else {
 				switch (tlsEngine.getHandshakeStatus()) {
 					case NEED_WRAP :
 						status = TLSStatus.NEED_WRITE;
