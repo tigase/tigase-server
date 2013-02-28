@@ -105,11 +105,11 @@ public class TLSWrapper {
 	 */
 	public TLSWrapper(SSLContext sslc, TLSEventHandler eventHandler, String[] sslProtocols, boolean clientMode) {
 		tlsEngine = sslc.createSSLEngine();
-                
 		tlsEngine.setUseClientMode(clientMode);
 
 		if (tls_jdk_nss_workaround) {
-			// Workaround for TLS/SSL bug in new JDK used with new version of nss library see also:
+			// Workaround for TLS/SSL bug in new JDK used with new version of
+			// nss library see also:
 			// http://stackoverflow.com/q/10687200/427545
 			// http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=b509d9cb5d8164d90e6731f5fc44?bug_id=6928796
 			tlsEngine.setEnabledCipherSuites(tls_workaround_ciphers);
@@ -124,7 +124,6 @@ public class TLSWrapper {
 		this.eventHandler = eventHandler;
 
 		if ( !clientMode) {
-			System.out.println("WANT CLIENT AUTH");
 			tlsEngine.setWantClientAuth(true);
 		}
 
