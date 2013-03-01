@@ -2,7 +2,7 @@
  * JabberIqRoster.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -80,7 +80,7 @@ public class JabberIqRoster
 				implements XMPPProcessorIfc, XMPPStopListenerIfc {
 	/** Field description */
 	public static final String ANON        = "anon";
-	private static final String[] ELEMENTS = { "query", "query" };
+	private static final String[] ELEMENTS = { Iq.QUERY_NAME, Iq.QUERY_NAME };
 
 	/**
 	 * Private logger for class instance.
@@ -681,8 +681,8 @@ public class JabberIqRoster
 						results.offer(
 								Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(
 									packet,
-									"You cannot modify this contact. It is controlled by an external service.",
-									true));
+									"You cannot modify this contact. It is controlled by an " +
+									"external service.", true));
 
 						return;
 					}
@@ -746,11 +746,9 @@ public class JabberIqRoster
 						roster_util.removeBuddy(session, buddy);
 						roster_util.updateBuddyChange(session, results, it);
 					} else {
-						String name = item.getAttributeStaticStr("name");
 
-						// if (name == null) {
-						// name = buddy;
-						// } // end of if (name == null)
+						// We are adding a new roster element here
+						String name          = item.getAttributeStaticStr("name");
 						List<Element> groups = item.getChildren();
 						String[] gr          = null;
 
@@ -863,14 +861,17 @@ public class JabberIqRoster
                         JID buddy = JID.jidInstanceNS(nitem.getAttribute("jid"));
                         String name = nitem.getAttribute("name");
                         String subscrStr = nitem.getAttribute("subscription");
-                        RosterAbstract.SubscriptionType subscr = subscrStr == null ? null : RosterAbstract.SubscriptionType.valueOf(subscrStr);
+                        RosterAbstract.SubscriptionType subscr =
+                          subscrStr == null ? null :
+                            RosterAbstract.SubscriptionType.valueOf(subscrStr);
                         String[] groups = null;
                         List<Element> ngroups = nitem.getChildren();
                         if (ngroups != null && !ngroups.isEmpty()) {
                                 int i = 0;
                                 groups = new String[ngroups.size()];
                                 for (Element group : nitem.getChildren()) {
-                                        groups[i++] = group.getCData() == null ? "" : group.getCData();
+                                     groups[i++] =
+                                       group.getCData() == null ? "" : group.getCData();
                                 }
                         }
                         roster_util.addBuddy(session, buddy, name, groups, null);
@@ -907,4 +908,4 @@ public class JabberIqRoster
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/02/28
