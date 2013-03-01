@@ -75,7 +75,6 @@ public class RosterElement
 
 	//~--- fields ---------------------------------------------------------------
 
-	// ~--- fields ---------------------------------------------------------------
 	private String[] groups                = null;
 	private JID jid                        = null;
 	private String name                    = null;
@@ -95,8 +94,6 @@ public class RosterElement
 	private boolean modified = false;
 
 	//~--- constructors ---------------------------------------------------------
-
-	// ~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>RosterElement</code> instance.
@@ -123,7 +120,7 @@ public class RosterElement
 			String grps = roster_el.getAttributeStaticStr(GRP_ATT);
 
 			if ((grps != null) &&!grps.trim().isEmpty()) {
-				groups = grps.split(",");
+				setGroups(grps.split(","));
 			}
 
 			String other_data = roster_el.getAttributeStaticStr(OTHER_ATT);
@@ -180,13 +177,11 @@ public class RosterElement
 		this.session      = session;
 		setJid(jid);
 		setName(name);
-		this.groups       = groups;
+		setGroups(groups);
 		this.subscription = SubscriptionType.none;
 	}
 
 	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -197,7 +192,7 @@ public class RosterElement
 	public void addGroups(String[] groups) {
 		if (groups != null) {
 			if (this.groups == null) {
-				this.groups = groups;
+				setGroups(groups);
 			} else {
 
 				// Groups names must be unique
@@ -209,7 +204,7 @@ public class RosterElement
 				for (String group : groups) {
 					groupsSet.add(group);
 				}
-				this.groups = groupsSet.toArray(new String[groupsSet.size()]);
+				setGroups(groupsSet.toArray(new String[groupsSet.size()]));
 			}
 		}
 
@@ -217,8 +212,6 @@ public class RosterElement
 	}
 
 	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -269,13 +262,13 @@ public class RosterElement
 	public Element getRosterElement() {
 		Element elem = new Element(ELEM_NAME, new String[] { JID_ATT, SUBS_ATT, NAME_ATT,
 						STRINGPREP_ATT }, new String[] { jid.toString(), subscription.toString(),
-						name, "" + stringpreped });
+						XMLUtils.escape(name), "" + stringpreped });
 
 		if ((groups != null) && (groups.length > 0)) {
 			String grps = "";
 
 			for (String group : groups) {
-				grps += group + ",";
+				grps += XMLUtils.escape(group) + ",";
 			}
 			grps = grps.substring(0, grps.length() - 1);
 			elem.setAttribute(GRP_ATT, grps);
@@ -331,6 +324,7 @@ public class RosterElement
 	 *
 	 * @return
 	 */
+	@Override
 	public String toString() {
 		return getRosterItem().toString();
 	}
@@ -379,19 +373,20 @@ public class RosterElement
 
 	//~--- set methods ----------------------------------------------------------
 
-	// ~--- set methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
 	 *
 	 * @param groups
 	 */
-	public void setGroups(String[] groups) {
-		this.groups = groups;
-		modified    = true;
-
-		// item = null;
+	public final void setGroups(String[] groups) {
+		if ((groups != null) && (groups.length > 0)) {
+			this.groups = new String[groups.length];
+			for (int i = 0; i < groups.length; i++) {
+				this.groups[i] = XMLUtils.unescape(groups[i]);
+			}
+			modified = true;
+		}
 	}
 
 	/**
@@ -400,15 +395,19 @@ public class RosterElement
 	 *
 	 * @param name
 	 */
-	public void setName(String name) {
+	public final void setName(String name) {
+		String old_name = this.name;
+
 		if (name == null) {
 			this.name = this.jid.getLocalpart();
 			if ((this.name == null) || this.name.trim().isEmpty()) {
 				this.name = this.jid.getBareJID().toString();
 			}
-			modified = true;
 		} else {
-			this.name = name;
+			this.name = XMLUtils.unescape(name);
+		}
+		if (!this.name.equals(old_name)) {
+			modified = true;
 		}
 	}
 
