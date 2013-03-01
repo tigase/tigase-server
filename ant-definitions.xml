@@ -126,9 +126,9 @@
       <copy
         file="ChangeLog"
         tofile="${dist}/@{packagename}-${version}/ChangeLog"/>
-      <mkdir dir="${dist}/@{packagename}-${version}/libs"/>
-      <copy todir="${dist}/@{packagename}-${version}/libs">
-        <filelist dir="libs">
+      <mkdir dir="${dist}/@{packagename}-${version}/${libs}"/>
+      <copy todir="${dist}/@{packagename}-${version}/${libs}">
+        <filelist dir="${libs}">
           <file name="tigase-utils.jar"/>
           <file name="tigase-xmltools.jar"/>
           <file name="jdbc-mysql.jar"/>
@@ -277,8 +277,8 @@
   	  <exec executable="svn">
         <arg line="export --non-interactive @{cvsroot} ${deb.src}"/>
   	  </exec>
-  	  <mkdir dir="${deb.src}/libs"/>
-  	  <copy todir="${deb.src}/libs">
+  	  <mkdir dir="${deb.src}/${libs}"/>
+  	  <copy todir="${deb.src}/${libs}">
   	    <fileset dir="${libs}"/>
   	  </copy>
   	  <!-- FIXME: Remove after adding etc/init-debian.properties to SVN -->
