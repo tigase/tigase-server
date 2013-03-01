@@ -49,7 +49,7 @@ fi
 
 # add tigase classes to installer build path
 mkdir $INSTALLER_DIR/$PATCHED_IZPACK_DIR/tigaseLib
-for tigase_lib in jars/tigase-server.jar libs/tigase-utils.jar libs/tigase-xmltools.jar
+for tigase_lib in jars/tigase-server.jar jars/tigase-utils.jar jars/tigase-xmltools.jar
 do
 	cp $tigase_lib $INSTALLER_DIR/$PATCHED_IZPACK_DIR/tigaseLib/`basename $tigase_lib`
 done

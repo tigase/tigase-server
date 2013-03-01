@@ -257,7 +257,7 @@ public class DataRepositoryImpl implements DataRepository {
                         driverClass = "com.mysql.jdbc.Driver";
                 }
                 else if (resource_uri.startsWith("jdbc:derby")) {
-                        driverClass = "org.apache.derby.jdbc.ClientDriver";
+                        driverClass = "org.apache.derby.jdbc.EmbeddedDriver";
                 }
 
                 try {

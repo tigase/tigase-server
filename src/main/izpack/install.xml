@@ -49,12 +49,12 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<pack200/>
 	</info>
 
-	<jar src="libs/jdbc-postgresql.jar"/>
-	<jar src="libs/jdbc-mysql.jar"/>
-	<jar src="libs/derby.jar"/>
+	<jar src="jars/jdbc-postgresql.jar"/>
+	<jar src="jars/jdbc-mysql.jar"/>
+	<jar src="jars/derby.jar"/>
 	<jar src="jars/tigase-server.jar"/>
-	<jar src="libs/tigase-xmltools.jar"/>
-	<jar src="libs/tigase-utils.jar"/>
+	<jar src="jars/tigase-xmltools.jar"/>
+	<jar src="jars/tigase-utils.jar"/>
 
 	<native type="izpack" name="ShellLink.dll"/>
 	<native type="izpack" name="ShellLink_x64.dll"/>
@@ -252,8 +252,8 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 					<include name="License.html"/>
 					<include name="Changelog"/>
 					<include name="jars/tigase-server.jar"/>
-					<include name="libs/tigase-utils.jar"/>
-					<include name="libs/tigase-xmltools.jar"/>
+					<include name="jars/tigase-utils.jar"/>
+					<include name="jars/tigase-xmltools.jar"/>
 					<include name="etc/tigase.conf"/>
 					<include name="certs/rsa-keystore"/>
 					<include name="certs/truststore"/>
@@ -302,9 +302,9 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 										target="${INSTALL_PATH}/wrapper.conf"/>
 
 				<singlefile src="win-stuff/wrapper/wrapper.dll"
-										target="$INSTALL_PATH/libs/wrapper.dll"/>
+										target="$INSTALL_PATH/jars/wrapper.dll"/>
 				<singlefile src="win-stuff/wrapper/wrapper.jar"
-										target="$INSTALL_PATH/libs/wrapper.jar"/>
+										target="$INSTALL_PATH/jars/wrapper.jar"/>
 
 				<singlefile src="win-stuff/scripts/InstallTigaseService.bat"
 										target="$INSTALL_PATH/InstallTigaseService.bat"/>
@@ -326,10 +326,10 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 			<pack name="Extras" required="no" preselected="yes">
 				<description>Extras libraries, MUC, PubSub...</description>
 				<fileset dir="." targetdir="$INSTALL_PATH">
-					<include name="libs/tigase-muc.jar"/>
-					<include name="libs/tigase-pubsub.jar"/>
-					<include name="libs/tigase-extras.jar"/>
-					<include name="libs/jdmkrt.jar"/>
+					<include name="jars/tigase-muc.jar"/>
+					<include name="jars/tigase-pubsub.jar"/>
+					<include name="jars/tigase-extras.jar"/>
+					<include name="jars/jdmkrt.jar"/>
 				</fileset>
 			</pack>
 
@@ -338,8 +338,8 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 				<fileset dir="src/main/groovy/tigase/admin" targetdir="$INSTALL_PATH/scripts/admin">
 					<include name="*.*"/>
 				</fileset>
-				<fileset dir="libs" targetdir="$INSTALL_PATH/libs">
-					<include name="groovy-all-1.8.5.jar"/>
+				<fileset dir="jars" targetdir="$INSTALL_PATH/jars">
+					<include name="groovy-all-2.1.0.jar"/>
 				</fileset>
 			</pack>
 
@@ -347,29 +347,29 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 <!-- 						installGroups="Derby Database"> -->
 				<description>Derby database (included) and JDBC driver</description>
 				<fileset dir="." targetdir="$INSTALL_PATH">
-					<include name="libs/derby.jar"/>
-					<include name="libs/derbytools.jar"/>
+					<include name="jars/derby.jar"/>
+					<include name="jars/derbytools.jar"/>
 				</fileset>
 			</pack>
 			<pack name="MySQL Database driver (DB not included)" required="no" preselected="yes">
 <!-- 						installGroups="MySQL Database"> -->
 				<description>MySQL JDBC driver (MySQL has to be installed separately)</description>
 				<fileset dir="." targetdir="$INSTALL_PATH">
-					<include name="libs/jdbc-mysql.jar"/>
+					<include name="jars/jdbc-mysql.jar"/>
 				</fileset>
 			</pack>
 			<pack name="PostgreSQL Database driver (DB not included)" required="no" preselected="yes">
 <!-- 						installGroups="PostgreSQL Database"> -->
 				<description>PostgreSQL JDBC driver (PostgreSQL has to be installed separately)</description>
 				<fileset dir="." targetdir="$INSTALL_PATH">
-					<include name="libs/jdbc-postgresql.jar"/>
+					<include name="jars/jdbc-postgresql.jar"/>
 				</fileset>
 			</pack>
 			<pack name="SQL Server Database driver (DB not included)" required="no" preselected="yes">
 <!-- 						installGroups="SQL Server Database"> -->
 				<description>SQL Server JDBC driver (SQL Server has to be installed separately)</description>
 				<fileset dir="." targetdir="$INSTALL_PATH">
-					<include name="libs/jtds-1.2.2.jar"/>
+					<include name="jars/jtds-1.2.2.jar"/>
 				</fileset>
 			</pack>
 			<pack name="Sources" required="no" preselected="no">
