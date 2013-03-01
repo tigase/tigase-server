@@ -94,14 +94,10 @@ public class JabberIqRoster
 
 	//~--- fields ---------------------------------------------------------------
 
-	// ~--- fields ---------------------------------------------------------------
-
 	/** Field description */
 	protected RosterAbstract roster_util = getRosterUtil();
 
 	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -131,8 +127,6 @@ public class JabberIqRoster
 	}
 
 	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -461,8 +455,6 @@ public class JabberIqRoster
 
 	//~--- get methods ----------------------------------------------------------
 
-	// ~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -474,8 +466,6 @@ public class JabberIqRoster
 	}
 
 	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -850,39 +840,6 @@ public class JabberIqRoster
 				break;
 
 			case set :
-
-//      processSetMethod.invoke(rosterProc, new Object[]{
-//                      packet, session, results, settings
-//              });
-
-/*        List<Element> nitems = packet.getElemChildren("/iq/query");
-        if (nitems != null) {
-                for (Element nitem : nitems) {
-                        JID buddy = JID.jidInstanceNS(nitem.getAttribute("jid"));
-                        String name = nitem.getAttribute("name");
-                        String subscrStr = nitem.getAttribute("subscription");
-                        RosterAbstract.SubscriptionType subscr =
-                          subscrStr == null ? null :
-                            RosterAbstract.SubscriptionType.valueOf(subscrStr);
-                        String[] groups = null;
-                        List<Element> ngroups = nitem.getChildren();
-                        if (ngroups != null && !ngroups.isEmpty()) {
-                                int i = 0;
-                                groups = new String[ngroups.size()];
-                                for (Element group : nitem.getChildren()) {
-                                     groups[i++] =
-                                       group.getCData() == null ? "" : group.getCData();
-                                }
-                        }
-                        roster_util.addBuddy(session, buddy, name, groups, null);
-                        roster_util.setBuddySubscription(session, subscr, buddy);
-
-                        Element item = roster_util.getBuddyItem(session, buddy);
-                        roster_util.updateBuddyChange(session, results, item);
-                }
-        }
-
-        results.offer(packet.okResult((String) null, 0));*/
 				processSetRequest(packet, session, results, settings);
 
 				break;
@@ -900,12 +857,6 @@ public class JabberIqRoster
 		}
 	}
 }    // JabberIqRoster
-
-
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
 
 
 //~ Formatted in Tigase Code Convention on 13/02/28
