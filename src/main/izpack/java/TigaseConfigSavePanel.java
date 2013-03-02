@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.Map;
 import java.util.Properties;
+import java.net.URLEncoder;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -37,6 +38,9 @@ import com.izforge.izpack.installer.InstallerFrame;
 import com.izforge.izpack.installer.IzPanel;
 import com.izforge.izpack.util.Debug;
 import com.izforge.izpack.util.OsVersion;
+import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The Hello panel class.
@@ -105,6 +109,7 @@ public class TigaseConfigSavePanel extends IzPanel {
 
 abstract class VariablesSource {
 	abstract String getVariable(String key);
+	abstract String getEncodedVariable(String key);
 }
 
 class IzPackInstallDataVariablesSource extends VariablesSource {
@@ -118,6 +123,19 @@ class IzPackInstallDataVariablesSource extends VariablesSource {
 	@Override
 	String getVariable(String key) {
 		return idata.getVariable(key);
+	}
+
+	@Override
+	String getEncodedVariable(String key) {
+
+		String variable = idata.getVariable(key);
+		String value = null;
+		try {
+			value = URLEncoder.encode(variable, "UTF-8");
+		} catch ( Exception ex ) {
+			Logger.getLogger( TigaseConfigSaveHelper.class.getName() ).log( Level.SEVERE, null, ex );
+		}
+		return value;
 	}
 }
 
@@ -149,10 +167,11 @@ class TigaseConfigSaveHelper {
 			}
 			if (varName.equals(TigaseConfigConst.USER_DB_URI)) {
 				TigaseConfigConst.props.setProperty(entry.getKey(), getDBUri(variablesSource));
-				TigaseConfigConst.props.setProperty("root-tigase-db-uri",
-					getRootTigaseDBUri(variablesSource));
+				TigaseConfigConst.props.setProperty("root-tigase-db-uri",getRootTigaseDBUri(variablesSource));
 				TigaseConfigConst.props.setProperty("root-db-uri", getRootDBUri(variablesSource));
 				Debug.trace("Set: " + entry.getKey() + " = " + getDBUri(variablesSource));
+				Debug.trace("Set: " + "root-tigase-db-uri" + " = " + getRootTigaseDBUri(variablesSource));
+				Debug.trace("Set: " + "root-db-uri" + " = " + getRootDBUri(variablesSource));
 				continue;
 			}
 
@@ -229,10 +248,10 @@ class TigaseConfigSaveHelper {
 		} else {
 			db_uri += "//" + variablesSource.getVariable("dbHost");
 			db_uri += "/" + variablesSource.getVariable("dbName");
-			db_uri += "?user=" + variablesSource.getVariable("dbUser");
-			if (variablesSource.getVariable("dbPass") != null
-				&& !variablesSource.getVariable("dbPass").isEmpty()) {
-				db_uri += "&password=" + variablesSource.getVariable("dbPass");
+			db_uri += "?user=" + variablesSource.getEncodedVariable("dbUser");
+			if (variablesSource.getEncodedVariable("dbPass") != null
+				&& !variablesSource.getEncodedVariable("dbPass").isEmpty()) {
+				db_uri += "&password=" + variablesSource.getEncodedVariable("dbPass");
 			}
 		}
 		return db_uri;
@@ -251,10 +270,10 @@ class TigaseConfigSaveHelper {
 		} else {
 			db_uri += "//" + variablesSource.getVariable("dbHost");
 			db_uri += "/" + variablesSource.getVariable("dbName");
-			db_uri += "?user=" + variablesSource.getVariable("dbSuperuser");
-			if (variablesSource.getVariable("dbSuperpass") != null
-				&& !variablesSource.getVariable("dbSuperpass").isEmpty()) {
-				db_uri += "&password=" + variablesSource.getVariable("dbSuperpass");
+			db_uri += "?user=" + variablesSource.getEncodedVariable("dbSuperuser");
+			if (variablesSource.getEncodedVariable("dbSuperpass") != null
+				&& !variablesSource.getEncodedVariable("dbSuperpass").isEmpty()) {
+				db_uri += "&password=" + variablesSource.getEncodedVariable("dbSuperpass");
 			}
 		}
 		return db_uri;
@@ -278,10 +297,10 @@ class TigaseConfigSaveHelper {
 		} else {
 			db_uri += "//" + variablesSource.getVariable("dbHost");
 			db_uri += db;
-			db_uri += "?user=" + variablesSource.getVariable("dbSuperuser");
-			if (variablesSource.getVariable("dbSuperpass") != null
-				&& !variablesSource.getVariable("dbSuperpass").isEmpty()) {
-				db_uri += "&password=" + variablesSource.getVariable("dbSuperpass");
+			db_uri += "?user=" + variablesSource.getEncodedVariable("dbSuperuser");
+			if (variablesSource.getEncodedVariable("dbSuperpass") != null
+				&& !variablesSource.getEncodedVariable("dbSuperpass").isEmpty()) {
+				db_uri += "&password=" + variablesSource.getEncodedVariable("dbSuperpass");
 			}
 		}
 		return db_uri;
@@ -301,10 +320,10 @@ class TigaseConfigSaveHelper {
 		} else {
 			db_uri += "//" + variablesSource.getVariable("dbAuthHost");
 			db_uri += "/" + variablesSource.getVariable("dbAuthName");
-			db_uri += "?user=" + variablesSource.getVariable("dbAuthUser");
-			if (variablesSource.getVariable("dbAuthPass") != null
-				&& !variablesSource.getVariable("dbAuthPass").isEmpty()) {
-				db_uri += "&password=" + variablesSource.getVariable("dbAuthPass");
+			db_uri += "?user=" + variablesSource.getEncodedVariable("dbAuthUser");
+			if (variablesSource.getEncodedVariable("dbAuthPass") != null
+				&& !variablesSource.getEncodedVariable("dbAuthPass").isEmpty()) {
+				db_uri += "&password=" + variablesSource.getEncodedVariable("dbAuthPass");
 			}
 		}
 		return db_uri;
