@@ -105,27 +105,28 @@ public class TLSWrapper {
 	 */
 	public TLSWrapper(SSLContext sslc, TLSEventHandler eventHandler, String[] sslProtocols, boolean clientMode) {
 		tlsEngine = sslc.createSSLEngine();
-
-		if ( !clientMode) {
-			tlsEngine.getSSLParameters().setWantClientAuth(true);
-		}
-                
 		tlsEngine.setUseClientMode(clientMode);
 
-                if (tls_jdk_nss_workaround) {
-                        // Workaround for TLS/SSL bug in new JDK used with new version of nss library see also:
-                        // http://stackoverflow.com/q/10687200/427545
-                        // http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=b509d9cb5d8164d90e6731f5fc44?bug_id=6928796
-                        tlsEngine.setEnabledCipherSuites(tls_workaround_ciphers);
-                }
-                
-                if (sslProtocols != null) {
-                        tlsEngine.setEnabledProtocols(sslProtocols);
-                }
+		if (tls_jdk_nss_workaround) {
+			// Workaround for TLS/SSL bug in new JDK used with new version of
+			// nss library see also:
+			// http://stackoverflow.com/q/10687200/427545
+			// http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=b509d9cb5d8164d90e6731f5fc44?bug_id=6928796
+			tlsEngine.setEnabledCipherSuites(tls_workaround_ciphers);
+		}
+
+		if (sslProtocols != null) {
+			tlsEngine.setEnabledProtocols(sslProtocols);
+		}
 
 		netBuffSize = tlsEngine.getSession().getPacketBufferSize();
 		appBuffSize = tlsEngine.getSession().getApplicationBufferSize();
 		this.eventHandler = eventHandler;
+
+		if ( !clientMode) {
+			tlsEngine.setWantClientAuth(true);
+		}
+
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -232,7 +233,7 @@ public class TLSWrapper {
 			if ((tlsEngineResult != null) && (tlsEngineResult.getStatus() == Status.CLOSED)) {
 				status = TLSStatus.CLOSED;
 			}      // end of if (tlsEngine.getStatus() == Status.BUFFER_UNDERFLOW)
-					else {
+			else {
 				switch (tlsEngine.getHandshakeStatus()) {
 					case NEED_WRAP :
 						status = TLSStatus.NEED_WRITE;
@@ -403,6 +404,11 @@ public class TLSWrapper {
 //    return app;
 //  }    // end of else
 	}
+
+	public SSLEngine getTlsEngine() {
+		return tlsEngine;
+	}
+
 }    // TLSWrapper
 
 

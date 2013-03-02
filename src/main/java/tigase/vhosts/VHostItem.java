@@ -2,7 +2,7 @@
  * VHostItem.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,6 +31,7 @@ import tigase.db.comp.RepositoryItemAbstract;
 import tigase.server.Command;
 import tigase.server.Packet;
 
+import tigase.util.DataTypes;
 import tigase.util.TigaseStringprepException;
 
 import tigase.xml.Element;
@@ -39,7 +40,6 @@ import tigase.xmpp.JID;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.IllegalFormatException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -165,11 +165,58 @@ public class VHostItem
 	/** Field description */
 	public static final String REGISTER_ENABLED_LABEL = "In-band registration";
 
+	/** Field description */
+	public static final String TLS_REQUIRED_ATT = "tls-required";
+
+	/** Field description */
+	public static final String TLS_REQUIRED_LABEL = "TLS required";
+
 	/**
 	 * Element name to for the VHostItem XML storage.
 	 */
 	public static final String VHOST_ELEM = "vhost";
-	private static final Logger log       = Logger.getLogger(VHostItem.class.getName());
+
+	/** Field description */
+	protected static final String VHOST_ANONYMOUS_ENABLED_PROP_KEY =
+		"vhost-anonymous-enabled";
+
+	/** Field description */
+	protected static final Boolean VHOST_ANONYMOUS_ENABLED_PROP_DEF = Boolean.TRUE;
+
+	/** Field description */
+	protected static final String VHOST_MAX_USERS_PROP_KEY = "vhost-max-users";
+
+	/** Field description */
+	protected static final Long VHOST_MAX_USERS_PROP_DEF = Long.valueOf(0l);
+
+	/** Field description */
+	protected static final String VHOST_MESSAGE_FORWARD_PROP_DEF = null;
+
+	/** Field description */
+	protected static final String VHOST_MESSAGE_FORWARD_PROP_KEY =
+		"vhost-message-forward-jid";
+
+	/** Field description */
+	protected static final String VHOST_PRESENCE_FORWARD_PROP_DEF = null;
+
+	/** Field description */
+	protected static final String VHOST_PRESENCE_FORWARD_PROP_KEY =
+		"vhost-presence-forward-jid";
+
+	/** Field description */
+	protected static final String VHOST_REGISTER_ENABLED_PROP_KEY =
+		"vhost-register-enabled";
+
+	/** Field description */
+	protected static final Boolean VHOST_REGISTER_ENABLED_PROP_DEF = Boolean.TRUE;
+
+	/** Field description */
+	protected static final String VHOST_TLS_REQUIRED_PROP_KEY = "vhost-tls-required";
+
+	/** Field description */
+	protected static final Boolean VHOST_TLS_REQUIRED_PROP_DEF = Boolean.FALSE;
+	private static final Logger log                            =
+		Logger.getLogger(VHostItem.class.getName());
 
 	/** Field description */
 	protected static final String[] VHOST_OTHER_PARAMS_PATH = { VHOST_ELEM,
@@ -180,21 +227,29 @@ public class VHostItem
 
 	//~--- fields ---------------------------------------------------------------
 
-	// ~--- fields ---------------------------------------------------------------
-	private String[] comps             = null;
-	private long maxUsersNumber        = 0L;
-	private JID messageForward         = null;
-	private String otherDomainParams   = null;
-	private JID presenceForward        = null;
+	private String[] comps      = null;
+	private long maxUsersNumber = Long.getLong(VHOST_MAX_USERS_PROP_KEY,
+																	VHOST_MAX_USERS_PROP_DEF);
+	private JID messageForward =
+		JID.jidInstanceNS(System.getProperty(VHOST_MESSAGE_FORWARD_PROP_KEY,
+			VHOST_MESSAGE_FORWARD_PROP_DEF));
+	private String otherDomainParams = null;
+	private JID presenceForward      =
+		JID.jidInstanceNS(System.getProperty(VHOST_PRESENCE_FORWARD_PROP_KEY,
+			VHOST_PRESENCE_FORWARD_PROP_DEF));
 	private VHostItem unmodifiableItem = null;
 	private JID vhost                  = null;
-	private boolean registerEnabled    = true;
-	private boolean enabled            = true;
-	private boolean anonymousEnabled   = true;
+	private boolean tlsRequired        = DataTypes.getProperty(VHOST_TLS_REQUIRED_PROP_KEY,
+																				 VHOST_TLS_REQUIRED_PROP_DEF);
+	private boolean registerEnabled =
+		DataTypes.getProperty(VHOST_REGISTER_ENABLED_PROP_KEY,
+													VHOST_REGISTER_ENABLED_PROP_DEF);
+	private boolean enabled          = true;
+	private boolean anonymousEnabled =
+		DataTypes.getProperty(VHOST_ANONYMOUS_ENABLED_PROP_KEY,
+													VHOST_ANONYMOUS_ENABLED_PROP_DEF);
 
 	//~--- constructors ---------------------------------------------------------
-
-	// ~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Constructs ...
@@ -242,8 +297,6 @@ public class VHostItem
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -258,6 +311,7 @@ public class VHostItem
 		Command.addCheckBoxField(packet, ENABLED_LABEL, enabled);
 		Command.addCheckBoxField(packet, ANONYMOUS_ENABLED_LABEL, anonymousEnabled);
 		Command.addCheckBoxField(packet, REGISTER_ENABLED_LABEL, registerEnabled);
+		Command.addCheckBoxField(packet, TLS_REQUIRED_LABEL, tlsRequired);
 		Command.addFieldValue(packet, MAX_USERS_NUMBER_LABEL, "" + maxUsersNumber);
 		Command.addFieldValue(packet, PRESENCE_FORWARD_ADDRESS_LABEL,
 													((presenceForward != null)
@@ -273,8 +327,6 @@ public class VHostItem
 	}
 
 	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Returns an array with the server components names which should process
@@ -378,8 +430,6 @@ public class VHostItem
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -401,6 +451,7 @@ public class VHostItem
 		enabled          = Command.getCheckBoxFieldValue(packet, ENABLED_LABEL);
 		anonymousEnabled = Command.getCheckBoxFieldValue(packet, ANONYMOUS_ENABLED_LABEL);
 		registerEnabled  = Command.getCheckBoxFieldValue(packet, REGISTER_ENABLED_LABEL);
+		tlsRequired      = Command.getCheckBoxFieldValue(packet, TLS_REQUIRED_LABEL);
 		try {
 			maxUsersNumber = Long.parseLong(Command.getFieldValue(packet,
 							MAX_USERS_NUMBER_LABEL));
@@ -452,6 +503,7 @@ public class VHostItem
 			Boolean.parseBoolean(elem.getAttributeStaticStr(ANONYMOUS_ENABLED_ATT));
 		registerEnabled =
 			Boolean.parseBoolean(elem.getAttributeStaticStr(REGISTER_ENABLED_ATT));
+		tlsRequired = Boolean.parseBoolean(elem.getAttributeStaticStr(TLS_REQUIRED_ATT));
 		try {
 			maxUsersNumber = Long.parseLong(elem.getAttributeStaticStr(MAX_USERS_NUMBER_ATT));
 		} catch (Exception e) {
@@ -494,13 +546,19 @@ public class VHostItem
 																				 props[0], ex);
 		}
 		for (String tmp : props) {
+			boolean val = true;
+
 			if (tmp.startsWith("-")) {
-				if (tmp.endsWith(ANONYMOUS_ENABLED_ATT)) {
-					anonymousEnabled = false;
-				}
-				if (tmp.endsWith(REGISTER_ENABLED_ATT)) {
-					registerEnabled = false;
-				}
+				val = false;
+			}
+			if (tmp.endsWith(ANONYMOUS_ENABLED_ATT)) {
+				anonymousEnabled = val;
+			}
+			if (tmp.endsWith(REGISTER_ENABLED_ATT)) {
+				registerEnabled = val;
+			}
+			if (tmp.endsWith(TLS_REQUIRED_ATT)) {
+				tlsRequired = val;
 			}
 			if (tmp.startsWith(MAX_USERS_NUMBER_ATT)) {
 				String[] mu = tmp.split("=");
@@ -580,20 +638,27 @@ public class VHostItem
 		return registerEnabled;
 	}
 
-	//~--- set methods ----------------------------------------------------------
+	/**
+	 * The method returns TLS required settings for the vhost.
+	 *
+	 *
+	 * @return a <code>boolean</code> value whether TLS is required for the vhost or not.
+	 */
+	public boolean isTlsRequired() {
+		return tlsRequired;
+	}
 
-	// ~--- set methods ----------------------------------------------------------
+	//~--- set methods ----------------------------------------------------------
 
 	/**
 	 * This method allows to enable or disable anonymous logins for this domain.
 	 * By default anonymous logins are enabled.
 	 *
-	 * @param enabled
-	 *          is a <code>boolean</code> value indicating whether anonymous
-	 *          logins are allowed for this domain.
+	 *
+	 * @param value
 	 */
-	public void setAnonymousEnabled(boolean enabled) {
-		this.anonymousEnabled = enabled;
+	public void setAnonymousEnabled(boolean value) {
+		this.anonymousEnabled = value;
 	}
 
 	/**
@@ -615,12 +680,11 @@ public class VHostItem
 	 * disabled packets sent for this domain are not processed normally, instead
 	 * the server returns an error to the sender. Domain is enabled by default.
 	 *
-	 * @param enabled
-	 *          is a <code>boolean</code> value indicating whether the domain is
-	 *          enabled or not.
+	 *
+	 * @param value
 	 */
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
+	public void setEnabled(boolean value) {
+		this.enabled = value;
 	}
 
 	/**
@@ -688,12 +752,22 @@ public class VHostItem
 	 * This method allows to enable or disable user account registration for this
 	 * domain. By default user account registration is enabled.
 	 *
-	 * @param enabled
-	 *          is a <code>boolean</code> value indicating whether user account
-	 *          registration is allowed for this domain or not.
+	 *
+	 * @param value
 	 */
-	public void setRegisterEnabled(boolean enabled) {
-		this.registerEnabled = enabled;
+	public void setRegisterEnabled(boolean value) {
+		this.registerEnabled = value;
+	}
+
+	/**
+	 * The method sets TLS required property for the vhost. By default TLS is not required.
+	 *
+	 *
+	 * @param value is a <code>boolean</code> parameter specifying whether TLS is required
+	 * for the virtual domain.
+	 */
+	public void setTlsRequired(boolean value) {
+		this.tlsRequired = value;
 	}
 
 	/**
@@ -754,6 +828,7 @@ public class VHostItem
 		elem.addAttribute(ENABLED_ATT, "" + enabled);
 		elem.addAttribute(ANONYMOUS_ENABLED_ATT, "" + anonymousEnabled);
 		elem.addAttribute(REGISTER_ENABLED_ATT, "" + registerEnabled);
+		elem.addAttribute(TLS_REQUIRED_ATT, "" + tlsRequired);
 		elem.addAttribute(MAX_USERS_NUMBER_ATT, "" + maxUsersNumber);
 		if (presenceForward != null) {
 			elem.addAttribute(PRESENCE_FORWARD_ADDRESS_ATT, presenceForward.toString());
@@ -782,6 +857,9 @@ public class VHostItem
 		if (!registerEnabled) {
 			sb.append(":-").append(REGISTER_ENABLED_ATT);
 		}
+		if (!tlsRequired) {
+			sb.append(":-").append(TLS_REQUIRED_ATT);
+		}
 		if (maxUsersNumber > 0) {
 			sb.append(':').append(MAX_USERS_NUMBER_ATT).append('=').append(maxUsersNumber);
 		}
@@ -807,7 +885,7 @@ public class VHostItem
 	public String toString() {
 		return "Domain: " + vhost + ", enabled: " + enabled + ", anonym: " +
 					 anonymousEnabled + ", register: " + registerEnabled + ", maxusers: " +
-					 maxUsersNumber;
+					 maxUsersNumber + ", tls: " + tlsRequired;
 	}
 
 	//~--- inner classes --------------------------------------------------------
@@ -984,9 +1062,18 @@ public class VHostItem
 			return VHostItem.this.isRegisterEnabled();
 		}
 
-		//~--- set methods --------------------------------------------------------
+		/**
+		 * Method description
+		 *
+		 *
+		 * @return
+		 */
+		@Override
+		public boolean isTlsRequired() {
+			return VHostItem.this.isTlsRequired();
+		}
 
-		// ~--- set methods --------------------------------------------------------
+		//~--- set methods --------------------------------------------------------
 
 		/**
 		 * This method allows to enable or disable anonymous logins for this domain.
@@ -1076,9 +1163,19 @@ public class VHostItem
 					"This is unmodifiable instance of VHostItem");
 		}
 
-		//~--- methods ------------------------------------------------------------
+		/**
+		 * Method description
+		 *
+		 *
+		 * @param enabled
+		 */
+		@Override
+		public void setTlsRequired(boolean enabled) {
+			throw new UnsupportedOperationException(
+					"This is unmodifiable instance of VHostItem");
+		}
 
-		// ~--- methods ------------------------------------------------------------
+		//~--- methods ------------------------------------------------------------
 
 		/**
 		 * The method exports the <code>VHostItem</code> object to XML
@@ -1111,4 +1208,4 @@ public class VHostItem
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/02/22

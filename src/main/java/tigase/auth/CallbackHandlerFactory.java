@@ -26,6 +26,10 @@ public class CallbackHandlerFactory {
 
 		CallbackHandler handler = handlerClass.newInstance();
 
+		if (handler instanceof SessionAware) {
+			((SessionAware) handler).setSession(session);
+		}
+
 		if (handler instanceof DomainAware) {
 			((DomainAware) handler).setDomain(session.getDomain().getVhost().getDomain());
 		}

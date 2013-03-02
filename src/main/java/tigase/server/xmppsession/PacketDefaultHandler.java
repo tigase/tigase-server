@@ -2,11 +2,12 @@
  * PacketDefaultHandler.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -37,11 +38,14 @@ import tigase.xmpp.NoConnectionIdException;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPSession;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Queue;
@@ -65,7 +69,6 @@ public class PacketDefaultHandler {
 	//~--- fields ---------------------------------------------------------------
 
 	// private static TigaseRuntime runtime = TigaseRuntime.getTigaseRuntime();
-	// ~--- fields ---------------------------------------------------------------
 	// private RosterAbstract roster_util =
 	// RosterFactory.getRosterImplementation(true);
 	private String[] AUTH_ONLY_ELEMS  = { "message", "presence" };
@@ -75,8 +78,6 @@ public class PacketDefaultHandler {
 
 	//~--- constructors ---------------------------------------------------------
 
-	// ~--- constructors ---------------------------------------------------------
-
 	/**
 	 * Creates a new <code>PacketDefaultHandler</code> instance.
 	 *
@@ -84,8 +85,6 @@ public class PacketDefaultHandler {
 	public PacketDefaultHandler() {}
 
 	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -258,11 +257,9 @@ public class PacketDefaultHandler {
 				} else {
 
 					// We do not accept anything without resource binding....
-					results.offer(
-							Authorization.NOT_AUTHORIZED.getResponseMessage(
-								packet,
-								"You must bind the resource first: http://www.xmpp.org/rfcs/rfc3920.html#bind",
-								true));
+					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+									"You must bind the resource first: " +
+									"http://www.xmpp.org/rfcs/rfc3920.html#bind", true));
 					if (log.isLoggable(Level.INFO)) {
 						log.log(Level.INFO, "Session details: connectionId={0}, sessionId={1}",
 										new Object[] { session.getConnectionId(),
@@ -301,25 +298,16 @@ public class PacketDefaultHandler {
 	 * @param repo
 	 * @param results
 	 *
+	 *
+	 * @throws XMPPException
 	 */
 	public void process(Packet packet, XMPPResourceConnection session,
-											NonAuthUserRepository repo, Queue<Packet> results) {
+											NonAuthUserRepository repo, Queue<Packet> results)
+					throws XMPPException {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Processing packet: {0}", packet.toStringSecure());
 		}
 		try {
-
-			// Already done in forward method....
-			// No need to repeat this (performance - everything counts...)
-			//// For all messages coming from the owner of this account set
-			//// proper 'from' attribute. This is actually needed for the case
-			//// when the user sends a message to himself.
-			// if (packet.getFrom() != null
-			// && packet.getFrom().equals(session.getConnectionId())) {
-			// packet.getElement().setAttribute("from", session.getJID());
-			// log.finest("Setting correct from attribute: " + session.getJID());
-			// } // end of if (packet.getFrom().equals(session.getConnectionId()))
-			// String id = null;
 			JID to = packet.getStanzaTo();
 
 			// If this is simple <iq type="result"/> then ignore it
@@ -333,28 +321,50 @@ public class PacketDefaultHandler {
 			if (session.isUserId(to.getBareJID())) {
 
 				// Yes this is message to 'this' client
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Yes, this is packet to ''this'' client: {0}", to);
+				Packet result;
+
+				// This is where and how we set the address of the component
+				// which should rceive the result packet for the final delivery
+				// to the end-user. In most cases this is a c2s or Bosh component
+				// which keep the user connection.
+				String resource = packet.getStanzaTo().getResource();
+
+				if (resource == null) {
+
+					// In default packet handler we deliver packets to a specific resource only
+					result = Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
+									"The feature is not supported yet.", true);
+					result.setPacketFrom(null);
+					result.setPacketTo(null);
+				} else {
+
+					// Otherwise only to the given resource or sent back as error.
+					XMPPResourceConnection con =
+						session.getParentSession().getResourceForResource(resource);
+
+					if (con != null) {
+						result = packet.copyElementOnly();
+						result.setPacketTo(con.getConnectionId());
+
+						// In most cases this might be skept, however if there is a
+						// problem during packet delivery an error might be sent back
+						result.setPacketFrom(packet.getTo());
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "Delivering message, packet: {0}, to session: {1}",
+											new Object[] { packet,
+																		 con });
+						}
+					} else {
+						result = Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet,
+										"The recipient is no longer available.", true);
+						result.setPacketFrom(null);
+						result.setPacketTo(null);
+					}
 				}
 
-				// Element elem = packet.getElement().clone();
-				// Packet result = new Packet(elem);
-				// result.setTo(session.getConnectionId(packet.getElemTo()));
-				// if (log.isLoggable(Level.FINEST)) {
-				// log.finest("Setting to: " + result.getTo());
-				// }
-				// result.setFrom(packet.getTo());
-				Packet result = packet.copyElementOnly();
-
-				result.setPacketFrom(packet.getTo());
-				try {
-					result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
-					results.offer(result);
-				} catch (NoConnectionIdException ex) {
-					log.log(Level.WARNING,
-									"Packet to the server which hasn't been properly processed: {0}",
-									packet);
-				}
+				// Don't forget to add the packet to the results queue or it
+				// will be lost.
+				results.offer(result);
 
 				return;
 			}    // end of else
@@ -364,13 +374,7 @@ public class PacketDefaultHandler {
 				if (session.isUserId(from)) {
 					Packet result = packet.copyElementOnly();
 
-					// String[] connIds = runtime.getConnectionIdsForJid(to);
-					// if (connIds != null && connIds.length > 0) {
-					// result.setTo(connIds[0]);
-					// }
 					results.offer(result);
-
-					return;
 				}
 			}
 		} catch (NotAuthorizedException e) {
@@ -386,10 +390,4 @@ public class PacketDefaultHandler {
 }
 
 
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-
-//~ Formatted in Tigase Code Convention on 13/02/16
+//~ Formatted in Tigase Code Convention on 13/02/28

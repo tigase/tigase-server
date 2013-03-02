@@ -172,7 +172,7 @@
 
  <target name="clean-all" depends="clean" description="Clean all extra files">
   <delete file="sample-junit-target.xml"/>
-  <delete dir="${jars}"/>
+  <delete file="${jars}/tigase-server*.jar"/>
   <delete dir="dist"/>
   <delete dir="docs-${jarfile}"/>
   <delete dir="target"/>

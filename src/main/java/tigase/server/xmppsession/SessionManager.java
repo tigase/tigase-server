@@ -23,6 +23,7 @@
 package tigase.server.xmppsession;
 
 import tigase.auth.TigaseSaslProvider;
+import tigase.auth.mechanisms.SaslEXTERNAL;
 
 import tigase.conf.Configurable;
 
@@ -1438,6 +1439,14 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 					log.log(Level.WARNING,
 							"There is no implementation for such command on the server: " + iqc);
 
+					processing_result = true;
+				}
+				break;
+			case CLIENT_AUTH:
+				if (connection != null) {
+					String[] jids = Command.getFieldValues(pc, "jids");
+					connection.putSessionData(SaslEXTERNAL.SASL_EXTERNAL_ALLOWED, Boolean.TRUE);
+					connection.putSessionData(SaslEXTERNAL.SESSION_AUTH_JIDS_KEY, jids);
 					processing_result = true;
 				}
 				break;

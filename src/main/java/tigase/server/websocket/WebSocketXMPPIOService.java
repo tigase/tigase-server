@@ -85,6 +85,8 @@ public class WebSocketXMPPIOService<RefObject>
 	private int pos           = 0;
 	private int version       = 0;
 
+	private byte[] partialFrame = null;
+	
 	// internal properties
 	private boolean websocket = false;
 	private boolean started   = false;
@@ -106,7 +108,43 @@ public class WebSocketXMPPIOService<RefObject>
 			return null;
 		}
 		if (websocket) {
-			cb = decodeFrame(cb);
+			// handling partialy decoded frame
+			if (partialFrame != null) {
+				ByteBuffer oldtmp = cb;
+				cb = ByteBuffer.allocate(partialFrame.length + oldtmp.remaining());
+				cb.order(oldtmp.order());
+				cb.put(partialFrame);
+				cb.put(oldtmp);
+				cb.flip();
+				oldtmp.clear();
+				partialFrame = null;
+				
+			}
+			
+			// data needs to be decoded fully not just first frame!!
+			ByteBuffer tmp = ByteBuffer.allocate(cb.remaining());	
+			// here we got buffer overflow
+			ByteBuffer decoded = null;
+			while (cb.hasRemaining() && (decoded = decodeFrame(cb)) != null) {
+				//decoded = decodeFrame(cb);
+				if (decoded != null && decoded.hasRemaining()) {
+					tmp.put(decoded);
+				}
+			}
+			
+			// handling data which were not decoded - not complete data
+			if (cb.hasRemaining()) {
+				partialFrame = new byte[cb.remaining()];
+				cb.get(partialFrame);
+			}
+			
+			// compact buffer after reading all frames
+			cb.compact();
+			
+			if (tmp.capacity() > 0) {
+				tmp.flip();
+			}
+			cb = tmp; 
 		}
 		if (started) {
 			return decode(cb);
@@ -154,39 +192,44 @@ public class WebSocketXMPPIOService<RefObject>
 
 		// Try to lock the data writing method
 		// If cannot lock and nothing to send, just leave
-		if (data == null) {
-			return;
-		}
-
 		boolean locked = writeInProgress.tryLock();
 
 		// Otherwise wait.....
 		if (!locked) {
+			if (data == null) {
+				return;
+			}
+			
 			writeInProgress.lock();
 		}
 		try {
 			if (websocket) {
 				try {
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "sending data = {0}", data);
+					if (data != null) {					
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "sending data = {0}", data);
+						}
+
+						ByteBuffer buf = encode(data);
+						int size = buf.remaining();
+
+						// set type as finally part (0x80) of message of type text (0x01)
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "sending encoded data size = {0}", size);
+						}
+
+						ByteBuffer bbuf = createFrameHeader((byte) 0x81, size);
+
+						// send frame header
+						writeBytes(bbuf);
+
+						// send frame content
+						writeBytes(buf);
+						buf.compact();
 					}
-
-					ByteBuffer buf = encode(data);
-					int size       = buf.remaining();
-
-					// set type as finally part (0x80) of message of type text (0x01)
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "sending encoded data size = {0}", size);
+					else {
+						writeBytes(null);
 					}
-
-					ByteBuffer bbuf = createFrameHeader((byte) 0x81, size);
-
-					// send frame header
-					writeBytes(bbuf);
-
-					// send frame content
-					writeBytes(buf);
-					buf.compact();
 				} catch (Exception ex) {
 					if (log.isLoggable(Level.FINE)) {
 						log.log(Level.FINE, "exception writing data", ex);
@@ -298,12 +341,13 @@ public class WebSocketXMPPIOService<RefObject>
 				log.finest("no content remainging to process");
 			}
 
-			return buf;
+			return null;
 		}
 
 		boolean masked = false;
 		byte type      = 0x00;
-
+		int position   = buf.position();
+		
 		if (frameLength == -1) {
 			type = buf.get();
 			if ((type & 0x08) == 0x08) {
@@ -356,7 +400,13 @@ public class WebSocketXMPPIOService<RefObject>
 			unmasked    = ByteBuffer.wrap(data);
 			frameLength = -1;
 		}
-		buf.compact();
+		else {
+			// not enought data so reset buffer position
+			buf.position(position);
+			frameLength = -1;
+			return null;
+		}	
+		
 		if (frameLength == -1) {
 
 			// we need to ignore pong frame

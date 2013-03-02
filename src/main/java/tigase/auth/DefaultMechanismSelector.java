@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.security.sasl.SaslServerFactory;
 
+import tigase.auth.mechanisms.SaslEXTERNAL;
 import tigase.auth.mechanisms.TigaseSaslServerFactory;
 import tigase.xmpp.XMPPResourceConnection;
 
@@ -37,9 +38,10 @@ public class DefaultMechanismSelector implements MechanismSelector {
 
 	protected boolean match(SaslServerFactory factory, String mechanismName, XMPPResourceConnection session) {
 		if (factory instanceof TigaseSaslServerFactory) {
-			if (!session.getDomain().isAnonymousEnabled() && "ANONYMOUS".equals(mechanismName)) {
+			if (!session.getDomain().isAnonymousEnabled() && "ANONYMOUS".equals(mechanismName))
 				return false;
-			}
+			if ("EXTERNAL".equals(mechanismName) && session.getSessionData(SaslEXTERNAL.SASL_EXTERNAL_ALLOWED) != Boolean.TRUE)
+				return false;
 			return true;
 		}
 		return false;

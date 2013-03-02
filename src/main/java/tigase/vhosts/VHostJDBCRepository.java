@@ -2,7 +2,7 @@
  * VHostJDBCRepository.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -65,7 +65,7 @@ import java.util.Map;
 public class VHostJDBCRepository
 				extends UserRepoRepository<VHostItem> {
 	/**
-	 * cofiguration option allowing specify default IP to which VHost should resolve
+	 * Configuration option allowing specify default IP to which VHost should resolve
 	 * vhost-man/dns-def-ip=
 	 */
 	public static final String DNS_DEF_IP_PROP_KEY = "dns-def-ip";
@@ -74,7 +74,7 @@ public class VHostJDBCRepository
 	public static String DNS_DEF_IP_PROP_VAL = null;
 
 	/**
-	 * cofiguration option allowing specify default hostname to which VHost should resolve
+	 * Configuration option allowing specify default hostname to which VHost should resolve
 	 * vhost-man/dns-srv-def-addr=
 	 */
 	public static final String DNS_SRV_DEF_ADDR_PROP_KEY = "dns-srv-def-addr";
@@ -83,7 +83,8 @@ public class VHostJDBCRepository
 	public static String DNS_SRV_DEF_ADDR_PROP_VAL = null;
 
 	/**
-	 * cofiguration option allowing specify default maximum number that user can register in service
+	 * Configuration option allowing specify default maximum number that user can register
+	 * in service
 	 *
 	 * vhost-man/domains-per-user-limit=
 	 */
@@ -294,9 +295,9 @@ public class VHostJDBCRepository
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Map props                = new HashMap<String, Object>();
-		Map params               = new HashMap<String, Object>();
-		VHostJDBCRepository repo = new VHostJDBCRepository();
+		Map<String, Object> props  = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<String, Object>();
+		VHostJDBCRepository repo   = new VHostJDBCRepository();
 
 		repo.getDefaults(props, params);
 		props.put(DNS_SRV_DEF_ADDR_PROP_KEY, "tigase.me");
@@ -315,7 +316,4 @@ public class VHostJDBCRepository
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/21
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/02/28

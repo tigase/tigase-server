@@ -2,7 +2,7 @@
  * XMPPResourceConnection.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -271,9 +271,26 @@ public class XMPPResourceConnection
 	 * @throws NoConnectionIdException
 	 */
 	public JID getConnectionId(JID jid) throws NoConnectionIdException {
-		return (((parentSession == null) || (jid == null))
-						? this.getConnectionId()
-						: parentSession.getResourceConnection(jid).getConnectionId());
+		JID result = null;
+
+		if ((jid != null)) {
+			if ((jid.getResource() != null) && (parentSession != null)) {
+				XMPPResourceConnection conn =
+					parentSession.getResourceForResource(jid.getResource());
+
+				result = (conn == null)
+								 ? null
+								 : conn.getConnectionId();
+			} else {
+				if ((jid.getResource() == null) || jid.getResource().equals(this.resource)) {
+					result = this.connectionId;
+				}
+			}
+		} else {
+			result = this.connectionId;
+		}
+
+		return result;
 	}
 
 	/**
@@ -962,4 +979,4 @@ public class XMPPResourceConnection
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/19
+//~ Formatted in Tigase Code Convention on 13/02/28

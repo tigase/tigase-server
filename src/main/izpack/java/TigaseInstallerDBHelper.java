@@ -131,6 +131,7 @@ class TigaseInstallerDBHelper {
 	public void validateDBConnection(TigaseInstallerDBHelper.MsgTarget msgTarget) {
 		connection_ok = false;
 		String db_conn = TigaseConfigConst.props.getProperty("root-db-uri");
+		Debug.trace("validateDBConnection (root-db-uri): " + db_conn);
 		if (db_conn == null) {
 			msgTarget.addResultMessage().append("Missing DB connection URL");
 			return;
@@ -151,6 +152,7 @@ class TigaseInstallerDBHelper {
 	}
 
 	private void selectDatabase(String db_uri) {
+		Debug.trace("selectDatabase (db_uri): " + db_uri);
 		schema_ver_query = TigaseConfigConst.JDBC_GETSCHEMAVER_QUERY;
 		if (db_uri.startsWith("jdbc:postgresql")) {
 			System.setProperty("jdbc.drivers", TigaseConfigConst.PGSQL_DRIVER);
@@ -175,6 +177,7 @@ class TigaseInstallerDBHelper {
 
 		db_ok = false;
 		String db_conn = TigaseConfigConst.props.getProperty("--user-db-uri");
+		Debug.trace("validateDBExists (--user-db-uri): " + db_conn);
 		if (db_conn == null) {
 			msgTarget.addResultMessage().append("Missing DB connection URL");
 			return;
@@ -238,6 +241,7 @@ class TigaseInstallerDBHelper {
 			return;
 		}
 		String db_conn = TigaseConfigConst.props.getProperty("root-tigase-db-uri");
+		Debug.trace("validateDBConversion (root-tigase-db-uri): " + db_conn);
 		try {
 			//conn.close();
                         ResultMessage resultMessage = msgTarget.addResultMessage();
@@ -285,6 +289,7 @@ class TigaseInstallerDBHelper {
 		schema_ok = false;
 		Connection conn = null;
 		String db_conn = TigaseConfigConst.props.getProperty("--user-db-uri");
+		Debug.trace("validateDBSchema (--user-db-uri): " + db_conn);
 		long users = 0;
 		try {
 			conn = DriverManager.getConnection(db_conn);
@@ -316,6 +321,7 @@ class TigaseInstallerDBHelper {
 		if (!schema_exists) {
 			Debug.trace("DB schema doesn't exists, creating one...");
 			db_conn = TigaseConfigConst.props.getProperty("root-tigase-db-uri");
+			Debug.trace("validateDBSchema (root-tigase-db-uri): " + db_conn);
 			try {
                             //conn.close();
                             conn = DriverManager.getConnection(db_conn);
@@ -362,6 +368,7 @@ class TigaseInstallerDBHelper {
 
 		// part 2, acquire reqired fields and validate them
                 String db_conn = TigaseConfigConst.props.getProperty("root-tigase-db-uri");
+				Debug.trace("postInstallation (root-tigase-db-uri): " + db_conn);
                 try {
                     //conn.close();
                     TigaseInstallerDBHelper.ResultMessage resultMessage = msgTarget.addResultMessage();
@@ -436,8 +443,10 @@ class TigaseInstallerDBHelper {
 		// if (className == null) 
 		//	className = TigaseConfigConst.props.getProperty("--user-db");
 		String resource = TigaseConfigConst.props.getProperty("--auth-db-uri");
+		Debug.trace("addXmppAdminAccount (--auth-db-uri): " + resource);
 		if (resource == null) 
 			resource = TigaseConfigConst.props.getProperty("root-tigase-db-uri");
+			Debug.trace("addXmppAdminAccount (root-tigase-db-uri): " + resource);
 
 		try {
 			AuthRepository repo = RepositoryFactory.getAuthRepository(
