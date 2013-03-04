@@ -29,7 +29,11 @@ package tigase.conf;
 import tigase.db.comp.RepositoryChangeListenerIfc;
 import tigase.db.TigaseDBException;
 
+import tigase.util.DataTypes;
+
 //~--- JDK imports ------------------------------------------------------------
+
+import java.io.FileWriter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,6 +54,12 @@ import java.util.Set;
  */
 public class ConfigurationCache
 				implements ConfigRepositoryIfc {
+	/** Field description */
+	public static final String CONFIG_DUMP_FILE_PROP_DEF = "etc/config-dump.properties";
+
+	/** Field description */
+	public static final String CONFIG_DUMP_FILE_PROP_KEY = "config-dump-file";
+
 	/**
 	 * Private logger for class instance.
 	 */
@@ -66,6 +76,8 @@ public class ConfigurationCache
 	 */
 	private Map<String, Set<ConfigItem>> config = new LinkedHashMap<String,
 																									Set<ConfigItem>>();
+	private String configDumpFileName                              =
+		CONFIG_DUMP_FILE_PROP_DEF;
 	private String hostname                                        = null;
 	private RepositoryChangeListenerIfc<ConfigItem> repoChangeList = null;
 
@@ -254,8 +266,7 @@ public class ConfigurationCache
 	 */
 	@Override
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
-
-		// Nothing for now, empty configuration for the repository
+		defs.put(CONFIG_DUMP_FILE_PROP_KEY, CONFIG_DUMP_FILE_PROP_DEF);
 	}
 
 	/**
@@ -409,30 +420,6 @@ public class ConfigurationCache
 
 	//~--- methods --------------------------------------------------------------
 
-//@Override
-//public Map<String, String> getPropertiesAsStrings(String compName) throws ConfigurationException {
-//
-//  // It must not return a null value, even if configuration for the
-//  // component does not exist yet, it has to initialized to create new one.
-//  Map<String, String> result = new LinkedHashMap<String, String>();
-//
-//  // Let's convert the internal representation of the configuration to that
-//  // used by the components.
-//  Set<ConfigItem> confItems = getItemsForComponent(compName);
-//
-//  if (confItems != null) {
-//    for (ConfigItem item : confItems) {
-//      String key = item.getConfigKey();
-//      String value = item.getConfigValToString();
-//
-//      result.put(key, value);
-//    }
-//  }
-//
-//  // Hopefuly this doesn't happen.... or I have a bug somewhere
-//  return result;
-//}
-
 	/**
 	 * Method description
 	 *
@@ -484,17 +471,6 @@ public class ConfigurationCache
 			addItem(compName, item);
 		}
 	}
-
-//@Override
-//public void putPropertiesFromStrings(String compName, Map<String, String> props)
-//    throws ConfigurationException {
-//  for (Map.Entry<String, String> entry : props.entrySet()) {
-//    ConfigItem item = new ConfigItem();
-//
-//    item.setNodeKey(getDefHostname(), compName, entry.getKey(), entry.getValue());
-//    addItem(compName, item);
-//  }
-//}
 
 	/**
 	 * Method description
@@ -601,8 +577,7 @@ public class ConfigurationCache
 	 */
 	@Override
 	public void setProperties(Map<String, Object> properties) {
-
-		// Nothing for now, empty configuration for the repository
+		configDumpFileName = (String) properties.get(CONFIG_DUMP_FILE_PROP_KEY);
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -632,9 +607,36 @@ public class ConfigurationCache
 	 */
 	@Override
 	public void store() throws TigaseDBException {
+		if (!isOff(configDumpFileName)) {
+			log.log(Level.WARNING, "Dumping server configuration to: {0}", configDumpFileName);
+			try {
+				FileWriter fw = new FileWriter(configDumpFileName, false);
 
-		// Do nothing, this is in memory config repository only
+				for (Map.Entry<String, Set<ConfigItem>> entry : config.entrySet()) {
+					for (ConfigItem item : entry.getValue()) {
+						fw.write(item.toPropertyString());
+						fw.write("\n");
+					}
+				}
+				fw.close();
+			} catch (Exception e) {
+				log.log(Level.WARNING, "Cannot dump server configuration.", e);
+			}
+		} else {
+			log.log(Level.WARNING, "Dumping server configuration is OFF: {0}",
+							configDumpFileName);
+		}
 	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	private boolean isOff(String str) {
+		return (str == null) || str.trim().isEmpty() || str.equalsIgnoreCase("off") ||
+					 str.equalsIgnoreCase("none") || str.equalsIgnoreCase("false") ||
+					 str.equalsIgnoreCase("no");
+	}
+
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description

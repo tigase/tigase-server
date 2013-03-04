@@ -44,8 +44,6 @@ import java.util.Queue;
  * @version $Rev$
  */
 public interface ServerComponent {
-	// Methods
-
 	/**
 	 * Method description
 	 *
@@ -63,8 +61,6 @@ public interface ServerComponent {
 	 * @return
 	 */
 	String getName();
-
-	// void setComponentId(String id);
 
 	/**
 	 * Method description
@@ -93,7 +89,10 @@ public interface ServerComponent {
 	void processPacket(Packet packet, Queue<Packet> results);
 
 	/**
-	 * Method description
+	 * Method is called by <code>MessageRouter</code> when all the startup components of
+	 * the server have been loaded and configured through setProperties(...) call.
+	 * At this point the whole server should be loaded and functional, except
+	 * initializations taking place in this routine.
 	 *
 	 */
 	void initializationCompleted();
