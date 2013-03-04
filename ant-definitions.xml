@@ -13,6 +13,8 @@
 		destdir="${build}"
 		debug="on"
 		encoding="UTF-8"
+		source="1.6"
+		target="1.6"		
 		deprecation="@{deprecation}">
 		<compilerarg line="@{xlint}"/>
 		<classpath>
