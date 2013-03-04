@@ -1,35 +1,39 @@
-
 /*
-* @(#)ConfigurationCache.java   2010.01.14 at 05:55:57 PST
-*
-* Tigase Jabber/XMPP Server
-* Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU Affero General Public License as published by
-* the Free Software Foundation, version 3 of the License.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU Affero General Public License for more details.
-*
-* You should have received a copy of the GNU Affero General Public License
-* along with this program. Look for COPYING file in the top folder.
-* If not, see http://www.gnu.org/licenses/.
-*
-* $Rev$
-* Last modified by $Author$
-* $Date$
+ * ConfigurationCache.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ *
  */
+
+
+
 package tigase.conf;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.TigaseDBException;
 import tigase.db.comp.RepositoryChangeListenerIfc;
+import tigase.db.TigaseDBException;
+
+import tigase.util.DataTypes;
 
 //~--- JDK imports ------------------------------------------------------------
+
+import java.io.FileWriter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,12 +41,10 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created: Dec 10, 2009 2:02:41 PM
@@ -50,7 +52,13 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ConfigurationCache implements ConfigRepositoryIfc {
+public class ConfigurationCache
+				implements ConfigRepositoryIfc {
+	/** Field description */
+	public static final String CONFIG_DUMP_FILE_PROP_DEF = "etc/config-dump.properties";
+
+	/** Field description */
+	public static final String CONFIG_DUMP_FILE_PROP_KEY = "config-dump-file";
 
 	/**
 	 * Private logger for class instance.
@@ -66,22 +74,39 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 	 * Very rarely we need access to whole configuration, in most cases
 	 * we access configuration for a particular server component.
 	 */
-	private Map<String, Set<ConfigItem>> config = new LinkedHashMap<String, Set<ConfigItem>>();
-	private String hostname = null;
+	private Map<String, Set<ConfigItem>> config = new LinkedHashMap<String,
+																									Set<ConfigItem>>();
+	private String configDumpFileName                              =
+		CONFIG_DUMP_FILE_PROP_DEF;
+	private String hostname                                        = null;
 	private RepositoryChangeListenerIfc<ConfigItem> repoChangeList = null;
 
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param repoChangeListener
+	 */
 	@Override
 	public void addRepoChangeListener(
-			RepositoryChangeListenerIfc<ConfigItem> repoChangeListener) {
+					RepositoryChangeListenerIfc<ConfigItem> repoChangeListener) {
 		this.repoChangeList = repoChangeListener;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param repoChangeListener
+	 */
 	@Override
 	public void removeRepoChangeListener(
-			RepositoryChangeListenerIfc<ConfigItem> repoChangeListener) {
+					RepositoryChangeListenerIfc<ConfigItem> repoChangeListener) {
 		this.repoChangeList = null;
 	}
-	
+
 	/**
 	 * Method description
 	 *
@@ -98,8 +123,8 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 		}
 
 		boolean updated = confItems.remove(item);
+
 		confItems.add(item);
-		
 		if (repoChangeList != null) {
 			if (updated) {
 				repoChangeList.itemUpdated(item);
@@ -137,9 +162,9 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 
 		if (idx1 > 0) {
 			String compName = key.substring(0, idx1);
-			int idx2 = key.lastIndexOf("/");
+			int idx2        = key.lastIndexOf("/");
 			String nodeName = null;
-			String keyName = key.substring(idx2 + 1);
+			String keyName  = key.substring(idx2 + 1);
 
 			if (idx1 != idx2) {
 				nodeName = key.substring(idx1 + 1, idx2);
@@ -150,8 +175,8 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 			item.set(getDefHostname(), compName, nodeName, keyName, value);
 			addItem(compName, item);
 		} else {
-			throw new IllegalArgumentException("You have to provide a key with at least"
-					+ " 'component_name/key_name': " + key);
+			throw new IllegalArgumentException("You have to provide a key with at least" +
+																				 " 'component_name/key_name': " + key);
 		}
 	}
 
@@ -241,8 +266,7 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 	 */
 	@Override
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
-
-		// Nothing for now, empty configuration for the repository
+		defs.put(CONFIG_DUMP_FILE_PROP_KEY, CONFIG_DUMP_FILE_PROP_DEF);
 	}
 
 	/**
@@ -294,9 +318,9 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 
 		if (idx1 > 0) {
 			String compName = key.substring(0, idx1);
-			int idx2 = key.lastIndexOf("/");
+			int idx2        = key.lastIndexOf("/");
 			String nodeName = null;
-			String keyName = key.substring(idx2 + 1);
+			String keyName  = key.substring(idx2 + 1);
 
 			if (idx1 != idx2) {
 				nodeName = key.substring(idx1 + 1, idx2);
@@ -304,8 +328,8 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 
 			return getItem(compName, nodeName, keyName);
 		} else {
-			throw new IllegalArgumentException("You have to provide a key with at least"
-					+ " 'component_name/key_name': " + key);
+			throw new IllegalArgumentException("You have to provide a key with at least" +
+																				 " 'component_name/key_name': " + key);
 		}
 	}
 
@@ -344,7 +368,7 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 	 */
 	@Override
 	public String[] getKeys(String compName, String node) {
-		Set<String> keysForNode = new LinkedHashSet<String>();
+		Set<String> keysForNode   = new LinkedHashSet<String>();
 		Set<ConfigItem> confItems = config.get(compName);
 
 		for (ConfigItem item : confItems) {
@@ -352,7 +376,6 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 				keysForNode.add(item.getKeyName());
 			}
 		}
-
 		if (keysForNode.size() > 0) {
 			return keysForNode.toArray(new String[keysForNode.size()]);
 		} else {
@@ -371,7 +394,8 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 	 * @throws ConfigurationException
 	 */
 	@Override
-	public Map<String, Object> getProperties(String compName) throws ConfigurationException {
+	public Map<String, Object> getProperties(String compName)
+					throws ConfigurationException {
 
 		// It must not return a null value, even if configuration for the
 		// component does not exist yet, it has to initialized to create new one.
@@ -383,7 +407,7 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 
 		if (confItems != null) {
 			for (ConfigItem item : confItems) {
-				String key = item.getConfigKey();
+				String key   = item.getConfigKey();
 				Object value = item.getConfigVal();
 
 				result.put(key, value);
@@ -393,30 +417,6 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 		// Hopefuly this doesn't happen.... or I have a bug somewhere
 		return result;
 	}
-
-//	@Override
-//	public Map<String, String> getPropertiesAsStrings(String compName) throws ConfigurationException {
-//
-//		// It must not return a null value, even if configuration for the
-//		// component does not exist yet, it has to initialized to create new one.
-//		Map<String, String> result = new LinkedHashMap<String, String>();
-//
-//		// Let's convert the internal representation of the configuration to that
-//		// used by the components.
-//		Set<ConfigItem> confItems = getItemsForComponent(compName);
-//
-//		if (confItems != null) {
-//			for (ConfigItem item : confItems) {
-//				String key = item.getConfigKey();
-//				String value = item.getConfigValToString();
-//
-//				result.put(key, value);
-//			}
-//		}
-//
-//		// Hopefuly this doesn't happen.... or I have a bug somewhere
-//		return result;
-//	}
 
 	//~--- methods --------------------------------------------------------------
 
@@ -442,7 +442,9 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 		try {
 			Collection<ConfigItem> items = allItems();
 
-			return (items != null) ? items.iterator() : null;
+			return (items != null)
+						 ? items.iterator()
+						 : null;
 		} catch (TigaseDBException ex) {
 			log.log(Level.WARNING, "Problem accessing repository: ", ex);
 
@@ -461,7 +463,7 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 	 */
 	@Override
 	public void putProperties(String compName, Map<String, Object> props)
-			throws ConfigurationException {
+					throws ConfigurationException {
 		for (Map.Entry<String, Object> entry : props.entrySet()) {
 			ConfigItem item = new ConfigItem();
 
@@ -469,17 +471,6 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 			addItem(compName, item);
 		}
 	}
-
-//	@Override
-//	public void putPropertiesFromStrings(String compName, Map<String, String> props)
-//			throws ConfigurationException {
-//		for (Map.Entry<String, String> entry : props.entrySet()) {
-//			ConfigItem item = new ConfigItem();
-//
-//			item.setNodeKey(getDefHostname(), compName, entry.getKey(), entry.getValue());
-//			addItem(compName, item);
-//		}
-//	}
 
 	/**
 	 * Method description
@@ -563,7 +554,6 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 		if (item == null) {
 			item = getItemInstance();
 		}
-
 		item.set(getDefHostname(), compName, node, key, value);
 		addItem(compName, item);
 	}
@@ -587,8 +577,7 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 	 */
 	@Override
 	public void setProperties(Map<String, Object> properties) {
-
-		// Nothing for now, empty configuration for the repository
+		configDumpFileName = (String) properties.get(CONFIG_DUMP_FILE_PROP_KEY);
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -618,9 +607,36 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 	 */
 	@Override
 	public void store() throws TigaseDBException {
+		if (!isOff(configDumpFileName)) {
+			log.log(Level.WARNING, "Dumping server configuration to: {0}", configDumpFileName);
+			try {
+				FileWriter fw = new FileWriter(configDumpFileName, false);
 
-		// Do nothing, this is in memory config repository only
+				for (Map.Entry<String, Set<ConfigItem>> entry : config.entrySet()) {
+					for (ConfigItem item : entry.getValue()) {
+						fw.write(item.toPropertyString());
+						fw.write("\n");
+					}
+				}
+				fw.close();
+			} catch (Exception e) {
+				log.log(Level.WARNING, "Cannot dump server configuration.", e);
+			}
+		} else {
+			log.log(Level.WARNING, "Dumping server configuration is OFF: {0}",
+							configDumpFileName);
+		}
 	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	private boolean isOff(String str) {
+		return (str == null) || str.trim().isEmpty() || str.equalsIgnoreCase("off") ||
+					 str.equalsIgnoreCase("none") || str.equalsIgnoreCase("false") ||
+					 str.equalsIgnoreCase("no");
+	}
+
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -634,11 +650,7 @@ public class ConfigurationCache implements ConfigRepositoryIfc {
 	public String validateItem(ConfigItem item) {
 		return null;
 	}
-
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/03/04

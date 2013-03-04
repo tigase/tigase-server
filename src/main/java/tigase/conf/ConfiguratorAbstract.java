@@ -541,6 +541,13 @@ public abstract class ConfiguratorAbstract
 		if (monitoring != null) {
 			monitoring.initializationCompleted();
 		}
+		try {
+
+			// Dump the configuration....
+			configRepo.store();
+		} catch (TigaseDBException ex) {
+			log.log(Level.WARNING, "Cannot store configuration.", ex);
+		}
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -683,6 +690,7 @@ public abstract class ConfiguratorAbstract
 	public void setProperties(Map<String, Object> props) {
 		setupLogManager(props);
 		super.setProperties(props);
+		configRepo.setProperties(props);
 		TLSUtil.configureSSLContext(props);
 
 		int repo_pool_size = 1;
@@ -1018,4 +1026,4 @@ public abstract class ConfiguratorAbstract
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/25
+//~ Formatted in Tigase Code Convention on 13/03/04

@@ -302,9 +302,14 @@ public class DataTypes {
 	 * @return
 	 */
 	public static String valueToString(Object value) {
-		char t      = getTypeId(value);
-		String varr = value.toString();
+		char t = getTypeId(value);
+		String varr;
 
+		if (value == null) {
+			varr = "<null>";
+		} else {
+			varr = value.toString();
+		}
 		switch (t) {
 		case 'l' :
 			varr = Arrays.toString((long[]) value);
@@ -332,11 +337,11 @@ public class DataTypes {
 			break;
 
 		default :
-			if (value.getClass().isArray()) {
+			if ((value != null) && value.getClass().isArray()) {
 				varr = Arrays.toString((Object[]) value);
 			}
 		}
-		if (value.getClass().isArray()) {
+		if ((value != null) && value.getClass().isArray()) {
 			varr = varr.substring(1, varr.length() - 1);
 		}
 
@@ -403,8 +408,13 @@ public class DataTypes {
 	 * @return
 	 */
 	public static char getTypeId(Object instance) {
-		Character result = typesMap.get(instance.getClass().getName());
+		Character result;
 
+		if (instance == null) {
+			result = 'S';
+		} else {
+			result = typesMap.get(instance.getClass().getName());
+		}
 		if (result == null) {
 			result = 'S';
 		}
@@ -431,4 +441,4 @@ public class DataTypes {
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/22
+//~ Formatted in Tigase Code Convention on 13/03/04
