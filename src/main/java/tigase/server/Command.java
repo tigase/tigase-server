@@ -2,7 +2,7 @@
  * Command.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -63,11 +63,18 @@ public enum Command {
 	 * stream from the client has been opened.
 	 */
 	STREAM_OPENED(Priority.SYSTEM),
-	
+
 	/**
-	 * Command sent from connection manager to the session manager after TLS handshake if client sent certificate.
+	 * Command sent from connection manager to the session manager after TLS handshake if
+	 * client sent certificate.
 	 */
 	CLIENT_AUTH(Priority.SYSTEM),
+
+	/**
+	 * Command sent from session manager to the connection manager after successful
+	 * user login.
+	 */
+	USER_LOGIN(Priority.SYSTEM),
 
 	/**
 	 * Command sent from a connection manager to the session manager when a
@@ -164,10 +171,16 @@ public enum Command {
 	public static final String COMMAND_EL = "command";
 
 	/** Field description */
+	public static final String FIELD_EL = "field";
+
+	/** Field description */
+	public static final String VALUE_EL = "value";
+
+	/** Field description */
 	public static final String XMLNS = "http://jabber.org/protocol/commands";
 
 	/** Field description */
-	protected static final String[] FIELD_VALUE_PATH = { "field", "value" };
+	protected static final String[] FIELD_VALUE_PATH = { FIELD_EL, VALUE_EL };
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -176,12 +189,9 @@ public enum Command {
 
 	//~--- fields ---------------------------------------------------------------
 
-	// ~--- fields ---------------------------------------------------------------
 	private Priority priority = Priority.NORMAL;
 
 	//~--- constant enums -------------------------------------------------------
-
-	// ~--- constant enums -------------------------------------------------------
 
 	/**
 	 * Ad-hoc command actions ad defined in the XEP-0050.
@@ -269,14 +279,11 @@ public enum Command {
 
 	//~--- constructors ---------------------------------------------------------
 
-	// ~--- constructors ---------------------------------------------------------
 	private Command(Priority priority) {
 		this.priority = priority;
 	}
 
 	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -327,13 +334,13 @@ public enum Command {
 			x = addDataForm(command, DataType.submit);
 		}
 		if (f_value != null) {
-			Element field = new Element("field", new String[] { "var", "type" },
+			Element field = new Element(FIELD_EL, new String[] { "var", "type" },
 																	new String[] { XMLUtils.escape(f_name),
 							"text-multi" });
 
 			for (String val : f_value) {
 				if (val != null) {
-					Element value = new Element("value", XMLUtils.escape(val));
+					Element value = new Element(VALUE_EL, XMLUtils.escape(val));
 
 					field.addChild(value);
 				}
@@ -370,13 +377,13 @@ public enum Command {
 			}
 		}
 		if (f_value != null) {
-			Element field = new Element("field", new String[] { "var", "type" },
+			Element field = new Element(FIELD_EL, new String[] { "var", "type" },
 																	new String[] { XMLUtils.escape(f_name),
 							"text-multi" });
 
 			for (String val : f_value) {
 				if (val != null) {
-					Element value = new Element("value", XMLUtils.escape(val));
+					Element value = new Element(VALUE_EL, XMLUtils.escape(val));
 
 					field.addChild(value);
 				}
@@ -409,9 +416,9 @@ public enum Command {
 			x = addDataForm(command, DataType.submit);
 		}
 
-		Element field = new Element("field",
+		Element field = new Element(FIELD_EL,
 																new Element[] {
-																	new Element("value",
+																	new Element(VALUE_EL,
 																		XMLUtils.escape(f_value)) }, new String[] { "var" },
 																			new String[] { XMLUtils.escape(f_name) });
 
@@ -458,9 +465,9 @@ public enum Command {
 			x = addDataForm(command, DataType.submit);
 		}
 
-		Element field = new Element("field",
+		Element field = new Element(FIELD_EL,
 																new Element[] {
-																	new Element("value",
+																	new Element(VALUE_EL,
 																		XMLUtils.escape(f_value)) }, new String[] { "var",
 						"type", "label" }, new String[] { XMLUtils.escape(f_name), "list-single",
 						XMLUtils.escape(label) });
@@ -468,7 +475,7 @@ public enum Command {
 		for (int i = 0; i < labels.length; i++) {
 			field.addChild(new Element("option",
 																 new Element[] {
-																	 new Element("value",
+																	 new Element(VALUE_EL,
 																		 XMLUtils.escape(options[i])) }, new String[] {
 																			 "label" }, new String[] {
 																			 XMLUtils.escape(labels[i]) }));
@@ -516,20 +523,20 @@ public enum Command {
 			x = addDataForm(command, DataType.submit);
 		}
 
-		Element field = new Element("field", new String[] { "var", "type", "label" },
+		Element field = new Element(FIELD_EL, new String[] { "var", "type", "label" },
 																new String[] { XMLUtils.escape(f_name),
 						"list-multi", XMLUtils.escape(label) });
 
 		for (int i = 0; i < labels.length; i++) {
 			field.addChild(new Element("option",
 																 new Element[] {
-																	 new Element("value",
+																	 new Element(VALUE_EL,
 																		 XMLUtils.escape(options[i])) }, new String[] {
 																			 "label" }, new String[] {
 																			 XMLUtils.escape(labels[i]) }));
 		}
 		for (int i = 0; i < f_values.length; i++) {
-			field.addChild(new Element("value", XMLUtils.escape(f_values[i])));
+			field.addChild(new Element(VALUE_EL, XMLUtils.escape(f_values[i])));
 		}
 		x.addChild(field);
 	}
@@ -558,9 +565,9 @@ public enum Command {
 			x = addDataForm(command, DataType.submit);
 		}
 
-		Element field = new Element("field",
+		Element field = new Element(FIELD_EL,
 																new Element[] {
-																	new Element("value",
+																	new Element(VALUE_EL,
 																		XMLUtils.escape(f_value)) }, new String[] { "var",
 						"type", "label" }, new String[] { XMLUtils.escape(f_name), type,
 						XMLUtils.escape(label) });
@@ -568,7 +575,7 @@ public enum Command {
 		for (int i = 0; i < labels.length; i++) {
 			field.addChild(new Element("option",
 																 new Element[] {
-																	 new Element("value",
+																	 new Element(VALUE_EL,
 																		 XMLUtils.escape(options[i])) }, new String[] {
 																			 "label" }, new String[] {
 																			 XMLUtils.escape(labels[i]) }));
@@ -595,9 +602,9 @@ public enum Command {
 			x = addDataForm(command, DataType.submit);
 		}
 
-		Element field = new Element("field",
+		Element field = new Element(FIELD_EL,
 																new Element[] {
-																	new Element("value",
+																	new Element(VALUE_EL,
 																		XMLUtils.escape(f_value)) }, new String[] { "var",
 						"type" }, new String[] { XMLUtils.escape(f_name), type });
 
@@ -625,9 +632,9 @@ public enum Command {
 			x = addDataForm(command, DataType.submit);
 		}
 
-		Element field = new Element("field",
+		Element field = new Element(FIELD_EL,
 																new Element[] {
-																	new Element("value",
+																	new Element(VALUE_EL,
 																		XMLUtils.escape(f_value)) }, new String[] { "var",
 						"type", "label" }, new String[] { XMLUtils.escape(f_name), type,
 						XMLUtils.escape(label) });
@@ -828,7 +835,7 @@ public enum Command {
 
 			if (children != null) {
 				for (Element child : children) {
-					if (child.getName().equals("field") &&
+					if (child.getName().equals(FIELD_EL) &&
 							child.getAttributeStaticStr("var").equals(f_name)) {
 						String value = child.getChildCDataStaticStr(FIELD_VALUE_PATH);
 
@@ -876,7 +883,7 @@ public enum Command {
 
 		for (Element child : children) {
 			log.info("Command form child: " + child.toString());
-			if (child.getName().equals("field") &&
+			if (child.getName().equals(FIELD_EL) &&
 					child.getAttributeStaticStr("var").equals(f_name)) {
 				String value = child.getChildCDataStaticStr(FIELD_VALUE_PATH);
 
@@ -912,18 +919,19 @@ public enum Command {
 
 			if (children != null) {
 				for (Element child : children) {
-					if (child.getName().equals("field") &&
+					if (child.getName().equals(FIELD_EL) &&
 							child.getAttributeStaticStr("var").equals(f_name)) {
 						List<String> values        = new LinkedList<String>();
 						List<Element> val_children = child.getChildren();
 
-						if(val_children!=null)
-						for (Element val_child : val_children) {
-							if (val_child.getName().equals("value")) {
-								String value = val_child.getCData();
+						if (val_children != null) {
+							for (Element val_child : val_children) {
+								if (val_child.getName().equals(VALUE_EL)) {
+									String value = val_child.getCData();
 
-								if (value != null) {
-									values.add(XMLUtils.unescape(value));
+									if (value != null) {
+										values.add(XMLUtils.unescape(value));
+									}
 								}
 							}
 						}
@@ -960,7 +968,7 @@ public enum Command {
 
 			if (children != null) {
 				for (Element child : children) {
-					if (child.getName().equals("field") &&
+					if (child.getName().equals(FIELD_EL) &&
 							child.getAttributeStaticStr("var").equals(f_name)) {
 						return x.removeChild(child);
 					}
@@ -992,7 +1000,7 @@ public enum Command {
 
 			if (children != null) {
 				for (Element child : children) {
-					if (child.getName().equals("field") &&
+					if (child.getName().equals(FIELD_EL) &&
 							child.getAttributeStaticStr("var").startsWith(f_name)) {
 						return child.getAttributeStaticStr("var");
 					}
@@ -1181,4 +1189,4 @@ public enum Command {
 }    // Command
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/03/04
