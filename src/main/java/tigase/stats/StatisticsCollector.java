@@ -586,6 +586,7 @@ public class StatisticsCollector extends
         public void release() {
                 super.release();
                 sp.stop();
+				statsArchivTasks.cancel();
         }
         
 	// ~--- get methods ----------------------------------------------------------
