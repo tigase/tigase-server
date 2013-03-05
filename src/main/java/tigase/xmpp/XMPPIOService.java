@@ -2,7 +2,7 @@
  * XMPPIOService.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -94,6 +94,7 @@ public class XMPPIOService<RefObject>
 
 	/** Field description */
 	protected SimpleParser parser                 = SingletonFactory.getParserInstance();
+	private String jid                            = null;
 	private long packetsReceived                  = 0;
 	private long packetsSent                      = 0;
 	private long req_idx                          = 0;
@@ -719,13 +720,32 @@ public class XMPPIOService<RefObject>
 			}
 		}
 	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param jid
+	 */
+	public void setUserJid(String jid) {
+		this.jid = jid;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String toString() {
+		return super.toString() + ", jid: " + jid;
+	}
 }    // XMPPIOService
 
 
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/03/04
