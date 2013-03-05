@@ -1876,17 +1876,19 @@ public class SessionManager
 			}
 			try {
 				session.addResourceConnection(conn);
-				try {
-					Packet user_login_cmd = Command.USER_LOGIN.getPacket(getComponentId(),
-																		conn.getConnectionId(), StanzaType.set,
-																		conn.nextStanzaId(), Command.DataType.submit);
+				if (!conn.isServerSession()) {
+					try {
+						Packet user_login_cmd = Command.USER_LOGIN.getPacket(getComponentId(),
+																			conn.getConnectionId(), StanzaType.set,
+																			conn.nextStanzaId(), Command.DataType.submit);
 
-					Command.addFieldValue(user_login_cmd, "user-jid", userId.toString());
-					addOutPacket(user_login_cmd);
-				} catch (NoConnectionIdException ex) {
+						Command.addFieldValue(user_login_cmd, "user-jid", userId.toString());
+						addOutPacket(user_login_cmd);
+					} catch (NoConnectionIdException ex) {
 
-					// This actually should not happen... might be a bug:
-					log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
+						// This actually should not happen... might be a bug:
+						log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
+					}
 				}
 			} catch (TigaseStringprepException ex) {
 				log.log(Level.INFO, "Stringprep problem for resource connection: {0}", conn);
