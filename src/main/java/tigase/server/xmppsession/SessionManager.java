@@ -2179,7 +2179,7 @@ public class SessionManager
 
 	//~--- methods --------------------------------------------------------------
 
-	private void walk(final Packet packet, final XMPPResourceConnection connection,
+	private void walk(final Packet packet, final XMPPResourceConnection connection,			
 										final Element elem, final Queue<Packet> results) {
 		for (XMPPProcessorIfc proc_t : processors.values()) {
 			String xmlns = elem.getXMLNS();
@@ -2190,12 +2190,12 @@ public class SessionManager
 
 			XMPPProcessorIfc processor = proc_t;
 
-			if (processor.isSupporting(elem.getName(), xmlns)) {
+			if (processor.canHandle(packet, connection) == Authorization.AUTHORIZED) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST,
-									"XMPPProcessorIfc: {0} ({1}" + ")" + "\n Request: " + "{2}, conn: {3}",
-									new Object[] { processor.getClass().getSimpleName(),
-																 processor.id(), packet, connection });
+							"XMPPProcessorIfc: {0} ({1}" + ")" + "\n Request: " + "{2}, conn: {3}",
+							new Object[]{processor.getClass().getSimpleName(),
+						processor.id(), packet, connection});
 				}
 
 				ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(processor.id());
@@ -2210,23 +2210,16 @@ public class SessionManager
 					// proc_t.debugQueue();
 					if (log.isLoggable(Level.FINE)) {
 						log.log(Level.FINE,
-										"Can not add packet: {0} to processor: {1} internal queue full.",
-										new Object[] { packet.toStringSecure(),
-																	 pt.getName() });
+								"Can not add packet: {0} to processor: {1} internal queue full.",
+								new Object[]{packet.toStringSecure(),
+							pt.getName()});
 					}
 				}
-			}    // end of if (proc.isSupporting(elem.getName(), elem.getXMLNS()))
+			}
 		}      // end of for ()
-
-		Collection<Element> children = elem.getChildren();
-
-		if (children != null) {
-			for (Element child : children) {
-				walk(packet, connection, child, results);
-			}    // end of for (Element child: children)
-		}      // end of if (children != null)
+		
 	}
-
+	
 	//~--- inner classes --------------------------------------------------------
 
 	private class AuthenticationTimer
