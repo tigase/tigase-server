@@ -40,9 +40,12 @@ import tigase.io.TLSUtil;
 
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.ServerComponent;
+import tigase.server.XMPPServer;
 
+import tigase.util.ClassUtil;
 import tigase.util.DataTypes;
 
+import tigase.xml.XMLUtils;
 import tigase.xmpp.BareJID;
 
 import static tigase.io.SSLContextContainerIfc.*;
@@ -1022,6 +1025,8 @@ public abstract class ConfiguratorAbstract
 		// System.out.println("Setting logging: \n" + buff.toString());
 		loadLogManagerConfig(buff.toString());
 		log.config("DONE");
+		log.config(XMPPServer.getImplementationVersion(XMLUtils.class));
+		log.config(XMPPServer.getImplementationVersion(ClassUtil.class));
 	}
 }
 
