@@ -26,8 +26,12 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.logging.Logger;
+
 import tigase.conf.ConfigurationException;
 import tigase.conf.ConfiguratorAbstract;
+import tigase.util.ClassUtil;
+import tigase.xml.XMLUtils;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -82,6 +86,14 @@ public final class XMPPServer {
 		return (version == null) ? "0.0.0-0" : version;
 	}
 
+	public static String getImplementationVersion(Class<?> c) {
+		Package p = c.getPackage();
+
+		String title = p == null ? null : p.getImplementationTitle();
+		String version = p == null ? null : p.getImplementationVersion();
+
+		return (title == null ? "unrecognized" : title) + " ver. " + (version == null ? "unknown" : version);
+	}
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -106,9 +118,11 @@ public final class XMPPServer {
 	 */
 	@SuppressWarnings("PMD")
 	public static void main(final String[] args) {
-
+		
 		parseParams(args);
 
+		System.out.println(getImplementationVersion(XMLUtils.class));
+		System.out.println(getImplementationVersion(ClassUtil.class));
                 start(args);
 	}
 
