@@ -62,6 +62,10 @@ public class BoshIOService extends XMPPIOService<Object> {
 	public static final String BOSH_EXTRA_HEADERS_FILE_PROP_KEY = "bosh-extra-headers-file";
 	public static final String BOSH_EXTRA_HEADERS_FILE_PROP_VAL =
 			"etc/bosh-extra-headers.txt";
+	public static final String CLIENT_ACCESS_POLICY_FILE_PROP_KEY = 
+		"client-access-policy-file";
+	public static final String CLIENT_ACCESS_POLICY_FILE_PROP_VAL = 
+		"etc/client-access-policy.xml";
 	private static final String EOL = "\r\n";
 	private static final String HTTP_OK_RESPONSE = "HTTP/1.1 200 OK" + EOL;
 	private static final String CONTENT_TYPE_HEADER = "Content-Type: ";
@@ -69,15 +73,21 @@ public class BoshIOService extends XMPPIOService<Object> {
 	private static final String CONNECTION = "Connection: ";
 	private static final String SERVER = "Server: Tigase Bosh/"
 			+ tigase.server.XMPPServer.getImplementationVersion();
+	private static final char[] HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER = 
+			"GET /clientaccesspolicy.xml".toCharArray();
 
 	// ~--- fields ---------------------------------------------------------------
 
 	private String content_type = "text/xml; charset=utf-8";
+	private static String client_access_policy = null;
 	private static String extra_headers = null;
 	private long rid = -1;
 	private UUID sid = null;
 	private BoshTask waitTimer = null;
 
+	private boolean firstPassCORS = true;
+	private boolean firstPassClientAccessPolicy = true;
+	
 	private static Boolean closeConnections;
 
 	public BoshIOService() {
@@ -104,6 +114,26 @@ public class BoshIOService extends XMPPIOService<Object> {
 			} catch (Exception ex) {
 				log.log(Level.WARNING, "Problem reading Bosh extra headers file: " + file_name,
 						ex);
+			}
+		}
+		if (client_access_policy == null) {
+			String file_name = System.getProperty(CLIENT_ACCESS_POLICY_FILE_PROP_KEY,
+													 CLIENT_ACCESS_POLICY_FILE_PROP_VAL);
+
+			try {
+				BufferedReader br = new BufferedReader(new FileReader(file_name));
+				String line       = br.readLine();
+				StringBuilder sb  = new StringBuilder();
+
+				while (line != null) {
+					sb.append(line).append(EOL);
+					line = br.readLine();
+				}
+				br.close();
+				client_access_policy = sb.toString();
+			} catch (Exception ex) {
+				log.log(Level.WARNING, "Problem reading client access policy file: " + file_name,
+								ex);
 			}
 		}
 	}
@@ -262,16 +292,31 @@ public class BoshIOService extends XMPPIOService<Object> {
 		if (closeConnections)
 			stop();
 	}
-
+	
 	@Override
 	public boolean checkData(char[] data) throws IOException {
-		if (data != null && data.length > 7 && data[0] == 'O') {
-			if (data[1] == 'P' && data[2] == 'T' && data[3] == 'I' && data[4] == 'O'
+		if (firstPassCORS && data != null && data.length > 7) {
+			if (data[0] == 'O' && data[1] == 'P' && data[2] == 'T' && data[3] == 'I' && data[4] == 'O'
 					&& data[5] == 'N' && data[6] == 'S') {
 
 				// responding with headers - needed for Chrome browser
 				this.writeRawData(prepareHeaders(null).toString());
 			}
+			firstPassCORS = false;
+		}
+		if (firstPassClientAccessPolicy && data != null && data.length >= HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER.length) {
+			if (data[0] == 'G' && data[1] == 'E' && data[2] == 'T') {
+				boolean ok = true;
+				int i = 3;
+				while (ok && i < HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER.length) {
+					ok &= (data[i] == HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER[i]);
+					i++;
+				}
+				if (ok) {
+					this.writeRawData(prepareHeaders(client_access_policy).toString() + client_access_policy);
+				}
+			}
+			firstPassClientAccessPolicy = false;
 		}
 		// by default do nothing and return false
 		return false;
