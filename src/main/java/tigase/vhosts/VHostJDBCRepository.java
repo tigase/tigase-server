@@ -97,7 +97,6 @@ public class VHostJDBCRepository
 
 	//~--- fields ---------------------------------------------------------------
 
-	// ~--- fields ---------------------------------------------------------------
 	private String def_ip_address    = null;
 	private String def_srv_address   = null;
 	private int max_domains_per_user = DOMAINS_PER_USER_LIMIT_PROP_VAL;
@@ -214,6 +213,7 @@ public class VHostJDBCRepository
 		}
 		def_ip_address       = (String) properties.get(DNS_DEF_IP_PROP_KEY);
 		max_domains_per_user = (Integer) properties.get(DOMAINS_PER_USER_LIMIT_PROP_KEY);
+		setAutoloadTimer(60);
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -316,4 +316,4 @@ public class VHostJDBCRepository
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/28
+//~ Formatted in Tigase Code Convention on 13/03/09

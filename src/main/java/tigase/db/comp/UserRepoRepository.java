@@ -1,10 +1,13 @@
 /*
+ * UserRepoRepository.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.db.comp;
 
@@ -39,12 +41,10 @@ import static tigase.conf.Configurable.*;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.Map;
-import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Map;
+import java.util.Queue;
 
 /**
  * Created: Oct 3, 2009 3:55:27 PM
@@ -54,19 +54,19 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public abstract class UserRepoRepository<Item extends RepositoryItem>
-		extends ConfigRepository<Item> {
-	private static final Logger log = Logger.getLogger(UserRepoRepository.class.getName());
-
+				extends ConfigRepository<Item> {
 	/** Field description */
 	public static final String REPO_CLASS_PROP_KEY = "repo-class";
 
 	/** Field description */
 	public static final String REPO_URI_PROP_KEY = "repo-uri";
+	private static final Logger log              =
+		Logger.getLogger(UserRepoRepository.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
 	private String items_list_pkey = "items-lists";
-	private UserRepository repo = null;
+	private UserRepository repo    = null;
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -129,7 +129,6 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 	@Override
 	public void reload() {
 		super.reload();
-
 		try {
 
 			// It is now time to load all Items' settings from the database:
@@ -137,7 +136,7 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 
 			if ((items_list != null) &&!items_list.isEmpty()) {
 				DomBuilderHandler domHandler = new DomBuilderHandler();
-				SimpleParser parser = SingletonFactory.getParserInstance();
+				SimpleParser parser          = SingletonFactory.getParserInstance();
 
 				parser.parse(domHandler, items_list.toCharArray(), 0, items_list.length());
 
@@ -148,14 +147,13 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 						Item item = getItemInstance();
 
 						item.initFromElement(elem);
-						items.put(item.getKey(), item);
+						addItem(item);
 					}
 				}
 			}
 		} catch (Exception ex) {
 			log.log(Level.SEVERE, "Problem with loading items list from the database.", ex);
 		}
-
 		log.log(Level.CONFIG, "All loaded items: {0}", items);
 	}
 
@@ -175,13 +173,13 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 		super.setProperties(properties);
 
 		String repo_class = (String) properties.get(REPO_CLASS_PROP_KEY);
-		String repo_uri = (String) properties.get(REPO_URI_PROP_KEY);
+		String repo_uri   = (String) properties.get(REPO_URI_PROP_KEY);
 
 		if ((repo_class != null) && (repo_uri != null)) {
-			log.log(Level.INFO, "Initializing custom component repository: {0}, db connection: {1}",
-					new Object[] { repo_class,
-					repo_uri });
-
+			log.log(Level.INFO,
+							"Initializing custom component repository: {0}, db connection: {1}",
+							new Object[] { repo_class,
+														 repo_uri });
 			try {
 				repo = RepositoryFactory.getUserRepository(repo_class, repo_uri, null);
 			} catch (Exception e) {
@@ -189,20 +187,18 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 				repo = null;
 			}
 		}
-
 		if (repo == null) {
 			repo = (UserRepository) properties.get(SHARED_USER_REPO_PROP_KEY);
 			log.config("Using shared repository instance.");
 		}
-
 		if (repo != null) {
 
 			// If this is the first run of the Items manager the database might not
 			// be properly initialized yet....
 			try {
-                                if (!repo.userExists(getRepoUser())) {
-                                        repo.addUser(getRepoUser());
-                                }
+				if (!repo.userExists(getRepoUser())) {
+					repo.addUser(getRepoUser());
+				}
 				repo.addUser(getRepoUser());
 			} catch (UserExistsException e) {
 
@@ -211,10 +207,9 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 			} catch (Exception e) {
 
 				// This is not expected so let's signal an error:
-				log.log(Level.SEVERE, "Problem with adding '" + getRepoUser() + "' user to the database",
-						e);
+				log.log(Level.SEVERE,
+								"Problem with adding '" + getRepoUser() + "' user to the database", e);
 			}
-
 			reload();
 		}
 	}
@@ -228,23 +223,20 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 	@Override
 	public void store() {
 		super.store();
+		if (repo != null) {
+			StringBuilder sb = new StringBuilder();
 
-		StringBuilder sb = new StringBuilder();
-
-		for (Item item : items.values()) {
-			sb.append(item.toElement().toString());
-		}
-
-		try {
-			repo.setData(getRepoUser(), getItemsListPKey(), sb.toString());
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Error storing items list in the repository", e);
+			for (Item item : items.values()) {
+				sb.append(item.toElement().toString());
+			}
+			try {
+				repo.setData(getRepoUser(), getItemsListPKey(), sb.toString());
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "Error storing items list in the repository", e);
+			}
 		}
 	}
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/03/09

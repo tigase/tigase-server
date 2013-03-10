@@ -180,7 +180,7 @@ public class MessageRouterConfig {
 																 String comp_name) {
 		boolean cluster_mode = isTrue((String) params.get(CLUSTER_MODE));
 
-		log.log(Level.CONFIG, "Cluster mode: ", params.get(CLUSTER_MODE));
+		log.log(Level.CONFIG, "Cluster mode: {0}", params.get(CLUSTER_MODE));
 		if (cluster_mode) {
 			log.config("Cluster mode is on, replacing known components with cluster" +
 								 " versions:");
@@ -521,4 +521,4 @@ public class MessageRouterConfig {
 }    // MessageRouterConfig
 
 
-//~ Formatted in Tigase Code Convention on 13/02/25
+//~ Formatted in Tigase Code Convention on 13/03/05

@@ -1,10 +1,13 @@
 /*
+ * ComponentRepository.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,14 +18,17 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.db.comp;
 
+//~--- non-JDK imports --------------------------------------------------------
+
 import tigase.db.TigaseDBException;
+
+//~--- JDK imports ------------------------------------------------------------
 
 import java.util.Collection;
 import java.util.Map;
@@ -42,16 +48,18 @@ import java.util.Map;
  * repository items in memory.
  * <p/>
  * Created: Oct 3, 2009 1:46:25 PM
- * 
+ *
  * @param <Item>
  *          An element stored in the component repository.
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface ComponentRepository<Item extends RepositoryItem> extends Iterable<Item> {
-
+public interface ComponentRepository<Item extends RepositoryItem>
+				extends Iterable<Item> {
 	/** Field description */
 	public static final String COMP_REPO_BIND = "comp_repo";
+
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Adds a listener for repository Item change.
@@ -70,7 +78,7 @@ public interface ComponentRepository<Item extends RepositoryItem> extends Iterab
 	 * to have all fields set correctly. After this method call is finished a new
 	 * added item must be available in the component repository. The method adds
 	 * the item to memory cache and permanent storage.
-	 * 
+	 *
 	 * @param item
 	 *          a <code>Item</code> with all it's configuration parameters.
 	 * @throws TigaseDBException
@@ -78,8 +86,8 @@ public interface ComponentRepository<Item extends RepositoryItem> extends Iterab
 	void addItem(Item item) throws TigaseDBException;
 
 	/**
-	 * Retuns a collection with all items stored in the repository.
-	 * 
+	 * Returns a collection with all items stored in the repository.
+	 *
 	 * @return
 	 * @throws TigaseDBException
 	 */
@@ -87,7 +95,7 @@ public interface ComponentRepository<Item extends RepositoryItem> extends Iterab
 
 	/**
 	 * The method checks whether the item is stored in the repository.
-	 * 
+	 *
 	 * @param key
 	 *          a <code>String</code> with key to search for.
 	 * @return a <code>boolean</code> value <code>true</code> if the item exists
@@ -95,13 +103,15 @@ public interface ComponentRepository<Item extends RepositoryItem> extends Iterab
 	 */
 	boolean contains(String key);
 
+	//~--- get methods ----------------------------------------------------------
+
 	/**
-	 * The method is called to obtain defualt configuration settings if there are
+	 * The method is called to obtain default configuration settings if there are
 	 * any for this repository implementation The configuration settings are
 	 * implementation dependent and there are no defaults set by the server.
 	 * Default settings returned by this method are then saved in the
-	 * configuration file and presented to the admin for further adjustements.
-	 * 
+	 * configuration file and presented to the admin for further adjustments.
+	 *
 	 * @param defs
 	 *          is a <code>Map</code> collection where all repository
 	 *          configuration defaults must be put.
@@ -116,7 +126,7 @@ public interface ComponentRepository<Item extends RepositoryItem> extends Iterab
 	/**
 	 * The method returns all item configuration parameters for a key or
 	 * <code>null</code> if the item does not exist in the repository.
-	 * 
+	 *
 	 * @param key
 	 *          a <code>String</code> with item identifier to search for.
 	 * @return a <code>Item</code> for a given key or <code>null</code> if the
@@ -126,10 +136,12 @@ public interface ComponentRepository<Item extends RepositoryItem> extends Iterab
 
 	/**
 	 * Creates a new, uninitialized instance of the repository Item.
-	 * 
+	 *
 	 * @return a new, uninitialized instance of the repository Item.
 	 */
 	Item getItemInstance();
+
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * This method is called to reload items from the database or other permanent
@@ -137,7 +149,7 @@ public interface ComponentRepository<Item extends RepositoryItem> extends Iterab
 	 * third-party system. When all modifications are done this method is called
 	 * to refresh the class cache. Whether the implementation load whole list or
 	 * just last modifications is implementation dependent.
-	 * 
+	 *
 	 * @throws TigaseDBException
 	 */
 	void reload() throws TigaseDBException;
@@ -145,28 +157,32 @@ public interface ComponentRepository<Item extends RepositoryItem> extends Iterab
 	/**
 	 * The method is called to remove given Item from the memory cache and
 	 * permanent storage. After this method is completed the item should no longer
-	 * be availble in the component repository.
-	 * 
+	 * be available in the component repository.
+	 *
 	 * @param key
 	 *          a <code>String</code> with domain name to remove.
 	 * @throws TigaseDBException
 	 */
 	void removeItem(String key) throws TigaseDBException;
 
+	//~--- set methods ----------------------------------------------------------
+
 	/**
 	 * The method is called to set configuration for this repository
 	 * implementation. The configuration is repository implementation dependent.
 	 * There are no default settings for the repository.
-	 * 
+	 *
 	 * @param properties
 	 *          a <code>Map</code> with configuration settings. Content of this
 	 *          <code>Map</code> must not be modified. This read-only collection.
 	 */
 	void setProperties(Map<String, Object> properties);
 
+	//~--- methods --------------------------------------------------------------
+
 	/**
-	 * The method returns number of itens in the repository.
-	 * 
+	 * The method returns number of items in the repository.
+	 *
 	 * @return an <code>int</code> value with number of items in the repository.
 	 */
 	int size();
@@ -175,7 +191,7 @@ public interface ComponentRepository<Item extends RepositoryItem> extends Iterab
 	 * The method is called to store all data in the database. It is used when the
 	 * repository has been changed in some way and the changes have to be put to a
 	 * permanent storage for later retrieval.
-	 * 
+	 *
 	 * @throws TigaseDBException
 	 */
 	void store() throws TigaseDBException;
@@ -184,11 +200,24 @@ public interface ComponentRepository<Item extends RepositoryItem> extends Iterab
 	 * Performs Item validation to check whether it meets the repository policy.
 	 * If validation is successful the method returns <code>null</code>, otherwise
 	 * it returns an error description.
-	 * 
+	 *
 	 * @param item
 	 *          is an <code>Item</code> object to perform validation checking
 	 *          upon.
 	 * @return <code>null</code> on success and an error message otherwise.
 	 */
 	String validateItem(Item item);
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Sets autoload task to periodically reload data from database.
+	 *
+	 *
+	 * @param delay in seconds between each database reload.
+	 */
+	void setAutoloadTimer(long delay);
 }
+
+
+//~ Formatted in Tigase Code Convention on 13/03/09

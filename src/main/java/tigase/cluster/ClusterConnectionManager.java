@@ -2,7 +2,7 @@
  * ClusterConnectionManager.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,6 +31,11 @@ import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.cluster.api.ClusterElement;
 import tigase.cluster.api.CommandListener;
+import tigase.cluster.repo.ClusterRepoItem;
+
+import tigase.db.comp.ComponentRepository;
+import tigase.db.comp.RepositoryChangeListenerIfc;
+import tigase.db.TigaseDBException;
 
 import tigase.net.ConnectionType;
 
@@ -42,7 +47,6 @@ import tigase.server.Packet;
 import tigase.server.ServiceChecker;
 
 import tigase.stats.StatisticsList;
-import tigase.stats.StatisticType;
 
 import tigase.util.Algorithms;
 import tigase.util.TigaseStringprepException;
@@ -86,7 +90,17 @@ import javax.script.Bindings;
  */
 public class ClusterConnectionManager
 				extends ConnectionManager<XMPPIOService<Object>>
-				implements ClusteredComponentIfc {
+				implements ClusteredComponentIfc, RepositoryChangeListenerIfc<ClusterRepoItem> {
+	/** Field description */
+	public static final String CLCON_REPO_CLASS_PROP_KEY = "repository-class";
+
+	/** Field description */
+	public static final String CLCON_REPO_CLASS_PROP_VAL =
+		"tigase.cluster.repo.ClConSQLRepository";
+
+	/** Field description */
+	public static final String CLCON_REPO_CLASS_PROPERTY = "--cl-conn-repo-class";
+
 	/** Field description */
 	public static final String CLUSTER_CONNECTIONS_PER_NODE_PAR =
 		"--cluster-connections-per-node";
@@ -153,10 +167,10 @@ public class ClusterConnectionManager
 	public String[] PORT_IFC_PROP_VAL = { "*" };
 
 	/** Field description */
-	public int[] PORTS = { 5277 };
+
+	// public int[] PORTS = { 5277 };
 
 	/** Field description */
-	public String SECRET_PROP_VAL                  = "someSecret";
 	private ClusterControllerIfc clusterController = null;
 
 	// private String cluster_controller_id = null;
@@ -166,16 +180,17 @@ public class ClusterConnectionManager
 		IDENTITY_TYPE_VAL;
 	private Map<String, CopyOnWriteArrayList<XMPPIOService<Object>>> connectionsPool =
 		new ConcurrentSkipListMap<String, CopyOnWriteArrayList<XMPPIOService<Object>>>();
-	private boolean connect_all        = CONNECT_ALL_PROP_VAL;
-	private boolean compress_stream    = COMPRESS_STREAM_PROP_VAL;
-	private long[] lastDay             = new long[24];
-	private int lastDayIdx             = 0;
-	private long[] lastHour            = new long[60];
-	private int lastHourIdx            = 0;
-	private int nodesNo                = 0;
-	private int per_node_conns         = CLUSTER_CONNECTIONS_PER_NODE_VAL;
-	private long servConnectedTimeouts = 0;
-	private long totalNodeDisconnects  = 0;
+	private boolean connect_all                       = CONNECT_ALL_PROP_VAL;
+	private boolean compress_stream                   = COMPRESS_STREAM_PROP_VAL;
+	private long[] lastDay                            = new long[24];
+	private int lastDayIdx                            = 0;
+	private long[] lastHour                           = new long[60];
+	private int lastHourIdx                           = 0;
+	private int nodesNo                               = 0;
+	private int per_node_conns                        = CLUSTER_CONNECTIONS_PER_NODE_VAL;
+	private ComponentRepository<ClusterRepoItem> repo = null;
+	private long servConnectedTimeouts                = 0;
+	private long totalNodeDisconnects                 = 0;
 
 	// private long packetsSent = 0;
 	// private long packetsReceived = 0;
@@ -192,9 +207,27 @@ public class ClusterConnectionManager
 	 * @return
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		Map<String, Object> defs = new LinkedHashMap<String, Object>(50);
+		String repo_class        = (String) params.get(CLCON_REPO_CLASS_PROPERTY);
+
+		if (repo_class == null) {
+			repo_class = CLCON_REPO_CLASS_PROP_VAL;
+		}
+		defs.put(CLCON_REPO_CLASS_PROP_KEY, repo_class);
+		try {
+			repo =
+				(ComponentRepository<ClusterRepoItem>) Class.forName(repo_class).newInstance();
+			repo.getDefaults(defs, params);
+		} catch (Exception e) {
+			log.log(Level.SEVERE,
+							"Can not instantiate items repository for class: " + repo_class, e);
+		}
+
 		Map<String, Object> props = super.getDefaults(params);
 
+		props.putAll(defs);
 		props.put(RETURN_SERVICE_DISCO_KEY, RETURN_SERVICE_DISCO_VAL);
 		props.put(IDENTITY_TYPE_KEY, IDENTITY_TYPE_VAL);
 		if ((params.get(CONNECT_ALL_PAR) == null) ||
@@ -359,6 +392,7 @@ public class ClusterConnectionManager
 	public void initBindings(Bindings binds) {
 		super.initBindings(binds);
 		binds.put("clusterCM", this);
+		binds.put(ComponentRepository.COMP_REPO_BIND, repo);
 	}
 
 	/**
@@ -660,6 +694,7 @@ public class ClusterConnectionManager
 	 * @param props
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 		if (props.get(IDENTITY_TYPE_KEY) != null) {
@@ -685,39 +720,18 @@ public class ClusterConnectionManager
 			return;
 		}
 
-		String[] cl_nodes = (String[]) props.get(CLUSTER_NODES_PROP_KEY);
-		int[] ports       = (int[]) props.get(PORTS_PROP_KEY);
+		String repo_class = (String) props.get(CLCON_REPO_CLASS_PROP_KEY);
 
-		if (ports != null) {
-			PORTS = ports;
-		}
-		if (cl_nodes != null) {
-			nodesNo = cl_nodes.length;
-			for (String node : cl_nodes) {
-				String host = BareJID.parseJID(node)[1];
+		try {
+			ComponentRepository<ClusterRepoItem> repo_tmp =
+				(ComponentRepository<ClusterRepoItem>) Class.forName(repo_class).newInstance();
 
-				log.log(Level.CONFIG, "Found cluster node host: {0}", host);
-				if (!host.equals(getDefHostName().getDomain()) &&
-						((host.hashCode() > getDefHostName().hashCode()) || connect_all)) {
-					for (int i = 0; i < per_node_conns; ++i) {
-						log.log(Level.CONFIG, "Trying to connect to cluster node: {0}", host);
-
-						Map<String, Object> port_props = new LinkedHashMap<String, Object>(12);
-
-						port_props.put(SECRET_PROP_KEY, SECRET_PROP_VAL);
-						port_props.put(PORT_LOCAL_HOST_PROP_KEY, getDefHostName());
-						port_props.put(PORT_TYPE_PROP_KEY, ConnectionType.connect);
-						port_props.put(PORT_SOCKET_PROP_KEY, SocketType.plain);
-						port_props.put(PORT_REMOTE_HOST_PROP_KEY, host);
-						port_props.put(PORT_IFC_PROP_KEY, new String[] { host });
-						port_props.put(MAX_RECONNECTS_PROP_KEY, 99999999);
-						port_props.put(PORT_KEY, PORTS[0]);
-						addWaitingTask(port_props);
-					}
-
-					// reconnectService(port_props, connectionDelay);
-				}
-			}
+			repo_tmp.addRepoChangeListener(this);
+			repo_tmp.setProperties(props);
+			repo = repo_tmp;
+		} catch (Exception e) {
+			log.log(Level.SEVERE,
+							"Can not create items repository instance for class: " + repo_class, e);
 		}
 	}
 
@@ -819,12 +833,14 @@ public class ClusterConnectionManager
 	 */
 	@Override
 	protected int[] getDefPlainPorts() {
-		return PORTS;
+		ClusterRepoItem item = repo.getItem(getDefHostName().getDomain());
+
+		return new int[] { item.getPortNo() };
 	}
 
 	/**
-	 * Method <code>getMaxInactiveTime</code> returns max keep-alive time for
-	 * inactive connection. we shoulnd not really close external component
+	 * Method <code>getMaxInactiveTime</code> returns max keep-alive
+	 * time for inactive connection. we should not really close the
 	 * connection at all, so let's say something like: 1000 days...
 	 *
 	 * @return a <code>long</code> value
@@ -857,9 +873,10 @@ public class ClusterConnectionManager
 	 */
 	@Override
 	protected Map<String, Object> getParamsForPort(int port) {
+		ClusterRepoItem item     = repo.getItem(getDefHostName().getDomain());
 		Map<String, Object> defs = new LinkedHashMap<String, Object>(10);
 
-		defs.put(SECRET_PROP_KEY, SECRET_PROP_VAL);
+		defs.put(SECRET_PROP_KEY, item.getPassword());
 		defs.put(PORT_TYPE_PROP_KEY, ConnectionType.accept);
 		defs.put(PORT_SOCKET_PROP_KEY, SocketType.plain);
 		defs.put(PORT_IFC_PROP_KEY, PORT_IFC_PROP_VAL);
@@ -1057,6 +1074,69 @@ public class ClusterConnectionManager
 		return "xmpp:25m:0:disc,bin:20000m:0:disc";
 	}
 
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 * @param repoItem
+	 */
+	@Override
+	public void itemAdded(ClusterRepoItem repoItem) {
+		log.log(Level.INFO, "Loaded repoItem: {0}", repoItem.toString());
+
+		String host = repoItem.getHostname();
+
+		if (!host.equals(getDefHostName().getDomain()) &&
+				((host.hashCode() > getDefHostName().hashCode()) || connect_all)) {
+			for (int i = 0; i < per_node_conns; ++i) {
+				log.log(Level.CONFIG, "Trying to connect to cluster node: {0}", host);
+
+				Map<String, Object> port_props = new LinkedHashMap<String, Object>(12);
+
+				port_props.put(SECRET_PROP_KEY, repoItem.getPassword());
+				port_props.put(PORT_LOCAL_HOST_PROP_KEY, getDefHostName());
+				port_props.put(PORT_TYPE_PROP_KEY, ConnectionType.connect);
+				port_props.put(PORT_SOCKET_PROP_KEY, SocketType.plain);
+				port_props.put(PORT_REMOTE_HOST_PROP_KEY, host);
+				port_props.put(PORT_IFC_PROP_KEY, new String[] { host });
+				port_props.put(MAX_RECONNECTS_PROP_KEY, 99999999);
+				port_props.put(PORT_KEY, repoItem.getPortNo());
+				addWaitingTask(port_props);
+			}
+
+			// reconnectService(port_props, connectionDelay);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param item
+	 */
+	@Override
+	public void itemUpdated(ClusterRepoItem item) {
+		throw new UnsupportedOperationException("Not supported yet.");
+
+		// To change body of generated methods, choose Tools | Templates.
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param item
+	 */
+	@Override
+	public void itemRemoved(ClusterRepoItem item) {
+		throw new UnsupportedOperationException("Not supported yet.");
+
+		// To change body of generated methods, choose Tools | Templates.
+	}
+
 	//~--- inner classes --------------------------------------------------------
 
 	private class IOServiceStatisticsGetter
@@ -1206,4 +1286,4 @@ public class ClusterConnectionManager
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/03/09

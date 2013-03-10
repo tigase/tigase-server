@@ -650,7 +650,18 @@ public class ConfigurationCache
 	public String validateItem(ConfigItem item) {
 		return null;
 	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param delay
+	 */
+	@Override
+	public void setAutoloadTimer(long delay) {}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/04
+//~ Formatted in Tigase Code Convention on 13/03/09

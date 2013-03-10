@@ -1453,8 +1453,8 @@ public class SessionManager
 					XMPPSession xs = sessionsByNodeId.get(stanzaFrom.getBareJID());
 
 					if (xs == null) {
-						log.log(Level.INFO, "Stream close for the user session which does not exist",
-										iqc);
+						log.log(Level.INFO,
+										"Stream close for the user session which does not exist: {0}", iqc);
 					} else {
 						XMPPResourceConnection xcr =
 							xs.getResourceForConnectionId(iqc.getPacketFrom());
@@ -2550,4 +2550,4 @@ public class SessionManager
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/03/04
+//~ Formatted in Tigase Code Convention on 13/03/05

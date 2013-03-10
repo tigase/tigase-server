@@ -334,7 +334,7 @@ public class MessageRouter
 		// We do not process packets with not destination address
 		// Just dropping them and writing a log message
 		if (packet.getTo() == null) {
-			log.warning("Packet with TO attribute set to NULL: " + packet);
+			log.log(Level.WARNING, "Packet with TO attribute set to NULL: {0}", packet);
 
 			return;
 		}    // end of if (packet.getTo() == null)
@@ -364,7 +364,7 @@ public class MessageRouter
 		// + ", type: " + packet.getType());
 		// }
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Processing packet: " + packet);
+			log.log(Level.FINEST, "Processing packet: {0}", packet);
 		}
 
 		// Detect inifinite loop if from == to
@@ -375,7 +375,7 @@ public class MessageRouter
 		if (((packet.getType() == StanzaType.error) && (packet.getFrom() != null) &&
 				 packet.getFrom().equals(packet.getTo()))) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Possible infinite loop, dropping packet: " + packet);
+				log.log(Level.FINEST, "Possible infinite loop, dropping packet: {0}", packet);
 			}
 
 			return;
@@ -1121,4 +1121,4 @@ public class MessageRouter
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/25
+//~ Formatted in Tigase Code Convention on 13/03/05
