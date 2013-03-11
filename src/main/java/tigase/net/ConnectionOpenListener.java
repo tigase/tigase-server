@@ -1,10 +1,13 @@
 /*
+ * ConnectionOpenListener.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,13 +18,16 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
+
 package tigase.net;
 
+//~--- JDK imports ------------------------------------------------------------
+
 import java.net.InetSocketAddress;
+
 import java.nio.channels.SocketChannel;
 
 /**
@@ -34,38 +40,112 @@ import java.nio.channels.SocketChannel;
  * @version $Rev$
  */
 public interface ConnectionOpenListener {
-
-	public static final int IPTOS_LOWCOST = 0x02;
-	public static final int IPTOS_RELIABILITY = 0x04;
-	public static final int IPTOS_THROUGHPUT = 0x08;
-	public static final int IPTOS_LOWDELAY = 0x10;
 	/**
 	 * <code>RECEIVE_BUFFER_SIZE</code> defines a size for TCP/IP packets.
 	 * XMPP data packets are quite small usually, below 1kB so we don't need
 	 * big TCP/IP data buffers.
 	 */
-	public static final int DEF_RECEIVE_BUFFER_SIZE = 2*1024;
+	public static final int DEF_RECEIVE_BUFFER_SIZE = 2 * 1024;
+
+	/** Field description */
+	public static final int IPTOS_LOWCOST = 0x02;
+
+	/** Field description */
+	public static final int IPTOS_LOWDELAY = 0x10;
+
+	/** Field description */
+	public static final int IPTOS_RELIABILITY = 0x04;
+
+	/** Field description */
+	public static final int IPTOS_THROUGHPUT = 0x08;
+
+	/** Field description */
 	public static final int DEF_TRAFFIC_CLASS = IPTOS_LOWCOST;
 
+	//~--- methods --------------------------------------------------------------
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param sc
+	 */
 	void accept(SocketChannel sc);
 
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	int getPort();
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	String[] getIfcs();
 
-        String getSRVType();
-        
-        String getRemoteHostname();
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	String getSRVType();
 
-        InetSocketAddress getRemoteAddress();
-        
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	String getRemoteHostname();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	InetSocketAddress getRemoteAddress();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	ConnectionType getConnectionType();
-        
-        SocketType getSocketType();
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	SocketType getSocketType();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	int getReceiveBufferSize();
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	int getTrafficClass();
+}    // ConnectionOpenListener
 
-} // ConnectionOpenListener
+
+//~ Formatted in Tigase Code Convention on 13/03/11

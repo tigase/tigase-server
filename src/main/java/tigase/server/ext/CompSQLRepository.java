@@ -67,50 +67,35 @@ public class CompSQLRepository
 	public static final String REPO_URI_PROP_KEY = "repo-uri";
 
 	/** Field description */
-	public static final String TABLE_NAME              = "external_component";
+	public static final String  TABLE_NAME             = "external_component";
 	private static final String CONNECTION_TYPE_COLUMN = "connection_type";
 	private static final String DOMAIN_COLUMN          = "domain";
 
 	/**
 	 * Private logger for class instances.
 	 */
-	private static final Logger log                  =
-		Logger.getLogger(CompSQLRepository.class.getName());
+	private static final Logger log = Logger.getLogger(CompSQLRepository.class.getName());
 	private static final String OTHER_DATA_COLUMN    = "other_data";
 	private static final String PASSWORD_COLUMN      = "password";
 	private static final String PORT_COLUMN          = "port";
 	private static final String PROTOCOL_COLUMN      = "protocol";
 	private static final String REMOTE_DOMAIN_COLUMN = "remote_domain";
-	private static final String GET_ITEM_QUERY       = "select * from " + TABLE_NAME +
-																										 " where domain = ?";
+	private static final String GET_ITEM_QUERY = "select * from " + TABLE_NAME +
+			" where " + DOMAIN_COLUMN + " = ?";
 	private static final String GET_ALL_ITEMS_QUERY = "select * from " + TABLE_NAME;
-	private static final String DELETE_ITEM_QUERY   = "delete from " + TABLE_NAME +
-																										" where (domain = ?)";
+	private static final String DELETE_ITEM_QUERY = "delete from " + TABLE_NAME +
+			" where (" + DOMAIN_COLUMN + " = ?)";
 	private static final String CREATE_TABLE_QUERY = "create table " + TABLE_NAME + " (" +
-																									 "  " + DOMAIN_COLUMN +
-																									 " varchar(512) NOT NULL," + "  " +
-																									 PASSWORD_COLUMN +
-																									 " varchar(255) NOT NULL," + "  " +
-																									 CONNECTION_TYPE_COLUMN +
-																									 " varchar(127)," + "  " +
-																									 PORT_COLUMN + " int," + "  " +
-																									 REMOTE_DOMAIN_COLUMN +
-																									 " varchar(1023)," + "  " +
-																									 PROTOCOL_COLUMN + " varchar(127)," +
-																									 "  " + OTHER_DATA_COLUMN +
-																									 " varchar(32672)," +
-																									 "  primary key(" + DOMAIN_COLUMN +
-																									 "))";
+			"  " + DOMAIN_COLUMN + " varchar(512) NOT NULL," + "  " + PASSWORD_COLUMN +
+			" varchar(255) NOT NULL," + "  " + CONNECTION_TYPE_COLUMN + " varchar(127)," +
+			"  " + PORT_COLUMN + " int," + "  " + REMOTE_DOMAIN_COLUMN + " varchar(1023)," +
+			"  " + PROTOCOL_COLUMN + " varchar(127)," + "  " + OTHER_DATA_COLUMN +
+			" varchar(32672)," + "  primary key(" + DOMAIN_COLUMN + "))";
 	private static final String CHECK_TABLE_QUERY = "select count(*) from " + TABLE_NAME;
-	private static final String ADD_ITEM_QUERY    = "insert into " + TABLE_NAME + " (" +
-																									DOMAIN_COLUMN + ", " +
-																									PASSWORD_COLUMN + ", " +
-																									CONNECTION_TYPE_COLUMN + ", " +
-																									PORT_COLUMN + ", " +
-																									REMOTE_DOMAIN_COLUMN + ", " +
-																									PROTOCOL_COLUMN + ", " +
-																									OTHER_DATA_COLUMN + ") " +
-																									" values (?, ?, ?, ?, ?, ?, ?)";
+	private static final String ADD_ITEM_QUERY = "insert into " + TABLE_NAME + " (" +
+			DOMAIN_COLUMN + ", " + PASSWORD_COLUMN + ", " + CONNECTION_TYPE_COLUMN + ", " +
+			PORT_COLUMN + ", " + REMOTE_DOMAIN_COLUMN + ", " + PROTOCOL_COLUMN + ", " +
+			OTHER_DATA_COLUMN + ") " + " values (?, ?, ?, ?, ?, ?, ?)";
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -122,7 +107,7 @@ public class CompSQLRepository
 	// private PreparedStatement deleteItemSt = null;
 	// private PreparedStatement getAllItemsSt = null;
 	// private PreparedStatement getItemSt = null;
-	private String tableName                = TABLE_NAME;
+	private String               tableName  = TABLE_NAME;
 	private CompConfigRepository configRepo = new CompConfigRepository();
 
 	//~--- methods --------------------------------------------------------------
@@ -135,7 +120,7 @@ public class CompSQLRepository
 	 */
 	@Override
 	public void addRepoChangeListener(
-					RepositoryChangeListenerIfc<CompRepoItem> repoChangeListener) {
+			RepositoryChangeListenerIfc<CompRepoItem> repoChangeListener) {
 		configRepo.addRepoChangeListener(repoChangeListener);
 	}
 
@@ -147,7 +132,7 @@ public class CompSQLRepository
 	 */
 	@Override
 	public void removeRepoChangeListener(
-					RepositoryChangeListenerIfc<CompRepoItem> repoChangeListener) {
+			RepositoryChangeListenerIfc<CompRepoItem> repoChangeListener) {
 		configRepo.removeRepoChangeListener(repoChangeListener);
 	}
 
@@ -224,7 +209,7 @@ public class CompSQLRepository
 
 		try {
 			PreparedStatement getAllItemsSt = data_repo.getPreparedStatement(null,
-																					GET_ALL_ITEMS_QUERY);
+					GET_ALL_ITEMS_QUERY);
 
 			synchronized (getAllItemsSt) {
 				rs = getAllItemsSt.executeQuery();
@@ -257,8 +242,6 @@ public class CompSQLRepository
 	}
 
 	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -296,7 +279,7 @@ public class CompSQLRepository
 
 			try {
 				PreparedStatement getItemSt = data_repo.getPreparedStatement(null,
-																				GET_ITEM_QUERY);
+						GET_ITEM_QUERY);
 
 				synchronized (getItemSt) {
 					getItemSt.setString(1, key);
@@ -328,8 +311,6 @@ public class CompSQLRepository
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -350,8 +331,7 @@ public class CompSQLRepository
 			data_repo.initPreparedStatement(ADD_ITEM_QUERY, ADD_ITEM_QUERY);
 			data_repo.initPreparedStatement(DELETE_ITEM_QUERY, DELETE_ITEM_QUERY);
 		} catch (Exception e) {
-
-			// Do nothing for now...
+			log.log(Level.WARNING, "Problem initializing database: ", e);
 		} finally {
 
 			// Check if DB is correctly setup and contains all required tables.
@@ -390,7 +370,7 @@ public class CompSQLRepository
 		configRepo.removeItem(key);
 		try {
 			PreparedStatement deleteItemSt = data_repo.getPreparedStatement(null,
-																				 DELETE_ITEM_QUERY);
+					DELETE_ITEM_QUERY);
 
 			synchronized (deleteItemSt) {
 				deleteItemSt.setString(1, key);
@@ -402,8 +382,6 @@ public class CompSQLRepository
 	}
 
 	//~--- set methods ----------------------------------------------------------
-
-	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -425,8 +403,6 @@ public class CompSQLRepository
 	}
 
 	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -538,7 +514,7 @@ public class CompSQLRepository
 
 	private Element parseElement(String data) {
 		DomBuilderHandler domHandler = new DomBuilderHandler();
-		SimpleParser parser          = SingletonFactory.getParserInstance();
+		SimpleParser      parser     = SingletonFactory.getParserInstance();
 
 		parser.parse(domHandler, data.toCharArray(), 0, data.length());
 
@@ -564,10 +540,4 @@ public class CompSQLRepository
 }
 
 
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-
-//~ Formatted in Tigase Code Convention on 13/03/09
+//~ Formatted in Tigase Code Convention on 13/03/11

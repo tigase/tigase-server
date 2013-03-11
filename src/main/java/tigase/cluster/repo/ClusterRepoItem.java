@@ -45,10 +45,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Created: Oct 3, 2009 4:39:51 PM
+ * Class description
  *
- * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
+ *
+ * @version        5.2.0, 13/03/09
+ * @author         <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
 public class ClusterRepoItem
 				extends RepositoryItemAbstract {

@@ -50,8 +50,8 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 	/** Field description */
 	protected ConcurrentSkipListMap<String, Item> items = new ConcurrentSkipListMap<String,
-																													Item>();
-	private Timer autoLoadTimer                              = null;
+			Item>();
+	private Timer                             autoLoadTimer  = null;
 	private RepositoryChangeListenerIfc<Item> repoChangeList = null;
 
 	//~--- set methods ----------------------------------------------------------
@@ -68,14 +68,17 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 		if (autoLoadTimer != null) {
 			autoLoadTimer.cancel();
+			autoLoadTimer = null;
 		}
-		autoLoadTimer = new Timer(getConfigKey(), true);
-		autoLoadTimer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				reload();
-			}
-		}, interval, interval);
+		if (interval > 0) {
+			autoLoadTimer = new Timer(getConfigKey(), true);
+			autoLoadTimer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					reload();
+				}
+			}, interval, interval);
+		}
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -88,7 +91,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 */
 	@Override
 	public void addRepoChangeListener(
-					RepositoryChangeListenerIfc<Item> repoChangeListener) {
+			RepositoryChangeListenerIfc<Item> repoChangeListener) {
 		this.repoChangeList = repoChangeListener;
 	}
 
@@ -100,7 +103,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 */
 	@Override
 	public void removeRepoChangeListener(
-					RepositoryChangeListenerIfc<Item> repoChangeListener) {
+			RepositoryChangeListenerIfc<Item> repoChangeListener) {
 		this.repoChangeList = null;
 	}
 
@@ -159,12 +162,32 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 				log.log(Level.INFO, "Calling itemAdded for: {0}", item);
 				repoChangeList.itemAdded(item);
 			} else {
-				log.log(Level.INFO, "Calling itemUpadted for: {0}", item);
-				repoChangeList.itemUpdated(item);
+				if (itemChanged(old, item)) {
+					log.log(Level.INFO, "Calling itemUpadted for: {0}", item);
+					repoChangeList.itemUpdated(item);
+				} else {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Not calling itemUpadted for: {0}, item unchanged.",
+								item);
+					}
+				}
 			}
 		} else {
 			log.log(Level.INFO, "No repoChangeListener for: {0}", item);
 		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param oldItem
+	 * @param newItem
+	 *
+	 * @return
+	 */
+	public boolean itemChanged(Item oldItem, Item newItem) {
+		return true;
 	}
 
 	/**
@@ -324,4 +347,4 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/09
+//~ Formatted in Tigase Code Convention on 13/03/11

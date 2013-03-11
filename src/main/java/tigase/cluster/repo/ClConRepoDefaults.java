@@ -22,10 +22,6 @@
 
 
 
-/*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
- */
 package tigase.cluster.repo;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -35,8 +31,11 @@ import tigase.util.DNSResolver;
 import tigase.xmpp.BareJID;
 
 /**
+ * Class description
  *
- * @author kobit
+ *
+ * @version        5.2.0, 13/03/09
+ * @author         <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
 public abstract class ClConRepoDefaults {
 	private static final BareJID clcon_user = BareJID.bareJIDInstanceNS("cl-conn-manager");
