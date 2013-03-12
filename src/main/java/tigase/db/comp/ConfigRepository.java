@@ -1,10 +1,13 @@
 /*
+ * ConfigRepository.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,23 +18,20 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.db.comp;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Map;
 
 /**
  * Created: Oct 3, 2009 2:58:41 PM
@@ -41,28 +41,54 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public abstract class ConfigRepository<Item extends RepositoryItem>
-		implements ComponentRepository<Item> {
+				implements ComponentRepository<Item> {
 	private static final Logger log = Logger.getLogger(ConfigRepository.class.getName());
 
-	protected ConcurrentSkipListMap<String, Item> items = new ConcurrentSkipListMap<String, Item>();
+	//~--- fields ---------------------------------------------------------------
+
+	/** Field description */
+	protected ConcurrentSkipListMap<String, Item> items = new ConcurrentSkipListMap<String,
+			Item>();
 	private RepositoryChangeListenerIfc<Item> repoChangeList = null;
 
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param repoChangeListener
+	 */
 	@Override
 	public void addRepoChangeListener(
 			RepositoryChangeListenerIfc<Item> repoChangeListener) {
 		this.repoChangeList = repoChangeListener;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param repoChangeListener
+	 */
 	@Override
 	public void removeRepoChangeListener(
 			RepositoryChangeListenerIfc<Item> repoChangeListener) {
 		this.repoChangeList = null;
 	}
-	
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	@Override
 	public String toString() {
 		return items.toString();
 	}
+
+	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -142,7 +168,6 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 		if (params.get(getPropertyKey()) != null) {
 			items_arr = ((String) params.get(getPropertyKey())).split(",");
 		}
-
 		defs.put(getConfigKey(), items_arr);
 	}
 
@@ -205,7 +230,6 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 		if ((items_arr != null) && (items_arr.length > 0)) {
 			items.clear();
-
 			for (String it : items_arr) {
 				log.log(Level.CONFIG, "Loading config item: {0}", it);
 
@@ -254,7 +278,4 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/03/11

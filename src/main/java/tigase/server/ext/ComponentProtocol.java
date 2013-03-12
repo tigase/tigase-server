@@ -2,11 +2,12 @@
  * ComponentProtocol.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -95,7 +96,7 @@ public class ComponentProtocol
 
 	/** Field description */
 	public static final String EXTCOMP_REPO_CLASS_PROP_VAL =
-		"tigase.server.ext.CompDBRepository";
+			"tigase.server.ext.CompDBRepository";
 
 	/** Field description */
 	public static final String EXTCOMP_REPO_CLASS_PROPERTY = "--extcomp-repo-class";
@@ -137,24 +138,24 @@ public class ComponentProtocol
 	 * of connections.
 	 */
 	private Map<String, CopyOnWriteArrayList<ComponentConnection>> connections =
-		new ConcurrentHashMap<String, CopyOnWriteArrayList<ComponentConnection>>();
-	private String[] hostnamesToBind                          = null;
-	private int maxAuthenticationAttempts                     = 1;
-	private ComponentRepository<CompRepoItem> repo            = null;
-	private Map<String, StreamOpenHandler> streamOpenHandlers = new LinkedHashMap<String,
-																																StreamOpenHandler>();
+			new ConcurrentHashMap<String, CopyOnWriteArrayList<ComponentConnection>>();
+	private String[]                          hostnamesToBind           = null;
+	private int                               maxAuthenticationAttempts = 1;
+	private ComponentRepository<CompRepoItem> repo                      = null;
+	private Map<String, StreamOpenHandler>    streamOpenHandlers =
+			new LinkedHashMap<String, StreamOpenHandler>();
 
 	/**
 	 * List of processors which should handle all traffic incoming from the
 	 * network. In most cases if not all, these processors handle just protocol
 	 * traffic, all the rest traffic should be passed on to MR.
 	 */
-	private Map<String, ExtProcessor> processors = new LinkedHashMap<String,
-																									 ExtProcessor>(10);
+	private Map<String, ExtProcessor> processors = new LinkedHashMap<String, ExtProcessor>(
+			10);
 	private UnknownXMLNSStreamOpenHandler unknownXMLNSHandler =
-		new UnknownXMLNSStreamOpenHandler();
-	private String identity_type = IDENTITY_TYPE_VAL;
-	private boolean experimental = false;
+			new UnknownXMLNSStreamOpenHandler();
+	private String  identity_type = IDENTITY_TYPE_VAL;
+	private boolean experimental  = false;
 
 	// private ServiceEntity serviceEntity = null;
 	private boolean closeOnSequenceError = true;
@@ -295,7 +296,7 @@ public class ComponentProtocol
 	private void updateServiceDiscoForConnection(String hostname, ComponentIOService serv) {
 
 		// Cut off the first, component part
-		int idx            = hostname.indexOf(".");
+		int    idx         = hostname.indexOf(".");
 		String newhostname = hostname.substring(idx + 1);
 
 		if (!isLocalDomain(newhostname)) {
@@ -346,8 +347,8 @@ public class ComponentProtocol
 			repo = (ComponentRepository<CompRepoItem>) Class.forName(repo_class).newInstance();
 			repo.getDefaults(defs, params);
 		} catch (Exception e) {
-			log.log(Level.SEVERE,
-							"Can not instantiate items repository for class: " + repo_class, e);
+			log.log(Level.SEVERE, "Can not instantiate items repository for class: " +
+					repo_class, e);
 		}
 		defs.put(PACK_ROUTED_KEY, PACK_ROUTED_VAL);
 		defs.put(RETURN_SERVICE_DISCO_KEY, RETURN_SERVICE_DISCO_VAL);
@@ -488,13 +489,13 @@ public class ComponentProtocol
 	@Override
 	public Queue<Packet> processSocketData(ComponentIOService serv) {
 		Queue<Packet> packets = serv.getReceivedPackets();
-		Packet p              = null;
+		Packet        p       = null;
 		Queue<Packet> results = new ArrayDeque<Packet>(2);
 
 		while ((p = packets.poll()) != null) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Processing socket: {0}, data: {0}", new Object[] { serv,
-								p });
+						p });
 			}
 
 			boolean processed = false;
@@ -516,7 +517,7 @@ public class ComponentProtocol
 							result = p.unpackRouted();
 						} catch (TigaseStringprepException ex) {
 							log.log(Level.WARNING,
-											"Packet stringprep addressing problem, dropping packet: {0}", p);
+									"Packet stringprep addressing problem, dropping packet: {0}", p);
 
 							return null;
 						}
@@ -529,14 +530,14 @@ public class ComponentProtocol
 				} else {
 					try {
 						Packet error = Authorization.NOT_AUTHORIZED.getResponseMessage(p,
-														 "Connection not yet authorized to send this packet.", true);
+								"Connection not yet authorized to send this packet.", true);
 
 						writePacketToSocket(serv, error);
 					} catch (PacketErrorTypeException ex) {
 
 						// Already error packet, just ignore to prevent infinite loop
 						log.log(Level.FINE,
-										"Received an error packet from unauthorized connection: {0}", p);
+								"Received an error packet from unauthorized connection: {0}", p);
 					}
 					if (closeOnSequenceError) {
 						serv.stop();
@@ -575,12 +576,11 @@ public class ComponentProtocol
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Connection started: " + serv.getRemoteAddress() + ", xmlns: " + xmlns +
-								 ", type: " + serv.connectionType().toString() + ", id=" +
-								 serv.getUniqueId());
+					", type: " + serv.connectionType().toString() + ", id=" + serv.getUniqueId());
 		}
 
 		StreamOpenHandler handler = streamOpenHandlers.get(xmlns);
-		String result             = null;
+		String            result  = null;
 
 		if (handler == null) {
 
@@ -589,7 +589,7 @@ public class ComponentProtocol
 		} else {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("cid: " + (String) serv.getSessionData().get("cid") + ", sending: " +
-									 result);
+						result);
 			}
 			result = handler.serviceStarted(serv);
 		}
@@ -612,8 +612,8 @@ public class ComponentProtocol
 
 		if (result) {
 			Map<String, Object> sessionData = service.getSessionData();
-			String hostname                 =
-				(String) sessionData.get(ComponentIOService.HOSTNAME_KEY);
+			String              hostname = (String) sessionData.get(ComponentIOService
+					.HOSTNAME_KEY);
 
 			if ((hostname != null) &&!hostname.isEmpty()) {
 				List<ComponentConnection> conns = service.getRefObject();
@@ -636,8 +636,8 @@ public class ComponentProtocol
 			} else {
 
 				// Stopped service which hasn't sent initial stream open yet
-				log.finer("Stopped service which hasn't sent initial stream open yet" +
-									service.getUniqueId());
+				log.finer("Stopped service which hasn't sent initial stream open yet" + service
+						.getUniqueId());
 			}
 
 			ConnectionType type = service.connectionType();
@@ -679,13 +679,13 @@ public class ComponentProtocol
 
 		try {
 			ComponentRepository<CompRepoItem> repo_tmp =
-				(ComponentRepository<CompRepoItem>) Class.forName(repo_class).newInstance();
+					(ComponentRepository<CompRepoItem>) Class.forName(repo_class).newInstance();
 
 			repo_tmp.setProperties(properties);
 			repo = repo_tmp;
 		} catch (Exception e) {
-			log.log(Level.SEVERE,
-							"Can not create items repository instance for class: " + repo_class, e);
+			log.log(Level.SEVERE, "Can not create items repository instance for class: " +
+					repo_class, e);
 		}
 
 		// Activate all connections for which parameters are defined in the
@@ -693,8 +693,8 @@ public class ComponentProtocol
 		for (CompRepoItem repoItem : repo) {
 			log.config("Loaded repoItem: " + repoItem.toString());
 			if (repoItem.getPort() > 0) {
-				String[] remote_host = PORT_IFC_PROP_VAL;
-				String remote_domain = repoItem.getRemoteHost();
+				String[] remote_host   = PORT_IFC_PROP_VAL;
+				String   remote_domain = repoItem.getRemoteHost();
 
 				if (repoItem.getRemoteHost() != null) {
 					remote_host = repoItem.getRemoteHost().split(";");
@@ -711,8 +711,8 @@ public class ComponentProtocol
 						// address to connect to.
 						String[] remote_host_copy = new String[remote_host.length - 1];
 
-						System.arraycopy(remote_host, 1, remote_host_copy, 0,
-														 remote_host_copy.length);
+						System.arraycopy(remote_host, 1, remote_host_copy, 0, remote_host_copy
+								.length);
 						remote_host = remote_host_copy;
 					}
 				}
@@ -836,13 +836,13 @@ public class ComponentProtocol
 	@Override
 	public String xmppStreamOpened(ComponentIOService serv, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Stream opened: " + serv.getRemoteAddress() + ", xmlns: " +
-								 attribs.get("xmlns") + ", type: " + serv.connectionType().toString() +
-								 ", uniqueId=" + serv.getUniqueId() + ", to=" + attribs.get("to"));
+			log.finest("Stream opened: " + serv.getRemoteAddress() + ", xmlns: " + attribs.get(
+					"xmlns") + ", type: " + serv.connectionType().toString() + ", uniqueId=" + serv
+					.getUniqueId() + ", to=" + attribs.get("to"));
 		}
 
-		String s_xmlns            = attribs.get("xmlns");
-		String result             = null;
+		String            s_xmlns = attribs.get("xmlns");
+		String            result  = null;
 		StreamOpenHandler handler = streamOpenHandlers.get(s_xmlns);
 
 		if ((handler == null) || (s_xmlns == null)) {
@@ -903,9 +903,9 @@ public class ComponentProtocol
 			return null;
 		}
 
-		ComponentIOService result                       = null;
-		String hostname                                 = p.getStanzaTo().getDomain();
-		CopyOnWriteArrayList<ComponentConnection> conns = connections.get(hostname);
+		ComponentIOService                        result   = null;
+		String                                    hostname = p.getStanzaTo().getDomain();
+		CopyOnWriteArrayList<ComponentConnection> conns    = connections.get(hostname);
 
 		// If there is no connections list for this domain and routings are set to *
 		// we use the first available list.
@@ -960,7 +960,7 @@ public class ComponentProtocol
 							result = serv;
 						} else {
 							log.info("Service is not connected for connection for hostname: " +
-											 hostname);
+									hostname);
 						}
 					} else {
 						log.info("Service is null for connection for hostname: " + hostname);
@@ -1006,8 +1006,8 @@ public class ComponentProtocol
 
 	// ~--- methods --------------------------------------------------------------
 	private synchronized void addComponentConnection(String hostname,
-					ComponentIOService s) {
-		ComponentConnection conn            = new ComponentConnection(hostname, s);
+			ComponentIOService s) {
+		ComponentConnection       conn      = new ComponentConnection(hostname, s);
 		List<ComponentConnection> refObject = s.getRefObject();
 
 		if (refObject == null) {
@@ -1019,8 +1019,8 @@ public class ComponentProtocol
 			refObject.add(conn);
 
 			// workaround to sort CopyOnWriteArrayList
-			ComponentConnection[] arr_list =
-				refObject.toArray(new ComponentConnection[refObject.size()]);
+			ComponentConnection[] arr_list = refObject.toArray(
+					new ComponentConnection[refObject.size()]);
 
 			Arrays.sort(arr_list);
 			refObject = new CopyOnWriteArrayList<ComponentConnection>(arr_list);
@@ -1043,8 +1043,8 @@ public class ComponentProtocol
 			result = conns.add(conn);
 
 			// workaround to sort CopyOnWriteArrayList
-			ComponentConnection[] arr_list =
-				conns.toArray(new ComponentConnection[conns.size()]);
+			ComponentConnection[] arr_list = conns.toArray(
+					new ComponentConnection[conns.size()]);
 
 			Arrays.sort(arr_list);
 			conns = new CopyOnWriteArrayList<ComponentConnection>(arr_list);
@@ -1058,9 +1058,9 @@ public class ComponentProtocol
 	}
 
 	private synchronized boolean removeComponentConnection(String hostname,
-					ComponentConnection conn) {
-		boolean result                                  = false;
-		CopyOnWriteArrayList<ComponentConnection> conns = connections.get(hostname);
+			ComponentConnection conn) {
+		boolean                                   result = false;
+		CopyOnWriteArrayList<ComponentConnection> conns  = connections.get(hostname);
 
 		if (conns != null) {
 
@@ -1083,12 +1083,12 @@ public class ComponentProtocol
 					result = true;
 				} else {
 					log.warning("Null or disconnected service for ComponentConnection for host: " +
-											hostname);
+							hostname);
 				}
 			}
 		} else {
 			log.warning("That should not happen, ComponentConnection is not null but " +
-									"the collection is: " + hostname);
+					"the collection is: " + hostname);
 		}
 
 		return result;
@@ -1168,4 +1168,4 @@ public class ComponentProtocol
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/18
+//~ Formatted in Tigase Code Convention on 13/03/11
