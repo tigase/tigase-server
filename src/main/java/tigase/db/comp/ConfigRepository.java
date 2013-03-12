@@ -32,6 +32,8 @@ import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created: Oct 3, 2009 2:58:41 PM
@@ -49,7 +51,35 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	/** Field description */
 	protected ConcurrentSkipListMap<String, Item> items = new ConcurrentSkipListMap<String,
 			Item>();
+	private Timer                             autoLoadTimer  = null;
 	private RepositoryChangeListenerIfc<Item> repoChangeList = null;
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param delay
+	 */
+	@Override
+	public void setAutoloadTimer(long delay) {
+		long interval = delay * 1000;
+
+		if (autoLoadTimer != null) {
+			autoLoadTimer.cancel();
+			autoLoadTimer = null;
+		}
+		if (interval > 0) {
+			autoLoadTimer = new Timer(getConfigKey(), true);
+			autoLoadTimer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					reload();
+				}
+			}, interval, interval);
+		}
+	}
 
 	//~--- methods --------------------------------------------------------------
 
@@ -124,8 +154,40 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 */
 	@Override
 	public void addItem(Item item) {
-		items.put(item.getKey(), item);
+		Item old = items.put(item.getKey(), item);
+
 		store();
+		if (repoChangeList != null) {
+			if (old == null) {
+				log.log(Level.INFO, "Calling itemAdded for: {0}", item);
+				repoChangeList.itemAdded(item);
+			} else {
+				if (itemChanged(old, item)) {
+					log.log(Level.INFO, "Calling itemUpadted for: {0}", item);
+					repoChangeList.itemUpdated(item);
+				} else {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Not calling itemUpadted for: {0}, item unchanged.",
+								item);
+					}
+				}
+			}
+		} else {
+			log.log(Level.INFO, "No repoChangeListener for: {0}", item);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param oldItem
+	 * @param newItem
+	 *
+	 * @return
+	 */
+	public boolean itemChanged(Item oldItem, Item newItem) {
+		return true;
 	}
 
 	/**
@@ -212,8 +274,14 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 */
 	@Override
 	public void removeItem(String key) {
-		items.remove(key);
-		store();
+		Item item = items.remove(key);
+
+		if (item != null) {
+			store();
+			if (repoChangeList != null) {
+				repoChangeList.itemRemoved(item);
+			}
+		}
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -236,7 +304,8 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 				Item item = getItemInstance();
 
 				item.initFromPropertyString(it);
-				items.put(item.getKey(), item);
+				addItem(item);
+				log.log(Level.CONFIG, "Loaded config item: {0}", item);
 			}
 		} else {
 			log.warning("Items list is not set in the configuration file!!");

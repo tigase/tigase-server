@@ -56,9 +56,7 @@ import tigase.xmpp.PacketErrorTypeException;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
@@ -691,7 +689,7 @@ public class ComponentProtocol
 		// Activate all connections for which parameters are defined in the
 		// repository
 		for (CompRepoItem repoItem : repo) {
-			log.config("Loaded repoItem: " + repoItem.toString());
+			log.log(Level.CONFIG, "Loaded repoItem: {0}", repoItem.toString());
 			if (repoItem.getPort() > 0) {
 				String[] remote_host   = PORT_IFC_PROP_VAL;
 				String   remote_domain = repoItem.getRemoteHost();
