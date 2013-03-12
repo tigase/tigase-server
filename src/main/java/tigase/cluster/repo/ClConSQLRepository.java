@@ -50,19 +50,8 @@ import java.util.Map;
  * @author         <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
 public class ClConSQLRepository
-				extends ClConConfigRepository {
-	/** Field description */
-	public static final String  REPO_URI_PROP_KEY = "repo-uri";
-	private static final String CPU_USAGE_COLUMN  = "cpu_usage";
-	private static final String HOSTNAME_COLUMN   = "hostname";
-	private static final String LASTUPDATE_COLUMN = "last_update";
-	private static final String MEM_USAGE_COLUMN  = "mem_usage";
-	private static final String PASSWORD_COLUMN   = "password";
-	private static final String PORT_COLUMN       = "port";
-
-	/** Field description */
-	private static final String TABLE_NAME = "cluster_nodes";
-
+				extends ClConConfigRepository
+				implements ClusterRepoConstants {
 	/**
 	 * Private logger for class instances.
 	 */
