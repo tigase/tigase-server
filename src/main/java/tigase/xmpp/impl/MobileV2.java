@@ -63,7 +63,7 @@ public class MobileV2
 	private static final String MAX_QUEUE_SIZE_KEY = "max-queue-size";
 	private static final String MOBILE_EL_NAME     = "mobile";
 	private static final String XMLNS              = "http://tigase.org/protocol/mobile#v2";
-	private static final String[] ELEMENTS         = { MOBILE_EL_NAME };
+	private static final String[][] ELEMENT_PATHS  = {{ "iq", MOBILE_EL_NAME }};
 	private static final String[] XMLNSS           = { XMLNS };
 	private static final Element[] SUP_FEATURES    = { new Element(MOBILE_EL_NAME,
 																										 new String[] { "xmlns" },
@@ -175,10 +175,10 @@ public class MobileV2
 	 * @return
 	 */
 	@Override
-	public String[] supElements() {
-		return ELEMENTS;
+	public String[][] supElementNamePaths() {
+		return ELEMENT_PATHS;
 	}
-
+	
 	/**
 	 * Method description
 	 *
