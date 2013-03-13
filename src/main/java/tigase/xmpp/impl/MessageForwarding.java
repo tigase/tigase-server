@@ -2,7 +2,7 @@
  * MessageForwarding.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -65,21 +65,20 @@ public class MessageForwarding
 	private static final String ID            = "message-vhost-forward";
 
 	/** Class logger */
-	private static final Logger log                    =
-		Logger.getLogger(MessageForwarding.class.getName());
-	private static final String XMLNS                  = "jabber:client";
-	private static final String[] ELEMENTS             = { tigase.server.Message
-																												 .ELEM_NAME };
-	private static final String[] XMLNSS               = { XMLNS };
-	private static final String[] MESSAGE_FORWARD_PATH = { tigase.server.Message.ELEM_NAME,
-					FORWARD_EL };
-	private static final Element forw_el = new Element(FORWARD_EL,
-																					 new String[] { "xmlns" },
-																					 new String[] { FORWARD_XMLNS });
+	private static final Logger     log = Logger.getLogger(MessageForwarding.class
+			.getName());
+	private static final String     XMLNS    = "jabber:client";
+	private static final String[][] ELEMENTS = {
+		{ tigase.server.Message.ELEM_NAME }
+	};
+	private static final String[]   XMLNSS   = { XMLNS };
+	private static final String[]   MESSAGE_FORWARD_PATH = { tigase.server.Message
+			.ELEM_NAME,
+			FORWARD_EL };
+	private static final Element forw_el = new Element(FORWARD_EL, new String[] {
+			"xmlns" }, new String[] { FORWARD_XMLNS });
 
 	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Returns plugin unique identifier.
@@ -106,8 +105,7 @@ public class MessageForwarding
 	 */
 	@Override
 	public void process(Packet packet, XMPPResourceConnection session,
-											NonAuthUserRepository repo, Queue<Packet> results,
-											Map<String, Object> settings)
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 					throws XMPPException {
 
 		// For performance reasons it is better to do the check
@@ -148,8 +146,8 @@ public class MessageForwarding
 
 			// Remember to cut the resource part off before comparing JIDs
 			BareJID id = (packet.getStanzaTo() != null)
-									 ? packet.getStanzaTo().getBareJID()
-									 : null;
+					? packet.getStanzaTo().getBareJID()
+					: null;
 
 			// Checking if this is a packet TO the owner of the session
 			if (session.isUserId(id)) {
@@ -160,8 +158,8 @@ public class MessageForwarding
 
 				// Remember to cut the resource part off before comparing JIDs
 				id = (packet.getStanzaFrom() != null)
-						 ? packet.getStanzaFrom().getBareJID()
-						 : null;
+						? packet.getStanzaFrom().getBareJID()
+						: null;
 
 				// Checking if this is maybe packet FROM the client
 				if (session.isUserId(id)) {
@@ -192,7 +190,7 @@ public class MessageForwarding
 		} catch (NotAuthorizedException e) {
 			log.warning("NotAuthorizedException for packet: " + packet);
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-							"You must authorize session first.", true));
+					"You must authorize session first.", true));
 		}    // end of try-catch
 	}
 
@@ -203,7 +201,7 @@ public class MessageForwarding
 	 * @return
 	 */
 	@Override
-	public String[] supElements() {
+	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
@@ -220,4 +218,4 @@ public class MessageForwarding
 }    // Message
 
 
-//~ Formatted in Tigase Code Convention on 13/02/21
+//~ Formatted in Tigase Code Convention on 13/03/12

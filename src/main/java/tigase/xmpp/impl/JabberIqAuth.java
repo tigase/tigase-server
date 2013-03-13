@@ -2,7 +2,7 @@
  * JabberIqAuth.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -40,8 +40,6 @@ import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.Priority;
 
-import tigase.util.PasswordHash;
-
 import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
@@ -68,7 +66,6 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.sasl.AuthorizeCallback;
 import javax.security.sasl.Sasl;
 
 /**
@@ -83,41 +80,36 @@ import javax.security.sasl.Sasl;
 public class JabberIqAuth
 				extends XMPPProcessor
 				implements XMPPProcessorIfc {
-	private static final String[] ELEMENTS = { "query" };
+	private static final String[][] ELEMENT_PATHS = {
+		Iq.IQ_QUERY_PATH
+	};
 
 	/**
-	 * Private logger for class instancess.
+	 * Private logger for class instances.
 	 */
-	private static final Logger log                      =
-		Logger.getLogger("tigase.xmpp.impl.JabberIqAuth");
-	private static final String XMLNS                    = "jabber:iq:auth";
-	private static final String ID                       = XMLNS;
-	private static final String[] XMLNSS                 = { XMLNS };
+	private static final Logger   log = Logger.getLogger(JabberIqAuth.class.getName());
+	private static final String   XMLNS  = "jabber:iq:auth";
+	private static final String   ID     = XMLNS;
+	private static final String[] XMLNSS = { XMLNS };
 	private static final String[] IQ_QUERY_USERNAME_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME,
-					"username" };
+			"username" };
 	private static final String[] IQ_QUERY_RESOURCE_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME,
-					"resource" };
+			"resource" };
 	private static final String[] IQ_QUERY_PASSWORD_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME,
-					"password" };
+			"password" };
 	private static final String[] IQ_QUERY_DIGEST_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME,
-					"digest" };
-	private static final Element[] FEATURES = { new Element("auth",
-																							new String[] { "xmlns" },
-																							new String[] {
-																								"http://jabber.org/features/iq-auth" }) };
-	private static final Element[] DISCO_FEATURES = { new Element("feature",
-																										new String[] { "var" },
-																										new String[] { XMLNS }) };
+			"digest" };
+	private static final Element[] FEATURES = { new Element("auth", new String[] {
+			"xmlns" }, new String[] { "http://jabber.org/features/iq-auth" }) };
+	private static final Element[] DISCO_FEATURES = { new Element("feature", new String[] {
+			"var" }, new String[] { XMLNS }) };
 
 	//~--- fields ---------------------------------------------------------------
 
 	private CallbackHandlerFactory callbackHandlerFactory = new CallbackHandlerFactory();
-	private MechanismSelector mechanismSelector;
+	private MechanismSelector      mechanismSelector;
 
 	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods
-	// --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -186,8 +178,8 @@ public class JabberIqAuth
 	 */
 	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
-											final NonAuthUserRepository repo, final Queue<Packet> results,
-											final Map<String, Object> settings)
+			final NonAuthUserRepository repo, final Queue<Packet> results, final Map<String,
+			Object> settings)
 					throws XMPPException {
 		if (session == null) {
 			return;
@@ -206,7 +198,7 @@ public class JabberIqAuth
 				// connection
 				// This is not allowed and must be forbidden.
 				Packet res = Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-											 "Cannot authenticate twice on the same stream.", false);
+						"Cannot authenticate twice on the same stream.", false);
 
 				// Make sure it gets delivered before stream close
 				res.setPriority(Priority.SYSTEM);
@@ -214,13 +206,13 @@ public class JabberIqAuth
 
 				// Optionally close the connection to make sure there is no
 				// confusion about the connection state.
-				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-								StanzaType.set, session.nextStanzaId()));
+				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType
+						.set, session.nextStanzaId()));
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST,
-									"Discovered second authentication attempt: {0}, packet: {1}",
-									new Object[] { session.toString(),
-																 packet.toString() });
+							"Discovered second authentication attempt: {0}, packet: {1}",
+							new Object[] { session.toString(),
+							packet.toString() });
 				}
 				try {
 					session.logout();
@@ -232,15 +224,15 @@ public class JabberIqAuth
 				}
 			}
 
-			Element request = packet.getElement();
-			StanzaType type = packet.getType();
+			Element    request = packet.getElement();
+			StanzaType type    = packet.getType();
 
 			switch (type) {
 			case get :
 				try {
-					StringBuilder response              = new StringBuilder("<username/>");
-					final Collection<String> auth_mechs =
-						mechanismSelector.filterMechanisms(Sasl.getSaslServerFactories(), session);
+					StringBuilder            response = new StringBuilder("<username/>");
+					final Collection<String> auth_mechs = mechanismSelector.filterMechanisms(Sasl
+							.getSaslServerFactories(), session);
 
 					if (auth_mechs.contains("PLAIN") || auth_mechs.contains("DIGEST-MD5")) {
 						response.append("<password/>");
@@ -252,7 +244,7 @@ public class JabberIqAuth
 				} catch (NullPointerException ex) {
 					log.warning("Database problem, most likely misconfiguration error: " + ex);
 					results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
-									"Database access problem, please contact administrator.", true));
+							"Database access problem, please contact administrator.", true));
 				}
 
 				break;
@@ -271,10 +263,10 @@ public class JabberIqAuth
 				String digest    = request.getChildCDataStaticStr(IQ_QUERY_DIGEST_PATH);
 
 				try {
-					BareJID user_id = BareJID.bareJIDInstance(user_name,
-															session.getDomain().getVhost().getDomain());
+					BareJID user_id = BareJID.bareJIDInstance(user_name, session.getDomain()
+							.getVhost().getDomain());
 					Authorization result = doAuth(repo, settings, session, user_id, password,
-																				digest);
+							digest);
 
 					if (result == Authorization.AUTHORIZED) {
 
@@ -285,12 +277,12 @@ public class JabberIqAuth
 							session.setResource(resource);
 						}
 						results.offer(session.getAuthState().getResponseMessage(packet,
-										"Authentication successful.", false));
+								"Authentication successful.", false));
 					} else {
 						results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-										"Authentication failed", false));
+								"Authentication failed", false));
 						results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-										StanzaType.set, session.nextStanzaId()));
+								StanzaType.set, session.nextStanzaId()));
 					}    // end of else
 				} catch (Exception e) {
 					log.info("Authentication failed: " + user_name);
@@ -298,8 +290,8 @@ public class JabberIqAuth
 						log.log(Level.FINEST, "Authorization exception: ", e);
 					}
 
-					Packet response = Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-															e.getMessage(), false);
+					Packet response = Authorization.NOT_AUTHORIZED.getResponseMessage(packet, e
+							.getMessage(), false);
 
 					response.setPriority(Priority.SYSTEM);
 					results.offer(response);
@@ -313,7 +305,7 @@ public class JabberIqAuth
 						session.putSessionData("auth-retries", new Integer(retries.intValue() + 1));
 					} else {
 						results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-										StanzaType.set, session.nextStanzaId()));
+								StanzaType.set, session.nextStanzaId()));
 					}
 				}
 
@@ -321,9 +313,9 @@ public class JabberIqAuth
 
 			default :
 				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-								"Message type is incorrect", false));
-				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-								StanzaType.set, session.nextStanzaId()));
+						"Message type is incorrect", false));
+				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType
+						.set, session.nextStanzaId()));
 
 				break;
 			}    // end of switch (type)
@@ -343,15 +335,14 @@ public class JabberIqAuth
 	 *
 	 * @return
 	 */
-	protected Authorization doAuth(NonAuthUserRepository repo,
-																 Map<String, Object> settings,
-																 XMPPResourceConnection session, BareJID user_id,
-																 String password, String digest) {
+	protected Authorization doAuth(NonAuthUserRepository repo, Map<String,
+			Object> settings, XMPPResourceConnection session, BareJID user_id, String password,
+			String digest) {
 		try {
 			CallbackHandler cbh = callbackHandlerFactory.create("PLAIN", session, repo,
-															settings);
-			final NameCallback nc = new NameCallback("Authentication identity",
-																user_id.getLocalpart());
+					settings);
+			final NameCallback nc = new NameCallback("Authentication identity", user_id
+					.getLocalpart());
 			final VerifyPasswordCallback vpc = new VerifyPasswordCallback(password);
 
 			cbh.handle(new Callback[] { nc });
@@ -404,8 +395,8 @@ public class JabberIqAuth
 	 * @return
 	 */
 	@Override
-	public String[] supElements() {
-		return ELEMENTS;
+	public String[][] supElementNamePaths() {
+		return ELEMENT_PATHS;
 	}
 
 	/**
@@ -444,4 +435,4 @@ public class JabberIqAuth
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/19
+//~ Formatted in Tigase Code Convention on 13/03/12

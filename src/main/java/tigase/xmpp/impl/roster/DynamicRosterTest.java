@@ -22,7 +22,7 @@
 
 
 
-package tigase.xmpp.impl;
+package tigase.xmpp.impl.roster;
 
 //~--- non-JDK imports --------------------------------------------------------
 

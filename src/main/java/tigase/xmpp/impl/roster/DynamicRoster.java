@@ -1,10 +1,13 @@
 /*
- *   Tigase Jabber/XMPP Server
- *  Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * DynamicRoster.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,12 +18,11 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
 
-package tigase.xmpp.impl;
+
+
+package tigase.xmpp.impl.roster;
 
 //~--- non-JDK imports --------------------------------------------------------
 
@@ -33,25 +35,22 @@ import tigase.xmpp.XMPPResourceConnection;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Map;
 
 /**
  * Describe class DynamicRoster here.
- * 
- * 
+ *
+ *
  * Created: Tue Nov 6 11:28:10 2007
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public abstract class DynamicRoster {
-	private static final String DYNAMIC_ROSTERS = "dynamic-rosters";
+	private static final String DYNAMIC_ROSTERS         = "dynamic-rosters";
 	private static final String DYNAMIC_ROSTERS_CLASSES = "dynamic-roster-classes";
 
 	/**
@@ -59,22 +58,23 @@ public abstract class DynamicRoster {
 	 */
 	private static Logger log = Logger.getLogger("tigase.xmpp.impl.DynamicRoster");
 
-	// ~--- methods --------------------------------------------------------------
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param session
 	 * @param settings
 	 * @param buddies
-	 * 
+	 *
 	 * @return
-	 * 
+	 *
 	 * @throws NotAuthorizedException
 	 */
-	public static JID[] addBuddies(final XMPPResourceConnection session,
-			final Map<String, Object> settings, JID[] buddies) throws NotAuthorizedException {
+	public static JID[] addBuddies(final XMPPResourceConnection session, final Map<String,
+			Object> settings, JID[] buddies)
+					throws NotAuthorizedException {
 		List<JID> result = getBuddiesList(session, settings);
 
 		if (buddies != null) {
@@ -82,9 +82,9 @@ public abstract class DynamicRoster {
 				result = new ArrayList<JID>();
 			}
 			addBuddiesToList(result, buddies);
-			//result.addAll(Arrays.asList(buddies));
-		}
 
+			// result.addAll(Arrays.asList(buddies));
+		}
 		if ((result != null) && (result.size() > 0)) {
 			return result.toArray(new JID[result.size()]);
 		}
@@ -92,21 +92,22 @@ public abstract class DynamicRoster {
 		return null;
 	}
 
-	// ~--- get methods ----------------------------------------------------------
+	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param session
 	 * @param settings
-	 * 
+	 *
 	 * @return
-	 * 
+	 *
 	 * @throws NotAuthorizedException
 	 */
-	public static JID[] getBuddies(final XMPPResourceConnection session,
-			final Map<String, Object> settings) throws NotAuthorizedException {
+	public static JID[] getBuddies(final XMPPResourceConnection session, final Map<String,
+			Object> settings)
+					throws NotAuthorizedException {
 		List<JID> result = getBuddiesList(session, settings);
 
 		if ((result != null) && (result.size() > 0)) {
@@ -118,17 +119,18 @@ public abstract class DynamicRoster {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param session
 	 * @param settings
-	 * 
+	 *
 	 * @return
-	 * 
+	 *
 	 * @throws NotAuthorizedException
 	 */
 	public static List<JID> getBuddiesList(final XMPPResourceConnection session,
-			final Map<String, Object> settings) throws NotAuthorizedException {
+			final Map<String, Object> settings)
+					throws NotAuthorizedException {
 		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
 
 		if (dynr != null) {
@@ -139,10 +141,10 @@ public abstract class DynamicRoster {
 
 				if (buddies != null) {
 					addBuddiesToList(result, buddies);
+
 					// result.addAll(Arrays.asList(buddies));
 				}
 			}
-
 			if (result.size() > 0) {
 				return result;
 			}
@@ -151,6 +153,15 @@ public abstract class DynamicRoster {
 		return null;
 	}
 
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param list
+	 * @param buddies
+	 */
 	public static void addBuddiesToList(List<JID> list, JID[] buddies) {
 		for (JID buddy : buddies) {
 			if (!list.contains(buddy)) {
@@ -159,20 +170,23 @@ public abstract class DynamicRoster {
 		}
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param session
 	 * @param settings
 	 * @param buddy
-	 * 
+	 *
 	 * @return
-	 * 
+	 *
 	 * @throws NotAuthorizedException
 	 */
 	public static Element getBuddyItem(final XMPPResourceConnection session,
-			final Map<String, Object> settings, JID buddy) throws NotAuthorizedException {
+			final Map<String, Object> settings, JID buddy)
+					throws NotAuthorizedException {
 		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
 
 		if (dynr != null) {
@@ -190,10 +204,10 @@ public abstract class DynamicRoster {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param settings
-	 * 
+	 *
 	 * @return
 	 */
 	public static DynamicRosterIfc[] getDynamicRosters(final Map<String, Object> settings) {
@@ -204,10 +218,8 @@ public abstract class DynamicRoster {
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Initializing settings.");
 				}
-
 				init_settings(settings);
 			}
-
 			dynr = (DynamicRosterIfc[]) settings.get(DYNAMIC_ROSTERS);
 		} else {
 			if (log.isLoggable(Level.FINEST)) {
@@ -220,17 +232,18 @@ public abstract class DynamicRoster {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param session
 	 * @param settings
-	 * 
+	 *
 	 * @return
-	 * 
+	 *
 	 * @throws NotAuthorizedException
 	 */
 	public static List<Element> getRosterItems(final XMPPResourceConnection session,
-			final Map<String, Object> settings) throws NotAuthorizedException {
+			final Map<String, Object> settings)
+					throws NotAuthorizedException {
 		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
 
 		if (dynr != null) {
@@ -243,7 +256,6 @@ public abstract class DynamicRoster {
 					result.addAll(items);
 				}
 			}
-
 			if (result.size() > 0) {
 				return result;
 			}
@@ -252,12 +264,12 @@ public abstract class DynamicRoster {
 		return null;
 	}
 
-	// ~--- methods --------------------------------------------------------------
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param settings
 	 */
 	public static void init_settings(final Map<String, Object> settings) {
@@ -269,8 +281,8 @@ public abstract class DynamicRoster {
 			String dynclss = (String) settings.get(DYNAMIC_ROSTERS_CLASSES);
 
 			if (dynclss != null) {
-				String[] dyncls = dynclss.split(",");
-				ArrayList<DynamicRosterIfc> al = new ArrayList<DynamicRosterIfc>(50);
+				String[]                    dyncls = dynclss.split(",");
+				ArrayList<DynamicRosterIfc> al     = new ArrayList<DynamicRosterIfc>(50);
 
 				for (String cls : dyncls) {
 					try {
@@ -281,15 +293,14 @@ public abstract class DynamicRoster {
 						} else {
 							dri.init(settings);
 						}
-
 						al.add(dri);
 						log.log(Level.INFO, "Initialized dynamic roster: {0}", cls);
 					} catch (Exception e) {
 						log.log(Level.WARNING, "Problem initializing dynmic roster class: {0}, {1}",
-								new Object[] { cls, e });
+								new Object[] { cls,
+								e });
 					}
 				}
-
 				if (al.size() > 0) {
 					settings.put(DYNAMIC_ROSTERS, al.toArray(new DynamicRosterIfc[al.size()]));
 				}
@@ -297,10 +308,20 @@ public abstract class DynamicRoster {
 		}
 	}
 
-	// ~--- get methods ----------------------------------------------------------
+	//~--- get methods ----------------------------------------------------------
 
-	static Element getItemExtraData(XMPPResourceConnection session,
-			Map<String, Object> settings, Element item) {
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param settings
+	 * @param item
+	 *
+	 * @return
+	 */
+	public static Element getItemExtraData(XMPPResourceConnection session, Map<String,
+			Object> settings, Element item) {
 		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
 
 		if (dynr != null) {
@@ -318,10 +339,18 @@ public abstract class DynamicRoster {
 		}
 	}
 
-	// ~--- set methods ----------------------------------------------------------
+	//~--- set methods ----------------------------------------------------------
 
-	static void setItemExtraData(XMPPResourceConnection session,
-			Map<String, Object> settings, Element item) {
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param settings
+	 * @param item
+	 */
+	public static void setItemExtraData(XMPPResourceConnection session, Map<String,
+			Object> settings, Element item) {
 		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
 
 		if (dynr != null) {
@@ -332,6 +361,5 @@ public abstract class DynamicRoster {
 	}
 }
 
-// ~ Formatted in Sun Code Convention
 
-// ~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/03/11

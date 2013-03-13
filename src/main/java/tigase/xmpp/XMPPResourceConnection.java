@@ -76,8 +76,8 @@ public class XMPPResourceConnection
 	/**
 	 * Private logger for class instances.
 	 */
-	private static final Logger log =
-		Logger.getLogger(XMPPResourceConnection.class.getName());
+	private static final Logger log = Logger.getLogger(XMPPResourceConnection.class
+			.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -86,21 +86,21 @@ public class XMPPResourceConnection
 	/**
 	 * This variable is to keep relates XMPPIOService ID only.
 	 */
-	private JID connectionId       = null;
+	private JID    connectionId    = null;
 	private String connectionState = null;
-	private long creationTime      = 0;
+	private long   creationTime    = 0;
 	private String defLang         = "en";
-	private long id_counter        = 0;
+	private long   id_counter      = 0;
 
 	/**
 	 * Value of <code>System.currentTimeMillis()</code> from the time when this
 	 * session last active from user side.
 	 */
-	private long lastAccessed                  = 0;
-	private SessionManagerHandler loginHandler = null;
-	private long packets_counter               = 0;
-	private XMPPSession parentSession          = null;
-	private int priority                       = 0;
+	private long                  lastAccessed    = 0;
+	private SessionManagerHandler loginHandler    = null;
+	private long                  packets_counter = 0;
+	private XMPPSession           parentSession   = null;
+	private int                   priority        = 0;
 
 	/**
 	 * Session resource - part of user's JID for this session
@@ -118,7 +118,7 @@ public class XMPPResourceConnection
 	 * initialization time.
 	 */
 	private String sessionId = null;
-	private JID userJid      = null;
+	private JID    userJid   = null;
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -132,8 +132,7 @@ public class XMPPResourceConnection
 	 * @param loginHandler
 	 */
 	public XMPPResourceConnection(JID connectionId, UserRepository rep,
-																AuthRepository authRepo,
-																SessionManagerHandler loginHandler) {
+			AuthRepository authRepo, SessionManagerHandler loginHandler) {
 		super(rep, authRepo);
 
 		long currTime = System.currentTimeMillis();
@@ -193,8 +192,8 @@ public class XMPPResourceConnection
 	 */
 	public JID[] getAllResourcesJIDs() {
 		return (parentSession == null)
-					 ? null
-					 : parentSession.getJIDs();
+				? null
+				: parentSession.getJIDs();
 	}
 
 	/**
@@ -238,8 +237,8 @@ public class XMPPResourceConnection
 	 */
 	public Object getCommonSessionData(String key) {
 		return (parentSession == null)
-					 ? null
-					 : parentSession.getCommonSessionData(key);
+				? null
+				: parentSession.getCommonSessionData(key);
 	}
 
 	/**
@@ -251,8 +250,7 @@ public class XMPPResourceConnection
 	public JID getConnectionId() throws NoConnectionIdException {
 		lastAccessed = System.currentTimeMillis();
 		if (this.connectionId == null) {
-			throw new NoConnectionIdException(
-					"Connection ID not set for this session. " +
+			throw new NoConnectionIdException("Connection ID not set for this session. " +
 					"This is probably the SM session to handle traffic " +
 					"addressed to the server itself. Or maybe it's a bug.");
 		}
@@ -275,12 +273,12 @@ public class XMPPResourceConnection
 
 		if ((jid != null)) {
 			if ((jid.getResource() != null) && (parentSession != null)) {
-				XMPPResourceConnection conn =
-					parentSession.getResourceForResource(jid.getResource());
+				XMPPResourceConnection conn = parentSession.getResourceForResource(jid
+						.getResource());
 
 				result = (conn == null)
-								 ? null
-								 : conn.getConnectionId();
+						? null
+						: conn.getConnectionId();
 			} else {
 				if ((jid.getResource() == null) || jid.getResource().equals(this.resource)) {
 					result = this.connectionId;
@@ -558,11 +556,11 @@ public class XMPPResourceConnection
 	 */
 	@Deprecated
 	public final Authorization loginDigest(String user, String digest, String id,
-					String alg)
+			String alg)
 					throws NotAuthorizedException, AuthorizationException, TigaseDBException,
-								 TigaseStringprepException {
-		BareJID userId       = BareJID.bareJIDInstance(user,
-														 getDomain().getVhost().getDomain());
+							TigaseStringprepException {
+		BareJID       userId = BareJID.bareJIDInstance(user, getDomain().getVhost()
+				.getDomain());
 		Authorization result = super.loginDigest(userId, digest, id, alg);
 
 		if (result == Authorization.AUTHORIZED) {
@@ -619,9 +617,9 @@ public class XMPPResourceConnection
 	@Deprecated
 	public final Authorization loginPlain(String user, String password)
 					throws NotAuthorizedException, AuthorizationException, TigaseDBException,
-								 TigaseStringprepException {
-		BareJID userId       = BareJID.bareJIDInstance(user,
-														 getDomain().getVhost().getDomain());
+							TigaseStringprepException {
+		BareJID       userId = BareJID.bareJIDInstance(user, getDomain().getVhost()
+				.getDomain());
 		Authorization result = super.loginPlain(userId, password);
 
 		if (result == Authorization.AUTHORIZED) {
@@ -726,8 +724,8 @@ public class XMPPResourceConnection
 	 */
 	public Object removeCommonSessionData(String key) {
 		return (parentSession == null)
-					 ? null
-					 : parentSession.removeCommonSessionData(key);
+				? null
+				: parentSession.removeCommonSessionData(key);
 	}
 
 	/**
@@ -788,9 +786,9 @@ public class XMPPResourceConnection
 		synchronized (this) {
 			if (parent != null) {
 				userJid = JID.jidInstance(parent.getUserName(), domain.getVhost().getDomain(),
-																	((resource != null)
-																	 ? resource
-																	 : sessionId));
+						((resource != null)
+						? resource
+						: sessionId));
 			}
 			this.parentSession = parent;
 		}
@@ -859,8 +857,8 @@ public class XMPPResourceConnection
 			parentSession.addResourceConnection(this);
 		}
 		userJid = userJid.copyWithResource((resource == null)
-																			 ? sessionId
-																			 : resource);
+				? sessionId
+				: resource);
 		loginHandler.handleResourceBind(this);
 	}
 
@@ -902,8 +900,8 @@ public class XMPPResourceConnection
 	@Override
 	public String toString() {
 		return "user_jid=" + userJid + ", packets=" + packets_counter + ", connectioId=" +
-					 connectionId + ", domain=" + domain.getVhost().getDomain() + ", authState=" +
-					 getAuthState().name() + ", isAnon=" + isAnonymous();
+				connectionId + ", domain=" + domain.getVhost().getDomain() + ", authState=" +
+				getAuthState().name() + ", isAnon=" + isAnonymous();
 	}
 
 	/**
@@ -973,10 +971,4 @@ public class XMPPResourceConnection
 }    // XMPPResourceConnection
 
 
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-
-//~ Formatted in Tigase Code Convention on 13/02/28
+//~ Formatted in Tigase Code Convention on 13/03/12

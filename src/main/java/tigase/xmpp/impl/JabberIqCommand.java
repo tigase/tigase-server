@@ -1,10 +1,13 @@
 /*
+ * JabberIqCommand.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.xmpp.impl;
 
@@ -27,6 +29,7 @@ package tigase.xmpp.impl;
 import tigase.db.NonAuthUserRepository;
 
 import tigase.server.Command;
+import tigase.server.Iq;
 import tigase.server.Packet;
 
 import tigase.xml.Element;
@@ -41,12 +44,10 @@ import tigase.xmpp.XMPPResourceConnection;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.Map;
-import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Map;
+import java.util.Queue;
 
 /**
  * Describe class JabberIqCommand here.
@@ -57,14 +58,18 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
-	private static final String[] ELEMENTS = { "command" };
-	private static final Logger log = Logger.getLogger("tigase.xmpp.impl.JabberIqCommand");
-	private static final String[] XMLNSS = { Command.XMLNS };
-	private static final String XMLNS = Command.XMLNS;
-	private static final String ID = XMLNS;
-	private static final Element[] DISCO_FEATURES = {
-		new Element("feature", new String[] { "var" }, new String[] { XMLNS }) };
+public class JabberIqCommand
+				extends XMPPProcessor
+				implements XMPPProcessorIfc {
+	private static final String[][] ELEMENTS = {
+		Iq.IQ_COMMAND_PATH
+	};
+	private static final Logger     log = Logger.getLogger(JabberIqCommand.class.getName());
+	private static final String[]   XMLNSS   = { Command.XMLNS };
+	private static final String     XMLNS    = Command.XMLNS;
+	private static final String     ID       = XMLNS;
+	private static final Element[]  DISCO_FEATURES = { new Element("feature",
+			new String[] { "var" }, new String[] { XMLNS }) };
 
 	//~--- methods --------------------------------------------------------------
 
@@ -93,9 +98,9 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 	 */
 	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
-			final NonAuthUserRepository repo, final Queue<Packet> results,
-				final Map<String, Object> settings)
-			throws XMPPException {
+			final NonAuthUserRepository repo, final Queue<Packet> results, final Map<String,
+			Object> settings)
+					throws XMPPException {
 		if (session == null) {
 			return;
 		}
@@ -122,18 +127,19 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 				// No need for that, initVars(...) takes care of that
 				// packet.getElement().setAttribute("to", session.getSMComponentId().toString());
 				packet.initVars(packet.getStanzaFrom(), session.getSMComponentId());
+
 				// TODO: Code below prevents from executing commands sent to vhost set to
 				// the same value as the machine hostname. Not sure why it was implemented
 				// that way. Maybe it caused internal, infinite loop in some cases.
 				// More testing is needed....
-//			} else {
-//				if (packet.getStanzaTo().equals(session.getSMComponentId())) {
-//					// This should be handled by SM, if it is not then drop it here.
-//					if (log.isLoggable(Level.FINEST)) {
-//						log.log(Level.FINEST, "Dropping unhandled packet addressed to SM: {0}", packet);
-//					}
-//					return;
-//				}
+//      } else {
+//        if (packet.getStanzaTo().equals(session.getSMComponentId())) {
+//          // This should be handled by SM, if it is not then drop it here.
+//          if (log.isLoggable(Level.FINEST)) {
+//            log.log(Level.FINEST, "Dropping unhandled packet addressed to SM: {0}", packet);
+//          }
+//          return;
+//        }
 			}
 
 			BareJID id = packet.getStanzaTo().getBareJID();
@@ -180,7 +186,7 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 	 * @return
 	 */
 	@Override
-	public String[] supElements() {
+	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
@@ -197,7 +203,4 @@ public class JabberIqCommand extends XMPPProcessor implements XMPPProcessorIfc {
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/03/12

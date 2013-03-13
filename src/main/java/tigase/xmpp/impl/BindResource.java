@@ -2,11 +2,12 @@
  * BindResource.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -63,30 +64,28 @@ public class BindResource
 				extends XMPPProcessor
 				implements XMPPProcessorIfc {
 	/** Field description */
-	public static final String DEF_RESOURCE_PREFIX_PROP_KEY = "def-resource-prefix";
-	private static final String[] ELEMENTS                  = { "bind" };
-	private static final Logger log                         =
-		Logger.getLogger(BindResource.class.getName());
-	private static int resGenerator                         = 0;
+	public static final String      DEF_RESOURCE_PREFIX_PROP_KEY = "def-resource-prefix";
+	private static final String     EL_NAME                      = "bind";
+	private static final String[][] ELEMENTS                     = {
+		Iq.IQ_BIND_RESOURCE_PATH
+	};
+	private static final Logger     log = Logger.getLogger(BindResource.class.getName());
+	private static int              resGenerator                 = 0;
 
 	// protected static final String RESOURCE_KEY = "Resource-Binded";
-	private static final String XMLNS       = "urn:ietf:params:xml:ns:xmpp-bind";
-	private static final String ID          = XMLNS;
-	private static final String[] XMLNSS    = { XMLNS };
-	private static final Element[] FEATURES = { new Element("bind",
-																							new String[] { "xmlns" },
-																							new String[] { XMLNS }) };
-	private static final Element[] DISCO_FEATURES = { new Element("feature",
-																										new String[] { "var" },
-																										new String[] { XMLNS }) };
+	private static final String    XMLNS  = "urn:ietf:params:xml:ns:xmpp-bind";
+	private static final String    ID     = XMLNS;
+	private static final String[]  XMLNSS = { XMLNS };
+	private static final Element[] FEATURES = { new Element(EL_NAME, new String[] {
+			"xmlns" }, new String[] { XMLNS }) };
+	private static final Element[] DISCO_FEATURES = { new Element("feature", new String[] {
+			"var" }, new String[] { XMLNS }) };
 
 	//~--- fields ---------------------------------------------------------------
 
 	private String resourceDefPrefix = "tigase-";
 
 	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -130,15 +129,15 @@ public class BindResource
 	 */
 	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
-											final NonAuthUserRepository repo, final Queue<Packet> results,
-											final Map<String, Object> settings)
+			final NonAuthUserRepository repo, final Queue<Packet> results, final Map<String,
+			Object> settings)
 					throws XMPPException {
 		if (session == null) {
 			return;
 		}    // end of if (session == null)
 		if (!session.isAuthorized()) {
 			results.offer(session.getAuthState().getResponseMessage(packet,
-							"Session is not yet authorized.", false));
+					"Session is not yet authorized.", false));
 
 			return;
 		}    // end of if (!session.isAuthorized())
@@ -146,8 +145,8 @@ public class BindResource
 		// TODO: test what happens if resource is bound multiple times for the same
 		// user session. in particular if XMPPSession object removes the old
 		// resource from the list.
-		Element request = packet.getElement();
-		StanzaType type = packet.getType();
+		Element    request = packet.getElement();
+		StanzaType type    = packet.getType();
 
 		try {
 			switch (type) {
@@ -166,33 +165,33 @@ public class BindResource
 							// User provided resource is invalid, generating different
 							// server one
 							log.log(Level.INFO,
-											"Incrrect resource provided by the user: {0}, generating a " +
-											"different one by the server.", resource);
+									"Incrrect resource provided by the user: {0}, generating a " +
+									"different one by the server.", resource);
 							resource = resourceDefPrefix + (++resGenerator);
 							session.setResource(resource);
 						}
 					}    // end of if (resource == null) else
 				} catch (TigaseStringprepException ex) {
 					log.log(Level.WARNING,
-									"stringprep problem with the server generated resource: {0}", resource);
+							"stringprep problem with the server generated resource: {0}", resource);
 				}
 				packet.initVars(session.getJID(), packet.getStanzaTo());
 
 				// session.putSessionData(RESOURCE_KEY, "true");
 				results.offer(packet.okResult(new Element("jid", session.getJID().toString()),
-																			1));
+						1));
 
 				break;
 
 			default :
 				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-								"Bind type is incorrect", false));
+						"Bind type is incorrect", false));
 
 				break;
 			}    // end of switch (type)
 		} catch (NotAuthorizedException e) {
 			results.offer(session.getAuthState().getResponseMessage(packet,
-							"Session is not yet authorized.", false));
+					"Session is not yet authorized.", false));
 		}    // end of try-catch
 	}
 
@@ -216,7 +215,7 @@ public class BindResource
 	 * @return
 	 */
 	@Override
-	public String[] supElements() {
+	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
@@ -250,10 +249,4 @@ public class BindResource
 }    // BindResource
 
 
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-
-//~ Formatted in Tigase Code Convention on 13/02/16
+//~ Formatted in Tigase Code Convention on 13/03/12

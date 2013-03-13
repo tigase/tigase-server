@@ -2,7 +2,7 @@
  * CAPS.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,9 @@ package tigase.xmpp.impl;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 
+import tigase.server.Iq;
 import tigase.server.Packet;
+import tigase.server.Presence;
 
 import tigase.xml.Element;
 
@@ -51,15 +53,17 @@ import java.util.logging.Logger;
 public class CAPS
 				extends XMPPProcessor
 				implements XMPPProcessorIfc {
-	private static final String[] ELEMENTS          = { "presence", "query" };
-	private static final String ID                  = "caps";
-	private static final Logger log                 =
-		Logger.getLogger(CAPS.class.getCanonicalName());
-	private static final String XMLNS_DISCO         =
-		"http://jabber.org/protocol/disco#info";
-	private static final String[] XMLNSS            = { "jabber:client", XMLNS_DISCO };
-	private static final RosterAbstract roster_impl =
-		RosterFactory.getRosterImplementation(true);
+	private static final String[][]     ELEMENTS = {
+		{ Presence.ELEM_NAME }, Iq.IQ_QUERY_PATH
+	};
+	private static final String         ID       = "caps";
+	private static final Logger         log = Logger.getLogger(CAPS.class
+			.getCanonicalName());
+	private static final String         XMLNS_DISCO =
+			"http://jabber.org/protocol/disco#info";
+	private static final String[]       XMLNSS   = { "jabber:client", XMLNS_DISCO };
+	private static final RosterAbstract roster_impl = RosterFactory.getRosterImplementation(
+			true);
 
 	//~--- methods --------------------------------------------------------------
 
@@ -81,7 +85,7 @@ public class CAPS
 	 * @return
 	 */
 	@Override
-	public String[] supElements() {
+	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
@@ -111,15 +115,14 @@ public class CAPS
 	@Override
 	@SuppressWarnings("unchecked")
 	public void process(Packet packet, XMPPResourceConnection session,
-											NonAuthUserRepository repo, Queue<Packet> results,
-											Map<String, Object> settings)
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 					throws XMPPException {
 		if ((session != null) && session.isAuthorized()) {
 			try {
-				if (packet.getElemName() == "presence") {
-					JID to                       = packet.getStanzaTo();
-					Map<JID, String[]> resources = (Map<JID,
-																					 String[]>) session.getCommonSessionData(ID);
+				if (packet.getElemName() == Presence.ELEM_NAME) {
+					JID                to = packet.getStanzaTo();
+					Map<JID, String[]> resources = (Map<JID, String[]>) session
+							.getCommonSessionData(ID);
 
 					if (resources == null) {
 						resources = new ConcurrentHashMap<JID, String[]>();
@@ -138,8 +141,8 @@ public class CAPS
 						if ((capsNodesOld == null) ||!Arrays.equals(capsNodes, capsNodesOld)) {
 
 							// we shoud send pep notifications now
-							if ((to != null) &&
-									!roster_impl.isSubscribedFrom(session, packet.getStanzaFrom())) {
+							if ((to != null) &&!roster_impl.isSubscribedFrom(session, packet
+									.getStanzaFrom())) {
 
 								// subscription is not sufficient
 								return;
@@ -149,22 +152,20 @@ public class CAPS
 							}
 
 							// checking for need of disco#info
-							PresenceCapabilitiesManager.prepareCapsQueries(
-									JID.jidInstanceNS(to.getDomain()), packet.getStanzaFrom(), capsNodes,
-									results);
+							PresenceCapabilitiesManager.prepareCapsQueries(JID.jidInstanceNS(to
+									.getDomain()), packet.getStanzaFrom(), capsNodes, results);
 							if (!session.isUserId(to.getBareJID())) {
 								return;
 							}
 							PresenceCapabilitiesManager.handlePresence(to, packet.getStanzaFrom(),
-											capsNodes, results);
+									capsNodes, results);
 						}
-					} else if ((packet.getType() == StanzaType.unavailable) ||
-										 (packet.getType() == StanzaType.error)) {
+					} else if ((packet.getType() == StanzaType.unavailable) || (packet.getType() ==
+							StanzaType.error)) {
 						resources.remove(packet.getStanzaFrom());
 					}
-				} else if ((packet.getElemName() == "iq") &&
-									 ((packet.getType() == StanzaType.error) ||
-										(packet.getType() == StanzaType.result))) {
+				} else if ((packet.getElemName() == Iq.ELEM_NAME) && ((packet.getType() ==
+						StanzaType.error) || (packet.getType() == StanzaType.result))) {
 					PresenceCapabilitiesManager.processCapsQueryResponse(packet);
 				}
 			} catch (NotAuthorizedException ex) {
@@ -172,10 +173,9 @@ public class CAPS
 			} catch (TigaseDBException ex) {
 				Logger.getLogger(CAPS.class.getName()).log(Level.SEVERE, null, ex);
 			}
-		} else if (((session == null) || session.isServerSession()) &&
-							 (packet.getElemName() == "iq") &&
-							 ((packet.getType() == StanzaType.error) ||
-								(packet.getType() == StanzaType.result))) {
+		} else if (((session == null) || session.isServerSession()) && (packet
+				.getElemName() == Iq.ELEM_NAME) && ((packet.getType() == StanzaType.error) ||
+				(packet.getType() == StanzaType.result))) {
 			PresenceCapabilitiesManager.processCapsQueryResponse(packet);
 		}
 	}
@@ -193,8 +193,8 @@ public class CAPS
 	 */
 	@SuppressWarnings("unchecked")
 	public static Set<JID> getJidsWithFeature(XMPPResourceConnection session,
-					String feature) {
-		Set<JID> jids                = new HashSet<JID>();
+			String feature) {
+		Set<JID>           jids      = new HashSet<JID>();
 		Map<JID, String[]> resources = (Map<JID, String[]>) session.getCommonSessionData(ID);
 
 		if (resources != null) {
@@ -226,4 +226,4 @@ public class CAPS
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/03/12

@@ -2,11 +2,12 @@
  * JabberIqRegister.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -66,36 +67,30 @@ import java.util.Queue;
 public class JabberIqRegister
 				extends XMPPProcessor
 				implements XMPPProcessorIfc {
-	private static final String[] ELEMENTS = { "query" };
-	private static final String ID         = "jabber:iq:register";
+	private static final String[][] ELEMENTS = {
+		Iq.IQ_QUERY_PATH
+	};
+	private static final String     ID       = "jabber:iq:register";
 
 	/**
 	 * Private logger for class instances.
-	 * >>>>>>> tigase/master
 	 */
-	private static Logger log                            =
-		Logger.getLogger(JabberIqRegister.class.getName());
-	private static final String[] XMLNSS                 = { "jabber:iq:register" };
+	private static Logger         log = Logger.getLogger(JabberIqRegister.class.getName());
+	private static final String[] XMLNSS = { "jabber:iq:register" };
 	private static final String[] IQ_QUERY_USERNAME_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME,
-					"username" };
+			"username" };
 	private static final String[] IQ_QUERY_REMOVE_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME,
-					"remove" };
+			"remove" };
 	private static final String[] IQ_QUERY_PASSWORD_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME,
-					"password" };
+			"password" };
 	private static final String[] IQ_QUERY_EMAIL_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME,
-					"email" };
-	private static final Element[] FEATURES = { new Element("register",
-																							new String[] { "xmlns" },
-																							new String[] {
-																								"http://jabber.org/features/iq-register" }) };
-	private static final Element[] DISCO_FEATURES = { new Element("feature",
-																										new String[] { "var" },
-																										new String[] {
-																											"jabber:iq:register" }) };
+			"email" };
+	private static final Element[] FEATURES = { new Element("register", new String[] {
+			"xmlns" }, new String[] { "http://jabber.org/features/iq-register" }) };
+	private static final Element[] DISCO_FEATURES = { new Element("feature", new String[] {
+			"var" }, new String[] { "jabber:iq:register" }) };
 
 	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -125,8 +120,7 @@ public class JabberIqRegister
 	 */
 	@Override
 	public void process(Packet packet, XMPPResourceConnection session,
-											NonAuthUserRepository repo, Queue<Packet> results,
-											Map<String, Object> settings)
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 					throws XMPPException {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Processing packet: " + packet.toString());
@@ -156,10 +150,9 @@ public class JabberIqRegister
 			// ID matches the session id but this is still not a request to the local
 			// server. The TO address must be checked too.....
 			// if (packet.getPacketFrom().equals(session.getConnectionId())) {
-			if ((packet.getPacketFrom() != null) &&
-					packet.getPacketFrom().equals(session.getConnectionId()) &&
-					(!session.isAuthorized() ||
-					 (session.isUserId(id) || session.isLocalDomain(id.toString(), false)))) {
+			if ((packet.getPacketFrom() != null) && packet.getPacketFrom().equals(session
+					.getConnectionId()) && (!session.isAuthorized() || (session.isUserId(id) ||
+					session.isLocalDomain(id.toString(), false)))) {
 
 				// We want to allow password change but not user registration if
 				// registration is disabled. The only way to tell apart registration
@@ -172,16 +165,16 @@ public class JabberIqRegister
 				Element request = packet.getElement();
 				boolean remove  = request.findChildStaticStr(IQ_QUERY_REMOVE_PATH) != null;
 
-				if ((!session.isAuthorized() || remove) &&
-						!session.getDomain().isRegisterEnabled()) {
+				if ((!session.isAuthorized() || remove) &&!session.getDomain()
+						.isRegisterEnabled()) {
 					results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
-									"Registration is not allowed for this domain.", true));
+							"Registration is not allowed for this domain.", true));
 
 					return;
 				}
 
 				Authorization result = Authorization.NOT_AUTHORIZED;
-				StanzaType type      = packet.getType();
+				StanzaType    type   = packet.getType();
 
 				switch (type) {
 				case set :
@@ -210,27 +203,26 @@ public class JabberIqRegister
 								results.offer(ok_result);
 
 								Packet close_cmd = Command.CLOSE.getPacket(session.getSMComponentId(),
-																		 session.getConnectionId(), StanzaType.set,
-																		 session.nextStanzaId());
+										session.getConnectionId(), StanzaType.set, session.nextStanzaId());
 
 								close_cmd.setPacketTo(session.getConnectionId());
 								close_cmd.setPriority(Priority.LOWEST);
 								results.offer(close_cmd);
 							} catch (NotAuthorizedException e) {
 								results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-												"You must authorize session first.", true));
+										"You must authorize session first.", true));
 							}    // end of try-catch
 						}
 					} else {
 
 						// No, so assuming this is registration of a new
 						// user or change registration details for existing user
-						String user_name               =
-							request.getChildCDataStaticStr(IQ_QUERY_USERNAME_PATH);
-						String password                =
-							request.getChildCDataStaticStr(IQ_QUERY_PASSWORD_PATH);
-						String email                   =
-							request.getChildCDataStaticStr(IQ_QUERY_EMAIL_PATH);
+						String              user_name = request.getChildCDataStaticStr(
+								IQ_QUERY_USERNAME_PATH);
+						String              password = request.getChildCDataStaticStr(
+								IQ_QUERY_PASSWORD_PATH);
+						String              email = request.getChildCDataStaticStr(
+								IQ_QUERY_EMAIL_PATH);
 						Map<String, String> reg_params = null;
 
 						if ((email != null) &&!email.trim().isEmpty()) {
@@ -242,19 +234,17 @@ public class JabberIqRegister
 							results.offer(result.getResponseMessage(packet, null, false));
 						} else {
 							results.offer(result.getResponseMessage(packet,
-											"Unsuccessful registration attempt", true));
+									"Unsuccessful registration attempt", true));
 						}
 					}
 
 					break;
 
 				case get :
-					results.offer(
-							packet.okResult(
-								"<instructions>" +
-								"Choose a user name and password for use with this service." +
-								"Please provide also your e-mail address." + "</instructions>" +
-								"<username/>" + "<password/>" + "<email/>", 1));
+					results.offer(packet.okResult("<instructions>" +
+							"Choose a user name and password for use with this service." +
+							"Please provide also your e-mail address." + "</instructions>" +
+							"<username/>" + "<password/>" + "<email/>", 1));
 
 					break;
 
@@ -270,7 +260,7 @@ public class JabberIqRegister
 
 				default :
 					results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-									"Message type is incorrect", true));
+							"Message type is incorrect", true));
 
 					break;
 				}    // end of switch (type)
@@ -288,15 +278,15 @@ public class JabberIqRegister
 			}
 		} catch (TigaseStringprepException ex) {
 			results.offer(Authorization.JID_MALFORMED.getResponseMessage(packet,
-							"Incorrect user name, stringprep processing failed.", true));
+					"Incorrect user name, stringprep processing failed.", true));
 		} catch (NotAuthorizedException e) {
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-							"You are not authorized to change registration settings.\n" +
-							e.getMessage(), true));
+					"You are not authorized to change registration settings.\n" + e.getMessage(),
+					true));
 		} catch (TigaseDBException e) {
 			log.warning("Database problem: " + e);
 			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
-							"Database access problem, please contact administrator.", true));
+					"Database access problem, please contact administrator.", true));
 		}    // end of try-catch
 	}
 
@@ -327,7 +317,7 @@ public class JabberIqRegister
 	 * @return
 	 */
 	@Override
-	public String[] supElements() {
+	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
@@ -364,10 +354,4 @@ public class JabberIqRegister
 }    // JabberIqRegister
 
 
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-
-//~ Formatted in Tigase Code Convention on 13/02/16
+//~ Formatted in Tigase Code Convention on 13/03/12

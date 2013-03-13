@@ -18,7 +18,7 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.xmpp.impl;
+package tigase.xmpp.impl.roster;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +29,7 @@ import tigase.xml.Element;
 import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.impl.Presence;
 //import tigase.xmpp.impl.Roster;
 //import tigase.xmpp.impl.Presence;
 

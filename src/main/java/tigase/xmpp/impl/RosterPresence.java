@@ -2,7 +2,7 @@
  * RosterPresence.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,11 +28,12 @@ package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
 
+import tigase.server.Iq;
 import tigase.server.Packet;
 
 import tigase.xml.Element;
 
-import tigase.xmpp.*;
+import tigase.xmpp.Authorization;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterFactory;
 import tigase.xmpp.XMPPException;
@@ -66,21 +67,22 @@ public class RosterPresence
 	/**
 	 * Private logger for class instance.
 	 */
-	private static Logger log              =
-		Logger.getLogger(RosterPresence.class.getName());
-	private static final String PRESENCE   = "presence";
-	private static final String[] ELEMENTS = { PRESENCE, "query", "query" };
-	private static final String[] XMLNSS   = { Presence.XMLNS, RosterAbstract.XMLNS,
-					RosterAbstract.XMLNS_DYNAMIC };
-	private static final RosterAbstract roster_util =
-		RosterFactory.getRosterImplementation(true);
+	private static Logger           log = Logger.getLogger(RosterPresence.class.getName());
+	private static final String     PRESENCE = "presence";
+	private static final String[][] ELEMENTS = {
+		{ PRESENCE }, Iq.IQ_QUERY_PATH, Iq.IQ_QUERY_PATH
+	};
+	private static final String[]   XMLNSS = { Presence.XMLNS, RosterAbstract.XMLNS,
+			RosterAbstract.XMLNS_DYNAMIC };
+	private static final RosterAbstract roster_util = RosterFactory.getRosterImplementation(
+			true);
 	private static final Element[] FEATURES       = RosterAbstract.FEATURES;
 	private static final Element[] DISCO_FEATURES = RosterAbstract.DISCO_FEATURES;
 
 	//~--- fields ---------------------------------------------------------------
 
-	private JabberIqRoster rosterProc = new JabberIqRoster();
-	private Presence presenceProc     = new Presence();
+	private JabberIqRoster rosterProc   = new JabberIqRoster();
+	private Presence       presenceProc = new Presence();
 
 	//~--- methods --------------------------------------------------------------
 
@@ -120,8 +122,8 @@ public class RosterPresence
 	 */
 	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
-											final NonAuthUserRepository repo, final Queue<Packet> results,
-											final Map<String, Object> settings)
+			final NonAuthUserRepository repo, final Queue<Packet> results, final Map<String,
+			Object> settings)
 					throws XMPPException {
 
 //  if (session == null) {
@@ -141,12 +143,12 @@ public class RosterPresence
 		if (packet.getElemName().equals(PRESENCE)) {
 			presenceProc.process(packet, session, repo, results, settings);
 		} else {
-			if ((packet.getStanzaTo() != null) && (packet.getStanzaFrom() != null) &&
-					session.isUserId(packet.getStanzaTo().getBareJID()) &&
-					!session.isUserId(packet.getStanzaFrom().getBareJID())) {
+			if ((packet.getStanzaTo() != null) && (packet.getStanzaFrom() != null) && session
+					.isUserId(packet.getStanzaTo().getBareJID()) &&!session.isUserId(packet
+					.getStanzaFrom().getBareJID())) {
 				if (!RemoteRosterManagement.isRemoteAllowed(packet.getStanzaFrom(), session)) {
 					results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
-									"Not authorized for remote roster management", true));
+							"Not authorized for remote roster management", true));
 
 					return;
 				}
@@ -210,14 +212,14 @@ public class RosterPresence
 
 					default :
 						results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-										"Bad stanza type", true));
+								"Bad stanza type", true));
 
 						break;
 					}
 				} catch (Throwable ex) {
 					log.log(Level.WARNING, "Reflection execution exception", ex);
 					results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
-									"Internal server error", true));
+							"Internal server error", true));
 				}
 			} else {
 				rosterProc.process(packet, session, repo, results, settings);
@@ -235,7 +237,7 @@ public class RosterPresence
 	 */
 	@Override
 	public void stopped(final XMPPResourceConnection session, final Queue<Packet> results,
-											final Map<String, Object> settings) {
+			final Map<String, Object> settings) {
 		presenceProc.stopped(session, results, settings);
 		rosterProc.stopped(session, results, settings);
 	}
@@ -260,7 +262,7 @@ public class RosterPresence
 	 * @return
 	 */
 	@Override
-	public String[] supElements() {
+	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
@@ -290,4 +292,4 @@ public class RosterPresence
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/03/12

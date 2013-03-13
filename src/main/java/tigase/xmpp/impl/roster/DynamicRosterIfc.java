@@ -18,7 +18,7 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.xmpp.impl;
+package tigase.xmpp.impl.roster;
 
 import java.util.Map;
 import java.util.List;

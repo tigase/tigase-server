@@ -2,7 +2,7 @@
  * XMPPProcessor.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -71,7 +71,12 @@ import java.util.Set;
 public abstract class XMPPProcessor
 				implements XMPPImplIfc {
 	/** Field description */
-	protected static final String ALL = "*";
+	protected static final String ALL_NAMES = "*";
+
+	/** Field description */
+	protected static final String[][] ALL_PATHS = {
+		{ "*" }
+	};
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -174,16 +179,16 @@ public abstract class XMPPProcessor
 	 */
 	@Override
 	public Authorization canHandle(Packet packet, XMPPResourceConnection conn) {
-		Authorization result = null;
-		String[][] elemPaths = supElementNamePaths();
+		Authorization result    = null;
+		String[][]    elemPaths = supElementNamePaths();
 
 		if (elemPaths != null) {
 
 			// This is the new API style
-			String[] elemXMLNS    = supNamespaces();
-			Set<StanzaType> types = supTypes();
+			String[]        elemXMLNS = supNamespaces();
+			Set<StanzaType> types     = supTypes();
 
-			result = checkPacket(packet, conn, elemPaths, elemXMLNS, types);
+			result = checkPacket(packet, elemPaths, elemXMLNS, types);
 		} else {
 
 			// And this is the old API left for backward compatibility with plugins
@@ -193,29 +198,31 @@ public abstract class XMPPProcessor
 			}
 		}
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST,
-							"XMPPProcessorIfc: {0} ({1})\n Request: " +
-							"{2}, conn: {3}, authorization: {4}", new Object[] {
-								this.getClass().getSimpleName(),
-								id(), packet, conn, result });
+			log.log(Level.FINEST, "XMPPProcessorIfc: {0} ({1})\n Request: " +
+					"{2}, conn: {3}, authorization: {4}", new Object[] { this.getClass()
+					.getSimpleName(),
+					id(), packet, conn, result });
 		}
 
 		return result;
 	}
 
-	private Authorization checkPacket(Packet packet, XMPPResourceConnection conn,
-																		String[][] elemPaths, String[] elemXMLNS,
-																		Set<StanzaType> types) {
-		Authorization result = null;
+	private Authorization checkPacket(Packet packet, String[][] elemPaths,
+			String[] elemXMLNS, Set<StanzaType> types) {
+		Authorization result   = null;
+		boolean       names_ok = elemPaths == ALL_PATHS;
 
-		for (int i = 0; i < elemPaths.length; i++) {
-			if (packet.isXMLNSStaticStr(elemPaths[i], elemXMLNS[i])) {
-				if ((types == null) || types.contains(packet.getType())) {
-					result = Authorization.AUTHORIZED;
+		if (!names_ok) {
+			for (int i = 0; i < elemPaths.length; i++) {
+				if (packet.isXMLNSStaticStr(elemPaths[i], elemXMLNS[i])) {
+					names_ok = true;
 
 					break;
 				}
 			}
+		}
+		if (names_ok && ((types == null) || types.contains(packet.getType()))) {
+			result = Authorization.AUTHORIZED;
 		}
 
 		return result;
@@ -223,7 +230,7 @@ public abstract class XMPPProcessor
 
 	private boolean walk(Element elem) {
 		boolean result;
-		String xmlns = elem.getXMLNS();
+		String  xmlns = elem.getXMLNS();
 
 		if (xmlns == null) {
 			xmlns = "jabber:client";
@@ -276,6 +283,7 @@ public abstract class XMPPProcessor
 	 * @return
 	 */
 	@Override
+	@Deprecated
 	public boolean isSupporting(final String element, final String ns) {
 		String[] impl_elements = supElements();
 		String[] impl_xmlns    = supNamespaces();
@@ -288,8 +296,8 @@ public abstract class XMPPProcessor
 				// This method is called very, very often and it is also very expensive
 				// therefore all XML element names and xmlns are created using
 				// String.intern()
-				if (((impl_elements[i] == element) || (impl_elements[i] == ALL)) &&
-						((impl_xmlns[i] == ns) || (impl_xmlns[i] == ALL))) {
+				if (((impl_elements[i] == element) || (impl_elements[i] == ALL_NAMES)) &&
+						((impl_xmlns[i] == ns) || (impl_xmlns[i] == ALL_NAMES))) {
 					return true;
 				}    // end of if (ELEMENTS[i].equals(element) && XMLNSS[i].equals(ns))
 			}      // end of for (int i = 0; i < ELEMENTS.length; i++)
@@ -320,6 +328,7 @@ public abstract class XMPPProcessor
 	 * @return
 	 */
 	@Override
+	@Deprecated
 	public String[] supElements() {
 		return null;
 	}
@@ -350,4 +359,4 @@ public abstract class XMPPProcessor
 }    // XMPPProcessor
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/03/11

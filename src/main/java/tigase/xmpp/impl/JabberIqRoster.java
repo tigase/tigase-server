@@ -38,6 +38,7 @@ import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
+import tigase.xmpp.impl.roster.DynamicRoster;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterFactory;
 import tigase.xmpp.JID;
@@ -79,17 +80,19 @@ public class JabberIqRoster
 				extends XMPPProcessor
 				implements XMPPProcessorIfc, XMPPStopListenerIfc {
 	/** Field description */
-	public static final String ANON        = "anon";
-	private static final String[] ELEMENTS = { Iq.QUERY_NAME, Iq.QUERY_NAME };
+	public static final String      ANON     = "anon";
+	private static final String[][] ELEMENTS = {
+		{ Iq.ELEM_NAME, Iq.QUERY_NAME }, { Iq.ELEM_NAME, Iq.QUERY_NAME }
+	};
 
 	/**
 	 * Private logger for class instance.
 	 */
-	private static final Logger log      = Logger.getLogger(JabberIqRoster.class.getName());
+	private static final Logger   log = Logger.getLogger(JabberIqRoster.class.getName());
 	private static final String[] XMLNSS = { RosterAbstract.XMLNS,
-					RosterAbstract.XMLNS_DYNAMIC };
+			RosterAbstract.XMLNS_DYNAMIC };
 	private static final String[] IQ_QUERY_ITEM_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME,
-					"item" };
+			"item" };
 	private static final String ID = RosterAbstract.XMLNS;
 
 	//~--- fields ---------------------------------------------------------------
@@ -140,7 +143,7 @@ public class JabberIqRoster
 	 * @throws NotAuthorizedException
 	 */
 	protected static void dynamicGetRequest(Packet packet, XMPPResourceConnection session,
-					Queue<Packet> results, Map<String, Object> settings)
+			Queue<Packet> results, Map<String, Object> settings)
 					throws NotAuthorizedException {
 		Element request = packet.getElement();
 		Element item    = request.findChildStaticStr(IQ_QUERY_ITEM_PATH);
@@ -155,7 +158,7 @@ public class JabberIqRoster
 		} else {
 			try {
 				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-								"Missing 'item' element, request can not be processed.", true));
+						"Missing 'item' element, request can not be processed.", true));
 			} catch (PacketErrorTypeException ex) {
 				log.log(Level.SEVERE, "Received error packet? not possible.", ex);
 			}
@@ -172,9 +175,9 @@ public class JabberIqRoster
 	 * @param settings
 	 */
 	protected static void dynamicSetRequest(Packet packet, XMPPResourceConnection session,
-					Queue<Packet> results, Map<String, Object> settings) {
-		Element request     = packet.getElement();
-		List<Element> items = request.getChildrenStaticStr(Iq.IQ_QUERY_PATH);
+			Queue<Packet> results, Map<String, Object> settings) {
+		Element       request = packet.getElement();
+		List<Element> items   = request.getChildrenStaticStr(Iq.IQ_QUERY_PATH);
 
 		if ((items != null) && (items.size() > 0)) {
 			for (Element item : items) {
@@ -184,7 +187,7 @@ public class JabberIqRoster
 		} else {
 			try {
 				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-								"Missing 'item' element, request can not be processed.", true));
+						"Missing 'item' element, request can not be processed.", true));
 			} catch (PacketErrorTypeException ex) {
 				log.log(Level.SEVERE, "Received error packet? not possible.", ex);
 			}
@@ -227,8 +230,7 @@ public class JabberIqRoster
 	 */
 	@Override
 	public void process(Packet packet, XMPPResourceConnection session,
-											NonAuthUserRepository repo, Queue<Packet> results,
-											Map<String, Object> settings)
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 					throws XMPPException {
 		if (session == null) {
 			if (log.isLoggable(Level.FINE)) {
@@ -252,9 +254,8 @@ public class JabberIqRoster
 		if (connectionId.equals(packet.getPacketFrom())) {
 
 			// Packet from the user, let's check where it should go
-			if ((packet.getStanzaTo() != null) &&
-					!session.isLocalDomain(packet.getStanzaTo().toString(), false) &&
-					!session.isUserId(packet.getStanzaTo().getBareJID())) {
+			if ((packet.getStanzaTo() != null) &&!session.isLocalDomain(packet.getStanzaTo()
+					.toString(), false) &&!session.isUserId(packet.getStanzaTo().getBareJID())) {
 				results.offer(packet.copyElementOnly());
 
 				return;
@@ -280,22 +281,21 @@ public class JabberIqRoster
 			}
 		}
 		try {
-			if ((packet.getStanzaFrom() != null) &&
-					!session.isUserId(packet.getStanzaFrom().getBareJID())) {
+			if ((packet.getStanzaFrom() != null) &&!session.isUserId(packet.getStanzaFrom()
+					.getBareJID())) {
 
 				// RFC says: ignore such request
-				log.log(Level.WARNING,
-								"Roster request ''from'' attribute doesn't match " +
-								"session: {0}, request: {1}", new Object[] { session,
-								packet });
+				log.log(Level.WARNING, "Roster request ''from'' attribute doesn't match " +
+						"session: {0}, request: {1}", new Object[] { session,
+						packet });
 
 				return;
 			}    // end of if (packet.getElemFrom() != null
 
 			// &&
 			// !session.getUserId().equals(JIDUtils.getNodeID(packet.getElemFrom())))
-			StanzaType type = packet.getType();
-			String xmlns    = packet.getElement().getXMLNSStaticStr(Iq.IQ_QUERY_PATH);
+			StanzaType type  = packet.getType();
+			String     xmlns = packet.getElement().getXMLNSStaticStr(Iq.IQ_QUERY_PATH);
 
 			if (xmlns == RosterAbstract.XMLNS) {
 				switch (type) {
@@ -316,7 +316,7 @@ public class JabberIqRoster
 
 				default :
 					results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-									"Request type is incorrect", false));
+							"Request type is incorrect", false));
 
 					break;
 				}    // end of switch (type)
@@ -340,7 +340,7 @@ public class JabberIqRoster
 
 					default :
 						results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-										"Request type is incorrect", false));
+								"Request type is incorrect", false));
 
 						break;
 					}    // end of switch (type)
@@ -352,14 +352,13 @@ public class JabberIqRoster
 			}
 		} catch (NotAuthorizedException e) {
 			log.log(Level.WARNING,
-							"Received roster request but user session is not authorized yet: {0}",
-							packet);
+					"Received roster request but user session is not authorized yet: {0}", packet);
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-							"You must authorize session first.", true));
+					"You must authorize session first.", true));
 		} catch (TigaseDBException e) {
 			log.log(Level.WARNING, "Database problem, please contact admin:", e);
 			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
-							"Database access problem, please contact administrator.", true));
+					"Database access problem, please contact administrator.", true));
 		}    // end of try-catch
 	}
 
@@ -373,7 +372,7 @@ public class JabberIqRoster
 	 */
 	@Override
 	public void stopped(final XMPPResourceConnection session, final Queue<Packet> results,
-											final Map<String, Object> settings) {
+			final Map<String, Object> settings) {
 
 		//// Synchronization to avoid conflict with login/logout events
 		//// processed in the SessionManager asynchronously
@@ -425,7 +424,7 @@ public class JabberIqRoster
 	 * @return
 	 */
 	@Override
-	public String[] supElements() {
+	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
@@ -514,8 +513,8 @@ public class JabberIqRoster
 					}
 				} catch (TigaseStringprepException ex) {
 					log.log(Level.INFO,
-									"JID from dynamic roster is incorrect, stringprep failed for: {0}",
-									element.getAttributeStaticStr("jid"));
+							"JID from dynamic roster is incorrect, stringprep failed for: {0}", element
+							.getAttributeStaticStr("jid"));
 					it.remove();
 				}
 			}
@@ -547,7 +546,7 @@ public class JabberIqRoster
 	 * @throws TigaseDBException
 	 */
 	protected void processGetRequest(Packet packet, XMPPResourceConnection session,
-																	 Queue<Packet> results, Map<String, Object> settings)
+			Queue<Packet> results, Map<String, Object> settings)
 					throws NotAuthorizedException, TigaseDBException {
 
 		// Retrieve all Dynamic roster elements from the roster repository
@@ -560,8 +559,8 @@ public class JabberIqRoster
 		}
 
 		// Check roster version hash.
-		String incomingHash = packet.getAttributeStaticStr(Iq.IQ_QUERY_PATH,
-														RosterAbstract.VER_ATT);
+		String incomingHash = packet.getAttributeStaticStr(Iq.IQ_QUERY_PATH, RosterAbstract
+				.VER_ATT);
 		String storedHash = "";
 
 		// If client provided hash and the server calculated hash are the same
@@ -604,8 +603,8 @@ public class JabberIqRoster
 
 				while (items.size() > 0) {
 					Element iq = new Element("iq", new String[] { "type", "id", "to" },
-																	 new String[] { "set",
-									session.nextStanzaId(), session.getJID().toString() });
+							new String[] { "set",
+							session.nextStanzaId(), session.getJID().toString() });
 
 					iq.setXMLNS(CLIENT_XMLNS);
 
@@ -626,11 +625,10 @@ public class JabberIqRoster
 				}
 			}
 		} catch (NoConnectionIdException ex) {
-			log.log(
-					Level.WARNING,
+			log.log(Level.WARNING,
 					"Problem with roster request, no connection ID for session: {0}, request: {1}",
 					new Object[] { session,
-												 packet });
+					packet });
 		}
 	}
 
@@ -648,8 +646,7 @@ public class JabberIqRoster
 	 * @throws XMPPException
 	 */
 	protected void processSetRequest(Packet packet, XMPPResourceConnection session,
-																	 Queue<Packet> results,
-																	 final Map<String, Object> settings)
+			Queue<Packet> results, final Map<String, Object> settings)
 					throws XMPPException, NotAuthorizedException, TigaseDBException {
 
 		// Element request = packet.getElement();
@@ -668,17 +665,15 @@ public class JabberIqRoster
 
 						// Let's return an error. Dynamic roster cannot be modified via
 						// XMPP.
-						results.offer(
-								Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(
-									packet,
-									"You cannot modify this contact. It is controlled by an " +
-									"external service.", true));
+						results.offer(Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(
+								packet, "You cannot modify this contact. It is controlled by an " +
+								"external service.", true));
 
 						return;
 					}
 					if (session.isUserId(buddy.getBareJID())) {
 						results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
-										"User can't add himself to the roster, RFC says NO.", true));
+								"User can't add himself to the roster, RFC says NO.", true));
 
 						return;
 					}
@@ -717,15 +712,15 @@ public class JabberIqRoster
 							pres.setAttribute(Packet.TO_ATT, buddy.toString());
 							pres.setAttribute(Packet.FROM_ATT, session.getBareJID().toString());
 							pres.setAttribute(Packet.TYPE_ATT, "unsubscribe");
-							results.offer(Packet.packetInstance(pres,
-											session.getJID().copyWithoutResource(), buddy));
+							results.offer(Packet.packetInstance(pres, session.getJID()
+									.copyWithoutResource(), buddy));
 							pres = new Element(Presence.PRESENCE_ELEMENT_NAME);
 							pres.setXMLNS(CLIENT_XMLNS);
 							pres.setAttribute(Packet.TO_ATT, buddy.toString());
 							pres.setAttribute(Packet.FROM_ATT, session.getBareJID().toString());
 							pres.setAttribute(Packet.TYPE_ATT, "unsubscribed");
-							results.offer(Packet.packetInstance(pres,
-											session.getJID().copyWithoutResource(), buddy));
+							results.offer(Packet.packetInstance(pres, session.getJID()
+									.copyWithoutResource(), buddy));
 						}    // is in the roster while he isn't. In such a case just ensure the
 
 						// client that the buddy has been removed for sure
@@ -738,9 +733,9 @@ public class JabberIqRoster
 					} else {
 
 						// We are adding a new roster element here
-						String name          = item.getAttributeStaticStr("name");
+						String        name   = item.getAttributeStaticStr("name");
 						List<Element> groups = item.getChildren();
-						String[] gr          = null;
+						String[]      gr     = null;
 
 						if ((groups != null) && (groups.size() > 0)) {
 							gr = new String[groups.size()];
@@ -749,8 +744,8 @@ public class JabberIqRoster
 
 							for (Element group : groups) {
 								gr[cnt++] = ((group.getCData() == null)
-														 ? ""
-														 : group.getCData());
+										? ""
+										: group.getCData());
 							}    // end of for (ElementData group : groups)
 
 							// end of for (ElementData group : groups)
@@ -762,8 +757,8 @@ public class JabberIqRoster
 						if ((type != null) && type.equals(ANON)) {
 							roster_util.setBuddySubscription(session, SubscriptionType.both, buddy);
 
-							Element pres =
-								(Element) session.getSessionData(XMPPResourceConnection.PRESENCE_KEY);
+							Element pres = (Element) session.getSessionData(XMPPResourceConnection
+									.PRESENCE_KEY);
 
 							if (pres == null) {
 								pres = new Element(Presence.PRESENCE_ELEMENT_NAME);
@@ -796,22 +791,22 @@ public class JabberIqRoster
 				results.offer(packet.okResult((String) null, 0));
 			} catch (TigaseStringprepException ex) {
 				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-								"Buddy JID is incorrct, stringprep failed.", true));
+						"Buddy JID is incorrct, stringprep failed.", true));
 			}
 		} else {
 			log.log(Level.WARNING, "No items found in roster set request: {0}", packet);
 			results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-							"No items found in the roster set request", true));
+					"No items found in the roster set request", true));
 		}
 	}
 
 	private void processRemoteRosterManagementRequest(Packet packet,
-					XMPPResourceConnection session, Queue<Packet> results,
-					final Map<String, Object> settings)
+			XMPPResourceConnection session, Queue<Packet> results, final Map<String,
+			Object> settings)
 					throws PacketErrorTypeException {
 		if (!RemoteRosterManagement.isRemoteAllowed(packet.getStanzaFrom(), session)) {
 			results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
-							"Not authorized for remote roster management", true));
+					"Not authorized for remote roster management", true));
 
 			return;
 		}
@@ -846,17 +841,17 @@ public class JabberIqRoster
 
 			default :
 				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-								"Bad stanza type", true));
+						"Bad stanza type", true));
 
 				break;
 			}
 		} catch (Throwable ex) {
 			log.log(Level.WARNING, "Reflection execution exception", ex);
 			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
-							"Internal server error", true));
+					"Internal server error", true));
 		}
 	}
 }    // JabberIqRoster
 
 
-//~ Formatted in Tigase Code Convention on 13/02/28
+//~ Formatted in Tigase Code Convention on 13/03/11

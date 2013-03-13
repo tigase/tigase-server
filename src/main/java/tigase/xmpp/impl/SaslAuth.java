@@ -2,7 +2,7 @@
  * SaslAuth.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -81,29 +81,26 @@ public class SaslAuth
 				extends XMPPProcessor
 				implements XMPPProcessorIfc {
 	/** Field description */
-	public static final String ID                           =
-		"urn:ietf:params:xml:ns:xmpp-sasl";
-	private static final String _XMLNS                      =
-		"urn:ietf:params:xml:ns:xmpp-sasl";
-	private final static String ALLOWED_SASL_MECHANISMS_KEY = "allowed-sasl-mechanisms";
-	private static final Element[] DISCO_FEATURES           = { new Element("feature",
-																															new String[] { "var" },
-																															new String[] { _XMLNS }) };
-	private static final String[] ELEMENTS      = {
-		"auth", "response", "challenge", "failure", "success", "abort"
+	public static final String     ID = "urn:ietf:params:xml:ns:xmpp-sasl";
+	private static final String    _XMLNS = "urn:ietf:params:xml:ns:xmpp-sasl";
+	private final static String    ALLOWED_SASL_MECHANISMS_KEY = "allowed-sasl-mechanisms";
+	private static final Element[] DISCO_FEATURES = { new Element("feature", new String[] {
+			"var" }, new String[] { _XMLNS }) };
+	private static final String[][] ELEMENTS        = {
+		{ "auth" }, { "response" }, { "challenge" }, { "failure" }, { "success" }, { "abort" }
 	};
-	private static final Logger log             =
-		Logger.getLogger(SaslAuth.class.getName());
-	private final static String SASL_SERVER_KEY = "SASL_SERVER_KEY";
-	private static final String[] XMLNSS        = {
+	private static final Logger     log = Logger.getLogger(SaslAuth.class.getName());
+	private final static String     SASL_SERVER_KEY = "SASL_SERVER_KEY";
+	private static final String[]   XMLNSS          = {
 		_XMLNS, _XMLNS, _XMLNS, _XMLNS, _XMLNS, _XMLNS
 	};
 
 	//~--- fields ---------------------------------------------------------------
 
-	private CallbackHandlerFactory callbackHandlerFactory = new CallbackHandlerFactory();
-	private final Map<String, Object> props               = new HashMap<String, Object>();
-	private MechanismSelector mechanismSelector;
+	private CallbackHandlerFactory    callbackHandlerFactory = new CallbackHandlerFactory();
+	private final Map<String, Object> props                  = new HashMap<String,
+			Object>();
+	private MechanismSelector         mechanismSelector;
 
 	//~--- constant enums -------------------------------------------------------
 
@@ -207,8 +204,8 @@ public class SaslAuth
 	@Override
 	@SuppressWarnings("unchecked")
 	public void process(final Packet packet, final XMPPResourceConnection session,
-											final NonAuthUserRepository repo, final Queue<Packet> results,
-											final Map<String, Object> settings) {
+			final NonAuthUserRepository repo, final Queue<Packet> results, final Map<String,
+			Object> settings) {
 		if (session == null) {
 			return;
 		}
@@ -226,7 +223,7 @@ public class SaslAuth
 				// connection
 				// This is not allowed and must be forbidden.
 				Packet res = packet.swapFromTo(createReply(ElementType.failure,
-											 "<not-authorized/>"), null, null);
+						"<not-authorized/>"), null, null);
 
 				// Make sure it gets delivered before stream close
 				res.setPriority(Priority.SYSTEM);
@@ -234,13 +231,13 @@ public class SaslAuth
 
 				// Optionally close the connection to make sure there is no
 				// confusion about the connection state.
-				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-								StanzaType.set, session.nextStanzaId()));
+				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType
+						.set, session.nextStanzaId()));
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST,
-									"Discovered second authentication attempt: {0}, packet: {1}",
-									new Object[] { session.toString(),
-																 packet.toString() });
+							"Discovered second authentication attempt: {0}, packet: {1}",
+							new Object[] { session.toString(),
+							packet.toString() });
 				}
 				try {
 					session.logout();
@@ -264,26 +261,23 @@ public class SaslAuth
 						log.finest("Start SASL auth. mechanism=" + mechanismName);
 					}
 
-					Collection<String> allowedMechanisms =
-						(Collection<String>) session.getSessionData(ALLOWED_SASL_MECHANISMS_KEY);
+					Collection<String> allowedMechanisms = (Collection<String>) session
+							.getSessionData(ALLOWED_SASL_MECHANISMS_KEY);
 
 					session.removeSessionData(ALLOWED_SASL_MECHANISMS_KEY);
 					if ((mechanismName == null) ||!allowedMechanisms.contains(mechanismName)) {
-						throw new XmppSaslException(SaslError.invalid_mechanism,
-																				"Mechanism '" + mechanismName +
-																				"' is not allowed");
+						throw new XmppSaslException(SaslError.invalid_mechanism, "Mechanism '" +
+								mechanismName + "' is not allowed");
 					}
 
 					CallbackHandler cbh = callbackHandlerFactory.create(mechanismName, session,
-																	repo, settings);
+							repo, settings);
 
-					ss = Sasl.createSaslServer(mechanismName, "xmpp",
-																		 session.getDomain().getVhost().getDomain(), props,
-																		 cbh);
+					ss = Sasl.createSaslServer(mechanismName, "xmpp", session.getDomain().getVhost()
+							.getDomain(), props, cbh);
 					if (ss == null) {
-						throw new XmppSaslException(SaslError.invalid_mechanism,
-																				"Mechanism '" + mechanismName +
-																				"' is not allowed");
+						throw new XmppSaslException(SaslError.invalid_mechanism, "Mechanism '" +
+								mechanismName + "' is not allowed");
 					}
 					session.putSessionData(SASL_SERVER_KEY, ss);
 				} else if ("response" == request.getName()) {
@@ -293,15 +287,15 @@ public class SaslAuth
 					}
 				} else {
 					throw new XmppSaslException(SaslError.malformed_request,
-																			"Unrecognized element " + request.getName());
+							"Unrecognized element " + request.getName());
 				}
 
 				byte[] data;
 				String cdata = request.getCData();
 
-				if (cdata != null && cdata.length() == 1 && cdata.equals("=")) {
+				if ((cdata != null) && (cdata.length() == 1) && cdata.equals("=")) {
 					data = new byte[] {};
-				} else if (cdata != null && cdata.length() > 0) {
+				} else if ((cdata != null) && (cdata.length() > 0)) {
 					data = Base64.decode(cdata);
 				} else {
 					data = new byte[] {};
@@ -321,8 +315,8 @@ public class SaslAuth
 					if (ss.getAuthorizationID().contains("@")) {
 						jid = BareJID.bareJIDInstance(ss.getAuthorizationID());
 					} else {
-						jid = BareJID.bareJIDInstance(ss.getAuthorizationID(),
-																					session.getDomain().getVhost().getDomain());
+						jid = BareJID.bareJIDInstance(ss.getAuthorizationID(), session.getDomain()
+								.getVhost().getDomain());
 					}
 					if (log.isLoggable(Level.FINE)) {
 						log.finest("Authorized as " + jid);
@@ -331,22 +325,22 @@ public class SaslAuth
 					boolean anonymous;
 
 					try {
-						Boolean x =
-							(Boolean) ss.getNegotiatedProperty(SaslANONYMOUS.IS_ANONYMOUS_PROPERTY);
+						Boolean x = (Boolean) ss.getNegotiatedProperty(SaslANONYMOUS
+								.IS_ANONYMOUS_PROPERTY);
 
 						anonymous = (x == null)
-												? false
-												: x.booleanValue();
+								? false
+								: x.booleanValue();
 					} catch (Exception e) {
 						anonymous = false;
 					}
 					session.removeSessionData(SASL_SERVER_KEY);
 					session.authorizeJID(jid, anonymous);
 					results.offer(packet.swapFromTo(createReply(ElementType.success,
-									challengeData), null, null));
+							challengeData), null, null));
 				} else if (!ss.isComplete()) {
 					results.offer(packet.swapFromTo(createReply(ElementType.challenge,
-									challengeData), null, null));
+							challengeData), null, null));
 				} else {
 					throw new XmppSaslException(SaslError.malformed_request);
 				}
@@ -368,7 +362,7 @@ public class SaslAuth
 				}
 
 				Packet response = packet.swapFromTo(createReply(ElementType.failure, el), null,
-														null);
+						null);
 
 				response.setPriority(Priority.SYSTEM);
 				results.offer(response);
@@ -379,7 +373,7 @@ public class SaslAuth
 				}
 
 				Packet response = packet.swapFromTo(createReply(ElementType.failure,
-														"<not-authorized/>"), null, null);
+						"<not-authorized/>"), null, null);
 
 				response.setPriority(Priority.SYSTEM);
 				results.offer(response);
@@ -390,7 +384,7 @@ public class SaslAuth
 				}
 
 				Packet response = packet.swapFromTo(createReply(ElementType.failure,
-														"<temporary-auth-failure/>"), null, null);
+						"<temporary-auth-failure/>"), null, null);
 
 				response.setPriority(Priority.SYSTEM);
 				results.offer(response);
@@ -418,7 +412,7 @@ public class SaslAuth
 	 * @return
 	 */
 	@Override
-	public String[] supElements() {
+	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
@@ -446,22 +440,21 @@ public class SaslAuth
 		if ((session == null) || session.isAuthorized()) {
 			return null;
 		} else {
-			Collection<String> auth_mechs =
-				mechanismSelector.filterMechanisms(Sasl.getSaslServerFactories(), session);
+			Collection<String> auth_mechs = mechanismSelector.filterMechanisms(Sasl
+					.getSaslServerFactories(), session);
 			Element[] mechs = new Element[auth_mechs.size()];
-			int idx         = 0;
+			int       idx   = 0;
 
 			session.putSessionData(ALLOWED_SASL_MECHANISMS_KEY, auth_mechs);
 			for (String mech : auth_mechs) {
 				mechs[idx++] = new Element("mechanism", mech);
 			}
 
-			return new Element[] {
-				new Element("mechanisms", mechs, new String[] { "xmlns" },
-										new String[] { _XMLNS }) };
+			return new Element[] { new Element("mechanisms", mechs, new String[] { "xmlns" },
+					new String[] { _XMLNS }) };
 		}
 	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/03/12

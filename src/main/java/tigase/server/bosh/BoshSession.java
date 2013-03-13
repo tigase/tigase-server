@@ -2,7 +2,7 @@
  * BoshSession.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -78,77 +78,77 @@ public class BoshSession {
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log                              =
-		Logger.getLogger(BoshSession.class.getName());
-	private static final String MESSAGE_ELEMENT_NAME             = "message";
-	private static final String PRESENCE_ELEMENT_NAME            = "presence";
-	private static final long SECOND                             = 1000;
+	private static final Logger              log = Logger.getLogger(BoshSession.class
+			.getName());
+	private static final String              MESSAGE_ELEMENT_NAME  = "message";
+	private static final String              PRESENCE_ELEMENT_NAME = "presence";
+	private static final long                SECOND                = 1000;
 	private static final TimerTaskComparator timerTaskComparator =
-		new TimerTaskComparator();
+			new TimerTaskComparator();
 
 	//~--- fields ---------------------------------------------------------------
 
 	// ~--- fields ---------------------------------------------------------------
-	private BoshSessionCache cache    = null;
-	private long cache_reload_counter = 0;
+	private BoshSessionCache cache                = null;
+	private long             cache_reload_counter = 0;
 
 	/**
 	 * <code>current_rid</code> is the table with body rids which are waiting for
 	 * replies.
 	 */
-	private long[] currentRids             = null;
-	private JID dataReceiver               = null;
-	private String domain                  = null;
-	private BoshSessionTaskHandler handler = null;
-	private int[] hashCodes                = null;
-	private BoshTask inactivityTimer       = null;
-	private long previous_received_rid     = -1;
-	private BoshSendQueueTask queueTask    = null;
-	private String[] replace_with          = { "$1&lt;a href=\"http://$2\" target=\"_blank\"&gt;$2&lt;/a&gt;",
-					"$1&lt;a href=\"$2\" target=\"_blank\"&gt;$2&lt;/a&gt;", };
-	private int rids_head    = 0;
-	private int rids_tail    = 0;
+	private long[]                 currentRids           = null;
+	private JID                    dataReceiver          = null;
+	private String                 domain                = null;
+	private BoshSessionTaskHandler handler               = null;
+	private int[]                  hashCodes             = null;
+	private BoshTask               inactivityTimer       = null;
+	private long                   previous_received_rid = -1;
+	private BoshSendQueueTask      queueTask             = null;
+	private String[]               replace_with = {
+			"$1&lt;a href=\"http://$2\" target=\"_blank\"&gt;$2&lt;/a&gt;",
+			"$1&lt;a href=\"$2\" target=\"_blank\"&gt;$2&lt;/a&gt;", };
+	private int    rids_head = 0;
+	private int    rids_tail = 0;
 	private String sessionId = null;
-	private UUID sid         = null;
+	private UUID   sid       = null;
 
 	// Old connections which might be reused in keep-alive mode.
 	// Requests have been responded to so in most cases the connection should
 	// be closed unless it is reused in keep-alive mode.
 	// Normally there should be no more than max 2 elements in the queue.
-	private Queue<BoshIOService> old_connections =
-		new LinkedBlockingQueue<BoshIOService>(4);
+	private Queue<BoshIOService> old_connections = new LinkedBlockingQueue<BoshIOService>(
+			4);
 
 	// Active connections with pending requests received
 	private ConcurrentSkipListMap<BoshTask, BoshIOService> connections =
-		new ConcurrentSkipListMap<BoshTask, BoshIOService>(timerTaskComparator);
+			new ConcurrentSkipListMap<BoshTask, BoshIOService>(timerTaskComparator);
+	private JID userJid = null;
 
 	// private enum TimedTask { EMPTY_RESP, STOP };
 	// private Map<TimerTask, TimedTask> task_enum =
 	// new LinkedHashMap<TimerTask, TimedTask>();
 	// private EnumMap<TimedTask, TimerTask> enum_task =
 	// new EnumMap<TimedTask, TimerTask>(TimedTask.class);
-	private Set<BoshTask> waitTimerSet =
-		new ConcurrentSkipListSet<BoshTask>(timerTaskComparator);
+	private Set<BoshTask> waitTimerSet = new ConcurrentSkipListSet<BoshTask>(
+			timerTaskComparator);
 	private Queue<Element> waiting_packets = new ConcurrentLinkedQueue<Element>();
-	private boolean terminate              = false;
-	private long min_polling               = MIN_POLLING_PROP_VAL;
-	private long max_wait                  = MAX_WAIT_DEF_PROP_VAL;
-	private long max_pause                 = MAX_PAUSE_PROP_VAL;
-	private long max_inactivity            = MAX_INACTIVITY_PROP_VAL;
-	private int max_batch_size             = MAX_BATCH_SIZE_VAL;
-	private Pattern[] links_regexs         = { Pattern.compile("([^>/\";]|^)(www\\.[^ ]+)",
-																						 Pattern.CASE_INSENSITIVE),
-					Pattern.compile("([^\">;]|^)(http://[^ ]+)", Pattern.CASE_INSENSITIVE), };
-	private int hold_requests        = HOLD_REQUESTS_PROP_VAL;
-	private String content_type      = CONTENT_TYPE_DEF;
-	private int concurrent_requests  = CONCURRENT_REQUESTS_PROP_VAL;
-	private boolean cache_on         = false;
-	private long batch_queue_timeout = BATCH_QUEUE_TIMEOUT_VAL;
-	private long last_send_time;
+	private boolean        terminate       = false;
+	private long           min_polling     = MIN_POLLING_PROP_VAL;
+	private long           max_wait        = MAX_WAIT_DEF_PROP_VAL;
+	private long           max_pause       = MAX_PAUSE_PROP_VAL;
+	private long           max_inactivity  = MAX_INACTIVITY_PROP_VAL;
+	private int            max_batch_size  = MAX_BATCH_SIZE_VAL;
+	private Pattern[]      links_regexs = { Pattern.compile("([^>/\";]|^)(www\\.[^ ]+)",
+			Pattern.CASE_INSENSITIVE),
+			Pattern.compile("([^\">;]|^)(http://[^ ]+)", Pattern.CASE_INSENSITIVE), };
+	private int     hold_requests       = HOLD_REQUESTS_PROP_VAL;
+	private String  content_type        = CONTENT_TYPE_DEF;
+	private int     concurrent_requests = CONCURRENT_REQUESTS_PROP_VAL;
+	private boolean cache_on            = false;
+	private long    batch_queue_timeout = BATCH_QUEUE_TIMEOUT_VAL;
+	private long    last_send_time;
 
 	//~--- constructors ---------------------------------------------------------
-
-	// ~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>BoshSession</code> instance.
@@ -159,7 +159,7 @@ public class BoshSession {
 	 * @param handler
 	 */
 	public BoshSession(String def_domain, JID dataReceiver,
-										 BoshSessionTaskHandler handler) {
+			BoshSessionTaskHandler handler) {
 		this.sid            = UUID.randomUUID();
 		this.domain         = def_domain;
 		this.dataReceiver   = dataReceiver;
@@ -168,8 +168,6 @@ public class BoshSession {
 	}
 
 	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -220,8 +218,6 @@ public class BoshSession {
 
 	//~--- get methods ----------------------------------------------------------
 
-	// ~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -264,8 +260,6 @@ public class BoshSession {
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -283,9 +277,8 @@ public class BoshSession {
 	 * @param out_results
 	 */
 	public void init(Packet packet, BoshIOService service, long max_wait, long min_polling,
-									 long max_inactivity, int concurrent_requests, int hold_requests,
-									 long max_pause, int max_batch_size, long batch_queue_timeout,
-									 Queue<Packet> out_results) {
+			long max_inactivity, int concurrent_requests, int hold_requests, long max_pause,
+			int max_batch_size, long batch_queue_timeout, Queue<Packet> out_results) {
 		String cache_action = packet.getAttributeStaticStr(CACHE_ATTR);
 
 		if ((cache_action != null) && cache_action.equals(CacheAction.on.toString())) {
@@ -300,7 +293,7 @@ public class BoshSession {
 			hashCodes[i]   = -1;
 		}
 
-		long wait_l   = max_wait;
+		long   wait_l = max_wait;
 		String wait_s = packet.getAttributeStaticStr(WAIT_ATTR);
 
 		if (wait_s != null) {
@@ -313,7 +306,7 @@ public class BoshSession {
 		this.max_wait = Math.min(wait_l, max_wait);
 
 		// this.max_wait = wait_l;
-		int hold_i     = hold_requests;
+		int    hold_i  = hold_requests;
 		String tmp_str = packet.getAttributeStaticStr(HOLD_ATTR);
 
 		if (tmp_str != null) {
@@ -372,9 +365,8 @@ public class BoshSession {
 		}
 		try {
 			BareJID userId = (packet.getAttributeStaticStr(Packet.FROM_ATT) != null)
-											 ? BareJID.bareJIDInstance(
-													 packet.getAttributeStaticStr(Packet.FROM_ATT))
-											 : null;
+					? BareJID.bareJIDInstance(packet.getAttributeStaticStr(Packet.FROM_ATT))
+					: null;
 
 			if (userId != null) {
 				BareJID hostJid = handler.getSeeOtherHostForJID(userId);
@@ -395,8 +387,8 @@ public class BoshSession {
 		sendBody(service, body);
 
 		// service.writeRawData(body.toString());
-		Packet streamOpen = Command.STREAM_OPENED.getPacket(null, null, StanzaType.set,
-													UUID.randomUUID().toString(), Command.DataType.submit);
+		Packet streamOpen = Command.STREAM_OPENED.getPacket(null, null, StanzaType.set, UUID
+				.randomUUID().toString(), Command.DataType.submit);
 
 		Command.addFieldValue(streamOpen, "session-id", sessionId);
 		Command.addFieldValue(streamOpen, "hostname", domain);
@@ -416,25 +408,25 @@ public class BoshSession {
 	public synchronized void processPacket(Packet packet, Queue<Packet> out_results) {
 		if (packet != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("[" + connections.size() + "] Processing packet: " +
-									 packet.toString());
+				log.finest("[" + connections.size() + "] Processing packet: " + packet
+						.toString());
 			}
 			if (filterInPacket(packet)) {
 				waiting_packets.offer(packet.getElement());
 			} else {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("[" + connections.size() + "] In packet filtered: " +
-										 packet.toString());
+					log.finest("[" + connections.size() + "] In packet filtered: " + packet
+							.toString());
 				}
 			}
 		}
 		if ((!connections.isEmpty()) && ((!waiting_packets.isEmpty()) || terminate)) {
 			long currentTime = System.currentTimeMillis();
 
-			if (terminate || (waiting_packets.size() >= max_batch_size) ||
-					(currentTime - last_send_time) > batch_queue_timeout) {
+			if (terminate || (waiting_packets.size() >= max_batch_size) || (currentTime -
+					last_send_time) > batch_queue_timeout) {
 				Map.Entry<BoshTask, BoshIOService> entry = connections.pollFirstEntry();
-				BoshIOService serv                       = entry.getValue();
+				BoshIOService                      serv  = entry.getValue();
 
 				sendBody(serv, null);
 			} else {
@@ -456,10 +448,10 @@ public class BoshSession {
 	 * @param out_results
 	 */
 	public synchronized void processSocketPacket(Packet packet, BoshIOService service,
-					Queue<Packet> out_results) {
+			Queue<Packet> out_results) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("[" + connections.size() + "] Processing socket packet: " +
-								 packet.toString());
+			log.finest("[" + connections.size() + "] Processing socket packet: " + packet
+					.toString());
 		}
 
 		BoshTask waitTimer = service.getWaitTimer();
@@ -477,8 +469,8 @@ public class BoshSession {
 			handler.cancelTask(inactivityTimer);
 		}
 		if ((packet.getElemName() == BODY_EL_NAME) && (packet.getXMLNS() == BOSH_XMLNS)) {
-			List<Element> children = packet.getElemChildrenStaticStr(BODY_EL_PATH);
-			boolean duplicate      = false;
+			List<Element> children  = packet.getElemChildrenStaticStr(BODY_EL_PATH);
+			boolean       duplicate = false;
 
 			if (packet.getAttributeStaticStr(RID_ATTR) != null) {
 				try {
@@ -486,7 +478,7 @@ public class BoshSession {
 
 					if (isDuplicateRid(rid, children)) {
 						log.info("Discovered duplicate client connection, trying to close the " +
-										 "old one with RID: " + rid);
+								"old one with RID: " + rid);
 
 						Element body = getBodyElem();
 
@@ -523,29 +515,29 @@ public class BoshSession {
 					terminate      = true;
 
 					Packet command = Command.STREAM_CLOSED.getPacket(null, null, StanzaType.set,
-														 UUID.randomUUID().toString());
+							UUID.randomUUID().toString());
 
 					handler.addOutStreamClosed(command, this);
 
 					// out_results.offer(command);
 				}
-				if ((packet.getAttributeStaticStr(RESTART_ATTR) != null) &&
-						packet.getAttributeStaticStr(RESTART_ATTR).equals("true")) {
+				if ((packet.getAttributeStaticStr(RESTART_ATTR) != null) && packet
+						.getAttributeStaticStr(RESTART_ATTR).equals("true")) {
 					log.fine("Found stream restart instruction: " + packet.toString());
 					out_results.offer(Command.GETFEATURES.getPacket(null, null, StanzaType.get,
-									"restart1", null));
+							"restart1", null));
 				}
 				if (packet.getAttributeStaticStr(CACHE_ATTR) != null) {
 					try {
-						CacheAction action =
-							CacheAction.valueOf(packet.getAttributeStaticStr(CACHE_ATTR));
+						CacheAction action = CacheAction.valueOf(packet.getAttributeStaticStr(
+								CACHE_ATTR));
 
 						if (cache_on || (action == CacheAction.on)) {
 							processCache(action, packet);
 						}
 					} catch (IllegalArgumentException e) {
-						log.warning("Incorrect cache action: " +
-												packet.getAttributeStaticStr(CACHE_ATTR));
+						log.warning("Incorrect cache action: " + packet.getAttributeStaticStr(
+								CACHE_ATTR));
 					}
 				} else {
 					if (children != null) {
@@ -580,7 +572,7 @@ public class BoshSession {
 			}
 		} else {
 			log.warning("[" + connections.size() + "] Unexpected packet from the network: " +
-									packet.toString());
+					packet.toString());
 
 			String er_msg = "Invalid body element";
 
@@ -596,8 +588,8 @@ public class BoshSession {
 				waiting_packets.add(error.getElement());
 				terminate = true;
 
-				Packet command = Command.STREAM_CLOSED.getPacket(null, null, StanzaType.set,
-													 UUID.randomUUID().toString());
+				Packet command = Command.STREAM_CLOSED.getPacket(null, null, StanzaType.set, UUID
+						.randomUUID().toString());
 
 				handler.addOutStreamClosed(command, this);
 
@@ -618,8 +610,6 @@ public class BoshSession {
 
 	//~--- set methods ----------------------------------------------------------
 
-	// ~--- set methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -631,8 +621,6 @@ public class BoshSession {
 	}
 
 	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -664,9 +652,8 @@ public class BoshSession {
 
 					// Do not send stream:features back with an error
 					if (packet.getName() != "stream:features") {
-						out_results.offer(
-								Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(
-									Packet.packetInstance(packet), "Bosh = disconnected", true));
+						out_results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(
+								Packet.packetInstance(packet), "Bosh = disconnected", true));
 					}
 				} catch (TigaseStringprepException ex) {
 					log.warning(
@@ -680,8 +667,8 @@ public class BoshSession {
 				log.finest("Closing session, inactivity timeout expired: " + getSid());
 			}
 
-			Packet command = Command.STREAM_CLOSED.getPacket(null, null, StanzaType.set,
-												 UUID.randomUUID().toString());
+			Packet command = Command.STREAM_CLOSED.getPacket(null, null, StanzaType.set, UUID
+					.randomUUID().toString());
 
 			handler.addOutStreamClosed(command, this);
 			closeAllConnections();
@@ -739,11 +726,10 @@ public class BoshSession {
 
 	//~--- get methods ----------------------------------------------------------
 
-	// ~--- get methods ----------------------------------------------------------
 	private Element getBodyElem() {
 		Element body = new Element(BODY_EL_NAME, new String[] { FROM_ATTR, SECURE_ATTR,
-						"xmpp:version", "xmlns:xmpp", "xmlns:stream" }, new String[] { this.domain,
-						"true", "1.0", "urn:xmpp:xbosh", "http://etherx.jabber.org/streams" });
+				"xmpp:version", "xmlns:xmpp", "xmlns:stream" }, new String[] { this.domain,
+				"true", "1.0", "urn:xmpp:xbosh", "http://etherx.jabber.org/streams" });
 
 		body.setXMLNS(BOSH_XMLNS);
 
@@ -805,7 +791,6 @@ public class BoshSession {
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
 	private void processAutomaticCache(Packet packet) {
 		if (packet.getElemName() == PRESENCE_ELEMENT_NAME) {
 			cache.addPresence(packet.getElement());
@@ -817,18 +802,18 @@ public class BoshSession {
 			cache.addRoster(packet.getElement());
 		}
 		if (packet.isXMLNSStaticStr(Iq.IQ_BIND_PATH, "urn:ietf:params:xml:ns:xmpp-bind")) {
-			cache.set(BoshSessionCache.RESOURCE_BIND_ID,
-								Collections.singletonList(packet.getElement()));
+			cache.set(BoshSessionCache.RESOURCE_BIND_ID, Collections.singletonList(packet
+					.getElement()));
 		}
 	}
 
 	private void processCache(CacheAction action, Packet packet) {
 		++cache_reload_counter;
 
-		int packet_counter      = 0;
-		List<Element> children  = packet.getElemChildrenStaticStr(BODY_EL_PATH);
-		String cache_id         = packet.getAttributeStaticStr(CACHE_ID_ATTR);
-		List<Element> cache_res = null;
+		int           packet_counter = 0;
+		List<Element> children       = packet.getElemChildrenStaticStr(BODY_EL_PATH);
+		String        cache_id       = packet.getAttributeStaticStr(CACHE_ID_ATTR);
+		List<Element> cache_res      = null;
 
 		switch (action) {
 		case on :
@@ -890,7 +875,7 @@ public class BoshSession {
 		synchronized (currentRids) {
 			if ((previous_received_rid + 1) != rid) {
 				log.info("Incorrect packet order, last_rid=" + previous_received_rid +
-								 ", current_rid=" + rid);
+						", current_rid=" + rid);
 			}
 			if ((packets != null) && (!packets.isEmpty())) {
 				StringBuilder sb = new StringBuilder();
@@ -925,7 +910,7 @@ public class BoshSession {
 	public synchronized void sendWaitingPackets() {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("trying to send waiting packets from queue of " + getSid() +
-								 " after timer = " + waiting_packets.size());
+					" after timer = " + waiting_packets.size());
 		}
 		if (!waiting_packets.isEmpty()) {
 			Map.Entry<BoshTask, BoshIOService> entry = connections.pollFirstEntry();
@@ -983,8 +968,8 @@ public class BoshSession {
 					stanza.setXMLNS(XMLNS_CLIENT_VAL);
 				}
 				body.addChild(stanza);
-				while ((!waiting_packets.isEmpty()) &&
-							 (body.getChildren().size() < max_batch_size)) {
+				while ((!waiting_packets.isEmpty()) && (body.getChildren().size() <
+						max_batch_size)) {
 
 					// body.addChild(applyFilters(waiting_packets.poll()));
 					stanza = waiting_packets.poll();
@@ -1011,8 +996,8 @@ public class BoshSession {
 			// log.log(Level.WARNING, "[" + connections.size() +
 			// "] Exception during writing to socket", e);
 		} catch (Exception e) {
-			log.log(Level.WARNING,
-							"[" + connections.size() + "] Exception during writing to socket", e);
+			log.log(Level.WARNING, "[" + connections.size() +
+					"] Exception during writing to socket", e);
 		}
 	}
 
@@ -1026,7 +1011,7 @@ public class BoshSession {
 				} else {
 					if (log.isLoggable(Level.WARNING)) {
 						log.warning("old_connections queue is empty but can not add new element!: " +
-												getSid());
+								getSid());
 					}
 
 					break;
@@ -1050,7 +1035,7 @@ public class BoshSession {
 			} else {
 				if (log.isLoggable(Level.WARNING)) {
 					log.warning("connections queue size is greater than 1 but poll returns null" +
-											getSid());
+							getSid());
 				}
 			}
 		}
@@ -1068,6 +1053,18 @@ public class BoshSession {
 		}
 	}
 
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param jid
+	 */
+	public void setUserJid(String jid) {
+		userJid = JID.jidInstanceNS(jid);
+	}
+
 	//~--- inner classes --------------------------------------------------------
 
 	private static class TimerTaskComparator
@@ -1081,6 +1078,7 @@ public class BoshSession {
 		 *
 		 * @return
 		 */
+		@Override
 		public int compare(BoshTask o1, BoshTask o2) {
 			if (o1.timerOrder > o2.timerOrder) {
 				return 1;
@@ -1095,10 +1093,4 @@ public class BoshSession {
 }
 
 
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/03/12

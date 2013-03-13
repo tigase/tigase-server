@@ -62,12 +62,15 @@ import java.util.Queue;
 public class Message
 				extends XMPPProcessor
 				implements XMPPProcessorIfc {
-	private static final String[] ELEMENTS = { "message" };
-	private static final String ID         = "message";
+	private static final String     ELEM_NAME = tigase.server.Message.ELEM_NAME;
+	private static final String[][] ELEMENTS  = {
+		{ ELEM_NAME }
+	};
+	private static final String     ID        = ELEM_NAME;
 
 	/** Class logger */
-	private static final Logger log      = Logger.getLogger(Message.class.getName());
-	private static final String XMLNS    = "jabber:client";
+	private static final Logger   log    = Logger.getLogger(Message.class.getName());
+	private static final String   XMLNS  = "jabber:client";
 	private static final String[] XMLNSS = { XMLNS };
 
 	//~--- methods --------------------------------------------------------------
@@ -97,16 +100,15 @@ public class Message
 	 */
 	@Override
 	public void process(Packet packet, XMPPResourceConnection session,
-											NonAuthUserRepository repo, Queue<Packet> results,
-											Map<String, Object> settings)
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 					throws XMPPException {
 
 		// For performance reasons it is better to do the check
 		// before calling logging method.
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Processing packet: {0}, for session: {1}",
-							new Object[] { packet,
-														 session });
+			log.log(Level.FINEST, "Processing packet: {0}, for session: {1}", new Object[] {
+					packet,
+					session });
 		}
 
 		// You may want to skip processing completely if the user is offline.
@@ -117,15 +119,15 @@ public class Message
 
 			// Remember to cut the resource part off before comparing JIDs
 			BareJID id = (packet.getStanzaTo() != null)
-									 ? packet.getStanzaTo().getBareJID()
-									 : null;
+					? packet.getStanzaTo().getBareJID()
+					: null;
 
 			// Checking if this is a packet TO the owner of the session
 			if (session.isUserId(id)) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Message 'to' this user, packet: {0}, for session: {1}",
-									new Object[] { packet,
-																 session });
+							new Object[] { packet,
+							session });
 				}
 
 				// Yes this is message to 'this' client
@@ -145,8 +147,8 @@ public class Message
 				} else {
 
 					// Otherwise only to the given resource or sent back as error.
-					XMPPResourceConnection con =
-						session.getParentSession().getResourceForResource(resource);
+					XMPPResourceConnection con = session.getParentSession().getResourceForResource(
+							resource);
 
 					if (con != null) {
 						conns.add(con);
@@ -167,13 +169,13 @@ public class Message
 						results.offer(result);
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST, "Delivering message, packet: {0}, to session: {1}",
-											new Object[] { packet,
-																		 con });
+									new Object[] { packet,
+									con });
 						}
 					}
 				} else {
 					Packet result = Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet,
-														"The recipient is no longer available.", true);
+							"The recipient is no longer available.", true);
 
 					result.setPacketFrom(null);
 					result.setPacketTo(null);
@@ -188,8 +190,8 @@ public class Message
 
 			// Remember to cut the resource part off before comparing JIDs
 			id = (packet.getStanzaFrom() != null)
-					 ? packet.getStanzaFrom().getBareJID()
-					 : null;
+					? packet.getStanzaFrom().getBareJID()
+					: null;
 
 			// Checking if this is maybe packet FROM the client
 			if (session.isUserId(id)) {
@@ -223,8 +225,8 @@ public class Message
 				// packet, it is a place to set it here:
 				el_result.setAttribute("from", session.getJID().toString());
 
-				Packet result = Packet.packetInstance(el_result, session.getJID(),
-													packet.getStanzaTo());
+				Packet result = Packet.packetInstance(el_result, session.getJID(), packet
+						.getStanzaTo());
 
 				// ... putting it to results queue is enough
 				results.offer(result);
@@ -232,7 +234,7 @@ public class Message
 		} catch (NotAuthorizedException e) {
 			log.warning("NotAuthorizedException for packet: " + packet);
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-							"You must authorize session first.", true));
+					"You must authorize session first.", true));
 		}    // end of try-catch
 	}
 
@@ -243,7 +245,7 @@ public class Message
 	 * @return
 	 */
 	@Override
-	public String[] supElements() {
+	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
@@ -260,4 +262,4 @@ public class Message
 }    // Message
 
 
-//~ Formatted in Tigase Code Convention on 13/02/28
+//~ Formatted in Tigase Code Convention on 13/03/12

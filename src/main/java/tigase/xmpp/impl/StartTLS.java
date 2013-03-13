@@ -66,28 +66,25 @@ public class StartTLS
 	public static final String EL_NAME = "starttls";
 
 	/** Field description */
-	protected static final String ID          = EL_NAME;
-	private static final String[] ELEMENTS    = { EL_NAME, "proceed", "failure" };
-	private static final Logger log           = Logger.getLogger(StartTLS.class.getName());
-	private static final String XMLNS         = "urn:ietf:params:xml:ns:xmpp-tls";
-	private static final String[] XMLNSS      = { XMLNS, XMLNS, XMLNS };
-	private static final Element[] F_REQUIRED = { new Element(
-																								"starttls",
-																								new Element[] {
-																									new Element(
-																										"required") }, new String[] {
-																											Packet.XMLNS_ATT }, new String[] {
-																											XMLNS }) };
-	private static final Element[] F_NOT_REQUIRED = { new Element(EL_NAME,
-																										new String[] { Packet.XMLNS_ATT },
-																										new String[] { XMLNS }) };
+	protected static final String   ID       = EL_NAME;
+	private static final String[][] ELEMENTS = {
+		{ EL_NAME }, { "proceed" }, { "failure" }
+	};
+	private static final Logger     log      = Logger.getLogger(StartTLS.class.getName());
+	private static final String     XMLNS    = "urn:ietf:params:xml:ns:xmpp-tls";
+	private static final String[]   XMLNSS   = { XMLNS, XMLNS, XMLNS };
+	private static final Element[]  F_REQUIRED = { new Element("starttls", new Element[] {
+			new Element("required") }, new String[] { Packet.XMLNS_ATT }, new String[] {
+			XMLNS }) };
+	private static final Element[] F_NOT_REQUIRED = { new Element(EL_NAME, new String[] {
+			Packet.XMLNS_ATT }, new String[] { XMLNS }) };
 
 	//~--- fields ---------------------------------------------------------------
 
 	private Element proceed = new Element("proceed", new String[] { Packet.XMLNS_ATT },
-															new String[] { XMLNS });
+			new String[] { XMLNS });
 	private Element failure = new Element("failure", new String[] { Packet.XMLNS_ATT },
-															new String[] { XMLNS });
+			new String[] { XMLNS });
 
 	//~--- methods --------------------------------------------------------------
 
@@ -114,8 +111,8 @@ public class StartTLS
 	 */
 	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
-											final NonAuthUserRepository repo, final Queue<Packet> results,
-											final Map<String, Object> settings) {
+			final NonAuthUserRepository repo, final Queue<Packet> results, final Map<String,
+			Object> settings) {
 		if (session == null) {
 			return;
 		}    // end of if (session == null)
@@ -127,26 +124,26 @@ public class StartTLS
 				// a DOS attack. Blocking it now, unless someone requests he wants
 				// to have multiple layers of TLS for his connection
 				log.log(Level.WARNING,
-								"Multiple TLS requests, possible DOS attack, closing connection: {0}",
-								packet);
+						"Multiple TLS requests, possible DOS attack, closing connection: {0}",
+						packet);
 				results.offer(packet.swapFromTo(failure, null, null));
-				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-								StanzaType.set, session.nextStanzaId()));
+				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType
+						.set, session.nextStanzaId()));
 
 				return;
 			}
 			session.putSessionData(ID, "true");
 
 			Packet result = Command.STARTTLS.getPacket(packet.getTo(), packet.getFrom(),
-												StanzaType.set, session.nextStanzaId(), Command.DataType.submit);
+					StanzaType.set, session.nextStanzaId(), Command.DataType.submit);
 
 			Command.setData(result, proceed);
 			results.offer(result);
 		} else {
 			log.log(Level.WARNING, "Unknown TLS element: {0}", packet);
 			results.offer(packet.swapFromTo(failure, null, null));
-			results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(),
-							StanzaType.set, session.nextStanzaId()));
+			results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType
+					.set, session.nextStanzaId()));
 		}    // end of if (packet.getElement().getName().equals("starttls")) else
 	}
 
@@ -157,7 +154,7 @@ public class StartTLS
 	 * @return
 	 */
 	@Override
-	public String[] supElements() {
+	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
@@ -213,8 +210,7 @@ public class StartTLS
 	 */
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
-														NonAuthUserRepository repo, Queue<Packet> results,
-														Map<String, Object> settings) {
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
 		boolean stop = false;
 
 		if ((session == null) || session.isServerSession()) {
@@ -229,8 +225,8 @@ public class StartTLS
 
 		// Check whether the TLS has been completed
 		// and the packet is allowed to be processed.
-		if ((vhost != null) && vhost.isTlsRequired() &&
-				(session.getSessionData(ID) == null) &&!packet.isElement(EL_NAME, XMLNS)) {
+		if ((vhost != null) && vhost.isTlsRequired() && (session.getSessionData(ID) ==
+				null) &&!packet.isElement(EL_NAME, XMLNS)) {
 			stop = true;
 		}
 
@@ -239,4 +235,4 @@ public class StartTLS
 }    // StartTLS
 
 
-//~ Formatted in Tigase Code Convention on 13/02/23
+//~ Formatted in Tigase Code Convention on 13/03/12

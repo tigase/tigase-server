@@ -2,7 +2,7 @@
  * OfflineMessages.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -76,24 +76,24 @@ public class OfflineMessages
 				implements XMPPPostprocessorIfc, XMPPProcessorIfc {
 	/** Field description */
 	protected static final String XMLNS = "jabber:client";
-	private static final String ID      = "msgoffline";
+	private static final String   ID    = "msgoffline";
 
 	/**
 	 * Private logger for class instances.
 	 */
-	private static final Logger log               =
-		Logger.getLogger(OfflineMessages.class.getName());
-	private static final String[] ELEMENTS        = { Presence.PRESENCE_ELEMENT_NAME };
-	private static final String[] XMLNSS          = { XMLNS };
-	private static final Element[] DISCO_FEATURES = { new Element("feature",
-																										new String[] { "var" },
-																										new String[] { "msgoffline" }) };
+	private static final Logger     log = Logger.getLogger(OfflineMessages.class.getName());
+	private static final String[][] ELEMENTS = {
+		{ Presence.PRESENCE_ELEMENT_NAME }
+	};
+	private static final String[]   XMLNSS   = { XMLNS };
+	private static final Element[]  DISCO_FEATURES = { new Element("feature",
+			new String[] { "var" }, new String[] { "msgoffline" }) };
 	private static final String defHost = DNSResolver.getDefaultHostname();
 
 	//~--- fields ---------------------------------------------------------------
 
-	private final SimpleDateFormat formatter =
-		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+	private final SimpleDateFormat formatter = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
 	//~--- methods --------------------------------------------------------------
 
@@ -135,8 +135,8 @@ public class OfflineMessages
 	 */
 	@Override
 	public void postProcess(final Packet packet, final XMPPResourceConnection conn,
-													final NonAuthUserRepository repo, final Queue<Packet> queue,
-													Map<String, Object> settings) {
+			final NonAuthUserRepository repo, final Queue<Packet> queue, Map<String,
+			Object> settings) {
 		if (conn == null) {
 			try {
 				MsgRepositoryIfc msg_repo = getMsgRepoImpl(repo, conn);
@@ -168,13 +168,13 @@ public class OfflineMessages
 	 */
 	@Override
 	public void process(final Packet packet, final XMPPResourceConnection conn,
-											final NonAuthUserRepository repo, final Queue<Packet> results,
-											final Map<String, Object> settings)
+			final NonAuthUserRepository repo, final Queue<Packet> results, final Map<String,
+			Object> settings)
 					throws NotAuthorizedException {
 		if (loadOfflineMessages(packet, conn)) {
 			try {
 				MsgRepositoryIfc msg_repo = getMsgRepoImpl(repo, conn);
-				Queue<Packet> packets     = restorePacketForOffLineUser(conn, msg_repo);
+				Queue<Packet>    packets  = restorePacketForOffLineUser(conn, msg_repo);
 
 				if (packets != null) {
 					if (log.isLoggable(Level.FINER)) {
@@ -200,13 +200,13 @@ public class OfflineMessages
 	 * @throws NotAuthorizedException
 	 */
 	public Queue<Packet> restorePacketForOffLineUser(XMPPResourceConnection conn,
-					MsgRepositoryIfc repo)
+			MsgRepositoryIfc repo)
 					throws UserNotFoundException, NotAuthorizedException {
 		Queue<Element> elems = repo.loadMessagesToJID(conn.getJID(), true);
 
 		if (elems != null) {
 			LinkedList<Packet> pacs = new LinkedList<Packet>();
-			Element elem            = null;
+			Element            elem = null;
 
 			while ((elem = elems.poll()) != null) {
 				try {
@@ -246,27 +246,27 @@ public class OfflineMessages
 					throws UserNotFoundException {
 		StanzaType type = pac.getType();
 
-		if ((pac.getElemName().equals("message") &&
-				 (pac.getElemCDataStaticStr(tigase.server.Message.MESSAGE_BODY_PATH) != null) &&
-				 ((type == null) || (type == StanzaType.normal) ||
-					(type == StanzaType.chat))) || (pac.getElemName().equals("presence") &&
-						((type == StanzaType.subscribe) || (type == StanzaType.subscribed) ||
-						 (type == StanzaType.unsubscribe) || (type == StanzaType.unsubscribed)))) {
+		if ((pac.getElemName().equals("message") && (pac.getElemCDataStaticStr(tigase.server
+				.Message.MESSAGE_BODY_PATH) != null) && ((type == null) || (type == StanzaType
+				.normal) || (type == StanzaType.chat))) || (pac.getElemName().equals(
+				"presence") && ((type == StanzaType.subscribe) || (type == StanzaType
+				.subscribed) || (type == StanzaType.unsubscribe) || (type == StanzaType
+				.unsubscribed)))) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Storing packet for offline user: {0}", pac);
 			}
 
-			Element elem = pac.getElement().clone();
-			String stamp = null;
+			Element elem  = pac.getElement().clone();
+			String  stamp = null;
 
 			synchronized (formatter) {
 				stamp = formatter.format(new Date());
 			}
 
-			String from = pac.getStanzaTo().getDomain();
-			Element x   = new Element("delay", "Offline Storage - " + defHost,
-																new String[] { "from",
-							"stamp", "xmlns" }, new String[] { from, stamp, "urn:xmpp:delay" });
+			String  from = pac.getStanzaTo().getDomain();
+			Element x = new Element("delay", "Offline Storage - " + defHost, new String[] {
+					"from",
+					"stamp", "xmlns" }, new String[] { from, stamp, "urn:xmpp:delay" });
 
 			elem.addChild(x);
 			repo.storeMessage(pac.getStanzaFrom(), pac.getStanzaTo(), null, elem);
@@ -276,7 +276,7 @@ public class OfflineMessages
 		} else {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Packet for offline user not suitable for storing: {0}",
-								pac);
+						pac);
 			}
 		}
 
@@ -303,7 +303,7 @@ public class OfflineMessages
 	 * @return a <code>String[]</code> value
 	 */
 	@Override
-	public String[] supElements() {
+	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
@@ -319,8 +319,6 @@ public class OfflineMessages
 
 	//~--- get methods ----------------------------------------------------------
 
-	// ~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -331,13 +329,12 @@ public class OfflineMessages
 	 * @return
 	 */
 	protected MsgRepositoryIfc getMsgRepoImpl(NonAuthUserRepository repo,
-					XMPPResourceConnection conn) {
+			XMPPResourceConnection conn) {
 		return new MsgRepositoryImpl(repo, conn);
 	}
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
 	// Implementation of tigase.xmpp.XMPPProcessorIfc
 
 	/**
@@ -368,8 +365,8 @@ public class OfflineMessages
 
 			// Should we send off-line messages now?
 			// Let's try to do it here and maybe later I find better place.
-			String priority_str =
-				packet.getElemCDataStaticStr(tigase.server.Presence.PRESENCE_PRIORITY_PATH);
+			String priority_str = packet.getElemCDataStaticStr(tigase.server.Presence
+					.PRESENCE_PRIORITY_PATH);
 			int priority = 0;
 
 			if (priority_str != null) {
@@ -391,24 +388,20 @@ public class OfflineMessages
 
 	//~--- inner classes --------------------------------------------------------
 
-	// ~--- inner classes --------------------------------------------------------
 	private class MsgRepositoryImpl
 					implements MsgRepositoryIfc {
-		private XMPPResourceConnection conn = null;
-		private SimpleParser parser         = SingletonFactory.getParserInstance();
-		private NonAuthUserRepository repo  = null;
+		private XMPPResourceConnection conn   = null;
+		private SimpleParser           parser = SingletonFactory.getParserInstance();
+		private NonAuthUserRepository  repo   = null;
 
 		//~--- constructors -------------------------------------------------------
 
-		// ~--- constructors -------------------------------------------------------
 		private MsgRepositoryImpl(NonAuthUserRepository repo, XMPPResourceConnection conn) {
 			this.repo = repo;
 			this.conn = conn;
 		}
 
 		//~--- get methods --------------------------------------------------------
-
-		// ~--- get methods --------------------------------------------------------
 
 		/**
 		 * Method description
@@ -426,8 +419,6 @@ public class OfflineMessages
 
 		//~--- methods ------------------------------------------------------------
 
-		// ~--- methods ------------------------------------------------------------
-
 		/**
 		 * Method description
 		 *
@@ -441,16 +432,16 @@ public class OfflineMessages
 		 */
 		@Override
 		public Queue<Element> loadMessagesToJID(JID to, boolean delete)
-						throws UserNotFoundException {
+				throws UserNotFoundException {
 			try {
 				DomBuilderHandler domHandler = new DomBuilderHandler();
-				String[] msgs                = conn.getOfflineDataList(ID, "messages");
+				String[]          msgs       = conn.getOfflineDataList(ID, "messages");
 
 				if ((msgs != null) && (msgs.length > 0)) {
 					conn.removeOfflineData(ID, "messages");
 
 					LinkedList<Packet> pacs = new LinkedList<Packet>();
-					StringBuilder sb        = new StringBuilder();
+					StringBuilder      sb   = new StringBuilder();
 
 					for (String msg : msgs) {
 						sb.append(msg);
@@ -464,9 +455,9 @@ public class OfflineMessages
 				}    // end of while (elem = elems.poll() != null)
 			} catch (NotAuthorizedException ex) {
 				log.info("User not authrized to retrieve offline messages, " +
-								 "this happens quite often on some installations where there" +
-								 " are a very short living client connections. They can " +
-								 "disconnect at any time. " + ex);
+						"this happens quite often on some installations where there" +
+						" are a very short living client connections. They can " +
+						"disconnect at any time. " + ex);
 			} catch (TigaseDBException ex) {
 				log.warning("Error accessing database for offline message: " + ex);
 			}
@@ -487,9 +478,9 @@ public class OfflineMessages
 		 */
 		@Override
 		public void storeMessage(JID from, JID to, Date expired, Element msg)
-						throws UserNotFoundException {
-			repo.addOfflineDataList(to.getBareJID(), ID, "messages",
-															new String[] { msg.toString() });
+				throws UserNotFoundException {
+			repo.addOfflineDataList(to.getBareJID(), ID, "messages", new String[] { msg
+					.toString() });
 		}
 	}
 
@@ -536,10 +527,4 @@ public class OfflineMessages
 }    // OfflineMessages
 
 
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/03/12

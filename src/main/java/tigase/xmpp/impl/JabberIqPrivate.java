@@ -2,7 +2,7 @@
  * JabberIqPrivate.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -65,21 +65,22 @@ import java.util.Queue;
 public class JabberIqPrivate
 				extends XMPPProcessor
 				implements XMPPProcessorIfc {
-	private static final String[] ELEMENTS = { "query" };
+	private static final String[][] ELEMENTS = {
+		Iq.IQ_QUERY_PATH
+	};
 
 	/**
 	 * Private logger for class instancess.
 	 */
-	private static Logger log                     =
-		Logger.getLogger("tigase.xmpp.impl.JabberIqPrivate");
-	private static final String XMLNS             = "jabber:iq:private";
-	private static final String PRIVATE_KEY       = XMLNS;
-	private static final String ID                = XMLNS;
-	private static final String[] XMLNSS          = { XMLNS };
+	private static Logger             log = Logger.getLogger(JabberIqPrivate.class
+			.getName());
+	private static final String       XMLNS       = "jabber:iq:private";
+	private static final String       PRIVATE_KEY = XMLNS;
+	private static final String       ID          = XMLNS;
+	private static final String[]     XMLNSS      = { XMLNS };
 	private static final SimpleParser parser      = SingletonFactory.getParserInstance();
-	private static final Element[] DISCO_FEATURES = { new Element("feature",
-																										new String[] { "var" },
-																										new String[] { XMLNS }) };
+	private static final Element[]    DISCO_FEATURES = { new Element("feature",
+			new String[] { "var" }, new String[] { XMLNS }) };
 
 	//~--- methods --------------------------------------------------------------
 
@@ -91,6 +92,7 @@ public class JabberIqPrivate
 	 *
 	 * @return
 	 */
+	@Override
 	public String id() {
 		return ID;
 	}
@@ -109,8 +111,7 @@ public class JabberIqPrivate
 	 */
 	@Override
 	public void process(Packet packet, XMPPResourceConnection session,
-											NonAuthUserRepository repo, Queue<Packet> results,
-											Map<String, Object> settings)
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 					throws XMPPException {
 
 		// Don't do anything if session is null
@@ -120,10 +121,10 @@ public class JabberIqPrivate
 			return;
 		}    // end of if (session == null)
 		try {
-			if ((packet.getStanzaTo() != null) &&
-					!session.isUserId(packet.getStanzaTo().getBareJID())) {
+			if ((packet.getStanzaTo() != null) &&!session.isUserId(packet.getStanzaTo()
+					.getBareJID())) {
 				results.offer(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet,
-								"You are not authorized to access this private storage.", true));
+						"You are not authorized to access this private storage.", true));
 
 				return;
 			}
@@ -131,13 +132,13 @@ public class JabberIqPrivate
 				List<Element> elems = packet.getElemChildrenStaticStr(Iq.IQ_QUERY_PATH);
 
 				if ((elems != null) && (elems.size() > 0)) {
-					Element elem    = elems.get(0);
+					Element    elem = elems.get(0);
 					StanzaType type = packet.getType();
 
 					switch (type) {
 					case get :
 						String priv = session.getData(PRIVATE_KEY, elem.getName() + elem.getXMLNS(),
-																					null);
+								null);
 
 						if (log.isLoggable(Level.FINEST)) {
 							log.finest("Loaded private data for key: " + elem.getName() + ": " + priv);
@@ -155,8 +156,8 @@ public class JabberIqPrivate
 						if (log.isLoggable(Level.FINEST)) {
 							log.finest("Saving private data: " + elem.toString());
 						}
-						session.setData(PRIVATE_KEY, elem.getName() + elem.getXMLNS(),
-														elem.toString());
+						session.setData(PRIVATE_KEY, elem.getName() + elem.getXMLNS(), elem
+								.toString());
 						results.offer(packet.okResult((String) null, 0));
 
 						break;
@@ -168,27 +169,27 @@ public class JabberIqPrivate
 
 					default :
 						results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-										"Request type is incorrect", false));
+								"Request type is incorrect", false));
 
 						break;
 					}    // end of switch (type)
 				} else {
 					results.offer(Authorization.NOT_ACCEPTABLE.getResponseMessage(packet,
-									"Missing query child element", true));
+							"Missing query child element", true));
 				}
 			} else {
 				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-								"You are not authorized to access this private storage.", true));
+						"You are not authorized to access this private storage.", true));
 			}    // end of else
 		} catch (NotAuthorizedException e) {
 			log.warning("Received privacy request but user session is not authorized yet: " +
-									packet.toString());
+					packet.toString());
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-							"You must authorize session first.", true));
+					"You must authorize session first.", true));
 		} catch (TigaseDBException e) {
 			log.warning("Database proble, please contact admin: " + e);
 			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
-							"Database access problem, please contact administrator.", true));
+					"Database access problem, please contact administrator.", true));
 		}    // end of try-catch
 	}
 
@@ -200,6 +201,7 @@ public class JabberIqPrivate
 	 *
 	 * @return
 	 */
+	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
 		return DISCO_FEATURES;
 	}
@@ -210,7 +212,8 @@ public class JabberIqPrivate
 	 *
 	 * @return
 	 */
-	public String[] supElements() {
+	@Override
+	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
@@ -220,6 +223,7 @@ public class JabberIqPrivate
 	 *
 	 * @return
 	 */
+	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
 	}
@@ -229,9 +233,9 @@ public class JabberIqPrivate
 
 		parser.parse(domHandler, data.toCharArray(), 0, data.length());
 
-		Queue<Element> elems = domHandler.getParsedElements();
-		Packet result        = packet.okResult((Element) null, 1);
-		Element query        = result.getElement().findChildStaticStr(Iq.IQ_QUERY_PATH);
+		Queue<Element> elems  = domHandler.getParsedElements();
+		Packet         result = packet.okResult((Element) null, 1);
+		Element        query  = result.getElement().findChildStaticStr(Iq.IQ_QUERY_PATH);
 
 		for (Element el : elems) {
 			query.addChild(el);
@@ -242,4 +246,4 @@ public class JabberIqPrivate
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/19
+//~ Formatted in Tigase Code Convention on 13/03/12

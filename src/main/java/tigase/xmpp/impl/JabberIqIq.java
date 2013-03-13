@@ -2,11 +2,12 @@
  * JabberIqIq.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -29,6 +30,7 @@ import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
 
+import tigase.server.Iq;
 import tigase.server.Packet;
 
 import tigase.util.Base64;
@@ -63,8 +65,10 @@ import java.util.Queue;
 public class JabberIqIq
 				extends XMPPProcessor
 				implements XMPPProcessorIfc, XMPPPreprocessorIfc {
-	private static final String[] ELEMENTS = { "query" };
-	private static final String LEVEL      = "level";
+	private static final String[][] ELEMENTS = {
+		Iq.IQ_QUERY_PATH
+	};
+	private static final String     LEVEL    = "level";
 
 	/**
 	 * Private logger for class instances.
@@ -79,12 +83,11 @@ public class JabberIqIq
 		"ZnVjaw==", "c2hpdA==", "d2hvcmU=", "ZGljaw==", "YXNz", "YW51cw==", "YXJzZQ==",
 		"dmFnaW5h", "cG9ybg==", "cGVuaXM=", "cGlzcw==", "c3V4"
 	};
-	private static final String XMLNS             = "jabber:iq:iq";
-	private static final String ID                = XMLNS;
-	private static final String[] XMLNSS          = { XMLNS };
-	private static final Element[] DISCO_FEATURES = { new Element("feature",
-																										new String[] { "var" },
-																										new String[] { XMLNS }) };
+	private static final String    XMLNS  = "jabber:iq:iq";
+	private static final String    ID     = XMLNS;
+	private static final String[]  XMLNSS = { XMLNS };
+	private static final Element[] DISCO_FEATURES = { new Element("feature", new String[] {
+			"var" }, new String[] { XMLNS }) };
 
 	//~--- methods --------------------------------------------------------------
 
@@ -171,15 +174,13 @@ public class JabberIqIq
 	 */
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
-														NonAuthUserRepository repo, Queue<Packet> results,
-														Map<String, Object> settings) {
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
 		try {
-			if ((session != null) && (packet.getFrom() != null) &&
-					packet.getFrom().equals(session.getConnectionId()) &&
-					(packet.getElemName() == tigase.server.Message.ELEM_NAME)) {
-				evaluateMessage(
-						session,
-						packet.getElemCDataStaticStr(tigase.server.Message.MESSAGE_BODY_PATH));
+			if ((session != null) && (packet.getFrom() != null) && packet.getFrom().equals(
+					session.getConnectionId()) && (packet.getElemName() == tigase.server.Message
+					.ELEM_NAME)) {
+				evaluateMessage(session, packet.getElemCDataStaticStr(tigase.server.Message
+						.MESSAGE_BODY_PATH));
 			}
 		} catch (Exception e) {
 
@@ -203,14 +204,14 @@ public class JabberIqIq
 	 */
 	@Override
 	public void process(Packet packet, XMPPResourceConnection session,
-											NonAuthUserRepository repo, Queue<Packet> results,
-											final Map<String, Object> settings)
+			NonAuthUserRepository repo, Queue<Packet> results, final Map<String,
+			Object> settings)
 					throws XMPPException {
-		if ((session == null) && (packet.getType() != null) &&
-				(packet.getType() == StanzaType.get)) {
+		if ((session == null) && (packet.getType() != null) && (packet.getType() == StanzaType
+				.get)) {
 			try {
 				String iq_level = repo.getPublicData(packet.getStanzaTo().getBareJID(), ID,
-														LEVEL, null);
+						LEVEL, null);
 
 				results.offer(getResponsePacket(packet, iq_level));
 			} catch (UserNotFoundException e) {
@@ -252,11 +253,11 @@ public class JabberIqIq
 						String curr_iq = changeIq(session, -2);
 
 						results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
-										"You are not allowed to set own IQ, your current IQ score: " +
-										curr_iq, true));
+								"You are not allowed to set own IQ, your current IQ score: " + curr_iq,
+								true));
 					} else {
 						results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-										"You are not authorized to set vcard data.", true));
+								"You are not authorized to set vcard data.", true));
 					}    // end of else
 
 					break;
@@ -272,7 +273,7 @@ public class JabberIqIq
 
 				default :
 					results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-									"Request type is incorrect", false));
+							"Request type is incorrect", false));
 
 					break;
 				}    // end of switch (type)
@@ -283,13 +284,13 @@ public class JabberIqIq
 			}      // end of else
 		} catch (NotAuthorizedException e) {
 			log.warning("Received privacy request but user session is not authorized yet: " +
-									packet.toString());
+					packet.toString());
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-							"You must authorize session first.", true));
+					"You must authorize session first.", true));
 		} catch (TigaseDBException e) {
 			log.warning("Database proble, please contact admin: " + e);
 			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
-							"Database access problem, please contact administrator.", true));
+					"Database access problem, please contact administrator.", true));
 		}
 	}
 
@@ -313,7 +314,7 @@ public class JabberIqIq
 	 * @return
 	 */
 	@Override
-	public String[] supElements() {
+	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
@@ -348,8 +349,8 @@ public class JabberIqIq
 		}
 
 		// User wrote a message, good + 0.01
-		double val  = 0.01;
-		int msg_len = msg.trim().length();
+		double val     = 0.01;
+		int    msg_len = msg.trim().length();
 
 		if ((msg_len > 10) && (msg_len < 100)) {
 			val += 0.01;
@@ -401,12 +402,12 @@ public class JabberIqIq
 		}
 
 		Element query = new Element("query", new Element[] { new Element("num", iq_level),
-						new Element("desc", calculateIQ(iq_level)) }, new String[] { "xmlns" },
-							new String[] { XMLNS });
+				new Element("desc", calculateIQ(iq_level)) }, new String[] { "xmlns" },
+						new String[] { XMLNS });
 
 		return packet.okResult(query, 0);
 	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/16
+//~ Formatted in Tigase Code Convention on 13/03/12

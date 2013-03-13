@@ -2,7 +2,7 @@
  * JabberIqStats.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,8 +28,8 @@ package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
 
-import tigase.server.BasicComponent;
 import tigase.server.Command;
+import tigase.server.Iq;
 import tigase.server.Packet;
 
 import tigase.util.ElementUtils;
@@ -64,15 +64,15 @@ import java.util.Queue;
 public class JabberIqStats
 				extends XMPPProcessor
 				implements XMPPProcessorIfc {
-	private static final String[] ELEMENTS        = { "query", "command" };
-	private static final Logger log               =
-		Logger.getLogger("tigase.xmpp.impl.JabberIqStats");
-	private static final String XMLNS             = "http://jabber.org/protocol/stats";
-	private static final String ID                = XMLNS;
-	private static final String[] XMLNSS          = { XMLNS, Command.XMLNS };
-	private static final Element[] DISCO_FEATURES = { new Element("feature",
-																										new String[] { "var" },
-																										new String[] { XMLNS }) };
+	private static final String[][] ELEMENTS = {
+		Iq.IQ_QUERY_PATH, Iq.IQ_COMMAND_PATH
+	};
+	private static final Logger     log = Logger.getLogger(JabberIqStats.class.getName());
+	private static final String     XMLNS    = "http://jabber.org/protocol/stats";
+	private static final String     ID       = XMLNS;
+	private static final String[]   XMLNSS   = { XMLNS, Command.XMLNS };
+	private static final Element[]  DISCO_FEATURES = { new Element("feature",
+			new String[] { "var" }, new String[] { XMLNS }) };
 
 	//~--- methods --------------------------------------------------------------
 
@@ -101,8 +101,8 @@ public class JabberIqStats
 	 */
 	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
-											final NonAuthUserRepository repo, final Queue<Packet> results,
-											final Map<String, Object> settings)
+			final NonAuthUserRepository repo, final Queue<Packet> results, final Map<String,
+			Object> settings)
 					throws XMPPException {
 		if (session == null) {
 			return;
@@ -112,20 +112,19 @@ public class JabberIqStats
 				log.log(Level.FINEST, "Received packet: {0}", packet);
 			}
 			if (packet.isCommand()) {
-				if ((packet.getCommand() == Command.GETSTATS) &&
-						(packet.getType() == StanzaType.result)) {
+				if ((packet.getCommand() == Command.GETSTATS) && (packet.getType() == StanzaType
+						.result)) {
 
 					// Send it back to user.
-					Element iq = ElementUtils.createIqQuery(session.getDomainAsJID(),
-												 session.getJID(), StanzaType.result, packet.getStanzaId(),
-												 XMLNS);
+					Element iq = ElementUtils.createIqQuery(session.getDomainAsJID(), session
+							.getJID(), StanzaType.result, packet.getStanzaId(), XMLNS);
 					Element query = iq.getChild("query");
 					Element stats = Command.getData(packet, "statistics", null);
 
 					query.addChildren(stats.getChildren());
 
-					Packet result = Packet.packetInstance(iq, session.getSMComponentId(),
-														session.getJID());
+					Packet result = Packet.packetInstance(iq, session.getSMComponentId(), session
+							.getJID());
 
 					result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
 					results.offer(result);
@@ -141,15 +140,15 @@ public class JabberIqStats
 
 			// Maybe it is message to admininstrator:
 			BareJID id = (packet.getStanzaTo() != null)
-									 ? packet.getStanzaTo().getBareJID()
-									 : null;
+					? packet.getStanzaTo().getBareJID()
+					: null;
 
 			// If ID part of user account contains only host name
 			// and this is local domain it is message to admin
 			if ((id == null) || session.isLocalDomain(id.toString(), false)) {
-				String oldto  = packet.getAttributeStaticStr("oldto");
-				Packet result = Command.GETSTATS.getPacket(packet.getStanzaFrom(),
-													session.getDomainAsJID(), StanzaType.get, packet.getStanzaId());
+				String oldto = packet.getAttributeStaticStr("oldto");
+				Packet result = Command.GETSTATS.getPacket(packet.getStanzaFrom(), session
+						.getDomainAsJID(), StanzaType.get, packet.getStanzaId());
 
 				if (oldto != null) {
 					result.getElement().setAttribute("oldto", oldto);
@@ -191,9 +190,9 @@ public class JabberIqStats
 			}    // end of else
 		} catch (NotAuthorizedException e) {
 			log.warning("Received stats request but user session is not authorized yet: " +
-									packet);
+					packet);
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-							"You must authorize session first.", true));
+					"You must authorize session first.", true));
 		}    // end of try-catch
 	}
 
@@ -217,7 +216,7 @@ public class JabberIqStats
 	 * @return
 	 */
 	@Override
-	public String[] supElements() {
+	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
@@ -234,4 +233,4 @@ public class JabberIqStats
 }    // JabberIqStats
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/03/12

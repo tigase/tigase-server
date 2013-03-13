@@ -20,7 +20,7 @@
  * $Date: 2010-10-27 20:27:58 -0600 (Wed, 27 Oct 2010) $
  * 
  */
-package tigase.xmpp.impl;
+package tigase.xmpp.impl.roster;
 
 import java.util.ArrayList;
 import java.util.List;

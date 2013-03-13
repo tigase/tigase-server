@@ -2,7 +2,7 @@
  * MessageAmp.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -66,35 +66,32 @@ import java.util.Queue;
 public class MessageAmp
 				extends XMPPProcessor
 				implements XMPPPostprocessorIfc, XMPPProcessorIfc {
-	private static final String AMP_JID_PROP_KEY     = "amp-jid";
-	private static final String[] ELEMENTS           = { "message", "presence" };
-	private static final String FROM_CONN_ID         = "from-conn-id";
-	private static final String ID                   = "amp";
-	private static Logger log                        =
-		Logger.getLogger(MessageAmp.class.getName());
-	private static final String MSG_OFFLINE_PROP_KEY = "msg-offline";
-	private static final String OFFLINE              = "offline";
-	private static final String TO_CONN_ID           = "to-conn-id";
-	private static final String TO_RES               = "to-res";
-	private static final String XMLNS                = "http://jabber.org/protocol/amp";
-	private static final String[] XMLNSS             = { "jabber:client", "jabber:client" };
-	private static Element[] DISCO_FEATURES          = { new Element("feature",
-																											 new String[] { "var" },
-																											 new String[] { XMLNS }),
-					new Element("feature", new String[] { "var" }, new String[] { "msgoffline" }) };
+	private static final String     AMP_JID_PROP_KEY     = "amp-jid";
+	private static final String[][] ELEMENTS             = {
+		{ "message" }, { "presence" }
+	};
+	private static final String     FROM_CONN_ID         = "from-conn-id";
+	private static final String     ID                   = "amp";
+	private static final Logger     log = Logger.getLogger(MessageAmp.class.getName());
+	private static final String     MSG_OFFLINE_PROP_KEY = "msg-offline";
+	private static final String     OFFLINE              = "offline";
+	private static final String     TO_CONN_ID           = "to-conn-id";
+	private static final String     TO_RES               = "to-res";
+	private static final String     XMLNS                = "http://jabber.org/protocol/amp";
+	private static final String[]   XMLNSS = { "jabber:client", "jabber:client" };
+	private static Element[]        DISCO_FEATURES = { new Element("feature",
+			new String[] { "var" }, new String[] { XMLNS }),
+			new Element("feature", new String[] { "var" }, new String[] { "msgoffline" }) };
 	private static final String defHost = DNSResolver.getDefaultHostname();
 
 	//~--- fields ---------------------------------------------------------------
 
-	// ~--- fields ---------------------------------------------------------------
-	private JID ampJID                       = null;
-	private MsgRepository msg_repo           = null;
+	private JID             ampJID           = null;
+	private MsgRepository   msg_repo         = null;
 	private OfflineMessages offlineProcessor = new OfflineMessages();
-	private Message messageProcessor         = new Message();
+	private Message         messageProcessor = new Message();
 
 	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -126,9 +123,9 @@ public class MessageAmp
 		} else {
 			ampJID = JID.jidInstanceNS("amp@" + defHost);
 		}
-		log.log(Level.CONFIG, "Loaded AMP_JID option: {0} = {1}",
-						new Object[] { AMP_JID_PROP_KEY,
-													 ampJID });
+		log.log(Level.CONFIG, "Loaded AMP_JID option: {0} = {1}", new Object[] {
+				AMP_JID_PROP_KEY,
+				ampJID });
 
 		String off_val = (String) settings.get(MSG_OFFLINE_PROP_KEY);
 
@@ -138,8 +135,8 @@ public class MessageAmp
 		if ((off_val != null) &&!Boolean.parseBoolean(off_val)) {
 			log.log(Level.CONFIG, "Offline messages storage: {0}", new Object[] { off_val });
 			offlineProcessor = null;
-			DISCO_FEATURES   = new Element[] {
-				new Element("feature", new String[] { "var" }, new String[] { XMLNS }) };
+			DISCO_FEATURES = new Element[] { new Element("feature", new String[] { "var" },
+					new String[] { XMLNS }) };
 		}
 
 		String msg_repo_uri = (String) settings.get(AmpFeatureIfc.AMP_MSG_REPO_URI_PROP_KEY);
@@ -182,13 +179,12 @@ public class MessageAmp
 	 */
 	@Override
 	public void postProcess(Packet packet, XMPPResourceConnection session,
-													NonAuthUserRepository repo, Queue<Packet> results,
-													Map<String, Object> settings) {
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
 		if ((offlineProcessor != null) && (session == null)) {
 			Element amp = packet.getElement().getChild("amp");
 
-			if ((amp == null) || (amp.getXMLNS() != XMLNS) ||
-					(amp.getAttributeStaticStr("status") != null)) {
+			if ((amp == null) || (amp.getXMLNS() != XMLNS) || (amp.getAttributeStaticStr(
+					"status") != null)) {
 				try {
 					offlineProcessor.savePacketForOffLineUser(packet, msg_repo);
 				} catch (UserNotFoundException ex) {
@@ -216,15 +212,14 @@ public class MessageAmp
 	 */
 	@Override
 	public void process(Packet packet, XMPPResourceConnection session,
-											NonAuthUserRepository repo, Queue<Packet> results,
-											Map<String, Object> settings)
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 					throws XMPPException {
 		if (packet.getElemName() == "presence") {
-			if ((offlineProcessor != null) &&
-					offlineProcessor.loadOfflineMessages(packet, session)) {
+			if ((offlineProcessor != null) && offlineProcessor.loadOfflineMessages(packet,
+					session)) {
 				try {
 					Queue<Packet> packets = offlineProcessor.restorePacketForOffLineUser(session,
-																		msg_repo);
+							msg_repo);
 
 					if (packets != null) {
 						if (log.isLoggable(Level.FINER)) {
@@ -252,8 +247,8 @@ public class MessageAmp
 					return;
 				}
 				if (session.isUserId(packet.getStanzaTo().getBareJID())) {
-					result.getElement().addAttribute(TO_CONN_ID,
-																					 session.getConnectionId().toString());
+					result.getElement().addAttribute(TO_CONN_ID, session.getConnectionId()
+							.toString());
 					result.getElement().addAttribute(TO_RES, session.getResource());
 				} else {
 					JID connectionId = session.getConnectionId();
@@ -286,7 +281,7 @@ public class MessageAmp
 	 * @return
 	 */
 	@Override
-	public String[] supElements() {
+	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
@@ -303,10 +298,4 @@ public class MessageAmp
 }
 
 
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/03/12

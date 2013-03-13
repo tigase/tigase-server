@@ -63,15 +63,15 @@ public class DomainFilter
 	public static final String ALLOWED_DOMAINS_KEY = "allowed-domains";
 
 	/** Field description */
-	public static final String ALLOWED_DOMAINS_LIST_KEY = "allowed-domains-list";
-	private static final String ID                      = "domain-filter";
+	public static final String  ALLOWED_DOMAINS_LIST_KEY = "allowed-domains-list";
+	private static final String ID                       = "domain-filter";
 
 	/**
 	 * Private logger for class instances.
 	 */
-	private static final Logger log        = Logger.getLogger(DomainFilter.class.getName());
-	private static final String[] ELEMENTS = { ALL };
-	private static final String[] XMLNSS   = { ALL };
+	private static final Logger     log = Logger.getLogger(DomainFilter.class.getName());
+	private static final String[][] ELEMENTS = ALL_PATHS;
+	private static final String[]   XMLNSS   = { ALL_NAMES };
 
 	//~--- enums ----------------------------------------------------------------
 
@@ -115,7 +115,7 @@ public class DomainFilter
 	 */
 	@Override
 	public void filter(Packet packet, XMPPResourceConnection session,
-										 NonAuthUserRepository repo, Queue<Packet> results) {
+			NonAuthUserRepository repo, Queue<Packet> results) {
 		if ((session == null) || (results == null) || (results.size() == 0)) {
 			return;
 		}
@@ -133,11 +133,10 @@ public class DomainFilter
 				Packet res = it.next();
 
 				if (domains == DOMAINS.BLOCK) {
-					if ((res.getType() != StanzaType.error) &&
-							((((res.getStanzaFrom() != null) &&
-								 !session.isUserId(
-									 res.getStanzaFrom().getBareJID())) || ((res.getStanzaTo() != null) &&
-										 !session.isUserId(res.getStanzaTo().getBareJID()))))) {
+					if ((res.getType() != StanzaType.error) && ((((res.getStanzaFrom() != null) &&
+							!session.isUserId(res.getStanzaFrom().getBareJID())) || ((res
+							.getStanzaTo() != null) &&!session.isUserId(res.getStanzaTo()
+							.getBareJID()))))) {
 						removePacket(it, res, errors, "Communication blocked.");
 					}
 
@@ -153,23 +152,23 @@ public class DomainFilter
 				case LOCAL :
 					if ((outDomain != null) &&!session.isLocalDomain(outDomain, true)) {
 						removePacket(it, res, errors,
-												 "You can only communicate within the server local domains.");
+								"You can only communicate within the server local domains.");
 					}
 
 					break;
 
 				case OWN :
-					if ((outDomain != null) &&
-							!outDomain.equals(session.getDomain().getVhost().getDomain())) {
+					if ((outDomain != null) &&!outDomain.equals(session.getDomain().getVhost()
+							.getDomain())) {
 						removePacket(it, res, errors,
-												 "You can only communicate within your own domain.");
+								"You can only communicate within your own domain.");
 					}
 
 					break;
 
 				case LIST :
 					String[] allowedDomains = getDomainsList(session);
-					boolean found           = false;
+					boolean  found          = false;
 
 					for (String domain : allowedDomains) {
 
@@ -183,7 +182,7 @@ public class DomainFilter
 					}
 					if (!found) {
 						removePacket(it, res, errors,
-												 "You can only communicate within selected list of domains.");
+								"You can only communicate within selected list of domains.");
 					}
 
 					break;
@@ -225,8 +224,7 @@ public class DomainFilter
 	 */
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
-														NonAuthUserRepository repo, Queue<Packet> results,
-														Map<String, Object> settings) {
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Processing: {0}", packet);
 		}
@@ -249,28 +247,27 @@ public class DomainFilter
 			}
 
 			String outDomain = (packet.getStanzaFrom() != null)
-												 ? packet.getStanzaFrom().getDomain()
-												 : null;
+					? packet.getStanzaFrom().getDomain()
+					: null;
 
 			try {
 				if (session.getConnectionId().equals(packet.getPacketFrom())) {
 					outDomain = (packet.getStanzaTo() != null)
-											? packet.getStanzaTo().getDomain()
-											: null;
+							? packet.getStanzaTo().getDomain()
+							: null;
 				}
 			} catch (NoConnectionIdException ex) {
 				log.log(Level.WARNING,
-								"No connection id for session, even though this is not a server " +
-								"session: {0}, request: {1}", new Object[] { session,
-								packet });
+						"No connection id for session, even though this is not a server " +
+						"session: {0}, request: {1}", new Object[] { session,
+						packet });
 			}
 			switch (domains) {
 			case BLOCK :
-				if ((packet.getType() == StanzaType.error) ||
-						((packet.getStanzaFrom() == null) ||
-						 (session.isUserId(packet.getStanzaFrom().getBareJID()) &&
-							((packet.getStanzaTo() == null) ||
-							 session.isUserId(packet.getStanzaTo().getBareJID()))))) {
+				if ((packet.getType() == StanzaType.error) || ((packet.getStanzaFrom() ==
+						null) || (session.isUserId(packet.getStanzaFrom().getBareJID()) && ((packet
+						.getStanzaTo() == null) || session.isUserId(packet.getStanzaTo()
+						.getBareJID()))))) {
 					return stop;
 				} else {
 					removePacket(null, packet, results, "Communication blocked.");
@@ -285,7 +282,7 @@ public class DomainFilter
 			case LOCAL :
 				if ((outDomain != null) &&!session.isLocalDomain(outDomain, true)) {
 					removePacket(null, packet, results,
-											 "You can only communicate within the server local domains.");
+							"You can only communicate within the server local domains.");
 					stop = true;
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "LOCAL Domains only, blocking packet: {0}", packet);
@@ -299,10 +296,10 @@ public class DomainFilter
 				break;
 
 			case OWN :
-				if ((outDomain != null) &&
-						!outDomain.equals(session.getDomain().getVhost().getDomain())) {
+				if ((outDomain != null) &&!outDomain.equals(session.getDomain().getVhost()
+						.getDomain())) {
 					removePacket(null, packet, results,
-											 "You can only communicate within your own domain.");
+							"You can only communicate within your own domain.");
 					stop = true;
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "OWN Domain only, blocking packet: {0}", packet);
@@ -317,7 +314,7 @@ public class DomainFilter
 
 			case LIST :
 				String[] allowedDomains = getDomainsList(session);
-				boolean found           = false;
+				boolean  found          = false;
 
 				for (String domain : allowedDomains) {
 					if (domain == outDomain) {
@@ -328,7 +325,7 @@ public class DomainFilter
 				}
 				if (!found) {
 					removePacket(null, packet, results,
-											 "You can only communicate within selected list of domains.");
+							"You can only communicate within selected list of domains.");
 					stop = true;
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "LISTED Domains only, blocking packet: {0}", packet);
@@ -355,12 +352,13 @@ public class DomainFilter
 	}
 
 	/**
-	 * Describe <code>supElements</code> method here.
+	 * Method description
 	 *
-	 * @return a <code>String[]</code> value
+	 *
+	 * @return
 	 */
 	@Override
-	public String[] supElements() {
+	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
@@ -427,8 +425,8 @@ public class DomainFilter
 	 */
 	public String[] getDomainsList(XMPPResourceConnection session)
 					throws NotAuthorizedException, TigaseDBException {
-		String[] allowedDomains =
-			(String[]) session.getCommonSessionData(ALLOWED_DOMAINS_LIST_KEY);
+		String[] allowedDomains = (String[]) session.getCommonSessionData(
+				ALLOWED_DOMAINS_LIST_KEY);
 
 		if (allowedDomains == null) {
 			String dbDomains = session.getData(null, ALLOWED_DOMAINS_KEY, null);
@@ -446,7 +444,7 @@ public class DomainFilter
 	//~--- methods --------------------------------------------------------------
 
 	private void removePacket(Iterator<Packet> it, Packet res, Queue<Packet> errors,
-														String msg) {
+			String msg) {
 		if (it != null) {
 			it.remove();
 		}
@@ -459,4 +457,4 @@ public class DomainFilter
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/21
+//~ Formatted in Tigase Code Convention on 13/03/11

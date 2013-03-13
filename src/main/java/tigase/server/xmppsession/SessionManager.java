@@ -377,6 +377,7 @@ public class SessionManager
 	 * @param list
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
 		if (list.checkLevel(Level.FINEST)) {
@@ -497,17 +498,19 @@ public class SessionManager
 	 */
 	@Override
 	public void handleResourceBind(XMPPResourceConnection conn) {
-		try {
-			Packet user_login_cmd = Command.USER_LOGIN.getPacket(getComponentId(), conn
-					.getConnectionId(), StanzaType.set, conn.nextStanzaId(), Command.DataType
-					.submit);
+		if (!conn.isServerSession() && (!"USER_STATUS".equals(conn.getSessionId()))) {
+			try {
+				Packet user_login_cmd = Command.USER_LOGIN.getPacket(getComponentId(), conn
+						.getConnectionId(), StanzaType.set, conn.nextStanzaId(), Command.DataType
+						.submit);
 
-			Command.addFieldValue(user_login_cmd, "user-jid", conn.getjid().toString());
-			addOutPacket(user_login_cmd);
-		} catch (NoConnectionIdException ex) {
+				Command.addFieldValue(user_login_cmd, "user-jid", conn.getjid().toString());
+				addOutPacket(user_login_cmd);
+			} catch (NoConnectionIdException ex) {
 
-			// This actually should not happen... might be a bug:
-			log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
+				// This actually should not happen... might be a bug:
+				log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
+			}
 		}
 	}
 
@@ -1273,7 +1276,9 @@ public class SessionManager
 		try {
 			XMPPResourceConnection conn = createUserSession(conn_id, domain);
 
+			System.out.println("conn.setSessionId(xmpp_sessionId): " + xmpp_sessionId);
 			conn.setSessionId(xmpp_sessionId);
+			System.out.println("conn.getSessionId(): " + conn.getSessionId());
 			user_repository.setData(user_id, "tokens", xmpp_sessionId, conn_id.toString());
 
 			Authorization auth = conn.loginToken(user_id, xmpp_sessionId, conn_id.toString());
@@ -1509,6 +1514,7 @@ public class SessionManager
 						if (connection == null) {
 							JID user_jid = JID.jidInstance(Command.getFieldValue(iqc, "jid"));
 
+							System.out.println("loginUserSession: " + "USER_STATUS");
 							connection = loginUserSession(iqc.getStanzaFrom(), user_jid.getDomain(),
 									user_jid.getBareJID(), user_jid.getResource(), "USER_STATUS");
 							connection.putSessionData("jingle", "active");
@@ -1862,7 +1868,8 @@ public class SessionManager
 			}
 			try {
 				session.addResourceConnection(conn);
-				if (!conn.isServerSession()) {
+				if (!conn.isServerSession() && (!"USER_STATUS".equals(conn.getSessionId()))) {
+					System.out.println("conn.getSessionId: " + conn.getSessionId());
 					try {
 						Packet user_login_cmd = Command.USER_LOGIN.getPacket(getComponentId(), conn
 								.getConnectionId(), StanzaType.set, conn.nextStanzaId(), Command.DataType
@@ -2525,4 +2532,4 @@ public class SessionManager
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/03/11
+//~ Formatted in Tigase Code Convention on 13/03/12
