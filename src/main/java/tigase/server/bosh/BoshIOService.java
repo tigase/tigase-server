@@ -301,6 +301,11 @@ public class BoshIOService extends XMPPIOService<Object> {
 
 				// responding with headers - needed for Chrome browser
 				this.writeRawData(prepareHeaders(null).toString());
+				
+				// connection needs to be closed as in other case data headers are not sent to browser
+				// until connection is closed and for OPTIONS request we are not sending any data
+				firstPassCORS = false;				
+				return true;
 			}
 			firstPassCORS = false;
 		}
@@ -314,6 +319,11 @@ public class BoshIOService extends XMPPIOService<Object> {
 				}
 				if (ok) {
 					this.writeRawData(prepareHeaders(client_access_policy).toString() + client_access_policy);
+					
+					// connection needs to be closed as in other case data headers are not sent to browser
+					// until connection is closed
+					firstPassClientAccessPolicy = false;				
+					return true;					
 				}
 			}
 			firstPassClientAccessPolicy = false;
