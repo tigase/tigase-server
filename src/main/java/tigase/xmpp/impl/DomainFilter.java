@@ -31,6 +31,8 @@ import tigase.db.TigaseDBException;
 
 import tigase.server.Packet;
 
+import tigase.vhosts.DomainFilterPolicy;
+
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NoConnectionIdException;
 import tigase.xmpp.NotAuthorizedException;
@@ -73,35 +75,6 @@ public class DomainFilter
 	private static final String[][] ELEMENTS = ALL_PATHS;
 	private static final String[]   XMLNSS   = { ALL_NAMES };
 
-	//~--- enums ----------------------------------------------------------------
-
-	/**
-	 * Enum description
-	 *
-	 */
-	public enum DOMAINS {
-		ALL, LOCAL, OWN, BLOCK, LIST;
-
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param domains
-		 *
-		 * @return
-		 */
-		public static DOMAINS valueof(String domains) {
-			if (domains == null) {
-				return null;
-			}
-			try {
-				return DOMAINS.valueOf(domains);
-			} catch (Exception e) {
-				return LIST;
-			}    // end of try-catch
-		}
-	}
-
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -120,10 +93,10 @@ public class DomainFilter
 			return;
 		}
 		try {
-			DOMAINS domains = getDomains(session);
+			DomainFilterPolicy domains = getDomains(session);
 
 			// Fast return when user is authorized to send packets to any domain
-			if (domains == DOMAINS.ALL) {
+			if (domains == DomainFilterPolicy.ALL) {
 				return;
 			}
 
@@ -132,7 +105,7 @@ public class DomainFilter
 			for (Iterator<Packet> it = results.iterator(); it.hasNext(); ) {
 				Packet res = it.next();
 
-				if (domains == DOMAINS.BLOCK) {
+				if (domains == DomainFilterPolicy.BLOCK) {
 					if ((res.getType() != StanzaType.error) && ((((res.getStanzaFrom() != null) &&
 							!session.isUserId(res.getStanzaFrom().getBareJID())) || ((res
 							.getStanzaTo() != null) &&!session.isUserId(res.getStanzaTo()
@@ -235,14 +208,14 @@ public class DomainFilter
 			return stop;
 		}
 		try {
-			DOMAINS domains = getDomains(session);
+			DomainFilterPolicy domains = getDomains(session);
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "DOMAINS setting is: {0}", domains.name());
 			}
 
 			// Fast return when user is authorized to send packets to any domain
-			if (domains == DOMAINS.ALL) {
+			if (domains == DomainFilterPolicy.ALL) {
 				return stop;
 			}
 
@@ -385,9 +358,10 @@ public class DomainFilter
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
-	public DOMAINS getDomains(XMPPResourceConnection session)
+	public DomainFilterPolicy getDomains(XMPPResourceConnection session)
 					throws NotAuthorizedException, TigaseDBException {
-		DOMAINS domains = (DOMAINS) session.getCommonSessionData(ALLOWED_DOMAINS_KEY);
+		DomainFilterPolicy domains = (DomainFilterPolicy) session.getCommonSessionData(
+				ALLOWED_DOMAINS_KEY);
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "domains read from user session: {0}", domains);
@@ -398,12 +372,12 @@ public class DomainFilter
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Domains read from database: {0}", dbDomains);
 			}
-			domains = DOMAINS.valueof(dbDomains);
+			domains = DomainFilterPolicy.valueof(dbDomains);
 			if (domains == null) {
 				if (session.isAnonymous()) {
-					domains = DOMAINS.LOCAL;
+					domains = DomainFilterPolicy.LOCAL;
 				} else {
-					domains = DOMAINS.ALL;
+					domains = session.getDomain().getDomainFilter();
 				}
 			}
 			session.putCommonSessionData(ALLOWED_DOMAINS_KEY, domains);
@@ -457,4 +431,4 @@ public class DomainFilter
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/11
+//~ Formatted in Tigase Code Convention on 13/03/16
