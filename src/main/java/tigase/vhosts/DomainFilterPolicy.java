@@ -1,5 +1,5 @@
 /*
- * ReceiverBareJidLB.java
+ * DomainFilterPolicy.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
@@ -22,44 +22,59 @@
 
 
 
-package tigase.server.ext.lb;
-
-//~--- non-JDK imports --------------------------------------------------------
-
-import tigase.server.ext.ComponentConnection;
-import tigase.server.ext.ComponentIOService;
-import tigase.server.Packet;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.List;
+/*
+* To change this template, choose Tools | Templates
+* and open the template in the editor.
+ */
+package tigase.vhosts;
 
 /**
- * @author Artur Hefczyc Created Jul 9, 2011
+ *
+ * @author kobit
  */
-public class ReceiverBareJidLB
-				implements LoadBalancerIfc {
+public enum DomainFilterPolicy {
+	ALL, LOCAL, OWN, BLOCK, LIST;
+
+	private static String[] valuesStr = null;
+
+	//~--- methods --------------------------------------------------------------
+
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param p
-	 * @param conns
+	 * @param domains
 	 *
 	 * @return
 	 */
-	@Override
-	public ComponentIOService selectConnection(Packet p, List<ComponentConnection> conns) {
-		ComponentIOService  result = null;
-		int                 idx = Math.abs(p.getStanzaTo().getBareJID().hashCode() % conns
-				.size());
-		ComponentConnection conn   = conns.get(idx);
+	public static DomainFilterPolicy valueof(String domains) {
+		if (domains == null) {
+			return null;
+		}
+		try {
+			return DomainFilterPolicy.valueOf(domains);
+		} catch (Exception e) {
+			return ALL;
+		}    // end of try-catch
+	}
 
-		if ((conn.getService() != null) && conn.getService().isConnected()) {
-			result = conn.getService();
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public static String[] valuesStr() {
+		if (valuesStr == null) {
+			DomainFilterPolicy[] vals = values();
+
+			valuesStr = new String[vals.length];
+			for (int i = 0; i < vals.length; i++) {
+				valuesStr[i] = vals[i].name();
+			}
 		}
 
-		return result;
+		return valuesStr;
 	}
 }
 

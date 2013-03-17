@@ -108,6 +108,12 @@ public class VHostItem
 	 */
 	public static final String COMPONENTS_ELEM = "comps";
 
+	/** Field description */
+	public static final String DOMAIN_FILTER_POLICY_ATT = "domain-filter";
+
+	/** Field description */
+	public static final String DOMAIN_FILTER_POLICY_LABEL = "Domain filter policy";
+
 	/**
 	 * This is an attribute name for storing information whether the VHost is
 	 * enabled or disabled.
@@ -166,6 +172,12 @@ public class VHostItem
 	public static final String REGISTER_ENABLED_LABEL = "In-band registration";
 
 	/** Field description */
+	public static final String S2S_SECRET_ATT = "s2s-secret";
+
+	/** Field description */
+	public static final String S2S_SECRET_LABEL = "S2S secret";
+
+	/** Field description */
 	public static final String TLS_REQUIRED_ATT = "tls-required";
 
 	/** Field description */
@@ -177,8 +189,17 @@ public class VHostItem
 	public static final String VHOST_ELEM = "vhost";
 
 	/** Field description */
+	protected static final String DOMAIN_FILTER_POLICY_PROP_KEY = "domain-filter-policy";
+
+	/** Field description */
+	protected static final String S2S_SECRET_PROP_DEF = null;
+
+	/** Field description */
+	protected static final String S2S_SECRET_PROP_KEY = "s2s-secret";
+
+	/** Field description */
 	protected static final String VHOST_ANONYMOUS_ENABLED_PROP_KEY =
-		"vhost-anonymous-enabled";
+			"vhost-anonymous-enabled";
 
 	/** Field description */
 	protected static final Boolean VHOST_ANONYMOUS_ENABLED_PROP_DEF = Boolean.TRUE;
@@ -194,18 +215,18 @@ public class VHostItem
 
 	/** Field description */
 	protected static final String VHOST_MESSAGE_FORWARD_PROP_KEY =
-		"vhost-message-forward-jid";
+			"vhost-message-forward-jid";
 
 	/** Field description */
 	protected static final String VHOST_PRESENCE_FORWARD_PROP_DEF = null;
 
 	/** Field description */
 	protected static final String VHOST_PRESENCE_FORWARD_PROP_KEY =
-		"vhost-presence-forward-jid";
+			"vhost-presence-forward-jid";
 
 	/** Field description */
 	protected static final String VHOST_REGISTER_ENABLED_PROP_KEY =
-		"vhost-register-enabled";
+			"vhost-register-enabled";
 
 	/** Field description */
 	protected static final Boolean VHOST_REGISTER_ENABLED_PROP_DEF = Boolean.TRUE;
@@ -215,39 +236,42 @@ public class VHostItem
 
 	/** Field description */
 	protected static final Boolean VHOST_TLS_REQUIRED_PROP_DEF = Boolean.FALSE;
-	private static final Logger log                            =
-		Logger.getLogger(VHostItem.class.getName());
+
+	/** Field description */
+	protected static final DomainFilterPolicy DOMAIN_FILTER_POLICY_PROP_DEF =
+			DomainFilterPolicy.ALL;
+	private static final Logger log = Logger.getLogger(VHostItem.class.getName());
 
 	/** Field description */
 	protected static final String[] VHOST_OTHER_PARAMS_PATH = { VHOST_ELEM,
-					OTHER_PARAMS_ELEM };
+			OTHER_PARAMS_ELEM };
 
 	/** Field description */
 	protected static final String[] VHOST_COMPONENTS_PATH = { VHOST_ELEM, COMPONENTS_ELEM };
 
 	//~--- fields ---------------------------------------------------------------
 
-	private String[] comps      = null;
-	private long maxUsersNumber = Long.getLong(VHOST_MAX_USERS_PROP_KEY,
-																	VHOST_MAX_USERS_PROP_DEF);
-	private JID messageForward =
-		JID.jidInstanceNS(System.getProperty(VHOST_MESSAGE_FORWARD_PROP_KEY,
-			VHOST_MESSAGE_FORWARD_PROP_DEF));
+	private String[] comps = null;
+	private long     maxUsersNumber = Long.getLong(VHOST_MAX_USERS_PROP_KEY,
+			VHOST_MAX_USERS_PROP_DEF);
+	private JID messageForward = JID.jidInstanceNS(System.getProperty(
+			VHOST_MESSAGE_FORWARD_PROP_KEY, VHOST_MESSAGE_FORWARD_PROP_DEF));
 	private String otherDomainParams = null;
-	private JID presenceForward      =
-		JID.jidInstanceNS(System.getProperty(VHOST_PRESENCE_FORWARD_PROP_KEY,
-			VHOST_PRESENCE_FORWARD_PROP_DEF));
+	private JID    presenceForward = JID.jidInstanceNS(System.getProperty(
+			VHOST_PRESENCE_FORWARD_PROP_KEY, VHOST_PRESENCE_FORWARD_PROP_DEF));
 	private VHostItem unmodifiableItem = null;
-	private JID vhost                  = null;
-	private boolean tlsRequired        = DataTypes.getProperty(VHOST_TLS_REQUIRED_PROP_KEY,
-																				 VHOST_TLS_REQUIRED_PROP_DEF);
-	private boolean registerEnabled =
-		DataTypes.getProperty(VHOST_REGISTER_ENABLED_PROP_KEY,
-													VHOST_REGISTER_ENABLED_PROP_DEF);
-	private boolean enabled          = true;
-	private boolean anonymousEnabled =
-		DataTypes.getProperty(VHOST_ANONYMOUS_ENABLED_PROP_KEY,
-													VHOST_ANONYMOUS_ENABLED_PROP_DEF);
+	private JID       vhost            = null;
+	private boolean   tlsRequired = DataTypes.getProperty(VHOST_TLS_REQUIRED_PROP_KEY,
+			VHOST_TLS_REQUIRED_PROP_DEF);
+	private String  s2sSecret = System.getProperty(S2S_SECRET_PROP_KEY,
+			S2S_SECRET_PROP_DEF);
+	private boolean registerEnabled = DataTypes.getProperty(
+			VHOST_REGISTER_ENABLED_PROP_KEY, VHOST_REGISTER_ENABLED_PROP_DEF);
+	private boolean            enabled = true;
+	private DomainFilterPolicy domainFilter = DomainFilterPolicy.valueof(System.getProperty(
+			DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString()));
+	private boolean anonymousEnabled = DataTypes.getProperty(
+			VHOST_ANONYMOUS_ENABLED_PROP_KEY, VHOST_ANONYMOUS_ENABLED_PROP_DEF);
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -306,23 +330,29 @@ public class VHostItem
 	@Override
 	public void addCommandFields(Packet packet) {
 		Command.addFieldValue(packet, HOSTNAME_LABEL, (vhost != null)
-						? vhost.getDomain()
-						: "");
+				? vhost.getDomain()
+				: "");
 		Command.addCheckBoxField(packet, ENABLED_LABEL, enabled);
 		Command.addCheckBoxField(packet, ANONYMOUS_ENABLED_LABEL, anonymousEnabled);
 		Command.addCheckBoxField(packet, REGISTER_ENABLED_LABEL, registerEnabled);
 		Command.addCheckBoxField(packet, TLS_REQUIRED_LABEL, tlsRequired);
+		Command.addFieldValue(packet, S2S_SECRET_LABEL, (s2sSecret != null)
+				? s2sSecret
+				: "");
+		Command.addFieldValue(packet, DOMAIN_FILTER_POLICY_LABEL, domainFilter.toString(),
+				DOMAIN_FILTER_POLICY_LABEL, DomainFilterPolicy.valuesStr(), DomainFilterPolicy
+				.valuesStr());
 		Command.addFieldValue(packet, MAX_USERS_NUMBER_LABEL, "" + maxUsersNumber);
-		Command.addFieldValue(packet, PRESENCE_FORWARD_ADDRESS_LABEL,
-													((presenceForward != null)
-													 ? presenceForward.toString()
-													 : ""));
+		Command.addFieldValue(packet, PRESENCE_FORWARD_ADDRESS_LABEL, ((presenceForward !=
+				null)
+				? presenceForward.toString()
+				: ""));
 		Command.addFieldValue(packet, MESSAGE_FORWARD_ADDRESS_LABEL, ((messageForward != null)
-						? messageForward.toString()
-						: ""));
+				? messageForward.toString()
+				: ""));
 		Command.addFieldValue(packet, OTHER_PARAMS_LABEL, (otherDomainParams != null)
-						? otherDomainParams
-						: "");
+				? otherDomainParams
+				: "");
 		super.addCommandFields(packet);
 	}
 
@@ -446,18 +476,30 @@ public class VHostItem
 			setVHost(tmp);
 		} catch (TigaseStringprepException ex) {
 			throw new IllegalArgumentException("Incorrect domain, unable to parse it: " + tmp,
-																				 ex);
+					ex);
 		}
 		enabled          = Command.getCheckBoxFieldValue(packet, ENABLED_LABEL);
 		anonymousEnabled = Command.getCheckBoxFieldValue(packet, ANONYMOUS_ENABLED_LABEL);
 		registerEnabled  = Command.getCheckBoxFieldValue(packet, REGISTER_ENABLED_LABEL);
 		tlsRequired      = Command.getCheckBoxFieldValue(packet, TLS_REQUIRED_LABEL);
+		tmp              = Command.getFieldValue(packet, S2S_SECRET_LABEL);
+		if ((tmp != null) &&!tmp.trim().isEmpty()) {
+			s2sSecret = tmp;
+		} else {
+			s2sSecret = null;
+		}
+		tmp = Command.getFieldValue(packet, DOMAIN_FILTER_POLICY_LABEL);
+		try {
+			domainFilter = DomainFilterPolicy.valueof(tmp);
+		} catch (Exception ex) {
+			domainFilter = DOMAIN_FILTER_POLICY_PROP_DEF;
+		}
 		try {
 			maxUsersNumber = Long.parseLong(Command.getFieldValue(packet,
-							MAX_USERS_NUMBER_LABEL));
+					MAX_USERS_NUMBER_LABEL));
 		} catch (Exception e) {
-			log.warning("Can not parse max users number: " +
-									Command.getFieldValue(packet, MAX_USERS_NUMBER_LABEL));
+			log.log(Level.WARNING, "Can not parse max users number: {0}", Command.getFieldValue(
+					packet, MAX_USERS_NUMBER_LABEL));
 		}
 		tmp = Command.getFieldValue(packet, PRESENCE_FORWARD_ADDRESS_LABEL);
 		if ((tmp != null) &&!tmp.trim().isEmpty()) {
@@ -467,7 +509,7 @@ public class VHostItem
 				presenceForward = null;
 
 				throw new IllegalArgumentException("Incorrect presence forward address: " + tmp,
-																					 ex);
+						ex);
 			}
 		}
 		tmp = Command.getFieldValue(packet, MESSAGE_FORWARD_ADDRESS_LABEL);
@@ -478,7 +520,7 @@ public class VHostItem
 				messageForward = null;
 
 				throw new IllegalArgumentException("Incorrect message forward address: " + tmp,
-																					 ex);
+						ex);
 			}
 		}
 		otherDomainParams = Command.getFieldValue(packet, OTHER_PARAMS_LABEL);
@@ -494,21 +536,28 @@ public class VHostItem
 	public void initFromElement(Element elem) {
 		if (elem.getName() != VHOST_ELEM) {
 			throw new IllegalArgumentException("Incorrect element name, expected: " +
-																				 VHOST_ELEM);
+					VHOST_ELEM);
 		}
 		super.initFromElement(elem);
 		setVHost(JID.jidInstanceNS(elem.getAttributeStaticStr(HOSTNAME_ATT)));
-		enabled          = Boolean.parseBoolean(elem.getAttributeStaticStr(ENABLED_ATT));
-		anonymousEnabled =
-			Boolean.parseBoolean(elem.getAttributeStaticStr(ANONYMOUS_ENABLED_ATT));
-		registerEnabled =
-			Boolean.parseBoolean(elem.getAttributeStaticStr(REGISTER_ENABLED_ATT));
+		enabled = Boolean.parseBoolean(elem.getAttributeStaticStr(ENABLED_ATT));
+		anonymousEnabled = Boolean.parseBoolean(elem.getAttributeStaticStr(
+				ANONYMOUS_ENABLED_ATT));
+		registerEnabled = Boolean.parseBoolean(elem.getAttributeStaticStr(
+				REGISTER_ENABLED_ATT));
 		tlsRequired = Boolean.parseBoolean(elem.getAttributeStaticStr(TLS_REQUIRED_ATT));
+		s2sSecret   = elem.getAttributeStaticStr(S2S_SECRET_ATT);
+		try {
+			domainFilter = DomainFilterPolicy.valueof(elem.getAttributeStaticStr(
+					DOMAIN_FILTER_POLICY_ATT));
+		} catch (Exception e) {
+			domainFilter = DOMAIN_FILTER_POLICY_PROP_DEF;
+		}
 		try {
 			maxUsersNumber = Long.parseLong(elem.getAttributeStaticStr(MAX_USERS_NUMBER_ATT));
 		} catch (Exception e) {
-			log.log(Level.WARNING, "Can not parse max users number: {0}",
-							elem.getAttributeStaticStr(MAX_USERS_NUMBER_ATT));
+			log.log(Level.WARNING, "Can not parse max users number: {0}", elem
+					.getAttributeStaticStr(MAX_USERS_NUMBER_ATT));
 		}
 
 		String tmp = elem.getAttributeStaticStr(PRESENCE_FORWARD_ADDRESS_ATT);
@@ -543,7 +592,7 @@ public class VHostItem
 			setVHost(props[0]);
 		} catch (TigaseStringprepException ex) {
 			throw new IllegalArgumentException("Domain misconfiguration, cannot parse it: " +
-																				 props[0], ex);
+					props[0], ex);
 		}
 		for (String tmp : props) {
 			boolean val = true;
@@ -560,6 +609,20 @@ public class VHostItem
 			if (tmp.endsWith(TLS_REQUIRED_ATT)) {
 				tlsRequired = val;
 			}
+			if (tmp.startsWith(S2S_SECRET_ATT)) {
+				String[] s2 = tmp.split("=");
+
+				s2sSecret = s2[1];
+			}
+			if (tmp.startsWith(DOMAIN_FILTER_POLICY_ATT)) {
+				String[] df = tmp.split("=");
+
+				try {
+					domainFilter = DomainFilterPolicy.valueof(df[1]);
+				} catch (Exception e) {
+					domainFilter = DOMAIN_FILTER_POLICY_PROP_DEF;
+				}
+			}
 			if (tmp.startsWith(MAX_USERS_NUMBER_ATT)) {
 				String[] mu = tmp.split("=");
 
@@ -567,8 +630,8 @@ public class VHostItem
 					maxUsersNumber = Long.parseLong(mu[1]);
 				} catch (NumberFormatException ex) {
 					maxUsersNumber = 0;
-					log.warning(
-							"Incorrect max users numner for vhost settings, number parsing error: " +
+					log.log(Level.WARNING,
+							"Incorrect max users number for vhost settings, number parsing error: {0}",
 							tmp);
 				}
 			}
@@ -579,8 +642,8 @@ public class VHostItem
 					presenceForward = JID.jidInstance(mu[1]);
 				} catch (TigaseStringprepException ex) {
 					presenceForward = null;
-					log.warning("Incorrect presence forwarding address, address parsing error: " +
-											tmp);
+					log.log(Level.WARNING,
+							"Incorrect presence forwarding address, address parsing error: {0}", tmp);
 				}
 			}
 			if (tmp.startsWith(MESSAGE_FORWARD_ADDRESS_ATT)) {
@@ -590,16 +653,14 @@ public class VHostItem
 					messageForward = JID.jidInstance(mu[1]);
 				} catch (TigaseStringprepException ex) {
 					messageForward = null;
-					log.warning("Incorrect presence forwarding address, address parsing error: " +
-											tmp);
+					log.log(Level.WARNING,
+							"Incorrect presence forwarding address, address parsing error: {0}", tmp);
 				}
 			}
 		}
 	}
 
 	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * This method checks whether anonymous login is enabled for this domain. This
@@ -646,6 +707,26 @@ public class VHostItem
 	 */
 	public boolean isTlsRequired() {
 		return tlsRequired;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public String getS2sSecret() {
+		return s2sSecret;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public DomainFilterPolicy getDomainFilter() {
+		return domainFilter;
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -774,6 +855,26 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
+	 * @param s2sSecret
+	 */
+	public void setS2sSecret(String s2sSecret) {
+		this.s2sSecret = s2sSecret;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param domainFilter
+	 */
+	public void setDomainFilter(DomainFilterPolicy domainFilter) {
+		this.domainFilter = domainFilter;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param vhost
 	 *
 	 * @throws TigaseStringprepException
@@ -797,8 +898,6 @@ public class VHostItem
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
-
 	/**
 	 * The method exports the <code>VHostItem</code> object to XML representation.
 	 *
@@ -806,8 +905,8 @@ public class VHostItem
 	 */
 	@Override
 	public Element toElement() {
-		Element elem     = super.toElement();
-		String comps_str = "";
+		Element elem      = super.toElement();
+		String  comps_str = "";
 
 		if ((comps != null) && (comps.length > 0)) {
 			for (String comp : comps) {
@@ -819,8 +918,8 @@ public class VHostItem
 		}
 
 		String other_params = (otherDomainParams != null)
-													? otherDomainParams
-													: "";
+				? otherDomainParams
+				: "";
 
 		elem.addChild(new Element(COMPONENTS_ELEM, comps_str));
 		elem.addChild(new Element(OTHER_PARAMS_ELEM, other_params));
@@ -829,6 +928,10 @@ public class VHostItem
 		elem.addAttribute(ANONYMOUS_ENABLED_ATT, "" + anonymousEnabled);
 		elem.addAttribute(REGISTER_ENABLED_ATT, "" + registerEnabled);
 		elem.addAttribute(TLS_REQUIRED_ATT, "" + tlsRequired);
+		if (s2sSecret != null) {
+			elem.addAttribute(S2S_SECRET_ATT, s2sSecret);
+		}
+		elem.addAttribute(DOMAIN_FILTER_POLICY_ATT, domainFilter.toString());
 		elem.addAttribute(MAX_USERS_NUMBER_ATT, "" + maxUsersNumber);
 		if (presenceForward != null) {
 			elem.addAttribute(PRESENCE_FORWARD_ADDRESS_ATT, presenceForward.toString());
@@ -860,6 +963,11 @@ public class VHostItem
 		if (!tlsRequired) {
 			sb.append(":-").append(TLS_REQUIRED_ATT);
 		}
+		if (s2sSecret != null) {
+			sb.append(':').append(S2S_SECRET_ATT).append('=').append(s2sSecret);
+		}
+		sb.append(':').append(DOMAIN_FILTER_POLICY_ATT).append('=').append(domainFilter
+				.toString());
 		if (maxUsersNumber > 0) {
 			sb.append(':').append(MAX_USERS_NUMBER_ATT).append('=').append(maxUsersNumber);
 		}
@@ -868,8 +976,8 @@ public class VHostItem
 					presenceForward.toString());
 		}
 		if (messageForward != null) {
-			sb.append(':').append(MESSAGE_FORWARD_ADDRESS_ATT).append('=').append(
-					messageForward.toString());
+			sb.append(':').append(MESSAGE_FORWARD_ADDRESS_ATT).append('=').append(messageForward
+					.toString());
 		}
 
 		return sb.toString();
@@ -884,13 +992,13 @@ public class VHostItem
 	@Override
 	public String toString() {
 		return "Domain: " + vhost + ", enabled: " + enabled + ", anonym: " +
-					 anonymousEnabled + ", register: " + registerEnabled + ", maxusers: " +
-					 maxUsersNumber + ", tls: " + tlsRequired;
+				anonymousEnabled + ", register: " + registerEnabled + ", maxusers: " +
+				maxUsersNumber + ", tls: " + tlsRequired + ", s2sSecret: " + s2sSecret +
+				", domainFilter: " + domainFilter;
 	}
 
 	//~--- inner classes --------------------------------------------------------
 
-	// ~--- inner classes --------------------------------------------------------
 	private class UnmodifiableVHostItem
 					extends VHostItem {
 		/**
@@ -954,8 +1062,6 @@ public class VHostItem
 
 		//~--- methods ------------------------------------------------------------
 
-		// ~--- methods ------------------------------------------------------------
-
 		/**
 		 * Method description
 		 *
@@ -982,8 +1088,6 @@ public class VHostItem
 
 		//~--- get methods --------------------------------------------------------
 
-		// ~--- get methods --------------------------------------------------------
-
 		/**
 		 * This method checks whether anonymous login is enabled for this domain.
 		 * This is the domain own configuration parameter which allows to disable
@@ -1000,6 +1104,7 @@ public class VHostItem
 		/**
 		 * @return the presenceForward
 		 */
+		@Override
 		public JID getPresenceForward() {
 			return VHostItem.this.presenceForward;
 		}
@@ -1009,6 +1114,7 @@ public class VHostItem
 		/**
 		 * @param presenceForward the presenceForward to set
 		 */
+		@Override
 		public void setPresenceForward(JID presenceForward) {
 			throw new UnsupportedOperationException(
 					"This is unmodifiable instance of VHostItem");
@@ -1019,6 +1125,7 @@ public class VHostItem
 		/**
 		 * @return the messageForward
 		 */
+		@Override
 		public JID getMessageForward() {
 			return VHostItem.this.messageForward;
 		}
@@ -1028,6 +1135,7 @@ public class VHostItem
 		/**
 		 * @param messageForward the messageForward to set
 		 */
+		@Override
 		public void setMessageForward(JID messageForward) {
 			throw new UnsupportedOperationException(
 					"This is unmodifiable instance of VHostItem");
@@ -1071,6 +1179,28 @@ public class VHostItem
 		@Override
 		public boolean isTlsRequired() {
 			return VHostItem.this.isTlsRequired();
+		}
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @return
+		 */
+		@Override
+		public String getS2sSecret() {
+			return VHostItem.this.getS2sSecret();
+		}
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @return
+		 */
+		@Override
+		public DomainFilterPolicy getDomainFilter() {
+			return VHostItem.this.getDomainFilter();
 		}
 
 		//~--- set methods --------------------------------------------------------
@@ -1175,6 +1305,30 @@ public class VHostItem
 					"This is unmodifiable instance of VHostItem");
 		}
 
+		/**
+		 * Method description
+		 *
+		 *
+		 * @param s2sSecret
+		 */
+		@Override
+		public void setS2sSecret(String s2sSecret) {
+			throw new UnsupportedOperationException(
+					"This is unmodifiable instance of VHostItem");
+		}
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @param filter
+		 */
+		@Override
+		public void setDomainFilter(DomainFilterPolicy filter) {
+			throw new UnsupportedOperationException(
+					"This is unmodifiable instance of VHostItem");
+		}
+
 		//~--- methods ------------------------------------------------------------
 
 		/**
@@ -1202,10 +1356,4 @@ public class VHostItem
 }
 
 
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-
-//~ Formatted in Tigase Code Convention on 13/02/22
+//~ Formatted in Tigase Code Convention on 13/03/16
