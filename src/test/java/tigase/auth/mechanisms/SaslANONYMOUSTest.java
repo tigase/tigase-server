@@ -10,14 +10,14 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.sasl.SaslException;
 
-import junit.framework.Assert;
+import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import tigase.auth.XmppSaslException;
 
-public class SaslANONYMOUSTest {
+public class SaslANONYMOUSTest extends TestCase {
 
 	private SaslANONYMOUS sasl;
 
@@ -43,14 +43,14 @@ public class SaslANONYMOUSTest {
 	public void testMalformedRequest() {
 		try {
 			sasl.evaluateResponse("a".getBytes());
-			Assert.fail("Exception must be throwed");
+			fail("Exception must be throwed");
 		} catch (XmppSaslException e) {
-			Assert.assertEquals("malformed-request", e.getSaslErrorElementName());
+			assertEquals("malformed-request", e.getSaslErrorElementName());
 		} catch (SaslException e) {
 		}
 
-		Assert.assertFalse(sasl.isComplete());
-		Assert.assertNull("Authorization ID must be null", sasl.getAuthorizationID());
+		assertFalse(sasl.isComplete());
+		assertNull("Authorization ID must be null", sasl.getAuthorizationID());
 	}
 
 	@Test
@@ -60,12 +60,12 @@ public class SaslANONYMOUSTest {
 			sasl.evaluateResponse("".getBytes());
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail(e.getMessage());
+			fail(e.getMessage());
 		}
 
-		Assert.assertTrue(sasl.isComplete());
-		Assert.assertEquals("somerandomname", sasl.getAuthorizationID());
-		Assert.assertTrue((Boolean) sasl.getNegotiatedProperty(SaslANONYMOUS.IS_ANONYMOUS_PROPERTY));
+		assertTrue(sasl.isComplete());
+		assertEquals("somerandomname", sasl.getAuthorizationID());
+		assertTrue((Boolean) sasl.getNegotiatedProperty(SaslANONYMOUS.IS_ANONYMOUS_PROPERTY));
 
 	}
 }

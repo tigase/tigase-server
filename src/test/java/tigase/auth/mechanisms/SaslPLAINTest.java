@@ -11,7 +11,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.sasl.AuthorizeCallback;
 import javax.security.sasl.SaslException;
 
-import junit.framework.Assert;
+import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +19,7 @@ import org.junit.Test;
 import tigase.auth.XmppSaslException;
 import tigase.auth.callbacks.VerifyPasswordCallback;
 
-public class SaslPLAINTest {
+public class SaslPLAINTest extends TestCase {
 
 	private SaslPLAIN sasl;
 
@@ -56,148 +56,148 @@ public class SaslPLAINTest {
 	public void testEmptyPassword() {
 		try {
 			sasl.evaluateResponse("\0juliet\0".getBytes());
-			Assert.fail("Exception must be throwed");
+			fail("Exception must be throwed");
 		} catch (XmppSaslException e) {
-			Assert.assertEquals("not-authorized", e.getSaslErrorElementName());
-			Assert.assertEquals("Password not verified", e.getMessage());
+			assertEquals("not-authorized", e.getSaslErrorElementName());
+			assertEquals("Password not verified", e.getMessage());
 		} catch (SaslException e) {
-			Assert.assertEquals("Password not verified", e.getMessage());
+			assertEquals("Password not verified", e.getMessage());
 		}
 
-		Assert.assertFalse(sasl.isComplete());
-		Assert.assertNull("Authorization ID must be null", sasl.getAuthorizationID());
+		assertFalse(sasl.isComplete());
+		assertNull("Authorization ID must be null", sasl.getAuthorizationID());
 	}
 
 	@Test
 	public void testEmptyUsername() {
 		try {
 			sasl.evaluateResponse("\0\0qaz".getBytes());
-			Assert.fail("Exception must be throwed");
+			fail("Exception must be throwed");
 		} catch (XmppSaslException e) {
-			Assert.assertEquals("malformed-request", e.getSaslErrorElementName());
+			assertEquals("malformed-request", e.getSaslErrorElementName());
 		} catch (SaslException e) {
 		}
 
-		Assert.assertFalse(sasl.isComplete());
-		Assert.assertNull("Authorization ID must be null", sasl.getAuthorizationID());
+		assertFalse(sasl.isComplete());
+		assertNull("Authorization ID must be null", sasl.getAuthorizationID());
 	}
 
 	@Test
 	public void testEmptyUsernamePassword() {
 		try {
 			sasl.evaluateResponse("\0\0".getBytes());
-			Assert.fail("Exception must be throwed");
+			fail("Exception must be throwed");
 		} catch (XmppSaslException e) {
-			Assert.assertEquals("malformed-request", e.getSaslErrorElementName());
+			assertEquals("malformed-request", e.getSaslErrorElementName());
 		} catch (SaslException e) {
 		}
 
-		Assert.assertFalse(sasl.isComplete());
-		Assert.assertNull("Authorization ID must be null", sasl.getAuthorizationID());
+		assertFalse(sasl.isComplete());
+		assertNull("Authorization ID must be null", sasl.getAuthorizationID());
 	}
 
 	@Test
 	public void testInvalidAuthzId() {
 		try {
 			sasl.evaluateResponse("romeo\0juliet\0xsecret".getBytes());
-			Assert.fail("Exception must be throwed");
+			fail("Exception must be throwed");
 		} catch (XmppSaslException e) {
-			Assert.assertEquals("invalid-authzid", e.getSaslErrorElementName());
-			Assert.assertEquals("PLAIN: juliet is not authorized to act as romeo", e.getMessage());
+			assertEquals("invalid-authzid", e.getSaslErrorElementName());
+			assertEquals("PLAIN: juliet is not authorized to act as romeo", e.getMessage());
 		} catch (SaslException e) {
-			Assert.assertEquals("PLAIN: juliet is not authorized to act as romeo", e.getMessage());
+			assertEquals("PLAIN: juliet is not authorized to act as romeo", e.getMessage());
 		}
 
-		Assert.assertFalse(sasl.isComplete());
-		Assert.assertNull("Authorization ID must be null", sasl.getAuthorizationID());
+		assertFalse(sasl.isComplete());
+		assertNull("Authorization ID must be null", sasl.getAuthorizationID());
 	}
 
 	@Test
 	public void testInvalidPassword() {
 		try {
 			sasl.evaluateResponse("\0juliet\0ysecret".getBytes());
-			Assert.fail("Exception must be throwed");
+			fail("Exception must be throwed");
 		} catch (XmppSaslException e) {
-			Assert.assertEquals("not-authorized", e.getSaslErrorElementName());
-			Assert.assertEquals("Password not verified", e.getMessage());
+			assertEquals("not-authorized", e.getSaslErrorElementName());
+			assertEquals("Password not verified", e.getMessage());
 		} catch (SaslException e) {
-			Assert.assertEquals("Password not verified", e.getMessage());
+			assertEquals("Password not verified", e.getMessage());
 		}
 
-		Assert.assertFalse(sasl.isComplete());
-		Assert.assertNull("Authorization ID must be null", sasl.getAuthorizationID());
+		assertFalse(sasl.isComplete());
+		assertNull("Authorization ID must be null", sasl.getAuthorizationID());
 	}
 
 	@Test
 	public void testInvalidUsername() {
 		try {
 			sasl.evaluateResponse("\0romeo\0xsecret".getBytes());
-			Assert.fail("Exception must be throwed");
+			fail("Exception must be throwed");
 		} catch (XmppSaslException e) {
-			Assert.assertEquals("not-authorized", e.getSaslErrorElementName());
-			Assert.assertEquals("Password not verified", e.getMessage());
+			assertEquals("not-authorized", e.getSaslErrorElementName());
+			assertEquals("Password not verified", e.getMessage());
 		} catch (SaslException e) {
-			Assert.assertEquals("Password not verified", e.getMessage());
+			assertEquals("Password not verified", e.getMessage());
 		}
 
-		Assert.assertFalse(sasl.isComplete());
-		Assert.assertNull("Authorization ID must be null", sasl.getAuthorizationID());
+		assertFalse(sasl.isComplete());
+		assertNull("Authorization ID must be null", sasl.getAuthorizationID());
 	}
 
 	@Test
 	public void testmalformedRequest1() {
 		try {
 			sasl.evaluateResponse("".getBytes());
-			Assert.fail("Exception must be throwed");
+			fail("Exception must be throwed");
 		} catch (XmppSaslException e) {
-			Assert.assertEquals("malformed-request", e.getSaslErrorElementName());
+			assertEquals("malformed-request", e.getSaslErrorElementName());
 		} catch (SaslException e) {
 		}
 
-		Assert.assertFalse(sasl.isComplete());
-		Assert.assertNull("Authorization ID must be null", sasl.getAuthorizationID());
+		assertFalse(sasl.isComplete());
+		assertNull("Authorization ID must be null", sasl.getAuthorizationID());
 	}
 
 	@Test
 	public void testmalformedRequest2() {
 		try {
 			sasl.evaluateResponse(null);
-			Assert.fail("Exception must be throwed");
+			fail("Exception must be throwed");
 		} catch (XmppSaslException e) {
-			Assert.assertEquals("malformed-request", e.getSaslErrorElementName());
+			assertEquals("malformed-request", e.getSaslErrorElementName());
 		} catch (SaslException e) {
 		}
 
-		Assert.assertFalse(sasl.isComplete());
-		Assert.assertNull("Authorization ID must be null", sasl.getAuthorizationID());
+		assertFalse(sasl.isComplete());
+		assertNull("Authorization ID must be null", sasl.getAuthorizationID());
 	}
 
 	@Test
 	public void testmalformedRequest3() {
 		try {
 			sasl.evaluateResponse("\0juliet\0xsecret\0".getBytes());
-			Assert.fail("Exception must be throwed");
+			fail("Exception must be throwed");
 		} catch (XmppSaslException e) {
-			Assert.assertEquals("malformed-request", e.getSaslErrorElementName());
+			assertEquals("malformed-request", e.getSaslErrorElementName());
 		} catch (SaslException e) {
 		}
 
-		Assert.assertFalse(sasl.isComplete());
-		Assert.assertNull("Authorization ID must be null", sasl.getAuthorizationID());
+		assertFalse(sasl.isComplete());
+		assertNull("Authorization ID must be null", sasl.getAuthorizationID());
 	}
 
 	@Test
 	public void testmalformedRequest4() {
 		try {
 			sasl.evaluateResponse("xyz".getBytes());
-			Assert.fail("Exception must be throwed");
+			fail("Exception must be throwed");
 		} catch (XmppSaslException e) {
-			Assert.assertEquals("malformed-request", e.getSaslErrorElementName());
+			assertEquals("malformed-request", e.getSaslErrorElementName());
 		} catch (SaslException e) {
 		}
 
-		Assert.assertFalse(sasl.isComplete());
-		Assert.assertNull("Authorization ID must be null", sasl.getAuthorizationID());
+		assertFalse(sasl.isComplete());
+		assertNull("Authorization ID must be null", sasl.getAuthorizationID());
 	}
 
 	@Test
@@ -207,11 +207,11 @@ public class SaslPLAINTest {
 			sasl.evaluateResponse("\0juliet\0xsecret".getBytes());
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail(e.getMessage());
+			fail(e.getMessage());
 		}
 
-		Assert.assertTrue(sasl.isComplete());
-		Assert.assertEquals("juliet", sasl.getAuthorizationID());
+		assertTrue(sasl.isComplete());
+		assertEquals("juliet", sasl.getAuthorizationID());
 
 	}
 
@@ -222,11 +222,11 @@ public class SaslPLAINTest {
 			sasl.evaluateResponse("juliet\0juliet\0xsecret".getBytes());
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail(e.getMessage());
+			fail(e.getMessage());
 		}
 
-		Assert.assertTrue(sasl.isComplete());
-		Assert.assertEquals("juliet", sasl.getAuthorizationID());
+		assertTrue(sasl.isComplete());
+		assertEquals("juliet", sasl.getAuthorizationID());
 	}
 
 	@Test
@@ -262,11 +262,11 @@ public class SaslPLAINTest {
 			sasl.evaluateResponse("romeo@example.net\0secondwitch\0shakespeare".getBytes());
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail(e.getMessage());
+			fail(e.getMessage());
 		}
 
-		Assert.assertTrue(sasl.isComplete());
-		Assert.assertEquals("romeo@example.net", sasl.getAuthorizationID());
+		assertTrue(sasl.isComplete());
+		assertEquals("romeo@example.net", sasl.getAuthorizationID());
 	}
 
 }

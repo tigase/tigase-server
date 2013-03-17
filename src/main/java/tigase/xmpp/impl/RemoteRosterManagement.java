@@ -58,12 +58,12 @@ import java.util.Set;
  */
 public class RemoteRosterManagement
 				extends XMPPProcessorAbstract {
-	private static final String[] ELEMENTS = { "query", "x" };
-	private static final String ID         = "remote-roster-management";
-	private static final Logger log        =
+	private static final String[][] ELEMENT_PATHS = {{ "iq", "query" }, { "message", "x" }};
+	private static final String ID                = "remote-roster-management";
+	private static final Logger log               =
 		Logger.getLogger("eu.hilow.xtigase.server.xmpp.RemoteRosterManagement");
-	private static final String XMLNS    = "http://spectrum.im/protocol/remote-roster";
-	private static final String[] XMLNSS = { XMLNS, "jabber:x:data" };
+	private static final String XMLNS             = "http://spectrum.im/protocol/remote-roster";
+	private static final String[] XMLNSS          = { XMLNS, "jabber:x:data" };
 
 	//~--- methods --------------------------------------------------------------
 
@@ -102,6 +102,7 @@ public class RemoteRosterManagement
 	 *
 	 * @throws PacketErrorTypeException
 	 */
+	@Override
 	public void processFromUserToServerPacket(JID connectionId, Packet packet,
 					XMPPResourceConnection session, NonAuthUserRepository repo,
 					Queue<Packet> results, Map<String, Object> settings)
@@ -132,6 +133,7 @@ public class RemoteRosterManagement
 	 *
 	 * @throws PacketErrorTypeException
 	 */
+	@Override
 	public void processServerSessionPacket(Packet packet, XMPPResourceConnection session,
 					NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 					throws PacketErrorTypeException {}
@@ -148,6 +150,7 @@ public class RemoteRosterManagement
 	 *
 	 * @throws PacketErrorTypeException
 	 */
+	@Override
 	public void processToUserPacket(Packet packet, XMPPResourceConnection session,
 																	NonAuthUserRepository repo, Queue<Packet> results,
 																	Map<String, Object> settings)
@@ -216,6 +219,10 @@ public class RemoteRosterManagement
 
 		if (x != null) {
 			Form form        = new Form(x);
+			if (!XMLNS.equals(form.getAsString("FORM_TYPE")) 
+					&& !session.isLocalDomain(packet.getStanzaTo().toString(), false)) {				
+				results.offer(packet);
+			}
 			JID jid          = JID.jidInstanceNS(form.get("jid").getValue());
 			Boolean answer   = false;
 			String answerStr = form.get("answer").getValue();
@@ -262,10 +269,10 @@ public class RemoteRosterManagement
 	 * @return
 	 */
 	@Override
-	public String[] supElements() {
-		return ELEMENTS;
+	public String[][] supElementNamePaths() {
+		return ELEMENT_PATHS;
 	}
-
+	
 	/**
 	 * Method description
 	 *

@@ -49,6 +49,7 @@ public class ClusterElementTest
 	 *
 	 */
 	@Test
+	@SuppressWarnings("deprecation")
 	public void testGetMethodName() {
 		SimpleParser parser       = new SimpleParser();
 		DomBuilderHandler handler = new DomBuilderHandler();
