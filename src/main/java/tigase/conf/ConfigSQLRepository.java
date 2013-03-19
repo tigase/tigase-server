@@ -30,8 +30,6 @@ import tigase.db.TigaseDBException;
 
 import tigase.util.DataTypes;
 
-import static tigase.conf.Configurable.*;
-
 //~--- JDK imports ------------------------------------------------------------
 
 import java.sql.PreparedStatement;
@@ -174,7 +172,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 		}
 
 		if (config_db_uri == null) {
-			config_db_uri = (String) params.get(GEN_USER_DB_URI);
+			config_db_uri = (String) params.get(RepositoryFactory.GEN_USER_DB_URI);
 		}
 
 		if (config_db_uri == null) {

@@ -26,8 +26,7 @@ package tigase.server.amp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.conf.Configurable;
-
+import tigase.db.RepositoryFactory;
 import tigase.db.UserRepository;
 
 import tigase.server.Packet;
@@ -139,7 +138,7 @@ public abstract class ActionAbstract
 		}
 
 		// Is there shared user repository instance? If so I want to use it:
-		user_repository = (UserRepository) props.get(Configurable.SHARED_USER_REPO_PROP_KEY);
+		user_repository = (UserRepository) props.get(RepositoryFactory.SHARED_USER_REPO_PROP_KEY);
 	}
 
 	//~--- methods --------------------------------------------------------------

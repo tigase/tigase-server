@@ -32,6 +32,7 @@ import java.util.Timer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.conf.Configurable;
+import tigase.db.RepositoryFactory;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Packet;
 import tigase.util.TigaseStringprepException;
@@ -214,8 +215,8 @@ public class StanzaSender extends AbstractMessageReceiver implements Configurabl
 		if (params.get(GEN_CONF + "drupal-db-uri") != null) {
 			repo_uri = (String) params.get(GEN_CONF + "drupal-db-uri");
 		} else {
-			if (params.get(GEN_USER_DB_URI) != null) {
-				repo_uri = (String) params.get(GEN_USER_DB_URI);
+			if (params.get(RepositoryFactory.GEN_USER_DB_URI) != null) {
+				repo_uri = (String) params.get(RepositoryFactory.GEN_USER_DB_URI);
 			} // end of if (params.get(GEN_USER_DB_URI) != null)
 		}
 

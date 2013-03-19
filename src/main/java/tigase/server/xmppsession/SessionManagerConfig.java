@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import tigase.util.DNSResolver;
 
 import static tigase.conf.Configurable.*;
+import tigase.db.RepositoryFactory;
 import tigase.xmpp.*;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -135,11 +136,11 @@ public abstract class SessionManagerConfig {
 	public static void getDefaults(Map<String, Object> props, Map<String, Object> params) {
 		props.put(ADMIN_SCRIPTS_PROP_KEY, ADMIN_SCRIPTS_PROP_VAL);
 
-		boolean full_comps = (params.get(GEN_AUTH_DB) == null)
-			|| params.get(GEN_AUTH_DB).toString().equals("mysql")
-			|| params.get(GEN_AUTH_DB).toString().equals("pgsql")
-			|| params.get(GEN_AUTH_DB).toString().equals("derby")
-			|| params.get(GEN_AUTH_DB).toString().equals("tigase-auth");
+		boolean full_comps = (params.get(RepositoryFactory.GEN_AUTH_DB) == null)
+			|| params.get(RepositoryFactory.GEN_AUTH_DB).toString().equals("mysql")
+			|| params.get(RepositoryFactory.GEN_AUTH_DB).toString().equals("pgsql")
+			|| params.get(RepositoryFactory.GEN_AUTH_DB).toString().equals("derby")
+			|| params.get(RepositoryFactory.GEN_AUTH_DB).toString().equals("tigase-auth");
 		LinkedHashSet<String> plugins = new LinkedHashSet<String>(32);
 
 		if ((Boolean) params.get(GEN_TEST)) {

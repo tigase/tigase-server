@@ -29,6 +29,7 @@ import tigase.server.ServerComponent;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.Map;
+import tigase.db.RepositoryFactory;
 
 //~--- interfaces -------------------------------------------------------------
 
@@ -122,32 +123,59 @@ public interface Configurable extends ServerComponent {
 	/** Field description */
 	public static final String GEN_EXT_COMP = "--ext-comp";
 
-	/** Field description */
-	public static final String GEN_USER_DB = "--user-db";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String GEN_USER_DB = RepositoryFactory.GEN_USER_DB;
 
-	/** Field description */
-	public static final String USER_REPO_POOL_CLASS = "--user-repo-pool";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String USER_REPO_POOL_CLASS = RepositoryFactory.USER_REPO_POOL_CLASS;
 
-	/** Field description */
-	public static final String USER_DOMAIN_POOL_CLASS = "--user-domain-repo-pool";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String USER_DOMAIN_POOL_CLASS = RepositoryFactory.USER_DOMAIN_POOL_CLASS;
 
-	/** Field description */
-	public static final String GEN_AUTH_DB = "--auth-db";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String GEN_AUTH_DB = RepositoryFactory.GEN_AUTH_DB;
 
-	/** Field description */
-	public static final String AUTH_REPO_POOL_CLASS = "--auth-repo-pool";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String AUTH_REPO_POOL_CLASS = RepositoryFactory.AUTH_REPO_POOL_CLASS;
 
-	/** Field description */
-	public static final String AUTH_DOMAIN_POOL_CLASS = "--auth-domain-repo-pool";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String AUTH_DOMAIN_POOL_CLASS = RepositoryFactory.AUTH_DOMAIN_POOL_CLASS;
 
-	/** Field description */
-	public static final String GEN_USER_DB_URI_PROP_KEY = "user-db-uri";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String GEN_USER_DB_URI_PROP_KEY = RepositoryFactory.GEN_USER_DB_URI_PROP_KEY;
 
-	/** Field description */
-	public static final String GEN_USER_DB_URI = "--" + GEN_USER_DB_URI_PROP_KEY;
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String GEN_USER_DB_URI = "--" + RepositoryFactory.GEN_USER_DB_URI_PROP_KEY;
 
-	/** Field description */
-	public static final String GEN_AUTH_DB_URI = "--auth-db-uri";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String GEN_AUTH_DB_URI = RepositoryFactory.GEN_AUTH_DB_URI;
 
 	/** Field description */
 	public static final String GEN_ADMINS = "--admins";
@@ -185,8 +213,11 @@ public interface Configurable extends ServerComponent {
 	/** Field description */
 	public static final String MONITORING = "--monitoring";
 
-	/** Field description */
-	public static final String USER_REPO_POOL_SIZE = "--user-repo-pool-size";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String USER_REPO_POOL_SIZE = RepositoryFactory.USER_REPO_POOL_SIZE;
 	
 	public static final String XMPP_STANZA_ACK = "--stanza-ack";
 	public static final String STANZA_WHITE_CHAR_ACK = "white-char";
@@ -195,76 +226,131 @@ public interface Configurable extends ServerComponent {
 	/** Field description */
 	public static final String STRINGPREP_PROCESSOR = "--stringprep-processor";
 
-	/** Field description */
-	public static final String XML_REPO_CLASS_PROP_VAL = "tigase.db.xml.XMLRepository";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String XML_REPO_CLASS_PROP_VAL = RepositoryFactory.XML_REPO_CLASS_PROP_VAL;
 
-	/** Field description */
-	public static final String DUMMY_REPO_CLASS_PROP_VAL = "tigase.db.DummyRepository";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String DUMMY_REPO_CLASS_PROP_VAL = RepositoryFactory.DUMMY_REPO_CLASS_PROP_VAL;
 
-	/** Field description */
-	public static final String MYSQL_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.JDBCRepository";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String MYSQL_REPO_CLASS_PROP_VAL = RepositoryFactory.MYSQL_REPO_CLASS_PROP_VAL;
 
-	/** Field description */
-	public static final String DERBY_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.JDBCRepository";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String DERBY_REPO_CLASS_PROP_VAL = RepositoryFactory.DERBY_REPO_CLASS_PROP_VAL;
 
-	/** Field description */
-	public static final String PGSQL_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.JDBCRepository";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String PGSQL_REPO_CLASS_PROP_VAL = RepositoryFactory.PGSQL_REPO_CLASS_PROP_VAL;
 
-	/** Field description */
-	public static final String TIGASE_AUTH_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.TigaseAuth";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String TIGASE_AUTH_REPO_CLASS_PROP_VAL = RepositoryFactory.TIGASE_AUTH_REPO_CLASS_PROP_VAL;
 
-	/** Field description */
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
 	public static final String TIGASE_CUSTOM_AUTH_REPO_CLASS_PROP_VAL =
-		"tigase.db.jdbc.TigaseCustomAuth";
+		RepositoryFactory.TIGASE_CUSTOM_AUTH_REPO_CLASS_PROP_VAL;
 
-	/** Field description */
-	public static final String DRUPALWP_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.DrupalWPAuth";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String DRUPALWP_REPO_CLASS_PROP_VAL = RepositoryFactory.DRUPALWP_REPO_CLASS_PROP_VAL;
 
-	/** Field description */
-	public static final String LIBRESOURCE_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.LibreSourceAuth";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String LIBRESOURCE_REPO_CLASS_PROP_VAL = RepositoryFactory.LIBRESOURCE_REPO_CLASS_PROP_VAL;
 
-	/** Field description */
-	public static final String SHARED_USER_REPO_PROP_KEY = "shared-user-repo";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String SHARED_USER_REPO_PROP_KEY = RepositoryFactory.SHARED_USER_REPO_PARAMS_PROP_KEY;
 
-	/** Field description */
-	public static final String SHARED_USER_REPO_PARAMS_PROP_KEY = "shared-user-repo-params";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String SHARED_USER_REPO_PARAMS_PROP_KEY = RepositoryFactory.SHARED_USER_REPO_PARAMS_PROP_KEY;
 
-	/** Field description */
-	public static final String SHARED_AUTH_REPO_PROP_KEY = "shared-auth-repo";
+	/** Field description
+	 * @deprecated
+	 */
+	@Deprecated
+	public static final String SHARED_AUTH_REPO_PROP_KEY = RepositoryFactory.SHARED_AUTH_REPO_PROP_KEY;
 
-	/** Field description */
-	public static final String SHARED_AUTH_REPO_PARAMS_PROP_KEY = "shared-auth-repo-params";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String SHARED_AUTH_REPO_PARAMS_PROP_KEY = RepositoryFactory.SHARED_AUTH_REPO_PARAMS_PROP_KEY;
 
-///** Field description */
-//public static final String SHARED_USER_REPO_POOL_PROP_KEY = "shared-user-repo-pool";
-///** Field description */
-//public static final String SHARED_USER_AUTH_REPO_POOL_PROP_KEY = "shared-user-auth-repo-pool";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String XML_REPO_URL_PROP_VAL = RepositoryFactory.XML_REPO_URL_PROP_VAL;
 
-	/** Field description */
-	public static final String XML_REPO_URL_PROP_VAL = "user-repository.xml";
-
-	/** Field description */
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
 	public static final String MYSQL_REPO_URL_PROP_VAL =
-		"jdbc:mysql://localhost/tigase?user=root&password=mypass";
+		RepositoryFactory.MYSQL_REPO_URL_PROP_VAL;
 
-	/** Field description */
-	public static final String DERBY_REPO_URL_PROP_VAL = "jdbc:derby:tigase-derbydb;create=true";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String DERBY_REPO_URL_PROP_VAL = RepositoryFactory.DERBY_REPO_URL_PROP_VAL;
 
-	/** Field description */
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
 	public static final String PGSQL_REPO_URL_PROP_VAL =
-		"jdbc:postgresql://localhost/tigase?user=tigase";
+		RepositoryFactory.PGSQL_REPO_URL_PROP_VAL;
 
-	/** Field description */
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
 	public static final String TIGASE_AUTH_REPO_URL_PROP_VAL =
-		"jdbc:mysql://localhost/tigasedb?user=tigase_user&password=mypass";
+		RepositoryFactory.TIGASE_AUTH_REPO_URL_PROP_VAL;
 
-	/** Field description */
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
 	public static final String DRUPAL_REPO_URL_PROP_VAL =
-		"jdbc:mysql://localhost/drupal?user=root&password=mypass";
+		RepositoryFactory.DRUPAL_REPO_URL_PROP_VAL;
 
-	/** Field description */
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
 	public static final String LIBRESOURCE_REPO_URL_PROP_VAL =
-		"jdbc:postgresql://localhost/libresource?user=demo";
+		RepositoryFactory.LIBRESOURCE_REPO_URL_PROP_VAL;
 
 	/** Field description */
 	public static final String DEF_SM_NAME = "sess-man";
@@ -367,26 +453,47 @@ public interface Configurable extends ServerComponent {
 	/** Field description */
 	public static final String VHOST_MAN_CLASS_NAME = "tigase.vhosts.VHostManager";
 
-	/** Field description */
-	public static final String USER_REPO_URL_PROP_KEY = "user-repo-url";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String USER_REPO_URL_PROP_KEY = RepositoryFactory.USER_REPO_URL_PROP_KEY;
 
-	/** Field description */
-	public static final String USER_REPO_PARAMS_NODE = "user-repo-params";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String USER_REPO_PARAMS_NODE = RepositoryFactory.USER_REPO_PARAMS_NODE;
 
-	/** Field description */
-	public static final String USER_REPO_POOL_SIZE_PROP_KEY = "user-repo-pool-size";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String USER_REPO_POOL_SIZE_PROP_KEY = RepositoryFactory.USER_REPO_POOL_SIZE_PROP_KEY;
 
-	/** Field description */
-	public static final String USER_REPO_DOMAINS_PROP_KEY = "user-repo-domains";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String USER_REPO_DOMAINS_PROP_KEY = RepositoryFactory.USER_REPO_DOMAINS_PROP_KEY;
 
-	/** Field description */
-	public static final String AUTH_REPO_DOMAINS_PROP_KEY = "auth-repo-domains";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String AUTH_REPO_DOMAINS_PROP_KEY = RepositoryFactory.AUTH_REPO_DOMAINS_PROP_KEY;
 
-	/** Field description */
-	public static final String AUTH_REPO_URL_PROP_KEY = "auth-repo-url";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String AUTH_REPO_URL_PROP_KEY = RepositoryFactory.AUTH_REPO_URL_PROP_KEY;
 
-	/** Field description */
-	public static final String AUTH_REPO_PARAMS_NODE = "auth-repo-params";
+	/** Field description
+	 * @deprecated moved to RepositoryFactory
+	 */
+	@Deprecated
+	public static final String AUTH_REPO_PARAMS_NODE = RepositoryFactory.AUTH_REPO_PARAMS_NODE;
 
 	/** Field description */
 	public static final String HOSTNAMES_PROP_KEY = "hostnames";

@@ -24,7 +24,7 @@ package tigase.util;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import static tigase.conf.Configurable.*;
+import tigase.db.RepositoryFactory;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -65,20 +65,20 @@ public abstract class DBUtils {
 
 		if (repo != null) {
 			if (repo.equals("mysql")) {
-				repo_class = MYSQL_REPO_CLASS_PROP_VAL;
-				repo_url = MYSQL_REPO_URL_PROP_VAL;
+				repo_class = RepositoryFactory.MYSQL_REPO_CLASS_PROP_VAL;
+				repo_url = RepositoryFactory.MYSQL_REPO_URL_PROP_VAL;
 			} else {
 				if (repo.equals("pgsql")) {
-					repo_class = PGSQL_REPO_CLASS_PROP_VAL;
-					repo_url = PGSQL_REPO_URL_PROP_VAL;
+					repo_class = RepositoryFactory.PGSQL_REPO_CLASS_PROP_VAL;
+					repo_url = RepositoryFactory.PGSQL_REPO_URL_PROP_VAL;
 				} else {
 					if (repo.equals("drupal")) {
-						repo_class = DRUPALWP_REPO_CLASS_PROP_VAL;
-						repo_url = DRUPAL_REPO_URL_PROP_VAL;
+						repo_class = RepositoryFactory.DRUPALWP_REPO_CLASS_PROP_VAL;
+						repo_url = RepositoryFactory.DRUPAL_REPO_URL_PROP_VAL;
 					} else {
 						if (repo.equals("libresource")) {
-							repo_class = LIBRESOURCE_REPO_CLASS_PROP_VAL;
-							repo_url = LIBRESOURCE_REPO_URL_PROP_VAL;
+							repo_class = RepositoryFactory.LIBRESOURCE_REPO_CLASS_PROP_VAL;
+							repo_url = RepositoryFactory.LIBRESOURCE_REPO_URL_PROP_VAL;
 						} else {
 							repo_class = repo;
 						}

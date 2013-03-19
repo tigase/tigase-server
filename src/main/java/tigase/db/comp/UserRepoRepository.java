@@ -37,8 +37,6 @@ import tigase.xml.SingletonFactory;
 
 import tigase.xmpp.BareJID;
 
-import static tigase.conf.Configurable.*;
-
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.logging.Level;
@@ -188,7 +186,7 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 			}
 		}
 		if (repo == null) {
-			repo = (UserRepository) properties.get(SHARED_USER_REPO_PROP_KEY);
+			repo = (UserRepository) properties.get(RepositoryFactory.SHARED_USER_REPO_PROP_KEY);
 			log.config("Using shared repository instance.");
 		}
 		if (repo != null) {

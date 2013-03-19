@@ -26,8 +26,7 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.conf.Configurable;
-
+import tigase.db.RepositoryFactory;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
@@ -144,7 +143,7 @@ public class MessageAmp
 		if (msg_repo_uri == null) {
 			msg_repo_uri = System.getProperty(AmpFeatureIfc.AMP_MSG_REPO_URI_PROP_KEY);
 			if (msg_repo_uri == null) {
-				msg_repo_uri = System.getProperty(Configurable.GEN_USER_DB_URI_PROP_KEY);
+				msg_repo_uri = System.getProperty(RepositoryFactory.GEN_USER_DB_URI_PROP_KEY);
 			}
 		}
 		if (msg_repo_uri != null) {

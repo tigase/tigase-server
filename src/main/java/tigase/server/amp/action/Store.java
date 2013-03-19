@@ -26,7 +26,7 @@ package tigase.server.amp.action;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.conf.Configurable;
+import tigase.db.RepositoryFactory;
 
 import tigase.db.UserNotFoundException;
 
@@ -149,7 +149,7 @@ public class Store
 		String db_uri            = (String) params.get(AMP_MSG_REPO_URI_PARAM);
 
 		if (db_uri == null) {
-			db_uri = (String) params.get(Configurable.USER_REPO_URL_PROP_KEY);
+			db_uri = (String) params.get(RepositoryFactory.USER_REPO_URL_PROP_KEY);
 		}
 		if (db_uri != null) {
 			defs.put(AMP_MSG_REPO_URI_PROP_KEY, db_uri);

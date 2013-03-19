@@ -36,8 +36,6 @@ import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
 
-import static tigase.conf.Configurable.*;
-
 //~--- JDK imports ------------------------------------------------------------
 
 import java.sql.PreparedStatement;
@@ -254,10 +252,10 @@ public class CompSQLRepository
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
 		configRepo.getDefaults(defs, params);
 
-		String repo_uri = DERBY_REPO_URL_PROP_VAL;
+		String repo_uri = RepositoryFactory.DERBY_REPO_URL_PROP_VAL;
 
-		if (params.get(GEN_USER_DB_URI) != null) {
-			repo_uri = (String) params.get(GEN_USER_DB_URI);
+		if (params.get(RepositoryFactory.GEN_USER_DB_URI) != null) {
+			repo_uri = (String) params.get(RepositoryFactory.GEN_USER_DB_URI);
 		}
 		defs.put(REPO_URI_PROP_KEY, repo_uri);
 	}

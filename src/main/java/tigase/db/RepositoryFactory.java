@@ -31,6 +31,7 @@ import static tigase.conf.Configurable.*;
 import java.sql.SQLException;
 
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -47,65 +48,78 @@ import java.util.concurrent.ConcurrentMap;
  */
 public abstract class RepositoryFactory {
 
-	/** Field description */
+	// DataRepository properties
+	public static final int DATA_REPO_POOL_SIZE_PROP_VAL = 10;
 	public static final String DATA_REPO_CLASS_PROP_KEY = "data-repo";
-
-	/** Field description */
 	public static final String DATA_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.DataRepositoryImpl";
-
-	/** Field description */
 	public static final String DATA_REPO_POOL_CLASS_PROP_KEY = "data-repo-pool";
-
-	/** Field description */
 	public static final String DATA_REPO_POOL_CLASS_PROP_VAL = "tigase.db.DataRepositoryPool";
-
-	/** Field description */
+	public static final String DATA_REPO_POOL_SIZE = "--data-repo-pool-size";
 	public static final String DATA_REPO_POOL_SIZE_PROP_KEY = "data-repo-pool-size";
 
-	/** Field description */
-	public static final int DATA_REPO_POOL_SIZE_PROP_VAL = 10;
-
-	/** Field description */
-	public static final String AUTH_REPO_CLASS_PROP_KEY = "auth-repo-class";
-
-	/** Field description */
-	public static final String AUTH_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.TigaseCustomAuth";
-
-	/** Field description */
-	public static final String AUTH_REPO_POOL_CLASS_PROP_KEY = "auth-repo-pool";
-
-	/** Field description */
-	public static final String AUTH_REPO_POOL_CLASS_PROP_DEF = "tigase.db.AuthRepositoryPool";
-
-	/** Field description */
-	public static final String AUTH_REPO_POOL_CLASS_PROP_VAL = null;
-
-	/** Field description */
-	public static final String AUTH_REPO_POOL_SIZE_PROP_KEY = "auth-repo-pool-size";
-
-	/** Field description */
+	// AuthRepository properties
 	public static final int AUTH_REPO_POOL_SIZE_PROP_VAL = 10;
+	public static final String AUTH_REPO_CLASS_PROP_KEY = "auth-repo-class";
+	public static final String AUTH_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.TigaseCustomAuth";
+	public static final String AUTH_REPO_POOL_CLASS = "--auth-repo-pool";
+	public static final String AUTH_REPO_POOL_CLASS_PROP_KEY = "auth-repo-pool";
+	public static final String AUTH_REPO_POOL_CLASS_PROP_DEF = "tigase.db.AuthRepositoryPool";
+	public static final String AUTH_REPO_POOL_CLASS_PROP_VAL = null;
+	public static final String AUTH_REPO_POOL_SIZE_PROP_KEY = "auth-repo-pool-size";
+	public static final String AUTH_REPO_POOL_SIZE = "--auth-repo-pool-size";
+	public static final String AUTH_DOMAIN_POOL_CLASS = "--auth-domain-repo-pool";
+	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_KEY = "auth-domain-repo-pool";
+	public static final String AUTH_DOMAIN_POOL_CLASS_PROP_VAL = "tigase.db.AuthRepositoryMDImpl";
+	public static final String AUTH_REPO_DOMAINS_PROP_KEY = "auth-repo-domains";
+	public static final String AUTH_REPO_PARAMS_NODE = "auth-repo-params";
+	public static final String AUTH_REPO_URL_PROP_KEY = "auth-repo-url";
+	public static final String SHARED_AUTH_REPO_PARAMS_PROP_KEY = "shared-auth-repo-params";
+	public static final String SHARED_AUTH_REPO_PROP_KEY = "shared-auth-repo";
+	public static final String TIGASE_AUTH_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.TigaseAuth";
+	public static final String TIGASE_AUTH_REPO_URL_PROP_VAL = 	"jdbc:mysql://localhost/tigasedb?user=tigase_user&password=mypass";
+	public static final String TIGASE_CUSTOM_AUTH_REPO_CLASS_PROP_VAL =	"tigase.db.jdbc.TigaseCustomAuth";
+	public static final String GEN_AUTH_DB = "--auth-db";
+	public static final String GEN_AUTH_DB_URI = "--auth-db-uri";
 
-	/** Field description */
-	public static final String USER_REPO_CLASS_PROP_KEY = "user-repo-class";
 
-	/** Field description */
-	public static final String USER_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.JDBCRepository";
-
-	/** Field description */
-	public static final String USER_REPO_POOL_CLASS_PROP_KEY = "user-repo-pool";
-
-	/** Field description */
-	public static final String USER_REPO_POOL_CLASS_PROP_DEF = "tigase.db.UserRepositoryPool";
-
-	/** Field description */
-	public static final String USER_REPO_POOL_CLASS_PROP_VAL = null;
-
-	/** Field description */
-	public static final String USER_REPO_POOL_SIZE_PROP_KEY = "user-repo-pool-size";
-
-	/** Field description */
+	// UserRepository properties
 	public static final int USER_REPO_POOL_SIZE_PROP_VAL = 10;
+	public static final String GEN_USER_DB = "--user-db";
+	public static final String GEN_USER_DB_URI = "--user-db-uri";
+	public static final String GEN_USER_DB_URI_PROP_KEY = "user-db-uri";
+	public static final String SHARED_USER_REPO_PARAMS_PROP_KEY = "shared-user-repo-params";
+	public static final String SHARED_USER_REPO_PROP_KEY = "shared-user-repo";
+	public static final String USER_DOMAIN_POOL_CLASS = "--user-domain-repo-pool";
+	public static final String USER_DOMAIN_POOL_CLASS_PROP_KEY = "user-domain-repo-pool";
+	public static final String USER_DOMAIN_POOL_CLASS_PROP_VAL = 	"tigase.db.UserRepositoryMDImpl";
+	public static final String USER_REPO_CLASS_PROP_KEY = "user-repo-class";
+	public static final String USER_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.JDBCRepository";
+	public static final String USER_REPO_DOMAINS_PROP_KEY = "user-repo-domains";
+	public static final String USER_REPO_PARAMS_NODE = "user-repo-params";
+	public static final String USER_REPO_POOL_CLASS = "--user-repo-pool";
+	public static final String USER_REPO_POOL_CLASS_PROP_DEF = "tigase.db.UserRepositoryPool";
+	public static final String USER_REPO_POOL_CLASS_PROP_KEY = "user-repo-pool";
+	public static final String USER_REPO_POOL_CLASS_PROP_VAL = null;
+	public static final String USER_REPO_POOL_SIZE = "--user-repo-pool-size";
+	public static final String USER_REPO_POOL_SIZE_PROP_KEY = "user-repo-pool-size";
+	public static final String USER_REPO_URL_PROP_KEY = "user-repo-url";
+
+	// repositories classes and URLs
+	public static final String DERBY_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.JDBCRepository";
+	public static final String DERBY_REPO_URL_PROP_VAL = "jdbc:derby:tigase-derbydb;create=true";
+	public static final String DRUPALWP_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.DrupalWPAuth";
+	public static final String DRUPAL_REPO_URL_PROP_VAL =	"jdbc:mysql://localhost/drupal?user=root&password=mypass";
+	public static final String DUMMY_REPO_CLASS_PROP_VAL = "tigase.db.DummyRepository";
+	public static final String LIBRESOURCE_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.LibreSourceAuth";
+	public static final String LIBRESOURCE_REPO_URL_PROP_VAL = 	"jdbc:postgresql://localhost/libresource?user=demo";
+	public static final String MYSQL_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.JDBCRepository";
+	public static final String MYSQL_REPO_URL_PROP_VAL =	"jdbc:mysql://localhost/tigase?user=root&password=mypass";
+	public static final String PGSQL_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.JDBCRepository";
+	public static final String PGSQL_REPO_URL_PROP_VAL = 	"jdbc:postgresql://localhost/tigase?user=tigase";
+	public static final String XML_REPO_CLASS_PROP_VAL = "tigase.db.xml.XMLRepository";
+	public static final String XML_REPO_URL_PROP_VAL = "user-repository.xml";
+
+	/** Field description */
 	private static ConcurrentMap<String, UserRepository> user_repos = new ConcurrentHashMap<String,
 		UserRepository>(5);
 	private static ConcurrentMap<String, AuthRepository> auth_repos = new ConcurrentHashMap<String,
@@ -117,7 +131,7 @@ public abstract class RepositoryFactory {
 
 	/**
 	 * Method description
-	 *
+	 * 
 	 *
 	 * @param class_name
 	 * @param resource
@@ -130,44 +144,48 @@ public abstract class RepositoryFactory {
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
 	 */
-	public static AuthRepository getAuthRepository(String class_name, String resource,
-			Map<String, String> params)
+	public static AuthRepository getAuthRepository( String class_name, String resource,
+																									Map<String, String> params )
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException,
-			DBInitException {
+						 DBInitException {
 		String cls = class_name;
 
-		if (cls == null) {
-			cls = System.getProperty(AUTH_REPO_CLASS_PROP_KEY, AUTH_REPO_CLASS_PROP_VAL);
+		if ( cls == null ){
+			cls = System.getProperty( AUTH_REPO_CLASS_PROP_KEY, AUTH_REPO_CLASS_PROP_VAL );
 		}
 
-		cls = getRepoClass(cls);
+		cls = getRepoClass( cls );
 
-		AuthRepository repo = auth_repos.get(cls + resource);
+		AuthRepository repo = auth_repos.get( cls + resource );
 
-		if (repo == null) {
-			if (System.getProperty(AUTH_REPO_POOL_CLASS_PROP_KEY, AUTH_REPO_POOL_CLASS_PROP_VAL)
-					!= null) {
-				int repo_pool_size = Integer.getInteger(AUTH_REPO_POOL_SIZE_PROP_KEY,
-					AUTH_REPO_POOL_SIZE_PROP_VAL);
-				AuthRepositoryPool repo_pool =
-					(AuthRepositoryPool) Class.forName(System.getProperty(AUTH_REPO_POOL_CLASS_PROP_KEY,
-						AUTH_REPO_POOL_CLASS_PROP_VAL)).newInstance();
+		if ( repo == null ){
+			String repo_pool_cls = System.getProperty( AUTH_REPO_POOL_CLASS_PROP_KEY, AUTH_REPO_POOL_CLASS_PROP_VAL );
+			int repo_pool_size;
+			if ( params.get( RepositoryFactory.AUTH_REPO_POOL_SIZE_PROP_KEY ) != null ){
+				repo_pool_size = Integer.parseInt( params.get( RepositoryFactory.AUTH_REPO_POOL_SIZE_PROP_KEY ) );
+			} else {
+				repo_pool_size = Integer.getInteger( AUTH_REPO_POOL_SIZE_PROP_KEY, AUTH_REPO_POOL_SIZE_PROP_VAL );
+			}
+			params.put( RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, String.valueOf( repo_pool_size ) );
+			if ( repo_pool_cls != null ){
 
-				repo_pool.initRepository(resource, params);
+				AuthRepositoryPool repo_pool = (AuthRepositoryPool) Class.forName( repo_pool_cls ).newInstance();
 
-				for (int i = 0; i < repo_pool_size; i++) {
-					repo = (AuthRepository) Class.forName(cls).newInstance();
-					repo.initRepository(resource, params);
-					repo_pool.addRepo(repo);
+				repo_pool.initRepository( resource, params );
+
+				for ( int i = 0 ; i < repo_pool_size ; i++ ) {
+					repo = (AuthRepository) Class.forName( cls ).newInstance();
+					repo.initRepository( resource, params );
+					repo_pool.addRepo( repo );
 				}
 
 				repo = repo_pool;
 			} else {
-				repo = (AuthRepository) Class.forName(cls).newInstance();
-				repo.initRepository(resource, params);
+				repo = (AuthRepository) Class.forName( cls ).newInstance();
+				repo.initRepository( resource, params );
 			}
 
-			auth_repos.put(cls + resource, repo);
+			auth_repos.put( cls + resource, repo );
 		}
 
 		return repo;
@@ -201,9 +219,14 @@ public abstract class RepositoryFactory {
 
 		DataRepository repo = data_repos.get(cls + resource);
 
-		if (repo == null) {
-			int repo_pool_size = Integer.getInteger(DATA_REPO_POOL_SIZE_PROP_KEY,
-				DATA_REPO_POOL_SIZE_PROP_VAL);
+		if ( repo == null ){
+			int repo_pool_size;
+			if ( params.get( RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY ) != null ){
+				repo_pool_size = Integer.parseInt( params.get( RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY ) );
+			} else {
+				repo_pool_size = Integer.getInteger( DATA_REPO_POOL_SIZE_PROP_KEY, DATA_REPO_POOL_SIZE_PROP_VAL );
+			}
+
 			DataRepositoryPool repo_pool =
 				(DataRepositoryPool) Class.forName(System.getProperty(DATA_REPO_POOL_CLASS_PROP_KEY,
 					DATA_REPO_POOL_CLASS_PROP_VAL)).newInstance();
@@ -295,16 +318,20 @@ public abstract class RepositoryFactory {
 
 		UserRepository repo = user_repos.get(cls + resource);
 
-		if (repo == null) {
-			if (System.getProperty(USER_REPO_POOL_CLASS_PROP_KEY, USER_REPO_POOL_CLASS_PROP_VAL)
-					!= null) {
-				int repo_pool_size = Integer.getInteger(USER_REPO_POOL_SIZE_PROP_KEY,
-					USER_REPO_POOL_SIZE_PROP_VAL);
-				UserRepositoryPool repo_pool =
-					(UserRepositoryPool) Class.forName(System.getProperty(USER_REPO_POOL_CLASS_PROP_KEY,
-						USER_REPO_POOL_CLASS_PROP_VAL)).newInstance();
+		if ( repo == null ){
+			String repo_pool_cls = System.getProperty( USER_REPO_POOL_CLASS_PROP_KEY, USER_REPO_POOL_CLASS_PROP_VAL );
+			int repo_pool_size;
+			if ( params.get( RepositoryFactory.USER_REPO_POOL_SIZE_PROP_KEY ) != null ){
+				repo_pool_size = Integer.parseInt( params.get( RepositoryFactory.USER_REPO_POOL_SIZE_PROP_KEY ) );
+			} else {
+				repo_pool_size = Integer.getInteger( USER_REPO_POOL_SIZE_PROP_KEY, USER_REPO_POOL_SIZE_PROP_VAL );
+			}
+			params.put( RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, String.valueOf( repo_pool_size ) );
+			if ( repo_pool_cls != null ){
 
-				repo_pool.initRepository(resource, params);
+				UserRepositoryPool repo_pool = (UserRepositoryPool) Class.forName( repo_pool_cls ).newInstance();
+
+				repo_pool.initRepository( resource, params );
 
 				for (int i = 0; i < repo_pool_size; i++) {
 					repo = (UserRepository) Class.forName(cls).newInstance();
@@ -324,9 +351,3 @@ public abstract class RepositoryFactory {
 		return repo;
 	}
 }    // RepositoryFactory
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

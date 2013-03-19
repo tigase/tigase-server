@@ -37,6 +37,7 @@ import java.util.TreeMap;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.db.RepositoryFactory;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.server.Command;
@@ -137,8 +138,8 @@ public class ConfiguratorOld extends ConfiguratorAbstract {
 				if (args[i].startsWith(GEN_TEST)) {
 					key = args[i];  val = Boolean.TRUE;
 				}
-				if (args[i].equals(GEN_USER_DB) || args[i].equals(GEN_USER_DB_URI)
-					|| args[i].equals(GEN_AUTH_DB) || args[i].equals(GEN_AUTH_DB_URI)
+				if (args[i].equals(RepositoryFactory.GEN_USER_DB) || args[i].equals(RepositoryFactory.GEN_USER_DB_URI)
+					|| args[i].equals(RepositoryFactory.GEN_AUTH_DB) || args[i].equals(RepositoryFactory.GEN_AUTH_DB_URI)
 					|| args[i].startsWith(GEN_COMP_NAME) || args[i].startsWith(GEN_COMP_CLASS)
 					|| args[i].startsWith(GEN_EXT_COMP) || args[i].equals(GEN_VIRT_HOSTS)
 					|| args[i].equals(GEN_ADMINS) || args[i].equals(GEN_DEBUG)
