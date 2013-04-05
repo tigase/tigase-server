@@ -44,6 +44,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -107,6 +108,7 @@ public class WebSocketXMPPIOService<RefObject>
 		if (cb == null) {
 			return null;
 		}
+
 		if (websocket) {
 			// handling partialy decoded frame
 			if (partialFrame != null) {
@@ -149,6 +151,11 @@ public class WebSocketXMPPIOService<RefObject>
 		if (started) {
 			return decode(cb);
 		}
+		
+		if (!cb.hasRemaining()) {
+			return null;
+		}
+		
 		if ((pos == 0) && (cb.get(0) != (byte) 'G')) {
 			started = true;
 
@@ -298,12 +305,16 @@ public class WebSocketXMPPIOService<RefObject>
 		if (!headers.containsKey(CONNECTION_KEY) ||
 				!headers.get(CONNECTION_KEY).contains("Upgrade")) {
 			writeRawData(BAD_REQUEST);
+			
+			dumpHeaders(headers);
 
 			return;
 		}
 		if (!headers.containsKey(WS_PROTOCOL_KEY) ||
 				!headers.get(WS_PROTOCOL_KEY).contains("xmpp")) {
 			writeRawData(BAD_REQUEST);
+
+			dumpHeaders(headers);
 
 			return;
 		}
@@ -536,6 +547,21 @@ public class WebSocketXMPPIOService<RefObject>
 
 		// dataBuffer.flip();
 		return dataBuffer;
+	}
+	
+	public void dumpHeaders(Map<String,String> headers) {
+		if (log.isLoggable(Level.FINEST)) {
+			StringBuilder builder = new StringBuilder(1000);
+			for(Map.Entry<String,String> entry : headers.entrySet()) {
+				builder.append("KEY = ");
+				builder.append(entry.getKey());
+				builder.append("VALUE = ");
+				builder.append(entry.getValue());
+				builder.append('\n');
+			}
+			
+			log.log(Level.FINEST, "received headers = \n{0}", builder.toString());
+		}		
 	}
 }
 
