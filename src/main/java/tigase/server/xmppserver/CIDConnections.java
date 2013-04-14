@@ -50,9 +50,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.TreeMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created: Jun 14, 2010 12:32:49 PM
@@ -63,9 +64,23 @@ import java.util.TreeMap;
 public class CIDConnections {
 	private static final Logger log              =
 		Logger.getLogger(CIDConnections.class.getName());
-	private static final Timer outgoingOpenTasks = new Timer("S2S outgoing open tasks",
-																									 true);
+//	private static final Timer outgoingOpenTasks = new Timer("S2S outgoing open tasks",
+//																									 true);
+	// TODO: #1195 - estimate proper default value 
+	private static int outgoingOpenTasksSize = 2;
+	
+	private static ScheduledExecutorService outgoingOpenTasks = 
+			Executors.newScheduledThreadPool(outgoingOpenTasksSize);
 
+	public static void setOutgoingOpenTheadsSize(int size) {
+		if (outgoingOpenTasksSize != size) {
+			outgoingOpenTasksSize = size;
+			ScheduledExecutorService scheduler = outgoingOpenTasks;
+			outgoingOpenTasks = Executors.newScheduledThreadPool(outgoingOpenTasksSize);
+			scheduler.shutdown();
+		}
+	}
+	
 	//~--- fields ---------------------------------------------------------------
 
 	private CID cid                                       = null;
@@ -551,7 +566,7 @@ public class CIDConnections {
 	 * @param verify_req
 	 */
 	public void sendHandshakingOnly(final Packet verify_req) {
-		outgoingOpenTasks.schedule(new TimerTask() {
+		outgoingOpenTasks.schedule(new Runnable() {
 			@Override
 			public void run() {
 				try {
@@ -574,7 +589,7 @@ public class CIDConnections {
 					log.log(Level.INFO, "Remote host not found: " + cid.getRemoteHost(), ex);
 				}
 			}
-		}, 0);
+		}, 0, TimeUnit.MILLISECONDS);
 	}
 
 	/**
@@ -650,7 +665,7 @@ public class CIDConnections {
 				log.log(Level.FINEST, "Scheduling task for openning a new connection for: {0}",
 								cid);
 			}
-			outgoingOpenTasks.schedule(new TimerTask() {
+			outgoingOpenTasks.schedule(new Runnable() {
 				@Override
 				public void run() {
 					boolean result = false;
@@ -670,7 +685,7 @@ public class CIDConnections {
 						outgoingOpenInProgress.set(false);
 					}
 				}
-			}, 0);
+			}, 0, TimeUnit.MILLISECONDS);
 		} else {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Outgoing open in progress, skipping for: {0}", cid);

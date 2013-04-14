@@ -59,6 +59,7 @@ import java.util.TimerTask;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -98,8 +99,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	/** Field description */
 	public static final long MAX_PACKET_WAITING_TIME_PROP_VAL = 7 * MINUTE;
-	private static Map<String, ConnectionWatchdogTask> waitingTasks = new LinkedHashMap<String,
-		ConnectionWatchdogTask>();
+	private static Map<String, tigase.util.TimerTask> waitingTaskFutures = new LinkedHashMap<String,
+		tigase.util.TimerTask>();
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -1360,7 +1361,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	//~--- inner classes --------------------------------------------------------
 
-	private class ConnectionWatchdogTask extends TimerTask {
+	private class ConnectionWatchdogTask extends tigase.util.TimerTask {
 		private ServerConnections conns = null;
 		private String localhost = null;
 		private String remotehost = null;
@@ -1373,14 +1374,14 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 			this.remotehost = remotehost;
 
 			String key = localhost + remotehost;
-			ConnectionWatchdogTask task = waitingTasks.get(key);
+			tigase.util.TimerTask task = waitingTaskFutures.get(key);
 
 			if (task != null) {
 				task.cancel();
 			}
 
 			addTimerTask(this, 15, TimeUnit.SECONDS);
-			waitingTasks.put(key, this);
+			waitingTaskFutures.put(key, task);
 		}
 
 		//~--- methods ------------------------------------------------------------
@@ -1393,7 +1394,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		public void run() {
 			String key = localhost + remotehost;
 
-			waitingTasks.remove(key);
+			waitingTaskFutures.remove(key);
 
 			if (conns.getOutgoingState() != ServerConnections.OutgoingState.OK) {
 				if (log.isLoggable(Level.FINEST)) {

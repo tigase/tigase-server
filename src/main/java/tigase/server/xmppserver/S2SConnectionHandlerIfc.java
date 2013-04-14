@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TimerTask;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 //~--- interfaces -------------------------------------------------------------
@@ -67,7 +68,7 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 
 	boolean addOutPacket(Packet packet);
 
-	void addTimerTask(TimerTask task, long delay, TimeUnit unit);
+	void addTimerTask(tigase.util.TimerTask task, long delay, TimeUnit unit);
 
 	//~--- get methods ----------------------------------------------------------
 

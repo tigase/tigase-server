@@ -20,13 +20,13 @@
  */
 package tigase.server.bosh;
 
-import java.util.TimerTask;
 import java.util.Queue;
 import java.util.ArrayDeque;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import tigase.server.Packet;
+import tigase.util.TimerTask;
 
 /**
  * Describe class BoshWaitTimer here.
@@ -43,7 +43,7 @@ public class BoshTask extends TimerTask {
 	protected long timerOrder = System.currentTimeMillis();
 	private BoshSession bs = null;
 	private BoshConnectionManager manager = null;
-
+	
 	// ~--- constructors -------------------------------------------------------
 
 	/**

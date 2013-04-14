@@ -1,5 +1,5 @@
 /*  Tigase Jabber/XMPP Server
- *  Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ *  Copyright (C) 2004-2013 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -18,25 +18,26 @@
  * Last modified by $Author: $
  * $Date: $
  */
-package tigase.server.bosh;
+package tigase.util;
 
-import tigase.util.TimerTask;
+import java.util.concurrent.ScheduledFuture;
 
 /**
- *
- * @author andrzej
+ * TimerTask class is basic implementation of java.util.TimerTask class which
+ * is used with ScheduledExecutorService in AbstractMessageRecevier.
  */
-public class BoshSendQueueTask extends TimerTask {
+public abstract class TimerTask implements Runnable {
 
-        private final BoshSession bs;
-        
-        public BoshSendQueueTask(BoshSession bs) {
-                this.bs = bs;
-        }
-
-        @Override
-        public void run() {
-                bs.sendWaitingPackets();
-        }
-        
+	private ScheduledFuture<?> future = null;
+	
+	public void setScheduledFuture(ScheduledFuture<?> future) {
+		this.future = future;
+	}
+	
+	public void cancel() {
+		if (future != null) {
+			future.cancel(false);
+		}
+	}
+	
 }
