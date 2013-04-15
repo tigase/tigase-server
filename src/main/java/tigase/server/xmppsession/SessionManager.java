@@ -2212,7 +2212,7 @@ public class SessionManager
 	//~--- inner classes --------------------------------------------------------
 
 	private class AuthenticationTimer
-					extends TimerTask {
+					extends tigase.util.TimerTask {
 		private JID connId = null;
 
 		//~--- constructors -------------------------------------------------------

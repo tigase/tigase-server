@@ -1210,7 +1210,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 					new Object[] { getName(),
 					delay / 1000, cid });
 		}
-		addTimerTask(new TimerTask() {
+		addTimerTask(new tigase.util.TimerTask() {
 			@Override
 			public void run() {
 				String host = (String) port_props.get(PORT_REMOTE_HOST_PROP_KEY);

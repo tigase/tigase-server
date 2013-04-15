@@ -53,6 +53,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -80,6 +81,9 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	protected static final String DB_RESULT_EL_NAME = "db:result";
 	protected static final String DB_VERIFY_EL_NAME = "db:verify";
 
+	/** Field description */	
+	public static final String CID_CONNECTIONS_TASKS_THREADS_KEY = "cid-connections-tasks-threads";
+
 	/** Field description */
 	public static final String MAX_PACKET_WAITING_TIME_PROP_KEY = "max-packet-waiting-time";
 
@@ -98,7 +102,11 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 
 	/** Field description */
 	public static final String S2S_CONNECTION_SELECTOR_PROP_KEY = "s2s-conn-selector";
-
+	
+	/** Field description */	
+	// TODO: #1195 - estimate proper default value 
+	public static final int CID_CONNECTIONS_TASKS_THREADS_VAL = Runtime.getRuntime().availableProcessors();
+	
 	/** Field description */
 	public static final String S2S_CONNECTION_SELECTOR_PROP_VAL =
 			"tigase.server.xmppserver.S2SRandomSelector";
@@ -174,6 +182,12 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 		binds.put(CID_CONNECTIONS_BIND, cidConnections);
 	}
 
+	@Override
+	public int schedulerThreads() {
+		// TODO: #1195 - estimate proper default value 
+		return Runtime.getRuntime().availableProcessors();
+	}
+	
 	/**
 	 * Method description
 	 * 
@@ -196,6 +210,20 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	 * @param unit
 	 */
 	@Override
+	public void addTimerTask(tigase.util.TimerTask task, long delay, TimeUnit unit) {
+		super.addTimerTask(task, delay, unit);
+	}
+
+	/**
+	 * Method description
+	 * 
+	 * 
+	 * @param task
+	 * @param delay
+	 * @param unit
+	 */
+	@Override
+	@Deprecated
 	public void addTimerTask(TimerTask task, long delay, TimeUnit unit) {
 		super.addTimerTask(task, delay, unit);
 	}
@@ -246,7 +274,8 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 		props.put(MAX_OUT_TOTAL_CONNECTIONS_PROP_KEY, MAX_OUT_TOTAL_CONNECTIONS_PROP_VAL);
 		props.put(MAX_OUT_PER_IP_CONNECTIONS_PROP_KEY, MAX_OUT_PER_IP_CONNECTIONS_PROP_VAL);
 		props.put(S2S_CONNECTION_SELECTOR_PROP_KEY, S2S_CONNECTION_SELECTOR_PROP_VAL);
-
+		props.put(CID_CONNECTIONS_TASKS_THREADS_KEY, CID_CONNECTIONS_TASKS_THREADS_VAL);
+		
 		return props;
 	}
 
@@ -731,6 +760,10 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 
+		if (props.containsKey(CID_CONNECTIONS_TASKS_THREADS_KEY)) {			
+			CIDConnections.setOutgoingOpenThreadsSize((Integer) props.get(CID_CONNECTIONS_TASKS_THREADS_KEY));
+		}
+		
 		if ( props.size() == 1 ){
 			// If props.size() == 1, it means this is a single property update
 			// and this component does not support single property change for the rest

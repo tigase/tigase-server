@@ -60,8 +60,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.regex.Pattern;
 import java.util.Set;
-import java.util.TimerTask;
 import java.util.UUID;
+import tigase.util.TimerTask;
 
 /**
  * Describe class BoshSession here.

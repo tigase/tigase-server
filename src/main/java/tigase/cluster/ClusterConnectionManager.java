@@ -76,6 +76,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.TimerTask;
 import java.util.UUID;
+import java.util.concurrent.ScheduledFuture;
 import java.util.zip.Deflater;
 
 import javax.script.Bindings;
@@ -159,7 +160,7 @@ public class ClusterConnectionManager
 
 	/** Field description */
 	public static final boolean COMPRESS_STREAM_PROP_VAL = false;
-	private static final String SERVICE_CONNECTED_TIMER  = "service-connected-timer";
+	private static final String SERVICE_CONNECTED_TASK_FUTURE  = "service-connected-task-future";
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -559,10 +560,10 @@ public class ClusterConnectionManager
 	 */
 	@Override
 	public void serviceStarted(XMPPIOService<Object> serv) {
-		ServiceConnectedTimer task = new ServiceConnectedTimer(serv);
+		ServiceConnectedTimerTask task = new ServiceConnectedTimerTask(serv);
 
-		serv.getSessionData().put(SERVICE_CONNECTED_TIMER, task);
-		addTimerTask(task, 10, TimeUnit.SECONDS);
+		serv.getSessionData().put(SERVICE_CONNECTED_TASK_FUTURE, task);
+		addTimerTask(task, 10, TimeUnit.SECONDS);		
 		super.serviceStarted(serv);
 		log.log(Level.INFO, "cluster connection opened: {0}, type: {1}, id={2}",
 				new Object[] { serv.getRemoteAddress(),
@@ -942,8 +943,8 @@ public class ClusterConnectionManager
 			clusterController.nodeConnected(addr);
 		}
 
-		ServiceConnectedTimer task = (ServiceConnectedTimer) serv.getSessionData().get(
-				SERVICE_CONNECTED_TIMER);
+		ServiceConnectedTimerTask task = (ServiceConnectedTimerTask) serv.getSessionData().get(
+				SERVICE_CONNECTED_TASK_FUTURE);
 
 		if (task == null) {
 			log.log(Level.WARNING, "Missing service connected timer task: {0}", serv);
@@ -1272,13 +1273,13 @@ public class ClusterConnectionManager
 	}
 
 
-	private class ServiceConnectedTimer
-					extends TimerTask {
+	private class ServiceConnectedTimerTask
+					extends tigase.util.TimerTask {
 		private XMPPIOService<Object> serv = null;
 
 		//~--- constructors -------------------------------------------------------
 
-		private ServiceConnectedTimer(XMPPIOService<Object> serv) {
+		private ServiceConnectedTimerTask(XMPPIOService<Object> serv) {
 			this.serv = serv;
 		}
 

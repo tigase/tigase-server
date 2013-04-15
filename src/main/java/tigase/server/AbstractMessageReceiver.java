@@ -41,6 +41,9 @@ import tigase.xml.Element;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -130,6 +133,12 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 			"tigase.server.filters.PacketCounter";
 
 	/**
+	 * Configuration property key for setting number of threads used by component
+	 * ScheduledExecutorService.
+	 */
+	public static final String SCHEDULER_THREADS_PROP_KEY = "scheduler-threads";
+	
+	/**
 	 * Constant used in time calculation procedures. Indicates a second that is
 	 * 1000 milliseconds.
 	 */
@@ -174,6 +183,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 	private long packets_per_second = 0;
 	private MessageReceiver parent = null;
 	private int pptIdx = 0;
+	private int schedulerThreads_size = 1;
 
 	// Array cache to speed processing up....
 	private final Priority[] pr_cache = Priority.values();
@@ -188,6 +198,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 	private final List<PriorityQueueAbstract<Packet>> in_queues =
 			new ArrayList<PriorityQueueAbstract<Packet>>(pr_cache.length);
 	private final long[] processPacketTimings = new long[100];
+	private ScheduledExecutorService receiverScheduler = null;
 	private Timer receiverTasks = null;
 
 	/**
@@ -554,6 +565,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 		}
 
 		defs.put(MAX_QUEUE_SIZE_PROP_KEY, getMaxQueueSize(queueSizeInt));
+		defs.put(SCHEDULER_THREADS_PROP_KEY, schedulerThreads());
 		defs.put(INCOMING_FILTERS_PROP_KEY, INCOMING_FILTERS_PROP_VAL);
 		defs.put(OUTGOING_FILTERS_PROP_KEY, OUTGOING_FILTERS_PROP_VAL);
 
@@ -813,6 +825,15 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 		return 1;
 	}
 
+	/**
+	 * Method returns default number of threads used by SchedulerExecutorService
+	 * 
+	 * @return 
+	 */
+	public int schedulerThreads() {
+		return 1;
+	}
+	
 	public int processingOutThreads() {
 		return 1;
 	}
@@ -902,6 +923,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 		super.setName(name);
 		in_queues_size = processingInThreads();
 		out_queues_size = processingOutThreads();
+		schedulerThreads_size = schedulerThreads();
 		setMaxQueueSize(maxInQueueSize);
 	}
 
@@ -932,6 +954,16 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 			setMaxQueueSize(queueSize);
 		}
 
+		if (props.get(SCHEDULER_THREADS_PROP_KEY) != null) {
+			int threads = (Integer) props.get(SCHEDULER_THREADS_PROP_KEY);
+			if (threads != schedulerThreads_size) {
+				schedulerThreads_size = threads;
+				ScheduledExecutorService scheduler = receiverScheduler;
+				receiverScheduler = Executors.newScheduledThreadPool(threads);
+				scheduler.shutdown();
+			}
+		}
+		
 		String filters = (String) props.get(INCOMING_FILTERS_PROP_KEY);
 
 		if ((filters != null) && !filters.trim().isEmpty()) {
@@ -1084,10 +1116,54 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 		return true;
 	}
 
+	/**
+	 * Method queues and executes timer tasks using ScheduledExecutorService 
+	 * which allows using more than one thread for executing tasks.
+	 * 
+	 * @param task
+	 * @param delay
+	 * @param unit
+	 * @deprecated
+	 */
+	protected void addTimerTask(tigase.util.TimerTask task, long delay, TimeUnit unit) {
+		ScheduledFuture<?> future = receiverScheduler.schedule(task, delay, unit);
+		task.setScheduledFuture(future);
+	}
+
+	/**
+	 * Method queues and executes timer tasks using ScheduledExecutorService 
+	 * which allows using more than one thread for executing tasks.
+	 * 
+	 * @param task
+	 * @param delay
+	 * @deprecated
+	 */
+	public void addTimerTask(tigase.util.TimerTask task, long delay) {
+		ScheduledFuture<?> future = receiverScheduler.schedule(task, delay, TimeUnit.MILLISECONDS);
+		task.setScheduledFuture(future);
+	}
+	
+	/**
+	 * Method queues and executes all timer tasks on Timer SINGLE thread.
+	 * 
+	 * @param task
+	 * @param delay
+	 * @param unit
+	 * @deprecated
+	 */
+	@Deprecated
 	protected void addTimerTask(TimerTask task, long delay, TimeUnit unit) {
 		receiverTasks.schedule(task, unit.toMillis(delay));
 	}
 
+	/**
+	 * Method queues and executes all timer tasks on Timer SINGLE thread.
+	 * 
+	 * @param task
+	 * @param delay
+	 * @deprecated
+	 */
+	@Deprecated
 	public void addTimerTask(TimerTask task, long delay) {
 		receiverTasks.schedule(task, delay);
 	}
@@ -1138,6 +1214,9 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 		// out_thread.setName("out_" + getName());
 		// out_thread.start();
 		// } // end of if (thread == null || ! thread.isAlive())
+		
+		receiverScheduler = Executors.newScheduledThreadPool(schedulerThreads_size);
+		
 		receiverTasks = new Timer(getName() + " tasks", true);
 		receiverTasks.scheduleAtFixedRate(new TimerTask() {
 			@Override
@@ -1192,9 +1271,14 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 			receiverTasks.cancel();
 			receiverTasks = null;
 		}
+		
+		if (receiverScheduler != null) {
+			receiverScheduler.shutdownNow();
+			receiverScheduler = null;
+		}
 	}
 
-	private class PacketReceiverTask extends TimerTask {
+	private class PacketReceiverTask extends tigase.util.TimerTask {
 		private ReceiverTimeoutHandler handler = null;
 		private String id = null;
 		private Packet packet = null;
@@ -1206,7 +1290,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 			this.packet = packet;
 			id = packet.getFrom().toString() + packet.getStanzaId();
 			waitingTasks.put(id, this);
-			receiverTasks.schedule(this, unit.toMillis(delay));
+			addTimerTask(this, delay, unit);
 
 			// log.finest("[" + getName() + "]  " + "Added timeout task for: " + id);
 		}

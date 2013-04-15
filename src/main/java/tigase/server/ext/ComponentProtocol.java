@@ -568,7 +568,7 @@ public class ComponentProtocol
 	@Override
 	public void serviceStarted(ComponentIOService serv) {
 		super.serviceStarted(serv);
-		addTimerTask(new AuthenticationTimer(serv), authenticationTimeOut, TimeUnit.SECONDS);
+		addTimerTask(new AuthenticationTimerTask(serv), authenticationTimeOut, TimeUnit.SECONDS);
 
 		String xmlns = ((CompRepoItem) serv.getSessionData().get(REPO_ITEM_KEY)).getXMLNS();
 
@@ -1131,14 +1131,14 @@ public class ComponentProtocol
 	//~--- inner classes --------------------------------------------------------
 
 	// ~--- inner classes --------------------------------------------------------
-	private class AuthenticationTimer
-					extends TimerTask {
+	private class AuthenticationTimerTask
+					extends tigase.util.TimerTask {
 		private ComponentIOService serv = null;
 
 		//~--- constructors -------------------------------------------------------
 
 		// ~--- constructors -------------------------------------------------------
-		private AuthenticationTimer(ComponentIOService serv) {
+		private AuthenticationTimerTask(ComponentIOService serv) {
 			this.serv = serv;
 		}
 
