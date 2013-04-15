@@ -67,12 +67,12 @@ public class CIDConnections {
 //	private static final Timer outgoingOpenTasks = new Timer("S2S outgoing open tasks",
 //																									 true);
 	// TODO: #1195 - estimate proper default value 
-	private static int outgoingOpenTasksSize = 2;
+	private static int outgoingOpenTasksSize = Runtime.getRuntime().availableProcessors();
 	
 	private static ScheduledExecutorService outgoingOpenTasks = 
 			Executors.newScheduledThreadPool(outgoingOpenTasksSize);
 
-	public static void setOutgoingOpenTheadsSize(int size) {
+	public static void setOutgoingOpenThreadsSize(int size) {
 		if (outgoingOpenTasksSize != size) {
 			outgoingOpenTasksSize = size;
 			ScheduledExecutorService scheduler = outgoingOpenTasks;

@@ -105,7 +105,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	
 	/** Field description */	
 	// TODO: #1195 - estimate proper default value 
-	public static final int CID_CONNECTIONS_TASKS_THREADS_VAL = 2;
+	public static final int CID_CONNECTIONS_TASKS_THREADS_VAL = Runtime.getRuntime().availableProcessors();
 	
 	/** Field description */
 	public static final String S2S_CONNECTION_SELECTOR_PROP_VAL =
@@ -185,7 +185,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	@Override
 	public int schedulerThreads() {
 		// TODO: #1195 - estimate proper default value 
-		return 2;
+		return Runtime.getRuntime().availableProcessors();
 	}
 	
 	/**
@@ -761,7 +761,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 		super.setProperties(props);
 
 		if (props.containsKey(CID_CONNECTIONS_TASKS_THREADS_KEY)) {			
-			CIDConnections.setOutgoingOpenTheadsSize((Integer) props.get(CID_CONNECTIONS_TASKS_THREADS_KEY));
+			CIDConnections.setOutgoingOpenThreadsSize((Integer) props.get(CID_CONNECTIONS_TASKS_THREADS_KEY));
 		}
 		
 		if ( props.size() == 1 ){
