@@ -70,6 +70,7 @@ import static tigase.xmpp.impl.roster.RosterAbstract.TO_SUBSCRIBED;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
@@ -1453,7 +1454,7 @@ public class Presence
 			// updatePresenceChange(packet.getElement(), session, results);
 			roster_util.updateBuddyChange(session, results, roster_util.getBuddyItem(session,
 					packet.getStanzaFrom()));
-		}
+			}
 
 		// We can't know that actually, this might come from offline storage
 		// roster_util.setBuddyOnline(session, packet.getElemFrom(), true);
@@ -1836,7 +1837,13 @@ public class Presence
 					buddy));
 			if (initial_presence != null) {
 				if (pres_type == PresenceType.out_subscribed) {
-					sendPresence(StanzaType.available, null, buddy, results, initial_presence);
+					// The contact's server MUST then also send current presence to the user
+					// from each of the contact's available resources.
+					List<XMPPResourceConnection> activeSessions = session.getActiveSessions();
+					for ( XMPPResourceConnection userSessions : activeSessions) {
+						Element presence = userSessions.getPresence();
+						sendPresence(StanzaType.available, userSessions.getjid(), buddy, results, presence);
+					}
 					roster_util.setPresenceSent(session, buddy, true);
 				} else {
 					sendPresence(StanzaType.unavailable, session.getJID(), buddy, results, null);
