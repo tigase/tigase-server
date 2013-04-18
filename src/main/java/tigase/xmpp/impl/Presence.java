@@ -67,6 +67,7 @@ import static tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -1627,7 +1628,13 @@ public class Presence extends XMPPProcessor implements XMPPProcessorIfc,
 
 			if (initial_presence != null) {
 				if (pres_type == PresenceType.out_subscribed) {
-					sendPresence(StanzaType.available, null, buddy, results, initial_presence);
+					// The contact's server MUST then also send current presence to the user
+					// from each of the contact's available resources.
+					List<XMPPResourceConnection> activeSessions = session.getActiveSessions();
+					for ( XMPPResourceConnection userSessions : activeSessions ) {
+						Element presence = userSessions.getPresence();
+						sendPresence( StanzaType.available, userSessions.getjid(), buddy, results, presence );
+					}
 					roster_util.setPresenceSent(session, buddy, true);
 				} else {
 					sendPresence(StanzaType.unavailable, session.getJID(), buddy, results, null);
