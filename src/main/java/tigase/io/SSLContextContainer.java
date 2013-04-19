@@ -196,8 +196,9 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		KeyStore keys = KeyStore.getInstance("JKS");
 
 		keys.load(null, emptyPass);
-		keys.setKeyEntry(alias, entry.getPrivateKey(), emptyPass, entry.getCertChain());
+		keys.setKeyEntry(alias, entry.getPrivateKey(), emptyPass, CertificateUtil.sort(entry.getCertChain()));
 
+		
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
 
 		kmf.init(keys, emptyPass);
