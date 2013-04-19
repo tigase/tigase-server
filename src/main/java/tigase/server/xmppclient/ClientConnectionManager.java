@@ -608,23 +608,23 @@ public class ClientConnectionManager
 					"<host-unknown xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
 					"</stream:error>" + "</stream:stream>";
 		}    // end of if (!hostnames.contains(hostname))
-		if ((fromJID != null) && (see_other_host_strategy != null)) {
-			BareJID see_other_host = see_other_host_strategy.findHostForJID(fromJID,
-					getDefHostName());
+		if ( ( fromJID != null ) && ( see_other_host_strategy != null )
+				 && see_other_host_strategy.isEnabled( SeeOtherHostIfc.Phase.OPEN ) ){
+			BareJID see_other_host = see_other_host_strategy.findHostForJID( fromJID,
+																																			 getDefHostName() );
 
-			if ((see_other_host != null) &&!see_other_host.equals(getDefHostName())) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Sending redirect for {0} to host {1}, connection {2}.",
-							new Object[] { fromJID,
-							see_other_host, serv });
+			if ( ( see_other_host != null ) && !see_other_host.equals( getDefHostName() ) ){
+				if ( log.isLoggable( Level.FINEST ) ){
+					log.log( Level.FINEST, "Sending redirect for {0} to host {1}, connection {2}.",
+									 new Object[] { fromJID,
+																	see_other_host, serv } );
 				}
-
-				return "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'" +
-						" xmlns:stream='http://etherx.jabber.org/streams'" +
-						" id='tigase-error-tigase'" + " from='" + getDefVHostItem() + "'" +
-						" version='1.0' xml:lang='en'>" + "<stream:error>" +
-						"<see-other-host xmlns='urn:ietf:params:xml:ns:xmpp-streams'>" +
-						see_other_host + "</see-other-host>" + "</stream:error>" + "</stream:stream>";
+				return "<stream:stream" + " xmlns='" + XMLNS + "'"
+							 + " xmlns:stream='http://etherx.jabber.org/streams'"
+							 + " id='tigase-error-tigase'" + " from='" + getDefVHostItem() + "'"
+							 + " version='1.0' xml:lang='en'>"
+							 + see_other_host_strategy.getStreamError( "urn:ietf:params:xml:ns:xmpp-streams", see_other_host ).toString()
+							 + "</stream:stream>";
 			}
 		}    // of if (from != null )
 
@@ -834,7 +834,46 @@ public class ClientConnectionManager
 
 			if (jid != null) {
 				if (serv != null) {
-					serv.setUserJid(jid);
+
+					BareJID fromJID = null;
+					try {
+						fromJID = BareJID.bareJIDInstance( jid );
+					} catch ( TigaseStringprepException ex ) {
+						log.log( Level.SEVERE, null, ex );
+					}
+
+					if ( ( fromJID != null )
+							 && ( see_other_host_strategy != null
+										&& see_other_host_strategy.isEnabled( SeeOtherHostIfc.Phase.LOGIN ) ) ){
+						BareJID see_other_host = see_other_host_strategy.findHostForJID( fromJID, getDefHostName() );
+						if ( ( see_other_host != null ) && !see_other_host.equals( getDefHostName() ) ){
+							if ( log.isLoggable( Level.FINEST ) ){
+								log.log( Level.FINEST, "Sending redirect for {0} to host {1}, connection {2}.",
+												 new Object[] { fromJID,
+																				see_other_host, serv } );
+							}
+							String redirectMessage =
+										 "<stream:stream" + " xmlns='" + XMLNS + "'"
+										 + " xmlns:stream='http://etherx.jabber.org/streams'"
+										 + " id='tigase-error-tigase'" + " from='" + getDefVHostItem() + "'"
+										 + " version='1.0' xml:lang='en'>"
+										 + see_other_host_strategy.getStreamError( "urn:ietf:params:xml:ns:xmpp-streams", see_other_host ).toString()
+										 + "</stream:stream>";
+
+							try {
+								SocketThread.removeSocketService( serv );
+
+								serv.writeRawData( redirectMessage );
+
+								serv.processWaitingPackets();
+								Thread.sleep( socket_close_wait_time );
+								serv.stop();
+
+							} catch (Exception e) {}
+						}
+					} else {
+						serv.setUserJid( jid );
+					}
 				} else {
 					if (log.isLoggable(Level.FINE)) {
 						log.log(Level.FINE, "Missing XMPPIOService for USER_LOGIN command: {0}", iqc);

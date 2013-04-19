@@ -40,6 +40,10 @@ import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
 
+import tigase.server.xmppclient.SeeOtherHostIfc.Phase;
+
+import tigase.util.TigaseStringprepException;
+
 import static tigase.server.bosh.Constants.*;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -52,6 +56,7 @@ import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
+import tigase.xml.Element;
 
 /**
  * Describe class BoshConnectionManager here.
@@ -78,10 +83,6 @@ public class BoshConnectionManager
 	private int[] PORTS       = { DEF_PORT_NO };
 	private long  min_polling = MIN_POLLING_PROP_VAL;
 
-	// private static final String HOSTNAMES_PROP_KEY = "hostnames";
-	// private String[] HOSTNAMES_PROP_VAL = {"localhost", "hostname"};
-	// private RoutingsContainer routings = null;
-	// private Set<String> hostnames = new TreeSet<String>();
 	private long                   max_wait            = MAX_WAIT_DEF_PROP_VAL;
 	private long                   max_pause           = MAX_PAUSE_PROP_VAL;
 	private long                   max_inactivity      = MAX_INACTIVITY_PROP_VAL;
@@ -486,12 +487,19 @@ public class BoshConnectionManager
 	 * @return
 	 */
 	@Override
-	public BareJID getSeeOtherHostForJID(BareJID fromJID) {
+	public BareJID getSeeOtherHostForJID(BareJID fromJID, Phase ph) {
 		if (see_other_host_strategy == null) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("no see-other-host implementation set");
 			}
 
+			return null;
+		}
+
+		if (!see_other_host_strategy.isEnabled( ph )) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("see-other-host not enabled for the Phase: " + ph.toString());
+			}
 			return null;
 		}
 
@@ -502,7 +510,7 @@ public class BoshConnectionManager
 			log.finest("using = " + see_other_host_strategy.getClass().getCanonicalName() +
 					"for jid = " + fromJID.toString() + " got = " + ((see_other_host != null)
 					? see_other_host.toString()
-					: "null"));
+					: "null") + " in phase: " + ph.toString());
 		}
 
 		return ((see_other_host != null) &&!see_other_host.equals(getDefHostName()))
@@ -548,16 +556,6 @@ public class BoshConnectionManager
 	//~--- get methods ----------------------------------------------------------
 
 	// ~--- get methods ----------------------------------------------------------
-	// public void processPacket(Packet packet) {
-	// log.finer("Processing packet: " + packet.getElemName()
-	// + ", type: " + packet.getType());
-	// log.finest("Processing packet: " + packet.toString());
-	// if (packet.isCommand() && packet.getCommand() != Command.OTHER) {
-	// processCommand(packet);
-	// } else {
-	// writePacketToSocket(packet);
-	// }
-	// }
 
 	/**
 	 * Method description
@@ -663,7 +661,27 @@ public class BoshConnectionManager
 
 			if (jid != null) {
 				if (session != null) {
-					session.setUserJid(jid);
+					try {
+						BareJID fromJID = BareJID.bareJIDInstance( jid );
+						BareJID hostJid = getSeeOtherHostForJID( fromJID, Phase.LOGIN );
+
+						if ( hostJid != null ){
+							Element streamErrorElement = see_other_host_strategy.getStreamError( "urn:ietf:params:xml:ns:xmpp-streams", hostJid );
+							Packet redirectPacket = Packet.packetInstance( streamErrorElement );
+							redirectPacket.setPacketTo( packet.getTo() );
+
+							writePacketToSocket( redirectPacket );
+							session.sendWaitingPackets();
+							session.close();
+							sessions.remove( session.getSid() );
+
+						} else {
+							session.setUserJid( jid );
+						}
+					} catch ( TigaseStringprepException ex ) {
+						log.log( Level.SEVERE, "user JID violates RFC6122 (XMPP:Address Format): ", ex);
+					}
+
 				} else {
 					if (log.isLoggable(Level.FINE)) {
 						log.log(Level.FINE, "Missing XMPPIOService for USER_LOGIN command: {0}",

@@ -25,6 +25,7 @@ package tigase.server.xmppclient;
 
 import java.util.List;
 import java.util.Map;
+import tigase.xml.Element;
 
 import tigase.xmpp.BareJID;
 
@@ -46,6 +47,13 @@ public interface SeeOtherHostIfc {
 			CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "defaul-host";
 	public static final String CM_SEE_OTHER_HOST_DEFAULT_PORT =
 			CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "defaul-port";
+	public static final String CM_SEE_OTHER_HOST_ACTIVE =
+			CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "active";
+
+	public static enum Phase {
+		OPEN, LOGIN, OTHER
+	}
+
 
 	// ~--- methods -------------------------------------------------------------
 	/**
@@ -60,12 +68,34 @@ public interface SeeOtherHostIfc {
 	 */
 	BareJID findHostForJID(BareJID jid, BareJID host);
 
+	/**
+	 * Sets list of available nodes in cluster environment
+	 *
+	 * @param nodes current list of nodes
+	 */
 	void setNodes(List<BareJID> nodes);
 
 	// ~--- properties ----------------------------------------------------------
-	// Map<String, Object> getDefaults(Map<String, Object> params);
+	void getDefaults( Map<String, Object> defs, Map<String, Object> params );
 
-	void getDefaults(Map<String, Object> defs, Map<String, Object> params);
+	void setProperties( Map<String, Object> props );
 
-	void setProperties(Map<String, Object> props);
+	/**
+	 * Returns Element object containing stream:error message
+	 *
+	 * @param xmlns xml namespace of the element
+	 * @param destination BareJID address of the redirect destination
+	 * @return element containing stream:error message
+	 */
+	Element getStreamError( String xmlns, BareJID destination );
+
+	/**
+	 * Performs check whether redirect is enabled in the given phase
+	 * by default see-other-host redirect is only active in stream:open phase
+	 *
+	 * @param ph phase for which the check should be performed
+	 * @return boolean value indicating whether to perform or not redirect for
+	 * the phase passed as argument
+	 */
+	boolean isEnabled(Phase ph);
 }

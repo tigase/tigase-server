@@ -207,7 +207,7 @@ public class SeeOtherHostDB extends SeeOtherHostHashed {
 
 			while (rs.next()) {
 				String user_jid = rs.getString("user_id");
-				String node_jid = rs.getString(NODE_ID);;
+				String node_jid = rs.getString(NODE_ID);
 				try {
 					BareJID user = BareJID.bareJIDInstance(user_jid);
 					BareJID node = BareJID.bareJIDInstance(node_jid);

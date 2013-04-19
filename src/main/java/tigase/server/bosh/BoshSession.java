@@ -29,8 +29,8 @@ package tigase.server.bosh;
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Message;
+import tigase.server.xmppclient.SeeOtherHostIfc.Phase;
 
-//import tigase.xmpp.*;
 import tigase.server.Packet;
 
 import tigase.util.TigaseStringprepException;
@@ -369,7 +369,7 @@ public class BoshSession {
 					: null;
 
 			if (userId != null) {
-				BareJID hostJid = handler.getSeeOtherHostForJID(userId);
+				BareJID hostJid = handler.getSeeOtherHostForJID(userId, Phase.OPEN);
 
 				if (hostJid != null) {
 					Element error        = new Element("stream:error");
@@ -980,6 +980,15 @@ public class BoshSession {
 				}
 			}
 		}
+
+		if ( body.getChild( "stream:error" ) != null ){
+			body.addAttribute( "condition", "remote-stream-error" );
+			body.addAttribute( "type", "terminate" );
+			body.addAttribute( "xmlns:stream", "http://etherx.jabber.org/streams" );
+			this.terminate = true;
+			System.out.println( "stream:error termination" );
+		}
+
 		try {
 			if (terminate) {
 				body.setAttribute("type", StanzaType.terminate.toString());
@@ -987,14 +996,6 @@ public class BoshSession {
 			handler.writeRawData(serv, body.toString());
 			retireConnectionService(serv);
 
-			// serv.writeRawData(body.toString());
-			// waiting_packets.clear();
-			// serv.stop();
-			// } catch (IOException e) {
-			//// I call it anyway at the end of method call
-			////disconnected(null);
-			// log.log(Level.WARNING, "[" + connections.size() +
-			// "] Exception during writing to socket", e);
 		} catch (Exception e) {
 			log.log(Level.WARNING, "[" + connections.size() +
 					"] Exception during writing to socket", e);
