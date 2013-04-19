@@ -186,7 +186,7 @@ case "$1" in
   restart|force-reload)
 	log_daemon_msg "Restarting $DESC"
 	stop
-	sleep 1
+	sleep 5
 	if start; then
 		log_end_msg 0
 	else
