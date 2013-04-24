@@ -94,81 +94,6 @@ public abstract class XMPPProcessor
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * Method <code>compareTo</code> is used to perform
-	 *
-	 * @param proc an <code>XMPPProcessor</code> value
-	 * @return an <code>int</code> value
-	 */
-	@Override
-	public final int compareTo(XMPPImplIfc proc) {
-		return getClass().getName().compareTo(proc.getClass().getName());
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public int concurrentQueuesNo() {
-		return 2;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 *
-	 * @deprecated
-	 */
-	@Override
-	@Deprecated
-	public int concurrentThreadsPerQueue() {
-		return 1;
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public XMPPProcessor getInstance() {
-		return this;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @param settings
-	 *
-	 * @throws TigaseDBException
-	 */
-	@Override
-	public void init(Map<String, Object> settings) throws TigaseDBException {}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 */
-	@Override
-	public void getStatistics(StatisticsList list) {}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
 	 * Method description
 	 *
 	 *
@@ -206,6 +131,181 @@ public abstract class XMPPProcessor
 
 		return result;
 	}
+
+	/**
+	 * Method <code>compareTo</code> is used to perform
+	 *
+	 * @param proc an <code>XMPPProcessor</code> value
+	 * @return an <code>int</code> value
+	 */
+	@Override
+	public final int compareTo(XMPPImplIfc proc) {
+		return getClass().getName().compareTo(proc.getClass().getName());
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int concurrentQueuesNo() {
+		return Runtime.getRuntime().availableProcessors();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 *
+	 * @deprecated
+	 */
+	@Override
+	@Deprecated
+	public int concurrentThreadsPerQueue() {
+		return 1;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 * @param settings
+	 *
+	 * @throws TigaseDBException
+	 */
+	@Override
+	public void init(Map<String, Object> settings) throws TigaseDBException {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 * @return
+	 */
+	@Override
+	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String[][] supElementNamePaths() {
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	@Deprecated
+	public String[] supElements() {
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String[] supNamespaces() {
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 * @return
+	 */
+	@Override
+	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public Set<StanzaType> supTypes() {
+		return null;
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public XMPPProcessor getInstance() {
+		return this;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param list
+	 */
+	@Override
+	public void getStatistics(StatisticsList list) {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param element
+	 * @param ns
+	 *
+	 * @return
+	 */
+	@Override
+	@Deprecated
+	public boolean isSupporting(final String element, final String ns) {
+		String[] impl_elements = supElements();
+		String[] impl_xmlns    = supNamespaces();
+
+		if ((impl_elements != null) && (impl_xmlns != null)) {
+			for (int i = 0; (i < impl_elements.length) && (i < impl_xmlns.length); i++) {
+
+				// ******   WARNING!!!! WARNING!!!!    *****
+				// This is intentional reference comparison!
+				// This method is called very, very often and it is also very expensive
+				// therefore all XML element names and xmlns are created using
+				// String.intern()
+				if (((impl_elements[i] == element) || (impl_elements[i] == ALL_NAMES)) &&
+						((impl_xmlns[i] == ns) || (impl_xmlns[i] == ALL_NAMES))) {
+					return true;
+				}    // end of if (ELEMENTS[i].equals(element) && XMLNSS[i].equals(ns))
+			}      // end of for (int i = 0; i < ELEMENTS.length; i++)
+		}        // end of if (impl_elements != null && impl_xmlns != null)
+
+		return false;
+	}
+
+	//~--- methods --------------------------------------------------------------
 
 	private Authorization checkPacket(Packet packet, String[][] elemPaths,
 			String[] elemXMLNS, Set<StanzaType> types) {
@@ -248,115 +348,7 @@ public abstract class XMPPProcessor
 
 		return result;
 	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public Set<StanzaType> supTypes() {
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String[][] supElementNamePaths() {
-		return null;
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param element
-	 * @param ns
-	 *
-	 * @return
-	 */
-	@Override
-	@Deprecated
-	public boolean isSupporting(final String element, final String ns) {
-		String[] impl_elements = supElements();
-		String[] impl_xmlns    = supNamespaces();
-
-		if ((impl_elements != null) && (impl_xmlns != null)) {
-			for (int i = 0; (i < impl_elements.length) && (i < impl_xmlns.length); i++) {
-
-				// ******   WARNING!!!! WARNING!!!!    *****
-				// This is intentional reference comparison!
-				// This method is called very, very often and it is also very expensive
-				// therefore all XML element names and xmlns are created using
-				// String.intern()
-				if (((impl_elements[i] == element) || (impl_elements[i] == ALL_NAMES)) &&
-						((impl_xmlns[i] == ns) || (impl_xmlns[i] == ALL_NAMES))) {
-					return true;
-				}    // end of if (ELEMENTS[i].equals(element) && XMLNSS[i].equals(ns))
-			}      // end of for (int i = 0; i < ELEMENTS.length; i++)
-		}        // end of if (impl_elements != null && impl_xmlns != null)
-
-		return false;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 * @return
-	 */
-	@Override
-	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	@Deprecated
-	public String[] supElements() {
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String[] supNamespaces() {
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 * @return
-	 */
-	@Override
-	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
-		return null;
-	}
 }    // XMPPProcessor
 
 
-//~ Formatted in Tigase Code Convention on 13/03/11
+//~ Formatted in Tigase Code Convention on 13/04/24
