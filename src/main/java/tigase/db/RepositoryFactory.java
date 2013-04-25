@@ -29,6 +29,7 @@ import static tigase.conf.Configurable.*;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
 
 import java.util.Map;
 import java.util.Properties;
@@ -131,7 +132,7 @@ public abstract class RepositoryFactory {
 
 	/**
 	 * Method description
-	 * 
+	 *
 	 *
 	 * @param class_name
 	 * @param resource
@@ -152,6 +153,10 @@ public abstract class RepositoryFactory {
 
 		if ( cls == null ){
 			cls = System.getProperty( AUTH_REPO_CLASS_PROP_KEY, AUTH_REPO_CLASS_PROP_VAL );
+		}
+
+		if (params == null ) {
+			params = new LinkedHashMap<String, String>(10);
 		}
 
 		cls = getRepoClass( cls );
@@ -215,6 +220,10 @@ public abstract class RepositoryFactory {
 
 		if (cls == null) {
 			cls = System.getProperty(DATA_REPO_CLASS_PROP_KEY, DATA_REPO_CLASS_PROP_VAL);
+		}
+
+		if (params == null ) {
+			params = new LinkedHashMap<String, String>(10);
 		}
 
 		DataRepository repo = data_repos.get(cls + resource);
@@ -314,6 +323,9 @@ public abstract class RepositoryFactory {
 			cls = System.getProperty(USER_REPO_CLASS_PROP_KEY, USER_REPO_CLASS_PROP_VAL);
 		}
 
+		if (params == null ) {
+			params = new LinkedHashMap<String, String>(10);
+		}
 		cls = getRepoClass(cls);
 
 		UserRepository repo = user_repos.get(cls + resource);
