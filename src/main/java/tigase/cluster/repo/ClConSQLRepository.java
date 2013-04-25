@@ -78,9 +78,9 @@ public class ClConSQLRepository
 					+ " from " + TABLE_NAME;
 	private static final String DELETE_ITEM_QUERY =
 					"delete from " + TABLE_NAME + " where (" + HOSTNAME_COLUMN + " = ?)";
-	private static final String CREATE_TABLE_QUERY =
+	private static final String CREATE_TABLE_QUERY_MYSQL =
 					"create table " + TABLE_NAME + " ("
-					+ "  " + HOSTNAME_COLUMN + " varchar(512) not null,"
+					+ "  " + HOSTNAME_COLUMN + " varchar(255) not null,"
 					+ "  " + PASSWORD_COLUMN + " varchar(255) not null,"
 					+ "  " + LASTUPDATE_COLUMN
 					+ " TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
@@ -88,21 +88,36 @@ public class ClConSQLRepository
 					+ "  " + CPU_USAGE_COLUMN + " float unsigned not null,"
 					+ "  " + MEM_USAGE_COLUMN + " float unsigned not null,"
 					+ "  primary key(" + HOSTNAME_COLUMN + "))";
-//	private static final String CHECK_TABLE_QUERY =
-//					"select count(*) from " + TABLE_NAME;
-	private static final String ADD_ITEM_QUERY =
+	private static final String CREATE_TABLE_QUERY =
+					"create table " + TABLE_NAME + " ("
+					+ "  " + HOSTNAME_COLUMN + " varchar(512) not null,"
+					+ "  " + PASSWORD_COLUMN + " varchar(255) not null,"
+					+ "  " + LASTUPDATE_COLUMN
+					+ " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
+					+ "  " + PORT_COLUMN + " int,"
+					+ "  " + CPU_USAGE_COLUMN + " double precision not null,"
+					+ "  " + MEM_USAGE_COLUMN + " double precision not null,"
+					+ "  primary key(" + HOSTNAME_COLUMN + "))";
+	private static final String INSERT_ITEM_QUERY =
 					"insert into " + TABLE_NAME + " ("
 					+ HOSTNAME_COLUMN + ", "
 					+ PASSWORD_COLUMN + ", "
+					+ LASTUPDATE_COLUMN + ", "
 					+ PORT_COLUMN + ", "
 					+ CPU_USAGE_COLUMN + ", "
 					+ MEM_USAGE_COLUMN
-					+ ") " + " values (?, ?, ?, ?, ?)"
-					+ " ON DUPLICATE KEY UPDATE"
-					+ " " + PASSWORD_COLUMN + " = VALUES(" + PASSWORD_COLUMN + "),"
-					+ " " + PORT_COLUMN + " = VALUES(" + PORT_COLUMN + "),"
-					+ " " + CPU_USAGE_COLUMN + " = VALUES(" + CPU_USAGE_COLUMN + "),"
-					+ " " + MEM_USAGE_COLUMN + " = VALUES(" + MEM_USAGE_COLUMN + ")";
+					+ ") "
+					+ " (select ?, ?, CURRENT_TIMESTAMP, ?, ?, ? from " + TABLE_NAME
+					+ " WHERE " + HOSTNAME_COLUMN + "=? HAVING count(*)=0)";
+	private static final String UPDATE_ITEM_QUERY =
+					"update " + TABLE_NAME + " set "
+					+ HOSTNAME_COLUMN + "= ?, "
+					+ PASSWORD_COLUMN + "= ?, "
+					+ LASTUPDATE_COLUMN + " = CURRENT_TIMESTAMP,"
+					+ PORT_COLUMN + "= ?, "
+					+ CPU_USAGE_COLUMN + "= ?, "
+					+ MEM_USAGE_COLUMN + "= ? "
+					+ " where " + HOSTNAME_COLUMN + "= ?"	;
 	/* @formatter:on */
 	//J+
 
@@ -151,7 +166,8 @@ public class ClConSQLRepository
 			// data_repo.initPreparedStatement(CHECK_TABLE_QUERY, CHECK_TABLE_QUERY);
 			data_repo.initPreparedStatement(GET_ITEM_QUERY, GET_ITEM_QUERY);
 			data_repo.initPreparedStatement(GET_ALL_ITEMS_QUERY, GET_ALL_ITEMS_QUERY);
-			data_repo.initPreparedStatement(ADD_ITEM_QUERY, ADD_ITEM_QUERY);
+			data_repo.initPreparedStatement(INSERT_ITEM_QUERY, INSERT_ITEM_QUERY);
+			data_repo.initPreparedStatement(UPDATE_ITEM_QUERY, UPDATE_ITEM_QUERY);
 			data_repo.initPreparedStatement(DELETE_ITEM_QUERY, DELETE_ITEM_QUERY);
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Problem initializing database: ", e);
@@ -167,8 +183,20 @@ public class ClConSQLRepository
 	@Override
 	public void storeItem(ClusterRepoItem item) {
 		try {
-			PreparedStatement insertItemSt = data_repo.getPreparedStatement(null,
-					ADD_ITEM_QUERY);
+			PreparedStatement updateItemSt = data_repo.getPreparedStatement(null,	UPDATE_ITEM_QUERY);
+			PreparedStatement insertItemSt = data_repo.getPreparedStatement(null, INSERT_ITEM_QUERY);
+
+			// relatively most DB compliant UPSERT
+
+			synchronized (updateItemSt) {
+				insertItemSt.setString(1, item.getHostname());
+				insertItemSt.setString(2, item.getPassword());
+				insertItemSt.setInt(3, item.getPortNo());
+				insertItemSt.setFloat(4, item.getCpuUsage());
+				insertItemSt.setFloat(5, item.getMemUsage());
+				insertItemSt.setString(6, item.getHostname());
+				insertItemSt.executeUpdate();
+			}
 
 			synchronized (insertItemSt) {
 				insertItemSt.setString(1, item.getHostname());
@@ -176,8 +204,10 @@ public class ClConSQLRepository
 				insertItemSt.setInt(3, item.getPortNo());
 				insertItemSt.setFloat(4, item.getCpuUsage());
 				insertItemSt.setFloat(5, item.getMemUsage());
+				insertItemSt.setString(6, item.getHostname());
 				insertItemSt.executeUpdate();
 			}
+
 		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem getting elements from DB: ", e);
 		}
@@ -255,11 +285,21 @@ public class ClConSQLRepository
 		ResultSet rs = null;
 		Statement st = null;
 
+		String resourceUri = data_repo.getResourceUri();
+		String createTableQuery;
+
+		if ( resourceUri.startsWith( "jdbc:mysql:" ) ){
+			createTableQuery = CREATE_TABLE_QUERY_MYSQL;
+		} else {
+			createTableQuery = CREATE_TABLE_QUERY;
+		}
+
 		try {
 			if (!data_repo.checkTable(TABLE_NAME)) {
 				log.info("DB for external component is not OK, creating missing tables...");
+
 				st = data_repo.createStatement(null);
-				st.executeUpdate(CREATE_TABLE_QUERY);
+				st.executeUpdate(createTableQuery);
 				log.info("DB for external component created OK");
 			}
 		} finally {
