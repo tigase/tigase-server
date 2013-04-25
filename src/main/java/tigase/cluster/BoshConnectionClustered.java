@@ -77,7 +77,9 @@ public class BoshConnectionClustered extends BoshConnectionManager implements
 				Arrays.sort(arr_list);
 				connectedNodes = new CopyOnWriteArrayList<BareJID>(arr_list);
 
-				see_other_host_strategy.setNodes(connectedNodes);
+				if ( see_other_host_strategy != null ){
+					see_other_host_strategy.setNodes( connectedNodes );
+				}
 			}
 		}
 	}
@@ -97,6 +99,10 @@ public class BoshConnectionClustered extends BoshConnectionManager implements
 		// if (connectedNodes.contains(nodeJID)) {
 		connectedNodes.remove(nodeJID);
 		// }
+
+		if ( see_other_host_strategy != null ){
+			see_other_host_strategy.setNodes( connectedNodes );
+		}	
 
 		final String hostname = node;
 
