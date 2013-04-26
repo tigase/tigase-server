@@ -189,13 +189,13 @@ public class ClConSQLRepository
 			// relatively most DB compliant UPSERT
 
 			synchronized (updateItemSt) {
-				insertItemSt.setString(1, item.getHostname());
-				insertItemSt.setString(2, item.getPassword());
-				insertItemSt.setInt(3, item.getPortNo());
-				insertItemSt.setFloat(4, item.getCpuUsage());
-				insertItemSt.setFloat(5, item.getMemUsage());
-				insertItemSt.setString(6, item.getHostname());
-				insertItemSt.executeUpdate();
+				updateItemSt.setString(1, item.getHostname());
+				updateItemSt.setString(2, item.getPassword());
+				updateItemSt.setInt(3, item.getPortNo());
+				updateItemSt.setFloat(4, item.getCpuUsage());
+				updateItemSt.setFloat(5, item.getMemUsage());
+				updateItemSt.setString(6, item.getHostname());
+				updateItemSt.executeUpdate();
 			}
 
 			synchronized (insertItemSt) {
