@@ -143,6 +143,9 @@
           <file name="tigase-extras.jar"/>
           <file name="tigase-muc.jar"/>
           <file name="tigase-pubsub.jar"/>
+          <file name="tigase-stun.jar"/>
+          <file name="tigase-socks5.jar"/>
+          <file name="tigase-message-archiving.jar"/>
         </filelist>
       </copy>
       <mkdir dir="${dist}/@{packagename}-${version}/certs"/>

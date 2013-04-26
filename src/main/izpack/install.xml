@@ -69,11 +69,10 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 <!--		<variable name="JDKPath" value="$JAVA_HOME"/> -->
 	</variables>
 
-<!-- moved to variables
 	<dynamicvariables>
-		<variable name="JDKPath" value="$JAVA_HOME"/>
+		<variable name="messageArchivePlugin" value="message-archive-xep-0136" condition="messageArchive" />
+		<variable name="messageArchivePlugin" value="off" condition="!messageArchive" />
 	</dynamicvariables>
- -->
 	<conditions>
 		<condition type="variable" id="installSelected">
 			<name>serverInstall</name>
@@ -101,6 +100,10 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		</condition>
 		<condition type="variable" id="authDBSelected">
 			<name>authDB</name>
+			<value>on</value>
+		</condition>
+		<condition type="variable" id="messageArchive">
+			<name>messageArchiveComponent</name>
 			<value>on</value>
 		</condition>
 	</conditions>
@@ -324,11 +327,14 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 				</fileset>
 			</pack>
 			<pack name="Extras" required="no" preselected="yes">
-				<description>Extras libraries, MUC, PubSub...</description>
+				<description>Extras libraries, MUC, PubSub, STUN, Socks5, Message Archiving</description>
 				<fileset dir="." targetdir="$INSTALL_PATH">
 					<include name="jars/tigase-muc.jar"/>
 					<include name="jars/tigase-pubsub.jar"/>
 					<include name="jars/tigase-extras.jar"/>
+					<include name="jars/tigase-stun.jar"/>
+					<include name="jars/tigase-socks5.jar"/>
+					<include name="jars/tigase-message-archiving.jar"/>
 					<include name="jars/jdmkrt.jar"/>
 				</fileset>
 			</pack>

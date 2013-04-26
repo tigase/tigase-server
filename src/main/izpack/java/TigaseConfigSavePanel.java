@@ -117,7 +117,7 @@ class IzPackInstallDataVariablesSource extends VariablesSource {
 
 	public IzPackInstallDataVariablesSource(AutomatedInstallData idata) {
 		this.idata = idata;
-		
+
 	}
 
 	@Override
@@ -140,7 +140,7 @@ class IzPackInstallDataVariablesSource extends VariablesSource {
 }
 
 class TigaseConfigSaveHelper {
-	
+
 	String showConfig(VariablesSource variablesSource) {
 		StringBuilder config = new StringBuilder();
 		int comp_idx = 0;
@@ -203,11 +203,43 @@ class TigaseConfigSaveHelper {
 					++comp_idx;
 					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "pubsub");
 					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
-						"tigase.pubsub.PubSubClusterComponent");
+						"tigase.pubsub.PubSubComponent");
 				}
 				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "pubsub");
 				continue;
 			}
+
+			if (varName.equals(TigaseConfigConst.SOCKS5_COMP)) {
+				if (varValue.equals("on")) {
+					++comp_idx;
+					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "proxy");
+					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
+						"tigase.socks5.Socks5ProxyComponent");
+				}
+				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "proxy");
+				continue;
+			}
+			if (varName.equals(TigaseConfigConst.STUN_COMP)) {
+				if (varValue.equals("on")) {
+					++comp_idx;
+					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "stun");
+					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
+						"tigase.stun.StunComponent");
+				}
+				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "stun");
+				continue;
+			}
+			if (varName.equals(TigaseConfigConst.ARCHIVE_COMP)) {
+				if (varValue.equals("on")) {
+					++comp_idx;
+					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "message-archive");
+					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
+						"tigase.archive.MessageArchiveComponent");
+				}
+				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "message-archive");
+				continue;
+			}
+
 			if (varName.equals(TigaseConfigConst.AUTH_DB_URI)) {
 				String auth_db_uri = getAuthUri(variablesSource);
 				if (auth_db_uri != null) {
@@ -341,7 +373,7 @@ class TigaseConfigSaveHelper {
 				Debug.trace("Missing variables for: " + plugin);
 				continue;
 			}
-			
+
 			final String value = variablesSource.getVariable(plugin);
 			final String prefix;
 			final String pluginId = TigaseConfigConst.getPluginId(plugin);
@@ -349,14 +381,14 @@ class TigaseConfigSaveHelper {
 				prefix = "-";
 			} else {
 				prefix = "+";
-			} 
-			
+			}
+
 			if (!plugins.isEmpty()) {
 				plugins += ",";
 			}
 			plugins += prefix + pluginId;
 		}
-		
+
 		return plugins;
 	}
 
@@ -369,7 +401,7 @@ class TigaseConfigSaveHelper {
 			return "server";
 		}
 		for (String deb: TigaseConfigConst.ALL_DEBUGS) {
-			if (variablesSource.getVariable(deb) == null 
+			if (variablesSource.getVariable(deb) == null
 					|| variablesSource.getVariable(deb).equals("off")) {
 				continue;
 			}
@@ -393,7 +425,7 @@ class TigaseConfigSaveHelper {
 		String result = TigaseConfigConst.userDBMap.get(dbVar);
 		return result != null ? result : "derby";
 	}
-	
+
 	// returns null if ok, error string on error
 	String saveConfig(AutomatedInstallData variablesSource, String config) {
 		// Try to read the config file.

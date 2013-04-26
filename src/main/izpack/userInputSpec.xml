@@ -33,7 +33,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 	<panel order="0">
 		<field type="title" txt="Select what you want to do next:"
 					 bold="true" size="2"/>
-		<field type="staticText" align="left" 
+		<field type="staticText" align="left"
 					 txt="On this panel you can specify whether you want to install only or configure already installed server or to do both. If you are just installing a server on your machine it is a good idea to do both steps."/>
 		<field type="space"/>
 		<field type="divider"/>
@@ -41,22 +41,22 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 
 		<field type="check" variable="serverInstall">
 			<description align="left" txt="The wizards you want to execute" />
-			<spec txt="Installation of the Tigase Server" 
+			<spec txt="Installation of the Tigase Server"
 						true="on" false="off"	set="true"/>
 		</field>
 		<field type="check" variable="serverConfig">
-			<spec txt="Configuration of the Tigase Server" 
+			<spec txt="Configuration of the Tigase Server"
 						true="on" false="off"	set="true"/>
 		</field>
 		<field type="space"/>
 		<field type="divider"/>
 		<field type="space"/>
-		<field type="staticText" align="left" 
+		<field type="staticText" align="left"
 					 txt="Please note!"/>
 		<field type="staticText" align="left"
 					 txt="While the Tigase server is quite stable and well tested application the installer itself is a new addition. Take precautions especially if you upgrade the server from earlier version. Backup old server files and the database."/>
 		<field type="space"/>
-		<field type="staticText" align="left" 
+		<field type="staticText" align="left"
 					 txt="If you notice any problems please report them to address: artur.hefczyc@tigase.org"/>
 	</panel>
 
@@ -84,13 +84,13 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 	<panel order="2">
 		<field type="title" txt="Basic Tigase server configuration"
 					 bold="true" size="2" />
-		<field type="staticText" align="left" 
+		<field type="staticText" align="left"
 					 txt="On this panel you can specify basic configuration settings for the Tigase server."/>
 		<field type="space" />
-		<field type="staticText" align="left" 
+		<field type="staticText" align="left"
 					 txt="Based on your selection here more configuration options might be presented later on. After the configuration is complete init.properties file will be created."/>
 		<field type="space" />
-		<field type="staticText" align="left" 
+		<field type="staticText" align="left"
 					 txt="You can optionally restart the server at the end of the process if you like."/>
 		<field type="divider" />
 		<field type="space"/>
@@ -99,13 +99,13 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 <!-- 			<description align="left" id="description.configType" -->
 <!-- 									 txt="Stick to the default unless you are realy sure you want something else."/> -->
 			<spec txt="Configuration type">
-				<choice txt="Default installation" 
+				<choice txt="Default installation"
 								value="--gen-config-def"  set="true"/>
-				<choice txt="Default plus extra components" 
+				<choice txt="Default plus extra components"
 								value="--gen-config-all" />
-				<choice txt="Session Manager only" 
+				<choice txt="Session Manager only"
 								value="--gen-config-sm" />
-				<choice txt="Network connectivity only" 
+				<choice txt="Network connectivity only"
 								value="--gen-config-cs" />
 			</spec>
 		</field>
@@ -128,15 +128,15 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 
 		<field type="combo" variable="dbType">
 			<spec txt="Select database">
-				<choice txt="Derby (built-in database)" 
+				<choice txt="Derby (built-in database)"
 								value="Derby" set="true"/>
-				<choice txt="MySQL" 
+				<choice txt="MySQL"
 								value="MySQL"/>
-				<choice txt="PostgreSQL" 
+				<choice txt="PostgreSQL"
 								value="PostgreSQL"/>
-				<choice txt="SQLServer" 
+				<choice txt="SQLServer"
 								value="SQLServer"/>
-				<choice txt="Other..." 
+				<choice txt="Other..."
 								value="Other"/>
 			</spec>
 		</field>
@@ -146,7 +146,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<field type="space"/>
 
 		<field type="check" variable="advancedConfig">
-			<spec txt="Advanced configuration options" 
+			<spec txt="Advanced configuration options"
 						true="on" false="off"	set="false"/>
 		</field>
 	</panel>
@@ -154,14 +154,14 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 	<!-- Advanced configuration -->
 	<panel order="3">
 		<field type="title" txt="Advanced configuration options:" bold="true" size="2"/>
-		<field type="staticText" align="left" 
+		<field type="staticText" align="left"
 					 txt="This panel offer advanced configuration options. Please do not change them unless you know what you are doing."/>
 		<field type="space"/>
 		<field type="divider"/>
 		<field type="space"/>
 
 		<field type="check" variable="authDB">
-			<spec txt="Separate authentication database" 
+			<spec txt="Separate authentication database"
 						true="on" false="off"	set="false"/>
 		</field>
 
@@ -172,14 +172,23 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<field type="check" variable="pubsubComponent">
 			<spec txt="PubSub" true="on" false="off"	set="false"/>
 		</field>
+		<field type="check" variable="stunComponent">
+			<spec txt="STUN Component" true="on" false="off"	set="false"/>
+		</field>
+		<field type="check" variable="socks5Component">
+			<spec txt="Socks5 Component" true="on" false="off"	set="true"/>
+		</field>
+		<field type="check" variable="messageArchiveComponent">
+			<spec txt="Message Archive Component" true="on" false="off"	set="true"/>
+		</field>
 
 		<field type="check" variable="clusterMode">
 			<description align="left" txt="Do you want your server to run in the cluster mode?" />
-			<spec txt="Cluster mode" true="true" false="false"	set="false"/>
+			<spec txt="Cluster mode" true="true" false="false"	set="true"/>
 		</field>
-		<field type="text" align="left" variable="clusterNodes">
+<!--		<field type="text" align="left" variable="clusterNodes">
 			<spec txt="Cluster nodes list" size="30" set="$HOST_NAME"/>
-		</field>
+		</field>-->
 
 		<field type="space"/>
 
@@ -268,6 +277,9 @@ uvme:vcard-temp,http://jabber.org/protocol/commands,jabber:iq:private,urn:xmpp:p
 		</field>
 		<field type="check" variable="zlibPlugin">
 			<spec txt="Zlib stream compression (new, experimental)" true="zlib" false="off" set="false"/>
+		</field>
+		<field type="check" variable="messageArchivePlugin">
+			<spec txt="Message archive plugin (xep 0136) required by archive component" true="message-archive-xep-0136" false="off" set="true"/>
 		</field>
 
 	</panel>
