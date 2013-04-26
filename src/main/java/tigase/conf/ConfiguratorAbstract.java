@@ -451,6 +451,8 @@ public abstract class ConfiguratorAbstract
 			defaults.put(DEFAULT_DOMAIN_CERT_KEY, DEFAULT_DOMAIN_CERT_VAL);
 		}
 
+		configRepo.getDefaults( defaults, params );
+
 		return defaults;
 	}
 
