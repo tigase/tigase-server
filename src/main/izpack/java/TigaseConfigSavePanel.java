@@ -142,10 +142,11 @@ class IzPackInstallDataVariablesSource extends VariablesSource {
 class TigaseConfigSaveHelper {
 
 	String showConfig(VariablesSource variablesSource) {
+		TigaseConfigConst.props.clear();
 		StringBuilder config = new StringBuilder();
 		int comp_idx = 0;
 		for (Map.Entry<String, String> entry:
-        TigaseConfigConst.tigaseIzPackMap.entrySet()) {
+		TigaseConfigConst.tigaseIzPackMap.entrySet()) {
 			String varName = entry.getValue();
 			String varValue = variablesSource.getVariable(varName);
 

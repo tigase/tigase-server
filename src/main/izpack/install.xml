@@ -66,6 +66,10 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<variable name="DerbyDBPath.windows" value="${INSTALL_PATH}\tigasedb"/>
 		<variable name="DerbyDBPath.mac" value="${INSTALL_PATH}/tigasedb"/>
 		<variable name="DerbyDBPath.unix" value="${INSTALL_PATH}/tigasedb"/>
+		<variable name="mucComponent" value="on"/>
+		<variable name="socks5Component" value="on"/>
+		<variable name="messageArchiveComponent" value="on"/>
+		<variable name="clusterMode" value="true"/>
 <!--		<variable name="JDKPath" value="$JAVA_HOME"/> -->
 	</variables>
 
@@ -191,6 +195,14 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<res id="derby-schema-5-1-sp" src="database/derby-schema-5-1-sp.sql"/>
 		<res id="derby-schema-5-1-props" src="database/derby-schema-5-1-props.sql"/>
 		<res id="derby-schema-upgrade-to-5-1" src="database/derby-schema-upgrade-to-5-1.sql"/>
+
+		<!-- Socks5 component schema files -->
+
+		<res id="derby-socks5-schema" src="database/derby-socks5-schema.sql"/>
+		<res id="postgresql-socks5-schema" src="database/postgresql-socks5-schema.sql"/>
+		<res id="mysql-socks5-schema" src="database/mysql-socks5-schema.sql"/>
+
+
 	</resources>
 
 	<!--

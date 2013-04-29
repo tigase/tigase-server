@@ -9,20 +9,20 @@ PATCHED_IZPACK_DIR="izpack.patched"
 GIT_URL="git://git.codehaus.org/izpack.git"
 
 # create installer directory
-if [ ! -e $INSTALLER_DIR ] ; then
-	mkdir $INSTALLER_DIR || exit -1
-fi
+#if [ ! -e $INSTALLER_DIR ] ; then
+#	mkdir $INSTALLER_DIR || exit -1
+#fi
 
 # create original izpack dir
-if [ -e $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR ] ; then
-	rm -rf $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR || exit -1
-fi
+#if [ -e $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR ] ; then
+#	rm -rf $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR || exit -1
+#fi
 
 # clone IzPack git repository
-git clone $GIT_URL $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR || exit -1
-cd $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR/
-	git checkout fde79de81836dbf4c594d6a6f184e27d756ae009 || exit -1
-cd ../../
+#git clone $GIT_URL $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR || exit -1
+#cd $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR/
+#	git checkout fde79de81836dbf4c594d6a6f184e27d756ae009 || exit -1
+#cd ../../
 
 # create patched directory
 if [ -e $INSTALLER_DIR/$PATCHED_IZPACK_DIR ] ; then

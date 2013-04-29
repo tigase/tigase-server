@@ -58,11 +58,11 @@ public abstract class TigaseConfigConst {
     new LinkedHashMap<String, String>();
 
 	public static String[] ALL_PLUGINS =
-	{"nonSaslAuthPlugin", "saslAuthPlugin", "resBindPlugin",
+	{"messageArchivePlugin", "nonSaslAuthPlugin", "saslAuthPlugin", "resBindPlugin",
 	 "sessionBindPlugin", "registerPlugin", "rosterPlugin", "presencePlugin", "privacyPlugin",
 	 "versionPlugin", "statsPlugin", "tlsPlugin", "msgOfflinePlugin",
 	 "vcardPlugin", "commandsPlugin", "privatePlugin", "pingPlugin",
-	 "basicFilterPlugin", "domainFilterPlugin", "pepPlugin", "zlibPlugin", "messageArchivePlugin"};
+	 "basicFilterPlugin", "domainFilterPlugin", "pepPlugin", "zlibPlugin"};
 	public static LinkedHashMap<String, String> pluginsMap =
     new LinkedHashMap<String, String>();
 
