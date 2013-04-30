@@ -221,6 +221,10 @@
         zipfile="@{packagename}-${version}.tar.gz"
         src="@{packagename}-${version}.tar"/>
       <delete file="@{packagename}-${version}.tar"/>
+      <move todir="pack/">
+        <fileset file="@{packagename}-${version}.tar.gz"/>
+        <fileset file="@{packagename}-${version}.zip"/>
+      </move>
     </sequential>
   </macrodef>
 

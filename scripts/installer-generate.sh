@@ -4,15 +4,21 @@
 
 IZPACK_DIR="installer/izpack.patched"
 #IZPACK_DIR="/Applications/IzPack"
+MAKE_EXE=true
 
 # create packages directory
-if [ ! -e packages ] ; then
-	mkdir packages || exit -1
+if [ ! -e pack ] ; then
+	mkdir pack || exit -1
 fi
 
 # create logs directory
 if [ ! -e logs ] ; then
 	mkdir logs || exit -1
+fi
+
+# copy socks5 schema
+if [ -d ../socks5 ] ; then
+	cp ../socks5/database/* database
 fi
 
 # insert appropriate version information
@@ -31,10 +37,20 @@ javadoc -d docs -sourcepath src/main/java/ -subpackages tigase -windowtitle "$WI
 $IZPACK_DIR/bin/compile \
      src/main/izpack/install_copy.xml \
      -h $IZPACK_DIR/ \
-     -b . -o ./packages/tigase-server-$TIGVER.jar
+     -b . -o ./pack/tigase-server-$TIGVER.jar
 
+# create exe file, on Mac copy proper 7za binary to izpack directory
+
+if [[ "$(uname -s)" == "Darwin" && -f /usr/local/bin/7za ]] ; then
+	cp /usr/local/bin/7za installer/izpack.patched/utils/wrappers/izpack2exe/
+else
+	MAKE_EXE=false
+fi
+
+if [ ${MAKE_EXE} ] ; then
 python $IZPACK_DIR/utils/wrappers/izpack2exe/izpack2exe.py \
-     --file=./packages/tigase-server-$TIGVER.jar --no-upx \
-     --output=./packages/tigase-server-$TIGVER.exe
+     --file=./pack/tigase-server-$TIGVER.jar --no-upx \
+     --output=./pack/tigase-server-$TIGVER.exe
+fi
 
 #rm -f src/main/izpack/install_copy.xml
