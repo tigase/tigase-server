@@ -27,3 +27,14 @@ docs
 installer
 packages
 src/main/izpack/install_copy.xml
+certs/default.pem
+certs/test-d.pem
+certs/tls-required.com.pem
+jars/tigase-archiving.jar
+jars/tigase-extras.jar
+jars/tigase-muc.jar
+jars/tigase-pubsub.jar
+jars/tigase-socks5.jar
+jars/tigase-stun.jar
+libs/
+
