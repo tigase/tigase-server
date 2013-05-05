@@ -1504,10 +1504,4 @@ public abstract class AbstractMessageReceiver
 }    // AbstractMessageReceiver
 
 
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-
 //~ Formatted in Tigase Code Convention on 13/04/24
