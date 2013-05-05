@@ -9,7 +9,7 @@ PATCHED_IZPACK_DIR="izpack.patched"
 GIT_URL="git://git.codehaus.org/izpack.git"
 
 # create installer directory
-if [ ! -e $INSTALLER_DIR ] ; then
+if [ !  -e $INSTALLER_DIR ] ; then
 	mkdir $INSTALLER_DIR || exit -1
 fi
 
@@ -32,7 +32,7 @@ cp -r $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR $INSTALLER_DIR/$PATCHED_IZPACK_DIR || 
 
 #checkout correct revision of the sources from local repository
 cd $INSTALLER_DIR/$PATCHED_IZPACK_DIR/
-git checkout v4.3.0
+git checkout v4.3.4
 cd ../../
 
 # apply patch
@@ -40,6 +40,8 @@ patch -d $INSTALLER_DIR/$PATCHED_IZPACK_DIR -p 1 < src/main/izpack/changes.patch
 
 # add custom TigasePanels
 cp src/main/izpack/java/*.java $INSTALLER_DIR/$PATCHED_IZPACK_DIR/src/lib/com/izforge/izpack/panels
+cp src/main/izpack/java/izpack/izpack/*.java $INSTALLER_DIR/$PATCHED_IZPACK_DIR/src/lib/com/izforge/izpack/installer
+cp src/main/izpack/java/izpack/panels/*.java $INSTALLER_DIR/$PATCHED_IZPACK_DIR/src/lib/com/izforge/izpack/panels
 
 #copy utilities from newer sources
 if [ ! -e $INSTALLER_DIR/$PATCHED_IZPACK_DIR/utils/wrappers/ ] ; then

@@ -98,7 +98,7 @@ public class TigaseConfigLoadPanel extends IzPanel {
 }
 
 class TigaseConfigLoadHelper {
-	
+
 	String loadConfig(AutomatedInstallData idata) {
 		// Try to read the config file.
 		File configPath = null;
@@ -184,27 +184,60 @@ class TigaseConfigLoadHelper {
 						}
 
 						if (varName.equals(TigaseConfigConst.MUC_COMP)) {
-							if ((props.getProperty("--comp-name-1") != null
-									&& props.getProperty("--comp-name-1").equals("muc"))
-								|| (props.getProperty("--comp-name-2") != null
-									&& props.getProperty("--comp-name-2").equals("muc"))) {
+							for (int i = 1 ; i <= 5 ; i++ ) {
+							if ((props.getProperty("--comp-name-" + i) != null
+									&& props.getProperty("--comp-name-" + i).equals("muc"))) {
 									idata.setVariable(TigaseConfigConst.MUC_COMP, "on");
-							}
+							}}
 								Debug.trace("Loaded: " + varName + " = " +
 									idata.getVariable(TigaseConfigConst.MUC_COMP));
 							continue;
 						}
 
 						if (varName.equals(TigaseConfigConst.PUBSUB_COMP)) {
-							if ((props.getProperty("--comp-name-1") != null
-									&& props.getProperty("--comp-name-1").equals("pubsub"))
-								|| (props.getProperty("--comp-name-2") != null
-									&& props.getProperty("--comp-name-2").equals("pubsub"))) {
+							for (int i = 1 ; i <= 5 ; i++ ) {
+							if ((props.getProperty("--comp-name-" + i) != null
+									&& props.getProperty("--comp-name-" + i).equals("pubsub"))) {
 									idata.setVariable(TigaseConfigConst.PUBSUB_COMP, "on");
-							}
-							Debug.trace("Load: " + "--comp-name-" + " = " + "pubsub");
+							}}
+								Debug.trace("Loaded: " + varName + " = " +
+									idata.getVariable(TigaseConfigConst.PUBSUB_COMP));
 							continue;
 						}
+
+						if (varName.equals(TigaseConfigConst.SOCKS5_COMP)) {
+							for (int i = 1 ; i <= 5 ; i++ ) {
+							if ((props.getProperty("--comp-name-" + i) != null
+									&& props.getProperty("--comp-name-" + i).equals("proxy"))) {
+									idata.setVariable(TigaseConfigConst.SOCKS5_COMP, "on");
+							}}
+								Debug.trace("Loaded: " + varName + " = " +
+									idata.getVariable(TigaseConfigConst.SOCKS5_COMP));
+							continue;
+						}
+
+						if (varName.equals(TigaseConfigConst.STUN_COMP)) {
+							for (int i = 1 ; i <= 5 ; i++ ) {
+							if ((props.getProperty("--comp-name-" + i) != null
+									&& props.getProperty("--comp-name-" + i).equals("stun"))) {
+									idata.setVariable(TigaseConfigConst.STUN_COMP, "on");
+							}}
+								Debug.trace("Loaded: " + varName + " = " +
+									idata.getVariable(TigaseConfigConst.STUN_COMP));
+							continue;
+						}
+
+						if (varName.equals(TigaseConfigConst.ARCHIVE_COMP)) {
+							for (int i = 1 ; i <= 5 ; i++ ) {
+							if ((props.getProperty("--comp-name-" + i) != null
+									&& props.getProperty("--comp-name-" + i).equals("message-archive"))) {
+									idata.setVariable(TigaseConfigConst.ARCHIVE_COMP, "on");
+							}}
+								Debug.trace("Loaded: " + varName + " = " +
+									idata.getVariable(TigaseConfigConst.ARCHIVE_COMP));
+							continue;
+						}
+
 
 						if (varName.equals(TigaseConfigConst.AUTH_DB_URI)) {
 							if (props.getProperty(name) != null) {
@@ -335,5 +368,5 @@ class TigaseConfigLoadHelper {
 			Debug.trace("Hm, the dbAuthUri doesn't match regex: " + dbUri);
 		}
 	}
-	
+
 }

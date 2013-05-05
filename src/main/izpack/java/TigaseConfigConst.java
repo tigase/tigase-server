@@ -58,7 +58,7 @@ public abstract class TigaseConfigConst {
     new LinkedHashMap<String, String>();
 
 	public static String[] ALL_PLUGINS =
-	{"nonSaslAuthPlugin", "saslAuthPlugin", "resBindPlugin",
+	{"messageArchivePlugin", "nonSaslAuthPlugin", "saslAuthPlugin", "resBindPlugin",
 	 "sessionBindPlugin", "registerPlugin", "rosterPlugin", "presencePlugin", "privacyPlugin",
 	 "versionPlugin", "statsPlugin", "tlsPlugin", "msgOfflinePlugin",
 	 "vcardPlugin", "commandsPlugin", "privatePlugin", "pingPlugin",
@@ -72,6 +72,9 @@ public abstract class TigaseConfigConst {
 	public static final String AUTH_HANDLE = "dbAuthHandle";
 	public static final String MUC_COMP = "mucComponent";
 	public static final String PUBSUB_COMP = "pubsubComponent";
+	public static final String STUN_COMP = "stunComponent";
+	public static final String SOCKS5_COMP = "socks5Component";
+	public static final String ARCHIVE_COMP = "messageArchiveComponent";
 	public static final String PLUGINS = "plugins";
 	public static final String DEBUG = "debug";
 	public static final String USER_DB_URI = "userDBUri";
@@ -85,6 +88,9 @@ public abstract class TigaseConfigConst {
 		tigaseIzPackMap.put("--auth-db", AUTH_HANDLE);
 		tigaseIzPackMap.put("--muc", MUC_COMP);
 		tigaseIzPackMap.put("--pubsub", PUBSUB_COMP);
+		tigaseIzPackMap.put("--socks5", SOCKS5_COMP);
+		tigaseIzPackMap.put("--stun", STUN_COMP);
+		tigaseIzPackMap.put("--archive", ARCHIVE_COMP);
 		tigaseIzPackMap.put("--cluster-mode", "clusterMode");
 		tigaseIzPackMap.put("--cluster-nodes", "clusterNodes");
 		tigaseIzPackMap.put("--debug", DEBUG);
@@ -131,6 +137,7 @@ public abstract class TigaseConfigConst {
 		pluginsMap.put("domain-filter", "domainFilterPlugin");
 		pluginsMap.put("pep", "pepPlugin");
 		pluginsMap.put("zlib", "zlibPlugin");
+		pluginsMap.put("message-archive-xep-0136", "messageArchivePlugin");
 	}
 
 	public static String getPluginId(String pluginVarNameToFind) {
@@ -142,7 +149,7 @@ public abstract class TigaseConfigConst {
 		}
 		return null;
 	}
-	
+
 	public static final String PGSQL_DRIVER = "org.postgresql.Driver";
 	public static final String MYSQL_DRIVER = "com.mysql.jdbc.Driver";
 	public static final String DERBY_DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";

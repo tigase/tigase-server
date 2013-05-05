@@ -21,11 +21,21 @@ import tigase.xmpp.BareJID;
 
 import com.izforge.izpack.installer.ResourceManager;
 import com.izforge.izpack.installer.ResourceNotFoundException;
+import com.izforge.izpack.installer.AutomatedInstallData;
+import com.izforge.izpack.installer.InstallData;
+import com.izforge.izpack.installer.InstallerFrame;
+import com.izforge.izpack.installer.IzPanel;
 import com.izforge.izpack.util.Debug;
 import com.izforge.izpack.util.VariableSubstitutor;
 import java.io.*;
+import java.net.URLEncoder;
+import java.sql.DatabaseMetaData;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+
 
 class TigaseInstallerDBHelper {
 
@@ -36,6 +46,11 @@ class TigaseInstallerDBHelper {
 	private String res_prefix = "";
 	private boolean schema_exists = false;
 	private String schema_version;
+
+	private AutomatedInstallData iData;
+
+	private VariablesSource variablesSource;
+
 
 
 	static final int DB_CONNEC_POS = 0;
@@ -48,12 +63,19 @@ class TigaseInstallerDBHelper {
 		INIT, IN_SQL;
 	}
 
+	public TigaseInstallerDBHelper() {
+		iData = TigaseInstallerCommon.getInstallData();
+		variablesSource = new IzPackInstallDataVariablesSource(iData);
+	}
+
+
+
 
 	private ArrayList<String> loadSQLQueries(
-			String resource, 
-			String res_prefix, 
-			Properties variables) 
-			throws Exception 
+			String resource,
+			String res_prefix,
+			Properties variables)
+			throws Exception
 			{
 		ArrayList<String> results = new ArrayList<String>();
 		VariableSubstitutor vs = new VariableSubstitutor(variables);
@@ -111,7 +133,7 @@ class TigaseInstallerDBHelper {
 			}
 
 
-	protected InputStream getResource(String resource) 
+	protected InputStream getResource(String resource)
 	throws ResourceNotFoundException {
 		return ResourceManager.getInstance().getInputStream(resource);
 	}
@@ -120,11 +142,14 @@ class TigaseInstallerDBHelper {
                 String res_prefix,
                 Properties variables)
                 throws Exception {
-            
+
             ArrayList<String> queries = new ArrayList<String>();
             queries.addAll(loadSQLQueries(res_prefix + "-schema-5-1-schema", res_prefix, variables));
             queries.addAll(loadSQLQueries(res_prefix + "-schema-5-1-sp", res_prefix, variables));
             queries.addAll(loadSQLQueries(res_prefix + "-schema-5-1-props", res_prefix, variables));
+
+//			System.out.println( "Socks5component variable: " + variablesSource.getVariable(TigaseConfigConst.SOCKS5_COMP) );
+
             return queries;
         }
 
@@ -192,7 +217,7 @@ class TigaseInstallerDBHelper {
 			} catch (Exception e) {
 				ResultMessage resulMessage = msgTarget.addResultMessage();
 				resulMessage.append("Doesn't exist");
-				resulMessage.append(", creating...");				
+				resulMessage.append(", creating...");
 
 				db_conn = TigaseConfigConst.props.getProperty("root-db-uri");
 				try {
@@ -350,7 +375,7 @@ class TigaseInstallerDBHelper {
 	}
 
 	public void postInstallation(Properties variables, TigaseInstallerDBHelper.MsgTarget msgTarget) {
-		
+
 		// part 1, check db preconditions
 		if (!connection_ok) {
 			msgTarget.addResultMessage().append("Connection not validated");
@@ -394,11 +419,72 @@ class TigaseInstallerDBHelper {
                     return;
                 }
 	}
-        
+
+	public void socks5SchemaLoad(Properties variables, TigaseInstallerDBHelper.MsgTarget msgTarget) {
+
+		String socks5 = variablesSource.getVariable(TigaseConfigConst.SOCKS5_COMP);
+		boolean installSocks5 = socks5.equals("on") ? true : false ;
+
+		// part 1, check db preconditions
+		if (!connection_ok) {
+			msgTarget.addResultMessage().append("Connection not validated");
+			return;
+		}
+		if (!db_ok) {
+			msgTarget.addResultMessage().append("Database not validated");
+			return;
+		}
+		Debug.trace("socks5Component variable state: " + socks5 + " " + installSocks5);
+		if ( !installSocks5 ) {
+			msgTarget.addResultMessage().append("Socks5 component not selected, skipping schema load");
+			return;
+		}
+                String db_conn = TigaseConfigConst.props.getProperty("root-tigase-db-uri");
+				Debug.trace("socks5SchemaLoad (root-tigase-db-uri): " + db_conn);
+                try {
+                    //conn.close();
+                    TigaseInstallerDBHelper.ResultMessage resultMessage = msgTarget.addResultMessage();
+                    resultMessage.append("Loading socks5 schema...");
+
+                    Connection conn = DriverManager.getConnection(db_conn);
+
+					DatabaseMetaData dbm = conn.getMetaData();
+					ResultSet tables = dbm.getTables(null, null, "tig_socks5_users", null);
+					ResultSet tables_derby = dbm.getTables(null, null, "TIG_SOCKS5_USERS", null);
+					if (tables.next()) {
+						// Table exists
+						msgTarget.addResultMessage().append("Socks5 schema exists, skipping schema load");
+					} else if (tables_derby.next()) {
+						// Table exists
+						msgTarget.addResultMessage().append("Socks5 schema exists, skipping schema load");
+					} else {
+						// Table does not exist
+						Statement stmt = conn.createStatement();
+
+						ArrayList<String> queries = loadSQLQueries(res_prefix + "-socks5-schema", res_prefix, variables);
+						for (String query : queries) {
+							if (!query.isEmpty()) {
+								Debug.trace("socks5 schema :: Executing query: " + query);
+								stmt.execute(query);
+							}
+						}
+
+						resultMessage.append(" completed OK");
+						stmt.close();
+					}
+
+                    conn.close();
+                } catch (Exception ex) {
+                    msgTarget.addResultMessage().append("Can't load socks5 schema: " + ex.getMessage());
+					Debug.trace("Can't load socks5 schema: " + ex.getMessage());
+                    return;
+                }
+	}
+
 	protected void addXmppAdminAccount(Properties variables,
 			MsgTarget msgTarget) {
 
-		
+
 		// part 1, check db preconditions
 		if (!connection_ok) {
 			msgTarget.addResultMessage().append("Connection not validated");
@@ -430,38 +516,38 @@ class TigaseInstallerDBHelper {
 			msgTarget.addResultMessage().append("Error: No admin users entered");
 			return;
 		}
-		
+
 		Object pwdObj = variables.get("adminsPwd");
 		if (pwdObj == null) {
 			msgTarget.addResultMessage().append("Error: No admin password enetered");
 			return;
 		}
 		String pwd = pwdObj.toString();
-		
+
 		String className = TigaseConfigConst.props.getProperty("--auth-db");
 		// currently Tigase use "tigase.db.jdbc.TigaseCustomAuth" if no --auth-db was configured
-		// if (className == null) 
+		// if (className == null)
 		//	className = TigaseConfigConst.props.getProperty("--user-db");
 		String resource = TigaseConfigConst.props.getProperty("--auth-db-uri");
 		Debug.trace("addXmppAdminAccount (--auth-db-uri): " + resource);
-		if (resource == null) 
+		if (resource == null)
 			resource = TigaseConfigConst.props.getProperty("root-tigase-db-uri");
 			Debug.trace("addXmppAdminAccount (root-tigase-db-uri): " + resource);
 
 		try {
 			AuthRepository repo = RepositoryFactory.getAuthRepository(
 					className, resource, null);
-			
+
 			for (BareJID jid : jids) {
 				try {
 					repo.addUser(jid, pwd);
 				} catch (UserExistsException e) {
 					// user is already there, we swallow the exception
-				} 
+				}
 			}
-			
+
 			msgTarget.addResultMessage().append("All users added");
-			
+
 		} catch (DBInitException e) {
 			msgTarget.addResultMessage().append("Error initializing DB");
 		} catch (TigaseDBException e) {
@@ -473,9 +559,9 @@ class TigaseInstallerDBHelper {
 		} catch (IllegalAccessException e) {
 			msgTarget.addResultMessage().append("Illegal access");
 		}
-	}	
+	}
 
-	
+
 	enum Tasks implements TigaseDBTask {
 		VALIDATE_CONNECTION("Checking connection to the database") {
 			public void execute(TigaseInstallerDBHelper helper, Properties variables, MsgTarget msgTarget) {
@@ -486,12 +572,12 @@ class TigaseInstallerDBHelper {
 			public void execute(TigaseInstallerDBHelper helper, Properties variables, MsgTarget msgTarget) {
 				helper.validateDBExists(variables, msgTarget);
 			}
-		},					
+		},
 		VALIDATE_DB_SCHEMA("Checking the database schema") {
 			public void execute(TigaseInstallerDBHelper helper, Properties variables, MsgTarget msgTarget) {
 				helper.validateDBSchema(variables, msgTarget);
 			}
-		},					
+		},
 		VALIDATE_DB_CONVERSION("Checking whether the database needs conversion") {
 			public void execute(TigaseInstallerDBHelper helper, Properties variables, MsgTarget msgTarget) {
 				helper.validateDBConversion(variables, msgTarget);
@@ -506,36 +592,80 @@ class TigaseInstallerDBHelper {
 			public void execute(TigaseInstallerDBHelper helper, Properties variables, MsgTarget msgTarget) {
 				helper.postInstallation(variables, msgTarget);
 			}
-		};
+		},
+		SOCKS5_COMPONENT("Loading socks5 component schema") {
+			public void execute(TigaseInstallerDBHelper helper, Properties variables, MsgTarget msgTarget) {
+				helper.socks5SchemaLoad(variables, msgTarget);
+			}
+		}
+
+
+//				System.out.println( "Socks5component variable: " + variablesSource.getVariable(TigaseConfigConst.SOCKS5_COMP) );
+//		Debug.trace( "Socks5component variable: " + variablesSource.getVariable(TigaseConfigConst.SOCKS5_COMP) );
+
+		;
 
 		private final String description;
-		
+
 		private Tasks(String description) {
 			this.description = description;
 		}
-		
+
 		public String getDescription() {
 			return description;
 		}
-		
+
 		// override to change order
 		public static TigaseDBTask[] getTasksInOrder() {
 			return values();
 		}
 	}
-	
-	
+
+
 	static interface TigaseDBTask {
 		String getDescription();
 		abstract void execute(TigaseInstallerDBHelper helper, Properties variables, MsgTarget msgTarget);
 	}
 
 	static interface MsgTarget {
-		abstract ResultMessage addResultMessage();	
+		abstract ResultMessage addResultMessage();
 	}
 
 	static interface ResultMessage {
 		void append(String msg);
 	}
-	
+
+}
+
+
+abstract class VariablesSource {
+	abstract String getVariable(String key);
+	abstract String getEncodedVariable(String key);
+}
+
+class IzPackInstallDataVariablesSource extends VariablesSource {
+	private final AutomatedInstallData idata;
+
+	public IzPackInstallDataVariablesSource(AutomatedInstallData idata) {
+		this.idata = idata;
+
+	}
+
+	@Override
+	String getVariable(String key) {
+		return idata.getVariable(key);
+	}
+
+	@Override
+	String getEncodedVariable(String key) {
+
+		String variable = idata.getVariable(key);
+		String value = null;
+		try {
+			value = URLEncoder.encode(variable, "UTF-8");
+		} catch ( Exception ex ) {
+			Logger.getLogger( TigaseInstallerDBHelper.class.getName() ).log( Level.SEVERE, null, ex );
+		}
+		return value;
+	}
 }

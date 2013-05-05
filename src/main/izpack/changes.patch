@@ -44,7 +44,7 @@ diff --git a/src/build.xml b/src/build.xml
 index 60e52dc..b29e756 100644
 --- a/src/build.xml
 +++ b/src/build.xml
-@@ -572,7 +572,6 @@
+@@ -558,7 +558,6 @@
              <!-- sourcepath is cleared so there's no mistaking what goes into the Panel -->
              <javac srcdir="@{srcdir}"
                     destdir="${bin.dir}/panels/@{name}"
@@ -52,7 +52,7 @@ index 60e52dc..b29e756 100644
                     sourcepath=""
                     optimize="on"
                     deprecation="on"
-@@ -581,6 +580,12 @@
+@@ -567,6 +566,12 @@
                     target="${compat.target}"
                     debuglevel="${debuglevel}">
                  <panel-fileset/>
@@ -65,7 +65,7 @@ index 60e52dc..b29e756 100644
              </javac>
              <jar jarfile="${bin.dir}/panels/@{name}.jar" basedir="${bin.dir}/panels/@{name}"/>
          </sequential>
-@@ -611,7 +616,9 @@
+@@ -597,7 +602,9 @@
          </build-panel>
          <build-panel name="CheckedHelloPanel">
              <include name="com/izforge/izpack/panels/CheckedHelloPanel.java"/>
@@ -75,7 +75,7 @@ index 60e52dc..b29e756 100644
              <include name="com/izforge/izpack/util/os/*RegistryHandler.java"/>
              <include name="com/izforge/izpack/util/OSClassHelper.java"/>
              <include name="com/izforge/izpack/util/os/WrappedNativeLibException.java"/>
-@@ -642,6 +649,7 @@
+@@ -629,6 +636,7 @@
              <include name="com/izforge/izpack/panels/PacksModel.java"/>
              <include name="com/izforge/izpack/panels/PacksPanel.java"/>
              <include name="com/izforge/izpack/panels/PacksPanelAutomationHelper.java"/>
@@ -83,33 +83,27 @@ index 60e52dc..b29e756 100644
              <include name="com/izforge/izpack/panels/PacksPanelBase.java"/>
              <include name="com/izforge/izpack/panels/PacksPanelInterface.java"/>
          </build-panel>
-@@ -655,12 +663,15 @@
-         </build-panel>
-         <build-panel name="HTMLLicencePanel">
-             <include name="com/izforge/izpack/panels/HTMLLicencePanel.java"/>
-+	        <include name="com/izforge/izpack/panels/HTMLLicencePanelConsoleHelper.java"/>
+@@ -646,9 +654,11 @@
          </build-panel>
          <build-panel name="HTMLInfoPanel">
              <include name="com/izforge/izpack/panels/HTMLInfoPanel.java"/>
-+	        <include name="com/izforge/izpack/panels/HTMLInfoPanelConsoleHelper.java"/>
++            <include name="com/izforge/izpack/panels/HTMLInfoPanelConsoleHelper.java"/>
          </build-panel>
          <build-panel name="TargetPanel">
              <include name="com/izforge/izpack/panels/PathInputPanel.java"/>
-+	        <include name="com/izforge/izpack/panels/PathInputPanelConsoleHelper.java"/>
++            <include name="com/izforge/izpack/panels/PathInputPanelConsoleHelper.java"/>
              <include name="com/izforge/izpack/panels/PathSelectionPanel.java"/>
              <include name="com/izforge/izpack/panels/TargetPanel.java"/>
              <include name="com/izforge/izpack/panels/TargetPanelAutomationHelper.java"/>
-@@ -674,7 +685,9 @@
-         </build-panel>
-         <build-panel name="JDKPathPanel">
-             <include name="com/izforge/izpack/panels/JDKPathPanel.java"/>
-+	        <include name="com/izforge/izpack/panels/JDKPathPanelConsoleHelper.java"/>
+@@ -665,6 +675,7 @@
+             <include name="com/izforge/izpack/panels/JDKPathPanelConsoleHelper.java"/>
+             <include name="com/izforge/izpack/panels/JDKPathPanelAutomationHelper.java"/>
              <include name="com/izforge/izpack/panels/PathInputPanel.java"/>
-+	        <include name="com/izforge/izpack/panels/PathInputPanelConsoleHelper.java"/>
++            <include name="com/izforge/izpack/panels/PathInputPanelConsoleHelper.java"/>
              <include name="com/izforge/izpack/panels/PathSelectionPanel.java"/>
              <include name="com/izforge/izpack/util/os/*RegistryHandler.java"/>
              <include name="com/izforge/izpack/util/OSClassHelper.java"/>
-@@ -684,6 +697,22 @@
+@@ -674,6 +685,22 @@
              <include name="com/coi/tools/os/izpack/Registry.java"/>
              <include name="com/coi/tools/os/izpack/COIOSHelper.java"/>
          </build-panel>
@@ -132,7 +126,7 @@ index 60e52dc..b29e756 100644
          <build-panel name="XInfoPanel">
              <include name="com/izforge/izpack/panels/XInfoPanel.java"/>
          </build-panel>
-@@ -776,6 +805,40 @@
+@@ -769,6 +796,40 @@
              <include name="com/izforge/izpack/panels/HTMLHelloPanel.java"/>
              <include name="com/izforge/izpack/panels/HTMLInfoPanel.java"/>
          </build-panel>
@@ -173,7 +167,7 @@ index 60e52dc..b29e756 100644
      </target>
  
      <!--
-@@ -811,6 +874,7 @@
+@@ -805,6 +866,7 @@
              <fileset dir="${build.dir}">
                  <include name="com/izforge/izpack/event/*.class"/>
                  <include name="com/izforge/izpack/util/IoHelper.class"/>
@@ -181,508 +175,6 @@ index 60e52dc..b29e756 100644
              </fileset>
          </jar>
      </target>
-diff --git a/src/lib/com/izforge/izpack/installer/ConsoleHelper.java b/src/lib/com/izforge/izpack/installer/ConsoleHelper.java
-new file mode 100644
-index 0000000..6a40663
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/installer/ConsoleHelper.java
-@@ -0,0 +1,172 @@
-+package com.izforge.izpack.installer;
-+
-+import java.io.BufferedReader;
-+import java.io.IOException;
-+import java.io.InputStreamReader;
-+
-+public class ConsoleHelper 
-+{
-+	public void readEnter() 
-+	throws IOException 
-+	{
-+		systemInAsReader().readLine();
-+	}
-+	
-+	public void displayAndBlock(String msg) 
-+	throws IOException 
-+	{
-+		System.out.println(msg);
-+		readEnter();
-+	}
-+	
-+	
-+	private BufferedReader reader = null;
-+	public BufferedReader systemInAsReader() 
-+	{
-+		if (reader == null)
-+		{
-+			reader = new BufferedReader(
-+					new InputStreamReader(System.in));
-+		}
-+		return reader;
-+	}
-+
-+	public void displayLabel(String label) {
-+		System.out.println(label);
-+	}
-+	
-+	public void displayPrompt(String prompt) {
-+		
-+		// cut : or :SPACE suffix
-+		String[] suffixesToCut = { ":", ": " };
-+		String newPrompt = prompt;
-+		for (String suffix : suffixesToCut) {
-+			if (newPrompt.endsWith(suffix)) 
-+			{
-+				int endIndex = newPrompt.length()-suffix.length();
-+				newPrompt = newPrompt.substring(0, endIndex);
-+			}
-+		}
-+		
-+		System.out.print(newPrompt + ": ");
-+	}
-+
-+	public <T> T readUntilValid(
-+			String prompt, 
-+			ValidatingConverter<String, T> converter) 
-+	throws IOException 
-+	{
-+		BufferedReader sysIn = systemInAsReader(); 
-+		
-+		T result = null;
-+		do 
-+		{
-+			displayPrompt(prompt);
-+			String line = sysIn.readLine();
-+			Option<T> validationResult = 
-+				converter.convert(line);
-+			if (validationResult.isDefined) 
-+			{
-+				result = validationResult.value;
-+			} else {
-+				String errorMsg = validationResult.msg;
-+				displayLabel(errorMsg);
-+			}
-+			
-+		} while (result == null);
-+		
-+		return result;
-+		
-+	}
-+
-+	public int chooseAction(String... actions) 
-+	throws IOException {
-+		final int numberOfActions = actions.length;
-+		if (numberOfActions < 2) {
-+			throw new IllegalArgumentException("Invalid number of " +
-+					"actions to choose from");
-+		}
-+		
-+		for (int i = 0 ; i < numberOfActions ; i++) {
-+			displayLabel( (i+1) + ".  " + actions[i]);
-+		}
-+		
-+		String prompt = "Choose number (1-" + numberOfActions + ")";
-+		return readUntilValid(prompt, new ValidatingConverter<String, Integer>() {
-+			public Option<Integer> convert(String from) {
-+				int number = 0;
-+				try {
-+					number = Integer.parseInt(from);
-+				} catch (NumberFormatException nfe)  {
-+					return Option.empty("Illegal number");
-+				}
-+				
-+				if (number < 1 || number > numberOfActions) {
-+					return Option.empty("Choice not in range");
-+				}
-+				
-+				return Option.full(number);
-+			}
-+		});
-+	}
-+
-+	public void displayEmptyLine() {
-+		System.out.println();
-+		
-+	}
-+
-+	private interface IPasswordReader {
-+		String getPassword(String prompt) throws IOException;
-+	}
-+	private IPasswordReader passwordReader = null;
-+
-+	private IPasswordReader getPasswordReader() 
-+	{
-+		if (passwordReader == null)  // create only once
-+		{
-+// doesn't seem to work for me anyway :/
-+//			if (System.console() != null) 
-+//			{
-+//				// java 6 passwords support
-+//				passwordReader = new IPasswordReader() 
-+//				{
-+//					public String getPassword(String prompt) throws IOException 
-+//					{
-+//						displayPrompt(prompt);
-+//						char[] pwd = System.console().readPassword(); 
-+//						return pwd == null ? null : pwd.toString();
-+//					}
-+//				};
-+//			} 
-+//			else 
-+//			{
-+				// fall back to display password on console :(
-+				passwordReader = new IPasswordReader() 
-+				{
-+					public String getPassword(String prompt) throws IOException 
-+					{
-+						System.out.println("WARNING: password will be visible while entering");
-+						displayPrompt(prompt);
-+						return systemInAsReader().readLine();
-+					}
-+				};
-+//			}
-+		}
-+		return passwordReader;
-+	}
-+	
-+	public String askForPassword(String prompt) 
-+	throws IOException 
-+	{
-+		return getPasswordReader().getPassword(prompt);
-+	}
-+
-+	public void displayMessage(String msg) {
-+		System.out.println(msg);
-+	}
-+
-+	public void displayRaw(String msg) {
-+		System.out.print(msg);
-+	}	
-+	
-+}
-\ No newline at end of file
-diff --git a/src/lib/com/izforge/izpack/installer/ConsoleInstallHelper.java b/src/lib/com/izforge/izpack/installer/ConsoleInstallHelper.java
-new file mode 100644
-index 0000000..e9284c1
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/installer/ConsoleInstallHelper.java
-@@ -0,0 +1,55 @@
-+package com.izforge.izpack.installer;
-+
-+import java.io.BufferedReader;
-+import java.io.IOException;
-+import java.util.Arrays;
-+import java.util.List;
-+
-+
-+public class ConsoleInstallHelper {
-+	// helpers
-+	public final ConsoleHelper console = new ConsoleHelper();
-+	public final IOHelper io = new IOHelper();
-+	public final ResourceHelper resource = new ResourceHelper();
-+	public final ConsolePager pager = new ConsolePager();
-+	public final HTMLHelper html = new HTMLHelper();
-+	public final VariablesHelper variables = new VariablesHelper();
-+	
-+	// singleton, use getInstance
-+	public static ConsoleInstallHelper getInstance() { return instance; }
-+	private ConsoleInstallHelper() {}
-+	private static final ConsoleInstallHelper instance = new ConsoleInstallHelper();
-+		
-+}
-+
-+
-+class IOHelper {
-+	
-+	public String readAll(BufferedReader reader) 
-+	throws IOException 
-+	{
-+		StringBuilder builder = new StringBuilder();
-+		
-+		String line = "";
-+		do 
-+		{
-+			line = reader.readLine();
-+			if (line != null) 
-+			{
-+				builder.append(line);
-+				builder.append("\n");
-+			}
-+		} while (line != null);
-+		
-+		return builder.toString();
-+	}
-+	
-+}
-+
-+
-+class TextHelper {
-+	List<String> convertToLines(String stringWithNewlines) {
-+		String[] lines = stringWithNewlines.split("\n");
-+		return Arrays.asList(lines);
-+	}
-+}
-diff --git a/src/lib/com/izforge/izpack/installer/ConsoleMenu.java b/src/lib/com/izforge/izpack/installer/ConsoleMenu.java
-new file mode 100644
-index 0000000..da3246c
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/installer/ConsoleMenu.java
-@@ -0,0 +1,116 @@
-+package com.izforge.izpack.installer;
-+
-+import java.io.IOException;
-+import java.util.List;
-+
-+
-+public abstract class ConsoleMenu {
-+	private final ConsoleHelper console;
-+	private boolean done = false;
-+	
-+	public ConsoleMenu(ConsoleHelper console) {
-+		this.console = console;
-+	}
-+
-+	public void run() 
-+	throws IOException 
-+	{
-+		while (isDone() == false) 
-+		{
-+			displayMenu();			
-+			console.displayEmptyLine();
-+			console.displayPrompt("Choose action");
-+			String userChoice = console.systemInAsReader().readLine();
-+			runAction(userChoice);
-+		}
-+	}
-+
-+	public boolean isDone() {
-+		return done;
-+	}
-+
-+	protected abstract List<IConsoleMenuItem> getMenuItems();
-+	protected abstract String getHeader();
-+
-+	private IConsoleMenuItem redisplayMenuItem = new IConsoleMenuItem() {
-+		public String renderToString() {
-+			return "Redisplay menu";
-+		}
-+		public void runAction() {
-+			displayMenu();
-+		}
-+	};
-+
-+	private IConsoleMenuItem doneMenuItem = new IConsoleMenuItem() {
-+		public String renderToString() {
-+			return "Done";
-+		}
-+		public void runAction() {
-+			done = true;
-+		}
-+	};
-+
-+	private IConsoleMenuItem invalidActionMenuItem = new IConsoleMenuItem() {
-+		public String renderToString() {
-+			return "ZONK !!"; // shouldn't be called
-+		}
-+		public void runAction() {
-+			console.displayLabel("Invalid command");
-+		}
-+	};
-+
-+
-+	private void displayItem(IConsoleMenuItem item, String prefix) {
-+		String itemStr = item.renderToString();
-+		console.displayLabel(prefix + " => " + itemStr);
-+	}
-+	
-+	private void displayMenu() {
-+		List<IConsoleMenuItem> items = getMenuItems();
-+		console.displayLabel("------");
-+		console.displayLabel(getHeader());
-+		console.displayEmptyLine();
-+		
-+		for (int i = 0 ; i < items.size() ; i++) {
-+			IConsoleMenuItem item = items.get(i);
-+			displayItem(item, "" + (i+1));
-+		}
-+		displayItem(redisplayMenuItem, "r");
-+		displayItem(doneMenuItem, "d");
-+	}
-+
-+	void runAction(String cmd) {
-+		
-+		List<? extends IConsoleMenuItem> menuItems = getMenuItems();
-+
-+		int nmbOfItems = menuItems.size();
-+		int nmb = 0;
-+		try {
-+			nmb = Integer.parseInt(cmd);
-+		}
-+		catch (NumberFormatException nfe) {
-+			nmb = -1;
-+		}
-+
-+		IConsoleMenuItem chosenAction = null;
-+		if (nmb >= 1 && nmb <= nmbOfItems) 
-+		{
-+			chosenAction = menuItems.get(nmb-1);
-+		} 
-+		else if ("r".equals(cmd)) 
-+		{
-+			chosenAction = redisplayMenuItem;
-+		} 
-+		else if ("d".equals(cmd)) 
-+		{
-+			chosenAction = doneMenuItem;
-+		} else 
-+		{
-+			chosenAction = invalidActionMenuItem;
-+		}
-+		
-+		chosenAction.runAction();
-+	}
-+	
-+	
-+}
-\ No newline at end of file
-diff --git a/src/lib/com/izforge/izpack/installer/ConsolePager.java b/src/lib/com/izforge/izpack/installer/ConsolePager.java
-new file mode 100644
-index 0000000..bf2ad7f
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/installer/ConsolePager.java
-@@ -0,0 +1,41 @@
-+package com.izforge.izpack.installer;
-+
-+import java.io.IOException;
-+import java.util.List;
-+
-+public class ConsolePager 
-+{
-+	private static TextHelper textHelper = new TextHelper();
-+	
-+	private static int DEFAULT_NO_OF_LINES = 20;
-+	private static String DEFAULT_PROMPT = "--- Press ENTER to continue ---";
-+	
-+	public void displayLongText(String text) 
-+	throws IOException 
-+	{
-+		displayLongText(
-+				text, 
-+				DEFAULT_NO_OF_LINES,
-+				DEFAULT_PROMPT);
-+	}
-+	
-+	public void displayLongText(
-+			String text, 
-+			int noOfLinesEach, 
-+			String continuePrompt) 
-+	throws IOException 
-+	{
-+		List<String> lines = textHelper.convertToLines(text);
-+		
-+		ConsoleHelper helper = new ConsoleHelper();
-+		for (int i = 0 ; i < lines.size() ; i++) 
-+		{
-+			System.out.println(lines.get(i));
-+			if (i != 0 && i % noOfLinesEach == 0) 
-+			{
-+				helper.displayAndBlock(continuePrompt);
-+			}
-+		}
-+	}
-+	
-+}
-\ No newline at end of file
-diff --git a/src/lib/com/izforge/izpack/installer/HTMLHelper.java b/src/lib/com/izforge/izpack/installer/HTMLHelper.java
-new file mode 100644
-index 0000000..1c0e7d6
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/installer/HTMLHelper.java
-@@ -0,0 +1,40 @@
-+package com.izforge.izpack.installer;
-+
-+
-+public class HTMLHelper {
-+	
-+	public String extractTextFromSimplifiedHTML(String htmlString) {
-+		// pattern relates to replace, when updating
-+		// be careful to keep the indexes in order
-+		// replacements will be performed in the same order
-+		// as they are in the two arrays
-+		String[] patterns = {
-+				"<[^>]*>",
-+				"&lt;",
-+				"&gt;",
-+				"&amp;",
-+				"&copy;",
-+				"&ldquo;",
-+				"&rdquo;"
-+		};
-+		String[] replaces = {
-+				"", // remove tags
-+				"<", // resolve <
-+				">", // resolve >
-+				"&", // resolve &
-+				"(C)", // turns &copy; to "(C)"
-+				"\"", // resolve left quotation
-+				"\"", // resolve right quotation
-+		};
-+		
-+		String result = htmlString;
-+		for (int i = 0 ; i < patterns.length ; i++) {
-+			String pattern = patterns[i];
-+			String replace = replaces[i];
-+			result = result.replaceAll(pattern, replace);
-+		}
-+		
-+		return result;
-+	}
-+	
-+}
-\ No newline at end of file
-diff --git a/src/lib/com/izforge/izpack/installer/IConsoleMenuItem.java b/src/lib/com/izforge/izpack/installer/IConsoleMenuItem.java
-new file mode 100644
-index 0000000..b737d3b
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/installer/IConsoleMenuItem.java
-@@ -0,0 +1,6 @@
-+package com.izforge.izpack.installer;
-+
-+public interface IConsoleMenuItem {
-+	public String renderToString();
-+	public void runAction();
-+}
-\ No newline at end of file
-diff --git a/src/lib/com/izforge/izpack/installer/Option.java b/src/lib/com/izforge/izpack/installer/Option.java
-new file mode 100644
-index 0000000..f3abcae
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/installer/Option.java
-@@ -0,0 +1,25 @@
-+package com.izforge.izpack.installer;
-+
-+// Optional parameter (makes optional parameters handling explicit)
-+// it has two states:
-+//   defined -> isDefined == true, value holds value
-+//   undefined -> isDefined == false, msg holds reason of emptiness
-+public class Option<T> {
-+	public final boolean isDefined;
-+	public final T value;
-+	public final String msg;
-+	
-+	private Option(boolean isDefined, T value, String msg) {
-+		this.isDefined = isDefined;
-+		this.value = value;
-+		this.msg = msg;
-+	}
-+	
-+	public static <T> Option<T> full(T value) {
-+		return new Option<T>(true, value, null);
-+	}
-+	
-+	public static <T> Option<T> empty(String msg) {
-+		return new Option<T>(false, null, msg);
-+	}
-+}
 diff --git a/src/lib/com/izforge/izpack/installer/PanelConsoleHelper.java b/src/lib/com/izforge/izpack/installer/PanelConsoleHelper.java
 index b6d9daa..053c035 100644
 --- a/src/lib/com/izforge/izpack/installer/PanelConsoleHelper.java
@@ -824,93 +316,6 @@ index b6d9daa..053c035 100644
 +    
 +    
  }
-diff --git a/src/lib/com/izforge/izpack/installer/ResourceHelper.java b/src/lib/com/izforge/izpack/installer/ResourceHelper.java
-new file mode 100644
-index 0000000..2f5a28f
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/installer/ResourceHelper.java
-@@ -0,0 +1,31 @@
-+package com.izforge.izpack.installer;
-+
-+import java.io.BufferedReader;
-+import java.io.InputStreamReader;
-+import java.net.URL;
-+
-+public class ResourceHelper {
-+	
-+	public String getResourceAsString(String resourceId) 
-+	throws ResourceNotFoundException
-+	{
-+        try
-+        {
-+            URL url = ResourceManager.getInstance().getURL(resourceId);
-+            if (url == null) 
-+            {
-+            	throw new RuntimeException("Invalid resource URL");
-+            }
-+            
-+            InputStreamReader reader = new InputStreamReader(url.openStream());
-+            BufferedReader bufferedReader = new BufferedReader(reader);
-+            return new IOHelper().readAll(bufferedReader);
-+        }
-+        catch (Exception ex)
-+        {
-+            throw new ResourceNotFoundException(
-+            		"Error loading resource " + resourceId);
-+        }
-+	}
-+
-+}
-\ No newline at end of file
-diff --git a/src/lib/com/izforge/izpack/installer/ValidatingConverter.java b/src/lib/com/izforge/izpack/installer/ValidatingConverter.java
-new file mode 100644
-index 0000000..36542e3
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/installer/ValidatingConverter.java
-@@ -0,0 +1,8 @@
-+package com.izforge.izpack.installer;
-+
-+//does conversion and validates results
-+//see Option for result description
-+public abstract class ValidatingConverter<F, T> {
-+	public abstract Option<T> convert(F from);
-+}
-+
-diff --git a/src/lib/com/izforge/izpack/installer/VariablesHelper.java b/src/lib/com/izforge/izpack/installer/VariablesHelper.java
-new file mode 100644
-index 0000000..55c7f9b
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/installer/VariablesHelper.java
-@@ -0,0 +1,28 @@
-+package com.izforge.izpack.installer;
-+
-+import java.util.Properties;
-+
-+import com.izforge.izpack.util.VariableSubstitutor;
-+
-+
-+public class VariablesHelper {
-+	public String expand(String string_to_parse, Properties variables) {
-+        try
-+        {
-+            // Initialize the variable substitutor
-+            VariableSubstitutor vs = new VariableSubstitutor(variables);
-+
-+            // Parses the info text
-+            string_to_parse = vs.substitute(string_to_parse, null);
-+        }
-+        catch (Exception err)
-+        {
-+            err.printStackTrace();
-+        }
-+        return string_to_parse;
-+	}
-+	
-+	public String expand(String string_to_parse, AutomatedInstallData idata) {
-+		return expand(string_to_parse, idata.getVariables());
-+	}
-+}
-\ No newline at end of file
 diff --git a/src/lib/com/izforge/izpack/panels/CheckedHelloPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/CheckedHelloPanelConsoleHelper.java
 new file mode 100644
 index 0000000..d5feff3
@@ -921,179 +326,7 @@ index 0000000..d5feff3
 +
 +public class CheckedHelloPanelConsoleHelper 
 +extends HelloPanelConsoleHelper {}
-diff --git a/src/lib/com/izforge/izpack/panels/DerbyPathPanel.java b/src/lib/com/izforge/izpack/panels/DerbyPathPanel.java
-new file mode 100644
-index 0000000..7d66dc2
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/panels/DerbyPathPanel.java
-@@ -0,0 +1,167 @@
-+package com.izforge.izpack.panels;
-+
-+import com.izforge.izpack.installer.AutomatedInstallData;
-+import com.izforge.izpack.installer.InstallData;
-+import com.izforge.izpack.installer.InstallerFrame;
-+import com.izforge.izpack.util.AbstractUIHandler;
-+import com.izforge.izpack.util.FileExecutor;
-+import com.izforge.izpack.util.OsVersion;
-+import com.izforge.izpack.util.os.RegistryDefaultHandler;
-+import com.izforge.izpack.util.os.RegistryHandler;
-+import com.izforge.izpack.util.VariableSubstitutor;
-+
-+import java.io.File;
-+import java.util.Arrays;
-+import java.util.HashSet;
-+import java.util.Set;
-+import java.util.StringTokenizer;
-+
-+/**
-+ * Panel which asks for the Derby database path.
-+ *
-+ * @author Klaus Bartz
-+ */
-+public class DerbyPathPanel extends PathInputPanel {
-+
-+	private static final long serialVersionUID = 1L;
-+
-+	private String variableName = null;
-+
-+	private DerbyPathPanelHelper helper = new DerbyPathPanelHelper();
-+	
-+	/**
-+	 * The constructor.
-+	 *
-+	 * @param parent The parent window.
-+	 * @param idata  The installation data.
-+	 */
-+	public DerbyPathPanel(InstallerFrame parent, InstallData idata) {
-+		super(parent, TigaseInstallerCommon.init(idata));
-+		setMustExist(false);
-+		setVariableName(helper.getVariableName());
-+	}
-+
-+	/**
-+	 * Indicates wether the panel has been validated or not.
-+	 *
-+	 * @return Wether the panel has been validated or not.
-+	 */
-+	public boolean isValidated()
-+	{
-+		boolean retval = false;
-+		if (super.isValidated()) {
-+			idata.setVariable(getVariableName(), pathSelectionPanel.getPath());
-+			return true;
-+		}
-+		return false;
-+	}
-+
-+	/**
-+	 * Called when the panel becomes active.
-+	 */
-+	public void panelActivate()
-+	{
-+		// Resolve the default for chosenPath
-+		super.panelActivate();
-+		// The variable will be exist if we enter this panel
-+		// second time. We would maintain the previos
-+		// selected path.
-+//		if (idata.getVariable(getVariableName()) != null) {
-+//			chosenPath = idata.getVariable(getVariableName());
-+//		} else {
-+//			if (OsVersion.IS_WINDOWS)	{
-+//				chosenPath = idata.getVariable(getVariableName()+".windows");
-+//			}
-+//			if (OsVersion.IS_OSX)	{
-+//				chosenPath = idata.getVariable(getVariableName()+".mac");
-+//			} else {
-+//				if (OsVersion.IS_UNIX)	{
-+//					chosenPath = idata.getVariable(getVariableName()+".unix");
-+//				}
-+//			}
-+//		}
-+//		VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
-+//		chosenPath = vs.substitute(chosenPath, null);
-+//		// Set the path for method pathIsValid ...
-+		
-+		String chosenPath = helper.getDefaultPath(idata);
-+		pathSelectionPanel.setPath(chosenPath);
-+
-+		if (!pathIsValid())
-+		{
-+			chosenPath = "";
-+		}
-+		// Set the default to the path selection panel.
-+		pathSelectionPanel.setPath(chosenPath);
-+// 		String var = idata.getVariable("DerbyPathPanel.skipIfValid");
-+// 		// Should we skip this panel?
-+// 		if (chosenPath.length() > 0 && var != null && "yes".equalsIgnoreCase(var))
-+// 		{
-+// 			idata.setVariable(getVariableName(), chosenPath);
-+// 			parent.skipPanel();
-+// 		}
-+
-+	}
-+
-+	/**
-+	 * Returns the name of the variable which should be used for the path.
-+	 *
-+	 * @return the name of the variable which should be used for the path
-+	 */
-+	public String getVariableName()
-+	{
-+		return variableName;
-+	}
-+
-+	/**
-+	 * Sets the name for the variable which should be set with the path.
-+	 *
-+	 * @param string variable name to be used
-+	 */
-+	public void setVariableName(String string)
-+	{
-+		variableName = string;
-+	}
-+
-+	/*
-+	 * (non-Javadoc)
-+	 * 
-+	 * @see com.izforge.izpack.installer.IzPanel#getSummaryBody()
-+	 */
-+	public String getSummaryBody()
-+	{
-+		return (idata.getVariable(getVariableName()));
-+	}
-+}
-+
-+class DerbyPathPanelHelper {
-+	
-+	String getVariableName() {
-+		return "DerbyDBPath";
-+	}
-+	
-+	String getDefaultPath(AutomatedInstallData idata) {
-+		String chosenPath = "";
-+		if (idata.getVariable(getVariableName()) != null) {
-+			chosenPath = idata.getVariable(getVariableName());
-+		} else {
-+			if (OsVersion.IS_WINDOWS)	{
-+				chosenPath = idata.getVariable(getVariableName()+".windows");
-+			}
-+			if (OsVersion.IS_OSX)	{
-+				chosenPath = idata.getVariable(getVariableName()+".mac");
-+			} else {
-+				if (OsVersion.IS_UNIX)	{
-+					chosenPath = idata.getVariable(getVariableName()+".unix");
-+				}
-+			}
-+		}
-+		VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
-+		chosenPath = vs.substitute(chosenPath, null);
-+		return chosenPath;
-+	}
-+
-+	public void setDefaultPath(AutomatedInstallData installData) {
-+		installData.setVariable(getVariableName(), getDefaultPath(installData));
-+	}
-+}
+
 diff --git a/src/lib/com/izforge/izpack/panels/HTMLInfoPanel.java b/src/lib/com/izforge/izpack/panels/HTMLInfoPanel.java
 index 8a14d89..a47d3ff 100644
 --- a/src/lib/com/izforge/izpack/panels/HTMLInfoPanel.java
@@ -1116,150 +349,6 @@ index 8a14d89..a47d3ff 100644
      }
  
      /**
-diff --git a/src/lib/com/izforge/izpack/panels/HTMLInfoPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/HTMLInfoPanelConsoleHelper.java
-new file mode 100644
-index 0000000..aac6d9a
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/panels/HTMLInfoPanelConsoleHelper.java
-@@ -0,0 +1,63 @@
-+package com.izforge.izpack.panels;
-+
-+import java.io.IOException;
-+import java.io.PrintWriter;
-+import java.util.Properties;
-+
-+import com.izforge.izpack.installer.AutomatedInstallData;
-+import com.izforge.izpack.installer.ConsoleInstallHelper;
-+import com.izforge.izpack.installer.PanelConsole;
-+import com.izforge.izpack.installer.PanelConsoleHelper;
-+import com.izforge.izpack.installer.ResourceNotFoundException;
-+
-+
-+// hardcoded resource name, should work only for standard one html panel
-+// uses simple html format, and extracts text from it using regex
-+// only interactive mode implemented
-+public class HTMLInfoPanelConsoleHelper extends PanelConsoleHelper implements PanelConsole 
-+{
-+	private ConsoleInstallHelper helper = ConsoleInstallHelper.getInstance();
-+		
-+	public boolean runConsole(AutomatedInstallData installData) 
-+	{
-+		try {
-+			// load resource
-+			//TODO how to get resource id from installData?
-+			String resourceId = "HTMLInfoPanel.info"; 
-+			String htmlInfo = helper.resource.getResourceAsString(resourceId);
-+			htmlInfo = helper.variables.expand(htmlInfo, installData);
-+			
-+			// convert from html
-+			String info = helper.html.extractTextFromSimplifiedHTML(htmlInfo);
-+
-+			// display using pager
-+			helper.pager.displayLongText(info);
-+		}
-+		catch (ResourceNotFoundException re) {
-+			re.printStackTrace();
-+			return false;
-+		}
-+		catch (IOException ioe) {
-+			ioe.printStackTrace();
-+			return false;
-+		}
-+				
-+		return continueQuitOrReboot(installData, this);
-+	}
-+
-+	
-+	
-+	
-+	// not implemented
-+	
-+	public boolean runConsoleFromPropertiesFile(
-+			AutomatedInstallData installData, Properties p) {
-+		return false;
-+	}
-+
-+	public boolean runGeneratePropertiesFile(AutomatedInstallData installData,
-+			PrintWriter printWriter) {
-+		return false;
-+	}
-+
-+}
-diff --git a/src/lib/com/izforge/izpack/panels/HTMLLicencePanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/HTMLLicencePanelConsoleHelper.java
-new file mode 100644
-index 0000000..c3e994c
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/panels/HTMLLicencePanelConsoleHelper.java
-@@ -0,0 +1,69 @@
-+package com.izforge.izpack.panels;
-+
-+import java.io.IOException;
-+import java.io.PrintWriter;
-+import java.util.Properties;
-+
-+import com.izforge.izpack.installer.AutomatedInstallData;
-+import com.izforge.izpack.installer.ConsoleInstallHelper;
-+import com.izforge.izpack.installer.PanelConsole;
-+import com.izforge.izpack.installer.PanelConsoleHelper;
-+import com.izforge.izpack.installer.ResourceNotFoundException;
-+
-+public class HTMLLicencePanelConsoleHelper 
-+extends PanelConsoleHelper 
-+implements PanelConsole
-+{
-+
-+	private ConsoleInstallHelper helper = ConsoleInstallHelper.getInstance();
-+	
-+	public boolean runConsole(AutomatedInstallData installData) {
-+		String headerLabel = installData.langpack.getString("LicencePanel.info");
-+		helper.console.displayLabel(headerLabel);
-+		
-+		try {
-+			// load resource
-+			//TODO how to get resource id from installData?
-+			String resourceId = "HTMLLicencePanel.licence"; 
-+			String htmlInfo = helper.resource.getResourceAsString(resourceId);
-+			htmlInfo = helper.variables.expand(htmlInfo, installData);
-+			
-+			// convert from html
-+			String info = helper.html.extractTextFromSimplifiedHTML(htmlInfo);
-+
-+			// display using pager
-+			helper.pager.displayLongText(info);
-+			
-+			String iAgree = installData.langpack.getString("LicencePanel.agree");
-+			String iDoNotAgree = installData.langpack.getString("LicencePanel.notagree");
-+			switch (helper.console.chooseAction(iAgree, iDoNotAgree)) {
-+			case 1: return continueQuitOrReboot(installData, this);
-+			case 2: return false;
-+			}
-+			
-+		}
-+		catch (ResourceNotFoundException re) {
-+			re.printStackTrace();
-+			return false;
-+		}
-+		catch (IOException ioe) {
-+			ioe.printStackTrace();
-+			return false;
-+		}
-+		
-+		// should be unreachable
-+		return false;
-+	}
-+
-+	
-+	// not implemented
-+	public boolean runConsoleFromPropertiesFile(
-+			AutomatedInstallData installData, Properties p) {
-+		return false;
-+	}
-+
-+	public boolean runGeneratePropertiesFile(AutomatedInstallData installData,
-+			PrintWriter printWriter) {
-+		return false;
-+	}
-+}
 diff --git a/src/lib/com/izforge/izpack/panels/HelloPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/HelloPanelConsoleHelper.java
 index bfb075a..f42d5f0 100644
 --- a/src/lib/com/izforge/izpack/panels/HelloPanelConsoleHelper.java
@@ -1310,262 +399,6 @@ index bfb075a..f42d5f0 100644
 +        return continueQuitOrReboot(idata, this);
      }
  }
-diff --git a/src/lib/com/izforge/izpack/panels/JDKPathPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/JDKPathPanelConsoleHelper.java
-new file mode 100644
-index 0000000..00d3b03
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/panels/JDKPathPanelConsoleHelper.java
-@@ -0,0 +1,51 @@
-+package com.izforge.izpack.panels;
-+
-+import java.io.File;
-+import java.io.PrintWriter;
-+import java.util.Properties;
-+
-+import com.izforge.izpack.installer.AutomatedInstallData;
-+import com.izforge.izpack.installer.Option;
-+import com.izforge.izpack.installer.ValidatingConverter;
-+
-+public class JDKPathPanelConsoleHelper extends PathInputPanelConsoleHelper {
-+
-+	private final static String JDK_PATH_VARIABLE_NAME = "JDKPath";
-+	
-+	public boolean runConsole(AutomatedInstallData installData) {
-+		return super.runConsole(installData);
-+	}
-+
-+	public boolean runConsoleFromPropertiesFile(
-+			AutomatedInstallData installData, Properties p) {
-+		return super.runConsoleFromPropertiesFile(installData, p);
-+	}
-+
-+	public boolean runGeneratePropertiesFile(AutomatedInstallData installData,
-+			PrintWriter printWriter) {
-+		return super.runGeneratePropertiesFile(installData, printWriter);
-+	}
-+
-+	// sorry, no proper version validation, no version check
-+	// everything needs to be extracted
-+	// or (preferably) accessed from JDKPathPanel, I couldn't do it, too complicated :/
-+	public ValidatingConverter<String, File> getPathValidator() {
-+		return new ValidatingConverter<String, File>() {
-+			public Option<File> convert(String line) {
-+				File file = new File(line);
-+				if (file.exists() == false) {
-+					return Option.empty("Path doesn't exist");
-+				} else {
-+					return Option.full(file);
-+				}
-+			}        	
-+		};
-+	}	
-+
-+	public void onResult(File inputPath, AutomatedInstallData iData) {
-+		iData.setVariable(
-+				JDK_PATH_VARIABLE_NAME, 
-+				inputPath.getAbsolutePath().toString());
-+	}
-+
-+}
-\ No newline at end of file
-diff --git a/src/lib/com/izforge/izpack/panels/PacksPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/PacksPanelConsoleHelper.java
-new file mode 100644
-index 0000000..9cf07d8
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/panels/PacksPanelConsoleHelper.java
-@@ -0,0 +1,118 @@
-+package com.izforge.izpack.panels;
-+
-+import java.io.IOException;
-+import java.io.PrintWriter;
-+import java.util.ArrayList;
-+import java.util.List;
-+import java.util.Properties;
-+
-+import com.izforge.izpack.Pack;
-+import com.izforge.izpack.installer.AutomatedInstallData;
-+import com.izforge.izpack.installer.ConsoleInstallHelper;
-+import com.izforge.izpack.installer.ConsoleMenu;
-+import com.izforge.izpack.installer.IConsoleMenuItem;
-+import com.izforge.izpack.installer.PanelConsole;
-+import com.izforge.izpack.installer.PanelConsoleHelper;
-+import com.izforge.izpack.panels.PacksHelper.PackSelection;
-+public class PacksPanelConsoleHelper 
-+extends PanelConsoleHelper 
-+implements PanelConsole 
-+{
-+
-+	private PacksHelper packsHelper = new PacksHelper();
-+	private ConsoleInstallHelper helper = ConsoleInstallHelper.getInstance();
-+	
-+	public boolean runConsole(final AutomatedInstallData installData) {
-+
-+		final List<IConsoleMenuItem> items 
-+			= packsHelper.getPacksSelections(installData);
-+		try {
-+			final String info = installData.langpack.getString("PacksPanel.info");
-+			
-+			ConsoleMenu consoleMenu = new ConsoleMenu(helper.console) {
-+				protected List<IConsoleMenuItem> getMenuItems() {
-+					return items;
-+				}
-+
-+				protected String getHeader() {
-+					return info;
-+				}
-+			};
-+			consoleMenu.run();
-+			
-+			List<Pack> selectedPacks = new ArrayList<Pack>();
-+			for (IConsoleMenuItem pack : items) {
-+				PackSelection selection = (PackSelection) pack;
-+				if (selection.isSelected) 
-+				{
-+					selectedPacks.add(selection.getPack());
-+				}
-+			}
-+			
-+			installData.selectedPacks = selectedPacks;
-+			
-+		} catch (IOException e) {
-+			e.printStackTrace();
-+			return false;
-+		} 
-+		
-+		return continueQuitOrReboot(installData, this);
-+	}
-+
-+	
-+	
-+	
-+	// not implemented
-+	public boolean runConsoleFromPropertiesFile(
-+			AutomatedInstallData installData, Properties p) {
-+		return false;
-+	}
-+
-+	public boolean runGeneratePropertiesFile(AutomatedInstallData installData,
-+			PrintWriter printWriter) {
-+		return false;
-+	}
-+
-+}
-+
-+class PacksHelper {
-+	
-+	public List<IConsoleMenuItem> getPacksSelections(AutomatedInstallData installData) {
-+		List<IConsoleMenuItem> result = new ArrayList<IConsoleMenuItem>();
-+		for (Pack pack : installData.availablePacks) {
-+			result.add(new PackSelection(pack)); 
-+		}
-+		return result;
-+	}
-+	
-+	class PackSelection implements IConsoleMenuItem {
-+		final Pack pack;
-+		boolean isSelected;
-+		
-+		public PackSelection(Pack pack) {
-+			this.pack = pack;
-+			this.isSelected = pack.preselected;
-+		}
-+
-+		public Pack getPack() {
-+			return pack;
-+		}
-+
-+		public String renderToString() {
-+			String option = "";
-+			if (pack.required == false) {
-+				String selected = isSelected ? "x" : " ";
-+				option = "[" + selected + "] ";
-+			}
-+			return option + pack.name + ", " + pack.description;
-+		}
-+
-+		public void runAction() {
-+			if (pack.required == false) {
-+				isSelected = !isSelected;
-+			} 
-+		}
-+	}
-+	
-+}
-+
-diff --git a/src/lib/com/izforge/izpack/panels/PathInputPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/PathInputPanelConsoleHelper.java
-new file mode 100644
-index 0000000..cfc0dd8
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/panels/PathInputPanelConsoleHelper.java
-@@ -0,0 +1,68 @@
-+package com.izforge.izpack.panels;
-+
-+import java.io.File;
-+import java.io.IOException;
-+import java.io.PrintWriter;
-+import java.util.Properties;
-+
-+import com.izforge.izpack.installer.AutomatedInstallData;
-+import com.izforge.izpack.installer.ConsoleInstallHelper;
-+import com.izforge.izpack.installer.PanelConsole;
-+import com.izforge.izpack.installer.PanelConsoleHelper;
-+import com.izforge.izpack.installer.ValidatingConverter;
-+
-+public abstract class PathInputPanelConsoleHelper extends PanelConsoleHelper implements PanelConsole {
-+
-+    protected ConsoleInstallHelper helper = ConsoleInstallHelper.getInstance();
-+    
-+    private String getIntroText(AutomatedInstallData installData) {
-+        String introText = getI18nStringForClass("extendedIntro", "PathInputPanel", installData);
-+        if (introText == null || introText.endsWith("extendedIntro")
-+                || introText.indexOf('$') > -1)
-+        {
-+            introText = getI18nStringForClass("intro", "PathInputPanel", installData);
-+            if (introText == null || introText.endsWith("intro"))
-+            {
-+                introText = "";
-+            }
-+        }
-+        return introText;
-+    }
-+    
-+	public boolean runConsole(AutomatedInstallData installData) 
-+	{
-+		try {
-+			final String introText = getIntroText(installData);
-+	        helper.console.displayLabel(introText);
-+	        
-+	        // get valid path
-+	        ValidatingConverter<String, File> pathValidator = getPathValidator();
-+			File inputPath = helper.console.readUntilValid(
-+					"Enter path",
-+					pathValidator);	
-+			
-+			onResult(inputPath, installData);
-+		}
-+		catch (IOException ioe) {
-+			ioe.printStackTrace();
-+			return false;
-+		}
-+		
-+		return true;
-+	}
-+
-+	public abstract ValidatingConverter<String, File> getPathValidator();
-+	
-+	abstract public void onResult(File inputPath, AutomatedInstallData iData);
-+
-+	public boolean runConsoleFromPropertiesFile(
-+			AutomatedInstallData installData, Properties p) {
-+		return false;
-+	}
-+
-+	public boolean runGeneratePropertiesFile(AutomatedInstallData installData,
-+			PrintWriter printWriter) {
-+		return false;
-+	}
-+
-+}
 diff --git a/src/lib/com/izforge/izpack/panels/TargetPanel.java b/src/lib/com/izforge/izpack/panels/TargetPanel.java
 index 7cf4ce2..03004f0 100644
 --- a/src/lib/com/izforge/izpack/panels/TargetPanel.java
@@ -1628,1296 +461,12 @@ index 964eec9..a3f0d85 100644
 +        return continueQuitOrReboot(idata, this);
      }
  }
-diff --git a/src/lib/com/izforge/izpack/panels/TigaseConfigConst.java b/src/lib/com/izforge/izpack/panels/TigaseConfigConst.java
-new file mode 100644
-index 0000000..2952d2e
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/panels/TigaseConfigConst.java
-@@ -0,0 +1,157 @@
-+/*  Tigase Project
-+ *  Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
-+ *
-+ * This program is free software: you can redistribute it and/or modify
-+ * it under the terms of the GNU Affero General Public License as published by
-+ * the Free Software Foundation, either version 3 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU Affero General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Affero General Public License
-+ * along with this program. Look for COPYING file in the top folder.
-+ * If not, see http://www.gnu.org/licenses/.
-+ *
-+ * $Rev$
-+ * Last modified by $Author$
-+ * $Date$
-+ */
-+package com.izforge.izpack.panels;
-+
-+import java.util.LinkedHashMap;
-+import java.util.Properties;
-+
-+/**
-+ * Describe class TigaseConfigConst here.
-+ *
-+ *
-+ * Created: Sat Oct 25 21:23:06 2008
-+ *
-+ * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
-+ * @version $Rev$
-+ */
-+public abstract class TigaseConfigConst {
-+
-+	public static Properties props = null;
-+
-+	public static LinkedHashMap<String, String> tigaseIzPackMap =
-+    new LinkedHashMap<String, String>();
-+// 	public static LinkedHashMap<String, String> izPackTigaseMap =
-+//     new LinkedHashMap<String, String>();
-+
-+	public static LinkedHashMap<String, String> userDBMap =
-+    new LinkedHashMap<String, String>();
-+
-+	public static LinkedHashMap<String, String> userDBUriMap =
-+    new LinkedHashMap<String, String>();
-+
-+	public static final String SERVER_DEBUG = "serverDebug";
-+	public static final String PLUGIN_DEBUG = "pluginsDebug";
-+	public static final String DB_DEBUG = "dbDebug";
-+	public static final String CLUSTER_DEBUG = "clusterDebug";
-+
-+	public static String[] ALL_DEBUGS =
-+	{SERVER_DEBUG, PLUGIN_DEBUG, DB_DEBUG, CLUSTER_DEBUG};
-+	public static LinkedHashMap<String, String> debugMap =
-+    new LinkedHashMap<String, String>();
-+
-+	public static String[] ALL_PLUGINS =
-+	{"nonSaslAuthPlugin", "saslAuthPlugin", "resBindPlugin",
-+	 "sessionBindPlugin", "registerPlugin", "rosterPlugin", "presencePlugin", "privacyPlugin",
-+	 "versionPlugin", "statsPlugin", "tlsPlugin", "msgOfflinePlugin",
-+	 "vcardPlugin", "commandsPlugin", "privatePlugin", "pingPlugin",
-+	 "basicFilterPlugin", "domainFilterPlugin", "pepPlugin", "zlibPlugin"};
-+	public static LinkedHashMap<String, String> pluginsMap =
-+    new LinkedHashMap<String, String>();
-+
-+	// Special variable names:
-+	public static final String DB_TYPE = "dbType";
-+	public static final String AUTH_DB = "authDB";
-+	public static final String AUTH_HANDLE = "dbAuthHandle";
-+	public static final String MUC_COMP = "mucComponent";
-+	public static final String PUBSUB_COMP = "pubsubComponent";
-+	public static final String PLUGINS = "plugins";
-+	public static final String DEBUG = "debug";
-+	public static final String USER_DB_URI = "userDBUri";
-+	public static final String AUTH_DB_URI = "dbAuthType";
-+
-+	static {
-+		tigaseIzPackMap.put("config-type", "configType");
-+		tigaseIzPackMap.put("--virt-hosts", "virtualDomains");
-+		tigaseIzPackMap.put("--admins", "admins");
-+		tigaseIzPackMap.put("--user-db", DB_TYPE);
-+		tigaseIzPackMap.put("--auth-db", AUTH_HANDLE);
-+		tigaseIzPackMap.put("--muc", MUC_COMP);
-+		tigaseIzPackMap.put("--pubsub", PUBSUB_COMP);
-+		tigaseIzPackMap.put("--cluster-mode", "clusterMode");
-+		tigaseIzPackMap.put("--cluster-nodes", "clusterNodes");
-+		tigaseIzPackMap.put("--debug", DEBUG);
-+		tigaseIzPackMap.put("--sm-plugins", PLUGINS);
-+		tigaseIzPackMap.put("--user-db-uri", USER_DB_URI);
-+		tigaseIzPackMap.put("--auth-db-uri", AUTH_DB_URI);
-+// 		for (Map.Entry entry: tigaseIzPackMap.entrySet()) {
-+// 			izPackTigaseMap.put(entry.getValue(), entry.getKey());
-+// 		}
-+
-+		userDBMap.put("Derby", "derby");
-+		userDBMap.put("MySQL", "mysql");
-+		userDBMap.put("PostgreSQL", "pgsql");
-+		userDBMap.put("SQLServer", "jtds:sqlserver");
-+
-+		userDBUriMap.put("derby", "Derby");
-+		userDBUriMap.put("mysql", "MySQL");
-+		userDBUriMap.put("postgresql", "PostgreSQL");
-+		userDBUriMap.put("pgsql", "PostgreSQL");
-+		userDBUriMap.put("jtds:sqlserver", "SQLServer");
-+
-+		debugMap.put("server", SERVER_DEBUG);
-+		debugMap.put("db", DB_DEBUG);
-+		debugMap.put("xmpp.impl", PLUGIN_DEBUG);
-+		debugMap.put("cluster", CLUSTER_DEBUG);
-+
-+		pluginsMap.put("jabber:iq:auth", "nonSaslAuthPlugin");
-+		pluginsMap.put("urn:ietf:params:xml:ns:xmpp-sasl", "saslAuthPlugin");
-+		pluginsMap.put("urn:ietf:params:xml:ns:xmpp-bind", "resBindPlugin");
-+		pluginsMap.put("urn:ietf:params:xml:ns:xmpp-session", "sessionBindPlugin");
-+		pluginsMap.put("jabber:iq:register", "registerPlugin");
-+		pluginsMap.put("jabber:iq:roster", "rosterPlugin");
-+		pluginsMap.put("presence", "presencePlugin");
-+		pluginsMap.put("jabber:iq:privacy", "privacyPlugin");
-+		pluginsMap.put("jabber:iq:version", "versionPlugin");
-+		pluginsMap.put("http://jabber.org/protocol/stats", "statsPlugin");
-+		pluginsMap.put("starttls", "tlsPlugin");
-+		pluginsMap.put("msgoffline", "msgOfflinePlugin");
-+		pluginsMap.put("vcard-temp", "vcardPlugin");
-+		pluginsMap.put("http://jabber.org/protocol/commands", "commandsPlugin");
-+		pluginsMap.put("jabber:iq:private", "privatePlugin");
-+		pluginsMap.put("urn:xmpp:ping", "pingPlugin");
-+		pluginsMap.put("basic-filter", "basicFilterPlugin");
-+		pluginsMap.put("domain-filter", "domainFilterPlugin");
-+		pluginsMap.put("pep", "pepPlugin");
-+		pluginsMap.put("zlib", "zlibPlugin");
-+	}
-+
-+	public static String getPluginId(String pluginVarNameToFind) {
-+		for (String pluginId : pluginsMap.keySet()) {
-+			String pluginVarName = pluginsMap.get(pluginId);
-+			if (pluginVarName.equals(pluginVarNameToFind)) {
-+				return pluginId;
-+			}
-+		}
-+		return null;
-+	}
-+	
-+	public static final String PGSQL_DRIVER = "org.postgresql.Driver";
-+	public static final String MYSQL_DRIVER = "com.mysql.jdbc.Driver";
-+	public static final String DERBY_DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
-+
-+	public static final String JDBC_CHECKUSERTABLE_QUERY
-+    = "select count(*) from tig_users";
-+
-+	public static final String JDBC_GETSCHEMAVER_QUERY
-+    = "select TigGetDBProperty('schema-version')";
-+	public static final String DERBY_GETSCHEMAVER_QUERY
-+    = "values TigGetDBProperty('schema-version')";
-+
-+}
-diff --git a/src/lib/com/izforge/izpack/panels/TigaseConfigLoadPanel.java b/src/lib/com/izforge/izpack/panels/TigaseConfigLoadPanel.java
-new file mode 100644
-index 0000000..576c754
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/panels/TigaseConfigLoadPanel.java
-@@ -0,0 +1,339 @@
-+/*
-+ * Tigase Jabber/XMPP Server
-+ * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
-+ *
-+ * This program is free software: you can redistribute it and/or modify
-+ * it under the terms of the GNU Affero General Public License as published by
-+ * the Free Software Foundation, either version 3 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU Affero General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Affero General Public License
-+ * along with this program. Look for COPYING file in the top folder.
-+ * If not, see http://www.gnu.org/licenses/.
-+ *
-+ * $Rev$
-+ * Last modified by $Author$
-+ * $Date$
-+ */
-+
-+package com.izforge.izpack.panels;
-+
-+import java.io.File;
-+import java.io.FileReader;
-+import java.util.Properties;
-+import java.util.Set;
-+import java.util.regex.Matcher;
-+import java.util.regex.Pattern;
-+
-+import javax.swing.JScrollPane;
-+import javax.swing.JTextArea;
-+
-+import com.izforge.izpack.gui.IzPanelLayout;
-+import com.izforge.izpack.gui.LabelFactory;
-+import com.izforge.izpack.installer.AutomatedInstallData;
-+import com.izforge.izpack.installer.InstallData;
-+import com.izforge.izpack.installer.InstallerFrame;
-+import com.izforge.izpack.installer.IzPanel;
-+import com.izforge.izpack.util.Debug;
-+
-+/**
-+ * The Hello panel class.
-+ *
-+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
-+ * @version $Rev$
-+ */
-+public class TigaseConfigLoadPanel extends IzPanel {
-+
-+	/**
-+	 *
-+	 */
-+	private static final long serialVersionUID = 1L;
-+
-+	private JTextArea textArea = null;
-+
-+	/**
-+	 * The constructor.
-+	 *
-+	 * @param parent The parent.
-+	 * @param idata  The installation data.
-+	 */
-+	public TigaseConfigLoadPanel(InstallerFrame parent, InstallData idata) {
-+		super(parent, TigaseInstallerCommon.init(idata), new IzPanelLayout());
-+
-+		// The config label.
-+		add(LabelFactory.create(parent.langpack.getString("TigaseConfigLoadPanel.info"),
-+				parent.icons.getImageIcon("edit"), LEADING), NEXT_LINE);
-+		// The text area which shows the info.
-+		textArea = new JTextArea("");
-+		textArea.setCaretPosition(0);
-+		textArea.setEditable(false);
-+		JScrollPane scroller = new JScrollPane(textArea);
-+		add(scroller, NEXT_LINE);
-+		// At end of layouting we should call the completeLayout method also they do nothing.
-+		getLayoutHelper().completeLayout();
-+	}
-+
-+	public void panelActivate() {
-+		super.panelActivate();
-+		// Existing configuration loading
-+		Debug.trace("panelActivate called for load pael");
-+		String config = new TigaseConfigLoadHelper().loadConfig(idata);
-+		textArea.setText(config);
-+	}
-+
-+
-+	/**
-+	 * Indicates whether the panel has been validated or not.
-+	 *
-+	 * @return Always true.
-+	 */
-+	public boolean isValidated() {
-+		return true;
-+	}
-+
-+}
-+
-+class TigaseConfigLoadHelper {
-+	
-+	String loadConfig(AutomatedInstallData idata) {
-+		// Try to read the config file.
-+		File configPath = null;
-+		StringBuilder config = new StringBuilder();
-+		try {
-+			if (idata.getVariable("searchTigaseHome") == null
-+				|| idata.getVariable("searchTigaseHome").isEmpty()) {
-+				configPath = new File(idata.getVariable("INSTALL_PATH"),
-+					"etc/init.properties");
-+			} else {
-+				configPath = new File(idata.getVariable("searchTigaseHome"),
-+					"etc/init.properties");
-+			}
-+			if (configPath.exists()) {
-+				Properties props = new Properties();
-+				props.load(new FileReader(configPath));
-+				Debug.trace("Loading init.properties file...");
-+				for (String name: props.stringPropertyNames()) {
-+					config.append(name + " = " + props.getProperty(name) + "\n");
-+				}
-+				Debug.trace(config);
-+				Debug.trace("Done.");
-+				Debug.trace("Loading variables....");
-+				for (String name: TigaseConfigConst.tigaseIzPackMap.keySet()) {
-+					String varName = TigaseConfigConst.tigaseIzPackMap.get(name);
-+					if (varName != null) {
-+						Debug.trace("Loading: " + varName + " = " + props.getProperty(name));
-+
-+						if (varName.equals(TigaseConfigConst.DEBUG)) {
-+							if (props.getProperty(name) != null) {
-+								parseDebugs(props.getProperty(name), idata);
-+								Debug.trace("Loaded: " + varName + " = " + props.getProperty(name));
-+							} else {
-+								Debug.trace("Missing configuration for " + varName);
-+							}
-+							continue;
-+						}
-+
-+						if (varName.equals(TigaseConfigConst.PLUGINS)) {
-+							if (props.getProperty(name) != null) {
-+								parsePlugins(props.getProperty(name), idata);
-+								Debug.trace("Loaded: " + varName + " = " + props.getProperty(name));
-+							} else {
-+								Debug.trace("Missing configuration for " + varName);
-+							}
-+							continue;
-+						}
-+
-+						if (varName.equals(TigaseConfigConst.USER_DB_URI)) {
-+							if (props.getProperty(name) != null) {
-+								parseUserDbUri(props.getProperty(name), idata);
-+								Debug.trace("Loaded: " + varName + " = " + props.getProperty(name));
-+							} else {
-+								Debug.trace("Missing configuration for " + varName);
-+							}
-+							continue;
-+						}
-+
-+						if (varName.equals(TigaseConfigConst.DB_TYPE)) {
-+							if (props.getProperty(name) != null) {
-+								String dbType =
-+                  TigaseConfigConst.userDBUriMap.get(props.getProperty(name));
-+								if (dbType == null) {
-+									dbType = "Other";
-+								}
-+								idata.setVariable(TigaseConfigConst.DB_TYPE, dbType);
-+								Debug.trace("Loaded: " + varName + " = " + dbType);
-+							} else {
-+								Debug.trace("Missing configuration for " + varName);
-+							}
-+							continue;
-+						}
-+
-+						if (varName.equals(TigaseConfigConst.AUTH_HANDLE)) {
-+							if (props.getProperty(name) != null) {
-+								idata.setVariable(TigaseConfigConst.AUTH_HANDLE,
-+									props.getProperty(name));
-+								Debug.trace("Loaded: " + varName + " = " + props.getProperty(name));
-+							} else {
-+								Debug.trace("Missing configuration for " + varName);
-+							}
-+							continue;
-+						}
-+
-+						if (varName.equals(TigaseConfigConst.MUC_COMP)) {
-+							if ((props.getProperty("--comp-name-1") != null
-+									&& props.getProperty("--comp-name-1").equals("muc"))
-+								|| (props.getProperty("--comp-name-2") != null
-+									&& props.getProperty("--comp-name-2").equals("muc"))) {
-+									idata.setVariable(TigaseConfigConst.MUC_COMP, "on");
-+							}
-+								Debug.trace("Loaded: " + varName + " = " +
-+									idata.getVariable(TigaseConfigConst.MUC_COMP));
-+							continue;
-+						}
-+
-+						if (varName.equals(TigaseConfigConst.PUBSUB_COMP)) {
-+							if ((props.getProperty("--comp-name-1") != null
-+									&& props.getProperty("--comp-name-1").equals("pubsub"))
-+								|| (props.getProperty("--comp-name-2") != null
-+									&& props.getProperty("--comp-name-2").equals("pubsub"))) {
-+									idata.setVariable(TigaseConfigConst.PUBSUB_COMP, "on");
-+							}
-+							Debug.trace("Load: " + "--comp-name-" + " = " + "pubsub");
-+							continue;
-+						}
-+
-+						if (varName.equals(TigaseConfigConst.AUTH_DB_URI)) {
-+							if (props.getProperty(name) != null) {
-+								parseAuthDbUri(props.getProperty(name), idata);
-+								Debug.trace("Loaded: " + varName + " = " + props.getProperty(name));
-+							} else {
-+								Debug.trace("Missing configuration for " + varName);
-+							}
-+							continue;
-+						}
-+
-+						if (props.getProperty(name) != null) {
-+							idata.setVariable(varName, props.getProperty(name));
-+						}
-+					}
-+				}
-+				Debug.trace("Done.");
-+			} else {
-+				config.append("The config file: " + configPath + " seems to not exist...");
-+			}
-+		} catch (Exception err) {
-+			StringBuilder errorConfig = new StringBuilder();
-+			errorConfig.append("Error : could not load the config file: " + configPath + "\n");
-+			errorConfig.append(err.toString() + "\n");
-+			for (StackTraceElement ste: err.getStackTrace()) {
-+				errorConfig.append(ste.toString() + "\n");
-+			}
-+			return errorConfig.toString();
-+		}
-+		return config.toString();
-+	}
-+
-+	private void parseDebugs(String debugs, AutomatedInstallData idata) {
-+		String[] ardebugs = debugs.split(",");
-+		Set<String> knownDebugs = TigaseConfigConst.debugMap.keySet();
-+		for (String debug: ardebugs) {
-+			if (knownDebugs.contains(debug)) {
-+				idata.setVariable(TigaseConfigConst.debugMap.get(debug), debug);
-+			}
-+		}
-+	}
-+
-+	private void parsePlugins(String plugins, AutomatedInstallData idata) {
-+		String[] arplugins = plugins.split(",");
-+		Set<String> knownPlugins = TigaseConfigConst.pluginsMap.keySet();
-+		for (String plugin: arplugins) {
-+			if (knownPlugins.contains(plugin)) {
-+				idata.setVariable(TigaseConfigConst.pluginsMap.get(plugin), plugin);
-+			}
-+		}
-+	}
-+
-+	private static Pattern dbUriPattern =
-+    Pattern.compile(
-+			"jdbc:([^:]+(:[^:]+)?):(//([^/]+))?/?([0-9.a-zA-Z_/-]+)[;\\?]?(user=([^;&]+))?[;&]?(password=([^;&]+))?[;&]?(.*)");
-+
-+	private void parseUserDbUri(String dbUri, AutomatedInstallData idata) {
-+		Matcher m = dbUriPattern.matcher(dbUri);
-+		if (m.matches()) {
-+			String jdbcDriver = m.group(1);
-+			String host = m.group(4);
-+			String dbName = m.group(5);
-+			String userName = m.group(7);
-+			String userPass = m.group(9);
-+			String otherPars = m.group(10);
-+// 		idata.setVariable(TigaseConfigConst.DB_TYPE,
-+// 			TigaseConfigConst.userDBUriMap.get(jdbcDriver));
-+			if (jdbcDriver.equals("mysql")) {
-+				idata.setVariable("dbSuperuser", "root");
-+			}
-+			if (jdbcDriver.equals("postgresql")) {
-+				idata.setVariable("dbSuperuser", "postgres");
-+			}
-+			if (host != null) {
-+				idata.setVariable("dbHost", host);
-+			}
-+			if (dbName != null) {
-+				if (jdbcDriver.equals("derby")) {
-+					idata.setVariable("DerbyDBPath", "/" + dbName);
-+					Debug.trace("DerbyDBPath set to /" + dbName);
-+				} else {
-+					idata.setVariable("dbName", dbName);
-+					Debug.trace("dbName read: " + dbName);
-+				}
-+			}
-+			if (userName != null) {
-+				idata.setVariable("dbUser", userName);
-+			}
-+			if (userPass != null) {
-+				idata.setVariable("dbPass", userPass);
-+			}
-+			if (otherPars != null) {
-+				idata.setVariable("dbParams", otherPars);
-+			}
-+		} else {
-+			Debug.trace("Hm, the dbUri doesn't match regex: " + dbUri);
-+		}
-+	}
-+
-+	private void parseAuthDbUri(String dbUri, AutomatedInstallData idata) {
-+		Matcher m = dbUriPattern.matcher(dbUri);
-+		if (m.matches()) {
-+			String jdbcDriver = m.group(1);
-+			String host = m.group(4);
-+			String dbName = m.group(5);
-+			String userName = m.group(7);
-+			String userPass = m.group(9);
-+			String otherPars = m.group(10);
-+			if (jdbcDriver != null) {
-+				idata.setVariable("dbAuthType", jdbcDriver);
-+			}
-+			if (host != null) {
-+				idata.setVariable("dbAuthHost", host);
-+			}
-+			if (dbName != null) {
-+				idata.setVariable("dbAuthName", dbName);
-+			}
-+			if (userName != null) {
-+				idata.setVariable("dbAuthUser", userName);
-+			}
-+			if (userPass != null) {
-+				idata.setVariable("dbAuthPass", userPass);
-+			}
-+			if (otherPars != null) {
-+				idata.setVariable("dbAuthParams", otherPars);
-+			}
-+		} else {
-+			Debug.trace("Hm, the dbAuthUri doesn't match regex: " + dbUri);
-+		}
-+	}
-+	
-+}
-diff --git a/src/lib/com/izforge/izpack/panels/TigaseConfigLoadPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/TigaseConfigLoadPanelConsoleHelper.java
-new file mode 100644
-index 0000000..8b418b1
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/panels/TigaseConfigLoadPanelConsoleHelper.java
-@@ -0,0 +1,29 @@
-+package com.izforge.izpack.panels;
-+
-+import java.io.PrintWriter;
-+import java.util.Properties;
-+
-+import com.izforge.izpack.installer.AutomatedInstallData;
-+import com.izforge.izpack.installer.PanelConsole;
-+import com.izforge.izpack.installer.PanelConsoleHelper;
-+
-+public class TigaseConfigLoadPanelConsoleHelper  extends PanelConsoleHelper implements PanelConsole {
-+
-+	public boolean runConsole(AutomatedInstallData installData) {
-+		new TigaseConfigLoadHelper().loadConfig(installData);
-+		return true;
-+	}
-+
-+	public boolean runConsoleFromPropertiesFile(
-+			AutomatedInstallData installData, Properties p) {
-+		new TigaseConfigLoadHelper().loadConfig(installData);
-+		return true;
-+	}
-+
-+	public boolean runGeneratePropertiesFile(AutomatedInstallData installData,
-+			PrintWriter printWriter) {
-+		new TigaseConfigLoadHelper().loadConfig(installData);
-+		return true;
-+	}
-+
-+}
-diff --git a/src/lib/com/izforge/izpack/panels/TigaseConfigSavePanel.java b/src/lib/com/izforge/izpack/panels/TigaseConfigSavePanel.java
-new file mode 100644
-index 0000000..05cd89b
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/panels/TigaseConfigSavePanel.java
-@@ -0,0 +1,414 @@
-+/*
-+ * Tigase Jabber/XMPP Server
-+ * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
-+ *
-+ * This program is free software: you can redistribute it and/or modify
-+ * it under the terms of the GNU Affero General Public License as published by
-+ * the Free Software Foundation, either version 3 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU Affero General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Affero General Public License
-+ * along with this program. Look for COPYING file in the top folder.
-+ * If not, see http://www.gnu.org/licenses/.
-+ *
-+ * $Rev$
-+ * Last modified by $Author$
-+ * $Date$
-+ */
-+
-+package com.izforge.izpack.panels;
-+
-+import java.io.File;
-+import java.io.FileWriter;
-+import java.util.Map;
-+import java.util.Properties;
-+
-+import javax.swing.JScrollPane;
-+import javax.swing.JTextArea;
-+
-+import com.izforge.izpack.gui.IzPanelLayout;
-+import com.izforge.izpack.installer.AutomatedInstallData;
-+import com.izforge.izpack.installer.InstallData;
-+import com.izforge.izpack.installer.InstallerFrame;
-+import com.izforge.izpack.installer.IzPanel;
-+import com.izforge.izpack.util.Debug;
-+import com.izforge.izpack.util.OsVersion;
-+
-+/**
-+ * The Hello panel class.
-+ *
-+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
-+ * @version $Rev$
-+ */
-+public class TigaseConfigSavePanel extends IzPanel {
-+
-+	/**
-+	 *
-+	 */
-+	private static final long serialVersionUID = 1L;
-+
-+	private JTextArea textArea = null;
-+
-+	private final TigaseConfigSaveHelper helper = new TigaseConfigSaveHelper();
-+
-+
-+	/**
-+	 * The constructor.
-+	 *
-+	 * @param parent The parent.
-+	 * @param idata  The installation data.
-+	 */
-+	public TigaseConfigSavePanel(InstallerFrame parent, InstallData idata) {
-+		super(parent, TigaseInstallerCommon.init(idata), new IzPanelLayout());
-+
-+		// The config label.
-+		String msg = parent.langpack.getString("TigaseConfigSavePanel.info");
-+		add(createMultiLineLabel(msg));
-+		add(IzPanelLayout.createParagraphGap());
-+		// The text area which shows the info.
-+		textArea = new JTextArea("");
-+		textArea.setCaretPosition(0);
-+		textArea.setEditable(true);
-+		JScrollPane scroller = new JScrollPane(textArea);
-+		add(scroller, NEXT_LINE);
-+		// At end of layouting we should call the completeLayout method also they do nothing.
-+		getLayoutHelper().completeLayout();
-+	}
-+
-+	public void panelActivate() {
-+		super.panelActivate();
-+		String config = helper.showConfig(
-+				new IzPackInstallDataVariablesSource(idata));
-+		textArea.setText(config);
-+	}
-+
-+
-+
-+	/**
-+	 * Indicates wether the panel has been validated or not.
-+	 *
-+	 * @return Always true.
-+	 */
-+	public boolean isValidated() {
-+		String errorStr =  helper.saveConfig(idata, textArea.getText());
-+		if (errorStr != null) {
-+			emitError("Can not write to config file", errorStr);
-+		}
-+		return true;
-+	}
-+
-+}
-+
-+abstract class VariablesSource {
-+	abstract String getVariable(String key);
-+}
-+
-+class IzPackInstallDataVariablesSource extends VariablesSource {
-+	private final AutomatedInstallData idata;
-+
-+	public IzPackInstallDataVariablesSource(AutomatedInstallData idata) {
-+		this.idata = idata;
-+		
-+	}
-+
-+	@Override
-+	String getVariable(String key) {
-+		return idata.getVariable(key);
-+	}
-+}
-+
-+class TigaseConfigSaveHelper {
-+	
-+	String showConfig(VariablesSource variablesSource) {
-+		TigaseConfigConst.props = new Properties();
-+		StringBuilder config = new StringBuilder();
-+		int comp_idx = 0;
-+		for (Map.Entry<String, String> entry:
-+        TigaseConfigConst.tigaseIzPackMap.entrySet()) {
-+			String varName = entry.getValue();
-+			String varValue = variablesSource.getVariable(varName);
-+
-+			if (varName.equals(TigaseConfigConst.DEBUG)) {
-+				String debugVar = getDebugs(variablesSource);
-+				if (!debugVar.isEmpty()) {
-+					TigaseConfigConst.props.setProperty(entry.getKey(), debugVar);
-+				}
-+				Debug.trace("Set: " + entry.getKey() + " = " + debugVar);
-+				continue;
-+			}
-+			if (varName.equals(TigaseConfigConst.PLUGINS)) {
-+				String pluginsVar = getPlugins(variablesSource);
-+				if (!pluginsVar.isEmpty()) {
-+					TigaseConfigConst.props.setProperty(entry.getKey(), pluginsVar);
-+				}
-+				Debug.trace("Set: " + entry.getKey() + " = " + pluginsVar);
-+				continue;
-+			}
-+			if (varName.equals(TigaseConfigConst.USER_DB_URI)) {
-+				TigaseConfigConst.props.setProperty(entry.getKey(), getDBUri(variablesSource));
-+				TigaseConfigConst.props.setProperty("root-tigase-db-uri",
-+					getRootTigaseDBUri(variablesSource));
-+				TigaseConfigConst.props.setProperty("root-db-uri", getRootDBUri(variablesSource));
-+				Debug.trace("Set: " + entry.getKey() + " = " + getDBUri(variablesSource));
-+				continue;
-+			}
-+
-+			if (varValue == null) continue;
-+
-+			if (varName.equals(TigaseConfigConst.DB_TYPE)) {
-+				TigaseConfigConst.props.setProperty(entry.getKey(), getUserDB(variablesSource));
-+				Debug.trace("Set: " + entry.getKey() + " = " + getUserDB(variablesSource));
-+				continue;
-+			}
-+			if (varName.equals(TigaseConfigConst.AUTH_HANDLE)) {
-+				TigaseConfigConst.props.setProperty(entry.getKey(),
-+					getAuthHandler(varValue, variablesSource));
-+				Debug.trace("Set: " + entry.getKey() + " = " + getAuthHandler(varValue, variablesSource));
-+				continue;
-+			}
-+			if (varName.equals(TigaseConfigConst.MUC_COMP)) {
-+				if (varValue.equals("on")) {
-+					++comp_idx;
-+					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "muc");
-+					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
-+						"tigase.muc.MUCComponent");
-+				}
-+				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "muc");
-+				continue;
-+			}
-+			if (varName.equals(TigaseConfigConst.PUBSUB_COMP)) {
-+				if (varValue.equals("on")) {
-+					++comp_idx;
-+					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "pubsub");
-+					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
-+						"tigase.pubsub.PubSubClusterComponent");
-+				}
-+				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "pubsub");
-+				continue;
-+			}
-+			if (varName.equals(TigaseConfigConst.AUTH_DB_URI)) {
-+				String auth_db_uri = getAuthUri(variablesSource);
-+				if (auth_db_uri != null) {
-+					TigaseConfigConst.props.setProperty(entry.getKey(), auth_db_uri);
-+					Debug.trace("Set: " + entry.getKey() + " = " + auth_db_uri);
-+				} else {
-+					Debug.trace("Not set: " + entry.getKey());
-+				}
-+				continue;
-+			}
-+			if (!varValue.trim().isEmpty()) {
-+				TigaseConfigConst.props.setProperty(entry.getKey(), varValue);
-+			}
-+			Debug.trace("Set: " + entry.getKey() + " = " + varValue);
-+		}
-+		for (String name: TigaseConfigConst.props.stringPropertyNames()) {
-+			if (!name.startsWith("root")) {
-+				config.append(name + " = " + TigaseConfigConst.props.getProperty(name) + "\n");
-+			}
-+		}
-+		return config.toString();
-+	}
-+
-+	private String getDBUri(VariablesSource variablesSource) {
-+		String db_uri = "jdbc:";
-+		String database = getUserDB(variablesSource);
-+		if (database.equals("pgsql")) {
-+			db_uri += "postgresql:";
-+		} else {
-+			db_uri += database + ":";
-+		}
-+		if (database.equals("derby")) {
-+			String derby_path = variablesSource.getVariable("DerbyDBPath");
-+			if (OsVersion.IS_WINDOWS) {
-+				derby_path = derby_path.replace("\\", "\\\\");
-+			}
-+			db_uri += derby_path;
-+		} else {
-+			db_uri += "//" + variablesSource.getVariable("dbHost");
-+			db_uri += "/" + variablesSource.getVariable("dbName");
-+			db_uri += "?user=" + variablesSource.getVariable("dbUser");
-+			if (variablesSource.getVariable("dbPass") != null
-+				&& !variablesSource.getVariable("dbPass").isEmpty()) {
-+				db_uri += "&password=" + variablesSource.getVariable("dbPass");
-+			}
-+		}
-+		return db_uri;
-+	}
-+
-+	private String getRootTigaseDBUri(VariablesSource variablesSource) {
-+		String db_uri = "jdbc:";
-+		String database = getUserDB(variablesSource);
-+		if (database.equals("pgsql")) {
-+			db_uri += "postgresql:";
-+		} else {
-+			db_uri += database + ":";
-+		}
-+		if (database.equals("derby")) {
-+			db_uri += variablesSource.getVariable("DerbyDBPath") + ";create=true";
-+		} else {
-+			db_uri += "//" + variablesSource.getVariable("dbHost");
-+			db_uri += "/" + variablesSource.getVariable("dbName");
-+			db_uri += "?user=" + variablesSource.getVariable("dbSuperuser");
-+			if (variablesSource.getVariable("dbSuperpass") != null
-+				&& !variablesSource.getVariable("dbSuperpass").isEmpty()) {
-+				db_uri += "&password=" + variablesSource.getVariable("dbSuperpass");
-+			}
-+		}
-+		return db_uri;
-+	}
-+
-+	private String getRootDBUri(VariablesSource variablesSource) {
-+		String db_uri = "jdbc:";
-+		String db = "";
-+		String database = getUserDB(variablesSource);
-+		if (database.equals("pgsql")) {
-+			db_uri += "postgresql:";
-+			db = "/postgres";
-+		} else {
-+			db_uri += database + ":";
-+			if (database.equals("mysql")) {
-+				db = "/mysql";
-+			}
-+		}
-+		if (database.equals("derby")) {
-+			db_uri += variablesSource.getVariable("DerbyDBPath") + ";create=true";
-+		} else {
-+			db_uri += "//" + variablesSource.getVariable("dbHost");
-+			db_uri += db;
-+			db_uri += "?user=" + variablesSource.getVariable("dbSuperuser");
-+			if (variablesSource.getVariable("dbSuperpass") != null
-+				&& !variablesSource.getVariable("dbSuperpass").isEmpty()) {
-+				db_uri += "&password=" + variablesSource.getVariable("dbSuperpass");
-+			}
-+		}
-+		return db_uri;
-+	}
-+
-+	private String getAuthUri(VariablesSource variablesSource) {
-+		String db_uri = "jdbc:";
-+		String database = variablesSource.getVariable(TigaseConfigConst.AUTH_DB_URI);
-+		db_uri += database + ":";
-+		if (database.equals("derby")) {
-+			String derby_path = variablesSource.getVariable("DerbyDBPath");
-+			if (derby_path != null) {
-+				db_uri += derby_path;
-+			} else {
-+				return null;
-+			}
-+		} else {
-+			db_uri += "//" + variablesSource.getVariable("dbAuthHost");
-+			db_uri += "/" + variablesSource.getVariable("dbAuthName");
-+			db_uri += "?user=" + variablesSource.getVariable("dbAuthUser");
-+			if (variablesSource.getVariable("dbAuthPass") != null
-+				&& !variablesSource.getVariable("dbAuthPass").isEmpty()) {
-+				db_uri += "&password=" + variablesSource.getVariable("dbAuthPass");
-+			}
-+		}
-+		return db_uri;
-+	}
-+
-+	private String getPlugins(VariablesSource variablesSource) {
-+		String plugins = "";
-+		if (variablesSource.getVariable(TigaseConfigConst.ALL_PLUGINS[0]) == null) {
-+			// The Panel with debuging settings was not shown so all
-+			// settins are null, then we set a default: 'server'
-+			return "";
-+		}
-+		for (String plugin: TigaseConfigConst.ALL_PLUGINS) {
-+			if (variablesSource.getVariable(plugin) == null) {
-+				Debug.trace("Missing variables for: " + plugin);
-+				continue;
-+			}
-+			
-+			final String value = variablesSource.getVariable(plugin);
-+			final String prefix;
-+			final String pluginId = TigaseConfigConst.getPluginId(plugin);
-+			if (value.equals("off")) {
-+				prefix = "-";
-+			} else {
-+				prefix = "+";
-+			} 
-+			
-+			if (!plugins.isEmpty()) {
-+				plugins += ",";
-+			}
-+			plugins += prefix + pluginId;
-+		}
-+		
-+		return plugins;
-+	}
-+
-+	private String getDebugs(VariablesSource variablesSource) {
-+
-+		String debugs = "";
-+		if (variablesSource.getVariable(TigaseConfigConst.ALL_DEBUGS[0]) == null) {
-+			// The Panel with debuging settings was not shown so all
-+			// settins are null, then we set a default: 'server'
-+			return "server";
-+		}
-+		for (String deb: TigaseConfigConst.ALL_DEBUGS) {
-+			if (variablesSource.getVariable(deb) == null 
-+					|| variablesSource.getVariable(deb).equals("off")) {
-+				continue;
-+			}
-+			if (!debugs.isEmpty()) {
-+				debugs += ",";
-+			}
-+			debugs += variablesSource.getVariable(deb);
-+		}
-+		return debugs;
-+	}
-+
-+	private String getAuthHandler(String var, VariablesSource variablesSource) {
-+		if (var.equals("Standard")) {
-+			return getUserDB(variablesSource);
-+		}
-+		return var;
-+	}
-+
-+	private String getUserDB(VariablesSource variablesSource) {
-+		String dbVar = variablesSource.getVariable(TigaseConfigConst.DB_TYPE);
-+		String result = TigaseConfigConst.userDBMap.get(dbVar);
-+		return result != null ? result : "derby";
-+	}
-+	
-+	// returns null if ok, error string on error
-+	String saveConfig(AutomatedInstallData variablesSource, String config) {
-+		// Try to read the config file.
-+		File configPath = null;
-+		File xmlConfigPath = null;
-+		try {
-+			if (variablesSource.getVariable("searchTigaseHome") == null
-+				|| variablesSource.getVariable("searchTigaseHome").isEmpty()) {
-+				configPath = new File(variablesSource.getVariable("INSTALL_PATH"),
-+					"etc/init.properties");
-+				xmlConfigPath = new File(variablesSource.getVariable("INSTALL_PATH"),
-+					"etc/tigase.xml");
-+			} else {
-+				configPath = new File(variablesSource.getVariable("searchTigaseHome"),
-+					"etc/init.properties");
-+				xmlConfigPath = new File(variablesSource.getVariable("searchTigaseHome"),
-+					"etc/tigase.xml");
-+			}
-+			FileWriter fw = new FileWriter(configPath, false);
-+			fw.write(config);
-+			fw.close();
-+			if (xmlConfigPath.exists()) {
-+				xmlConfigPath.delete();
-+			}
-+		} catch (Exception err) {
-+			String error = "Error : could not write to the config file: " + configPath + "\n";
-+			error += err.toString() + "\n";
-+			for (StackTraceElement ste: err.getStackTrace()) {
-+				error += ste.toString() + "\n";
-+			}
-+			return error;
-+		}
-+		return null;
-+	}
-+
-+}
-\ No newline at end of file
-diff --git a/src/lib/com/izforge/izpack/panels/TigaseConfigSavePanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/TigaseConfigSavePanelConsoleHelper.java
-new file mode 100644
-index 0000000..1858e6f
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/panels/TigaseConfigSavePanelConsoleHelper.java
-@@ -0,0 +1,35 @@
-+package com.izforge.izpack.panels;
-+
-+import java.io.PrintWriter;
-+import java.util.Properties;
-+
-+import com.izforge.izpack.installer.AutomatedInstallData;
-+import com.izforge.izpack.installer.PanelConsole;
-+import com.izforge.izpack.installer.PanelConsoleHelper;
-+
-+public class TigaseConfigSavePanelConsoleHelper  
-+extends PanelConsoleHelper implements PanelConsole {
-+
-+	public boolean runConsole(AutomatedInstallData installData) {
-+		TigaseConfigSaveHelper helper = new TigaseConfigSaveHelper();
-+		
-+		String config =  helper.showConfig(
-+				new IzPackInstallDataVariablesSource(installData));
-+		helper.saveConfig(installData, config);
-+		
-+		return true;
-+	}
-+
-+	
-+	
-+	public boolean runConsoleFromPropertiesFile(
-+			AutomatedInstallData installData, Properties p) {
-+		return false;
-+	}
-+
-+	public boolean runGeneratePropertiesFile(AutomatedInstallData installData,
-+			PrintWriter printWriter) {
-+		return false;
-+	}
-+
-+}
-diff --git a/src/lib/com/izforge/izpack/panels/TigaseDBCheckPanel.java b/src/lib/com/izforge/izpack/panels/TigaseDBCheckPanel.java
-new file mode 100644
-index 0000000..dd0cc46
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/panels/TigaseDBCheckPanel.java
-@@ -0,0 +1,160 @@
-+/*
-+ * Tigase Jabber/XMPP Server
-+ * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
-+ *
-+ * This program is free software: you can redistribute it and/or modify
-+ * it under the terms of the GNU Affero General Public License as published by
-+ * the Free Software Foundation, either version 3 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU Affero General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Affero General Public License
-+ * along with this program. Look for COPYING file in the top folder.
-+ * If not, see http://www.gnu.org/licenses/.
-+ *
-+ * $Rev$
-+ * Last modified by $Author$
-+ * $Date$
-+ */
-+
-+package com.izforge.izpack.panels;
-+
-+import java.util.Timer;
-+import java.util.TimerTask;
-+
-+import javax.swing.JScrollPane;
-+import javax.swing.JTable;
-+import javax.swing.SwingUtilities;
-+import javax.swing.table.AbstractTableModel;
-+import javax.swing.table.TableModel;
-+
-+import com.izforge.izpack.gui.IzPanelLayout;
-+import com.izforge.izpack.installer.InstallData;
-+import com.izforge.izpack.installer.InstallerFrame;
-+import com.izforge.izpack.installer.IzPanel;
-+import com.izforge.izpack.panels.TigaseInstallerDBHelper.MsgTarget;
-+import com.izforge.izpack.panels.TigaseInstallerDBHelper.ResultMessage;
-+import com.izforge.izpack.panels.TigaseInstallerDBHelper.TigaseDBTask;
-+
-+/**
-+ * The Hello panel class.
-+ *
-+ * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
-+ * @version $Rev$
-+ */
-+public class TigaseDBCheckPanel extends IzPanel {
-+
-+	/**
-+	 *
-+	 */
-+	private static final long serialVersionUID = 1L;
-+
-+	private JTable table = null;
-+	private Timer delayedTasks = new Timer("DelayedTasks", true);
-+
-+	private final InstallData idata;
-+
-+	/**
-+	 * The constructor.
-+	 *
-+	 * @param parent The parent.
-+	 * @param idata  The installation data.
-+	 */
-+	public TigaseDBCheckPanel(InstallerFrame parent, InstallData idata) {
-+		super(parent, TigaseInstallerCommon.init(idata), new IzPanelLayout());
-+		this.idata = idata;
-+
-+		// The config label.
-+		String msg = parent.langpack.getString("TigaseDBCheckPanel.info");
-+		add(createMultiLineLabel(msg));
-+		add(IzPanelLayout.createParagraphGap());
-+
-+		final String[] columnNames = new String[] {"Action", "Result"};
-+		
-+		TigaseDBTask[] tasks = TigaseInstallerDBHelper.Tasks.getTasksInOrder();
-+		final String[][] data = new String[tasks.length][];
-+		for (int i = 0 ; i < tasks.length ; i++) {
-+			TigaseDBTask task = tasks[i];
-+			data[i] = new String[] { task.getDescription(), "" };
-+		}
-+		
-+		TableModel dataModel = new AbstractTableModel() {
-+//				private String[] columnNames = names;
-+//				private Object[][] data = datas;
-+				public int getColumnCount() { return columnNames.length; }
-+				public int getRowCount() { return data.length; }
-+				public String getColumnName(int col) { return columnNames[col]; }
-+				public Object getValueAt(int row, int col) { return data[row][col]; }
-+				public Class getColumnClass(int c) { return getValueAt(0, c).getClass(); }
-+				public boolean isCellEditable(int row, int col) { return false; }
-+				public void setValueAt(Object value, int row, int col) {
-+					data[row][col] = value.toString();
-+					fireTableCellUpdated(row, col);
-+				}
-+      };
-+		// The table area which shows the info.
-+		table = new JTable(dataModel);
-+		//		table.setEditable(false);
-+		//add(table, NEXT_LINE);
-+		JScrollPane scroller = new JScrollPane(table);
-+		table.setFillsViewportHeight(true);
-+		add(scroller, NEXT_LINE);
-+		// At end of layouting we should call the completeLayout
-+		// method also they do nothing.
-+		getLayoutHelper().completeLayout();
-+	}
-+
-+	public void panelActivate() {
-+		super.panelActivate();
-+		parent.lockNextButton();
-+		
-+		final TigaseInstallerDBHelper dbHelper = new TigaseInstallerDBHelper();
-+		
-+		delayedTasks.schedule(new TimerTask() {
-+				
-+			public void run() {
-+				TigaseDBTask[] tasks = TigaseInstallerDBHelper.Tasks.getTasksInOrder();
-+				
-+				for (int i = 0 ; i < tasks.length ; i++) {
-+					TigaseDBTask task = tasks[i];
-+					final int row = i;
-+					
-+					MsgTarget msgTarget = new MsgTarget() {
-+						public ResultMessage addResultMessage() {
-+							return new ResultMessage() {
-+								private String fullMsg = "";
-+
-+								public void append(String msg) {
-+									fullMsg += msg;
-+									SwingUtilities.invokeLater(new Runnable() {
-+										public void run() {
-+											table.getModel().setValueAt(fullMsg, row, 1);
-+										}
-+									});
-+								}
-+							};
-+						}
-+					};
-+						
-+					task.execute(dbHelper, idata.getVariables(), msgTarget);
-+				}
-+				parent.unlockNextButton();
-+			}
-+		}, 500);
-+	}
-+
-+	/**
-+	 * Indicates wether the panel has been validated or not.
-+	 *
-+	 * @return Always true.
-+	 */
-+	public boolean isValidated() {
-+		return true;
-+	}
-+
-+}
-+
-+
-diff --git a/src/lib/com/izforge/izpack/panels/TigaseDBCheckPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/TigaseDBCheckPanelConsoleHelper.java
-new file mode 100644
-index 0000000..101e248
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/panels/TigaseDBCheckPanelConsoleHelper.java
-@@ -0,0 +1,62 @@
-+package com.izforge.izpack.panels;
-+
-+import java.io.PrintWriter;
-+import java.util.Properties;
-+
-+import com.izforge.izpack.installer.AutomatedInstallData;
-+import com.izforge.izpack.installer.ConsoleInstallHelper;
-+import com.izforge.izpack.installer.PanelConsole;
-+import com.izforge.izpack.installer.PanelConsoleHelper;
-+import com.izforge.izpack.panels.TigaseInstallerDBHelper.ResultMessage;
-+import com.izforge.izpack.panels.TigaseInstallerDBHelper.TigaseDBTask;
-+
-+public class TigaseDBCheckPanelConsoleHelper extends PanelConsoleHelper implements PanelConsole {
-+
-+	private ConsoleInstallHelper helper = ConsoleInstallHelper.getInstance();
-+	
-+	public boolean runConsole(AutomatedInstallData installData) {
-+		
-+		TigaseInstallerDBHelper dbHelper = new TigaseInstallerDBHelper();
-+	
-+		helper.console.displayLabel("Performing DB tasks");
-+				
-+		for (TigaseDBTask task : TigaseInstallerDBHelper.Tasks.getTasksInOrder()) {
-+			helper.console.displayEmptyLine();
-+			helper.console.displayRaw(task.getDescription() + "  ");
-+			
-+			TigaseInstallerDBHelper.MsgTarget msgTarget = new TigaseInstallerDBHelper.MsgTarget() {
-+				public ResultMessage addResultMessage() {
-+					helper.console.displayEmptyLine();
-+					return new ResultMessage() {
-+						public void append(String msg) {
-+							helper.console.displayRaw(msg);
-+						}
-+					};
-+				}
-+			};
-+
-+			task.execute(dbHelper, installData.getVariables(), msgTarget);
-+		}
-+		
-+		helper.console.displayEmptyLine();
-+		helper.console.displayEmptyLine();
-+		helper.console.displayEmptyLine();
-+
-+		return true;
-+	}
-+
-+
-+	
-+	// not implemented
-+	
-+	public boolean runConsoleFromPropertiesFile(
-+			AutomatedInstallData installData, Properties p) {
-+		return false;
-+	}
-+
-+	public boolean runGeneratePropertiesFile(AutomatedInstallData installData,
-+			PrintWriter printWriter) {
-+		return false;
-+	}
-+
-+}
-diff --git a/src/lib/com/izforge/izpack/panels/TigaseInstallerDbHelperFunctionalTest.java b/src/lib/com/izforge/izpack/panels/TigaseInstallerDbHelperFunctionalTest.java
-new file mode 100644
-index 0000000..f1d2afb
---- /dev/null
-+++ b/src/lib/com/izforge/izpack/panels/TigaseInstallerDbHelperFunctionalTest.java
-@@ -0,0 +1,39 @@
-+package com.izforge.izpack.panels;
-+
-+import java.util.Properties;
-+
-+import com.izforge.izpack.panels.TigaseInstallerDBHelper.MsgTarget;
-+import com.izforge.izpack.panels.TigaseInstallerDBHelper.ResultMessage;
-+import com.izforge.izpack.panels.TigaseInstallerDBHelper.TigaseDBTask;
-+
-+public class TigaseInstallerDbHelperFunctionalTest {
-+
-+	public static void main(String[] args) {
-+		testPostgres();
-+	}
-+
-+	private static void testPostgres() {
-+		
-+		TigaseInstallerDBHelper helper = new TigaseInstallerDBHelper();
-+		Properties variables = new Properties();
-+		
-+		for (final TigaseDBTask task : 
-+			TigaseInstallerDBHelper.Tasks.getTasksInOrder()) 
-+		{
-+			MsgTarget msgTarget = new MsgTarget() {
-+				public ResultMessage addResultMessage() {
-+					System.err.println("Task: " + task.getDescription());
-+					return new ResultMessage() {
-+						public void append(String msg) {
-+							System.err.print(msg);
-+						}
-+					};
-+				}
-+			};
-+			
-+			task.execute(helper, variables, msgTarget);
-+		}
-+		
-+	}
-+	
-+}
+
 diff --git a/src/lib/com/izforge/izpack/panels/UserInputPanel.java b/src/lib/com/izforge/izpack/panels/UserInputPanel.java
 index fbda7e9..5e46d4e 100644
 --- a/src/lib/com/izforge/izpack/panels/UserInputPanel.java
 +++ b/src/lib/com/izforge/izpack/panels/UserInputPanel.java
-@@ -2456,6 +2456,8 @@ public class UserInputPanel extends IzPanel implements ActionListener, ItemListe
+@@ -2497,6 +2497,8 @@ public class UserInputPanel extends IzPanel implements ActionListener, ItemListe
                  if (value.equals(trueValue))
                  {
                      set = TRUE;
@@ -2930,15 +479,14 @@ diff --git a/src/lib/com/izforge/izpack/panels/UserInputPanelConsoleHelper.java 
 index ca9a659..1245897 100644
 --- a/src/lib/com/izforge/izpack/panels/UserInputPanelConsoleHelper.java
 +++ b/src/lib/com/izforge/izpack/panels/UserInputPanelConsoleHelper.java
-@@ -25,6 +25,7 @@ import java.io.IOException;
- import java.io.InputStreamReader;
- import java.io.PrintWriter;
- import java.util.ArrayList;
-+import java.util.Arrays;
+@@ -29,17 +29,16 @@ import java.util.Arrays;
  import java.util.Iterator;
  import java.util.List;
  import java.util.Properties;
-@@ -33,6 +34,8 @@ import java.util.Vector;
+-import java.util.StringTokenizer;
+ import java.util.Vector;
+ 
+-import com.izforge.izpack.Pack;
  import com.izforge.izpack.Panel;
  import com.izforge.izpack.adaptator.IXMLElement;
  import com.izforge.izpack.installer.AutomatedInstallData;
@@ -2947,7 +495,11 @@ index ca9a659..1245897 100644
  import com.izforge.izpack.installer.PanelConsole;
  import com.izforge.izpack.installer.PanelConsoleHelper;
  import com.izforge.izpack.util.Debug;
-@@ -68,6 +71,8 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+-import com.izforge.izpack.util.OsVersion;
+ import com.izforge.izpack.util.SpecHelper;
+ import com.izforge.izpack.util.VariableSubstitutor;
+ 
+@@ -72,10 +71,10 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
      private static final String SET = "set";
  
      private static final String TEXT = "txt";
@@ -2955,65 +507,141 @@ index ca9a659..1245897 100644
 +    private static final String ID = "id";
  
      private static final String SPEC = "spec";
+-    
+-    private static final String PWD = "pwd";
  
-@@ -78,16 +83,28 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+     private static final String TYPE_ATTRIBUTE = "type";
+ 
+@@ -84,77 +83,48 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
      private static final String COMBO_FIELD = "combo";
  
      private static final String STATIC_TEXT = "staticText";
--
 +    
 +    private static final String TITLE_TEXT = "title";
-+
+ 
+-    private static final String CHOICE = "choice";
 +    private static final String SPACE_TEXT = "space";
 +    
 +    private static final String DIVIDER_TEXT = "divider";
-+    
+     
+-    private static final String FILE = "file";
 +    private static final String CHECK_FIELD = "check";
-+    
-     private static final String CHOICE = "choice";
+     
+-    private static final String PASSWORD = "password";
++    private static final String CHOICE = "choice";
  
      private static final String VALUE = "value";
  
      private static final String RADIO_FIELD = "radio";
-+    
+-
+-    private static final String TITLE_FIELD = "title";
+-
+-    private static final String CHECK_FIELD = "check";
+-
+-    private static final String RULE_FIELD = "rule";
+     
+-    private static final String SPACE = "space";
+-    
+-    private static final String DIVIDER = "divider";
+-
+-    static final String DISPLAY_FORMAT = "displayFormat";
+-
+-    static final String PLAIN_STRING = "plainString";
+-
+-    static final String SPECIAL_SEPARATOR = "specialSeparator";
+-
+-    static final String LAYOUT = "layout";
+-
+-    static final String RESULT_FORMAT = "resultFormat";
 +    private static final String PASSWORD_FIELD = "password";
  
      private static final String DESCRIPTION = "description";
  
-     private static final String TRUE = "true";
-+    
+-    private static final String TRUE = "true";   
+-        
+-    private static final String NAME = "name";
+-
+-    private static final String FAMILY = "family";
+-
+-    private static final String OS = "os";
+-
+-    private static final String SELECTEDPACKS = "createForPack";
+-
+-   
+-    private static Input SPACE_INTPUT_FIELD = new Input(SPACE, null, null, SPACE, "\r", 0);
+-    private static Input DIVIDER_INPUT_FIELD = new Input(DIVIDER, null, null, DIVIDER, "------------------------------------------", 0);
++    private static final String TRUE = "true";
+     
 +    private static final String FALSE = "false";
- 
++
      public List<Input> listInputs;
+-          
++
+     public UserInputPanelConsoleHelper()
+     {
+         instanceNumber = instanceCount++;
+         listInputs = new ArrayList<Input>();
+-        
+     }
  
-@@ -103,7 +120,7 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+     public boolean runConsoleFromPropertiesFile(AutomatedInstallData installData, Properties p)
+     {
+-    	
+         collectInputs(installData);
          Iterator<Input> inputIterator = listInputs.iterator();
          while (inputIterator.hasNext())
          {
 -            String strVariableName = ((Input) inputIterator.next()).strVariableName;
+-            if (strVariableName != null)
 +            String strVariableName = ((Input) inputIterator.next()).getVariableName();
-             String strVariableValue = p.getProperty(strVariableName);
-             if (strVariableValue != null)
++            String strVariableValue = p.getProperty(strVariableName);
++            if (strVariableValue != null)
              {
-@@ -120,7 +137,7 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+-                String strVariableValue = p.getProperty(strVariableName);
+-                if (strVariableValue != null)
+-                {
+-                    installData.setVariable(strVariableName, strVariableValue);
+-                }
++                installData.setVariable(strVariableName, strVariableValue);
+             }
+         }
+         return true;
+@@ -163,80 +133,35 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+     public boolean runGeneratePropertiesFile(AutomatedInstallData installData,
+             PrintWriter printWriter)
+     {
+-
+         collectInputs(installData);
          Iterator<Input> inputIterator = listInputs.iterator();
          while (inputIterator.hasNext())
          {
--            printWriter.println(((Input) inputIterator.next()).strVariableName + "=");
+-            Input input = (Input) inputIterator.next();
+-            if (input.strVariableName != null)
+-            {
+-                printWriter.println(input.strVariableName + "=");
+-            }
 +            printWriter.println(((Input) inputIterator.next()).getVariableName() + "=");
          }
          return true;
      }
-@@ -133,37 +150,14 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+ 
+     public boolean runConsole(AutomatedInstallData idata)
+     {
+-
+-        boolean processpanel = collectInputs(idata);
+-        if (!processpanel) {
+-            return true;
+-        }
++        collectInputs(idata);
+         boolean status = true;
+         Iterator<Input> inputsIterator = listInputs.iterator();
          while (inputsIterator.hasNext())
          {
              Input input = inputsIterator.next();
--            String text = input.strText;
--            if (text != null)
--            {
--                System.out.println(text);
--            }
--            if (TEXT_FIELD.equals(input.strFieldType))
+- 
+-            if (TEXT_FIELD.equals(input.strFieldType) 
+-        		|| FILE.equals(input.strFieldType) 
+-        		|| RULE_FIELD.equals(input.strFieldType))
 -            {
 -                status = status && processTextField(input, idata);
 -            }
@@ -3022,6 +650,20 @@ index ca9a659..1245897 100644
 -            {
 -                status = status && processComboRadioField(input, idata);
 -            }
+-            else if (CHECK_FIELD.equals(input.strFieldType))
+-            {
+-                status = status && processCheckField(input, idata);
+-            } 
+-           else if(STATIC_TEXT.equals(input.strFieldType) 
+-        		   || TITLE_FIELD.equals(input.strFieldType)
+-        		   || DIVIDER.equals(input.strFieldType)
+-        		   || SPACE.equals(input.strFieldType) )
+-           {
+-        	   status = status && processSimpleField(input, idata);
+-           } 
+-           else if (PASSWORD.equals(input.strFieldType) ) {
+-               status = status && processPasswordField(input, idata);
+-           }
 -
 -        }
 -
@@ -3048,14 +690,94 @@ index ca9a659..1245897 100644
      }
  
      public boolean collectInputs(AutomatedInstallData idata)
-@@ -215,147 +209,10 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
-             }
-             listInputs.add(getInputFromField(field));
-         }
-+        
-         return true;
-     }
+     {
+-    	
+         listInputs.clear();
+         IXMLElement data;
+         IXMLElement spec = null;
+@@ -255,7 +180,6 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+         {
  
+             e1.printStackTrace();
+-            return false;
+         }
+ 
+         specElements = specHelper.getSpec().getChildrenNamed(NODE_ID);
+@@ -267,320 +191,41 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+             if (((attribute != null) && instance.equals(attribute))
+                     || ((dataID != null) && (panelid != null) && (panelid.equals(dataID))))
+             {
+-
+-                Vector<IXMLElement> forPacks = data.getChildrenNamed(SELECTEDPACKS);
+-                Vector<IXMLElement> forOs = data.getChildrenNamed(OS);
+-
+-                if (itemRequiredFor(forPacks, idata) && itemRequiredForOs(forOs)) {
+-                    spec = data;
+-                    break;
+-                }
++                spec = data;
+             }
+         }
+-        
+-        if (spec == null) {
+-            return false;
+-        }
+         Vector<IXMLElement> fields = spec.getChildrenNamed(FIELD_NODE_ID);
+         for (int i = 0; i < fields.size(); i++)
+         {
+             IXMLElement field = fields.elementAt(i);
+-
+-            Vector<IXMLElement> forPacks = field.getChildrenNamed(SELECTEDPACKS);
+-            Vector<IXMLElement> forOs = field.getChildrenNamed(OS);
+-
+-            if (itemRequiredFor(forPacks, idata) && itemRequiredForOs(forOs)) {
+-        
+-                String conditionid = field.getAttribute(ATTRIBUTE_CONDITIONID_NAME);
+-                if (conditionid != null)
++            String conditionid = field.getAttribute(ATTRIBUTE_CONDITIONID_NAME);
++            if (conditionid != null)
++            {
++                // check if condition is fulfilled
++                if (!idata.getRules().isConditionTrue(conditionid, idata.getVariables()))
+                 {
+-                    // check if condition is fulfilled
+-                    if (!idata.getRules().isConditionTrue(conditionid, idata.getVariables()))
+-                    {
+-                        continue;
+-                    }
+-                }
+-                Input in = getInputFromField(field, idata);
+-                if (in != null) {
+-                	listInputs.add(in);
++                    continue;
+                 }
+             }
+-         }
+-        return true;
+-    }
+-    
+-    boolean processSimpleField(Input input, AutomatedInstallData idata)
+-    {
+-        VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
+-        System.out.println(vs.substitute(input.strText, null));
+-        return true;
+-    }
+-    
+-    boolean processPasswordField(Input input, AutomatedInstallData idata) {
+-
+-        Password pwd = (Password) input;
+-        
+-        boolean rtn = false;
+-        for (int i=0; i < pwd.input.length; i++) {
+-            rtn = processTextField(pwd.input[i], idata);
+-            if (!rtn) return rtn;
++            listInputs.add(getInputFromField(field));
+         }
+-    
+-        return rtn;
+         
+-    }
+-
 -    boolean processTextField(Input input, AutomatedInstallData idata)
 -    {
 -        String variable = input.strVariableName;
@@ -3068,23 +790,21 @@ index ca9a659..1245897 100644
 -            Debug.trace("Error: no spec element defined in file field");
 -            return false;
 -        }
--        set = input.strDefaultValue;
+-       
+-        set = idata.getVariable(variable);
 -        if (set == null)
 -        {
--            set = idata.getVariable(variable);
+-            set = input.strDefaultValue;
 -            if (set == null)
 -            {
 -                set = "";
--            }
+-            } 
 -        }
--        else
--        {
--            if (set != null && !"".equals(set))
--            {
 -
--                VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
--                set = vs.substitute(set, null);
--            }
+-        if (set != null && !"".equals(set))
+-        {
+-            VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
+-            set = vs.substitute(set, null);
 -        }
 -
 -        fieldText = input.listChoices.get(0).strText;
@@ -3106,16 +826,24 @@ index ca9a659..1245897 100644
 -        {
 -            e.printStackTrace();
 -        }
--        return true;
+         return true;
 -
--    }
--
+     }
+ 
 -    boolean processComboRadioField(Input input, AutomatedInstallData idata)
 -    {// TODO protection if selection not valid and no set value
 -        String variable = input.strVariableName;
 -        if ((variable == null) || (variable.length() == 0)) { return false; }
 -        String currentvariablevalue = idata.getVariable(variable);
+-		  //If we dont do this, choice with index=0 will always be displayed, no matter what is selected
+-		  input.iSelectedChoice = -1;
 -        boolean userinput = false;
+-        
+-        // display the description for this combo or radio field
+-        if (input.strText != null) {
+-            System.out.println(input.strText);
+-        }
+-        
 -        List<Choice> lisChoices = input.listChoices;
 -        if (lisChoices.size() == 0)
 -        {
@@ -3130,6 +858,9 @@ index ca9a659..1245897 100644
 -        {
 -            Choice choice = lisChoices.get(i);
 -            String value = choice.strValue;
+-            // if the choice value is provided via a property to the process, then
+-            // set it as the selected choice, rather than defaulting to what the
+-            // spec defines.
 -            if (userinput)
 -            {
 -                if ((value != null) && (value.length() > 0) && (currentvariablevalue.equals(value)))
@@ -3195,36 +926,150 @@ index ca9a659..1245897 100644
 -
 -    }
  
-     public Input getInputFromField(IXMLElement field)
+-    boolean processCheckField(Input input, AutomatedInstallData idata)
+-    {
+-        String variable = input.strVariableName;
+-        if ((variable == null) || (variable.length() == 0)) { return false; }
+-        String currentvariablevalue = idata.getVariable(variable);
+-        if (currentvariablevalue == null)
+-        {
+-            currentvariablevalue = "";
+-        }
+-        List<Choice> lisChoices = input.listChoices;
+-        if (lisChoices.size() == 0)
+-        {
+-            Debug.trace("Error: no spec element defined in check field");
+-            return false;
+-        }
+-        Choice choice = null;
+-        for (int i = 0; i < lisChoices.size(); i++)
+-        {
+-            choice = lisChoices.get(i);
+-            String value = choice.strValue;
+-
+-            if ((value != null) && (value.length() > 0) && (currentvariablevalue.equals(value)))
+-            {
+-                input.iSelectedChoice = i;
+-            }
+-            else
+-            {
+-                String set = input.strDefaultValue;
+-                if (set != null)
+-                {
+-                    if (set != null && !"".equals(set))
+-                    {
+-                        VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
+-                        set = vs.substitute(set, null);
+-                    }
+-                    if (set.equals(TRUE))
+-                    {
+-                        input.iSelectedChoice = 1;
+-                    }
+-                }
+-            }
+-        }
+-        System.out.println("  [" + (input.iSelectedChoice == 1 ? "x" : " ") + "] "
+-                + (choice.strText != null ? choice.strText : ""));
+-        try
+-        {
+-            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+-            boolean bKeepAsking = true;
+-
+-            while (bKeepAsking)
+-            {
+-                System.out.println("input 1 to select, 0 to deselect:");
+-                String strIn = br.readLine();
+-                // take default value if default value exists and no user input
+-                if (strIn.trim().equals(""))
+-                {
+-                    bKeepAsking = false;
+-                }
+-                int j = -1;
+-                try
+-                {
+-                    j = Integer.valueOf(strIn).intValue();
+-                }
+-                catch (Exception ex)
+-                {}
+-                // take user input if user input is valid
+-                if ((j == 0) || j == 1)
+-                {
+-                    input.iSelectedChoice = j;
+-                    bKeepAsking = false;
+-                }
+-            }
+-        }
+-        catch (IOException e)
+-        {
+-            e.printStackTrace();
+-        }
+-        idata.setVariable(variable, input.listChoices.get(input.iSelectedChoice).strValue);
+-        return true;
+-
+-    }
+-
+-    public Input getInputFromField(IXMLElement field, AutomatedInstallData idata)
++    public Input getInputFromField(IXMLElement field)
      {
-@@ -365,11 +222,10 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+         String strVariableName = field.getAttribute(VARIABLE);
+         String strFieldType = field.getAttribute(TYPE_ATTRIBUTE);
+-        if (TITLE_FIELD.equals(strFieldType))
+-        {
+-            String strText = null;
+-            strText = field.getAttribute(TEXT);
+-            return new Input(strVariableName, null, null, TITLE_FIELD, strText, 0);
+-        }
+-        
+         if (STATIC_TEXT.equals(strFieldType))
          {
              String strText = null;
              strText = field.getAttribute(TEXT);
 -            return new Input(strVariableName, null, null, STATIC_TEXT, strText, 0);
 +            return new StaticText(strVariableName, strText);
          }
-         if (TEXT_FIELD.equals(strFieldType))
+-        
+-        if (TEXT_FIELD.equals(strFieldType) || FILE.equals(strFieldType) )
++        if (TEXT_FIELD.equals(strFieldType))
          {
 -            List<Choice> choicesList = new ArrayList<Choice>();
              String strFieldText = null;
              String strSet = null;
              String strText = null;
-@@ -384,9 +240,29 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+@@ -588,94 +233,41 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+             IXMLElement description = field.getFirstChildNamed(DESCRIPTION);
+             if (spec != null)
+             {
+-                strText = spec.getAttribute(TEXT);
+-                strSet = spec.getAttribute(SET);
++                strText = field.getFirstChildNamed(SPEC).getAttribute(TEXT);
++                strSet = field.getFirstChildNamed(SPEC).getAttribute(SET);
+             }
+             if (description != null)
              {
                  strFieldText = description.getAttribute(TEXT);
              }
 -            choicesList.add(new Choice(strText, null, strSet));
--            return new Input(strVariableName, strSet, choicesList, TEXT_FIELD, strFieldText, 0);
+-            return new Input(strVariableName, strSet, choicesList, strFieldType, strFieldText, 0);
 -
 +            Choice choice = new Choice(strText, null, strSet);
 +            return new Text(strVariableName, true, strSet, choice, strFieldText);
-+        }
+         }
+-         
+-        if (RULE_FIELD.equals(strFieldType))
+-        {
+-
+-            List<Choice> choicesList = new ArrayList<Choice>();
+-            String strFieldText = null;
+-            String strSet = null;
+-            String strText = null;
 +        else if (PASSWORD_FIELD.equals(strFieldType)) {
-+            IXMLElement spec = field.getFirstChildNamed(SPEC);
+             IXMLElement spec = field.getFirstChildNamed(SPEC);
+-            IXMLElement description = field.getFirstChildNamed(DESCRIPTION);
 +            String pwd1, pwd2;
-+            if (spec != null)
-+            {
+             if (spec != null)
+             {
+-                strText = spec.getAttribute(TEXT);
+-                strSet = spec.getAttribute(SET);
 +            	List<IXMLElement> pwdElements = field.getChildrenNamed("pwd");
 +            	if (pwdElements.size() != 2) {
 +            		throw new RuntimeException("Currently only two pwd values" +
@@ -3238,16 +1083,186 @@ index ca9a659..1245897 100644
 +            	}
 +            } else {
 +            	throw new RuntimeException("Password field needs specification");
-+            }
+             }
+-            if (description != null)
+-            {
+-                strFieldText = description.getAttribute(TEXT);
+-            }
+-            if (strSet != null && spec.getAttribute(LAYOUT) != null)
+-            {
+-                StringTokenizer layoutTokenizer = new StringTokenizer(spec.getAttribute(LAYOUT));
+-                List<String> listSet = Arrays.asList(new String[layoutTokenizer.countTokens()]);
+-                StringTokenizer setTokenizer = new StringTokenizer(strSet);
+-                String token;
+-                while (setTokenizer.hasMoreTokens())
+-                {
+-                    token = setTokenizer.nextToken();
+-                    if (token.indexOf(":") > -1)
+-                    {
+-                        listSet.set(new Integer(token.substring(0, token.indexOf(":"))).intValue(),
+-                                token.substring(token.indexOf(":") + 1));
+-                    }
+-                }
+-
+-                int iCounter = 0;
+-                StringBuffer sb = new StringBuffer();
+-                String strRusultFormat = spec.getAttribute(RESULT_FORMAT);
+-                String strSpecialSeparator = spec.getAttribute(SPECIAL_SEPARATOR);
+-                while (layoutTokenizer.hasMoreTokens())
+-                {
+-                    token = layoutTokenizer.nextToken();
+-                    if (token.matches(".*:.*:.*"))
+-                    {
+-                        sb.append(listSet.get(iCounter) != null ? listSet.get(iCounter) : "");
+-                        iCounter++;
+-                    }
+-                    else
+-                    {
+-                        if (SPECIAL_SEPARATOR.equals(strRusultFormat))
+-                        {
+-                            sb.append(strSpecialSeparator);
+-                        }
+-                        else if (PLAIN_STRING.equals(strRusultFormat))
+-                        {
+-
+-                        }
+-                        else
+-                        // if (DISPLAY_FORMAT.equals(strRusultFormat))
+-                        {
+-                            sb.append(token);
+-                        }
+-
+-                    }
+-                }
+-                strSet = sb.toString();
+-            }
+-            choicesList.add(new Choice(strText, null, strSet));
+-            return new Input(strVariableName, strSet, choicesList, TEXT_FIELD, strFieldText, 0);
+-
 +            return new Password(strVariableName, pwd1, pwd2);
          }
-         else if (COMBO_FIELD.equals(strFieldType) || RADIO_FIELD.equals(strFieldType))
+-
+-        if (COMBO_FIELD.equals(strFieldType) || RADIO_FIELD.equals(strFieldType))
++        else if (COMBO_FIELD.equals(strFieldType) || RADIO_FIELD.equals(strFieldType))
          {
-@@ -409,44 +285,384 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
-                 choicesList.add(new Choice(choice.getAttribute(TEXT), choice.getAttribute(VALUE),
-                         choice.getAttribute(SET)));
+             List<Choice> choicesList = new ArrayList<Choice>();
+             String strFieldText = null;
+-            int selection = -1;
+             IXMLElement spec = field.getFirstChildNamed(SPEC);
+             IXMLElement description = field.getFirstChildNamed(DESCRIPTION);
+             Vector<IXMLElement> choices = null;
+@@ -689,310 +281,388 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
              }
--            return new Input(strVariableName, null, choicesList, COMBO_FIELD, strFieldText, -1);
+             for (int i = 0; i < choices.size(); i++)
+             {
+-
+                 IXMLElement choice = choices.elementAt(i);
+-                String processorClass = choice.getAttribute("processor");
+-
+-                if (processorClass != null && !"".equals(processorClass))
+-                {
+-                    String choiceValues = "";
+-                    try
+-                    {
+-                        choiceValues = ((Processor) Class.forName(processorClass).newInstance())
+-                                .process(null);
+-                    }
+-                    catch (Throwable t)
+-                    {
+-                        t.printStackTrace();
+-                    }
+-                    String set = choice.getAttribute(SET);
+-                    if (set == null)
+-                    {
+-                        set = "";
+-                    }
+-                    if (set != null && !"".equals(set))
+-                    {
+-                        VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
+-                        set = vs.substitute(set, null);
+-                    }
+-
+-                    StringTokenizer tokenizer = new StringTokenizer(choiceValues, ":");
+-                    int counter = 0;
+-                    while (tokenizer.hasMoreTokens())
+-                    {
+-                        String token = tokenizer.nextToken();
+-                        String choiceSet = null;
+-                        if (token.equals(set) 
+-                                ) {
+-                            choiceSet="true";
+-                            selection=counter;
+-                        }
+-                        choicesList.add(new Choice(
+-                                    token, 
+-                                    token,
+-                                    choiceSet));
+-                        counter++;
+-                        
+-                    }
+-                }
+-                else
+-                {
+-                    String value = choice.getAttribute(VALUE);
+-                    
+-                    String set = choice.getAttribute(SET);
+-                     if (set != null)
+-                    {
+-                        if (set != null && !"".equals(set))
+-                        {
+-                            VariableSubstitutor vs = new VariableSubstitutor(idata
+-                                    .getVariables());
+-                            set = vs.substitute(set, null);
+-                        }
+-                        if (set.equalsIgnoreCase(TRUE))
+-                        {
+-                            selection=i;
+-                            
+-                        }
+-                    }
+-
+-                    
+-                    choicesList.add(new Choice(
+-                                choice.getAttribute(TEXT), 
+-                                value,
+-                                set));
+-
+-                    }
+-                }
+-
+-            if (choicesList.size() == 1) {
+-                selection = 0;
+-            }
+-          
+-            return new Input(strVariableName, null, choicesList, strFieldType, strFieldText, selection);
+-        }
+-        
+-        if (CHECK_FIELD.equals(strFieldType))
+-        {
+-            List<Choice> choicesList = new ArrayList<Choice>();
+-            String strFieldText = null;
+-            String strSet = null;
+-            String strText = null;
+-            int iSelectedChoice = 0;
+-            IXMLElement spec = field.getFirstChildNamed(SPEC);
+-            IXMLElement description = field.getFirstChildNamed(DESCRIPTION);
+-            if (spec != null)
+-            {
+-                strText = spec.getAttribute(TEXT);
+-                strSet = spec.getAttribute(SET);
+-                choicesList.add(new Choice(strText, spec.getAttribute("false"), null));
+-                choicesList.add(new Choice(strText, spec.getAttribute("true"), null));
+-                if (strSet != null)
+-                {
+-                    if (strSet.equalsIgnoreCase(TRUE))
+-                    {
+-                        iSelectedChoice = 1;
+-                    }
+-                }
++                choicesList.add(new Choice(choice.getAttribute(TEXT), choice.getAttribute(VALUE),
++                        choice.getAttribute(SET)));
+             }
+-            else
 +            return new Combo(strVariableName, choicesList, strFieldText);
 +            
 +//            return new Input(strVariableName, null, choicesList, COMBO_FIELD, strFieldText, -1);
@@ -3259,58 +1274,149 @@ index ca9a659..1245897 100644
 +        	
 +        	IXMLElement descriptionElem = field.getFirstChildNamed(DESCRIPTION);
 +        	if (descriptionElem != null)
-+            {
+             {
+-                System.out.println("No spec specified for input of type check");
 +                description = new Description(descriptionElem);
-+            }
+             }
+-
+-            if (description != null)
+-            {
+-                strFieldText = description.getAttribute(TEXT);
 +        	
 +        	IXMLElement specElem = field.getFirstChildNamed(SPEC);
 +            if (specElem != null) {
 +            	spec = new Spec(specElem);
-+            }
+             }
+-            return new Input(strVariableName, strSet, choicesList, CHECK_FIELD, strFieldText,
+-                    iSelectedChoice);
 +        	
 +        	return new Check(strVariableName, spec, description);
-+        }
+         }
+-
+-
+-        if (SPACE.equals(strFieldType) )
 +        else if (TITLE_TEXT.equals(strFieldType))
-+        {
+         {
+-            return SPACE_INTPUT_FIELD;
+-
+-        }
+-        
+-        if (DIVIDER.equals(strFieldType)) 
 +            String strText = null;
 +            strText = field.getAttribute(TEXT);
 +            return new Title(strText);        	
 +        } 
 +        else if (SPACE_TEXT.equals(strFieldType)) 
-+        {
+         {
+-            return DIVIDER_INPUT_FIELD;
 +        	return new Space();
-+        }
+         }
 +        else if (DIVIDER_TEXT.equals(strFieldType))
 +        {
-+        
+         
+-        
+-        if (PASSWORD.equals(strFieldType))
 +        	return new Divider();
-         }
-         else
++        }
++        else
          {
--            System.out.println(strFieldType + " field collection not implemented");
+-            List<Choice> choicesList = new ArrayList<Choice>();
+-            String strFieldText = null;
+-            String strSet = null;
+-            String strText = null;
+-            
+-            IXMLElement spec = field.getFirstChildNamed(SPEC);
+-            if (spec != null)
+-            {
+-                
+-                Vector<IXMLElement> pwds = spec.getChildrenNamed(PWD);
+-                if (pwds == null || pwds.size() == 0) {
+-                    System.out.println("No pwd specified in the spec for type password");
+-                    return null;                   
+-                }
 +        	System.out.println(strFieldType + " field collection not implemented");
  
+-                Input[] inputs = new Input[pwds.size()];
+-                for (int i = 0; i < pwds.size(); i++)
+-                {
+-                  
+-                    IXMLElement pwde = pwds.elementAt(i);
+-                    strText = pwde.getAttribute(TEXT);
+-                    strSet = pwde.getAttribute(SET);
+-                    choicesList.add(new Choice(strText, null, strSet));
+-                    inputs[i] = new Input(strVariableName, strSet, choicesList, strFieldType, strFieldText, 0);
+-                
+-                }
+-                 return new Password(strFieldType, inputs);                
+-                
+-             } 
+-            
+-            System.out.println("No spec specified for input of type password");
+-            return null;
          }
+-
+-        
+-        System.out.println(strFieldType + " field collection not implemented");
+-
          return null;
      }
- 
--    public class Input
+-    
+-    /*--------------------------------------------------------------------------*/
+-    /**
+-     * Verifies if an item is required for any of the packs listed. An item is required for a pack
+-     * in the list if that pack is actually selected for installation. <br>
+-     * <br>
+-     * <b>Note:</b><br>
+-     * If the list of selected packs is empty then <code>true</code> is always returnd. The same is
+-     * true if the <code>packs</code> list is empty.
+-     *
+-     * @param packs a <code>Vector</code> of <code>String</code>s. Each of the strings denotes a
+-     * pack for which an item should be created if the pack is actually installed.
+-     * @return <code>true</code> if the item is required for at least one pack in the list,
+-     * otherwise returns <code>false</code>.
+-     */
+-    /*--------------------------------------------------------------------------*/
+-    /*
+-     * $ @design
+-     *
+-     * The information about the installed packs comes from InstallData.selectedPacks. This assumes
+-     * that this panel is presented to the user AFTER the PacksPanel.
+-     * --------------------------------------------------------------------------
+-     */
+-    private boolean itemRequiredFor(Vector<IXMLElement> packs, AutomatedInstallData idata)
 -    {
+ 
+-        String selected;
+-        String required;
 -
--        public Input(String strVariableName, String strDefaultValue, List<Choice> listChoices,
--                String strFieldType, String strText, int iSelectedChoice)
+-        if (packs.size() == 0) { return (true); }
+-
+-        // ----------------------------------------------------
+-        // We are getting to this point if any packs have been
+-        // specified. This means that there is a possibility
+-        // that some UI elements will not get added. This
+-        // means that we can not allow to go back to the
+-        // PacksPanel, because the process of building the
+-        // UI is not reversable.
+-        // ----------------------------------------------------
+-        // packsDefined = true;
+-
+-        // ----------------------------------------------------
+-        // analyze if the any of the packs for which the item
+-        // is required have been selected for installation.
+-        // ----------------------------------------------------
+-        for (int i = 0; i < idata.selectedPacks.size(); i++)
 -        {
--            this.strVariableName = strVariableName;
--            this.strDefaultValue = strDefaultValue;
--            this.listChoices = listChoices;
--            this.strFieldType = strFieldType;
--            this.strText = strText;
--            this.iSelectedChoice = iSelectedChoice;
+-            selected = ((Pack) idata.selectedPacks.get(i)).name;
+-
+-            for (int k = 0; k < packs.size(); k++)
+-            {
+-                required = (packs.elementAt(k)).getAttribute(NAME, "");
+-                if (selected.equals(required)) { return (true); }
+-            }
 -        }
 -
--        String strVariableName;
--
--        String strDefaultValue;
+-        return (false);
 +    
 +    abstract class Input {
 +    	
@@ -3357,8 +1463,30 @@ index ca9a659..1245897 100644
 +    	}
 +    	
 +    	
-+    }
-+    
+     }
+     
+-    /**
+-     * Verifies if an item is required for the operating system the installer executed. The
+-     * configuration for this feature is: <br/>
+-     * &lt;os family="unix"/&gt; <br>
+-     * <br>
+-     * <b>Note:</b><br>
+-     * If the list of the os is empty then <code>true</code> is always returnd.
+-     *
+-     * @param os The <code>Vector</code> of <code>String</code>s. containing the os names
+-     * @return <code>true</code> if the item is required for the os, otherwise returns
+-     * <code>false</code>.
+-     */
+-    public boolean itemRequiredForOs(Vector<IXMLElement> os)
+-    {
+-        if (os.size() == 0) { return true; }
+-
+-        for (int i = 0; i < os.size(); i++)
+-        {
+-            String family = (os.elementAt(i)).getAttribute(FAMILY);
+-            boolean match = false;
+-
+-            if ("windows".equals(family))
 +    public class Text extends Input {
 +		private final String strDefaultValue;
 +		protected final String text;
@@ -3386,7 +1514,8 @@ index ca9a659..1245897 100644
 +
 +            set = strDefaultValue;
 +            if (set == null)
-+            {
+             {
+-                match = OsVersion.IS_WINDOWS;
 +                if (variable != null) {
 +                	set = idata.getVariable(variable);
 +                }
@@ -3394,17 +1523,21 @@ index ca9a659..1245897 100644
 +                {
 +                    set = "";
 +                }
-+            }
+             }
+-            else if ("mac".equals(family))
 +            else
-+            {
+             {
+-                match = OsVersion.IS_OSX;
 +                if (set != null && !"".equals(set))
 +                {
 +                    VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
 +                    set = vs.substitute(set, null);
 +                }
-+            }
- 
--        List<Choice> listChoices;
+             }
+-            else if ("unix".equals(family))
+-            {
+-                match = OsVersion.IS_UNIX;
++
 +            fieldText = (choice == null) ? text  : choice.strText;
 +            fieldText = helper.variables.expand(fieldText, idata);
 +            System.out.print(fieldText);
@@ -3429,13 +1562,16 @@ index ca9a659..1245897 100644
 +	            {
 +	                e.printStackTrace();
 +	            }
-+            }
+             }
+-            if (match) { return true; }
+-        }
+-        return false;
+-    }
 +            return true;
  
--        String strFieldType;
 +		}
 +    }
-+    
+     
 +    class Password extends Input {
 +
 +		private final String pwd1;
@@ -3479,6 +1615,33 @@ index ca9a659..1245897 100644
 +		}
 +    }
  
+-    public static class Input
+-    {
+-        
+-        public Input(String strFieldType) 
+-        {
+-                this.strFieldType = strFieldType;
+-        }
+-
+-        public Input(String strVariableName, String strDefaultValue, List<Choice> listChoices,
+-                String strFieldType, String strFieldText, int iSelectedChoice)
+-        {
+-            this.strVariableName = strVariableName;
+-            this.strDefaultValue = strDefaultValue;
+-            this.listChoices = listChoices;
+-            this.strFieldType = strFieldType;
+-            this.strText = strFieldText;
+-            this.iSelectedChoice = iSelectedChoice;
+-        }
+-
+-        String strVariableName;
+-
+-        String strDefaultValue;
+-
+-        List<Choice> listChoices;
+-
+-        String strFieldType;
+-
 -        String strText;
 +    class Title extends Text {
 +    	public Title(String text) {
@@ -3493,7 +1656,7 @@ index ca9a659..1245897 100644
 +		}
      }
 -
--    public class Choice
+-    public static class Choice
 +    
 +    class Space extends Text {
 +    	public Space() {
@@ -3653,7 +1816,7 @@ index ca9a659..1245897 100644
      {
  
          public Choice(String strText, String strValue, String strSet)
-@@ -457,9 +673,59 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
+@@ -1003,23 +673,59 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
          }
  
          String strText;
@@ -3662,13 +1825,24 @@ index ca9a659..1245897 100644
 -
          String strSet;
 +        
-+    }
-+    
+     }
+     
+-    public static class Password extends Input
+-    {
+-               
+-        public Password(String strFieldType, Input[] input) {
+-            super(strFieldType);
+-            this.input = input;
+-        }
+-       
+-        Input[] input;
 +    class Description {
-+
+ 
+-        
+-    }
 +    	private final String text;
 +		private final String id;
-+
+ 
 +		public String getText() {
 +			return text;
 +		}
@@ -3713,5 +1887,5 @@ index ca9a659..1245897 100644
 +			isFalse = spec.getAttribute(FALSE);
 +        	// set attribute - what for?
 +		}
-     }
++    }
  }
