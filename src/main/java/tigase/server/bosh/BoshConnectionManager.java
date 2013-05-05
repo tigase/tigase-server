@@ -30,8 +30,13 @@ import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.ReceiverTimeoutHandler;
 import tigase.server.xmppclient.ClientConnectionManager;
+import tigase.server.xmppclient.SeeOtherHostIfc.Phase;
 
 import tigase.stats.StatisticsList;
+
+import tigase.util.TigaseStringprepException;
+
+import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
@@ -39,10 +44,6 @@ import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
-
-import tigase.server.xmppclient.SeeOtherHostIfc.Phase;
-
-import tigase.util.TigaseStringprepException;
 
 import static tigase.server.bosh.Constants.*;
 
@@ -56,7 +57,6 @@ import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
-import tigase.xml.Element;
 
 /**
  * Describe class BoshConnectionManager here.
@@ -80,9 +80,8 @@ public class BoshConnectionManager
 
 	//~--- fields ---------------------------------------------------------------
 
-	private int[] PORTS       = { DEF_PORT_NO };
-	private long  min_polling = MIN_POLLING_PROP_VAL;
-
+	private int[]                  PORTS               = { DEF_PORT_NO };
+	private long                   min_polling         = MIN_POLLING_PROP_VAL;
 	private long                   max_wait            = MAX_WAIT_DEF_PROP_VAL;
 	private long                   max_pause           = MAX_PAUSE_PROP_VAL;
 	private long                   max_inactivity      = MAX_INACTIVITY_PROP_VAL;
@@ -103,20 +102,6 @@ public class BoshConnectionManager
 			BoshSession>();
 
 	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
-	@Override
-	public void processPacket(final Packet packet) {
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Processing packet: {0}", packet.toString());
-		}
-		super.processPacket(packet);
-	}
 
 	/**
 	 * Method description
@@ -161,7 +146,7 @@ public class BoshConnectionManager
 	 * @param tt
 	 */
 	@Override
-	public void cancelTask(BoshTask tt) {
+	public void cancelSendQueueTask(BoshSendQueueTask tt) {
 		tt.cancel();
 	}
 
@@ -172,59 +157,23 @@ public class BoshConnectionManager
 	 * @param tt
 	 */
 	@Override
-	public void cancelSendQueueTask(BoshSendQueueTask tt) {
+	public void cancelTask(BoshTask tt) {
 		tt.cancel();
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param params
-	 *
-	 * @return
+	 * @param packet
 	 */
 	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> props = super.getDefaults(params);
-
-		props.put(MAX_WAIT_DEF_PROP_KEY, MAX_WAIT_DEF_PROP_VAL);
-		props.put(MIN_POLLING_PROP_KEY, MIN_POLLING_PROP_VAL);
-		props.put(MAX_INACTIVITY_PROP_KEY, MAX_INACTIVITY_PROP_VAL);
-		props.put(CONCURRENT_REQUESTS_PROP_KEY, CONCURRENT_REQUESTS_PROP_VAL);
-		props.put(HOLD_REQUESTS_PROP_KEY, HOLD_REQUESTS_PROP_VAL);
-		props.put(MAX_PAUSE_PROP_KEY, MAX_PAUSE_PROP_VAL);
-		props.put(MAX_BATCH_SIZE_KEY, MAX_BATCH_SIZE_VAL);
-		props.put(BATCH_QUEUE_TIMEOUT_KEY, BATCH_QUEUE_TIMEOUT_VAL);
-
-		return props;
+	public void processPacket(final Packet packet) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Processing packet: {0}", packet.toString());
+		}
+		super.processPacket(packet);
 	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getDiscoCategoryType() {
-		return "c2s";
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getDiscoDescription() {
-		return "Bosh connection manager";
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	// ~--- methods --------------------------------------------------------------
 
@@ -268,7 +217,7 @@ public class BoshConnectionManager
 						sid = bs.getSid();
 						sessions.put(sid, bs);
 					} else {
-						log.info("Invalid hostname. Closing invalid connection");
+						log.log(Level.INFO, "Invalid hostname. Closing invalid connection: {0}", p);
 						try {
 							serv.sendErrorAndStop(Authorization.NOT_ALLOWED, p, "Invalid hostname.");
 						} catch (Exception e) {
@@ -317,8 +266,8 @@ public class BoshConnectionManager
 	 * @return
 	 */
 	@Override
-	public BoshTask scheduleTask(BoshSession bs, long delay) {
-		BoshTask bt = new BoshTask(bs, this);
+	public BoshSendQueueTask scheduleSendQueueTask(final BoshSession bs, long delay) {
+		BoshSendQueueTask bt = new BoshSendQueueTask(bs);
 
 		addTimerTask(bt, delay);
 
@@ -336,8 +285,8 @@ public class BoshConnectionManager
 	 * @return
 	 */
 	@Override
-	public BoshSendQueueTask scheduleSendQueueTask(final BoshSession bs, long delay) {
-		BoshSendQueueTask bt = new BoshSendQueueTask(bs);
+	public BoshTask scheduleTask(BoshSession bs, long delay) {
+		BoshTask bt = new BoshTask(bs, this);
 
 		addTimerTask(bt, delay);
 
@@ -374,55 +323,6 @@ public class BoshConnectionManager
 			}
 		}
 	}
-
-	//~--- set methods ----------------------------------------------------------
-
-	// ~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param props
-	 */
-	@Override
-	public void setProperties(Map<String, Object> props) {
-		super.setProperties(props);
-		if (props.get(MAX_WAIT_DEF_PROP_KEY) != null) {
-			max_wait = (Long) props.get(MAX_WAIT_DEF_PROP_KEY);
-			log.info("Setting max_wait to: " + max_wait);
-		}
-		if (props.get(MIN_POLLING_PROP_KEY) != null) {
-			min_polling = (Long) props.get(MIN_POLLING_PROP_KEY);
-			log.info("Setting min_polling to: " + min_polling);
-		}
-		if (props.get(MAX_INACTIVITY_PROP_KEY) != null) {
-			max_inactivity = (Long) props.get(MAX_INACTIVITY_PROP_KEY);
-			log.info("Setting max_inactivity to: " + max_inactivity);
-		}
-		if (props.get(CONCURRENT_REQUESTS_PROP_KEY) != null) {
-			concurrent_requests = (Integer) props.get(CONCURRENT_REQUESTS_PROP_KEY);
-			log.info("Setting concurrent_requests to: " + concurrent_requests);
-		}
-		if (props.get(HOLD_REQUESTS_PROP_KEY) != null) {
-			hold_requests = (Integer) props.get(HOLD_REQUESTS_PROP_KEY);
-			log.info("Setting hold_requests to: " + hold_requests);
-		}
-		if (props.get(MAX_PAUSE_PROP_KEY) != null) {
-			max_pause = (Long) props.get(MAX_PAUSE_PROP_KEY);
-			log.info("Setting max_pause to: " + max_pause);
-		}
-		if (props.get(MAX_BATCH_SIZE_KEY) != null) {
-			max_batch_size = (Integer) props.get(MAX_BATCH_SIZE_KEY);
-			log.info("Setting max_batch_size to: " + max_batch_size);
-		}
-		if (props.get(BATCH_QUEUE_TIMEOUT_KEY) != null) {
-			batch_queue_timeout = (Long) props.get(BATCH_QUEUE_TIMEOUT_KEY);
-			log.info("Setting batch_queue_timeout to: " + batch_queue_timeout);
-		}
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	// ~--- methods --------------------------------------------------------------
 
@@ -482,7 +382,54 @@ public class BoshConnectionManager
 	 * Method description
 	 *
 	 *
+	 * @param params
+	 *
+	 * @return
+	 */
+	@Override
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		Map<String, Object> props = super.getDefaults(params);
+
+		props.put(MAX_WAIT_DEF_PROP_KEY, MAX_WAIT_DEF_PROP_VAL);
+		props.put(MIN_POLLING_PROP_KEY, MIN_POLLING_PROP_VAL);
+		props.put(MAX_INACTIVITY_PROP_KEY, MAX_INACTIVITY_PROP_VAL);
+		props.put(CONCURRENT_REQUESTS_PROP_KEY, CONCURRENT_REQUESTS_PROP_VAL);
+		props.put(HOLD_REQUESTS_PROP_KEY, HOLD_REQUESTS_PROP_VAL);
+		props.put(MAX_PAUSE_PROP_KEY, MAX_PAUSE_PROP_VAL);
+		props.put(MAX_BATCH_SIZE_KEY, MAX_BATCH_SIZE_VAL);
+		props.put(BATCH_QUEUE_TIMEOUT_KEY, BATCH_QUEUE_TIMEOUT_VAL);
+
+		return props;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String getDiscoCategoryType() {
+		return "c2s";
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String getDiscoDescription() {
+		return "Bosh connection manager";
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param fromJID
+	 * @param ph
 	 *
 	 * @return
 	 */
@@ -495,11 +442,11 @@ public class BoshConnectionManager
 
 			return null;
 		}
-
-		if (!see_other_host_strategy.isEnabled( ph )) {
+		if (!see_other_host_strategy.isEnabled(ph)) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("see-other-host not enabled for the Phase: " + ph.toString());
 			}
+
 			return null;
 		}
 
@@ -518,7 +465,99 @@ public class BoshConnectionManager
 				: null;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param list
+	 */
+	@Override
+	public void getStatistics(StatisticsList list) {
+		super.getStatistics(list);
+		if (list.checkLevel(Level.FINEST)) {
+
+			// Be careful here, the size() for this map is expensive to count
+			list.add(getName(), "Bosh sessions", sessions.size(), Level.FINEST);
+		}
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	// ~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param props
+	 */
+	@Override
+	public void setProperties(Map<String, Object> props) {
+		super.setProperties(props);
+		if (props.get(MAX_WAIT_DEF_PROP_KEY) != null) {
+			max_wait = (Long) props.get(MAX_WAIT_DEF_PROP_KEY);
+			log.info("Setting max_wait to: " + max_wait);
+		}
+		if (props.get(MIN_POLLING_PROP_KEY) != null) {
+			min_polling = (Long) props.get(MIN_POLLING_PROP_KEY);
+			log.info("Setting min_polling to: " + min_polling);
+		}
+		if (props.get(MAX_INACTIVITY_PROP_KEY) != null) {
+			max_inactivity = (Long) props.get(MAX_INACTIVITY_PROP_KEY);
+			log.info("Setting max_inactivity to: " + max_inactivity);
+		}
+		if (props.get(CONCURRENT_REQUESTS_PROP_KEY) != null) {
+			concurrent_requests = (Integer) props.get(CONCURRENT_REQUESTS_PROP_KEY);
+			log.info("Setting concurrent_requests to: " + concurrent_requests);
+		}
+		if (props.get(HOLD_REQUESTS_PROP_KEY) != null) {
+			hold_requests = (Integer) props.get(HOLD_REQUESTS_PROP_KEY);
+			log.info("Setting hold_requests to: " + hold_requests);
+		}
+		if (props.get(MAX_PAUSE_PROP_KEY) != null) {
+			max_pause = (Long) props.get(MAX_PAUSE_PROP_KEY);
+			log.info("Setting max_pause to: " + max_pause);
+		}
+		if (props.get(MAX_BATCH_SIZE_KEY) != null) {
+			max_batch_size = (Integer) props.get(MAX_BATCH_SIZE_KEY);
+			log.info("Setting max_batch_size to: " + max_batch_size);
+		}
+		if (props.get(BATCH_QUEUE_TIMEOUT_KEY) != null) {
+			batch_queue_timeout = (Long) props.get(BATCH_QUEUE_TIMEOUT_KEY);
+			log.info("Setting batch_queue_timeout to: " + batch_queue_timeout);
+		}
+	}
+
 	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param out_results
+	 * @param bs
+	 */
+	protected void addOutPackets(Queue<Packet> out_results, BoshSession bs) {
+		for (Packet res : out_results) {
+			res.setPacketFrom(getFromAddress(bs.getSid().toString()));
+			res.setPacketTo(bs.getDataReceiver());
+			if (res.getCommand() != null) {
+				switch (res.getCommand()) {
+				case STREAM_CLOSED :
+				case GETFEATURES :
+					res.initVars(res.getPacketFrom(), res.getPacketTo());
+
+					break;
+
+				default :
+
+				// Do nothing...
+				}
+			}
+			addOutPacket(res);
+		}
+		out_results.clear();
+	}
 
 	/**
 	 * Method description
@@ -553,87 +592,6 @@ public class BoshConnectionManager
 		return null;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 *
-	 * @return
-	 */
-	protected BoshSession getBoshSession(JID jid) {
-		UUID sid = UUID.fromString(jid.getResource());
-
-		return sessions.get(sid);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	protected int[] getDefPlainPorts() {
-		return PORTS;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	protected int[] getDefSSLPorts() {
-		return null;
-	}
-
-	/**
-	 * Method <code>getMaxInactiveTime</code> returns max keep-alive time for
-	 * inactive connection. For Bosh it does not make sense to keep the idle
-	 * connection longer than 10 minutes.
-	 *
-	 * @return a <code>long</code> value
-	 */
-	@Override
-	protected long getMaxInactiveTime() {
-		return 10 * MINUTE;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	protected BoshIOService getXMPPIOServiceInstance() {
-		return new BoshIOService();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 */
-	@Override
-	public void getStatistics(StatisticsList list) {
-		super.getStatistics(list);
-		if (list.checkLevel(Level.FINEST)) {
-
-			// Be careful here, the size() for this map is expensive to count
-			list.add(getName(), "Bosh sessions", sessions.size(), Level.FINEST);
-		}
-	}
-
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -662,26 +620,26 @@ public class BoshConnectionManager
 			if (jid != null) {
 				if (session != null) {
 					try {
-						BareJID fromJID = BareJID.bareJIDInstance( jid );
-						BareJID hostJid = getSeeOtherHostForJID( fromJID, Phase.LOGIN );
+						BareJID fromJID = BareJID.bareJIDInstance(jid);
+						BareJID hostJid = getSeeOtherHostForJID(fromJID, Phase.LOGIN);
 
-						if ( hostJid != null ){
-							Element streamErrorElement = see_other_host_strategy.getStreamError( "urn:ietf:params:xml:ns:xmpp-streams", hostJid );
-							Packet redirectPacket = Packet.packetInstance( streamErrorElement );
-							redirectPacket.setPacketTo( packet.getTo() );
+						if (hostJid != null) {
+							Element streamErrorElement = see_other_host_strategy.getStreamError(
+									"urn:ietf:params:xml:ns:xmpp-streams", hostJid);
+							Packet redirectPacket = Packet.packetInstance(streamErrorElement);
 
-							writePacketToSocket( redirectPacket );
+							redirectPacket.setPacketTo(packet.getTo());
+							writePacketToSocket(redirectPacket);
 							session.sendWaitingPackets();
 							session.close();
-							sessions.remove( session.getSid() );
-
+							sessions.remove(session.getSid());
 						} else {
-							session.setUserJid( jid );
+							session.setUserJid(jid);
 						}
-					} catch ( TigaseStringprepException ex ) {
-						log.log( Level.SEVERE, "user JID violates RFC6122 (XMPP:Address Format): ", ex);
+					} catch (TigaseStringprepException ex) {
+						log.log(Level.SEVERE, "user JID violates RFC6122 (XMPP:Address Format): ",
+								ex);
 					}
-
 				} else {
 					if (log.isLoggable(Level.FINE)) {
 						log.log(Level.FINE, "Missing XMPPIOService for USER_LOGIN command: {0}",
@@ -774,36 +732,78 @@ public class BoshConnectionManager
 		}
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
+	// ~--- get methods ----------------------------------------------------------
+	// public void processPacket(Packet packet) {
+	// log.finer("Processing packet: " + packet.getElemName()
+	// + ", type: " + packet.getType());
+	// log.finest("Processing packet: " + packet.toString());
+	// if (packet.isCommand() && packet.getCommand() != Command.OTHER) {
+	// processCommand(packet);
+	// } else {
+	// writePacketToSocket(packet);
+	// }
+	// }
+
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param out_results
-	 * @param bs
+	 * @param jid
+	 *
+	 * @return
 	 */
-	protected void addOutPackets(Queue<Packet> out_results, BoshSession bs) {
-		for (Packet res : out_results) {
-			res.setPacketFrom(getFromAddress(bs.getSid().toString()));
-			res.setPacketTo(bs.getDataReceiver());
-			if (res.getCommand() != null) {
-				switch (res.getCommand()) {
-				case STREAM_CLOSED :
-				case GETFEATURES :
-					res.initVars(res.getPacketFrom(), res.getPacketTo());
+	protected BoshSession getBoshSession(JID jid) {
+		UUID sid = UUID.fromString(jid.getResource());
 
-					break;
-
-				default :
-
-				// Do nothing...
-				}
-			}
-			addOutPacket(res);
-		}
-		out_results.clear();
+		return sessions.get(sid);
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	protected int[] getDefPlainPorts() {
+		return PORTS;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	protected int[] getDefSSLPorts() {
+		return null;
+	}
+
+	/**
+	 * Method <code>getMaxInactiveTime</code> returns max keep-alive time for
+	 * inactive connection. For Bosh it does not make sense to keep the idle
+	 * connection longer than 10 minutes.
+	 *
+	 * @return a <code>long</code> value
+	 */
+	@Override
+	protected long getMaxInactiveTime() {
+		return 10 * MINUTE;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	protected BoshIOService getXMPPIOServiceInstance() {
+		return new BoshIOService();
+	}
 
 	// ~--- get methods ----------------------------------------------------------
 	private JID getFromAddress(String id) {
@@ -865,4 +865,4 @@ public class BoshConnectionManager
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/03/12
+//~ Formatted in Tigase Code Convention on 13/04/24
