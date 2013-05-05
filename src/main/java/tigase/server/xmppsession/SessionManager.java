@@ -670,7 +670,8 @@ public class SessionManager
 		defPacketHandler = new PacketDefaultHandler();
 
 		// Is there shared user repository instance? If so I want to use it:
-		user_repository = (UserRepository) props.get(RepositoryFactory.SHARED_USER_REPO_PROP_KEY);
+		user_repository = (UserRepository) props.get(RepositoryFactory
+				.SHARED_USER_REPO_PROP_KEY);
 		if (user_repository != null) {
 			log.log(Level.CONFIG, "Using shared repository instance: {0}", user_repository
 					.getClass().getName());
@@ -703,7 +704,8 @@ public class SessionManager
 				log.log(Level.SEVERE, "Can't initialize user repository: ", e);
 			}    // end of try-catch
 		}
-		auth_repository = (AuthRepository) props.get(RepositoryFactory.SHARED_AUTH_REPO_PROP_KEY);
+		auth_repository = (AuthRepository) props.get(RepositoryFactory
+				.SHARED_AUTH_REPO_PROP_KEY);
 		if (auth_repository != null) {
 			log.log(Level.CONFIG, "Using shared auth repository instance: {0}", auth_repository
 					.getClass().getName());
@@ -2528,4 +2530,4 @@ public class SessionManager
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/03/16
+//~ Formatted in Tigase Code Convention on 13/03/19
