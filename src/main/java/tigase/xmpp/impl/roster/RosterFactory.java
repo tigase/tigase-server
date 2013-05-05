@@ -34,7 +34,13 @@ package tigase.xmpp.impl.roster;
  * @version $Rev$
  */
 public abstract class RosterFactory {
-	private static RosterAbstract shared = null;
+	/** Field description */
+	public static final String ROSTER_IMPL_PROP_KEY = "roster-implementation";
+
+	/** Field description */
+	public static final String    ROSTER_IMPL_PROP_VAL = RosterFlat.class
+			.getCanonicalName();
+	private static RosterAbstract shared               = null;
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -47,15 +53,13 @@ public abstract class RosterFactory {
 	 * @return
 	 */
 	public static RosterAbstract getRosterImplementation(boolean shared_impl) {
-		if (shared_impl) {
-			if (shared == null) {
-				shared = new RosterFlat();
-			}
+		try {
+			String cls_name = System.getProperty(ROSTER_IMPL_PROP_KEY, ROSTER_IMPL_PROP_VAL);
 
-			return shared;
+			return getRosterImplementation(cls_name, shared_impl);
+		} catch (Exception e) {
+			return null;
 		}
-
-		return new RosterFlat();
 	}
 
 	/**
