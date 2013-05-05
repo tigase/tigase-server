@@ -1,12 +1,13 @@
 /*
  * IOService.java
- * 
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,34 +26,9 @@ package tigase.net;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.io.IOException;
-import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.CharBuffer;
-import java.nio.channels.SocketChannel;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.CoderResult;
-import java.nio.charset.MalformedInputException;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLPeerUnverifiedException;
-import javax.net.ssl.TrustManager;
-
 import tigase.cert.CertCheckResult;
 import tigase.cert.CertificateUtil;
+
 import tigase.io.BufferUnderflowException;
 import tigase.io.IOInterface;
 import tigase.io.SocketIO;
@@ -61,9 +37,42 @@ import tigase.io.TLSIO;
 import tigase.io.TLSUtil;
 import tigase.io.TLSWrapper;
 import tigase.io.ZLibIO;
+
 import tigase.stats.StatisticsList;
+
 import tigase.xmpp.JID;
+
 //~--- JDK imports ------------------------------------------------------------
+
+import java.io.IOException;
+
+import java.net.Socket;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.channels.SocketChannel;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CoderResult;
+import java.nio.charset.MalformedInputException;
+
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.Map;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.TrustManager;
 
 /**
  * <code>IOService</code> offers thread safe
@@ -122,51 +131,46 @@ public abstract class IOService<RefObject>
 	 * Variable
 	 * <code>log</code> is a class logger.
 	 */
-	private static final Logger log                   =
-		Logger.getLogger(IOService.class.getName());
-	private static final long MAX_ALLOWED_EMPTY_CALLS = 1000;
+	private static final Logger log = Logger.getLogger(IOService.class.getName());
+	private static final long   MAX_ALLOWED_EMPTY_CALLS = 1000;
 
 	//~--- fields ---------------------------------------------------------------
 
 	/**
 	 * The saved partial bytes for multi-byte UTF-8 characters between reads
 	 */
-	protected byte[] partialCharacterBytes = null;
-
-	// ----- END -----------------------------------------------------------------
-	private JID connectionId = null;
-
-	// ~--- fields ---------------------------------------------------------------
-	private ConnectionType connectionType = null;
-	private JID dataReceiver              = null;
+	protected byte[]       partialCharacterBytes = null;
+	private JID            connectionId          = null;
+	private ConnectionType connectionType        = null;
+	private JID            dataReceiver          = null;
 
 	/**
 	 * Field description
 	 */
-	private long empty_read_call_count = 0;
-	private String id                  = null;
+	private long   empty_read_call_count = 0;
+	private String id                    = null;
 
 	/**
 	 * This variable keeps the time of last transfer in any direction it is
 	 * used to help detect dead connections.
 	 */
-	private long lastTransferTime                                   = 0;
-	private String local_address                                    = null;
-	private long[] rdData                                           = new long[60];
-	private RefObject refObject                                     = null;
-	private String remote_address                                   = null;
-	private IOServiceListener<IOService<RefObject>> serviceListener = null;
+	private long                                    lastTransferTime = 0;
+	private String                                  local_address    = null;
+	private long[]                                  rdData           = new long[60];
+	private RefObject                               refObject        = null;
+	private String                                  remote_address   = null;
+	private IOServiceListener<IOService<RefObject>> serviceListener  = null;
 
 	/**
 	 * <code>socketInput</code> buffer keeps data read from socket.
 	 */
-	private ByteBuffer socketInput                    = null;
-	private int socketInputSize                       = 2048;
-	private IOInterface socketIO                      = null;
-	private boolean stopping                          = false;
-	private long[] wrData                             = new long[60];
+	private ByteBuffer                    socketInput     = null;
+	private int                           socketInputSize = 2048;
+	private IOInterface                   socketIO        = null;
+	private boolean                       stopping        = false;
+	private long[]                        wrData          = new long[60];
 	private ConcurrentMap<String, Object> sessionData = new ConcurrentHashMap<String,
-																												Object>(4, 0.75f, 4);
+			Object>(4, 0.75f, 4);
 
 	// properties from block below should not be used without proper knowledge
 	// ----- BEGIN ---------------------------------------------------------------
@@ -178,15 +182,13 @@ public abstract class IOService<RefObject>
 	protected CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
 
 	/** Field description */
-	protected CharBuffer cb                     = CharBuffer.allocate(2048);
+	protected CharBuffer        cb              = CharBuffer.allocate(2048);
 	private final ReentrantLock writeInProgress = new ReentrantLock();
 	private final ReentrantLock readInProgress  = new ReentrantLock();
-
-	private List<String> peersJIDsFromCert;
+	private List<String>        peersJIDsFromCert;
+	private TrustManager[]      x509TrustManagers;
 
 	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -241,11 +243,10 @@ public abstract class IOService<RefObject>
 			} catch (Exception ex) {
 				sock_str = ex.toString();
 			}
-			log.log(
-					Level.INFO,
+			log.log(Level.INFO,
 					"Problem connecting to remote host: {0}, address: {1}, socket: {2} - exception: {3}, session data: {4}",
 					new Object[] { host,
-												 remote_address, sock_str, e, sessionData });
+					remote_address, sock_str, e, sessionData });
 
 			throw e;
 		}
@@ -257,8 +258,8 @@ public abstract class IOService<RefObject>
 
 		local_address  = sock.getLocalAddress().getHostAddress();
 		remote_address = sock.getInetAddress().getHostAddress();
-		id             = local_address + "_" + sock.getLocalPort() + "_" + remote_address +
-										 "_" + sock.getPort();
+		id = local_address + "_" + sock.getLocalPort() + "_" + remote_address + "_" + sock
+				.getPort();
 		setLastTransferTime();
 	}
 
@@ -293,8 +294,8 @@ public abstract class IOService<RefObject>
 		}
 
 		return readLock
-					 ? this
-					 : null;
+				? this
+				: null;
 	}
 
 	/**
@@ -328,9 +329,8 @@ public abstract class IOService<RefObject>
 
 			// Well, do nothing, we are closing the connection anyway....
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST,
-								"Socket: " + socketIO + ", Exception while stopping service: " +
-								connectionId, e);
+				log.log(Level.FINEST, "Socket: " + socketIO +
+						", Exception while stopping service: " + connectionId, e);
 			}
 		} finally {
 			if (serviceListener != null) {
@@ -355,8 +355,6 @@ public abstract class IOService<RefObject>
 	}
 
 	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -464,8 +462,6 @@ public abstract class IOService<RefObject>
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -478,14 +474,17 @@ public abstract class IOService<RefObject>
 
 		sessionData.put(CERT_CHECK_RESULT, certCheckResult);
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "{0}, TLS handshake completed: {1}", new Object[] { this, certCheckResult });
+			log.log(Level.FINEST, "{0}, TLS handshake completed: {1}", new Object[] { this,
+					certCheckResult });
 		}
-
 		if (!wrapper.getTlsEngine().getUseClientMode()) {
 			try {
-				Certificate[] certs = wrapper.getTlsEngine().getSession().getPeerCertificates();
-				Certificate peerCert = certs[certs.length - 1];
-				List<String> xmppJIDs = CertificateUtil.extractXmppAddrs((X509Certificate) peerCert);
+				Certificate[] certs    = wrapper.getTlsEngine().getSession()
+						.getPeerCertificates();
+				Certificate   peerCert = certs[certs.length - 1];
+				List<String>  xmppJIDs = CertificateUtil.extractXmppAddrs(
+						(X509Certificate) peerCert);
+
 				this.peersJIDsFromCert = xmppJIDs;
 			} catch (SSLPeerUnverifiedException e) {
 				this.peersJIDsFromCert = null;
@@ -494,13 +493,10 @@ public abstract class IOService<RefObject>
 				log.log(Level.WARNING, "Problem with extracting subjectAltName", e);
 			}
 		}
-
 		serviceListener.tlsHandshakeCompleted(this);
 	}
 
 	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Describe
@@ -511,8 +507,8 @@ public abstract class IOService<RefObject>
 	 */
 	public boolean isConnected() {
 		boolean result = (socketIO == null)
-										 ? false
-										 : socketIO.isConnected();
+				? false
+				: socketIO.isConnected();
 
 		if (log.isLoggable(Level.FINEST)) {
 
@@ -523,17 +519,15 @@ public abstract class IOService<RefObject>
 			// log.log(Level.FINEST, "Socket: " + socketIO + ", Connected: " + result,
 			// thr);
 			// }
-			log.log(Level.FINEST, "Socket: {0}, Connected: {1}, id: {2}",
-							new Object[] { socketIO,
-														 result, connectionId });
+			log.log(Level.FINEST, "Socket: {0}, Connected: {1}, id: {2}", new Object[] {
+					socketIO,
+					result, connectionId });
 		}
 
 		return result;
 	}
 
 	//~--- set methods ----------------------------------------------------------
-
-	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -664,13 +658,11 @@ public abstract class IOService<RefObject>
 				sessionData.put(entry.getKey(), entry.getValue());
 			}
 		}
-		connectionType =
-			ConnectionType.valueOf(sessionData.get(PORT_TYPE_PROP_KEY).toString());
+		connectionType = ConnectionType.valueOf(sessionData.get(PORT_TYPE_PROP_KEY)
+				.toString());
 	}
 
 	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -685,9 +677,9 @@ public abstract class IOService<RefObject>
 			throw new IllegalStateException("SSL mode is already activated.");
 		}
 
-		TLSWrapper wrapper = new TLSWrapper(TLSUtil.getSSLContext("SSL",
-													 (String) sessionData.get(HOSTNAME_KEY), clientMode), this,
-														 (String[]) sessionData.get(SSL_PROTOCOLS_KEY), clientMode);
+		TLSWrapper wrapper = new TLSWrapper(TLSUtil.getSSLContext("SSL", (String) sessionData
+				.get(HOSTNAME_KEY), clientMode), this, (String[]) sessionData.get(
+				SSL_PROTOCOLS_KEY), clientMode);
 
 		socketIO = new TLSIO(socketIO, wrapper, byteOrder());
 		setLastTransferTime();
@@ -724,16 +716,20 @@ public abstract class IOService<RefObject>
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "{0}, Starting TLS for domain: {1}", new Object[] { this,
-								tls_hostname });
+						tls_hostname });
 			}
 
 			SSLContext sslContext;
+
 			if (x509TrustManagers != null) {
-				sslContext = TLSUtil.getSSLContext("TLS", tls_hostname, clientMode, x509TrustManagers);
+				sslContext = TLSUtil.getSSLContext("TLS", tls_hostname, clientMode,
+						x509TrustManagers);
 			} else {
 				sslContext = TLSUtil.getSSLContext("TLS", tls_hostname, clientMode);
 			}
-			TLSWrapper wrapper = new TLSWrapper(sslContext, this, (String[]) sessionData.get(SSL_PROTOCOLS_KEY), clientMode);
+
+			TLSWrapper wrapper = new TLSWrapper(sslContext, this, (String[]) sessionData.get(
+					SSL_PROTOCOLS_KEY), clientMode);
 
 			socketIO = new TLSIO(socketIO, wrapper, byteOrder());
 			setLastTransferTime();
@@ -742,15 +738,31 @@ public abstract class IOService<RefObject>
 		}
 	}
 
-	private TrustManager[] x509TrustManagers;
-	
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	public TrustManager[] getX509TrustManagers() {
 		return x509TrustManagers;
 	}
 
-	public void setX509TrustManagers(TrustManager[] trustManager ) {
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param trustManager
+	 */
+	public void setX509TrustManagers(TrustManager[] trustManager) {
 		this.x509TrustManagers = trustManager;
 	}
+
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -875,8 +887,8 @@ public abstract class IOService<RefObject>
 		if (log.isLoggable(Level.FINEST)) {
 			if ((msg != null) && (msg.trim().length() > 0)) {
 				String log_msg = "\n" + ((connectionType() != null)
-																 ? connectionType().toString()
-																 : "null-type") + " " + prefix + "\n" + msg + "\n";
+						? connectionType().toString()
+						: "null-type") + " " + prefix + "\n" + msg + "\n";
 
 				// System.out.print(log_msg);
 				log.finest(log_msg);
@@ -918,14 +930,14 @@ public abstract class IOService<RefObject>
 
 			// resizeInputBuffer();
 			// Maybe we can shrink the input buffer??
-			if ((socketInput.capacity() > socketInputSize) &&
-					(socketInput.remaining() == socketInput.capacity())) {
+			if ((socketInput.capacity() > socketInputSize) && (socketInput.remaining() ==
+					socketInput.capacity())) {
 
 				// Yes, looks like we can
 				if (log.isLoggable(Level.FINE)) {
 					log.log(Level.FINE, "Socket: {0}, Resizing socketInput down to {1} bytes.",
-									new Object[] { socketIO,
-																 socketInputSize });
+							new Object[] { socketIO,
+							socketInputSize });
 				}
 				socketInput = ByteBuffer.allocate(socketInputSize);
 				socketInput.order(byteOrder());
@@ -952,8 +964,8 @@ public abstract class IOService<RefObject>
 				if (tmpBuffer != null) {
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Socket: {0}, Reading network binary data: {1}",
-										new Object[] { socketIO,
-																	 socketIO.bytesRead() });
+								new Object[] { socketIO,
+								socketIO.bytesRead() });
 					}
 
 					// Restore the partial bytes for multibyte UTF8 characters
@@ -964,8 +976,8 @@ public abstract class IOService<RefObject>
 
 						ByteBuffer oldTmpBuffer = tmpBuffer;
 
-						tmpBuffer = ByteBuffer.allocate(partialCharacterBytes.length +
-																						oldTmpBuffer.remaining() + 2);
+						tmpBuffer = ByteBuffer.allocate(partialCharacterBytes.length + oldTmpBuffer
+								.remaining() + 2);
 						tmpBuffer.order(byteOrder());
 						tmpBuffer.put(partialCharacterBytes);
 						tmpBuffer.put(oldTmpBuffer);
@@ -993,8 +1005,8 @@ public abstract class IOService<RefObject>
 					if (cb.capacity() < tmpBuffer.remaining() * 4) {
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST, "Socket: {0}, resizing character buffer to: {1}",
-											new Object[] { socketIO,
-																		 tmpBuffer.remaining() });
+									new Object[] { socketIO,
+									tmpBuffer.remaining() });
 						}
 						cb = CharBuffer.allocate(tmpBuffer.remaining() * 4);
 					}
@@ -1010,8 +1022,8 @@ public abstract class IOService<RefObject>
 						cb.get(result);
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST, "Socket: {0}, Decoded character data: {1}",
-											new Object[] { socketIO,
-																		 new String(result) });
+									new Object[] { socketIO,
+									new String(result) });
 						}
 
 						// if (log.isLoggable(Level.FINEST)) {
@@ -1029,8 +1041,8 @@ public abstract class IOService<RefObject>
 					if (cr.isUnderflow() && (tmpBuffer.remaining() > 0)) {
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST, "Socket: {0}, UTF-8 decoder data underflow: {1}",
-											new Object[] { socketIO,
-																		 tmpBuffer.remaining() });
+									new Object[] { socketIO,
+									tmpBuffer.remaining() });
 						}
 
 						// Save the partial bytes of a multibyte character such that they
@@ -1060,11 +1072,11 @@ public abstract class IOService<RefObject>
 				// sometimes it happens that the connection has been lost
 				// and the select thinks there are some bytes waiting for reading
 				// and 0 bytes are read
-				if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS &&
-						(!writeInProgress.isLocked())) {
+				if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS && (!writeInProgress
+						.isLocked())) {
 					log.log(Level.WARNING,
-									"Socket: {0}, Max allowed empty calls excceeded, closing connection.",
-									socketIO);
+							"Socket: {0}, Max allowed empty calls excceeded, closing connection.",
+							socketIO);
 					forceStop();
 				}
 			}
@@ -1116,11 +1128,11 @@ public abstract class IOService<RefObject>
 
 				return tmpBuffer;
 			} else {
-				if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS &&
-						(!writeInProgress.isLocked())) {
+				if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS && (!writeInProgress
+						.isLocked())) {
 					log.log(Level.WARNING,
-									"Socket: {0}, Max allowed empty calls excceeded, closing connection.",
-									socketIO);
+							"Socket: {0}, Max allowed empty calls excceeded, closing connection.",
+							socketIO);
 					forceStop();
 				}
 			}
@@ -1168,13 +1180,13 @@ public abstract class IOService<RefObject>
 			if ((data != null) && (data.length() > 0)) {
 				if (log.isLoggable(Level.FINEST)) {
 					if (data.length() < 256) {
-						log.log(Level.FINEST, "Socket: {0}, Writing data ({1}): {2}",
-										new Object[] { socketIO,
-																	 data.length(), data });
+						log.log(Level.FINEST, "Socket: {0}, Writing data ({1}): {2}", new Object[] {
+								socketIO,
+								data.length(), data });
 					} else {
-						log.log(Level.FINEST, "Socket: {0}, Writing data: {1}",
-										new Object[] { socketIO,
-																	 data.length() });
+						log.log(Level.FINEST, "Socket: {0}, Writing data: {1}", new Object[] {
+								socketIO,
+								data.length() });
 					}
 				}
 
@@ -1199,7 +1211,7 @@ public abstract class IOService<RefObject>
 				socketIO.write(dataBuffer);
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Socket: {0}, wrote: {1}", new Object[] { socketIO,
-									data.length() });
+							data.length() });
 				}
 
 				// idx_start = idx_offset;
@@ -1256,7 +1268,7 @@ public abstract class IOService<RefObject>
 				socketIO.write(data);
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Socket: {0}, wrote: {1}", new Object[] { socketIO,
-									length });
+							length });
 				}
 
 				// idx_start = idx_offset;
@@ -1295,8 +1307,8 @@ public abstract class IOService<RefObject>
 
 			if (log.isLoggable(Level.FINE)) {
 				log.log(Level.FINE, "Socket: {0}, Resizing socketInput to {1} bytes.",
-								new Object[] { socketIO,
-															 newSize });
+						new Object[] { socketIO,
+						newSize });
 			}
 
 			ByteBuffer b = ByteBuffer.allocate(newSize);
@@ -1338,7 +1350,6 @@ public abstract class IOService<RefObject>
 
 	//~--- set methods ----------------------------------------------------------
 
-	// ~--- set methods ----------------------------------------------------------
 	private void setLastTransferTime() {
 		lastTransferTime = System.currentTimeMillis();
 	}
@@ -1362,14 +1373,18 @@ public abstract class IOService<RefObject>
 		socketIO.setLogId(connectionId.toString());
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	public List<String> getPeersJIDsFromCert() {
 		return peersJIDsFromCert;
 	}
 }    // IOService
 
 
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-
-//~ Formatted in Tigase Code Convention on 13/02/08
+//~ Formatted in Tigase Code Convention on 13/03/19
