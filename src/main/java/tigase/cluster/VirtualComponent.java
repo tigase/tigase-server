@@ -109,7 +109,7 @@ import java.util.Queue;
  */
 public class VirtualComponent
 				implements ServerComponent, XMPPService, Configurable, DisableDisco,
-									 VHostListener {
+						VHostListener {
 	/**
 	 * Parameter to set service discovery item category name for the virtual
 	 * component. Please refer to service discovery documentation for a correct
@@ -121,7 +121,7 @@ public class VirtualComponent
 	public static final String DISCO_CATEGORY_PROP_VAL = "conference";
 
 	/**
-	 * Comma separated list of features for the service discovery item reprezented
+	 * Comma separated list of features for the service discovery item represented
 	 * by this virtual component. Please check with the real component to obtain a
 	 * correct list of features.
 	 */
@@ -180,30 +180,17 @@ public class VirtualComponent
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
-	protected VHostManagerIfc vHostManager = null;
-	private JID componentId                = null;
-	private String discoCategory           = null;
-	private String[] discoFeatures         = null;
-	private String discoName               = null;
-	private String discoNode               = null;
-	private String discoType               = null;
-	private String fixedDomain             = null;
-	private String name                    = null;
-	private JID redirectTo                 = null;
-	private ServiceEntity serviceEntity    = null;
-
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param manager
-	 */
-	@Override
-	public void setVHostManager(VHostManagerIfc manager) {
-		this.vHostManager = manager;
-	}
+	protected VHostManagerIfc vHostManager  = null;
+	private JID               componentId   = null;
+	private String            discoCategory = null;
+	private String[]          discoFeatures = null;
+	private String            discoName     = null;
+	private String            discoNode     = null;
+	private String            discoType     = null;
+	private String            fixedDomain   = null;
+	private String            name          = null;
+	private JID               redirectTo    = null;
+	private ServiceEntity     serviceEntity = null;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -239,6 +226,37 @@ public class VirtualComponent
 	public boolean handlesNonLocalDomains() {
 		return false;
 	}
+
+	/**
+	 * Method description
+	 *
+	 */
+	@Override
+	public void initializationCompleted() {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param results
+	 */
+	@Override
+	public void processPacket(Packet packet, Queue<Packet> results) {
+		if (redirectTo != null) {
+			packet.setPacketTo(redirectTo);
+			results.add(packet);
+		} else {
+			log.log(Level.INFO, "No redirectTo address, dropping packet: {0}", packet);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 */
+	@Override
+	public void release() {}
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -349,39 +367,6 @@ public class VirtualComponent
 		return name;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 */
-	@Override
-	public void initializationCompleted() {}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param results
-	 */
-	@Override
-	public void processPacket(Packet packet, Queue<Packet> results) {
-		if (redirectTo != null) {
-			packet.setPacketTo(redirectTo);
-			results.add(packet);
-		} else {
-			log.log(Level.INFO, "No redirectTo address, dropping packet: {0}", packet);
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 */
-	@Override
-	public void release() {}
-
 	//~--- set methods ----------------------------------------------------------
 
 	/**
@@ -420,8 +405,7 @@ public class VirtualComponent
 				} catch (TigaseStringprepException ex) {
 					redirectTo = null;
 					log.log(Level.WARNING,
-									"stringprep processing failed for given redirect address: {0}",
-									redirect);
+							"stringprep processing failed for given redirect address: {0}", redirect);
 				}
 			}
 		}
@@ -447,13 +431,24 @@ public class VirtualComponent
 				(discoFeatures != null)) {
 			serviceEntity = new ServiceEntity(getName(), null, discoName);
 			serviceEntity.addIdentities(new ServiceIdentity(discoCategory, discoType,
-							discoName));
+					discoName));
 			for (String feature : discoFeatures) {
 				serviceEntity.addFeatures(feature);
 			}
 		}
 	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param manager
+	 */
+	@Override
+	public void setVHostManager(VHostManagerIfc manager) {
+		this.vHostManager = manager;
+	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/04
+//~ Formatted in Tigase Code Convention on 13/04/14
