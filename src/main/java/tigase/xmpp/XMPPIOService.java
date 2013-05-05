@@ -70,18 +70,18 @@ public class XMPPIOService<RefObject>
 
 	/** Field description */
 	public static final String CROSS_DOMAIN_POLICY_FILE_PROP_KEY =
-		"cross-domain-policy-file";
+			"cross-domain-policy-file";
 
 	/** Field description */
 	public static final String CROSS_DOMAIN_POLICY_FILE_PROP_VAL =
-		"etc/cross-domain-policy.xml";
+			"etc/cross-domain-policy.xml";
 
 	/** Field description */
 	public static final String ID_ATT = "id";
 
 	/** Field description */
-	public static final String REQ_NAME       = "req";
-	private static String cross_domain_policy = null;
+	public static final String REQ_NAME            = "req";
+	private static String      cross_domain_policy = null;
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -93,26 +93,26 @@ public class XMPPIOService<RefObject>
 	private XMPPDomBuilderHandler<RefObject> domHandler = null;
 
 	/** Field description */
-	protected SimpleParser parser                 = SingletonFactory.getParserInstance();
-	private String jid                            = null;
-	private long packetsReceived                  = 0;
-	private long packetsSent                      = 0;
-	private long req_idx                          = 0;
+	protected SimpleParser        parser = SingletonFactory.getParserInstance();
+	private String                jid                  = null;
+	private long                  packetsReceived      = 0;
+	private long                  packetsSent          = 0;
+	private long                  req_idx              = 0;
 	@SuppressWarnings("rawtypes")
-	private XMPPIOServiceListener serviceListener = null;
-	private long totalPacketsReceived             = 0;
-	private long totalPacketsSent                 = 0;
+	private XMPPIOServiceListener serviceListener      = null;
+	private long                  totalPacketsReceived = 0;
+	private long                  totalPacketsSent     = 0;
 
 	/**
 	 * The <code>waitingPackets</code> queue keeps data which have to be
 	 * processed.
 	 */
 	private ConcurrentLinkedQueue<Packet> waitingPackets =
-		new ConcurrentLinkedQueue<Packet>();
+			new ConcurrentLinkedQueue<Packet>();
 	private ConcurrentSkipListMap<String, Packet> waitingForAck =
-		new ConcurrentSkipListMap<String, Packet>();
+			new ConcurrentSkipListMap<String, Packet>();
 	private boolean white_char_ack = false;
-	private String xmlns           = null;
+	private String  xmlns          = null;
 	private boolean xmpp_ack       = false;
 	private boolean strict_ack     = false;
 
@@ -121,7 +121,7 @@ public class XMPPIOService<RefObject>
 	 * processed and they are actual processing results.
 	 */
 	private ConcurrentLinkedQueue<Packet> receivedPackets =
-		new ConcurrentLinkedQueue<Packet>();
+			new ConcurrentLinkedQueue<Packet>();
 	private boolean firstPacket = true;
 
 	/** Field description */
@@ -129,7 +129,6 @@ public class XMPPIOService<RefObject>
 
 	//~--- constructors ---------------------------------------------------------
 
-	// ~--- constructors ---------------------------------------------------------
 	// /**
 	// * Variable <code>lock</code> keeps reference to object lock.
 	// * It supports multi-threaded processing and can be called simultaneously
@@ -151,12 +150,12 @@ public class XMPPIOService<RefObject>
 		domHandler = new XMPPDomBuilderHandler<RefObject>(this);
 		if (cross_domain_policy == null) {
 			String file_name = System.getProperty(CROSS_DOMAIN_POLICY_FILE_PROP_KEY,
-													 CROSS_DOMAIN_POLICY_FILE_PROP_VAL);
+					CROSS_DOMAIN_POLICY_FILE_PROP_VAL);
 
 			try {
-				BufferedReader br = new BufferedReader(new FileReader(file_name));
-				String line       = br.readLine();
-				StringBuilder sb  = new StringBuilder();
+				BufferedReader br   = new BufferedReader(new FileReader(file_name));
+				String         line = br.readLine();
+				StringBuilder  sb   = new StringBuilder();
 
 				while (line != null) {
 					sb.append(line);
@@ -167,7 +166,7 @@ public class XMPPIOService<RefObject>
 				cross_domain_policy = sb.toString();
 			} catch (Exception ex) {
 				log.log(Level.WARNING, "Problem reading cross domain poicy file: " + file_name,
-								ex);
+						ex);
 			}
 		}
 	}
@@ -248,8 +247,6 @@ public class XMPPIOService<RefObject>
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method <code>addPacketToSend</code> adds new data which will be processed
 	 * during next run. Data are kept in proper order like in <em>FIFO</em> queue.
@@ -262,12 +259,12 @@ public class XMPPIOService<RefObject>
 			String req = "" + (++req_idx);
 
 			packet.getElement().addChild(new Element(REQ_NAME, new String[] { ID_ATT },
-							new String[] { req }));
+					new String[] { req }));
 			waitingForAck.put(req, packet);
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Added req {1} for packet: {2}",
-								new Object[] { toString(),
-															 req, packet });
+				log.log(Level.FINEST, "{0}, Added req {1} for packet: {2}", new Object[] {
+						toString(),
+						req, packet });
 			}
 		}
 		++packetsSent;
@@ -276,8 +273,6 @@ public class XMPPIOService<RefObject>
 	}
 
 	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -302,9 +297,9 @@ public class XMPPIOService<RefObject>
 			if (req == null) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST,
-									"{0}, Missing req element in waiting for ACK packet: {1}",
-									new Object[] { toString(),
-																 p });
+							"{0}, Missing req element in waiting for ACK packet: {1}", new Object[] {
+							toString(),
+							p });
 				}
 			} else {
 				p.getElement().removeChild(req);
@@ -326,8 +321,6 @@ public class XMPPIOService<RefObject>
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
-
 	/**
 	 * Describe <code>processWaitingPackets</code> method here.
 	 *
@@ -344,19 +337,17 @@ public class XMPPIOService<RefObject>
 			// ++cnt;
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "{0}, Sending packet: {1}", new Object[] { toString(),
-								packet });
+						packet });
 			}
 			writeRawData(packet.getElement().toString());
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "{0}, SENT: {1}", new Object[] { toString(),
-								packet.getElement().toString() });
+						packet.getElement().toString() });
 			}
 		}    // end of while (packet = waitingPackets.poll() != null)
 	}
 
 	//~--- set methods ----------------------------------------------------------
-
-	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -381,8 +372,6 @@ public class XMPPIOService<RefObject>
 	}
 
 	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Describe <code>stop</code> method here.
@@ -429,15 +418,15 @@ public class XMPPIOService<RefObject>
 	public void xmppStreamOpen(final String data) {
 		try {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Sending data: {1}",
-								new Object[] { toString(), data });
+				log.log(Level.FINEST, "{0}, Sending data: {1}", new Object[] { toString(),
+						data });
 			}
 			writeRawData(data);
 			assert debug(data, "--SENT:");
 		} catch (IOException e) {
-			log.log(Level.WARNING, "{0}, Error sending stream open data: {1}",
-							new Object[] { toString(),
-														 e });
+			log.log(Level.WARNING, "{0}, Error sending stream open data: {1}", new Object[] {
+					toString(),
+					e });
 			forceStop();
 		}
 	}
@@ -505,16 +494,16 @@ public class XMPPIOService<RefObject>
 			while (isConnected() && (data != null) && (data.length > 0)) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "{0}, READ:\n{1}", new Object[] { toString(),
-									new String(data) });
+							new String(data) });
 				}
 
 				boolean disconnect = checkData(data);
 
 				if (disconnect) {
 					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE, "{0}, checkData says disconnect: {1}",
-										new Object[] { toString(),
-																	 new String(data) });
+						log.log(Level.FINE, "{0}, checkData says disconnect: {1}", new Object[] {
+								toString(),
+								new String(data) });
 					} else {
 						log.log(Level.WARNING, "{0}, checkData says disconnect", toString());
 					}
@@ -535,12 +524,12 @@ public class XMPPIOService<RefObject>
 					parser.parse(domHandler, data, 0, data.length);
 					if (domHandler.parseError()) {
 						if (log.isLoggable(Level.FINE)) {
-							log.log(Level.FINE, "{0}, Data parsing error: {1}",
-											new Object[] { toString(),
-																		 new String(data) });
+							log.log(Level.FINE, "{0}, Data parsing error: {1}", new Object[] {
+									toString(),
+									new String(data) });
 						} else {
 							log.log(Level.WARNING, "{0}, data parsing error, stopping connection",
-											toString());
+									toString());
 						}
 						forceStop();
 
@@ -560,7 +549,7 @@ public class XMPPIOService<RefObject>
 						// log.finer("Read element: " + elem.getName());
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST, "{0}, Read packet: {1}", new Object[] { toString(),
-											elem });
+									elem });
 						}
 
 						// System.out.print(elem.toString());
@@ -570,13 +559,11 @@ public class XMPPIOService<RefObject>
 						sendAck(pack);
 					}    // end of while ((elem = elems.poll()) != null)
 				} catch (TigaseStringprepException ex) {
-					log.log(Level.INFO,
-									toString() + ", Incorrect to/from JID format for stanza: " +
-									elem.toString(), ex);
+					log.log(Level.INFO, toString() +
+							", Incorrect to/from JID format for stanza: " + elem.toString(), ex);
 				} catch (Exception ex) {
-					log.log(Level.INFO,
-									toString() + ", Incorrect XML data: " + new String(data) +
-									", stopping connection: " + getConnectionId() + ", exception: ", ex);
+					log.log(Level.INFO, toString() + ", Incorrect XML data: " + new String(data) +
+							", stopping connection: " + getConnectionId() + ", exception: ", ex);
 					forceStop();
 				}    // end of try-catch
 				data = readData();
@@ -584,8 +571,8 @@ public class XMPPIOService<RefObject>
 		} else {
 			if (log.isLoggable(Level.FINE)) {
 				log.log(Level.FINE,
-								"{0}, function called when the service is not connected! forceStop()",
-								toString());
+						"{0}, function called when the service is not connected! forceStop()",
+						toString());
 			}
 			forceStop();
 		}
@@ -674,9 +661,9 @@ public class XMPPIOService<RefObject>
 			}
 			writeRawData("</stream:stream>");
 		} catch (IOException e) {
-			log.log(Level.INFO, "{0}, Error sending stream closed data: {1}",
-							new Object[] { toString(),
-														 e });
+			log.log(Level.INFO, "{0}, Error sending stream closed data: {1}", new Object[] {
+					toString(),
+					e });
 		}
 
 		// streamClosed = true;
@@ -705,7 +692,7 @@ public class XMPPIOService<RefObject>
 			try {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "{0}, Sending data: {1}", new Object[] { toString(),
-									response });
+							response });
 				}
 				writeRawData(response);
 				processWaitingPackets();
@@ -713,9 +700,9 @@ public class XMPPIOService<RefObject>
 					stop();
 				}    // end of if (response.endsWith())
 			} catch (IOException e) {
-				log.log(Level.WARNING, "{0}, Error sending stream open data: {1}",
-								new Object[] { toString(),
-															 e });
+				log.log(Level.WARNING, "{0}, Error sending stream open data: {1}", new Object[] {
+						toString(),
+						e });
 				forceStop();
 			}
 		}
@@ -748,4 +735,4 @@ public class XMPPIOService<RefObject>
 }    // XMPPIOService
 
 
-//~ Formatted in Tigase Code Convention on 13/03/04
+//~ Formatted in Tigase Code Convention on 13/03/19
