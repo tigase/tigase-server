@@ -458,6 +458,7 @@ public class VHostItem
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Can not parse max users number: {0}", elem
 					.getAttributeStaticStr(MAX_USERS_NUMBER_ATT));
+			maxUsersNumber = Long.getLong(VHOST_MAX_USERS_PROP_KEY, VHOST_MAX_USERS_PROP_DEF);
 		}
 
 		String tmp = elem.getAttributeStaticStr(PRESENCE_FORWARD_ADDRESS_ATT);
