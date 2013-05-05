@@ -179,15 +179,6 @@ public class BoshSession {
 		closeAllConnections();
 	}
 
-	private void closeAllConnections() {
-		for (BoshIOService conn : old_connections) {
-			conn.stop();
-		}
-		for (BoshIOService conn : connections.values()) {
-			conn.stop();
-		}
-	}
-
 	/**
 	 * Method description
 	 *
@@ -215,50 +206,6 @@ public class BoshSession {
 			inactivityTimer = handler.scheduleTask(this, max_inactivity * SECOND);
 		}
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public JID getDataReceiver() {
-		return dataReceiver;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public String getDomain() {
-		return domain;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public String getSessionId() {
-		return sessionId;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public UUID getSid() {
-		return sid;
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -608,19 +555,27 @@ public class BoshSession {
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
-	 *
-	 * @param dataReceiver
 	 */
-	public void setDataReceiver(JID dataReceiver) {
-		this.dataReceiver = dataReceiver;
-	}
+	public synchronized void sendWaitingPackets() {
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("trying to send waiting packets from queue of " + getSid() +
+					" after timer = " + waiting_packets.size());
+		}
+		if (!waiting_packets.isEmpty()) {
+			Map.Entry<BoshTask, BoshIOService> entry = connections.pollFirstEntry();
 
-	//~--- methods --------------------------------------------------------------
+			if (entry == null) {
+				return;
+			}
+
+			BoshIOService serv = entry.getValue();
+
+			sendBody(serv, null);
+		}
+	}
 
 	/**
 	 * Method description
@@ -689,6 +644,80 @@ public class BoshSession {
 		return false;
 	}
 
+	/**
+	 * Method description
+	 *
+	 */
+	public void terminateBoshSession() {
+		terminate = true;
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public JID getDataReceiver() {
+		return dataReceiver;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public String getDomain() {
+		return domain;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public String getSessionId() {
+		return sessionId;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public UUID getSid() {
+		return sid;
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param dataReceiver
+	 */
+	public void setDataReceiver(JID dataReceiver) {
+		this.dataReceiver = dataReceiver;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param jid
+	 */
+	public void setUserJid(String jid) {
+		userJid = JID.jidInstanceNS(jid);
+	}
+
+	//~--- methods --------------------------------------------------------------
+
 	private Element applyFilters(Element packet) {
 		Element result = packet.clone();
 
@@ -708,6 +737,15 @@ public class BoshSession {
 		return result;
 	}
 
+	private void closeAllConnections() {
+		for (BoshIOService conn : old_connections) {
+			conn.stop();
+		}
+		for (BoshIOService conn : connections.values()) {
+			conn.stop();
+		}
+	}
+
 	private boolean filterInPacket(Packet packet) {
 		if (cache_on) {
 			processAutomaticCache(packet);
@@ -723,73 +761,6 @@ public class BoshSession {
 
 		return true;
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	private Element getBodyElem() {
-		Element body = new Element(BODY_EL_NAME, new String[] { FROM_ATTR, SECURE_ATTR,
-				"xmpp:version", "xmlns:xmpp", "xmlns:stream" }, new String[] { this.domain,
-				"true", "1.0", "urn:xmpp:xbosh", "http://etherx.jabber.org/streams" });
-
-		body.setXMLNS(BOSH_XMLNS);
-
-		return body;
-	}
-
-	private long getCurrentRidTail() {
-		synchronized (currentRids) {
-			return currentRids[rids_tail];
-		}
-	}
-
-	private boolean isDuplicateMessage(long rid, List<Element> packets) {
-		synchronized (currentRids) {
-			int hashCode = -1;
-
-			if ((packets != null) && (!packets.isEmpty())) {
-				StringBuilder sb = new StringBuilder();
-
-				for (Element elem : packets) {
-					sb.append(elem.toString());
-				}
-				hashCode = sb.toString().hashCode();
-			}
-			if (hashCode == -1) {
-				return false;
-			}
-			for (int i = 0; i < currentRids.length; ++i) {
-				if (rid == currentRids[i]) {
-					return hashCode == hashCodes[i];
-				}
-			}
-		}
-
-		return false;
-	}
-
-	private boolean isDuplicateRid(long rid, List<Element> packets) {
-		synchronized (currentRids) {
-			int hashCode = -1;
-
-			if ((packets != null) && (!packets.isEmpty())) {
-				StringBuilder sb = new StringBuilder();
-
-				for (Element elem : packets) {
-					sb.append(elem.toString());
-				}
-				hashCode = sb.toString().hashCode();
-			}
-			for (int i = 0; i < currentRids.length; ++i) {
-				if (rid == currentRids[i]) {
-					return hashCode != hashCodes[i];
-				}
-			}
-		}
-
-		return false;
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private void processAutomaticCache(Packet packet) {
 		if (packet.getElemName() == PRESENCE_ELEMENT_NAME) {
@@ -874,8 +845,9 @@ public class BoshSession {
 	private void processRid(long rid, List<Element> packets) {
 		synchronized (currentRids) {
 			if ((previous_received_rid + 1) != rid) {
-				log.info("Incorrect packet order, last_rid=" + previous_received_rid +
-						", current_rid=" + rid);
+				log.log(Level.FINER, "Incorrect packet order, last_rid={0}, current_rid={1}",
+						new Object[] { previous_received_rid,
+						rid });
 			}
 			if ((packets != null) && (!packets.isEmpty())) {
 				StringBuilder sb = new StringBuilder();
@@ -895,34 +867,44 @@ public class BoshSession {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
-	public void terminateBoshSession() {
-		terminate = true;
-	}
-
-	/**
-	 * Method description
-	 *
-	 */
-	public synchronized void sendWaitingPackets() {
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("trying to send waiting packets from queue of " + getSid() +
-					" after timer = " + waiting_packets.size());
-		}
-		if (!waiting_packets.isEmpty()) {
+	private void retireAllOldConnections() {
+		while (connections.size() > 1) {
 			Map.Entry<BoshTask, BoshIOService> entry = connections.pollFirstEntry();
 
-			if (entry == null) {
-				return;
-			}
+			handler.cancelTask(entry.getKey());
 
 			BoshIOService serv = entry.getValue();
 
-			sendBody(serv, null);
+			if (serv != null) {
+				retireConnectionService(serv);
+			} else {
+				if (log.isLoggable(Level.WARNING)) {
+					log.warning("connections queue size is greater than 1 but poll returns null" +
+							getSid());
+				}
+			}
 		}
+	}
+
+	private void retireConnectionService(BoshIOService serv) {
+		if (!old_connections.contains(serv)) {
+			while (!old_connections.offer(serv)) {
+				BoshIOService old_serv = old_connections.poll();
+
+				if (old_serv != null) {
+					old_serv.stop();
+				} else {
+					if (log.isLoggable(Level.WARNING)) {
+						log.warning("old_connections queue is empty but can not add new element!: " +
+								getSid());
+					}
+
+					break;
+				}
+			}
+		}
+		serv.setSid(null);
+		disconnected(serv);
 	}
 
 	private synchronized void sendBody(BoshIOService serv, Element body_par) {
@@ -1002,46 +984,6 @@ public class BoshSession {
 		}
 	}
 
-	private void retireConnectionService(BoshIOService serv) {
-		if (!old_connections.contains(serv)) {
-			while (!old_connections.offer(serv)) {
-				BoshIOService old_serv = old_connections.poll();
-
-				if (old_serv != null) {
-					old_serv.stop();
-				} else {
-					if (log.isLoggable(Level.WARNING)) {
-						log.warning("old_connections queue is empty but can not add new element!: " +
-								getSid());
-					}
-
-					break;
-				}
-			}
-		}
-		serv.setSid(null);
-		disconnected(serv);
-	}
-
-	private void retireAllOldConnections() {
-		while (connections.size() > 1) {
-			Map.Entry<BoshTask, BoshIOService> entry = connections.pollFirstEntry();
-
-			handler.cancelTask(entry.getKey());
-
-			BoshIOService serv = entry.getValue();
-
-			if (serv != null) {
-				retireConnectionService(serv);
-			} else {
-				if (log.isLoggable(Level.WARNING)) {
-					log.warning("connections queue size is greater than 1 but poll returns null" +
-							getSid());
-				}
-			}
-		}
-	}
-
 	private long takeCurrentRidTail() {
 		synchronized (currentRids) {
 			int idx = rids_tail++;
@@ -1054,16 +996,69 @@ public class BoshSession {
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
+	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 */
-	public void setUserJid(String jid) {
-		userJid = JID.jidInstanceNS(jid);
+	private Element getBodyElem() {
+		Element body = new Element(BODY_EL_NAME, new String[] { FROM_ATTR, SECURE_ATTR,
+				"xmpp:version", "xmlns:xmpp", "xmlns:stream" }, new String[] { this.domain,
+				"true", "1.0", "urn:xmpp:xbosh", "http://etherx.jabber.org/streams" });
+
+		body.setXMLNS(BOSH_XMLNS);
+
+		return body;
+	}
+
+	private long getCurrentRidTail() {
+		synchronized (currentRids) {
+			return currentRids[rids_tail];
+		}
+	}
+
+	private boolean isDuplicateMessage(long rid, List<Element> packets) {
+		synchronized (currentRids) {
+			int hashCode = -1;
+
+			if ((packets != null) && (!packets.isEmpty())) {
+				StringBuilder sb = new StringBuilder();
+
+				for (Element elem : packets) {
+					sb.append(elem.toString());
+				}
+				hashCode = sb.toString().hashCode();
+			}
+			if (hashCode == -1) {
+				return false;
+			}
+			for (int i = 0; i < currentRids.length; ++i) {
+				if (rid == currentRids[i]) {
+					return hashCode == hashCodes[i];
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private boolean isDuplicateRid(long rid, List<Element> packets) {
+		synchronized (currentRids) {
+			int hashCode = -1;
+
+			if ((packets != null) && (!packets.isEmpty())) {
+				StringBuilder sb = new StringBuilder();
+
+				for (Element elem : packets) {
+					sb.append(elem.toString());
+				}
+				hashCode = sb.toString().hashCode();
+			}
+			for (int i = 0; i < currentRids.length; ++i) {
+				if (rid == currentRids[i]) {
+					return hashCode != hashCodes[i];
+				}
+			}
+		}
+
+		return false;
 	}
 
 	//~--- inner classes --------------------------------------------------------
@@ -1094,4 +1089,4 @@ public class BoshSession {
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/12
+//~ Formatted in Tigase Code Convention on 13/04/22
