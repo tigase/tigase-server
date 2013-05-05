@@ -21,7 +21,7 @@ stop ()	{
 svc_restart () {
 	ebegin "Restarting Tigase"
 	su - ${TIGASE_USER} -c "${TIGASE_ENV} ${TIGASE_HOME}/bin/tigase.sh stop ${TIGASE_HOME}/${TIGASE_CONF}"
-	sleep 5
+	sleep 10
 	su - ${TIGASE_USER} -c "${TIGASE_ENV} ${TIGASE_HOME}/bin/tigase.sh start ${TIGASE_HOME}/${TIGASE_CONF}"
 	eend $?
 }
