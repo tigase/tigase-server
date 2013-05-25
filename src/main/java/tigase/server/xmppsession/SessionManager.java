@@ -183,6 +183,152 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
+	 * @param packet
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean addOutPacket(Packet packet) {
+
+		// We actually have to set packetFrom address to the session manager ID
+		// to make sure the connection manager for instance can report problems back
+		// This cause other problems with packets processing which have to be
+		// resolved anyway
+		if (packet.getPacketFrom() == null) {
+			packet.setPacketFrom(getComponentId());
+		}
+
+		return super.addOutPacket(packet);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param plug_id
+	 * @param conc
+	 *
+	 * @return
+	 *
+	 * @throws ClassNotFoundException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 */
+	public XMPPImplIfc addPlugin(String plug_id, Integer conc)
+					throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+		XMPPImplIfc      result = null;
+		XMPPProcessorIfc proc   = null;
+
+		if (plug_id.equals(sessionOpenProcId)) {
+			sessionOpenProc = new SessionOpenProc();
+			proc            = sessionOpenProc;
+		}
+		if (plug_id.equals(sessionCloseProcId)) {
+			sessionCloseProc = new SessionCloseProc();
+			proc             = sessionCloseProc;
+		}
+		if (plug_id.equals(defaultHandlerProcId)) {
+			defHandlerProc = new DefaultHandlerProc();
+			proc           = defHandlerProc;
+		}
+		if (proc == null) {
+			proc = SessionManagerConfig.getProcessor(plug_id);
+		}
+
+		boolean loaded = false;
+
+		if (proc != null) {
+			int concurrency = ((conc != null)
+					? conc
+					: ((proc != null)
+					? proc.concurrentQueuesNo()
+					: 0));
+
+			System.out.println("Loading plugin: " + plug_id + "=" + concurrency + " ...");
+
+			// If there is not default processors thread pool or the processor does
+			// have thread pool specific settings create a separate thread pool
+			// for the processor
+			if ((workerThreads.get(defPluginsThreadsPool) == null) || (conc != null)) {
+				ProcessorWorkerThread                    worker = new ProcessorWorkerThread();
+				ProcessingThreads<ProcessorWorkerThread> pt =
+						new ProcessingThreads<ProcessorWorkerThread>(worker, concurrency,
+						maxInQueueSize, proc.id());
+
+				workerThreads.put(proc.id(), pt);
+				log.log(Level.CONFIG, "Created thread pool: {0}, queue: {1} for plugin id: {2}",
+						new Object[] { concurrency,
+						maxInQueueSize, proc.id() });
+			}
+			processors.put(proc.id(), proc);
+			log.log(Level.CONFIG, "Added processor: {0} for plugin id: {1}", new Object[] { proc
+					.getClass().getSimpleName(),
+					proc.id() });
+			loaded = true;
+			result = proc;
+		}
+
+		XMPPPreprocessorIfc preproc = SessionManagerConfig.getPreprocessor(plug_id);
+
+		if (preproc != null) {
+			preProcessors.put(plug_id, preproc);
+			log.log(Level.CONFIG, "Added preprocessor: {0} for plugin id: {1}", new Object[] {
+					preproc.getClass().getSimpleName(),
+					plug_id });
+			loaded = true;
+			result = preproc;
+		}
+
+		XMPPPostprocessorIfc postproc = SessionManagerConfig.getPostprocessor(plug_id);
+
+		if (postproc != null) {
+			postProcessors.put(plug_id, postproc);
+			log.log(Level.CONFIG, "Added postprocessor: {0} for plugin id: {1}", new Object[] {
+					postproc.getClass().getSimpleName(),
+					plug_id });
+			loaded = true;
+			result = postproc;
+		}
+
+		XMPPStopListenerIfc stoplist = SessionManagerConfig.getStopListener(plug_id);
+
+		if (stoplist != null) {
+			stopListeners.put(plug_id, stoplist);
+			log.log(Level.CONFIG, "Added stopped processor: {0} for plugin id: {1}",
+					new Object[] { stoplist.getClass().getSimpleName(),
+					plug_id });
+			loaded = true;
+			result = stoplist;
+		}
+
+		XMPPPacketFilterIfc filterproc = SessionManagerConfig.getPacketFilter(plug_id);
+
+		if (filterproc != null) {
+			outFilters.put(plug_id, filterproc);
+			log.log(Level.CONFIG, "Added packet filter: {0} for plugin id: {1}", new Object[] {
+					filterproc.getClass().getSimpleName(),
+					plug_id });
+			loaded = true;
+			result = filterproc;
+		}
+		if (!loaded) {
+			log.log(Level.WARNING, "No implementation found for plugin id: {0}", plug_id);
+		}    // end of if (!loaded)
+		if (result != null) {
+			allPlugins.add(result);
+			if (result instanceof PresenceCapabilitiesManager.PresenceCapabilitiesListener) {
+				PresenceCapabilitiesManager.registerPresenceHandler((PresenceCapabilitiesManager
+						.PresenceCapabilitiesListener) result);
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param jid
 	 *
 	 * @return
@@ -190,6 +336,213 @@ public class SessionManager
 	@Override
 	public boolean containsJid(BareJID jid) {
 		return sessionsByNodeId.containsKey(jid);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param userId
+	 * @param conn
+	 */
+	@Override
+	public void handleLogin(BareJID userId, XMPPResourceConnection conn) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "handleLogin called for: {0}, conn_id: {1}", new Object[] {
+					userId,
+					conn });
+		}
+		registerNewSession(userId, conn);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param userId
+	 * @param conn
+	 */
+	@Override
+	public void handleLogout(BareJID userId, XMPPResourceConnection conn) {
+		XMPPSession session = sessionsByNodeId.get(userId);
+
+		if ((session != null) && (session.getActiveResourcesSize() <= 1)) {
+			sessionsByNodeId.remove(userId);
+		}    // end of if (session.getActiveResourcesSize() == 0)
+		try {
+			connectionsByFrom.remove(conn.getConnectionId());
+
+			Packet cmd = Command.CLOSE.getPacket(getComponentId(), conn.getConnectionId(),
+					StanzaType.set, conn.nextStanzaId());
+			String error = (String) conn.getSessionData(XMPPResourceConnection.ERROR_KEY);
+
+			if (error != null) {
+				Element err_el = new Element(error);
+
+				err_el.setXMLNS("urn:ietf:params:xml:ns:xmpp-streams");
+				cmd.getElement().getChild("command").addChild(err_el);
+			}
+			fastAddOutPacket(cmd);
+		} catch (NoConnectionIdException ex) {
+			log.log(Level.WARNING, "Connection ID not set for session: {0}", conn);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param conn
+	 */
+	@Override
+	public void handlePresenceSet(XMPPResourceConnection conn) {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param conn
+	 */
+	@Override
+	public void handleResourceBind(XMPPResourceConnection conn) {
+		if (!conn.isServerSession() && (!"USER_STATUS".equals(conn.getSessionId()))) {
+			try {
+				Packet user_login_cmd = Command.USER_LOGIN.getPacket(getComponentId(), conn
+						.getConnectionId(), StanzaType.set, conn.nextStanzaId(), Command.DataType
+						.submit);
+
+				Command.addFieldValue(user_login_cmd, "user-jid", conn.getjid().toString());
+				addOutPacket(user_login_cmd);
+			} catch (NoConnectionIdException ex) {
+
+				// This actually should not happen... might be a bug:
+				log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
+			}
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean handlesLocalDomains() {
+		return true;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param binds
+	 */
+	@Override
+	public void initBindings(Bindings binds) {
+		super.initBindings(binds);
+		binds.put(CommandIfc.AUTH_REPO, auth_repository);
+		binds.put(CommandIfc.USER_CONN, connectionsByFrom);
+		binds.put(CommandIfc.USER_REPO, user_repository);
+		binds.put(CommandIfc.USER_SESS, sessionsByNodeId);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int processingInThreads() {
+		return Runtime.getRuntime().availableProcessors() * 8;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int processingOutThreads() {
+		return Runtime.getRuntime().availableProcessors() * 8;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 */
+	@Override
+	public void processPacket(final Packet packet) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Received packet: {0}", packet.toStringSecure());
+		}
+		if (packet.isCommand() && processCommand(packet)) {
+			packet.processedBy("SessionManager");
+
+			// No more processing is needed for command packet
+			return;
+		}    // end of if (pc.isCommand())
+
+		XMPPResourceConnection conn = getXMPPResourceConnection(packet);
+
+		if ((conn == null) && (isBrokenPacket(packet)) || processAdminsOrDomains(packet)) {
+			return;
+		}
+		processPacket(packet, conn);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param plug_id
+	 */
+	public void removePlugin(String plug_id) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Removing plugin {0}", plug_id);
+		}
+
+		XMPPImplIfc                              p  = null;
+		ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.remove(plug_id);
+
+		if (pt != null) {
+			p = processors.remove(plug_id);
+			pt.shutdown();
+			if (p != null) {
+				allPlugins.remove(p);
+			}
+		}
+		if (preProcessors.get(plug_id) != null) {
+			p = preProcessors.remove(plug_id);
+			allPlugins.remove(p);
+		}
+		if (postProcessors.get(plug_id) != null) {
+			p = postProcessors.remove(plug_id);
+			allPlugins.remove(p);
+		}
+		if (stopListeners.get(plug_id) != null) {
+			p = stopListeners.remove(plug_id);
+			allPlugins.remove(p);
+		}
+		if ((p != null) && (p instanceof PresenceCapabilitiesManager
+				.PresenceCapabilitiesListener)) {
+			PresenceCapabilitiesManager.unregisterPresenceHandler((PresenceCapabilitiesManager
+					.PresenceCapabilitiesListener) p);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public boolean skipPrivacy() {
+		return skipPrivacy;
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -340,10 +693,17 @@ public class SessionManager
 
 		if (session != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Session not null, getting resource for jid: {0}", jid);
+				log.log(Level.FINEST, "Session not null, searching session for jid: {0}", jid);
 			}
 
-			return session.getResourceConnection(jid);
+			XMPPResourceConnection res = session.getResourceConnection(jid);
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Found session: {0}, for jid: {1}", new Object[] { res,
+						jid });
+			}
+
+			return res;
 		}    // end of if (session != null)
 
 		// Maybe this is a call for the server session?
@@ -353,22 +713,6 @@ public class SessionManager
 
 		return null;
 	}
-
-	//~--- methods --------------------------------------------------------------
-
-	private long calcAverage(long[] timings) {
-		long res = 0;
-
-		for (long ppt : timings) {
-			res += ppt;
-		}
-
-		long processingTime = res / timings.length;
-
-		return processingTime;
-	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -429,104 +773,6 @@ public class SessionManager
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param userId
-	 * @param conn
-	 */
-	@Override
-	public void handleLogin(BareJID userId, XMPPResourceConnection conn) {
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "handleLogin called for: {0}, conn_id: {1}", new Object[] {
-					userId,
-					conn });
-		}
-		registerNewSession(userId, conn);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param userId
-	 * @param conn
-	 */
-	@Override
-	public void handleLogout(BareJID userId, XMPPResourceConnection conn) {
-		XMPPSession session = sessionsByNodeId.get(userId);
-
-		if ((session != null) && (session.getActiveResourcesSize() <= 1)) {
-			sessionsByNodeId.remove(userId);
-		}    // end of if (session.getActiveResourcesSize() == 0)
-		try {
-			connectionsByFrom.remove(conn.getConnectionId());
-
-			Packet cmd = Command.CLOSE.getPacket(getComponentId(), conn.getConnectionId(),
-					StanzaType.set, conn.nextStanzaId());
-			String error = (String) conn.getSessionData(XMPPResourceConnection.ERROR_KEY);
-
-			if (error != null) {
-				Element err_el = new Element(error);
-
-				err_el.setXMLNS("urn:ietf:params:xml:ns:xmpp-streams");
-				cmd.getElement().getChild("command").addChild(err_el);
-			}
-			fastAddOutPacket(cmd);
-		} catch (NoConnectionIdException ex) {
-			log.log(Level.WARNING, "Connection ID not set for session: {0}", conn);
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param conn
-	 */
-	@Override
-	public void handlePresenceSet(XMPPResourceConnection conn) {}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param conn
-	 */
-	@Override
-	public void handleResourceBind(XMPPResourceConnection conn) {
-		if (!conn.isServerSession() && (!"USER_STATUS".equals(conn.getSessionId()))) {
-			try {
-				Packet user_login_cmd = Command.USER_LOGIN.getPacket(getComponentId(), conn
-						.getConnectionId(), StanzaType.set, conn.nextStanzaId(), Command.DataType
-						.submit);
-
-				Command.addFieldValue(user_login_cmd, "user-jid", conn.getjid().toString());
-				addOutPacket(user_login_cmd);
-			} catch (NoConnectionIdException ex) {
-
-				// This actually should not happen... might be a bug:
-				log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
-			}
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public boolean handlesLocalDomains() {
-		return true;
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -537,25 +783,6 @@ public class SessionManager
 	public boolean hasCompleteJidsInfo() {
 		return true;
 	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param binds
-	 */
-	@Override
-	public void initBindings(Bindings binds) {
-		super.initBindings(binds);
-		binds.put(CommandIfc.AUTH_REPO, auth_repository);
-		binds.put(CommandIfc.USER_CONN, connectionsByFrom);
-		binds.put(CommandIfc.USER_REPO, user_repository);
-		binds.put(CommandIfc.USER_SESS, sessionsByNodeId);
-	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -573,56 +800,6 @@ public class SessionManager
 		} else {
 			return isLocalDomain(domain);
 		}
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
-	@Override
-	public void processPacket(final Packet packet) {
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Received packet: {0}", packet.toStringSecure());
-		}
-		if (packet.isCommand() && processCommand(packet)) {
-			packet.processedBy("SessionManager");
-
-			// No more processing is needed for command packet
-			return;
-		}    // end of if (pc.isCommand())
-
-		XMPPResourceConnection conn = getXMPPResourceConnection(packet);
-
-		if ((conn == null) && (isBrokenPacket(packet)) || processAdminsOrDomains(packet)) {
-			return;
-		}
-		processPacket(packet, conn);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public int processingInThreads() {
-		return Runtime.getRuntime().availableProcessors() * 8;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public int processingOutThreads() {
-		return Runtime.getRuntime().availableProcessors() * 8;
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -840,16 +1017,6 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
-	 * @return
-	 */
-	public boolean skipPrivacy() {
-		return skipPrivacy;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
 	 * @param packet
 	 * @param conn
 	 * @param results
@@ -1061,204 +1228,6 @@ public class SessionManager
 	protected boolean fastAddOutPacket(Packet packet) {
 		return addOutPacket(packet);
 	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 *
-	 * @return
-	 */
-	@Override
-	public boolean addOutPacket(Packet packet) {
-
-		// We actually have to set packetFrom address to the session manager ID
-		// to make sure the connection manager for instance can report problems back
-		// This cause other problems with packets processing which have to be
-		// resolved anyway
-		if (packet.getPacketFrom() == null) {
-			packet.setPacketFrom(getComponentId());
-		}
-
-		return super.addOutPacket(packet);
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param def
-	 *
-	 * @return
-	 */
-	@Override
-	protected Integer getMaxQueueSize(int def) {
-		return def * 10;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 *
-	 * @return
-	 */
-	protected XMPPSession getSession(BareJID jid) {
-		return sessionsByNodeId.get(jid);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param connId
-	 *
-	 * @return
-	 */
-	protected XMPPResourceConnection getXMPPResourceConnection(JID connId) {
-		return connectionsByFrom.get(connId);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param p
-	 *
-	 * @return
-	 */
-	protected XMPPResourceConnection getXMPPResourceConnection(Packet p) {
-		XMPPResourceConnection conn = null;
-		JID                    from = p.getPacketFrom();
-
-		if (from != null) {
-			conn = connectionsByFrom.get(from);
-			if (conn != null) {
-				return conn;
-			}
-		}
-
-		// It might be a message _to_ some user on this server
-		// so let's look for established session for this user...
-		JID to = p.getStanzaTo();
-
-		if (to != null) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Searching for resource connection for: " + to);
-			}
-			conn = getResourceConnection(to);
-		} else {
-
-			// Hm, not sure what should I do now....
-			// Maybe I should treat it as message to admin....
-			log.log(Level.INFO,
-					"Message without TO attribute set, don''t know what to do wih this: {0}", p);
-		}    // end of else
-
-		return conn;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param p
-	 *
-	 * @return
-	 */
-	protected boolean isBrokenPacket(Packet p) {
-
-		// TODO: check this out to make sure it does not lead to an infinite
-		// processing loop These are most likely packets generated inside the SM to
-		// other users who are offline, like presence updates.
-		if (getComponentId().equals(p.getPacketFrom()) && (p.getPacketTo() == null)) {
-			return false;
-		}
-		if (p.getFrom() == null) {
-
-			// This is actually a broken packet and we can't even return an error
-			// for it, so just log it and drop it.
-			log.log(Level.FINE, "Broken packet: {0}", p.toStringSecure());
-
-			return true;
-		}
-		if (!p.getFrom().equals(p.getStanzaFrom()) && (!p.isCommand() || (p.isCommand() && (p
-				.getCommand() == Command.OTHER)))) {
-
-			// Sometimes (Bosh) connection is gone and this is an error packet
-			// sent back to the original sender. This original sender might be
-			// not local....
-			if ((p.getStanzaFrom() != null) &&!isLocalDomain(p.getStanzaFrom().getDomain())) {
-
-				// ok just forward it there....
-				p.setPacketFrom(null);
-				p.setPacketTo(null);
-				fastAddOutPacket(p);
-
-				return true;
-			}
-
-			// It doesn't look good, there should really be a connection for
-			// this packet....
-			// returning error back...
-			log.log(Level.FINE, "Broken packet: {0}", p.toStringSecure());
-
-			// we do not want to send presence error packets here...
-			if ((p.getElemName() == Iq.ELEM_NAME) || (p.getElemName() == Message.ELEM_NAME)) {
-				try {
-					Packet error = Authorization.SERVICE_UNAVAILABLE.getResponseMessage(p,
-							"Service not available.", true);
-
-					error.setPacketTo(p.getFrom());
-					fastAddOutPacket(error);
-				} catch (PacketErrorTypeException e) {
-					log.log(Level.FINE, "Packet is error type already: {0}", p.toStringSecure());
-				}
-			}
-
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 *
-	 * @return
-	 */
-	protected boolean isTrusted(JID jid) {
-		if (trusted.contains(jid.getBareJID().toString())) {
-			return true;
-		}
-
-		return isAdmin(jid);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 *
-	 * @return
-	 */
-	protected boolean isTrusted(String jid) {
-		if (trusted.contains(jid)) {
-			return true;
-		}
-
-		return false;
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -1907,168 +1876,233 @@ public class SessionManager
 		}
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param plug_id
-	 * @param conc
+	 * @param def
 	 *
 	 * @return
-	 *
-	 * @throws ClassNotFoundException
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
 	 */
-	public XMPPImplIfc addPlugin(String plug_id, Integer conc)
-					throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-		XMPPImplIfc      result = null;
-		XMPPProcessorIfc proc   = null;
-
-		if (plug_id.equals(sessionOpenProcId)) {
-			sessionOpenProc = new SessionOpenProc();
-			proc            = sessionOpenProc;
-		}
-		if (plug_id.equals(sessionCloseProcId)) {
-			sessionCloseProc = new SessionCloseProc();
-			proc             = sessionCloseProc;
-		}
-		if (plug_id.equals(defaultHandlerProcId)) {
-			defHandlerProc = new DefaultHandlerProc();
-			proc           = defHandlerProc;
-		}
-		if (proc == null) {
-			proc = SessionManagerConfig.getProcessor(plug_id);
-		}
-
-		boolean loaded = false;
-
-		if (proc != null) {
-			int concurrency = ((conc != null)
-					? conc
-					: ((proc != null)
-					? proc.concurrentQueuesNo()
-					: 0));
-
-			System.out.println("Loading plugin: " + plug_id + "=" + concurrency + " ...");
-
-			// If there is not default processors thread pool or the processor does
-			// have thread pool specific settings create a separate thread pool
-			// for the processor
-			if ((workerThreads.get(defPluginsThreadsPool) == null) || (conc != null)) {
-				ProcessorWorkerThread                    worker = new ProcessorWorkerThread();
-				ProcessingThreads<ProcessorWorkerThread> pt =
-						new ProcessingThreads<ProcessorWorkerThread>(worker, concurrency,
-						maxInQueueSize, proc.id());
-
-				workerThreads.put(proc.id(), pt);
-				log.log(Level.CONFIG, "Created thread pool: {0}, queue: {1} for plugin id: {2}",
-						new Object[] { concurrency,
-						maxInQueueSize, proc.id() });
-			}
-			processors.put(proc.id(), proc);
-			log.log(Level.CONFIG, "Added processor: {0} for plugin id: {1}", new Object[] { proc
-					.getClass().getSimpleName(),
-					proc.id() });
-			loaded = true;
-			result = proc;
-		}
-
-		XMPPPreprocessorIfc preproc = SessionManagerConfig.getPreprocessor(plug_id);
-
-		if (preproc != null) {
-			preProcessors.put(plug_id, preproc);
-			log.log(Level.CONFIG, "Added preprocessor: {0} for plugin id: {1}", new Object[] {
-					preproc.getClass().getSimpleName(),
-					plug_id });
-			loaded = true;
-			result = preproc;
-		}
-
-		XMPPPostprocessorIfc postproc = SessionManagerConfig.getPostprocessor(plug_id);
-
-		if (postproc != null) {
-			postProcessors.put(plug_id, postproc);
-			log.log(Level.CONFIG, "Added postprocessor: {0} for plugin id: {1}", new Object[] {
-					postproc.getClass().getSimpleName(),
-					plug_id });
-			loaded = true;
-			result = postproc;
-		}
-
-		XMPPStopListenerIfc stoplist = SessionManagerConfig.getStopListener(plug_id);
-
-		if (stoplist != null) {
-			stopListeners.put(plug_id, stoplist);
-			log.log(Level.CONFIG, "Added stopped processor: {0} for plugin id: {1}",
-					new Object[] { stoplist.getClass().getSimpleName(),
-					plug_id });
-			loaded = true;
-			result = stoplist;
-		}
-
-		XMPPPacketFilterIfc filterproc = SessionManagerConfig.getPacketFilter(plug_id);
-
-		if (filterproc != null) {
-			outFilters.put(plug_id, filterproc);
-			log.log(Level.CONFIG, "Added packet filter: {0} for plugin id: {1}", new Object[] {
-					filterproc.getClass().getSimpleName(),
-					plug_id });
-			loaded = true;
-			result = filterproc;
-		}
-		if (!loaded) {
-			log.log(Level.WARNING, "No implementation found for plugin id: {0}", plug_id);
-		}    // end of if (!loaded)
-		if (result != null) {
-			allPlugins.add(result);
-			if (result instanceof PresenceCapabilitiesManager.PresenceCapabilitiesListener) {
-				PresenceCapabilitiesManager.registerPresenceHandler((PresenceCapabilitiesManager
-						.PresenceCapabilitiesListener) result);
-			}
-		}
-
-		return result;
+	@Override
+	protected Integer getMaxQueueSize(int def) {
+		return def * 10;
 	}
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param plug_id
+	 * @param jid
+	 *
+	 * @return
 	 */
-	public void removePlugin(String plug_id) {
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Removing plugin {0}", plug_id);
-		}
+	protected XMPPSession getSession(BareJID jid) {
+		return sessionsByNodeId.get(jid);
+	}
 
-		XMPPImplIfc                              p  = null;
-		ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.remove(plug_id);
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param connId
+	 *
+	 * @return
+	 */
+	protected XMPPResourceConnection getXMPPResourceConnection(JID connId) {
+		return connectionsByFrom.get(connId);
+	}
 
-		if (pt != null) {
-			p = processors.remove(plug_id);
-			pt.shutdown();
-			if (p != null) {
-				allPlugins.remove(p);
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param p
+	 *
+	 * @return
+	 */
+	protected XMPPResourceConnection getXMPPResourceConnection(Packet p) {
+		XMPPResourceConnection conn = null;
+		JID                    from = p.getPacketFrom();
+
+		if (from != null) {
+			conn = connectionsByFrom.get(from);
+			if (conn != null) {
+				return conn;
 			}
 		}
-		if (preProcessors.get(plug_id) != null) {
-			p = preProcessors.remove(plug_id);
-			allPlugins.remove(p);
+
+		// It might be a message _to_ some user on this server
+		// so let's look for established session for this user...
+		JID to = p.getStanzaTo();
+
+		if (to != null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Searching for resource connection for: " + to);
+			}
+			conn = getResourceConnection(to);
+		} else {
+
+			// Hm, not sure what should I do now....
+			// Maybe I should treat it as message to admin....
+			log.log(Level.INFO,
+					"Message without TO attribute set, don''t know what to do wih this: {0}", p);
+		}    // end of else
+
+		return conn;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param p
+	 *
+	 * @return
+	 */
+	protected boolean isBrokenPacket(Packet p) {
+
+		// TODO: check this out to make sure it does not lead to an infinite
+		// processing loop These are most likely packets generated inside the SM to
+		// other users who are offline, like presence updates.
+		if (getComponentId().equals(p.getPacketFrom()) && (p.getPacketTo() == null)) {
+			return false;
 		}
-		if (postProcessors.get(plug_id) != null) {
-			p = postProcessors.remove(plug_id);
-			allPlugins.remove(p);
+		if (p.getFrom() == null) {
+
+			// This is actually a broken packet and we can't even return an error
+			// for it, so just log it and drop it.
+			log.log(Level.FINE, "Broken packet: {0}", p.toStringSecure());
+
+			return true;
 		}
-		if (stopListeners.get(plug_id) != null) {
-			p = stopListeners.remove(plug_id);
-			allPlugins.remove(p);
+		if (!p.getFrom().equals(p.getStanzaFrom()) && (!p.isCommand() || (p.isCommand() && (p
+				.getCommand() == Command.OTHER)))) {
+
+			// Sometimes (Bosh) connection is gone and this is an error packet
+			// sent back to the original sender. This original sender might be
+			// not local....
+			if ((p.getStanzaFrom() != null) &&!isLocalDomain(p.getStanzaFrom().getDomain())) {
+
+				// ok just forward it there....
+				p.setPacketFrom(null);
+				p.setPacketTo(null);
+				fastAddOutPacket(p);
+
+				return true;
+			}
+
+			// It doesn't look good, there should really be a connection for
+			// this packet....
+			// returning error back...
+			log.log(Level.FINE, "Broken packet: {0}", p.toStringSecure());
+
+			// we do not want to send presence error packets here...
+			if ((p.getElemName() == Iq.ELEM_NAME) || (p.getElemName() == Message.ELEM_NAME)) {
+				try {
+					Packet error = Authorization.SERVICE_UNAVAILABLE.getResponseMessage(p,
+							"Service not available.", true);
+
+					error.setPacketTo(p.getFrom());
+					fastAddOutPacket(error);
+				} catch (PacketErrorTypeException e) {
+					log.log(Level.FINE, "Packet is error type already: {0}", p.toStringSecure());
+				}
+			}
+
+			return true;
 		}
-		if ((p != null) && (p instanceof PresenceCapabilitiesManager
-				.PresenceCapabilitiesListener)) {
-			PresenceCapabilitiesManager.unregisterPresenceHandler((PresenceCapabilitiesManager
-					.PresenceCapabilitiesListener) p);
+
+		return false;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param jid
+	 *
+	 * @return
+	 */
+	protected boolean isTrusted(JID jid) {
+		if (trusted.contains(jid.getBareJID().toString())) {
+			return true;
 		}
+
+		return isAdmin(jid);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param jid
+	 *
+	 * @return
+	 */
+	protected boolean isTrusted(String jid) {
+		if (trusted.contains(jid)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	private long calcAverage(long[] timings) {
+		long res = 0;
+
+		for (long ppt : timings) {
+			res += ppt;
+		}
+
+		long processingTime = res / timings.length;
+
+		return processingTime;
+	}
+
+	private void walk(final Packet packet, final XMPPResourceConnection connection) {
+
+		// final Element elem, final Queue<Packet> results) {
+		for (XMPPProcessorIfc proc_t : processors.values()) {
+			XMPPProcessorIfc processor = proc_t;
+			Authorization    result    = processor.canHandle(packet, connection);
+
+			if (result == Authorization.AUTHORIZED) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "XMPPProcessorIfc: {0} ({1}" + ")" + "\n Request: " +
+							"{2}, conn: {3}", new Object[] { processor.getClass().getSimpleName(),
+							processor.id(), packet, connection });
+				}
+
+				ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(processor.id());
+
+				if (pt == null) {
+					pt = workerThreads.get(defPluginsThreadsPool);
+				}
+				if (pt.addItem(processor, packet, connection)) {
+					packet.processedBy(processor.id());
+				} else {
+
+					// proc_t.debugQueue();
+					if (log.isLoggable(Level.FINE)) {
+						log.log(Level.FINE,
+								"Can not add packet: {0} to processor: {1} internal queue full.",
+								new Object[] { packet.toStringSecure(),
+								pt.getName() });
+					}
+				}
+			} else {
+				if (result != null) {
+
+					// TODO: A plugin returned an error, the packet should be bounced back
+					// with an appropriate error
+				}
+			}
+		}    // end of for ()
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -2166,49 +2200,6 @@ public class SessionManager
 		for (Packet res : results) {
 			res.setPermissions(perms);
 		}
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	private void walk(final Packet packet, final XMPPResourceConnection connection) {
-
-		// final Element elem, final Queue<Packet> results) {
-		for (XMPPProcessorIfc proc_t : processors.values()) {
-			XMPPProcessorIfc processor = proc_t;
-			Authorization    result    = processor.canHandle(packet, connection);
-
-			if (result == Authorization.AUTHORIZED) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "XMPPProcessorIfc: {0} ({1}" + ")" + "\n Request: " +
-							"{2}, conn: {3}", new Object[] { processor.getClass().getSimpleName(),
-							processor.id(), packet, connection });
-				}
-
-				ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(processor.id());
-
-				if (pt == null) {
-					pt = workerThreads.get(defPluginsThreadsPool);
-				}
-				if (pt.addItem(processor, packet, connection)) {
-					packet.processedBy(processor.id());
-				} else {
-
-					// proc_t.debugQueue();
-					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE,
-								"Can not add packet: {0} to processor: {1} internal queue full.",
-								new Object[] { packet.toStringSecure(),
-								pt.getName() });
-					}
-				}
-			} else {
-				if (result != null) {
-
-					// TODO: A plugin returned an error, the packet should be bounced back
-					// with an appropriate error
-				}
-			}
-		}    // end of for ()
 	}
 
 	//~--- inner classes --------------------------------------------------------
@@ -2345,24 +2336,6 @@ public class SessionManager
 					extends WorkerThread {
 		private ArrayDeque<Packet> local_results = new ArrayDeque<Packet>(100);
 
-		//~--- get methods --------------------------------------------------------
-
-		// ~--- get methods --------------------------------------------------------
-
-		/**
-		 * Method description
-		 *
-		 *
-		 *
-		 * @return
-		 */
-		@Override
-		public WorkerThread getNewInstance() {
-			ProcessorWorkerThread worker = new ProcessorWorkerThread();
-
-			return worker;
-		}
-
 		//~--- methods ------------------------------------------------------------
 
 		// ~--- methods ------------------------------------------------------------
@@ -2391,6 +2364,24 @@ public class SessionManager
 				log.log(Level.WARNING, "Exception during packet processing: " + item.getPacket()
 						.toStringSecure(), e);
 			}
+		}
+
+		//~--- get methods --------------------------------------------------------
+
+		// ~--- get methods --------------------------------------------------------
+
+		/**
+		 * Method description
+		 *
+		 *
+		 *
+		 * @return
+		 */
+		@Override
+		public WorkerThread getNewInstance() {
+			ProcessorWorkerThread worker = new ProcessorWorkerThread();
+
+			return worker;
 		}
 	}
 
@@ -2530,4 +2521,4 @@ public class SessionManager
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/03/19
+//~ Formatted in Tigase Code Convention on 13/05/24

@@ -37,4 +37,5 @@ jars/tigase-pubsub.jar
 jars/tigase-socks5.jar
 jars/tigase-stun.jar
 libs/
+scripts/update-code-config.sh
 
