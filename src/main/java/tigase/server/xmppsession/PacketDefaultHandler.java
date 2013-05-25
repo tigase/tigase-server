@@ -34,7 +34,6 @@ import tigase.server.Packet;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
-import tigase.xmpp.NoConnectionIdException;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
@@ -44,8 +43,6 @@ import tigase.xmpp.XMPPSession;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Queue;
@@ -63,18 +60,18 @@ public class PacketDefaultHandler {
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log =
-		Logger.getLogger(PacketDefaultHandler.class.getName());
+	private static final Logger log = Logger.getLogger(PacketDefaultHandler.class
+			.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
 	// private static TigaseRuntime runtime = TigaseRuntime.getTigaseRuntime();
 	// private RosterAbstract roster_util =
 	// RosterFactory.getRosterImplementation(true);
-	private String[] AUTH_ONLY_ELEMS  = { "message", "presence" };
-	private String[] COMPRESS_PATH    = { "compress" };
-	private String[] IGNORE_PACKETS   = { "stream:features" };
-	private StanzaType[] IGNORE_TYPES = { StanzaType.error };
+	private String[]     AUTH_ONLY_ELEMS = { "message", "presence" };
+	private String[]     COMPRESS_PATH   = { "compress" };
+	private String[]     IGNORE_PACKETS  = { "stream:features" };
+	private StanzaType[] IGNORE_TYPES    = { StanzaType.error };
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -132,7 +129,7 @@ public class PacketDefaultHandler {
 	 * @return
 	 */
 	public boolean forward(final Packet packet, final XMPPResourceConnection session,
-												 final NonAuthUserRepository repo, final Queue<Packet> results) {
+			final NonAuthUserRepository repo, final Queue<Packet> results) {
 
 		// Processing of the packets which needs to be processed as quickly
 		// as possible, direct presences from unsubscribed entities apparently
@@ -162,8 +159,7 @@ public class PacketDefaultHandler {
 	 * @return
 	 */
 	public boolean preprocess(final Packet packet, final XMPPResourceConnection session,
-														final NonAuthUserRepository repo,
-														final Queue<Packet> results) {
+			final NonAuthUserRepository repo, final Queue<Packet> results) {
 		if (session != null) {
 			session.incPacketsCounter();
 
@@ -174,8 +170,8 @@ public class PacketDefaultHandler {
 			}
 		}
 		for (int i = 0; i < IGNORE_PACKETS.length; i++) {
-			if ((packet.getElemName() == IGNORE_PACKETS[i]) &&
-					(packet.getType() == IGNORE_TYPES[i])) {
+			if ((packet.getElemName() == IGNORE_PACKETS[i]) && (packet.getType() ==
+					IGNORE_TYPES[i])) {
 				return true;
 			}
 		}
@@ -196,15 +192,14 @@ public class PacketDefaultHandler {
 					for (String elem : AUTH_ONLY_ELEMS) {
 						if (packet.getElemName() == elem) {
 							results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-											"You must authenticate session first, before you" +
-											" can send any message or presence packet.", true));
+									"You must authenticate session first, before you" +
+									" can send any message or presence packet.", true));
 							if (log.isLoggable(Level.FINE)) {
 								log.log(Level.FINE,
-												"Packet received before the session has been authenticated." +
-												"Session details: connectionId=" +
-												"{0}, sessionId={1}, packet={2}", new Object[] {
-													session.getConnectionId(),
-													session.getSessionId(), packet.toStringSecure() });
+										"Packet received before the session has been authenticated." +
+										"Session details: connectionId=" + "{0}, sessionId={1}, packet={2}",
+										new Object[] { session.getConnectionId(),
+										session.getSessionId(), packet.toStringSecure() });
 							}
 
 							return true;
@@ -220,11 +215,9 @@ public class PacketDefaultHandler {
 				// http://xmpp.org/extensions/xep-0170.html
 				// stream compression might occur between authentication and resource
 				// binding
-				if (session.isResourceSet() ||
-						packet.isXMLNSStaticStr(
-							Iq.IQ_BIND_PATH,
-							"urn:ietf:params:xml:ns:xmpp-bind") || packet.isXMLNSStaticStr(
-								COMPRESS_PATH, "http://jabber.org/protocol/compress")) {
+				if (session.isResourceSet() || packet.isXMLNSStaticStr(Iq.IQ_BIND_PATH,
+						"urn:ietf:params:xml:ns:xmpp-bind") || packet.isXMLNSStaticStr(COMPRESS_PATH,
+						"http://jabber.org/protocol/compress")) {
 					JID from_jid = session.getJID();
 
 					if (from_jid != null) {
@@ -232,8 +225,8 @@ public class PacketDefaultHandler {
 						// Do not replace current settings if there is at least correct
 						// BareJID
 						// already set.
-						if ((packet.getStanzaFrom() == null) ||
-								!from_jid.getBareJID().equals(packet.getStanzaFrom().getBareJID())) {
+						if ((packet.getStanzaFrom() == null) ||!from_jid.getBareJID().equals(packet
+								.getStanzaFrom().getBareJID())) {
 							if (log.isLoggable(Level.FINEST)) {
 								log.log(Level.FINEST, "Setting correct from attribute: {0}", from_jid);
 							}
@@ -243,27 +236,26 @@ public class PacketDefaultHandler {
 							packet.initVars(from_jid, packet.getStanzaTo());
 						} else {
 							if (log.isLoggable(Level.FINEST)) {
-								log.log(
-										Level.FINEST,
+								log.log(Level.FINEST,
 										"Skipping setting correct from attribute: {0}, is already correct.",
 										from_jid);
 							}
 						}
 					} else {
 						log.log(Level.WARNING,
-										"Session is authenticated but session.getJid() is empty: {0}",
-										packet.toStringSecure());
+								"Session is authenticated but session.getJid() is empty: {0}", packet
+								.toStringSecure());
 					}
 				} else {
 
 					// We do not accept anything without resource binding....
 					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-									"You must bind the resource first: " +
-									"http://www.xmpp.org/rfcs/rfc3920.html#bind", true));
+							"You must bind the resource first: " +
+							"http://www.xmpp.org/rfcs/rfc3920.html#bind", true));
 					if (log.isLoggable(Level.INFO)) {
 						log.log(Level.INFO, "Session details: connectionId={0}, sessionId={1}",
-										new Object[] { session.getConnectionId(),
-																	 session.getSessionId() });
+								new Object[] { session.getConnectionId(),
+								session.getSessionId() });
 					}
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Session more detais: JID={0}", session.getjid());
@@ -277,8 +269,8 @@ public class PacketDefaultHandler {
 			// Ignore this packet
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST,
-								"Ignoring packet with an error to non-existen user session: {0}",
-								packet.toStringSecure());
+						"Ignoring packet with an error to non-existen user session: {0}", packet
+						.toStringSecure());
 			}
 		} catch (Exception e) {
 			log.log(Level.FINEST, "Packet preprocessing exception: ", e);
@@ -302,7 +294,7 @@ public class PacketDefaultHandler {
 	 * @throws XMPPException
 	 */
 	public void process(Packet packet, XMPPResourceConnection session,
-											NonAuthUserRepository repo, Queue<Packet> results)
+			NonAuthUserRepository repo, Queue<Packet> results)
 					throws XMPPException {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Processing packet: {0}", packet.toStringSecure());
@@ -312,8 +304,8 @@ public class PacketDefaultHandler {
 
 			// If this is simple <iq type="result"/> then ignore it
 			// and consider it OK
-			if ((to == null) && (packet.getElemName() == "iq") &&
-					(packet.getType() == StanzaType.result)) {
+			if ((to == null) && (packet.getElemName() == "iq") && (packet.getType() ==
+					StanzaType.result)) {
 
 				// Nothing to do....
 				return;
@@ -333,14 +325,14 @@ public class PacketDefaultHandler {
 
 					// In default packet handler we deliver packets to a specific resource only
 					result = Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
-									"The feature is not supported yet.", true);
+							"The feature is not supported yet.", true);
 					result.setPacketFrom(null);
 					result.setPacketTo(null);
 				} else {
 
 					// Otherwise only to the given resource or sent back as error.
-					XMPPResourceConnection con =
-						session.getParentSession().getResourceForResource(resource);
+					XMPPResourceConnection con = session.getParentSession().getResourceForResource(
+							resource);
 
 					if (con != null) {
 						result = packet.copyElementOnly();
@@ -351,12 +343,12 @@ public class PacketDefaultHandler {
 						result.setPacketFrom(packet.getTo());
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST, "Delivering message, packet: {0}, to session: {1}",
-											new Object[] { packet,
-																		 con });
+									new Object[] { packet,
+									con });
 						}
 					} else {
 						result = Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet,
-										"The recipient is no longer available.", true);
+								"The recipient is no longer available.", true);
 						result.setPacketFrom(null);
 						result.setPacketTo(null);
 					}
@@ -380,7 +372,7 @@ public class PacketDefaultHandler {
 		} catch (NotAuthorizedException e) {
 			try {
 				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-								"You must authorize session first.", true));
+						"You must authorize session first.", true));
 				log.log(Level.INFO, "NotAuthorizedException for packet: {0}", packet.toString());
 			} catch (PacketErrorTypeException e2) {
 				log.log(Level.INFO, "Packet processing exception: {0}", e2);
@@ -390,4 +382,4 @@ public class PacketDefaultHandler {
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/28
+//~ Formatted in Tigase Code Convention on 13/05/24

@@ -36,6 +36,7 @@ import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPProcessor;
@@ -148,10 +149,19 @@ public class JabberIqCommand
 
 				// Yes this is message to 'this' client
 				Packet result = packet.copyElementOnly();
+				JID    conId  = session.getConnectionId(packet.getStanzaTo());
 
-				result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
-				result.setPacketFrom(packet.getTo());
-				results.offer(result);
+				if (conId != null) {
+					result.setPacketTo(conId);
+					result.setPacketFrom(packet.getTo());
+					results.offer(result);
+				} else {
+					result = Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet,
+							"The recipient is no longer available.", true);
+					result.setPacketFrom(null);
+					result.setPacketTo(null);
+					results.offer(result);
+				}
 			} else {
 
 				// This is message to some other client
@@ -203,4 +213,4 @@ public class JabberIqCommand
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/12
+//~ Formatted in Tigase Code Convention on 13/05/24

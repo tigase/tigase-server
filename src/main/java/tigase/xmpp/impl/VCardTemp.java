@@ -117,6 +117,50 @@ public class VCardTemp
 	 * @throws PacketErrorTypeException
 	 */
 	@Override
+	public void processFromUserOutPacket(JID connectionId, Packet packet,
+			XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
+			Map<String, Object> settings)
+					throws PacketErrorTypeException {
+		if (session.isLocalDomain(packet.getStanzaTo().getDomain(), false)) {
+
+			// This is a local user so we can quickly get his vCard from the database
+			try {
+				String strvCard = repo.getPublicData(packet.getStanzaTo().getBareJID(), ID,
+						VCARD_KEY, null);
+				Packet result = null;
+
+				if (strvCard != null) {
+					result = parseXMLData(strvCard, packet);
+				} else {
+					result = packet.okResult((String) null, 1);
+				}    // end of if (vcard != null)
+				result.setPacketTo(connectionId);
+				results.offer(result);
+			} catch (UserNotFoundException e) {
+				results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
+						"User not found", true));
+			}    // end of try-catch
+		} else {
+
+			// Else forward the packet to a remote server
+			results.offer(packet.copyElementOnly());
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param connectionId
+	 * @param packet
+	 * @param session
+	 * @param repo
+	 * @param results
+	 * @param settings
+	 *
+	 * @throws PacketErrorTypeException
+	 */
+	@Override
 	public void processFromUserToServerPacket(JID connectionId, Packet packet,
 			XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
 			Map<String, Object> settings)
@@ -236,50 +280,6 @@ public class VCardTemp
 	 * Method description
 	 *
 	 *
-	 * @param connectionId
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 * @param settings
-	 *
-	 * @throws PacketErrorTypeException
-	 */
-	@Override
-	public void processFromUserOutPacket(JID connectionId, Packet packet,
-			XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
-			Map<String, Object> settings)
-					throws PacketErrorTypeException {
-		if (session.isLocalDomain(packet.getStanzaTo().getDomain(), false)) {
-
-			// This is a local user so we can quickly get his vCard from the database
-			try {
-				String strvCard = repo.getPublicData(packet.getStanzaTo().getBareJID(), ID,
-						VCARD_KEY, null);
-				Packet result = null;
-
-				if (strvCard != null) {
-					result = parseXMLData(strvCard, packet);
-				} else {
-					result = packet.okResult((String) null, 1);
-				}    // end of if (vcard != null)
-				result.setPacketTo(connectionId);
-				results.offer(result);
-			} catch (UserNotFoundException e) {
-				results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
-						"User not found", true));
-			}    // end of try-catch
-		} else {
-
-			// Else forward the packet to a remote server
-			results.offer(packet.copyElementOnly());
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
 	 * @param packet
 	 * @param session
 	 * @param repo
@@ -313,6 +313,14 @@ public class VCardTemp
 		if ((session != null) && session.isAuthorized() && (packet.getType() != StanzaType
 				.get)) {
 			try {
+				JID conId = session.getConnectionId(packet.getStanzaTo());
+
+				if (conId == null) {
+
+					// Drop it, user is no longer online.
+					return;
+				}
+
 				Packet result = packet.copyElementOnly();
 
 				result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
@@ -387,4 +395,4 @@ public class VCardTemp
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/03/12
+//~ Formatted in Tigase Code Convention on 13/05/24

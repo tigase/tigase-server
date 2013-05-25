@@ -38,6 +38,7 @@ import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;
@@ -114,6 +115,13 @@ public class JabberIqStats
 			if (packet.isCommand()) {
 				if ((packet.getCommand() == Command.GETSTATS) && (packet.getType() == StanzaType
 						.result)) {
+					JID conId = session.getConnectionId(packet.getStanzaTo());
+
+					if (conId == null) {
+
+						// Drop it, user is no longer online.
+						return;
+					}
 
 					// Send it back to user.
 					Element iq = ElementUtils.createIqQuery(session.getDomainAsJID(), session
@@ -126,7 +134,7 @@ public class JabberIqStats
 					Packet result = Packet.packetInstance(iq, session.getSMComponentId(), session
 							.getJID());
 
-					result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
+					result.setPacketTo(conId);
 					results.offer(result);
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Sending result: {0}", result);
@@ -233,4 +241,4 @@ public class JabberIqStats
 }    // JabberIqStats
 
 
-//~ Formatted in Tigase Code Convention on 13/03/12
+//~ Formatted in Tigase Code Convention on 13/05/24
