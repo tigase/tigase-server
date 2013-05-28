@@ -1,10 +1,13 @@
 /*
+ * LogFormatter.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,25 +18,19 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.util;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import java.util.Calendar;
-import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Map;
 
 /**
  * Describe class LogFormatter here.
@@ -44,13 +41,15 @@ import java.util.logging.LogRecord;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class LogFormatter extends Formatter {
-
+public class LogFormatter
+				extends Formatter {
 	/** Field description */
 	public static final Map<Integer, LogWithStackTraceEntry> errors =
-		new ConcurrentSkipListMap<Integer, LogWithStackTraceEntry>();
-	private static int MED_LEN = 55;
-	private static int LEVEL_OFFSET = 12;
+			new ConcurrentSkipListMap<Integer, LogWithStackTraceEntry>();
+	private static int DATE_TIME_LEN = 24;
+	private static int LEVEL_OFFSET  = 12;
+	private static int MED_LEN       = 35;
+	private static int TH_NAME_LEN   = 17;
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -76,38 +75,37 @@ public class LogFormatter extends Formatter {
 	 */
 	@Override
 	public synchronized String format(LogRecord record) {
-		StringBuilder sb = new StringBuilder(100);
+		StringBuilder sb = new StringBuilder(200);
 
 		cal.setTimeInMillis(record.getMillis());
-		sb.append(String.format("%1$tF %1$tT", cal));
+		sb.append(String.format("%1$tF %1$tT.%1$tL", cal));
 
+		String th_name = Thread.currentThread().getName();
+
+		sb.append(" [").append(th_name).append("]");
+		while (sb.length() < DATE_TIME_LEN + TH_NAME_LEN) {
+			sb.append(' ');
+		}    // end of while (sb.length() < MEDIUM_LEN)
 		if (record.getSourceClassName() != null) {
 			String clsName = record.getSourceClassName();
-			int idx = clsName.lastIndexOf('.');
+			int    idx     = clsName.lastIndexOf('.');
 
 			if (idx >= 0) {
 				clsName = clsName.substring(idx + 1);
 			}    // end of if (idx >= 0)
-
 			sb.append("  ").append(clsName);
 		}      // end of if (record.getSourceClassName() != null)
-
 		if (record.getSourceMethodName() != null) {
 			sb.append(".").append(record.getSourceMethodName()).append("()");
 		}    // end of if (record.getSourceMethodName() != null)
-
-		while (sb.length() < MED_LEN) {
+		while (sb.length() < DATE_TIME_LEN + TH_NAME_LEN + MED_LEN) {
 			sb.append(' ');
 		}    // end of while (sb.length() < MEDIUM_LEN)
-
 		sb.append("  ").append(record.getLevel()).append(": ");
-
-		while (sb.length() < MED_LEN + LEVEL_OFFSET) {
+		while (sb.length() < DATE_TIME_LEN + TH_NAME_LEN + MED_LEN + LEVEL_OFFSET) {
 			sb.append(' ');
 		}    // end of while (sb.length() < MEDIUM_LEN)
-
 		sb.append(formatMessage(record));
-
 		if (record.getThrown() != null) {
 			sb.append('\n').append(record.getThrown().toString());
 
@@ -122,7 +120,7 @@ public class LogFormatter extends Formatter {
 	}
 
 	private void addError(Throwable thrown, String stack, String log_msg) {
-		Integer code = stack.hashCode();
+		Integer                code  = stack.hashCode();
 		LogWithStackTraceEntry entry = errors.get(code);
 
 		if (entry == null) {
@@ -131,11 +129,9 @@ public class LogFormatter extends Formatter {
 			if (msg == null) {
 				msg = thrown.toString();
 			}
-
 			entry = new LogWithStackTraceEntry(msg, log_msg);
 			errors.put(code, entry);
 		}
-
 		entry.increment();
 	}
 
@@ -163,7 +159,4 @@ public class LogFormatter extends Formatter {
 }    // LogFormatter
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/05/27
