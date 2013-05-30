@@ -191,30 +191,6 @@ public abstract class IOService<RefObject>
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * Method description
-	 *
-	 *
-	 * @throws IOException
-	 */
-	public abstract void processWaitingPackets() throws IOException;
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @throws IOException
-	 */
-	protected abstract void processSocketData() throws IOException;
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	protected abstract int receivedPackets();
-
-	/**
 	 * Method
 	 * <code>accept</code> is used to perform
 	 *
@@ -243,7 +219,7 @@ public abstract class IOService<RefObject>
 			} catch (Exception ex) {
 				sock_str = ex.toString();
 			}
-			log.log(Level.INFO,
+			log.log(Level.FINER,
 					"Problem connecting to remote host: {0}, address: {1}, socket: {2} - exception: {3}, session data: {4}",
 					new Object[] { host,
 					remote_address, sock_str, e, sessionData });
@@ -354,114 +330,6 @@ public abstract class IOService<RefObject>
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public JID getDataReceiver() {
-		return this.dataReceiver;
-	}
-
-	/**
-	 * This method returns the time of last transfer in any direction
-	 * through this service. It is used to help detect dead connections.
-	 *
-	 * @return
-	 */
-	public long getLastTransferTime() {
-		return lastTransferTime;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public String getLocalAddress() {
-		return local_address;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public long[] getReadCounters() {
-		return rdData;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public RefObject getRefObject() {
-		return refObject;
-	}
-
-	/**
-	 * Returns a remote IP address for the TCP/IP connection.
-	 *
-	 *
-	 * @return a remote IP address for the TCP/IP connection.
-	 */
-	public String getRemoteAddress() {
-		return remote_address;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public ConcurrentMap<String, Object> getSessionData() {
-		return sessionData;
-	}
-
-	/**
-	 * Method
-	 * <code>getSocketChannel</code> is used to perform
-	 *
-	 * @return a
-	 * <code>SocketChannel</code> value
-	 */
-	public SocketChannel getSocketChannel() {
-		return socketIO.getSocketChannel();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 * @param reset
-	 */
-	public void getStatistics(StatisticsList list, boolean reset) {
-		if (socketIO != null) {
-			socketIO.getStatistics(list, reset);
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public long[] getWriteCounters() {
-		return wrData;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -496,173 +364,13 @@ public abstract class IOService<RefObject>
 		serviceListener.tlsHandshakeCompleted(this);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Describe
-	 * <code>isConnected</code> method here.
-	 *
-	 * @return a
-	 * <code>boolean</code> value
-	 */
-	public boolean isConnected() {
-		boolean result = (socketIO == null)
-				? false
-				: socketIO.isConnected();
-
-		if (log.isLoggable(Level.FINEST)) {
-
-			// if (socketIO.getSocketChannel().socket().getLocalPort() == 5269) {
-			// Throwable thr = new Throwable();
-			//
-			// thr.fillInStackTrace();
-			// log.log(Level.FINEST, "Socket: " + socketIO + ", Connected: " + result,
-			// thr);
-			// }
-			log.log(Level.FINEST, "Socket: {0}, Connected: {1}, id: {2}", new Object[] {
-					socketIO,
-					result, connectionId });
-		}
-
-		return result;
-	}
-
-	//~--- set methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param address
+	 * @throws IOException
 	 */
-	public void setDataReceiver(JID address) {
-		this.dataReceiver = address;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param sl
-	 */
-
-	// @SuppressWarnings("unchecked")
-	public void setIOServiceListener(IOServiceListener<IOService<RefObject>> sl) {
-		this.serviceListener = sl;
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param reset
-	 *
-	 * @return
-	 */
-	public long getBytesSent(boolean reset) {
-		return socketIO.getBytesSent(reset);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public long getTotalBytesSent() {
-		return socketIO.getTotalBytesSent();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param reset
-	 *
-	 * @return
-	 */
-	public long getBytesReceived(boolean reset) {
-		return socketIO.getBytesReceived(reset);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public long getTotalBytesReceived() {
-		return socketIO.getTotalBytesReceived();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param reset
-	 *
-	 * @return
-	 */
-	public long getBuffOverflow(boolean reset) {
-		return socketIO.getBuffOverflow(reset);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public long getTotalBuffOverflow() {
-		return socketIO.getTotalBuffOverflow();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public String getUniqueId() {
-		return id;
-	}
-
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param refObject
-	 */
-	public void setRefObject(RefObject refObject) {
-		this.refObject = refObject;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param props
-	 */
-	public void setSessionData(Map<String, Object> props) {
-
-		// Sometimes, some values are null which is allowed in the original Map
-		// however, ConcurrentHashMap does not allow nulls as value so we have
-		// to copy Maps carefully.
-		sessionData = new ConcurrentHashMap<String, Object>(props.size());
-		for (Map.Entry<String, Object> entry : props.entrySet()) {
-			if (entry.getValue() != null) {
-				sessionData.put(entry.getKey(), entry.getValue());
-			}
-		}
-		connectionType = ConnectionType.valueOf(sessionData.get(PORT_TYPE_PROP_KEY)
-				.toString());
-	}
-
-	//~--- methods --------------------------------------------------------------
+	public abstract void processWaitingPackets() throws IOException;
 
 	/**
 	 * Method description
@@ -738,32 +446,6 @@ public abstract class IOService<RefObject>
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public TrustManager[] getX509TrustManagers() {
-		return x509TrustManagers;
-	}
-
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param trustManager
-	 */
-	public void setX509TrustManagers(TrustManager[] trustManager) {
-		this.x509TrustManagers = trustManager;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -831,6 +513,319 @@ public abstract class IOService<RefObject>
 		return socketIO.waitingToSendSize();
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param reset
+	 *
+	 * @return
+	 */
+	public long getBuffOverflow(boolean reset) {
+		return socketIO.getBuffOverflow(reset);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param reset
+	 *
+	 * @return
+	 */
+	public long getBytesReceived(boolean reset) {
+		return socketIO.getBytesReceived(reset);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param reset
+	 *
+	 * @return
+	 */
+	public long getBytesSent(boolean reset) {
+		return socketIO.getBytesSent(reset);
+	}
+
+	/**
+	 * @return the connectionId
+	 */
+	public JID getConnectionId() {
+		return connectionId;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public JID getDataReceiver() {
+		return this.dataReceiver;
+	}
+
+	/**
+	 * This method returns the time of last transfer in any direction
+	 * through this service. It is used to help detect dead connections.
+	 *
+	 * @return
+	 */
+	public long getLastTransferTime() {
+		return lastTransferTime;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public String getLocalAddress() {
+		return local_address;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public List<String> getPeersJIDsFromCert() {
+		return peersJIDsFromCert;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long[] getReadCounters() {
+		return rdData;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public RefObject getRefObject() {
+		return refObject;
+	}
+
+	/**
+	 * Returns a remote IP address for the TCP/IP connection.
+	 *
+	 *
+	 * @return a remote IP address for the TCP/IP connection.
+	 */
+	public String getRemoteAddress() {
+		return remote_address;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public ConcurrentMap<String, Object> getSessionData() {
+		return sessionData;
+	}
+
+	/**
+	 * Method
+	 * <code>getSocketChannel</code> is used to perform
+	 *
+	 * @return a
+	 * <code>SocketChannel</code> value
+	 */
+	public SocketChannel getSocketChannel() {
+		return socketIO.getSocketChannel();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param list
+	 * @param reset
+	 */
+	public void getStatistics(StatisticsList list, boolean reset) {
+		if (socketIO != null) {
+			socketIO.getStatistics(list, reset);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long getTotalBuffOverflow() {
+		return socketIO.getTotalBuffOverflow();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long getTotalBytesReceived() {
+		return socketIO.getTotalBytesReceived();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long getTotalBytesSent() {
+		return socketIO.getTotalBytesSent();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public String getUniqueId() {
+		return id;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long[] getWriteCounters() {
+		return wrData;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public TrustManager[] getX509TrustManagers() {
+		return x509TrustManagers;
+	}
+
+	/**
+	 * Describe
+	 * <code>isConnected</code> method here.
+	 *
+	 * @return a
+	 * <code>boolean</code> value
+	 */
+	public boolean isConnected() {
+		boolean result = (socketIO == null)
+				? false
+				: socketIO.isConnected();
+
+		if (log.isLoggable(Level.FINEST)) {
+
+			// if (socketIO.getSocketChannel().socket().getLocalPort() == 5269) {
+			// Throwable thr = new Throwable();
+			//
+			// thr.fillInStackTrace();
+			// log.log(Level.FINEST, "Socket: " + socketIO + ", Connected: " + result,
+			// thr);
+			// }
+			log.log(Level.FINEST, "Socket: {0}, Connected: {1}, id: {2}", new Object[] {
+					socketIO,
+					result, connectionId });
+		}
+
+		return result;
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * @param connectionId the connectionId to set
+	 */
+	public void setConnectionId(JID connectionId) {
+		this.connectionId = connectionId;
+		socketIO.setLogId(connectionId.toString());
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param address
+	 */
+	public void setDataReceiver(JID address) {
+		this.dataReceiver = address;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param sl
+	 */
+
+	// @SuppressWarnings("unchecked")
+	public void setIOServiceListener(IOServiceListener<IOService<RefObject>> sl) {
+		this.serviceListener = sl;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param refObject
+	 */
+	public void setRefObject(RefObject refObject) {
+		this.refObject = refObject;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param props
+	 */
+	public void setSessionData(Map<String, Object> props) {
+
+		// Sometimes, some values are null which is allowed in the original Map
+		// however, ConcurrentHashMap does not allow nulls as value so we have
+		// to copy Maps carefully.
+		sessionData = new ConcurrentHashMap<String, Object>(props.size());
+		for (Map.Entry<String, Object> entry : props.entrySet()) {
+			if (entry.getValue() != null) {
+				sessionData.put(entry.getKey(), entry.getValue());
+			}
+		}
+		connectionType = ConnectionType.valueOf(sessionData.get(PORT_TYPE_PROP_KEY)
+				.toString());
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param trustManager
+	 */
+	public void setX509TrustManagers(TrustManager[] trustManager) {
+		this.x509TrustManagers = trustManager;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
 	/**
 	 * Method description
 	 *
@@ -840,19 +835,6 @@ public abstract class IOService<RefObject>
 	protected ByteOrder byteOrder() {
 		return ByteOrder.BIG_ENDIAN;
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 * @return
-	 */
-	protected boolean isInputBufferEmpty() {
-		return (socketInput != null) && (socketInput.remaining() == socketInput.capacity());
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Describe
@@ -896,6 +878,62 @@ public abstract class IOService<RefObject>
 		}
 
 		return true;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @throws IOException
+	 */
+	protected abstract void processSocketData() throws IOException;
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 *
+	 * @throws IOException
+	 */
+	protected ByteBuffer readBytes() throws IOException {
+		setLastTransferTime();
+		if (log.isLoggable(Level.FINEST) && (empty_read_call_count > 10)) {
+			Throwable thr = new Throwable();
+
+			thr.fillInStackTrace();
+			log.log(Level.FINEST, "Socket: " + socketIO, thr);
+		}
+		try {
+			ByteBuffer tmpBuffer = socketIO.read(socketInput);
+
+			if (socketIO.bytesRead() > 0) {
+				empty_read_call_count = 0;
+
+				return tmpBuffer;
+			} else {
+				if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS && (!writeInProgress
+						.isLocked())) {
+					log.log(Level.WARNING,
+							"Socket: {0}, Max allowed empty calls excceeded, closing connection.",
+							socketIO);
+					forceStop();
+				}
+			}
+		} catch (BufferUnderflowException ex) {
+			resizeInputBuffer();
+
+			return readBytes();
+		} catch (Exception eof) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Socket: " + socketIO + ", Exception reading data", eof);
+			}
+
+			// eof.printStackTrace();
+			forceStop();
+		}
+
+		return null;
 	}
 
 	/**
@@ -1109,47 +1147,64 @@ public abstract class IOService<RefObject>
 	 *
 	 *
 	 * @return
-	 *
-	 * @throws IOException
 	 */
-	protected ByteBuffer readBytes() throws IOException {
-		setLastTransferTime();
-		if (log.isLoggable(Level.FINEST) && (empty_read_call_count > 10)) {
-			Throwable thr = new Throwable();
+	protected abstract int receivedPackets();
 
-			thr.fillInStackTrace();
-			log.log(Level.FINEST, "Socket: " + socketIO, thr);
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param data
+	 */
+	protected void writeBytes(ByteBuffer data) {
+
+		// Try to lock the data writing method
+		boolean locked = writeInProgress.tryLock();
+
+		// If cannot lock and nothing to send, just leave
+		if (!locked && (data == null)) {
+			return;
 		}
+
+		// Otherwise wait.....
+		if (!locked) {
+			writeInProgress.lock();
+		}
+
+		// Avoid concurrent calls here (one from call() and another from
+		// application)
 		try {
-			ByteBuffer tmpBuffer = socketIO.read(socketInput);
+			if ((data != null) && data.hasRemaining()) {
+				int length = data.remaining();
 
-			if (socketIO.bytesRead() > 0) {
+				socketIO.write(data);
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Socket: {0}, wrote: {1}", new Object[] { socketIO,
+							length });
+				}
+
+				// idx_start = idx_offset;
+				// idx_offset = Math.min(idx_start + out_buff_size, data.length());
+				// }
+				setLastTransferTime();
+
+				// addWritten(data.length());
 				empty_read_call_count = 0;
-
-				return tmpBuffer;
 			} else {
-				if ((++empty_read_call_count) > MAX_ALLOWED_EMPTY_CALLS && (!writeInProgress
-						.isLocked())) {
-					log.log(Level.WARNING,
-							"Socket: {0}, Max allowed empty calls excceeded, closing connection.",
-							socketIO);
-					forceStop();
+				if (socketIO.waitingToSend()) {
+					socketIO.write(null);
+					setLastTransferTime();
+					empty_read_call_count = 0;
 				}
 			}
-		} catch (BufferUnderflowException ex) {
-			resizeInputBuffer();
-
-			return readBytes();
-		} catch (Exception eof) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Socket: " + socketIO + ", Exception reading data", eof);
+		} catch (Exception e) {
+			if (log.isLoggable(Level.FINER)) {
+				log.log(Level.FINER, "Data writing exception " + connectionId, e);
 			}
-
-			// eof.printStackTrace();
 			forceStop();
+		} finally {
+			writeInProgress.unlock();
 		}
-
-		return null;
 	}
 
 	/**
@@ -1238,62 +1293,18 @@ public abstract class IOService<RefObject>
 		}
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	/**
 	 * Method description
 	 *
-	 *
-	 * @param data
+	 * @return
 	 */
-	protected void writeBytes(ByteBuffer data) {
-
-		// Try to lock the data writing method
-		boolean locked = writeInProgress.tryLock();
-
-		// If cannot lock and nothing to send, just leave
-		if (!locked && (data == null)) {
-			return;
-		}
-
-		// Otherwise wait.....
-		if (!locked) {
-			writeInProgress.lock();
-		}
-
-		// Avoid concurrent calls here (one from call() and another from
-		// application)
-		try {
-			if ((data != null) && data.hasRemaining()) {
-				int length = data.remaining();
-
-				socketIO.write(data);
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Socket: {0}, wrote: {1}", new Object[] { socketIO,
-							length });
-				}
-
-				// idx_start = idx_offset;
-				// idx_offset = Math.min(idx_start + out_buff_size, data.length());
-				// }
-				setLastTransferTime();
-
-				// addWritten(data.length());
-				empty_read_call_count = 0;
-			} else {
-				if (socketIO.waitingToSend()) {
-					socketIO.write(null);
-					setLastTransferTime();
-					empty_read_call_count = 0;
-				}
-			}
-		} catch (Exception e) {
-			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER, "Data writing exception " + connectionId, e);
-			}
-			forceStop();
-		} finally {
-			writeInProgress.unlock();
-		}
+	protected boolean isInputBufferEmpty() {
+		return (socketInput != null) && (socketInput.remaining() == socketInput.capacity());
 	}
+
+	//~--- methods --------------------------------------------------------------
 
 	private void resizeInputBuffer() throws IOException {
 		int netSize = socketIO.getInputPacketSize();
@@ -1353,38 +1364,7 @@ public abstract class IOService<RefObject>
 	private void setLastTransferTime() {
 		lastTransferTime = System.currentTimeMillis();
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * @return the connectionId
-	 */
-	public JID getConnectionId() {
-		return connectionId;
-	}
-
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * @param connectionId the connectionId to set
-	 */
-	public void setConnectionId(JID connectionId) {
-		this.connectionId = connectionId;
-		socketIO.setLogId(connectionId.toString());
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public List<String> getPeersJIDsFromCert() {
-		return peersJIDsFromCert;
-	}
 }    // IOService
 
 
-//~ Formatted in Tigase Code Convention on 13/03/19
+//~ Formatted in Tigase Code Convention on 13/05/29
