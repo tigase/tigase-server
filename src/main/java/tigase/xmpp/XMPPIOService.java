@@ -720,6 +720,10 @@ public class XMPPIOService<RefObject>
 		this.jid = jid;
 	}
 
+	public String getUserJid() {
+		return this.jid;
+	}
+	
 	//~--- methods --------------------------------------------------------------
 
 	/**

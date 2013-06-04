@@ -537,6 +537,11 @@ public class ClientConnectionManager
 				Packet command = Command.STREAM_CLOSED.getPacket(serv.getConnectionId(), serv
 						.getDataReceiver(), StanzaType.set, UUID.randomUUID().toString());
 
+				String userJid = serv.getUserJid();
+				if (userJid != null) {
+					Command.addFieldValue(command, "user-jid", userJid);
+				}
+				
 				// In case of mass-disconnects, adjust the timeout properly
 				addOutPacketWithTimeout(command, stoppedHandler, 120l, TimeUnit.SECONDS);
 				log.log(Level.FINE, "Service stopped, sending packet: {0}", command);
