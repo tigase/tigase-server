@@ -33,6 +33,10 @@ public abstract class TimerTask implements Runnable {
 	public void setScheduledFuture(ScheduledFuture<?> future) {
 		this.future = future;
 	}
+
+	public boolean isScheduled() {
+		return future != null && !future.isCancelled() && !future.isDone();
+	}
 	
 	public void cancel() {
 		if (future != null) {

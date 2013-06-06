@@ -445,7 +445,6 @@ public abstract class AbstractMessageReceiver
 	 *
 	 * @param task
 	 * @param delay
-	 * @deprecated
 	 */
 	public void addTimerTask(tigase.util.TimerTask task, long delay) {
 		ScheduledFuture<?> future = receiverScheduler.schedule(task, delay, TimeUnit
@@ -1183,8 +1182,7 @@ public abstract class AbstractMessageReceiver
 	 *
 	 * @param task
 	 * @param delay
-	 * @param unit
-	 * @deprecated
+	 * @param uni
 	 */
 	protected void addTimerTask(tigase.util.TimerTask task, long delay, TimeUnit unit) {
 		ScheduledFuture<?> future = receiverScheduler.schedule(task, delay, unit);
