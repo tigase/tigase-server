@@ -2,7 +2,7 @@
  * BasicComponent.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -102,28 +102,29 @@ public class BasicComponent
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
-	protected VHostManagerIfc vHostManager = null;
-	private JID compId                     = null;
-	private String DEF_HOSTNAME_PROP_VAL   = DNSResolver.getDefaultHostname();
-	private String name                    = null;
-	private BareJID defHostname            =
-		BareJID.bareJIDInstanceNS(DEF_HOSTNAME_PROP_VAL);
+	protected VHostManagerIfc vHostManager          = null;
+	private JID               compId                = null;
+	private String            DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefaultHostname();
+	private String            name                  = null;
+	private BareJID           defHostname = BareJID.bareJIDInstanceNS(
+			DEF_HOSTNAME_PROP_VAL);
 
 	/** Field description */
 	protected Map<String, CommandIfc> scriptCommands = new ConcurrentHashMap<String,
-																											 CommandIfc>(20);
-	private boolean nonAdminCommands                 = false;
+			CommandIfc>(20);
+	private boolean                      nonAdminCommands = false;
 	private Map<String, EnumSet<CmdAcl>> commandsACL = new ConcurrentHashMap<String,
-																											 EnumSet<CmdAcl>>(20);
+			EnumSet<CmdAcl>>(20);
 
 	/**
 	 * List of the component administrators
 	 */
-	protected Set<BareJID> admins                   = new ConcurrentSkipListSet<BareJID>();
-	private ScriptEngineManager scriptEngineManager = null;
-	private String scriptsBaseDir                   = null;
-	private String scriptsCompDir                   = null;
-	private ServiceEntity serviceEntity             = null;
+	protected Set<BareJID>      admins = new ConcurrentSkipListSet<BareJID>();
+	private ScriptEngineManager scriptEngineManager     = null;
+	private String              scriptsBaseDir          = null;
+	private String              scriptsCompDir          = null;
+	private ServiceEntity       serviceEntity           = null;
+	private boolean             initializationCompleted = false;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -213,6 +214,195 @@ public class BasicComponent
 		return false;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean handlesLocalDomains() {
+		return false;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean handlesNameSubdomains() {
+		return true;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean handlesNonLocalDomains() {
+		return false;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param binds
+	 */
+	public void initBindings(Bindings binds) {
+		binds.put(CommandIfc.VHOST_MANAGER, vHostManager);
+		binds.put(CommandIfc.ADMINS_SET, admins);
+		binds.put(CommandIfc.COMMANDS_ACL, commandsACL);
+		binds.put(CommandIfc.SCRI_MANA, scriptEngineManager);
+		binds.put(CommandIfc.ADMN_CMDS, scriptCommands);
+		binds.put(CommandIfc.ADMN_DISC, serviceEntity);
+		binds.put(CommandIfc.SCRIPT_BASE_DIR, scriptsBaseDir);
+		binds.put(CommandIfc.SCRIPT_COMP_DIR, scriptsCompDir);
+		binds.put(CommandIfc.COMPONENT_NAME, getName());
+	}
+
+	/**
+	 * Method description
+	 *
+	 */
+	@Override
+	public void initializationCompleted() {
+		initializationCompleted = true;
+
+//  log.log(Level.WARNING,
+//      "initializationCompleted for component name: {0}, full JID: {1}", new Object[] {
+//      getName(),
+//      getComponentId() });
+//  Thread.dumpStack();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param results
+	 */
+	@Override
+	public void processPacket(Packet packet, Queue<Packet> results) {
+		if (packet.isCommand() && getName().equals(packet.getStanzaTo().getLocalpart()) &&
+				isLocalDomain(packet.getStanzaTo().getDomain())) {
+			processScriptCommand(packet, results);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 */
+	@Override
+	public void release() {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param domain
+	 */
+	public void removeComponentDomain(String domain) {
+		vHostManager.removeComponentDomain(domain);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param jid
+	 * @param node
+	 * @param description
+	 */
+	public void removeServiceDiscoveryItem(String jid, String node, String description) {
+		ServiceEntity item = new ServiceEntity(jid, node, description);
+
+		// item.addIdentities(new ServiceIdentity("component", identity_type,
+		// name));
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Modifying service-discovery info, removing: {0}", item);
+		}
+		serviceEntity.removeItems(item);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param jid
+	 * @param node
+	 * @param description
+	 * @param admin
+	 */
+	public void updateServiceDiscoveryItem(String jid, String node, String description,
+			boolean admin) {
+		updateServiceDiscoveryItem(jid, node, description, admin, (String[]) null);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param jid
+	 * @param node
+	 * @param description
+	 * @param admin
+	 * @param features
+	 */
+	public void updateServiceDiscoveryItem(String jid, String node, String description,
+			boolean admin, String... features) {
+		updateServiceDiscoveryItem(jid, node, description, null, null, admin, features);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param jid
+	 * @param node
+	 * @param description
+	 * @param category
+	 * @param type
+	 * @param admin
+	 * @param features
+	 */
+	public void updateServiceDiscoveryItem(String jid, String node, String description,
+			String category, String type, boolean admin, String... features) {
+		if (serviceEntity.getJID().equals(jid) && (serviceEntity.getNode() == node)) {
+			serviceEntity.setAdminOnly(admin);
+			serviceEntity.setDescription(description);
+			if ((category != null) || (type != null)) {
+				serviceEntity.addIdentities(new ServiceIdentity(category, type, description));
+			}
+			if (features != null) {
+				serviceEntity.setFeatures("http://jabber.org/protocol/commands");
+				serviceEntity.addFeatures(features);
+			}
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Modifying service-discovery info: {0}", serviceEntity);
+			}
+		} else {
+			ServiceEntity item = new ServiceEntity(jid, node, description, admin);
+
+			if ((category != null) || (type != null)) {
+				item.addIdentities(new ServiceIdentity(category, type, description));
+			}
+			if (features != null) {
+				item.addFeatures(features);
+			}
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Adding new item: {0}", item);
+			}
+			serviceEntity.addItems(item);
+		}
+	}
+
 	//~--- get methods ----------------------------------------------------------
 
 	/**
@@ -224,16 +414,6 @@ public class BasicComponent
 	@Override
 	public JID getComponentId() {
 		return compId;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public BareJID getDefHostName() {
-		return defHostname;
 	}
 
 	/**
@@ -278,8 +458,20 @@ public class BasicComponent
 	 *
 	 * @return
 	 */
-	public String getDiscoCategoryType() {
-		return "generic";
+	public BareJID getDefHostName() {
+		return defHostname;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public BareJID getDefVHostItem() {
+		return (vHostManager != null)
+				? vHostManager.getDefVHostItem()
+				: getDefHostName();
 	}
 
 	/**
@@ -290,6 +482,16 @@ public class BasicComponent
 	 */
 	public String getDiscoCategory() {
 		return "component";
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public String getDiscoCategoryType() {
+		return "generic";
 	}
 
 	/**
@@ -359,8 +561,8 @@ public class BasicComponent
 		}
 
 		// OLD API support end
-		if (getName().equals(jid.getLocalpart()) ||
-				jid.toString().startsWith(getName() + ".")) {
+		if (getName().equals(jid.getLocalpart()) || jid.toString().startsWith(getName() +
+				".")) {
 			return serviceEntity.getDiscoInfo(node, isAdmin(from) || nonAdminCommands);
 		}
 
@@ -392,35 +594,6 @@ public class BasicComponent
 	 *
 	 * @return
 	 */
-	public List<Element> getScriptItems(String node, JID jid, JID from) {
-		LinkedList<Element> result = null;
-		boolean isAdminFrom        = isAdmin(from);
-
-		if (node.equals("http://jabber.org/protocol/commands") &&
-				(isAdminFrom || nonAdminCommands)) {
-			result = new LinkedList<Element>();
-			for (CommandIfc comm : scriptCommands.values()) {
-				if (!comm.isAdminOnly() || isAdminFrom) {
-					result.add(new Element("item", new String[] { "node", "name", "jid" },
-																 new String[] { comm.getCommandId(),
-									comm.getDescription(), jid.toString() }));
-				}
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param node
-	 * @param jid
-	 * @param from
-	 *
-	 * @return
-	 */
 	@Override
 	public List<Element> getDiscoItems(String node, JID jid, JID from) {
 
@@ -434,26 +607,26 @@ public class BasicComponent
 		// OLD API support end
 		boolean isAdminFrom = isAdmin(from);
 
-		if (getName().equals(jid.getLocalpart()) ||
-				jid.toString().startsWith(getName() + ".")) {
+		if (getName().equals(jid.getLocalpart()) || jid.toString().startsWith(getName() +
+				".")) {
 			if (node != null) {
-				if (node.equals("http://jabber.org/protocol/commands") &&
-						(isAdminFrom || nonAdminCommands)) {
+				if (node.equals("http://jabber.org/protocol/commands") && (isAdminFrom ||
+						nonAdminCommands)) {
 					result = new LinkedList<Element>();
 					for (CommandIfc comm : scriptCommands.values()) {
 						if (!comm.isAdminOnly() || isAdminFrom) {
 							result.add(new Element("item", new String[] { "node", "name", "jid" },
-																		 new String[] { comm.getCommandId(),
-											comm.getDescription(), jid.toString() }));
+									new String[] { comm.getCommandId(),
+									comm.getDescription(), jid.toString() }));
 						}
 					}
 				} else {
-					result = serviceEntity.getDiscoItems(node, jid.toString(),
-									(isAdminFrom || nonAdminCommands));
+					result = serviceEntity.getDiscoItems(node, jid.toString(), (isAdminFrom ||
+							nonAdminCommands));
 				}
 			} else {
-				result = serviceEntity.getDiscoItems(null, jid.toString(),
-								(isAdminFrom || nonAdminCommands));
+				result = serviceEntity.getDiscoItems(null, jid.toString(), (isAdminFrom ||
+						nonAdminCommands));
 				if (result != null) {
 					for (Iterator<Element> it = result.iterator(); it.hasNext(); ) {
 						Element element = it.next();
@@ -468,32 +641,32 @@ public class BasicComponent
 			// Element result = serviceEntity.getDiscoItem(null, getName() + "." + jid);
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Found disco items: {0}", ((result != null)
-								? result.toString()
-								: null));
+						? result.toString()
+						: null));
 			}
 
 			return result;
 		} else {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "{0} General disco items request, node: {1}",
-								new Object[] { getName(),
-															 node });
+						new Object[] { getName(),
+						node });
 			}
 			if (node == null) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0} Disco items request for null node",
-									new Object[] { getName() });
+					log.log(Level.FINEST, "{0} Disco items request for null node", new Object[] {
+							getName() });
 				}
 
 				Element res = null;
 
 				if (!serviceEntity.isAdminOnly() || isAdmin(from) || nonAdminCommands) {
 					res = serviceEntity.getDiscoItem(null, isSubdomain()
-									? (getName() + "." + jid)
-									: getName() + "@" + jid.toString());
+							? (getName() + "." + jid)
+							: getName() + "@" + jid.toString());
 				}
-				result = serviceEntity.getDiscoItems(null, null,
-								(isAdminFrom || nonAdminCommands));
+				result = serviceEntity.getDiscoItems(null, null, (isAdminFrom ||
+						nonAdminCommands));
 				if (res != null) {
 					if (result != null) {
 						for (Iterator<Element> it = result.iterator(); it.hasNext(); ) {
@@ -529,89 +702,44 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
+	 * @param node
+	 * @param jid
+	 * @param from
+	 *
+	 * @return
+	 */
+	public List<Element> getScriptItems(String node, JID jid, JID from) {
+		LinkedList<Element> result      = null;
+		boolean             isAdminFrom = isAdmin(from);
+
+		if (node.equals("http://jabber.org/protocol/commands") && (isAdminFrom ||
+				nonAdminCommands)) {
+			result = new LinkedList<Element>();
+			for (CommandIfc comm : scriptCommands.values()) {
+				if (!comm.isAdminOnly() || isAdminFrom) {
+					result.add(new Element("item", new String[] { "node", "name", "jid" },
+							new String[] { comm.getCommandId(),
+							comm.getDescription(), jid.toString() }));
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param domain
 	 *
 	 * @return
 	 */
 	public VHostItem getVHostItem(String domain) {
 		return (vHostManager != null)
-					 ? vHostManager.getVHostItem(domain)
-					 : null;
+				? vHostManager.getVHostItem(domain)
+				: null;
 	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public BareJID getDefVHostItem() {
-		return (vHostManager != null)
-					 ? vHostManager.getDefVHostItem()
-					 : getDefHostName();
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public boolean handlesLocalDomains() {
-		return false;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public boolean handlesNameSubdomains() {
-		return true;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public boolean handlesNonLocalDomains() {
-		return false;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param binds
-	 */
-	public void initBindings(Bindings binds) {
-		binds.put(CommandIfc.VHOST_MANAGER, vHostManager);
-		binds.put(CommandIfc.ADMINS_SET, admins);
-		binds.put(CommandIfc.COMMANDS_ACL, commandsACL);
-		binds.put(CommandIfc.SCRI_MANA, scriptEngineManager);
-		binds.put(CommandIfc.ADMN_CMDS, scriptCommands);
-		binds.put(CommandIfc.ADMN_DISC, serviceEntity);
-		binds.put(CommandIfc.SCRIPT_BASE_DIR, scriptsBaseDir);
-		binds.put(CommandIfc.SCRIPT_COMP_DIR, scriptsCompDir);
-		binds.put(CommandIfc.COMPONENT_NAME, getName());
-	}
-
-	/**
-	 * Method description
-	 *
-	 */
-	@Override
-	public void initializationCompleted() {}
-
-	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -629,14 +757,25 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
+	 * @return
+	 */
+	@Override
+	public boolean isInitializationComplete() {
+		return initializationCompleted;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param domain
 	 *
 	 * @return
 	 */
 	public boolean isLocalDomain(String domain) {
 		return (vHostManager != null)
-					 ? vHostManager.isLocalDomain(domain)
-					 : false;
+				? vHostManager.isLocalDomain(domain)
+				: false;
 	}
 
 	/**
@@ -649,8 +788,8 @@ public class BasicComponent
 	 */
 	public boolean isLocalDomainOrComponent(String domain) {
 		return (vHostManager != null)
-					 ? vHostManager.isLocalDomainOrComponent(domain)
-					 : false;
+				? vHostManager.isLocalDomainOrComponent(domain)
+				: false;
 	}
 
 	/**
@@ -660,59 +799,6 @@ public class BasicComponent
 	 */
 	public boolean isSubdomain() {
 		return false;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param results
-	 */
-	@Override
-	public void processPacket(Packet packet, Queue<Packet> results) {
-		if (packet.isCommand() && getName().equals(packet.getStanzaTo().getLocalpart()) &&
-				isLocalDomain(packet.getStanzaTo().getDomain())) {
-			processScriptCommand(packet, results);
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 */
-	@Override
-	public void release() {}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 */
-	public void removeComponentDomain(String domain) {
-		vHostManager.removeComponentDomain(domain);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 * @param node
-	 * @param description
-	 */
-	public void removeServiceDiscoveryItem(String jid, String node, String description) {
-		ServiceEntity item = new ServiceEntity(jid, node, description);
-
-		// item.addIdentities(new ServiceIdentity("component", identity_type,
-		// name));
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Modifying service-discovery info, removing: {0}", item);
-		}
-		serviceEntity.removeItems(item);
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -741,6 +827,11 @@ public class BasicComponent
 	 */
 	@Override
 	public void setProperties(Map<String, Object> props) {
+		if (isInitializationComplete()) {
+
+			// Do we really need to do this again?
+			return;
+		}
 		if (scriptEngineManager == null) {
 			if (XMPPServer.isOSGi()) {
 				scriptEngineManager = new OSGiScriptEngineManager();
@@ -772,9 +863,9 @@ public class BasicComponent
 		}
 		for (Map.Entry<String, Object> entry : props.entrySet()) {
 			if (entry.getKey().startsWith(COMMAND_PROP_NODE)) {
-				String cmdId        = entry.getKey().substring(COMMAND_PROP_NODE.length() + 1);
-				String[] cmdAcl     = entry.getValue().toString().split(",");
-				EnumSet<CmdAcl> acl = EnumSet.noneOf(CmdAcl.class);
+				String          cmdId  = entry.getKey().substring(COMMAND_PROP_NODE.length() + 1);
+				String[]        cmdAcl = entry.getValue().toString().split(",");
+				EnumSet<CmdAcl> acl    = EnumSet.noneOf(CmdAcl.class);
 
 				for (String cmda : cmdAcl) {
 					CmdAcl acl_tmp = CmdAcl.valueof(cmda);
@@ -789,7 +880,7 @@ public class BasicComponent
 		}
 		serviceEntity = new ServiceEntity(name, null, getDiscoDescription(), true);
 		serviceEntity.addIdentities(new ServiceIdentity(getDiscoCategory(),
-						getDiscoCategoryType(), getDiscoDescription()));
+				getDiscoCategoryType(), getDiscoDescription()));
 		serviceEntity.addFeatures("http://jabber.org/protocol/commands");
 
 		CommandIfc command = new AddScriptCommand();
@@ -823,112 +914,6 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @param jid
-	 * @param node
-	 * @param description
-	 * @param admin
-	 */
-	public void updateServiceDiscoveryItem(String jid, String node, String description,
-					boolean admin) {
-		updateServiceDiscoveryItem(jid, node, description, admin, (String[]) null);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 * @param node
-	 * @param description
-	 * @param admin
-	 * @param features
-	 */
-	public void updateServiceDiscoveryItem(String jid, String node, String description,
-					boolean admin, String... features) {
-		updateServiceDiscoveryItem(jid, node, description, null, null, admin, features);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 * @param node
-	 * @param description
-	 * @param category
-	 * @param type
-	 * @param admin
-	 * @param features
-	 */
-	public void updateServiceDiscoveryItem(String jid, String node, String description,
-					String category, String type, boolean admin, String... features) {
-		if (serviceEntity.getJID().equals(jid) && (serviceEntity.getNode() == node)) {
-			serviceEntity.setAdminOnly(admin);
-			serviceEntity.setDescription(description);
-			if ((category != null) || (type != null)) {
-				serviceEntity.addIdentities(new ServiceIdentity(category, type, description));
-			}
-			if (features != null) {
-				serviceEntity.setFeatures("http://jabber.org/protocol/commands");
-				serviceEntity.addFeatures(features);
-			}
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Modifying service-discovery info: {0}", serviceEntity);
-			}
-		} else {
-			ServiceEntity item = new ServiceEntity(jid, node, description, admin);
-
-			if ((category != null) || (type != null)) {
-				item.addIdentities(new ServiceIdentity(category, type, description));
-			}
-			if (features != null) {
-				item.addFeatures(features);
-			}
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Adding new item: {0}", item);
-			}
-			serviceEntity.addItems(item);
-		}
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	protected ServiceEntity getServiceEntity() {
-		return serviceEntity;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	protected Map<String, CommandIfc> getScriptCommands() {
-		return scriptCommands;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	protected boolean isNonAdminCommands() {
-		return nonAdminCommands;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
 	 * @param pc
 	 * @param results
 	 *
@@ -952,7 +937,7 @@ public class BasicComponent
 			return false;
 		}
 
-		Iq iqc                = (Iq) pc;
+		Iq             iqc    = (Iq) pc;
 		Command.Action action = Command.getAction(iqc);
 
 		if (action == Command.Action.cancel) {
@@ -964,8 +949,8 @@ public class BasicComponent
 			return true;
 		}
 
-		String strCommand = iqc.getStrCommand();
-		CommandIfc com    = scriptCommands.get(strCommand);
+		String     strCommand = iqc.getStrCommand();
+		CommandIfc com        = scriptCommands.get(strCommand);
 
 		if ((strCommand != null) && (com != null)) {
 			boolean admin = false;
@@ -988,11 +973,11 @@ public class BasicComponent
 					com.runCommand(iqc, binds, results);
 				} else {
 					if (log.isLoggable(Level.FINER)) {
-						log.log(Level.FINER, "Command rejected non-admin detected: {0}",
-										pc.getStanzaFrom());
+						log.log(Level.FINER, "Command rejected non-admin detected: {0}", pc
+								.getStanzaFrom());
 					}
 					results.offer(Authorization.FORBIDDEN.getResponseMessage(pc,
-									"Only Administrator can call the command.", true));
+							"Only Administrator can call the command.", true));
 				}
 			} catch (Exception e) {
 				log.log(Level.WARNING, "Unknown admin command processing exception: " + pc, e);
@@ -1004,22 +989,56 @@ public class BasicComponent
 		return false;
 	}
 
-	private void loadScripts() {
-		log.log(Level.CONFIG, "Loading admin scripts for component: {0}.",
-						new Object[] { getName() });
+	//~--- get methods ----------------------------------------------------------
 
-		File file                   = null;
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	protected Map<String, CommandIfc> getScriptCommands() {
+		return scriptCommands;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	protected ServiceEntity getServiceEntity() {
+		return serviceEntity;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	protected boolean isNonAdminCommands() {
+		return nonAdminCommands;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	private void loadScripts() {
+		log.log(Level.CONFIG, "Loading admin scripts for component: {0}.", new Object[] {
+				getName() });
+
+		File             file       = null;
 		AddScriptCommand addCommand = new AddScriptCommand();
-		Bindings binds              = scriptEngineManager.getBindings();
+		Bindings         binds      = scriptEngineManager.getBindings();
 
 		initBindings(binds);
 
 		String[] dirs = new String[] { scriptsBaseDir, scriptsCompDir };
 
 		for (String scriptsPath : dirs) {
-			log.log(Level.CONFIG, "{0}: Loading scripts from directory: {1}",
-							new Object[] { getName(),
-														 scriptsPath });
+			log.log(Level.CONFIG, "{0}: Loading scripts from directory: {1}", new Object[] {
+					getName(),
+					scriptsPath });
 			try {
 				File adminDir = new File(scriptsPath);
 
@@ -1034,9 +1053,9 @@ public class BasicComponent
 
 							file = f;
 
-							StringBuilder sb     = new StringBuilder();
+							StringBuilder  sb    = new StringBuilder();
 							BufferedReader buffr = new BufferedReader(new FileReader(file));
-							String line          = null;
+							String         line  = null;
 
 							while ((line = buffr.readLine()) != null) {
 								sb.append(line).append("\n");
@@ -1044,8 +1063,8 @@ public class BasicComponent
 								int idx = line.indexOf(CommandIfc.SCRIPT_DESCRIPTION);
 
 								if (idx >= 0) {
-									cmdDescr =
-										line.substring(idx + CommandIfc.SCRIPT_DESCRIPTION.length()).trim();
+									cmdDescr = line.substring(idx + CommandIfc.SCRIPT_DESCRIPTION.length())
+											.trim();
 								}
 								idx = line.indexOf(CommandIfc.SCRIPT_ID);
 								if (idx >= 0) {
@@ -1053,22 +1072,22 @@ public class BasicComponent
 								}
 								idx = line.indexOf(CommandIfc.SCRIPT_COMPONENT);
 								if (idx >= 0) {
-									comp = line.substring(idx +
-																				CommandIfc.SCRIPT_COMPONENT.length()).trim();
+									comp = line.substring(idx + CommandIfc.SCRIPT_COMPONENT.length())
+											.trim();
 								}
 							}
 							buffr.close();
 							if ((cmdId == null) || (cmdDescr == null) || (comp == null)) {
 								log.log(Level.WARNING,
-												"Admin script found but it has no command ID or command" +
-												"description: " + "{0}", file);
+										"Admin script found but it has no command ID or command" +
+										"description: " + "{0}", file);
 
 								continue;
 							}
 
 							// What components should load the script....
 							String[] comp_names = comp.split(",");
-							boolean found       = false;
+							boolean  found      = false;
 
 							for (String cmp : comp_names) {
 								found = getName().equals(cmp);
@@ -1078,31 +1097,30 @@ public class BasicComponent
 							}
 							if (!found) {
 								log.log(Level.CONFIG, "{0}: skipping admin script for component: {1}",
-												new Object[] { getName(),
-																			 comp });
+										new Object[] { getName(),
+										comp });
 
 								continue;
 							}
 
-							int idx    = file.toString().lastIndexOf('.');
+							int    idx = file.toString().lastIndexOf('.');
 							String ext = file.toString().substring(idx + 1);
 
 							addCommand.addAdminScript(cmdId, cmdDescr, sb.toString(), null, ext, binds);
-							log.log(
-									Level.CONFIG,
+							log.log(Level.CONFIG,
 									"{0}: Loaded admin command from file: {1}, id: {2}, ext: {3}, descr: {4}",
 									new Object[] { getName(),
-																 file, cmdId, ext, cmdDescr });
+									file, cmdId, ext, cmdDescr });
 						}
 					}
 				} else {
 					log.log(Level.CONFIG, "Admin scripts directory is missing: {0}, creating...",
-									adminDir);
+							adminDir);
 					try {
 						adminDir.mkdirs();
 					} catch (Exception e) {
 						log.log(Level.WARNING,
-										"Can't create scripts directory , read-only filesystem: " + file, e);
+								"Can't create scripts directory , read-only filesystem: " + file, e);
 					}
 				}
 			} catch (Exception e) {
@@ -1113,4 +1131,4 @@ public class BasicComponent
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/06/08

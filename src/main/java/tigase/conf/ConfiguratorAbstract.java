@@ -274,6 +274,11 @@ public abstract class ConfiguratorAbstract
 	 */
 	@Override
 	public void initializationCompleted() {
+		if (isInitializationComplete()) {
+
+			// Do we really need to do this again?
+			return;
+		}
 		super.initializationCompleted();
 		if (monitoring != null) {
 			monitoring.initializationCompleted();

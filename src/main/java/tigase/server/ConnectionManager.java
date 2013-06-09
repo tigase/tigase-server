@@ -248,51 +248,79 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 *
 	 * @return
 	 */
-	public abstract Queue<Packet> processSocketData(IO serv);
+	@SuppressWarnings("empty-statement")
+	public boolean checkTrafficLimits(IO serv) {
+		boolean xmppLimitHit = false;
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param port_props
-	 */
-	public abstract void reconnectionFailed(Map<String, Object> port_props);
+		if (last_minute_packets_limit > 0) {
+			xmppLimitHit = (serv.getPacketsReceived(false) >= last_minute_packets_limit) ||
+					(serv.getPacketsSent(false) >= last_minute_packets_limit);
+		}
+		if (!xmppLimitHit && (total_packets_limit > 0)) {
+			xmppLimitHit = (serv.getTotalPacketsReceived() >= total_packets_limit) || (serv
+					.getTotalPacketsSent() >= total_packets_limit);
+		}
+		if (xmppLimitHit) {
+			Level level = Level.FINER;
 
-	//~--- get methods ----------------------------------------------------------
+			if (isHighThroughput()) {
+				level = Level.WARNING;
+			}
+			switch (xmppLimitAction) {
+			case DROP_PACKETS :
+				if (log.isLoggable(level)) {
+					log.log(level, "[[{0}]] XMPP Limits exceeded on connection {1}" +
+							" dropping pakcets: {2}", new Object[] { getName(),
+							serv, serv.getReceivedPackets() });
+				}
+				while (serv.getReceivedPackets().poll() != null);
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	protected abstract long getMaxInactiveTime();
+				break;
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	protected abstract IO getXMPPIOServiceInstance();
+			default :
+				if (log.isLoggable(level)) {
+					log.log(level, "[[{0}]] XMPP Limits exceeded on connection {1}" +
+							" stopping, packets dropped: {2}", new Object[] { getName(),
+							serv, serv.getReceivedPackets() });
+				}
+				serv.forceStop();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	protected String getDefTrafficThrottling() {
-		String result = ST_TRAFFIC_THROTTLING_PROP_VAL;
+				break;
+			}
 
-		if (isHighThroughput()) {
-			result = HT_TRAFFIC_THROTTLING_PROP_VAL;
+			return false;
 		}
 
-		return result;
-	}
+		boolean binLimitHit   = false;
+		long    bytesSent     = serv.getBytesSent(false);
+		long    bytesReceived = serv.getBytesReceived(false);
 
-	//~--- methods --------------------------------------------------------------
+		if (last_minute_bin_limit > 0) {
+			binLimitHit = (bytesSent >= last_minute_bin_limit) || (bytesReceived >=
+					last_minute_bin_limit);
+		}
+
+		long totalSent     = serv.getTotalBytesSent();
+		long totalReceived = serv.getTotalBytesReceived();
+
+		if (!binLimitHit && (total_bin_limit > 0)) {
+			binLimitHit = (totalReceived >= total_bin_limit) || (totalSent >= total_bin_limit);
+		}
+		if (binLimitHit) {
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "[[{0}]] Binary Limits exceeded ({1}:{2}:{3}:{4}) on" +
+						" connection {5} stopping, packets dropped: {6}", new Object[] {
+					getName(), bytesSent, bytesReceived, totalSent, totalReceived, serv,
+					serv.getReceivedPackets()
+				});
+			}
+			serv.forceStop();
+
+			return false;
+		}
+
+		return true;
+	}
 
 	/**
 	 * Method description
@@ -315,45 +343,356 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	}
 
 	/**
+	 * This method can be overwritten in extending classes to get a different
+	 * packets distribution to different threads. For PubSub, probably better
+	 * packets distribution to different threads would be based on the sender
+	 * address rather then destination address.
+	 *
+	 * @param packet
+	 * @return
+	 */
+	@Override
+	public int hashCodeForPacket(Packet packet) {
+		if (packet.getStanzaTo() != null) {
+			return packet.getStanzaTo().hashCode();
+		}
+		if (packet.getTo() != null) {
+			return packet.getTo().hashCode();
+		}
+
+		return super.hashCodeForPacket(packet);
+	}
+
+	/**
 	 * Method description
 	 *
 	 *
-	 * @param ht_def_key
-	 * @param ht_dev_val
-	 * @param st_def_key
-	 * @param st_def_val
-	 * @param prop_key
-	 * @param prop_val_class
-	 * @param params
-	 * @param props
-	 * @param <T>
+	 * @param binds
 	 */
-	protected <T> void checkHighThroughputProperty(String ht_def_key, T ht_dev_val,
-			String st_def_key, T st_def_val, String prop_key, Class<T> prop_val_class,
-			Map<String, Object> params, Map<String, Object> props) {
-		T      tmp     = st_def_val;
-		String str_tmp = null;
+	@Override
+	public void initBindings(Bindings binds) {
+		super.initBindings(binds);
+		binds.put(CommandIfc.SERVICES_MAP, services);
+	}
 
-		if (isHighThroughput()) {
-			tmp     = ht_dev_val;
-			str_tmp = (String) params.get(ht_def_key);
+	/**
+	 * Method description
+	 *
+	 */
+	@Override
+	public void initializationCompleted() {
+		if (isInitializationComplete()) {
+
+			// Do we really need to do this again?
+			return;
+		}
+		super.initializationCompleted();
+		initializationCompleted = true;
+		for (Map<String, Object> params : waitingTasks) {
+			reconnectService(params, connectionDelay);
+		}
+		waitingTasks.clear();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param serv
+	 *
+	 * @throws IOException
+	 */
+	@Override
+	public void packetsReady(IO serv) throws IOException {
+
+		// Under a high load data, especially lots of packets on a single
+		// connection it may happen that one threads started processing
+		// socketData and then another thread reads more packets which
+		// may take over earlier data depending on a thread scheduler used.
+		// synchronized (serv) {
+		if (checkTrafficLimits(serv)) {
+			writePacketsToSocket(serv, processSocketData(serv));
+		}
+
+		// }
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int processingInThreads() {
+		return Runtime.getRuntime().availableProcessors() * 4;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int processingOutThreads() {
+		return Runtime.getRuntime().availableProcessors() * 4;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 */
+	@Override
+	public void processPacket(Packet packet) {
+		writePacketToSocket(packet);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param serv
+	 *
+	 * @return
+	 */
+	public abstract Queue<Packet> processSocketData(IO serv);
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param port_props
+	 */
+	public abstract void reconnectionFailed(Map<String, Object> port_props);
+
+	/**
+	 * Method description
+	 *
+	 */
+	@Override
+	public void release() {
+
+		// delayedTasks.cancel();
+		releaseListeners();
+		super.release();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param service
+	 */
+	@TODO(note = "Do something if service with the same unique ID is already started, " +
+			"possibly kill the old one...")
+	public void serviceStarted(final IO service) {
+
+		// synchronized(services) {
+		String id = getUniqueId(service);
+
+		if (log.isLoggable(Level.FINER)) {
+			log.log(Level.FINER, "[[{0}]] Connection started: {1}", new Object[] { getName(),
+					service });
+		}
+
+		IO serv = services.get(id);
+
+		if (serv != null) {
+			if (serv == service) {
+				log.log(Level.WARNING,
+						"{0}: That would explain a lot, adding the same service twice, ID: {1}",
+						new Object[] { getName(),
+						serv });
+			} else {
+
+				// Is it at all possible to happen???
+				// let's log it for now....
+				log.log(Level.WARNING,
+						"{0}: Attempt to add different service with the same ID: {1}", new Object[] {
+						getName(),
+						service });
+
+				// And stop the old service....
+				serv.stop();
+			}
+		}
+		services.put(id, service);
+		++services_size;
+
+		// }
+	}
+
+	/**
+	 *
+	 * @param service
+	 * @return
+	 */
+	@Override
+	public boolean serviceStopped(IO service) {
+
+		// Hopefuly there is no exception at this point, but just in case...
+		// This is a very fresh code after all
+		try {
+			ioStatsGetter.check(service);
+		} catch (Exception e) {
+			log.log(Level.INFO,
+					"Nothing serious to worry about but please notify the developer.", e);
+		}
+
+		// synchronized(service) {
+		String id = getUniqueId(service);
+
+		if (log.isLoggable(Level.FINER)) {
+			log.log(Level.FINER, "[[{0}]] Connection stopped: {1}", new Object[] { getName(),
+					service });
+		}
+
+		// id might be null if service is stopped in accept method due to
+		// an exception during establishing TCP/IP connection
+		// IO serv = (id != null ? services.get(id) : null);
+		if (id != null) {
+			boolean result = services.remove(id, service);
+
+			if (result) {
+				--services_size;
+			} else if (log.isLoggable(Level.FINER)) {
+
+				// Is it at all possible to happen???
+				// let's log it for now....
+				log.log(Level.FINER, "[[{0}]] Attempt to stop incorrect service: {1}",
+						new Object[] { getName(),
+						service });
+			}
+
+			return result;
+		}
+
+		return false;
+
+		// }
+	}
+
+	/**
+	 * Method description
+	 *
+	 */
+	@Override
+	public void stop() {
+		this.releaseListeners();
+
+		// when stopping connection manager we need to stop all active connections as well
+		for (IO service : services.values()) {
+			service.forceStop();
+		}
+		super.stop();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param port_props
+	 */
+	public void updateConnectionDetails(Map<String, Object> port_props) {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param serv
+	 * @param packets
+	 */
+	public void writePacketsToSocket(IO serv, Queue<Packet> packets) {
+		if (serv != null) {
+
+			// synchronized (serv) {
+			if ((packets != null) && (packets.size() > 0)) {
+				Packet p = null;
+
+				while ((p = packets.poll()) != null) {
+					if (log.isLoggable(Level.FINER) &&!log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINER, "{0}, Processing packet: {1}, type: {2}", new Object[] {
+								serv,
+								p.getElemName(), p.getType() });
+					}
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "{0}, Writing packet: {1}", new Object[] { serv, p });
+					}
+					serv.addPacketToSend(p);
+				}      // end of for ()
+				try {
+					serv.processWaitingPackets();
+					SocketThread.addSocketService(serv);
+				} catch (Exception e) {
+					log.log(Level.WARNING, serv + "Exception during writing packets: ", e);
+					try {
+						serv.stop();
+					} catch (Exception e1) {
+						log.log(Level.WARNING, serv + "Exception stopping XMPPIOService: ", e1);
+					}    // end of try-catch
+				}      // end of try-catch
+			}
+
+			// }
 		} else {
-			tmp     = st_def_val;
-			str_tmp = (String) params.get(st_def_key);
-		}
-		if (prop_val_class.isAssignableFrom(Integer.class)) {
-			tmp = prop_val_class.cast(DataTypes.parseNum(str_tmp, Integer.class,
-					(Integer) tmp));
-		}
-		if (prop_val_class.isAssignableFrom(Long.class)) {
-			tmp = prop_val_class.cast(DataTypes.parseNum(str_tmp, Long.class, (Long) tmp));
-		}
-		if (prop_val_class.isAssignableFrom(String.class)) {
-			tmp = prop_val_class.cast(str_tmp);
-		}
-		props.put(prop_key, tmp);
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "Can't find service for packets: [{0}] ", packets);
+			}
+		}          // end of if (ios != null) else
+	}
 
-		// log.warning("Set property: (" + prop_key + ", " + tmp + ")");
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param ios
+	 * @param p
+	 *
+	 * @return
+	 */
+	public boolean writePacketToSocket(IO ios, Packet p) {
+		if (ios != null) {
+			if (log.isLoggable(Level.FINER) &&!log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINER, "{0}, Processing packet: {1}, type: {2}", new Object[] { ios,
+						p.getElemName(), p.getType() });
+			}
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "{0}, Writing packet: {1}", new Object[] { ios, p });
+			}
+
+			// synchronized (ios) {
+			ios.addPacketToSend(p);
+			if (ios.writeInProgress.tryLock()) {
+				try {
+					ios.processWaitingPackets();
+					SocketThread.addSocketService(ios);
+
+					return true;
+				} catch (Exception e) {
+					log.log(Level.WARNING, ios + "Exception during writing packets: ", e);
+					try {
+						ios.stop();
+					} catch (Exception e1) {
+						log.log(Level.WARNING, ios + "Exception stopping XMPPIOService: ", e1);
+					}    // end of try-catch
+				} finally {
+					ios.writeInProgress.unlock();
+				}
+			}
+
+			// }
+		} else {
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "Can''t find service for packet: <{0}> {1}, service id: {2}",
+						new Object[] { p.getElemName(),
+						p.getTo(), getServiceId(p) });
+			}
+		}    // end of if (ios != null) else
+
+		return false;
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -491,300 +830,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		list.add(getName(), "Watchdog stopped", watchdogStopped, Level.FINE);
 	}
 
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * This method can be overwritten in extending classes to get a different
-	 * packets distribution to different threads. For PubSub, probably better
-	 * packets distribution to different threads would be based on the sender
-	 * address rather then destination address.
-	 *
-	 * @param packet
-	 * @return
-	 */
-	@Override
-	public int hashCodeForPacket(Packet packet) {
-		if (packet.getStanzaTo() != null) {
-			return packet.getStanzaTo().hashCode();
-		}
-		if (packet.getTo() != null) {
-			return packet.getTo().hashCode();
-		}
-
-		return super.hashCodeForPacket(packet);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param binds
-	 */
-	@Override
-	public void initBindings(Bindings binds) {
-		super.initBindings(binds);
-		binds.put(CommandIfc.SERVICES_MAP, services);
-	}
-
-	/**
-	 * Method description
-	 *
-	 */
-	@Override
-	public void initializationCompleted() {
-		super.initializationCompleted();
-		initializationCompleted = true;
-		for (Map<String, Object> params : waitingTasks) {
-			reconnectService(params, connectionDelay);
-		}
-		waitingTasks.clear();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 *
-	 * @throws IOException
-	 */
-	@Override
-	public void packetsReady(IO serv) throws IOException {
-
-		// Under a high load data, especially lots of packets on a single
-		// connection it may happen that one threads started processing
-		// socketData and then another thread reads more packets which
-		// may take over earlier data depending on a thread scheduler used.
-		// synchronized (serv) {
-		if (checkTrafficLimits(serv)) {
-			writePacketsToSocket(serv, processSocketData(serv));
-		}
-
-		// }
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 *
-	 * @return
-	 */
-	@SuppressWarnings("empty-statement")
-	public boolean checkTrafficLimits(IO serv) {
-		boolean xmppLimitHit = false;
-
-		if (last_minute_packets_limit > 0) {
-			xmppLimitHit = (serv.getPacketsReceived(false) >= last_minute_packets_limit) ||
-					(serv.getPacketsSent(false) >= last_minute_packets_limit);
-		}
-		if (!xmppLimitHit && (total_packets_limit > 0)) {
-			xmppLimitHit = (serv.getTotalPacketsReceived() >= total_packets_limit) || (serv
-					.getTotalPacketsSent() >= total_packets_limit);
-		}
-		if (xmppLimitHit) {
-			Level level = Level.FINER;
-
-			if (isHighThroughput()) {
-				level = Level.WARNING;
-			}
-			switch (xmppLimitAction) {
-			case DROP_PACKETS :
-				if (log.isLoggable(level)) {
-					log.log(level, "[[{0}]] XMPP Limits exceeded on connection {1}" +
-							" dropping pakcets: {2}", new Object[] { getName(),
-							serv, serv.getReceivedPackets() });
-				}
-				while (serv.getReceivedPackets().poll() != null);
-
-				break;
-
-			default :
-				if (log.isLoggable(level)) {
-					log.log(level, "[[{0}]] XMPP Limits exceeded on connection {1}" +
-							" stopping, packets dropped: {2}", new Object[] { getName(),
-							serv, serv.getReceivedPackets() });
-				}
-				serv.forceStop();
-
-				break;
-			}
-
-			return false;
-		}
-
-		boolean binLimitHit   = false;
-		long    bytesSent     = serv.getBytesSent(false);
-		long    bytesReceived = serv.getBytesReceived(false);
-
-		if (last_minute_bin_limit > 0) {
-			binLimitHit = (bytesSent >= last_minute_bin_limit) || (bytesReceived >=
-					last_minute_bin_limit);
-		}
-
-		long totalSent     = serv.getTotalBytesSent();
-		long totalReceived = serv.getTotalBytesReceived();
-
-		if (!binLimitHit && (total_bin_limit > 0)) {
-			binLimitHit = (totalReceived >= total_bin_limit) || (totalSent >= total_bin_limit);
-		}
-		if (binLimitHit) {
-			if (log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE, "[[{0}]] Binary Limits exceeded ({1}:{2}:{3}:{4}) on" +
-						" connection {5} stopping, packets dropped: {6}", new Object[] {
-					getName(), bytesSent, bytesReceived, totalSent, totalReceived, serv,
-					serv.getReceivedPackets()
-				});
-			}
-			serv.forceStop();
-
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
-	@Override
-	public void processPacket(Packet packet) {
-		writePacketToSocket(packet);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public int processingInThreads() {
-		return Runtime.getRuntime().availableProcessors() * 4;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public int processingOutThreads() {
-		return Runtime.getRuntime().availableProcessors() * 4;
-	}
-
-	/**
-	 * Method description
-	 *
-	 */
-	@Override
-	public void release() {
-
-		// delayedTasks.cancel();
-		releaseListeners();
-		super.release();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param service
-	 */
-	@TODO(note = "Do something if service with the same unique ID is already started, " +
-			"possibly kill the old one...")
-	public void serviceStarted(final IO service) {
-
-		// synchronized(services) {
-		String id = getUniqueId(service);
-
-		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "[[{0}]] Connection started: {1}", new Object[] { getName(),
-					service });
-		}
-
-		IO serv = services.get(id);
-
-		if (serv != null) {
-			if (serv == service) {
-				log.log(Level.WARNING,
-						"{0}: That would explain a lot, adding the same service twice, ID: {1}",
-						new Object[] { getName(),
-						serv });
-			} else {
-
-				// Is it at all possible to happen???
-				// let's log it for now....
-				log.log(Level.WARNING,
-						"{0}: Attempt to add different service with the same ID: {1}", new Object[] {
-						getName(),
-						service });
-
-				// And stop the old service....
-				serv.stop();
-			}
-		}
-		services.put(id, service);
-		++services_size;
-
-		// }
-	}
-
-	/**
-	 *
-	 * @param service
-	 * @return
-	 */
-	@Override
-	public boolean serviceStopped(IO service) {
-
-		// Hopefuly there is no exception at this point, but just in case...
-		// This is a very fresh code after all
-		try {
-			ioStatsGetter.check(service);
-		} catch (Exception e) {
-			log.log(Level.INFO,
-					"Nothing serious to worry about but please notify the developer.", e);
-		}
-
-		// synchronized(service) {
-		String id = getUniqueId(service);
-
-		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "[[{0}]] Connection stopped: {1}", new Object[] { getName(),
-					service });
-		}
-
-		// id might be null if service is stopped in accept method due to
-		// an exception during establishing TCP/IP connection
-		// IO serv = (id != null ? services.get(id) : null);
-		if (id != null) {
-			boolean result = services.remove(id, service);
-
-			if (result) {
-				--services_size;
-			} else if (log.isLoggable(Level.FINER)) {
-
-				// Is it at all possible to happen???
-				// let's log it for now....
-				log.log(Level.FINER, "[[{0}]] Attempt to stop incorrect service: {1}",
-						new Object[] { getName(),
-						service });
-			}
-
-			return result;
-		}
-
-		return false;
-
-		// }
-	}
-
 	//~--- set methods ----------------------------------------------------------
 
 	/**
@@ -859,6 +904,13 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			// ConnectionManager does not support it yet.
 			return;
 		}
+		if (isInitializationComplete()) {
+
+			// Do we really need to do this again?
+			// Looks like reconfiguration for the port is not working correctly anyway
+			// so for now we do not want to do it.
+			return;
+		}
 		releaseListeners();
 
 		int[] ports = (int[]) props.get(PORTS_PROP_KEY);
@@ -891,103 +943,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 * Method description
 	 *
 	 *
-	 * @param ios
-	 * @param p
-	 *
-	 * @return
-	 */
-	public boolean writePacketToSocket(IO ios, Packet p) {
-		if (ios != null) {
-			if (log.isLoggable(Level.FINER) &&!log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINER, "{0}, Processing packet: {1}, type: {2}", new Object[] { ios,
-						p.getElemName(), p.getType() });
-			}
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Writing packet: {1}", new Object[] { ios, p });
-			}
-
-			// synchronized (ios) {
-			ios.addPacketToSend(p);
-			if (ios.writeInProgress.tryLock()) {
-				try {
-					ios.processWaitingPackets();
-					SocketThread.addSocketService(ios);
-
-					return true;
-				} catch (Exception e) {
-					log.log(Level.WARNING, ios + "Exception during writing packets: ", e);
-					try {
-						ios.stop();
-					} catch (Exception e1) {
-						log.log(Level.WARNING, ios + "Exception stopping XMPPIOService: ", e1);
-					}    // end of try-catch
-				} finally {
-					ios.writeInProgress.unlock();
-				}
-			}
-
-			// }
-		} else {
-			if (log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE, "Can''t find service for packet: <{0}> {1}, service id: {2}",
-						new Object[] { p.getElemName(),
-						p.getTo(), getServiceId(p) });
-			}
-		}    // end of if (ios != null) else
-
-		return false;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 * @param packets
-	 */
-	public void writePacketsToSocket(IO serv, Queue<Packet> packets) {
-		if (serv != null) {
-
-			// synchronized (serv) {
-			if ((packets != null) && (packets.size() > 0)) {
-				Packet p = null;
-
-				while ((p = packets.poll()) != null) {
-					if (log.isLoggable(Level.FINER) &&!log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINER, "{0}, Processing packet: {1}, type: {2}", new Object[] {
-								serv,
-								p.getElemName(), p.getType() });
-					}
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "{0}, Writing packet: {1}", new Object[] { serv, p });
-					}
-					serv.addPacketToSend(p);
-				}      // end of for ()
-				try {
-					serv.processWaitingPackets();
-					SocketThread.addSocketService(serv);
-				} catch (Exception e) {
-					log.log(Level.WARNING, serv + "Exception during writing packets: ", e);
-					try {
-						serv.stop();
-					} catch (Exception e1) {
-						log.log(Level.WARNING, serv + "Exception stopping XMPPIOService: ", e1);
-					}    // end of try-catch
-				}      // end of try-catch
-			}
-
-			// }
-		} else {
-			if (log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE, "Can't find service for packets: [{0}] ", packets);
-			}
-		}          // end of if (ios != null) else
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
 	 * @param conn
 	 */
 	protected void addWaitingTask(Map<String, Object> conn) {
@@ -996,6 +951,48 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		} else {
 			waitingTasks.add(conn);
 		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param ht_def_key
+	 * @param ht_dev_val
+	 * @param st_def_key
+	 * @param st_def_val
+	 * @param prop_key
+	 * @param prop_val_class
+	 * @param params
+	 * @param props
+	 * @param <T>
+	 */
+	protected <T> void checkHighThroughputProperty(String ht_def_key, T ht_dev_val,
+			String st_def_key, T st_def_val, String prop_key, Class<T> prop_val_class,
+			Map<String, Object> params, Map<String, Object> props) {
+		T      tmp     = st_def_val;
+		String str_tmp = null;
+
+		if (isHighThroughput()) {
+			tmp     = ht_dev_val;
+			str_tmp = (String) params.get(ht_def_key);
+		} else {
+			tmp     = st_def_val;
+			str_tmp = (String) params.get(st_def_key);
+		}
+		if (prop_val_class.isAssignableFrom(Integer.class)) {
+			tmp = prop_val_class.cast(DataTypes.parseNum(str_tmp, Integer.class,
+					(Integer) tmp));
+		}
+		if (prop_val_class.isAssignableFrom(Long.class)) {
+			tmp = prop_val_class.cast(DataTypes.parseNum(str_tmp, Long.class, (Long) tmp));
+		}
+		if (prop_val_class.isAssignableFrom(String.class)) {
+			tmp = prop_val_class.cast(str_tmp);
+		}
+		props.put(prop_key, tmp);
+
+		// log.warning("Set property: (" + prop_key + ", " + tmp + ")");
 	}
 
 	/**
@@ -1021,6 +1018,61 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		}
 	}
 
+	/**
+	 *
+	 * @param p
+	 * @return
+	 */
+	protected boolean writePacketToSocket(Packet p) {
+		IO ios = getXMPPIOService(p);
+
+		if (ios != null) {
+			return writePacketToSocket(ios, p);
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param p
+	 * @param serviceId
+	 *
+	 * @return
+	 */
+	protected boolean writePacketToSocket(Packet p, String serviceId) {
+		IO ios = getXMPPIOService(serviceId);
+
+		if (ios != null) {
+			return writePacketToSocket(ios, p);
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param ios
+	 * @param data
+	 */
+	protected void writeRawData(IO ios, String data) {
+		try {
+			ios.writeRawData(data);
+			SocketThread.addSocketService(ios);
+		} catch (Exception e) {
+			log.log(Level.WARNING, ios + "Exception during writing data: " + data, e);
+			try {
+				ios.stop();
+			} catch (Exception e1) {
+				log.log(Level.WARNING, ios + "Exception stopping XMPPIOService: ", e1);
+			}    // end of try-catch
+		}
+	}
+
 	//~--- get methods ----------------------------------------------------------
 
 	/**
@@ -1042,6 +1094,30 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	protected int[] getDefSSLPorts() {
 		return null;
 	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	protected String getDefTrafficThrottling() {
+		String result = ST_TRAFFIC_THROTTLING_PROP_VAL;
+
+		if (isHighThroughput()) {
+			result = HT_TRAFFIC_THROTTLING_PROP_VAL;
+		}
+
+		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	protected abstract long getMaxInactiveTime();
 
 	/**
 	 * Method description
@@ -1121,66 +1197,19 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 *
 	 * @return
 	 */
+	protected abstract IO getXMPPIOServiceInstance();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
 	protected boolean isHighThroughput() {
 		return false;
 	}
 
 	//~--- methods --------------------------------------------------------------
-
-	/**
-	 *
-	 * @param p
-	 * @return
-	 */
-	protected boolean writePacketToSocket(Packet p) {
-		IO ios = getXMPPIOService(p);
-
-		if (ios != null) {
-			return writePacketToSocket(ios, p);
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param p
-	 * @param serviceId
-	 *
-	 * @return
-	 */
-	protected boolean writePacketToSocket(Packet p, String serviceId) {
-		IO ios = getXMPPIOService(serviceId);
-
-		if (ios != null) {
-			return writePacketToSocket(ios, p);
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param ios
-	 * @param data
-	 */
-	protected void writeRawData(IO ios, String data) {
-		try {
-			ios.writeRawData(data);
-			SocketThread.addSocketService(ios);
-		} catch (Exception e) {
-			log.log(Level.WARNING, ios + "Exception during writing data: " + data, e);
-			try {
-				ios.stop();
-			} catch (Exception e1) {
-				log.log(Level.WARNING, ios + "Exception stopping XMPPIOService: ", e1);
-			}    // end of try-catch
-		}
-	}
 
 	private void putDefPortParams(Map<String, Object> props, int port, SocketType sock) {
 		log.log(Level.CONFIG, "Generating defaults for port: {0}", port);
@@ -1251,29 +1280,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		}
 		connectThread.addConnectionOpenListener(cli);
 	}
-
-	/**
-	 * Method description
-	 *
-	 */
-	@Override
-	public void stop() {
-		this.releaseListeners();
-
-		// when stopping connection manager we need to stop all active connections as well
-		for (IO service : services.values()) {
-			service.forceStop();
-		}
-		super.stop();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param port_props
-	 */
-	public void updateConnectionDetails(Map<String, Object> port_props) {}
 
 	//~--- inner classes --------------------------------------------------------
 
@@ -1357,6 +1363,17 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			}          // end of try-catch
 		}
 
+		/**
+		 * Method description
+		 *
+		 *
+		 * @return
+		 */
+		@Override
+		public String toString() {
+			return port_props.toString();
+		}
+
 		//~--- get methods --------------------------------------------------------
 
 		/**
@@ -1419,39 +1436,35 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		 * @return
 		 */
 		@Override
+		public InetSocketAddress getRemoteAddress() {
+			return (InetSocketAddress) port_props.get("remote-address");
+		}
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @return
+		 */
+		@Override
+		public String getRemoteHostname() {
+			if (port_props.containsKey(PORT_REMOTE_HOST_PROP_KEY)) {
+				return (String) port_props.get(PORT_REMOTE_HOST_PROP_KEY);
+			}
+
+			return (String) port_props.get("remote-hostname");
+		}
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @return
+		 */
+		@Override
 		public SocketType getSocketType() {
 			return SocketType.valueOf(port_props.get(PORT_SOCKET_PROP_KEY).toString());
 		}
-
-		/**
-		 * Method description
-		 *
-		 *
-		 * @return
-		 */
-		@Override
-		public int getTrafficClass() {
-			if (isHighThroughput()) {
-				return IPTOS_THROUGHPUT;
-			} else {
-				return DEF_TRAFFIC_CLASS;
-			}
-		}
-
-		//~--- methods ------------------------------------------------------------
-
-		/**
-		 * Method description
-		 *
-		 *
-		 * @return
-		 */
-		@Override
-		public String toString() {
-			return port_props.toString();
-		}
-
-		//~--- get methods --------------------------------------------------------
 
 		/**
 		 * Method description
@@ -1477,23 +1490,12 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		 * @return
 		 */
 		@Override
-		public String getRemoteHostname() {
-			if (port_props.containsKey(PORT_REMOTE_HOST_PROP_KEY)) {
-				return (String) port_props.get(PORT_REMOTE_HOST_PROP_KEY);
+		public int getTrafficClass() {
+			if (isHighThroughput()) {
+				return IPTOS_THROUGHPUT;
+			} else {
+				return DEF_TRAFFIC_CLASS;
 			}
-
-			return (String) port_props.get("remote-hostname");
-		}
-
-		/**
-		 * Method description
-		 *
-		 *
-		 * @return
-		 */
-		@Override
-		public InetSocketAddress getRemoteAddress() {
-			return (InetSocketAddress) port_props.get("remote-address");
 		}
 	}
 
@@ -1604,4 +1606,4 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 }    // ConnectionManager
 
 
-//~ Formatted in Tigase Code Convention on 13/03/11
+//~ Formatted in Tigase Code Convention on 13/06/08

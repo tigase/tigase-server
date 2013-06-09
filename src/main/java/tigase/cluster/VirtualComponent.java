@@ -367,6 +367,17 @@ public class VirtualComponent
 		return name;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean isInitializationComplete() {
+		return false;
+	}
+
 	//~--- set methods ----------------------------------------------------------
 
 	/**
@@ -451,4 +462,4 @@ public class VirtualComponent
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/04/14
+//~ Formatted in Tigase Code Convention on 13/06/08

@@ -1182,7 +1182,7 @@ public abstract class AbstractMessageReceiver
 	 *
 	 * @param task
 	 * @param delay
-	 * @param uni
+	 * @param unit
 	 */
 	protected void addTimerTask(tigase.util.TimerTask task, long delay, TimeUnit unit) {
 		ScheduledFuture<?> future = receiverScheduler.schedule(task, delay, unit);
@@ -1502,4 +1502,4 @@ public abstract class AbstractMessageReceiver
 }    // AbstractMessageReceiver
 
 
-//~ Formatted in Tigase Code Convention on 13/04/24
+//~ Formatted in Tigase Code Convention on 13/06/08
