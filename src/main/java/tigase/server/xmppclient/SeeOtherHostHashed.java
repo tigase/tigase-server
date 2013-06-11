@@ -43,17 +43,17 @@ import java.util.logging.Logger;
 //public class SeeOtherHostHashed implements SeeOtherHostIfc {
 public class SeeOtherHostHashed extends SeeOtherHost {
 
-//	protected List<BareJID> defaulHost = null;
+//	protected List<BareJID> defaultHost = null;
 	protected List<BareJID> connectedNodes = new CopyOnWriteArrayList<BareJID>();
 	private static final Logger log = Logger.getLogger(SeeOtherHostHashed.class.getName());
 
 	@Override
 	public BareJID findHostForJID(BareJID jid, BareJID host) {
 		int hash = Math.abs(jid.hashCode());
-		if (defaulHost !=null
-			&& !defaulHost.isEmpty()
-			&& connectedNodes.contains( defaulHost.get( hash % defaulHost.size() ) ) ) {
-				return defaulHost.get( hash % defaulHost.size() );
+		if (defaultHost !=null
+			&& !defaultHost.isEmpty()
+			&& connectedNodes.contains( defaultHost.get( hash % defaultHost.size() ) ) ) {
+				return defaultHost.get( hash % defaultHost.size() );
 		} else if (connectedNodes.size() > 0 ) {
 			return connectedNodes.get( hash % connectedNodes.size());
 		} else {

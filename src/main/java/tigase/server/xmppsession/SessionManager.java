@@ -118,24 +118,24 @@ public class SessionManager
 
 	//~--- fields ---------------------------------------------------------------
 
-	private AuthRepository                   auth_repository       = null;
-	private long                             authTimeouts          = 0;
-	private long                             closedConnections     = 0;
-	private DefaultHandlerProc               defHandlerProc        = null;
-	private PacketDefaultHandler             defPacketHandler      = null;
+	private AuthRepository                   auth_repository                 = null;
+	private long                             authTimeouts                    = 0;
+	private long                             closedConnections               = 0;
+	private DefaultHandlerProc               defHandlerProc                  = null;
+	private PacketDefaultHandler             defPacketHandler                = null;
 	private String                           defPluginsThreadsPool = "default-threads-pool";
 	private boolean                          forceDetailStaleConnectionCheck = true;
-	private int                              maxIdx                = 100;
-	private int                              maxUserConnections    = 0;
-	private int                              maxUserSessions       = 0;
-	private NonAuthUserRepository            naUserRepository      = null;
-	private SessionCloseProc                 sessionCloseProc      = null;
-	private SessionOpenProc                  sessionOpenProc       = null;
-	private SMResourceConnection             smResourceConnection  = null;
-	private int                              tIdx                  = 0;
-	private long                             totalUserConnections  = 0;
-	private long                             totalUserSessions     = 0;
-	private UserRepository                   user_repository       = null;
+	private int                              maxIdx                          = 100;
+	private int                              maxUserConnections              = 0;
+	private int                              maxUserSessions                 = 0;
+	private NonAuthUserRepository            naUserRepository                = null;
+	private SessionCloseProc                 sessionCloseProc                = null;
+	private SessionOpenProc                  sessionOpenProc                 = null;
+	private SMResourceConnection             smResourceConnection            = null;
+	private int                              tIdx                            = 0;
+	private long                             totalUserConnections            = 0;
+	private long                             totalUserSessions               = 0;
+	private UserRepository                   user_repository                 = null;
 	private Set<String>                      trusted = new ConcurrentSkipListSet<String>();
 	private Map<String, XMPPStopListenerIfc> stopListeners = new ConcurrentHashMap<String,
 			XMPPStopListenerIfc>(10);
@@ -150,6 +150,8 @@ public class SessionManager
 			new ConcurrentSkipListSet<XMPPImplIfc>();
 	private Map<String, ProcessingThreads<ProcessorWorkerThread>> workerThreads =
 			new ConcurrentHashMap<String, ProcessingThreads<ProcessorWorkerThread>>(32);
+	private StaleConnectionCloser         staleConnectionCloser =
+			new StaleConnectionCloser();
 	private Map<String, XMPPProcessorIfc> processors = new ConcurrentHashMap<String,
 			XMPPProcessorIfc>(32);
 	private Map<String, XMPPPreprocessorIfc> preProcessors = new ConcurrentHashMap<String,
@@ -177,8 +179,6 @@ public class SessionManager
 	 */
 	protected ConcurrentHashMap<JID, XMPPResourceConnection> connectionsByFrom =
 			new ConcurrentHashMap<JID, XMPPResourceConnection>(100000);
-	
-	private StaleConnectionCloser staleConnectionCloser = new StaleConnectionCloser();
 
 	//~--- methods --------------------------------------------------------------
 
@@ -584,10 +584,10 @@ public class SessionManager
 		Map<String, Object> props = super.getDefaults(params);
 
 		SessionManagerConfig.getDefaults(props, params);
-
 		props.put(FORCE_DETAIL_STALE_CONNECTION_CHECK, true);
-		props.put(STALE_CONNECTION_CLOSER_QUEUE_SIZE_KEY, StaleConnectionCloser.DEF_QUEUE_SIZE);
-		
+		props.put(STALE_CONNECTION_CLOSER_QUEUE_SIZE_KEY, StaleConnectionCloser
+				.DEF_QUEUE_SIZE);
+
 		return props;
 	}
 
@@ -843,21 +843,21 @@ public class SessionManager
 				}
 			}
 		}
-
 		if (props.get(FORCE_DETAIL_STALE_CONNECTION_CHECK) != null) {
-			forceDetailStaleConnectionCheck = (Boolean) props.get(FORCE_DETAIL_STALE_CONNECTION_CHECK);	
-			log.log(Level.CONFIG, "forced detailed stale connection checking is set to = {0}", forceDetailStaleConnectionCheck);
+			forceDetailStaleConnectionCheck = (Boolean) props.get(
+					FORCE_DETAIL_STALE_CONNECTION_CHECK);
+			log.log(Level.CONFIG, "forced detailed stale connection checking is set to = {0}",
+					forceDetailStaleConnectionCheck);
 		}
-
 		if (props.get(STALE_CONNECTION_CLOSER_QUEUE_SIZE_KEY) != null) {
-			staleConnectionCloser.setMaxQueueSize((Integer) props.get(STALE_CONNECTION_CLOSER_QUEUE_SIZE_KEY));
-			log.log(Level.CONFIG, "stale connection closer queue is set to = {0}", staleConnectionCloser.getMaxQueueSize());
-		}		
-		
+			staleConnectionCloser.setMaxQueueSize((Integer) props.get(
+					STALE_CONNECTION_CLOSER_QUEUE_SIZE_KEY));
+			log.log(Level.CONFIG, "stale connection closer queue is set to = {0}",
+					staleConnectionCloser.getMaxQueueSize());
+		}
 		if (!staleConnectionCloser.isScheduled()) {
 			addTimerTask(staleConnectionCloser, staleConnectionCloser.getTimeout());
 		}
-				
 		if (props.size() == 1) {
 
 			// If props.size() == 1, it means this is a single property update
@@ -865,7 +865,6 @@ public class SessionManager
 			// of it's settings
 			return;
 		}
-		
 		defPacketHandler = new PacketDefaultHandler();
 
 		// Is there shared user repository instance? If so I want to use it:
@@ -937,6 +936,13 @@ public class SessionManager
 		}
 		naUserRepository = new NonAuthUserRepositoryImpl(user_repository, getDefHostName(),
 				Boolean.parseBoolean((String) props.get(AUTO_CREATE_OFFLINE_USER_PROP_KEY)));
+		if (isInitializationComplete()) {
+
+			// Before we can allow for plugins initialization again, this needs to be
+			// tested to ensure there is no double initialization and multiple threads
+			// pools are not created to waste resources
+			return;
+		}
 
 		LinkedHashMap<String, Integer> plugins_concurrency = new LinkedHashMap<String,
 				Integer>(20);
@@ -1068,6 +1074,7 @@ public class SessionManager
 	 *
 	 *
 	 * @param connectionId
+	 * @param userId
 	 * @param closeOnly
 	 */
 	protected void closeConnection(JID connectionId, String userId, boolean closeOnly) {
@@ -1091,50 +1098,58 @@ public class SessionManager
 		} else {
 			log.log(Level.FINE, "Can not find resource connection for connectionId: {0}",
 					connectionId);
-
 			if (userId != null) {
+
 				// check using userId if we can find stale XMPPResourceConnection
-				log.log(Level.WARNING, "Found trying to find stale XMPPResourceConnection by userId {0}...", userId);
-				JID userJid = JID.jidInstanceNS(userId);
+				log.log(Level.WARNING,
+						"Found trying to find stale XMPPResourceConnection by userId {0}...", userId);
+
+				JID         userJid         = JID.jidInstanceNS(userId);
 				XMPPSession sessionByUserId = sessionsByNodeId.get(userJid.getBareJID());
+
 				if (sessionByUserId != null) {
 					connection = sessionByUserId.getResourceForConnectionId(connectionId);
 					if (connection != null) {
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.WARNING, "Found stale XMPPResourceConnection {0} by userId {1}, removing...", new Object[]{connection, userId});
+							log.log(Level.WARNING,
+									"Found stale XMPPResourceConnection {0} by userId {1}, removing...",
+									new Object[] { connection,
+									userId });
 						}
 						sessionByUserId.removeResourceConnection(connection);
 					}
 				}
+
 				return;
 			}
-			
+
 			// Maybe we should move this loop based check to separe thread for performance reason
 			// Check if our Set<JID> of not found sessions contains each of available connections from each session
-			if (!forceDetailStaleConnectionCheck)
+			if (!forceDetailStaleConnectionCheck) {
 				return;
+			}
 
 			// Let's make sure there is no stale XMPPResourceConnection in some
 			// XMPPSession
 			// object which may cause problems and packets sent to nowhere.
-			// This might an expensive operation though.... add item to queue 
+			// This might an expensive operation though.... add item to queue
 			// executed in other thread
 			staleConnectionCloser.queueForClose(connectionId);
-			
+
 			// code below is original loop for finding stale XMPPResourceConnections
-//			log.log(Level.INFO, "Trying to find and remove stale XMPPResourceConnection: {0}",
-//					connectionId);
-//			
-//			for (XMPPSession session : sessionsByNodeId.values()) {
-//				connection = session.getResourceForConnectionId(connectionId);
-//				if (connection != null) {
-//					log.log(Level.WARNING, "Found stale XMPPResourceConnection: {0}, removing...",
-//							connection);
-//					session.removeResourceConnection(connection);
+//    log.log(Level.INFO, "Trying to find and remove stale XMPPResourceConnection: {0}",
+//        connectionId);
 //
-//					break;
-//				}
-//			}			
+//    for (XMPPSession session : sessionsByNodeId.values()) {
+//      connection = session.getResourceForConnectionId(connectionId);
+//      if (connection != null) {
+//        log.log(Level.WARNING, "Found stale XMPPResourceConnection: {0}, removing...",
+//            connection);
+//        session.removeResourceConnection(connection);
+//
+//        break;
+//      }
+//    }
 		}    // end of if (conn != null) else
 	}
 
@@ -1837,6 +1852,7 @@ public class SessionManager
 	 * @param conn
 	 */
 	protected void registerNewSession(BareJID userId, XMPPResourceConnection conn) {
+		log.log(Level.WARNING, "registerNewSession for: {0}", userId);
 		synchronized (conn) {
 			if (conn.getSessionData(XMPPResourceConnection.CLOSING_KEY) != null) {
 
@@ -1874,6 +1890,7 @@ public class SessionManager
 								Packet command = Command.CHECK_USER_CONNECTION.getPacket(
 										getComponentId(), connection.getConnectionId(), StanzaType.get, UUID
 										.randomUUID().toString());
+
 								Command.addFieldValue(command, "user-jid", userId.toString());
 								addOutPacketWithTimeout(command, connectionCheckCommandHandler, 30l,
 										TimeUnit.SECONDS);
@@ -2314,6 +2331,7 @@ public class SessionManager
 
 				// The connection is not longer active, closing the user session here.
 				String userJid = Command.getFieldValue(packet, "user-jid");
+
 				closeConnection(packet.getTo(), userJid, false);
 			}
 		}
@@ -2331,7 +2349,9 @@ public class SessionManager
 						"Connection checker timeout expired, closing connection: {0}", packet
 						.getTo());
 			}
-				String userJid = Command.getFieldValue(packet, "user-jid");
+
+			String userJid = Command.getFieldValue(packet, "user-jid");
+
 			closeConnection(packet.getTo(), userJid, false);
 		}
 	}
@@ -2484,7 +2504,9 @@ public class SessionManager
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Executing connection close for: {0}", packet);
 			}
+
 			String userJid = Command.getFieldValue(packet, "user-jid");
+
 			closeConnection(packet.getFrom(), userJid, false);
 		}
 	}
@@ -2567,104 +2589,137 @@ public class SessionManager
 			fastAddOutPacket(packet.okResult((String) null, 0));
 		}
 	}
-	
-	private class StaleConnectionCloser extends tigase.util.TimerTask {
-		
-		public static final int DEF_QUEUE_SIZE = 1000;
-		public static final long DEF_TIMEOUT = 30 * 1000;
-		
-		private long timeout;
-		private int maxQueueSize;
-		private Set<JID> workingSet;
-		private Set<JID> queueSet;
 
-		private Thread thread;
-		
+
+	private class StaleConnectionCloser
+					extends tigase.util.TimerTask {
+		/** Field description */
+		public static final int DEF_QUEUE_SIZE = 1000;
+
+		/** Field description */
+		public static final long DEF_TIMEOUT = 30 * 1000;
+
+		//~--- fields -------------------------------------------------------------
+
+		private int      maxQueueSize;
+		private Set<JID> queueSet;
+		private Thread   thread;
+		private long     timeout;
+		private Set<JID> workingSet;
+
+		//~--- constructors -------------------------------------------------------
+
+		/**
+		 * Constructs ...
+		 *
+		 */
 		public StaleConnectionCloser() {
 			this(DEF_QUEUE_SIZE, DEF_TIMEOUT);
 		}
-		
+
+		/**
+		 * Constructs ...
+		 *
+		 *
+		 * @param queueSize
+		 * @param timeout
+		 */
 		public StaleConnectionCloser(int queueSize, long timeout) {
-			this.timeout = timeout;
+			this.timeout      = timeout;
 			this.maxQueueSize = queueSize;
-			workingSet = new HashSet<JID>(queueSize);
-			queueSet = new HashSet<JID>(queueSize);
-		}
-		
-		public int getMaxQueueSize() {
-			return maxQueueSize;
-		}
-		
-		public void setMaxQueueSize(int queueSize) {
-			this.maxQueueSize = queueSize;
+			workingSet        = new HashSet<JID>(queueSize);
+			queueSet          = new HashSet<JID>(queueSize);
 		}
 
-		public long getTimeout() {
-			return timeout;
-		}
-		
-		public boolean queueForClose(JID connectionId) {
-			boolean result;
-			synchronized (this) {
-				if (queueSet.size() > maxQueueSize)
-					return false;
-				
-				result = queueSet.add(connectionId);
-			}
-			
-			if (!result && log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "connection with id {0} already queued for removing as stale"
-						+ " XMPPResourceConnection", connectionId);
-			}
-			return result;
-		}
-			
+		//~--- methods ------------------------------------------------------------
+
+		/**
+		 * Method description
+		 *
+		 */
 		public void closeConnections() {
+
 			// nothing waiting to remove
-			if (workingSet.isEmpty())
+			if (workingSet.isEmpty()) {
 				return;
-			
+			}
 			log.log(Level.INFO, "Trying to find and remove stale XMPPResourceConnections");
-			LinkedList<XMPPResourceConnection> staleConnections = new LinkedList<XMPPResourceConnection>();
-			
+
+			LinkedList<XMPPResourceConnection> staleConnections =
+					new LinkedList<XMPPResourceConnection>();
+
 			for (XMPPSession session : sessionsByNodeId.values()) {
 				List<XMPPResourceConnection> connections = session.getActiveResources();
+
 				for (XMPPResourceConnection connection : connections) {
 					try {
 						JID connectionId = connection.getConnectionId();
+
 						if (workingSet.contains(connectionId)) {
+
 							// queue connection for removal
 							staleConnections.offer(connection);
-							
+
 							// remove from working set
 							workingSet.remove(connectionId);
 						}
-					}
-					catch (NoConnectionIdException ex) {
+					} catch (NoConnectionIdException ex) {
 						log.log(Level.FINEST, "found connection without proper connection id = {0}",
 								connection.toString());
 					}
 				}
-				
+
 				// remove queued connections
 				XMPPResourceConnection connection;
+
 				while ((connection = staleConnections.poll()) != null) {
 					log.log(Level.WARNING, "Found stale XMPPResourceConnection: {0}, removing...",
 							connection);
 					session.removeResourceConnection(connection);
 				}
-				
+
 				// working set is empty so break iteration now
-				if (workingSet.isEmpty())
+				if (workingSet.isEmpty()) {
 					break;
+				}
 			}
 		}
 
+		/**
+		 * Method description
+		 *
+		 *
+		 * @param connectionId
+		 *
+		 * @return
+		 */
+		public boolean queueForClose(JID connectionId) {
+			boolean result;
+
+			synchronized (this) {
+				if (queueSet.size() > maxQueueSize) {
+					return false;
+				}
+				result = queueSet.add(connectionId);
+			}
+			if (!result && log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST,
+						"connection with id {0} already queued for removing as stale" +
+						" XMPPResourceConnection", connectionId);
+			}
+
+			return result;
+		}
+
+		/**
+		 * Method description
+		 *
+		 */
 		@Override
 		public void run() {
-			if (thread != null && thread.isAlive())
+			if ((thread != null) && thread.isAlive()) {
 				return;
-			
+			}
 			thread = new Thread() {
 				@Override
 				public void run() {
@@ -2672,30 +2727,64 @@ public class SessionManager
 					thread = null;
 				}
 			};
-			
 			thread.start();
 		}
-		
+
+		//~--- get methods --------------------------------------------------------
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @return
+		 */
+		public int getMaxQueueSize() {
+			return maxQueueSize;
+		}
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @return
+		 */
+		public long getTimeout() {
+			return timeout;
+		}
+
+		//~--- set methods --------------------------------------------------------
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @param queueSize
+		 */
+		public void setMaxQueueSize(int queueSize) {
+			this.maxQueueSize = queueSize;
+		}
+
+		//~--- methods ------------------------------------------------------------
+
 		private void process() {
 			try {
-				while(swapSets()) {
-					closeConnections();							
+				while (swapSets()) {
+					closeConnections();
 				}
-			}
-			catch (Throwable th) {
+			} catch (Throwable th) {
 				log.log(Level.SEVERE, "exception closing stale connections", th);
 			}
-			
 			addTimerTask(this, timeout);
 		}
-				
+
 		private boolean swapSets() {
 			synchronized (this) {
 				Set<JID> tmp = workingSet;
+
 				workingSet = queueSet;
-				queueSet = tmp;
+				queueSet   = tmp;
 				queueSet.clear();
-				
+
 				return !workingSet.isEmpty();
 			}
 		}
@@ -2709,4 +2798,4 @@ public class SessionManager
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/05/24
+//~ Formatted in Tigase Code Convention on 13/06/08

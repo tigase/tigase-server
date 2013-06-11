@@ -44,9 +44,9 @@ public interface SeeOtherHostIfc {
 
 	// default properties
 	public static final String CM_SEE_OTHER_HOST_DEFAULT_HOST =
-			CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "defaul-host";
+			CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "default-host";
 	public static final String CM_SEE_OTHER_HOST_DEFAULT_PORT =
-			CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "defaul-port";
+			CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "default-port";
 	public static final String CM_SEE_OTHER_HOST_ACTIVE =
 			CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "active";
 

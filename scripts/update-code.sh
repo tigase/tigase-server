@@ -44,5 +44,5 @@ done
 cd ${CUR_DIR}
 
 if [ "${TARGET_DIR}" != "" ] ; then
-  cp -fv ${PROJECTS_DIR}/server/jars/* ${TARGET_DIR}/jars/
+  cp -fv ${PROJECTS_DIR}/server/jars/* ${TARGET_DIR}/bundle/
 fi

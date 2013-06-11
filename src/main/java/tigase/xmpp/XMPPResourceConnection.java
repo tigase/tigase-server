@@ -149,306 +149,16 @@ public class XMPPResourceConnection
 	/**
 	 * Method description
 	 *
-	 */
-	public void incPacketsCounter() {
-		++packets_counter;
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public long getPacketsCounter() {
-		return packets_counter;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 *
-	 *
-	 * @throws NotAuthorizedException
-	 */
-	public List<XMPPResourceConnection> getActiveSessions() throws NotAuthorizedException {
-		if (!isAuthorized()) {
-			throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
-		}    // end of if (username == null)
-
-		return parentSession.getActiveResources();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 *
-	 */
-	public JID[] getAllResourcesJIDs() {
-		return (parentSession == null)
-				? null
-				: parentSession.getJIDs();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public long getAuthTime() {
-		return authenticationTime - creationTime;
-	}
-
-	/**
-	 * Returns user JID but without <em>resource</em> part. This is real user ID
-	 * not session ID. To retrieve session ID - full JID refer to
-	 * <code>getJID()</code> method.<br/>
-	 * If session has not been authorized yet this method throws
-	 * <code>NotAuthorizedException</code>.
-	 *
-	 * @return a <code>String</code> value of user ID - this is user JID without
-	 *         resource part. To obtain full user JID please refer to
-	 *         <code>getJID</code> method.
-	 * @exception NotAuthorizedException
-	 *              when this session has not been authorized yet and some parts
-	 *              of user JID are not known yet.
-	 * @see #getJID()
-	 */
-	@Override
-	public final BareJID getBareJID() throws NotAuthorizedException {
-		if (!isAuthorized()) {
-			throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
-		}    // end of if (username == null)
-
-		return userJid.getBareJID();
-	}
-
-	/**
-	 *
-	 * @param key
-	 * @return
-	 */
-	public Object getCommonSessionData(String key) {
-		return (parentSession == null)
-				? null
-				: parentSession.getCommonSessionData(key);
-	}
-
-	/**
-	 * Gets the value of connectionId
-	 *
-	 * @return the value of connectionId
-	 * @throws NoConnectionIdException
-	 */
-	public JID getConnectionId() throws NoConnectionIdException {
-		lastAccessed = System.currentTimeMillis();
-		if (this.connectionId == null) {
-			throw new NoConnectionIdException("Connection ID not set for this session. " +
-					"This is probably the SM session to handle traffic " +
-					"addressed to the server itself. Or maybe it's a bug.");
-		}
-
-		return this.connectionId;
-	}
-
-	/**
-	 * Method description
-	 *
 	 *
 	 * @param jid
-	 *
-	 * @return
-	 *
-	 * @throws NoConnectionIdException
+	 * @param anonymous
 	 */
-	public JID getConnectionId(JID jid) throws NoConnectionIdException {
-		JID result = null;
-
-		if ((jid != null)) {
-			if ((jid.getResource() != null) && (parentSession != null)) {
-				XMPPResourceConnection conn = parentSession.getResourceForResource(jid
-						.getResource());
-
-				result = (conn == null)
-						? null
-						: conn.getConnectionId();
-			} else {
-				if ((jid.getResource() == null) || jid.getResource().equals(this.resource)) {
-					result = this.connectionId;
-				}
-			}
-		} else {
-			result = this.connectionId;
-		}
-
-		return result;
+	public void authorizeJID(BareJID jid, boolean anonymous) {
+		loginHandler.handleLogin(jid, this);
+		authState    = Authorization.AUTHORIZED;
+		is_anonymous = anonymous;
+		login();
 	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public long getCreationTime() {
-		return creationTime;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public String getDefLang() {
-		return this.defLang;
-	}
-
-	/**
-	 * Returns full user JID for this session or throws
-	 * <code>NotAuthorizedException</code> if session is not authorized yet and
-	 * therefore user name and resource is not known yet.
-	 *
-	 * @return a <code>String</code> value of calculated user full JID for this
-	 *         session including resource name.
-	 * @throws NotAuthorizedException
-	 */
-	public final JID getJID() throws NotAuthorizedException {
-		if (!isAuthorized()) {
-			throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
-		}    // end of if (username == null)
-
-		return userJid;
-	}
-
-	/**
-	 * Gets the value of lastAccessed
-	 *
-	 * @return the value of lastAccessed
-	 */
-	public long getLastAccessed() {
-		return this.lastAccessed;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public XMPPSession getParentSession() {
-		return parentSession;
-	}
-
-	/**
-	 * Returns last presence packet with the user presence status or
-	 * <code>null</code> if the user has not yet sent an initial presence.
-	 *
-	 * @return an <code>Element</code> with last presence status received from the
-	 *         user.
-	 */
-	public Element getPresence() {
-		return (Element) getSessionData(PRESENCE_KEY);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public int getPriority() {
-		return priority;
-	}
-
-	/**
-	 * Gets the value of resource
-	 *
-	 * @return the value of resource
-	 */
-	public String getResource() {
-		return this.resource;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public JID getSMComponentId() {
-		return loginHandler.getComponentId();
-	}
-
-	/**
-	 * Retrieves session data. This method gives access to temporary session data
-	 * only. You can retrieve earlier saved data giving key ID to receive needed
-	 * value. Please see <code>putSessionData</code> description for more details.
-	 *
-	 * @param key
-	 *          a <code>String</code> value of stored data ID.
-	 * @return a <code>Object</code> value of data for given key.
-	 * @see #putSessionData(String, Object)
-	 */
-	public final Object getSessionData(final String key) {
-		lastAccessed = System.currentTimeMillis();
-
-		return sessionData.get(key);
-	}
-
-	/**
-	 * Gets the value of sessionId
-	 *
-	 * @return the value of sessionId
-	 */
-	public String getSessionId() {
-		return this.sessionId;
-	}
-
-	/**
-	 * To get the user bare JID please use <code>getBareJID</code> method, to
-	 * check the whether the user with given BareJID is owner of the session
-	 * please use method <code>isUserId(...)</code>. From now one the user session
-	 * may handle more than a single userId, hence getting just userId is not
-	 * enough to check whether the user Id belongs to the session.
-	 *
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
-	 *
-	 * @deprecated
-	 */
-	@Deprecated
-	public BareJID getUserId() throws NotAuthorizedException {
-		return this.getBareJID();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
-	 */
-	@Override
-	public final String getUserName() throws NotAuthorizedException {
-		if (!isAuthorized()) {
-			throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
-		}    // end of if (username == null)
-
-		return parentSession.getUserName();
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	// ~--- methods --------------------------------------------------------------
 
@@ -466,75 +176,13 @@ public class XMPPResourceConnection
 		return userJid;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
-	 *
-	 * @return
 	 */
-	@Override
-	public boolean isAuthorized() {
-		return super.isAuthorized() && (parentSession != null);
+	public void incPacketsCounter() {
+		++packets_counter;
 	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param outDomain
-	 * @param includeComponents
-	 *
-	 * @return
-	 */
-	public boolean isLocalDomain(String outDomain, boolean includeComponents) {
-		return loginHandler.isLocalDomain(outDomain, includeComponents);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public boolean isResourceSet() {
-		return this.resource != null;
-	}
-
-	/**
-	 * Returns information whether this is a server (SessionManager) session or
-	 * normal user session. The server session is used to handle packets addressed
-	 * to the server itself (local domain name).
-	 *
-	 * @return a <code>boolean</code> value of <code>true</code> if this is the
-	 *         server session and <code>false</code> otherwise.
-	 */
-	public boolean isServerSession() {
-		return false;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param bareJID
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
-	 */
-	public boolean isUserId(BareJID bareJID) throws NotAuthorizedException {
-		if (!isAuthorized()) {
-			throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
-		}    // end of if (username == null)
-
-		return userJid.getBareJID().equals(bareJID);
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	// ~--- methods --------------------------------------------------------------
 
@@ -751,6 +399,439 @@ public class XMPPResourceConnection
 		sessionData.remove(key);
 	}
 
+	// ~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 */
+	public void streamClosed() {
+		synchronized (this) {
+			if (parentSession != null) {
+				parentSession.streamClosed(this);
+				parentSession = null;
+			}
+		}    // end of if (parentSession != null)
+		resource  = null;
+		sessionId = null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String toString() {
+		return "user_jid=" + userJid + ", packets=" + packets_counter + ", connectioId=" +
+				connectionId + ", domain=" + domain.getVhost().getDomain() + ", authState=" +
+				getAuthState().name() + ", isAnon=" + isAnonymous();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param name_param
+	 *
+	 * @return
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 * @throws TigaseStringprepException
+	 */
+	@Override
+	public Authorization unregister(String name_param)
+					throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
+		Authorization auth_res = super.unregister(name_param);
+
+		// if (auth_res == Authorization.AUTHORIZED) {
+		// List<XMPPResourceConnection> res_conn =
+		// parentSession.getActiveResources();
+		// for (XMPPResourceConnection res: res_conn) {
+		// if (res != this) {
+		// res.logout();
+		// } // end of if (res != this)
+		// } // end of for (XMPPResourceConnection res: res_conn)
+		// logout();
+		// } // end of if (res == Authorization.AUTHORIZED)
+		return auth_res;
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 *
+	 *
+	 * @throws NotAuthorizedException
+	 */
+	public List<XMPPResourceConnection> getActiveSessions() throws NotAuthorizedException {
+		if (!isAuthorized()) {
+			throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
+		}    // end of if (username == null)
+
+		return parentSession.getActiveResources();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 *
+	 */
+	public JID[] getAllResourcesJIDs() {
+		return (parentSession == null)
+				? null
+				: parentSession.getJIDs();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public AuthRepository getAuthRepository() {
+		return authRepo;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long getAuthTime() {
+		return authenticationTime - creationTime;
+	}
+
+	/**
+	 * Returns user JID but without <em>resource</em> part. This is real user ID
+	 * not session ID. To retrieve session ID - full JID refer to
+	 * <code>getJID()</code> method.<br/>
+	 * If session has not been authorized yet this method throws
+	 * <code>NotAuthorizedException</code>.
+	 *
+	 * @return a <code>String</code> value of user ID - this is user JID without
+	 *         resource part. To obtain full user JID please refer to
+	 *         <code>getJID</code> method.
+	 * @exception NotAuthorizedException
+	 *              when this session has not been authorized yet and some parts
+	 *              of user JID are not known yet.
+	 * @see #getJID()
+	 */
+	@Override
+	public final BareJID getBareJID() throws NotAuthorizedException {
+		if (!isAuthorized()) {
+			throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
+		}    // end of if (username == null)
+
+		return userJid.getBareJID();
+	}
+
+	/**
+	 *
+	 * @param key
+	 * @return
+	 */
+	public Object getCommonSessionData(String key) {
+		return (parentSession == null)
+				? null
+				: parentSession.getCommonSessionData(key);
+	}
+
+	/**
+	 * Gets the value of connectionId
+	 *
+	 * @return the value of connectionId
+	 * @throws NoConnectionIdException
+	 */
+	public JID getConnectionId() throws NoConnectionIdException {
+		lastAccessed = System.currentTimeMillis();
+		if (this.connectionId == null) {
+			throw new NoConnectionIdException("Connection ID not set for this session. " +
+					"This is probably the SM session to handle traffic " +
+					"addressed to the server itself. Or maybe it's a bug.");
+		}
+
+		return this.connectionId;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param jid
+	 *
+	 * @return
+	 *
+	 * @throws NoConnectionIdException
+	 */
+	public JID getConnectionId(JID jid) throws NoConnectionIdException {
+		JID result = null;
+
+		if ((jid != null)) {
+			if ((jid.getResource() != null) && (parentSession != null)) {
+				XMPPResourceConnection conn = parentSession.getResourceForResource(jid
+						.getResource());
+
+				if (conn == null) {
+					throw new NoConnectionIdException(
+							"No connection available for given resource.");
+				} else {
+					result = conn.getConnectionId();
+				}
+			} else {
+				if ((jid.getResource() == null) || jid.getResource().equals(this.resource)) {
+					result = this.connectionId;
+				}
+			}
+		} else {
+			result = this.connectionId;
+		}
+
+		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long getCreationTime() {
+		return creationTime;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public String getDefLang() {
+		return this.defLang;
+	}
+
+	/**
+	 * Returns full user JID for this session or throws
+	 * <code>NotAuthorizedException</code> if session is not authorized yet and
+	 * therefore user name and resource is not known yet.
+	 *
+	 * @return a <code>String</code> value of calculated user full JID for this
+	 *         session including resource name.
+	 * @throws NotAuthorizedException
+	 */
+	public final JID getJID() throws NotAuthorizedException {
+		if (!isAuthorized()) {
+			throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
+		}    // end of if (username == null)
+
+		return userJid;
+	}
+
+	/**
+	 * Gets the value of lastAccessed
+	 *
+	 * @return the value of lastAccessed
+	 */
+	public long getLastAccessed() {
+		return this.lastAccessed;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long getPacketsCounter() {
+		return packets_counter;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public XMPPSession getParentSession() {
+		return parentSession;
+	}
+
+	/**
+	 * Returns last presence packet with the user presence status or
+	 * <code>null</code> if the user has not yet sent an initial presence.
+	 *
+	 * @return an <code>Element</code> with last presence status received from the
+	 *         user.
+	 */
+	public Element getPresence() {
+		return (Element) getSessionData(PRESENCE_KEY);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public int getPriority() {
+		return priority;
+	}
+
+	/**
+	 * Gets the value of resource
+	 *
+	 * @return the value of resource
+	 */
+	public String getResource() {
+		return this.resource;
+	}
+
+	/**
+	 * Retrieves session data. This method gives access to temporary session data
+	 * only. You can retrieve earlier saved data giving key ID to receive needed
+	 * value. Please see <code>putSessionData</code> description for more details.
+	 *
+	 * @param key
+	 *          a <code>String</code> value of stored data ID.
+	 * @return a <code>Object</code> value of data for given key.
+	 * @see #putSessionData(String, Object)
+	 */
+	public final Object getSessionData(final String key) {
+		lastAccessed = System.currentTimeMillis();
+
+		return sessionData.get(key);
+	}
+
+	/**
+	 * Gets the value of sessionId
+	 *
+	 * @return the value of sessionId
+	 */
+	public String getSessionId() {
+		return this.sessionId;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public JID getSMComponentId() {
+		return loginHandler.getComponentId();
+	}
+
+	/**
+	 * To get the user bare JID please use <code>getBareJID</code> method, to
+	 * check the whether the user with given BareJID is owner of the session
+	 * please use method <code>isUserId(...)</code>. From now one the user session
+	 * may handle more than a single userId, hence getting just userId is not
+	 * enough to check whether the user Id belongs to the session.
+	 *
+	 *
+	 * @return
+	 *
+	 * @throws NotAuthorizedException
+	 *
+	 * @deprecated
+	 */
+	@Deprecated
+	public BareJID getUserId() throws NotAuthorizedException {
+		return this.getBareJID();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 *
+	 * @throws NotAuthorizedException
+	 */
+	@Override
+	public final String getUserName() throws NotAuthorizedException {
+		if (!isAuthorized()) {
+			throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
+		}    // end of if (username == null)
+
+		return parentSession.getUserName();
+	}
+
+	// ~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean isAuthorized() {
+		return super.isAuthorized() && (parentSession != null);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param outDomain
+	 * @param includeComponents
+	 *
+	 * @return
+	 */
+	public boolean isLocalDomain(String outDomain, boolean includeComponents) {
+		return loginHandler.isLocalDomain(outDomain, includeComponents);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public boolean isResourceSet() {
+		return this.resource != null;
+	}
+
+	/**
+	 * Returns information whether this is a server (SessionManager) session or
+	 * normal user session. The server session is used to handle packets addressed
+	 * to the server itself (local domain name).
+	 *
+	 * @return a <code>boolean</code> value of <code>true</code> if this is the
+	 *         server session and <code>false</code> otherwise.
+	 */
+	public boolean isServerSession() {
+		return false;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param bareJID
+	 *
+	 * @return
+	 *
+	 * @throws NotAuthorizedException
+	 */
+	public boolean isUserId(BareJID bareJID) throws NotAuthorizedException {
+		if (!isAuthorized()) {
+			throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
+		}    // end of if (username == null)
+
+		return userJid.getBareJID().equals(bareJID);
+	}
+
 	//~--- set methods ----------------------------------------------------------
 
 	/**
@@ -874,66 +955,6 @@ public class XMPPResourceConnection
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 */
-	public void streamClosed() {
-		synchronized (this) {
-			if (parentSession != null) {
-				parentSession.streamClosed(this);
-				parentSession = null;
-			}
-		}    // end of if (parentSession != null)
-		resource  = null;
-		sessionId = null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String toString() {
-		return "user_jid=" + userJid + ", packets=" + packets_counter + ", connectioId=" +
-				connectionId + ", domain=" + domain.getVhost().getDomain() + ", authState=" +
-				getAuthState().name() + ", isAnon=" + isAnonymous();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param name_param
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 * @throws TigaseStringprepException
-	 */
-	@Override
-	public Authorization unregister(String name_param)
-					throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
-		Authorization auth_res = super.unregister(name_param);
-
-		// if (auth_res == Authorization.AUTHORIZED) {
-		// List<XMPPResourceConnection> res_conn =
-		// parentSession.getActiveResources();
-		// for (XMPPResourceConnection res: res_conn) {
-		// if (res != this) {
-		// res.logout();
-		// } // end of if (res != this)
-		// } // end of for (XMPPResourceConnection res: res_conn)
-		// logout();
-		// } // end of if (res == Authorization.AUTHORIZED)
-		return auth_res;
-	}
-
 	/**
 	 * Method description
 	 *
@@ -942,33 +963,7 @@ public class XMPPResourceConnection
 	protected void login() {
 		authenticationTime = System.currentTimeMillis();
 	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 * @param anonymous
-	 */
-	public void authorizeJID(BareJID jid, boolean anonymous) {
-		loginHandler.handleLogin(jid, this);
-		authState    = Authorization.AUTHORIZED;
-		is_anonymous = anonymous;
-		login();
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public AuthRepository getAuthRepository() {
-		return authRepo;
-	}
 }    // XMPPResourceConnection
 
 
-//~ Formatted in Tigase Code Convention on 13/03/12
+//~ Formatted in Tigase Code Convention on 13/06/04

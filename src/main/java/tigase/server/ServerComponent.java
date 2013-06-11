@@ -45,38 +45,13 @@ import java.util.Queue;
  */
 public interface ServerComponent {
 	/**
-	 * Method description
-	 *
-	 *
-	 * @param name
-	 */
-	void setName(String name);
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	String getName();
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	JID getComponentId();
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
+	 * Method is called by <code>MessageRouter</code> when all the startup components of
+	 * the server have been loaded and configured through setProperties(...) call.
+	 * At this point the whole server should be loaded and functional, except
+	 * initializations taking place in this routine.
 	 *
 	 */
-	void release();
+	void initializationCompleted();
 
 	/**
 	 * <code>processPacket</code> is a blocking processing method implemented
@@ -89,14 +64,47 @@ public interface ServerComponent {
 	void processPacket(Packet packet, Queue<Packet> results);
 
 	/**
-	 * Method is called by <code>MessageRouter</code> when all the startup components of
-	 * the server have been loaded and configured through setProperties(...) call.
-	 * At this point the whole server should be loaded and functional, except
-	 * initializations taking place in this routine.
+	 * Method description
 	 *
 	 */
-	void initializationCompleted();
+	void release();
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	JID getComponentId();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	String getName();
+
+	/**
+	 * Method returns information about whether the initialization process
+	 * (initializationCompleted()) method has been called.
+	 * @return <code>true</code> if initialization of the object has been completed
+	 * <code>false</code> otherwise
+	 */
+	boolean isInitializationComplete();
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param name
+	 */
+	void setName(String name);
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/04
+//~ Formatted in Tigase Code Convention on 13/06/08

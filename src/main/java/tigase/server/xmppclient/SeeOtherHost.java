@@ -50,13 +50,13 @@ public class SeeOtherHost implements SeeOtherHostIfc {
 
 	private static final Logger log = Logger.getLogger(SeeOtherHost.class.getName());
 	
-	protected List<BareJID> defaulHost = null;
+	protected List<BareJID> defaultHost = null;
 	private ArrayList<Phase> active = new ArrayList<Phase>();
 
 	@Override
 	public BareJID findHostForJID(BareJID jid, BareJID host) {
-		if (defaulHost != null && !defaulHost.isEmpty()) {
-			return defaulHost.get( 0 );
+		if (defaultHost != null && !defaultHost.isEmpty()) {
+			return defaultHost.get( 0 );
 		} else {
 			return host;
 		}
@@ -86,17 +86,17 @@ public class SeeOtherHost implements SeeOtherHostIfc {
 
 		if ((props.containsKey(SeeOtherHostIfc.CM_SEE_OTHER_HOST_DEFAULT_HOST))
 			&& !props.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_DEFAULT_HOST).toString().trim().isEmpty()) {
-			defaulHost = new ArrayList<BareJID>();
+			defaultHost = new ArrayList<BareJID>();
 			for (String host : ((String) props.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_DEFAULT_HOST)).split(",")) {
 				try {
-					defaulHost.add(BareJID.bareJIDInstance(host));
+					defaultHost.add(BareJID.bareJIDInstance(host));
 				} catch (TigaseStringprepException ex) {
 					log.log(Level.CONFIG, "From JID violates RFC6122 (XMPP:Address Format): ", ex);
 				}
 			}
-			Collections.sort(defaulHost);
+			Collections.sort(defaultHost);
 		} else {
-			defaulHost = null;
+			defaultHost = null;
 		}
 	}
 
