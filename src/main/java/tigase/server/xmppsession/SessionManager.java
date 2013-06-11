@@ -1108,7 +1108,7 @@ public class SessionManager
 				XMPPSession sessionByUserId = sessionsByNodeId.get(userJid.getBareJID());
 
 				if (sessionByUserId != null) {
-					connection = sessionByUserId.getResourceConnection(connectionId);
+					connection = sessionByUserId.getResourceForConnectionId(connectionId);
 					if (connection != null) {
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.WARNING,
