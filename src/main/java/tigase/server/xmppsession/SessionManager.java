@@ -1852,7 +1852,6 @@ public class SessionManager
 	 * @param conn
 	 */
 	protected void registerNewSession(BareJID userId, XMPPResourceConnection conn) {
-		log.log(Level.WARNING, "registerNewSession for: {0}", userId);
 		synchronized (conn) {
 			if (conn.getSessionData(XMPPResourceConnection.CLOSING_KEY) != null) {
 
