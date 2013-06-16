@@ -345,7 +345,7 @@ public abstract class IOService<RefObject>
 			log.log(Level.FINEST, "{0}, TLS handshake completed: {1}", new Object[] { this,
 					certCheckResult });
 		}
-		if (!wrapper.getTlsEngine().getUseClientMode()) {
+		if (!wrapper.getTlsEngine().getUseClientMode() && wrapper.getTlsEngine().getWantClientAuth()) {
 			try {
 				Certificate[] certs    = wrapper.getTlsEngine().getSession()
 						.getPeerCertificates();
@@ -380,14 +380,14 @@ public abstract class IOService<RefObject>
 	 *
 	 * @throws IOException
 	 */
-	public void startSSL(boolean clientMode) throws IOException {
+	public void startSSL(boolean clientMode, boolean wantClientAuth) throws IOException {
 		if (socketIO instanceof TLSIO) {
 			throw new IllegalStateException("SSL mode is already activated.");
 		}
 
 		TLSWrapper wrapper = new TLSWrapper(TLSUtil.getSSLContext("SSL", (String) sessionData
 				.get(HOSTNAME_KEY), clientMode), this, (String[]) sessionData.get(
-				SSL_PROTOCOLS_KEY), clientMode);
+				SSL_PROTOCOLS_KEY), clientMode, wantClientAuth);
 
 		socketIO = new TLSIO(socketIO, wrapper, byteOrder());
 		setLastTransferTime();
@@ -403,7 +403,7 @@ public abstract class IOService<RefObject>
 	 *
 	 * @throws IOException
 	 */
-	public void startTLS(boolean clientMode) throws IOException {
+	public void startTLS(boolean clientMode, boolean wantClientAuth) throws IOException {
 		if (socketIO.checkCapabilities(TLSIO.TLS_CAPS)) {
 			throw new IllegalStateException("TLS mode is already activated " + connectionId);
 		}
@@ -437,7 +437,7 @@ public abstract class IOService<RefObject>
 			}
 
 			TLSWrapper wrapper = new TLSWrapper(sslContext, this, (String[]) sessionData.get(
-					SSL_PROTOCOLS_KEY), clientMode);
+					SSL_PROTOCOLS_KEY), clientMode, wantClientAuth);
 
 			socketIO = new TLSIO(socketIO, wrapper, byteOrder());
 			setLastTransferTime();

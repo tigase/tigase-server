@@ -89,6 +89,8 @@ public class ClientConnectionManager
 	private static final String  SOCKET_CLOSE_WAIT_PROP_KEY = "socket-close-wait";
 	private static final String  XMLNS                      = "jabber:client";
 	private static final boolean ROUTING_MODE_PROP_VAL      = true;
+	private static final boolean TLS_WANT_CLIENT_AUTH_ENABLED_DEF = false;
+	private static final String  TLS_WANT_CLIENT_AUTH_ENABLED_KEY = "tls-want-client-auth-enabled";
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -119,6 +121,8 @@ public class ClientConnectionManager
 	private final ClientTrustManagerFactory clientTrustManagerFactory =
 			new ClientTrustManagerFactory();
 
+	private boolean tlsWantClientAuthEnabled = TLS_WANT_CLIENT_AUTH_ENABLED_DEF;
+	
 	//~--- get methods ----------------------------------------------------------
 
 	// ~--- get methods
@@ -162,6 +166,7 @@ public class ClientConnectionManager
 			}
 		}
 		props.put(SOCKET_CLOSE_WAIT_PROP_KEY, SOCKET_CLOSE_WAIT_PROP_DEF);
+		props.put(TLS_WANT_CLIENT_AUTH_ENABLED_KEY, TLS_WANT_CLIENT_AUTH_ENABLED_DEF);
 
 		return props;
 	}
@@ -468,6 +473,10 @@ public class ClientConnectionManager
 				routings.addRouting(entry.getKey().substring(idx), (String) entry.getValue());
 			}    // end of if (entry.getKey().startsWith(ROUTINGS_PROP_KEY + "/"))
 		}      // end of for ()
+		
+		if (props.containsKey(TLS_WANT_CLIENT_AUTH_ENABLED_KEY)) {
+			tlsWantClientAuthEnabled = (Boolean) props.get(TLS_WANT_CLIENT_AUTH_ENABLED_KEY);
+		}		
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -780,6 +789,11 @@ public class ClientConnectionManager
 		return new XMPPIOService<Object>();
 	}
 
+	@Override
+	protected boolean isTlsWantClientAuthEnabled() {
+		return tlsWantClientAuthEnabled;
+	}
+	
 	//~--- methods --------------------------------------------------------------
 
 	// ~--- methods
@@ -949,7 +963,7 @@ public class ClientConnectionManager
 					TrustManager[] x = clientTrustManagerFactory.getManager(serv);
 
 					serv.setX509TrustManagers(x);
-					serv.startTLS(false);
+					serv.startTLS(false, isTlsWantClientAuthEnabled());
 					SocketThread.addSocketService(serv);
 				} catch (Exception e) {
 					log.log(Level.WARNING, "Error starting TLS: {0}", e);

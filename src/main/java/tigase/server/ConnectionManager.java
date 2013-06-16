@@ -1209,6 +1209,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		return false;
 	}
 
+	protected boolean isTlsWantClientAuthEnabled() {
+		return false;
+	}	
+	
 	//~--- methods --------------------------------------------------------------
 
 	private void putDefPortParams(Map<String, Object> props, int port, SocketType sock) {
@@ -1317,7 +1321,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			try {
 				serv.accept(sc);
 				if (getSocketType() == SocketType.ssl) {
-					serv.startSSL(false);
+					serv.startSSL(false, isTlsWantClientAuthEnabled());
 				}    // end of if (socket == SocketType.ssl)
 				serviceStarted(serv);
 				SocketThread.addSocketService(serv);

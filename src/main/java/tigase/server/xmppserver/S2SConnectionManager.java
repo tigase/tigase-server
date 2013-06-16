@@ -931,6 +931,11 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	}
 
 	@Override
+	public boolean isTlsWantClientAuthEnabled() {
+		return true;
+	}
+	
+	@Override
 	protected boolean isHighThroughput() {
 		return true;
 	}
