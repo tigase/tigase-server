@@ -96,6 +96,8 @@ public class TLSWrapper {
 	private static final String[] tls_enabled_protocols = System.getProperty("tls-enabled-protocols") != null 
 			? System.getProperty("tls-enabled-protocols").split(",") : null;
 	
+	private static final boolean sasl_external_disabled = Boolean.getBoolean("sasl-external-disabled");
+	
 	//~--- constructors ---------------------------------------------------------
 
 	/**
@@ -129,7 +131,7 @@ public class TLSWrapper {
 		appBuffSize = tlsEngine.getSession().getApplicationBufferSize();
 		this.eventHandler = eventHandler;
 
-		if ( !clientMode) {
+		if (!clientMode && !sasl_external_disabled) {
 			tlsEngine.setWantClientAuth(true);
 		}
 
