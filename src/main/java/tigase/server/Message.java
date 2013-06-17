@@ -113,10 +113,14 @@ public class Message
 	 */
 	public static Packet getMessage(JID from, JID to, StanzaType type, String body,
 																	String subject, String thread, String id) {
-		Element message = new Element("message", new Element[] { new Element("body", body) },
-																	null, null);
+		Element message = new Element("message", null, null);
 
 		message.setXMLNS(CLIENT_XMLNS);
+		
+		if (body != null) {
+			message.addChild(new Element("body", body));
+		}
+		
 		if (from != null) {
 			message.addAttribute("from", from.toString());
 		}
