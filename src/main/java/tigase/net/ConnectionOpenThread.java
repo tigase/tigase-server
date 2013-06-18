@@ -111,36 +111,6 @@ public class ConnectionOpenThread
 		}    // end of try-catch
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public static ConnectionOpenThread getInstance() {
-
-		// Long new_throttling = Long.getLong("new-connections-throttling");
-//  if (new_throttling != null) {
-//    throttling = new_throttling;
-//    log.log(Level.WARNING, "New connections throttling set to: {0}", throttling);
-//  }
-		if (acceptThread == null) {
-			acceptThread = new ConnectionOpenThread();
-
-			Thread thrd = new Thread(acceptThread);
-
-			thrd.setName("ConnectionOpenThread");
-			thrd.start();
-			if (log.isLoggable(Level.FINER)) {
-				log.finer("ConnectionOpenThread started.");
-			}
-		}    // end of if (acceptThread == null)
-
-		return acceptThread;
-	}
-
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -195,18 +165,20 @@ public class ConnectionOpenThread
 
 					i.remove();
 
-					SocketChannel sc = null;
+					SocketChannel sc        = null;
+					boolean       throttled = false;
+					int           port_no   = 0;
 
 					if ((sk.readyOps() & SelectionKey.OP_ACCEPT) != 0) {
 						ServerSocketChannel nextReady = (ServerSocketChannel) sk.channel();
 
-						sc = nextReady.accept();
+						port_no = nextReady.socket().getLocalPort();
+						sc      = nextReady.accept();
 						if (log.isLoggable(Level.FINEST)) {
 							log.finest("OP_ACCEPT");
 						}
 
-						PortThrottlingData port_throttling = throttling.get(nextReady.socket()
-								.getLocalPort());
+						PortThrottlingData port_throttling = throttling.get(port_no);
 
 						if (port_throttling != null) {
 							++port_throttling.lastSecondConnections;
@@ -216,13 +188,13 @@ public class ConnectionOpenThread
 											"New connections throttling level exceeded, closing: {0}", sc);
 								}
 								sc.close();
-								sc = null;
+								sc        = null;
+								throttled = true;
 							}
 						} else {
 
 							// Hm, this should not happen actually
-							log.log(Level.WARNING, "Throttling not configured for port: {0}", nextReady
-									.socket().getLocalPort());
+							log.log(Level.WARNING, "Throttling not configured for port: {0}", port_no);
 						}
 					}    // end of if (sk.readyOps() & SelectionKey.OP_ACCEPT)
 					if ((sk.readyOps() & SelectionKey.OP_CONNECT) != 0) {
@@ -258,7 +230,10 @@ public class ConnectionOpenThread
 							al.accept(sc);
 						}
 					} else {
-						log.warning("Can't obtain socket channel from selection key.");
+						log.log(Level.WARNING,
+								"Can't obtain socket channel from selection key, throttling activated = {0}, for port: {1}",
+								new Object[] { throttled,
+								port_no });
 					}    // end of if (sc != null) else
 					++accept_counter;
 				}
@@ -295,6 +270,38 @@ public class ConnectionOpenThread
 		stopping = true;
 		selector.wakeup();
 	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public static ConnectionOpenThread getInstance() {
+
+		// Long new_throttling = Long.getLong("new-connections-throttling");
+//  if (new_throttling != null) {
+//    throttling = new_throttling;
+//    log.log(Level.WARNING, "New connections throttling set to: {0}", throttling);
+//  }
+		if (acceptThread == null) {
+			acceptThread = new ConnectionOpenThread();
+
+			Thread thrd = new Thread(acceptThread);
+
+			thrd.setName("ConnectionOpenThread");
+			thrd.start();
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("ConnectionOpenThread started.");
+			}
+		}    // end of if (acceptThread == null)
+
+		return acceptThread;
+	}
+
+	//~--- methods --------------------------------------------------------------
 
 	private void addAllWaiting() throws IOException {
 		ConnectionOpenListener al = null;
@@ -456,4 +463,4 @@ public class ConnectionOpenThread
 }    // ConnectionOpenThread
 
 
-//~ Formatted in Tigase Code Convention on 13/03/11
+//~ Formatted in Tigase Code Convention on 13/06/15
