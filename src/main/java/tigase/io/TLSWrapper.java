@@ -93,6 +93,9 @@ public class TLSWrapper {
                 "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA",
                 "TLS_EMPTY_RENEGOTIATION_INFO_SCSV"};
                 
+	private static final String[] tls_enabled_protocols = System.getProperty("tls-enabled-protocols") != null 
+			? System.getProperty("tls-enabled-protocols").split(",") : null;
+	
 	//~--- constructors ---------------------------------------------------------
 
 	/**
@@ -103,7 +106,7 @@ public class TLSWrapper {
 	 * @param eventHandler
 	 * @param clientMode
 	 */
-	public TLSWrapper(SSLContext sslc, TLSEventHandler eventHandler, String[] sslProtocols, boolean clientMode) {
+	public TLSWrapper(SSLContext sslc, TLSEventHandler eventHandler, String[] sslProtocols, boolean clientMode, boolean wantClientAuth) {
 		tlsEngine = sslc.createSSLEngine();
 		tlsEngine.setUseClientMode(clientMode);
 
@@ -118,12 +121,15 @@ public class TLSWrapper {
 		if (sslProtocols != null) {
 			tlsEngine.setEnabledProtocols(sslProtocols);
 		}
+		else if (tls_enabled_protocols != null) {
+			tlsEngine.setEnabledProtocols(tls_enabled_protocols);
+		}
 
 		netBuffSize = tlsEngine.getSession().getPacketBufferSize();
 		appBuffSize = tlsEngine.getSession().getApplicationBufferSize();
 		this.eventHandler = eventHandler;
 
-		if ( !clientMode) {
+		if (!clientMode && wantClientAuth) {
 			tlsEngine.setWantClientAuth(true);
 		}
 

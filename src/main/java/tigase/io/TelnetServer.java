@@ -311,7 +311,7 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 		iosock = new SocketIO(sc);
 
 		if (ssl) {
-			iosock = new TLSIO(iosock, new TLSWrapper(TLSUtil.getSSLContext("SSL", null), null, null, false), ByteOrder.BIG_ENDIAN);
+			iosock = new TLSIO(iosock, new TLSWrapper(TLSUtil.getSSLContext("SSL", null), null, null, false, false), ByteOrder.BIG_ENDIAN);
 		}    // end of if (ssl)
 
 		reader.addIOInterface(iosock);

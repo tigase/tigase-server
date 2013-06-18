@@ -162,7 +162,7 @@ public class StartTLSProcessor implements ExtProcessor {
 				Thread.sleep(10);
 			}
 
-			serv.startTLS(client);
+			serv.startTLS(client, false);
 		} catch (Exception e) {
 			log.warning("TLS mode start failed: " + e.getMessage());
 			serv.forceStop();
