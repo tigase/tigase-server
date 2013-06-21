@@ -147,7 +147,7 @@ start() {
             return 1
         fi
 
-	su ${USERNAME} -c "start-stop-daemon --start --quiet --make-pidfile --chdir ${TIGASE_HOME} --pidfile $PIDFILE --chuid $USERNAME:$USERGROUP --exec $JAVA -- $TIGASE_CMD >>${TIGASE_CONSOLE_LOG} 2>&1 &"
+	su ${USERNAME} -c "/sbin/start-stop-daemon --start --quiet --make-pidfile --chdir ${TIGASE_HOME} --pidfile $PIDFILE --chuid $USERNAME:$USERGROUP --exec $JAVA -- $TIGASE_CMD >>${TIGASE_CONSOLE_LOG} 2>&1 &"
 
 	sleep 3
 	PID=`cat $PIDFILE`
@@ -161,7 +161,7 @@ start() {
 }
 
 stop() {
-        su ${USERNAME} -c "start-stop-daemon --stop --quiet  --chdir ${TIGASE_HOME} --pidfile $PIDFILE --chuid $USERNAME:$USERGROUP  --exec $JAVA > /dev/null"
+        su ${USERNAME} -c "/sbin/start-stop-daemon --stop --quiet  --chdir ${TIGASE_HOME} --pidfile $PIDFILE --chuid $USERNAME:$USERGROUP  --exec $JAVA > /dev/null"
         
 	rm -f "$PIDFILE"
 }
