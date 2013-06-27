@@ -163,16 +163,16 @@ public class SeeOtherHostDB extends SeeOtherHostHashed {
 		log.log(Level.INFO, "Initializing dbAccess for db connection url: {0}", conn_str);
 		data_repo = RepositoryFactory.getDataRepository(null, conn_str, map);
 
-		// checkDB();
+		checkDB();
 
 		data_repo.initPreparedStatement(get_host_query, get_host_query);
 		data_repo.initPreparedStatement(get_all_data_query, get_all_data_query);
 		queryAllDB();
 	}
 
-	// private void checkDB() throws SQLException {
-	// data_repo.checkTable(SEE_OTHER_HOST_TABLE, CREATE_STATS_TABLE);
-	// }
+	private void checkDB() throws SQLException {
+		data_repo.checkTable( SEE_OTHER_HOST_TABLE, CREATE_STATS_TABLE );
+	}
 
 	private BareJID queryDB(BareJID user) throws UserNotFoundException, SQLException,
 			TigaseStringprepException {
