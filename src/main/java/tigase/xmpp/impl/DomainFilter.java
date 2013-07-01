@@ -32,6 +32,7 @@ import tigase.db.TigaseDBException;
 import tigase.server.Packet;
 
 import tigase.vhosts.DomainFilterPolicy;
+import tigase.vhosts.VHostItem;
 
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NoConnectionIdException;
@@ -360,27 +361,31 @@ public class DomainFilter
 	 */
 	public DomainFilterPolicy getDomains(XMPPResourceConnection session)
 					throws NotAuthorizedException, TigaseDBException {
+		VHostItem domain = session.getDomain();
 		DomainFilterPolicy domains = (DomainFilterPolicy) session.getCommonSessionData(
 				ALLOWED_DOMAINS_KEY);
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "domains read from user session: {0}", domains);
+			log.log(Level.FINEST, "Domains read from user session: {0} for VHost: {1}", new Object[] {domains, domain} );
 		}
 		if (domains == null) {
 			String dbDomains = session.getData(null, ALLOWED_DOMAINS_KEY, null);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Domains read from database: {0}", dbDomains);
+				log.log(Level.FINEST, "Domains read from database: {0} for VHost: {1}", new Object[] {dbDomains, domain});
 			}
 			domains = DomainFilterPolicy.valueof(dbDomains);
 			if (domains == null) {
 				if (session.isAnonymous()) {
 					domains = DomainFilterPolicy.LOCAL;
 				} else {
-					domains = session.getDomain().getDomainFilter();
+					domains = domain.getDomainFilter();
 				}
 			}
-			session.putCommonSessionData(ALLOWED_DOMAINS_KEY, domains);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Domains read from VHost item: {0} for VHost: {1}", new Object[] {domains, domain});
+			}
+			session.putCommonSessionData( ALLOWED_DOMAINS_KEY, domains );
 		}
 
 		return domains;
