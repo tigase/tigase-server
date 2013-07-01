@@ -32,6 +32,7 @@ import tigase.server.*
 import tigase.util.*
 import tigase.xmpp.*
 import tigase.xmpp.impl.DomainFilter
+import tigase.vhosts.DomainFilterPolicy
 import tigase.db.UserRepository
 import tigase.db.UserNotFoundException
 
@@ -49,11 +50,11 @@ def domain = Command.getFieldValue(p, DOMAIN)
 def domainList = Command.getFieldValue(p, DOMAIN_LIST)
 
 if (jid == null || domain == null ||
-	(domain == DomainFilter.DOMAINS.LIST.name() && domainList == null)) {
+	(domain == DomainFilterPolicy.LIST.name() && domainList == null)) {
 	def res = (Iq)p.commandResult(Command.DataType.form);
 	Command.addFieldValue(res, JID, jid ?: "", "jid-single", "User JID")
 	def domainStr = []
-  DomainFilter.DOMAINS.values().each { domainStr += it.name() }
+  DomainFilterPolicy.values().each { domainStr += it.name() }
 	Command.addFieldValue(res, DOMAIN, domain ?: domainStr[0], "List of domains",
 		(String[])domainStr, (String[])domainStr)
 	Command.addFieldValue(res, DOMAIN_LIST, domainList ?: "", "text-single", "Domains List")
@@ -85,7 +86,7 @@ try {
 		DomainFilter.ALLOWED_DOMAINS_KEY, null)
 
 	def new_value = domain
-	if (domain == DomainFilter.DOMAINS.LIST.name()) {
+	if (domain == DomainFilterPolicy.LIST.name()) {
 		new_value = domainList
 	}
 	repo.setData(bareJID, null, DomainFilter.ALLOWED_DOMAINS_KEY, new_value)
