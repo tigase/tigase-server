@@ -9,7 +9,7 @@
 	<groupId>tigase</groupId>
 	<artifactId>tigase-server</artifactId>
 	<name>Tigase XMPP Server</name>
-	<version>5.2.0-SNAPSHOT</version>
+	<version>5.2.0-beta2</version>
 	<packaging>bundle</packaging>    
 	<description>Tigase XMPP Server - OSGi bundle</description>
 	<url>http://www.tigase.org/</url>
