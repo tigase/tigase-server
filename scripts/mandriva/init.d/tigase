@@ -51,11 +51,7 @@ case "$1" in
 	;;
   restart)
 	stop
-<<<<<<< Updated upstream
-	sleep 5
-=======
 	sleep 10
->>>>>>> Stashed changes
 	start
 	;;
   condrestart)

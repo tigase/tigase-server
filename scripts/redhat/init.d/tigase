@@ -230,11 +230,7 @@ case "$1" in
 	restart|force-reload)
 	echo "Restarting $DESC"
 	stop
-<<<<<<< Updated upstream
-	sleep 5
-=======
 	sleep 10
->>>>>>> Stashed changes
 	if start; then
 		success
 	else
