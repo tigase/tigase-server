@@ -496,4 +496,4 @@ public class XMPPSession {
 }    // XMPPSession
 
 
-//~ Formatted in Tigase Code Convention on 13/06/11
+//~ Formatted in Tigase Code Convention on 13/07/06

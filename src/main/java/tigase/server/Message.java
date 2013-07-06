@@ -2,11 +2,12 @@
  * Message.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -57,8 +58,6 @@ public class Message
 
 	//~--- constructors ---------------------------------------------------------
 
-	// ~--- constructors ---------------------------------------------------------
-
 	/**
 	 * Constructs ...
 	 *
@@ -85,8 +84,6 @@ public class Message
 
 	//~--- get methods ----------------------------------------------------------
 
-	// ~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Creates a packet with message stanza.
 	 *
@@ -112,15 +109,13 @@ public class Message
 	 *         <code>Message</code> instance) with the message stanza.
 	 */
 	public static Packet getMessage(JID from, JID to, StanzaType type, String body,
-																	String subject, String thread, String id) {
+			String subject, String thread, String id) {
 		Element message = new Element("message", null, null);
 
 		message.setXMLNS(CLIENT_XMLNS);
-		
 		if (body != null) {
 			message.addChild(new Element("body", body));
 		}
-		
 		if (from != null) {
 			message.addAttribute("from", from.toString());
 		}
@@ -156,10 +151,4 @@ public class Message
 }
 
 
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-
-//~ Formatted in Tigase Code Convention on 13/02/16
+//~ Formatted in Tigase Code Convention on 13/07/06

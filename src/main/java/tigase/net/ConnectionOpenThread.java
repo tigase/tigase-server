@@ -463,4 +463,4 @@ public class ConnectionOpenThread
 }    // ConnectionOpenThread
 
 
-//~ Formatted in Tigase Code Convention on 13/06/15
+//~ Formatted in Tigase Code Convention on 13/07/06
