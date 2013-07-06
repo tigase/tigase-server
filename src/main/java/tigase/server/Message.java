@@ -105,7 +105,7 @@ public class Message
 	 *          do not set packet IDs for messages but in some cases this might be
 	 *          useful.
 	 *
-	 * @return a new <code>Packet</code> instance (more specificaly
+	 * @return a new <code>Packet</code> instance (more specifically
 	 *         <code>Message</code> instance) with the message stanza.
 	 */
 	public static Packet getMessage(JID from, JID to, StanzaType type, String body,
