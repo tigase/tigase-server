@@ -345,6 +345,18 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
+	 * @param packet
+	 * @param conn
+	 */
+	public void handleLocalPacket(Packet packet, XMPPResourceConnection conn) {
+
+		// Do nothing here. Maybe we will attach some handlers later
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param userId
 	 * @param conn
 	 */
@@ -1745,6 +1757,18 @@ public class SessionManager
 		// defForwTm = System.currentTimeMillis() - startTime;
 		if (!stop) {
 			walk(packet, conn);
+			try {
+				if ((conn != null) && conn.getConnectionId().equals(packet.getPacketFrom())) {
+					handleLocalPacket(packet, conn);
+				}
+			} catch (NoConnectionIdException ex) {
+
+				// Ignore, this should not happen at this point, or even at all.
+				log.log(Level.INFO,
+						"Impossible happened, please report to developer packet: {0}, connection: {1}.",
+						new Object[] { packet,
+						conn });
+			}
 		}
 
 		// walkTm = System.currentTimeMillis() - startTime;
@@ -2797,4 +2821,4 @@ public class SessionManager
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/06/08
+//~ Formatted in Tigase Code Convention on 13/07/06
