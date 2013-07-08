@@ -94,7 +94,8 @@ public class MessageCarbons
 				results.offer(packet.okResult((Element) null, 0));
 			}
 		}
-		else if (packet.getElemName() == "message" && packet.getStanzaTo() != null) {
+		else if (packet.getElemName() == "message" && packet.getType() == StanzaType.chat 
+				&& packet.getStanzaTo() != null) {
 						
 			Set<JID> enabledJids = (Set<JID>) session.getCommonSessionData(ENABLED_KEY);
 			if (enabledJids == null || enabledJids.isEmpty()) {
@@ -103,8 +104,9 @@ public class MessageCarbons
 			}
 			
 			// if this is error delivering forked message we should not fork it
-			if (isErrorDeliveringForkedMessage(packet, session))
-				return;
+			// but we need to fork only messsages with type chat so no need to check it
+			//if (isErrorDeliveringForkedMessage(packet, session))
+			//	return;
 			
 			if (session.isUserId(packet.getStanzaTo().getBareJID()) && packet.getStanzaTo().getResource() == null) {
 				// message is cloned to all resources by Message.java, it violates RFC6121 
@@ -135,10 +137,11 @@ public class MessageCarbons
 					}
 				}*/
 			}
-			else {
+			else if (packet.getType() == StanzaType.chat) {
 				// if this is error delivering forked message we should not fork it
-				if (isErrorDeliveringForkedMessage(packet, session))
-					return;
+				// but we need to fork only messsages with type chat so no need to check it
+				//if (isErrorDeliveringForkedMessage(packet, session))
+				//	return;
 				
 				// if this is private message then do not send carbon copy
 				Element privateEl = packet.getElement().getChild("private", XMLNS);
@@ -317,7 +320,7 @@ public class MessageCarbons
 			if (res.getElemName() != Message.ELEM_NAME)
 				continue;
 			
-			// if it is 
+			// if it is error during delivering forked message then drop it
 			if (isErrorDeliveringForkedMessage(packet, session)) {
 				it.remove();
 			}
