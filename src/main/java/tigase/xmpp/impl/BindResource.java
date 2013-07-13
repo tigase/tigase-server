@@ -67,7 +67,7 @@ public class BindResource
 	public static final String      DEF_RESOURCE_PREFIX_PROP_KEY = "def-resource-prefix";
 	private static final String     EL_NAME                      = "bind";
 	private static final String[][] ELEMENTS                     = {
-		Iq.IQ_BIND_RESOURCE_PATH
+		Iq.IQ_BIND_PATH
 	};
 	private static final Logger     log = Logger.getLogger(BindResource.class.getName());
 	private static int              resGenerator                 = 0;
