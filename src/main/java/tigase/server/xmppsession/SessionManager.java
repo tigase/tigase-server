@@ -563,6 +563,24 @@ public class SessionManager
 	//~--- get methods ----------------------------------------------------------
 
 	/**
+	 * Calculates number of Active Users, i.e. users which session wasn't idle longer than 5 minutes
+	 * @return number of Active Users
+	 */
+	private long getActiveUserNumber() {
+		int count = 0;
+		for ( BareJID bareJID : sessionsByNodeId.keySet() ) {
+			if ( !bareJID.toString().startsWith( "sess-man" ) ){
+				for ( XMPPResourceConnection xMPPResourceConnection : sessionsByNodeId.get( bareJID ).getActiveResources() ) {
+					if ( System.currentTimeMillis() - xMPPResourceConnection.getLastAccessed() < 5 * 60 * 1000 ){
+						count++;
+					}
+				}
+			}
+		}
+		return count;
+	}
+
+	/**
 	 * Method description
 	 *
 	 *
@@ -753,6 +771,7 @@ public class SessionManager
 		list.add(getName(), "Open user sessions", sessionsByNodeId.size(), Level.INFO);
 		list.add(getName(), "Maximum user sessions", maxUserSessions, Level.FINE);
 		list.add(getName(), "Total user sessions", totalUserSessions, Level.FINER);
+		list.add(getName(), "Active user connections", getActiveUserNumber(), Level.FINER);
 		list.add(getName(), "Authentication timouts", authTimeouts, Level.INFO);
 		if (list.checkLevel(Level.INFO)) {
 			int  totalQueuesWait     = list.getValue(getName(), "Total queues wait", 0);
