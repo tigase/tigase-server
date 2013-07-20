@@ -41,6 +41,7 @@ import tigase.xml.SingletonFactory;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -49,6 +50,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
+import tigase.server.xmppclient.XMPPIOProcessor;
 
 /**
  * Describe class XMPPIOService here.
@@ -103,6 +105,8 @@ public class XMPPIOService<RefObject>
 	private long                  totalPacketsReceived = 0;
 	private long                  totalPacketsSent     = 0;
 
+	private XMPPIOProcessor[] processors = null;
+	
 	/**
 	 * The <code>waitingPackets</code> queue keeps data which have to be
 	 * processed.
@@ -255,6 +259,15 @@ public class XMPPIOService<RefObject>
 	 *          a <code>Packet</code> value of data to process.
 	 */
 	public void addPacketToSend(Packet packet) {
+		// processing packet using io level processors
+		if (processors != null) {
+			for (XMPPIOProcessor processor : processors) {
+				if (processor.processOutgoing(this, packet)) {
+					return;
+				}					
+			}
+		}
+		
 		if (xmpp_ack) {
 			String req = "" + (++req_idx);
 
@@ -458,6 +471,18 @@ public class XMPPIOService<RefObject>
 			}
 			firstPacket = false;
 		}
+		
+		if (processors != null) {
+			boolean stop = false;
+			
+			for (XMPPIOProcessor processor : processors) {
+				stop |= processor.processIncoming(this, packet);
+			}
+			
+			if (stop) 
+				return;
+		}		
+		
 		if (packet.getElemName() == ACK_NAME) {
 			String ack_id = packet.getAttributeStaticStr(ID_ATT);
 		} else {
@@ -708,7 +733,22 @@ public class XMPPIOService<RefObject>
 		}
 	}
 
+	@Override
+	public void forceStop() {
+		super.forceStop();
+		
+		if (processors != null) {
+			for (XMPPIOProcessor processor : processors) {
+				processor.serviceStopped(this);
+			}
+		}
+	}
+	
 	//~--- set methods ----------------------------------------------------------
+
+	public void setProcessors(XMPPIOProcessor[] processors) {
+		this.processors = processors;
+	}
 
 	/**
 	 * Method description
