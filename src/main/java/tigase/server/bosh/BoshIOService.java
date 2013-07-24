@@ -295,6 +295,9 @@ public class BoshIOService
 		if (data != null) {
 			sb.append(CONTENT_TYPE_LENGTH).append(data.getBytes().length).append(EOL);
 		}
+		else {
+			sb.append(CONTENT_TYPE_LENGTH).append("0").append(EOL);
+		}
 		if (extra_headers != null) {
 			sb.append(extra_headers);
 		}
