@@ -358,6 +358,13 @@ public class XMPPIOService<RefObject>
 						packet.getElement().toString() });
 			}
 		}    // end of while (packet = waitingPackets.poll() != null)
+		
+		// notify io processors that all waiting packets were sent
+		if (processors != null) { 
+			for (XMPPIOProcessor processor : processors) {
+				processor.packetsSent(this);
+			}
+		}
 	}
 
 	//~--- set methods ----------------------------------------------------------
