@@ -184,7 +184,7 @@ class TigaseConfigLoadHelper {
 						}
 
 						if (varName.equals(TigaseConfigConst.MUC_COMP)) {
-							for (int i = 1 ; i <= 5 ; i++ ) {
+							for (int i = 1 ; i <= 10 ; i++ ) {
 							if ((props.getProperty("--comp-name-" + i) != null
 									&& props.getProperty("--comp-name-" + i).equals("muc"))) {
 									idata.setVariable(TigaseConfigConst.MUC_COMP, "on");
@@ -195,7 +195,7 @@ class TigaseConfigLoadHelper {
 						}
 
 						if (varName.equals(TigaseConfigConst.PUBSUB_COMP)) {
-							for (int i = 1 ; i <= 5 ; i++ ) {
+							for (int i = 1 ; i <= 10 ; i++ ) {
 							if ((props.getProperty("--comp-name-" + i) != null
 									&& props.getProperty("--comp-name-" + i).equals("pubsub"))) {
 									idata.setVariable(TigaseConfigConst.PUBSUB_COMP, "on");
@@ -206,7 +206,7 @@ class TigaseConfigLoadHelper {
 						}
 
 						if (varName.equals(TigaseConfigConst.SOCKS5_COMP)) {
-							for (int i = 1 ; i <= 5 ; i++ ) {
+							for (int i = 1 ; i <= 10 ; i++ ) {
 							if ((props.getProperty("--comp-name-" + i) != null
 									&& props.getProperty("--comp-name-" + i).equals("proxy"))) {
 									idata.setVariable(TigaseConfigConst.SOCKS5_COMP, "on");
@@ -217,7 +217,7 @@ class TigaseConfigLoadHelper {
 						}
 
 						if (varName.equals(TigaseConfigConst.STUN_COMP)) {
-							for (int i = 1 ; i <= 5 ; i++ ) {
+							for (int i = 1 ; i <= 10 ; i++ ) {
 							if ((props.getProperty("--comp-name-" + i) != null
 									&& props.getProperty("--comp-name-" + i).equals("stun"))) {
 									idata.setVariable(TigaseConfigConst.STUN_COMP, "on");
@@ -227,8 +227,19 @@ class TigaseConfigLoadHelper {
 							continue;
 						}
 
+						if (varName.equals(TigaseConfigConst.HTTP_COMP)) {
+							for (int i = 1 ; i <= 10 ; i++ ) {
+							if ((props.getProperty("--comp-name-" + i) != null
+									&& props.getProperty("--comp-name-" + i).equals("rest"))) {
+									idata.setVariable(TigaseConfigConst.HTTP_COMP, "on");
+							}}
+								Debug.trace("Loaded: " + varName + " = " +
+									idata.getVariable(TigaseConfigConst.HTTP_COMP));
+							continue;
+						}
+
 						if (varName.equals(TigaseConfigConst.ARCHIVE_COMP)) {
-							for (int i = 1 ; i <= 5 ; i++ ) {
+							for (int i = 1 ; i <= 10 ; i++ ) {
 							if ((props.getProperty("--comp-name-" + i) != null
 									&& props.getProperty("--comp-name-" + i).equals("message-archive"))) {
 									idata.setVariable(TigaseConfigConst.ARCHIVE_COMP, "on");
@@ -248,6 +259,20 @@ class TigaseConfigLoadHelper {
 							}
 							continue;
 						}
+
+
+						if (varName.equals(TigaseConfigConst.ACS_COMP)) {
+							if ((props.getProperty("--sm-cluster-strategy-class") != null
+									&& props.getProperty("--sm-cluster-strategy-class").equals(TigaseConfigConst.ACS_COMP_CLASS))) {
+									idata.setVariable(TigaseConfigConst.ACS_COMP, "on");
+							} else {
+								idata.setVariable(TigaseConfigConst.ACS_COMP, "off");
+							}
+								Debug.trace("Loaded: " + varName + " = " +
+									idata.getVariable(TigaseConfigConst.ACS_COMP));
+							continue;
+						}
+
 
 						if (props.getProperty(name) != null) {
 							idata.setVariable(varName, props.getProperty(name));

@@ -75,10 +75,21 @@ public abstract class TigaseConfigConst {
 	public static final String STUN_COMP = "stunComponent";
 	public static final String SOCKS5_COMP = "socks5Component";
 	public static final String ARCHIVE_COMP = "messageArchiveComponent";
+	public static final String HTTP_COMP = "httpApiComponent";
+	public static final String ACS_COMP = "acsComponent";
 	public static final String PLUGINS = "plugins";
 	public static final String DEBUG = "debug";
 	public static final String USER_DB_URI = "userDBUri";
 	public static final String AUTH_DB_URI = "dbAuthType";
+
+	// classes
+	public static final String MUC_COMP_CLASS = "tigase.muc.MUCComponent";
+	public static final String PUBSUB_COMP_CLASS = "tigase.pubsub.PubSubComponent";
+	public static final String SOCKS5_COMP_CLASS = "tigase.socks5.Socks5ProxyComponent";
+	public static final String STUN_COMP_CLASS = "tigase.stun.StunComponent";
+	public static final String ARCHIVE_COMP_CLASS = "tigase.archive.MessageArchiveComponent";
+	public static final String HTTP_COMP_CLASS = "tigase.http.rest.RestMessageReceiver";
+	public static final String ACS_COMP_CLASS = "tigase.cluster.strategy.OnlineUsersCachingStrategy";
 
 	static {
 		tigaseIzPackMap.put("config-type", "configType");
@@ -90,13 +101,15 @@ public abstract class TigaseConfigConst {
 		tigaseIzPackMap.put("--pubsub", PUBSUB_COMP);
 		tigaseIzPackMap.put("--socks5", SOCKS5_COMP);
 		tigaseIzPackMap.put("--stun", STUN_COMP);
+		tigaseIzPackMap.put("--http", HTTP_COMP);
 		tigaseIzPackMap.put("--archive", ARCHIVE_COMP);
 		tigaseIzPackMap.put("--cluster-mode", "clusterMode");
-		tigaseIzPackMap.put("--cluster-nodes", "clusterNodes");
+//		tigaseIzPackMap.put("--cluster-nodes", "clusterNodes");
 		tigaseIzPackMap.put("--debug", DEBUG);
 		tigaseIzPackMap.put("--sm-plugins", PLUGINS);
 		tigaseIzPackMap.put("--user-db-uri", USER_DB_URI);
 		tigaseIzPackMap.put("--auth-db-uri", AUTH_DB_URI);
+		tigaseIzPackMap.put("--sm-cluster-strategy-class", ACS_COMP);
 // 		for (Map.Entry entry: tigaseIzPackMap.entrySet()) {
 // 			izPackTigaseMap.put(entry.getValue(), entry.getKey());
 // 		}

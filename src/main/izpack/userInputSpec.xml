@@ -178,15 +178,27 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<field type="check" variable="socks5Component">
 			<spec txt="Socks5 Component" true="on" false="off"	set="true"/>
 		</field>
+		<field type="check" variable="httpApiComponent">
+			<spec txt="HTTP API Component" true="on" false="off"	set="false"/>
+		</field>
 		<field type="check" variable="messageArchiveComponent">
 			<spec txt="Message Archive Component" true="on" false="off"	set="true"/>
 		</field>
+
+		<field type="space"/>
+
 
 		<field type="check" variable="clusterMode">
 			<description align="left" txt="Do you want your server to run in the cluster mode?" />
 			<spec txt="Cluster mode" true="true" false="false"	set="true"/>
 		</field>
-<!--		<field type="text" align="left" variable="clusterNodes">
+
+		<field type="check" variable="acsComponent" condition="clusterMode">
+			<spec txt="Tigase Advanced Clustering Strategy (ACS) Component" true="on" false="off"	set="false"/>
+		</field>
+
+
+	<!--		<field type="text" align="left" variable="clusterNodes">
 			<spec txt="Cluster nodes list" size="30" set="$HOST_NAME"/>
 		</field>-->
 
@@ -210,6 +222,33 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 
 	<!-- Plugins selection -->
 	<panel order="4">
+		<field type="title" txt="Advanced Clustering Strategy information" bold="true" size="2" />
+		<field type="space"/>
+		<field type="divider"/>
+		<field type="space"/>
+		<field type="staticText" align="left" size="2"
+					 txt="You have selected Tigase Advanced Clustering component. This component requires licence. If no valid licence is found then following data will be send back to Tigase team on daily basis:" />
+		<field type="space"/>
+		<field type="staticText" align="left" size="1" txt="- machine hostname" />
+		<field type="staticText" align="left" size="1" txt="- list of VHosts" />
+		<field type="staticText" align="left" size="1" txt="- uptime" />
+		<field type="staticText" align="left" size="1" txt="- memory usage" />
+		<field type="staticText" align="left" size="1" txt="- number of online users" />
+		<field type="staticText" align="left" size="1" txt="- count of cluster nodes" />
+		<field type="space"/>
+		<field type="divider"/>
+		<field type="space"/>
+		<field type="text" align="left" size="1" variable="acsName">
+			<description align="left" txt="To confirm please enter your name or company name below" />
+			<spec txt="Name: " id="" size="15" set=""/>
+			<validator class="com.izforge.izpack.util.NotEmptyValidator" txt="Field is empty!" />
+		</field>
+
+	</panel>
+
+
+	<!-- Plugins selection -->
+	<panel order="5">
 		<field type="title" txt="Plugins selection:" bold="true" size="2"/>
 		<field type="staticText" align="left" txt="Please selected/deselect plugins to be loaded by the server."/>
 		<field type="space"/>
@@ -285,7 +324,7 @@ uvme:vcard-temp,http://jabber.org/protocol/commands,jabber:iq:private,urn:xmpp:p
 	</panel>
 
 	<!-- Database configuration -->
-	<panel order="5">
+	<panel order="6">
 		<field type="title" txt="Database configuration:" bold="true" size="2"/>
 		<field type="staticText" align="left" txt="You have selected $dbType database. This database needs additional configuration parameters. Please enter all required information."/>
 		<field type="space"/>
@@ -332,7 +371,7 @@ uvme:vcard-temp,http://jabber.org/protocol/commands,jabber:iq:private,urn:xmpp:p
 	</panel>
 
 	<!-- Authentication database configuration -->
-	<panel order="6">
+	<panel order="7">
 		<field type="title" txt="Authentication database configuration:"
 					 bold="true" size="2"/>
 		<field type="staticText" align="left" txt="You have selected a separate authentication database. You have to provide more details about this database."/>

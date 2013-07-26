@@ -70,6 +70,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<variable name="socks5Component" value="on"/>
 		<variable name="messageArchiveComponent" value="on"/>
 		<variable name="clusterMode" value="true"/>
+		<variable name="acsName" value=""/>
 <!--		<variable name="JDKPath" value="$JAVA_HOME"/> -->
 	</variables>
 
@@ -108,6 +109,10 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		</condition>
 		<condition type="variable" id="messageArchive">
 			<name>messageArchiveComponent</name>
+			<value>on</value>
+		</condition>
+		<condition type="variable" id="acsSelected">
+			<name>acsComponent</name>
 			<value>on</value>
 		</condition>
 	</conditions>
@@ -232,12 +237,17 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 
 			<panel classname="UserInputPanel" condition="!installSelected"
 						 id="InstallationPathForConfigPanel.id"/>
+
 			<panel classname="TigaseConfigLoadPanel" condition="configSelected"
 						 id="TigaseConfigLoadPanel.id"/>
 			<panel classname="UserInputPanel" condition="configSelected"
 						 id="BasicConfigurationPanel.id"/>
 			<panel classname="UserInputPanel" condition="advancedSelected"
 						 id="AdvancedConfigurationPanel.id"/>
+
+			<panel classname="UserInputPanel" condition="acsSelected"
+						 id="AdvancedClusteringStrategyPanel.id"/>
+
 			<panel classname="UserInputPanel" condition="advancedSelected"
 						 id="PluginsListPanel.id"/>
 			<panel classname="UserInputPanel" condition="mysqlSelected|pgsqlSelected"
@@ -339,7 +349,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 				</fileset>
 			</pack>
 			<pack name="Extras" required="no" preselected="yes">
-				<description>Extras libraries, MUC, PubSub, STUN, Socks5, Message Archiving</description>
+				<description>Extras libraries, MUC, PubSub, STUN, Socks5, Message Archiving, ACS</description>
 				<fileset dir="." targetdir="$INSTALL_PATH">
 					<include name="jars/tigase-muc.jar"/>
 					<include name="jars/tigase-pubsub.jar"/>
@@ -348,6 +358,10 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 					<include name="jars/tigase-socks5.jar"/>
 					<include name="jars/tigase-message-archiving.jar"/>
 					<include name="jars/jdmkrt.jar"/>
+					<include name="jars/tigase-acs.jar"/>
+					<include name="jars/licence-lib.jar"/>
+					<include name="jars/tigase-stats-collector-library.jar"/>
+					<include name="jars/tigase-stats-collector-provider.jar"/>
 				</fileset>
 			</pack>
 
@@ -388,6 +402,22 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 				<description>SQL Server JDBC driver (SQL Server has to be installed separately)</description>
 				<fileset dir="." targetdir="$INSTALL_PATH">
 					<include name="jars/jtds-1.2.2.jar"/>
+				</fileset>
+			</pack>
+			<pack name="HTTP API Component" required="no" preselected="no">
+				<description>Interface for the service administration, monitoring and exchange data between Tigase and external system</description>
+				<fileset dir="." targetdir="${INSTALL_PATH}">
+					<include name="jars/javax.servlet.jar"/>
+					<include name="jars/jetty-continuation.jar"/>
+					<include name="jars/jetty-deploy.jar"/>
+					<include name="jars/jetty-http.jar"/>
+					<include name="jars/jetty-io.jar"/>
+					<include name="jars/jetty-security.jar"/>
+					<include name="jars/jetty-server.jar"/>
+					<include name="jars/jetty-servlet.jar"/>
+					<include name="jars/jetty-util.jar"/>
+					<include name="jars/jetty-webapp.jar"/>
+					<include name="jars/jetty-xml.jar"/>
 				</fileset>
 			</pack>
 			<pack name="Sources" required="no" preselected="no">

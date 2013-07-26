@@ -150,6 +150,8 @@ class TigaseConfigSaveHelper {
 			String varName = entry.getValue();
 			String varValue = variablesSource.getVariable(varName);
 
+			Debug.trace("=== HTTP varValue: " + varName + " : " + varValue);
+			
 			if (varName.equals(TigaseConfigConst.DEBUG)) {
 				String debugVar = getDebugs(variablesSource);
 				if (!debugVar.isEmpty()) {
@@ -194,9 +196,9 @@ class TigaseConfigSaveHelper {
 					++comp_idx;
 					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "muc");
 					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
-						"tigase.muc.MUCComponent");
+						TigaseConfigConst.MUC_COMP_CLASS);
 				}
-				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "muc");
+				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "muc" + " % to:" + "--comp-class-"+comp_idx + "=" + TigaseConfigConst.MUC_COMP_CLASS);
 				continue;
 			}
 			if (varName.equals(TigaseConfigConst.PUBSUB_COMP)) {
@@ -204,9 +206,9 @@ class TigaseConfigSaveHelper {
 					++comp_idx;
 					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "pubsub");
 					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
-						"tigase.pubsub.PubSubComponent");
+						TigaseConfigConst.PUBSUB_COMP_CLASS);
 				}
-				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "pubsub");
+				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "pubsub" + " % to:" + "--comp-class-"+comp_idx + "=" + TigaseConfigConst.PUBSUB_COMP_CLASS);
 				continue;
 			}
 
@@ -215,9 +217,9 @@ class TigaseConfigSaveHelper {
 					++comp_idx;
 					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "proxy");
 					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
-						"tigase.socks5.Socks5ProxyComponent");
+						TigaseConfigConst.SOCKS5_COMP_CLASS);
 				}
-				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "proxy");
+				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "proxy" + " % to:" + "--comp-class-"+comp_idx + "=" + TigaseConfigConst.SOCKS5_COMP_CLASS);
 				continue;
 			}
 			if (varName.equals(TigaseConfigConst.STUN_COMP)) {
@@ -225,9 +227,19 @@ class TigaseConfigSaveHelper {
 					++comp_idx;
 					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "stun");
 					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
-						"tigase.stun.StunComponent");
+						TigaseConfigConst.STUN_COMP_CLASS);
 				}
-				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "stun");
+				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "stun" + " % to:" + "--comp-class-"+comp_idx + "=" + TigaseConfigConst.STUN_COMP_CLASS);
+				continue;
+			}
+			if (varName.equals(TigaseConfigConst.HTTP_COMP)) {
+				if (varValue.equals("on")) {
+					++comp_idx;
+					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "rest");
+					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
+						TigaseConfigConst.HTTP_COMP_CLASS);
+				}
+				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "rest" + " % to:" + "--comp-class-"+comp_idx + "=" + TigaseConfigConst.HTTP_COMP_CLASS);
 				continue;
 			}
 			if (varName.equals(TigaseConfigConst.ARCHIVE_COMP)) {
@@ -235,9 +247,17 @@ class TigaseConfigSaveHelper {
 					++comp_idx;
 					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "message-archive");
 					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
-						"tigase.archive.MessageArchiveComponent");
+						TigaseConfigConst.ARCHIVE_COMP_CLASS);
 				}
-				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "message-archive");
+				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "message-archive" + " % to:" + "--comp-class-"+comp_idx + "=" + TigaseConfigConst.HTTP_COMP_CLASS);
+				continue;
+			}
+
+			if (varName.equals(TigaseConfigConst.ACS_COMP)) {
+				if (varValue.equals("on")) {
+					TigaseConfigConst.props.setProperty("--sm-cluster-strategy-class", TigaseConfigConst.ACS_COMP_CLASS);
+				}
+				Debug.trace("Set: " + "--sm-cluster-strategy-class = " + TigaseConfigConst.ACS_COMP_CLASS);
 				continue;
 			}
 
