@@ -49,8 +49,8 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<pack200/>
 	</info>
 
-	<jar src="jars/jdbc-postgresql.jar"/>
-	<jar src="jars/jdbc-mysql.jar"/>
+	<jar src="jars/postgresql.jar"/>
+	<jar src="jars/mysql-connector-java.jar"/>
 	<jar src="jars/derby.jar"/>
 	<jar src="jars/tigase-server.jar"/>
 	<jar src="jars/tigase-xmltools.jar"/>
@@ -371,7 +371,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 					<include name="*.*"/>
 				</fileset>
 				<fileset dir="jars" targetdir="$INSTALL_PATH/jars">
-					<include name="groovy-all-2.1.0.jar"/>
+					<include name="groovy-all.jar"/>
 				</fileset>
 			</pack>
 
@@ -387,21 +387,21 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 <!-- 						installGroups="MySQL Database"> -->
 				<description>MySQL JDBC driver (MySQL has to be installed separately)</description>
 				<fileset dir="." targetdir="$INSTALL_PATH">
-					<include name="jars/jdbc-mysql.jar"/>
+					<include name="jars/mysql-connector-java.jar"/>
 				</fileset>
 			</pack>
 			<pack name="PostgreSQL Database driver (DB not included)" required="no" preselected="yes">
 <!-- 						installGroups="PostgreSQL Database"> -->
 				<description>PostgreSQL JDBC driver (PostgreSQL has to be installed separately)</description>
 				<fileset dir="." targetdir="$INSTALL_PATH">
-					<include name="jars/jdbc-postgresql.jar"/>
+					<include name="jars/postgresql.jar"/>
 				</fileset>
 			</pack>
 			<pack name="SQL Server Database driver (DB not included)" required="no" preselected="yes">
 <!-- 						installGroups="SQL Server Database"> -->
 				<description>SQL Server JDBC driver (SQL Server has to be installed separately)</description>
 				<fileset dir="." targetdir="$INSTALL_PATH">
-					<include name="jars/jtds-1.2.2.jar"/>
+					<include name="jars/jtds.jar"/>
 				</fileset>
 			</pack>
 			<pack name="HTTP API Component" required="no" preselected="no">

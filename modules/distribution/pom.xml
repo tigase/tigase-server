@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<properties>
+		<packaging.type>pom</packaging.type>
+		<dist_path>../..</dist_path>
+	</properties>
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>tigase</groupId>
+	<artifactId>tigase-server-dist</artifactId>
+	<name>Tigase XMPP Server Distribution builder</name>
+
+	<packaging>${packaging.type}</packaging>
+
+	<parent>
+		<groupId>tigase</groupId>
+		<artifactId>tigase-server-master</artifactId>
+		<version>5.2.0-SNAPSHOT</version>
+		<relativePath>../master</relativePath>
+	</parent>
+	
+	<build>
+		<plugins>
+
+			<plugin>
+				<artifactId>exec-maven-plugin</artifactId>
+				<groupId>org.codehaus.mojo</groupId>
+				<version>1.2.1</version>
+				<executions>
+					<execution><!-- Run our version calculation script -->
+						<id>ChangeLog generation</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${project.basedir}/scripts/genChangeLog.sh</executable>
+							<workingDirectory>${project.basedir}</workingDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.4</version>
+				<executions>
+					<execution>
+						<id>dist</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>src/main/assembly/dist.xml</descriptor>
+								<descriptor>src/main/assembly/dist-max.xml</descriptor>
+							</descriptors>
+							<tarLongFileMode>gnu</tarLongFileMode>
+							<finalName>tigase-server-${project.version}-b${gitVersion}</finalName>
+							<outputDirectory>../../pack</outputDirectory>
+							<!--<appendAssemblyId>false</appendAssemblyId>-->
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<quiet/>
+							<reportOutputDirectory>${project.reporting.outputDirectory}/docs</reportOutputDirectory>
+							<destDir>docs</destDir>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <configuration>
+              <target>
+								<exec executable="sed" output="README">
+									<arg value="-e"/>
+									<arg value="s/&lt;[^>]*>//g"/>
+									<arg value="-e"/>
+									<arg value="s/&#60;[^>]*>//g"/>
+									<arg value="-e"/>
+									<arg value="s/&amp;[^; ]*;//g"/>
+									<arg value="-e"/>
+									<arg value="s/${APP_VER}/${project.version}/g"/>
+									<arg value="${dist_path}/package.html"/>
+								</exec>
+								<exec executable="sed" output="package.html">
+									<arg value="s/${APP_VER}/${project.version}--b${gitVersion}/g"/>
+									<arg value="${dist_path}/package.html"/>
+								</exec>
+								<copy file="${dist_path}/License.html" tofile="License.html"/>
+								<!--<copy file="${dist_path}/ChangeLog" tofile="ChangeLog"/>-->
+
+							</target>
+						</configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.8</version>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.basedir}/../../jars</outputDirectory>
+							<stripVersion>true</stripVersion>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+		</plugins>
+	</build>
+
+	<dependencies>
+
+		<!--tigase dependencies-->
+		<dependency>
+			<groupId>tigase</groupId>
+			<artifactId>tigase-server</artifactId>
+			<version>5.2.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>tigase</groupId>
+			<artifactId>tigase-utils</artifactId>
+			<version>3.4.2-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>tigase</groupId>
+			<artifactId>tigase-xmltools</artifactId>
+			<version>3.4.4-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>tigase</groupId>
+			<artifactId>tigase-muc</artifactId>
+			<version>2.2.0-SNAPSHOT</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>tigase</groupId>
+			<artifactId>tigase-pubsub</artifactId>
+			<version>2.2.0-SNAPSHOT</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>tigase</groupId>
+			<artifactId>tigase-extras</artifactId>
+			<version>1.1.0-SNAPSHOT</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>tigase</groupId>
+			<artifactId>licence-lib</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>tigase</groupId>
+			<artifactId>tigase-stats-collector-library</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>tigase</groupId>
+			<artifactId>tigase-stats-collector-provider</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>tigase</groupId>
+			<artifactId>tigase-http-api</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>tigase</groupId>
+			<artifactId>tigase-message-archiving</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>tigase</groupId>
+			<artifactId>tigase-socks5</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>tigase</groupId>
+			<artifactId>tigase-stun</artifactId>
+			<version>1.1.0-SNAPSHOT</version>
+			<scope>runtime</scope>
+		</dependency>
+
+
+		<!--databases-->
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derby</artifactId>
+			<version>10.9.1.0</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derbytools</artifactId>
+			<version>10.9.1.0</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.6</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>9.1-901-1.jdbc4</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- other libraries-->
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-all</artifactId>
+			<version>2.1.0</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>openDMK</groupId>
+			<artifactId>jdmkrt</artifactId>
+			<version>1.0-b02</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jtds</groupId>
+			<artifactId>jtds</artifactId>
+			<version>1.2.2</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-core</artifactId>
+			<version>1.3</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+
+		<!--HTTP API component dependencies-->
+		<dependency>
+			<groupId>org.eclipse.jetty.orbit</groupId>
+			<artifactId>javax.servlet</artifactId>
+			<version>3.0.0.v201112011016</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-continuation</artifactId>
+			<version>8.1.9.v20130131</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-deploy</artifactId>
+			<version>8.1.9.v20130131</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-http</artifactId>
+			<version>8.1.9.v20130131</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-io</artifactId>
+			<version>8.1.9.v20130131</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-security</artifactId>
+			<version>8.1.9.v20130131</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>8.1.9.v20130131</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-servlet</artifactId>
+			<version>8.1.9.v20130131</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-util</artifactId>
+			<version>8.1.9.v20130131</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-webapp</artifactId>
+			<version>8.1.9.v20130131</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-xml</artifactId>
+			<version>8.1.9.v20130131</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty.osgi</groupId>
+			<artifactId>jetty-osgi-boot</artifactId>
+			<version>8.1.9.v20130131</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!--OSGi dependencies-->
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>1.4.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jul-to-slf4j</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+</project>
+

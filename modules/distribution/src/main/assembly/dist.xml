@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+	<id>dist</id>
+	<formats>
+		<format>zip</format>
+		<format>tar.gz</format>
+	</formats>
+
+	<fileSets>
+		<fileSet>
+			<directory>./</directory>
+			<outputDirectory>./</outputDirectory>
+			<includes>
+				<include>README</include>
+				<include>ChangeLog</include>
+				<include>License.html</include>
+				<include>package.html</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>../../certs</directory>
+			<outputDirectory>certs</outputDirectory>
+			<includes>
+				<include>dummy.cer</include>
+				<include>rsa-keystore</include>
+				<include>truststore</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>../../database</directory>
+			<outputDirectory>database</outputDirectory>
+			<includes>
+				<include>*</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>../../docs</directory>
+			<outputDirectory>docs</outputDirectory>
+			<includes>
+				<include>*/**</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>../../etc</directory>
+			<outputDirectory>etc</outputDirectory>
+			<includes>
+				<include>bosh-extra-headers.txt</include>
+				<include>cross-domain-policy.xml</include>
+				<include>init.properties</include>
+				<include>tigase.conf</include>
+				<include>jmx.access</include>
+				<include>jmx.password</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>../../src/main/groovy/tigase/admin</directory>
+			<outputDirectory>scripts/admin</outputDirectory>
+			<includes>
+				<include>**/*</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>../../scripts</directory>
+			<outputDirectory>scripts</outputDirectory>
+			<includes>
+				<include>**/*</include>
+			</includes>
+			<excludes>
+				<exclude></exclude>
+			</excludes>
+		</fileSet>
+		<fileSet>
+			<directory>./</directory>
+			<outputDirectory>/logs</outputDirectory>
+			<excludes>
+				<exclude>*/**</exclude>
+			</excludes>
+			<fileMode>0644</fileMode>
+		</fileSet>
+	</fileSets>
+	<dependencySets>
+		<dependencySet>
+			<useProjectArtifact>false</useProjectArtifact>
+			<outputDirectory>jars</outputDirectory>
+			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+			<unpack>false</unpack>
+			<scope>runtime</scope>
+			<includes>
+				<!--tigase libraries-->
+				<include>tigase:tigase-utils</include>
+				<include>tigase:tigase-xmltools</include>
+				<include>tigase:tigase-server</include>
+
+				<!--database libraries-->
+				<include>org.apache.derby:derby</include>
+				<include>org.apache.derby:derbytools</include>
+				<include>mysql:mysql-connector-java</include>
+				<include>postgresql:postgresql</include>
+				<!-- other libraries-->
+				<include>org.codehaus.groovy:groovy-all</include>
+				<include>openDMK:jdmkrt</include>
+				<include>net.sourceforge.jtds:jtds</include>
+
+			</includes>
+		</dependencySet>
+	</dependencySets>
+</assembly>

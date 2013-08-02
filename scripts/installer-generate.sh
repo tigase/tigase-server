@@ -16,13 +16,21 @@ if [ ! -e logs ] ; then
 	mkdir logs || exit -1
 fi
 
+
+
+# get dependencies
+cd modules/distribution
+mvn -U dependency:copy-dependencies -DoutputDirectory=../../jars -Dmdep.stripVersion=true
+cd ../..
+
 # copy socks5 schema
 if [ -d ../socks5 ] ; then
 	cp ../socks5/database/* database
 fi
 
 # insert appropriate version information
-export TIGVER=`grep -m 1 "Tigase-Version:" MANIFEST.MF | sed -e "s/Tigase-Version: \(.*\)/\\1/"`
+export TIGVER=`grep -m 1 "Tigase-Version:" target/classes/META-INF/MANIFEST.MF | sed -e "s/Tigase-Version: \(.*\)/\\1/" | sed 's/[[:space:]]//'`
+echo -e $TIGVER
 sed -e "s/<appversion>\([^<]*\)<\/appversion>/<appversion>$TIGVER<\/appversion>/" \
     src/main/izpack/install.xml > src/main/izpack/install_copy.xml
 
