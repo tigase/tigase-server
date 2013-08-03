@@ -177,6 +177,7 @@
 							<quiet>true</quiet>
 							<reportOutputDirectory>${project.reporting.outputDirectory}/docs</reportOutputDirectory>
 							<destDir>docs</destDir>
+							<maxmemory>512m</maxmemory>
 						</configuration>
 					</execution>
 				</executions>
