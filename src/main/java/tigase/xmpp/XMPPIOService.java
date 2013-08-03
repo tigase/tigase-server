@@ -698,6 +698,12 @@ public class XMPPIOService<RefObject>
 					e });
 		}
 
+		if (processors != null) {
+			for (XMPPIOProcessor processor : processors) {
+				processor.serviceStopped(this, true);
+			}
+		}
+		
 		// streamClosed = true;
 		if (serviceListener != null) {
 			serviceListener.xmppStreamClosed(this);
@@ -741,14 +747,16 @@ public class XMPPIOService<RefObject>
 	}
 
 	@Override
-	public void forceStop() {
-		super.forceStop();
-		
+	public void forceStop() {		
+		boolean stop = false;
 		if (processors != null) {
 			for (XMPPIOProcessor processor : processors) {
-				processor.serviceStopped(this);
+				stop |= processor.serviceStopped(this, false);
 			}
 		}
+		
+		if (!stop)
+			super.forceStop();
 	}
 	
 	//~--- set methods ----------------------------------------------------------

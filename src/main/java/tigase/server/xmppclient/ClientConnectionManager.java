@@ -47,16 +47,13 @@ import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
-import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import java.util.Arrays;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.LinkedList;
 import java.util.List;
@@ -83,7 +80,6 @@ public class ClientConnectionManager
 	 */
 	private static final Logger log = Logger.getLogger(ClientConnectionManager.class
 			.getName());
-	private static final String  IO_PROCESSORS_PROP_KEY     = "processors";
 	private static final String  ROUTING_ENTRY_PROP_KEY     = ".+";
 	private static final String  ROUTING_MODE_PROP_KEY      = "multi-mode";
 	private static final String  ROUTINGS_PROP_KEY          = "routings";
@@ -448,19 +444,9 @@ public class ClientConnectionManager
 		if (props.get(SOCKET_CLOSE_WAIT_PROP_KEY) != null) {
 			socket_close_wait_time = (Long) props.get(SOCKET_CLOSE_WAIT_PROP_KEY);
 		}
-		if (props.containsKey(IO_PROCESSORS_PROP_KEY)) {
-			String[] processorsArr = (String[]) props.get(IO_PROCESSORS_PROP_KEY);
-			List<XMPPIOProcessor> processors = new ArrayList<XMPPIOProcessor>();
-			
-			if (processorsArr != null) {
-				Arrays.sort(processorsArr);
-				if (Arrays.binarySearch(processorsArr, StreamManagementIOProcessor.XMLNS) >= 0) {
-					processors.add(new StreamManagementIOProcessor(this));
-				}
-			}
-			
-			this.processors = processors.toArray(new XMPPIOProcessor[processors.size()]);
-		}
+		
+		processors = XMPPIOProcessorsFactory.updateIOProcessors(this, processors, props);
+
 		if (props.size() == 1) {
 
 			// If props.size() == 1, it means this is a single property update
@@ -1089,6 +1075,16 @@ public class ClientConnectionManager
 
 			break;
 
+		case OTHER:
+			if (processors != null) {
+				for (XMPPIOProcessor processor : processors) {
+					//handled |= processor.processCommand(packet);
+					processor.processCommand(serv, packet);
+				}
+			}
+			
+			break;
+			
 		default :
 			writePacketToSocket(iqc);
 

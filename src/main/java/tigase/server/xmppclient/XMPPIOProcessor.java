@@ -22,6 +22,8 @@
 package tigase.server.xmppclient;
 
 import java.io.IOException;
+import java.util.Map;
+import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.XMPPIOService;
@@ -32,6 +34,13 @@ import tigase.xmpp.XMPPIOService;
  */
 public interface XMPPIOProcessor {
 
+	/**
+	 * Returns identifier of processor
+	 * 
+	 * @return 
+	 */
+	String getId();
+	
 	/**
 	 * Returns array of features added by this processor
 	 * 
@@ -70,9 +79,34 @@ public interface XMPPIOProcessor {
 	void packetsSent(XMPPIOService service) throws IOException;
 	
 	/**
+	 * Process command execution which may be sent from other component and 
+	 * should be processed by processor
+	 * 
+	 * @param packet 
+	 */
+	void processCommand(XMPPIOService service, Packet packet);
+	
+	/**
 	 * Method called when XMPPIOService is closed.
 	 * 
 	 * @param service 
+	 * @param streamClosed 
+	 * @return true if connecton manager should not be notified about stopping 
+	 *				of this service
 	 */
-	void serviceStopped(XMPPIOService service);
+	boolean serviceStopped(XMPPIOService service, boolean streamClosed);
+	
+	/**
+	 * Sets connection manager instance for which this XMPPIOProcessor is used
+	 * 
+	 * @param connectionManager 
+	 */
+	void setConnectionManager(ConnectionManager connectionManager);
+	
+	/**
+	 * Method used for setting properties
+	 * 
+	 * @param props 
+	 */
+	void setProperties(Map<String,Object> props);
 }

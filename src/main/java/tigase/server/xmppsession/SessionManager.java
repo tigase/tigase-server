@@ -1650,6 +1650,35 @@ public class SessionManager
 
 			break;
 
+		case STREAM_MOVED:
+			if (connection != null) {
+				String oldConnectionJidStr = Command.getFieldValue(pc, "old-conn-jid");
+				JID oldConnJid = JID.jidInstanceNS(oldConnectionJidStr);
+				
+				try {
+					// get old session and replace it's connection id to redirect packets
+					// to new connection
+					XMPPResourceConnection oldConn = connectionsByFrom.remove(oldConnJid);
+					oldConn.setConnectionId(connection.getConnectionId());
+					connectionsByFrom.remove(connection.getConnectionId());
+					connectionsByFrom.put(oldConnJid, oldConn);
+
+					// remove current connection from list of active connections as 
+					// this connection will be used with other already authenticated connection
+					sessionsByNodeId.get(oldConn.getBareJID()).removeResourceConnection(connection);
+
+					Packet cmd = Command.OTHER.getPacket(getComponentId(), oldConnJid, StanzaType.set, "moved");
+					Command.addFieldValue(cmd, "cmd", "stream-moved");
+					Command.addFieldValue(cmd, "new-conn-jid", oldConn.getConnectionId().toString());
+					addOutPacket(cmd);
+				}
+				catch (XMPPException ex) {
+					log.log(Level.SEVERE, "exception while replacing old connection id = " + oldConnJid 
+							+ " with new connection id = " + pc.getPacketFrom().toString(), ex);
+				}				
+			}
+			break;
+			
 		default :
 			if (getComponentId().equals(iqc.getStanzaTo()) && getComponentId().equals(iqc
 					.getPacketFrom())) {
