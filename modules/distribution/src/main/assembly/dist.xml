@@ -46,10 +46,14 @@
 			<includes>
 				<include>bosh-extra-headers.txt</include>
 				<include>cross-domain-policy.xml</include>
+				<include>client-access-policy.xml</include>
 				<include>init.properties</include>
 				<include>tigase.conf</include>
 				<include>jmx.access</include>
 				<include>jmx.password</include>
+				<include>logback.xml</include>
+				<include>snmp.acl</include>
+				<include>tigase-http-context.xml</include>
 			</includes>
 		</fileSet>
 		<fileSet>
@@ -68,6 +72,7 @@
 			<excludes>
 				<exclude></exclude>
 			</excludes>
+			<fileMode>0744</fileMode>
 		</fileSet>
 		<fileSet>
 			<directory>./</directory>
@@ -76,6 +81,7 @@
 				<exclude>*/**</exclude>
 			</excludes>
 			<fileMode>0644</fileMode>
+			<directoryMode>0744</directoryMode>
 		</fileSet>
 	</fileSets>
 	<dependencySets>
@@ -84,12 +90,12 @@
 			<outputDirectory>jars</outputDirectory>
 			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
 			<unpack>false</unpack>
-			<scope>runtime</scope>
+			<!--<scope>runtime</scope>-->
 			<includes>
 				<!--tigase libraries-->
-				<include>tigase:tigase-utils</include>
-				<include>tigase:tigase-xmltools</include>
 				<include>tigase:tigase-server</include>
+				<!--<include>tigase:tigase-utils</include>-->
+				<!--<include>tigase:tigase-xmltools</include>-->
 
 				<!--database libraries-->
 				<include>org.apache.derby:derby</include>

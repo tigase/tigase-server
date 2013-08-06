@@ -164,6 +164,10 @@
           <file name="jmx.password"/>
           <file name="cross-domain-policy.xml"/>
           <file name="bosh-extra-headers.txt"/>
+          <file name="client-access-policy.xml"/>
+          <file name="logback.xml"/>
+          <file name="snmp.acl"/>
+          <file name="tigase-http-context.xml"/>
         </filelist>
       </copy>
       <mkdir dir="${dist}/@{packagename}-${version}/database"/>

@@ -69,7 +69,7 @@ if ! [ $OSGI ] ; then
 	LIB_DIR=jars
 	JAR_FILE=${LIB_DIR}/tigase-server*.jar
 else
-	LIB_DIR=bundle
+	LIB_DIR=jars
 	JAR_FILE=${LIB_DIR}/org.apache.felix.main*.jar
 fi
 
