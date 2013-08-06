@@ -1,0 +1,20 @@
+<configuration scan="true">
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>logs/tigase.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%date [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="tigase.xmpp.XMPPDomBuilderHandler" level="warn"/>
+    <logger name="tigase.server" level="trace"/>
+    <logger name="tigase.io" level="warn"/>
+    <logger name="tigase.osgi" level="trace"/>
+    <logger name="tigase.xmpp" level="trace"/>
+
+    <root level="trace">
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>
+
