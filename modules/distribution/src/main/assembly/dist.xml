@@ -73,6 +73,7 @@
 				<exclude></exclude>
 			</excludes>
 			<fileMode>0744</fileMode>
+			<directoryMode>0744</directoryMode>
 		</fileSet>
 		<fileSet>
 			<directory>./</directory>

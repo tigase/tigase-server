@@ -78,6 +78,7 @@
 				<include>**/*</include>
 			</includes>
 			<fileMode>0744</fileMode>
+			<directoryMode>0744</directoryMode>
 		</fileSet>
 		<fileSet>
 			<directory>./</directory>
