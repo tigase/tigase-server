@@ -61,6 +61,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 	
 	// used attribute names
 	private static final String H_ATTR = "h";
+	private static final String LOCATION_ATTR = "location";
 	private static final String RESUME_ATTR = "resume";
 	private static final String MAX_ATTR = "max";
 	private static final String PREVID_ATTR = "previd";
@@ -147,8 +148,10 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 					services.put(id, service);
 				}
 				try {
+					String location = connectionManager.getDefHostName().toString();
 					service.writeRawData("<" + ENABLED_NAME + " xmlns='" + XMLNS + "'"
-							+ ( id != null ? " id='" + id + "' " + RESUME_ATTR + "='true' "+ MAX_ATTR + "='" + max + "'" : "" ) +" />");
+							+ ( id != null ? " id='" + id + "' " + RESUME_ATTR + "='true' "+ MAX_ATTR + "='" + max + "'" : "" ) 
+							+ " " + LOCATION_ATTR + "='" + location + "' />");
 				}
 				catch (IOException ex) {
 					if (log.isLoggable(Level.FINE)) {
