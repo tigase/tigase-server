@@ -163,6 +163,11 @@ public enum Command {
 	VHOSTS_REMOVE(Priority.NORMAL),
 
 	/**
+	 * Command sent to SessionManager to change connectionId of existing session.
+	 */
+	STREAM_MOVED(Priority.NORMAL),
+	
+	/**
 	 * Identifies all other, not predefined commands.
 	 */
 	OTHER(Priority.NORMAL);
