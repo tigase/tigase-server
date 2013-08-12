@@ -30,6 +30,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.net.IOServiceListener;
 import tigase.server.Command;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
@@ -220,7 +221,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		OutQueue outQueue = (OutQueue) service.getSessionData().get(OUT_COUNTER_KEY);		
 		outQueue.append(packet);
 		
-		return false;
+		return service.getSessionData().containsKey(RESUMPTION_TASK_KEY);
 	}
 	
 	@Override
@@ -280,21 +281,38 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		if (streamClosed) {
 			service.getSessionData().remove(STREAM_ID_KEY);
 		}
-		
+
+//		try {
+//			throw new Exception();
+//		} catch (Throwable ex) {
+//			log.log(Level.WARNING, "resumption timeout started, stream close = " + streamClosed, ex);
+//			ex.printStackTrace();
+//		}
+				
+		// some buggy client (ie. Psi) may close stream without sending stream 
+		// close which forces us to thread this stream as broken and waiting for 
+		// resumption but those clients are not compatible with XEP-0198 and 
+		// resumption so this should not happen
 		if (isResumptionEnabled(service)) {
 			String id = (String) service.getSessionData().get(STREAM_ID_KEY);
 			if (!services.containsKey(id))
 				return false;
-			
+
+			// ConnectionManager must not be notified about closed connection
+			// but connection needs to be closed so this is this case we still 
+			// return false to call forceStop but we remove IOServiceListener
+			service.setIOServiceListener((IOServiceListener) null);
+				
 			int resumptionTimeout = (Integer) service.getSessionData().get(MAX_RESUMPTION_TIMEOUT_KEY);
 			synchronized (service) {
-				if (!service.getSessionData().containsKey(RESUMPTION_TASK_KEY)) {
+				if (!service.getSessionData().containsKey(RESUMPTION_TASK_KEY)) {					
 					TimerTask timerTask = new ResumptionTimeoutTask(service);
+					service.getSessionData().put(RESUMPTION_TASK_KEY, timerTask);
 					connectionManager.addTimerTask(timerTask, resumptionTimeout * 1000);
 				}
 			}
 			
-			return true;
+			return false;
 		}
 		
 		sendErrorsForQueuedPackets(service);
