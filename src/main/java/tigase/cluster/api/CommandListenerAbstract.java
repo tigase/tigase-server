@@ -1,5 +1,5 @@
 /*
- * CommandListener.java
+ * CommandListenerAbstract.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
@@ -22,41 +22,81 @@
 
 
 
+/*
+* To change this template, choose Tools | Templates
+* and open the template in the editor.
+ */
 package tigase.cluster.api;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.stats.StatisticsList;
 
-import tigase.xml.Element;
-
-import tigase.xmpp.JID;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-
 /**
- * @author Artur Hefczyc Created Mar 16, 2011
+ *
+ * @author kobit
  */
-public interface CommandListener
-				extends Comparable<CommandListener> {
+public abstract class CommandListenerAbstract
+				implements CommandListener {
+	private String commandName;
+
+	//~--- constructors ---------------------------------------------------------
+
+	/**
+	 * Constructs ...
+	 *
+	 *
+	 * @param name
+	 */
+	public CommandListenerAbstract(String name) {
+		setName(name);
+	}
+
+	//~--- methods --------------------------------------------------------------
+
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param fromNode
-	 * @param visitedNodes
-	 * @param data
-	 * @param packets
+	 * @param cl
 	 *
-	 * @throws ClusterCommandException
+	 * @return
 	 */
-	void executeCommand(JID fromNode, Set<JID> visitedNodes, Map<String, String> data,
-			Queue<Element> packets)
-					throws ClusterCommandException;
+	@Override
+	public int compareTo(CommandListener cl) {
+		return commandName.compareTo(cl.getName());
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param cl
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean equals(Object cl) {
+		return ((cl != null) && (cl instanceof CommandListener) && commandName.equals(
+				((CommandListener) cl).getName()));
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int hashCode() {
+		int hash = 265;
+
+		hash = hash + ((this.commandName != null)
+				? this.commandName.hashCode()
+				: 0);
+
+		return hash;
+	}
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -66,7 +106,10 @@ public interface CommandListener
 	 *
 	 * @return
 	 */
-	String getName();
+	@Override
+	public String getName() {
+		return commandName;
+	}
 
 	/**
 	 * Method description
@@ -74,7 +117,8 @@ public interface CommandListener
 	 *
 	 * @param list
 	 */
-	void getStatistics(StatisticsList list);
+	@Override
+	public void getStatistics(StatisticsList list) {}
 
 	//~--- set methods ----------------------------------------------------------
 
@@ -84,7 +128,10 @@ public interface CommandListener
 	 *
 	 * @param name
 	 */
-	void setName(String name);
+	@Override
+	public final void setName(String name) {
+		commandName = name;
+	}
 }
 
 
