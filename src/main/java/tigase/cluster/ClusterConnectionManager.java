@@ -31,11 +31,11 @@ import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.cluster.api.ClusterElement;
 import tigase.cluster.api.CommandListener;
+import tigase.cluster.api.CommandListenerAbstract;
 import tigase.cluster.repo.ClusterRepoItem;
 
 import tigase.db.comp.ComponentRepository;
 import tigase.db.comp.RepositoryChangeListenerIfc;
-import tigase.db.TigaseDBException;
 
 import tigase.net.ConnectionType;
 
@@ -74,9 +74,7 @@ import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.TimerTask;
 import java.util.UUID;
-import java.util.concurrent.ScheduledFuture;
 import java.util.zip.Deflater;
 
 import javax.script.Bindings;
@@ -160,7 +158,8 @@ public class ClusterConnectionManager
 
 	/** Field description */
 	public static final boolean COMPRESS_STREAM_PROP_VAL = false;
-	private static final String SERVICE_CONNECTED_TASK_FUTURE  = "service-connected-task-future";
+	private static final String SERVICE_CONNECTED_TASK_FUTURE =
+			"service-connected-task-future";
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -196,7 +195,521 @@ public class ClusterConnectionManager
 
 	// private long packetsSent = 0;
 	// private long packetsReceived = 0;
-	private CommandListener sendPacket = new SendPacket();
+	private CommandListener sendPacket = new SendPacket(ClusterControllerIfc
+			.DELIVER_CLUSTER_PACKET_CMD);
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * This method can be overwritten in extending classes to get a different
+	 * packets distribution to different threads. For PubSub, probably better
+	 * packets distribution to different threads would be based on the sender
+	 * address rather then destination address.
+	 *
+	 * @param packet
+	 * @return
+	 */
+	@Override
+	public int hashCodeForPacket(Packet packet) {
+
+		// If this is a cluster packet let's try to do a bit more smart hashing
+		// based on the stanza from/to addresses
+		if (packet.getElemName() == ClusterElement.CLUSTER_EL_NAME) {
+
+			// TODO: Look for a simpler, more efficient algorithm to distribute
+			// cluster packets among different threads.
+			// This looks like an overkill to me, however I don't see any better way
+			ClusterElement clel = new ClusterElement(packet.getElement());
+
+			// If there is no XMPP stanzas with an address inside the cluster packet,
+			// we can try Map data and User ID inside it if it exists.
+			String userId = clel.getMethodParam("userId");
+
+			if (userId != null) {
+				return userId.hashCode();
+			}
+
+			Queue<Element> children = clel.getDataPackets();
+
+			if ((children != null) && (children.size() > 0)) {
+				Element child     = children.peek();
+				String  stanzaAdd = child.getAttributeStaticStr(Packet.TO_ATT);
+
+				if (stanzaAdd != null) {
+					return stanzaAdd.hashCode();
+				} else {
+
+					// This might be user's initial presence. In such a case we take
+					// stanzaFrom instead
+					stanzaAdd = child.getAttributeStaticStr(Packet.FROM_ATT);
+					if (stanzaAdd != null) {
+						return stanzaAdd.hashCode();
+					} else {
+
+						// This may happen for some cluster packets, like:
+						// resp-sync-online-sm-cmd and this is correct
+						log.log(Level.FINE, "No stanzaTo or from for cluster packet: {0}", packet);
+					}
+				}
+			}
+		}
+
+		// There is a separate connection to each cluster node, ideally we want to
+		// process packets in a separate thread for each connection, so let's try
+		// to get the hash code by the destination node address
+		if (packet.getStanzaTo() != null) {
+			return packet.getStanzaTo().hashCode();
+		}
+
+		return packet.getTo().hashCode();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param binds
+	 */
+	@Override
+	public void initBindings(Bindings binds) {
+		super.initBindings(binds);
+		binds.put("clusterCM", this);
+		binds.put(ComponentRepository.COMP_REPO_BIND, repo);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 * @param repoItem
+	 */
+	@Override
+	public void itemAdded(ClusterRepoItem repoItem) {
+		log.log(Level.INFO, "Loaded repoItem: {0}", repoItem.toString());
+
+		String host = repoItem.getHostname();
+
+		if (!host.equals(getDefHostName().getDomain())
+
+//  && ((host.hashCode() > getDefHostName().hashCode()) || connect_all)
+		) {
+			for (int i = 0; i < per_node_conns; ++i) {
+				log.log(Level.CONFIG, "Trying to connect to cluster node: {0}", host);
+
+				Map<String, Object> port_props = new LinkedHashMap<String, Object>(12);
+
+				port_props.put(SECRET_PROP_KEY, repoItem.getPassword());
+				port_props.put(PORT_LOCAL_HOST_PROP_KEY, getDefHostName());
+				port_props.put(PORT_TYPE_PROP_KEY, ConnectionType.connect);
+				port_props.put(PORT_SOCKET_PROP_KEY, SocketType.plain);
+				port_props.put(PORT_REMOTE_HOST_PROP_KEY, host);
+				port_props.put(PORT_IFC_PROP_KEY, new String[] { host });
+				port_props.put(MAX_RECONNECTS_PROP_KEY, 99999999);
+				port_props.put(PORT_KEY, repoItem.getPortNo());
+				addWaitingTask(port_props);
+			}
+
+			// reconnectService(port_props, connectionDelay);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param item
+	 */
+	@Override
+	public void itemRemoved(ClusterRepoItem item) {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param item
+	 */
+	@Override
+	public void itemUpdated(ClusterRepoItem item) {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param node
+	 */
+	@Override
+	public void nodeConnected(String node) {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param node
+	 */
+	@Override
+	public void nodeDisconnected(String node) {}
+
+	/**
+	 *
+	 * @return
+	 */
+	@Override
+	public int processingInThreads() {
+
+		// TODO: The number of threads should be equal or greater to number of
+		// cluster nodes.
+		// This should work well as far as nodesNo is initialized before this
+		// method is called which is true only during program startup time.
+		// In case of reconfiguration or new node joining this might not be
+		// the case. Low priority issue though.
+		return Math.max(Runtime.getRuntime().availableProcessors(), nodesNo) * 8;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public int processingOutThreads() {
+
+		// TODO: The number of threads should be equal or greater to number of
+		// cluster nodes.
+		// This should work well as far as nodesNo is initialized before this
+		// method is called which is true only during program startup time.
+		// In case of reconfiguration or new node joining this might not be
+		// the case. Low priority issue though.
+		return Math.max(Runtime.getRuntime().availableProcessors(), nodesNo) * 8;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 */
+	@Override
+	public void processOutPacket(Packet packet) {
+		if (packet.getElemName() == ClusterElement.CLUSTER_EL_NAME) {
+			clusterController.handleClusterPacket(packet.getElement());
+		} else {
+
+			// This should, actually, not happen. Let's log it here
+			if (log.isLoggable(Level.INFO)) {
+				log.log(Level.INFO, "Unexpected packet on cluster connection: {0}", packet);
+			}
+			super.processOutPacket(packet);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 */
+	@Override
+	public void processPacket(Packet packet) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Processing packet: {0}", packet);
+		}
+		if ((packet.getStanzaTo() != null) && packet.getStanzaTo().equals(getComponentId())) {
+			try {
+				addOutPacket(Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
+						"Not implemented", true));
+			} catch (PacketErrorTypeException e) {
+				log.log(Level.WARNING, "Packet processing exception: {0}", e);
+			}
+
+			return;
+		}
+		if (packet.getElemName() == ClusterElement.CLUSTER_EL_NAME) {
+			writePacketToSocket(packet);
+		} else {
+			writePacketToSocket(packet.packRouted());
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param serv
+	 *
+	 * @return
+	 */
+	@Override
+	public Queue<Packet> processSocketData(XMPPIOService<Object> serv) {
+		Packet p = null;
+
+		while ((p = serv.getReceivedPackets().poll()) != null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Processing socket data: {0}", p);
+			}
+			if (p.getElemName().equals("handshake")) {
+				processHandshake(p, serv);
+			} else {
+
+				// ++packetsReceived;
+				Packet result = p;
+
+				if (p.isRouted()) {
+
+					// processReceivedRid(p, serv);
+					// processReceivedAck(p, serv);
+					try {
+						result = p.unpackRouted();
+					} catch (TigaseStringprepException ex) {
+						log.log(Level.WARNING,
+								"Packet stringprep addressing problem, dropping packet: {0}", p);
+
+						return null;
+					}
+				}    // end of if (p.isRouted())
+				addOutPacket(result);
+			}
+		}        // end of while ()
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param port_props
+	 */
+	@Override
+	public void reconnectionFailed(Map<String, Object> port_props) {
+
+		// TODO: handle this somehow
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param serv
+	 */
+	@Override
+	public void serviceStarted(XMPPIOService<Object> serv) {
+		ServiceConnectedTimerTask task = new ServiceConnectedTimerTask(serv);
+
+		serv.getSessionData().put(SERVICE_CONNECTED_TASK_FUTURE, task);
+		addTimerTask(task, 10, TimeUnit.SECONDS);
+		super.serviceStarted(serv);
+		log.log(Level.INFO, "cluster connection opened: {0}, type: {1}, id={2}",
+				new Object[] { serv.getRemoteAddress(),
+				serv.connectionType().toString(), serv.getUniqueId() });
+		if (compress_stream) {
+			log.log(Level.INFO, "Starting stream compression for: {0}", serv.getUniqueId());
+			serv.startZLib(Deflater.BEST_COMPRESSION);
+		}
+		switch (serv.connectionType()) {
+		case connect :
+
+			// Send init xmpp stream here
+			String remote_host = (String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
+
+			serv.getSessionData().put(XMPPIOService.HOSTNAME_KEY, remote_host);
+			serv.getSessionData().put(PORT_ROUTING_TABLE_PROP_KEY, new String[] { remote_host,
+					".*@" + remote_host, ".*\\." + remote_host });
+
+			String data = "<stream:stream" + " xmlns='" + XMLNS + "'" +
+					" xmlns:stream='http://etherx.jabber.org/streams'" + " from='" +
+					getDefHostName() + "'" + " to='" + remote_host + "'" + ">";
+
+			log.log(Level.INFO, "cid: {0}, sending: {1}", new Object[] { (String) serv
+					.getSessionData().get("cid"),
+					data });
+			serv.xmppStreamOpen(data);
+
+			break;
+
+		default :
+
+			// Do nothing, more data should come soon...
+			break;
+		}    // end of switch (service.connectionType())
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param service
+	 *
+	 * @return
+	 */
+	@Override
+	public boolean serviceStopped(XMPPIOService<Object> service) {
+		boolean result = super.serviceStopped(service);
+
+		// Make sure it runs just once for each disconnect
+		if (result) {
+			Map<String, Object> sessionData = service.getSessionData();
+			String[]            routings = (String[]) sessionData.get(
+					PORT_ROUTING_TABLE_PROP_KEY);
+
+//    String ip = service.getRemoteAddress();
+//    CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(ip);
+//
+//    if (conns == null) {
+//      conns = new CopyOnWriteArrayList<XMPPIOService<Object>>();
+//      connectionsPool.put(ip, conns);
+//    }
+			String                                      addr = (String) sessionData.get(
+					PORT_REMOTE_HOST_PROP_KEY);
+			CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(addr);
+
+			if (conns == null) {
+				conns = new CopyOnWriteArrayList<XMPPIOService<Object>>();
+				connectionsPool.put(addr, conns);
+			}
+
+			int size = conns.size();
+
+			conns.remove(service);
+			if (size == 1) {
+				if (routings != null) {
+					updateRoutings(routings, false);
+				}
+
+				// removeRouting(serv.getRemoteHost());
+				log.log(Level.INFO, "Disonnected from: {0}", addr);
+				updateServiceDiscoveryItem(addr, addr, XMLNS + " disconnected", true);
+				clusterController.nodeDisconnected(addr);
+			}
+
+			ConnectionType type = service.connectionType();
+
+			if (type == ConnectionType.connect) {
+				addWaitingTask(sessionData);
+			}    // end of if (type == ConnectionType.connect)
+			++totalNodeDisconnects;
+
+			int hour = TimeUtils.getHourNow();
+
+			if (lastDayIdx != hour) {
+				lastDayIdx    = hour;
+				lastDay[hour] = 0;
+				Arrays.fill(lastHour, 0);
+			}
+			++lastDay[hour];
+
+			int minute = TimeUtils.getMinuteNow();
+
+			++lastHour[minute];
+		}
+
+		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param service
+	 */
+	@Override
+	public void tlsHandshakeCompleted(XMPPIOService<Object> service) {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param port_props
+	 */
+	@Override
+	public void updateConnectionDetails(Map<String, Object> port_props) {
+		String          host = (String) port_props.get(PORT_REMOTE_HOST_PROP_KEY);
+		ClusterRepoItem item = repo.getItem(host);
+
+		if (item != null) {
+			port_props.put(SECRET_PROP_KEY, item.getPassword());
+			port_props.put(PORT_KEY, item.getPortNo());
+		} else {
+			port_props.put(MAX_RECONNECTS_PROP_KEY, 0);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param serv
+	 */
+	@Override
+	public void xmppStreamClosed(XMPPIOService<Object> serv) {
+		log.info("Stream closed.");
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param service
+	 * @param attribs
+	 *
+	 * @return
+	 */
+	@Override
+	public String xmppStreamOpened(XMPPIOService<Object> service, Map<String,
+			String> attribs) {
+		log.log(Level.INFO, "Stream opened: {0}", attribs);
+		switch (service.connectionType()) {
+		case connect : {
+			String id = attribs.get("id");
+
+			service.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
+
+			String secret = (String) service.getSessionData().get(SECRET_PROP_KEY);
+
+			try {
+				String digest = Algorithms.hexDigest(id, secret, "SHA");
+
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Calculating digest: id={0}, secret={1}, digest={2}",
+							new Object[] { id,
+							secret, digest });
+				}
+
+				return "<handshake>" + digest + "</handshake>";
+			} catch (NoSuchAlgorithmException e) {
+				log.log(Level.SEVERE, "Can not generate digest for pass phrase.", e);
+
+				return null;
+			}
+		}
+
+		case accept : {
+			String remote_host = attribs.get("from");
+
+			service.getSessionData().put(XMPPIOService.HOSTNAME_KEY, remote_host);
+			service.getSessionData().put(PORT_REMOTE_HOST_PROP_KEY, remote_host);
+			service.getSessionData().put(PORT_ROUTING_TABLE_PROP_KEY, new String[] {
+					remote_host,
+					".*@" + remote_host, ".*\\." + remote_host });
+
+			String id = UUID.randomUUID().toString();
+
+			service.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
+
+			return "<stream:stream" + " xmlns='" + XMLNS + "'" +
+					" xmlns:stream='http://etherx.jabber.org/streams'" + " from='" +
+					getDefHostName() + "'" + " to='" + remote_host + "'" + " id='" + id + "'" + ">";
+		}
+
+		default :
+
+			// Do nothing, more data should come soon...
+			break;
+		}    // end of switch (service.connectionType())
+
+		return null;
+	}
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -318,360 +831,6 @@ public class ClusterConnectionManager
 		// Level.FINE);
 	}
 
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * This method can be overwritten in extending classes to get a different
-	 * packets distribution to different threads. For PubSub, probably better
-	 * packets distribution to different threads would be based on the sender
-	 * address rather then destination address.
-	 *
-	 * @param packet
-	 * @return
-	 */
-	@Override
-	public int hashCodeForPacket(Packet packet) {
-
-		// If this is a cluster packet let's try to do a bit more smart hashing
-		// based on the stanza from/to addresses
-		if (packet.getElemName() == ClusterElement.CLUSTER_EL_NAME) {
-
-			// TODO: Look for a simpler, more efficient algorithm to distribute
-			// cluster packets among different threads.
-			// This looks like an overkill to me, however I don't see any better way
-			ClusterElement clel = new ClusterElement(packet.getElement());
-
-			// If there is no XMPP stanzas with an address inside the cluster packet,
-			// we can try Map data and User ID inside it if it exists.
-			String userId = clel.getMethodParam("userId");
-
-			if (userId != null) {
-				return userId.hashCode();
-			}
-
-			Queue<Element> children = clel.getDataPackets();
-
-			if ((children != null) && (children.size() > 0)) {
-				Element child     = children.peek();
-				String  stanzaAdd = child.getAttributeStaticStr(Packet.TO_ATT);
-
-				if (stanzaAdd != null) {
-					return stanzaAdd.hashCode();
-				} else {
-
-					// This might be user's initial presence. In such a case we take
-					// stanzaFrom instead
-					stanzaAdd = child.getAttributeStaticStr(Packet.FROM_ATT);
-					if (stanzaAdd != null) {
-						return stanzaAdd.hashCode();
-					} else {
-
-						// This may happen for some cluster packets, like:
-						// resp-sync-online-sm-cmd and this is correct
-						log.log(Level.FINE, "No stanzaTo or from for cluster packet: {0}", packet);
-					}
-				}
-			}
-		}
-
-		// There is a separate connection to each cluster node, ideally we want to
-		// process packets in a separate thread for each connection, so let's try
-		// to get the hash code by the destination node address
-		if (packet.getStanzaTo() != null) {
-			return packet.getStanzaTo().hashCode();
-		}
-
-		return packet.getTo().hashCode();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param binds
-	 */
-	@Override
-	public void initBindings(Bindings binds) {
-		super.initBindings(binds);
-		binds.put("clusterCM", this);
-		binds.put(ComponentRepository.COMP_REPO_BIND, repo);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param node
-	 */
-	@Override
-	public void nodeConnected(String node) {}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param node
-	 */
-	@Override
-	public void nodeDisconnected(String node) {}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
-	@Override
-	public void processPacket(Packet packet) {
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Processing packet: {0}", packet);
-		}
-		if ((packet.getStanzaTo() != null) && packet.getStanzaTo().equals(getComponentId())) {
-			try {
-				addOutPacket(Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
-						"Not implemented", true));
-			} catch (PacketErrorTypeException e) {
-				log.log(Level.WARNING, "Packet processing exception: {0}", e);
-			}
-
-			return;
-		}
-		if (packet.getElemName() == ClusterElement.CLUSTER_EL_NAME) {
-			writePacketToSocket(packet);
-		} else {
-			writePacketToSocket(packet.packRouted());
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 *
-	 * @return
-	 */
-	@Override
-	public Queue<Packet> processSocketData(XMPPIOService<Object> serv) {
-		Packet p = null;
-
-		while ((p = serv.getReceivedPackets().poll()) != null) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Processing socket data: {0}", p);
-			}
-			if (p.getElemName().equals("handshake")) {
-				processHandshake(p, serv);
-			} else {
-
-				// ++packetsReceived;
-				Packet result = p;
-
-				if (p.isRouted()) {
-
-					// processReceivedRid(p, serv);
-					// processReceivedAck(p, serv);
-					try {
-						result = p.unpackRouted();
-					} catch (TigaseStringprepException ex) {
-						log.log(Level.WARNING,
-								"Packet stringprep addressing problem, dropping packet: {0}", p);
-
-						return null;
-					}
-				}    // end of if (p.isRouted())
-				addOutPacket(result);
-			}
-		}        // end of while ()
-
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
-	@Override
-	public void processOutPacket(Packet packet) {
-		if (packet.getElemName() == ClusterElement.CLUSTER_EL_NAME) {
-			clusterController.handleClusterPacket(packet.getElement());
-		} else {
-
-			// This should, actually, not happen. Let's log it here
-			if (log.isLoggable(Level.INFO)) {
-				log.log(Level.INFO, "Unexpected packet on cluster connection: {0}", packet);
-			}
-			super.processOutPacket(packet);
-		}
-	}
-
-	/**
-	 *
-	 * @return
-	 */
-	@Override
-	public int processingInThreads() {
-
-		// TODO: The number of threads should be equal or greater to number of
-		// cluster nodes.
-		// This should work well as far as nodesNo is initialized before this
-		// method is called which is true only during program startup time.
-		// In case of reconfiguration or new node joining this might not be
-		// the case. Low priority issue though.
-		return Math.max(Runtime.getRuntime().availableProcessors(), nodesNo) * 8;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public int processingOutThreads() {
-
-		// TODO: The number of threads should be equal or greater to number of
-		// cluster nodes.
-		// This should work well as far as nodesNo is initialized before this
-		// method is called which is true only during program startup time.
-		// In case of reconfiguration or new node joining this might not be
-		// the case. Low priority issue though.
-		return Math.max(Runtime.getRuntime().availableProcessors(), nodesNo) * 8;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param port_props
-	 */
-	@Override
-	public void reconnectionFailed(Map<String, Object> port_props) {
-
-		// TODO: handle this somehow
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 */
-	@Override
-	public void serviceStarted(XMPPIOService<Object> serv) {
-		ServiceConnectedTimerTask task = new ServiceConnectedTimerTask(serv);
-
-		serv.getSessionData().put(SERVICE_CONNECTED_TASK_FUTURE, task);
-		addTimerTask(task, 10, TimeUnit.SECONDS);		
-		super.serviceStarted(serv);
-		log.log(Level.INFO, "cluster connection opened: {0}, type: {1}, id={2}",
-				new Object[] { serv.getRemoteAddress(),
-				serv.connectionType().toString(), serv.getUniqueId() });
-		if (compress_stream) {
-			log.log(Level.INFO, "Starting stream compression for: {0}", serv.getUniqueId());
-			serv.startZLib(Deflater.BEST_COMPRESSION);
-		}
-		switch (serv.connectionType()) {
-		case connect :
-
-			// Send init xmpp stream here
-			String remote_host = (String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
-
-			serv.getSessionData().put(XMPPIOService.HOSTNAME_KEY, remote_host);
-			serv.getSessionData().put(PORT_ROUTING_TABLE_PROP_KEY, new String[] { remote_host,
-					".*@" + remote_host, ".*\\." + remote_host });
-
-			String data = "<stream:stream" + " xmlns='" + XMLNS + "'" +
-					" xmlns:stream='http://etherx.jabber.org/streams'" + " from='" +
-					getDefHostName() + "'" + " to='" + remote_host + "'" + ">";
-
-			log.log(Level.INFO, "cid: {0}, sending: {1}", new Object[] { (String) serv
-					.getSessionData().get("cid"),
-					data });
-			serv.xmppStreamOpen(data);
-
-			break;
-
-		default :
-
-			// Do nothing, more data should come soon...
-			break;
-		}    // end of switch (service.connectionType())
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param service
-	 *
-	 * @return
-	 */
-	@Override
-	public boolean serviceStopped(XMPPIOService<Object> service) {
-		boolean result = super.serviceStopped(service);
-
-		// Make sure it runs just once for each disconnect
-		if (result) {
-			Map<String, Object> sessionData = service.getSessionData();
-			String[]            routings = (String[]) sessionData.get(
-					PORT_ROUTING_TABLE_PROP_KEY);
-
-//    String ip = service.getRemoteAddress();
-//    CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(ip);
-//
-//    if (conns == null) {
-//      conns = new CopyOnWriteArrayList<XMPPIOService<Object>>();
-//      connectionsPool.put(ip, conns);
-//    }
-			String                                      addr = (String) sessionData.get(
-					PORT_REMOTE_HOST_PROP_KEY);
-			CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(addr);
-
-			if (conns == null) {
-				conns = new CopyOnWriteArrayList<XMPPIOService<Object>>();
-				connectionsPool.put(addr, conns);
-			}
-
-			int size = conns.size();
-
-			conns.remove(service);
-			if (size == 1) {
-				if (routings != null) {
-					updateRoutings(routings, false);
-				}
-
-				// removeRouting(serv.getRemoteHost());
-				log.log(Level.INFO, "Disonnected from: {0}", addr);
-				updateServiceDiscoveryItem(addr, addr, XMLNS + " disconnected", true);
-				clusterController.nodeDisconnected(addr);
-			}
-
-			ConnectionType type = service.connectionType();
-
-			if (type == ConnectionType.connect) {
-				addWaitingTask(sessionData);
-			}    // end of if (type == ConnectionType.connect)
-			++totalNodeDisconnects;
-
-			int hour = TimeUtils.getHourNow();
-
-			if (lastDayIdx != hour) {
-				lastDayIdx    = hour;
-				lastDay[hour] = 0;
-				Arrays.fill(lastHour, 0);
-			}
-			++lastDay[hour];
-
-			int minute = TimeUtils.getMinuteNow();
-
-			++lastHour[minute];
-		}
-
-		return result;
-	}
-
 	//~--- set methods ----------------------------------------------------------
 
 	/**
@@ -683,10 +842,8 @@ public class ClusterConnectionManager
 	@Override
 	public void setClusterController(ClusterControllerIfc cl_controller) {
 		clusterController = cl_controller;
-		clusterController.removeCommandListener(ClusterControllerIfc
-				.DELIVER_CLUSTER_PACKET_CMD, sendPacket);
-		clusterController.setCommandListener(ClusterControllerIfc.DELIVER_CLUSTER_PACKET_CMD,
-				sendPacket);
+		clusterController.removeCommandListener(sendPacket);
+		clusterController.setCommandListener(sendPacket);
 	}
 
 	/**
@@ -743,85 +900,79 @@ public class ClusterConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @param service
-	 */
-	@Override
-	public void tlsHandshakeCompleted(XMPPIOService<Object> service) {}
-
-	/**
-	 * Method description
-	 *
-	 *
 	 * @param serv
 	 */
-	@Override
-	public void xmppStreamClosed(XMPPIOService<Object> serv) {
-		log.info("Stream closed.");
+	protected void serviceConnected(XMPPIOService<Object> serv) {
+		String[] routings = (String[]) serv.getSessionData().get(PORT_ROUTING_TABLE_PROP_KEY);
+		String   addr     = (String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
+
+//  String ip = serv.getRemoteAddress();
+//  CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(ip);
+//
+//  if (conns == null) {
+//    conns = new CopyOnWriteArrayList<XMPPIOService<Object>>();
+//    connectionsPool.put(ip, conns);
+//  }
+		CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(addr);
+
+		if (conns == null) {
+			conns = new CopyOnWriteArrayList<XMPPIOService<Object>>();
+			connectionsPool.put(addr, conns);
+		}
+
+		int size = conns.size();
+
+		conns.add(serv);
+		if (size == 0) {
+			updateRoutings(routings, true);
+			log.log(Level.INFO, "Connected to: {0}", addr);
+			updateServiceDiscoveryItem(addr, addr, XMLNS + " connected", true);
+			clusterController.nodeConnected(addr);
+		}
+
+		ServiceConnectedTimerTask task = (ServiceConnectedTimerTask) serv.getSessionData()
+				.get(SERVICE_CONNECTED_TASK_FUTURE);
+
+		if (task == null) {
+			log.log(Level.WARNING, "Missing service connected timer task: {0}", serv);
+		} else {
+			task.cancel();
+		}
 	}
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param service
-	 * @param attribs
+	 * @param p
 	 *
 	 * @return
 	 */
 	@Override
-	public String xmppStreamOpened(XMPPIOService<Object> service, Map<String,
-			String> attribs) {
-		log.log(Level.INFO, "Stream opened: {0}", attribs);
-		switch (service.connectionType()) {
-		case connect : {
-			String id = attribs.get("id");
+	protected boolean writePacketToSocket(Packet p) {
 
-			service.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
+		// ++packetsSent;
+		String ip = p.getTo().getDomain();
 
-			String secret = (String) service.getSessionData().get(SECRET_PROP_KEY);
+//  try {
+//    ip = DNSResolver.getHostIP(p.getTo().getDomain());
+//  } catch (UnknownHostException ex) {
+//    ip = p.getTo().getDomain();
+//  }
+		int                                         code  = Math.abs(hashCodeForPacket(p));
+		CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(ip);
 
-			try {
-				String digest = Algorithms.hexDigest(id, secret, "SHA");
+		if ((conns != null) && (conns.size() > 0)) {
+			XMPPIOService<Object> serv = conns.get(code % conns.size());
 
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Calculating digest: id={0}, secret={1}, digest={2}",
-							new Object[] { id,
-							secret, digest });
-				}
+			return super.writePacketToSocket(serv, p);
+		} else {
+			log.log(Level.WARNING, "No cluster connection to send a packet: {0}", p);
 
-				return "<handshake>" + digest + "</handshake>";
-			} catch (NoSuchAlgorithmException e) {
-				log.log(Level.SEVERE, "Can not generate digest for pass phrase.", e);
-
-				return null;
-			}
+			return false;
 		}
 
-		case accept : {
-			String remote_host = attribs.get("from");
-
-			service.getSessionData().put(XMPPIOService.HOSTNAME_KEY, remote_host);
-			service.getSessionData().put(PORT_REMOTE_HOST_PROP_KEY, remote_host);
-			service.getSessionData().put(PORT_ROUTING_TABLE_PROP_KEY, new String[] {
-					remote_host,
-					".*@" + remote_host, ".*\\." + remote_host });
-
-			String id = UUID.randomUUID().toString();
-
-			service.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
-
-			return "<stream:stream" + " xmlns='" + XMLNS + "'" +
-					" xmlns:stream='http://etherx.jabber.org/streams'" + " from='" +
-					getDefHostName() + "'" + " to='" + remote_host + "'" + " id='" + id + "'" + ">";
-		}
-
-		default :
-
-			// Do nothing, more data should come soon...
-			break;
-		}    // end of switch (service.connectionType())
-
-		return null;
+		// return super.writePacketToSocket(p);
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -837,6 +988,17 @@ public class ClusterConnectionManager
 		ClusterRepoItem item = repo.getItem(getDefHostName().getDomain());
 
 		return new int[] { item.getPortNo() };
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	protected String getDefTrafficThrottling() {
+		return "xmpp:25m:0:disc,bin:20000m:0:disc";
 	}
 
 	/**
@@ -908,85 +1070,6 @@ public class ClusterConnectionManager
 	}
 
 	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 */
-	protected void serviceConnected(XMPPIOService<Object> serv) {
-		String[] routings = (String[]) serv.getSessionData().get(PORT_ROUTING_TABLE_PROP_KEY);
-		String   addr     = (String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
-
-//  String ip = serv.getRemoteAddress();
-//  CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(ip);
-//
-//  if (conns == null) {
-//    conns = new CopyOnWriteArrayList<XMPPIOService<Object>>();
-//    connectionsPool.put(ip, conns);
-//  }
-		CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(addr);
-
-		if (conns == null) {
-			conns = new CopyOnWriteArrayList<XMPPIOService<Object>>();
-			connectionsPool.put(addr, conns);
-		}
-
-		int size = conns.size();
-
-		conns.add(serv);
-		if (size == 0) {
-			updateRoutings(routings, true);
-			log.log(Level.INFO, "Connected to: {0}", addr);
-			updateServiceDiscoveryItem(addr, addr, XMLNS + " connected", true);
-			clusterController.nodeConnected(addr);
-		}
-
-		ServiceConnectedTimerTask task = (ServiceConnectedTimerTask) serv.getSessionData().get(
-				SERVICE_CONNECTED_TASK_FUTURE);
-
-		if (task == null) {
-			log.log(Level.WARNING, "Missing service connected timer task: {0}", serv);
-		} else {
-			task.cancel();
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param p
-	 *
-	 * @return
-	 */
-	@Override
-	protected boolean writePacketToSocket(Packet p) {
-
-		// ++packetsSent;
-		String ip = p.getTo().getDomain();
-
-//  try {
-//    ip = DNSResolver.getHostIP(p.getTo().getDomain());
-//  } catch (UnknownHostException ex) {
-//    ip = p.getTo().getDomain();
-//  }
-		int                                         code  = Math.abs(hashCodeForPacket(p));
-		CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(ip);
-
-		if ((conns != null) && (conns.size() > 0)) {
-			XMPPIOService<Object> serv = conns.get(code % conns.size());
-
-			return super.writePacketToSocket(serv, p);
-		} else {
-			log.log(Level.WARNING, "No cluster connection to send a packet: {0}", p);
-
-			return false;
-		}
-
-		// return super.writePacketToSocket(p);
-	}
 
 	private void processHandshake(Packet p, XMPPIOService<Object> serv) {
 		switch (serv.connectionType()) {
@@ -1062,95 +1145,6 @@ public class ClusterConnectionManager
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	protected String getDefTrafficThrottling() {
-		return "xmpp:25m:0:disc,bin:20000m:0:disc";
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @param repoItem
-	 */
-	@Override
-	public void itemAdded(ClusterRepoItem repoItem) {
-		log.log(Level.INFO, "Loaded repoItem: {0}", repoItem.toString());
-
-		String host = repoItem.getHostname();
-
-		if (!host.equals(getDefHostName().getDomain())
-
-//  && ((host.hashCode() > getDefHostName().hashCode()) || connect_all)
-		) {
-			for (int i = 0; i < per_node_conns; ++i) {
-				log.log(Level.CONFIG, "Trying to connect to cluster node: {0}", host);
-
-				Map<String, Object> port_props = new LinkedHashMap<String, Object>(12);
-
-				port_props.put(SECRET_PROP_KEY, repoItem.getPassword());
-				port_props.put(PORT_LOCAL_HOST_PROP_KEY, getDefHostName());
-				port_props.put(PORT_TYPE_PROP_KEY, ConnectionType.connect);
-				port_props.put(PORT_SOCKET_PROP_KEY, SocketType.plain);
-				port_props.put(PORT_REMOTE_HOST_PROP_KEY, host);
-				port_props.put(PORT_IFC_PROP_KEY, new String[] { host });
-				port_props.put(MAX_RECONNECTS_PROP_KEY, 99999999);
-				port_props.put(PORT_KEY, repoItem.getPortNo());
-				addWaitingTask(port_props);
-			}
-
-			// reconnectService(port_props, connectionDelay);
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param port_props
-	 */
-	@Override
-	public void updateConnectionDetails(Map<String, Object> port_props) {
-		String          host = (String) port_props.get(PORT_REMOTE_HOST_PROP_KEY);
-		ClusterRepoItem item = repo.getItem(host);
-
-		if (item != null) {
-			port_props.put(SECRET_PROP_KEY, item.getPassword());
-			port_props.put(PORT_KEY, item.getPortNo());
-		} else {
-			port_props.put(MAX_RECONNECTS_PROP_KEY, 0);
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param item
-	 */
-	@Override
-	public void itemUpdated(ClusterRepoItem item) {}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param item
-	 */
-	@Override
-	public void itemRemoved(ClusterRepoItem item) {}
-
 	//~--- inner classes --------------------------------------------------------
 
 	private class IOServiceStatisticsGetter
@@ -1176,6 +1170,23 @@ public class ClusterConnectionManager
 			decompressionRatio += list.getValue("zlibio", "Average decompression rate", -1f);
 			++counter;
 			clIOQueue += service.waitingToSendSize();
+		}
+
+		/**
+		 * Method description
+		 *
+		 */
+		public void reset() {
+
+			// Statistics are reset on the low socket level instead. This way we do
+			// not loose
+			// any stats in case of the disconnection.
+			// bytesReceived = 0;
+			// bytesSent = 0;
+			clIOQueue          = 0;
+			counter            = 0;
+			compressionRatio   = 0f;
+			decompressionRatio = 0f;
 		}
 
 		//~--- get methods --------------------------------------------------------
@@ -1209,35 +1220,16 @@ public class ClusterConnectionManager
 		public int getWaitingToSend() {
 			return clIOQueue;
 		}
-
-		//~--- methods ------------------------------------------------------------
-
-		/**
-		 * Method description
-		 *
-		 */
-		public void reset() {
-
-			// Statistics are reset on the low socket level instead. This way we do
-			// not loose
-			// any stats in case of the disconnection.
-			// bytesReceived = 0;
-			// bytesSent = 0;
-			clIOQueue          = 0;
-			counter            = 0;
-			compressionRatio   = 0f;
-			decompressionRatio = 0f;
-		}
 	}
 
 
 	private class SendPacket
-					implements CommandListener {
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see tigase.cluster.api.CommandListener#executeCommand(java.util.Map)
-		 */
+					extends CommandListenerAbstract {
+		private SendPacket(String name) {
+			super(name);
+		}
+
+		//~--- methods ------------------------------------------------------------
 
 		/**
 		 * Method description
@@ -1300,4 +1292,4 @@ public class ClusterConnectionManager
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/11
+//~ Formatted in Tigase Code Convention on 13/07/06

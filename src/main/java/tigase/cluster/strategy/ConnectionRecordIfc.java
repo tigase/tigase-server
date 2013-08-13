@@ -1,5 +1,5 @@
 /*
- * CommandListener.java
+ * ConnectionRecordIfc.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
@@ -22,41 +22,30 @@
 
 
 
-package tigase.cluster.api;
+/*
+* To change this template, choose Tools | Templates
+* and open the template in the editor.
+ */
+package tigase.cluster.strategy;
 
 //~--- non-JDK imports --------------------------------------------------------
-
-import tigase.stats.StatisticsList;
 
 import tigase.xml.Element;
 
 import tigase.xmpp.JID;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-
 /**
- * @author Artur Hefczyc Created Mar 16, 2011
+ *
+ * @author kobit
  */
-public interface CommandListener
-				extends Comparable<CommandListener> {
+public interface ConnectionRecordIfc {
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param fromNode
-	 * @param visitedNodes
-	 * @param data
-	 * @param packets
-	 *
-	 * @throws ClusterCommandException
+	 * @return
 	 */
-	void executeCommand(JID fromNode, Set<JID> visitedNodes, Map<String, String> data,
-			Queue<Element> packets)
-					throws ClusterCommandException;
+	Element toElement();
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -66,15 +55,31 @@ public interface CommandListener
 	 *
 	 * @return
 	 */
-	String getName();
+	JID getConnectionId();
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param list
+	 * @return
 	 */
-	void getStatistics(StatisticsList list);
+	JID getNode();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	String getSessionId();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	JID getUserJid();
 
 	//~--- set methods ----------------------------------------------------------
 
@@ -82,10 +87,21 @@ public interface CommandListener
 	 * Method description
 	 *
 	 *
-	 * @param name
+	 * @param elem
 	 */
-	void setName(String name);
+	void setElement(Element elem);
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param node
+	 * @param userJid
+	 * @param sessionId
+	 * @param connectionId
+	 */
+	void setRecordFields(JID node, JID userJid, String sessionId, JID connectionId);
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/06/22

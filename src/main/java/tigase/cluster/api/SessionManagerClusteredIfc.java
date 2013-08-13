@@ -1,5 +1,5 @@
 /*
- * CommandListener.java
+ * SessionManagerClusteredIfc.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
@@ -22,41 +22,55 @@
 
 
 
+/*
+* To change this template, choose Tools | Templates
+* and open the template in the editor.
+ */
 package tigase.cluster.api;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.stats.StatisticsList;
+import tigase.server.Packet;
+import tigase.server.xmppsession.SessionManagerHandler;
 
-import tigase.xml.Element;
-
+import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
+import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.XMPPSession;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author Artur Hefczyc Created Mar 16, 2011
+ *
+ * @author kobit
  */
-public interface CommandListener
-				extends Comparable<CommandListener> {
+public interface SessionManagerClusteredIfc
+				extends SessionManagerHandler {
+	/** Field description */
+	public static final String SESSION_FOUND_KEY = "user-session-found-key";
+
+	//~--- methods --------------------------------------------------------------
+
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param fromNode
-	 * @param visitedNodes
-	 * @param data
-	 * @param packets
+	 * @param packet
 	 *
-	 * @throws ClusterCommandException
+	 * @return
 	 */
-	void executeCommand(JID fromNode, Set<JID> visitedNodes, Map<String, String> data,
-			Queue<Element> packets)
-					throws ClusterCommandException;
+	boolean fastAddOutPacket(Packet packet);
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param el_packet
+	 * @param conn
+	 */
+	void processPacket(Packet el_packet, XMPPResourceConnection conn);
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -64,27 +78,27 @@ public interface CommandListener
 	 * Method description
 	 *
 	 *
+	 * @param el_packet
+	 *
 	 * @return
 	 */
-	String getName();
+	XMPPResourceConnection getXMPPResourceConnection(Packet el_packet);
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param list
+	 * @return
 	 */
-	void getStatistics(StatisticsList list);
-
-	//~--- set methods ----------------------------------------------------------
+	ConcurrentHashMap<JID, XMPPResourceConnection> getXMPPResourceConnections();
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param name
+	 * @return
 	 */
-	void setName(String name);
+	ConcurrentHashMap<BareJID, XMPPSession> getXMPPSessions();
 }
 
 
