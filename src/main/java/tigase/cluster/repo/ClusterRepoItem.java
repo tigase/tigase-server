@@ -31,6 +31,8 @@ import tigase.db.comp.RepositoryItemAbstract;
 import tigase.server.Command;
 import tigase.server.Packet;
 
+import tigase.util.Algorithms;
+
 import tigase.xml.Element;
 
 import tigase.xmpp.BareJID;
@@ -43,6 +45,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.UUID;
 
 /**
  * Class description
@@ -105,12 +108,12 @@ public class ClusterRepoItem
 
 	//~--- fields ---------------------------------------------------------------
 
-	private float cpuUsage  = 0f;
-	private String hostname = null;
-	private long lastUpdate = 0l;
-	private float memUsage  = 0f;
-	private String password = PASSWORD_PROP_VAL;
-	private int portNo      = PORT_NO_PROP_VAL;
+	private float  cpuUsage   = 0f;
+	private String hostname   = null;
+	private long   lastUpdate = 0l;
+	private float  memUsage   = 0f;
+	private String password   = Algorithms.sha256(UUID.randomUUID().toString());
+	private int    portNo     = PORT_NO_PROP_VAL;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -123,105 +126,19 @@ public class ClusterRepoItem
 	@Override
 	public void addCommandFields(Packet packet) {
 		Command.addFieldValue(packet, HOSTNAME_LABEL, ((hostname != null)
-						? hostname
-						: ""));
+				? hostname
+				: ""));
 		Command.addFieldValue(packet, PASSWORD_LABEL, ((password != null)
-						? password
-						: ""));
+				? password
+				: ""));
 		Command.addFieldValue(packet, PORT_NO_LABEL, ((portNo > 0)
-						? "" + portNo
-						: ""));
+				? "" + portNo
+				: ""));
 		Command.addFieldValue(packet, LAST_UPDATE_LABEL, "" + new Date(lastUpdate));
 		Command.addFieldValue(packet, CPU_USAGE_LABEL, "" + cpuUsage);
 		Command.addFieldValue(packet, MEM_USAGE_LABEL, "" + memUsage);
 		super.addCommandFields(packet);
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public String getPassword() {
-		return password;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public String getHostname() {
-		return hostname;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public int getPortNo() {
-		return portNo;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public long getLastUpdate() {
-		return lastUpdate;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getElemName() {
-		return REPO_ITEM_ELEM_NAME;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getKey() {
-		return hostname;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public float getCpuUsage() {
-		return cpuUsage;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public float getMemUsage() {
-		return memUsage;
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -268,7 +185,7 @@ public class ClusterRepoItem
 	public void initFromElement(Element elem) {
 		if (elem.getName() != REPO_ITEM_ELEM_NAME) {
 			throw new IllegalArgumentException("Incorrect element name, expected: " +
-																				 REPO_ITEM_ELEM_NAME);
+					REPO_ITEM_ELEM_NAME);
 		}
 		super.initFromElement(elem);
 		hostname   = elem.getAttributeStaticStr(HOSTNAME_ATTR);
@@ -292,7 +209,7 @@ public class ClusterRepoItem
 		if (props.length > 0) {
 			hostname = BareJID.parseJID(props[0])[1];
 		}
-		if (props.length > 1) {
+		if ((props.length > 1) &&!props[1].trim().isEmpty()) {
 			password = props[1];
 		}
 		if (props.length > 2) {
@@ -338,7 +255,7 @@ public class ClusterRepoItem
 	@Override
 	public String toPropertyString() {
 		return hostname + ":" + password + ":" + portNo + ":" + lastUpdate + ":" + cpuUsage +
-					 ":" + memUsage;
+				":" + memUsage;
 	}
 
 	/**
@@ -352,7 +269,102 @@ public class ClusterRepoItem
 		return toPropertyString();
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public float getCpuUsage() {
+		return cpuUsage;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String getElemName() {
+		return REPO_ITEM_ELEM_NAME;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public String getHostname() {
+		return hostname;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	@Override
+	public String getKey() {
+		return hostname;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public long getLastUpdate() {
+		return lastUpdate;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public float getMemUsage() {
+		return memUsage;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public String getPassword() {
+		return password;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return
+	 */
+	public int getPortNo() {
+		return portNo;
+	}
+
 	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 * @param cpuUsage
+	 */
+	void setCpuUsage(float cpuUsage) {
+		this.cpuUsage = cpuUsage;
+	}
 
 	/**
 	 * Method description
@@ -363,6 +375,27 @@ public class ClusterRepoItem
 	 */
 	void setHostname(String hostname) {
 		this.hostname = hostname;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 * @param update
+	 */
+	void setLastUpdate(long update) {
+		this.lastUpdate = update;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param memUsage
+	 */
+	void setMemUsage(float memUsage) {
+		this.memUsage = memUsage;
 	}
 
 	/**
@@ -385,38 +418,6 @@ public class ClusterRepoItem
 		this.portNo = port;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @param update
-	 */
-	void setLastUpdate(long update) {
-		this.lastUpdate = update;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @param cpuUsage
-	 */
-	void setCpuUsage(float cpuUsage) {
-		this.cpuUsage = cpuUsage;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param memUsage
-	 */
-	void setMemUsage(float memUsage) {
-		this.memUsage = memUsage;
-	}
-
 	//~--- methods --------------------------------------------------------------
 
 	private int parsePortNo(String input) {
@@ -434,4 +435,4 @@ public class ClusterRepoItem
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/09
+//~ Formatted in Tigase Code Convention on 13/07/06
