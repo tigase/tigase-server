@@ -140,15 +140,14 @@ public class SessionManager
 	private Set<String>                      trusted = new ConcurrentSkipListSet<String>();
 	private Map<String, XMPPStopListenerIfc> stopListeners = new ConcurrentHashMap<String,
 			XMPPStopListenerIfc>(10);
-	private boolean skipPrivacy = false;
+	private boolean          skipPrivacy = false;
+	private Set<XMPPImplIfc> allPlugins  = new ConcurrentSkipListSet<XMPPImplIfc>();
 
 	/**
 	 * A Map with bare user JID as a key and a user session object as a value.
 	 */
-	private ConcurrentHashMap<BareJID, XMPPSession> sessionsByNodeId =
+	protected ConcurrentHashMap<BareJID, XMPPSession> sessionsByNodeId =
 			new ConcurrentHashMap<BareJID, XMPPSession>(100000);
-	private Set<XMPPImplIfc>                                      allPlugins =
-			new ConcurrentSkipListSet<XMPPImplIfc>();
 	private Map<String, ProcessingThreads<ProcessorWorkerThread>> workerThreads =
 			new ConcurrentHashMap<String, ProcessingThreads<ProcessorWorkerThread>>(32);
 	private StaleConnectionCloser         staleConnectionCloser =
