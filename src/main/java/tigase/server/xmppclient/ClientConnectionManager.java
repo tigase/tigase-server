@@ -1075,7 +1075,7 @@ public class ClientConnectionManager
 
 			break;
 
-		case OTHER:
+		case STREAM_MOVED:
 			if (processors != null) {
 				for (XMPPIOProcessor processor : processors) {
 					//handled |= processor.processCommand(packet);

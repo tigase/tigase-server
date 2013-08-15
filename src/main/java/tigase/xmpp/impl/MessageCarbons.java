@@ -307,7 +307,7 @@ public class MessageCarbons
 	@Override
 	public void filter(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results) {
 		if ((session == null) ||!session.isAuthorized() || (results == null) || (results
-				.size() == 0)) {
+				.size() == 0) || packet == null) {
 			return;
 		}
 		

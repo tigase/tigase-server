@@ -37,6 +37,7 @@ import tigase.server.Packet;
 import tigase.util.TimerTask;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
@@ -135,6 +136,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 				
 				
 				String id = null;
+				String location = null;
 				int max = resumption_timeout;
 
 				if (resumption_timeout > 0 && packet.getElement().getAttributeStaticStr(RESUME_ATTR) != null) {
@@ -143,13 +145,13 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 						max = Math.min(max, Integer.parseInt(maxStr));
 					}
 					id = UUID.randomUUID().toString();
+					location = connectionManager.getDefHostName().toString();
 					service.getSessionData().putIfAbsent(STREAM_ID_KEY, id);
 					service.getSessionData().put(MAX_RESUMPTION_TIMEOUT_KEY, max);
 					
 					services.put(id, service);
 				}
 				try {
-					String location = connectionManager.getDefHostName().toString();
 					service.writeRawData("<" + ENABLED_NAME + " xmlns='" + XMLNS + "'"
 							+ ( id != null ? " id='" + id + "' " + RESUME_ATTR + "='true' "+ MAX_ATTR + "='" + max + "'" : "" ) 
 							+ " " + LOCATION_ATTR + "='" + location + "' />");
@@ -176,6 +178,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 					
 					service.forceStop();
 				}
+				return true;
 			}
 			else {
 				return false;
@@ -239,20 +242,29 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 	public void processCommand(XMPPIOService service, Packet pc) {
 		String cmdId = Command.getFieldValue(pc, "cmd");
 		if ("stream-moved".equals(cmdId)) {
-			String newConnJid = Command.getFieldValue(pc, "new-conn-jid");
+			String newConn = Command.getFieldValue(pc, "new-conn-jid");
 			
 			String id = (String) service.getSessionData().get(STREAM_ID_KEY);
 			
-			XMPPIOService newService = services.get(id);
+			
+			JID newConnJid = JID.jidInstanceNS(newConn);
+			XMPPIOService newService = connectionManager.getXMPPIOService(newConnJid.getResource());
 			
 			// if connection was closed during resumption, then close
 			// old connection as it would not be able to resume 
 			if (newService != null) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "stream for user {2} moved from {0} to {1}", new Object[] { 
+						service.getConnectionId(), newService.getConnectionId(), newService.getUserJid() });
+				}
 				try {
 					Counter inCounter = (Counter) newService.getSessionData().get(IN_COUNTER_KEY);
 					newService.writeRawData("<" + RESUMED_NAME + " xmlns='" + XMLNS + "' " + PREVID_ATTR + "='" 
 							+ id + "' " + H_ATTR + "='" + inCounter.get() + "' />");
 
+					service.getSessionData().put("stream-closed", "stream-closed");
+					services.put(id, newService);
+					
 					// resending packets thru new connection
 					OutQueue outQueue = (OutQueue) newService.getSessionData().get(OUT_COUNTER_KEY);
 					List<Packet> packetsToResend = new ArrayList<Packet>(outQueue.getQueue());
@@ -261,12 +273,26 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 					}
 				}
 				catch (IOException ex) {
-					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE, "could not confirm session resumption for user = " 
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "could not confirm session resumption for user = " 
 								+ newService.getUserJid(), ex);
 					}
+					
+					// remove new connection if resumption failed
+					services.remove(id);
 				}
 			}	
+			else {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "no new service available for user {0} to resume from {1},"
+							+ " already closed?", new Object[] { service.getUserJid(), service });
+				}
+			}
+			
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "closing old service {0} for user {1}", new Object[] { service, 
+					service.getUserJid()});
+			}
 			
 			// stopping old service
 			connectionManager.serviceStopped(service);
@@ -365,6 +391,8 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 			// used for session
 			Packet cmd = Command.STREAM_MOVED.getPacket(service.getConnectionId(), 
 					service.getDataReceiver(), StanzaType.set, "moved");
+			cmd.setPacketFrom(service.getConnectionId());
+			cmd.setPacketTo(service.getDataReceiver());
 			Command.addFieldValue(cmd, "old-conn-jid", oldService.getConnectionId().toString());
 			connectionManager.processOutPacket(cmd);
 		}
@@ -412,7 +440,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		
 		@Override
 		public void run() {	
-			String id = (String) service.getSessionData().get(STREAM_ID_KEY);
+			String id = (String) service.getSessionData().get(STREAM_ID_KEY);			
 			if (services.remove(id, service)) {
 				sendErrorsForQueuedPackets(service);
 				//service.getSessionData().put(SERVICE_STOP_ALLOWED_KEY, true);
