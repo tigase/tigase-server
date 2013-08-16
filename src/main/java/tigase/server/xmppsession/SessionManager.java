@@ -1680,7 +1680,7 @@ public class SessionManager
 					XMPPResourceConnection oldConn = connectionsByFrom.remove(oldConnJid);
 					oldConn.setConnectionId(connection.getConnectionId());
 					connectionsByFrom.remove(connection.getConnectionId());
-					connectionsByFrom.put(oldConnJid, oldConn);
+					connectionsByFrom.put(oldConn.getConnectionId(), oldConn);
 
 					// remove current connection from list of active connections as 
 					// this connection will be used with other already authenticated connection

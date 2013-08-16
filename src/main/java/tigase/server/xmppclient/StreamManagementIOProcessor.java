@@ -37,6 +37,7 @@ import tigase.server.Packet;
 import tigase.util.TimerTask;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
@@ -258,6 +259,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 						service.getConnectionId(), newService.getConnectionId(), newService.getUserJid() });
 				}
 				try {
+					newService.setUserJid(service.getUserJid());
 					Counter inCounter = (Counter) newService.getSessionData().get(IN_COUNTER_KEY);
 					newService.writeRawData("<" + RESUMED_NAME + " xmlns='" + XMLNS + "' " + PREVID_ATTR + "='" 
 							+ id + "' " + H_ATTR + "='" + inCounter.get() + "' />");
@@ -279,7 +281,8 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 					}
 					
 					// remove new connection if resumption failed
-					services.remove(id);
+					services.remove(id, service);
+					services.remove(id, newService);
 				}
 			}	
 			else {
@@ -362,8 +365,13 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 	 */
 	private void resumeStream(XMPPIOService service, String id, int h) throws IOException {
 		XMPPIOService oldService = services.get(id);
-		if (oldService == null || service.getUserJid().equals(oldService.getUserJid()))
-			return;
+		if (oldService == null || !isSameUser(oldService, service)) {
+			// should send failed!
+			service.writeRawData("<failed xmlns='" + XMLNS + "'>" 
+					+ "<item-not-found xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>"
+					+ "</failed>");				
+			return;	
+		}
 		
 		if (services.remove(id, oldService)) {
 			synchronized (oldService) {
@@ -402,6 +410,23 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 					+ "<item-not-found xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>"
 					+ "</failed>");
 		}
+	}
+	
+	/**
+	 * Verifies if connections are authenticate for same bare jid
+	 * 
+	 * @param oldService
+	 * @param newService
+	 * @return true - only when bare jids are the same
+	 */
+	private boolean isSameUser(XMPPIOService oldService, XMPPIOService newService) {
+		if (oldService.getUserJid() == null || newService.getUserJid() == null)
+			return false;
+		
+		JID oldUserJid = JID.jidInstanceNS(oldService.getUserJid());
+		JID newUserJid = JID.jidInstanceNS(newService.getUserJid());
+		
+		return oldUserJid.getBareJID().equals(newUserJid.getBareJID());
 	}
 	
 	/**
