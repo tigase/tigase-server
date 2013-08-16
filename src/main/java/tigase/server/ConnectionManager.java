@@ -1175,7 +1175,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 *
 	 * @return
 	 */
-	protected IO getXMPPIOService(String serviceId) {
+	public IO getXMPPIOService(String serviceId) {
 		return services.get(serviceId);
 	}
 

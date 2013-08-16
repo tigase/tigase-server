@@ -564,6 +564,13 @@ public class XMPPResourceConnection
 	}
 
 	/**
+	 * Sets the value of connectionId
+	 */
+	public void setConnectionId(JID connectionId) {
+		this.connectionId = connectionId;
+	}
+	
+	/**
 	 * Method description
 	 *
 	 *
