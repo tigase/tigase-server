@@ -71,12 +71,16 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<variable name="messageArchiveComponent" value="on"/>
 		<variable name="clusterMode" value="true"/>
 		<variable name="acsName" value=""/>
+		<variable name="jarsDir" value="jars"/>
 <!--		<variable name="JDKPath" value="$JAVA_HOME"/> -->
 	</variables>
 
 	<dynamicvariables>
 		<variable name="messageArchivePlugin" value="message-archive-xep-0136" condition="messageArchive" />
 		<variable name="messageArchivePlugin" value="off" condition="!messageArchive" />
+
+		<variable name="osgiEnabled" value="true" condition="izpack.selected.osgi" />
+		<variable name="osgiEnabled" value="false" condition="!izpack.selected.osgi" />
 	</dynamicvariables>
 	<conditions>
 		<condition type="variable" id="installSelected">
@@ -276,9 +280,6 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 					<include name="package.html"/>
 					<include name="License.html"/>
 					<include name="Changelog"/>
-					<include name="jars/tigase-server.jar"/>
-					<include name="jars/tigase-utils.jar"/>
-					<include name="jars/tigase-xmltools.jar"/>
 					<include name="etc/tigase.conf"/>
 					<include name="certs/rsa-keystore"/>
 					<include name="certs/truststore"/>
@@ -291,7 +292,17 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 					<include name="etc/jmx.password"/>"
 					<include name="etc/cross-domain-policy.xml"/>"
 					<include name="etc/bosh-extra-headers.txt"/>"
+					<include name="etc/cross-domain-policy.xml"/>"
+					<include name="etc/client-access-policy.xml"/>"
+					<include name="etc/logback.xml"/>"
+					<include name="etc/snmp.acl"/>"
 				</fileset>
+				<fileset dir="./jars" targetdir="$INSTALL_PATH/${jarsDir}">
+					<include name="tigase-server.jar"/>
+					<!--<include name="tigase-utils.jar"/>-->
+					<!--<include name="tigase-xmltools.jar"/>-->
+				</fileset>
+
 				<parsable targetfile="$INSTALL_PATH/etc/init.properties"/>
 				<parsable targetfile="$INSTALL_PATH/etc/tigase.conf"/>
 			</pack>
@@ -327,9 +338,9 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 										target="${INSTALL_PATH}/wrapper.conf"/>
 
 				<singlefile src="win-stuff/wrapper/wrapper.dll"
-										target="$INSTALL_PATH/jars/wrapper.dll"/>
+										target="$INSTALL_PATH/${jarsDir}/wrapper.dll"/>
 				<singlefile src="win-stuff/wrapper/wrapper.jar"
-										target="$INSTALL_PATH/jars/wrapper.jar"/>
+										target="$INSTALL_PATH/${jarsDir}/wrapper.jar"/>
 
 				<singlefile src="win-stuff/scripts/InstallTigaseService.bat"
 										target="$INSTALL_PATH/InstallTigaseService.bat"/>
@@ -350,18 +361,20 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 			</pack>
 			<pack name="Extras" required="no" preselected="yes">
 				<description>Extras libraries, MUC, PubSub, STUN, Socks5, Message Archiving, ACS</description>
-				<fileset dir="." targetdir="$INSTALL_PATH">
-					<include name="jars/tigase-muc.jar"/>
-					<include name="jars/tigase-pubsub.jar"/>
-					<include name="jars/tigase-extras.jar"/>
-					<include name="jars/tigase-stun.jar"/>
-					<include name="jars/tigase-socks5.jar"/>
-					<include name="jars/tigase-message-archiving.jar"/>
-					<include name="jars/jdmkrt.jar"/>
-					<include name="jars/tigase-acs.jar"/>
-					<include name="jars/licence-lib.jar"/>
-					<include name="jars/tigase-stats-collector-library.jar"/>
-					<include name="jars/tigase-stats-collector-provider.jar"/>
+				<fileset dir="./jars" targetdir="$INSTALL_PATH/${jarsDir}">
+					<include name="tigase-muc.jar"/>
+					<include name="tigase-pubsub.jar"/>
+					<include name="tigase-extras.jar"/>
+					<include name="tigase-stun.jar"/>
+					<include name="jstun.jar"/>
+					<include name="tigase-socks5.jar"/>
+					<include name="tigase-message-archiving.jar"/>
+					<include name="jdmkrt.jar"/>
+					<include name="hamcrest-core.jar"/>
+					<include name="tigase-acs.jar"/>
+					<include name="licence-lib.jar"/>
+					<include name="tigase-stats-collector-library.jar"/>
+					<include name="tigase-stats-collector-provider.jar"/>
 				</fileset>
 			</pack>
 
@@ -370,7 +383,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 				<fileset dir="src/main/groovy/tigase/admin" targetdir="$INSTALL_PATH/scripts/admin">
 					<include name="*.*"/>
 				</fileset>
-				<fileset dir="jars" targetdir="$INSTALL_PATH/jars">
+				<fileset dir="jars" targetdir="$INSTALL_PATH/${jarsDir}">
 					<include name="groovy-all.jar"/>
 				</fileset>
 			</pack>
@@ -378,46 +391,73 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 			<pack name="Derby Database (DB included)" required="no" preselected="yes">
 <!-- 						installGroups="Derby Database"> -->
 				<description>Derby database (included) and JDBC driver</description>
-				<fileset dir="." targetdir="$INSTALL_PATH">
-					<include name="jars/derby.jar"/>
-					<include name="jars/derbytools.jar"/>
+				<fileset dir="./jars" targetdir="$INSTALL_PATH/${jarsDir}">
+					<include name="derby.jar"/>
+					<include name="derbytools.jar"/>
 				</fileset>
 			</pack>
 			<pack name="MySQL Database driver (DB not included)" required="no" preselected="yes">
 <!-- 						installGroups="MySQL Database"> -->
 				<description>MySQL JDBC driver (MySQL has to be installed separately)</description>
-				<fileset dir="." targetdir="$INSTALL_PATH">
-					<include name="jars/mysql-connector-java.jar"/>
+				<fileset dir="./jars" targetdir="$INSTALL_PATH/${jarsDir}">
+					<include name="mysql-connector-java.jar"/>
 				</fileset>
 			</pack>
 			<pack name="PostgreSQL Database driver (DB not included)" required="no" preselected="yes">
 <!-- 						installGroups="PostgreSQL Database"> -->
 				<description>PostgreSQL JDBC driver (PostgreSQL has to be installed separately)</description>
-				<fileset dir="." targetdir="$INSTALL_PATH">
-					<include name="jars/postgresql.jar"/>
+				<fileset dir="./jars" targetdir="$INSTALL_PATH/${jarsDir}">
+					<include name="postgresql.jar"/>
 				</fileset>
 			</pack>
 			<pack name="SQL Server Database driver (DB not included)" required="no" preselected="yes">
 <!-- 						installGroups="SQL Server Database"> -->
 				<description>SQL Server JDBC driver (SQL Server has to be installed separately)</description>
-				<fileset dir="." targetdir="$INSTALL_PATH">
-					<include name="jars/jtds.jar"/>
+				<fileset dir="./jars" targetdir="$INSTALL_PATH/${jarsDir}">
+					<include name="jtds.jar"/>
+				</fileset>
+			</pack>
+			<pack name="OSGi dependencies" required="no" preselected="no" id="osgi">
+				<description>If you intend to run Tigase in OSGi mode you need additional libraries. Enabling this Pack will also setup configuration files to start Tigase XMPP server in OSGi mode.</description>
+				<fileset dir="./conf" targetdir="${INSTALL_PATH}/conf">
+					<include name="config.properties"/>
+				</fileset>
+				<fileset dir="./etc" targetdir="${INSTALL_PATH}/etc">
+					<include name="logback.xml"/>
+				</fileset>
+				<fileset dir="./jars" targetdir="${INSTALL_PATH}/${jarsDir}">
+					<include name="org.osgi.core.jar"/>
+					<include name="org.apache.felix.bundlerepository.jar"/>
+					<include name="org.apache.felix.configadmin.jar"/>
+					<include name="org.apache.felix.shell.jar"/>
+					<include name="org.apache.felix.shell.remote.jar"/>
+					<include name="org.apache.felix.main.jar"/>
+					<include name="jetty-osgi-boot.jar"/>
+					<include name="logback-classic.jar"/>
+					<include name="logback-core.jar"/>
+					<include name="slf4j-api.jar"/>
+					<include name="jul-to-slf4j.jar"/>
 				</fileset>
 			</pack>
 			<pack name="HTTP API Component" required="no" preselected="no">
 				<description>Interface for the service administration, monitoring and exchange data between Tigase and external system</description>
-				<fileset dir="." targetdir="${INSTALL_PATH}">
-					<include name="jars/javax.servlet.jar"/>
-					<include name="jars/jetty-continuation.jar"/>
-					<include name="jars/jetty-deploy.jar"/>
-					<include name="jars/jetty-http.jar"/>
-					<include name="jars/jetty-io.jar"/>
-					<include name="jars/jetty-security.jar"/>
-					<include name="jars/jetty-server.jar"/>
-					<include name="jars/jetty-servlet.jar"/>
-					<include name="jars/jetty-util.jar"/>
-					<include name="jars/jetty-webapp.jar"/>
-					<include name="jars/jetty-xml.jar"/>
+				<fileset dir="./etc" targetdir="${INSTALL_PATH}/etc">
+					<include name="tigase-http-context.xml"/>
+				</fileset>
+				<fileset dir="./jars" targetdir="${INSTALL_PATH}/${jarsDir}">
+					<include name="jetty-osgi-boot.jar"/>
+					<include name="tigase-http-api.jar"/>
+					<include name="javax.servlet.jar"/>
+					<include name="jetty-continuation.jar"/>
+					<include name="jetty-deploy.jar"/>
+					<include name="jetty-http.jar"/>
+					<include name="jetty-io.jar"/>
+					<include name="jetty-security.jar"/>
+					<include name="jetty-server.jar"/>
+					<include name="jetty-servlet.jar"/>
+					<include name="jetty-util.jar"/>
+					<include name="jetty-webapp.jar"/>
+					<include name="jetty-xml.jar"/>
 				</fileset>
 			</pack>
 			<pack name="Sources" required="no" preselected="no">

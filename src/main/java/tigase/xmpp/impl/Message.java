@@ -154,6 +154,10 @@ public class Message
 						conns.add(con);
 					}
 				}
+
+				// MessageCarbons: message cloned to all resources? why? it should be copied only
+				// to resources with non negative priority!!
+				
 				if (conns.size() > 0) {
 					for (XMPPResourceConnection con : conns) {
 						Packet result = packet.copyElementOnly();

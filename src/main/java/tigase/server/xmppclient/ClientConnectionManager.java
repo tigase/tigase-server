@@ -47,7 +47,6 @@ import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
-import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -55,7 +54,6 @@ import tigase.xmpp.XMPPResourceConnection;
 import java.io.IOException;
 
 import java.util.Arrays;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.LinkedList;
 import java.util.List;
@@ -102,8 +100,9 @@ public class ClientConnectionManager
 
 	/** Field description */
 	protected SeeOtherHostIfc                   see_other_host_strategy = null;
-	private final Map<String, XMPPProcessorIfc> processors = new ConcurrentHashMap<String,
-			XMPPProcessorIfc>();
+//	private final Map<String, XMPPProcessorIfc> processors = new ConcurrentHashMap<String,
+//			XMPPProcessorIfc>();
+	private XMPPIOProcessor[] processors = new XMPPIOProcessor[0];
 	private final ReceiverTimeoutHandler stoppedHandler         = newStoppedHandler();
 	private final ReceiverTimeoutHandler startedHandler         = newStartedHandler();
 	private long                         socket_close_wait_time =
@@ -424,6 +423,8 @@ public class ClientConnectionManager
 		JID    connectionId = getFromAddress(id);
 
 		service.setConnectionId(connectionId);
+		
+		service.setProcessors(processors);
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -443,6 +444,9 @@ public class ClientConnectionManager
 		if (props.get(SOCKET_CLOSE_WAIT_PROP_KEY) != null) {
 			socket_close_wait_time = (Long) props.get(SOCKET_CLOSE_WAIT_PROP_KEY);
 		}
+		
+		processors = XMPPIOProcessorsFactory.updateIOProcessors(this, processors, props);
+
 		if (props.size() == 1) {
 
 			// If props.size() == 1, it means this is a single property update
@@ -832,7 +836,7 @@ public class ClientConnectionManager
 		switch (iqc.getCommand()) {
 		case GETFEATURES :
 			if (iqc.getType() == StanzaType.result) {
-				List<Element> features      = getFeatures(getXMPPSession(iqc));
+				List<Element> features      = getFeatures(serv);
 				Element       elem_features = new Element("stream:features");
 
 				elem_features.addChildren(features);
@@ -1071,6 +1075,16 @@ public class ClientConnectionManager
 
 			break;
 
+		case STREAM_MOVED:
+			if (processors != null) {
+				for (XMPPIOProcessor processor : processors) {
+					//handled |= processor.processCommand(packet);
+					processor.processCommand(serv, packet);
+				}
+			}
+			
+			break;
+			
 		default :
 			writePacketToSocket(iqc);
 
@@ -1082,11 +1096,11 @@ public class ClientConnectionManager
 
 	// ~--- get methods
 	// ----------------------------------------------------------
-	private List<Element> getFeatures(XMPPResourceConnection session) {
+	private List<Element> getFeatures(XMPPIOService service) {
 		List<Element> results = new LinkedList<Element>();
 
-		for (XMPPProcessorIfc proc : processors.values()) {
-			Element[] features = proc.supStreamFeatures(session);
+		for (XMPPIOProcessor proc : processors) {
+			Element[] features = proc.supStreamFeatures(service);
 
 			if (features != null) {
 				results.addAll(Arrays.asList(features));
