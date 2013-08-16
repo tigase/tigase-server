@@ -307,6 +307,8 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		if (!isEnabled(service))
 			return false;
 
+		String id = (String) service.getSessionData().get(STREAM_ID_KEY);
+		
 		if (streamClosed) {
 			service.getSessionData().remove(STREAM_ID_KEY);
 		}
@@ -323,7 +325,6 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		// resumption but those clients are not compatible with XEP-0198 and 
 		// resumption so this should not happen
 		if (isResumptionEnabled(service)) {
-			String id = (String) service.getSessionData().get(STREAM_ID_KEY);
 			if (!services.containsKey(id))
 				return false;
 
@@ -342,6 +343,9 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 			}
 			
 			return false;
+		}
+		else if (id != null) {
+			services.remove(id, service);
 		}
 		
 		sendErrorsForQueuedPackets(service);
