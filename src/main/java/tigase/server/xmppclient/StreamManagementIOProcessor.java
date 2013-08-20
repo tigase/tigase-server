@@ -155,7 +155,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 				try {
 					service.writeRawData("<" + ENABLED_NAME + " xmlns='" + XMLNS + "'"
 							+ ( id != null ? " id='" + id + "' " + RESUME_ATTR + "='true' "+ MAX_ATTR + "='" + max + "'" : "" ) 
-							+ " " + LOCATION_ATTR + "='" + location + "' />");
+							+ ( location != null ? " " + LOCATION_ATTR + "='" + location + "'" : "" ) + " />");
 				}
 				catch (IOException ex) {
 					if (log.isLoggable(Level.FINE)) {
