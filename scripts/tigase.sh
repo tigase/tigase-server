@@ -80,12 +80,12 @@ if [ -z "${TIGASE_HOME}" ] ; then
   TIGASE_JAR=""
 fi
 
-if ! [ $OSGI ] ; then
-	LIB_DIR=jars
-	JAR_FILE=${LIB_DIR}/tigase-server*.jar
-else
+if [ -n "${OSGI}" ] && ${OSGI} ; then
 	LIB_DIR=jars
 	JAR_FILE=${LIB_DIR}/org.apache.felix.main*.jar
+else
+	LIB_DIR=jars
+	JAR_FILE=${LIB_DIR}/tigase-server*.jar
 fi
 
 for j in ${TIGASE_HOME}/${JAR_FILE} ; do
@@ -137,7 +137,7 @@ CLASSPATH="`ls -d ${TIGASE_HOME}/${LIB_DIR}/*.jar 2>/dev/null | grep -v wrapper 
 
 LOGBACK="-Dlogback.configurationFile=$TIGASE_HOME/etc/logback.xml"
 
-if [ $OSGI ] ; then
+if [ -n "${OSGI}" ] && ${OSGI} ; then
 	TIGASE_CMD="${JAVA} ${JAVA_OPTIONS} ${LOGBACK} -jar ${JAR_FILE}"
 else
 	TIGASE_CMD="${JAVA} ${JAVA_OPTIONS} ${LOGBACK} -cp ${CLASSPATH} ${TIGASE_RUN}"
@@ -170,18 +170,16 @@ case "${1}" in
     fi
     echo "Shutting down Tigase: $PID"
 
-	if ! [ $OSGI ] ; then
-		kill $PID 2>/dev/null
-		for ((i=1; i <= 30; i++)) ; do
-		  if ps -p $PID > /dev/null ; then
-			echo "$i. Waiting for the server to terminate..."
-			sleep 1
-		  else
-			echo "$i. Tigase terminated."
-			break
-		  fi
-		done
-	fi
+	kill $PID 2>/dev/null
+	for ((i=1; i <= 30; i++)) ; do
+	  if ps -p $PID > /dev/null ; then
+		echo "$i. Waiting for the server to terminate..."
+		sleep 1
+	  else
+		echo "$i. Tigase terminated."
+		break
+	  fi
+	done
 	
 	if ps -p $PID > /dev/null ; then
       echo "Forcing the server to terminate."
