@@ -84,13 +84,13 @@
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-utils</artifactId>
-			<version>3.4.2-SNAPSHOT</version>
+			<version>3.4.2-tigase-5.2.0-beta3</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-xmltools</artifactId>
-			<version>3.4.3-SNAPSHOT</version>
+			<version>3.4.3-tigase-5.2.0-beta3</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
