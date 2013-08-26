@@ -198,7 +198,7 @@
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-server</artifactId>
-			<version>5.2.0-tigase-5.2.0-beta3</version>
+			<version>5.2.0-beta3</version>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
