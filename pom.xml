@@ -90,7 +90,7 @@
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-xmltools</artifactId>
-			<version>3.4.3-tigase-5.2.0-beta3</version>
+			<version>3.4.4-tigase-5.2.0-beta3</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
