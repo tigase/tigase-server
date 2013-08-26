@@ -52,7 +52,6 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<appsubpath>Tigase-$APP_VER</appsubpath>
 		<javaversion>1.6</javaversion>
 		<requiresjdk>no</requiresjdk>
-		<pack200/>
 	</info>
 
 	<jar src="jars/postgresql.jar"/>
