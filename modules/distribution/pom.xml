@@ -19,6 +19,38 @@
 		<relativePath>../master</relativePath>
 	</parent>
 	
+	<profiles>
+	  <profile>
+		<activation>
+		  <os>
+			<family>!windows</family>
+		  </os>
+		</activation>
+		<build>
+			<plugins>
+				<plugin>
+					<artifactId>exec-maven-plugin</artifactId>
+					<groupId>org.codehaus.mojo</groupId>
+					<version>1.2.1</version>
+					<executions>
+						<execution><!-- Run our version calculation script -->
+							<id>ChangeLog generation</id>
+							<phase>validate</phase>
+							<goals>
+								<goal>exec</goal>
+							</goals>
+							<configuration>
+								<executable>${project.basedir}/scripts/genChangeLog.sh</executable>
+								<workingDirectory>${project.basedir}</workingDirectory>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</build>
+	  </profile>
+	</profiles>		
+	
 	<build>
 		<plugins>
 
