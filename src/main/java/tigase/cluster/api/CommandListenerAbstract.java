@@ -60,7 +60,9 @@ public abstract class CommandListenerAbstract
 	 *
 	 * @param cl
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int compareTo(CommandListener cl) {
@@ -73,7 +75,9 @@ public abstract class CommandListenerAbstract
 	 *
 	 * @param cl
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean equals(Object cl) {
@@ -85,7 +89,9 @@ public abstract class CommandListenerAbstract
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int hashCode() {
@@ -104,7 +110,9 @@ public abstract class CommandListenerAbstract
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getName() {
@@ -135,4 +143,4 @@ public abstract class CommandListenerAbstract
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/08/29

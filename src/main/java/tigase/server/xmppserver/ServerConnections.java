@@ -1,10 +1,13 @@
 /*
- *   Tigase Jabber/XMPP Server
- *  Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * ServerConnections.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.server.xmppserver;
 
@@ -32,13 +34,11 @@ import tigase.xmpp.XMPPIOService;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.ArrayDeque;
-import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Queue;
 
 /**
  * Describe class ServerConnections here.
@@ -50,35 +50,24 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class ServerConnections {
-
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log =
-		Logger.getLogger("tigase.server.xmppserver.ServerConnections");
-
-	//~--- constant enums -------------------------------------------------------
-
-	/**
-	 * Enum description
-	 *
-	 */
-	public enum OutgoingState {
-		NULL, CONNECTING, HANDSHAKING, OK;
-	}
+	private static final Logger log = Logger.getLogger(
+			"tigase.server.xmppserver.ServerConnections");
 
 	//~--- fields ---------------------------------------------------------------
 
-	private CID cid = null;
+	private CID                                         cid     = null;
 	private ConnectionHandlerIfc<XMPPIOService<Object>> handler = null;
 
 	/**
 	 * Outgoing (connect) service for data packets.
 	 */
-	private XMPPIOService<Object> outgoing = null;
-	private OutgoingState conn_state = OutgoingState.NULL;
-	private long receivedPackets = 0;
-	private long sentPackets = 0;
+	private XMPPIOService<Object> outgoing        = null;
+	private OutgoingState         conn_state      = OutgoingState.NULL;
+	private long                  receivedPackets = 0;
+	private long                  sentPackets     = 0;
 
 ///**
 // * Incoming (accept) services session:id. Some servers (EJabberd) opens
@@ -90,14 +79,16 @@ public class ServerConnections {
 	/**
 	 * Normal packets between users on different servers
 	 */
-	private ConcurrentLinkedQueue<Packet> waitingPackets = new ConcurrentLinkedQueue<Packet>();
+	private ConcurrentLinkedQueue<Packet> waitingPackets =
+			new ConcurrentLinkedQueue<Packet>();
 
 	/**
 	 * Controll packets for s2s connection establishing
 	 */
 	private ConcurrentLinkedQueue<Packet> waitingControlPackets =
-		new ConcurrentLinkedQueue<Packet>();
-	private ConcurrentHashMap<String, String> db_keys = new ConcurrentHashMap<String, String>();
+			new ConcurrentLinkedQueue<Packet>();
+	private ConcurrentHashMap<String, String> db_keys = new ConcurrentHashMap<String,
+			String>();
 
 	/**
 	 * Keeps the creation time. After some time the queue and all
@@ -106,6 +97,16 @@ public class ServerConnections {
 	 * to the remote server should be performed.
 	 */
 	private long creationTime = System.currentTimeMillis();
+
+	//~--- constant enums -------------------------------------------------------
+
+	/**
+	 * Enum description
+	 *
+	 */
+	public enum OutgoingState {
+		NULL, CONNECTING, HANDSHAKING, OK;
+	}
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -118,7 +119,7 @@ public class ServerConnections {
 	 */
 	public ServerConnections(ConnectionHandlerIfc<XMPPIOService<Object>> handler, CID cid) {
 		this.handler = handler;
-		this.cid = cid;
+		this.cid     = cid;
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -143,7 +144,6 @@ public class ServerConnections {
 		if (waitingPackets.size() == 0) {
 			creationTime = System.currentTimeMillis();
 		}
-
 		waitingPackets.offer(packet);
 	}
 
@@ -157,14 +157,268 @@ public class ServerConnections {
 		XMPPIOService<Object> old = outgoing;
 
 		if (outgoing != serv) {
-			outgoing = serv;
+			outgoing   = serv;
 			conn_state = OutgoingState.HANDSHAKING;
 		}
-
 		if (old != null) {
 			log.info("Old outgoing connection: " + old + " replaced with new one: " + outgoing);
 			old.forceStop();
 		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 */
+	public synchronized void handleDialbackFailure() {
+		if (outgoing != null) {
+			outgoing.forceStop();
+			outgoing = null;
+		}
+		conn_state = OutgoingState.NULL;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of boolean
+	 */
+	public synchronized boolean handleDialbackSuccess() {
+		if ((outgoing != null) && (conn_state == OutgoingState.HANDSHAKING)) {
+			setValid();
+
+			ArrayDeque<Packet> all    = new ArrayDeque<Packet>();
+			Packet             packet = null;
+
+			while ((packet = waitingControlPackets.poll()) != null) {
+				all.offer(packet);
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Sending on connection: " + outgoing + " control packet: " + packet);
+				}
+			}
+			sentPackets += waitingPackets.size();
+			while ((packet = waitingPackets.poll()) != null) {
+				all.offer(packet);
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Sending on connection: " + outgoing + " packet: " + packet);
+				}
+			}
+			handler.writePacketsToSocket(outgoing, all);
+
+			return true;
+		} else {
+			log.warning("Something wrong, the method was called when the outgoing " +
+					"connection is null for cid: " + cid);
+			outgoing   = null;
+			conn_state = OutgoingState.NULL;
+
+			return false;
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of boolean
+	 */
+	public boolean needsConnection() {
+		return (conn_state == OutgoingState.NULL);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of boolean
+	 */
+	public boolean outgoingIsNull() {
+		return outgoing == null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param sessionId
+	 * @param dbKey
+	 */
+	public void putDBKey(String sessionId, String dbKey) {
+		db_keys.put(sessionId, dbKey);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of boolean
+	 */
+	public synchronized boolean sendAllControlPackets() {
+		if (log.isLoggable(Level.FINEST)) {
+			for (Packet packet : waitingControlPackets) {
+				log.finest("Sending on connection: " + outgoing + " control packet: " + packet);
+			}
+		}
+		handler.writePacketsToSocket(outgoing, waitingControlPackets);
+
+		return true;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 *
+	 *
+	 *
+	 * @return a value of boolean
+	 */
+	public synchronized boolean sendControlPacket(Packet packet) {
+		boolean result = false;
+
+		if ((outgoing != null) && outgoing.isConnected() && ((conn_state == OutgoingState
+				.OK) || (conn_state == OutgoingState.HANDSHAKING))) {
+			result = handler.writePacketToSocket(outgoing, packet);
+			if (!result) {
+				outgoing.forceStop();
+				outgoing = null;
+			} else {
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Sent on connection: " + outgoing + " control packet: " + packet);
+				}
+			}
+		}
+		if (!result) {
+			addControlPacket(packet);
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Connection not ready: " + outgoing +
+						" control packet added to waiting: " + packet);
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Describe <code>sendPacket</code> method here.
+	 *
+	 * @param packet a <code>Packet</code> value
+	 *  a <code>boolean</code> value
+	 *
+	 * @return a value of boolean
+	 */
+	public synchronized boolean sendPacket(Packet packet) {
+		boolean result = false;
+
+		if ((outgoing != null) && outgoing.isConnected() && (conn_state == OutgoingState
+				.OK)) {
+			result = handler.writePacketToSocket(outgoing, packet);
+			if (!result) {
+				outgoing.forceStop();
+				outgoing = null;
+			} else {
+				++sentPackets;
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Sent on connection: " + outgoing + " packet sent: " + packet);
+				}
+			}
+		}
+		if (!result) {
+			addDataPacket(packet);
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Connection not ready: " + outgoing + " packet added to waiting: " +
+						packet);
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param serv
+	 */
+	public void serviceStopped(XMPPIOService<Object> serv) {
+		String session_id = (String) serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
+
+		if (session_id != null) {
+			db_keys.remove(session_id);
+		} else {
+			log.info("Session_ID is null for: " + serv);
+		}
+		if (serv == outgoing) {
+			outgoing   = null;
+			conn_state = OutgoingState.NULL;
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("Connection removed: " + outgoing + ", session id: " + session_id);
+			}
+
+//    return;
+		}
+
+//  XMPPIOService rem = incoming.remove(session_id);
+//  if (rem == null) {
+//    log.fine("No service with given SESSION_ID: " + session_id);
+//  } else {
+//    log.finer("Connection removed: " + session_id);
+//  }
+	}
+
+	/**
+	 * Method description
+	 *
+	 */
+	public void stopAll() {
+		if (outgoing != null) {
+			outgoing.forceStop();
+			outgoing = null;
+		}
+		conn_state = OutgoingState.NULL;
+
+//  Set<Map.Entry<String, XMPPIOService>> set = incoming.entrySet();
+//  for (Map.Entry<String, XMPPIOService> entry: set) {
+//    entry.getValue().forceStop();
+//    set.remove(entry);
+//  }
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of String
+	 */
+	@Override
+	public String toString() {
+		return "cid: " + cid + ", conn_state: " + conn_state.name() + ", outgoing: " +
+				outgoing + ", waitingPackets: " + waitingPackets.size() + ", controlPacket: " +
+				waitingControlPackets.size() + ", db_keys: " + db_keys.size();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of long
+	 */
+	public long waitingTime() {
+		return (System.currentTimeMillis() - creationTime);
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -173,7 +427,9 @@ public class ServerConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of CID
 	 */
 	public CID getCID() {
 		return cid;
@@ -185,7 +441,9 @@ public class ServerConnections {
 	 *
 	 * @param sessionId
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	public String getDBKey(String sessionId) {
 		return db_keys.get(sessionId);
@@ -195,7 +453,9 @@ public class ServerConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of int
 	 */
 	public int getDBKeysSize() {
 		return db_keys.size();
@@ -205,7 +465,9 @@ public class ServerConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of OutgoingState
 	 */
 	public OutgoingState getOutgoingState() {
 		return conn_state;
@@ -215,72 +477,13 @@ public class ServerConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Queue<Packet>
 	 */
 	public Queue<Packet> getWaitingPackets() {
 		return waitingPackets;
 	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 */
-	public synchronized void handleDialbackFailure() {
-		if (outgoing != null) {
-			outgoing.forceStop();
-			outgoing = null;
-		}
-
-		conn_state = OutgoingState.NULL;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public synchronized boolean handleDialbackSuccess() {
-		if ((outgoing != null) && (conn_state == OutgoingState.HANDSHAKING)) {
-			setValid();
-
-			ArrayDeque<Packet> all = new ArrayDeque<Packet>();
-			Packet packet = null;
-
-			while ((packet = waitingControlPackets.poll()) != null) {
-				all.offer(packet);
-
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Sending on connection: " + outgoing + " control packet: " + packet);
-				}
-			}
-
-			sentPackets += waitingPackets.size();
-
-			while ((packet = waitingPackets.poll()) != null) {
-				all.offer(packet);
-
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Sending on connection: " + outgoing + " packet: " + packet);
-				}
-			}
-
-			handler.writePacketsToSocket(outgoing, all);
-
-			return true;
-		} else {
-			log.warning("Something wrong, the method was called when the outgoing "
-					+ "connection is null for cid: " + cid);
-			outgoing = null;
-			conn_state = OutgoingState.NULL;
-
-			return false;
-		}
-	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -288,7 +491,9 @@ public class ServerConnections {
 	 *
 	 * @param serv
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	public boolean isOutgoing(XMPPIOService<Object> serv) {
 		return serv == outgoing;
@@ -349,168 +554,12 @@ public class ServerConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	public boolean isOutgoingConnected() {
 		return (outgoing != null) && outgoing.isConnected();
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public boolean needsConnection() {
-		return (conn_state == OutgoingState.NULL);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public boolean outgoingIsNull() {
-		return outgoing == null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param sessionId
-	 * @param dbKey
-	 */
-	public void putDBKey(String sessionId, String dbKey) {
-		db_keys.put(sessionId, dbKey);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public synchronized boolean sendAllControlPackets() {
-		if (log.isLoggable(Level.FINEST)) {
-			for (Packet packet : waitingControlPackets) {
-				log.finest("Sending on connection: " + outgoing + " control packet: " + packet);
-			}
-		}
-
-		handler.writePacketsToSocket(outgoing, waitingControlPackets);
-
-		return true;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 *
-	 * @return
-	 */
-	public synchronized boolean sendControlPacket(Packet packet) {
-		boolean result = false;
-
-		if ((outgoing != null) && outgoing.isConnected()
-				&& ((conn_state == OutgoingState.OK) || (conn_state == OutgoingState.HANDSHAKING))) {
-			result = handler.writePacketToSocket(outgoing, packet);
-
-			if ( !result) {
-				outgoing.forceStop();
-				outgoing = null;
-			} else {
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Sent on connection: " + outgoing + " control packet: " + packet);
-				}
-			}
-		}
-
-		if ( !result) {
-			addControlPacket(packet);
-
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Connection not ready: " + outgoing + " control packet added to waiting: "
-						+ packet);
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * Describe <code>sendPacket</code> method here.
-	 *
-	 * @param packet a <code>Packet</code> value
-	 * @return a <code>boolean</code> value
-	 */
-	public synchronized boolean sendPacket(Packet packet) {
-		boolean result = false;
-
-		if ((outgoing != null) && outgoing.isConnected() && (conn_state == OutgoingState.OK)) {
-			result = handler.writePacketToSocket(outgoing, packet);
-
-			if ( !result) {
-				outgoing.forceStop();
-				outgoing = null;
-			} else {
-				++sentPackets;
-
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Sent on connection: " + outgoing + " packet sent: " + packet);
-				}
-			}
-		}
-
-		if ( !result) {
-			addDataPacket(packet);
-
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Connection not ready: " + outgoing + " packet added to waiting: "
-						+ packet);
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 */
-	public void serviceStopped(XMPPIOService<Object> serv) {
-		String session_id = (String) serv.getSessionData().get(XMPPIOService.SESSION_ID_KEY);
-
-		if (session_id != null) {
-			db_keys.remove(session_id);
-		} else {
-			log.info("Session_ID is null for: " + serv);
-		}
-
-		if (serv == outgoing) {
-			outgoing = null;
-			conn_state = OutgoingState.NULL;
-
-			if (log.isLoggable(Level.FINER)) {
-				log.finer("Connection removed: " + outgoing + ", session id: " + session_id);
-			}
-
-//    return;
-		}
-
-//  XMPPIOService rem = incoming.remove(session_id);
-//  if (rem == null) {
-//    log.fine("No service with given SESSION_ID: " + session_id);
-//  } else {
-//    log.finer("Connection removed: " + session_id);
-//  }
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -531,57 +580,10 @@ public class ServerConnections {
 		conn_state = OutgoingState.OK;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 */
-	public void stopAll() {
-		if (outgoing != null) {
-			outgoing.forceStop();
-			outgoing = null;
-		}
-
-		conn_state = OutgoingState.NULL;
-
-//  Set<Map.Entry<String, XMPPIOService>> set = incoming.entrySet();
-//  for (Map.Entry<String, XMPPIOService> entry: set) {
-//    entry.getValue().forceStop();
-//    set.remove(entry);
-//  }
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String toString() {
-		return "cid: " + cid + ", conn_state: " + conn_state.name() + ", outgoing: " + outgoing
-				+ ", waitingPackets: " + waitingPackets.size() + ", controlPacket: "
-					+ waitingControlPackets.size() + ", db_keys: " + db_keys.size();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public long waitingTime() {
-		return (System.currentTimeMillis() - creationTime);
-	}
-
 //public int incomingSize() {
 //  return incoming.size();
 //}
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/28

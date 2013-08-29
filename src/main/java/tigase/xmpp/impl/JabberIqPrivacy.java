@@ -161,7 +161,9 @@ public class JabberIqPrivacy
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String id() {
@@ -177,7 +179,9 @@ public class JabberIqPrivacy
 	 * @param repo a <code>NonAuthUserRepository</code> value
 	 * @param results
 	 * @param settings
-	 * @return a <code>boolean</code> value
+	 *  a <code>boolean</code> value
+	 *
+	 * @return a value of boolean
 	 */
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
@@ -254,7 +258,9 @@ public class JabberIqPrivacy
 	 *
 	 * @param session
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Element[]
 	 */
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
@@ -265,7 +271,9 @@ public class JabberIqPrivacy
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[][]
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -276,11 +284,112 @@ public class JabberIqPrivacy
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[]
 	 */
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param items
+	 *
+	 *
+	 *
+	 * @return a value of Authorization
+	 */
+	public static Authorization validateList(final XMPPResourceConnection session,
+			final List<Element> items) {
+		Authorization result = null;
+
+		try {
+			HashSet<Integer> orderSet = new HashSet<Integer>();
+
+			// creating set of all known groups in roster
+			HashSet<String> groups = new HashSet<String>();
+
+			if (session != null) {
+				JID[] jids = roster_util.getBuddies(session);
+
+				if (jids != null) {
+					for (JID jid : jids) {
+						String[] buddyGroups = roster_util.getBuddyGroups(session, jid);
+
+						if (buddyGroups != null) {
+							for (String group : buddyGroups) {
+								groups.add(group);
+							}
+						}
+					}
+				}
+			}
+			for (Element item : items) {
+				ITEM_TYPE type = ITEM_TYPE.all;
+
+				if (item.getAttributeStaticStr(TYPE) != null) {
+					type = ITEM_TYPE.valueOf(item.getAttributeStaticStr(TYPE));
+				}    // end of if (item.getAttribute(TYPE) != null)
+
+				String value = item.getAttributeStaticStr(VALUE);
+
+				switch (type) {
+				case jid :
+
+					// if jid is not valid it will throw exception
+					JID.jidInstance(value);
+
+					break;
+
+				case group :
+					boolean matched = groups.contains(value);
+
+					if (!matched) {
+						result = Authorization.ITEM_NOT_FOUND;
+					}
+
+					break;
+
+				case subscription :
+
+					// if subscription is not valid it will throw exception
+					ITEM_SUBSCRIPTIONS.valueOf(value);
+
+					break;
+
+				case all :
+				default :
+					break;
+				}
+				if (result != null) {
+					break;
+				}
+
+				// if action is not valid it will throw exception
+				ITEM_ACTION.valueOf(item.getAttributeStaticStr(ACTION));
+
+				// checking unique order attribute value
+				Integer order = Integer.parseInt(item.getAttributeStaticStr(ORDER));
+
+				if ((order == null) || (order < 0) ||!orderSet.add(order)) {
+					result = Authorization.BAD_REQUEST;
+				}
+				if (result != null) {
+					break;
+				}
+			}
+		} catch (Exception ex) {
+
+			// if we get exception list is not valid
+			result = Authorization.BAD_REQUEST;
+		}
+
+		return result;
 	}
 
 	private boolean allowed(Packet packet, XMPPResourceConnection session) {
@@ -593,104 +702,7 @@ public class JabberIqPrivacy
 					"Only 1 element is allowed in privacy set request.", true));
 		}    // end of else
 	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param items
-	 *
-	 * @return
-	 */
-	public static Authorization validateList(final XMPPResourceConnection session,
-			final List<Element> items) {
-		Authorization result = null;
-
-		try {
-			HashSet<Integer> orderSet = new HashSet<Integer>();
-
-			// creating set of all known groups in roster
-			HashSet<String> groups = new HashSet<String>();
-
-			if (session != null) {
-				JID[] jids = roster_util.getBuddies(session);
-
-				if (jids != null) {
-					for (JID jid : jids) {
-						String[] buddyGroups = roster_util.getBuddyGroups(session, jid);
-
-						if (buddyGroups != null) {
-							for (String group : buddyGroups) {
-								groups.add(group);
-							}
-						}
-					}
-				}
-			}
-			for (Element item : items) {
-				ITEM_TYPE type = ITEM_TYPE.all;
-
-				if (item.getAttributeStaticStr(TYPE) != null) {
-					type = ITEM_TYPE.valueOf(item.getAttributeStaticStr(TYPE));
-				}    // end of if (item.getAttribute(TYPE) != null)
-
-				String value = item.getAttributeStaticStr(VALUE);
-
-				switch (type) {
-				case jid :
-
-					// if jid is not valid it will throw exception
-					JID.jidInstance(value);
-
-					break;
-
-				case group :
-					boolean matched = groups.contains(value);
-
-					if (!matched) {
-						result = Authorization.ITEM_NOT_FOUND;
-					}
-
-					break;
-
-				case subscription :
-
-					// if subscription is not valid it will throw exception
-					ITEM_SUBSCRIPTIONS.valueOf(value);
-
-					break;
-
-				case all :
-				default :
-					break;
-				}
-				if (result != null) {
-					break;
-				}
-
-				// if action is not valid it will throw exception
-				ITEM_ACTION.valueOf(item.getAttributeStaticStr(ACTION));
-
-				// checking unique order attribute value
-				Integer order = Integer.parseInt(item.getAttributeStaticStr(ORDER));
-
-				if ((order == null) || (order < 0) ||!orderSet.add(order)) {
-					result = Authorization.BAD_REQUEST;
-				}
-				if (result != null) {
-					break;
-				}
-			}
-		} catch (Exception ex) {
-
-			// if we get exception list is not valid
-			result = Authorization.BAD_REQUEST;
-		}
-
-		return result;
-	}
 }    // JabberIqPrivacy
 
 
-//~ Formatted in Tigase Code Convention on 13/03/12
+//~ Formatted in Tigase Code Convention on 13/08/28

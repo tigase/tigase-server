@@ -230,7 +230,9 @@ public class ClusterRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Element</code>
 	 */
 	@Override
 	public Element toElement() {
@@ -250,7 +252,9 @@ public class ClusterRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String toPropertyString() {
@@ -262,7 +266,9 @@ public class ClusterRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String toString() {
@@ -275,7 +281,9 @@ public class ClusterRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>float</code>
 	 */
 	public float getCpuUsage() {
 		return cpuUsage;
@@ -285,7 +293,9 @@ public class ClusterRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getElemName() {
@@ -296,7 +306,9 @@ public class ClusterRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String getHostname() {
 		return hostname;
@@ -306,7 +318,9 @@ public class ClusterRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getKey() {
@@ -317,7 +331,9 @@ public class ClusterRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>long</code>
 	 */
 	public long getLastUpdate() {
 		return lastUpdate;
@@ -327,7 +343,9 @@ public class ClusterRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>float</code>
 	 */
 	public float getMemUsage() {
 		return memUsage;
@@ -337,7 +355,9 @@ public class ClusterRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String getPassword() {
 		return password;
@@ -347,7 +367,9 @@ public class ClusterRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	public int getPortNo() {
 		return portNo;
@@ -435,4 +457,4 @@ public class ClusterRepoItem
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/08/29

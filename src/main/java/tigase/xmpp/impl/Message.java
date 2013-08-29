@@ -79,7 +79,9 @@ public class Message
 	 * Returns plugin unique identifier.
 	 *
 	 *
-	 * @return pugin unique identifier.
+	 *  pugin unique identifier.
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String id() {
@@ -157,7 +159,6 @@ public class Message
 
 				// MessageCarbons: message cloned to all resources? why? it should be copied only
 				// to resources with non negative priority!!
-				
 				if (conns.size() > 0) {
 					for (XMPPResourceConnection con : conns) {
 						Packet result = packet.copyElementOnly();
@@ -246,7 +247,9 @@ public class Message
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[][]
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -257,7 +260,9 @@ public class Message
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[]
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -266,4 +271,4 @@ public class Message
 }    // Message
 
 
-//~ Formatted in Tigase Code Convention on 13/03/12
+//~ Formatted in Tigase Code Convention on 13/08/28

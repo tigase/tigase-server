@@ -46,7 +46,9 @@ public class ReceiverBareJidLB
 	 * @param p
 	 * @param conns
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>ComponentIOService</code>
 	 */
 	@Override
 	public ComponentIOService selectConnection(Packet p, List<ComponentConnection> conns) {
@@ -64,4 +66,4 @@ public class ReceiverBareJidLB
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/16
+//~ Formatted in Tigase Code Convention on 13/08/28

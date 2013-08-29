@@ -402,7 +402,9 @@ public class ClusterController
 	 *
 	 * @param params
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -415,7 +417,9 @@ public class ClusterController
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -426,7 +430,9 @@ public class ClusterController
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getDiscoDescription() {
@@ -439,7 +445,9 @@ public class ClusterController
 	 *
 	 * @param component
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean isCorrectType(ServerComponent component) {
@@ -497,4 +505,4 @@ public class ClusterController
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/08/29

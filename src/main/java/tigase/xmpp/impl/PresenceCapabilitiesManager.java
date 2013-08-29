@@ -2,7 +2,7 @@
  * PresenceCapabilitiesManager.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -58,46 +58,15 @@ import java.util.Set;
  * @author         Enter your name here...
  */
 public class PresenceCapabilitiesManager {
-	private static long idCounter = 0;
-	private static Logger log     =
-		Logger.getLogger(PresenceCapabilitiesManager.class.getName());
+	private static long   idCounter = 0;
+	private static Logger log = Logger.getLogger(PresenceCapabilitiesManager.class
+			.getName());
 
 	// Map<capsNode,Set<feature>>
 	private static Map<String, String[]> nodeFeatures = new ConcurrentHashMap<String,
-																												String[]>(250);
+			String[]>(250);
 	private static List<PresenceCapabilitiesListener> handlers =
-		new CopyOnWriteArrayList<PresenceCapabilitiesListener>();
-
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param capsNode
-	 * @param features
-	 */
-	public static void setNodeFeatures(String capsNode, String[] features) {
-		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "setting features for node = {0}", capsNode);
-		}
-		Arrays.sort(features);
-		nodeFeatures.put(capsNode, features);
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param capsNode
-	 *
-	 * @return
-	 */
-	public static String[] getNodeFeatures(String capsNode) {
-		return nodeFeatures.get(capsNode);
-	}
+			new CopyOnWriteArrayList<PresenceCapabilitiesListener>();
 
 	//~--- methods --------------------------------------------------------------
 
@@ -105,31 +74,22 @@ public class PresenceCapabilitiesManager {
 	 * Method description
 	 *
 	 *
-	 * @param c
-	 *
-	 * @return
+	 * @param owner
+	 * @param from
+	 * @param capsNodes
+	 * @param results
 	 */
-	public static String[] processPresence(Element c) {
-		Set<String> caps_nodes = null;
-
-		if (c != null) {
-			caps_nodes = new HashSet<String>();
-
-			String caps_node = c.getAttributeStaticStr("node") + "#" +
-												 c.getAttributeStaticStr("ver");
-
-			caps_nodes.add(caps_node);
-			if ((c.getAttributeStaticStr("hash") == null) &&
-					(c.getAttributeStaticStr("ext") != null)) {
-				for (String e : c.getAttributeStaticStr("ext").split(" ")) {
-					caps_nodes.add(c.getAttributeStaticStr("node") + "#" + e);
-				}
-			}
-		} else {
-			return null;
+	public static void handlePresence(JID owner, JID from, String[] capsNodes,
+			Queue<Packet> results) {
+		if (capsNodes == null) {
+			return;
 		}
 
-		return caps_nodes.toArray(new String[caps_nodes.size()]);
+		List<PresenceCapabilitiesListener> handlers = PresenceCapabilitiesManager.handlers;
+
+		for (PresenceCapabilitiesListener handler : handlers) {
+			handler.handlePresence(owner, from, capsNodes, results);
+		}
 	}
 
 	/**
@@ -142,7 +102,7 @@ public class PresenceCapabilitiesManager {
 	 * @param results
 	 */
 	public static void prepareCapsQueries(JID compJid, JID to, String[] caps_nodes,
-					Queue<Packet> results) {
+			Queue<Packet> results) {
 		if (caps_nodes != null) {
 			for (String caps_node : caps_nodes) {
 				if (!nodeFeatures.containsKey(caps_node)) {
@@ -162,7 +122,7 @@ public class PresenceCapabilitiesManager {
 	 * @param results
 	 */
 	public static void prepareCapsQueriesEl(JID compJid, JID to, String[] caps_nodes,
-					Queue<Element> results) {
+			Queue<Element> results) {
 		if (caps_nodes != null) {
 			for (String caps_node : caps_nodes) {
 				if (!nodeFeatures.containsKey(caps_node)) {
@@ -176,51 +136,13 @@ public class PresenceCapabilitiesManager {
 	 * Method description
 	 *
 	 *
-	 * @param compJid
-	 * @param p
-	 * @param results
-	 *
-	 * @return
-	 */
-	public static String[] processPresence(JID compJid, Packet p, Queue<Packet> results) {
-		Element c            = p.getElement().getChild("c");
-		Set<String> features = new HashSet<String>();
-
-		if (c != null) {
-			String caps_node = c.getAttributeStaticStr("node") + "#" +
-												 c.getAttributeStaticStr("ver");
-
-			// String[] nFeatures = nodeFeatures.get(caps_node);
-			if (!nodeFeatures.containsKey(caps_node)) {
-				Set<String> caps_nodes = new HashSet<String>();
-
-				caps_nodes.add(caps_node);
-				if ((c.getAttributeStaticStr("hash") == null) &&
-						(c.getAttributeStaticStr("ext") != null)) {
-					for (String e : c.getAttributeStaticStr("ext").split(" ")) {
-						caps_nodes.add(c.getAttributeStaticStr("node") + "#" + e);
-					}
-				}
-				for (String node : caps_nodes) {
-					if (!nodeFeatures.containsKey(node)) {
-						results.offer(prepareCapsQuery(p.getFrom(), compJid, node));
-					}
-				}
-			}
-		}
-
-		return features.toArray(new String[features.size()]);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
 	 * @param to
 	 * @param from
 	 * @param node
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Packet
 	 */
 	public static Packet prepareCapsQuery(JID to, JID from, String node) {
 		Element iq = prepareCapsQueryEl(to, from, node);
@@ -236,16 +158,18 @@ public class PresenceCapabilitiesManager {
 	 * @param from
 	 * @param node
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Element
 	 */
 	public static Element prepareCapsQueryEl(JID to, JID from, String node) {
-		String id  = String.valueOf(idCounter++);
+		String  id = String.valueOf(idCounter++);
 		Element iq = new Element("iq", new String[] { "from", "to", "id", "type" },
-														 new String[] { from.toString(),
-						to.toString(), id, "get" });
-		Element query = new Element("query", new String[] { "xmlns", "node" },
-																new String[] { "http://jabber.org/protocol/disco#info",
-						node });
+				new String[] { from.toString(),
+				to.toString(), id, "get" });
+		Element query = new Element("query", new String[] { "xmlns", "node" }, new String[] {
+				"http://jabber.org/protocol/disco#info",
+				node });
 
 		iq.addChild(query);
 
@@ -266,7 +190,7 @@ public class PresenceCapabilitiesManager {
 
 		if ((nick == null) || Configurable.DEF_SM_NAME.equals(nick)) {
 			Element query = packet.getElement().getChild("query",
-												"http://jabber.org/protocol/disco#info");
+					"http://jabber.org/protocol/disco#info");
 
 			if (query != null) {
 				if (packet.getType() == StanzaType.result) {
@@ -289,8 +213,8 @@ public class PresenceCapabilitiesManager {
 							}
 							features.add(item.getAttributeStaticStr("var"));
 						}
-						setNodeFeatures(query.getAttributeStaticStr("node"),
-														features.toArray(new String[features.size()]));
+						setNodeFeatures(query.getAttributeStaticStr("node"), features.toArray(
+								new String[features.size()]));
 					}
 				}
 
@@ -308,22 +232,75 @@ public class PresenceCapabilitiesManager {
 	 * Method description
 	 *
 	 *
-	 * @param owner
-	 * @param from
-	 * @param capsNodes
-	 * @param results
+	 * @param c
+	 *
+	 *
+	 *
+	 * @return a value of String[]
 	 */
-	public static void handlePresence(JID owner, JID from, String[] capsNodes,
-																		Queue<Packet> results) {
-		if (capsNodes == null) {
-			return;
+	public static String[] processPresence(Element c) {
+		Set<String> caps_nodes = null;
+
+		if (c != null) {
+			caps_nodes = new HashSet<String>();
+
+			String caps_node = c.getAttributeStaticStr("node") + "#" + c.getAttributeStaticStr(
+					"ver");
+
+			caps_nodes.add(caps_node);
+			if ((c.getAttributeStaticStr("hash") == null) && (c.getAttributeStaticStr("ext") !=
+					null)) {
+				for (String e : c.getAttributeStaticStr("ext").split(" ")) {
+					caps_nodes.add(c.getAttributeStaticStr("node") + "#" + e);
+				}
+			}
+		} else {
+			return null;
 		}
 
-		List<PresenceCapabilitiesListener> handlers = PresenceCapabilitiesManager.handlers;
+		return caps_nodes.toArray(new String[caps_nodes.size()]);
+	}
 
-		for (PresenceCapabilitiesListener handler : handlers) {
-			handler.handlePresence(owner, from, capsNodes, results);
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param compJid
+	 * @param p
+	 * @param results
+	 *
+	 *
+	 *
+	 * @return a value of String[]
+	 */
+	public static String[] processPresence(JID compJid, Packet p, Queue<Packet> results) {
+		Element     c        = p.getElement().getChild("c");
+		Set<String> features = new HashSet<String>();
+
+		if (c != null) {
+			String caps_node = c.getAttributeStaticStr("node") + "#" + c.getAttributeStaticStr(
+					"ver");
+
+			// String[] nFeatures = nodeFeatures.get(caps_node);
+			if (!nodeFeatures.containsKey(caps_node)) {
+				Set<String> caps_nodes = new HashSet<String>();
+
+				caps_nodes.add(caps_node);
+				if ((c.getAttributeStaticStr("hash") == null) && (c.getAttributeStaticStr(
+						"ext") != null)) {
+					for (String e : c.getAttributeStaticStr("ext").split(" ")) {
+						caps_nodes.add(c.getAttributeStaticStr("node") + "#" + e);
+					}
+				}
+				for (String node : caps_nodes) {
+					if (!nodeFeatures.containsKey(node)) {
+						results.offer(prepareCapsQuery(p.getFrom(), compJid, node));
+					}
+				}
+			}
 		}
+
+		return features.toArray(new String[features.size()]);
 	}
 
 	/**
@@ -344,6 +321,39 @@ public class PresenceCapabilitiesManager {
 	 */
 	public static void unregisterPresenceHandler(PresenceCapabilitiesListener handler) {
 		handlers.remove(handler);
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param capsNode
+	 *
+	 *
+	 *
+	 * @return a value of String[]
+	 */
+	public static String[] getNodeFeatures(String capsNode) {
+		return nodeFeatures.get(capsNode);
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param capsNode
+	 * @param features
+	 */
+	public static void setNodeFeatures(String capsNode, String[] features) {
+		if (log.isLoggable(Level.FINER)) {
+			log.log(Level.FINER, "setting features for node = {0}", capsNode);
+		}
+		Arrays.sort(features);
+		nodeFeatures.put(capsNode, features);
 	}
 
 	//~--- inner interfaces -----------------------------------------------------
@@ -370,4 +380,4 @@ public class PresenceCapabilitiesManager {
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/08/28

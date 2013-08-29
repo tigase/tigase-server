@@ -50,7 +50,8 @@ public abstract class RosterFactory {
 	 *
 	 * @param shared_impl
 	 *
-	 * @return
+	 *
+	 * @return a value of RosterAbstract
 	 */
 	public static RosterAbstract getRosterImplementation(boolean shared_impl) {
 		try {
@@ -69,8 +70,9 @@ public abstract class RosterFactory {
 	 * @param class_name
 	 * @param shared_impl
 	 *
-	 * @return
 	 *
+	 *
+	 * @return a value of RosterAbstract
 	 * @throws ClassNotFoundException
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
@@ -91,4 +93,4 @@ public abstract class RosterFactory {
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/04/24
+//~ Formatted in Tigase Code Convention on 13/08/28

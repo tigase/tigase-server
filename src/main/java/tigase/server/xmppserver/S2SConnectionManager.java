@@ -1,10 +1,13 @@
 /*
+ * S2SConnectionManager.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,10 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
+
 package tigase.server.xmppserver;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -47,45 +50,34 @@ import tigase.xmpp.PacketErrorTypeException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Map;
+import java.util.Queue;
+import java.util.TimerTask;
 
 import javax.script.Bindings;
 
-//~--- classes ----------------------------------------------------------------
-
 /**
  * Created: Jun 14, 2010 11:59:38 AM
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class S2SConnectionManager extends ConnectionManager<S2SIOService> implements
-		S2SConnectionHandlerIfc<S2SIOService> {
-
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
-	private static final Logger log = Logger
-			.getLogger(S2SConnectionManager.class.getName());
-	private static final String XMLNS_SERVER_VAL = "jabber:server";
-	private static final String XMLNS_CLIENT_VAL = "jabber:client";
-	protected static final String DB_RESULT_EL_NAME = "db:result";
-	protected static final String DB_VERIFY_EL_NAME = "db:verify";
-
-	/** Field description */	
-	public static final String CID_CONNECTIONS_TASKS_THREADS_KEY = "cid-connections-tasks-threads";
+public class S2SConnectionManager
+				extends ConnectionManager<S2SIOService>
+				implements S2SConnectionHandlerIfc<S2SIOService> {
+	/** Field description */
+	public static final String CID_CONNECTIONS_BIND = "cidConnections";
 
 	/** Field description */
-	public static final String MAX_PACKET_WAITING_TIME_PROP_KEY = "max-packet-waiting-time";
+	public static final String CID_CONNECTIONS_TASKS_THREADS_KEY =
+			"cid-connections-tasks-threads";
 
 	/** Field description */
 	public static final String MAX_CONNECTION_INACTIVITY_TIME_PROP_KEY =
@@ -95,30 +87,44 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	public static final String MAX_INCOMING_CONNECTIONS_PROP_KEY = "max-in-conns";
 
 	/** Field description */
-	public static final String MAX_OUT_TOTAL_CONNECTIONS_PROP_KEY = "max-out-total-conns";
+	public static final int MAX_INCOMING_CONNECTIONS_PROP_VAL = 4;
 
 	/** Field description */
 	public static final String MAX_OUT_PER_IP_CONNECTIONS_PROP_KEY = "max-out-per-ip-conns";
 
 	/** Field description */
-	public static final String S2S_CONNECTION_SELECTOR_PROP_KEY = "s2s-conn-selector";
-	
-	/** Field description */	
-	// TODO: #1195 - estimate proper default value 
-	public static final int CID_CONNECTIONS_TASKS_THREADS_VAL = Runtime.getRuntime().availableProcessors();
-	
-	/** Field description */
-	public static final String S2S_CONNECTION_SELECTOR_PROP_VAL =
-			"tigase.server.xmppserver.S2SRandomSelector";
+	public static final int MAX_OUT_PER_IP_CONNECTIONS_PROP_VAL = 1;
 
 	/** Field description */
-	public static final int MAX_INCOMING_CONNECTIONS_PROP_VAL = 4;
+	public static final String MAX_OUT_TOTAL_CONNECTIONS_PROP_KEY = "max-out-total-conns";
 
 	/** Field description */
 	public static final int MAX_OUT_TOTAL_CONNECTIONS_PROP_VAL = 1;
 
 	/** Field description */
-	public static final int MAX_OUT_PER_IP_CONNECTIONS_PROP_VAL = 1;
+	public static final String MAX_PACKET_WAITING_TIME_PROP_KEY = "max-packet-waiting-time";
+
+	/** Field description */
+	public static final String S2S_CONNECTION_SELECTOR_PROP_KEY = "s2s-conn-selector";
+
+	/** Field description */
+	public static final String S2S_CONNECTION_SELECTOR_PROP_VAL =
+			"tigase.server.xmppserver.S2SRandomSelector";
+
+	/** Field description */
+	protected static final String DB_RESULT_EL_NAME = "db:result";
+
+	/** Field description */
+	protected static final String DB_VERIFY_EL_NAME = "db:verify";
+
+	/**
+	 * Variable <code>log</code> is a class logger.
+	 */
+	private static final Logger log = Logger.getLogger(S2SConnectionManager.class
+			.getName());
+	private static final String PROCESSORS_CONF_PROP_KEY = "processors-conf";
+	private static final String XMLNS_CLIENT_VAL         = "jabber:client";
+	private static final String XMLNS_SERVER_VAL         = "jabber:server";
 
 	/** Field description */
 	public static final long MAX_PACKET_WAITING_TIME_PROP_VAL = 7 * MINUTE;
@@ -126,12 +132,15 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	/** Field description */
 	public static final long MAX_CONNECTION_INACTIVITY_TIME_PROP_VAL = 15 * MINUTE;
 
-	public static final String CID_CONNECTIONS_BIND = "cidConnections";
+	/** Field description */
 
-        private static final String PROCESSORS_CONF_PROP_KEY = "processors-conf";
-        
+	// TODO: #1195 - estimate proper default value
+	public static final int CID_CONNECTIONS_TASKS_THREADS_VAL = Runtime.getRuntime()
+			.availableProcessors();
+
+	//~--- fields ---------------------------------------------------------------
+
 	// ~--- fields ---------------------------------------------------------------
-
 	private S2SConnectionSelector connSelector = null;
 
 	/**
@@ -141,22 +150,22 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	 * specifies the maximum time for connecting to remote server. If this time is
 	 * exceeded then no more reconnecting attempts are performed and packets are
 	 * sent back with error information.
-	 * 
+	 *
 	 * Default TCP/IP timeout is 300 seconds so we can follow this convention but
 	 * administrator can set different timeout in server configuration.
 	 */
-	private long maxPacketWaitingTime = MAX_PACKET_WAITING_TIME_PROP_VAL;
-	private int maxOUTTotalConnections = MAX_OUT_TOTAL_CONNECTIONS_PROP_VAL;
-	private int maxOUTPerIPConnections = MAX_OUT_PER_IP_CONNECTIONS_PROP_VAL;
-	private long maxInactivityTime = MAX_CONNECTION_INACTIVITY_TIME_PROP_VAL;
-	private int maxINConnections = MAX_INCOMING_CONNECTIONS_PROP_VAL;
+	private long maxPacketWaitingTime   = MAX_PACKET_WAITING_TIME_PROP_VAL;
+	private int  maxOUTTotalConnections = MAX_OUT_TOTAL_CONNECTIONS_PROP_VAL;
+	private int  maxOUTPerIPConnections = MAX_OUT_PER_IP_CONNECTIONS_PROP_VAL;
+	private int  maxINConnections       = MAX_INCOMING_CONNECTIONS_PROP_VAL;
+	private long maxInactivityTime      = MAX_CONNECTION_INACTIVITY_TIME_PROP_VAL;
 
 	/**
 	 * Outgoing and incoming connections for a given domains pair (localdomain,
 	 * remotedomain)
 	 */
-	private Map<CID, CIDConnections> cidConnections =
-			new ConcurrentHashMap<CID, CIDConnections>(10000);
+	private Map<CID, CIDConnections> cidConnections = new ConcurrentHashMap<CID,
+			CIDConnections>(10000);
 
 	/**
 	 * List of processors which should handle all traffic incoming from the
@@ -165,36 +174,19 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	 */
 	private Map<String, S2SProcessor> processors = new LinkedHashMap<String, S2SProcessor>(
 			10);
-	private Map<String, S2SProcessor> filters = new LinkedHashMap<String, S2SProcessor>(
-			10);
+	private Map<String, S2SProcessor> filters = new LinkedHashMap<String, S2SProcessor>(10);
 
-	// ~--- methods --------------------------------------------------------------
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
-	 * @param binds
-	 */
-	@Override
-	public void initBindings(Bindings binds) {
-		super.initBindings(binds);
-		binds.put(CID_CONNECTIONS_BIND, cidConnections);
-	}
-
-	@Override
-	public int schedulerThreads() {
-		// TODO: #1195 - estimate proper default value 
-		return Runtime.getRuntime().availableProcessors();
-	}
-	
-	/**
-	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param packet
-	 * 
-	 * @return
+	 *
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	@Override
 	public boolean addOutPacket(Packet packet) {
@@ -203,8 +195,8 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param task
 	 * @param delay
 	 * @param unit
@@ -216,8 +208,8 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param task
 	 * @param delay
 	 * @param unit
@@ -228,198 +220,15 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 		super.addTimerTask(task, delay, unit);
 	}
 
-	// ~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param cid
-	 * @param createNew
-	 * 
-	 * @return
-	 * 
-	 * @throws LocalhostException
-	 * @throws NotLocalhostException
-	 */
-	@Override
-	public CIDConnections getCIDConnections(CID cid, boolean createNew)
-			throws NotLocalhostException, LocalhostException {
-		CIDConnections result = getCIDConnections(cid);
-
-		if ((result == null) && createNew && (cid != null)) {
-			result = createNewCIDConnections(cid);
-		}
-
-		return result;
-	}
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param params
-	 * 
-	 * @return
-	 */
-	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> props = super.getDefaults(params);
-
-		props
-				.put(MAX_PACKET_WAITING_TIME_PROP_KEY, MAX_PACKET_WAITING_TIME_PROP_VAL / SECOND);
-		props.put(MAX_CONNECTION_INACTIVITY_TIME_PROP_KEY,
-				MAX_CONNECTION_INACTIVITY_TIME_PROP_VAL / SECOND);
-		props.put(MAX_INCOMING_CONNECTIONS_PROP_KEY, MAX_INCOMING_CONNECTIONS_PROP_VAL);
-		props.put(MAX_OUT_TOTAL_CONNECTIONS_PROP_KEY, MAX_OUT_TOTAL_CONNECTIONS_PROP_VAL);
-		props.put(MAX_OUT_PER_IP_CONNECTIONS_PROP_KEY, MAX_OUT_PER_IP_CONNECTIONS_PROP_VAL);
-		props.put(S2S_CONNECTION_SELECTOR_PROP_KEY, S2S_CONNECTION_SELECTOR_PROP_VAL);
-		props.put(CID_CONNECTIONS_TASKS_THREADS_KEY, CID_CONNECTIONS_TASKS_THREADS_VAL);
-		
-		return props;
-	}
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @return
-	 */
-	@Override
-	public String getDiscoCategoryType() {
-		return "s2s";
-	}
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @return
-	 */
-	@Override
-	public String getDiscoDescription() {
-		return "S2S connection manager";
-	}
-
-	/**
-	 * 
-	 * @param connectionCid
-	 * @param keyCid
-	 * @param key
-	 * @param key_sessionId
-	 * @param asking_sessionId
-	 * @return
-	 */
-	@Override
-	public String getLocalDBKey(CID connectionCid, CID keyCid, String key,
-			String key_sessionId, String asking_sessionId) {
-		CIDConnections cid_conns = getCIDConnections(keyCid);
-		String result = (cid_conns == null) ? null : cid_conns.getDBKey(key_sessionId);
-
-		if (result == null) {
-
-			// In piggybacking mode the DB key can be available in the connectionCID
-			// rather then
-			// keyCID
-			cid_conns = getCIDConnections(connectionCid);
-			result = (cid_conns == null) ? null : cid_conns.getDBKey(key_sessionId);
-		}
-
-		return result;
-	}
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param list
-	 */
-	@Override
-	public void getStatistics(StatisticsList list) {
-		super.getStatistics(list);
-		list.add(getName(), "CIDs number", cidConnections.size(), Level.INFO);
-
-		if (list.checkLevel(Level.FINEST)) {
-			long total_outgoing = 0;
-			long total_outgoing_tls = 0;
-			long total_outgoing_handshaking = 0;
-			long total_incoming = 0;
-			long total_incoming_tls = 0;
-			long total_dbKeys = 0;
-			long total_waiting = 0;
-			long total_waiting_control = 0;
-
-			for (Map.Entry<CID, CIDConnections> cid_conn : cidConnections.entrySet()) {
-				int outgoing = cid_conn.getValue().getOutgoingCount();
-				int outgoing_tls = cid_conn.getValue().getOutgoingTLSCount();
-				int outgoing_handshaking = cid_conn.getValue().getOutgoingHandshakingCount();
-				int incoming = cid_conn.getValue().getIncomingCount();
-				int incoming_tls = cid_conn.getValue().getIncomingTLSCount();
-				int dbKeys = cid_conn.getValue().getDBKeysCount();
-				int waiting = cid_conn.getValue().getWaitingCount();
-				int waiting_control = cid_conn.getValue().getWaitingControlCount();
-
-				if (log.isLoggable(Level.FINEST)) {
-
-					// Throwable thr = new Throwable();
-					//
-					// thr.fillInStackTrace();
-					// log.log(Level.FINEST, "Called from: ", thr);
-					log.log(Level.FINEST,
-							"CID: {0}, OUT: {1}, OUT_HAND: {2}, IN: {3}, dbKeys: {4}, "
-									+ "waiting: {5}, waiting_control: {6}",
-							new Object[] { cid_conn.getKey(), outgoing, outgoing_handshaking, incoming,
-									dbKeys, waiting, waiting_control });
-				}
-
-				total_outgoing += outgoing;
-				total_outgoing_tls += outgoing_tls;
-				total_outgoing_handshaking += outgoing_handshaking;
-				total_incoming += incoming;
-				total_incoming_tls += incoming_tls;
-				total_dbKeys += dbKeys;
-				total_waiting += waiting;
-				total_waiting_control += waiting_control;
-			}
-
-			list.add(getName(), "Total outgoing", total_outgoing, Level.FINEST);
-			list.add(getName(), "Total outgoing TLS", total_outgoing_tls, Level.FINEST);
-			list.add(getName(), "Total outgoing handshaking", total_outgoing_handshaking,
-					Level.FINEST);
-			list.add(getName(), "Total incoming", total_incoming, Level.FINEST);
-			list.add(getName(), "Total incoming TLS", total_incoming_tls, Level.FINEST);
-			list.add(getName(), "Total DB keys", total_dbKeys, Level.FINEST);
-			list.add(getName(), "Total waiting", total_waiting, Level.FINEST);
-			list.add(getName(), "Total control waiting", total_waiting_control, Level.FINEST);
-		}
-	}
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * 
-	 * @param serv
-	 * @return
-	 */
-	@Override
-	public List<Element> getStreamFeatures(S2SIOService serv) {
-		List<Element> results = new ArrayList<Element>(10);
-
-		for (S2SProcessor proc : processors.values()) {
-			proc.streamFeatures(serv, results);
-		}
-
-		return results;
-	}
-
 	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
-	 * @return
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	@Override
 	public boolean handlesNonLocalDomains() {
@@ -428,11 +237,13 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param packet
-	 * 
-	 * @return
+	 *
+	 *
+	 *
+	 * @return a value of int
 	 */
 	@Override
 	public int hashCodeForPacket(Packet packet) {
@@ -450,10 +261,24 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 		return 1;
 	}
 
+	// ~--- methods --------------------------------------------------------------
+
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
+	 * @param binds
+	 */
+	@Override
+	public void initBindings(Bindings binds) {
+		super.initBindings(binds);
+		binds.put(CID_CONNECTIONS_BIND, cidConnections);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param port_props
 	 */
 	@Override
@@ -463,8 +288,8 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param packet
 	 */
 	@Override
@@ -472,18 +297,16 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Processing packet: {0}", packet);
 		}
-
-		if ((packet.getStanzaTo() == null)
-				|| packet.getStanzaTo().getDomain().trim().isEmpty()) {
-			log.log(Level.WARNING, "Missing ''to'' attribute, ignoring packet...{0}"
-					+ "\n This most likely happens due to missconfiguration of components"
-					+ " domain names.", packet);
+		if ((packet.getStanzaTo() == null) || packet.getStanzaTo().getDomain().trim()
+				.isEmpty()) {
+			log.log(Level.WARNING, "Missing ''to'' attribute, ignoring packet...{0}" +
+					"\n This most likely happens due to missconfiguration of components" +
+					" domain names.", packet);
 
 			return;
 		}
-
-		if ((packet.getStanzaFrom() == null)
-				|| packet.getStanzaFrom().getDomain().trim().isEmpty()) {
+		if ((packet.getStanzaFrom() == null) || packet.getStanzaFrom().getDomain().trim()
+				.isEmpty()) {
 			log.log(Level.WARNING, "Missing ''from'' attribute, ignoring packet...{0}", packet);
 
 			return;
@@ -496,15 +319,15 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 			// Code commented out below is not needed anymore
 			// following call below takes care of hostnames checking:
 			// getCIDConnections(cid, true);
-			// // Check whether addressing is correct:
+			//// Check whether addressing is correct:
 			//
-			// // We don't send packets to local domains trough s2s, there
-			// // must be something wrong with configuration
+			//// We don't send packets to local domains trough s2s, there
+			//// must be something wrong with configuration
 			// if (isLocalDomainOrComponent(to_hostname)) {
 			//
-			// // Ups, remote hostname is the same as one of local hostname??
-			// // Internal loop possible, we don't want that....
-			// // Let's send the packet back....
+			//// Ups, remote hostname is the same as one of local hostname??
+			//// Internal loop possible, we don't want that....
+			//// Let's send the packet back....
 			// if (log.isLoggable(Level.INFO)) {
 			// log.log(Level.INFO, "Packet addresses to localhost,"
 			// + " I am not processing it: {0}", packet);
@@ -521,10 +344,10 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 			// Code commented out below is not needed anymore
 			// following call below takes care of hostnames checking:
 			// getCIDConnections(cid, true);
-			// // I think from_hostname needs to be different from to_hostname at
-			// // this point... or s2s doesn't make sense
+			//// I think from_hostname needs to be different from to_hostname at
+			//// this point... or s2s doesn't make sense
 			//
-			// // All hostnames go through String.intern()
+			//// All hostnames go through String.intern()
 			// if (to_hostname == from_hostname) {
 			// log.log(Level.WARNING,
 			// "Dropping incorrect packet - from_hostname == to_hostname: {0}",
@@ -537,25 +360,20 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Connection ID is: {0}", cid);
 			}
-
 			try {
-				CIDConnections cid_conns = getCIDConnections(cid, true);
-				Packet server_packet = packet.copyElementOnly();
+				CIDConnections cid_conns     = getCIDConnections(cid, true);
+				Packet         server_packet = packet.copyElementOnly();
 
 				server_packet.getElement().removeAttribute("xmlns");
 				cid_conns.sendPacket(server_packet);
 			} catch (NotLocalhostException e) {
-				addOutPacket(Authorization.NOT_ACCEPTABLE
-						.getResponseMessage(
-								packet,
-								"S2S - Incorrect source address - none of any local virtual hosts or components.",
-								true));
+				addOutPacket(Authorization.NOT_ACCEPTABLE.getResponseMessage(packet,
+						"S2S - Incorrect source address - none of any local virtual hosts or components.",
+						true));
 			} catch (LocalhostException e) {
-				addOutPacket(Authorization.NOT_ACCEPTABLE
-						.getResponseMessage(
-								packet,
-								"S2S - Incorrect destinationaddress - one of local virtual hosts or components.",
-								true));
+				addOutPacket(Authorization.NOT_ACCEPTABLE.getResponseMessage(packet,
+						"S2S - Incorrect destinationaddress - one of local virtual hosts or components.",
+						true));
 			}
 		} catch (PacketErrorTypeException e) {
 			log.log(Level.WARNING, "Packet processing exception: {0}", e);
@@ -564,42 +382,42 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param serv
-	 * 
-	 * @return
+	 *
+	 *
+	 *
+	 * @return a value of Queue<Packet>
 	 */
 	@Override
 	public Queue<Packet> processSocketData(S2SIOService serv) {
 		Queue<Packet> packets = serv.getReceivedPackets();
-		Packet p = null;
+		Packet        p       = null;
 		Queue<Packet> results = new ArrayDeque<Packet>(2);
 
 		while ((p = packets.poll()) != null) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Processing socket data: {0}", p);
 			}
+			if (p.getXMLNS() == null) {
+				p.setXMLNS(XMLNS_SERVER_VAL);
+			}
 
-                        if (p.getXMLNS() == null) {
-                                p.setXMLNS(XMLNS_SERVER_VAL);
-                        }
-                        
 			boolean processed = false;
 
 			for (S2SProcessor proc : processors.values()) {
 				processed |= proc.process(p, serv, results);
 				writePacketsToSocket(serv, results);
 			}
+			if (!processed) {
+				for (S2SProcessor filter : filters.values()) {
+					processed |= filter.process(p, serv, results);
+					writePacketsToSocket(serv, results);
+				}
+			}
+			if (!processed) {
 
-                        if (!processed) {
-                                for (S2SProcessor filter : filters.values()) {
-                                        processed |= filter.process(p, serv, results);
-                                        writePacketsToSocket(serv, results);                                        
-                                }                                
-                        }
-                        
-			if (!processed) {                                
 				// Sometimes xmlns is not set for the packet. Usually it does not
 				// cause any problems but when the packet is sent over the s2s, ext
 				// or cluster connection it may be quite problematic.
@@ -608,15 +426,14 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 				// In theory null does not hurt, but if the packet goes through the
 				// cluster
 				// connection is gets cluster XMLNS
-				if (p.getXMLNS() == XMLNS_SERVER_VAL || p.getXMLNS() == null) {
+				if ((p.getXMLNS() == XMLNS_SERVER_VAL) || (p.getXMLNS() == null)) {
 					p.setXMLNS(XMLNS_CLIENT_VAL);
 				}
-
 				try {
 					if (isLocalDomainOrComponent(p.getStanzaTo().getDomain())) {
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "{0}, Adding packet out: {1}",
-									new Object[] { serv, p });
+							log.log(Level.FINEST, "{0}, Adding packet out: {1}", new Object[] { serv,
+									p });
 						}
 
 						// TODO: not entirely sure if this is a good idea....
@@ -627,22 +444,21 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 						try {
 							serv.addPacketToSend(Authorization.NOT_ACCEPTABLE.getResponseMessage(p,
 									"Not a local virtual domain or component", true));
-						} catch (PacketErrorTypeException ex) {
-						}
+						} catch (PacketErrorTypeException ex) {}
 					}
 				} catch (Exception e) {
 					log.log(Level.INFO, "Unexpected exception for packet: " + p, e);
 				}
 			}
-		} // end of while ()
+		}    // end of while ()
 
 		return null;
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param port_props
 	 */
 	@Override
@@ -670,8 +486,21 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
+	 * @return a value of int
+	 */
+	@Override
+	public int schedulerThreads() {
+
+		// TODO: #1195 - estimate proper default value
+		return Runtime.getRuntime().availableProcessors();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param elem_name
 	 * @param connCid
 	 * @param keyCid
@@ -680,8 +509,10 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	 * @param serv_sessionId
 	 * @param cdata
 	 * @param handshakingOnly
-	 * 
-	 * @return
+	 *
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	@Override
 	public boolean sendVerifyResult(String elem_name, CID connCid, CID keyCid,
@@ -690,8 +521,8 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 		CIDConnections cid_conns = getCIDConnections(connCid);
 
 		if (cid_conns != null) {
-			Packet verify_valid =
-					getValidResponse(elem_name, keyCid, key_sessionId, valid, cdata);
+			Packet verify_valid = getValidResponse(elem_name, keyCid, key_sessionId, valid,
+					cdata);
 
 			if (handshakingOnly) {
 				cid_conns.sendHandshakingOnly(verify_valid);
@@ -713,15 +544,14 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param serv
 	 */
 	@Override
 	public void serviceStarted(S2SIOService serv) {
 		super.serviceStarted(serv);
 		log.log(Level.FINEST, "s2s connection opened: {0}", serv);
-
 		for (S2SProcessor proc : processors.values()) {
 			proc.serviceStarted(serv);
 		}
@@ -729,11 +559,13 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param serv
-	 * 
-	 * @return
+	 *
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	@Override
 	public boolean serviceStopped(S2SIOService serv) {
@@ -748,101 +580,12 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 		return result;
 	}
 
-	// ~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param props
-	 */
-	@Override
-	public void setProperties(Map<String, Object> props) {
-		super.setProperties(props);
-
-		if (props.containsKey(CID_CONNECTIONS_TASKS_THREADS_KEY)) {			
-			CIDConnections.setOutgoingOpenThreadsSize((Integer) props.get(CID_CONNECTIONS_TASKS_THREADS_KEY));
-		}
-		
-		if ( props.size() == 1 ){
-			// If props.size() == 1, it means this is a single property update
-			// and this component does not support single property change for the rest
-			// of it's settings
-			return;
-		}
-
-                // it needs to be here as we need properties for plugins
-		// TODO: Make used processors list a configurable thing
-		processors.clear();
-		processors.put( Dialback.class.getSimpleName(), new Dialback() );
-		processors.put( StartTLS.class.getSimpleName(), new StartTLS() );
-		processors.put( StartZlib.class.getSimpleName(), new StartZlib() );
-		processors.put( StreamError.class.getSimpleName(), new StreamError() );
-		processors.put( StreamFeatures.class.getSimpleName(), new StreamFeatures() );
-		processors.put( StreamOpen.class.getSimpleName(), new StreamOpen() );
-
-		for ( S2SProcessor proc : processors.values() ) {
-                        Map<String,Object> proc_props = new ConcurrentHashMap<String,Object>(4);
-                        for (Map.Entry<String,Object> entry : props.entrySet()) {
-                                if (entry.getKey().startsWith(PROCESSORS_CONF_PROP_KEY)) {
-                                        String[] nodes = entry.getKey().split("/");
-                                        if (nodes.length > 2) {
-                                                String[] ids = nodes[1].split(",");
-                                                if (Arrays.binarySearch(ids, proc.getClass().getSimpleName()) >= 0) {
-                                                        proc_props.put(nodes[2], entry.getValue());
-                                                }
-                                        }
-                                }
-                        }
-
-                        proc.init( this, proc_props );
-		}
-
-		filters.clear();
-		filters.put( PacketChecker.class.getSimpleName(), new PacketChecker() );
-
-		for ( S2SProcessor filter : filters.values() ) {
-                        Map<String,Object> proc_props = new ConcurrentHashMap<String,Object>(4);
-                        for (Map.Entry<String,Object> entry : props.entrySet()) {
-                                if (entry.getKey().startsWith(PROCESSORS_CONF_PROP_KEY)) {
-                                        String[] nodes = entry.getKey().split("/");
-                                        if (nodes.length > 2) {
-                                                String[] ids = nodes[1].split(",");
-                                                if (Arrays.binarySearch(ids, filter.getClass().getSimpleName()) >= 0) {
-                                                        proc_props.put(nodes[2], entry.getValue());
-                                                }
-                                        }
-                                }
-                        }
-
-                        filter.init( this, proc_props );
-		}
-
-                
-		maxPacketWaitingTime = (Long) props.get(MAX_PACKET_WAITING_TIME_PROP_KEY) * SECOND;
-		maxInactivityTime =
-				(Long) props.get(MAX_CONNECTION_INACTIVITY_TIME_PROP_KEY) * SECOND;
-		maxOUTTotalConnections = (Integer) props.get(MAX_OUT_TOTAL_CONNECTIONS_PROP_KEY);
-		maxOUTPerIPConnections = (Integer) props.get(MAX_OUT_PER_IP_CONNECTIONS_PROP_KEY);
-		maxINConnections = (Integer) props.get(MAX_INCOMING_CONNECTIONS_PROP_KEY);
-
-		String selector_str = (String) props.get(S2S_CONNECTION_SELECTOR_PROP_KEY);
-
-		try {
-			connSelector = (S2SConnectionSelector) Class.forName(selector_str).newInstance();
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Incorrect s2s connection selector class provided: {0}",
-					selector_str);
-			log.log(Level.SEVERE, "Selector initialization exception: ", e);
-		}
-	}
-
 	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param serv
 	 */
 	@Override
@@ -854,8 +597,8 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param ios
 	 * @param data
 	 */
@@ -866,8 +609,8 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param serv
 	 */
 	@Override
@@ -875,7 +618,6 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "{0}, Stream closed.", new Object[] { serv });
 		}
-
 		for (S2SProcessor proc : processors.values()) {
 			proc.streamClosed(serv);
 		}
@@ -883,12 +625,14 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param serv
 	 * @param attribs
-	 * 
-	 * @return
+	 *
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String xmppStreamOpened(S2SIOService serv, Map<String, String> attribs) {
@@ -905,66 +649,391 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 				sb.append(res);
 			}
 		}
-
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "{0}, Sending stream open: {1}", new Object[] { serv, sb });
 		}
 
-		return (sb.length() == 0) ? null : sb.toString();
+		return (sb.length() == 0)
+				? null
+				: sb.toString();
 	}
+
+	//~--- get methods ----------------------------------------------------------
 
 	// ~--- get methods ----------------------------------------------------------
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param cid
+	 * @param createNew
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of CIDConnections
+	 * @throws LocalhostException
+	 * @throws NotLocalhostException
+	 */
+	@Override
+	public CIDConnections getCIDConnections(CID cid, boolean createNew)
+					throws NotLocalhostException, LocalhostException {
+		CIDConnections result = getCIDConnections(cid);
+
+		if ((result == null) && createNew && (cid != null)) {
+			result = createNewCIDConnections(cid);
+		}
+
+		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param params
+	 *
+	 *
+	 *
+	 * @return a value of Map<String,Object>
+	 */
+	@Override
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		Map<String, Object> props = super.getDefaults(params);
+
+		props.put(MAX_PACKET_WAITING_TIME_PROP_KEY, MAX_PACKET_WAITING_TIME_PROP_VAL /
+				SECOND);
+		props.put(MAX_CONNECTION_INACTIVITY_TIME_PROP_KEY,
+				MAX_CONNECTION_INACTIVITY_TIME_PROP_VAL / SECOND);
+		props.put(MAX_INCOMING_CONNECTIONS_PROP_KEY, MAX_INCOMING_CONNECTIONS_PROP_VAL);
+		props.put(MAX_OUT_TOTAL_CONNECTIONS_PROP_KEY, MAX_OUT_TOTAL_CONNECTIONS_PROP_VAL);
+		props.put(MAX_OUT_PER_IP_CONNECTIONS_PROP_KEY, MAX_OUT_PER_IP_CONNECTIONS_PROP_VAL);
+		props.put(S2S_CONNECTION_SELECTOR_PROP_KEY, S2S_CONNECTION_SELECTOR_PROP_VAL);
+		props.put(CID_CONNECTIONS_TASKS_THREADS_KEY, CID_CONNECTIONS_TASKS_THREADS_VAL);
+
+		return props;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of String
+	 */
+	@Override
+	public String getDiscoCategoryType() {
+		return "s2s";
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of String
+	 */
+	@Override
+	public String getDiscoDescription() {
+		return "S2S connection manager";
+	}
+
+	/**
+	 *
+	 * @param connectionCid
+	 * @param keyCid
+	 * @param key
+	 * @param key_sessionId
+	 * @param asking_sessionId
+	 *
+	 *
+	 * @return a value of String
+	 */
+	@Override
+	public String getLocalDBKey(CID connectionCid, CID keyCid, String key,
+			String key_sessionId, String asking_sessionId) {
+		CIDConnections cid_conns = getCIDConnections(keyCid);
+		String         result    = (cid_conns == null)
+				? null
+				: cid_conns.getDBKey(key_sessionId);
+
+		if (result == null) {
+
+			// In piggybacking mode the DB key can be available in the connectionCID
+			// rather then
+			// keyCID
+			cid_conns = getCIDConnections(connectionCid);
+			result    = (cid_conns == null)
+					? null
+					: cid_conns.getDBKey(key_sessionId);
+		}
+
+		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param list
+	 */
+	@Override
+	public void getStatistics(StatisticsList list) {
+		super.getStatistics(list);
+		list.add(getName(), "CIDs number", cidConnections.size(), Level.INFO);
+		if (list.checkLevel(Level.FINEST)) {
+			long total_outgoing             = 0;
+			long total_outgoing_tls         = 0;
+			long total_outgoing_handshaking = 0;
+			long total_incoming             = 0;
+			long total_incoming_tls         = 0;
+			long total_dbKeys               = 0;
+			long total_waiting              = 0;
+			long total_waiting_control      = 0;
+
+			for (Map.Entry<CID, CIDConnections> cid_conn : cidConnections.entrySet()) {
+				int outgoing             = cid_conn.getValue().getOutgoingCount();
+				int outgoing_tls         = cid_conn.getValue().getOutgoingTLSCount();
+				int outgoing_handshaking = cid_conn.getValue().getOutgoingHandshakingCount();
+				int incoming             = cid_conn.getValue().getIncomingCount();
+				int incoming_tls         = cid_conn.getValue().getIncomingTLSCount();
+				int dbKeys               = cid_conn.getValue().getDBKeysCount();
+				int waiting              = cid_conn.getValue().getWaitingCount();
+				int waiting_control      = cid_conn.getValue().getWaitingControlCount();
+
+				if (log.isLoggable(Level.FINEST)) {
+
+					// Throwable thr = new Throwable();
+					//
+					// thr.fillInStackTrace();
+					// log.log(Level.FINEST, "Called from: ", thr);
+					log.log(Level.FINEST,
+							"CID: {0}, OUT: {1}, OUT_HAND: {2}, IN: {3}, dbKeys: {4}, " +
+							"waiting: {5}, waiting_control: {6}", new Object[] {
+						cid_conn.getKey(), outgoing, outgoing_handshaking, incoming, dbKeys, waiting,
+								waiting_control
+					});
+				}
+				total_outgoing             += outgoing;
+				total_outgoing_tls         += outgoing_tls;
+				total_outgoing_handshaking += outgoing_handshaking;
+				total_incoming             += incoming;
+				total_incoming_tls         += incoming_tls;
+				total_dbKeys               += dbKeys;
+				total_waiting              += waiting;
+				total_waiting_control      += waiting_control;
+			}
+			list.add(getName(), "Total outgoing", total_outgoing, Level.FINEST);
+			list.add(getName(), "Total outgoing TLS", total_outgoing_tls, Level.FINEST);
+			list.add(getName(), "Total outgoing handshaking", total_outgoing_handshaking, Level
+					.FINEST);
+			list.add(getName(), "Total incoming", total_incoming, Level.FINEST);
+			list.add(getName(), "Total incoming TLS", total_incoming_tls, Level.FINEST);
+			list.add(getName(), "Total DB keys", total_dbKeys, Level.FINEST);
+			list.add(getName(), "Total waiting", total_waiting, Level.FINEST);
+			list.add(getName(), "Total control waiting", total_waiting_control, Level.FINEST);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 * @param serv
+	 *
+	 *
+	 * @return a value of List<Element>
+	 */
+	@Override
+	public List<Element> getStreamFeatures(S2SIOService serv) {
+		List<Element> results = new ArrayList<Element>(10);
+
+		for (S2SProcessor proc : processors.values()) {
+			proc.streamFeatures(serv, results);
+		}
+
+		return results;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of boolean
+	 */
+	@Override
+	public boolean isTlsWantClientAuthEnabled() {
+		return true;
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	// ~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param props
+	 */
+	@Override
+	public void setProperties(Map<String, Object> props) {
+		super.setProperties(props);
+		if (props.containsKey(CID_CONNECTIONS_TASKS_THREADS_KEY)) {
+			CIDConnections.setOutgoingOpenThreadsSize((Integer) props.get(
+					CID_CONNECTIONS_TASKS_THREADS_KEY));
+		}
+		if (props.size() == 1) {
+
+			// If props.size() == 1, it means this is a single property update
+			// and this component does not support single property change for the rest
+			// of it's settings
+			return;
+		}
+
+		// it needs to be here as we need properties for plugins
+		// TODO: Make used processors list a configurable thing
+		processors.clear();
+		processors.put(Dialback.class.getSimpleName(), new Dialback());
+		processors.put(StartTLS.class.getSimpleName(), new StartTLS());
+		processors.put(StartZlib.class.getSimpleName(), new StartZlib());
+		processors.put(StreamError.class.getSimpleName(), new StreamError());
+		processors.put(StreamFeatures.class.getSimpleName(), new StreamFeatures());
+		processors.put(StreamOpen.class.getSimpleName(), new StreamOpen());
+		for (S2SProcessor proc : processors.values()) {
+			Map<String, Object> proc_props = new ConcurrentHashMap<String, Object>(4);
+
+			for (Map.Entry<String, Object> entry : props.entrySet()) {
+				if (entry.getKey().startsWith(PROCESSORS_CONF_PROP_KEY)) {
+					String[] nodes = entry.getKey().split("/");
+
+					if (nodes.length > 2) {
+						String[] ids = nodes[1].split(",");
+
+						if (Arrays.binarySearch(ids, proc.getClass().getSimpleName()) >= 0) {
+							proc_props.put(nodes[2], entry.getValue());
+						}
+					}
+				}
+			}
+			proc.init(this, proc_props);
+		}
+		filters.clear();
+		filters.put(PacketChecker.class.getSimpleName(), new PacketChecker());
+		for (S2SProcessor filter : filters.values()) {
+			Map<String, Object> proc_props = new ConcurrentHashMap<String, Object>(4);
+
+			for (Map.Entry<String, Object> entry : props.entrySet()) {
+				if (entry.getKey().startsWith(PROCESSORS_CONF_PROP_KEY)) {
+					String[] nodes = entry.getKey().split("/");
+
+					if (nodes.length > 2) {
+						String[] ids = nodes[1].split(",");
+
+						if (Arrays.binarySearch(ids, filter.getClass().getSimpleName()) >= 0) {
+							proc_props.put(nodes[2], entry.getValue());
+						}
+					}
+				}
+			}
+			filter.init(this, proc_props);
+		}
+		maxPacketWaitingTime = (Long) props.get(MAX_PACKET_WAITING_TIME_PROP_KEY) * SECOND;
+		maxInactivityTime = (Long) props.get(MAX_CONNECTION_INACTIVITY_TIME_PROP_KEY) *
+				SECOND;
+		maxOUTTotalConnections = (Integer) props.get(MAX_OUT_TOTAL_CONNECTIONS_PROP_KEY);
+		maxOUTPerIPConnections = (Integer) props.get(MAX_OUT_PER_IP_CONNECTIONS_PROP_KEY);
+		maxINConnections       = (Integer) props.get(MAX_INCOMING_CONNECTIONS_PROP_KEY);
+
+		String selector_str = (String) props.get(S2S_CONNECTION_SELECTOR_PROP_KEY);
+
+		try {
+			connSelector = (S2SConnectionSelector) Class.forName(selector_str).newInstance();
+		} catch (Exception e) {
+			log.log(Level.SEVERE, "Incorrect s2s connection selector class provided: {0}",
+					selector_str);
+			log.log(Level.SEVERE, "Selector initialization exception: ", e);
+		}
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	// ~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of int[]
+	 */
 	@Override
 	protected int[] getDefPlainPorts() {
 		return new int[] { 5269 };
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of long
+	 */
 	@Override
 	protected long getMaxInactiveTime() {
 		return maxInactivityTime;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of S2SIOService
+	 */
 	@Override
 	protected S2SIOService getXMPPIOServiceInstance() {
 		return new S2SIOService();
 	}
 
-	@Override
-	public boolean isTlsWantClientAuthEnabled() {
-		return true;
-	}
-	
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of boolean
+	 */
 	@Override
 	protected boolean isHighThroughput() {
 		return true;
 	}
 
+	//~--- methods --------------------------------------------------------------
+
 	// ~--- methods --------------------------------------------------------------
-
-	private CIDConnections createNewCIDConnections(CID cid) throws NotLocalhostException,
-			LocalhostException {
+	private CIDConnections createNewCIDConnections(CID cid)
+					throws NotLocalhostException, LocalhostException {
 		if (!isLocalDomainOrComponent(cid.getLocalHost())) {
-			throw new NotLocalhostException("This is not a valid localhost: "
-					+ cid.getLocalHost());
+			throw new NotLocalhostException("This is not a valid localhost: " + cid
+					.getLocalHost());
 		}
-
 		if (isLocalDomainOrComponent(cid.getRemoteHost())) {
-			throw new LocalhostException("This is not a valid remotehost: "
-					+ cid.getRemoteHost());
+			throw new LocalhostException("This is not a valid remotehost: " + cid
+					.getRemoteHost());
 		}
 
-		CIDConnections cid_conns =
-				new CIDConnections(cid, this, connSelector, maxINConnections,
-						maxOUTTotalConnections, maxOUTPerIPConnections, maxPacketWaitingTime);
+		CIDConnections cid_conns = new CIDConnections(cid, this, connSelector,
+				maxINConnections, maxOUTTotalConnections, maxOUTPerIPConnections,
+				maxPacketWaitingTime);
 
 		cidConnections.put(cid, cid_conns);
 
 		return cid_conns;
 	}
 
-	// ~--- get methods ----------------------------------------------------------
+	//~--- get methods ----------------------------------------------------------
 
+	// ~--- get methods ----------------------------------------------------------
 	private CIDConnections getCIDConnections(CID cid) {
 		if (cid == null) {
 			return null;
@@ -980,7 +1049,6 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 		if (cdata != null) {
 			elem.setCData(cdata);
 		}
-
 		if (valid != null) {
 			if (valid.booleanValue()) {
 				elem.addAttribute("type", "valid");
@@ -988,19 +1056,22 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 				elem.addAttribute("type", "invalid");
 			}
 		}
-
 		if (id != null) {
 			elem.addAttribute("id", id);
 		}
 
-		Packet result =
-				Packet.packetInstance(elem, JID.jidInstanceNS(cid.getLocalHost()),
-						JID.jidInstanceNS(cid.getRemoteHost()));
+		Packet result = Packet.packetInstance(elem, JID.jidInstanceNS(cid.getLocalHost()), JID
+				.jidInstanceNS(cid.getRemoteHost()));
 
 		return result;
 	}
 }
 
+
+
 // ~ Formatted in Sun Code Convention
 
 // ~ Formatted by Jindent --- http://www.jindent.com
+
+
+//~ Formatted in Tigase Code Convention on 13/08/28

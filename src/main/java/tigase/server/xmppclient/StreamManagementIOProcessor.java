@@ -19,23 +19,23 @@
  * If not, see http://www.gnu.org/licenses/.
  *
  */
+
+
+
 package tigase.server.xmppclient;
 
-import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+//~--- non-JDK imports --------------------------------------------------------
+
 import tigase.net.IOServiceListener;
+
 import tigase.server.Command;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
+
 import tigase.util.TimerTask;
+
 import tigase.xml.Element;
+
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
@@ -43,343 +43,450 @@ import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
 
+//~--- JDK imports ------------------------------------------------------------
+
+import java.io.IOException;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.Map;
+import java.util.UUID;
+
 /**
  * Class implements XEP-0198 Stream Management
- * 
+ *
  * @author andrzej
  */
-public class StreamManagementIOProcessor implements XMPPIOProcessor {
-
-	private static final Logger log = Logger.getLogger(StreamManagementIOProcessor.class.getCanonicalName());
-	
+public class StreamManagementIOProcessor
+				implements XMPPIOProcessor {
+	/** Field description */
 	public static final String XMLNS = "urn:xmpp:sm:3";
 
 	// used tag names
-	private static final String ACK_NAME = "a";
-	private static final String ENABLE_NAME = "enable";
+	private static final String ACK_NAME     = "a";
+	private static final String ENABLE_NAME  = "enable";
 	private static final String ENABLED_NAME = "enabled";
-	private static final String REQ_NAME = "r";
-	private static final String RESUME_NAME = "resume";
-	private static final String RESUMED_NAME = "resumed";
-	
+
 	// used attribute names
-	private static final String H_ATTR = "h";
+	private static final String H_ATTR        = "h";
 	private static final String LOCATION_ATTR = "location";
-	private static final String RESUME_ATTR = "resume";
-	private static final String MAX_ATTR = "max";
-	private static final String PREVID_ATTR = "previd";
-		
-	// various strings used as key to store data in maps
-	private static final String IN_COUNTER_KEY = XMLNS + "_in";
+	private static final Logger log = Logger.getLogger(StreamManagementIOProcessor.class
+			.getCanonicalName());
+	private static final String MAX_ATTR                   = "max";
+	private static final String PREVID_ATTR                = "previd";
+	private static final String REQ_NAME                   = "r";
+	private static final String RESUME_ATTR                = "resume";
+	private static final String RESUME_NAME                = "resume";
+	private static final String RESUMED_NAME               = "resumed";
+	private static final String OUT_COUNTER_KEY            = XMLNS + "_out";
 	private static final String MAX_RESUMPTION_TIMEOUT_KEY = XMLNS + "_resumption-timeout";
-	private static final String OUT_COUNTER_KEY = XMLNS + "_out";
-	private static final String RESUMPTION_TASK_KEY = XMLNS + "_resumption-task";
-	private static final String RESUMPTION_TIMEOUT_PROP_KEY = "resumption-timeout";
-	private static final String STREAM_ID_KEY = XMLNS + "_stream_id";
-	
+
+	// various strings used as key to store data in maps
+	private static final String    IN_COUNTER_KEY              = XMLNS + "_in";
+	private static final String    RESUMPTION_TASK_KEY         = XMLNS + "_resumption-task";
+	private static final String    RESUMPTION_TIMEOUT_PROP_KEY = "resumption-timeout";
+	private static final String    STREAM_ID_KEY               = XMLNS + "_stream_id";
 	private static final Element[] FEATURES = { new Element("sm", new String[] { "xmlns" },
 			new String[] { XMLNS }) };
-	
-	private final ConcurrentHashMap<String,XMPPIOService> services = new ConcurrentHashMap<String,XMPPIOService>();
-	
-	private int resumption_timeout = 60;
-	private int default_ack_request_count = 10;
-	
+
+	//~--- fields ---------------------------------------------------------------
+
+	private int                                            default_ack_request_count = 10;
+	private int                                            resumption_timeout        = 60;
+	private final ConcurrentHashMap<String, XMPPIOService> services =
+			new ConcurrentHashMap<String, XMPPIOService>();
 	private ConnectionManager connectionManager;
-			
+
+	//~--- constructors ---------------------------------------------------------
+
 	/**
-	 * Method returns true if XMPPIOService has enabled SM.
-	 * 
-	 * @param service
-	 * @return 
+	 * Constructs ...
+	 *
 	 */
-	public static boolean isEnabled(XMPPIOService service) {
-		return service.getSessionData().containsKey(IN_COUNTER_KEY);
-	}
-	
-	private static boolean isResumptionEnabled(XMPPIOService service) {
-		return service.getSessionData().containsKey(STREAM_ID_KEY);
-	}
-	
-	public StreamManagementIOProcessor() {
+	public StreamManagementIOProcessor() {}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param service
+	 *
+	 * @throws IOException
+	 */
+	@Override
+	public void packetsSent(XMPPIOService service) throws IOException {
+		if (!isEnabled(service)) {
+			return;
+		}
+
+		OutQueue outQueue = (OutQueue) service.getSessionData().get(OUT_COUNTER_KEY);
+
+		if (outQueue.waitingForAck() >= default_ack_request_count) {
+			service.writeRawData("<" + REQ_NAME + " xmlns='" + XMLNS + "' />");
+		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param service
+	 * @param pc
+	 */
 	@Override
-	public String getId() {
-		return XMLNS;
+	public void processCommand(XMPPIOService service, Packet pc) {
+		String cmdId = Command.getFieldValue(pc, "cmd");
+
+		if ("stream-moved".equals(cmdId)) {
+			String        newConn    = Command.getFieldValue(pc, "new-conn-jid");
+			String        id         = (String) service.getSessionData().get(STREAM_ID_KEY);
+			JID           newConnJid = JID.jidInstanceNS(newConn);
+			XMPPIOService newService = connectionManager.getXMPPIOService(newConnJid
+					.getResource());
+
+			// if connection was closed during resumption, then close
+			// old connection as it would not be able to resume
+			if (newService != null) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "stream for user {2} moved from {0} to {1}",
+							new Object[] { service.getConnectionId(),
+							newService.getConnectionId(), newService.getUserJid() });
+				}
+				try {
+					newService.setUserJid(service.getUserJid());
+
+					Counter inCounter = (Counter) newService.getSessionData().get(IN_COUNTER_KEY);
+
+					newService.writeRawData("<" + RESUMED_NAME + " xmlns='" + XMLNS + "' " +
+							PREVID_ATTR + "='" + id + "' " + H_ATTR + "='" + inCounter.get() + "' />");
+					service.getSessionData().put("stream-closed", "stream-closed");
+					services.put(id, newService);
+
+					// resending packets thru new connection
+					OutQueue     outQueue = (OutQueue) newService.getSessionData().get(
+							OUT_COUNTER_KEY);
+					List<Packet> packetsToResend = new ArrayList<Packet>(outQueue.getQueue());
+
+					for (Packet packet : packetsToResend) {
+						newService.addPacketToSend(packet);
+					}
+				} catch (IOException ex) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "could not confirm session resumption for user = " +
+								newService.getUserJid(), ex);
+					}
+
+					// remove new connection if resumption failed
+					services.remove(id, service);
+					services.remove(id, newService);
+				}
+			} else {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST,
+							"no new service available for user {0} to resume from {1}," +
+							" already closed?", new Object[] { service.getUserJid(),
+							service });
+				}
+			}
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "closing old service {0} for user {1}", new Object[] {
+						service,
+						service.getUserJid() });
+			}
+
+			// stopping old service
+			connectionManager.serviceStopped(service);
+		}
 	}
-	
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param service
+	 * @param packet
+	 *
+	 * @return a value of boolean
+	 */
 	@Override
-	public void setConnectionManager(ConnectionManager connectionManager) {
-		this.connectionManager = connectionManager;
-	}	
-	
-	@Override
-	public Element[] supStreamFeatures(XMPPIOService service) {
-		// user jid may not be set yet because is is set during resource binding
-		// while this feature should be advertised just after authentication of 
-		// connection
-		/*if (service.getUserJid() == null)
-			return null;*/
-		
-		return FEATURES;
-	}
-	
-	@Override
-	public boolean processIncoming(XMPPIOService service, Packet packet) {		
+	public boolean processIncoming(XMPPIOService service, Packet packet) {
 		if (!isEnabled(service)) {
 			if (packet.getXMLNS() != XMLNS) {
 				return false;
-			}
-			else if (packet.getElemName() == ENABLE_NAME) {
+			} else if (packet.getElemName() == ENABLE_NAME) {
 				service.getSessionData().putIfAbsent(IN_COUNTER_KEY, new Counter());
 				service.getSessionData().putIfAbsent(OUT_COUNTER_KEY, new OutQueue());
-				
-				
-				String id = null;
-				String location = null;
-				int max = resumption_timeout;
 
-				if (resumption_timeout > 0 && packet.getElement().getAttributeStaticStr(RESUME_ATTR) != null) {
+				String id       = null;
+				String location = null;
+				int    max      = resumption_timeout;
+
+				if ((resumption_timeout > 0) && (packet.getElement().getAttributeStaticStr(
+						RESUME_ATTR) != null)) {
 					String maxStr = packet.getElement().getAttributeStaticStr(MAX_ATTR);
+
 					if (maxStr != null) {
 						max = Math.min(max, Integer.parseInt(maxStr));
 					}
-					id = UUID.randomUUID().toString();
+					id       = UUID.randomUUID().toString();
 					location = connectionManager.getDefHostName().toString();
 					service.getSessionData().putIfAbsent(STREAM_ID_KEY, id);
 					service.getSessionData().put(MAX_RESUMPTION_TIMEOUT_KEY, max);
-					
 					services.put(id, service);
 				}
 				try {
-					service.writeRawData("<" + ENABLED_NAME + " xmlns='" + XMLNS + "'"
-							+ ( id != null ? " id='" + id + "' " + RESUME_ATTR + "='true' "+ MAX_ATTR + "='" + max + "'" : "" ) 
-							+ ( location != null ? " " + LOCATION_ATTR + "='" + location + "'" : "" ) + " />");
-				}
-				catch (IOException ex) {
+					service.writeRawData("<" + ENABLED_NAME + " xmlns='" + XMLNS + "'" + ((id !=
+							null)
+							? " id='" + id + "' " + RESUME_ATTR + "='true' " + MAX_ATTR + "='" + max +
+									"'"
+							: "") + ((location != null)
+							? " " + LOCATION_ATTR + "='" + location + "'"
+							: "") + " />");
+				} catch (IOException ex) {
 					if (log.isLoggable(Level.FINE)) {
 						log.log(Level.FINE, "exception during sending <enabled/>, stopping...", ex);
 					}
 					service.forceStop();
 				}
+
 				return true;
-			}
-			else if (packet.getElemName() == RESUME_NAME) {
-				String h = packet.getElement().getAttributeStaticStr(H_ATTR);
+			} else if (packet.getElemName() == RESUME_NAME) {
+				String h  = packet.getElement().getAttributeStaticStr(H_ATTR);
 				String id = packet.getElement().getAttributeStaticStr(PREVID_ATTR);
-				
+
 				try {
 					resumeStream(service, id, Integer.parseInt(h));
 				} catch (IOException ex) {
 					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE, "exception while resuming stream for user " 
-								+ service.getUserJid() + " with id " + id, ex);
+						log.log(Level.FINE, "exception while resuming stream for user " + service
+								.getUserJid() + " with id " + id, ex);
 					}
-					
 					service.forceStop();
 				}
+
 				return true;
-			}
-			else {
+			} else {
 				return false;
 			}
 		}
 		if (packet.getXMLNS() == XMLNS) {
 			if (packet.getElemName() == ACK_NAME) {
-				String valStr = packet.getAttributeStaticStr(H_ATTR);
-				
-				int val = Integer.parseInt(valStr);
+				String   valStr   = packet.getAttributeStaticStr(H_ATTR);
+				int      val      = Integer.parseInt(valStr);
 				OutQueue outQueue = (OutQueue) service.getSessionData().get(OUT_COUNTER_KEY);
+
 				outQueue.ack(val);
-			}
-			else if (packet.getElemName() == REQ_NAME) {
+			} else if (packet.getElemName() == REQ_NAME) {
 				int value = ((Counter) service.getSessionData().get(IN_COUNTER_KEY)).get();
-				
+
 				try {
-					service.writeRawData("<" + ACK_NAME + " xmlns='" + XMLNS 
-							+ "' " + H_ATTR + "='" + String.valueOf(value) + "'/>");
-				}
-				catch (IOException ex) {
+					service.writeRawData("<" + ACK_NAME + " xmlns='" + XMLNS + "' " + H_ATTR +
+							"='" + String.valueOf(value) + "'/>");
+				} catch (IOException ex) {
 					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE, "exception during sending <a/> as "
-								+ "response for <r/>, stopping...", ex);
+						log.log(Level.FINE, "exception during sending <a/> as " +
+								"response for <r/>, stopping...", ex);
 					}
 					service.forceStop();
 				}
 			}
+
 			return true;
 		}
-		
 		((Counter) service.getSessionData().get(IN_COUNTER_KEY)).inc();
-		
+
 		return false;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param service
+	 * @param packet
+	 *
+	 * @return a value of boolean
+	 */
 	@Override
 	public boolean processOutgoing(XMPPIOService service, Packet packet) {
-		if (!isEnabled(service) || packet.getXMLNS() == XMLNS) {
+		if (!isEnabled(service) || (packet.getXMLNS() == XMLNS)) {
 			return false;
 		}
-		
-		OutQueue outQueue = (OutQueue) service.getSessionData().get(OUT_COUNTER_KEY);		
+
+		OutQueue outQueue = (OutQueue) service.getSessionData().get(OUT_COUNTER_KEY);
+
 		outQueue.append(packet);
-		
+
 		return service.getSessionData().containsKey(RESUMPTION_TASK_KEY);
 	}
-	
-	@Override
-	public void packetsSent(XMPPIOService service) throws IOException {
-		if (!isEnabled(service))
-			return;
-		
-		OutQueue outQueue = (OutQueue) service.getSessionData().get(OUT_COUNTER_KEY);		
-		if (outQueue.waitingForAck() >= default_ack_request_count) {
-			service.writeRawData("<" + REQ_NAME + " xmlns='" + XMLNS + "' />");
-		}
-	}
-	
-	@Override
-	public void processCommand(XMPPIOService service, Packet pc) {
-		String cmdId = Command.getFieldValue(pc, "cmd");
-		if ("stream-moved".equals(cmdId)) {
-			String newConn = Command.getFieldValue(pc, "new-conn-jid");
-			
-			String id = (String) service.getSessionData().get(STREAM_ID_KEY);
-			
-			
-			JID newConnJid = JID.jidInstanceNS(newConn);
-			XMPPIOService newService = connectionManager.getXMPPIOService(newConnJid.getResource());
-			
-			// if connection was closed during resumption, then close
-			// old connection as it would not be able to resume 
-			if (newService != null) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "stream for user {2} moved from {0} to {1}", new Object[] { 
-						service.getConnectionId(), newService.getConnectionId(), newService.getUserJid() });
-				}
-				try {
-					newService.setUserJid(service.getUserJid());
-					Counter inCounter = (Counter) newService.getSessionData().get(IN_COUNTER_KEY);
-					newService.writeRawData("<" + RESUMED_NAME + " xmlns='" + XMLNS + "' " + PREVID_ATTR + "='" 
-							+ id + "' " + H_ATTR + "='" + inCounter.get() + "' />");
 
-					service.getSessionData().put("stream-closed", "stream-closed");
-					services.put(id, newService);
-					
-					// resending packets thru new connection
-					OutQueue outQueue = (OutQueue) newService.getSessionData().get(OUT_COUNTER_KEY);
-					List<Packet> packetsToResend = new ArrayList<Packet>(outQueue.getQueue());
-					for (Packet packet : packetsToResend) {
-						newService.addPacketToSend(packet);
-					}
-				}
-				catch (IOException ex) {
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "could not confirm session resumption for user = " 
-								+ newService.getUserJid(), ex);
-					}
-					
-					// remove new connection if resumption failed
-					services.remove(id, service);
-					services.remove(id, newService);
-				}
-			}	
-			else {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "no new service available for user {0} to resume from {1},"
-							+ " already closed?", new Object[] { service.getUserJid(), service });
-				}
-			}
-			
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "closing old service {0} for user {1}", new Object[] { service, 
-					service.getUserJid()});
-			}
-			
-			// stopping old service
-			connectionManager.serviceStopped(service);
-		}
-	}
-	
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param service
+	 * @param streamClosed
+	 *
+	 * @return a value of boolean
+	 */
 	@Override
 	public boolean serviceStopped(XMPPIOService service, boolean streamClosed) {
-		if (!isEnabled(service))
+		if (!isEnabled(service)) {
 			return false;
+		}
 
 		String id = (String) service.getSessionData().get(STREAM_ID_KEY);
-		
+
 		if (streamClosed) {
 			service.getSessionData().remove(STREAM_ID_KEY);
 		}
 
-//		try {
-//			throw new Exception();
-//		} catch (Throwable ex) {
-//			log.log(Level.WARNING, "resumption timeout started, stream close = " + streamClosed, ex);
-//			ex.printStackTrace();
-//		}
-				
-		// some buggy client (ie. Psi) may close stream without sending stream 
-		// close which forces us to thread this stream as broken and waiting for 
-		// resumption but those clients are not compatible with XEP-0198 and 
+//  try {
+//    throw new Exception();
+//  } catch (Throwable ex) {
+//    log.log(Level.WARNING, "resumption timeout started, stream close = " + streamClosed, ex);
+//    ex.printStackTrace();
+//  }
+		// some buggy client (ie. Psi) may close stream without sending stream
+		// close which forces us to thread this stream as broken and waiting for
+		// resumption but those clients are not compatible with XEP-0198 and
 		// resumption so this should not happen
 		if (isResumptionEnabled(service)) {
-			if (!services.containsKey(id))
+			if (!services.containsKey(id)) {
 				return false;
+			}
 
 			// ConnectionManager must not be notified about closed connection
-			// but connection needs to be closed so this is this case we still 
+			// but connection needs to be closed so this is this case we still
 			// return false to call forceStop but we remove IOServiceListener
 			service.setIOServiceListener((IOServiceListener) null);
-				
-			int resumptionTimeout = (Integer) service.getSessionData().get(MAX_RESUMPTION_TIMEOUT_KEY);
+
+			int resumptionTimeout = (Integer) service.getSessionData().get(
+					MAX_RESUMPTION_TIMEOUT_KEY);
+
 			synchronized (service) {
-				if (!service.getSessionData().containsKey(RESUMPTION_TASK_KEY)) {					
+				if (!service.getSessionData().containsKey(RESUMPTION_TASK_KEY)) {
 					TimerTask timerTask = new ResumptionTimeoutTask(service);
+
 					service.getSessionData().put(RESUMPTION_TASK_KEY, timerTask);
 					connectionManager.addTimerTask(timerTask, resumptionTimeout * 1000);
 				}
 			}
-			
+
 			return false;
-		}
-		else if (id != null) {
+		} else if (id != null) {
 			services.remove(id, service);
 		}
-		
 		sendErrorsForQueuedPackets(service);
+
 		return false;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param service
+	 *
+	 * @return a value of Element[]
+	 */
 	@Override
-	public void setProperties(Map<String,Object> props) {
+	public Element[] supStreamFeatures(XMPPIOService service) {
+
+		// user jid may not be set yet because is is set during resource binding
+		// while this feature should be advertised just after authentication of
+		// connection
+
+		/*
+		 * if (service.getUserJid() == null)
+		 * return null;
+		 */
+		return FEATURES;
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of String
+	 */
+	@Override
+	public String getId() {
+		return XMLNS;
+	}
+
+	/**
+	 * Method returns true if XMPPIOService has enabled SM.
+	 *
+	 * @param service
+	 *
+	 *
+	 * @return a value of boolean
+	 */
+	public static boolean isEnabled(XMPPIOService service) {
+		return service.getSessionData().containsKey(IN_COUNTER_KEY);
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param connectionManager
+	 */
+	@Override
+	public void setConnectionManager(ConnectionManager connectionManager) {
+		this.connectionManager = connectionManager;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param props
+	 */
+	@Override
+	public void setProperties(Map<String, Object> props) {
 		if (props.containsKey(RESUMPTION_TIMEOUT_PROP_KEY)) {
 			this.resumption_timeout = (Integer) props.get(RESUMPTION_TIMEOUT_PROP_KEY);
 		}
 	}
-	
+
+	//~--- methods --------------------------------------------------------------
+
 	/**
 	 * Method responsible for starting process of stream resumption
-	 * 
+	 *
 	 * @param service
 	 * @param id
 	 * @param h
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	private void resumeStream(XMPPIOService service, String id, int h) throws IOException {
 		XMPPIOService oldService = services.get(id);
-		if (oldService == null || !isSameUser(oldService, service)) {
+
+		if ((oldService == null) ||!isSameUser(oldService, service)) {
+
 			// should send failed!
-			service.writeRawData("<failed xmlns='" + XMLNS + "'>" 
-					+ "<item-not-found xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>"
-					+ "</failed>");				
-			return;	
+			service.writeRawData("<failed xmlns='" + XMLNS + "'>" +
+					"<item-not-found xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" + "</failed>");
+
+			return;
 		}
-		
 		if (services.remove(id, oldService)) {
 			synchronized (oldService) {
-				TimerTask timerTask = (TimerTask) oldService.getSessionData().remove(RESUMPTION_TASK_KEY);
+				TimerTask timerTask = (TimerTask) oldService.getSessionData().remove(
+						RESUMPTION_TASK_KEY);
+
 				if (timerTask != null) {
 					timerTask.cancel();
 				}
@@ -388,145 +495,159 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 
 			// get old out queue
 			OutQueue outQueue = (OutQueue) oldService.getSessionData().get(OUT_COUNTER_KEY);
+
 			outQueue.ack(h);
 
 			// move required data from old XMPPIOService session data to new service session data
 			service.getSessionData().put(OUT_COUNTER_KEY, outQueue);
-			service.getSessionData().put(MAX_RESUMPTION_TIMEOUT_KEY, 
-					oldService.getSessionData().get(MAX_RESUMPTION_TIMEOUT_KEY));
-			service.getSessionData().put(IN_COUNTER_KEY, 
-					oldService.getSessionData().get(IN_COUNTER_KEY));
-			service.getSessionData().put(STREAM_ID_KEY, 
-					oldService.getSessionData().get(STREAM_ID_KEY));
-			
-			// send notification to session manager about change of connection 
+			service.getSessionData().put(MAX_RESUMPTION_TIMEOUT_KEY, oldService.getSessionData()
+					.get(MAX_RESUMPTION_TIMEOUT_KEY));
+			service.getSessionData().put(IN_COUNTER_KEY, oldService.getSessionData().get(
+					IN_COUNTER_KEY));
+			service.getSessionData().put(STREAM_ID_KEY, oldService.getSessionData().get(
+					STREAM_ID_KEY));
+
+			// send notification to session manager about change of connection
 			// used for session
-			Packet cmd = Command.STREAM_MOVED.getPacket(service.getConnectionId(), 
-					service.getDataReceiver(), StanzaType.set, "moved");
+			Packet cmd = Command.STREAM_MOVED.getPacket(service.getConnectionId(), service
+					.getDataReceiver(), StanzaType.set, "moved");
+
 			cmd.setPacketFrom(service.getConnectionId());
 			cmd.setPacketTo(service.getDataReceiver());
 			Command.addFieldValue(cmd, "old-conn-jid", oldService.getConnectionId().toString());
 			connectionManager.processOutPacket(cmd);
-		}
-		else {
+		} else {
+
 			// should send failed!
-			service.writeRawData("<failed xmlns='" + XMLNS + "'>" 
-					+ "<item-not-found xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>"
-					+ "</failed>");
+			service.writeRawData("<failed xmlns='" + XMLNS + "'>" +
+					"<item-not-found xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" + "</failed>");
 		}
 	}
-	
-	/**
-	 * Verifies if connections are authenticate for same bare jid
-	 * 
-	 * @param oldService
-	 * @param newService
-	 * @return true - only when bare jids are the same
-	 */
-	private boolean isSameUser(XMPPIOService oldService, XMPPIOService newService) {
-		if (oldService.getUserJid() == null || newService.getUserJid() == null)
-			return false;
-		
-		JID oldUserJid = JID.jidInstanceNS(oldService.getUserJid());
-		JID newUserJid = JID.jidInstanceNS(newService.getUserJid());
-		
-		return oldUserJid.getBareJID().equals(newUserJid.getBareJID());
-	}
-	
+
 	/**
 	 * Method responsible for sending recipient-unavailable error for all not acked packets
-	 * 
-	 * @param service 
+	 *
+	 * @param service
 	 */
 	private void sendErrorsForQueuedPackets(XMPPIOService service) {
-		OutQueue outQueue = (OutQueue) service.getSessionData().remove(OUT_COUNTER_KEY);		
+		OutQueue outQueue = (OutQueue) service.getSessionData().remove(OUT_COUNTER_KEY);
+
 		if (outQueue != null) {
 			Packet packet = null;
-			
+
 			while ((packet = outQueue.queue.poll()) != null) {
 				try {
 					connectionManager.processOutPacket(Authorization.RECIPIENT_UNAVAILABLE
 							.getResponseMessage(packet, null, true));
 				} catch (PacketErrorTypeException ex) {
-					log.log(Level.FINER, "exception prepareing request for returning error, data = {0}", 
-							packet);
+					log.log(Level.FINER,
+							"exception prepareing request for returning error, data = {0}", packet);
 				}
 			}
 		}
 	}
-	
-	/**
-	 * ResumptionTimeoutTask class is used for handing of timeout used during 
-	 * session resumption
-	 */
-	private class ResumptionTimeoutTask extends TimerTask {
 
-		private final XMPPIOService service;
-		
-		public ResumptionTimeoutTask(XMPPIOService service) {
-			this.service = service;
-		}
-		
-		@Override
-		public void run() {	
-			String id = (String) service.getSessionData().get(STREAM_ID_KEY);			
-			if (services.remove(id, service)) {
-				sendErrorsForQueuedPackets(service);
-				//service.getSessionData().put(SERVICE_STOP_ALLOWED_KEY, true);
-				connectionManager.serviceStopped(service);
-			}
-		}
-		
+	//~--- get methods ----------------------------------------------------------
+
+	private static boolean isResumptionEnabled(XMPPIOService service) {
+		return service.getSessionData().containsKey(STREAM_ID_KEY);
 	}
-	
+
+	/**
+	 * Verifies if connections are authenticate for same bare jid
+	 *
+	 * @param oldService
+	 * @param newService
+	 *  true - only when bare jids are the same
+	 */
+	private boolean isSameUser(XMPPIOService oldService, XMPPIOService newService) {
+		if ((oldService.getUserJid() == null) || (newService.getUserJid() == null)) {
+			return false;
+		}
+
+		JID oldUserJid = JID.jidInstanceNS(oldService.getUserJid());
+		JID newUserJid = JID.jidInstanceNS(newService.getUserJid());
+
+		return oldUserJid.getBareJID().equals(newUserJid.getBareJID());
+	}
+
+	//~--- inner classes --------------------------------------------------------
+
 	/**
 	 * Counter class implements proper counter with overflow from 2^32-1 to 0
 	 */
 	private static class Counter {
-		
 		private int counter = 0;
-		
+
+		//~--- methods ------------------------------------------------------------
+
 		/**
 		 * Increment counter
 		 */
 		public void inc() {
 			counter++;
-			if (counter < 0)
+			if (counter < 0) {
 				counter = 0;
+			}
 		}
-		
+
+		//~--- get methods --------------------------------------------------------
+
 		/**
 		 * Get value of counter.
-		 * 
-		 * @return 
+		 *
+		 *
+		 *
+		 * @return a value of int
 		 */
 		public int get() {
 			return counter;
 		}
-				
+
+		//~--- set methods --------------------------------------------------------
+
 		/**
 		 * Sets value of a counter - use only for testing!
-		 * 
-		 * @param value 
+		 *
+		 * @param value
 		 */
 		protected void setCounter(int value) {
 			this.counter = value;
 		}
 	}
-	
+
+
 	/**
 	 * OutQueue class implements queue of outgoing packets waiting for ack
-	 * with implementation of removing acked elements when id of acked packet 
+	 * with implementation of removing acked elements when id of acked packet
 	 * is passed
 	 */
-	public static class OutQueue extends Counter {
-		
+	public static class OutQueue
+					extends Counter {
 		private final ArrayDeque<Packet> queue = new ArrayDeque<Packet>();
-		
+
+		//~--- methods ------------------------------------------------------------
+
+		/**
+		 * Confirm delivery of packets up to count passed as value
+		 *
+		 * @param value
+		 */
+		public void ack(int value) {
+			int count = get() - value;
+
+			if (count < 0) {
+				count = (Integer.MAX_VALUE - value) + get() + 1;
+			}
+			while (count < queue.size()) {
+				queue.poll();
+			}
+		}
+
 		/**
 		 * Append packet to waiting for ack queue
-		 * 
-		 * @param packet 
+		 *
+		 * @param packet
 		 */
 		public void append(Packet packet) {
 			if (!packet.wasProcessedBy(XMLNS)) {
@@ -535,42 +656,73 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 				inc();
 			}
 		}
-		
-		/**
-		 * Confirm delivery of packets up to count passed as value
-		 * 
-		 * @param value 
-		 */
-		public void ack(int value) {			
-			int count = get() - value;
-			
-			if (count < 0) {
-				count = (Integer.MAX_VALUE - value) + get() + 1;
-			}
-			
-			while (count < queue.size()) {
-				queue.poll();
-			}
-		}
-		
+
 		/**
 		 * Returns size of queue containing packets waiting for ack
-		 * 
-		 * @return 
+		 *
+		 *
+		 *
+		 * @return a value of int
 		 */
 		public int waitingForAck() {
 			return queue.size();
 		}
-		
+
+		//~--- get methods --------------------------------------------------------
+
 		/**
-		 * Method returns internal queue with packets waiting for ack - use testing 
+		 * Method returns internal queue with packets waiting for ack - use testing
 		 * only!
-		 * 
-		 * @return 
+		 *
+		 *
+		 *
+		 * @return a value of ArrayDeque<Packet>
 		 */
 		protected ArrayDeque<Packet> getQueue() {
 			return queue;
 		}
-		
+	}
+
+
+	/**
+	 * ResumptionTimeoutTask class is used for handing of timeout used during
+	 * session resumption
+	 */
+	private class ResumptionTimeoutTask
+					extends TimerTask {
+		private final XMPPIOService service;
+
+		//~--- constructors -------------------------------------------------------
+
+		/**
+		 * Constructs ...
+		 *
+		 *
+		 * @param service
+		 */
+		public ResumptionTimeoutTask(XMPPIOService service) {
+			this.service = service;
+		}
+
+		//~--- methods ------------------------------------------------------------
+
+		/**
+		 * Method description
+		 *
+		 */
+		@Override
+		public void run() {
+			String id = (String) service.getSessionData().get(STREAM_ID_KEY);
+
+			if (services.remove(id, service)) {
+				sendErrorsForQueuedPackets(service);
+
+				// service.getSessionData().put(SERVICE_STOP_ALLOWED_KEY, true);
+				connectionManager.serviceStopped(service);
+			}
+		}
 	}
 }
+
+
+//~ Formatted in Tigase Code Convention on 13/08/28

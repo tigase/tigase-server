@@ -106,7 +106,9 @@ public class JabberIqIq
 	 *
 	 * @param iq_level
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	public static String calculateIQ(String iq_level) {
 		double value = 100;
@@ -153,7 +155,9 @@ public class JabberIqIq
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String id() {
@@ -170,7 +174,9 @@ public class JabberIqIq
 	 * @param results
 	 *
 	 * @param settings
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
@@ -300,7 +306,9 @@ public class JabberIqIq
 	 *
 	 * @param session
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Element[]
 	 */
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
@@ -311,7 +319,9 @@ public class JabberIqIq
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[][]
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -322,7 +332,9 @@ public class JabberIqIq
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[]
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -410,4 +422,4 @@ public class JabberIqIq
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/12
+//~ Formatted in Tigase Code Convention on 13/08/28

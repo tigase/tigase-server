@@ -57,24 +57,73 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 	public static final String REPO_CLASS_PROP_KEY = "repo-class";
 
 	/** Field description */
-	public static final String REPO_URI_PROP_KEY = "repo-uri";
-	private static final Logger log              =
-		Logger.getLogger(UserRepoRepository.class.getName());
+	public static final String  REPO_URI_PROP_KEY = "repo-uri";
+	private static final Logger log = Logger.getLogger(UserRepoRepository.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
-	private String items_list_pkey = "items-lists";
-	private UserRepository repo    = null;
+	private String         items_list_pkey = "items-lists";
+	private UserRepository repo            = null;
 
-	//~--- get methods ----------------------------------------------------------
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
-	 *
-	 * @return
 	 */
-	public abstract BareJID getRepoUser();
+	@Override
+	public void reload() {
+		super.reload();
+		try {
+
+			// It is now time to load all Items' settings from the database:
+			String items_list = repo.getData(getRepoUser(), getItemsListPKey());
+
+			if ((items_list != null) &&!items_list.isEmpty()) {
+				DomBuilderHandler domHandler = new DomBuilderHandler();
+				SimpleParser      parser     = SingletonFactory.getParserInstance();
+
+				parser.parse(domHandler, items_list.toCharArray(), 0, items_list.length());
+
+				Queue<Element> elems = domHandler.getParsedElements();
+
+				if ((elems != null) && (elems.size() > 0)) {
+					for (Element elem : elems) {
+						Item item = getItemInstance();
+
+						item.initFromElement(elem);
+						addItem(item);
+					}
+				}
+			}
+		} catch (Exception ex) {
+			log.log(Level.SEVERE, "Problem with loading items list from the database.", ex);
+		}
+		log.log(Level.CONFIG, "All loaded items: {0}", items);
+	}
+
+	/**
+	 * Method description
+	 *
+	 */
+	@Override
+	public void store() {
+		super.store();
+		if (repo != null) {
+			StringBuilder sb = new StringBuilder();
+
+			for (Item item : items.values()) {
+				sb.append(item.toElement().toString());
+			}
+			try {
+				repo.setData(getRepoUser(), getItemsListPKey(), sb.toString());
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "Error storing items list in the repository", e);
+			}
+		}
+	}
+
+	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -112,48 +161,23 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String getItemsListPKey() {
 		return items_list_pkey;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>BareJID</code>
 	 */
-	@Override
-	public void reload() {
-		super.reload();
-		try {
-
-			// It is now time to load all Items' settings from the database:
-			String items_list = repo.getData(getRepoUser(), getItemsListPKey());
-
-			if ((items_list != null) &&!items_list.isEmpty()) {
-				DomBuilderHandler domHandler = new DomBuilderHandler();
-				SimpleParser parser          = SingletonFactory.getParserInstance();
-
-				parser.parse(domHandler, items_list.toCharArray(), 0, items_list.length());
-
-				Queue<Element> elems = domHandler.getParsedElements();
-
-				if ((elems != null) && (elems.size() > 0)) {
-					for (Element elem : elems) {
-						Item item = getItemInstance();
-
-						item.initFromElement(elem);
-						addItem(item);
-					}
-				}
-			}
-		} catch (Exception ex) {
-			log.log(Level.SEVERE, "Problem with loading items list from the database.", ex);
-		}
-		log.log(Level.CONFIG, "All loaded items: {0}", items);
-	}
+	public abstract BareJID getRepoUser();
 
 	//~--- set methods ----------------------------------------------------------
 
@@ -175,9 +199,9 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 
 		if ((repo_class != null) && (repo_uri != null)) {
 			log.log(Level.INFO,
-							"Initializing custom component repository: {0}, db connection: {1}",
-							new Object[] { repo_class,
-														 repo_uri });
+					"Initializing custom component repository: {0}, db connection: {1}",
+					new Object[] { repo_class,
+					repo_uri });
 			try {
 				repo = RepositoryFactory.getUserRepository(repo_class, repo_uri, null);
 			} catch (Exception e) {
@@ -205,36 +229,13 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 			} catch (Exception e) {
 
 				// This is not expected so let's signal an error:
-				log.log(Level.SEVERE,
-								"Problem with adding '" + getRepoUser() + "' user to the database", e);
+				log.log(Level.SEVERE, "Problem with adding '" + getRepoUser() +
+						"' user to the database", e);
 			}
 			reload();
-		}
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 */
-	@Override
-	public void store() {
-		super.store();
-		if (repo != null) {
-			StringBuilder sb = new StringBuilder();
-
-			for (Item item : items.values()) {
-				sb.append(item.toElement().toString());
-			}
-			try {
-				repo.setData(getRepoUser(), getItemsListPKey(), sb.toString());
-			} catch (Exception e) {
-				log.log(Level.SEVERE, "Error storing items list in the repository", e);
-			}
 		}
 	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/09
+//~ Formatted in Tigase Code Convention on 13/08/29

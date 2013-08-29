@@ -1,10 +1,13 @@
 /*
+ * UserRepositoryPool.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.db;
 
@@ -31,14 +33,12 @@ import tigase.xmpp.BareJID;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.Collections;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Map;
 
 /**
  * Created: Jan 28, 2009 8:46:53 PM
@@ -46,14 +46,15 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class UserRepositoryPool implements UserRepository {
+public class UserRepositoryPool
+				implements UserRepository {
 	private static final Logger log = Logger.getLogger(UserRepositoryPool.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
-	private Map<String, Object> cache = null;
+	private Map<String, Object>                 cache = null;
 	private LinkedBlockingQueue<UserRepository> repoPool =
-		new LinkedBlockingQueue<UserRepository>();
+			new LinkedBlockingQueue<UserRepository>();
 
 	//~--- methods --------------------------------------------------------------
 
@@ -71,7 +72,7 @@ public class UserRepositoryPool implements UserRepository {
 	 */
 	@Override
 	public void addDataList(BareJID user, String subnode, String key, String[] list)
-			throws UserNotFoundException, TigaseDBException {
+					throws UserNotFoundException, TigaseDBException {
 		UserRepository repo = takeRepo();
 
 		if (repo != null) {
@@ -119,379 +120,6 @@ public class UserRepositoryPool implements UserRepository {
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param subnode
-	 * @param key
-	 * @param def
-	 *
-	 * @return
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
-	@Override
-	public String getData(BareJID user, String subnode, String key, String def)
-			throws UserNotFoundException, TigaseDBException {
-		String data = (String) cache.get(user + "/" + subnode + "/" + key);
-
-		if (data != null) {
-			return data;
-		}
-
-		UserRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				return repo.getData(user, subnode, key, def);
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
-		}
-
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param subnode
-	 * @param key
-	 *
-	 * @return
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
-	@Override
-	public String getData(BareJID user, String subnode, String key)
-			throws UserNotFoundException, TigaseDBException {
-		String data = (String) cache.get(user + "/" + subnode + "/" + key);
-
-		if (data != null) {
-			return data;
-		}
-
-		UserRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				return repo.getData(user, subnode, key);
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
-		}
-
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param key
-	 *
-	 * @return
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
-	@Override
-	public String getData(BareJID user, String key)
-			throws UserNotFoundException, TigaseDBException {
-		String data = (String) cache.get(user + "/" + key);
-
-		if (data != null) {
-			return data;
-		}
-
-		UserRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				return repo.getData(user, key);
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
-		}
-
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param subnode
-	 * @param key
-	 *
-	 * @return
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
-	@Override
-	public String[] getDataList(BareJID user, String subnode, String key)
-			throws UserNotFoundException, TigaseDBException {
-		UserRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				return repo.getDataList(user, subnode, key);
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
-		}
-
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param subnode
-	 *
-	 * @return
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
-	@Override
-	public String[] getKeys(BareJID user, String subnode)
-			throws UserNotFoundException, TigaseDBException {
-		UserRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				return repo.getKeys(user, subnode);
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
-		}
-
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 *
-	 * @return
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
-	@Override
-	public String[] getKeys(BareJID user) throws UserNotFoundException, TigaseDBException {
-		UserRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				return repo.getKeys(user);
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
-		}
-
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getResourceUri() {
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param subnode
-	 *
-	 * @return
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
-	@Override
-	public String[] getSubnodes(BareJID user, String subnode)
-			throws UserNotFoundException, TigaseDBException {
-		UserRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				return repo.getSubnodes(user, subnode);
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
-		}
-
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 *
-	 * @return
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
-	@Override
-	public String[] getSubnodes(BareJID user) throws UserNotFoundException, TigaseDBException {
-		UserRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				return repo.getSubnodes(user);
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
-		}
-
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 *
-	 * @return
-	 *
-	 * @throws TigaseDBException
-	 */
-	@Override
-	public long getUserUID(BareJID user) throws TigaseDBException {
-		UserRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				return repo.getUserUID(user);
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
-		}
-
-		return -1;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 *
-	 * @throws TigaseDBException
-	 */
-	@Override
-	public List<BareJID> getUsers() throws TigaseDBException {
-		UserRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				return repo.getUsers();
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
-		}
-
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public long getUsersCount() {
-		UserRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				return repo.getUsersCount();
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
-		}
-
-		return 0;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 *
-	 * @return
-	 */
-	@Override
-	public long getUsersCount(String domain) {
-		UserRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				return repo.getUsersCount(domain);
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
-		}
-
-		return 0;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -503,7 +131,7 @@ public class UserRepositoryPool implements UserRepository {
 	 */
 	@Override
 	public void initRepository(String resource_uri, Map<String, String> params)
-			throws DBInitException {
+					throws DBInitException {
 		if (resource_uri.contains("cacheRepo=off")) {
 			log.fine("Disabling cache.");
 			cache = Collections.synchronizedMap(new RepoCache(0, -1000));
@@ -525,7 +153,7 @@ public class UserRepositoryPool implements UserRepository {
 	 */
 	@Override
 	public void removeData(BareJID user, String subnode, String key)
-			throws UserNotFoundException, TigaseDBException {
+					throws UserNotFoundException, TigaseDBException {
 		cache.remove(user + "/" + subnode + "/" + key);
 
 		UserRepository repo = takeRepo();
@@ -553,7 +181,7 @@ public class UserRepositoryPool implements UserRepository {
 	 */
 	@Override
 	public void removeData(BareJID user, String key)
-			throws UserNotFoundException, TigaseDBException {
+					throws UserNotFoundException, TigaseDBException {
 		cache.remove(user + "/" + key);
 
 		UserRepository repo = takeRepo();
@@ -581,7 +209,7 @@ public class UserRepositoryPool implements UserRepository {
 	 */
 	@Override
 	public void removeSubnode(BareJID user, String subnode)
-			throws UserNotFoundException, TigaseDBException {
+					throws UserNotFoundException, TigaseDBException {
 		cache.remove(user + "/" + subnode);
 
 		UserRepository repo = takeRepo();
@@ -621,102 +249,13 @@ public class UserRepositoryPool implements UserRepository {
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param user
-	 * @param subnode
-	 * @param key
-	 * @param value
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
-	@Override
-	public void setData(BareJID user, String subnode, String key, String value)
-			throws UserNotFoundException, TigaseDBException {
-		UserRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				repo.setData(user, subnode, key, value);
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
-		}
-
-		cache.put(user + "/" + subnode + "/" + key, value);
-	}
-
-	/**
-	 * Method description
 	 *
 	 *
-	 * @param user
-	 * @param key
-	 * @param value
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
-	@Override
-	public void setData(BareJID user, String key, String value)
-			throws UserNotFoundException, TigaseDBException {
-		UserRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				repo.setData(user, key, value);
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
-		}
-
-		cache.put(user + "/" + key, value);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param subnode
-	 * @param key
-	 * @param list
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
-	@Override
-	public void setDataList(BareJID user, String subnode, String key, String[] list)
-			throws UserNotFoundException, TigaseDBException {
-		UserRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				repo.setDataList(user, subnode, key, list);
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
-		}
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
+	 * @return a value of <code>UserRepository</code>
 	 */
 	public UserRepository takeRepo() {
 		try {
@@ -734,7 +273,9 @@ public class UserRepositoryPool implements UserRepository {
 	 *
 	 * @param user
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean userExists(BareJID user) {
@@ -753,10 +294,495 @@ public class UserRepositoryPool implements UserRepository {
 		return false;
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param user
+	 * @param subnode
+	 * @param key
+	 * @param def
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 * @throws TigaseDBException
+	 * @throws UserNotFoundException
+	 */
+	@Override
+	public String getData(BareJID user, String subnode, String key, String def)
+					throws UserNotFoundException, TigaseDBException {
+		String data = (String) cache.get(user + "/" + subnode + "/" + key);
+
+		if (data != null) {
+			return data;
+		}
+
+		UserRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getData(user, subnode, key, def);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+		}
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param user
+	 * @param subnode
+	 * @param key
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 * @throws TigaseDBException
+	 * @throws UserNotFoundException
+	 */
+	@Override
+	public String getData(BareJID user, String subnode, String key)
+					throws UserNotFoundException, TigaseDBException {
+		String data = (String) cache.get(user + "/" + subnode + "/" + key);
+
+		if (data != null) {
+			return data;
+		}
+
+		UserRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getData(user, subnode, key);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+		}
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param user
+	 * @param key
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 * @throws TigaseDBException
+	 * @throws UserNotFoundException
+	 */
+	@Override
+	public String getData(BareJID user, String key)
+					throws UserNotFoundException, TigaseDBException {
+		String data = (String) cache.get(user + "/" + key);
+
+		if (data != null) {
+			return data;
+		}
+
+		UserRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getData(user, key);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+		}
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param user
+	 * @param subnode
+	 * @param key
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
+	 * @throws TigaseDBException
+	 * @throws UserNotFoundException
+	 */
+	@Override
+	public String[] getDataList(BareJID user, String subnode, String key)
+					throws UserNotFoundException, TigaseDBException {
+		UserRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getDataList(user, subnode, key);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+		}
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param user
+	 * @param subnode
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
+	 * @throws TigaseDBException
+	 * @throws UserNotFoundException
+	 */
+	@Override
+	public String[] getKeys(BareJID user, String subnode)
+					throws UserNotFoundException, TigaseDBException {
+		UserRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getKeys(user, subnode);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+		}
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param user
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
+	 * @throws TigaseDBException
+	 * @throws UserNotFoundException
+	 */
+	@Override
+	public String[] getKeys(BareJID user) throws UserNotFoundException, TigaseDBException {
+		UserRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getKeys(user);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+		}
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getResourceUri() {
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param user
+	 * @param subnode
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
+	 * @throws TigaseDBException
+	 * @throws UserNotFoundException
+	 */
+	@Override
+	public String[] getSubnodes(BareJID user, String subnode)
+					throws UserNotFoundException, TigaseDBException {
+		UserRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getSubnodes(user, subnode);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+		}
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param user
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
+	 * @throws TigaseDBException
+	 * @throws UserNotFoundException
+	 */
+	@Override
+	public String[] getSubnodes(BareJID user)
+					throws UserNotFoundException, TigaseDBException {
+		UserRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getSubnodes(user);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+		}
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>List<BareJID></code>
+	 * @throws TigaseDBException
+	 */
+	@Override
+	public List<BareJID> getUsers() throws TigaseDBException {
+		UserRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getUsers();
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+		}
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	@Override
+	public long getUsersCount() {
+		UserRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getUsersCount();
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+		}
+
+		return 0;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param domain
+	 *
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	@Override
+	public long getUsersCount(String domain) {
+		UserRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getUsersCount(domain);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+		}
+
+		return 0;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param user
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 * @throws TigaseDBException
+	 */
+	@Override
+	public long getUserUID(BareJID user) throws TigaseDBException {
+		UserRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getUserUID(user);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+		}
+
+		return -1;
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param user
+	 * @param subnode
+	 * @param key
+	 * @param value
+	 *
+	 * @throws TigaseDBException
+	 * @throws UserNotFoundException
+	 */
+	@Override
+	public void setData(BareJID user, String subnode, String key, String value)
+					throws UserNotFoundException, TigaseDBException {
+		UserRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				repo.setData(user, subnode, key, value);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+		}
+		cache.put(user + "/" + subnode + "/" + key, value);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param user
+	 * @param key
+	 * @param value
+	 *
+	 * @throws TigaseDBException
+	 * @throws UserNotFoundException
+	 */
+	@Override
+	public void setData(BareJID user, String key, String value)
+					throws UserNotFoundException, TigaseDBException {
+		UserRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				repo.setData(user, key, value);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+		}
+		cache.put(user + "/" + key, value);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param user
+	 * @param subnode
+	 * @param key
+	 * @param list
+	 *
+	 * @throws TigaseDBException
+	 * @throws UserNotFoundException
+	 */
+	@Override
+	public void setDataList(BareJID user, String subnode, String key, String[] list)
+					throws UserNotFoundException, TigaseDBException {
+		UserRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				repo.setDataList(user, subnode, key, list);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+		}
+	}
+
 	//~--- inner classes --------------------------------------------------------
 
-	private class RepoCache extends SimpleCache<String, Object> {
-
+	private class RepoCache
+					extends SimpleCache<String, Object> {
 		/**
 		 * Constructs ...
 		 *
@@ -776,7 +802,9 @@ public class UserRepositoryPool implements UserRepository {
 		 *
 		 * @param key
 		 *
-		 * @return
+		 *
+		 *
+		 * @return a value of <code>Object</code>
 		 */
 		@Override
 		public Object remove(Object key) {
@@ -784,9 +812,9 @@ public class UserRepositoryPool implements UserRepository {
 				return null;
 			}
 
-			Object val = super.remove(key);
-			String strk = key.toString();
-			Iterator<String> ks = keySet().iterator();
+			Object           val  = super.remove(key);
+			String           strk = key.toString();
+			Iterator<String> ks   = keySet().iterator();
 
 			while (ks.hasNext()) {
 				String k = ks.next().toString();
@@ -802,7 +830,4 @@ public class UserRepositoryPool implements UserRepository {
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/29

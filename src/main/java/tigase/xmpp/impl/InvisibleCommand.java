@@ -57,7 +57,7 @@ import java.util.Queue;
 /**
  * Class InvisibleCommand implements XEP-0186 Invisible Command support
  *
- * @see http://xmpp.org/extensions/xep-0186.html
+ * @see <a href="http://xmpp.org/extensions/xep-0186.html">XEP-0186</a>
  *
  * @author andrzej
  */
@@ -87,7 +87,9 @@ public class InvisibleCommand
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String id() {
@@ -98,37 +100,35 @@ public class InvisibleCommand
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * @param packet
+	 * @param session
+	 * @param repo
+	 * @param results
+	 * @param settings
+	 *
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	@Override
-	public String[][] supElementNamePaths() {
-		return ELEMENT_PATHS;
+	public boolean preProcess(Packet packet, XMPPResourceConnection session,
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
+
+		// stop presence broadcast if invisibility is activated - only offline should be allowed to broadcast it to buddies with direct stanza sent
+		if ((packet.getElemName() == "presence") && (packet.getStanzaTo() == null) && (packet
+				.getType() != StanzaType.unavailable)) {
+			Boolean active = (Boolean) session.getSessionData(ACTIVE_KEY);
+
+			active = (active != null) && active;
+			if (active) {
+				packet.processedBy(ID);
+			}
+
+			return active;
+		}
+
+		return false;
 	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String[] supNamespaces() {
-		return XMLNSS;
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	protected RosterAbstract getRosterUtil() {
-		return RosterFactory.getRosterImplementation(true);
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -212,34 +212,42 @@ public class InvisibleCommand
 	 * Method description
 	 *
 	 *
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 * @param settings
 	 *
-	 * @return
+	 *
+	 * @return a value of String[][]
 	 */
 	@Override
-	public boolean preProcess(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
+	public String[][] supElementNamePaths() {
+		return ELEMENT_PATHS;
+	}
 
-		// stop presence broadcast if invisibility is activated - only offline should be allowed to broadcast it to buddies with direct stanza sent
-		if ((packet.getElemName() == "presence") && (packet.getStanzaTo() == null) && (packet
-				.getType() != StanzaType.unavailable)) {
-			Boolean active = (Boolean) session.getSessionData(ACTIVE_KEY);
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of String[]
+	 */
+	@Override
+	public String[] supNamespaces() {
+		return XMLNSS;
+	}
 
-			active = (active != null) && active;
-			if (active) {
-				packet.processedBy(ID);
-			}
+	//~--- get methods ----------------------------------------------------------
 
-			return active;
-		}
-
-		return false;
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of RosterAbstract
+	 */
+	protected RosterAbstract getRosterUtil() {
+		return RosterFactory.getRosterImplementation(true);
 	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/11
+//~ Formatted in Tigase Code Convention on 13/08/28

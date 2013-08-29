@@ -557,7 +557,9 @@ public abstract class ConfiguratorAbstract
 	 * file.
 	 *
 	 * @param params
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -721,7 +723,9 @@ public abstract class ConfiguratorAbstract
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 */
 	public Map<String, Object> getDefConfigParams() {
 		return initProperties;
@@ -731,7 +735,9 @@ public abstract class ConfiguratorAbstract
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String getMessageRouterClassName() {
 		return "tigase.server.MessageRouter";
@@ -743,7 +749,9 @@ public abstract class ConfiguratorAbstract
 	 *
 	 * @param objName
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Object</code>
 	 */
 	public static Object getMXBean(String objName) {
 		if (monitoring != null) {
@@ -759,8 +767,10 @@ public abstract class ConfiguratorAbstract
 	 *
 	 * @param nodeId
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 * @throws ConfigurationException
 	 */
 	public Map<String, Object> getProperties(String nodeId) throws ConfigurationException {
@@ -773,7 +783,9 @@ public abstract class ConfiguratorAbstract
 	 *
 	 * @param component
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean isCorrectType(ServerComponent component) {
@@ -1111,4 +1123,4 @@ public abstract class ConfiguratorAbstract
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/06/08
+//~ Formatted in Tigase Code Convention on 13/08/29

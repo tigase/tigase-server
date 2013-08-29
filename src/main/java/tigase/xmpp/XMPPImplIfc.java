@@ -2,7 +2,7 @@
  * XMPPImplIfc.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -58,6 +58,25 @@ public interface XMPPImplIfc
 	//~--- methods --------------------------------------------------------------
 
 	/**
+	 * By default the method uses {@link #supElementNamePaths() } and
+	 * {@link #supTypes() } method results to determine whether the plugin would process
+	 * given packet. However, a plugin can implement own logic to determine packet
+	 * processing capabilities or conditions. Please note, this method must be very fast
+	 * and efficient. No I/O processing is recommended as it may impact performance of
+	 * the whole system.
+	 *
+	 *
+	 * @param packet is a <code>Packet</code> for processing.
+	 * @param conn is a user session object or null.
+	 *
+	 * @return returns <code>Authorization</code> enum value or null. Null means the
+	 * plugin is simply not processing the packet. {@link Authorization#AUTHORIZED} means
+	 * the plugin can process the packet, any other {@link Authorization} enum value
+	 * means an error which has to be returned to the sender.
+	 */
+	Authorization canHandle(Packet packet, XMPPResourceConnection conn);
+
+	/**
 	 * Methods returns a preferable number of threads/packets queues for the plugin.
 	 * This number can be overwritten through configuration settings, however, a default
 	 * value should be reasonably good for most standard installations.
@@ -76,7 +95,8 @@ public interface XMPPImplIfc
 	 * using {@link #concurrentQueuesNo() }.
 	 *
 	 *
-	 * @return
+	 *
+	 * @return a value of int
 	 */
 	@Deprecated
 	int concurrentThreadsPerQueue();
@@ -104,43 +124,6 @@ public interface XMPPImplIfc
 	 */
 	void init(Map<String, Object> settings) throws TigaseDBException;
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method <code>isSupporting</code> takes element name and name-space for this
-	 * element and determines whether this element can be processed by this
-	 * plugin.
-	 *
-	 * @param elem
-	 *          a <code>String</code> value
-	 * @param ns
-	 *          a <code>String</code> value
-	 * @return a <code>boolean</code> value
-	 */
-	@Deprecated
-	boolean isSupporting(String elem, String ns);
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * By default the method uses {@link #supElementNamePaths() } and
-	 * {@link #supTypes() } method results to determine whether the plugin would process
-	 * given packet. However, a plugin can implement own logic to determine packet
-	 * processing capabilities or conditions. Please note, this method must be very fast
-	 * and efficient. No I/O processing is recommended as it may impact performance of
-	 * the whole system.
-	 *
-	 *
-	 * @param packet is a <code>Packet</code> for processing.
-	 * @param conn is a user session object or null.
-	 *
-	 * @return returns <code>Authorization</code> enum value or null. Null means the
-	 * plugin is simply not processing the packet. {@link Authorization#AUTHORIZED} means
-	 * the plugin can process the packet, any other {@link Authorization} enum value
-	 * means an error which has to be returned to the sender.
-	 */
-	Authorization canHandle(Packet packet, XMPPResourceConnection conn);
-
 	/**
 	 * Method <code>supDiscoFeatures</code> returns an array of XML
 	 * <code>Element</code>s with service discovery features which have to be
@@ -152,19 +135,6 @@ public interface XMPPImplIfc
 	 * @return an <code>Element[]</code> value
 	 */
 	Element[] supDiscoFeatures(XMPPResourceConnection session);
-
-	/**
-	 * Method <code>supElements</code> returns an array of element names for
-	 * stanzas which can be processed by this plugin. Each element name
-	 * corresponds to XMLNS returned in array by <code>supNamespaces()</code>
-	 * method.
-	 * This method has been deprecated in favor of <code>supElementNamePaths</code>.
-	 *
-	 * @return a <code>String[]</code> value
-	 * @see supElementNamePaths
-	 */
-	@Deprecated
-	String[] supElements();
 
 	/**
 	 * Method <code>supElementNamePaths</code> returns an array of element
@@ -181,6 +151,19 @@ public interface XMPPImplIfc
 	String[][] supElementNamePaths();
 
 	/**
+	 * Method <code>supElements</code> returns an array of element names for
+	 * stanzas which can be processed by this plugin. Each element name
+	 * corresponds to XMLNS returned in array by <code>supNamespaces()</code>
+	 * method.
+	 * This method has been deprecated in favor of <code>supElementNamePaths</code>.
+	 *
+	 * @return a <code>String[]</code> value
+	 * @see #supElementNamePaths()
+	 */
+	@Deprecated
+	String[] supElements();
+
+	/**
 	 * Method <code>supNamespaces</code> returns an array of name-spaces for
 	 * stanzas which can be processed by this plugin. Each namespace
 	 * corresponds to element name returned in array by
@@ -189,18 +172,6 @@ public interface XMPPImplIfc
 	 * @return a <code>String[]</code> value
 	 */
 	String[] supNamespaces();
-
-	/**
-	 * Method returns an array of all stanza types which the plugin is able
-	 * to handle. If the method returns NULL, then all stanzas of all types
-	 * will be passed to the plugin for processing.
-	 * Otherwise only stanzas with selected types, assuming that
-	 * element names and name-spaces match as well.
-	 *
-	 *
-	 * @return a <code>StanzaType[]</code> array of supported stanza types.
-	 */
-	Set<StanzaType> supTypes();
 
 	/**
 	 * Method <code>supStreamFeatures</code> returns an array of XML
@@ -214,6 +185,18 @@ public interface XMPPImplIfc
 	 */
 	Element[] supStreamFeatures(XMPPResourceConnection session);
 
+	/**
+	 * Method returns an array of all stanza types which the plugin is able
+	 * to handle. If the method returns NULL, then all stanzas of all types
+	 * will be passed to the plugin for processing.
+	 * Otherwise only stanzas with selected types, assuming that
+	 * element names and name-spaces match as well.
+	 *
+	 *
+	 * @return a <code>StanzaType[]</code> array of supported stanza types.
+	 */
+	Set<StanzaType> supTypes();
+
 	//~--- get methods ----------------------------------------------------------
 
 	/**
@@ -221,7 +204,21 @@ public interface XMPPImplIfc
 	 * @param list is a statistics collection to which plugins own metrics can be added.
 	 */
 	void getStatistics(StatisticsList list);
+
+	/**
+	 * Method <code>isSupporting</code> takes element name and name-space for this
+	 * element and determines whether this element can be processed by this
+	 * plugin.
+	 *
+	 * @param elem
+	 *          a <code>String</code> value
+	 * @param ns
+	 *          a <code>String</code> value
+	 * @return a <code>boolean</code> value
+	 */
+	@Deprecated
+	boolean isSupporting(String elem, String ns);
 }    // XMPPImplIfc
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/08/28

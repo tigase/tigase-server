@@ -2,7 +2,7 @@
  * Privacy.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -141,6 +141,20 @@ public class Privacy {
 	 * Method description
 	 *
 	 *
+	 * @param list
+	 *
+	 *
+	 *
+	 * @return a value of String
+	 */
+	public static String listNode(final String list) {
+		return PRIVACY + "/" + list;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param session
 	 * @param list
 	 *
@@ -167,8 +181,10 @@ public class Privacy {
 	 *
 	 * @param session
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of Element
 	 * @throws NotAuthorizedException
 	 */
 	public static Element getActiveList(XMPPResourceConnection session)
@@ -182,8 +198,10 @@ public class Privacy {
 	 *
 	 * @param session
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of String
 	 * @throws NotAuthorizedException
 	 */
 	public static String getActiveListName(XMPPResourceConnection session)
@@ -203,8 +221,10 @@ public class Privacy {
 	 *
 	 * @param session
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of String
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
@@ -220,8 +240,10 @@ public class Privacy {
 	 * @param session
 	 * @param list
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of Element
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
@@ -235,13 +257,13 @@ public class Privacy {
 		String list_str = session.getData(lNode, PRIVACY_LIST, null);
 
 		if ((list_str != null) &&!list_str.isEmpty()) {
-			SimpleParser parser          = SingletonFactory.getParserInstance();
+			SimpleParser      parser     = SingletonFactory.getParserInstance();
 			DomBuilderHandler domHandler = new DomBuilderHandler();
 
 			parser.parse(domHandler, list_str.toCharArray(), 0, list_str.length());
 
-			Queue<Element> elems = domHandler.getParsedElements();
-			Element result       = elems.poll();
+			Queue<Element> elems  = domHandler.getParsedElements();
+			Element        result = elems.poll();
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Loaded privacy list: {0}", result);
@@ -260,33 +282,35 @@ public class Privacy {
 	 * @param session
 	 * @param list
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of Element
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
 	public static Element getListOld(XMPPResourceConnection session, String list)
 					throws NotAuthorizedException, TigaseDBException {
-		String lNode   = listNode(list);
+		String   lNode = listNode(list);
 		String[] items = session.getDataGroups(lNode);
 
 		if (items != null) {
 			Element eList = new Element(LIST, new String[] { NAME }, new String[] { list });
 
 			for (String item : items) {
-				String iNode     = lNode + "/" + item;
-				String type      = session.getData(iNode, TYPE, null);
-				String value     = session.getData(iNode, VALUE, null);
-				String action    = session.getData(iNode, ACTION, null);
+				String   iNode   = lNode + "/" + item;
+				String   type    = session.getData(iNode, TYPE, null);
+				String   value   = session.getData(iNode, VALUE, null);
+				String   action  = session.getData(iNode, ACTION, null);
 				String[] stanzas = session.getDataList(iNode, STANZAS);
 
 				if ((item == null) || (action == null)) {
 					continue;
 				}
 
-				Element eItem = new Element(ITEM, new String[] { ORDER, ACTION },
-																		new String[] { item,
-								action });
+				Element eItem = new Element(ITEM, new String[] { ORDER, ACTION }, new String[] {
+						item,
+						action });
 
 				if (type != null) {
 					eItem.addAttribute(TYPE, type);
@@ -314,28 +338,16 @@ public class Privacy {
 	 *
 	 * @param session
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of String[]
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
 	public static String[] getLists(XMPPResourceConnection session)
 					throws NotAuthorizedException, TigaseDBException {
 		return session.getDataGroups(PRIVACY);
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 *
-	 * @return
-	 */
-	public static String listNode(final String list) {
-		return PRIVACY + "/" + list;
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -364,8 +376,7 @@ public class Privacy {
 			if (list != null) {
 				session.putSessionData(ACTIVE, list);
 			} else {
-				log.log(
-						Level.INFO,
+				log.log(Level.INFO,
 						"Setting active list to null, do something better than that, perhaps notify user.");
 			}
 		}
@@ -426,4 +437,4 @@ public class Privacy {
 }    // Privacy
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/08/28

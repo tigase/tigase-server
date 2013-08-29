@@ -1,10 +1,13 @@
 /*
+ * RepoRosterTask.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.server.sreceiver;
 
@@ -39,12 +41,10 @@ import static tigase.server.sreceiver.TaskCommons.*;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.Map;
-import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Map;
+import java.util.Queue;
 
 /**
  * Describe class RepoRosterTask here.
@@ -55,17 +55,19 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class RepoRosterTask extends AbstractReceiverTask {
-	private static Logger log = Logger.getLogger("tigase.server.sreceiver.RepoRosterTask");
-	private static final String roster_node = "/roster";
-	private static final String subscribed_key = "subscribed";
-	private static final String owner_key = "owner";
-	private static final String admin_key = "admin";
+public abstract class RepoRosterTask
+				extends AbstractReceiverTask {
+	private static final String admin_key               = "admin";
+	private static Logger       log = Logger.getLogger(
+			"tigase.server.sreceiver.RepoRosterTask");
 	private static final String moderation_accepted_key = "moderation-accepted";
+	private static final String owner_key               = "owner";
+	private static final String roster_node             = "/roster";
+	private static final String subscribed_key          = "subscribed";
 
 	//~--- fields ---------------------------------------------------------------
 
-	private boolean loaded = false;
+	private boolean        loaded     = false;
 	private UserRepository repository = null;
 
 	//~--- methods --------------------------------------------------------------
@@ -76,7 +78,9 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of RosterItem
 	 */
 	@Override
 	public RosterItem addToRoster(JID jid) {
@@ -95,7 +99,6 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 	 */
 	public void destroy(Queue<Packet> results) {
 		super.destroy(results);
-
 		try {
 			repository.removeUser(getJID().getBareJID());
 		} catch (TigaseDBException e) {
@@ -133,7 +136,9 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of RosterItem
 	 */
 	@Override
 	public RosterItem removeFromRoster(JID jid) {
@@ -158,21 +163,18 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 		if (map.get(USER_REPOSITORY_PROP_KEY) != null) {
 			repository = (UserRepository) map.get(USER_REPOSITORY_PROP_KEY);
 		}
-
 		if ((repository != null) &&!loaded) {
 			try {
 				try {
 					repository.addUser(getJID().getBareJID());
 				} catch (UserExistsException e) {    /* Ignore, this is correct and expected */
 				}
-
 				loaded = true;
 				loadRoster();
 			} catch (TigaseDBException e) {
 				log.log(Level.SEVERE, "Problem loading roster from repository", e);
 			}                                      // end of try-catch
 		}                                        // end of if (repository != null && !loaded)
-
 		super.setParams(map);
 	}
 
@@ -223,8 +225,8 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 	@Override
 	public void setRosterItemSubscribed(RosterItem ri, boolean subscribed) {
 		super.setRosterItemSubscribed(ri, subscribed);
-		log.fine(getJID() + ": " + "Updating subscription for " + ri.getJid() + " to "
-				+ subscribed);
+		log.fine(getJID() + ": " + "Updating subscription for " + ri.getJid() + " to " +
+				subscribed);
 		saveToRepository(ri);
 	}
 
@@ -233,8 +235,8 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 	private RosterItem loadFromRepository(JID jid) {
 		log.info(getJID() + ": Loading roster item for: " + jid);
 
-		String repo_node = roster_node + "/" + jid;
-		RosterItem ri = new RosterItem(jid);
+		String     repo_node = roster_node + "/" + jid;
+		RosterItem ri        = new RosterItem(jid);
 
 		try {
 			String tmp = repository.getData(getJID().getBareJID(), repo_node, subscribed_key);
@@ -275,22 +277,18 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 
 			log.info(getJID() + ": " + ri.getJid() + ": subscribed = " + tmp);
 			repository.setData(getJID().getBareJID(), repo_node, subscribed_key, tmp);
-			repository.setData(getJID().getBareJID(), repo_node, owner_key,
-					Boolean.valueOf(ri.isOwner()).toString());
-			repository.setData(getJID().getBareJID(), repo_node, admin_key,
-					Boolean.valueOf(ri.isAdmin()).toString());
+			repository.setData(getJID().getBareJID(), repo_node, owner_key, Boolean.valueOf(ri
+					.isOwner()).toString());
+			repository.setData(getJID().getBareJID(), repo_node, admin_key, Boolean.valueOf(ri
+					.isAdmin()).toString());
 			repository.setData(getJID().getBareJID(), repo_node, moderation_accepted_key,
 					Boolean.valueOf(ri.isModerationAccepted()).toString());
 		} catch (TigaseDBException e) {
-			log.log(Level.SEVERE,
-					"Problem saving roster data for: " + "JID = " + getJID() + ", node = " + repo_node
-						+ ", RosterItem = " + ri.getJid(), e);
+			log.log(Level.SEVERE, "Problem saving roster data for: " + "JID = " + getJID() +
+					", node = " + repo_node + ", RosterItem = " + ri.getJid(), e);
 		}    // end of try-catch
 	}
 }    // RepoRosterTask
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/28

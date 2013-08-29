@@ -72,7 +72,8 @@ public class ConnectionRecord
 	 *
 	 * @param rec
 	 *
-	 * @return
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int compareTo(ConnectionRecord rec) {
@@ -85,7 +86,8 @@ public class ConnectionRecord
 	 *
 	 * @param rec
 	 *
-	 * @return
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean equals(Object rec) {
@@ -102,7 +104,8 @@ public class ConnectionRecord
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int hashCode() {
@@ -113,7 +116,8 @@ public class ConnectionRecord
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 * @return a value of <code>Element</code>
 	 */
 	@Override
 	public Element toElement() {
@@ -131,7 +135,8 @@ public class ConnectionRecord
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String toString() {
@@ -214,4 +219,4 @@ public class ConnectionRecord
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/08/29

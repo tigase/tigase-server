@@ -2,7 +2,7 @@
  * CompRepoItem.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -115,14 +115,14 @@ public class CompRepoItem
 	private String auth_pass = null;
 
 	// "accept:muc.domain.tld:5277:user:passwd"
-	private String domain       = null;
-	private int port            = -1;
-	private String prop_xmlns   = null;
-	private String remoteHost   = null;
-	private String[] routings   = null;
-	private ConnectionType type = ConnectionType.accept;
-	private String xmlns        = null;
-	private LoadBalancerIfc lb  = DEF_LB_CLASS;
+	private String          domain     = null;
+	private int             port       = -1;
+	private String          prop_xmlns = null;
+	private String          remoteHost = null;
+	private String[]        routings   = null;
+	private ConnectionType  type       = ConnectionType.accept;
+	private String          xmlns      = null;
+	private LoadBalancerIfc lb         = DEF_LB_CLASS;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -137,143 +137,35 @@ public class CompRepoItem
 	@Override
 	public void addCommandFields(Packet packet) {
 		Command.addFieldValue(packet, DOMAIN_NAME_LABEL, ((domain != null)
-						? domain
-						: ""));
+				? domain
+				: ""));
 		Command.addFieldValue(packet, DOMAIN_PASS_LABEL, ((auth_pass != null)
-						? auth_pass
-						: ""));
+				? auth_pass
+				: ""));
 
 		String[] types = new String[ConnectionType.values().length];
-		int i          = 0;
+		int      i     = 0;
 
 		for (ConnectionType t : ConnectionType.values()) {
 			types[i++] = t.name();
 		}
 		Command.addFieldValue(packet, CONNECTION_TYPE_LABEL, type.name(),
-													CONNECTION_TYPE_LABEL, types, types);
+				CONNECTION_TYPE_LABEL, types, types);
 		Command.addFieldValue(packet, PORT_NO_LABEL, ((port > 0)
-						? "" + port
-						: ""));
+				? "" + port
+				: ""));
 		Command.addFieldValue(packet, REMOTE_HOST_LABEL, ((remoteHost != null)
-						? remoteHost
-						: ""));
+				? remoteHost
+				: ""));
 		Command.addFieldValue(packet, PROTO_XMLNS_LABEL, ((prop_xmlns != null)
-						? prop_xmlns
-						: ""));
+				? prop_xmlns
+				: ""));
 		Command.addFieldValue(packet, LB_CLASS_LABEL, ((lb != null)
-						? lb.getClass().getName()
-						: ""));
+				? lb.getClass().getName()
+				: ""));
 		Command.addFieldValue(packet, ROUTINGS_LABEL, "");
 		super.addCommandFields(packet);
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public String getAuthPasswd() {
-		return auth_pass;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public ConnectionType getConnectionType() {
-		return type;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public LoadBalancerIfc getLoadBalancer() {
-		return lb;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public String getDomain() {
-		return domain;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getElemName() {
-		return REPO_ITEM_ELEM_NAME;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getKey() {
-		return domain;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public int getPort() {
-		return port;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public String getRemoteHost() {
-		return remoteHost;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public String[] getRoutings() {
-		return routings;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public String getXMLNS() {
-		return xmlns;
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	// ~--- methods --------------------------------------------------------------
 
@@ -319,48 +211,6 @@ public class CompRepoItem
 	}
 
 	/**
-	 * @param tmp
-	 * @return
-	 */
-	private LoadBalancerIfc lbInstance(String cls_name) {
-		String class_name = cls_name;
-
-//  if (!class_name.endsWith(".class")) {
-//    class_name = class_name + ".class";
-//  }
-		log.log(Level.INFO, "Activating load-balancer for domain: {0}, class: {1}",
-						new Object[] { domain,
-													 class_name });
-
-		LoadBalancerIfc result = null;
-
-		try {
-			result = (LoadBalancerIfc) Class.forName(class_name).newInstance();
-		} catch (Exception ex1) {
-			class_name = "tigase.server.ext.lb." + class_name;
-			log.log(Level.INFO, "Cannot active load balancer for class: {0}, trying: {1}",
-							new Object[] { cls_name,
-														 class_name });
-			try {
-				result = (LoadBalancerIfc) Class.forName(class_name).newInstance();
-			} catch (Exception ex2) {
-				log.log(
-						Level.WARNING,
-						"Cannot active load balancer for class:" +
-						" {0}, or: {1}, errors: {2} or {3}, using default LB: {4}", new Object[] {
-							cls_name,
-							class_name, ex1, ex2, DEF_LB_CLASS.getClass().getName() });
-				result = DEF_LB_CLASS;
-			}
-		}
-		log.log(Level.INFO, "Activated load-balancer for domain: {0}, class: {1}",
-						new Object[] { domain,
-													 result.getClass().getName() });
-
-		return result;
-	}
-
-	/**
 	 * Method description
 	 *
 	 *
@@ -370,7 +220,7 @@ public class CompRepoItem
 	public void initFromElement(Element elem) {
 		if (elem.getName() != REPO_ITEM_ELEM_NAME) {
 			throw new IllegalArgumentException("Incorrect element name, expected: " +
-																				 REPO_ITEM_ELEM_NAME);
+					REPO_ITEM_ELEM_NAME);
 		}
 		super.initFromElement(elem);
 		setDomain(elem.getAttributeStaticStr(DOMAIN_ATTR));
@@ -433,30 +283,15 @@ public class CompRepoItem
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	// ~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 */
-	public void setDomain(String domain) {
-		this.domain = domain;
-		routings    = new String[] { domain, ".*@" + domain, ".*\\." + domain };
-	}
-
-	//~--- methods --------------------------------------------------------------
-
 	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Element</code>
 	 */
 	@Override
 	public Element toElement() {
@@ -491,26 +326,169 @@ public class CompRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String toPropertyString() {
 		return domain + ":" + auth_pass + ":" + type.name() + ":" + port + ":" + remoteHost +
-					 ":" + prop_xmlns + ":" + lb.getClass().getName();
+				":" + prop_xmlns + ":" + lb.getClass().getName();
 	}
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String toString() {
 		return toPropertyString();
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
+	// ~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	public String getAuthPasswd() {
+		return auth_pass;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>ConnectionType</code>
+	 */
+	public ConnectionType getConnectionType() {
+		return type;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	public String getDomain() {
+		return domain;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getElemName() {
+		return REPO_ITEM_ELEM_NAME;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getKey() {
+		return domain;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>LoadBalancerIfc</code>
+	 */
+	public LoadBalancerIfc getLoadBalancer() {
+		return lb;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>int</code>
+	 */
+	public int getPort() {
+		return port;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	public String getRemoteHost() {
+		return remoteHost;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
+	 */
+	public String[] getRoutings() {
+		return routings;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	public String getXMLNS() {
+		return xmlns;
+	}
+
 	//~--- set methods ----------------------------------------------------------
+
+	// ~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param domain
+	 */
+	public void setDomain(String domain) {
+		this.domain = domain;
+		routings    = new String[] { domain, ".*@" + domain, ".*\\." + domain };
+	}
 
 	// ~--- set methods ----------------------------------------------------------
 
@@ -567,6 +545,46 @@ public class CompRepoItem
 
 	//~--- methods --------------------------------------------------------------
 
+	/**
+	 * @param tmp
+	 *
+	 */
+	private LoadBalancerIfc lbInstance(String cls_name) {
+		String class_name = cls_name;
+
+//  if (!class_name.endsWith(".class")) {
+//    class_name = class_name + ".class";
+//  }
+		log.log(Level.INFO, "Activating load-balancer for domain: {0}, class: {1}",
+				new Object[] { domain,
+				class_name });
+
+		LoadBalancerIfc result = null;
+
+		try {
+			result = (LoadBalancerIfc) Class.forName(class_name).newInstance();
+		} catch (Exception ex1) {
+			class_name = "tigase.server.ext.lb." + class_name;
+			log.log(Level.INFO, "Cannot active load balancer for class: {0}, trying: {1}",
+					new Object[] { cls_name,
+					class_name });
+			try {
+				result = (LoadBalancerIfc) Class.forName(class_name).newInstance();
+			} catch (Exception ex2) {
+				log.log(Level.WARNING, "Cannot active load balancer for class:" +
+						" {0}, or: {1}, errors: {2} or {3}, using default LB: {4}", new Object[] {
+						cls_name,
+						class_name, ex1, ex2, DEF_LB_CLASS.getClass().getName() });
+				result = DEF_LB_CLASS;
+			}
+		}
+		log.log(Level.INFO, "Activated load-balancer for domain: {0}, class: {1}",
+				new Object[] { domain,
+				result.getClass().getName() });
+
+		return result;
+	}
+
 	// ~--- methods --------------------------------------------------------------
 	private ConnectionType parseConnectionType(String input) {
 		ConnectionType result = ConnectionType.accept;
@@ -618,4 +636,4 @@ public class CompRepoItem
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/08/28

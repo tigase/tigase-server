@@ -277,7 +277,9 @@ public class ConnectionOpenThread
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>ConnectionOpenThread</code>
 	 */
 	public static ConnectionOpenThread getInstance() {
 
@@ -463,4 +465,4 @@ public class ConnectionOpenThread
 }    // ConnectionOpenThread
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/08/28

@@ -92,13 +92,13 @@ public class ConfigItem
 
 	//~--- fields ---------------------------------------------------------------
 
-	private String clusterNode        = null;
-	private String compName           = null;
-	private String keyName            = null;
-	private long lastModificationTime = -1;
-	private String nodeName           = null;
-	private Object value              = null;
-	private FLAGS flag                = FLAGS.DEFAULT;
+	private String clusterNode          = null;
+	private String compName             = null;
+	private String keyName              = null;
+	private long   lastModificationTime = -1;
+	private String nodeName             = null;
+	private Object value                = null;
+	private FLAGS  flag                 = FLAGS.DEFAULT;
 
 	//~--- constant enums -------------------------------------------------------
 
@@ -128,8 +128,8 @@ public class ConfigItem
 			Command.addTextField(packet, NODE_NAME_LABEL, nodeName);
 		}
 		Command.addTextField(packet, KEY_NAME_LABEL, ((keyName != null)
-						? keyName
-						: ""));
+				? keyName
+				: ""));
 		Command.addTextField(packet, "    ", "    ");
 
 		String value_label = VALUE_LABEL;
@@ -143,122 +143,37 @@ public class ConfigItem
 		super.addCommandFields(packet);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
-	 */
-	public String getClusterNode() {
-		return clusterNode;
-	}
-
-	/**
-	 * Method description
+	 * @param o
 	 *
 	 *
-	 * @return
-	 */
-	public String getCompName() {
-		return compName;
-	}
-
-	/**
-	 * Returns a configuration property key which is constructed in a following
-	 * way: <code>
-	 * nodeName + "/" + keyName
-	 * </code>
 	 *
-	 * @return
-	 */
-	public String getConfigKey() {
-		return ((nodeName != null)
-						? nodeName + "/"
-						: "") + keyName;
-	}
-
-	/**
-	 * Returns a configuration property value.
-	 *
-	 * @return
-	 */
-	public Object getConfigVal() {
-		return value;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public String getConfigValToString() {
-		return (value == null)
-					 ? null
-					 : DataTypes.valueToString(value);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
-	public String getElemName() {
-		return REPO_ITEM_ELEM_NAME;
+	public boolean equals(Object o) {
+		if (o instanceof ConfigItem) {
+			return getKey().equals(((ConfigItem) o).getKey());
+		}
+
+		return false;
 	}
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
-	 */
-	public FLAGS getFlag() {
-		return flag;
-	}
-
-	/**
-	 * Returns ConfigItem key which is constructed in a following way: <code>
-	 * compName + "/" + nodeName + "/" + keyName
-	 * </code>
 	 *
-	 * @return
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
-	public String getKey() {
-		return ((compName != null)
-						? compName + "/"
-						: "") + ((nodeName != null)
-										 ? nodeName + "/"
-										 : "") + keyName;
+	public int hashCode() {
+		return getKey().hashCode();
 	}
-
-	/**
-	 * Returns a property key which is constructed in a following way: <code>
-	 * keyName
-	 * </code>
-	 *
-	 * @return
-	 */
-	public String getKeyName() {
-		return keyName;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public String getNodeName() {
-		return nodeName;
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -285,7 +200,7 @@ public class ConfigItem
 		}
 
 		String value_label = Command.getFieldKeyStartingWith(packet, VALUE_LABEL);
-		char t             = DataTypes.decodeTypeIdFromName(value_label);
+		char   t           = DataTypes.decodeTypeIdFromName(value_label);
 
 		tmp = Command.getFieldValue(packet, value_label);
 		if ((tmp != null) &&!tmp.isEmpty()) {
@@ -312,8 +227,8 @@ public class ConfigItem
 	 */
 	@Override
 	public void initFromPropertyString(String propString) {
-		int idx_eq    = propString.indexOf('=');
-		String[] prop = propString.split("=");
+		int      idx_eq = propString.indexOf('=');
+		String[] prop   = propString.split("=");
 
 		// String key = prop[0].trim();
 		// Object val = prop[1];
@@ -331,7 +246,7 @@ public class ConfigItem
 
 		if (idx1 > 0) {
 			String compNameMeth = key.substring(0, idx1);
-			int idx2            = key.lastIndexOf("/");
+			int    idx2         = key.lastIndexOf("/");
 			String nodeNameMeth = null;
 			String keyNameMeth  = key.substring(idx2 + 1);
 
@@ -341,11 +256,219 @@ public class ConfigItem
 			set(compNameMeth, nodeNameMeth, keyNameMeth, val);
 		} else {
 			throw new IllegalArgumentException("You have to provide a key with at least" +
-																				 " 'component_name/key_name': " + key);
+					" 'component_name/key_name': " + key);
 		}
 	}
 
+	// public static final String REPO_ITEM_ELEM_NAME = "prop";
+	// public static final String CLUSTER_NODE_ATTR = "cluster-node";
+	// public static final String COMPONENT_NAME_ATTR = "comp-name";
+	// public static final String NODE_NAME_ATTR = "node-name";
+	// public static final String KEY_NAME_ATTR = "key-name";
+	// public static final String VALUE_ATTR = "value";
+	// public static final String FLAG_ATTR = "flag";
+	// public static final String VALUE_TYPE_ATTR = "value-type";
+	//
+	// private String clusterNode = null;
+	// private String compName = null;
+	// private String nodeName = null;
+	// private String keyName = null;
+	// private Object value = null;
+	// private FLAGS flag = FLAGS.DEFAULT;
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>Element</code>
+	 */
+	@Override
+	public Element toElement() {
+		Element elem = super.toElement();
+
+		if (clusterNode != null) {
+			elem.addAttribute(CLUSTER_NODE_ATTR, clusterNode);
+		}
+		elem.addAttribute(COMPONENT_NAME_ATTR, compName);
+		if (nodeName != null) {
+			elem.addAttribute(NODE_NAME_ATTR, nodeName);
+		}
+		elem.addAttribute(KEY_NAME_ATTR, keyName);
+		elem.addAttribute(VALUE_ATTR, DataTypes.valueToString(value));
+		elem.addAttribute(VALUE_TYPE_ATTR, "" + DataTypes.getTypeId(value));
+		elem.addAttribute(FLAG_ATTR, flag.name());
+
+		return elem;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String toPropertyString() {
+		char   t      = DataTypes.getTypeId(value);
+		String result = getKey() + "[" + t + "]=";
+		String varr   = DataTypes.valueToString(value);
+
+		result += varr;
+
+		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String toString() {
+		return getKey() + "=" + value;
+	}
+
 	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	public String getClusterNode() {
+		return clusterNode;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	public String getCompName() {
+		return compName;
+	}
+
+	/**
+	 * Returns a configuration property key which is constructed in a following
+	 * way: <code>
+	 * nodeName + "/" + keyName
+	 * </code>
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	public String getConfigKey() {
+		return ((nodeName != null)
+				? nodeName + "/"
+				: "") + keyName;
+	}
+
+	/**
+	 * Returns a configuration property value.
+	 *
+	 *
+	 *
+	 * @return a value of <code>Object</code>
+	 */
+	public Object getConfigVal() {
+		return value;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	public String getConfigValToString() {
+		return (value == null)
+				? null
+				: DataTypes.valueToString(value);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getElemName() {
+		return REPO_ITEM_ELEM_NAME;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>FLAGS</code>
+	 */
+	public FLAGS getFlag() {
+		return flag;
+	}
+
+	/**
+	 * Returns ConfigItem key which is constructed in a following way: <code>
+	 * compName + "/" + nodeName + "/" + keyName
+	 * </code>
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getKey() {
+		return ((compName != null)
+				? compName + "/"
+				: "") + ((nodeName != null)
+				? nodeName + "/"
+				: "") + keyName;
+	}
+
+	/**
+	 * Returns a property key which is constructed in a following way: <code>
+	 * keyName
+	 * </code>
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	public String getKeyName() {
+		return keyName;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	public String getNodeName() {
+		return nodeName;
+	}
 
 	/**
 	 * Method description
@@ -355,55 +478,27 @@ public class ConfigItem
 	 * @param node
 	 * @param key
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean isCompNodeKey(String comp, String node, String key) {
 		return isComponent(comp) && isNode(node) && isKey(key);
 	}
 
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param o
-	 *
-	 * @return
-	 */
-	@Override
-	public boolean equals(Object o) {
-		if (o instanceof ConfigItem) {
-			return getKey().equals(((ConfigItem) o).getKey());
-		}
-
-		return false;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public int hashCode() {
-		return getKey().hashCode();
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Checks if the given component name is equal to this item compName.
 	 *
 	 * @param comp
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean isComponent(String comp) {
 		if (compName != comp) {
 			return (compName != null)
-						 ? compName.equals(comp)
-						 : false;
+					? compName.equals(comp)
+					: false;
 		}
 
 		return true;
@@ -413,13 +508,15 @@ public class ConfigItem
 	 * Checks if the given key is equal to this item keyName.
 	 *
 	 * @param key
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean isKey(String key) {
 		if (keyName != key) {
 			return (keyName != null)
-						 ? keyName.equals(key)
-						 : false;
+					? keyName.equals(key)
+					: false;
 		}
 
 		return true;
@@ -429,15 +526,17 @@ public class ConfigItem
 	 * Checks if the given node is equal to this item nodeName
 	 *
 	 * @param node
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean isNode(String node) {
 		if (nodeName != node) {
 
 			// At least one is not null
 			return (nodeName != null)
-						 ? nodeName.equals(node)
-						 : false;
+					? nodeName.equals(node)
+					: false;
 		}
 
 		return true;
@@ -451,7 +550,9 @@ public class ConfigItem
 	 *
 	 * @param node
 	 * @param key
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean isNodeKey(String node, String key) {
 		return isNode(node) && isKey(key);
@@ -472,9 +573,9 @@ public class ConfigItem
 	 * @param flag_str_m
 	 */
 	public void set(String clusterNode_m, String compName_m, String nodeName_m,
-									String key_m, String value_str_m, char val_type_m, String flag_str_m) {
+			String key_m, String value_str_m, char val_type_m, String flag_str_m) {
 		Object value_m = DataTypes.decodeValueType(val_type_m, value_str_m);
-		FLAGS flag_m   = FLAGS.DEFAULT;
+		FLAGS  flag_m  = FLAGS.DEFAULT;
 
 		try {
 			flag_m = FLAGS.valueOf(flag_str_m);
@@ -497,7 +598,7 @@ public class ConfigItem
 	 * @param flag_m
 	 */
 	public void set(String clusterNode_m, String compName_m, String nodeName_m,
-									String key_m, Object value_m, FLAGS flag_m) {
+			String key_m, Object value_m, FLAGS flag_m) {
 		if (clusterNode_m != null) {
 			this.clusterNode = clusterNode_m;
 		}
@@ -531,7 +632,7 @@ public class ConfigItem
 	 * @param flag_str_m
 	 */
 	public void set(String compName_m, String nodeName_m, String key_m, String value_str_m,
-									char val_type_m, String flag_str_m) {
+			char val_type_m, String flag_str_m) {
 		set(null, compName_m, nodeName_m, key_m, value_str_m, val_type_m, flag_str_m);
 	}
 
@@ -559,7 +660,7 @@ public class ConfigItem
 	 * @param value
 	 */
 	public void set(String clusterNode, String compName, String nodeName, String key,
-									Object value) {
+			Object value) {
 		set(clusterNode, compName, nodeName, key, value, null);
 	}
 
@@ -573,8 +674,8 @@ public class ConfigItem
 	 * @param value
 	 */
 	public void setNodeKey(String clusterNode, String compName, String nodeKey,
-												 Object value) {
-		int key_idx        = nodeKey.lastIndexOf("/");
+			Object value) {
+		int    key_idx     = nodeKey.lastIndexOf("/");
 		String method_key  = nodeKey;
 		String method_node = null;
 
@@ -584,78 +685,7 @@ public class ConfigItem
 		}
 		set(clusterNode, compName, method_node, method_key, value);
 	}
-
-	//~--- methods --------------------------------------------------------------
-
-	// public static final String REPO_ITEM_ELEM_NAME = "prop";
-	// public static final String CLUSTER_NODE_ATTR = "cluster-node";
-	// public static final String COMPONENT_NAME_ATTR = "comp-name";
-	// public static final String NODE_NAME_ATTR = "node-name";
-	// public static final String KEY_NAME_ATTR = "key-name";
-	// public static final String VALUE_ATTR = "value";
-	// public static final String FLAG_ATTR = "flag";
-	// public static final String VALUE_TYPE_ATTR = "value-type";
-	//
-	// private String clusterNode = null;
-	// private String compName = null;
-	// private String nodeName = null;
-	// private String keyName = null;
-	// private Object value = null;
-	// private FLAGS flag = FLAGS.DEFAULT;
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public Element toElement() {
-		Element elem = super.toElement();
-
-		if (clusterNode != null) {
-			elem.addAttribute(CLUSTER_NODE_ATTR, clusterNode);
-		}
-		elem.addAttribute(COMPONENT_NAME_ATTR, compName);
-		if (nodeName != null) {
-			elem.addAttribute(NODE_NAME_ATTR, nodeName);
-		}
-		elem.addAttribute(KEY_NAME_ATTR, keyName);
-		elem.addAttribute(VALUE_ATTR, DataTypes.valueToString(value));
-		elem.addAttribute(VALUE_TYPE_ATTR, "" + DataTypes.getTypeId(value));
-		elem.addAttribute(FLAG_ATTR, flag.name());
-
-		return elem;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String toPropertyString() {
-		char t        = DataTypes.getTypeId(value);
-		String result = getKey() + "[" + t + "]=";
-		String varr   = DataTypes.valueToString(value);
-
-		result += varr;
-
-		return result;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String toString() {
-		return getKey() + "=" + value;
-	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/25
+//~ Formatted in Tigase Code Convention on 13/08/29

@@ -2,7 +2,7 @@
  * ExpireAt.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -58,21 +58,8 @@ public class ExpireAt
 
 	//~--- fields ---------------------------------------------------------------
 
-	private final SimpleDateFormat formatter =
-		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getName() {
-		return NAME;
-	}
+	private final SimpleDateFormat formatter = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
 	//~--- methods --------------------------------------------------------------
 
@@ -84,7 +71,9 @@ public class ExpireAt
 	 * @param packet
 	 * @param rule
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean match(Packet packet, Element rule) {
@@ -108,7 +97,22 @@ public class ExpireAt
 
 		return false;
 	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getName() {
+		return NAME;
+	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/08/28

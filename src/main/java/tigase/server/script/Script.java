@@ -1,10 +1,13 @@
 /*
+ * Script.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.server.script;
 
@@ -33,9 +35,9 @@ import tigase.server.Packet;
 import java.io.StringWriter;
 
 import java.util.Arrays;
-import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Queue;
 
 import javax.script.Bindings;
 import javax.script.Compilable;
@@ -45,57 +47,23 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-//~--- classes ----------------------------------------------------------------
-
 /**
  * Created: Jan 2, 2009 1:21:55 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class Script extends AbstractScriptCommand {
+public class Script
+				extends AbstractScriptCommand {
 	private static final Logger log = Logger.getLogger(Script.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
 	private CompiledScript compiledScript = null;
-	private String ext = null;
-	private String language = null;
-	private String script = null;
-	private ScriptEngine scriptEngine = null;
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public Bindings getBindings() {
-		return scriptEngine.createBindings();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public String getFileExtension() {
-		return ext;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public String getLanguageName() {
-		return language;
-	}
+	private String         ext            = null;
+	private String         language       = null;
+	private String         script         = null;
+	private ScriptEngine   scriptEngine   = null;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -114,36 +82,31 @@ public class Script extends AbstractScriptCommand {
 	 */
 	public void init(String id, String description, String script, String lang, String ext,
 			Bindings binds)
-			throws ScriptException {
+					throws ScriptException {
 		super.init(id, description);
-		this.script = script;
+		this.script   = script;
 		this.language = lang;
-		this.ext = ext;
+		this.ext      = ext;
 
 		ScriptEngineManager scriptEngineManager = (ScriptEngineManager) binds.get(SCRI_MANA);
 
 		if (language != null) {
 			scriptEngine = scriptEngineManager.getEngineByName(language);
 		}
-
 		if (ext != null) {
 			scriptEngine = scriptEngineManager.getEngineByExtension(ext);
 		}
-
-		if ( !Packet.FULL_DEBUG && (scriptEngine instanceof Compilable)) {
+		if (!Packet.FULL_DEBUG && (scriptEngine instanceof Compilable)) {
 			compiledScript = ((Compilable) scriptEngine).compile(script);
 		}
-
 		if (this.language == null) {
 			this.language = scriptEngine.getFactory().getLanguageName();
 		}
-
 		if (this.ext == null) {
 			this.ext = scriptEngine.getFactory().getExtensions().get(0);
 		}
-
-		log.log(Level.INFO, "Initialized script command, lang: {0}, ext: {1}",
-				new Object[] { this.language,
+		log.log(Level.INFO, "Initialized script command, lang: {0}, ext: {1}", new Object[] {
+				this.language,
 				this.ext });
 
 		// ", script text: \n" + this.script);
@@ -161,7 +124,7 @@ public class Script extends AbstractScriptCommand {
 	@SuppressWarnings({ "unchecked" })
 	public void runCommand(Iq packet, Bindings binds, Queue<Packet> results) {
 		ScriptContext context = null;
-		StringWriter writer = null;
+		StringWriter  writer  = null;
 
 		try {
 
@@ -177,23 +140,19 @@ public class Script extends AbstractScriptCommand {
 			context.setBindings(binds, ScriptContext.ENGINE_SCOPE);
 			writer = new StringWriter();
 			context.setErrorWriter(writer);
-
 			if (compiledScript != null) {
 				res = compiledScript.eval(context);
 			} else {
 				res = scriptEngine.eval(script, context);
 			}
-
 			if (res == null) {
 
 				// Yes, Python doesn't return results normally
 				// (or I don't know how to do it)
 				// Python can either return a Packet as 'packet' or string as 'result'
 				res = binds.get("result");
-
 				if (res.toString().isEmpty()) {
 					res = binds.get(PACKET);
-
 					if (res == packet) {
 
 						// Ups, apparently the script returned no results, to avoid infinite loop
@@ -202,7 +161,6 @@ public class Script extends AbstractScriptCommand {
 					}
 				}
 			}
-
 			if (res instanceof Packet) {
 				results.offer((Packet) res);
 			} else {
@@ -219,7 +177,6 @@ public class Script extends AbstractScriptCommand {
 					} else {
 						text = new String[] { "Script returned no results." };
 					}
-
 					Command.addFieldMultiValue(result, SCRIPT_RESULT, Arrays.asList(text));
 					results.offer(result);
 				}
@@ -229,17 +186,16 @@ public class Script extends AbstractScriptCommand {
 
 			Command.addTextField(result, "Note", "Script execution error.");
 
-			StackTraceElement[] ste = e.getStackTrace();
-			String[] error =
-				new String[ste.length + 2 + ((writer != null) ? writer.toString().split("\n").length : 0)];
+			StackTraceElement[] ste   = e.getStackTrace();
+			String[]            error = new String[ste.length + 2 + ((writer != null)
+					? writer.toString().split("\n").length
+					: 0)];
 
 			error[0] = e.getMessage();
 			error[1] = e.toString();
-
 			for (int i = 0; i < ste.length; i++) {
 				error[i + 2] = ste[i].toString();
 			}
-
 			if (writer != null) {
 				String[] errorMsgs = writer.toString().split("\n");
 
@@ -247,19 +203,53 @@ public class Script extends AbstractScriptCommand {
 					error[i + 2 + ste.length] = errorMsgs[i];
 				}
 			}
-
 			if (e.getMessage() != null) {
 				Command.addTextField(result, "Error message", e.getMessage());
 			}
-
 			Command.addFieldMultiValue(result, "Debug info", Arrays.asList(error));
 			results.offer(result);
 		}
 	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>Bindings</code>
+	 */
+	@Override
+	public Bindings getBindings() {
+		return scriptEngine.createBindings();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	public String getFileExtension() {
+		return ext;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	public String getLanguageName() {
+		return language;
+	}
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/28

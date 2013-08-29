@@ -1,10 +1,13 @@
 /*
- *   Tigase Jabber/XMPP Server
- *  Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * DBUtils.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.util;
 
@@ -30,8 +32,6 @@ import tigase.db.RepositoryFactory;
 
 import java.util.Map;
 
-//~--- classes ----------------------------------------------------------------
-
 /**
  * Describe class DBUtils here.
  *
@@ -42,7 +42,6 @@ import java.util.Map;
  * @version $Rev$
  */
 public abstract class DBUtils {
-
 	/**
 	 * Method description
 	 *
@@ -51,34 +50,35 @@ public abstract class DBUtils {
 	 * @param primaryKey
 	 * @param secondaryKey
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[]
 	 */
 	public static String[] decodeDBParams(final Map<String, Object> params,
 			final String primaryKey, final String secondaryKey) {
 		String repo_class = null;
-		String repo_url = null;
-		String repo = (String) params.get(primaryKey);
+		String repo_url   = null;
+		String repo       = (String) params.get(primaryKey);
 
 		if ((repo == null) && (secondaryKey != null)) {
 			repo = (String) params.get(secondaryKey);
 		}
-
 		if (repo != null) {
 			if (repo.equals("mysql")) {
 				repo_class = RepositoryFactory.MYSQL_REPO_CLASS_PROP_VAL;
-				repo_url = RepositoryFactory.MYSQL_REPO_URL_PROP_VAL;
+				repo_url   = RepositoryFactory.MYSQL_REPO_URL_PROP_VAL;
 			} else {
 				if (repo.equals("pgsql")) {
 					repo_class = RepositoryFactory.PGSQL_REPO_CLASS_PROP_VAL;
-					repo_url = RepositoryFactory.PGSQL_REPO_URL_PROP_VAL;
+					repo_url   = RepositoryFactory.PGSQL_REPO_URL_PROP_VAL;
 				} else {
 					if (repo.equals("drupal")) {
 						repo_class = RepositoryFactory.DRUPALWP_REPO_CLASS_PROP_VAL;
-						repo_url = RepositoryFactory.DRUPAL_REPO_URL_PROP_VAL;
+						repo_url   = RepositoryFactory.DRUPAL_REPO_URL_PROP_VAL;
 					} else {
 						if (repo.equals("libresource")) {
 							repo_class = RepositoryFactory.LIBRESOURCE_REPO_CLASS_PROP_VAL;
-							repo_url = RepositoryFactory.LIBRESOURCE_REPO_URL_PROP_VAL;
+							repo_url   = RepositoryFactory.LIBRESOURCE_REPO_URL_PROP_VAL;
 						} else {
 							repo_class = repo;
 						}
@@ -92,7 +92,4 @@ public abstract class DBUtils {
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/28

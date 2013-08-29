@@ -244,7 +244,9 @@ public abstract class IOService<RefObject>
 	 * <code>run</code> is used to perform
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>IOService<?></code>
 	 * @throws IOException
 	 */
 	@Override
@@ -278,7 +280,9 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>ConnectionType</code>
 	 */
 	public ConnectionType connectionType() {
 		return this.connectionType;
@@ -345,7 +349,8 @@ public abstract class IOService<RefObject>
 			log.log(Level.FINEST, "{0}, TLS handshake completed: {1}", new Object[] { this,
 					certCheckResult });
 		}
-		if (!wrapper.getTlsEngine().getUseClientMode() && wrapper.getTlsEngine().getWantClientAuth()) {
+		if (!wrapper.getTlsEngine().getUseClientMode() && wrapper.getTlsEngine()
+				.getWantClientAuth()) {
 			try {
 				Certificate[] certs    = wrapper.getTlsEngine().getSession()
 						.getPeerCertificates();
@@ -377,6 +382,7 @@ public abstract class IOService<RefObject>
 	 *
 	 *
 	 * @param clientMode
+	 * @param wantClientAuth is a <code>boolean</code>
 	 *
 	 * @throws IOException
 	 */
@@ -400,6 +406,7 @@ public abstract class IOService<RefObject>
 	 *
 	 *
 	 * @param clientMode
+	 * @param wantClientAuth is a <code>boolean</code>
 	 *
 	 * @throws IOException
 	 */
@@ -476,7 +483,9 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String toString() {
@@ -487,7 +496,9 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean waitingToRead() {
 		return true;
@@ -497,7 +508,9 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean waitingToSend() {
 		return socketIO.waitingToSend();
@@ -507,7 +520,9 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	public int waitingToSendSize() {
 		return socketIO.waitingToSendSize();
@@ -521,7 +536,9 @@ public abstract class IOService<RefObject>
 	 *
 	 * @param reset
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>long</code>
 	 */
 	public long getBuffOverflow(boolean reset) {
 		return socketIO.getBuffOverflow(reset);
@@ -533,7 +550,9 @@ public abstract class IOService<RefObject>
 	 *
 	 * @param reset
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>long</code>
 	 */
 	public long getBytesReceived(boolean reset) {
 		return socketIO.getBytesReceived(reset);
@@ -545,14 +564,18 @@ public abstract class IOService<RefObject>
 	 *
 	 * @param reset
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>long</code>
 	 */
 	public long getBytesSent(boolean reset) {
 		return socketIO.getBytesSent(reset);
 	}
 
 	/**
-	 * @return the connectionId
+	 *  the connectionId
+	 *
+	 * @return a value of <code>JID</code>
 	 */
 	public JID getConnectionId() {
 		return connectionId;
@@ -562,7 +585,9 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>JID</code>
 	 */
 	public JID getDataReceiver() {
 		return this.dataReceiver;
@@ -572,7 +597,9 @@ public abstract class IOService<RefObject>
 	 * This method returns the time of last transfer in any direction
 	 * through this service. It is used to help detect dead connections.
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>long</code>
 	 */
 	public long getLastTransferTime() {
 		return lastTransferTime;
@@ -582,7 +609,9 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String getLocalAddress() {
 		return local_address;
@@ -592,7 +621,9 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>List<String></code>
 	 */
 	public List<String> getPeersJIDsFromCert() {
 		return peersJIDsFromCert;
@@ -602,7 +633,9 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>long[]</code>
 	 */
 	public long[] getReadCounters() {
 		return rdData;
@@ -612,7 +645,9 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>RefObject</code>
 	 */
 	public RefObject getRefObject() {
 		return refObject;
@@ -622,7 +657,9 @@ public abstract class IOService<RefObject>
 	 * Returns a remote IP address for the TCP/IP connection.
 	 *
 	 *
-	 * @return a remote IP address for the TCP/IP connection.
+	 *  a remote IP address for the TCP/IP connection.
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String getRemoteAddress() {
 		return remote_address;
@@ -632,7 +669,9 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>ConcurrentMap<String,Object></code>
 	 */
 	public ConcurrentMap<String, Object> getSessionData() {
 		return sessionData;
@@ -642,8 +681,10 @@ public abstract class IOService<RefObject>
 	 * Method
 	 * <code>getSocketChannel</code> is used to perform
 	 *
-	 * @return a
+	 *  a
 	 * <code>SocketChannel</code> value
+	 *
+	 * @return a value of <code>SocketChannel</code>
 	 */
 	public SocketChannel getSocketChannel() {
 		return socketIO.getSocketChannel();
@@ -666,7 +707,9 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>long</code>
 	 */
 	public long getTotalBuffOverflow() {
 		return socketIO.getTotalBuffOverflow();
@@ -676,7 +719,9 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>long</code>
 	 */
 	public long getTotalBytesReceived() {
 		return socketIO.getTotalBytesReceived();
@@ -686,7 +731,9 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>long</code>
 	 */
 	public long getTotalBytesSent() {
 		return socketIO.getTotalBytesSent();
@@ -696,7 +743,9 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String getUniqueId() {
 		return id;
@@ -706,7 +755,9 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>long[]</code>
 	 */
 	public long[] getWriteCounters() {
 		return wrData;
@@ -716,7 +767,9 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>TrustManager[]</code>
 	 */
 	public TrustManager[] getX509TrustManagers() {
 		return x509TrustManagers;
@@ -726,8 +779,10 @@ public abstract class IOService<RefObject>
 	 * Describe
 	 * <code>isConnected</code> method here.
 	 *
-	 * @return a
+	 *  a
 	 * <code>boolean</code> value
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean isConnected() {
 		boolean result = (socketIO == null)
@@ -830,7 +885,9 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>ByteOrder</code>
 	 */
 	protected ByteOrder byteOrder() {
 		return ByteOrder.BIG_ENDIAN;
@@ -842,8 +899,10 @@ public abstract class IOService<RefObject>
 	 *
 	 * @param msg a
 	 * <code>char[]</code> value
-	 * @return a
+	 *  a
 	 * <code>boolean</code> value
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean debug(final char[] msg) {
 		if (msg != null) {
@@ -862,8 +921,10 @@ public abstract class IOService<RefObject>
 	 * @param msg a
 	 * <code>String</code> value
 	 * @param prefix
-	 * @return a
+	 *  a
 	 * <code>boolean</code> value
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean debug(final String msg, final String prefix) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -892,8 +953,10 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of <code>ByteBuffer</code>
 	 * @throws IOException
 	 */
 	protected ByteBuffer readBytes() throws IOException {
@@ -948,8 +1011,10 @@ public abstract class IOService<RefObject>
 	 * Describe
 	 * <code>readData</code> method here.
 	 *
-	 * @return a
+	 *  a
 	 * <code>char[]</code> value
+	 *
+	 * @return a value of <code>char[]</code>
 	 * @exception IOException if an error occurs
 	 */
 	protected char[] readData() throws IOException {
@@ -1146,7 +1211,9 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	protected abstract int receivedPackets();
 
@@ -1298,7 +1365,9 @@ public abstract class IOService<RefObject>
 	/**
 	 * Method description
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean isInputBufferEmpty() {
 		return (socketInput != null) && (socketInput.remaining() == socketInput.capacity());
@@ -1367,4 +1436,4 @@ public abstract class IOService<RefObject>
 }    // IOService
 
 
-//~ Formatted in Tigase Code Convention on 13/05/29
+//~ Formatted in Tigase Code Convention on 13/08/28

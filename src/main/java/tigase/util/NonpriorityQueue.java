@@ -1,10 +1,13 @@
 /*
+ * NonpriorityQueue.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,18 +18,15 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.util;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.concurrent.LinkedBlockingQueue;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Feb 9, 2010 11:32:30 AM
@@ -35,7 +35,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class NonpriorityQueue<E> extends PriorityQueueAbstract<E> {
+public class NonpriorityQueue<E>
+				extends PriorityQueueAbstract<E> {
 	private LinkedBlockingQueue<E> queue = null;
 
 	//~--- constructors ---------------------------------------------------------
@@ -46,6 +47,12 @@ public class NonpriorityQueue<E> extends PriorityQueueAbstract<E> {
 	 */
 	public NonpriorityQueue() {}
 
+	/**
+	 * Constructs ...
+	 *
+	 *
+	 * @param maxSize
+	 */
 	protected NonpriorityQueue(int maxSize) {
 		init(0, maxSize);
 	}
@@ -71,7 +78,9 @@ public class NonpriorityQueue<E> extends PriorityQueueAbstract<E> {
 	 * @param element
 	 * @param priority
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	@Override
 	public boolean offer(E element, int priority) {
@@ -90,6 +99,51 @@ public class NonpriorityQueue<E> extends PriorityQueueAbstract<E> {
 	@Override
 	public void put(E element, int priority) throws InterruptedException {
 		queue.put(element);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of int[]
+	 */
+	@Override
+	public int[] size() {
+		int[] result = new int[1];
+
+		result[0] = queue.size();
+
+		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of E
+	 * @throws InterruptedException
+	 */
+	@Override
+	public E take() throws InterruptedException {
+		return queue.take();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of int
+	 */
+	@Override
+	public int totalSize() {
+		return queue.size();
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -113,51 +167,7 @@ public class NonpriorityQueue<E> extends PriorityQueueAbstract<E> {
 //     queue = new LinkedBlockingQueue<E>(newSize);
 //     oldQueue.drainTo(queue);
 	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public int[] size() {
-		int[] result = new int[1];
-
-		result[0] = queue.size();
-
-		return result;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 *
-	 * @throws InterruptedException
-	 */
-	@Override
-	public E take() throws InterruptedException {
-		return queue.take();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public int totalSize() {
-		return queue.size();
-	}
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/28

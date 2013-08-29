@@ -107,7 +107,8 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 * @param packet
 	 * @param conn
 	 *
-	 * @return
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	boolean processPacket(Packet packet, XMPPResourceConnection conn);
 
@@ -137,7 +138,8 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 * @return a value of <code>E</code>
 	 */
 	E getConnectionRecordInstance();
 
@@ -231,4 +233,4 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/08/29

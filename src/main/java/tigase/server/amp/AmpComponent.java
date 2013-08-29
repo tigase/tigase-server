@@ -2,7 +2,7 @@
  * AmpComponent.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -60,21 +60,19 @@ import java.util.Queue;
 public class AmpComponent
 				extends AbstractMessageReceiver
 				implements ActionResultsHandlerIfc {
-	private static final String AMP_NODE     = "http://jabber.org/protocol/amp";
-	private static final Logger log          =
-		Logger.getLogger(AmpComponent.class.getName());
-	private static final String AMP_XMLNS    = AMP_NODE;
-	private static final Element top_feature = new Element("feature",
-																							 new String[] { "var" },
-																							 new String[] { AMP_NODE });
+	private static final String  AMP_NODE  = "http://jabber.org/protocol/amp";
+	private static final Logger  log = Logger.getLogger(AmpComponent.class.getName());
+	private static final String  AMP_XMLNS = AMP_NODE;
+	private static final Element top_feature = new Element("feature", new String[] {
+			"var" }, new String[] { AMP_NODE });
 
 	//~--- fields ---------------------------------------------------------------
 
 	// ~--- fields ---------------------------------------------------------------
-	private Map<String, ActionIfc> actions       = new ConcurrentSkipListMap<String,
-																									 ActionIfc>();
+	private Map<String, ActionIfc>    actions = new ConcurrentSkipListMap<String,
+			ActionIfc>();
 	private Map<String, ConditionIfc> conditions = new ConcurrentSkipListMap<String,
-																									 ConditionIfc>();
+			ConditionIfc>();
 
 	//~--- methods --------------------------------------------------------------
 
@@ -86,7 +84,9 @@ public class AmpComponent
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean addOutPacket(Packet packet) {
@@ -99,145 +99,14 @@ public class AmpComponent
 	 *
 	 * @param packets
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean addOutPackets(Queue<Packet> packets) {
 		return super.addOutPackets(packets);
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 * @return
-	 */
-	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> defs = super.getDefaults(params);
-		ActionIfc action         = new Drop();
-
-		actions.put(action.getName(), action);
-		action = new tigase.server.amp.action.Error();
-		actions.put(action.getName(), action);
-		action = new Notify();
-		actions.put(action.getName(), action);
-		action = new tigase.server.amp.action.Deliver();
-		actions.put(action.getName(), action);
-		action = new Store();
-		actions.put(action.getName(), action);
-		action = new Alert();
-		actions.put(action.getName(), action);
-
-		ConditionIfc condition = new Deliver();
-
-		conditions.put(condition.getName(), condition);
-		condition = new ExpireAt();
-		conditions.put(condition.getName(), condition);
-		condition = new MatchResource();
-		conditions.put(condition.getName(), condition);
-		for (ActionIfc a : actions.values()) {
-			Map<String, Object> d = a.getDefaults(params);
-
-			if (d != null) {
-				defs.putAll(d);
-			}
-		}
-
-		// for (ConditionIfc c : conditions.values()) {
-		// Map<String, Object> d = c.getDefaults(params);
-		//
-		// if (d != null) {
-		// defs.putAll(d);
-		// }
-		// }
-		return defs;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getDiscoCategoryType() {
-		return "generic";
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getDiscoDescription() {
-		return "IM AMP Support";
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param node
-	 * @param jid
-	 * @param from
-	 *
-	 * @return
-	 */
-	@Override
-	public Element getDiscoInfo(String node, JID jid, JID from) {
-		Element query = super.getDiscoInfo(node, jid, from);
-
-		if ((jid != null) &&
-				(getName().equals(jid.getLocalpart()) || isLocalDomain(jid.toString())) &&
-				(AMP_NODE.equals(node))) {
-			if (query == null) {
-				query = new Element("query");
-				query.setXMLNS(XMPPService.INFO_XMLNS);
-			}
-			query.addChild(new Element("identity", new String[] { "name", "category", "type" },
-																 new String[] { getDiscoDescription(),
-							"im", getDiscoCategoryType() }));
-			query.addChild(top_feature);
-			for (ActionIfc action : actions.values()) {
-				query.addChild(new Element("feature", new String[] { "var" },
-																	 new String[] {
-																		 AMP_NODE + "?action=" + action.getName() }));
-			}
-			for (ConditionIfc cond : conditions.values()) {
-				query.addChild(new Element("feature", new String[] { "var" },
-																	 new String[] {
-																		 AMP_NODE + "?condition=" + cond.getName() }));
-			}
-
-			// for (ProcessingThreads<ProcessorWorkerThread> proc_t :
-			// processors.values()) {
-			// Element[] discoFeatures =
-			// proc_t.getWorkerThread().processor.supDiscoFeatures(null);
-			//
-			// if (discoFeatures != null) {
-			// query.addChildren(Arrays.asList(discoFeatures));
-			// } // end of if (discoFeatures != null)
-			// }
-		}
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Found disco info: " + ((query != null)
-																				 ? query.toString()
-																				 : null));
-		}
-
-		return query;
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	// ~--- methods --------------------------------------------------------------
 
@@ -293,6 +162,142 @@ public class AmpComponent
 			}
 			def.execute(packet, null);
 		}
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	// ~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param params
+	 *
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
+	 */
+	@Override
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		Map<String, Object> defs   = super.getDefaults(params);
+		ActionIfc           action = new Drop();
+
+		actions.put(action.getName(), action);
+		action = new tigase.server.amp.action.Error();
+		actions.put(action.getName(), action);
+		action = new Notify();
+		actions.put(action.getName(), action);
+		action = new tigase.server.amp.action.Deliver();
+		actions.put(action.getName(), action);
+		action = new Store();
+		actions.put(action.getName(), action);
+		action = new Alert();
+		actions.put(action.getName(), action);
+
+		ConditionIfc condition = new Deliver();
+
+		conditions.put(condition.getName(), condition);
+		condition = new ExpireAt();
+		conditions.put(condition.getName(), condition);
+		condition = new MatchResource();
+		conditions.put(condition.getName(), condition);
+		for (ActionIfc a : actions.values()) {
+			Map<String, Object> d = a.getDefaults(params);
+
+			if (d != null) {
+				defs.putAll(d);
+			}
+		}
+
+		// for (ConditionIfc c : conditions.values()) {
+		// Map<String, Object> d = c.getDefaults(params);
+		//
+		// if (d != null) {
+		// defs.putAll(d);
+		// }
+		// }
+		return defs;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getDiscoCategoryType() {
+		return "generic";
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getDiscoDescription() {
+		return "IM AMP Support";
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param node
+	 * @param jid
+	 * @param from
+	 *
+	 *
+	 *
+	 * @return a value of <code>Element</code>
+	 */
+	@Override
+	public Element getDiscoInfo(String node, JID jid, JID from) {
+		Element query = super.getDiscoInfo(node, jid, from);
+
+		if ((jid != null) && (getName().equals(jid.getLocalpart()) || isLocalDomain(jid
+				.toString())) && (AMP_NODE.equals(node))) {
+			if (query == null) {
+				query = new Element("query");
+				query.setXMLNS(XMPPService.INFO_XMLNS);
+			}
+			query.addChild(new Element("identity", new String[] { "name", "category", "type" },
+					new String[] { getDiscoDescription(),
+					"im", getDiscoCategoryType() }));
+			query.addChild(top_feature);
+			for (ActionIfc action : actions.values()) {
+				query.addChild(new Element("feature", new String[] { "var" }, new String[] {
+						AMP_NODE + "?action=" + action.getName() }));
+			}
+			for (ConditionIfc cond : conditions.values()) {
+				query.addChild(new Element("feature", new String[] { "var" }, new String[] {
+						AMP_NODE + "?condition=" + cond.getName() }));
+			}
+
+			// for (ProcessingThreads<ProcessorWorkerThread> proc_t :
+			// processors.values()) {
+			// Element[] discoFeatures =
+			// proc_t.getWorkerThread().processor.supDiscoFeatures(null);
+			//
+			// if (discoFeatures != null) {
+			// query.addChildren(Arrays.asList(discoFeatures));
+			// } // end of if (discoFeatures != null)
+			// }
+		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Found disco info: " + ((query != null)
+					? query.toString()
+					: null));
+		}
+
+		return query;
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -383,4 +388,4 @@ public class AmpComponent
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/08/28

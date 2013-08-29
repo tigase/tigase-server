@@ -1,10 +1,13 @@
 /*
+ * TLSIO.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.io;
 
@@ -37,21 +39,20 @@ import java.nio.channels.SocketChannel;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.net.ssl.SSLEngineResult;
 
-//~--- classes ----------------------------------------------------------------
+import javax.net.ssl.SSLEngineResult;
 
 /**
  * Describe class TLSIO here.
- * 
- * 
+ *
+ *
  * Created: Sat May 14 07:43:30 2005
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class TLSIO implements IOInterface {
-
+public class TLSIO
+				implements IOInterface {
 	/** Field description */
 	public static final String TLS_CAPS = "tls-caps";
 
@@ -60,8 +61,9 @@ public class TLSIO implements IOInterface {
 	 */
 	private static final Logger log = Logger.getLogger(TLSIO.class.getName());
 
-	// ~--- fields ---------------------------------------------------------------
+	//~--- fields ---------------------------------------------------------------
 
+	// ~--- fields ---------------------------------------------------------------
 	private IOInterface io = null;
 
 	/**
@@ -75,8 +77,9 @@ public class TLSIO implements IOInterface {
 	 */
 	private TLSWrapper tlsWrapper = null;
 
-	// ~--- constructors ---------------------------------------------------------
+	//~--- constructors ---------------------------------------------------------
 
+	// ~--- constructors ---------------------------------------------------------
 	// /**
 	// * Creates a new <code>TLSIO</code> instance.
 	// *
@@ -89,163 +92,76 @@ public class TLSIO implements IOInterface {
 
 	/**
 	 * Constructs ...
-	 * 
-	 * 
+	 *
+	 *
 	 * @param ioi
 	 * @param wrapper
-	 * 
+	 * @param order
+	 *
 	 * @throws IOException
 	 */
-	public TLSIO(final IOInterface ioi, final TLSWrapper wrapper, final ByteOrder order) throws IOException {
-		io = ioi;
+	public TLSIO(final IOInterface ioi, final TLSWrapper wrapper, final ByteOrder order)
+					throws IOException {
+		io         = ioi;
 		tlsWrapper = wrapper;
 		tlsWrapper.setDebugId(toString());
 		tlsInput = ByteBuffer.allocate(tlsWrapper.getAppBuffSize());
-                tlsInput.order(order);
-
+		tlsInput.order(order);
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "TLS Socket created: {0}", io.toString());
 		}
-
 		if (tlsWrapper.isClientMode()) {
 			if (log.isLoggable(Level.FINER)) {
 				log.finer("TLS - client mode, starting handshaking now...");
 			}
-
 			write(ByteBuffer.allocate(0));
-		} // end of if (tlsWrapper.isClientMode())
+		}    // end of if (tlsWrapper.isClientMode())
 	}
+
+	//~--- methods --------------------------------------------------------------
 
 	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
-	 * @return
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int bytesRead() {
 		return io.bytesRead();
 	}
 
-	@Override
-	public long getBytesSent(boolean reset) {
-		return io.getBytesSent(reset);
-	}
-
-	@Override
-	public long getTotalBytesSent() {
-		return io.getTotalBytesSent();
-	}
-
-	@Override
-	public long getBytesReceived(boolean reset) {
-		return io.getBytesReceived(reset);
-	}
-
-	@Override
-	public long getTotalBytesReceived() {
-		return io.getTotalBytesReceived();
-	}
-
-	@Override
-	public long getBuffOverflow(boolean reset) {
-		return io.getBuffOverflow(reset);
-	}
-
-	@Override
-	public long getTotalBuffOverflow() {
-		return io.getTotalBuffOverflow();
-	}
-
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param caps
-	 * 
-	 * @return
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean checkCapabilities(String caps) {
 		return caps.contains(TLS_CAPS) || io.checkCapabilities(caps);
 	}
 
-	// ~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @return
-	 * 
-	 * @throws IOException
-	 */
-	@Override
-	public int getInputPacketSize() throws IOException {
-		return tlsWrapper.getPacketBuffSize();
-	}
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @return
-	 */
-	@Override
-	public SocketChannel getSocketChannel() {
-		return io.getSocketChannel();
-	}
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param list
-	 * @param reset
-	 */
-	@Override
-	public void getStatistics(StatisticsList list, boolean reset) {
-		if (io != null) {
-			io.getStatistics(list, reset);
-		}
-	}
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @return
-	 */
-	@Override
-	public boolean isConnected() {
-		return io.isConnected();
-	}
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param addr
-	 * 
-	 * @return
-	 */
-	@Override
-	public boolean isRemoteAddress(String addr) {
-		return io.isRemoteAddress(addr);
-	}
-
 	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param buff
-	 * 
-	 * @return
-	 * 
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>ByteBuffer</code>
 	 * @throws IOException
 	 */
 	@Override
@@ -268,13 +184,13 @@ public class TLSIO implements IOInterface {
 			return decodeData(tmpBuffer);
 		} else {
 			return null;
-		} // end of else
+		}    // end of else
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @throws IOException
 	 */
 	@Override
@@ -284,16 +200,17 @@ public class TLSIO implements IOInterface {
 
 			// Thread.dumpStack();
 		}
-
 		io.stop();
 		tlsWrapper.close();
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
-	 * @return
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String toString() {
@@ -302,9 +219,11 @@ public class TLSIO implements IOInterface {
 
 	/**
 	 * Method description
-	 * 
-	 * 
-	 * @return
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean waitingToSend() {
@@ -313,9 +232,11 @@ public class TLSIO implements IOInterface {
 
 	/**
 	 * Method description
-	 * 
-	 * 
-	 * @return
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int waitingToSendSize() {
@@ -324,12 +245,14 @@ public class TLSIO implements IOInterface {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param buff
-	 * 
-	 * @return
-	 * 
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 * @throws IOException
 	 */
 	@Override
@@ -341,54 +264,53 @@ public class TLSIO implements IOInterface {
 		// Looks like for some reason tlsWrapper.getStatus() sometimes starts to
 		// return
 		// NEED_READ status all the time and the loop never ends.
-		int loop_cnt = 0;
-		int max_loop_runs = 1000;
+		int     loop_cnt      = 0;
+		int     max_loop_runs = 1000;
+		boolean breakNow      = true;
 
-		boolean breakNow = true;
-		
-		while (((stat == TLSStatus.NEED_WRITE) || (stat == TLSStatus.NEED_READ))
-				&& (++loop_cnt < max_loop_runs)) {
+		while (((stat == TLSStatus.NEED_WRITE) || (stat == TLSStatus.NEED_READ)) &&
+				(++loop_cnt < max_loop_runs)) {
 			switch (stat) {
-				case NEED_WRITE:
-					writeBuff(ByteBuffer.allocate(0));
+			case NEED_WRITE :
+				writeBuff(ByteBuffer.allocate(0));
 
-					break;
+				break;
 
-				case NEED_READ:
-					// We can get NEED_READ TLS status while there are data awaiting to be
-					// sent thru network connection - we need to force sending data and to break
-					// from this loop
-					if (io.waitingToSend()) {
-						io.write(null);
-						
-						// it appears only during handshake so force break only in this case
-						if (tlsWrapper.getTlsEngine().getHandshakeStatus() == 
-								SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING 
-								&& (buff == null || !buff.hasRemaining())) {
-							breakNow = true;
-						}
+			case NEED_READ :
+
+				// We can get NEED_READ TLS status while there are data awaiting to be
+				// sent thru network connection - we need to force sending data and to break
+				// from this loop
+				if (io.waitingToSend()) {
+					io.write(null);
+
+					// it appears only during handshake so force break only in this case
+					if ((tlsWrapper.getTlsEngine().getHandshakeStatus() == SSLEngineResult
+							.HandshakeStatus.NOT_HANDSHAKING) && ((buff == null) ||!buff
+							.hasRemaining())) {
+						breakNow = true;
 					}
-					
-					// I wonder if some real data can be read from the socket here (and we
-					// would
-					// loose the data) or this is just TLS stuff here.....
-					ByteBuffer rbuff = read(ByteBuffer.allocate(tlsWrapper.getNetBuffSize()));
+				}
 
-					break;
+				// I wonder if some real data can be read from the socket here (and we
+				// would
+				// loose the data) or this is just TLS stuff here.....
+				ByteBuffer rbuff = read(ByteBuffer.allocate(tlsWrapper.getNetBuffSize()));
 
-				// case CLOSED:
-				// if (tlsWrapper.getStatus() == TLSStatus.CLOSED) {
-				// if (log.isLoggable(Level.FINER)) {
-				// log.finer("TLS Socket closed...");
-				// }
-				// throw new EOFException("Socket has been closed.");
-				// } // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
-				// break;
-				default:
+				break;
+
+			// case CLOSED:
+			// if (tlsWrapper.getStatus() == TLSStatus.CLOSED) {
+			// if (log.isLoggable(Level.FINER)) {
+			// log.finer("TLS Socket closed...");
+			// }
+			// throw new EOFException("Socket has been closed.");
+			// } // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
+			// break;
+			default :
 			}
-
 			stat = tlsWrapper.getStatus();
-		
+
 			// We can get NEED_READ TLS status while there are data awaiting to be
 			// sent thru network connection - we need to force sending data and to break
 			// from this loop
@@ -396,7 +318,6 @@ public class TLSIO implements IOInterface {
 				break;
 			}
 		}
-
 		if (loop_cnt > (max_loop_runs / 2)) {
 			log.log(Level.WARNING,
 					"Infinite loop detected in write(buff) TLS code, tlsWrapper.getStatus(): {0}",
@@ -405,14 +326,13 @@ public class TLSIO implements IOInterface {
 			// Let's close the connection now
 			throw new EOFException("Socket has been closed due to TLS problems.");
 		}
-
 		if (tlsWrapper.getStatus() == TLSStatus.CLOSED) {
 			if (log.isLoggable(Level.FINER)) {
 				log.finer("TLS Socket closed...");
 			}
 
 			throw new EOFException("Socket has been closed.");
-		} // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
+		}    // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
 
 		int result = -1;
 
@@ -421,9 +341,9 @@ public class TLSIO implements IOInterface {
 		} else {
 			if (log.isLoggable(Level.FINER)) {
 				log.log(Level.FINER, "TLS - Writing data, remaining: {0}, {1}", new Object[] {
-						buff.remaining(), toString() });
+						buff.remaining(),
+						toString() });
 			}
-
 			result = writeBuff(buff);
 		}
 
@@ -436,9 +356,176 @@ public class TLSIO implements IOInterface {
 		return result;
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param reset is a <code>boolean</code>
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	@Override
+	public long getBuffOverflow(boolean reset) {
+		return io.getBuffOverflow(reset);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param reset is a <code>boolean</code>
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	@Override
+	public long getBytesReceived(boolean reset) {
+		return io.getBytesReceived(reset);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param reset is a <code>boolean</code>
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	@Override
+	public long getBytesSent(boolean reset) {
+		return io.getBytesSent(reset);
+	}
+
+	// ~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>int</code>
+	 * @throws IOException
+	 */
+	@Override
+	public int getInputPacketSize() throws IOException {
+		return tlsWrapper.getPacketBuffSize();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>SocketChannel</code>
+	 */
+	@Override
+	public SocketChannel getSocketChannel() {
+		return io.getSocketChannel();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param list
+	 * @param reset
+	 */
+	@Override
+	public void getStatistics(StatisticsList list, boolean reset) {
+		if (io != null) {
+			io.getStatistics(list, reset);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	@Override
+	public long getTotalBuffOverflow() {
+		return io.getTotalBuffOverflow();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	@Override
+	public long getTotalBytesReceived() {
+		return io.getTotalBytesReceived();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	@Override
+	public long getTotalBytesSent() {
+		return io.getTotalBytesSent();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 */
+	@Override
+	public boolean isConnected() {
+		return io.isConnected();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param addr
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 */
+	@Override
+	public boolean isRemoteAddress(String addr) {
+		return io.isRemoteAddress(addr);
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see tigase.io.IOInterface#setLogId(java.lang.String)
+	 */
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param logId is a <code>String</code>
+	 */
+	@Override
+	public void setLogId(String logId) {
+		io.setLogId(logId);
+	}
+
+	//~--- methods --------------------------------------------------------------
+
 	private ByteBuffer decodeData(ByteBuffer input) throws IOException {
-		TLSStatus stat = null;
-		boolean continueLoop = true;
+		TLSStatus stat         = null;
+		boolean   continueLoop = true;
 
 		// input.flip();
 		// do_loop:
@@ -475,61 +562,59 @@ public class TLSIO implements IOInterface {
 			// input.compact();
 			// }// end of if (input.hasRemaining())
 			switch (tlsWrapper.getStatus()) {
-				case NEED_WRITE:
-					writeBuff(ByteBuffer.allocate(0));
+			case NEED_WRITE :
+				writeBuff(ByteBuffer.allocate(0));
 
-					break;
+				break;
 
-				case UNDERFLOW:
+			case UNDERFLOW :
 
-					// if (log.isLoggable(Level.FINER) && !log.isLoggable(Level.FINEST)) {
-					// int netSize = tlsWrapper.getPacketBuffSize();
-					// log.finer("tlsWrapper.getStatus() = UNDERFLOW");
-					// log.finer("PacketBuffSize=" + netSize);
-					// log.finer("input.capacity()=" + input.capacity());
-					// log.finer("input.remaining()=" + input.remaining());
-					// log.finer("input.limit()=" + input.limit());
-					// log.finer("input.position()=" + input.position());
-					// log.finer("tlsInput.capacity()=" + tlsInput.capacity());
-					// log.finer("tlsInput.remaining()=" + tlsInput.remaining());
-					// log.finer("tlsInput.limit()=" + tlsInput.limit());
-					// log.finer("tlsInput.position()=" + tlsInput.position());
-					// }
-					// Obtain more inbound network data for src,
-					// then retry the operation.
-					// If there is some data ready to read, let's try to read it before we
-					// increase
-					// the buffer size
-					// throw new BufferUnderflowException();
-					if (tlsInput.capacity() == tlsInput.remaining()) {
-						throw new BufferUnderflowException();
-					} else {
-						input.compact();
-						continueLoop = false;
-					}
+				// if (log.isLoggable(Level.FINER) && !log.isLoggable(Level.FINEST)) {
+				// int netSize = tlsWrapper.getPacketBuffSize();
+				// log.finer("tlsWrapper.getStatus() = UNDERFLOW");
+				// log.finer("PacketBuffSize=" + netSize);
+				// log.finer("input.capacity()=" + input.capacity());
+				// log.finer("input.remaining()=" + input.remaining());
+				// log.finer("input.limit()=" + input.limit());
+				// log.finer("input.position()=" + input.position());
+				// log.finer("tlsInput.capacity()=" + tlsInput.capacity());
+				// log.finer("tlsInput.remaining()=" + tlsInput.remaining());
+				// log.finer("tlsInput.limit()=" + tlsInput.limit());
+				// log.finer("tlsInput.position()=" + tlsInput.position());
+				// }
+				// Obtain more inbound network data for src,
+				// then retry the operation.
+				// If there is some data ready to read, let's try to read it before we
+				// increase
+				// the buffer size
+				// throw new BufferUnderflowException();
+				if (tlsInput.capacity() == tlsInput.remaining()) {
+					throw new BufferUnderflowException();
+				} else {
+					input.compact();
+					continueLoop = false;
+				}
 
-					break;
+				break;
 
-				case CLOSED:
+			case CLOSED :
 
-					// if (tlsWrapper.getStatus() == TLSStatus.CLOSED) {
-					if (log.isLoggable(Level.FINER)) {
-						log.finer("TLS Socket closed..." + toString());
-					}
+				// if (tlsWrapper.getStatus() == TLSStatus.CLOSED) {
+				if (log.isLoggable(Level.FINER)) {
+					log.finer("TLS Socket closed..." + toString());
+				}
 
-					throw new EOFException("Socket has been closed.");
+				throw new EOFException("Socket has been closed.");
 
-					// } // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
-					// break do_loop;
-					// break;
-				default:
-					break;
-			} // end of switch (tlsWrapper.getStatus())
-
+			// } // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
+			// break do_loop;
+			// break;
+			default :
+				break;
+			}    // end of switch (tlsWrapper.getStatus())
 			stat = tlsWrapper.getStatus();
-		} while (continueLoop && ((stat == TLSStatus.NEED_READ) || (stat == TLSStatus.OK))
-				&& input.hasRemaining());
-
+		} while (continueLoop && ((stat == TLSStatus.NEED_READ) || (stat == TLSStatus.OK)) &&
+				input.hasRemaining());
 		if (continueLoop) {
 			if (input.hasRemaining()) {
 				input.rewind();
@@ -537,7 +622,6 @@ public class TLSIO implements IOInterface {
 				input.clear();
 			}
 		}
-
 		tlsInput.flip();
 
 		return tlsInput;
@@ -545,7 +629,7 @@ public class TLSIO implements IOInterface {
 
 	private int writeBuff(ByteBuffer buff) throws IOException {
 		int result = 0;
-		int wr = 0;
+		int wr     = 0;
 
 		// The loop below falls into infinite loop for some reason.
 		// Let's try to detect it here and recover.
@@ -559,7 +643,7 @@ public class TLSIO implements IOInterface {
 		// What to do with possible user data received in such a call?
 		// It happens extremely rarely and is hard to diagnose. Let's leave it
 		// as it is now which just causes such connections to be closed.
-		int loop_cnt = 0;
+		int loop_cnt      = 0;
 		int max_loop_runs = 1000;
 
 		do {
@@ -576,42 +660,33 @@ public class TLSIO implements IOInterface {
 			// Not sure if this is really needed, I guess not...
 			tlsOutput.clear();
 			tlsWrapper.wrap(buff, tlsOutput);
-
 			if (tlsWrapper.getStatus() == TLSStatus.CLOSED) {
 				throw new EOFException("Socket has been closed.");
-			} // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
-
+			}    // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
 			tlsOutput.flip();
-			wr = io.write(tlsOutput);
+			wr     = io.write(tlsOutput);
 			result += wr;
 		} while (buff.hasRemaining() && (++loop_cnt < max_loop_runs));
-
 		if (loop_cnt > (max_loop_runs / 2)) {
-			log.warning("Infinite loop detected in writeBuff(buff) TLS code, "
-					+ "tlsWrapper.getStatus(): " + tlsWrapper.getStatus());
+			log.warning("Infinite loop detected in writeBuff(buff) TLS code, " +
+					"tlsWrapper.getStatus(): " + tlsWrapper.getStatus());
 
 			// Let's close the connection now
 			throw new EOFException("Socket has been closed due to TLS problems.");
 		}
-
 		if (tlsWrapper.getStatus() == TLSStatus.NEED_WRITE) {
 			writeBuff(ByteBuffer.allocate(0));
-		} // end of if ()
+		}    // end of if ()
 
 		return result;
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see tigase.io.IOInterface#setLogId(java.lang.String)
-	 */
-	@Override
-	public void setLogId(String logId) {
-		io.setLogId(logId);
-	}
-} // TLSIO
+}    // TLSIO
+
+
 
 // ~ Formatted in Sun Code Convention
 
 // ~ Formatted by Jindent --- http://www.jindent.com
+
+
+//~ Formatted in Tigase Code Convention on 13/08/28

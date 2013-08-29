@@ -81,7 +81,9 @@ public class MessageAll
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String id() {
@@ -200,7 +202,9 @@ public class MessageAll
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[][]
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -211,7 +215,9 @@ public class MessageAll
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[]
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -220,4 +226,4 @@ public class MessageAll
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/12
+//~ Formatted in Tigase Code Convention on 13/08/28

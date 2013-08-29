@@ -96,7 +96,9 @@ public class JabberIqRegister
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String id() {
@@ -296,7 +298,9 @@ public class JabberIqRegister
 	 *
 	 * @param session
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Element[]
 	 */
 	@Override
 	public Element[] supDiscoFeatures(XMPPResourceConnection session) {
@@ -314,7 +318,9 @@ public class JabberIqRegister
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[][]
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -325,7 +331,9 @@ public class JabberIqRegister
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[]
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -338,7 +346,9 @@ public class JabberIqRegister
 	 *
 	 * @param session
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Element[]
 	 */
 	@Override
 	public Element[] supStreamFeatures(XMPPResourceConnection session) {
@@ -354,4 +364,4 @@ public class JabberIqRegister
 }    // JabberIqRegister
 
 
-//~ Formatted in Tigase Code Convention on 13/03/12
+//~ Formatted in Tigase Code Convention on 13/08/28

@@ -29,11 +29,11 @@ package tigase.server.bosh;
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Message;
+import tigase.server.Packet;
 import tigase.server.xmppclient.SeeOtherHostIfc.Phase;
 
-import tigase.server.Packet;
-
 import tigase.util.TigaseStringprepException;
+import tigase.util.TimerTask;
 
 import tigase.xml.Element;
 
@@ -61,7 +61,6 @@ import java.util.Queue;
 import java.util.regex.Pattern;
 import java.util.Set;
 import java.util.UUID;
-import tigase.util.TimerTask;
 
 /**
  * Describe class BoshSession here.
@@ -584,7 +583,9 @@ public class BoshSession {
 	 * @param out_results
 	 * @param tt
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean task(Queue<Packet> out_results, TimerTask tt) {
 		if (tt == inactivityTimer) {
@@ -658,7 +659,9 @@ public class BoshSession {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>JID</code>
 	 */
 	public JID getDataReceiver() {
 		return dataReceiver;
@@ -668,7 +671,9 @@ public class BoshSession {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String getDomain() {
 		return domain;
@@ -678,7 +683,9 @@ public class BoshSession {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String getSessionId() {
 		return sessionId;
@@ -688,7 +695,9 @@ public class BoshSession {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>UUID</code>
 	 */
 	public UUID getSid() {
 		return sid;
@@ -962,22 +971,19 @@ public class BoshSession {
 				}
 			}
 		}
-
-		if ( body.getChild( "stream:error" ) != null ){
-			body.addAttribute( "condition", "remote-stream-error" );
-			body.addAttribute( "type", "terminate" );
-			body.addAttribute( "xmlns:stream", "http://etherx.jabber.org/streams" );
+		if (body.getChild("stream:error") != null) {
+			body.addAttribute("condition", "remote-stream-error");
+			body.addAttribute("type", "terminate");
+			body.addAttribute("xmlns:stream", "http://etherx.jabber.org/streams");
 			this.terminate = true;
-			System.out.println( "stream:error termination" );
+			System.out.println("stream:error termination");
 		}
-
 		try {
 			if (terminate) {
 				body.setAttribute("type", StanzaType.terminate.toString());
 			}
 			handler.writeRawData(serv, body.toString());
 			retireConnectionService(serv);
-
 		} catch (Exception e) {
 			log.log(Level.WARNING, "[" + connections.size() +
 					"] Exception during writing to socket", e);
@@ -1072,7 +1078,9 @@ public class BoshSession {
 		 * @param o1
 		 * @param o2
 		 *
-		 * @return
+		 *
+		 *
+		 * @return a value of <code>int</code>
 		 */
 		@Override
 		public int compare(BoshTask o1, BoshTask o2) {
@@ -1089,4 +1097,4 @@ public class BoshSession {
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/04/22
+//~ Formatted in Tigase Code Convention on 13/08/28

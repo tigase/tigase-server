@@ -39,7 +39,7 @@ import java.util.Map;
 public class DataTypes {
 	/** Field description */
 	public static final Map<String, Character> typesMap = new LinkedHashMap<String,
-																													Character>();
+			Character>();
 
 	//~--- static initializers --------------------------------------------------
 
@@ -65,54 +65,21 @@ public class DataTypes {
 
 	//~--- methods --------------------------------------------------------------
 
-	// public static char[] sizeChars = {'k', 'K', 'm', 'M', 'g', 'G', 't', 'T'};
-
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param num
-	 * @param cls
-	 * @param def
-	 * @param <T>
+	 * @param name
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of char
 	 */
-	public static <T extends Number> T parseNum(String num, Class<T> cls, T def) {
-		if (num == null) {
-			return def;
-		}
+	public static char decodeTypeIdFromName(String name) {
+		char result = 'S';
 
-		T result        = def;
-		String toParse  = num;
-		long multiplier = 1;
-
-		try {
-			switch (num.charAt(num.length() - 1)) {
-			case 'k' :
-			case 'K' :
-				multiplier = 1024;
-				toParse    = num.substring(0, num.length() - 1);
-
-				break;
-
-			case 'm' :
-			case 'M' :
-				multiplier = 1024 * 1024;
-				toParse    = num.substring(0, num.length() - 1);
-
-				break;
-
-			case 'g' :
-			case 'G' :
-				multiplier = 1024 * 1024 * 1024;
-				toParse    = num.substring(0, num.length() - 1);
-
-				break;
-			}
-			result = cls.cast(Long.valueOf(Long.parseLong(toParse) * multiplier));
-		} catch (Exception e) {
-			return def;
+		if (name.endsWith("]")) {
+			result = name.charAt(name.length() - 2);
 		}
 
 		return result;
@@ -122,38 +89,13 @@ public class DataTypes {
 	 * Method description
 	 *
 	 *
-	 * @param size
-	 * @param def
-	 *
-	 * @return
-	 */
-	public static int parseSizeInt(String size, int def) {
-		return parseNum(size, Integer.class, def);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param val
-	 *
-	 * @return
-	 */
-	public static boolean parseBool(final String val) {
-		return (val != null) &&
-					 (val.equalsIgnoreCase("yes") || val.equalsIgnoreCase("true") ||
-						val.equalsIgnoreCase("on") || val.equals("1"));
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
 	 * @param typeId
 	 * @param value
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of Object
 	 * @throws IllegalArgumentException
 	 */
 	public static Object decodeValueType(char typeId, String value)
@@ -202,7 +144,7 @@ public class DataTypes {
 				// Comma separated, Strings array
 				String[] s_str      = value.split(",");
 				String[] trimed_str = new String[s_str.length];
-				int si              = 0;
+				int      si         = 0;
 
 				for (String s : s_str) {
 					trimed_str[si++] = s.trim();
@@ -215,8 +157,8 @@ public class DataTypes {
 
 				// Comma separated, long array
 				String[] longs_str = value.split(",");
-				long[] longs       = new long[longs_str.length];
-				int l              = 0;
+				long[]   longs     = new long[longs_str.length];
+				int      l         = 0;
 
 				for (String s : longs_str) {
 					longs[l++] = Long.parseLong(s.trim());
@@ -229,8 +171,8 @@ public class DataTypes {
 
 				// Comma separated, int array
 				String[] ints_str = value.split(",");
-				int[] ints        = new int[ints_str.length];
-				int i             = 0;
+				int[]    ints     = new int[ints_str.length];
+				int      i        = 0;
 
 				for (String s : ints_str) {
 					ints[i++] = Integer.parseInt(s.trim());
@@ -242,9 +184,9 @@ public class DataTypes {
 			case 'b' :
 
 				// Comma separated, boolean array
-				String[] bools_str = value.split(",");
-				boolean[] bools    = new boolean[bools_str.length];
-				int b              = 0;
+				String[]  bools_str = value.split(",");
+				boolean[] bools     = new boolean[bools_str.length];
+				int       b         = 0;
 
 				for (String s : bools_str) {
 					bools[b++] = parseBool(s.trim());
@@ -257,8 +199,8 @@ public class DataTypes {
 
 				// Comma separated, float array
 				String[] float_str = value.split(",");
-				float[] floats     = new float[float_str.length];
-				int f              = 0;
+				float[]  floats    = new float[float_str.length];
+				int      f         = 0;
 
 				for (String s : float_str) {
 					floats[f++] = Float.parseFloat(s.trim());
@@ -272,7 +214,7 @@ public class DataTypes {
 				// Comma separated, double array
 				String[] doubles_str = value.split(",");
 				double[] doubles     = new double[doubles_str.length];
-				int d                = 0;
+				int      d           = 0;
 
 				for (String s : doubles_str) {
 					doubles[d++] = Double.parseDouble(s.trim());
@@ -297,12 +239,134 @@ public class DataTypes {
 	 * Method description
 	 *
 	 *
+	 * @param name
 	 * @param value
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
+	 */
+	public static String encodeTypeIdInName(String name, Object value) {
+		char t = DataTypes.getTypeId(value);
+
+		return name + "[" + t + "]";
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param val
+	 *
+	 *
+	 *
+	 * @return a value of boolean
+	 */
+	public static boolean parseBool(final String val) {
+		return (val != null) && (val.equalsIgnoreCase("yes") || val.equalsIgnoreCase(
+				"true") || val.equalsIgnoreCase("on") || val.equals("1"));
+	}
+
+	// public static char[] sizeChars = {'k', 'K', 'm', 'M', 'g', 'G', 't', 'T'};
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param num
+	 * @param cls
+	 * @param def
+	 * @param <T>
+	 *
+	 *
+	 *
+	 * @return a value of T
+	 */
+	public static <T extends Number> T parseNum(String num, Class<T> cls, T def) {
+		if (num == null) {
+			return def;
+		}
+
+		T      result     = def;
+		String toParse    = num;
+		long   multiplier = 1;
+
+		try {
+			switch (num.charAt(num.length() - 1)) {
+			case 'k' :
+			case 'K' :
+				multiplier = 1024;
+				toParse    = num.substring(0, num.length() - 1);
+
+				break;
+
+			case 'm' :
+			case 'M' :
+				multiplier = 1024 * 1024;
+				toParse    = num.substring(0, num.length() - 1);
+
+				break;
+
+			case 'g' :
+			case 'G' :
+				multiplier = 1024 * 1024 * 1024;
+				toParse    = num.substring(0, num.length() - 1);
+
+				break;
+			}
+			result = cls.cast(Long.valueOf(Long.parseLong(toParse) * multiplier));
+		} catch (Exception e) {
+			return def;
+		}
+
+		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param size
+	 * @param def
+	 *
+	 *
+	 *
+	 * @return a value of int
+	 */
+	public static int parseSizeInt(String size, int def) {
+		return parseNum(size, Integer.class, def);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param name
+	 *
+	 *
+	 *
+	 * @return a value of String
+	 */
+	public static String stripNameFromTypeId(String name) {
+		if (name.endsWith("]")) {
+			return name.substring(0, name.length() - 3);
+		} else {
+			return name;
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param value
+	 *
+	 *
+	 *
+	 * @return a value of String
 	 */
 	public static String valueToString(Object value) {
-		char t = getTypeId(value);
+		char   t = getTypeId(value);
 		String varr;
 
 		if (value == null) {
@@ -348,56 +412,26 @@ public class DataTypes {
 		return varr;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param name
-	 *
-	 * @return
-	 */
-	public static char decodeTypeIdFromName(String name) {
-		char result = 'S';
-
-		if (name.endsWith("]")) {
-			result = name.charAt(name.length() - 2);
-		}
-
-		return result;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param name
-	 *
-	 * @return
-	 */
-	public static String stripNameFromTypeId(String name) {
-		if (name.endsWith("]")) {
-			return name.substring(0, name.length() - 3);
-		} else {
-			return name;
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param name
-	 * @param value
-	 *
-	 * @return
-	 */
-	public static String encodeTypeIdInName(String name, Object value) {
-		char t = DataTypes.getTypeId(value);
-
-		return name + "[" + t + "]";
-	}
-
 	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param key
+	 * @param def
+	 *
+	 *
+	 *
+	 * @return a value of boolean
+	 */
+	public static boolean getProperty(String key, Boolean def) {
+		String val = System.getProperty(key, (def != null)
+				? def.toString()
+				: null);
+
+		return parseBool(val);
+	}
 
 	/**
 	 * Method description
@@ -405,7 +439,9 @@ public class DataTypes {
 	 *
 	 * @param instance
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of char
 	 */
 	public static char getTypeId(Object instance) {
 		Character result;
@@ -421,24 +457,7 @@ public class DataTypes {
 
 		return result.charValue();
 	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param key
-	 * @param def
-	 *
-	 * @return
-	 */
-	public static boolean getProperty(String key, Boolean def) {
-		String val = System.getProperty(key, (def != null)
-						? def.toString()
-						: null);
-
-		return parseBool(val);
-	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/04
+//~ Formatted in Tigase Code Convention on 13/08/28

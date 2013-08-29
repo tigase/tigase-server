@@ -1,25 +1,27 @@
-
 /*
-* Tigase Jabber/XMPP Server
-* Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU Affero General Public License as published by
-* the Free Software Foundation, version 3 of the License.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU Affero General Public License for more details.
-*
-* You should have received a copy of the GNU Affero General Public License
-* along with this program. Look for COPYING file in the top folder.
-* If not, see http://www.gnu.org/licenses/.
-*
-* $Rev$
-* Last modified by $Author$
-* $Date$
+ * StreamError.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ *
  */
+
+
+
 package tigase.server.xmppserver.proc;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -31,11 +33,9 @@ import tigase.server.xmppserver.S2SProcessor;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
-import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Dec 9, 2010 2:00:08 PM
@@ -43,7 +43,8 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class StreamError extends S2SAbstractProcessor {
+public class StreamError
+				extends S2SAbstractProcessor {
 	private static final Logger log = Logger.getLogger(StreamError.class.getName());
 
 	//~--- methods --------------------------------------------------------------
@@ -56,7 +57,9 @@ public class StreamError extends S2SAbstractProcessor {
 	 * @param serv
 	 * @param results
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	@Override
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
@@ -71,7 +74,4 @@ public class StreamError extends S2SAbstractProcessor {
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/28

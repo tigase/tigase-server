@@ -1,3 +1,27 @@
+/*
+ * StoredProcedures.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+
+
 package tigase.db.derby;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -17,8 +41,6 @@ import java.sql.Statement;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Class description
@@ -44,10 +66,9 @@ public class StoredProcedures {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
 		try {
-			PreparedStatement ps =
-				conn.prepareStatement("select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users where account_status > 0");
+			PreparedStatement ps = conn.prepareStatement(
+					"select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users where account_status > 0");
 
 			data[0] = ps.executeQuery();
 		} catch (SQLException e) {
@@ -72,15 +93,14 @@ public class StoredProcedures {
 	 * @throws SQLException
 	 */
 	public static void tigAddNode(long parentNid, long uid, String node, ResultSet[] data)
-			throws SQLException {
+					throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
 		try {
-			PreparedStatement ps =
-				conn.prepareStatement("insert into tig_nodes (parent_nid, uid, node) values (?, ?, ?)",
-					Statement.RETURN_GENERATED_KEYS);
+			PreparedStatement ps = conn.prepareStatement(
+					"insert into tig_nodes (parent_nid, uid, node) values (?, ?, ?)", Statement
+					.RETURN_GENERATED_KEYS);
 
 			ps.setLong(1, parentNid);
 			ps.setLong(2, uid);
@@ -108,23 +128,27 @@ public class StoredProcedures {
 	 * @throws SQLException
 	 */
 	public static void tigAddUser(String userId, String userPw, ResultSet[] data)
-			throws SQLException {
+					throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
-
 		try {
+
 			// check whether user exists
-			PreparedStatement ps_check = conn.prepareStatement("select uid from tig_users where lower(user_id)=?");
+			PreparedStatement ps_check = conn.prepareStatement(
+					"select uid from tig_users where lower(user_id)=?");
+
 			ps_check.setString(1, userId.toLowerCase());
+
 			ResultSet rs_check = ps_check.executeQuery();
+
 			if (rs_check.next()) {
 				return;
 			}
-			PreparedStatement ps =
-				conn.prepareStatement("insert into tig_users (user_id, user_pw) values (?, ?)",
-					Statement.RETURN_GENERATED_KEYS);
+
+			PreparedStatement ps = conn.prepareStatement(
+					"insert into tig_users (user_id, user_pw) values (?, ?)", Statement
+					.RETURN_GENERATED_KEYS);
 
 			ps.setString(1, userId);
 			ps.setString(2, userPw);
@@ -134,21 +158,21 @@ public class StoredProcedures {
 
 			rs.next();
 
-			long generatedKey = rs.getLong(1);
-			PreparedStatement ps3 = conn.prepareStatement("select uid from tig_users where uid=?");
+			long              generatedKey = rs.getLong(1);
+			PreparedStatement ps3 = conn.prepareStatement(
+					"select uid from tig_users where uid=?");
 
 			ps3.setLong(1, generatedKey);
 			data[0] = ps3.executeQuery();
 
-			PreparedStatement ps2 =
-				conn.prepareStatement("insert into tig_nodes (parent_nid, uid, node) values (NULL, ?, 'root')");
+			PreparedStatement ps2 = conn.prepareStatement(
+					"insert into tig_nodes (parent_nid, uid, node) values (NULL, ?, 'root')");
 
 			ps2.setLong(1, generatedKey);
 			ps2.executeUpdate();
-
 			if (null == userPw) {
-				PreparedStatement ps4 =
-						conn.prepareStatement("update tig_users set account_status = -1 where uid = ?");
+				PreparedStatement ps4 = conn.prepareStatement(
+						"update tig_users set account_status = -1 where uid = ?");
 
 				ps4.setLong(1, generatedKey);
 				ps4.executeUpdate();
@@ -174,9 +198,9 @@ public class StoredProcedures {
 	 * @throws SQLException
 	 */
 	public static void tigAddUserPlainPw(String userId, String userPw, ResultSet[] data)
-			throws SQLException {
+					throws SQLException {
 		String encMethod = tigGetDBProperty("password-encoding");
-		String encp = encodePassword(encMethod, userId, userPw);
+		String encp      = encodePassword(encMethod, userId, userPw);
 
 		tigAddUser(userId, encp, data);
 	}
@@ -193,10 +217,9 @@ public class StoredProcedures {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
 		try {
-			PreparedStatement ps =
-				conn.prepareStatement("select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users");
+			PreparedStatement ps = conn.prepareStatement(
+					"select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users");
 
 			data[0] = ps.executeQuery();
 		} catch (SQLException e) {
@@ -221,9 +244,9 @@ public class StoredProcedures {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
 		try {
-			PreparedStatement ps = conn.prepareStatement("select count(*) as res_cnt from tig_users");
+			PreparedStatement ps = conn.prepareStatement(
+					"select count(*) as res_cnt from tig_users");
 
 			data[0] = ps.executeQuery();
 		} catch (SQLException e) {
@@ -248,10 +271,9 @@ public class StoredProcedures {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
 		try {
-			PreparedStatement ps =
-				conn.prepareStatement("update tig_users set account_status = 0 where lower(user_id) = ?");
+			PreparedStatement ps = conn.prepareStatement(
+					"update tig_users set account_status = 0 where lower(user_id) = ?");
 
 			ps.setString(1, userId.toLowerCase());
 			ps.executeUpdate();
@@ -277,10 +299,9 @@ public class StoredProcedures {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
 		try {
-			PreparedStatement ps =
-				conn.prepareStatement("select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users where account_status = 0");
+			PreparedStatement ps = conn.prepareStatement(
+					"select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users where account_status = 0");
 
 			data[0] = ps.executeQuery();
 		} catch (SQLException e) {
@@ -305,10 +326,9 @@ public class StoredProcedures {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
 		try {
-			PreparedStatement ps =
-				conn.prepareStatement("update tig_users set account_status = 1 where lower(user_id) = ?");
+			PreparedStatement ps = conn.prepareStatement(
+					"update tig_users set account_status = 1 where lower(user_id) = ?");
 
 			ps.setString(1, userId.toLowerCase());
 			ps.executeUpdate();
@@ -328,15 +348,16 @@ public class StoredProcedures {
 	 *
 	 * @param key
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 * @throws SQLException
 	 */
 	public static String tigGetDBProperty(final String key) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
 		try {
 			String result = null;
 
@@ -344,13 +365,12 @@ public class StoredProcedures {
 				log.finest("function tigGetDBProperty('" + key + "') called");
 			}
 
-			PreparedStatement ps =
-				conn.prepareStatement("select pval from tig_pairs, tig_users where (pkey = ?) AND (user_id = 'db-properties') AND (tig_pairs.uid = tig_users.uid)");
+			PreparedStatement ps = conn.prepareStatement(
+					"select pval from tig_pairs, tig_users where (pkey = ?) AND (user_id = 'db-properties') AND (tig_pairs.uid = tig_users.uid)");
 			ResultSet rs;
 
 			ps.setString(1, key.toLowerCase());
 			rs = ps.executeQuery();
-
 			if (rs.next()) {
 				result = rs.getString(1);
 			}
@@ -379,10 +399,9 @@ public class StoredProcedures {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
 		try {
-			PreparedStatement ps =
-				conn.prepareStatement("select user_pw from tig_users where lower(user_id) = ?");
+			PreparedStatement ps = conn.prepareStatement(
+					"select user_pw from tig_users where lower(user_id) = ?");
 
 			ps.setString(1, userId.toLowerCase());
 			data[0] = ps.executeQuery();
@@ -405,13 +424,14 @@ public class StoredProcedures {
 	 *
 	 * @throws SQLException
 	 */
-	public static void tigGetUserDBUid(String userId, ResultSet[] data) throws SQLException {
+	public static void tigGetUserDBUid(String userId, ResultSet[] data)
+					throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
 		try {
-			PreparedStatement ps = conn.prepareStatement("select uid from tig_users where lower(user_id) = ?");
+			PreparedStatement ps = conn.prepareStatement(
+					"select uid from tig_users where lower(user_id) = ?");
 
 			ps.setString(1, userId.toLowerCase());
 			data[0] = ps.executeQuery();
@@ -435,9 +455,9 @@ public class StoredProcedures {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
 		try {
-			PreparedStatement ps = conn.prepareStatement("update tig_users set online_status = 0");
+			PreparedStatement ps = conn.prepareStatement(
+					"update tig_users set online_status = 0");
 
 			ps.executeUpdate();
 		} catch (SQLException e) {
@@ -462,10 +482,9 @@ public class StoredProcedures {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
 		try {
-			PreparedStatement ps =
-				conn.prepareStatement("select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users where online_status = 0");
+			PreparedStatement ps = conn.prepareStatement(
+					"select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users where online_status = 0");
 
 			data[0] = ps.executeQuery();
 		} catch (SQLException e) {
@@ -490,10 +509,9 @@ public class StoredProcedures {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
 		try {
-			PreparedStatement ps =
-				conn.prepareStatement("select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users where online_status > 0");
+			PreparedStatement ps = conn.prepareStatement(
+					"select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users where online_status > 0");
 
 			data[0] = ps.executeQuery();
 		} catch (SQLException e) {
@@ -515,11 +533,11 @@ public class StoredProcedures {
 	 *
 	 * @throws SQLException
 	 */
-	public static void tigPutDBProperty(final String key, final String value) throws SQLException {
+	public static void tigPutDBProperty(final String key, final String value)
+					throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
 		try {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("procedure tigPutDBProperty('" + key + "', '" + value + "') called");
@@ -528,21 +546,20 @@ public class StoredProcedures {
 			int result;
 
 			if (tigGetDBProperty(key) != null) {
-				PreparedStatement ps =
-					conn.prepareStatement("update tig_pairs set tig_pairs.pval = ? where (pkey = ?) and uid = (select uid from tig_users where tig_users.user_id = 'db-properties')");
+				PreparedStatement ps = conn.prepareStatement(
+						"update tig_pairs set tig_pairs.pval = ? where (pkey = ?) and uid = (select uid from tig_users where tig_users.user_id = 'db-properties')");
 
 				ps.setString(1, value);
 				ps.setString(2, key);
 				result = ps.executeUpdate();
 			} else {
-				PreparedStatement ps =
-					conn.prepareStatement("insert into tig_pairs (pkey, pval, uid) select ?, ?, uid from tig_users where (user_id = 'db-properties')");
+				PreparedStatement ps = conn.prepareStatement(
+						"insert into tig_pairs (pkey, pval, uid) select ?, ?, uid from tig_users where (user_id = 'db-properties')");
 
 				ps.setString(1, key);
 				ps.setString(2, value);
 				result = ps.executeUpdate();
 			}
-
 			if (result != 1) {
 				log.severe("Error on put properties");
 			}
@@ -568,9 +585,9 @@ public class StoredProcedures {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
 		try {
-			PreparedStatement ps3 = conn.prepareStatement("select uid from tig_users where lower(user_id) = ?");
+			PreparedStatement ps3 = conn.prepareStatement(
+					"select uid from tig_users where lower(user_id) = ?");
 
 			ps3.setString(1, userId.toLowerCase());
 
@@ -578,13 +595,15 @@ public class StoredProcedures {
 
 			rs.next();
 
-			long uid = rs.getLong(1);
-			PreparedStatement ps1 = conn.prepareStatement("delete from tig_pairs where uid = ?");
+			long              uid = rs.getLong(1);
+			PreparedStatement ps1 = conn.prepareStatement(
+					"delete from tig_pairs where uid = ?");
 
 			ps1.setLong(1, uid);
 			ps1.executeUpdate();
 
-			PreparedStatement ps2 = conn.prepareStatement("delete from tig_nodes where uid = ?");
+			PreparedStatement ps2 = conn.prepareStatement(
+					"delete from tig_nodes where uid = ?");
 
 			ps2.setLong(1, uid);
 			ps2.executeUpdate();
@@ -603,48 +622,48 @@ public class StoredProcedures {
 		}
 	}
 
-        /**
-         *
-         * @param nid
-         * @param uid
-         * @param key
-         * @param value
-         * @throws SQLException
-         */
-        public static void tigUpdatePairs(long nid, long uid, String key, String value) throws SQLException {
+	/**
+	 *
+	 * @param nid
+	 * @param uid
+	 * @param key
+	 * @param value
+	 * @throws SQLException
+	 */
+	public static void tigUpdatePairs(long nid, long uid, String key, String value)
+					throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
 		try {
-			PreparedStatement ps = conn.prepareStatement("select 1 from tig_pairs where nid = ? and uid = ? and pkey = ?");
+			PreparedStatement ps = conn.prepareStatement(
+					"select 1 from tig_pairs where nid = ? and uid = ? and pkey = ?");
 
-                        ps.setLong(1, nid);
-                        ps.setLong(2, uid);
-                        ps.setString(3, key);
+			ps.setLong(1, nid);
+			ps.setLong(2, uid);
+			ps.setString(3, key);
 
-                        ResultSet rs = ps.executeQuery();
-                        if (rs.next()) {
-                                PreparedStatement ps1 = conn.prepareStatement("update tig_pairs set pval = ? where nid = ? and uid = ? and pkey = ?");
+			ResultSet rs = ps.executeQuery();
 
-                                ps1.setString(1, value);
-                                ps1.setLong(2, nid);
-                                ps1.setLong(3, uid);
-                                ps1.setString(4, key);
+			if (rs.next()) {
+				PreparedStatement ps1 = conn.prepareStatement(
+						"update tig_pairs set pval = ? where nid = ? and uid = ? and pkey = ?");
 
-                                ps1.executeUpdate();
-                        }
-                        else {
-                                PreparedStatement ps1 = conn.prepareStatement("insert into tig_pairs (nid, uid, pkey, pval) values (?, ?, ?, ?)");
+				ps1.setString(1, value);
+				ps1.setLong(2, nid);
+				ps1.setLong(3, uid);
+				ps1.setString(4, key);
+				ps1.executeUpdate();
+			} else {
+				PreparedStatement ps1 = conn.prepareStatement(
+						"insert into tig_pairs (nid, uid, pkey, pval) values (?, ?, ?, ?)");
 
-                                ps1.setLong(1, nid);
-                                ps1.setLong(2, uid);
-                                ps1.setString(3, key);
-                                ps1.setString(4, value);
-
-                                ps1.executeUpdate();
-                        }
-
+				ps1.setLong(1, nid);
+				ps1.setLong(2, uid);
+				ps1.setString(3, key);
+				ps1.setString(4, value);
+				ps1.executeUpdate();
+			}
 		} catch (SQLException e) {
 
 			// e.printStackTrace();
@@ -653,8 +672,7 @@ public class StoredProcedures {
 		} finally {
 			conn.close();
 		}
-        }
-
+	}
 
 	/**
 	 * Method description
@@ -669,10 +687,9 @@ public class StoredProcedures {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
 		try {
-			PreparedStatement ps =
-				conn.prepareStatement("update tig_users set user_pw = ? where lower(user_id) = ?");
+			PreparedStatement ps = conn.prepareStatement(
+					"update tig_users set user_pw = ? where lower(user_id) = ?");
 
 			ps.setString(1, userPw);
 			ps.setString(2, userId.toLowerCase());
@@ -696,9 +713,10 @@ public class StoredProcedures {
 	 *
 	 * @throws SQLException
 	 */
-	public static void tigUpdatePasswordPlainPw(String userId, String userPw) throws SQLException {
+	public static void tigUpdatePasswordPlainPw(String userId, String userPw)
+					throws SQLException {
 		String encMethod = tigGetDBProperty("password-encoding");
-		String encp = encodePassword(encMethod, userId, userPw);
+		String encp      = encodePassword(encMethod, userId, userPw);
 
 		tigUpdatePassword(userId, encp);
 	}
@@ -712,7 +730,8 @@ public class StoredProcedures {
 	 *
 	 * @throws SQLException
 	 */
-	public static void tigUpdatePasswordPlainPwRev(String userPw, String userId) throws SQLException {
+	public static void tigUpdatePasswordPlainPwRev(String userPw, String userId)
+					throws SQLException {
 		tigUpdatePasswordPlainPw(userId, userPw);
 	}
 
@@ -727,14 +746,13 @@ public class StoredProcedures {
 	 * @throws SQLException
 	 */
 	public static void tigUserLogin(String userId, String userPw, ResultSet[] data)
-			throws SQLException {
+					throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
 		try {
-			PreparedStatement ps =
-				conn.prepareStatement("select user_id from tig_users where (account_status > 0) AND ( lower(user_id) = ?) AND (user_pw = ?)");
+			PreparedStatement ps = conn.prepareStatement(
+					"select user_id from tig_users where (account_status > 0) AND ( lower(user_id) = ?) AND (user_pw = ?)");
 
 			ps.setString(1, userId.toLowerCase());
 			ps.setString(2, userPw);
@@ -746,8 +764,8 @@ public class StoredProcedures {
 
 				data[0] = x.executeQuery();
 
-				PreparedStatement flps =
-					conn.prepareStatement("update tig_users set online_status = online_status + 1, last_login = current timestamp where lower(user_id) =  ?");
+				PreparedStatement flps = conn.prepareStatement(
+						"update tig_users set online_status = online_status + 1, last_login = current timestamp where lower(user_id) =  ?");
 
 				flps.setString(1, userId.toLowerCase());
 				flps.executeUpdate();
@@ -756,8 +774,8 @@ public class StoredProcedures {
 
 				data[0] = x.executeQuery();
 
-				PreparedStatement flps =
-					conn.prepareStatement("update tig_users set failed_logins = failed_logins + 1 where lower(user_id) = ?");
+				PreparedStatement flps = conn.prepareStatement(
+						"update tig_users set failed_logins = failed_logins + 1 where lower(user_id) = ?");
 
 				flps.setString(1, userId.toLowerCase());
 				flps.executeUpdate();
@@ -783,9 +801,9 @@ public class StoredProcedures {
 	 * @throws SQLException
 	 */
 	public static void tigUserLoginPlainPw(String userId, String userPw, ResultSet[] data)
-			throws SQLException {
+					throws SQLException {
 		String encMethod = tigGetDBProperty("password-encoding");
-		String encp = encodePassword(encMethod, userId, userPw);
+		String encp      = encodePassword(encMethod, userId, userPw);
 
 		tigUserLogin(userId, encp, data);
 	}
@@ -802,10 +820,9 @@ public class StoredProcedures {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
 		try {
-			PreparedStatement ps =
-				conn.prepareStatement("update tig_users set online_status = online_status - 1, last_logout = current timestamp where lower(user_id) =  ?");
+			PreparedStatement ps = conn.prepareStatement(
+					"update tig_users set online_status = online_status - 1, last_logout = current timestamp where lower(user_id) =  ?");
 
 			ps.setString(1, userId.toLowerCase());
 			ps.executeUpdate();
@@ -829,7 +846,6 @@ public class StoredProcedures {
 		} else {
 			return userPw;
 		}
-
 	}
 
 	private static String md5(String data) {
@@ -850,7 +866,4 @@ public class StoredProcedures {
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/29

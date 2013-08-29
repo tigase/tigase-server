@@ -2,7 +2,7 @@
  * DynamicRosterTest.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -56,81 +56,6 @@ public class DynamicRosterTest
 
 	private Map<String, Element> memStorage = new LinkedHashMap<String, Element>();
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
-	 */
-	@Override
-	public JID[] getBuddies(XMPPResourceConnection session) throws NotAuthorizedException {
-		return new JID[] { JID.jidInstanceNS("dynrost@test-d") };
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param buddy
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
-	 */
-	@Override
-	public Element getBuddyItem(XMPPResourceConnection session, JID buddy)
-					throws NotAuthorizedException {
-		if ("dynrost@test-d".equals(buddy.getBareJID().toString())) {
-			return getBuddy();
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param item
-	 *
-	 * @return
-	 */
-	@Override
-	public Element getItemExtraData(Element item) {
-		String jid     = item.getAttributeStaticStr("jid");
-		Element result = memStorage.get(jid);
-
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Retrieving item: {0}, for jid={1}", new Object[] { result,
-							jid });
-		}
-
-		return result;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
-	 */
-	@Override
-	public List<Element> getRosterItems(XMPPResourceConnection session)
-					throws NotAuthorizedException {
-		return new ArrayList<Element>(Arrays.asList(getBuddy()));
-	}
-
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -150,6 +75,89 @@ public class DynamicRosterTest
 	 */
 	@Override
 	public void init(String par) {}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of JID[]
+	 * @throws NotAuthorizedException
+	 */
+	@Override
+	public JID[] getBuddies(XMPPResourceConnection session) throws NotAuthorizedException {
+		return new JID[] { JID.jidInstanceNS("dynrost@test-d") };
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param buddy
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of Element
+	 * @throws NotAuthorizedException
+	 */
+	@Override
+	public Element getBuddyItem(XMPPResourceConnection session, JID buddy)
+					throws NotAuthorizedException {
+		if ("dynrost@test-d".equals(buddy.getBareJID().toString())) {
+			return getBuddy();
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param item
+	 *
+	 *
+	 *
+	 * @return a value of Element
+	 */
+	@Override
+	public Element getItemExtraData(Element item) {
+		String  jid    = item.getAttributeStaticStr("jid");
+		Element result = memStorage.get(jid);
+
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Retrieving item: {0}, for jid={1}", new Object[] { result,
+					jid });
+		}
+
+		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of List<Element>
+	 * @throws NotAuthorizedException
+	 */
+	@Override
+	public List<Element> getRosterItems(XMPPResourceConnection session)
+					throws NotAuthorizedException {
+		return new ArrayList<Element>(Arrays.asList(getBuddy()));
+	}
 
 	//~--- set methods ----------------------------------------------------------
 
@@ -173,11 +181,10 @@ public class DynamicRosterTest
 
 	private Element getBuddy() {
 		return new Element("item", new Element[] { new Element("group", "test group") },
-											 new String[] { "jid",
-																			"name", "subscription" }, new String[] {
-																			"dynrost@test-d", "dynrost", "both" });
+				new String[] { "jid",
+				"name", "subscription" }, new String[] { "dynrost@test-d", "dynrost", "both" });
 	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/08/28

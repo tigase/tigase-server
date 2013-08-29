@@ -54,96 +54,6 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	private Timer                             autoLoadTimer  = null;
 	private RepositoryChangeListenerIfc<Item> repoChangeList = null;
 
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param delay
-	 */
-	@Override
-	public void setAutoloadTimer(long delay) {
-		long interval = delay * 1000;
-
-		if (autoLoadTimer != null) {
-			autoLoadTimer.cancel();
-			autoLoadTimer = null;
-		}
-		if (interval > 0) {
-			autoLoadTimer = new Timer(getConfigKey(), true);
-			autoLoadTimer.schedule(new TimerTask() {
-				@Override
-				public void run() {
-					reload();
-				}
-			}, interval, interval);
-		}
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param repoChangeListener
-	 */
-	@Override
-	public void addRepoChangeListener(
-			RepositoryChangeListenerIfc<Item> repoChangeListener) {
-		this.repoChangeList = repoChangeListener;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param repoChangeListener
-	 */
-	@Override
-	public void removeRepoChangeListener(
-			RepositoryChangeListenerIfc<Item> repoChangeListener) {
-		this.repoChangeList = null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String toString() {
-		return items.toString();
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public abstract String getConfigKey();
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public abstract String[] getDefaultPropetyItems();
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public abstract String getPropertyKey();
-
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -181,20 +91,21 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 * Method description
 	 *
 	 *
-	 * @param oldItem
-	 * @param newItem
-	 *
-	 * @return
+	 * @param repoChangeListener
 	 */
-	public boolean itemChanged(Item oldItem, Item newItem) {
-		return true;
+	@Override
+	public void addRepoChangeListener(
+			RepositoryChangeListenerIfc<Item> repoChangeListener) {
+		this.repoChangeList = repoChangeListener;
 	}
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Collection<Item></code>
 	 */
 	@Override
 	public Collection<Item> allItems() {
@@ -207,52 +118,37 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 *
 	 * @param key
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean contains(String key) {
 		return items.keySet().contains(key);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param defs
-	 * @param params
+	 * @param oldItem
+	 * @param newItem
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
-	@Override
-	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
-		String[] items_arr = getDefaultPropetyItems();
-
-		if (params.get(getPropertyKey()) != null) {
-			items_arr = ((String) params.get(getPropertyKey())).split(",");
-		}
-		defs.put(getConfigKey(), items_arr);
+	public boolean itemChanged(Item oldItem, Item newItem) {
+		return true;
 	}
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param key
-	 *
-	 * @return
-	 */
-	@Override
-	public Item getItem(String key) {
-		return items.get(key);
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
 	 *
 	 *
-	 * @return
+	 * @return a value of <code>Iterator<Item></code>
 	 */
 	@Override
 	public Iterator<Item> iterator() {
@@ -284,7 +180,156 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param repoChangeListener
+	 */
+	@Override
+	public void removeRepoChangeListener(
+			RepositoryChangeListenerIfc<Item> repoChangeListener) {
+		this.repoChangeList = null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>int</code>
+	 */
+	@Override
+	public int size() {
+		return items.size();
+	}
+
+	/**
+	 * Method description
+	 *
+	 */
+	@Override
+	public void store() {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String toString() {
+		return items.toString();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param item
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String validateItem(Item item) {
+		return null;
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	public abstract String getConfigKey();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
+	 */
+	public abstract String[] getDefaultPropetyItems();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param defs
+	 * @param params
+	 */
+	@Override
+	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
+		String[] items_arr = getDefaultPropetyItems();
+
+		if (params.get(getPropertyKey()) != null) {
+			items_arr = ((String) params.get(getPropertyKey())).split(",");
+		}
+		defs.put(getConfigKey(), items_arr);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param key
+	 *
+	 *
+	 *
+	 * @return a value of <code>Item</code>
+	 */
+	@Override
+	public Item getItem(String key) {
+		return items.get(key);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	public abstract String getPropertyKey();
+
 	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param delay
+	 */
+	@Override
+	public void setAutoloadTimer(long delay) {
+		long interval = delay * 1000;
+
+		if (autoLoadTimer != null) {
+			autoLoadTimer.cancel();
+			autoLoadTimer = null;
+		}
+		if (interval > 0) {
+			autoLoadTimer = new Timer(getConfigKey(), true);
+			autoLoadTimer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					reload();
+				}
+			}, interval, interval);
+		}
+	}
 
 	/**
 	 * Method description
@@ -311,40 +356,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 			log.warning("Items list is not set in the configuration file!!");
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public int size() {
-		return items.size();
-	}
-
-	/**
-	 * Method description
-	 *
-	 */
-	@Override
-	public void store() {}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param item
-	 *
-	 * @return
-	 */
-	@Override
-	public String validateItem(Item item) {
-		return null;
-	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/11
+//~ Formatted in Tigase Code Convention on 13/08/29

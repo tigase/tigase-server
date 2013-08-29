@@ -59,7 +59,9 @@ public class ComponentConnection
 	 *
 	 * @param o
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int compareTo(ComponentConnection o) {
@@ -78,7 +80,9 @@ public class ComponentConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String getDomain() {
 		return domain;
@@ -88,7 +92,9 @@ public class ComponentConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>ComponentIOService</code>
 	 */
 	public ComponentIOService getService() {
 		return service;
@@ -96,4 +102,4 @@ public class ComponentConnection
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/16
+//~ Formatted in Tigase Code Convention on 13/08/28

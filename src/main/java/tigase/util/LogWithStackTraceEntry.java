@@ -1,10 +1,13 @@
 /*
+ * LogWithStackTraceEntry.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.util;
 
@@ -26,15 +28,13 @@ package tigase.util;
 
 import java.util.logging.LogRecord;
 
-//~--- classes ----------------------------------------------------------------
-
 /**
  *
  */
 public class LogWithStackTraceEntry {
-	private long counter = 0;
-	private String msg = null;
-	private String record = null;
+	private long   counter = 0;
+	private String msg     = null;
+	private String record  = null;
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -46,8 +46,22 @@ public class LogWithStackTraceEntry {
 	 * @param msg
 	 */
 	public LogWithStackTraceEntry(String msg, String record) {
-		this.msg = msg;
+		this.msg    = msg;
 		this.record = record;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of long
+	 */
+	public long increment() {
+		return ++counter;
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -56,7 +70,9 @@ public class LogWithStackTraceEntry {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of long
 	 */
 	public long getCounter() {
 		return counter;
@@ -66,7 +82,9 @@ public class LogWithStackTraceEntry {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	public String getMessage() {
 		return msg;
@@ -76,27 +94,14 @@ public class LogWithStackTraceEntry {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	public String getRecord() {
 		return record;
 	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public long increment() {
-		return ++counter;
-	}
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/28

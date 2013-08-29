@@ -101,7 +101,9 @@ public class OfflineMessages
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of int
 	 */
 	@Override
 	public int concurrentQueuesNo() {
@@ -111,7 +113,9 @@ public class OfflineMessages
 	/**
 	 * Describe <code>id</code> method here.
 	 *
-	 * @return a <code>String</code> value
+	 *  a <code>String</code> value
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String id() {
@@ -194,8 +198,10 @@ public class OfflineMessages
 	 *
 	 * @param conn
 	 * @param repo
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of Queue<Packet>
 	 * @throws UserNotFoundException
 	 * @throws NotAuthorizedException
 	 */
@@ -238,8 +244,10 @@ public class OfflineMessages
 	 * @param pac
 	 * @param repo
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of boolean
 	 * @throws UserNotFoundException
 	 */
 	public boolean savePacketForOffLineUser(Packet pac, MsgRepositoryIfc repo)
@@ -288,7 +296,9 @@ public class OfflineMessages
 	 *
 	 * @param session
 	 *          a <code>XMPPResourceConnection</code> value
-	 * @return a <code>String[]</code> value
+	 *  a <code>String[]</code> value
+	 *
+	 * @return a value of Element[]
 	 */
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
@@ -300,7 +310,9 @@ public class OfflineMessages
 	/**
 	 * Describe <code>supElements</code> method here.
 	 *
-	 * @return a <code>String[]</code> value
+	 *  a <code>String[]</code> value
+	 *
+	 * @return a value of String[][]
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -310,30 +322,14 @@ public class OfflineMessages
 	/**
 	 * Describe <code>supNamespaces</code> method here.
 	 *
-	 * @return a <code>String[]</code> value
+	 *  a <code>String[]</code> value
+	 *
+	 * @return a value of String[]
 	 */
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param repo
-	 * @param conn
-	 *
-	 * @return
-	 */
-	protected MsgRepositoryIfc getMsgRepoImpl(NonAuthUserRepository repo,
-			XMPPResourceConnection conn) {
-		return new MsgRepositoryImpl(repo, conn);
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	// Implementation of tigase.xmpp.XMPPProcessorIfc
 
@@ -344,7 +340,9 @@ public class OfflineMessages
 	 * @param packet
 	 * @param conn
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	protected boolean loadOfflineMessages(Packet packet, XMPPResourceConnection conn) {
 
@@ -386,6 +384,24 @@ public class OfflineMessages
 		return false;
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param repo
+	 * @param conn
+	 *
+	 *
+	 *
+	 * @return a value of MsgRepositoryIfc
+	 */
+	protected MsgRepositoryIfc getMsgRepoImpl(NonAuthUserRepository repo,
+			XMPPResourceConnection conn) {
+		return new MsgRepositoryImpl(repo, conn);
+	}
+
 	//~--- inner classes --------------------------------------------------------
 
 	private class MsgRepositoryImpl
@@ -401,22 +417,6 @@ public class OfflineMessages
 			this.conn = conn;
 		}
 
-		//~--- get methods --------------------------------------------------------
-
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param time
-		 * @param delete
-		 *
-		 * @return
-		 */
-		@Override
-		public Element getMessageExpired(long time, boolean delete) {
-			throw new UnsupportedOperationException("Not supported yet.");
-		}
-
 		//~--- methods ------------------------------------------------------------
 
 		/**
@@ -426,8 +426,10 @@ public class OfflineMessages
 		 * @param to
 		 * @param delete
 		 *
-		 * @return
 		 *
+		 *
+		 *
+		 * @return a value of Queue<Element>
 		 * @throws UserNotFoundException
 		 */
 		@Override
@@ -482,6 +484,24 @@ public class OfflineMessages
 			repo.addOfflineDataList(to.getBareJID(), ID, "messages", new String[] { msg
 					.toString() });
 		}
+
+		//~--- get methods --------------------------------------------------------
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @param time
+		 * @param delete
+		 *
+		 *
+		 *
+		 * @return a value of Element
+		 */
+		@Override
+		public Element getMessageExpired(long time, boolean delete) {
+			throw new UnsupportedOperationException("Not supported yet.");
+		}
 	}
 
 
@@ -494,7 +514,9 @@ public class OfflineMessages
 		 * @param p1
 		 * @param p2
 		 *
-		 * @return
+		 *
+		 *
+		 * @return a value of int
 		 */
 		@Override
 		public int compare(Packet p1, Packet p2) {
@@ -527,4 +549,4 @@ public class OfflineMessages
 }    // OfflineMessages
 
 
-//~ Formatted in Tigase Code Convention on 13/03/12
+//~ Formatted in Tigase Code Convention on 13/08/28

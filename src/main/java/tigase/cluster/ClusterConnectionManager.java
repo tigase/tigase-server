@@ -207,7 +207,9 @@ public class ClusterConnectionManager
 	 * address rather then destination address.
 	 *
 	 * @param packet
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int hashCodeForPacket(Packet packet) {
@@ -352,7 +354,9 @@ public class ClusterConnectionManager
 
 	/**
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int processingInThreads() {
@@ -370,7 +374,9 @@ public class ClusterConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int processingOutThreads() {
@@ -438,7 +444,9 @@ public class ClusterConnectionManager
 	 *
 	 * @param serv
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Queue<Packet></code>
 	 */
 	@Override
 	public Queue<Packet> processSocketData(XMPPIOService<Object> serv) {
@@ -541,7 +549,9 @@ public class ClusterConnectionManager
 	 *
 	 * @param service
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean serviceStopped(XMPPIOService<Object> service) {
@@ -653,7 +663,9 @@ public class ClusterConnectionManager
 	 * @param service
 	 * @param attribs
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String xmppStreamOpened(XMPPIOService<Object> service, Map<String,
@@ -719,7 +731,9 @@ public class ClusterConnectionManager
 	 *
 	 * @param params
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
@@ -784,7 +798,9 @@ public class ClusterConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -795,7 +811,9 @@ public class ClusterConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getDiscoDescription() {
@@ -946,7 +964,9 @@ public class ClusterConnectionManager
 	 *
 	 * @param p
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	protected boolean writePacketToSocket(Packet p) {
@@ -981,7 +1001,9 @@ public class ClusterConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int[]</code>
 	 */
 	@Override
 	protected int[] getDefPlainPorts() {
@@ -994,7 +1016,9 @@ public class ClusterConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	protected String getDefTrafficThrottling() {
@@ -1006,7 +1030,9 @@ public class ClusterConnectionManager
 	 * time for inactive connection. we should not really close the
 	 * connection at all, so let's say something like: 1000 days...
 	 *
-	 * @return a <code>long</code> value
+	 *  a <code>long</code> value
+	 *
+	 * @return a value of <code>long</code>
 	 */
 	@Override
 	protected long getMaxInactiveTime() {
@@ -1019,7 +1045,9 @@ public class ClusterConnectionManager
 	 *
 	 * @param def
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Integer</code>
 	 */
 	@Override
 	protected Integer getMaxQueueSize(int def) {
@@ -1032,7 +1060,9 @@ public class ClusterConnectionManager
 	 *
 	 * @param port
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 */
 	@Override
 	protected Map<String, Object> getParamsForPort(int port) {
@@ -1051,7 +1081,9 @@ public class ClusterConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>XMPPIOService<Object></code>
 	 */
 	@Override
 	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
@@ -1062,7 +1094,9 @@ public class ClusterConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	protected boolean isHighThroughput() {
@@ -1195,7 +1229,9 @@ public class ClusterConnectionManager
 		 * Method description
 		 *
 		 *
-		 * @return
+		 *
+		 *
+		 * @return a value of <code>float</code>
 		 */
 		public float getAverageCompressionRatio() {
 			return compressionRatio / counter;
@@ -1205,7 +1241,9 @@ public class ClusterConnectionManager
 		 * Method description
 		 *
 		 *
-		 * @return
+		 *
+		 *
+		 * @return a value of <code>float</code>
 		 */
 		public float getAverageDecompressionRatio() {
 			return decompressionRatio / counter;
@@ -1215,7 +1253,9 @@ public class ClusterConnectionManager
 		 * Method description
 		 *
 		 *
-		 * @return
+		 *
+		 *
+		 * @return a value of <code>int</code>
 		 */
 		public int getWaitingToSend() {
 			return clIOQueue;
@@ -1292,4 +1332,4 @@ public class ClusterConnectionManager
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/08/29

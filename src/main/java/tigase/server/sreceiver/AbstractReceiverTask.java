@@ -2,7 +2,7 @@
  * AbstractReceiverTask.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -67,8 +67,8 @@ import java.util.TreeMap;
  */
 public abstract class AbstractReceiverTask
 				implements ReceiverTaskIfc {
-	private static Logger log =
-		Logger.getLogger("tigase.server.sreceiver.AbstractReceiverTask");
+	private static Logger log = Logger.getLogger(
+			"tigase.server.sreceiver.AbstractReceiverTask");
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -76,21 +76,21 @@ public abstract class AbstractReceiverTask
 
 //private String name = null;
 //protected String local_domain = null;
-	private String description                   = null;
-	private JID jid                              = null;
-	private JID owner                            = null;
-	private long packets_received                = 0;
-	private long packets_sent                    = 0;
-	private Map<String, PropertyItem> props      = null;
-	private StanzaReceiverIfc srecv              = null;
-	private SubscrRestrictions subsc_restr       = SUBSCR_RESTRICTIONS_PROP_VAL;
-	private boolean send_to_online_only          = ONLINE_ONLY_PROP_VAL;
-	private SenderRestrictions send_restr        = ALLOWED_SENDERS_PROP_VAL;
-	private SenderAddress replace_sender_address = REPLACE_SENDER_PROP_VAL;
-	private MessageType message_type             = MESSAGE_TYPE_PROP_VAL;
-	private Pattern subscr_restr_regex           =
-		Pattern.compile(SUBSCR_RESTR_REGEX_PROP_VAL);
-	private Map<JID, RosterItem> roster          = new HashMap<JID, RosterItem>();
+	private String                    description            = null;
+	private JID                       jid                    = null;
+	private JID                       owner                  = null;
+	private long                      packets_received       = 0;
+	private long                      packets_sent           = 0;
+	private Map<String, PropertyItem> props                  = null;
+	private StanzaReceiverIfc         srecv                  = null;
+	private SubscrRestrictions        subsc_restr            = SUBSCR_RESTRICTIONS_PROP_VAL;
+	private boolean                   send_to_online_only    = ONLINE_ONLY_PROP_VAL;
+	private SenderRestrictions        send_restr             = ALLOWED_SENDERS_PROP_VAL;
+	private SenderAddress             replace_sender_address = REPLACE_SENDER_PROP_VAL;
+	private MessageType               message_type           = MESSAGE_TYPE_PROP_VAL;
+	private Pattern                   subscr_restr_regex = Pattern.compile(
+			SUBSCR_RESTR_REGEX_PROP_VAL);
+	private Map<JID, RosterItem>      roster = new HashMap<JID, RosterItem>();
 
 	//~--- methods --------------------------------------------------------------
 
@@ -110,7 +110,7 @@ public abstract class AbstractReceiverTask
 				}    // end of if (getRosterItem(buddy) == null)
 				log.info(getJID() + ": " + "Adding buddy to roster: " + buddy);
 				presence = getPresence(jid, buddy, StanzaType.subscribe, jid.getLocalpart(),
-															 null);
+						null);
 			} else {
 				log.info(getJID() + ": " + "Not allowed to subscribe, rejecting: " + buddy);
 				presence = getPresence(jid, buddy, StanzaType.unsubscribed);
@@ -138,7 +138,9 @@ public abstract class AbstractReceiverTask
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>RosterItem</code>
 	 */
 	public RosterItem addToRoster(JID jid) {
 		RosterItem ri = new RosterItem(jid.copyWithoutResource());
@@ -171,165 +173,6 @@ public abstract class AbstractReceiverTask
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public Map<String, PropertyItem> getDefaultParams() {
-		Map<String, PropertyItem> defs = new TreeMap<String, PropertyItem>();
-
-		defs.put(SUBSCR_RESTRICTIONS_PROP_KEY,
-						 new PropertyItem(SUBSCR_RESTRICTIONS_PROP_KEY,
-															SUBSCR_RESTRICTIONS_DISPL_NAME,
-															SUBSCR_RESTRICTIONS_PROP_VAL));
-		defs.put(MESSAGE_TYPE_PROP_KEY,
-						 new PropertyItem(MESSAGE_TYPE_PROP_KEY, MESSAGE_TYPE_DISPL_NAME,
-															MESSAGE_TYPE_PROP_VAL));
-		defs.put(ALLOWED_SENDERS_PROP_KEY,
-						 new PropertyItem(ALLOWED_SENDERS_PROP_KEY, ALLOWED_SENDERS_DISPL_NAME,
-															ALLOWED_SENDERS_PROP_VAL));
-		defs.put(SUBSCR_RESTR_REGEX_PROP_KEY,
-						 new PropertyItem(SUBSCR_RESTR_REGEX_PROP_KEY, SUBSCR_RESTR_REGEX_DISPL_NAME,
-															SUBSCR_RESTR_REGEX_PROP_VAL));
-		defs.put(ONLINE_ONLY_PROP_KEY,
-						 new PropertyItem(ONLINE_ONLY_PROP_KEY, ONLINE_ONLY_DISPL_NAME,
-															ONLINE_ONLY_PROP_VAL));
-		defs.put(REPLACE_SENDER_PROP_KEY,
-						 new PropertyItem(REPLACE_SENDER_PROP_KEY, REPLACE_SENDER_DISPL_NAME,
-															REPLACE_SENDER_PROP_VAL));
-		defs.put(ALLOWED_SENDERS_LIST_PROP_KEY,
-						 new PropertyItem(ALLOWED_SENDERS_LIST_PROP_KEY,
-															ALLOWED_SENDERS_LIST_DISPL_NAME,
-															ALLOWED_SENDERS_LIST_PROP_VAL));
-		defs.put(DESCRIPTION_PROP_KEY,
-						 new PropertyItem(DESCRIPTION_PROP_KEY, DESCRIPTION_DISPL_NAME,
-															DESCRIPTION_PROP_VAL));
-		defs.put(TASK_ADMINS_PROP_KEY,
-						 new PropertyItem(TASK_ADMINS_PROP_KEY, TASK_ADMINS_DISPL_NAME,
-															TASK_ADMINS_PROP_VAL));
-		defs.put(TASK_OWNER_PROP_KEY,
-						 new PropertyItem(TASK_OWNER_PROP_KEY, TASK_OWNER_DISPL_NAME,
-															TASK_OWNER_PROP_VAL));
-
-		return defs;
-	}
-
-	/**
-	 * Describe <code>getDescription</code> method here.
-	 *
-	 * @return a <code>String</code> value
-	 */
-	@Override
-	public String getDescription() {
-		return description;
-	}
-
-	/**
-	 * Describe <code>getInstance</code> method here.
-	 *
-	 * @return a <code>ReceiverTaskIfc</code> value
-	 */
-	@Override
-	public ReceiverTaskIfc getInstance() {
-		try {
-			return getClass().newInstance();
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can't instantiate receiver task: " + getClass().getName(),
-							e);
-
-			return null;
-		}    // end of try-catch
-	}
-
-	/**
-	 * Describe <code>getJID</code> method here.
-	 *
-	 * @return a <code>String</code> value
-	 */
-	@Override
-	public JID getJID() {
-		return jid;
-	}
-
-	/**
-	 * Describe <code>getParams</code> method here.
-	 *
-	 * @return a <code>Map</code> value
-	 */
-	@Override
-	public Map<String, PropertyItem> getParams() {
-		return props;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public Map<JID, RosterItem> getRoster() {
-		return roster;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 *
-	 * @return
-	 */
-	public RosterItem getRosterItem(JID jid) {
-		return roster.get(jid.copyWithoutResource());
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 */
-	@Override
-	public void getStatistics(StatisticsList list) {}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public List<StatRecord> getStats() {
-		List<StatRecord> stats = new LinkedList<StatRecord>();
-
-		stats.add(new StatRecord(getJID().toString(), "Roster size", "int", roster.size(),
-														 Level.INFO));
-		stats.add(new StatRecord(getJID().toString(), "Packets received", "long",
-														 packets_received, Level.INFO));
-		stats.add(new StatRecord(getJID().toString(), "Packets sent", "long", packets_sent,
-														 Level.INFO));
-
-		int moderation_needed = 0;
-
-		for (RosterItem ri : roster.values()) {
-			moderation_needed += (ri.isModerationAccepted()
-														? 0
-														: 1);
-		}    // end of for (RosterItem ri: roster)
-		stats.add(new StatRecord(getJID().toString(), "Awaiting moderation", "int",
-														 moderation_needed, Level.INFO));
-
-		return stats;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -343,100 +186,14 @@ public abstract class AbstractReceiverTask
 
 			if (ri.isSubscribed()) {
 				presence = getPresence(jid, ri.getJid(), StanzaType.available, null,
-															 getDescription());
+						getDescription());
 			} else {
-				presence = getPresence(jid, ri.getJid(), StanzaType.subscribe,
-															 jid.getLocalpart(), null);
+				presence = getPresence(jid, ri.getJid(), StanzaType.subscribe, jid
+						.getLocalpart(), null);
 			}    // end of if (ri.isSubscribed()) else
 			results.offer(presence);
 		}
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 *
-	 * @return
-	 */
-	@Override
-	public boolean isAdmin(JID jid) {
-		RosterItem ri = getRosterItem(jid);
-
-		return (ri != null) && (ri.isAdmin() || ri.isOwner());
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param buddy
-	 *
-	 * @return
-	 */
-	public boolean isAllowedToPost(JID buddy) {
-		boolean result = false;
-		RosterItem ri  = getRosterItem(buddy);
-
-		switch (send_restr) {
-		case SUBSCRIBED :
-			result = (ri != null) && ri.isSubscribed() && ri.isModerationAccepted();
-
-			break;
-
-		case OWNER :
-			result = (ri != null) && ri.isOwner();
-
-			break;
-
-		default :
-			result = true;
-
-			break;
-		}    // end of switch (send_restr)
-
-		return result;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param buddy
-	 *
-	 * @return
-	 */
-	public boolean isAllowedToSubscribe(JID buddy) {
-		boolean result = false;
-
-		switch (subsc_restr) {
-		case LOCAL :
-			String buddy_domain = buddy.getDomain();
-
-			if (buddy_domain.equals(jid.getDomain())) {
-				result = true;
-			}    // end of if (buddy_domain.equals(local_domain))
-
-			break;
-
-		case REGEX :
-			result = subscr_restr_regex.matcher(buddy.toString()).matches();
-
-			break;
-
-		default :
-			result = true;
-
-			break;
-		}      // end of switch (subsc_restr)
-
-		return result;
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Describe <code>processPacket</code> method here.
@@ -464,7 +221,7 @@ public abstract class AbstractReceiverTask
 			} else {
 				try {
 					results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
-									"You are not allowed to post a message.", true));
+							"You are not allowed to post a message.", true));
 				} catch (PacketErrorTypeException e) {
 					log.warning("Packet processing exception: " + e);
 				}
@@ -479,7 +236,9 @@ public abstract class AbstractReceiverTask
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>RosterItem</code>
 	 */
 	public RosterItem removeFromRoster(JID jid) {
 		return roster.remove(jid.copyWithoutResource());
@@ -502,6 +261,256 @@ public abstract class AbstractReceiverTask
 				results.offer(getPresence(jid, buddy, StanzaType.unsubscribed));
 			}    // end of if (getRosterItem(buddy) == null)
 		}      // end of for (String buddy: new_subscr)
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>Map<String,PropertyItem></code>
+	 */
+	@Override
+	public Map<String, PropertyItem> getDefaultParams() {
+		Map<String, PropertyItem> defs = new TreeMap<String, PropertyItem>();
+
+		defs.put(SUBSCR_RESTRICTIONS_PROP_KEY, new PropertyItem(SUBSCR_RESTRICTIONS_PROP_KEY,
+				SUBSCR_RESTRICTIONS_DISPL_NAME, SUBSCR_RESTRICTIONS_PROP_VAL));
+		defs.put(MESSAGE_TYPE_PROP_KEY, new PropertyItem(MESSAGE_TYPE_PROP_KEY,
+				MESSAGE_TYPE_DISPL_NAME, MESSAGE_TYPE_PROP_VAL));
+		defs.put(ALLOWED_SENDERS_PROP_KEY, new PropertyItem(ALLOWED_SENDERS_PROP_KEY,
+				ALLOWED_SENDERS_DISPL_NAME, ALLOWED_SENDERS_PROP_VAL));
+		defs.put(SUBSCR_RESTR_REGEX_PROP_KEY, new PropertyItem(SUBSCR_RESTR_REGEX_PROP_KEY,
+				SUBSCR_RESTR_REGEX_DISPL_NAME, SUBSCR_RESTR_REGEX_PROP_VAL));
+		defs.put(ONLINE_ONLY_PROP_KEY, new PropertyItem(ONLINE_ONLY_PROP_KEY,
+				ONLINE_ONLY_DISPL_NAME, ONLINE_ONLY_PROP_VAL));
+		defs.put(REPLACE_SENDER_PROP_KEY, new PropertyItem(REPLACE_SENDER_PROP_KEY,
+				REPLACE_SENDER_DISPL_NAME, REPLACE_SENDER_PROP_VAL));
+		defs.put(ALLOWED_SENDERS_LIST_PROP_KEY, new PropertyItem(
+				ALLOWED_SENDERS_LIST_PROP_KEY, ALLOWED_SENDERS_LIST_DISPL_NAME,
+				ALLOWED_SENDERS_LIST_PROP_VAL));
+		defs.put(DESCRIPTION_PROP_KEY, new PropertyItem(DESCRIPTION_PROP_KEY,
+				DESCRIPTION_DISPL_NAME, DESCRIPTION_PROP_VAL));
+		defs.put(TASK_ADMINS_PROP_KEY, new PropertyItem(TASK_ADMINS_PROP_KEY,
+				TASK_ADMINS_DISPL_NAME, TASK_ADMINS_PROP_VAL));
+		defs.put(TASK_OWNER_PROP_KEY, new PropertyItem(TASK_OWNER_PROP_KEY,
+				TASK_OWNER_DISPL_NAME, TASK_OWNER_PROP_VAL));
+
+		return defs;
+	}
+
+	/**
+	 * Describe <code>getDescription</code> method here.
+	 *
+	 *  a <code>String</code> value
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getDescription() {
+		return description;
+	}
+
+	/**
+	 * Describe <code>getInstance</code> method here.
+	 *
+	 *  a <code>ReceiverTaskIfc</code> value
+	 *
+	 * @return a value of <code>ReceiverTaskIfc</code>
+	 */
+	@Override
+	public ReceiverTaskIfc getInstance() {
+		try {
+			return getClass().newInstance();
+		} catch (Exception e) {
+			log.log(Level.SEVERE, "Can't instantiate receiver task: " + getClass().getName(),
+					e);
+
+			return null;
+		}    // end of try-catch
+	}
+
+	/**
+	 * Describe <code>getJID</code> method here.
+	 *
+	 *  a <code>String</code> value
+	 *
+	 * @return a value of <code>JID</code>
+	 */
+	@Override
+	public JID getJID() {
+		return jid;
+	}
+
+	/**
+	 * Describe <code>getParams</code> method here.
+	 *
+	 *  a <code>Map</code> value
+	 *
+	 * @return a value of <code>Map<String,PropertyItem></code>
+	 */
+	@Override
+	public Map<String, PropertyItem> getParams() {
+		return props;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>Map<JID,RosterItem></code>
+	 */
+	@Override
+	public Map<JID, RosterItem> getRoster() {
+		return roster;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param jid
+	 *
+	 *
+	 *
+	 * @return a value of <code>RosterItem</code>
+	 */
+	public RosterItem getRosterItem(JID jid) {
+		return roster.get(jid.copyWithoutResource());
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param list
+	 */
+	@Override
+	public void getStatistics(StatisticsList list) {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>List<StatRecord></code>
+	 */
+	@Override
+	public List<StatRecord> getStats() {
+		List<StatRecord> stats = new LinkedList<StatRecord>();
+
+		stats.add(new StatRecord(getJID().toString(), "Roster size", "int", roster.size(),
+				Level.INFO));
+		stats.add(new StatRecord(getJID().toString(), "Packets received", "long",
+				packets_received, Level.INFO));
+		stats.add(new StatRecord(getJID().toString(), "Packets sent", "long", packets_sent,
+				Level.INFO));
+
+		int moderation_needed = 0;
+
+		for (RosterItem ri : roster.values()) {
+			moderation_needed += (ri.isModerationAccepted()
+					? 0
+					: 1);
+		}    // end of for (RosterItem ri: roster)
+		stats.add(new StatRecord(getJID().toString(), "Awaiting moderation", "int",
+				moderation_needed, Level.INFO));
+
+		return stats;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param jid
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 */
+	@Override
+	public boolean isAdmin(JID jid) {
+		RosterItem ri = getRosterItem(jid);
+
+		return (ri != null) && (ri.isAdmin() || ri.isOwner());
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param buddy
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 */
+	public boolean isAllowedToPost(JID buddy) {
+		boolean    result = false;
+		RosterItem ri     = getRosterItem(buddy);
+
+		switch (send_restr) {
+		case SUBSCRIBED :
+			result = (ri != null) && ri.isSubscribed() && ri.isModerationAccepted();
+
+			break;
+
+		case OWNER :
+			result = (ri != null) && ri.isOwner();
+
+			break;
+
+		default :
+			result = true;
+
+			break;
+		}    // end of switch (send_restr)
+
+		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param buddy
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 */
+	public boolean isAllowedToSubscribe(JID buddy) {
+		boolean result = false;
+
+		switch (subsc_restr) {
+		case LOCAL :
+			String buddy_domain = buddy.getDomain();
+
+			if (buddy_domain.equals(jid.getDomain())) {
+				result = true;
+			}    // end of if (buddy_domain.equals(local_domain))
+
+			break;
+
+		case REGEX :
+			result = subscr_restr_regex.matcher(buddy.toString()).matches();
+
+			break;
+
+		default :
+			result = true;
+
+			break;
+		}      // end of switch (subsc_restr)
+
+		return result;
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -534,51 +543,45 @@ public abstract class AbstractReceiverTask
 		}    // end of if (props == null)
 		if (map.get(DESCRIPTION_PROP_KEY) != null) {
 			description = (String) map.get(DESCRIPTION_PROP_KEY);
-			props.put(DESCRIPTION_PROP_KEY,
-								new PropertyItem(DESCRIPTION_PROP_KEY, DESCRIPTION_DISPL_NAME,
-																 description));
+			props.put(DESCRIPTION_PROP_KEY, new PropertyItem(DESCRIPTION_PROP_KEY,
+					DESCRIPTION_DISPL_NAME, description));
 		}    // end of if (map.get(DESCRIPTION_PROP_KEY) != null)
 		if (map.get(SUBSCR_RESTR_REGEX_PROP_KEY) != null) {
 			subscr_restr_regex = Pattern.compile((String) map.get(SUBSCR_RESTR_REGEX_PROP_KEY));
-			props.put(SUBSCR_RESTR_REGEX_PROP_KEY,
-								new PropertyItem(SUBSCR_RESTR_REGEX_PROP_KEY,
-																 SUBSCR_RESTR_REGEX_DISPL_NAME, subscr_restr_regex));
+			props.put(SUBSCR_RESTR_REGEX_PROP_KEY, new PropertyItem(
+					SUBSCR_RESTR_REGEX_PROP_KEY, SUBSCR_RESTR_REGEX_DISPL_NAME,
+					subscr_restr_regex));
 		}    // end of if (map.get(SUBSCR_RESTR_REGEX_PROP_KEY) != null)
 
 		String tmp = (String) map.get(SUBSCR_RESTRICTIONS_PROP_KEY);
 
 		if (tmp != null) {
 			subsc_restr = SubscrRestrictions.valueOf(tmp);
-			props.put(SUBSCR_RESTRICTIONS_PROP_KEY,
-								new PropertyItem(SUBSCR_RESTRICTIONS_PROP_KEY,
-																 SUBSCR_RESTRICTIONS_DISPL_NAME, subsc_restr));
+			props.put(SUBSCR_RESTRICTIONS_PROP_KEY, new PropertyItem(
+					SUBSCR_RESTRICTIONS_PROP_KEY, SUBSCR_RESTRICTIONS_DISPL_NAME, subsc_restr));
 		}    // end of if (tmp != null)
 		tmp = (String) map.get(ALLOWED_SENDERS_PROP_KEY);
 		if (tmp != null) {
 			send_restr = SenderRestrictions.valueOf(tmp);
-			props.put(ALLOWED_SENDERS_PROP_KEY,
-								new PropertyItem(ALLOWED_SENDERS_PROP_KEY, ALLOWED_SENDERS_DISPL_NAME,
-																 send_restr));
+			props.put(ALLOWED_SENDERS_PROP_KEY, new PropertyItem(ALLOWED_SENDERS_PROP_KEY,
+					ALLOWED_SENDERS_DISPL_NAME, send_restr));
 		}    // end of if (tmp != null)
 		tmp = (String) map.get(MESSAGE_TYPE_PROP_KEY);
 		if (tmp != null) {
 			message_type = MessageType.valueOf(tmp);
-			props.put(MESSAGE_TYPE_PROP_KEY,
-								new PropertyItem(MESSAGE_TYPE_PROP_KEY, MESSAGE_TYPE_DISPL_NAME,
-																 message_type));
+			props.put(MESSAGE_TYPE_PROP_KEY, new PropertyItem(MESSAGE_TYPE_PROP_KEY,
+					MESSAGE_TYPE_DISPL_NAME, message_type));
 		}    // end of if (tmp != null)
 		if (map.get(ONLINE_ONLY_PROP_KEY) != null) {
 			send_to_online_only = parseBool(map.get(ONLINE_ONLY_PROP_KEY));
-			props.put(ONLINE_ONLY_PROP_KEY,
-								new PropertyItem(ONLINE_ONLY_PROP_KEY, ONLINE_ONLY_DISPL_NAME,
-																 send_to_online_only));
+			props.put(ONLINE_ONLY_PROP_KEY, new PropertyItem(ONLINE_ONLY_PROP_KEY,
+					ONLINE_ONLY_DISPL_NAME, send_to_online_only));
 		}    // end of if (map.get(ONLINE_ONLY_PROP_KEY) != null)
 		tmp = (String) map.get(REPLACE_SENDER_PROP_KEY);
 		if (tmp != null) {
 			replace_sender_address = SenderAddress.valueOf(tmp);
-			props.put(REPLACE_SENDER_PROP_KEY,
-								new PropertyItem(REPLACE_SENDER_PROP_KEY, REPLACE_SENDER_DISPL_NAME,
-																 replace_sender_address));
+			props.put(REPLACE_SENDER_PROP_KEY, new PropertyItem(REPLACE_SENDER_PROP_KEY,
+					REPLACE_SENDER_DISPL_NAME, replace_sender_address));
 		}    // end of if (map.get(REPLACE_SENDER_PROP_KEY) != null)
 		tmp = (String) map.get(TASK_OWNER_PROP_KEY);
 		if ((tmp != null) && (tmp.length() > 0)) {
@@ -596,12 +599,12 @@ public abstract class AbstractReceiverTask
 			setRosterItemOwner(ri, true);
 			setRosterItemAdmin(ri, true);
 			setRosterItemModerationAccepted(ri, true);
-			props.put(TASK_OWNER_PROP_KEY,
-								new PropertyItem(TASK_OWNER_PROP_KEY, TASK_OWNER_DISPL_NAME, owner));
+			props.put(TASK_OWNER_PROP_KEY, new PropertyItem(TASK_OWNER_PROP_KEY,
+					TASK_OWNER_DISPL_NAME, owner));
 		}
 		if (props.get(TASK_OWNER_PROP_KEY) == null) {
-			props.put(TASK_OWNER_PROP_KEY,
-								new PropertyItem(TASK_OWNER_PROP_KEY, TASK_OWNER_DISPL_NAME, ""));
+			props.put(TASK_OWNER_PROP_KEY, new PropertyItem(TASK_OWNER_PROP_KEY,
+					TASK_OWNER_DISPL_NAME, ""));
 		}
 		tmp = (String) map.get(TASK_ADMINS_PROP_KEY);
 		if ((tmp != null) && (tmp.length() > 0)) {
@@ -628,12 +631,12 @@ public abstract class AbstractReceiverTask
 					log.warning("Incorrect admin JID, stringprep processing failed: " + admin);
 				}
 			}        // end of for (String tmp_b: tmp_arr)
-			props.put(TASK_ADMINS_PROP_KEY,
-								new PropertyItem(TASK_ADMINS_PROP_KEY, TASK_ADMINS_DISPL_NAME, tmp));
+			props.put(TASK_ADMINS_PROP_KEY, new PropertyItem(TASK_ADMINS_PROP_KEY,
+					TASK_ADMINS_DISPL_NAME, tmp));
 		}
 		if (props.get(TASK_ADMINS_PROP_KEY) == null) {
-			props.put(TASK_ADMINS_PROP_KEY,
-								new PropertyItem(TASK_ADMINS_PROP_KEY, TASK_ADMINS_DISPL_NAME, ""));
+			props.put(TASK_ADMINS_PROP_KEY, new PropertyItem(TASK_ADMINS_PROP_KEY,
+					TASK_ADMINS_DISPL_NAME, ""));
 		}
 	}
 
@@ -691,7 +694,7 @@ public abstract class AbstractReceiverTask
 	 */
 	public void setRosterItemSubscribed(RosterItem ri, boolean subscribed) {
 		log.fine(getJID() + ": " + "Updating subscription for " + ri.getJid() + " to " +
-						 subscribed);
+				subscribed);
 		ri.setSubscribed(subscribed);
 	}
 
@@ -716,7 +719,9 @@ public abstract class AbstractReceiverTask
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean addOutPacket(Packet packet) {
 		return srecv.addOutPacket(packet);
@@ -731,9 +736,9 @@ public abstract class AbstractReceiverTask
 	 */
 	protected void processMessage(Packet packet, Queue<Packet> results) {
 		for (RosterItem ri : roster.values()) {
-			if (ri.isSubscribed() && ri.isModerationAccepted() &&
-					(!send_to_online_only || ri.isOnline()) &&
-					(!packet.getStanzaFrom().copyWithoutResource().equals(ri.getJid()))) {
+			if (ri.isSubscribed() && ri.isModerationAccepted() && (!send_to_online_only || ri
+					.isOnline()) && (!packet.getStanzaFrom().copyWithoutResource().equals(ri
+					.getJid()))) {
 				Element message = packet.getElement().clone();
 				Element body    = message.getChild("body");
 
@@ -770,8 +775,8 @@ public abstract class AbstractReceiverTask
 
 					String cdata = body.getCData();
 
-					body.setCData(old_from + " sends for installation at " +
-												srecv.getDefHostName() + ":\n\n" + cdata);
+					body.setCData(old_from + " sends for installation at " + srecv
+							.getDefHostName() + ":\n\n" + cdata);
 
 					break;
 				}
@@ -800,7 +805,7 @@ public abstract class AbstractReceiverTask
 			if (ri != null) {
 				setRosterItemOnline(ri, true);
 				results.offer(getPresence(jid, packet.getStanzaFrom(), StanzaType.available,
-																	null, getDescription()));
+						null, getDescription()));
 			}    // end of if (ri != null)
 
 			break;
@@ -822,13 +827,13 @@ public abstract class AbstractReceiverTask
 			if (ri != null) {
 				setRosterItemSubscribed(ri, true);
 				results.offer(getPresence(jid, packet.getStanzaFrom(), StanzaType.available,
-																	null, getDescription()));
+						null, getDescription()));
 				if (!ri.isModerationAccepted()) {
 					results.offer(getMessage(jid, packet.getStanzaFrom(), StanzaType.headline,
-																	 "You are now subscribed to " + getJID() + ".\n\n" +
-																	 "Your subscription, however awaits moderation.\n\n" +
-																	 "Once your subscription is approved next message\n" +
-																	 "will be sent confirming your membership."));
+							"You are now subscribed to " + getJID() + ".\n\n" +
+							"Your subscription, however awaits moderation.\n\n" +
+							"Once your subscription is approved next message\n" +
+							"will be sent confirming your membership."));
 				}
 			}    // end of if (ri != null)
 
@@ -847,4 +852,4 @@ public abstract class AbstractReceiverTask
 }    // AbstractReceiverTask
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/08/28

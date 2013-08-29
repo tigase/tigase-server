@@ -2,7 +2,7 @@
  * Deliver.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -47,7 +47,7 @@ public class Deliver
 	/**
 	 * Private logger for class instances.
 	 */
-	private static Logger log        = Logger.getLogger(Deliver.class.getName());
+	private static Logger       log  = Logger.getLogger(Deliver.class.getName());
 	private static final String name = "deliver";
 
 	//~--- fields ---------------------------------------------------------------
@@ -72,19 +72,6 @@ public class Deliver
 		offline_storage = (off_val == null) || Boolean.parseBoolean(off_val);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getName() {
-		return name;
-	}
-
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -95,11 +82,13 @@ public class Deliver
 	 * @param packet
 	 * @param rule
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean match(Packet packet, Element rule) {
-		String value   = rule.getAttributeStaticStr("value");
+		String  value  = rule.getAttributeStaticStr("value");
 		boolean result = false;
 
 		if (value != null) {
@@ -108,8 +97,8 @@ public class Deliver
 
 				switch (m_val) {
 				case direct :
-					result = (packet.getAttributeStaticStr(OFFLINE) == null) &&
-									 (packet.getAttributeStaticStr(FROM_CONN_ID) == null);
+					result = (packet.getAttributeStaticStr(OFFLINE) == null) && (packet
+							.getAttributeStaticStr(FROM_CONN_ID) == null);
 
 					break;
 
@@ -142,7 +131,22 @@ public class Deliver
 
 		return result;
 	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getName() {
+		return name;
+	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/08/28

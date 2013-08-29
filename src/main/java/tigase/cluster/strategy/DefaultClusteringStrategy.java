@@ -114,7 +114,9 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean containsJid(BareJID jid) {
@@ -192,7 +194,9 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	 * @param packet
 	 * @param conn
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean processPacket(Packet packet, XMPPResourceConnection conn) {
@@ -239,8 +243,10 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	 *          to be sent to a next cluster node
 	 * @param visitedNodes
 	 *          a list of nodes already visited by the packet.
-	 * @return true if the packet was sent to next cluster node and false
+	 *  true if the packet was sent to next cluster node and false
 	 *         otherwise.
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean sendToNextNode(JID fromNode, Set<JID> visitedNodes, Map<String,
 			String> data, Packet packet) {
@@ -267,7 +273,9 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>List<JID></code>
 	 */
 	@Override
 	public List<JID> getAllNodes() {
@@ -280,7 +288,9 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>JID[]</code>
 	 */
 	@Override
 	public JID[] getConnectionIdsForJid(BareJID jid) {
@@ -293,7 +303,9 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>E</code>
 	 */
 	@Override
 	public E getConnectionRecord(JID jid) {
@@ -304,7 +316,9 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>E</code>
 	 */
 	@Override
 	public E getConnectionRecordInstance() {
@@ -317,7 +331,9 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	 *
 	 * @param bareJID
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Set<E></code>
 	 */
 	@Override
 	public Set<E> getConnectionRecords(BareJID bareJID) {
@@ -330,7 +346,9 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	 *
 	 * @param params
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -341,7 +359,9 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Object</code>
 	 */
 	@Override
 	@Deprecated
@@ -357,7 +377,9 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	 * @param visitedNodes
 	 * @param packet
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>List<JID></code>
 	 */
 	public List<JID> getNodesForPacketForward(JID fromNode, Set<JID> visitedNodes,
 			Packet packet) {
@@ -413,7 +435,9 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean hasCompleteJidsInfo() {
@@ -466,7 +490,9 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean isSuitableForForward(Packet packet) {
 
@@ -511,4 +537,4 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/08/29

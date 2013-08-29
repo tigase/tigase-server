@@ -1,25 +1,27 @@
-
 /*
-* Tigase Jabber/XMPP Server
-* Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU Affero General Public License as published by
-* the Free Software Foundation, version 3 of the License.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU Affero General Public License for more details.
-*
-* You should have received a copy of the GNU Affero General Public License
-* along with this program. Look for COPYING file in the top folder.
-* If not, see http://www.gnu.org/licenses/.
-*
-* $Rev$
-* Last modified by $Author$
-* $Date$
+ * AuthRepositoryPool.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ *
  */
+
+
+
 package tigase.db;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -28,12 +30,10 @@ import tigase.xmpp.BareJID;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Map;
 
 /**
  * Created: Mar 27, 2010 11:31:17 PM
@@ -41,13 +41,14 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class AuthRepositoryPool implements AuthRepository {
+public class AuthRepositoryPool
+				implements AuthRepository {
 	private static final Logger log = Logger.getLogger(AuthRepositoryPool.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
 	private LinkedBlockingQueue<AuthRepository> repoPool =
-		new LinkedBlockingQueue<AuthRepository>();
+			new LinkedBlockingQueue<AuthRepository>();
 
 	//~--- methods --------------------------------------------------------------
 
@@ -73,7 +74,7 @@ public class AuthRepositoryPool implements AuthRepository {
 	 */
 	@Override
 	public void addUser(BareJID user, String password)
-			throws UserExistsException, TigaseDBException {
+					throws UserExistsException, TigaseDBException {
 		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
@@ -96,8 +97,10 @@ public class AuthRepositoryPool implements AuthRepository {
 	 * @param id
 	 * @param alg
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 * @throws AuthorizationException
 	 * @throws TigaseDBException
 	 * @throws UserNotFoundException
@@ -105,7 +108,7 @@ public class AuthRepositoryPool implements AuthRepository {
 	@Override
 	@Deprecated
 	public boolean digestAuth(BareJID user, String digest, String id, String alg)
-			throws UserNotFoundException, TigaseDBException, AuthorizationException {
+					throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
@@ -121,81 +124,6 @@ public class AuthRepositoryPool implements AuthRepository {
 		return false;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getResourceUri() {
-		AuthRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				return repo.getResourceUri();
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
-		}
-
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public long getUsersCount() {
-		AuthRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				return repo.getUsersCount();
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
-		}
-
-		return -1;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 *
-	 * @return
-	 */
-	@Override
-	public long getUsersCount(String domain) {
-		AuthRepository repo = takeRepo();
-
-		if (repo != null) {
-			try {
-				return repo.getUsersCount(domain);
-			} finally {
-				addRepo(repo);
-			}
-		} else {
-			log.warning("repo is NULL, pool empty? - " + repoPool.size());
-		}
-
-		return -1;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -207,7 +135,7 @@ public class AuthRepositoryPool implements AuthRepository {
 	 */
 	@Override
 	public void initRepository(String resource_uri, Map<String, String> params)
-			throws DBInitException {}
+					throws DBInitException {}
 
 	/**
 	 * Method description
@@ -239,15 +167,17 @@ public class AuthRepositoryPool implements AuthRepository {
 	 *
 	 * @param authProps
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 * @throws AuthorizationException
 	 * @throws TigaseDBException
 	 * @throws UserNotFoundException
 	 */
 	@Override
 	public boolean otherAuth(Map<String, Object> authProps)
-			throws UserNotFoundException, TigaseDBException, AuthorizationException {
+					throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
@@ -270,8 +200,10 @@ public class AuthRepositoryPool implements AuthRepository {
 	 * @param user
 	 * @param password
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 * @throws AuthorizationException
 	 * @throws TigaseDBException
 	 * @throws UserNotFoundException
@@ -279,7 +211,7 @@ public class AuthRepositoryPool implements AuthRepository {
 	@Override
 	@Deprecated
 	public boolean plainAuth(BareJID user, String password)
-			throws UserNotFoundException, TigaseDBException, AuthorizationException {
+					throws UserNotFoundException, TigaseDBException, AuthorizationException {
 		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
@@ -344,7 +276,9 @@ public class AuthRepositoryPool implements AuthRepository {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>AuthRepository</code>
 	 */
 	public AuthRepository takeRepo() {
 		try {
@@ -368,7 +302,7 @@ public class AuthRepositoryPool implements AuthRepository {
 	 */
 	@Override
 	public void updatePassword(BareJID user, String password)
-			throws UserNotFoundException, TigaseDBException {
+					throws UserNotFoundException, TigaseDBException {
 		AuthRepository repo = takeRepo();
 
 		if (repo != null) {
@@ -381,10 +315,86 @@ public class AuthRepositoryPool implements AuthRepository {
 			log.warning("repo is NULL, pool empty? - " + repoPool.size());
 		}
 	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getResourceUri() {
+		AuthRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getResourceUri();
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+		}
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	@Override
+	public long getUsersCount() {
+		AuthRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getUsersCount();
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+		}
+
+		return -1;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param domain
+	 *
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	@Override
+	public long getUsersCount(String domain) {
+		AuthRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getUsersCount(domain);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+		}
+
+		return -1;
+	}
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/29

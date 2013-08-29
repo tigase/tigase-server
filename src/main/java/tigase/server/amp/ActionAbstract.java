@@ -2,7 +2,7 @@
  * ActionAbstract.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -64,16 +64,15 @@ public abstract class ActionAbstract
 
 	/** Field description */
 	public static final String SECURITY_PROP_KEY = "security-level";
-	private static Logger log                    =
-		Logger.getLogger(ActionAbstract.class.getName());
+	private static Logger      log = Logger.getLogger(ActionAbstract.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
-	protected ActionResultsHandlerIfc resultsHandler = null;
-	private SECURITY security                        = SECURITY.STRICT;
-	private UserRepository user_repository           = null;
-	RosterFlat rosterUtil                            = new RosterFlat();
+	protected ActionResultsHandlerIfc resultsHandler  = null;
+	private SECURITY                  security        = SECURITY.STRICT;
+	private UserRepository            user_repository = null;
+	RosterFlat                        rosterUtil      = new RosterFlat();
 
 	//~--- constant enums -------------------------------------------------------
 
@@ -89,12 +88,14 @@ public abstract class ActionAbstract
 	 *
 	 * @param params
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> defs = new LinkedHashMap<String, Object>();
-		String sec_str           = (String) params.get(AMP_SECURITY_LEVEL);
+		Map<String, Object> defs    = new LinkedHashMap<String, Object>();
+		String              sec_str = (String) params.get(AMP_SECURITY_LEVEL);
 
 		if (null == sec_str) {
 			sec_str = AMP_SECURITY_LEVEL_DEFAULT;
@@ -120,7 +121,7 @@ public abstract class ActionAbstract
 	 */
 	@Override
 	public void setProperties(Map<String, Object> props,
-														ActionResultsHandlerIfc resultsHandler) {
+			ActionResultsHandlerIfc resultsHandler) {
 		this.resultsHandler = resultsHandler;
 
 		String sec_str = (String) props.get(AMP_SECURITY_LEVEL);
@@ -133,12 +134,13 @@ public abstract class ActionAbstract
 
 			// Ignore, this is expected here
 		} catch (Exception e) {
-			log.log(Level.WARNING,
-							"Incorrect amp security settings, using defaults: " + security, e);
+			log.log(Level.WARNING, "Incorrect amp security settings, using defaults: " +
+					security, e);
 		}
 
 		// Is there shared user repository instance? If so I want to use it:
-		user_repository = (UserRepository) props.get(RepositoryFactory.SHARED_USER_REPO_PROP_KEY);
+		user_repository = (UserRepository) props.get(RepositoryFactory
+				.SHARED_USER_REPO_PROP_KEY);
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -150,8 +152,10 @@ public abstract class ActionAbstract
 	 * @param packet
 	 * @param rule
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of <code>Packet</code>
 	 * @throws PacketErrorTypeException
 	 */
 	protected Packet prepareAmpPacket(Packet packet, Element rule)
@@ -178,10 +182,10 @@ public abstract class ActionAbstract
 		if (error_result) {
 			result = Authorization.NOT_ACCEPTABLE.getResponseMessage(packet, null, false);
 		} else {
-			JID old_from        = packet.getStanzaFrom();
-			JID old_to          = packet.getStanzaTo();
+			JID    old_from     = packet.getStanzaFrom();
+			JID    old_to       = packet.getStanzaTo();
 			String from_conn_id = packet.getAttributeStaticStr(FROM_CONN_ID);
-			JID new_from        = null;
+			JID    new_from     = null;
 
 			if (from_conn_id != null) {
 				new_from = JID.jidInstanceNS(old_from.getDomain());
@@ -197,8 +201,8 @@ public abstract class ActionAbstract
 
 			result.getElement().removeChild(amp);
 			amp = new Element("amp", new Element[] { rule }, new String[] { "from", "to",
-							"xmlns", "status" }, new String[] { old_from.toString(), old_to.toString(),
-							AMP_XMLNS, getName() });
+					"xmlns", "status" }, new String[] { old_from.toString(), old_to.toString(),
+					AMP_XMLNS, getName() });
 			result.getElement().addChild(amp);
 			removeTigasePayload(result);
 			if (from_conn_id != null) {
@@ -225,8 +229,8 @@ public abstract class ActionAbstract
 
 	private boolean checkUserRoster(JID user, JID contact) {
 		try {
-			String roster_str = user_repository.getData(user.getBareJID(),
-														RosterAbstract.ROSTER);
+			String roster_str = user_repository.getData(user.getBareJID(), RosterAbstract
+					.ROSTER);
 
 			if (roster_str != null) {
 				Map<BareJID, RosterElement> roster = new LinkedHashMap<BareJID, RosterElement>();
@@ -248,4 +252,4 @@ public abstract class ActionAbstract
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/08/28

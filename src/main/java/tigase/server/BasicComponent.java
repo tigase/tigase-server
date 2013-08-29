@@ -142,7 +142,9 @@ public class BasicComponent
 	 *
 	 * @param jid
 	 * @param commandId
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean canCallCommand(JID jid, String commandId) {
 		boolean result = isAdmin(jid);
@@ -173,7 +175,9 @@ public class BasicComponent
 	 * @param jid
 	 * @param acl
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean checkCommandAcl(JID jid, EnumSet<CmdAcl> acl) {
 		for (CmdAcl cmdAcl : acl) {
@@ -218,7 +222,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean handlesLocalDomains() {
@@ -229,7 +235,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean handlesNameSubdomains() {
@@ -240,7 +248,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean handlesNonLocalDomains() {
@@ -409,7 +419,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>JID</code>
 	 */
 	@Override
 	public JID getComponentId() {
@@ -422,7 +434,9 @@ public class BasicComponent
 	 *
 	 * @param params
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -456,7 +470,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>BareJID</code>
 	 */
 	public BareJID getDefHostName() {
 		return defHostname;
@@ -466,7 +482,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>BareJID</code>
 	 */
 	public BareJID getDefVHostItem() {
 		return (vHostManager != null)
@@ -478,7 +496,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String getDiscoCategory() {
 		return "component";
@@ -488,7 +508,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String getDiscoCategoryType() {
 		return "generic";
@@ -498,7 +520,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String getDiscoDescription() {
 		return "Undefined description";
@@ -507,7 +531,9 @@ public class BasicComponent
 	/**
 	 * Exists for backward compatibility with the old API.
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>List<Element></code>
 	 */
 	@Deprecated
 	public List<Element> getDiscoFeatures() {
@@ -520,7 +546,9 @@ public class BasicComponent
 	 *
 	 * @param from
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>List<Element></code>
 	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
@@ -533,7 +561,9 @@ public class BasicComponent
 	 * @param node
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Element</code>
 	 */
 	@Deprecated
 	public Element getDiscoInfo(String node, JID jid) {
@@ -548,7 +578,9 @@ public class BasicComponent
 	 * @param jid
 	 * @param from
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Element</code>
 	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
@@ -577,7 +609,9 @@ public class BasicComponent
 	 * @param node
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>List<Element></code>
 	 */
 	@Deprecated
 	public List<Element> getDiscoItems(String node, JID jid) {
@@ -592,7 +626,9 @@ public class BasicComponent
 	 * @param jid
 	 * @param from
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>List<Element></code>
 	 */
 	@Override
 	public List<Element> getDiscoItems(String node, JID jid, JID from) {
@@ -691,7 +727,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getName() {
@@ -706,7 +744,9 @@ public class BasicComponent
 	 * @param jid
 	 * @param from
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>List<Element></code>
 	 */
 	public List<Element> getScriptItems(String node, JID jid, JID from) {
 		LinkedList<Element> result      = null;
@@ -733,7 +773,9 @@ public class BasicComponent
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>VHostItem</code>
 	 */
 	public VHostItem getVHostItem(String domain) {
 		return (vHostManager != null)
@@ -747,7 +789,9 @@ public class BasicComponent
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean isAdmin(JID jid) {
 		return admins.contains(jid.getBareJID());
@@ -757,7 +801,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean isInitializationComplete() {
@@ -770,7 +816,9 @@ public class BasicComponent
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean isLocalDomain(String domain) {
 		return (vHostManager != null)
@@ -784,7 +832,9 @@ public class BasicComponent
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean isLocalDomainOrComponent(String domain) {
 		return (vHostManager != null)
@@ -795,7 +845,9 @@ public class BasicComponent
 	/**
 	 * Method returns true is component should be represented as subdomain
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean isSubdomain() {
 		return false;
@@ -917,7 +969,9 @@ public class BasicComponent
 	 * @param pc
 	 * @param results
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean processScriptCommand(Packet pc, Queue<Packet> results) {
 
@@ -995,7 +1049,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Map<String,CommandIfc></code>
 	 */
 	protected Map<String, CommandIfc> getScriptCommands() {
 		return scriptCommands;
@@ -1005,7 +1061,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>ServiceEntity</code>
 	 */
 	protected ServiceEntity getServiceEntity() {
 		return serviceEntity;
@@ -1015,7 +1073,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean isNonAdminCommands() {
 		return nonAdminCommands;
@@ -1131,4 +1191,4 @@ public class BasicComponent
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/06/08
+//~ Formatted in Tigase Code Convention on 13/08/28

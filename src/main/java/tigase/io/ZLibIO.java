@@ -1,10 +1,13 @@
 /*
+ * ZLibIO.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.io;
 
@@ -38,16 +40,14 @@ import java.nio.channels.SocketChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//~--- classes ----------------------------------------------------------------
-
 /**
  * Created: Jul 29, 2009 11:58:02 AM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ZLibIO implements IOInterface {
-
+public class ZLibIO
+				implements IOInterface {
 	/** Field description */
 	public static final String ZLIB_CAPS = "zlib-caps";
 
@@ -58,7 +58,7 @@ public class ZLibIO implements IOInterface {
 
 	//~--- fields ---------------------------------------------------------------
 
-	private IOInterface io = null;
+	private IOInterface io   = null;
 	private ZLibWrapper zlib = null;
 
 	//~--- constructors ---------------------------------------------------------
@@ -72,7 +72,7 @@ public class ZLibIO implements IOInterface {
 	 */
 	public ZLibIO(final IOInterface ioi, final int level) {
 		this.io = ioi;
-		zlib = new ZLibWrapper();
+		zlib    = new ZLibWrapper();
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -81,41 +81,13 @@ public class ZLibIO implements IOInterface {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int bytesRead() {
 		return io.bytesRead();
-	}
-
-	@Override
-	public long getBytesSent(boolean reset) {
-		return io.getBytesSent(reset);
-	}
-
-	@Override
-	public long getTotalBytesSent() {
-		return io.getTotalBytesSent();
-	}
-
-	@Override
-	public long getBytesReceived(boolean reset) {
-		return io.getBytesReceived(reset);
-	}
-
-	@Override
-	public long getTotalBytesReceived() {
-		return io.getTotalBytesReceived();
-	}
-
-	@Override
-	public long getBuffOverflow(boolean reset) {
-		return io.getBuffOverflow(reset);
-	}
-
-	@Override
-	public long getTotalBuffOverflow() {
-		return io.getTotalBuffOverflow();
 	}
 
 	/**
@@ -124,83 +96,14 @@ public class ZLibIO implements IOInterface {
 	 *
 	 * @param caps
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean checkCapabilities(String caps) {
 		return caps.contains(ZLIB_CAPS) || io.checkCapabilities(caps);
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 *
-	 * @throws IOException
-	 */
-	@Override
-	public int getInputPacketSize() throws IOException {
-		return io.getInputPacketSize();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public SocketChannel getSocketChannel() {
-		return io.getSocketChannel();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 * @param reset
-	 */
-	@Override
-	public void getStatistics(StatisticsList list, boolean reset) {
-		if (io != null) {
-			io.getStatistics(list, reset);
-		}
-
-		if (zlib != null) {
-			list.add("zlibio", "Average compression rate", zlib.averageCompressionRate(), Level.FINE);
-			list.add("zlibio", "Average decompression rate", zlib.averageDecompressionRate(), Level.FINE);
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public boolean isConnected() {
-		return io.isConnected();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param addr
-	 *
-	 * @return
-	 */
-	@Override
-	public boolean isRemoteAddress(String addr) {
-		return io.isRemoteAddress(addr);
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -208,8 +111,10 @@ public class ZLibIO implements IOInterface {
 	 *
 	 * @param buff
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of <code>ByteBuffer</code>
 	 * @throws IOException
 	 */
 	@Override
@@ -241,7 +146,6 @@ public class ZLibIO implements IOInterface {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Stop called..." + toString());
 		}
-
 		io.stop();
 		zlib.end();
 	}
@@ -250,7 +154,9 @@ public class ZLibIO implements IOInterface {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String toString() {
@@ -261,7 +167,9 @@ public class ZLibIO implements IOInterface {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean waitingToSend() {
@@ -272,7 +180,9 @@ public class ZLibIO implements IOInterface {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int waitingToSendSize() {
@@ -285,8 +195,10 @@ public class ZLibIO implements IOInterface {
 	 *
 	 * @param buff
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 * @throws IOException
 	 */
 	@Override
@@ -294,7 +206,6 @@ public class ZLibIO implements IOInterface {
 		if (buff == null) {
 			return io.write(null);
 		}
-
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "ZLIB - Writing data, remaining: {0}", buff.remaining());
 		}
@@ -305,8 +216,168 @@ public class ZLibIO implements IOInterface {
 		return io.write(compressed_buff);
 	}
 
-	/* (non-Javadoc)
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param reset is a <code>boolean</code>
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	@Override
+	public long getBuffOverflow(boolean reset) {
+		return io.getBuffOverflow(reset);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param reset is a <code>boolean</code>
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	@Override
+	public long getBytesReceived(boolean reset) {
+		return io.getBytesReceived(reset);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param reset is a <code>boolean</code>
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	@Override
+	public long getBytesSent(boolean reset) {
+		return io.getBytesSent(reset);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>int</code>
+	 * @throws IOException
+	 */
+	@Override
+	public int getInputPacketSize() throws IOException {
+		return io.getInputPacketSize();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>SocketChannel</code>
+	 */
+	@Override
+	public SocketChannel getSocketChannel() {
+		return io.getSocketChannel();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param list
+	 * @param reset
+	 */
+	@Override
+	public void getStatistics(StatisticsList list, boolean reset) {
+		if (io != null) {
+			io.getStatistics(list, reset);
+		}
+		if (zlib != null) {
+			list.add("zlibio", "Average compression rate", zlib.averageCompressionRate(), Level
+					.FINE);
+			list.add("zlibio", "Average decompression rate", zlib.averageDecompressionRate(),
+					Level.FINE);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	@Override
+	public long getTotalBuffOverflow() {
+		return io.getTotalBuffOverflow();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	@Override
+	public long getTotalBytesReceived() {
+		return io.getTotalBytesReceived();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	@Override
+	public long getTotalBytesSent() {
+		return io.getTotalBytesSent();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 */
+	@Override
+	public boolean isConnected() {
+		return io.isConnected();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param addr
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 */
+	@Override
+	public boolean isRemoteAddress(String addr) {
+		return io.isRemoteAddress(addr);
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/*
+	 *  (non-Javadoc)
 	 * @see tigase.io.IOInterface#setLogId(java.lang.String)
+	 */
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param logId is a <code>String</code>
 	 */
 	@Override
 	public void setLogId(String logId) {
@@ -315,7 +386,4 @@ public class ZLibIO implements IOInterface {
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/28

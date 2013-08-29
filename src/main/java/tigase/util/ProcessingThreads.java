@@ -1,10 +1,13 @@
 /*
+ * ProcessingThreads.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.util;
 
@@ -35,8 +37,6 @@ import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Apr 21, 2009 8:50:50 PM
@@ -62,8 +62,8 @@ public class ProcessingThreads<E extends WorkerThread> {
 	// Therefore it is also recommended that there is a single thread for
 	// each queue but we can ditribute load increasing number of queues.
 	// private int numQueues = 2;
-	private int numWorkerThreads = 1;
-	private ArrayList<E> workerThreads = null;
+	private int          numWorkerThreads = 1;
+	private ArrayList<E> workerThreads    = null;
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -84,13 +84,13 @@ public class ProcessingThreads<E extends WorkerThread> {
 	 */
 	@SuppressWarnings({ "unchecked" })
 	public ProcessingThreads(E worker, int numWorkerThreads, int maxQueueSize, String name)
-			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+					throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
 		// this.numQueues = numQueues;
 		// this.maxQueueSize = maxQueueSize;
 		this.numWorkerThreads = numWorkerThreads;
-		workerThreads = new ArrayList<E>(numWorkerThreads);
-		this.name = name;
+		workerThreads         = new ArrayList<E>(numWorkerThreads);
+		this.name             = name;
 
 //  for (int i = 0; i < numQueues; i++) {
 		// LinkedBlockingQueue<QueueItem> queue = new LinkedBlockingQueue<QueueItem>(maxQueueSize);
@@ -118,18 +118,21 @@ public class ProcessingThreads<E extends WorkerThread> {
 	 * @param packet
 	 * @param conn
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
-	public boolean addItem(XMPPProcessorIfc processor, Packet packet, XMPPResourceConnection conn) {
-		boolean ret = false;
+	public boolean addItem(XMPPProcessorIfc processor, Packet packet,
+			XMPPResourceConnection conn) {
+		boolean   ret  = false;
 		QueueItem item = new QueueItem(processor, packet, conn);
 
 		try {
 			if ((item.getConn() != null) && item.getConn().isAuthorized()) {
 
 				// Queueing packets per user...
-				ret = workerThreads.get(Math.abs(conn.getJID().getBareJID().hashCode())
-						% numWorkerThreads).offer(item);
+				ret = workerThreads.get(Math.abs(conn.getJID().getBareJID().hashCode()) %
+						numWorkerThreads).offer(item);
 
 //      ret = queues.get(Math.abs(conn.getJID().getBareJID().hashCode()
 //          % numQueues)).offer(item, packet.getPriority().ordinal());
@@ -137,15 +140,15 @@ public class ProcessingThreads<E extends WorkerThread> {
 				if (packet.getPacketFrom() != null) {
 
 					// Queueing packets per user's connection...
-					ret = workerThreads.get(Math.abs(packet.getPacketFrom().hashCode())
-							% numWorkerThreads).offer(item);
+					ret = workerThreads.get(Math.abs(packet.getPacketFrom().hashCode()) %
+							numWorkerThreads).offer(item);
 				} else {
 
 					// Otherwise per destination address
 					// If the packet elemTo is set then used it, otherwise just packetTo:
 					if (packet.getStanzaTo() != null) {
-						ret = workerThreads.get(Math.abs(packet.getStanzaTo().getBareJID().hashCode())
-								% numWorkerThreads).offer(item);
+						ret = workerThreads.get(Math.abs(packet.getStanzaTo().getBareJID()
+								.hashCode()) % numWorkerThreads).offer(item);
 
 //          ret = queues.get(Math.abs(packet.getStanzaTo().hashCode() % numQueues)).offer(item,
 //              packet.getPriority().ordinal());
@@ -164,18 +167,17 @@ public class ProcessingThreads<E extends WorkerThread> {
 			// Otherwise per destination address
 			// If the packet elemTo is set then used it, otherwise just packetTo:
 			if (packet.getStanzaTo() != null) {
-				ret = workerThreads.get(Math.abs(packet.getStanzaTo().getBareJID().hashCode())
-						% numWorkerThreads).offer(item);
+				ret = workerThreads.get(Math.abs(packet.getStanzaTo().getBareJID().hashCode()) %
+						numWorkerThreads).offer(item);
 			} else {
-				ret = workerThreads.get(Math.abs(packet.getTo().hashCode()) % numWorkerThreads).offer(item);
+				ret = workerThreads.get(Math.abs(packet.getTo().hashCode()) % numWorkerThreads)
+						.offer(item);
 			}
 
 			// ret = nullQueue.offer(item, packet.getPriority().ordinal());
 		}
-
-		if ( !ret) {
+		if (!ret) {
 			++droppedPackets;
-
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Packet dropped due to queue overflow: {0}", packet);
 			}
@@ -184,17 +186,29 @@ public class ProcessingThreads<E extends WorkerThread> {
 		return ret;
 	}
 
+	/**
+	 * Method description
+	 *
+	 */
+	public void shutdown() {
+		for (WorkerThread workerThread : workerThreads) {
+			workerThread.shutdown();
+		}
+	}
+
 	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of long
 	 */
 	public long getAverageProcessingTime() {
-		long average = 0;
-		int counters = 0;
+		long average  = 0;
+		int  counters = 0;
 
 		for (WorkerThread workerThread : workerThreads) {
 			if (workerThread.getAverageProcessingTime() > 0) {
@@ -202,7 +216,6 @@ public class ProcessingThreads<E extends WorkerThread> {
 				++counters;
 			}
 		}
-
 		if (counters > 0) {
 			return average / counters;
 		} else {
@@ -214,7 +227,9 @@ public class ProcessingThreads<E extends WorkerThread> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of long
 	 */
 	public long getDroppedPackets() {
 		return droppedPackets;
@@ -224,7 +239,9 @@ public class ProcessingThreads<E extends WorkerThread> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	public String getName() {
 		return name;
@@ -234,7 +251,9 @@ public class ProcessingThreads<E extends WorkerThread> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of int
 	 */
 	public int getTotalQueueSize() {
 		int ret = 0;
@@ -250,7 +269,9 @@ public class ProcessingThreads<E extends WorkerThread> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of int
 	 */
 	public int getTotalRuns() {
 		int ret = 0;
@@ -262,16 +283,11 @@ public class ProcessingThreads<E extends WorkerThread> {
 		return ret;
 	}
 
-        public void shutdown() {
-                for (WorkerThread workerThread : workerThreads) {
-                        workerThread.shutdown();
-                }
-        }
 ///**
 // * Method description
 // *
 // *
-// * @return
+// *
 // */
 //public E getWorkerThread() {
 //  try {
@@ -283,7 +299,4 @@ public class ProcessingThreads<E extends WorkerThread> {
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/28

@@ -78,7 +78,9 @@ public class JabberIqVersion
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String id() {
@@ -125,7 +127,9 @@ public class JabberIqVersion
 	 *
 	 * @param session
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Element[]
 	 */
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
@@ -136,7 +140,9 @@ public class JabberIqVersion
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[][]
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -147,7 +153,9 @@ public class JabberIqVersion
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[]
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -156,4 +164,4 @@ public class JabberIqVersion
 }    // JabberIqVersion
 
 
-//~ Formatted in Tigase Code Convention on 13/03/12
+//~ Formatted in Tigase Code Convention on 13/08/28

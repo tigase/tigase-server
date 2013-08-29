@@ -2,7 +2,7 @@
  * RepositoryAccess.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -63,7 +63,7 @@ public abstract class RepositoryAccess {
 
 	/** Field description */
 	protected static final String NOT_AUTHORIZED_MSG =
-		"Session has not been yet authorised.";
+			"Session has not been yet authorised.";
 	private static final String ANONYMOUS_MECH = "ANONYMOUS";
 
 	/**
@@ -115,39 +115,7 @@ public abstract class RepositoryAccess {
 		// this.anon_allowed = anon_allowed;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
-	 */
-	public abstract BareJID getBareJID() throws NotAuthorizedException;
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
-	 */
-	public abstract String getUserName() throws NotAuthorizedException;
-
 	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 */
-	protected abstract void login();
 
 	/**
 	 * Method description
@@ -212,330 +180,6 @@ public abstract class RepositoryAccess {
 		addDataList(calcNode(PUBLIC_DATA_NODE, subnode), key, list);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Gets the value of authState
-	 *
-	 * @return the value of authState
-	 */
-	public final Authorization getAuthState() {
-		return this.authState;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param xmpp_sessionId
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public String getAuthenticationToken(String xmpp_sessionId)
-					throws NotAuthorizedException, TigaseDBException {
-		UUID token = UUID.randomUUID();
-
-		setData("tokens", xmpp_sessionId, token.toString());
-
-		return token.toString();
-	}
-
-	/**
-	 * <code>getData</code> method is a twin sister (brother?) of
-	 * <code>setData(String, String, String)</code> method. It allows you to
-	 * retrieve data stored with above method. It is data stored in given node
-	 * with given key identifier. If there are no data associated with given key
-	 * or given node does not exist given <code>def</code> value is returned.
-	 *
-	 * @param subnode
-	 *          a <code>String</code> value is path to node where pair
-	 *          <code>(key, value)</code> are stored.
-	 * @param key
-	 *          a <code>String</code> value of key ID for data to retrieve.
-	 * @param def
-	 *          a <code>String</code> value of default returned if there is
-	 *          nothing stored with given key. <code>def</code> can be set to any
-	 *          value you wish to have back as default value or <code>null</code>
-	 *          if you want to have back <code>null</code> if no data was found.
-	 *          If you set <code>def</code> to <code>null</code> it has exactly
-	 *          the same effect as if you use <code>getData(String)</code> method.
-	 * @return a <code>String</code> value of data found for given key or
-	 *         <code>def</code> if there was no data associated with given key.
-	 * @exception NotAuthorizedException
-	 *              is thrown when session has not been authorized yet and there
-	 *              is no access to permanent storage.
-	 * @throws TigaseDBException
-	 * @see #setData(String, String, String)
-	 */
-	public String getData(String subnode, String key, String def)
-					throws NotAuthorizedException, TigaseDBException {
-		if (is_anonymous) {
-			return null;
-		}
-		if (!isAuthorized()) {
-			throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG);
-		}
-		try {
-			return repo.getData(getBareJID(), subnode, key, def);
-		} catch (UserNotFoundException e) {
-			log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
-
-			throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-
-			// } catch (TigaseDBException e) {
-			// log.log(Level.SEVERE, "Repository access exception.", e);
-		}    // end of try-catch
-
-		// return null;
-	}
-
-	/**
-	 * This method retrieves list of all direct subnodes for given node. It works
-	 * in similar way as <code>ls</code> unix command or <code>dir</code> under
-	 * DOS/Windows systems.
-	 *
-	 * @param subnode
-	 *          a <code>String</code> value of path to node for which we want to
-	 *          retrieve list of direct subnodes.
-	 * @return a <code>String[]</code> array of direct subnodes names for given
-	 *         node.
-	 * @exception NotAuthorizedException
-	 *              is thrown when session has not been authorized yet and there
-	 *              is no access to permanent storage.
-	 * @throws TigaseDBException
-	 * @see #setData(String, String, String)
-	 */
-	public String[] getDataGroups(String subnode)
-					throws NotAuthorizedException, TigaseDBException {
-		if (is_anonymous) {
-			return null;
-		}
-		if (!isAuthorized()) {
-			throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG);
-		}
-		try {
-			return repo.getSubnodes(getBareJID(), subnode);
-		} catch (UserNotFoundException e) {
-			log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
-
-			throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-
-			// } catch (TigaseDBException e) {
-			// log.log(Level.SEVERE, "Repository access exception.", e);
-		}    // end of try-catch
-
-		// return null;
-	}
-
-	/**
-	 * This method returns all data keys available in permanent storage in given
-	 * node. There is not though any information what kind of data is stored with
-	 * this key. This is up to user (developer) to determine what data type is
-	 * associated with key and what is it's meaning.
-	 *
-	 * @param subnode
-	 *          a <code>String</code> value pointing to specific subnode in user
-	 *          reposiotry where data have to be stored.
-	 * @return a <code>String[]</code> array containing all data keys found in
-	 *         given subnode.
-	 * @exception NotAuthorizedException
-	 *              is thrown when session has not been authorized yet and there
-	 *              is no access to permanent storage.
-	 * @throws TigaseDBException
-	 * @see #setData(String, String, String)
-	 */
-	public String[] getDataKeys(final String subnode)
-					throws NotAuthorizedException, TigaseDBException {
-		if (is_anonymous) {
-			return null;
-		}
-		if (!isAuthorized()) {
-			throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG);
-		}
-		try {
-			return repo.getKeys(getBareJID(), subnode);
-		} catch (UserNotFoundException e) {
-			log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
-
-			throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-
-			// } catch (TigaseDBException e) {
-			// log.log(Level.SEVERE, "Repository access exception.", e);
-		}    // end of try-catch
-
-		// return null;
-	}
-
-	/**
-	 * This method allows to retrieve list of values associated with one key. As
-	 * it is possible to store many values with one key there are a few methods
-	 * which provides this functionality. If given key does not exists in given
-	 * subnode <code>null</code> is returned.
-	 *
-	 * @param subnode
-	 *          a <code>String</code> value pointing to specific subnode in user
-	 *          reposiotry where data have to be stored.
-	 * @param key
-	 *          a <code>String</code> value of data key ID.
-	 * @return a <code>String[]</code> array containing all values found for given
-	 *         key.
-	 * @exception NotAuthorizedException
-	 *              is thrown when session has not been authorized yet and there
-	 *              is no access to permanent storage.
-	 * @throws TigaseDBException
-	 * @see #setData(String, String, String)
-	 */
-	public String[] getDataList(String subnode, String key)
-					throws NotAuthorizedException, TigaseDBException {
-		if (is_anonymous) {
-			return null;
-		}
-		if (!isAuthorized()) {
-			throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG);
-		}
-		try {
-			return repo.getDataList(getBareJID(), subnode, key);
-		} catch (UserNotFoundException e) {
-			log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
-
-			throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
-
-			// } catch (TigaseDBException e) {
-			// log.log(Level.SEVERE, "Repository access exception.", e);
-		}    // end of try-catch
-
-		// return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public VHostItem getDomain() {
-		return domain;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public JID getDomainAsJID() {
-		return domain.getVhost();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param subnode
-	 * @param key
-	 * @param def
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public String getOfflineData(String subnode, String key, String def)
-					throws NotAuthorizedException, TigaseDBException {
-		return getData(calcNode(OFFLINE_DATA_NODE, subnode), key, def);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param subnode
-	 * @param key
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public String[] getOfflineDataList(String subnode, String key)
-					throws NotAuthorizedException, TigaseDBException {
-		return getDataList(calcNode(OFFLINE_DATA_NODE, subnode), key);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param subnode
-	 * @param key
-	 * @param def
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public String getPublicData(String subnode, String key, String def)
-					throws NotAuthorizedException, TigaseDBException {
-		return getData(calcNode(PUBLIC_DATA_NODE, subnode), key, def);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param subnode
-	 * @param key
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public String[] getPublicDataList(String subnode, String key)
-					throws NotAuthorizedException, TigaseDBException {
-		return getDataList(calcNode(PUBLIC_DATA_NODE, subnode), key);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public boolean isAnonymous() {
-		return is_anonymous;
-	}
-
-	// /**
-	// * Sets the value of authState
-	// *
-	// * @param argAuthState Value to assign to this.authState
-	// */
-	// protected void setAuthState(final Authorization argAuthState) {
-	// this.authState = argAuthState;
-	// }
-
-	/**
-	 * This method allows you test this session if it already has been authorized.
-	 * If <code>true</code> is returned as method result it means session has
-	 * already been authorized, if <code>false</code> however session is still not
-	 * authorized.
-	 *
-	 * @return a <code>boolean</code> value which informs whether this session has
-	 *         been already authorized or not.
-	 */
-	public boolean isAuthorized() {
-		return authState == Authorization.AUTHORIZED;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
 	// ~--- methods --------------------------------------------------------------
 
 	/**
@@ -547,8 +191,10 @@ public abstract class RepositoryAccess {
 	 * @param id
 	 * @param alg
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of Authorization
 	 * @throws AuthorizationException
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -581,8 +227,10 @@ public abstract class RepositoryAccess {
 	 *
 	 * @param props
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of Authorization
 	 * @throws AuthorizationException
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -596,9 +244,8 @@ public abstract class RepositoryAccess {
 
 			if (domain.isAnonymousEnabled() && (mech != null) && mech.equals(ANONYMOUS_MECH)) {
 				is_anonymous = true;
-				props.put(AuthRepository.USER_ID_KEY,
-									BareJID.bareJIDInstanceNS(UUID.randomUUID().toString(),
-										getDomain().getVhost().getDomain()));
+				props.put(AuthRepository.USER_ID_KEY, BareJID.bareJIDInstanceNS(UUID.randomUUID()
+						.toString(), getDomain().getVhost().getDomain()));
 				authState = Authorization.AUTHORIZED;
 				login();
 			} else {
@@ -630,7 +277,9 @@ public abstract class RepositoryAccess {
 	 *
 	 * @param userId
 	 * @param password
-	 * @return a <code>Authorization</code> value of result code.
+	 *  a <code>Authorization</code> value of result code.
+	 *
+	 * @return a value of Authorization
 	 * @throws NotAuthorizedException
 	 * @throws AuthorizationException
 	 * @throws TigaseDBException
@@ -665,9 +314,11 @@ public abstract class RepositoryAccess {
 	 * @param xmpp_sessionId
 	 * @param token
 	 *
-	 * @return
 	 *
 	 *
+	 *
+	 *
+	 * @return a value of Authorization
 	 * @throws AuthorizationException
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -724,17 +375,16 @@ public abstract class RepositoryAccess {
 		}
 		authProps.put(AuthRepository.SERVER_NAME_KEY, getDomain().getVhost().getDomain());
 		authRepo.queryAuth(authProps);
-		if (domain.isAnonymousEnabled() &&
-				(authProps.get(AuthRepository.PROTOCOL_KEY) ==
-				 AuthRepository.PROTOCOL_VAL_SASL)) {
+		if (domain.isAnonymousEnabled() && (authProps.get(AuthRepository.PROTOCOL_KEY) ==
+				AuthRepository.PROTOCOL_VAL_SASL)) {
 			String[] auth_mechs = (String[]) authProps.get(AuthRepository.RESULT_KEY);
 
 			if (auth_mechs == null) {
 				throw new TigaseDBException("No euthentication mechanisms found, probably " +
-																		"DB misconfiguration problem.");
+						"DB misconfiguration problem.");
 			}
-			auth_mechs                        = Arrays.copyOf(auth_mechs,
-							auth_mechs.length + 1);
+			auth_mechs                        = Arrays.copyOf(auth_mechs, auth_mechs.length +
+					1);
 			auth_mechs[auth_mechs.length - 1] = ANONYMOUS_MECH;
 			authProps.put(AuthRepository.RESULT_KEY, auth_mechs);
 		}
@@ -748,8 +398,10 @@ public abstract class RepositoryAccess {
 	 * @param pass_param
 	 * @param email_param
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of Authorization
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 * @throws TigaseStringprepException
@@ -777,14 +429,16 @@ public abstract class RepositoryAccess {
 	 * @param pass_param
 	 * @param reg_params
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of Authorization
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 * @throws TigaseStringprepException
 	 */
-	public Authorization register(String name_param, String pass_param,
-																Map<String, String> reg_params)
+	public Authorization register(String name_param, String pass_param, Map<String,
+			String> reg_params)
 					throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
 
 		// Some clients send plain user name and others send
@@ -806,30 +460,29 @@ public abstract class RepositoryAccess {
 			long domainUsers = authRepo.getUsersCount(domain.getVhost().getDomain());
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Current number of users for domain: " +
-									 domain.getVhost().getDomain() + " is: " + domainUsers);
+				log.finest("Current number of users for domain: " + domain.getVhost()
+						.getDomain() + " is: " + domainUsers);
 			}
 			if (domainUsers >= domain.getMaxUsersNumber()) {
 				throw new NotAuthorizedException("Maximum users number for the domain exceeded.");
 			}
 		}
-		if ((user_name == null) || user_name.equals("") || (pass_param == null) ||
-				pass_param.equals("")) {
+		if ((user_name == null) || user_name.equals("") || (pass_param == null) || pass_param
+				.equals("")) {
 			return Authorization.NOT_ACCEPTABLE;
 		}
 		try {
-			authRepo.addUser(BareJID.bareJIDInstance(user_name,
-							getDomain().getVhost().getDomain()), pass_param);
+			authRepo.addUser(BareJID.bareJIDInstance(user_name, getDomain().getVhost()
+					.getDomain()), pass_param);
 			if (log.isLoggable(Level.INFO)) {
-				log.info("User added: " +
-								 BareJID.toString(user_name, getDomain().getVhost().getDomain()) +
-								 ", pass: " + pass_param);
+				log.info("User added: " + BareJID.toString(user_name, getDomain().getVhost()
+						.getDomain()) + ", pass: " + pass_param);
 			}
 			setRegistration(user_name, pass_param, reg_params);
 			if (log.isLoggable(Level.INFO)) {
-				log.info("Registration data set for: " +
-								 BareJID.toString(user_name, getDomain().getVhost().getDomain()) +
-								 ", pass: " + pass_param + ", reg_params: " + reg_params);
+				log.info("Registration data set for: " + BareJID.toString(user_name, getDomain()
+						.getVhost().getDomain()) + ", pass: " + pass_param + ", reg_params: " +
+						reg_params);
 			}
 
 			return Authorization.AUTHORIZED;
@@ -958,6 +611,446 @@ public abstract class RepositoryAccess {
 	public void removePublicDataGroup(String subnode)
 					throws NotAuthorizedException, TigaseDBException {
 		removeDataGroup(calcNode(PUBLIC_DATA_NODE, subnode));
+	}
+
+	// ~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param name_param
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of Authorization
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 * @throws TigaseStringprepException
+	 */
+	public Authorization unregister(String name_param)
+					throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
+		if (!isAuthorized()) {
+			return Authorization.FORBIDDEN;
+		}
+
+		// Some clients send plain user name and others send
+		// jid as user name. Let's resolve this here.
+		String user_name = BareJID.parseJID(name_param)[0];
+
+		if ((user_name == null) || user_name.trim().isEmpty()) {
+			user_name = name_param;
+		}    // end of if (user_mame == null || user_name.equals(""))
+		if (getUserName().equals(user_name)) {
+			try {
+				authRepo.removeUser(BareJID.bareJIDInstance(user_name, getDomain().getVhost()
+						.getDomain()));
+				try {
+					repo.removeUser(BareJID.bareJIDInstance(user_name, getDomain().getVhost()
+							.getDomain()));
+				} catch (UserNotFoundException ex) {
+
+					// We ignore this error here. If auth_repo and user_repo are in fact
+					// the same
+					// database, then user has been already removed with the
+					// auth_repo.removeUser(...)
+					// then the second call to user_repo may throw the exception which is
+					// fine.
+				}
+
+				// We mark the session as no longer authorized to prevent data access through
+				// this session.
+				logout();
+
+				// Session authorized is returned only to indicate successful operation.
+				return Authorization.AUTHORIZED;
+			} catch (UserNotFoundException e) {
+				return Authorization.REGISTRATION_REQUIRED;
+			} catch (TigaseDBException e) {
+				log.log(Level.SEVERE, "Repository access exception.", e);
+
+				return Authorization.INTERNAL_SERVER_ERROR;
+			}    // end of catch
+		} else {
+			return Authorization.FORBIDDEN;
+		}
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param xmpp_sessionId
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of String
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public String getAuthenticationToken(String xmpp_sessionId)
+					throws NotAuthorizedException, TigaseDBException {
+		UUID token = UUID.randomUUID();
+
+		setData("tokens", xmpp_sessionId, token.toString());
+
+		return token.toString();
+	}
+
+	// ~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Gets the value of authState
+	 *
+	 *  the value of authState
+	 *
+	 * @return a value of Authorization
+	 */
+	public final Authorization getAuthState() {
+		return this.authState;
+	}
+
+	// ~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of BareJID
+	 * @throws NotAuthorizedException
+	 */
+	public abstract BareJID getBareJID() throws NotAuthorizedException;
+
+	/**
+	 * <code>getData</code> method is a twin sister (brother?) of
+	 * <code>setData(String, String, String)</code> method. It allows you to
+	 * retrieve data stored with above method. It is data stored in given node
+	 * with given key identifier. If there are no data associated with given key
+	 * or given node does not exist given <code>def</code> value is returned.
+	 *
+	 * @param subnode
+	 *          a <code>String</code> value is path to node where pair
+	 *          <code>(key, value)</code> are stored.
+	 * @param key
+	 *          a <code>String</code> value of key ID for data to retrieve.
+	 * @param def
+	 *          a <code>String</code> value of default returned if there is
+	 *          nothing stored with given key. <code>def</code> can be set to any
+	 *          value you wish to have back as default value or <code>null</code>
+	 *          if you want to have back <code>null</code> if no data was found.
+	 *          If you set <code>def</code> to <code>null</code> it has exactly
+	 *          the same effect as if you use <code>getData(String)</code> method.
+	 *  a <code>String</code> value of data found for given key or
+	 *         <code>def</code> if there was no data associated with given key.
+	 *
+	 * @return a value of String
+	 * @exception NotAuthorizedException
+	 *              is thrown when session has not been authorized yet and there
+	 *              is no access to permanent storage.
+	 * @throws TigaseDBException
+	 * @see #setData(String, String, String)
+	 */
+	public String getData(String subnode, String key, String def)
+					throws NotAuthorizedException, TigaseDBException {
+		if (is_anonymous) {
+			return null;
+		}
+		if (!isAuthorized()) {
+			throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG);
+		}
+		try {
+			return repo.getData(getBareJID(), subnode, key, def);
+		} catch (UserNotFoundException e) {
+			log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
+
+			throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
+
+			// } catch (TigaseDBException e) {
+			// log.log(Level.SEVERE, "Repository access exception.", e);
+		}    // end of try-catch
+
+		// return null;
+	}
+
+	/**
+	 * This method retrieves list of all direct subnodes for given node. It works
+	 * in similar way as <code>ls</code> unix command or <code>dir</code> under
+	 * DOS/Windows systems.
+	 *
+	 * @param subnode
+	 *          a <code>String</code> value of path to node for which we want to
+	 *          retrieve list of direct subnodes.
+	 *  a <code>String[]</code> array of direct subnodes names for given
+	 *         node.
+	 *
+	 * @return a value of String[]
+	 * @exception NotAuthorizedException
+	 *              is thrown when session has not been authorized yet and there
+	 *              is no access to permanent storage.
+	 * @throws TigaseDBException
+	 * @see #setData(String, String, String)
+	 */
+	public String[] getDataGroups(String subnode)
+					throws NotAuthorizedException, TigaseDBException {
+		if (is_anonymous) {
+			return null;
+		}
+		if (!isAuthorized()) {
+			throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG);
+		}
+		try {
+			return repo.getSubnodes(getBareJID(), subnode);
+		} catch (UserNotFoundException e) {
+			log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
+
+			throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
+
+			// } catch (TigaseDBException e) {
+			// log.log(Level.SEVERE, "Repository access exception.", e);
+		}    // end of try-catch
+
+		// return null;
+	}
+
+	/**
+	 * This method returns all data keys available in permanent storage in given
+	 * node. There is not though any information what kind of data is stored with
+	 * this key. This is up to user (developer) to determine what data type is
+	 * associated with key and what is it's meaning.
+	 *
+	 * @param subnode
+	 *          a <code>String</code> value pointing to specific subnode in user
+	 *          reposiotry where data have to be stored.
+	 *  a <code>String[]</code> array containing all data keys found in
+	 *         given subnode.
+	 *
+	 * @return a value of String[]
+	 * @exception NotAuthorizedException
+	 *              is thrown when session has not been authorized yet and there
+	 *              is no access to permanent storage.
+	 * @throws TigaseDBException
+	 * @see #setData(String, String, String)
+	 */
+	public String[] getDataKeys(final String subnode)
+					throws NotAuthorizedException, TigaseDBException {
+		if (is_anonymous) {
+			return null;
+		}
+		if (!isAuthorized()) {
+			throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG);
+		}
+		try {
+			return repo.getKeys(getBareJID(), subnode);
+		} catch (UserNotFoundException e) {
+			log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
+
+			throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
+
+			// } catch (TigaseDBException e) {
+			// log.log(Level.SEVERE, "Repository access exception.", e);
+		}    // end of try-catch
+
+		// return null;
+	}
+
+	/**
+	 * This method allows to retrieve list of values associated with one key. As
+	 * it is possible to store many values with one key there are a few methods
+	 * which provides this functionality. If given key does not exists in given
+	 * subnode <code>null</code> is returned.
+	 *
+	 * @param subnode
+	 *          a <code>String</code> value pointing to specific subnode in user
+	 *          reposiotry where data have to be stored.
+	 * @param key
+	 *          a <code>String</code> value of data key ID.
+	 *  a <code>String[]</code> array containing all values found for given
+	 *         key.
+	 *
+	 * @return a value of String[]
+	 * @exception NotAuthorizedException
+	 *              is thrown when session has not been authorized yet and there
+	 *              is no access to permanent storage.
+	 * @throws TigaseDBException
+	 * @see #setData(String, String, String)
+	 */
+	public String[] getDataList(String subnode, String key)
+					throws NotAuthorizedException, TigaseDBException {
+		if (is_anonymous) {
+			return null;
+		}
+		if (!isAuthorized()) {
+			throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG);
+		}
+		try {
+			return repo.getDataList(getBareJID(), subnode, key);
+		} catch (UserNotFoundException e) {
+			log.log(Level.FINEST, "Problem accessing reposiotry: ", e);
+
+			throw new NotAuthorizedException(NO_ACCESS_TO_REP_MSG, e);
+
+			// } catch (TigaseDBException e) {
+			// log.log(Level.SEVERE, "Repository access exception.", e);
+		}    // end of try-catch
+
+		// return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of VHostItem
+	 */
+	public VHostItem getDomain() {
+		return domain;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of JID
+	 */
+	public JID getDomainAsJID() {
+		return domain.getVhost();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param subnode
+	 * @param key
+	 * @param def
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of String
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public String getOfflineData(String subnode, String key, String def)
+					throws NotAuthorizedException, TigaseDBException {
+		return getData(calcNode(OFFLINE_DATA_NODE, subnode), key, def);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param subnode
+	 * @param key
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of String[]
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public String[] getOfflineDataList(String subnode, String key)
+					throws NotAuthorizedException, TigaseDBException {
+		return getDataList(calcNode(OFFLINE_DATA_NODE, subnode), key);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param subnode
+	 * @param key
+	 * @param def
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of String
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public String getPublicData(String subnode, String key, String def)
+					throws NotAuthorizedException, TigaseDBException {
+		return getData(calcNode(PUBLIC_DATA_NODE, subnode), key, def);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param subnode
+	 * @param key
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of String[]
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public String[] getPublicDataList(String subnode, String key)
+					throws NotAuthorizedException, TigaseDBException {
+		return getDataList(calcNode(PUBLIC_DATA_NODE, subnode), key);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of String
+	 * @throws NotAuthorizedException
+	 */
+	public abstract String getUserName() throws NotAuthorizedException;
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of boolean
+	 */
+	public boolean isAnonymous() {
+		return is_anonymous;
+	}
+
+	// /**
+	// * Sets the value of authState
+	// *
+	// * @param argAuthState Value to assign to this.authState
+	// */
+	// protected void setAuthState(final Authorization argAuthState) {
+	// this.authState = argAuthState;
+	// }
+
+	/**
+	 * This method allows you test this session if it already has been authorized.
+	 * If <code>true</code> is returned as method result it means session has
+	 * already been authorized, if <code>false</code> however session is still not
+	 * authorized.
+	 *
+	 *  a <code>boolean</code> value which informs whether this session has
+	 *         been already authorized or not.
+	 *
+	 * @return a value of boolean
+	 */
+	public boolean isAuthorized() {
+		return authState == Authorization.AUTHORIZED;
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -1155,62 +1248,8 @@ public abstract class RepositoryAccess {
 	/**
 	 * Method description
 	 *
-	 *
-	 * @param name_param
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 * @throws TigaseStringprepException
 	 */
-	public Authorization unregister(String name_param)
-					throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
-		if (!isAuthorized()) {
-			return Authorization.FORBIDDEN;
-		}
-
-		// Some clients send plain user name and others send
-		// jid as user name. Let's resolve this here.
-		String user_name = BareJID.parseJID(name_param)[0];
-
-		if ((user_name == null) || user_name.trim().isEmpty()) {
-			user_name = name_param;
-		}    // end of if (user_mame == null || user_name.equals(""))
-		if (getUserName().equals(user_name)) {
-			try {
-				authRepo.removeUser(BareJID.bareJIDInstance(user_name,
-								getDomain().getVhost().getDomain()));
-				try {
-					repo.removeUser(BareJID.bareJIDInstance(user_name,
-									getDomain().getVhost().getDomain()));
-				} catch (UserNotFoundException ex) {
-
-					// We ignore this error here. If auth_repo and user_repo are in fact
-					// the same
-					// database, then user has been already removed with the
-					// auth_repo.removeUser(...)
-					// then the second call to user_repo may throw the exception which is
-					// fine.
-				}
-
-				// We mark the session as no longer authorized to prevent data access through
-				// this session.
-				logout();
-
-				// Session authorized is returned only to indicate successful operation.
-				return Authorization.AUTHORIZED;
-			} catch (UserNotFoundException e) {
-				return Authorization.REGISTRATION_REQUIRED;
-			} catch (TigaseDBException e) {
-				log.log(Level.SEVERE, "Repository access exception.", e);
-
-				return Authorization.INTERNAL_SERVER_ERROR;
-			}    // end of catch
-		} else {
-			return Authorization.FORBIDDEN;
-		}
-	}
+	protected abstract void login();
 
 	private String calcNode(String base, String subnode) {
 		if (subnode == null) {
@@ -1221,7 +1260,7 @@ public abstract class RepositoryAccess {
 	}
 
 	private Authorization changeRegistration(final String name_param,
-					final String pass_param, final Map<String, String> registr_params)
+			final String pass_param, final Map<String, String> registr_params)
 					throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
 		if ((name_param == null) || name_param.equals("") || (pass_param == null) ||
 				pass_param.equals("")) {
@@ -1241,8 +1280,7 @@ public abstract class RepositoryAccess {
 	// ~--- get methods ----------------------------------------------------------
 	private boolean isLoginAllowed() throws AuthorizationException {
 		if (isAuthorized()) {
-			throw new AuthorizationException(
-					"User session already authenticated. " +
+			throw new AuthorizationException("User session already authenticated. " +
 					"Subsequent login is forbidden. You must loggin on a different connection.");
 		}
 
@@ -1253,15 +1291,15 @@ public abstract class RepositoryAccess {
 
 	// ~--- set methods ----------------------------------------------------------
 	private void setRegistration(final String name_param, final String pass_param,
-															 final Map<String, String> registr_params)
+			final Map<String, String> registr_params)
 					throws TigaseDBException, TigaseStringprepException {
 		try {
-			authRepo.updatePassword(BareJID.bareJIDInstance(name_param,
-							getDomain().getVhost().getDomain()), pass_param);
+			authRepo.updatePassword(BareJID.bareJIDInstance(name_param, getDomain().getVhost()
+					.getDomain()), pass_param);
 			if (registr_params != null) {
 				for (Map.Entry<String, String> entry : registr_params.entrySet()) {
-					repo.setData(BareJID.bareJIDInstance(name_param,
-									getDomain().getVhost().getDomain()), entry.getKey(), entry.getValue());
+					repo.setData(BareJID.bareJIDInstance(name_param, getDomain().getVhost()
+							.getDomain()), entry.getKey(), entry.getValue());
 				}
 			}
 		} catch (UserNotFoundException e) {
@@ -1280,4 +1318,4 @@ public abstract class RepositoryAccess {
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/08/28

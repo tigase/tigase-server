@@ -100,7 +100,9 @@ public abstract class XMPPProcessor
 	 * @param packet
 	 * @param conn
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Authorization
 	 */
 	@Override
 	public Authorization canHandle(Packet packet, XMPPResourceConnection conn) {
@@ -136,7 +138,9 @@ public abstract class XMPPProcessor
 	 * Method <code>compareTo</code> is used to perform
 	 *
 	 * @param proc an <code>XMPPProcessor</code> value
-	 * @return an <code>int</code> value
+	 *  an <code>int</code> value
+	 *
+	 * @return a value of int
 	 */
 	@Override
 	public final int compareTo(XMPPImplIfc proc) {
@@ -147,7 +151,9 @@ public abstract class XMPPProcessor
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of int
 	 */
 	@Override
 	public int concurrentQueuesNo() {
@@ -158,9 +164,11 @@ public abstract class XMPPProcessor
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
 	 *
 	 * @deprecated
+	 *
+	 * @return a value of int
 	 */
 	@Override
 	@Deprecated
@@ -186,7 +194,9 @@ public abstract class XMPPProcessor
 	 *
 	 * @param session
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Element[]
 	 */
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
@@ -197,7 +207,9 @@ public abstract class XMPPProcessor
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[][]
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -208,7 +220,9 @@ public abstract class XMPPProcessor
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[]
 	 */
 	@Override
 	@Deprecated
@@ -220,7 +234,9 @@ public abstract class XMPPProcessor
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[]
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -233,7 +249,9 @@ public abstract class XMPPProcessor
 	 *
 	 * @param session
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Element[]
 	 */
 	@Override
 	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
@@ -244,7 +262,9 @@ public abstract class XMPPProcessor
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Set<StanzaType>
 	 */
 	@Override
 	public Set<StanzaType> supTypes() {
@@ -257,7 +277,9 @@ public abstract class XMPPProcessor
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of XMPPProcessor
 	 */
 	public XMPPProcessor getInstance() {
 		return this;
@@ -279,7 +301,9 @@ public abstract class XMPPProcessor
 	 * @param element
 	 * @param ns
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	@Override
 	@Deprecated
@@ -351,4 +375,4 @@ public abstract class XMPPProcessor
 }    // XMPPProcessor
 
 
-//~ Formatted in Tigase Code Convention on 13/04/24
+//~ Formatted in Tigase Code Convention on 13/08/28

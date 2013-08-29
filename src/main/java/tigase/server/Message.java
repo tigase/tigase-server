@@ -105,8 +105,10 @@ public class Message
 	 *          do not set packet IDs for messages but in some cases this might be
 	 *          useful.
 	 *
-	 * @return a new <code>Packet</code> instance (more specifically
+	 *  a new <code>Packet</code> instance (more specifically
 	 *         <code>Message</code> instance) with the message stanza.
+	 *
+	 * @return a value of <code>Packet</code>
 	 */
 	public static Packet getMessage(JID from, JID to, StanzaType type, String body,
 			String subject, String thread, String id) {
@@ -142,7 +144,9 @@ public class Message
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
 	 */
 	@Override
 	protected String[] getElNameErrorPath() {
@@ -151,4 +155,4 @@ public class Message
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/08/28

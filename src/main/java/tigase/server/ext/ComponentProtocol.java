@@ -242,21 +242,6 @@ public class ComponentProtocol
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	protected String getDefTrafficThrottling() {
-		return "xmpp:25m:0:disc,bin:20000m:0:disc";
-	}
-
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -291,177 +276,6 @@ public class ComponentProtocol
 		addComponentDomain(hostname);
 	}
 
-	private void updateServiceDiscoForConnection(String hostname, ComponentIOService serv) {
-
-		// Cut off the first, component part
-		int    idx         = hostname.indexOf(".");
-		String newhostname = hostname.substring(idx + 1);
-
-		if (!isLocalDomain(newhostname)) {
-			updateServiceDiscoveryItem(newhostname, "ext", serv.getUniqueId(), true);
-		} else {
-
-			// We don't do the trick because this would break stuff
-		}
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param hostname
-	 *
-	 * @return
-	 */
-	@Override
-	public CompRepoItem getCompRepoItem(String hostname) {
-		return repo.getItem(hostname);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 * @return
-	 */
-	@Override
-	@SuppressWarnings({ "unchecked" })
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> defs = super.getDefaults(params);
-
-		experimental = Boolean.parseBoolean((String) params.get("--experimental"));
-
-		String repo_class = (String) params.get(EXTCOMP_REPO_CLASS_PROPERTY);
-
-		if (repo_class == null) {
-			repo_class = EXTCOMP_REPO_CLASS_PROP_VAL;
-		}
-		defs.put(EXTCOMP_REPO_CLASS_PROP_KEY, repo_class);
-		try {
-			repo = (ComponentRepository<CompRepoItem>) Class.forName(repo_class).newInstance();
-			repo.getDefaults(defs, params);
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can not instantiate items repository for class: " +
-					repo_class, e);
-		}
-		defs.put(PACK_ROUTED_KEY, PACK_ROUTED_VAL);
-		defs.put(RETURN_SERVICE_DISCO_KEY, RETURN_SERVICE_DISCO_VAL);
-		defs.put(IDENTITY_TYPE_KEY, IDENTITY_TYPE_VAL);
-
-		String bind_hostnames = (String) params.get(EXTCOMP_BIND_HOSTNAMES);
-
-		if (bind_hostnames != null) {
-			defs.put(EXTCOMP_BIND_HOSTNAMES_PROP_KEY, bind_hostnames.split(","));
-		} else {
-			defs.put(EXTCOMP_BIND_HOSTNAMES_PROP_KEY, new String[] { "" });
-		}
-		defs.put(CLOSE_ON_SEQUENCE_ERROR_PROP_KEY, closeOnSequenceError);
-		defs.put(MAX_AUTH_ATTEMPTS_PROP_KEY, maxAuthenticationAttempts);
-		defs.put(AUTHENTICATION_TIMEOUT_PROP_KEY, authenticationTimeOut);
-
-		return defs;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getDiscoCategoryType() {
-		return identity_type;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getDiscoDescription() {
-		return "External component";
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param key
-	 *
-	 * @return
-	 */
-	@Override
-	public ExtProcessor getProcessor(String key) {
-		return processors.get(key);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 */
-	@Override
-	public void getStatistics(StatisticsList list) {
-		super.getStatistics(list);
-
-		// Warning size() for ConcurrentHashMap is very slow
-		// unless we have a huge number of domains this should not be a problem
-		// though.
-		list.add(getName(), "Number of external domains", connections.size(), Level.FINE);
-
-		int size = 0;
-
-		for (CopyOnWriteArrayList<ComponentConnection> conns : connections.values()) {
-			size += conns.size();
-		}
-		list.add(getName(), "Number of external component connections", size, Level.FINER);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 *
-	 * @return
-	 */
-	@Override
-	public List<Element> getStreamFeatures(ComponentIOService serv) {
-		List<Element> results = new LinkedList<Element>();
-
-		for (ExtProcessor proc : processors.values()) {
-			List<Element> proc_res = proc.getStreamFeatures(serv, this);
-
-			if (proc_res != null) {
-				results.addAll(proc_res);
-			}
-		}
-
-		return results;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param xmlns
-	 *
-	 * @return
-	 */
-	@Override
-	public StreamOpenHandler getStreamOpenHandler(String xmlns) {
-		return streamOpenHandlers.get(xmlns);
-	}
-
-	//~--- methods --------------------------------------------------------------
-
 	// ~--- methods --------------------------------------------------------------
 
 	/**
@@ -482,7 +296,9 @@ public class ComponentProtocol
 	 *
 	 * @param serv
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Queue<Packet></code>
 	 */
 	@Override
 	public Queue<Packet> processSocketData(ComponentIOService serv) {
@@ -568,7 +384,8 @@ public class ComponentProtocol
 	@Override
 	public void serviceStarted(ComponentIOService serv) {
 		super.serviceStarted(serv);
-		addTimerTask(new AuthenticationTimerTask(serv), authenticationTimeOut, TimeUnit.SECONDS);
+		addTimerTask(new AuthenticationTimerTask(serv), authenticationTimeOut, TimeUnit
+				.SECONDS);
 
 		String xmlns = ((CompRepoItem) serv.getSessionData().get(REPO_ITEM_KEY)).getXMLNS();
 
@@ -602,7 +419,9 @@ public class ComponentProtocol
 	 *
 	 * @param service
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean serviceStopped(ComponentIOService service) {
@@ -648,6 +467,282 @@ public class ComponentProtocol
 		}
 
 		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param service
+	 */
+	@Override
+	public void tlsHandshakeCompleted(ComponentIOService service) {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param hostname
+	 * @param serv
+	 */
+	@Override
+	public void unbindHostname(String hostname, ComponentIOService serv) {
+		CopyOnWriteArrayList<ComponentConnection> conns = connections.get(hostname);
+
+		if (conns != null) {
+			ComponentConnection conn = null;
+
+			for (ComponentConnection componentConnection : conns) {
+				if (componentConnection.getService() == serv) {
+					conn = componentConnection;
+				}
+			}
+			if (conn != null) {
+				boolean moreConnections = removeComponentConnection(conn.getDomain(), conn);
+
+				if (!moreConnections) {
+					removeRoutings(conn.getDomain());
+				}
+			}
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param ios
+	 * @param p
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 */
+	@Override
+	public boolean writePacketToSocket(ComponentIOService ios, Packet p) {
+
+		// String xmlns = (String)ios.getSessionData().get("xmlns");
+		// if (xmlns != null) {
+		// p.getElement().setXMLNS(xmlns);
+		// }
+		p.getElement().removeAttribute("xmlns");
+
+		return super.writePacketToSocket(ios, p);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param serv
+	 */
+	@Override
+	public void xmppStreamClosed(ComponentIOService serv) {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param serv
+	 * @param attribs
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String xmppStreamOpened(ComponentIOService serv, Map<String, String> attribs) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Stream opened: " + serv.getRemoteAddress() + ", xmlns: " + attribs.get(
+					"xmlns") + ", type: " + serv.connectionType().toString() + ", uniqueId=" + serv
+					.getUniqueId() + ", to=" + attribs.get("to"));
+		}
+
+		String            s_xmlns = attribs.get("xmlns");
+		String            result  = null;
+		StreamOpenHandler handler = streamOpenHandlers.get(s_xmlns);
+
+		if ((handler == null) || (s_xmlns == null)) {
+			log.finest("unknownXMLNSHandler is processing request");
+			result = unknownXMLNSHandler.streamOpened(serv, attribs, this);
+		} else {
+			log.finest(handler.getClass().getName() + " is processing request");
+			result = handler.streamOpened(serv, attribs, this);
+		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Sending back: " + result);
+		}
+
+		return result;
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param hostname
+	 *
+	 *
+	 *
+	 * @return a value of <code>CompRepoItem</code>
+	 */
+	@Override
+	public CompRepoItem getCompRepoItem(String hostname) {
+		return repo.getItem(hostname);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param params
+	 *
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
+	 */
+	@Override
+	@SuppressWarnings({ "unchecked" })
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		Map<String, Object> defs = super.getDefaults(params);
+
+		experimental = Boolean.parseBoolean((String) params.get("--experimental"));
+
+		String repo_class = (String) params.get(EXTCOMP_REPO_CLASS_PROPERTY);
+
+		if (repo_class == null) {
+			repo_class = EXTCOMP_REPO_CLASS_PROP_VAL;
+		}
+		defs.put(EXTCOMP_REPO_CLASS_PROP_KEY, repo_class);
+		try {
+			repo = (ComponentRepository<CompRepoItem>) Class.forName(repo_class).newInstance();
+			repo.getDefaults(defs, params);
+		} catch (Exception e) {
+			log.log(Level.SEVERE, "Can not instantiate items repository for class: " +
+					repo_class, e);
+		}
+		defs.put(PACK_ROUTED_KEY, PACK_ROUTED_VAL);
+		defs.put(RETURN_SERVICE_DISCO_KEY, RETURN_SERVICE_DISCO_VAL);
+		defs.put(IDENTITY_TYPE_KEY, IDENTITY_TYPE_VAL);
+
+		String bind_hostnames = (String) params.get(EXTCOMP_BIND_HOSTNAMES);
+
+		if (bind_hostnames != null) {
+			defs.put(EXTCOMP_BIND_HOSTNAMES_PROP_KEY, bind_hostnames.split(","));
+		} else {
+			defs.put(EXTCOMP_BIND_HOSTNAMES_PROP_KEY, new String[] { "" });
+		}
+		defs.put(CLOSE_ON_SEQUENCE_ERROR_PROP_KEY, closeOnSequenceError);
+		defs.put(MAX_AUTH_ATTEMPTS_PROP_KEY, maxAuthenticationAttempts);
+		defs.put(AUTHENTICATION_TIMEOUT_PROP_KEY, authenticationTimeOut);
+
+		return defs;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getDiscoCategoryType() {
+		return identity_type;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getDiscoDescription() {
+		return "External component";
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param key
+	 *
+	 *
+	 *
+	 * @return a value of <code>ExtProcessor</code>
+	 */
+	@Override
+	public ExtProcessor getProcessor(String key) {
+		return processors.get(key);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param list
+	 */
+	@Override
+	public void getStatistics(StatisticsList list) {
+		super.getStatistics(list);
+
+		// Warning size() for ConcurrentHashMap is very slow
+		// unless we have a huge number of domains this should not be a problem
+		// though.
+		list.add(getName(), "Number of external domains", connections.size(), Level.FINE);
+
+		int size = 0;
+
+		for (CopyOnWriteArrayList<ComponentConnection> conns : connections.values()) {
+			size += conns.size();
+		}
+		list.add(getName(), "Number of external component connections", size, Level.FINER);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param serv
+	 *
+	 *
+	 *
+	 * @return a value of <code>List<Element></code>
+	 */
+	@Override
+	public List<Element> getStreamFeatures(ComponentIOService serv) {
+		List<Element> results = new LinkedList<Element>();
+
+		for (ExtProcessor proc : processors.values()) {
+			List<Element> proc_res = proc.getStreamFeatures(serv, this);
+
+			if (proc_res != null) {
+				results.addAll(proc_res);
+			}
+		}
+
+		return results;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param xmlns
+	 *
+	 *
+	 *
+	 * @return a value of <code>StreamOpenHandler</code>
+	 */
+	@Override
+	public StreamOpenHandler getStreamOpenHandler(String xmlns) {
+		return streamOpenHandlers.get(xmlns);
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -752,112 +847,20 @@ public class ComponentProtocol
 		processors.put(proc.getId(), proc);
 	}
 
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param service
-	 */
-	@Override
-	public void tlsHandshakeCompleted(ComponentIOService service) {}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param hostname
-	 * @param serv
-	 */
-	@Override
-	public void unbindHostname(String hostname, ComponentIOService serv) {
-		CopyOnWriteArrayList<ComponentConnection> conns = connections.get(hostname);
-
-		if (conns != null) {
-			ComponentConnection conn = null;
-
-			for (ComponentConnection componentConnection : conns) {
-				if (componentConnection.getService() == serv) {
-					conn = componentConnection;
-				}
-			}
-			if (conn != null) {
-				boolean moreConnections = removeComponentConnection(conn.getDomain(), conn);
-
-				if (!moreConnections) {
-					removeRoutings(conn.getDomain());
-				}
-			}
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param ios
-	 * @param p
-	 *
-	 * @return
-	 */
-	@Override
-	public boolean writePacketToSocket(ComponentIOService ios, Packet p) {
-
-		// String xmlns = (String)ios.getSessionData().get("xmlns");
-		// if (xmlns != null) {
-		// p.getElement().setXMLNS(xmlns);
-		// }
-		p.getElement().removeAttribute("xmlns");
-
-		return super.writePacketToSocket(ios, p);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 */
-	@Override
-	public void xmppStreamClosed(ComponentIOService serv) {}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 * @param attribs
-	 *
-	 * @return
-	 */
-	@Override
-	public String xmppStreamOpened(ComponentIOService serv, Map<String, String> attribs) {
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Stream opened: " + serv.getRemoteAddress() + ", xmlns: " + attribs.get(
-					"xmlns") + ", type: " + serv.connectionType().toString() + ", uniqueId=" + serv
-					.getUniqueId() + ", to=" + attribs.get("to"));
-		}
-
-		String            s_xmlns = attribs.get("xmlns");
-		String            result  = null;
-		StreamOpenHandler handler = streamOpenHandlers.get(s_xmlns);
-
-		if ((handler == null) || (s_xmlns == null)) {
-			log.finest("unknownXMLNSHandler is processing request");
-			result = unknownXMLNSHandler.streamOpened(serv, attribs, this);
-		} else {
-			log.finest(handler.getClass().getName() + " is processing request");
-			result = handler.streamOpened(serv, attribs, this);
-		}
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Sending back: " + result);
-		}
-
-		return result;
-	}
-
 	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	protected String getDefTrafficThrottling() {
+		return "xmpp:25m:0:disc,bin:20000m:0:disc";
+	}
 
 	// ~--- get methods ----------------------------------------------------------
 
@@ -865,7 +868,9 @@ public class ComponentProtocol
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>long</code>
 	 */
 	@Override
 	protected long getMaxInactiveTime() {
@@ -878,7 +883,9 @@ public class ComponentProtocol
 	 *
 	 * @param def
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Integer</code>
 	 */
 	@Override
 	protected Integer getMaxQueueSize(int def) {
@@ -891,7 +898,9 @@ public class ComponentProtocol
 	 *
 	 * @param p
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>ComponentIOService</code>
 	 */
 	@Override
 	protected ComponentIOService getXMPPIOService(Packet p) {
@@ -982,7 +991,9 @@ public class ComponentProtocol
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>ComponentIOService</code>
 	 */
 	@Override
 	protected ComponentIOService getXMPPIOServiceInstance() {
@@ -993,7 +1004,9 @@ public class ComponentProtocol
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	protected boolean isHighThroughput() {
@@ -1128,6 +1141,20 @@ public class ComponentProtocol
 		log.finest("All regex routings: " + getRegexRoutings().toString());
 	}
 
+	private void updateServiceDiscoForConnection(String hostname, ComponentIOService serv) {
+
+		// Cut off the first, component part
+		int    idx         = hostname.indexOf(".");
+		String newhostname = hostname.substring(idx + 1);
+
+		if (!isLocalDomain(newhostname)) {
+			updateServiceDiscoveryItem(newhostname, "ext", serv.getUniqueId(), true);
+		} else {
+
+			// We don't do the trick because this would break stuff
+		}
+	}
+
 	//~--- inner classes --------------------------------------------------------
 
 	// ~--- inner classes --------------------------------------------------------
@@ -1166,4 +1193,4 @@ public class ComponentProtocol
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/03/11
+//~ Formatted in Tigase Code Convention on 13/08/28

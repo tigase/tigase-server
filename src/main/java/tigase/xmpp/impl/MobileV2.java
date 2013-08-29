@@ -81,138 +81,6 @@ public class MobileV2
 	 * Method description
 	 *
 	 *
-	 * @return
-	 */
-	@Override
-	public String id() {
-		return ID;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param settings
-	 *
-	 * @throws TigaseDBException
-	 */
-	@Override
-	public void init(Map<String, Object> settings) throws TigaseDBException {
-		super.init(settings);
-
-		Integer maxQueueSizeVal = (Integer) settings.get(MAX_QUEUE_SIZE_KEY);
-
-		if (maxQueueSizeVal != null) {
-			maxQueueSize = maxQueueSizeVal;
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 * @param settings
-	 */
-	@Override
-	public void process(final Packet packet, final XMPPResourceConnection session,
-			final NonAuthUserRepository repo, final Queue<Packet> results, final Map<String,
-			Object> settings) {
-		if (session == null) {
-			return;
-		}
-		if (!session.isAuthorized()) {
-			try {
-				results.offer(session.getAuthState().getResponseMessage(packet,
-						"Session is not yet authorized.", false));
-			} catch (PacketErrorTypeException ex) {
-				log.log(Level.FINEST,
-						"ignoring packet from not authorized session which is already of type error");
-			}
-
-			return;
-		}
-		try {
-			StanzaType type = packet.getType();
-
-			switch (type) {
-			case set :
-				Element el       = packet.getElement().getChild(MOBILE_EL_NAME);
-				String  valueStr = el.getAttributeStaticStr("enable");
-
-				// if value is true queuing will be enabled
-				boolean value = (valueStr != null) && ("true".equals(valueStr) || "1".equals(
-						valueStr));
-
-				if (session.getSessionData(QUEUE_KEY) == null) {
-
-					// session.putSessionData(QUEUE_KEY, new
-					// LinkedBlockingQueue<Packet>());
-					session.putSessionData(QUEUE_KEY, new ConcurrentHashMap<JID, Packet>());
-				}
-				session.putSessionData(XMLNS, value);
-				results.offer(packet.okResult((Element) null, 0));
-
-				break;
-
-			default :
-				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-						"Mobile processing type is incorrect", false));
-			}
-		} catch (PacketErrorTypeException ex) {
-			Logger.getLogger(MobileV2.class.getName()).log(Level.SEVERE, null, ex);
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String[][] supElementNamePaths() {
-		return ELEMENT_PATHS;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String[] supNamespaces() {
-		return XMLNSS;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 * @return
-	 */
-	@Override
-	public Element[] supStreamFeatures(XMPPResourceConnection session) {
-		if (session == null) {
-			return null;
-		}
-		if (!session.isAuthorized()) {
-			return null;
-		}
-
-		return SUP_FEATURES;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
 	 * @param _packet
 	 * @param sessionFromSM
 	 * @param repo
@@ -304,7 +172,9 @@ public class MobileV2
 	 * @param res
 	 * @param queue
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	public boolean filter(XMPPResourceConnection session, Packet res, Map<JID,
 			Packet> queue) {
@@ -334,13 +204,155 @@ public class MobileV2
 		return true;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of String
+	 */
+	@Override
+	public String id() {
+		return ID;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param settings
+	 *
+	 * @throws TigaseDBException
+	 */
+	@Override
+	public void init(Map<String, Object> settings) throws TigaseDBException {
+		super.init(settings);
+
+		Integer maxQueueSizeVal = (Integer) settings.get(MAX_QUEUE_SIZE_KEY);
+
+		if (maxQueueSizeVal != null) {
+			maxQueueSize = maxQueueSizeVal;
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param session
+	 * @param repo
+	 * @param results
+	 * @param settings
+	 */
+	@Override
+	public void process(final Packet packet, final XMPPResourceConnection session,
+			final NonAuthUserRepository repo, final Queue<Packet> results, final Map<String,
+			Object> settings) {
+		if (session == null) {
+			return;
+		}
+		if (!session.isAuthorized()) {
+			try {
+				results.offer(session.getAuthState().getResponseMessage(packet,
+						"Session is not yet authorized.", false));
+			} catch (PacketErrorTypeException ex) {
+				log.log(Level.FINEST,
+						"ignoring packet from not authorized session which is already of type error");
+			}
+
+			return;
+		}
+		try {
+			StanzaType type = packet.getType();
+
+			switch (type) {
+			case set :
+				Element el       = packet.getElement().getChild(MOBILE_EL_NAME);
+				String  valueStr = el.getAttributeStaticStr("enable");
+
+				// if value is true queuing will be enabled
+				boolean value = (valueStr != null) && ("true".equals(valueStr) || "1".equals(
+						valueStr));
+
+				if (session.getSessionData(QUEUE_KEY) == null) {
+
+					// session.putSessionData(QUEUE_KEY, new
+					// LinkedBlockingQueue<Packet>());
+					session.putSessionData(QUEUE_KEY, new ConcurrentHashMap<JID, Packet>());
+				}
+				session.putSessionData(XMLNS, value);
+				results.offer(packet.okResult((Element) null, 0));
+
+				break;
+
+			default :
+				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+						"Mobile processing type is incorrect", false));
+			}
+		} catch (PacketErrorTypeException ex) {
+			Logger.getLogger(MobileV2.class.getName()).log(Level.SEVERE, null, ex);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of String[][]
+	 */
+	@Override
+	public String[][] supElementNamePaths() {
+		return ELEMENT_PATHS;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of String[]
+	 */
+	@Override
+	public String[] supNamespaces() {
+		return XMLNSS;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 *
+	 *
+	 * @return a value of Element[]
+	 */
+	@Override
+	public Element[] supStreamFeatures(XMPPResourceConnection session) {
+		if (session == null) {
+			return null;
+		}
+		if (!session.isAuthorized()) {
+			return null;
+		}
+
+		return SUP_FEATURES;
+	}
+
 	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Check if queuing is enabled
 	 *
 	 * @param session
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	protected boolean isQueueEnabled(XMPPResourceConnection session) {
 		Boolean enabled = (Boolean) session.getSessionData(XMLNS);
@@ -350,4 +362,4 @@ public class MobileV2
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/16
+//~ Formatted in Tigase Code Convention on 13/08/28

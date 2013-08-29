@@ -91,15 +91,114 @@ public class VHostJDBCRepository
 	public static final String DOMAINS_PER_USER_LIMIT_PROP_KEY = "domains-per-user-limit";
 
 	/** Field description */
-	public static final int DOMAINS_PER_USER_LIMIT_PROP_VAL = 25;
-	private static final Logger log                         =
-		Logger.getLogger(VHostJDBCRepository.class.getName());
+	public static final int     DOMAINS_PER_USER_LIMIT_PROP_VAL = 25;
+	private static final Logger log = Logger.getLogger(VHostJDBCRepository.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
-	private String def_ip_address    = null;
-	private String def_srv_address   = null;
-	private int max_domains_per_user = DOMAINS_PER_USER_LIMIT_PROP_VAL;
+	private String def_ip_address       = null;
+	private String def_srv_address      = null;
+	private int    max_domains_per_user = DOMAINS_PER_USER_LIMIT_PROP_VAL;
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Simple verification of VHost validation
+	 *
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Map<String, Object> props  = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<String, Object>();
+		VHostJDBCRepository repo   = new VHostJDBCRepository();
+
+		repo.getDefaults(props, params);
+		props.put(DNS_SRV_DEF_ADDR_PROP_KEY, "tigase.me");
+		props.put(DOMAINS_PER_USER_LIMIT_PROP_KEY, 50);
+		repo.setProperties(props);
+
+		VHostItem domain = null;
+
+		try {
+			domain = new VHostItem("tigase.im");
+		} catch (TigaseStringprepException ex) {
+			Logger.getLogger(VHostJDBCRepository.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		System.out.println("repo.validateItem( domain ) :: " + repo.validateItem(domain));
+	}
+
+	/**
+	 * Performs validation of given VHostItem
+	 *
+	 * @param item VHostItem which should be validated
+	 *
+	 *
+	 * @return a value of String
+	 */
+	@Override
+	public String validateItem(VHostItem item) {
+		if ((item.getVhost() == null) || (item.getVhost().getDomain() == null) || item
+				.getVhost().getDomain().isEmpty()) {
+			return "Domain name not specified";
+		}
+
+		int vhost_count = 0;
+
+		for (VHostItem it : allItems()) {
+			if (it.isOwner(item.getOwner())) {
+				++vhost_count;
+			}
+		}
+		if (vhost_count >= max_domains_per_user) {
+			return "Maximum number of domains exceeded for the user! Current number is: " +
+					vhost_count;
+		}
+		if (System.getProperty("vhost-disable-dns-check") != null) {
+			return null;
+		}
+
+		// verify all SRV DNS records
+		try {
+			DNSEntry[] entries = DNSResolver.getHostSRV_Entries(item.getKey());
+
+			if (entries != null) {
+				for (DNSEntry dNSEntry : entries) {
+					log.finest("Validating DNS SRV settings ('" + dNSEntry +
+							"') for the given hostname: " + item.getKey() + " (defaults: " +
+							def_ip_address + ", " + def_srv_address);
+					if (Arrays.asList(dNSEntry.getIps()).contains(def_ip_address) || def_srv_address
+							.equals(dNSEntry.getDnsResultHost())) {
+
+						// configuration is OK
+						return null;
+					}
+				}
+
+				return "Incorrect DNS SRV settings" + Arrays.asList(entries);
+			}
+		} catch (UnknownHostException ex) {
+
+			// Ignore, maybe simply IP address is set in DNS
+		}
+
+		// verify DNS records
+		try {
+			String[] ipAddress = DNSResolver.getHostIPs(item.getKey());
+
+			if (ipAddress != null) {
+				if (Arrays.asList(ipAddress).contains(def_ip_address)) {
+					return null;
+				} else {
+					return "Incorrect IP address: '" + Arrays.asList(ipAddress) +
+							"' found in DNS for the given host: " + item.getKey();
+				}
+			} else {
+				return "No DNS settings found for given host: " + item.getKey();
+			}
+		} catch (UnknownHostException ex1) {
+			return "There is no DNS settings for given host: " + item.getKey();
+		}
+	}
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -107,7 +206,9 @@ public class VHostJDBCRepository
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String getConfigKey() {
@@ -118,7 +219,9 @@ public class VHostJDBCRepository
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[]
 	 */
 	@Override
 	public String[] getDefaultPropetyItems() {
@@ -153,7 +256,9 @@ public class VHostJDBCRepository
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of VHostItem
 	 */
 	@Override
 	public VHostItem getItemInstance() {
@@ -164,7 +269,9 @@ public class VHostJDBCRepository
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String getItemsListPKey() {
@@ -175,7 +282,9 @@ public class VHostJDBCRepository
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String getPropertyKey() {
@@ -186,7 +295,9 @@ public class VHostJDBCRepository
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of BareJID
 	 */
 	@Override
 	public BareJID getRepoUser() {
@@ -215,105 +326,7 @@ public class VHostJDBCRepository
 		max_domains_per_user = (Integer) properties.get(DOMAINS_PER_USER_LIMIT_PROP_KEY);
 		setAutoloadTimer(60);
 	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Performs validation of given VHostItem
-	 *
-	 * @param item VHostItem which should be validated
-	 * @return
-	 */
-	@Override
-	public String validateItem(VHostItem item) {
-		if ((item.getVhost() == null) || (item.getVhost().getDomain() == null) ||
-				item.getVhost().getDomain().isEmpty()) {
-			return "Domain name not specified";
-		}
-
-		int vhost_count = 0;
-
-		for (VHostItem it : allItems()) {
-			if (it.isOwner(item.getOwner())) {
-				++vhost_count;
-			}
-		}
-		if (vhost_count >= max_domains_per_user) {
-			return "Maximum number of domains exceeded for the user! Current number is: " +
-						 vhost_count;
-		}
-		if (System.getProperty("vhost-disable-dns-check") != null) {
-			return null;
-		}
-
-		// verify all SRV DNS records
-		try {
-			DNSEntry[] entries = DNSResolver.getHostSRV_Entries(item.getKey());
-
-			if (entries != null) {
-				for (DNSEntry dNSEntry : entries) {
-					log.finest("Validating DNS SRV settings ('" + dNSEntry +
-										 "') for the given hostname: " + item.getKey() + " (defaults: " +
-										 def_ip_address + ", " + def_srv_address);
-					if (Arrays.asList(dNSEntry.getIps()).contains(def_ip_address) ||
-							def_srv_address.equals(dNSEntry.getDnsResultHost())) {
-
-						// configuration is OK
-						return null;
-					}
-				}
-
-				return "Incorrect DNS SRV settings" + Arrays.asList(entries);
-			}
-		} catch (UnknownHostException ex) {
-
-			// Ignore, maybe simply IP address is set in DNS
-		}
-
-		// verify DNS records
-		try {
-			String[] ipAddress = DNSResolver.getHostIPs(item.getKey());
-
-			if (ipAddress != null) {
-				if (Arrays.asList(ipAddress).contains(def_ip_address)) {
-					return null;
-				} else {
-					return "Incorrect IP address: '" + Arrays.asList(ipAddress) +
-								 "' found in DNS for the given host: " + item.getKey();
-				}
-			} else {
-				return "No DNS settings found for given host: " + item.getKey();
-			}
-		} catch (UnknownHostException ex1) {
-			return "There is no DNS settings for given host: " + item.getKey();
-		}
-	}
-
-	/**
-	 * Simple verification of VHost validation
-	 *
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		Map<String, Object> props  = new HashMap<String, Object>();
-		Map<String, Object> params = new HashMap<String, Object>();
-		VHostJDBCRepository repo   = new VHostJDBCRepository();
-
-		repo.getDefaults(props, params);
-		props.put(DNS_SRV_DEF_ADDR_PROP_KEY, "tigase.me");
-		props.put(DOMAINS_PER_USER_LIMIT_PROP_KEY, 50);
-		repo.setProperties(props);
-
-		VHostItem domain = null;
-
-		try {
-			domain = new VHostItem("tigase.im");
-		} catch (TigaseStringprepException ex) {
-			Logger.getLogger(VHostJDBCRepository.class.getName()).log(Level.SEVERE, null, ex);
-		}
-		System.out.println("repo.validateItem( domain ) :: " + repo.validateItem(domain));
-	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/09
+//~ Formatted in Tigase Code Convention on 13/08/28

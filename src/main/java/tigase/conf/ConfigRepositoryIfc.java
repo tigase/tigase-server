@@ -50,33 +50,20 @@ public interface ConfigRepositoryIfc
 	//~--- methods --------------------------------------------------------------
 
 	/**
+	 * Method adds an Item to the configuration repository where the key is
+	 * the item key constructed of component name, node name and property key name.
+	 * @param key
+	 * @param value
+	 * @throws ConfigurationException
+	 */
+	void addItem(String key, Object value) throws ConfigurationException;
+
+	/**
 	 * Initializes the configuration repository.
 	 * @param params
 	 * @throws ConfigurationException
 	 */
 	void init(Map<String, Object> params) throws ConfigurationException;
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Returns all known settings for the given component name.
-	 * @param compName
-	 * @return
-	 * @throws ConfigurationException
-	 */
-	Map<String, Object> getProperties(String compName) throws ConfigurationException;
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param compName
-	 *
-	 * @return
-	 */
-	Set<ConfigItem> getItemsForComponent(String compName);
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Sets/adds properties for the given component name.
@@ -87,6 +74,14 @@ public interface ConfigRepositoryIfc
 	void putProperties(String compName, Map<String, Object> props)
 					throws ConfigurationException;
 
+	/**
+	 * Removes a configuration setting from the configuration repository.
+	 * @param compName
+	 * @param node
+	 * @param key
+	 */
+	void remove(String compName, String node, String key);
+
 	//~--- get methods ----------------------------------------------------------
 
 	/**
@@ -96,9 +91,63 @@ public interface ConfigRepositoryIfc
 	 * @param node
 	 * @param key
 	 * @param def
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Object</code>
 	 */
 	Object get(String compName, String node, String key, Object def);
+
+	/**
+	 * Returns all component names for which there are some configuration settings
+	 * available.
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
+	 */
+	String[] getCompNames();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
+	 */
+	Map<String, Object> getInitProperties();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param compName
+	 *
+	 *
+	 *
+	 * @return a value of <code>Set<ConfigItem></code>
+	 */
+	Set<ConfigItem> getItemsForComponent(String compName);
+
+	/**
+	 * Returns an array of all configuration keys for a given component and configuration
+	 * node.
+	 * @param compName
+	 * @param node
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
+	 */
+	String[] getKeys(String compName, String node);
+
+	/**
+	 * Returns all known settings for the given component name.
+	 * @param compName
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
+	 * @throws ConfigurationException
+	 */
+	Map<String, Object> getProperties(String compName) throws ConfigurationException;
 
 	//~--- set methods ----------------------------------------------------------
 
@@ -111,45 +160,6 @@ public interface ConfigRepositoryIfc
 	 */
 	void set(String compName, String node, String key, Object value);
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Returns all component names for which there are some configuration settings
-	 * available.
-	 * @return
-	 */
-	String[] getCompNames();
-
-	/**
-	 * Returns an array of all configuration keys for a given component and configuration
-	 * node.
-	 * @param compName
-	 * @param node
-	 * @return
-	 */
-	String[] getKeys(String compName, String node);
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Removes a configuration setting from the configuration repository.
-	 * @param compName
-	 * @param node
-	 * @param key
-	 */
-	void remove(String compName, String node, String key);
-
-	/**
-	 * Method adds an Item to the configuration repository where the key is
-	 * the item key constructed of component name, node name and property key name.
-	 * @param key
-	 * @param value
-	 * @throws ConfigurationException
-	 */
-	void addItem(String key, Object value) throws ConfigurationException;
-
-	//~--- set methods ----------------------------------------------------------
-
 	/**
 	 * This is used to load a configuration for a selected cluster node. The configuration
 	 * repository (file or database) may contain settings for all cluster nodes, some
@@ -158,17 +168,7 @@ public interface ConfigRepositoryIfc
 	 * @param hostname
 	 */
 	void setDefHostname(String hostname);
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	Map<String, Object> getInitProperties();
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/04
+//~ Formatted in Tigase Code Convention on 13/08/29

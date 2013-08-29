@@ -2,11 +2,12 @@
  * XMPPServiceCollector.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -54,8 +55,8 @@ public abstract class XMPPServiceCollector
 	 * Variable <code>log</code> is a class logger.
 	 */
 	@SuppressWarnings("unused")
-	private static final Logger log =
-		Logger.getLogger(XMPPServiceCollector.class.getName());
+	private static final Logger log = Logger.getLogger(XMPPServiceCollector.class
+			.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -69,10 +70,9 @@ public abstract class XMPPServiceCollector
 	 */
 	public XMPPServiceCollector() {
 		serviceEntity = new ServiceEntity("Tigase", "server", "Session manager");
-		serviceEntity.addIdentities(new ServiceIdentity[] {
-			new ServiceIdentity("server", "im",
-													tigase.server.XMPPServer.NAME + " ver. " +
-													tigase.server.XMPPServer.getImplementationVersion()) });
+		serviceEntity.addIdentities(new ServiceIdentity[] { new ServiceIdentity("server",
+				"im", tigase.server.XMPPServer.NAME + " ver. " + tigase.server.XMPPServer
+				.getImplementationVersion()) });
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -95,23 +95,6 @@ public abstract class XMPPServiceCollector
 	@Override
 	public void componentRemoved(XMPPService component) {}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param component
-	 *
-	 * @return
-	 */
-	@Override
-	public boolean isCorrectType(ServerComponent component) {
-		return component instanceof XMPPService;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -121,11 +104,11 @@ public abstract class XMPPServiceCollector
 	 */
 	@Override
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
-		if (packet.isXMLNSStaticStr(Iq.IQ_QUERY_PATH, INFO_XMLNS) ||
-				packet.isXMLNSStaticStr(Iq.IQ_QUERY_PATH, ITEMS_XMLNS)) {
-			JID jid       = packet.getStanzaTo();
-			JID from      = packet.getStanzaFrom();
-			String node   = packet.getAttributeStaticStr(Iq.IQ_QUERY_PATH, "node");
+		if (packet.isXMLNSStaticStr(Iq.IQ_QUERY_PATH, INFO_XMLNS) || packet.isXMLNSStaticStr(
+				Iq.IQ_QUERY_PATH, ITEMS_XMLNS)) {
+			JID     jid   = packet.getStanzaTo();
+			JID     from  = packet.getStanzaFrom();
+			String  node  = packet.getAttributeStaticStr(Iq.IQ_QUERY_PATH, "node");
 			Element query = packet.getElement().getChild("query").clone();
 
 			if (packet.isXMLNSStaticStr(Iq.IQ_QUERY_PATH, INFO_XMLNS)) {
@@ -151,7 +134,24 @@ public abstract class XMPPServiceCollector
 			results.offer(packet.okResult(query, 0));
 		}
 	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param component
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 */
+	@Override
+	public boolean isCorrectType(ServerComponent component) {
+		return component instanceof XMPPService;
+	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/16
+//~ Formatted in Tigase Code Convention on 13/08/28

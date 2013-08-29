@@ -1,10 +1,13 @@
 /*
+ * UserRepository.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,14 +18,18 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.db;
 
+//~--- non-JDK imports --------------------------------------------------------
+
 import tigase.xmpp.BareJID;
+
+//~--- JDK imports ------------------------------------------------------------
+
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +49,6 @@ import java.util.Map;
  * @version $Rev$
  */
 public interface UserRepository {
-
 	/**
 	 * <code>addDataList</code> method adds mode entries to existing data list
 	 * associated with given key in repository under given node path.
@@ -62,14 +68,14 @@ public interface UserRepository {
 	 * @throws TigaseDBException if database backend error occurs.
 	 */
 	void addDataList(BareJID user, String subnode, String key, String[] list)
-			throws UserNotFoundException, TigaseDBException;
+					throws UserNotFoundException, TigaseDBException;
 
 	/**
 	 * This <code>addUser</code> method allows to add new user to repository.
 	 * It <b>must</b> throw en exception <code>UserExistsException</code> if such
 	 * user already exists because user <b>must</b> be unique within user
 	 * repository data base.<br/>
-	 * As one <em>XMPP</em> server can support many virtual internet domains it
+	 * As one <em>XMPP</em> server can support many virtual Internet domains it
 	 * is required that <code>user</code> id consists of user name and domain
 	 * address: <em>username@domain.address.net</em> for example.
 	 *
@@ -79,6 +85,111 @@ public interface UserRepository {
 	 * @throws TigaseDBException if database backend error occurs.
 	 */
 	void addUser(BareJID user) throws UserExistsException, TigaseDBException;
+
+	/**
+	 * The method is called to initialize the data repository. Depending on the implementation
+	 * all the initialization parameters can be passed either via <code>resource_uri</code>
+	 * parameter as the database connection string or via <code>params</code> map if
+	 * the required repository parameters are more complex or both.
+	 * @param resource_uri value in most cases representing the database connection string.
+	 * @param params is a <code>Map</code> with repository properties necessary to initialize
+	 * and perform all the functions. The initialization parameters are implementation dependent.
+	 *
+	 * @throws DBInitException
+	 */
+	void initRepository(String resource_uri, Map<String, String> params)
+					throws DBInitException;
+
+	/**
+	 * <code>removeData</code> method removes pair (key, value) from user
+	 * repository in given subnode.
+	 * If the key exists in user repository there is always a value
+	 * associated with this key - even empty <code>String</code>. If key does not
+	 * exist the <code>null</code> value is returned from repository backend or
+	 * given default value.
+	 *
+	 * @param user a <code>BareJID</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param subnode a <code>String</code> value is a node path where data is
+	 * stored. Node path has the same form as directory path on file system:
+	 * <pre>/root/subnode1/subnode2</pre>.
+	 * @param key a <code>String</code> for which the value is to be removed.
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
+	 * @throws TigaseDBException if database backend error occurs.
+	 */
+	void removeData(BareJID user, String subnode, String key)
+					throws UserNotFoundException, TigaseDBException;
+
+	/**
+	 * <code>removeData</code> method removes pair (key, value) from user
+	 * repository in default repository node.
+	 * If the key exists in user repository there is always a value
+	 * associated with this key - even empty <code>String</code>. If key does not
+	 * exist the <code>null</code> value is returned from repository backend or
+	 * given default value.
+	 *
+	 * @param user a <code>BareJID</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param key a <code>String</code> for which the value is to be removed.
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
+	 * @throws TigaseDBException if database backend error occurs.
+	 */
+	void removeData(BareJID user, String key)
+					throws UserNotFoundException, TigaseDBException;
+
+	/**
+	 * <code>removeSubnode</code> method removes given subnode with all subnodes
+	 * in this node and all data stored in this node and in all subnodes.
+	 * Effectively it removes entire repository tree starting from given node.
+	 *
+	 * @param user a <code>BareJID</code> value of user ID for which data must be
+	 * stored. User ID consists of user name and domain name.
+	 * @param subnode a <code>String</code> value is a node path to subnode which
+	 * has to be removed. Node path has the same form as directory path on file
+	 * system: <pre>/root/subnode1/subnode2</pre>.
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
+	 * @throws TigaseDBException if database backend error occurs.
+	 */
+	void removeSubnode(BareJID user, String subnode)
+					throws UserNotFoundException, TigaseDBException;
+
+	/**
+	 * This <code>removeUser</code> method allows to remove user and all his data
+	 * from user repository.
+	 * If given user id does not exist <code>UserNotFoundException</code> must be
+	 * thrown. As one <em>XMPP</em> server can support many virtual internet
+	 * domains it is required that <code>user</code> id consists of user name and
+	 * domain address: <em>username@domain.address.net</em> for example.
+	 *
+	 * @param user a <code>BareJID</code> value of user id consisting of user name
+	 * and domain address.
+	 * @exception UserNotFoundException if user id hasn't been found in repository.
+	 * @throws TigaseDBException if database backend error occurs.
+	 */
+	void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException;
+
+	/**
+	 * Method <code>userExists</code> checks whether the user (or repository top node)
+	 * exists in the database. The method doesn't throw any exception nor it creates
+	 * the user in case it is missing. It just checks whether the user is already
+	 * in the database.
+	 *
+	 * Please don't overuse this method. All other methods
+	 * throw <code>UserNotFoundException</code> exception in case the user is missing
+	 * for which you executed the method. The exception is thrown unless
+	 * <code>userAutoCreate</code> property is set to true. In such case the exception
+	 * is never thrown and the methods are executed for given parameters prior to
+	 * creating user entry if it is missing.
+	 *
+	 * Therefore this method should be used only to check whether the account exists
+	 * without creating it.
+	 *
+	 * @param user a <code>BareJID</code> value
+	 * @return a <code>boolean</code> value
+	 */
+	boolean userExists(BareJID user);
+
+	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * <code>getData</code> method returns a value associated with given key for
@@ -99,7 +210,7 @@ public interface UserRepository {
 	 * @throws TigaseDBException if database backend error occurs.
 	 */
 	String getData(BareJID user, String subnode, String key, String def)
-			throws UserNotFoundException, TigaseDBException;
+					throws UserNotFoundException, TigaseDBException;
 
 	/**
 	 * <code>getData</code> method returns a value associated with given key for
@@ -118,7 +229,7 @@ public interface UserRepository {
 	 * @throws TigaseDBException if database backend error occurs.
 	 */
 	String getData(BareJID user, String subnode, String key)
-			throws UserNotFoundException, TigaseDBException;
+					throws UserNotFoundException, TigaseDBException;
 
 	/**
 	 * <code>getData</code> method returns a value associated with given key for
@@ -133,7 +244,8 @@ public interface UserRepository {
 	 * @exception UserNotFoundException if user id hasn't been found in repository.
 	 * @throws TigaseDBException if database backend error occurs.
 	 */
-	String getData(BareJID user, String key) throws UserNotFoundException, TigaseDBException;
+	String getData(BareJID user, String key)
+					throws UserNotFoundException, TigaseDBException;
 
 	/**
 	 * <code>getDataList</code> method returns array of values associated with
@@ -152,7 +264,7 @@ public interface UserRepository {
 	 * @throws TigaseDBException if database backend error occurs.
 	 */
 	String[] getDataList(BareJID user, String subnode, String key)
-			throws UserNotFoundException, TigaseDBException;
+					throws UserNotFoundException, TigaseDBException;
 
 	/**
 	 * <code>getKeys</code> method returns list of all keys stored in given
@@ -170,7 +282,8 @@ public interface UserRepository {
 	 * @exception UserNotFoundException if user id hasn't been found in repository.
 	 * @throws TigaseDBException if database backend error occurs.
 	 */
-	String[] getKeys(BareJID user, String subnode) throws UserNotFoundException, TigaseDBException;
+	String[] getKeys(BareJID user, String subnode)
+					throws UserNotFoundException, TigaseDBException;
 
 	/**
 	 * <code>getKeys</code> method returns list of all keys stored in default user
@@ -207,7 +320,7 @@ public interface UserRepository {
 	 * @throws TigaseDBException if database backend error occurs.
 	 */
 	String[] getSubnodes(BareJID user, String subnode)
-			throws UserNotFoundException, TigaseDBException;
+					throws UserNotFoundException, TigaseDBException;
 
 	/**
 	 * <code>getSubnodes</code> method returns list of all <em>root</em> nodes for
@@ -223,18 +336,6 @@ public interface UserRepository {
 	String[] getSubnodes(BareJID user) throws UserNotFoundException, TigaseDBException;
 
 	/**
-	 * Returns a user unique ID number within the given repository. Please note it is also
-	 * possible that the ID number is unique only for the user domain. The ID is a positive
-	 * number if the user exists and negative if the user was not found in the repository.
-	 * @param user a <code>BareJID</code> value of user ID for which data must be
-	 * stored or retrieved. User ID consists of user name and domain name.
-	 * @return a user inique ID number within the repository or domain. The ID is a positive
-	 * number if the user exists and negative if the user was not found in the repository.
-	 * @throws TigaseDBException if there is a problem with accessing user repository.
-	 */
-	long getUserUID(BareJID user) throws TigaseDBException;
-
-	/**
 	 * This method is only used by the data conversion tools. They attempt
 	 * to copy whole user repositories from one to another database. Databases
 	 * might not be compatible but as long as the API is implemented and they
@@ -242,7 +343,8 @@ public interface UserRepository {
 	 * source.
 	 * @return returns a collection of all user IDs (Jabber IDs) stored in
 	 * the user repository.
-	 * @throws tigase.db.TigaseDBException
+	 *
+	 * @throws TigaseDBException
 	 */
 	List<BareJID> getUsers() throws TigaseDBException;
 
@@ -261,88 +363,19 @@ public interface UserRepository {
 	 */
 	long getUsersCount(String domain);
 
-	//~--- methods --------------------------------------------------------------
-
 	/**
-	 * The method is called to initialize the data repository. Depending on the implementation
-	 * all the initialization parameters can be passed either via <code>resource_uri</code>
-	 * parameter as the database connection string or via <code>params</code> map if
-	 * the required repository parameters are more complex or both.
-	 * @param resource_uri value in most cases representing the database connection string.
-	 * @param params is a <code>Map</code> with repository properties necessary to initialize
-	 * and perform all the functions. The initialization parameters are implementation dependent.
-	 * @throws tigase.db.DBInitException if there was an error during repository initialization.
-	 * Some implementations, though, perform so called lazy initialization so even though there
-	 * is a problem with the underlying repository it may not be signaled through this method
-	 * call.
-	 */
-	void initRepository(String resource_uri, Map<String, String> params) throws DBInitException;
-
-	/**
-	 * <code>removeData</code> method removes pair (key, value) from user
-	 * repository in given subnode.
-	 * If the key exists in user repository there is always a value
-	 * associated with this key - even empty <code>String</code>. If key does not
-	 * exist the <code>null</code> value is returned from repository backend or
-	 * given default value.
-	 *
+	 * Returns a user unique ID number within the given repository. Please note it is also
+	 * possible that the ID number is unique only for the user domain. The ID is a positive
+	 * number if the user exists and negative if the user was not found in the repository.
 	 * @param user a <code>BareJID</code> value of user ID for which data must be
-	 * stored. User ID consists of user name and domain name.
-	 * @param subnode a <code>String</code> value is a node path where data is
-	 * stored. Node path has the same form as directory path on file system:
-	 * <pre>/root/subnode1/subnode2</pre>.
-	 * @param key a <code>String</code> for which the value is to be removed.
-	 * @exception UserNotFoundException if user id hasn't been found in repository.
-	 * @throws TigaseDBException if database backend error occurs.
+	 * stored or retrieved. User ID consists of user name and domain name.
+	 * @return a user inique ID number within the repository or domain. The ID is a positive
+	 * number if the user exists and negative if the user was not found in the repository.
+	 * @throws TigaseDBException if there is a problem with accessing user repository.
 	 */
-	void removeData(BareJID user, String subnode, String key)
-			throws UserNotFoundException, TigaseDBException;
+	long getUserUID(BareJID user) throws TigaseDBException;
 
-	/**
-	 * <code>removeData</code> method removes pair (key, value) from user
-	 * repository in default repository node.
-	 * If the key exists in user repository there is always a value
-	 * associated with this key - even empty <code>String</code>. If key does not
-	 * exist the <code>null</code> value is returned from repository backend or
-	 * given default value.
-	 *
-	 * @param user a <code>BareJID</code> value of user ID for which data must be
-	 * stored. User ID consists of user name and domain name.
-	 * @param key a <code>String</code> for which the value is to be removed.
-	 * @exception UserNotFoundException if user id hasn't been found in repository.
-	 * @throws TigaseDBException if database backend error occurs.
-	 */
-	void removeData(BareJID user, String key) throws UserNotFoundException, TigaseDBException;
-
-	/**
-	 * <code>removeSubnode</code> method removes given subnode with all subnodes
-	 * in this node and all data stored in this node and in all subnodes.
-	 * Effectively it removes entire repository tree starting from given node.
-	 *
-	 * @param user a <code>BareJID</code> value of user ID for which data must be
-	 * stored. User ID consists of user name and domain name.
-	 * @param subnode a <code>String</code> value is a node path to subnode which
-	 * has to be removed. Node path has the same form as directory path on file
-	 * system: <pre>/root/subnode1/subnode2</pre>.
-	 * @exception UserNotFoundException if user id hasn't been found in repository.
-	 * @throws TigaseDBException if database backend error occurs.
-	 */
-	void removeSubnode(BareJID user, String subnode) throws UserNotFoundException, TigaseDBException;
-
-	/**
-	 * This <code>removeUser</code> method allows to remove user and all his data
-	 * from user repository.
-	 * If given user id does not exist <code>UserNotFoundException</code> must be
-	 * thrown. As one <em>XMPP</em> server can support many virtual internet
-	 * domains it is required that <code>user</code> id consists of user name and
-	 * domain address: <em>username@domain.address.net</em> for example.
-	 *
-	 * @param user a <code>BareJID</code> value of user id consisting of user name
-	 * and domain address.
-	 * @exception UserNotFoundException if user id hasn't been found in repository.
-	 * @throws TigaseDBException if database backend error occurs.
-	 */
-	void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException;
+	//~--- set methods ----------------------------------------------------------
 
 	/**
 	 * <code>setData</code> method sets data value for given user ID in repository
@@ -364,7 +397,7 @@ public interface UserRepository {
 	 * @throws TigaseDBException if database backend error occurs.
 	 */
 	void setData(BareJID user, String subnode, String key, String value)
-			throws UserNotFoundException, TigaseDBException;
+					throws UserNotFoundException, TigaseDBException;
 
 	/**
 	 * This <code>setData</code> method sets data value for given user ID
@@ -384,7 +417,7 @@ public interface UserRepository {
 	 * @throws TigaseDBException if database backend error occurs.
 	 */
 	void setData(BareJID user, String key, String value)
-			throws UserNotFoundException, TigaseDBException;
+					throws UserNotFoundException, TigaseDBException;
 
 	/**
 	 * <code>setDataList</code> method sets list of values for given user
@@ -406,28 +439,8 @@ public interface UserRepository {
 	 * @throws TigaseDBException if database backend error occurs.
 	 */
 	void setDataList(BareJID user, String subnode, String key, String[] list)
-			throws UserNotFoundException, TigaseDBException;
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method <code>userExists</code> checks whether the user (or repository top node)
-	 * exists in the database. The method doesn't throw any exception nor it creates
-	 * the user in case it is missing. It just checks whether the user is already
-	 * in the database.
-	 *
-	 * Please don't overuse this method. All other methods
-	 * throw <code>UserNotFoundException</code> exception in case the user is missing
-	 * for which you executed the method. The exception is thrown unless
-	 * <code>userAutoCreate</code> property is set to true. In such case the exception
-	 * is never thrown and the methods are executed for given parameters prior to
-	 * creating user entry if it is missing.
-	 *
-	 * Therefore this method should be used only to check whether the account exists
-	 * without creating it.
-	 *
-	 * @param user a <code>BareJID</code> value
-	 * @return a <code>boolean</code> value
-	 */
-	boolean userExists(BareJID user);
+					throws UserNotFoundException, TigaseDBException;
 }    // UserRepository
+
+
+//~ Formatted in Tigase Code Convention on 13/08/29

@@ -126,7 +126,9 @@ public class S2SConnectionClustered
 	 * @param key_sessionId
 	 * @param asking_sessionId
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getLocalDBKey(CID connectionCid, CID keyCid, String key,
@@ -185,7 +187,9 @@ public class S2SConnectionClustered
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>JID</code>
 	 */
 	protected JID getFirstClusterNode() {
 		JID cluster_node = null;
@@ -351,4 +355,4 @@ public class S2SConnectionClustered
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/08/29

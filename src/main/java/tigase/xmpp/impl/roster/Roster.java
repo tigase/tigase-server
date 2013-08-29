@@ -1,10 +1,13 @@
 /*
+ * Roster.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.xmpp.impl.roster;
 
@@ -36,8 +38,6 @@ import tigase.xmpp.XMPPResourceConnection;
 
 import java.util.logging.Logger;
 
-//~--- classes ----------------------------------------------------------------
-
 /**
  * Describe class Roster here.
  *
@@ -47,8 +47,8 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class Roster extends RosterAbstract {
-
+public class Roster
+				extends RosterAbstract {
 	/**
 	 * Private logger for class instances.
 	 */
@@ -70,19 +70,17 @@ public class Roster extends RosterAbstract {
 	 * @throws TigaseDBException
 	 */
 	@Override
-	public void addBuddy(XMPPResourceConnection session, JID jid, String name, String[] groups,
-			String otherData)
-			throws NotAuthorizedException, TigaseDBException {
+	public void addBuddy(XMPPResourceConnection session, JID jid, String name,
+			String[] groups, String otherData)
+					throws NotAuthorizedException, TigaseDBException {
 		String nick = name;
 
 		if ((nick == null) || nick.trim().isEmpty()) {
 			nick = jid.getLocalpart();
-
 			if ((nick == null) || nick.trim().isEmpty()) {
 				nick = jid.toString();
 			}
 		}
-
 		session.setData(groupNode(jid), NAME, nick);
 		session.setData(groupNode(jid), SUBSCRIPTION, SubscriptionType.none.toString());
 		session.setDataList(groupNode(jid), GROUPS, groups);
@@ -96,14 +94,16 @@ public class Roster extends RosterAbstract {
 	 * @param buddy
 	 * @param groups
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of boolean
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
 	@Override
 	public boolean addBuddyGroup(XMPPResourceConnection session, JID buddy, String[] groups)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
@@ -114,15 +114,76 @@ public class Roster extends RosterAbstract {
 	 * @param session
 	 * @param buddy
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of boolean
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
 	@Override
 	public boolean containsBuddy(XMPPResourceConnection session, JID buddy)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	/*
+	 *  (non-Javadoc)
+	 * @see tigase.xmpp.impl.roster.RosterAbstract#logout()
+	 */
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 */
+	@Override
+	public void logout(XMPPResourceConnection session) {
+
+		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param jid
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of boolean
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	@Override
+	public boolean presenceSent(XMPPResourceConnection session, JID jid)
+					throws NotAuthorizedException, TigaseDBException {
+		return false;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param jid
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of boolean
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	@Override
+	public boolean removeBuddy(final XMPPResourceConnection session, JID jid)
+					throws NotAuthorizedException, TigaseDBException {
+		session.removeDataGroup(groupNode(jid));
+
+		return true;
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -133,19 +194,21 @@ public class Roster extends RosterAbstract {
 	 *
 	 * @param session
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of JID[]
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
 	@Override
 	public JID[] getBuddies(final XMPPResourceConnection session)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 		String[] jids = session.getDataGroups(ROSTER);
 
 		if ((jids != null) && (jids.length > 0)) {
 			JID[] result = new JID[jids.length];
-			int idx = 0;
+			int   idx    = 0;
 
 			for (String jid : jids) {
 				try {
@@ -168,14 +231,16 @@ public class Roster extends RosterAbstract {
 	 * @param session
 	 * @param buddy
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of String[]
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
 	@Override
 	public String[] getBuddyGroups(final XMPPResourceConnection session, JID buddy)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 		return session.getDataList(groupNode(buddy), GROUPS);
 	}
 
@@ -186,14 +251,16 @@ public class Roster extends RosterAbstract {
 	 * @param session
 	 * @param buddy
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of String
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
 	@Override
 	public String getBuddyName(final XMPPResourceConnection session, JID buddy)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 		return session.getData(groupNode(buddy), NAME, null);
 	}
 
@@ -204,14 +271,17 @@ public class Roster extends RosterAbstract {
 	 * @param session
 	 * @param buddy
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of SubscriptionType
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
 	@Override
-	public SubscriptionType getBuddySubscription(final XMPPResourceConnection session, JID buddy)
-			throws NotAuthorizedException, TigaseDBException {
+	public SubscriptionType getBuddySubscription(final XMPPResourceConnection session,
+			JID buddy)
+					throws NotAuthorizedException, TigaseDBException {
 
 		// return SubscriptionType.both;
 		String subscr = session.getData(groupNode(buddy), SUBSCRIPTION, null);
@@ -228,56 +298,56 @@ public class Roster extends RosterAbstract {
 	 *
 	 *
 	 * @param session
+	 * @param buddy
+	 *
+	 * @return a value of String
+	 */
+	public String getCustomStatus(XMPPResourceConnection session, JID buddy) {
+		return null;
+	}
+
+	/*
+	 *  (non-Javadoc)
+	 * @see tigase.xmpp.impl.roster.RosterAbstract#getRosterElement(tigase.xmpp.XMPPResourceConnection, tigase.xmpp.JID)
+	 */
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
 	 * @param jid
 	 *
-	 * @return
+	 * @return a value of RosterElementIfc
 	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	@Override
+	public RosterElementIfc getRosterElement(XMPPResourceConnection session, JID jid)
+					throws NotAuthorizedException, TigaseDBException {
+
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param jid
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of boolean
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
 	@Override
 	public boolean isOnline(XMPPResourceConnection session, JID jid)
-			throws NotAuthorizedException, TigaseDBException {
-		return true;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param jid
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	@Override
-	public boolean presenceSent(XMPPResourceConnection session, JID jid)
-			throws NotAuthorizedException, TigaseDBException {
-		return false;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param jid
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	@Override
-	public boolean removeBuddy(final XMPPResourceConnection session, JID jid)
-			throws NotAuthorizedException, TigaseDBException {
-		session.removeDataGroup(groupNode(jid));
-
+					throws NotAuthorizedException, TigaseDBException {
 		return true;
 	}
 
@@ -295,8 +365,9 @@ public class Roster extends RosterAbstract {
 	 * @throws TigaseDBException
 	 */
 	@Override
-	public void setBuddyName(final XMPPResourceConnection session, JID buddy, final String name)
-			throws NotAuthorizedException, TigaseDBException {
+	public void setBuddyName(final XMPPResourceConnection session, JID buddy,
+			final String name)
+					throws NotAuthorizedException, TigaseDBException {
 		session.setData(groupNode(buddy), NAME, name);
 	}
 
@@ -314,7 +385,7 @@ public class Roster extends RosterAbstract {
 	@Override
 	public void setBuddySubscription(final XMPPResourceConnection session,
 			final SubscriptionType subscription, JID buddy)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 		session.setData(groupNode(buddy), SUBSCRIPTION, subscription.toString());
 	}
 
@@ -331,7 +402,7 @@ public class Roster extends RosterAbstract {
 	 */
 	@Override
 	public void setOnline(XMPPResourceConnection session, JID jid, boolean online)
-			throws NotAuthorizedException, TigaseDBException {}
+					throws NotAuthorizedException, TigaseDBException {}
 
 	/**
 	 * Method description
@@ -346,31 +417,7 @@ public class Roster extends RosterAbstract {
 	 */
 	@Override
 	public void setPresenceSent(XMPPResourceConnection session, JID jid, boolean sent)
-			throws NotAuthorizedException, TigaseDBException {}
-
-	/* (non-Javadoc)
-	 * @see tigase.xmpp.impl.roster.RosterAbstract#getRosterElement(tigase.xmpp.XMPPResourceConnection, tigase.xmpp.JID)
-	 */
-	@Override
-	public RosterElementIfc getRosterElement(XMPPResourceConnection session, JID jid)
-			throws NotAuthorizedException, TigaseDBException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see tigase.xmpp.impl.roster.RosterAbstract#logout()
-	 */
-	@Override
-	public void logout(XMPPResourceConnection session) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	public String getCustomStatus(XMPPResourceConnection session, JID buddy) {
-		return null;
-	}
-
+					throws NotAuthorizedException, TigaseDBException {}
 
 //@Override
 //public String[] getBuddies(XMPPResourceConnection session, boolean onlineOnly)
@@ -392,7 +439,4 @@ public class Roster extends RosterAbstract {
 }    // Roster
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/28

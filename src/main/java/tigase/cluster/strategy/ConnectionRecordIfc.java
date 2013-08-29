@@ -43,7 +43,9 @@ public interface ConnectionRecordIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Element</code>
 	 */
 	Element toElement();
 
@@ -53,7 +55,9 @@ public interface ConnectionRecordIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>JID</code>
 	 */
 	JID getConnectionId();
 
@@ -61,7 +65,9 @@ public interface ConnectionRecordIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>JID</code>
 	 */
 	JID getNode();
 
@@ -69,7 +75,9 @@ public interface ConnectionRecordIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	String getSessionId();
 
@@ -77,7 +85,9 @@ public interface ConnectionRecordIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>JID</code>
 	 */
 	JID getUserJid();
 
@@ -104,4 +114,4 @@ public interface ConnectionRecordIfc {
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/06/22
+//~ Formatted in Tigase Code Convention on 13/08/29

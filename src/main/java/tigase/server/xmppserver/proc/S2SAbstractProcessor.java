@@ -105,8 +105,8 @@ public abstract class S2SAbstractProcessor
 
 	/** Field description */
 	protected static final String[] FEATURES_DIALBACK_PATH = { FEATURES_EL, DIALBACK_EL };
-	private static final Logger log                        =
-		Logger.getLogger(S2SAbstractProcessor.class.getName());
+	private static final Logger     log = Logger.getLogger(S2SAbstractProcessor.class
+			.getName());
 
 	/** Field description */
 	public static boolean FORCE_VERSION = false;
@@ -127,18 +127,18 @@ public abstract class S2SAbstractProcessor
 	 * @param serv
 	 */
 	public void generateStreamError(boolean initStream, String error_el,
-																	S2SIOService serv) {
+			S2SIOService serv) {
 		String strError = "";
 
 		if (initStream) {
 			strError += "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS_SERVER_VAL +
-									"'" + " xmlns:stream='http://etherx.jabber.org/streams'" +
-									" id='tigase-server-error'" + " from='" + handler.getDefHostName() +
-									"'" + " xml:lang='en'>";
+					"'" + " xmlns:stream='http://etherx.jabber.org/streams'" +
+					" id='tigase-server-error'" + " from='" + handler.getDefHostName() + "'" +
+					" xml:lang='en'>";
 		}
 		strError += "<stream:error>" + "<" + error_el +
-								" xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" + "</stream:error>" +
-								"</stream:stream>";
+				" xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" + "</stream:error>" +
+				"</stream:stream>";
 		try {
 			if (log.isLoggable(Level.FINEST)) {
 				Throwable thr = new Throwable();
@@ -146,7 +146,7 @@ public abstract class S2SAbstractProcessor
 				thr.fillInStackTrace();
 				log.log(Level.FINEST, "Called from: ", thr);
 				log.log(Level.FINEST, "{0}, Sending stream error: {1}", new Object[] { serv,
-								strError });
+						strError });
 			}
 			handler.writeRawData(serv, strError);
 			serv.stop();
@@ -163,8 +163,8 @@ public abstract class S2SAbstractProcessor
 	 * @param props
 	 */
 	@Override
-	public void init(S2SConnectionHandlerIfc<S2SIOService> handler,
-									 Map<String, Object> props) {
+	public void init(S2SConnectionHandlerIfc<S2SIOService> handler, Map<String,
+			Object> props) {
 		this.handler = handler;
 	}
 
@@ -176,7 +176,9 @@ public abstract class S2SAbstractProcessor
 	 * @param serv
 	 * @param results
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	@Override
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
@@ -207,7 +209,9 @@ public abstract class S2SAbstractProcessor
 	 *
 	 * @param hostname
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	public boolean skipTLSForHost(String hostname) {
 
@@ -259,7 +263,9 @@ public abstract class S2SAbstractProcessor
 	 * @param serv
 	 * @param attribs
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String streamOpened(S2SIOService serv, Map<String, String> attribs) {
@@ -268,4 +274,4 @@ public abstract class S2SAbstractProcessor
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/05
+//~ Formatted in Tigase Code Convention on 13/08/28

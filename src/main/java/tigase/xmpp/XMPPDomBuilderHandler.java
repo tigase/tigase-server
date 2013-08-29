@@ -1,10 +1,13 @@
 /*
+ * XMPPDomBuilderHandler.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.xmpp;
 
@@ -35,13 +37,11 @@ import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.EmptyStackException;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * <code>XMPPDomBuilderHandler</code> - implementation of
@@ -64,33 +64,36 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
-	private static Logger log = Logger.getLogger(XMPPDomBuilderHandler.class.getName());
-
+public class XMPPDomBuilderHandler<RefObject>
+				implements SimpleHandler {
+	/** Field description */
 	public static int ELEMENTS_NUMBER_LIMIT = 1000;
-	public static final String ELEMENTS_NUMBER_LIMIT_PROP_KEY =
-		"tigase.xmpp.elements_number_limit";
 
-	private static final String ELEM_STREAM_STREAM = "stream:stream";
-	private static ElementFactory defaultFactory = new DefaultElementFactory();
+	/** Field description */
+	public static final String ELEMENTS_NUMBER_LIMIT_PROP_KEY =
+			"tigase.xmpp.elements_number_limit";
+	private static final String   ELEM_STREAM_STREAM = "stream:stream";
+	private static Logger         log = Logger.getLogger(XMPPDomBuilderHandler.class
+			.getName());
+	private static ElementFactory defaultFactory     = new DefaultElementFactory();
 
 	//~--- fields ---------------------------------------------------------------
 
 	private ElementFactory customFactory = null;
-	private Object parserState = null;
-	private XMPPIOService<RefObject> service = null;
-	private String top_xmlns = null;
-	private Map<String, String> namespaces = new TreeMap<String, String>();
-	private boolean error = false;
-	private ArrayDeque<Element> el_stack = new ArrayDeque<Element>(10);
-	private ArrayDeque<Element> all_roots = new ArrayDeque<Element>(1);
 
 	/**
 	 * Protection from the system overload and DOS attack. We want to limit number
 	 * of elements created within a single XMPP stanza.
 	 *
 	 */
-	private int elements_number_limit = 0;
+	private int                      elements_number_limit = 0;
+	private Object                   parserState           = null;
+	private XMPPIOService<RefObject> service               = null;
+	private String                   top_xmlns             = null;
+	private Map<String, String>      namespaces            = new TreeMap<String, String>();
+	private boolean                  error                 = false;
+	private ArrayDeque<Element>      el_stack              = new ArrayDeque<Element>(10);
+	private ArrayDeque<Element>      all_roots             = new ArrayDeque<Element>(1);
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -102,9 +105,9 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 	 */
 	public XMPPDomBuilderHandler(XMPPIOService<RefObject> ioserv) {
 		customFactory = defaultFactory;
-		service = ioserv;
-		ELEMENTS_NUMBER_LIMIT =
-			Integer.getInteger(ELEMENTS_NUMBER_LIMIT_PROP_KEY, ELEMENTS_NUMBER_LIMIT);
+		service       = ioserv;
+		ELEMENTS_NUMBER_LIMIT = Integer.getInteger(ELEMENTS_NUMBER_LIMIT_PROP_KEY,
+				ELEMENTS_NUMBER_LIMIT);
 	}
 
 	/**
@@ -116,9 +119,9 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 	 */
 	public XMPPDomBuilderHandler(XMPPIOService<RefObject> ioserv, ElementFactory factory) {
 		customFactory = factory;
-		service = ioserv;
-		ELEMENTS_NUMBER_LIMIT =
-			Integer.getInteger(ELEMENTS_NUMBER_LIMIT_PROP_KEY, ELEMENTS_NUMBER_LIMIT);
+		service       = ioserv;
+		ELEMENTS_NUMBER_LIMIT = Integer.getInteger(ELEMENTS_NUMBER_LIMIT_PROP_KEY,
+				ELEMENTS_NUMBER_LIMIT);
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -136,6 +139,7 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 		}
 
 		Element elem = el_stack.peek();
+
 		if (elem != null) {
 			elem.setCData(cdata.toString());
 		}
@@ -160,7 +164,6 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 
 			return;
 		}    // end of if (tmp_name.equals(ELEM_STREAM_STREAM))
-
 		if (el_stack.isEmpty()) {
 			el_stack.push(newElement(tmp_name, null, null, null));
 		}    // end of if (tmp_name.equals())
@@ -170,7 +173,6 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 		if (el_stack.isEmpty()) {
 			elements_number_limit = 0;
 			all_roots.offer(elem);
-
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Adding new request: " + elem.toString());
 			}
@@ -188,27 +190,11 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 	@Override
 	public void error(String errorMessage) {
 		log.warning("XML content parse error.");
-
 		if (log.isLoggable(Level.FINE)) {
 			log.fine(errorMessage);
 		}
-
 		error = true;
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public Queue<Element> getParsedElements() {
-		return all_roots;
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -229,7 +215,9 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	public boolean parseError() {
 		return error;
@@ -239,7 +227,9 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Object
 	 */
 	@Override
 	public Object restoreParserState() {
@@ -282,14 +272,12 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 				if (attr_names[i] == null) {
 					break;
 				}
-
 				if (attr_names[i].toString().startsWith("xmlns:")) {
 
 					// TODO should use a StringCache instead of intern() to avoid potential
 					// DOS by exhausting permgen
-					namespaces.put(attr_names[i].substring("xmlns:".length(),
-							attr_names[i].length()).intern(), attr_values[i].toString());
-
+					namespaces.put(attr_names[i].substring("xmlns:".length(), attr_names[i]
+							.length()).intern(), attr_values[i].toString());
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("Namespace found: " + attr_values[i].toString());
 					}
@@ -311,32 +299,28 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 					}    // end of else
 				}      // end of for (int i = 0; i < attr_names.length; i++)
 			}        // end of if (attr_name != null)
-
 			service.xmppStreamOpened(attribs);
 
 			return;
 		}          // end of if (tmp_name.equals(ELEM_STREAM_STREAM))
 
-		String new_xmlns = null;
-		String prefix = null;
+		String new_xmlns       = null;
+		String prefix          = null;
 		String tmp_name_prefix = null;
-		int idx = tmp_name.indexOf(':');
+		int    idx             = tmp_name.indexOf(':');
 
 		if (idx > 0) {
 			tmp_name_prefix = tmp_name.substring(0, idx);
-
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Found prefixed element name, prefix: " + tmp_name_prefix);
 			}
 		}
-
 		if (tmp_name_prefix != null) {
 			for (String pref : namespaces.keySet()) {
 				if (tmp_name_prefix.equals(pref)) {
 					new_xmlns = namespaces.get(pref);
-					tmp_name = tmp_name.substring(pref.length() + 1, tmp_name.length());
-					prefix = pref;
-
+					tmp_name  = tmp_name.substring(pref.length() + 1, tmp_name.length());
+					prefix    = pref;
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("new_xmlns = " + new_xmlns);
 					}
@@ -345,7 +329,7 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 		}
 
 		Element elem = newElement(tmp_name, null, attr_names, attr_values);
-		String ns = elem.getXMLNS();
+		String  ns   = elem.getXMLNS();
 
 		if (ns == null) {
 			if (el_stack.isEmpty() || (el_stack.peek().getXMLNS() == null)) {
@@ -353,24 +337,36 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 				// elem.setDefXMLNS(top_xmlns);
 			} else {
 				elem.setDefXMLNS(el_stack.peek().getXMLNS());
-
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("DefXMLNS assigned: " + elem.toString());
 				}
 			}
 		}
-
 		if (new_xmlns != null) {
 			elem.setXMLNS(new_xmlns);
 			elem.removeAttribute("xmlns:" + prefix);
-
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("new_xmlns assigned: " + elem.toString());
 			}
 		}
-
 		el_stack.push(elem);
 	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of Queue<Element>
+	 */
+	public Queue<Element> getParsedElements() {
+		return all_roots;
+	}
+
+	//~--- methods --------------------------------------------------------------
 
 	private Element newElement(String name, String cdata, StringBuilder[] attnames,
 			StringBuilder[] attvals) {
@@ -378,12 +374,10 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 		if (elements_number_limit > ELEMENTS_NUMBER_LIMIT) {
 			throw new XMPPParserException("Too many elements for staza, possible DOS attack.");
 		}
+
 		return customFactory.elementInstance(name, cdata, attnames, attvals);
 	}
 }    // XMPPDomBuilderHandler
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/28

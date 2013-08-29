@@ -2,7 +2,7 @@
  * Iq.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -78,8 +78,8 @@ public class Iq
 	//~--- fields ---------------------------------------------------------------
 
 	private Command command      = null;
-	private String iqQueryXMLNS  = null;
-	private String strCommand    = null;
+	private String  iqQueryXMLNS = null;
+	private String  strCommand   = null;
 	private boolean serviceDisco = false;
 	private boolean cmd          = false;
 
@@ -117,10 +117,33 @@ public class Iq
 	 * Method description
 	 *
 	 *
+	 * @param cmd_type
+	 *
+	 *
+	 *
+	 * @return a value of <code>Packet</code>
+	 */
+	public Packet commandResult(Command.DataType cmd_type) {
+		Packet result = packetInstance(command.createIqCommand(getStanzaTo(),
+				getStanzaFrom(), StanzaType.result, getStanzaId(), strCommand, cmd_type),
+				getStanzaTo(), getStanzaFrom());
+
+		result.setPacketFrom(getTo());
+		result.setPacketTo(getFrom());
+
+		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param packet
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of <code>Packet</code>
 	 * @throws TigaseStringprepException
 	 */
 	public static Packet commandResultForm(Iq packet) throws TigaseStringprepException {
@@ -135,8 +158,10 @@ public class Iq
 	 *
 	 * @param packet
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of <code>Packet</code>
 	 * @throws TigaseStringprepException
 	 */
 	public static Packet commandResultResult(Iq packet) throws TigaseStringprepException {
@@ -167,14 +192,16 @@ public class Iq
 	 * <code>null</code> in most cases as this is not part of the XMPP RFC. Some deployments
 	 * needs some extra information about the roster item type though.
 	 *
-	 * @return a new <code>Packet</code> instance or <code>Iq</code> instance more
+	 *  a new <code>Packet</code> instance or <code>Iq</code> instance more
 	 * specificly with a roster entry content.
+	 *
+	 * @return a value of <code>Iq</code>
 	 */
 	public static Iq createRosterPacket(String iq_type, String iq_id, JID from, JID to,
-					JID item_jid, String item_name, String[] item_groups, String subscription,
-					String item_type) {
+			JID item_jid, String item_name, String[] item_groups, String subscription,
+			String item_type) {
 		Element iq = new Element("iq", new String[] { "type", "id" }, new String[] { iq_type,
-						iq_id });
+				iq_id });
 
 		iq.setXMLNS(CLIENT_XMLNS);
 		if (from != null) {
@@ -189,8 +216,8 @@ public class Iq
 		query.setXMLNS(RosterAbstract.XMLNS);
 		iq.addChild(query);
 
-		Element item = new Element("item", new String[] { "jid" },
-															 new String[] { item_jid.toString() });
+		Element item = new Element("item", new String[] { "jid" }, new String[] { item_jid
+				.toString() });
 
 		if (item_type != null) {
 			item.addAttribute("type", item_type);
@@ -213,32 +240,15 @@ public class Iq
 		return new Iq(iq, from, to);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param cmd_type
-	 *
-	 * @return
-	 */
-	public Packet commandResult(Command.DataType cmd_type) {
-		Packet result = packetInstance(command.createIqCommand(getStanzaTo(),
-											getStanzaFrom(), StanzaType.result, getStanzaId(), strCommand,
-											cmd_type), getStanzaTo(), getStanzaFrom());
-
-		result.setPacketFrom(getTo());
-		result.setPacketTo(getFrom());
-
-		return result;
-	}
-
 	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Command</code>
 	 */
 	@Override
 	public Command getCommand() {
@@ -249,7 +259,9 @@ public class Iq
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String getIQChildName() {
 		List<Element> children = elem.getChildren();
@@ -265,7 +277,9 @@ public class Iq
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String getIQXMLNS() {
 		if (iqQueryXMLNS == null) {
@@ -279,18 +293,9 @@ public class Iq
 	 * Method description
 	 *
 	 *
-	 * @return
-	 */
-	@Override
-	protected String[] getElNameErrorPath() {
-		return IQ_ERROR_PATH;
-	}
-
-	/**
-	 * Method description
 	 *
 	 *
-	 * @return
+	 * @return a value of <code>String</code>
 	 */
 	public String getStrCommand() {
 		return strCommand;
@@ -300,7 +305,9 @@ public class Iq
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean isCommand() {
@@ -311,11 +318,26 @@ public class Iq
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean isServiceDisco() {
 		return serviceDisco;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
+	 */
+	@Override
+	protected String[] getElNameErrorPath() {
+		return IQ_ERROR_PATH;
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -329,9 +351,9 @@ public class Iq
 			command    = Command.valueof(strCommand);
 		}
 		serviceDisco = (isXMLNSStaticStr(IQ_QUERY_PATH, XMPPService.INFO_XMLNS) ||
-										isXMLNSStaticStr(IQ_QUERY_PATH, XMPPService.ITEMS_XMLNS));
+				isXMLNSStaticStr(IQ_QUERY_PATH, XMPPService.ITEMS_XMLNS));
 	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/08/28

@@ -65,8 +65,7 @@ public class RosterElement
 	private static final double INITIAL_WEIGHT_VAL    = 1d;
 	private static final String JID_ATT               = "jid";
 	private static final String LAST_SEEN_ATT         = "last-seen";
-	private static final Logger log                   =
-		Logger.getLogger(RosterElement.class.getName());
+	private static final Logger log = Logger.getLogger(RosterElement.class.getName());
 	private static final String NAME_ATT              = "name";
 	private static final String OTHER_ATT             = "other";
 	private static final String STRINGPREP_ATT        = "preped";
@@ -75,19 +74,19 @@ public class RosterElement
 
 	//~--- fields ---------------------------------------------------------------
 
-	private String[] groups                = null;
-	private JID jid                        = null;
-	private String name                    = null;
-	private String otherData               = null;
-	private long lastSeen                  = INITIAL_LAST_SEEN_VAL;
-	private double activity                = INITIAL_ACTIVITY_VAL;
-	private XMPPResourceConnection session = null;
-	private String stringpreped            = null;
-	private SubscriptionType subscription  = null;
-	private double weight                  = INITIAL_WEIGHT_VAL;
-	private boolean presence_sent          = false;
-	private boolean persistent             = true;
-	private Map<String, Boolean> onlineMap = new ConcurrentHashMap<String, Boolean>();
+	private String[]               groups        = null;
+	private JID                    jid           = null;
+	private String                 name          = null;
+	private String                 otherData     = null;
+	private long                   lastSeen      = INITIAL_LAST_SEEN_VAL;
+	private double                 activity      = INITIAL_ACTIVITY_VAL;
+	private XMPPResourceConnection session       = null;
+	private String                 stringpreped  = null;
+	private SubscriptionType       subscription  = null;
+	private double                 weight        = INITIAL_WEIGHT_VAL;
+	private boolean                presence_sent = false;
+	private boolean                persistent    = true;
+	private Map<String, Boolean>   onlineMap     = new ConcurrentHashMap<String, Boolean>();
 
 	// private Element item = null;
 	// private boolean online = false;
@@ -113,8 +112,8 @@ public class RosterElement
 			if (roster_el.getAttributeStaticStr(SUBS_ATT) == null) {
 				subscription = SubscriptionType.none;
 			} else {
-				subscription =
-					SubscriptionType.valueOf(roster_el.getAttributeStaticStr(SUBS_ATT));
+				subscription = SubscriptionType.valueOf(roster_el.getAttributeStaticStr(
+						SUBS_ATT));
 			}
 
 			String grps = roster_el.getAttributeStaticStr(GRP_ATT);
@@ -172,7 +171,7 @@ public class RosterElement
 	 * @param session
 	 */
 	public RosterElement(JID jid, String name, String[] groups,
-											 XMPPResourceConnection session) {
+			XMPPResourceConnection session) {
 		this.stringpreped = XMPPStringPrepFactory.STRINGPREP_PROCESSOR;
 		this.session      = session;
 		setJid(jid);
@@ -211,13 +210,37 @@ public class RosterElement
 		// item = null;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of String
+	 */
+	@Override
+	public String toString() {
+		return getRosterItem().toString();
+	}
+
 	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 *  the activity
+	 *
+	 * @return a value of double
+	 */
+	public double getActivity() {
+		return activity;
+	}
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[]
 	 */
 	public String[] getGroups() {
 		return groups;
@@ -227,17 +250,30 @@ public class RosterElement
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of JID
 	 */
 	public JID getJid() {
 		return jid;
 	}
 
 	/**
+	 *  the lastSeen
+	 *
+	 * @return a value of long
+	 */
+	public long getLastSeen() {
+		return lastSeen;
+	}
+
+	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	public String getName() {
 		return name;
@@ -247,7 +283,9 @@ public class RosterElement
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	public String getOtherData() {
 		return otherData;
@@ -257,12 +295,14 @@ public class RosterElement
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Element
 	 */
 	public Element getRosterElement() {
 		Element elem = new Element(ELEM_NAME, new String[] { JID_ATT, SUBS_ATT, NAME_ATT,
-						STRINGPREP_ATT }, new String[] { jid.toString(), subscription.toString(),
-						XMLUtils.escape(name), "" + stringpreped });
+				STRINGPREP_ATT }, new String[] { jid.toString(), subscription.toString(),
+				XMLUtils.escape(name), "" + stringpreped });
 
 		if ((groups != null) && (groups.length > 0)) {
 			String grps = "";
@@ -288,7 +328,9 @@ public class RosterElement
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Element
 	 */
 	public Element getRosterItem() {
 
@@ -316,36 +358,34 @@ public class RosterElement
 		return item;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
-	 */
-	@Override
-	public String toString() {
-		return getRosterItem().toString();
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
 	 *
 	 *
-	 * @return
+	 * @return a value of SubscriptionType
 	 */
 	public SubscriptionType getSubscription() {
 		return subscription;
 	}
 
 	/**
+	 *  the weight
+	 *
+	 * @return a value of double
+	 */
+	public double getWeight() {
+		return weight;
+	}
+
+	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	public boolean isModified() {
 		return modified;
@@ -355,23 +395,48 @@ public class RosterElement
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	public boolean isOnline() {
 		return onlineMap.size() > 0;
 	}
 
 	/**
+	 *
+	 *
+	 * @return a value of boolean
+	 */
+	public boolean isPersistent() {
+		return persistent;
+	}
+
+	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	public boolean isPresence_sent() {
 		return presence_sent;
 	}
 
 	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * @param activity
+	 *          the activity to set
+	 */
+	public void setActivity(double activity) {
+		this.activity = activity;
+		if (activity != 0) {
+			weight = 1 / activity;
+		}
+		modified = true;
+	}
 
 	/**
 	 * Method description
@@ -387,6 +452,14 @@ public class RosterElement
 			}
 			modified = true;
 		}
+	}
+
+	/**
+	 * @param lastSeen the lastSeen to set
+	 */
+	public void setLastSeen(long lastSeen) {
+		this.lastSeen = lastSeen;
+		modified      = true;
 	}
 
 	/**
@@ -443,6 +516,16 @@ public class RosterElement
 	 * Method description
 	 *
 	 *
+	 * @param persistent
+	 */
+	public void setPersistent(boolean persistent) {
+		this.persistent = persistent;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param presence_sent
 	 */
 	public void setPresence_sent(boolean presence_sent) {
@@ -466,6 +549,15 @@ public class RosterElement
 		// item = null;
 	}
 
+	/**
+	 * @param weight
+	 *          the weight to set
+	 */
+	public void setWeight(double weight) {
+		this.weight = weight;
+		modified    = true;
+	}
+
 	private void setJid(JID jid) {
 		this.jid = jid;
 		modified = true;
@@ -480,90 +572,7 @@ public class RosterElement
 		}
 		stringpreped = XMPPStringPrepFactory.STRINGPREP_PROCESSOR;
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * @return
-	 */
-	public boolean isPersistent() {
-		return persistent;
-	}
-
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param persistent
-	 */
-	public void setPersistent(boolean persistent) {
-		this.persistent = persistent;
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * @return the activity
-	 */
-	public double getActivity() {
-		return activity;
-	}
-
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * @param activity
-	 *          the activity to set
-	 */
-	public void setActivity(double activity) {
-		this.activity = activity;
-		if (activity != 0) {
-			weight = 1 / activity;
-		}
-		modified = true;
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * @return the weight
-	 */
-	public double getWeight() {
-		return weight;
-	}
-
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * @param weight
-	 *          the weight to set
-	 */
-	public void setWeight(double weight) {
-		this.weight = weight;
-		modified    = true;
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * @return the lastSeen
-	 */
-	public long getLastSeen() {
-		return lastSeen;
-	}
-
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * @param lastSeen the lastSeen to set
-	 */
-	public void setLastSeen(long lastSeen) {
-		this.lastSeen = lastSeen;
-		modified      = true;
-	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/28
+//~ Formatted in Tigase Code Convention on 13/08/28

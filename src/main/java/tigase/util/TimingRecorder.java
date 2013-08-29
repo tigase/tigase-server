@@ -87,7 +87,9 @@ public class TimingRecorder {
 	 *
 	 * @param id
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of long
 	 */
 	public static long getAverageTiming(String id) {
 		return timings.get(id).getAverageTiming();
@@ -99,7 +101,9 @@ public class TimingRecorder {
 	 *
 	 * @param id
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of long
 	 */
 	public static long getMaxRecordedTiming(String id) {
 		return timings.get(id).getMaxRecordedTiming();
@@ -107,4 +111,4 @@ public class TimingRecorder {
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/04/24
+//~ Formatted in Tigase Code Convention on 13/08/28

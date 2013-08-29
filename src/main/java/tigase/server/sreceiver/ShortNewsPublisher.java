@@ -2,7 +2,7 @@
  * ShortNewsPublisher.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -84,24 +84,24 @@ public class ShortNewsPublisher
 				extends RepoRosterTask {
 	private static final String DB_CONNECTION_DISPL_NAME = "Database connection string";
 	private static final String DB_CONNECTION_PROP_KEY   = "db-connection-string";
-	private static final String DB_CONNECTION_PROP_VAL   =
-		"jdbc:mysql://localhost/tigase?user=root&password=mypass";
+	private static final String DB_CONNECTION_PROP_VAL =
+			"jdbc:mysql://localhost/tigase?user=root&password=mypass";
 	private static final String DB_TABLE_DISPL_NAME  = "Database table name";
 	private static final String DB_TABLE_PROP_KEY    = "db-table";
 	private static final String DB_TABLE_PROP_VAL    = "short_news";
 	private static final String NEWS_TYPE_DISPL_NAME = "News type";
 	private static final String NEWS_TYPE_PROP_KEY   = "news-type";
 	private static final String NEWS_TYPE_PROP_VAL   = "minis";
-	private static final String TASK_HELP            =
-		"This tasks writes all messages to special table in database" +
-		" called 'short_news' and notifies all subscribed users about" +
-		" new post. Table in database keeps following information about" +
-		" post: publishing_time, author, subject, body. This subscription" +
-		" task is ideal for publish short news on your Web site." +
-		" Users can subscribe to the news just by adding task JID" +
-		" to their roster, unsubscribing is equally simple - remove" +
-		" JID from roster to stop receiving news. By default subscription" +
-		" to this task is moderated."
+	private static final String TASK_HELP =
+			"This tasks writes all messages to special table in database" +
+			" called 'short_news' and notifies all subscribed users about" +
+			" new post. Table in database keeps following information about" +
+			" post: publishing_time, author, subject, body. This subscription" +
+			" task is ideal for publish short news on your Web site." +
+			" Users can subscribe to the news just by adding task JID" +
+			" to their roster, unsubscribing is equally simple - remove" +
+			" JID from roster to stop receiving news. By default subscription" +
+			" to this task is moderated."
 	;
 	private static final String TASK_TYPE = "Short news publisher";
 
@@ -201,29 +201,25 @@ public class ShortNewsPublisher
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Map<String,PropertyItem>
 	 */
 	public Map<String, PropertyItem> getDefaultParams() {
 		Map<String, PropertyItem> defs = super.getDefaultParams();
 
-		defs.put(MESSAGE_TYPE_PROP_KEY,
-						 new PropertyItem(MESSAGE_TYPE_PROP_KEY, MESSAGE_TYPE_DISPL_NAME,
-															MessageType.NORMAL));
-		defs.put(SUBSCR_RESTRICTIONS_PROP_KEY,
-						 new PropertyItem(SUBSCR_RESTRICTIONS_PROP_KEY,
-															SUBSCR_RESTRICTIONS_DISPL_NAME,
-															SubscrRestrictions.MODERATED));
-		defs.put(DESCRIPTION_PROP_KEY,
-						 new PropertyItem(DESCRIPTION_PROP_KEY, DESCRIPTION_DISPL_NAME,
-															"Short news for the Web site..."));
-		defs.put(DB_CONNECTION_PROP_KEY,
-						 new PropertyItem(DB_CONNECTION_PROP_KEY, DB_CONNECTION_DISPL_NAME,
-															DB_CONNECTION_PROP_VAL));
-		defs.put(DB_TABLE_PROP_KEY,
-						 new PropertyItem(DB_TABLE_PROP_KEY, DB_TABLE_DISPL_NAME, DB_TABLE_PROP_VAL));
-		defs.put(NEWS_TYPE_PROP_KEY,
-						 new PropertyItem(NEWS_TYPE_PROP_KEY, NEWS_TYPE_DISPL_NAME,
-															NEWS_TYPE_PROP_VAL));
+		defs.put(MESSAGE_TYPE_PROP_KEY, new PropertyItem(MESSAGE_TYPE_PROP_KEY,
+				MESSAGE_TYPE_DISPL_NAME, MessageType.NORMAL));
+		defs.put(SUBSCR_RESTRICTIONS_PROP_KEY, new PropertyItem(SUBSCR_RESTRICTIONS_PROP_KEY,
+				SUBSCR_RESTRICTIONS_DISPL_NAME, SubscrRestrictions.MODERATED));
+		defs.put(DESCRIPTION_PROP_KEY, new PropertyItem(DESCRIPTION_PROP_KEY,
+				DESCRIPTION_DISPL_NAME, "Short news for the Web site..."));
+		defs.put(DB_CONNECTION_PROP_KEY, new PropertyItem(DB_CONNECTION_PROP_KEY,
+				DB_CONNECTION_DISPL_NAME, DB_CONNECTION_PROP_VAL));
+		defs.put(DB_TABLE_PROP_KEY, new PropertyItem(DB_TABLE_PROP_KEY, DB_TABLE_DISPL_NAME,
+				DB_TABLE_PROP_VAL));
+		defs.put(NEWS_TYPE_PROP_KEY, new PropertyItem(NEWS_TYPE_PROP_KEY,
+				NEWS_TYPE_DISPL_NAME, NEWS_TYPE_PROP_VAL));
 
 		return defs;
 	}
@@ -232,7 +228,9 @@ public class ShortNewsPublisher
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	public String getHelp() {
 		return TASK_HELP;
@@ -242,7 +240,9 @@ public class ShortNewsPublisher
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	public String getType() {
 		return TASK_TYPE;
@@ -263,19 +263,18 @@ public class ShortNewsPublisher
 
 		if (map.get(DB_TABLE_PROP_KEY) != null) {
 			tableName = (String) map.get(DB_TABLE_PROP_KEY);
-			props.put(DB_TABLE_PROP_KEY,
-								new PropertyItem(DB_TABLE_PROP_KEY, DB_TABLE_DISPL_NAME, tableName));
+			props.put(DB_TABLE_PROP_KEY, new PropertyItem(DB_TABLE_PROP_KEY,
+					DB_TABLE_DISPL_NAME, tableName));
 		}
 		if (map.get(NEWS_TYPE_PROP_KEY) != null) {
 			newsType = (String) map.get(NEWS_TYPE_PROP_KEY);
-			props.put(NEWS_TYPE_PROP_KEY,
-								new PropertyItem(NEWS_TYPE_PROP_KEY, NEWS_TYPE_DISPL_NAME, newsType));
+			props.put(NEWS_TYPE_PROP_KEY, new PropertyItem(NEWS_TYPE_PROP_KEY,
+					NEWS_TYPE_DISPL_NAME, newsType));
 		}
 		if (map.get(DB_CONNECTION_PROP_KEY) != null) {
 			db_conn = (String) map.get(DB_CONNECTION_PROP_KEY);
-			props.put(DB_CONNECTION_PROP_KEY,
-								new PropertyItem(DB_CONNECTION_PROP_KEY, DB_CONNECTION_DISPL_NAME,
-																 db_conn));
+			props.put(DB_CONNECTION_PROP_KEY, new PropertyItem(DB_CONNECTION_PROP_KEY,
+					DB_CONNECTION_DISPL_NAME, db_conn));
 			try {
 				initRepo();
 			} catch (SQLException e) {
@@ -326,28 +325,22 @@ public class ShortNewsPublisher
 				insert_post.setString(3, XMLUtils.unescape(body));
 				insert_post.executeUpdate();
 				results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
-																				 StanzaType.chat,
-																				 "Your post has been successfuly submitted.",
-																				 "Short news submitions result.", null,
-																				 packet.getStanzaId()));
+						StanzaType.chat, "Your post has been successfuly submitted.",
+						"Short news submitions result.", null, packet.getStanzaId()));
 			} else {
 
 				// if body is null it might be an empty message used for
 				// announcing other side that the user has just started typing
 				// message, such messages we just ignore
 				results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
-																				 StanzaType.normal,
-																				 "Missing body, post has NOT been submitted.",
-																				 "Short news submitions result.", null,
-																				 packet.getStanzaId()));
+						StanzaType.normal, "Missing body, post has NOT been submitted.",
+						"Short news submitions result.", null, packet.getStanzaId()));
 			}
 		} catch (SQLException e) {
 			log.log(Level.SEVERE, "Problem inserting new post: " + packet.toString(), e);
 			results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
-																			 StanzaType.normal,
-																			 "There was a problem with post submitting: " + e,
-																			 "Short news submitions result.", null,
-																			 packet.getStanzaId()));
+					StanzaType.normal, "There was a problem with post submitting: " + e,
+					"Short news submitions result.", null, packet.getStanzaId()));
 		}
 	}
 
@@ -356,7 +349,7 @@ public class ShortNewsPublisher
 	 * is still valid, if not it simply reconnect and reinitializes database
 	 * backend.
 	 *
-	 * @return a <code>boolean</code> value
+	 *  a <code>boolean</code> value
 	 * @exception SQLException if an error occurs
 	 */
 	private boolean checkConnection() throws SQLException {
@@ -376,9 +369,8 @@ public class ShortNewsPublisher
 
 	private String commandsHelp() {
 		return "Available commands are:\n" + "//help - display this help info\n" +
-					 "//update N - update post number N, posts content to update\n" +
-					 "             starts from the next line\n" +
-					 "//delete N - remove post number N";
+				"//update N - update post number N, posts content to update\n" +
+				"             starts from the next line\n" + "//delete N - remove post number N";
 	}
 
 	private void deletePost(long snid) throws SQLException {
@@ -402,39 +394,20 @@ public class ShortNewsPublisher
 		conn_valid_st = conn.prepareStatement(query);
 		if ((newsType == null) || (newsType.length() == 0)) {
 			query = "insert into " + tableName + " (news_type, author, subject, body) " +
-							" values (null, ?, ?, ?)";
+					" values (null, ?, ?, ?)";
 		} else {
 			query = "insert into " + tableName + " (news_type, author, subject, body) " +
-							" values ('" + newsType + "', ?, ?, ?)";
+					" values ('" + newsType + "', ?, ?, ?)";
 		}
 		insert_post = conn.prepareStatement(query);
 		query       = "delete from " + tableName + " where snid = ?";
 		delete_post = conn.prepareStatement(query);
-		query       = "update " + tableName + " set subject = ?, body = ?" +
-									" where snid = ? ";
+		query = "update " + tableName + " set subject = ?, body = ?" + " where snid = ? ";
 		update_post = conn.prepareStatement(query);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	private boolean isPostCommand(Packet packet) {
-		String body = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
-
-		if (body != null) {
-			for (command comm : command.values()) {
-				if (body.startsWith("//" + comm.toString())) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
 	private void runCommand(Packet packet, Queue<Packet> results) {
-		String body         = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
+		String   body       = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
 		String[] body_split = body.split(" |\n|\r");
 
 		try {
@@ -443,29 +416,24 @@ public class ShortNewsPublisher
 			switch (comm) {
 			case help :
 				results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
-																				 StanzaType.chat, commandsHelp(),
-																				 "Commands description", null,
-																				 packet.getStanzaId()));
+						StanzaType.chat, commandsHelp(), "Commands description", null, packet
+						.getStanzaId()));
 
 				break;
 
 			case update :
 				updatePost(packet, Long.parseLong(body_split[1]));
-				results.offer(
-						Message.getMessage(
-							packet.getStanzaTo(), packet.getStanzaFrom(), StanzaType.normal,
-							"Post " + body_split[1] + " successfuly updated.",
-							"Command execution result", null, packet.getStanzaId()));
+				results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+						StanzaType.normal, "Post " + body_split[1] + " successfuly updated.",
+						"Command execution result", null, packet.getStanzaId()));
 
 				break;
 
 			case delete :
 				deletePost(Long.parseLong(body_split[1]));
-				results.offer(
-						Message.getMessage(
-							packet.getStanzaTo(), packet.getStanzaFrom(), StanzaType.normal,
-							"Post " + body_split[1] + " successfuly deleted.",
-							"Command execution result", null, packet.getStanzaId()));
+				results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+						StanzaType.normal, "Post " + body_split[1] + " successfuly deleted.",
+						"Command execution result", null, packet.getStanzaId()));
 
 				break;
 
@@ -474,13 +442,12 @@ public class ShortNewsPublisher
 			}
 		} catch (Exception e) {
 			String error_text = "Hm, something wrong with command executing...: " +
-													body_split[0] + ", " + body_split[1] + ", " + e;
+					body_split[0] + ", " + body_split[1] + ", " + e;
 
 			log.log(Level.WARNING, error_text, e);
 			results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
-																			 StanzaType.normal, error_text,
-																			 "Problem with command execution", null,
-																			 packet.getStanzaId()));
+					StanzaType.normal, error_text, "Problem with command execution", null, packet
+					.getStanzaId()));
 		}
 	}
 
@@ -502,7 +469,23 @@ public class ShortNewsPublisher
 			update_post.executeUpdate();
 		}
 	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	private boolean isPostCommand(Packet packet) {
+		String body = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
+
+		if (body != null) {
+			for (command comm : command.values()) {
+				if (body.startsWith("//" + comm.toString())) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/19
+//~ Formatted in Tigase Code Convention on 13/08/28

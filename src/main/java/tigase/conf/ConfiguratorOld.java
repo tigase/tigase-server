@@ -595,8 +595,10 @@ public class ConfiguratorOld
 	 *
 	 * @param key
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 * @throws ConfigurationException
 	 */
 	public Map<String, Object> getAllProperties(String key) throws ConfigurationException {
@@ -628,7 +630,9 @@ public class ConfiguratorOld
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
 	 */
 	public String[] getComponents() {
 		return repository.getCompNames();
@@ -638,7 +642,9 @@ public class ConfiguratorOld
 	 * Returns defualt configuration settings in case if there is no
 	 * config file.
 	 * @param params
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -654,7 +660,9 @@ public class ConfiguratorOld
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 */
 	@Override
 	public Map<String, Object> getDefConfigParams() {
@@ -667,7 +675,9 @@ public class ConfiguratorOld
 	 *
 	 * @param from
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>List<Element></code>
 	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
@@ -682,7 +692,9 @@ public class ConfiguratorOld
 	 * @param jid
 	 * @param from
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Element</code>
 	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
@@ -701,7 +713,9 @@ public class ConfiguratorOld
 	 * @param jid
 	 * @param from
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>List<Element></code>
 	 */
 	@Override
 	public List<Element> getDiscoItems(String node, JID jid, JID from) {
@@ -727,7 +741,9 @@ public class ConfiguratorOld
 	 *
 	 * @param objName
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Object</code>
 	 */
 	public static Object getMXBean(String objName) {
 		if (monitoring != null) {
@@ -791,7 +807,9 @@ public class ConfiguratorOld
 	 * @param result_pack
 	 * @param admin
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Object</code>
 	 */
 	public Object setPropertyValue(String key, String val, Packet result_pack,
 			boolean admin) {
@@ -825,8 +843,10 @@ public class ConfiguratorOld
 	 * @param feedback
 	 * @param orig
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of <code>Object</code>
 	 * @throws Exception
 	 */
 	public Object setValue(String node_key, String value, boolean add, boolean feedback,
@@ -1431,4 +1451,4 @@ public class ConfiguratorOld
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/06/08
+//~ Formatted in Tigase Code Convention on 13/08/29

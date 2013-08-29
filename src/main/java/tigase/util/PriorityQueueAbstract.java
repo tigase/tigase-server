@@ -1,10 +1,13 @@
 /*
+ * PriorityQueueAbstract.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,14 +18,11 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
 
-package tigase.util;
 
-//~--- classes ----------------------------------------------------------------
+
+package tigase.util;
 
 /**
  * Works like a LinkedBlockingQueue using the put() and take() methods but
@@ -38,7 +38,6 @@ package tigase.util;
  * @version $Rev$
  */
 public abstract class PriorityQueueAbstract<E> {
-
 	/** Field description */
 	public static final String NONPRIORITY_QUEUE = "nonpriority-queue";
 
@@ -65,7 +64,9 @@ public abstract class PriorityQueueAbstract<E> {
 	 * @param element
 	 * @param priority
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	public abstract boolean offer(E element, int priority);
 
@@ -82,23 +83,13 @@ public abstract class PriorityQueueAbstract<E> {
 	 */
 	public abstract void put(E element, int priority) throws InterruptedException;
 
-	//~--- set methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param maxSize
-	 */
-	public abstract void setMaxSize(int maxSize);
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
 	 *
 	 *
-	 * @return
+	 * @return a value of int[]
 	 */
 	public abstract int[] size();
 
@@ -108,8 +99,10 @@ public abstract class PriorityQueueAbstract<E> {
 	 * Method description
 	 *
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of E
 	 * @throws InterruptedException
 	 */
 	public abstract E take() throws InterruptedException;
@@ -118,7 +111,9 @@ public abstract class PriorityQueueAbstract<E> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of int
 	 */
 	public abstract int totalSize();
 
@@ -132,12 +127,15 @@ public abstract class PriorityQueueAbstract<E> {
 	 * @param maxSize
 	 * @param <E>
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of PriorityQueueAbstract<E>
 	 */
 	@SuppressWarnings("unchecked")
-	public static <E> PriorityQueueAbstract<E> getPriorityQueue(int maxPriority, int maxSize) {
-		PriorityQueueAbstract<E> result = null;
-		String queue_class = System.getProperty(QUEUE_IMPLEMENTATION, null);
+	public static <E> PriorityQueueAbstract<E> getPriorityQueue(int maxPriority,
+			int maxSize) {
+		PriorityQueueAbstract<E> result      = null;
+		String                   queue_class = System.getProperty(QUEUE_IMPLEMENTATION, null);
 
 		if ((queue_class == null) || queue_class.isEmpty()) {
 			if (Boolean.getBoolean(NONPRIORITY_QUEUE)) {
@@ -152,17 +150,23 @@ public abstract class PriorityQueueAbstract<E> {
 				e.printStackTrace();
 				System.exit(1);
 			}
-
 			result.init(maxPriority, maxSize);
 		}
 
 //  System.out.println("Initialized queue implementation: " + result.getClass().getName());
 		return result;
 	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param maxSize
+	 */
+	public abstract void setMaxSize(int maxSize);
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/28

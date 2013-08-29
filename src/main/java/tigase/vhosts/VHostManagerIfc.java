@@ -2,7 +2,7 @@
  * VHostManagerIfc.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -50,35 +50,34 @@ import java.util.List;
  */
 public interface VHostManagerIfc {
 	/**
-	 * This method checks whether given domain is server by this server instance.
-	 * That is if this domain is local to this server installation. It doesn't
-	 * check however whether the domain is disabled or enabled. It only checks
-	 * if tthe list of local domains contains this virtual host.
-	 *
-	 * @param domain is a String with domain name to check.
-	 * @return a boolean value indicating whether given domain is local or not.
+	 * Adds a component domain to the collection of local component domains.
+	 * This is mainly needed/used by an external components connecting to the
+	 * server and binding hostnames. Normally the s2s component have no way of
+	 * knowing about this new and temporary domains handled by the server and
+	 * would refuse all connections for these domains. Adding them to a collection
+	 * of component domains allows the s2s to detect them and accept connection
+	 * for them.
+	 * @param domain is a component domain name added to the collection.
 	 */
-	boolean isLocalDomain(String domain);
+	void addComponentDomain(String domain);
+
+	/**
+	 * Removes a domain previously registered by a component. It should not be
+	 * normally used.
+	 * @param domain is a component domain name being removed from the collection.
+	 */
+	void removeComponentDomain(String domain);
+
+	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param domain
 	 *
-	 * @return
+	 * @return a value of List<JID>
 	 */
-	boolean isLocalDomainOrComponent(String domain);
-
-	/**
-	 * This method checks whether anonymous login is enabled for a given domain.
-	 * That is it checks whether this domains is local and anonymousEnabled
-	 * parameter for this domain is set to true.
-	 * @param domain is a String with domain name to check.
-	 * @return a boolean value indicating whether given domain is enabled for
-	 * anonymous logins or not.
-	 */
-	boolean isAnonymousEnabled(String domain);
+	List<JID> getAllVHosts();
 
 	/**
 	 * The method returns an array with server components which can process
@@ -109,36 +108,6 @@ public interface VHostManagerIfc {
 	ServerComponent[] getComponentsForNonLocalDomain(String domain);
 
 	/**
-	 * Returns an object with all domain properties for given domain.
-	 * @param domain is a domain name
-	 * @return a VHostItem object with all domain properties.
-	 */
-	VHostItem getVHostItem(String domain);
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Adds a component domain to the collection of local component domains.
-	 * This is mainly needed/used by an external components connecting to the
-	 * server and binding hostnames. Normally the s2s component have no way of
-	 * knowing about this new and temporary domains handled by the server and
-	 * would refuse all connections for these domains. Adding them to a collection
-	 * of component domains allows the s2s to detect them and accept connection
-	 * for them.
-	 * @param domain is a component domain name added to the collection.
-	 */
-	void addComponentDomain(String domain);
-
-	/**
-	 * Removes a domain previously registered by a component. It should not be
-	 * normally used.
-	 * @param domain is a component domain name being removed from the collection.
-	 */
-	void removeComponentDomain(String domain);
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
 	 * Method <code>getDefVHostItem</code> returns a default VHost for the installation.
 	 * In most cases this is the first VHost defined in the server configuration.
 	 *
@@ -147,13 +116,44 @@ public interface VHostManagerIfc {
 	BareJID getDefVHostItem();
 
 	/**
+	 * Returns an object with all domain properties for given domain.
+	 * @param domain is a domain name
+	 * @return a VHostItem object with all domain properties.
+	 */
+	VHostItem getVHostItem(String domain);
+
+	/**
+	 * This method checks whether anonymous login is enabled for a given domain.
+	 * That is it checks whether this domains is local and anonymousEnabled
+	 * parameter for this domain is set to true.
+	 * @param domain is a String with domain name to check.
+	 * @return a boolean value indicating whether given domain is enabled for
+	 * anonymous logins or not.
+	 */
+	boolean isAnonymousEnabled(String domain);
+
+	/**
+	 * This method checks whether given domain is server by this server instance.
+	 * That is if this domain is local to this server installation. It doesn't
+	 * check however whether the domain is disabled or enabled. It only checks
+	 * if tthe list of local domains contains this virtual host.
+	 *
+	 * @param domain is a String with domain name to check.
+	 * @return a boolean value indicating whether given domain is local or not.
+	 */
+	boolean isLocalDomain(String domain);
+
+	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * @param domain
+	 *
+	 *
+	 * @return a value of boolean
 	 */
-	List<JID> getAllVHosts();
+	boolean isLocalDomainOrComponent(String domain);
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/19
+//~ Formatted in Tigase Code Convention on 13/08/28

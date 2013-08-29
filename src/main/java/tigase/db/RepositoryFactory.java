@@ -274,8 +274,10 @@ public abstract class RepositoryFactory {
 	 * @param resource
 	 * @param params
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of <code>AuthRepository</code>
 	 * @throws ClassNotFoundException
 	 * @throws DBInitException
 	 * @throws IllegalAccessException
@@ -340,8 +342,10 @@ public abstract class RepositoryFactory {
 	 * @param resource
 	 * @param params
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of <code>DataRepository</code>
 	 * @throws ClassNotFoundException
 	 * @throws DBInitException
 	 * @throws IllegalAccessException
@@ -397,7 +401,9 @@ public abstract class RepositoryFactory {
 	 *
 	 * @param repo_name
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public static String getRepoClass(String repo_name) {
 		String result = repo_name;
@@ -436,8 +442,10 @@ public abstract class RepositoryFactory {
 	 * @param resource
 	 * @param params
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of <code>UserRepository</code>
 	 * @throws ClassNotFoundException
 	 * @throws DBInitException
 	 * @throws IllegalAccessException
@@ -496,4 +504,4 @@ public abstract class RepositoryFactory {
 }    // RepositoryFactory
 
 
-//~ Formatted in Tigase Code Convention on 13/05/27
+//~ Formatted in Tigase Code Convention on 13/08/29

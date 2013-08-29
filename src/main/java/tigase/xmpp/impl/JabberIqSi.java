@@ -72,7 +72,9 @@ public abstract class JabberIqSi
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String id() {
@@ -83,7 +85,24 @@ public abstract class JabberIqSi
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * @param session
+	 *
+	 *
+	 *
+	 * @return a value of Element[]
+	 */
+	@Override
+	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
+		return DISCO_FEATURES;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of String[][]
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -94,26 +113,15 @@ public abstract class JabberIqSi
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[]
 	 */
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
 	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 * @return
-	 */
-	@Override
-	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
-		return DISCO_FEATURES;
-	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/12
+//~ Formatted in Tigase Code Convention on 13/08/28

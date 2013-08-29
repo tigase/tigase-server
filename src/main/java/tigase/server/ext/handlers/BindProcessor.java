@@ -2,11 +2,12 @@
  * BindProcessor.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -53,46 +54,18 @@ import java.util.Queue;
  */
 public class BindProcessor
 				implements ExtProcessor {
-	private static final String EL_NAME                 = "bind";
+	private static final String   EL_NAME               = "bind";
 	private static final String[] IQ_BIND_HOSTNAME_PATH = { "iq", "bind", "hostname" };
 	private static final String[] IQ_UNBIND_PATH        = { "iq", "unbind" };
 
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log       = Logger.getLogger(BindProcessor.class.getName());
-	private static final String XMLNS     = "urn:xmpp:component:0";
-	private static final String ID        = EL_NAME;
+	private static final Logger  log   = Logger.getLogger(BindProcessor.class.getName());
+	private static final String  XMLNS = "urn:xmpp:component:0";
+	private static final String  ID    = EL_NAME;
 	private static final Element FEATURES = new Element(EL_NAME, new String[] { "xmlns" },
-																						new String[] { XMLNS });
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getId() {
-		return ID;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 * @param handler
-	 *
-	 * @return
-	 */
-	@Override
-	public List<Element> getStreamFeatures(ComponentIOService serv,
-					ComponentProtocolHandler handler) {
-		return Arrays.asList(FEATURES);
-	}
+			new String[] { XMLNS });
 
 	//~--- methods --------------------------------------------------------------
 
@@ -105,11 +78,13 @@ public class BindProcessor
 	 * @param handler
 	 * @param results
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean process(Packet p, ComponentIOService serv,
-												 ComponentProtocolHandler handler, Queue<Packet> results) {
+			ComponentProtocolHandler handler, Queue<Packet> results) {
 		if (p.isXMLNSStaticStr(Iq.IQ_BIND_PATH, XMLNS)) {
 			if ((p.getType() == StanzaType.set) && serv.isAuthenticated()) {
 				String hostname = p.getElemCDataStaticStr(IQ_BIND_HOSTNAME_PATH);
@@ -149,15 +124,15 @@ public class BindProcessor
 	 */
 	@Override
 	public void startProcessing(Packet p, ComponentIOService serv,
-															ComponentProtocolHandler handler, Queue<Packet> results) {
-		String[] hostnames =
-			(String[]) serv.getSessionData().get(EXTCOMP_BIND_HOSTNAMES_PROP_KEY);
+			ComponentProtocolHandler handler, Queue<Packet> results) {
+		String[] hostnames = (String[]) serv.getSessionData().get(
+				EXTCOMP_BIND_HOSTNAMES_PROP_KEY);
 
 		if (hostnames != null) {
 			for (String host : hostnames) {
 				if (!host.isEmpty()) {
 					Packet bind_p = Packet.packetInstance(newBindElement(host, handler), null,
-														null);
+							null);
 
 					log.info("Generating hostname bind packet: " + bind_p.toString());
 					results.offer(bind_p);
@@ -168,12 +143,46 @@ public class BindProcessor
 		}
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getId() {
+		return ID;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param serv
+	 * @param handler
+	 *
+	 *
+	 *
+	 * @return a value of <code>List<Element></code>
+	 */
+	@Override
+	public List<Element> getStreamFeatures(ComponentIOService serv,
+			ComponentProtocolHandler handler) {
+		return Arrays.asList(FEATURES);
+	}
+
+	//~--- methods --------------------------------------------------------------
+
 	private Element newBindElement(String host, ComponentProtocolHandler handler) {
-		Element result = new Element("iq", new String[] { "type", "id" },
-																 new String[] { "set",
-						handler.newPacketId("bind") });
+		Element result = new Element("iq", new String[] { "type", "id" }, new String[] {
+				"set",
+				handler.newPacketId("bind") });
 		Element bind = new Element(EL_NAME, new Element[] { new Element("hostname", host) },
-															 new String[] { "xmlns" }, new String[] { XMLNS });
+				new String[] { "xmlns" }, new String[] { XMLNS });
 
 		result.addChild(bind);
 
@@ -190,4 +199,4 @@ public class BindProcessor
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/16
+//~ Formatted in Tigase Code Convention on 13/08/28

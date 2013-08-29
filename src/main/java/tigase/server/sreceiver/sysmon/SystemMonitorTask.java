@@ -2,11 +2,12 @@
  * SystemMonitorTask.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -60,24 +61,23 @@ import java.util.TimerTask;
  */
 public class SystemMonitorTask
 				extends RepoRosterTask {
-	private static Logger log =
-		Logger.getLogger("tigase.server.sreceiver.sysmon.SystemMonitorTask");
+	private static Logger log = Logger.getLogger(
+			"tigase.server.sreceiver.sysmon.SystemMonitorTask");
 	private static final String MONITORS_CLASSES_PROP_KEY = "Monitor implementations";
-	private static final String TASK_HELP                 =
-		"This is a system monitor task." +
-		" It monitors system resources usage and sends notifications" +
-		" to subscribed users. It allos responds to your messages with" +
-		" a simple reply message. This is to ensure the monitor works.";
+	private static final String TASK_HELP = "This is a system monitor task." +
+			" It monitors system resources usage and sends notifications" +
+			" to subscribed users. It allos responds to your messages with" +
+			" a simple reply message. This is to ensure the monitor works.";
 	private static final String TASK_TYPE                  = "System Monitor";
 	private static final String WARNING_THRESHOLD_PROP_KEY = "Warning threshold";
 
 	//~--- fields ---------------------------------------------------------------
 
 	// private long interval = 10*SECOND;
-	private String[] all_monitors                 = null;
-	private String[] selected_monitors            = null;
+	private String[]                     all_monitors      = null;
+	private String[]                     selected_monitors = null;
 	private Map<JID, ResourceMonitorIfc> monitors = new LinkedHashMap<JID,
-																										ResourceMonitorIfc>();
+			ResourceMonitorIfc>();
 	private Timer tasks             = null;
 	private float warning_threshold = 0.8f;
 	;
@@ -90,8 +90,8 @@ public class SystemMonitorTask
 	 */
 	public SystemMonitorTask() {
 		try {
-			Set<ResourceMonitorIfc> mons =
-				ClassUtil.getImplementations(ResourceMonitorIfc.class);
+			Set<ResourceMonitorIfc> mons = ClassUtil.getImplementations(
+					ResourceMonitorIfc.class);
 
 			all_monitors = new String[mons.size()];
 
@@ -111,9 +111,9 @@ public class SystemMonitorTask
 	//~--- enums ----------------------------------------------------------------
 
 	private enum command {
-		help(" - Displays help info."),
-		state(" - Displays current state from all monitors."),
-		threshold(" [0.NN] - sets/displays current threshold value.");
+		help(" - Displays help info."), state(
+				" - Displays current state from all monitors."), threshold(
+				" [0.NN] - sets/displays current threshold value.");
 
 		private String helpText = null;
 
@@ -129,7 +129,9 @@ public class SystemMonitorTask
 		 * Method description
 		 *
 		 *
-		 * @return
+		 *
+		 *
+		 * @return a value of String
 		 */
 		public String getHelp() {
 			return helpText;
@@ -150,105 +152,6 @@ public class SystemMonitorTask
 		tasks = null;
 		super.destroy(results);
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public Map<String, PropertyItem> getDefaultParams() {
-		Map<String, PropertyItem> defs = super.getDefaultParams();
-
-		defs.put(DESCRIPTION_PROP_KEY,
-						 new PropertyItem(DESCRIPTION_PROP_KEY, DESCRIPTION_DISPL_NAME,
-															"System Monitor Task"));
-		defs.put(MESSAGE_TYPE_PROP_KEY,
-						 new PropertyItem(MESSAGE_TYPE_PROP_KEY, MESSAGE_TYPE_DISPL_NAME,
-															MessageType.NORMAL));
-		defs.put(ONLINE_ONLY_PROP_KEY,
-						 new PropertyItem(ONLINE_ONLY_PROP_KEY, ONLINE_ONLY_DISPL_NAME, false));
-		defs.put(REPLACE_SENDER_PROP_KEY,
-						 new PropertyItem(REPLACE_SENDER_PROP_KEY, REPLACE_SENDER_DISPL_NAME,
-															SenderAddress.REPLACE_SRECV));
-		defs.put(SUBSCR_RESTRICTIONS_PROP_KEY,
-						 new PropertyItem(SUBSCR_RESTRICTIONS_PROP_KEY,
-															SUBSCR_RESTRICTIONS_DISPL_NAME,
-															SubscrRestrictions.MODERATED));
-		defs.put(MONITORS_CLASSES_PROP_KEY,
-						 new PropertyItem(MONITORS_CLASSES_PROP_KEY, MONITORS_CLASSES_PROP_KEY,
-															all_monitors, all_monitors,
-															"List of system monitors available for use"));
-		defs.put(WARNING_THRESHOLD_PROP_KEY,
-						 new PropertyItem(WARNING_THRESHOLD_PROP_KEY, WARNING_THRESHOLD_PROP_KEY,
-															warning_threshold));
-
-		return defs;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getHelp() {
-		return TASK_HELP;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public Map<String, PropertyItem> getParams() {
-		Map<String, PropertyItem> props = super.getParams();
-
-		props.put(MONITORS_CLASSES_PROP_KEY,
-							new PropertyItem(MONITORS_CLASSES_PROP_KEY, MONITORS_CLASSES_PROP_KEY,
-															 selected_monitors, all_monitors,
-															 "List of system monitors available for use"));
-		props.put(WARNING_THRESHOLD_PROP_KEY,
-							new PropertyItem(WARNING_THRESHOLD_PROP_KEY, WARNING_THRESHOLD_PROP_KEY,
-															 warning_threshold));
-
-//  log.fine("selected_monitors: " + Arrays.toString(selected_monitors) +
-//            ", all_monitors: " + Arrays.toString(all_monitors));
-		return props;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 */
-	@Override
-	public void getStatistics(StatisticsList list) {
-		super.getStatistics(list);
-		for (ResourceMonitorIfc monitor : monitors.values()) {
-			monitor.getStatistics(list);
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getType() {
-		return TASK_TYPE;
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -284,6 +187,102 @@ public class SystemMonitorTask
 				monitor1Day();
 			}
 		}, INTERVAL_1DAY, INTERVAL_1DAY);
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of Map<String,PropertyItem>
+	 */
+	@Override
+	public Map<String, PropertyItem> getDefaultParams() {
+		Map<String, PropertyItem> defs = super.getDefaultParams();
+
+		defs.put(DESCRIPTION_PROP_KEY, new PropertyItem(DESCRIPTION_PROP_KEY,
+				DESCRIPTION_DISPL_NAME, "System Monitor Task"));
+		defs.put(MESSAGE_TYPE_PROP_KEY, new PropertyItem(MESSAGE_TYPE_PROP_KEY,
+				MESSAGE_TYPE_DISPL_NAME, MessageType.NORMAL));
+		defs.put(ONLINE_ONLY_PROP_KEY, new PropertyItem(ONLINE_ONLY_PROP_KEY,
+				ONLINE_ONLY_DISPL_NAME, false));
+		defs.put(REPLACE_SENDER_PROP_KEY, new PropertyItem(REPLACE_SENDER_PROP_KEY,
+				REPLACE_SENDER_DISPL_NAME, SenderAddress.REPLACE_SRECV));
+		defs.put(SUBSCR_RESTRICTIONS_PROP_KEY, new PropertyItem(SUBSCR_RESTRICTIONS_PROP_KEY,
+				SUBSCR_RESTRICTIONS_DISPL_NAME, SubscrRestrictions.MODERATED));
+		defs.put(MONITORS_CLASSES_PROP_KEY, new PropertyItem(MONITORS_CLASSES_PROP_KEY,
+				MONITORS_CLASSES_PROP_KEY, all_monitors, all_monitors,
+				"List of system monitors available for use"));
+		defs.put(WARNING_THRESHOLD_PROP_KEY, new PropertyItem(WARNING_THRESHOLD_PROP_KEY,
+				WARNING_THRESHOLD_PROP_KEY, warning_threshold));
+
+		return defs;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of String
+	 */
+	@Override
+	public String getHelp() {
+		return TASK_HELP;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of Map<String,PropertyItem>
+	 */
+	@Override
+	public Map<String, PropertyItem> getParams() {
+		Map<String, PropertyItem> props = super.getParams();
+
+		props.put(MONITORS_CLASSES_PROP_KEY, new PropertyItem(MONITORS_CLASSES_PROP_KEY,
+				MONITORS_CLASSES_PROP_KEY, selected_monitors, all_monitors,
+				"List of system monitors available for use"));
+		props.put(WARNING_THRESHOLD_PROP_KEY, new PropertyItem(WARNING_THRESHOLD_PROP_KEY,
+				WARNING_THRESHOLD_PROP_KEY, warning_threshold));
+
+//  log.fine("selected_monitors: " + Arrays.toString(selected_monitors) +
+//            ", all_monitors: " + Arrays.toString(all_monitors));
+		return props;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param list
+	 */
+	@Override
+	public void getStatistics(StatisticsList list) {
+		super.getStatistics(list);
+		for (ResourceMonitorIfc monitor : monitors.values()) {
+			monitor.getStatistics(list);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of String
+	 */
+	@Override
+	public String getType() {
+		return TASK_TYPE;
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -329,10 +328,10 @@ public class SystemMonitorTask
 			monitors.clear();
 			for (String string : mons) {
 				try {
-					ResourceMonitorIfc resMon =
-						(ResourceMonitorIfc) Class.forName(string).newInstance();
-					JID monJid = JID.jidInstance(getJID() + "/" +
-																			 resMon.getClass().getSimpleName());
+					ResourceMonitorIfc resMon = (ResourceMonitorIfc) Class.forName(string)
+							.newInstance();
+					JID monJid = JID.jidInstance(getJID() + "/" + resMon.getClass()
+							.getSimpleName());
 
 					resMon.init(monJid, warning_threshold, this);
 					monitors.put(monJid, resMon);
@@ -366,9 +365,8 @@ public class SystemMonitorTask
 				String body = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
 
 				results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
-																				 StanzaType.normal,
-																				 "This is response to your message: [" + body +
-																				 "]", "Response", null, packet.getStanzaId()));
+						StanzaType.normal, "This is response to your message: [" + body + "]",
+						"Response", null, packet.getStanzaId()));
 			}
 		}
 	}
@@ -426,24 +424,6 @@ public class SystemMonitorTask
 		return "Available commands are:\n" + sb.toString();
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	private boolean isPostCommand(Packet packet) {
-		String body = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
-
-		if (body != null) {
-			for (command comm : command.values()) {
-				if (body.startsWith("//" + comm.toString())) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
 	private void monitor10Secs() {
 		Queue<Packet> results = new ArrayDeque<Packet>();
 
@@ -495,16 +475,15 @@ public class SystemMonitorTask
 	}
 
 	private void runCommand(Packet packet, Queue<Packet> results) {
-		String body         = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
+		String   body       = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
 		String[] body_split = body.split("\\s");
-		command comm        = command.valueOf(body_split[0].substring(2));
+		command  comm       = command.valueOf(body_split[0].substring(2));
 
 		switch (comm) {
 		case help :
 			results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
-																			 StanzaType.chat, commandsHelp(),
-																			 "Commands description", null,
-																			 packet.getStanzaId()));
+					StanzaType.chat, commandsHelp(), "Commands description", null, packet
+					.getStanzaId()));
 
 			break;
 
@@ -516,8 +495,7 @@ public class SystemMonitorTask
 				sb.append(resmon.getState() + "\n");
 			}
 			results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
-																			 StanzaType.chat, sb.toString(), "Monitors State",
-																			 null, packet.getStanzaId()));
+					StanzaType.chat, sb.toString(), "Monitors State", null, packet.getStanzaId()));
 
 			break;
 
@@ -538,25 +516,19 @@ public class SystemMonitorTask
 				} catch (Exception e) {}
 				if (correct) {
 					results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
-																					 StanzaType.chat,
-																					 "New threshold set to: " + warning_threshold +
-																					 "\n", "Threshold command.", null,
-																						 packet.getStanzaId()));
+							StanzaType.chat, "New threshold set to: " + warning_threshold + "\n",
+							"Threshold command.", null, packet.getStanzaId()));
 				} else {
-					results
-						.offer(Message
-							.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(), StanzaType
-								.chat, "Incorrect threshold givenm using the old threshold: " +
-									warning_threshold + "\n" +
-									"Correct threshold is a float point number 0 < N < 1.", "Threshold command.", null, packet
-										.getStanzaId()));
+					results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
+							StanzaType.chat, "Incorrect threshold givenm using the old threshold: " +
+							warning_threshold + "\n" +
+							"Correct threshold is a float point number 0 < N < 1.",
+							"Threshold command.", null, packet.getStanzaId()));
 				}
 			} else {
 				results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
-																				 StanzaType.chat,
-																				 "Current threshold value is: " +
-																				 warning_threshold, "Threshold command.", null,
-																					 packet.getStanzaId()));
+						StanzaType.chat, "Current threshold value is: " + warning_threshold,
+						"Threshold command.", null, packet.getStanzaId()));
 			}
 
 			break;
@@ -564,21 +536,36 @@ public class SystemMonitorTask
 	}
 
 	private void runMonitorCommand(ResourceMonitorIfc monitor, Packet packet,
-																 Queue<Packet> results) {
-		String body         = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
+			Queue<Packet> results) {
+		String   body       = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
 		String[] body_split = body.split("\\s");
-		String result       = monitor.runCommand(body_split);
+		String   result     = monitor.runCommand(body_split);
 
 		if (result == null) {
 			result = "Monitor " + monitor.getClass().getSimpleName() +
-							 " command was run but returned no results.";
+					" command was run but returned no results.";
 		}
 		results.offer(Message.getMessage(packet.getStanzaTo(), packet.getStanzaFrom(),
-																		 StanzaType.chat, result,
-																		 monitor.getClass().getSimpleName() + " command.",
-																		 null, packet.getStanzaId()));
+				StanzaType.chat, result, monitor.getClass().getSimpleName() + " command.", null,
+				packet.getStanzaId()));
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	private boolean isPostCommand(Packet packet) {
+		String body = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
+
+		if (body != null) {
+			for (command comm : command.values()) {
+				if (body.startsWith("//" + comm.toString())) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/16
+//~ Formatted in Tigase Code Convention on 13/08/28

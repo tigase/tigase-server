@@ -131,7 +131,9 @@ public class ProcessorFactory {
 	 *
 	 * @param id
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of XMPPPacketFilterIfc
 	 */
 	public static XMPPPacketFilterIfc getPacketFilter(String id) {
 		XMPPImplIfc imp = processors.get(id);
@@ -149,7 +151,9 @@ public class ProcessorFactory {
 	 *
 	 * @param id
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of XMPPPostprocessorIfc
 	 */
 	public static XMPPPostprocessorIfc getPostprocessor(String id) {
 		XMPPImplIfc imp = processors.get(id);
@@ -167,7 +171,9 @@ public class ProcessorFactory {
 	 *
 	 * @param id
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of XMPPPreprocessorIfc
 	 */
 	public static XMPPPreprocessorIfc getPreprocessor(String id) {
 		XMPPImplIfc imp = processors.get(id);
@@ -185,7 +191,9 @@ public class ProcessorFactory {
 	 *
 	 * @param id
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of XMPPProcessorIfc
 	 */
 	public static XMPPProcessorIfc getProcessor(String id) {
 		XMPPImplIfc imp = processors.get(id);
@@ -203,7 +211,9 @@ public class ProcessorFactory {
 	 *
 	 * @param id
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of XMPPStopListenerIfc
 	 */
 	public static XMPPStopListenerIfc getStopListener(String id) {
 		XMPPImplIfc imp = processors.get(id);
@@ -219,7 +229,9 @@ public class ProcessorFactory {
 	 * Check if plugin implementation is in server jar
 	 *
 	 * @param id
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	public static boolean hasImplementation(String id) {
 		return processors.containsKey(id);
@@ -227,4 +239,4 @@ public class ProcessorFactory {
 }    // ProcessorFactory
 
 
-//~ Formatted in Tigase Code Convention on 13/03/11
+//~ Formatted in Tigase Code Convention on 13/08/28

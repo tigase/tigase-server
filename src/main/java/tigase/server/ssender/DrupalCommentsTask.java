@@ -1,10 +1,13 @@
 /*
+ * DrupalCommentsTask.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.server.ssender;
 
@@ -46,11 +48,9 @@ import java.sql.SQLException;
 
 //import java.sql.Date;
 import java.util.ArrayDeque;
-import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Queue;
 
 /**
  * <code>DrupalCommentsTask</code> implements tasks for cyclic retrieving new
@@ -73,16 +73,30 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class DrupalCommentsTask extends SenderTask {
-
+public class DrupalCommentsTask
+				extends SenderTask {
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log =
-		Logger.getLogger("tigase.server.ssender.DrupalCommentsTask");
+	private static final Logger log = Logger.getLogger(
+			"tigase.server.ssender.DrupalCommentsTask");
 	private static final long SECOND = 1000;
 
 	//~--- fields ---------------------------------------------------------------
+
+	/**
+	 * <code>lastCheck</code> keeps time of last forum comments check so it
+	 * gets only new posts.
+	 *
+	 */
+	protected long lastCommentsCheck = -1;
+
+	/**
+	 * <code>lastCheck</code> keeps time of last forum topics check so it
+	 * gets only new posts.
+	 *
+	 */
+	protected long lastTopicsCheck = -1;
 
 	/**
 	 * <code>conn</code> variable keeps connection to database.
@@ -127,24 +141,10 @@ public class DrupalCommentsTask extends SenderTask {
 	private JID jid = null;
 
 	/**
-	 * <code>lastCheck</code> keeps time of last forum comments check so it
-	 * gets only new posts.
-	 *
-	 */
-	protected long lastCommentsCheck = -1;
-
-	/**
 	 * <code>lastConnectionValidated</code> variable keeps time where the
 	 * connection was validated for the last time.
 	 */
 	private long lastConnectionValidated = 0;
-
-	/**
-	 * <code>lastCheck</code> keeps time of last forum topics check so it
-	 * gets only new posts.
-	 *
-	 */
-	protected long lastTopicsCheck = -1;
 
 	/**
 	 * <code>connectionValidateInterval</code> is kind of constant keeping minimum
@@ -158,7 +158,9 @@ public class DrupalCommentsTask extends SenderTask {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	@Override
 	public boolean cancel() {
@@ -176,21 +178,6 @@ public class DrupalCommentsTask extends SenderTask {
 		return result;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * <code>getInitString</code> method returns initialization string passed
-	 * to it in <code>init()</code> method.
-	 *
-	 * @return a <code>String</code> value of initialization string.
-	 */
-	@Override
-	public String getInitString() {
-		return db_conn;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * <code>init</code> method is a task specific initialization rountine.
 	 *
@@ -206,17 +193,15 @@ public class DrupalCommentsTask extends SenderTask {
 	@Override
 	public void init(StanzaHandler handler, String initString) throws IOException {
 		this.handler = handler;
-		db_conn = initString;
-
+		db_conn      = initString;
 		try {
 			findExtraParams(db_conn);
 		} catch (TigaseStringprepException ex) {
-			throw new IOException("Destination address problem, stringprep processing failed", ex);
+			throw new IOException("Destination address problem, stringprep processing failed",
+					ex);
 		}
-
 		lastCommentsCheck = System.currentTimeMillis() / SECOND;
-		lastTopicsCheck = System.currentTimeMillis() / SECOND;
-
+		lastTopicsCheck   = System.currentTimeMillis() / SECOND;
 		try {
 			initRepo();
 		} catch (SQLException e) {
@@ -241,6 +226,25 @@ public class DrupalCommentsTask extends SenderTask {
 
 	//~--- get methods ----------------------------------------------------------
 
+	/**
+	 * <code>getInitString</code> method returns initialization string passed
+	 * to it in <code>init()</code> method.
+	 *
+	 *  a <code>String</code> value of initialization string.
+	 *
+	 * @return a value of String
+	 */
+	@Override
+	public String getInitString() {
+		return db_conn;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of Queue<Packet>
+	 */
 	protected Queue<Packet> getNewPackets() {
 		Queue<Packet> results = new ArrayDeque<Packet>();
 
@@ -257,7 +261,7 @@ public class DrupalCommentsTask extends SenderTask {
 	 * is still valid, if not it simply reconnect and reinitializes database
 	 * backend.
 	 *
-	 * @return a <code>boolean</code> value
+	 *  a <code>boolean</code> value
 	 * @exception SQLException if an error occurs
 	 */
 	private boolean checkConnection() throws SQLException {
@@ -304,13 +308,13 @@ public class DrupalCommentsTask extends SenderTask {
 		String query = "select 1;";
 
 		conn_valid_st = conn.prepareStatement(query);
-		query = "select name, thread, subject, comment " + "from comments where"
-				+ " (status = 0) and (timestamp > ?);";
+		query = "select name, thread, subject, comment " + "from comments where" +
+				" (status = 0) and (timestamp > ?);";
 		get_new_comments = conn.prepareStatement(query);
-		query = "select users.name as name, node_revisions.title as title,"
-				+ " node_revisions.body as body" + " from forum, node_revisions, users where"
-					+ " (status = 1) and (node_revisions.timestamp > ?)"
-						+ " and users.uid = node_revisions.uid" + " and node_revisions.vid = forum.vid;";
+		query = "select users.name as name, node_revisions.title as title," +
+				" node_revisions.body as body" + " from forum, node_revisions, users where" +
+				" (status = 1) and (node_revisions.timestamp > ?)" +
+				" and users.uid = node_revisions.uid" + " and node_revisions.vid = forum.vid;";
 		get_new_topics = conn.prepareStatement(query);
 	}
 
@@ -322,16 +326,15 @@ public class DrupalCommentsTask extends SenderTask {
 			log.info("New comment check, timestamp = " + lastCommentsCheck);
 			get_new_comments.setLong(1, lastCommentsCheck);
 			lastCommentsCheck = System.currentTimeMillis() / SECOND;
-			rs = get_new_comments.executeQuery();
-
+			rs                = get_new_comments.executeQuery();
 			while (rs.next()) {
-				String name = rs.getString("name");
-				String thread = rs.getString("thread");
+				String name    = rs.getString("name");
+				String thread  = rs.getString("thread");
 				String subject = rs.getString("subject");
 				String comment = rs.getString("comment");
 				Packet msg = Message.getMessage(getName(), jid, StanzaType.normal,
-											 "New comment by " + name + ":\n\n" + XMLUtils.escape(comment),
-											 XMLUtils.escape(subject), thread, null);
+						"New comment by " + name + ":\n\n" + XMLUtils.escape(comment), XMLUtils
+						.escape(subject), thread, null);
 
 				log.fine("Sending new comment: " + msg.toString());
 				results.offer(msg);
@@ -357,15 +360,14 @@ public class DrupalCommentsTask extends SenderTask {
 			checkConnection();
 			get_new_topics.setLong(1, lastTopicsCheck);
 			lastTopicsCheck = System.currentTimeMillis() / SECOND;
-			rs = get_new_topics.executeQuery();
-
+			rs              = get_new_topics.executeQuery();
 			while (rs.next()) {
-				String name = rs.getString("name");
+				String name  = rs.getString("name");
 				String title = rs.getString("title");
-				String body = rs.getString("body");
+				String body  = rs.getString("body");
 				Packet msg = Message.getMessage(getName(), jid, StanzaType.normal,
-											 "New post by " + name + ":\n\n" + XMLUtils.escape(body),
-											 XMLUtils.escape(title), null, null);
+						"New post by " + name + ":\n\n" + XMLUtils.escape(body), XMLUtils.escape(
+						title), null, null);
 
 				log.fine("Sending new topic: " + msg.toString());
 				results.offer(msg);
@@ -399,7 +401,4 @@ public class DrupalCommentsTask extends SenderTask {
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/28

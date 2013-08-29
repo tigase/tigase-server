@@ -114,30 +114,6 @@ public class CompSQLRepository
 	 * Method description
 	 *
 	 *
-	 * @param repoChangeListener
-	 */
-	@Override
-	public void addRepoChangeListener(
-			RepositoryChangeListenerIfc<CompRepoItem> repoChangeListener) {
-		configRepo.addRepoChangeListener(repoChangeListener);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param repoChangeListener
-	 */
-	@Override
-	public void removeRepoChangeListener(
-			RepositoryChangeListenerIfc<CompRepoItem> repoChangeListener) {
-		configRepo.removeRepoChangeListener(repoChangeListener);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
 	 * @param item
 	 */
 	@Override
@@ -195,7 +171,21 @@ public class CompSQLRepository
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * @param repoChangeListener
+	 */
+	@Override
+	public void addRepoChangeListener(
+			RepositoryChangeListenerIfc<CompRepoItem> repoChangeListener) {
+		configRepo.addRepoChangeListener(repoChangeListener);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>Collection<CompRepoItem></code>
 	 */
 	@Override
 	public Collection<CompRepoItem> allItems() {
@@ -230,7 +220,9 @@ public class CompSQLRepository
 	 *
 	 * @param key
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean contains(String key) {
@@ -238,76 +230,6 @@ public class CompSQLRepository
 
 		return result;
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param defs
-	 * @param params
-	 */
-	@Override
-	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
-		configRepo.getDefaults(defs, params);
-
-		String repo_uri = RepositoryFactory.DERBY_REPO_URL_PROP_VAL;
-
-		if (params.get(RepositoryFactory.GEN_USER_DB_URI) != null) {
-			repo_uri = (String) params.get(RepositoryFactory.GEN_USER_DB_URI);
-		}
-		defs.put(REPO_URI_PROP_KEY, repo_uri);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param key
-	 *
-	 * @return
-	 */
-	@Override
-	public CompRepoItem getItem(String key) {
-		CompRepoItem result = configRepo.getItem(key);
-
-		if (result == null) {
-			ResultSet rs = null;
-
-			try {
-				PreparedStatement getItemSt = data_repo.getPreparedStatement(null,
-						GET_ITEM_QUERY);
-
-				synchronized (getItemSt) {
-					getItemSt.setString(1, key);
-					rs = getItemSt.executeQuery();
-					if (rs.next()) {
-						result = createItemFromRS(rs);
-					}
-				}
-			} catch (SQLException e) {
-				log.log(Level.WARNING, "Problem getting element from DB for domain: " + key, e);
-			} finally {
-				data_repo.release(null, rs);
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public CompRepoItem getItemInstance() {
-		return configRepo.getItemInstance();
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -340,7 +262,9 @@ public class CompSQLRepository
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Iterator<CompRepoItem></code>
 	 */
 	@Override
 	public Iterator<CompRepoItem> iterator() {
@@ -379,34 +303,25 @@ public class CompSQLRepository
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param properties
+	 * @param repoChangeListener
 	 */
 	@Override
-	public void setProperties(Map<String, Object> properties) {
-		configRepo.setProperties(properties);
-
-		String repo_uri = (String) properties.get(REPO_URI_PROP_KEY);
-
-		try {
-			initRepository(repo_uri, null);
-		} catch (SQLException ex) {
-			log.log(Level.WARNING, "Problem initializing database.", ex);
-		}
+	public void removeRepoChangeListener(
+			RepositoryChangeListenerIfc<CompRepoItem> repoChangeListener) {
+		configRepo.removeRepoChangeListener(repoChangeListener);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int size() {
@@ -431,12 +346,118 @@ public class CompSQLRepository
 	 *
 	 * @param item
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String validateItem(CompRepoItem item) {
 		return null;
 	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param defs
+	 * @param params
+	 */
+	@Override
+	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
+		configRepo.getDefaults(defs, params);
+
+		String repo_uri = RepositoryFactory.DERBY_REPO_URL_PROP_VAL;
+
+		if (params.get(RepositoryFactory.GEN_USER_DB_URI) != null) {
+			repo_uri = (String) params.get(RepositoryFactory.GEN_USER_DB_URI);
+		}
+		defs.put(REPO_URI_PROP_KEY, repo_uri);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param key
+	 *
+	 *
+	 *
+	 * @return a value of <code>CompRepoItem</code>
+	 */
+	@Override
+	public CompRepoItem getItem(String key) {
+		CompRepoItem result = configRepo.getItem(key);
+
+		if (result == null) {
+			ResultSet rs = null;
+
+			try {
+				PreparedStatement getItemSt = data_repo.getPreparedStatement(null,
+						GET_ITEM_QUERY);
+
+				synchronized (getItemSt) {
+					getItemSt.setString(1, key);
+					rs = getItemSt.executeQuery();
+					if (rs.next()) {
+						result = createItemFromRS(rs);
+					}
+				}
+			} catch (SQLException e) {
+				log.log(Level.WARNING, "Problem getting element from DB for domain: " + key, e);
+			} finally {
+				data_repo.release(null, rs);
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>CompRepoItem</code>
+	 */
+	@Override
+	public CompRepoItem getItemInstance() {
+		return configRepo.getItemInstance();
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param delay
+	 */
+	@Override
+	public void setAutoloadTimer(long delay) {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param properties
+	 */
+	@Override
+	public void setProperties(Map<String, Object> properties) {
+		configRepo.setProperties(properties);
+
+		String repo_uri = (String) properties.get(REPO_URI_PROP_KEY);
+
+		try {
+			initRepository(repo_uri, null);
+		} catch (SQLException ex) {
+			log.log(Level.WARNING, "Problem initializing database.", ex);
+		}
+	}
+
+	//~--- methods --------------------------------------------------------------
 
 	private void checkDB() throws SQLException {
 		ResultSet rs = null;
@@ -524,18 +545,7 @@ public class CompSQLRepository
 
 		return null;
 	}
-
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param delay
-	 */
-	@Override
-	public void setAutoloadTimer(long delay) {}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/11
+//~ Formatted in Tigase Code Convention on 13/08/28

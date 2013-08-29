@@ -118,29 +118,22 @@ public class SaslAuth
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of int
 	 */
 	@Override
 	public int concurrentQueuesNo() {
 		return Runtime.getRuntime().availableProcessors();
 	}
 
-	private Element createReply(final ElementType type, final String cdata) {
-		Element reply = new Element(type.toString());
-
-		reply.setXMLNS(_XMLNS);
-		if (cdata != null) {
-			reply.setCData(cdata);
-		}
-
-		return reply;
-	}
-
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String id() {
@@ -179,16 +172,6 @@ public class SaslAuth
 
 			throw new RuntimeException("Can't create SASL Mechanism Selector", e);
 		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 */
-	protected void onAuthFail(final XMPPResourceConnection session) {
-		session.removeSessionData(SASL_SERVER_KEY);
 	}
 
 	/**
@@ -398,7 +381,9 @@ public class SaslAuth
 	 *
 	 * @param session
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Element[]
 	 */
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
@@ -409,7 +394,9 @@ public class SaslAuth
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[][]
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -420,7 +407,9 @@ public class SaslAuth
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[]
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -433,7 +422,9 @@ public class SaslAuth
 	 *
 	 * @param session
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Element[]
 	 */
 	@Override
 	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
@@ -454,7 +445,28 @@ public class SaslAuth
 					new String[] { _XMLNS }) };
 		}
 	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 */
+	protected void onAuthFail(final XMPPResourceConnection session) {
+		session.removeSessionData(SASL_SERVER_KEY);
+	}
+
+	private Element createReply(final ElementType type, final String cdata) {
+		Element reply = new Element(type.toString());
+
+		reply.setXMLNS(_XMLNS);
+		if (cdata != null) {
+			reply.setCData(cdata);
+		}
+
+		return reply;
+	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/12
+//~ Formatted in Tigase Code Convention on 13/08/28

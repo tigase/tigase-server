@@ -263,9 +263,11 @@ public abstract class AbstractMessageReceiver
 	 *          is a <code>Packet</code> instance being put to the component
 	 *          internal input queue.
 	 *
-	 * @return a <code>boolean</code> value of <code>true</code> if the packet has
+	 *  a <code>boolean</code> value of <code>true</code> if the packet has
 	 *         been successfully added to the queue and <code>false</code>
 	 *         otherwise.
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean addPacket(Packet packet) {
@@ -312,10 +314,12 @@ public abstract class AbstractMessageReceiver
 	 *          is a <code>Packet</code> instance being put to the component
 	 *          internal input queue.
 	 *
-	 * @return a <code>boolean</code> value of <code>true</code> if the packet has
+	 *  a <code>boolean</code> value of <code>true</code> if the packet has
 	 *         been successfully added to the queue and <code>false</code>
 	 *         otherwise.
-	 * @see AbstractMessageReceiver.addPacket(Packet packet)
+	 * @see AbstractMessageReceiver#addPacket(Packet packet)
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean addPacketNB(Packet packet) {
@@ -371,10 +375,12 @@ public abstract class AbstractMessageReceiver
 	 *          <code>hashCodeForPacket(Packet)</code> method how to control
 	 *          assiging packets to particular threads.
 	 *
-	 * @return a <code>boolean</code> value of <code>true</code> if all packets
+	 *  a <code>boolean</code> value of <code>true</code> if all packets
 	 *         has been successfully added to the component's internal input queue
 	 *         and <code>false</code> otherwise.
-	 * @see AbstractMessageReceiver.hashCodeForPacket(Packet packet)
+	 * @see AbstractMessageReceiver#hashCodeForPacket(Packet packet)
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean addPackets(Queue<Packet> packets) {
@@ -407,7 +413,7 @@ public abstract class AbstractMessageReceiver
 	 * component.getName() + '@' + any virtual domain
 	 * </pre>
 	 *
-	 * @TODO: The future implementation most likely accept packets addressed to:
+	 * TODO: The future implementation most likely accept packets addressed to:
 	 *
 	 *        <pre>
 	 * any virtual domain + '/' + component.getName()
@@ -536,7 +542,9 @@ public abstract class AbstractMessageReceiver
 	 * @param packet
 	 *          is a <code>Packet</code> which needs to be processed by some
 	 *          thread.
-	 * @return a hash code generated for the input thread.
+	 *  a hash code generated for the input thread.
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	public int hashCodeForPacket(Packet packet) {
 		if ((packet.getPacketFrom() != null) &&!getComponentId().equals(packet
@@ -565,7 +573,9 @@ public abstract class AbstractMessageReceiver
 	 *
 	 * @param prefix
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String newPacketId(String prefix) {
 		StringBuilder sb = new StringBuilder(32);
@@ -582,7 +592,9 @@ public abstract class AbstractMessageReceiver
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	public int processingInThreads() {
 		return 1;
@@ -592,7 +604,9 @@ public abstract class AbstractMessageReceiver
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	public int processingOutThreads() {
 		return 1;
@@ -605,7 +619,9 @@ public abstract class AbstractMessageReceiver
 	 * unneeded threads. Use <code>processingOutThreads()</code> and
 	 * <code>processingInThreads()</code> instead.
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Deprecated
 	public int processingThreads() {
@@ -685,7 +701,9 @@ public abstract class AbstractMessageReceiver
 	 *
 	 * @param address
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean removeRegexRouting(String address) {
 		return regexRoutings.remove(Pattern.compile(address, Pattern.CASE_INSENSITIVE));
@@ -694,7 +712,9 @@ public abstract class AbstractMessageReceiver
 	/**
 	 * Method returns default number of threads used by SchedulerExecutorService
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	public int schedulerThreads() {
 		return 1;
@@ -742,7 +762,9 @@ public abstract class AbstractMessageReceiver
 	 *          starting up server. These parameters can be used as a hints to
 	 *          generate component's default configuration.
 	 *
-	 * @return a <code>Map</code> with the component default configuration.
+	 *  a <code>Map</code> with the component default configuration.
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -770,8 +792,10 @@ public abstract class AbstractMessageReceiver
 	 * compiled regular expression patterns. The <code>Set</code> can be empty but
 	 * it can not be null.
 	 *
-	 * @return a <code>Set</code> with all component's routings as a compiled
+	 *  a <code>Set</code> with all component's routings as a compiled
 	 *         regular expression patterns.
+	 *
+	 * @return a value of <code>Set<Pattern></code>
 	 */
 	public Set<Pattern> getRegexRoutings() {
 		return regexRoutings;
@@ -899,7 +923,9 @@ public abstract class AbstractMessageReceiver
 	 *
 	 * @param address
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean isInRegexRoutings(String address) {
@@ -1076,7 +1102,9 @@ public abstract class AbstractMessageReceiver
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean addOutPacket(Packet packet) {
 		int queueIdx = Math.abs(hashCodeForPacket(packet) % out_queues_size);
@@ -1105,7 +1133,9 @@ public abstract class AbstractMessageReceiver
 	 *
 	 * @param packet
 	 *          a <code>Packet</code> value
-	 * @return a <code>boolean</code> value
+	 *  a <code>boolean</code> value
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean addOutPacketNB(Packet packet) {
 		int queueIdx = Math.abs(hashCodeForPacket(packet) % out_queues_size);
@@ -1138,7 +1168,9 @@ public abstract class AbstractMessageReceiver
 	 *
 	 * @param packets
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean addOutPackets(Queue<Packet> packets) {
 		Packet  p      = null;
@@ -1165,7 +1197,9 @@ public abstract class AbstractMessageReceiver
 	 * @param delay
 	 * @param unit
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean addOutPacketWithTimeout(Packet packet,
 			ReceiverTimeoutHandler handler, long delay, TimeUnit unit) {
@@ -1211,7 +1245,9 @@ public abstract class AbstractMessageReceiver
 	 *
 	 * @param def
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Integer</code>
 	 */
 	protected Integer getMaxQueueSize(int def) {
 		return def;
@@ -1502,4 +1538,4 @@ public abstract class AbstractMessageReceiver
 }    // AbstractMessageReceiver
 
 
-//~ Formatted in Tigase Code Convention on 13/06/08
+//~ Formatted in Tigase Code Convention on 13/08/29

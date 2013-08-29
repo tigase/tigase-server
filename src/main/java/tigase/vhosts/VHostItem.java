@@ -524,9 +524,9 @@ public class VHostItem
 
 				try {
 					domainFilter = DomainFilterPolicy.valueof(df[1]);
-					if ( domainFilter == null ){
-						domainFilter = DomainFilterPolicy.valueof( System.getProperty(
-								DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString() ) );
+					if (domainFilter == null) {
+						domainFilter = DomainFilterPolicy.valueof(System.getProperty(
+								DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString()));
 					}
 				} catch (Exception e) {
 					domainFilter = DOMAIN_FILTER_POLICY_PROP_DEF;
@@ -572,7 +572,9 @@ public class VHostItem
 	/**
 	 * The method exports the <code>VHostItem</code> object to XML representation.
 	 *
-	 * @return an <code>Element</code> object with vhost information.
+	 *  an <code>Element</code> object with vhost information.
+	 *
+	 * @return a value of Element
 	 */
 	@Override
 	public Element toElement() {
@@ -620,7 +622,9 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String toPropertyString() {
@@ -660,7 +664,9 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String toString() {
@@ -677,7 +683,9 @@ public class VHostItem
 	 * packets sent to this domain or <code>null</code> (default) if there is no
 	 * specific component assigned to this domain.
 	 *
-	 * @return a <code>String[]</code> object with server component names.
+	 *  a <code>String[]</code> object with server component names.
+	 *
+	 * @return a value of String[]
 	 */
 	public String[] getComps() {
 		return comps;
@@ -687,13 +695,16 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of DomainFilterPolicy
 	 */
 	public DomainFilterPolicy getDomainFilter() {
-		if ( domainFilter == null ){
-			domainFilter = DomainFilterPolicy.valueof( System.getProperty(
-					DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString() ) );
+		if (domainFilter == null) {
+			domainFilter = DomainFilterPolicy.valueof(System.getProperty(
+					DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString()));
 		}
+
 		return domainFilter;
 	}
 
@@ -701,7 +712,9 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String getElemName() {
@@ -712,7 +725,9 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String getKey() {
@@ -724,15 +739,19 @@ public class VHostItem
 	 * domain. This parameter is to allow for limiting number of users on per
 	 * domain basis.
 	 *
-	 * @return a <code>long</code> value indicating the maximum number of user
+	 *  a <code>long</code> value indicating the maximum number of user
 	 *         accounts allowed for this domain.
+	 *
+	 * @return a value of long
 	 */
 	public long getMaxUsersNumber() {
 		return maxUsersNumber;
 	}
 
 	/**
-	 * @return the messageForward
+	 *  the messageForward
+	 *
+	 * @return a value of JID
 	 */
 	public JID getMessageForward() {
 		return messageForward;
@@ -742,7 +761,9 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of JID
 	 */
 	public JID getMessageForwardAddress() {
 		return presenceForward;
@@ -754,14 +775,18 @@ public class VHostItem
 	 * allows to access configuration parameters which are not specified at the
 	 * time of API definition.
 	 *
-	 * @return a <code>String</code> value with domain extra parameters.
+	 *  a <code>String</code> value with domain extra parameters.
+	 *
+	 * @return a value of String
 	 */
 	public String getOtherDomainParams() {
 		return otherDomainParams;
 	}
 
 	/**
-	 * @return the presenceForward
+	 *  the presenceForward
+	 *
+	 * @return a value of JID
 	 */
 	public JID getPresenceForward() {
 		return presenceForward;
@@ -771,7 +796,9 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of JID
 	 */
 	public JID getPresenceForwardAddress() {
 		return presenceForward;
@@ -781,7 +808,9 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	public String getS2sSecret() {
 		return s2sSecret;
@@ -791,7 +820,9 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of VHostItem
 	 */
 	public VHostItem getUnmodifiableVHostItem() {
 		if (unmodifiableItem == null) {
@@ -804,7 +835,9 @@ public class VHostItem
 	/**
 	 * This method return a virtual host name as a <code>String</code> value.
 	 *
-	 * @return a <code>String</code> value with the virtual domain name.
+	 *  a <code>String</code> value with the virtual domain name.
+	 *
+	 * @return a value of JID
 	 */
 	public JID getVhost() {
 		return this.vhost;
@@ -815,8 +848,10 @@ public class VHostItem
 	 * is the domain own configuration parameter which allows to disable anonymous
 	 * logins on per domain basis.
 	 *
-	 * @return a <code>boolean</code> value indicating whether anonymous logins
+	 *  a <code>boolean</code> value indicating whether anonymous logins
 	 *         are allowed for this domain.
+	 *
+	 * @return a value of boolean
 	 */
 	public boolean isAnonymousEnabled() {
 		return anonymousEnabled;
@@ -828,8 +863,10 @@ public class VHostItem
 	 * packets for this domain are not processed normally. Instead the server
 	 * returns an error.
 	 *
-	 * @return a <code>boolean</code> value <code>true</code> if the domain is
+	 *  a <code>boolean</code> value <code>true</code> if the domain is
 	 *         enabled and <code>false</code> if the domain is disabled.
+	 *
+	 * @return a value of boolean
 	 */
 	public boolean isEnabled() {
 		return enabled;
@@ -840,8 +877,10 @@ public class VHostItem
 	 * not. This is the domain own configuration parameter which allows to disable
 	 * user accounts registration via XMPP per domain basis.
 	 *
-	 * @return a <code>boolean</code> value indicating whether user account
+	 *  a <code>boolean</code> value indicating whether user account
 	 *         registration is allowed for this domain.
+	 *
+	 * @return a value of boolean
 	 */
 	public boolean isRegisterEnabled() {
 		return registerEnabled;
@@ -851,7 +890,9 @@ public class VHostItem
 	 * The method returns TLS required settings for the vhost.
 	 *
 	 *
-	 * @return a <code>boolean</code> value whether TLS is required for the vhost or not.
+	 *  a <code>boolean</code> value whether TLS is required for the vhost or not.
+	 *
+	 * @return a value of boolean
 	 */
 	public boolean isTlsRequired() {
 		return tlsRequired;
@@ -1034,7 +1075,9 @@ public class VHostItem
 		 * The method exports the <code>VHostItem</code> object to XML
 		 * representation.
 		 *
-		 * @return an <code>Element</code> object with vhost information.
+		 *  an <code>Element</code> object with vhost information.
+		 *
+		 * @return a value of Element
 		 */
 		@Override
 		public Element toElement() {
@@ -1045,7 +1088,9 @@ public class VHostItem
 		 * Method description
 		 *
 		 *
-		 * @return
+		 *
+		 *
+		 * @return a value of String
 		 */
 		@Override
 		public String toString() {
@@ -1059,7 +1104,9 @@ public class VHostItem
 		 * packets sent to this domain or <code>null</code> (default) if there is no
 		 * specific component assigned to this domain.
 		 *
-		 * @return a <code>String[]</code> object with server component names.
+		 *  a <code>String[]</code> object with server component names.
+		 *
+		 * @return a value of String[]
 		 */
 		@Override
 		public String[] getComps() {
@@ -1070,7 +1117,9 @@ public class VHostItem
 		 * Method description
 		 *
 		 *
-		 * @return
+		 *
+		 *
+		 * @return a value of DomainFilterPolicy
 		 */
 		@Override
 		public DomainFilterPolicy getDomainFilter() {
@@ -1082,8 +1131,10 @@ public class VHostItem
 		 * domain. This parameter is to allow for limiting number of users on per
 		 * domain basis.
 		 *
-		 * @return a <code>long</code> value indicating the maximum number of user
+		 *  a <code>long</code> value indicating the maximum number of user
 		 *         accounts allowed for this domain.
+		 *
+		 * @return a value of long
 		 */
 		@Override
 		public long getMaxUsersNumber() {
@@ -1091,7 +1142,9 @@ public class VHostItem
 		}
 
 		/**
-		 * @return the messageForward
+		 *  the messageForward
+		 *
+		 * @return a value of JID
 		 */
 		@Override
 		public JID getMessageForward() {
@@ -1104,7 +1157,9 @@ public class VHostItem
 		 * allows to access configuration parameters which are not specified at the
 		 * time of API definition.
 		 *
-		 * @return a <code>String</code> value with domain extra parameters.
+		 *  a <code>String</code> value with domain extra parameters.
+		 *
+		 * @return a value of String
 		 */
 		@Override
 		public String getOtherDomainParams() {
@@ -1112,7 +1167,9 @@ public class VHostItem
 		}
 
 		/**
-		 * @return the presenceForward
+		 *  the presenceForward
+		 *
+		 * @return a value of JID
 		 */
 		@Override
 		public JID getPresenceForward() {
@@ -1123,7 +1180,9 @@ public class VHostItem
 		 * Method description
 		 *
 		 *
-		 * @return
+		 *
+		 *
+		 * @return a value of String
 		 */
 		@Override
 		public String getS2sSecret() {
@@ -1134,7 +1193,9 @@ public class VHostItem
 		 * Method description
 		 *
 		 *
-		 * @return
+		 *
+		 *
+		 * @return a value of VHostItem
 		 */
 		@Override
 		public VHostItem getUnmodifiableVHostItem() {
@@ -1144,7 +1205,9 @@ public class VHostItem
 		/**
 		 * This method return a virtual host name as a <code>String</code> value.
 		 *
-		 * @return a <code>String</code> value with the virtual domain name.
+		 *  a <code>String</code> value with the virtual domain name.
+		 *
+		 * @return a value of JID
 		 */
 		@Override
 		public JID getVhost() {
@@ -1156,8 +1219,10 @@ public class VHostItem
 		 * This is the domain own configuration parameter which allows to disable
 		 * anonymous logins on per domain basis.
 		 *
-		 * @return a <code>boolean</code> value indicating whether anonymous logins
+		 *  a <code>boolean</code> value indicating whether anonymous logins
 		 *         are allowed for this domain.
+		 *
+		 * @return a value of boolean
 		 */
 		@Override
 		public boolean isAnonymousEnabled() {
@@ -1170,8 +1235,10 @@ public class VHostItem
 		 * packets for this domain are not processed normally. Instead the server
 		 * returns an error.
 		 *
-		 * @return a <code>boolean</code> value <code>true</code> if the domain is
+		 *  a <code>boolean</code> value <code>true</code> if the domain is
 		 *         enabled and <code>false</code> if the domain is disabled.
+		 *
+		 * @return a value of boolean
 		 */
 		@Override
 		public boolean isEnabled() {
@@ -1183,8 +1250,10 @@ public class VHostItem
 		 * not. This is the domain own configuration parameter which allows to
 		 * disable user accounts registration via XMPP per domain basis.
 		 *
-		 * @return a <code>boolean</code> value indicating whether user account
+		 *  a <code>boolean</code> value indicating whether user account
 		 *         registration is allowed for this domain.
+		 *
+		 * @return a value of boolean
 		 */
 		@Override
 		public boolean isRegisterEnabled() {
@@ -1195,7 +1264,9 @@ public class VHostItem
 		 * Method description
 		 *
 		 *
-		 * @return
+		 *
+		 *
+		 * @return a value of boolean
 		 */
 		@Override
 		public boolean isTlsRequired() {
@@ -1349,4 +1420,4 @@ public class VHostItem
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/04/05
+//~ Formatted in Tigase Code Convention on 13/08/28

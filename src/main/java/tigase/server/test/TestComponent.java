@@ -2,7 +2,7 @@
  * TestComponent.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -59,18 +59,17 @@ import javax.script.Bindings;
  */
 public class TestComponent
 				extends AbstractMessageReceiver {
-	private static final String ABUSE_ADDRESS_KEY     = "abuse-address";
-	private static final String BAD_WORDS_KEY         = "bad-words";
-	private static final String BAD_WORDS_VAR         = "badWords";
-	private static final String[] INITIAL_BAD_WORDS   = { "word1", "word2", "word3" };
-	private static final String[] INITIAL_WHITE_LIST  = { "admin@localhost" };
-	private static final String NOTIFICATION_FREQ_KEY = "notification-freq";
-	private static final String PREPEND_TEXT_KEY      = "log-prepend";
-	private static final String SECURE_LOGGING_KEY    = "secure-logging";
-	private static final String WHITE_LIST_VAR        = "whiteList";
-	private static final String WHITELIST_KEY         = "white-list";
-	private static final Logger log                   =
-		Logger.getLogger(TestComponent.class.getName());
+	private static final String   ABUSE_ADDRESS_KEY     = "abuse-address";
+	private static final String   BAD_WORDS_KEY         = "bad-words";
+	private static final String   BAD_WORDS_VAR         = "badWords";
+	private static final String[] INITIAL_BAD_WORDS     = { "word1", "word2", "word3" };
+	private static final String[] INITIAL_WHITE_LIST    = { "admin@localhost" };
+	private static final String   NOTIFICATION_FREQ_KEY = "notification-freq";
+	private static final String   PREPEND_TEXT_KEY      = "log-prepend";
+	private static final String   SECURE_LOGGING_KEY    = "secure-logging";
+	private static final String   WHITE_LIST_VAR        = "whiteList";
+	private static final String   WHITELIST_KEY         = "white-list";
+	private static final Logger   log = Logger.getLogger(TestComponent.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -81,21 +80,21 @@ public class TestComponent
 	 * processPacket(...) in another thread. We expect that changes are very rare
 	 * and small, most of operations are just iterations.
 	 */
-	private Set<String> badWords      = new CopyOnWriteArraySet<String>();
-	private int delayCounter          = 0;
-	private long messagesCounter      = 0;
-	private int notificationFrequency = 10;
-	private String prependText        = "Spam detected: ";
-	private long spamCounter          = 0;
-	private long totalSpamCounter     = 0;
+	private Set<String> badWords              = new CopyOnWriteArraySet<String>();
+	private int         delayCounter          = 0;
+	private long        messagesCounter       = 0;
+	private int         notificationFrequency = 10;
+	private String      prependText           = "Spam detected: ";
+	private long        spamCounter           = 0;
+	private long        totalSpamCounter      = 0;
 
 	/**
 	 * This might be changed in one threads while it is iterated in
 	 * processPacket(...) in another thread. We expect that changes are very rare
 	 * and small, most of operations are just contains(...).
 	 */
-	private Set<String> whiteList = new ConcurrentSkipListSet<String>();
-	private boolean secureLogging = false;
+	private Set<String> whiteList     = new ConcurrentSkipListSet<String>();
+	private boolean     secureLogging = false;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -108,79 +107,12 @@ public class TestComponent
 		super.everyMinute();
 		if ((++delayCounter) >= notificationFrequency) {
 			addOutPacket(Message.getMessage(getComponentId(), abuseAddress, StanzaType.chat,
-																			"Detected spam messages: " + spamCounter,
-																			"Spam counter", null, newPacketId("spam-")));
+					"Detected spam messages: " + spamCounter, "Spam counter", null, newPacketId(
+					"spam-")));
 			delayCounter = 0;
 			spamCounter  = 0;
 		}
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 * @return
-	 */
-	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> defs = super.getDefaults(params);
-
-		Collections.addAll(badWords, INITIAL_BAD_WORDS);
-		Collections.addAll(whiteList, INITIAL_WHITE_LIST);
-		defs.put(BAD_WORDS_KEY, INITIAL_BAD_WORDS);
-		defs.put(WHITELIST_KEY, INITIAL_WHITE_LIST);
-		defs.put(PREPEND_TEXT_KEY, prependText);
-		defs.put(SECURE_LOGGING_KEY, secureLogging);
-		defs.put(ABUSE_ADDRESS_KEY, "admin@localhost");
-		defs.put(NOTIFICATION_FREQ_KEY, notificationFrequency);
-
-		return defs;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getDiscoCategoryType() {
-		return "spam";
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getDiscoDescription() {
-		return "Spam filtering";
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 */
-	@Override
-	public void getStatistics(StatisticsList list) {
-		super.getStatistics(list);
-		list.add(getName(), "Spam messages found", totalSpamCounter, Level.INFO);
-		list.add(getName(), "All messages processed", messagesCounter, Level.FINE);
-		if (list.checkLevel(Level.FINEST)) {
-
-			// Some very expensive statistics generation code...
-		}
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -188,7 +120,9 @@ public class TestComponent
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of int
 	 */
 	@Override
 	public int hashCodeForPacket(Packet packet) {
@@ -226,6 +160,32 @@ public class TestComponent
 	 * Method description
 	 *
 	 *
+	 *
+	 *
+	 * @return a value of int
+	 */
+	@Override
+	public int processingInThreads() {
+		return Runtime.getRuntime().availableProcessors();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of int
+	 */
+	@Override
+	public int processingOutThreads() {
+		return Runtime.getRuntime().availableProcessors();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param packet
 	 */
 	@Override
@@ -233,9 +193,8 @@ public class TestComponent
 
 		// Is this packet a message?
 		if ("message" == packet.getElemName()) {
-			updateServiceDiscoveryItem(getName(), "messages",
-																 "Messages processed: [" + (++messagesCounter) + "]",
-																 true);
+			updateServiceDiscoveryItem(getName(), "messages", "Messages processed: [" +
+					(++messagesCounter) + "]", true);
 
 			JID from = packet.getStanzaFrom();
 
@@ -251,9 +210,8 @@ public class TestComponent
 						if (body.contains(word)) {
 							log.finest(prependText + packet.toString(secureLogging));
 							++spamCounter;
-							updateServiceDiscoveryItem(getName(), "spam",
-																				 "Spam caught: [" + (++totalSpamCounter) + "]",
-																				 true);
+							updateServiceDiscoveryItem(getName(), "spam", "Spam caught: [" +
+									(++totalSpamCounter) + "]", true);
 
 							return;
 						}
@@ -268,26 +226,75 @@ public class TestComponent
 		addOutPacket(result);
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * @param params
+	 *
+	 *
+	 *
+	 * @return a value of Map<String,Object>
 	 */
 	@Override
-	public int processingInThreads() {
-		return Runtime.getRuntime().availableProcessors();
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		Map<String, Object> defs = super.getDefaults(params);
+
+		Collections.addAll(badWords, INITIAL_BAD_WORDS);
+		Collections.addAll(whiteList, INITIAL_WHITE_LIST);
+		defs.put(BAD_WORDS_KEY, INITIAL_BAD_WORDS);
+		defs.put(WHITELIST_KEY, INITIAL_WHITE_LIST);
+		defs.put(PREPEND_TEXT_KEY, prependText);
+		defs.put(SECURE_LOGGING_KEY, secureLogging);
+		defs.put(ABUSE_ADDRESS_KEY, "admin@localhost");
+		defs.put(NOTIFICATION_FREQ_KEY, notificationFrequency);
+
+		return defs;
 	}
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
-	public int processingOutThreads() {
-		return Runtime.getRuntime().availableProcessors();
+	public String getDiscoCategoryType() {
+		return "spam";
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of String
+	 */
+	@Override
+	public String getDiscoDescription() {
+		return "Spam filtering";
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param list
+	 */
+	@Override
+	public void getStatistics(StatisticsList list) {
+		super.getStatistics(list);
+		list.add(getName(), "Spam messages found", totalSpamCounter, Level.INFO);
+		list.add(getName(), "All messages processed", messagesCounter, Level.FINE);
+		if (list.checkLevel(Level.FINEST)) {
+
+			// Some very expensive statistics generation code...
+		}
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -308,15 +315,14 @@ public class TestComponent
 		try {
 			abuseAddress = JID.jidInstance((String) props.get(ABUSE_ADDRESS_KEY));
 		} catch (TigaseStringprepException ex) {
-			log.warning("Incorrect abuseAddress, stringprep error: " +
-									(String) props.get(ABUSE_ADDRESS_KEY));
+			log.warning("Incorrect abuseAddress, stringprep error: " + (String) props.get(
+					ABUSE_ADDRESS_KEY));
 		}
 		notificationFrequency = (Integer) props.get(NOTIFICATION_FREQ_KEY);
 		updateServiceDiscoveryItem(getName(), null, getDiscoDescription(), "automation",
-															 "spam-filtering", true, "tigase:x:spam-filter",
-															 "tigase:x:spam-reporting");
+				"spam-filtering", true, "tigase:x:spam-filter", "tigase:x:spam-reporting");
 	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/19
+//~ Formatted in Tigase Code Convention on 13/08/28

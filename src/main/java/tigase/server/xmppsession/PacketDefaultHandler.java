@@ -90,7 +90,9 @@ public class PacketDefaultHandler {
 	 * @param packet
 	 * @param session
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	public boolean canHandle(Packet packet, XMPPResourceConnection session) {
 		if (session == null) {
@@ -126,7 +128,9 @@ public class PacketDefaultHandler {
 	 * @param repo
 	 * @param results
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	public boolean forward(final Packet packet, final XMPPResourceConnection session,
 			final NonAuthUserRepository repo, final Queue<Packet> results) {
@@ -156,7 +160,9 @@ public class PacketDefaultHandler {
 	 * @param repo
 	 * @param results
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	public boolean preprocess(final Packet packet, final XMPPResourceConnection session,
 			final NonAuthUserRepository repo, final Queue<Packet> results) {
@@ -382,4 +388,4 @@ public class PacketDefaultHandler {
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/05/24
+//~ Formatted in Tigase Code Convention on 13/08/28

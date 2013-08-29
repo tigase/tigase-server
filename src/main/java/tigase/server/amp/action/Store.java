@@ -2,7 +2,7 @@
  * Store.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,6 @@ package tigase.server.amp.action;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.RepositoryFactory;
-
 import tigase.db.UserNotFoundException;
 
 import tigase.server.amp.ActionAbstract;
@@ -65,10 +64,10 @@ public class Store
 	//~--- fields ---------------------------------------------------------------
 
 	// ~--- fields ---------------------------------------------------------------
-	private Thread expiredProcessor          = null;
-	private MsgRepository repo               = null;
-	private final SimpleDateFormat formatter =
-		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+	private Thread                 expiredProcessor = null;
+	private MsgRepository          repo             = null;
+	private final SimpleDateFormat formatter = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
 	//~--- methods --------------------------------------------------------------
 
@@ -82,13 +81,15 @@ public class Store
 	 * @param rule
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean execute(Packet packet, Element rule) {
 		if (repo != null) {
-			Date expired = null;
-			String stamp = null;
+			Date   expired = null;
+			String stamp   = null;
 
 			if (packet.getAttributeStaticStr(EXPIRED) == null) {
 				if (rule == null) {
@@ -103,9 +104,8 @@ public class Store
 					try {
 						expired = formatter.parse(rule.getAttributeStaticStr("value"));
 					} catch (Exception e) {
-						log.log(Level.INFO,
-										"Incorrect expire-at value: " + rule.getAttributeStaticStr("value"),
-										e);
+						log.log(Level.INFO, "Incorrect expire-at value: " + rule
+								.getAttributeStaticStr("value"), e);
 						expired = null;
 					}
 				}
@@ -117,8 +117,8 @@ public class Store
 
 				if (elem.getChild("delay", "urn:xmpp:delay") == null) {
 					Element x = new Element("delay", "Offline Storage", new String[] { "from",
-									"stamp", "xmlns" }, new String[] { packet.getStanzaTo().getDomain(),
-									stamp, "urn:xmpp:delay" });
+							"stamp", "xmlns" }, new String[] { packet.getStanzaTo().getDomain(), stamp,
+							"urn:xmpp:delay" });
 
 					elem.addChild(x);
 				}
@@ -141,12 +141,14 @@ public class Store
 	 *
 	 * @param params
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> defs = super.getDefaults(params);
-		String db_uri            = (String) params.get(AMP_MSG_REPO_URI_PARAM);
+		Map<String, Object> defs   = super.getDefaults(params);
+		String              db_uri = (String) params.get(AMP_MSG_REPO_URI_PARAM);
 
 		if (db_uri == null) {
 			db_uri = (String) params.get(RepositoryFactory.USER_REPO_URL_PROP_KEY);
@@ -162,7 +164,9 @@ public class Store
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getName() {
@@ -196,9 +200,8 @@ public class Store
 					// Entry happens to be null for (shared-user-repo-params, null)
 					// TODO: Not sure if this is supposed to happen, more investigation is needed.
 					if (entry.getValue() != null) {
-						log.log(Level.WARNING,
-										"Reading properties: (" + entry.getKey() + ", " + entry.getValue() +
-										")");
+						log.log(Level.WARNING, "Reading properties: (" + entry.getKey() + ", " + entry
+								.getValue() + ")");
 						db_props.put(entry.getKey(), entry.getValue().toString());
 					}
 				}
@@ -236,34 +239,11 @@ public class Store
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods ----------------------------------------------------------
-	private Element getExpireAtRule(Packet packet) {
-		Element amp         = packet.getElement().getChild("amp", AMP_XMLNS);
-		List<Element> rules = amp.getChildren();
-		Element rule        = null;
-
-		if ((rules != null) && (rules.size() > 0)) {
-			for (Element r : rules) {
-				String cond = r.getAttributeStaticStr(CONDITION_ATT);
-
-				if ((cond != null) && cond.equals(ExpireAt.NAME)) {
-					rule = r;
-
-					break;
-				}
-			}
-		}
-
-		return rule;
-	}
-
 	//~--- methods --------------------------------------------------------------
 
 	// ~--- methods --------------------------------------------------------------
 	private void removeExpireAtRule(Packet packet) {
-		Element amp         = packet.getElement().getChild("amp", AMP_XMLNS);
+		Element       amp   = packet.getElement().getChild("amp", AMP_XMLNS);
 		List<Element> rules = amp.getChildren();
 
 		if ((rules != null) && (rules.size() > 0)) {
@@ -282,6 +262,29 @@ public class Store
 			packet.getElement().removeChild(amp);
 		}
 	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	// ~--- get methods ----------------------------------------------------------
+	private Element getExpireAtRule(Packet packet) {
+		Element       amp   = packet.getElement().getChild("amp", AMP_XMLNS);
+		List<Element> rules = amp.getChildren();
+		Element       rule  = null;
+
+		if ((rules != null) && (rules.size() > 0)) {
+			for (Element r : rules) {
+				String cond = r.getAttributeStaticStr(CONDITION_ATT);
+
+				if ((cond != null) && cond.equals(ExpireAt.NAME)) {
+					rule = r;
+
+					break;
+				}
+			}
+		}
+
+		return rule;
+	}
 }
 
 
@@ -291,4 +294,4 @@ public class Store
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/08/28

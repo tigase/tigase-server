@@ -115,11 +115,26 @@ public class JabberIqAuth
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of int
 	 */
 	@Override
 	public int concurrentQueuesNo() {
 		return Runtime.getRuntime().availableProcessors();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of String
+	 */
+	@Override
+	public String id() {
+		return ID;
 	}
 
 	/**
@@ -151,17 +166,6 @@ public class JabberIqAuth
 
 			throw new RuntimeException("Can't create SASL Mechanism Selector", e);
 		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String id() {
-		return ID;
 	}
 
 	/**
@@ -326,6 +330,66 @@ public class JabberIqAuth
 	 * Method description
 	 *
 	 *
+	 * @param session
+	 *
+	 *
+	 *
+	 * @return a value of Element[]
+	 */
+	@Override
+	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
+		return DISCO_FEATURES;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of String[][]
+	 */
+	@Override
+	public String[][] supElementNamePaths() {
+		return ELEMENT_PATHS;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of String[]
+	 */
+	@Override
+	public String[] supNamespaces() {
+		return XMLNSS;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 *
+	 *
+	 * @return a value of Element[]
+	 */
+	@Override
+	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
+		if ((session == null) || session.isAuthorized()) {
+			return null;
+		} else {
+			return FEATURES;
+		}    // end of if (session.isAuthorized()) else
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param repo
 	 * @param settings
 	 * @param session
@@ -333,7 +397,9 @@ public class JabberIqAuth
 	 * @param password
 	 * @param digest
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Authorization
 	 */
 	protected Authorization doAuth(NonAuthUserRepository repo, Map<String,
 			Object> settings, XMPPResourceConnection session, BareJID user_id, String password,
@@ -374,58 +440,6 @@ public class JabberIqAuth
 			return Authorization.INTERNAL_SERVER_ERROR;
 		}
 	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 * @return
-	 */
-	@Override
-	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
-		return DISCO_FEATURES;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String[][] supElementNamePaths() {
-		return ELEMENT_PATHS;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String[] supNamespaces() {
-		return XMLNSS;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 * @return
-	 */
-	@Override
-	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
-		if ((session == null) || session.isAuthorized()) {
-			return null;
-		} else {
-			return FEATURES;
-		}    // end of if (session.isAuthorized()) else
-	}
 }    // JabberIqAuth
 
 
@@ -435,4 +449,4 @@ public class JabberIqAuth
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/03/12
+//~ Formatted in Tigase Code Convention on 13/08/28

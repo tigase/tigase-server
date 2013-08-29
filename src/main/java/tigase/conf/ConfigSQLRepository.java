@@ -1,10 +1,13 @@
 /*
+ * ConfigSQLRepository.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.conf;
 
@@ -41,12 +43,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created: Dec 15, 2009 10:44:00 PM
@@ -54,13 +54,13 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ConfigSQLRepository extends ConfigurationCache {
+public class ConfigSQLRepository
+				extends ConfigurationCache {
+	/** Field description */
+	public static final String CONFIG_REPO_URI_INIT_KEY = "--tigase-config-repo-uri";
 
 	/** Field description */
 	public static final String CONFIG_REPO_URI_PROP_KEY = "tigase-config-repo-uri";
-
-	/** Field description */
-	public static final String CONFIG_REPO_URI_INIT_KEY = "--tigase-config-repo-uri";
 
 	/**
 	 * Private logger for class instancess.
@@ -89,71 +89,16 @@ public class ConfigSQLRepository extends ConfigurationCache {
 	 * Method description
 	 *
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of <code>Collection<ConfigItem></code>
 	 * @throws TigaseDBException
 	 */
 	@Override
 	public Collection<ConfigItem> allItems() throws TigaseDBException {
 		return dbAccess.getAllItems();
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String[] getCompNames() {
-		return dbAccess.getComponentNames();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param compName
-	 * @param node
-	 * @param key
-	 *
-	 * @return
-	 */
-	@Override
-	public ConfigItem getItem(String compName, String node, String key) {
-		return dbAccess.getItem(compName, node, key);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param compName
-	 *
-	 * @return
-	 */
-	@Override
-	public Set<ConfigItem> getItemsForComponent(String compName) {
-		return dbAccess.getCompItems(compName);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param compName
-	 * @param node
-	 *
-	 * @return
-	 */
-	@Override
-	public String[] getKeys(String compName, String node) {
-		return dbAccess.getKeys(compName, node);
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -170,31 +115,28 @@ public class ConfigSQLRepository extends ConfigurationCache {
 		if (config_db_uri == null) {
 			config_db_uri = (String) params.get(CONFIG_REPO_URI_INIT_KEY);
 		}
-
 		if (config_db_uri == null) {
 			config_db_uri = (String) params.get(RepositoryFactory.GEN_USER_DB_URI);
 		}
-
 		if (config_db_uri == null) {
 			log.severe("Missing configuration database connection string.");
 			log.severe("Tigase needs a database connection string to load configuration.");
 			log.severe("You can provide it in a few ways and the Tigase server checks");
 			log.severe("following parameters in the order below:");
 			log.severe("1. System property: -Dtigase-config-repo-uri=db-connection-string");
-			log.severe("2. init.properties file or command line parameter: "
-					+ "--tigase-config-repo-uri=db-connection-string");
-			log.severe("3. init.properties file or command line parameter: "
-					+ "--user-db-uri=db-connection-string");
+			log.severe("2. init.properties file or command line parameter: " +
+					"--tigase-config-repo-uri=db-connection-string");
+			log.severe("3. init.properties file or command line parameter: " +
+					"--user-db-uri=db-connection-string");
 			log.severe("Please correct the error and restart the server.");
 			System.exit(1);
 		}
-
 		try {
 			dbAccess.initRepository(config_db_uri, null);
 		} catch (SQLException ex) {
 			log.log(Level.SEVERE, "Problem connecting to configuration database: ", ex);
-			log.severe("Please check whether the database connection string is correct: "
-					+ config_db_uri);
+			log.severe("Please check whether the database connection string is correct: " +
+					config_db_uri);
 			System.exit(1);
 		}
 	}
@@ -215,17 +157,82 @@ public class ConfigSQLRepository extends ConfigurationCache {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int size() {
 		return dbAccess.getPropertiesCount();
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
+	 */
+	@Override
+	public String[] getCompNames() {
+		return dbAccess.getComponentNames();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param compName
+	 * @param node
+	 * @param key
+	 *
+	 *
+	 *
+	 * @return a value of <code>ConfigItem</code>
+	 */
+	@Override
+	public ConfigItem getItem(String compName, String node, String key) {
+		return dbAccess.getItem(compName, node, key);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param compName
+	 *
+	 *
+	 *
+	 * @return a value of <code>Set<ConfigItem></code>
+	 */
+	@Override
+	public Set<ConfigItem> getItemsForComponent(String compName) {
+		return dbAccess.getCompItems(compName);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param compName
+	 * @param node
+	 *
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
+	 */
+	@Override
+	public String[] getKeys(String compName, String node) {
+		return dbAccess.getKeys(compName, node);
+	}
+
 	//~--- inner classes --------------------------------------------------------
 
 	private class JDBCAccess {
-
+		//J-
 		/** Field description */
 		public static final String TABLE_NAME = "tigase_configuration";
 		private static final String CLUSTER_NODE_COLUMN = "cluster_node";
@@ -276,6 +283,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 		private static final String GET_KEYS_QUERY = "select " + KEY_NAME_COLUMN + " from "
 			+ TABLE_NAME + " where " + CLUSTER_NODE_WHERE_PART + " AND (" + COMPONENT_NAME_COLUMN
 			+ " = ?)" + " AND (" + NODE_NAME_COLUMN + " = ?)";
+//J+
 
 		//~--- fields -------------------------------------------------------------
 
@@ -305,7 +313,8 @@ public class ConfigSQLRepository extends ConfigurationCache {
 		 *
 		 * @throws SQLException
 		 */
-		public void initRepository(String conn_str, Map<String, String> params) throws SQLException {
+		public void initRepository(String conn_str, Map<String, String> params)
+				throws SQLException {
 			try {
 				data_repo = RepositoryFactory.getDataRepository(null, conn_str, params);
 
@@ -313,25 +322,33 @@ public class ConfigSQLRepository extends ConfigurationCache {
 				checkDB();
 				data_repo.initPreparedStatement(GET_ITEM_QUERY, GET_ITEM_QUERY);
 				data_repo.initPreparedStatement(GET_ALL_ITEMS_QUERY, GET_ALL_ITEMS_QUERY);
-				data_repo.initPreparedStatement(GET_COMPONENT_ITEMS_QUERY, GET_COMPONENT_ITEMS_QUERY);
+				data_repo.initPreparedStatement(GET_COMPONENT_ITEMS_QUERY,
+						GET_COMPONENT_ITEMS_QUERY);
 				data_repo.initPreparedStatement(ADD_ITEM_QUERY, ADD_ITEM_QUERY);
 				data_repo.initPreparedStatement(UPDATE_ITEM_QUERY, UPDATE_ITEM_QUERY);
 				data_repo.initPreparedStatement(DELETE_ITEM_QUERY, DELETE_ITEM_QUERY);
 				data_repo.initPreparedStatement(GET_UPDATED_ITEMS_QUERY, GET_UPDATED_ITEMS_QUERY);
-				data_repo.initPreparedStatement(GET_COMPONENT_NAMES_QUERY, GET_COMPONENT_NAMES_QUERY);
-				data_repo.initPreparedStatement(GET_PROPERTIES_COUNT_QUERY, GET_PROPERTIES_COUNT_QUERY);
+				data_repo.initPreparedStatement(GET_COMPONENT_NAMES_QUERY,
+						GET_COMPONENT_NAMES_QUERY);
+				data_repo.initPreparedStatement(GET_PROPERTIES_COUNT_QUERY,
+						GET_PROPERTIES_COUNT_QUERY);
 				data_repo.initPreparedStatement(GET_KEYS_QUERY, GET_KEYS_QUERY);
 			} catch (Exception e) {}
 		}
 
 		private void addItem(ConfigItem item) {
 			try {
-				PreparedStatement addItemSt = data_repo.getPreparedStatement(null, ADD_ITEM_QUERY);
+				PreparedStatement addItemSt = data_repo.getPreparedStatement(null,
+						ADD_ITEM_QUERY);
 
 				synchronized (addItemSt) {
-					addItemSt.setString(1, ((item.getClusterNode() != null) ? item.getClusterNode() : ""));
+					addItemSt.setString(1, ((item.getClusterNode() != null)
+							? item.getClusterNode()
+							: ""));
 					addItemSt.setString(2, item.getCompName());
-					addItemSt.setString(3, ((item.getNodeName() != null) ? item.getNodeName() : ""));
+					addItemSt.setString(3, ((item.getNodeName() != null)
+							? item.getNodeName()
+							: ""));
 					addItemSt.setString(4, item.getKeyName());
 					addItemSt.setString(5, item.getConfigValToString());
 					addItemSt.setString(6, "" + DataTypes.getTypeId(item.getConfigVal()));
@@ -342,20 +359,24 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 				// Maybe the configuration item is already there, let's try to update it then
 				try {
-					PreparedStatement updateItemSt = data_repo.getPreparedStatement(null, UPDATE_ITEM_QUERY);
+					PreparedStatement updateItemSt = data_repo.getPreparedStatement(null,
+							UPDATE_ITEM_QUERY);
 
 					synchronized (updateItemSt) {
 						updateItemSt.setString(1, item.getConfigValToString());
-						updateItemSt.setString(2,
-								((item.getClusterNode() != null) ? item.getClusterNode() : ""));
+						updateItemSt.setString(2, ((item.getClusterNode() != null)
+								? item.getClusterNode()
+								: ""));
 						updateItemSt.setString(3, item.getCompName());
-						updateItemSt.setString(4, ((item.getNodeName() != null) ? item.getNodeName() : ""));
+						updateItemSt.setString(4, ((item.getNodeName() != null)
+								? item.getNodeName()
+								: ""));
 						updateItemSt.setString(5, item.getKeyName());
 						updateItemSt.executeUpdate();
 					}
 				} catch (SQLException ex) {
-					log.log(Level.WARNING,
-							"Problem adding/updating an item to DB: " + item.toElement() + "\n", ex);
+					log.log(Level.WARNING, "Problem adding/updating an item to DB: " + item
+							.toElement() + "\n", ex);
 
 //        log.log(Level.WARNING,
 //            "SQLWarning: " + updateItemSt.getWarnings().getMessage() +
@@ -371,7 +392,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 			Statement st = null;
 
 			try {
-				if ( !data_repo.checkTable(TABLE_NAME)) {
+				if (!data_repo.checkTable(TABLE_NAME)) {
 					st = data_repo.createStatement(null);
 					st.executeUpdate(CREATE_TABLE_QUERY);
 				} else {
@@ -385,34 +406,56 @@ public class ConfigSQLRepository extends ConfigurationCache {
 		}
 
 		private ConfigItem createItemFromRS(ResultSet rs) throws SQLException {
-			ConfigItem result = getItemInstance();
-			String clusterNode = rs.getString(CLUSTER_NODE_COLUMN);
-			String compName = rs.getString(COMPONENT_NAME_COLUMN);
-			String nodeName = rs.getString(NODE_NAME_COLUMN);
-			String keyName = rs.getString(KEY_NAME_COLUMN);
-			String value_str = rs.getString(VALUE_COLUMN);
-			String value_type = rs.getString(VALUE_TYPE_COLUMN);
-			String flag_str = rs.getString(FLAG_COLUMN);
+			ConfigItem result      = getItemInstance();
+			String     clusterNode = rs.getString(CLUSTER_NODE_COLUMN);
+			String     compName    = rs.getString(COMPONENT_NAME_COLUMN);
+			String     nodeName    = rs.getString(NODE_NAME_COLUMN);
+			String     keyName     = rs.getString(KEY_NAME_COLUMN);
+			String     value_str   = rs.getString(VALUE_COLUMN);
+			String     value_type  = rs.getString(VALUE_TYPE_COLUMN);
+			String     flag_str    = rs.getString(FLAG_COLUMN);
 
-			result.set(clusterNode, compName, nodeName, keyName, value_str, value_type.charAt(0),
-					flag_str);
+			result.set(clusterNode, compName, nodeName, keyName, value_str, value_type.charAt(
+					0), flag_str);
 
 			return result;
+		}
+
+		private void removeItem(ConfigItem item) {
+			try {
+				PreparedStatement deleteItemSt = data_repo.getPreparedStatement(null,
+						DELETE_ITEM_QUERY);
+
+				synchronized (deleteItemSt) {
+					deleteItemSt.setString(1, ((item.getClusterNode() != null)
+							? item.getClusterNode()
+							: ""));
+					deleteItemSt.setString(2, item.getCompName());
+					deleteItemSt.setString(3, ((item.getNodeName() != null)
+							? item.getNodeName()
+							: ""));
+					deleteItemSt.setString(4, item.getKeyName());
+					deleteItemSt.executeUpdate();
+				}
+			} catch (SQLException e) {
+				log.log(Level.WARNING, "Problem removing an item from DB: " + item.toElement(),
+						e);
+			}
 		}
 
 		//~--- get methods --------------------------------------------------------
 
 		private Collection<ConfigItem> getAllItems() {
 			List<ConfigItem> result = new ArrayList<ConfigItem>();
-			ResultSet rs = null;
+			ResultSet        rs     = null;
 
 			try {
-				PreparedStatement getAllItemsSt = data_repo.getPreparedStatement(null, GET_ALL_ITEMS_QUERY);
+				PreparedStatement getAllItemsSt = data_repo.getPreparedStatement(null,
+						GET_ALL_ITEMS_QUERY);
 
 				synchronized (getAllItemsSt) {
 					getAllItemsSt.setString(1, getDefHostname());
 					rs = getAllItemsSt.executeQuery();
-
 					while (rs.next()) {
 						ConfigItem item = createItemFromRS(rs);
 
@@ -432,17 +475,16 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 		private Set<ConfigItem> getCompItems(String compName) {
 			Set<ConfigItem> result = new LinkedHashSet<ConfigItem>();
-			ResultSet rs = null;
+			ResultSet       rs     = null;
 
 			try {
-				PreparedStatement getCompItemsSt =
-					data_repo.getPreparedStatement(null, GET_COMPONENT_ITEMS_QUERY);
+				PreparedStatement getCompItemsSt = data_repo.getPreparedStatement(null,
+						GET_COMPONENT_ITEMS_QUERY);
 
 				synchronized (getCompItemsSt) {
 					getCompItemsSt.setString(1, getDefHostname());
 					getCompItemsSt.setString(2, compName);
 					rs = getCompItemsSt.executeQuery();
-
 					while (rs.next()) {
 						ConfigItem item = createItemFromRS(rs);
 
@@ -462,16 +504,15 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 		private String[] getComponentNames() {
 			List<String> result = new ArrayList<String>();
-			ResultSet rs = null;
+			ResultSet    rs     = null;
 
 			try {
-				PreparedStatement getCompNamesSt =
-					data_repo.getPreparedStatement(null, GET_COMPONENT_NAMES_QUERY);
+				PreparedStatement getCompNamesSt = data_repo.getPreparedStatement(null,
+						GET_COMPONENT_NAMES_QUERY);
 
 				synchronized (getCompNamesSt) {
 					getCompNamesSt.setString(1, getDefHostname());
 					rs = getCompNamesSt.executeQuery();
-
 					while (rs.next()) {
 						result.add(rs.getString(COMPONENT_NAME_COLUMN));
 					}
@@ -487,10 +528,11 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 		private ConfigItem getItem(String compName, String node, String key) {
 			ConfigItem result = null;
-			ResultSet rs = null;
+			ResultSet  rs     = null;
 
 			try {
-				PreparedStatement getItemSt = data_repo.getPreparedStatement(null, GET_ITEM_QUERY);
+				PreparedStatement getItemSt = data_repo.getPreparedStatement(null,
+						GET_ITEM_QUERY);
 
 				synchronized (getItemSt) {
 					getItemSt.setString(1, getDefHostname());
@@ -498,7 +540,6 @@ public class ConfigSQLRepository extends ConfigurationCache {
 					getItemSt.setString(3, node);
 					getItemSt.setString(4, key);
 					rs = getItemSt.executeQuery();
-
 					while (rs.next()) {
 						ConfigItem item = createItemFromRS(rs);
 
@@ -520,17 +561,17 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 		private String[] getKeys(String compName, String node) {
 			List<String> result = new ArrayList<String>();
-			ResultSet rs = null;
+			ResultSet    rs     = null;
 
 			try {
-				PreparedStatement getKeysSt = data_repo.getPreparedStatement(null, GET_KEYS_QUERY);
+				PreparedStatement getKeysSt = data_repo.getPreparedStatement(null,
+						GET_KEYS_QUERY);
 
 				synchronized (getKeysSt) {
 					getKeysSt.setString(1, getDefHostname());
 					getKeysSt.setString(2, compName);
 					getKeysSt.setString(3, node);
 					rs = getKeysSt.executeQuery();
-
 					while (rs.next()) {
 						result.add(rs.getString(KEY_NAME_COLUMN));
 					}
@@ -545,17 +586,16 @@ public class ConfigSQLRepository extends ConfigurationCache {
 		}
 
 		private int getPropertiesCount() {
-			int result = 0;
-			ResultSet rs = null;
+			int       result = 0;
+			ResultSet rs     = null;
 
 			try {
-				PreparedStatement getPropertiesCountSt =
-					data_repo.getPreparedStatement(null, GET_PROPERTIES_COUNT_QUERY);
+				PreparedStatement getPropertiesCountSt = data_repo.getPreparedStatement(null,
+						GET_PROPERTIES_COUNT_QUERY);
 
 				synchronized (getPropertiesCountSt) {
 					getPropertiesCountSt.setString(1, getDefHostname());
 					rs = getPropertiesCountSt.executeQuery();
-
 					while (rs.next()) {
 						result = rs.getInt("count");
 					}
@@ -568,29 +608,8 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 			return result;
 		}
-
-		//~--- methods ------------------------------------------------------------
-
-		private void removeItem(ConfigItem item) {
-			try {
-				PreparedStatement deleteItemSt = data_repo.getPreparedStatement(null, DELETE_ITEM_QUERY);
-
-				synchronized (deleteItemSt) {
-					deleteItemSt.setString(1, ((item.getClusterNode() != null) ? item.getClusterNode() : ""));
-					deleteItemSt.setString(2, item.getCompName());
-					deleteItemSt.setString(3, ((item.getNodeName() != null) ? item.getNodeName() : ""));
-					deleteItemSt.setString(4, item.getKeyName());
-					deleteItemSt.executeUpdate();
-				}
-			} catch (SQLException e) {
-				log.log(Level.WARNING, "Problem removing an item from DB: " + item.toElement(), e);
-			}
-		}
 	}
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/29

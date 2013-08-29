@@ -54,26 +54,25 @@ import java.util.Queue;
  */
 public class SocketIO
 				implements IOInterface {
-	private static final Logger log                          =
-		Logger.getLogger(SocketIO.class.getName());
-	private static final int MAX_USER_IO_QUEUE_SIZE_PROP_DEF = 1000;
+	private static final Logger log = Logger.getLogger(SocketIO.class.getName());
+	private static final int    MAX_USER_IO_QUEUE_SIZE_PROP_DEF = 1000;
 
 	// ~--- fields ---------------------------------------------------------------
 	private static final String MAX_USER_IO_QUEUE_SIZE_PROP_KEY = "max-user-io-queue-size";
 
 	//~--- fields ---------------------------------------------------------------
 
-	private long buffOverflow            = 0;
-	private int bytesRead                = 0;
-	private long bytesReceived           = 0;
-	private long bytesSent               = 0;
-	private SocketChannel channel        = null;
-	private Queue<ByteBuffer> dataToSend = null;
-	private String logId                 = null;
-	private String remoteAddress         = null;
-	private long totalBuffOverflow       = 0;
-	private long totalBytesReceived      = 0;
-	private long totalBytesSent          = 0;
+	private long              buffOverflow       = 0;
+	private int               bytesRead          = 0;
+	private long              bytesReceived      = 0;
+	private long              bytesSent          = 0;
+	private SocketChannel     channel            = null;
+	private Queue<ByteBuffer> dataToSend         = null;
+	private String            logId              = null;
+	private String            remoteAddress      = null;
+	private long              totalBuffOverflow  = 0;
+	private long              totalBytesReceived = 0;
+	private long              totalBytesSent     = 0;
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -94,7 +93,7 @@ public class SocketIO
 			dataToSend = new LinkedBlockingQueue<ByteBuffer>(100000);
 		} else {
 			int queue_size = Integer.getInteger(MAX_USER_IO_QUEUE_SIZE_PROP_KEY,
-												 MAX_USER_IO_QUEUE_SIZE_PROP_DEF);
+					MAX_USER_IO_QUEUE_SIZE_PROP_DEF);
 
 			dataToSend = new LinkedBlockingQueue<ByteBuffer>(queue_size);
 		}
@@ -106,7 +105,9 @@ public class SocketIO
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int bytesRead() {
@@ -119,174 +120,14 @@ public class SocketIO
 	 *
 	 * @param caps
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean checkCapabilities(String caps) {
 		return false;
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 *
-	 * @throws IOException
-	 */
-	@Override
-	public int getInputPacketSize() throws IOException {
-		return channel.socket().getReceiveBufferSize();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public SocketChannel getSocketChannel() {
-		return channel;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 * @param reset
-	 */
-	@Override
-	public void getStatistics(StatisticsList list, boolean reset) {
-		list.add("socketio", "Bytes sent", bytesSent, Level.FINE);
-		list.add("socketio", "Bytes received", bytesReceived, Level.FINE);
-		list.add("socketio", "Buffers overflow", buffOverflow, Level.FINE);
-		list.add("socketio", "Total bytes sent", totalBytesSent, Level.FINE);
-		list.add("socketio", "Total bytes received", totalBytesReceived, Level.FINE);
-		list.add("socketio", "Ttoal buffers overflow", totalBuffOverflow, Level.FINE);
-		if (reset) {
-			bytesSent     = 0;
-			bytesReceived = 0;
-			buffOverflow  = 0;
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param reset
-	 *
-	 * @return
-	 */
-	public long getBytesSent(boolean reset) {
-		long tmp = bytesSent;
-
-		if (reset) {
-			bytesSent = 0;
-		}
-
-		return tmp;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public long getTotalBytesSent() {
-		return totalBytesSent;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param reset
-	 *
-	 * @return
-	 */
-	public long getBytesReceived(boolean reset) {
-		long tmp = bytesReceived;
-
-		if (reset) {
-			bytesReceived = 0;
-		}
-
-		return tmp;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public long getTotalBytesReceived() {
-		return totalBytesReceived;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param reset
-	 *
-	 * @return
-	 */
-	public long getBuffOverflow(boolean reset) {
-		long tmp = buffOverflow;
-
-		if (reset) {
-			buffOverflow = 0;
-		}
-
-		return tmp;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public long getTotalBuffOverflow() {
-		return totalBuffOverflow;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public boolean isConnected() {
-
-		// More correct would be calling both methods, however in the Tigase
-		// all SocketChannels are connected before SocketIO is created.
-		// return channel.isOpen() && channel.isConnected();
-		return channel.isOpen();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param addr
-	 *
-	 * @return
-	 */
-	@Override
-	public boolean isRemoteAddress(String addr) {
-		return remoteAddress.equals(addr);
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -294,8 +135,10 @@ public class SocketIO
 	 *
 	 * @param buff
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of <code>ByteBuffer</code>
 	 * @throws IOException
 	 */
 	@Override
@@ -303,7 +146,7 @@ public class SocketIO
 		bytesRead = channel.read(buff);
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "Read from channel {0} bytes, {1}", new Object[] { bytesRead,
-							toString() });
+					toString() });
 		}
 		if (bytesRead == -1) {
 			throw new EOFException("Channel has been closed.");
@@ -339,20 +182,24 @@ public class SocketIO
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String toString() {
 		return logId + ((channel == null)
-										? null
-										: channel.socket());
+				? null
+				: channel.socket());
 	}
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean waitingToSend() {
@@ -363,7 +210,9 @@ public class SocketIO
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int waitingToSendSize() {
@@ -376,8 +225,10 @@ public class SocketIO
 	 *
 	 * @param buff
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 * @throws IOException
 	 */
 	@Override
@@ -395,9 +246,9 @@ public class SocketIO
 		// return result;
 		if ((buff != null) && buff.hasRemaining()) {
 			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER, "SOCKET - Writing data, remaining: {0}, {1}",
-								new Object[] { buff.remaining(),
-															 toString() });
+				log.log(Level.FINER, "SOCKET - Writing data, remaining: {0}, {1}", new Object[] {
+						buff.remaining(),
+						toString() });
 			}
 			if (!dataToSend.offer(buff)) {
 				++buffOverflow;
@@ -405,12 +256,12 @@ public class SocketIO
 			}
 		}
 
-		int result            = 0;
+		int        result     = 0;
 		ByteBuffer dataBuffer = null;
 
 		if (dataToSend.size() > 1) {
 			ByteBuffer[] buffs = dataToSend.toArray(new ByteBuffer[dataToSend.size()]);
-			long res           = channel.write(buffs);
+			long         res   = channel.write(buffs);
 
 			if (res == -1) {
 				throw new EOFException("Channel has been closed.");
@@ -441,7 +292,7 @@ public class SocketIO
 		}
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "Wrote to channel {0} bytes, {1}", new Object[] { result,
-							toString() });
+					toString() });
 		}
 
 		// if (isRemoteAddress("81.142.228.219")) {
@@ -451,6 +302,186 @@ public class SocketIO
 		totalBytesSent += result;
 
 		return result;
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param reset
+	 *
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	public long getBuffOverflow(boolean reset) {
+		long tmp = buffOverflow;
+
+		if (reset) {
+			buffOverflow = 0;
+		}
+
+		return tmp;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param reset
+	 *
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	public long getBytesReceived(boolean reset) {
+		long tmp = bytesReceived;
+
+		if (reset) {
+			bytesReceived = 0;
+		}
+
+		return tmp;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param reset
+	 *
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	public long getBytesSent(boolean reset) {
+		long tmp = bytesSent;
+
+		if (reset) {
+			bytesSent = 0;
+		}
+
+		return tmp;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>int</code>
+	 * @throws IOException
+	 */
+	@Override
+	public int getInputPacketSize() throws IOException {
+		return channel.socket().getReceiveBufferSize();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>SocketChannel</code>
+	 */
+	@Override
+	public SocketChannel getSocketChannel() {
+		return channel;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param list
+	 * @param reset
+	 */
+	@Override
+	public void getStatistics(StatisticsList list, boolean reset) {
+		list.add("socketio", "Bytes sent", bytesSent, Level.FINE);
+		list.add("socketio", "Bytes received", bytesReceived, Level.FINE);
+		list.add("socketio", "Buffers overflow", buffOverflow, Level.FINE);
+		list.add("socketio", "Total bytes sent", totalBytesSent, Level.FINE);
+		list.add("socketio", "Total bytes received", totalBytesReceived, Level.FINE);
+		list.add("socketio", "Ttoal buffers overflow", totalBuffOverflow, Level.FINE);
+		if (reset) {
+			bytesSent     = 0;
+			bytesReceived = 0;
+			buffOverflow  = 0;
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	public long getTotalBuffOverflow() {
+		return totalBuffOverflow;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	public long getTotalBytesReceived() {
+		return totalBytesReceived;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	public long getTotalBytesSent() {
+		return totalBytesSent;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 */
+	@Override
+	public boolean isConnected() {
+
+		// More correct would be calling both methods, however in the Tigase
+		// all SocketChannels are connected before SocketIO is created.
+		// return channel.isOpen() && channel.isConnected();
+		return channel.isOpen();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param addr
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 */
+	@Override
+	public boolean isRemoteAddress(String addr) {
+		return remoteAddress.equals(addr);
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -474,4 +505,4 @@ public class SocketIO
 }    // SocketIO
 
 
-//~ Formatted in Tigase Code Convention on 13/03/08
+//~ Formatted in Tigase Code Convention on 13/08/28

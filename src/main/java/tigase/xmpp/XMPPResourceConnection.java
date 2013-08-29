@@ -169,8 +169,10 @@ public class XMPPResourceConnection
 	 * method is for logging using only to avoid excessive use of try/catch for
 	 * debugging code. It may return null.
 	 *
-	 * @return a <code>String</code> value of calculated user full JID for this
+	 *  a <code>String</code> value of calculated user full JID for this
 	 *         session including resource name.
+	 *
+	 * @return a value of JID
 	 */
 	public final JID getjid() {
 		return userJid;
@@ -195,8 +197,10 @@ public class XMPPResourceConnection
 	 * @param id
 	 * @param alg
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of Authorization
 	 * @throws AuthorizationException
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -224,8 +228,10 @@ public class XMPPResourceConnection
 	 *
 	 * @param props
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of Authorization
 	 * @throws AuthorizationException
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -255,8 +261,10 @@ public class XMPPResourceConnection
 	 * @param user
 	 * @param password
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of Authorization
 	 * @throws AuthorizationException
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -301,7 +309,9 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	public String nextStanzaId() {
 		return "tig" + (++id_counter);
@@ -368,7 +378,9 @@ public class XMPPResourceConnection
 	 *
 	 * @param key
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Object
 	 */
 	public Object removeCommonSessionData(String key) {
 		return (parentSession == null)
@@ -420,7 +432,9 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String toString() {
@@ -435,8 +449,10 @@ public class XMPPResourceConnection
 	 *
 	 * @param name_param
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of Authorization
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 * @throws TigaseStringprepException
@@ -465,9 +481,11 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
 	 *
 	 *
+	 *
+	 *
+	 * @return a value of List<XMPPResourceConnection>
 	 * @throws NotAuthorizedException
 	 */
 	public List<XMPPResourceConnection> getActiveSessions() throws NotAuthorizedException {
@@ -482,8 +500,10 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of JID[]
 	 */
 	public JID[] getAllResourcesJIDs() {
 		return (parentSession == null)
@@ -495,7 +515,9 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of AuthRepository
 	 */
 	public AuthRepository getAuthRepository() {
 		return authRepo;
@@ -505,7 +527,9 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of long
 	 */
 	public long getAuthTime() {
 		return authenticationTime - creationTime;
@@ -518,9 +542,11 @@ public class XMPPResourceConnection
 	 * If session has not been authorized yet this method throws
 	 * <code>NotAuthorizedException</code>.
 	 *
-	 * @return a <code>String</code> value of user ID - this is user JID without
+	 *  a <code>String</code> value of user ID - this is user JID without
 	 *         resource part. To obtain full user JID please refer to
 	 *         <code>getJID</code> method.
+	 *
+	 * @return a value of BareJID
 	 * @exception NotAuthorizedException
 	 *              when this session has not been authorized yet and some parts
 	 *              of user JID are not known yet.
@@ -538,7 +564,9 @@ public class XMPPResourceConnection
 	/**
 	 *
 	 * @param key
-	 * @return
+	 *
+	 *
+	 * @return a value of Object
 	 */
 	public Object getCommonSessionData(String key) {
 		return (parentSession == null)
@@ -549,7 +577,9 @@ public class XMPPResourceConnection
 	/**
 	 * Gets the value of connectionId
 	 *
-	 * @return the value of connectionId
+	 *  the value of connectionId
+	 *
+	 * @return a value of JID
 	 * @throws NoConnectionIdException
 	 */
 	public JID getConnectionId() throws NoConnectionIdException {
@@ -564,20 +594,15 @@ public class XMPPResourceConnection
 	}
 
 	/**
-	 * Sets the value of connectionId
-	 */
-	public void setConnectionId(JID connectionId) {
-		this.connectionId = connectionId;
-	}
-	
-	/**
 	 * Method description
 	 *
 	 *
 	 * @param jid
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of JID
 	 * @throws NoConnectionIdException
 	 */
 	public JID getConnectionId(JID jid) throws NoConnectionIdException {
@@ -610,7 +635,9 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of long
 	 */
 	public long getCreationTime() {
 		return creationTime;
@@ -620,7 +647,9 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	public String getDefLang() {
 		return this.defLang;
@@ -631,8 +660,10 @@ public class XMPPResourceConnection
 	 * <code>NotAuthorizedException</code> if session is not authorized yet and
 	 * therefore user name and resource is not known yet.
 	 *
-	 * @return a <code>String</code> value of calculated user full JID for this
+	 *  a <code>String</code> value of calculated user full JID for this
 	 *         session including resource name.
+	 *
+	 * @return a value of JID
 	 * @throws NotAuthorizedException
 	 */
 	public final JID getJID() throws NotAuthorizedException {
@@ -646,7 +677,9 @@ public class XMPPResourceConnection
 	/**
 	 * Gets the value of lastAccessed
 	 *
-	 * @return the value of lastAccessed
+	 *  the value of lastAccessed
+	 *
+	 * @return a value of long
 	 */
 	public long getLastAccessed() {
 		return this.lastAccessed;
@@ -656,7 +689,9 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of long
 	 */
 	public long getPacketsCounter() {
 		return packets_counter;
@@ -666,7 +701,9 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of XMPPSession
 	 */
 	public XMPPSession getParentSession() {
 		return parentSession;
@@ -676,8 +713,10 @@ public class XMPPResourceConnection
 	 * Returns last presence packet with the user presence status or
 	 * <code>null</code> if the user has not yet sent an initial presence.
 	 *
-	 * @return an <code>Element</code> with last presence status received from the
+	 *  an <code>Element</code> with last presence status received from the
 	 *         user.
+	 *
+	 * @return a value of Element
 	 */
 	public Element getPresence() {
 		return (Element) getSessionData(PRESENCE_KEY);
@@ -687,7 +726,9 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of int
 	 */
 	public int getPriority() {
 		return priority;
@@ -696,7 +737,9 @@ public class XMPPResourceConnection
 	/**
 	 * Gets the value of resource
 	 *
-	 * @return the value of resource
+	 *  the value of resource
+	 *
+	 * @return a value of String
 	 */
 	public String getResource() {
 		return this.resource;
@@ -709,8 +752,10 @@ public class XMPPResourceConnection
 	 *
 	 * @param key
 	 *          a <code>String</code> value of stored data ID.
-	 * @return a <code>Object</code> value of data for given key.
+	 *  a <code>Object</code> value of data for given key.
 	 * @see #putSessionData(String, Object)
+	 *
+	 * @return a value of Object
 	 */
 	public final Object getSessionData(final String key) {
 		lastAccessed = System.currentTimeMillis();
@@ -721,7 +766,9 @@ public class XMPPResourceConnection
 	/**
 	 * Gets the value of sessionId
 	 *
-	 * @return the value of sessionId
+	 *  the value of sessionId
+	 *
+	 * @return a value of String
 	 */
 	public String getSessionId() {
 		return this.sessionId;
@@ -731,7 +778,9 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of JID
 	 */
 	public JID getSMComponentId() {
 		return loginHandler.getComponentId();
@@ -745,8 +794,10 @@ public class XMPPResourceConnection
 	 * enough to check whether the user Id belongs to the session.
 	 *
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of BareJID
 	 * @throws NotAuthorizedException
 	 *
 	 * @deprecated
@@ -760,8 +811,10 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of String
 	 * @throws NotAuthorizedException
 	 */
 	@Override
@@ -779,7 +832,9 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	@Override
 	public boolean isAuthorized() {
@@ -793,7 +848,9 @@ public class XMPPResourceConnection
 	 * @param outDomain
 	 * @param includeComponents
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	public boolean isLocalDomain(String outDomain, boolean includeComponents) {
 		return loginHandler.isLocalDomain(outDomain, includeComponents);
@@ -803,7 +860,9 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	public boolean isResourceSet() {
 		return this.resource != null;
@@ -814,8 +873,10 @@ public class XMPPResourceConnection
 	 * normal user session. The server session is used to handle packets addressed
 	 * to the server itself (local domain name).
 	 *
-	 * @return a <code>boolean</code> value of <code>true</code> if this is the
+	 *  a <code>boolean</code> value of <code>true</code> if this is the
 	 *         server session and <code>false</code> otherwise.
+	 *
+	 * @return a value of boolean
 	 */
 	public boolean isServerSession() {
 		return false;
@@ -827,8 +888,10 @@ public class XMPPResourceConnection
 	 *
 	 * @param bareJID
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of boolean
 	 * @throws NotAuthorizedException
 	 */
 	public boolean isUserId(BareJID bareJID) throws NotAuthorizedException {
@@ -840,6 +903,15 @@ public class XMPPResourceConnection
 	}
 
 	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Sets the value of connectionId
+	 *
+	 * @param connectionId
+	 */
+	public void setConnectionId(JID connectionId) {
+		this.connectionId = connectionId;
+	}
 
 	/**
 	 * Method description
@@ -973,4 +1045,4 @@ public class XMPPResourceConnection
 }    // XMPPResourceConnection
 
 
-//~ Formatted in Tigase Code Convention on 13/06/04
+//~ Formatted in Tigase Code Convention on 13/08/28

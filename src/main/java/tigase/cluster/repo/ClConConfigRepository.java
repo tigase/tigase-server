@@ -55,53 +55,38 @@ public class ClConConfigRepository
 
 	private long autoreload_interval = AUTORELOAD_INTERVAL_PROP_VAL;
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String[] getDefaultPropetyItems() {
-		return ClConRepoDefaults.getDefaultPropetyItems();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getPropertyKey() {
-		return ClConRepoDefaults.getPropertyKey();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getConfigKey() {
-		return ClConRepoDefaults.getConfigKey();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public ClusterRepoItem getItemInstance() {
-		return ClConRepoDefaults.getItemInstance();
-	}
-
 	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param oldItem
+	 * @param newItem
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 */
+	@Override
+	public boolean itemChanged(ClusterRepoItem oldItem, ClusterRepoItem newItem) {
+		return !oldItem.getPassword().equals(newItem.getPassword()) || (oldItem
+				.getPortNo() != newItem.getPortNo());
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param item
+	 */
+	public void itemLoaded(ClusterRepoItem item) {
+		if (System.currentTimeMillis() - item.getLastUpdate() <= 5000 * autoreload_interval) {
+			addItem(item);
+		} else {
+			removeItem(item.getHostname());
+		}
+	}
 
 	/**
 	 * Method description
@@ -130,30 +115,35 @@ public class ClConConfigRepository
 	 *
 	 * @param item
 	 */
-	public void itemLoaded(ClusterRepoItem item) {
-		if (System.currentTimeMillis() - item.getLastUpdate() <= 5000 * autoreload_interval) {
-			addItem(item);
-		} else {
-			removeItem(item.getHostname());
-		}
+	public void storeItem(ClusterRepoItem item) {}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getConfigKey() {
+		return ClConRepoDefaults.getConfigKey();
 	}
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param oldItem
-	 * @param newItem
 	 *
-	 * @return
+	 *
+	 * @return a value of <code>String[]</code>
 	 */
 	@Override
-	public boolean itemChanged(ClusterRepoItem oldItem, ClusterRepoItem newItem) {
-		return !oldItem.getPassword().equals(newItem.getPassword()) || (oldItem
-				.getPortNo() != newItem.getPortNo());
+	public String[] getDefaultPropetyItems() {
+		return ClConRepoDefaults.getDefaultPropetyItems();
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -183,6 +173,32 @@ public class ClConConfigRepository
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>ClusterRepoItem</code>
+	 */
+	@Override
+	public ClusterRepoItem getItemInstance() {
+		return ClConRepoDefaults.getItemInstance();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getPropertyKey() {
+		return ClConRepoDefaults.getPropertyKey();
+	}
+
 	//~--- set methods ----------------------------------------------------------
 
 	/**
@@ -197,17 +213,7 @@ public class ClConConfigRepository
 		autoreload_interval = (Long) props.get(AUTORELOAD_INTERVAL_PROP_KEY);
 		setAutoloadTimer(autoreload_interval);
 	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param item
-	 */
-	public void storeItem(ClusterRepoItem item) {}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/11
+//~ Formatted in Tigase Code Convention on 13/08/29

@@ -71,7 +71,9 @@ public class LogFormatter
 	 *
 	 * @param record
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public synchronized String format(LogRecord record) {
@@ -159,4 +161,4 @@ public class LogFormatter
 }    // LogFormatter
 
 
-//~ Formatted in Tigase Code Convention on 13/05/27
+//~ Formatted in Tigase Code Convention on 13/08/28

@@ -2,7 +2,7 @@
  * RepositoryItemAbstract.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -54,17 +54,7 @@ public abstract class RepositoryItemAbstract
 	//~--- fields ---------------------------------------------------------------
 
 	private String[] admins = null;
-	private String owner    = null;
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public abstract String getElemName();
+	private String   owner  = null;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -77,36 +67,10 @@ public abstract class RepositoryItemAbstract
 	@Override
 	public void addCommandFields(Packet packet) {
 		Command.addFieldValue(packet, OWNER_LABEL, (owner != null)
-						? owner
-						: packet.getStanzaTo().getBareJID().toString());
+				? owner
+				: packet.getStanzaTo().getBareJID().toString());
 		Command.addFieldValue(packet, ADMINS_LABEL, adminsToString(admins));
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String[] getAdmins() {
-		return admins;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getOwner() {
-		return owner;
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -135,7 +99,65 @@ public abstract class RepositoryItemAbstract
 		admins = adminsFromString(elem.getAttributeStaticStr(ADMINS_ATT));
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>Element</code>
+	 */
+	@Override
+	public Element toElement() {
+		Element elem = new Element(getElemName());
+
+		if (owner != null) {
+			elem.addAttribute(OWNER_ATT, owner);
+		}
+		if (admins != null) {
+			elem.addAttribute(ADMINS_ATT, adminsToString(admins));
+		}
+
+		return elem;
+	}
+
 	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
+	 */
+	@Override
+	public String[] getAdmins() {
+		return admins;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	public abstract String getElemName();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getOwner() {
+		return owner;
+	}
 
 	/**
 	 * Method description
@@ -143,7 +165,9 @@ public abstract class RepositoryItemAbstract
 	 *
 	 * @param id
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean isAdmin(String id) {
@@ -165,13 +189,15 @@ public abstract class RepositoryItemAbstract
 	 *
 	 * @param id
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean isOwner(String id) {
 		return ((owner == null)
-						? false
-						: owner.equals(id));
+				? false
+				: owner.equals(id));
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -199,26 +225,6 @@ public abstract class RepositoryItemAbstract
 	}
 
 	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public Element toElement() {
-		Element elem = new Element(getElemName());
-
-		if (owner != null) {
-			elem.addAttribute(OWNER_ATT, owner);
-		}
-		if (admins != null) {
-			elem.addAttribute(ADMINS_ATT, adminsToString(admins));
-		}
-
-		return elem;
-	}
 
 	private String[] adminsFromString(String admins_m) {
 		String[] result = null;
@@ -253,4 +259,4 @@ public abstract class RepositoryItemAbstract
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/08/29

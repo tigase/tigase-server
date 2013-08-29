@@ -130,7 +130,9 @@ public class AuthRepositoryImpl
 	 *          a <code>String</code> value
 	 * @param alg
 	 *          a <code>String</code> value
-	 * @return a <code>boolean</code> value
+	 *  a <code>boolean</code> value
+	 *
+	 * @return a value of <code>boolean</code>
 	 * @exception UserNotFoundException
 	 *              if an error occurs
 	 * @exception TigaseDBException
@@ -157,47 +159,6 @@ public class AuthRepositoryImpl
 			throw new AuthorizationException("No such algorithm.", e);
 		}    // end of try-catch
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getResourceUri() {
-		return repo.getResourceUri();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public long getUsersCount() {
-		return repo.getUsersCount();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 *
-	 * @return
-	 */
-	@Override
-	public long getUsersCount(String domain) {
-		return repo.getUsersCount(domain);
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	// ~--- methods --------------------------------------------------------------
 
@@ -228,7 +189,9 @@ public class AuthRepositoryImpl
 	 *
 	 * @param props
 	 *          a <code>Map</code> value
-	 * @return a <code>boolean</code> value
+	 *  a <code>boolean</code> value
+	 *
+	 * @return a value of <code>boolean</code>
 	 * @exception UserNotFoundException
 	 *              if an error occurs
 	 * @exception TigaseDBException
@@ -277,7 +240,9 @@ public class AuthRepositoryImpl
 	 *          a <code>String</code> value
 	 * @param password
 	 *          a <code>String</code> value
-	 * @return a <code>boolean</code> value
+	 *  a <code>boolean</code> value
+	 *
+	 * @return a value of <code>boolean</code>
 	 * @exception UserNotFoundException
 	 *              if an error occurs
 	 * @exception TigaseDBException
@@ -350,9 +315,46 @@ public class AuthRepositoryImpl
 	//~--- get methods ----------------------------------------------------------
 
 	// ~--- get methods ----------------------------------------------------------
-	private String getPassword(BareJID user)
-					throws UserNotFoundException, TigaseDBException {
-		return repo.getData(user, PASSWORD_KEY);
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getResourceUri() {
+		return repo.getResourceUri();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	@Override
+	public long getUsersCount() {
+		return repo.getUsersCount();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param domain
+	 *
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	@Override
+	public long getUsersCount(String domain) {
+		return repo.getUsersCount(domain);
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -403,6 +405,14 @@ public class AuthRepositoryImpl
 		} catch (SaslException e) {
 			throw new AuthorizationException("Sasl exception.", e);
 		}      // end of try-catch
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	// ~--- get methods ----------------------------------------------------------
+	private String getPassword(BareJID user)
+					throws UserNotFoundException, TigaseDBException {
+		return repo.getData(user, PASSWORD_KEY);
 	}
 
 	//~--- inner classes --------------------------------------------------------
@@ -514,4 +524,4 @@ public class AuthRepositoryImpl
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/03/12
+//~ Formatted in Tigase Code Convention on 13/08/29

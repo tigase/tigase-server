@@ -355,7 +355,9 @@ public class StatisticsCollector
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String shutdown() {
@@ -377,7 +379,9 @@ public class StatisticsCollector
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of StatisticsList
 	 */
 	public StatisticsList getAllStats() {
 		StatisticsList list = new StatisticsList(Level.ALL);
@@ -413,7 +417,9 @@ public class StatisticsCollector
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of List<String>
 	 */
 	public List<String> getComponentsNames() {
 		return new ArrayList<String>(components.keySet());
@@ -440,7 +446,9 @@ public class StatisticsCollector
 	 *
 	 * @param params
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Map<String,Object>
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -485,7 +493,9 @@ public class StatisticsCollector
 	 *
 	 * @param from
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of List<Element>
 	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
@@ -500,7 +510,9 @@ public class StatisticsCollector
 	 * @param jid
 	 * @param from
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Element
 	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
@@ -519,7 +531,9 @@ public class StatisticsCollector
 	 * @param jid
 	 * @param from
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of List<Element>
 	 */
 	@Override
 	public List<Element> getDiscoItems(String node, JID jid, JID from) {
@@ -560,7 +574,9 @@ public class StatisticsCollector
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String getName() {
@@ -573,7 +589,9 @@ public class StatisticsCollector
 	 *
 	 * @param component
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	@Override
 	public boolean isCorrectType(ServerComponent component) {
@@ -763,4 +781,4 @@ public class StatisticsCollector
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/06/08
+//~ Formatted in Tigase Code Convention on 13/08/28

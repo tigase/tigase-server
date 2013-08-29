@@ -2,7 +2,7 @@
  * RemoteRosterManagement.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -58,12 +58,14 @@ import java.util.Set;
  */
 public class RemoteRosterManagement
 				extends XMPPProcessorAbstract {
-	private static final String[][] ELEMENT_PATHS = {{ "iq", "query" }, { "message", "x" }};
-	private static final String ID                = "remote-roster-management";
-	private static final Logger log               =
-		Logger.getLogger("eu.hilow.xtigase.server.xmpp.RemoteRosterManagement");
-	private static final String XMLNS             = "http://spectrum.im/protocol/remote-roster";
-	private static final String[] XMLNSS          = { XMLNS, "jabber:x:data" };
+	private static final String[][] ELEMENT_PATHS = {
+		{ "iq", "query" }, { "message", "x" }
+	};
+	private static final String     ID            = "remote-roster-management";
+	private static final Logger     log = Logger.getLogger(
+			"eu.hilow.xtigase.server.xmpp.RemoteRosterManagement");
+	private static final String   XMLNS  = "http://spectrum.im/protocol/remote-roster";
+	private static final String[] XMLNSS = { XMLNS, "jabber:x:data" };
 
 	//~--- methods --------------------------------------------------------------
 
@@ -71,22 +73,26 @@ public class RemoteRosterManagement
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of int
 	 */
 	@Override
-	public String id() {
-		return ID;
+	public int concurrentQueuesNo() {
+		return Runtime.getRuntime().availableProcessors();
 	}
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
-	public int concurrentQueuesNo() {
-		return Runtime.getRuntime().availableProcessors();
+	public String id() {
+		return ID;
 	}
 
 	/**
@@ -104,8 +110,8 @@ public class RemoteRosterManagement
 	 */
 	@Override
 	public void processFromUserToServerPacket(JID connectionId, Packet packet,
-					XMPPResourceConnection session, NonAuthUserRepository repo,
-					Queue<Packet> results, Map<String, Object> settings)
+			XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
+			Map<String, Object> settings)
 					throws PacketErrorTypeException {
 		if (packet.getElemName() == "message") {
 			try {
@@ -114,7 +120,7 @@ public class RemoteRosterManagement
 				results.offer(Authorization.FORBIDDEN.getResponseMessage(packet, null, false));
 			} catch (TigaseDBException ex) {
 				results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
-								null, true));
+						null, true));
 			}
 		} else {
 			results.offer(packet);
@@ -135,7 +141,7 @@ public class RemoteRosterManagement
 	 */
 	@Override
 	public void processServerSessionPacket(Packet packet, XMPPResourceConnection session,
-					NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 					throws PacketErrorTypeException {}
 
 	/**
@@ -152,8 +158,7 @@ public class RemoteRosterManagement
 	 */
 	@Override
 	public void processToUserPacket(Packet packet, XMPPResourceConnection session,
-																	NonAuthUserRepository repo, Queue<Packet> results,
-																	Map<String, Object> settings)
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 					throws PacketErrorTypeException {
 		if (packet.getElemName() == "iq") {
 			processIq(packet, session, repo, results, settings);
@@ -162,12 +167,108 @@ public class RemoteRosterManagement
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of String[][]
+	 */
+	@Override
+	public String[][] supElementNamePaths() {
+		return ELEMENT_PATHS;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of String[]
+	 */
+	@Override
+	public String[] supNamespaces() {
+		return XMLNSS;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param item
+	 * @param update
+	 * @param results
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public static void updateBuddyChange(XMPPResourceConnection session, Element item,
+			Element update, Queue<Packet> results)
+					throws NotAuthorizedException, TigaseDBException {
+		JID jid = JID.jidInstanceNS(item.getAttributeStaticStr("jid"));
+
+		if (jid.getLocalpart() == null) {
+			return;
+		}
+		jid = JID.jidInstanceNS(jid.getDomain());
+		if (isRemoteAllowed(jid, session)) {
+			Element iq = update.clone();
+
+			iq.setAttribute("from", session.getBareJID().toString());
+			iq.setAttribute("to", jid.getDomain());
+			iq.setAttribute("id", "rst" + session.nextStanzaId());
+			results.offer(Packet.packetInstance(iq, JID.jidInstance(session.getBareJID()),
+					jid));
+		}
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param jid
+	 * @param session
+	 *
+	 *
+	 *
+	 * @return a value of boolean
+	 */
+	public static boolean isRemoteAllowed(JID jid, XMPPResourceConnection session) {
+		try {
+			if (session == null) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "no session to check if {0} is allowed", jid.toString());
+				}
+
+				return false;
+			}
+
+			Set<JID> allowed = getAllowed(session);
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "checking if sender jid = {0} is in allowed set = {1}",
+						new Object[] { jid,
+						allowed });
+			}
+
+			return allowed.contains(jid);
+		} catch (Exception ex) {
+			return false;
+		}
+	}
+
+	//~--- methods --------------------------------------------------------------
+
 	private void processIq(Packet packet, XMPPResourceConnection session,
-												 NonAuthUserRepository repo, Queue<Packet> results,
-												 Map<String, Object> settings)
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 					throws PacketErrorTypeException {
 		Element query = packet.getElement().getChild("query",
-											"http://spectrum.im/protocol/remote-roster");
+				"http://spectrum.im/protocol/remote-roster");
 
 		if (query == null) {
 			super.processToUserPacket(packet, session, repo, results, settings);
@@ -178,21 +279,20 @@ public class RemoteRosterManagement
 		switch (packet.getType()) {
 		case set :
 			if ("request".equals(query.getAttributeStaticStr(Packet.TYPE_ATT))) {
-				JID from    = JID.jidInstanceNS(packet.getStanzaTo().getDomain());
-				Element msg = new Element(tigase.server.Message.ELEM_NAME);
+				JID     from = JID.jidInstanceNS(packet.getStanzaTo().getDomain());
+				Element msg  = new Element(tigase.server.Message.ELEM_NAME);
 
 				msg.setAttribute(Packet.FROM_ATT, from.toString());
 				msg.setAttribute(Packet.TO_ATT, packet.getStanzaTo().toString());
 
-				Form form = new Form(Packet.FROM_ATT, "Roster change permission",
-														 packet.getStanzaFrom().getBareJID().toString() +
-														 " wants to edit your roster with following reason: " +
-														 query.getAttributeStaticStr("reason") +
-														 ". Do you want to allow it?");
+				Form form = new Form(Packet.FROM_ATT, "Roster change permission", packet
+						.getStanzaFrom().getBareJID().toString() +
+						" wants to edit your roster with following reason: " + query
+						.getAttributeStaticStr("reason") + ". Do you want to allow it?");
 
 				form.addField(Field.fieldHidden("FORM_TYPE", XMLNS));
-				form.addField(Field.fieldHidden("jid",
-																				packet.getStanzaFrom().getBareJID().toString()));
+				form.addField(Field.fieldHidden("jid", packet.getStanzaFrom().getBareJID()
+						.toString()));
 				form.addField(Field.fieldBoolean("answer", true, "Allow roster edit"));
 				msg.addChildren(Collections.singletonList(form.getElement()));
 
@@ -201,31 +301,33 @@ public class RemoteRosterManagement
 				results.offer(resp);
 			} else {
 				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-								"Unknown request type", false));
+						"Unknown request type", false));
 			}
 
 			break;
 
 		default :
 			results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Bad request",
-							true));
+					true));
 		}
 	}
 
 	private void processMessageFormResponse(Packet packet, XMPPResourceConnection session,
-					NonAuthUserRepository repo, Queue<Packet> results)
+			NonAuthUserRepository repo, Queue<Packet> results)
 					throws NotAuthorizedException, TigaseDBException {
 		Element x = packet.getElement().getChild("x");
 
 		if (x != null) {
-			Form form        = new Form(x);
-			if (!XMLNS.equals(form.getAsString("FORM_TYPE")) 
-					&& !session.isLocalDomain(packet.getStanzaTo().toString(), false)) {				
+			Form form = new Form(x);
+
+			if (!XMLNS.equals(form.getAsString("FORM_TYPE")) &&!session.isLocalDomain(packet
+					.getStanzaTo().toString(), false)) {
 				results.offer(packet);
 			}
-			JID jid          = JID.jidInstanceNS(form.get("jid").getValue());
-			Boolean answer   = false;
-			String answerStr = form.get("answer").getValue();
+
+			JID     jid       = JID.jidInstanceNS(form.get("jid").getValue());
+			Boolean answer    = false;
+			String  answerStr = form.get("answer").getValue();
 
 			if ("true".equals(answerStr) || "1".equals(answerStr)) {
 				answer = true;
@@ -252,36 +354,14 @@ public class RemoteRosterManagement
 
 			query.setAttribute("xmlns", XMLNS);
 			query.setAttribute("type", answer
-																 ? "allowed"
-																 : "rejected");
+					? "allowed"
+					: "rejected");
 			iq.addChildren(Collections.singletonList(query));
-			results.offer(Packet.packetInstance(iq,
-							packet.getStanzaFrom().copyWithoutResource(), jid));
+			results.offer(Packet.packetInstance(iq, packet.getStanzaFrom()
+					.copyWithoutResource(), jid));
 		} else {
 			results.offer(packet);
 		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String[][] supElementNamePaths() {
-		return ELEMENT_PATHS;
-	}
-	
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String[] supNamespaces() {
-		return XMLNSS;
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -314,7 +394,7 @@ public class RemoteRosterManagement
 				session.putCommonSessionData("remote-roster-allowed", allowed);
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "read list of jids allowed to modify roster = {0}",
-									allowed);
+							allowed);
 				}
 			}
 
@@ -344,76 +424,7 @@ public class RemoteRosterManagement
 		}
 		session.setData("remote-roster-management", "allowed", buf.toString());
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 * @param session
-	 *
-	 * @return
-	 */
-	public static boolean isRemoteAllowed(JID jid, XMPPResourceConnection session) {
-		try {
-			if (session == null) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "no session to check if {0} is allowed", jid.toString());
-				}
-
-				return false;
-			}
-
-			Set<JID> allowed = getAllowed(session);
-
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "checking if sender jid = {0} is in allowed set = {1}",
-								new Object[] { jid,
-															 allowed });
-			}
-
-			return allowed.contains(jid);
-		} catch (Exception ex) {
-			return false;
-		}
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param item
-	 * @param update
-	 * @param results
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public static void updateBuddyChange(XMPPResourceConnection session, Element item,
-					Element update, Queue<Packet> results)
-					throws NotAuthorizedException, TigaseDBException {
-		JID jid = JID.jidInstanceNS(item.getAttributeStaticStr("jid"));
-
-		if (jid.getLocalpart() == null) {
-			return;
-		}
-		jid = JID.jidInstanceNS(jid.getDomain());
-		if (isRemoteAllowed(jid, session)) {
-			Element iq = update.clone();
-
-			iq.setAttribute("from", session.getBareJID().toString());
-			iq.setAttribute("to", jid.getDomain());
-			iq.setAttribute("id", "rst" + session.nextStanzaId());
-			results.offer(Packet.packetInstance(iq, JID.jidInstance(session.getBareJID()),
-							jid));
-		}
-	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/08/28

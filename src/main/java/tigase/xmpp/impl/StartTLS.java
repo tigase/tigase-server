@@ -92,11 +92,52 @@ public class StartTLS
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String id() {
 		return ID;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param session
+	 * @param repo
+	 * @param results
+	 * @param settings
+	 *
+	 *
+	 *
+	 * @return a value of boolean
+	 */
+	@Override
+	public boolean preProcess(Packet packet, XMPPResourceConnection session,
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
+		boolean stop = false;
+
+		if ((session == null) || session.isServerSession()) {
+			return stop;
+		}
+
+		VHostItem vhost = session.getDomain();
+
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "VHost: {0}", new Object[] { vhost });
+		}
+
+		// Check whether the TLS has been completed
+		// and the packet is allowed to be processed.
+		if ((vhost != null) && vhost.isTlsRequired() && (session.getSessionData(ID) ==
+				null) &&!packet.isElement(EL_NAME, XMLNS)) {
+			stop = true;
+		}
+
+		return stop;
 	}
 
 	/**
@@ -151,7 +192,9 @@ public class StartTLS
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[][]
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -162,7 +205,9 @@ public class StartTLS
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[]
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -175,7 +220,9 @@ public class StartTLS
 	 *
 	 * @param session
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Element[]
 	 */
 	@Override
 	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
@@ -195,44 +242,7 @@ public class StartTLS
 			return null;
 		}    // end of if (session.isAuthorized()) else
 	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 * @param settings
-	 *
-	 * @return
-	 */
-	@Override
-	public boolean preProcess(Packet packet, XMPPResourceConnection session,
-			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
-		boolean stop = false;
-
-		if ((session == null) || session.isServerSession()) {
-			return stop;
-		}
-
-		VHostItem vhost = session.getDomain();
-
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "VHost: {0}", new Object[] { vhost });
-		}
-
-		// Check whether the TLS has been completed
-		// and the packet is allowed to be processed.
-		if ((vhost != null) && vhost.isTlsRequired() && (session.getSessionData(ID) ==
-				null) &&!packet.isElement(EL_NAME, XMLNS)) {
-			stop = true;
-		}
-
-		return stop;
-	}
 }    // StartTLS
 
 
-//~ Formatted in Tigase Code Convention on 13/03/12
+//~ Formatted in Tigase Code Convention on 13/08/28

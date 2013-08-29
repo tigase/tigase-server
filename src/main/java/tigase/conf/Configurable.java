@@ -613,7 +613,9 @@ public interface Configurable
 	/**
 	 * Returns default configuration settings for this object.
 	 * @param params
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 */
 	Map<String, Object> getDefaults(Map<String, Object> params);
 
@@ -627,4 +629,4 @@ public interface Configurable
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/04/14
+//~ Formatted in Tigase Code Convention on 13/08/29

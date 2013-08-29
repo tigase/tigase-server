@@ -59,7 +59,9 @@ public interface SessionManagerClusteredIfc
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	boolean fastAddOutPacket(Packet packet);
 
@@ -80,7 +82,9 @@ public interface SessionManagerClusteredIfc
 	 *
 	 * @param el_packet
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>XMPPResourceConnection</code>
 	 */
 	XMPPResourceConnection getXMPPResourceConnection(Packet el_packet);
 
@@ -88,7 +92,9 @@ public interface SessionManagerClusteredIfc
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>ConcurrentHashMap<JID,XMPPResourceConnection></code>
 	 */
 	ConcurrentHashMap<JID, XMPPResourceConnection> getXMPPResourceConnections();
 
@@ -96,10 +102,12 @@ public interface SessionManagerClusteredIfc
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>ConcurrentHashMap<BareJID,XMPPSession></code>
 	 */
 	ConcurrentHashMap<BareJID, XMPPSession> getXMPPSessions();
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/08/29

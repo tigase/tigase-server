@@ -77,37 +77,15 @@ public abstract class LastActivity
 	private final static String[] XMLNSS = new String[] { XMLNS, "jabber:client",
 			"jabber:client" };
 
-	//~--- get methods ----------------------------------------------------------
-
-	private static long getTime(NonAuthUserRepository repo, BareJID requestedJid)
-					throws UserNotFoundException {
-		String data = repo.getPublicData(requestedJid, ID, LAST_ACTIVITY_KEY, null);
-
-		if (data == null) {
-			return -1;
-		}
-		try {
-			return Long.parseLong(data);
-		} catch (Exception e) {
-			return -1;
-		}
-	}
-
-	private static long getTime(XMPPResourceConnection session) {
-		final Long last = (Long) session.getSessionData(LAST_ACTIVITY_KEY);
-
-		return (last == null)
-				? -1
-				: last.longValue();
-	}
-
 	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String id() {
@@ -335,7 +313,9 @@ public abstract class LastActivity
 	 *
 	 * @param session
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Element[]
 	 */
 	@Override
 	public Element[] supDiscoFeatures(XMPPResourceConnection session) {
@@ -346,7 +326,9 @@ public abstract class LastActivity
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[][]
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -357,13 +339,39 @@ public abstract class LastActivity
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[]
 	 */
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
 	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	private static long getTime(NonAuthUserRepository repo, BareJID requestedJid)
+					throws UserNotFoundException {
+		String data = repo.getPublicData(requestedJid, ID, LAST_ACTIVITY_KEY, null);
+
+		if (data == null) {
+			return -1;
+		}
+		try {
+			return Long.parseLong(data);
+		} catch (Exception e) {
+			return -1;
+		}
+	}
+
+	private static long getTime(XMPPResourceConnection session) {
+		final Long last = (Long) session.getSessionData(LAST_ACTIVITY_KEY);
+
+		return (last == null)
+				? -1
+				: last.longValue();
+	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/12
+//~ Formatted in Tigase Code Convention on 13/08/28

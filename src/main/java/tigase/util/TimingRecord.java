@@ -76,7 +76,9 @@ public class TimingRecord {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of long
 	 */
 	public long getAverageTiming() {
 		throw new UnsupportedOperationException(
@@ -87,7 +89,9 @@ public class TimingRecord {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of long
 	 */
 	long getMaxRecordedTiming() {
 		throw new UnsupportedOperationException(
@@ -96,4 +100,4 @@ public class TimingRecord {
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/04/24
+//~ Formatted in Tigase Code Convention on 13/08/28

@@ -68,8 +68,10 @@ public abstract class DynamicRoster {
 	 * @param settings
 	 * @param buddies
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of JID[]
 	 * @throws NotAuthorizedException
 	 */
 	public static JID[] addBuddies(final XMPPResourceConnection session, final Map<String,
@@ -92,69 +94,6 @@ public abstract class DynamicRoster {
 		return null;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param settings
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
-	 */
-	public static JID[] getBuddies(final XMPPResourceConnection session, final Map<String,
-			Object> settings)
-					throws NotAuthorizedException {
-		List<JID> result = getBuddiesList(session, settings);
-
-		if ((result != null) && (result.size() > 0)) {
-			return result.toArray(new JID[result.size()]);
-		}
-
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param settings
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
-	 */
-	public static List<JID> getBuddiesList(final XMPPResourceConnection session,
-			final Map<String, Object> settings)
-					throws NotAuthorizedException {
-		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
-
-		if (dynr != null) {
-			ArrayList<JID> result = new ArrayList<JID>();
-
-			for (DynamicRosterIfc dri : dynr) {
-				JID[] buddies = dri.getBuddies(session);
-
-				if (buddies != null) {
-					addBuddiesToList(result, buddies);
-
-					// result.addAll(Arrays.asList(buddies));
-				}
-			}
-			if (result.size() > 0) {
-				return result;
-			}
-		}
-
-		return null;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -169,102 +108,6 @@ public abstract class DynamicRoster {
 			}
 		}
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param settings
-	 * @param buddy
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
-	 */
-	public static Element getBuddyItem(final XMPPResourceConnection session,
-			final Map<String, Object> settings, JID buddy)
-					throws NotAuthorizedException {
-		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
-
-		if (dynr != null) {
-			for (DynamicRosterIfc dri : dynr) {
-				Element item = dri.getBuddyItem(session, buddy);
-
-				if (item != null) {
-					return item;
-				}
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param settings
-	 *
-	 * @return
-	 */
-	public static DynamicRosterIfc[] getDynamicRosters(final Map<String, Object> settings) {
-		DynamicRosterIfc[] dynr = null;
-
-		if (settings != null) {
-			synchronized (settings) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Initializing settings.");
-				}
-				init_settings(settings);
-			}
-			dynr = (DynamicRosterIfc[]) settings.get(DYNAMIC_ROSTERS);
-		} else {
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Settings parameter is NULL");
-			}
-		}
-
-		return dynr;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param settings
-	 *
-	 * @return
-	 *
-	 * @throws NotAuthorizedException
-	 */
-	public static List<Element> getRosterItems(final XMPPResourceConnection session,
-			final Map<String, Object> settings)
-					throws NotAuthorizedException {
-		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
-
-		if (dynr != null) {
-			ArrayList<Element> result = new ArrayList<Element>();
-
-			for (DynamicRosterIfc dri : dynr) {
-				List<Element> items = dri.getRosterItems(session);
-
-				if (items != null) {
-					result.addAll(items);
-				}
-			}
-			if (result.size() > 0) {
-				return result;
-			}
-		}
-
-		return null;
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -316,9 +159,136 @@ public abstract class DynamicRoster {
 	 *
 	 * @param session
 	 * @param settings
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of JID[]
+	 * @throws NotAuthorizedException
+	 */
+	public static JID[] getBuddies(final XMPPResourceConnection session, final Map<String,
+			Object> settings)
+					throws NotAuthorizedException {
+		List<JID> result = getBuddiesList(session, settings);
+
+		if ((result != null) && (result.size() > 0)) {
+			return result.toArray(new JID[result.size()]);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param settings
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of List<JID>
+	 * @throws NotAuthorizedException
+	 */
+	public static List<JID> getBuddiesList(final XMPPResourceConnection session,
+			final Map<String, Object> settings)
+					throws NotAuthorizedException {
+		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
+
+		if (dynr != null) {
+			ArrayList<JID> result = new ArrayList<JID>();
+
+			for (DynamicRosterIfc dri : dynr) {
+				JID[] buddies = dri.getBuddies(session);
+
+				if (buddies != null) {
+					addBuddiesToList(result, buddies);
+
+					// result.addAll(Arrays.asList(buddies));
+				}
+			}
+			if (result.size() > 0) {
+				return result;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param settings
+	 * @param buddy
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of Element
+	 * @throws NotAuthorizedException
+	 */
+	public static Element getBuddyItem(final XMPPResourceConnection session,
+			final Map<String, Object> settings, JID buddy)
+					throws NotAuthorizedException {
+		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
+
+		if (dynr != null) {
+			for (DynamicRosterIfc dri : dynr) {
+				Element item = dri.getBuddyItem(session, buddy);
+
+				if (item != null) {
+					return item;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param settings
+	 *
+	 *
+	 *
+	 * @return a value of DynamicRosterIfc[]
+	 */
+	public static DynamicRosterIfc[] getDynamicRosters(final Map<String, Object> settings) {
+		DynamicRosterIfc[] dynr = null;
+
+		if (settings != null) {
+			synchronized (settings) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.finest("Initializing settings.");
+				}
+				init_settings(settings);
+			}
+			dynr = (DynamicRosterIfc[]) settings.get(DYNAMIC_ROSTERS);
+		} else {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Settings parameter is NULL");
+			}
+		}
+
+		return dynr;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param settings
 	 * @param item
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Element
 	 */
 	public static Element getItemExtraData(XMPPResourceConnection session, Map<String,
 			Object> settings, Element item) {
@@ -337,6 +307,42 @@ public abstract class DynamicRoster {
 		} else {
 			return null;
 		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param settings
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of List<Element>
+	 * @throws NotAuthorizedException
+	 */
+	public static List<Element> getRosterItems(final XMPPResourceConnection session,
+			final Map<String, Object> settings)
+					throws NotAuthorizedException {
+		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
+
+		if (dynr != null) {
+			ArrayList<Element> result = new ArrayList<Element>();
+
+			for (DynamicRosterIfc dri : dynr) {
+				List<Element> items = dri.getRosterItems(session);
+
+				if (items != null) {
+					result.addAll(items);
+				}
+			}
+			if (result.size() > 0) {
+				return result;
+			}
+		}
+
+		return null;
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -362,4 +368,4 @@ public abstract class DynamicRoster {
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/11
+//~ Formatted in Tigase Code Convention on 13/08/28

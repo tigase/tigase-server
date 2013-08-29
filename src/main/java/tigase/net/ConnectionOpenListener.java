@@ -78,47 +78,9 @@ public interface ConnectionOpenListener {
 	 * Method description
 	 *
 	 *
-	 * @return
-	 */
-	int getPort();
-
-	/**
-	 * Method description
 	 *
 	 *
-	 * @return
-	 */
-	String[] getIfcs();
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	String getSRVType();
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	String getRemoteHostname();
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	InetSocketAddress getRemoteAddress();
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
+	 * @return a value of <code>ConnectionType</code>
 	 */
 	ConnectionType getConnectionType();
 
@@ -126,15 +88,29 @@ public interface ConnectionOpenListener {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
 	 */
-	SocketType getSocketType();
+	String[] getIfcs();
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
+	 */
+	int getPort();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	int getReceiveBufferSize();
 
@@ -142,10 +118,52 @@ public interface ConnectionOpenListener {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>InetSocketAddress</code>
+	 */
+	InetSocketAddress getRemoteAddress();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	String getRemoteHostname();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>SocketType</code>
+	 */
+	SocketType getSocketType();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	String getSRVType();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	int getTrafficClass();
 }    // ConnectionOpenListener
 
 
-//~ Formatted in Tigase Code Convention on 13/03/11
+//~ Formatted in Tigase Code Convention on 13/08/28

@@ -114,8 +114,10 @@ public class SessionManagerClustered
 	 * @param jid
 	 *          a user's JID for whom we query information.
 	 *
-	 * @return true if the user is known as online to the installation, false if
+	 *  true if the user is known as online to the installation, false if
 	 *         the method does not know.
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean containsJid(BareJID jid) {
@@ -132,7 +134,9 @@ public class SessionManagerClustered
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean fastAddOutPacket(Packet packet) {
@@ -224,7 +228,9 @@ public class SessionManagerClustered
 	 * this component.
 	 *
 	 *
-	 * @return preferable number of threads set for this component.
+	 *  preferable number of threads set for this component.
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int processingInThreads() {
@@ -236,7 +242,9 @@ public class SessionManagerClustered
 	 * this component.
 	 *
 	 *
-	 * @return preferable number of threads set for this component.
+	 *  preferable number of threads set for this component.
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int processingOutThreads() {
@@ -329,7 +337,9 @@ public class SessionManagerClustered
 	 * @param jid
 	 *          a user's JID for whom we query information.
 	 *
-	 * @return a list of all user's connection IDs.
+	 *  a list of all user's connection IDs.
+	 *
+	 * @return a value of <code>JID[]</code>
 	 */
 	@Override
 	public JID[] getConnectionIdsForJid(BareJID jid) {
@@ -354,8 +364,10 @@ public class SessionManagerClustered
 	 *          is a Map with system-wide default settings found in
 	 *          init.properties file or similar location.
 	 *
-	 * @return a Map with all default component settings generated from the
+	 *  a Map with all default component settings generated from the
 	 *         default parameters in init.properties file.
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -433,7 +445,9 @@ public class SessionManagerClustered
 	/**
 	 * Returns active clustering strategy object.
 	 *
-	 * @return active clustering strategy object.
+	 *  active clustering strategy object.
+	 *
+	 * @return a value of <code>ClusteringStrategyIfc</code>
 	 */
 	public ClusteringStrategyIfc getStrategy() {
 		return strategy;
@@ -446,7 +460,9 @@ public class SessionManagerClustered
 	 *
 	 * @param p
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>XMPPResourceConnection</code>
 	 */
 	@Override
 	public XMPPResourceConnection getXMPPResourceConnection(Packet p) {
@@ -457,7 +473,9 @@ public class SessionManagerClustered
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>ConcurrentHashMap<JID,XMPPResourceConnection></code>
 	 */
 	@Override
 	public ConcurrentHashMap<JID, XMPPResourceConnection> getXMPPResourceConnections() {
@@ -468,7 +486,9 @@ public class SessionManagerClustered
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>ConcurrentHashMap<BareJID,XMPPSession></code>
 	 */
 	@Override
 	public ConcurrentHashMap<BareJID, XMPPSession> getXMPPSessions() {
@@ -483,8 +503,10 @@ public class SessionManagerClustered
 	 * provide it to further optimize cluster traffic.
 	 *
 	 *
-	 * @return a true boolean value if the strategy has a complete information
+	 *  a true boolean value if the strategy has a complete information
 	 *         about all users connected to all cluster nodes.
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean hasCompleteJidsInfo() {
@@ -572,9 +594,6 @@ public class SessionManagerClustered
 	 * takes a list of cluster nodes from the strategy and sends a notification to
 	 * all those nodes about the event.
 	 *
-	 * @see tigase.server.xmppsession.SessionManager#closeSession(tigase.xmpp.
-	 *      XMPPResourceConnection, boolean)
-	 *
 	 * @param conn
 	 * @param closeOnly
 	 */
@@ -625,4 +644,4 @@ public class SessionManagerClustered
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/08/29

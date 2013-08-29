@@ -1,10 +1,13 @@
 /*
+ * ComponentConnectStreamOpenHandler.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,14 +15,12 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
-
-* along with this program. Look for COPYING file in the top folder.
+ * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.server.ext.handlers;
 
@@ -35,35 +36,20 @@ import tigase.server.ext.StreamOpenHandler;
 import java.util.List;
 import java.util.Map;
 
-//~--- classes ----------------------------------------------------------------
-
 /**
  * Created: Oct 7, 2009 5:50:34 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ComponentConnectStreamOpenHandler implements StreamOpenHandler {
-
+public class ComponentConnectStreamOpenHandler
+				implements StreamOpenHandler {
 	/** Field description */
 	public static final String XMLNS = "jabber:component:connect";
 
 	//~--- fields ---------------------------------------------------------------
 
 	private String[] xmlnss = new String[] { XMLNS };
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String[] getXMLNSs() {
-		return xmlnss;
-	}
 
 	//~--- methods --------------------------------------------------------------
 
@@ -73,7 +59,9 @@ public class ComponentConnectStreamOpenHandler implements StreamOpenHandler {
 	 *
 	 * @param s
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String serviceStarted(ComponentIOService s) {
@@ -88,7 +76,9 @@ public class ComponentConnectStreamOpenHandler implements StreamOpenHandler {
 	 * @param attribs
 	 * @param handler
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String streamOpened(ComponentIOService serv, Map<String, String> attribs,
@@ -98,10 +88,22 @@ public class ComponentConnectStreamOpenHandler implements StreamOpenHandler {
 		// and perhaps it is not worth implementing, unless someone requests it
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
+	 */
+	@Override
+	public String[] getXMLNSs() {
+		return xmlnss;
+	}
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/28

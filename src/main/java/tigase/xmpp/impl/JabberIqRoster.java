@@ -100,105 +100,15 @@ public class JabberIqRoster
 	/** Field description */
 	protected RosterAbstract roster_util = getRosterUtil();
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param item
-	 *
-	 * @return
-	 */
-	public static String[] getItemGroups(Element item) {
-		List<Element> elgr = item.getChildren();
-
-		if ((elgr != null) && (elgr.size() > 0)) {
-			ArrayList<String> groups = new ArrayList<String>(1);
-
-			for (Element grp : elgr) {
-				if (grp.getName() == RosterAbstract.GROUP) {
-					groups.add(grp.getCData());
-				}
-			}
-			if (groups.size() > 0) {
-				return groups.toArray(new String[groups.size()]);
-			}
-		}
-
-		return null;
-	}
-
 	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param packet
-	 * @param session
-	 * @param results
-	 * @param settings
-	 *
-	 * @throws NotAuthorizedException
-	 */
-	protected static void dynamicGetRequest(Packet packet, XMPPResourceConnection session,
-			Queue<Packet> results, Map<String, Object> settings)
-					throws NotAuthorizedException {
-		Element request = packet.getElement();
-		Element item    = request.findChildStaticStr(IQ_QUERY_ITEM_PATH);
-
-		if (item != null) {
-			Element new_item = DynamicRoster.getItemExtraData(session, settings, item);
-
-			if (new_item == null) {
-				new_item = item;
-			}
-			results.offer(packet.okResult(new_item, 1));
-		} else {
-			try {
-				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-						"Missing 'item' element, request can not be processed.", true));
-			} catch (PacketErrorTypeException ex) {
-				log.log(Level.SEVERE, "Received error packet? not possible.", ex);
-			}
-		}
-	}
-
-	/**
-	 * Method description
 	 *
 	 *
-	 * @param packet
-	 * @param session
-	 * @param results
-	 * @param settings
-	 */
-	protected static void dynamicSetRequest(Packet packet, XMPPResourceConnection session,
-			Queue<Packet> results, Map<String, Object> settings) {
-		Element       request = packet.getElement();
-		List<Element> items   = request.getChildrenStaticStr(Iq.IQ_QUERY_PATH);
-
-		if ((items != null) && (items.size() > 0)) {
-			for (Element item : items) {
-				DynamicRoster.setItemExtraData(session, settings, item);
-			}
-			results.offer(packet.okResult((String) null, 0));
-		} else {
-			try {
-				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-						"Missing 'item' element, request can not be processed.", true));
-			} catch (PacketErrorTypeException ex) {
-				log.log(Level.SEVERE, "Received error packet? not possible.", ex);
-			}
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
+	 * @return a value of int
 	 */
 	@Override
 	public int concurrentQueuesNo() {
@@ -209,7 +119,9 @@ public class JabberIqRoster
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String id() {
@@ -410,7 +322,9 @@ public class JabberIqRoster
 	 *
 	 * @param session
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Element[]
 	 */
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
@@ -421,7 +335,9 @@ public class JabberIqRoster
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[][]
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -432,7 +348,9 @@ public class JabberIqRoster
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[]
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -445,7 +363,9 @@ public class JabberIqRoster
 	 *
 	 * @param session
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Element[]
 	 */
 	@Override
 	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
@@ -458,10 +378,29 @@ public class JabberIqRoster
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * @param item
+	 *
+	 *
+	 *
+	 * @return a value of String[]
 	 */
-	protected RosterAbstract getRosterUtil() {
-		return RosterFactory.getRosterImplementation(true);
+	public static String[] getItemGroups(Element item) {
+		List<Element> elgr = item.getChildren();
+
+		if ((elgr != null) && (elgr.size() > 0)) {
+			ArrayList<String> groups = new ArrayList<String>(1);
+
+			for (Element grp : elgr) {
+				if (grp.getName() == RosterAbstract.GROUP) {
+					groups.add(grp.getCData());
+				}
+			}
+			if (groups.size() > 0) {
+				return groups.toArray(new String[groups.size()]);
+			}
+		}
+
+		return null;
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -470,67 +409,63 @@ public class JabberIqRoster
 	 * Method description
 	 *
 	 *
+	 * @param packet
 	 * @param session
+	 * @param results
 	 * @param settings
 	 *
 	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
 	 */
-	protected void updateHash(XMPPResourceConnection session, Map<String, Object> settings)
-					throws NotAuthorizedException, TigaseDBException {
+	protected static void dynamicGetRequest(Packet packet, XMPPResourceConnection session,
+			Queue<Packet> results, Map<String, Object> settings)
+					throws NotAuthorizedException {
+		Element request = packet.getElement();
+		Element item    = request.findChildStaticStr(IQ_QUERY_ITEM_PATH);
 
-		// Retrieve standard roster items.
-		List<Element> ritems = roster_util.getRosterItems(session);
+		if (item != null) {
+			Element new_item = DynamicRoster.getItemExtraData(session, settings, item);
 
-		// Recalculate the roster hash again with dynamic roster content
-		StringBuilder roster_str = new StringBuilder(5000);
-
-		// Retrieve all Dynamic roster elements from the roster repository
-		List<Element> its = DynamicRoster.getRosterItems(session, settings);
-
-		// There is always a chance that the same elements exist in a dynamic roster
-		// and the standard user roster. Moreover, the items in the standard roster
-		// may have a different presence subscription set.
-		// Here we make sure they are both in sync, that is for each entry which
-		// exists in both rosters we enforce 'both' subscription type for element in
-		// standard roster and remove it from the dynamic roster list.
-		if ((its != null) && (its.size() > 0)) {
-			for (Iterator<Element> it = its.iterator(); it.hasNext(); ) {
-				Element element = it.next();
-
-				try {
-					JID jid = JID.jidInstance(element.getAttributeStaticStr("jid"));
-
-					if (roster_util.containsBuddy(session, jid)) {
-						roster_util.setBuddySubscription(session, SubscriptionType.both, jid);
-
-						String[] itemGroups = getItemGroups(element);
-
-						if (itemGroups != null) {
-							roster_util.addBuddyGroup(session, jid, itemGroups);
-						}
-						it.remove();
-					}
-				} catch (TigaseStringprepException ex) {
-					log.log(Level.INFO,
-							"JID from dynamic roster is incorrect, stringprep failed for: {0}", element
-							.getAttributeStaticStr("jid"));
-					it.remove();
-				}
+			if (new_item == null) {
+				new_item = item;
 			}
-
-			// This may seem to be redundant as this call has already been made
-			// but the roster could have been changed during above dynamic roster
-			// merge
-			ritems = roster_util.getRosterItems(session);
-			for (Element ritem : its) {
-				roster_str.append(ritem.toString());
+			results.offer(packet.okResult(new_item, 1));
+		} else {
+			try {
+				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+						"Missing 'item' element, request can not be processed.", true));
+			} catch (PacketErrorTypeException ex) {
+				log.log(Level.SEVERE, "Received error packet? not possible.", ex);
 			}
 		}
-		for (Element ritem : ritems) {
-			roster_str.append(ritem.toString());
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param session
+	 * @param results
+	 * @param settings
+	 */
+	protected static void dynamicSetRequest(Packet packet, XMPPResourceConnection session,
+			Queue<Packet> results, Map<String, Object> settings) {
+		Element       request = packet.getElement();
+		List<Element> items   = request.getChildrenStaticStr(Iq.IQ_QUERY_PATH);
+
+		if ((items != null) && (items.size() > 0)) {
+			for (Element item : items) {
+				DynamicRoster.setItemExtraData(session, settings, item);
+			}
+			results.offer(packet.okResult((String) null, 0));
+		} else {
+			try {
+				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
+						"Missing 'item' element, request can not be processed.", true));
+			} catch (PacketErrorTypeException ex) {
+				log.log(Level.SEVERE, "Received error packet? not possible.", ex);
+			}
 		}
-		roster_util.updateRosterHash(roster_str.toString(), session);
 	}
 
 	/**
@@ -800,6 +735,89 @@ public class JabberIqRoster
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param settings
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	protected void updateHash(XMPPResourceConnection session, Map<String, Object> settings)
+					throws NotAuthorizedException, TigaseDBException {
+
+		// Retrieve standard roster items.
+		List<Element> ritems = roster_util.getRosterItems(session);
+
+		// Recalculate the roster hash again with dynamic roster content
+		StringBuilder roster_str = new StringBuilder(5000);
+
+		// Retrieve all Dynamic roster elements from the roster repository
+		List<Element> its = DynamicRoster.getRosterItems(session, settings);
+
+		// There is always a chance that the same elements exist in a dynamic roster
+		// and the standard user roster. Moreover, the items in the standard roster
+		// may have a different presence subscription set.
+		// Here we make sure they are both in sync, that is for each entry which
+		// exists in both rosters we enforce 'both' subscription type for element in
+		// standard roster and remove it from the dynamic roster list.
+		if ((its != null) && (its.size() > 0)) {
+			for (Iterator<Element> it = its.iterator(); it.hasNext(); ) {
+				Element element = it.next();
+
+				try {
+					JID jid = JID.jidInstance(element.getAttributeStaticStr("jid"));
+
+					if (roster_util.containsBuddy(session, jid)) {
+						roster_util.setBuddySubscription(session, SubscriptionType.both, jid);
+
+						String[] itemGroups = getItemGroups(element);
+
+						if (itemGroups != null) {
+							roster_util.addBuddyGroup(session, jid, itemGroups);
+						}
+						it.remove();
+					}
+				} catch (TigaseStringprepException ex) {
+					log.log(Level.INFO,
+							"JID from dynamic roster is incorrect, stringprep failed for: {0}", element
+							.getAttributeStaticStr("jid"));
+					it.remove();
+				}
+			}
+
+			// This may seem to be redundant as this call has already been made
+			// but the roster could have been changed during above dynamic roster
+			// merge
+			ritems = roster_util.getRosterItems(session);
+			for (Element ritem : its) {
+				roster_str.append(ritem.toString());
+			}
+		}
+		for (Element ritem : ritems) {
+			roster_str.append(ritem.toString());
+		}
+		roster_util.updateRosterHash(roster_str.toString(), session);
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of RosterAbstract
+	 */
+	protected RosterAbstract getRosterUtil() {
+		return RosterFactory.getRosterImplementation(true);
+	}
+
+	//~--- methods --------------------------------------------------------------
+
 	private void processRemoteRosterManagementRequest(Packet packet,
 			XMPPResourceConnection session, Queue<Packet> results, final Map<String,
 			Object> settings)
@@ -854,4 +872,4 @@ public class JabberIqRoster
 }    // JabberIqRoster
 
 
-//~ Formatted in Tigase Code Convention on 13/03/11
+//~ Formatted in Tigase Code Convention on 13/08/28

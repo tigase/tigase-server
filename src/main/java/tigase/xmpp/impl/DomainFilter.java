@@ -177,7 +177,9 @@ public class DomainFilter
 	/**
 	 * Describe <code>id</code> method here.
 	 *
-	 * @return a <code>String</code> value
+	 *  a <code>String</code> value
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String id() {
@@ -194,7 +196,9 @@ public class DomainFilter
 	 * @param results
 	 *
 	 * @param settings
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
@@ -329,7 +333,9 @@ public class DomainFilter
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[][]
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -339,7 +345,9 @@ public class DomainFilter
 	/**
 	 * Describe <code>supNamespaces</code> method here.
 	 *
-	 * @return a <code>String[]</code> value
+	 *  a <code>String[]</code> value
+	 *
+	 * @return a value of String[]
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -354,25 +362,31 @@ public class DomainFilter
 	 *
 	 * @param session
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of DomainFilterPolicy
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
 	public DomainFilterPolicy getDomains(XMPPResourceConnection session)
 					throws NotAuthorizedException, TigaseDBException {
-		VHostItem domain = session.getDomain();
+		VHostItem          domain = session.getDomain();
 		DomainFilterPolicy domains = (DomainFilterPolicy) session.getCommonSessionData(
 				ALLOWED_DOMAINS_KEY);
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Domains read from user session: {0} for VHost: {1}", new Object[] {domains, domain} );
+			log.log(Level.FINEST, "Domains read from user session: {0} for VHost: {1}",
+					new Object[] { domains,
+					domain });
 		}
 		if (domains == null) {
 			String dbDomains = session.getData(null, ALLOWED_DOMAINS_KEY, null);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Domains read from database: {0} for VHost: {1}", new Object[] {dbDomains, domain});
+				log.log(Level.FINEST, "Domains read from database: {0} for VHost: {1}",
+						new Object[] { dbDomains,
+						domain });
 			}
 			domains = DomainFilterPolicy.valueof(dbDomains);
 			if (domains == null) {
@@ -383,9 +397,11 @@ public class DomainFilter
 				}
 			}
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Domains read from VHost item: {0} for VHost: {1}", new Object[] {domains, domain});
+				log.log(Level.FINEST, "Domains read from VHost item: {0} for VHost: {1}",
+						new Object[] { domains,
+						domain });
 			}
-			session.putCommonSessionData( ALLOWED_DOMAINS_KEY, domains );
+			session.putCommonSessionData(ALLOWED_DOMAINS_KEY, domains);
 		}
 
 		return domains;
@@ -397,8 +413,10 @@ public class DomainFilter
 	 *
 	 * @param session
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of String[]
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
@@ -436,4 +454,4 @@ public class DomainFilter
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/16
+//~ Formatted in Tigase Code Convention on 13/08/28

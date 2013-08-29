@@ -1,10 +1,13 @@
 /*
+ * PriorityQueueRelaxed.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.util;
 
@@ -28,8 +30,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//~--- classes ----------------------------------------------------------------
-
 /**
  * Created: Feb 9, 2010 11:12:56 AM
  *
@@ -37,17 +37,18 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class PriorityQueueRelaxed<E> extends PriorityQueueAbstract<E> {
-
+public class PriorityQueueRelaxed<E>
+				extends PriorityQueueAbstract<E> {
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log = Logger.getLogger(PriorityQueueRelaxed.class.getName());
+	private static final Logger log = Logger.getLogger(PriorityQueueRelaxed.class
+			.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
-	private LinkedBlockingQueue<E>[] qs = null;
-	private int lowestNonEmpty = Integer.MAX_VALUE;
+	private LinkedBlockingQueue<E>[] qs             = null;
+	private int                      lowestNonEmpty = Integer.MAX_VALUE;
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -84,7 +85,6 @@ public class PriorityQueueRelaxed<E> extends PriorityQueueAbstract<E> {
 
 //  qs = new LinkedBlockingQueue[maxPriority + 1];
 		qs = new LinkedBlockingQueue[maxPriority];
-
 		for (int i = 0; i < qs.length; i++) {
 			qs[i] = new LinkedBlockingQueue<E>(maxSize);
 		}
@@ -99,7 +99,9 @@ public class PriorityQueueRelaxed<E> extends PriorityQueueAbstract<E> {
 	 * @param element
 	 * @param priority
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	@Override
 	public boolean offer(E element, int priority) {
@@ -132,35 +134,13 @@ public class PriorityQueueRelaxed<E> extends PriorityQueueAbstract<E> {
 		add(element, priority, true);
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param maxSize
-	 */
-	@Override
-	public void setMaxSize(int maxSize) {
-		for (int i = 0; i < qs.length; i++) {
-
-			// We don't want to lose any data so the new size must
-			// be enough to keep all exising elements
-			LinkedBlockingQueue<E> oldQueue = qs[i];
-			int newSize = Math.max(oldQueue.size(), maxSize);
-
-			qs[i] = new LinkedBlockingQueue<E>(newSize);
-			oldQueue.drainTo(qs[i]);
-		}
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
 	 *
 	 *
-	 * @return
+	 * @return a value of int[]
 	 */
 	@Override
 	public int[] size() {
@@ -179,8 +159,10 @@ public class PriorityQueueRelaxed<E> extends PriorityQueueAbstract<E> {
 	 * Method description
 	 *
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of E
 	 * @throws InterruptedException
 	 */
 	@Override
@@ -225,7 +207,9 @@ public class PriorityQueueRelaxed<E> extends PriorityQueueAbstract<E> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of int
 	 */
 	@Override
 	public int totalSize() {
@@ -238,17 +222,42 @@ public class PriorityQueueRelaxed<E> extends PriorityQueueAbstract<E> {
 		return result;
 	}
 
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param maxSize
+	 */
+	@Override
+	public void setMaxSize(int maxSize) {
+		for (int i = 0; i < qs.length; i++) {
+
+			// We don't want to lose any data so the new size must
+			// be enough to keep all exising elements
+			LinkedBlockingQueue<E> oldQueue = qs[i];
+			int                    newSize  = Math.max(oldQueue.size(), maxSize);
+
+			qs[i] = new LinkedBlockingQueue<E>(newSize);
+			oldQueue.drainTo(qs[i]);
+		}
+	}
+
+	//~--- methods --------------------------------------------------------------
+
 	// TODO: Reduce synchronization but be carefull many threads are writing
 	// to queues at the same time.
 	// private boolean add(E element, int priority, boolean blocking, String owner)
-	private boolean add(E element, int priority, boolean blocking) throws InterruptedException {
+	private boolean add(E element, int priority, boolean blocking)
+					throws InterruptedException {
 		if ((priority < 0) || (qs.length <= priority)) {
-			throw new IllegalArgumentException("parameter priority must be " + "between 0 and "
-					+ (qs.length - 1));
+			throw new IllegalArgumentException("parameter priority must be " +
+					"between 0 and " + (qs.length - 1));
 		}
 
-		boolean result = true;
-		LinkedBlockingQueue<E> q = qs[priority];
+		boolean                result = true;
+		LinkedBlockingQueue<E> q      = qs[priority];
 
 		if (blocking) {
 
@@ -266,7 +275,6 @@ public class PriorityQueueRelaxed<E> extends PriorityQueueAbstract<E> {
 //            element.toString() + ", result: " + result +
 //            ", lowestNonEmpty: " + lowestNonEmpty + ", size: " + q.size());
 		}
-
 		if (result) {
 			synchronized (this) {
 				if (priority < lowestNonEmpty) {
@@ -275,7 +283,6 @@ public class PriorityQueueRelaxed<E> extends PriorityQueueAbstract<E> {
 //                lowestNonEmpty + ", to: " + priority);
 					lowestNonEmpty = priority;
 				}
-
 				this.notify();
 			}
 		} else {
@@ -291,7 +298,7 @@ public class PriorityQueueRelaxed<E> extends PriorityQueueAbstract<E> {
 
 	private int findNextNonEmpty() {
 		for (int i = 0; i < qs.length; i++) {
-			if ( !qs[i].isEmpty()) {
+			if (!qs[i].isEmpty()) {
 				return i;
 			}
 		}
@@ -301,7 +308,4 @@ public class PriorityQueueRelaxed<E> extends PriorityQueueAbstract<E> {
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/28

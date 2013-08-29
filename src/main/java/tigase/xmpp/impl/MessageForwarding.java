@@ -84,7 +84,9 @@ public class MessageForwarding
 	 * Returns plugin unique identifier.
 	 *
 	 *
-	 * @return pugin unique identifier.
+	 *  pugin unique identifier.
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String id() {
@@ -198,7 +200,9 @@ public class MessageForwarding
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[][]
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -209,7 +213,9 @@ public class MessageForwarding
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[]
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -218,4 +224,4 @@ public class MessageForwarding
 }    // Message
 
 
-//~ Formatted in Tigase Code Convention on 13/03/12
+//~ Formatted in Tigase Code Convention on 13/08/28

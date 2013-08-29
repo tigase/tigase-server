@@ -21,18 +21,18 @@
  */
 
 
+
 package tigase.xmpp.impl;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
+//~--- non-JDK imports --------------------------------------------------------
+
 import tigase.db.NonAuthUserRepository;
+
 import tigase.server.Message;
 import tigase.server.Packet;
+
 import tigase.xml.Element;
+
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 import tigase.xmpp.NoConnectionIdException;
@@ -45,153 +45,246 @@ import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPStopListenerIfc;
 
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+
 /**
  * MessageCarbons class implements XEP-0280 Message Carbons protocol extension.
- * 
+ *
  * @author andrzej
  */
-public class MessageCarbons 
+public class MessageCarbons
 				extends XMPPProcessor
-				implements XMPPProcessorIfc, XMPPStopListenerIfc, XMPPPacketFilterIfc
-				{    
+				implements XMPPProcessorIfc, XMPPStopListenerIfc, XMPPPacketFilterIfc {
+	private static final String[][] ELEMENTS    = {
+		{ "message" }, { "iq", "enable" }, { "iq", "disable" }
+	};
+	private static final String     ID          = "message-carbons";
+	private static final String     XMLNS       = "urn:xmpp:carbons:2";
+	private static final String[]   XMLNSS = { XMPPProcessor.CLIENT_XMLNS, XMLNS, XMLNS };
+	private static final String     ENABLED_KEY = XMLNS + "-enabled";
+	private static final Element[]  DISCO_FEATURES = { new Element("feature",
+			new String[] { "var" }, new String[] { XMLNS }) };
 
-	private static final String ID = "message-carbons";
-	
-	private static final String XMLNS = "urn:xmpp:carbons:2";
-	
-	private static final String[][] ELEMENTS = { { "message" }, { "iq", "enable" }, { "iq", "disable" } };
-	private static final String[] XMLNSS = { XMPPProcessor.CLIENT_XMLNS, XMLNS, XMLNS };
- 	
-	private static final Element[] DISCO_FEATURES = { new Element("feature", new String[] { "var" }, new String[] { XMLNS }) };
-	
-	private static final String ENABLED_KEY = XMLNS+"-enabled";
-	
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method processes outgoing packets from SessionManager
+	 *
+	 * @param packet
+	 * @param session
+	 * @param repo
+	 * @param results
+	 */
+	@Override
+	public void filter(Packet packet, XMPPResourceConnection session,
+			NonAuthUserRepository repo, Queue<Packet> results) {
+		if ((session == null) ||!session.isAuthorized() || (results == null) || (results
+				.size() == 0) || (packet == null)) {
+			return;
+		}
+		if (packet.getElemName() != Message.ELEM_NAME) {
+			return;
+		}
+		for (Iterator<Packet> it = results.iterator(); it.hasNext(); ) {
+			Packet res = it.next();
+
+			if (res.getElemName() != Message.ELEM_NAME) {
+				continue;
+			}
+
+			// if it is error during delivering forked message then drop it
+			if (isErrorDeliveringForkedMessage(packet, session)) {
+				it.remove();
+			}
+
+			Element messageEl = res.getElement();
+			Element privateEl = messageEl.getChild("private", XMLNS);
+
+			if (privateEl != null) {
+
+				// TODO: is it enought to just remove this element?
+				messageEl.removeChild(privateEl);
+			}
+		}
+	}
+
 	/**
 	 * Returns plugins unique identifier
-	 * 
-	 * @return 
+	 *
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String id() {
 		return ID;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param session
+	 * @param repo
+	 * @param results
+	 * @param settings
+	 *
+	 * @throws XMPPException
+	 */
 	@Override
-	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) throws XMPPException {
+	public void process(Packet packet, XMPPResourceConnection session,
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
+					throws XMPPException {
 		if (packet.getElemName() == "iq") {
-
-			boolean enable = packet.getElement().getChild("enable", XMLNS) != null;
+			boolean enable  = packet.getElement().getChild("enable", XMLNS) != null;
 			boolean disable = packet.getElement().getChild("disable", XMLNS) != null;
-			
+
 			// we can only enable or disable but we cannot do both
-			if ((enable && disable) || (!enable && !disable)) {
+			if ((enable && disable) || (!enable &&!disable)) {
 				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, null, false));
-			}
-			else {
+			} else {
 				setEnabled(session, enable);
-				
+
 				// send result of operation
 				results.offer(packet.okResult((Element) null, 0));
 			}
-		}
-		else if (packet.getElemName() == "message" && packet.getType() == StanzaType.chat 
-				&& packet.getStanzaTo() != null) {
-						
+		} else if ((packet.getElemName() == "message") && (packet.getType() == StanzaType
+				.chat) && (packet.getStanzaTo() != null)) {
 			Set<JID> enabledJids = (Set<JID>) session.getCommonSessionData(ENABLED_KEY);
-			if (enabledJids == null || enabledJids.isEmpty()) {
+
+			if ((enabledJids == null) || enabledJids.isEmpty()) {
+
 				// no session has enabled message carbons
 				return;
 			}
-			
+
 			// if this is error delivering forked message we should not fork it
 			// but we need to fork only messsages with type chat so no need to check it
-			//if (isErrorDeliveringForkedMessage(packet, session))
-			//	return;
-			
-			if (session.isUserId(packet.getStanzaTo().getBareJID()) && packet.getStanzaTo().getResource() == null) {
-				// message is cloned to all resources by Message.java, it violates RFC6121 
+			// if (isErrorDeliveringForkedMessage(packet, session))
+			// return;
+			if (session.isUserId(packet.getStanzaTo().getBareJID()) && (packet.getStanzaTo()
+					.getResource() == null)) {
+
+				// message is cloned to all resources by Message.java, it violates RFC6121
 				// while it should be copied only to resources with non negative priority!!
 				// until it is not solved there is no need to fork messages
-				
-/*				// we need to fork this message
-				JID sessionJid = session.getJID();	
-				
-				for (JID jid : enabledJids) {
-					// do not fork if message would be sent to this connection by default
-					if (sessionJid.equals(jid))
-						continue;
-					
-					
-					Packet msgClone = Packet.packetInstance(packet.getElement().clone(), packet.getStanzaFrom(), jid);//packet.copyElementOnly();
-					msgClone.setPacketFrom(packet.getPacketTo());
-					
-					try {						
-						msgClone.setPacketTo(session.getConnectionId(jid));
-						
-						results.offer(msgClone);
-					}
-					catch (NoConnectionIdException ex) {
-						// no connection for this resource, so this jid needs to
-						// be removed from list of enabled resources
-						enabledJids.remove(jid);
-					}
-				}*/
-			}
-			else if (packet.getType() == StanzaType.chat) {
+
+/*        // we need to fork this message
+        JID sessionJid = session.getJID();
+
+        for (JID jid : enabledJids) {
+          // do not fork if message would be sent to this connection by default
+          if (sessionJid.equals(jid))
+            continue;
+
+
+          Packet msgClone = Packet.packetInstance(packet.getElement().clone(), packet.getStanzaFrom(), jid);//packet.copyElementOnly();
+          msgClone.setPacketFrom(packet.getPacketTo());
+
+          try {
+            msgClone.setPacketTo(session.getConnectionId(jid));
+
+            results.offer(msgClone);
+          }
+          catch (NoConnectionIdException ex) {
+            // no connection for this resource, so this jid needs to
+            // be removed from list of enabled resources
+            enabledJids.remove(jid);
+          }
+        }*/
+			} else if (packet.getType() == StanzaType.chat) {
+
 				// if this is error delivering forked message we should not fork it
 				// but we need to fork only messsages with type chat so no need to check it
-				//if (isErrorDeliveringForkedMessage(packet, session))
-				//	return;
-				
+				// if (isErrorDeliveringForkedMessage(packet, session))
+				// return;
 				// if this is private message then do not send carbon copy
 				Element privateEl = packet.getElement().getChild("private", XMLNS);
-				
+
 				if (privateEl != null) {
+
 					// TODO: is it enought to just remove this element?
 					packet.getElement().removeChild(privateEl);
+
 					return;
 				}
-			
-				String type = session.isUserId(packet.getStanzaTo().getBareJID()) ? "received" : "sent";
-				JID srcJid = JID.jidInstance(session.getBareJID());
-				
+
+				String type   = session.isUserId(packet.getStanzaTo().getBareJID())
+						? "received"
+						: "sent";
+				JID    srcJid = JID.jidInstance(session.getBareJID());
+
 				for (JID jid : enabledJids) {
-					
+
 					// do not send carbon copy to session to which it is addressed
 					// or from which it is sent
-					if (session.getJID().equals(jid))
+					if (session.getJID().equals(jid)) {
 						continue;
-					
-					// prepare carbon copy of message					
-					try {						
-						Packet msgClone = prepareCarbonCopy(packet, session, srcJid, jid, type);
-						results.offer(msgClone);
 					}
-					catch (NoConnectionIdException ex) {
+
+					// prepare carbon copy of message
+					try {
+						Packet msgClone = prepareCarbonCopy(packet, session, srcJid, jid, type);
+
+						results.offer(msgClone);
+					} catch (NoConnectionIdException ex) {
+
 						// no connection for this resource, so this jid needs to
 						// be removed from list of enabled resources
 						enabledJids.remove(jid);
 					}
 				}
+			}
+		}
+	}
+
+	/**
+	 * If session is stopped then disable carbon copy for this session
+	 *
+	 * @param session
+	 * @param results
+	 * @param settings
+	 */
+	@Override
+	public void stopped(XMPPResourceConnection session, Queue<Packet> results, Map<String,
+			Object> settings) {
+		if (session.isAuthorized()) {
+			try {
+				setEnabled(session, false);
+			} catch (NotAuthorizedException ex) {
+
+				// ingoring exception, should not happen
 			}
 		}
 	}
 
 	/**
 	 * Return array of element containing supported disco features
-	 * 
+	 *
 	 * @param session
-	 * @return 
+	 *
+	 *
+	 * @return a value of Element[]
 	 */
 	@Override
 	public Element[] supDiscoFeatures(XMPPResourceConnection session) {
 		return DISCO_FEATURES;
 	}
-	
+
 	/**
 	 * Returns array of split path of supported elements
-	 * 
-	 * @return 
+	 *
+	 *
+	 *
+	 * @return a value of String[][]
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -200,180 +293,133 @@ public class MessageCarbons
 
 	/**
 	 * Returns array of supported namespaces
-	 * 
-	 * @return 
+	 *
+	 *
+	 *
+	 * @return a value of String[]
 	 */
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
 	}
-	
+
 	/**
 	 * Prepare packet which is carbon copy of message passed as argument
-	 * 
+	 *
 	 * @param packet
 	 * @param session
 	 * @param srcJid
 	 * @param jid
 	 * @param type
-	 * @return
-	 * @throws NoConnectionIdException 
+	 *
+	 * @throws NoConnectionIdException
 	 */
-	private Packet prepareCarbonCopy(Packet packet, XMPPResourceConnection session, 
-			JID srcJid, JID jid, String type) throws NoConnectionIdException {
-		Packet msgClone = Message.getMessage(srcJid, jid, packet.getType(), null, 
-				null, null, packet.getStanzaId());
-		
+	private Packet prepareCarbonCopy(Packet packet, XMPPResourceConnection session,
+			JID srcJid, JID jid, String type)
+					throws NoConnectionIdException {
+		Packet msgClone = Message.getMessage(srcJid, jid, packet.getType(), null, null, null,
+				packet.getStanzaId());
+
 		msgClone.setPacketTo(session.getConnectionId(jid));
 
 		Element received = new Element(type);
+
 		received.setXMLNS(XMLNS);
 		msgClone.getElement().addChild(received);
 
 		Element forwarded = new Element("forwarded");
+
 		forwarded.setXMLNS("urn:xmpp:forward:0");
 		received.addChild(forwarded);
-
 		forwarded.addChild(packet.getElement().clone());
-		
+
 		return msgClone;
-		
 	}
-	
-	/**
-	 * Add/Remove session JID to set of JIDs with enabled carbon copy protocol
-	 * 
-	 * @param session
-	 * @param value
-	 * @throws NotAuthorizedException 
-	 */
-	private void setEnabled(XMPPResourceConnection session, boolean value) throws NotAuthorizedException {
-		synchronized(session.getParentSession()) {
-			Set<JID> enabledJids = (Set<JID>) session.getCommonSessionData(ENABLED_KEY);
-			if (enabledJids == null && value) {
-				enabledJids = new CopyOnWriteArraySet<JID>();
-				session.putCommonSessionData(ENABLED_KEY, enabledJids);
-			}			
-			
-			if (value) {
-				enabledJids.add(session.getJID());
-			}
-			else if (enabledJids != null) {
-				enabledJids.remove(session.getJID());
-			}
-		}
-	}
-	
+
+	//~--- get methods ----------------------------------------------------------
+
 	/**
 	 * Returns true if session is enabled for receiving carbon copy messages
-	 * 
+	 *
 	 * @param session
-	 * @return
-	 * @throws NotAuthorizedException 
+	 *
+	 * @throws NotAuthorizedException
 	 */
-	private boolean isEnabled(XMPPResourceConnection session) throws NotAuthorizedException {
+	private boolean isEnabled(XMPPResourceConnection session)
+					throws NotAuthorizedException {
 		Set<JID> enabledJids = (Set<JID>) session.getCommonSessionData(ENABLED_KEY);
 
-		return enabledJids != null && enabledJids.contains(session.getJID());
+		return (enabledJids != null) && enabledJids.contains(session.getJID());
 	}
 
 	/**
-	 * If session is stopped then disable carbon copy for this session
-	 * 
-	 * @param session
-	 * @param results
-	 * @param settings 
-	 */
-	@Override
-	public void stopped(XMPPResourceConnection session, Queue<Packet> results, Map<String, Object> settings) {
-		if (session.isAuthorized()) {
-			try {
-				setEnabled(session, false);
-			}
-			catch (NotAuthorizedException ex) {
-				// ingoring exception, should not happen
-			}
-		}
-	}
-
-	/**
-	 * Method processes outgoing packets from SessionManager
-	 * 
+	 * Method returns true if
+	 *
 	 * @param packet
 	 * @param session
-	 * @param repo
-	 * @param results 
+	 *
 	 */
-	@Override
-	public void filter(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results) {
-		if ((session == null) ||!session.isAuthorized() || (results == null) || (results
-				.size() == 0) || packet == null) {
-			return;
-		}
-		
-		if (packet.getElemName() != Message.ELEM_NAME)
-			return;
-		
-		for (Iterator<Packet> it = results.iterator(); it.hasNext(); ) {
-			Packet res = it.next();
-			
-			if (res.getElemName() != Message.ELEM_NAME)
-				continue;
-			
-			// if it is error during delivering forked message then drop it
-			if (isErrorDeliveringForkedMessage(packet, session)) {
-				it.remove();
-			}
-			
-			Element messageEl = res.getElement();			
-			
-			Element privateEl = messageEl.getChild("private", XMLNS);
-
-			if (privateEl != null) {
-				// TODO: is it enought to just remove this element?
-				messageEl.removeChild(privateEl);
-			}
-		}		
-	}
-	
-	/**
-	 * Method returns true if 
-	 * 
-	 * @param packet
-	 * @param session
-	 * @return 
-	 */
-	private boolean isErrorDeliveringForkedMessage(Packet packet, XMPPResourceConnection session) {
-
-		if (!session.isAuthorized() || packet.getStanzaTo() == null)
+	private boolean isErrorDeliveringForkedMessage(Packet packet,
+			XMPPResourceConnection session) {
+		if (!session.isAuthorized() || (packet.getStanzaTo() == null)) {
 			return false;
-			
-		
+		}
 		try {
-			// check if it is error from delivering forked message
-			if (packet.getType() == StanzaType.error && packet.getStanzaTo().getResource() == null
-					&& session.isUserId(packet.getStanzaTo().getBareJID())) {
 
+			// check if it is error from delivering forked message
+			if ((packet.getType() == StanzaType.error) && (packet.getStanzaTo()
+					.getResource() == null) && session.isUserId(packet.getStanzaTo()
+					.getBareJID())) {
 				Element messageEl = packet.getElement();
 
 				// it will be error if it contains sent element
 				Element sentEl = messageEl.getChild("sent", XMLNS);
+
 				if (sentEl != null) {
 					return true;
 				}
 
 				// it will also be error if it contains received element
 				Element receivedEl = messageEl.getChild("received", XMLNS);
+
 				if (receivedEl != null) {
 					return true;
 				}
 			}
-		}
-		catch (NotAuthorizedException ex) {
+		} catch (NotAuthorizedException ex) {
+
 			// should not happens
 		}
-			
+
 		return false;
 	}
-	
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Add/Remove session JID to set of JIDs with enabled carbon copy protocol
+	 *
+	 * @param session
+	 * @param value
+	 * @throws NotAuthorizedException
+	 */
+	private void setEnabled(XMPPResourceConnection session, boolean value)
+					throws NotAuthorizedException {
+		synchronized (session.getParentSession()) {
+			Set<JID> enabledJids = (Set<JID>) session.getCommonSessionData(ENABLED_KEY);
+
+			if ((enabledJids == null) && value) {
+				enabledJids = new CopyOnWriteArraySet<JID>();
+				session.putCommonSessionData(ENABLED_KEY, enabledJids);
+			}
+			if (value) {
+				enabledJids.add(session.getJID());
+			} else if (enabledJids != null) {
+				enabledJids.remove(session.getJID());
+			}
+		}
+	}
 }
+
+
+//~ Formatted in Tigase Code Convention on 13/08/28

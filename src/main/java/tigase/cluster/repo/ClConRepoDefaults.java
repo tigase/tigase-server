@@ -46,27 +46,21 @@ public abstract class ClConRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>BareJID</code>
 	 */
-	static String[] getDefaultPropetyItems() {
-		return new String[] { DNSResolver.getDefaultHostname() };
+	public static BareJID getRepoUser() {
+		return clcon_user;
 	}
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
-	 */
-	static String getPropertyKey() {
-		return "--cluster-nodes";
-	}
-
-	/**
-	 * Method description
 	 *
 	 *
-	 * @return
+	 * @return a value of <code>String</code>
 	 */
 	static String getConfigKey() {
 		return "cluster-nodes";
@@ -76,7 +70,21 @@ public abstract class ClConRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
+	 */
+	static String[] getDefaultPropetyItems() {
+		return new String[] { DNSResolver.getDefaultHostname() };
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>ClusterRepoItem</code>
 	 */
 	static ClusterRepoItem getItemInstance() {
 		return new ClusterRepoItem();
@@ -86,12 +94,14 @@ public abstract class ClConRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
-	public static BareJID getRepoUser() {
-		return clcon_user;
+	static String getPropertyKey() {
+		return "--cluster-nodes";
 	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/09
+//~ Formatted in Tigase Code Convention on 13/08/29

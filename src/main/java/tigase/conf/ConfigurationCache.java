@@ -75,37 +75,13 @@ public class ConfigurationCache
 	 * we access configuration for a particular server component.
 	 */
 	private Map<String, Set<ConfigItem>> config = new LinkedHashMap<String,
-																									Set<ConfigItem>>();
-	private String configDumpFileName                              =
-		CONFIG_DUMP_FILE_PROP_DEF;
-	private String hostname                                        = null;
+			Set<ConfigItem>>();
+	private String                                  configDumpFileName =
+			CONFIG_DUMP_FILE_PROP_DEF;
+	private String                                  hostname       = null;
 	private RepositoryChangeListenerIfc<ConfigItem> repoChangeList = null;
 
 	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param repoChangeListener
-	 */
-	@Override
-	public void addRepoChangeListener(
-					RepositoryChangeListenerIfc<ConfigItem> repoChangeListener) {
-		this.repoChangeList = repoChangeListener;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param repoChangeListener
-	 */
-	@Override
-	public void removeRepoChangeListener(
-					RepositoryChangeListenerIfc<ConfigItem> repoChangeListener) {
-		this.repoChangeList = null;
-	}
 
 	/**
 	 * Method description
@@ -162,7 +138,7 @@ public class ConfigurationCache
 
 		if (idx1 > 0) {
 			String compName = key.substring(0, idx1);
-			int idx2        = key.lastIndexOf("/");
+			int    idx2     = key.lastIndexOf("/");
 			String nodeName = null;
 			String keyName  = key.substring(idx2 + 1);
 
@@ -176,7 +152,7 @@ public class ConfigurationCache
 			addItem(compName, item);
 		} else {
 			throw new IllegalArgumentException("You have to provide a key with at least" +
-																				 " 'component_name/key_name': " + key);
+					" 'component_name/key_name': " + key);
 		}
 	}
 
@@ -184,8 +160,22 @@ public class ConfigurationCache
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * @param repoChangeListener
+	 */
+	@Override
+	public void addRepoChangeListener(
+			RepositoryChangeListenerIfc<ConfigItem> repoChangeListener) {
+		this.repoChangeList = repoChangeListener;
+	}
+
+	/**
+	 * Method description
 	 *
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>Collection<ConfigItem></code>
 	 * @throws TigaseDBException
 	 */
 	@Override
@@ -205,220 +195,14 @@ public class ConfigurationCache
 	 *
 	 * @param key
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean contains(String key) {
 		return getItem(key) != null;
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param compName
-	 * @param node
-	 * @param key
-	 * @param def
-	 *
-	 * @return
-	 */
-	@Override
-	public Object get(String compName, String node, String key, Object def) {
-		ConfigItem item = getItem(compName, node, key);
-
-		if (item != null) {
-			return item.getConfigVal();
-		}
-
-		return def;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String[] getCompNames() {
-		return config.keySet().toArray(new String[config.size()]);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public String getDefHostname() {
-		return this.hostname;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param defs
-	 * @param params
-	 */
-	@Override
-	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
-		defs.put(CONFIG_DUMP_FILE_PROP_KEY, CONFIG_DUMP_FILE_PROP_DEF);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public Map<String, Object> getInitProperties() {
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param compName
-	 * @param node
-	 * @param key
-	 *
-	 * @return
-	 */
-	public ConfigItem getItem(String compName, String node, String key) {
-		Set<ConfigItem> confItems = getItemsForComponent(compName);
-
-		if (confItems != null) {
-			for (ConfigItem item : confItems) {
-				if (item.isNodeKey(node, key)) {
-					return item;
-				}
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param key
-	 *
-	 * @return
-	 */
-	@Override
-	public ConfigItem getItem(String key) {
-		int idx1 = key.indexOf("/");
-
-		if (idx1 > 0) {
-			String compName = key.substring(0, idx1);
-			int idx2        = key.lastIndexOf("/");
-			String nodeName = null;
-			String keyName  = key.substring(idx2 + 1);
-
-			if (idx1 != idx2) {
-				nodeName = key.substring(idx1 + 1, idx2);
-			}
-
-			return getItem(compName, nodeName, keyName);
-		} else {
-			throw new IllegalArgumentException("You have to provide a key with at least" +
-																				 " 'component_name/key_name': " + key);
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public ConfigItem getItemInstance() {
-		return new ConfigItem();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param compName
-	 *
-	 * @return
-	 */
-	@Override
-	public Set<ConfigItem> getItemsForComponent(String compName) {
-		return config.get(compName);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param compName
-	 * @param node
-	 *
-	 * @return
-	 */
-	@Override
-	public String[] getKeys(String compName, String node) {
-		Set<String> keysForNode   = new LinkedHashSet<String>();
-		Set<ConfigItem> confItems = config.get(compName);
-
-		for (ConfigItem item : confItems) {
-			if (item.isNode(node)) {
-				keysForNode.add(item.getKeyName());
-			}
-		}
-		if (keysForNode.size() > 0) {
-			return keysForNode.toArray(new String[keysForNode.size()]);
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param compName
-	 *
-	 * @return
-	 *
-	 * @throws ConfigurationException
-	 */
-	@Override
-	public Map<String, Object> getProperties(String compName)
-					throws ConfigurationException {
-
-		// It must not return a null value, even if configuration for the
-		// component does not exist yet, it has to initialized to create new one.
-		Map<String, Object> result = new LinkedHashMap<String, Object>();
-
-		// Let's convert the internal representation of the configuration to that
-		// used by the components.
-		Set<ConfigItem> confItems = getItemsForComponent(compName);
-
-		if (confItems != null) {
-			for (ConfigItem item : confItems) {
-				String key   = item.getConfigKey();
-				Object value = item.getConfigVal();
-
-				result.put(key, value);
-			}
-		}
-
-		// Hopefuly this doesn't happen.... or I have a bug somewhere
-		return result;
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -435,7 +219,9 @@ public class ConfigurationCache
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Iterator<ConfigItem></code>
 	 */
 	@Override
 	public Iterator<ConfigItem> iterator() {
@@ -443,8 +229,8 @@ public class ConfigurationCache
 			Collection<ConfigItem> items = allItems();
 
 			return (items != null)
-						 ? items.iterator()
-						 : null;
+					? items.iterator()
+					: null;
 		} catch (TigaseDBException ex) {
 			log.log(Level.WARNING, "Problem accessing repository: ", ex);
 
@@ -536,57 +322,25 @@ public class ConfigurationCache
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param compName
-	 * @param node
-	 * @param key
-	 * @param value
+	 * @param repoChangeListener
 	 */
 	@Override
-	public void set(String compName, String node, String key, Object value) {
-		ConfigItem item = getItem(compName, node, key);
-
-		if (item == null) {
-			item = getItemInstance();
-		}
-		item.set(getDefHostname(), compName, node, key, value);
-		addItem(compName, item);
+	public void removeRepoChangeListener(
+			RepositoryChangeListenerIfc<ConfigItem> repoChangeListener) {
+		this.repoChangeList = null;
 	}
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param hostname
-	 */
-	@Override
-	public void setDefHostname(String hostname) {
-		this.hostname = hostname;
-	}
-
-	/**
-	 * Method description
 	 *
 	 *
-	 * @param properties
-	 */
-	@Override
-	public void setProperties(Map<String, Object> properties) {
-		configDumpFileName = (String) properties.get(CONFIG_DUMP_FILE_PROP_KEY);
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int size() {
@@ -624,19 +378,9 @@ public class ConfigurationCache
 			}
 		} else {
 			log.log(Level.WARNING, "Dumping server configuration is OFF: {0}",
-							configDumpFileName);
+					configDumpFileName);
 		}
 	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	private boolean isOff(String str) {
-		return (str == null) || str.trim().isEmpty() || str.equalsIgnoreCase("off") ||
-					 str.equalsIgnoreCase("none") || str.equalsIgnoreCase("false") ||
-					 str.equalsIgnoreCase("no");
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -644,14 +388,262 @@ public class ConfigurationCache
 	 *
 	 * @param item
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String validateItem(ConfigItem item) {
 		return null;
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param compName
+	 * @param node
+	 * @param key
+	 * @param def
+	 *
+	 *
+	 *
+	 * @return a value of <code>Object</code>
+	 */
+	@Override
+	public Object get(String compName, String node, String key, Object def) {
+		ConfigItem item = getItem(compName, node, key);
+
+		if (item != null) {
+			return item.getConfigVal();
+		}
+
+		return def;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
+	 */
+	@Override
+	public String[] getCompNames() {
+		return config.keySet().toArray(new String[config.size()]);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param defs
+	 * @param params
+	 */
+	@Override
+	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
+		defs.put(CONFIG_DUMP_FILE_PROP_KEY, CONFIG_DUMP_FILE_PROP_DEF);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	public String getDefHostname() {
+		return this.hostname;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
+	 */
+	@Override
+	public Map<String, Object> getInitProperties() {
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param compName
+	 * @param node
+	 * @param key
+	 *
+	 *
+	 *
+	 * @return a value of <code>ConfigItem</code>
+	 */
+	public ConfigItem getItem(String compName, String node, String key) {
+		Set<ConfigItem> confItems = getItemsForComponent(compName);
+
+		if (confItems != null) {
+			for (ConfigItem item : confItems) {
+				if (item.isNodeKey(node, key)) {
+					return item;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param key
+	 *
+	 *
+	 *
+	 * @return a value of <code>ConfigItem</code>
+	 */
+	@Override
+	public ConfigItem getItem(String key) {
+		int idx1 = key.indexOf("/");
+
+		if (idx1 > 0) {
+			String compName = key.substring(0, idx1);
+			int    idx2     = key.lastIndexOf("/");
+			String nodeName = null;
+			String keyName  = key.substring(idx2 + 1);
+
+			if (idx1 != idx2) {
+				nodeName = key.substring(idx1 + 1, idx2);
+			}
+
+			return getItem(compName, nodeName, keyName);
+		} else {
+			throw new IllegalArgumentException("You have to provide a key with at least" +
+					" 'component_name/key_name': " + key);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>ConfigItem</code>
+	 */
+	@Override
+	public ConfigItem getItemInstance() {
+		return new ConfigItem();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param compName
+	 *
+	 *
+	 *
+	 * @return a value of <code>Set<ConfigItem></code>
+	 */
+	@Override
+	public Set<ConfigItem> getItemsForComponent(String compName) {
+		return config.get(compName);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param compName
+	 * @param node
+	 *
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
+	 */
+	@Override
+	public String[] getKeys(String compName, String node) {
+		Set<String>     keysForNode = new LinkedHashSet<String>();
+		Set<ConfigItem> confItems   = config.get(compName);
+
+		for (ConfigItem item : confItems) {
+			if (item.isNode(node)) {
+				keysForNode.add(item.getKeyName());
+			}
+		}
+		if (keysForNode.size() > 0) {
+			return keysForNode.toArray(new String[keysForNode.size()]);
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param compName
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
+	 * @throws ConfigurationException
+	 */
+	@Override
+	public Map<String, Object> getProperties(String compName)
+					throws ConfigurationException {
+
+		// It must not return a null value, even if configuration for the
+		// component does not exist yet, it has to initialized to create new one.
+		Map<String, Object> result = new LinkedHashMap<String, Object>();
+
+		// Let's convert the internal representation of the configuration to that
+		// used by the components.
+		Set<ConfigItem> confItems = getItemsForComponent(compName);
+
+		if (confItems != null) {
+			for (ConfigItem item : confItems) {
+				String key   = item.getConfigKey();
+				Object value = item.getConfigVal();
+
+				result.put(key, value);
+			}
+		}
+
+		// Hopefuly this doesn't happen.... or I have a bug somewhere
+		return result;
+	}
+
 	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param compName
+	 * @param node
+	 * @param key
+	 * @param value
+	 */
+	@Override
+	public void set(String compName, String node, String key, Object value) {
+		ConfigItem item = getItem(compName, node, key);
+
+		if (item == null) {
+			item = getItemInstance();
+		}
+		item.set(getDefHostname(), compName, node, key, value);
+		addItem(compName, item);
+	}
 
 	/**
 	 * Method description
@@ -661,7 +653,37 @@ public class ConfigurationCache
 	 */
 	@Override
 	public void setAutoloadTimer(long delay) {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param hostname
+	 */
+	@Override
+	public void setDefHostname(String hostname) {
+		this.hostname = hostname;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param properties
+	 */
+	@Override
+	public void setProperties(Map<String, Object> properties) {
+		configDumpFileName = (String) properties.get(CONFIG_DUMP_FILE_PROP_KEY);
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	private boolean isOff(String str) {
+		return (str == null) || str.trim().isEmpty() || str.equalsIgnoreCase("off") || str
+				.equalsIgnoreCase("none") || str.equalsIgnoreCase("false") || str
+				.equalsIgnoreCase("no");
+	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/09
+//~ Formatted in Tigase Code Convention on 13/08/29

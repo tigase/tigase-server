@@ -1,10 +1,13 @@
 /*
- *   Tigase Jabber/XMPP Server
- *  Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * TimeUtils.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,18 +18,15 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.util;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.Calendar;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * This is too slow.
@@ -38,12 +38,13 @@ import java.util.Calendar;
  * @version $Rev$
  */
 public abstract class TimeUtils {
-
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of int
 	 */
 	public static int getHourNow() {
 		Calendar cal = Calendar.getInstance();
@@ -55,7 +56,9 @@ public abstract class TimeUtils {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of int
 	 */
 	public static int getMinuteNow() {
 		Calendar cal = Calendar.getInstance();
@@ -65,7 +68,4 @@ public abstract class TimeUtils {
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/28

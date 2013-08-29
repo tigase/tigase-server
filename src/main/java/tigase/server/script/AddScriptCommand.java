@@ -1,10 +1,13 @@
 /*
+ * AddScriptCommand.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.server.script;
 
@@ -39,17 +41,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Map;
+import java.util.Queue;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Jan 2, 2009 2:29:48 PM
@@ -57,7 +57,8 @@ import javax.script.ScriptException;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class AddScriptCommand extends AbstractScriptCommand {
+public class AddScriptCommand
+				extends AbstractScriptCommand {
 	private static final Logger log = Logger.getLogger(AddScriptCommand.class.getName());
 
 	//~--- methods --------------------------------------------------------------
@@ -73,24 +74,27 @@ public class AddScriptCommand extends AbstractScriptCommand {
 	 * @param ext
 	 * @param binds
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of <code>Script</code>
 	 * @throws ScriptException
 	 */
 	@SuppressWarnings({ "unchecked" })
 	public Script addAdminScript(String cmdId, String cmdDescr, String script, String lang,
 			String ext, Bindings binds)
-			throws ScriptException {
+					throws ScriptException {
 		Script as = new Script();
 
 		as.init(cmdId, cmdDescr, script, lang, ext, binds);
 
-		Map<String, CommandIfc> adminCommands = (Map<String, CommandIfc>) binds.get(ADMN_CMDS);
+		Map<String, CommandIfc> adminCommands = (Map<String, CommandIfc>) binds.get(
+				ADMN_CMDS);
 
 		adminCommands.put(as.getCommandId(), as);
 
-		Map<String, EnumSet<CmdAcl>> commandsACL = (Map<String,
-			EnumSet<CmdAcl>>) binds.get(COMMANDS_ACL);
+		Map<String, EnumSet<CmdAcl>> commandsACL = (Map<String, EnumSet<CmdAcl>>) binds.get(
+				COMMANDS_ACL);
 		EnumSet<CmdAcl> acl = commandsACL.get(as.getCommandId());
 
 		if (acl != null) {
@@ -115,21 +119,6 @@ public class AddScriptCommand extends AbstractScriptCommand {
 		return as;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public Bindings getBindings() {
-		return null;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -141,13 +130,14 @@ public class AddScriptCommand extends AbstractScriptCommand {
 	@Override
 	@SuppressWarnings({ "unchecked" })
 	public void runCommand(Iq packet, Bindings binds, Queue<Packet> results) {
-		String language = Command.getFieldValue(packet, LANGUAGE);
-		String commandId = Command.getFieldValue(packet, COMMAND_ID);
-		String description = Command.getFieldValue(packet, DESCRIPT);
-		String[] scriptText = Command.getFieldValues(packet, SCRIPT_TEXT);
-		boolean saveToDisk = Command.getCheckBoxFieldValue(packet, SAVE_TO_DISK);
+		String   language    = Command.getFieldValue(packet, LANGUAGE);
+		String   commandId   = Command.getFieldValue(packet, COMMAND_ID);
+		String   description = Command.getFieldValue(packet, DESCRIPT);
+		String[] scriptText  = Command.getFieldValues(packet, SCRIPT_TEXT);
+		boolean  saveToDisk  = Command.getCheckBoxFieldValue(packet, SAVE_TO_DISK);
 
-		if (isEmpty(language) || isEmpty(commandId) || isEmpty(description) || (scriptText == null)) {
+		if (isEmpty(language) || isEmpty(commandId) || isEmpty(description) || (scriptText ==
+				null)) {
 			results.offer(prepareScriptCommand(packet, binds));
 		} else {
 			StringBuilder sb = new StringBuilder(1024);
@@ -157,14 +147,13 @@ public class AddScriptCommand extends AbstractScriptCommand {
 					sb.append(string).append("\n");
 				}
 			}
-
 			try {
-				Script s = addAdminScript(commandId, description, sb.toString(), language, null, binds);
+				Script s = addAdminScript(commandId, description, sb.toString(), language, null,
+						binds);
 				Packet result = packet.commandResult(Command.DataType.result);
 
 				Command.addTextField(result, "Note", "Script loaded successfuly.");
 				results.offer(result);
-
 				if (saveToDisk) {
 					saveCommandToDisk(commandId, description, sb, s.getFileExtension(), binds);
 				}
@@ -175,16 +164,14 @@ public class AddScriptCommand extends AbstractScriptCommand {
 
 				Command.addTextField(result, "Note", "Script initialization error.");
 
-				StackTraceElement[] ste = e.getStackTrace();
-				String[] error = new String[ste.length + 2];
+				StackTraceElement[] ste   = e.getStackTrace();
+				String[]            error = new String[ste.length + 2];
 
 				error[0] = e.getMessage();
 				error[1] = e.toString();
-
 				for (int i = 0; i < ste.length; i++) {
 					error[i + 2] = ste[i].toString();
 				}
-
 				Command.addTextField(result, "Error message", e.getMessage());
 				Command.addFieldMultiValue(result, "Debug info", Arrays.asList(error));
 				results.offer(result);
@@ -192,35 +179,49 @@ public class AddScriptCommand extends AbstractScriptCommand {
 		}
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>Bindings</code>
+	 */
+	@Override
+	public Bindings getBindings() {
+		return null;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
 	private Packet prepareScriptCommand(Iq packet, Bindings binds) {
 		Packet result = packet.commandResult(Command.DataType.form);
 
 		Command.addFieldValue(result, DESCRIPT, "Short description");
 		Command.addFieldValue(result, COMMAND_ID, "new-command");
 
-		ScriptEngineManager scriptEngineManager = (ScriptEngineManager) binds.get(SCRI_MANA);
+		ScriptEngineManager       scriptEngineManager = (ScriptEngineManager) binds.get(
+				SCRI_MANA);
 		List<ScriptEngineFactory> scriptFactories = scriptEngineManager.getEngineFactories();
 
 		if (scriptFactories != null) {
 			String[] langs = new String[scriptFactories.size()];
-			int idx = 0;
-			String def = null;
+			int      idx   = 0;
+			String   def   = null;
 
 			for (ScriptEngineFactory scriptEngineFactory : scriptFactories) {
 				langs[idx++] = scriptEngineFactory.getLanguageName();
-
 				if (scriptEngineFactory.getLanguageName().equals("groovy")) {
 					def = "groovy";
 				}
 			}
-
 			if (def == null) {
 				def = langs[0];
 			}
-
 			Command.addFieldValue(result, LANGUAGE, def, LANGUAGE, langs, langs);
 		}
-
 		Command.addFieldMultiValue(result, SCRIPT_TEXT, Collections.nCopies(1, ""));
 		Command.addCheckBoxField(result, SAVE_TO_DISK, true);
 
@@ -229,19 +230,19 @@ public class AddScriptCommand extends AbstractScriptCommand {
 
 	private void saveCommandToDisk(String commandId, String description, StringBuilder sb,
 			String fileExtension, Bindings binds)
-			throws IOException {
-		File fileName = new File((String) binds.get(SCRIPT_COMP_DIR), commandId + "." + fileExtension);
+					throws IOException {
+		File fileName = new File((String) binds.get(SCRIPT_COMP_DIR), commandId + "." +
+				fileExtension);
 
 		log.log(Level.INFO, "Saving command: {0} to disk file: {1}", new Object[] { commandId,
 				fileName.toString() });
 
-		FileWriter fw = new FileWriter(fileName, false);
-		String comment = lineCommentStart.get(fileExtension);
+		FileWriter fw      = new FileWriter(fileName, false);
+		String     comment = lineCommentStart.get(fileExtension);
 
 		if (comment == null) {
 			comment = "//";
 		}
-
 		fw.write(comment + " " + SCRIPT_DESCRIPTION + " " + description + '\n');
 		fw.write(comment + " " + SCRIPT_ID + " " + commandId + '\n');
 		fw.write(comment + " " + SCRIPT_COMPONENT + " " + binds.get(COMPONENT_NAME) + '\n');
@@ -251,7 +252,4 @@ public class AddScriptCommand extends AbstractScriptCommand {
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/28

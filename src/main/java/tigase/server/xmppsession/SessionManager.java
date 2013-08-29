@@ -187,7 +187,9 @@ public class SessionManager
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	@Override
 	public boolean addOutPacket(Packet packet) {
@@ -210,8 +212,10 @@ public class SessionManager
 	 * @param plug_id
 	 * @param conc
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of XMPPImplIfc
 	 * @throws ClassNotFoundException
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
@@ -333,7 +337,9 @@ public class SessionManager
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	@Override
 	public boolean containsJid(BareJID jid) {
@@ -439,7 +445,9 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	@Override
 	public boolean handlesLocalDomains() {
@@ -465,7 +473,9 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of int
 	 */
 	@Override
 	public int processingInThreads() {
@@ -476,7 +486,9 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of int
 	 */
 	@Override
 	public int processingOutThreads() {
@@ -553,7 +565,9 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	public boolean skipPrivacy() {
 		return skipPrivacy;
@@ -562,30 +576,14 @@ public class SessionManager
 	//~--- get methods ----------------------------------------------------------
 
 	/**
-	 * Calculates number of Active Users, i.e. users which session wasn't idle longer than 5 minutes
-	 * @return number of Active Users
-	 */
-	private long getActiveUserNumber() {
-		int count = 0;
-		for ( BareJID bareJID : sessionsByNodeId.keySet() ) {
-			if ( !bareJID.toString().startsWith( "sess-man" ) ){
-				for ( XMPPResourceConnection xMPPResourceConnection : sessionsByNodeId.get( bareJID ).getActiveResources() ) {
-					if ( System.currentTimeMillis() - xMPPResourceConnection.getLastAccessed() < 5 * 60 * 1000 ){
-						count++;
-					}
-				}
-			}
-		}
-		return count;
-	}
-
-	/**
 	 * Method description
 	 *
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of JID[]
 	 */
 	@Override
 	public JID[] getConnectionIdsForJid(BareJID jid) {
@@ -606,7 +604,9 @@ public class SessionManager
 	 *
 	 * @param params
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Map<String,Object>
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -624,7 +624,9 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -635,7 +637,9 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	@Override
 	public String getDiscoDescription() {
@@ -648,7 +652,9 @@ public class SessionManager
 	 *
 	 * @param from
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of List<Element>
 	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
@@ -677,7 +683,9 @@ public class SessionManager
 	 * @param jid
 	 * @param from
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Element
 	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
@@ -721,7 +729,9 @@ public class SessionManager
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of XMPPResourceConnection
 	 */
 	public XMPPResourceConnection getResourceConnection(JID jid) {
 		XMPPSession session = getSession(jid.getBareJID());
@@ -813,7 +823,9 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	@Override
 	public boolean hasCompleteJidsInfo() {
@@ -827,7 +839,9 @@ public class SessionManager
 	 * @param domain
 	 * @param includeComponents
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	@Override
 	public boolean isLocalDomain(String domain, boolean includeComponents) {
@@ -1093,7 +1107,9 @@ public class SessionManager
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	protected boolean addTrusted(JID jid) {
 		return trusted.add(jid.getBareJID().toString());
@@ -1255,8 +1271,10 @@ public class SessionManager
 	 * @param conn_id
 	 * @param domain
 	 *
-	 * @return
 	 *
+	 *
+	 *
+	 * @return a value of XMPPResourceConnection
 	 * @throws TigaseStringprepException
 	 */
 	protected XMPPResourceConnection createUserSession(JID conn_id, String domain)
@@ -1306,7 +1324,9 @@ public class SessionManager
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	protected boolean delTrusted(JID jid) {
 		return trusted.remove(jid.getBareJID().toString());
@@ -1318,7 +1338,9 @@ public class SessionManager
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	protected boolean fastAddOutPacket(Packet packet) {
 		return addOutPacket(packet);
@@ -1334,7 +1356,9 @@ public class SessionManager
 	 * @param resource
 	 * @param xmpp_sessionId
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of XMPPResourceConnection
 	 */
 	@SuppressWarnings("deprecation")
 	protected XMPPResourceConnection loginUserSession(JID conn_id, String domain,
@@ -1372,7 +1396,9 @@ public class SessionManager
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	protected boolean processAdminsOrDomains(Packet packet) {
 		if ((packet.getStanzaFrom() == null) && (packet.getPacketFrom() != null)) {
@@ -1412,7 +1438,9 @@ public class SessionManager
 	 *
 	 * @param pc
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	protected boolean processCommand(Packet pc) {
 		if ((pc.getStanzaTo() == null) ||!(getComponentId().equals(pc.getStanzaTo()) ||
@@ -1668,38 +1696,44 @@ public class SessionManager
 
 			break;
 
-		case STREAM_MOVED:
+		case STREAM_MOVED :
 			if (connection != null) {
 				String oldConnectionJidStr = Command.getFieldValue(pc, "old-conn-jid");
-				JID oldConnJid = JID.jidInstanceNS(oldConnectionJidStr);
-				
+				JID    oldConnJid          = JID.jidInstanceNS(oldConnectionJidStr);
+
 				try {
+
 					// get old session and replace it's connection id to redirect packets
 					// to new connection
 					XMPPResourceConnection oldConn = connectionsByFrom.remove(oldConnJid);
+
 					oldConn.setConnectionId(connection.getConnectionId());
 					connectionsByFrom.remove(connection.getConnectionId());
 					connectionsByFrom.put(oldConn.getConnectionId(), oldConn);
 
-					// remove current connection from list of active connections as 
+					// remove current connection from list of active connections as
 					// this connection will be used with other already authenticated connection
 					sessionsByNodeId.get(oldConn.getBareJID()).removeResourceConnection(connection);
 
-					Packet cmd = Command.STREAM_MOVED.getPacket(getComponentId(), oldConnJid, StanzaType.set, "moved");
+					Packet cmd = Command.STREAM_MOVED.getPacket(getComponentId(), oldConnJid,
+							StanzaType.set, "moved");
+
 					Command.addFieldValue(cmd, "cmd", "stream-moved");
-					Command.addFieldValue(cmd, "new-conn-jid", oldConn.getConnectionId().toString());
+					Command.addFieldValue(cmd, "new-conn-jid", oldConn.getConnectionId()
+							.toString());
 					cmd.setPacketFrom(getComponentId());
 					cmd.setPacketTo(oldConnJid);
 					addOutPacket(cmd);
+				} catch (XMPPException ex) {
+					log.log(Level.SEVERE, "exception while replacing old connection id = " +
+							oldConnJid + " with new connection id = " + pc.getPacketFrom().toString(),
+							ex);
 				}
-				catch (XMPPException ex) {
-					log.log(Level.SEVERE, "exception while replacing old connection id = " + oldConnJid 
-							+ " with new connection id = " + pc.getPacketFrom().toString(), ex);
-				}								
 			}
 			processing_result = true;
+
 			break;
-			
+
 		default :
 			if (getComponentId().equals(iqc.getStanzaTo()) && getComponentId().equals(iqc
 					.getPacketFrom())) {
@@ -2026,7 +2060,9 @@ public class SessionManager
 	 *
 	 * @param def
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of Integer
 	 */
 	@Override
 	protected Integer getMaxQueueSize(int def) {
@@ -2039,7 +2075,9 @@ public class SessionManager
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of XMPPSession
 	 */
 	protected XMPPSession getSession(BareJID jid) {
 		return sessionsByNodeId.get(jid);
@@ -2051,7 +2089,9 @@ public class SessionManager
 	 *
 	 * @param connId
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of XMPPResourceConnection
 	 */
 	protected XMPPResourceConnection getXMPPResourceConnection(JID connId) {
 		return connectionsByFrom.get(connId);
@@ -2063,7 +2103,9 @@ public class SessionManager
 	 *
 	 * @param p
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of XMPPResourceConnection
 	 */
 	protected XMPPResourceConnection getXMPPResourceConnection(Packet p) {
 		XMPPResourceConnection conn = null;
@@ -2102,7 +2144,9 @@ public class SessionManager
 	 *
 	 * @param p
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	protected boolean isBrokenPacket(Packet p) {
 
@@ -2166,7 +2210,9 @@ public class SessionManager
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	protected boolean isTrusted(JID jid) {
 		if (trusted.contains(jid.getBareJID().toString())) {
@@ -2182,7 +2228,9 @@ public class SessionManager
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
 	protected boolean isTrusted(String jid) {
 		if (trusted.contains(jid)) {
@@ -2248,6 +2296,28 @@ public class SessionManager
 	}
 
 	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Calculates number of Active Users, i.e. users which session wasn't idle longer than 5 minutes
+	 *  number of Active Users
+	 */
+	private long getActiveUserNumber() {
+		int count = 0;
+
+		for (BareJID bareJID : sessionsByNodeId.keySet()) {
+			if (!bareJID.toString().startsWith("sess-man")) {
+				for (XMPPResourceConnection xMPPResourceConnection : sessionsByNodeId.get(bareJID)
+						.getActiveResources()) {
+					if (System.currentTimeMillis() - xMPPResourceConnection.getLastAccessed() < 5 *
+							60 * 1000) {
+						count++;
+					}
+				}
+			}
+		}
+
+		return count;
+	}
 
 	private List<Element> getFeatures(XMPPResourceConnection session) {
 		List<Element> results = new LinkedList<Element>();
@@ -2437,7 +2507,9 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * @return
+		 *
+		 *
+		 * @return a value of int
 		 */
 		@Override
 		public int concurrentQueuesNo() {
@@ -2448,7 +2520,9 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * @return
+		 *
+		 *
+		 * @return a value of String
 		 */
 		@Override
 		public String id() {
@@ -2522,7 +2596,9 @@ public class SessionManager
 		 *
 		 *
 		 *
-		 * @return
+		 *
+		 *
+		 * @return a value of WorkerThread
 		 */
 		@Override
 		public WorkerThread getNewInstance() {
@@ -2540,7 +2616,9 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * @return
+		 *
+		 *
+		 * @return a value of int
 		 */
 		@Override
 		public int concurrentQueuesNo() {
@@ -2551,7 +2629,9 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * @return
+		 *
+		 *
+		 * @return a value of String
 		 */
 		@Override
 		public String id() {
@@ -2592,7 +2672,9 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * @return
+		 *
+		 *
+		 * @return a value of int
 		 */
 		@Override
 		public int concurrentQueuesNo() {
@@ -2603,7 +2685,9 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * @return
+		 *
+		 *
+		 * @return a value of String
 		 */
 		@Override
 		public String id() {
@@ -2764,7 +2848,9 @@ public class SessionManager
 		 *
 		 * @param connectionId
 		 *
-		 * @return
+		 *
+		 *
+		 * @return a value of boolean
 		 */
 		public boolean queueForClose(JID connectionId) {
 			boolean result;
@@ -2809,7 +2895,9 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * @return
+		 *
+		 *
+		 * @return a value of int
 		 */
 		public int getMaxQueueSize() {
 			return maxQueueSize;
@@ -2819,7 +2907,9 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * @return
+		 *
+		 *
+		 * @return a value of long
 		 */
 		public long getTimeout() {
 			return timeout;
@@ -2871,4 +2961,4 @@ public class SessionManager
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/08/28

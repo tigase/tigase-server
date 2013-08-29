@@ -77,7 +77,9 @@ public abstract class SMNonCachingAllNodes
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean containsJid(BareJID jid) {
@@ -118,7 +120,9 @@ public abstract class SMNonCachingAllNodes
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>List<JID></code>
 	 */
 	@Override
 	public List<JID> getAllNodes() {
@@ -131,7 +135,9 @@ public abstract class SMNonCachingAllNodes
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>JID[]</code>
 	 */
 	@Override
 	public JID[] getConnectionIdsForJid(BareJID jid) {
@@ -152,7 +158,9 @@ public abstract class SMNonCachingAllNodes
 	 *
 	 * @param bareJID
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Set<ConnectionRecord></code>
 	 */
 	@Override
 	public Set<ConnectionRecord> getConnectionRecords(BareJID bareJID) {
@@ -169,7 +177,9 @@ public abstract class SMNonCachingAllNodes
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Object</code>
 	 */
 	@Override
 	@Deprecated
@@ -183,7 +193,9 @@ public abstract class SMNonCachingAllNodes
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>List<JID></code>
 	 */
 	public List<JID> getNodesForJid(JID jid) {
 		return getAllNodes();
@@ -197,7 +209,9 @@ public abstract class SMNonCachingAllNodes
 	 * @param visitedNodes
 	 * @param packet
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>List<JID></code>
 	 */
 	public List<JID> getNodesForPacketForward(JID fromNode, Set<JID> visitedNodes,
 			Packet packet) {
@@ -264,7 +278,9 @@ public abstract class SMNonCachingAllNodes
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>List<JID></code>
 	 */
 	public List<JID> getNodesForUserConnect(JID jid) {
 		return getAllNodes();
@@ -283,7 +299,9 @@ public abstract class SMNonCachingAllNodes
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>List<JID></code>
 	 */
 	public List<JID> getNodesForUserDisconnect(JID jid) {
 		return getAllNodes();
@@ -304,7 +322,9 @@ public abstract class SMNonCachingAllNodes
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean hasCompleteJidsInfo() {
@@ -340,7 +360,9 @@ public abstract class SMNonCachingAllNodes
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean isSuitableForForward(Packet packet) {
 
@@ -388,7 +410,7 @@ public abstract class SMNonCachingAllNodes
 	/**
 	 * @param fromNode
 	 * @param visitedNodes
-	 * @return
+	 *
 	 */
 	private List<JID> selectNodes(JID fromNode, Set<JID> visitedNodes) {
 		List<JID> result = null;
@@ -454,4 +476,4 @@ public abstract class SMNonCachingAllNodes
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/08/29

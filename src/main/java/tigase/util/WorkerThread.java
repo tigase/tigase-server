@@ -1,10 +1,13 @@
 /*
+ * WorkerThread.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.util;
 
@@ -28,16 +30,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//~--- classes ----------------------------------------------------------------
-
 /**
  * Created: Apr 21, 2009 9:02:57 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class WorkerThread extends Thread {
-
+public abstract class WorkerThread
+				extends Thread {
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
@@ -48,22 +48,25 @@ public abstract class WorkerThread extends Thread {
 	private long averageProcessingTime = 0;
 
 //private PriorityQueueAbstract<QueueItem> queue = null;
-	private LinkedBlockingQueue<QueueItem> queue = null;
-	private long runsCnt = 0;
-	private boolean stopped = false;
+	private LinkedBlockingQueue<QueueItem> queue   = null;
+	private long                           runsCnt = 0;
+	private boolean                        stopped = false;
 
-	//~--- get methods ----------------------------------------------------------
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
 	 *
+	 * @param item
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of boolean
 	 */
-	public abstract WorkerThread getNewInstance();
-
-	//~--- methods --------------------------------------------------------------
+	public boolean offer(QueueItem item) {
+		return queue.offer(item);
+	}
 
 //{
 //  WorkerThread worker = new WorkerThread();
@@ -79,42 +82,6 @@ public abstract class WorkerThread extends Thread {
 	 */
 	public abstract void process(QueueItem item);
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public long getAverageProcessingTime() {
-		return averageProcessingTime;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public long getRunsCounter() {
-		return runsCnt;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param item
-	 *
-	 * @return
-	 */
-	public boolean offer(QueueItem item) {
-		return queue.offer(item);
-	}
-
 	/**
 	 * Method description
 	 *
@@ -123,7 +90,7 @@ public abstract class WorkerThread extends Thread {
 	public void run() {
 		QueueItem item = null;
 
-		while ( !stopped) {
+		while (!stopped) {
 			try {
 				item = queue.take();
 
@@ -137,13 +104,68 @@ public abstract class WorkerThread extends Thread {
 					averageProcessingTime = (averageProcessingTime + end) / 2;
 				}
 			} catch (Exception e) {
-				log.log(Level.SEVERE,
-						this.getClass().getName() + ",(" + getName() + ") Exception during packet processing: "
-							+ item.getPacket(), e);
+				log.log(Level.SEVERE, this.getClass().getName() + ",(" + getName() +
+						") Exception during packet processing: " + item.getPacket(), e);
 			}
-
 			++runsCnt;
 		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 */
+	public void shutdown() {
+		stopped = true;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of int
+	 */
+	public int size() {
+		return queue.size();
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of long
+	 */
+	public long getAverageProcessingTime() {
+		return averageProcessingTime;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of WorkerThread
+	 */
+	public abstract WorkerThread getNewInstance();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of long
+	 */
+	public long getRunsCounter() {
+		return runsCnt;
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -158,32 +180,11 @@ public abstract class WorkerThread extends Thread {
 		LinkedBlockingQueue<QueueItem> oldQueue = queue;
 
 		queue = new LinkedBlockingQueue<QueueItem>(maxSize);
-
 		if (oldQueue != null) {
 			queue.addAll(oldQueue);
 		}
 	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public int size() {
-		return queue.size();
-	}
-        
-        public void shutdown() {
-                stopped = true;
-        }
-        
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/28

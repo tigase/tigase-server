@@ -151,53 +151,93 @@ public class BoshIOService
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public long getRid() {
-		return this.rid;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public UUID getSid() {
-		return this.sid;
-	}
-
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param timer
-	 */
-	public void setWaitTimer(BoshTask timer) {
-		waitTimer = timer;
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public BoshTask getWaitTimer() {
-		return waitTimer;
-	}
-
 	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param data
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 * @throws IOException
+	 */
+	@Override
+	public boolean checkData(char[] data) throws IOException {
+		if (firstPassCORS && (data != null) && (data.length > 7)) {
+			if ((data[0] == 'O') && (data[1] == 'P') && (data[2] == 'T') && (data[3] == 'I') &&
+					(data[4] == 'O') && (data[5] == 'N') && (data[6] == 'S')) {
+
+				// responding with headers - needed for Chrome browser
+				this.writeRawData(prepareHeaders(null).toString());
+
+				// connection needs to be closed as in other case data headers are not sent to browser
+				// until connection is closed and for OPTIONS request we are not sending any data
+				firstPassCORS = false;
+
+				return true;
+			}
+			firstPassCORS = false;
+		}
+		if (firstPassClientAccessPolicy && (data != null) && (data.length >=
+				HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER.length)) {
+			if ((data[0] == 'G') && (data[1] == 'E') && (data[2] == 'T')) {
+				boolean ok = true;
+				int     i  = 3;
+
+				while (ok && (i < HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER.length)) {
+					ok &= (data[i] == HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER[i]);
+					i++;
+				}
+				if (ok) {
+					this.writeRawData(prepareHeaders(client_access_policy).toString() +
+							client_access_policy);
+
+					// connection needs to be closed as in other case data headers are not sent to browser
+					// until connection is closed
+					firstPassClientAccessPolicy = false;
+
+					return true;
+				}
+			}
+			firstPassClientAccessPolicy = false;
+		}
+
+		// by default do nothing and return false
+		return false;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param data
+	 *
+	 *
+	 *
+	 * @return a value of <code>StringBuilder</code>
+	 */
+	public StringBuilder prepareHeaders(String data) {
+		StringBuilder sb = new StringBuilder(200);
+
+		sb.append(HTTP_OK_RESPONSE);
+		sb.append(CONTENT_TYPE_HEADER).append(content_type).append(EOL);
+		if (data != null) {
+			sb.append(CONTENT_TYPE_LENGTH).append(data.getBytes().length).append(EOL);
+		} else {
+			sb.append(CONTENT_TYPE_LENGTH).append("0").append(EOL);
+		}
+		if (extra_headers != null) {
+			sb.append(extra_headers);
+		}
+		sb.append(SERVER).append(EOL);
+		sb.append(EOL);
+
+		return sb;
+	}
 
 	/**
 	 * Method description
@@ -245,6 +285,70 @@ public class BoshIOService
 		stop();
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param data
+	 *
+	 * @throws IOException
+	 */
+	@Override
+	public void writeRawData(String data) throws IOException {
+		if ((data != null) && data.startsWith("<body")) {
+			StringBuilder sb = prepareHeaders(data);
+
+			sb.append(data);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Writing to socket:\n{0}", sb.toString());
+			}
+			super.writeRawData(sb.toString());
+		} else {
+			super.writeRawData(data);
+		}
+		if (closeConnections) {
+			stop();
+		}
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	public long getRid() {
+		return this.rid;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>UUID</code>
+	 */
+	public UUID getSid() {
+		return this.sid;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>BoshTask</code>
+	 */
+	public BoshTask getWaitTimer() {
+		return waitTimer;
+	}
+
 	//~--- set methods ----------------------------------------------------------
 
 	/**
@@ -277,117 +381,16 @@ public class BoshIOService
 		this.sid = sid;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param data
-	 *
-	 * @return
+	 * @param timer
 	 */
-	public StringBuilder prepareHeaders(String data) {
-		StringBuilder sb = new StringBuilder(200);
-
-		sb.append(HTTP_OK_RESPONSE);
-		sb.append(CONTENT_TYPE_HEADER).append(content_type).append(EOL);
-		if (data != null) {
-			sb.append(CONTENT_TYPE_LENGTH).append(data.getBytes().length).append(EOL);
-		}
-		else {
-			sb.append(CONTENT_TYPE_LENGTH).append("0").append(EOL);
-		}
-		if (extra_headers != null) {
-			sb.append(extra_headers);
-		}
-		sb.append(SERVER).append(EOL);
-		sb.append(EOL);
-
-		return sb;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param data
-	 *
-	 * @throws IOException
-	 */
-	@Override
-	public void writeRawData(String data) throws IOException {
-		if ((data != null) && data.startsWith("<body")) {
-			StringBuilder sb = prepareHeaders(data);
-
-			sb.append(data);
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Writing to socket:\n{0}", sb.toString());
-			}
-			super.writeRawData(sb.toString());
-		} else {
-			super.writeRawData(data);
-		}
-		if (closeConnections) {
-			stop();
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param data
-	 *
-	 * @return
-	 *
-	 * @throws IOException
-	 */
-	@Override
-	public boolean checkData(char[] data) throws IOException {
-		if (firstPassCORS && (data != null) && (data.length > 7)) {
-			if ((data[0] == 'O') && (data[1] == 'P') && (data[2] == 'T') && (data[3] == 'I') &&
-					(data[4] == 'O') && (data[5] == 'N') && (data[6] == 'S')) {
-
-				// responding with headers - needed for Chrome browser
-				this.writeRawData(prepareHeaders(null).toString());
-
-				// connection needs to be closed as in other case data headers are not sent to browser
-				// until connection is closed and for OPTIONS request we are not sending any data
-				firstPassCORS = false;
-
-				return true;
-			}
-			firstPassCORS = false;
-		}
-		if (firstPassClientAccessPolicy && (data != null) && (data.length >=
-				HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER.length)) {
-			if ((data[0] == 'G') && (data[1] == 'E') && (data[2] == 'T')) {
-				boolean ok = true;
-				int     i  = 3;
-
-				while (ok && (i < HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER.length)) {
-					ok &= (data[i] == HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER[i]);
-					i++;
-				}
-				if (ok) {
-					this.writeRawData(prepareHeaders(client_access_policy).toString() +
-							client_access_policy);
-
-					// connection needs to be closed as in other case data headers are not sent to browser
-					// until connection is closed
-					firstPassClientAccessPolicy = false;
-
-					return true;
-				}
-			}
-			firstPassClientAccessPolicy = false;
-		}
-
-		// by default do nothing and return false
-		return false;
+	public void setWaitTimer(BoshTask timer) {
+		waitTimer = timer;
 	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/19
+//~ Formatted in Tigase Code Convention on 13/08/28

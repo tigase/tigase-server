@@ -1,10 +1,13 @@
 /*
+ * UnknownXMLNSStreamOpenHandler.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.server.ext.handlers;
 
@@ -34,36 +36,23 @@ import tigase.server.ext.StreamOpenHandler;
 import java.util.List;
 import java.util.Map;
 
-//~--- classes ----------------------------------------------------------------
-
 /**
  * Created: Oct 2, 2009 5:18:44 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class UnknownXMLNSStreamOpenHandler implements StreamOpenHandler {
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String[] getXMLNSs() {
-		return null;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
+public class UnknownXMLNSStreamOpenHandler
+				implements StreamOpenHandler {
 	/**
 	 * Method description
 	 *
 	 *
 	 * @param s
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String serviceStarted(ComponentIOService s) {
@@ -78,43 +67,53 @@ public class UnknownXMLNSStreamOpenHandler implements StreamOpenHandler {
 	 * @param attribs
 	 * @param handler
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String streamOpened(ComponentIOService serv, Map<String, String> attribs,
 			ComponentProtocolHandler handler) {
-		String xmlns = attribs.get("xmlns");
-		StringBuilder sb =
-			new StringBuilder("<stream:stream xmlns:stream='http://etherx.jabber.org/streams'"
-				+ " version='1.0'" + " xml:lang='en'");
+		String        xmlns = attribs.get("xmlns");
+		StringBuilder sb = new StringBuilder(
+				"<stream:stream xmlns:stream='http://etherx.jabber.org/streams'" +
+				" version='1.0'" + " xml:lang='en'");
 
 		if (xmlns != null) {
 			sb.append(" xmlns='").append(xmlns).append("'");
 		}
-
 		if (attribs.get("to") != null) {
 			sb.append(" from='").append(attribs.get("to")).append("'");
 		}
-
 		if (attribs.get("from") != null) {
 			sb.append(" to='").append(attribs.get("from")).append("'");
 		}
-
 		if (attribs.get("id") != null) {
 			sb.append(" id='").append(attribs.get("id")).append("'");
 		}
-
 		sb.append('>');
-		sb.append("<stream:error>"
-				+ "<invalid-namespace xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
-					+ "</stream:error>" + "</stream:stream>");
+		sb.append("<stream:error>" +
+				"<invalid-namespace xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
+				"</stream:error>" + "</stream:stream>");
 
 		return sb.toString();
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
+	 */
+	@Override
+	public String[] getXMLNSs() {
+		return null;
 	}
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/28

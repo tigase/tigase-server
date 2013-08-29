@@ -1,10 +1,13 @@
 /*
+ * VHostRepoDefaults.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.vhosts;
 
@@ -30,8 +32,6 @@ import tigase.xmpp.BareJID;
 
 import static tigase.conf.Configurable.*;
 
-//~--- classes ----------------------------------------------------------------
-
 /**
  * Created: Oct 3, 2009 4:26:09 PM
  *
@@ -39,8 +39,8 @@ import static tigase.conf.Configurable.*;
  * @version $Rev$
  */
 public abstract class VHostRepoDefaults {
+	private static final String  vhost_list_pkey = "vhosts-lists";
 	private static final BareJID vhost_user = BareJID.bareJIDInstanceNS("vhost-manager");
-	private static final String vhost_list_pkey = "vhosts-lists";
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -48,7 +48,9 @@ public abstract class VHostRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	public static String getConfigKey() {
 		return HOSTNAMES_PROP_KEY;
@@ -58,7 +60,9 @@ public abstract class VHostRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String[]
 	 */
 	public static String[] getDefaultPropetyItems() {
 		return DNSResolver.getDefHostNames();
@@ -68,7 +72,9 @@ public abstract class VHostRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of VHostItem
 	 */
 	public static VHostItem getItemInstance() {
 		return new VHostItem();
@@ -78,7 +84,9 @@ public abstract class VHostRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	public static String getItemsListPKey() {
 		return vhost_list_pkey;
@@ -88,7 +96,9 @@ public abstract class VHostRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of String
 	 */
 	public static String getPropertyKey() {
 		return GEN_VIRT_HOSTS;
@@ -98,7 +108,9 @@ public abstract class VHostRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of BareJID
 	 */
 	public static BareJID getRepoUser() {
 		return vhost_user;
@@ -106,7 +118,4 @@ public abstract class VHostRepoDefaults {
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/28

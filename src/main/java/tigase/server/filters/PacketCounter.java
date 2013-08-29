@@ -72,7 +72,9 @@ public class PacketCounter
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Packet</code>
 	 */
 	@Override
 	public Packet filter(Packet packet) {
@@ -165,4 +167,4 @@ public class PacketCounter
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/04/24
+//~ Formatted in Tigase Code Convention on 13/08/28

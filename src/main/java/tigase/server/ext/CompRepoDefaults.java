@@ -1,10 +1,13 @@
 /*
+ * CompRepoDefaults.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,18 +18,15 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.server.ext;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.xmpp.BareJID;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Oct 24, 2009 3:57:36 PM
@@ -35,8 +35,8 @@ import tigase.xmpp.BareJID;
  * @version $Rev$
  */
 public abstract class CompRepoDefaults {
+	private static final String  comp_list_pkey = "ext-comp-lists";
 	private static final BareJID comp_user = BareJID.bareJIDInstanceNS("ext-comp-manager");
-	private static final String comp_list_pkey = "ext-comp-lists";
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -44,7 +44,9 @@ public abstract class CompRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public static String getConfigKey() {
 		return "comp-items";
@@ -54,7 +56,9 @@ public abstract class CompRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
 	 */
 	public static String[] getDefaultPropetyItems() {
 		return new String[] { "muc.domain.tld:passwd:listen:5277:accept" };
@@ -64,7 +68,9 @@ public abstract class CompRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>CompRepoItem</code>
 	 */
 	public static CompRepoItem getItemInstance() {
 		return new CompRepoItem();
@@ -74,7 +80,9 @@ public abstract class CompRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public static String getItemsListPKey() {
 		return comp_list_pkey;
@@ -84,7 +92,9 @@ public abstract class CompRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public static String getPropertyKey() {
 		return "--external";
@@ -94,7 +104,9 @@ public abstract class CompRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>BareJID</code>
 	 */
 	public static BareJID getRepoUser() {
 		return comp_user;
@@ -102,7 +114,4 @@ public abstract class CompRepoDefaults {
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/08/28

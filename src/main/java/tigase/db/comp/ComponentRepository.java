@@ -62,18 +62,6 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * Adds a listener for repository Item change.
-	 * @param repoChangeListener
-	 */
-	void addRepoChangeListener(RepositoryChangeListenerIfc<Item> repoChangeListener);
-
-	/**
-	 * Removes a listener for repository Item change.
-	 * @param repoChangeListener
-	 */
-	void removeRepoChangeListener(RepositoryChangeListenerIfc<Item> repoChangeListener);
-
-	/**
 	 * The method adds a new or updates existing Item in the repository. It needs
 	 * to have all fields set correctly. After this method call is finished a new
 	 * added item must be available in the component repository. The method adds
@@ -86,9 +74,16 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	void addItem(Item item) throws TigaseDBException;
 
 	/**
+	 * Adds a listener for repository Item change.
+	 * @param repoChangeListener
+	 */
+	void addRepoChangeListener(RepositoryChangeListenerIfc<Item> repoChangeListener);
+
+	/**
 	 * Returns a collection with all items stored in the repository.
 	 *
-	 * @return
+	 *
+	 * @return a value of <code>Collection<Item></code>
 	 * @throws TigaseDBException
 	 */
 	Collection<Item> allItems() throws TigaseDBException;
@@ -102,6 +97,62 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	 *         in the repository or <code>false</code> of it does not.
 	 */
 	boolean contains(String key);
+
+	/**
+	 * This method is called to reload items from the database or other permanent
+	 * storage. It is possible that items list is modified externally by
+	 * third-party system. When all modifications are done this method is called
+	 * to refresh the class cache. Whether the implementation load whole list or
+	 * just last modifications is implementation dependent.
+	 *
+	 * @throws TigaseDBException
+	 */
+	void reload() throws TigaseDBException;
+
+	/**
+	 * The method is called to remove given Item from the memory cache and
+	 * permanent storage. After this method is completed the item should no longer
+	 * be available in the component repository.
+	 *
+	 * @param key
+	 *          a <code>String</code> with domain name to remove.
+	 * @throws TigaseDBException
+	 */
+	void removeItem(String key) throws TigaseDBException;
+
+	/**
+	 * Removes a listener for repository Item change.
+	 * @param repoChangeListener
+	 */
+	void removeRepoChangeListener(RepositoryChangeListenerIfc<Item> repoChangeListener);
+
+	/**
+	 * The method returns number of items in the repository.
+	 *
+	 * @return an <code>int</code> value with number of items in the repository.
+	 */
+	int size();
+
+	/**
+	 * The method is called to store all data in the database. It is used when the
+	 * repository has been changed in some way and the changes have to be put to a
+	 * permanent storage for later retrieval.
+	 *
+	 * @throws TigaseDBException
+	 */
+	void store() throws TigaseDBException;
+
+	/**
+	 * Performs Item validation to check whether it meets the repository policy.
+	 * If validation is successful the method returns <code>null</code>, otherwise
+	 * it returns an error description.
+	 *
+	 * @param item
+	 *          is an <code>Item</code> object to perform validation checking
+	 *          upon.
+	 * @return <code>null</code> on success and an error message otherwise.
+	 */
+	String validateItem(Item item);
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -141,31 +192,15 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	 */
 	Item getItemInstance();
 
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * This method is called to reload items from the database or other permanent
-	 * storage. It is possible that items list is modified externally by
-	 * third-party system. When all modifications are done this method is called
-	 * to refresh the class cache. Whether the implementation load whole list or
-	 * just last modifications is implementation dependent.
-	 *
-	 * @throws TigaseDBException
-	 */
-	void reload() throws TigaseDBException;
-
-	/**
-	 * The method is called to remove given Item from the memory cache and
-	 * permanent storage. After this method is completed the item should no longer
-	 * be available in the component repository.
-	 *
-	 * @param key
-	 *          a <code>String</code> with domain name to remove.
-	 * @throws TigaseDBException
-	 */
-	void removeItem(String key) throws TigaseDBException;
-
 	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Sets autoload task to periodically reload data from database.
+	 *
+	 *
+	 * @param delay in seconds between each database reload.
+	 */
+	void setAutoloadTimer(long delay);
 
 	/**
 	 * The method is called to set configuration for this repository
@@ -177,47 +212,7 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	 *          <code>Map</code> must not be modified. This read-only collection.
 	 */
 	void setProperties(Map<String, Object> properties);
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * The method returns number of items in the repository.
-	 *
-	 * @return an <code>int</code> value with number of items in the repository.
-	 */
-	int size();
-
-	/**
-	 * The method is called to store all data in the database. It is used when the
-	 * repository has been changed in some way and the changes have to be put to a
-	 * permanent storage for later retrieval.
-	 *
-	 * @throws TigaseDBException
-	 */
-	void store() throws TigaseDBException;
-
-	/**
-	 * Performs Item validation to check whether it meets the repository policy.
-	 * If validation is successful the method returns <code>null</code>, otherwise
-	 * it returns an error description.
-	 *
-	 * @param item
-	 *          is an <code>Item</code> object to perform validation checking
-	 *          upon.
-	 * @return <code>null</code> on success and an error message otherwise.
-	 */
-	String validateItem(Item item);
-
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Sets autoload task to periodically reload data from database.
-	 *
-	 *
-	 * @param delay in seconds between each database reload.
-	 */
-	void setAutoloadTimer(long delay);
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/03/09
+//~ Formatted in Tigase Code Convention on 13/08/29

@@ -110,7 +110,9 @@ public class BoshConnectionManager
 	 * @param packet
 	 * @param bs
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean addOutStreamClosed(Packet packet, BoshSession bs) {
@@ -130,7 +132,9 @@ public class BoshConnectionManager
 	 *
 	 * @param packet
 	 * @param bs
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean addOutStreamOpen(Packet packet, BoshSession bs) {
@@ -183,7 +187,9 @@ public class BoshConnectionManager
 	 *
 	 * @param srv
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Queue<Packet></code>
 	 */
 	@Override
 	public Queue<Packet> processSocketData(XMPPIOService<Object> srv) {
@@ -263,7 +269,9 @@ public class BoshConnectionManager
 	 * @param bs
 	 * @param delay
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>BoshSendQueueTask</code>
 	 */
 	@Override
 	public BoshSendQueueTask scheduleSendQueueTask(final BoshSession bs, long delay) {
@@ -282,7 +290,9 @@ public class BoshConnectionManager
 	 * @param bs
 	 * @param delay
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>BoshTask</code>
 	 */
 	@Override
 	public BoshTask scheduleTask(BoshSession bs, long delay) {
@@ -357,7 +367,9 @@ public class BoshConnectionManager
 	 * @param serv
 	 * @param attribs
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String xmppStreamOpened(BoshIOService serv, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINE)) {
@@ -384,7 +396,9 @@ public class BoshConnectionManager
 	 *
 	 * @param params
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -406,7 +420,9 @@ public class BoshConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -417,7 +433,9 @@ public class BoshConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getDiscoDescription() {
@@ -431,7 +449,9 @@ public class BoshConnectionManager
 	 * @param fromJID
 	 * @param ph
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>BareJID</code>
 	 */
 	@Override
 	public BareJID getSeeOtherHostForJID(BareJID fromJID, Phase ph) {
@@ -568,7 +588,9 @@ public class BoshConnectionManager
 	 * @param command_sessionId
 	 * @param serv
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>JID</code>
 	 */
 	@Override
 	protected JID changeDataReceiver(Packet packet, JID newAddress,
@@ -596,7 +618,9 @@ public class BoshConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>ReceiverTimeoutHandler</code>
 	 */
 	@Override
 	protected ReceiverTimeoutHandler newStartedHandler() {
@@ -710,7 +734,9 @@ public class BoshConnectionManager
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	protected boolean writePacketToSocket(Packet packet) {
@@ -752,7 +778,9 @@ public class BoshConnectionManager
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>BoshSession</code>
 	 */
 	protected BoshSession getBoshSession(JID jid) {
 		UUID sid = UUID.fromString(jid.getResource());
@@ -764,7 +792,9 @@ public class BoshConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int[]</code>
 	 */
 	@Override
 	protected int[] getDefPlainPorts() {
@@ -775,7 +805,9 @@ public class BoshConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int[]</code>
 	 */
 	@Override
 	protected int[] getDefSSLPorts() {
@@ -787,7 +819,9 @@ public class BoshConnectionManager
 	 * inactive connection. For Bosh it does not make sense to keep the idle
 	 * connection longer than 10 minutes.
 	 *
-	 * @return a <code>long</code> value
+	 *  a <code>long</code> value
+	 *
+	 * @return a value of <code>long</code>
 	 */
 	@Override
 	protected long getMaxInactiveTime() {
@@ -798,7 +832,9 @@ public class BoshConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>BoshIOService</code>
 	 */
 	@Override
 	protected BoshIOService getXMPPIOServiceInstance() {
@@ -865,4 +901,4 @@ public class BoshConnectionManager
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/04/24
+//~ Formatted in Tigase Code Convention on 13/08/28

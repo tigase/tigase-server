@@ -75,7 +75,8 @@ public interface ServerComponent {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 * @return a value of <code>JID</code>
 	 */
 	JID getComponentId();
 
@@ -83,7 +84,8 @@ public interface ServerComponent {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	String getName();
 
@@ -107,4 +109,4 @@ public interface ServerComponent {
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/06/08
+//~ Formatted in Tigase Code Convention on 13/08/29
