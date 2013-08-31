@@ -905,6 +905,8 @@ public class SessionManagerClustered extends SessionManager implements
 						}
 					}
 				}
+				
+				processPresenceUpdate(session, elem);
 			} else {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(

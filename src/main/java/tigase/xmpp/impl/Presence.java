@@ -76,6 +76,8 @@ import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import tigase.xmpp.XMPPSession;
 
 /**
  * Describe class Presence here.
@@ -121,7 +123,7 @@ public class Presence
 	/** Field description */
 	protected static final String XMLNS                      = CLIENT_XMLNS;
 	private static int            HIGH_PRIORITY_PRESENCES_NO = 10;
-
+	
 	/**
 	 * Private logger for class instance.
 	 */
@@ -135,6 +137,8 @@ public class Presence
 	private static final String[][] ELEMENTS                = {
 		{ PRESENCE_ELEMENT_NAME }
 	};
+	private static final String[] PRESENCE_PRIORITY_PATH    = { "presence",
+		"priority" };
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -520,7 +524,7 @@ public class Presence
 	 */
 	public static void updateUserResources(Element presence,
 			XMPPResourceConnection session, Queue<Packet> results, boolean initial)
-					throws NotAuthorizedException {
+					throws NotAuthorizedException {		
 		for (XMPPResourceConnection conn : session.getActiveSessions()) {
 			try {
 				if (log.isLoggable(Level.FINER)) {
@@ -682,6 +686,49 @@ public class Presence
 				// This catch is to make sure all other resources receive notification.
 			}
 		}        // end of for (XMPPResourceConnection conn: sessions)
+	}
+	
+	protected static void updateResourcesAvailable(XMPPResourceConnection session, StanzaType type, Packet packet) {
+		XMPPSession sess = session.getParentSession();
+		if (sess != null) {
+			Map<JID,Map> resources;
+			boolean online = type == null || type == StanzaType.available;
+			
+			synchronized (sess) {
+				resources = (Map<JID,Map>) sess.getCommonSessionData(XMPPResourceConnection.ALL_RESOURCES_KEY);
+				if (resources == null) {
+					if (!online)
+						return;
+					
+					resources = new ConcurrentHashMap<JID,Map>();
+					session.putCommonSessionData(XMPPResourceConnection.ALL_RESOURCES_KEY, resources);
+				}
+			}
+						
+			if (online) {
+				Map map = resources.get(packet.getStanzaFrom());			
+				if (map == null) {
+					map = new ConcurrentHashMap();
+					resources.put(packet.getStanzaFrom(), map);					
+				}
+				
+				String priorityStr = packet.getElemCDataStaticStr(PRESENCE_PRIORITY_PATH);
+				if (priorityStr != null) {
+					map.put(XMPPResourceConnection.ALL_RESOURCES_PRIORITY_KEY, Integer.parseInt(priorityStr));
+				}
+				else if (!map.containsKey(XMPPResourceConnection.ALL_RESOURCES_PRIORITY_KEY)) {
+					map.put(XMPPResourceConnection.ALL_RESOURCES_PRIORITY_KEY, 0);
+				}
+				
+				Element c = packet.getElement().getChild("c", "http://jabber.org/protocol/caps");
+				if (c != null) {
+					map.put(XMPPResourceConnection.ALL_RESOURCES_CAPS_KEY, PresenceCapabilitiesManager.processPresence(c));
+				}
+			}
+			else {
+				resources.remove(packet.getStanzaFrom());
+			}
+		}
 	}
 
 	private static boolean requiresPresenceSending(RosterAbstract roster, JID buddy,
@@ -1232,6 +1279,10 @@ public class Presence
 							packet.getStanzaTo() });
 				}
 
+//				if (session.isUserId(packet.getStanzaFrom().getBareJID())) {
+//					updateResourcesAvailable(session, packet.getType(), packet);
+//				}
+				
 				// Send a direct presence to correct resource, otherwise ignore
 				Packet result = packet.copyElementOnly();
 

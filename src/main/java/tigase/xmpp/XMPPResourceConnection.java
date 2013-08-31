@@ -73,6 +73,10 @@ public class XMPPResourceConnection
 	 */
 	public static final String PRESENCE_KEY = "user-presence";
 
+	public static final String ALL_RESOURCES_KEY = "all-resources";
+	public static final String ALL_RESOURCES_PRIORITY_KEY = "priority";
+	public static final String ALL_RESOURCES_CAPS_KEY = "caps";
+	
 	/**
 	 * Private logger for class instances.
 	 */
