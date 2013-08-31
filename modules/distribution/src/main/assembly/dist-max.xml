@@ -106,6 +106,7 @@
 				<include>tigase:tigase-server</include>
 				<!--<include>tigase:tigase-utils</include>-->
 				<!--<include>tigase:tigase-xmltools</include>-->
+				<include>tigase:tigase-acs</include>
 				<include>tigase:tigase-muc</include>
 				<include>tigase:tigase-pubsub</include>
 				<include>tigase:tigase-extras</include>

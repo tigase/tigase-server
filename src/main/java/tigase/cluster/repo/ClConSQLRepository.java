@@ -85,8 +85,8 @@ public class ClConSQLRepository
 					+ "  " + LASTUPDATE_COLUMN
 					+ " TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
 					+ "  " + PORT_COLUMN + " int,"
-					+ "  " + CPU_USAGE_COLUMN + " float unsigned not null,"
-					+ "  " + MEM_USAGE_COLUMN + " float unsigned not null,"
+					+ "  " + CPU_USAGE_COLUMN + " double precision unsigned not null,"
+					+ "  " + MEM_USAGE_COLUMN + " double precision unsigned not null,"
 					+ "  primary key(" + HOSTNAME_COLUMN + "))";
 	private static final String CREATE_TABLE_QUERY =
 					"create table " + TABLE_NAME + " ("

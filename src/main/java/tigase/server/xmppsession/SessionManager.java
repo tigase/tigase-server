@@ -95,6 +95,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.script.Bindings;
+import tigase.xmpp.XMPPPresenceUpdateProcessorIfc;
 
 /**
  * Class SessionManager
@@ -166,6 +167,8 @@ public class SessionManager
 			long[]>();
 	private Map<String, XMPPPostprocessorIfc> postProcessors =
 			new ConcurrentHashMap<String, XMPPPostprocessorIfc>(10);
+	private Map<String, XMPPPresenceUpdateProcessorIfc> presenceProcessors = 
+			new ConcurrentHashMap<String, XMPPPresenceUpdateProcessorIfc>();
 	private Map<String, Map<String, Object>> plugin_config = new ConcurrentHashMap<String,
 			Map<String, Object>>(20);
 	private Map<String, XMPPPacketFilterIfc> outFilters = new ConcurrentHashMap<String,
@@ -173,6 +176,8 @@ public class SessionManager
 	private ConnectionCheckCommandHandler connectionCheckCommandHandler =
 			new ConnectionCheckCommandHandler();
 
+	protected Queue<Packet> packetWriterQueue = new WriterQueue<Packet>();
+	
 	/**
 	 * A Map with connectionID as a key and an object with all the user connection
 	 * data as a value
@@ -323,6 +328,9 @@ public class SessionManager
 				PresenceCapabilitiesManager.registerPresenceHandler((PresenceCapabilitiesManager
 						.PresenceCapabilitiesListener) result);
 			}
+			if (result instanceof XMPPPresenceUpdateProcessorIfc) {
+				presenceProcessors.put(result.id(), (XMPPPresenceUpdateProcessorIfc) result);
+			}
 		}
 
 		return result;
@@ -410,7 +418,16 @@ public class SessionManager
 	 * @param conn
 	 */
 	@Override
-	public void handlePresenceSet(XMPPResourceConnection conn) {}
+	public void handlePresenceSet(XMPPResourceConnection conn) {
+		XMPPSession parentSession = conn.getParentSession();
+		
+		if (parentSession == null)
+			return;
+		
+		Element presence = conn.getPresence();
+		
+		this.processPresenceUpdate(parentSession, presence);
+	}
 
 	/**
 	 * Method description
@@ -543,10 +560,14 @@ public class SessionManager
 			p = stopListeners.remove(plug_id);
 			allPlugins.remove(p);
 		}
-		if ((p != null) && (p instanceof PresenceCapabilitiesManager
-				.PresenceCapabilitiesListener)) {
-			PresenceCapabilitiesManager.unregisterPresenceHandler((PresenceCapabilitiesManager
-					.PresenceCapabilitiesListener) p);
+		if (p != null) {
+			if (p instanceof PresenceCapabilitiesManager.PresenceCapabilitiesListener) {
+				PresenceCapabilitiesManager.unregisterPresenceHandler((PresenceCapabilitiesManager
+						.PresenceCapabilitiesListener) p);
+			}
+			if (p instanceof XMPPPresenceUpdateProcessorIfc) {
+				presenceProcessors.remove(plug_id);
+			}
 		}
 	}
 
@@ -1919,6 +1940,32 @@ public class SessionManager
 		// postTime[idx] = postTm;
 	}
 
+	protected void processPresenceUpdate(XMPPSession session, Element packet) {
+		try {
+			if (presenceProcessors.isEmpty())
+				return;
+			
+			Packet presence = Packet.packetInstance(packet);
+			for (XMPPResourceConnection conn : session.getActiveResources()) {
+				for (XMPPPresenceUpdateProcessorIfc proc : presenceProcessors.values()) {
+					try {
+						proc.presenceUpdate(conn, presence, packetWriterQueue);
+					}
+					catch (NotAuthorizedException ex) {
+						log.log(Level.SEVERE, "exception processing presence update for "
+								+ "session = {0} and packet = {1}", 
+								new Object[]{session, packet});					
+					}
+				}
+			}
+		}
+		catch (TigaseStringprepException ex) {
+			// should not happen
+			log.log(Level.SEVERE, "exception processing presence update for session = {0}"
+					+ " and packet = {1}", new Object[]{session, packet});
+		}
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -2862,6 +2909,35 @@ public class SessionManager
 				return !workingSet.isEmpty();
 			}
 		}
+	}
+	
+	protected class WriterQueue<E extends Packet> extends AbstractQueue<E> {
+
+		@Override
+		public Iterator<E> iterator() {
+			throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		}
+
+		@Override
+		public int size() {
+			throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		}
+
+		@Override
+		public boolean offer(E packet) {
+			return SessionManager.this.addOutPacket(packet);
+		}
+
+		@Override
+		public E poll() {
+			throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		}
+
+		@Override
+		public E peek() {
+			throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		}
+		
 	}
 }
 

@@ -65,12 +65,12 @@ fi
 PATH=/sbin:/bin:/usr/sbin:/usr/bin:${JAVA_HOME}/bin
 
 # Find tigase-server jar
-if ! [ $OSGI ] ; then
-	LIB_DIR=jars
-	JAR_FILE=${LIB_DIR}/tigase-server*.jar
-else
+if [ -n "${OSGI}" ] && ${OSGI} ; then
 	LIB_DIR=jars
 	JAR_FILE=${LIB_DIR}/org.apache.felix.main*.jar
+else
+	LIB_DIR=jars
+	JAR_FILE=${LIB_DIR}/tigase-server*.jar
 fi
 
 for j in ${TIGASE_HOME}/${JAR_FILE} ; do
@@ -120,7 +120,7 @@ done
 
 LOGBACK="-Dlogback.configurationFile=$TIGASE_HOME/etc/logback.xml"
 
-if [ $OSGI ] ; then
+if [ -n "${OSGI}" ] && ${OSGI} ; then
 	TIGASE_CMD="${JAVA_OPTIONS} ${LOGBACK} -jar ${JAR_FILE}"
 else
 	TIGASE_CMD="${JAVA_OPTIONS} ${LOGBACK} -cp ${CLASSPATH} ${TIGASE_RUN}"
