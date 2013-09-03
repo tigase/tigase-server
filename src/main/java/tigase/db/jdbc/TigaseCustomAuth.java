@@ -51,7 +51,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.sql.Statement;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -961,10 +960,18 @@ public class TigaseCustomAuth implements AuthRepository {
 
 			synchronized (user_login) {
 
-				// String user_id = BareJID.jidToBareJID(user);
-				user_login.setString(1, user.toString());
-				user_login.setString(2, password);
-				rs = user_login.executeQuery();
+				user_login.setString( 1, user.toString() );
+				user_login.setString( 2, password );
+
+				switch ( data_repo.getDatabaseType() ) {
+					case sqlserver:
+						user_login.executeUpdate();
+						rs = user_login.getGeneratedKeys();
+						break;
+					default:
+						rs = user_login.executeQuery();
+						break;
+				}
 
 				boolean auth_result_ok = false;
 

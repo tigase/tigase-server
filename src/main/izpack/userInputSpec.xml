@@ -220,7 +220,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 
 	</panel>
 
-	<!-- Plugins selection -->
+	<!-- ACS information -->
 	<panel order="4">
 		<field type="title" txt="Advanced Clustering Strategy information" bold="true" size="2" />
 		<field type="space"/>
@@ -246,9 +246,22 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 
 	</panel>
 
+	<!-- MS SQL Server information -->
+	<panel order="5">
+		<field type="title" txt="MS SQL Server information" bold="true" size="2" />
+		<field type="space"/>
+		<field type="divider"/>
+		<field type="space"/>
+		<field type="staticText" align="left" size="2"
+					 txt="You have selected MS SQL Server as your database. While we provide you, for easy install, with open-source jTDS JDBC driver allowing to connect to MS SQL Server, we recommend using JDBC driver from Microsoft." />
+		<field type="staticText" align="left" size="2"
+					 txt="More information can be found on our website: http://www.tigase.org/content/prepare-ms-sql-server-database-tigase-server" />
+		<field type="space"/>
+
+	</panel>
 
 	<!-- Plugins selection -->
-	<panel order="5">
+	<panel order="6">
 		<field type="title" txt="Plugins selection:" bold="true" size="2"/>
 		<field type="staticText" align="left" txt="Please selected/deselect plugins to be loaded by the server."/>
 		<field type="space"/>
@@ -324,7 +337,7 @@ uvme:vcard-temp,http://jabber.org/protocol/commands,jabber:iq:private,urn:xmpp:p
 	</panel>
 
 	<!-- Database configuration -->
-	<panel order="6">
+	<panel order="7">
 		<field type="title" txt="Database configuration:" bold="true" size="2"/>
 		<field type="staticText" align="left" txt="You have selected $dbType database. This database needs additional configuration parameters. Please enter all required information."/>
 		<field type="space"/>
@@ -371,7 +384,7 @@ uvme:vcard-temp,http://jabber.org/protocol/commands,jabber:iq:private,urn:xmpp:p
 	</panel>
 
 	<!-- Authentication database configuration -->
-	<panel order="7">
+	<panel order="8">
 		<field type="title" txt="Authentication database configuration:"
 					 bold="true" size="2"/>
 		<field type="staticText" align="left" txt="You have selected a separate authentication database. You have to provide more details about this database."/>

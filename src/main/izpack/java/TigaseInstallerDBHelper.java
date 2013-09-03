@@ -30,6 +30,9 @@ import com.izforge.izpack.util.VariableSubstitutor;
 import java.io.*;
 import java.net.URLEncoder;
 import java.sql.DatabaseMetaData;
+import java.sql.Driver;
+import java.sql.SQLException;
+import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -163,6 +166,11 @@ class TigaseInstallerDBHelper {
 		} else {
 			selectDatabase(db_conn);
 			try {
+				Enumeration<Driver> drivers = DriverManager.getDrivers();
+				while (drivers.hasMoreElements()) {
+					Debug.trace("DriverManager (drivers): " + drivers.nextElement().toString());
+				}
+				Debug.trace("DriverManager (drivers end):");
 				Connection conn = DriverManager.getConnection(db_conn);
 				conn.close();
 				connection_ok = true;
@@ -179,18 +187,43 @@ class TigaseInstallerDBHelper {
 	private void selectDatabase(String db_uri) {
 		Debug.trace("selectDatabase (db_uri): " + db_uri);
 		schema_ver_query = TigaseConfigConst.JDBC_GETSCHEMAVER_QUERY;
+		String driverClass = null;
 		if (db_uri.startsWith("jdbc:postgresql")) {
-			System.setProperty("jdbc.drivers", TigaseConfigConst.PGSQL_DRIVER);
+			driverClass = TigaseConfigConst.PGSQL_DRIVER;
+			System.setProperty("jdbc.drivers", driverClass);
 			res_prefix = "postgresql";
 		}
+		if (db_uri.startsWith("jdbc:sqlserver") || db_uri.startsWith("jdbc:jtds:sqlserver")) {
+			driverClass = TigaseConfigConst.SQLSERVER_DRIVER;
+			System.setProperty("jdbc.drivers", driverClass);
+			res_prefix = "sqlserver";
+			schema_ver_query = TigaseConfigConst.SQLSERVER_GETSCHEMAVER_QUERY;
+		}
 		if (db_uri.startsWith("jdbc:mysql")) {
-			System.setProperty("jdbc.drivers", TigaseConfigConst.MYSQL_DRIVER);
+			driverClass = TigaseConfigConst.MYSQL_DRIVER;
+			System.setProperty("jdbc.drivers", driverClass);
 			res_prefix = "mysql";
 		}
 		if (db_uri.startsWith("jdbc:derby")) {
-			System.setProperty("jdbc.drivers", TigaseConfigConst.DERBY_DRIVER);
+			driverClass = TigaseConfigConst.DERBY_DRIVER;
+			System.setProperty("jdbc.drivers", driverClass);
 			res_prefix = "derby";
 			schema_ver_query = TigaseConfigConst.DERBY_GETSCHEMAVER_QUERY;
+		}
+		Driver driver;
+		try {
+
+			Debug.trace("selectDatabase (jdbc.drivers): " + System.getProperty( "jdbc.drivers" ));
+			Debug.trace("selectDatabase (res_prefix): " + res_prefix);
+			Debug.trace("selectDatabase (schema_ver_query): " + schema_ver_query);
+
+			driver = (Driver) Class.forName(driverClass).newInstance();
+			Debug.trace("selectDatabase (driver): " + driver.toString());
+			Debug.trace("selectDatabase (driver.acceptsURL): " + driver.acceptsURL( db_uri));
+
+			DriverManager.registerDriver(driver);
+		} catch ( Exception ex ) {
+			Logger.getLogger( TigaseInstallerDBHelper.class.getName() ).log( Level.SEVERE, null, ex );
 		}
 	}
 
@@ -535,6 +568,7 @@ class TigaseInstallerDBHelper {
 			Debug.trace("addXmppAdminAccount (root-tigase-db-uri): " + resource);
 
 		try {
+			Debug.trace("RepositoryFactory.getAuthRepository(" + className + ", " + resource + ",  + null)" );
 			AuthRepository repo = RepositoryFactory.getAuthRepository(
 					className, resource, null);
 
@@ -550,14 +584,19 @@ class TigaseInstallerDBHelper {
 
 		} catch (DBInitException e) {
 			msgTarget.addResultMessage().append("Error initializing DB");
+			Debug.trace("DBInitException: " + e);
 		} catch (TigaseDBException e) {
 			msgTarget.addResultMessage().append("DB error: " + e.getMessage());
+			Debug.trace("TigaseDBException: " + e);
 		} catch (ClassNotFoundException e) {
 			msgTarget.addResultMessage().append("Error locating connector");
+			Debug.trace("ClassNotFoundException: " + e);
 		} catch (InstantiationException e) {
 			msgTarget.addResultMessage().append("Error initializing connector");
+			Debug.trace("InstantiationException: " + e);
 		} catch (IllegalAccessException e) {
 			msgTarget.addResultMessage().append("Illegal access");
+			Debug.trace("IllegalAccessException: " + e);
 		}
 	}
 

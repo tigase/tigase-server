@@ -287,8 +287,11 @@ class TigaseConfigSaveHelper {
 	private String getDBUri(VariablesSource variablesSource) {
 		String db_uri = "jdbc:";
 		String database = getUserDB(variablesSource);
+		Debug.trace("getDBUri | database: "  +database);
 		if (database.equals("pgsql")) {
 			db_uri += "postgresql:";
+		} else if (database.equals("sqlserver")) {
+			db_uri += "jtds:sqlserver:";
 		} else {
 			db_uri += database + ":";
 		}
@@ -298,6 +301,17 @@ class TigaseConfigSaveHelper {
 				derby_path = derby_path.replace("\\", "\\\\");
 			}
 			db_uri += derby_path;
+		} else if ( database.equals( "sqlserver" ) ){
+			db_uri += "//" + variablesSource.getVariable("dbHost");
+			db_uri += ";databaseName=" + variablesSource.getVariable("dbName");
+			db_uri += ";user=" + variablesSource.getEncodedVariable("dbUser");
+			if ( variablesSource.getEncodedVariable( "dbPass" ) != null
+					 && !variablesSource.getEncodedVariable( "dbPass" ).isEmpty() ){
+				db_uri += ";password=" + variablesSource.getEncodedVariable( "dbPass" );
+			}
+			db_uri += ";schema=dbo";
+			db_uri += ";lastUpdateCount=false";
+			db_uri += ";cacheMetaData=false";
 		} else {
 			db_uri += "//" + variablesSource.getVariable("dbHost");
 			db_uri += "/" + variablesSource.getVariable("dbName");
@@ -313,13 +327,27 @@ class TigaseConfigSaveHelper {
 	private String getRootTigaseDBUri(VariablesSource variablesSource) {
 		String db_uri = "jdbc:";
 		String database = getUserDB(variablesSource);
+		Debug.trace("getDBUri | database: " + database);
 		if (database.equals("pgsql")) {
 			db_uri += "postgresql:";
+		} else if (database.equals("sqlserver")) {
+			db_uri += "jtds:sqlserver:";
 		} else {
 			db_uri += database + ":";
 		}
 		if (database.equals("derby")) {
 			db_uri += variablesSource.getVariable("DerbyDBPath") + ";create=true";
+		} else if ( database.equals( "sqlserver" ) ){
+			db_uri += "//" + variablesSource.getVariable("dbHost");
+			db_uri += ";databaseName=" + variablesSource.getVariable("dbName");
+			db_uri += ";user=" + variablesSource.getEncodedVariable("dbSuperuser");
+			if ( variablesSource.getEncodedVariable( "dbSuperpass" ) != null
+					 && !variablesSource.getEncodedVariable( "dbSuperpass" ).isEmpty() ){
+				db_uri += ";password=" + variablesSource.getEncodedVariable( "dbSuperpass" );
+			}
+			db_uri += ";schema=dbo";
+			db_uri += ";lastUpdateCount=false";
+			db_uri += ";cacheMetaData=false";
 		} else {
 			db_uri += "//" + variablesSource.getVariable("dbHost");
 			db_uri += "/" + variablesSource.getVariable("dbName");
@@ -336,9 +364,13 @@ class TigaseConfigSaveHelper {
 		String db_uri = "jdbc:";
 		String db = "";
 		String database = getUserDB(variablesSource);
+		Debug.trace("getDBUri | database: " + database);
 		if (database.equals("pgsql")) {
 			db_uri += "postgresql:";
 			db = "/postgres";
+		} else if (database.equals("sqlserver")) {
+			db_uri += "jtds:sqlserver:";
+			db = ";databaseName=master";
 		} else {
 			db_uri += database + ":";
 			if (database.equals("mysql")) {
@@ -347,6 +379,17 @@ class TigaseConfigSaveHelper {
 		}
 		if (database.equals("derby")) {
 			db_uri += variablesSource.getVariable("DerbyDBPath") + ";create=true";
+		} else if ( database.equals( "sqlserver" ) ){
+			db_uri += "//" + variablesSource.getVariable("dbHost");
+			db_uri += ";databaseName=master";
+			db_uri += ";user=" + variablesSource.getEncodedVariable("dbSuperuser");
+			if ( variablesSource.getEncodedVariable( "dbSuperpass" ) != null
+					 && !variablesSource.getEncodedVariable( "dbSuperpass" ).isEmpty() ){
+				db_uri += ";password=" + variablesSource.getEncodedVariable( "dbSuperpass" );
+			}
+			db_uri += ";schema=dbo";
+			db_uri += ";lastUpdateCount=false";
+			db_uri += ";cacheMetaData=false";
 		} else {
 			db_uri += "//" + variablesSource.getVariable("dbHost");
 			db_uri += db;
@@ -370,6 +413,17 @@ class TigaseConfigSaveHelper {
 			} else {
 				return null;
 			}
+		} else if ( database.equals( "sqlserver" ) ){
+			db_uri += "//" + variablesSource.getVariable("dbAuthHost");
+			db_uri += ";databaseName=" + variablesSource.getVariable("dbAuthName");
+			db_uri += ";user=" + variablesSource.getEncodedVariable("dbAuthUser");
+			if ( variablesSource.getEncodedVariable( "dbAuthPass" ) != null
+					 && !variablesSource.getEncodedVariable( "dbAuthPass" ).isEmpty() ){
+				db_uri += ";password=" + variablesSource.getEncodedVariable( "dbAuthPass" );
+			}
+			db_uri += ";schema=dbo";
+			db_uri += ";lastUpdateCount=false";
+			db_uri += ";cacheMetaData=false";
 		} else {
 			db_uri += "//" + variablesSource.getVariable("dbAuthHost");
 			db_uri += "/" + variablesSource.getVariable("dbAuthName");
@@ -441,9 +495,11 @@ class TigaseConfigSaveHelper {
 		return var;
 	}
 
-	private String getUserDB(VariablesSource variablesSource) {
-		String dbVar = variablesSource.getVariable(TigaseConfigConst.DB_TYPE);
-		String result = TigaseConfigConst.userDBMap.get(dbVar);
+	private String getUserDB( VariablesSource variablesSource ) {
+		String dbVar = variablesSource.getVariable( TigaseConfigConst.DB_TYPE );
+		Debug.trace( "@@ getUserDB | dbVar: " + dbVar );
+		String result = TigaseConfigConst.userDBMap.get( dbVar );
+		Debug.trace( "@@ getUserDB | result: " + result );
 		return result != null ? result : "derby";
 	}
 

@@ -328,6 +328,12 @@
 			<version>9.1-901-1.jdbc4</version>
 			<scope>runtime</scope>
 		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jtds</groupId>
+			<artifactId>jtds</artifactId>
+			<version>1.2.8</version>
+			<scope>runtime</scope>
+		</dependency>
 
 		<!-- other libraries-->
 		<dependency>
@@ -340,12 +346,6 @@
 			<groupId>openDMK</groupId>
 			<artifactId>jdmkrt</artifactId>
 			<version>1.0-b02</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jtds</groupId>
-			<artifactId>jtds</artifactId>
-			<version>1.2.2</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>

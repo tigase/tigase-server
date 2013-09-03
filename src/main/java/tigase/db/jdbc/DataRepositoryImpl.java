@@ -64,6 +64,10 @@ public class DataRepositoryImpl implements DataRepository {
 			"select * from SYS.SYSTABLES where tablename = UPPER(?) and ? is not null";
 
 	/** Field description */
+	public static final String SQLSERVER_CHECK_TABLE_QUERY =
+			"SELECT * FROM INFORMATION_SCHEMA.TABLES where TABLE_TYPE = 'BASE TABLE' AND  TABLE_NAME = ? and TABLE_SCHEMA = ?";
+
+	/** Field description */
 	public static final String OTHER_CHECK_TABLE_QUERY = "";
 
 	/** Field description */
@@ -77,6 +81,8 @@ public class DataRepositoryImpl implements DataRepository {
 	/** Field description */
 	public static final int DB_CONN_TIMEOUT = 15;
 
+	private dbTypes database = null;
+
 	private Connection conn = null;
 	private PreparedStatement conn_valid_st = null;
 	private long connectionValidateInterval = 1000 * 60;
@@ -86,7 +92,7 @@ public class DataRepositoryImpl implements DataRepository {
 	private Map<String, PreparedStatement> db_statements =
 			new ConcurrentSkipListMap<String, PreparedStatement>();
 	private Map<String, String> db_queries = new ConcurrentSkipListMap<String, String>();
-	private String check_table_query = MYSQL_CHECK_TABLE_QUERY;
+	private String check_table_query = OTHER_CHECK_TABLE_QUERY;
 	private String table_schema = null;
 	private int query_timeout = QUERY_TIMEOUT;
 	private int db_conn_timeout = DB_CONN_TIMEOUT;
@@ -221,6 +227,15 @@ public class DataRepositoryImpl implements DataRepository {
 	}
 
 	/**
+	 *
+	 * @return
+	 */
+	@Override
+	public dbTypes getDatabaseType() {
+		return database;
+	}
+
+	/**
 	 * Method description
 	 * 
 	 * 
@@ -248,47 +263,77 @@ public class DataRepositoryImpl implements DataRepository {
 	@Override
 	public void initRepository(String resource_uri, Map<String, String> params)
 			throws SQLException {
-                String driverClass = null;
+		String driverClass = null;
 
-                if (resource_uri.startsWith("jdbc:postgresql")) {
-                        driverClass = "org.postgresql.Driver";
-                }
-                else if (resource_uri.startsWith("jdbc:mysql")) {
-                        driverClass = "com.mysql.jdbc.Driver";
-                }
-                else if (resource_uri.startsWith("jdbc:derby")) {
-                        driverClass = "org.apache.derby.jdbc.EmbeddedDriver";
-                }
+		if ( resource_uri.startsWith( "jdbc:postgresql" ) ){
+			database = dbTypes.postgresql;
+		} else if ( resource_uri.startsWith( "jdbc:mysql" ) ){
+			database = dbTypes.mysql;
+		} else if ( resource_uri.startsWith( "jdbc:derby" ) ){
+			database = dbTypes.derby;
+		} else if ( resource_uri.startsWith( "jdbc:jtds:sqlserver" ) ){
+			database = dbTypes.jtds;
+		} else if ( resource_uri.startsWith( "jdbc:sqlserver" ) ){
+			database = dbTypes.sqlserver;
+		}
 
-                try {
-                        Class.forName(driverClass, true, this.getClass().getClassLoader());
-                }
-                catch (ClassNotFoundException ex) {
-                        Logger.getLogger(DataRepositoryImpl.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                
-                
+		switch ( database ) {
+			case postgresql:
+				driverClass = "org.postgresql.Driver";
+				check_table_query = PGSQL_CHECK_TABLE_QUERY;
+				break;
+			case mysql:
+				driverClass = "com.mysql.jdbc.Driver";
+				check_table_query = MYSQL_CHECK_TABLE_QUERY;
+				break;
+			case derby:
+				driverClass = "org.apache.derby.jdbc.EmbeddedDriver";
+				check_table_query = DERBY_CHECK_TABLE_QUERY;
+				break;
+			case jtds:
+				driverClass = "net.sourceforge.jtds.jdbc.Driver";
+				check_table_query = SQLSERVER_CHECK_TABLE_QUERY;
+				break;
+			case sqlserver:
+				driverClass = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+				check_table_query = SQLSERVER_CHECK_TABLE_QUERY;
+				break;
+			default:
+				driverClass = "net.sf.log4jdbc.sql.jdbcapi.DriverSpy";
+				check_table_query = OTHER_CHECK_TABLE_QUERY;
+				break;
+		}
+
+		try {
+			Class.forName( driverClass, true, this.getClass().getClassLoader() );
+		} catch ( ClassNotFoundException ex ) {
+			Logger.getLogger( DataRepositoryImpl.class.getName() ).log( Level.SEVERE, null, ex );
+		}
+
 		db_conn = resource_uri;
-		db_conn_timeout = getParam(DB_CONN_TIMEOUT_PROP_KEY, params, DB_CONN_TIMEOUT);
-		query_timeout = getParam(QUERY_TIMEOUT_PROP_KEY, params, QUERY_TIMEOUT);
+		db_conn_timeout = getParam( DB_CONN_TIMEOUT_PROP_KEY, params, DB_CONN_TIMEOUT );
+		query_timeout = getParam( QUERY_TIMEOUT_PROP_KEY, params, QUERY_TIMEOUT );
 
-		if (db_conn != null) {
-			String[] slashes = db_conn.split("/");
-			table_schema = slashes[slashes.length - 1].split("\\?")[0];
-			log.log(Level.INFO, "Table schema found: {0}", table_schema);
+		if ( db_conn != null ){
+
+			switch ( database ) {
+				case jtds:
+				case sqlserver:
+					table_schema = "dbo";
+					break;
+				case postgresql:
+					table_schema = "public";
+					break;
+				default:
+					String[] slashes = db_conn.split( "/" );
+					table_schema = slashes[slashes.length - 1].split( "\\?" )[0];
+					break;
+			}
+			log.log( Level.INFO, "Table schema found: {0}, database type: {1}, database driver: {2}",
+							 new Object[] { table_schema, database.toString(), driverClass } );
 		}
 		initRepo();
 
-		if (db_conn.contains("mysql")) {
-			check_table_query = MYSQL_CHECK_TABLE_QUERY;
-		} else if (db_conn.contains("postgresql")) {
-			check_table_query = PGSQL_CHECK_TABLE_QUERY;
-			table_schema = "public";
-		} else if (db_conn.contains("derby")) {
-			check_table_query = DERBY_CHECK_TABLE_QUERY;
-		} else {
-			check_table_query = OTHER_CHECK_TABLE_QUERY;
-		}
 
 		if (!check_table_query.isEmpty()) {
 			initPreparedStatement(check_table_query, check_table_query);

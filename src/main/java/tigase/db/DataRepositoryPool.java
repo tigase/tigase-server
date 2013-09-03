@@ -28,10 +28,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,6 +51,7 @@ public class DataRepositoryPool implements DataRepository {
 	private CopyOnWriteArrayList<DataRepository> repoPool =
 			new CopyOnWriteArrayList<DataRepository>();
 	private String resource_uri = null;
+	private dbTypes database = null;
 
 	// ~--- methods --------------------------------------------------------------
 
@@ -196,6 +195,16 @@ public class DataRepositoryPool implements DataRepository {
 		return resource_uri;
 	}
 
+
+	/**
+	 *
+	 * @return
+	 */
+	@Override
+	public dbTypes getDatabaseType() {
+		return database;
+	}
+
 	// ~--- methods --------------------------------------------------------------
 
 	/**
@@ -227,9 +236,23 @@ public class DataRepositoryPool implements DataRepository {
 	public void initRepository(String resource_uri, Map<String, String> params)
 			throws SQLException {
 		this.resource_uri = resource_uri;
-
+		
 		for (DataRepository dataRepository : repoPool) {
 			dataRepository.initRepository(resource_uri, params);
+			this.database = dataRepository.getDatabaseType();
+		}
+		if ( this.database == null ){
+			if ( resource_uri.startsWith( "jdbc:postgresql" ) ){
+				database = dbTypes.postgresql;
+			} else if ( resource_uri.startsWith( "jdbc:mysql" ) ){
+				database = dbTypes.mysql;
+			} else if ( resource_uri.startsWith( "jdbc:derby" ) ){
+				database = dbTypes.derby;
+			} else if ( resource_uri.startsWith( "jdbc:jtds:sqlserver" ) ){
+				database = dbTypes.jtds;
+			} else if ( resource_uri.startsWith( "jdbc:sqlserver" ) ){
+				database = dbTypes.sqlserver;
+			}
 		}
 	}
 

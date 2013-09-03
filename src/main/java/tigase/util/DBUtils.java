@@ -63,24 +63,29 @@ public abstract class DBUtils {
 			repo = (String) params.get(secondaryKey);
 		}
 
-		if (repo != null) {
-			if (repo.equals("mysql")) {
+		if ( repo != null ){
+			if ( repo.equals( "mysql" ) ){
 				repo_class = RepositoryFactory.MYSQL_REPO_CLASS_PROP_VAL;
 				repo_url = RepositoryFactory.MYSQL_REPO_URL_PROP_VAL;
 			} else {
-				if (repo.equals("pgsql")) {
+				if ( repo.equals( "pgsql" ) ){
 					repo_class = RepositoryFactory.PGSQL_REPO_CLASS_PROP_VAL;
 					repo_url = RepositoryFactory.PGSQL_REPO_URL_PROP_VAL;
 				} else {
-					if (repo.equals("drupal")) {
+					if ( repo.equals( "drupal" ) ){
 						repo_class = RepositoryFactory.DRUPALWP_REPO_CLASS_PROP_VAL;
 						repo_url = RepositoryFactory.DRUPAL_REPO_URL_PROP_VAL;
 					} else {
-						if (repo.equals("libresource")) {
-							repo_class = RepositoryFactory.LIBRESOURCE_REPO_CLASS_PROP_VAL;
-							repo_url = RepositoryFactory.LIBRESOURCE_REPO_URL_PROP_VAL;
+						if ( repo.equals( "sqlserver" ) ){
+							repo_class = RepositoryFactory.SQLSERVER_REPO_CLASS_PROP_VAL;
+							repo_url = RepositoryFactory.SQLSERVER_REPO_URL_PROP_VAL;
 						} else {
-							repo_class = repo;
+							if ( repo.equals( "libresource" ) ){
+								repo_class = RepositoryFactory.LIBRESOURCE_REPO_CLASS_PROP_VAL;
+								repo_url = RepositoryFactory.LIBRESOURCE_REPO_URL_PROP_VAL;
+							} else {
+								repo_class = repo;
+							}
 						}
 					}
 				}

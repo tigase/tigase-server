@@ -16,12 +16,8 @@ if [ ! -e logs ] ; then
 	mkdir logs || exit -1
 fi
 
-
-
 # get dependencies
-cd modules/distribution
-mvn -U dependency:copy-dependencies -DoutputDirectory=../../jars -Dmdep.stripVersion=true
-cd ../..
+mvn -f modules/distribution dependency:copy-dependencies -DoutputDirectory=jars -Dmdep.stripVersion=true
 
 # copy socks5 schema
 if [ -d ../socks5 ] ; then
