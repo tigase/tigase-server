@@ -263,11 +263,15 @@ public class SaslAuth
 
 					Collection<String> allowedMechanisms = (Collection<String>) session
 							.getSessionData(ALLOWED_SASL_MECHANISMS_KEY);
-
 					session.removeSessionData(ALLOWED_SASL_MECHANISMS_KEY);
-					if ((mechanismName == null) ||!allowedMechanisms.contains(mechanismName)) {
-						throw new XmppSaslException(SaslError.invalid_mechanism, "Mechanism '" +
-								mechanismName + "' is not allowed");
+
+					if (allowedMechanisms == null) {
+						allowedMechanisms = mechanismSelector.filterMechanisms(Sasl.getSaslServerFactories(), session);
+					}
+					
+					if ((mechanismName == null) || allowedMechanisms == null || !allowedMechanisms.contains(mechanismName)) {
+						throw new XmppSaslException(SaslError.invalid_mechanism, "Mechanism '" + mechanismName
+								+ "' is not allowed");
 					}
 
 					CallbackHandler cbh = callbackHandlerFactory.create(mechanismName, session,
@@ -454,6 +458,7 @@ public class SaslAuth
 					new String[] { _XMLNS }) };
 		}
 	}
+	
 }
 
 
