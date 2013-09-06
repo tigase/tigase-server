@@ -352,10 +352,18 @@ public class TigaseAuth implements AuthRepository {
 
 			synchronized (user_login_plain_pw_sp) {
 
-				// String user_id = BareJID.jidToBareJID(user);
 				user_login_plain_pw_sp.setString(1, user.toString());
 				user_login_plain_pw_sp.setString(2, password);
-				rs = user_login_plain_pw_sp.executeQuery();
+				switch ( data_repo.getDatabaseType() ) {
+					case jtds:
+					case sqlserver:
+						user_login_plain_pw_sp.executeUpdate();
+						rs = user_login_plain_pw_sp.getGeneratedKeys();
+						break;
+					default:
+						rs = user_login_plain_pw_sp.executeQuery();
+						break;
+				}
 
 				boolean auth_result_ok = false;
 

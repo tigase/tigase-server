@@ -123,11 +123,11 @@
 				<include>org.apache.derby:derbytools</include>
 				<include>mysql:mysql-connector-java</include>
 				<include>postgresql:postgresql</include>
+				<include>net.sourceforge.jtds:jtds</include>
 				
 				<!-- other libraries-->
 				<include>org.codehaus.groovy:groovy-all</include>
 				<include>openDMK:jdmkrt</include>
-				<include>net.sourceforge.jtds:jtds</include>
 				<include>org.hamcrest:hamcrest-core</include>
 				<include>org.slf4j:slf4j-api</include>
 				<include>org.slf4j:jul-to-slf4j</include>

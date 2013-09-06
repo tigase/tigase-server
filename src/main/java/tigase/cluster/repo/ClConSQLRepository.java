@@ -29,8 +29,6 @@ package tigase.cluster.repo;
 import tigase.db.DataRepository;
 import tigase.db.RepositoryFactory;
 
-import static tigase.conf.Configurable.*;
-
 //~--- JDK imports ------------------------------------------------------------
 
 import java.sql.PreparedStatement;
@@ -98,6 +96,20 @@ public class ClConSQLRepository
 					+ "  " + CPU_USAGE_COLUMN + " double precision not null,"
 					+ "  " + MEM_USAGE_COLUMN + " double precision not null,"
 					+ "  primary key(" + HOSTNAME_COLUMN + "))";
+	private static final String CREATE_TABLE_QUERY_SQLSERVER =
+					"create table [dbo].[" + TABLE_NAME + "] ("
+					+ "  " + HOSTNAME_COLUMN + " varchar(512) not null,"
+					+ "  " + PASSWORD_COLUMN + " varchar(255) not null,"
+					+ "  " + LASTUPDATE_COLUMN
+					+ " [datetime] NULL,"
+					+ "  " + PORT_COLUMN + " int,"
+					+ "  " + CPU_USAGE_COLUMN + " double precision not null,"
+					+ "  " + MEM_USAGE_COLUMN + " double precision not null,"
+					+ " CONSTRAINT [PK_" + TABLE_NAME + "] PRIMARY KEY CLUSTERED ( [" + HOSTNAME_COLUMN + "] ASC ) ON [PRIMARY], "
+					+ " CONSTRAINT [IX_" + TABLE_NAME + "_" + HOSTNAME_COLUMN + "] UNIQUE NONCLUSTERED ( [" + HOSTNAME_COLUMN + "] ASC ) ON [PRIMARY] "
+					+ ") ON [PRIMARY]"
+					+ "ALTER TABLE [dbo].[" + TABLE_NAME + "] ADD  CONSTRAINT "
+					+ "[DF_" + TABLE_NAME + "_" + LASTUPDATE_COLUMN + "]  DEFAULT (getdate()) FOR [" + LASTUPDATE_COLUMN + "] ";
 	private static final String INSERT_ITEM_QUERY =
 					"insert into " + TABLE_NAME + " ("
 					+ HOSTNAME_COLUMN + ", "
@@ -138,10 +150,10 @@ public class ClConSQLRepository
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
 		super.getDefaults(defs, params);
 
-		String repo_uri = DERBY_REPO_URL_PROP_VAL;
+		String repo_uri = RepositoryFactory.DERBY_REPO_URL_PROP_VAL;
 
-		if (params.get(GEN_USER_DB_URI) != null) {
-			repo_uri = (String) params.get(GEN_USER_DB_URI);
+		if (params.get(RepositoryFactory.GEN_USER_DB_URI) != null) {
+			repo_uri = (String) params.get(RepositoryFactory.GEN_USER_DB_URI);
 		}
 		defs.put(REPO_URI_PROP_KEY, repo_uri);
 	}
@@ -281,17 +293,29 @@ public class ClConSQLRepository
 		// Do nothing everything is written on demand to DB
 	}
 
+	/**
+	 * Performs database check, creates missing schema if necessary
+	 *
+	 * @throws SQLException
+	 */
 	private void checkDB() throws SQLException {
 		ResultSet rs = null;
 		Statement st = null;
 
-		String resourceUri = data_repo.getResourceUri();
+		DataRepository.dbTypes databaseType = data_repo.getDatabaseType();
 		String createTableQuery;
 
-		if ( resourceUri.startsWith( "jdbc:mysql:" ) ){
-			createTableQuery = CREATE_TABLE_QUERY_MYSQL;
-		} else {
-			createTableQuery = CREATE_TABLE_QUERY;
+		switch ( databaseType ) {
+			case mysql:
+				createTableQuery = CREATE_TABLE_QUERY_MYSQL;
+				break;
+			case jtds:
+			case sqlserver:
+				createTableQuery = CREATE_TABLE_QUERY_SQLSERVER;
+				break;
+			default:
+				createTableQuery = CREATE_TABLE_QUERY;
+				break;
 		}
 
 		try {

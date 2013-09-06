@@ -79,7 +79,7 @@ public class XMPPIOProcessorsFactory {
 		
 		Map<String,Object> results = new HashMap<String,Object>();
 		
-		String keyPrefix = IO_PROCESSORS_PROP_KEY + "/" + procId;
+		String keyPrefix = IO_PROCESSORS_PROP_KEY + "/" + procId + "/";
 				
 		for (Map.Entry<String,Object> entry : props.entrySet()) {
 			if (entry.getKey().startsWith(keyPrefix)) {

@@ -251,8 +251,6 @@ public class ConfigSQLRepository extends ConfigurationCache {
 			+ COMPONENT_NAME_COLUMN + " = ?) " + " AND (" + NODE_NAME_COLUMN + " = ?) " + " AND ("
 			+ KEY_NAME_COLUMN + " = ?) ";
 
-		// + " AND (" + FLAG_COLUMN + " = ?)";
-		private static final String CHECK_TABLE_QUERY = "select count(*) from " + TABLE_NAME;
 		private static final String GET_ITEM_QUERY = "select * from " + TABLE_NAME + ITEM_WHERE_PART;
 		private static final String ADD_ITEM_QUERY = "insert into " + TABLE_NAME + " ("
 			+ CLUSTER_NODE_COLUMN + ", " + COMPONENT_NAME_COLUMN + ", " + NODE_NAME_COLUMN + ", "
@@ -282,19 +280,6 @@ public class ConfigSQLRepository extends ConfigurationCache {
 		private DataRepository data_repo = null;
 
 		//~--- methods ------------------------------------------------------------
-
-//  private PreparedStatement createTableSt = null;
-//  private PreparedStatement checkTableSt = null;
-//  private PreparedStatement getItemSt = null;
-//  private PreparedStatement getAllItemsSt = null;
-//  private PreparedStatement getCompItemsSt = null;
-//  private PreparedStatement getUpdatedItemsSt = null;
-//  private PreparedStatement addItemSt = null;
-//  private PreparedStatement updateItemSt = null;
-//  private PreparedStatement deleteItemSt = null;
-//  private PreparedStatement getCompNamesSt = null;
-//  private PreparedStatement getPropertiesCountSt = null;
-//  private PreparedStatement getKeysSt = null;
 
 		/**
 		 * Method description
@@ -357,9 +342,6 @@ public class ConfigSQLRepository extends ConfigurationCache {
 					log.log(Level.WARNING,
 							"Problem adding/updating an item to DB: " + item.toElement() + "\n", ex);
 
-//        log.log(Level.WARNING,
-//            "SQLWarning: " + updateItemSt.getWarnings().getMessage() +
-//            ", state: " + updateItemSt.getWarnings().getSQLState());
 				}
 			} catch (Exception e) {
 				log.warning(e + "Exception while adding config item: " + item.toString());

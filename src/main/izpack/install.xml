@@ -57,6 +57,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 	<jar src="jars/postgresql.jar"/>
 	<jar src="jars/mysql-connector-java.jar"/>
 	<jar src="jars/derby.jar"/>
+	<jar src="jars/jtds.jar"/>
 	<jar src="jars/tigase-server.jar"/>
 	<jar src="jars/tigase-xmltools.jar"/>
 	<jar src="jars/tigase-utils.jar"/>
@@ -107,6 +108,10 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<condition type="variable" id="pgsqlSelected">
 			<name>dbType</name>
 			<value>PostgreSQL</value>
+		</condition>
+		<condition type="variable" id="sqlserverSelected">
+			<name>dbType</name>
+			<value>SQLServer</value>
 		</condition>
 		<condition type="variable" id="derbySelected">
 			<name>dbType</name>
@@ -210,10 +215,20 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<res id="derby-schema-5-1-props" src="database/derby-schema-5-1-props.sql"/>
 		<res id="derby-schema-upgrade-to-5-1" src="database/derby-schema-upgrade-to-5-1.sql"/>
 
-		<!-- Socks5 component schema files -->
+		<res id="sqlserver-installer-create-db" src="database/sqlserver-installer-create-db.sql"/>
+		<res id="sqlserver-installer-post" src="database/sqlserver-installer-post.sql"/>
+		<res id="sqlserver-schema-5-1-schema" src="database/sqlserver-schema-5-1-schema.sql"/>
+		<res id="sqlserver-schema-5-1-sp" src="database/sqlserver-schema-5-1-sp.sql"/>
+		<res id="sqlserver-schema-5-1-props" src="database/sqlserver-schema-5-1-props.sql"/>
 
+		<!-- Socks5 component schema files -->
 		<res id="derby-socks5-schema" src="database/derby-socks5-schema.sql"/>
 		<res id="postgresql-socks5-schema" src="database/postgresql-socks5-schema.sql"/>
+		<res id="mysql-socks5-schema" src="database/mysql-socks5-schema.sql"/>
+		<res id="sqlserver-socks5-schema" src="database/sqlserver-socks5-schema.sql"/>
+
+		<!-- Socks5 component schema files -->
+		<res id="sqlserver-socks5-schema" src="database/sqlserver-socks5-schema.sql"/>
 		<res id="mysql-socks5-schema" src="database/mysql-socks5-schema.sql"/>
 
 
@@ -256,10 +271,12 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 
 			<panel classname="UserInputPanel" condition="acsSelected"
 						 id="AdvancedClusteringStrategyPanel.id"/>
+			<panel classname="UserInputPanel" condition="sqlserverSelected"
+						 id="SqlServerPanel.id"/>
 
 			<panel classname="UserInputPanel" condition="advancedSelected"
 						 id="PluginsListPanel.id"/>
-			<panel classname="UserInputPanel" condition="mysqlSelected|pgsqlSelected"
+			<panel classname="UserInputPanel" condition="mysqlSelected|pgsqlSelected|sqlserverSelected"
 						 id="DatabaseConfigurationPanel.id"/>
 			<panel classname="DerbyPathPanel" condition="derbySelected"
 						 id="DerbyPathPanel.id"/>

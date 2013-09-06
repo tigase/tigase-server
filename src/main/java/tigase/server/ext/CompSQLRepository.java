@@ -84,27 +84,22 @@ public class CompSQLRepository
 	private static final String DELETE_ITEM_QUERY = "delete from " + TABLE_NAME +
 			" where (" + DOMAIN_COLUMN + " = ?)";
 	private static final String CREATE_TABLE_QUERY = "create table " + TABLE_NAME + " (" +
-			"  " + DOMAIN_COLUMN + " varchar(512) NOT NULL," + "  " + PASSWORD_COLUMN +
+			"  " + DOMAIN_COLUMN + " varchar(255) NOT NULL," + "  " + PASSWORD_COLUMN +
 			" varchar(255) NOT NULL," + "  " + CONNECTION_TYPE_COLUMN + " varchar(127)," +
-			"  " + PORT_COLUMN + " int," + "  " + REMOTE_DOMAIN_COLUMN + " varchar(1023)," +
+			"  " + PORT_COLUMN + " int," + "  " + REMOTE_DOMAIN_COLUMN + " varchar(255)," +
 			"  " + PROTOCOL_COLUMN + " varchar(127)," + "  " + OTHER_DATA_COLUMN +
-			" varchar(32672)," + "  primary key(" + DOMAIN_COLUMN + "))";
+			" TEXT," + "  primary key(" + DOMAIN_COLUMN + "))";
 	private static final String CHECK_TABLE_QUERY = "select count(*) from " + TABLE_NAME;
 	private static final String ADD_ITEM_QUERY = "insert into " + TABLE_NAME + " (" +
 			DOMAIN_COLUMN + ", " + PASSWORD_COLUMN + ", " + CONNECTION_TYPE_COLUMN + ", " +
 			PORT_COLUMN + ", " + REMOTE_DOMAIN_COLUMN + ", " + PROTOCOL_COLUMN + ", " +
-			OTHER_DATA_COLUMN + ") " + " values (?, ?, ?, ?, ?, ?, ?)";
+//			OTHER_DATA_COLUMN + ") " + " values (?, ?, ?, ?, ?, ?, ?)";
+			OTHER_DATA_COLUMN + ") " + " (select ?, ?, ?, ?, ?, ?, ? from " + TABLE_NAME + " where " + DOMAIN_COLUMN + " = ? HAVING count(*)=0) ";
 
 	//~--- fields ---------------------------------------------------------------
 
 	private DataRepository data_repo = null;
 
-	// private PreparedStatement addItemSt = null;
-	// private PreparedStatement checkTableSt = null;
-	// private PreparedStatement createTableSt = null;
-	// private PreparedStatement deleteItemSt = null;
-	// private PreparedStatement getAllItemsSt = null;
-	// private PreparedStatement getItemSt = null;
 	private String               tableName  = TABLE_NAME;
 	private CompConfigRepository configRepo = new CompConfigRepository();
 
@@ -148,6 +143,7 @@ public class CompSQLRepository
 			synchronized (addItemSt) {
 				if ((item.getDomain() != null) &&!item.getDomain().isEmpty()) {
 					addItemSt.setString(1, item.getDomain());
+					addItemSt.setString(8, item.getDomain());
 				} else {
 					throw new NullPointerException("Null or empty domain name is not allowed");
 				}
@@ -438,22 +434,13 @@ public class CompSQLRepository
 		return null;
 	}
 
+	/**
+	 * Performs database check, creates missing schema if necessary
+	 *
+	 * @throws SQLException
+	 */
 	private void checkDB() throws SQLException {
-		ResultSet rs = null;
-		Statement st = null;
-
-		try {
-			if (!data_repo.checkTable(tableName)) {
-				log.info("DB for external component is not OK, creating missing tables...");
-				st = data_repo.createStatement(null);
-				st.executeUpdate(CREATE_TABLE_QUERY);
-				log.info("DB for external component created OK");
-			}
-		} finally {
-			data_repo.release(st, rs);
-			rs = null;
-			st = null;
-		}
+		data_repo.checkTable( tableName, CREATE_TABLE_QUERY );
 	}
 
 	private CompRepoItem createItemFromRS(ResultSet rs) throws SQLException {

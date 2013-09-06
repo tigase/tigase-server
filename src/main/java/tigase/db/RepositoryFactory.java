@@ -24,10 +24,6 @@
 
 package tigase.db;
 
-//~--- non-JDK imports --------------------------------------------------------
-
-import static tigase.conf.Configurable.*;
-
 //~--- JDK imports ------------------------------------------------------------
 
 import java.sql.SQLException;
@@ -163,6 +159,14 @@ public abstract class RepositoryFactory {
 	public static final String LIBRESOURCE_REPO_URL_PROP_VAL =
 			"jdbc:postgresql://localhost/libresource?user=demo";
 
+	/** Default MS SQL Server JDBC class */
+	public static final String SQLSERVER_REPO_CLASS_PROP_VAL =
+			"tigase.db.jdbc.JDBCRepository";
+
+	/** Default MS SQL Server JDBC connection string */
+	public static final String SQLSERVER_REPO_URL_PROP_VAL =
+			"jdbc:sqlserver://localhost:1433;databaseName=tigasedb;user=tigase;password=tigase;schema=dbo";
+
 	/** Field description */
 	public static final String MYSQL_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.JDBCRepository";
 
@@ -257,6 +261,9 @@ public abstract class RepositoryFactory {
 	public static final String XML_REPO_URL_PROP_VAL = "user-repository.xml";
 
 	/** Field description */
+	public static final String DATABASE_TYPE_PROP_KEY = "database-type";
+
+	/** Field description */
 	private static ConcurrentMap<String, UserRepository> user_repos =
 			new ConcurrentHashMap<String, UserRepository>(5);
 	private static ConcurrentMap<String, DataRepository> data_repos =
@@ -311,6 +318,7 @@ public abstract class RepositoryFactory {
 			}
 			params.put(RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, String.valueOf(
 					repo_pool_size));
+			params.put(RepositoryFactory.DATABASE_TYPE_PROP_KEY, class_name);
 			if (repo_pool_cls != null) {
 				AuthRepositoryPool repo_pool = (AuthRepositoryPool) Class.forName(repo_pool_cls)
 						.newInstance();
@@ -373,6 +381,7 @@ public abstract class RepositoryFactory {
 				repo_pool_size = Integer.getInteger(DATA_REPO_POOL_SIZE_PROP_KEY,
 						DATA_REPO_POOL_SIZE_PROP_VAL);
 			}
+			params.put(RepositoryFactory.DATABASE_TYPE_PROP_KEY, class_name);
 
 			DataRepositoryPool repo_pool = (DataRepositoryPool) Class.forName(System
 					.getProperty(DATA_REPO_POOL_CLASS_PROP_KEY, DATA_REPO_POOL_CLASS_PROP_VAL))
@@ -424,6 +433,9 @@ public abstract class RepositoryFactory {
 		if (repo_name.equals("libresource")) {
 			result = LIBRESOURCE_REPO_CLASS_PROP_VAL;
 		}
+		if (repo_name.equals("sqlserver")) {
+			result = SQLSERVER_REPO_CLASS_PROP_VAL;
+		}
 
 		return result;
 	}
@@ -473,6 +485,7 @@ public abstract class RepositoryFactory {
 			}
 			params.put(RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, String.valueOf(
 					repo_pool_size));
+			params.put(RepositoryFactory.DATABASE_TYPE_PROP_KEY, class_name);
 			if (repo_pool_cls != null) {
 				UserRepositoryPool repo_pool = (UserRepositoryPool) Class.forName(repo_pool_cls)
 						.newInstance();

@@ -95,6 +95,14 @@ public class JDBCRepository
 	public static final String DERBY_GETSCHEMAVER_QUERY =
 		"values TigGetDBProperty('schema-version')";
 
+	/** Stored procedure used to check version of the schema
+	 * 
+	 * neither MS SQL Server JDBC driver supports default
+	 * schema prefix in connection string for stored functions
+	 */
+	public static final String SQLSERVER_GETSCHEMAVER_QUERY =
+		"select dbo.TigGetDBProperty('schema-version')";
+
 	/** Field description */
 	public static final String JDBC_GETSCHEMAVER_QUERY =
 		"select TigGetDBProperty('schema-version')";
@@ -139,7 +147,6 @@ public class JDBCRepository
 	private Map<String, Object> cache = null;
 	private DataRepository data_repo  = null;
 	private String get_users_query    = null;
-	private boolean derby_mode        = false;
 	private boolean autoCreateUser    = false;
 
 	//~--- methods --------------------------------------------------------------
@@ -322,10 +329,6 @@ public class JDBCRepository
 												final String def)
 					throws UserNotFoundException, TigaseDBException {
 
-		// String[] cache_res = (String[])cache.get(user_id+"/"+subnode+"/"+key);
-		// if (cache_res != null) {
-		// return cache_res[0];
-		// } // end of if (result != null)
 		ResultSet rs = null;
 
 		try {
@@ -569,7 +572,7 @@ public class JDBCRepository
 
 		try {
 			long nid                            = getNodeNID(null, user_id, subnode);
-			PreparedStatement nodes_for_node_st = data_repo.getPreparedStatement(user_id,
+				PreparedStatement nodes_for_node_st = data_repo.getPreparedStatement(user_id,
 																							NODES_FOR_NODE_QUERY);
 
 			synchronized (nodes_for_node_st) {
@@ -665,11 +668,11 @@ public class JDBCRepository
 			} else {
 				uid_sp = repo.getPreparedStatement(user_id, GET_USER_DB_UID_QUERY);
 			}
-			synchronized (uid_sp) {
-				uid_sp.setString(1, user_id.toString());
+			synchronized ( uid_sp ) {
+				uid_sp.setString( 1, user_id.toString() );
 				rs = uid_sp.executeQuery();
 				if (rs.next()) {
-					result = rs.getLong(1);
+					result = rs.getLong( 1 );
 				} else {
 					result = -1;
 				}
@@ -808,7 +811,6 @@ public class JDBCRepository
 	public void initRepository(final String connection_str, Map<String, String> params)
 					throws DBInitException {
 		try {
-			derby_mode = connection_str.startsWith("jdbc:derby");
 			data_repo  = RepositoryFactory.getDataRepository(null, connection_str, params);
 			checkDBSchema();
 			if (connection_str.contains("autoCreateUser=true")) {
@@ -1201,40 +1203,6 @@ public class JDBCRepository
 			}
 		}
 
-		// int counter = 0;
-		// boolean success = false;
-		// DataRepository repo = data_repo.takeRepoHandle();
-		// try {
-		// while (!success && ++counter < 4) {
-		// try {
-		// repo.startTransaction();
-		// removeData(repo, user_id, subnode, key);
-		// addDataList(repo, user_id, subnode, key, list);
-		// repo.commit();
-		// repo.endTransaction();
-		// success = true;
-		// } catch (SQLException sqlex) {
-		// try {
-		// repo.rollback();
-		// repo.endTransaction();
-		// } catch (SQLException e) {
-		// log.log(Level.WARNING, "Problem rolling-back transaction: ", e);
-		// }
-		// try {
-		// Thread.sleep(10);
-		// } catch (InterruptedException ex) {
-		// }
-		// }
-		// }
-		// } finally {
-		// data_repo.releaseRepoHandle(repo);
-		// }
-		// if (!success) {
-		// log.log(Level.WARNING,
-		// "Unsuccessful dataList set, user_id: " + user_id + ", subnode: " +
-		// subnode
-		// + ", key: " + key + ", list: " + Arrays.toString(list));
-		// }
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -1292,7 +1260,17 @@ public class JDBCRepository
 				}    // end of else
 				node_add_sp.setLong(2, uid);
 				node_add_sp.setString(3, node_name);
-				rs = node_add_sp.executeQuery();
+
+				switch ( data_repo.getDatabaseType() ) {
+					case sqlserver:
+						node_add_sp.executeUpdate();
+						rs = node_add_sp.getGeneratedKeys();
+						break;
+					default:
+						rs = node_add_sp.executeQuery();
+						break;
+				}
+
 				if (rs.next()) {
 					return rs.getLong(1);
 				} else {
@@ -1335,17 +1313,27 @@ public class JDBCRepository
 			try {
 				user_add_sp.setString(1, user_id.toString());
 				user_add_sp.setNull(2, Types.VARCHAR);
-				rs = user_add_sp.executeQuery();
+
+				String out = String.format("Jid %1$s;", user_id.toString());
+				log.log(Level.ALL, out );
+				System.out.println( out );
+
+				switch ( data_repo.getDatabaseType() ) {
+					case sqlserver:
+						user_add_sp.executeUpdate();
+						rs = user_add_sp.getGeneratedKeys();
+						break;
+					default:
+						rs = user_add_sp.executeQuery();
+						break;
+				}
+
 				if (rs.next()) {
 					uid = rs.getLong(1);
 
 					// addNode(uid, -1, root_node);
 				} else {
 					log.warning("Missing UID after adding new user...");
-
-					// throw new
-					// TigaseDBException("Propeblem adding new user to repository. "
-					// + "The SP should return uid or fail");
 				}    // end of if (isnext) else
 			} finally {
 				data_repo.release(null, rs);
@@ -1385,9 +1373,20 @@ public class JDBCRepository
 	// Implementation of tigase.db.UserRepository
 	private void checkDBSchema() throws SQLException {
 		String schema_version = "1.0";
-		String query          = (derby_mode
-														 ? DERBY_GETSCHEMAVER_QUERY
-														 : JDBC_GETSCHEMAVER_QUERY);
+		String query = null;
+
+		switch ( data_repo.getDatabaseType() ) {
+			case derby:
+				query = DERBY_GETSCHEMAVER_QUERY;
+				break;
+			case jtds:
+			case sqlserver:
+				query = SQLSERVER_GETSCHEMAVER_QUERY;
+				break;
+			default:
+				query = JDBC_GETSCHEMAVER_QUERY;
+				break;
+		}
 		Statement stmt        = data_repo.createStatement(null);
 		ResultSet rs          = stmt.executeQuery(query);
 

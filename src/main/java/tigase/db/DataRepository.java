@@ -48,6 +48,15 @@ import tigase.xmpp.BareJID;
 public interface DataRepository {
 
 	/**
+	 * Helper enumeration with types of supported databases.
+	 *
+	 */
+	public static enum dbTypes {
+
+		derby, mysql, postgresql, jtds, sqlserver, other
+	}
+
+	/**
 	 * The method checks whether a table for the given name exists in the
 	 * database.
 	 * 
@@ -113,8 +122,14 @@ public interface DataRepository {
 	 */
 	String getResourceUri();
 
-	// ~--- methods --------------------------------------------------------------
+	/**
+	 * Returns type of DataRepository database
+	 *
+	 * @return
+	 */
+	dbTypes getDatabaseType();
 
+	// ~--- methods --------------------------------------------------------------
 	/**
 	 * Initializes a prepared statement for a given query and stores it internally
 	 * under the given id key. It can be retrieved later using

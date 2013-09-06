@@ -26,6 +26,9 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import tigase.conf.ConfigurationException;
@@ -118,7 +121,7 @@ public final class XMPPServer {
 	 */
 	@SuppressWarnings("PMD")
 	public static void main(final String[] args) {
-		
+
 		parseParams(args);
 
 		System.out.println(getImplementationVersion(XMLUtils.class));

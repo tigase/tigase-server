@@ -336,6 +336,9 @@ class TigaseConfigLoadHelper {
 			if (jdbcDriver.equals("postgresql")) {
 				idata.setVariable("dbSuperuser", "postgres");
 			}
+			if (jdbcDriver.equals("sqlserver")) {
+				idata.setVariable("dbSuperuser", "root");
+			}
 			if (host != null) {
 				idata.setVariable("dbHost", host);
 			}

@@ -142,6 +142,7 @@ public abstract class SessionManagerConfig {
 			|| params.get(RepositoryFactory.GEN_AUTH_DB).toString().equals("mysql")
 			|| params.get(RepositoryFactory.GEN_AUTH_DB).toString().equals("pgsql")
 			|| params.get(RepositoryFactory.GEN_AUTH_DB).toString().equals("derby")
+			|| params.get(RepositoryFactory.GEN_AUTH_DB).toString().equals("sqlserver")
 			|| params.get(RepositoryFactory.GEN_AUTH_DB).toString().equals("tigase-auth");
 		LinkedHashSet<String> plugins = new LinkedHashSet<String>(32);
 
@@ -202,18 +203,6 @@ public abstract class SessionManagerConfig {
 			ANONYMOUS_DOMAINS_PROP_VAL = DNSResolver.getDefHostNames();
 		}
 
-//  props.put(HOSTNAMES_PROP_KEY, HOSTNAMES_PROP_VAL);
-//  props.put(ANONYMOUS_DOMAINS_PROP_KEY, ANONYMOUS_DOMAINS_PROP_VAL);
-//  if (params.get(GEN_ADMINS) != null) {
-//    ADMINS_PROP_VAL = ((String)params.get(GEN_ADMINS)).split(",");
-//  } else {
-//    ADMINS_PROP_VAL = new String[HOSTNAMES_PROP_VAL.length];
-//    for (int i = 0; i < ADMINS_PROP_VAL.length; i++) {
-//      ADMINS_PROP_VAL[i] = "admin@"+HOSTNAMES_PROP_VAL[i];
-//    } // end of for (int i = 0; i < ADMINS_PROP_VAL.length; i++)
-//  }
-//  props.put(ADMINS_PROP_KEY, ADMINS_PROP_VAL);
-		// props.put(ANONYMOUS_PEERS_PROP_KEY, ADMINS_PROP_VAL);
 		if (params.get(GEN_TRUSTED) != null) {
 			TRUSTED_PROP_VAL = ((String) params.get(GEN_TRUSTED)).split(",");
 		} else {

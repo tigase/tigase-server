@@ -242,7 +242,7 @@ public class JabberIqPrivacy
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
 		} catch (TigaseDBException e) {
-			log.log(Level.WARNING, "Database proble, please contact admin: {0}", e);
+			log.log(Level.WARNING, "Database problem, please contact admin: {0}", e);
 			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
 					"Database access problem, please contact administrator.", true));
 		}

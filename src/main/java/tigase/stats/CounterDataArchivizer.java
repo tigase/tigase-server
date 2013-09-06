@@ -80,6 +80,7 @@ public class CounterDataArchivizer implements StatisticsArchivizerIfc {
 
 	private DataRepository data_repo = null;
 	private String init_entry_query = null;
+	private String create_table_query = null;
 
 	// private PreparedStatement initEntry = null;
 	private String tableName = DEF_TABLE_NAME;
@@ -138,9 +139,14 @@ public class CounterDataArchivizer implements StatisticsArchivizerIfc {
 		}
 
 		init_entry_query = "insert into " + tableName + " (" + keyField + ", " + valueField + ") "
-				+ " values (?, ?) on duplicate key update " + valueField + " = ?";
+											 + " (select ?, ? from " + tableName + " where " + keyField + " = ? HAVING count(*)=0)";
+
 		update_entry_query = "update " + tableName + " set " + valueField + " = ? where " + keyField
-				+ " = ?";
+												 + " = ?";
+		create_table_query = "CREATE TABLE " + tableName + " ( "
+												 + keyField + " varchar(255) NOT NULL DEFAULT '0', "
+												 + valueField + " varchar(255) NOT NULL DEFAULT '0',"
+												 + "  PRIMARY KEY ( " + keyField + " ));";
 
 		try {
 			initRepository((String) conf.get(DB_URL_PROP_KEY), null);
@@ -163,18 +169,26 @@ public class CounterDataArchivizer implements StatisticsArchivizerIfc {
 	 * @param key
 	 * @param value
 	 */
-	public void initData(String key, String value) {
+	public void initData( String key, String value ) {
 		try {
-			PreparedStatement initEntry = data_repo.getPreparedStatement(null, init_entry_query);
+			PreparedStatement updateEntry = data_repo.getPreparedStatement( null, update_entry_query );
+			PreparedStatement initEntry = data_repo.getPreparedStatement( null, init_entry_query );
 
-			synchronized (initEntry) {
-				initEntry.setString(1, key);
-				initEntry.setString(2, value);
-				initEntry.setString(3, value);
+			synchronized ( updateEntry ) {
+				updateEntry.setString( 1, value );
+				updateEntry.setString( 2, key );
+				System.out.println( "updateEntry: " + updateEntry );
+				updateEntry.executeUpdate();
+			}
+			synchronized ( initEntry ) {
+				initEntry.setString( 1, key );
+				initEntry.setString( 2, value );
+				initEntry.setString( 3, key );
+				System.out.println( "initEntry: " + initEntry );
 				initEntry.executeUpdate();
 			}
-		} catch (SQLException e) {
-			log.log(Level.WARNING, "Problem adding new entry to DB: ", e);
+		} catch ( SQLException e ) {
+			log.log( Level.WARNING, "Problem adding new entry to DB: ", e );
 		}
 	}
 
@@ -191,12 +205,24 @@ public class CounterDataArchivizer implements StatisticsArchivizerIfc {
 	 * @throws IllegalAccessException
 	 * @throws DBInitException
 	 */
-	public void initRepository(String conn_str, Map<String, String> params)
+	public void initRepository( String conn_str, Map<String, String> params )
 			throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException,
-			DBInitException {
-		data_repo = RepositoryFactory.getDataRepository(null, conn_str, params);
-		data_repo.initPreparedStatement(init_entry_query, init_entry_query);
-		data_repo.initPreparedStatement(update_entry_query, update_entry_query);
+						 DBInitException {
+		data_repo = RepositoryFactory.getDataRepository( null, conn_str, params );
+
+		checkDB();
+
+		data_repo.initPreparedStatement( init_entry_query, init_entry_query );
+		data_repo.initPreparedStatement( update_entry_query, update_entry_query );
+	}
+
+	/**
+	 * Performs database check, creates missing schema if necessary
+	 *
+	 * @throws SQLException
+	 */
+	private void checkDB() throws SQLException {
+		data_repo.checkTable( tableName, create_table_query );
 	}
 
 	/**

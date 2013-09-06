@@ -117,12 +117,13 @@ public abstract class TigaseConfigConst {
 		userDBMap.put("Derby", "derby");
 		userDBMap.put("MySQL", "mysql");
 		userDBMap.put("PostgreSQL", "pgsql");
-		userDBMap.put("SQLServer", "jtds:sqlserver");
+		userDBMap.put("SQLServer", "sqlserver");
 
 		userDBUriMap.put("derby", "Derby");
 		userDBUriMap.put("mysql", "MySQL");
 		userDBUriMap.put("postgresql", "PostgreSQL");
 		userDBUriMap.put("pgsql", "PostgreSQL");
+		userDBUriMap.put("sqlserver", "SQLServer");
 		userDBUriMap.put("jtds:sqlserver", "SQLServer");
 
 		debugMap.put("server", SERVER_DEBUG);
@@ -166,6 +167,7 @@ public abstract class TigaseConfigConst {
 	public static final String PGSQL_DRIVER = "org.postgresql.Driver";
 	public static final String MYSQL_DRIVER = "com.mysql.jdbc.Driver";
 	public static final String DERBY_DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
+	public static final String SQLSERVER_DRIVER = "net.sourceforge.jtds.jdbc.Driver";
 
 	public static final String JDBC_CHECKUSERTABLE_QUERY
     = "select count(*) from tig_users";
@@ -174,5 +176,7 @@ public abstract class TigaseConfigConst {
     = "select TigGetDBProperty('schema-version')";
 	public static final String DERBY_GETSCHEMAVER_QUERY
     = "values TigGetDBProperty('schema-version')";
+	public static final String SQLSERVER_GETSCHEMAVER_QUERY
+    = "select dbo.TigGetDBProperty('schema-version')";
 
 }
