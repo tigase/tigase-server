@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.net.IOServiceListener;
+import tigase.net.SocketThread;
 import tigase.server.Command;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
@@ -272,6 +273,26 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 					List<Packet> packetsToResend = new ArrayList<Packet>(outQueue.getQueue());
 					for (Packet packet : packetsToResend) {
 						newService.addPacketToSend(packet);
+					}
+										
+					// if there is any packet waiting we need to write them to socket
+					// and to do that we need to call processWaitingPackets();
+					if (!packetsToResend.isEmpty()) {
+						if (newService.writeInProgress.tryLock()) {
+							try {
+								newService.processWaitingPackets();
+								SocketThread.addSocketService(newService);
+							} catch (Exception e) {
+								log.log(Level.WARNING, newService + "Exception during writing packets: ", e);
+								try {
+									newService.stop();
+								} catch (Exception e1) {
+									log.log(Level.WARNING, newService + "Exception stopping XMPPIOService: ", e1);
+								}    // end of try-catch
+							} finally {
+								newService.writeInProgress.unlock();
+							}
+						}
 					}
 				}
 				catch (IOException ex) {
