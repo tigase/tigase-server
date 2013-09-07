@@ -521,7 +521,7 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		long seconds = (System.currentTimeMillis() - start) / 1000;
 
 		log.log(Level.CONFIG, "Loaded {0} trust certificates, it took {1} seconds.", new Object[] { counter, seconds });
-	}
+	}	
 }
 
 // ~ Formatted in Sun Code Convention

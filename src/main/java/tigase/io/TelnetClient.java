@@ -29,6 +29,7 @@ import static tigase.io.SSLContextContainerIfc.*;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.ByteArrayInputStream;
+import java.io.EOFException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -327,6 +328,9 @@ public class TelnetClient implements SampleSocketThread.SocketHandler {
 			}    // end of if (cb != null)
 		}      // end of if (socketIO.bytesRead() > 0)
 
+		if (!ioifc.isConnected())
+			throw new EOFException("Channel has been closed.");		
+		
 		reader.addIOInterface(ioifc);
 	}
 

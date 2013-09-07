@@ -306,7 +306,10 @@ public class SocketIO
 							toString() });
 		}
 		if (bytesRead == -1) {
-			throw new EOFException("Channel has been closed.");
+			// we need to close channel but we should not throw exception as
+			// in other way we will lose data from higher level internal buffers
+			channel.close();
+//			throw new EOFException("Channel has been closed.");
 		}    // end of if (result == -1)
 		if (bytesRead > 0) {
 			buff.flip();
