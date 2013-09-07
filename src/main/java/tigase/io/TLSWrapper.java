@@ -73,8 +73,11 @@ public class TLSWrapper {
 	private SSLEngine tlsEngine = null;
 	private SSLEngineResult tlsEngineResult = null;
 
-	// TLS/SSL issue with JDK and NSS - bug workaround
-	private static final boolean tls_jdk_nss_workaround = Boolean.getBoolean("tls-jdk-nss-bug-workaround-active");
+    // TLS/SSL issue with JDK and NSS - bug workaround
+    private static final boolean tls_jdk_nss_workaround = 
+			System.getProperty("tls-jdk-nss-bug-workaround-active") == null 
+			? true : Boolean.getBoolean("tls-jdk-nss-bug-workaround-active");
+
 	private static final String[] tls_workaround_ciphers = new String[]{
 		"SSL_RSA_WITH_RC4_128_MD5",
 		"SSL_RSA_WITH_RC4_128_SHA",
