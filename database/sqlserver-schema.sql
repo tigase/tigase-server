@@ -14,7 +14,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[tig_users](
 	[uid] [bigint] NOT NULL,
-	[user_id] [varchar](128) NOT NULL
+	[user_id] [nvarchar](128) NOT NULL
 ) ON [PRIMARY]
 
 GO
@@ -37,10 +37,10 @@ GO
 CREATE TABLE [dbo].[short_news](
 	[snid] [bigint] IDENTITY(1,1) NOT NULL,
 	[publishing_time] [datetime] NOT NULL CONSTRAINT [DF_short_news_publishing_time]  DEFAULT (getdate()),
-	[news_type] [varchar](50) NULL,
-	[author] [varchar](128) NOT NULL,
-	[subject] [varchar](128) NOT NULL,
-	[body] [varchar](1024) NOT NULL,
+	[news_type] [nvarchar](50) NULL,
+	[author] [nvarchar](128) NOT NULL,
+	[subject] [nvarchar](128) NOT NULL,
+	[body] [nvarchar](1024) NOT NULL,
  CONSTRAINT [PK_short_news] PRIMARY KEY CLUSTERED 
 (
 	[snid] ASC
@@ -84,7 +84,7 @@ CREATE TABLE [dbo].[tig_nodes](
 	[nid] [bigint] NOT NULL,
 	[parent_nid] [bigint] NULL,
 	[uid] [bigint] NOT NULL,
-	[node] [varchar](64) NOT NULL
+	[node] [nvarchar](64) NOT NULL
 ) ON [PRIMARY]
 
 GO
@@ -115,7 +115,7 @@ GO
 CREATE TABLE [dbo].[tig_pairs](
 	[nid] [bigint] NOT NULL,
 	[uid] [bigint] NOT NULL,
-	[pkey] [varchar](128) NOT NULL,
+	[pkey] [nvarchar](128) NOT NULL,
 	[pval] [text] NULL
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 
