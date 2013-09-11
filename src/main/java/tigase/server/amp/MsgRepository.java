@@ -111,7 +111,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 							+ MSG_EXPIRED_COLUMN + " [datetime] ," + "  "
 							+ MSG_FROM_UID_COLUMN + " bigint," + "  "
 							+ MSG_TO_UID_COLUMN + " bigint NOT NULL," + "  "
-							+ MSG_BODY_COLUMN + " varchar(4096) NOT NULL);"
+							+ MSG_BODY_COLUMN + " nvarchar(4096) NOT NULL);"
 							+ "create index index_" + MSG_EXPIRED_COLUMN + " on " + MSG_TABLE
 							+ " (" + MSG_EXPIRED_COLUMN + ");"
 							+ "create index index_" + MSG_FROM_UID_COLUMN + "_" + MSG_TO_UID_COLUMN
@@ -156,7 +156,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 							"create table " + JID_TABLE + " ( " + "  "
 							+ JID_ID_COLUMN + " [bigint] IDENTITY(1,1)," + "  "
 							+ JID_SHA_COLUMN + " char(128) NOT NULL," + "  "
-							+ JID_COLUMN + " varchar(2049) NOT NULL," + "  "
+							+ JID_COLUMN + " nvarchar(2049) NOT NULL," + "  "
 							+ HISTORY_FLAG_COLUMN + " int default 0,"
 							+ " primary key (" + JID_ID_COLUMN + ")); "
 							+ "create unique index index_" + JID_SHA_COLUMN + " on " + JID_TABLE
