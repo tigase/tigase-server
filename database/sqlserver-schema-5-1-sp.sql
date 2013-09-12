@@ -209,7 +209,7 @@ AS
 begin
 --Declare @_result nvarchar(MAX);
 return (select pval  from tig_pairs AS p, tig_users AS u
-		where (pkey = @_tkey) AND (sha1_user_id = HASHBYTES('SHA1', LOWER('db-properties')))
+		where (pkey = @_tkey) AND (sha1_user_id = HASHBYTES('SHA1', LOWER(N'db-properties')))
 					AND (p.uid = u.uid));
 
 end
@@ -228,11 +228,11 @@ create procedure dbo.TigPutDBProperty
 		Declare @_uid int;
 		Declare @_count int;
 		if exists (select 1 from tig_pairs, tig_users
-					where (sha1_user_id = HASHBYTES('SHA1', LOWER('db-properties')))
+					where (sha1_user_id = HASHBYTES('SHA1', LOWER(N'db-properties')))
 						AND (tig_users.uid = tig_pairs.uid)  AND (pkey = @_tkey))
 			begin
 				select @_nid = tig_pairs.nid, @_uid = tig_pairs.uid from tig_pairs, tig_users
-					where (sha1_user_id = HASHBYTES('SHA1', LOWER('db-properties')))
+					where (sha1_user_id = HASHBYTES('SHA1', LOWER(N'db-properties')))
 						AND (tig_users.uid = tig_pairs.uid)  AND (pkey = @_tkey);
 				update tig_pairs set pval = @_tval
 					where (@_uid = uid) AND (pkey = @_tkey) ;
@@ -240,11 +240,11 @@ create procedure dbo.TigPutDBProperty
 		else
 			begin
 				select @_nid = tig_pairs.nid, @_uid = tig_pairs.uid from tig_pairs, tig_users
-					where (sha1_user_id = HASHBYTES('SHA1', LOWER('db-properties')))
+					where (sha1_user_id = HASHBYTES('SHA1', LOWER(N'db-properties')))
 						AND (tig_users.uid = tig_pairs.uid)  AND (pkey = @_tkey);
 				insert into tig_pairs (pkey, pval, uid)
 					select @_tkey, @_tval, uid from tig_users
-						where (sha1_user_id = HASHBYTES('SHA1', LOWER('db-properties')));
+						where (sha1_user_id = HASHBYTES('SHA1', LOWER(N'db-properties')));
 			end
 	end
 -- QUERY END:
@@ -269,7 +269,7 @@ AS
 
 		if (@res_uid is not NULL)
 			insert into tig_nodes (parent_nid, uid, node)
-				values (NULL, @res_uid, 'root');
+				values (NULL, @res_uid, N'root');
 
 		if (@_user_pw is NULL) 
 			update tig_users set account_status = -1 where uid = @res_uid;
@@ -289,20 +289,20 @@ AS
 begin
 	declare @_encoding nvarchar(512)
 	declare @_hashed_pass varbinary(32)
-	set @_encoding = dbo.TigGetDBProperty('password-encoding')
-	if @_encoding = 'MD5-PASSWORD'
+	set @_encoding = dbo.TigGetDBProperty(N'password-encoding')
+	if @_encoding = N'MD5-PASSWORD'
 		begin
 			set @_hashed_pass = HASHBYTES('MD5', @_user_pw);
 			exec TigAddUser @_user_id, @_hashed_pass;
 		end
-	if @_encoding = 'MD5-USERID-PASSWORD' 
+	if @_encoding = N'MD5-USERID-PASSWORD' 
 		begin
 			set @_hashed_pass = HASHBYTES('MD5', CONCAT(@_user_id, @_user_pw));
 			exec TigAddUser @_user_id, @_hashed_pass
 		end
-	if @_encoding = 'MD5-USERNAME-PASSWORD'
+	if @_encoding = N'MD5-USERNAME-PASSWORD'
 		begin
-			set @_hashed_pass = HASHBYTES('MD5', CONCAT((LEFT (@_user_id, CHARINDEX('@',@_user_id)-1)), @_user_pw));
+			set @_hashed_pass = HASHBYTES('MD5', CONCAT((LEFT (@_user_id, CHARINDEX(N'@',@_user_id)-1)), @_user_pw));
 			exec TigAddUser @_user_id, @_hashed_pass;
 		end
 	else
@@ -372,20 +372,20 @@ AS
 begin
 	declare @_encoding nvarchar(512)
 	declare @_hashed_pass varbinary(32)
-	set @_encoding = dbo.TigGetDBProperty('password-encoding')
-	if @_encoding = 'MD5-PASSWORD'
+	set @_encoding = dbo.TigGetDBProperty(N'password-encoding')
+	if @_encoding = N'MD5-PASSWORD'
 		begin
 			set @_hashed_pass = HASHBYTES('MD5', @_user_pw);
 			exec TigUpdatePassword @_user_id, @_hashed_pass;
 		end
-	if @_encoding = 'MD5-USERID-PASSWORD' 
+	if @_encoding = N'MD5-USERID-PASSWORD' 
 		begin
 			set @_hashed_pass = HASHBYTES('MD5', CONCAT(@_user_id, @_user_pw));
 			exec TigUpdatePassword @_user_id, @_hashed_pass
 		end
-	if @_encoding = 'MD5-USERNAME-PASSWORD'
+	if @_encoding = N'MD5-USERNAME-PASSWORD'
 		begin
-			set @_hashed_pass = HASHBYTES('MD5', CONCAT((LEFT (@_user_id, CHARINDEX('@',@_user_id)-1)), @_user_pw));
+			set @_hashed_pass = HASHBYTES('MD5', CONCAT((LEFT (@_user_id, CHARINDEX(N'@',@_user_id)-1)), @_user_pw));
 			exec TigUpdatePassword @_user_id, @_hashed_pass;
 		end
 	else
@@ -489,20 +489,20 @@ AS
 begin
 	declare @_encoding nvarchar(512)
 	declare @_hashed_pass varbinary(32)
-	set @_encoding = dbo.TigGetDBProperty('password-encoding')
+	set @_encoding = dbo.TigGetDBProperty(N'password-encoding')
 	if @_encoding = 'MD5-PASSWORD'
 		begin
 			set @_hashed_pass = HASHBYTES('MD5', @_user_pw);
 			exec TigUserLogin @_user_id, @_hashed_pass;
 		end
-	if @_encoding = 'MD5-USERID-PASSWORD' 
+	if @_encoding = N'MD5-USERID-PASSWORD' 
 		begin
 			set @_hashed_pass = HASHBYTES('MD5', CONCAT(@_user_id, @_user_pw));
 			exec TigUserLogin @_user_id, @_hashed_pass
 		end
-	if @_encoding = 'MD5-USERNAME-PASSWORD'
+	if @_encoding = N'MD5-USERNAME-PASSWORD'
 		begin
-			set @_hashed_pass = HASHBYTES('MD5', CONCAT((LEFT (@_user_id, CHARINDEX('@',@_user_id)-1)), @_user_pw));
+			set @_hashed_pass = HASHBYTES('MD5', CONCAT((LEFT (@_user_id, CHARINDEX(N'@',@_user_id)-1)), @_user_pw));
 			exec TigUserLogin @_user_id, @_hashed_pass;
 		end
 	else
