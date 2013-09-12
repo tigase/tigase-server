@@ -17,11 +17,6 @@
 --
 -- Database stored procedures and functions for Tigase schema version 5.2.0
 
--- QUERY START: USE DATABASE
-USE [${dbName}]
--- QUERY END: USE DATABASE
-GO
-
 -- QUERY START:
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigInitdb')
 DROP PROCEDURE TigInitdb

@@ -20,11 +20,6 @@
 --  $Date: $
 --
 
--- QUERY START: USE DATABASE
-USE [${dbName}]
--- QUERY END: USE DATABASE
-GO
-
 -- QUERY START:
 -- This is a dummy user who keeps all the database-properties
 exec dbo.TigAddUserPlainPw 'db-properties', NULL;
