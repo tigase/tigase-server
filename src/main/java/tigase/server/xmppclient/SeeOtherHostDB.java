@@ -90,7 +90,7 @@ public class SeeOtherHostDB extends SeeOtherHostHashed {
 
 	private static final String SQLSERVER_CREATE_STATS_TABLE = "create table " + SEE_OTHER_HOST_TABLE
 			+ " ( " + SERIAL_ID + " [bigint] IDENTITY(1,1)," + USER_ID + " bigint NOT NULL, "
-			+ NODE_ID + " varchar(2049) NOT NULL, " + " primary key (" + SERIAL_ID + "), "
+			+ NODE_ID + " nvarchar(2049) NOT NULL, " + " primary key (" + SERIAL_ID + "), "
 			+ " constraint tig_see_other_host_constr foreign key (" + USER_ID
 			+ ") references tig_users (" + USER_ID + ")" + ")";
 

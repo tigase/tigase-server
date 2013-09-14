@@ -17,11 +17,6 @@
 --
 -- Database stored procedures and functions for Tigase schema version 5.2.0
 
--- QUERY START: USE DATABASE
-USE [${dbName}]
--- QUERY END: USE DATABASE
-GO
-
 -- QUERY START:
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigInitdb')
 DROP PROCEDURE TigInitdb
@@ -204,12 +199,12 @@ GO
 
 -- QUERY START:
 -- Database properties get - function
-create function TigGetDBProperty(@_tkey varchar(255)) returns varchar(MAX)
+create function TigGetDBProperty(@_tkey nvarchar(255)) returns nvarchar(MAX)
 AS
 begin
---Declare @_result varchar(MAX);
+--Declare @_result nvarchar(MAX);
 return (select pval  from tig_pairs AS p, tig_users AS u
-		where (pkey = @_tkey) AND (sha1_user_id = HASHBYTES('SHA1', LOWER('db-properties')))
+		where (pkey = @_tkey) AND (sha1_user_id = HASHBYTES('SHA1', LOWER(N'db-properties')))
 					AND (p.uid = u.uid));
 
 end
@@ -220,7 +215,7 @@ GO
 -- QUERY START:
 -- Database properties set - procedure
 create procedure dbo.TigPutDBProperty
-	@_tkey varchar(255),
+	@_tkey nvarchar(255),
 	@_tval ntext
 	AS
 	begin
@@ -228,11 +223,11 @@ create procedure dbo.TigPutDBProperty
 		Declare @_uid int;
 		Declare @_count int;
 		if exists (select 1 from tig_pairs, tig_users
-					where (sha1_user_id = HASHBYTES('SHA1', LOWER('db-properties')))
+					where (sha1_user_id = HASHBYTES('SHA1', LOWER(N'db-properties')))
 						AND (tig_users.uid = tig_pairs.uid)  AND (pkey = @_tkey))
 			begin
 				select @_nid = tig_pairs.nid, @_uid = tig_pairs.uid from tig_pairs, tig_users
-					where (sha1_user_id = HASHBYTES('SHA1', LOWER('db-properties')))
+					where (sha1_user_id = HASHBYTES('SHA1', LOWER(N'db-properties')))
 						AND (tig_users.uid = tig_pairs.uid)  AND (pkey = @_tkey);
 				update tig_pairs set pval = @_tval
 					where (@_uid = uid) AND (pkey = @_tkey) ;
@@ -240,11 +235,11 @@ create procedure dbo.TigPutDBProperty
 		else
 			begin
 				select @_nid = tig_pairs.nid, @_uid = tig_pairs.uid from tig_pairs, tig_users
-					where (sha1_user_id = HASHBYTES('SHA1', LOWER('db-properties')))
+					where (sha1_user_id = HASHBYTES('SHA1', LOWER(N'db-properties')))
 						AND (tig_users.uid = tig_pairs.uid)  AND (pkey = @_tkey);
 				insert into tig_pairs (pkey, pval, uid)
 					select @_tkey, @_tval, uid from tig_users
-						where (sha1_user_id = HASHBYTES('SHA1', LOWER('db-properties')));
+						where (sha1_user_id = HASHBYTES('SHA1', LOWER(N'db-properties')));
 			end
 	end
 -- QUERY END:
@@ -256,8 +251,8 @@ GO
 -- encoded properly according to the database settings.
 -- If password is not encoded TigAddUserPlainPw should be used instead.
 create procedure dbo.TigAddUser
-	@_user_id varchar(2049),
-	@_user_pw varchar(255)
+	@_user_id nvarchar(2049),
+	@_user_pw nvarchar(255)
 AS
 	begin
 		declare @res_uid bigint;
@@ -269,7 +264,7 @@ AS
 
 		if (@res_uid is not NULL)
 			insert into tig_nodes (parent_nid, uid, node)
-				values (NULL, @res_uid, 'root');
+				values (NULL, @res_uid, N'root');
 
 		if (@_user_pw is NULL) 
 			update tig_users set account_status = -1 where uid = @res_uid;
@@ -283,26 +278,26 @@ GO
 -- Takes plain text user password and converts it to internal representation
 -- and creates a new user account.
 create procedure dbo.TigAddUserPlainPw
-	@_user_id varchar(2049),
-	@_user_pw varchar(255)
+	@_user_id nvarchar(2049),
+	@_user_pw nvarchar(255)
 AS
 begin
-	declare @_encoding varchar(512)
+	declare @_encoding nvarchar(512)
 	declare @_hashed_pass varbinary(32)
-	set @_encoding = dbo.TigGetDBProperty('password-encoding')
-	if @_encoding = 'MD5-PASSWORD'
+	set @_encoding = dbo.TigGetDBProperty(N'password-encoding')
+	if @_encoding = N'MD5-PASSWORD'
 		begin
 			set @_hashed_pass = HASHBYTES('MD5', @_user_pw);
 			exec TigAddUser @_user_id, @_hashed_pass;
 		end
-	if @_encoding = 'MD5-USERID-PASSWORD' 
+	if @_encoding = N'MD5-USERID-PASSWORD' 
 		begin
 			set @_hashed_pass = HASHBYTES('MD5', CONCAT(@_user_id, @_user_pw));
 			exec TigAddUser @_user_id, @_hashed_pass
 		end
-	if @_encoding = 'MD5-USERNAME-PASSWORD'
+	if @_encoding = N'MD5-USERNAME-PASSWORD'
 		begin
-			set @_hashed_pass = HASHBYTES('MD5', CONCAT((LEFT (@_user_id, CHARINDEX('@',@_user_id)-1)), @_user_pw));
+			set @_hashed_pass = HASHBYTES('MD5', CONCAT((LEFT (@_user_id, CHARINDEX(N'@',@_user_id)-1)), @_user_pw));
 			exec TigAddUser @_user_id, @_hashed_pass;
 		end
 	else
@@ -315,7 +310,7 @@ GO
 -- Low level database user id as big number. Used only for performance reasons
 -- and save database space. Besides JID is too large to server as UID
 create procedure dbo.TigGetUserDBUid
-	@_user_id varchar(2049)
+	@_user_id nvarchar(2049)
 AS	
 begin
 	select uid from tig_users where sha1_user_id = hashbytes('SHA1', lower(@_user_id));
@@ -326,7 +321,7 @@ GO
 -- QUERY START:
 -- Removes a user from the database
 create procedure dbo.TigRemoveUser
-	@_user_id varchar(2049)
+	@_user_id nvarchar(2049)
 AS
 begin
 	declare @res_uid bigint;
@@ -343,7 +338,7 @@ GO
 -- QUERY START:
 -- Returns user's password from the database
 create procedure dbo.TigGetPassword
-	@_user_id varchar(2049)
+	@_user_id nvarchar(2049)
 AS
 begin
 	select user_pw from tig_users where sha1_user_id = hashbytes('SHA1', lower(@_user_id));
@@ -354,8 +349,8 @@ GO
 -- QUERY START:
 -- Update user password
 create procedure dbo.TigUpdatePassword
-	@_user_id varchar(2049),
-	@_user_pw varchar(255)
+	@_user_id nvarchar(2049),
+	@_user_pw nvarchar(255)
 AS
 begin
 	update tig_users set user_pw = @_user_pw where sha1_user_id = hashbytes('SHA1', lower(@_user_id));
@@ -366,26 +361,26 @@ GO
 -- QUERY START:
 -- Takes plain text user password and converts it to internal representation
 create procedure dbo.TigUpdatePasswordPlainPw
-	@_user_id varchar(2049),
-	@_user_pw varchar(255)
+	@_user_id nvarchar(2049),
+	@_user_pw nvarchar(255)
 AS
 begin
-	declare @_encoding varchar(512)
+	declare @_encoding nvarchar(512)
 	declare @_hashed_pass varbinary(32)
-	set @_encoding = dbo.TigGetDBProperty('password-encoding')
-	if @_encoding = 'MD5-PASSWORD'
+	set @_encoding = dbo.TigGetDBProperty(N'password-encoding')
+	if @_encoding = N'MD5-PASSWORD'
 		begin
 			set @_hashed_pass = HASHBYTES('MD5', @_user_pw);
 			exec TigUpdatePassword @_user_id, @_hashed_pass;
 		end
-	if @_encoding = 'MD5-USERID-PASSWORD' 
+	if @_encoding = N'MD5-USERID-PASSWORD' 
 		begin
 			set @_hashed_pass = HASHBYTES('MD5', CONCAT(@_user_id, @_user_pw));
 			exec TigUpdatePassword @_user_id, @_hashed_pass
 		end
-	if @_encoding = 'MD5-USERNAME-PASSWORD'
+	if @_encoding = N'MD5-USERNAME-PASSWORD'
 		begin
-			set @_hashed_pass = HASHBYTES('MD5', CONCAT((LEFT (@_user_id, CHARINDEX('@',@_user_id)-1)), @_user_pw));
+			set @_hashed_pass = HASHBYTES('MD5', CONCAT((LEFT (@_user_id, CHARINDEX(N'@',@_user_id)-1)), @_user_pw));
 			exec TigUpdatePassword @_user_id, @_hashed_pass;
 		end
 	else
@@ -399,8 +394,8 @@ GO
 -- Some implementations require the parameters to be in the same order as
 -- the update query.
 create procedure dbo.TigUpdatePasswordPlainPwRev
-	@_user_pw varchar(255),
-	@_user_id varchar(2049)
+	@_user_pw nvarchar(255),
+	@_user_id nvarchar(2049)
 AS
 begin
 	exec TigUpdatePasswordPlainPw @_user_id, @_user_pw;
@@ -457,8 +452,8 @@ GO
 -- If the login is successful it also increases online_status and sets
 -- last_login time to the current timestamp
 create procedure dbo.TigUserLogin
-	@_user_id varchar(2049),
-	@_user_pw varchar(255)
+	@_user_id nvarchar(2049),
+	@_user_pw nvarchar(255)
 AS
 begin
 	if exists(select 1 from tig_users
@@ -483,26 +478,26 @@ GO
 -- Performs user login for a plain text password, converting it to an internal
 -- representation if necessary
 create procedure dbo.TigUserLoginPlainPw
-	@_user_id varchar(2049),
-	@_user_pw varchar(255)
+	@_user_id nvarchar(2049),
+	@_user_pw nvarchar(255)
 AS
 begin
-	declare @_encoding varchar(512)
+	declare @_encoding nvarchar(512)
 	declare @_hashed_pass varbinary(32)
-	set @_encoding = dbo.TigGetDBProperty('password-encoding')
+	set @_encoding = dbo.TigGetDBProperty(N'password-encoding')
 	if @_encoding = 'MD5-PASSWORD'
 		begin
 			set @_hashed_pass = HASHBYTES('MD5', @_user_pw);
 			exec TigUserLogin @_user_id, @_hashed_pass;
 		end
-	if @_encoding = 'MD5-USERID-PASSWORD' 
+	if @_encoding = N'MD5-USERID-PASSWORD' 
 		begin
 			set @_hashed_pass = HASHBYTES('MD5', CONCAT(@_user_id, @_user_pw));
 			exec TigUserLogin @_user_id, @_hashed_pass
 		end
-	if @_encoding = 'MD5-USERNAME-PASSWORD'
+	if @_encoding = N'MD5-USERNAME-PASSWORD'
 		begin
-			set @_hashed_pass = HASHBYTES('MD5', CONCAT((LEFT (@_user_id, CHARINDEX('@',@_user_id)-1)), @_user_pw));
+			set @_hashed_pass = HASHBYTES('MD5', CONCAT((LEFT (@_user_id, CHARINDEX(N'@',@_user_id)-1)), @_user_pw));
 			exec TigUserLogin @_user_id, @_hashed_pass;
 		end
 	else
@@ -527,7 +522,7 @@ GO
 -- QUERY START:
 -- It decreases online_status and sets last_logout time to the current timestamp
 create procedure dbo.TigUserLogout
-	@_user_id varchar(2049)
+	@_user_id nvarchar(2049)
 AS
 begin
 	update tig_users
@@ -541,7 +536,7 @@ GO
 -- QUERY START:
 -- Disable user account
 create procedure dbo.TigDisableAccount
-	@_user_id varchar(2049)
+	@_user_id nvarchar(2049)
 AS
 begin
 	update tig_users set account_status = 0 where sha1_user_id = hashbytes('SHA1', lower(@_user_id));
@@ -552,7 +547,7 @@ GO
 -- QUERY START:
 -- Enable user account
 create procedure dbo.TigEnableAccount
-	@_user_id varchar(2049)
+	@_user_id nvarchar(2049)
 AS
 begin
 	update tig_users set account_status = 1 where sha1_user_id = hashbytes('SHA1', lower(@_user_id));
@@ -587,7 +582,7 @@ GO
 create procedure dbo.TigAddNode
 @_parent_nid bigint,
 @_uid bigint,
-@_node varchar(255)
+@_node nvarchar(255)
 AS
 begin
 	insert into tig_nodes (parent_nid, uid, node)
@@ -602,7 +597,7 @@ GO
 create procedure dbo.TigUpdatePairs
 @_nid bigint,
 @_uid bigint,
-@_tkey varchar(255),
+@_tkey nvarchar(255),
 @_tval ntext
 AS
 begin

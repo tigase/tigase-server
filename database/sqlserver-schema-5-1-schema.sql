@@ -24,11 +24,6 @@ SET QUOTED_IDENTIFIER ON
 -- QUERY END:
 GO
 
--- QUERY START: USE DATABASE
-USE [${dbName}]
--- QUERY END: USE DATABASE
-GO
-
 -- QUERY START:
 CREATE TABLE [dbo].[tig_users](
 	[uid] [bigint] IDENTITY(1,1) NOT NULL,
@@ -195,9 +190,9 @@ CREATE TABLE [dbo].[short_news](
 	[snid] [bigint] IDENTITY(1,1) NOT NULL,
 	[publishing_time] [datetime] NOT NULL,
 	[news_type] [varchar](50) NULL,
-	[author] [varchar](128) NOT NULL,
-	[subject] [varchar](128) NOT NULL,
-	[body] [varchar](1024) NOT NULL,
+	[author] [nvarchar](128) NOT NULL,
+	[subject] [nvarchar](128) NOT NULL,
+	[body] [nvarchar](1024) NOT NULL,
  CONSTRAINT [PK_short_news_snid] PRIMARY KEY CLUSTERED ( [snid] ASC ) ON [PRIMARY]
 ) ON [PRIMARY]
 -- QUERY END:

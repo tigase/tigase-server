@@ -98,8 +98,8 @@ public class ClConSQLRepository
 					+ "  primary key(" + HOSTNAME_COLUMN + "))";
 	private static final String CREATE_TABLE_QUERY_SQLSERVER =
 					"create table [dbo].[" + TABLE_NAME + "] ("
-					+ "  " + HOSTNAME_COLUMN + " varchar(512) not null,"
-					+ "  " + PASSWORD_COLUMN + " varchar(255) not null,"
+					+ "  " + HOSTNAME_COLUMN + " nvarchar(512) not null,"
+					+ "  " + PASSWORD_COLUMN + " nvarchar(255) not null,"
 					+ "  " + LASTUPDATE_COLUMN
 					+ " [datetime] NULL,"
 					+ "  " + PORT_COLUMN + " int,"
