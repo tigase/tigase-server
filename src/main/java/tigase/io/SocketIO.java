@@ -42,6 +42,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Queue;
+import tigase.net.IOUtil;
 
 /**
  * Describe class SocketIO here.
@@ -300,7 +301,17 @@ public class SocketIO
 	 */
 	@Override
 	public ByteBuffer read(final ByteBuffer buff) throws IOException {
-		bytesRead = channel.read(buff);
+		ByteBuffer tmp = IOUtil.getDirectBuffer(buff.remaining());
+		try {
+			bytesRead = channel.read(tmp);
+			tmp.flip();
+			if (bytesRead > 0) {
+				buff.put(tmp);
+			}
+		} finally {
+			IOUtil.returnDirectBuffer(tmp);
+		}
+		
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "Read from channel {0} bytes, {1}", new Object[] { bytesRead,
 							toString() });
@@ -410,38 +421,44 @@ public class SocketIO
 
 		int result            = 0;
 		ByteBuffer dataBuffer = null;
-
-		if (dataToSend.size() > 1) {
-			ByteBuffer[] buffs = dataToSend.toArray(new ByteBuffer[dataToSend.size()]);
-			long res           = channel.write(buffs);
-
+		
+		// we are processing all buffers one by one to reduce need for direct 
+		// memory, and we use our own cache of DirectByteBuffers as cache from JDK
+		// may keep up to 1024 buffers for single thread!!
+		while ((dataBuffer = dataToSend.peek()) != null) {
+			int pos = dataBuffer.position();
+			int lim = dataBuffer.limit();
+			int rem = (pos <= lim ? lim - pos : 0);
+			int res = 0;
+			
+			ByteBuffer tmp = IOUtil.getDirectBuffer(rem);
+			try {
+				tmp.put(dataBuffer);
+				tmp.flip();
+				dataBuffer.position(pos);
+				res = channel.write(tmp);
+				if (res > 0) {
+					dataBuffer.position(pos + res);
+				}
+			} finally {
+				IOUtil.returnDirectBuffer(tmp);
+			}
+			
 			if (res == -1) {
 				throw new EOFException("Channel has been closed.");
-			}
-			if (res > 0) {
+			} else {
 				result += res;
-				for (ByteBuffer byteBuffer : buffs) {
-					if (!byteBuffer.hasRemaining()) {
-						dataToSend.poll();
-					} else {
-						break;
-					}
-				}
 			}
-		} else {
-			if ((dataBuffer = dataToSend.peek()) != null) {
-				int res = channel.write(dataBuffer);
-
-				if (res == -1) {
-					throw new EOFException("Channel has been closed.");
-				} else {
-					result += res;
-				}
-				if (!dataBuffer.hasRemaining()) {
-					dataToSend.poll();
-				}
+			
+			if (!dataBuffer.hasRemaining()) {
+				dataToSend.poll();
+			}
+			else {
+				break;
 			}
 		}
+		
+		
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "Wrote to channel {0} bytes, {1}", new Object[] { result,
 							toString() });
