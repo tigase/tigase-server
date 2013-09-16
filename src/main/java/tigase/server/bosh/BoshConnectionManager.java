@@ -27,6 +27,7 @@ package tigase.server.bosh;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.server.Command;
+import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.ReceiverTimeoutHandler;
 import tigase.server.xmppclient.ClientConnectionManager;
@@ -50,6 +51,7 @@ import static tigase.server.bosh.Constants.*;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.ArrayDeque;
+import java.util.List;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -658,6 +660,23 @@ public class BoshConnectionManager
 					log.log(Level.FINER, "Closing session for command CLOSE: {0}", session
 							.getSid());
 				}
+
+				try {
+					List<Element> err_el = packet.getElement().getChildrenStaticStr( Iq.IQ_COMMAND_PATH );
+					if ( ( err_el != null ) && ( err_el.size() > 0 ) ){
+
+						Element error = new Element( "stream:error" );
+						error.addChild( err_el.get( 0 ) );
+						Packet condition = Packet.packetInstance( error );
+						condition.setPacketTo( packet.getTo() );
+						writePacketToSocket( condition );
+						session.sendWaitingPackets();
+						bosh_session_close_delay = 100;
+					}
+				} catch ( TigaseStringprepException ex ) {
+					Logger.getLogger( BoshConnectionManager.class.getName() ).log( Level.SEVERE, null, ex );
+				}
+
 				if (bosh_session_close_delay > 0) {
 					try {
 						Thread.sleep(bosh_session_close_delay);
