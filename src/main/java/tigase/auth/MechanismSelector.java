@@ -7,7 +7,6 @@ import java.util.Map;
 import javax.security.sasl.SaslServerFactory;
 
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.impl.SaslAuth;
 
 /**
  * Interface for implementing selectors of SASL mechanisms.
