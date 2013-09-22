@@ -321,7 +321,7 @@ public class MessageRouterConfig {
 	 *
 	 * @param name
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws ClassNotFoundException
 	 * @throws IllegalAccessException
@@ -353,7 +353,7 @@ public class MessageRouterConfig {
 	 * @param cls_name
 	 * @param currCls
 	 *
-	 * @return
+	 * 
 	 */
 	@SuppressWarnings("unchecked")
 	public boolean componentClassEquals(String cls_name,
@@ -381,7 +381,7 @@ public class MessageRouterConfig {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String[] getMsgRcvActiveNames() {
 		String[] names              = (String[]) props.get(MSG_RECEIVERS_NAMES_PROP_KEY);
@@ -406,7 +406,7 @@ public class MessageRouterConfig {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String[] getMsgRcvInactiveNames() {
 		String[] names       = (String[]) props.get(MSG_RECEIVERS_NAMES_PROP_KEY);
@@ -435,7 +435,7 @@ public class MessageRouterConfig {
 	 *
 	 * @param name
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws ClassNotFoundException
 	 * @throws IllegalAccessException
@@ -465,7 +465,7 @@ public class MessageRouterConfig {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String[] getRegistrNames() {
 		String[] names = (String[]) props.get(REGISTRATOR_NAMES_PROP_KEY);
@@ -489,7 +489,7 @@ public class MessageRouterConfig {
 	 * Check if class exists for server component
 	 *
 	 * @param name
-	 * @return
+	 * 
 	 */
 	private boolean hasClassForServerComponent(String name) {
 		try {

@@ -156,7 +156,7 @@ public class VHostManager
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public ServerComponent[] getComponentsForLocalDomain(String domain) {
@@ -203,7 +203,7 @@ public class VHostManager
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public ServerComponent[] getComponentsForNonLocalDomain(String domain) {
@@ -224,7 +224,7 @@ public class VHostManager
 	 *
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	@SuppressWarnings({ "unchecked" })
@@ -253,7 +253,7 @@ public class VHostManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -264,7 +264,7 @@ public class VHostManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoDescription() {
@@ -293,7 +293,7 @@ public class VHostManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<JID> getAllVHosts() {
@@ -316,7 +316,7 @@ public class VHostManager
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public VHostItem getVHostItem(String domain) {
@@ -327,7 +327,7 @@ public class VHostManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public BareJID getDefVHostItem() {
@@ -362,7 +362,7 @@ public class VHostManager
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isAnonymousEnabled(String domain) {
@@ -383,7 +383,7 @@ public class VHostManager
 	 *
 	 * @param component
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isCorrectType(ServerComponent component) {
@@ -396,7 +396,7 @@ public class VHostManager
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isLocalDomain(String domain) {
@@ -411,7 +411,7 @@ public class VHostManager
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isLocalDomainOrComponent(String domain) {

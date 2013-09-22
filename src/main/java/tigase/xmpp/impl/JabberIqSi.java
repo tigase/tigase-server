@@ -72,7 +72,7 @@ public abstract class JabberIqSi
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String id() {
@@ -83,7 +83,7 @@ public abstract class JabberIqSi
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -94,7 +94,7 @@ public abstract class JabberIqSi
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -107,7 +107,7 @@ public abstract class JabberIqSi
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {

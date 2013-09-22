@@ -138,7 +138,7 @@ public abstract class AbstractReceiverTask
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	public RosterItem addToRoster(JID jid) {
 		RosterItem ri = new RosterItem(jid.copyWithoutResource());
@@ -177,7 +177,7 @@ public abstract class AbstractReceiverTask
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, PropertyItem> getDefaultParams() {
@@ -270,7 +270,7 @@ public abstract class AbstractReceiverTask
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<JID, RosterItem> getRoster() {
@@ -283,7 +283,7 @@ public abstract class AbstractReceiverTask
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	public RosterItem getRosterItem(JID jid) {
 		return roster.get(jid.copyWithoutResource());
@@ -302,7 +302,7 @@ public abstract class AbstractReceiverTask
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<StatRecord> getStats() {
@@ -360,7 +360,7 @@ public abstract class AbstractReceiverTask
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isAdmin(JID jid) {
@@ -375,7 +375,7 @@ public abstract class AbstractReceiverTask
 	 *
 	 * @param buddy
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isAllowedToPost(JID buddy) {
 		boolean result = false;
@@ -407,7 +407,7 @@ public abstract class AbstractReceiverTask
 	 *
 	 * @param buddy
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isAllowedToSubscribe(JID buddy) {
 		boolean result = false;
@@ -479,7 +479,7 @@ public abstract class AbstractReceiverTask
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	public RosterItem removeFromRoster(JID jid) {
 		return roster.remove(jid.copyWithoutResource());
@@ -716,7 +716,7 @@ public abstract class AbstractReceiverTask
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 */
 	protected boolean addOutPacket(Packet packet) {
 		return srecv.addOutPacket(packet);

@@ -106,7 +106,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public int getCLIOQueueSize() {
@@ -117,7 +117,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public float[] getCLPacketsPerSecHistory() {
@@ -129,7 +129,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public int getCLQueueSize() {
@@ -140,7 +140,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public float getCPUUsage() {
@@ -151,7 +151,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public float[] getCPUUsageHistory() {
@@ -163,7 +163,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public int getCPUsNumber() {
@@ -174,7 +174,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public int getClusterCacheSize() {
@@ -187,7 +187,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public float getClusterCompressionRatio() {
@@ -198,7 +198,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getClusterNetworkBytes() {
@@ -209,7 +209,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public float getClusterNetworkBytesPerSecond() {
@@ -220,7 +220,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getClusterPackets() {
@@ -233,7 +233,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public float getClusterPacketsPerSec() {
@@ -246,7 +246,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * 
 	 * @param comp
 	 * 
-	 * @return
+	 * 
 	 */
 	public int getCompConnections(String comp) {
 		return cache.allStats.getCompConnections(comp);
@@ -258,7 +258,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * 
 	 * @param comp
 	 * 
-	 * @return
+	 * 
 	 */
 	public long getCompIqs(String comp) {
 		return cache.allStats.getCompIq(comp);
@@ -270,7 +270,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * 
 	 * @param comp
 	 * 
-	 * @return
+	 * 
 	 */
 	public long getCompMessages(String comp) {
 		return cache.allStats.getCompMsg(comp);
@@ -282,7 +282,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * 
 	 * @param comp
 	 * 
-	 * @return
+	 * 
 	 */
 	public long getCompPackets(String comp) {
 		return cache.allStats.getCompPackets(comp);
@@ -294,7 +294,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * 
 	 * @param comp
 	 * 
-	 * @return
+	 * 
 	 */
 	public long getCompPresences(String comp) {
 		return cache.allStats.getCompPres(comp);
@@ -328,7 +328,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	/**
 	 * Get Attribute exposed for management
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<String> getComponentsNames() {
@@ -339,7 +339,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public int getConnectionsNumber() {
@@ -352,7 +352,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public int[] getConnectionsNumberHistory() {
@@ -363,7 +363,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public float getHeapMemUsage() {
@@ -374,7 +374,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public float[] getHeapUsageHistory() {
@@ -386,7 +386,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getIQAuthNumber() {
@@ -399,7 +399,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getIQOtherNumber() {
@@ -412,7 +412,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public float getIQOtherNumberPerSec() {
@@ -423,7 +423,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public MBeanInfo getMBeanInfo() {
@@ -438,7 +438,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getMessagesNumber() {
@@ -451,7 +451,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public float getMessagesNumberPerSec() {
@@ -461,7 +461,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	/**
 	 * Get Attribute exposed for management
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getName() {
@@ -472,7 +472,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public float getNonHeapMemUsage() {
@@ -483,7 +483,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	public MBeanNotificationInfo[] getNotificationInfo() {
 		return new MBeanNotificationInfo[] {};
@@ -493,7 +493,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getPresencesNumber() {
@@ -506,7 +506,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public float getPresencesNumberPerSec() {
@@ -517,7 +517,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getProcesCPUTime() {
@@ -528,7 +528,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getQueueOverflow() {
@@ -541,7 +541,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public int getQueueSize() {
@@ -554,7 +554,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	public long getRegistered() {
 		return cache.registered;
@@ -564,7 +564,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getSMPacketsNumber() {
@@ -575,7 +575,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public float getSMPacketsNumberPerSec() {
@@ -586,7 +586,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public float[] getSMPacketsPerSecHistory() {
@@ -598,7 +598,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public int getSMQueueSize() {
@@ -609,7 +609,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public int getServerConnections() {
@@ -622,7 +622,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public int[] getServerConnectionsHistory() {
@@ -638,7 +638,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * @param stat
 	 * @param def
 	 * 
-	 * @return
+	 * 
 	 */
 	public long getStats(String cmp_name, String stat, long def) {
 		return cache.allStats.getValue(cmp_name, stat, def);
@@ -652,7 +652,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * @param stat
 	 * @param def
 	 * 
-	 * @return
+	 * 
 	 */
 	public float getStats(String cmp_name, String stat, float def) {
 		return cache.allStats.getValue(cmp_name, stat, def);
@@ -666,7 +666,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * @param stat
 	 * @param def
 	 * 
-	 * @return
+	 * 
 	 */
 	public String getStats(String cmp_name, String stat, String def) {
 		return cache.allStats.getValue(cmp_name, stat, def);
@@ -680,7 +680,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * @param stat
 	 * @param def
 	 * 
-	 * @return
+	 * 
 	 */
 	public int getStats(String cmp_name, String stat, int def) {
 		return cache.allStats.getValue(cmp_name, stat, def);
@@ -690,7 +690,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getSystemDetails() {
@@ -703,7 +703,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getUptime() {
@@ -715,7 +715,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * MBeanInfo.getDescription()
 	 * 
 	 * @param info
-	 * @return
+	 * 
 	 */
 	@Override
 	protected String getDescription(MBeanInfo info) {
@@ -727,7 +727,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * MBeanAttributeInfo.getDescription()
 	 * 
 	 * @param info
-	 * @return
+	 * 
 	 */
 	@Override
 	protected String getDescription(MBeanAttributeInfo info) {
@@ -764,7 +764,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * @param op
 	 * @param param
 	 * @param sequence
-	 * @return
+	 * 
 	 */
 	@Override
 	protected String getDescription(MBeanOperationInfo op, MBeanParameterInfo param,
@@ -800,7 +800,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * MBeanOperationInfo.getDescription()
 	 * 
 	 * @param info
-	 * @return
+	 * 
 	 */
 	@Override
 	protected String getDescription(MBeanOperationInfo info) {
@@ -839,7 +839,7 @@ public class StatisticsProvider extends StandardMBean implements StatisticsProvi
 	 * @param op
 	 * @param param
 	 * @param sequence
-	 * @return
+	 * 
 	 */
 	@Override
 	protected String getParameterName(MBeanOperationInfo op, MBeanParameterInfo param,

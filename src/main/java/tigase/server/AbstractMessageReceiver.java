@@ -28,20 +28,12 @@ package tigase.server;
 
 import tigase.annotations.TODO;
 
-import tigase.disco.ServiceEntity;
-
-import tigase.server.script.CommandIfc;
-
 import tigase.stats.StatisticsContainer;
 import tigase.stats.StatisticsList;
 import tigase.stats.StatisticType;
 
 import tigase.util.PatternComparator;
 import tigase.util.PriorityQueueAbstract;
-
-import tigase.xml.Element;
-
-import tigase.xmpp.JID;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -315,7 +307,7 @@ public abstract class AbstractMessageReceiver
 	 * @return a <code>boolean</code> value of <code>true</code> if the packet has
 	 *         been successfully added to the queue and <code>false</code>
 	 *         otherwise.
-	 * @see AbstractMessageReceiver.addPacket(Packet packet)
+	 * @see AbstractMessageReceiver#addPacket(Packet packet)
 	 */
 	@Override
 	public boolean addPacketNB(Packet packet) {
@@ -374,7 +366,7 @@ public abstract class AbstractMessageReceiver
 	 * @return a <code>boolean</code> value of <code>true</code> if all packets
 	 *         has been successfully added to the component's internal input queue
 	 *         and <code>false</code> otherwise.
-	 * @see AbstractMessageReceiver.hashCodeForPacket(Packet packet)
+	 * @see AbstractMessageReceiver#hashCodeForPacket(Packet packet)
 	 */
 	@Override
 	public boolean addPackets(Queue<Packet> packets) {
@@ -407,7 +399,7 @@ public abstract class AbstractMessageReceiver
 	 * component.getName() + '@' + any virtual domain
 	 * </pre>
 	 *
-	 * @TODO: The future implementation most likely accept packets addressed to:
+	 * TODO: The future implementation most likely accept packets addressed to:
 	 *
 	 *        <pre>
 	 * any virtual domain + '/' + component.getName()
@@ -565,7 +557,9 @@ public abstract class AbstractMessageReceiver
 	 *
 	 * @param prefix
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String newPacketId(String prefix) {
 		StringBuilder sb = new StringBuilder(32);
@@ -582,7 +576,9 @@ public abstract class AbstractMessageReceiver
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	public int processingInThreads() {
 		return 1;
@@ -592,7 +588,9 @@ public abstract class AbstractMessageReceiver
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	public int processingOutThreads() {
 		return 1;
@@ -605,7 +603,9 @@ public abstract class AbstractMessageReceiver
 	 * unneeded threads. Use <code>processingOutThreads()</code> and
 	 * <code>processingInThreads()</code> instead.
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Deprecated
 	public int processingThreads() {
@@ -685,7 +685,9 @@ public abstract class AbstractMessageReceiver
 	 *
 	 * @param address
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean removeRegexRouting(String address) {
 		return regexRoutings.remove(Pattern.compile(address, Pattern.CASE_INSENSITIVE));
@@ -694,7 +696,9 @@ public abstract class AbstractMessageReceiver
 	/**
 	 * Method returns default number of threads used by SchedulerExecutorService
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	public int schedulerThreads() {
 		return 1;
@@ -899,7 +903,9 @@ public abstract class AbstractMessageReceiver
 	 *
 	 * @param address
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean isInRegexRoutings(String address) {
@@ -1076,7 +1082,9 @@ public abstract class AbstractMessageReceiver
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean addOutPacket(Packet packet) {
 		int queueIdx = Math.abs(hashCodeForPacket(packet) % out_queues_size);
@@ -1138,7 +1146,9 @@ public abstract class AbstractMessageReceiver
 	 *
 	 * @param packets
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean addOutPackets(Queue<Packet> packets) {
 		Packet  p      = null;
@@ -1165,7 +1175,9 @@ public abstract class AbstractMessageReceiver
 	 * @param delay
 	 * @param unit
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean addOutPacketWithTimeout(Packet packet,
 			ReceiverTimeoutHandler handler, long delay, TimeUnit unit) {
@@ -1211,7 +1223,9 @@ public abstract class AbstractMessageReceiver
 	 *
 	 * @param def
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>Integer</code>
 	 */
 	protected Integer getMaxQueueSize(int def) {
 		return def;
@@ -1502,4 +1516,4 @@ public abstract class AbstractMessageReceiver
 }    // AbstractMessageReceiver
 
 
-//~ Formatted in Tigase Code Convention on 13/06/08
+//~ Formatted in Tigase Code Convention on 13/09/21

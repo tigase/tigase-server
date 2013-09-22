@@ -29,6 +29,7 @@ package tigase.xmpp;
 import tigase.net.IOService;
 
 import tigase.server.Packet;
+import tigase.server.xmppclient.XMPPIOProcessor;
 
 import tigase.util.TigaseStringprepException;
 
@@ -41,16 +42,15 @@ import tigase.xml.SingletonFactory;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.List;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
-import tigase.server.xmppclient.XMPPIOProcessor;
 
 /**
  * Describe class XMPPIOService here.
@@ -99,14 +99,13 @@ public class XMPPIOService<RefObject>
 	private String                jid                  = null;
 	private long                  packetsReceived      = 0;
 	private long                  packetsSent          = 0;
+	private XMPPIOProcessor[]     processors           = null;
 	private long                  req_idx              = 0;
 	@SuppressWarnings("rawtypes")
 	private XMPPIOServiceListener serviceListener      = null;
 	private long                  totalPacketsReceived = 0;
 	private long                  totalPacketsSent     = 0;
 
-	private XMPPIOProcessor[] processors = null;
-	
 	/**
 	 * The <code>waitingPackets</code> queue keeps data which have to be
 	 * processed.
@@ -175,80 +174,6 @@ public class XMPPIOService<RefObject>
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param white_char_ack
-	 * @param xmpp_ack
-	 * @param strict
-	 */
-	public void setAckMode(boolean white_char_ack, boolean xmpp_ack, boolean strict) {
-		this.white_char_ack = white_char_ack;
-		this.xmpp_ack       = xmpp_ack;
-		this.strict_ack     = strict;
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param reset
-	 *
-	 * @return
-	 */
-	public long getPacketsSent(boolean reset) {
-		long tmp = packetsSent;
-
-		if (reset) {
-			packetsSent = 0;
-		}
-
-		return tmp;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public long getTotalPacketsSent() {
-		return totalPacketsSent;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param reset
-	 *
-	 * @return
-	 */
-	public long getPacketsReceived(boolean reset) {
-		long tmp = packetsReceived;
-
-		if (reset) {
-			packetsReceived = 0;
-		}
-
-		return tmp;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public long getTotalPacketsReceived() {
-		return totalPacketsReceived;
-	}
-
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -259,15 +184,15 @@ public class XMPPIOService<RefObject>
 	 *          a <code>Packet</code> value of data to process.
 	 */
 	public void addPacketToSend(Packet packet) {
+
 		// processing packet using io level processors
 		if (processors != null) {
 			for (XMPPIOProcessor processor : processors) {
 				if (processor.processOutgoing(this, packet)) {
 					return;
-				}					
+				}
 			}
 		}
-		
 		if (xmpp_ack) {
 			String req = "" + (++req_idx);
 
@@ -285,54 +210,37 @@ public class XMPPIOService<RefObject>
 		waitingPackets.offer(packet);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
-	 * Method description
+	 *
+	 * @param data
 	 *
 	 *
-	 * @return
+	 * @return a value of <code>boolean</code>
+	 * @throws IOException
 	 */
-	public Queue<Packet> getReceivedPackets() {
-		return receivedPackets;
+	public boolean checkData(char[] data) throws IOException {
+
+		// by default do nothing and return false
+		return false;
 	}
 
 	/**
 	 * Method description
 	 *
-	 *
-	 * @return
 	 */
-	public Map<String, Packet> getWaitingForAct() {
-		for (Packet p : waitingForAck.values()) {
-			Element req = p.getElement().getChild(REQ_NAME);
+	@Override
+	public void forceStop() {
+		boolean stop = false;
 
-			if (req == null) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST,
-							"{0}, Missing req element in waiting for ACK packet: {1}", new Object[] {
-							toString(),
-							p });
-				}
-			} else {
-				p.getElement().removeChild(req);
+		if (processors != null) {
+			for (XMPPIOProcessor processor : processors) {
+				stop |= processor.serviceStopped(this, false);
 			}
 		}
-
-		return waitingForAck;
+		if (!stop) {
+			super.forceStop();
+		}
 	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public String getXMLNS() {
-		return this.xmlns;
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Describe <code>processWaitingPackets</code> method here.
@@ -358,40 +266,14 @@ public class XMPPIOService<RefObject>
 						packet.getElement().toString() });
 			}
 		}    // end of while (packet = waitingPackets.poll() != null)
-		
+
 		// notify io processors that all waiting packets were sent
-		if (processors != null) { 
+		if (processors != null) {
 			for (XMPPIOProcessor processor : processors) {
 				processor.packetsSent(this);
 			}
 		}
 	}
-
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param servList
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void setIOServiceListener(XMPPIOServiceListener servList) {
-		this.serviceListener = servList;
-		super.setIOServiceListener(servList);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param xmlns
-	 */
-	public void setXMLNS(String xmlns) {
-		this.xmlns = xmlns;
-	}
-
-	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Describe <code>stop</code> method here.
@@ -405,6 +287,19 @@ public class XMPPIOService<RefObject>
 		// serviceListener.xmppStreamClosed(this);
 		// } // end of if (!streamClosed)
 		super.stop();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String toString() {
+		return super.toString() + ", jid: " + jid;
 	}
 
 	/**
@@ -451,6 +346,193 @@ public class XMPPIOService<RefObject>
 		}
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param reset
+	 *
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	public long getPacketsReceived(boolean reset) {
+		long tmp = packetsReceived;
+
+		if (reset) {
+			packetsReceived = 0;
+		}
+
+		return tmp;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param reset
+	 *
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	public long getPacketsSent(boolean reset) {
+		long tmp = packetsSent;
+
+		if (reset) {
+			packetsSent = 0;
+		}
+
+		return tmp;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>Queue<Packet></code>
+	 */
+	public Queue<Packet> getReceivedPackets() {
+		return receivedPackets;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	public long getTotalPacketsReceived() {
+		return totalPacketsReceived;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	public long getTotalPacketsSent() {
+		return totalPacketsSent;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	public String getUserJid() {
+		return this.jid;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>Map<String,Packet></code>
+	 */
+	public Map<String, Packet> getWaitingForAct() {
+		for (Packet p : waitingForAck.values()) {
+			Element req = p.getElement().getChild(REQ_NAME);
+
+			if (req == null) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST,
+							"{0}, Missing req element in waiting for ACK packet: {1}", new Object[] {
+							toString(),
+							p });
+				}
+			} else {
+				p.getElement().removeChild(req);
+			}
+		}
+
+		return waitingForAck;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	public String getXMLNS() {
+		return this.xmlns;
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param white_char_ack
+	 * @param xmpp_ack
+	 * @param strict
+	 */
+	public void setAckMode(boolean white_char_ack, boolean xmpp_ack, boolean strict) {
+		this.white_char_ack = white_char_ack;
+		this.xmpp_ack       = xmpp_ack;
+		this.strict_ack     = strict;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param servList
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void setIOServiceListener(XMPPIOServiceListener servList) {
+		this.serviceListener = servList;
+		super.setIOServiceListener(servList);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param processors is a <code>XMPPIOProcessor[]</code>
+	 */
+	public void setProcessors(XMPPIOProcessor[] processors) {
+		this.processors = processors;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param jid
+	 */
+	public void setUserJid(String jid) {
+		this.jid = jid;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param xmlns
+	 */
+	public void setXMLNS(String xmlns) {
+		this.xmlns = xmlns;
+	}
+
+	//~--- methods --------------------------------------------------------------
+
 	/**
 	 * Method <code>addReceivedPacket</code> puts processing results to queue. The
 	 * processing results are usually data (messages) which has been just received
@@ -478,18 +560,16 @@ public class XMPPIOService<RefObject>
 			}
 			firstPacket = false;
 		}
-		
 		if (processors != null) {
 			boolean stop = false;
-			
+
 			for (XMPPIOProcessor processor : processors) {
 				stop |= processor.processIncoming(this, packet);
 			}
-			
-			if (stop) 
+			if (stop) {
 				return;
-		}		
-		
+			}
+		}
 		if (packet.getElemName() == ACK_NAME) {
 			String ack_id = packet.getAttributeStaticStr(ID_ATT);
 		} else {
@@ -614,64 +694,13 @@ public class XMPPIOService<RefObject>
 		// }
 	}
 
-	private void sendAck(Packet packet) {
-
-		// If stanza receiving confirmation is configured, try to send confirmation
-		// back
-		if (white_char_ack || xmpp_ack) {
-			String ack = null;
-
-			if (white_char_ack) {
-
-				// If confirming via white space is enabled then prepare space ack.
-				ack = " ";
-			}
-			if (xmpp_ack) {
-				Element req = packet.getElement().getChild(REQ_NAME);
-
-				if (req != null) {
-					packet.getElement().removeChild(req);
-
-					String req_val = req.getAttributeStaticStr(ID_ATT);
-
-					if (req_val != null) {
-
-						// XMPP ack might be enabled in configuration but the client may not
-						// support it. In such a case we do not send XMPP ack.
-						ack = "<" + ACK_NAME + " " + ID_ATT + "=\"" + req_val + "\"/>";
-					}
-				}
-			}
-			if (ack != null) {
-				try {
-					writeRawData(ack);
-					log.log(Level.FINEST, "Sent ack confirmation: '" + ack + "'");
-				} catch (Exception ex) {
-					forceStop();
-					log.log(Level.FINE, "Can't send ack confirmation: '" + ack + "'", ex);
-				}
-			}
-		}
-	}
-
-	/**
-	 *
-	 * @param data
-	 *   @return
-	 *
-	 * @throws IOException
-	 */
-	public boolean checkData(char[] data) throws IOException {
-
-		// by default do nothing and return false
-		return false;
-	}
-
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	protected int receivedPackets() {
@@ -697,13 +726,12 @@ public class XMPPIOService<RefObject>
 					toString(),
 					e });
 		}
-
 		if (processors != null) {
 			for (XMPPIOProcessor processor : processors) {
 				processor.serviceStopped(this, true);
 			}
 		}
-		
+
 		// streamClosed = true;
 		if (serviceListener != null) {
 			serviceListener.xmppStreamClosed(this);
@@ -746,52 +774,46 @@ public class XMPPIOService<RefObject>
 		}
 	}
 
-	@Override
-	public void forceStop() {		
-		boolean stop = false;
-		if (processors != null) {
-			for (XMPPIOProcessor processor : processors) {
-				stop |= processor.serviceStopped(this, false);
+	private void sendAck(Packet packet) {
+
+		// If stanza receiving confirmation is configured, try to send confirmation
+		// back
+		if (white_char_ack || xmpp_ack) {
+			String ack = null;
+
+			if (white_char_ack) {
+
+				// If confirming via white space is enabled then prepare space ack.
+				ack = " ";
+			}
+			if (xmpp_ack) {
+				Element req = packet.getElement().getChild(REQ_NAME);
+
+				if (req != null) {
+					packet.getElement().removeChild(req);
+
+					String req_val = req.getAttributeStaticStr(ID_ATT);
+
+					if (req_val != null) {
+
+						// XMPP ack might be enabled in configuration but the client may not
+						// support it. In such a case we do not send XMPP ack.
+						ack = "<" + ACK_NAME + " " + ID_ATT + "=\"" + req_val + "\"/>";
+					}
+				}
+			}
+			if (ack != null) {
+				try {
+					writeRawData(ack);
+					log.log(Level.FINEST, "Sent ack confirmation: '" + ack + "'");
+				} catch (Exception ex) {
+					forceStop();
+					log.log(Level.FINE, "Can't send ack confirmation: '" + ack + "'", ex);
+				}
 			}
 		}
-		
-		if (!stop)
-			super.forceStop();
-	}
-	
-	//~--- set methods ----------------------------------------------------------
-
-	public void setProcessors(XMPPIOProcessor[] processors) {
-		this.processors = processors;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 */
-	public void setUserJid(String jid) {
-		this.jid = jid;
-	}
-
-	public String getUserJid() {
-		return this.jid;
-	}
-	
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String toString() {
-		return super.toString() + ", jid: " + jid;
 	}
 }    // XMPPIOService
 
 
-//~ Formatted in Tigase Code Convention on 13/03/19
+//~ Formatted in Tigase Code Convention on 13/09/21

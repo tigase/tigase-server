@@ -82,7 +82,7 @@ public class CID {
 	 *
 	 * @param o
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean equals(Object o) {
@@ -99,7 +99,7 @@ public class CID {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getLocalHost() {
 		return localHost;
@@ -109,7 +109,7 @@ public class CID {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getRemoteHost() {
 		return remoteHost;
@@ -121,7 +121,7 @@ public class CID {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int hashCode() {
@@ -132,7 +132,7 @@ public class CID {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String toString() {

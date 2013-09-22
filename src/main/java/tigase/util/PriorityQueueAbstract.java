@@ -65,7 +65,7 @@ public abstract class PriorityQueueAbstract<E> {
 	 * @param element
 	 * @param priority
 	 *
-	 * @return
+	 * 
 	 */
 	public abstract boolean offer(E element, int priority);
 
@@ -98,7 +98,7 @@ public abstract class PriorityQueueAbstract<E> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public abstract int[] size();
 
@@ -108,7 +108,7 @@ public abstract class PriorityQueueAbstract<E> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws InterruptedException
 	 */
@@ -118,7 +118,7 @@ public abstract class PriorityQueueAbstract<E> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public abstract int totalSize();
 
@@ -132,7 +132,7 @@ public abstract class PriorityQueueAbstract<E> {
 	 * @param maxSize
 	 * @param <E>
 	 *
-	 * @return
+	 * 
 	 */
 	@SuppressWarnings("unchecked")
 	public static <E> PriorityQueueAbstract<E> getPriorityQueue(int maxPriority, int maxSize) {

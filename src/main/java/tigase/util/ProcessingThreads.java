@@ -118,7 +118,7 @@ public class ProcessingThreads<E extends WorkerThread> {
 	 * @param packet
 	 * @param conn
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean addItem(XMPPProcessorIfc processor, Packet packet, XMPPResourceConnection conn) {
 		boolean ret = false;
@@ -190,7 +190,7 @@ public class ProcessingThreads<E extends WorkerThread> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long getAverageProcessingTime() {
 		long average = 0;
@@ -214,7 +214,7 @@ public class ProcessingThreads<E extends WorkerThread> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long getDroppedPackets() {
 		return droppedPackets;
@@ -224,7 +224,7 @@ public class ProcessingThreads<E extends WorkerThread> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getName() {
 		return name;
@@ -234,7 +234,7 @@ public class ProcessingThreads<E extends WorkerThread> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int getTotalQueueSize() {
 		int ret = 0;
@@ -250,7 +250,7 @@ public class ProcessingThreads<E extends WorkerThread> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int getTotalRuns() {
 		int ret = 0;
@@ -271,7 +271,7 @@ public class ProcessingThreads<E extends WorkerThread> {
 // * Method description
 // *
 // *
-// * @return
+// * 
 // */
 //public E getWorkerThread() {
 //  try {

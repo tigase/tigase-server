@@ -46,7 +46,7 @@ public abstract class ClConRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	static String[] getDefaultPropetyItems() {
 		return new String[] { DNSResolver.getDefaultHostname() };
@@ -56,7 +56,7 @@ public abstract class ClConRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	static String getPropertyKey() {
 		return "--cluster-nodes";
@@ -66,7 +66,7 @@ public abstract class ClConRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	static String getConfigKey() {
 		return "cluster-nodes";
@@ -76,7 +76,7 @@ public abstract class ClConRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	static ClusterRepoItem getItemInstance() {
 		return new ClusterRepoItem();
@@ -86,7 +86,7 @@ public abstract class ClConRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static BareJID getRepoUser() {
 		return clcon_user;

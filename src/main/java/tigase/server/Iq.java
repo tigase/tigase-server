@@ -119,7 +119,7 @@ public class Iq
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseStringprepException
 	 */
@@ -135,7 +135,7 @@ public class Iq
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseStringprepException
 	 */
@@ -219,7 +219,7 @@ public class Iq
 	 *
 	 * @param cmd_type
 	 *
-	 * @return
+	 * 
 	 */
 	public Packet commandResult(Command.DataType cmd_type) {
 		Packet result = packetInstance(command.createIqCommand(getStanzaTo(),
@@ -238,7 +238,7 @@ public class Iq
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Command getCommand() {
@@ -249,7 +249,7 @@ public class Iq
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getIQChildName() {
 		List<Element> children = elem.getChildren();
@@ -265,7 +265,7 @@ public class Iq
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getIQXMLNS() {
 		if (iqQueryXMLNS == null) {
@@ -279,7 +279,7 @@ public class Iq
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected String[] getElNameErrorPath() {
@@ -290,7 +290,7 @@ public class Iq
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getStrCommand() {
 		return strCommand;
@@ -300,7 +300,7 @@ public class Iq
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isCommand() {
@@ -311,7 +311,7 @@ public class Iq
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isServiceDisco() {

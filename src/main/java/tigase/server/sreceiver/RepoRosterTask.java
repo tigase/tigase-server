@@ -76,7 +76,7 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public RosterItem addToRoster(JID jid) {
@@ -133,7 +133,7 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public RosterItem removeFromRoster(JID jid) {

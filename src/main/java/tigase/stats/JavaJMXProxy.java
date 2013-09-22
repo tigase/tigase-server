@@ -178,7 +178,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 *
 	 * @param level
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, String> getAllStats(int level) {
@@ -193,7 +193,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int getCLIOQueueSize() {
@@ -204,7 +204,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public float[] getCLPacketsPerSecHistory() {
@@ -215,7 +215,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int getCLQueueSize() {
@@ -226,7 +226,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public float getCPUUsage() {
@@ -237,7 +237,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public float[] getCPUUsageHistory() {
@@ -248,7 +248,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int getCPUsNumber() {
@@ -259,7 +259,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int getClusterCacheSize() {
@@ -270,7 +270,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public float getClusterCompressionRatio() {
@@ -281,7 +281,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getClusterNetworkBytes() {
@@ -292,7 +292,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public float getClusterNetworkBytesPerSecond() {
@@ -303,7 +303,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getClusterPackets() {
@@ -314,7 +314,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public float getClusterPacketsPerSec() {
@@ -328,7 +328,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * @param compName
 	 * @param level
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, String> getComponentStats(String compName, int level) {
@@ -343,7 +343,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<String> getComponentsNames() {
@@ -358,7 +358,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int getConnectionsNumber() {
@@ -369,7 +369,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int[] getConnectionsNumberHistory() {
@@ -380,7 +380,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public float getHeapMemUsage() {
@@ -391,7 +391,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public float[] getHeapUsageHistory() {
@@ -402,7 +402,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getIQAuthNumber() {
@@ -413,7 +413,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getIQOtherNumber() {
@@ -424,7 +424,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public float getIQOtherNumberPerSec() {
@@ -435,7 +435,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getId() {
 		return id;
@@ -445,7 +445,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long getLastCacheUpdate() {
 		return lastCacheUpdate;
@@ -455,7 +455,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getMessagesNumber() {
@@ -466,7 +466,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public float getMessagesNumberPerSec() {
@@ -477,7 +477,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getName() {
@@ -492,7 +492,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public float getNonHeapMemUsage() {
@@ -503,7 +503,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getPresencesNumber() {
@@ -514,7 +514,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public float getPresencesNumberPerSec() {
@@ -525,7 +525,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getProcesCPUTime() {
@@ -536,7 +536,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getQueueOverflow() {
@@ -547,7 +547,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int getQueueSize() {
@@ -558,7 +558,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getSMPacketsNumber() {
@@ -569,7 +569,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public float getSMPacketsNumberPerSec() {
@@ -580,7 +580,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public float[] getSMPacketsPerSecHistory() {
@@ -591,7 +591,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int getSMQueueSize() {
@@ -602,7 +602,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int getServerConnections() {
@@ -613,7 +613,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int[] getServerConnectionsHistory() {
@@ -624,7 +624,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getSystemDetails() {
@@ -635,7 +635,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getUptime() {
@@ -720,7 +720,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isConnected() {
 		return tigBean != null;
@@ -730,7 +730,7 @@ public class JavaJMXProxy implements StatisticsProviderMBean, NotificationListen
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isInitialized() {
 		return isConnected() && initialized;

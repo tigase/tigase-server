@@ -198,7 +198,7 @@ public class MessageForwarding
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -209,7 +209,7 @@ public class MessageForwarding
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {

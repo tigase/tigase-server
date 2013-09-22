@@ -112,7 +112,7 @@ public class BoshConnectionManager
 	 * @param packet
 	 * @param bs
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean addOutStreamClosed(Packet packet, BoshSession bs) {
@@ -132,7 +132,7 @@ public class BoshConnectionManager
 	 *
 	 * @param packet
 	 * @param bs
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean addOutStreamOpen(Packet packet, BoshSession bs) {
@@ -185,7 +185,7 @@ public class BoshConnectionManager
 	 *
 	 * @param srv
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Queue<Packet> processSocketData(XMPPIOService<Object> srv) {
@@ -265,7 +265,7 @@ public class BoshConnectionManager
 	 * @param bs
 	 * @param delay
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public BoshSendQueueTask scheduleSendQueueTask(final BoshSession bs, long delay) {
@@ -284,7 +284,7 @@ public class BoshConnectionManager
 	 * @param bs
 	 * @param delay
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public BoshTask scheduleTask(BoshSession bs, long delay) {
@@ -359,7 +359,7 @@ public class BoshConnectionManager
 	 * @param serv
 	 * @param attribs
 	 *
-	 * @return
+	 * 
 	 */
 	public String xmppStreamOpened(BoshIOService serv, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINE)) {
@@ -386,7 +386,7 @@ public class BoshConnectionManager
 	 *
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -408,7 +408,7 @@ public class BoshConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -419,7 +419,7 @@ public class BoshConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoDescription() {
@@ -433,7 +433,7 @@ public class BoshConnectionManager
 	 * @param fromJID
 	 * @param ph
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public BareJID getSeeOtherHostForJID(BareJID fromJID, Phase ph) {
@@ -570,7 +570,7 @@ public class BoshConnectionManager
 	 * @param command_sessionId
 	 * @param serv
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected JID changeDataReceiver(Packet packet, JID newAddress,
@@ -598,7 +598,7 @@ public class BoshConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected ReceiverTimeoutHandler newStartedHandler() {
@@ -729,7 +729,7 @@ public class BoshConnectionManager
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected boolean writePacketToSocket(Packet packet) {
@@ -771,7 +771,7 @@ public class BoshConnectionManager
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	protected BoshSession getBoshSession(JID jid) {
 		UUID sid = UUID.fromString(jid.getResource());
@@ -783,7 +783,7 @@ public class BoshConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected int[] getDefPlainPorts() {
@@ -794,7 +794,7 @@ public class BoshConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected int[] getDefSSLPorts() {
@@ -817,7 +817,7 @@ public class BoshConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected BoshIOService getXMPPIOServiceInstance() {

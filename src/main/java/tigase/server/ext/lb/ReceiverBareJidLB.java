@@ -46,7 +46,7 @@ public class ReceiverBareJidLB
 	 * @param p
 	 * @param conns
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public ComponentIOService selectConnection(Packet p, List<ComponentConnection> conns) {

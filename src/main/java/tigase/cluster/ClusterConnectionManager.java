@@ -207,7 +207,7 @@ public class ClusterConnectionManager
 	 * address rather then destination address.
 	 *
 	 * @param packet
-	 * @return
+	 * 
 	 */
 	@Override
 	public int hashCodeForPacket(Packet packet) {
@@ -352,7 +352,7 @@ public class ClusterConnectionManager
 
 	/**
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int processingInThreads() {
@@ -370,7 +370,7 @@ public class ClusterConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int processingOutThreads() {
@@ -438,7 +438,7 @@ public class ClusterConnectionManager
 	 *
 	 * @param serv
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Queue<Packet> processSocketData(XMPPIOService<Object> serv) {
@@ -541,7 +541,7 @@ public class ClusterConnectionManager
 	 *
 	 * @param service
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean serviceStopped(XMPPIOService<Object> service) {
@@ -653,7 +653,7 @@ public class ClusterConnectionManager
 	 * @param service
 	 * @param attribs
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String xmppStreamOpened(XMPPIOService<Object> service, Map<String,
@@ -719,7 +719,7 @@ public class ClusterConnectionManager
 	 *
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
@@ -784,7 +784,7 @@ public class ClusterConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -795,7 +795,7 @@ public class ClusterConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoDescription() {
@@ -946,7 +946,7 @@ public class ClusterConnectionManager
 	 *
 	 * @param p
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected boolean writePacketToSocket(Packet p) {
@@ -981,7 +981,7 @@ public class ClusterConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected int[] getDefPlainPorts() {
@@ -994,7 +994,7 @@ public class ClusterConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected String getDefTrafficThrottling() {
@@ -1019,7 +1019,7 @@ public class ClusterConnectionManager
 	 *
 	 * @param def
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected Integer getMaxQueueSize(int def) {
@@ -1032,7 +1032,7 @@ public class ClusterConnectionManager
 	 *
 	 * @param port
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected Map<String, Object> getParamsForPort(int port) {
@@ -1051,7 +1051,7 @@ public class ClusterConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
@@ -1062,7 +1062,7 @@ public class ClusterConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected boolean isHighThroughput() {
@@ -1195,7 +1195,7 @@ public class ClusterConnectionManager
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public float getAverageCompressionRatio() {
 			return compressionRatio / counter;
@@ -1205,7 +1205,7 @@ public class ClusterConnectionManager
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public float getAverageDecompressionRatio() {
 			return decompressionRatio / counter;
@@ -1215,7 +1215,7 @@ public class ClusterConnectionManager
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public int getWaitingToSend() {
 			return clIOQueue;

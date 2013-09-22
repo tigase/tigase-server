@@ -60,7 +60,7 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 	 *
 	 *
 	 * @param serv
-	 * @return
+	 * 
 	 */
 	public List<Element> getStreamFeatures(S2SIOService serv);
 

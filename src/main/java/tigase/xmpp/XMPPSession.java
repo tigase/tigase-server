@@ -193,7 +193,7 @@ public class XMPPSession {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -212,7 +212,7 @@ public class XMPPSession {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public List<XMPPResourceConnection> getActiveResources() {
 		return (List<XMPPResourceConnection>) activeResources;
@@ -222,7 +222,7 @@ public class XMPPSession {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@SuppressWarnings({ "unchecked" })
 	public List<XMPPResourceConnection> getActiveResourcesClone() {
@@ -233,7 +233,7 @@ public class XMPPSession {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int getActiveResourcesSize() {
 		return activeResources.size();
@@ -242,7 +242,7 @@ public class XMPPSession {
 	/**
 	 *
 	 * @param key
-	 * @return
+	 * 
 	 */
 	public Object getCommonSessionData(String key) {
 		return sessionData.get(key);
@@ -252,7 +252,7 @@ public class XMPPSession {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 *
 	 */
 	public JID[] getConnectionIds() {
@@ -276,7 +276,7 @@ public class XMPPSession {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 *
 	 */
 	public JID[] getJIDs() {
@@ -294,7 +294,7 @@ public class XMPPSession {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long getLiveTime() {
 		return (System.currentTimeMillis() - creationTime);
@@ -304,7 +304,7 @@ public class XMPPSession {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long getPacketsCounter() {
 		return packets_counter;
@@ -316,7 +316,7 @@ public class XMPPSession {
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	public synchronized XMPPResourceConnection getResourceConnection(JID jid) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -404,7 +404,7 @@ public class XMPPSession {
 	 *
 	 * @param connectionId
 	 *
-	 * @return
+	 * 
 	 */
 	public XMPPResourceConnection getResourceForConnectionId(JID connectionId) {
 		try {
@@ -427,7 +427,7 @@ public class XMPPSession {
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	public XMPPResourceConnection getResourceForJID(JID jid) {
 		final String resource = jid.getResource();
@@ -441,7 +441,7 @@ public class XMPPSession {
 	 *
 	 * @param resource
 	 *
-	 * @return
+	 * 
 	 */
 	public XMPPResourceConnection getResourceForResource(String resource) {
 		if ((resource != null) && (resource.length() > 0)) {
@@ -463,7 +463,7 @@ public class XMPPSession {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getUserName() {
 		return username;
@@ -488,7 +488,7 @@ public class XMPPSession {
 	 *
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 */
 	protected Object removeCommonSessionData(String key) {
 		return sessionData.remove(key);

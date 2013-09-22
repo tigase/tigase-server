@@ -60,7 +60,7 @@ public abstract class CommandListenerAbstract
 	 *
 	 * @param cl
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int compareTo(CommandListener cl) {
@@ -73,7 +73,7 @@ public abstract class CommandListenerAbstract
 	 *
 	 * @param cl
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean equals(Object cl) {
@@ -85,7 +85,7 @@ public abstract class CommandListenerAbstract
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int hashCode() {
@@ -104,7 +104,7 @@ public abstract class CommandListenerAbstract
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getName() {

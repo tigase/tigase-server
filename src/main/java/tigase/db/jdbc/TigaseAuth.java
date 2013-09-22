@@ -145,7 +145,7 @@ public class TigaseAuth implements AuthRepository {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getResourceUri() {
@@ -193,7 +193,7 @@ public class TigaseAuth implements AuthRepository {
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getUsersCount(String domain) {

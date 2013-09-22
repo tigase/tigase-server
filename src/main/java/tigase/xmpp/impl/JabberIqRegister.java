@@ -96,7 +96,7 @@ public class JabberIqRegister
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String id() {
@@ -296,7 +296,7 @@ public class JabberIqRegister
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element[] supDiscoFeatures(XMPPResourceConnection session) {
@@ -314,7 +314,7 @@ public class JabberIqRegister
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -325,7 +325,7 @@ public class JabberIqRegister
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -338,7 +338,7 @@ public class JabberIqRegister
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element[] supStreamFeatures(XMPPResourceConnection session) {

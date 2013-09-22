@@ -620,7 +620,7 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String toPropertyString() {
@@ -660,7 +660,7 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String toString() {
@@ -687,7 +687,7 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public DomainFilterPolicy getDomainFilter() {
 		if ( domainFilter == null ){
@@ -701,7 +701,7 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getElemName() {
@@ -712,7 +712,7 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getKey() {
@@ -742,7 +742,7 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public JID getMessageForwardAddress() {
 		return presenceForward;
@@ -771,7 +771,7 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public JID getPresenceForwardAddress() {
 		return presenceForward;
@@ -781,7 +781,7 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getS2sSecret() {
 		return s2sSecret;
@@ -791,7 +791,7 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public VHostItem getUnmodifiableVHostItem() {
 		if (unmodifiableItem == null) {
@@ -1045,7 +1045,7 @@ public class VHostItem
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String toString() {
@@ -1070,7 +1070,7 @@ public class VHostItem
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public DomainFilterPolicy getDomainFilter() {
@@ -1123,7 +1123,7 @@ public class VHostItem
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String getS2sSecret() {
@@ -1134,7 +1134,7 @@ public class VHostItem
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public VHostItem getUnmodifiableVHostItem() {
@@ -1195,7 +1195,7 @@ public class VHostItem
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public boolean isTlsRequired() {

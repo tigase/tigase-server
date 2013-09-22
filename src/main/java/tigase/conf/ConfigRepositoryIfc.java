@@ -61,7 +61,7 @@ public interface ConfigRepositoryIfc
 	/**
 	 * Returns all known settings for the given component name.
 	 * @param compName
-	 * @return
+	 * 
 	 * @throws ConfigurationException
 	 */
 	Map<String, Object> getProperties(String compName) throws ConfigurationException;
@@ -72,7 +72,7 @@ public interface ConfigRepositoryIfc
 	 *
 	 * @param compName
 	 *
-	 * @return
+	 * 
 	 */
 	Set<ConfigItem> getItemsForComponent(String compName);
 
@@ -96,7 +96,7 @@ public interface ConfigRepositoryIfc
 	 * @param node
 	 * @param key
 	 * @param def
-	 * @return
+	 * 
 	 */
 	Object get(String compName, String node, String key, Object def);
 
@@ -116,7 +116,7 @@ public interface ConfigRepositoryIfc
 	/**
 	 * Returns all component names for which there are some configuration settings
 	 * available.
-	 * @return
+	 * 
 	 */
 	String[] getCompNames();
 
@@ -125,7 +125,7 @@ public interface ConfigRepositoryIfc
 	 * node.
 	 * @param compName
 	 * @param node
-	 * @return
+	 * 
 	 */
 	String[] getKeys(String compName, String node);
 
@@ -165,7 +165,7 @@ public interface ConfigRepositoryIfc
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	Map<String, Object> getInitProperties();
 }

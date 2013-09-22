@@ -68,7 +68,7 @@ public abstract class DynamicRoster {
 	 * @param settings
 	 * @param buddies
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 */
@@ -101,7 +101,7 @@ public abstract class DynamicRoster {
 	 * @param session
 	 * @param settings
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 */
@@ -124,7 +124,7 @@ public abstract class DynamicRoster {
 	 * @param session
 	 * @param settings
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 */
@@ -180,7 +180,7 @@ public abstract class DynamicRoster {
 	 * @param settings
 	 * @param buddy
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 */
@@ -208,7 +208,7 @@ public abstract class DynamicRoster {
 	 *
 	 * @param settings
 	 *
-	 * @return
+	 * 
 	 */
 	public static DynamicRosterIfc[] getDynamicRosters(final Map<String, Object> settings) {
 		DynamicRosterIfc[] dynr = null;
@@ -237,7 +237,7 @@ public abstract class DynamicRoster {
 	 * @param session
 	 * @param settings
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 */
@@ -318,7 +318,7 @@ public abstract class DynamicRoster {
 	 * @param settings
 	 * @param item
 	 *
-	 * @return
+	 * 
 	 */
 	public static Element getItemExtraData(XMPPResourceConnection session, Map<String,
 			Object> settings, Element item) {

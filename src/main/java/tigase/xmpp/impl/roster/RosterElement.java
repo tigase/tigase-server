@@ -217,7 +217,7 @@ public class RosterElement
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String[] getGroups() {
 		return groups;
@@ -227,7 +227,7 @@ public class RosterElement
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public JID getJid() {
 		return jid;
@@ -237,7 +237,7 @@ public class RosterElement
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getName() {
 		return name;
@@ -247,7 +247,7 @@ public class RosterElement
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getOtherData() {
 		return otherData;
@@ -257,7 +257,7 @@ public class RosterElement
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public Element getRosterElement() {
 		Element elem = new Element(ELEM_NAME, new String[] { JID_ATT, SUBS_ATT, NAME_ATT,
@@ -288,7 +288,7 @@ public class RosterElement
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public Element getRosterItem() {
 
@@ -322,7 +322,7 @@ public class RosterElement
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String toString() {
@@ -335,7 +335,7 @@ public class RosterElement
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public SubscriptionType getSubscription() {
 		return subscription;
@@ -345,7 +345,7 @@ public class RosterElement
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isModified() {
 		return modified;
@@ -355,7 +355,7 @@ public class RosterElement
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isOnline() {
 		return onlineMap.size() > 0;
@@ -365,7 +365,7 @@ public class RosterElement
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isPresence_sent() {
 		return presence_sent;
@@ -484,7 +484,7 @@ public class RosterElement
 	//~--- get methods ----------------------------------------------------------
 
 	/**
-	 * @return
+	 * 
 	 */
 	public boolean isPersistent() {
 		return persistent;

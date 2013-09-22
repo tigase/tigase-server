@@ -73,7 +73,7 @@ public class AddScriptCommand extends AbstractScriptCommand {
 	 * @param ext
 	 * @param binds
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws ScriptException
 	 */
@@ -121,7 +121,7 @@ public class AddScriptCommand extends AbstractScriptCommand {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Bindings getBindings() {

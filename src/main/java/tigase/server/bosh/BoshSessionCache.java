@@ -207,7 +207,7 @@ public class BoshSessionCache {
 	 *
 	 * @param id
 	 *
-	 * @return
+	 * 
 	 */
 	public List<Element> get(String id) {
 		if (id == null) {
@@ -227,7 +227,7 @@ public class BoshSessionCache {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public List<Element> getAll() {
 		List<Element> result = new ArrayList<Element>();
@@ -247,7 +247,7 @@ public class BoshSessionCache {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public List<Element> getAllPresences() {
 		return new ArrayList<Element>(jid_presence.values());
@@ -259,7 +259,7 @@ public class BoshSessionCache {
 	 *
 	 * @param from
 	 *
-	 * @return
+	 * 
 	 */
 	public List<Element> getPresence(String... from) {
 		List<Element> result = new ArrayList<Element>();
@@ -283,7 +283,7 @@ public class BoshSessionCache {
 	 *
 	 * @param id
 	 *
-	 * @return
+	 * 
 	 */
 	public List<Element> remove(String id) {
 		if (id == null) {

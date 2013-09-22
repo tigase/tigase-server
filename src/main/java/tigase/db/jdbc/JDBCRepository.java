@@ -546,7 +546,7 @@ public class JDBCRepository
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getResourceUri() {
@@ -621,7 +621,7 @@ public class JDBCRepository
 	 *
 	 * @param user_id
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 */
@@ -652,7 +652,7 @@ public class JDBCRepository
 	 * @param repo
 	 * @param user_id
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws SQLException
 	 */
@@ -761,7 +761,7 @@ public class JDBCRepository
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getUsersCount(String domain) {
@@ -1228,7 +1228,7 @@ public class JDBCRepository
 	 *
 	 * @param user
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean userExists(BareJID user) {
@@ -1588,7 +1588,7 @@ public class JDBCRepository
 		 *
 		 * @param key
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public Object remove(Object key) {

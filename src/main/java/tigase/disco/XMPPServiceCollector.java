@@ -103,7 +103,7 @@ public abstract class XMPPServiceCollector
 	 *
 	 * @param component
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isCorrectType(ServerComponent component) {

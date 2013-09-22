@@ -78,7 +78,7 @@ public class MessageCarbons
 	/**
 	 * Returns plugins unique identifier
 	 * 
-	 * @return 
+	 * 
 	 */
 	@Override
 	public String id() {
@@ -237,7 +237,7 @@ public class MessageCarbons
 	 * Return array of element containing supported disco features
 	 * 
 	 * @param session
-	 * @return 
+	 * 
 	 */
 	@Override
 	public Element[] supDiscoFeatures(XMPPResourceConnection session) {
@@ -247,7 +247,7 @@ public class MessageCarbons
 	/**
 	 * Returns array of split path of supported elements
 	 * 
-	 * @return 
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -257,7 +257,7 @@ public class MessageCarbons
 	/**
 	 * Returns array of supported namespaces
 	 * 
-	 * @return 
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -272,7 +272,7 @@ public class MessageCarbons
 	 * @param srcJid
 	 * @param jid
 	 * @param type
-	 * @return
+	 * 
 	 * @throws NoConnectionIdException 
 	 */
 	private static Packet prepareCarbonCopy(Packet packet, XMPPResourceConnection session, 
@@ -330,7 +330,7 @@ public class MessageCarbons
 	 * Returns true if session is enabled for receiving carbon copy messages
 	 * 
 	 * @param session
-	 * @return
+	 * 
 	 * @throws NotAuthorizedException 
 	 */
 	private static boolean isEnabled(XMPPResourceConnection session) throws NotAuthorizedException {
@@ -453,7 +453,7 @@ public class MessageCarbons
 	 * 
 	 * @param packet
 	 * @param session
-	 * @return 
+	 * 
 	 */
 	private boolean isErrorDeliveringForkedMessage(Packet packet, XMPPResourceConnection session) {
 

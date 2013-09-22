@@ -82,7 +82,7 @@ public class Store
 	 * @param rule
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean execute(Packet packet, Element rule) {
@@ -141,7 +141,7 @@ public class Store
 	 *
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -162,7 +162,7 @@ public class Store
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getName() {

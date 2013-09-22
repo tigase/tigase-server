@@ -71,7 +71,7 @@ public class CAPS
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String id() {
@@ -82,7 +82,7 @@ public class CAPS
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -93,7 +93,7 @@ public class CAPS
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -189,7 +189,7 @@ public class CAPS
 	 * @param session
 	 * @param feature
 	 *
-	 * @return
+	 * 
 	 */
 	@SuppressWarnings("unchecked")
 	public static Set<JID> getJidsWithFeature(XMPPResourceConnection session,

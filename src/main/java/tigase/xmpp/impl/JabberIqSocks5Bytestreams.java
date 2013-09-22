@@ -70,7 +70,7 @@ public abstract class JabberIqSocks5Bytestreams
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String id() {
@@ -81,7 +81,7 @@ public abstract class JabberIqSocks5Bytestreams
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -92,7 +92,7 @@ public abstract class JabberIqSocks5Bytestreams
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {

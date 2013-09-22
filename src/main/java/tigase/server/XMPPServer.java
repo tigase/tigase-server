@@ -81,7 +81,7 @@ public final class XMPPServer {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static String getImplementationVersion() {
 		String version = XMPPServer.class.getPackage().getImplementationVersion();
@@ -103,7 +103,7 @@ public final class XMPPServer {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static String help() {
 		return "\n" + "Parameters:\n" + " -h               this help message\n"
@@ -253,7 +253,7 @@ public final class XMPPServer {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static String version() {
 		return "\n" + "-- \n" + NAME + " XMPP Server, version: " + getImplementationVersion()

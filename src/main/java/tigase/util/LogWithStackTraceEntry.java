@@ -56,7 +56,7 @@ public class LogWithStackTraceEntry {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long getCounter() {
 		return counter;
@@ -66,7 +66,7 @@ public class LogWithStackTraceEntry {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getMessage() {
 		return msg;
@@ -76,7 +76,7 @@ public class LogWithStackTraceEntry {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getRecord() {
 		return record;
@@ -88,7 +88,7 @@ public class LogWithStackTraceEntry {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long increment() {
 		return ++counter;

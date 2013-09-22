@@ -189,7 +189,7 @@ public class Packet {
 	 *
 	 * @param el
 	 *
-	 * @return
+	 * 
 	 */
 	public static String elemToString(Element el) {
 		String elemData = el.toString();
@@ -208,7 +208,7 @@ public class Packet {
 	 *
 	 * @param el
 	 *
-	 * @return
+	 * 
 	 */
 	public static String elemToStringSecure(Element el) {
 		String elemData = el.toStringSecure();
@@ -450,7 +450,7 @@ public class Packet {
 	 *
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 */
 	public String getAttributeStaticStr(String key) {
 		return elem.getAttributeStaticStr(key);
@@ -1027,7 +1027,7 @@ public class Packet {
 	 * @param name is a <code>String</code> representing the XML element name.
 	 * @param xmlns is a <code>String</code> representing the XML xmlns value.
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isElement(String name, String xmlns) {
 		return (elem.getName() == name) && (xmlns == elem.getXMLNS());
@@ -1468,7 +1468,7 @@ public class Packet {
 	 * not a XMPP stanza only, it also contains some Tigase specific meta-data.
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String toString() {

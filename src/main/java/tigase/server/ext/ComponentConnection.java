@@ -59,7 +59,7 @@ public class ComponentConnection
 	 *
 	 * @param o
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int compareTo(ComponentConnection o) {
@@ -78,7 +78,7 @@ public class ComponentConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getDomain() {
 		return domain;
@@ -88,7 +88,7 @@ public class ComponentConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public ComponentIOService getService() {
 		return service;

@@ -230,7 +230,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 	 * Method description
 	 * 
 	 * @param id_string
-	 * @return
+	 * 
 	 */
 	public static MsgRepository getInstance(String id_string) {
 		MsgRepository result = repos.get(id_string);
@@ -248,7 +248,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 	 * 
 	 * @param time
 	 * @param delete
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element getMessageExpired(long time, boolean delete) {
@@ -355,7 +355,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 	 * 
 	 * @param to
 	 * @param delete
-	 * @return
+	 * 
 	 * @throws UserNotFoundException
 	 */
 	@Override
@@ -762,7 +762,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 		 * Method description
 		 * 
 		 * @param o
-		 * @return
+		 * 
 		 */
 		@Override
 		public int compareTo(Delayed o) {
@@ -775,7 +775,7 @@ public class MsgRepository implements MsgRepositoryIfc {
 		 * Method description
 		 * 
 		 * @param unit
-		 * @return
+		 * 
 		 */
 		@Override
 		public long getDelay(TimeUnit unit) {

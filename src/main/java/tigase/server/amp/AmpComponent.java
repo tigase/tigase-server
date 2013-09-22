@@ -86,7 +86,7 @@ public class AmpComponent
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean addOutPacket(Packet packet) {
@@ -99,7 +99,7 @@ public class AmpComponent
 	 *
 	 * @param packets
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean addOutPackets(Queue<Packet> packets) {
@@ -116,7 +116,7 @@ public class AmpComponent
 	 *
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -164,7 +164,7 @@ public class AmpComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -175,7 +175,7 @@ public class AmpComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoDescription() {
@@ -190,7 +190,7 @@ public class AmpComponent
 	 * @param jid
 	 * @param from
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {

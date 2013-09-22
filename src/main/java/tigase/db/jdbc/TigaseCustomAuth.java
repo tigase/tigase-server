@@ -415,7 +415,7 @@ public class TigaseCustomAuth implements AuthRepository {
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getResourceUri() {
@@ -469,7 +469,7 @@ public class TigaseCustomAuth implements AuthRepository {
 	 * 
 	 * @param domain
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getUsersCount(String domain) {

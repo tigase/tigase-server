@@ -89,7 +89,7 @@ public abstract class ActionAbstract
 	 *
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -150,7 +150,7 @@ public abstract class ActionAbstract
 	 * @param packet
 	 * @param rule
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws PacketErrorTypeException
 	 */

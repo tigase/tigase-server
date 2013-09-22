@@ -402,7 +402,7 @@ public class ClusterController
 	 *
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -415,7 +415,7 @@ public class ClusterController
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -426,7 +426,7 @@ public class ClusterController
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoDescription() {
@@ -439,7 +439,7 @@ public class ClusterController
 	 *
 	 * @param component
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isCorrectType(ServerComponent component) {

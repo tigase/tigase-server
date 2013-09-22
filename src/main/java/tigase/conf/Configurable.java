@@ -613,7 +613,7 @@ public interface Configurable
 	/**
 	 * Returns default configuration settings for this object.
 	 * @param params
-	 * @return
+	 * 
 	 */
 	Map<String, Object> getDefaults(Map<String, Object> params);
 

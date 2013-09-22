@@ -201,7 +201,7 @@ public class ShortNewsPublisher
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public Map<String, PropertyItem> getDefaultParams() {
 		Map<String, PropertyItem> defs = super.getDefaultParams();
@@ -232,7 +232,7 @@ public class ShortNewsPublisher
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getHelp() {
 		return TASK_HELP;
@@ -242,7 +242,7 @@ public class ShortNewsPublisher
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getType() {
 		return TASK_TYPE;

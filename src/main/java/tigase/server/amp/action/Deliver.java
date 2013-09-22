@@ -53,7 +53,7 @@ public class Deliver
 	 * @param rule
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean execute(Packet packet, Element rule) {
@@ -75,7 +75,7 @@ public class Deliver
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getName() {

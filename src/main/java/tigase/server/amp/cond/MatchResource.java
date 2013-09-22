@@ -60,7 +60,7 @@ public class MatchResource
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getName() {
@@ -77,7 +77,7 @@ public class MatchResource
 	 * @param packet
 	 * @param rule
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean match(Packet packet, Element rule) {

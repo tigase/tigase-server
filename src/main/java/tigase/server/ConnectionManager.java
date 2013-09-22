@@ -246,7 +246,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 *
 	 * @param serv
 	 *
-	 * @return
+	 * 
 	 */
 	@SuppressWarnings("empty-statement")
 	public boolean checkTrafficLimits(IO serv) {
@@ -349,7 +349,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 * address rather then destination address.
 	 *
 	 * @param packet
-	 * @return
+	 * 
 	 */
 	@Override
 	public int hashCodeForPacket(Packet packet) {
@@ -421,7 +421,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int processingInThreads() {
@@ -432,7 +432,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int processingOutThreads() {
@@ -456,7 +456,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 *
 	 * @param serv
 	 *
-	 * @return
+	 * 
 	 */
 	public abstract Queue<Packet> processSocketData(IO serv);
 
@@ -528,7 +528,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	/**
 	 *
 	 * @param service
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean serviceStopped(IO service) {
@@ -651,7 +651,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 * @param ios
 	 * @param p
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean writePacketToSocket(IO ios, Packet p) {
 		if (ios != null) {
@@ -703,7 +703,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 *
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -1021,7 +1021,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	/**
 	 *
 	 * @param p
-	 * @return
+	 * 
 	 */
 	protected boolean writePacketToSocket(Packet p) {
 		IO ios = getXMPPIOService(p);
@@ -1040,7 +1040,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 * @param p
 	 * @param serviceId
 	 *
-	 * @return
+	 * 
 	 */
 	protected boolean writePacketToSocket(Packet p, String serviceId) {
 		IO ios = getXMPPIOService(serviceId);
@@ -1079,7 +1079,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	protected int[] getDefPlainPorts() {
 		return null;
@@ -1089,7 +1089,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	protected int[] getDefSSLPorts() {
 		return null;
@@ -1099,7 +1099,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	protected String getDefTrafficThrottling() {
 		String result = ST_TRAFFIC_THROTTLING_PROP_VAL;
@@ -1115,7 +1115,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	protected abstract long getMaxInactiveTime();
 
@@ -1125,7 +1125,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 *
 	 * @param port
 	 *
-	 * @return
+	 * 
 	 */
 	protected Map<String, Object> getParamsForPort(int port) {
 		return null;
@@ -1137,7 +1137,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 */
 	protected String getServiceId(Packet packet) {
 		return getServiceId(packet.getTo());
@@ -1149,7 +1149,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	protected String getServiceId(JID jid) {
 		return jid.getResource();
@@ -1161,7 +1161,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 *
 	 * @param serv
 	 *
-	 * @return
+	 * 
 	 */
 	protected String getUniqueId(IO serv) {
 		return serv.getUniqueId();
@@ -1173,7 +1173,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 *
 	 * @param serviceId
 	 *
-	 * @return
+	 * 
 	 */
 	public IO getXMPPIOService(String serviceId) {
 		return services.get(serviceId);
@@ -1185,7 +1185,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 *
 	 * @param p
 	 *
-	 * @return
+	 * 
 	 */
 	protected IO getXMPPIOService(Packet p) {
 		return services.get(getServiceId(p));
@@ -1195,7 +1195,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	protected abstract IO getXMPPIOServiceInstance();
 
@@ -1203,7 +1203,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	protected boolean isHighThroughput() {
 		return false;
@@ -1371,7 +1371,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String toString() {
@@ -1384,7 +1384,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public ConnectionType getConnectionType() {
@@ -1404,7 +1404,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String[] getIfcs() {
@@ -1415,7 +1415,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public int getPort() {
@@ -1426,7 +1426,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public int getReceiveBufferSize() {
@@ -1437,7 +1437,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public InetSocketAddress getRemoteAddress() {
@@ -1448,7 +1448,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String getRemoteHostname() {
@@ -1463,7 +1463,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public SocketType getSocketType() {
@@ -1474,7 +1474,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String getSRVType() {
@@ -1491,7 +1491,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public int getTrafficClass() {

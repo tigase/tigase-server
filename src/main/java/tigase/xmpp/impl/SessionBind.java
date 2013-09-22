@@ -77,7 +77,7 @@ public class SessionBind
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String id() {
@@ -135,7 +135,7 @@ public class SessionBind
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
@@ -146,7 +146,7 @@ public class SessionBind
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -157,7 +157,7 @@ public class SessionBind
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -170,7 +170,7 @@ public class SessionBind
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element[] supStreamFeatures(final XMPPResourceConnection session) {

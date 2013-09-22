@@ -64,7 +64,7 @@ public interface CommandListener
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	String getName();
 

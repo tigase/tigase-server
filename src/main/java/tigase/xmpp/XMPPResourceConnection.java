@@ -199,7 +199,7 @@ public class XMPPResourceConnection
 	 * @param id
 	 * @param alg
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws AuthorizationException
 	 * @throws NotAuthorizedException
@@ -228,7 +228,7 @@ public class XMPPResourceConnection
 	 *
 	 * @param props
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws AuthorizationException
 	 * @throws NotAuthorizedException
@@ -259,7 +259,7 @@ public class XMPPResourceConnection
 	 * @param user
 	 * @param password
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws AuthorizationException
 	 * @throws NotAuthorizedException
@@ -305,7 +305,7 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String nextStanzaId() {
 		return "tig" + (++id_counter);
@@ -372,7 +372,7 @@ public class XMPPResourceConnection
 	 *
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 */
 	public Object removeCommonSessionData(String key) {
 		return (parentSession == null)
@@ -424,7 +424,7 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String toString() {
@@ -439,7 +439,7 @@ public class XMPPResourceConnection
 	 *
 	 * @param name_param
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -469,7 +469,7 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 *
 	 *
 	 * @throws NotAuthorizedException
@@ -486,7 +486,7 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 *
 	 */
 	public JID[] getAllResourcesJIDs() {
@@ -499,7 +499,7 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public AuthRepository getAuthRepository() {
 		return authRepo;
@@ -509,7 +509,7 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long getAuthTime() {
 		return authenticationTime - creationTime;
@@ -542,7 +542,7 @@ public class XMPPResourceConnection
 	/**
 	 *
 	 * @param key
-	 * @return
+	 * 
 	 */
 	public Object getCommonSessionData(String key) {
 		return (parentSession == null)
@@ -580,7 +580,7 @@ public class XMPPResourceConnection
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NoConnectionIdException
 	 */
@@ -614,7 +614,7 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long getCreationTime() {
 		return creationTime;
@@ -624,7 +624,7 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getDefLang() {
 		return this.defLang;
@@ -660,7 +660,7 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long getPacketsCounter() {
 		return packets_counter;
@@ -670,7 +670,7 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public XMPPSession getParentSession() {
 		return parentSession;
@@ -691,7 +691,7 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int getPriority() {
 		return priority;
@@ -735,7 +735,7 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public JID getSMComponentId() {
 		return loginHandler.getComponentId();
@@ -749,7 +749,7 @@ public class XMPPResourceConnection
 	 * enough to check whether the user Id belongs to the session.
 	 *
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 *
@@ -764,7 +764,7 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 */
@@ -783,7 +783,7 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isAuthorized() {
@@ -797,7 +797,7 @@ public class XMPPResourceConnection
 	 * @param outDomain
 	 * @param includeComponents
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isLocalDomain(String outDomain, boolean includeComponents) {
 		return loginHandler.isLocalDomain(outDomain, includeComponents);
@@ -807,7 +807,7 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isResourceSet() {
 		return this.resource != null;
@@ -831,7 +831,7 @@ public class XMPPResourceConnection
 	 *
 	 * @param bareJID
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 */

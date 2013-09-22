@@ -146,7 +146,7 @@ public class StreamOpen extends S2SAbstractProcessor {
 	 * @param serv
 	 * @param attribs
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public String streamOpened(S2SIOService serv, Map<String, String> attribs) {

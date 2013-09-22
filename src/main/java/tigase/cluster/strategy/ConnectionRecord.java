@@ -72,7 +72,7 @@ public class ConnectionRecord
 	 *
 	 * @param rec
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int compareTo(ConnectionRecord rec) {
@@ -85,7 +85,7 @@ public class ConnectionRecord
 	 *
 	 * @param rec
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean equals(Object rec) {
@@ -102,7 +102,7 @@ public class ConnectionRecord
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int hashCode() {
@@ -113,7 +113,7 @@ public class ConnectionRecord
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element toElement() {
@@ -131,7 +131,7 @@ public class ConnectionRecord
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String toString() {

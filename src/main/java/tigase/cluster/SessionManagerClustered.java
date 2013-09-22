@@ -132,7 +132,9 @@ public class SessionManagerClustered
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean fastAddOutPacket(Packet packet) {
@@ -446,7 +448,9 @@ public class SessionManagerClustered
 	 *
 	 * @param p
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>XMPPResourceConnection</code>
 	 */
 	@Override
 	public XMPPResourceConnection getXMPPResourceConnection(Packet p) {
@@ -457,7 +461,9 @@ public class SessionManagerClustered
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>ConcurrentHashMap<JID,XMPPResourceConnection></code>
 	 */
 	@Override
 	public ConcurrentHashMap<JID, XMPPResourceConnection> getXMPPResourceConnections() {
@@ -468,7 +474,9 @@ public class SessionManagerClustered
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>ConcurrentHashMap<BareJID,XMPPSession></code>
 	 */
 	@Override
 	public ConcurrentHashMap<BareJID, XMPPSession> getXMPPSessions() {
@@ -572,8 +580,7 @@ public class SessionManagerClustered
 	 * takes a list of cluster nodes from the strategy and sends a notification to
 	 * all those nodes about the event.
 	 *
-	 * @see tigase.server.xmppsession.SessionManager#closeSession(tigase.xmpp.
-	 *      XMPPResourceConnection, boolean)
+	 * @see SessionManager#closeSession
 	 *
 	 * @param conn
 	 * @param closeOnly
@@ -625,4 +632,4 @@ public class SessionManagerClustered
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/09/21

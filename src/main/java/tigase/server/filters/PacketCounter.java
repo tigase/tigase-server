@@ -72,7 +72,7 @@ public class PacketCounter
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Packet filter(Packet packet) {

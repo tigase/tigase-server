@@ -123,7 +123,7 @@ public abstract class RepositoryAccess {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 */
@@ -133,7 +133,7 @@ public abstract class RepositoryAccess {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 */
@@ -231,7 +231,7 @@ public abstract class RepositoryAccess {
 	 *
 	 * @param xmpp_sessionId
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -416,7 +416,7 @@ public abstract class RepositoryAccess {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public VHostItem getDomain() {
 		return domain;
@@ -426,7 +426,7 @@ public abstract class RepositoryAccess {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public JID getDomainAsJID() {
 		return domain.getVhost();
@@ -440,7 +440,7 @@ public abstract class RepositoryAccess {
 	 * @param key
 	 * @param def
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -457,7 +457,7 @@ public abstract class RepositoryAccess {
 	 * @param subnode
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -475,7 +475,7 @@ public abstract class RepositoryAccess {
 	 * @param key
 	 * @param def
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -492,7 +492,7 @@ public abstract class RepositoryAccess {
 	 * @param subnode
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -506,7 +506,7 @@ public abstract class RepositoryAccess {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isAnonymous() {
 		return is_anonymous;
@@ -547,7 +547,7 @@ public abstract class RepositoryAccess {
 	 * @param id
 	 * @param alg
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws AuthorizationException
 	 * @throws NotAuthorizedException
@@ -581,7 +581,7 @@ public abstract class RepositoryAccess {
 	 *
 	 * @param props
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws AuthorizationException
 	 * @throws NotAuthorizedException
@@ -665,7 +665,7 @@ public abstract class RepositoryAccess {
 	 * @param xmpp_sessionId
 	 * @param token
 	 *
-	 * @return
+	 * 
 	 *
 	 *
 	 * @throws AuthorizationException
@@ -748,7 +748,7 @@ public abstract class RepositoryAccess {
 	 * @param pass_param
 	 * @param email_param
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -777,7 +777,7 @@ public abstract class RepositoryAccess {
 	 * @param pass_param
 	 * @param reg_params
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -1158,7 +1158,7 @@ public abstract class RepositoryAccess {
 	 *
 	 * @param name_param
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException

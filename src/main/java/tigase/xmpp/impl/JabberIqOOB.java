@@ -64,7 +64,7 @@ public abstract class JabberIqOOB
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String id() {
@@ -75,7 +75,7 @@ public abstract class JabberIqOOB
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -86,7 +86,7 @@ public abstract class JabberIqOOB
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {

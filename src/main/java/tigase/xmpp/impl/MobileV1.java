@@ -88,7 +88,7 @@ public class MobileV1
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String id() {
@@ -188,7 +188,7 @@ public class MobileV1
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -199,7 +199,7 @@ public class MobileV1
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -212,7 +212,7 @@ public class MobileV1
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element[] supStreamFeatures(XMPPResourceConnection session) {
@@ -322,7 +322,7 @@ public class MobileV1
 	 * @param res
 	 * @param queue
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean filter(XMPPResourceConnection session, Packet res, Queue<Packet> queue) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -357,7 +357,7 @@ public class MobileV1
 	 * Check if queuing is enabled
 	 *
 	 * @param session
-	 * @return
+	 * 
 	 */
 	protected boolean isQueueEnabled(XMPPResourceConnection session) {
 		Boolean enabled = (Boolean) session.getSessionData(XMLNS);
@@ -369,7 +369,7 @@ public class MobileV1
 	 * Check timeout for queue
 	 *
 	 * @param session
-	 * @return
+	 * 
 	 */
 	protected boolean isTimedOut(XMPPResourceConnection session) {
 		Long lastAccessTime = (Long) session.getSessionData(LAST_TRANSFER_KEY);
@@ -401,7 +401,7 @@ public class MobileV1
 	 * Get timeout used for session queue
 	 *
 	 * @param session
-	 * @return
+	 * 
 	 */
 	private long getTimeout(XMPPResourceConnection session) {
 		Long timeout = (Long) session.getSessionData(TIMEOUT_KEY);

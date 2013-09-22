@@ -69,7 +69,7 @@ public class DataRepositoryPool implements DataRepository {
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	public DataRepository takeRepo(BareJID user_id) {
 		int idx = user_id != null ? Math.abs(user_id.hashCode() % repoPool.size()) : 0;
@@ -108,7 +108,7 @@ public class DataRepositoryPool implements DataRepository {
 	 * 
 	 * @param tableName
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws SQLException
 	 */
@@ -142,7 +142,7 @@ public class DataRepositoryPool implements DataRepository {
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws SQLException
 	 */
@@ -167,7 +167,7 @@ public class DataRepositoryPool implements DataRepository {
 	 * 
 	 * @param stIdKey
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws SQLException
 	 */
@@ -188,7 +188,7 @@ public class DataRepositoryPool implements DataRepository {
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getResourceUri() {
@@ -198,7 +198,7 @@ public class DataRepositoryPool implements DataRepository {
 
 	/**
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public dbTypes getDatabaseType() {

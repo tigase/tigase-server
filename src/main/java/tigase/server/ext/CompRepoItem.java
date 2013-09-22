@@ -175,7 +175,7 @@ public class CompRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getAuthPasswd() {
 		return auth_pass;
@@ -185,7 +185,7 @@ public class CompRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public ConnectionType getConnectionType() {
 		return type;
@@ -195,7 +195,7 @@ public class CompRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public LoadBalancerIfc getLoadBalancer() {
 		return lb;
@@ -205,7 +205,7 @@ public class CompRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getDomain() {
 		return domain;
@@ -215,7 +215,7 @@ public class CompRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getElemName() {
@@ -226,7 +226,7 @@ public class CompRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getKey() {
@@ -237,7 +237,7 @@ public class CompRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int getPort() {
 		return port;
@@ -247,7 +247,7 @@ public class CompRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getRemoteHost() {
 		return remoteHost;
@@ -257,7 +257,7 @@ public class CompRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String[] getRoutings() {
 		return routings;
@@ -267,7 +267,7 @@ public class CompRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getXMLNS() {
 		return xmlns;
@@ -320,7 +320,7 @@ public class CompRepoItem
 
 	/**
 	 * @param tmp
-	 * @return
+	 * 
 	 */
 	private LoadBalancerIfc lbInstance(String cls_name) {
 		String class_name = cls_name;
@@ -456,7 +456,7 @@ public class CompRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element toElement() {
@@ -491,7 +491,7 @@ public class CompRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String toPropertyString() {
@@ -503,7 +503,7 @@ public class CompRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String toString() {

@@ -43,7 +43,7 @@ public interface ConnectionRecordIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	Element toElement();
 
@@ -53,7 +53,7 @@ public interface ConnectionRecordIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	JID getConnectionId();
 
@@ -61,7 +61,7 @@ public interface ConnectionRecordIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	JID getNode();
 
@@ -69,7 +69,7 @@ public interface ConnectionRecordIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	String getSessionId();
 
@@ -77,7 +77,7 @@ public interface ConnectionRecordIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	JID getUserJid();
 

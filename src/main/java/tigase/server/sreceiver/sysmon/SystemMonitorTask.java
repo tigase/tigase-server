@@ -129,7 +129,7 @@ public class SystemMonitorTask
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getHelp() {
 			return helpText;
@@ -157,7 +157,7 @@ public class SystemMonitorTask
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, PropertyItem> getDefaultParams() {
@@ -193,7 +193,7 @@ public class SystemMonitorTask
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getHelp() {
@@ -204,7 +204,7 @@ public class SystemMonitorTask
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, PropertyItem> getParams() {
@@ -241,7 +241,7 @@ public class SystemMonitorTask
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getType() {

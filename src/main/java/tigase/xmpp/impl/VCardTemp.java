@@ -96,7 +96,7 @@ public class VCardTemp
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String id() {
@@ -341,7 +341,7 @@ public class VCardTemp
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
@@ -352,7 +352,7 @@ public class VCardTemp
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -363,7 +363,7 @@ public class VCardTemp
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {

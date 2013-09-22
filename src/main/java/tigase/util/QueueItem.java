@@ -86,7 +86,7 @@ public class QueueItem {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public XMPPProcessorIfc getProcessor() {
 		return processor;

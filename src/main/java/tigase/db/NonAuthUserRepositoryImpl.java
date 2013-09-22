@@ -146,7 +146,7 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 	 * @param key
 	 * @param def
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 */
@@ -167,7 +167,7 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 	 * @param key
 	 * @param def
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws UserNotFoundException
 	 */
@@ -192,7 +192,7 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 	 * @param subnode
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws UserNotFoundException
 	 */
@@ -217,7 +217,7 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 	 * @param key
 	 * @param def
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 */

@@ -87,7 +87,7 @@ public class TimingRecorder {
 	 *
 	 * @param id
 	 *
-	 * @return
+	 * 
 	 */
 	public static long getAverageTiming(String id) {
 		return timings.get(id).getAverageTiming();
@@ -99,7 +99,7 @@ public class TimingRecorder {
 	 *
 	 * @param id
 	 *
-	 * @return
+	 * 
 	 */
 	public static long getMaxRecordedTiming(String id) {
 		return timings.get(id).getMaxRecordedTiming();

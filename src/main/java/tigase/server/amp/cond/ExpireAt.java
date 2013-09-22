@@ -67,7 +67,7 @@ public class ExpireAt
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getName() {
@@ -84,7 +84,7 @@ public class ExpireAt
 	 * @param packet
 	 * @param rule
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean match(Packet packet, Element rule) {

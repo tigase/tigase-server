@@ -107,7 +107,7 @@ public class SocketIO
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int bytesRead() {
@@ -120,7 +120,7 @@ public class SocketIO
 	 *
 	 * @param caps
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean checkCapabilities(String caps) {
@@ -133,7 +133,7 @@ public class SocketIO
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws IOException
 	 */
@@ -146,7 +146,7 @@ public class SocketIO
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public SocketChannel getSocketChannel() {
@@ -181,7 +181,7 @@ public class SocketIO
 	 *
 	 * @param reset
 	 *
-	 * @return
+	 * 
 	 */
 	public long getBytesSent(boolean reset) {
 		long tmp = bytesSent;
@@ -197,7 +197,7 @@ public class SocketIO
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long getTotalBytesSent() {
 		return totalBytesSent;
@@ -209,7 +209,7 @@ public class SocketIO
 	 *
 	 * @param reset
 	 *
-	 * @return
+	 * 
 	 */
 	public long getBytesReceived(boolean reset) {
 		long tmp = bytesReceived;
@@ -225,7 +225,7 @@ public class SocketIO
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long getTotalBytesReceived() {
 		return totalBytesReceived;
@@ -237,7 +237,7 @@ public class SocketIO
 	 *
 	 * @param reset
 	 *
-	 * @return
+	 * 
 	 */
 	public long getBuffOverflow(boolean reset) {
 		long tmp = buffOverflow;
@@ -253,7 +253,7 @@ public class SocketIO
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long getTotalBuffOverflow() {
 		return totalBuffOverflow;
@@ -263,7 +263,7 @@ public class SocketIO
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isConnected() {
@@ -280,7 +280,7 @@ public class SocketIO
 	 *
 	 * @param addr
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isRemoteAddress(String addr) {
@@ -295,7 +295,7 @@ public class SocketIO
 	 *
 	 * @param buff
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws IOException
 	 */
@@ -353,7 +353,7 @@ public class SocketIO
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String toString() {
@@ -366,7 +366,7 @@ public class SocketIO
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean waitingToSend() {
@@ -377,7 +377,7 @@ public class SocketIO
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int waitingToSendSize() {
@@ -390,7 +390,7 @@ public class SocketIO
 	 *
 	 * @param buff
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws IOException
 	 */

@@ -40,7 +40,7 @@ public class WebSocketClientConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected int[] getDefPlainPorts() {
@@ -51,7 +51,7 @@ public class WebSocketClientConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected int[] getDefSSLPorts() {
@@ -61,7 +61,7 @@ public class WebSocketClientConnectionManager
 	/**
 	 * Method returns XMPPIOService instance implementing WebSocketXMPPIOService
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected XMPPIOService<Object> getXMPPIOServiceInstance() {

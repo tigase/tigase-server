@@ -110,7 +110,7 @@ public class Dialback
 	 * @param serv
 	 * @param results
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
@@ -262,7 +262,7 @@ public class Dialback
 	 * @param serv
 	 * @param attribs
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String streamOpened(S2SIOService serv, Map<String, String> attribs) {
@@ -466,7 +466,7 @@ public class Dialback
 	 *
 	 * @param serv
 	 * @param domain
-	 * @return
+	 * 
 	 */
 	@SuppressWarnings("unchecked")
 	private boolean wasResultRequested(S2SIOService serv, String domain) {
@@ -482,7 +482,7 @@ public class Dialback
 	 * @see CIDConnections#sendHandshakingOnly
 	 * @param serv
 	 * @param domain
-	 * @return
+	 * 
 	 */
 	private boolean wasVerifyRequested(S2SIOService serv, String domain) {
 		String requested =

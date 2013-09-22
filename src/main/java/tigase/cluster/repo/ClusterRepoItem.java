@@ -230,7 +230,7 @@ public class ClusterRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element toElement() {
@@ -250,7 +250,7 @@ public class ClusterRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String toPropertyString() {
@@ -262,7 +262,7 @@ public class ClusterRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String toString() {
@@ -275,7 +275,7 @@ public class ClusterRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public float getCpuUsage() {
 		return cpuUsage;
@@ -285,7 +285,7 @@ public class ClusterRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getElemName() {
@@ -296,7 +296,7 @@ public class ClusterRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getHostname() {
 		return hostname;
@@ -306,7 +306,7 @@ public class ClusterRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getKey() {
@@ -317,7 +317,7 @@ public class ClusterRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long getLastUpdate() {
 		return lastUpdate;
@@ -327,7 +327,7 @@ public class ClusterRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public float getMemUsage() {
 		return memUsage;
@@ -337,7 +337,7 @@ public class ClusterRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getPassword() {
 		return password;
@@ -347,7 +347,7 @@ public class ClusterRepoItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int getPortNo() {
 		return portNo;

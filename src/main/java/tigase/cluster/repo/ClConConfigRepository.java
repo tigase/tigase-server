@@ -61,7 +61,7 @@ public class ClConConfigRepository
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] getDefaultPropetyItems() {
@@ -72,7 +72,7 @@ public class ClConConfigRepository
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getPropertyKey() {
@@ -83,7 +83,7 @@ public class ClConConfigRepository
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getConfigKey() {
@@ -94,7 +94,7 @@ public class ClConConfigRepository
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public ClusterRepoItem getItemInstance() {
@@ -145,7 +145,7 @@ public class ClConConfigRepository
 	 * @param oldItem
 	 * @param newItem
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean itemChanged(ClusterRepoItem oldItem, ClusterRepoItem newItem) {

@@ -263,7 +263,7 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 	 * 
 	 * @param packet
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean addOutPacket(Packet packet) {
@@ -278,7 +278,7 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 	 * 
 	 * @param params
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getDefaults(final Map<String, Object> params) {
@@ -426,7 +426,7 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 	 * 
 	 * @param from
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
@@ -460,7 +460,7 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 	 * @param jid
 	 * @param from
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<Element> getDiscoItems(String node, JID jid, JID from) {
@@ -496,7 +496,7 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 	 * 
 	 * @param jidOrName
 	 * 
-	 * @return
+	 * 
 	 */
 	public ReceiverTaskIfc getTask(String jidOrName) {
 		if (jidOrName == null) {
@@ -518,7 +518,7 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 	 * 
 	 * @param jid
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isAdmin(JID jid) {

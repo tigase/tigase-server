@@ -78,7 +78,7 @@ public interface MonitorPluginIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String commandsHelp();
 
@@ -94,7 +94,7 @@ public interface MonitorPluginIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getState();
 
@@ -104,7 +104,7 @@ public interface MonitorPluginIfc {
 	 *
 	 * @param command
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isMonitorCommand(String command);
 
@@ -116,7 +116,7 @@ public interface MonitorPluginIfc {
 	 *
 	 * @param command
 	 *
-	 * @return
+	 * 
 	 */
 	public String runCommand(String[] command);
 

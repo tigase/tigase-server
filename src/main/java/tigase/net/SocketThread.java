@@ -159,7 +159,7 @@ public class SocketThread implements Runnable {
 // * Method description
 // *
 // *
-// * @return
+// * 
 // */
 //public static SocketThread getInstance() {
 //  return socketReadThread[0];
@@ -550,7 +550,7 @@ public class SocketThread implements Runnable {
 		 * @param o1
 		 * @param o2
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public int compare(IOService<?> o1, IOService<?> o2) {

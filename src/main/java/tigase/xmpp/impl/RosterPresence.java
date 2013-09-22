@@ -90,7 +90,7 @@ public class RosterPresence
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int concurrentQueuesNo() {
@@ -101,7 +101,7 @@ public class RosterPresence
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String id() {
@@ -248,7 +248,7 @@ public class RosterPresence
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
@@ -259,7 +259,7 @@ public class RosterPresence
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -270,7 +270,7 @@ public class RosterPresence
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -283,7 +283,7 @@ public class RosterPresence
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element[] supStreamFeatures(final XMPPResourceConnection session) {

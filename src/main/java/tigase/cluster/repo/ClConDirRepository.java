@@ -152,7 +152,7 @@ public class ClConDirRepository
 		 *
 		 * @param file
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public boolean accept(File file) {

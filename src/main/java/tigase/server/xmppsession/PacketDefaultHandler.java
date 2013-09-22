@@ -90,7 +90,7 @@ public class PacketDefaultHandler {
 	 * @param packet
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean canHandle(Packet packet, XMPPResourceConnection session) {
 		if (session == null) {
@@ -126,7 +126,7 @@ public class PacketDefaultHandler {
 	 * @param repo
 	 * @param results
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean forward(final Packet packet, final XMPPResourceConnection session,
 			final NonAuthUserRepository repo, final Queue<Packet> results) {
@@ -156,7 +156,7 @@ public class PacketDefaultHandler {
 	 * @param repo
 	 * @param results
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean preprocess(final Packet packet, final XMPPResourceConnection session,
 			final NonAuthUserRepository repo, final Queue<Packet> results) {

@@ -57,7 +57,7 @@ public class S2SRandomSelector implements S2SConnectionSelector {
 	 * @param packet
 	 * @param outgoing
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public S2SConnection selectConnection(Packet packet, Set<S2SConnection> outgoing) {

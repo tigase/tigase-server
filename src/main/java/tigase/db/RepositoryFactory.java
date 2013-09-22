@@ -281,7 +281,7 @@ public abstract class RepositoryFactory {
 	 * @param resource
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws ClassNotFoundException
 	 * @throws DBInitException
@@ -348,7 +348,7 @@ public abstract class RepositoryFactory {
 	 * @param resource
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws ClassNotFoundException
 	 * @throws DBInitException
@@ -406,7 +406,7 @@ public abstract class RepositoryFactory {
 	 *
 	 * @param repo_name
 	 *
-	 * @return
+	 * 
 	 */
 	public static String getRepoClass(String repo_name) {
 		String result = repo_name;
@@ -448,7 +448,7 @@ public abstract class RepositoryFactory {
 	 * @param resource
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws ClassNotFoundException
 	 * @throws DBInitException

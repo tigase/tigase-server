@@ -102,7 +102,7 @@ public abstract class TLSUtil {
 	 * @param protocol
 	 * @param hostname
 	 *
-	 * @return
+	 * 
 	 */
 	public static SSLContext getSSLContext(String protocol, String hostname) {
 		return sslContextContainer.getSSLContext(protocol, hostname, false);
@@ -115,7 +115,7 @@ public abstract class TLSUtil {
 	 * @param protocol
 	 * @param hostname
 	 *
-	 * @return
+	 * 
 	 */
 	public static SSLContext getSSLContext(String protocol, String hostname, boolean clientMode) {
 		return sslContextContainer.getSSLContext(protocol, hostname, clientMode);
@@ -129,7 +129,7 @@ public abstract class TLSUtil {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static KeyStore getTrustStore() {
 		return sslContextContainer.getTrustStore();

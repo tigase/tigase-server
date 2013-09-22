@@ -76,7 +76,7 @@ public class TimingRecord {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long getAverageTiming() {
 		throw new UnsupportedOperationException(
@@ -87,7 +87,7 @@ public class TimingRecord {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	long getMaxRecordedTiming() {
 		throw new UnsupportedOperationException(

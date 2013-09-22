@@ -88,7 +88,7 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	/**
 	 * Returns a collection with all items stored in the repository.
 	 *
-	 * @return
+	 * 
 	 * @throws TigaseDBException
 	 */
 	Collection<Item> allItems() throws TigaseDBException;

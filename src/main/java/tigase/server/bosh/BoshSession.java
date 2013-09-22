@@ -584,7 +584,7 @@ public class BoshSession {
 	 * @param out_results
 	 * @param tt
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean task(Queue<Packet> out_results, TimerTask tt) {
 		if (tt == inactivityTimer) {
@@ -658,7 +658,7 @@ public class BoshSession {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public JID getDataReceiver() {
 		return dataReceiver;
@@ -668,7 +668,7 @@ public class BoshSession {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getDomain() {
 		return domain;
@@ -678,7 +678,7 @@ public class BoshSession {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getSessionId() {
 		return sessionId;
@@ -688,7 +688,7 @@ public class BoshSession {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public UUID getSid() {
 		return sid;
@@ -1072,7 +1072,7 @@ public class BoshSession {
 		 * @param o1
 		 * @param o2
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public int compare(BoshTask o1, BoshTask o2) {

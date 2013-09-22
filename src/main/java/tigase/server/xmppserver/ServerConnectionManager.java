@@ -142,7 +142,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean addOutPacket(Packet packet) {
@@ -157,7 +157,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 *
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -199,7 +199,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -210,7 +210,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoDescription() {
@@ -264,7 +264,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean handlesNonLocalDomains() {
@@ -277,7 +277,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int hashCodeForPacket(Packet packet) {
@@ -301,7 +301,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 *
 	 * @param session_id
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isIncomingValid(String session_id) {
 		if (session_id == null) {
@@ -604,7 +604,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 *
 	 * @param serv
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Queue<Packet> processSocketData(XMPPIOService<Object> serv) {
@@ -666,7 +666,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 * @param session_id
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean sendToIncoming(String session_id, Packet packet) {
 		XMPPIOService<Object> serv = incoming.get(session_id);
@@ -730,7 +730,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 *
 	 * @param serv
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean serviceStopped(XMPPIOService<Object> serv) {
@@ -896,7 +896,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 * @param serv
 	 * @param attribs
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String xmppStreamOpened(XMPPIOService<Object> serv, Map<String, String> attribs) {

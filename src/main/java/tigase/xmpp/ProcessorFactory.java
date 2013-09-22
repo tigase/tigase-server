@@ -131,7 +131,7 @@ public class ProcessorFactory {
 	 *
 	 * @param id
 	 *
-	 * @return
+	 * 
 	 */
 	public static XMPPPacketFilterIfc getPacketFilter(String id) {
 		XMPPImplIfc imp = processors.get(id);
@@ -149,7 +149,7 @@ public class ProcessorFactory {
 	 *
 	 * @param id
 	 *
-	 * @return
+	 * 
 	 */
 	public static XMPPPostprocessorIfc getPostprocessor(String id) {
 		XMPPImplIfc imp = processors.get(id);
@@ -167,7 +167,7 @@ public class ProcessorFactory {
 	 *
 	 * @param id
 	 *
-	 * @return
+	 * 
 	 */
 	public static XMPPPreprocessorIfc getPreprocessor(String id) {
 		XMPPImplIfc imp = processors.get(id);
@@ -185,7 +185,7 @@ public class ProcessorFactory {
 	 *
 	 * @param id
 	 *
-	 * @return
+	 * 
 	 */
 	public static XMPPProcessorIfc getProcessor(String id) {
 		XMPPImplIfc imp = processors.get(id);
@@ -203,7 +203,7 @@ public class ProcessorFactory {
 	 *
 	 * @param id
 	 *
-	 * @return
+	 * 
 	 */
 	public static XMPPStopListenerIfc getStopListener(String id) {
 		XMPPImplIfc imp = processors.get(id);
@@ -219,7 +219,7 @@ public class ProcessorFactory {
 	 * Check if plugin implementation is in server jar
 	 *
 	 * @param id
-	 * @return
+	 * 
 	 */
 	public static boolean hasImplementation(String id) {
 		return processors.containsKey(id);

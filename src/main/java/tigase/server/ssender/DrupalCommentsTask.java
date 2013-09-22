@@ -158,7 +158,7 @@ public class DrupalCommentsTask extends SenderTask {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean cancel() {

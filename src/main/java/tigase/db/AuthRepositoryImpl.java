@@ -166,7 +166,7 @@ public class AuthRepositoryImpl
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getResourceUri() {
@@ -177,7 +177,7 @@ public class AuthRepositoryImpl
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getUsersCount() {
@@ -190,7 +190,7 @@ public class AuthRepositoryImpl
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getUsersCount(String domain) {

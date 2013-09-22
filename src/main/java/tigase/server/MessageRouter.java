@@ -166,7 +166,7 @@ public class MessageRouter
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int hashCodeForPacket(Packet packet) {
@@ -214,7 +214,7 @@ public class MessageRouter
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int processingInThreads() {
@@ -225,7 +225,7 @@ public class MessageRouter
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int processingOutThreads() {
@@ -584,7 +584,7 @@ public class MessageRouter
 	 *
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -599,7 +599,7 @@ public class MessageRouter
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -610,7 +610,7 @@ public class MessageRouter
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoDescription() {
@@ -872,7 +872,7 @@ public class MessageRouter
 	 *
 	 * @param def
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected Integer getMaxQueueSize(int def) {

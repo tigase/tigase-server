@@ -79,7 +79,7 @@ public class StartZLib
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String id() {
@@ -140,7 +140,7 @@ public class StartZLib
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -151,7 +151,7 @@ public class StartZLib
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -164,7 +164,7 @@ public class StartZLib
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element[] supStreamFeatures(final XMPPResourceConnection session) {

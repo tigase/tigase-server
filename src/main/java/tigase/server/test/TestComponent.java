@@ -123,7 +123,7 @@ public class TestComponent
 	 *
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -145,7 +145,7 @@ public class TestComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -156,7 +156,7 @@ public class TestComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoDescription() {
@@ -188,7 +188,7 @@ public class TestComponent
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int hashCodeForPacket(Packet packet) {
@@ -272,7 +272,7 @@ public class TestComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int processingInThreads() {
@@ -283,7 +283,7 @@ public class TestComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int processingOutThreads() {

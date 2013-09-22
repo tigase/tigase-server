@@ -72,7 +72,7 @@ public class BindProcessor
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getId() {
@@ -86,7 +86,7 @@ public class BindProcessor
 	 * @param serv
 	 * @param handler
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<Element> getStreamFeatures(ComponentIOService serv,
@@ -105,7 +105,7 @@ public class BindProcessor
 	 * @param handler
 	 * @param results
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean process(Packet p, ComponentIOService serv,

@@ -130,7 +130,7 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		 * Method description
 		 * 
 		 * 
-		 * @return
+		 * 
 		 */
 		@Override
 		public X509Certificate[] getAcceptedIssuers() {
@@ -149,7 +149,7 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		 * 
 		 * @param pathname
 		 * 
-		 * @return
+		 * 
 		 */
 		@Override
 		public boolean accept(File pathname) {
@@ -294,7 +294,7 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 	 * @param protocol
 	 * @param hostname
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public SSLContext getSSLContext(String protocol, String hostname, boolean clientMode, TrustManager... tms) {
@@ -348,7 +348,7 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public KeyStore getTrustStore() {

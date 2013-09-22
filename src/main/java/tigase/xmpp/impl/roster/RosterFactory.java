@@ -50,7 +50,7 @@ public abstract class RosterFactory {
 	 *
 	 * @param shared_impl
 	 *
-	 * @return
+	 * 
 	 */
 	public static RosterAbstract getRosterImplementation(boolean shared_impl) {
 		try {
@@ -69,7 +69,7 @@ public abstract class RosterFactory {
 	 * @param class_name
 	 * @param shared_impl
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws ClassNotFoundException
 	 * @throws IllegalAccessException

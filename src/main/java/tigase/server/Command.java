@@ -737,7 +737,7 @@ public enum Command {
 	 * @param node
 	 * @param data_type
 	 *
-	 * @return
+	 * 
 	 */
 	public static Element createIqCommand(JID from, JID to, final StanzaType type,
 					final String id, final String node, final DataType data_type) {
@@ -756,7 +756,7 @@ public enum Command {
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 */
 	public static Action getAction(final Packet packet) {
 		String action = packet.getAttributeStaticStr(Iq.IQ_COMMAND_PATH, "action");
@@ -775,7 +775,7 @@ public enum Command {
 	 * @param packet
 	 * @param f_name
 	 *
-	 * @return
+	 * 
 	 */
 	public static boolean getCheckBoxFieldValue(Packet packet, String f_name) {
 		String result = getFieldValue(packet, f_name);
@@ -794,7 +794,7 @@ public enum Command {
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 */
 	public static List<Element> getData(final Packet packet) {
 		Element iq      = packet.getElement();
@@ -811,7 +811,7 @@ public enum Command {
 	 * @param el_name
 	 * @param xmlns
 	 *
-	 * @return
+	 * 
 	 */
 	public static Element getData(final Packet packet, final String el_name,
 																final String xmlns) {
@@ -828,7 +828,7 @@ public enum Command {
 	 * @param packet
 	 * @param f_name
 	 *
-	 * @return
+	 * 
 	 */
 	public static String getFieldValue(Packet packet, String f_name) {
 		Element iq      = packet.getElement();
@@ -863,7 +863,7 @@ public enum Command {
 	 * @param f_name
 	 * @param debug
 	 *
-	 * @return
+	 * 
 	 */
 	public static String getFieldValue(final Packet packet, final String f_name,
 																		 boolean debug) {
@@ -912,7 +912,7 @@ public enum Command {
 	 * @param packet
 	 * @param f_name
 	 *
-	 * @return
+	 * 
 	 */
 	public static String[] getFieldValues(final Packet packet, final String f_name) {
 		Element iq      = packet.getElement();
@@ -961,7 +961,7 @@ public enum Command {
 	 * @param packet
 	 * @param f_name
 	 *
-	 * @return
+	 * 
 	 */
 	public static boolean removeFieldValue(final Packet packet, final String f_name) {
 		Element iq      = packet.getElement();
@@ -993,7 +993,7 @@ public enum Command {
 	 * @param packet
 	 * @param f_name
 	 *
-	 * @return
+	 * 
 	 */
 	public static String getFieldKeyStartingWith(Packet packet, String f_name) {
 		Element iq      = packet.getElement();
@@ -1070,7 +1070,7 @@ public enum Command {
 	 *
 	 * @param cmd
 	 *
-	 * @return
+	 * 
 	 */
 	public static Command valueof(String cmd) {
 		try {
@@ -1159,7 +1159,7 @@ public enum Command {
 	 * @param type
 	 * @param id
 	 *
-	 * @return
+	 * 
 	 */
 	public Packet getPacket(JID from, JID to, final StanzaType type, final String id) {
 		Element elem  = createIqCommand(from, to, type, id, this.toString(), null);
@@ -1180,7 +1180,7 @@ public enum Command {
 	 * @param id
 	 * @param data_type
 	 *
-	 * @return
+	 * 
 	 */
 	public Packet getPacket(JID from, JID to, StanzaType type, String id,
 													DataType data_type) {

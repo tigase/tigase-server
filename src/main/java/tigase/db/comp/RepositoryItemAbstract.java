@@ -62,7 +62,7 @@ public abstract class RepositoryItemAbstract
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public abstract String getElemName();
 
@@ -88,7 +88,7 @@ public abstract class RepositoryItemAbstract
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] getAdmins() {
@@ -99,7 +99,7 @@ public abstract class RepositoryItemAbstract
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getOwner() {
@@ -143,7 +143,7 @@ public abstract class RepositoryItemAbstract
 	 *
 	 * @param id
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isAdmin(String id) {
@@ -165,7 +165,7 @@ public abstract class RepositoryItemAbstract
 	 *
 	 * @param id
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isOwner(String id) {
@@ -204,7 +204,7 @@ public abstract class RepositoryItemAbstract
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element toElement() {

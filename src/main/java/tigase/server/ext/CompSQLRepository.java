@@ -191,7 +191,7 @@ public class CompSQLRepository
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Collection<CompRepoItem> allItems() {
@@ -226,7 +226,7 @@ public class CompSQLRepository
 	 *
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean contains(String key) {
@@ -262,7 +262,7 @@ public class CompSQLRepository
 	 *
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public CompRepoItem getItem(String key) {
@@ -296,7 +296,7 @@ public class CompSQLRepository
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public CompRepoItem getItemInstance() {
@@ -336,7 +336,7 @@ public class CompSQLRepository
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Iterator<CompRepoItem> iterator() {
@@ -402,7 +402,7 @@ public class CompSQLRepository
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int size() {
@@ -427,7 +427,7 @@ public class CompSQLRepository
 	 *
 	 * @param item
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String validateItem(CompRepoItem item) {

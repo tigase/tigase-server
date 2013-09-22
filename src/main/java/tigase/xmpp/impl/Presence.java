@@ -287,7 +287,7 @@ public class Presence
 	 * @param results
 	 * @param pres
 	 *
-	 * @return
+	 * 
 	 */
 	public static Packet sendPresence(StanzaType t, JID from, JID to,
 			Queue<Packet> results, Element pres) {
@@ -825,7 +825,7 @@ public class Presence
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int concurrentQueuesNo() {
@@ -836,7 +836,7 @@ public class Presence
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String id() {
@@ -1173,7 +1173,7 @@ public class Presence
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -1184,7 +1184,7 @@ public class Presence
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -1197,7 +1197,7 @@ public class Presence
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	protected RosterAbstract getRosterUtil() {
 		return RosterFactory.getRosterImplementation(true);

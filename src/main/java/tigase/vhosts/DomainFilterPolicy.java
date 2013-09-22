@@ -45,7 +45,7 @@ public enum DomainFilterPolicy {
 	 *
 	 * @param domains
 	 *
-	 * @return
+	 * 
 	 */
 	public static DomainFilterPolicy valueof(String domains) {
 		if (domains == null) {
@@ -62,7 +62,7 @@ public enum DomainFilterPolicy {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static String[] valuesStr() {
 		if (valuesStr == null) {

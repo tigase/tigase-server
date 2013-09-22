@@ -78,7 +78,7 @@ public class JabberIqCommand
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String id() {
@@ -182,7 +182,7 @@ public class JabberIqCommand
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
@@ -193,7 +193,7 @@ public class JabberIqCommand
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -204,7 +204,7 @@ public class JabberIqCommand
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {

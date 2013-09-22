@@ -106,7 +106,7 @@ public class PacketChecker extends S2SAbstractProcessor {
          * @param serv
          * @param results
          *
-         * @return
+         * 
          */
         @Override
         public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
@@ -152,7 +152,7 @@ public class PacketChecker extends S2SAbstractProcessor {
          * @param p
          * @param serv
          * @param cid
-         * @return 
+         * 
          */
         protected boolean isAllowed(Packet p, S2SIOService serv, CID cid) {
                 boolean allowed  = serv.isAuthenticated(cid);

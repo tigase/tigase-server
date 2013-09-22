@@ -71,7 +71,7 @@ public class LogFormatter
 	 *
 	 * @param record
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public synchronized String format(LogRecord record) {

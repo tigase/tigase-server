@@ -290,7 +290,7 @@ public abstract class RosterAbstract {
 		 * 
 		 * @param pres_type
 		 * 
-		 * @return
+		 * 
 		 */
 		public SubscriptionType getStateTransition(PresenceType pres_type) {
 			SubscriptionType res = stateTransition.get(pres_type);
@@ -332,7 +332,7 @@ public abstract class RosterAbstract {
 		 * Method description
 		 * 
 		 * 
-		 * @return
+		 * 
 		 */
 		public Map<String, String> getSubscriptionAttr() {
 			return attrs;
@@ -482,7 +482,7 @@ public abstract class RosterAbstract {
 	 * @param buddy
 	 * @param groups
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -497,7 +497,7 @@ public abstract class RosterAbstract {
 	 * @param session
 	 * @param buddy
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -517,7 +517,7 @@ public abstract class RosterAbstract {
 	 * 
 	 * @param session
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -532,7 +532,7 @@ public abstract class RosterAbstract {
 	 * @param session
 	 * @param buddy
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -548,7 +548,7 @@ public abstract class RosterAbstract {
 	 * @param session
 	 * @param buddy
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -563,7 +563,7 @@ public abstract class RosterAbstract {
 	 * @param session
 	 * @param buddy
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -579,7 +579,7 @@ public abstract class RosterAbstract {
 	 * @param session
 	 * @param jid
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -596,7 +596,7 @@ public abstract class RosterAbstract {
 	 * @param session
 	 * @param jid
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -611,7 +611,7 @@ public abstract class RosterAbstract {
 	 * @param session
 	 * @param jid
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -693,7 +693,7 @@ public abstract class RosterAbstract {
 	 * @param session
 	 * @param subscrs
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -728,7 +728,7 @@ public abstract class RosterAbstract {
 	 * 
 	 * @param session
 	 * 
-	 * @return
+	 * 
 	 */
 	public String getBuddiesHash(final XMPPResourceConnection session) {
 		String hash = (String) session.getCommonSessionData(ROSTERHASH); 
@@ -742,7 +742,7 @@ public abstract class RosterAbstract {
 	 * @param session
 	 * @param buddy
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -788,7 +788,7 @@ public abstract class RosterAbstract {
 	 * @param session
 	 * @param packet
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws NotAuthorizedException
 	 */
@@ -871,7 +871,7 @@ public abstract class RosterAbstract {
 	 * 
 	 * @param session
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -902,7 +902,7 @@ public abstract class RosterAbstract {
 	 * @param subscription
 	 * @param presence
 	 * 
-	 * @return
+	 * 
 	 */
 	public SubscriptionType getStateTransition(final SubscriptionType subscription,
 			final PresenceType presence) {
@@ -921,7 +921,7 @@ public abstract class RosterAbstract {
 	 * 
 	 * @param buddy
 	 * 
-	 * @return
+	 * 
 	 */
 	public String groupNode(JID buddy) {
 		return ROSTER + "/" + buddy.getBareJID();
@@ -959,7 +959,7 @@ public abstract class RosterAbstract {
 	 * @param session
 	 * @param jid
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -978,7 +978,7 @@ public abstract class RosterAbstract {
 	 * @param session
 	 * @param jid
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -996,7 +996,7 @@ public abstract class RosterAbstract {
 	 * 
 	 * @param subscr
 	 * 
-	 * @return
+	 * 
 	 */
 	public boolean isSubscribedFrom(SubscriptionType subscr) {
 		return FROM_SUBSCRIBED.contains(subscr);
@@ -1009,7 +1009,7 @@ public abstract class RosterAbstract {
 	 * @param session
 	 * @param jid
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -1073,7 +1073,7 @@ public abstract class RosterAbstract {
 	 * @param presence
 	 * @param jid
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -1160,7 +1160,7 @@ public abstract class RosterAbstract {
 	/**
 	 * @param session
 	 * @param buddy
-	 * @return
+	 * 
 	 * @throws TigaseDBException
 	 * @throws NotAuthorizedException
 	 */

@@ -69,7 +69,7 @@ public class TesterTask
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getHelp() {
@@ -80,7 +80,7 @@ public class TesterTask
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getType() {

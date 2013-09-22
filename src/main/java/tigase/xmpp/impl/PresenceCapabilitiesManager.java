@@ -93,7 +93,7 @@ public class PresenceCapabilitiesManager {
 	 *
 	 * @param capsNode
 	 *
-	 * @return
+	 * 
 	 */
 	public static String[] getNodeFeatures(String capsNode) {
 		return nodeFeatures.get(capsNode);
@@ -107,7 +107,7 @@ public class PresenceCapabilitiesManager {
 	 *
 	 * @param c
 	 *
-	 * @return
+	 * 
 	 */
 	public static String[] processPresence(Element c) {
 		Set<String> caps_nodes = null;
@@ -180,7 +180,7 @@ public class PresenceCapabilitiesManager {
 	 * @param p
 	 * @param results
 	 *
-	 * @return
+	 * 
 	 */
 	public static String[] processPresence(JID compJid, Packet p, Queue<Packet> results) {
 		Element c            = p.getElement().getChild("c");
@@ -220,7 +220,7 @@ public class PresenceCapabilitiesManager {
 	 * @param from
 	 * @param node
 	 *
-	 * @return
+	 * 
 	 */
 	public static Packet prepareCapsQuery(JID to, JID from, String node) {
 		Element iq = prepareCapsQueryEl(to, from, node);
@@ -236,7 +236,7 @@ public class PresenceCapabilitiesManager {
 	 * @param from
 	 * @param node
 	 *
-	 * @return
+	 * 
 	 */
 	public static Element prepareCapsQueryEl(JID to, JID from, String node) {
 		String id  = String.valueOf(idCounter++);

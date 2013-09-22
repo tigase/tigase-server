@@ -64,7 +64,7 @@ public class DynamicRosterTest
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 */
@@ -80,7 +80,7 @@ public class DynamicRosterTest
 	 * @param session
 	 * @param buddy
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 */
@@ -100,7 +100,7 @@ public class DynamicRosterTest
 	 *
 	 * @param item
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element getItemExtraData(Element item) {
@@ -121,7 +121,7 @@ public class DynamicRosterTest
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 */

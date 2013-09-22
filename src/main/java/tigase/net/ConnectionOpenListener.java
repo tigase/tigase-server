@@ -78,7 +78,7 @@ public interface ConnectionOpenListener {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	int getPort();
 
@@ -86,7 +86,7 @@ public interface ConnectionOpenListener {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	String[] getIfcs();
 
@@ -94,7 +94,7 @@ public interface ConnectionOpenListener {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	String getSRVType();
 
@@ -102,7 +102,7 @@ public interface ConnectionOpenListener {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	String getRemoteHostname();
 
@@ -110,7 +110,7 @@ public interface ConnectionOpenListener {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	InetSocketAddress getRemoteAddress();
 
@@ -118,7 +118,7 @@ public interface ConnectionOpenListener {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	ConnectionType getConnectionType();
 
@@ -126,7 +126,7 @@ public interface ConnectionOpenListener {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	SocketType getSocketType();
 
@@ -134,7 +134,7 @@ public interface ConnectionOpenListener {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	int getReceiveBufferSize();
 
@@ -142,7 +142,7 @@ public interface ConnectionOpenListener {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	int getTrafficClass();
 }    // ConnectionOpenListener

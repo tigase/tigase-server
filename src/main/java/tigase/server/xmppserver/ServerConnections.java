@@ -173,7 +173,7 @@ public class ServerConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public CID getCID() {
 		return cid;
@@ -185,7 +185,7 @@ public class ServerConnections {
 	 *
 	 * @param sessionId
 	 *
-	 * @return
+	 * 
 	 */
 	public String getDBKey(String sessionId) {
 		return db_keys.get(sessionId);
@@ -195,7 +195,7 @@ public class ServerConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int getDBKeysSize() {
 		return db_keys.size();
@@ -205,7 +205,7 @@ public class ServerConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public OutgoingState getOutgoingState() {
 		return conn_state;
@@ -215,7 +215,7 @@ public class ServerConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public Queue<Packet> getWaitingPackets() {
 		return waitingPackets;
@@ -240,7 +240,7 @@ public class ServerConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public synchronized boolean handleDialbackSuccess() {
 		if ((outgoing != null) && (conn_state == OutgoingState.HANDSHAKING)) {
@@ -288,7 +288,7 @@ public class ServerConnections {
 	 *
 	 * @param serv
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isOutgoing(XMPPIOService<Object> serv) {
 		return serv == outgoing;
@@ -349,7 +349,7 @@ public class ServerConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isOutgoingConnected() {
 		return (outgoing != null) && outgoing.isConnected();
@@ -361,7 +361,7 @@ public class ServerConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean needsConnection() {
 		return (conn_state == OutgoingState.NULL);
@@ -371,7 +371,7 @@ public class ServerConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean outgoingIsNull() {
 		return outgoing == null;
@@ -392,7 +392,7 @@ public class ServerConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public synchronized boolean sendAllControlPackets() {
 		if (log.isLoggable(Level.FINEST)) {
@@ -412,7 +412,7 @@ public class ServerConnections {
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 */
 	public synchronized boolean sendControlPacket(Packet packet) {
 		boolean result = false;
@@ -556,7 +556,7 @@ public class ServerConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String toString() {
@@ -569,7 +569,7 @@ public class ServerConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long waitingTime() {
 		return (System.currentTimeMillis() - creationTime);

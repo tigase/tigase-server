@@ -355,7 +355,7 @@ public class StatisticsCollector
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String shutdown() {
@@ -377,7 +377,7 @@ public class StatisticsCollector
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public StatisticsList getAllStats() {
 		StatisticsList list = new StatisticsList(Level.ALL);
@@ -413,7 +413,7 @@ public class StatisticsCollector
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public List<String> getComponentsNames() {
 		return new ArrayList<String>(components.keySet());
@@ -440,7 +440,7 @@ public class StatisticsCollector
 	 *
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -485,7 +485,7 @@ public class StatisticsCollector
 	 *
 	 * @param from
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
@@ -500,7 +500,7 @@ public class StatisticsCollector
 	 * @param jid
 	 * @param from
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
@@ -519,7 +519,7 @@ public class StatisticsCollector
 	 * @param jid
 	 * @param from
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<Element> getDiscoItems(String node, JID jid, JID from) {
@@ -560,7 +560,7 @@ public class StatisticsCollector
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getName() {
@@ -573,7 +573,7 @@ public class StatisticsCollector
 	 *
 	 * @param component
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isCorrectType(ServerComponent component) {

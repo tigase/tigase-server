@@ -92,7 +92,7 @@ public class StartTLS
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String id() {
@@ -151,7 +151,7 @@ public class StartTLS
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -162,7 +162,7 @@ public class StartTLS
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -175,7 +175,7 @@ public class StartTLS
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
@@ -206,7 +206,7 @@ public class StartTLS
 	 * @param results
 	 * @param settings
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,

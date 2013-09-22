@@ -72,7 +72,7 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public abstract BareJID getRepoUser();
 
@@ -112,7 +112,7 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getItemsListPKey() {
 		return items_list_pkey;

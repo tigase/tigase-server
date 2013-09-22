@@ -180,7 +180,7 @@ public class DrupalWPAuth implements AuthRepository {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getResourceUri() {
@@ -191,7 +191,7 @@ public class DrupalWPAuth implements AuthRepository {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getUsersCount() {
@@ -204,7 +204,7 @@ public class DrupalWPAuth implements AuthRepository {
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getUsersCount(String domain) {

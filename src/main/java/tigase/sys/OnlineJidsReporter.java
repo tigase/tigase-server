@@ -41,7 +41,7 @@ public interface OnlineJidsReporter {
 	 * Checks whether there is an online session for the given user BareJID.
 	 * 
 	 * @param jid
-	 * @return
+	 * 
 	 */
 	boolean containsJid(BareJID jid);
 

@@ -116,7 +116,7 @@ public class TelnetClient implements SampleSocketThread.SocketHandler {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static String help() {
 		return "\n" + "Parameters:\n" + " -?                this help message\n"
@@ -294,7 +294,7 @@ public class TelnetClient implements SampleSocketThread.SocketHandler {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static String version() {
 		return "\n" + "-- \n" + "Tigase XMPP Telnet, version: "

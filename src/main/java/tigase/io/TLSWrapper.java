@@ -144,7 +144,7 @@ public class TLSWrapper {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int bytesConsumed() {
 		return tlsEngineResult.bytesConsumed();
@@ -168,7 +168,7 @@ public class TLSWrapper {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int getAppBuffSize() {
 		return appBuffSize;
@@ -180,7 +180,7 @@ public class TLSWrapper {
 	 *
 	 *
 	 * @param revocationEnabled
-	 * @return
+	 * 
 	 */
 	public CertCheckResult getCertificateStatus(boolean revocationEnabled) {
 		Certificate[] peerChain = null;
@@ -208,7 +208,7 @@ public class TLSWrapper {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int getNetBuffSize() {
 		return netBuffSize;
@@ -218,7 +218,7 @@ public class TLSWrapper {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int getPacketBuffSize() {
 		return tlsEngine.getSession().getPacketBufferSize();
@@ -228,7 +228,7 @@ public class TLSWrapper {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public TLSStatus getStatus() {
 		TLSStatus status = null;
@@ -269,7 +269,7 @@ public class TLSWrapper {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isClientMode() {
 		return tlsEngine.getUseClientMode();
@@ -296,7 +296,7 @@ public class TLSWrapper {
 	 * @param net
 	 * @param app
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws SSLException
 	 */

@@ -58,7 +58,7 @@ public class ComponentConnectStreamOpenHandler implements StreamOpenHandler {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] getXMLNSs() {
@@ -73,7 +73,7 @@ public class ComponentConnectStreamOpenHandler implements StreamOpenHandler {
 	 *
 	 * @param s
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String serviceStarted(ComponentIOService s) {
@@ -88,7 +88,7 @@ public class ComponentConnectStreamOpenHandler implements StreamOpenHandler {
 	 * @param attribs
 	 * @param handler
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String streamOpened(ComponentIOService serv, Map<String, String> attribs,

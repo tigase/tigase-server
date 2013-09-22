@@ -248,7 +248,7 @@ public class ComponentProtocol
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected String getDefTrafficThrottling() {
@@ -313,7 +313,7 @@ public class ComponentProtocol
 	 *
 	 * @param hostname
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public CompRepoItem getCompRepoItem(String hostname) {
@@ -326,7 +326,7 @@ public class ComponentProtocol
 	 *
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	@SuppressWarnings({ "unchecked" })
@@ -370,7 +370,7 @@ public class ComponentProtocol
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -381,7 +381,7 @@ public class ComponentProtocol
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoDescription() {
@@ -394,7 +394,7 @@ public class ComponentProtocol
 	 *
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public ExtProcessor getProcessor(String key) {
@@ -430,7 +430,7 @@ public class ComponentProtocol
 	 *
 	 * @param serv
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<Element> getStreamFeatures(ComponentIOService serv) {
@@ -453,7 +453,7 @@ public class ComponentProtocol
 	 *
 	 * @param xmlns
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public StreamOpenHandler getStreamOpenHandler(String xmlns) {
@@ -482,7 +482,7 @@ public class ComponentProtocol
 	 *
 	 * @param serv
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Queue<Packet> processSocketData(ComponentIOService serv) {
@@ -602,7 +602,7 @@ public class ComponentProtocol
 	 *
 	 * @param service
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean serviceStopped(ComponentIOService service) {
@@ -799,7 +799,7 @@ public class ComponentProtocol
 	 * @param ios
 	 * @param p
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean writePacketToSocket(ComponentIOService ios, Packet p) {
@@ -829,7 +829,7 @@ public class ComponentProtocol
 	 * @param serv
 	 * @param attribs
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String xmppStreamOpened(ComponentIOService serv, Map<String, String> attribs) {
@@ -865,7 +865,7 @@ public class ComponentProtocol
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected long getMaxInactiveTime() {
@@ -878,7 +878,7 @@ public class ComponentProtocol
 	 *
 	 * @param def
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected Integer getMaxQueueSize(int def) {
@@ -891,7 +891,7 @@ public class ComponentProtocol
 	 *
 	 * @param p
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected ComponentIOService getXMPPIOService(Packet p) {
@@ -982,7 +982,7 @@ public class ComponentProtocol
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected ComponentIOService getXMPPIOServiceInstance() {
@@ -993,7 +993,7 @@ public class ComponentProtocol
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected boolean isHighThroughput() {

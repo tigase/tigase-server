@@ -80,29 +80,28 @@ public class ClientConnectionManager
 	 */
 	private static final Logger log = Logger.getLogger(ClientConnectionManager.class
 			.getName());
-	private static final String  ROUTING_ENTRY_PROP_KEY     = ".+";
-	private static final String  ROUTING_MODE_PROP_KEY      = "multi-mode";
-	private static final String  ROUTINGS_PROP_KEY          = "routings";
-	private static final long    SOCKET_CLOSE_WAIT_PROP_DEF = 1;
-	private static final String  SOCKET_CLOSE_WAIT_PROP_KEY = "socket-close-wait";
-	private static final String  XMLNS                      = "jabber:client";
-	private static final boolean ROUTING_MODE_PROP_VAL      = true;
+	private static final String ROUTING_ENTRY_PROP_KEY     = ".+";
+	private static final String ROUTING_MODE_PROP_KEY      = "multi-mode";
+	private static final String ROUTINGS_PROP_KEY          = "routings";
+	private static final long   SOCKET_CLOSE_WAIT_PROP_DEF = 1;
+	private static final String SOCKET_CLOSE_WAIT_PROP_KEY = "socket-close-wait";
+	private static final String TLS_WANT_CLIENT_AUTH_ENABLED_KEY =
+			"tls-want-client-auth-enabled";
+	private static final String  XMLNS                            = "jabber:client";
 	private static final boolean TLS_WANT_CLIENT_AUTH_ENABLED_DEF = false;
-	private static final String  TLS_WANT_CLIENT_AUTH_ENABLED_KEY = "tls-want-client-auth-enabled";
+	private static final boolean ROUTING_MODE_PROP_VAL            = true;
 
 	//~--- fields ---------------------------------------------------------------
-
-	// ~--- fields
-	// ---------------------------------------------------------------
 
 	/** Field description */
 	protected RoutingsContainer routings = null;
 
 	/** Field description */
-	protected SeeOtherHostIfc                   see_other_host_strategy = null;
-//	private final Map<String, XMPPProcessorIfc> processors = new ConcurrentHashMap<String,
-//			XMPPProcessorIfc>();
-	private XMPPIOProcessor[] processors = new XMPPIOProcessor[0];
+	protected SeeOtherHostIfc see_other_host_strategy = null;
+
+//private final Map<String, XMPPProcessorIfc> processors = new ConcurrentHashMap<String,
+//    XMPPProcessorIfc>();
+	private XMPPIOProcessor[]            processors             = new XMPPIOProcessor[0];
 	private final ReceiverTimeoutHandler stoppedHandler         = newStoppedHandler();
 	private final ReceiverTimeoutHandler startedHandler         = newStartedHandler();
 	private long                         socket_close_wait_time =
@@ -119,110 +118,9 @@ public class ClientConnectionManager
 	private IPMonitor                       ipMonitor = new IPMonitor();
 	private final ClientTrustManagerFactory clientTrustManagerFactory =
 			new ClientTrustManagerFactory();
-
 	private boolean tlsWantClientAuthEnabled = TLS_WANT_CLIENT_AUTH_ENABLED_DEF;
-	
-	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods
-	// ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 * @param params
-	 * @return
-	 */
-	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> props = super.getDefaults(params);
-		Boolean             r_mode = (Boolean) params.get(getName() + "/" +
-				ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY);
-		String see_other_host_class = (String) params.get(SeeOtherHostIfc
-				.CM_SEE_OTHER_HOST_CLASS_PROPERTY);
-
-		see_other_host_strategy = getSeeOtherHostInstance(see_other_host_class);
-		props.put(SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_KEY, see_other_host_class);
-		if (see_other_host_strategy != null) {
-			see_other_host_strategy.getDefaults(props, params);
-		}
-		if (r_mode == null) {
-			props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY, ROUTING_MODE_PROP_VAL);
-
-			// If the server is configured as connection manager only node then
-			// route packets to SM on remote host where is default routing
-			// for external component.
-			// Otherwise default routing is to SM on localhost
-			if (params.get("config-type").equals(GEN_CONFIG_CS) && (params.get(GEN_EXT_COMP) !=
-					null)) {
-				String[] comp_params = ((String) params.get(GEN_EXT_COMP)).split(",");
-
-				props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY, DEF_SM_NAME + "@" +
-						comp_params[1]);
-			} else {
-				props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY, DEF_SM_NAME + "@" +
-						DNSResolver.getDefaultHostname());
-			}
-		}
-		props.put(SOCKET_CLOSE_WAIT_PROP_KEY, SOCKET_CLOSE_WAIT_PROP_DEF);
-		props.put(TLS_WANT_CLIENT_AUTH_ENABLED_KEY, TLS_WANT_CLIENT_AUTH_ENABLED_DEF);
-
-		return props;
-	}
-
-	/**
-	 * Method description
-	 *
-	 * @return
-	 */
-	@Override
-	public String getDiscoCategoryType() {
-		return "c2s";
-	}
-
-	/**
-	 * Method description
-	 *
-	 * @return
-	 */
-	@Override
-	public String getDiscoDescription() {
-		return "Client connection manager";
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param see_other_host_class
-	 *
-	 * @return
-	 */
-	public SeeOtherHostIfc getSeeOtherHostInstance(String see_other_host_class) {
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Configuring see_other_host strategy for: " + see_other_host_class);
-		}
-		if (see_other_host_class == null) {
-			see_other_host_class = SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_DEF_VAL;
-		}
-		if (see_other_host_class.equals("none")) {
-			return null;
-		}
-		try {
-			see_other_host_strategy = (SeeOtherHostIfc) Class.forName(see_other_host_class)
-					.newInstance();
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can not instantiate see_other_host strategy for class: " +
-					see_other_host_class, e);
-		}
-
-		return see_other_host_strategy;
-	}
 
 	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods
-	// --------------------------------------------------------------
 
 	/**
 	 * This method can be overwritten in extending classes to get a different
@@ -231,7 +129,8 @@ public class ClientConnectionManager
 	 * address rather then destination address.
 	 *
 	 * @param packet
-	 * @return
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int hashCodeForPacket(Packet packet) {
@@ -324,7 +223,8 @@ public class ClientConnectionManager
 	 * Method description
 	 *
 	 * @param serv
-	 * @return
+	 *
+	 * @return a value of <code>Queue<Packet></code>
 	 */
 	@Override
 	public Queue<Packet> processSocketData(XMPPIOService<Object> serv) {
@@ -397,21 +297,6 @@ public class ClientConnectionManager
 	/**
 	 * Method description
 	 *
-	 * @param service
-	 * @return
-	 */
-	@Override
-	public boolean serviceStopped(XMPPIOService<Object> service) {
-		boolean result = super.serviceStopped(service);
-
-		xmppStreamClosed(service);
-
-		return result;
-	}
-
-	/**
-	 * Method description
-	 *
 	 *
 	 * @param service
 	 */
@@ -423,70 +308,24 @@ public class ClientConnectionManager
 		JID    connectionId = getFromAddress(id);
 
 		service.setConnectionId(connectionId);
-		
 		service.setProcessors(processors);
 	}
-
-	//~--- set methods ----------------------------------------------------------
-
-	// ~--- set methods
-	// ----------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
-	 * @param props
+	 * @param service
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
-	public void setProperties(Map<String, Object> props) {
-		super.setProperties(props);
-		clientTrustManagerFactory.setProperties(props);
-		if (props.get(SOCKET_CLOSE_WAIT_PROP_KEY) != null) {
-			socket_close_wait_time = (Long) props.get(SOCKET_CLOSE_WAIT_PROP_KEY);
-		}
-		
-		processors = XMPPIOProcessorsFactory.updateIOProcessors(this, processors, props);
+	public boolean serviceStopped(XMPPIOService<Object> service) {
+		boolean result = super.serviceStopped(service);
 
-		if (props.size() == 1) {
+		xmppStreamClosed(service);
 
-			// If props.size() == 1, it means this is a single property update
-			// and this component does not support single property change for
-			// the rest
-			// of it's settings
-			return;
-		}
-
-		String see_other_host_class = (String) props.get(SeeOtherHostIfc
-				.CM_SEE_OTHER_HOST_CLASS_PROP_KEY);
-
-		see_other_host_strategy = getSeeOtherHostInstance(see_other_host_class);
-		if (see_other_host_strategy != null) {
-			see_other_host_strategy.setProperties(props);
-		}
-
-		boolean routing_mode = (Boolean) props.get(ROUTINGS_PROP_KEY + "/" +
-				ROUTING_MODE_PROP_KEY);
-
-		routings = new RoutingsContainer(routing_mode);
-
-		int idx = (ROUTINGS_PROP_KEY + "/").length();
-
-		for (Map.Entry<String, Object> entry : props.entrySet()) {
-			if (entry.getKey().startsWith(ROUTINGS_PROP_KEY + "/") &&!entry.getKey().equals(
-					ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY)) {
-				routings.addRouting(entry.getKey().substring(idx), (String) entry.getValue());
-			}    // end of if (entry.getKey().startsWith(ROUTINGS_PROP_KEY + "/"))
-		}      // end of for ()
-		
-		if (props.containsKey(TLS_WANT_CLIENT_AUTH_ENABLED_KEY)) {
-			tlsWantClientAuthEnabled = (Boolean) props.get(TLS_WANT_CLIENT_AUTH_ENABLED_KEY);
-		}		
+		return result;
 	}
-
-	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods
-	// --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -549,12 +388,12 @@ public class ClientConnectionManager
 			if (serv.getDataReceiver() != null) {
 				Packet command = Command.STREAM_CLOSED.getPacket(serv.getConnectionId(), serv
 						.getDataReceiver(), StanzaType.set, UUID.randomUUID().toString());
-
 				String userJid = serv.getUserJid();
+
 				if (userJid != null) {
 					Command.addFieldValue(command, "user-jid", userJid);
 				}
-				
+
 				// In case of mass-disconnects, adjust the timeout properly
 				addOutPacketWithTimeout(command, stoppedHandler, 120l, TimeUnit.SECONDS);
 				log.log(Level.FINE, "Service stopped, sending packet: {0}", command);
@@ -579,7 +418,8 @@ public class ClientConnectionManager
 	 *
 	 * @param serv
 	 * @param attribs
-	 * @return
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String xmppStreamOpened(XMPPIOService<Object> serv, Map<String,
@@ -626,23 +466,24 @@ public class ClientConnectionManager
 					"<host-unknown xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
 					"</stream:error>" + "</stream:stream>";
 		}    // end of if (!hostnames.contains(hostname))
-		if ( ( fromJID != null ) && ( see_other_host_strategy != null )
-				 && see_other_host_strategy.isEnabled( SeeOtherHostIfc.Phase.OPEN ) ){
-			BareJID see_other_host = see_other_host_strategy.findHostForJID( fromJID,
-																																			 getDefHostName() );
+		if ((fromJID != null) && (see_other_host_strategy != null) && see_other_host_strategy
+				.isEnabled(SeeOtherHostIfc.Phase.OPEN)) {
+			BareJID see_other_host = see_other_host_strategy.findHostForJID(fromJID,
+					getDefHostName());
 
-			if ( ( see_other_host != null ) && !see_other_host.equals( getDefHostName() ) ){
-				if ( log.isLoggable( Level.FINEST ) ){
-					log.log( Level.FINEST, "Sending redirect for {0} to host {1}, connection {2}.",
-									 new Object[] { fromJID,
-																	see_other_host, serv } );
+			if ((see_other_host != null) &&!see_other_host.equals(getDefHostName())) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Sending redirect for {0} to host {1}, connection {2}.",
+							new Object[] { fromJID,
+							see_other_host, serv });
 				}
-				return "<stream:stream" + " xmlns='" + XMLNS + "'"
-							 + " xmlns:stream='http://etherx.jabber.org/streams'"
-							 + " id='tigase-error-tigase'" + " from='" + getDefVHostItem() + "'"
-							 + " version='1.0' xml:lang='en'>"
-							 + see_other_host_strategy.getStreamError( "urn:ietf:params:xml:ns:xmpp-streams", see_other_host ).toString()
-							 + "</stream:stream>";
+
+				return "<stream:stream" + " xmlns='" + XMLNS + "'" +
+						" xmlns:stream='http://etherx.jabber.org/streams'" +
+						" id='tigase-error-tigase'" + " from='" + getDefVHostItem() + "'" +
+						" version='1.0' xml:lang='en'>" + see_other_host_strategy.getStreamError(
+						"urn:ietf:params:xml:ns:xmpp-streams", see_other_host).toString() +
+						"</stream:stream>";
 			}
 		}    // of if (from != null )
 
@@ -696,6 +537,156 @@ public class ClientConnectionManager
 		return null;
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 * @param params
+	 *
+	 * @return a value of <code>Map<String,Object></code>
+	 */
+	@Override
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		Map<String, Object> props = super.getDefaults(params);
+		Boolean             r_mode = (Boolean) params.get(getName() + "/" +
+				ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY);
+		String see_other_host_class = (String) params.get(SeeOtherHostIfc
+				.CM_SEE_OTHER_HOST_CLASS_PROPERTY);
+
+		see_other_host_strategy = getSeeOtherHostInstance(see_other_host_class);
+		props.put(SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_KEY, see_other_host_class);
+		if (see_other_host_strategy != null) {
+			see_other_host_strategy.getDefaults(props, params);
+		}
+		if (r_mode == null) {
+			props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY, ROUTING_MODE_PROP_VAL);
+
+			// If the server is configured as connection manager only node then
+			// route packets to SM on remote host where is default routing
+			// for external component.
+			// Otherwise default routing is to SM on localhost
+			if (params.get("config-type").equals(GEN_CONFIG_CS) && (params.get(GEN_EXT_COMP) !=
+					null)) {
+				String[] comp_params = ((String) params.get(GEN_EXT_COMP)).split(",");
+
+				props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY, DEF_SM_NAME + "@" +
+						comp_params[1]);
+			} else {
+				props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY, DEF_SM_NAME + "@" +
+						DNSResolver.getDefaultHostname());
+			}
+		}
+		props.put(SOCKET_CLOSE_WAIT_PROP_KEY, SOCKET_CLOSE_WAIT_PROP_DEF);
+		props.put(TLS_WANT_CLIENT_AUTH_ENABLED_KEY, TLS_WANT_CLIENT_AUTH_ENABLED_DEF);
+
+		return props;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getDiscoCategoryType() {
+		return "c2s";
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getDiscoDescription() {
+		return "Client connection manager";
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param see_other_host_class
+	 *
+	 *
+	 * @return a value of <code>SeeOtherHostIfc</code>
+	 */
+	public SeeOtherHostIfc getSeeOtherHostInstance(String see_other_host_class) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("Configuring see_other_host strategy for: " + see_other_host_class);
+		}
+		if (see_other_host_class == null) {
+			see_other_host_class = SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_DEF_VAL;
+		}
+		if (see_other_host_class.equals("none")) {
+			return null;
+		}
+		try {
+			see_other_host_strategy = (SeeOtherHostIfc) Class.forName(see_other_host_class)
+					.newInstance();
+		} catch (Exception e) {
+			log.log(Level.SEVERE, "Can not instantiate see_other_host strategy for class: " +
+					see_other_host_class, e);
+		}
+
+		return see_other_host_strategy;
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 * @param props
+	 */
+	@Override
+	public void setProperties(Map<String, Object> props) {
+		super.setProperties(props);
+		clientTrustManagerFactory.setProperties(props);
+		if (props.get(SOCKET_CLOSE_WAIT_PROP_KEY) != null) {
+			socket_close_wait_time = (Long) props.get(SOCKET_CLOSE_WAIT_PROP_KEY);
+		}
+		processors = XMPPIOProcessorsFactory.updateIOProcessors(this, processors, props);
+		if (props.size() == 1) {
+
+			// If props.size() == 1, it means this is a single property update
+			// and this component does not support single property change for
+			// the rest
+			// of it's settings
+			return;
+		}
+
+		String see_other_host_class = (String) props.get(SeeOtherHostIfc
+				.CM_SEE_OTHER_HOST_CLASS_PROP_KEY);
+
+		see_other_host_strategy = getSeeOtherHostInstance(see_other_host_class);
+		if (see_other_host_strategy != null) {
+			see_other_host_strategy.setProperties(props);
+		}
+
+		boolean routing_mode = (Boolean) props.get(ROUTINGS_PROP_KEY + "/" +
+				ROUTING_MODE_PROP_KEY);
+
+		routings = new RoutingsContainer(routing_mode);
+
+		int idx = (ROUTINGS_PROP_KEY + "/").length();
+
+		for (Map.Entry<String, Object> entry : props.entrySet()) {
+			if (entry.getKey().startsWith(ROUTINGS_PROP_KEY + "/") &&!entry.getKey().equals(
+					ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY)) {
+				routings.addRouting(entry.getKey().substring(idx), (String) entry.getValue());
+			}    // end of if (entry.getKey().startsWith(ROUTINGS_PROP_KEY + "/"))
+		}      // end of for ()
+		if (props.containsKey(TLS_WANT_CLIENT_AUTH_ENABLED_KEY)) {
+			tlsWantClientAuthEnabled = (Boolean) props.get(TLS_WANT_CLIENT_AUTH_ENABLED_KEY);
+		}
+	}
+
+	//~--- methods --------------------------------------------------------------
+
 	/**
 	 * Method description
 	 *
@@ -705,7 +696,7 @@ public class ClientConnectionManager
 	 * @param command_sessionId
 	 * @param serv
 	 *
-	 * @return
+	 * @return a value of <code>JID</code>
 	 */
 	protected JID changeDataReceiver(Packet packet, JID newAddress,
 			String command_sessionId, XMPPIOService<Object> serv) {
@@ -730,84 +721,12 @@ public class ClientConnectionManager
 		return null;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods
-	// ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
-	 */
-	@Override
-	protected int[] getDefPlainPorts() {
-		return new int[] { 5222 };
-	}
-
-	/**
-	 * Method description
 	 *
-	 *
-	 * @return
-	 */
-	@Override
-	protected int[] getDefSSLPorts() {
-		return new int[] { 5223 };
-	}
-
-	/**
-	 * Method <code>getMaxInactiveTime</code> returns max keep-alive time for
-	 * inactive connection. Let's assume user should send something at least
-	 * once every 24 hours....
-	 *
-	 * @return a <code>long</code> value
-	 */
-	@Override
-	protected long getMaxInactiveTime() {
-		return 24 * HOUR;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param def
-	 *
-	 * @return
-	 */
-	@Override
-	protected Integer getMaxQueueSize(int def) {
-		return def * 10;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
-		return new XMPPIOService<Object>();
-	}
-
-	@Override
-	protected boolean isTlsWantClientAuthEnabled() {
-		return tlsWantClientAuthEnabled;
-	}
-	
-	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods
-	// --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
+	 * @return a value of <code>ReceiverTimeoutHandler</code>
 	 */
 	protected ReceiverTimeoutHandler newStartedHandler() {
 		return new StartedHandler();
@@ -817,7 +736,8 @@ public class ClientConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 * @return a value of <code>ReceiverTimeoutHandler</code>
 	 */
 	protected ReceiverTimeoutHandler newStoppedHandler() {
 		return new StoppedHandler();
@@ -857,45 +777,43 @@ public class ClientConnectionManager
 
 			if (jid != null) {
 				if (serv != null) {
-
 					BareJID fromJID = null;
-					try {
-						fromJID = BareJID.bareJIDInstance( jid );
-					} catch ( TigaseStringprepException ex ) {
-						log.log( Level.SEVERE, null, ex );
-					}
 
-					if ( ( fromJID != null )
-							 && ( see_other_host_strategy != null
-										&& see_other_host_strategy.isEnabled( SeeOtherHostIfc.Phase.LOGIN ) ) ){
-						BareJID see_other_host = see_other_host_strategy.findHostForJID( fromJID, getDefHostName() );
-						if ( ( see_other_host != null ) && !see_other_host.equals( getDefHostName() ) ){
-							if ( log.isLoggable( Level.FINEST ) ){
-								log.log( Level.FINEST, "Sending redirect for {0} to host {1}, connection {2}.",
-												 new Object[] { fromJID,
-																				see_other_host, serv } );
+					try {
+						fromJID = BareJID.bareJIDInstance(jid);
+					} catch (TigaseStringprepException ex) {
+						log.log(Level.SEVERE, null, ex);
+					}
+					if ((fromJID != null) && ((see_other_host_strategy != null) &&
+							see_other_host_strategy.isEnabled(SeeOtherHostIfc.Phase.LOGIN))) {
+						BareJID see_other_host = see_other_host_strategy.findHostForJID(fromJID,
+								getDefHostName());
+
+						if ((see_other_host != null) &&!see_other_host.equals(getDefHostName())) {
+							if (log.isLoggable(Level.FINEST)) {
+								log.log(Level.FINEST,
+										"Sending redirect for {0} to host {1}, connection {2}.",
+										new Object[] { fromJID,
+										see_other_host, serv });
 							}
-							String redirectMessage =
-										 "<stream:stream" + " xmlns='" + XMLNS + "'"
-										 + " xmlns:stream='http://etherx.jabber.org/streams'"
-										 + " id='tigase-error-tigase'" + " from='" + getDefVHostItem() + "'"
-										 + " version='1.0' xml:lang='en'>"
-										 + see_other_host_strategy.getStreamError( "urn:ietf:params:xml:ns:xmpp-streams", see_other_host ).toString()
-										 + "</stream:stream>";
+
+							String redirectMessage = "<stream:stream" + " xmlns='" + XMLNS + "'" +
+									" xmlns:stream='http://etherx.jabber.org/streams'" +
+									" id='tigase-error-tigase'" + " from='" + getDefVHostItem() + "'" +
+									" version='1.0' xml:lang='en'>" + see_other_host_strategy
+									.getStreamError("urn:ietf:params:xml:ns:xmpp-streams", see_other_host)
+									.toString() + "</stream:stream>";
 
 							try {
-								SocketThread.removeSocketService( serv );
-
-								serv.writeRawData( redirectMessage );
-
+								SocketThread.removeSocketService(serv);
+								serv.writeRawData(redirectMessage);
 								serv.processWaitingPackets();
-								Thread.sleep( socket_close_wait_time );
+								Thread.sleep(socket_close_wait_time);
 								serv.stop();
-
 							} catch (Exception e) {}
 						}
 					} else {
-						serv.setUserJid( jid );
+						serv.setUserJid(jid);
 					}
 				} else {
 					if (log.isLoggable(Level.FINE)) {
@@ -1075,16 +993,17 @@ public class ClientConnectionManager
 
 			break;
 
-		case STREAM_MOVED:
+		case STREAM_MOVED :
 			if (processors != null) {
 				for (XMPPIOProcessor processor : processors) {
-					//handled |= processor.processCommand(packet);
+
+					// handled |= processor.processCommand(packet);
 					processor.processCommand(serv, packet);
 				}
 			}
-			
+
 			break;
-			
+
 		default :
 			writePacketToSocket(iqc);
 
@@ -1094,8 +1013,79 @@ public class ClientConnectionManager
 
 	//~--- get methods ----------------------------------------------------------
 
-	// ~--- get methods
-	// ----------------------------------------------------------
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 * @return a value of <code>int[]</code>
+	 */
+	@Override
+	protected int[] getDefPlainPorts() {
+		return new int[] { 5222 };
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 * @return a value of <code>int[]</code>
+	 */
+	@Override
+	protected int[] getDefSSLPorts() {
+		return new int[] { 5223 };
+	}
+
+	/**
+	 * Method <code>getMaxInactiveTime</code> returns max keep-alive time for
+	 * inactive connection. Let's assume user should send something at least
+	 * once every 24 hours....
+	 *
+	 * @return a <code>long</code> value
+	 */
+	@Override
+	protected long getMaxInactiveTime() {
+		return 24 * HOUR;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param def
+	 *
+	 *
+	 * @return a value of <code>Integer</code>
+	 */
+	@Override
+	protected Integer getMaxQueueSize(int def) {
+		return def * 10;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 * @return a value of <code>XMPPIOService<Object></code>
+	 */
+	@Override
+	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
+		return new XMPPIOService<Object>();
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 */
+	@Override
+	protected boolean isTlsWantClientAuthEnabled() {
+		return tlsWantClientAuthEnabled;
+	}
+
 	private List<Element> getFeatures(XMPPIOService service) {
 		List<Element> results = new LinkedList<Element>();
 
@@ -1124,8 +1114,6 @@ public class ClientConnectionManager
 
 	//~--- inner classes --------------------------------------------------------
 
-	// ~--- inner classes
-	// --------------------------------------------------------
 	private class StartedHandler
 					implements ReceiverTimeoutHandler {
 		/**
@@ -1204,8 +1192,4 @@ public class ClientConnectionManager
 }
 
 
-
-// ~ Formatted in Tigase Code Convention on 13/02/20
-
-
-//~ Formatted in Tigase Code Convention on 13/03/12
+//~ Formatted in Tigase Code Convention on 13/09/21

@@ -75,7 +75,7 @@ public interface ServerComponent {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	JID getComponentId();
 
@@ -83,7 +83,7 @@ public interface ServerComponent {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	String getName();
 

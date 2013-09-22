@@ -108,7 +108,7 @@ public class JabberIqRoster
 	 *
 	 * @param item
 	 *
-	 * @return
+	 * 
 	 */
 	public static String[] getItemGroups(Element item) {
 		List<Element> elgr = item.getChildren();
@@ -198,7 +198,7 @@ public class JabberIqRoster
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int concurrentQueuesNo() {
@@ -209,7 +209,7 @@ public class JabberIqRoster
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String id() {
@@ -410,7 +410,7 @@ public class JabberIqRoster
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
@@ -421,7 +421,7 @@ public class JabberIqRoster
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -432,7 +432,7 @@ public class JabberIqRoster
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -445,7 +445,7 @@ public class JabberIqRoster
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
@@ -458,7 +458,7 @@ public class JabberIqRoster
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	protected RosterAbstract getRosterUtil() {
 		return RosterFactory.getRosterImplementation(true);

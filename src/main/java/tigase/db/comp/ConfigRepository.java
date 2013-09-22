@@ -111,7 +111,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String toString() {
@@ -124,7 +124,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public abstract String getConfigKey();
 
@@ -132,7 +132,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public abstract String[] getDefaultPropetyItems();
 
@@ -140,7 +140,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public abstract String getPropertyKey();
 
@@ -184,7 +184,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 * @param oldItem
 	 * @param newItem
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean itemChanged(Item oldItem, Item newItem) {
 		return true;
@@ -194,7 +194,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Collection<Item> allItems() {
@@ -207,7 +207,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 *
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean contains(String key) {
@@ -239,7 +239,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 *
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Item getItem(String key) {
@@ -252,7 +252,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Iterator<Item> iterator() {
@@ -318,7 +318,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int size() {
@@ -338,7 +338,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 *
 	 * @param item
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String validateItem(Item item) {

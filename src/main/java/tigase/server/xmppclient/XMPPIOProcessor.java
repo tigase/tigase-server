@@ -37,7 +37,7 @@ public interface XMPPIOProcessor {
 	/**
 	 * Returns identifier of processor
 	 * 
-	 * @return 
+	 * 
 	 */
 	String getId();
 	
@@ -45,7 +45,7 @@ public interface XMPPIOProcessor {
 	 * Returns array of features added by this processor
 	 * 
 	 * @param service
-	 * @return 
+	 * 
 	 */
 	Element[] supStreamFeatures(XMPPIOService service);
 	

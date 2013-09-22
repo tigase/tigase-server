@@ -194,7 +194,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	 * 
 	 * @param packet
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean addOutPacket(Packet packet) {
@@ -237,7 +237,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	 * @param cid
 	 * @param createNew
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws LocalhostException
 	 * @throws NotLocalhostException
@@ -260,7 +260,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	 * 
 	 * @param params
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -283,7 +283,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -294,7 +294,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoDescription() {
@@ -308,7 +308,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	 * @param key
 	 * @param key_sessionId
 	 * @param asking_sessionId
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getLocalDBKey(CID connectionCid, CID keyCid, String key,
@@ -400,7 +400,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	 * 
 	 * 
 	 * @param serv
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<Element> getStreamFeatures(S2SIOService serv) {
@@ -419,7 +419,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean handlesNonLocalDomains() {
@@ -432,7 +432,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	 * 
 	 * @param packet
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public int hashCodeForPacket(Packet packet) {
@@ -568,7 +568,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	 * 
 	 * @param serv
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public Queue<Packet> processSocketData(S2SIOService serv) {
@@ -681,7 +681,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	 * @param cdata
 	 * @param handshakingOnly
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean sendVerifyResult(String elem_name, CID connCid, CID keyCid,
@@ -733,7 +733,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	 * 
 	 * @param serv
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean serviceStopped(S2SIOService serv) {
@@ -888,7 +888,7 @@ public class S2SConnectionManager extends ConnectionManager<S2SIOService> implem
 	 * @param serv
 	 * @param attribs
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public String xmppStreamOpened(S2SIOService serv, Map<String, String> attribs) {

@@ -96,7 +96,7 @@ public class Roster extends RosterAbstract {
 	 * @param buddy
 	 * @param groups
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -114,7 +114,7 @@ public class Roster extends RosterAbstract {
 	 * @param session
 	 * @param buddy
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -133,7 +133,7 @@ public class Roster extends RosterAbstract {
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -168,7 +168,7 @@ public class Roster extends RosterAbstract {
 	 * @param session
 	 * @param buddy
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -186,7 +186,7 @@ public class Roster extends RosterAbstract {
 	 * @param session
 	 * @param buddy
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -204,7 +204,7 @@ public class Roster extends RosterAbstract {
 	 * @param session
 	 * @param buddy
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -230,7 +230,7 @@ public class Roster extends RosterAbstract {
 	 * @param session
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -250,7 +250,7 @@ public class Roster extends RosterAbstract {
 	 * @param session
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -268,7 +268,7 @@ public class Roster extends RosterAbstract {
 	 * @param session
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException

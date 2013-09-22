@@ -71,7 +71,7 @@ public class RemoteRosterManagement
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String id() {
@@ -82,7 +82,7 @@ public class RemoteRosterManagement
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int concurrentQueuesNo() {
@@ -266,7 +266,7 @@ public class RemoteRosterManagement
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -277,7 +277,7 @@ public class RemoteRosterManagement
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -354,7 +354,7 @@ public class RemoteRosterManagement
 	 * @param jid
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	public static boolean isRemoteAllowed(JID jid, XMPPResourceConnection session) {
 		try {

@@ -115,7 +115,7 @@ public class JabberIqAuth
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int concurrentQueuesNo() {
@@ -157,7 +157,7 @@ public class JabberIqAuth
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String id() {
@@ -333,7 +333,7 @@ public class JabberIqAuth
 	 * @param password
 	 * @param digest
 	 *
-	 * @return
+	 * 
 	 */
 	protected Authorization doAuth(NonAuthUserRepository repo, Map<String,
 			Object> settings, XMPPResourceConnection session, BareJID user_id, String password,
@@ -381,7 +381,7 @@ public class JabberIqAuth
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
@@ -392,7 +392,7 @@ public class JabberIqAuth
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -403,7 +403,7 @@ public class JabberIqAuth
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -416,7 +416,7 @@ public class JabberIqAuth
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element[] supStreamFeatures(final XMPPResourceConnection session) {

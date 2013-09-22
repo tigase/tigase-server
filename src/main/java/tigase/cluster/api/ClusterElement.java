@@ -248,7 +248,7 @@ public class ClusterElement {
 	 * @param to
 	 * @param type
 	 *
-	 * @return
+	 * 
 	 */
 	public static Element clusterElement(JID from, JID to, StanzaType type) {
 		Element cluster_el = new Element(CLUSTER_EL_NAME, new String[] { "from", "to",
@@ -271,7 +271,7 @@ public class ClusterElement {
 	 * @param type
 	 * @param packet_from
 	 *
-	 * @return
+	 * 
 	 */
 	public static Element createClusterElement(JID from, JID to, StanzaType type,
 					String packet_from) {
@@ -293,7 +293,7 @@ public class ClusterElement {
 	 * @param method_name
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 */
 	public static ClusterElement createClusterMethodCall(JID from, JID to, StanzaType type,
 					String method_name, Map<String, String> params) {
@@ -326,7 +326,7 @@ public class ClusterElement {
 	 * @param cluster_nodes
 	 * @param comp_id
 	 *
-	 * @return
+	 * 
 	 */
 	public static ClusterElement createForNextNode(ClusterElement clel,
 					List<JID> cluster_nodes, JID comp_id) {
@@ -463,7 +463,7 @@ public class ClusterElement {
 	 * @param type
 	 * @param results
 	 *
-	 * @return
+	 * 
 	 */
 	public ClusterElement createMethodResponse(JID from, StanzaType type,
 					Map<String, String> results) {
@@ -479,7 +479,7 @@ public class ClusterElement {
 	 * @param type
 	 * @param results
 	 *
-	 * @return
+	 * 
 	 */
 	public ClusterElement createMethodResponse(JID from, JID to, StanzaType type,
 					Map<String, String> results) {
@@ -512,7 +512,7 @@ public class ClusterElement {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public Map<String, String> getAllMethodParams() {
 		return method_params;
@@ -522,7 +522,7 @@ public class ClusterElement {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public Map<String, String> getAllMethodResults() {
 		return method_results;
@@ -534,7 +534,7 @@ public class ClusterElement {
 	 *
 	 *
 	 * @param id
-	 * @return
+	 * 
 	 */
 	public Element getClusterElement(String id) {
 		elem.setAttribute("id", id);
@@ -546,7 +546,7 @@ public class ClusterElement {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public Queue<Element> getDataPackets() {
 		return packets;
@@ -556,7 +556,7 @@ public class ClusterElement {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public JID getFirstNode() {
 		return first_node;
@@ -566,7 +566,7 @@ public class ClusterElement {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getMethodName() {
 		return method_name;
@@ -578,7 +578,7 @@ public class ClusterElement {
 	 *
 	 * @param par_name
 	 *
-	 * @return
+	 * 
 	 */
 	public String getMethodParam(String par_name) {
 		return (method_params == null)
@@ -593,7 +593,7 @@ public class ClusterElement {
 	 * @param par_name
 	 * @param def
 	 *
-	 * @return
+	 * 
 	 */
 	public long getMethodParam(String par_name, long def) {
 		String val_str = getMethodParam(par_name);
@@ -615,7 +615,7 @@ public class ClusterElement {
 	 *
 	 * @param val_name
 	 *
-	 * @return
+	 * 
 	 */
 	public String getMethodResultVal(String val_name) {
 		return (method_results == null)
@@ -630,7 +630,7 @@ public class ClusterElement {
 	 * @param val_name
 	 * @param def
 	 *
-	 * @return
+	 * 
 	 */
 	public long getMethodResultVal(String val_name, long def) {
 		String val_str = getMethodResultVal(val_name);
@@ -650,7 +650,7 @@ public class ClusterElement {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public Set<JID> getVisitedNodes() {
 		return visited_nodes;
@@ -662,7 +662,7 @@ public class ClusterElement {
 	 *
 	 * @param node_id
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isVisitedNode(JID node_id) {
 		return visited_nodes.contains(node_id);
@@ -676,7 +676,7 @@ public class ClusterElement {
 	 *
 	 * @param node_id
 	 *
-	 * @return
+	 * 
 	 */
 	public ClusterElement nextClusterNode(JID node_id) {
 		Element next_el = elem.clone();

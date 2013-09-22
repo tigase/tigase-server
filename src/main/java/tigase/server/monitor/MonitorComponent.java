@@ -55,7 +55,7 @@ public class MonitorComponent extends AbstractMessageReceiver {
 	 *
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -68,7 +68,7 @@ public class MonitorComponent extends AbstractMessageReceiver {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -79,7 +79,7 @@ public class MonitorComponent extends AbstractMessageReceiver {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoDescription() {
@@ -123,7 +123,7 @@ public class MonitorComponent extends AbstractMessageReceiver {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int processingInThreads() {

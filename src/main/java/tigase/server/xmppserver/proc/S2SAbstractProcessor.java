@@ -176,7 +176,7 @@ public abstract class S2SAbstractProcessor
 	 * @param serv
 	 * @param results
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
@@ -207,7 +207,7 @@ public abstract class S2SAbstractProcessor
 	 *
 	 * @param hostname
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean skipTLSForHost(String hostname) {
 
@@ -259,7 +259,7 @@ public abstract class S2SAbstractProcessor
 	 * @param serv
 	 * @param attribs
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String streamOpened(S2SIOService serv, Map<String, String> attribs) {

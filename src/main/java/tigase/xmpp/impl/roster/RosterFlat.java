@@ -81,7 +81,7 @@ public class RosterFlat
 	 * @param relem
 	 * @param roster
 	 *
-	 * @return
+	 * 
 	 */
 	public static boolean addBuddy(RosterElement relem,
 																 Map<BareJID, RosterElement> roster) {
@@ -101,7 +101,7 @@ public class RosterFlat
 	 * @param buddy
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -124,7 +124,7 @@ public class RosterFlat
 	 * @param roster
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	public static boolean parseRosterUtil(String roster_str,
 					Map<BareJID, RosterElement> roster, XMPPResourceConnection session) {
@@ -222,7 +222,7 @@ public class RosterFlat
 	 * @param buddy
 	 * @param groups
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -252,7 +252,7 @@ public class RosterFlat
 	 * @param session
 	 * @param buddy
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -275,7 +275,7 @@ public class RosterFlat
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -323,7 +323,7 @@ public class RosterFlat
 	 * @param session
 	 * @param buddy
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -346,7 +346,7 @@ public class RosterFlat
 	 *
 	 * @param relem
 	 *
-	 * @return
+	 * 
 	 */
 	public Element getBuddyItem(RosterElement relem) {
 		return relem.getRosterItem();
@@ -359,7 +359,7 @@ public class RosterFlat
 	 * @param session
 	 * @param buddy
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -383,7 +383,7 @@ public class RosterFlat
 	 * @param session
 	 * @param buddy
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -407,7 +407,7 @@ public class RosterFlat
 	 * @param session
 	 * @param buddy
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -435,7 +435,7 @@ public class RosterFlat
 	 * @param groups
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	public RosterElement getRosterElementInstance(JID buddy, String name, String[] groups,
 					XMPPResourceConnection session) {
@@ -448,7 +448,7 @@ public class RosterFlat
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -478,7 +478,7 @@ public class RosterFlat
 	 * @param session
 	 * @param buddy
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -503,7 +503,7 @@ public class RosterFlat
 	 * @param roster
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean parseRoster(String roster_str, Map<BareJID, RosterElement> roster,
 														 XMPPResourceConnection session) {
@@ -517,7 +517,7 @@ public class RosterFlat
 	 * @param session
 	 * @param buddy
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -537,7 +537,7 @@ public class RosterFlat
 	 * @param session
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -677,7 +677,7 @@ public class RosterFlat
 	 * @param session
 	 * @param buddy
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -695,7 +695,7 @@ public class RosterFlat
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -807,7 +807,7 @@ public class RosterFlat
 	 * @param session
 	 * @param buddy
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -864,7 +864,7 @@ public class RosterFlat
 
 	/**
 	 * @param session
-	 * @return
+	 * 
 	 * @throws TigaseDBException
 	 * @throws NotAuthorizedException
 	 */
@@ -928,7 +928,7 @@ public class RosterFlat
 		 * @param arg0
 		 * @param arg1
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public int compare(JID arg0, JID arg1) {

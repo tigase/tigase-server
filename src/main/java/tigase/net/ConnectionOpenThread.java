@@ -277,7 +277,7 @@ public class ConnectionOpenThread
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static ConnectionOpenThread getInstance() {
 

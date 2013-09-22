@@ -194,7 +194,7 @@ public class DomainFilter
 	 * @param results
 	 *
 	 * @param settings
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
@@ -329,7 +329,7 @@ public class DomainFilter
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -354,7 +354,7 @@ public class DomainFilter
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -397,7 +397,7 @@ public class DomainFilter
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException

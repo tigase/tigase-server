@@ -177,7 +177,7 @@ public abstract class TigaseRuntime {
 	/**
 	 * We try to return OLD memory pool size as this is what is the most interesting
 	 * to us. If this is not possible then we return total Heap size.
-	 * @return
+	 * 
 	 */
 	public long getHeapMemMax() {
 		if (oldMemPool != null) {
@@ -190,7 +190,7 @@ public abstract class TigaseRuntime {
 	/**
 	 * We try to return OLD memory pool size as this is what is the most interesting
 	 * to us. If this is not possible then we return total Heap used.
-	 * @return
+	 * 
 	 */
 	public long getHeapMemUsed() {
 		if (oldMemPool != null) {

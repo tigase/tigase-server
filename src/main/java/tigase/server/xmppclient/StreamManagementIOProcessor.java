@@ -92,7 +92,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 	 * Method returns true if XMPPIOService has enabled SM.
 	 * 
 	 * @param service
-	 * @return 
+	 * 
 	 */
 	public static boolean isEnabled(XMPPIOService service) {
 		return service.getSessionData().containsKey(IN_COUNTER_KEY);
@@ -519,7 +519,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		/**
 		 * Get value of counter.
 		 * 
-		 * @return 
+		 * 
 		 */
 		public int get() {
 			return counter;
@@ -577,7 +577,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		/**
 		 * Returns size of queue containing packets waiting for ack
 		 * 
-		 * @return 
+		 * 
 		 */
 		public int waitingForAck() {
 			return queue.size();
@@ -587,7 +587,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		 * Method returns internal queue with packets waiting for ack - use testing 
 		 * only!
 		 * 
-		 * @return 
+		 * 
 		 */
 		protected ArrayDeque<Packet> getQueue() {
 			return queue;

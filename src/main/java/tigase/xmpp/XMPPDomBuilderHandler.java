@@ -202,7 +202,7 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public Queue<Element> getParsedElements() {
 		return all_roots;
@@ -229,7 +229,7 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean parseError() {
 		return error;
@@ -239,7 +239,7 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Object restoreParserState() {

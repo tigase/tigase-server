@@ -101,7 +101,7 @@ public class OfflineMessages
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int concurrentQueuesNo() {
@@ -194,7 +194,7 @@ public class OfflineMessages
 	 *
 	 * @param conn
 	 * @param repo
-	 * @return
+	 * 
 	 *
 	 * @throws UserNotFoundException
 	 * @throws NotAuthorizedException
@@ -238,7 +238,7 @@ public class OfflineMessages
 	 * @param pac
 	 * @param repo
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws UserNotFoundException
 	 */
@@ -326,7 +326,7 @@ public class OfflineMessages
 	 * @param repo
 	 * @param conn
 	 *
-	 * @return
+	 * 
 	 */
 	protected MsgRepositoryIfc getMsgRepoImpl(NonAuthUserRepository repo,
 			XMPPResourceConnection conn) {
@@ -344,7 +344,7 @@ public class OfflineMessages
 	 * @param packet
 	 * @param conn
 	 *
-	 * @return
+	 * 
 	 */
 	protected boolean loadOfflineMessages(Packet packet, XMPPResourceConnection conn) {
 
@@ -410,7 +410,7 @@ public class OfflineMessages
 		 * @param time
 		 * @param delete
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public Element getMessageExpired(long time, boolean delete) {
@@ -426,7 +426,7 @@ public class OfflineMessages
 		 * @param to
 		 * @param delete
 		 *
-		 * @return
+		 * 
 		 *
 		 * @throws UserNotFoundException
 		 */
@@ -494,7 +494,7 @@ public class OfflineMessages
 		 * @param p1
 		 * @param p2
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public int compare(Packet p1, Packet p2) {

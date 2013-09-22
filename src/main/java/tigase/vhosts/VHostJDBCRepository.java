@@ -107,7 +107,7 @@ public class VHostJDBCRepository
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getConfigKey() {
@@ -118,7 +118,7 @@ public class VHostJDBCRepository
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] getDefaultPropetyItems() {
@@ -153,7 +153,7 @@ public class VHostJDBCRepository
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public VHostItem getItemInstance() {
@@ -164,7 +164,7 @@ public class VHostJDBCRepository
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getItemsListPKey() {
@@ -175,7 +175,7 @@ public class VHostJDBCRepository
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getPropertyKey() {
@@ -186,7 +186,7 @@ public class VHostJDBCRepository
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public BareJID getRepoUser() {
@@ -222,7 +222,7 @@ public class VHostJDBCRepository
 	 * Performs validation of given VHostItem
 	 *
 	 * @param item VHostItem which should be validated
-	 * @return
+	 * 
 	 */
 	@Override
 	public String validateItem(VHostItem item) {

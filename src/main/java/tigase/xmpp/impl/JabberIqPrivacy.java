@@ -161,7 +161,7 @@ public class JabberIqPrivacy
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String id() {
@@ -254,7 +254,7 @@ public class JabberIqPrivacy
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
@@ -265,7 +265,7 @@ public class JabberIqPrivacy
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -276,7 +276,7 @@ public class JabberIqPrivacy
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -601,7 +601,7 @@ public class JabberIqPrivacy
 	 * @param session
 	 * @param items
 	 *
-	 * @return
+	 * 
 	 */
 	public static Authorization validateList(final XMPPResourceConnection session,
 			final List<Element> items) {

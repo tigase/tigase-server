@@ -142,7 +142,7 @@ public class Message
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected String[] getElNameErrorPath() {

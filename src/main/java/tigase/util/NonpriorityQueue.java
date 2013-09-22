@@ -71,7 +71,7 @@ public class NonpriorityQueue<E> extends PriorityQueueAbstract<E> {
 	 * @param element
 	 * @param priority
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean offer(E element, int priority) {
@@ -120,7 +120,7 @@ public class NonpriorityQueue<E> extends PriorityQueueAbstract<E> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int[] size() {
@@ -135,7 +135,7 @@ public class NonpriorityQueue<E> extends PriorityQueueAbstract<E> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws InterruptedException
 	 */
@@ -148,7 +148,7 @@ public class NonpriorityQueue<E> extends PriorityQueueAbstract<E> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int totalSize() {

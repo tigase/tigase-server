@@ -107,7 +107,7 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 * @param packet
 	 * @param conn
 	 *
-	 * @return
+	 * 
 	 */
 	boolean processPacket(Packet packet, XMPPResourceConnection conn);
 
@@ -137,7 +137,7 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	E getConnectionRecordInstance();
 

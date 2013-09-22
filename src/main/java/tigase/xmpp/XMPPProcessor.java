@@ -100,7 +100,7 @@ public abstract class XMPPProcessor
 	 * @param packet
 	 * @param conn
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Authorization canHandle(Packet packet, XMPPResourceConnection conn) {
@@ -147,7 +147,7 @@ public abstract class XMPPProcessor
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int concurrentQueuesNo() {
@@ -158,7 +158,7 @@ public abstract class XMPPProcessor
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 *
 	 * @deprecated
 	 */
@@ -186,7 +186,7 @@ public abstract class XMPPProcessor
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
@@ -197,7 +197,7 @@ public abstract class XMPPProcessor
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -208,7 +208,7 @@ public abstract class XMPPProcessor
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	@Deprecated
@@ -220,7 +220,7 @@ public abstract class XMPPProcessor
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -233,7 +233,7 @@ public abstract class XMPPProcessor
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
@@ -244,7 +244,7 @@ public abstract class XMPPProcessor
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Set<StanzaType> supTypes() {
@@ -257,7 +257,7 @@ public abstract class XMPPProcessor
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public XMPPProcessor getInstance() {
 		return this;
@@ -279,7 +279,7 @@ public abstract class XMPPProcessor
 	 * @param element
 	 * @param ns
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	@Deprecated

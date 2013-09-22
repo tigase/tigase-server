@@ -80,7 +80,7 @@ public class Presence
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected String[] getElNameErrorPath() {

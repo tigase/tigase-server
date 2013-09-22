@@ -126,7 +126,7 @@ public class S2SConnectionClustered
 	 * @param key_sessionId
 	 * @param asking_sessionId
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getLocalDBKey(CID connectionCid, CID keyCid, String key,
@@ -185,7 +185,7 @@ public class S2SConnectionClustered
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	protected JID getFirstClusterNode() {
 		JID cluster_node = null;

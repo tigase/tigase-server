@@ -167,7 +167,7 @@ public class Privacy {
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 */
@@ -182,7 +182,7 @@ public class Privacy {
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 */
@@ -203,7 +203,7 @@ public class Privacy {
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -220,7 +220,7 @@ public class Privacy {
 	 * @param session
 	 * @param list
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -260,7 +260,7 @@ public class Privacy {
 	 * @param session
 	 * @param list
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -314,7 +314,7 @@ public class Privacy {
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -332,7 +332,7 @@ public class Privacy {
 	 *
 	 * @param list
 	 *
-	 * @return
+	 * 
 	 */
 	public static String listNode(final String list) {
 		return PRIVACY + "/" + list;

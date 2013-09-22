@@ -192,7 +192,7 @@ public class SessionManager
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean addOutPacket(Packet packet) {
@@ -215,7 +215,7 @@ public class SessionManager
 	 * @param plug_id
 	 * @param conc
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws ClassNotFoundException
 	 * @throws IllegalAccessException
@@ -341,7 +341,7 @@ public class SessionManager
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean containsJid(BareJID jid) {
@@ -456,7 +456,7 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean handlesLocalDomains() {
@@ -482,7 +482,7 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int processingInThreads() {
@@ -493,7 +493,7 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int processingOutThreads() {
@@ -574,7 +574,7 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean skipPrivacy() {
 		return skipPrivacy;
@@ -606,7 +606,7 @@ public class SessionManager
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public JID[] getConnectionIdsForJid(BareJID jid) {
@@ -627,7 +627,7 @@ public class SessionManager
 	 *
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -645,7 +645,7 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -656,7 +656,7 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoDescription() {
@@ -669,7 +669,7 @@ public class SessionManager
 	 *
 	 * @param from
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
@@ -698,7 +698,7 @@ public class SessionManager
 	 * @param jid
 	 * @param from
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
@@ -742,7 +742,7 @@ public class SessionManager
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	public XMPPResourceConnection getResourceConnection(JID jid) {
 		XMPPSession session = getSession(jid.getBareJID());
@@ -834,7 +834,7 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean hasCompleteJidsInfo() {
@@ -848,7 +848,7 @@ public class SessionManager
 	 * @param domain
 	 * @param includeComponents
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isLocalDomain(String domain, boolean includeComponents) {
@@ -1114,7 +1114,7 @@ public class SessionManager
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	protected boolean addTrusted(JID jid) {
 		return trusted.add(jid.getBareJID().toString());
@@ -1276,7 +1276,7 @@ public class SessionManager
 	 * @param conn_id
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseStringprepException
 	 */
@@ -1327,7 +1327,7 @@ public class SessionManager
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	protected boolean delTrusted(JID jid) {
 		return trusted.remove(jid.getBareJID().toString());
@@ -1339,7 +1339,7 @@ public class SessionManager
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 */
 	protected boolean fastAddOutPacket(Packet packet) {
 		return addOutPacket(packet);
@@ -1355,7 +1355,7 @@ public class SessionManager
 	 * @param resource
 	 * @param xmpp_sessionId
 	 *
-	 * @return
+	 * 
 	 */
 	@SuppressWarnings("deprecation")
 	protected XMPPResourceConnection loginUserSession(JID conn_id, String domain,
@@ -1393,7 +1393,7 @@ public class SessionManager
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 */
 	protected boolean processAdminsOrDomains(Packet packet) {
 		if ((packet.getStanzaFrom() == null) && (packet.getPacketFrom() != null)) {
@@ -1433,7 +1433,7 @@ public class SessionManager
 	 *
 	 * @param pc
 	 *
-	 * @return
+	 * 
 	 */
 	protected boolean processCommand(Packet pc) {
 		if ((pc.getStanzaTo() == null) ||!(getComponentId().equals(pc.getStanzaTo()) ||
@@ -2073,7 +2073,7 @@ public class SessionManager
 	 *
 	 * @param def
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected Integer getMaxQueueSize(int def) {
@@ -2086,7 +2086,7 @@ public class SessionManager
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	protected XMPPSession getSession(BareJID jid) {
 		return sessionsByNodeId.get(jid);
@@ -2098,7 +2098,7 @@ public class SessionManager
 	 *
 	 * @param connId
 	 *
-	 * @return
+	 * 
 	 */
 	protected XMPPResourceConnection getXMPPResourceConnection(JID connId) {
 		return connectionsByFrom.get(connId);
@@ -2110,7 +2110,7 @@ public class SessionManager
 	 *
 	 * @param p
 	 *
-	 * @return
+	 * 
 	 */
 	protected XMPPResourceConnection getXMPPResourceConnection(Packet p) {
 		XMPPResourceConnection conn = null;
@@ -2149,7 +2149,7 @@ public class SessionManager
 	 *
 	 * @param p
 	 *
-	 * @return
+	 * 
 	 */
 	protected boolean isBrokenPacket(Packet p) {
 
@@ -2213,7 +2213,7 @@ public class SessionManager
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	protected boolean isTrusted(JID jid) {
 		if (trusted.contains(jid.getBareJID().toString())) {
@@ -2229,7 +2229,7 @@ public class SessionManager
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	protected boolean isTrusted(String jid) {
 		if (trusted.contains(jid)) {
@@ -2484,7 +2484,7 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public int concurrentQueuesNo() {
@@ -2495,7 +2495,7 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String id() {
@@ -2569,7 +2569,7 @@ public class SessionManager
 		 *
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public WorkerThread getNewInstance() {
@@ -2587,7 +2587,7 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public int concurrentQueuesNo() {
@@ -2598,7 +2598,7 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String id() {
@@ -2639,7 +2639,7 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public int concurrentQueuesNo() {
@@ -2650,7 +2650,7 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String id() {
@@ -2811,7 +2811,7 @@ public class SessionManager
 		 *
 		 * @param connectionId
 		 *
-		 * @return
+		 * 
 		 */
 		public boolean queueForClose(JID connectionId) {
 			boolean result;
@@ -2856,7 +2856,7 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public int getMaxQueueSize() {
 			return maxQueueSize;
@@ -2866,7 +2866,7 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public long getTimeout() {
 			return timeout;

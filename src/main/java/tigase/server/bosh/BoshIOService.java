@@ -157,7 +157,7 @@ public class BoshIOService
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long getRid() {
 		return this.rid;
@@ -167,7 +167,7 @@ public class BoshIOService
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public UUID getSid() {
 		return this.sid;
@@ -191,7 +191,7 @@ public class BoshIOService
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public BoshTask getWaitTimer() {
 		return waitTimer;
@@ -285,7 +285,7 @@ public class BoshIOService
 	 *
 	 * @param data
 	 *
-	 * @return
+	 * 
 	 */
 	public StringBuilder prepareHeaders(String data) {
 		StringBuilder sb = new StringBuilder(200);
@@ -339,7 +339,7 @@ public class BoshIOService
 	 *
 	 * @param data
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws IOException
 	 */

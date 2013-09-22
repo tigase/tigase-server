@@ -142,7 +142,7 @@ public class BasicComponent
 	 *
 	 * @param jid
 	 * @param commandId
-	 * @return
+	 * 
 	 */
 	public boolean canCallCommand(JID jid, String commandId) {
 		boolean result = isAdmin(jid);
@@ -173,7 +173,7 @@ public class BasicComponent
 	 * @param jid
 	 * @param acl
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean checkCommandAcl(JID jid, EnumSet<CmdAcl> acl) {
 		for (CmdAcl cmdAcl : acl) {
@@ -218,7 +218,7 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean handlesLocalDomains() {
@@ -229,7 +229,7 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean handlesNameSubdomains() {
@@ -240,7 +240,7 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean handlesNonLocalDomains() {
@@ -409,7 +409,7 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public JID getComponentId() {
@@ -422,7 +422,7 @@ public class BasicComponent
 	 *
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -456,7 +456,7 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public BareJID getDefHostName() {
 		return defHostname;
@@ -466,7 +466,7 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public BareJID getDefVHostItem() {
 		return (vHostManager != null)
@@ -478,7 +478,7 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getDiscoCategory() {
 		return "component";
@@ -488,7 +488,7 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getDiscoCategoryType() {
 		return "generic";
@@ -498,7 +498,7 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getDiscoDescription() {
 		return "Undefined description";
@@ -507,7 +507,7 @@ public class BasicComponent
 	/**
 	 * Exists for backward compatibility with the old API.
 	 *
-	 * @return
+	 * 
 	 */
 	@Deprecated
 	public List<Element> getDiscoFeatures() {
@@ -520,7 +520,7 @@ public class BasicComponent
 	 *
 	 * @param from
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
@@ -533,7 +533,7 @@ public class BasicComponent
 	 * @param node
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	@Deprecated
 	public Element getDiscoInfo(String node, JID jid) {
@@ -548,7 +548,7 @@ public class BasicComponent
 	 * @param jid
 	 * @param from
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
@@ -577,7 +577,7 @@ public class BasicComponent
 	 * @param node
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	@Deprecated
 	public List<Element> getDiscoItems(String node, JID jid) {
@@ -592,7 +592,7 @@ public class BasicComponent
 	 * @param jid
 	 * @param from
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<Element> getDiscoItems(String node, JID jid, JID from) {
@@ -691,7 +691,7 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getName() {
@@ -706,7 +706,7 @@ public class BasicComponent
 	 * @param jid
 	 * @param from
 	 *
-	 * @return
+	 * 
 	 */
 	public List<Element> getScriptItems(String node, JID jid, JID from) {
 		LinkedList<Element> result      = null;
@@ -733,7 +733,7 @@ public class BasicComponent
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	public VHostItem getVHostItem(String domain) {
 		return (vHostManager != null)
@@ -747,7 +747,7 @@ public class BasicComponent
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isAdmin(JID jid) {
 		return admins.contains(jid.getBareJID());
@@ -757,7 +757,7 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isInitializationComplete() {
@@ -770,7 +770,7 @@ public class BasicComponent
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isLocalDomain(String domain) {
 		return (vHostManager != null)
@@ -784,7 +784,7 @@ public class BasicComponent
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isLocalDomainOrComponent(String domain) {
 		return (vHostManager != null)
@@ -795,7 +795,7 @@ public class BasicComponent
 	/**
 	 * Method returns true is component should be represented as subdomain
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isSubdomain() {
 		return false;
@@ -917,7 +917,7 @@ public class BasicComponent
 	 * @param pc
 	 * @param results
 	 *
-	 * @return
+	 * 
 	 */
 	protected boolean processScriptCommand(Packet pc, Queue<Packet> results) {
 
@@ -995,7 +995,7 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	protected Map<String, CommandIfc> getScriptCommands() {
 		return scriptCommands;
@@ -1005,7 +1005,7 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	protected ServiceEntity getServiceEntity() {
 		return serviceEntity;
@@ -1015,7 +1015,7 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	protected boolean isNonAdminCommands() {
 		return nonAdminCommands;

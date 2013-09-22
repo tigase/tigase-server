@@ -51,7 +51,7 @@ public abstract class DBUtils {
 	 * @param primaryKey
 	 * @param secondaryKey
 	 *
-	 * @return
+	 * 
 	 */
 	public static String[] decodeDBParams(final Map<String, Object> params,
 			final String primaryKey, final String secondaryKey) {

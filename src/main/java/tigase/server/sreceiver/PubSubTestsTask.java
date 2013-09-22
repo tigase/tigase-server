@@ -112,7 +112,7 @@ public class PubSubTestsTask
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getHelp() {
 			return helpText;
@@ -125,7 +125,7 @@ public class PubSubTestsTask
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, PropertyItem> getDefaultParams() {
@@ -154,7 +154,7 @@ public class PubSubTestsTask
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getHelp() {
@@ -165,7 +165,7 @@ public class PubSubTestsTask
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getType() {
@@ -180,7 +180,7 @@ public class PubSubTestsTask
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	protected boolean addOutPacket(Packet packet) {

@@ -149,7 +149,7 @@ public class CIDConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean getOutgoingInProgress() {
 		return outgoingOpenInProgress.get();
@@ -273,7 +273,7 @@ public class CIDConnections {
 	 *
 	 * @param key_sessionId
 	 *
-	 * @return
+	 * 
 	 */
 	public String getDBKey(String key_sessionId) {
 		return dbKeys.get(key_sessionId);
@@ -283,7 +283,7 @@ public class CIDConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int getDBKeysCount() {
 		return dbKeys.size();
@@ -293,7 +293,7 @@ public class CIDConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int getIncomingCount() {
 		int result = 0;
@@ -311,7 +311,7 @@ public class CIDConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int getIncomingTLSCount() {
 		int result = 0;
@@ -332,7 +332,7 @@ public class CIDConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int getMaxOutConns() {
 		return this.max_out_conns;
@@ -342,7 +342,7 @@ public class CIDConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int getMaxOutConnsPerIP() {
 		return this.max_out_conns_per_ip;
@@ -352,7 +352,7 @@ public class CIDConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int getOutgoingCount() {
 		int result = 0;
@@ -370,7 +370,7 @@ public class CIDConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int getOutgoingHandshakingCount() {
 		int result = 0;
@@ -388,7 +388,7 @@ public class CIDConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int getOutgoingTLSCount() {
 		int result = 0;
@@ -411,7 +411,7 @@ public class CIDConnections {
 	 *
 	 * @param sessionId
 	 *
-	 * @return
+	 * 
 	 */
 	public S2SConnection getS2SConnectionForSessionId(String sessionId) {
 		S2SConnection s2s_conn = null;
@@ -452,7 +452,7 @@ public class CIDConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int getWaitingControlCount() {
 		int result = 0;
@@ -474,7 +474,7 @@ public class CIDConnections {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int getWaitingCount() {
 		return waitingPackets.size();
@@ -533,7 +533,7 @@ public class CIDConnections {
 	 *
 	 * @param sessionId
 	 * @param packet
-	 * @return
+	 * 
 	 */
 	public boolean sendControlPacket(String sessionId, Packet packet) {
 

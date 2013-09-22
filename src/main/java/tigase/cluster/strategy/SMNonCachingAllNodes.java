@@ -77,7 +77,7 @@ public abstract class SMNonCachingAllNodes
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean containsJid(BareJID jid) {
@@ -118,7 +118,7 @@ public abstract class SMNonCachingAllNodes
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<JID> getAllNodes() {
@@ -131,7 +131,7 @@ public abstract class SMNonCachingAllNodes
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public JID[] getConnectionIdsForJid(BareJID jid) {
@@ -152,7 +152,7 @@ public abstract class SMNonCachingAllNodes
 	 *
 	 * @param bareJID
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Set<ConnectionRecord> getConnectionRecords(BareJID bareJID) {
@@ -169,7 +169,7 @@ public abstract class SMNonCachingAllNodes
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	@Deprecated
@@ -183,7 +183,7 @@ public abstract class SMNonCachingAllNodes
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	public List<JID> getNodesForJid(JID jid) {
 		return getAllNodes();
@@ -197,7 +197,7 @@ public abstract class SMNonCachingAllNodes
 	 * @param visitedNodes
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 */
 	public List<JID> getNodesForPacketForward(JID fromNode, Set<JID> visitedNodes,
 			Packet packet) {
@@ -264,7 +264,7 @@ public abstract class SMNonCachingAllNodes
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	public List<JID> getNodesForUserConnect(JID jid) {
 		return getAllNodes();
@@ -283,7 +283,7 @@ public abstract class SMNonCachingAllNodes
 	 *
 	 * @param jid
 	 *
-	 * @return
+	 * 
 	 */
 	public List<JID> getNodesForUserDisconnect(JID jid) {
 		return getAllNodes();
@@ -304,7 +304,7 @@ public abstract class SMNonCachingAllNodes
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean hasCompleteJidsInfo() {
@@ -340,7 +340,7 @@ public abstract class SMNonCachingAllNodes
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 */
 	protected boolean isSuitableForForward(Packet packet) {
 
@@ -388,7 +388,7 @@ public abstract class SMNonCachingAllNodes
 	/**
 	 * @param fromNode
 	 * @param visitedNodes
-	 * @return
+	 * 
 	 */
 	private List<JID> selectNodes(JID fromNode, Set<JID> visitedNodes) {
 		List<JID> result = null;

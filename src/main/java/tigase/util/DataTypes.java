@@ -76,7 +76,7 @@ public class DataTypes {
 	 * @param def
 	 * @param <T>
 	 *
-	 * @return
+	 * 
 	 */
 	public static <T extends Number> T parseNum(String num, Class<T> cls, T def) {
 		if (num == null) {
@@ -125,7 +125,7 @@ public class DataTypes {
 	 * @param size
 	 * @param def
 	 *
-	 * @return
+	 * 
 	 */
 	public static int parseSizeInt(String size, int def) {
 		return parseNum(size, Integer.class, def);
@@ -137,7 +137,7 @@ public class DataTypes {
 	 *
 	 * @param val
 	 *
-	 * @return
+	 * 
 	 */
 	public static boolean parseBool(final String val) {
 		return (val != null) &&
@@ -152,7 +152,7 @@ public class DataTypes {
 	 * @param typeId
 	 * @param value
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws IllegalArgumentException
 	 */
@@ -299,7 +299,7 @@ public class DataTypes {
 	 *
 	 * @param value
 	 *
-	 * @return
+	 * 
 	 */
 	public static String valueToString(Object value) {
 		char t = getTypeId(value);
@@ -354,7 +354,7 @@ public class DataTypes {
 	 *
 	 * @param name
 	 *
-	 * @return
+	 * 
 	 */
 	public static char decodeTypeIdFromName(String name) {
 		char result = 'S';
@@ -372,7 +372,7 @@ public class DataTypes {
 	 *
 	 * @param name
 	 *
-	 * @return
+	 * 
 	 */
 	public static String stripNameFromTypeId(String name) {
 		if (name.endsWith("]")) {
@@ -389,7 +389,7 @@ public class DataTypes {
 	 * @param name
 	 * @param value
 	 *
-	 * @return
+	 * 
 	 */
 	public static String encodeTypeIdInName(String name, Object value) {
 		char t = DataTypes.getTypeId(value);
@@ -405,7 +405,7 @@ public class DataTypes {
 	 *
 	 * @param instance
 	 *
-	 * @return
+	 * 
 	 */
 	public static char getTypeId(Object instance) {
 		Character result;
@@ -429,7 +429,7 @@ public class DataTypes {
 	 * @param key
 	 * @param def
 	 *
-	 * @return
+	 * 
 	 */
 	public static boolean getProperty(String key, Boolean def) {
 		String val = System.getProperty(key, (def != null)

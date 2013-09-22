@@ -89,7 +89,7 @@ public class S2SConnection implements Comparable<S2SConnection> {
 	 *
 	 * @param o
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int compareTo(S2SConnection o) {
@@ -102,7 +102,7 @@ public class S2SConnection implements Comparable<S2SConnection> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getIPAddress() {
 		return ipAddress;
@@ -112,7 +112,7 @@ public class S2SConnection implements Comparable<S2SConnection> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public S2SIOService getS2SIOService() {
 		return service;
@@ -122,7 +122,7 @@ public class S2SConnection implements Comparable<S2SConnection> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int getWaitingControlCount() {
 		return waitingControlPackets.size();
@@ -132,7 +132,7 @@ public class S2SConnection implements Comparable<S2SConnection> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isConnected() {
 		return (service != null) && service.isConnected();
@@ -162,7 +162,7 @@ public class S2SConnection implements Comparable<S2SConnection> {
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws IOException
 	 */
@@ -188,7 +188,7 @@ public class S2SConnection implements Comparable<S2SConnection> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String toString() {

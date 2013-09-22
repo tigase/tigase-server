@@ -595,7 +595,7 @@ public class ConfiguratorOld
 	 *
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws ConfigurationException
 	 */
@@ -628,7 +628,7 @@ public class ConfiguratorOld
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String[] getComponents() {
 		return repository.getCompNames();
@@ -638,7 +638,7 @@ public class ConfiguratorOld
 	 * Returns defualt configuration settings in case if there is no
 	 * config file.
 	 * @param params
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -654,7 +654,7 @@ public class ConfiguratorOld
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getDefConfigParams() {
@@ -667,7 +667,7 @@ public class ConfiguratorOld
 	 *
 	 * @param from
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
@@ -682,7 +682,7 @@ public class ConfiguratorOld
 	 * @param jid
 	 * @param from
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
@@ -701,7 +701,7 @@ public class ConfiguratorOld
 	 * @param jid
 	 * @param from
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<Element> getDiscoItems(String node, JID jid, JID from) {
@@ -727,7 +727,7 @@ public class ConfiguratorOld
 	 *
 	 * @param objName
 	 *
-	 * @return
+	 * 
 	 */
 	public static Object getMXBean(String objName) {
 		if (monitoring != null) {
@@ -791,7 +791,7 @@ public class ConfiguratorOld
 	 * @param result_pack
 	 * @param admin
 	 *
-	 * @return
+	 * 
 	 */
 	public Object setPropertyValue(String key, String val, Packet result_pack,
 			boolean admin) {
@@ -825,7 +825,7 @@ public class ConfiguratorOld
 	 * @param feedback
 	 * @param orig
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws Exception
 	 */

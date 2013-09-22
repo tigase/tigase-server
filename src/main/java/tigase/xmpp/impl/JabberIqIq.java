@@ -106,7 +106,7 @@ public class JabberIqIq
 	 *
 	 * @param iq_level
 	 *
-	 * @return
+	 * 
 	 */
 	public static String calculateIQ(String iq_level) {
 		double value = 100;
@@ -153,7 +153,7 @@ public class JabberIqIq
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String id() {
@@ -170,7 +170,7 @@ public class JabberIqIq
 	 * @param results
 	 *
 	 * @param settings
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
@@ -300,7 +300,7 @@ public class JabberIqIq
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
@@ -311,7 +311,7 @@ public class JabberIqIq
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -322,7 +322,7 @@ public class JabberIqIq
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {

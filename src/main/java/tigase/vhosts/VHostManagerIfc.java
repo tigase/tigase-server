@@ -66,7 +66,7 @@ public interface VHostManagerIfc {
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	boolean isLocalDomainOrComponent(String domain);
 
@@ -150,7 +150,7 @@ public interface VHostManagerIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	List<JID> getAllVHosts();
 }

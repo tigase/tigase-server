@@ -89,7 +89,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 */
@@ -104,7 +104,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] getCompNames() {
@@ -119,7 +119,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 	 * @param node
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public ConfigItem getItem(String compName, String node, String key) {
@@ -132,7 +132,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 	 *
 	 * @param compName
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Set<ConfigItem> getItemsForComponent(String compName) {
@@ -146,7 +146,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 	 * @param compName
 	 * @param node
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] getKeys(String compName, String node) {
@@ -215,7 +215,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int size() {

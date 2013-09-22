@@ -42,7 +42,7 @@ public class CompDBRepository extends UserRepoRepository<CompRepoItem> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getConfigKey() {
@@ -53,7 +53,7 @@ public class CompDBRepository extends UserRepoRepository<CompRepoItem> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] getDefaultPropetyItems() {
@@ -64,7 +64,7 @@ public class CompDBRepository extends UserRepoRepository<CompRepoItem> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public CompRepoItem getItemInstance() {
@@ -75,7 +75,7 @@ public class CompDBRepository extends UserRepoRepository<CompRepoItem> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getPropertyKey() {
@@ -86,7 +86,7 @@ public class CompDBRepository extends UserRepoRepository<CompRepoItem> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public BareJID getRepoUser() {

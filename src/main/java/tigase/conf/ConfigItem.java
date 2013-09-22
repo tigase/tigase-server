@@ -149,7 +149,7 @@ public class ConfigItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getClusterNode() {
 		return clusterNode;
@@ -159,7 +159,7 @@ public class ConfigItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getCompName() {
 		return compName;
@@ -171,7 +171,7 @@ public class ConfigItem
 	 * nodeName + "/" + keyName
 	 * </code>
 	 *
-	 * @return
+	 * 
 	 */
 	public String getConfigKey() {
 		return ((nodeName != null)
@@ -182,7 +182,7 @@ public class ConfigItem
 	/**
 	 * Returns a configuration property value.
 	 *
-	 * @return
+	 * 
 	 */
 	public Object getConfigVal() {
 		return value;
@@ -192,7 +192,7 @@ public class ConfigItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getConfigValToString() {
 		return (value == null)
@@ -204,7 +204,7 @@ public class ConfigItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getElemName() {
@@ -215,7 +215,7 @@ public class ConfigItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public FLAGS getFlag() {
 		return flag;
@@ -226,7 +226,7 @@ public class ConfigItem
 	 * compName + "/" + nodeName + "/" + keyName
 	 * </code>
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getKey() {
@@ -242,7 +242,7 @@ public class ConfigItem
 	 * keyName
 	 * </code>
 	 *
-	 * @return
+	 * 
 	 */
 	public String getKeyName() {
 		return keyName;
@@ -252,7 +252,7 @@ public class ConfigItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getNodeName() {
 		return nodeName;
@@ -355,7 +355,7 @@ public class ConfigItem
 	 * @param node
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isCompNodeKey(String comp, String node, String key) {
 		return isComponent(comp) && isNode(node) && isKey(key);
@@ -369,7 +369,7 @@ public class ConfigItem
 	 *
 	 * @param o
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean equals(Object o) {
@@ -384,7 +384,7 @@ public class ConfigItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int hashCode() {
@@ -397,7 +397,7 @@ public class ConfigItem
 	 * Checks if the given component name is equal to this item compName.
 	 *
 	 * @param comp
-	 * @return
+	 * 
 	 */
 	public boolean isComponent(String comp) {
 		if (compName != comp) {
@@ -413,7 +413,7 @@ public class ConfigItem
 	 * Checks if the given key is equal to this item keyName.
 	 *
 	 * @param key
-	 * @return
+	 * 
 	 */
 	public boolean isKey(String key) {
 		if (keyName != key) {
@@ -429,7 +429,7 @@ public class ConfigItem
 	 * Checks if the given node is equal to this item nodeName
 	 *
 	 * @param node
-	 * @return
+	 * 
 	 */
 	public boolean isNode(String node) {
 		if (nodeName != node) {
@@ -451,7 +451,7 @@ public class ConfigItem
 	 *
 	 * @param node
 	 * @param key
-	 * @return
+	 * 
 	 */
 	public boolean isNodeKey(String node, String key) {
 		return isNode(node) && isKey(key);
@@ -607,7 +607,7 @@ public class ConfigItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element toElement() {
@@ -632,7 +632,7 @@ public class ConfigItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String toPropertyString() {
@@ -649,7 +649,7 @@ public class ConfigItem
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String toString() {

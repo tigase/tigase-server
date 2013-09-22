@@ -244,7 +244,7 @@ public abstract class IOService<RefObject>
 	 * <code>run</code> is used to perform
 	 *
 	 *
-	 * @return
+	 * 
 	 * @throws IOException
 	 */
 	@Override
@@ -278,7 +278,7 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public ConnectionType connectionType() {
 		return this.connectionType;
@@ -476,7 +476,7 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String toString() {
@@ -487,7 +487,7 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean waitingToRead() {
 		return true;
@@ -497,7 +497,7 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean waitingToSend() {
 		return socketIO.waitingToSend();
@@ -507,7 +507,7 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int waitingToSendSize() {
 		return socketIO.waitingToSendSize();
@@ -521,7 +521,7 @@ public abstract class IOService<RefObject>
 	 *
 	 * @param reset
 	 *
-	 * @return
+	 * 
 	 */
 	public long getBuffOverflow(boolean reset) {
 		return socketIO.getBuffOverflow(reset);
@@ -533,7 +533,7 @@ public abstract class IOService<RefObject>
 	 *
 	 * @param reset
 	 *
-	 * @return
+	 * 
 	 */
 	public long getBytesReceived(boolean reset) {
 		return socketIO.getBytesReceived(reset);
@@ -545,7 +545,7 @@ public abstract class IOService<RefObject>
 	 *
 	 * @param reset
 	 *
-	 * @return
+	 * 
 	 */
 	public long getBytesSent(boolean reset) {
 		return socketIO.getBytesSent(reset);
@@ -562,7 +562,7 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public JID getDataReceiver() {
 		return this.dataReceiver;
@@ -572,7 +572,7 @@ public abstract class IOService<RefObject>
 	 * This method returns the time of last transfer in any direction
 	 * through this service. It is used to help detect dead connections.
 	 *
-	 * @return
+	 * 
 	 */
 	public long getLastTransferTime() {
 		return lastTransferTime;
@@ -582,7 +582,7 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getLocalAddress() {
 		return local_address;
@@ -592,7 +592,7 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public List<String> getPeersJIDsFromCert() {
 		return peersJIDsFromCert;
@@ -602,7 +602,7 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long[] getReadCounters() {
 		return rdData;
@@ -612,7 +612,7 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public RefObject getRefObject() {
 		return refObject;
@@ -632,7 +632,7 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public ConcurrentMap<String, Object> getSessionData() {
 		return sessionData;
@@ -666,7 +666,7 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long getTotalBuffOverflow() {
 		return socketIO.getTotalBuffOverflow();
@@ -676,7 +676,7 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long getTotalBytesReceived() {
 		return socketIO.getTotalBytesReceived();
@@ -686,7 +686,7 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long getTotalBytesSent() {
 		return socketIO.getTotalBytesSent();
@@ -696,7 +696,7 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getUniqueId() {
 		return id;
@@ -706,7 +706,7 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long[] getWriteCounters() {
 		return wrData;
@@ -716,7 +716,7 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public TrustManager[] getX509TrustManagers() {
 		return x509TrustManagers;
@@ -830,7 +830,7 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	protected ByteOrder byteOrder() {
 		return ByteOrder.BIG_ENDIAN;
@@ -892,7 +892,7 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws IOException
 	 */
@@ -1146,7 +1146,7 @@ public abstract class IOService<RefObject>
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	protected abstract int receivedPackets();
 
@@ -1298,7 +1298,7 @@ public abstract class IOService<RefObject>
 	/**
 	 * Method description
 	 *
-	 * @return
+	 * 
 	 */
 	protected boolean isInputBufferEmpty() {
 		return (socketInput != null) && (socketInput.remaining() == socketInput.capacity());

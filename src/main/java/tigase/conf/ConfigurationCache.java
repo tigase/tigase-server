@@ -184,7 +184,7 @@ public class ConfigurationCache
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 */
@@ -205,7 +205,7 @@ public class ConfigurationCache
 	 *
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean contains(String key) {
@@ -223,7 +223,7 @@ public class ConfigurationCache
 	 * @param key
 	 * @param def
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Object get(String compName, String node, String key, Object def) {
@@ -240,7 +240,7 @@ public class ConfigurationCache
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] getCompNames() {
@@ -251,7 +251,7 @@ public class ConfigurationCache
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getDefHostname() {
 		return this.hostname;
@@ -273,7 +273,7 @@ public class ConfigurationCache
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getInitProperties() {
@@ -288,7 +288,7 @@ public class ConfigurationCache
 	 * @param node
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 */
 	public ConfigItem getItem(String compName, String node, String key) {
 		Set<ConfigItem> confItems = getItemsForComponent(compName);
@@ -310,7 +310,7 @@ public class ConfigurationCache
 	 *
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public ConfigItem getItem(String key) {
@@ -337,7 +337,7 @@ public class ConfigurationCache
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public ConfigItem getItemInstance() {
@@ -350,7 +350,7 @@ public class ConfigurationCache
 	 *
 	 * @param compName
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Set<ConfigItem> getItemsForComponent(String compName) {
@@ -364,7 +364,7 @@ public class ConfigurationCache
 	 * @param compName
 	 * @param node
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] getKeys(String compName, String node) {
@@ -389,7 +389,7 @@ public class ConfigurationCache
 	 *
 	 * @param compName
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws ConfigurationException
 	 */
@@ -435,7 +435,7 @@ public class ConfigurationCache
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Iterator<ConfigItem> iterator() {
@@ -586,7 +586,7 @@ public class ConfigurationCache
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int size() {
@@ -644,7 +644,7 @@ public class ConfigurationCache
 	 *
 	 * @param item
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String validateItem(ConfigItem item) {

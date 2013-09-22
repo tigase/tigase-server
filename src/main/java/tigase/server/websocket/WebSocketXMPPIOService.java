@@ -98,7 +98,7 @@ public class WebSocketXMPPIOService<RefObject>
 	 * Custom implementation of readData function which decodes WebSocket
 	 * protocol frames
 	 *
-	 * @return
+	 * 
 	 * @throws IOException
 	 */
 	@Override
@@ -344,7 +344,7 @@ public class WebSocketXMPPIOService<RefObject>
 	 * Decode data encoded in WebSocket frames from buffer
 	 *
 	 * @param buf
-	 * @return
+	 * 
 	 */
 	private ByteBuffer decodeFrame(ByteBuffer buf) {
 		if (!buf.hasRemaining()) {
@@ -455,7 +455,7 @@ public class WebSocketXMPPIOService<RefObject>
 	 *
 	 * @param type
 	 * @param size
-	 * @return
+	 * 
 	 */
 	private ByteBuffer createFrameHeader(byte type, int size) {
 		ByteBuffer bbuf = ByteBuffer.allocate(9);
@@ -479,7 +479,7 @@ public class WebSocketXMPPIOService<RefObject>
 	 * Decode data from buffer to chars array
 	 *
 	 * @param tmpBuffer
-	 * @return
+	 * 
 	 * @throws MalformedInputException
 	 */
 	private char[] decode(ByteBuffer tmpBuffer) throws MalformedInputException {
@@ -532,7 +532,7 @@ public class WebSocketXMPPIOService<RefObject>
 	 * Encode string into buffer
 	 *
 	 * @param data
-	 * @return
+	 * 
 	 * @throws CharacterCodingException
 	 */
 	private ByteBuffer encode(String data) throws CharacterCodingException {

@@ -229,7 +229,7 @@ public abstract class SessionManagerConfig {
          * Returns list of active plugins with implementation available
          * 
          * @param props
-         * @return 
+         * 
          */
         public static String[] getActivePlugins(Map<String, Object> props) {
                 String[] allPlugins = (String[]) props.get(PLUGINS_PROP_KEY);
@@ -262,7 +262,7 @@ public abstract class SessionManagerConfig {
          * Get processor instance
          * 
          * @param plug_id
-         * @return 
+         * 
          */
         public static XMPPProcessorIfc getProcessor(String plug_id) {
                 XMPPImplIfc proc = getXMPPImplIfc(plug_id);
@@ -282,7 +282,7 @@ public abstract class SessionManagerConfig {
          * Get preprocessor instance
          * 
          * @param plug_id
-         * @return 
+         * 
          */
         public static XMPPPreprocessorIfc getPreprocessor(String plug_id) {
                 XMPPImplIfc proc = getXMPPImplIfc(plug_id);
@@ -302,7 +302,7 @@ public abstract class SessionManagerConfig {
          * Get postprocessor instance
          * 
          * @param plug_id
-         * @return 
+         * 
          */
         public static XMPPPostprocessorIfc getPostprocessor(String plug_id) {
                 XMPPImplIfc proc = getXMPPImplIfc(plug_id);
@@ -322,7 +322,7 @@ public abstract class SessionManagerConfig {
          * Get packetfilter instance
          * 
          * @param plug_id
-         * @return 
+         * 
          */
         public static XMPPPacketFilterIfc getPacketFilter(String plug_id) {
                 XMPPImplIfc proc = getXMPPImplIfc(plug_id);
@@ -342,7 +342,7 @@ public abstract class SessionManagerConfig {
          * Get stoplistener instance
          * 
          * @param plug_id
-         * @return 
+         * 
          */
         public static XMPPStopListenerIfc getStopListener(String plug_id) {
                 XMPPImplIfc proc = getXMPPImplIfc(plug_id);

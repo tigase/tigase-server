@@ -198,7 +198,7 @@ public class VirtualComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean handlesLocalDomains() {
@@ -209,7 +209,7 @@ public class VirtualComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean handlesNameSubdomains() {
@@ -220,7 +220,7 @@ public class VirtualComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean handlesNonLocalDomains() {
@@ -264,7 +264,7 @@ public class VirtualComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public JID getComponentId() {
@@ -277,7 +277,7 @@ public class VirtualComponent
 	 *
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -311,7 +311,7 @@ public class VirtualComponent
 	 *
 	 * @param from
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
@@ -326,7 +326,7 @@ public class VirtualComponent
 	 * @param jid
 	 * @param from
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
@@ -341,7 +341,7 @@ public class VirtualComponent
 	 * @param jid
 	 * @param from
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<Element> getDiscoItems(String node, JID jid, JID from) {
@@ -360,7 +360,7 @@ public class VirtualComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getName() {
@@ -371,7 +371,7 @@ public class VirtualComponent
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isInitializationComplete() {

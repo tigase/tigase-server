@@ -103,7 +103,7 @@ public class DataRepositoryImpl implements DataRepository {
 	 * 
 	 * @param tableName
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws SQLException
 	 */
@@ -179,7 +179,7 @@ public class DataRepositoryImpl implements DataRepository {
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws SQLException
 	 */
@@ -199,7 +199,7 @@ public class DataRepositoryImpl implements DataRepository {
 	 * 
 	 * @param stIdKey
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws SQLException
 	 */
@@ -219,7 +219,7 @@ public class DataRepositoryImpl implements DataRepository {
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getResourceUri() {
@@ -228,7 +228,7 @@ public class DataRepositoryImpl implements DataRepository {
 
 	/**
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public dbTypes getDatabaseType() {

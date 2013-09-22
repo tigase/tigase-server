@@ -107,7 +107,7 @@ public abstract class LastActivity
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String id() {
@@ -335,7 +335,7 @@ public abstract class LastActivity
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element[] supDiscoFeatures(XMPPResourceConnection session) {
@@ -346,7 +346,7 @@ public abstract class LastActivity
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -357,7 +357,7 @@ public abstract class LastActivity
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {

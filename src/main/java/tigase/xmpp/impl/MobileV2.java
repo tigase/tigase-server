@@ -81,7 +81,7 @@ public class MobileV2
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String id() {
@@ -171,7 +171,7 @@ public class MobileV2
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -182,7 +182,7 @@ public class MobileV2
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -195,7 +195,7 @@ public class MobileV2
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element[] supStreamFeatures(XMPPResourceConnection session) {
@@ -304,7 +304,7 @@ public class MobileV2
 	 * @param res
 	 * @param queue
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean filter(XMPPResourceConnection session, Packet res, Map<JID,
 			Packet> queue) {
@@ -340,7 +340,7 @@ public class MobileV2
 	 * Check if queuing is enabled
 	 *
 	 * @param session
-	 * @return
+	 * 
 	 */
 	protected boolean isQueueEnabled(XMPPResourceConnection session) {
 		Boolean enabled = (Boolean) session.getSessionData(XMLNS);

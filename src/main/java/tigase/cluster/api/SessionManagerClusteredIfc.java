@@ -59,7 +59,7 @@ public interface SessionManagerClusteredIfc
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 */
 	boolean fastAddOutPacket(Packet packet);
 
@@ -80,7 +80,7 @@ public interface SessionManagerClusteredIfc
 	 *
 	 * @param el_packet
 	 *
-	 * @return
+	 * 
 	 */
 	XMPPResourceConnection getXMPPResourceConnection(Packet el_packet);
 
@@ -88,7 +88,7 @@ public interface SessionManagerClusteredIfc
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	ConcurrentHashMap<JID, XMPPResourceConnection> getXMPPResourceConnections();
 
@@ -96,7 +96,7 @@ public interface SessionManagerClusteredIfc
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	ConcurrentHashMap<BareJID, XMPPSession> getXMPPSessions();
 }

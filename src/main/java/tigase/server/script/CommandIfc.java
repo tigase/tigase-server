@@ -127,7 +127,7 @@ public interface CommandIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public Bindings getBindings();
 

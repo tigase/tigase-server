@@ -353,7 +353,7 @@ public class XMLRepository implements AuthRepository, UserRepository {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getResourceUri() {
@@ -417,7 +417,7 @@ public class XMLRepository implements AuthRepository, UserRepository {
 	 *
 	 * @param user
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 */
@@ -430,7 +430,7 @@ public class XMLRepository implements AuthRepository, UserRepository {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public synchronized List<BareJID> getUsers() {
@@ -450,7 +450,7 @@ public class XMLRepository implements AuthRepository, UserRepository {
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public synchronized long getUsersCount(String domain) {
@@ -470,7 +470,7 @@ public class XMLRepository implements AuthRepository, UserRepository {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public synchronized long getUsersCount() {
@@ -794,7 +794,7 @@ public class XMLRepository implements AuthRepository, UserRepository {
 	 *
 	 * @param user
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public synchronized boolean userExists(BareJID user) {
