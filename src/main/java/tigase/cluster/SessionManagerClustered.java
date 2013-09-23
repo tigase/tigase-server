@@ -31,6 +31,8 @@ import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.cluster.api.SessionManagerClusteredIfc;
 import tigase.cluster.strategy.ClusteringStrategyIfc;
 
+import tigase.server.ComponentInfo;
+
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
@@ -101,6 +103,7 @@ public class SessionManagerClustered
 	private JID                   my_hostname       = null;
 	private int                   nodesNo           = 0;
 	private ClusteringStrategyIfc strategy          = null;
+	private ComponentInfo         cmpInfo               = null;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -439,6 +442,18 @@ public class SessionManagerClustered
 	 */
 	public ClusteringStrategyIfc getStrategy() {
 		return strategy;
+	}
+
+	/**
+	 * Allows to obtain various informations about components
+	 *
+	 * @return information about particular component
+	 */
+	@Override
+	public ComponentInfo getComponentInfo() {
+		cmpInfo = super.getComponentInfo();
+		cmpInfo.getComponentData().put( "ClusteringStrategy", strategy != null ? strategy.getClass() : null );
+		return cmpInfo;
 	}
 
 	/**

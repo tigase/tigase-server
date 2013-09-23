@@ -106,6 +106,7 @@ public class BasicComponent
 	private JID               compId                = null;
 	private String            DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefaultHostname();
 	private String            name                  = null;
+	private ComponentInfo     cmpInfo               = null;
 	private BareJID           defHostname = BareJID.bareJIDInstanceNS(
 			DEF_HOSTNAME_PROP_VAL);
 
@@ -414,6 +415,19 @@ public class BasicComponent
 	@Override
 	public JID getComponentId() {
 		return compId;
+	}
+
+	/**
+	 * Allows to obtain various informations about components
+	 *
+	 * @return information about particular component
+	 */
+	@Override
+	public ComponentInfo getComponentInfo() {
+		if ( cmpInfo == null ){
+			cmpInfo = new ComponentInfo( getName(), this.getClass() );
+		}
+		return cmpInfo;
 	}
 
 	/**
@@ -895,6 +909,9 @@ public class BasicComponent
 			scriptsCompDir = scriptsBaseDir + "/" + getName();
 			loadScripts();
 		}
+
+		cmpInfo = new ComponentInfo( getName(), this.getClass() );
+
 	}
 
 	/**

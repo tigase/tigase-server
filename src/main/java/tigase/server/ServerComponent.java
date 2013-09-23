@@ -80,6 +80,13 @@ public interface ServerComponent {
 	JID getComponentId();
 
 	/**
+	 * Allows to obtain various informations about components
+	 *
+	 * @return information about particular component
+	 */
+	ComponentInfo getComponentInfo();
+
+	/**
 	 * Method description
 	 *
 	 *

@@ -803,6 +803,8 @@ public class MessageRouter
 						addComponent(mr);
 					}
 
+					System.out.println( "Loading component: " + mr.getComponentInfo() );
+					
 //        if (start) {
 //                ((MessageReceiver) mr).start();
 //        }

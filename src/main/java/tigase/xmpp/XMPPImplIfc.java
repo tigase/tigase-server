@@ -38,6 +38,8 @@ import tigase.xml.Element;
 
 import java.util.Map;
 import java.util.Set;
+import tigase.server.ComponentInfo;
+import tigase.server.ServerComponent;
 
 /**
  * This is a base interface for all session manager plugins. There are packet
@@ -200,6 +202,12 @@ public interface XMPPImplIfc
 
 	//~--- get methods ----------------------------------------------------------
 
+	/**
+	 * Allows to obtain various informations about components
+	 *
+	 * @return information about particular component
+	 */
+	ComponentInfo getComponentInfo();
 	/**
 	 * The method allows to retrieve plugin own statistics if it generates any.
 	 * @param list is a statistics collection to which plugins own metrics can be added.

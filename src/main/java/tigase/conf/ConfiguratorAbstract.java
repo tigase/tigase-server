@@ -39,8 +39,8 @@ import tigase.db.UserRepositoryMDImpl;
 import tigase.io.TLSUtil;
 
 import tigase.server.AbstractComponentRegistrator;
+import tigase.server.ComponentInfo;
 import tigase.server.ServerComponent;
-import tigase.server.XMPPServer;
 
 import tigase.util.ClassUtil;
 import tigase.util.DataTypes;
@@ -1075,8 +1075,8 @@ public abstract class ConfiguratorAbstract
 		// System.out.println("Setting logging: \n" + buff.toString());
 		loadLogManagerConfig(buff.toString());
 		log.config("DONE");
-		log.config(XMPPServer.getImplementationVersion(XMLUtils.class));
-		log.config(XMPPServer.getImplementationVersion(ClassUtil.class));
+		log.config((new ComponentInfo( XMLUtils.class )).toString());
+		log.config((new ComponentInfo( ClassUtil.class )).toString());
 	}
 
 	//~--- get methods ----------------------------------------------------------

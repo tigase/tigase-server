@@ -225,6 +225,7 @@ public class SessionManager
 					throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		XMPPImplIfc      result = null;
 		XMPPProcessorIfc proc   = null;
+		String version;
 
 		if (plug_id.equals(sessionOpenProcId)) {
 			sessionOpenProc = new SessionOpenProc();
@@ -251,7 +252,6 @@ public class SessionManager
 					? proc.concurrentQueuesNo()
 					: 0));
 
-			System.out.println("Loading plugin: " + plug_id + "=" + concurrency + " ...");
 
 			// If there is not default processors thread pool or the processor does
 			// have thread pool specific settings create a separate thread pool
@@ -273,6 +273,8 @@ public class SessionManager
 					proc.id() });
 			loaded = true;
 			result = proc;
+			version = result.getComponentInfo().getComponentVersion();
+			System.out.println("Loading plugin: " + plug_id + "=" + concurrency + " ... " + (version.isEmpty() ? "" : "\t, version: " + version) );
 		}
 
 		XMPPPreprocessorIfc preproc = SessionManagerConfig.getPreprocessor(plug_id);

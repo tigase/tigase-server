@@ -32,6 +32,8 @@ import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
 
+import tigase.server.ComponentInfo;
+
 import tigase.server.DisableDisco;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
@@ -191,6 +193,7 @@ public class VirtualComponent
 	private String            name          = null;
 	private JID               redirectTo    = null;
 	private ServiceEntity     serviceEntity = null;
+	private ComponentInfo     cmpInfo				= null;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -269,6 +272,19 @@ public class VirtualComponent
 	@Override
 	public JID getComponentId() {
 		return componentId;
+	}
+
+	/**
+	 * Allows to obtain various informations about components
+	 *
+	 * @return information about particular component
+	 */
+	@Override
+	public ComponentInfo getComponentInfo() {
+		if ( cmpInfo == null ){
+			cmpInfo = new ComponentInfo( getName(), this.getClass() );
+		}
+		return cmpInfo;
 	}
 
 	/**
@@ -447,6 +463,7 @@ public class VirtualComponent
 				serviceEntity.addFeatures(feature);
 			}
 		}
+		cmpInfo = new ComponentInfo( getName(), this.getClass() );
 	}
 
 	/**

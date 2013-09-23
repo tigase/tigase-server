@@ -41,6 +41,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Set;
+import tigase.server.ComponentInfo;
+import tigase.server.ServerComponent;
+import tigase.server.ComponentInfo;
+import tigase.server.XMPPServer;
 
 /**
  * <code>XMPPProcessor</code> abstract class contains basic definition for
@@ -77,6 +81,11 @@ public abstract class XMPPProcessor
 	protected static final String[][] ALL_PATHS = {
 		{ "*" }
 	};
+	protected static ComponentInfo cmpInfo = null;
+
+	{
+		cmpInfo = new ComponentInfo( id(), this.getClass() );
+	}
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -271,6 +280,24 @@ public abstract class XMPPProcessor
 	 */
 	@Override
 	public void getStatistics(StatisticsList list) {}
+
+	/**
+	 * Allows to obtain various informations about components
+	 *
+	 * @return information about particular component
+	 */
+	@Override
+	public ComponentInfo getComponentInfo() {
+		if ( cmpInfo == null ){
+			cmpInfo = new ComponentInfo( id(), this.getClass() );
+		}
+		return cmpInfo;
+	}
+
+	@Override
+	public String toString() {
+		return id() + getComponentInfo();
+	}
 
 	/**
 	 * Method description

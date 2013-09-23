@@ -84,19 +84,10 @@ public final class XMPPServer {
 	 * 
 	 */
 	public static String getImplementationVersion() {
-		String version = XMPPServer.class.getPackage().getImplementationVersion();
-
-		return (version == null) ? "0.0.0-0" : version;
+		String version = ComponentInfo.getImplementationVersion( XMPPServer.class );
+		return (version.isEmpty() ? "0.0.0-0" : version);
 	}
 
-	public static String getImplementationVersion(Class<?> c) {
-		Package p = c.getPackage();
-
-		String title = p == null ? null : p.getImplementationTitle();
-		String version = p == null ? null : p.getImplementationVersion();
-
-		return (title == null ? "unrecognized" : title) + " ver. " + (version == null ? "unknown" : version);
-	}
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -124,9 +115,10 @@ public final class XMPPServer {
 
 		parseParams(args);
 
-		System.out.println(getImplementationVersion(XMLUtils.class));
-		System.out.println(getImplementationVersion(ClassUtil.class));
-                start(args);
+		System.out.println( ( new ComponentInfo( XMLUtils.class ) ).toString() );
+		System.out.println( ( new ComponentInfo( ClassUtil.class ) ).toString() );
+		System.out.println( ( new ComponentInfo( XMPPServer.class ) ).toString() );
+		start( args );
 	}
 
         public static void start(String[] args) {
