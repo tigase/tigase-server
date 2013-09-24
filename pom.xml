@@ -61,6 +61,7 @@
 				<configuration>
 					<instructions combine.inherited="append">
 						<manifestLocation>src/main/resources/META-INF/MANIFEST.MF</manifestLocation>
+						<Implementation-Title>${project.name}</Implementation-Title>
 						<Implementation-Version>${project.version}-b${gitVersion}/${buildNumber} (${maven.build.timestamp})</Implementation-Version>
 						<Implementation-Build>${gitVersion}/${buildNumber} (${maven.build.timestamp})</Implementation-Build>
 						<Tigase-Version>${project.version}-b${gitVersion}</Tigase-Version>
