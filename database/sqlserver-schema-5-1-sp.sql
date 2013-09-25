@@ -292,12 +292,12 @@ begin
 		end
 	if @_encoding = N'MD5-USERID-PASSWORD' 
 		begin
-			set @_hashed_pass = HASHBYTES('MD5', CONCAT(@_user_id, @_user_pw));
+			set @_hashed_pass = HASHBYTES('MD5', @_user_id + @_user_pw);
 			exec TigAddUser @_user_id, @_hashed_pass
 		end
 	if @_encoding = N'MD5-USERNAME-PASSWORD'
 		begin
-			set @_hashed_pass = HASHBYTES('MD5', CONCAT((LEFT (@_user_id, CHARINDEX(N'@',@_user_id)-1)), @_user_pw));
+			set @_hashed_pass = HASHBYTES('MD5', (LEFT (@_user_id, CHARINDEX(N'@',@_user_id)-1)) + @_user_pw);
 			exec TigAddUser @_user_id, @_hashed_pass;
 		end
 	else
@@ -375,12 +375,12 @@ begin
 		end
 	if @_encoding = N'MD5-USERID-PASSWORD' 
 		begin
-			set @_hashed_pass = HASHBYTES('MD5', CONCAT(@_user_id, @_user_pw));
+			set @_hashed_pass = HASHBYTES('MD5', @_user_id + @_user_pw);
 			exec TigUpdatePassword @_user_id, @_hashed_pass
 		end
 	if @_encoding = N'MD5-USERNAME-PASSWORD'
 		begin
-			set @_hashed_pass = HASHBYTES('MD5', CONCAT((LEFT (@_user_id, CHARINDEX(N'@',@_user_id)-1)), @_user_pw));
+			set @_hashed_pass = HASHBYTES('MD5', (LEFT (@_user_id, CHARINDEX(N'@',@_user_id)-1)) + @_user_pw);
 			exec TigUpdatePassword @_user_id, @_hashed_pass;
 		end
 	else
@@ -492,12 +492,12 @@ begin
 		end
 	if @_encoding = N'MD5-USERID-PASSWORD' 
 		begin
-			set @_hashed_pass = HASHBYTES('MD5', CONCAT(@_user_id, @_user_pw));
+			set @_hashed_pass = HASHBYTES('MD5', @_user_id + @_user_pw);
 			exec TigUserLogin @_user_id, @_hashed_pass
 		end
 	if @_encoding = N'MD5-USERNAME-PASSWORD'
 		begin
-			set @_hashed_pass = HASHBYTES('MD5', CONCAT((LEFT (@_user_id, CHARINDEX(N'@',@_user_id)-1)), @_user_pw));
+			set @_hashed_pass = HASHBYTES('MD5', (LEFT (@_user_id, CHARINDEX(N'@',@_user_id)-1)) + @_user_pw);
 			exec TigUserLogin @_user_id, @_hashed_pass;
 		end
 	else
