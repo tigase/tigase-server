@@ -19,7 +19,6 @@
  * Last modified by $Author$
  * $Date$
  */
-
 package tigase.conf;
 
 import java.util.logging.Level;
@@ -33,8 +32,8 @@ import java.util.logging.Logger;
  */
 public class Configurator extends ConfiguratorAbstract {
 
-        private static final Logger log = Logger.getLogger(Configurator.class.getCanonicalName());
-        
+	private static final Logger log = Logger.getLogger(Configurator.class.getCanonicalName());
+
 	@Override
 	public String getDiscoDescription() {
 		return "Configuration management";
@@ -45,23 +44,20 @@ public class Configurator extends ConfiguratorAbstract {
 		return "generic";
 	}
 
-        @Override
-        public void componentAdded(Configurable component) {
-                try {
-                        super.componentAdded(component);
-                }
-                catch (NullPointerException ex) {
-                        log.log(Level.WARNING, "ignoring NPE", ex);
-                }
-        }
-        
-        public void updateMessageRouter() {
-                try {
-                        setup(getComponent("message-router"));
-                }
-                catch (Exception e) {
-                        log.log(Level.WARNING, "Problem instantiating component:", e);
-                }	 // end of try-catch		
-        }
-        
-}       
+	@Override
+	public void componentAdded(Configurable component) {
+		try {
+			super.componentAdded(component);
+		} catch (NullPointerException ex) {
+			log.log(Level.WARNING, "ignoring NPE", ex);
+		}
+	}
+
+	public void updateMessageRouter() {
+		try {
+			setup(getComponent("message-router"));
+		} catch (Exception e) {
+			log.log(Level.WARNING, "Problem instantiating component:", e);
+		}	 // end of try-catch		
+	}
+}

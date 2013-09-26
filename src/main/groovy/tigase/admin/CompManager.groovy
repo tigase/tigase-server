@@ -1,6 +1,6 @@
 /*
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -55,13 +55,27 @@ try {
 		def prop = conf.getProperties(comp_name);
 		try {
 			def comp = ModulesManagerImpl.getInstance().getServerComponent(comp_class);
+			if (!comp) {
+				def INTERNAL_COMPONENTS = [];
+				INTERNAL_COMPONENTS.addAll(MessageRouterConfig.COMPONENT_CLASSES.values());
+				INTERNAL_COMPONENTS.addAll(MessageRouterConfig.COMP_CLUS_MAP.values());
+				
+				if (!XMPPServer.isOSGi() || INTERNAL_COMPONENTS.contains(comp_class)) {
+					comp = XMPPServer.class.getClassLoader().loadClass(comp_class).newInstance()
+				}
+			}
 			if (comp) {
-				def defProp = comp.getDefaults(conf.getDefConfigParams());
+				comp.setName(comp_name)
+				def defProp = comp.getDefaults(conf.getDefConfigParams() ?: [:])  ?: [:];
 				defProp.putAll(prop);
 				return defProp;
 			}
+			else {
+				return [:];
+			}
 		}
 		catch(Exception ex) {
+			ex.printStackTrace();
 			return [:];
 		}
 	};
@@ -73,7 +87,11 @@ try {
 		keys.sort { it }.each { key ->
 			def val = prop[key];
 			if (val.getClass().isArray()) {
-				val = val.join(',');
+				def tmp = [];
+				for (def x : val) {
+					tmp.add(String.valueOf(x));
+				}
+				val = tmp.join(',');
 			}
 			if (!(val instanceof String)) {
 				val = val.toString();
@@ -91,11 +109,16 @@ try {
                 
 			def tmpVal = defVal;
 			if (tmpVal.getClass().isArray()) {
-				tmpVal = tmpVal.join(',');
+				def tmp = [];
+				for (def x : tmpVal) {
+					tmp.add(String.valueOf(x));
+				}
+				tmpVal = tmp.join(',');
 			}
 
 			if (val && !val.equals(tmpVal)) {
 				def cls = defVal.getClass();
+				if (val == "null") val = null;
 				if (cls == Long[].class) {
 					def out = [];
 					val.split(',').each { out.add(Long.parseLong(it))};
@@ -116,6 +139,9 @@ try {
 				}
 				else if (cls == Integer.class) {
 					val = Integer.parseInt(val);
+				}
+				else if (cls == Boolean.class) {
+					val = Boolean.parseBoolean(val);
 				}
 				else {
 					println "unknown convertion for key = " + key + " , " + cls.getName()
@@ -174,7 +200,9 @@ try {
 
 		compNames.each {
 			def mr = conf.getComponent( it );
-			Command.addFieldMultiValue(res, it, Arrays.asList( mr.getComponentInfo().toString() ))
+			if (mr) {
+				Command.addFieldMultiValue(res, it, Arrays.asList( mr.getComponentInfo().toString() ))
+			}
 		}
 		Command.addHiddenField(res, ACTION, action);
 		return res
@@ -228,6 +256,10 @@ try {
 					suffix = it.key.substring(Configurable.GEN_COMP_NAME.length());
 				}
 				comp_class = conf.getDefConfigParams().get(Configurable.GEN_COMP_CLASS + suffix);
+
+				if (!comp_class) comp_class = MessageRouterConfig.COMPONENT_CLASSES.get(comp_name);
+				if (!comp_class) comp_class = MessageRouterConfig.COMP_CLUS_MAP.get(comp_name);
+				if (!comp_class) throw new Exception("Could not find component class for component: " + comp_name);
 			}
                         
 			def res = (Iq)p.commandResult(Command.DataType.form)

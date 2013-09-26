@@ -131,8 +131,10 @@ public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean deleteComponent(ServerComponent component) {
-		components.remove(component.getName());
-		componentRemoved((E) component);
+		if (isCorrectType(component)) {
+			components.remove(component.getName());
+			componentRemoved((E) component);
+		}
 
 		return true;
 	}
