@@ -192,7 +192,7 @@ GO
 create procedure dbo.TigInitdb
 AS
 begin
-  update tig_users set online_status = 0;
+  update dbo.tig_users set online_status = 0;
 end
 -- QUERY END:
 GO
@@ -203,7 +203,7 @@ create function TigGetDBProperty(@_tkey nvarchar(255)) returns nvarchar(MAX)
 AS
 begin
 --Declare @_result nvarchar(MAX);
-return (select pval  from tig_pairs AS p, tig_users AS u
+return (select pval  from dbo.tig_pairs AS p, dbo.tig_users AS u
 		where (pkey = @_tkey) AND (sha1_user_id = HASHBYTES('SHA1', LOWER(N'db-properties')))
 					AND (p.uid = u.uid));
 
@@ -222,23 +222,23 @@ create procedure dbo.TigPutDBProperty
 		Declare @_nid int;
 		Declare @_uid int;
 		Declare @_count int;
-		if exists (select 1 from tig_pairs, tig_users
+		if exists (select 1 from dbo.tig_pairs, dbo.tig_users
 					where (sha1_user_id = HASHBYTES('SHA1', LOWER(N'db-properties')))
-						AND (tig_users.uid = tig_pairs.uid)  AND (pkey = @_tkey))
+						AND (dbo.tig_users.uid = dbo.tig_pairs.uid)  AND (pkey = @_tkey))
 			begin
-				select @_nid = tig_pairs.nid, @_uid = tig_pairs.uid from tig_pairs, tig_users
+				select @_nid = dbo.tig_pairs.nid, @_uid = dbo.tig_pairs.uid from dbo.tig_pairs, dbo.tig_users
 					where (sha1_user_id = HASHBYTES('SHA1', LOWER(N'db-properties')))
-						AND (tig_users.uid = tig_pairs.uid)  AND (pkey = @_tkey);
-				update tig_pairs set pval = @_tval
+						AND (dbo.tig_users.uid = dbo.tig_pairs.uid)  AND (pkey = @_tkey);
+				update dbo.tig_pairs set pval = @_tval
 					where (@_uid = uid) AND (pkey = @_tkey) ;
 			end
 		else
 			begin
-				select @_nid = tig_pairs.nid, @_uid = tig_pairs.uid from tig_pairs, tig_users
+				select @_nid = dbo.tig_pairs.nid, @_uid = dbo.tig_pairs.uid from dbo.tig_pairs, dbo.tig_users
 					where (sha1_user_id = HASHBYTES('SHA1', LOWER(N'db-properties')))
-						AND (tig_users.uid = tig_pairs.uid)  AND (pkey = @_tkey);
-				insert into tig_pairs (pkey, pval, uid)
-					select @_tkey, @_tval, uid from tig_users
+						AND (dbo.tig_users.uid = dbo.tig_pairs.uid)  AND (pkey = @_tkey);
+				insert into dbo.tig_pairs (pkey, pval, uid)
+					select @_tkey, @_tval, uid from dbo.tig_users
 						where (sha1_user_id = HASHBYTES('SHA1', LOWER(N'db-properties')));
 			end
 	end
@@ -257,17 +257,17 @@ AS
 	begin
 		declare @res_uid bigint;
 
-		insert into tig_users (user_id, sha1_user_id, user_pw)
+		insert into dbo.tig_users (user_id, sha1_user_id, user_pw)
 			values (@_user_id, HASHBYTES('SHA1', LOWER(@_user_id)) , @_user_pw);
 
 		set  @res_uid = (select SCOPE_IDENTITY());
 
 		if (@res_uid is not NULL)
-			insert into tig_nodes (parent_nid, uid, node)
+			insert into dbo.tig_nodes (parent_nid, uid, node)
 				values (NULL, @res_uid, N'root');
 
 		if (@_user_pw is NULL) 
-			update tig_users set account_status = -1 where uid = @res_uid;
+			update dbo.tig_users set account_status = -1 where uid = @res_uid;
 
 		select @res_uid as uid;
 	end;
@@ -313,7 +313,7 @@ create procedure dbo.TigGetUserDBUid
 	@_user_id nvarchar(2049)
 AS	
 begin
-	select uid from tig_users where sha1_user_id = hashbytes('SHA1', lower(@_user_id));
+	select uid from dbo.tig_users where sha1_user_id = hashbytes('SHA1', lower(@_user_id));
 end
 -- QUERY END:
 GO
@@ -326,11 +326,11 @@ AS
 begin
 	declare @res_uid bigint;
 
-	set @res_uid = (select uid from tig_users where sha1_user_id = hashbytes('SHA1', lower(@_user_id)));
+	set @res_uid = (select uid from dbo.tig_users where sha1_user_id = hashbytes('SHA1', lower(@_user_id)));
 
-	delete from tig_pairs where uid = @res_uid;
-	delete from tig_nodes where uid = @res_uid;
-	delete from tig_users where uid = @res_uid;
+	delete from dbo.tig_pairs where uid = @res_uid;
+	delete from dbo.tig_nodes where uid = @res_uid;
+	delete from dbo.tig_users where uid = @res_uid;
 end
 -- QUERY END:
 GO
@@ -341,7 +341,7 @@ create procedure dbo.TigGetPassword
 	@_user_id nvarchar(2049)
 AS
 begin
-	select user_pw from tig_users where sha1_user_id = hashbytes('SHA1', lower(@_user_id));
+	select user_pw from dbo.tig_users where sha1_user_id = hashbytes('SHA1', lower(@_user_id));
 end
 -- QUERY END:
 GO
@@ -353,7 +353,7 @@ create procedure dbo.TigUpdatePassword
 	@_user_pw nvarchar(255)
 AS
 begin
-	update tig_users set user_pw = @_user_pw where sha1_user_id = hashbytes('SHA1', lower(@_user_id));
+	update dbo.tig_users set user_pw = @_user_pw where sha1_user_id = hashbytes('SHA1', lower(@_user_id));
 end
 -- QUERY END:
 GO
@@ -409,7 +409,7 @@ create procedure dbo.TigOnlineUsers
 AS
 begin
 	select user_id, last_login, last_logout, online_status, failed_logins, account_status
-		from tig_users where online_status > 0;
+		from dbo.tig_users where online_status > 0;
 end
 -- QUERY END:
 GO
@@ -420,7 +420,7 @@ create procedure dbo.TigOfflineUsers
 AS
 begin
 	select user_id, last_login, last_logout, online_status, failed_logins, account_status
-		from tig_users where online_status = 0;
+		from dbo.tig_users where online_status = 0;
 end
 -- QUERY END:
 GO
@@ -431,7 +431,7 @@ create procedure dbo.TigAllUsers
 AS
 begin
 	select user_id, last_login, last_logout, online_status, failed_logins, account_status
-		from tig_users;
+		from dbo.tig_users;
 end
 -- QUERY END:
 GO
@@ -441,7 +441,7 @@ GO
 create procedure dbo.TigAllUsersCount
 AS
 begin
-	select count(*) from tig_users;
+	select count(*) from dbo.tig_users;
 end
 -- QUERY END:
 GO
@@ -456,18 +456,18 @@ create procedure dbo.TigUserLogin
 	@_user_pw nvarchar(255)
 AS
 begin
-	if exists(select 1 from tig_users
+	if exists(select 1 from dbo.tig_users
 		where (account_status > 0) AND (sha1_user_id = hashbytes('SHA1', lower(@_user_id)))
 			AND (user_pw = @_user_pw) AND (user_id = @_user_id))
 		begin
-		update tig_users
+		update dbo.tig_users
 			set online_status = online_status + 1, last_login = CURRENT_TIMESTAMP
 				where sha1_user_id = hashbytes('SHA1', lower(@_user_id));
 			select @_user_id as user_id;
 		end
 	else
 		begin
-			update tig_users set failed_logins = failed_logins + 1 where sha1_user_id = hashbytes('SHA1', lower(@_user_id));
+			update dbo.tig_users set failed_logins = failed_logins + 1 where sha1_user_id = hashbytes('SHA1', lower(@_user_id));
 			select NULL as user_id;
 		end
 	end
@@ -525,7 +525,7 @@ create procedure dbo.TigUserLogout
 	@_user_id nvarchar(2049)
 AS
 begin
-	update tig_users
+	update dbo.tig_users
 		set online_status = dbo.InlineMax(online_status - 1, 0),
 			last_logout = CURRENT_TIMESTAMP
 		where user_id = @_user_id;
@@ -539,7 +539,7 @@ create procedure dbo.TigDisableAccount
 	@_user_id nvarchar(2049)
 AS
 begin
-	update tig_users set account_status = 0 where sha1_user_id = hashbytes('SHA1', lower(@_user_id));
+	update dbo.tig_users set account_status = 0 where sha1_user_id = hashbytes('SHA1', lower(@_user_id));
 end
 -- QUERY END:
 GO
@@ -550,7 +550,7 @@ create procedure dbo.TigEnableAccount
 	@_user_id nvarchar(2049)
 AS
 begin
-	update tig_users set account_status = 1 where sha1_user_id = hashbytes('SHA1', lower(@_user_id));
+	update dbo.tig_users set account_status = 1 where sha1_user_id = hashbytes('SHA1', lower(@_user_id));
 end
 -- QUERY END:
 GO
@@ -561,7 +561,7 @@ create procedure dbo.TigActiveAccounts
 AS
 begin
 	select user_id, last_login, last_logout, online_status, failed_logins, account_status
-		from tig_users where account_status > 0;
+		from dbo.tig_users where account_status > 0;
 end
 -- QUERY END:
 GO
@@ -572,7 +572,7 @@ create procedure dbo.TigDisabledAccounts
 AS
 begin
 	select user_id, last_login, last_logout, online_status, failed_logins, account_status
-		from tig_users where account_status = 0;
+		from dbo.tig_users where account_status = 0;
 end
 -- QUERY END:
 GO
@@ -585,7 +585,7 @@ create procedure dbo.TigAddNode
 @_node nvarchar(255)
 AS
 begin
-	insert into tig_nodes (parent_nid, uid, node)
+	insert into dbo.tig_nodes (parent_nid, uid, node)
 		values (@_parent_nid, @_uid, @_node);
 	select SCOPE_IDENTITY() as nid;
 end
@@ -601,10 +601,10 @@ create procedure dbo.TigUpdatePairs
 @_tval ntext
 AS
 begin
-  if exists(SELECT 1 FROM tig_pairs WHERE nid = @_nid AND uid = @_uid AND pkey = @_tkey)
-    UPDATE tig_pairs SET pval = @_tval WHERE nid = @_nid AND uid = @_uid AND pkey = @_tkey;
+  if exists(SELECT 1 FROM dbo.tig_pairs WHERE nid = @_nid AND uid = @_uid AND pkey = @_tkey)
+    UPDATE dbo.tig_pairs SET pval = @_tval WHERE nid = @_nid AND uid = @_uid AND pkey = @_tkey;
   ELSE
-    INSERT INTO tig_pairs (nid, uid, pkey, pval) VALUES (@_nid, @_uid, @_tkey, @_tval);
+    INSERT INTO dbo.tig_pairs (nid, uid, pkey, pval) VALUES (@_nid, @_uid, @_tkey, @_tval);
 END
 -- QUERY END:
 GO
