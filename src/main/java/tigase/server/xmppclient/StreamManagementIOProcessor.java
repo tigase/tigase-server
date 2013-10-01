@@ -35,6 +35,7 @@ import tigase.net.SocketThread;
 import tigase.server.Command;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
+import tigase.server.Presence;
 import tigase.util.TimerTask;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
@@ -71,6 +72,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 	private static final String PREVID_ATTR = "previd";
 		
 	// various strings used as key to store data in maps
+	private static final String INGORE_UNDELIVERED_PRESENCE_KEY = "ignore-undelivered-presence";
 	private static final String IN_COUNTER_KEY = XMLNS + "_in";
 	private static final String MAX_RESUMPTION_TIMEOUT_KEY = XMLNS + "_resumption-timeout";
 	private static final String OUT_COUNTER_KEY = XMLNS + "_out";
@@ -83,6 +85,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 	
 	private final ConcurrentHashMap<String,XMPPIOService> services = new ConcurrentHashMap<String,XMPPIOService>();
 	
+	private boolean ignoreUndeliveredPresence = true;
 	private int resumption_timeout = 60;
 	private int default_ack_request_count = 10;
 	
@@ -378,6 +381,9 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		if (props.containsKey(RESUMPTION_TIMEOUT_PROP_KEY)) {
 			this.resumption_timeout = (Integer) props.get(RESUMPTION_TIMEOUT_PROP_KEY);
 		}
+		if (props.containsKey(INGORE_UNDELIVERED_PRESENCE_KEY)) {
+			this.ignoreUndeliveredPresence = (Boolean) props.get(INGORE_UNDELIVERED_PRESENCE_KEY);
+		}
 	}
 	
 	/**
@@ -466,6 +472,15 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 			
 			while ((packet = outQueue.queue.poll()) != null) {
 				try {
+					// we should not send errors for presences as Presence module does not
+					// allow to send presence with type error from users and presences
+					// with type error resulting from presences sent to barejid are
+					// messing up a lot on client side. moreover presences with type
+					// unavailable will be send by Presence plugin from SessionManager
+					// when session will be closed just after sending this errors
+					if (packet.getElemName() == Presence.ELEM_NAME && ignoreUndeliveredPresence)
+						continue;
+					
 					connectionManager.processOutPacket(Authorization.RECIPIENT_UNAVAILABLE
 							.getResponseMessage(packet, null, true));
 				} catch (PacketErrorTypeException ex) {
