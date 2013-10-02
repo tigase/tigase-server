@@ -345,7 +345,10 @@ public class BoshIOService
 	 */
 	@Override
 	public boolean checkData(char[] data) throws IOException {
-		if (firstPassCORS && (data != null) && (data.length > 7)) {
+		// we need to check this every time as Webkit based browser are reusing
+		// existing connections and repeat this CORS request every 10 minutes
+		//if (firstPassCORS && 
+		if ((data != null) && (data.length > 7)) {
 			if ((data[0] == 'O') && (data[1] == 'P') && (data[2] == 'T') && (data[3] == 'I') &&
 					(data[4] == 'O') && (data[5] == 'N') && (data[6] == 'S')) {
 
@@ -354,11 +357,11 @@ public class BoshIOService
 
 				// connection needs to be closed as in other case data headers are not sent to browser
 				// until connection is closed and for OPTIONS request we are not sending any data
-				firstPassCORS = false;
+				//firstPassCORS = false;
 
-				return true;
+				return false;
 			}
-			firstPassCORS = false;
+			//firstPassCORS = false;
 		}
 		if (firstPassClientAccessPolicy && (data != null) && (data.length >=
 				HTTP_CLIENT_ACCESS_POLICY_REQUEST_HEADER.length)) {
