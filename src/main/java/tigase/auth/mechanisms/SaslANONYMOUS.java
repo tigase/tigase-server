@@ -34,9 +34,6 @@ public class SaslANONYMOUS extends AbstractSasl {
 
 	@Override
 	public byte[] evaluateResponse(byte[] response) throws SaslException {
-		if (response != null && response.length > 0)
-			throw new SaslException("Invalid request. Message is not supported.");
-
 		NameCallback nc = new NameCallback("ANONYMOUS identity", UUID.randomUUID().toString());
 		handleCallbacks(nc);
 
