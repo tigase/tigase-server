@@ -40,20 +40,6 @@ public class SaslANONYMOUSTest extends TestCase {
 	}
 
 	@Test
-	public void testMalformedRequest() {
-		try {
-			sasl.evaluateResponse("a".getBytes());
-			fail("Exception must be throwed");
-		} catch (XmppSaslException e) {
-			assertEquals("malformed-request", e.getSaslErrorElementName());
-		} catch (SaslException e) {
-		}
-
-		assertFalse(sasl.isComplete());
-		assertNull("Authorization ID must be null", sasl.getAuthorizationID());
-	}
-
-	@Test
 	public void testSuccess() {
 
 		try {
