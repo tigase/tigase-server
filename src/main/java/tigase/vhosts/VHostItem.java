@@ -101,6 +101,9 @@ public class VHostItem
 	/** Field description */
 	public static final String ANONYMOUS_ENABLED_LABEL = "Anonymous enabled";
 
+	/** Field description */
+	public static final String COMPONENTS_ATT = "comps";
+
 	/**
 	 * Element name for the VHostItem XML child keeping list of the server
 	 * component which can handle packets for this domain. In most cases this
@@ -519,14 +522,22 @@ public class VHostItem
 
 				s2sSecret = s2[1];
 			}
+			if (tmp.startsWith(COMPONENTS_ATT)) {
+				String[] c         = tmp.split("=");
+				String   comps_str = c[1];
+
+				if (!comps_str.isEmpty()) {
+					comps = comps_str.split(";");
+				}
+			}
 			if (tmp.startsWith(DOMAIN_FILTER_POLICY_ATT)) {
 				String[] df = tmp.split("=");
 
 				try {
 					domainFilter = DomainFilterPolicy.valueof(df[1]);
-					if ( domainFilter == null ){
-						domainFilter = DomainFilterPolicy.valueof( System.getProperty(
-								DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString() ) );
+					if (domainFilter == null) {
+						domainFilter = DomainFilterPolicy.valueof(System.getProperty(
+								DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString()));
 					}
 				} catch (Exception e) {
 					domainFilter = DOMAIN_FILTER_POLICY_PROP_DEF;
@@ -620,7 +631,9 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String toPropertyString() {
@@ -660,7 +673,9 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String toString() {
@@ -687,13 +702,16 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>DomainFilterPolicy</code>
 	 */
 	public DomainFilterPolicy getDomainFilter() {
-		if ( domainFilter == null ){
-			domainFilter = DomainFilterPolicy.valueof( System.getProperty(
-					DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString() ) );
+		if (domainFilter == null) {
+			domainFilter = DomainFilterPolicy.valueof(System.getProperty(
+					DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString()));
 		}
+
 		return domainFilter;
 	}
 
@@ -701,7 +719,9 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getElemName() {
@@ -712,7 +732,9 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getKey() {
@@ -742,7 +764,9 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>JID</code>
 	 */
 	public JID getMessageForwardAddress() {
 		return presenceForward;
@@ -771,7 +795,9 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>JID</code>
 	 */
 	public JID getPresenceForwardAddress() {
 		return presenceForward;
@@ -781,7 +807,9 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String getS2sSecret() {
 		return s2sSecret;
@@ -791,7 +819,9 @@ public class VHostItem
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>VHostItem</code>
 	 */
 	public VHostItem getUnmodifiableVHostItem() {
 		if (unmodifiableItem == null) {
@@ -1045,7 +1075,9 @@ public class VHostItem
 		 * Method description
 		 *
 		 *
-		 * 
+		 *
+		 *
+		 * @return a value of <code>String</code>
 		 */
 		@Override
 		public String toString() {
@@ -1070,7 +1102,9 @@ public class VHostItem
 		 * Method description
 		 *
 		 *
-		 * 
+		 *
+		 *
+		 * @return a value of <code>DomainFilterPolicy</code>
 		 */
 		@Override
 		public DomainFilterPolicy getDomainFilter() {
@@ -1123,7 +1157,9 @@ public class VHostItem
 		 * Method description
 		 *
 		 *
-		 * 
+		 *
+		 *
+		 * @return a value of <code>String</code>
 		 */
 		@Override
 		public String getS2sSecret() {
@@ -1134,7 +1170,9 @@ public class VHostItem
 		 * Method description
 		 *
 		 *
-		 * 
+		 *
+		 *
+		 * @return a value of <code>VHostItem</code>
 		 */
 		@Override
 		public VHostItem getUnmodifiableVHostItem() {
@@ -1195,7 +1233,9 @@ public class VHostItem
 		 * Method description
 		 *
 		 *
-		 * 
+		 *
+		 *
+		 * @return a value of <code>boolean</code>
 		 */
 		@Override
 		public boolean isTlsRequired() {
@@ -1349,4 +1389,4 @@ public class VHostItem
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/04/05
+//~ Formatted in Tigase Code Convention on 13/10/05

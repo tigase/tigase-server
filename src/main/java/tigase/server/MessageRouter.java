@@ -166,7 +166,9 @@ public class MessageRouter
 	 *
 	 * @param packet
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int hashCodeForPacket(Packet packet) {
@@ -214,7 +216,9 @@ public class MessageRouter
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int processingInThreads() {
@@ -225,7 +229,9 @@ public class MessageRouter
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int processingOutThreads() {
@@ -584,7 +590,9 @@ public class MessageRouter
 	 *
 	 * @param params
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -599,7 +607,9 @@ public class MessageRouter
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -610,7 +620,9 @@ public class MessageRouter
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getDiscoDescription() {
@@ -802,9 +814,8 @@ public class MessageRouter
 					} else {
 						addComponent(mr);
 					}
+					System.out.println("Loading component: " + mr.getComponentInfo());
 
-					System.out.println( "Loading component: " + mr.getComponentInfo() );
-					
 //        if (start) {
 //                ((MessageReceiver) mr).start();
 //        }
@@ -874,7 +885,9 @@ public class MessageRouter
 	 *
 	 * @param def
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>Integer</code>
 	 */
 	@Override
 	protected Integer getMaxQueueSize(int def) {
@@ -1110,10 +1123,4 @@ public class MessageRouter
 }
 
 
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-
-//~ Formatted in Tigase Code Convention on 13/04/11
+//~ Formatted in Tigase Code Convention on 13/10/04

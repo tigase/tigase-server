@@ -68,12 +68,11 @@ public class VHostManager
 
 	/** Field description */
 	public static final String VHOSTS_REPO_CLASS_PROP_VAL =
-		"tigase.vhosts.VHostJDBCRepository";
+			"tigase.vhosts.VHostJDBCRepository";
 
 	/** Field description */
-	public static final String VHOSTS_REPO_CLASS_PROPERTY = "--vhost-repo-class";
-	private static final Logger log                       =
-		Logger.getLogger(VHostManager.class.getName());
+	public static final String  VHOSTS_REPO_CLASS_PROPERTY = "--vhost-repo-class";
+	private static final Logger log = Logger.getLogger(VHostManager.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -81,17 +80,17 @@ public class VHostManager
 	private long getComponentsForNonLocalDomainCalls = 0;
 
 	// private ServiceEntity serviceEntity = null;
-	private String identity_type                              = "generic";
-	private long isAnonymousEnabledCalls                      = 0;
-	private long isLocalDomainCalls                           = 0;
+	private String                       identity_type           = "generic";
+	private long                         isAnonymousEnabledCalls = 0;
+	private long                         isLocalDomainCalls      = 0;
 	private LinkedHashSet<VHostListener> localDomainsHandlers =
-		new LinkedHashSet<VHostListener>(10);
+			new LinkedHashSet<VHostListener>(10);
 	private LinkedHashSet<VHostListener> nonLocalDomainsHandlers =
-		new LinkedHashSet<VHostListener>(10);
+			new LinkedHashSet<VHostListener>(10);
 	private LinkedHashSet<VHostListener> nameSubdomainsHandlers =
-		new LinkedHashSet<VHostListener>(10);
+			new LinkedHashSet<VHostListener>(10);
 	private ConcurrentSkipListSet<String> registeredComponentDomains =
-		new ConcurrentSkipListSet<String>();
+			new ConcurrentSkipListSet<String>();
 	private ComponentRepository<VHostItem> repo = null;
 
 	//~--- constructors ---------------------------------------------------------
@@ -148,152 +147,38 @@ public class VHostManager
 		nameSubdomainsHandlers.remove(component);
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param binds
+	 */
+	@Override
+	public void initBindings(Bindings binds) {
+		super.initBindings(binds);
+		binds.put(ComponentRepository.COMP_REPO_BIND, repo);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param domain
+	 */
+	@Override
+	public void removeComponentDomain(String domain) {
+		registeredComponentDomains.remove(domain);
+	}
+
 	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param domain
-	 *
-	 * 
-	 */
-	@Override
-	public ServerComponent[] getComponentsForLocalDomain(String domain) {
-		++getComponentsForLocalDomainCalls;
-
-		VHostItem vhost = repo.getItem(domain);
-
-		if (vhost == null) {
-
-			// This is not a local domain.
-			// Maybe this is a 'name' subdomain: 'pubsub'.domain.name
-			int idx = domain.indexOf('.');
-
-			if (idx > 0) {
-				String name            = domain.substring(0, idx);
-				String basedomain      = domain.substring(idx + 1);
-				VHostListener listener = components.get(name);
-
-				if ((listener != null) && listener.handlesNameSubdomains() &&
-						isLocalDomain(basedomain)) {
-					return new ServerComponent[] { listener };
-				}
-			}
-
-			return null;
-		} else {
-
-			// Return all components for local domains and components selected
-			// for this specific domain
-			LinkedHashSet<ServerComponent> results = new LinkedHashSet<ServerComponent>(10);
-
-			results.addAll(localDomainsHandlers);
-			if (results.size() > 0) {
-				return results.toArray(new ServerComponent[results.size()]);
-			} else {
-				return null;
-			}
-		}
-	}
-
-	/**
-	 * Method description
 	 *
 	 *
-	 * @param domain
-	 *
-	 * 
-	 */
-	@Override
-	public ServerComponent[] getComponentsForNonLocalDomain(String domain) {
-		++getComponentsForNonLocalDomainCalls;
-
-		// Return components for non-local domains
-		if (nonLocalDomainsHandlers.size() > 0) {
-			return nonLocalDomainsHandlers.toArray(
-					new ServerComponent[nonLocalDomainsHandlers.size()]);
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 * 
-	 */
-	@Override
-	@SuppressWarnings({ "unchecked" })
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> defs = super.getDefaults(params);
-		String repo_class        = (String) params.get(VHOSTS_REPO_CLASS_PROPERTY);
-
-		if (repo_class == null) {
-			repo_class = VHOSTS_REPO_CLASS_PROP_VAL;
-		}
-		defs.put(VHOSTS_REPO_CLASS_PROP_KEY, repo_class);
-		try {
-			ComponentRepository<VHostItem> repo_tmp =
-				(ComponentRepository<VHostItem>) Class.forName(repo_class).newInstance();
-
-			repo_tmp.getDefaults(defs, params);
-		} catch (Exception e) {
-			log.log(Level.SEVERE,
-							"Can not instantiate VHosts repository for class: " + repo_class, e);
-		}
-
-		return defs;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
-	@Override
-	public String getDiscoCategoryType() {
-		return identity_type;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
-	@Override
-	public String getDiscoDescription() {
-		return "VHost Manager";
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 */
-	@Override
-	public void getStatistics(StatisticsList list) {
-		list.add(getName(), "Number of VHosts", repo.size(), Level.FINE);
-		list.add(getName(), "Checks: is local domain", isLocalDomainCalls, Level.FINER);
-		list.add(getName(), "Checks: is anonymous domain", isAnonymousEnabledCalls,
-						 Level.FINER);
-		list.add(getName(), "Get components for local domain",
-						 getComponentsForLocalDomainCalls, Level.FINER);
-		list.add(getName(), "Get components for non-local domain",
-						 getComponentsForNonLocalDomainCalls, Level.FINER);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
+	 * @return a value of <code>List<JID></code>
 	 */
 	@Override
 	public List<JID> getAllVHosts() {
@@ -316,18 +201,134 @@ public class VHostManager
 	 *
 	 * @param domain
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>ServerComponent[]</code>
 	 */
 	@Override
-	public VHostItem getVHostItem(String domain) {
-		return repo.getItem(domain);
+	public ServerComponent[] getComponentsForLocalDomain(String domain) {
+		++getComponentsForLocalDomainCalls;
+
+		VHostItem vhost = repo.getItem(domain);
+
+		if (vhost == null) {
+
+			// This is not a local domain.
+			// Maybe this is a 'name' subdomain: 'pubsub'.domain.name
+			int idx = domain.indexOf('.');
+
+			if (idx > 0) {
+				String        name       = domain.substring(0, idx);
+				String        basedomain = domain.substring(idx + 1);
+				VHostListener listener   = components.get(name);
+
+				if ((listener != null) && listener.handlesNameSubdomains() && isLocalDomain(
+						basedomain)) {
+					return new ServerComponent[] { listener };
+				}
+			}
+
+			return null;
+		} else {
+
+//    // First check whether the domain has special configuration
+//    // specifying what components are for this domain:
+//    String[] comps = vhost.getComps();
+//    if (comps != null && comps.length > 0) {
+//      !!
+//    }
+			// Return all components for local domains and components selected
+			// for this specific domain
+			LinkedHashSet<ServerComponent> results = new LinkedHashSet<ServerComponent>(10);
+
+			// are there any components explicitly bound to this domain?
+			String[] comps = vhost.getComps();
+
+			if ((comps != null) && (comps.length > 0)) {
+				for (String name : comps) {
+					VHostListener listener = components.get(name);
+
+					if (listener != null) {
+						results.add(listener);
+					}
+				}
+			}
+
+			// if not, then add any generic handlers
+			if (results.size() == 0) {
+				results.addAll(localDomainsHandlers);
+			}
+			if (results.size() > 0) {
+				return results.toArray(new ServerComponent[results.size()]);
+			} else {
+				return null;
+			}
+		}
 	}
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * 
+	 * @param domain
+	 *
+	 *
+	 *
+	 * @return a value of <code>ServerComponent[]</code>
+	 */
+	@Override
+	public ServerComponent[] getComponentsForNonLocalDomain(String domain) {
+		++getComponentsForNonLocalDomainCalls;
+
+		// Return components for non-local domains
+		if (nonLocalDomainsHandlers.size() > 0) {
+			return nonLocalDomainsHandlers.toArray(
+					new ServerComponent[nonLocalDomainsHandlers.size()]);
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param params
+	 *
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
+	 */
+	@Override
+	@SuppressWarnings({ "unchecked" })
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		Map<String, Object> defs       = super.getDefaults(params);
+		String              repo_class = (String) params.get(VHOSTS_REPO_CLASS_PROPERTY);
+
+		if (repo_class == null) {
+			repo_class = VHOSTS_REPO_CLASS_PROP_VAL;
+		}
+		defs.put(VHOSTS_REPO_CLASS_PROP_KEY, repo_class);
+		try {
+			ComponentRepository<VHostItem> repo_tmp = (ComponentRepository<VHostItem>) Class
+					.forName(repo_class).newInstance();
+
+			repo_tmp.getDefaults(defs, params);
+		} catch (Exception e) {
+			log.log(Level.SEVERE, "Can not instantiate VHosts repository for class: " +
+					repo_class, e);
+		}
+
+		return defs;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>BareJID</code>
 	 */
 	@Override
 	public BareJID getDefVHostItem() {
@@ -340,21 +341,49 @@ public class VHostManager
 		return getDefHostName();
 	}
 
-	//~--- methods --------------------------------------------------------------
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getDiscoCategoryType() {
+		return identity_type;
+	}
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param binds
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
-	public void initBindings(Bindings binds) {
-		super.initBindings(binds);
-		binds.put(ComponentRepository.COMP_REPO_BIND, repo);
+	public String getDiscoDescription() {
+		return "VHost Manager";
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param list
+	 */
+	@Override
+	public void getStatistics(StatisticsList list) {
+		list.add(getName(), "Number of VHosts", repo.size(), Level.FINE);
+		list.add(getName(), "Checks: is local domain", isLocalDomainCalls, Level.FINER);
+		list.add(getName(), "Checks: is anonymous domain", isAnonymousEnabledCalls, Level
+				.FINER);
+		list.add(getName(), "Get components for local domain",
+				getComponentsForLocalDomainCalls, Level.FINER);
+		list.add(getName(), "Get components for non-local domain",
+				getComponentsForNonLocalDomainCalls, Level.FINER);
+	}
 
 	/**
 	 * Method description
@@ -362,7 +391,24 @@ public class VHostManager
 	 *
 	 * @param domain
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>VHostItem</code>
+	 */
+	@Override
+	public VHostItem getVHostItem(String domain) {
+		return repo.getItem(domain);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param domain
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean isAnonymousEnabled(String domain) {
@@ -383,7 +429,9 @@ public class VHostManager
 	 *
 	 * @param component
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean isCorrectType(ServerComponent component) {
@@ -396,7 +444,9 @@ public class VHostManager
 	 *
 	 * @param domain
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean isLocalDomain(String domain) {
@@ -411,7 +461,9 @@ public class VHostManager
 	 *
 	 * @param domain
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean isLocalDomainOrComponent(String domain) {
@@ -424,29 +476,16 @@ public class VHostManager
 			int idx = domain.indexOf('.');
 
 			if (idx > 0) {
-				String name            = domain.substring(0, idx);
-				String basedomain      = domain.substring(idx + 1);
-				VHostListener listener = components.get(name);
+				String        name       = domain.substring(0, idx);
+				String        basedomain = domain.substring(idx + 1);
+				VHostListener listener   = components.get(name);
 
-				result = ((listener != null) && listener.handlesNameSubdomains() &&
-									isLocalDomain(basedomain));
+				result = ((listener != null) && listener.handlesNameSubdomains() && isLocalDomain(
+						basedomain));
 			}
 		}
 
 		return result;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 */
-	@Override
-	public void removeComponentDomain(String domain) {
-		registeredComponentDomains.remove(domain);
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -477,19 +516,19 @@ public class VHostManager
 
 		if (repo_class != null) {
 			try {
-				ComponentRepository<VHostItem> repo_tmp =
-					(ComponentRepository<VHostItem>) Class.forName(repo_class).newInstance();
+				ComponentRepository<VHostItem> repo_tmp = (ComponentRepository<VHostItem>) Class
+						.forName(repo_class).newInstance();
 
 				repo_tmp.setProperties(properties);
 				repo = repo_tmp;
 				log.warning(repo.toString());
 			} catch (Exception e) {
-				log.log(Level.SEVERE,
-								"Can not create VHost repository instance for class: " + repo_class, e);
+				log.log(Level.SEVERE, "Can not create VHost repository instance for class: " +
+						repo_class, e);
 			}
 		}
 	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/22
+//~ Formatted in Tigase Code Convention on 13/10/05
