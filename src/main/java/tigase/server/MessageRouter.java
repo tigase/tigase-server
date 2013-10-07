@@ -314,14 +314,16 @@ public class MessageRouter
 		}
 
 		// Catch and process all service discovery packets here....
-		ServerComponent comp = (packet.getStanzaTo() == null)
-				? null
-				: getLocalComponent(packet.getStanzaTo());
-
+//  ServerComponent comp = (packet.getStanzaTo() == null)
+//      ? null
+//      : getLocalComponent(packet.getStanzaTo());
 		if (packet.isServiceDisco() && (packet.getType() == StanzaType.get) && (packet
-				.getStanzaFrom() != null) && ((packet.getStanzaTo() == null) || ((comp != null) &&
-				!(comp instanceof DisableDisco)) || isLocalDomain(packet.getStanzaTo()
-				.toString()))) {
+				.getStanzaFrom() != null) && ((packet.getStanzaTo() == null) || (isLocalDomain(
+				packet.getStanzaTo().toString()) &&!isDiscoDisabled(packet.getStanzaTo())))) {
+
+//    .getStanzaFrom() != null) && ((packet.getStanzaTo() == null) || ((comp != null) &&
+//    !(comp instanceof DisableDisco)) || isLocalDomain(packet.getStanzaTo()
+//    .toString()))) {
 			Queue<Packet> results = new ArrayDeque<Packet>();
 
 			processDiscoQuery(packet, results);
@@ -348,7 +350,8 @@ public class MessageRouter
 		// 3. component name + "." + default domain name
 		// 4. component name + "." + any virtual host name
 		// TODO: check the efficiency for packets addressed to c2s component
-		comp = getLocalComponent(packet.getTo());
+		ServerComponent comp = getLocalComponent(packet.getTo());
+
 		if (comp != null) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "1. Packet will be processed by: {0}, {1}", new Object[] {
@@ -582,8 +585,6 @@ public class MessageRouter
 
 	//~--- get methods ----------------------------------------------------------
 
-	// ~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -696,8 +697,6 @@ public class MessageRouter
 	}
 
 	//~--- set methods ----------------------------------------------------------
-
-	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -877,8 +876,6 @@ public class MessageRouter
 
 	//~--- get methods ----------------------------------------------------------
 
-	// ~--- get methods ----------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -896,7 +893,6 @@ public class MessageRouter
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
 	private void installUpdatesChecker(long interval) {
 		stopUpdatesChecker();
 		updates_checker = new UpdatesChecker(interval, this,
@@ -1120,7 +1116,27 @@ public class MessageRouter
 			return null;
 		}
 	}
+
+	private boolean isDiscoDisabled(JID to) {
+		ServerComponent comp = getLocalComponent(to);
+
+		if (comp != null) {
+			return (comp instanceof DisableDisco);
+		} else {
+			ServerComponent[] comps = getComponentsForLocalDomain(to.getDomain());
+
+			if (comps != null) {
+				for (ServerComponent c : comps) {
+					if (c instanceof DisableDisco) {
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/10/04
+//~ Formatted in Tigase Code Convention on 13/10/07
