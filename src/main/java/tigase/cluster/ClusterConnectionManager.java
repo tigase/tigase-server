@@ -207,7 +207,9 @@ public class ClusterConnectionManager
 	 * address rather then destination address.
 	 *
 	 * @param packet
-	 * 
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int hashCodeForPacket(Packet packet) {
@@ -352,7 +354,9 @@ public class ClusterConnectionManager
 
 	/**
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int processingInThreads() {
@@ -370,7 +374,9 @@ public class ClusterConnectionManager
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int processingOutThreads() {
@@ -438,7 +444,9 @@ public class ClusterConnectionManager
 	 *
 	 * @param serv
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>Queue<Packet></code>
 	 */
 	@Override
 	public Queue<Packet> processSocketData(XMPPIOService<Object> serv) {
@@ -541,7 +549,9 @@ public class ClusterConnectionManager
 	 *
 	 * @param service
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean serviceStopped(XMPPIOService<Object> service) {
@@ -565,7 +575,7 @@ public class ClusterConnectionManager
 			CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(addr);
 
 			if (conns == null) {
-				conns = new CopyOnWriteArrayList<XMPPIOService<Object>>();
+				conns = new CopyOnWriteArrayList<>();
 				connectionsPool.put(addr, conns);
 			}
 
@@ -633,6 +643,10 @@ public class ClusterConnectionManager
 		} else {
 			port_props.put(MAX_RECONNECTS_PROP_KEY, 0);
 		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "ClusterRepoItem: {0}, port_props: {1}", new Object[] { item,
+					port_props });
+		}
 	}
 
 	/**
@@ -653,7 +667,9 @@ public class ClusterConnectionManager
 	 * @param service
 	 * @param attribs
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String xmppStreamOpened(XMPPIOService<Object> service, Map<String,
@@ -665,7 +681,8 @@ public class ClusterConnectionManager
 
 			service.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
 
-			String secret = (String) service.getSessionData().get(SECRET_PROP_KEY);
+			ClusterRepoItem item   = repo.getItem(getDefHostName().getDomain());
+			String          secret = item.getPassword();
 
 			try {
 				String digest = Algorithms.hexDigest(id, secret, "SHA");
@@ -696,6 +713,7 @@ public class ClusterConnectionManager
 			String id = UUID.randomUUID().toString();
 
 			service.getSessionData().put(XMPPIOService.SESSION_ID_KEY, id);
+			updateConnectionDetails(service.getSessionData());
 
 			return "<stream:stream" + " xmlns='" + XMLNS + "'" +
 					" xmlns:stream='http://etherx.jabber.org/streams'" + " from='" +
@@ -719,7 +737,9 @@ public class ClusterConnectionManager
 	 *
 	 * @param params
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
@@ -784,7 +804,9 @@ public class ClusterConnectionManager
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -795,7 +817,9 @@ public class ClusterConnectionManager
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getDiscoDescription() {
@@ -855,7 +879,6 @@ public class ClusterConnectionManager
 	@Override
 	@SuppressWarnings("unchecked")
 	public void setProperties(Map<String, Object> props) {
-		super.setProperties(props);
 		if (props.get(IDENTITY_TYPE_KEY) != null) {
 			identity_type = (String) props.get(IDENTITY_TYPE_KEY);
 		}
@@ -872,6 +895,7 @@ public class ClusterConnectionManager
 		}
 		connectionDelay = 5 * SECOND;
 		if (props.size() == 1) {
+			super.setProperties(props);
 
 			// If props.size() == 1, it means this is a single property update
 			// and this component does not support single property change for the rest
@@ -892,6 +916,7 @@ public class ClusterConnectionManager
 			log.log(Level.SEVERE, "Can not create items repository instance for class: " +
 					repo_class, e);
 		}
+		super.setProperties(props);
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -946,7 +971,9 @@ public class ClusterConnectionManager
 	 *
 	 * @param p
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	protected boolean writePacketToSocket(Packet p) {
@@ -981,7 +1008,9 @@ public class ClusterConnectionManager
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>int[]</code>
 	 */
 	@Override
 	protected int[] getDefPlainPorts() {
@@ -994,7 +1023,9 @@ public class ClusterConnectionManager
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	protected String getDefTrafficThrottling() {
@@ -1019,7 +1050,9 @@ public class ClusterConnectionManager
 	 *
 	 * @param def
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>Integer</code>
 	 */
 	@Override
 	protected Integer getMaxQueueSize(int def) {
@@ -1032,17 +1065,22 @@ public class ClusterConnectionManager
 	 *
 	 * @param port
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 */
 	@Override
 	protected Map<String, Object> getParamsForPort(int port) {
-		ClusterRepoItem     item = repo.getItem(getDefHostName().getDomain());
 		Map<String, Object> defs = new LinkedHashMap<String, Object>(10);
 
-		defs.put(SECRET_PROP_KEY, item.getPassword());
 		defs.put(PORT_TYPE_PROP_KEY, ConnectionType.accept);
 		defs.put(PORT_SOCKET_PROP_KEY, SocketType.plain);
 		defs.put(PORT_IFC_PROP_KEY, PORT_IFC_PROP_VAL);
+
+//  if (log.isLoggable(Level.FINEST)) {
+//    log.log(Level.FINEST, "ParamsForPort, item: {0}, defs: {1}", new Object[] { item,
+//        defs });
+//  }
 
 		return defs;
 	}
@@ -1051,7 +1089,9 @@ public class ClusterConnectionManager
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>XMPPIOService<Object></code>
 	 */
 	@Override
 	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
@@ -1062,7 +1102,9 @@ public class ClusterConnectionManager
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	protected boolean isHighThroughput() {
@@ -1094,9 +1136,10 @@ public class ClusterConnectionManager
 				String loc_digest = Algorithms.hexDigest(id, secret, "SHA");
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Calculating digest: id={0}, secret={1}, digest={2}",
-							new Object[] { id,
-							secret, loc_digest });
+					log.log(Level.FINEST,
+							"Calculating digest: secret={0}, digest={1}, loc_digest={2}, sessionData={3}",
+							new Object[] { secret,
+							digest, loc_digest, serv.getSessionData() });
 				}
 				if ((digest != null) && digest.equals(loc_digest)) {
 					Packet resp = Packet.packetInstance(new Element("handshake"), null, null);
@@ -1195,7 +1238,9 @@ public class ClusterConnectionManager
 		 * Method description
 		 *
 		 *
-		 * 
+		 *
+		 *
+		 * @return a value of <code>float</code>
 		 */
 		public float getAverageCompressionRatio() {
 			return compressionRatio / counter;
@@ -1205,7 +1250,9 @@ public class ClusterConnectionManager
 		 * Method description
 		 *
 		 *
-		 * 
+		 *
+		 *
+		 * @return a value of <code>float</code>
 		 */
 		public float getAverageDecompressionRatio() {
 			return decompressionRatio / counter;
@@ -1215,7 +1262,9 @@ public class ClusterConnectionManager
 		 * Method description
 		 *
 		 *
-		 * 
+		 *
+		 *
+		 * @return a value of <code>int</code>
 		 */
 		public int getWaitingToSend() {
 			return clIOQueue;
@@ -1292,4 +1341,4 @@ public class ClusterConnectionManager
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/10/07

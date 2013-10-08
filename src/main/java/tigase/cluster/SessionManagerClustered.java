@@ -32,7 +32,6 @@ import tigase.cluster.api.SessionManagerClusteredIfc;
 import tigase.cluster.strategy.ClusteringStrategyIfc;
 
 import tigase.server.ComponentInfo;
-
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
@@ -99,11 +98,11 @@ public class SessionManagerClustered
 	//~--- fields ---------------------------------------------------------------
 
 	private ClusterControllerIfc  clusterController = null;
+	private ComponentInfo         cmpInfo           = null;
 	private JID                   my_address        = null;
 	private JID                   my_hostname       = null;
 	private int                   nodesNo           = 0;
 	private ClusteringStrategyIfc strategy          = null;
-	private ComponentInfo         cmpInfo               = null;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -326,6 +325,21 @@ public class SessionManagerClustered
 	//~--- get methods ----------------------------------------------------------
 
 	/**
+	 * Allows to obtain various informations about components
+	 *
+	 * @return information about particular component
+	 */
+	@Override
+	public ComponentInfo getComponentInfo() {
+		cmpInfo = super.getComponentInfo();
+		cmpInfo.getComponentData().put("ClusteringStrategy", (strategy != null)
+				? strategy.getClass()
+				: null);
+
+		return cmpInfo;
+	}
+
+	/**
 	 * If the installation knows about user's JID, that he is connected to the
 	 * system, then this method returns all user's connection IDs. As an
 	 * optimization we can forward packets to all user's connections directly from
@@ -445,18 +459,6 @@ public class SessionManagerClustered
 	}
 
 	/**
-	 * Allows to obtain various informations about components
-	 *
-	 * @return information about particular component
-	 */
-	@Override
-	public ComponentInfo getComponentInfo() {
-		cmpInfo = super.getComponentInfo();
-		cmpInfo.getComponentData().put( "ClusteringStrategy", strategy != null ? strategy.getClass() : null );
-		return cmpInfo;
-	}
-
-	/**
 	 * Method description
 	 *
 	 *
@@ -557,6 +559,7 @@ public class SessionManagerClustered
 				ClusteringStrategyIfc strategy_tmp = (ClusteringStrategyIfc) Class.forName(
 						strategy_class).newInstance();
 
+				strategy_tmp.setSessionManagerHandler(this);
 				strategy_tmp.setProperties(props);
 
 				// strategy_tmp.init(getName());
@@ -647,4 +650,4 @@ public class SessionManagerClustered
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/09/21
+//~ Formatted in Tigase Code Convention on 13/10/07
