@@ -163,6 +163,9 @@ public abstract class ConfiguratorAbstract
 	// Default user auth repository instance which can be shared among components
 	private ConfigRepositoryIfc configRepo = new ConfigurationCache();
 
+	// Common logging setup
+	private Map<String, String> loggingSetup = new LinkedHashMap<String, String>(10);
+
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -1053,30 +1056,31 @@ public abstract class ConfiguratorAbstract
 		return domains;
 	}
 
-	private void setupLogManager(Map<String, Object> properties) {
+	private void setupLogManager( Map<String, Object> properties ) {
 		Set<Map.Entry<String, Object>> entries = properties.entrySet();
-		StringBuilder                  buff    = new StringBuilder(200);
+		StringBuilder buff = new StringBuilder( 200 );
 
-		for (Map.Entry<String, Object> entry : entries) {
-			if (entry.getKey().startsWith(LOGGING_KEY)) {
-				String key = entry.getKey().substring(LOGGING_KEY.length());
-
-				buff.append(key).append("=").append(entry.getValue()).append("\n");
-				if (key.equals("java.util.logging.FileHandler.pattern")) {
-					File log_path = new File(entry.getValue().toString()).getParentFile();
-
-					if (!log_path.exists()) {
-						log_path.mkdirs();
-					}
-				}    // end of if (key.equals())
-			}      // end of if (entry.getKey().startsWith(LOGGING_KEY))
+		for ( Map.Entry<String, Object> entry : entries ) {
+			if ( entry.getKey().startsWith( LOGGING_KEY ) ){
+				String key = entry.getKey().substring( LOGGING_KEY.length() );
+				loggingSetup.put( key, entry.getValue().toString() );
+			}
 		}
+
+		for ( String key : loggingSetup.keySet() ) {
+			String entry = loggingSetup.get( key );
+			buff.append( key ).append( "=" ).append( entry ).append( "\n" );
+			if ( key.equals( "java.util.logging.FileHandler.pattern" ) ){
+				File log_path = new File( entry ).getParentFile();
+				if ( !log_path.exists() ){
+					log_path.mkdirs();
+				}
+			}    // end of if (key.equals())
+		}      // end of if (entry.getKey().startsWith(LOGGING_KEY))
 
 		// System.out.println("Setting logging: \n" + buff.toString());
 		loadLogManagerConfig(buff.toString());
 		log.config("DONE");
-		log.config((new ComponentInfo( XMLUtils.class )).toString());
-		log.config((new ComponentInfo( ClassUtil.class )).toString());
 	}
 
 	//~--- get methods ----------------------------------------------------------

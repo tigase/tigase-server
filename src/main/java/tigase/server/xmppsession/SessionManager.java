@@ -1237,6 +1237,27 @@ public class SessionManager
 						log.log(Level.FINE, "Found parent session for: {0}", userJid);
 					}
 					if (session.getActiveResourcesSize() <= 1) {
+						// we should check if other this is the only connection on session
+						// as in some cases connection can be already removed from active
+						// resources but there might be other connection which is active
+						if (session.getActiveResourcesSize() > 0 
+								&& !session.getActiveResources().contains(conn)) {
+							log.log(Level.FINE, "Session contains connection for other "
+									+ "resource than: {0}, not removing session", userJid);
+							
+							if (log.isLoggable(Level.FINER)) {
+								StringBuilder sb = new StringBuilder(100);
+
+								for (XMPPResourceConnection res_con : session.getActiveResources()) {
+									sb.append(", res=").append(res_con.getResource());
+								}
+								log.log(Level.FINER, "Number of connections is {0} for the user: {1}{2}",
+										new Object[]{session.getActiveResourcesSize(),
+									userJid, sb.toString()});
+							}						
+							return;
+						}
+						
 						session = sessionsByNodeId.remove(userJid.getBareJID());
 						if (session == null) {
 							log.log(Level.INFO, "UPS can't remove, session not found in map: {0}",
