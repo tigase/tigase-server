@@ -1,10 +1,13 @@
 /*
- *   Tigase Jabber/XMPP Server
- *  Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * RosterAbstract.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.xmpp.impl.roster;
 
@@ -49,23 +51,144 @@ import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Map;
+import java.util.Queue;
 
 /**
  * Describe class RosterAbstract here.
- * 
- * 
+ *
+ *
  * Created: Thu Sep 4 18:09:52 2008
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public abstract class RosterAbstract {
+	/** Field description */
+	public static final String CLIENT_XMLNS = "jabber:client";
+
+	/** Field description */
+	public static final String GROUP = "group";
+
+	/** Field description */
+	public static final String GROUPS = "groups";
+
+	/** Field description */
+	public static final String NAME = "name";
+
+	/** Field description */
+	public static final String ROSTER = "roster";
+
+	/** Field description */
+	public static final String ROSTER_XMLNS = "jabber:iq:roster";
+
+	/** Field description */
+	public static final String ROSTERHASH = "rosterhash";
+
+	/** Field description */
+	public static final String SUBSCRIPTION = "subscription";
+
+	/** Field description */
+	public static final String VER_ATT = "ver";
+
+	/** Field description */
+	public static final String XMLNS = "jabber:iq:roster";
+
+	/** Field description */
+	public static final String XMLNS_DYNAMIC = "jabber:iq:roster-dynamic";
+
+	// ~--- static fields --------------------------------------------------------
+
+	/**
+	 * Private logger for class instances.
+	 */
+	private static Logger log = Logger.getLogger(RosterAbstract.class.getName());
+
+	/** Field description */
+	public static final EnumSet<SubscriptionType> TO_SUBSCRIBED = EnumSet.of(
+			SubscriptionType.to, SubscriptionType.to_pending_in, SubscriptionType.both);
+
+	/** Field description */
+	public static final EnumSet<SubscriptionType> SUB_TO = EnumSet.of(SubscriptionType.to,
+			SubscriptionType.to_pending_in);
+
+	/** Field description */
+	public static final EnumSet<SubscriptionType> SUB_NONE = EnumSet.of(SubscriptionType
+			.none, SubscriptionType.none_pending_out, SubscriptionType.none_pending_in,
+			SubscriptionType.none_pending_out_in);
+
+	/** Field description */
+	public static final EnumSet<SubscriptionType> SUB_FROM = EnumSet.of(SubscriptionType
+			.from, SubscriptionType.from_pending_out);
+
+	/** Field description */
+	public static final EnumSet<SubscriptionType> SUB_BOTH = EnumSet.of(SubscriptionType
+			.both);
+
+	/** Field description */
+	public static final EnumSet<SubscriptionType> PENDING_OUT = EnumSet.of(SubscriptionType
+			.none_pending_out, SubscriptionType.none_pending_out_in, SubscriptionType
+			.from_pending_out);
+
+	/** Field description */
+	public static final EnumSet<SubscriptionType> PENDING_IN = EnumSet.of(SubscriptionType
+			.none_pending_in, SubscriptionType.none_pending_out_in, SubscriptionType
+			.to_pending_in);
+
+	/** Field description */
+	public static final EnumSet<StanzaType> INITIAL_PRESENCES = EnumSet.of(StanzaType
+			.available, StanzaType.unavailable);
+
+	/** Field description */
+	public static final EnumSet<SubscriptionType> FROM_SUBSCRIBED = EnumSet.of(
+			SubscriptionType.from, SubscriptionType.from_pending_out, SubscriptionType.both);
+
+	/** Field description */
+	public static final Element[] FEATURES = { new Element("ver", new String[] { "xmlns" },
+			new String[] { "urn:xmpp:features:rosterver" }) };
+
+	/** Field description */
+	public static final Element[] DISCO_FEATURES = { new Element("feature", new String[] {
+			"var" }, new String[] { XMLNS }),
+			new Element("feature", new String[] { "var" }, new String[] { XMLNS_DYNAMIC }) };
+	private static EnumMap<SubscriptionType, StateTransition> subsToStateMap =
+			new EnumMap<SubscriptionType, StateTransition>(SubscriptionType.class);
+
+	//~--- static initializers --------------------------------------------------
+
+	// ~--- static initializers --------------------------------------------------
+	static {
+		subsToStateMap.put(SubscriptionType.none, StateTransition.none);
+		subsToStateMap.put(SubscriptionType.none_pending_out, StateTransition
+				.none_pending_out);
+		subsToStateMap.put(SubscriptionType.none_pending_in, StateTransition.none_pending_in);
+		subsToStateMap.put(SubscriptionType.none_pending_out_in, StateTransition
+				.none_pending_out_in);
+		subsToStateMap.put(SubscriptionType.to, StateTransition.to);
+		subsToStateMap.put(SubscriptionType.to_pending_in, StateTransition.to_pending_in);
+		subsToStateMap.put(SubscriptionType.from, StateTransition.from);
+		subsToStateMap.put(SubscriptionType.from_pending_out, StateTransition
+				.from_pending_out);
+		subsToStateMap.put(SubscriptionType.both, StateTransition.both);
+	}
+
+	//~--- constant enums -------------------------------------------------------
+
+	// ~--- constant enums -------------------------------------------------------
+
+	/**
+	 * Enum description
+	 *
+	 */
+	public enum PresenceType {
+		out_initial, out_subscribe, out_unsubscribe, out_subscribed, out_unsubscribed,
+				out_probe, in_initial, in_subscribe, in_unsubscribe, in_subscribed,
+				in_unsubscribed, in_probe, error;
+	}
+
+	//~--- enums ----------------------------------------------------------------
 
 	// Below StateTransition enum is implementation of all below tables
 	// coming from RFC-3921
@@ -185,88 +308,89 @@ public abstract class RosterAbstract {
 
 	/**
 	 * Enum description
-	 * 
+	 *
 	 */
 	public enum StateTransition {
-		none(SubscriptionType.none, // Table 1.
-				SubscriptionType.none, // Table 2.
-				SubscriptionType.none_pending_in, // Table 3.
-				SubscriptionType.none, // Table 4.
-				SubscriptionType.none, // Table 5.
-				SubscriptionType.none, // Table 6.
-				SubscriptionType.none_pending_out, // Table 7.
-				SubscriptionType.none // Table 8.
-		), none_pending_out(SubscriptionType.none_pending_out, // Table 1.
-				SubscriptionType.none_pending_out, // Table 2.
-				SubscriptionType.none_pending_out_in, // Table 3.
-				SubscriptionType.none_pending_out, // Table 4.
-				SubscriptionType.to, // Table 5.
-				SubscriptionType.none, // Table 6.
-				SubscriptionType.none_pending_out, // Table 7.
-				SubscriptionType.none // Table 8.
-		), none_pending_in(SubscriptionType.from, // Table 1.
-				SubscriptionType.none, // Table 2.
-				SubscriptionType.none_pending_in, // Table 3.
-				SubscriptionType.none, // Table 4.
-				SubscriptionType.none_pending_in, // Table 5.
-				SubscriptionType.none_pending_in, // Table 6.
-				SubscriptionType.none_pending_out_in, // Table 7.
-				SubscriptionType.none_pending_in // Table 8.
-		), none_pending_out_in(SubscriptionType.from_pending_out, // Table 1.
-				SubscriptionType.none_pending_out, // Table 2.
-				SubscriptionType.none_pending_out_in, // Table 3.
-				SubscriptionType.none_pending_out, // Table 4.
-				SubscriptionType.to_pending_in, // Table 5.
-				SubscriptionType.none_pending_in, // Table 6.
-				SubscriptionType.none_pending_out_in, // Table 7.
-				SubscriptionType.none_pending_in // Table 8.
-		), to(SubscriptionType.to, // Table 1.
-				SubscriptionType.to, // Table 2.
-				SubscriptionType.to_pending_in, // Table 3.
-				SubscriptionType.to, // Table 4.
-				SubscriptionType.to, // Table 5.
-				SubscriptionType.none, // Table 6.
-				SubscriptionType.to, // Table 7.
-				SubscriptionType.none // Table 8.
-		), to_pending_in(SubscriptionType.both, // Table 1.
-				SubscriptionType.to, // Table 2.
-				SubscriptionType.to_pending_in, // Table 3.
-				SubscriptionType.to, // Table 4.
-				SubscriptionType.to_pending_in, // Table 5.
-				SubscriptionType.none_pending_in, // Table 6.
-				SubscriptionType.to_pending_in, // Table 7.
-				SubscriptionType.none_pending_in // Table 8.
-		), from(SubscriptionType.from, // Table 1.
-				SubscriptionType.none, // Table 2.
-				SubscriptionType.from, // Table 3.
-				SubscriptionType.none, // Table 4.
-				SubscriptionType.from, // Table 5.
-				SubscriptionType.from, // Table 6.
-				SubscriptionType.from_pending_out, // Table 7.
-				SubscriptionType.from // Table 8.
-		), from_pending_out(SubscriptionType.from_pending_out, // Table 1.
-				SubscriptionType.none_pending_out, // Table 2.
-				SubscriptionType.from_pending_out, // Table 3.
-				SubscriptionType.none_pending_out, // Table 4.
-				SubscriptionType.both, // Table 5.
-				SubscriptionType.from, // Table 6.
-				SubscriptionType.from_pending_out, // Table 7.
-				SubscriptionType.from // Table 8.
-		), both(SubscriptionType.both, // Table 1.
-				SubscriptionType.to, // Table 2.
-				SubscriptionType.both, // Table 3.
-				SubscriptionType.to, // Table 4.
-				SubscriptionType.both, // Table 5.
-				SubscriptionType.from, // Table 6.
-				SubscriptionType.both, // Table 7.
-				SubscriptionType.from // Table 8.
-		);
+		none(SubscriptionType.none,                                       // Table 1.
+				 SubscriptionType.none,                                       // Table 2.
+				 SubscriptionType.none_pending_in,                            // Table 3.
+				 SubscriptionType.none,                                       // Table 4.
+				 SubscriptionType.none,                                       // Table 5.
+				 SubscriptionType.none,                                       // Table 6.
+				 SubscriptionType.none_pending_out,                           // Table 7.
+				 SubscriptionType.none                                        // Table 8.
+				 ), none_pending_out(SubscriptionType.none_pending_out,       // Table 1.
+				 SubscriptionType.none_pending_out,                           // Table 2.
+				 SubscriptionType.none_pending_out_in,                        // Table 3.
+				 SubscriptionType.none_pending_out,                           // Table 4.
+				 SubscriptionType.to,                                         // Table 5.
+				 SubscriptionType.none,                                       // Table 6.
+				 SubscriptionType.none_pending_out,                           // Table 7.
+				 SubscriptionType.none                                        // Table 8.
+				 ), none_pending_in(SubscriptionType.from,                    // Table 1.
+				 SubscriptionType.none,                                       // Table 2.
+				 SubscriptionType.none_pending_in,                            // Table 3.
+				 SubscriptionType.none,                                       // Table 4.
+				 SubscriptionType.none_pending_in,                            // Table 5.
+				 SubscriptionType.none_pending_in,                            // Table 6.
+				 SubscriptionType.none_pending_out_in,                        // Table 7.
+				 SubscriptionType.none_pending_in                             // Table 8.
+				 ), none_pending_out_in(SubscriptionType.from_pending_out,    // Table 1.
+				 SubscriptionType.none_pending_out,                           // Table 2.
+				 SubscriptionType.none_pending_out_in,                        // Table 3.
+				 SubscriptionType.none_pending_out,                           // Table 4.
+				 SubscriptionType.to_pending_in,                              // Table 5.
+				 SubscriptionType.none_pending_in,                            // Table 6.
+				 SubscriptionType.none_pending_out_in,                        // Table 7.
+				 SubscriptionType.none_pending_in                             // Table 8.
+				 ), to(SubscriptionType.to,                                   // Table 1.
+				 SubscriptionType.to,                                         // Table 2.
+				 SubscriptionType.to_pending_in,                              // Table 3.
+				 SubscriptionType.to,                                         // Table 4.
+				 SubscriptionType.to,                                         // Table 5.
+				 SubscriptionType.none,                                       // Table 6.
+				 SubscriptionType.to,                                         // Table 7.
+				 SubscriptionType.none                                        // Table 8.
+				 ), to_pending_in(SubscriptionType.both,                      // Table 1.
+				 SubscriptionType.to,                                         // Table 2.
+				 SubscriptionType.to_pending_in,                              // Table 3.
+				 SubscriptionType.to,                                         // Table 4.
+				 SubscriptionType.to_pending_in,                              // Table 5.
+				 SubscriptionType.none_pending_in,                            // Table 6.
+				 SubscriptionType.to_pending_in,                              // Table 7.
+				 SubscriptionType.none_pending_in                             // Table 8.
+				 ), from(SubscriptionType.from,                               // Table 1.
+				 SubscriptionType.none,                                       // Table 2.
+				 SubscriptionType.from,                                       // Table 3.
+				 SubscriptionType.none,                                       // Table 4.
+				 SubscriptionType.from,                                       // Table 5.
+				 SubscriptionType.from,                                       // Table 6.
+				 SubscriptionType.from_pending_out,                           // Table 7.
+				 SubscriptionType.from                                        // Table 8.
+				 ), from_pending_out(SubscriptionType.from_pending_out,       // Table 1.
+				 SubscriptionType.none_pending_out,                           // Table 2.
+				 SubscriptionType.from_pending_out,                           // Table 3.
+				 SubscriptionType.none_pending_out,                           // Table 4.
+				 SubscriptionType.both,                                       // Table 5.
+				 SubscriptionType.from,                                       // Table 6.
+				 SubscriptionType.from_pending_out,                           // Table 7.
+				 SubscriptionType.from                                        // Table 8.
+				 ), both(SubscriptionType.both,                               // Table 1.
+				 SubscriptionType.to,                                         // Table 2.
+				 SubscriptionType.both,                                       // Table 3.
+				 SubscriptionType.to,                                         // Table 4.
+				 SubscriptionType.both,                                       // Table 5.
+				 SubscriptionType.from,                                       // Table 6.
+				 SubscriptionType.both,                                       // Table 7.
+				 SubscriptionType.from                                        // Table 8.
+				 );
 
 		private EnumMap<PresenceType, SubscriptionType> stateTransition =
 				new EnumMap<PresenceType, SubscriptionType>(PresenceType.class);
 
-		// ~--- constructors -------------------------------------------------------
+		//~--- constructors -------------------------------------------------------
 
+		// ~--- constructors -------------------------------------------------------
 		private StateTransition(SubscriptionType out_subscribed,
 				SubscriptionType out_unsubscribed, SubscriptionType in_subscribe,
 				SubscriptionType in_unsubscribe, SubscriptionType in_subscribed,
@@ -282,22 +406,26 @@ public abstract class RosterAbstract {
 			stateTransition.put(PresenceType.out_unsubscribe, out_unsubscribe);
 		}
 
+		//~--- get methods --------------------------------------------------------
+
 		// ~--- get methods --------------------------------------------------------
 
 		/**
 		 * Method description
-		 * 
-		 * 
+		 *
+		 *
 		 * @param pres_type
-		 * 
-		 * 
+		 *
+		 *
+		 *
+		 * @return a value of <code>SubscriptionType</code>
 		 */
 		public SubscriptionType getStateTransition(PresenceType pres_type) {
 			SubscriptionType res = stateTransition.get(pres_type);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("this=" + this.toString() + ", pres_type=" + pres_type + ", res="
-						+ res);
+				log.finest("this=" + this.toString() + ", pres_type=" + pres_type + ", res=" +
+						res);
 			}
 
 			return res;
@@ -306,7 +434,7 @@ public abstract class RosterAbstract {
 
 	/**
 	 * Enum description
-	 * 
+	 *
 	 */
 	public enum SubscriptionType {
 		none("none", null), none_pending_out("none", "subscribe"), none_pending_in("none",
@@ -316,612 +444,101 @@ public abstract class RosterAbstract {
 
 		private Map<String, String> attrs = new LinkedHashMap<String, String>(2, 1.0f);
 
-		// ~--- constructors -------------------------------------------------------
+		//~--- constructors -------------------------------------------------------
 
+		// ~--- constructors -------------------------------------------------------
 		private SubscriptionType(String subscr, String ask) {
 			attrs.put("subscription", subscr);
-
 			if (ask != null) {
 				attrs.put("ask", ask);
-			} // end of if (ask != null)
+			}    // end of if (ask != null)
 		}
+
+		//~--- get methods --------------------------------------------------------
 
 		// ~--- get methods --------------------------------------------------------
 
 		/**
 		 * Method description
-		 * 
-		 * 
-		 * 
+		 *
+		 *
+		 *
+		 *
+		 * @return a value of <code>Map<String,String></code>
 		 */
 		public Map<String, String> getSubscriptionAttr() {
 			return attrs;
 		}
 	}
 
-	// ~--- static fields --------------------------------------------------------
-
-	/**
-	 * Private logger for class instances.
-	 */
-	private static Logger log = Logger.getLogger(RosterAbstract.class.getName());
-
-	public static final String CLIENT_XMLNS = "jabber:client";
-
-	/** Field description */
-	public static final String ROSTER_XMLNS = "jabber:iq:roster";
-
-	/** Field description */
-	public static final String ROSTER = "roster";
-
-	/** Field description */
-	public static final String GROUPS = "groups";
-
-	/** Field description */
-	public static final String GROUP = "group";
-
-	/** Field description */
-	public static final String NAME = "name";
-
-	/** Field description */
-	public static final String SUBSCRIPTION = "subscription";
-
-	/** Field description */
-	public static final String ROSTERHASH = "rosterhash";
-
-	/** Field description */
-	public static final String XMLNS = "jabber:iq:roster";
-
-	/** Field description */
-	public static final String XMLNS_DYNAMIC = "jabber:iq:roster-dynamic";
-	
-	public static final String VER_ATT = "ver";
-
-	/** Field description */
-	public static final Element[] DISCO_FEATURES = {
-			new Element("feature", new String[] { "var" }, new String[] { XMLNS }),
-			new Element("feature", new String[] { "var" }, new String[] { XMLNS_DYNAMIC }) };
-
-	/** Field description */
-	public static final Element[] FEATURES = { new Element("ver", new String[] { "xmlns" },
-			new String[] { "urn:xmpp:features:rosterver" }) };
-
-	/** Field description */
-	public static final EnumSet<SubscriptionType> SUB_NONE = EnumSet.of(
-			SubscriptionType.none, SubscriptionType.none_pending_out,
-			SubscriptionType.none_pending_in, SubscriptionType.none_pending_out_in);
-
-	/** Field description */
-	public static final EnumSet<SubscriptionType> SUB_TO = EnumSet.of(SubscriptionType.to,
-			SubscriptionType.to_pending_in);
-
-	/** Field description */
-	public static final EnumSet<SubscriptionType> SUB_FROM = EnumSet.of(
-			SubscriptionType.from, SubscriptionType.from_pending_out);
-
-	/** Field description */
-	public static final EnumSet<SubscriptionType> SUB_BOTH = EnumSet
-			.of(SubscriptionType.both);
-
-	/** Field description */
-	public static final EnumSet<SubscriptionType> TO_SUBSCRIBED = EnumSet.of(
-			SubscriptionType.to, SubscriptionType.to_pending_in, SubscriptionType.both);
-
-	/** Field description */
-	public static final EnumSet<SubscriptionType> FROM_SUBSCRIBED = EnumSet.of(
-			SubscriptionType.from, SubscriptionType.from_pending_out, SubscriptionType.both);
-
-	/** Field description */
-	public static final EnumSet<StanzaType> INITIAL_PRESENCES = EnumSet.of(
-			StanzaType.available, StanzaType.unavailable);
-
-	/** Field description */
-	public static final EnumSet<SubscriptionType> PENDING_IN = EnumSet.of(
-			SubscriptionType.none_pending_in, SubscriptionType.none_pending_out_in,
-			SubscriptionType.to_pending_in);
-
-	/** Field description */
-	public static final EnumSet<SubscriptionType> PENDING_OUT = EnumSet.of(
-			SubscriptionType.none_pending_out, SubscriptionType.none_pending_out_in,
-			SubscriptionType.from_pending_out);
-	private static EnumMap<SubscriptionType, StateTransition> subsToStateMap =
-			new EnumMap<SubscriptionType, StateTransition>(SubscriptionType.class);
-
-	// ~--- constant enums -------------------------------------------------------
-
-	/**
-	 * Enum description
-	 * 
-	 */
-	public enum PresenceType {
-		out_initial, out_subscribe, out_unsubscribe, out_subscribed, out_unsubscribed,
-		out_probe, in_initial, in_subscribe, in_unsubscribe, in_subscribed, in_unsubscribed,
-		in_probe, error;
-	}
-
-	// ~--- static initializers --------------------------------------------------
-
-	static {
-		subsToStateMap.put(SubscriptionType.none, StateTransition.none);
-		subsToStateMap.put(SubscriptionType.none_pending_out,
-				StateTransition.none_pending_out);
-		subsToStateMap.put(SubscriptionType.none_pending_in, StateTransition.none_pending_in);
-		subsToStateMap.put(SubscriptionType.none_pending_out_in,
-				StateTransition.none_pending_out_in);
-		subsToStateMap.put(SubscriptionType.to, StateTransition.to);
-		subsToStateMap.put(SubscriptionType.to_pending_in, StateTransition.to_pending_in);
-		subsToStateMap.put(SubscriptionType.from, StateTransition.from);
-		subsToStateMap.put(SubscriptionType.from_pending_out,
-				StateTransition.from_pending_out);
-		subsToStateMap.put(SubscriptionType.both, StateTransition.both);
-	}
+	//~--- methods --------------------------------------------------------------
 
 	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param session
 	 * @param jid
 	 * @param name
 	 * @param groups
 	 * @param otherData
-	 * 
+	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
 	public abstract void addBuddy(XMPPResourceConnection session, JID jid, String name,
-			String[] groups, String otherData) throws NotAuthorizedException, TigaseDBException;
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param buddy
-	 * @param groups
-	 * 
-	 * 
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public abstract boolean addBuddyGroup(final XMPPResourceConnection session, JID buddy,
-			final String[] groups) throws NotAuthorizedException, TigaseDBException;
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param buddy
-	 * 
-	 * 
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public abstract boolean containsBuddy(final XMPPResourceConnection session, JID buddy)
-			throws NotAuthorizedException, TigaseDBException;
-
-	// ~--- get methods ----------------------------------------------------------
-
-	// public abstract String[] getBuddies(final XMPPResourceConnection session,
-	// boolean onlineOnly)
-	// throws NotAuthorizedException, TigaseDBException;
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * 
-	 * 
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public abstract JID[] getBuddies(final XMPPResourceConnection session)
-			throws NotAuthorizedException, TigaseDBException;
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param buddy
-	 * 
-	 * 
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public abstract String[]
-			getBuddyGroups(final XMPPResourceConnection session, JID buddy)
+			String[] groups, String otherData)
 					throws NotAuthorizedException, TigaseDBException;
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param session
 	 * @param buddy
-	 * 
-	 * 
-	 * 
+	 * @param groups
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
-	public abstract String getBuddyName(final XMPPResourceConnection session, JID buddy)
-			throws NotAuthorizedException, TigaseDBException;
+	public abstract boolean addBuddyGroup(final XMPPResourceConnection session, JID buddy,
+			final String[] groups)
+					throws NotAuthorizedException, TigaseDBException;
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param session
 	 * @param buddy
-	 * 
-	 * 
-	 * 
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
-	public abstract SubscriptionType getBuddySubscription(
-			final XMPPResourceConnection session, JID buddy) throws NotAuthorizedException,
-			TigaseDBException;
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param jid
-	 * 
-	 * 
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public abstract boolean isOnline(XMPPResourceConnection session, JID jid)
-			throws NotAuthorizedException, TigaseDBException;
+	public abstract boolean containsBuddy(final XMPPResourceConnection session, JID buddy)
+					throws NotAuthorizedException, TigaseDBException;
 
 	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param jid
-	 * 
-	 * 
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public abstract boolean presenceSent(XMPPResourceConnection session, JID jid)
-			throws NotAuthorizedException, TigaseDBException;
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param jid
-	 * 
-	 * 
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public abstract boolean removeBuddy(final XMPPResourceConnection session, JID jid)
-			throws NotAuthorizedException, TigaseDBException;
-
-	// ~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
+	 *
+	 *
 	 * @param buddy
-	 * @param name
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public abstract void setBuddyName(final XMPPResourceConnection session, JID buddy,
-			final String name) throws NotAuthorizedException, TigaseDBException;
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param subscription
-	 * @param buddy
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public abstract void setBuddySubscription(final XMPPResourceConnection session,
-			final SubscriptionType subscription, JID buddy) throws NotAuthorizedException,
-			TigaseDBException;
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param jid
-	 * @param online
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public abstract void setOnline(XMPPResourceConnection session, JID jid, boolean online)
-			throws NotAuthorizedException, TigaseDBException;
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param jid
-	 * @param sent
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public abstract void setPresenceSent(XMPPResourceConnection session, JID jid,
-			boolean sent) throws NotAuthorizedException, TigaseDBException;
-
-	public abstract RosterElementIfc getRosterElement(XMPPResourceConnection session,
-			JID jid) throws NotAuthorizedException, TigaseDBException;
-
-	// ~--- get methods ----------------------------------------------------------
-
-	// public String[] getBuddies(final XMPPResourceConnection session,
-	// final EnumSet<SubscriptionType> subscrs, boolean onlineOnly)
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param subscrs
-	 * 
-	 * 
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public JID[] getBuddies(final XMPPResourceConnection session,
-			final EnumSet<SubscriptionType> subscrs) throws NotAuthorizedException,
-			TigaseDBException {
-
-		// final String[] allBuddies = getBuddies(session, onlineOnly);
-		JID[] allBuddies = getBuddies(session);
-
-		if (allBuddies == null) {
-			return null;
-		} // end of if (allBuddies == null)
-
-		ArrayList<JID> list = new ArrayList<JID>();
-
-		for (JID buddy : allBuddies) {
-			final SubscriptionType subs = getBuddySubscription(session, buddy);
-
-			if (subscrs.contains(subs)) {
-				list.add(buddy);
-			} // end of if (subscrs.contains(subs))
-		} // end of for ()
-
-		return list.toArray(new JID[list.size()]);
-	}
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * 
-	 * 
-	 */
-	public String getBuddiesHash(final XMPPResourceConnection session) {
-		String hash = (String) session.getCommonSessionData(ROSTERHASH); 
-		return (hash != null ? hash : "");
-	}
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param buddy
-	 * 
-	 * 
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public Element getBuddyItem(final XMPPResourceConnection session, JID buddy)
-			throws NotAuthorizedException, TigaseDBException {
-		SubscriptionType subscr = getBuddySubscription(session, buddy);
-
-		if (subscr == null) {
-			subscr = SubscriptionType.none;
-			setBuddySubscription(session, subscr, buddy);
-		} // end of if
-
-		Element item = new Element("item");
-
-		item.setAttribute("jid", buddy.toString());
-		item.addAttributes(subscr.getSubscriptionAttr());
-
-		String name = getBuddyName(session, buddy);
-
-		if (name != null) {
-			item.setAttribute("name", XMLUtils.escape(name));
-		}
-
-		String[] groups = getBuddyGroups(session, buddy);
-
-		if (groups != null) {
-			for (String gr : groups) {
-				Element group = new Element("group");
-
-				group.setCData(XMLUtils.escape(gr));
-				item.addChild(group);
-			} // end of for ()
-		} // end of if-else
-
-		return item;
-	}
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param packet
-	 * 
-	 * 
-	 * 
-	 * @throws NotAuthorizedException
-	 */
-	public PresenceType getPresenceType(final XMPPResourceConnection session,
-			final Packet packet) throws NotAuthorizedException {
-		BareJID to =
-				(packet.getStanzaTo() != null) ? packet.getStanzaTo().getBareJID() : null;
-		StanzaType type = packet.getType();
-
-		if (type == null) {
-			type = StanzaType.available;
-		} else {
-			if (type == StanzaType.error) {
-				return PresenceType.error;
-			}
-		}
-
-		if ((to == null) || !session.isUserId(to)) {
-			if (INITIAL_PRESENCES.contains(type)) {
-				return PresenceType.out_initial;
-			}
-
-			if (type == StanzaType.subscribe) {
-				return PresenceType.out_subscribe;
-			} // end of if (type == StanzaType.subscribe)
-
-			if (type == StanzaType.unsubscribe) {
-				return PresenceType.out_unsubscribe;
-			} // end of if (type == StanzaType.unsubscribe)
-
-			if (type == StanzaType.subscribed) {
-				return PresenceType.out_subscribed;
-			} // end of if (type == StanzaType.subscribed)
-
-			if (type == StanzaType.unsubscribed) {
-				return PresenceType.out_unsubscribed;
-			} // end of if (type == StanzaType.unsubscribed)
-
-			// StanzaType.probe is invalid here....
-			// if (type == StanzaType.probe) {
-			// return PresenceType.out_probe;
-			// } // if (type == StanzaType.probe)
-		} // end of if (to == null || to.equals(session.getUserId()))
-
-		if ((to != null) && session.isUserId(to)) {
-			if (INITIAL_PRESENCES.contains(type)) {
-				return PresenceType.in_initial;
-			}
-
-			if (type == StanzaType.subscribe) {
-				return PresenceType.in_subscribe;
-			} // end of if (type == StanzaType.subscribe)
-
-			if (type == StanzaType.unsubscribe) {
-				return PresenceType.in_unsubscribe;
-			} // end of if (type == StanzaType.unsubscribe)
-
-			if (type == StanzaType.subscribed) {
-				return PresenceType.in_subscribed;
-			} // end of if (type == StanzaType.subscribed)
-
-			if (type == StanzaType.unsubscribed) {
-				return PresenceType.in_unsubscribed;
-			} // end of if (type == StanzaType.unsubscribed)
-
-			if (type == StanzaType.probe) {
-				return PresenceType.in_probe;
-			} // end of if (type == StanzaType.probe)
-		} // end of if (to != null && !to.equals(session.getUserId()))
-
-		return null;
-	}
-
-	// public List<Element> getRosterItems(XMPPResourceConnection session, boolean
-	// online)
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * 
-	 * 
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public List<Element> getRosterItems(XMPPResourceConnection session)
-			throws NotAuthorizedException, TigaseDBException {
-		LinkedList<Element> items = new LinkedList<Element>();
-
-		// String[] buddies = getBuddies(session, online);
-		JID[] buddies = getBuddies(session);
-
-		if (buddies != null) {
-			for (JID buddy : buddies) {
-				Element buddy_item = getBuddyItem(session, buddy);
-
-				// String item_group = buddy_item.getCData("/item/group");
-				items.add(buddy_item);
-			}
-		}
-
-		return items;
-	}
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param subscription
-	 * @param presence
-	 * 
-	 * 
-	 */
-	public SubscriptionType getStateTransition(final SubscriptionType subscription,
-			final PresenceType presence) {
-                StateTransition transition = subsToStateMap.get(subscription);
-                if (transition == null) {
-                        return getStateTransition(SubscriptionType.none, presence);
-                }
-		return transition.getStateTransition(presence);
-	}
-
-	// ~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param buddy
-	 * 
-	 * 
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String groupNode(JID buddy) {
 		return ROSTER + "/" + buddy.getBareJID();
@@ -940,108 +557,79 @@ public abstract class RosterAbstract {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param repo
-	 * 
+	 *
 	 * @throws TigaseDBException
 	 * @throws TigaseDBException
 	 */
-	public void init(UserRepository repo) throws TigaseDBException, TigaseDBException {
-	}
-
-	// ~--- get methods ----------------------------------------------------------
+	public void init(UserRepository repo) throws TigaseDBException, TigaseDBException {}
 
 	/**
 	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param jid
-	 * 
-	 * 
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
+	 *
+	 *
+	 * @param session is a <code>XMPPResourceConnection</code>
 	 */
-	public boolean isPendingIn(final XMPPResourceConnection session, JID jid)
-			throws NotAuthorizedException, TigaseDBException {
-		SubscriptionType subscr = getBuddySubscription(session, jid);
-
-		return PENDING_IN.contains(subscr);
-	}
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param jid
-	 * 
-	 * 
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public boolean isSubscribedFrom(final XMPPResourceConnection session, JID jid)
-			throws NotAuthorizedException, TigaseDBException {
-		SubscriptionType subscr = getBuddySubscription(session, jid);
-
-		return FROM_SUBSCRIBED.contains(subscr);
-	}
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param subscr
-	 * 
-	 * 
-	 */
-	public boolean isSubscribedFrom(SubscriptionType subscr) {
-		return FROM_SUBSCRIBED.contains(subscr);
-	}
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param jid
-	 * 
-	 * 
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public boolean isSubscribedTo(final XMPPResourceConnection session, JID jid)
-			throws NotAuthorizedException, TigaseDBException {
-		SubscriptionType subscr = getBuddySubscription(session, jid);
-
-		return TO_SUBSCRIBED.contains(subscr);
-	}
+	public abstract void logout(XMPPResourceConnection session);
 
 	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
+	 * @param session
+	 * @param jid
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public abstract boolean presenceSent(XMPPResourceConnection session, JID jid)
+					throws NotAuthorizedException, TigaseDBException;
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param jid
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public abstract boolean removeBuddy(final XMPPResourceConnection session, JID jid)
+					throws NotAuthorizedException, TigaseDBException;
+
+	// ~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param session
 	 * @param results
 	 * @param item
-	 * 
+	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 * @throws NoConnectionIdException
 	 */
 	public void updateBuddyChange(final XMPPResourceConnection session,
-			final Queue<Packet> results, final Element item) throws NotAuthorizedException,
-			TigaseDBException, NoConnectionIdException {
+			final Queue<Packet> results, final Element item)
+					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
 		Element update = new Element("iq");
 
 		update.setXMLNS(CLIENT_XMLNS);
-
 		update.setAttribute("type", StanzaType.set.toString());
 
 		Element query = new Element("query");
@@ -1050,7 +638,6 @@ public abstract class RosterAbstract {
 		query.addAttribute(VER_ATT, getBuddiesHash(session));
 		query.addChild(item);
 		update.addChild(query);
-
 		for (XMPPResourceConnection conn : session.getActiveSessions()) {
 			Element conn_update = update.clone();
 
@@ -1060,59 +647,62 @@ public abstract class RosterAbstract {
 			Packet pack_update = Packet.packetInstance(conn_update, null, conn.getJID());
 
 			pack_update.setPacketTo(conn.getConnectionId());
+
 			// pack_update.setPacketFrom(session.getJID());
 			results.offer(pack_update);
-		} // end of for (XMPPResourceConnection conn: sessions)
+		}    // end of for (XMPPResourceConnection conn: sessions)
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param session
 	 * @param presence
 	 * @param jid
-	 * 
-	 * 
-	 * 
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
 	public boolean updateBuddySubscription(final XMPPResourceConnection session,
-			final PresenceType presence, JID jid) throws NotAuthorizedException,
-			TigaseDBException {
+			final PresenceType presence, JID jid)
+					throws NotAuthorizedException, TigaseDBException {
 		SubscriptionType current_subscription = getBuddySubscription(session, jid);
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "current_subscription={0} for jid={1}", new Object[] {
-					current_subscription, jid });
+					current_subscription,
+					jid });
 		}
-
 		if (current_subscription == null) {
+
 			// don't create new roster item for incomming unsubscribe presence #219 /
 			// #210
-			if (presence != PresenceType.in_unsubscribe
-					&& presence != PresenceType.out_unsubscribe) {
+			if ((presence != PresenceType.in_unsubscribe) && (presence != PresenceType
+					.out_unsubscribe)) {
 				addBuddy(session, jid, null, null, null);
 			}
 			current_subscription = SubscriptionType.none;
 		}
 
-		final SubscriptionType new_subscription =
-				getStateTransition(current_subscription, presence);
+		final SubscriptionType new_subscription = getStateTransition(current_subscription,
+				presence);
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "new_subscription={0} for presence={1}", new Object[] {
-					new_subscription, presence });
+					new_subscription,
+					presence });
 		}
-
-		if ((current_subscription == SubscriptionType.none_pending_in)
-				&& (presence == PresenceType.out_unsubscribed)) {
+		if ((current_subscription == SubscriptionType.none_pending_in) && (presence ==
+				PresenceType.out_unsubscribed)) {
 			removeBuddy(session, jid);
 
 			return false;
 		}
-
 		if (current_subscription != new_subscription) {
 			setBuddySubscription(session, new_subscription, jid);
 
@@ -1138,8 +728,8 @@ public abstract class RosterAbstract {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param roster_str
 	 * @param session
 	 */
@@ -1151,20 +741,510 @@ public abstract class RosterAbstract {
 		} catch (Exception e) {
 			roster_hash = null;
 		}
-
 		session.putCommonSessionData(ROSTERHASH, roster_hash);
 	}
 
-	public abstract void logout(XMPPResourceConnection session);
+	//~--- get methods ----------------------------------------------------------
+
+	// ~--- get methods ----------------------------------------------------------
+	// public abstract String[] getBuddies(final XMPPResourceConnection session,
+	// boolean onlineOnly)
+	// throws NotAuthorizedException, TigaseDBException;
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>JID[]</code>
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public abstract JID[] getBuddies(final XMPPResourceConnection session)
+					throws NotAuthorizedException, TigaseDBException;
+
+	// ~--- get methods ----------------------------------------------------------
+	// public String[] getBuddies(final XMPPResourceConnection session,
+	// final EnumSet<SubscriptionType> subscrs, boolean onlineOnly)
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param subscrs
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>JID[]</code>
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public JID[] getBuddies(final XMPPResourceConnection session,
+			final EnumSet<SubscriptionType> subscrs)
+					throws NotAuthorizedException, TigaseDBException {
+
+		// final String[] allBuddies = getBuddies(session, onlineOnly);
+		JID[] allBuddies = getBuddies(session);
+
+		if (allBuddies == null) {
+			return null;
+		}    // end of if (allBuddies == null)
+
+		ArrayList<JID> list = new ArrayList<JID>();
+
+		for (JID buddy : allBuddies) {
+			final SubscriptionType subs = getBuddySubscription(session, buddy);
+
+			if (subscrs.contains(subs)) {
+				list.add(buddy);
+			}    // end of if (subscrs.contains(subs))
+		}      // end of for ()
+
+		return list.toArray(new JID[list.size()]);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	public String getBuddiesHash(final XMPPResourceConnection session) {
+		String hash = (String) session.getCommonSessionData(ROSTERHASH);
+
+		return ((hash != null)
+				? hash
+				: "");
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param buddy
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public abstract String[] getBuddyGroups(final XMPPResourceConnection session, JID buddy)
+					throws NotAuthorizedException, TigaseDBException;
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param buddy
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>Element</code>
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public Element getBuddyItem(final XMPPResourceConnection session, JID buddy)
+					throws NotAuthorizedException, TigaseDBException {
+		SubscriptionType subscr = getBuddySubscription(session, buddy);
+
+		if (subscr == null) {
+			subscr = SubscriptionType.none;
+			setBuddySubscription(session, subscr, buddy);
+		}    // end of if
+
+		Element item = new Element("item");
+
+		item.setAttribute("jid", buddy.toString());
+		item.addAttributes(subscr.getSubscriptionAttr());
+
+		String name = getBuddyName(session, buddy);
+
+		if (name != null) {
+			item.setAttribute("name", XMLUtils.escape(name));
+		}
+
+		String[] groups = getBuddyGroups(session, buddy);
+
+		if (groups != null) {
+			for (String gr : groups) {
+				Element group = new Element("group");
+
+				group.setCData(XMLUtils.escape(gr));
+				item.addChild(group);
+			}    // end of for ()
+		}      // end of if-else
+
+		return item;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param buddy
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public abstract String getBuddyName(final XMPPResourceConnection session, JID buddy)
+					throws NotAuthorizedException, TigaseDBException;
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param buddy
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>SubscriptionType</code>
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public abstract SubscriptionType getBuddySubscription(
+			final XMPPResourceConnection session, JID buddy)
+					throws NotAuthorizedException, TigaseDBException;
 
 	/**
 	 * @param session
 	 * @param buddy
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 * @throws TigaseDBException
 	 * @throws NotAuthorizedException
 	 */
 	public abstract String getCustomStatus(XMPPResourceConnection session, JID buddy)
-			throws NotAuthorizedException, TigaseDBException;
+					throws NotAuthorizedException, TigaseDBException;
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param packet
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>PresenceType</code>
+	 * @throws NotAuthorizedException
+	 */
+	public PresenceType getPresenceType(final XMPPResourceConnection session,
+			final Packet packet)
+					throws NotAuthorizedException {
+		BareJID    to   = (packet.getStanzaTo() != null)
+				? packet.getStanzaTo().getBareJID()
+				: null;
+		StanzaType type = packet.getType();
+
+		if (type == null) {
+			type = StanzaType.available;
+		} else {
+			if (type == StanzaType.error) {
+				return PresenceType.error;
+			}
+		}
+		if ((to == null) ||!session.isUserId(to)) {
+			if (INITIAL_PRESENCES.contains(type)) {
+				return PresenceType.out_initial;
+			}
+			if (type == StanzaType.subscribe) {
+				return PresenceType.out_subscribe;
+			}    // end of if (type == StanzaType.subscribe)
+			if (type == StanzaType.unsubscribe) {
+				return PresenceType.out_unsubscribe;
+			}    // end of if (type == StanzaType.unsubscribe)
+			if (type == StanzaType.subscribed) {
+				return PresenceType.out_subscribed;
+			}    // end of if (type == StanzaType.subscribed)
+			if (type == StanzaType.unsubscribed) {
+				return PresenceType.out_unsubscribed;
+			}    // end of if (type == StanzaType.unsubscribed)
+
+			// StanzaType.probe is invalid here....
+			// if (type == StanzaType.probe) {
+			// return PresenceType.out_probe;
+			// } // if (type == StanzaType.probe)
+		}      // end of if (to == null || to.equals(session.getUserId()))
+		if ((to != null) && session.isUserId(to)) {
+			if (INITIAL_PRESENCES.contains(type)) {
+				return PresenceType.in_initial;
+			}
+			if (type == StanzaType.subscribe) {
+				return PresenceType.in_subscribe;
+			}    // end of if (type == StanzaType.subscribe)
+			if (type == StanzaType.unsubscribe) {
+				return PresenceType.in_unsubscribe;
+			}    // end of if (type == StanzaType.unsubscribe)
+			if (type == StanzaType.subscribed) {
+				return PresenceType.in_subscribed;
+			}    // end of if (type == StanzaType.subscribed)
+			if (type == StanzaType.unsubscribed) {
+				return PresenceType.in_unsubscribed;
+			}    // end of if (type == StanzaType.unsubscribed)
+			if (type == StanzaType.probe) {
+				return PresenceType.in_probe;
+			}    // end of if (type == StanzaType.probe)
+		}      // end of if (to != null && !to.equals(session.getUserId()))
+
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session is a <code>XMPPResourceConnection</code>
+	 * @param jid is a <code>JID</code>
+	 *
+	 * @return a value of <code>RosterElementIfc</code>
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public abstract RosterElementIfc getRosterElement(XMPPResourceConnection session,
+			JID jid)
+					throws NotAuthorizedException, TigaseDBException;
+
+	// public List<Element> getRosterItems(XMPPResourceConnection session, boolean
+	// online)
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>List<Element></code>
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public List<Element> getRosterItems(XMPPResourceConnection session)
+					throws NotAuthorizedException, TigaseDBException {
+		LinkedList<Element> items = new LinkedList<Element>();
+
+		// String[] buddies = getBuddies(session, online);
+		JID[] buddies = getBuddies(session);
+
+		if (buddies != null) {
+			for (JID buddy : buddies) {
+				Element buddy_item = getBuddyItem(session, buddy);
+
+				// String item_group = buddy_item.getCData("/item/group");
+				items.add(buddy_item);
+			}
+		}
+
+		return items;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param subscription
+	 * @param presence
+	 *
+	 *
+	 *
+	 * @return a value of <code>SubscriptionType</code>
+	 */
+	public static SubscriptionType getStateTransition(final SubscriptionType subscription,
+			final PresenceType presence) {
+		StateTransition transition = subsToStateMap.get(subscription);
+
+		if (transition == null) {
+			return getStateTransition(SubscriptionType.none, presence);
+		}
+
+		return transition.getStateTransition(presence);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param jid
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public abstract boolean isOnline(XMPPResourceConnection session, JID jid)
+					throws NotAuthorizedException, TigaseDBException;
+
+	// ~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param jid
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public boolean isPendingIn(final XMPPResourceConnection session, JID jid)
+					throws NotAuthorizedException, TigaseDBException {
+		SubscriptionType subscr = getBuddySubscription(session, jid);
+
+		return PENDING_IN.contains(subscr);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param jid
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public boolean isSubscribedFrom(final XMPPResourceConnection session, JID jid)
+					throws NotAuthorizedException, TigaseDBException {
+		SubscriptionType subscr = getBuddySubscription(session, jid);
+
+		return FROM_SUBSCRIBED.contains(subscr);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param subscr
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 */
+	public boolean isSubscribedFrom(SubscriptionType subscr) {
+		return FROM_SUBSCRIBED.contains(subscr);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param jid
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public boolean isSubscribedTo(final XMPPResourceConnection session, JID jid)
+					throws NotAuthorizedException, TigaseDBException {
+		SubscriptionType subscr = getBuddySubscription(session, jid);
+
+		return TO_SUBSCRIBED.contains(subscr);
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	// ~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param buddy
+	 * @param name
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public abstract void setBuddyName(final XMPPResourceConnection session, JID buddy,
+			final String name)
+					throws NotAuthorizedException, TigaseDBException;
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param subscription
+	 * @param buddy
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public abstract void setBuddySubscription(final XMPPResourceConnection session,
+			final SubscriptionType subscription, JID buddy)
+					throws NotAuthorizedException, TigaseDBException;
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param jid
+	 * @param online
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public abstract void setOnline(XMPPResourceConnection session, JID jid, boolean online)
+					throws NotAuthorizedException, TigaseDBException;
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param jid
+	 * @param sent
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public abstract void setPresenceSent(XMPPResourceConnection session, JID jid,
+			boolean sent)
+					throws NotAuthorizedException, TigaseDBException;
 }
+
+
+//~ Formatted in Tigase Code Convention on 13/10/09
