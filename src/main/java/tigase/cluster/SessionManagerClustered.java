@@ -415,6 +415,19 @@ public class SessionManagerClustered
 		return props;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getDiscoDescription() {
+		return super.getDiscoDescription() + " clustered" + strategy.getInfo();
+	}
+
 	// private long calcAverage(long[] timings) {
 	// long res = 0;
 	//
@@ -650,4 +663,4 @@ public class SessionManagerClustered
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/10/07
+//~ Formatted in Tigase Code Convention on 13/10/15
