@@ -35,8 +35,6 @@ import tigase.cluster.api.CommandListenerAbstract;
 import tigase.server.xmppserver.CID;
 import tigase.server.xmppserver.S2SConnectionManager;
 
-import tigase.stats.StatisticsList;
-
 import tigase.xml.Element;
 
 import tigase.xmpp.JID;
@@ -79,16 +77,12 @@ public class S2SConnectionClustered
 	//~--- fields ---------------------------------------------------------------
 
 	private ClusterControllerIfc clusterController = null;
-
-	// ~--- fields ---------------------------------------------------------------
-	private List<JID>       cl_nodes_array   = new CopyOnWriteArrayList<JID>();
-	private CommandListener checkDBKeyResult = new CheckDBKeyResult(
+	private List<JID>            cl_nodes_array    = new CopyOnWriteArrayList<JID>();
+	private CommandListener      checkDBKeyResult = new CheckDBKeyResult(
 			CHECK_DB_KEY_RESULT_CMD);
 	private CommandListener checkDBKey = new CheckDBKey(CHECK_DB_KEY_CMD);
 
 	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -114,7 +108,18 @@ public class S2SConnectionClustered
 
 	//~--- get methods ----------------------------------------------------------
 
-	// ~--- get methods ----------------------------------------------------------
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getDiscoDescription() {
+		return super.getDiscoDescription() + " clustered";
+	}
 
 	/**
 	 * Method description
@@ -126,7 +131,9 @@ public class S2SConnectionClustered
 	 * @param key_sessionId
 	 * @param asking_sessionId
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getLocalDBKey(CID connectionCid, CID keyCid, String key,
@@ -185,7 +192,9 @@ public class S2SConnectionClustered
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>JID</code>
 	 */
 	protected JID getFirstClusterNode() {
 		JID cluster_node = null;
@@ -314,15 +323,15 @@ public class S2SConnectionClustered
 		//~--- methods ------------------------------------------------------------
 
 		/**
-		 * Method description
+		 *   Method description
 		 *
 		 *
-		 * @param fromNode
-		 * @param visitedNodes
-		 * @param data
-		 * @param packets
+		 *   @param fromNode
+		 *   @param visitedNodes
+		 *   @param data
+		 *   @param packets
 		 *
-		 * @throws ClusterCommandException
+		 *   @throws ClusterCommandException
 		 */
 		@Override
 		public void executeCommand(JID fromNode, Set<JID> visitedNodes, Map<String,
@@ -351,4 +360,4 @@ public class S2SConnectionClustered
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/10/15
