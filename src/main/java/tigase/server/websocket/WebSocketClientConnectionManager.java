@@ -2,7 +2,7 @@
  * WebSocketClientConnectionManager.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -40,7 +40,20 @@ public class WebSocketClientConnectionManager
 	 * Method description
 	 *
 	 *
-	 * 
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getDiscoDescription() {
+		return "Websocket connection manager";
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>int[]</code>
 	 */
 	@Override
 	protected int[] getDefPlainPorts() {
@@ -51,7 +64,9 @@ public class WebSocketClientConnectionManager
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>int[]</code>
 	 */
 	@Override
 	protected int[] getDefSSLPorts() {
@@ -61,7 +76,9 @@ public class WebSocketClientConnectionManager
 	/**
 	 * Method returns XMPPIOService instance implementing WebSocketXMPPIOService
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>XMPPIOService<Object></code>
 	 */
 	@Override
 	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
@@ -70,4 +87,4 @@ public class WebSocketClientConnectionManager
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/02/20
+//~ Formatted in Tigase Code Convention on 13/10/15
