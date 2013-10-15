@@ -356,6 +356,17 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	 * Method description
 	 *
 	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String getInfo() {
+		return "basic strategy";
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 *
 	 *
 	 * @return a value of <code>Object</code>
@@ -536,4 +547,4 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/10/07
+//~ Formatted in Tigase Code Convention on 13/10/15

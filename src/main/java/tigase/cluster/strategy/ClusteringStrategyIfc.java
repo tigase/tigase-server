@@ -107,7 +107,7 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 * @param packet
 	 * @param conn
 	 *
-	 * 
+	 *
 	 */
 	boolean processPacket(Packet packet, XMPPResourceConnection conn);
 
@@ -137,7 +137,7 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	E getConnectionRecordInstance();
 
@@ -228,6 +228,8 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 *          is an instance of the SessionManagerHandler class.
 	 */
 	void setSessionManagerHandler(SessionManagerClusteredIfc sm);
+
+	public String getInfo();
 }
 
 
