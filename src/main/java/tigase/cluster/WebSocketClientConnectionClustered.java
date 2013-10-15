@@ -143,11 +143,13 @@ public class WebSocketClientConnectionClustered
 	 * Method description
 	 *
 	 *
+	 *
+	 *
 	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getDiscoDescription() {
-		return "Websocket connection manager clustered";
+		return super.getDiscoDescription() + " clustered";
 	}
 
 	/**
