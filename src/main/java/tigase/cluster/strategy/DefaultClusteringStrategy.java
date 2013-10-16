@@ -264,6 +264,17 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 		return result;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	@Override
+	public String toString() {
+		return getInfo();
+	}
+
 	//~--- get methods ----------------------------------------------------------
 
 	/**

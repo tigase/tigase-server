@@ -425,7 +425,19 @@ public class SessionManagerClustered
 	 */
 	@Override
 	public String getDiscoDescription() {
-		return super.getDiscoDescription() + " clustered" + strategy.getInfo();
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "disco description from SM Clustered");
+		}
+
+		String result;
+
+		result = super.getDiscoDescription();
+		result += " clustered, ";
+		result += strategy;
+
+		return result;
+
+//  return super.getDiscoDescription() + " clustered, " + strategy;
 	}
 
 	// private long calcAverage(long[] timings) {
