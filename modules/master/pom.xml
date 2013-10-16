@@ -141,7 +141,7 @@
 						<configuration>
 							<providerSelection>2.0</providerSelection>
 							<properties>
-								<script>git rev-list master --count</script>
+								<script>git rev-list HEAD --count</script>
 							</properties>
 							<source>
 								def command = project.properties.script
