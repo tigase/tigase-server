@@ -823,7 +823,7 @@ public class ClusterConnectionManager
 	 */
 	@Override
 	public String getDiscoDescription() {
-		return XMLNS + " " + getName();
+		return "Cluster connection manager";
 	}
 
 	/**
@@ -1081,7 +1081,6 @@ public class ClusterConnectionManager
 //    log.log(Level.FINEST, "ParamsForPort, item: {0}, defs: {1}", new Object[] { item,
 //        defs });
 //  }
-
 		return defs;
 	}
 
@@ -1341,4 +1340,4 @@ public class ClusterConnectionManager
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/10/07
+//~ Formatted in Tigase Code Convention on 13/10/15
