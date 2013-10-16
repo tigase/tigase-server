@@ -69,17 +69,16 @@ public class MessageRouterConfig {
 
 	/** Field description */
 	public static final String UPDATES_CHECKING_INTERVAL_PROP_KEY =
-		"updates-checking-interval";
+			"updates-checking-interval";
 
 	/** Field description */
 	public static final long UPDATES_CHECKING_INTERVAL_PROP_VAL = 7;
 
 	/** Field description */
-	public static final String UPDATES_CHECKING_PROP_KEY           = "updates-checking";
-	private static String[] LOCAL_ADDRESSES_PROP_VALUE             = { "localhost",
-					"hostname" };
-	private static final Logger log                                =
-		Logger.getLogger("tigase.server.MessageRouterConfig");
+	public static final String    UPDATES_CHECKING_PROP_KEY        = "updates-checking";
+	private static String[]       LOCAL_ADDRESSES_PROP_VALUE = { "localhost", "hostname" };
+	private static final Logger   log = Logger.getLogger(
+			"tigase.server.MessageRouterConfig");
 	private static final String[] DEF_MSG_RECEIVERS_NAMES_PROP_VAL = {
 		DEF_C2S_NAME, DEF_S2S_NAME, DEF_SM_NAME, DEF_BOSH_NAME, DEF_MONITOR_NAME,
 		DEF_AMP_NAME, DEF_WS2S_NAME
@@ -91,30 +90,30 @@ public class MessageRouterConfig {
 
 	/** Field description */
 	public static final String MSG_RECEIVERS_NAMES_PROP_KEY = MSG_RECEIVERS_PROP_KEY +
-																														"id-names";
+			"id-names";
 	private static final String[] SM_MSG_RECEIVERS_NAMES_PROP_VAL = { DEF_EXT_COMP_NAME,
-					DEF_SM_NAME, DEF_MONITOR_NAME, DEF_AMP_NAME };
+			DEF_SM_NAME, DEF_MONITOR_NAME, DEF_AMP_NAME };
 	private static final String[] DEF_REGISTRATOR_NAMES_PROP_VAL = { DEF_VHOST_MAN_NAME,
-					DEF_STATS_NAME };
+			DEF_STATS_NAME };
 	private static final String[] CS_MSG_RECEIVERS_NAMES_PROP_VAL = {
 		DEF_C2S_NAME, DEF_S2S_NAME, DEF_EXT_COMP_NAME, DEF_BOSH_NAME, DEF_MONITOR_NAME,
 		DEF_AMP_NAME, DEF_WS2S_NAME
 	};
 	private static final Map<String, String> COMPONENT_CLASSES = new LinkedHashMap<String,
-																																 String>();
+			String>();
 	private static final String[] COMP_MSG_RECEIVERS_NAMES_PROP_VAL = { DEF_COMP_PROT_NAME,
-					DEF_MONITOR_NAME, DEF_AMP_NAME };
+			DEF_MONITOR_NAME, DEF_AMP_NAME };
 	private static final Map<String, String> COMP_CLUS_MAP = new LinkedHashMap<String,
-																														 String>();
+			String>();
 	private static final String[] CLUSTER_REGISTRATOR_NAMES_PROP_VAL = { DEF_VHOST_MAN_NAME,
-					DEF_STATS_NAME, DEF_CLUST_CONTR_NAME };
+			DEF_STATS_NAME, DEF_CLUST_CONTR_NAME };
 
 	/** Field description */
 	public static final Boolean UPDATES_CHECKING_PROP_VAL = true;
 
 	/** Field description */
 	public static final String REGISTRATOR_NAMES_PROP_KEY = REGISTRATOR_PROP_KEY +
-																													"id-names";
+			"id-names";
 
 	/** Field description */
 	public static final boolean DISCO_SHOW_VERSION_PROP_VAL = true;
@@ -145,7 +144,7 @@ public class MessageRouterConfig {
 		COMP_CLUS_MAP.put(C2S_COMP_CLASS_NAME, C2S_CLUST_COMP_CLASS_NAME);
 		COMP_CLUS_MAP.put(BOSH_COMP_CLASS_NAME, BOSH_CLUST_COMP_CLASS_NAME);
 		COMP_CLUS_MAP.put(MONITOR_CLASS_NAME, MONITOR_CLUST_CLASS_NAME);
-		COMP_CLUS_MAP.put(DEF_WS2S_NAME, WS2S_CLUST_CLASS_NAME);
+		COMP_CLUS_MAP.put(WS2S_CLASS_NAME, WS2S_CLUST_CLASS_NAME);
 	}
 
 	//~--- fields ---------------------------------------------------------------
@@ -166,6 +165,37 @@ public class MessageRouterConfig {
 		// System.out.println("MessageRouterConfig() properties: " + props.toString());
 	}
 
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param cls_name
+	 * @param currCls
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 */
+	@SuppressWarnings("unchecked")
+	public boolean componentClassEquals(String cls_name,
+			Class<? extends ServerComponent> currCls) {
+		Class<? extends ServerComponent> cls = null;
+
+		try {
+			cls = ModulesManagerImpl.getInstance().getServerComponentClass(cls_name);
+			if (((cls == null) && (!XMPPServer.isOSGi() || COMPONENT_CLASSES.containsValue(
+					cls_name) || COMP_CLUS_MAP.containsValue(cls_name))) || EXT_COMP_CLASS_NAME
+					.equals(cls_name)) {
+				cls = (Class<? extends ServerComponent>) this.getClass().getClassLoader()
+						.loadClass(cls_name);
+			}
+		} catch (Exception ex) {}
+
+		return (cls != null) && currCls.equals(cls);
+	}
+
 	//~--- get methods ----------------------------------------------------------
 
 	/**
@@ -177,19 +207,19 @@ public class MessageRouterConfig {
 	 * @param comp_name
 	 */
 	public static void getDefaults(Map<String, Object> defs, Map<String, Object> params,
-																 String comp_name) {
+			String comp_name) {
 		boolean cluster_mode = isTrue((String) params.get(CLUSTER_MODE));
 
 		log.log(Level.CONFIG, "Cluster mode: {0}", params.get(CLUSTER_MODE));
 		if (cluster_mode) {
 			log.config("Cluster mode is on, replacing known components with cluster" +
-								 " versions:");
+					" versions:");
 			for (Map.Entry<String, String> entry : COMPONENT_CLASSES.entrySet()) {
 				String cls = COMP_CLUS_MAP.get(entry.getValue());
 
 				if (cls != null) {
 					log.log(Level.CONFIG, "Replacing {0} with {1}", new Object[] { entry.getValue(),
-									cls });
+							cls });
 					entry.setValue(cls);
 				}
 			}
@@ -197,9 +227,9 @@ public class MessageRouterConfig {
 			log.config("Cluster mode is off.");
 		}
 
-		String config_type = (String) params.get("config-type");
-		String[] rcv_names = DEF_MSG_RECEIVERS_NAMES_PROP_VAL;
-		Object par_names   = params.get(comp_name + "/" + MSG_RECEIVERS_NAMES_PROP_KEY);
+		String   config_type = (String) params.get("config-type");
+		String[] rcv_names   = DEF_MSG_RECEIVERS_NAMES_PROP_VAL;
+		Object   par_names   = params.get(comp_name + "/" + MSG_RECEIVERS_NAMES_PROP_KEY);
 
 		if (par_names != null) {
 			rcv_names = (String[]) par_names;
@@ -227,8 +257,8 @@ public class MessageRouterConfig {
 				String new_comp_name = DEF_EXT_COMP_NAME + key.substring(GEN_EXT_COMP.length());
 
 				if (Arrays.binarySearch(rcv_names, new_comp_name) < 0) {
-					rcv_names                       = Arrays.copyOf(rcv_names,
-									rcv_names.length + 1);
+					rcv_names                       = Arrays.copyOf(rcv_names, rcv_names.length +
+							1);
 					rcv_names[rcv_names.length - 1] = new_comp_name;
 					Arrays.sort(rcv_names);
 				}
@@ -247,8 +277,8 @@ public class MessageRouterConfig {
 				if (Arrays.binarySearch(rcv_names, c_name) < 0) {
 					defs.put(MSG_RECEIVERS_PROP_KEY + c_name + ".class", c_class);
 					defs.put(MSG_RECEIVERS_PROP_KEY + c_name + ".active", true);
-					rcv_names                       = Arrays.copyOf(rcv_names,
-									rcv_names.length + 1);
+					rcv_names                       = Arrays.copyOf(rcv_names, rcv_names.length +
+							1);
 					rcv_names[rcv_names.length - 1] = c_name;
 					Arrays.sort(rcv_names);
 
@@ -262,7 +292,7 @@ public class MessageRouterConfig {
 			log.config("In cluster mode I am setting up 1 listening xep-0114 component:");
 			if (Arrays.binarySearch(rcv_names, DEF_CL_COMP_NAME) < 0) {
 				defs.put(MSG_RECEIVERS_PROP_KEY + DEF_CL_COMP_NAME + ".class",
-								 CL_COMP_CLASS_NAME);
+						CL_COMP_CLASS_NAME);
 				defs.put(MSG_RECEIVERS_PROP_KEY + DEF_CL_COMP_NAME + ".active", true);
 				rcv_names                       = Arrays.copyOf(rcv_names, rcv_names.length + 1);
 				rcv_names[rcv_names.length - 1] = DEF_CL_COMP_NAME;
@@ -304,93 +334,22 @@ public class MessageRouterConfig {
 		defs.put(UPDATES_CHECKING_INTERVAL_PROP_KEY, UPDATES_CHECKING_INTERVAL_PROP_VAL);
 	}
 
-	private static boolean isTrue(String val) {
-		if (val == null) {
-			return false;
-		}
-
-		String value = val.toLowerCase();
-
-		return (value.equals("true") || value.equals("yes") || value.equals("on") ||
-						value.equals("1"));
-	}
-
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param name
-	 *
-	 * 
-	 *
-	 * @throws ClassNotFoundException
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
-	 */
-	public ServerComponent getMsgRcvInstance(String name)
-					throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-		String cls_name     = (String) props.get(MSG_RECEIVERS_PROP_KEY + name + ".class");
-		ServerComponent cls = null;
-
-		cls = ModulesManagerImpl.getInstance().getServerComponent(cls_name);
-		if (((cls == null) &&
-				 (!XMPPServer.isOSGi() || COMPONENT_CLASSES.containsValue(cls_name) ||
-					COMP_CLUS_MAP.containsValue(cls_name))) || EXT_COMP_CLASS_NAME.equals(
-						cls_name)) {
-			cls = (ServerComponent) this.getClass().getClassLoader().loadClass(
-				cls_name).newInstance();
-		}
-
-		return cls;
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
 	 *
 	 *
-	 * @param cls_name
-	 * @param currCls
-	 *
-	 * 
-	 */
-	@SuppressWarnings("unchecked")
-	public boolean componentClassEquals(String cls_name,
-					Class<? extends ServerComponent> currCls) {
-		Class<? extends ServerComponent> cls = null;
-
-		try {
-			cls = ModulesManagerImpl.getInstance().getServerComponentClass(cls_name);
-			if (((cls == null) &&
-					 (!XMPPServer.isOSGi() || COMPONENT_CLASSES.containsValue(cls_name) ||
-						COMP_CLUS_MAP.containsValue(cls_name))) || EXT_COMP_CLASS_NAME.equals(
-							cls_name)) {
-				cls =
-					(Class<? extends ServerComponent>) this.getClass().getClassLoader().loadClass(
-						cls_name);
-			}
-		} catch (Exception ex) {}
-
-		return (cls != null) && currCls.equals(cls);
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
+	 * @return a value of <code>String[]</code>
 	 */
 	public String[] getMsgRcvActiveNames() {
-		String[] names              = (String[]) props.get(MSG_RECEIVERS_NAMES_PROP_KEY);
+		String[]     names          = (String[]) props.get(MSG_RECEIVERS_NAMES_PROP_KEY);
 		List<String> availableNames = new ArrayList<String>();
 
 		for (String name : names) {
-			if (hasClassForServerComponent(name) &&
-					((props.get(MSG_RECEIVERS_PROP_KEY + name + ".active") != null) &&
-					 (Boolean) props.get(MSG_RECEIVERS_PROP_KEY + name + ".active"))) {
+			if (hasClassForServerComponent(name) && ((props.get(MSG_RECEIVERS_PROP_KEY + name +
+					".active") != null) && (Boolean) props.get(MSG_RECEIVERS_PROP_KEY + name +
+					".active"))) {
 				availableNames.add(name);
 			}
 		}
@@ -406,11 +365,13 @@ public class MessageRouterConfig {
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
 	 */
 	public String[] getMsgRcvInactiveNames() {
-		String[] names       = (String[]) props.get(MSG_RECEIVERS_NAMES_PROP_KEY);
-		ArrayList<String> al = new ArrayList<String>();
+		String[]          names = (String[]) props.get(MSG_RECEIVERS_NAMES_PROP_KEY);
+		ArrayList<String> al    = new ArrayList<String>();
 
 		for (String name : names) {
 			if ((props.get(MSG_RECEIVERS_PROP_KEY + name + ".active") == null) ||
@@ -435,8 +396,41 @@ public class MessageRouterConfig {
 	 *
 	 * @param name
 	 *
-	 * 
 	 *
+	 *
+	 *
+	 * @return a value of <code>ServerComponent</code>
+	 * @throws ClassNotFoundException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 */
+	public ServerComponent getMsgRcvInstance(String name)
+					throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+		String          cls_name = (String) props.get(MSG_RECEIVERS_PROP_KEY + name +
+				".class");
+		ServerComponent cls = null;
+
+		cls = ModulesManagerImpl.getInstance().getServerComponent(cls_name);
+		if (((cls == null) && (!XMPPServer.isOSGi() || COMPONENT_CLASSES.containsValue(
+				cls_name) || COMP_CLUS_MAP.containsValue(cls_name))) || EXT_COMP_CLASS_NAME
+				.equals(cls_name)) {
+			cls = (ServerComponent) this.getClass().getClassLoader().loadClass(cls_name)
+					.newInstance();
+		}
+
+		return cls;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param name
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>ComponentRegistrator</code>
 	 * @throws ClassNotFoundException
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
@@ -448,8 +442,8 @@ public class MessageRouterConfig {
 		// I changed location for the XMPPServiceCollector class
 		// to avoid problems with old configuration files let's detect it here
 		// and silently convert it to new package name:
-		if (cls_name.equals("tigase.server.XMPPServiceCollector") ||
-				cls_name.equals("tigase.disco.XMPPServiceCollector")) {
+		if (cls_name.equals("tigase.server.XMPPServiceCollector") || cls_name.equals(
+				"tigase.disco.XMPPServiceCollector")) {
 			log.warning(
 					"This class is not used anymore. Correct your configuration please. Remove " +
 					"all references to class: XMPPServiceCollector.");
@@ -457,15 +451,17 @@ public class MessageRouterConfig {
 			return null;
 		}
 
-		return (ComponentRegistrator) this.getClass().getClassLoader().loadClass(
-				cls_name).newInstance();
+		return (ComponentRegistrator) this.getClass().getClassLoader().loadClass(cls_name)
+				.newInstance();
 	}
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String[]</code>
 	 */
 	public String[] getRegistrNames() {
 		String[] names = (String[]) props.get(REGISTRATOR_NAMES_PROP_KEY);
@@ -489,7 +485,7 @@ public class MessageRouterConfig {
 	 * Check if class exists for server component
 	 *
 	 * @param name
-	 * 
+	 *
 	 */
 	private boolean hasClassForServerComponent(String name) {
 		try {
@@ -503,10 +499,9 @@ public class MessageRouterConfig {
 			if (ModulesManagerImpl.getInstance().hasClassForServerComponent(cls_name)) {
 				return true;
 			}
-			if (XMPPServer.isOSGi() &&
-					!(COMPONENT_CLASSES.containsValue(cls_name) ||
-						COMP_CLUS_MAP.containsValue(cls_name) ||
-						EXT_COMP_CLASS_NAME.equals(cls_name))) {
+			if (XMPPServer.isOSGi() &&!(COMPONENT_CLASSES.containsValue(cls_name) ||
+					COMP_CLUS_MAP.containsValue(cls_name) || EXT_COMP_CLASS_NAME.equals(
+					cls_name))) {
 				return false;
 			}
 
@@ -518,7 +513,18 @@ public class MessageRouterConfig {
 			return false;
 		}
 	}
+
+	private static boolean isTrue(String val) {
+		if (val == null) {
+			return false;
+		}
+
+		String value = val.toLowerCase();
+
+		return (value.equals("true") || value.equals("yes") || value.equals("on") || value
+				.equals("1"));
+	}
 }    // MessageRouterConfig
 
 
-//~ Formatted in Tigase Code Convention on 13/03/05
+//~ Formatted in Tigase Code Convention on 13/10/15
