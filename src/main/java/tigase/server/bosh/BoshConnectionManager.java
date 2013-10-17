@@ -51,9 +51,9 @@ import static tigase.server.bosh.Constants.*;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.ArrayDeque;
-import java.util.List;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
@@ -112,7 +112,9 @@ public class BoshConnectionManager
 	 * @param packet
 	 * @param bs
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean addOutStreamClosed(Packet packet, BoshSession bs) {
@@ -132,7 +134,9 @@ public class BoshConnectionManager
 	 *
 	 * @param packet
 	 * @param bs
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean addOutStreamOpen(Packet packet, BoshSession bs) {
@@ -185,7 +189,9 @@ public class BoshConnectionManager
 	 *
 	 * @param srv
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>Queue<Packet></code>
 	 */
 	@Override
 	public Queue<Packet> processSocketData(XMPPIOService<Object> srv) {
@@ -265,7 +271,9 @@ public class BoshConnectionManager
 	 * @param bs
 	 * @param delay
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>BoshSendQueueTask</code>
 	 */
 	@Override
 	public BoshSendQueueTask scheduleSendQueueTask(final BoshSession bs, long delay) {
@@ -284,7 +292,9 @@ public class BoshConnectionManager
 	 * @param bs
 	 * @param delay
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>BoshTask</code>
 	 */
 	@Override
 	public BoshTask scheduleTask(BoshSession bs, long delay) {
@@ -359,7 +369,9 @@ public class BoshConnectionManager
 	 * @param serv
 	 * @param attribs
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String xmppStreamOpened(BoshIOService serv, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINE)) {
@@ -386,7 +398,9 @@ public class BoshConnectionManager
 	 *
 	 * @param params
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -408,7 +422,9 @@ public class BoshConnectionManager
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -419,7 +435,9 @@ public class BoshConnectionManager
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getDiscoDescription() {
@@ -433,7 +451,9 @@ public class BoshConnectionManager
 	 * @param fromJID
 	 * @param ph
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>BareJID</code>
 	 */
 	@Override
 	public BareJID getSeeOtherHostForJID(BareJID fromJID, Phase ph) {
@@ -570,7 +590,9 @@ public class BoshConnectionManager
 	 * @param command_sessionId
 	 * @param serv
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>JID</code>
 	 */
 	@Override
 	protected JID changeDataReceiver(Packet packet, JID newAddress,
@@ -598,7 +620,9 @@ public class BoshConnectionManager
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>ReceiverTimeoutHandler</code>
 	 */
 	@Override
 	protected ReceiverTimeoutHandler newStartedHandler() {
@@ -660,23 +684,26 @@ public class BoshConnectionManager
 					log.log(Level.FINER, "Closing session for command CLOSE: {0}", session
 							.getSid());
 				}
-
 				try {
-					List<Element> err_el = packet.getElement().getChildrenStaticStr( Iq.IQ_COMMAND_PATH );
-					if ( ( err_el != null ) && ( err_el.size() > 0 ) ){
+					List<Element> err_el = packet.getElement().getChildrenStaticStr(Iq
+							.IQ_COMMAND_PATH);
 
-						Element error = new Element( "stream:error" );
-						error.addChild( err_el.get( 0 ) );
-						Packet condition = Packet.packetInstance( error );
-						condition.setPacketTo( packet.getTo() );
-						writePacketToSocket( condition );
+					if ((err_el != null) && (err_el.size() > 0)) {
+						Element error = new Element("stream:error");
+
+						error.addChild(err_el.get(0));
+
+						Packet condition = Packet.packetInstance(error);
+
+						condition.setPacketTo(packet.getTo());
+						writePacketToSocket(condition);
 						session.sendWaitingPackets();
 						bosh_session_close_delay = 100;
 					}
-				} catch ( TigaseStringprepException ex ) {
-					Logger.getLogger( BoshConnectionManager.class.getName() ).log( Level.SEVERE, null, ex );
+				} catch (TigaseStringprepException ex) {
+					Logger.getLogger(BoshConnectionManager.class.getName()).log(Level.SEVERE, null,
+							ex);
 				}
-
 				if (bosh_session_close_delay > 0) {
 					try {
 						Thread.sleep(bosh_session_close_delay);
@@ -729,7 +756,9 @@ public class BoshConnectionManager
 	 *
 	 * @param packet
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	protected boolean writePacketToSocket(Packet packet) {
@@ -771,19 +800,29 @@ public class BoshConnectionManager
 	 *
 	 * @param jid
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>BoshSession</code>
 	 */
 	protected BoshSession getBoshSession(JID jid) {
-		UUID sid = UUID.fromString(jid.getResource());
+		String res = jid.getResource();
 
-		return sessions.get(sid);
+		if (res != null) {
+			UUID sid = UUID.fromString(res);
+
+			return sessions.get(sid);
+		}
+
+		return null;
 	}
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>int[]</code>
 	 */
 	@Override
 	protected int[] getDefPlainPorts() {
@@ -794,7 +833,9 @@ public class BoshConnectionManager
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>int[]</code>
 	 */
 	@Override
 	protected int[] getDefSSLPorts() {
@@ -817,7 +858,9 @@ public class BoshConnectionManager
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>BoshIOService</code>
 	 */
 	@Override
 	protected BoshIOService getXMPPIOServiceInstance() {
@@ -884,4 +927,4 @@ public class BoshConnectionManager
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/04/24
+//~ Formatted in Tigase Code Convention on 13/10/15
