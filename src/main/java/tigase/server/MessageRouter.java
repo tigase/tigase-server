@@ -85,22 +85,18 @@ public class MessageRouter
 
 	// private static final long startupTime = System.currentTimeMillis();
 	// private Set<String> localAddresses = new CopyOnWriteArraySet<String>();
-	private String                   disco_name         = DISCO_NAME_PROP_VAL;
-	private boolean                  disco_show_version = DISCO_SHOW_VERSION_PROP_VAL;
-	private UpdatesChecker           updates_checker    = null;
-	private Map<String, XMPPService> xmppServices = new ConcurrentHashMap<String,
-			XMPPService>();
-	private Map<String, ComponentRegistrator> registrators = new ConcurrentHashMap<String,
-			ComponentRegistrator>();
-	private Map<String, MessageReceiver> receivers = new ConcurrentHashMap<String,
-			MessageReceiver>();
-	private boolean                   inProperties = false;
-	private Set<String>               connectionManagerNames =
-			new ConcurrentSkipListSet<String>();
-	private Map<JID, ServerComponent> components_byId = new ConcurrentHashMap<JID,
-			ServerComponent>();
-	private Map<String, ServerComponent> components = new ConcurrentHashMap<String,
-			ServerComponent>();
+	private String                            disco_name      = DISCO_NAME_PROP_VAL;
+	private boolean                           disco_show_version =
+			DISCO_SHOW_VERSION_PROP_VAL;
+	private UpdatesChecker                    updates_checker = null;
+	private Map<String, XMPPService>          xmppServices = new ConcurrentHashMap<>();
+	private Map<String, ComponentRegistrator> registrators = new ConcurrentHashMap<>();
+	private Map<String, MessageReceiver>      receivers = new ConcurrentHashMap<>();
+	private boolean                           inProperties    = false;
+	private Set<String>                       connectionManagerNames =
+			new ConcurrentSkipListSet<>();
+	private Map<JID, ServerComponent>         components_byId = new ConcurrentHashMap<>();
+	private Map<String, ServerComponent>      components      = new ConcurrentHashMap<>();
 
 	//~--- methods --------------------------------------------------------------
 
@@ -312,19 +308,8 @@ public class MessageRouter
 
 			return;
 		}
-
-		// Catch and process all service discovery packets here....
-//  ServerComponent comp = (packet.getStanzaTo() == null)
-//      ? null
-//      : getLocalComponent(packet.getStanzaTo());
-		if (packet.isServiceDisco() && (packet.getType() == StanzaType.get) && (packet
-				.getStanzaFrom() != null) && ((packet.getStanzaTo() == null) || (isLocalDomain(
-				packet.getStanzaTo().toString()) &&!isDiscoDisabled(packet.getStanzaTo())))) {
-
-//    .getStanzaFrom() != null) && ((packet.getStanzaTo() == null) || ((comp != null) &&
-//    !(comp instanceof DisableDisco)) || isLocalDomain(packet.getStanzaTo()
-//    .toString()))) {
-			Queue<Packet> results = new ArrayDeque<Packet>();
+		if (isLocalDiscoRequest(packet)) {
+			Queue<Packet> results = new ArrayDeque<>();
 
 			processDiscoQuery(packet, results);
 			if (results.size() > 0) {
@@ -1117,9 +1102,7 @@ public class MessageRouter
 		}
 	}
 
-	private boolean isDiscoDisabled(JID to) {
-		ServerComponent comp = getLocalComponent(to);
-
+	private boolean isDiscoDisabled(ServerComponent comp, JID to) {
 		if (comp != null) {
 			return (comp instanceof DisableDisco);
 		} else {
@@ -1136,7 +1119,25 @@ public class MessageRouter
 
 		return false;
 	}
+
+	private boolean isLocalDiscoRequest(Packet packet) {
+		boolean         result = false;
+		JID             to     = packet.getStanzaTo();
+		ServerComponent comp   = (to == null)
+				? null
+				: getLocalComponent(to);
+
+		result = packet.isServiceDisco() && (packet.getType() == StanzaType.get) && (packet
+				.getStanzaFrom() != null) && ((packet.getStanzaTo() == null) || (((comp !=
+				null) || isLocalDomain(packet.getStanzaTo().toString())) &&!isDiscoDisabled(comp,
+				to)));
+
+//  .getStanzaFrom() != null) && ((packet.getStanzaTo() == null) || ((comp != null) &&
+//  !(comp instanceof DisableDisco)) || isLocalDomain(packet.getStanzaTo()
+//  .toString()))) {
+		return result;
+	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/10/07
+//~ Formatted in Tigase Code Convention on 13/10/16
