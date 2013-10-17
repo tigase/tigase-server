@@ -38,8 +38,6 @@ import tigase.server.AbstractComponentRegistrator;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
 
-import tigase.stats.StatisticsList;
-
 import tigase.xml.Element;
 
 import tigase.xmpp.JID;
@@ -152,6 +150,7 @@ public class ClusterController
 	 *
 	 * @param node
 	 */
+	@Override
 	public void nodeConnected(String node) {
 		for (ClusteredComponentIfc comp : components.values()) {
 			comp.nodeConnected(node);
@@ -164,6 +163,7 @@ public class ClusterController
 	 *
 	 * @param node
 	 */
+	@Override
 	public void nodeDisconnected(String node) {
 		for (ClusteredComponentIfc comp : components.values()) {
 			comp.nodeDisconnected(node);
@@ -402,7 +402,9 @@ public class ClusterController
 	 *
 	 * @param params
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -415,7 +417,9 @@ public class ClusterController
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -426,11 +430,13 @@ public class ClusterController
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getDiscoDescription() {
-		return "Server clustering";
+		return "Cluster controller";
 	}
 
 	/**
@@ -439,7 +445,9 @@ public class ClusterController
 	 *
 	 * @param component
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean isCorrectType(ServerComponent component) {
@@ -497,4 +505,4 @@ public class ClusterController
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/10/15
