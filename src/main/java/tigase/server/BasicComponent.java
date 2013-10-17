@@ -103,10 +103,10 @@ public class BasicComponent
 
 	/** Field description */
 	protected VHostManagerIfc vHostManager          = null;
+	private ComponentInfo     cmpInfo               = null;
 	private JID               compId                = null;
 	private String            DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefaultHostname();
 	private String            name                  = null;
-	private ComponentInfo     cmpInfo               = null;
 	private BareJID           defHostname = BareJID.bareJIDInstanceNS(
 			DEF_HOSTNAME_PROP_VAL);
 
@@ -143,7 +143,9 @@ public class BasicComponent
 	 *
 	 * @param jid
 	 * @param commandId
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean canCallCommand(JID jid, String commandId) {
 		boolean result = isAdmin(jid);
@@ -174,7 +176,9 @@ public class BasicComponent
 	 * @param jid
 	 * @param acl
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean checkCommandAcl(JID jid, EnumSet<CmdAcl> acl) {
 		for (CmdAcl cmdAcl : acl) {
@@ -219,7 +223,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean handlesLocalDomains() {
@@ -230,7 +236,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean handlesNameSubdomains() {
@@ -241,7 +249,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean handlesNonLocalDomains() {
@@ -404,13 +414,26 @@ public class BasicComponent
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 */
+	public void updateServiceEntity() {
+		serviceEntity = new ServiceEntity(name, null, getDiscoDescription(), true);
+		serviceEntity.addIdentities(new ServiceIdentity(getDiscoCategory(),
+				getDiscoCategoryType(), getDiscoDescription()));
+		serviceEntity.addFeatures("http://jabber.org/protocol/commands");
+	}
+
 	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>JID</code>
 	 */
 	@Override
 	public JID getComponentId() {
@@ -424,9 +447,10 @@ public class BasicComponent
 	 */
 	@Override
 	public ComponentInfo getComponentInfo() {
-		if ( cmpInfo == null ){
-			cmpInfo = new ComponentInfo( getName(), this.getClass() );
+		if (cmpInfo == null) {
+			cmpInfo = new ComponentInfo(getName(), this.getClass());
 		}
+
 		return cmpInfo;
 	}
 
@@ -436,7 +460,9 @@ public class BasicComponent
 	 *
 	 * @param params
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -470,7 +496,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>BareJID</code>
 	 */
 	public BareJID getDefHostName() {
 		return defHostname;
@@ -480,7 +508,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>BareJID</code>
 	 */
 	public BareJID getDefVHostItem() {
 		return (vHostManager != null)
@@ -492,7 +522,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String getDiscoCategory() {
 		return "component";
@@ -502,7 +534,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String getDiscoCategoryType() {
 		return "generic";
@@ -512,7 +546,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String getDiscoDescription() {
 		return "Undefined description";
@@ -521,7 +557,9 @@ public class BasicComponent
 	/**
 	 * Exists for backward compatibility with the old API.
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>List<Element></code>
 	 */
 	@Deprecated
 	public List<Element> getDiscoFeatures() {
@@ -534,7 +572,9 @@ public class BasicComponent
 	 *
 	 * @param from
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>List<Element></code>
 	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
@@ -547,7 +587,9 @@ public class BasicComponent
 	 * @param node
 	 * @param jid
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>Element</code>
 	 */
 	@Deprecated
 	public Element getDiscoInfo(String node, JID jid) {
@@ -562,7 +604,9 @@ public class BasicComponent
 	 * @param jid
 	 * @param from
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>Element</code>
 	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
@@ -591,7 +635,9 @@ public class BasicComponent
 	 * @param node
 	 * @param jid
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>List<Element></code>
 	 */
 	@Deprecated
 	public List<Element> getDiscoItems(String node, JID jid) {
@@ -606,7 +652,9 @@ public class BasicComponent
 	 * @param jid
 	 * @param from
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>List<Element></code>
 	 */
 	@Override
 	public List<Element> getDiscoItems(String node, JID jid, JID from) {
@@ -705,7 +753,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getName() {
@@ -720,7 +770,9 @@ public class BasicComponent
 	 * @param jid
 	 * @param from
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>List<Element></code>
 	 */
 	public List<Element> getScriptItems(String node, JID jid, JID from) {
 		LinkedList<Element> result      = null;
@@ -747,7 +799,9 @@ public class BasicComponent
 	 *
 	 * @param domain
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>VHostItem</code>
 	 */
 	public VHostItem getVHostItem(String domain) {
 		return (vHostManager != null)
@@ -761,7 +815,9 @@ public class BasicComponent
 	 *
 	 * @param jid
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean isAdmin(JID jid) {
 		return admins.contains(jid.getBareJID());
@@ -771,7 +827,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean isInitializationComplete() {
@@ -784,7 +842,9 @@ public class BasicComponent
 	 *
 	 * @param domain
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean isLocalDomain(String domain) {
 		return (vHostManager != null)
@@ -798,7 +858,9 @@ public class BasicComponent
 	 *
 	 * @param domain
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean isLocalDomainOrComponent(String domain) {
 		return (vHostManager != null)
@@ -809,7 +871,9 @@ public class BasicComponent
 	/**
 	 * Method returns true is component should be represented as subdomain
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean isSubdomain() {
 		return false;
@@ -892,10 +956,7 @@ public class BasicComponent
 				commandsACL.put(cmdId, acl);
 			}
 		}
-		serviceEntity = new ServiceEntity(name, null, getDiscoDescription(), true);
-		serviceEntity.addIdentities(new ServiceIdentity(getDiscoCategory(),
-				getDiscoCategoryType(), getDiscoDescription()));
-		serviceEntity.addFeatures("http://jabber.org/protocol/commands");
+		updateServiceEntity();
 
 		CommandIfc command = new AddScriptCommand();
 
@@ -909,9 +970,7 @@ public class BasicComponent
 			scriptsCompDir = scriptsBaseDir + "/" + getName();
 			loadScripts();
 		}
-
-		cmpInfo = new ComponentInfo( getName(), this.getClass() );
-
+		cmpInfo = new ComponentInfo(getName(), this.getClass());
 	}
 
 	/**
@@ -934,7 +993,9 @@ public class BasicComponent
 	 * @param pc
 	 * @param results
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean processScriptCommand(Packet pc, Queue<Packet> results) {
 
@@ -1012,7 +1073,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>Map<String,CommandIfc></code>
 	 */
 	protected Map<String, CommandIfc> getScriptCommands() {
 		return scriptCommands;
@@ -1022,7 +1085,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>ServiceEntity</code>
 	 */
 	protected ServiceEntity getServiceEntity() {
 		return serviceEntity;
@@ -1032,7 +1097,9 @@ public class BasicComponent
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean isNonAdminCommands() {
 		return nonAdminCommands;
@@ -1148,4 +1215,4 @@ public class BasicComponent
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/06/08
+//~ Formatted in Tigase Code Convention on 13/10/16

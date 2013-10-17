@@ -590,7 +590,7 @@ public class SessionManagerClustered
 				// strategy_tmp.init(getName());
 				strategy = strategy_tmp;
 				strategy.setSessionManagerHandler(this);
-				log.log(Level.CONFIG, "Loaded SM strategy: " + strategy_class);
+				log.log(Level.CONFIG, "Loaded SM strategy: {0}", strategy_class);
 
 				// strategy.nodeConnected(getComponentId());
 				addTrusted(getComponentId());
@@ -598,10 +598,11 @@ public class SessionManagerClustered
 					strategy.setClusterController(clusterController);
 				}
 			} catch (Exception e) {
-				log.log(Level.SEVERE, "Can not clustering strategy instance for class: " +
+				log.log(Level.SEVERE, "Cannot instance clustering strategy class: " +
 						strategy_class, e);
 			}
 		}
+		updateServiceEntity();
 		try {
 			if (props.get(MY_DOMAIN_NAME_PROP_KEY) != null) {
 				my_hostname = JID.jidInstance((String) props.get(MY_DOMAIN_NAME_PROP_KEY));
@@ -675,4 +676,4 @@ public class SessionManagerClustered
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/10/15
+//~ Formatted in Tigase Code Convention on 13/10/16
