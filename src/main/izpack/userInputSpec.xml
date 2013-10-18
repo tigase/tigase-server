@@ -226,15 +226,11 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<field type="space"/>
 		<field type="divider"/>
 		<field type="space"/>
-		<field type="staticText" align="left" size="2"
-					 txt="You have selected Tigase Advanced Clustering component. This component requires licence. If no valid licence is found then following data will be send back to Tigase team on daily basis:" />
-		<field type="space"/>
-		<field type="staticText" align="left" size="1" txt="- machine hostname" />
-		<field type="staticText" align="left" size="1" txt="- list of VHosts" />
-		<field type="staticText" align="left" size="1" txt="- uptime" />
-		<field type="staticText" align="left" size="1" txt="- memory usage" />
-		<field type="staticText" align="left" size="1" txt="- number of online users" />
-		<field type="staticText" align="left" size="1" txt="- count of cluster nodes" />
+		<field type="staticText" align="left" size="2" txt="This installation package contains Tigase ACS component, which is not open source software. The Tigase ACS component is only available under a commercial license. The full text of the commercial license agreement is available upon request." />
+		<field type="staticText" align="left" size="2" txt="The Tigase ACS component is provided free of charge for testing and development purposes only. Any use of the component on production systems, either commercial or not-for-profit, requires the purchase of a license." />
+		<field type="staticText" align="left" size="2" txt="If the Tigase ACS component is activated without a valid license, it will continue to work, including its full set of features, but it will send certain statistical information to Tigase's servers on a regular basis. If the Tigase ACS component cannot access our servers to send information, it will stop working. Once a valid license is installed, the Tigase ACS component will stop sending statistical information to Tigase's servers." />
+		<field type="staticText" align="left" size="2" txt="By activating the Tigase ACS component without a valid license you agree and accept that the component will send certain statistical information (such as DNS domain names, vhost names, number of online users, number of cluster nodes, etc.) which may be considered confidential and proprietary by the user. You accept and confirm that such information, which may be considered confidential or proprietary, will be transferred to Tigase's servers and that you will not pursue any remedy at law as a result of the information transfer." />
+		<field type="staticText" align="left" size="2" txt="If the Tigase ACS component is installed but not activated, no statistical information will be sent to Tigase's servers." />
 		<field type="space"/>
 		<field type="divider"/>
 		<field type="space"/>
