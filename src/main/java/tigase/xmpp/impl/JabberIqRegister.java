@@ -37,6 +37,7 @@ import tigase.server.Priority;
 import tigase.util.TigaseStringprepException;
 
 import tigase.xml.Element;
+import tigase.xml.XMLUtils;
 
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
@@ -217,19 +218,20 @@ public class JabberIqRegister
 
 						// No, so assuming this is registration of a new
 						// user or change registration details for existing user
-						String              user_name = request.getChildCDataStaticStr(
-								IQ_QUERY_USERNAME_PATH);
-						String              password = request.getChildCDataStaticStr(
-								IQ_QUERY_PASSWORD_PATH);
-						String              email = request.getChildCDataStaticStr(
-								IQ_QUERY_EMAIL_PATH);
+						String user_name = request.getChildCDataStaticStr(
+								IQ_QUERY_USERNAME_PATH );
+						String password = request.getChildCDataStaticStr(
+								IQ_QUERY_PASSWORD_PATH );
+						String pass_enc = XMLUtils.unescape( password );
+						String email = request.getChildCDataStaticStr(
+								IQ_QUERY_EMAIL_PATH );
 						Map<String, String> reg_params = null;
 
 						if ((email != null) &&!email.trim().isEmpty()) {
 							reg_params = new LinkedHashMap<String, String>();
 							reg_params.put("email", email);
 						}
-						result = session.register(user_name, password, reg_params);
+						result = session.register(user_name, pass_enc, reg_params);
 						if (result == Authorization.AUTHORIZED) {
 							results.offer(result.getResponseMessage(packet, null, false));
 						} else {
