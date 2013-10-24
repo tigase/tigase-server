@@ -67,8 +67,12 @@ public class Store
 	// ~--- fields ---------------------------------------------------------------
 	private Thread expiredProcessor          = null;
 	private MsgRepository repo               = null;
-	private final SimpleDateFormat formatter =
-		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+	private final SimpleDateFormat formatter;
+
+	{
+		this.formatter = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" );
+		this.formatter.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+	}
 
 	//~--- methods --------------------------------------------------------------
 
