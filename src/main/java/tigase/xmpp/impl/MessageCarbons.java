@@ -347,6 +347,9 @@ public class MessageCarbons
 	 * @param results 
 	 */
 	private static void notifyStateChanged(JID from, JID to, boolean value, Queue<Packet> results) {
+		if (from.equals(to))
+			return;
+		
 		Element iq = new Element("iq", new String[]{"xmlns", "type"},
 				new String[]{Packet.CLIENT_XMLNS, StanzaType.set.name()});
 		Element enable = new Element(value ? ENABLE_ELEM_NAME : DISABLE_ELEM_NAME,
