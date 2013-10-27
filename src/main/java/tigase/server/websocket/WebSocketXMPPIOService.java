@@ -232,7 +232,7 @@ public class WebSocketXMPPIOService<RefObject>
 
 						// send frame content
 						writeBytes(buf);
-						buf.compact();
+						//buf.compact();
 					}
 					else {
 						writeBytes(null);
@@ -458,7 +458,7 @@ public class WebSocketXMPPIOService<RefObject>
 	 * 
 	 */
 	private ByteBuffer createFrameHeader(byte type, int size) {
-		ByteBuffer bbuf = ByteBuffer.allocate(9);
+		ByteBuffer bbuf = ByteBuffer.allocate(12);
 
 		bbuf.put(type);
 		if (size <= 125) {
