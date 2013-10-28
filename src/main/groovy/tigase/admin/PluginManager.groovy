@@ -22,7 +22,7 @@
 
 /*
 
-Manage active server components
+Manage active server plugins
 
 AS:Description: Manage active server plugins
 AS:CommandId: plugin-manager
@@ -61,7 +61,12 @@ if (!submit) {
         def res = (Iq)p.commandResult(Command.DataType.form)
                 
         def pluginsAll = [];
-        pluginsAll.addAll(ModulesManagerImpl.getInstance().plugins.keySet());
+		if (XMPPServer.isOSGi()) {
+			pluginsAll.addAll(ModulesManagerImpl.getInstance().plugins.keySet());
+		}
+		else {
+			pluginsAll.addAll(tigase.xmpp.ProcessorFactory.processors.keySet());
+		}
         def conf = XMPPServer.getConfigurator();
         def pluginsEnabled = [];
         pluginsEnabled.addAll(tigase.server.xmppsession.SessionManagerConfig.PLUGINS_FULL_PROP_VAL);
