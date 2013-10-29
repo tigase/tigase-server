@@ -257,15 +257,19 @@ public class SessionManager
 			// have thread pool specific settings create a separate thread pool
 			// for the processor
 			if ((workerThreads.get(defPluginsThreadsPool) == null) || (conc != null)) {
-				ProcessorWorkerThread                    worker = new ProcessorWorkerThread();
-				ProcessingThreads<ProcessorWorkerThread> pt =
-						new ProcessingThreads<ProcessorWorkerThread>(worker, concurrency,
-						maxInQueueSize, proc.id());
+				// Added to make sure that there will be only one thread pool for plugin
+				// so if one exits we will keep it and not create another one
+				if (!workerThreads.containsKey(proc.id())) {
+					ProcessorWorkerThread                    worker = new ProcessorWorkerThread();
+					ProcessingThreads<ProcessorWorkerThread> pt =
+							new ProcessingThreads<ProcessorWorkerThread>(worker, concurrency,
+							maxInQueueSize, proc.id());
 
-				workerThreads.put(proc.id(), pt);
-				log.log(Level.CONFIG, "Created thread pool: {0}, queue: {1} for plugin id: {2}",
-						new Object[] { concurrency,
-						maxInQueueSize, proc.id() });
+					workerThreads.put(proc.id(), pt);
+					log.log(Level.CONFIG, "Created thread pool: {0}, queue: {1} for plugin id: {2}",
+							new Object[] { concurrency,
+							maxInQueueSize, proc.id() });
+				}
 			}
 			processors.put(proc.id(), proc);
 			log.log(Level.CONFIG, "Added processor: {0} for plugin id: {1}", new Object[] { proc
@@ -989,107 +993,106 @@ public class SessionManager
 		}
 		naUserRepository = new NonAuthUserRepositoryImpl(user_repository, getDefHostName(),
 				Boolean.parseBoolean((String) props.get(AUTO_CREATE_OFFLINE_USER_PROP_KEY)));
-		if (isInitializationComplete()) {
 
-			// Before we can allow for plugins initialization again, this needs to be
-			// tested to ensure there is no double initialization and multiple threads
-			// pools are not created to waste resources
-			return;
-		}
+		synchronized (this) {
+			LinkedHashMap<String, Integer> plugins_concurrency = new LinkedHashMap<String, Integer>(20);
+			String[] plugins_conc = ((String) props.get(PLUGINS_CONCURRENCY_PROP_KEY)).split(",");
 
-		LinkedHashMap<String, Integer> plugins_concurrency = new LinkedHashMap<String,
-				Integer>(20);
-		String[] plugins_conc = ((String) props.get(PLUGINS_CONCURRENCY_PROP_KEY)).split(",");
+			log.log(Level.CONFIG, "Loading concurrency plugins list: {0}", Arrays.toString(
+					plugins_conc));
+			if ((plugins_conc != null) && (plugins_conc.length > 0)) {
+				for (String plugc : plugins_conc) {
+					log.log(Level.CONFIG, "Loading: {0}", plugc);
+					if (!plugc.trim().isEmpty()) {
+						String[] pc = plugc.split("=");
 
-		log.log(Level.CONFIG, "Loading concurrency plugins list: {0}", Arrays.toString(
-				plugins_conc));
-		if ((plugins_conc != null) && (plugins_conc.length > 0)) {
-			for (String plugc : plugins_conc) {
-				log.log(Level.CONFIG, "Loading: {0}", plugc);
-				if (!plugc.trim().isEmpty()) {
-					String[] pc = plugc.split("=");
+						try {
+							int conc = Integer.parseInt(pc[1]);
 
-					try {
-						int conc = Integer.parseInt(pc[1]);
-
-						plugins_concurrency.put(pc[0], conc);
-						log.log(Level.CONFIG, "Concurrency for plugin: {0} set to: {1}",
-								new Object[] { pc[0],
-								conc });
-					} catch (Exception e) {
-						log.log(Level.WARNING, "Plugin concurrency parsing error for: " + plugc +
-								", ", e);
-					}
-				}
-			}
-		}
-
-		Set<String> keys = new HashSet<String>(processors.keySet());
-
-		try {
-			String sm_threads_pool = (String) props.get(SM_THREADS_POOL_PROP_KEY);
-
-			if (!sm_threads_pool.equals(SM_THREADS_POOL_PROP_VAL)) {
-				String[] threads_pool_params = sm_threads_pool.split(":");
-				int      def_pool_size       = 100;
-
-				if (threads_pool_params.length > 1) {
-					try {
-						def_pool_size = Integer.parseInt(threads_pool_params[1]);
-					} catch (Exception e) {
-						log.log(Level.WARNING,
-								"Incorrect threads pool size: {0}, setting default to 100",
-								threads_pool_params[1]);
-						def_pool_size = 100;
-					}
-				}
-
-				ProcessorWorkerThread                    worker = new ProcessorWorkerThread();
-				ProcessingThreads<ProcessorWorkerThread> pt =
-						new ProcessingThreads<ProcessorWorkerThread>(worker, def_pool_size,
-						maxInQueueSize, defPluginsThreadsPool);
-
-				workerThreads.put(defPluginsThreadsPool, pt);
-				log.log(Level.CONFIG, "Created a default thread pool: {0}", def_pool_size);
-			}
-
-			String[] plugins = SessionManagerConfig.getActivePlugins(props);
-
-			log.log(Level.CONFIG, "Loaded plugins list: {0}", Arrays.toString(plugins));
-
-			// maxPluginsNo = plugins.length;
-			// processors.clear();
-			for (String plug_id : plugins) {
-				keys.remove(plug_id);
-				log.log(Level.CONFIG, "Loading and configuring plugin: {0}", plug_id);
-
-				XMPPImplIfc plugin = addPlugin(plug_id, plugins_concurrency.get(plug_id));
-
-				if (plugin != null) {
-					Map<String, Object> plugin_settings = getPluginSettings(plug_id, props);
-
-					if (plugin_settings.size() > 0) {
-						if (log.isLoggable(Level.CONFIG)) {
-							log.log(Level.CONFIG, "Plugin configuration: {0}", plugin_settings);
+							plugins_concurrency.put(pc[0], conc);
+							log.log(Level.CONFIG, "Concurrency for plugin: {0} set to: {1}",
+									new Object[]{pc[0],
+								conc});
+						} catch (Exception e) {
+							log.log(Level.WARNING, "Plugin concurrency parsing error for: " + plugc
+									+ ", ", e);
 						}
-						plugin_config.put(plug_id, plugin_settings);
-					}
-					try {
-						plugin.init(plugin_settings);
-					} catch (TigaseDBException ex) {
-						log.log(Level.SEVERE, "Problem initializing plugin: " + plugin.id(), ex);
 					}
 				}
-			}    // end of for (String comp_id: plugins)
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Problem with component initialization: " + getName(), e);
+			}
+
+			Set<String> keys = new HashSet<String>(processors.keySet());
+
+			try {
+				if (!isInitializationComplete()) {
+					String sm_threads_pool = (String) props.get(SM_THREADS_POOL_PROP_KEY);
+
+					if (!sm_threads_pool.equals(SM_THREADS_POOL_PROP_VAL)) {
+						String[] threads_pool_params = sm_threads_pool.split(":");
+						int def_pool_size = 100;
+
+						if (threads_pool_params.length > 1) {
+							try {
+								def_pool_size = Integer.parseInt(threads_pool_params[1]);
+							} catch (Exception e) {
+								log.log(Level.WARNING,
+										"Incorrect threads pool size: {0}, setting default to 100",
+										threads_pool_params[1]);
+								def_pool_size = 100;
+							}
+						}
+
+						ProcessorWorkerThread worker = new ProcessorWorkerThread();
+						ProcessingThreads<ProcessorWorkerThread> pt =
+								new ProcessingThreads<ProcessorWorkerThread>(worker, def_pool_size,
+								maxInQueueSize, defPluginsThreadsPool);
+
+						workerThreads.put(defPluginsThreadsPool, pt);
+						log.log(Level.CONFIG, "Created a default thread pool: {0}", def_pool_size);
+					}
+				}
+
+				String[] plugins = SessionManagerConfig.getActivePlugins(props);
+
+				log.log(Level.CONFIG, "Loaded plugins list: {0}", Arrays.toString(plugins));
+
+				// maxPluginsNo = plugins.length;
+				// processors.clear();
+				for (String plug_id : plugins) {
+					keys.remove(plug_id);
+					log.log(Level.CONFIG, "Loading and configuring plugin: {0}", plug_id);
+
+					XMPPImplIfc plugin = addPlugin(plug_id, plugins_concurrency.get(plug_id));
+
+					if (plugin != null) {
+						Map<String, Object> plugin_settings = getPluginSettings(plug_id, props);
+
+						if (plugin_settings.size() > 0) {
+							if (log.isLoggable(Level.CONFIG)) {
+								log.log(Level.CONFIG, "Plugin configuration: {0}", plugin_settings);
+							}
+							plugin_config.put(plug_id, plugin_settings);
+						}
+						try {
+							plugin.init(plugin_settings);
+						} catch (TigaseDBException ex) {
+							log.log(Level.SEVERE, "Problem initializing plugin: " + plugin.id(), ex);
+						}
+					}
+				}    // end of for (String comp_id: plugins)
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "Problem with component initialization: " + getName(), e);
+			}
+			for (String key : keys) {
+				removePlugin(key);
+			}
 		}
-		for (String key : keys) {
-			removePlugin(key);
+		
+		if (!isInitializationComplete()) {
+			smResourceConnection = new SMResourceConnection(null, user_repository,
+					auth_repository, this);
+			registerNewSession(getComponentId().getBareJID(), smResourceConnection);
 		}
-		smResourceConnection = new SMResourceConnection(null, user_repository,
-				auth_repository, this);
-		registerNewSession(getComponentId().getBareJID(), smResourceConnection);
 	}
 
 	//~--- methods --------------------------------------------------------------

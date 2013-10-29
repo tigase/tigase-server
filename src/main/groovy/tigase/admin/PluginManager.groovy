@@ -130,9 +130,10 @@ else {
                 else if (!enable && pluginsEnabled.contains(id)) {
                         if (!str.isEmpty()) str += ",";
                         str += "-" + id;
+						pluginsEnabled.remove(id);
                 }
         }
-        
+
         def conf = XMPPServer.getConfigurator();
         conf.getDefConfigParams().put(Configurable.GEN_SM_PLUGINS, str);
 
@@ -141,7 +142,7 @@ else {
         conf.putProperties("sess-man", props);
                 
         ((Configurator) XMPPServer.getConfigurator()).updateMessageRouter();
-                
+		
         def res = (Iq)p.commandResult(Command.DataType.result)
 
         Command.addTextField(res, "Note", "Operation successful.");
