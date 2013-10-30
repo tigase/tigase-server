@@ -145,6 +145,7 @@ public class MessageRouterConfig {
 		COMP_CLUS_MAP.put(BOSH_COMP_CLASS_NAME, BOSH_CLUST_COMP_CLASS_NAME);
 		COMP_CLUS_MAP.put(MONITOR_CLASS_NAME, MONITOR_CLUST_CLASS_NAME);
 		COMP_CLUS_MAP.put(WS2S_CLASS_NAME, WS2S_CLUST_CLASS_NAME);
+		COMP_CLUS_MAP.put(VHOST_MAN_CLASS_NAME, VHOST_MAN_CLUST_CLASS_NAME);
 	}
 
 	//~--- fields ---------------------------------------------------------------

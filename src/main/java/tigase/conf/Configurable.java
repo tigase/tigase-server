@@ -382,6 +382,10 @@ public interface Configurable
 	public static final String VHOST_MAN_CLASS_NAME = "tigase.vhosts.VHostManager";
 
 	/** Field description */
+	public static final String VHOST_MAN_CLUST_CLASS_NAME =
+			"tigase.cluster.VHostManagerClustered";
+
+	/** Field description */
 	public static final String WS2S_CLASS_NAME =
 			"tigase.server.websocket.WebSocketClientConnectionManager";
 

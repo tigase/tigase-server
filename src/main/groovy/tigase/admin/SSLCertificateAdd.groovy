@@ -27,7 +27,7 @@ Add an SSL certificate for a given domain.
 AS:Description: Add SSL Certificate
 AS:CommandId: ssl-certificate-add
 AS:Component: vhost-man
-*/
+ */
 
 package tigase.admin
 
@@ -36,6 +36,9 @@ import tigase.db.comp.*
 import tigase.server.*
 import tigase.cert.*
 import tigase.io.*
+import tigase.xmpp.JID
+import tigase.cluster.*
+import tigase.conf.ConfiguratorAbstract;
 
 def MARKER = "command-marker"
 //def ITEMS = "item-list"
@@ -54,6 +57,12 @@ def itemKey = Command.getFieldValue(packet, VHOST)
 def marker = Command.getFieldValue(packet, MARKER)
 def pemCertVals = Command.getFieldValues(packet, CERTIFICATE)
 def saveToDisk = Command.getCheckBoxFieldValue(packet, SAVE_TO_DISK)
+
+Queue results = new LinkedList()
+def supportedComponents = ["vhost-man"]
+def NOTIFY_CLUSTER = "notify-cluster"
+boolean clusterMode =  Boolean.valueOf( System.getProperty("cluster-mode", false.toString()) );
+boolean notifyCluster = Boolean.valueOf( Command.getFieldValue(packet, NOTIFY_CLUSTER) )
 
 // The first step - provide a list of all vhosts for the user
 if (itemKey == null) {
@@ -90,6 +99,9 @@ if (marker == null) {
 			Command.addFieldMultiValue(result, CERTIFICATE, [""])
 			Command.addCheckBoxField(result, SAVE_TO_DISK, true)
 			Command.addHiddenField(result, MARKER, MARKER)
+			if 	( clusterMode  ) {
+				Command.addHiddenField(result, NOTIFY_CLUSTER, true.toString())
+			}
 			return result
 		} else {
 			def result = p.commandResult(Command.DataType.result)
@@ -99,9 +111,25 @@ if (marker == null) {
 	}
 }
 
+if 	( clusterMode && notifyCluster && supportedComponents.contains(componentName) ) {
+	def nodes = (List)connectedNodes
+	if (nodes && nodes.size() > 0 ) {
+		nodes.each { node ->
+			def forward = p.copyElementOnly();
+			Command.removeFieldValue(forward, NOTIFY_CLUSTER)
+			Command.addHiddenField(forward, NOTIFY_CLUSTER, false.toString())
+			forward.setPacketTo( node );
+			forward.setPermissions( Permissions.ADMIN );
+
+			results.offer(forward)
+		}
+	}
+}
+
 // The last step - process the form submitted by the user
 def result = p.commandResult(Command.DataType.result)
 def item = repo.getItem(itemKey)
+
 if (item == null) {
 	Command.addTextField(result, "Error", "No such VHost, loading SSL certificate impossible.")
 } else {
@@ -133,4 +161,5 @@ if (item == null) {
 	}
 }
 
-return result
+results.add(result);
+return results;
