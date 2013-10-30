@@ -238,7 +238,7 @@ public class ClConSQLRepository
 		try {
 			PreparedStatement getAllItemsSt = data_repo.getPreparedStatement(null,
 					GET_ALL_ITEMS_QUERY);
-
+			
 			synchronized (getAllItemsSt) {
 				rs = getAllItemsSt.executeQuery();
 				while (rs.next()) {

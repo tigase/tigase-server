@@ -514,7 +514,7 @@ public class VHostManager
 
 		String repo_class = (String) properties.get(VHOSTS_REPO_CLASS_PROP_KEY);
 
-		if (repo_class != null) {
+		if (repo_class != null && !isInitializationComplete()) {
 			try {
 				ComponentRepository<VHostItem> repo_tmp = (ComponentRepository<VHostItem>) Class
 						.forName(repo_class).newInstance();
