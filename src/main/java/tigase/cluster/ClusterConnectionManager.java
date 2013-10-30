@@ -267,10 +267,10 @@ public class ClusterConnectionManager
 	}
 
 	/**
-	 * Method description
+	 * Initialize a mapping of key/value pairs which can be used in scripts
+	 * loaded by the server
 	 *
-	 *
-	 * @param binds
+	 * @param binds A mapping of key/value pairs, all of whose keys are Strings.
 	 */
 	@Override
 	public void initBindings(Bindings binds) {
@@ -335,19 +335,22 @@ public class ClusterConnectionManager
 	public void itemUpdated(ClusterRepoItem item) {}
 
 	/**
-	 * Method description
-	 *
+	 * Method is called on cluster node connection event. This is a
+	 * notification to the component that a new cluster node has connected.
 	 *
 	 * @param node
+	 *          is a hostname of a cluster node generating the event.
 	 */
 	@Override
 	public void nodeConnected(String node) {}
 
 	/**
-	 * Method description
-	 *
+	 * Method is called on cluster node disconnection event. This is a
+	 * notification to the component that there was network connection lost to one
+	 * of the cluster nodes.
 	 *
 	 * @param node
+	 *          is a hostname of a cluster node generating the event.
 	 */
 	@Override
 	public void nodeDisconnected(String node) {}
@@ -858,8 +861,8 @@ public class ClusterConnectionManager
 	//~--- set methods ----------------------------------------------------------
 
 	/**
-	 * Method description
-	 *
+	 * Set's the configures the cluster controller object for cluster
+	 * communication and API.
 	 *
 	 * @param cl_controller
 	 */

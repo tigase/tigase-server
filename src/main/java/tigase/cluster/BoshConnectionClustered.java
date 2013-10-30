@@ -70,10 +70,11 @@ public class BoshConnectionClustered
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * Method description
-	 *
+	 * Method is called on cluster node connection event. This is a
+	 * notification to the component that a new cluster node has connected.
 	 *
 	 * @param node
+	 *          is a hostname of a cluster node generating the event.
 	 */
 	@Override
 	public void nodeConnected(String node) {
@@ -98,8 +99,12 @@ public class BoshConnectionClustered
 	}
 
 	/**
+	 * Method is called on cluster node disconnection event. This is a
+	 * notification to the component that there was network connection lost to one
+	 * of the cluster nodes.
 	 *
 	 * @param node
+	 *          is a hostname of a cluster node generating the event.
 	 */
 	@Override
 	public void nodeDisconnected(String node) {
