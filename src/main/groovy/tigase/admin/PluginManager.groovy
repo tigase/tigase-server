@@ -90,7 +90,7 @@ if (!submit) {
                                         if (!pluginsAll.contains(id)) {
                                                 pluginsAll.add(id);
                                         }
-                                        pluginsEnabled.remove(id.substring(1));
+                                        pluginsEnabled.remove(id);
                                         break;
                                 default:
                                         pluginsEnabled.add(id);
@@ -136,7 +136,7 @@ else {
 
         def conf = XMPPServer.getConfigurator();
         conf.getDefConfigParams().put(Configurable.GEN_SM_PLUGINS, str);
-
+	
         def props = [:];
         props[tigase.server.xmppsession.SessionManagerConfig.PLUGINS_PROP_KEY] = (pluginsEnabled as String[]);
         conf.putProperties("sess-man", props);
