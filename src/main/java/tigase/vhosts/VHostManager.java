@@ -91,7 +91,7 @@ public class VHostManager
 			new LinkedHashSet<VHostListener>(10);
 	private ConcurrentSkipListSet<String> registeredComponentDomains =
 			new ConcurrentSkipListSet<String>();
-	private ComponentRepository<VHostItem> repo = null;
+	protected ComponentRepository<VHostItem> repo = null;
 
 	//~--- constructors ---------------------------------------------------------
 
