@@ -261,7 +261,6 @@ public class SessionManager
 			// have thread pool specific settings create a separate thread pool
 			// for the processor
 			if ((workerThreads.get(defPluginsThreadsPool) == null) || (conc != null)) {
-
 				// Added to make sure that there will be only one thread pool for plugin
 				// so if one exits we will keep it and not create another one
 				if (!workerThreads.containsKey(proc.id())) {
@@ -271,9 +270,8 @@ public class SessionManager
 							maxInQueueSize, proc.id());
 
 					workerThreads.put(proc.id(), pt);
-					log.log(Level.CONFIG,
-							"Created thread pool: {0}, queue: {1} for plugin id: {2}", new Object[] {
-							concurrency,
+					log.log(Level.CONFIG, "Created thread pool: {0}, queue: {1} for plugin id: {2}",
+							new Object[] { concurrency,
 							maxInQueueSize, proc.id() });
 				}
 			}
@@ -1013,11 +1011,10 @@ public class SessionManager
 		}
 		naUserRepository = new NonAuthUserRepositoryImpl(user_repository, getDefHostName(),
 				Boolean.parseBoolean((String) props.get(AUTO_CREATE_OFFLINE_USER_PROP_KEY)));
+
 		synchronized (this) {
-			LinkedHashMap<String, Integer> plugins_concurrency = new LinkedHashMap<String,
-					Integer>(20);
-			String[] plugins_conc = ((String) props.get(PLUGINS_CONCURRENCY_PROP_KEY)).split(
-					",");
+			LinkedHashMap<String, Integer> plugins_concurrency = new LinkedHashMap<String, Integer>(20);
+			String[] plugins_conc = ((String) props.get(PLUGINS_CONCURRENCY_PROP_KEY)).split(",");
 
 			log.log(Level.CONFIG, "Loading concurrency plugins list: {0}", Arrays.toString(
 					plugins_conc));
@@ -1032,11 +1029,11 @@ public class SessionManager
 
 							plugins_concurrency.put(pc[0], conc);
 							log.log(Level.CONFIG, "Concurrency for plugin: {0} set to: {1}",
-									new Object[] { pc[0],
-									conc });
+									new Object[]{pc[0],
+								conc});
 						} catch (Exception e) {
-							log.log(Level.WARNING, "Plugin concurrency parsing error for: " + plugc +
-									", ", e);
+							log.log(Level.WARNING, "Plugin concurrency parsing error for: " + plugc
+									+ ", ", e);
 						}
 					}
 				}
@@ -1050,7 +1047,7 @@ public class SessionManager
 
 					if (!sm_threads_pool.equals(SM_THREADS_POOL_PROP_VAL)) {
 						String[] threads_pool_params = sm_threads_pool.split(":");
-						int      def_pool_size       = 100;
+						int def_pool_size = 100;
 
 						if (threads_pool_params.length > 1) {
 							try {
@@ -1063,7 +1060,7 @@ public class SessionManager
 							}
 						}
 
-						ProcessorWorkerThread                    worker = new ProcessorWorkerThread();
+						ProcessorWorkerThread worker = new ProcessorWorkerThread();
 						ProcessingThreads<ProcessorWorkerThread> pt =
 								new ProcessingThreads<ProcessorWorkerThread>(worker, def_pool_size,
 								maxInQueueSize, defPluginsThreadsPool);
@@ -1108,6 +1105,7 @@ public class SessionManager
 				removePlugin(key);
 			}
 		}
+		
 		if (!isInitializationComplete()) {
 			smResourceConnection = new SMResourceConnection(null, user_repository,
 					auth_repository, this);
