@@ -32,12 +32,26 @@ package tigase.cluster.api;
 
 import tigase.stats.StatisticsList;
 
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
+
+import static tigase.cluster.strategy.ClusteringStrategyIfc.*;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.Map;
+
 /**
  *
  * @author kobit
  */
 public abstract class CommandListenerAbstract
 				implements CommandListener {
+	private static long syncInTraffic  = 0;
+	private static long syncOutTraffic = 0;
+
+	//~--- fields ---------------------------------------------------------------
+
 	private String commandName;
 
 	//~--- constructors ---------------------------------------------------------
@@ -60,7 +74,9 @@ public abstract class CommandListenerAbstract
 	 *
 	 * @param cl
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int compareTo(CommandListener cl) {
@@ -73,7 +89,9 @@ public abstract class CommandListenerAbstract
 	 *
 	 * @param cl
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean equals(Object cl) {
@@ -85,7 +103,9 @@ public abstract class CommandListenerAbstract
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int hashCode() {
@@ -98,13 +118,31 @@ public abstract class CommandListenerAbstract
 		return hash;
 	}
 
+	/**
+	 * Method description
+	 *
+	 */
+	public synchronized void incSyncInTraffic() {
+		++syncInTraffic;
+	}
+
+	/**
+	 * Method description
+	 *
+	 */
+	public synchronized void incSyncOutTraffic() {
+		++syncOutTraffic;
+	}
+
 	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getName() {
@@ -119,6 +157,28 @@ public abstract class CommandListenerAbstract
 	 */
 	@Override
 	public void getStatistics(StatisticsList list) {}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	public static long getSyncInTraffic() {
+		return syncInTraffic;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	public static long getSyncOutTraffic() {
+		return syncOutTraffic;
+	}
 
 	//~--- set methods ----------------------------------------------------------
 
@@ -135,4 +195,4 @@ public abstract class CommandListenerAbstract
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/11/02

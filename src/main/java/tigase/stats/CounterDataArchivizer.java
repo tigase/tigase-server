@@ -1,31 +1,33 @@
-
 /*
-* Tigase Jabber/XMPP Server
-* Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU Affero General Public License as published by
-* the Free Software Foundation, version 3 of the License.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU Affero General Public License for more details.
-*
-* You should have received a copy of the GNU Affero General Public License
-* along with this program. Look for COPYING file in the top folder.
-* If not, see http://www.gnu.org/licenses/.
-*
-* $Rev$
-* Last modified by $Author$
-* $Date$
+ * CounterDataArchivizer.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ *
  */
+
+
+
 package tigase.stats;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.DBInitException;
 import tigase.db.DataRepository;
+import tigase.db.DBInitException;
 import tigase.db.RepositoryFactory;
 
 import tigase.server.XMPPServer;
@@ -39,11 +41,9 @@ import java.sql.SQLException;
 
 import java.text.NumberFormat;
 
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Map;
 
 /**
  * Created: Mar 25, 2010 8:55:11 PM
@@ -51,40 +51,41 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class CounterDataArchivizer implements StatisticsArchivizerIfc {
-	private static final Logger log = Logger.getLogger(CounterDataArchivizer.class.getName());
-
+public class CounterDataArchivizer
+				implements StatisticsArchivizerIfc {
 	/** Field description */
 	public static final String DB_URL_PROP_KEY = "db-url";
-
-	/** Field description */
-	public static final String TABLE_NAME_PROP_KEY = "table-name";
 
 	/** Field description */
 	public static final String KEY_FIELD_PROP_KEY = "key-field";
 
 	/** Field description */
-	public static final String VAL_FIELD_PROP_KEY = "val-field";
-	private static final String DEF_TABLE_NAME = "counter_data";
-	private static final String DEF_KEY_FIELD_NAME = "counter_name";
+	public static final String TABLE_NAME_PROP_KEY = "table-name";
+
+	/** Field description */
+	public static final String  VAL_FIELD_PROP_KEY   = "val-field";
+	private static final String CPU_USAGE_TEXT       = "Usage CPU [%]: ";
+	private static final String DEF_KEY_FIELD_NAME   = "counter_name";
+	private static final String DEF_TABLE_NAME       = "counter_data";
 	private static final String DEF_VALUE_FIELD_NAME = "counter_value";
-	private static final String USER_CONNECTIONS_TEXT = "Connections c2s: ";
+	private static final Logger log = Logger.getLogger(CounterDataArchivizer.class
+			.getName());
+	private static final String MEM_USAGE_TEXT          = "Usage RAM [%]: ";
 	private static final String SERVER_CONNECTIONS_TEXT = "Connections s2s: ";
-	private static final String CPU_USAGE_TEXT = "Usage CPU [%]: ";
-	private static final String MEM_USAGE_TEXT = "Usage RAM [%]: ";
-	private static final String UPTIME_TEXT = "Uptime: ";
-	private static final String VERSION_TEXT = "Version: ";
-	private static final String VHOSTS_TEXT = "VHosts: ";
+	private static final String UPTIME_TEXT             = "Uptime: ";
+	private static final String USER_CONNECTIONS_TEXT   = "Connections c2s: ";
+	private static final String VERSION_TEXT            = "Version: ";
+	private static final String VHOSTS_TEXT             = "VHosts: ";
 
 	//~--- fields ---------------------------------------------------------------
 
-	private DataRepository data_repo = null;
-	private String init_entry_query = null;
-	private String create_table_query = null;
+	private String         create_table_query = null;
+	private DataRepository data_repo          = null;
+	private String         init_entry_query   = null;
 
 	// private PreparedStatement initEntry = null;
-	private String tableName = DEF_TABLE_NAME;
-	private String keyField = DEF_KEY_FIELD_NAME;
+	private String tableName          = DEF_TABLE_NAME;
+	private String keyField           = DEF_KEY_FIELD_NAME;
 	private String update_entry_query = null;
 
 	// private PreparedStatement updateEntry = null;
@@ -125,29 +126,22 @@ public class CounterDataArchivizer implements StatisticsArchivizerIfc {
 		if (prop != null) {
 			tableName = prop;
 		}
-
 		prop = (String) conf.get(KEY_FIELD_PROP_KEY);
-
 		if (prop != null) {
 			keyField = prop;
 		}
-
 		prop = (String) conf.get(VAL_FIELD_PROP_KEY);
-
 		if (prop != null) {
 			valueField = prop;
 		}
-
-		init_entry_query = "insert into " + tableName + " (" + keyField + ", " + valueField + ") "
-											 + " (select ?, ? from " + tableName + " where " + keyField + " = ? HAVING count(*)=0)";
-
-		update_entry_query = "update " + tableName + " set " + valueField + " = ? where " + keyField
-												 + " = ?";
-		create_table_query = "CREATE TABLE " + tableName + " ( "
-												 + keyField + " varchar(255) NOT NULL DEFAULT '0', "
-												 + valueField + " varchar(255) NOT NULL DEFAULT '0',"
-												 + "  PRIMARY KEY ( " + keyField + " ));";
-
+		init_entry_query = "insert into " + tableName + " (" + keyField + ", " + valueField +
+				") " + " (select ?, ? from " + tableName + " where " + keyField +
+				" = ? HAVING count(*)=0)";
+		update_entry_query = "update " + tableName + " set " + valueField + " = ? where " +
+				keyField + " = ?";
+		create_table_query = "CREATE TABLE " + tableName + " ( " + keyField +
+				" varchar(255) NOT NULL DEFAULT '0', " + valueField +
+				" varchar(255) NOT NULL DEFAULT '0'," + "  PRIMARY KEY ( " + keyField + " ));";
 		try {
 			initRepository((String) conf.get(DB_URL_PROP_KEY), null);
 			initData(VERSION_TEXT, XMPPServer.getImplementationVersion());
@@ -169,26 +163,28 @@ public class CounterDataArchivizer implements StatisticsArchivizerIfc {
 	 * @param key
 	 * @param value
 	 */
-	public void initData( String key, String value ) {
+	public void initData(String key, String value) {
 		try {
-			PreparedStatement updateEntry = data_repo.getPreparedStatement( null, update_entry_query );
-			PreparedStatement initEntry = data_repo.getPreparedStatement( null, init_entry_query );
+			PreparedStatement updateEntry = data_repo.getPreparedStatement(null,
+					update_entry_query);
+			PreparedStatement initEntry = data_repo.getPreparedStatement(null,
+					init_entry_query);
 
-			synchronized ( updateEntry ) {
-				updateEntry.setString( 1, value );
-				updateEntry.setString( 2, key );
-				System.out.println( "updateEntry: " + updateEntry );
+			synchronized (updateEntry) {
+				updateEntry.setString(1, value);
+				updateEntry.setString(2, key);
+				System.out.println("updateEntry: " + updateEntry);
 				updateEntry.executeUpdate();
 			}
-			synchronized ( initEntry ) {
-				initEntry.setString( 1, key );
-				initEntry.setString( 2, value );
-				initEntry.setString( 3, key );
-				System.out.println( "initEntry: " + initEntry );
+			synchronized (initEntry) {
+				initEntry.setString(1, key);
+				initEntry.setString(2, value);
+				initEntry.setString(3, key);
+				System.out.println("initEntry: " + initEntry);
 				initEntry.executeUpdate();
 			}
-		} catch ( SQLException e ) {
-			log.log( Level.WARNING, "Problem adding new entry to DB: ", e );
+		} catch (SQLException e) {
+			log.log(Level.WARNING, "Problem adding new entry to DB: ", e);
 		}
 	}
 
@@ -205,24 +201,13 @@ public class CounterDataArchivizer implements StatisticsArchivizerIfc {
 	 * @throws IllegalAccessException
 	 * @throws DBInitException
 	 */
-	public void initRepository( String conn_str, Map<String, String> params )
-			throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException,
-						 DBInitException {
-		data_repo = RepositoryFactory.getDataRepository( null, conn_str, params );
-
+	public void initRepository(String conn_str, Map<String, String> params)
+					throws SQLException, ClassNotFoundException, InstantiationException,
+							IllegalAccessException, DBInitException {
+		data_repo = RepositoryFactory.getDataRepository(null, conn_str, params);
 		checkDB();
-
-		data_repo.initPreparedStatement( init_entry_query, init_entry_query );
-		data_repo.initPreparedStatement( update_entry_query, update_entry_query );
-	}
-
-	/**
-	 * Performs database check, creates missing schema if necessary
-	 *
-	 * @throws SQLException
-	 */
-	private void checkDB() throws SQLException {
-		data_repo.checkTable( tableName, create_table_query );
+		data_repo.initPreparedStatement(init_entry_query, init_entry_query);
+		data_repo.initPreparedStatement(update_entry_query, update_entry_query);
 	}
 
 	/**
@@ -244,7 +229,8 @@ public class CounterDataArchivizer implements StatisticsArchivizerIfc {
 	 */
 	public void updateData(String key, String value) {
 		try {
-			PreparedStatement updateEntry = data_repo.getPreparedStatement(null, update_entry_query);
+			PreparedStatement updateEntry = data_repo.getPreparedStatement(null,
+					update_entry_query);
 
 			synchronized (updateEntry) {
 				updateEntry.setString(1, value);
@@ -255,10 +241,16 @@ public class CounterDataArchivizer implements StatisticsArchivizerIfc {
 			log.log(Level.WARNING, "Problem adding new entry to DB: ", e);
 		}
 	}
+
+	/**
+	 * Performs database check, creates missing schema if necessary
+	 *
+	 * @throws SQLException
+	 */
+	private void checkDB() throws SQLException {
+		data_repo.checkTable(tableName, create_table_query);
+	}
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/10/25

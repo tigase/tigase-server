@@ -64,7 +64,9 @@ public interface CommandListener
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	String getName();
 
@@ -88,4 +90,4 @@ public interface CommandListener
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/11/01

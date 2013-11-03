@@ -1,5 +1,5 @@
 /*
- * CommandListenerAbstract.java
+ * CommandListenerSMAbstract.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
@@ -30,15 +30,31 @@ package tigase.cluster.api;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.cluster.strategy.ClusteringStrategyIfc;
+import tigase.cluster.strategy.ConnectionRecordIfc;
+
 import tigase.stats.StatisticsList;
+
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
+
+import static tigase.cluster.strategy.ClusteringStrategyIfc.*;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.Map;
 
 /**
  *
  * @author kobit
+ *
+ * @param <E>
+ * @param <R>
  */
-public abstract class CommandListenerAbstract
-				implements CommandListener {
-	private String commandName;
+public abstract class CommandListenerSMAbstract<R extends ConnectionRecordIfc,
+		E extends ClusteringStrategyIfc<R>>
+				extends CommandListenerAbstract {
+	private final E strat;
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -47,55 +63,11 @@ public abstract class CommandListenerAbstract
 	 *
 	 *
 	 * @param name
+	 * @param strat
 	 */
-	public CommandListenerAbstract(String name) {
-		setName(name);
-	}
-
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param cl
-	 *
-	 * 
-	 */
-	@Override
-	public int compareTo(CommandListener cl) {
-		return commandName.compareTo(cl.getName());
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param cl
-	 *
-	 * 
-	 */
-	@Override
-	public boolean equals(Object cl) {
-		return ((cl != null) && (cl instanceof CommandListener) && commandName.equals(
-				((CommandListener) cl).getName()));
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
-	@Override
-	public int hashCode() {
-		int hash = 265;
-
-		hash = hash + ((this.commandName != null)
-				? this.commandName.hashCode()
-				: 0);
-
-		return hash;
+	public CommandListenerSMAbstract(String name, E strat) {
+		super(name);
+		this.strat = strat;
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -104,35 +76,34 @@ public abstract class CommandListenerAbstract
 	 * Method description
 	 *
 	 *
-	 * 
+	 * @param node is a <code>JID</code>
+	 * @param data is a <code>Map<String,String></code>
+	 *
+	 * @return a value of <code>R</code>
 	 */
-	@Override
-	public String getName() {
-		return commandName;
+	public R getConnectionRecord(JID node, Map<String, String> data) {
+		BareJID userId       = BareJID.bareJIDInstanceNS(data.get(USER_ID));
+		String  resource     = data.get(RESOURCE);
+		JID     jid          = JID.jidInstanceNS(userId, resource);
+		String  sessionId    = data.get(XMPP_SESSION_ID);
+		JID     connectionId = JID.jidInstanceNS(data.get(CONNECTION_ID));
+		R       result       = strat.getConnectionRecordInstance();
+
+		result.setRecordFields(node, jid, sessionId, connectionId);
+
+		return result;
 	}
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param list
+	 * @return a value of <code>E</code>
 	 */
-	@Override
-	public void getStatistics(StatisticsList list) {}
-
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param name
-	 */
-	@Override
-	public final void setName(String name) {
-		commandName = name;
+	public E getStrategy() {
+		return strat;
 	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/11/02

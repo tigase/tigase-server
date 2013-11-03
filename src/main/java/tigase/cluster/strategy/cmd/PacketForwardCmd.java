@@ -31,9 +31,10 @@ package tigase.cluster.strategy.cmd;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.cluster.api.ClusterCommandException;
-import tigase.cluster.api.CommandListenerAbstract;
+import tigase.cluster.api.CommandListenerSMAbstract;
 import tigase.cluster.api.SessionManagerClusteredIfc;
 import tigase.cluster.SessionManagerClustered;
+import tigase.cluster.strategy.ConnectionRecord;
 import tigase.cluster.strategy.DefaultClusteringStrategy;
 
 import tigase.server.Packet;
@@ -62,16 +63,12 @@ import java.util.Set;
  * @author         <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
 public class PacketForwardCmd
-				extends CommandListenerAbstract {
+				extends CommandListenerSMAbstract<ConnectionRecord,
+						DefaultClusteringStrategy<ConnectionRecord>> {
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
 	private static final Logger log = Logger.getLogger(PacketForwardCmd.class.getName());
-
-	//~--- fields ---------------------------------------------------------------
-
-	private SessionManagerClusteredIfc sm;
-	private DefaultClusteringStrategy  strategy;
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -81,14 +78,10 @@ public class PacketForwardCmd
 	 *
 	 *
 	 * @param name
-	 * @param sm
 	 * @param strategy
 	 */
-	public PacketForwardCmd(String name, SessionManagerClusteredIfc sm,
-			DefaultClusteringStrategy strategy) {
-		super(name);
-		this.sm       = sm;
-		this.strategy = strategy;
+	public PacketForwardCmd(String name, DefaultClusteringStrategy strategy) {
+		super(name, strategy);
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -124,16 +117,17 @@ public class PacketForwardCmd
 			for (Element elem : packets) {
 				try {
 					Packet                 el_packet = Packet.packetInstance(elem);
-					XMPPResourceConnection conn      = sm.getXMPPResourceConnection(el_packet);
-					Map<String, String>    locdata   = null;
+					XMPPResourceConnection conn = getStrategy().getSM().getXMPPResourceConnection(
+							el_packet);
+					Map<String, String> locdata;
 
 					if (conn != null) {
-						locdata = new LinkedHashMap<String, String>();
+						locdata = new LinkedHashMap<>();
 						if (data != null) {
 							locdata.putAll(data);
 						}
-						data.put(SessionManagerClusteredIfc.SESSION_FOUND_KEY, sm.getComponentId()
-								.toString());
+						data.put(SessionManagerClusteredIfc.SESSION_FOUND_KEY, getStrategy().getSM()
+								.getComponentId().toString());
 					}
 
 					// The commented if below causes the packet to stop being forwarded
@@ -147,7 +141,7 @@ public class PacketForwardCmd
 					// Instead, always send the packet to next node:
 					boolean isSent;
 
-					isSent = strategy.sendToNextNode(fromNode, visitedNodes, data, Packet
+					isSent = getStrategy().sendToNextNode(fromNode, visitedNodes, data, Packet
 							.packetInstance(elem));
 
 					// If there is a user session for the packet, process it
@@ -155,8 +149,8 @@ public class PacketForwardCmd
 
 						// Hold on! If this is the first node (fromNode) it means the
 						// packet was already processed here....
-						if (!sm.getComponentId().equals(fromNode)) {
-							sm.processPacket(el_packet, conn);
+						if (!getStrategy().getSM().getComponentId().equals(fromNode)) {
+							getStrategy().getSM().processPacket(el_packet, conn);
 						} else {
 
 							// Ignore the packet, it has been processed already
@@ -165,12 +159,12 @@ public class PacketForwardCmd
 
 						// No user session, but if this is the first node the packet has
 						// returned, so maybe this is a packet for offline storage?
-						if (sm.getComponentId().equals(fromNode)) {
+						if (getStrategy().getSM().getComponentId().equals(fromNode)) {
 
 							// However it could have been processed on another node already
 							if ((data == null) || (data.get(SessionManagerClustered
 									.SESSION_FOUND_KEY) == null)) {
-								sm.processPacket(el_packet, conn);
+								getStrategy().getSM().processPacket(el_packet, conn);
 							}
 						}
 					}
@@ -185,4 +179,4 @@ public class PacketForwardCmd
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/11/02

@@ -55,23 +55,28 @@ import java.util.Set;
  */
 public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 				extends OnlineJidsReporter {
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param userId
-	 * @param conn
-	 */
-	public void handleLocalUserLogin(BareJID userId, XMPPResourceConnection conn);
+	/** Field description */
+	public static final String AUTH_TIME = "auth-time";
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param userId
-	 * @param conn
-	 */
-	public void handleLocalUserLogout(BareJID userId, XMPPResourceConnection conn);
+	/** Field description */
+	public static final String CLUSTER_NODE = "cluster-node";
+
+	/** Field description */
+	public static final String CONNECTION_ID = "connId";
+
+	/** Field description */
+	public static final String RESOURCE = "resource";
+
+	/** Field description */
+	public static final String SM_ID = "smId";
+
+	/** Field description */
+	public static final String USER_ID = "userId";
+
+	/** Field description */
+	public static final String XMPP_SESSION_ID = "xmppSessId";
+
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -81,6 +86,40 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 * @param conn
 	 */
 	void handleLocalPacket(Packet packet, XMPPResourceConnection conn);
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param conn is a <code>XMPPResourceConnection</code>
+	 */
+	void handleLocalPresenceSet(XMPPResourceConnection conn);
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param conn is a <code>XMPPResourceConnection</code>
+	 */
+	void handleLocalResourceBind(XMPPResourceConnection conn);
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param userId
+	 * @param conn
+	 */
+	void handleLocalUserLogin(BareJID userId, XMPPResourceConnection conn);
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param userId
+	 * @param conn
+	 */
+	void handleLocalUserLogout(BareJID userId, XMPPResourceConnection conn);
 
 	/**
 	 * This is a handler method which is called when a new node connects to the
@@ -108,6 +147,8 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 * @param conn
 	 *
 	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	boolean processPacket(Packet packet, XMPPResourceConnection conn);
 
@@ -138,6 +179,8 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 *
 	 *
 	 *
+	 *
+	 * @return a value of <code>E</code>
 	 */
 	E getConnectionRecordInstance();
 
@@ -173,6 +216,14 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	Map<String, Object> getDefaults(Map<String, Object> params);
 
 	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of <code>String</code>
+	 */
+	String getInfo();
+
+	/**
 	 * <strong>Note! This is not for a common use method.</strong> This is for
 	 * debugging and diagnostic purposes only and maybe removed or changed at any
 	 * time in the future. It returns a content of an internal cache from the
@@ -186,6 +237,14 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 */
 	@Deprecated
 	Object getInternalCacheData();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of <code>SessionManagerClusteredIfc</code>
+	 */
+	SessionManagerClusteredIfc getSM();
 
 	/**
 	 * Add the strategy statistics to the List.
@@ -228,9 +287,7 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 *          is an instance of the SessionManagerHandler class.
 	 */
 	void setSessionManagerHandler(SessionManagerClusteredIfc sm);
-
-	public String getInfo();
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/11/02

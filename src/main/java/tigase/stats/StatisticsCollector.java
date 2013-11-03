@@ -355,7 +355,9 @@ public class StatisticsCollector
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String shutdown() {
@@ -377,7 +379,9 @@ public class StatisticsCollector
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>StatisticsList</code>
 	 */
 	public StatisticsList getAllStats() {
 		StatisticsList list = new StatisticsList(Level.ALL);
@@ -413,7 +417,9 @@ public class StatisticsCollector
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>List<String></code>
 	 */
 	public List<String> getComponentsNames() {
 		return new ArrayList<String>(components.keySet());
@@ -440,7 +446,9 @@ public class StatisticsCollector
 	 *
 	 * @param params
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -463,13 +471,14 @@ public class StatisticsCollector
 			try {
 				hSize = Integer.parseInt(st_pars[0]);
 			} catch (Exception ex) {
-				log.config("Invalid statistics history size settings: " + st_pars[0]);
+				log.log(Level.CONFIG, "Invalid statistics history size settings: {0}",
+						st_pars[0]);
 			}
 			if (st_pars.length > 1) {
 				try {
 					updateInt = Long.parseLong(st_pars[1]);
 				} catch (Exception ex) {
-					log.config("Invalid statistics update interval: " + st_pars[1]);
+					log.log(Level.CONFIG, "Invalid statistics update interval: {0}", st_pars[1]);
 				}
 			}
 		}
@@ -485,7 +494,9 @@ public class StatisticsCollector
 	 *
 	 * @param from
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>List<Element></code>
 	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
@@ -500,7 +511,9 @@ public class StatisticsCollector
 	 * @param jid
 	 * @param from
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>Element</code>
 	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
@@ -519,7 +532,9 @@ public class StatisticsCollector
 	 * @param jid
 	 * @param from
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>List<Element></code>
 	 */
 	@Override
 	public List<Element> getDiscoItems(String node, JID jid, JID from) {
@@ -560,7 +575,9 @@ public class StatisticsCollector
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getName() {
@@ -573,7 +590,9 @@ public class StatisticsCollector
 	 *
 	 * @param component
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean isCorrectType(ServerComponent component) {
@@ -581,8 +600,6 @@ public class StatisticsCollector
 	}
 
 	//~--- set methods ----------------------------------------------------------
-
-	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -647,6 +664,7 @@ public class StatisticsCollector
 			}
 		}
 		initializationCompletedTask = new TimerTask() {
+			@Override
 			public void run() {
 				for (String arch_prop : archivs) {
 					try {
@@ -694,7 +712,6 @@ public class StatisticsCollector
 
 	//~--- get methods ----------------------------------------------------------
 
-	// ~--- get methods ----------------------------------------------------------
 	private Map<String, Object> getArchivizerConf(String name, Map<String, Object> props) {
 		Map<String, Object> result    = new LinkedHashMap<String, Object>(4);
 		String              key_start = STATS_ARCHIVIZERS_PROP_KEY + "/" + name + "/";
@@ -714,14 +731,12 @@ public class StatisticsCollector
 
 	//~--- inner classes --------------------------------------------------------
 
-	// ~--- inner classes --------------------------------------------------------
 	private class ArchivizerRunner
 					extends Thread {
 		private boolean stopped = false;
 
 		//~--- constructors -------------------------------------------------------
 
-		// ~--- constructors -------------------------------------------------------
 		private ArchivizerRunner() {
 			super("stats-archivizer");
 			setDaemon(true);
@@ -729,8 +744,6 @@ public class StatisticsCollector
 		}
 
 		//~--- methods ------------------------------------------------------------
-
-		// ~--- methods ------------------------------------------------------------
 
 		/**
 		 * Method description
@@ -757,10 +770,4 @@ public class StatisticsCollector
 }
 
 
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-
-//~ Formatted in Tigase Code Convention on 13/06/08
+//~ Formatted in Tigase Code Convention on 13/10/23

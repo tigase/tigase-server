@@ -59,9 +59,26 @@ public interface SessionManagerClusteredIfc
 	 *
 	 * @param packet
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	boolean fastAddOutPacket(Packet packet);
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param conn_id is a <code>JID</code>
+	 * @param domain is a <code>String</code>
+	 * @param user_id is a <code>BareJID</code>
+	 * @param resource is a <code>String</code>
+	 * @param xmpp_sessionId is a <code>String</code>
+	 *
+	 * @return a value of <code>XMPPResourceConnection</code>
+	 */
+	XMPPResourceConnection loginUserSession(JID conn_id, String domain, BareJID user_id,
+			String resource, String xmpp_sessionId);
 
 	/**
 	 * Method description
@@ -80,7 +97,9 @@ public interface SessionManagerClusteredIfc
 	 *
 	 * @param el_packet
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>XMPPResourceConnection</code>
 	 */
 	XMPPResourceConnection getXMPPResourceConnection(Packet el_packet);
 
@@ -88,7 +107,9 @@ public interface SessionManagerClusteredIfc
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>ConcurrentHashMap<JID,XMPPResourceConnection></code>
 	 */
 	ConcurrentHashMap<JID, XMPPResourceConnection> getXMPPResourceConnections();
 
@@ -96,10 +117,12 @@ public interface SessionManagerClusteredIfc
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>ConcurrentHashMap<BareJID,XMPPSession></code>
 	 */
 	ConcurrentHashMap<BareJID, XMPPSession> getXMPPSessions();
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/11/02

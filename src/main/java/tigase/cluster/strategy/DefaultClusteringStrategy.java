@@ -30,6 +30,8 @@ import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.CommandListener;
 import tigase.cluster.api.SessionManagerClusteredIfc;
 import tigase.cluster.strategy.cmd.PacketForwardCmd;
+import tigase.cluster.strategy.cmd.UserConnectedCmd;
+import tigase.cluster.strategy.cmd.UserPresenceCmd;
 
 import tigase.server.Packet;
 
@@ -37,6 +39,8 @@ import tigase.stats.StatisticsList;
 
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
+import tigase.xmpp.NoConnectionIdException;
+import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 
@@ -63,6 +67,15 @@ import java.util.Set;
  */
 public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 				implements ClusteringStrategyIfc<E> {
+	/** Field description */
+	public static final String USER_CONNECTED_CMD = "user-connected-sm-cmd";
+
+	/** Field description */
+	public static final String USER_DISCONNECTED_CMD = "user-disconnected-sm-cmd";
+
+	/** Field description */
+	public static final String USER_PRESENCE_CMD = "user-presence-sm-cmd";
+
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
@@ -78,12 +91,12 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	// private ClusteringMetadataIfc<E> metadata = null;
 
 	/** Field description */
-	protected SessionManagerClusteredIfc sm = null;
+	private SessionManagerClusteredIfc sm       = null;
+	private Set<CommandListener>       commands =
+			new CopyOnWriteArraySet<CommandListener>();
 
 	/** Field description */
 	protected CopyOnWriteArrayList<JID> cl_nodes_list = new CopyOnWriteArrayList<JID>();
-	private Set<CommandListener>        commands =
-			new CopyOnWriteArraySet<CommandListener>();
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -130,7 +143,37 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	 * @param conn
 	 */
 	@Override
-	public void handleLocalPacket(Packet packet, XMPPResourceConnection conn) {}
+	public void handleLocalPacket(Packet packet, XMPPResourceConnection conn) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "{0}: for connection: {1}", new Object[] { packet, conn });
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param conn is a <code>XMPPResourceConnection</code>
+	 */
+	@Override
+	public void handleLocalPresenceSet(XMPPResourceConnection conn) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "for connection: {0}", new Object[] { conn });
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param conn is a <code>XMPPResourceConnection</code>
+	 */
+	@Override
+	public void handleLocalResourceBind(XMPPResourceConnection conn) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "for connection: {0}", new Object[] { conn });
+		}
+	}
 
 	/**
 	 * Method description
@@ -141,6 +184,9 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	 */
 	@Override
 	public void handleLocalUserLogin(BareJID userId, XMPPResourceConnection conn) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "{0}: for connection: {1}", new Object[] { userId, conn });
+		}
 
 		// Do nothing
 	}
@@ -154,6 +200,9 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	 */
 	@Override
 	public void handleLocalUserLogout(BareJID userId, XMPPResourceConnection conn) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "{0}: for connection: {1}", new Object[] { userId, conn });
+		}
 
 		// Do nothing
 	}
@@ -187,6 +236,42 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	}
 
 	/**
+	 * A utility method used to prepare a Map of data with user session data
+	 * before it can be sent over to another cluster node. This is supposed to
+	 * contain all the user's session essential information which directly
+	 * identify user's resource and network connection. This information allows to
+	 * detect two different user's connection made for the same resource. This may
+	 * happen if both connections are established to different nodes.
+	 *
+	 * @param conn
+	 *          is user's XMPPResourceConnection for which Map structure is
+	 *          prepare.
+	 *
+	 *  a Map structure with all user's connection essential data.
+	 *
+	 *
+	 * @return a value of <code>Map<String,String></code>
+	 * @throws NoConnectionIdException
+	 * @throws NotAuthorizedException
+	 */
+	public Map<String, String> prepareConnectionParams(XMPPResourceConnection conn)
+					throws NotAuthorizedException, NoConnectionIdException {
+		Map<String, String> params = new LinkedHashMap<>(10);
+
+		params.put(USER_ID, conn.getBareJID().toString());
+		params.put(RESOURCE, conn.getResource());
+		params.put(CONNECTION_ID, conn.getConnectionId().toString());
+		params.put(XMPP_SESSION_ID, conn.getSessionId());
+		params.put(AUTH_TIME, "" + conn.getAuthTime());
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Called for conn: {0}, result: ", new Object[] { conn,
+					params });
+		}
+
+		return params;
+	}
+
+	/**
 	 * Method description
 	 *
 	 *
@@ -212,7 +297,7 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 			Map<String, String> data = null;
 
 			if (conn != null) {
-				data = new LinkedHashMap<String, String>();
+				data = new LinkedHashMap<>();
 				data.put(SESSION_FOUND_KEY, sm.getComponentId().toString());
 			}
 			cluster.sendToNodes(PACKET_FORWARD_CMD, data, packet.getElement(), sm
@@ -288,6 +373,16 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	@Override
 	public List<JID> getAllNodes() {
 		return cl_nodes_list;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of <code>ClusterControllerIfc</code>
+	 */
+	public ClusterControllerIfc getClusterController() {
+		return cluster;
 	}
 
 	/**
@@ -440,6 +535,17 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	 * Method description
 	 *
 	 *
+	 * @return a value of <code>SessionManagerClusteredIfc</code>
+	 */
+	@Override
+	public SessionManagerClusteredIfc getSM() {
+		return sm;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param list
 	 */
 	@Override
@@ -489,7 +595,9 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	 */
 	@Override
 	public void setProperties(Map<String, Object> props) {
-		addCommandListener(new PacketForwardCmd(PACKET_FORWARD_CMD, sm, this));
+		addCommandListener(new PacketForwardCmd(PACKET_FORWARD_CMD, this));
+		addCommandListener(new UserConnectedCmd(USER_CONNECTED_CMD, this));
+		addCommandListener(new UserPresenceCmd(USER_PRESENCE_CMD, this));
 	}
 
 	/**
@@ -524,25 +632,27 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 
 		// Artur: Moved it to the front of the method for performance reasons.
 		// TODO: make sure it does not affect logic.
+		// If this is a packet addressed from SM, we do not forward.
 		if ((packet.getPacketFrom() != null) &&!sm.getComponentId().equals(packet
 				.getPacketFrom())) {
 			return false;
 		}
 
 		// This is for packet forwarding logic.
-		// Some packets are for certain not forwarded like packets without to
-		// attribute set.
+		// Some packets are for certain not forwarded like packets without "to"
+		// attribute set, or a packet addressed to a local domain or a packet
+		// addressed to a SM component
 		if ((packet.getStanzaTo() == null) || sm.isLocalDomain(packet.getStanzaTo()
-				.toString(), false) || sm.getComponentId().getBareJID().equals((packet
-				.getStanzaTo().getBareJID()))) {
+				.toString(), false) || sm.getComponentId().getBareJID().equals(packet
+				.getStanzaTo().getBareJID())) {
 			return false;
 		}
 
 		// Also packets sent from the server to user are not being forwarded like
 		// service discovery perhaps?
 		if ((packet.getStanzaFrom() == null) || sm.isLocalDomain(packet.getStanzaFrom()
-				.toString(), false) || sm.getComponentId().getBareJID().equals((packet
-				.getStanzaFrom().getBareJID()))) {
+				.toString(), false) || sm.getComponentId().getBareJID().equals(packet
+				.getStanzaFrom().getBareJID())) {
 			return false;
 		}
 
@@ -558,4 +668,4 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/10/15
+//~ Formatted in Tigase Code Convention on 13/11/02

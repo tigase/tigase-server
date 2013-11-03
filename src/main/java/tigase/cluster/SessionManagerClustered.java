@@ -47,6 +47,8 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPSession;
 
+import static tigase.cluster.strategy.ClusteringStrategyIfc.CLUSTER_NODE;
+
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.Arrays;
@@ -153,6 +155,9 @@ public class SessionManagerClustered
 	@Override
 	public void handleLocalPacket(Packet packet, XMPPResourceConnection conn) {
 		if (strategy != null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "{0}: for connection: {1}", new Object[] { packet, conn });
+			}
 			strategy.handleLocalPacket(packet, conn);
 		}
 	}
@@ -167,7 +172,53 @@ public class SessionManagerClustered
 	@Override
 	public void handleLogin(BareJID userId, XMPPResourceConnection conn) {
 		super.handleLogin(userId, conn);
-		strategy.handleLocalUserLogin(userId, conn);
+		if (strategy != null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "{0}: for connection: {1}", new Object[] { userId, conn });
+			}
+			strategy.handleLocalUserLogin(userId, conn);
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param conn is a <code>XMPPResourceConnection</code>
+	 */
+	@Override
+	public void handlePresenceSet(XMPPResourceConnection conn) {
+		if (conn.getSessionData(CLUSTER_NODE) == null) {
+			super.handlePresenceSet(conn);
+			if (strategy != null) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "for connection: {0}", new Object[] { conn });
+				}
+				strategy.handleLocalPresenceSet(conn);
+			}
+		} else {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "for CLUSTER REMOTE connection: {0}", new Object[] {
+						conn });
+			}
+		}
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param conn is a <code>XMPPResourceConnection</code>
+	 */
+	@Override
+	public void handleResourceBind(XMPPResourceConnection conn) {
+		super.handleResourceBind(conn);
+		if (strategy != null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "for connection: {0}", new Object[] { conn });
+			}
+			strategy.handleLocalResourceBind(conn);
+		}
 	}
 
 	/**
@@ -180,6 +231,23 @@ public class SessionManagerClustered
 	public void initBindings(Bindings binds) {
 		super.initBindings(binds);
 		binds.put(CLUSTER_STRATEGY_VAR, strategy);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param conn_id is a <code>JID</code>
+	 * @param domain is a <code>String</code>
+	 * @param user_id is a <code>BareJID</code>
+	 * @param resource is a <code>String</code>
+	 * @param xmpp_sessionId is a <code>String</code>
+	 *
+	 * @return a value of <code>XMPPResourceConnection</code>
+	 */
+	public XMPPResourceConnection loginUserSession(JID conn_id, String domain,
+			BareJID user_id, String resource, String xmpp_sessionId) {
+		return super.loginUserSession(conn_id, domain, user_id, resource, xmpp_sessionId);
 	}
 
 	/**
@@ -279,7 +347,13 @@ public class SessionManagerClustered
 				log.log(Level.FINEST, "Ressource connection found: {0}", conn);
 			}
 
-			boolean clusterOK = strategy.processPacket(packet, conn);
+			boolean clusterOK = false;
+
+			// We do not process packets directly "from" a client "to" the SM component
+			// such packets should be handled using handleLocalPacket method instead
+			if (!getComponentId().equals(packet.getPacketTo())) {
+				clusterOK = strategy.processPacket(packet, conn);
+			}
 
 			// clTm = System.currentTimeMillis() - startTime;
 			if (conn == null) {
@@ -676,4 +750,4 @@ public class SessionManagerClustered
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/10/16
+//~ Formatted in Tigase Code Convention on 13/11/02
