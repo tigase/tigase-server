@@ -21,7 +21,7 @@ fi
 # clone IzPack git repository
 git clone $GIT_URL $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR || exit -1
 cd $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR/
-	git checkout fde79de81836dbf4c594d6a6f184e27d756ae009 || exit -1
+	git checkout -b original fde79de81836dbf4c594d6a6f184e27d756ae009 || exit -1
 cd ../../
 
 # create patched directory
@@ -32,7 +32,7 @@ cp -r $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR $INSTALLER_DIR/$PATCHED_IZPACK_DIR || 
 
 #checkout correct revision of the sources from local repository
 cd $INSTALLER_DIR/$PATCHED_IZPACK_DIR/
-git checkout v4.3.4
+git checkout -b v4 v4.3.0
 cd ../../
 
 # apply patch
@@ -40,8 +40,6 @@ patch -d $INSTALLER_DIR/$PATCHED_IZPACK_DIR -p 1 < src/main/izpack/changes.patch
 
 # add custom TigasePanels
 cp src/main/izpack/java/*.java $INSTALLER_DIR/$PATCHED_IZPACK_DIR/src/lib/com/izforge/izpack/panels
-cp src/main/izpack/java/izpack/izpack/*.java $INSTALLER_DIR/$PATCHED_IZPACK_DIR/src/lib/com/izforge/izpack/installer
-cp src/main/izpack/java/izpack/panels/*.java $INSTALLER_DIR/$PATCHED_IZPACK_DIR/src/lib/com/izforge/izpack/panels
 
 #copy utilities from newer sources
 if [ ! -e $INSTALLER_DIR/$PATCHED_IZPACK_DIR/utils/wrappers/ ] ; then

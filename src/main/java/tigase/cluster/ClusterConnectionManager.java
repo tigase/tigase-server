@@ -267,10 +267,10 @@ public class ClusterConnectionManager
 	}
 
 	/**
-	 * Method description
+	 * Initialize a mapping of key/value pairs which can be used in scripts
+	 * loaded by the server
 	 *
-	 *
-	 * @param binds
+	 * @param binds A mapping of key/value pairs, all of whose keys are Strings.
 	 */
 	@Override
 	public void initBindings(Bindings binds) {
@@ -335,19 +335,22 @@ public class ClusterConnectionManager
 	public void itemUpdated(ClusterRepoItem item) {}
 
 	/**
-	 * Method description
-	 *
+	 * Method is called on cluster node connection event. This is a
+	 * notification to the component that a new cluster node has connected.
 	 *
 	 * @param node
+	 *          is a hostname of a cluster node generating the event.
 	 */
 	@Override
 	public void nodeConnected(String node) {}
 
 	/**
-	 * Method description
-	 *
+	 * Method is called on cluster node disconnection event. This is a
+	 * notification to the component that there was network connection lost to one
+	 * of the cluster nodes.
 	 *
 	 * @param node
+	 *          is a hostname of a cluster node generating the event.
 	 */
 	@Override
 	public void nodeDisconnected(String node) {}
@@ -752,9 +755,12 @@ public class ClusterConnectionManager
 		}
 		defs.put(CLCON_REPO_CLASS_PROP_KEY, repo_class);
 		try {
-			repo = (ComponentRepository<ClusterRepoItem>) Class.forName(repo_class)
+			ComponentRepository<ClusterRepoItem> repoTmp = 
+					(ComponentRepository<ClusterRepoItem>) Class.forName(repo_class)
 					.newInstance();
-			repo.getDefaults(defs, params);
+			repoTmp.getDefaults(defs, params);
+			if (repo == null)
+				repo = repoTmp;
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can not instantiate items repository for class: " +
 					repo_class, e);
@@ -858,8 +864,8 @@ public class ClusterConnectionManager
 	//~--- set methods ----------------------------------------------------------
 
 	/**
-	 * Method description
-	 *
+	 * Set's the configures the cluster controller object for cluster
+	 * communication and API.
 	 *
 	 * @param cl_controller
 	 */
@@ -893,8 +899,8 @@ public class ClusterConnectionManager
 		if (props.get(CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY) != null) {
 			per_node_conns = (Integer) props.get(CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY);
 		}
-		connectionDelay = 5 * SECOND;
-		if (props.size() == 1) {
+		connectionDelay = 5 * SECOND;		
+		if (props.size() == 1 || isInitializationComplete()) {
 			super.setProperties(props);
 
 			// If props.size() == 1, it means this is a single property update
@@ -902,7 +908,7 @@ public class ClusterConnectionManager
 			// of it's settings
 			return;
 		}
-
+		
 		String repo_class = (String) props.get(CLCON_REPO_CLASS_PROP_KEY);
 
 		try {

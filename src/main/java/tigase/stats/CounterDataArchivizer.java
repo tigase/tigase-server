@@ -68,12 +68,13 @@ public class CounterDataArchivizer
 	private static final String DEF_KEY_FIELD_NAME   = "counter_name";
 	private static final String DEF_TABLE_NAME       = "counter_data";
 	private static final String DEF_VALUE_FIELD_NAME = "counter_value";
+	private static final String MEM_USAGE_TEXT       = "Usage RAM [%]: ";
 	private static final Logger log = Logger.getLogger(CounterDataArchivizer.class
 			.getName());
-	private static final String MEM_USAGE_TEXT          = "Usage RAM [%]: ";
 	private static final String SERVER_CONNECTIONS_TEXT = "Connections s2s: ";
 	private static final String UPTIME_TEXT             = "Uptime: ";
 	private static final String USER_CONNECTIONS_TEXT   = "Connections c2s: ";
+	private static final String USER_REGISTERED_TEXT    = "Registered user: ";
 	private static final String VERSION_TEXT            = "Version: ";
 	private static final String VHOSTS_TEXT             = "VHosts: ";
 
@@ -107,6 +108,7 @@ public class CounterDataArchivizer
 		initData(CPU_USAGE_TEXT, format.format(sp.getCPUUsage()));
 		initData(MEM_USAGE_TEXT, format.format(sp.getHeapMemUsage()));
 		format = NumberFormat.getIntegerInstance();
+		initData(USER_REGISTERED_TEXT, format.format(sp.getRegistered()));
 		initData(USER_CONNECTIONS_TEXT, format.format(sp.getConnectionsNumber()));
 		initData(SERVER_CONNECTIONS_TEXT, format.format(sp.getServerConnections()));
 		initData(UPTIME_TEXT, TigaseRuntime.getTigaseRuntime().getUptimeString());
@@ -134,6 +136,7 @@ public class CounterDataArchivizer
 		if (prop != null) {
 			valueField = prop;
 		}
+		log.log(Level.SEVERE, "Initialize stats archive, table: {0} ", tableName);
 		init_entry_query = "insert into " + tableName + " (" + keyField + ", " + valueField +
 				") " + " (select ?, ? from " + tableName + " where " + keyField +
 				" = ? HAVING count(*)=0)";
@@ -173,14 +176,12 @@ public class CounterDataArchivizer
 			synchronized (updateEntry) {
 				updateEntry.setString(1, value);
 				updateEntry.setString(2, key);
-				System.out.println("updateEntry: " + updateEntry);
 				updateEntry.executeUpdate();
 			}
 			synchronized (initEntry) {
 				initEntry.setString(1, key);
 				initEntry.setString(2, value);
 				initEntry.setString(3, key);
-				System.out.println("initEntry: " + initEntry);
 				initEntry.executeUpdate();
 			}
 		} catch (SQLException e) {
@@ -253,4 +254,4 @@ public class CounterDataArchivizer
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/10/25
+//~ Formatted in Tigase Code Convention on 13/11/02

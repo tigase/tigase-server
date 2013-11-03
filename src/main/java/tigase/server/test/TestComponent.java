@@ -210,10 +210,10 @@ public class TestComponent
 	}
 
 	/**
-	 * Method description
+	 * Initialize a mapping of key/value pairs which can be used in scripts
+	 * loaded by the server
 	 *
-	 *
-	 * @param binds
+	 * @param binds A mapping of key/value pairs, all of whose keys are Strings.
 	 */
 	@Override
 	public void initBindings(Bindings binds) {

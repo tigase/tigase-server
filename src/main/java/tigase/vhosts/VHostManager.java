@@ -91,7 +91,7 @@ public class VHostManager
 			new LinkedHashSet<VHostListener>(10);
 	private ConcurrentSkipListSet<String> registeredComponentDomains =
 			new ConcurrentSkipListSet<String>();
-	private ComponentRepository<VHostItem> repo = null;
+	protected ComponentRepository<VHostItem> repo = null;
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -148,10 +148,10 @@ public class VHostManager
 	}
 
 	/**
-	 * Method description
+	 * Initialize a mapping of key/value pairs which can be used in scripts
+	 * loaded by the server
 	 *
-	 *
-	 * @param binds
+	 * @param binds A mapping of key/value pairs, all of whose keys are Strings.
 	 */
 	@Override
 	public void initBindings(Bindings binds) {
@@ -514,7 +514,7 @@ public class VHostManager
 
 		String repo_class = (String) properties.get(VHOSTS_REPO_CLASS_PROP_KEY);
 
-		if (repo_class != null) {
+		if (repo_class != null && !isInitializationComplete()) {
 			try {
 				ComponentRepository<VHostItem> repo_tmp = (ComponentRepository<VHostItem>) Class
 						.forName(repo_class).newInstance();

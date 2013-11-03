@@ -22,7 +22,7 @@
 
 /*
 
-Manage active server components
+Manage active server plugins
 
 AS:Description: Manage active server plugins
 AS:CommandId: plugin-manager
@@ -61,7 +61,12 @@ if (!submit) {
         def res = (Iq)p.commandResult(Command.DataType.form)
                 
         def pluginsAll = [];
-        pluginsAll.addAll(ModulesManagerImpl.getInstance().plugins.keySet());
+		if (XMPPServer.isOSGi()) {
+			pluginsAll.addAll(ModulesManagerImpl.getInstance().plugins.keySet());
+		}
+		else {
+			pluginsAll.addAll(tigase.xmpp.ProcessorFactory.processors.keySet());
+		}
         def conf = XMPPServer.getConfigurator();
         def pluginsEnabled = [];
         pluginsEnabled.addAll(tigase.server.xmppsession.SessionManagerConfig.PLUGINS_FULL_PROP_VAL);
@@ -85,7 +90,7 @@ if (!submit) {
                                         if (!pluginsAll.contains(id)) {
                                                 pluginsAll.add(id);
                                         }
-                                        pluginsEnabled.remove(id.substring(1));
+                                        pluginsEnabled.remove(id);
                                         break;
                                 default:
                                         pluginsEnabled.add(id);
@@ -125,18 +130,19 @@ else {
                 else if (!enable && pluginsEnabled.contains(id)) {
                         if (!str.isEmpty()) str += ",";
                         str += "-" + id;
+						pluginsEnabled.remove(id);
                 }
         }
-        
+
         def conf = XMPPServer.getConfigurator();
         conf.getDefConfigParams().put(Configurable.GEN_SM_PLUGINS, str);
-
+	
         def props = [:];
         props[tigase.server.xmppsession.SessionManagerConfig.PLUGINS_PROP_KEY] = (pluginsEnabled as String[]);
         conf.putProperties("sess-man", props);
                 
         ((Configurator) XMPPServer.getConfigurator()).updateMessageRouter();
-                
+		
         def res = (Iq)p.commandResult(Command.DataType.result)
 
         Command.addTextField(res, "Note", "Operation successful.");

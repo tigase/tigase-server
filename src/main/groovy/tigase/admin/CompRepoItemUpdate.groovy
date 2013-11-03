@@ -29,7 +29,7 @@ Works only for some components which actually use the repository that way.
 AS:Description: Update item configuration
 AS:CommandId: comp-repo-item-update
 AS:Component: vhost-man,ext,basic-conf
-*/
+ */
 
 package tigase.admin
 
@@ -48,6 +48,12 @@ def isServiceAdmin = admins.contains(stanzaFromBare)
 
 def itemKey = Command.getFieldValue(packet, ITEMS)
 def marker = Command.getFieldValue(packet, MARKER)
+
+def supportedComponents = ["vhost-man"]
+def NOTIFY_CLUSTER = "notify-cluster"
+boolean clusterMode =  Boolean.valueOf( System.getProperty("cluster-mode", false.toString()) );
+boolean notifyCluster = Boolean.valueOf( Command.getFieldValue(packet, NOTIFY_CLUSTER) )
+Queue results = new LinkedList()
 
 if (itemKey == null) {
 	def items = repo.allItems()
@@ -81,11 +87,30 @@ if (marker == null) {
 			item.addCommandFields(result)
 			Command.addHiddenField(result, MARKER, MARKER)
 			Command.addHiddenField(result, ITEMS, itemKey)
+			if 	( clusterMode  ) {
+				Command.addHiddenField(result, NOTIFY_CLUSTER, true.toString())
+			}
 			return result
 		} else {
 			def result = p.commandResult(Command.DataType.result)
 			Command.addTextField(result, "Error", "You do not have enough permissions to manage this item.")
 			return result
+		}
+	}
+}
+
+if 	( clusterMode && notifyCluster && supportedComponents.contains(componentName) ) {
+	def nodes = (List)connectedNodes
+
+	if (nodes && nodes.size() > 0 ) {
+		nodes.each { node ->
+			def forward = p.copyElementOnly();
+			Command.removeFieldValue(forward, NOTIFY_CLUSTER)
+			Command.addHiddenField(forward, NOTIFY_CLUSTER, false.toString())
+			forward.setPacketTo( node );
+			forward.setPermissions( Permissions.ADMIN );
+
+			results.offer(forward)
 		}
 	}
 }
@@ -110,4 +135,5 @@ if (oldItem == null) {
 }
 
 
-return result
+results.add(result);
+return results;

@@ -29,7 +29,7 @@ Works only for some components which actually use the repository that way.
 AS:Description: Add new item
 AS:CommandId: comp-repo-item-add
 AS:Component: vhost-man,ext
-*/
+ */
 
 package tigase.admin
 
@@ -48,11 +48,36 @@ def isServiceAdmin = admins.contains(stanzaFromBare)
 def item = repo.getItemInstance()
 def marker = Command.getFieldValue(p, MARKER)
 
+def supportedComponents = ["vhost-man"]
+def NOTIFY_CLUSTER = "notify-cluster"
+boolean clusterMode =  Boolean.valueOf( System.getProperty("cluster-mode", false.toString()) );
+boolean notifyCluster = Boolean.valueOf( Command.getFieldValue(packet, NOTIFY_CLUSTER) )
+Queue results = new LinkedList()
+
+
 if (marker == null) {
   def result = p.commandResult(Command.DataType.form)
   item.addCommandFields(result)
 	Command.addHiddenField(result, MARKER, MARKER)
+	if 	( clusterMode  ) {
+		Command.addHiddenField(result, NOTIFY_CLUSTER, true.toString())
+	}
 	return result
+}
+
+if 	( clusterMode && notifyCluster && supportedComponents.contains(componentName) ) {
+	def nodes = (List)connectedNodes
+	if (nodes && nodes.size() > 0 ) {
+		nodes.each { node ->
+			def forward = p.copyElementOnly();
+			Command.removeFieldValue(forward, NOTIFY_CLUSTER)
+			Command.addHiddenField(forward, NOTIFY_CLUSTER, false.toString())
+			forward.setPacketTo( node );
+			forward.setPermissions( Permissions.ADMIN );
+
+			results.offer(forward)
+		}
+	}
 }
 
 item.initFromCommand(p)
@@ -76,4 +101,5 @@ if (oldItem == null) {
 	Command.addTextField(result, "Error", "The item is already added, you can't add it twice.")
 }
 
-return result
+results.add(result);
+return results;

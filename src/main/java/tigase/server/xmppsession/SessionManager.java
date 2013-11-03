@@ -76,6 +76,7 @@ import tigase.xmpp.XMPPImplIfc;
 import tigase.xmpp.XMPPPacketFilterIfc;
 import tigase.xmpp.XMPPPostprocessorIfc;
 import tigase.xmpp.XMPPPreprocessorIfc;
+import tigase.xmpp.XMPPPresenceUpdateProcessorIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
@@ -95,7 +96,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.script.Bindings;
-import tigase.xmpp.XMPPPresenceUpdateProcessorIfc;
 
 /**
  * Class SessionManager
@@ -154,6 +154,8 @@ public class SessionManager
 			new StaleConnectionCloser();
 	private Map<String, XMPPProcessorIfc> processors = new ConcurrentHashMap<String,
 			XMPPProcessorIfc>(32);
+	private Map<String, XMPPPresenceUpdateProcessorIfc> presenceProcessors =
+			new ConcurrentHashMap<String, XMPPPresenceUpdateProcessorIfc>();
 	private Map<String, XMPPPreprocessorIfc> preProcessors = new ConcurrentHashMap<String,
 			XMPPPreprocessorIfc>(10);
 
@@ -166,8 +168,6 @@ public class SessionManager
 			long[]>();
 	private Map<String, XMPPPostprocessorIfc> postProcessors =
 			new ConcurrentHashMap<String, XMPPPostprocessorIfc>(10);
-	private Map<String, XMPPPresenceUpdateProcessorIfc> presenceProcessors = 
-			new ConcurrentHashMap<String, XMPPPresenceUpdateProcessorIfc>();
 	private Map<String, Map<String, Object>> plugin_config = new ConcurrentHashMap<String,
 			Map<String, Object>>(20);
 	private Map<String, XMPPPacketFilterIfc> outFilters = new ConcurrentHashMap<String,
@@ -175,8 +175,9 @@ public class SessionManager
 	private ConnectionCheckCommandHandler connectionCheckCommandHandler =
 			new ConnectionCheckCommandHandler();
 
+	/** Field description */
 	protected Queue<Packet> packetWriterQueue = new WriterQueue<Packet>();
-	
+
 	/**
 	 * A Map with connectionID as a key and an object with all the user connection
 	 * data as a value
@@ -192,7 +193,9 @@ public class SessionManager
 	 *
 	 * @param packet
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean addOutPacket(Packet packet) {
@@ -215,8 +218,10 @@ public class SessionManager
 	 * @param plug_id
 	 * @param conc
 	 *
-	 * 
 	 *
+	 *
+	 *
+	 * @return a value of <code>XMPPImplIfc</code>
 	 * @throws ClassNotFoundException
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
@@ -225,7 +230,7 @@ public class SessionManager
 					throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		XMPPImplIfc      result = null;
 		XMPPProcessorIfc proc   = null;
-		String version;
+		String           version;
 
 		if (plug_id.equals(sessionOpenProcId)) {
 			sessionOpenProc = new SessionOpenProc();
@@ -252,29 +257,37 @@ public class SessionManager
 					? proc.concurrentQueuesNo()
 					: 0));
 
-
 			// If there is not default processors thread pool or the processor does
 			// have thread pool specific settings create a separate thread pool
 			// for the processor
 			if ((workerThreads.get(defPluginsThreadsPool) == null) || (conc != null)) {
-				ProcessorWorkerThread                    worker = new ProcessorWorkerThread();
-				ProcessingThreads<ProcessorWorkerThread> pt =
-						new ProcessingThreads<ProcessorWorkerThread>(worker, concurrency,
-						maxInQueueSize, proc.id());
 
-				workerThreads.put(proc.id(), pt);
-				log.log(Level.CONFIG, "Created thread pool: {0}, queue: {1} for plugin id: {2}",
-						new Object[] { concurrency,
-						maxInQueueSize, proc.id() });
+				// Added to make sure that there will be only one thread pool for plugin
+				// so if one exits we will keep it and not create another one
+				if (!workerThreads.containsKey(proc.id())) {
+					ProcessorWorkerThread                    worker = new ProcessorWorkerThread();
+					ProcessingThreads<ProcessorWorkerThread> pt =
+							new ProcessingThreads<ProcessorWorkerThread>(worker, concurrency,
+							maxInQueueSize, proc.id());
+
+					workerThreads.put(proc.id(), pt);
+					log.log(Level.CONFIG,
+							"Created thread pool: {0}, queue: {1} for plugin id: {2}", new Object[] {
+							concurrency,
+							maxInQueueSize, proc.id() });
+				}
 			}
 			processors.put(proc.id(), proc);
 			log.log(Level.CONFIG, "Added processor: {0} for plugin id: {1}", new Object[] { proc
 					.getClass().getSimpleName(),
 					proc.id() });
-			loaded = true;
-			result = proc;
+			loaded  = true;
+			result  = proc;
 			version = result.getComponentInfo().getComponentVersion();
-			System.out.println("Loading plugin: " + plug_id + "=" + concurrency + " ... " + (version.isEmpty() ? "" : "\t, version: " + version) );
+			System.out.println("Loading plugin: " + plug_id + "=" + concurrency + " ... " +
+					(version.isEmpty()
+					? ""
+					: "\t, version: " + version));
 		}
 
 		XMPPPreprocessorIfc preproc = SessionManagerConfig.getPreprocessor(plug_id);
@@ -343,7 +356,9 @@ public class SessionManager
 	 *
 	 * @param jid
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean containsJid(BareJID jid) {
@@ -421,12 +436,13 @@ public class SessionManager
 	@Override
 	public void handlePresenceSet(XMPPResourceConnection conn) {
 		XMPPSession parentSession = conn.getParentSession();
-		
-		if (parentSession == null)
+
+		if (parentSession == null) {
 			return;
-		
+		}
+
 		Element presence = conn.getPresence();
-		
+
 		this.processPresenceUpdate(parentSession, presence);
 	}
 
@@ -458,7 +474,9 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean handlesLocalDomains() {
@@ -466,10 +484,10 @@ public class SessionManager
 	}
 
 	/**
-	 * Method description
+	 * Initialize a mapping of key/value pairs which can be used in scripts
+	 * loaded by the server
 	 *
-	 *
-	 * @param binds
+	 * @param binds A mapping of key/value pairs, all of whose keys are Strings.
 	 */
 	@Override
 	public void initBindings(Bindings binds) {
@@ -484,7 +502,9 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int processingInThreads() {
@@ -495,7 +515,9 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	@Override
 	public int processingOutThreads() {
@@ -576,7 +598,9 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean skipPrivacy() {
 		return skipPrivacy;
@@ -585,30 +609,14 @@ public class SessionManager
 	//~--- get methods ----------------------------------------------------------
 
 	/**
-	 * Calculates number of Active Users, i.e. users which session wasn't idle longer than 5 minutes
-	 * @return number of Active Users
-	 */
-	private long getActiveUserNumber() {
-		int count = 0;
-		for ( BareJID bareJID : sessionsByNodeId.keySet() ) {
-			if ( !bareJID.toString().startsWith( "sess-man" ) ){
-				for ( XMPPResourceConnection xMPPResourceConnection : sessionsByNodeId.get( bareJID ).getActiveResources() ) {
-					if ( System.currentTimeMillis() - xMPPResourceConnection.getLastAccessed() < 5 * 60 * 1000 ){
-						count++;
-					}
-				}
-			}
-		}
-		return count;
-	}
-
-	/**
 	 * Method description
 	 *
 	 *
 	 * @param jid
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>JID[]</code>
 	 */
 	@Override
 	public JID[] getConnectionIdsForJid(BareJID jid) {
@@ -629,7 +637,9 @@ public class SessionManager
 	 *
 	 * @param params
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>Map<String,Object></code>
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -647,7 +657,9 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -658,7 +670,9 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String getDiscoDescription() {
@@ -671,7 +685,9 @@ public class SessionManager
 	 *
 	 * @param from
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>List<Element></code>
 	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
@@ -700,7 +716,9 @@ public class SessionManager
 	 * @param jid
 	 * @param from
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>Element</code>
 	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
@@ -744,7 +762,9 @@ public class SessionManager
 	 *
 	 * @param jid
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>XMPPResourceConnection</code>
 	 */
 	public XMPPResourceConnection getResourceConnection(JID jid) {
 		XMPPSession session = getSession(jid.getBareJID());
@@ -836,7 +856,9 @@ public class SessionManager
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean hasCompleteJidsInfo() {
@@ -850,7 +872,9 @@ public class SessionManager
 	 * @param domain
 	 * @param includeComponents
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean isLocalDomain(String domain, boolean includeComponents) {
@@ -989,107 +1013,106 @@ public class SessionManager
 		}
 		naUserRepository = new NonAuthUserRepositoryImpl(user_repository, getDefHostName(),
 				Boolean.parseBoolean((String) props.get(AUTO_CREATE_OFFLINE_USER_PROP_KEY)));
-		if (isInitializationComplete()) {
+		synchronized (this) {
+			LinkedHashMap<String, Integer> plugins_concurrency = new LinkedHashMap<String,
+					Integer>(20);
+			String[] plugins_conc = ((String) props.get(PLUGINS_CONCURRENCY_PROP_KEY)).split(
+					",");
 
-			// Before we can allow for plugins initialization again, this needs to be
-			// tested to ensure there is no double initialization and multiple threads
-			// pools are not created to waste resources
-			return;
-		}
+			log.log(Level.CONFIG, "Loading concurrency plugins list: {0}", Arrays.toString(
+					plugins_conc));
+			if ((plugins_conc != null) && (plugins_conc.length > 0)) {
+				for (String plugc : plugins_conc) {
+					log.log(Level.CONFIG, "Loading: {0}", plugc);
+					if (!plugc.trim().isEmpty()) {
+						String[] pc = plugc.split("=");
 
-		LinkedHashMap<String, Integer> plugins_concurrency = new LinkedHashMap<String,
-				Integer>(20);
-		String[] plugins_conc = ((String) props.get(PLUGINS_CONCURRENCY_PROP_KEY)).split(",");
+						try {
+							int conc = Integer.parseInt(pc[1]);
 
-		log.log(Level.CONFIG, "Loading concurrency plugins list: {0}", Arrays.toString(
-				plugins_conc));
-		if ((plugins_conc != null) && (plugins_conc.length > 0)) {
-			for (String plugc : plugins_conc) {
-				log.log(Level.CONFIG, "Loading: {0}", plugc);
-				if (!plugc.trim().isEmpty()) {
-					String[] pc = plugc.split("=");
-
-					try {
-						int conc = Integer.parseInt(pc[1]);
-
-						plugins_concurrency.put(pc[0], conc);
-						log.log(Level.CONFIG, "Concurrency for plugin: {0} set to: {1}",
-								new Object[] { pc[0],
-								conc });
-					} catch (Exception e) {
-						log.log(Level.WARNING, "Plugin concurrency parsing error for: " + plugc +
-								", ", e);
-					}
-				}
-			}
-		}
-
-		Set<String> keys = new HashSet<String>(processors.keySet());
-
-		try {
-			String sm_threads_pool = (String) props.get(SM_THREADS_POOL_PROP_KEY);
-
-			if (!sm_threads_pool.equals(SM_THREADS_POOL_PROP_VAL)) {
-				String[] threads_pool_params = sm_threads_pool.split(":");
-				int      def_pool_size       = 100;
-
-				if (threads_pool_params.length > 1) {
-					try {
-						def_pool_size = Integer.parseInt(threads_pool_params[1]);
-					} catch (Exception e) {
-						log.log(Level.WARNING,
-								"Incorrect threads pool size: {0}, setting default to 100",
-								threads_pool_params[1]);
-						def_pool_size = 100;
-					}
-				}
-
-				ProcessorWorkerThread                    worker = new ProcessorWorkerThread();
-				ProcessingThreads<ProcessorWorkerThread> pt =
-						new ProcessingThreads<ProcessorWorkerThread>(worker, def_pool_size,
-						maxInQueueSize, defPluginsThreadsPool);
-
-				workerThreads.put(defPluginsThreadsPool, pt);
-				log.log(Level.CONFIG, "Created a default thread pool: {0}", def_pool_size);
-			}
-
-			String[] plugins = SessionManagerConfig.getActivePlugins(props);
-
-			log.log(Level.CONFIG, "Loaded plugins list: {0}", Arrays.toString(plugins));
-
-			// maxPluginsNo = plugins.length;
-			// processors.clear();
-			for (String plug_id : plugins) {
-				keys.remove(plug_id);
-				log.log(Level.CONFIG, "Loading and configuring plugin: {0}", plug_id);
-
-				XMPPImplIfc plugin = addPlugin(plug_id, plugins_concurrency.get(plug_id));
-
-				if (plugin != null) {
-					Map<String, Object> plugin_settings = getPluginSettings(plug_id, props);
-
-					if (plugin_settings.size() > 0) {
-						if (log.isLoggable(Level.CONFIG)) {
-							log.log(Level.CONFIG, "Plugin configuration: {0}", plugin_settings);
+							plugins_concurrency.put(pc[0], conc);
+							log.log(Level.CONFIG, "Concurrency for plugin: {0} set to: {1}",
+									new Object[] { pc[0],
+									conc });
+						} catch (Exception e) {
+							log.log(Level.WARNING, "Plugin concurrency parsing error for: " + plugc +
+									", ", e);
 						}
-						plugin_config.put(plug_id, plugin_settings);
-					}
-					try {
-						plugin.init(plugin_settings);
-					} catch (TigaseDBException ex) {
-						log.log(Level.SEVERE, "Problem initializing plugin: " + plugin.id(), ex);
 					}
 				}
-			}    // end of for (String comp_id: plugins)
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Problem with component initialization: " + getName(), e);
+			}
+
+			Set<String> keys = new HashSet<String>(processors.keySet());
+
+			try {
+				if (!isInitializationComplete()) {
+					String sm_threads_pool = (String) props.get(SM_THREADS_POOL_PROP_KEY);
+
+					if (!sm_threads_pool.equals(SM_THREADS_POOL_PROP_VAL)) {
+						String[] threads_pool_params = sm_threads_pool.split(":");
+						int      def_pool_size       = 100;
+
+						if (threads_pool_params.length > 1) {
+							try {
+								def_pool_size = Integer.parseInt(threads_pool_params[1]);
+							} catch (Exception e) {
+								log.log(Level.WARNING,
+										"Incorrect threads pool size: {0}, setting default to 100",
+										threads_pool_params[1]);
+								def_pool_size = 100;
+							}
+						}
+
+						ProcessorWorkerThread                    worker = new ProcessorWorkerThread();
+						ProcessingThreads<ProcessorWorkerThread> pt =
+								new ProcessingThreads<ProcessorWorkerThread>(worker, def_pool_size,
+								maxInQueueSize, defPluginsThreadsPool);
+
+						workerThreads.put(defPluginsThreadsPool, pt);
+						log.log(Level.CONFIG, "Created a default thread pool: {0}", def_pool_size);
+					}
+				}
+
+				String[] plugins = SessionManagerConfig.getActivePlugins(props);
+
+				log.log(Level.CONFIG, "Loaded plugins list: {0}", Arrays.toString(plugins));
+
+				// maxPluginsNo = plugins.length;
+				// processors.clear();
+				for (String plug_id : plugins) {
+					keys.remove(plug_id);
+					log.log(Level.CONFIG, "Loading and configuring plugin: {0}", plug_id);
+
+					XMPPImplIfc plugin = addPlugin(plug_id, plugins_concurrency.get(plug_id));
+
+					if (plugin != null) {
+						Map<String, Object> plugin_settings = getPluginSettings(plug_id, props);
+
+						if (plugin_settings.size() > 0) {
+							if (log.isLoggable(Level.CONFIG)) {
+								log.log(Level.CONFIG, "Plugin configuration: {0}", plugin_settings);
+							}
+							plugin_config.put(plug_id, plugin_settings);
+						}
+						try {
+							plugin.init(plugin_settings);
+						} catch (TigaseDBException ex) {
+							log.log(Level.SEVERE, "Problem initializing plugin: " + plugin.id(), ex);
+						}
+					}
+				}    // end of for (String comp_id: plugins)
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "Problem with component initialization: " + getName(), e);
+			}
+			for (String key : keys) {
+				removePlugin(key);
+			}
 		}
-		for (String key : keys) {
-			removePlugin(key);
+		if (!isInitializationComplete()) {
+			smResourceConnection = new SMResourceConnection(null, user_repository,
+					auth_repository, this);
+			registerNewSession(getComponentId().getBareJID(), smResourceConnection);
 		}
-		smResourceConnection = new SMResourceConnection(null, user_repository,
-				auth_repository, this);
-		registerNewSession(getComponentId().getBareJID(), smResourceConnection);
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -1116,7 +1139,9 @@ public class SessionManager
 	 *
 	 * @param jid
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean addTrusted(JID jid) {
 		return trusted.add(jid.getBareJID().toString());
@@ -1237,14 +1262,14 @@ public class SessionManager
 						log.log(Level.FINE, "Found parent session for: {0}", userJid);
 					}
 					if (session.getActiveResourcesSize() <= 1) {
+
 						// we should check if other this is the only connection on session
 						// as in some cases connection can be already removed from active
 						// resources but there might be other connection which is active
-						if (session.getActiveResourcesSize() > 0 
-								&& !session.getActiveResources().contains(conn)) {
-							log.log(Level.FINE, "Session contains connection for other "
-									+ "resource than: {0}, not removing session", userJid);
-							
+						if ((session.getActiveResourcesSize() > 0) &&!session.getActiveResources()
+								.contains(conn)) {
+							log.log(Level.FINE, "Session contains connection for other " +
+									"resource than: {0}, not removing session", userJid);
 							if (log.isLoggable(Level.FINER)) {
 								StringBuilder sb = new StringBuilder(100);
 
@@ -1252,12 +1277,12 @@ public class SessionManager
 									sb.append(", res=").append(res_con.getResource());
 								}
 								log.log(Level.FINER, "Number of connections is {0} for the user: {1}{2}",
-										new Object[]{session.getActiveResourcesSize(),
-									userJid, sb.toString()});
-							}						
+										new Object[] { session.getActiveResourcesSize(),
+										userJid, sb.toString() });
+							}
+
 							return;
 						}
-						
 						session = sessionsByNodeId.remove(userJid.getBareJID());
 						if (session == null) {
 							log.log(Level.INFO, "UPS can't remove, session not found in map: {0}",
@@ -1299,8 +1324,10 @@ public class SessionManager
 	 * @param conn_id
 	 * @param domain
 	 *
-	 * 
 	 *
+	 *
+	 *
+	 * @return a value of <code>XMPPResourceConnection</code>
 	 * @throws TigaseStringprepException
 	 */
 	protected XMPPResourceConnection createUserSession(JID conn_id, String domain)
@@ -1350,7 +1377,9 @@ public class SessionManager
 	 *
 	 * @param jid
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean delTrusted(JID jid) {
 		return trusted.remove(jid.getBareJID().toString());
@@ -1362,7 +1391,9 @@ public class SessionManager
 	 *
 	 * @param packet
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean fastAddOutPacket(Packet packet) {
 		return addOutPacket(packet);
@@ -1378,7 +1409,9 @@ public class SessionManager
 	 * @param resource
 	 * @param xmpp_sessionId
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>XMPPResourceConnection</code>
 	 */
 	@SuppressWarnings("deprecation")
 	protected XMPPResourceConnection loginUserSession(JID conn_id, String domain,
@@ -1416,7 +1449,9 @@ public class SessionManager
 	 *
 	 * @param packet
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean processAdminsOrDomains(Packet packet) {
 		if ((packet.getStanzaFrom() == null) && (packet.getPacketFrom() != null)) {
@@ -1456,7 +1491,9 @@ public class SessionManager
 	 *
 	 * @param pc
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean processCommand(Packet pc) {
 		if ((pc.getStanzaTo() == null) ||!(getComponentId().equals(pc.getStanzaTo()) ||
@@ -1712,38 +1749,44 @@ public class SessionManager
 
 			break;
 
-		case STREAM_MOVED:
+		case STREAM_MOVED :
 			if (connection != null) {
 				String oldConnectionJidStr = Command.getFieldValue(pc, "old-conn-jid");
-				JID oldConnJid = JID.jidInstanceNS(oldConnectionJidStr);
-				
+				JID    oldConnJid          = JID.jidInstanceNS(oldConnectionJidStr);
+
 				try {
+
 					// get old session and replace it's connection id to redirect packets
 					// to new connection
 					XMPPResourceConnection oldConn = connectionsByFrom.remove(oldConnJid);
+
 					oldConn.setConnectionId(connection.getConnectionId());
 					connectionsByFrom.remove(connection.getConnectionId());
 					connectionsByFrom.put(oldConn.getConnectionId(), oldConn);
 
-					// remove current connection from list of active connections as 
+					// remove current connection from list of active connections as
 					// this connection will be used with other already authenticated connection
 					sessionsByNodeId.get(oldConn.getBareJID()).removeResourceConnection(connection);
 
-					Packet cmd = Command.STREAM_MOVED.getPacket(getComponentId(), oldConnJid, StanzaType.set, "moved");
+					Packet cmd = Command.STREAM_MOVED.getPacket(getComponentId(), oldConnJid,
+							StanzaType.set, "moved");
+
 					Command.addFieldValue(cmd, "cmd", "stream-moved");
-					Command.addFieldValue(cmd, "new-conn-jid", oldConn.getConnectionId().toString());
+					Command.addFieldValue(cmd, "new-conn-jid", oldConn.getConnectionId()
+							.toString());
 					cmd.setPacketFrom(getComponentId());
 					cmd.setPacketTo(oldConnJid);
 					addOutPacket(cmd);
+				} catch (XMPPException ex) {
+					log.log(Level.SEVERE, "exception while replacing old connection id = " +
+							oldConnJid + " with new connection id = " + pc.getPacketFrom().toString(),
+							ex);
 				}
-				catch (XMPPException ex) {
-					log.log(Level.SEVERE, "exception while replacing old connection id = " + oldConnJid 
-							+ " with new connection id = " + pc.getPacketFrom().toString(), ex);
-				}								
 			}
 			processing_result = true;
+
 			break;
-			
+
 		default :
 			if (getComponentId().equals(iqc.getStanzaTo()) && getComponentId().equals(iqc
 					.getPacketFrom())) {
@@ -1962,32 +2005,41 @@ public class SessionManager
 		// postTime[idx] = postTm;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session is a <code>XMPPSession</code>
+	 * @param packet is a <code>Element</code>
+	 */
 	protected void processPresenceUpdate(XMPPSession session, Element packet) {
 		try {
-			if (presenceProcessors.isEmpty())
+			if (presenceProcessors.isEmpty()) {
 				return;
-			
+			}
+
 			Packet presence = Packet.packetInstance(packet);
+
 			for (XMPPResourceConnection conn : session.getActiveResources()) {
 				for (XMPPPresenceUpdateProcessorIfc proc : presenceProcessors.values()) {
 					try {
 						proc.presenceUpdate(conn, presence, packetWriterQueue);
-					}
-					catch (NotAuthorizedException ex) {
-						log.log(Level.SEVERE, "exception processing presence update for "
-								+ "session = {0} and packet = {1}", 
-								new Object[]{session, packet});					
+					} catch (NotAuthorizedException ex) {
+						log.log(Level.SEVERE, "exception processing presence update for " +
+								"session = {0} and packet = {1}", new Object[] { session,
+								packet });
 					}
 				}
 			}
-		}
-		catch (TigaseStringprepException ex) {
+		} catch (TigaseStringprepException ex) {
+
 			// should not happen
-			log.log(Level.SEVERE, "exception processing presence update for session = {0}"
-					+ " and packet = {1}", new Object[]{session, packet});
+			log.log(Level.SEVERE, "exception processing presence update for session = {0}" +
+					" and packet = {1}", new Object[] { session,
+					packet });
 		}
 	}
-	
+
 	/**
 	 * Method description
 	 *
@@ -2096,7 +2148,9 @@ public class SessionManager
 	 *
 	 * @param def
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>Integer</code>
 	 */
 	@Override
 	protected Integer getMaxQueueSize(int def) {
@@ -2109,7 +2163,9 @@ public class SessionManager
 	 *
 	 * @param jid
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>XMPPSession</code>
 	 */
 	protected XMPPSession getSession(BareJID jid) {
 		return sessionsByNodeId.get(jid);
@@ -2121,7 +2177,9 @@ public class SessionManager
 	 *
 	 * @param connId
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>XMPPResourceConnection</code>
 	 */
 	protected XMPPResourceConnection getXMPPResourceConnection(JID connId) {
 		return connectionsByFrom.get(connId);
@@ -2133,7 +2191,9 @@ public class SessionManager
 	 *
 	 * @param p
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>XMPPResourceConnection</code>
 	 */
 	protected XMPPResourceConnection getXMPPResourceConnection(Packet p) {
 		XMPPResourceConnection conn = null;
@@ -2172,7 +2232,9 @@ public class SessionManager
 	 *
 	 * @param p
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean isBrokenPacket(Packet p) {
 
@@ -2236,7 +2298,9 @@ public class SessionManager
 	 *
 	 * @param jid
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean isTrusted(JID jid) {
 		if (trusted.contains(jid.getBareJID().toString())) {
@@ -2252,7 +2316,9 @@ public class SessionManager
 	 *
 	 * @param jid
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean isTrusted(String jid) {
 		if (trusted.contains(jid)) {
@@ -2318,6 +2384,28 @@ public class SessionManager
 	}
 
 	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Calculates number of Active Users, i.e. users which session wasn't idle longer than 5 minutes
+	 * @return number of Active Users
+	 */
+	private long getActiveUserNumber() {
+		int count = 0;
+
+		for (BareJID bareJID : sessionsByNodeId.keySet()) {
+			if (!bareJID.toString().startsWith("sess-man")) {
+				for (XMPPResourceConnection xMPPResourceConnection : sessionsByNodeId.get(bareJID)
+						.getActiveResources()) {
+					if (System.currentTimeMillis() - xMPPResourceConnection.getLastAccessed() < 5 *
+							60 * 1000) {
+						count++;
+					}
+				}
+			}
+		}
+
+		return count;
+	}
 
 	private List<Element> getFeatures(XMPPResourceConnection session) {
 		List<Element> results = new LinkedList<Element>();
@@ -2507,7 +2595,9 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * 
+		 *
+		 *
+		 * @return a value of <code>int</code>
 		 */
 		@Override
 		public int concurrentQueuesNo() {
@@ -2518,7 +2608,9 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * 
+		 *
+		 *
+		 * @return a value of <code>String</code>
 		 */
 		@Override
 		public String id() {
@@ -2592,7 +2684,9 @@ public class SessionManager
 		 *
 		 *
 		 *
-		 * 
+		 *
+		 *
+		 * @return a value of <code>WorkerThread</code>
 		 */
 		@Override
 		public WorkerThread getNewInstance() {
@@ -2610,7 +2704,9 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * 
+		 *
+		 *
+		 * @return a value of <code>int</code>
 		 */
 		@Override
 		public int concurrentQueuesNo() {
@@ -2621,7 +2717,9 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * 
+		 *
+		 *
+		 * @return a value of <code>String</code>
 		 */
 		@Override
 		public String id() {
@@ -2662,7 +2760,9 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * 
+		 *
+		 *
+		 * @return a value of <code>int</code>
 		 */
 		@Override
 		public int concurrentQueuesNo() {
@@ -2673,7 +2773,9 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * 
+		 *
+		 *
+		 * @return a value of <code>String</code>
 		 */
 		@Override
 		public String id() {
@@ -2834,7 +2936,9 @@ public class SessionManager
 		 *
 		 * @param connectionId
 		 *
-		 * 
+		 *
+		 *
+		 * @return a value of <code>boolean</code>
 		 */
 		public boolean queueForClose(JID connectionId) {
 			boolean result;
@@ -2879,7 +2983,9 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * 
+		 *
+		 *
+		 * @return a value of <code>int</code>
 		 */
 		public int getMaxQueueSize() {
 			return maxQueueSize;
@@ -2889,7 +2995,9 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * 
+		 *
+		 *
+		 * @return a value of <code>long</code>
 		 */
 		public long getTimeout() {
 			return timeout;
@@ -2932,34 +3040,79 @@ public class SessionManager
 			}
 		}
 	}
-	
-	protected class WriterQueue<E extends Packet> extends AbstractQueue<E> {
 
+
+	/**
+	 * Class description
+	 *
+	 *
+	 * @param <E>
+	 *
+	 * @version        5.2.0, 13/11/02
+	 * @author         <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
+	 */
+	protected class WriterQueue<E extends Packet>
+					extends AbstractQueue<E> {
+		/**
+		 * Method description
+		 *
+		 *
+		 * @return a value of <code>Iterator<E></code>
+		 */
 		@Override
 		public Iterator<E> iterator() {
-			throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+			throw new UnsupportedOperationException(
+					"Not supported yet.");    // To change body of generated methods, choose Tools | Templates.
 		}
 
-		@Override
-		public int size() {
-			throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-		}
-
+		/**
+		 * Method description
+		 *
+		 *
+		 * @param packet is a <code>E</code>
+		 *
+		 * @return a value of <code>boolean</code>
+		 */
 		@Override
 		public boolean offer(E packet) {
 			return SessionManager.this.addOutPacket(packet);
 		}
 
-		@Override
-		public E poll() {
-			throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-		}
-
+		/**
+		 * Method description
+		 *
+		 *
+		 * @return a value of <code>E</code>
+		 */
 		@Override
 		public E peek() {
-			throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+			throw new UnsupportedOperationException(
+					"Not supported yet.");    // To change body of generated methods, choose Tools | Templates.
 		}
-		
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @return a value of <code>E</code>
+		 */
+		@Override
+		public E poll() {
+			throw new UnsupportedOperationException(
+					"Not supported yet.");    // To change body of generated methods, choose Tools | Templates.
+		}
+
+		/**
+		 * Method description
+		 *
+		 *
+		 * @return a value of <code>int</code>
+		 */
+		@Override
+		public int size() {
+			throw new UnsupportedOperationException(
+					"Not supported yet.");    // To change body of generated methods, choose Tools | Templates.
+		}
 	}
 }
 
@@ -2970,4 +3123,4 @@ public class SessionManager
 // ~ Formatted by Jindent --- http://www.jindent.com
 
 
-//~ Formatted in Tigase Code Convention on 13/07/06
+//~ Formatted in Tigase Code Convention on 13/11/02

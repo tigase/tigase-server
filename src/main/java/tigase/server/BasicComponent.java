@@ -259,10 +259,10 @@ public class BasicComponent
 	}
 
 	/**
-	 * Method description
+	 * Initialize a mapping of key/value pairs which can be used in scripts
+	 * loaded by the server
 	 *
-	 *
-	 * @param binds
+	 * @param binds A mapping of key/value pairs, all of whose keys are Strings.
 	 */
 	public void initBindings(Bindings binds) {
 		binds.put(CommandIfc.VHOST_MANAGER, vHostManager);

@@ -210,11 +210,12 @@ try {
 	else if (comp_name == null) {
 		def res = (Iq)p.commandResult(Command.DataType.form)
 		def compNames = []
-		conf_repo.getCompNames().each { compNames += it }
+		def conf = XMPPServer.getConfigurator();
+		conf_repo.getCompNames().findAll{ conf.getComponent(it) != null }.each { compNames += it }
 		compNames.sort();
 		Command.addFieldValue(res, COMP_NAME, comp_name ?: compNames[0], "Components",
 			(String[])compNames, (String[])compNames)
-		Command.addHiddenField(res, ACTION, action);
+		Command.addHiddenField(res, ACTION, action ?: "");
 		return res
 	}
 	else {
@@ -259,6 +260,7 @@ try {
 
 				if (!comp_class) comp_class = MessageRouterConfig.COMPONENT_CLASSES.get(comp_name);
 				if (!comp_class) comp_class = MessageRouterConfig.COMP_CLUS_MAP.get(comp_name);
+				if (!comp_class && comp_name == "basic-conf") comp_class = XMPPServer.getConfigurator().getClass().getCanonicalName();
 				if (!comp_class) throw new Exception("Could not find component class for component: " + comp_name);
 			}
                         
