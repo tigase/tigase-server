@@ -205,8 +205,8 @@ public class SessionManagerClustered
 	}
 
 	/**
-	 * Initialize a mapping of key/value pairs which can be used in scripts
-	 * loaded by the server
+	 * Method description
+	 *
 	 *
 	 * @param conn is a <code>XMPPResourceConnection</code>
 	 */
