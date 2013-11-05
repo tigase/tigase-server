@@ -171,7 +171,7 @@ case "${1}" in
     echo "Shutting down Tigase: $PID"
 
 	kill $PID 2>/dev/null
-	for ((i=1; i <= 30; i++)) ; do
+	for ((i=1; i <= 10; i++)) ; do
 	  if ps -p $PID > /dev/null ; then
 		echo "$i. Waiting for the server to terminate..."
 		sleep 1

@@ -202,6 +202,8 @@ case "$1" in
 	echo "USER                =  $USER"
 	echo "HOME                =  $HOME"
 	echo
+    echo "OSGI                =  $OSGI"
+	echo
 	echo "TIGASE_HOME         =  $TIGASE_HOME"
 	echo "TIGASE_JAR          =  $TIGASE_JAR"
 	echo "TIGASE_CMD          =  $TIGASE_CMD"
