@@ -135,7 +135,7 @@ else {
         }
 
         def conf = XMPPServer.getConfigurator();
-        conf.getDefConfigParams().put(Configurable.GEN_SM_PLUGINS, str);
+        conf.getDefConfigParams().put(Configurable.GEN_SM_PLUGINS, str.isEmpty() ? null : str);
 	
         def props = [:];
         props[tigase.server.xmppsession.SessionManagerConfig.PLUGINS_PROP_KEY] = (pluginsEnabled as String[]);
