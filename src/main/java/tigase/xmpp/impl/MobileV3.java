@@ -281,9 +281,14 @@ public class MobileV3
 			
 			QueueState state = QueueState.need_flush;
 			if (!isQueueEnabled(session)) {
-				if (presenceQueue == null || packetQueue == null 
-						|| presenceQueue.isEmpty() || packetQueue.isEmpty())
+				if ((presenceQueue == null && packetQueue == null)
+						|| (presenceQueue.isEmpty() && packetQueue.isEmpty())) {
 					continue;
+				}
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "mobile queues needs flushing - presences: {0}, packets: {1}", 
+							new Object[] {presenceQueue.size(), packetQueue.size() });
+				}
 			} else {
 				state = filter(session, res, presenceQueue, packetQueue);
 				if (state == QueueState.queued) {
@@ -308,7 +313,7 @@ public class MobileV3
 					
 					synchronized (presenceQueue) {
 						for (Packet p : presenceQueue.values()) {
-							prependResults.offer(res);
+							prependResults.offer(p);
 						}
 						presenceQueue.clear();
 					}
@@ -337,7 +342,7 @@ public class MobileV3
 		
 		if (prependResults != null && !prependResults.isEmpty()) {
 			if (log.isLoggable(Level.FINEST)) 
-				log.log(Level.SEVERE, "sending queued packets = {0}", prependResults.size());
+				log.log(Level.FINEST, "sending queued packets = {0}", prependResults.size());
 			prependResults.addAll(results);
 			results.clear();
 			results.addAll(prependResults);
@@ -355,7 +360,7 @@ public class MobileV3
 	 *
 	 * 
 	 */
-	public QueueState filter(XMPPResourceConnection session, Packet res, Map<JID,
+	private QueueState filter(XMPPResourceConnection session, Packet res, Map<JID,
 			Packet> presenceQueue, Queue<Packet> packetQueue) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "checking if packet should be queued {0}", res.toString());
