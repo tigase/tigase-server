@@ -57,6 +57,7 @@ import java.util.logging.Logger;
 import java.util.Map;
 
 import javax.script.Bindings;
+import tigase.xml.Element;
 
 /**
  * Class SessionManagerClusteredOld
@@ -88,7 +89,7 @@ public class SessionManagerClustered
 
 	/** Field description */
 	public static final int SYNC_MAX_BATCH_SIZE = 1000;
-
+	
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
@@ -169,7 +170,7 @@ public class SessionManagerClustered
 		super.handleLogin(userId, conn);
 		strategy.handleLocalUserLogin(userId, conn);
 	}
-
+	
 	/**
 	 * Initialize a mapping of key/value pairs which can be used in scripts
 	 * loaded by the server
@@ -222,7 +223,7 @@ public class SessionManagerClustered
 		sendAdminNotification("Cluster node '" + node + "' disconnected (" + (new Date()) +
 				")", "Cluster node disconnected: " + node, node);
 	}
-
+	
 	/**
 	 * Concurrency control method. Returns preferable number of threads set for
 	 * this component.
@@ -541,6 +542,11 @@ public class SessionManagerClustered
 		return strategy.hasCompleteJidsInfo();
 	}
 
+	@Override
+	public void processPresenceUpdate(XMPPSession session, Element packet) {
+		super.processPresenceUpdate(session, packet);
+	}
+	
 	//~--- set methods ----------------------------------------------------------
 
 	/**
@@ -656,7 +662,7 @@ public class SessionManagerClustered
 			log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
 		}
 	}
-
+	
 	private void sendAdminNotification(String msg, String subject, String node) {
 		String message = msg;
 

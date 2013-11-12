@@ -34,7 +34,7 @@ import tigase.cluster.api.ClusterCommandException;
 import tigase.cluster.api.CommandListenerAbstract;
 import tigase.cluster.api.SessionManagerClusteredIfc;
 import tigase.cluster.SessionManagerClustered;
-import tigase.cluster.strategy.DefaultClusteringStrategy;
+import tigase.cluster.strategy.DefaultClusteringStrategyAbstract;
 
 import tigase.server.Packet;
 
@@ -71,7 +71,7 @@ public class PacketForwardCmd
 	//~--- fields ---------------------------------------------------------------
 
 	private SessionManagerClusteredIfc sm;
-	private DefaultClusteringStrategy  strategy;
+	private DefaultClusteringStrategyAbstract  strategy;
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -85,7 +85,7 @@ public class PacketForwardCmd
 	 * @param strategy
 	 */
 	public PacketForwardCmd(String name, SessionManagerClusteredIfc sm,
-			DefaultClusteringStrategy strategy) {
+			DefaultClusteringStrategyAbstract strategy) {
 		super(name);
 		this.sm       = sm;
 		this.strategy = strategy;
