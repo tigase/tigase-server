@@ -61,7 +61,7 @@ public class MessageCarbons
 	
 	private static final String ID = "message-carbons";
 	
-	private static final String XMLNS = "urn:xmpp:carbons:2";
+	public static final String XMLNS = "urn:xmpp:carbons:2";
 	
 	private static final String[][] ELEMENTS = { { "message" }, { "iq", "enable" }, { "iq", "disable" } };
 	private static final String[] XMLNSS = { XMPPProcessor.CLIENT_XMLNS, XMLNS, XMLNS };
