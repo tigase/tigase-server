@@ -1152,13 +1152,15 @@ public class SessionManager
 				closeSession(connection, closeOnly);
 			}
 		} else {
-			log.log(Level.FINE, "Can not find resource connection for connectionId: {0}",
-					connectionId);
+			if (log.isLoggable(Level.FINE))
+				log.log(Level.FINE, "Can not find resource connection for connectionId: {0}",
+						connectionId);
 			if (userId != null) {
 
 				// check using userId if we can find stale XMPPResourceConnection
-				log.log(Level.WARNING,
-						"Found trying to find stale XMPPResourceConnection by userId {0}...", userId);
+				if (log.isLoggable(Level.FINEST))
+					log.log(Level.FINEST,
+							"Found trying to find stale XMPPResourceConnection by userId {0}...", userId);
 
 				JID         userJid         = JID.jidInstanceNS(userId);
 				XMPPSession sessionByUserId = sessionsByNodeId.get(userJid.getBareJID());
@@ -1167,7 +1169,7 @@ public class SessionManager
 					connection = sessionByUserId.getResourceForConnectionId(connectionId);
 					if (connection != null) {
 						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.WARNING,
+							log.log(Level.FINEST,
 									"Found stale XMPPResourceConnection {0} by userId {1}, removing...",
 									new Object[] { connection,
 									userId });

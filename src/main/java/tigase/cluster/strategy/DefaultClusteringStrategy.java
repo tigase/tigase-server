@@ -26,6 +26,7 @@ package tigase.cluster.strategy;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.ArrayList;
 import java.util.Collections;
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.CommandListener;
@@ -220,6 +221,40 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 		}
 		
 		super.handleLocalPacket(packet, conn);
+	}
+	
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param userId
+	 * @param conn
+	 */
+	@Override
+	public void handleLocalUserLogout(BareJID userId, XMPPResourceConnection conn) {
+		try {
+			if (!conn.isAuthorized())
+				return;
+			Element presence = conn.getPresence();
+			if (presence == null) {
+				presence = new Element(Presence.ELEM_NAME);
+				presence.setXMLNS(Presence.CLIENT_XMLNS);
+			} else {
+				presence = presence.clone();
+			}
+			presence.setAttribute("from", conn.getJID().toString());
+			presence.setAttribute("type", StanzaType.unavailable.name());
+			
+			Map<String, String> params = prepareConnectionParams(conn);
+			List<JID> cl_nodes = getAllNodes();
+			if (cl_nodes != null && cl_nodes.size() > 0) {
+				//++clusterSyncOutTraffic;
+				cluster.sendToNodes(USER_PRESENCE_CMD, params, presence,
+						sm.getComponentId(), null, cl_nodes.toArray(new JID[cl_nodes.size()]));
+			}
+		} catch (Exception e) {
+			log.log(Level.WARNING, "Problem with broadcast user presence for: " + conn, e);
+		}
 	}
 	
 	/**
