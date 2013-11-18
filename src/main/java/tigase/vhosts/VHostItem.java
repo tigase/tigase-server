@@ -882,7 +882,7 @@ public class VHostItem
 	 * @return a <code>boolean</code> value whether TLS is required for the vhost or not.
 	 */
 	public boolean isTlsRequired() {
-		return tlsRequired || XMPPServer.TLS_HARDENED_MODE;
+		return tlsRequired || XMPPServer.isHardenedModeEnabled();
 	}
 
 	//~--- set methods ----------------------------------------------------------

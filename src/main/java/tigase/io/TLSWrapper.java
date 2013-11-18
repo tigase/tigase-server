@@ -117,12 +117,12 @@ public class TLSWrapper {
 		}
 
 		if (log.isLoggable(Level.CONFIG))
-			log.config("Hardened mode is " + (XMPPServer.TLS_HARDENED_MODE ? "enabled" : "disabled"));
+			log.config("Hardened mode is " + (XMPPServer.isHardenedModeEnabled() ? "enabled" : "disabled"));
 
 		String enabledProtocolsProp = System.getProperty("tls-enabled-protocols");
 		if (enabledProtocolsProp != null) {
 			enabledProtocols = enabledProtocolsProp.split(",");
-		} else if (XMPPServer.TLS_HARDENED_MODE) {
+		} else if (XMPPServer.isHardenedModeEnabled()) {
 			enabledProtocols = new String[] { "SSLv2Hello", "TLSv1", "TLSv1.1", "TLSv1.2" };
 		}
 
@@ -132,7 +132,7 @@ public class TLSWrapper {
 		String enabledCiphersProp = System.getProperty("tls-enabled-ciphers");
 		if (enabledCiphersProp != null) {
 			enabledCiphers = enabledCiphersProp.split(",");
-		} else if (XMPPServer.TLS_HARDENED_MODE) {
+		} else if (XMPPServer.isHardenedModeEnabled()) {
 			enabledCiphers = null;
 		} else if (tls_jdk_nss_workaround) {
 			if (log.isLoggable(Level.CONFIG))

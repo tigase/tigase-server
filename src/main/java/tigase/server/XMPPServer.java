@@ -53,11 +53,13 @@ public final class XMPPServer {
 	@SuppressWarnings("PMD")
 	public static final String  CONFIGURATOR_PROP_KEY = "tigase-configurator";
 	private static final String DEF_CONFIGURATOR      = "tigase.conf.Configurator";
-	public static final String HARDENED_MODE_KEY = "hardened-mode";
+ 	public static final String HARDENED_MODE_KEY = "hardened-mode";
 
-	public static boolean TLS_HARDENED_MODE = System.getProperty(XMPPServer.HARDENED_MODE_KEY) == null ? false
-			: Boolean.getBoolean(XMPPServer.HARDENED_MODE_KEY);
-
+	public static boolean isHardenedModeEnabled() {
+		return System.getProperty(XMPPServer.HARDENED_MODE_KEY) == null ? false
+				: Boolean.getBoolean(XMPPServer.HARDENED_MODE_KEY);
+	}
+	
 	/** Field description */
 	public static final String NAME       = "Tigase";
 	private static String      serverName = "message-router";
@@ -118,6 +120,8 @@ public final class XMPPServer {
 	public static void main(final String[] args) {
 
 		parseParams(args);
+		
+		
 
 		System.out.println( ( new ComponentInfo( XMLUtils.class ) ).toString() );
 		System.out.println( ( new ComponentInfo( ClassUtil.class ) ).toString() );
