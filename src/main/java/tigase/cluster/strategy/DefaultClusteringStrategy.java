@@ -160,6 +160,15 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "for connection: {0}", new Object[] { conn });
 		}
+		try {
+			Map<String, String> params   = prepareConnectionParams(conn);
+			List<JID>           cl_nodes = getAllNodes();
+
+			cluster.sendToNodes(USER_PRESENCE_CMD, params, conn.getPresence(), getSM()
+					.getComponentId(), null, cl_nodes.toArray(new JID[cl_nodes.size()]));
+		} catch (NotAuthorizedException | NoConnectionIdException e) {
+			log.log(Level.WARNING, "Problem with broadcast user presence for: " + conn, e);
+		}
 	}
 
 	/**
@@ -172,6 +181,15 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	public void handleLocalResourceBind(XMPPResourceConnection conn) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "for connection: {0}", new Object[] { conn });
+		}
+		try {
+			Map<String, String> params   = prepareConnectionParams(conn);
+			List<JID>           cl_nodes = getAllNodes();
+
+			cluster.sendToNodes(USER_CONNECTED_CMD, params, getSM().getComponentId(), cl_nodes
+					.toArray(new JID[cl_nodes.size()]));
+		} catch (NotAuthorizedException | NoConnectionIdException e) {
+			log.log(Level.WARNING, "Problem with broadcast user presence for: " + conn, e);
 		}
 	}
 
@@ -668,4 +686,4 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/11/02
+//~ Formatted in Tigase Code Convention on 13/11/11

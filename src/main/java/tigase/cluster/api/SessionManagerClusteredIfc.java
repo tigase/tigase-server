@@ -74,11 +74,12 @@ public interface SessionManagerClusteredIfc
 	 * @param user_id is a <code>BareJID</code>
 	 * @param resource is a <code>String</code>
 	 * @param xmpp_sessionId is a <code>String</code>
+	 * @param tmpSession is a <code>boolean</code>
 	 *
 	 * @return a value of <code>XMPPResourceConnection</code>
 	 */
 	XMPPResourceConnection loginUserSession(JID conn_id, String domain, BareJID user_id,
-			String resource, String xmpp_sessionId);
+			String resource, String xmpp_sessionId, boolean tmpSession);
 
 	/**
 	 * Method description

@@ -130,9 +130,6 @@ public class ClusterConnectionManager
 	public static final String IDENTITY_TYPE_VAL = "generic";
 
 	/** Field description */
-	public static final String PORT_LOCAL_HOST_PROP_KEY = "local-host";
-
-	/** Field description */
 	public static final String PORT_ROUTING_TABLE_PROP_KEY = "routing-table";
 
 	/** Field description */
@@ -164,13 +161,6 @@ public class ClusterConnectionManager
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
-	public String[] PORT_IFC_PROP_VAL = { "*" };
-
-	/** Field description */
-
-	// public int[] PORTS = { 5277 };
-
-	/** Field description */
 	private ClusterControllerIfc clusterController = null;
 
 	// private String cluster_controller_id = null;
@@ -179,7 +169,7 @@ public class ClusterConnectionManager
 	private String                                                   identity_type =
 			IDENTITY_TYPE_VAL;
 	private Map<String, CopyOnWriteArrayList<XMPPIOService<Object>>> connectionsPool =
-			new ConcurrentSkipListMap<String, CopyOnWriteArrayList<XMPPIOService<Object>>>();
+			new ConcurrentSkipListMap<>();
 	private boolean                              connect_all = CONNECT_ALL_PROP_VAL;
 	private boolean                              compress_stream = COMPRESS_STREAM_PROP_VAL;
 	private long[]                               lastDay               = new long[24];
@@ -755,12 +745,13 @@ public class ClusterConnectionManager
 		}
 		defs.put(CLCON_REPO_CLASS_PROP_KEY, repo_class);
 		try {
-			ComponentRepository<ClusterRepoItem> repoTmp = 
-					(ComponentRepository<ClusterRepoItem>) Class.forName(repo_class)
-					.newInstance();
+			ComponentRepository<ClusterRepoItem> repoTmp =
+					(ComponentRepository<ClusterRepoItem>) Class.forName(repo_class).newInstance();
+
 			repoTmp.getDefaults(defs, params);
-			if (repo == null)
+			if (repo == null) {
 				repo = repoTmp;
+			}
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can not instantiate items repository for class: " +
 					repo_class, e);
@@ -899,8 +890,8 @@ public class ClusterConnectionManager
 		if (props.get(CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY) != null) {
 			per_node_conns = (Integer) props.get(CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY);
 		}
-		connectionDelay = 5 * SECOND;		
-		if (props.size() == 1 || isInitializationComplete()) {
+		connectionDelay = 5 * SECOND;
+		if ((props.size() == 1) || isInitializationComplete()) {
 			super.setProperties(props);
 
 			// If props.size() == 1, it means this is a single property update
@@ -908,7 +899,7 @@ public class ClusterConnectionManager
 			// of it's settings
 			return;
 		}
-		
+
 		String repo_class = (String) props.get(CLCON_REPO_CLASS_PROP_KEY);
 
 		try {
@@ -1346,4 +1337,4 @@ public class ClusterConnectionManager
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/10/15
+//~ Formatted in Tigase Code Convention on 13/11/02

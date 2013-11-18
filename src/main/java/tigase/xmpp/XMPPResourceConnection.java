@@ -58,6 +58,15 @@ import java.util.Map;
 public class XMPPResourceConnection
 				extends RepositoryAccess {
 	/** Field description */
+	public static final String ALL_RESOURCES_CAPS_KEY = "caps";
+
+	/** Field description */
+	public static final String ALL_RESOURCES_KEY = "all-resources";
+
+	/** Field description */
+	public static final String ALL_RESOURCES_PRIORITY_KEY = "priority";
+
+	/** Field description */
 	public static final String AUTHENTICATION_TIMEOUT_KEY = "authentication-timeout";
 
 	/** Field description */
@@ -73,10 +82,6 @@ public class XMPPResourceConnection
 	 */
 	public static final String PRESENCE_KEY = "user-presence";
 
-	public static final String ALL_RESOURCES_KEY = "all-resources";
-	public static final String ALL_RESOURCES_PRIORITY_KEY = "priority";
-	public static final String ALL_RESOURCES_CAPS_KEY = "caps";
-	
 	/**
 	 * Private logger for class instances.
 	 */
@@ -121,8 +126,9 @@ public class XMPPResourceConnection
 	 * <code>sessionId</code> keeps XMPP stream session ID given at connection
 	 * initialization time.
 	 */
-	private String sessionId = null;
-	private JID    userJid   = null;
+	private String  sessionId  = null;
+	private boolean tmpSession = false;
+	private JID     userJid    = null;
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -158,9 +164,9 @@ public class XMPPResourceConnection
 	 * @param anonymous
 	 */
 	public void authorizeJID(BareJID jid, boolean anonymous) {
-		loginHandler.handleLogin(jid, this);
 		authState    = Authorization.AUTHORIZED;
 		is_anonymous = anonymous;
+		loginHandler.handleLogin(jid, this);
 		login();
 	}
 
@@ -199,8 +205,10 @@ public class XMPPResourceConnection
 	 * @param id
 	 * @param alg
 	 *
-	 * 
 	 *
+	 *
+	 *
+	 * @return a value of <code>Authorization</code>
 	 * @throws AuthorizationException
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -228,8 +236,10 @@ public class XMPPResourceConnection
 	 *
 	 * @param props
 	 *
-	 * 
 	 *
+	 *
+	 *
+	 * @return a value of <code>Authorization</code>
 	 * @throws AuthorizationException
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -259,8 +269,10 @@ public class XMPPResourceConnection
 	 * @param user
 	 * @param password
 	 *
-	 * 
 	 *
+	 *
+	 *
+	 * @return a value of <code>Authorization</code>
 	 * @throws AuthorizationException
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -305,7 +317,9 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String nextStanzaId() {
 		return "tig" + (++id_counter);
@@ -372,7 +386,9 @@ public class XMPPResourceConnection
 	 *
 	 * @param key
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>Object</code>
 	 */
 	public Object removeCommonSessionData(String key) {
 		return (parentSession == null)
@@ -424,13 +440,15 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	@Override
 	public String toString() {
 		return "user_jid=" + userJid + ", packets=" + packets_counter + ", connectioId=" +
 				connectionId + ", domain=" + domain.getVhost().getDomain() + ", authState=" +
-				getAuthState().name() + ", isAnon=" + isAnonymous();
+				getAuthState().name() + ", isAnon=" + isAnonymous() + ", isTmp=" + isTmpSession();
 	}
 
 	/**
@@ -439,8 +457,10 @@ public class XMPPResourceConnection
 	 *
 	 * @param name_param
 	 *
-	 * 
 	 *
+	 *
+	 *
+	 * @return a value of <code>Authorization</code>
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 * @throws TigaseStringprepException
@@ -469,9 +489,11 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * 
 	 *
 	 *
+	 *
+	 *
+	 * @return a value of <code>List<XMPPResourceConnection></code>
 	 * @throws NotAuthorizedException
 	 */
 	public List<XMPPResourceConnection> getActiveSessions() throws NotAuthorizedException {
@@ -486,8 +508,10 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * 
 	 *
+	 *
+	 *
+	 * @return a value of <code>JID[]</code>
 	 */
 	public JID[] getAllResourcesJIDs() {
 		return (parentSession == null)
@@ -499,7 +523,9 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>AuthRepository</code>
 	 */
 	public AuthRepository getAuthRepository() {
 		return authRepo;
@@ -509,7 +535,9 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>long</code>
 	 */
 	public long getAuthTime() {
 		return authenticationTime - creationTime;
@@ -542,7 +570,9 @@ public class XMPPResourceConnection
 	/**
 	 *
 	 * @param key
-	 * 
+	 *
+	 *
+	 * @return a value of <code>Object</code>
 	 */
 	public Object getCommonSessionData(String key) {
 		return (parentSession == null)
@@ -568,20 +598,15 @@ public class XMPPResourceConnection
 	}
 
 	/**
-	 * Sets the value of connectionId
-	 */
-	public void setConnectionId(JID connectionId) {
-		this.connectionId = connectionId;
-	}
-	
-	/**
 	 * Method description
 	 *
 	 *
 	 * @param jid
 	 *
-	 * 
 	 *
+	 *
+	 *
+	 * @return a value of <code>JID</code>
 	 * @throws NoConnectionIdException
 	 */
 	public JID getConnectionId(JID jid) throws NoConnectionIdException {
@@ -614,7 +639,9 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>long</code>
 	 */
 	public long getCreationTime() {
 		return creationTime;
@@ -624,7 +651,9 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String getDefLang() {
 		return this.defLang;
@@ -660,7 +689,9 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>long</code>
 	 */
 	public long getPacketsCounter() {
 		return packets_counter;
@@ -670,7 +701,9 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>XMPPSession</code>
 	 */
 	public XMPPSession getParentSession() {
 		return parentSession;
@@ -691,7 +724,9 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	public int getPriority() {
 		return priority;
@@ -735,7 +770,9 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>JID</code>
 	 */
 	public JID getSMComponentId() {
 		return loginHandler.getComponentId();
@@ -749,8 +786,10 @@ public class XMPPResourceConnection
 	 * enough to check whether the user Id belongs to the session.
 	 *
 	 *
-	 * 
 	 *
+	 *
+	 *
+	 * @return a value of <code>BareJID</code>
 	 * @throws NotAuthorizedException
 	 *
 	 * @deprecated
@@ -764,8 +803,10 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * 
 	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 * @throws NotAuthorizedException
 	 */
 	@Override
@@ -783,7 +824,9 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	@Override
 	public boolean isAuthorized() {
@@ -797,7 +840,9 @@ public class XMPPResourceConnection
 	 * @param outDomain
 	 * @param includeComponents
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean isLocalDomain(String outDomain, boolean includeComponents) {
 		return loginHandler.isLocalDomain(outDomain, includeComponents);
@@ -807,7 +852,9 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 */
 	public boolean isResourceSet() {
 		return this.resource != null;
@@ -829,10 +876,22 @@ public class XMPPResourceConnection
 	 * Method description
 	 *
 	 *
+	 * @return a value of <code>boolean</code>
+	 */
+	public boolean isTmpSession() {
+		return tmpSession;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
 	 * @param bareJID
 	 *
-	 * 
 	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
 	 * @throws NotAuthorizedException
 	 */
 	public boolean isUserId(BareJID bareJID) throws NotAuthorizedException {
@@ -844,6 +903,15 @@ public class XMPPResourceConnection
 	}
 
 	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Sets the value of connectionId
+	 *
+	 * @param connectionId is a <code>JID</code>
+	 */
+	public void setConnectionId(JID connectionId) {
+		this.connectionId = connectionId;
+	}
 
 	/**
 	 * Method description
@@ -964,6 +1032,16 @@ public class XMPPResourceConnection
 		this.sessionId = argSessionId;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param tmp is a <code>boolean</code>
+	 */
+	public void setTmpSession(boolean tmp) {
+		tmpSession = tmp;
+	}
+
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -977,4 +1055,4 @@ public class XMPPResourceConnection
 }    // XMPPResourceConnection
 
 
-//~ Formatted in Tigase Code Convention on 13/06/04
+//~ Formatted in Tigase Code Convention on 13/11/02

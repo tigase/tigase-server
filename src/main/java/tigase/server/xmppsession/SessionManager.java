@@ -30,6 +30,7 @@ import tigase.auth.mechanisms.SaslEXTERNAL;
 
 import tigase.conf.Configurable;
 
+import tigase.db.AuthorizationException;
 import tigase.db.AuthRepository;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.NonAuthUserRepositoryImpl;
@@ -454,7 +455,8 @@ public class SessionManager
 	 */
 	@Override
 	public void handleResourceBind(XMPPResourceConnection conn) {
-		if (!conn.isServerSession() && (!"USER_STATUS".equals(conn.getSessionId()))) {
+		if (!conn.isServerSession() && (!"USER_STATUS".equals(conn.getSessionId())) &&!conn
+				.isTmpSession()) {
 			try {
 				Packet user_login_cmd = Command.USER_LOGIN.getPacket(getComponentId(), conn
 						.getConnectionId(), StanzaType.set, conn.nextStanzaId(), Command.DataType
@@ -1408,6 +1410,7 @@ public class SessionManager
 	 * @param user_id
 	 * @param resource
 	 * @param xmpp_sessionId
+	 * @param tmpSession is a <code>boolean</code>
 	 *
 	 *
 	 *
@@ -1415,16 +1418,17 @@ public class SessionManager
 	 */
 	@SuppressWarnings("deprecation")
 	protected XMPPResourceConnection loginUserSession(JID conn_id, String domain,
-			BareJID user_id, String resource, String xmpp_sessionId) {
+			BareJID user_id, String resource, String xmpp_sessionId, boolean tmpSession) {
 		try {
 			XMPPResourceConnection conn = createUserSession(conn_id, domain);
 
+			conn.setTmpSession(tmpSession);
 			conn.setSessionId(xmpp_sessionId);
-			user_repository.setData(user_id, "tokens", xmpp_sessionId, conn_id.toString());
 
-			Authorization auth = conn.loginToken(user_id, xmpp_sessionId, conn_id.toString());
-
-			if (auth == Authorization.AUTHORIZED) {
+			// user_repository.setData(user_id, "tokens", xmpp_sessionId, conn_id.toString());
+			// Authorization auth = conn.loginToken(user_id, xmpp_sessionId, conn_id.toString());
+			conn.authorizeJID(user_id, false);
+			if (conn.isAuthorized()) {
 				handleLogin(user_id, conn);
 				if (resource != null) {
 					conn.setResource(resource);
@@ -1436,7 +1440,7 @@ public class SessionManager
 			}
 
 			return conn;
-		} catch (Exception ex) {
+		} catch (TigaseStringprepException | NotAuthorizedException ex) {
 			log.log(Level.WARNING, "Problem logging user: " + user_id + "/" + resource, ex);
 		}
 
@@ -1660,7 +1664,7 @@ public class SessionManager
 							JID user_jid = JID.jidInstance(Command.getFieldValue(iqc, "jid"));
 
 							connection = loginUserSession(iqc.getStanzaFrom(), user_jid.getDomain(),
-									user_jid.getBareJID(), user_jid.getResource(), "USER_STATUS");
+									user_jid.getBareJID(), user_jid.getResource(), "USER_STATUS", false);
 							connection.putSessionData("jingle", "active");
 							fastAddOutPacket(iqc.okResult((String) null, 0));
 							if (presence == null) {
@@ -2100,7 +2104,8 @@ public class SessionManager
 			}
 			try {
 				session.addResourceConnection(conn);
-				if (!conn.isServerSession() && (!"USER_STATUS".equals(conn.getSessionId()))) {
+				if ((!"USER_STATUS".equals(conn.getSessionId())) &&!conn.isServerSession() &&!conn
+						.isTmpSession()) {
 					try {
 						Packet user_login_cmd = Command.USER_LOGIN.getPacket(getComponentId(), conn
 								.getConnectionId(), StanzaType.set, conn.nextStanzaId(), Command.DataType
@@ -3115,12 +3120,6 @@ public class SessionManager
 		}
 	}
 }
-
-
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
 
 
 //~ Formatted in Tigase Code Convention on 13/11/02

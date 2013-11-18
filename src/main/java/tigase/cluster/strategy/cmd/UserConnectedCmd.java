@@ -22,10 +22,6 @@
 
 
 
-/*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
- */
 package tigase.cluster.strategy.cmd;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -144,17 +140,22 @@ public class UserConnectedCmd
 					err_el.setXMLNS("urn:ietf:params:xml:ns:xmpp-streams");
 					cmd.getElement().getChild("command").addChild(err_el);
 					getStrategy().getSM().fastAddOutPacket(cmd);
-				} catch (Exception ex) {
+				} catch (NoConnectionIdException ex) {
 
-					// TODO Auto-generated catch block
-					ex.printStackTrace();
+					// Ignore, we do not have to do anything in such a case
 				}
 			}
 
-			// If there are other connections for this use we setup a "cluster" type
-			// of XMPPResourceConnection to allows for a better support for plugins
+			// If there are other connections for this use we setup a "cluster" - tmpSession
+			// type of XMPPResourceConnection to allows for a better support for plugins
 			// not aware of a cluster environment.
 			if (session.getActiveResourcesSize() > sessions_no) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST,
+							"The user {0} is already there, adding tmp-session for: {1}",
+							new Object[] { rec.getUserJid().getBareJID(),
+							rec });
+				}
 
 				// Make sure the object hasn't been initialized before
 				XMPPResourceConnection connection = getStrategy().getSM()
@@ -163,15 +164,32 @@ public class UserConnectedCmd
 				if (connection == null) {
 					connection = getStrategy().getSM().loginUserSession(rec.getConnectionId(), rec
 							.getUserJid().getDomain(), rec.getUserJid().getBareJID(), rec.getUserJid()
-							.getResource(), rec.getSessionId());
+							.getResource(), rec.getSessionId(), true);
 					connection.putSessionData(CLUSTER_NODE, rec.getNode());
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Tmp-session created: {0}", new Object[] {
+								connection });
+					}
 
 					// Now send back to the node on which the user opened a new connection
 					// information that we have here other user's sessions
 					// But only if this is not yet a response to the even on other node
-					if (data.get(USER_CONNECTED_RESPONSE) != null) {
+					if (data.get(USER_CONNECTED_RESPONSE) == null) {
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST,
+									"This is not a Tmp-session, sending local connections back");
+						}
 						for (XMPPResourceConnection c : session.getActiveResources()) {
-							if ((c != connection) && (c != conn)) {
+							if (log.isLoggable(Level.FINEST)) {
+								log.log(Level.FINEST, "Checking connection: {0}", new Object[] { c });
+							}
+							if ((c != connection) && (c != conn) && (!c.isTmpSession())) {
+								if (log.isLoggable(Level.FINEST)) {
+									log.log(Level.FINEST,
+											"Sending to node {0} local user connection info: {1}",
+											new Object[] { rec.getNode(),
+											c });
+								}
 								try {
 									Map<String, String> params = getStrategy().prepareConnectionParams(
 											conn);
@@ -180,12 +198,14 @@ public class UserConnectedCmd
 									getStrategy().getClusterController().sendToNodes(getName(), params,
 											getStrategy().getSM().getComponentId(), new JID[] { rec
 											.getNode() });
-								} catch (NotAuthorizedException ex) {
+								} catch (NotAuthorizedException | NoConnectionIdException ex) {
 
 									// Ignore, we do not want not authenticated connections to be sent
-								} catch (NoConnectionIdException ex) {
-
-									// Ignore, we do not want this to be sent
+								}
+							} else {
+								if (log.isLoggable(Level.FINEST)) {
+									log.log(Level.FINEST, "Does not qualify, not sending back: {0}",
+											new Object[] { c });
 								}
 							}
 						}
@@ -196,6 +216,18 @@ public class UserConnectedCmd
 								rec);
 					}
 				}
+			} else {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST,
+							"No other active connections for user: {0}, do not need to anything else",
+							new Object[] { rec.getUserJid() });
+				}
+			}
+		} else {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST,
+						"No other connections for user: {0}, do not need to anything else",
+						new Object[] { rec.getUserJid() });
 			}
 		}
 		if (log.isLoggable(Level.FINEST)) {
@@ -207,4 +239,4 @@ public class UserConnectedCmd
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/11/02
+//~ Formatted in Tigase Code Convention on 13/11/11

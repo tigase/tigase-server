@@ -38,6 +38,8 @@ import tigase.cluster.strategy.DefaultClusteringStrategy;
 //import tigase.cluster.strategy.OnlineUsersCachingStrategy;
 import tigase.server.Packet;
 
+import tigase.util.TigaseStringprepException;
+
 import tigase.xml.Element;
 
 import tigase.xmpp.JID;
@@ -108,40 +110,21 @@ public class UserPresenceCmd
 					visitedNodes, data, packets });
 		}
 
-		ConnectionRecord rec = getConnectionRecord(fromNode, data);
-		XMPPSession      session = getStrategy().getSM().getXMPPSessions().get(rec
-				.getUserJid().getBareJID());
-		Element elem = packets.poll();
+		ConnectionRecord rec      = getConnectionRecord(fromNode, data);
+		Element          presence = packets.peek();
 
-		// Update user's XMPPResourceConnection with presence data
-		if (session != null) {
-			XMPPResourceConnection conn = session.getResourceForConnectionId(rec
-					.getConnectionId());
+		for (Element elem : packets) {
+			try {
+				Packet packet = Packet.packetInstance(presence);
 
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST,
-						"User's {0} XMPPSession found: {1}, XMPPResourceConnection found: {2}",
-						new Object[] { rec.getUserJid().getBareJID(),
-						session, conn });
+				packet.setPacketFrom(rec.getConnectionId());
+				getStrategy().getSM().fastAddOutPacket(packet);
+			} catch (TigaseStringprepException ex) {
+				log.log(Level.WARNING, "Stringprep problem with presence packet: {0}", elem);
 			}
-			if (conn != null) {
-				conn.setPresence(elem);
-			}
-		} else {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST,
-						"No user session for presence update: {0}, visitedNodes: {1}, data: {2}, packets: {3}",
-						new Object[] { fromNode,
-						visitedNodes, data, packets });
-			}
-		}
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "User presence jid: {0}, fromNode: {1}", new Object[] { rec
-					.getUserJid(),
-					fromNode });
 		}
 	}
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/11/02
+//~ Formatted in Tigase Code Convention on 13/11/11

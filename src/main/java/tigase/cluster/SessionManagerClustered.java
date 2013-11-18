@@ -172,11 +172,19 @@ public class SessionManagerClustered
 	@Override
 	public void handleLogin(BareJID userId, XMPPResourceConnection conn) {
 		super.handleLogin(userId, conn);
-		if (strategy != null) {
+		if (conn.isTmpSession()) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}: for connection: {1}", new Object[] { userId, conn });
+				log.log(Level.FINEST, "for CLUSTER REMOTE connection: {0}", new Object[] {
+						conn });
 			}
-			strategy.handleLocalUserLogin(userId, conn);
+		} else {
+			if (strategy != null) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "{0}: for connection: {1}", new Object[] { userId,
+							conn });
+				}
+				strategy.handleLocalUserLogin(userId, conn);
+			}
 		}
 	}
 
@@ -188,18 +196,18 @@ public class SessionManagerClustered
 	 */
 	@Override
 	public void handlePresenceSet(XMPPResourceConnection conn) {
-		if (conn.getSessionData(CLUSTER_NODE) == null) {
+		if (conn.isTmpSession()) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "for CLUSTER REMOTE connection: {0}", new Object[] {
+						conn });
+			}
+		} else {
 			super.handlePresenceSet(conn);
 			if (strategy != null) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "for connection: {0}", new Object[] { conn });
 				}
 				strategy.handleLocalPresenceSet(conn);
-			}
-		} else {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "for CLUSTER REMOTE connection: {0}", new Object[] {
-						conn });
 			}
 		}
 	}
@@ -212,12 +220,19 @@ public class SessionManagerClustered
 	 */
 	@Override
 	public void handleResourceBind(XMPPResourceConnection conn) {
-		super.handleResourceBind(conn);
-		if (strategy != null) {
+		if (conn.isTmpSession()) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "for connection: {0}", new Object[] { conn });
+				log.log(Level.FINEST, "for CLUSTER REMOTE connection: {0}", new Object[] {
+						conn });
 			}
-			strategy.handleLocalResourceBind(conn);
+		} else {
+			super.handleResourceBind(conn);
+			if (strategy != null) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "for connection: {0}", new Object[] { conn });
+				}
+				strategy.handleLocalResourceBind(conn);
+			}
 		}
 	}
 
@@ -242,12 +257,14 @@ public class SessionManagerClustered
 	 * @param user_id is a <code>BareJID</code>
 	 * @param resource is a <code>String</code>
 	 * @param xmpp_sessionId is a <code>String</code>
+	 * @param tmpSession is a <code>boolean</code>
 	 *
 	 * @return a value of <code>XMPPResourceConnection</code>
 	 */
 	public XMPPResourceConnection loginUserSession(JID conn_id, String domain,
-			BareJID user_id, String resource, String xmpp_sessionId) {
-		return super.loginUserSession(conn_id, domain, user_id, resource, xmpp_sessionId);
+			BareJID user_id, String resource, String xmpp_sessionId, boolean tmpSession) {
+		return super.loginUserSession(conn_id, domain, user_id, resource, xmpp_sessionId,
+				tmpSession);
 	}
 
 	/**
@@ -750,4 +767,4 @@ public class SessionManagerClustered
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/11/02
+//~ Formatted in Tigase Code Convention on 13/11/11
