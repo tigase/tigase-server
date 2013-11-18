@@ -53,6 +53,10 @@ public final class XMPPServer {
 	@SuppressWarnings("PMD")
 	public static final String  CONFIGURATOR_PROP_KEY = "tigase-configurator";
 	private static final String DEF_CONFIGURATOR      = "tigase.conf.Configurator";
+	public static final String HARDENED_MODE_KEY = "hardened-mode";
+
+	public static boolean TLS_HARDENED_MODE = System.getProperty(XMPPServer.HARDENED_MODE_KEY) == null ? false
+			: Boolean.getBoolean(XMPPServer.HARDENED_MODE_KEY);
 
 	/** Field description */
 	public static final String NAME       = "Tigase";

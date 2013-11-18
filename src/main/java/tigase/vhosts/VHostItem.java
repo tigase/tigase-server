@@ -27,18 +27,16 @@ package tigase.vhosts;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.comp.RepositoryItemAbstract;
-
 import tigase.server.Command;
 import tigase.server.Packet;
-
+import tigase.server.XMPPServer;
 import tigase.util.DataTypes;
 import tigase.util.TigaseStringprepException;
-
 import tigase.xml.Element;
-
 import tigase.xmpp.JID;
 
 //~--- JDK imports ------------------------------------------------------------
+
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -884,7 +882,7 @@ public class VHostItem
 	 * @return a <code>boolean</code> value whether TLS is required for the vhost or not.
 	 */
 	public boolean isTlsRequired() {
-		return tlsRequired;
+		return tlsRequired || XMPPServer.TLS_HARDENED_MODE;
 	}
 
 	//~--- set methods ----------------------------------------------------------
