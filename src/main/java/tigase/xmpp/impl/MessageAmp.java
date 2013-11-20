@@ -180,6 +180,11 @@ public class MessageAmp
 	public void postProcess(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
 		if ((offlineProcessor != null) && (session == null)) {
+			if (packet.getElemName() == tigase.server.Message.ELEM_NAME 
+					&& packet.getStanzaTo() != null && packet.getStanzaTo().getResource() != null) {
+				return;
+			}
+			
 			Element amp = packet.getElement().getChild("amp");
 
 			if ((amp == null) || (amp.getXMLNS() != XMLNS) || (amp.getAttributeStaticStr(
