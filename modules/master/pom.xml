@@ -13,7 +13,7 @@
 
 	<groupId>tigase</groupId>
 	<artifactId>tigase-server-master</artifactId>
-	<version>5.2.0-SNAPSHOT</version>
+	<version>5.2.0-rc1</version>
 	
 	<name>Tigase XMPP Server Master project</name>
 
