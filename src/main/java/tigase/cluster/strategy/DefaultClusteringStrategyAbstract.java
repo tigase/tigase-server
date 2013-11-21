@@ -499,6 +499,13 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 	 */
 	@Override
 	public void setProperties(Map<String, Object> props) {
+		// we need to remember that this method can be called more than once
+		// and we need to clean list of commands if we are adding any command here
+		CommandListener[] oldCmds = commands.toArray(new CommandListener[commands.size()]);
+		for (CommandListener oldCmd : oldCmds) {
+			if (PACKET_FORWARD_CMD.equals(oldCmd.getName()))
+				commands.remove(oldCmd);
+		} 
 		addCommandListener(new PacketForwardCmd(PACKET_FORWARD_CMD, sm, this));
 	}
 
