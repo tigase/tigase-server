@@ -1,5 +1,5 @@
 /*
- * PacketErrorTypeException.java
+ * RosterRetrievingException.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
@@ -22,18 +22,22 @@
 
 
 
-package tigase.xmpp;
+/*
+* To change this license header, choose License Headers in Project Properties.
+* To change this template file, choose Tools | Templates
+* and open the template in the editor.
+ */
+package tigase.xmpp.impl.roster;
+
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.xmpp.XMPPException;
 
 /**
- * Describe class PacketErrorTypeException here.
  *
- *
- * Created: Tue Oct  9 13:41:43 2007
- *
- * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
+ * @author kobit
  */
-public class PacketErrorTypeException
+public class RosterRetrievingException
 				extends XMPPException {
 	private static final long serialVersionUID = 1L;
 
@@ -44,7 +48,7 @@ public class PacketErrorTypeException
 	 *
 	 * @param message
 	 */
-	public PacketErrorTypeException(String message) {
+	public RosterRetrievingException(String message) {
 		super(message);
 	}
 
@@ -55,7 +59,7 @@ public class PacketErrorTypeException
 	 * @param message
 	 * @param cause
 	 */
-	public PacketErrorTypeException(String message, Throwable cause) {
+	public RosterRetrievingException(String message, Throwable cause) {
 		super(message, cause);
 	}
 }
