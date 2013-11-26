@@ -1,9 +1,13 @@
-/*  Tigase Jabber/XMPP Server
- *  Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+/*
+ * DynamicRosterIfc.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,18 +18,24 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
+
 package tigase.xmpp.impl.roster;
 
-import java.util.Map;
-import java.util.List;
-import tigase.xmpp.XMPPResourceConnection;
+//~--- non-JDK imports --------------------------------------------------------
+
 import tigase.xml.Element;
+
 import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.XMPPResourceConnection;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Interface <code>DynamicRosterIfc</code> is to dynamically generate user roster
@@ -34,7 +44,7 @@ import tigase.xmpp.NotAuthorizedException;
  * user. It just allows you to inject extra contacts lists to the user roster.
  * <p/>
  * There is a very simple example implementing this interface which creates
- * roster entries for anoymous users - <code>tigase.xmpp.impl.AnonymousRoster</code>.
+ * roster entries for anonymous users - <code>tigase.xmpp.impl.AnonymousRoster</code>.
  * You can use it as a starting point for your code.
  * <p/>
  * You can have as many implementations of this interface loaded at the same
@@ -67,17 +77,12 @@ import tigase.xmpp.NotAuthorizedException;
  * @version $Rev$
  */
 public interface DynamicRosterIfc {
-
-	void setItemExtraData(Element item);
-
-	Element getItemExtraData(Element item);
-
 	/**
 	 * <code>init</code> method is used to provide configuration parameters
-	 * and initialize the object. Please have a look at the interface descriotion
+	 * and initialize the object. Please have a look at the interface description
 	 * for more details about configuration parameters. The object is never used
 	 * before it's <code>init(...)</code> method is called but it might be
-	 * used stright away after the method has finished.
+	 * used straight away after the method has finished.
 	 *
 	 * @param props a <code>Map<String, Object> props</code> is a configuration
 	 * parameters map in the form: key:value exactly as they were specified
@@ -87,14 +92,16 @@ public interface DynamicRosterIfc {
 
 	/**
 	 * <code>init</code> method is called at the initialization time when simple
-	 * form of startu parameters are used:
-   * <pre>sess-man/plugins-conf/roster-presence/class-name.init=configuration-string</pre>
-   * The <code>configuration-string</code> is passed to this <code>init(...)</code>
-   * method in exact form as it was found in the configuration file.
+	 * form of startup parameters are used:
+	 * <pre>sess-man/plugins-conf/roster-presence/class-name.init=configuration-string</pre>
+	 * The <code>configuration-string</code> is passed to this <code>init(...)</code>
+	 * method in exact form as it was found in the configuration file.
 	 *
 	 * @param par a <code>String</code> value of the configuration string.
 	 */
 	void init(String par);
+
+	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * <code>getBuddies</code> method returns <code>String</code> array with
@@ -108,9 +115,17 @@ public interface DynamicRosterIfc {
 	 * of the user roster.
 	 * @exception NotAuthorizedException may be thrown if the connection session
 	 * is not yet authenticated but authorization is required to access roster data.
+	 * @exception RosterRetrievingException may be thrown when an unknown error in the
+	 * custom roster retrieving logic occurs. A message from the exception must be sent
+	 * back to a user as an error message.
+	 * @exception RepositoryAccessException may be thrown when there is an error accessing
+	 * the roster data repository, even though the user is correctly authenticated. No
+	 * error is sent back to a user, only an empty roster but the repository exception is
+	 * logged to the log file.
 	 */
 	JID[] getBuddies(XMPPResourceConnection session)
-		throws NotAuthorizedException;
+					throws NotAuthorizedException, RosterRetrievingException,
+							RepositoryAccessException;
 
 	/**
 	 * <code>getBuddyItem</code> method returns buddy item element for a given JID
@@ -129,14 +144,34 @@ public interface DynamicRosterIfc {
 	 *  new String[] {peer, "both", JIDUtils.getNodeNick(peer)});</pre>
 	 * @exception NotAuthorizedException may be thrown if the connection session
 	 * is not yet authenticated but authorization is required to access roster data.
+	 * @exception RosterRetrievingException may be thrown when an unknown error in the
+	 * custom roster retrieving logic occurs. A message from the exception must be sent
+	 * back to a user as an error message.
+	 * @exception RepositoryAccessException may be thrown when there is an error accessing
+	 * the roster data repository, even though the user is correctly authenticated. No
+	 * error is sent back to a user, only an empty roster but the repository exception is
+	 * logged to the log file.
 	 */
 	Element getBuddyItem(XMPPResourceConnection session, JID buddy)
-		throws NotAuthorizedException;
+					throws NotAuthorizedException, RosterRetrievingException,
+							RepositoryAccessException;
+
+	/**
+	 * Returns a new roster Item element with additional, non-standard information
+	 * for a given item. This is a way to associate custom roster information with
+	 * a contact.
+	 *
+	 *
+	 * @param item is a <code>Element</code>
+	 *
+	 * @return a value of <code>Element</code>
+	 */
+	Element getItemExtraData(Element item);
 
 	/**
 	 * <code>getRosterItems</code> method returns a full list with all buddies
 	 * generated by this dynamic roster implementation. The list contains all
-	 * contacts for the roster with all contacts details - buddy jid, nick name,
+	 * contacts for the roster with all contacts details - buddy JID, nick name,
 	 * subscription (typically always both) and groups. Please have a look at
 	 * <code>getBuddyItem(...)</code> description for details how to create
 	 * an Element entry for the roster item.
@@ -146,15 +181,35 @@ public interface DynamicRosterIfc {
 	 * the array call the <code>getBuddyItem(...)</code>. I strongly advice to
 	 * not do it. This is a server with thousands of connected users and possibly
 	 * thousands of packets going through the server. Think of a performance and
-	 * excute database query once if possible rather then many times.
+	 * execute database query once if possible rather then many times.
 	 *
 	 * @param session a <code>XMPPResourceConnection</code> value of the connection
 	 * session object.
 	 * @return a <code>List<Element></code> value
 	 * @exception NotAuthorizedException may be thrown if the connection session
 	 * is not yet authenticated but authorization is required to access roster data.
+	 * @exception RosterRetrievingException may be thrown when an unknown error in the
+	 * custom roster retrieving logic occurs. A message from the exception must be sent
+	 * back to a user as an error message.
+	 * @exception RepositoryAccessException may be thrown when there is an error accessing
+	 * the roster data repository, even though the user is correctly authenticated. No
+	 * error is sent back to a user, only an empty roster but the repository exception is
+	 * logged to the log file.
 	 */
 	List<Element> getRosterItems(XMPPResourceConnection session)
-		throws NotAuthorizedException;
+					throws NotAuthorizedException, RosterRetrievingException,
+							RepositoryAccessException;
 
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param item is a <code>Element</code>
+	 */
+	void setItemExtraData(Element item);
 }
+
+
+//~ Formatted in Tigase Code Convention on 13/11/26
