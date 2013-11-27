@@ -22,11 +22,6 @@
 
 
 
-/*
-* To change this license header, choose License Headers in Project Properties.
-* To change this template file, choose Tools | Templates
-* and open the template in the editor.
- */
 package tigase.xmpp.impl.roster;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -65,4 +60,4 @@ public class RosterRetrievingException
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/11/26
+//~ Formatted in Tigase Code Convention on 13/11/27
