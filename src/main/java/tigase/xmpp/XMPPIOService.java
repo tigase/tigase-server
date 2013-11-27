@@ -78,6 +78,12 @@ public class XMPPIOService<RefObject>
 	public static final String CROSS_DOMAIN_POLICY_FILE_PROP_VAL =
 			"etc/cross-domain-policy.xml";
 
+	/**
+	 * Key name of the system property for configuration protection
+	 * from system overload and DOS attack.
+	 */
+	public static final String DOM_HANDLER = "XMPPDomBuilderHandler";
+
 	/** Field description */
 	public static final String ID_ATT = "id";
 
@@ -93,7 +99,7 @@ public class XMPPIOService<RefObject>
 	//~--- fields ---------------------------------------------------------------
 
 	private XMPPDomBuilderHandler<RefObject> domHandler = null;
-
+	
 	/** Field description */
 	protected SimpleParser        parser = SingletonFactory.getParserInstance();
 	private String                jid                  = null;
@@ -132,25 +138,14 @@ public class XMPPIOService<RefObject>
 
 	//~--- constructors ---------------------------------------------------------
 
-	// /**
-	// * Variable <code>lock</code> keeps reference to object lock.
-	// * It supports multi-threaded processing and can be called simultaneously
-	// from
-	// * many threads. It is not recommended however as lock prevents most of
-	// * methods to be executed concurrently as they process data received from
-	// * socket and the data should be processed in proper order.
-	// */
-	// private Lock writeLock = new ReentrantLock();
-	// private Lock readLock = new ReentrantLock();
-	// private boolean streamClosed = false;
-
 	/**
 	 * Creates a new <code>XMPPIOService</code> instance.
 	 *
 	 */
 	public XMPPIOService() {
 		super();
-		domHandler = new XMPPDomBuilderHandler<RefObject>(this);
+		domHandler = new XMPPDomBuilderHandler<>( this );
+		getSessionData().put( DOM_HANDLER, domHandler );
 		if (cross_domain_policy == null) {
 			String file_name = System.getProperty(CROSS_DOMAIN_POLICY_FILE_PROP_KEY,
 					CROSS_DOMAIN_POLICY_FILE_PROP_VAL);
@@ -348,6 +343,15 @@ public class XMPPIOService<RefObject>
 
 	//~--- get methods ----------------------------------------------------------
 
+//	/**
+//	 *
+//	 * @return
+//	 */
+//	public int getElementLimits() {
+//		return elements_number_limit;
+//	}
+
+
 	/**
 	 * Method description
 	 *
@@ -487,6 +491,15 @@ public class XMPPIOService<RefObject>
 		this.white_char_ack = white_char_ack;
 		this.xmpp_ack       = xmpp_ack;
 		this.strict_ack     = strict;
+	}
+
+
+	/**
+	 *
+	 * @param limit
+	 */
+	public void setElementLimits(int limit) {
+
 	}
 
 	/**

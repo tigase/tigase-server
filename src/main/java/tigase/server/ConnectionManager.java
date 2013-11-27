@@ -67,6 +67,8 @@ import java.util.Set;
 import java.util.TimerTask;
 
 import javax.script.Bindings;
+import tigase.xmpp.XMPPDomBuilderHandler;
+import static tigase.xmpp.XMPPIOService.DOM_HANDLER;
 
 /**
  * Describe class ConnectionManager here.
@@ -128,6 +130,18 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	/** Field description */
 	protected static final int NET_BUFFER_ST_PROP_VAL = 2 * 1024;
+
+	/**
+	 * Key name of the system property for configuration protection
+	 * from system overload and DOS attack.
+	 */
+	public static final String ELEMENTS_NUMBER_LIMIT_PROP_KEY = "elements-number-limit";
+
+	/**
+	 * Default value for the system property for configuration protection
+	 * from system overload and DOS attack.
+	 */
+	public static int ELEMENTS_NUMBER_LIMIT_PROP_VAL = 1000;
 
 	/** Field description */
 	protected static final String PORT_CLASS_PROP_KEY = "class";
@@ -212,6 +226,12 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	private long                          total_packets_limit =
 			TOTAL_PACKETS_LIMIT_PROP_VAL;
 	private long                          total_bin_limit     = TOTAL_BIN_LIMIT_PROP_VAL;
+	/**
+	 * Protection from the system overload and DOS attack. We want to limit number
+	 * of elements created within a single XMPP stanza.
+	 *
+	 */
+	protected int elements_number_limit = 0;
 	private ConcurrentHashMap<String, IO> services = new ConcurrentHashMap<String, IO>();
 	private Set<ConnectionListenerImpl>   pending_open = Collections.synchronizedSet(
 			new HashSet<ConnectionListenerImpl>());;
@@ -737,6 +757,13 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				getDefTrafficThrottling(), TRAFFIC_THROTTLING_PROP_KEY, String.class, params,
 				props);
 
+		if ( params.get( "--" + ELEMENTS_NUMBER_LIMIT_PROP_KEY ) != null ){
+			elements_number_limit = Integer.valueOf( (String)params.get( "--" + ELEMENTS_NUMBER_LIMIT_PROP_KEY ) );
+		} else {
+			elements_number_limit = ELEMENTS_NUMBER_LIMIT_PROP_VAL;
+		}
+			props.put( ELEMENTS_NUMBER_LIMIT_PROP_KEY, elements_number_limit );
+
 		int[]  ports     = null;
 		String ports_str = (String) params.get("--" + getName() + "-ports");
 
@@ -928,6 +955,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				}
 			}
 		}
+
+		if ( props.get (ELEMENTS_NUMBER_LIMIT_PROP_KEY ) != null ){
+			elements_number_limit = (int) props.get (ELEMENTS_NUMBER_LIMIT_PROP_KEY );
+		}
+
 		if (props.size() == 1) {
 
 			// If props.size() == 1, it means this is a single property update and
@@ -1371,6 +1403,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			}
 
 			IO serv = getXMPPIOServiceInstance();
+
+			( (XMPPDomBuilderHandler) serv.getSessionData().get( DOM_HANDLER ) ).setElementsLimit( elements_number_limit );
 
 			serv.setIOServiceListener(ConnectionManager.this);
 			serv.setSessionData(port_props);
