@@ -90,4 +90,4 @@ public interface CommandListener
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/11/01
+//~ Formatted in Tigase Code Convention on 13/11/29

@@ -33,6 +33,8 @@ package tigase.cluster.api;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManagerHandler;
 
+import tigase.xml.Element;
+
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.XMPPResourceConnection;
@@ -41,7 +43,6 @@ import tigase.xmpp.XMPPSession;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.concurrent.ConcurrentHashMap;
-import tigase.xml.Element;
 
 /**
  *
@@ -70,26 +71,19 @@ public interface SessionManagerClusteredIfc
 	 * Method description
 	 *
 	 *
-	 * @param conn_id is a <code>JID</code>
-	 * @param domain is a <code>String</code>
-	 * @param user_id is a <code>BareJID</code>
-	 * @param resource is a <code>String</code>
-	 * @param xmpp_sessionId is a <code>String</code>
-	 * @param tmpSession is a <code>boolean</code>
-	 *
-	 * @return a value of <code>XMPPResourceConnection</code>
+	 * @param el_packet
+	 * @param conn
 	 */
-	XMPPResourceConnection loginUserSession(JID conn_id, String domain, BareJID user_id,
-			String resource, String xmpp_sessionId, boolean tmpSession);
+	void processPacket(Packet el_packet, XMPPResourceConnection conn);
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param el_packet
-	 * @param conn
+	 * @param session is a <code>XMPPSession</code>
+	 * @param element is a <code>Element</code>
 	 */
-	void processPacket(Packet el_packet, XMPPResourceConnection conn);
+	void processPresenceUpdate(XMPPSession session, Element element);
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -124,9 +118,7 @@ public interface SessionManagerClusteredIfc
 	 * @return a value of <code>ConcurrentHashMap<BareJID,XMPPSession></code>
 	 */
 	ConcurrentHashMap<BareJID, XMPPSession> getXMPPSessions();
-	
-	void processPresenceUpdate(XMPPSession session, Element element);
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/11/02
+//~ Formatted in Tigase Code Convention on 13/11/29

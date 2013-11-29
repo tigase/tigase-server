@@ -26,6 +26,7 @@ package tigase.cluster.strategy;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.HashMap;
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.CommandListener;
 import tigase.cluster.api.SessionManagerClusteredIfc;
@@ -73,13 +74,21 @@ import tigase.xmpp.XMPPSession;
  */
 public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 				implements ClusteringStrategyIfc<E> {
+
+	private static enum ErrorForwarding {
+		forward,
+		drop
+	}
+
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
 	private static final Logger log = Logger.getLogger(DefaultClusteringStrategyAbstract.class
 			.getName());
 	private static final String PACKET_FORWARD_CMD = "packet-forward-sm-cmd";
-	
+
+	private static final String ERROR_FORWARDING_KEY = "error-forwarding";
+
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
@@ -94,7 +103,7 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 	protected CopyOnWriteArrayList<JID> cl_nodes_list = new CopyOnWriteArrayList<JID>();
 	private Set<CommandListener>        commands =
 			new CopyOnWriteArraySet<CommandListener>();
-
+	private ErrorForwarding errorForwarding = ErrorForwarding.drop;
 	//~--- constructors ---------------------------------------------------------
 
 	/**
@@ -370,7 +379,9 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		return null;
+		Map<String, Object> props = new HashMap<String, Object>();
+		props.put(ERROR_FORWARDING_KEY, ErrorForwarding.drop.name());
+		return props;
 	}
 
 	/**
@@ -505,8 +516,13 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 		for (CommandListener oldCmd : oldCmds) {
 			if (PACKET_FORWARD_CMD.equals(oldCmd.getName()))
 				commands.remove(oldCmd);
-		} 
+		}
 		addCommandListener(new PacketForwardCmd(PACKET_FORWARD_CMD, sm, this));
+
+		if (props.containsKey(ERROR_FORWARDING_KEY)) {
+			errorForwarding = ErrorForwarding.valueOf(
+					(String) props.get(ERROR_FORWARDING_KEY));
+		}
 	}
 
 	/**
@@ -534,9 +550,16 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 	 */
 	protected boolean isSuitableForForward(Packet packet) {
 
-		// Do not forward any error packets for now.
-		if (packet.getType() == StanzaType.error) {
-			return false;
+		switch (errorForwarding) {
+			case forward:
+				break;
+
+			default:
+				// Do not forward any error packets by default
+				if (packet.getType() == StanzaType.error) {
+					return false;
+				}
+				break;
 		}
 
 		// Artur: Moved it to the front of the method for performance reasons.
@@ -572,7 +595,7 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 
 		return true;
 	}
-	
+
 }
 
 

@@ -41,13 +41,13 @@ import tigase.stats.StatisticsList;
 import tigase.util.DNSResolver;
 import tigase.util.TigaseStringprepException;
 
+import tigase.xml.Element;
+
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPSession;
-
-import static tigase.cluster.strategy.ClusteringStrategyIfc.CLUSTER_NODE;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -59,7 +59,6 @@ import java.util.logging.Logger;
 import java.util.Map;
 
 import javax.script.Bindings;
-import tigase.xml.Element;
 
 /**
  * Class SessionManagerClusteredOld
@@ -91,7 +90,7 @@ public class SessionManagerClustered
 
 	/** Field description */
 	public static final int SYNC_MAX_BATCH_SIZE = 1000;
-	
+
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
@@ -156,9 +155,6 @@ public class SessionManagerClustered
 	@Override
 	public void handleLocalPacket(Packet packet, XMPPResourceConnection conn) {
 		if (strategy != null) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}: for connection: {1}", new Object[] { packet, conn });
-			}
 			strategy.handleLocalPacket(packet, conn);
 		}
 	}
@@ -173,70 +169,9 @@ public class SessionManagerClustered
 	@Override
 	public void handleLogin(BareJID userId, XMPPResourceConnection conn) {
 		super.handleLogin(userId, conn);
-		if (conn.isTmpSession()) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "for CLUSTER REMOTE connection: {0}", new Object[] {
-						conn });
-			}
-		} else {
-			if (strategy != null) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}: for connection: {1}", new Object[] { userId,
-							conn });
-				}
-				strategy.handleLocalUserLogin(userId, conn);
-			}
-		}
+		strategy.handleLocalUserLogin(userId, conn);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param conn is a <code>XMPPResourceConnection</code>
-	 */
-	@Override
-	public void handlePresenceSet(XMPPResourceConnection conn) {
-		if (conn.isTmpSession()) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "for CLUSTER REMOTE connection: {0}", new Object[] {
-						conn });
-			}
-		} else {
-			super.handlePresenceSet(conn);
-			if (strategy != null) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "for connection: {0}", new Object[] { conn });
-				}
-				strategy.handleLocalPresenceSet(conn);
-			}
-		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param conn is a <code>XMPPResourceConnection</code>
-	 */
-	@Override
-	public void handleResourceBind(XMPPResourceConnection conn) {
-		if (conn.isTmpSession()) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "for CLUSTER REMOTE connection: {0}", new Object[] {
-						conn });
-			}
-		} else {
-			super.handleResourceBind(conn);
-			if (strategy != null) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "for connection: {0}", new Object[] { conn });
-				}
-				strategy.handleLocalResourceBind(conn);
-			}
-		}
-	}
-	
 	/**
 	 * Initialize a mapping of key/value pairs which can be used in scripts
 	 * loaded by the server
@@ -247,25 +182,6 @@ public class SessionManagerClustered
 	public void initBindings(Bindings binds) {
 		super.initBindings(binds);
 		binds.put(CLUSTER_STRATEGY_VAR, strategy);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param conn_id is a <code>JID</code>
-	 * @param domain is a <code>String</code>
-	 * @param user_id is a <code>BareJID</code>
-	 * @param resource is a <code>String</code>
-	 * @param xmpp_sessionId is a <code>String</code>
-	 * @param tmpSession is a <code>boolean</code>
-	 *
-	 * @return a value of <code>XMPPResourceConnection</code>
-	 */
-	public XMPPResourceConnection loginUserSession(JID conn_id, String domain,
-			BareJID user_id, String resource, String xmpp_sessionId, boolean tmpSession) {
-		return super.loginUserSession(conn_id, domain, user_id, resource, xmpp_sessionId,
-				tmpSession);
 	}
 
 	/**
@@ -308,7 +224,7 @@ public class SessionManagerClustered
 		sendAdminNotification("Cluster node '" + node + "' disconnected (" + (new Date()) +
 				")", "Cluster node disconnected: " + node, node);
 	}
-	
+
 	/**
 	 * Concurrency control method. Returns preferable number of threads set for
 	 * this component.
@@ -365,13 +281,7 @@ public class SessionManagerClustered
 				log.log(Level.FINEST, "Ressource connection found: {0}", conn);
 			}
 
-			boolean clusterOK = false;
-
-			// We do not process packets directly "from" a client "to" the SM component
-			// such packets should be handled using handleLocalPacket method instead
-			if (!getComponentId().equals(packet.getPacketTo())) {
-				clusterOK = strategy.processPacket(packet, conn);
-			}
+			boolean clusterOK = strategy.processPacket(packet, conn);
 
 			// clTm = System.currentTimeMillis() - startTime;
 			if (conn == null) {
@@ -412,6 +322,18 @@ public class SessionManagerClustered
 	@Override
 	public void processPacket(Packet packet, XMPPResourceConnection conn) {
 		super.processPacket(packet, conn);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session is a <code>XMPPSession</code>
+	 * @param packet is a <code>Element</code>
+	 */
+	@Override
+	public void processPresenceUpdate(XMPPSession session, Element packet) {
+		super.processPresenceUpdate(session, packet);
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -633,11 +555,6 @@ public class SessionManagerClustered
 		return strategy.hasCompleteJidsInfo();
 	}
 
-	@Override
-	public void processPresenceUpdate(XMPPSession session, Element packet) {
-		super.processPresenceUpdate(session, packet);
-	}
-	
 	//~--- set methods ----------------------------------------------------------
 
 	/**
@@ -753,7 +670,7 @@ public class SessionManagerClustered
 			log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
 		}
 	}
-	
+
 	private void sendAdminNotification(String msg, String subject, String node) {
 		String message = msg;
 
@@ -773,4 +690,4 @@ public class SessionManagerClustered
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/11/11
+//~ Formatted in Tigase Code Convention on 13/11/29
