@@ -383,4 +383,4 @@ public abstract class DynamicRoster {
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/11/26
+//~ Formatted in Tigase Code Convention on 13/11/29

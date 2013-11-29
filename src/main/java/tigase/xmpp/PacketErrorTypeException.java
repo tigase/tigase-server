@@ -62,4 +62,4 @@ public class PacketErrorTypeException
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/11/27
+//~ Formatted in Tigase Code Convention on 13/11/29
