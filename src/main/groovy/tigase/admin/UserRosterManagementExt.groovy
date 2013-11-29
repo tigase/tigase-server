@@ -50,6 +50,7 @@ try {
 	def ROSTER_OWNER_JID = "roster-owner-jid"
 	def ROSTER_OWNER_PRESENCE = "roster-owner-presence"
 	def ROSTER_OWNER_NAME = "roster-owner-name"
+	def ROSTER_OWNER_GROUPS = "roster-owner-groups"
 	def ROSTER_ITEM_JID = "roster-item-jid"
 	def ROSTER_ITEM_NAME = "roster-item-name"
 	def ROSTER_ITEM_GROUPS = "roster-item-groups"
@@ -78,6 +79,7 @@ try {
 
 	def rosterOwnerJid = Command.getFieldValue(packet, ROSTER_OWNER_JID)
 	def rosterOwnerName = Command.getFieldValue(packet, ROSTER_OWNER_NAME)
+	def rosterOwnerGroups = Command.getFieldValue(packet, ROSTER_OWNER_GROUPS)
 	def rosterItemJid = Command.getFieldValue(packet, ROSTER_ITEM_JID)
 	def rosterItemName = Command.getFieldValue(packet, ROSTER_ITEM_NAME)
 	def rosterItemGroups = Command.getFieldValue(packet, ROSTER_ITEM_GROUPS)
@@ -90,9 +92,10 @@ try {
 		def res = p.commandResult(Command.DataType.form);
 		Command.addFieldValue(res, ROSTER_OWNER_JID, rosterOwnerJid ?: "", "jid-single", "Roster owner JID")
 		Command.addFieldValue(res, ROSTER_OWNER_NAME, rosterOwnerName ?: "",  "text-single", "Roster owner name")
+		Command.addFieldValue(res, ROSTER_OWNER_GROUPS, rosterOwnerGroups ?: "", "text-single", "Comma separated list of owner groups")
 		Command.addFieldValue(res, ROSTER_ITEM_JID, rosterItemJid ?: "", "jid-single", "Roster item JID")
 		Command.addFieldValue(res, ROSTER_ITEM_NAME, rosterItemName ?: "",  "text-single", "Roster item name")
-		Command.addFieldValue(res, ROSTER_ITEM_GROUPS, rosterItemGroups ?: "", "text-single", "Comma separated list of groups")
+		Command.addFieldValue(res, ROSTER_ITEM_GROUPS, rosterItemGroups ?: "", "text-single", "Comma separated list of item groups")
 		Command.addFieldValue(res, ROSTER_ITEM_SUBSCR, subscriptions[0], "Roster item Subscription", (String[])subscriptions, (String[])subscriptions)
 		Command.addFieldValue(res, ROSTER_ACTION, actions[0], "Action", (String[])actions_descr, (String[])actions)
 		Command.addHiddenField(res, ROSTER_NOTIFY_CLUSTER, true.toString())
@@ -147,6 +150,7 @@ try {
 			} else {
 				RosterElement rel = new RosterElement(i_jid, i_name, i_groups ? i_groups.split(",") : null, null)
 				rel.setSubscription(RosterAbstract.SubscriptionType.valueOf(i_subscr))
+				rel.setPersistent(true);
 				roster.put(i_jid, rel)
 			}
 			StringBuilder sb = new StringBuilder(200)
@@ -169,6 +173,7 @@ try {
 
 	updateRoster(jidRosterOwnerJid, jidRosterItemJid, rosterItemName, rosterItemGroups, rosterItemSubscr, rosterNotifyCluster)
 
+	Element pres;
 	if (rosterAction == UPDATE_EXT || rosterAction == REMOVE_EXT) {
 		def subscr = rosterItemSubscr;
 		switch (rosterItemSubscr) {
@@ -183,13 +188,14 @@ try {
 			return results;
 		}
 
-		updateRoster(jidRosterItemJid, jidRosterOwnerJid, rosterOwnerName, rosterItemGroups, subscr, rosterNotifyCluster)
+		updateRoster(jidRosterItemJid, jidRosterOwnerJid, rosterOwnerName, rosterOwnerGroups, subscr, rosterNotifyCluster)
+		
+		if (!remove_item) {
+			pres = new Element("presence", (String[])["from", "to", "type"], (String[])[rosterOwnerJid, rosterItemJid, "probe"])
+			results.offer(Packet.packetInstance(pres))
+		}
 	}
-
 	if (!remove_item) {
-
-		Element pres = new Element("presence", (String[])["from", "to", "type"], (String[])[rosterOwnerJid, rosterItemJid, "probe"])
-		results.offer(Packet.packetInstance(pres))
 		pres = new Element("presence", (String[])["from", "to", "type"], (String[])[rosterItemJid, rosterOwnerJid, "probe"])
 		results.offer(Packet.packetInstance(pres))
 	}
@@ -199,7 +205,5 @@ try {
 
 	//return results
 	return (Queue)results
-
-
 
 }  catch (Exception ex) { ex.printStackTrace(); }
