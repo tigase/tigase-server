@@ -73,10 +73,13 @@ public abstract class DynamicRoster {
 	 *
 	 * @return a value of <code>JID[]</code>
 	 * @throws NotAuthorizedException
+	 * @throws RepositoryAccessException
+	 * @throws RosterRetrievingException
 	 */
 	public static JID[] addBuddies(final XMPPResourceConnection session, final Map<String,
 			Object> settings, JID[] buddies)
-					throws NotAuthorizedException {
+					throws NotAuthorizedException, RosterRetrievingException,
+							RepositoryAccessException {
 		List<JID> result = getBuddiesList(session, settings);
 
 		if (buddies != null) {
@@ -165,10 +168,13 @@ public abstract class DynamicRoster {
 	 *
 	 * @return a value of <code>JID[]</code>
 	 * @throws NotAuthorizedException
+	 * @throws RepositoryAccessException
+	 * @throws RosterRetrievingException
 	 */
 	public static JID[] getBuddies(final XMPPResourceConnection session, final Map<String,
 			Object> settings)
-					throws NotAuthorizedException {
+					throws NotAuthorizedException, RosterRetrievingException,
+							RepositoryAccessException {
 		List<JID> result = getBuddiesList(session, settings);
 
 		if ((result != null) && (result.size() > 0)) {
@@ -190,10 +196,13 @@ public abstract class DynamicRoster {
 	 *
 	 * @return a value of <code>List<JID></code>
 	 * @throws NotAuthorizedException
+	 * @throws RepositoryAccessException
+	 * @throws RosterRetrievingException
 	 */
 	public static List<JID> getBuddiesList(final XMPPResourceConnection session,
 			final Map<String, Object> settings)
-					throws NotAuthorizedException {
+					throws NotAuthorizedException, RosterRetrievingException,
+							RepositoryAccessException {
 		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
 
 		if (dynr != null) {
@@ -229,10 +238,13 @@ public abstract class DynamicRoster {
 	 *
 	 * @return a value of <code>Element</code>
 	 * @throws NotAuthorizedException
+	 * @throws RepositoryAccessException
+	 * @throws RosterRetrievingException
 	 */
 	public static Element getBuddyItem(final XMPPResourceConnection session,
 			final Map<String, Object> settings, JID buddy)
-					throws NotAuthorizedException {
+					throws NotAuthorizedException, RosterRetrievingException,
+							RepositoryAccessException {
 		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
 
 		if (dynr != null) {
@@ -321,10 +333,13 @@ public abstract class DynamicRoster {
 	 *
 	 * @return a value of <code>List<Element></code>
 	 * @throws NotAuthorizedException
+	 * @throws RepositoryAccessException
+	 * @throws RosterRetrievingException
 	 */
 	public static List<Element> getRosterItems(final XMPPResourceConnection session,
 			final Map<String, Object> settings)
-					throws NotAuthorizedException {
+					throws NotAuthorizedException, RosterRetrievingException,
+							RepositoryAccessException {
 		DynamicRosterIfc[] dynr = getDynamicRosters(settings);
 
 		if (dynr != null) {
@@ -368,4 +383,4 @@ public abstract class DynamicRoster {
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/11/27
+//~ Formatted in Tigase Code Convention on 13/11/26

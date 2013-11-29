@@ -26,20 +26,29 @@ package tigase.cluster.strategy;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.HashMap;
+import tigase.cluster.api.ClusterCommandException;
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.CommandListener;
+import tigase.cluster.api.CommandListenerAbstract;
 import tigase.cluster.api.SessionManagerClusteredIfc;
 import tigase.cluster.strategy.cmd.PacketForwardCmd;
 
+import tigase.server.Command;
+import tigase.server.Iq;
 import tigase.server.Packet;
+import tigase.server.Presence;
 
 import tigase.stats.StatisticsList;
 
+import tigase.xml.Element;
+
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
+import tigase.xmpp.NoConnectionIdException;
+import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.XMPPSession;
 
 import static tigase.cluster.api.SessionManagerClusteredIfc.SESSION_FOUND_KEY;
 
@@ -47,6 +56,7 @@ import static tigase.cluster.api.SessionManagerClusteredIfc.SESSION_FOUND_KEY;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -54,15 +64,6 @@ import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import tigase.cluster.api.ClusterCommandException;
-import tigase.cluster.api.CommandListenerAbstract;
-import tigase.server.Command;
-import tigase.server.Iq;
-import tigase.server.Presence;
-import tigase.xml.Element;
-import tigase.xmpp.NoConnectionIdException;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.XMPPSession;
 
 /**
  * Created: May 13, 2009 9:53:44 AM
@@ -74,20 +75,14 @@ import tigase.xmpp.XMPPSession;
  */
 public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 				implements ClusteringStrategyIfc<E> {
-
-	private static enum ErrorForwarding {
-		forward,
-		drop
-	}
+	private static final String ERROR_FORWARDING_KEY = "error-forwarding";
 
 	/**
 	 * Variable <code>log</code> is a class logger.
 	 */
-	private static final Logger log = Logger.getLogger(DefaultClusteringStrategyAbstract.class
-			.getName());
+	private static final Logger log = Logger.getLogger(
+			DefaultClusteringStrategyAbstract.class.getName());
 	private static final String PACKET_FORWARD_CMD = "packet-forward-sm-cmd";
-
-	private static final String ERROR_FORWARDING_KEY = "error-forwarding";
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -100,10 +95,15 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 	protected SessionManagerClusteredIfc sm = null;
 
 	/** Field description */
-	protected CopyOnWriteArrayList<JID> cl_nodes_list = new CopyOnWriteArrayList<JID>();
+	protected CopyOnWriteArrayList<JID> cl_nodes_list   = new CopyOnWriteArrayList<JID>();
 	private Set<CommandListener>        commands =
 			new CopyOnWriteArraySet<CommandListener>();
-	private ErrorForwarding errorForwarding = ErrorForwarding.drop;
+	private ErrorForwarding             errorForwarding = ErrorForwarding.drop;
+
+	//~--- constant enums -------------------------------------------------------
+
+	private static enum ErrorForwarding { forward, drop }
+
 	//~--- constructors ---------------------------------------------------------
 
 	/**
@@ -380,7 +380,9 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = new HashMap<String, Object>();
+
 		props.put(ERROR_FORWARDING_KEY, ErrorForwarding.drop.name());
+
 		return props;
 	}
 
@@ -510,18 +512,19 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 	 */
 	@Override
 	public void setProperties(Map<String, Object> props) {
+
 		// we need to remember that this method can be called more than once
 		// and we need to clean list of commands if we are adding any command here
 		CommandListener[] oldCmds = commands.toArray(new CommandListener[commands.size()]);
+
 		for (CommandListener oldCmd : oldCmds) {
-			if (PACKET_FORWARD_CMD.equals(oldCmd.getName()))
+			if (PACKET_FORWARD_CMD.equals(oldCmd.getName())) {
 				commands.remove(oldCmd);
+			}
 		}
 		addCommandListener(new PacketForwardCmd(PACKET_FORWARD_CMD, sm, this));
-
 		if (props.containsKey(ERROR_FORWARDING_KEY)) {
-			errorForwarding = ErrorForwarding.valueOf(
-					(String) props.get(ERROR_FORWARDING_KEY));
+			errorForwarding = ErrorForwarding.valueOf((String) props.get(ERROR_FORWARDING_KEY));
 		}
 	}
 
@@ -549,17 +552,18 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean isSuitableForForward(Packet packet) {
-
 		switch (errorForwarding) {
-			case forward:
-				break;
+		case forward :
+			break;
 
-			default:
-				// Do not forward any error packets by default
-				if (packet.getType() == StanzaType.error) {
-					return false;
-				}
-				break;
+		default :
+
+			// Do not forward any error packets by default
+			if (packet.getType() == StanzaType.error) {
+				return false;
+			}
+
+			break;
 		}
 
 		// Artur: Moved it to the front of the method for performance reasons.
@@ -595,8 +599,7 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 
 		return true;
 	}
-
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/10/15
+//~ Formatted in Tigase Code Convention on 13/11/29

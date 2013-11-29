@@ -115,8 +115,17 @@ public interface DynamicRosterIfc {
 	 * of the user roster.
 	 * @exception NotAuthorizedException may be thrown if the connection session
 	 * is not yet authenticated but authorization is required to access roster data.
+	 * @exception RosterRetrievingException may be thrown when an unknown error in the
+	 * custom roster retrieving logic occurs. A message from the exception must be sent
+	 * back to a user as an error message.
+	 * @exception RepositoryAccessException may be thrown when there is an error accessing
+	 * the roster data repository, even though the user is correctly authenticated. No
+	 * error is sent back to a user, only an empty roster but the repository exception is
+	 * logged to the log file.
 	 */
-	JID[] getBuddies(XMPPResourceConnection session) throws NotAuthorizedException;
+	JID[] getBuddies(XMPPResourceConnection session)
+					throws NotAuthorizedException, RosterRetrievingException,
+							RepositoryAccessException;
 
 	/**
 	 * <code>getBuddyItem</code> method returns buddy item element for a given JID
@@ -135,12 +144,22 @@ public interface DynamicRosterIfc {
 	 *  new String[] {peer, "both", JIDUtils.getNodeNick(peer)});</pre>
 	 * @exception NotAuthorizedException may be thrown if the connection session
 	 * is not yet authenticated but authorization is required to access roster data.
+	 * @exception RosterRetrievingException may be thrown when an unknown error in the
+	 * custom roster retrieving logic occurs. A message from the exception must be sent
+	 * back to a user as an error message.
+	 * @exception RepositoryAccessException may be thrown when there is an error accessing
+	 * the roster data repository, even though the user is correctly authenticated. No
+	 * error is sent back to a user, only an empty roster but the repository exception is
+	 * logged to the log file.
 	 */
 	Element getBuddyItem(XMPPResourceConnection session, JID buddy)
-					throws NotAuthorizedException;
+					throws NotAuthorizedException, RosterRetrievingException,
+							RepositoryAccessException;
 
 	/**
-	 * Method description
+	 * Returns a new roster Item element with additional, non-standard information
+	 * for a given item. This is a way to associate custom roster information with
+	 * a contact.
 	 *
 	 *
 	 * @param item is a <code>Element</code>
@@ -169,9 +188,17 @@ public interface DynamicRosterIfc {
 	 * @return a <code>List<Element></code> value
 	 * @exception NotAuthorizedException may be thrown if the connection session
 	 * is not yet authenticated but authorization is required to access roster data.
+	 * @exception RosterRetrievingException may be thrown when an unknown error in the
+	 * custom roster retrieving logic occurs. A message from the exception must be sent
+	 * back to a user as an error message.
+	 * @exception RepositoryAccessException may be thrown when there is an error accessing
+	 * the roster data repository, even though the user is correctly authenticated. No
+	 * error is sent back to a user, only an empty roster but the repository exception is
+	 * logged to the log file.
 	 */
 	List<Element> getRosterItems(XMPPResourceConnection session)
-					throws NotAuthorizedException;
+					throws NotAuthorizedException, RosterRetrievingException,
+							RepositoryAccessException;
 
 	//~--- set methods ----------------------------------------------------------
 
@@ -185,4 +212,4 @@ public interface DynamicRosterIfc {
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/10/31
+//~ Formatted in Tigase Code Convention on 13/11/26

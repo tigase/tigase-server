@@ -41,10 +41,12 @@ import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.impl.roster.DynamicRoster;
+import tigase.xmpp.impl.roster.RepositoryAccessException;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterElement;
 import tigase.xmpp.impl.roster.RosterElementIfc;
 import tigase.xmpp.impl.roster.RosterFactory;
+import tigase.xmpp.impl.roster.RosterRetrievingException;
 import tigase.xmpp.JID;
 import tigase.xmpp.NoConnectionIdException;
 import tigase.xmpp.NotAuthorizedException;
@@ -275,7 +277,12 @@ public class Presence
 		// Let's process BOTH first and then TO_ONLY and FROM_ONLY separately
 		JID[] buddies = roster_util.getBuddies(session, SUB_BOTH);
 
-		buddies = DynamicRoster.addBuddies(session, settings, buddies);
+		try {
+			buddies = DynamicRoster.addBuddies(session, settings, buddies);
+		} catch (RosterRetrievingException | RepositoryAccessException ex) {
+
+			// Ignore, handled in the JabberIqRoster code
+		}
 		if (buddies != null) {
 			for (JID buddy : buddies) {
 				if (log.isLoggable(Level.FINEST)) {
@@ -778,7 +785,12 @@ public class Presence
 
 		JID[] buddies = roster.getBuddies(session, subscrs);
 
-		buddies = DynamicRoster.addBuddies(session, settings, buddies);
+		try {
+			buddies = DynamicRoster.addBuddies(session, settings, buddies);
+		} catch (RosterRetrievingException | RepositoryAccessException ex) {
+
+			// Ignore, handled in the JabberIqRoster code
+		}
 		if (buddies != null) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Buddies found: " + Arrays.toString(buddies));
@@ -1224,8 +1236,14 @@ public class Presence
 
 		// If other users are in 'to' or 'both' contacts, broadcast
 		// their presences to all active resources
-		if (roster_util.isSubscribedTo(session, presBuddy) || (DynamicRoster.getBuddyItem(
-				session, settings, presBuddy) != null)
+		Element dynItem;
+
+		try {
+			dynItem = DynamicRoster.getBuddyItem(session, settings, presBuddy);
+		} catch (RosterRetrievingException | RepositoryAccessException ex) {
+			dynItem = null;
+		}
+		if (roster_util.isSubscribedTo(session, presBuddy) || (dynItem != null)
 
 		// ||
 		//// This might be just unsubscribed buddy
@@ -1278,8 +1296,14 @@ public class Presence
 			Queue<Packet> results, Map<String, Object> settings, PresenceType presenceType)
 					throws NotAuthorizedException, TigaseDBException, PacketErrorTypeException {
 		SubscriptionType buddy_subscr = null;
+		Element          dynItem;
 
-		if (DynamicRoster.getBuddyItem(session, settings, packet.getStanzaFrom()) != null) {
+		try {
+			dynItem = DynamicRoster.getBuddyItem(session, settings, packet.getStanzaFrom());
+		} catch (RosterRetrievingException | RepositoryAccessException ex) {
+			dynItem = null;
+		}
+		if (dynItem != null) {
 			buddy_subscr = SubscriptionType.both;
 		} else {
 			buddy_subscr = roster_util.getBuddySubscription(session, packet.getStanzaFrom());
@@ -1960,4 +1984,4 @@ public class Presence
 }    // Presence
 
 
-//~ Formatted in Tigase Code Convention on 13/11/27
+//~ Formatted in Tigase Code Convention on 13/11/26
