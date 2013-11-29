@@ -112,14 +112,12 @@ public class StatisticsCollector
 
 	//~--- fields ---------------------------------------------------------------
 
-	private int       historySize                 = 0;
-	private TimerTask initializationCompletedTask = null;
-
-	// ~--- fields ---------------------------------------------------------------
-	private ServiceEntity                        serviceEntity = null;
-	private StatisticsProvider                   sp            = null;
+	private int                                  historySize                 = 0;
+	private TimerTask                            initializationCompletedTask = null;
+	private ServiceEntity                        serviceEntity               = null;
+	private StatisticsProvider                   sp                          = null;
 	private Map<String, StatisticsArchivizerIfc> archivizers =
-			new ConcurrentSkipListMap<String, StatisticsArchivizerIfc>();
+			new ConcurrentSkipListMap<>();
 	private ArchivizerRunner arch_runner = new ArchivizerRunner();
 
 	// private ServiceEntity stats_modules = null;
@@ -128,8 +126,6 @@ public class StatisticsCollector
 	private long  updateInterval   = 10;
 
 	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -188,8 +184,6 @@ public class StatisticsCollector
 			initializationCompletedTask.run();
 		}
 	}
-
-	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -349,8 +343,6 @@ public class StatisticsCollector
 		statsArchivTasks.cancel();
 	}
 
-	// ~--- methods --------------------------------------------------------------
-
 	/**
 	 * Method description
 	 *
@@ -372,8 +364,6 @@ public class StatisticsCollector
 	}
 
 	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -770,4 +760,4 @@ public class StatisticsCollector
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/10/23
+//~ Formatted in Tigase Code Convention on 13/11/29

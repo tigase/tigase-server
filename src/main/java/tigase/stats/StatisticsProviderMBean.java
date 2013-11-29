@@ -221,6 +221,22 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
+	 * @return a value of <code>long</code>
+	 */
+	public long getDirectMemUsed();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of <code>long[]</code>
+	 */
+	public long[] getDirectMemUsedHistory();
+
+	/**
+	 * Method description
+	 *
+	 *
 	 *
 	 *
 	 * @return a value of <code>float</code>
@@ -448,4 +464,4 @@ public interface StatisticsProviderMBean {
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/09/21
+//~ Formatted in Tigase Code Convention on 13/11/29
