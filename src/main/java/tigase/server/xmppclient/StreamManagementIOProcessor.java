@@ -336,7 +336,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		if (streamClosed) {
 			service.getSessionData().remove(STREAM_ID_KEY);
 		}
-
+				
 //		try {
 //			throw new Exception();
 //		} catch (Throwable ex) {

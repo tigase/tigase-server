@@ -49,6 +49,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
+import tigase.db.TigaseDBException;
+import tigase.xmpp.StanzaType;
 
 /**
  * Message forwarder class. Forwards <code>Message</code> packet to it's destination
@@ -62,6 +64,7 @@ import java.util.Queue;
 public class Message
 				extends XMPPProcessor
 				implements XMPPProcessorIfc {
+	
 	private static final String     ELEM_NAME = tigase.server.Message.ELEM_NAME;
 	private static final String[][] ELEMENTS  = {
 		{ ELEM_NAME }
@@ -70,9 +73,11 @@ public class Message
 
 	/** Class logger */
 	private static final Logger   log    = Logger.getLogger(Message.class.getName());
+	private static final String   DELIVERY_RULES_KEY = "delivery-rules";
 	private static final String   XMLNS  = "jabber:client";
 	private static final String[] XMLNSS = { XMLNS };
 
+	private MessageDeliveryRules deliveryRules = MessageDeliveryRules.inteligent;
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -86,6 +91,15 @@ public class Message
 		return ID;
 	}
 
+	@Override
+	public void init(Map<String, Object> settings) throws TigaseDBException {
+		super.init(settings);
+		
+		deliveryRules = settings.containsKey(DELIVERY_RULES_KEY) 
+				? MessageDeliveryRules.inteligent 
+				: MessageDeliveryRules.valueOf((String) settings.get(DELIVERY_RULES_KEY));
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -113,6 +127,42 @@ public class Message
 
 		// You may want to skip processing completely if the user is offline.
 		if (session == null) {
+			if (packet.getStanzaTo() != null && packet.getStanzaTo().getResource() != null) {
+				if (deliveryRules != MessageDeliveryRules.strict) {
+					StanzaType type = packet.getType();
+					if (type == null) {
+						type = StanzaType.normal;
+					}
+					switch (type) {
+						case chat:
+							// try to deliver this message to all available resources so we should
+							// treat it as a stanza with bare "to" attribute
+							Packet result = packet.copyElementOnly();
+							result.initVars(packet.getStanzaFrom(), 
+									packet.getStanzaTo().copyWithoutResource());
+							results.offer(result);							
+							break;
+							
+						case error:
+							// for error packet we should ignore stanza according to RFC 6121
+							break;
+							
+						case headline:
+						case groupchat:
+						case normal:
+						default:
+							// for each of this types RFC 6121 recomends silent ignoring of stanza
+							// or to return error recipient-unavailable - we will send error as
+							// droping packet without response may not be a good idea
+							results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(
+									packet, "The recipient is no longer available.", true));
+					}
+				}
+				else {
+					results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet, 
+							"The recipient is no longer available.", true));
+				}
+			}
 			return;
 		}    // end of if (session == null)
 		try {
@@ -128,6 +178,17 @@ public class Message
 					log.log(Level.FINEST, "Message 'to' this user, packet: {0}, for session: {1}",
 							new Object[] { packet,
 							session });
+				}
+				
+				if (packet.getStanzaFrom() != null && session.isUserId(packet.getStanzaFrom().getBareJID())) {
+					JID connectionId = session.getConnectionId();
+					if (connectionId.equals(packet.getPacketFrom())) {
+						results.offer(packet.copyElementOnly());
+						// this would cause message packet to be stored in offline storage and will not
+						// send recipient-unavailable error but it will behave the same as a message to 
+						// unavailable resources from other sessions or servers
+						return;
+					}
 				}
 
 				// Yes this is message to 'this' client
@@ -262,6 +323,11 @@ public class Message
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
+	}
+	
+	private static enum MessageDeliveryRules {
+		strict,
+		inteligent
 	}
 }    // Message
 

@@ -385,9 +385,8 @@ public abstract class IOService<RefObject>
 			throw new IllegalStateException("SSL mode is already activated.");
 		}
 
-		TLSWrapper wrapper = new TLSWrapper(TLSUtil.getSSLContext("SSL", (String) sessionData
-				.get(HOSTNAME_KEY), clientMode), this, (String[]) sessionData.get(
-				SSL_PROTOCOLS_KEY), clientMode, wantClientAuth);
+		TLSWrapper wrapper = new TLSWrapper(TLSUtil.getSSLContext("SSL", (String) sessionData.get(HOSTNAME_KEY), clientMode),
+				this, clientMode, wantClientAuth);
 
 		socketIO = new TLSIO(socketIO, wrapper, byteOrder());
 		setLastTransferTime();
@@ -436,8 +435,7 @@ public abstract class IOService<RefObject>
 				sslContext = TLSUtil.getSSLContext("TLS", tls_hostname, clientMode);
 			}
 
-			TLSWrapper wrapper = new TLSWrapper(sslContext, this, (String[]) sessionData.get(
-					SSL_PROTOCOLS_KEY), clientMode, wantClientAuth);
+			TLSWrapper wrapper = new TLSWrapper(sslContext, this, clientMode, wantClientAuth);
 
 			socketIO = new TLSIO(socketIO, wrapper, byteOrder());
 			setLastTransferTime();

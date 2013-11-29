@@ -158,6 +158,13 @@ public class ClusterConnectionManager
 	private static final String SERVICE_CONNECTED_TASK_FUTURE =
 			"service-connected-task-future";
 
+	/**
+	 * Default value for the system property for configuration protection
+	 * from system overload and DOS attack.
+	 */
+	public static int ELEMENTS_NUMBER_LIMIT_CLUSTER_PROP_VAL = 100 * 1000;
+
+
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
@@ -794,6 +801,8 @@ public class ClusterConnectionManager
 		}
 		props.put(CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY, conns_int);
 
+		props.put( ELEMENTS_NUMBER_LIMIT_PROP_KEY, ELEMENTS_NUMBER_LIMIT_CLUSTER_PROP_VAL);
+
 		return props;
 	}
 
@@ -913,6 +922,11 @@ public class ClusterConnectionManager
 			log.log(Level.SEVERE, "Can not create items repository instance for class: " +
 					repo_class, e);
 		}
+
+		if ( props.get( ELEMENTS_NUMBER_LIMIT_PROP_KEY ) != null ){
+			elements_number_limit = (Integer) props.get( ELEMENTS_NUMBER_LIMIT_PROP_KEY );
+		}
+
 		super.setProperties(props);
 	}
 
@@ -1074,10 +1088,6 @@ public class ClusterConnectionManager
 		defs.put(PORT_SOCKET_PROP_KEY, SocketType.plain);
 		defs.put(PORT_IFC_PROP_KEY, PORT_IFC_PROP_VAL);
 
-//  if (log.isLoggable(Level.FINEST)) {
-//    log.log(Level.FINEST, "ParamsForPort, item: {0}, defs: {1}", new Object[] { item,
-//        defs });
-//  }
 		return defs;
 	}
 
@@ -1091,7 +1101,7 @@ public class ClusterConnectionManager
 	 */
 	@Override
 	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
-		return new XMPPIOService<Object>();
+		return new XMPPIOService<>();
 	}
 
 	/**

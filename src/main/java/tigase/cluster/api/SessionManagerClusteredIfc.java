@@ -41,6 +41,7 @@ import tigase.xmpp.XMPPSession;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.concurrent.ConcurrentHashMap;
+import tigase.xml.Element;
 
 /**
  *
@@ -123,6 +124,8 @@ public interface SessionManagerClusteredIfc
 	 * @return a value of <code>ConcurrentHashMap<BareJID,XMPPSession></code>
 	 */
 	ConcurrentHashMap<BareJID, XMPPSession> getXMPPSessions();
+	
+	void processPresenceUpdate(XMPPSession session, Element element);
 }
 
 

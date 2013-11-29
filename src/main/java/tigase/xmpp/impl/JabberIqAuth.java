@@ -422,9 +422,11 @@ public class JabberIqAuth
 	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
 		if ((session == null) || session.isAuthorized()) {
 			return null;
+		} else if (session.getDomain().isTlsRequired() && !session.isEncrypted()) {
+			return null;
 		} else {
 			return FEATURES;
-		}    // end of if (session.isAuthorized()) else
+		} // end of if (session.isAuthorized()) else
 	}
 }    // JabberIqAuth
 

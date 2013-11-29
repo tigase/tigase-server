@@ -311,11 +311,20 @@ public class MobileV3
 						prependResultsThreadQueue.set(prependResults);
 					}
 					
-					synchronized (presenceQueue) {
-						for (Packet p : presenceQueue.values()) {
-							prependResults.offer(p);
+					try {
+						synchronized (presenceQueue) {
+							JID connId = session.getConnectionId();
+							for (Packet p : presenceQueue.values()) {
+								// we need to set packet to again in case Stream
+								// Management resumption happend in meanwhile
+								p.setPacketTo(connId);
+								prependResults.offer(p);
+							}
+							presenceQueue.clear();
 						}
-						presenceQueue.clear();
+					}
+					catch (NoConnectionIdException ex) {
+						log.log(Level.SEVERE, "this should not happen", ex);
 					}
 					
 				case need_packet_flush:
@@ -326,12 +335,22 @@ public class MobileV3
 							prependResultsThreadQueue.set(prependResults);
 						}
 					}
-					
-					synchronized (packetQueue) {
-						prependResults.addAll(packetQueue);
-						packetQueue.clear();
+					try {
+						synchronized (packetQueue) {
+							JID connId = session.getConnectionId();
+							Packet p = null;
+							while ((p = packetQueue.poll()) != null) {
+								// we need to set packet to again in case Stream
+								// Management resumption happend in meanwhile
+								p.setPacketTo(connId);
+								prependResults.offer(p);
+							}
+							packetQueue.clear();
+						}
 					}
-				
+					catch (NoConnectionIdException ex) {
+						log.log(Level.SEVERE, "this should not happen", ex);
+					}				
 				case queued:					
 					break;
 					

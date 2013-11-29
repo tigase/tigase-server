@@ -30,15 +30,13 @@ import tigase.db.AuthorizationException;
 import tigase.db.AuthRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
-
 import tigase.server.Presence;
 import tigase.server.xmppsession.SessionManagerHandler;
-
 import tigase.util.TigaseStringprepException;
-
 import tigase.xml.Element;
 
 //~--- JDK imports ------------------------------------------------------------
+
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
@@ -1051,6 +1049,11 @@ public class XMPPResourceConnection
 	@Override
 	protected void login() {
 		authenticationTime = System.currentTimeMillis();
+	}
+
+	public boolean isEncrypted() {
+		String tls = (String) getSessionData("starttls");
+		return tls != null && "true".equals(tls);
 	}
 }    // XMPPResourceConnection
 
