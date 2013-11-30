@@ -568,10 +568,13 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 
 		// Artur: Moved it to the front of the method for performance reasons.
 		// TODO: make sure it does not affect logic.
-		if ((packet.getPacketFrom() != null) &&!sm.getComponentId().equals(packet
-				.getPacketFrom())) {
-			return false;
-		}
+		// Andrzej: this blocks sending responses from other components if 
+		// packet was processed on other node that node of user session, ie.
+		// when new PubSub clustered component is used
+//		if ((packet.getPacketFrom() != null) &&!sm.getComponentId().equals(packet
+//				.getPacketFrom())) {
+//			return false;
+//		}
 
 		// This is for packet forwarding logic.
 		// Some packets are for certain not forwarded like packets without to
