@@ -72,7 +72,6 @@ try {
 	def sessions = (Map<BareJID, XMPPSession>)userSessions
 	def vhost_man = (VHostManagerIfc)vhostMan
 	def admins = (Set)adminsSet
-	def cluster = (ClusteringStrategyIfc)clusterStrategy
 
 	def stanzaFromBare = p.getStanzaFrom().getBareJID();
 	def isServiceAdmin = admins.contains(stanzaFromBare);
@@ -104,18 +103,20 @@ try {
 	}
 
 	if 	( rosterNotifyCluster ) {
+		if (this.hasProperty("clusterStrategy")) {
+	        def cluster = (ClusteringStrategyIfc) clusterStrategy
+			List<JID> cl_conns = cluster.getAllNodes()
+			if (cl_conns && cl_conns.size() > 0) {
+				cl_conns.each { node ->
 
-		List<JID> cl_conns = cluster.getAllNodes()
-		if (cl_conns && cl_conns.size() > 0) {
-			cl_conns.each { node ->
+					def forward = p.copyElementOnly();
+					Command.removeFieldValue(forward, ROSTER_NOTIFY_CLUSTER)
+					Command.addHiddenField(forward, ROSTER_NOTIFY_CLUSTER, false.toString())
+					forward.setPacketTo( node );
+					forward.setPermissions( Permissions.ADMIN );
 
-				def forward = p.copyElementOnly();
-				Command.removeFieldValue(forward, ROSTER_NOTIFY_CLUSTER)
-				Command.addHiddenField(forward, ROSTER_NOTIFY_CLUSTER, false.toString())
-				forward.setPacketTo( node );
-				forward.setPermissions( Permissions.ADMIN );
-
-				results.offer(forward)
+					results.offer(forward)
+				}
 			}
 		}
 	}
