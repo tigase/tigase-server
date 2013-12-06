@@ -1040,7 +1040,7 @@ public class MessageRouter
 			return comp;
 		}
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "None compId matches: {0}, for map: {1}", new Object[] { jid,
+			log.log(Level.FINEST, "None compId matches (fast lookup): {0}, for map: {1}", new Object[] { jid,
 					components_byId });
 		}
 
@@ -1059,7 +1059,7 @@ public class MessageRouter
 		}
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST,
-					"Still no comp name matches: {0}, for map: {1}, for all VHosts: {3}",
+					"Still no comp name matches (VHost lookup): {0}, for map: {1}, for all VHosts: {3}",
 					new Object[] { jid,
 					components, vHostManager.getAllVHosts() });
 		}
@@ -1078,6 +1078,12 @@ public class MessageRouter
 			if ((comp != null) && (isLocalDomain(basename) || basename.equals(getDefHostName()
 					.getDomain()))) {
 				return comp;
+			}
+			if ( log.isLoggable( Level.FINEST ) ){
+				log.log( Level.FINEST,
+								 "Component match failed: {0}, for comp: {1}, basename: {3}",
+								 new Object[] { jid,
+																components, comp, basename } );
 			}
 		}
 
