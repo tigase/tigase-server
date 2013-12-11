@@ -38,6 +38,7 @@ import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
+import static tigase.xmpp.impl.Presence.AUTO_AUTHORIZE_PROP_KEY;
 import tigase.xmpp.impl.roster.DynamicRoster;
 import tigase.xmpp.impl.roster.RepositoryAccessException;
 import tigase.xmpp.impl.roster.RosterAbstract;
@@ -96,7 +97,9 @@ public class JabberIqRoster
 	private static final String[] IQ_QUERY_ITEM_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME,
 			"item" };
 	private static final String ID = RosterAbstract.XMLNS;
-
+	/** variable holding setting regarding auto authorisation of items added to
+	 * user roset */
+	private static boolean autoAuthorize = false;
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
@@ -129,6 +132,16 @@ public class JabberIqRoster
 	public String id() {
 		return ID;
 	}
+
+	@Override
+	public void init( Map<String, Object> settings ) throws TigaseDBException {
+		autoAuthorize = Boolean.parseBoolean( (String) settings.get( AUTO_AUTHORIZE_PROP_KEY ) );
+		if ( autoAuthorize ){
+			log.config( "Automatic presence subscription of new roster items enabled,"
+									+ "results in less strict XMPP specs compatibility " );
+		}
+	}
+
 
 	/**
 	 * Method description
@@ -708,7 +721,7 @@ public class JabberIqRoster
 
 						String type = item.getAttributeStaticStr(Packet.TYPE_ATT);
 
-						if ((type != null) && type.equals(ANON)) {
+						if ( ( type != null ) && type.equals( ANON ) || autoAuthorize ){
 							roster_util.setBuddySubscription(session, SubscriptionType.both, buddy);
 
 							Element pres = (Element) session.getSessionData(XMPPResourceConnection
@@ -723,6 +736,9 @@ public class JabberIqRoster
 							pres.setAttribute(Packet.TO_ATT, buddy.toString());
 							pres.setAttribute(Packet.FROM_ATT, session.getJID().toString());
 							results.offer(Packet.packetInstance(pres, session.getJID(), buddy));
+							if ( autoAuthorize ){
+								Presence.sendPresence( StanzaType.subscribe, session.getJID(), buddy, results, null );
+							}
 						}
 
 						Element new_buddy = roster_util.getBuddyItem(session, buddy);
