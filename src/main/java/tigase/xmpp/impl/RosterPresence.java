@@ -239,7 +239,6 @@ public class RosterPresence
 	public void stopped(final XMPPResourceConnection session, final Queue<Packet> results,
 			final Map<String, Object> settings) {
 		presenceProc.stopped(session, results, settings);
-		rosterProc.stopped(session, results, settings);
 	}
 
 	/**
