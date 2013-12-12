@@ -58,18 +58,6 @@ public abstract class XMPPProcessorAbstract
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 * @param settings
-	 *
-	 * @throws XMPPException
-	 */
 	@Override
 	public void process(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
@@ -314,11 +302,6 @@ public abstract class XMPPProcessorAbstract
 					throws PacketErrorTypeException {
 		try {
 
-//    Packet result = packet.copyElementOnly();
-//
-//    result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
-//    result.setPacketFrom(packet.getTo());
-//    results.offer(result);
 			List<XMPPResourceConnection> conns    = new ArrayList<XMPPResourceConnection>(5);
 			String                       resource = packet.getStanzaTo().getResource();
 
