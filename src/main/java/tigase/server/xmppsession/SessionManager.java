@@ -2358,7 +2358,7 @@ public class SessionManager
 
 			if (result == Authorization.AUTHORIZED) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "XMPPProcessorIfc: {0} ({1}" + ")" + "\n Request: " +
+					log.log(Level.FINEST, "XMPPProcessorIfc: {0} ({1}" + ")" + "Request: " +
 							"{2}, conn: {3}", new Object[] { processor.getClass().getSimpleName(),
 							processor.id(), packet, connection });
 				}
