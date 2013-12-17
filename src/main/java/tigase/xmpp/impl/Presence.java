@@ -1835,7 +1835,10 @@ public class Presence
 	 * @param buddy   JID of a contact for which a check is to be performed.
 	 * @param session user session which keeps all the user session data and also
 	 *                gives an access to the user's repository data.
-	 * @return
+	 *
+	 * @return {code true} if the contacts requires sending presence (e.g. is not
+	 *         online and option skipOffline is enabled)
+	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */

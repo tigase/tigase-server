@@ -140,7 +140,7 @@ public abstract class RosterAbstract {
 	public static final EnumSet<StanzaType> INITIAL_PRESENCES = EnumSet.of(StanzaType
 			.available, StanzaType.unavailable);
 
-	/** Holds all {@SubscriptionType} elements that can be perceived as <em>FROM</em> subscription */
+	/** Holds all {link @SubscriptionType} elements that can be perceived as <em>FROM</em> subscription */
 	public static final EnumSet<SubscriptionType> FROM_SUBSCRIBED = EnumSet.of(
 			SubscriptionType.from, SubscriptionType.from_pending_out, SubscriptionType.both);
 
