@@ -10,7 +10,6 @@ import javax.security.sasl.SaslServerFactory;
 
 import tigase.auth.mechanisms.SaslEXTERNAL;
 import tigase.auth.mechanisms.TigaseSaslServerFactory;
-import tigase.server.XMPPServer;
 import tigase.xmpp.XMPPResourceConnection;
 
 public class DefaultMechanismSelector implements MechanismSelector {
