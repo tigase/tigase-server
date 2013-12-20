@@ -311,6 +311,18 @@
 			<version>2.0.1-SNAPSHOT</version>
 			<scope>runtime</scope>
 		</dependency>
+		<dependency>
+			<groupId>tigase</groupId>
+			<artifactId>tigase-acs-muc</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>tigase</groupId>
+			<artifactId>tigase-acs-pubsub</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<scope>runtime</scope>
+		</dependency>
 
 
 		<!--databases-->
