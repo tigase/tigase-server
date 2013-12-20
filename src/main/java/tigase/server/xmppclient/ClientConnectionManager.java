@@ -1083,7 +1083,7 @@ public class ClientConnectionManager
 	 */
 	@Override
 	protected boolean isTlsWantClientAuthEnabled() {
-		return tlsWantClientAuthEnabled;
+		return clientTrustManagerFactory.isSaslExternalAvailable();
 	}
 
 	private List<Element> getFeatures(XMPPIOService service) {

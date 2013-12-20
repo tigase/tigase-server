@@ -32,6 +32,8 @@ public class ClientTrustManagerFactory {
 
 	private final TrustManager[] trustWrapper;
 
+	private boolean saslExternalAvailable=true;
+
 	public ClientTrustManagerFactory() {
 		this.trustWrapper = new TrustManager[] { new X509TrustManager() {
 
@@ -95,6 +97,7 @@ public class ClientTrustManagerFactory {
 			tmf.init(keystore);
 			TrustManager[] trustManagers = tmf.getTrustManagers();
 			trustManager = (X509TrustManager) trustManagers[0];
+			this.saslExternalAvailable = true;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -105,5 +108,10 @@ public class ClientTrustManagerFactory {
 			loadTrustedCert((String) props.get(CA_CERT_PATH));
 		}
 	}
+
+	public boolean isSaslExternalAvailable() {
+		return saslExternalAvailable;
+	}
+	
 
 }
