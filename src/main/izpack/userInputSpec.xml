@@ -196,6 +196,12 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<field type="check" variable="acsComponent" condition="clusterMode">
 			<spec txt="Tigase Advanced Clustering Strategy (ACS) Component" true="on" false="off"	set="false"/>
 		</field>
+		<field type="check" variable="acsPubSubComponent"  condition="{{clusterMode+acsComponent}}">
+			<spec txt="PubSub ACS" true="acs" false="off"	set="false"/>
+		</field>
+		<field type="check" variable="acsMUCComponent"  condition="{{clusterMode+acsComponent}}">
+			<spec txt="MUC ACS" true="acs" false="off"	set="false"/>
+		</field>
 
 
 	<!--		<field type="text" align="left" variable="clusterNodes">

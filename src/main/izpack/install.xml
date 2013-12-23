@@ -47,6 +47,13 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 			<author name="Wojciech Czubaszek" email="wojciech.czubaszek@tigase.org"/>
 			<author name="Eric Dziewa" email="eric.dziewa@tigase.org"/>
 			<author name="Jacek Predki" email="jacek.predki@tigase.com"/>
+			<author name="Piotr Kontek" email=""/>
+			<author name="Alexander Gnauck" email=""/>
+			<author name="Tomasz Sterna" email=""/>
+			<author name="Mateusz Fiołka" email=""/>
+			<author name="David Pache" email=""/>
+			<author name="Peter Sandström" email=""/>
+			<author name="Yonas Yanfa" email=""/>
 		</authors>
 		<url>http://www.tigase.org/</url>
 		<appsubpath>Tigase-$APP_VER</appsubpath>
@@ -127,6 +134,14 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		</condition>
 		<condition type="variable" id="acsSelected">
 			<name>acsComponent</name>
+			<value>on</value>
+		</condition>
+		<condition type="variable" id="acsMUCSelected">
+			<name>acsMUCComponent</name>
+			<value>on</value>
+		</condition>
+		<condition type="variable" id="acsPubSubSelected">
+			<name>acsPubSubComponent</name>
 			<value>on</value>
 		</condition>
 	</conditions>
@@ -269,7 +284,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 			<panel classname="UserInputPanel" condition="advancedSelected"
 						 id="AdvancedConfigurationPanel.id"/>
 
-			<panel classname="UserInputPanel" condition="acsSelected"
+			<panel classname="UserInputPanel" condition="acsSelected|acsMUCSelected|acsPubSubSelected"
 						 id="AdvancedClusteringStrategyPanel.id"/>
 			<panel classname="UserInputPanel" condition="sqlserverSelected"
 						 id="SqlServerPanel.id"/>
@@ -394,6 +409,8 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 					<include name="jdmkrt.jar"/>
 					<include name="hamcrest-core.jar"/>
 					<include name="tigase-acs.jar"/>
+					<include name="tigase-acs-muc.jar"/>
+					<include name="tigase-acs-pubsub.jar"/>
 					<include name="licence-lib.jar"/>
 					<include name="tigase-stats-collector-library.jar"/>
 					<include name="tigase-stats-collector-provider.jar"/>
@@ -403,6 +420,9 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 			<pack name="Groovy scripting" required="no">
 				<description>Various Groovy scripts extending server functionality</description>
 				<fileset dir="src/main/groovy/tigase/admin" targetdir="$INSTALL_PATH/scripts/admin">
+					<include name="*.*"/>
+				</fileset>
+				<fileset dir="scripts/admin" targetdir="$INSTALL_PATH/scripts/admin">
 					<include name="*.*"/>
 				</fileset>
 				<fileset dir="jars" targetdir="$INSTALL_PATH/${jarsDir}">
@@ -465,6 +485,9 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 				<description>Interface for the service administration, monitoring and exchange data between Tigase and external system</description>
 				<fileset dir="./etc" targetdir="${INSTALL_PATH}/etc">
 					<include name="tigase-http-context.xml"/>
+				</fileset>
+				<fileset dir="." targetdir="${INSTALL_PATH}" defaultexcludes="yes">
+					<include name="scripts/rest/**/*"/>
 				</fileset>
 				<fileset dir="./jars" targetdir="${INSTALL_PATH}/${jarsDir}">
 					<include name="jetty-osgi-boot.jar"/>

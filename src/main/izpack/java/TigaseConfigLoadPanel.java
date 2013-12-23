@@ -261,6 +261,30 @@ class TigaseConfigLoadHelper {
 						}
 
 
+						if (varName.equals(TigaseConfigConst.ACS_MUC_COMP)) {
+							for (int i = 1 ; i <= 10 ; i++ ) {
+								if ((props.getProperty("--comp-name-" + i) != null
+										&& props.getProperty("--comp-class-" + i).equals(TigaseConfigConst.ACS_MUC_COMP_CLASS))) {
+										idata.setVariable(TigaseConfigConst.ACS_MUC_COMP, "acs");
+								}
+							}
+								Debug.trace("Loaded: " + varName + " = " +
+									idata.getVariable(TigaseConfigConst.MUC_COMP));
+							continue;
+						}
+
+						if (varName.equals(TigaseConfigConst.ACS_PUBSUB_COMP)) {
+							for (int i = 1 ; i <= 10 ; i++ ) {
+								if ((props.getProperty("--comp-name-" + i) != null
+										&& props.getProperty("--comp-class-" + i).equals(TigaseConfigConst.ACS_PUBSUB_COMP_CLASS))) {
+										idata.setVariable(TigaseConfigConst.ACS_PUBSUB_COMP, "acs");
+								}
+							}
+								Debug.trace("Loaded: " + varName + " = " +
+									idata.getVariable(TigaseConfigConst.PUBSUB_COMP));
+							continue;
+						}
+
 						if (varName.equals(TigaseConfigConst.ACS_COMP)) {
 							if ((props.getProperty("--sm-cluster-strategy-class") != null
 									&& props.getProperty("--sm-cluster-strategy-class").equals(TigaseConfigConst.ACS_COMP_CLASS))) {
