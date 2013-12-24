@@ -64,14 +64,15 @@
 
 	<profiles>
 		<profile>
-			<id>osgi</id>
+			<id>dist</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
 				<property>
-					<name>profile.osgi</name>
+					<name>dist</name>
 				</property>
 			</activation>
 			<properties>
+				<maven.javadoc.skip>false</maven.javadoc.skip>
 				<packaging.type>bundle</packaging.type>
 			</properties>
 		</profile>

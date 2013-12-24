@@ -25,12 +25,21 @@
 			</activation>
 			<properties>
 				<packaging.type>bundle</packaging.type>
+				<maven.javadoc.skip>true</maven.javadoc.skip>
 			</properties>
 		</profile>
 		<profile>
 			<id>jar</id>
 			<properties>
 				<packaging.type>jar</packaging.type>
+				<maven.javadoc.skip>true</maven.javadoc.skip>
+			</properties>
+		</profile>
+		<profile>
+			<id>dist</id>
+			<properties>
+				<packaging.type>bundle</packaging.type>
+				<maven.javadoc.skip>false</maven.javadoc.skip>
 			</properties>
 		</profile>
 	</profiles>
@@ -79,6 +88,31 @@
 					</instructions>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<source>1.7</source>
+							<quiet>true</quiet>
+							<aggregate>true</aggregate>
+							<reportOutputDirectory>${project.reporting.outputDirectory}/docs</reportOutputDirectory>
+							<destDir>docs</destDir>
+
+							<finalName>${project.artifactId}-${project.version}-b${gitVersion}</finalName>
+							<jarOutputDirectory>pack</jarOutputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
 	<dependencies>
