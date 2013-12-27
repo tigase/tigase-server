@@ -55,10 +55,6 @@
 		<developerConnection>scm:git:https://svn.tigase.org/git/tigase-server.git</developerConnection>
 		<url>https://projects.tigase.org/projects/tigase-server/repository</url>
 	</scm>
-	<organization>
-		<name>Tigase</name>
-		<url>http://www.tigase.org</url>
-	</organization>
 	<build>
 		<finalName>${project.artifactId}</finalName>
 			<plugins>
