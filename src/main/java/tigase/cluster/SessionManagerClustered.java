@@ -185,6 +185,12 @@ public class SessionManagerClustered
 		}
 		super.handleLogout(userId, conn); //To change body of generated methods, choose Tools | Templates.
 	}
+
+	@Override
+	public void handleResourceBind(XMPPResourceConnection conn) {
+		super.handleResourceBind(conn);
+		strategy.handleLocalUserResourceBind(conn);
+	}
 	
 	/**
 	 * Initialize a mapping of key/value pairs which can be used in scripts

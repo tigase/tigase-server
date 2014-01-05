@@ -176,6 +176,16 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 
 		// Do nothing
 	}
+	
+	/**
+	 * Method description
+	 * 
+	 * 
+	 * @param conn 
+	 */
+	public void handleLocalUserResourceBind(XMPPResourceConnection conn) {
+		
+	}
 
 	/**
 	 * Method description
