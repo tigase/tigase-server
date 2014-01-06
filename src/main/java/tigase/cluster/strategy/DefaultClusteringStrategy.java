@@ -171,6 +171,26 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 
 	/**
 	 * Method description
+	 * 
+	 * 
+	 * @param conn 
+	 */	
+	@Override
+	public void handleLocalResourceBind(XMPPResourceConnection conn) {
+		try {
+			Map<String, String> params = prepareConnectionParams(conn);
+			List<JID> cl_nodes = getAllNodes();
+
+			// ++clusterSyncOutTraffic;
+			cluster.sendToNodes(USER_CONNECTED_CMD, params, sm.getComponentId(), cl_nodes
+					.toArray(new JID[cl_nodes.size()]));
+		} catch (Exception e) {
+			log.log(Level.WARNING, "Problem with broadcast user presence for: " + conn, e);
+		}
+	}	
+	
+	/**
+	 * Method description
 	 *
 	 *
 	 * @param userId
@@ -203,26 +223,6 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 				cluster.sendToNodes(USER_PRESENCE_CMD, params, presence, sm.getComponentId(),
 						null, cl_nodes.toArray(new JID[cl_nodes.size()]));
 			}
-		} catch (Exception e) {
-			log.log(Level.WARNING, "Problem with broadcast user presence for: " + conn, e);
-		}
-	}
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param conn 
-	 */	
-	@Override
-	public void handleLocalUserResourceBind(XMPPResourceConnection conn) {
-		try {
-			Map<String, String> params = prepareConnectionParams(conn);
-			List<JID> cl_nodes = getAllNodes();
-
-			// ++clusterSyncOutTraffic;
-			cluster.sendToNodes(USER_CONNECTED_CMD, params, sm.getComponentId(), cl_nodes
-					.toArray(new JID[cl_nodes.size()]));
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Problem with broadcast user presence for: " + conn, e);
 		}

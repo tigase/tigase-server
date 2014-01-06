@@ -189,7 +189,7 @@ public class SessionManagerClustered
 	@Override
 	public void handleResourceBind(XMPPResourceConnection conn) {
 		super.handleResourceBind(conn);
-		strategy.handleLocalUserResourceBind(conn);
+		strategy.handleLocalResourceBind(conn);
 	}
 	
 	/**
