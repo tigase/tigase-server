@@ -27,14 +27,11 @@ package tigase.xmpp.impl;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.NonAuthUserRepository;
-
 import tigase.server.Command;
 import tigase.server.Packet;
-
 import tigase.vhosts.VHostItem;
-
 import tigase.xml.Element;
-
+import tigase.xmpp.NoConnectionIdException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPProcessor;
@@ -42,6 +39,7 @@ import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 
 //~--- JDK imports ------------------------------------------------------------
+
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -186,7 +184,7 @@ public class StartTLS
 		if ((session != null) && (session.getSessionData(ID) == null)) {
 			VHostItem vhost = session.getDomain();
 
-			if ((vhost != null) && vhost.isTlsRequired()) {
+			if ((vhost != null) && isTlsRequired(session)) {
 				return F_REQUIRED;
 			} else {
 				return F_NOT_REQUIRED;
@@ -196,6 +194,19 @@ public class StartTLS
 		}    // end of if (session.isAuthorized()) else
 	}
 
+	protected boolean isTlsRequired(final XMPPResourceConnection session) {
+		VHostItem vhost = session.getDomain();
+		try {
+			if ("c2s".equals(session.getConnectionId().getLocalpart()))
+				return vhost.isTlsRequired();
+			else
+				return false;
+		} catch (NoConnectionIdException e) {
+			log.log(Level.WARNING, "Can't check sessionId", e);
+			return vhost.isTlsRequired();
+		}
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -225,8 +236,8 @@ public class StartTLS
 
 		// Check whether the TLS has been completed
 		// and the packet is allowed to be processed.
-		if ((vhost != null) && vhost.isTlsRequired() && (session.getSessionData(ID) ==
-				null) &&!packet.isElement(EL_NAME, XMLNS)) {
+		if ((vhost != null) && isTlsRequired(session) && (session.getSessionData(ID) == null)
+				&& !packet.isElement(EL_NAME, XMLNS)) {
 			stop = true;
 		}
 
