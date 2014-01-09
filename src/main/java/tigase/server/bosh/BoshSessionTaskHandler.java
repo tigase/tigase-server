@@ -50,5 +50,7 @@ public interface BoshSessionTaskHandler {
 
 	boolean addOutStreamClosed( Packet packet, BoshSession bs );
 
+	BareJID getDefHostName();
+	
 	BareJID getSeeOtherHostForJID( BareJID userId, SeeOtherHostIfc.Phase ph );
 }

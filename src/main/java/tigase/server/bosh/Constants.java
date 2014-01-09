@@ -100,6 +100,10 @@ public abstract class Constants {
 	/** Field description */
 	protected static final int HOLD_REQUESTS_PROP_VAL = 1;
 
+	/** Name of custom attribute to pass name of host to which 
+	 * BOSH connection is established */
+	protected static final String HOST_ATTR = "host";
+	
 	/** Field description */
 	protected static final String INACTIVITY_ATTR = "inactivity";
 
