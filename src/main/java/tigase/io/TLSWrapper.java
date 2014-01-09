@@ -87,6 +87,10 @@ public class TLSWrapper {
 			"SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA", "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA",
 			"TLS_EMPTY_RENEGOTIATION_INFO_SCSV" };
 
+	private static final String[] HARDENED_MODE_FORBIDDEN_SIPHERS = new String[] { "TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA",
+			"TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA", "SSL_RSA_WITH_3DES_EDE_CBC_SHA", "TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA",
+			"TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA", "SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA", "SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA" };
+	
 	private static String[] enabledProtocols;
 
 	private static String[] enabledCiphers;
@@ -108,10 +112,12 @@ public class TLSWrapper {
 	}
 
 	static {
+		String[] allEnabledCiphers = null;
 		try {
 			SSLEngine tmpE = SSLContext.getDefault().createSSLEngine();
+			allEnabledCiphers = tmpE.getEnabledCipherSuites();
 			log.config("Supported protocols: " + markEnabled(tmpE.getEnabledProtocols(), tmpE.getSupportedProtocols()));
-			log.config("Supported ciphers: " + markEnabled(tmpE.getEnabledCipherSuites(), tmpE.getSupportedCipherSuites()));
+			log.config("Supported ciphers: " + markEnabled(allEnabledCiphers, tmpE.getSupportedCipherSuites()));
 		} catch (NoSuchAlgorithmException e) {
 			log.log(Level.WARNING, "Can't determine supported protocols", e);
 		}
@@ -133,7 +139,9 @@ public class TLSWrapper {
 		if (enabledCiphersProp != null) {
 			enabledCiphers = enabledCiphersProp.split(",");
 		} else if (XMPPServer.isHardenedModeEnabled()) {
-			enabledCiphers = null;
+			ArrayList<String> ciphers = new ArrayList<String>(Arrays.asList(allEnabledCiphers));
+			ciphers.removeAll(Arrays.asList(HARDENED_MODE_FORBIDDEN_SIPHERS));
+			enabledCiphers = ciphers.toArray(new String[] {});
 		} else if (tls_jdk_nss_workaround) {
 			if (log.isLoggable(Level.CONFIG))
 				log.config("Workaround for TLS/SSL bug is enabled");
