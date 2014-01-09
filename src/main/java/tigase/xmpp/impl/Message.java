@@ -96,8 +96,8 @@ public class Message
 		super.init(settings);
 		
 		deliveryRules = settings.containsKey(DELIVERY_RULES_KEY) 
-				? MessageDeliveryRules.inteligent 
-				: MessageDeliveryRules.valueOf((String) settings.get(DELIVERY_RULES_KEY));
+				? MessageDeliveryRules.valueOf((String) settings.get(DELIVERY_RULES_KEY))
+				: MessageDeliveryRules.inteligent;
 	}
 	
 	/**
