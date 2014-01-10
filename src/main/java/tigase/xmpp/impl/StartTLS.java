@@ -184,7 +184,7 @@ public class StartTLS
 		if ((session != null) && (session.getSessionData(ID) == null)) {
 			VHostItem vhost = session.getDomain();
 
-			if ((vhost != null) && isTlsRequired(session)) {
+			if ((vhost != null) && session.isTlsRequired()) {
 				return F_REQUIRED;
 			} else {
 				return F_NOT_REQUIRED;
@@ -192,19 +192,6 @@ public class StartTLS
 		} else {
 			return null;
 		}    // end of if (session.isAuthorized()) else
-	}
-
-	protected boolean isTlsRequired(final XMPPResourceConnection session) {
-		VHostItem vhost = session.getDomain();
-		try {
-			if ("c2s".equals(session.getConnectionId().getLocalpart()))
-				return vhost.isTlsRequired();
-			else
-				return false;
-		} catch (NoConnectionIdException e) {
-			log.log(Level.WARNING, "Can't check sessionId", e);
-			return vhost.isTlsRequired();
-		}
 	}
 	
 	/**
@@ -236,7 +223,7 @@ public class StartTLS
 
 		// Check whether the TLS has been completed
 		// and the packet is allowed to be processed.
-		if ((vhost != null) && isTlsRequired(session) && (session.getSessionData(ID) == null)
+		if ((vhost != null) && session.isTlsRequired() && (session.getSessionData(ID) == null)
 				&& !packet.isElement(EL_NAME, XMLNS)) {
 			stop = true;
 		}
