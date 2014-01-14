@@ -32,7 +32,7 @@ public class ClientTrustManagerFactory {
 
 	private final TrustManager[] trustWrapper;
 
-	private boolean saslExternalAvailable=true;
+	private boolean saslExternalAvailable = false;
 
 	public ClientTrustManagerFactory() {
 		this.trustWrapper = new TrustManager[] { new X509TrustManager() {
