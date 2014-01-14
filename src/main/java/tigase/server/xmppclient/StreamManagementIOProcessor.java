@@ -403,6 +403,14 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 					+ "</failed>");				
 			return;	
 		}
+
+		// if stream has resource binded then we should not resume
+		if (service.getUserJid() != null) {
+			service.writeRawData("<failed xmlns='" + XMLNS + "'>"
+					+ "<unexpected-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>"
+					+ "</failed>");
+			return;
+		}
 		
 		if (services.remove(id, oldService)) {
 			synchronized (oldService) {
