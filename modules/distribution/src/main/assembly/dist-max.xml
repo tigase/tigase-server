@@ -72,6 +72,13 @@
 			</includes>
 		</fileSet>
 		<fileSet>
+			<directory>../../jars</directory>
+			<outputDirectory>jars</outputDirectory>
+			<includes>
+				<include>**/*.old</include>
+			</includes>
+		</fileSet>
+		<fileSet>
 			<directory>../../scripts</directory>
 			<outputDirectory>scripts</outputDirectory>
 			<includes>

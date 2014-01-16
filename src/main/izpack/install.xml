@@ -81,6 +81,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<variable name="DerbyDBPath.unix" value="${INSTALL_PATH}/tigasedb"/>
 		<variable name="mucComponent" value="on"/>
 		<variable name="socks5Component" value="on"/>
+		<variable name="PubSubComponent" value="on"/>
 		<variable name="messageArchiveComponent" value="on"/>
 		<variable name="clusterMode" value="true"/>
 		<variable name="acsName" value=""/>
@@ -242,9 +243,11 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<res id="mysql-socks5-schema" src="database/mysql-socks5-schema.sql"/>
 		<res id="sqlserver-socks5-schema" src="database/sqlserver-socks5-schema.sql"/>
 
-		<!-- Socks5 component schema files -->
-		<res id="sqlserver-socks5-schema" src="database/sqlserver-socks5-schema.sql"/>
-		<res id="mysql-socks5-schema" src="database/mysql-socks5-schema.sql"/>
+		<!-- PubSub component schema files -->
+		<res id="derby-pubsub-schema" src="database/derby-pubsub-schema-3.0.0.sql"/>
+		<res id="mysql-pubsub-schema" src="database/mysql-pubsub-schema-3.0.0.sql"/>
+		<res id="sqlserver-pubsub-schema" src="database/sqlserver-pubsub-schema-3.0.0.sql"/>
+		<res id="postgresql-pubsub-schema" src="database/postgresql-pubsub-schema-3.0.0.sql"/>
 
 
 	</resources>
@@ -401,6 +404,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 				<fileset dir="./jars" targetdir="$INSTALL_PATH/${jarsDir}">
 					<include name="tigase-muc.jar"/>
 					<include name="tigase-pubsub.jar"/>
+					<include name="tigase-pubsub-2.2.0-SNAPSHOT.jar.old"/>
 					<include name="tigase-extras.jar"/>
 					<include name="tigase-stun.jar"/>
 					<include name="jstun.jar"/>

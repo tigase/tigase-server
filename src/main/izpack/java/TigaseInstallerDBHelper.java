@@ -514,6 +514,67 @@ class TigaseInstallerDBHelper {
                 }
 	}
 
+	public void pubsubSchemaLoad(Properties variables, TigaseInstallerDBHelper.MsgTarget msgTarget) {
+
+		String pubsub = variablesSource.getVariable(TigaseConfigConst.PUBSUB_COMP);
+		boolean installPubSub = pubsub.equals("on") ? true : false ;
+
+		// part 1, check db preconditions
+		if (!connection_ok) {
+			msgTarget.addResultMessage().append("Connection not validated");
+			return;
+		}
+		if (!db_ok) {
+			msgTarget.addResultMessage().append("Database not validated");
+			return;
+		}
+		Debug.trace("socks5Component variable state: " + pubsub + " " + installPubSub);
+		if ( !installPubSub ) {
+			msgTarget.addResultMessage().append("PubSub component not selected, skipping schema load");
+			return;
+		}
+                String db_conn = TigaseConfigConst.props.getProperty("root-tigase-db-uri");
+				Debug.trace("PubSubSchemaLoad (root-tigase-db-uri): " + db_conn);
+                try {
+                    //conn.close();
+                    TigaseInstallerDBHelper.ResultMessage resultMessage = msgTarget.addResultMessage();
+                    resultMessage.append("Loading PubSub schema...");
+
+                    Connection conn = DriverManager.getConnection(db_conn);
+
+					DatabaseMetaData dbm = conn.getMetaData();
+					ResultSet tables = dbm.getTables(null, null, "tig_pubsub_nodes", null);
+					ResultSet tables_derby = dbm.getTables(null, null, "tig_pubsub_nodes".toUpperCase(), null);
+					if (tables.next()) {
+						// Table exists
+						msgTarget.addResultMessage().append("PubSub schema exists, skipping schema load");
+					} else if (tables_derby.next()) {
+						// Table exists
+						msgTarget.addResultMessage().append("PubSub schema exists, skipping schema load");
+					} else {
+						// Table does not exist
+						Statement stmt = conn.createStatement();
+
+						ArrayList<String> queries = loadSQLQueries(res_prefix + "-pubsub-schema", res_prefix, variables);
+						for (String query : queries) {
+							if (!query.isEmpty()) {
+								Debug.trace("socks5 schema :: Executing query: " + query);
+								stmt.execute(query);
+							}
+						}
+
+						resultMessage.append(" completed OK");
+						stmt.close();
+					}
+
+                    conn.close();
+                } catch (Exception ex) {
+                    msgTarget.addResultMessage().append("Can't load PubSub schema: " + ex.getMessage());
+					Debug.trace("Can't load PubSub schema: " + ex.getMessage());
+                    return;
+                }
+	}
+
 	protected void addXmppAdminAccount(Properties variables,
 			MsgTarget msgTarget) {
 
@@ -635,6 +696,11 @@ class TigaseInstallerDBHelper {
 		SOCKS5_COMPONENT("Loading socks5 component schema") {
 			public void execute(TigaseInstallerDBHelper helper, Properties variables, MsgTarget msgTarget) {
 				helper.socks5SchemaLoad(variables, msgTarget);
+			}
+		},
+		PUBSUB_COMPONENT("Loading PubSub component schema") {
+			public void execute(TigaseInstallerDBHelper helper, Properties variables, MsgTarget msgTarget) {
+				helper.pubsubSchemaLoad(variables, msgTarget);
 			}
 		}
 

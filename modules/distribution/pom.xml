@@ -131,6 +131,27 @@
 						</configuration>
 					</execution>
 					<execution>
+						<id>copy-old-pubsub</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>tigase</groupId>
+									<artifactId>tigase-pubsub</artifactId>
+									<version>2.2.0-SNAPSHOT</version>
+									<destFileName>tigase-pubsub-2.2.0-SNAPSHOT.jar.old</destFileName>
+									<type>jar</type>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.basedir}/../../jars</outputDirectory>
+							<stripVersion>false</stripVersion>
+							<useBaseVersion>true</useBaseVersion>
+						</configuration>
+					</execution>
+					<execution>
 						<id>tigase-resources</id>
 						<phase>validate</phase>
 						<goals>
@@ -181,17 +202,17 @@
 								<artifactItem>
 									<groupId>tigase</groupId>
 									<artifactId>tigase-pubsub</artifactId>
-									<version>2.2.0-SNAPSHOT</version>
+									<version>3.0.0-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.basedir}/../../database</outputDirectory>
-									<includes>**/*.sql</includes>
+									<includes>**/*.sql,**/*.sh,**/*.txt</includes>
 								</artifactItem>
 
 								<artifactItem>
 									<groupId>tigase</groupId>
 									<artifactId>tigase-pubsub</artifactId>
-									<version>2.2.0-SNAPSHOT</version>
+									<version>3.0.0-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.basedir}/../../scripts</outputDirectory>
@@ -236,7 +257,7 @@
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-pubsub</artifactId>
-			<version>2.2.0-SNAPSHOT</version>
+			<version>3.0.0-SNAPSHOT</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
