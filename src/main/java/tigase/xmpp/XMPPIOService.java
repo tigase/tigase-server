@@ -618,7 +618,7 @@ public class XMPPIOService<RefObject>
 
 			while (isConnected() && (data != null) && (data.length > 0)) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0}, READ:\n{1}", new Object[] { toString(),
+					log.log(Level.FINEST, "{0}, READ:{1}", new Object[] { toString(),
 							new String(data) });
 				}
 

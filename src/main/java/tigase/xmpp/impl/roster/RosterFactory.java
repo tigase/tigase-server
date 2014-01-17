@@ -19,76 +19,75 @@
  * If not, see http://www.gnu.org/licenses/.
  *
  */
-
-
-
 package tigase.xmpp.impl.roster;
 
 /**
- * Describe class RosterFactory here.
+ * {@link RosterFactory} is an factory that is responsible for creation
+ * appropriate instance of {@link RosterAbstract} class
  *
- *
- * Created: Thu Sep  4 18:33:11 2008
+ * Created: Thu Sep 4 18:33:11 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public abstract class RosterFactory {
-	/** Field description */
-	public static final String ROSTER_IMPL_PROP_KEY = "roster-implementation";
 
-	/** Field description */
-	public static final String    ROSTER_IMPL_PROP_VAL = RosterFlat.class
+	/** Key used to configure class name holding roster implementation */
+	public static final String ROSTER_IMPL_PROP_KEY = "roster-implementation";
+	/** Default roster implementation class - {@link RosterFactory} */
+	public static final String ROSTER_IMPL_PROP_VAL = RosterFlat.class
 			.getCanonicalName();
-	private static RosterAbstract shared               = null;
+	/** Holds shared implementation of {@link RosterAbstract} */
+	private static RosterAbstract shared = null;
 
 	//~--- get methods ----------------------------------------------------------
-
 	/**
-	 * Method description
+	 * Creates new instance of class implementing {@link RosterAbstract} - either
+	 * default one ({@link RosterFlat}) or the one configured with
+	 * <em>"roster-implementation"</em> property.
 	 *
+	 * @param shared_impl determines whether to returns shared or non shared
+	 *                    implementation
 	 *
-	 * @param shared_impl
-	 *
-	 * 
+	 * @return new instance of class implementing {@link RosterAbstract}
 	 */
-	public static RosterAbstract getRosterImplementation(boolean shared_impl) {
+	public static RosterAbstract getRosterImplementation( boolean shared_impl ) {
 		try {
-			String cls_name = System.getProperty(ROSTER_IMPL_PROP_KEY, ROSTER_IMPL_PROP_VAL);
+			String cls_name = System.getProperty( ROSTER_IMPL_PROP_KEY, ROSTER_IMPL_PROP_VAL );
 
-			return getRosterImplementation(cls_name, shared_impl);
-		} catch (Exception e) {
+			return getRosterImplementation( cls_name, shared_impl );
+		} catch ( ClassNotFoundException | InstantiationException | IllegalAccessException e ) {
 			return null;
 		}
 	}
 
 	/**
-	 * Method description
+	 * Creates new instance of class implementing {@link RosterAbstract} from
+	 * provided
+	 * <code>class_name</code>
 	 *
+	 * @param class_name  full qualified name of the class
+	 * @param shared_impl determines whether to returns shared or non shared
+	 *                    implementation
 	 *
-	 * @param class_name
-	 * @param shared_impl
-	 *
-	 * 
+	 * @return new instance of class implementing {@link RosterAbstract}
 	 *
 	 * @throws ClassNotFoundException
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
 	 */
-	public static RosterAbstract getRosterImplementation(String class_name,
-			boolean shared_impl)
-					throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-		if (shared_impl) {
-			if (shared == null) {
-				shared = (RosterAbstract) Class.forName(class_name).newInstance();
+	public static RosterAbstract getRosterImplementation( String class_name,
+																												boolean shared_impl )
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+		if ( shared_impl ){
+			if ( shared == null ){
+				shared = (RosterAbstract) Class.forName( class_name ).newInstance();
 			}
-
 			return shared;
 		}
 
-		return (RosterAbstract) Class.forName(class_name).newInstance();
+		return (RosterAbstract) Class.forName( class_name ).newInstance();
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/04/24

@@ -10,7 +10,6 @@ import javax.security.sasl.SaslServerFactory;
 
 import tigase.auth.mechanisms.SaslEXTERNAL;
 import tigase.auth.mechanisms.TigaseSaslServerFactory;
-import tigase.server.XMPPServer;
 import tigase.xmpp.XMPPResourceConnection;
 
 public class DefaultMechanismSelector implements MechanismSelector {
@@ -38,7 +37,7 @@ public class DefaultMechanismSelector implements MechanismSelector {
 	}
 
 	protected boolean match(SaslServerFactory factory, String mechanismName, XMPPResourceConnection session) {
-		if (session.getDomain().isTlsRequired() && !session.isEncrypted())
+		if (session.isTlsRequired() && !session.isEncrypted())
 			return false;
 		if (factory instanceof TigaseSaslServerFactory) {
 			if (!session.getDomain().isAnonymousEnabled() && "ANONYMOUS".equals(mechanismName))

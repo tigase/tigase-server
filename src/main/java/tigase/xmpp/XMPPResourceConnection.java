@@ -33,9 +33,11 @@ import tigase.db.UserRepository;
 import tigase.server.Presence;
 import tigase.server.xmppsession.SessionManagerHandler;
 import tigase.util.TigaseStringprepException;
+import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
 
 //~--- JDK imports ------------------------------------------------------------
+
 
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -1055,6 +1057,20 @@ public class XMPPResourceConnection
 		String tls = (String) getSessionData("starttls");
 		return tls != null && "true".equals(tls);
 	}
+	
+	public boolean isTlsRequired() {
+		VHostItem vhost = getDomain();
+		try {
+			if ("c2s".equals(getConnectionId().getLocalpart()))
+				return vhost.isTlsRequired();
+			else
+				return false;
+		} catch (NoConnectionIdException e) {
+			log.log(Level.WARNING, "Can't check sessionId", e);
+			return vhost.isTlsRequired();
+		}
+	}
+	
 }    // XMPPResourceConnection
 
 

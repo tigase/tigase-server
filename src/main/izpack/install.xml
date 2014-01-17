@@ -47,6 +47,13 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 			<author name="Wojciech Czubaszek" email="wojciech.czubaszek@tigase.org"/>
 			<author name="Eric Dziewa" email="eric.dziewa@tigase.org"/>
 			<author name="Jacek Predki" email="jacek.predki@tigase.com"/>
+			<author name="Piotr Kontek" email=""/>
+			<author name="Alexander Gnauck" email=""/>
+			<author name="Tomasz Sterna" email=""/>
+			<author name="Mateusz Fiołka" email=""/>
+			<author name="David Pache" email=""/>
+			<author name="Peter Sandström" email=""/>
+			<author name="Yonas Yanfa" email=""/>
 		</authors>
 		<url>http://www.tigase.org/</url>
 		<appsubpath>Tigase-$APP_VER</appsubpath>
@@ -74,6 +81,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<variable name="DerbyDBPath.unix" value="${INSTALL_PATH}/tigasedb"/>
 		<variable name="mucComponent" value="on"/>
 		<variable name="socks5Component" value="on"/>
+		<variable name="PubSubComponent" value="on"/>
 		<variable name="messageArchiveComponent" value="on"/>
 		<variable name="clusterMode" value="true"/>
 		<variable name="acsName" value=""/>
@@ -127,6 +135,14 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		</condition>
 		<condition type="variable" id="acsSelected">
 			<name>acsComponent</name>
+			<value>on</value>
+		</condition>
+		<condition type="variable" id="acsMUCSelected">
+			<name>acsMUCComponent</name>
+			<value>on</value>
+		</condition>
+		<condition type="variable" id="acsPubSubSelected">
+			<name>acsPubSubComponent</name>
 			<value>on</value>
 		</condition>
 	</conditions>
@@ -227,9 +243,11 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<res id="mysql-socks5-schema" src="database/mysql-socks5-schema.sql"/>
 		<res id="sqlserver-socks5-schema" src="database/sqlserver-socks5-schema.sql"/>
 
-		<!-- Socks5 component schema files -->
-		<res id="sqlserver-socks5-schema" src="database/sqlserver-socks5-schema.sql"/>
-		<res id="mysql-socks5-schema" src="database/mysql-socks5-schema.sql"/>
+		<!-- PubSub component schema files -->
+		<res id="derby-pubsub-schema" src="database/derby-pubsub-schema-3.0.0.sql"/>
+		<res id="mysql-pubsub-schema" src="database/mysql-pubsub-schema-3.0.0.sql"/>
+		<res id="sqlserver-pubsub-schema" src="database/sqlserver-pubsub-schema-3.0.0.sql"/>
+		<res id="postgresql-pubsub-schema" src="database/postgresql-pubsub-schema-3.0.0.sql"/>
 
 
 	</resources>
@@ -269,7 +287,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 			<panel classname="UserInputPanel" condition="advancedSelected"
 						 id="AdvancedConfigurationPanel.id"/>
 
-			<panel classname="UserInputPanel" condition="acsSelected"
+			<panel classname="UserInputPanel" condition="acsSelected|acsMUCSelected|acsPubSubSelected"
 						 id="AdvancedClusteringStrategyPanel.id"/>
 			<panel classname="UserInputPanel" condition="sqlserverSelected"
 						 id="SqlServerPanel.id"/>
@@ -386,6 +404,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 				<fileset dir="./jars" targetdir="$INSTALL_PATH/${jarsDir}">
 					<include name="tigase-muc.jar"/>
 					<include name="tigase-pubsub.jar"/>
+					<include name="tigase-pubsub-2.2.0-SNAPSHOT.jar.old"/>
 					<include name="tigase-extras.jar"/>
 					<include name="tigase-stun.jar"/>
 					<include name="jstun.jar"/>
@@ -394,6 +413,8 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 					<include name="jdmkrt.jar"/>
 					<include name="hamcrest-core.jar"/>
 					<include name="tigase-acs.jar"/>
+					<include name="tigase-acs-muc.jar"/>
+					<include name="tigase-acs-pubsub.jar"/>
 					<include name="licence-lib.jar"/>
 					<include name="tigase-stats-collector-library.jar"/>
 					<include name="tigase-stats-collector-provider.jar"/>
@@ -403,6 +424,9 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 			<pack name="Groovy scripting" required="no">
 				<description>Various Groovy scripts extending server functionality</description>
 				<fileset dir="src/main/groovy/tigase/admin" targetdir="$INSTALL_PATH/scripts/admin">
+					<include name="*.*"/>
+				</fileset>
+				<fileset dir="scripts/admin" targetdir="$INSTALL_PATH/scripts/admin">
 					<include name="*.*"/>
 				</fileset>
 				<fileset dir="jars" targetdir="$INSTALL_PATH/${jarsDir}">
@@ -465,6 +489,9 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 				<description>Interface for the service administration, monitoring and exchange data between Tigase and external system</description>
 				<fileset dir="./etc" targetdir="${INSTALL_PATH}/etc">
 					<include name="tigase-http-context.xml"/>
+				</fileset>
+				<fileset dir="." targetdir="${INSTALL_PATH}" defaultexcludes="yes">
+					<include name="scripts/rest/**/*"/>
 				</fileset>
 				<fileset dir="./jars" targetdir="${INSTALL_PATH}/${jarsDir}">
 					<include name="jetty-osgi-boot.jar"/>

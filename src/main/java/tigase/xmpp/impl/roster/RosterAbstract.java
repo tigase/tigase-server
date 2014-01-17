@@ -63,7 +63,6 @@ import java.util.Queue;
  * Created: Thu Sep 4 18:09:52 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
  */
 public abstract class RosterAbstract {
 	/** Field description */
@@ -104,7 +103,7 @@ public abstract class RosterAbstract {
 	/**
 	 * Private logger for class instances.
 	 */
-	private static Logger log = Logger.getLogger(RosterAbstract.class.getName());
+	private static final Logger log = Logger.getLogger(RosterAbstract.class.getName());
 
 	/** Field description */
 	public static final EnumSet<SubscriptionType> TO_SUBSCRIBED = EnumSet.of(
@@ -141,7 +140,7 @@ public abstract class RosterAbstract {
 	public static final EnumSet<StanzaType> INITIAL_PRESENCES = EnumSet.of(StanzaType
 			.available, StanzaType.unavailable);
 
-	/** Field description */
+	/** Holds all {link @SubscriptionType} elements that can be perceived as <em>FROM</em> subscription */
 	public static final EnumSet<SubscriptionType> FROM_SUBSCRIBED = EnumSet.of(
 			SubscriptionType.from, SubscriptionType.from_pending_out, SubscriptionType.both);
 
@@ -1029,8 +1028,6 @@ public abstract class RosterAbstract {
 			JID jid)
 					throws NotAuthorizedException, TigaseDBException;
 
-	// public List<Element> getRosterItems(XMPPResourceConnection session, boolean
-	// online)
 
 	/**
 	 * Method description

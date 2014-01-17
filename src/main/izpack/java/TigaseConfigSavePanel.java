@@ -150,7 +150,7 @@ class TigaseConfigSaveHelper {
 			String varName = entry.getValue();
 			String varValue = variablesSource.getVariable(varName);
 
-			Debug.trace("=== HTTP varValue: " + varName + " : " + varValue);
+			Debug.trace("=== Processing varName: varValue :: " + varName + " : " + varValue);
 			
 			if (varName.equals(TigaseConfigConst.DEBUG)) {
 				String debugVar = getDebugs(variablesSource);
@@ -191,24 +191,50 @@ class TigaseConfigSaveHelper {
 				Debug.trace("Set: " + entry.getKey() + " = " + getAuthHandler(varValue, variablesSource));
 				continue;
 			}
-			if (varName.equals(TigaseConfigConst.MUC_COMP)) {
-				if (varValue.equals("on")) {
+			if (varName.equals(TigaseConfigConst.MUC_COMP))  {
+				if ( varValue.equals( "on" ) ){
 					++comp_idx;
-					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "muc");
-					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
-						TigaseConfigConst.MUC_COMP_CLASS);
+					TigaseConfigConst.props.setProperty( "--comp-name-" + comp_idx, "muc" );
+
+					String acsMUC = TigaseConfigConst.tigaseIzPackMap.get( "--muc_acs" );
+					String acsMUCValue = variablesSource.getVariable( acsMUC );
+					Debug.trace( " @@ Set: acsMUC " + acsMUC + " / acsMUCValue: " + acsMUCValue );
+
+					if ( acsMUC != null && acsMUCValue.equals( "acs" ) ){
+						TigaseConfigConst.props.setProperty( "--comp-class-" + comp_idx,
+																								 TigaseConfigConst.ACS_MUC_COMP_CLASS );
+						Debug.trace( "Set: " + "--comp-name-" + comp_idx + " = " + "muc" + " % to:" + "--comp-class-" + comp_idx + "=" + TigaseConfigConst.ACS_MUC_COMP_CLASS );
+					} else {
+						TigaseConfigConst.props.setProperty( "--comp-class-" + comp_idx,
+																								 TigaseConfigConst.MUC_COMP_CLASS );
+						Debug.trace( "Set: " + "--comp-name-" + comp_idx + " = " + "muc" + " % to:" + "--comp-class-" + comp_idx + "=" + TigaseConfigConst.MUC_COMP_CLASS );
+					}
 				}
-				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "muc" + " % to:" + "--comp-class-"+comp_idx + "=" + TigaseConfigConst.MUC_COMP_CLASS);
 				continue;
 			}
-			if (varName.equals(TigaseConfigConst.PUBSUB_COMP)) {
-				if (varValue.equals("on")) {
+			
+			if ( varName.equals( TigaseConfigConst.PUBSUB_COMP ) ){
+				if ( varValue.equals( "on" ) ){
 					++comp_idx;
-					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "pubsub");
-					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
-						TigaseConfigConst.PUBSUB_COMP_CLASS);
+					TigaseConfigConst.props.setProperty( "--comp-name-" + comp_idx, "pubsub" );
+					String acsPubSub = TigaseConfigConst.tigaseIzPackMap.get( "--pubsub_acs" );
+					String acsPubSubValue = variablesSource.getVariable( acsPubSub );
+					Debug.trace( " @@ Set: acsMUC " + acsPubSub + " / acsMUCValue: " + acsPubSubValue );
+
+					if ( acsPubSub != null && acsPubSubValue.equals( "acs" ) ){
+						TigaseConfigConst.props.setProperty( "--comp-class-" + comp_idx,
+																								 TigaseConfigConst.ACS_PUBSUB_COMP_CLASS );
+						Debug.trace( "Set: " + "--comp-name-" + comp_idx + " = " + "pubsub" + " % to:" + "--comp-class-" + comp_idx + "=" + TigaseConfigConst.ACS_PUBSUB_COMP_CLASS );
+					} else {
+						TigaseConfigConst.props.setProperty( "--comp-class-" + comp_idx,
+																								 TigaseConfigConst.PUBSUB_COMP_CLASS );
+						Debug.trace( "Set: " + "--comp-name-" + comp_idx + " = " + "pubsub" + " % to:" + "--comp-class-" + comp_idx + "=" + TigaseConfigConst.PUBSUB_COMP_CLASS );
+					}
 				}
-				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "pubsub" + " % to:" + "--comp-class-"+comp_idx + "=" + TigaseConfigConst.PUBSUB_COMP_CLASS);
+				continue;
+			}
+
+			if (varName.equals(TigaseConfigConst.ACS_PUBSUB_COMP) || varName.equals(TigaseConfigConst.ACS_MUC_COMP)) {
 				continue;
 			}
 

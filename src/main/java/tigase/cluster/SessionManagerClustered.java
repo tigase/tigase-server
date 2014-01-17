@@ -172,6 +172,26 @@ public class SessionManagerClustered
 		strategy.handleLocalUserLogin(userId, conn);
 	}
 
+	@Override
+	public void handleLogout(BareJID userId, XMPPResourceConnection conn) {
+		// Exception here should not normally happen, but if it does, then
+		// consequences might be severe, let's catch it then
+		try {
+			if (conn.isAuthorized() && conn.isResourceSet()) {
+				strategy.handleLocalUserLogout(userId, conn);
+			}
+		} catch (Exception ex) {
+			log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
+		}
+		super.handleLogout(userId, conn); //To change body of generated methods, choose Tools | Templates.
+	}
+
+	@Override
+	public void handleResourceBind(XMPPResourceConnection conn) {
+		super.handleResourceBind(conn);
+		strategy.handleLocalResourceBind(conn);
+	}
+	
 	/**
 	 * Initialize a mapping of key/value pairs which can be used in scripts
 	 * loaded by the server

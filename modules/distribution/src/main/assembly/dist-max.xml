@@ -72,6 +72,13 @@
 			</includes>
 		</fileSet>
 		<fileSet>
+			<directory>../../jars</directory>
+			<outputDirectory>jars</outputDirectory>
+			<includes>
+				<include>**/*.old</include>
+			</includes>
+		</fileSet>
+		<fileSet>
 			<directory>../../scripts</directory>
 			<outputDirectory>scripts</outputDirectory>
 			<includes>
@@ -107,6 +114,8 @@
 				<!--<include>tigase:tigase-utils</include>-->
 				<!--<include>tigase:tigase-xmltools</include>-->
 				<include>tigase:tigase-acs</include>
+				<include>tigase:tigase-acs-muc</include>
+				<include>tigase:tigase-acs-pubsub</include>
 				<include>tigase:tigase-muc</include>
 				<include>tigase:tigase-pubsub</include>
 				<include>tigase:tigase-extras</include>

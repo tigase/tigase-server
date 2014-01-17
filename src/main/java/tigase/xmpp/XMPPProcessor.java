@@ -42,16 +42,13 @@ import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Set;
 import tigase.server.ComponentInfo;
-import tigase.server.ServerComponent;
-import tigase.server.ComponentInfo;
-import tigase.server.XMPPServer;
 
 /**
  * <code>XMPPProcessor</code> abstract class contains basic definition for
  * <em>XMPP</em> processor.
  * To create new processor implementing particular <em>XMPP</em> functionality
  * it is enough to extend this class and implement one abstract method.<br/>
- * Additionally to allow system properly recognize this processor you need also
+ * Additionally to allow system properly recognise this processor you need also
  * to implement own constructor which sets proper values to parent constructor.
  * You must implement exactly one constructor with zero parameters which calls
  * parent constructor with proper values. Refer to constructor documentation
@@ -60,7 +57,7 @@ import tigase.server.XMPPServer;
  * in <em>XMPP</em> network you should be also familiar with
  * <code>addReply(...)</code>, <code>addMessage(...)</code> and
  * <code>addBroadcast(...)</code> methods.<br/>
- * There is also partialy implemented functionality to send messages to entities
+ * There is also partially implemented functionality to send messages to entities
  * in other networks like <em>SMTP</em> or other implemented by the server.
  * Once this implementation is finished there will be more information available.
  * If you, however, are interested in this particular feature send a question
@@ -102,15 +99,6 @@ public abstract class XMPPProcessor
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param conn
-	 *
-	 * 
-	 */
 	@Override
 	public Authorization canHandle(Packet packet, XMPPResourceConnection conn) {
 		Authorization result    = null;
@@ -152,109 +140,46 @@ public abstract class XMPPProcessor
 		return getClass().getName().compareTo(proc.getClass().getName());
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public int concurrentQueuesNo() {
 		return Runtime.getRuntime().availableProcessors();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 *
-	 * @deprecated
-	 */
 	@Override
 	@Deprecated
 	public int concurrentThreadsPerQueue() {
 		return 1;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @param settings
-	 *
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public void init(Map<String, Object> settings) throws TigaseDBException {}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 * 
-	 */
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String[][] supElementNamePaths() {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	@Deprecated
 	public String[] supElements() {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String[] supNamespaces() {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 * 
-	 */
 	@Override
 	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public Set<StanzaType> supTypes() {
 		return null;
@@ -272,20 +197,9 @@ public abstract class XMPPProcessor
 		return this;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 */
 	@Override
 	public void getStatistics(StatisticsList list) {}
 
-	/**
-	 * Allows to obtain various informations about components
-	 *
-	 * @return information about particular component
-	 */
 	@Override
 	public ComponentInfo getComponentInfo() {
 		if ( cmpInfo == null ){
@@ -299,15 +213,6 @@ public abstract class XMPPProcessor
 		return id() + getComponentInfo();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param element
-	 * @param ns
-	 *
-	 * 
-	 */
 	@Override
 	@Deprecated
 	public boolean isSupporting(final String element, final String ns) {

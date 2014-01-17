@@ -166,22 +166,29 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 				log.log(Level.WARNING, "Problem with broadcast user presence for: " + conn, e);
 			}
 		}
-		if (packet.isXMLNSStaticStr(Iq.IQ_BIND_RESOURCE_PATH,
-				"urn:ietf:params:xml:ns:xmpp-bind")) {
-			try {
-				Map<String, String> params   = prepareConnectionParams(conn);
-				List<JID>           cl_nodes = getAllNodes();
-
-				// ++clusterSyncOutTraffic;
-				cluster.sendToNodes(USER_CONNECTED_CMD, params, sm.getComponentId(), cl_nodes
-						.toArray(new JID[cl_nodes.size()]));
-			} catch (Exception e) {
-				log.log(Level.WARNING, "Problem with broadcast user presence for: " + conn, e);
-			}
-		}
 		super.handleLocalPacket(packet, conn);
 	}
 
+	/**
+	 * Method description
+	 * 
+	 * 
+	 * @param conn 
+	 */	
+	@Override
+	public void handleLocalResourceBind(XMPPResourceConnection conn) {
+		try {
+			Map<String, String> params = prepareConnectionParams(conn);
+			List<JID> cl_nodes = getAllNodes();
+
+			// ++clusterSyncOutTraffic;
+			cluster.sendToNodes(USER_CONNECTED_CMD, params, sm.getComponentId(), cl_nodes
+					.toArray(new JID[cl_nodes.size()]));
+		} catch (Exception e) {
+			log.log(Level.WARNING, "Problem with broadcast user presence for: " + conn, e);
+		}
+	}	
+	
 	/**
 	 * Method description
 	 *
@@ -220,7 +227,7 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 			log.log(Level.WARNING, "Problem with broadcast user presence for: " + conn, e);
 		}
 	}
-
+	
 	//~--- get methods ----------------------------------------------------------
 
 	/**

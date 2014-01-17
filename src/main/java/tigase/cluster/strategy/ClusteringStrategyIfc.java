@@ -55,6 +55,23 @@ import java.util.Set;
  */
 public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 				extends OnlineJidsReporter {
+	
+	/**
+	 * Method description
+	 * 
+	 * 
+	 * @param conn 
+	 */
+	public void handleLocalPresenceSet(XMPPResourceConnection conn);
+	
+	/**
+	 * Method description
+	 * 
+	 * 
+	 * @param conn 
+	 */
+	public void handleLocalResourceBind(XMPPResourceConnection conn);
+	
 	/**
 	 * Method description
 	 *

@@ -77,6 +77,8 @@ public abstract class TigaseConfigConst {
 	public static final String ARCHIVE_COMP = "messageArchiveComponent";
 	public static final String HTTP_COMP = "httpApiComponent";
 	public static final String ACS_COMP = "acsComponent";
+	public static final String ACS_MUC_COMP = "acsMUCComponent";
+	public static final String ACS_PUBSUB_COMP = "acsPubSubComponent";
 	public static final String PLUGINS = "plugins";
 	public static final String DEBUG = "debug";
 	public static final String USER_DB_URI = "userDBUri";
@@ -90,6 +92,8 @@ public abstract class TigaseConfigConst {
 	public static final String ARCHIVE_COMP_CLASS = "tigase.archive.MessageArchiveComponent";
 	public static final String HTTP_COMP_CLASS = "tigase.http.rest.RestMessageReceiver";
 	public static final String ACS_COMP_CLASS = "tigase.cluster.strategy.OnlineUsersCachingStrategy";
+	public static final String ACS_MUC_COMP_CLASS = "tigase.muc.cluster.MUCComponentClustered";
+	public static final String ACS_PUBSUB_COMP_CLASS = "tigase.pubsub.cluster.PubSubComponentClustered";
 
 	static {
 		tigaseIzPackMap.put("config-type", "configType");
@@ -110,6 +114,8 @@ public abstract class TigaseConfigConst {
 		tigaseIzPackMap.put("--user-db-uri", USER_DB_URI);
 		tigaseIzPackMap.put("--auth-db-uri", AUTH_DB_URI);
 		tigaseIzPackMap.put("--sm-cluster-strategy-class", ACS_COMP);
+		tigaseIzPackMap.put("--muc_acs", ACS_MUC_COMP);
+		tigaseIzPackMap.put("--pubsub_acs", ACS_PUBSUB_COMP);
 // 		for (Map.Entry entry: tigaseIzPackMap.entrySet()) {
 // 			izPackTigaseMap.put(entry.getValue(), entry.getKey());
 // 		}

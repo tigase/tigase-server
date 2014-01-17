@@ -153,6 +153,30 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 
 	/**
 	 * Method description
+	 * 
+	 * 
+	 * @param conn 
+	 */
+	@Override
+	public void handleLocalPresenceSet(XMPPResourceConnection conn) {
+
+		// Do nothing
+	}
+
+	/**
+	 * Method description
+	 * 
+	 * 
+	 * @param conn 
+	 */
+	@Override
+	public void handleLocalResourceBind(XMPPResourceConnection conn) {
+
+		// Do nothing
+	}
+	
+	/**
+	 * Method description
 	 *
 	 *
 	 * @param userId
@@ -176,7 +200,7 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 
 		// Do nothing
 	}
-
+	
 	/**
 	 * Method description
 	 *
