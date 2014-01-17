@@ -123,6 +123,12 @@ public class ClusterConnectionManager
 	/** Field description */
 	public static final String CONNECT_ALL_PROP_KEY = "connect-all";
 
+	/**
+	 * Default value for the system property for configuration protection
+	 * from system overload and DOS attack.
+	 */
+	public static int ELEMENTS_NUMBER_LIMIT_CLUSTER_PROP_VAL = 100 * 1000;
+
 	/** Field description */
 	public static final String IDENTITY_TYPE_KEY = "identity-type";
 
@@ -157,13 +163,6 @@ public class ClusterConnectionManager
 	public static final boolean COMPRESS_STREAM_PROP_VAL = false;
 	private static final String SERVICE_CONNECTED_TASK_FUTURE =
 			"service-connected-task-future";
-
-	/**
-	 * Default value for the system property for configuration protection
-	 * from system overload and DOS attack.
-	 */
-	public static int ELEMENTS_NUMBER_LIMIT_CLUSTER_PROP_VAL = 100 * 1000;
-
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -800,8 +799,7 @@ public class ClusterConnectionManager
 			}
 		}
 		props.put(CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY, conns_int);
-
-		props.put( ELEMENTS_NUMBER_LIMIT_PROP_KEY, ELEMENTS_NUMBER_LIMIT_CLUSTER_PROP_VAL);
+		props.put(ELEMENTS_NUMBER_LIMIT_PROP_KEY, ELEMENTS_NUMBER_LIMIT_CLUSTER_PROP_VAL);
 
 		return props;
 	}
@@ -922,11 +920,9 @@ public class ClusterConnectionManager
 			log.log(Level.SEVERE, "Can not create items repository instance for class: " +
 					repo_class, e);
 		}
-
-		if ( props.get( ELEMENTS_NUMBER_LIMIT_PROP_KEY ) != null ){
-			elements_number_limit = (Integer) props.get( ELEMENTS_NUMBER_LIMIT_PROP_KEY );
+		if (props.get(ELEMENTS_NUMBER_LIMIT_PROP_KEY) != null) {
+			elements_number_limit = (Integer) props.get(ELEMENTS_NUMBER_LIMIT_PROP_KEY);
 		}
-
 		super.setProperties(props);
 	}
 
@@ -1153,7 +1149,14 @@ public class ClusterConnectionManager
 					writePacketToSocket(serv, resp);
 					serviceConnected(serv);
 				} else {
-					log.warning("Handshaking password doesn't match, disconnecting...");
+					if (secret == null) {
+						log.log(Level.WARNING,
+								"Remote hostname not found in local configuration or time difference between cluster nodes is too big. Connection not accepted: {0}",
+								serv);
+					} else {
+						log.log(Level.WARNING,
+								"Handshaking password doesn''t match, disconnecting: {0}", serv);
+					}
 					serv.stop();
 				}
 			} catch (Exception e) {
@@ -1347,4 +1350,4 @@ public class ClusterConnectionManager
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/11/02
+//~ Formatted in Tigase Code Convention on 14/01/17
