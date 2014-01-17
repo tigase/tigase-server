@@ -23,7 +23,7 @@ function build_xmltools() {
 
  function build_maven() {
    mvn clean package &> ${TMP_DIR}/$1-build.txt
-   echo `find target -name "tigase-*"`
+   echo `find target -name "tigase-*.jar"`
  }
 
  function build_extras() {
@@ -48,4 +48,8 @@ function build_socks5() {
 
 function build_stun() {
 	build_maven stun
+}
+
+function build_tigase_http_api() {
+  build_maven "tigase-http-api"
 }

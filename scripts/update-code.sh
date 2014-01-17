@@ -16,7 +16,7 @@ if [ "$1" != "" ] ; then
 fi
 . ${CONFIG}
 
-SRV_PACKAGES="xmltools utils extras server muc pubsub archiving socks5 stun"
+SRV_PACKAGES="xmltools utils extras server muc pubsub archiving socks5 stun tigase_http_api"
 
 CUR_DIR=`pwd`
 
@@ -45,4 +45,5 @@ cd ${CUR_DIR}
 
 if [ "${TARGET_DIR}" != "" ] ; then
   cp -fv ${PROJECTS_DIR}/server/jars/* ${TARGET_DIR}/bundle/
+	cp -fv ${PROJECTS_DIR}/server/jars/* ${TARGET_DIR}/jars/
 fi
