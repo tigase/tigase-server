@@ -1180,9 +1180,10 @@ public class BasicComponent
 								}
 							}
 							if (!found) {
-								log.log(Level.CONFIG, "{0}: skipping admin script for component: {1}",
-										new Object[] { getName(),
-										comp });
+								log.log(Level.CONFIG,
+										"{0}: skipping admin script {1} for component: {2}", new Object[] {
+										getName(),
+										scriptsPath, comp });
 
 								continue;
 							}
@@ -1215,4 +1216,4 @@ public class BasicComponent
 }
 
 
-//~ Formatted in Tigase Code Convention on 13/10/16
+//~ Formatted in Tigase Code Convention on 13/12/09
