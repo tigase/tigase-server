@@ -333,6 +333,8 @@ class DBSchemaLoader {
 									+ "\n\t[-" + FILE_KEY + " path_to_sql_schema_file]"
 									+ "\n\t[-" + QUERY_KEY + " sql_query_to_execute]"
 									+ "\n\t[-" + LOG_LEVEL_KEY + " java logger Level]"
+									+ "\n\t[-" + ADMIN_JID_KEY + " comma separated list of admin JIDs]"
+									+ "\n\t[-" + ADMIN_JID_PASS_KEY + " password (one for all entered JIDs]"
 									+ "\n\targuments take following precedent: query, file, whole schema"
 									+ "\n\t(i.e. file superseeds schema execution, query superseeds file execution).";
 		return help;
