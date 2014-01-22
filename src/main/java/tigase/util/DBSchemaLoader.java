@@ -879,9 +879,6 @@ class DBSchemaLoader {
 		}
 
 		switch ( database ) {
-			case "pgsql":
-				db_uri += "postgresql:";
-				break;
 			case "sqlserver":
 				db_uri += "jtds:sqlserver:";
 				break;
@@ -911,6 +908,8 @@ class DBSchemaLoader {
 				db_uri += "//" + props.getProperty( DATABASE_HOSTNAME_KEY ) + "/";
 				if ( includeDbName ){
 					db_uri += props.getProperty( DATABASE_NAME_KEY );
+				} else if (database.equals( "postgresql")) {
+					db_uri +=  "postgres" ;
 				}
 				db_uri += "?user=" + props.getProperty( USERNAME );
 				if ( props.getProperty( PASSWORD ) != null
