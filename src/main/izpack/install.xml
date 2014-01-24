@@ -404,7 +404,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 				<fileset dir="./jars" targetdir="$INSTALL_PATH/${jarsDir}">
 					<include name="tigase-muc.jar"/>
 					<include name="tigase-pubsub.jar"/>
-					<include name="tigase-pubsub-2.2.0-SNAPSHOT.jar.old"/>
+					<include name="tigase-pubsub-2.2.0.jar.old"/>
 					<include name="tigase-extras.jar"/>
 					<include name="tigase-stun.jar"/>
 					<include name="jstun.jar"/>
