@@ -15,7 +15,7 @@
 	<parent>
 		<groupId>tigase</groupId>
 		<artifactId>tigase-server-master</artifactId>
-		<version>5.2.0-SNAPSHOT</version>
+		<version>5.2.0-rc2</version>
 		<relativePath>../master</relativePath>
 	</parent>
 	
@@ -141,7 +141,7 @@
 								<artifactItem>
 									<groupId>tigase</groupId>
 									<artifactId>tigase-pubsub</artifactId>
-									<version>2.2.0-SNAPSHOT</version>
+									<version>2.2.0-tigase-server-5.2.0-rc2</version>
 									<destFileName>tigase-pubsub-2.2.0.jar.old</destFileName>
 									<type>jar</type>
 								</artifactItem>
@@ -162,7 +162,7 @@
 								<artifactItem>
 									<groupId>tigase</groupId>
 									<artifactId>tigase-http-api</artifactId>
-									<version>1.0.0-SNAPSHOT</version>
+									<version>1.0.0-tigase-server-5.2.0-rc2</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.basedir}/../../etc</outputDirectory>
@@ -172,7 +172,7 @@
 								<artifactItem>
 									<groupId>tigase</groupId>
 									<artifactId>tigase-http-api</artifactId>
-									<version>1.0.0-SNAPSHOT</version>
+									<version>1.0.0-tigase-server-5.2.0-rc2</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.basedir}/../../scripts</outputDirectory>
@@ -182,7 +182,7 @@
 								<artifactItem>
 									<groupId>tigase</groupId>
 									<artifactId>tigase-muc</artifactId>
-									<version>2.2.0-SNAPSHOT</version>
+									<version>2.2.0-tigase-server-5.2.0-rc2</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.basedir}/../../scripts</outputDirectory>
@@ -192,7 +192,7 @@
 								<artifactItem>
 									<groupId>tigase</groupId>
 									<artifactId>tigase-socks5</artifactId>
-									<version>1.0.0-SNAPSHOT</version>
+									<version>1.0.0-tigase-server-5.2.0-rc2</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.basedir}/../../database</outputDirectory>
@@ -202,7 +202,7 @@
 								<artifactItem>
 									<groupId>tigase</groupId>
 									<artifactId>tigase-pubsub</artifactId>
-									<version>3.0.0-SNAPSHOT</version>
+									<version>3.0.0-tigase-server-5.2.0-rc2</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.basedir}/../../database</outputDirectory>
@@ -212,7 +212,7 @@
 								<artifactItem>
 									<groupId>tigase</groupId>
 									<artifactId>tigase-pubsub</artifactId>
-									<version>3.0.0-SNAPSHOT</version>
+									<version>3.0.0-tigase-server-5.2.0-rc2</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.basedir}/../../scripts</outputDirectory>
@@ -234,96 +234,96 @@
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-server</artifactId>
-			<version>5.2.0-SNAPSHOT</version>
+			<version>5.2.0-rc2</version>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-utils</artifactId>
-			<version>3.4.2-SNAPSHOT</version>
+			<version>3.4.2-tigase-server-5.2.0-rc2</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-xmltools</artifactId>
-			<version>3.4.4-SNAPSHOT</version>
+			<version>3.4.4-tigase-server-5.2.0-rc2</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-muc</artifactId>
-			<version>2.2.0-SNAPSHOT</version>
+			<version>2.2.0-tigase-server-5.2.0-rc2</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-pubsub</artifactId>
-			<version>3.0.0-SNAPSHOT</version>
+			<version>3.0.0-tigase-server-5.2.0-rc2</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-extras</artifactId>
-			<version>1.1.0-SNAPSHOT</version>
+			<version>1.1.0-tigase-server-5.2.0-rc2</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>licence-lib</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0-tigase-server-5.2.0-rc2</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-stats-collector-library</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0-tigase-server-5.2.0-rc2</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-stats-collector-provider</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0-tigase-server-5.2.0-rc2</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-http-api</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0-tigase-server-5.2.0-rc2</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-message-archiving</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0-tigase-server-5.2.0-rc2</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-socks5</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0-tigase-server-5.2.0-rc2</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-stun</artifactId>
-			<version>1.1.0-SNAPSHOT</version>
+			<version>1.1.0-tigase-server-5.2.0-rc2</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-acs</artifactId>
-			<version>2.0.1-SNAPSHOT</version>
+			<version>2.0.1-tigase-server-5.2.0-rc2</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-acs-muc</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0-tigase-server-5.2.0-rc2</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-acs-pubsub</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0-tigase-server-5.2.0-rc2</version>
 			<scope>runtime</scope>
 		</dependency>
 
