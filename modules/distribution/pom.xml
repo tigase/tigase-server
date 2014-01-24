@@ -166,7 +166,7 @@
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.basedir}/../../etc</outputDirectory>
-									<includes>**/*.xml</includes>
+									<includes>*.xml</includes>
 								</artifactItem>
 
 								<artifactItem>
