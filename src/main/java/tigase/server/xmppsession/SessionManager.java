@@ -406,7 +406,15 @@ public class SessionManager
 	public void handleLogout(BareJID userId, XMPPResourceConnection conn) {
 		XMPPSession session = sessionsByNodeId.get(userId);
 
-		if ((session != null) && (session.getActiveResourcesSize() <= 1)) {
+		// we need to make sure that session has no other connections as it might
+		// have one connection but not this one, so condition
+		// session.getActiveResourcesSize() <= 1 
+		// was not enough
+		//if ((session != null) && (session.getActiveResourcesSize() <= 1)) {	
+		boolean onlyConnectionForSession = session != null && (session.getActiveResourcesSize() == 0 
+				|| (session.getActiveResourcesSize() == 1 && session.getActiveResources().contains(conn)));
+						
+		if (onlyConnectionForSession) {
 			sessionsByNodeId.remove(userId);
 		}    // end of if (session.getActiveResourcesSize() == 0)
 		try {
