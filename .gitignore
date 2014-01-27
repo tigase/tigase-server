@@ -54,3 +54,11 @@ modules/distribution/README
 modules/distribution/package.html
 etc/META-INF/maven/tigase/tigase-http-api/pom.xml
 scripts/pubsub/repository_migrator.groovy
+database/README.txt
+database/derby-pubsub-schema-3.0.0.sql
+database/mysql-pubsub-schema-3.0.0-pre-upgrade.sql
+database/mysql-pubsub-schema-3.0.0.sql
+database/postgresql-pubsub-schema-3.0.0.sql
+database/pubsub-db-create-derby.sh
+database/pubsub-db-migrate.sh
+database/sqlserver-pubsub-schema-3.0.0.sql
