@@ -232,6 +232,19 @@ public class AddScriptCommand extends AbstractScriptCommand {
 			throws IOException {
 		File fileName = new File((String) binds.get(SCRIPT_COMP_DIR), commandId + "." + fileExtension);
 
+		File parentDirectory = fileName.getParentFile();
+
+		if ( ( parentDirectory != null ) && !parentDirectory.exists() ){
+			log.log( Level.CONFIG, "Admin scripts directory is missing: {0}, creating...",
+							 parentDirectory );
+			try {
+				parentDirectory.mkdirs();
+			} catch ( Exception e ) {
+				log.log( Level.WARNING,
+								 "Can't create scripts directory , read-only filesystem: " + parentDirectory, e );
+			}
+		}
+
 		log.log(Level.INFO, "Saving command: {0} to disk file: {1}", new Object[] { commandId,
 				fileName.toString() });
 

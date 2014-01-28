@@ -56,6 +56,7 @@ import tigase.xmpp.JID;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
@@ -73,6 +74,7 @@ import java.util.Set;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 /**
  * Created: Oct 17, 2009 7:49:05 PM
@@ -1198,17 +1200,8 @@ public class BasicComponent
 									file, cmdId, ext, cmdDescr });
 						}
 					}
-				} else {
-					log.log(Level.CONFIG, "Admin scripts directory is missing: {0}, creating...",
-							adminDir);
-					try {
-						adminDir.mkdirs();
-					} catch (Exception e) {
-						log.log(Level.WARNING,
-								"Can't create scripts directory , read-only filesystem: " + file, e);
-					}
-				}
-			} catch (Exception e) {
+				} 
+			} catch (IOException | ScriptException e) {
 				log.log(Level.WARNING, "Can't load the admin script file: " + file, e);
 			}
 		}
