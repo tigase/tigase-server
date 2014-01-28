@@ -1132,7 +1132,7 @@ public class BasicComponent
 					for (File f : adminDir.listFiles()) {
 
 						// Just regular files here....
-						if (f.isFile() &&!f.toString().endsWith("~")) {
+						if (f.isFile() &&!f.toString().endsWith("~") &&!f.isHidden())  {
 							String cmdId    = null;
 							String cmdDescr = null;
 							String comp     = null;
