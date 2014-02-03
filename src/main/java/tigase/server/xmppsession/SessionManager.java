@@ -1491,6 +1491,14 @@ public class SessionManager
 				packet.processedBy("admins-or-domains");
 
 				return true;
+			} else if (packet.getElemName() == "iq"
+								 && packet.getType() == StanzaType.result) {
+				if ( log.isLoggable( Level.FINER ) ){
+					log.log( Level.FINER, "IQ result packet addressed directly to server and not handle by any plugin: {0}",
+									 packet );
+				}
+				packet.processedBy( "iq-result-to-server" );
+				return true;
 			} else {
 				if (log.isLoggable(Level.FINER)) {
 					log.log(Level.FINER, "Packet for hostname, should be handled elsewhere: {0}",
