@@ -26,44 +26,26 @@ package tigase.cluster.strategy;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.cluster.api.ClusterCommandException;
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.CommandListener;
-import tigase.cluster.api.CommandListenerAbstract;
 import tigase.cluster.api.SessionManagerClusteredIfc;
+import static tigase.cluster.api.SessionManagerClusteredIfc.SESSION_FOUND_KEY;
 import tigase.cluster.strategy.cmd.PacketForwardCmd;
 
-import tigase.server.Command;
-import tigase.server.Iq;
 import tigase.server.Packet;
-import tigase.server.Presence;
-
-import tigase.stats.StatisticsList;
-
-import tigase.xml.Element;
 
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
-import tigase.xmpp.NoConnectionIdException;
-import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.XMPPSession;
 
-import static tigase.cluster.api.SessionManagerClusteredIfc.SESSION_FOUND_KEY;
+import tigase.stats.StatisticsList;
 
-//~--- JDK imports ------------------------------------------------------------
-
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
 
 /**
  * Created: May 13, 2009 9:53:44 AM
@@ -126,87 +108,36 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 		commands.add(cmd);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean containsJid(BareJID jid) {
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param conn
-	 */
 	@Override
 	public void handleLocalPacket(Packet packet, XMPPResourceConnection conn) {}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param conn 
-	 */
 	@Override
 	public void handleLocalPresenceSet(XMPPResourceConnection conn) {
-
 		// Do nothing
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param conn 
-	 */
 	@Override
 	public void handleLocalResourceBind(XMPPResourceConnection conn) {
-
 		// Do nothing
 	}
 	
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param userId
-	 * @param conn
-	 */
 	@Override
 	public void handleLocalUserLogin(BareJID userId, XMPPResourceConnection conn) {
 
 		// Do nothing
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param userId
-	 * @param conn
-	 */
 	@Override
 	public void handleLocalUserLogout(BareJID userId, XMPPResourceConnection conn) {
 
 		// Do nothing
 	}
 	
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 */
 	@Override
 	public void nodeConnected(JID jid) {
 		boolean result = cl_nodes_list.addIfAbsent(jid);
@@ -215,12 +146,6 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 				result });
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 */
 	@Override
 	public void nodeDisconnected(JID jid) {
 		boolean result = cl_nodes_list.remove(jid);
@@ -229,17 +154,6 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 				result });
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param conn
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean processPacket(Packet packet, XMPPResourceConnection conn) {
 		List<JID> toNodes = getNodesForPacketForward(sm.getComponentId(), null, packet);
@@ -307,12 +221,6 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String toString() {
 		return getInfo();
@@ -320,87 +228,31 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>List<JID></code>
-	 */
 	@Override
 	public List<JID> getAllNodes() {
 		return cl_nodes_list;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 *
-	 *
-	 *
-	 * @return a value of <code>JID[]</code>
-	 */
 	@Override
 	public JID[] getConnectionIdsForJid(BareJID jid) {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 *
-	 *
-	 *
-	 * @return a value of <code>E</code>
-	 */
 	@Override
 	public E getConnectionRecord(JID jid) {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>E</code>
-	 */
 	@Override
 	public E getConnectionRecordInstance() {
 		return (E) (new ConnectionRecord());
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param bareJID
-	 *
-	 *
-	 *
-	 * @return a value of <code>Set<E></code>
-	 */
 	@Override
 	public Set<E> getConnectionRecords(BareJID bareJID) {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 *
-	 *
-	 * @return a value of <code>Map<String,Object></code>
-	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = new HashMap<String, Object>();
@@ -410,25 +262,11 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 		return props;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getInfo() {
 		return "basic strategy";
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>Object</code>
-	 */
 	@Override
 	@Deprecated
 	public Object getInternalCacheData() {
@@ -483,12 +321,6 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 		return nodes;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 */
 	@Override
 	public void getStatistics(StatisticsList list) {
 		list.add("cluster-strat", "Connected nodes", cl_nodes_list.size(), Level.INFO);
@@ -497,14 +329,6 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean hasCompleteJidsInfo() {
 		return false;
@@ -512,13 +336,6 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @param clComp
-	 */
 	@Override
 	public void setClusterController(ClusterControllerIfc clComp) {
 		cluster = clComp;
@@ -528,12 +345,6 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param props
-	 */
 	@Override
 	public void setProperties(Map<String, Object> props) {
 
@@ -552,12 +363,6 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param sm
-	 */
 	@Override
 	public void setSessionManagerHandler(SessionManagerClusteredIfc sm) {
 		this.sm = sm;

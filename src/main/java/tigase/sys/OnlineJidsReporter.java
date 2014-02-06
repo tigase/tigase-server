@@ -19,7 +19,6 @@
  * Last modified by $Author$
  * $Date$
  */
-
 package tigase.sys;
 
 import tigase.xmpp.BareJID;
@@ -33,18 +32,35 @@ import tigase.xmpp.JID;
  */
 public interface OnlineJidsReporter {
 
-  //Set<String> getOnlineJids();
-
+	/**
+	 * Indicates whether given {@code OnlineJidsReporter} contains complete
+	 * information about connected JIDs.
+	 *
+	 *
+	 * @return {@code true} if the informations are complete, {@code false}
+	 *         otherwise.
+	 */
 	boolean hasCompleteJidsInfo();
 
 	/**
 	 * Checks whether there is an online session for the given user BareJID.
-	 * 
-	 * @param jid
-	 * 
+	 *
+	 * @param jid id of the user which we want to check.
+	 *
+	 * @return {@code true} if there is user session for the given JID,
+	 *         {@code false} otherwise.
+	 *
 	 */
-	boolean containsJid(BareJID jid);
+	boolean containsJid( BareJID jid );
 
-	JID[] getConnectionIdsForJid(BareJID jid);
+	/**
+	 * Retrieve all connection IDs (CIDs) for the given user.
+	 *
+	 * @param jid id of the user for which we want to retrieve the list.
+	 *
+	 * @return an array of {@link JID} containing all Connection IDs (CIDs) for
+	 *         the given user.
+	 */
+	JID[] getConnectionIdsForJid( BareJID jid );
 
 }
