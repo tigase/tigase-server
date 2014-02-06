@@ -31,6 +31,7 @@ import tigase.db.TigaseDBException;
 import tigase.server.Packet;
 import tigase.server.Priority;
 import tigase.stats.StatisticsList;
+import tigase.sys.TigaseRuntime;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.*;
@@ -67,6 +68,7 @@ public class Presence
 	public static final String PRESENCE_GLOBAL_FORWARD = "presence-global-forward";
 	/** Field description */
 	public static final String SKIP_OFFLINE_PROP_KEY = "skip-offline";
+	public static final String SKIP_OFFLINE_SYS_PROP_KEY = "skip-offline-sys";
 	/**
 	 * key allowing enabling automatic authorisation.
 	 */
@@ -82,6 +84,7 @@ public class Presence
 	private static final String[] PRESENCE_PRIORITY_PATH = { "presence", "priority" };
 	private static final String[] XMLNSS = { XMLNS };
 	private static boolean skipOffline = false;
+	private static boolean skipOfflineSys = false;
 	/** variable holding setting regarding auto authorisation of items added to
 	 * user roset */
 	private static boolean autoAuthorize = false;
@@ -161,6 +164,10 @@ public class Presence
 	/**
 	 * <code>sendPresenceBroadcast</code> method broadcasts given presence to all
 	 * buddies from roster and to all users to which direct presence was sent.
+	 * Before sending presence method calls {@link  requiresPresenceSending()},
+	 * configured to only check local environment status (if enabled) to verify
+	 * whether presence needs to be sent.
+
 	 *
 	 * @param session  user session which keeps all the user session data and also
 	 *                 gives an access to the user's repository data.
@@ -195,16 +202,23 @@ public class Presence
 		}
 		if ( buddies != null ){
 			for ( JID buddy : buddies ) {
-				if ( log.isLoggable( Level.FINEST ) ){
-					log.log( Level.FINEST, "Sending probe to: {0}", buddy );
-				}
-				sendPresence( null, null, buddy, results, presProbe );
-				if ( requiresPresenceSending( roster_util, buddy, session ) ){
+				if ( requiresPresenceSending( roster_util, buddy, session, true ) ){
 					if ( log.isLoggable( Level.FINEST ) ){
-						log.log( Level.FINEST, "Sending intial to: {0}", buddy );
+						log.log( Level.FINEST, session.getBareJID()
+																	 + " | Sending presence probe to: " + buddy );
+					}
+					sendPresence( null, null, buddy, results, presProbe );
+					if ( log.isLoggable( Level.FINEST ) ){
+						log.log( Level.FINEST, session.getBareJID()
+																	 + " | Sending intial presence to: " + buddy );
 					}
 					sendPresence( null, null, buddy, results, presInit );
 					roster_util.setPresenceSent( session, buddy, true );
+				} else {
+					if ( log.isLoggable( Level.FINEST ) ){
+						log.log( Level.FINEST, session.getBareJID()
+																	 + " | Skipping sending initial presence and probe to: " +  buddy );
+					}
 				}
 			}    // end of for (String buddy: buddies)
 		}      // end of if (buddies == null)
@@ -213,10 +227,19 @@ public class Presence
 
 		if ( buddies_to != null ){
 			for ( JID buddy : buddies_to ) {
-				if ( log.isLoggable( Level.FINEST ) ){
-					log.log( Level.FINEST, "Sending probe to: {0}", buddy );
+				if ( requiresPresenceSending( roster_util, buddy, session, true ) ){
+					if ( log.isLoggable( Level.FINEST ) ){
+						log.log( Level.FINEST, session.getBareJID()
+																	 + " | Sending probe to: " + buddy );
+					}
+					sendPresence( null, null, buddy, results, presProbe );
 				}
-				sendPresence( null, null, buddy, results, presProbe );
+				else {
+					if ( log.isLoggable( Level.FINEST ) ){
+						log.log( Level.FINEST, session.getBareJID()
+																	 + " | Skipping sending presence probe to: " + buddy );
+					}
+				}
 			}    // end of for (String buddy: buddies)
 		}      // end of if (buddies == null)
 
@@ -226,12 +249,19 @@ public class Presence
 
 		if ( buddies_from != null ){
 			for ( JID buddy : buddies_from ) {
-				if ( requiresPresenceSending( roster_util, buddy, session ) ){
+				if ( requiresPresenceSending( roster_util, buddy, session, true ) ){
 					if ( log.isLoggable( Level.FINEST ) ){
-						log.log( Level.FINEST, "Sending initial to: {0}", buddy );
+						log.log( Level.FINEST, session.getBareJID()
+																	 + " | Sending initial presence to: " + buddy );
 					}
 					sendPresence( null, null, buddy, results, presInit );
 					roster_util.setPresenceSent( session, buddy, true );
+				}
+				else {
+					if ( log.isLoggable( Level.FINEST ) ){
+						log.log( Level.FINEST, session.getBareJID()
+																	 + " | Skipping sending initial presence and probe to: " + buddy );
+					}
 				}
 			}    // end of for (String buddy: buddies)
 		}      // end of if (buddies == null)
@@ -252,7 +282,12 @@ public class Presence
 
 		// Init plugin configuration
 		skipOffline = Boolean.parseBoolean( (String) settings.get( SKIP_OFFLINE_PROP_KEY ) );
+		skipOfflineSys = Boolean.parseBoolean( (String) settings.get( SKIP_OFFLINE_SYS_PROP_KEY ) );
 
+		if ( skipOffline || skipOfflineSys ){
+			log.config( String.format( "Skipping sending presence to offline contacts enabled ::"
+					+ "skipOffline: %1$s, skipOfflineSys: %2$s", skipOffline, skipOfflineSys) );
+		}
 		autoAuthorize = Boolean.parseBoolean( (String) settings.get( AUTO_AUTHORIZE_PROP_KEY ) );
 		if ( autoAuthorize ){
 			log.config( "Automatic presence autorization enabled, results in less strict XMPP specs compatibility " );
@@ -564,6 +599,9 @@ public class Presence
 	/**
 	 * <code>sendPresenceBroadcast</code> method broadcasts given presence to all
 	 * buddies from roster and to all users to which direct presence was sent.
+	 * Before sending presence method calls {@link  requiresPresenceSending()}
+	 * performing, if configured, both system and roster check to verify whether
+	 * presence needs to be sent.
 	 *
 	 * @param t           specifies type of the presence to be send.
 	 * @param session     user session which keeps all the user session data and
@@ -606,14 +644,14 @@ public class Presence
 		}
 		if ( buddies != null ){
 			if ( log.isLoggable( Level.FINEST ) ){
-				log.log( Level.FINEST, "Buddies found: " + Arrays.toString( buddies ) );
+				log.log( Level.FINEST, session.getBareJID() + " | Buddies found: " + Arrays.toString( buddies ) );
 			}
 
 			Priority pack_priority = Priority.PRESENCE;
 			int pres_cnt = 0;
 
 			for ( JID buddy : buddies ) {
-				if ( requiresPresenceSending( roster, buddy, session ) ){
+				if ( requiresPresenceSending( roster, buddy, session, false ) ){
 					Packet pack = sendPresence( t, session.getJID(), buddy, results, pres );
 
 					if ( pres_cnt == HIGH_PRIORITY_PRESENCES_NO ){
@@ -626,7 +664,7 @@ public class Presence
 					}
 				} else {
 					if ( log.isLoggable( Level.FINEST ) ){
-						log.log( Level.FINEST, "Not sending presence to buddy: " + buddy );
+						log.log( Level.FINEST, session.getBareJID() + " | Not sending presence to buddy: " + buddy );
 					}
 				}
 			}    // end of for (String buddy: buddies)
@@ -1444,7 +1482,7 @@ public class Presence
 				if ( first ){
 					try {
 						sendRosterOfflinePresence( session, results );
-					} catch ( Exception ex ) {
+					} catch ( NotAuthorizedException | TigaseDBException | NoConnectionIdException ex ) {
 						log.log( Level.INFO, "Experimental code throws exception: ", ex );
 					}
 
@@ -1745,7 +1783,7 @@ public class Presence
 						log.log( Level.FINER, "Skipping presence update to: {0}", conn.getJID() );
 					}
 				}    // end of else
-			} catch ( Exception e ) {
+			} catch ( NoConnectionIdException | NotAuthorizedException e ) {
 				// It might be quite possible that one of the user connections
 				// is in state not allowed for sending presence, in such a case
 				// none of user connections would receive presence.
@@ -1778,7 +1816,7 @@ public class Presence
 					if ( !online ){
 						return;
 					}
-					resources = new ConcurrentHashMap<JID, Map>();
+					resources = new ConcurrentHashMap<>();
 					session.putCommonSessionData( XMPPResourceConnection.ALL_RESOURCES_KEY,
 																				resources );
 				}
@@ -1828,29 +1866,49 @@ public class Presence
 	/**
 	 * Method checks whether a given contact requires sending presence. In case of
 	 * enabling option {@code skipOffline} and user being offline in the roster
-	 * the presence is not sent.
+	 * the presence is not sent. Alternatively enabling option
+	 * {@code skipOfflineSys} would cause local environment check for user status
+	 * and omit sending presence if the local use is offline.
 	 *
 	 *
-	 * @param roster  instance of class implementing {@link RosterAbstract}.
-	 * @param buddy   JID of a contact for which a check is to be performed.
-	 * @param session user session which keeps all the user session data and also
-	 *                gives an access to the user's repository data.
+	 * @param roster      instance of class implementing {@link RosterAbstract}.
+	 * @param buddy       JID of a contact for which a check is to be performed.
+	 * @param session     user session which keeps all the user session data and
+	 *                    also gives an access to the user's repository data.
+	 * @param systemCheck indicates whether the check should be only based on
+	 *                    local environment state ({@code true}) or rooster state
+	 *                    of given user should also be taken into consideration
+	 *                    ({@code false}).
 	 *
-	 * @return {code true} if the contacts requires sending presence (e.g. is not
-	 *         online and option skipOffline is enabled)
+	 * @return {code true} if the contact requires sending presence (e.g. is not
+	 *         online and options skipOffline or skipOfflineSys are enabled)
 	 *
-	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
+	 * @throws NotAuthorizedException
 	 */
-	private static boolean requiresPresenceSending( RosterAbstract roster, JID buddy,
-																									XMPPResourceConnection session )
+	private static boolean requiresPresenceSending(RosterAbstract roster,
+			JID buddy, XMPPResourceConnection session, boolean systemCheck)
 			throws NotAuthorizedException, TigaseDBException {
 		boolean result = true;
 
-		if ( skipOffline && !roster.isOnline( session, buddy ) ){
-			result = false;
+		// if non-system check is enabled during broadcast of non-first initial
+		// presence or offline presence
+		if (!systemCheck) {
+			if (skipOffline && !roster.isOnline(session, buddy)) {
+				result = result && false;
+			}
+		}
+
+		if ( skipOfflineSys ){
+			TigaseRuntime runtime = TigaseRuntime.getTigaseRuntime();
+			if ( runtime.hasCompleteJidsInfo()
+					 && session.isLocalDomain( buddy.getDomain(), false )
+					 && !runtime.isJidOnline( buddy ) ){
+
+				result = result && false;
+			}
 		}
 
 		return result;
 	}
-}    // Presence
+} // Presence
