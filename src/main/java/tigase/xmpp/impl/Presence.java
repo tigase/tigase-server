@@ -84,7 +84,7 @@ public class Presence
 	private static final String[] PRESENCE_PRIORITY_PATH = { "presence", "priority" };
 	private static final String[] XMLNSS = { XMLNS };
 	private static boolean skipOffline = false;
-	private static boolean skipOfflineSys = false;
+	private static boolean skipOfflineSys = true;
 	/** variable holding setting regarding auto authorisation of items added to
 	 * user roset */
 	private static boolean autoAuthorize = false;
@@ -281,11 +281,15 @@ public class Presence
 	public void init( Map<String, Object> settings ) throws TigaseDBException {
 
 		// Init plugin configuration
-		skipOffline = Boolean.parseBoolean( (String) settings.get( SKIP_OFFLINE_PROP_KEY ) );
-		skipOfflineSys = Boolean.parseBoolean( (String) settings.get( SKIP_OFFLINE_SYS_PROP_KEY ) );
+		String tmp;
+		tmp = (String) settings.get( SKIP_OFFLINE_PROP_KEY );
+		skipOffline = tmp != null ? Boolean.parseBoolean( tmp ) : skipOffline;
+
+		tmp = (String) settings.get( SKIP_OFFLINE_SYS_PROP_KEY );
+		skipOfflineSys = tmp != null ? Boolean.parseBoolean( tmp ) : skipOfflineSys;
 
 		if ( skipOffline || skipOfflineSys ){
-			log.config( String.format( "Skipping sending presence to offline contacts enabled ::"
+			log.config( String.format( "Skipping sending presence to offline contacts enabled :: "
 					+ "skipOffline: %1$s, skipOfflineSys: %2$s", skipOffline, skipOfflineSys) );
 		}
 		autoAuthorize = Boolean.parseBoolean( (String) settings.get( AUTO_AUTHORIZE_PROP_KEY ) );
@@ -293,7 +297,7 @@ public class Presence
 			log.config( "Automatic presence autorization enabled, results in less strict XMPP specs compatibility " );
 		}
 
-		String tmp = (String) settings.get( OFFLINE_ROSTER_LAST_SEEN_PROP_KEY );
+		tmp = (String) settings.get( OFFLINE_ROSTER_LAST_SEEN_PROP_KEY );
 
 		if ( tmp != null ){
 			offlineRosterLastSeen = tmp.split( "," );
