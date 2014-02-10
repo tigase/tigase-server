@@ -493,16 +493,20 @@ public class MessageRouterConfig {
 			String cls_name = (String) props.get(MSG_RECEIVERS_PROP_KEY + name + ".class");
 
 			if (cls_name == null) {
+				if (log.isLoggable(Level.WARNING))
+					log.log(Level.WARNING, "Can't load component " + name + ": Class is not defined in config.");
 				return false;
 			}
 
-			// first check if there is registered class in ModuleManagerImpl as it is easy
+			// first check if there is registered class in ModuleManagerImpl as
+			// it is easy
 			if (ModulesManagerImpl.getInstance().hasClassForServerComponent(cls_name)) {
 				return true;
 			}
-			if (XMPPServer.isOSGi() &&!(COMPONENT_CLASSES.containsValue(cls_name) ||
-					COMP_CLUS_MAP.containsValue(cls_name) || EXT_COMP_CLASS_NAME.equals(
-					cls_name))) {
+			if (XMPPServer.isOSGi()
+					&& !(COMPONENT_CLASSES.containsValue(cls_name) || COMP_CLUS_MAP.containsValue(cls_name) || EXT_COMP_CLASS_NAME.equals(cls_name))) {
+				if (log.isLoggable(Level.WARNING))
+					log.log(Level.WARNING, "Can't load component " + name + ": " + cls_name + " is external class.");
 				return false;
 			}
 
@@ -511,6 +515,8 @@ public class MessageRouterConfig {
 
 			return true;
 		} catch (Exception ex) {
+			if (log.isLoggable(Level.WARNING))
+				log.log(Level.WARNING, "Can't load component " + name + ": " + ex.getMessage());
 			return false;
 		}
 	}
