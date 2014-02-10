@@ -29,7 +29,8 @@ CREATE TABLE [dbo].[tig_users](
 	[uid] [bigint] IDENTITY(1,1) NOT NULL,
 
 	-- Jabber User ID
-	[user_id] [nvarchar](256) NOT NULL,
+	[user_id] [nvarchar](2049) NOT NULL,
+	
 	-- UserID SHA1 hash to prevent duplicate user_ids
 	[sha1_user_id] [varbinary](32) NOT NULL,
 	-- User password encrypted or not
@@ -50,6 +51,8 @@ CREATE TABLE [dbo].[tig_users](
 	-- User status, whether the account is active or disabled
 	-- >0 - account active, 0 - account disabled
 	[account_status] [int] default 1,
+	-- helper column for indexing due to limitation of SQL server 
+	user_id_fragment AS LEFT (user_id, 256), 
 
 	CONSTRAINT [PK_tig_users] PRIMARY KEY CLUSTERED ( [uid] ASC ) ON [PRIMARY],
 	CONSTRAINT [IX_tig_users_sha1_user_id] UNIQUE NONCLUSTERED ( [sha1_user_id] ASC ) ON [PRIMARY]
@@ -77,7 +80,7 @@ CREATE NONCLUSTERED INDEX [IX_tig_users_online_status] ON [dbo].[tig_users] ([on
 GO
 
 -- QUERY START:
-CREATE NONCLUSTERED INDEX [IX_tig_users_user_id] ON [dbo].[tig_users] ( [user_id] ASC) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_tig_users_user_id_fragment] ON [dbo].[tig_users] ( [user_id_fragment] ASC) ON [PRIMARY]
 -- QUERY END:
 GO
 
