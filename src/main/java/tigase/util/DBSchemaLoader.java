@@ -208,8 +208,7 @@ class DBSchemaLoader {
 		} else {
 			tasks = Tasks.getTasksInOrder();
 		}
-		for ( int i = 0 ; i < tasks.length ; i++ ) {
-			TigaseDBTask task = tasks[i];
+		for ( TigaseDBTask task : tasks ) {
 			task.execute( helper, props );
 		}
 	}
