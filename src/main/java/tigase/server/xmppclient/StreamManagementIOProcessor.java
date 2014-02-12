@@ -78,6 +78,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 	private static final String OUT_COUNTER_KEY = XMLNS + "_out";
 	private static final String RESUMPTION_TASK_KEY = XMLNS + "_resumption-task";
 	private static final String RESUMPTION_TIMEOUT_PROP_KEY = "resumption-timeout";
+	private static final String RESUMPTION_TIMEOUT_START_KEY = "resumption-timeout-start";
 	private static final String STREAM_ID_KEY = XMLNS + "_stream_id";
 	
 	private static final Element[] FEATURES = { new Element("sm", new String[] { "xmlns" },
@@ -343,6 +344,19 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 //			log.log(Level.WARNING, "resumption timeout started, stream close = " + streamClosed, ex);
 //			ex.printStackTrace();
 //		}
+		Long resumptionTimeoutStart = (Long) service.getSessionData().get(RESUMPTION_TIMEOUT_START_KEY);
+		if (resumptionTimeoutStart != null) {
+			// if resumptionTimeoutStart is set let's check if resumption was 
+			// not started for longer time than twice value of resumption_timeout
+			if ((System.currentTimeMillis() - resumptionTimeoutStart) > (2 * resumption_timeout * 1000)) {
+				// if so we should assume that resumption failed so we should 
+				// send errors, remove reference to service and stop this service
+				sendErrorsForQueuedPackets(service);	
+				services.remove(id, service);
+				connectionManager.serviceStopped(service);
+			}
+			return false;
+		}
 				
 		// some buggy client (ie. Psi) may close stream without sending stream 
 		// close which forces us to thread this stream as broken and waiting for 
@@ -363,6 +377,12 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 					TimerTask timerTask = new ResumptionTimeoutTask(service);
 					service.getSessionData().put(RESUMPTION_TASK_KEY, timerTask);
 					connectionManager.addTimerTask(timerTask, resumptionTimeout * 1000);
+					
+					// set timestamp of begining of resumption to be able to detect
+					// if something went wrong during resumption and service is
+					// still kept in connection manager services as active service
+					// after twice as long as resumption timeout
+					service.getSessionData().put(RESUMPTION_TIMEOUT_START_KEY, System.currentTimeMillis());
 				}
 			}
 			
