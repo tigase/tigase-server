@@ -71,7 +71,7 @@ public abstract class TigaseConfigConst {
 	public static final String AUTH_DB = "authDB";
 	public static final String AUTH_HANDLE = "dbAuthHandle";
 	public static final String MUC_COMP = "mucComponent";
-	public static final String PUBSUB_COMP = "pubsubComponent";
+	public static final String PUBSUB_COMP = "PubSubComponent";
 	public static final String STUN_COMP = "stunComponent";
 	public static final String SOCKS5_COMP = "socks5Component";
 	public static final String ARCHIVE_COMP = "messageArchiveComponent";

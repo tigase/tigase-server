@@ -169,7 +169,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 			<description align="left" txt="Select optional components to run" />
 			<spec txt="MUC" true="on" false="off"	set="true"/>
 		</field>
-		<field type="check" variable="pubsubComponent">
+		<field type="check" variable="PubSubComponent">
 			<spec txt="PubSub" true="on" false="off"	set="false"/>
 		</field>
 		<field type="check" variable="stunComponent">

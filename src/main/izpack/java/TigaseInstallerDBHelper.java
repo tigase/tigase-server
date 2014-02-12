@@ -517,7 +517,8 @@ class TigaseInstallerDBHelper {
 	public void pubsubSchemaLoad(Properties variables, TigaseInstallerDBHelper.MsgTarget msgTarget) {
 
 		String pubsub = variablesSource.getVariable(TigaseConfigConst.PUBSUB_COMP);
-		boolean installPubSub = pubsub.equals("on") ? true : false ;
+		Debug.trace("PubSub variable state: " + pubsub);
+		boolean installPubSub = (pubsub != null && pubsub.equals("on")) ? true : false ;
 
 		// part 1, check db preconditions
 		if (!connection_ok) {
@@ -528,7 +529,7 @@ class TigaseInstallerDBHelper {
 			msgTarget.addResultMessage().append("Database not validated");
 			return;
 		}
-		Debug.trace("socks5Component variable state: " + pubsub + " " + installPubSub);
+		Debug.trace("PubSub variable state: " + pubsub + " " + installPubSub);
 		if ( !installPubSub ) {
 			msgTarget.addResultMessage().append("PubSub component not selected, skipping schema load");
 			return;

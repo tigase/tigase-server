@@ -200,7 +200,7 @@ class TigaseConfigSaveHelper {
 					String acsMUCValue = variablesSource.getVariable( acsMUC );
 					Debug.trace( " @@ Set: acsMUC " + acsMUC + " / acsMUCValue: " + acsMUCValue );
 
-					if ( acsMUC != null && acsMUCValue.equals( "acs" ) ){
+					if ( acsMUC != null && acsMUCValue != null && acsMUCValue.equals( "acs" ) ){
 						TigaseConfigConst.props.setProperty( "--comp-class-" + comp_idx,
 																								 TigaseConfigConst.ACS_MUC_COMP_CLASS );
 						Debug.trace( "Set: " + "--comp-name-" + comp_idx + " = " + "muc" + " % to:" + "--comp-class-" + comp_idx + "=" + TigaseConfigConst.ACS_MUC_COMP_CLASS );
@@ -221,7 +221,7 @@ class TigaseConfigSaveHelper {
 					String acsPubSubValue = variablesSource.getVariable( acsPubSub );
 					Debug.trace( " @@ Set: acsMUC " + acsPubSub + " / acsMUCValue: " + acsPubSubValue );
 
-					if ( acsPubSub != null && acsPubSubValue.equals( "acs" ) ){
+					if ( acsPubSub != null && acsPubSubValue != null && acsPubSubValue.equals( "acs" ) ){
 						TigaseConfigConst.props.setProperty( "--comp-class-" + comp_idx,
 																								 TigaseConfigConst.ACS_PUBSUB_COMP_CLASS );
 						Debug.trace( "Set: " + "--comp-name-" + comp_idx + " = " + "pubsub" + " % to:" + "--comp-class-" + comp_idx + "=" + TigaseConfigConst.ACS_PUBSUB_COMP_CLASS );
