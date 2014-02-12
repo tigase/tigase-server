@@ -50,11 +50,6 @@
 			<url>http://www.gnu.org/licenses/agpl.txt</url>
 		</license>
 	</licenses>
-	<scm>
-		<connection>scm:git:https://svn.tigase.org/git/tigase-server.git</connection>
-		<developerConnection>scm:git:https://svn.tigase.org/git/tigase-server.git</developerConnection>
-		<url>https://projects.tigase.org/projects/tigase-server/repository</url>
-	</scm>
 	<build>
 		<finalName>${project.artifactId}</finalName>
 			<plugins>

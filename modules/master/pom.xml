@@ -46,8 +46,8 @@
 	</licenses>
 
 	<scm>
-		<connection>scm:git:https://svn.tigase.org/git/tigase-server.git</connection>
-		<developerConnection>scm:git:https://svn.tigase.org/git/tigase-server.git</developerConnection>
+		<connection>scm:git:https://repository.tigase.org/git/tigase-server.git</connection>
+		<developerConnection>scm:git:https://repository.tigase.org/git/tigase-server.git</developerConnection>
 		<url>https://projects.tigase.org/projects/tigase-server/repository</url>
 	</scm>
 
