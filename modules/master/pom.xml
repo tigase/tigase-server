@@ -58,19 +58,20 @@
 
 	<modules>
 		<module>../../</module>
-		<module>../distribution</module>
-		<module>../izpack-installer</module>
 	</modules>
 
 	<profiles>
 		<profile>
 			<id>dist</id>
 			<activation>
-				<activeByDefault>true</activeByDefault>
 				<property>
 					<name>dist</name>
 				</property>
 			</activation>
+			<modules>
+				<module>../distribution</module>
+				<module>../izpack-installer</module>
+			</modules>
 			<properties>
 				<maven.javadoc.skip>false</maven.javadoc.skip>
 				<packaging.type>bundle</packaging.type>
