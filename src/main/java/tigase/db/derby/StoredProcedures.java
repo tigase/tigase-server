@@ -6,14 +6,10 @@ import tigase.util.Algorithms;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.io.BufferedReader;
 import java.security.MessageDigest;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -539,7 +535,10 @@ public class StoredProcedures {
 					conn.prepareStatement("insert into tig_pairs (pkey, pval, uid) select ?, ?, uid from tig_users where (user_id = 'db-properties')");
 
 				ps.setString(1, key);
-				ps.setString(2, value);
+				Clob c = conn.createClob();
+				c.setString( 1, value);
+				ps.setClob( 2, c);
+//				ps.setString(2, value);
 				result = ps.executeUpdate();
 			}
 
@@ -611,7 +610,7 @@ public class StoredProcedures {
          * @param value
          * @throws SQLException
          */
-        public static void tigUpdatePairs(long nid, long uid, String key, String value) throws SQLException {
+        public static void tigUpdatePairs(long nid, long uid, String key, Clob value) throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:default:connection");
 
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
@@ -627,7 +626,7 @@ public class StoredProcedures {
                         if (rs.next()) {
                                 PreparedStatement ps1 = conn.prepareStatement("update tig_pairs set pval = ? where nid = ? and uid = ? and pkey = ?");
 
-                                ps1.setString(1, value);
+                                ps1.setClob(1, value);
                                 ps1.setLong(2, nid);
                                 ps1.setLong(3, uid);
                                 ps1.setString(4, key);
@@ -640,7 +639,7 @@ public class StoredProcedures {
                                 ps1.setLong(1, nid);
                                 ps1.setLong(2, uid);
                                 ps1.setString(3, key);
-                                ps1.setString(4, value);
+                                ps1.setClob(4, value);
 
                                 ps1.executeUpdate();
                         }

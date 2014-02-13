@@ -111,6 +111,11 @@ public class XMPPIOService<RefObject>
 	private XMPPIOServiceListener serviceListener      = null;
 	private long                  totalPacketsReceived = 0;
 	private long                  totalPacketsSent     = 0;
+	/**
+	 * This variable keeps the time of last received XMPP packet, it is used to
+	 * help detect dead connections.
+	 */
+	private long                                    lastXmppPacketReceivedTime = 0;
 
 	/**
 	 * The <code>waitingPackets</code> queue keeps data which have to be
@@ -589,6 +594,7 @@ public class XMPPIOService<RefObject>
 			sendAck(packet);
 			++packetsReceived;
 			++totalPacketsReceived;
+			setLastXmppPacketReceiveTime();
 			receivedPackets.offer(packet);
 		}
 	}
@@ -825,6 +831,25 @@ public class XMPPIOService<RefObject>
 				}
 			}
 		}
+	}
+
+	/**
+	 * This method sets the time of last received XMPP packet, it is used to
+	 * help detect dead connections.
+	 */
+	private void setLastXmppPacketReceiveTime() {
+		lastXmppPacketReceivedTime = System.currentTimeMillis();
+	}
+
+	/**
+	 * This method returns the time when the last XMPP packet was received, it is
+	 * used to help detect dead connections.
+	 *
+	 * @return {@code long} number denoting time when the last XMPP packet was
+	 *         received.
+	 */
+	public long getLastXmppPacketReceiveTime() {
+		return lastXmppPacketReceivedTime;
 	}
 }    // XMPPIOService
 

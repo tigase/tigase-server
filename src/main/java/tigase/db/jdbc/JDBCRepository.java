@@ -26,38 +26,16 @@ package tigase.db.jdbc;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.AuthorizationException;
-import tigase.db.AuthRepository;
-import tigase.db.AuthRepositoryImpl;
-import tigase.db.DataRepository;
-import tigase.db.DBInitException;
-import tigase.db.RepositoryFactory;
-import tigase.db.TigaseDBException;
-import tigase.db.UserExistsException;
-import tigase.db.UserNotFoundException;
-import tigase.db.UserRepository;
-
-import tigase.util.SimpleCache;
+import tigase.db.*;
 
 import tigase.xmpp.BareJID;
 
-//~--- JDK imports ------------------------------------------------------------
+import tigase.util.SimpleCache;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.sql.*;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
-import java.util.StringTokenizer;
 
 /**
  * Not synchronized implementation! Musn't be used by more than one thread at
@@ -1134,9 +1112,17 @@ public class JDBCRepository
 				update_pairs_sp.setLong(1, nid);
 				update_pairs_sp.setLong(2, uid);
 				update_pairs_sp.setString(3, key);
-				update_pairs_sp.setString(4, value);
+				switch ( data_repo.getDatabaseType() ) {
+					case derby:
+						Clob c = update_pairs_sp.getConnection().createClob();
+						c.setString( 1, value);
+						update_pairs_sp.setClob( 4, c);
+						break;
+					default:
+						update_pairs_sp.setString( 4, value );
+				}
 				update_pairs_sp.executeUpdate();
-			} catch (SQLException e) {
+			} catch ( SQLException e ) {
 				log.log(Level.WARNING,
 								"Error setting data , user_id: " + user_id + ", subnode: " + subnode +
 								", key: " + key + ", uid: " + uid + ", nid: " + nid + ", value: " +
