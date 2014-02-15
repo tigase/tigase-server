@@ -304,42 +304,53 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 
 		try {
 
-                        if (clientMode) {
-                                sslContext = SSLContext.getInstance(protocol);
-                                sslContext.init(null, tms, secureRandom);
-                                return sslContext;
-                        }
+			// in client mode we need SSLContext initialized with certificate for proper domain
+			// as in other case we would not be able to authenticate to other endpoint by
+			// providing proper client certificate for domain
+//			if (clientMode) {
+//				sslContext = SSLContext.getInstance(protocol);
+//				sslContext.init(null, tms, secureRandom);
+//				return sslContext;
+//			}
 
-                        
-                        if (alias == null) {
-                                alias = def_cert_alias;
-                        } // end of if (hostname == null)
 
-                        sslContext = find(sslContexts, alias);
+			if (alias == null) {
+				alias = def_cert_alias;
+			} // end of if (hostname == null)
 
-                        if (sslContext == null) {
-                                KeyManagerFactory kmf = find(kmfs, alias);
+			sslContext = find(sslContexts, alias);
 
-                                if (kmf == null) {
-                                        KeyPair keyPair = CertificateUtil.createKeyPair(1024, "secret");
-                                        X509Certificate cert = CertificateUtil.createSelfSignedCertificate(email, alias, ou, o, null, null, null,
-                                                        keyPair);
-                                        CertificateEntry entry = new CertificateEntry();
+			if (sslContext == null) {
+				KeyManagerFactory kmf = find(kmfs, alias);
 
-                                        entry.setPrivateKey(keyPair.getPrivate());
-                                        entry.setCertChain(new Certificate[] { cert });
-                                        kmf = addCertificateEntry(entry, alias, true);
-                                        log.log(Level.WARNING, "Auto-generated certificate for domain: {0}", alias);
-                                }
+				if (kmf == null) {
+					// if there is no KeyManagerFactory for domain then we can create
+					// new empty context as we have no certificate for this domain
+					if (clientMode) {
+						sslContext = SSLContext.getInstance(protocol);
+						sslContext.init(null, tms, secureRandom);
+						return sslContext;
+					}
 
-                                sslContext = SSLContext.getInstance(protocol);
-                                sslContext.init(kmf.getKeyManagers(), tms, secureRandom);
-                                sslContexts.put(alias, sslContext);
-                        }
-                } catch (Exception e) {
-                        log.log(Level.SEVERE, "Can not initialize SSLContext for domain: " + alias + ", protocol: " + protocol, e);
-                        sslContext = null;
-                }
+					KeyPair keyPair = CertificateUtil.createKeyPair(1024, "secret");
+					X509Certificate cert = CertificateUtil.createSelfSignedCertificate(email, alias, ou, o, null, null, null,
+							keyPair);
+					CertificateEntry entry = new CertificateEntry();
+
+					entry.setPrivateKey(keyPair.getPrivate());
+					entry.setCertChain(new Certificate[]{cert});
+					kmf = addCertificateEntry(entry, alias, true);
+					log.log(Level.WARNING, "Auto-generated certificate for domain: {0}", alias);
+				}
+
+				sslContext = SSLContext.getInstance(protocol);
+				sslContext.init(kmf.getKeyManagers(), tms, secureRandom);
+				sslContexts.put(alias, sslContext);
+			}
+		} catch (Exception e) {
+			log.log(Level.SEVERE, "Can not initialize SSLContext for domain: " + alias + ", protocol: " + protocol, e);
+			sslContext = null;
+		}
                 
 		return sslContext;
 	}
