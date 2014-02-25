@@ -425,7 +425,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		}
 
 		// if stream has resource binded then we should not resume
-		if (service.getUserJid() != null) {
+		if (service.getUserJid() != null && JID.jidInstanceNS(service.getUserJid()).getResource() != null) {
 			service.writeRawData("<failed xmlns='" + XMLNS + "'>"
 					+ "<unexpected-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>"
 					+ "</failed>");
