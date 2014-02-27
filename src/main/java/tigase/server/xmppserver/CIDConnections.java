@@ -618,12 +618,21 @@ public class CIDConnections {
 
 					if (s2s_conn != null) {
 						try {
-							packetSent = s2s_conn.sendPacket(waiting);
-							waitingPackets.poll();
-							if (log.isLoggable(Level.FINEST)) {
-								log.log(Level.FINEST, "Packet: {0} sent over connection: {1}",
+							if (s2s_conn.isConnected()) {
+								packetSent = s2s_conn.sendPacket(waiting);
+								waitingPackets.poll();
+								if (log.isLoggable(Level.FINEST)) {
+									log.log(Level.FINEST, "Packet: {0} sent over connection: {1}",
 												new Object[] { waiting,
 																			 s2s_conn.getS2SIOService() });
+								}
+							}							
+							else {
+								if (log.isLoggable(Level.FINEST)) {
+									log.log(Level.FINEST, "There was a closed connection available - removing "
+											+ "connection {0} from set of active connections", s2s_conn);
+								}
+								outgoing.remove(s2s_conn);
 							}
 						} catch (Exception ex) {
 							log.log(Level.FINE,
