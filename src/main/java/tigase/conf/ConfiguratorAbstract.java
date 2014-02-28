@@ -114,6 +114,7 @@ public abstract class ConfiguratorAbstract
 
 	/** Field description */
 	public static final String PROPERTY_FILENAME_PROP_KEY = "--property-file";
+	public static final String PROPERTY_FILENAME_PROP_DEF = "etc/init.properties";
 
 	/**
 	 * Field description
@@ -402,8 +403,24 @@ public abstract class ConfiguratorAbstract
 
 		String property_filenames = (String) initProperties.get(PROPERTY_FILENAME_PROP_KEY);
 
+		// if no property file was specified then use default one.
+		if (property_filenames == null) {
+			property_filenames = PROPERTY_FILENAME_PROP_DEF;
+				log.log(Level.WARNING, "No property file not specified! Using default one {0}",
+						property_filenames);
+		}
+
 		if (property_filenames != null) {
 			String[] prop_files = property_filenames.split(",");
+
+			if ( prop_files.length == 1 ){
+				File f = new File( prop_files[0] );
+				if ( !f.exists() ){
+					log.log( Level.WARNING, "Provided property file {0} does NOT EXISTS! Using default one {1}",
+									 new String[] { f.getAbsolutePath(), PROPERTY_FILENAME_PROP_DEF } );
+					prop_files[0] = PROPERTY_FILENAME_PROP_DEF;
+				}
+			}
 
 			for (String property_filename : prop_files) {
 				log.log(Level.CONFIG, "Loading initial properties from property file: {0}",
