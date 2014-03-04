@@ -57,8 +57,6 @@ def body = Command.getFieldValues(p, MSG_BODY)
 def NOTIFY_CLUSTER = "notify-cluster"
 boolean clusterMode =  Boolean.valueOf( System.getProperty("cluster-mode", false.toString()) );
 boolean notifyCluster = Boolean.valueOf( Command.getFieldValue(packet, NOTIFY_CLUSTER) )
-def cluster = (ClusteringStrategyIfc)clusterStrategy
-def nodes = cluster.getAllNodes()
 
 if (fromJid == null || subject == null || msg_type == null || body == null) {
 	def res = (Iq)p.commandResult(Command.DataType.form);
@@ -90,17 +88,22 @@ if (fromJid == null || subject == null || msg_type == null || body == null) {
 
 Queue results = new LinkedList()
 if 	( clusterMode && notifyCluster ) {
-	if (nodes && nodes.size() > 0 ) {
-		nodes.each { node ->
-			def forward = p.copyElementOnly();
-			Command.removeFieldValue(forward, NOTIFY_CLUSTER)
-			Command.addHiddenField(forward, NOTIFY_CLUSTER, false.toString())
-			forward.setPacketTo( node );
-			forward.setPermissions( Permissions.ADMIN );
+		if (this.hasProperty("clusterStrategy")) {
+	        def cluster = (ClusteringStrategyIfc) clusterStrategy
+			List<JID> cl_conns = cluster.getAllNodes()
+			if (cl_conns && cl_conns.size() > 0) {
+				cl_conns.each { node ->
 
-			results.offer(forward)
+					def forward = p.copyElementOnly();
+					Command.removeFieldValue(forward, ROSTER_NOTIFY_CLUSTER)
+					Command.addHiddenField(forward, ROSTER_NOTIFY_CLUSTER, false.toString())
+					forward.setPacketTo( node );
+					forward.setPermissions( Permissions.ADMIN );
+
+					results.offer(forward)
+				}
+			}
 		}
-	}
 }
 
 
