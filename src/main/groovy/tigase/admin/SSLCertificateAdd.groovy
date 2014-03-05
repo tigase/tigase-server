@@ -145,7 +145,7 @@ if (item == null) {
 		} else {
 			def certCName = CertificateUtil.getCertCName(certEntry.getCertChain()[0])
 			def subjectAltName = CertificateUtil.getCertAltCName(certEntry.getCertChain()[0])
-			if (certCName != itemKey && !subjectAltName.contains(itemKey)) {
+			if (certCName != itemKey && !subjectAltName.contains(itemKey) && !isServiceAdmin) {
 				Command.addTextField(result, "Error", "Neither certificate CName nor any of SubjectAlternativeNames match the domain name!")
 			} else {
 				def params = new HashMap()
