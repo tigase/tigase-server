@@ -144,8 +144,9 @@ if (item == null) {
 			//println(pemCert);
 		} else {
 			def certCName = CertificateUtil.getCertCName(certEntry.getCertChain()[0])
-			if (certCName != itemKey && !isServiceAdmin) {
-				Command.addTextField(result, "Error", "Certificate CName must match the domain name!")
+			def subjectAltName = CertificateUtil.getCertAltCName(certEntry.getCertChain()[0])
+			if (certCName != itemKey && !subjectAltName.contains(itemKey)) {
+				Command.addTextField(result, "Error", "Neither certificate CName nor any of SubjectAlternativeNames match the domain name!")
 			} else {
 				def params = new HashMap()
 				params.put(SSLContextContainerIfc.PEM_CERTIFICATE_KEY, pemCert)
