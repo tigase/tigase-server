@@ -118,6 +118,15 @@ public interface SessionManagerClusteredIfc
 	 * @return a value of <code>ConcurrentHashMap<BareJID,XMPPSession></code>
 	 */
 	ConcurrentHashMap<BareJID, XMPPSession> getXMPPSessions();
+	
+	/**
+	 * Method to check if there is XMPPResourceConnection instance for 
+	 * connection JID.
+	 * 
+	 * @param connJid
+	 * @return true - if there is XMPPResourceConnection for connection JID
+	 */
+	boolean hasXMPPResourceConnectionForConnectionJid(JID connJid);
 }
 
 

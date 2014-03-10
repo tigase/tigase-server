@@ -404,7 +404,13 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 //				.getPacketFrom())) {
 //			return false;
 //		}
-
+		// Andrzej: Added in place of condition which was checked above as due to
+		// lack of this condition messages sent from client with "from" attribute
+		// set are duplicated	
+		if (packet.getPacketFrom() != null && sm.hasXMPPResourceConnectionForConnectionJid(packet.getPacketFrom())) {
+			return false;
+		}
+		
 		// This is for packet forwarding logic.
 		// Some packets are for certain not forwarded like packets without to
 		// attribute set.

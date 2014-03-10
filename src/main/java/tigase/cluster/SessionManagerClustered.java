@@ -575,6 +575,11 @@ public class SessionManagerClustered
 		return strategy.hasCompleteJidsInfo();
 	}
 
+	@Override
+	public boolean hasXMPPResourceConnectionForConnectionJid(JID connJid) {
+		return this.connectionsByFrom.containsKey(connJid);
+	}
+	
 	//~--- set methods ----------------------------------------------------------
 
 	/**
