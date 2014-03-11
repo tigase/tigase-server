@@ -334,7 +334,7 @@ public class RosterFlat
 	 */
 	public RosterElement getRosterElementInstance(JID buddy, String name, String[] groups,
 					XMPPResourceConnection session) {
-		return new RosterElement(buddy, name, groups, session);
+		return new RosterElement(buddy.copyWithoutResource(), name, groups, session);
 	}
 
 	@Override

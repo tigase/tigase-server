@@ -1221,13 +1221,13 @@ public class Presence
 			if ( !autoAuthorize ){
 				updatePresenceChange( packet, session, results );
 			} else {
-				roster_util.setBuddySubscription( session, SubscriptionType.both, packet.getStanzaFrom() );
+				roster_util.setBuddySubscription( session, SubscriptionType.both, packet.getStanzaFrom().copyWithoutResource() );
 			}
 		}      // end of else
 
 		if ( autoAuthorize ){
 			roster_util.updateBuddyChange( session, results,
-																		 roster_util.getBuddyItem( session, packet.getStanzaFrom() ) );
+																		 roster_util.getBuddyItem( session, packet.getStanzaFrom().copyWithoutResource() ) );
 
 			broadcastProbe( session, results, settings );
 			sendPresence( StanzaType.subscribed, session.getJID(),
@@ -1280,7 +1280,7 @@ public class Presence
 			results.offer( forward_p );
 
 			if ( autoAuthorize ){
-				roster_util.setBuddySubscription( session, SubscriptionType.both, packet.getStanzaFrom() );
+				roster_util.setBuddySubscription( session, SubscriptionType.both, packet.getStanzaFrom().copyWithoutResource() );
 			}
 			roster_util.updateBuddyChange( session, results, roster_util.getBuddyItem( session,
 																																								 packet.getStanzaFrom() ) );
@@ -1343,7 +1343,6 @@ public class Presence
 
 			if ( autoAuthorize ){
 				broadcastProbe( session, results, settings );
-				sendPresence( StanzaType.unavailable, session.getJID(), packet.getStanzaFrom(), results, null );
 			}
 
 		}
@@ -1571,7 +1570,7 @@ public class Presence
 			subscr_changed = roster_util.updateBuddySubscription( session, pres_type,
 																														packet.getStanzaTo() );
 			if ( autoAuthorize ){
-				roster_util.setBuddySubscription( session, SubscriptionType.both, packet.getStanzaTo() );
+				roster_util.setBuddySubscription( session, SubscriptionType.both, packet.getStanzaTo().copyWithoutResource() );
 			}
 			if ( subscr_changed ){
 				roster_util.updateBuddyChange( session, results, roster_util.getBuddyItem( session,
@@ -1639,7 +1638,7 @@ public class Presence
 																																	buddy );
 
 		if ( autoAuthorize && pres_type == PresenceType.out_subscribed ){
-			roster_util.setBuddySubscription( session, SubscriptionType.both, buddy );
+			roster_util.setBuddySubscription( session, SubscriptionType.both, buddy.copyWithoutResource() );
 		}
 
 		if ( subscr_changed ){
