@@ -198,6 +198,26 @@ public class Privacy {
 	}
 
 	/**
+	 *
+	 * @param session
+	 * @return
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
+	public static Element getDefaultList(XMPPResourceConnection session)
+					throws NotAuthorizedException, TigaseDBException {
+		Element sessionDefaultList = (Element) session.getCommonSessionData( DEFAULT );
+		if ( sessionDefaultList == null ){
+			String defaultListName = getDefaultListName( session );
+			if ( defaultListName != null ){
+				sessionDefaultList = Privacy.getList( session, defaultListName);
+				session.putCommonSessionData( DEFAULT, sessionDefaultList );
+			}
+		}
+		return sessionDefaultList;
+	}
+
+	/**
 	 * Method description
 	 *
 	 *
@@ -208,7 +228,7 @@ public class Privacy {
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
-	public static String getDefaultList(XMPPResourceConnection session)
+	public static String getDefaultListName(XMPPResourceConnection session)
 					throws NotAuthorizedException, TigaseDBException {
 		return session.getData(PRIVACY, DEFAULT, null);
 	}
@@ -355,7 +375,7 @@ public class Privacy {
 		if (lName == null) {
 
 			// User declines to use current actiev list
-			session.removeSessionData(ACTIVE);
+			session.removeSessionData( ACTIVE );
 		} else {
 
 			// User selects a different active list
@@ -387,42 +407,10 @@ public class Privacy {
 			session.setData(PRIVACY, DEFAULT, list.getAttributeStaticStr(NAME));
 		} else {
 			session.removeData(PRIVACY, DEFAULT);
+			session.removeCommonSessionData( DEFAULT );
 		}
 	}
 
-//public static void addListOld(XMPPResourceConnection session,
-//        Element list)
-//        throws NotAuthorizedException, TigaseDBException {
-//
-//  String lNode = listNode(list.getAttribute(NAME));
-//
-//  // Always remove this list as it is either removed or replaced
-//  // by new one. To make sure there are no old data left, let's
-//  // remove it here.
-//  session.removeDataGroup(lNode);
-//
-//  if (list.getChildren() != null && list.getChildren().size() > 0) {
-//    for (Element item: list.getChildren()) {
-//      String iNode = lNode + "/" + item.getAttribute(ORDER);
-//      if (item.getAttribute(TYPE) != null) {
-//        session.setData(iNode, TYPE, item.getAttribute(TYPE));
-//      } // end of if (item.getAttribute(TYPE) != null)
-//      if (item.getAttribute(VALUE) != null) {
-//        session.setData(iNode, VALUE, item.getAttribute(VALUE));
-//      } // end of if (item.getAttribute(VALUE) != null)
-//      session.setData(iNode, ACTION, item.getAttribute(ACTION));
-//      List<Element> stanzas_list = item.getChildren();
-//      if (stanzas_list != null && stanzas_list.size() > 0) {
-//        String[] stanzas = new String[stanzas_list.size()];
-//        int cnt = -1;
-//        for (Element stanza: stanzas_list) {
-//          stanzas[++cnt] = stanza.getName();
-//        } // end of for (Element stanza: stanzas_list)
-//        session.setDataList(iNode, STANZAS, stanzas);
-//      } // end of if (stanzas_list != null && stanzas_list.size() > 0)
-//    } // end of for (Element item: list.getChildren())
-//  }
-//}
 }    // Privacy
 
 
