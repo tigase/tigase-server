@@ -24,6 +24,7 @@ package tigase.io;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.util.IOListener;
 import tigase.stats.StatisticsList;
 
 import tigase.util.ZLibWrapper;
@@ -312,6 +313,10 @@ public class ZLibIO implements IOInterface {
 	public void setLogId(String logId) {
 		io.setLogId(logId);
 	}
+	
+	public void setIOListener(IOListener listener) {
+		zlib.setIOListener(listener);
+	}	
 }
 
 
