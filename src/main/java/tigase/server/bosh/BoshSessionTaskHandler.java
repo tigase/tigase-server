@@ -22,6 +22,7 @@ package tigase.server.bosh;
 
 import java.util.TimerTask;
 import tigase.server.Packet;
+import tigase.server.xmppclient.SeeOtherHostIfc;
 import tigase.xmpp.BareJID;
 
 /**
@@ -35,19 +36,21 @@ import tigase.xmpp.BareJID;
  */
 public interface BoshSessionTaskHandler {
 
-	BoshTask scheduleTask(BoshSession bs, long delay);
-        
-        BoshSendQueueTask scheduleSendQueueTask(BoshSession tt, long delay);
+	BoshTask scheduleTask( BoshSession bs, long delay );
 
-	void cancelTask(BoshTask bs);
-        
-        void cancelSendQueueTask(BoshSendQueueTask bt);
+	BoshSendQueueTask scheduleSendQueueTask( BoshSession tt, long delay );
 
-	void writeRawData(BoshIOService ios, String data);
+	void cancelTask( BoshTask bs );
 
-	boolean addOutStreamOpen(Packet packet, BoshSession bs);
+	void cancelSendQueueTask( BoshSendQueueTask bt );
 
-	boolean addOutStreamClosed(Packet packet, BoshSession bs);
+	void writeRawData( BoshIOService ios, String data );
 
-        BareJID getSeeOtherHostForJID(BareJID userId);        
+	boolean addOutStreamOpen( Packet packet, BoshSession bs );
+
+	boolean addOutStreamClosed( Packet packet, BoshSession bs );
+
+	BareJID getDefHostName();
+	
+	BareJID getSeeOtherHostForJID( BareJID userId, SeeOtherHostIfc.Phase ph );
 }

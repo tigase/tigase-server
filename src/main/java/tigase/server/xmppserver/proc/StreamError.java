@@ -56,7 +56,7 @@ public class StreamError extends S2SAbstractProcessor {
 	 * @param serv
 	 * @param results
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {

@@ -24,38 +24,13 @@ package tigase.db.jdbc;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.auth.SaslPLAIN;
-
-import tigase.db.AuthRepository;
-import tigase.db.AuthorizationException;
-import tigase.db.DBInitException;
-import tigase.db.DataRepository;
-import tigase.db.RepositoryFactory;
-import tigase.db.TigaseDBException;
-import tigase.db.UserExistsException;
-import tigase.db.UserNotFoundException;
-
-import tigase.util.Algorithms;
-import tigase.util.Base64;
-
-import tigase.xmpp.BareJID;
-
-import static tigase.db.AuthRepository.*;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.io.IOException;
-
 import java.math.BigDecimal;
-
 import java.security.NoSuchAlgorithmException;
-
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -71,6 +46,19 @@ import javax.security.sasl.RealmCallback;
 import javax.security.sasl.Sasl;
 import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
+
+import tigase.db.AuthRepository;
+import tigase.db.AuthorizationException;
+import tigase.db.DBInitException;
+import tigase.db.DataRepository;
+import tigase.db.RepositoryFactory;
+import tigase.db.TigaseDBException;
+import tigase.db.UserExistsException;
+import tigase.db.UserNotFoundException;
+import tigase.util.Algorithms;
+import tigase.util.Base64;
+import tigase.xmpp.BareJID;
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -192,7 +180,7 @@ public class DrupalWPAuth implements AuthRepository {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getResourceUri() {
@@ -203,7 +191,7 @@ public class DrupalWPAuth implements AuthRepository {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getUsersCount() {
@@ -216,7 +204,7 @@ public class DrupalWPAuth implements AuthRepository {
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getUsersCount(String domain) {
@@ -556,7 +544,7 @@ public class DrupalWPAuth implements AuthRepository {
 				Map<String, String> sasl_props = new TreeMap<String, String>();
 
 				sasl_props.put(Sasl.QOP, "auth");
-				sasl_props.put(SaslPLAIN.ENCRYPTION_KEY, SaslPLAIN.ENCRYPTION_MD5);
+				sasl_props.put("password-encryption", "MD5");
 				ss = Sasl.createSaslServer((String) props.get(MACHANISM_KEY), "xmpp",
 						(String) props.get(SERVER_NAME_KEY), sasl_props, new SaslCallbackHandler(props));
 				props.put("SaslServer", ss);

@@ -30,6 +30,8 @@ import java.security.cert.CertificateParsingException;
 import java.util.Map;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 //~--- interfaces -------------------------------------------------------------
 
@@ -226,8 +228,10 @@ public interface SSLContextContainerIfc {
 	 *            SSLContext.
 	 * @return a <code>SSLContext</code> value
 	 */
-	SSLContext getSSLContext(String protocol, String hostname);
+	SSLContext getSSLContext(String protocol, String hostname, boolean clientMode);
 
+	 SSLContext getSSLContext(String protocol, String hostname, boolean clientMode, TrustManager... tms);
+	
 	/**
 	 * Returns a trust store with all trusted certificates.
 	 * 

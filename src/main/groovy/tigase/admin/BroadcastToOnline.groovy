@@ -37,6 +37,10 @@ import tigase.util.*
 import tigase.xmpp.*
 import tigase.db.*
 import tigase.xml.*
+import tigase.cluster.*;
+import tigase.cluster.api.*;
+import tigase.cluster.strategy.*;
+
 
 def FROM_JID = "from-jid"
 def SUBJECT = "subject"
@@ -49,6 +53,10 @@ def fromJid = Command.getFieldValue(p, FROM_JID)
 def subject = Command.getFieldValue(p, SUBJECT)
 def msg_type = Command.getFieldValue(p, MSG_TYPE)
 def body = Command.getFieldValues(p, MSG_BODY)
+
+def NOTIFY_CLUSTER = "notify-cluster"
+boolean clusterMode =  Boolean.valueOf( System.getProperty("cluster-mode", false.toString()) );
+boolean notifyCluster = Boolean.valueOf( Command.getFieldValue(packet, NOTIFY_CLUSTER) )
 
 if (fromJid == null || subject == null || msg_type == null || body == null) {
 	def res = (Iq)p.commandResult(Command.DataType.form);
@@ -70,15 +78,40 @@ if (fromJid == null || subject == null || msg_type == null || body == null) {
 
 	Command.addFieldMultiValue(res, MSG_BODY, body)
 
+	if 	( clusterMode  ) {
+		Command.addHiddenField(res, NOTIFY_CLUSTER, true.toString())
+	}
+
+
 	return res
 }
+
+Queue results = new LinkedList()
+if 	( clusterMode && notifyCluster ) {
+		if (this.hasProperty("clusterStrategy")) {
+	        def cluster = (ClusteringStrategyIfc) clusterStrategy
+			List<JID> cl_conns = cluster.getAllNodes()
+			if (cl_conns && cl_conns.size() > 0) {
+				cl_conns.each { node ->
+
+					def forward = p.copyElementOnly();
+					Command.removeFieldValue(forward, ROSTER_NOTIFY_CLUSTER)
+					Command.addHiddenField(forward, ROSTER_NOTIFY_CLUSTER, false.toString())
+					forward.setPacketTo( node );
+					forward.setPermissions( Permissions.ADMIN );
+
+					results.offer(forward)
+				}
+			}
+		}
+}
+
 
 def jidFrom = JID.jidInstanceNS(fromJid)
 def type = StanzaType.valueOf(msg_type)
 def msg_body = body.join('\n')
 
 def msg = Message.getMessage(null, null, type, msg_body, subject, null, "admin")
-Queue results = new LinkedList()
 def result = p.commandResult(Command.DataType.result)
 Command.addTextField(result, "Note", "Operation successful");
 results += result

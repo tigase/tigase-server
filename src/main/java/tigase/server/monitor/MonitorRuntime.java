@@ -117,7 +117,7 @@ public class MonitorRuntime extends TigaseRuntime {
 	/**
 	 *
 	 * @param jid
-	 * @return
+	 * 
 	 */
 	@Override
 	public JID[] getConnectionIdsForJid(JID jid) {

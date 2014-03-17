@@ -90,7 +90,7 @@ public class SMResourceConnection extends XMPPResourceConnection {
 	 *
 	 * @param bareJID
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isUserId(BareJID bareJID) {

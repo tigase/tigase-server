@@ -1,158 +1,143 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<packaging.type>bundle</packaging.type>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>tigase</groupId>
 	<artifactId>tigase-server</artifactId>
 	<name>Tigase XMPP Server</name>
-	<version>5.2.0-SNAPSHOT</version>
-	<description>Tigase XMPP Server</description>
-	<url>http://www.tigase.org/</url>
-	<issueManagement>
-		<system>Redmine</system>
-		<url>https://projects.tigase.org/projects/tigase-server</url>
-	</issueManagement>
-	<developers>
-		<developer>
-			<id>kobit</id>
-			<name>Artur Hefczyc</name>
-			<email>kobit@tigase.org</email>
-			<url>http://www.tigase.org/</url>
-			<roles>
-				<role>architect</role>
-				<role>developer</role>
-			</roles>
-		</developer>
-	</developers>
+	<packaging>${packaging.type}</packaging>
+	<description>Tigase XMPP Server - OSGi bundle</description>
+
+	<parent>
+		<groupId>tigase</groupId>
+		<artifactId>tigase-server-master</artifactId>
+		<version>5.3.0-SNAPSHOT</version>
+		<relativePath>modules/master</relativePath>
+	</parent>
+
+	<profiles>
+		<profile>
+			<id>osgi</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<packaging.type>bundle</packaging.type>
+				<maven.javadoc.skip>true</maven.javadoc.skip>
+			</properties>
+		</profile>
+		<profile>
+			<id>jar</id>
+			<properties>
+				<packaging.type>jar</packaging.type>
+				<maven.javadoc.skip>true</maven.javadoc.skip>
+			</properties>
+		</profile>
+		<profile>
+			<id>dist</id>
+			<properties>
+				<packaging.type>bundle</packaging.type>
+				<maven.javadoc.skip>false</maven.javadoc.skip>
+			</properties>
+		</profile>
+	</profiles>
+
 	<licenses>
 		<license>
 			<name>GNU Affero General Public License GPLv3</name>
 			<url>http://www.gnu.org/licenses/agpl.txt</url>
 		</license>
 	</licenses>
-	<scm>
-		<connection>scm:git:https://svn.tigase.org/git/tigase-server.git</connection>
-		<developerConnection>scm:git:https://svn.tigase.org/git/tigase-server.git</developerConnection>
-		<url>https://projects.tigase.org/projects/tigase-server/repository</url>
-	</scm>
-	<organization>
-		<name>Tigase</name>
-		<url>http://www.tigase.org</url>
-	</organization>
 	<build>
-		<plugins>
+		<finalName>${project.artifactId}</finalName>
+			<plugins>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>buildnumber-maven-plugin</artifactId>
-				<version>1.1</version>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.4.0</version>
+				<extensions>true</extensions>
 				<configuration>
-					<timestampFormat>{0,date} {0,time}</timestampFormat>
-					<doCheck>false</doCheck>
-					<doUpdate>false</doUpdate>
-					 <shortRevisionLength>8</shortRevisionLength>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>validate</phase>
-						<goals>
-							<goal>create</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.5.1</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-					<encoding>UTF-8</encoding>
-					<showDeprecation>true</showDeprecation>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<packageName>tigase/</packageName>
-							<mainClass>tigase.server.XMPPServer</mainClass>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-						</manifest>
-						<manifestEntries>
-							<Implementation-Version>${project.version} build ${buildNumber} (${timestamp})</Implementation-Version>
-							<Implementation-Build>${buildNumber} (${timestamp})</Implementation-Build>
-						</manifestEntries>
-						<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
-					</archive>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.3</version>
-				<configuration>
-					<descriptors>
-						<descriptor>src/main/assembly/prodenv.xml</descriptor>
-					</descriptors>
-					<finalName>${project.artifactId}-${project.version}</finalName>
+					<instructions combine.inherited="append">
+						<manifestLocation>src/main/resources/META-INF/MANIFEST.MF</manifestLocation>
+						<Implementation-Title>${project.name}</Implementation-Title>
+						<Implementation-Version>${project.version}-b${gitVersion}/${buildNumber} (${maven.build.timestamp})</Implementation-Version>
+						<Implementation-Build>${gitVersion}/${buildNumber} (${maven.build.timestamp})</Implementation-Build>
+						<Tigase-Version>${project.version}-b${gitVersion}</Tigase-Version>
+						<Bundle-Activator>tigase.osgi.Activator</Bundle-Activator>
+						<Export-Package>gnu.inet.encoding.*;version=${packet.version},tigase.*;version=${packet.version};-split-package:=merge-first</Export-Package>
+						<Import-Package>!junit.*,!sun.*,!com.sun.*,*</Import-Package>
+						<DynamicImport-Package>*</DynamicImport-Package>
+						<inlinedArtifacts>
+							<inlinedArtifact>tigase-utils</inlinedArtifact>
+							<inlinedArtifact>tigase-xmltools</inlinedArtifact>
+						</inlinedArtifacts>
+						<Embed-Dependency>*;scope=compile|runtime;artifactId=!junit|org.osgi.core|slf4j-api|tigase-utils|tigase-xmltools</Embed-Dependency>
+						<Bundle-SymbolicName>${project.artifactId};singleton=true</Bundle-SymbolicName>
+						<Private-Package>tigase.annotations.*,tigase.auth.*,tigase.cluster.*,tigase.conf.*,tigase.db.*,tigase.disco.*,tigase.http.*,tigase.io.*,tigase.net.*,tigase.server.*,tigase.stats.*,tigase.sys.*,tigase.util.*,tigase.vhosts.*,tigase.xmpp.*</Private-Package>
+					</instructions>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<source>1.7</source>
+							<quiet>true</quiet>
+							<aggregate>true</aggregate>
+							<reportOutputDirectory>${project.reporting.outputDirectory}/docs</reportOutputDirectory>
+							<destDir>docs</destDir>
+
+							<finalName>${project.artifactId}-${project.version}-b${gitVersion}</finalName>
+							<jarOutputDirectory>pack</jarOutputDirectory>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
+
 		</plugins>
-		<extensions>
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-ssh-external</artifactId>
-				<version>2.2</version>
-			</extension>
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-ssh</artifactId>
-				<version>2.2</version>
-			</extension>
-		</extensions>
 	</build>
 	<dependencies>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-utils</artifactId>
-			<version>3.4.1-SNAPSHOT</version>
+			<version>3.4.3-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-xmltools</artifactId>
-			<version>3.4.3-SNAPSHOT</version>
+			<version>3.4.5-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>1.4.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jul-to-slf4j</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
-	<repositories>
-		<repository>
-			<id>tigase</id>
-			<name>Tigase repository</name>
-			<url>http://maven.tigase.org</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-	<distributionManagement>
-		<repository>
-			<id>tigase</id>
-			<name>Tigase repository</name>
-			<url>scp://maven.tigase.org:/home/webapp/maven-repository</url>
-		</repository>
-		<snapshotRepository>
-			<id>tigase</id>
-			<name>Tigase snapshot repository</name>
-			<url>scp://maven.tigase.org:/home/webapp/maven-repository</url>
-		</snapshotRepository>
-	</distributionManagement>
 </project>
 

@@ -1,10 +1,13 @@
 /*
+ * SimpleForwarder.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.xmpp.impl;
 
@@ -38,11 +40,9 @@ import tigase.xmpp.XMPPResourceConnection;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
-import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class SimpleForwarder here.
@@ -53,12 +53,13 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class SimpleForwarder extends XMPPProcessor implements XMPPProcessorIfc {
-
+public abstract class SimpleForwarder
+				extends XMPPProcessor
+				implements XMPPProcessorIfc {
 	/**
-	 * Private logger for class instancess.
+	 * Private logger for class instances.
 	 */
-	private static Logger log = Logger.getLogger("tigase.xmpp.impl.SimpleForwarder");
+	private static Logger log = Logger.getLogger(SimpleForwarder.class.getName());
 
 	//~--- methods --------------------------------------------------------------
 
@@ -75,11 +76,10 @@ public abstract class SimpleForwarder extends XMPPProcessor implements XMPPProce
 	@Override
 	public void process(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
-			throws XMPPException {
+					throws XMPPException {
 		if (session == null) {
 			return;
 		}    // end of if (session == null)
-
 		try {
 			BareJID id = packet.getStanzaTo().getBareJID();
 
@@ -105,7 +105,4 @@ public abstract class SimpleForwarder extends XMPPProcessor implements XMPPProce
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/03/12

@@ -66,7 +66,7 @@ public class StartTLSProcessor implements ExtProcessor {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getId() {
@@ -80,7 +80,7 @@ public class StartTLSProcessor implements ExtProcessor {
 	 * @param serv
 	 * @param handler
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<Element> getStreamFeatures(ComponentIOService serv,
@@ -103,7 +103,7 @@ public class StartTLSProcessor implements ExtProcessor {
 	 * @param handler
 	 * @param results
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean process(Packet p, ComponentIOService serv, ComponentProtocolHandler handler,
@@ -162,7 +162,7 @@ public class StartTLSProcessor implements ExtProcessor {
 				Thread.sleep(10);
 			}
 
-			serv.startTLS(client);
+			serv.startTLS(client, false);
 		} catch (Exception e) {
 			log.warning("TLS mode start failed: " + e.getMessage());
 			serv.forceStop();

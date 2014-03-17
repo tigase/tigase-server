@@ -1,10 +1,13 @@
 /*
+ * IBB.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,19 +18,19 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
+
 package tigase.xmpp.impl;
 
-import java.util.Arrays;
-import java.util.Queue;
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.server.Iq;
+
+//~--- JDK imports ------------------------------------------------------------
+
 import java.util.logging.Logger;
-import tigase.db.NonAuthUserRepository;
-import tigase.server.Packet;
-import tigase.xml.Element;
-import tigase.xmpp.XMPPResourceConnection;
 
 /**
  * XEP-0047: In-Band Bytestreams (IBB)
@@ -45,26 +48,57 @@ import tigase.xmpp.XMPPResourceConnection;
  * future releases.
  */
 @Deprecated
-public abstract class IBB extends SimpleForwarder {
+public abstract class IBB
+				extends SimpleForwarder {
+	private static final String[][] ELEMENTS = {
+		{ Iq.ELEM_NAME, "open" }, { Iq.ELEM_NAME, "data" }, { Iq.ELEM_NAME, "close" }
+	};
 
-  /**
-   * Private logger for class instancess.
-   */
-  private static Logger log = Logger.getLogger("tigase.xmpp.impl.IBB");
+	/**
+	 * Private logger for class instances.
+	 */
+	private static final Logger   log    = Logger.getLogger(IBB.class.getName());
+	private static final String   XMLNS  = "http://jabber.org/protocol/ibb";
+	private static final String   ID     = XMLNS;
+	private static final String[] XMLNSS = { XMLNS, XMLNS, XMLNS };
 
-  private static final String XMLNS = "http://jabber.org/protocol/ibb";
-	private static final String ID = XMLNS;
-	private static final String[] ELEMENTS = {"open", "data", "close"};
-  private static final String[] XMLNSS = {XMLNS, XMLNS, XMLNS};
+	//~--- methods --------------------------------------------------------------
 
 	// Implementation of tigase.xmpp.XMPPImplIfc
 
-	public String id() { return ID; }
+	/**
+	 * Method description
+	 *
+	 *
+	 * 
+	 */
+	@Override
+	public String id() {
+		return ID;
+	}
 
-	public String[] supElements()
-	{ return ELEMENTS; }
+	/**
+	 * Method description
+	 *
+	 *
+	 * 
+	 */
+	@Override
+	public String[][] supElementNamePaths() {
+		return ELEMENTS;
+	}
 
-	public String[] supNamespaces()
-	{ return XMLNSS; }
-
+	/**
+	 * Method description
+	 *
+	 *
+	 * 
+	 */
+	@Override
+	public String[] supNamespaces() {
+		return XMLNSS;
+	}
 }
+
+
+//~ Formatted in Tigase Code Convention on 13/03/11

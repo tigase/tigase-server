@@ -29,6 +29,7 @@ import static tigase.io.SSLContextContainerIfc.*;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.ByteArrayInputStream;
+import java.io.EOFException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -36,6 +37,7 @@ import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.CharBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
@@ -98,7 +100,7 @@ public class TelnetClient implements SampleSocketThread.SocketHandler {
 		iosock = new SocketIO(sc);
 
 		if (ssl) {
-			iosock = new TLSIO(iosock, new TLSWrapper(TLSUtil.getSSLContext("SSL", null), null, true));
+			iosock = new TLSIO(iosock, new TLSWrapper(TLSUtil.getSSLContext("SSL", null), null, true, false), ByteOrder.BIG_ENDIAN);
 		}    // end of if (ssl)
 
 		reader.addIOInterface(iosock);
@@ -114,7 +116,7 @@ public class TelnetClient implements SampleSocketThread.SocketHandler {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static String help() {
 		return "\n" + "Parameters:\n" + " -?                this help message\n"
@@ -292,7 +294,7 @@ public class TelnetClient implements SampleSocketThread.SocketHandler {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static String version() {
 		return "\n" + "-- \n" + "Tigase XMPP Telnet, version: "
@@ -326,6 +328,9 @@ public class TelnetClient implements SampleSocketThread.SocketHandler {
 			}    // end of if (cb != null)
 		}      // end of if (socketIO.bytesRead() > 0)
 
+		if (!ioifc.isConnected())
+			throw new EOFException("Channel has been closed.");		
+		
 		reader.addIOInterface(ioifc);
 	}
 

@@ -73,7 +73,7 @@ public abstract class AbstractScriptCommand implements CommandIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getCommandId() {
@@ -84,7 +84,7 @@ public abstract class AbstractScriptCommand implements CommandIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDescription() {
@@ -112,7 +112,7 @@ public abstract class AbstractScriptCommand implements CommandIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isAdminOnly() {

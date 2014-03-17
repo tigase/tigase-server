@@ -1,10 +1,13 @@
 /*
+ * ConfigItem.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.conf;
 
@@ -35,47 +37,21 @@ import tigase.xml.Element;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Dec 10, 2009 2:40:26 PM
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ConfigItem extends RepositoryItemAbstract {
-
-	/**
-	 * Private logger for class instance.
-	 */
-	private static final Logger log = Logger.getLogger(ConfigItem.class.getName());
-
-	/** Field description */
-	public static final String REPO_ITEM_ELEM_NAME = "prop";
-
+public class ConfigItem
+				extends RepositoryItemAbstract {
 	/** Field description */
 	public static final String CLUSTER_NODE_ATTR = "cluster-node";
 
 	/** Field description */
 	public static final String COMPONENT_NAME_ATTR = "comp-name";
-
-	/** Field description */
-	public static final String NODE_NAME_ATTR = "node-name";
-
-	/** Field description */
-	public static final String KEY_NAME_ATTR = "key-name";
-
-	/** Field description */
-	public static final String VALUE_ATTR = "value";
-
-	/** Field description */
-	public static final String FLAG_ATTR = "flag";
-
-	/** Field description */
-	public static final String VALUE_TYPE_ATTR = "value-type";
 
 	// public static final String CLUSTER_NODE_LABEL = "Cluster node";
 
@@ -83,40 +59,61 @@ public class ConfigItem extends RepositoryItemAbstract {
 	public static final String COMPONENT_NAME_LABEL = "Component name";
 
 	/** Field description */
-	public static final String NODE_NAME_LABEL = "Property node name";
+	public static final String FLAG_ATTR = "flag";
+
+	/** Field description */
+	public static final String KEY_NAME_ATTR = "key-name";
 
 	/** Field description */
 	public static final String KEY_NAME_LABEL = "Property key name";
 
 	/** Field description */
+	public static final String NODE_NAME_ATTR = "node-name";
+
+	/** Field description */
+	public static final String NODE_NAME_LABEL = "Property node name";
+
+	/** Field description */
+	public static final String REPO_ITEM_ELEM_NAME = "prop";
+
+	/** Field description */
+	public static final String VALUE_ATTR = "value";
+
+	/** Field description */
 	public static final String VALUE_LABEL = "Propety value";
 
-	// ~--- constant enums -------------------------------------------------------
+	/** Field description */
+	public static final String VALUE_TYPE_ATTR = "value-type";
+
+	/**
+	 * Private logger for class instance.
+	 */
+	private static final Logger log = Logger.getLogger(ConfigItem.class.getName());
+
+	//~--- fields ---------------------------------------------------------------
+
+	private String clusterNode        = null;
+	private String compName           = null;
+	private String keyName            = null;
+	private long lastModificationTime = -1;
+	private String nodeName           = null;
+	private Object value              = null;
+	private FLAGS flag                = FLAGS.DEFAULT;
+
+	//~--- constant enums -------------------------------------------------------
 
 	/**
 	 * Enum description
-	 * 
+	 *
 	 */
-	public enum FLAGS {
-		INITIAL, DEFAULT, UPDATED;
-	}
+	public enum FLAGS { INITIAL, DEFAULT, UPDATED; }
 
-	// ~--- fields ---------------------------------------------------------------
-
-	private String clusterNode = null;
-	private String compName = null;
-	private String keyName = null;
-	private long lastModificationTime = -1;
-	private String nodeName = null;
-	private Object value = null;
-	private FLAGS flag = FLAGS.DEFAULT;
-
-	// ~--- methods --------------------------------------------------------------
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param packet
 	 */
 	@Override
@@ -130,28 +127,29 @@ public class ConfigItem extends RepositoryItemAbstract {
 		if (nodeName != null) {
 			Command.addTextField(packet, NODE_NAME_LABEL, nodeName);
 		}
-		Command.addTextField(packet, KEY_NAME_LABEL, ((keyName != null) ? keyName : ""));
+		Command.addTextField(packet, KEY_NAME_LABEL, ((keyName != null)
+						? keyName
+						: ""));
 		Command.addTextField(packet, "    ", "    ");
 
 		String value_label = VALUE_LABEL;
-		String value_str = "";
+		String value_str   = "";
 
 		if (value != null) {
-			value_str = DataTypes.valueToString(value);
+			value_str   = DataTypes.valueToString(value);
 			value_label += " [" + DataTypes.getTypeId(value) + "]";
 		}
-
 		Command.addFieldValue(packet, value_label, value_str);
 		super.addCommandFields(packet);
 	}
 
-	// ~--- get methods ----------------------------------------------------------
+	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
+	 *
+	 *
 	 * 
-	 * 
-	 * @return
 	 */
 	public String getClusterNode() {
 		return clusterNode;
@@ -159,9 +157,9 @@ public class ConfigItem extends RepositoryItemAbstract {
 
 	/**
 	 * Method description
+	 *
+	 *
 	 * 
-	 * 
-	 * @return
 	 */
 	public String getCompName() {
 		return compName;
@@ -172,17 +170,19 @@ public class ConfigItem extends RepositoryItemAbstract {
 	 * way: <code>
 	 * nodeName + "/" + keyName
 	 * </code>
+	 *
 	 * 
-	 * @return
 	 */
 	public String getConfigKey() {
-		return ((nodeName != null) ? nodeName + "/" : "") + keyName;
+		return ((nodeName != null)
+						? nodeName + "/"
+						: "") + keyName;
 	}
 
 	/**
 	 * Returns a configuration property value.
+	 *
 	 * 
-	 * @return
 	 */
 	public Object getConfigVal() {
 		return value;
@@ -190,19 +190,21 @@ public class ConfigItem extends RepositoryItemAbstract {
 
 	/**
 	 * Method description
+	 *
+	 *
 	 * 
-	 * 
-	 * @return
 	 */
 	public String getConfigValToString() {
-		return (value == null) ? null : DataTypes.valueToString(value);
+		return (value == null)
+					 ? null
+					 : DataTypes.valueToString(value);
 	}
 
 	/**
 	 * Method description
+	 *
+	 *
 	 * 
-	 * 
-	 * @return
 	 */
 	@Override
 	public String getElemName() {
@@ -211,9 +213,9 @@ public class ConfigItem extends RepositoryItemAbstract {
 
 	/**
 	 * Method description
+	 *
+	 *
 	 * 
-	 * 
-	 * @return
 	 */
 	public FLAGS getFlag() {
 		return flag;
@@ -223,21 +225,24 @@ public class ConfigItem extends RepositoryItemAbstract {
 	 * Returns ConfigItem key which is constructed in a following way: <code>
 	 * compName + "/" + nodeName + "/" + keyName
 	 * </code>
+	 *
 	 * 
-	 * @return
 	 */
 	@Override
 	public String getKey() {
-		return ((compName != null) ? compName + "/" : "")
-				+ ((nodeName != null) ? nodeName + "/" : "") + keyName;
+		return ((compName != null)
+						? compName + "/"
+						: "") + ((nodeName != null)
+										 ? nodeName + "/"
+										 : "") + keyName;
 	}
 
 	/**
 	 * Returns a property key which is constructed in a following way: <code>
 	 * keyName
 	 * </code>
+	 *
 	 * 
-	 * @return
 	 */
 	public String getKeyName() {
 		return keyName;
@@ -245,20 +250,20 @@ public class ConfigItem extends RepositoryItemAbstract {
 
 	/**
 	 * Method description
+	 *
+	 *
 	 * 
-	 * 
-	 * @return
 	 */
 	public String getNodeName() {
 		return nodeName;
 	}
 
-	// ~--- methods --------------------------------------------------------------
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param packet
 	 */
 	@Override
@@ -267,36 +272,31 @@ public class ConfigItem extends RepositoryItemAbstract {
 
 		String tmp = Command.getFieldValue(packet, COMPONENT_NAME_LABEL);
 
-		if ((tmp != null) && !tmp.isEmpty()) {
+		if ((tmp != null) &&!tmp.isEmpty()) {
 			compName = tmp;
 		}
-
 		tmp = Command.getFieldValue(packet, NODE_NAME_LABEL);
-
-		if ((tmp != null) && !tmp.isEmpty()) {
+		if ((tmp != null) &&!tmp.isEmpty()) {
 			nodeName = tmp;
 		}
-
 		tmp = Command.getFieldValue(packet, KEY_NAME_LABEL);
-
-		if ((tmp != null) && !tmp.isEmpty()) {
+		if ((tmp != null) &&!tmp.isEmpty()) {
 			keyName = tmp;
 		}
 
 		String value_label = Command.getFieldKeyStartingWith(packet, VALUE_LABEL);
-		char t = DataTypes.decodeTypeIdFromName(value_label);
+		char t             = DataTypes.decodeTypeIdFromName(value_label);
 
 		tmp = Command.getFieldValue(packet, value_label);
-
-		if ((tmp != null) && !tmp.isEmpty()) {
+		if ((tmp != null) &&!tmp.isEmpty()) {
 			value = DataTypes.decodeValueType(t, tmp);
 		}
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param elem
 	 */
 	@Override
@@ -306,13 +306,13 @@ public class ConfigItem extends RepositoryItemAbstract {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param propString
 	 */
 	@Override
 	public void initFromPropertyString(String propString) {
-		int idx_eq = propString.indexOf('=');
+		int idx_eq    = propString.indexOf('=');
 		String[] prop = propString.split("=");
 
 		// String key = prop[0].trim();
@@ -331,59 +331,79 @@ public class ConfigItem extends RepositoryItemAbstract {
 
 		if (idx1 > 0) {
 			String compNameMeth = key.substring(0, idx1);
-			int idx2 = key.lastIndexOf("/");
+			int idx2            = key.lastIndexOf("/");
 			String nodeNameMeth = null;
-			String keyNameMeth = key.substring(idx2 + 1);
+			String keyNameMeth  = key.substring(idx2 + 1);
 
 			if (idx1 != idx2) {
 				nodeNameMeth = key.substring(idx1 + 1, idx2);
 			}
-
 			set(compNameMeth, nodeNameMeth, keyNameMeth, val);
 		} else {
-			throw new IllegalArgumentException("You have to provide a key with at least"
-					+ " 'component_name/key_name': " + key);
+			throw new IllegalArgumentException("You have to provide a key with at least" +
+																				 " 'component_name/key_name': " + key);
 		}
 	}
 
-	// ~--- get methods ----------------------------------------------------------
+	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param comp
 	 * @param node
 	 * @param key
+	 *
 	 * 
-	 * @return
 	 */
 	public boolean isCompNodeKey(String comp, String node, String key) {
 		return isComponent(comp) && isNode(node) && isKey(key);
 	}
-	
+
+	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param o
+	 *
+	 * 
+	 */
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof ConfigItem) {
 			return getKey().equals(((ConfigItem) o).getKey());
 		}
+
 		return false;
 	}
-	
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * 
+	 */
 	@Override
 	public int hashCode() {
 		return getKey().hashCode();
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	/**
 	 * Checks if the given component name is equal to this item compName.
-	 * 
+	 *
 	 * @param comp
-	 * @return
+	 * 
 	 */
 	public boolean isComponent(String comp) {
 		if (compName != comp) {
-			return (compName != null) ? compName.equals(comp) : false;
+			return (compName != null)
+						 ? compName.equals(comp)
+						 : false;
 		}
 
 		return true;
@@ -391,13 +411,15 @@ public class ConfigItem extends RepositoryItemAbstract {
 
 	/**
 	 * Checks if the given key is equal to this item keyName.
-	 * 
+	 *
 	 * @param key
-	 * @return
+	 * 
 	 */
 	public boolean isKey(String key) {
 		if (keyName != key) {
-			return (keyName != null) ? keyName.equals(key) : false;
+			return (keyName != null)
+						 ? keyName.equals(key)
+						 : false;
 		}
 
 		return true;
@@ -405,15 +427,17 @@ public class ConfigItem extends RepositoryItemAbstract {
 
 	/**
 	 * Checks if the given node is equal to this item nodeName
-	 * 
+	 *
 	 * @param node
-	 * @return
+	 * 
 	 */
 	public boolean isNode(String node) {
 		if (nodeName != node) {
 
 			// At least one is not null
-			return (nodeName != null) ? nodeName.equals(node) : false;
+			return (nodeName != null)
+						 ? nodeName.equals(node)
+						 : false;
 		}
 
 		return true;
@@ -424,21 +448,21 @@ public class ConfigItem extends RepositoryItemAbstract {
 	 * keyName. This method call works the same way as following statement: <code>
 	 * isNode(node) && isKey(key)
 	 * </code>
-	 * 
+	 *
 	 * @param node
 	 * @param key
-	 * @return
+	 * 
 	 */
 	public boolean isNodeKey(String node, String key) {
 		return isNode(node) && isKey(key);
 	}
 
-	// ~--- set methods ----------------------------------------------------------
+	//~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param clusterNode_m
 	 * @param compName_m
 	 * @param nodeName_m
@@ -448,9 +472,9 @@ public class ConfigItem extends RepositoryItemAbstract {
 	 * @param flag_str_m
 	 */
 	public void set(String clusterNode_m, String compName_m, String nodeName_m,
-			String key_m, String value_str_m, char val_type_m, String flag_str_m) {
+									String key_m, String value_str_m, char val_type_m, String flag_str_m) {
 		Object value_m = DataTypes.decodeValueType(val_type_m, value_str_m);
-		FLAGS flag_m = FLAGS.DEFAULT;
+		FLAGS flag_m   = FLAGS.DEFAULT;
 
 		try {
 			flag_m = FLAGS.valueOf(flag_str_m);
@@ -458,14 +482,13 @@ public class ConfigItem extends RepositoryItemAbstract {
 			log.warning("Incorrect config item flag: " + flag_str_m + ", setting DEFAULT.");
 			flag_m = FLAGS.DEFAULT;
 		}
-
 		set(clusterNode_m, compName_m, nodeName_m, key_m, value_m, flag_m);
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param clusterNode_m
 	 * @param compName_m
 	 * @param nodeName_m
@@ -474,38 +497,32 @@ public class ConfigItem extends RepositoryItemAbstract {
 	 * @param flag_m
 	 */
 	public void set(String clusterNode_m, String compName_m, String nodeName_m,
-			String key_m, Object value_m, FLAGS flag_m) {
+									String key_m, Object value_m, FLAGS flag_m) {
 		if (clusterNode_m != null) {
 			this.clusterNode = clusterNode_m;
 		}
-
 		if (compName_m != null) {
 			this.compName = compName_m;
 		}
-
 		if (nodeName_m != null) {
 			this.nodeName = nodeName_m;
 		}
-
 		if (key_m != null) {
 			this.keyName = key_m;
 		}
-
 		if (value_m != null) {
 			this.value = value_m;
 		}
-
 		if (flag_m != null) {
 			this.flag = flag_m;
 		}
-
 		lastModificationTime = System.currentTimeMillis();
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param compName_m
 	 * @param nodeName_m
 	 * @param key_m
@@ -514,14 +531,14 @@ public class ConfigItem extends RepositoryItemAbstract {
 	 * @param flag_str_m
 	 */
 	public void set(String compName_m, String nodeName_m, String key_m, String value_str_m,
-			char val_type_m, String flag_str_m) {
+									char val_type_m, String flag_str_m) {
 		set(null, compName_m, nodeName_m, key_m, value_str_m, val_type_m, flag_str_m);
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param compName
 	 * @param nodeName
 	 * @param key
@@ -533,8 +550,8 @@ public class ConfigItem extends RepositoryItemAbstract {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param clusterNode
 	 * @param compName
 	 * @param nodeName
@@ -542,34 +559,33 @@ public class ConfigItem extends RepositoryItemAbstract {
 	 * @param value
 	 */
 	public void set(String clusterNode, String compName, String nodeName, String key,
-			Object value) {
+									Object value) {
 		set(clusterNode, compName, nodeName, key, value, null);
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param clusterNode
 	 * @param compName
 	 * @param nodeKey
 	 * @param value
 	 */
-	public void
-			setNodeKey(String clusterNode, String compName, String nodeKey, Object value) {
-		int key_idx = nodeKey.lastIndexOf("/");
-		String method_key = nodeKey;
+	public void setNodeKey(String clusterNode, String compName, String nodeKey,
+												 Object value) {
+		int key_idx        = nodeKey.lastIndexOf("/");
+		String method_key  = nodeKey;
 		String method_node = null;
 
 		if (key_idx >= 0) {
-			method_key = nodeKey.substring(key_idx + 1);
+			method_key  = nodeKey.substring(key_idx + 1);
 			method_node = nodeKey.substring(0, key_idx);
 		}
-
 		set(clusterNode, compName, method_node, method_key, value);
 	}
 
-	// ~--- methods --------------------------------------------------------------
+	//~--- methods --------------------------------------------------------------
 
 	// public static final String REPO_ITEM_ELEM_NAME = "prop";
 	// public static final String CLUSTER_NODE_ATTR = "cluster-node";
@@ -589,9 +605,9 @@ public class ConfigItem extends RepositoryItemAbstract {
 
 	/**
 	 * Method description
+	 *
+	 *
 	 * 
-	 * 
-	 * @return
 	 */
 	@Override
 	public Element toElement() {
@@ -600,13 +616,10 @@ public class ConfigItem extends RepositoryItemAbstract {
 		if (clusterNode != null) {
 			elem.addAttribute(CLUSTER_NODE_ATTR, clusterNode);
 		}
-
 		elem.addAttribute(COMPONENT_NAME_ATTR, compName);
-
 		if (nodeName != null) {
 			elem.addAttribute(NODE_NAME_ATTR, nodeName);
 		}
-
 		elem.addAttribute(KEY_NAME_ATTR, keyName);
 		elem.addAttribute(VALUE_ATTR, DataTypes.valueToString(value));
 		elem.addAttribute(VALUE_TYPE_ATTR, "" + DataTypes.getTypeId(value));
@@ -617,15 +630,15 @@ public class ConfigItem extends RepositoryItemAbstract {
 
 	/**
 	 * Method description
+	 *
+	 *
 	 * 
-	 * 
-	 * @return
 	 */
 	@Override
 	public String toPropertyString() {
-		char t = DataTypes.getTypeId(value);
+		char t        = DataTypes.getTypeId(value);
 		String result = getKey() + "[" + t + "]=";
-		String varr = DataTypes.valueToString(value);
+		String varr   = DataTypes.valueToString(value);
 
 		result += varr;
 
@@ -634,9 +647,9 @@ public class ConfigItem extends RepositoryItemAbstract {
 
 	/**
 	 * Method description
+	 *
+	 *
 	 * 
-	 * 
-	 * @return
 	 */
 	@Override
 	public String toString() {
@@ -644,6 +657,5 @@ public class ConfigItem extends RepositoryItemAbstract {
 	}
 }
 
-// ~ Formatted in Sun Code Convention
 
-// ~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/02/25

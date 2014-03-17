@@ -57,7 +57,7 @@ public class Notify extends ActionAbstract {
 	 * @param rule
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean execute(Packet packet, Element rule) {
@@ -79,7 +79,7 @@ public class Notify extends ActionAbstract {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getName() {

@@ -26,7 +26,12 @@ call TigPutDBProperty('schema-version','5.1');
 -- QUERY END:
 
 -- QUERY START:
-CREATE procedure TigUpdatePairs(nid bigint, uid bigint, tkey varchar(255), tval varchar(32672)) 
+drop procedure  TigUpdatePairs;
+-- QUERY END:
+
+
+-- QUERY START:
+CREATE procedure TigUpdatePairs(nid bigint, uid bigint, tkey varchar(255), tval clob) 
         PARAMETER STYLE JAVA
         LANGUAGE JAVA
         MODIFIES SQL DATA

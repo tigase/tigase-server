@@ -51,6 +51,7 @@ import java.util.logging.Logger;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import tigase.cert.CertificateEntry;
@@ -129,7 +130,7 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		 * Method description
 		 * 
 		 * 
-		 * @return
+		 * 
 		 */
 		@Override
 		public X509Certificate[] getAcceptedIssuers() {
@@ -148,7 +149,7 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		 * 
 		 * @param pathname
 		 * 
-		 * @return
+		 * 
 		 */
 		@Override
 		public boolean accept(File pathname) {
@@ -195,8 +196,9 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		KeyStore keys = KeyStore.getInstance("JKS");
 
 		keys.load(null, emptyPass);
-		keys.setKeyEntry(alias, entry.getPrivateKey(), emptyPass, entry.getCertChain());
+		keys.setKeyEntry(alias, entry.getPrivateKey(), emptyPass, CertificateUtil.sort(entry.getCertChain()));
 
+		
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
 
 		kmf.init(keys, emptyPass);
@@ -266,6 +268,25 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 	// ~--- inner classes
 	// --------------------------------------------------------
 
+	public SSLContext getSSLContext(String protocol, String hostname, boolean clientMode) {
+		return getSSLContext(protocol, hostname, clientMode, tms);
+	}
+	
+	public static <T> T find(Map<String, T> data, String key) {
+		if (data.containsKey(key)) {
+			return data.get(key);
+		}
+		for (Entry<String, T> entry : data.entrySet()) {
+			final String k = entry.getKey();
+			if (k.startsWith("*") && key.endsWith(k.substring(1))) {
+				data.put(key, entry.getValue());
+				return entry.getValue();
+			}
+		}
+
+		return null;
+	}
+
 	/**
 	 * Method description
 	 * 
@@ -273,33 +294,51 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 	 * @param protocol
 	 * @param hostname
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
-	public SSLContext getSSLContext(String protocol, String hostname) {
+	public SSLContext getSSLContext(String protocol, String hostname, boolean clientMode, TrustManager... tms) {
 		SSLContext sslContext = null;
 
 		String alias = hostname;
 
 		try {
 
+			// in client mode we need SSLContext initialized with certificate for proper domain
+			// as in other case we would not be able to authenticate to other endpoint by
+			// providing proper client certificate for domain
+//			if (clientMode) {
+//				sslContext = SSLContext.getInstance(protocol);
+//				sslContext.init(null, tms, secureRandom);
+//				return sslContext;
+//			}
+
+
 			if (alias == null) {
 				alias = def_cert_alias;
 			} // end of if (hostname == null)
 
-			sslContext = sslContexts.get(alias);
+			sslContext = find(sslContexts, alias);
 
 			if (sslContext == null) {
-				KeyManagerFactory kmf = kmfs.get(alias);
+				KeyManagerFactory kmf = find(kmfs, alias);
 
 				if (kmf == null) {
+					// if there is no KeyManagerFactory for domain then we can create
+					// new empty context as we have no certificate for this domain
+					if (clientMode) {
+						sslContext = SSLContext.getInstance(protocol);
+						sslContext.init(null, tms, secureRandom);
+						return sslContext;
+					}
+
 					KeyPair keyPair = CertificateUtil.createKeyPair(1024, "secret");
 					X509Certificate cert = CertificateUtil.createSelfSignedCertificate(email, alias, ou, o, null, null, null,
 							keyPair);
 					CertificateEntry entry = new CertificateEntry();
 
 					entry.setPrivateKey(keyPair.getPrivate());
-					entry.setCertChain(new Certificate[] { cert });
+					entry.setCertChain(new Certificate[]{cert});
 					kmf = addCertificateEntry(entry, alias, true);
 					log.log(Level.WARNING, "Auto-generated certificate for domain: {0}", alias);
 				}
@@ -312,7 +351,7 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 			log.log(Level.SEVERE, "Can not initialize SSLContext for domain: " + alias + ", protocol: " + protocol, e);
 			sslContext = null;
 		}
-
+                
 		return sslContext;
 	}
 
@@ -320,7 +359,7 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public KeyStore getTrustStore() {
@@ -493,7 +532,7 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		long seconds = (System.currentTimeMillis() - start) / 1000;
 
 		log.log(Level.CONFIG, "Loaded {0} trust certificates, it took {1} seconds.", new Object[] { counter, seconds });
-	}
+	}	
 }
 
 // ~ Formatted in Sun Code Convention

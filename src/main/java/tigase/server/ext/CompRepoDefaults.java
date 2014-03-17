@@ -44,7 +44,7 @@ public abstract class CompRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static String getConfigKey() {
 		return "comp-items";
@@ -54,7 +54,7 @@ public abstract class CompRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static String[] getDefaultPropetyItems() {
 		return new String[] { "muc.domain.tld:passwd:listen:5277:accept" };
@@ -64,7 +64,7 @@ public abstract class CompRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static CompRepoItem getItemInstance() {
 		return new CompRepoItem();
@@ -74,7 +74,7 @@ public abstract class CompRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static String getItemsListPKey() {
 		return comp_list_pkey;
@@ -84,7 +84,7 @@ public abstract class CompRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static String getPropertyKey() {
 		return "--external";
@@ -94,7 +94,7 @@ public abstract class CompRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static BareJID getRepoUser() {
 		return comp_user;

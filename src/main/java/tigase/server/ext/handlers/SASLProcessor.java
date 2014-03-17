@@ -70,7 +70,7 @@ public class SASLProcessor implements ExtProcessor {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getId() {
@@ -84,7 +84,7 @@ public class SASLProcessor implements ExtProcessor {
 	 * @param serv
 	 * @param handler
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<Element> getStreamFeatures(ComponentIOService serv,
@@ -107,7 +107,7 @@ public class SASLProcessor implements ExtProcessor {
 	 * @param handler
 	 * @param results
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean process(Packet p, ComponentIOService serv, ComponentProtocolHandler handler,

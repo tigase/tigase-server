@@ -29,7 +29,7 @@ Works only for some components which actually use the repository that way.
 AS:Description: Remove an item
 AS:CommandId: comp-repo-item-remove
 AS:Component: vhost-man,ext
-*/
+ */
 
 package tigase.admin
 
@@ -47,6 +47,12 @@ def isServiceAdmin = admins.contains(stanzaFromBare)
 
 def itemKey = Command.getFieldValue(packet, ITEMS)
 
+def supportedComponents = ["vhost-man"]
+def NOTIFY_CLUSTER = "notify-cluster"
+boolean clusterMode =  Boolean.valueOf( System.getProperty("cluster-mode", false.toString()) );
+boolean notifyCluster = Boolean.valueOf( Command.getFieldValue(packet, NOTIFY_CLUSTER) )
+Queue results = new LinkedList()
+
 if (itemKey == null) {
 	def items = repo.allItems()
 	def itemsStr = []
@@ -61,11 +67,29 @@ if (itemKey == null) {
 		def result = p.commandResult(Command.DataType.form)
 		Command.addFieldValue(result, ITEMS, itemsStr[0], "List of items",
 			(String[])itemsStr, (String[])itemsStr)
+		if 	( clusterMode  ) {
+			Command.addHiddenField(result, NOTIFY_CLUSTER, true.toString())
+		}
 		return result
 	} else {
 		def result = p.commandResult(Command.DataType.result)
 		Command.addTextField(result, "Note", "There are no items on the list");
 		return result
+	}
+}
+
+if 	( clusterMode && notifyCluster && supportedComponents.contains(componentName) ) {
+	def nodes = (List)connectedNodes
+	if (nodes && nodes.size() > 0 ) {
+		nodes.each { node ->
+			def forward = p.copyElementOnly();
+			Command.removeFieldValue(forward, NOTIFY_CLUSTER)
+			Command.addHiddenField(forward, NOTIFY_CLUSTER, false.toString())
+			forward.setPacketTo( node );
+			forward.setPermissions( Permissions.ADMIN );
+
+			results.offer(forward)
+		}
 	}
 }
 
@@ -83,4 +107,5 @@ if (item == null) {
 	}
 }
 
-return result
+results.add(result);
+return results;

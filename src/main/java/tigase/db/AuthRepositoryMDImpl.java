@@ -95,7 +95,7 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 	 * @param id
 	 * @param alg
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws AuthorizationException
 	 * @throws TigaseDBException
@@ -126,7 +126,7 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	public AuthRepository getRepo(String domain) {
 		AuthRepository result = repos.get(domain);
@@ -142,7 +142,7 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getResourceUri() {
@@ -153,7 +153,7 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getUsersCount() {
@@ -172,7 +172,7 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getUsersCount(String domain) {
@@ -234,7 +234,7 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 	 *
 	 * @param authProps
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws AuthorizationException
 	 * @throws TigaseDBException
@@ -263,7 +263,7 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 	 * @param user
 	 * @param password
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws AuthorizationException
 	 * @throws TigaseDBException
@@ -311,7 +311,7 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	public AuthRepository removeRepo(String domain) {
 		return repos.remove(domain);

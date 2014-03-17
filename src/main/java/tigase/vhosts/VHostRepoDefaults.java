@@ -48,7 +48,7 @@ public abstract class VHostRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static String getConfigKey() {
 		return HOSTNAMES_PROP_KEY;
@@ -58,7 +58,7 @@ public abstract class VHostRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static String[] getDefaultPropetyItems() {
 		return DNSResolver.getDefHostNames();
@@ -68,7 +68,7 @@ public abstract class VHostRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static VHostItem getItemInstance() {
 		return new VHostItem();
@@ -78,7 +78,7 @@ public abstract class VHostRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static String getItemsListPKey() {
 		return vhost_list_pkey;
@@ -88,7 +88,7 @@ public abstract class VHostRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static String getPropertyKey() {
 		return GEN_VIRT_HOSTS;
@@ -98,7 +98,7 @@ public abstract class VHostRepoDefaults {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static BareJID getRepoUser() {
 		return vhost_user;

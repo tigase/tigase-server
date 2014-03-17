@@ -59,6 +59,7 @@ import java.util.TimerTask;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -98,8 +99,8 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	/** Field description */
 	public static final long MAX_PACKET_WAITING_TIME_PROP_VAL = 7 * MINUTE;
-	private static Map<String, ConnectionWatchdogTask> waitingTasks = new LinkedHashMap<String,
-		ConnectionWatchdogTask>();
+	private static Map<String, tigase.util.TimerTask> waitingTaskFutures = new LinkedHashMap<String,
+		tigase.util.TimerTask>();
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -141,7 +142,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean addOutPacket(Packet packet) {
@@ -156,7 +157,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 *
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -198,7 +199,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -209,7 +210,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoDescription() {
@@ -263,7 +264,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean handlesNonLocalDomains() {
@@ -276,7 +277,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int hashCodeForPacket(Packet packet) {
@@ -300,7 +301,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 *
 	 * @param session_id
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isIncomingValid(String session_id) {
 		if (session_id == null) {
@@ -603,7 +604,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 *
 	 * @param serv
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Queue<Packet> processSocketData(XMPPIOService<Object> serv) {
@@ -665,7 +666,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 * @param session_id
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean sendToIncoming(String session_id, Packet packet) {
 		XMPPIOService<Object> serv = incoming.get(session_id);
@@ -729,7 +730,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 *
 	 * @param serv
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean serviceStopped(XMPPIOService<Object> serv) {
@@ -895,7 +896,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 * @param serv
 	 * @param attribs
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String xmppStreamOpened(XMPPIOService<Object> serv, Map<String, String> attribs) {
@@ -1360,7 +1361,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	//~--- inner classes --------------------------------------------------------
 
-	private class ConnectionWatchdogTask extends TimerTask {
+	private class ConnectionWatchdogTask extends tigase.util.TimerTask {
 		private ServerConnections conns = null;
 		private String localhost = null;
 		private String remotehost = null;
@@ -1373,14 +1374,14 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 			this.remotehost = remotehost;
 
 			String key = localhost + remotehost;
-			ConnectionWatchdogTask task = waitingTasks.get(key);
+			tigase.util.TimerTask task = waitingTaskFutures.get(key);
 
 			if (task != null) {
 				task.cancel();
 			}
 
 			addTimerTask(this, 15, TimeUnit.SECONDS);
-			waitingTasks.put(key, this);
+			waitingTaskFutures.put(key, task);
 		}
 
 		//~--- methods ------------------------------------------------------------
@@ -1393,7 +1394,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		public void run() {
 			String key = localhost + remotehost;
 
-			waitingTasks.remove(key);
+			waitingTaskFutures.remove(key);
 
 			if (conns.getOutgoingState() != ServerConnections.OutgoingState.OK) {
 				if (log.isLoggable(Level.FINEST)) {

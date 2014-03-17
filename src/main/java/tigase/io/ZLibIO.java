@@ -81,7 +81,7 @@ public class ZLibIO implements IOInterface {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int bytesRead() {
@@ -124,7 +124,7 @@ public class ZLibIO implements IOInterface {
 	 *
 	 * @param caps
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean checkCapabilities(String caps) {
@@ -137,7 +137,7 @@ public class ZLibIO implements IOInterface {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws IOException
 	 */
@@ -150,7 +150,7 @@ public class ZLibIO implements IOInterface {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public SocketChannel getSocketChannel() {
@@ -180,7 +180,7 @@ public class ZLibIO implements IOInterface {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isConnected() {
@@ -193,7 +193,7 @@ public class ZLibIO implements IOInterface {
 	 *
 	 * @param addr
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isRemoteAddress(String addr) {
@@ -208,7 +208,7 @@ public class ZLibIO implements IOInterface {
 	 *
 	 * @param buff
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws IOException
 	 */
@@ -250,7 +250,7 @@ public class ZLibIO implements IOInterface {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String toString() {
@@ -261,7 +261,7 @@ public class ZLibIO implements IOInterface {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean waitingToSend() {
@@ -272,7 +272,7 @@ public class ZLibIO implements IOInterface {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int waitingToSendSize() {
@@ -285,7 +285,7 @@ public class ZLibIO implements IOInterface {
 	 *
 	 * @param buff
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws IOException
 	 */

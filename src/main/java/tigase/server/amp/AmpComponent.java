@@ -1,10 +1,13 @@
 /*
+ * AmpComponent.java
+ *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,10 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
+
 package tigase.server.amp;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -26,7 +29,6 @@ package tigase.server.amp;
 import tigase.disco.XMPPService;
 
 import tigase.server.AbstractMessageReceiver;
-import tigase.server.Packet;
 import tigase.server.amp.action.Alert;
 import tigase.server.amp.action.Drop;
 import tigase.server.amp.action.Notify;
@@ -34,6 +36,7 @@ import tigase.server.amp.action.Store;
 import tigase.server.amp.cond.Deliver;
 import tigase.server.amp.cond.ExpireAt;
 import tigase.server.amp.cond.MatchResource;
+import tigase.server.Packet;
 
 import tigase.xml.Element;
 
@@ -41,44 +44,49 @@ import tigase.xmpp.JID;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Map;
+import java.util.Queue;
 
 /**
  * Created: Apr 26, 2010 3:22:06 PM
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class AmpComponent extends AbstractMessageReceiver implements
-		ActionResultsHandlerIfc {
-	private static final Logger log = Logger.getLogger(AmpComponent.class.getName());
-	private static final String AMP_NODE = "http://jabber.org/protocol/amp";
-	private static final String AMP_XMLNS = AMP_NODE;
+public class AmpComponent
+				extends AbstractMessageReceiver
+				implements ActionResultsHandlerIfc {
+	private static final String AMP_NODE     = "http://jabber.org/protocol/amp";
+	private static final Logger log          =
+		Logger.getLogger(AmpComponent.class.getName());
+	private static final String AMP_XMLNS    = AMP_NODE;
 	private static final Element top_feature = new Element("feature",
-			new String[] { "var" }, new String[] { AMP_NODE });
+																							 new String[] { "var" },
+																							 new String[] { AMP_NODE });
+
+	//~--- fields ---------------------------------------------------------------
 
 	// ~--- fields ---------------------------------------------------------------
+	private Map<String, ActionIfc> actions       = new ConcurrentSkipListMap<String,
+																									 ActionIfc>();
+	private Map<String, ConditionIfc> conditions = new ConcurrentSkipListMap<String,
+																									 ConditionIfc>();
 
-	private Map<String, ActionIfc> actions = new ConcurrentSkipListMap<String, ActionIfc>();
-	private Map<String, ConditionIfc> conditions =
-			new ConcurrentSkipListMap<String, ConditionIfc>();
+	//~--- methods --------------------------------------------------------------
 
 	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param packet
+	 *
 	 * 
-	 * @return
 	 */
 	@Override
 	public boolean addOutPacket(Packet packet) {
@@ -87,31 +95,33 @@ public class AmpComponent extends AbstractMessageReceiver implements
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param packets
+	 *
 	 * 
-	 * @return
 	 */
 	@Override
 	public boolean addOutPackets(Queue<Packet> packets) {
 		return super.addOutPackets(packets);
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	// ~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param params
+	 *
 	 * 
-	 * @return
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defs = super.getDefaults(params);
-		ActionIfc action = new Drop();
+		ActionIfc action         = new Drop();
 
 		actions.put(action.getName(), action);
 		action = new tigase.server.amp.action.Error();
@@ -132,7 +142,6 @@ public class AmpComponent extends AbstractMessageReceiver implements
 		conditions.put(condition.getName(), condition);
 		condition = new MatchResource();
 		conditions.put(condition.getName(), condition);
-
 		for (ActionIfc a : actions.values()) {
 			Map<String, Object> d = a.getDefaults(params);
 
@@ -153,9 +162,9 @@ public class AmpComponent extends AbstractMessageReceiver implements
 
 	/**
 	 * Method description
+	 *
+	 *
 	 * 
-	 * 
-	 * @return
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -164,9 +173,9 @@ public class AmpComponent extends AbstractMessageReceiver implements
 
 	/**
 	 * Method description
+	 *
+	 *
 	 * 
-	 * 
-	 * @return
 	 */
 	@Override
 	public String getDiscoDescription() {
@@ -175,38 +184,38 @@ public class AmpComponent extends AbstractMessageReceiver implements
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param node
 	 * @param jid
 	 * @param from
+	 *
 	 * 
-	 * @return
 	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
 		Element query = super.getDiscoInfo(node, jid, from);
 
-		if ((jid != null)
-				&& (getName().equals(jid.getLocalpart()) || isLocalDomain(jid.toString()))
-				&& (AMP_NODE.equals(node))) {
+		if ((jid != null) &&
+				(getName().equals(jid.getLocalpart()) || isLocalDomain(jid.toString())) &&
+				(AMP_NODE.equals(node))) {
 			if (query == null) {
 				query = new Element("query");
 				query.setXMLNS(XMPPService.INFO_XMLNS);
 			}
-
 			query.addChild(new Element("identity", new String[] { "name", "category", "type" },
-					new String[] { getDiscoDescription(), "im", getDiscoCategoryType() }));
+																 new String[] { getDiscoDescription(),
+							"im", getDiscoCategoryType() }));
 			query.addChild(top_feature);
-
 			for (ActionIfc action : actions.values()) {
 				query.addChild(new Element("feature", new String[] { "var" },
-						new String[] { AMP_NODE + "?action=" + action.getName() }));
+																	 new String[] {
+																		 AMP_NODE + "?action=" + action.getName() }));
 			}
-
 			for (ConditionIfc cond : conditions.values()) {
 				query.addChild(new Element("feature", new String[] { "var" },
-						new String[] { AMP_NODE + "?condition=" + cond.getName() }));
+																	 new String[] {
+																		 AMP_NODE + "?condition=" + cond.getName() }));
 			}
 
 			// for (ProcessingThreads<ProcessorWorkerThread> proc_t :
@@ -219,38 +228,41 @@ public class AmpComponent extends AbstractMessageReceiver implements
 			// } // end of if (discoFeatures != null)
 			// }
 		}
-
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Found disco info: " + ((query != null) ? query.toString() : null));
+			log.finest("Found disco info: " + ((query != null)
+																				 ? query.toString()
+																				 : null));
 		}
 
 		return query;
 	}
 
+	//~--- methods --------------------------------------------------------------
+
 	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param packet
 	 */
 	@Override
 	public void processPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("My packet: " + packet);
-		} 
+		}
 
 		ActionIfc def = null;
 
-		if (packet.getAttribute(AmpFeatureIfc.OFFLINE) == null) {
+		if (packet.getAttributeStaticStr(AmpFeatureIfc.OFFLINE) == null) {
 			def = actions.get("deliver");
 		} else {
 			def = actions.get("store");
 		}
 
 		boolean exec_def = true;
-		Element amp = packet.getElement().getChild("amp", AMP_XMLNS);
+		Element amp      = packet.getElement().getChild("amp", AMP_XMLNS);
 
 		if (amp != null) {
 			List<Element> rules = amp.getChildren();
@@ -265,43 +277,44 @@ public class AmpComponent extends AbstractMessageReceiver implements
 				}
 			} else {
 				log.warning("AMP packet but empty rule-set! " + packet);
+
 				// In case of such error, let's just drop the packet
 				return;
 			}
 		} else {
 			log.warning("Not an AMP packet! " + packet);
+
 			// In case of such error, let's just drop the packet
 			return;
 		}
-
 		if (exec_def) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Executing default action: " + def.getName());
 			}
-
 			def.execute(packet, null);
 		}
 	}
+
+	//~--- set methods ----------------------------------------------------------
 
 	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param props
 	 */
 	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
-
 		if (props.size() == 1) {
+
 			// If props.size() == 1, it means this is a single property update
 			// and this component does not support single property change for the rest
 			// of it's settings
 			return;
 		}
-
 		for (ActionIfc a : actions.values()) {
 			a.setProperties(props, this);
 		}
@@ -311,10 +324,11 @@ public class AmpComponent extends AbstractMessageReceiver implements
 		// }
 	}
 
-	// ~--- methods --------------------------------------------------------------
+	//~--- methods --------------------------------------------------------------
 
+	// ~--- methods --------------------------------------------------------------
 	private boolean executeAction(Packet packet, Element rule) {
-		String act = rule.getAttribute(AmpFeatureIfc.ACTION_ATT);
+		String act = rule.getAttributeStaticStr(AmpFeatureIfc.ACTION_ATT);
 
 		if (act != null) {
 			ActionIfc action = actions.get(act);
@@ -338,7 +352,7 @@ public class AmpComponent extends AbstractMessageReceiver implements
 	}
 
 	private boolean matchCondition(Packet packet, Element rule) {
-		String cond = rule.getAttribute(AmpFeatureIfc.CONDITION_ATT);
+		String cond = rule.getAttributeStaticStr(AmpFeatureIfc.CONDITION_ATT);
 
 		if (cond != null) {
 			ConditionIfc condition = conditions.get(cond);
@@ -362,6 +376,11 @@ public class AmpComponent extends AbstractMessageReceiver implements
 	}
 }
 
+
+
 // ~ Formatted in Sun Code Convention
 
 // ~ Formatted by Jindent --- http://www.jindent.com
+
+
+//~ Formatted in Tigase Code Convention on 13/02/20

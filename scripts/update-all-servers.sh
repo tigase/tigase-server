@@ -1,19 +1,19 @@
 #!/bin/bash
 
 if [ "$1" == "" ] ; then
-  SERVERS=`cat all-production-servers.txt`
+	LOCATIONS=`cat all-production-servers.txt`
 else
-  SERVERS=`cat $1`
+	LOCATIONS=`cat $1`
 fi
 DIR="/home/tigase/tigase-server"
 
-echo -e "=== SERVERS:\n${SERVERS}"
+echo -e "=== LOCATIONS:\n${LOCATIONS}"
 echo -e "=== DIR:\n${DIR}"
 
-read -p "Press [Enter] key to start restart..."
+read -p "Press [Enter] key to start update..."
 
 
-for s in ${SERVERS} ; do
+for s in ${LOCATIONS} ; do
 
 	echo -e "\n\n===\tuploading to ${s} ==="
 

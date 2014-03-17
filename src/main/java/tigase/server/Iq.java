@@ -1,10 +1,13 @@
 /*
+ * Iq.java
+ *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.server;
 
@@ -30,15 +32,13 @@ import tigase.util.TigaseStringprepException;
 
 import tigase.xml.Element;
 
+import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
-import tigase.xmpp.impl.roster.RosterAbstract;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.List;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Created: Dec 31, 2009 8:43:21 PM
@@ -46,18 +46,42 @@ import java.util.List;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class Iq extends Packet {
-
+public class Iq
+				extends Packet {
 	/** Field description */
 	public static final String ELEM_NAME = "iq";
 
+	/** Field description */
+	public static final String QUERY_NAME = "query";
+
+	/** Field description */
+	public static final String[] IQ_QUERY_PATH = { ELEM_NAME, QUERY_NAME };
+
+	/** Field description */
+	public static final String[] IQ_PUBSUB_PATH = { ELEM_NAME, "pubsub" };
+
+	/** Field description */
+	public static final String[] IQ_ERROR_PATH = { ELEM_NAME, "error" };
+
+	/** Field description */
+	public static final String[] IQ_COMMAND_PATH = { ELEM_NAME, "command" };
+
+	/** Field description */
+	public static final String[] IQ_CHAT_PATH = { ELEM_NAME, "chat" };
+
+	/** Field description */
+	public static final String[] IQ_BIND_RESOURCE_PATH = { ELEM_NAME, "bind", "resource" };
+
+	/** Field description */
+	public static final String[] IQ_BIND_PATH = { ELEM_NAME, "bind" };
+
 	//~--- fields ---------------------------------------------------------------
 
-	private Command command = null;
-	private String iqQueryXMLNS = null;
-	private String strCommand = null;
+	private Command command      = null;
+	private String iqQueryXMLNS  = null;
+	private String strCommand    = null;
 	private boolean serviceDisco = false;
-	private boolean cmd = false;
+	private boolean cmd          = false;
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -95,7 +119,7 @@ public class Iq extends Packet {
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseStringprepException
 	 */
@@ -111,7 +135,7 @@ public class Iq extends Packet {
 	 *
 	 * @param packet
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseStringprepException
 	 */
@@ -147,16 +171,15 @@ public class Iq extends Packet {
 	 * specificly with a roster entry content.
 	 */
 	public static Iq createRosterPacket(String iq_type, String iq_id, JID from, JID to,
-			JID item_jid, String item_name, String[] item_groups, String subscription,
-				String item_type) {
+					JID item_jid, String item_name, String[] item_groups, String subscription,
+					String item_type) {
 		Element iq = new Element("iq", new String[] { "type", "id" }, new String[] { iq_type,
-				iq_id });
-		iq.setXMLNS(CLIENT_XMLNS);
+						iq_id });
 
+		iq.setXMLNS(CLIENT_XMLNS);
 		if (from != null) {
 			iq.addAttribute("from", from.toString());
 		}
-
 		if (to != null) {
 			iq.addAttribute("to", to.toString());
 		}
@@ -167,20 +190,17 @@ public class Iq extends Packet {
 		iq.addChild(query);
 
 		Element item = new Element("item", new String[] { "jid" },
-			new String[] { item_jid.toString() });
+															 new String[] { item_jid.toString() });
 
 		if (item_type != null) {
 			item.addAttribute("type", item_type);
 		}
-
 		if (item_name != null) {
 			item.addAttribute(RosterAbstract.NAME, item_name);
 		}
-
 		if (subscription != null) {
 			item.addAttribute(RosterAbstract.SUBSCRIPTION, subscription);
 		}
-
 		if (item_groups != null) {
 			for (String gr : item_groups) {
 				Element group = new Element(RosterAbstract.GROUP, gr);
@@ -188,7 +208,6 @@ public class Iq extends Packet {
 				item.addChild(group);
 			}
 		}
-
 		query.addChild(item);
 
 		return new Iq(iq, from, to);
@@ -200,11 +219,12 @@ public class Iq extends Packet {
 	 *
 	 * @param cmd_type
 	 *
-	 * @return
+	 * 
 	 */
 	public Packet commandResult(Command.DataType cmd_type) {
-		Packet result = packetInstance(command.createIqCommand(getStanzaTo(), getStanzaFrom(),
-			StanzaType.result, getStanzaId(), strCommand, cmd_type), getStanzaTo(), getStanzaFrom());
+		Packet result = packetInstance(command.createIqCommand(getStanzaTo(),
+											getStanzaFrom(), StanzaType.result, getStanzaId(), strCommand,
+											cmd_type), getStanzaTo(), getStanzaFrom());
 
 		result.setPacketFrom(getTo());
 		result.setPacketTo(getFrom());
@@ -218,7 +238,7 @@ public class Iq extends Packet {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Command getCommand() {
@@ -229,7 +249,7 @@ public class Iq extends Packet {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getIQChildName() {
 		List<Element> children = elem.getChildren();
@@ -245,11 +265,11 @@ public class Iq extends Packet {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getIQXMLNS() {
 		if (iqQueryXMLNS == null) {
-			iqQueryXMLNS = elem.getXMLNS("/iq/query");
+			iqQueryXMLNS = elem.getXMLNSStaticStr(IQ_QUERY_PATH);
 		}
 
 		return iqQueryXMLNS;
@@ -259,7 +279,18 @@ public class Iq extends Packet {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
+	 */
+	@Override
+	protected String[] getElNameErrorPath() {
+		return IQ_ERROR_PATH;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * 
 	 */
 	public String getStrCommand() {
 		return strCommand;
@@ -269,7 +300,7 @@ public class Iq extends Packet {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isCommand() {
@@ -280,7 +311,7 @@ public class Iq extends Packet {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isServiceDisco() {
@@ -293,18 +324,14 @@ public class Iq extends Packet {
 		Element child = elem.getChild("command", Command.XMLNS);
 
 		if (child != null) {
-			cmd = true;
-			strCommand = child.getAttribute("node");
-			command = Command.valueof(strCommand);
+			cmd        = true;
+			strCommand = child.getAttributeStaticStr("node");
+			command    = Command.valueof(strCommand);
 		}
-
-		serviceDisco = (isXMLNS("/iq/query", XMPPService.INFO_XMLNS)
-				|| isXMLNS("/iq/query", XMPPService.ITEMS_XMLNS));
+		serviceDisco = (isXMLNSStaticStr(IQ_QUERY_PATH, XMPPService.INFO_XMLNS) ||
+										isXMLNSStaticStr(IQ_QUERY_PATH, XMPPService.ITEMS_XMLNS));
 	}
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/02/20

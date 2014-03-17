@@ -20,7 +20,7 @@
 
 # Settings paths and other variables
 
-JAVA_HOME=/usr/java/default/
+JAVA_HOME=/usr/lib/jvm/java/
 
 USERNAME=tigase
 USERGROUP=tigase
@@ -28,7 +28,7 @@ NAME=tigase
 DESC="Tigase XMPP server"
 
 TIGASE_HOME=/home/tigase/tigase-server
-TIGASE_LIB=${TIGASE_HOME}/libs
+TIGASE_LIB=${TIGASE_HOME}/jars
 TIGASE_CONFIG=/etc/tigase/tigase-server.xml
 TIGASE_OPTIONS=
 TIGASE_PARAMS=
@@ -230,7 +230,7 @@ case "$1" in
 	restart|force-reload)
 	echo "Restarting $DESC"
 	stop
-	sleep 1
+	sleep 10
 	if start; then
 		success
 	else

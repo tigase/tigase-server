@@ -1,10 +1,13 @@
 /*
+ * StatisticsProviderMBean.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.stats;
 
@@ -28,15 +30,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-//~--- interfaces -------------------------------------------------------------
-
 /**
  * Interface StatisticsProviderMBean
  *
  * @author kobit
  */
 public interface StatisticsProviderMBean {
-
 	/**
 	 * Operation exposed for management
 	 * @param level Statistics level, 0 - All, 500 - Medium, 800 - Minimal
@@ -48,7 +47,9 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	public int getCLIOQueueSize();
 
@@ -56,7 +57,9 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>float[]</code>
 	 */
 	public float[] getCLPacketsPerSecHistory();
 
@@ -64,7 +67,9 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	public int getCLQueueSize();
 
@@ -72,31 +77,9 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
-	 */
-	public float getCPUUsage();
-
-	/**
-	 * Method description
 	 *
 	 *
-	 * @return
-	 */
-	public float[] getCPUUsageHistory();
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public int getCPUsNumber();
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
+	 * @return a value of <code>int</code>
 	 */
 	public int getClusterCacheSize();
 
@@ -104,7 +87,9 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>float</code>
 	 */
 	public float getClusterCompressionRatio();
 
@@ -112,7 +97,9 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>long</code>
 	 */
 	public long getClusterNetworkBytes();
 
@@ -120,7 +107,9 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>float</code>
 	 */
 	public float getClusterNetworkBytesPerSecond();
 
@@ -128,7 +117,9 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>long</code>
 	 */
 	public long getClusterPackets();
 
@@ -136,17 +127,11 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>float</code>
 	 */
 	public float getClusterPacketsPerSec();
-
-	/**
-	 * Operation exposed for management
-	 * @param compName The component name to provide statistics for
-	 * @param level Statistics level, 0 - All, 500 - Medium, 800 - Minimal
-	 * @return java.util.Map<String, String>
-	 */
-	public Map<String, String> getComponentStats(String compName, int level);
 
 ///**
 // * Operation exposed for management
@@ -158,15 +143,27 @@ public interface StatisticsProviderMBean {
 	/**
 	 * Get Attribute exposed for management
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>List<String></code>
 	 */
 	public List<String> getComponentsNames();
+
+	/**
+	 * Operation exposed for management
+	 * @param compName The component name to provide statistics for
+	 * @param level Statistics level, 0 - All, 500 - Medium, 800 - Minimal
+	 * @return java.util.Map<String, String>
+	 */
+	public Map<String, String> getComponentStats(String compName, int level);
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	public int getConnectionsNumber();
 
@@ -174,7 +171,9 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int[]</code>
 	 */
 	public int[] getConnectionsNumberHistory();
 
@@ -182,7 +181,65 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
+	 */
+	public int getCPUsNumber();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>float</code>
+	 */
+	public float getCPUUsage();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>float[]</code>
+	 */
+	public float[] getCPUUsageHistory();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param statsKeys is a <code>String[]</code>
+	 *
+	 * @return a value of <code>Map<String,Object></code>
+	 */
+	public Map<String, Object> getCurStats(String[] statsKeys);
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	public long getDirectMemUsed();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @return a value of <code>long[]</code>
+	 */
+	public long[] getDirectMemUsedHistory();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>float</code>
 	 */
 	public float getHeapMemUsage();
 
@@ -190,7 +247,9 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>float[]</code>
 	 */
 	public float[] getHeapUsageHistory();
 
@@ -198,7 +257,9 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>long</code>
 	 */
 	public long getIQAuthNumber();
 
@@ -206,7 +267,9 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>long</code>
 	 */
 	public long getIQOtherNumber();
 
@@ -214,7 +277,9 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>float</code>
 	 */
 	public float getIQOtherNumberPerSec();
 
@@ -222,7 +287,9 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>long</code>
 	 */
 	public long getMessagesNumber();
 
@@ -230,14 +297,18 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>float</code>
 	 */
 	public float getMessagesNumberPerSec();
 
 	/**
 	 * Get Attribute exposed for management
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String getName();
 
@@ -245,7 +316,9 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>float</code>
 	 */
 	public float getNonHeapMemUsage();
 
@@ -253,7 +326,9 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>long</code>
 	 */
 	public long getPresencesNumber();
 
@@ -261,7 +336,9 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>float</code>
 	 */
 	public float getPresencesNumberPerSec();
 
@@ -269,7 +346,9 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>long</code>
 	 */
 	public long getProcesCPUTime();
 
@@ -277,7 +356,9 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>long</code>
 	 */
 	public long getQueueOverflow();
 
@@ -285,7 +366,9 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int</code>
 	 */
 	public int getQueueSize();
 
@@ -293,39 +376,9 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
-	 */
-	public long getSMPacketsNumber();
-
-	/**
-	 * Method description
 	 *
 	 *
-	 * @return
-	 */
-	public float getSMPacketsNumberPerSec();
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public float[] getSMPacketsPerSecHistory();
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	public int getSMQueueSize();
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
+	 * @return a value of <code>int</code>
 	 */
 	public int getServerConnections();
 
@@ -333,7 +386,9 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>int[]</code>
 	 */
 	public int[] getServerConnectionsHistory();
 
@@ -341,7 +396,59 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>long</code>
+	 */
+	public long getSMPacketsNumber();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>float</code>
+	 */
+	public float getSMPacketsNumberPerSec();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>float[]</code>
+	 */
+	public float[] getSMPacketsPerSecHistory();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>int</code>
+	 */
+	public int getSMQueueSize();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param statsKeys is a <code>String[]</code>
+	 *
+	 * @return a value of <code>Map<String,LinkedList<Object>></code>
+	 */
+	public Map<String, LinkedList<Object>> getStatsHistory(String[] statsKeys);
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 *
+	 * @return a value of <code>String</code>
 	 */
 	public String getSystemDetails();
 
@@ -349,22 +456,12 @@ public interface StatisticsProviderMBean {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 *
+	 *
+	 * @return a value of <code>long</code>
 	 */
 	public long getUptime();
-	
-	public Map<String, LinkedList<Object>> getStatsHistory(String[] statsKeys);
-
-	/**
-	 * @param array
-	 * @return
-	 */
-	public Map<String, Object> getCurStats(String[] statsKeys);
-
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/11/29

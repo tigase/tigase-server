@@ -95,7 +95,7 @@ public class DummyRepository implements UserRepository, AuthRepository {
 	 * @param id
 	 * @param alg
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws AuthorizationException
 	 * @throws TigaseDBException
@@ -249,7 +249,7 @@ public class DummyRepository implements UserRepository, AuthRepository {
 	 *
 	 * @param user
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 */
@@ -284,7 +284,7 @@ public class DummyRepository implements UserRepository, AuthRepository {
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getUsersCount(String domain) {
@@ -320,7 +320,7 @@ public class DummyRepository implements UserRepository, AuthRepository {
 	 *
 	 * @param authProps
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws AuthorizationException
 	 * @throws TigaseDBException
@@ -339,7 +339,7 @@ public class DummyRepository implements UserRepository, AuthRepository {
 	 * @param user
 	 * @param password
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws AuthorizationException
 	 * @throws TigaseDBException
@@ -473,7 +473,7 @@ public class DummyRepository implements UserRepository, AuthRepository {
 	 *
 	 * @param user
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean userExists(BareJID user) {

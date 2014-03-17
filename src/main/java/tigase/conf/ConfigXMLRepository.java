@@ -110,7 +110,7 @@ public class ConfigXMLRepository extends ConfigurationCache {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws XMLDBException
 	 */
@@ -124,7 +124,7 @@ public class ConfigXMLRepository extends ConfigurationCache {
 	 *
 	 * @param file_name
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws XMLDBException
 	 */
@@ -140,7 +140,7 @@ public class ConfigXMLRepository extends ConfigurationCache {
 	 * @param debug
 	 * @param file_name
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws XMLDBException
 	 */
@@ -211,7 +211,7 @@ public class ConfigXMLRepository extends ConfigurationCache {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 */
@@ -235,7 +235,7 @@ public class ConfigXMLRepository extends ConfigurationCache {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] getCompNames() {
@@ -256,7 +256,7 @@ public class ConfigXMLRepository extends ConfigurationCache {
 	 * @param node
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public ConfigItem getItem(String compName, String node, String key) {
@@ -283,7 +283,7 @@ public class ConfigXMLRepository extends ConfigurationCache {
 	 *
 	 * @param compName
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Set<ConfigItem> getItemsForComponent(String compName) {
@@ -314,7 +314,7 @@ public class ConfigXMLRepository extends ConfigurationCache {
 	 * @param root
 	 * @param node
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] getKeys(final String root, final String node) {
@@ -354,7 +354,7 @@ public class ConfigXMLRepository extends ConfigurationCache {
 	 *
 	 * @param cls
 	 *
-	 * @return
+	 * 
 	 */
 	public String nodeForPackage(Class cls) {
 		return cls.getPackage().getName().replace('.', '/');
@@ -384,7 +384,7 @@ public class ConfigXMLRepository extends ConfigurationCache {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int size() {

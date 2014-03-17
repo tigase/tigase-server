@@ -70,7 +70,7 @@ public class JabberClientStreamOpenHandler implements StreamOpenHandler {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] getXMLNSs() {
@@ -85,7 +85,7 @@ public class JabberClientStreamOpenHandler implements StreamOpenHandler {
 	 *
 	 * @param serv
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String serviceStarted(ComponentIOService serv) {
@@ -123,7 +123,7 @@ public class JabberClientStreamOpenHandler implements StreamOpenHandler {
 	 * @param attribs
 	 * @param handler
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String streamOpened(ComponentIOService serv, Map<String, String> attribs,

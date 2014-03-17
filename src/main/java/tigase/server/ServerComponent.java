@@ -1,10 +1,13 @@
 /*
+ * ServerComponent.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,15 +18,19 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.server;
 
-import java.util.Queue;
+//~--- non-JDK imports --------------------------------------------------------
+
 import tigase.xmpp.JID;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.Queue;
 
 /**
  * Interface ServerComponent
@@ -37,19 +44,16 @@ import tigase.xmpp.JID;
  * @version $Rev$
  */
 public interface ServerComponent {
-  // Methods
+	/**
+	 * Method is called by <code>MessageRouter</code> when all the startup components of
+	 * the server have been loaded and configured through setProperties(...) call.
+	 * At this point the whole server should be loaded and functional, except
+	 * initializations taking place in this routine.
+	 *
+	 */
+	void initializationCompleted();
 
-  void setName(String name);
-
-  String getName();
-
-	//	void setComponentId(String id);
-
-	JID getComponentId();
-
-  void release();
-
-  /**
+	/**
 	 * <code>processPacket</code> is a blocking processing method implemented
 	 * by all components. This method processes packet and returns results
 	 * instantly without waiting for any resources.
@@ -59,6 +63,55 @@ public interface ServerComponent {
 	 */
 	void processPacket(Packet packet, Queue<Packet> results);
 
-	void initializationCompleted();
+	/**
+	 * Method description
+	 *
+	 */
+	void release();
 
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * 
+	 */
+	JID getComponentId();
+
+	/**
+	 * Allows to obtain various informations about components
+	 *
+	 * @return information about particular component
+	 */
+	ComponentInfo getComponentInfo();
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * 
+	 */
+	String getName();
+
+	/**
+	 * Method returns information about whether the initialization process
+	 * (initializationCompleted()) method has been called.
+	 * @return <code>true</code> if initialization of the object has been completed
+	 * <code>false</code> otherwise
+	 */
+	boolean isInitializationComplete();
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param name
+	 */
+	void setName(String name);
 }
+
+
+//~ Formatted in Tigase Code Convention on 13/06/08

@@ -69,7 +69,7 @@ public class HandshakeProcessor implements ExtProcessor {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getId() {
@@ -83,7 +83,7 @@ public class HandshakeProcessor implements ExtProcessor {
 	 * @param serv
 	 * @param handler
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<Element> getStreamFeatures(ComponentIOService serv,
@@ -102,7 +102,7 @@ public class HandshakeProcessor implements ExtProcessor {
 	 * @param handler
 	 * @param results
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean process(Packet p, ComponentIOService serv, ComponentProtocolHandler handler,

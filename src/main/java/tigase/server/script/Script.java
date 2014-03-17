@@ -70,7 +70,7 @@ public class Script extends AbstractScriptCommand {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Bindings getBindings() {
@@ -81,7 +81,7 @@ public class Script extends AbstractScriptCommand {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getFileExtension() {
 		return ext;
@@ -91,7 +91,7 @@ public class Script extends AbstractScriptCommand {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getLanguageName() {
 		return language;

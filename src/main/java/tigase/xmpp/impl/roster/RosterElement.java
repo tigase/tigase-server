@@ -1,10 +1,13 @@
 /*
- *   Tigase Jabber/XMPP Server
- *  Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * RosterElement.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.xmpp.impl.roster;
 
@@ -39,11 +41,9 @@ import static tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashSet;
+import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class RosterElement here.
@@ -54,44 +54,46 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class RosterElement implements RosterElementIfc {
-	private static final Logger log = Logger.getLogger(RosterElement.class.getName());
-	private static final String ELEM_NAME = "contact";
-	private static final String JID_ATT = "jid";
-	private static final String NAME_ATT = "name";
-	private static final String SUBS_ATT = "subs";
-	private static final String GRP_ATT = "groups";
-	private static final String OTHER_ATT = "other";
-	private static final String STRINGPREP_ATT = "preped";
-	private static final String ACTIVITY_ATT = "activity";
-	private static final String WEIGHT_ATT = "weight";
-	private static final String LAST_SEEN_ATT = "last-seen";
-
-	private static final double INITIAL_ACTIVITY_VAL = 1d;
-	private static final double INITIAL_WEIGHT_VAL = 1d;
+public class RosterElement
+				implements RosterElementIfc {
+	/** Field description */
 	protected static final long INITIAL_LAST_SEEN_VAL = 1000l;
+	private static final String ACTIVITY_ATT          = "activity";
+	private static final String ELEM_NAME             = "contact";
+	private static final String GRP_ATT               = "groups";
+	private static final double INITIAL_ACTIVITY_VAL  = 1d;
+	private static final double INITIAL_WEIGHT_VAL    = 1d;
+	private static final String JID_ATT               = "jid";
+	private static final String LAST_SEEN_ATT         = "last-seen";
+	private static final Logger log                   =
+		Logger.getLogger(RosterElement.class.getName());
+	private static final String NAME_ATT              = "name";
+	private static final String OTHER_ATT             = "other";
+	private static final String STRINGPREP_ATT        = "preped";
+	private static final String SUBS_ATT              = "subs";
+	private static final String WEIGHT_ATT            = "weight";
 
-	// ~--- fields ---------------------------------------------------------------
+	//~--- fields ---------------------------------------------------------------
 
-	private String[] groups = null;
-	private JID jid = null;
-	private String name = null;
-	private String otherData = null;
-	private long lastSeen = INITIAL_LAST_SEEN_VAL;
-	private double activity = INITIAL_ACTIVITY_VAL;
-	private double weight = INITIAL_WEIGHT_VAL;
+	private String[] groups                = null;
+	private JID jid                        = null;
+	private String name                    = null;
+	private String otherData               = null;
+	private long lastSeen                  = INITIAL_LAST_SEEN_VAL;
+	private double activity                = INITIAL_ACTIVITY_VAL;
 	private XMPPResourceConnection session = null;
-	private String stringpreped = null;
-	private SubscriptionType subscription = null;
-	private boolean presence_sent = false;
+	private String stringpreped            = null;
+	private SubscriptionType subscription  = null;
+	private double weight                  = INITIAL_WEIGHT_VAL;
+	private boolean presence_sent          = false;
+	private boolean persistent             = true;
 	private Map<String, Boolean> onlineMap = new ConcurrentHashMap<String, Boolean>();
 
 	// private Element item = null;
 	// private boolean online = false;
 	private boolean modified = false;
-	private boolean persistent = true;
 
-	// ~--- constructors ---------------------------------------------------------
+	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>RosterElement</code> instance.
@@ -102,33 +104,33 @@ public class RosterElement implements RosterElementIfc {
 	 * @throws TigaseStringprepException
 	 */
 	public RosterElement(Element roster_el, XMPPResourceConnection session)
-			throws TigaseStringprepException {
+					throws TigaseStringprepException {
 		this.session = session;
-
 		if (roster_el.getName() == ELEM_NAME) {
-			this.stringpreped = roster_el.getAttribute(STRINGPREP_ATT);
-			setJid(roster_el.getAttribute(JID_ATT));
-			setName(roster_el.getAttribute(NAME_ATT));
-
-			if (roster_el.getAttribute(SUBS_ATT) == null) {
+			this.stringpreped = roster_el.getAttributeStaticStr(STRINGPREP_ATT);
+			setJid(roster_el.getAttributeStaticStr(JID_ATT));
+			setName(roster_el.getAttributeStaticStr(NAME_ATT));
+			if (roster_el.getAttributeStaticStr(SUBS_ATT) == null) {
 				subscription = SubscriptionType.none;
 			} else {
-				subscription = SubscriptionType.valueOf(roster_el.getAttribute(SUBS_ATT));
+				subscription =
+					SubscriptionType.valueOf(roster_el.getAttributeStaticStr(SUBS_ATT));
 			}
 
-			String grps = roster_el.getAttribute(GRP_ATT);
+			String grps = roster_el.getAttributeStaticStr(GRP_ATT);
 
-			if ((grps != null) && !grps.trim().isEmpty()) {
-				groups = grps.split(",");
+			if ((grps != null) &&!grps.trim().isEmpty()) {
+				setGroups(grps.split(","));
 			}
 
-			String other_data = roster_el.getAttribute(OTHER_ATT);
+			String other_data = roster_el.getAttributeStaticStr(OTHER_ATT);
 
-			if ((other_data != null) && !other_data.trim().isEmpty()) {
+			if ((other_data != null) &&!other_data.trim().isEmpty()) {
 				otherData = other_data;
 			}
 
-			String num_str = roster_el.getAttribute(ACTIVITY_ATT);
+			String num_str = roster_el.getAttributeStaticStr(ACTIVITY_ATT);
+
 			if (num_str != null) {
 				try {
 					activity = Double.parseDouble(num_str);
@@ -137,8 +139,7 @@ public class RosterElement implements RosterElementIfc {
 					activity = INITIAL_ACTIVITY_VAL;
 				}
 			}
-
-			num_str = roster_el.getAttribute(WEIGHT_ATT);
+			num_str = roster_el.getAttributeStaticStr(WEIGHT_ATT);
 			if (num_str != null) {
 				try {
 					weight = Double.parseDouble(num_str);
@@ -147,8 +148,7 @@ public class RosterElement implements RosterElementIfc {
 					weight = INITIAL_WEIGHT_VAL;
 				}
 			}
-
-			num_str = roster_el.getAttribute(LAST_SEEN_ATT);
+			num_str = roster_el.getAttributeStaticStr(LAST_SEEN_ATT);
 			if (num_str != null) {
 				try {
 					lastSeen = Long.parseLong(num_str);
@@ -157,7 +157,6 @@ public class RosterElement implements RosterElementIfc {
 					lastSeen = INITIAL_LAST_SEEN_VAL;
 				}
 			}
-
 		} else {
 			log.warning("Incorrect roster data: " + roster_el.toString());
 		}
@@ -173,16 +172,16 @@ public class RosterElement implements RosterElementIfc {
 	 * @param session
 	 */
 	public RosterElement(JID jid, String name, String[] groups,
-			XMPPResourceConnection session) {
+											 XMPPResourceConnection session) {
 		this.stringpreped = XMPPStringPrepFactory.STRINGPREP_PROCESSOR;
-		this.session = session;
+		this.session      = session;
 		setJid(jid);
 		setName(name);
-		this.groups = groups;
+		setGroups(groups);
 		this.subscription = SubscriptionType.none;
 	}
 
-	// ~--- methods --------------------------------------------------------------
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
@@ -193,7 +192,7 @@ public class RosterElement implements RosterElementIfc {
 	public void addGroups(String[] groups) {
 		if (groups != null) {
 			if (this.groups == null) {
-				this.groups = groups;
+				setGroups(groups);
 			} else {
 
 				// Groups names must be unique
@@ -202,25 +201,23 @@ public class RosterElement implements RosterElementIfc {
 				for (String group : this.groups) {
 					groupsSet.add(group);
 				}
-
 				for (String group : groups) {
 					groupsSet.add(group);
 				}
-
-				this.groups = groupsSet.toArray(new String[groupsSet.size()]);
+				setGroups(groupsSet.toArray(new String[groupsSet.size()]));
 			}
 		}
 
 		// item = null;
 	}
 
-	// ~--- get methods ----------------------------------------------------------
+	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String[] getGroups() {
 		return groups;
@@ -230,7 +227,7 @@ public class RosterElement implements RosterElementIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public JID getJid() {
 		return jid;
@@ -240,7 +237,7 @@ public class RosterElement implements RosterElementIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getName() {
 		return name;
@@ -250,7 +247,7 @@ public class RosterElement implements RosterElementIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getOtherData() {
 		return otherData;
@@ -260,33 +257,28 @@ public class RosterElement implements RosterElementIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public Element getRosterElement() {
-		Element elem =
-				new Element(ELEM_NAME,
-						new String[] { JID_ATT, SUBS_ATT, NAME_ATT, STRINGPREP_ATT }, new String[] {
-								jid.toString(), subscription.toString(), name, "" + stringpreped });
+		Element elem = new Element(ELEM_NAME, new String[] { JID_ATT, SUBS_ATT, NAME_ATT,
+						STRINGPREP_ATT }, new String[] { jid.toString(), subscription.toString(),
+						XMLUtils.escape(name), "" + stringpreped });
 
 		if ((groups != null) && (groups.length > 0)) {
 			String grps = "";
 
 			for (String group : groups) {
-				grps += group + ",";
+				grps += XMLUtils.escape(group) + ",";
 			}
-
 			grps = grps.substring(0, grps.length() - 1);
 			elem.setAttribute(GRP_ATT, grps);
 		}
-
 		if (otherData != null) {
 			elem.setAttribute(OTHER_ATT, otherData);
 		}
-
 		elem.setAttribute(ACTIVITY_ATT, Double.toString(activity));
 		elem.setAttribute(WEIGHT_ATT, Double.toString(weight));
 		elem.setAttribute(LAST_SEEN_ATT, Long.toString(lastSeen));
-
 		modified = false;
 
 		return elem;
@@ -296,7 +288,7 @@ public class RosterElement implements RosterElementIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public Element getRosterItem() {
 
@@ -308,33 +300,42 @@ public class RosterElement implements RosterElementIfc {
 
 		item.setAttribute("jid", jid.toString());
 		item.addAttributes(subscription.getSubscriptionAttr());
-
 		if (name != null) {
 			item.setAttribute("name", XMLUtils.escape(name));
 		}
-
 		if (groups != null) {
 			for (String gr : groups) {
 				Element group = new Element("group");
 
 				group.setCData(XMLUtils.escape(gr));
 				item.addChild(group);
-			} // end of for ()
-		} // end of if-else
+			}    // end of for ()
+		}      // end of if-else
 
 		// }
 		return item;
 	}
 
-	public String toString() {
-		return getRosterItem().toString();
-	}
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return getRosterItem().toString();
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * 
 	 */
 	public SubscriptionType getSubscription() {
 		return subscription;
@@ -344,7 +345,7 @@ public class RosterElement implements RosterElementIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isModified() {
 		return modified;
@@ -354,7 +355,7 @@ public class RosterElement implements RosterElementIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isOnline() {
 		return onlineMap.size() > 0;
@@ -364,13 +365,13 @@ public class RosterElement implements RosterElementIfc {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isPresence_sent() {
 		return presence_sent;
 	}
 
-	// ~--- set methods ----------------------------------------------------------
+	//~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -378,11 +379,14 @@ public class RosterElement implements RosterElementIfc {
 	 *
 	 * @param groups
 	 */
-	public void setGroups(String[] groups) {
-		this.groups = groups;
-		modified = true;
-
-		// item = null;
+	public final void setGroups(String[] groups) {
+		if ((groups != null) && (groups.length > 0)) {
+			this.groups = new String[groups.length];
+			for (int i = 0; i < groups.length; i++) {
+				this.groups[i] = XMLUtils.unescape(groups[i]);
+			}
+			modified = true;
+		}
 	}
 
 	/**
@@ -391,28 +395,32 @@ public class RosterElement implements RosterElementIfc {
 	 *
 	 * @param name
 	 */
-	public void setName(String name) {
+	public final void setName(String name) {
+		String old_name = this.name;
+
 		if (name == null) {
 			this.name = this.jid.getLocalpart();
-
 			if ((this.name == null) || this.name.trim().isEmpty()) {
 				this.name = this.jid.getBareJID().toString();
 			}
-			modified = true;
 		} else {
-			this.name = name;
+			this.name = XMLUtils.unescape(name);
 		}
-
+		if (!this.name.equals(old_name)) {
+			modified = true;
+		}
 	}
 
 	/**
 	 * Method description
 	 *
 	 *
+	 *
+	 * @param resource
 	 * @param online
 	 */
 	public void setOnline(String resource, boolean online) {
-		if (onlineMap != null && resource != null) {
+		if ((onlineMap != null) && (resource != null)) {
 			if (online) {
 				onlineMap.put(resource, Boolean.TRUE);
 			} else {
@@ -453,7 +461,6 @@ public class RosterElement implements RosterElementIfc {
 		} else {
 			this.subscription = subscription;
 		}
-
 		modified = true;
 
 		// item = null;
@@ -471,20 +478,31 @@ public class RosterElement implements RosterElementIfc {
 			this.jid = JID.jidInstance(jid);
 			modified = true;
 		}
-
 		stringpreped = XMPPStringPrepFactory.STRINGPREP_PROCESSOR;
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	/**
-	 * @return
+	 * 
 	 */
 	public boolean isPersistent() {
 		return persistent;
 	}
 
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param persistent
+	 */
 	public void setPersistent(boolean persistent) {
 		this.persistent = persistent;
 	}
+
+	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * @return the activity
@@ -492,6 +510,8 @@ public class RosterElement implements RosterElementIfc {
 	public double getActivity() {
 		return activity;
 	}
+
+	//~--- set methods ----------------------------------------------------------
 
 	/**
 	 * @param activity
@@ -505,6 +525,8 @@ public class RosterElement implements RosterElementIfc {
 		modified = true;
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	/**
 	 * @return the weight
 	 */
@@ -512,15 +534,18 @@ public class RosterElement implements RosterElementIfc {
 		return weight;
 	}
 
+	//~--- set methods ----------------------------------------------------------
+
 	/**
 	 * @param weight
 	 *          the weight to set
 	 */
 	public void setWeight(double weight) {
 		this.weight = weight;
-		modified = true;
-
+		modified    = true;
 	}
+
+	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * @return the lastSeen
@@ -529,12 +554,16 @@ public class RosterElement implements RosterElementIfc {
 		return lastSeen;
 	}
 
+	//~--- set methods ----------------------------------------------------------
+
 	/**
 	 * @param lastSeen the lastSeen to set
 	 */
 	public void setLastSeen(long lastSeen) {
 		this.lastSeen = lastSeen;
-		modified = true;
+		modified      = true;
 	}
-
 }
+
+
+//~ Formatted in Tigase Code Convention on 13/02/28

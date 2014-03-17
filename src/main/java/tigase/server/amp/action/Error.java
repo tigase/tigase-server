@@ -65,7 +65,7 @@ public class Error extends ActionAbstract {
 	 * @param rule
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean execute(Packet packet, Element rule) {
@@ -92,7 +92,7 @@ public class Error extends ActionAbstract {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getName() {

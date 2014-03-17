@@ -43,7 +43,7 @@ public abstract class TimeUtils {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static int getHourNow() {
 		Calendar cal = Calendar.getInstance();
@@ -55,7 +55,7 @@ public abstract class TimeUtils {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public static int getMinuteNow() {
 		Calendar cal = Calendar.getInstance();

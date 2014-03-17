@@ -1,25 +1,27 @@
-
 /*
-* Tigase Jabber/XMPP Server
-* Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU Affero General Public License as published by
-* the Free Software Foundation, version 3 of the License.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU Affero General Public License for more details.
-*
-* You should have received a copy of the GNU Affero General Public License
-* along with this program. Look for COPYING file in the top folder.
-* If not, see http://www.gnu.org/licenses/.
-*
-* $Rev$
-* Last modified by $Author$
-* $Date$
+ * S2SAbstractProcessor.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ *
  */
+
+
+
 package tigase.server.xmppserver.proc;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -34,12 +36,10 @@ import tigase.xml.Element;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.List;
-import java.util.Map;
-import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Map;
+import java.util.Queue;
 
 /**
  * Created: Dec 10, 2010 3:32:11 PM
@@ -47,29 +47,73 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class S2SAbstractProcessor implements S2SProcessor {
-	protected static final String XMLNS_SERVER_VAL = "jabber:server";
-	protected static final String XMLNS_CLIENT_VAL = "jabber:client";
-	protected static final String XMLNS_DB_VAL = "jabber:server:dialback";
-	protected static final String RESULT_EL_NAME = "result";
-	protected static final String VERIFY_EL_NAME = "verify";
+public abstract class S2SAbstractProcessor
+				implements S2SProcessor {
+	/** Field description */
 	protected static final String DB_RESULT_EL_NAME = "db:result";
+
+	/** Field description */
 	protected static final String DB_VERIFY_EL_NAME = "db:verify";
-	protected static final String XMLNS_DB_ATT = "xmlns:db";
-	protected static final String STREAM_FEATURES_EL = "stream:features";
+
+	/** Field description */
+	protected static final String DIALBACK_EL = "dialback";
+
+	/** Field description */
+	protected static final String DIALBACK_NS = "urn:xmpp:features:dialback";
+
+	/** Field description */
 	protected static final String FEATURES_EL = "features";
+
+	/** Field description */
 	protected static final String FEATURES_NS = "http://etherx.jabber.org/streams";
-	protected static final String START_TLS_EL = "starttls";
-	protected static final String DIALBACK_TLS_EL = "dialback";
+
+	/** Field description */
 	protected static final String PROCEED_TLS_EL = "proceed";
+
+	/** Field description */
+	protected static final String RESULT_EL_NAME = "result";
+
+	/** Field description */
+	protected static final String START_TLS_EL = "starttls";
+
+	/** Field description */
 	protected static final String START_TLS_NS = "urn:ietf:params:xml:ns:xmpp-tls";
-	protected static final String DIALBACK_TLS_NS = "urn:xmpp:features:dialback";
+
+	/** Field description */
+	protected static final String STREAM_FEATURES_EL = "stream:features";
+
+	/** Field description */
+	protected static final String VERIFY_EL_NAME = "verify";
+
+	/** Field description */
 	protected static final String VERSION_ATT_NAME = "version";
-	private static final Logger log = Logger.getLogger(S2SAbstractProcessor.class.getName());
+
+	/** Field description */
+	protected static final String XMLNS_CLIENT_VAL = "jabber:client";
+
+	/** Field description */
+	protected static final String XMLNS_DB_ATT = "xmlns:db";
+
+	/** Field description */
+	protected static final String XMLNS_DB_VAL = "jabber:server:dialback";
+
+	/** Field description */
+	protected static final String XMLNS_SERVER_VAL = "jabber:server";
+
+	/** Field description */
+	protected static final String[] FEATURES_STARTTLS_PATH = { FEATURES_EL, START_TLS_EL };
+
+	/** Field description */
+	protected static final String[] FEATURES_DIALBACK_PATH = { FEATURES_EL, DIALBACK_EL };
+	private static final Logger log                        =
+		Logger.getLogger(S2SAbstractProcessor.class.getName());
+
+	/** Field description */
 	public static boolean FORCE_VERSION = false;
 
 	//~--- fields ---------------------------------------------------------------
 
+	/** Field description */
 	protected S2SConnectionHandlerIfc<S2SIOService> handler = null;
 
 	//~--- methods --------------------------------------------------------------
@@ -82,27 +126,28 @@ public abstract class S2SAbstractProcessor implements S2SProcessor {
 	 * @param error_el
 	 * @param serv
 	 */
-	public void generateStreamError(boolean initStream, String error_el, S2SIOService serv) {
+	public void generateStreamError(boolean initStream, String error_el,
+																	S2SIOService serv) {
 		String strError = "";
 
 		if (initStream) {
-			strError += "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS_SERVER_VAL + "'"
-					+ " xmlns:stream='http://etherx.jabber.org/streams'" + " id='tigase-server-error'"
-						+ " from='" + handler.getDefHostName() + "'" + " xml:lang='en'>";
+			strError += "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS_SERVER_VAL +
+									"'" + " xmlns:stream='http://etherx.jabber.org/streams'" +
+									" id='tigase-server-error'" + " from='" + handler.getDefHostName() +
+									"'" + " xml:lang='en'>";
 		}
-
-		strError += "<stream:error>" + "<" + error_el
-				+ " xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" + "</stream:error>" + "</stream:stream>";
-
+		strError += "<stream:error>" + "<" + error_el +
+								" xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" + "</stream:error>" +
+								"</stream:stream>";
 		try {
 			if (log.isLoggable(Level.FINEST)) {
 				Throwable thr = new Throwable();
 
 				thr.fillInStackTrace();
 				log.log(Level.FINEST, "Called from: ", thr);
-				log.log(Level.FINEST, "{0}, Sending stream error: {1}", new Object[] { serv, strError });
+				log.log(Level.FINEST, "{0}, Sending stream error: {1}", new Object[] { serv,
+								strError });
 			}
-
 			handler.writeRawData(serv, strError);
 			serv.stop();
 		} catch (Exception e) {
@@ -115,9 +160,11 @@ public abstract class S2SAbstractProcessor implements S2SProcessor {
 	 *
 	 *
 	 * @param handler
+	 * @param props
 	 */
 	@Override
-	public void init(S2SConnectionHandlerIfc<S2SIOService> handler) {
+	public void init(S2SConnectionHandlerIfc<S2SIOService> handler,
+									 Map<String, Object> props) {
 		this.handler = handler;
 	}
 
@@ -129,7 +176,7 @@ public abstract class S2SAbstractProcessor implements S2SProcessor {
 	 * @param serv
 	 * @param results
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
@@ -160,7 +207,7 @@ public abstract class S2SAbstractProcessor implements S2SProcessor {
 	 *
 	 * @param hostname
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean skipTLSForHost(String hostname) {
 
@@ -212,7 +259,7 @@ public abstract class S2SAbstractProcessor implements S2SProcessor {
 	 * @param serv
 	 * @param attribs
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String streamOpened(S2SIOService serv, Map<String, String> attribs) {
@@ -221,7 +268,4 @@ public abstract class S2SAbstractProcessor implements S2SProcessor {
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/03/05

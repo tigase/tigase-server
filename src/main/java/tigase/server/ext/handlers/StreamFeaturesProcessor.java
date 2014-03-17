@@ -63,7 +63,7 @@ public class StreamFeaturesProcessor implements ExtProcessor {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getId() {
@@ -77,7 +77,7 @@ public class StreamFeaturesProcessor implements ExtProcessor {
 	 * @param serv
 	 * @param handler
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<Element> getStreamFeatures(ComponentIOService serv,
@@ -96,7 +96,7 @@ public class StreamFeaturesProcessor implements ExtProcessor {
 	 * @param handler
 	 * @param results
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean process(Packet p, ComponentIOService serv, ComponentProtocolHandler handler,

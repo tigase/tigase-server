@@ -1,4 +1,6 @@
 /*
+ * Constants.java
+ *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
@@ -15,14 +17,11 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
 
-package tigase.server.bosh;
 
-//~--- classes ----------------------------------------------------------------
+
+package tigase.server.bosh;
 
 /**
  * Describe class Constants here.
@@ -34,55 +33,158 @@ package tigase.server.bosh;
  * @version $Rev$
  */
 public abstract class Constants {
-
 	/** Field description */
 	public static final String BOSH_VERSION = "1.6";
-	protected static final int MAX_PACKETS = 15;
-	protected static final String XMLNS_CLIENT_VAL = "jabber:client";
-	protected static final String MAX_WAIT_DEF_PROP_KEY = "max-wait";
-	protected static final long MAX_WAIT_DEF_PROP_VAL = 30;
-	protected static final String MIN_POLLING_PROP_KEY = "min-polling";
-	protected static final long MIN_POLLING_PROP_VAL = 10;
-	protected static final String MAX_INACTIVITY_PROP_KEY = "max-inactivity";
-	protected static final long MAX_INACTIVITY_PROP_VAL = 10;
-	protected static final String CONCURRENT_REQUESTS_PROP_KEY = "concurrent-requests";
-	protected static final int CONCURRENT_REQUESTS_PROP_VAL = 2;
-	protected static final String HOLD_REQUESTS_PROP_KEY = "hold-requests";
-	protected static final int HOLD_REQUESTS_PROP_VAL = 1;
-	protected static final String MAX_PAUSE_PROP_KEY = "max-inactivity";
-	protected static final long MAX_PAUSE_PROP_VAL = 10;
-        protected static final int MAX_BATCH_SIZE_VAL = MAX_PACKETS;
-        protected static final String MAX_BATCH_SIZE_KEY = "max-batch-size";
-        protected static final String BATCH_QUEUE_TIMEOUT_KEY = "batch-queue-timeout";
-        protected static final long BATCH_QUEUE_TIMEOUT_VAL = 100;
-	protected static final String BOSH_XMLNS = "http://jabber.org/protocol/httpbind";
-	protected static final String BODY_EL_NAME = "body";
-	protected static final String CONTENT_ATTR = "content";
-	protected static final String WAIT_ATTR = "wait";
-	protected static final String HOLD_ATTR = "hold";
-	protected static final String RID_ATTR = "rid";
-	protected static final String TO_ATTR = "to";
-	protected static final String ROUTE_ATTR = "route";
-	protected static final String SECURE_ATTR = "secure";
-	protected static final String ACK_ATTR = "ack";
-	protected static final String SID_ATTR = "sid";
-	protected static final String INACTIVITY_ATTR = "inactivity";
-	protected static final String POLLING_ATTR = "polling";
-	protected static final String REQUESTS_ATTR = "requests";
+
+	/** Field description */
 	protected static final String ACCEPT_ATTR = "accept";
-	protected static final String MAXPAUSE_ATTR = "maxpause";
-	protected static final String CHARSETS_ATTR = "charsets";
-	protected static final String VER_ATTR = "ver";
-	protected static final String FROM_ATTR = "from";
+
+	/** Field description */
+	protected static final String ACK_ATTR = "ack";
+
+	/** Field description */
 	protected static final String AUTHID_ATTR = "authid";
-	protected static final String RESTART_ATTR = "xmpp:restart";
-	protected static final String LANG_ATTR = "xml:lang";
+
+	/** Field description */
+	protected static final String BATCH_QUEUE_TIMEOUT_KEY = "batch-queue-timeout";
+
+	/** Field description */
+	protected static final long BATCH_QUEUE_TIMEOUT_VAL = 100;
+
+	/** Field description */
+	protected static final String BODY_EL_NAME = "body";
+
+	/** Field description */
+	protected static final String[] BODY_EL_PATH = { "body" };
+
+	/** Field description */
+	protected static final long BOSH_SESSION_CLOSE_DELAY_DEF_VAL = 0;
+
+	/** Field description */
+	protected static final String BOSH_SESSION_CLOSE_DELAY_PROP_KEY =
+		"bosh-session-close-delay";
+
+	/** Field description */
+	protected static final String BOSH_XMLNS = "http://jabber.org/protocol/httpbind";
+
+	/** Field description */
 	protected static final String CACHE_ATTR = "cache";
+
+	/** Field description */
 	protected static final String CACHE_ID_ATTR = "cache-id";
+
+	/** Field description */
+	protected static final String CHARSETS_ATTR = "charsets";
+
+	/** Field description */
+	protected static final String CONCURRENT_REQUESTS_PROP_KEY = "concurrent-requests";
+
+	/** Field description */
+	protected static final int CONCURRENT_REQUESTS_PROP_VAL = 2;
+
+	/** Field description */
+	protected static final String CONTENT_ATTR = "content";
+
+	/** Field description */
 	protected static final String CONTENT_TYPE_DEF = "text/xml; charset=utf-8";
+
+	/** Field description */
+	protected static final String FROM_ATTR = "from";
+
+	/** Field description */
+	protected static final String HOLD_ATTR = "hold";
+
+	/** Field description */
+	protected static final String HOLD_REQUESTS_PROP_KEY = "hold-requests";
+
+	/** Field description */
+	protected static final int HOLD_REQUESTS_PROP_VAL = 1;
+
+	/** Name of custom attribute to pass name of host to which 
+	 * BOSH connection is established */
+	protected static final String HOST_ATTR = "host";
+	
+	/** Field description */
+	protected static final String INACTIVITY_ATTR = "inactivity";
+
+	/** Field description */
+	protected static final String LANG_ATTR = "xml:lang";
+
+	/** Field description */
+	protected static final String MAX_BATCH_SIZE_KEY = "max-batch-size";
+
+	/** Field description */
+	protected static final String MAX_INACTIVITY_PROP_KEY = "max-inactivity";
+
+	/** Field description */
+	protected static final long MAX_INACTIVITY_PROP_VAL = 10;
+
+	/** Field description */
+	protected static final int MAX_PACKETS = 15;
+
+	/** Field description */
+	protected static final String MAX_PAUSE_PROP_KEY = "max-inactivity";
+
+	/** Field description */
+	protected static final long MAX_PAUSE_PROP_VAL = 10;
+
+	/** Field description */
+	protected static final String MAX_WAIT_DEF_PROP_KEY = "max-wait";
+
+	/** Field description */
+	protected static final long MAX_WAIT_DEF_PROP_VAL = 30;
+
+	/** Field description */
+	protected static final String MAXPAUSE_ATTR = "maxpause";
+
+	/** Field description */
+	protected static final String MIN_POLLING_PROP_KEY = "min-polling";
+
+	/** Field description */
+	protected static final long MIN_POLLING_PROP_VAL = 10;
+
+	/** Field description */
+	protected static final String POLLING_ATTR = "polling";
+
+	/** Field description */
+	protected static final String REQUESTS_ATTR = "requests";
+
+	/** Field description */
+	protected static final String RESTART_ATTR = "xmpp:restart";
+
+	/** Field description */
+	protected static final String RID_ATTR = "rid";
+
+	/** Field description */
+	protected static final String ROUTE_ATTR = "route";
+
+	/** Field description */
+	protected static final String SECURE_ATTR = "secure";
+
+	/** Field description */
+	protected static final String SID_ATTR = "sid";
+
+	/** Field description */
+	protected static final String TO_ATTR = "to";
+
+	/** Field description */
+	protected static final String VER_ATTR = "ver";
+
+	/** Field description */
+	protected static final String WAIT_ATTR = "wait";
+
+	/** Field description */
+	protected static final String XMLNS_CLIENT_VAL = "jabber:client";
+
+	/** Field description */
+	protected static final int MAX_BATCH_SIZE_VAL = MAX_PACKETS;
 
 	//~--- constant enums -------------------------------------------------------
 
+	/**
+	 * Enum description
+	 *
+	 */
 	protected enum CacheAction {
 		on, off, set, add, get, get_all, remove;
 	}
@@ -97,7 +199,4 @@ public abstract class Constants {
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/02/16

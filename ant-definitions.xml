@@ -13,6 +13,8 @@
 		destdir="${build}"
 		debug="on"
 		encoding="UTF-8"
+		source="1.6"
+		target="1.6"		
 		deprecation="@{deprecation}">
 		<compilerarg line="@{xlint}"/>
 		<classpath>
@@ -126,21 +128,24 @@
       <copy
         file="ChangeLog"
         tofile="${dist}/@{packagename}-${version}/ChangeLog"/>
-      <mkdir dir="${dist}/@{packagename}-${version}/libs"/>
-      <copy todir="${dist}/@{packagename}-${version}/libs">
-        <filelist dir="libs">
+      <mkdir dir="${dist}/@{packagename}-${version}/${libs}"/>
+      <copy todir="${dist}/@{packagename}-${version}/${libs}">
+        <filelist dir="${libs}">
           <file name="tigase-utils.jar"/>
           <file name="tigase-xmltools.jar"/>
-          <file name="jdbc-mysql.jar"/>
-          <file name="groovy-all-1.8.5.jar"/>
-          <file name="jdbc-postgresql.jar"/>
+          <file name="mysql-connector-java.jar"/>
+          <file name="groovy-all.jar"/>
+          <file name="postgresql.jar"/>
           <file name="derby.jar"/>
           <file name="derbytools.jar"/>
-          <file name="jtds-1.2.2.jar"/>
+          <file name="jtds.jar"/>
           <file name="jdmkrt.jar"/>
           <file name="tigase-extras.jar"/>
           <file name="tigase-muc.jar"/>
           <file name="tigase-pubsub.jar"/>
+          <file name="tigase-stun.jar"/>
+          <file name="tigase-socks5.jar"/>
+          <file name="tigase-message-archiving.jar"/>
         </filelist>
       </copy>
       <mkdir dir="${dist}/@{packagename}-${version}/certs"/>
@@ -159,6 +164,10 @@
           <file name="jmx.password"/>
           <file name="cross-domain-policy.xml"/>
           <file name="bosh-extra-headers.txt"/>
+          <file name="client-access-policy.xml"/>
+          <file name="logback.xml"/>
+          <file name="snmp.acl"/>
+          <file name="tigase-http-context.xml"/>
         </filelist>
       </copy>
       <mkdir dir="${dist}/@{packagename}-${version}/database"/>
@@ -216,6 +225,10 @@
         zipfile="@{packagename}-${version}.tar.gz"
         src="@{packagename}-${version}.tar"/>
       <delete file="@{packagename}-${version}.tar"/>
+      <move todir="pack/">
+        <fileset file="@{packagename}-${version}.tar.gz"/>
+        <fileset file="@{packagename}-${version}.zip"/>
+      </move>
     </sequential>
   </macrodef>
 
@@ -277,8 +290,8 @@
   	  <exec executable="svn">
         <arg line="export --non-interactive @{cvsroot} ${deb.src}"/>
   	  </exec>
-  	  <mkdir dir="${deb.src}/libs"/>
-  	  <copy todir="${deb.src}/libs">
+  	  <mkdir dir="${deb.src}/${libs}"/>
+  	  <copy todir="${deb.src}/${libs}">
   	    <fileset dir="${libs}"/>
   	  </copy>
   	  <!-- FIXME: Remove after adding etc/init-debian.properties to SVN -->

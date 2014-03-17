@@ -124,7 +124,7 @@ public class UserRepositoryMDImpl implements UserRepository {
 	 * @param key
 	 * @param def
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 * @throws UserNotFoundException
@@ -153,7 +153,7 @@ public class UserRepositoryMDImpl implements UserRepository {
 	 * @param subnode
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 * @throws UserNotFoundException
@@ -181,7 +181,7 @@ public class UserRepositoryMDImpl implements UserRepository {
 	 * @param user
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 * @throws UserNotFoundException
@@ -210,7 +210,7 @@ public class UserRepositoryMDImpl implements UserRepository {
 	 * @param subnode
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 * @throws UserNotFoundException
@@ -238,7 +238,7 @@ public class UserRepositoryMDImpl implements UserRepository {
 	 * @param user
 	 * @param subnode
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 * @throws UserNotFoundException
@@ -265,7 +265,7 @@ public class UserRepositoryMDImpl implements UserRepository {
 	 *
 	 * @param user
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 * @throws UserNotFoundException
@@ -291,7 +291,7 @@ public class UserRepositoryMDImpl implements UserRepository {
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	public UserRepository getRepo(String domain) {
 		UserRepository result = repos.get(domain);
@@ -307,7 +307,7 @@ public class UserRepositoryMDImpl implements UserRepository {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getResourceUri() {
@@ -321,7 +321,7 @@ public class UserRepositoryMDImpl implements UserRepository {
 	 * @param user
 	 * @param subnode
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 * @throws UserNotFoundException
@@ -348,7 +348,7 @@ public class UserRepositoryMDImpl implements UserRepository {
 	 *
 	 * @param user
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 * @throws UserNotFoundException
@@ -374,7 +374,7 @@ public class UserRepositoryMDImpl implements UserRepository {
 	 *
 	 * @param user
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 */
@@ -397,7 +397,7 @@ public class UserRepositoryMDImpl implements UserRepository {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 */
@@ -416,7 +416,7 @@ public class UserRepositoryMDImpl implements UserRepository {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getUsersCount() {
@@ -435,7 +435,7 @@ public class UserRepositoryMDImpl implements UserRepository {
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getUsersCount(String domain) {
@@ -524,7 +524,7 @@ public class UserRepositoryMDImpl implements UserRepository {
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	public UserRepository removeRepo(String domain) {
 		return repos.remove(domain);
@@ -673,7 +673,7 @@ public class UserRepositoryMDImpl implements UserRepository {
 	 *
 	 * @param user
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean userExists(BareJID user) {

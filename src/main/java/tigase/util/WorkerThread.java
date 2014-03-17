@@ -59,7 +59,7 @@ public abstract class WorkerThread extends Thread {
 	 *
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public abstract WorkerThread getNewInstance();
 
@@ -85,7 +85,7 @@ public abstract class WorkerThread extends Thread {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long getAverageProcessingTime() {
 		return averageProcessingTime;
@@ -95,7 +95,7 @@ public abstract class WorkerThread extends Thread {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public long getRunsCounter() {
 		return runsCnt;
@@ -109,7 +109,7 @@ public abstract class WorkerThread extends Thread {
 	 *
 	 * @param item
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean offer(QueueItem item) {
 		return queue.offer(item);
@@ -170,11 +170,16 @@ public abstract class WorkerThread extends Thread {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public int size() {
 		return queue.size();
 	}
+        
+        public void shutdown() {
+                stopped = true;
+        }
+        
 }
 
 

@@ -1,10 +1,13 @@
 /*
+ * ReceiverBareJidLB.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,33 +18,50 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev: 2411 $
- * Last modified by $Author: kobit $
- * $Date: 2010-10-27 20:27:58 -0600 (Wed, 27 Oct 2010) $
- * 
  */
+
+
+
 package tigase.server.ext.lb;
 
-import java.util.ArrayList;
+//~--- non-JDK imports --------------------------------------------------------
 
-import tigase.server.Packet;
 import tigase.server.ext.ComponentConnection;
 import tigase.server.ext.ComponentIOService;
+import tigase.server.Packet;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.List;
 
 /**
  * @author Artur Hefczyc Created Jul 9, 2011
  */
-public class ReceiverBareJidLB implements LoadBalancerIfc {
+public class ReceiverBareJidLB
+				implements LoadBalancerIfc {
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param p
+	 * @param conns
+	 *
+	 * 
+	 */
+	@Override
+	public ComponentIOService selectConnection(Packet p, List<ComponentConnection> conns) {
+		ComponentIOService  result = null;
+		int                 idx = Math.abs(p.getStanzaTo().getBareJID().hashCode() % conns
+				.size());
+		ComponentConnection conn   = conns.get(idx);
 
-	public ComponentIOService selectConnection(Packet p,
-			ArrayList<ComponentConnection> conns) {
-		ComponentIOService result = null;
-		int idx = Math.abs(p.getStanzaTo().getBareJID().hashCode() % conns.size());
-		ComponentConnection conn = conns.get(idx);
-		if (conn.getService() != null && conn.getService().isConnected()) {
+		if ((conn.getService() != null) && conn.getService().isConnected()) {
 			result = conn.getService();
 		}
+
 		return result;
 	}
-
 }
+
+
+//~ Formatted in Tigase Code Convention on 13/03/16

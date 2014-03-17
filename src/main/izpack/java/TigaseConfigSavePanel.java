@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.Map;
 import java.util.Properties;
+import java.net.URLEncoder;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -37,6 +38,9 @@ import com.izforge.izpack.installer.InstallerFrame;
 import com.izforge.izpack.installer.IzPanel;
 import com.izforge.izpack.util.Debug;
 import com.izforge.izpack.util.OsVersion;
+import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The Hello panel class.
@@ -105,6 +109,7 @@ public class TigaseConfigSavePanel extends IzPanel {
 
 abstract class VariablesSource {
 	abstract String getVariable(String key);
+	abstract String getEncodedVariable(String key);
 }
 
 class IzPackInstallDataVariablesSource extends VariablesSource {
@@ -112,25 +117,41 @@ class IzPackInstallDataVariablesSource extends VariablesSource {
 
 	public IzPackInstallDataVariablesSource(AutomatedInstallData idata) {
 		this.idata = idata;
-		
+
 	}
 
 	@Override
 	String getVariable(String key) {
 		return idata.getVariable(key);
 	}
+
+	@Override
+	String getEncodedVariable(String key) {
+
+		String variable = idata.getVariable(key);
+		String value = null;
+		try {
+			value = URLEncoder.encode(variable, "UTF-8");
+		} catch ( Exception ex ) {
+			Logger.getLogger( TigaseConfigSaveHelper.class.getName() ).log( Level.SEVERE, null, ex );
+		}
+		return value;
+	}
 }
 
 class TigaseConfigSaveHelper {
-	
+
 	String showConfig(VariablesSource variablesSource) {
+		TigaseConfigConst.props.clear();
 		StringBuilder config = new StringBuilder();
 		int comp_idx = 0;
 		for (Map.Entry<String, String> entry:
-        TigaseConfigConst.tigaseIzPackMap.entrySet()) {
+		TigaseConfigConst.tigaseIzPackMap.entrySet()) {
 			String varName = entry.getValue();
 			String varValue = variablesSource.getVariable(varName);
 
+			Debug.trace("=== Processing varName: varValue :: " + varName + " : " + varValue);
+			
 			if (varName.equals(TigaseConfigConst.DEBUG)) {
 				String debugVar = getDebugs(variablesSource);
 				if (!debugVar.isEmpty()) {
@@ -149,10 +170,11 @@ class TigaseConfigSaveHelper {
 			}
 			if (varName.equals(TigaseConfigConst.USER_DB_URI)) {
 				TigaseConfigConst.props.setProperty(entry.getKey(), getDBUri(variablesSource));
-				TigaseConfigConst.props.setProperty("root-tigase-db-uri",
-					getRootTigaseDBUri(variablesSource));
+				TigaseConfigConst.props.setProperty("root-tigase-db-uri",getRootTigaseDBUri(variablesSource));
 				TigaseConfigConst.props.setProperty("root-db-uri", getRootDBUri(variablesSource));
 				Debug.trace("Set: " + entry.getKey() + " = " + getDBUri(variablesSource));
+				Debug.trace("Set: " + "root-tigase-db-uri" + " = " + getRootTigaseDBUri(variablesSource));
+				Debug.trace("Set: " + "root-db-uri" + " = " + getRootDBUri(variablesSource));
 				continue;
 			}
 
@@ -169,26 +191,102 @@ class TigaseConfigSaveHelper {
 				Debug.trace("Set: " + entry.getKey() + " = " + getAuthHandler(varValue, variablesSource));
 				continue;
 			}
-			if (varName.equals(TigaseConfigConst.MUC_COMP)) {
-				if (varValue.equals("on")) {
+			if (varName.equals(TigaseConfigConst.MUC_COMP))  {
+				if ( varValue.equals( "on" ) ){
 					++comp_idx;
-					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "muc");
-					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
-						"tigase.muc.MUCComponent");
+					TigaseConfigConst.props.setProperty( "--comp-name-" + comp_idx, "muc" );
+
+					String acsMUC = TigaseConfigConst.tigaseIzPackMap.get( "--muc_acs" );
+					String acsMUCValue = variablesSource.getVariable( acsMUC );
+					Debug.trace( " @@ Set: acsMUC " + acsMUC + " / acsMUCValue: " + acsMUCValue );
+
+					if ( acsMUC != null && acsMUCValue != null && acsMUCValue.equals( "acs" ) ){
+						TigaseConfigConst.props.setProperty( "--comp-class-" + comp_idx,
+																								 TigaseConfigConst.ACS_MUC_COMP_CLASS );
+						Debug.trace( "Set: " + "--comp-name-" + comp_idx + " = " + "muc" + " % to:" + "--comp-class-" + comp_idx + "=" + TigaseConfigConst.ACS_MUC_COMP_CLASS );
+					} else {
+						TigaseConfigConst.props.setProperty( "--comp-class-" + comp_idx,
+																								 TigaseConfigConst.MUC_COMP_CLASS );
+						Debug.trace( "Set: " + "--comp-name-" + comp_idx + " = " + "muc" + " % to:" + "--comp-class-" + comp_idx + "=" + TigaseConfigConst.MUC_COMP_CLASS );
+					}
 				}
-				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "muc");
 				continue;
 			}
-			if (varName.equals(TigaseConfigConst.PUBSUB_COMP)) {
-				if (varValue.equals("on")) {
+			
+			if ( varName.equals( TigaseConfigConst.PUBSUB_COMP ) ){
+				if ( varValue.equals( "on" ) ){
 					++comp_idx;
-					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "pubsub");
-					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
-						"tigase.pubsub.PubSubClusterComponent");
+					TigaseConfigConst.props.setProperty( "--comp-name-" + comp_idx, "pubsub" );
+					String acsPubSub = TigaseConfigConst.tigaseIzPackMap.get( "--pubsub_acs" );
+					String acsPubSubValue = variablesSource.getVariable( acsPubSub );
+					Debug.trace( " @@ Set: acsMUC " + acsPubSub + " / acsMUCValue: " + acsPubSubValue );
+
+					if ( acsPubSub != null && acsPubSubValue != null && acsPubSubValue.equals( "acs" ) ){
+						TigaseConfigConst.props.setProperty( "--comp-class-" + comp_idx,
+																								 TigaseConfigConst.ACS_PUBSUB_COMP_CLASS );
+						Debug.trace( "Set: " + "--comp-name-" + comp_idx + " = " + "pubsub" + " % to:" + "--comp-class-" + comp_idx + "=" + TigaseConfigConst.ACS_PUBSUB_COMP_CLASS );
+					} else {
+						TigaseConfigConst.props.setProperty( "--comp-class-" + comp_idx,
+																								 TigaseConfigConst.PUBSUB_COMP_CLASS );
+						Debug.trace( "Set: " + "--comp-name-" + comp_idx + " = " + "pubsub" + " % to:" + "--comp-class-" + comp_idx + "=" + TigaseConfigConst.PUBSUB_COMP_CLASS );
+					}
 				}
-				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "pubsub");
 				continue;
 			}
+
+			if (varName.equals(TigaseConfigConst.ACS_PUBSUB_COMP) || varName.equals(TigaseConfigConst.ACS_MUC_COMP)) {
+				continue;
+			}
+
+			if (varName.equals(TigaseConfigConst.SOCKS5_COMP)) {
+				if (varValue.equals("on")) {
+					++comp_idx;
+					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "proxy");
+					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
+						TigaseConfigConst.SOCKS5_COMP_CLASS);
+				}
+				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "proxy" + " % to:" + "--comp-class-"+comp_idx + "=" + TigaseConfigConst.SOCKS5_COMP_CLASS);
+				continue;
+			}
+			if (varName.equals(TigaseConfigConst.STUN_COMP)) {
+				if (varValue.equals("on")) {
+					++comp_idx;
+					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "stun");
+					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
+						TigaseConfigConst.STUN_COMP_CLASS);
+				}
+				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "stun" + " % to:" + "--comp-class-"+comp_idx + "=" + TigaseConfigConst.STUN_COMP_CLASS);
+				continue;
+			}
+			if (varName.equals(TigaseConfigConst.HTTP_COMP)) {
+				if (varValue.equals("on")) {
+					++comp_idx;
+					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "rest");
+					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
+						TigaseConfigConst.HTTP_COMP_CLASS);
+				}
+				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "rest" + " % to:" + "--comp-class-"+comp_idx + "=" + TigaseConfigConst.HTTP_COMP_CLASS);
+				continue;
+			}
+			if (varName.equals(TigaseConfigConst.ARCHIVE_COMP)) {
+				if (varValue.equals("on")) {
+					++comp_idx;
+					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "message-archive");
+					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
+						TigaseConfigConst.ARCHIVE_COMP_CLASS);
+				}
+				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "message-archive" + " % to:" + "--comp-class-"+comp_idx + "=" + TigaseConfigConst.HTTP_COMP_CLASS);
+				continue;
+			}
+
+			if (varName.equals(TigaseConfigConst.ACS_COMP)) {
+				if (varValue.equals("on")) {
+					TigaseConfigConst.props.setProperty("--sm-cluster-strategy-class", TigaseConfigConst.ACS_COMP_CLASS);
+				}
+				Debug.trace("Set: " + "--sm-cluster-strategy-class = " + TigaseConfigConst.ACS_COMP_CLASS);
+				continue;
+			}
+
 			if (varName.equals(TigaseConfigConst.AUTH_DB_URI)) {
 				String auth_db_uri = getAuthUri(variablesSource);
 				if (auth_db_uri != null) {
@@ -215,8 +313,11 @@ class TigaseConfigSaveHelper {
 	private String getDBUri(VariablesSource variablesSource) {
 		String db_uri = "jdbc:";
 		String database = getUserDB(variablesSource);
+		Debug.trace("getDBUri | database: "  +database);
 		if (database.equals("pgsql")) {
 			db_uri += "postgresql:";
+		} else if (database.equals("sqlserver")) {
+			db_uri += "jtds:sqlserver:";
 		} else {
 			db_uri += database + ":";
 		}
@@ -226,13 +327,24 @@ class TigaseConfigSaveHelper {
 				derby_path = derby_path.replace("\\", "\\\\");
 			}
 			db_uri += derby_path;
+		} else if ( database.equals( "sqlserver" ) ){
+			db_uri += "//" + variablesSource.getVariable("dbHost");
+			db_uri += ";databaseName=" + variablesSource.getVariable("dbName");
+			db_uri += ";user=" + variablesSource.getEncodedVariable("dbUser");
+			if ( variablesSource.getEncodedVariable( "dbPass" ) != null
+					 && !variablesSource.getEncodedVariable( "dbPass" ).isEmpty() ){
+				db_uri += ";password=" + variablesSource.getEncodedVariable( "dbPass" );
+			}
+			db_uri += ";schema=dbo";
+			db_uri += ";lastUpdateCount=false";
+			db_uri += ";cacheMetaData=false";
 		} else {
 			db_uri += "//" + variablesSource.getVariable("dbHost");
 			db_uri += "/" + variablesSource.getVariable("dbName");
-			db_uri += "?user=" + variablesSource.getVariable("dbUser");
-			if (variablesSource.getVariable("dbPass") != null
-				&& !variablesSource.getVariable("dbPass").isEmpty()) {
-				db_uri += "&password=" + variablesSource.getVariable("dbPass");
+			db_uri += "?user=" + variablesSource.getEncodedVariable("dbUser");
+			if (variablesSource.getEncodedVariable("dbPass") != null
+				&& !variablesSource.getEncodedVariable("dbPass").isEmpty()) {
+				db_uri += "&password=" + variablesSource.getEncodedVariable("dbPass");
 			}
 		}
 		return db_uri;
@@ -241,20 +353,34 @@ class TigaseConfigSaveHelper {
 	private String getRootTigaseDBUri(VariablesSource variablesSource) {
 		String db_uri = "jdbc:";
 		String database = getUserDB(variablesSource);
+		Debug.trace("getDBUri | database: " + database);
 		if (database.equals("pgsql")) {
 			db_uri += "postgresql:";
+		} else if (database.equals("sqlserver")) {
+			db_uri += "jtds:sqlserver:";
 		} else {
 			db_uri += database + ":";
 		}
 		if (database.equals("derby")) {
 			db_uri += variablesSource.getVariable("DerbyDBPath") + ";create=true";
+		} else if ( database.equals( "sqlserver" ) ){
+			db_uri += "//" + variablesSource.getVariable("dbHost");
+			db_uri += ";databaseName=" + variablesSource.getVariable("dbName");
+			db_uri += ";user=" + variablesSource.getEncodedVariable("dbSuperuser");
+			if ( variablesSource.getEncodedVariable( "dbSuperpass" ) != null
+					 && !variablesSource.getEncodedVariable( "dbSuperpass" ).isEmpty() ){
+				db_uri += ";password=" + variablesSource.getEncodedVariable( "dbSuperpass" );
+			}
+			db_uri += ";schema=dbo";
+			db_uri += ";lastUpdateCount=false";
+			db_uri += ";cacheMetaData=false";
 		} else {
 			db_uri += "//" + variablesSource.getVariable("dbHost");
 			db_uri += "/" + variablesSource.getVariable("dbName");
-			db_uri += "?user=" + variablesSource.getVariable("dbSuperuser");
-			if (variablesSource.getVariable("dbSuperpass") != null
-				&& !variablesSource.getVariable("dbSuperpass").isEmpty()) {
-				db_uri += "&password=" + variablesSource.getVariable("dbSuperpass");
+			db_uri += "?user=" + variablesSource.getEncodedVariable("dbSuperuser");
+			if (variablesSource.getEncodedVariable("dbSuperpass") != null
+				&& !variablesSource.getEncodedVariable("dbSuperpass").isEmpty()) {
+				db_uri += "&password=" + variablesSource.getEncodedVariable("dbSuperpass");
 			}
 		}
 		return db_uri;
@@ -264,9 +390,13 @@ class TigaseConfigSaveHelper {
 		String db_uri = "jdbc:";
 		String db = "";
 		String database = getUserDB(variablesSource);
+		Debug.trace("getDBUri | database: " + database);
 		if (database.equals("pgsql")) {
 			db_uri += "postgresql:";
 			db = "/postgres";
+		} else if (database.equals("sqlserver")) {
+			db_uri += "jtds:sqlserver:";
+			db = ";databaseName=master";
 		} else {
 			db_uri += database + ":";
 			if (database.equals("mysql")) {
@@ -275,13 +405,24 @@ class TigaseConfigSaveHelper {
 		}
 		if (database.equals("derby")) {
 			db_uri += variablesSource.getVariable("DerbyDBPath") + ";create=true";
+		} else if ( database.equals( "sqlserver" ) ){
+			db_uri += "//" + variablesSource.getVariable("dbHost");
+			db_uri += ";databaseName=master";
+			db_uri += ";user=" + variablesSource.getEncodedVariable("dbSuperuser");
+			if ( variablesSource.getEncodedVariable( "dbSuperpass" ) != null
+					 && !variablesSource.getEncodedVariable( "dbSuperpass" ).isEmpty() ){
+				db_uri += ";password=" + variablesSource.getEncodedVariable( "dbSuperpass" );
+			}
+			db_uri += ";schema=dbo";
+			db_uri += ";lastUpdateCount=false";
+			db_uri += ";cacheMetaData=false";
 		} else {
 			db_uri += "//" + variablesSource.getVariable("dbHost");
 			db_uri += db;
-			db_uri += "?user=" + variablesSource.getVariable("dbSuperuser");
-			if (variablesSource.getVariable("dbSuperpass") != null
-				&& !variablesSource.getVariable("dbSuperpass").isEmpty()) {
-				db_uri += "&password=" + variablesSource.getVariable("dbSuperpass");
+			db_uri += "?user=" + variablesSource.getEncodedVariable("dbSuperuser");
+			if (variablesSource.getEncodedVariable("dbSuperpass") != null
+				&& !variablesSource.getEncodedVariable("dbSuperpass").isEmpty()) {
+				db_uri += "&password=" + variablesSource.getEncodedVariable("dbSuperpass");
 			}
 		}
 		return db_uri;
@@ -298,13 +439,24 @@ class TigaseConfigSaveHelper {
 			} else {
 				return null;
 			}
+		} else if ( database.equals( "sqlserver" ) ){
+			db_uri += "//" + variablesSource.getVariable("dbAuthHost");
+			db_uri += ";databaseName=" + variablesSource.getVariable("dbAuthName");
+			db_uri += ";user=" + variablesSource.getEncodedVariable("dbAuthUser");
+			if ( variablesSource.getEncodedVariable( "dbAuthPass" ) != null
+					 && !variablesSource.getEncodedVariable( "dbAuthPass" ).isEmpty() ){
+				db_uri += ";password=" + variablesSource.getEncodedVariable( "dbAuthPass" );
+			}
+			db_uri += ";schema=dbo";
+			db_uri += ";lastUpdateCount=false";
+			db_uri += ";cacheMetaData=false";
 		} else {
 			db_uri += "//" + variablesSource.getVariable("dbAuthHost");
 			db_uri += "/" + variablesSource.getVariable("dbAuthName");
-			db_uri += "?user=" + variablesSource.getVariable("dbAuthUser");
-			if (variablesSource.getVariable("dbAuthPass") != null
-				&& !variablesSource.getVariable("dbAuthPass").isEmpty()) {
-				db_uri += "&password=" + variablesSource.getVariable("dbAuthPass");
+			db_uri += "?user=" + variablesSource.getEncodedVariable("dbAuthUser");
+			if (variablesSource.getEncodedVariable("dbAuthPass") != null
+				&& !variablesSource.getEncodedVariable("dbAuthPass").isEmpty()) {
+				db_uri += "&password=" + variablesSource.getEncodedVariable("dbAuthPass");
 			}
 		}
 		return db_uri;
@@ -322,7 +474,7 @@ class TigaseConfigSaveHelper {
 				Debug.trace("Missing variables for: " + plugin);
 				continue;
 			}
-			
+
 			final String value = variablesSource.getVariable(plugin);
 			final String prefix;
 			final String pluginId = TigaseConfigConst.getPluginId(plugin);
@@ -330,14 +482,14 @@ class TigaseConfigSaveHelper {
 				prefix = "-";
 			} else {
 				prefix = "+";
-			} 
-			
+			}
+
 			if (!plugins.isEmpty()) {
 				plugins += ",";
 			}
 			plugins += prefix + pluginId;
 		}
-		
+
 		return plugins;
 	}
 
@@ -350,7 +502,7 @@ class TigaseConfigSaveHelper {
 			return "server";
 		}
 		for (String deb: TigaseConfigConst.ALL_DEBUGS) {
-			if (variablesSource.getVariable(deb) == null 
+			if (variablesSource.getVariable(deb) == null
 					|| variablesSource.getVariable(deb).equals("off")) {
 				continue;
 			}
@@ -369,12 +521,14 @@ class TigaseConfigSaveHelper {
 		return var;
 	}
 
-	private String getUserDB(VariablesSource variablesSource) {
-		String dbVar = variablesSource.getVariable(TigaseConfigConst.DB_TYPE);
-		String result = TigaseConfigConst.userDBMap.get(dbVar);
+	private String getUserDB( VariablesSource variablesSource ) {
+		String dbVar = variablesSource.getVariable( TigaseConfigConst.DB_TYPE );
+		Debug.trace( "@@ getUserDB | dbVar: " + dbVar );
+		String result = TigaseConfigConst.userDBMap.get( dbVar );
+		Debug.trace( "@@ getUserDB | result: " + result );
 		return result != null ? result : "derby";
 	}
-	
+
 	// returns null if ok, error string on error
 	String saveConfig(AutomatedInstallData variablesSource, String config) {
 		// Try to read the config file.

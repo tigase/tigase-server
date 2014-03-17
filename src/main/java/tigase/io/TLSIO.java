@@ -32,10 +32,12 @@ import java.io.EOFException;
 import java.io.IOException;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.SocketChannel;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.net.ssl.SSLEngineResult;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -94,11 +96,12 @@ public class TLSIO implements IOInterface {
 	 * 
 	 * @throws IOException
 	 */
-	public TLSIO(final IOInterface ioi, final TLSWrapper wrapper) throws IOException {
+	public TLSIO(final IOInterface ioi, final TLSWrapper wrapper, final ByteOrder order) throws IOException {
 		io = ioi;
 		tlsWrapper = wrapper;
 		tlsWrapper.setDebugId(toString());
 		tlsInput = ByteBuffer.allocate(tlsWrapper.getAppBuffSize());
+                tlsInput.order(order);
 
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "TLS Socket created: {0}", io.toString());
@@ -119,7 +122,7 @@ public class TLSIO implements IOInterface {
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public int bytesRead() {
@@ -162,7 +165,7 @@ public class TLSIO implements IOInterface {
 	 * 
 	 * @param caps
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean checkCapabilities(String caps) {
@@ -175,7 +178,7 @@ public class TLSIO implements IOInterface {
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws IOException
 	 */
@@ -188,7 +191,7 @@ public class TLSIO implements IOInterface {
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public SocketChannel getSocketChannel() {
@@ -213,7 +216,7 @@ public class TLSIO implements IOInterface {
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isConnected() {
@@ -226,7 +229,7 @@ public class TLSIO implements IOInterface {
 	 * 
 	 * @param addr
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isRemoteAddress(String addr) {
@@ -241,7 +244,7 @@ public class TLSIO implements IOInterface {
 	 * 
 	 * @param buff
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws IOException
 	 */
@@ -290,7 +293,7 @@ public class TLSIO implements IOInterface {
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public String toString() {
@@ -301,7 +304,7 @@ public class TLSIO implements IOInterface {
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean waitingToSend() {
@@ -312,7 +315,7 @@ public class TLSIO implements IOInterface {
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public int waitingToSendSize() {
@@ -325,7 +328,7 @@ public class TLSIO implements IOInterface {
 	 * 
 	 * @param buff
 	 * 
-	 * @return
+	 * 
 	 * 
 	 * @throws IOException
 	 */
@@ -341,6 +344,8 @@ public class TLSIO implements IOInterface {
 		int loop_cnt = 0;
 		int max_loop_runs = 1000;
 
+		boolean breakNow = true;
+		
 		while (((stat == TLSStatus.NEED_WRITE) || (stat == TLSStatus.NEED_READ))
 				&& (++loop_cnt < max_loop_runs)) {
 			switch (stat) {
@@ -350,7 +355,20 @@ public class TLSIO implements IOInterface {
 					break;
 
 				case NEED_READ:
-
+					// We can get NEED_READ TLS status while there are data awaiting to be
+					// sent thru network connection - we need to force sending data and to break
+					// from this loop
+					if (io.waitingToSend()) {
+						io.write(null);
+						
+						// it appears only during handshake so force break only in this case
+						if (tlsWrapper.getTlsEngine().getHandshakeStatus() == 
+								SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING 
+								&& (buff == null || !buff.hasRemaining())) {
+							breakNow = true;
+						}
+					}
+					
 					// I wonder if some real data can be read from the socket here (and we
 					// would
 					// loose the data) or this is just TLS stuff here.....
@@ -370,6 +388,13 @@ public class TLSIO implements IOInterface {
 			}
 
 			stat = tlsWrapper.getStatus();
+		
+			// We can get NEED_READ TLS status while there are data awaiting to be
+			// sent thru network connection - we need to force sending data and to break
+			// from this loop
+			if (breakNow) {
+				break;
+			}
 		}
 
 		if (loop_cnt > (max_loop_runs / 2)) {

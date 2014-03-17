@@ -55,7 +55,7 @@ public class MonitorComponent extends AbstractMessageReceiver {
 	 *
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -68,7 +68,7 @@ public class MonitorComponent extends AbstractMessageReceiver {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoCategoryType() {
@@ -79,7 +79,7 @@ public class MonitorComponent extends AbstractMessageReceiver {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getDiscoDescription() {
@@ -100,10 +100,10 @@ public class MonitorComponent extends AbstractMessageReceiver {
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * Method description
+	 * Initialize a mapping of key/value pairs which can be used in scripts
+	 * loaded by the server
 	 *
-	 *
-	 * @param binds
+	 * @param binds A mapping of key/value pairs, all of whose keys are Strings.
 	 */
 	@Override
 	public void initBindings(Bindings binds) {
@@ -123,7 +123,7 @@ public class MonitorComponent extends AbstractMessageReceiver {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public int processingInThreads() {

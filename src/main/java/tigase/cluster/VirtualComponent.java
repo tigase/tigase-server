@@ -1,10 +1,13 @@
 /*
+ * VirtualComponent.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.cluster;
 
@@ -30,6 +32,8 @@ import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
 
+import tigase.server.ComponentInfo;
+
 import tigase.server.DisableDisco;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
@@ -37,7 +41,6 @@ import tigase.server.ServerComponent;
 import tigase.util.DNSResolver;
 import tigase.util.TigaseStringprepException;
 
-import tigase.vhosts.VHostItem;
 import tigase.vhosts.VHostListener;
 import tigase.vhosts.VHostManagerIfc;
 
@@ -51,12 +54,10 @@ import tigase.xmpp.JID;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Map;
+import java.util.Queue;
 
 /**
  * The purpose of this component implementation is to forward packets to a
@@ -99,6 +100,7 @@ import java.util.logging.Logger;
  * muc/disco-type=text
  * muc/disco-category=conference
  * muc/disco-features=http://jabber.org/protocol/muc
+ * muc/fixed-domain=example.com
  * </pre>
  *
  * Above options set all possible parameters to setup virtual MUC component.
@@ -107,20 +109,28 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class VirtualComponent implements ServerComponent, XMPPService, Configurable,
-		DisableDisco, VHostListener {
+public class VirtualComponent
+				implements ServerComponent, XMPPService, Configurable, DisableDisco,
+						VHostListener {
+	/**
+	 * Parameter to set service discovery item category name for the virtual
+	 * component. Please refer to service discovery documentation for a correct
+	 * category or check what is returned by your real component instance.
+	 */
+	public static final String DISCO_CATEGORY_PROP_KEY = "disco-category";
 
-	protected VHostManagerIfc vHostManager = null;
+	/** Field description */
+	public static final String DISCO_CATEGORY_PROP_VAL = "conference";
 
 	/**
-	 * Variable <code>log</code> is a class logger.
+	 * Comma separated list of features for the service discovery item represented
+	 * by this virtual component. Please check with the real component to obtain a
+	 * correct list of features.
 	 */
-	private static final Logger log = Logger.getLogger("tigase.cluster.VirtualComponent");
+	public static final String DISCO_FEATURES_PROP_KEY = "disco-features";
 
-	/**
-	 * Virtual component parameter setting packet redirect destination address.
-	 */
-	public static final String REDIRECT_TO_PROP_KEY = "redirect-to";
+	/** Field description */
+	public static final String DISCO_FEATURES_PROP_VAL = "http://jabber.org/protocol/muc";
 
 	/**
 	 * Parameter to set service discovery item name for the virtual component
@@ -149,51 +159,49 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 	 */
 	public static final String DISCO_TYPE_PROP_KEY = "disco-type";
 
-	/** Field description */
+	/** A default value for service discovery item type, which is 'text' */
 	public static final String DISCO_TYPE_PROP_VAL = "text";
 
 	/**
-	 * Parameter to set service discovery item category name for the virtual
-	 * component. Please refer to service discovery documentation for a correct
-	 * category or check what is returned by your real component instance.
+	 * If set, then it is used as the component domain name part. This domains is
+	 * displayed on the service discovery information, instead of virtual host based on
+	 * the user's query.
 	 */
-	public static final String DISCO_CATEGORY_PROP_KEY = "disco-category";
-
-	/** Field description */
-	public static final String DISCO_CATEGORY_PROP_VAL = "conference";
+	public static final String FIXED_DOMAIN_PROP_KEY = "fixed-domain";
 
 	/**
-	 * Comma separated list of features for the service discovery item reprezented
-	 * by this virtual component. Please check with the real component to obtain a
-	 * correct list of features.
+	 * Virtual component parameter setting packet redirect destination address.
 	 */
-	public static final String DISCO_FEATURES_PROP_KEY = "disco-features";
+	public static final String REDIRECT_TO_PROP_KEY = "redirect-to";
+
+	/**
+	 * Variable <code>log</code> is a class logger.
+	 */
+	private static final Logger log = Logger.getLogger("tigase.cluster.VirtualComponent");
+
+	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
-	public static final String DISCO_FEATURES_PROP_VAL = "http://jabber.org/protocol/muc";
+	protected VHostManagerIfc vHostManager  = null;
+	private JID               componentId   = null;
+	private String            discoCategory = null;
+	private String[]          discoFeatures = null;
+	private String            discoName     = null;
+	private String            discoNode     = null;
+	private String            discoType     = null;
+	private String            fixedDomain   = null;
+	private String            name          = null;
+	private JID               redirectTo    = null;
+	private ServiceEntity     serviceEntity = null;
+	private ComponentInfo     cmpInfo				= null;
 
-	// ~--- fields ---------------------------------------------------------------
-
-	private JID componentId = null;
-	private String discoCategory = null;
-	private String[] discoFeatures = null;
-	private String discoName = null;
-	private String discoNode = null;
-	private String discoType = null;
-	private String name = null;
-	private JID redirectTo = null;
-	private ServiceEntity serviceEntity = null;
-
-	@Override
-	public void setVHostManager(VHostManagerIfc manager) {
-		this.vHostManager = manager;
-	}
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean handlesLocalDomains() {
@@ -204,7 +212,7 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean handlesNameSubdomains() {
@@ -215,7 +223,7 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean handlesNonLocalDomains() {
@@ -225,114 +233,9 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 	/**
 	 * Method description
 	 *
-	 *
-	 * @return
 	 */
 	@Override
-	public JID getComponentId() {
-		return componentId;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 * @return
-	 */
-	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> defs = new LinkedHashMap<String, Object>();
-
-		defs.put(REDIRECT_TO_PROP_KEY, "");
-
-		if (params.get(CLUSTER_NODES) != null) {
-			String[] cl_nodes = ((String) params.get(CLUSTER_NODES)).split(",");
-
-			for (String node : cl_nodes) {
-				if (!node.equals(DNSResolver.getDefaultHostname())) {
-					defs.put(REDIRECT_TO_PROP_KEY, BareJID.toString(getName(), node));
-
-					break;
-				}
-			}
-		}
-
-		defs.put(DISCO_NAME_PROP_KEY, DISCO_NAME_PROP_VAL);
-		defs.put(DISCO_NODE_PROP_KEY, DISCO_NODE_PROP_VAL);
-		defs.put(DISCO_TYPE_PROP_KEY, DISCO_TYPE_PROP_VAL);
-		defs.put(DISCO_CATEGORY_PROP_KEY, DISCO_CATEGORY_PROP_VAL);
-		defs.put(DISCO_FEATURES_PROP_KEY, DISCO_FEATURES_PROP_VAL);
-
-		return defs;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param from
-	 *
-	 * @return
-	 */
-	@Override
-	public List<Element> getDiscoFeatures(JID from) {
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param node
-	 * @param jid
-	 * @param from
-	 *
-	 * @return
-	 */
-	@Override
-	public Element getDiscoInfo(String node, JID jid, JID from) {
-		return null;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param node
-	 * @param jid
-	 * @param from
-	 *
-	 * @return
-	 */
-	@Override
-	public List<Element> getDiscoItems(String node, JID jid, JID from) {
-		Element result = serviceEntity.getDiscoItem(null, getName() + "." + jid);
-
-		return Arrays.asList(result);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return
-	 */
-	@Override
-	public String getName() {
-		return name;
-	}
-
-	// ~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 */
-	@Override
-	public void initializationCompleted() {
-	}
+	public void initializationCompleted() {}
 
 	/**
 	 * Method description
@@ -347,7 +250,7 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 			packet.setPacketTo(redirectTo);
 			results.add(packet);
 		} else {
-			log.info("No redirectTo address, dropping packet: " + packet.toString());
+			log.log(Level.INFO, "No redirectTo address, dropping packet: {0}", packet);
 		}
 	}
 
@@ -356,10 +259,142 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 	 *
 	 */
 	@Override
-	public void release() {
+	public void release() {}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * 
+	 */
+	@Override
+	public JID getComponentId() {
+		return componentId;
 	}
 
-	// ~--- set methods ----------------------------------------------------------
+	/**
+	 * Allows to obtain various informations about components
+	 *
+	 * @return information about particular component
+	 */
+	@Override
+	public ComponentInfo getComponentInfo() {
+		if ( cmpInfo == null ){
+			cmpInfo = new ComponentInfo( getName(), this.getClass() );
+		}
+		return cmpInfo;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param params
+	 *
+	 * 
+	 */
+	@Override
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		Map<String, Object> defs = new LinkedHashMap<String, Object>();
+
+		defs.put(REDIRECT_TO_PROP_KEY, "");
+		if (params.get(CLUSTER_NODES) != null) {
+			String[] cl_nodes = ((String) params.get(CLUSTER_NODES)).split(",");
+
+			for (String node : cl_nodes) {
+				if (!node.equals(DNSResolver.getDefaultHostname())) {
+					defs.put(REDIRECT_TO_PROP_KEY, BareJID.toString(getName(), node));
+
+					break;
+				}
+			}
+		}
+		defs.put(DISCO_NAME_PROP_KEY, DISCO_NAME_PROP_VAL);
+		defs.put(DISCO_NODE_PROP_KEY, DISCO_NODE_PROP_VAL);
+		defs.put(DISCO_TYPE_PROP_KEY, DISCO_TYPE_PROP_VAL);
+		defs.put(DISCO_CATEGORY_PROP_KEY, DISCO_CATEGORY_PROP_VAL);
+		defs.put(DISCO_FEATURES_PROP_KEY, DISCO_FEATURES_PROP_VAL);
+		defs.put(FIXED_DOMAIN_PROP_KEY, null);
+
+		return defs;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param from
+	 *
+	 * 
+	 */
+	@Override
+	public List<Element> getDiscoFeatures(JID from) {
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param node
+	 * @param jid
+	 * @param from
+	 *
+	 * 
+	 */
+	@Override
+	public Element getDiscoInfo(String node, JID jid, JID from) {
+		return null;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param node
+	 * @param jid
+	 * @param from
+	 *
+	 * 
+	 */
+	@Override
+	public List<Element> getDiscoItems(String node, JID jid, JID from) {
+		String domain = jid.toString();
+
+		if (fixedDomain != null) {
+			domain = fixedDomain;
+		}
+
+		Element result = serviceEntity.getDiscoItem(null, getName() + "." + domain);
+
+		return Arrays.asList(result);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * 
+	 */
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * 
+	 */
+	@Override
+	public boolean isInitializationComplete() {
+		return false;
+	}
+
+	//~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -369,7 +404,7 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 	 */
 	@Override
 	public void setName(String name) {
-		this.name = name;
+		this.name        = name;
 		this.componentId = JID.jidInstanceNS(name, DNSResolver.getDefaultHostname(), null);
 	}
 
@@ -381,6 +416,11 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 	 */
 	@Override
 	public void setProperties(Map<String, Object> properties) {
+		fixedDomain = (String) properties.get(FIXED_DOMAIN_PROP_KEY);
+		if (fixedDomain != null) {
+			this.componentId = JID.jidInstanceNS(null, name + "." + fixedDomain, null);
+		}
+
 		String redirect = (String) properties.get(REDIRECT_TO_PROP_KEY);
 
 		if (redirect != null) {
@@ -391,12 +431,11 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 					redirectTo = JID.jidInstance(redirect);
 				} catch (TigaseStringprepException ex) {
 					redirectTo = null;
-					log.warning("stringprep processing failed for given redirect address: "
-							+ redirect);
+					log.log(Level.WARNING,
+							"stringprep processing failed for given redirect address: {0}", redirect);
 				}
 			}
 		}
-
 		if (properties.get(DISCO_NAME_PROP_KEY) != null) {
 			discoName = (String) properties.get(DISCO_NAME_PROP_KEY);
 		}
@@ -406,7 +445,6 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 				discoNode = null;
 			}
 		}
-
 		if (properties.get(DISCO_CATEGORY_PROP_KEY) != null) {
 			discoCategory = (String) properties.get(DISCO_CATEGORY_PROP_KEY);
 		}
@@ -416,20 +454,29 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 		if (properties.get(DISCO_TYPE_PROP_KEY) != null) {
 			discoFeatures = ((String) properties.get(DISCO_TYPE_PROP_KEY)).split(",");
 		}
-
-		if (discoName != null && discoCategory != null && discoType != null
-				&& discoFeatures != null) {
+		if ((discoName != null) && (discoCategory != null) && (discoType != null) &&
+				(discoFeatures != null)) {
 			serviceEntity = new ServiceEntity(getName(), null, discoName);
-			serviceEntity
-					.addIdentities(new ServiceIdentity(discoCategory, discoType, discoName));
-
+			serviceEntity.addIdentities(new ServiceIdentity(discoCategory, discoType,
+					discoName));
 			for (String feature : discoFeatures) {
 				serviceEntity.addFeatures(feature);
 			}
 		}
+		cmpInfo = new ComponentInfo( getName(), this.getClass() );
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param manager
+	 */
+	@Override
+	public void setVHostManager(VHostManagerIfc manager) {
+		this.vHostManager = manager;
 	}
 }
 
-// ~ Formatted in Sun Code Convention
 
-// ~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/06/08

@@ -1,10 +1,13 @@
 /*
+ * ServiceDiscovery.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.xmpp.impl;
 
@@ -29,6 +31,7 @@ import tigase.db.NonAuthUserRepository;
 import tigase.disco.XMPPServiceCollector;
 
 import tigase.server.Command;
+import tigase.server.Iq;
 import tigase.server.Packet;
 
 import tigase.xml.Element;
@@ -41,11 +44,9 @@ import tigase.xmpp.XMPPResourceConnection;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
-import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Implementation of JEP-030.
@@ -56,17 +57,20 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class ServiceDiscovery extends XMPPProcessorAbstract {
-	private static final Logger log = Logger.getLogger("tigase.xmpp.impl.ServiceDiscovery");
-	private static final String ID = "disco";
-	private static final String[] ELEMENTS = { "query", "query", "query" };
-	private static final String[] XMLNSS = { XMPPServiceCollector.INFO_XMLNS,
+public class ServiceDiscovery
+				extends XMPPProcessorAbstract {
+	private static final String     ID       = "disco";
+	private static final Logger     log = Logger.getLogger(ServiceDiscovery.class
+			.getName());
+	private static final String[][] ELEMENTS = {
+		Iq.IQ_QUERY_PATH, Iq.IQ_QUERY_PATH, Iq.IQ_QUERY_PATH
+	};
+	private static final String[]   XMLNSS = { XMPPServiceCollector.INFO_XMLNS,
 			XMPPServiceCollector.ITEMS_XMLNS, Command.XMLNS };
-	private static final Element[] DISCO_FEATURES = {
-		new Element("feature", new String[] { "var" },
-			new String[] { XMPPServiceCollector.INFO_XMLNS }),
-		new Element("feature", new String[] { "var" },
-			new String[] { XMPPServiceCollector.ITEMS_XMLNS }) };
+	private static final Element[] DISCO_FEATURES = { new Element("feature", new String[] {
+			"var" }, new String[] { XMPPServiceCollector.INFO_XMLNS }),
+			new Element("feature", new String[] { "var" }, new String[] { XMPPServiceCollector
+					.ITEMS_XMLNS }) };
 
 	//~--- methods --------------------------------------------------------------
 
@@ -74,7 +78,7 @@ public class ServiceDiscovery extends XMPPProcessorAbstract {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String id() {
@@ -97,8 +101,8 @@ public class ServiceDiscovery extends XMPPProcessorAbstract {
 	@Override
 	public void processFromUserToServerPacket(JID connectionId, Packet packet,
 			XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
-				Map<String, Object> settings)
-			throws PacketErrorTypeException {
+			Map<String, Object> settings)
+					throws PacketErrorTypeException {
 
 		// Handled elsewhere (in MessageRouter)
 		results.offer(packet.copyElementOnly());
@@ -118,7 +122,7 @@ public class ServiceDiscovery extends XMPPProcessorAbstract {
 	@Override
 	public void processNullSessionPacket(Packet packet, NonAuthUserRepository repo,
 			Queue<Packet> results, Map<String, Object> settings)
-			throws PacketErrorTypeException {
+					throws PacketErrorTypeException {
 		results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet,
 				"The target is unavailable at this time.", true));
 	}
@@ -138,7 +142,7 @@ public class ServiceDiscovery extends XMPPProcessorAbstract {
 	@Override
 	public void processServerSessionPacket(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
-			throws PacketErrorTypeException {
+					throws PacketErrorTypeException {
 
 		// Handled elsewhere (in MessageRouter)
 	}
@@ -149,7 +153,7 @@ public class ServiceDiscovery extends XMPPProcessorAbstract {
 	 *
 	 * @param session
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
@@ -160,10 +164,10 @@ public class ServiceDiscovery extends XMPPProcessorAbstract {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
-	public String[] supElements() {
+	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
@@ -171,7 +175,7 @@ public class ServiceDiscovery extends XMPPProcessorAbstract {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] supNamespaces() {
@@ -180,7 +184,4 @@ public class ServiceDiscovery extends XMPPProcessorAbstract {
 }    // ServiceDiscovery
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/03/12

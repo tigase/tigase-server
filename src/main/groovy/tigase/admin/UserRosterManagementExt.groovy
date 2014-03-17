@@ -29,7 +29,7 @@ If both given JIDs are local, rosters for both users are updated accordingly.
 AS:Description: Update user roster entry, extended version.
 AS:CommandId: user-roster-management-ext
 AS:Component: sess-man
-*/
+ */
 
 package tigase.admin
 
@@ -40,157 +40,171 @@ import tigase.db.*
 import tigase.xmpp.impl.roster.*
 import tigase.xml.*
 import tigase.vhosts.*
+import tigase.cluster.*;
+import tigase.cluster.api.*;
+import tigase.cluster.strategy.*;
 
-def ROSTER_OWNER_JID = "roster-owner-jid"
-def ROSTER_OWNER_NAME = "roster-owner-name"
-def ROSTER_ITEM_JID = "roster-item-jid"
-def ROSTER_ITEM_NAME = "roster-item-name"
-def ROSTER_ITEM_GROUPS = "roster-item-groups"
-def ROSTER_ITEM_SUBSCR = "roster-item-subscr"
-def ROSTER_ACTION = "roster-action"
-//def ROSTER_NOTIFY_CLUSTER = "notify-cluster"
 
-def UPDATE = "update"
-def REMOVE = "remove"
-def UPDATE_EXT = "update-ext"
-def REMOVE_EXT = "remove-ext"
-def subscriptions = ["both", "from", "to", "none"]
-def actions = [UPDATE, REMOVE, UPDATE_EXT, REMOVE_EXT]
-def actions_descr = ["Add/Update item", "Remove item",
-  "Add/Update both rosters", "Remove from both rosters"]
-//def notify_cluster = ["no", "yes"]
+try {
 
-def p = (Packet)packet
-def repository = (UserRepository)userRepository
-def sessions = (Map<BareJID, XMPPSession>)userSessions
-def vhost_man = (VHostManagerIfc)vhostMan
-def admins = (Set)adminsSet
+	def ROSTER_OWNER_JID = "roster-owner-jid"
+	def ROSTER_OWNER_PRESENCE = "roster-owner-presence"
+	def ROSTER_OWNER_NAME = "roster-owner-name"
+	def ROSTER_OWNER_GROUPS = "roster-owner-groups"
+	def ROSTER_ITEM_JID = "roster-item-jid"
+	def ROSTER_ITEM_NAME = "roster-item-name"
+	def ROSTER_ITEM_GROUPS = "roster-item-groups"
+	def ROSTER_ITEM_SUBSCR = "roster-item-subscr"
+	def ROSTER_ACTION = "roster-action"
+	def ROSTER_NOTIFY_CLUSTER = "notify-cluster"
 
-def stanzaFromBare = p.getStanzaFrom().getBareJID();
-def isServiceAdmin = admins.contains(stanzaFromBare);
+	def UPDATE = "update"
+	def REMOVE = "remove"
+	def UPDATE_EXT = "update-ext"
+	def REMOVE_EXT = "remove-ext"
+	def subscriptions = ["both", "from", "to", "none"]
+	def actions = [UPDATE, REMOVE, UPDATE_EXT, REMOVE_EXT]
+	def actions_descr = ["Add/Update item", "Remove item", "Add/Update both rosters", "Remove from both rosters"]
 
-def rosterOwnerJid = Command.getFieldValue(packet, ROSTER_OWNER_JID)
-def rosterOwnerName = Command.getFieldValue(packet, ROSTER_OWNER_NAME)
-def rosterItemJid = Command.getFieldValue(packet, ROSTER_ITEM_JID)
-def rosterItemName = Command.getFieldValue(packet, ROSTER_ITEM_NAME)
-def rosterItemGroups = Command.getFieldValue(packet, ROSTER_ITEM_GROUPS)
-def rosterItemSubscr = Command.getFieldValue(packet, ROSTER_ITEM_SUBSCR)
-def rosterAction = Command.getFieldValue(packet, ROSTER_ACTION)
-//def rosterNotifyCluster = Command.getFieldValue(packet, ROSTER_NOTIFY_CLUSTER)
+	Queue results = new LinkedList()
+	def p = (Packet)packet
+	def repository = (UserRepository)userRepository
+	def sessions = (Map<BareJID, XMPPSession>)userSessions
+	def vhost_man = (VHostManagerIfc)vhostMan
+	def admins = (Set)adminsSet
 
-if (rosterOwnerJid == null || rosterItemJid == null ||
-	rosterItemSubscr == null || rosterAction == null) {
-	def res = p.commandResult(Command.DataType.form);
-	Command.addFieldValue(res, ROSTER_OWNER_JID, rosterOwnerJid ?: "",
-    "jid-single", "Roster owner JID")
-	Command.addFieldValue(res, ROSTER_OWNER_NAME, rosterOwnerName ?: "",
-    "text-single", "Roster owner name")
-	Command.addFieldValue(res, ROSTER_ITEM_JID, rosterItemJid ?: "",
-    "jid-single", "Roster item JID")
-	Command.addFieldValue(res, ROSTER_ITEM_NAME, rosterItemName ?: "",
-    "text-single", "Roster item name")
-	Command.addFieldValue(res, ROSTER_ITEM_GROUPS, rosterItemGroups ?: "",
-    "text-single", "Comma separated list of groups")
-	Command.addFieldValue(res, ROSTER_ITEM_SUBSCR, subscriptions[0],
-    "Roster item Subscription", (String[])subscriptions, (String[])subscriptions)
-	Command.addFieldValue(res, ROSTER_ACTION, actions[0],
-    "Action", (String[])actions_descr, (String[])actions)
-//	Command.addFieldValue(res, ROSTER_NOTIFY_CLUSTER, notify_cluster[0],
-//    "Notify cluster", (String[])notify_cluster, (String[])notify_cluster)
+	def stanzaFromBare = p.getStanzaFrom().getBareJID();
+	def isServiceAdmin = admins.contains(stanzaFromBare);
 
-	return res
-}
+	def rosterOwnerJid = Command.getFieldValue(packet, ROSTER_OWNER_JID)
+	def rosterOwnerName = Command.getFieldValue(packet, ROSTER_OWNER_NAME)
+	def rosterOwnerGroups = Command.getFieldValue(packet, ROSTER_OWNER_GROUPS)
+	def rosterItemJid = Command.getFieldValue(packet, ROSTER_ITEM_JID)
+	def rosterItemName = Command.getFieldValue(packet, ROSTER_ITEM_NAME)
+	def rosterItemGroups = Command.getFieldValue(packet, ROSTER_ITEM_GROUPS)
+	def rosterItemSubscr = Command.getFieldValue(packet, ROSTER_ITEM_SUBSCR)
+	def rosterAction = Command.getFieldValue(packet, ROSTER_ACTION)
+	boolean rosterNotifyCluster = Boolean.valueOf( Command.getFieldValue(packet, ROSTER_NOTIFY_CLUSTER) )
 
-def remove_item = rosterAction == REMOVE || rosterAction == REMOVE_EXT
+	if (rosterOwnerJid == null || rosterItemJid == null ||
+		rosterItemSubscr == null || rosterAction == null) {
+		def res = p.commandResult(Command.DataType.form);
+		Command.addFieldValue(res, ROSTER_OWNER_JID, rosterOwnerJid ?: "", "jid-single", "Roster owner JID")
+		Command.addFieldValue(res, ROSTER_OWNER_NAME, rosterOwnerName ?: "",  "text-single", "Roster owner name")
+		Command.addFieldValue(res, ROSTER_OWNER_GROUPS, rosterOwnerGroups ?: "", "text-single", "Comma separated list of owner groups")
+		Command.addFieldValue(res, ROSTER_ITEM_JID, rosterItemJid ?: "", "jid-single", "Roster item JID")
+		Command.addFieldValue(res, ROSTER_ITEM_NAME, rosterItemName ?: "",  "text-single", "Roster item name")
+		Command.addFieldValue(res, ROSTER_ITEM_GROUPS, rosterItemGroups ?: "", "text-single", "Comma separated list of item groups")
+		Command.addFieldValue(res, ROSTER_ITEM_SUBSCR, subscriptions[0], "Roster item Subscription", (String[])subscriptions, (String[])subscriptions)
+		Command.addFieldValue(res, ROSTER_ACTION, actions[0], "Action", (String[])actions_descr, (String[])actions)
+		Command.addHiddenField(res, ROSTER_NOTIFY_CLUSTER, true.toString())
 
-def Queue<Packet> results = new LinkedList<Packet>()
+		return res
+	}
 
-def updateRoster = { jid, i_jid, i_name, i_groups, i_subscr ->
+	if 	( rosterNotifyCluster ) {
+		if (this.hasProperty("clusterStrategy")) {
+	        def cluster = (ClusteringStrategyIfc) clusterStrategy
+			List<JID> cl_conns = cluster.getAllNodes()
+			if (cl_conns && cl_conns.size() > 0) {
+				cl_conns.each { node ->
 
-	def sess = sessions == null ? null : sessions.get(jid.getBareJID());
-	def conn = sess != null ? sess.getActiveResources().get(0) : null;
-	if (conn) {
-		// Update online
-		RosterAbstract rosterUtil = RosterFactory.getRosterImplementation(true)
-		Element item = new Element("item",
-			(String[])["jid", "subscription"], (String[])[i_jid, "remove"])
-		if (remove_item) {
-			rosterUtil.removeBuddy(conn, i_jid)
-		} else {
-			rosterUtil.addBuddy(conn, i_jid, i_name ?: i_jid.getLocalpart(),
-				i_groups ? i_groups.split(",") : null, null)
-			rosterUtil.setBuddySubscription(conn,
-				RosterAbstract.SubscriptionType.valueOf(i_subscr), i_jid)
-			item = rosterUtil.getBuddyItem(conn, i_jid)
+					def forward = p.copyElementOnly();
+					Command.removeFieldValue(forward, ROSTER_NOTIFY_CLUSTER)
+					Command.addHiddenField(forward, ROSTER_NOTIFY_CLUSTER, false.toString())
+					forward.setPacketTo( node );
+					forward.setPermissions( Permissions.ADMIN );
+
+					results.offer(forward)
+				}
+			}
 		}
-		rosterUtil.updateBuddyChange(conn, results, item)
-	} else {
-		// Update offline
-		String rosterStr = repository.getData(jid.getBareJID(), null,
-			RosterAbstract.ROSTER, null) ?: ""
-		Map<BareJID, RosterElement> roster = new LinkedHashMap<BareJID, RosterElement>()
-		RosterFlat.parseRosterUtil(rosterStr, roster, null)
-		if (remove_item) {
-			roster.remove(i_jid.getBareJID())
-		} else {
-			RosterElement rel = new RosterElement(i_jid, i_name,
-					i_groups ? i_groups.split(",") : null, null)
+	}
+
+
+	def remove_item = rosterAction == REMOVE || rosterAction == REMOVE_EXT
+
+	def updateRoster = { jid, i_jid, i_name, i_groups, i_subscr, i_original_node ->
+
+		def sess = sessions == null ? null : sessions.get(jid.getBareJID());
+		def conn = sess != null ? sess.getActiveResources().get(0) : null;
+		if (conn) {
+			// Update online
+			RosterAbstract rosterUtil = RosterFactory.getRosterImplementation(true)
+			Element item = new Element("item",
+				(String[])["jid", "subscription"], (String[])[i_jid, "remove"])
+			if (remove_item) {
+				rosterUtil.removeBuddy(conn, i_jid)
+			} else {
+				rosterUtil.addBuddy(conn, i_jid, i_name ?: i_jid.getLocalpart(), i_groups ? i_groups.split(",") : null, null)
+				rosterUtil.setBuddySubscription(conn, RosterAbstract.SubscriptionType.valueOf(i_subscr), i_jid)
+				item = rosterUtil.getBuddyItem(conn, i_jid)
+			}
+			rosterUtil.updateBuddyChange(conn, results, item)
+		} else if (i_original_node) {
+			// Update offline and only on original node
+			String rosterStr = repository.getData(jid.getBareJID(), null, RosterAbstract.ROSTER, null) ?: ""
+			Map<BareJID, RosterElement> roster = new LinkedHashMap<BareJID, RosterElement>()
+			RosterFlat.parseRosterUtil(rosterStr, roster, null)
+			if (remove_item) {
+				roster.remove(i_jid.getBareJID())
+			} else {
+				RosterElement rel = new RosterElement(i_jid, i_name, i_groups ? i_groups.split(",") : null, null)
 				rel.setSubscription(RosterAbstract.SubscriptionType.valueOf(i_subscr))
-			roster.put(i_jid, rel)
-		}
-		StringBuilder sb = new StringBuilder(200)
-		for (RosterElement relem: roster.values())
+				rel.setPersistent(true);
+				roster.put(i_jid, rel)
+			}
+			StringBuilder sb = new StringBuilder(200)
+			for (RosterElement relem: roster.values())
 			sb.append(relem.getRosterElement().toString())
-		repository.setData(jid.getBareJID(), null, RosterAbstract.ROSTER, sb.toString());
-	}
-}
-
-def jidRosterOwnerJid = JID.jidInstanceNS(rosterOwnerJid);
-def jidRosterItemJid = JID.jidInstanceNS(rosterItemJid);
-
-Packet result = p.commandResult(Command.DataType.result)
-def vhost = vhost_man.getVHostItem(jidRosterOwnerJid.getDomain());
-if (vhost == null || (!isServiceAdmin && !vhost.isOwner(stanzaFromBare.toString()) && !vhost.isAdmin(stanzaFromBare.toString()))) {
-	Command.addTextField(result, "Error", "You do not have enough permissions to modify roster of "+rosterOwnerJid);
-	results.add(result);
-	return results;
-}
-
-updateRoster(jidRosterOwnerJid, jidRosterItemJid, rosterItemName,
-	rosterItemGroups, rosterItemSubscr)
-
-if (rosterAction == UPDATE_EXT || rosterAction == REMOVE_EXT) {
-	def subscr = rosterItemSubscr;
-	switch (rosterItemSubscr) {
-		case "to" : subscr = "from"; break;
-		case "from" : subscr = "to"; break;
+			repository.setData(jid.getBareJID(), null, RosterAbstract.ROSTER, sb.toString());
+		}
 	}
 
-	vhost = vhost_man.getVHostItem(jidRosterItemJid.getDomain());
+	def jidRosterOwnerJid = JID.jidInstanceNS(rosterOwnerJid);
+	def jidRosterItemJid = JID.jidInstanceNS(rosterItemJid);
+
+	Packet result = p.commandResult(Command.DataType.result)
+	def vhost = vhost_man.getVHostItem(jidRosterOwnerJid.getDomain());
 	if (vhost == null || (!isServiceAdmin && !vhost.isOwner(stanzaFromBare.toString()) && !vhost.isAdmin(stanzaFromBare.toString()))) {
-		Command.addTextField(result, "Error", "You do not have enough permissions to modify roster of "+rosterItemJid);
+		Command.addTextField(result, "Error", "You do not have enough permissions to modify roster of "+rosterOwnerJid);
 		results.add(result);
 		return results;
 	}
 
-	updateRoster(jidRosterItemJid, jidRosterOwnerJid, rosterOwnerName,
-		rosterItemGroups, subscr)
-}
+	updateRoster(jidRosterOwnerJid, jidRosterItemJid, rosterItemName, rosterItemGroups, rosterItemSubscr, rosterNotifyCluster)
 
-if (!remove_item) {
+	Element pres;
+	if (rosterAction == UPDATE_EXT || rosterAction == REMOVE_EXT) {
+		def subscr = rosterItemSubscr;
+		switch (rosterItemSubscr) {
+		case "to" : subscr = "from"; break;
+		case "from" : subscr = "to"; break;
+		}
 
-	Element pres = new Element("presence",
-		(String[])["from", "to", "type"], (String[])[rosterOwnerJid, rosterItemJid,
-      "probe"])
-  results.offer(Packet.packetInstance(pres))
-	pres = new Element("presence",
-		(String[])["from", "to", "type"], (String[])[rosterItemJid, rosterOwnerJid,
-			"probe"])
-  results.offer(Packet.packetInstance(pres))
-}
+		vhost = vhost_man.getVHostItem(jidRosterItemJid.getDomain());
+		if (vhost == null || (!isServiceAdmin && !vhost.isOwner(stanzaFromBare.toString()) && !vhost.isAdmin(stanzaFromBare.toString()))) {
+			Command.addTextField(result, "Error", "You do not have enough permissions to modify roster of "+rosterItemJid);
+			results.add(result);
+			return results;
+		}
 
-Command.addTextField(result, "Note", "Operation successful");
-results.add(result)
+		updateRoster(jidRosterItemJid, jidRosterOwnerJid, rosterOwnerName, rosterOwnerGroups, subscr, rosterNotifyCluster)
+		
+		if (!remove_item) {
+			pres = new Element("presence", (String[])["from", "to", "type"], (String[])[rosterOwnerJid, rosterItemJid, "probe"])
+			results.offer(Packet.packetInstance(pres))
+		}
+	}
+	if (!remove_item) {
+		pres = new Element("presence", (String[])["from", "to", "type"], (String[])[rosterItemJid, rosterOwnerJid, "probe"])
+		results.offer(Packet.packetInstance(pres))
+	}
 
-return results
+	Command.addTextField(result, "Note", "Operation successful");
+	results.add(result)
 
+	//return results
+	return (Queue)results
+
+}  catch (Exception ex) { ex.printStackTrace(); }

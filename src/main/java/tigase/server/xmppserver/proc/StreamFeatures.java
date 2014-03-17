@@ -60,7 +60,7 @@ public class StreamFeatures extends S2SAbstractProcessor {
 	 * @param serv
 	 * @param results
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
@@ -82,7 +82,7 @@ public class StreamFeatures extends S2SAbstractProcessor {
 	 * @param serv
 	 * @param attribs
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String streamOpened(S2SIOService serv, Map<String, String> attribs) {

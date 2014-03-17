@@ -263,7 +263,7 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 	 * 
 	 * @param packet
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean addOutPacket(Packet packet) {
@@ -278,7 +278,7 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 	 * 
 	 * @param params
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getDefaults(final Map<String, Object> params) {
@@ -352,35 +352,35 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 
 		defs.put(TASKS_LIST_PROP_KEY, conf_tasks.toArray(new String[0]));
 
-		String srec_repo_class = DERBY_REPO_CLASS_PROP_VAL;
-		String srec_repo_uri = DERBY_REPO_URL_PROP_VAL;
+		String srec_repo_class = RepositoryFactory.DERBY_REPO_CLASS_PROP_VAL;
+		String srec_repo_uri = RepositoryFactory.DERBY_REPO_URL_PROP_VAL;
 		String conf_srec_db = null;
 
 		if (params.get(GEN_SREC_DB) != null) {
 			conf_srec_db = (String) params.get(GEN_SREC_DB);
 		} else {
-			if (params.get(GEN_USER_DB) != null) {
-				conf_srec_db = (String) params.get(GEN_USER_DB);
+			if (params.get(RepositoryFactory.GEN_USER_DB) != null) {
+				conf_srec_db = (String) params.get(RepositoryFactory.GEN_USER_DB);
 			} // end of if (params.get(GEN_USER_DB) != null)
 		} // end of if (params.get(GEN_SREC_DB) != null) else
 
 		if (conf_srec_db != null) {
 			if (conf_srec_db.equals("mysql")) {
-				srec_repo_class = MYSQL_REPO_CLASS_PROP_VAL;
-				srec_repo_uri = MYSQL_REPO_URL_PROP_VAL;
+				srec_repo_class = RepositoryFactory.MYSQL_REPO_CLASS_PROP_VAL;
+				srec_repo_uri = RepositoryFactory.MYSQL_REPO_URL_PROP_VAL;
 			}
 
 			if (conf_srec_db.equals("pgsql")) {
-				srec_repo_class = PGSQL_REPO_CLASS_PROP_VAL;
-				srec_repo_uri = PGSQL_REPO_URL_PROP_VAL;
+				srec_repo_class = RepositoryFactory.PGSQL_REPO_CLASS_PROP_VAL;
+				srec_repo_uri = RepositoryFactory.PGSQL_REPO_URL_PROP_VAL;
 			}
 		} // end of if (conf_srec_db != null)
 
 		if (params.get(GEN_SREC_DB_URI) != null) {
 			srec_repo_uri = (String) params.get(GEN_SREC_DB_URI);
 		} else {
-			if (params.get(GEN_USER_DB_URI) != null) {
-				srec_repo_uri = (String) params.get(GEN_USER_DB_URI);
+			if (params.get(RepositoryFactory.GEN_USER_DB_URI) != null) {
+				srec_repo_uri = (String) params.get(RepositoryFactory.GEN_USER_DB_URI);
 			} // end of if (params.get(GEN_USER_DB_URI) != null)
 		} // end of else
 
@@ -426,7 +426,7 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 	 * 
 	 * @param from
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
@@ -460,7 +460,7 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 	 * @param jid
 	 * @param from
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<Element> getDiscoItems(String node, JID jid, JID from) {
@@ -496,7 +496,7 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 	 * 
 	 * @param jidOrName
 	 * 
-	 * @return
+	 * 
 	 */
 	public ReceiverTaskIfc getTask(String jidOrName) {
 		if (jidOrName == null) {
@@ -518,7 +518,7 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 	 * 
 	 * @param jid
 	 * 
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean isAdmin(JID jid) {

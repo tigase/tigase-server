@@ -1,10 +1,13 @@
 /*
+ * RosterFlat.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.xmpp.impl.roster;
 
@@ -40,48 +42,50 @@ import tigase.xmpp.XMPPResourceConnection;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Map;
+import java.util.Queue;
 
 /**
  * Describe class RosterFlat here.
- * 
- * 
+ *
+ *
  * Created: Tue Feb 21 18:05:53 2006
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class RosterFlat extends RosterAbstract {
-
+public class RosterFlat
+				extends RosterAbstract {
 	/**
 	 * Private logger for class instances.
 	 */
-	private static final Logger log = Logger.getLogger(RosterFlat.class.getName());
+	private static final Logger log          = Logger.getLogger(RosterFlat.class.getName());
 	private static final SimpleParser parser = SingletonFactory.getParserInstance();
-	private static int maxRosterSize = new Long(Runtime.getRuntime().maxMemory() / 250000L)
-			.intValue();
+	private static int maxRosterSize         = new Long(Runtime.getRuntime().maxMemory() /
+																							 250000L).intValue();
+
+	//~--- methods --------------------------------------------------------------
 
 	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param relem
 	 * @param roster
+	 * @return 
+	 *
 	 * 
-	 * @return
 	 */
-	public static boolean addBuddy(RosterElement relem, Map<BareJID, RosterElement> roster) {
+	public static boolean addBuddy(RosterElement relem,
+																 Map<BareJID, RosterElement> roster) {
 		if (roster.size() < maxRosterSize) {
 			roster.put(relem.getJid().getBareJID(), relem);
 
@@ -91,27 +95,43 @@ public class RosterFlat extends RosterAbstract {
 		return false;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param buddy
+	 * @param session
+	 *
+	 * 
+	 *
+	 * @return 
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
 	public RosterElement addTempBuddy(JID buddy, XMPPResourceConnection session)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElementInstance(buddy, null, null, session);
+
 		relem.setPersistent(false);
 		addBuddy(relem, getUserRoster(session));
+
 		return relem;
 	}
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param roster_str
 	 * @param roster
 	 * @param session
+	 * @return 
+	 *
 	 * 
-	 * @return
 	 */
 	public static boolean parseRosterUtil(String roster_str,
-			Map<BareJID, RosterElement> roster, XMPPResourceConnection session) {
-		boolean result = false;
+					Map<BareJID, RosterElement> roster, XMPPResourceConnection session) {
+		boolean result               = false;
 		DomBuilderHandler domHandler = new DomBuilderHandler();
 
 		parser.parse(domHandler, roster_str.toCharArray(), 0, roster_str.length());
@@ -124,7 +144,6 @@ public class RosterFlat extends RosterAbstract {
 					RosterElement relem = new RosterElement(elem, session);
 
 					result |= relem.isModified();
-
 					if (!addBuddy(relem, roster)) {
 						break;
 					}
@@ -137,22 +156,10 @@ public class RosterFlat extends RosterAbstract {
 		return result;
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param buddy
-	 * @param name
-	 * @param groups
-	 * @param otherData
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public void addBuddy(XMPPResourceConnection session, JID buddy, String name,
-			String[] groups, String otherData) throws NotAuthorizedException, TigaseDBException {
+											 String[] groups, String otherData)
+					throws NotAuthorizedException, TigaseDBException {
 
 		// String buddy = JIDUtils.getNodeID(jid);
 		RosterElement relem = getRosterElement(session, buddy);
@@ -162,18 +169,23 @@ public class RosterFlat extends RosterAbstract {
 
 			relem = getRosterElementInstance(buddy, name, groups, session);
 			relem.setOtherData(otherData);
-
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "1. Added buddy to roster: {0}, name: {1}, item: {2}",
+								new Object[] { relem.getJid(),
+															 relem.getName(), relem.getRosterItem() });
+			}
 			if (addBuddy(relem, roster)) {
 				saveUserRoster(session);
 			} else {
 				throw new TigaseDBException("Too many elements in the user roster.");
 			}
-
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Added buddy to roster: {0}", buddy);
+				log.log(Level.FINEST, "2. Added buddy to roster: {0}, name: {1}, item: {2}",
+								new Object[] { relem.getJid(),
+															 relem.getName(), relem.getRosterItem() });
 			}
 		} else {
-			if ((name != null) && !name.isEmpty()) {
+			if ((name != null) &&!name.isEmpty()) {
 				relem.setName(name);
 			}
 
@@ -186,29 +198,14 @@ public class RosterFlat extends RosterAbstract {
 
 			// }
 			saveUserRoster(session);
-
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Updated buddy in roster: {0}", buddy);
 			}
 		}
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param buddy
-	 * @param groups
-	 * 
-	 * @return
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	@Override
-	public boolean
-			addBuddyGroup(XMPPResourceConnection session, JID buddy, String[] groups)
+	public boolean addBuddyGroup(XMPPResourceConnection session, JID buddy, String[] groups)
 					throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
 
@@ -225,88 +222,46 @@ public class RosterFlat extends RosterAbstract {
 		}
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param buddy
-	 * 
-	 * @return
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public boolean containsBuddy(XMPPResourceConnection session, JID buddy)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
-		return relem != null && relem.isPersistent();
+
+		return (relem != null) && relem.isPersistent();
 	}
+
+	//~--- get methods ----------------------------------------------------------
 
 	// ~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * 
-	 * @return
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	@Override
 	// public String[] getBuddies(XMPPResourceConnection session,
 	// boolean onlineOnly)
-			public
-			JID[] getBuddies(XMPPResourceConnection session) throws NotAuthorizedException,
-					TigaseDBException {
+	public JID[] getBuddies(XMPPResourceConnection session)
+					throws NotAuthorizedException, TigaseDBException {
 		Map<BareJID, RosterElement> roster = getUserRoster(session);
-		
+
 		if (roster.size() == 0) {
 			return null;
 		}
-		
+
 		JID[] result = new JID[roster.size()];
-		int idx = 0;
+		int idx      = 0;
 
 		for (RosterElement rosterElement : roster.values()) {
 			result[idx++] = rosterElement.getJid();
 		}
+
 		// TODO: this sorting should be optional as it may impact performance
 		Arrays.sort(result, new RosterElemComparator(roster));
 
 		return result;
 
-		// if (onlineOnly) {
-		// ArrayList<String> online = new ArrayList<String>();
-		// for (Map.Entry<String, RosterElement> rosterEl : roster.entrySet()) {
-		// if (rosterEl.getValue().isOnline()) {
-		// online.add(rosterEl.getKey());
-		// }
-		// }
-		// return online.toArray(new String[online.size()]);
-		// } else {
-		// }
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param buddy
-	 * 
-	 * @return
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public String[] getBuddyGroups(XMPPResourceConnection session, JID buddy)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
 
 		if (relem == null) {
@@ -318,31 +273,19 @@ public class RosterFlat extends RosterAbstract {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param relem
+	 *
 	 * 
-	 * @return
 	 */
 	public Element getBuddyItem(RosterElement relem) {
 		return relem.getRosterItem();
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param buddy
-	 * 
-	 * @return
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public Element getBuddyItem(final XMPPResourceConnection session, JID buddy)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
 
 		if (relem == null) {
@@ -352,21 +295,9 @@ public class RosterFlat extends RosterAbstract {
 		}
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param buddy
-	 * 
-	 * @return
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public String getBuddyName(XMPPResourceConnection session, JID buddy)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
 
 		if (relem == null) {
@@ -376,21 +307,9 @@ public class RosterFlat extends RosterAbstract {
 		}
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param buddy
-	 * 
-	 * @return
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public SubscriptionType getBuddySubscription(XMPPResourceConnection session, JID buddy)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
 
 		if (relem == null) {
@@ -404,35 +323,24 @@ public class RosterFlat extends RosterAbstract {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param buddy
 	 * @param name
 	 * @param groups
 	 * @param session
+	 *
 	 * 
-	 * @return
 	 */
 	public RosterElement getRosterElementInstance(JID buddy, String name, String[] groups,
-			XMPPResourceConnection session) {
-		return new RosterElement(buddy, name, groups, session);
+					XMPPResourceConnection session) {
+		return new RosterElement(buddy.copyWithoutResource(), name, groups, session);
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * 
-	 * @return
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public List<Element> getRosterItems(XMPPResourceConnection session)
-			throws NotAuthorizedException, TigaseDBException {
-		LinkedList<Element> items = new LinkedList<Element>();
+					throws NotAuthorizedException, TigaseDBException {
+		LinkedList<Element> items          = new LinkedList<Element>();
 		Map<BareJID, RosterElement> roster = getUserRoster(session);
 
 		for (RosterElement relem : roster.values()) {
@@ -442,149 +350,94 @@ public class RosterFlat extends RosterAbstract {
 			if (relem.isPersistent()) {
 				items.add(getBuddyItem(relem));
 			}
-
 		}
 
 		return items;
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param buddy
-	 * 
-	 * @return
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public boolean isOnline(XMPPResourceConnection session, JID buddy)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
 
 		return (relem != null) && relem.isOnline();
 	}
 
+	//~--- methods --------------------------------------------------------------
+
 	// ~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param roster_str
 	 * @param roster
 	 * @param session
+	 *
 	 * 
-	 * @return
 	 */
 	public boolean parseRoster(String roster_str, Map<BareJID, RosterElement> roster,
-			XMPPResourceConnection session) {
+														 XMPPResourceConnection session) {
 		return parseRosterUtil(roster_str, roster, session);
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param buddy
-	 * 
-	 * @return
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public boolean presenceSent(XMPPResourceConnection session, JID buddy)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
 
 		return (relem != null) && relem.isPresence_sent();
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param jid
-	 * 
-	 * @return
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public boolean removeBuddy(XMPPResourceConnection session, JID jid)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 		Map<BareJID, RosterElement> roster = getUserRoster(session);
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Removing roster buddy: {0}, before removal: {1}",
-					new Object[] { jid, roster });
+							new Object[] { jid,
+														 roster });
 		}
 		roster.remove(jid.getBareJID());
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Removing roster buddy: {0}, after removal: {1}",
-					new Object[] { jid, roster });
+							new Object[] { jid,
+														 roster });
 		}
 		saveUserRoster(session);
 
 		return true;
 	}
 
+	//~--- set methods ----------------------------------------------------------
+
 	// ~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param buddy
-	 * @param name
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public void setBuddyName(XMPPResourceConnection session, JID buddy, String name)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
 
 		if (relem != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Setting name: ''{0}'' for buddy: {1}", new Object[] {
-						name, buddy });
+				log.log(Level.FINEST, "Setting name: ''{0}'' for buddy: {1}", new Object[] { name,
+								buddy });
 			}
-
-			if ((name != null) && !name.isEmpty()) {
+			if ((name != null) &&!name.isEmpty()) {
 				relem.setName(name);
 			}
-
 			saveUserRoster(session);
 		} else {
 			log.log(Level.WARNING, "Setting buddy name for non-existen contact: {0}", buddy);
 		}
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param subscription
-	 * @param buddy
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public void setBuddySubscription(XMPPResourceConnection session,
-			SubscriptionType subscription, JID buddy) throws NotAuthorizedException,
-			TigaseDBException {
+																	 SubscriptionType subscription, JID buddy)
+					throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
 
 		if (relem != null) {
@@ -595,43 +448,20 @@ public class RosterFlat extends RosterAbstract {
 		}
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param buddy
-	 * @param online
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public void setOnline(XMPPResourceConnection session, JID buddy, boolean online)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
 
 		if (relem == null) {
 			relem = addTempBuddy(buddy, session);
 		}
-
 		relem.setOnline(buddy.getResource(), online);
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * @param buddy
-	 * @param sent
-	 * 
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public void setPresenceSent(XMPPResourceConnection session, JID buddy, boolean sent)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
 
 		if (relem == null) {
@@ -640,10 +470,12 @@ public class RosterFlat extends RosterAbstract {
 		relem.setPresence_sent(sent);
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	// ~--- get methods ----------------------------------------------------------
 
 	public RosterElement getRosterElement(XMPPResourceConnection session, JID buddy)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 		Map<BareJID, RosterElement> roster = getUserRoster(session);
 
 		return roster.get(buddy.getBareJID());
@@ -651,7 +483,7 @@ public class RosterFlat extends RosterAbstract {
 
 	@SuppressWarnings({ "unchecked" })
 	protected Map<BareJID, RosterElement> getUserRoster(XMPPResourceConnection session)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 		Map<BareJID, RosterElement> roster = null;
 
 		// The method can be called from different plugins concurrently.
@@ -659,7 +491,6 @@ public class RosterFlat extends RosterAbstract {
 		// access problems
 		synchronized (session) {
 			roster = (Map<BareJID, RosterElement>) session.getCommonSessionData(ROSTER);
-
 			if (roster == null) {
 				roster = loadUserRoster(session);
 			}
@@ -668,34 +499,43 @@ public class RosterFlat extends RosterAbstract {
 		return roster;
 	}
 
+	//~--- methods --------------------------------------------------------------
+
 	// ~--- methods --------------------------------------------------------------
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
 	protected void saveUserRoster(XMPPResourceConnection session)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 		Map<BareJID, RosterElement> roster = getUserRoster(session);
-		StringBuilder sb = new StringBuilder(5000);
+		StringBuilder sb                   = new StringBuilder(5000);
 
 		for (RosterElement relem : roster.values()) {
 			if (relem.isPersistent()) {
 				sb.append(relem.getRosterElement().toString());
 			}
 		}
-
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Saving user roster: {0}", sb);
 		}
-
 		session.setData(null, ROSTER, sb.toString());
 	}
 
 	private Map<BareJID, RosterElement> loadUserRoster(XMPPResourceConnection session)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 
 		// In most times we just read from this data structure
 		// From time to time there might be some modification, posibly concurrent
 		// very unlikely by more than one thread
-		Map<BareJID, RosterElement> roster =
-				new ConcurrentHashMap<BareJID, RosterElement>(100, 0.25f, 1);
+		Map<BareJID, RosterElement> roster = new ConcurrentHashMap<BareJID,
+																					 RosterElement>(100, 0.25f, 1);
 
 		session.putCommonSessionData(ROSTER, roster);
 
@@ -704,8 +544,7 @@ public class RosterFlat extends RosterAbstract {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Loaded user roster: {0}", roster_str);
 		}
-
-		if ((roster_str != null) && !roster_str.isEmpty()) {
+		if ((roster_str != null) &&!roster_str.isEmpty()) {
 			updateRosterHash(roster_str, session);
 
 			boolean modified = parseRoster(roster_str, roster, session);
@@ -718,22 +557,21 @@ public class RosterFlat extends RosterAbstract {
 			// Try to load a roster from the 'old' style roster storage and
 			// convert it the the flat roster storage
 			Roster oldRoster = new Roster();
-			JID[] buddies = oldRoster.getBuddies(session);
+			JID[] buddies    = oldRoster.getBuddies(session);
 
 			if ((buddies != null) && (buddies.length > 0)) {
 				for (JID buddy : buddies) {
-					String name = oldRoster.getBuddyName(session, buddy);
+					String name             = oldRoster.getBuddyName(session, buddy);
 					SubscriptionType subscr = oldRoster.getBuddySubscription(session, buddy);
-					String[] groups = oldRoster.getBuddyGroups(session, buddy);
-					RosterElement relem = getRosterElementInstance(buddy, name, groups, session);
+					String[] groups         = oldRoster.getBuddyGroups(session, buddy);
+					RosterElement relem     = getRosterElementInstance(buddy, name, groups,
+																			session);
 
 					relem.setSubscription(subscr);
-
 					if (!addBuddy(relem, roster)) {
 						break;
 					}
 				}
-
 				saveUserRoster(session);
 			}
 		}
@@ -741,69 +579,39 @@ public class RosterFlat extends RosterAbstract {
 		return roster;
 	}
 
-	// @Override
-	// public void setBuddyOnline(XMPPResourceConnection session, String buddy,
-	// boolean online)
-	// throws NotAuthorizedException, TigaseDBException {
-	// RosterElement relem = getRosterElement(session, buddy);
-	// if (relem != null) {
-	// relem.setOnline(online);
-	// }
-	// }
-	//
-	// @Override
-	// public boolean isBuddyOnline(XMPPResourceConnection session, String buddy)
-	// throws NotAuthorizedException, TigaseDBException {
-	// RosterElement relem = getRosterElement(session, buddy);
-	// if (relem != null) {
-	// return relem.isOnline();
-	// }
-	// return false;
-	// }
+	//~--- get methods ----------------------------------------------------------
 
-	private class RosterElemComparator implements Comparator<JID> {
-
-		private Map<BareJID, RosterElement> roster = null;
-
-		private RosterElemComparator(Map<BareJID, RosterElement> roster) {
-			this.roster = roster;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-		 */
-		@Override
-		public int compare(JID arg0, JID arg1) {
-			double w0 = roster.get(arg0.getBareJID()).getWeight();
-			double w1 = roster.get(arg1.getBareJID()).getWeight();
-			return Double.compare(w0, w1);
-		}
-
-	}
-
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 * @param buddy
+	 *
+	 * 
+	 *
+	 * @throws NotAuthorizedException
+	 * @throws TigaseDBException
+	 */
 	public String getCustomStatus(XMPPResourceConnection session, JID buddy)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 		RosterElement rel = getRosterElement(session, buddy);
-		String result = null;
+		String result     = null;
+
 		if (rel != null) {
 			if (rel.getLastSeen() > RosterElement.INITIAL_LAST_SEEN_VAL) {
-				result =
-						"Buddy last seen on: " + new Date(rel.getLastSeen()) + ", weight: "
-								+ rel.getWeight();
+				result = "Buddy last seen on: " + new Date(rel.getLastSeen()) + ", weight: " +
+								 rel.getWeight();
 			} else {
 				result = "Never seen";
 			}
 		}
+
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see tigase.xmpp.impl.roster.RosterAbstract#logout()
-	 */
+	//~--- methods --------------------------------------------------------------
+
 	@Override
 	public void logout(XMPPResourceConnection session) {
 		try {
@@ -811,34 +619,60 @@ public class RosterFlat extends RosterAbstract {
 				saveUserRoster(session);
 			}
 		} catch (NotAuthorizedException ex) {
+
 			// TODO Auto-generated catch block
 			ex.printStackTrace();
 		} catch (TigaseDBException ex) {
+
 			// TODO Auto-generated catch block
 			ex.printStackTrace();
 		}
 	}
 
+	//~--- get methods ----------------------------------------------------------
+
 	/**
 	 * @param session
+	 * 
 	 * @return
 	 * @throws TigaseDBException
 	 * @throws NotAuthorizedException
 	 */
 	public boolean isModified(XMPPResourceConnection session)
-			throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException {
 		Map<BareJID, RosterElement> roster = getUserRoster(session);
-		boolean result = false;
+		boolean result                     = false;
+
 		if (roster != null) {
 			for (RosterElement rel : roster.values()) {
 				result |= rel.isModified();
 			}
 		}
+
 		return result;
 	}
 
-} // RosterFlat
+	//~--- inner classes --------------------------------------------------------
 
-// ~ Formatted in Sun Code Convention
+	private class RosterElemComparator
+					implements Comparator<JID> {
+		private Map<BareJID, RosterElement> roster = null;
 
-// ~ Formatted by Jindent --- http://www.jindent.com
+		//~--- constructors -------------------------------------------------------
+
+		private RosterElemComparator(Map<BareJID, RosterElement> roster) {
+			this.roster = roster;
+		}
+
+		//~--- methods ------------------------------------------------------------
+
+		@Override
+		public int compare(JID arg0, JID arg1) {
+			double w0 = roster.get(arg0.getBareJID()).getWeight();
+			double w1 = roster.get(arg1.getBareJID()).getWeight();
+
+			return Double.compare(w0, w1);
+		}
+	}
+}    // RosterFlat
+

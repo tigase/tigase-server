@@ -1,27 +1,27 @@
-
 /*
-* @(#)Packet.java   2010.01.16 at 07:05:30 GMT
-*
-* Tigase Jabber/XMPP Server
-* Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU Affero General Public License as published by
-* the Free Software Foundation, version 3 of the License.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU Affero General Public License for more details.
-*
-* You should have received a copy of the GNU Affero General Public License
-* along with this program. Look for COPYING file in the top folder.
-* If not, see http://www.gnu.org/licenses/.
-*
-* $Rev$
-* Last modified by $Author$
-* $Date$
+ * Packet.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ *
  */
+
+
+
 package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -39,8 +39,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-//~--- classes ----------------------------------------------------------------
-
 /**
  * Objects of this class carry a single XMPP packet (stanza).
  * The XMPP stanza is carried as an XML element in DOM structure by the
@@ -52,7 +50,7 @@ import java.util.Set;
  * stanza <code>Element</code> is not unmodifiable it should be treated as such. This
  * particular <code>Packet</code> can be processed concurrently at the same time in
  * different components or plugins of the Tigase server. Modifying it may lead to
- * unexpected and hard to diagnoze behaviours. Every time you want to change or
+ * unexpected and hard to diagnose behaviors. Every time you want to change or
  * update the object you should obtaina a copy of it using one of the utility methods:
  * <code>copyElementOnly()</code>, <code>swapFromTo(...)</code>,
  * <code>errorResult(...)</code>, <code>okResult(...)</code>,
@@ -99,12 +97,35 @@ import java.util.Set;
  * @version $Rev$
  */
 public class Packet {
+	/** Field description */
+	public static final String CLIENT_XMLNS = "jabber:client";
+
+	/** Field description */
+	public static final String FROM_ATT = "from";
+
+	/** Field description */
+	public static final String ID_ATT = "id";
+
+	/** Field description */
+	public static final String PERM_ATT = "perm";
+
+	/** Field description */
+	public static final String PRIORITY_ATT = "pr";
+
+	/** Field description */
+	public static final String TO_ATT = "to";
+
+	/** Field description */
+	public static final String TYPE_ATT = "type";
+
+	/** Field description */
+	public static final String XMLNS_ATT = "xmlns";
 	private static final String ERROR_NS = "urn:ietf:params:xml:ns:xmpp-stanzas";
 
 	/**
 	 * The variable control whether the toStringSecure() hides all the CData information
-	 * from stanzas printed to logs or logs the full, detailed stanza content. By default the
-	 * variable is set to 'false' to protect users' privacy and not reveail chat content.
+	 * from stanzas printed to logs or logs the full, detailed stanza content. By default
+	 * the variable is set to 'false' to protect users' privacy and not reveal chat content.
 	 * This is the value to be used in all production/live systems. For the debug purposes
 	 * on the test or development system it can be set to 'true' to help diagnose run-time
 	 * problems.<p/>
@@ -112,46 +133,21 @@ public class Packet {
 	 * <code>'packet.debug.full'</code> to <code>'true'</code>.
 	 */
 	public static boolean FULL_DEBUG = Boolean.getBoolean("packet.debug.full");
-	public static final String CLIENT_XMLNS = "jabber:client";
-	public static final String FROM_ATT = "from";
-	public static final String TO_ATT = "to";
-	public static final String PRIORITY_ATT = "pr";
-	public static final String PERM_ATT = "perm";
 
 	//~--- fields ---------------------------------------------------------------
 
-///**
-// * For internal Tigase use only. The session manager stores in stanza the old, original
-// * address while the packet is processd. This is sometimes necessary as the SM works
-// * for many virtual domains and the main SM address may be different from the address
-// * the user has put to the stanza.
-// */
-//public static final String OLDFROM = "oldfrom";
-//
-///**
-// * Constant <code>OLDTO</code> is kind of hack to store old request address
-// * when the packet is processed by the session manager. The problem is that
-// * SessionManager may work for many virtual domains but has just one real
-// * address. So to forward the request to the SessionManager the 'to' address
-// * is replaced with the real SessionManager address. The response however
-// * needs to be sent with the 'from' address as the original request was 'to'.
-// * Therefore 'oldto' attribute temporarly stores the old 'to' address
-// * and after the packet processing is completed the 'from' attribute
-// * is replaced with original 'to' value.
-// *
-// */
-//public static final String OLDTO = "oldto";
-	private JID packetFrom = null;
-	private JID packetTo = null;
-	private String packetToString = null;
-	private String packetToStringSecure = null;
-	private Set<String> processorsIds = new LinkedHashSet<String>(4, 0.9f);
-	private JID stanzaFrom = null;
-	private String stanzaId = null;
-	private JID stanzaTo = null;
-	private Priority priority = Priority.NORMAL;
-	private Permissions permissions = Permissions.NONE;
+	/** Field description */
 	protected Element elem;
+	private JID packetFrom              = null;
+	private JID packetTo                = null;
+	private String packetToString       = null;
+	private String packetToStringSecure = null;
+	private Set<String> processorsIds   = new LinkedHashSet<String>(4, 0.9f);
+	private JID stanzaFrom              = null;
+	private String stanzaId             = null;
+	private JID stanzaTo                = null;
+	private Priority priority           = Priority.NORMAL;
+	private Permissions permissions     = Permissions.NONE;
 	private boolean routed;
 	private StanzaType type;
 
@@ -176,7 +172,7 @@ public class Packet {
 	 *
 	 * @param elem is XML element with a single XMPP stanza.
 	 * @param stanzaFrom is a source JID address of the stanza passed as the
-	 * contructor parameter.
+	 * constructor parameter.
 	 * @param stanzaTo is a destination JID address of the stanza passed as the
 	 * constructor parameter.
 	 */
@@ -193,11 +189,11 @@ public class Packet {
 	 *
 	 * @param el
 	 *
-	 * @return
+	 * 
 	 */
 	public static String elemToString(Element el) {
 		String elemData = el.toString();
-		int size = elemData.length();
+		int size        = elemData.length();
 
 		if (size > 1024) {
 			elemData = elemData.substring(0, 1024) + " ... ";
@@ -212,11 +208,11 @@ public class Packet {
 	 *
 	 * @param el
 	 *
-	 * @return
+	 * 
 	 */
 	public static String elemToStringSecure(Element el) {
 		String elemData = el.toStringSecure();
-		int size = elemData.length();
+		int size        = elemData.length();
 
 		if (size > 1024) {
 			elemData = elemData.substring(0, 1024) + " ... ";
@@ -227,42 +223,46 @@ public class Packet {
 
 	/**
 	 * The method returns <code>Packet</code> instance.
-	 * More specificly it returns instance of one of the following classes: <code>Iq</code>,
-	 * <code>Message</code> or <code>Presence</code>. It takes stanza XML element
-	 * as an arguments, parses some the most commonly used data and created an object.
-	 * Preparsed information are: stanza from/to addresses, stanza id, type and presets
+	 * More specifically it returns instance of one of the following classes:
+	 * <code>Iq</code>, <code>Message</code> or <code>Presence</code>. It takes stanza XML
+	 * element as an arguments, parses some the most commonly used data and created an
+	 * object.
+	 * Pre-parsed information are: stanza from/to addresses, stanza id, type and presets
 	 * the <code>Packet</code> priority.<p/>
 	 * If there is a stringprep processing error for either the stanza source or destination
 	 * address <code>TigaseStringprepException</code> exception is thrown.
 	 * @param elem is a stanza XML <code>Element</code>
-	 * @return a <code>Packet</code> instance, more specificly instance of one of the
+	 * @return a <code>Packet</code> instance, more specifically instance of one of the
 	 * following classes: <code>Iq</code>, <code>Message</code> or <code>Presence</code>.
 	 * @throws TigaseStringprepException if there is stanza from or to address parsing
 	 * error.
 	 */
 	public static Packet packetInstance(Element elem) throws TigaseStringprepException {
+		Packet result = null;
+
 		if (elem.getName() == Message.ELEM_NAME) {
-			return new Message(elem);
+			result = new Message(elem);
 		}
-
 		if (elem.getName() == Presence.ELEM_NAME) {
-			return new Presence(elem);
+			result = new Presence(elem);
 		}
-
 		if (elem.getName() == Iq.ELEM_NAME) {
-			return new Iq(elem);
+			result = new Iq(elem);
+		}
+		if (result == null) {
+			result = new Packet(elem);
 		}
 
-		return new Packet(elem);
+		return result;
 	}
 
 	/**
 	 * The method returns <code>Packet</code> instance.
-	 * More specificly it returns instance of one of the following classes: <code>Iq</code>,
-	 * <code>Message</code> or <code>Presence</code>. It takes stanza XML element
-	 * as an arguments and preparsed stanza from and to addresses. The method
+	 * More specifically it returns instance of one of the following classes:
+	 * <code>Iq</code>, <code>Message</code> or <code>Presence</code>. It takes stanza XML
+	 * element as an arguments and pre-parsed stanza from and to addresses. The method
 	 * parses some other, the most commonly used data and created an object.
-	 * Preparsed information are: stanza id, type and presets the <code>Packet</code>
+	 * Pre-parsed information are: stanza id, type and presets the <code>Packet</code>
 	 * priority.<p/>
 	 * This method does not parses stanza from and stanza to address from the given XML
 	 * document, hence it does not throw <code>TigaseStringprepException</code>. Even
@@ -271,52 +271,57 @@ public class Packet {
 	 * incorrectly routed or processed.
 	 *
 	 * @param elem is the stanza XML <code>Element</code>
-	 * @param stanzaFrom is a preparsed <code>JID</code> instance from the given stanza
+	 * @param stanzaFrom is a pre-parsed <code>JID</code> instance from the given stanza
 	 * XML element.
-	 * @param stanzaTo is a preparsed <code>JID</code> instance from the given stanza
+	 * @param stanzaTo is a pre-parsed <code>JID</code> instance from the given stanza
 	 * XML element.
-	 * @return a <code>Packet</code> instance, more specificly instance of one of the
+	 * @return a <code>Packet</code> instance, more specifically instance of one of the
 	 * following classes: <code>Iq</code>, <code>Message</code> or <code>Presence</code>.
 	 */
 	public static Packet packetInstance(Element elem, JID stanzaFrom, JID stanzaTo) {
+		Packet result = null;
+
 		if (elem.getName() == Message.ELEM_NAME) {
-			return new Message(elem, stanzaFrom, stanzaTo);
+			result = new Message(elem, stanzaFrom, stanzaTo);
 		}
-
 		if (elem.getName() == Presence.ELEM_NAME) {
-			return new Presence(elem, stanzaFrom, stanzaTo);
+			result = new Presence(elem, stanzaFrom, stanzaTo);
 		}
-
 		if (elem.getName() == Iq.ELEM_NAME) {
-			return new Iq(elem, stanzaFrom, stanzaTo);
+			result = new Iq(elem, stanzaFrom, stanzaTo);
+		}
+		if (result == null) {
+			result = new Packet(elem, stanzaFrom, stanzaTo);
 		}
 
-		return new Packet(elem, stanzaFrom, stanzaTo);
+		return result;
 	}
 
 	/**
 	 * The method creates XML stanza from given parameters and returns
 	 * <code>Packet</code> instance for this XML stanza.
-	 * More specificly it returns instance of one of the following classes: <code>Iq</code>,
-	 * <code>Message</code> or <code>Presence</code>. <p/>
+	 * More specifically it returns instance of one of the following classes:
+	 * <code>Iq</code>, <code>Message</code> or <code>Presence</code>. <p/>
 	 * The method first builds an XML stanza from given parameters: element name,
 	 * from and to addresses and stanza type, then it creates a Packet instance for the
 	 * stanza. It also runs all the parsing and stringprep processing, hence it throws
 	 * an exception if any error is found.
-	 * @param el_name XML stanza elemen name as <code>String</code>.
+	 * @param el_name XML stanza element name as <code>String</code>.
 	 * @param from is the stanza <strong>from</strong> address as <code>String</code>
 	 * @param to is the stanza <strong>to</strong> address as <code>String</code>.
 	 * @param type is one of the stanza types: <strong>set</strong>, <strong>get</strong>,
 	 * <strong>result</strong>, .... as <code>StanzaType</code> instance.
-	 * @return a <code>Packet</code> instance, more specificly instance of one of the
+	 * @return a <code>Packet</code> instance, more specifically instance of one of the
 	 * following classes: <code>Iq</code>, <code>Message</code> or <code>Presence</code>.
 	 * @throws TigaseStringprepException if there is stanza from or to address parsing
 	 * error.
 	 */
-	public static Packet packetInstance(String el_name, String from, String to, StanzaType type)
-			throws TigaseStringprepException {
-		Element elem = new Element(el_name, new String[] { "from", "to", "type" }, new String[] { from,
-				to, type.toString() });
+	public static Packet packetInstance(String el_name, String from, String to,
+					StanzaType type)
+					throws TigaseStringprepException {
+		Element elem = new Element(el_name, new String[] { FROM_ATT, TO_ATT, TYPE_ATT },
+															 new String[] { from,
+						to, type.toString() });
 
 		return packetInstance(elem);
 	}
@@ -332,7 +337,7 @@ public class Packet {
 	 */
 	public Packet copyElementOnly() {
 		Element res_elem = elem.clone();
-		Packet result = packetInstance(res_elem, getStanzaFrom(), getStanzaTo());
+		Packet result    = packetInstance(res_elem, getStanzaFrom(), getStanzaTo());
 
 		result.setPriority(priority);
 
@@ -341,7 +346,7 @@ public class Packet {
 
 	/**
 	 * Method returns a string representation of all the data enclosed by the
-	 * <code>Packet</code> intance. All stanza XML element and all fields are converted
+	 * <code>Packet</code> instance. All stanza XML element and all fields are converted
 	 * to the <code>String</code> representation for debugging. Please note, this may
 	 * be resources consuming process so use it only when experiencing problems with
 	 * <code>Packet</code> content.
@@ -370,7 +375,7 @@ public class Packet {
 	 * @param errorType is a <code>String</code> representation of the error type defined
 	 * in the XMPP RFC-3920.
 	 * @param errorCode is an integer error code defined in the XMPP RFC for backward
-	 * compatibility with old Jabber implementatons.
+	 * compatibility with old Jabber implementations.
 	 * @param errorCondition is a <code>String</code> representation of the error condition
 	 * defined in the XMPP RFC-3920.
 	 * @param errorText human readable error message.
@@ -381,30 +386,17 @@ public class Packet {
 	 * is a response to this <code>Packet</code> instance.
 	 */
 	public Packet errorResult(final String errorType, final Integer errorCode,
-			final String errorCondition, final String errorText, final boolean includeOriginalXML) {
+														final String errorCondition, final String errorText,
+														final boolean includeOriginalXML) {
 		Element reply = new Element(elem.getName());
 
-		reply.setAttribute("type", StanzaType.error.toString());
-
-		// This is not needed anymore, initVars(...) takes care of that
-//  if (getStanzaFrom() != null) {
-//    reply.setAttribute("to", getStanzaFrom().toString());
-//  }    // end of if (getElemFrom() != null)
-//
-//  if (getStanzaTo() != null) {
-//    reply.setAttribute("from", getStanzaTo().toString());
-//  }    // end of if (getElemTo() != null)
+		reply.setAttribute(TYPE_ATT, StanzaType.error.toString());
 		if (getStanzaId() != null) {
-			reply.setAttribute("id", getStanzaId());
+			reply.setAttribute(ID_ATT, getStanzaId());
 		}    // end of if (getElemId() != null)
-
 		if (includeOriginalXML) {
 			reply.addChildren(elem.getChildren());
 		}    // end of if (includeOriginalXML)
-
-//  if (getAttribute(OLDTO) != null) {
-//    reply.setAttribute(OLDTO, getAttribute(OLDTO));
-//  }
 		if (getXMLNS() != null) {
 			reply.setXMLNS(getXMLNS());
 		}
@@ -414,22 +406,19 @@ public class Packet {
 		if (errorCode != null) {
 			error.setAttribute("code", errorCode.toString());
 		}
-
-		error.setAttribute("type", errorType);
+		error.setAttribute(TYPE_ATT, errorType);
 
 		Element cond = new Element(errorCondition);
 
 		cond.setXMLNS(ERROR_NS);
 		error.addChild(cond);
-
 		if (errorText != null) {
-			Element t = new Element("text", errorText,
-				new String[] { "xml:lang", "xmlns" },
-				new String[] { "en", ERROR_NS });
+			Element t = new Element("text", errorText, new String[] { "xml:lang", "xmlns" },
+															new String[] { "en",
+							ERROR_NS });
 
 			error.addChild(t);
 		}    // end of if (text != null && text.length() > 0)
-
 		reply.addChild(error);
 
 		return swapFromTo(reply, getStanzaTo(), getStanzaFrom());
@@ -448,9 +437,68 @@ public class Packet {
 	 * @param key is an attribute key.
 	 *
 	 * @return an attribute value or NULL if there is no such attribute.
+	 * @deprecated Consider using {@link #getAttributeStaticStr(java.lang.String) } instead.
 	 */
+	@Deprecated
 	public String getAttribute(String key) {
 		return elem.getAttribute(key);
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param key
+	 *
+	 * 
+	 */
+	public String getAttributeStaticStr(String key) {
+		return elem.getAttributeStaticStr(key);
+	}
+
+	/**
+	 * A convenience method for accessing stanza top level or any of it's children
+	 * attribute. This call is equal to the call:
+	 * <pre>
+	 * packet.getElement().getAttribute(xmlPath, key);
+	 * </pre>
+	 * <strong>Please note! This method can only be used with static strings or with
+	 * strings processed through <code>String.intern()</code> call. It uses "==" for
+	 * string comparison for performance reasons. If you pass dynamically built
+	 * <code>String[]</code> to the method call, use
+	 * {@link #getAttribute(java.lang.String[], java.lang.String) } instead.</strong>
+	 *
+	 * @param path is XML path for the stanza element or stanza child for which attribute
+	 * is retrieved.
+	 * @param key is an attribute key.
+	 *
+	 * @return value of the requested attribute or NULL if the attribute is not set.
+	 */
+	public String getAttributeStaticStr(String[] path, String key) {
+		return elem.getAttributeStaticStr(path, key);
+	}
+
+	/**
+	 * A convenience method for accessing stanza top level or any of it's children
+	 * attribute. This call is equal to the call:
+	 * <pre>
+	 * packet.getElement().getAttribute(xmlPath, key);
+	 * </pre>
+	 * <strong>For performance reasons please consider using
+	 * {@link #getAttributeStaticStr(java.lang.String[], java.lang.String) }
+	 * instead.</strong>
+	 *
+	 *
+	 *
+	 * @param path
+	 * @param key
+	 * @return value of the requested attribute or NULL if the attribute is not set.
+	 * @deprecated use {@link #getAttributeStaticStr(java.lang.String[], java.lang.String)}
+	 * instead, if possible, if not, contact us so we preserve the API.
+	 */
+	@Deprecated
+	public String getAttribute(String[] path, String key) {
+		return elem.getAttribute(path, key);
 	}
 
 	/**
@@ -464,14 +512,17 @@ public class Packet {
 	 * is retrieved.
 	 * @param key is an attribute key.
 	 *
-	 * @return
+	 * @return value of the requested attribute or NULL if the attribute is not set.
+	 * @deprecated use {@link #getAttributeStaticStr(java.lang.String[], java.lang.String)}
+	 * instead, if possible, or {@link #getAttribute(java.lang.String[], java.lang.String)}
 	 */
+	@Deprecated
 	public String getAttribute(String path, String key) {
 		return elem.getAttribute(path, key);
 	}
 
 	/**
-	 * The method alwats returns NULL. It is overwritten in the <code>Iq</code> class
+	 * The method always returns NULL. It is overwritten in the <code>Iq</code> class
 	 * where it returns a command identifier if the <em>iq</code> stanza represnts an
 	 * ad-hoc command. It is provided here is a convenience so the developer does not
 	 * have to cast the packet to IQ before retrieving the command id.
@@ -490,12 +541,59 @@ public class Packet {
 	 * <pre>
 	 * packet.getElement().getCData(xmlPath);
 	 * </pre>
+	 * <strong>Please note! This method can only be used with static strings or with
+	 * strings processed through <code>String.intern()</code> call. It uses "==" for
+	 * string comparison for performance reasons. If you pass dynamically built
+	 * <code>String[]</code> to the method call, use
+	 * {@link #getElemCData(java.lang.String[])} instead.</strong>
 	 *
 	 * @param xmlPath is an XML path to the stanza element for which CData is retrieved.
 	 *
 	 * @return CData for a given element or NULL if the element does not exist or there is
 	 * no CData for the element.
 	 */
+	public String getElemCDataStaticStr(String[] xmlPath) {
+		return elem.getCDataStaticStr(xmlPath);
+	}
+
+	/**
+	 * Method returns character data from the enclosed stanza for a given stanza element
+	 * or child pointed by the <code>xmlPath</code> parameter.
+	 * This call is equal to the call:
+	 * <pre>
+	 * packet.getElement().getCData(xmlPath);
+	 * </pre>
+	 * <strong>For performance reasons please consider using
+	 * {@link #getElemCDataStaticStr(java.lang.String[])} instead.</strong>
+	 *
+	 * @param xmlPath is an XML path to the stanza element for which CData is retrieved.
+	 *
+	 * @return CData for a given element or NULL if the element does not exist or there is
+	 * no CData for the element.
+	 * @deprecated use {@link #getElemCDataStaticStr(java.lang.String[]) } instead,
+	 * if possible, if not, contact us so we preserve the API.
+	 */
+	@Deprecated
+	public String getElemCData(String[] xmlPath) {
+		return elem.getCData(xmlPath);
+	}
+
+	/**
+	 * Method returns character data from the enclosed stanza for a given stanza element
+	 * or child pointed by the <code>xmlPath</code> parameter.
+	 * This call is equal to the call:
+	 * <pre>
+	 * packet.getElement().getCData(xmlPath);
+	 * </pre>
+	 *
+	 * @param xmlPath is an XML path to the stanza element for which CData is retrieved.
+	 *
+	 * @return CData for a given element or NULL if the element does not exist or there is
+	 * no CData for the element.
+	 * @deprecated use {@link #getElemCDataStaticStr(java.lang.String[])} instead,
+	 * if possible, or {@link #getElemCData(java.lang.String[])}
+	 */
+	@Deprecated
 	public String getElemCData(String xmlPath) {
 		return elem.getCData(xmlPath);
 	}
@@ -520,6 +618,52 @@ public class Packet {
 	 * stanza element or child pointed by the <code>xmlPath</code> parameter.
 	 * This call is equal to the call:
 	 * <pre>
+	 * packet.getElement().getChildrenStaticStr(xmlPath);
+	 * </pre>
+	 * <strong>Please note! This method can only be used with static strings or with
+	 * strings processed through <code>String.intern()</code> call. It uses "==" for
+	 * string comparison for performance reasons. If you pass dynamically built
+	 * <code>String[]</code> to the method call, use
+	 * {@link #getElemChildren(java.lang.String[]) } instead.</strong>
+	 *
+	 * @param xmlPath is an XML path to the stanza element for which children are
+	 * retrieved.
+	 *
+	 * @return children list for a given element or NULL if the element does not exist
+	 * or there is no children for the element.
+	 */
+	public List<Element> getElemChildrenStaticStr(String[] xmlPath) {
+		return elem.getChildrenStaticStr(xmlPath);
+	}
+
+	/**
+	 * Method returns a list of all XML children from the enclosed stanza for a given
+	 * stanza element or child pointed by the <code>xmlPath</code> parameter.
+	 * This call is equal to the call:
+	 * <pre>
+	 * packet.getElement().getChildren(xmlPath);
+	 * </pre>
+	 * <strong>For performance reasons please consider using
+	 * {@link #getElemChildrenStaticStr(java.lang.String[]) } instead.</strong>
+	 *
+	 * @param xmlPath is an XML path to the stanza element for which children are
+	 * retrieved.
+	 *
+	 * @return children list for a given element or NULL if the element does not exist
+	 * or there is no children for the element.
+	 * @deprecated use {@link #getElemChildrenStaticStr(java.lang.String[])} instead,
+	 * if possible, if not, contact us so we preserve the API.
+	 */
+	@Deprecated
+	public List<Element> getElemChildren(String[] xmlPath) {
+		return elem.getChildren(xmlPath);
+	}
+
+	/**
+	 * Method returns a list of all XML children from the enclosed stanza for a given
+	 * stanza element or child pointed by the <code>xmlPath</code> parameter.
+	 * This call is equal to the call:
+	 * <pre>
 	 * packet.getElement().getChildren(xmlPath);
 	 * </pre>
 	 *
@@ -528,7 +672,10 @@ public class Packet {
 	 *
 	 * @return children list for a given element or NULL if the element does not exist
 	 * or there is no children for the element.
+	 * @deprecated use {@link #getElemChildrenStaticStr(java.lang.String[]) } instead,
+	 * if possible, or {@link #getElemChildren(java.lang.String[]) }.
 	 */
+	@Deprecated
 	public List<Element> getElemChildren(String xmlPath) {
 		return elem.getChildren(xmlPath);
 	}
@@ -543,11 +690,13 @@ public class Packet {
 	 */
 	@Deprecated
 	public String getElemFrom() {
-		return (stanzaFrom != null) ? stanzaFrom.toString() : null;
+		return (stanzaFrom != null)
+					 ? stanzaFrom.toString()
+					 : null;
 	}
 
 	/**
-	 * Cnvenience method for retrieving the stanza top element name.
+	 * Convenience method for retrieving the stanza top element name.
 	 * This call is equal to the call:
 	 * <pre>
 	 * packet.getElement().getName();
@@ -570,7 +719,9 @@ public class Packet {
 	 */
 	@Deprecated
 	public String getElemTo() {
-		return (stanzaTo != null) ? stanzaTo.toString() : null;
+		return (stanzaTo != null)
+					 ? stanzaTo.toString()
+					 : null;
 	}
 
 	/**
@@ -590,17 +741,27 @@ public class Packet {
 	 * @return parsed stanza error condition or NULL if there is not error condition.
 	 */
 	public String getErrorCondition() {
-		List<Element> children = elem.getChildren(elem.getName() + "/error");
+		List<Element> children = elem.getChildrenStaticStr(getElNameErrorPath());
 
 		if (children != null) {
 			for (Element cond : children) {
-				if ( !cond.getName().equals("text")) {
+				if (!cond.getName().equals("text")) {
 					return cond.getName();
 				}    // end of if (!cond.getName().equals("text"))
 			}      // end of for (Element cond: children)
 		}        // end of if (children == null) else
 
 		return null;
+	}
+
+	/**
+	 * A convenience method to provide XML path as <code>String[]</code> to error element.
+	 * This method should be override by all classes extending this class.
+	 *
+	 * @return XML path to error element.
+	 */
+	protected String[] getElNameErrorPath() {
+		return new String[] { elem.getName(), "error" };
 	}
 
 	/**
@@ -613,7 +774,9 @@ public class Packet {
 	 * neither the packet source address is set nor the stanza source address is set.
 	 */
 	public JID getFrom() {
-		return (packetFrom != null) ? packetFrom : stanzaFrom;
+		return (packetFrom != null)
+					 ? packetFrom
+					 : stanzaFrom;
 	}
 
 	/**
@@ -652,7 +815,8 @@ public class Packet {
 	}
 
 	/**
-	 * Method returns the packet priority,
+	 * Method returns the packet priority. For more details please refer to {@link Priority}
+	 * enumeration.
 	 *
 	 *
 	 * @return the packet priority.
@@ -666,7 +830,7 @@ public class Packet {
 	 * session manager processor which handles the packet can mark the packet as
 	 * processed. This is used internally by the session manager to detect packets
 	 * which hasn't been processed by any processor, hence a default action is
-	 * applied to the apcket if possible.
+	 * applied to the packet if possible.
 	 *
 	 *
 	 * @return a <code>Set</code> of stanza processor IDs which handled the packet.
@@ -676,7 +840,7 @@ public class Packet {
 	}
 
 	/**
-	 * Method returns source address of rhe stanza enclosed by this packet.
+	 * Method returns source address of the stanza enclosed by this packet.
 	 * @return a <code>JID</code> instance of the stanza source address or NULL if the
 	 * source address has not been set for the stanza.
 	 */
@@ -696,7 +860,7 @@ public class Packet {
 	}
 
 	/**
-	 * Method returns destinaion address of rhe stanza enclosed by this packet.
+	 * Method returns destination address of the stanza enclosed by this packet.
 	 * @return a <code>JID</code> instance of the stanza destination address or NULL if
 	 * the destination address has not been set for the stanza.
 	 */
@@ -715,7 +879,9 @@ public class Packet {
 	 * is set.
 	 */
 	public JID getTo() {
-		return (packetTo != null) ? packetTo : stanzaTo;
+		return (packetTo != null)
+					 ? packetTo
+					 : stanzaTo;
 	}
 
 	/**
@@ -767,31 +933,27 @@ public class Packet {
 	public void initVars(JID stanzaFrom, JID stanzaTo) {
 		if (this.stanzaFrom != stanzaFrom) {
 			this.stanzaFrom = stanzaFrom;
-
 			if (stanzaFrom == null) {
 				elem.removeAttribute(FROM_ATT);
 			} else {
 				elem.setAttribute(FROM_ATT, stanzaFrom.toString());
 			}
 		}
-
 		if (this.stanzaTo != stanzaTo) {
 			this.stanzaTo = stanzaTo;
-
 			if (stanzaTo == null) {
 				elem.removeAttribute(TO_ATT);
 			} else {
 				elem.setAttribute(TO_ATT, stanzaTo.toString());
 			}
 		}
-
-		stanzaId = elem.getAttribute("id");
-		packetToString = null;
+		stanzaId             = elem.getAttributeStaticStr(ID_ATT);
+		packetToString       = null;
 		packetToStringSecure = null;
 	}
 
 	/**
-	 * The method allows for resyncing/parsing stanza JIDs stored in the packet with the
+	 * The method allows for re-syncing/parsing stanza JIDs stored in the packet with the
 	 * attributes of the stanza if they have been changed for any reason.
 	 * <strong>Method mostly used internally only.</strong> Normally stanza carried by this
 	 * Packet instance
@@ -799,8 +961,8 @@ public class Packet {
 	 * RFC requires that the server adds missing <em>'from'</em> attribute to every
 	 * packet sent by the user. It would be highly inefficient to create a new instance
 	 * of the data just to add the missing from address. In such a case SM adds missing
-	 * attribute but then stanza preparsed JIDs stored in the packet are out of sync with
-	 * the enclosed stanza. This method causes stanza JIDs reparsing and setting the packet
+	 * attribute but then stanza pre-parsed JIDs stored in the packet are out of sync with
+	 * the enclosed stanza. This method causes stanza JIDs re-parsing and setting the packet
 	 * variables.
 	 *
 	 *
@@ -808,35 +970,30 @@ public class Packet {
 	 * JIDs parsing.
 	 */
 	public void initVars() throws TigaseStringprepException {
-		String tmp = elem.getAttribute(TO_ATT);
+		String tmp = elem.getAttributeStaticStr(TO_ATT);
 
 		if (tmp != null) {
 			stanzaTo = JID.jidInstance(tmp);
 		} else {
 			stanzaTo = null;
 		}
-
-		tmp = elem.getAttribute(FROM_ATT);
-
+		tmp = elem.getAttributeStaticStr(FROM_ATT);
 		if (tmp != null) {
 			stanzaFrom = JID.jidInstance(tmp);
 		} else {
 			stanzaFrom = null;
 		}
-
-		stanzaId = elem.getAttribute("id");
-		packetToString = null;
+		stanzaId             = elem.getAttributeStaticStr(ID_ATT);
+		packetToString       = null;
 		packetToStringSecure = null;
-		tmp = elem.getAttribute(PRIORITY_ATT);
+		tmp                  = elem.getAttributeStaticStr(PRIORITY_ATT);
 		if (tmp != null) {
 			priority = Priority.valueOf(tmp);
 		}
-		tmp = elem.getAttribute(PERM_ATT);
+		tmp = elem.getAttributeStaticStr(PERM_ATT);
 		if (tmp != null) {
 			permissions = Permissions.valueOf(tmp);
 		}
-
-
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -858,7 +1015,7 @@ public class Packet {
 	}
 
 	/**
-	 * The method checks wherher the enclosed stanza is a speciifc XML element.
+	 * The method checks whether the enclosed stanza is a specific XML element.
 	 * That is, it checks whether the stanza element name and XMLNS is exactly
 	 * the same as given parameters.
 	 * This is a convenience method which logic is equal to the code below:
@@ -870,7 +1027,7 @@ public class Packet {
 	 * @param name is a <code>String</code> representing the XML element name.
 	 * @param xmlns is a <code>String</code> representing the XML xmlns value.
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isElement(String name, String xmlns) {
 		return (elem.getName() == name) && (xmlns == elem.getXMLNS());
@@ -909,28 +1066,85 @@ public class Packet {
 
 	/**
 	 * The method checks whether the enclosed stanza contains an XML element and
-	 * XML child element for a given element path and xmlns.
+	 * XML child element for a given element path and XMLNS.
 	 * The <code>elementPath</code> is directory path like string.
+	 * <strong>Please note! This method can only be used with static strings or with
+	 * strings processed through <code>String.intern()</code> call. It uses "==" for
+	 * string comparison for performance reasons. If you pass dynamically built
+	 * <code>String[]</code> to the method call, use
+	 * {@link #isXMLNS(java.lang.String[], java.lang.String)} instead.</strong>
 	 *
-	 * @param elementPath is a <code>String</code> value which represents XML
-	 * element to a desired child element.
+	 * @param elementPath is a <code>String[]</code> value which represents XML
+	 * element path to a desired child element.
 	 * @param xmlns is a <code>String</code> value which represents XML XMLNS.
 	 *
-	 * @return
+	 * @return a <code>true</code> is element given in parameters is found in the packet
+	 * stanza, otherwise <code>false</code>
 	 */
+	public boolean isXMLNSStaticStr(String[] elementPath, String xmlns) {
+		String this_xmlns = elem.getXMLNSStaticStr(elementPath);
+
+		return (this_xmlns == xmlns);
+	}
+
+	/**
+	 * The method checks whether the enclosed stanza contains an XML element and
+	 * XML child element for a given element path and xmlns.
+	 * The <code>elementPath</code> is a String array with path elements.
+	 * <strong>For performance reasons please consider using
+	 * {@link #isXMLNSStaticStr(java.lang.String[], java.lang.String)} instead.</strong>
+	 *
+	 * @param elementPath is a <code>String[]</code> value which represents XML
+	 * element path to a desired child element.
+	 * @param xmlns is a <code>String</code> value which represents XML XMLNS.
+	 *
+	 * @return a <code>true</code> is element given in parameters is found in the packet
+	 * stanza, otherwise <code>false</code>
+	 * @deprecated use {@link #isXMLNSStaticStr(String[], String)} instead,
+	 * if possible, if not contact us so we preserve the API.
+	 */
+	@Deprecated
+	public boolean isXMLNS(String[] elementPath, String xmlns) {
+		String this_xmlns = elem.getXMLNS(elementPath);
+
+		return (this_xmlns == xmlns);
+	}
+
+	/**
+	 * Checks whether the XML stanza contains XML element with given XML path and
+	 * element name and XMLNS. This is inefficient method and highly recommended not to use.
+	 * Please use the other methods which accept <code>String[]</code> instead.
+	 *
+	 *
+	 * @param elementPath is a string with XML path in form of: "/root/child1/child2"
+	 * @param xmlns is a valid XML namespace.
+	 *
+	 * @return a <code>true</code> is element given in parameters is found in the packet
+	 * stanza, otherwise <code>false</code>
+	 * @deprecated use {@link #isXMLNSStaticStr(String[], String)} instead,
+	 * if possible, or {@link #isXMLNS(String[], String)}
+	 */
+	@Deprecated
 	public boolean isXMLNS(String elementPath, String xmlns) {
 		String this_xmlns = elem.getXMLNS(elementPath);
 
-		if (this_xmlns == xmlns) {
-			return true;
-		}
-
-		return false;
+		return (this_xmlns == xmlns);
 	}
 
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Method allows to set-force XMLNS for the element. This is mostly used in cases
+	 * where there is no XMLNS provided for the element (by the client for example) and
+	 * then a default one is used. However, in some contexts a default XMLNS might be
+	 * confusing such as when the packet is passed between s2s to c2s connection and
+	 * the default XMLNS changes.
+	 *
+	 * @param xmlns a valid XMLNS string for the element.
+	 */
 	public void setXMLNS(String xmlns) {
 		elem.setXMLNS(xmlns);
-		packetToString = null;
+		packetToString       = null;
 		packetToStringSecure = null;
 	}
 
@@ -957,25 +1171,11 @@ public class Packet {
 		if (getXMLNS() != null) {
 			reply.setXMLNS(getXMLNS());
 		}
-
-		reply.setAttribute("type", StanzaType.result.toString());
-
-		// Not needed anymore, initVars(...) takes care of that
-//  if (getStanzaFrom() != null) {
-//    reply.setAttribute("to", getStanzaFrom().toString());
-//  }    // end of if (getElemFrom() != null)
-//
-//  if (getStanzaTo() != null) {
-//    reply.setAttribute("from", getStanzaTo().toString());
-//  }    // end of if (getElemFrom() != null)
-//
+		reply.setAttribute(TYPE_ATT, StanzaType.result.toString());
 		if (getStanzaId() != null) {
-			reply.setAttribute("id", getStanzaId());
+			reply.setAttribute(ID_ATT, getStanzaId());
 		}    // end of if (getElemId() != null)
 
-//  if (getAttribute(OLDTO) != null) {
-//    reply.setAttribute(OLDTO, getAttribute(OLDTO));
-//  }
 		Element old_child = elem;
 		Element new_child = reply;
 
@@ -988,7 +1188,6 @@ public class Packet {
 			new_child.addChild(tmp);
 			new_child = tmp;
 		}    // end of for (int i = 0; i < originalXML; i++)
-
 		if (includeXML != null) {
 			new_child.setCData(includeXML);
 		}    // end of if (includeOriginalXML)
@@ -1020,25 +1219,11 @@ public class Packet {
 		if (getXMLNS() != null) {
 			reply.setXMLNS(getXMLNS());
 		}
-
-		reply.setAttribute("type", StanzaType.result.toString());
-
-		// Not needed anymore, initVars(...) takes care of that
-//  if (getStanzaFrom() != null) {
-//    reply.setAttribute("to", getStanzaFrom().toString());
-//  }    // end of if (getElemFrom() != null)
-//
-//  if (getStanzaTo() != null) {
-//    reply.setAttribute("from", getStanzaTo().toString());
-//  }    // end of if (getElemFrom() != null)
-//
+		reply.setAttribute(TYPE_ATT, StanzaType.result.toString());
 		if (getStanzaId() != null) {
-			reply.setAttribute("id", getStanzaId());
+			reply.setAttribute(ID_ATT, getStanzaId());
 		}    // end of if (getElemId() != null)
 
-//  if (getAttribute(OLDTO) != null) {
-//    reply.setAttribute(OLDTO, getAttribute(OLDTO));
-//  }
 		Element old_child = elem;
 		Element new_child = reply;
 
@@ -1051,7 +1236,6 @@ public class Packet {
 			new_child.addChild(tmp);
 			new_child = tmp;
 		}    // end of for (int i = 0; i < originalXML; i++)
-
 		if (includeXML != null) {
 			new_child.addChild(includeXML);
 		}    // end of if (includeOriginalXML)
@@ -1072,10 +1256,9 @@ public class Packet {
 	 * @return a new <code>Packet</code> instance with <code>route</code> stanza.
 	 */
 	public Packet packRouted() {
-		Element routedp = new Element("route",
-			new String[] { TO_ATT, FROM_ATT, PRIORITY_ATT, PERM_ATT },
-			new String[] { getTo().toString(),	getFrom().toString(),
-										 priority.toString(), permissions.toString() });
+		Element routedp = new Element("route", new String[] { TO_ATT, FROM_ATT, PRIORITY_ATT,
+						PERM_ATT }, new String[] { getTo().toString(), getFrom().toString(),
+																			 priority.toString(), permissions.toString() });
 
 		routedp.addChild(elem);
 
@@ -1123,9 +1306,9 @@ public class Packet {
 	 * permissions calculated by the session manager.
 	 */
 	public void setPermissions(Permissions perm) {
-		packetToString = null;
+		packetToString       = null;
 		packetToStringSecure = null;
-		permissions = perm;
+		permissions          = perm;
 	}
 
 	/**
@@ -1134,7 +1317,7 @@ public class Packet {
 	 * which experience overload and some packets may be delivered with a delay
 	 * if they are low priority packets.
 	 *
-	 * @param priority os a new <code>Priority</code> instance set for the packet.
+	 * @param priority is a new <code>Priority</code> instance set for the packet.
 	 */
 	public void setPriority(Priority priority) {
 		this.priority = priority;
@@ -1143,7 +1326,7 @@ public class Packet {
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * The method left for compatiblity with an old API reasons. Use
+	 * The method left for compatibility with an old API reasons. Use
 	 * <code>swapStanzaFromTo()</code> instead.
 	 *
 	 * @return a new packet instance with a copy of the stanza element with
@@ -1156,7 +1339,7 @@ public class Packet {
 	}
 
 	/**
-	 * The method left for compatiblity with an old API reasons. Use
+	 * The method left for compatibility with an old API reasons. Use
 	 * <code>swapStanzaFromTo()</code> instead.
 	 *
 	 * @param type a new stanza type which has to be set to the generated
@@ -1206,7 +1389,7 @@ public class Packet {
 	 * @return a new <code>Packet>/code> instance.
 	 */
 	public Packet swapFromTo() {
-		Element el = elem.clone();
+		Element el    = elem.clone();
 		Packet packet = packetInstance(el, getStanzaFrom(), getStanzaTo());
 
 		packet.setPacketTo(getFrom());
@@ -1225,11 +1408,7 @@ public class Packet {
 	 * @return a new <code>Packet</code> instance.
 	 */
 	public Packet swapStanzaFromTo() {
-		Element copy = elem.clone();
-
-		// Not needed anymore, initVars(...) takes care of that
-//  copy.setAttribute("to", getStanzaFrom().toString());
-//  copy.setAttribute("from", getStanzaTo().toString());
+		Element copy  = elem.clone();
 		Packet result = packetInstance(copy, getStanzaTo(), getStanzaFrom());
 
 		result.setPriority(priority);
@@ -1249,10 +1428,7 @@ public class Packet {
 	public Packet swapStanzaFromTo(final StanzaType type) {
 		Element copy = elem.clone();
 
-		// Not needed anymore, initVars(...) takes care of that
-//  copy.setAttribute("to", getStanzaFrom().toString());
-//  copy.setAttribute("from", getStanzaTo().toString());
-		copy.setAttribute("type", type.toString());
+		copy.setAttribute(TYPE_ATT, type.toString());
 
 		Packet result = packetInstance(copy, getStanzaTo(), getStanzaFrom());
 
@@ -1287,6 +1463,13 @@ public class Packet {
 		return "from=" + packetFrom + ", to=" + packetTo + packetToString;
 	}
 
+	/**
+	 * Provides human-readable string presentation of the <code>Packet</code> object. It is
+	 * not a XMPP stanza only, it also contains some Tigase specific meta-data.
+	 *
+	 *
+	 * 
+	 */
 	@Override
 	public String toString() {
 		return toString(FULL_DEBUG);
@@ -1294,7 +1477,7 @@ public class Packet {
 
 	/**
 	 * Is a convenience method which allows you to call always the same method
-	 * but parametrize (configure) whether you want to get a secure packet string
+	 * but change (configure) whether you want to get a secure packet string
 	 * representation or full representation.
 	 *
 	 * @param secure parameter specifies whether the secure packet representation
@@ -1390,9 +1573,9 @@ public class Packet {
 	}
 
 	private String calcToString(String elemData) {
-		return ", DATA=" + elemData + ", SIZE=" + elem.toString().length() + ", XMLNS="
-				+ elem.getXMLNS() + ", PRIORITY=" + priority + ", PERMISSION=" + permissions + ", TYPE="
-					+ type;
+		return ", DATA=" + elemData + ", SIZE=" + elem.toString().length() + ", XMLNS=" +
+					 elem.getXMLNS() + ", PRIORITY=" + priority + ", PERMISSION=" + permissions +
+					 ", TYPE=" + type;
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -1401,21 +1584,18 @@ public class Packet {
 		if (elem == null) {
 			throw new NullPointerException();
 		}    // end of if (elem == null)
-
 		this.elem = elem;
-
-		if (elem.getAttribute("type") != null) {
-			type = StanzaType.valueof(elem.getAttribute("type"));
+		if (elem.getAttributeStaticStr(TYPE_ATT) != null) {
+			type = StanzaType.valueof(elem.getAttributeStaticStr(TYPE_ATT));
 		} else {
 			type = null;
 		}    // end of if (elem.getAttribute("type") != null) else
-
 		if (elem.getName() == "cluster") {
 			setPriority(Priority.CLUSTER);
 		} else {
-			if ((elem.getName() == "presence")
-					&& ((type == null) || (type == StanzaType.available) || (type == StanzaType.unavailable)
-						|| (type == StanzaType.probe))) {
+			if ((elem.getName() == "presence") &&
+					((type == null) || (type == StanzaType.available) ||
+					 (type == StanzaType.unavailable) || (type == StanzaType.probe))) {
 				setPriority(Priority.PRESENCE);
 			} else {
 				if (elem.getName() == "route") {
@@ -1429,7 +1609,4 @@ public class Packet {
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/02/20

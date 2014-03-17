@@ -41,20 +41,33 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<appversion>${ENV[TIGVER]}</appversion>
 		<authors>
 			<author name="Artur Hefczyc" email="artur.hefczyc@tigase.org"/>
+			<author name="Bartosz Małkowski" email="bmalkowski@tigase.pl"/>
+			<author name="Wojciech Kapcia" email="wojciech.kapcia@tigase.org"/>
+			<author name="Andrzej Wójcik" email="andrzejw@tigase.org"/>
+			<author name="Wojciech Czubaszek" email="wojciech.czubaszek@tigase.org"/>
+			<author name="Eric Dziewa" email="eric.dziewa@tigase.org"/>
+			<author name="Jacek Predki" email="jacek.predki@tigase.com"/>
+			<author name="Piotr Kontek" email=""/>
+			<author name="Alexander Gnauck" email=""/>
+			<author name="Tomasz Sterna" email=""/>
+			<author name="Mateusz Fiołka" email=""/>
+			<author name="David Pache" email=""/>
+			<author name="Peter Sandström" email=""/>
+			<author name="Yonas Yanfa" email=""/>
 		</authors>
 		<url>http://www.tigase.org/</url>
 		<appsubpath>Tigase-$APP_VER</appsubpath>
 		<javaversion>1.6</javaversion>
 		<requiresjdk>no</requiresjdk>
-		<pack200/>
 	</info>
 
-	<jar src="libs/jdbc-postgresql.jar"/>
-	<jar src="libs/jdbc-mysql.jar"/>
-	<jar src="libs/derby.jar"/>
+	<jar src="jars/postgresql.jar"/>
+	<jar src="jars/mysql-connector-java.jar"/>
+	<jar src="jars/derby.jar"/>
+	<jar src="jars/jtds.jar"/>
 	<jar src="jars/tigase-server.jar"/>
-	<jar src="libs/tigase-xmltools.jar"/>
-	<jar src="libs/tigase-utils.jar"/>
+	<jar src="jars/tigase-xmltools.jar"/>
+	<jar src="jars/tigase-utils.jar"/>
 
 	<native type="izpack" name="ShellLink.dll"/>
 	<native type="izpack" name="ShellLink_x64.dll"/>
@@ -66,14 +79,23 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<variable name="DerbyDBPath.windows" value="${INSTALL_PATH}\tigasedb"/>
 		<variable name="DerbyDBPath.mac" value="${INSTALL_PATH}/tigasedb"/>
 		<variable name="DerbyDBPath.unix" value="${INSTALL_PATH}/tigasedb"/>
+		<variable name="mucComponent" value="on"/>
+		<variable name="socks5Component" value="on"/>
+		<variable name="PubSubComponent" value="on"/>
+		<variable name="messageArchiveComponent" value="on"/>
+		<variable name="clusterMode" value="true"/>
+		<variable name="acsName" value=""/>
+		<variable name="jarsDir" value="jars"/>
 <!--		<variable name="JDKPath" value="$JAVA_HOME"/> -->
 	</variables>
 
-<!-- moved to variables
 	<dynamicvariables>
-		<variable name="JDKPath" value="$JAVA_HOME"/>
+		<variable name="messageArchivePlugin" value="message-archive-xep-0136" condition="messageArchive" />
+		<variable name="messageArchivePlugin" value="off" condition="!messageArchive" />
+
+		<variable name="osgiEnabled" value="true" condition="izpack.selected.osgi" />
+		<variable name="osgiEnabled" value="false" condition="!izpack.selected.osgi" />
 	</dynamicvariables>
- -->
 	<conditions>
 		<condition type="variable" id="installSelected">
 			<name>serverInstall</name>
@@ -95,12 +117,32 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 			<name>dbType</name>
 			<value>PostgreSQL</value>
 		</condition>
+		<condition type="variable" id="sqlserverSelected">
+			<name>dbType</name>
+			<value>SQLServer</value>
+		</condition>
 		<condition type="variable" id="derbySelected">
 			<name>dbType</name>
 			<value>Derby</value>
 		</condition>
 		<condition type="variable" id="authDBSelected">
 			<name>authDB</name>
+			<value>on</value>
+		</condition>
+		<condition type="variable" id="messageArchive">
+			<name>messageArchiveComponent</name>
+			<value>on</value>
+		</condition>
+		<condition type="variable" id="acsSelected">
+			<name>acsComponent</name>
+			<value>on</value>
+		</condition>
+		<condition type="variable" id="acsMUCSelected">
+			<name>acsMUCComponent</name>
+			<value>on</value>
+		</condition>
+		<condition type="variable" id="acsPubSubSelected">
+			<name>acsPubSubComponent</name>
 			<value>on</value>
 		</condition>
 	</conditions>
@@ -188,6 +230,26 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 		<res id="derby-schema-5-1-sp" src="database/derby-schema-5-1-sp.sql"/>
 		<res id="derby-schema-5-1-props" src="database/derby-schema-5-1-props.sql"/>
 		<res id="derby-schema-upgrade-to-5-1" src="database/derby-schema-upgrade-to-5-1.sql"/>
+
+		<res id="sqlserver-installer-create-db" src="database/sqlserver-installer-create-db.sql"/>
+		<res id="sqlserver-installer-post" src="database/sqlserver-installer-post.sql"/>
+		<res id="sqlserver-schema-5-1-schema" src="database/sqlserver-schema-5-1-schema.sql"/>
+		<res id="sqlserver-schema-5-1-sp" src="database/sqlserver-schema-5-1-sp.sql"/>
+		<res id="sqlserver-schema-5-1-props" src="database/sqlserver-schema-5-1-props.sql"/>
+
+		<!-- Socks5 component schema files -->
+		<res id="derby-socks5-schema" src="database/derby-socks5-schema.sql"/>
+		<res id="postgresql-socks5-schema" src="database/postgresql-socks5-schema.sql"/>
+		<res id="mysql-socks5-schema" src="database/mysql-socks5-schema.sql"/>
+		<res id="sqlserver-socks5-schema" src="database/sqlserver-socks5-schema.sql"/>
+
+		<!-- PubSub component schema files -->
+		<res id="derby-pubsub-schema" src="database/derby-pubsub-schema-3.0.0.sql"/>
+		<res id="mysql-pubsub-schema" src="database/mysql-pubsub-schema-3.0.0.sql"/>
+		<res id="sqlserver-pubsub-schema" src="database/sqlserver-pubsub-schema-3.0.0.sql"/>
+		<res id="postgresql-pubsub-schema" src="database/postgresql-pubsub-schema-3.0.0.sql"/>
+
+
 	</resources>
 
 	<!--
@@ -217,15 +279,22 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 
 			<panel classname="UserInputPanel" condition="!installSelected"
 						 id="InstallationPathForConfigPanel.id"/>
+
 			<panel classname="TigaseConfigLoadPanel" condition="configSelected"
 						 id="TigaseConfigLoadPanel.id"/>
 			<panel classname="UserInputPanel" condition="configSelected"
 						 id="BasicConfigurationPanel.id"/>
 			<panel classname="UserInputPanel" condition="advancedSelected"
 						 id="AdvancedConfigurationPanel.id"/>
+
+			<panel classname="UserInputPanel" condition="acsSelected|acsMUCSelected|acsPubSubSelected"
+						 id="AdvancedClusteringStrategyPanel.id"/>
+			<panel classname="UserInputPanel" condition="sqlserverSelected"
+						 id="SqlServerPanel.id"/>
+
 			<panel classname="UserInputPanel" condition="advancedSelected"
 						 id="PluginsListPanel.id"/>
-			<panel classname="UserInputPanel" condition="mysqlSelected|pgsqlSelected"
+			<panel classname="UserInputPanel" condition="mysqlSelected|pgsqlSelected|sqlserverSelected"
 						 id="DatabaseConfigurationPanel.id"/>
 			<panel classname="DerbyPathPanel" condition="derbySelected"
 						 id="DerbyPathPanel.id"/>
@@ -251,9 +320,6 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 					<include name="package.html"/>
 					<include name="License.html"/>
 					<include name="Changelog"/>
-					<include name="jars/tigase-server.jar"/>
-					<include name="libs/tigase-utils.jar"/>
-					<include name="libs/tigase-xmltools.jar"/>
 					<include name="etc/tigase.conf"/>
 					<include name="certs/rsa-keystore"/>
 					<include name="certs/truststore"/>
@@ -266,7 +332,17 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 					<include name="etc/jmx.password"/>"
 					<include name="etc/cross-domain-policy.xml"/>"
 					<include name="etc/bosh-extra-headers.txt"/>"
+					<include name="etc/cross-domain-policy.xml"/>"
+					<include name="etc/client-access-policy.xml"/>"
+					<include name="etc/logback.xml"/>"
+					<include name="etc/snmp.acl"/>"
 				</fileset>
+				<fileset dir="./jars" targetdir="$INSTALL_PATH/${jarsDir}">
+					<include name="tigase-server.jar"/>
+					<!--<include name="tigase-utils.jar"/>-->
+					<!--<include name="tigase-xmltools.jar"/>-->
+				</fileset>
+
 				<parsable targetfile="$INSTALL_PATH/etc/init.properties"/>
 				<parsable targetfile="$INSTALL_PATH/etc/tigase.conf"/>
 			</pack>
@@ -302,9 +378,9 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 										target="${INSTALL_PATH}/wrapper.conf"/>
 
 				<singlefile src="win-stuff/wrapper/wrapper.dll"
-										target="$INSTALL_PATH/libs/wrapper.dll"/>
+										target="$INSTALL_PATH/${jarsDir}/wrapper.dll"/>
 				<singlefile src="win-stuff/wrapper/wrapper.jar"
-										target="$INSTALL_PATH/libs/wrapper.jar"/>
+										target="$INSTALL_PATH/${jarsDir}/wrapper.jar"/>
 
 				<singlefile src="win-stuff/scripts/InstallTigaseService.bat"
 										target="$INSTALL_PATH/InstallTigaseService.bat"/>
@@ -324,12 +400,24 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 				</fileset>
 			</pack>
 			<pack name="Extras" required="no" preselected="yes">
-				<description>Extras libraries, MUC, PubSub...</description>
-				<fileset dir="." targetdir="$INSTALL_PATH">
-					<include name="libs/tigase-muc.jar"/>
-					<include name="libs/tigase-pubsub.jar"/>
-					<include name="libs/tigase-extras.jar"/>
-					<include name="libs/jdmkrt.jar"/>
+				<description>Extras libraries, MUC, PubSub, STUN, Socks5, Message Archiving, ACS</description>
+				<fileset dir="./jars" targetdir="$INSTALL_PATH/${jarsDir}">
+					<include name="tigase-muc.jar"/>
+					<include name="tigase-pubsub.jar"/>
+					<include name="tigase-pubsub-2.2.0.jar.old"/>
+					<include name="tigase-extras.jar"/>
+					<include name="tigase-stun.jar"/>
+					<include name="jstun.jar"/>
+					<include name="tigase-socks5.jar"/>
+					<include name="tigase-message-archiving.jar"/>
+					<include name="jdmkrt.jar"/>
+					<include name="hamcrest-core.jar"/>
+					<include name="tigase-acs.jar"/>
+					<include name="tigase-acs-muc.jar"/>
+					<include name="tigase-acs-pubsub.jar"/>
+					<include name="licence-lib.jar"/>
+					<include name="tigase-stats-collector-library.jar"/>
+					<include name="tigase-stats-collector-provider.jar"/>
 				</fileset>
 			</pack>
 
@@ -338,38 +426,87 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 				<fileset dir="src/main/groovy/tigase/admin" targetdir="$INSTALL_PATH/scripts/admin">
 					<include name="*.*"/>
 				</fileset>
-				<fileset dir="libs" targetdir="$INSTALL_PATH/libs">
-					<include name="groovy-all-1.8.5.jar"/>
+				<fileset dir="scripts/admin" targetdir="$INSTALL_PATH/scripts/admin">
+					<include name="*.*"/>
+				</fileset>
+				<fileset dir="jars" targetdir="$INSTALL_PATH/${jarsDir}">
+					<include name="groovy-all.jar"/>
 				</fileset>
 			</pack>
 
 			<pack name="Derby Database (DB included)" required="no" preselected="yes">
 <!-- 						installGroups="Derby Database"> -->
 				<description>Derby database (included) and JDBC driver</description>
-				<fileset dir="." targetdir="$INSTALL_PATH">
-					<include name="libs/derby.jar"/>
-					<include name="libs/derbytools.jar"/>
+				<fileset dir="./jars" targetdir="$INSTALL_PATH/${jarsDir}">
+					<include name="derby.jar"/>
+					<include name="derbytools.jar"/>
 				</fileset>
 			</pack>
 			<pack name="MySQL Database driver (DB not included)" required="no" preselected="yes">
 <!-- 						installGroups="MySQL Database"> -->
 				<description>MySQL JDBC driver (MySQL has to be installed separately)</description>
-				<fileset dir="." targetdir="$INSTALL_PATH">
-					<include name="libs/jdbc-mysql.jar"/>
+				<fileset dir="./jars" targetdir="$INSTALL_PATH/${jarsDir}">
+					<include name="mysql-connector-java.jar"/>
 				</fileset>
 			</pack>
 			<pack name="PostgreSQL Database driver (DB not included)" required="no" preselected="yes">
 <!-- 						installGroups="PostgreSQL Database"> -->
 				<description>PostgreSQL JDBC driver (PostgreSQL has to be installed separately)</description>
-				<fileset dir="." targetdir="$INSTALL_PATH">
-					<include name="libs/jdbc-postgresql.jar"/>
+				<fileset dir="./jars" targetdir="$INSTALL_PATH/${jarsDir}">
+					<include name="postgresql.jar"/>
 				</fileset>
 			</pack>
 			<pack name="SQL Server Database driver (DB not included)" required="no" preselected="yes">
 <!-- 						installGroups="SQL Server Database"> -->
 				<description>SQL Server JDBC driver (SQL Server has to be installed separately)</description>
-				<fileset dir="." targetdir="$INSTALL_PATH">
-					<include name="libs/jtds-1.2.2.jar"/>
+				<fileset dir="./jars" targetdir="$INSTALL_PATH/${jarsDir}">
+					<include name="jtds.jar"/>
+				</fileset>
+			</pack>
+			<pack name="OSGi dependencies" required="no" preselected="no" id="osgi">
+				<description>If you intend to run Tigase in OSGi mode you need additional libraries. Enabling this Pack will also setup configuration files to start Tigase XMPP server in OSGi mode.</description>
+				<fileset dir="./conf" targetdir="${INSTALL_PATH}/conf">
+					<include name="config.properties"/>
+				</fileset>
+				<fileset dir="./etc" targetdir="${INSTALL_PATH}/etc">
+					<include name="logback.xml"/>
+				</fileset>
+				<fileset dir="./jars" targetdir="${INSTALL_PATH}/${jarsDir}">
+					<include name="org.osgi.core.jar"/>
+					<include name="org.apache.felix.bundlerepository.jar"/>
+					<include name="org.apache.felix.configadmin.jar"/>
+					<include name="org.apache.felix.shell.jar"/>
+					<include name="org.apache.felix.shell.remote.jar"/>
+					<include name="org.apache.felix.main.jar"/>
+					<include name="jetty-osgi-boot.jar"/>
+					<include name="logback-classic.jar"/>
+					<include name="logback-core.jar"/>
+					<include name="slf4j-api.jar"/>
+					<include name="jul-to-slf4j.jar"/>
+				</fileset>
+			</pack>
+			<pack name="HTTP API Component" required="no" preselected="no">
+				<description>Interface for the service administration, monitoring and exchange data between Tigase and external system</description>
+				<fileset dir="./etc" targetdir="${INSTALL_PATH}/etc">
+					<include name="tigase-http-context.xml"/>
+				</fileset>
+				<fileset dir="." targetdir="${INSTALL_PATH}" defaultexcludes="yes">
+					<include name="scripts/rest/**/*"/>
+				</fileset>
+				<fileset dir="./jars" targetdir="${INSTALL_PATH}/${jarsDir}">
+					<include name="jetty-osgi-boot.jar"/>
+					<include name="tigase-http-api.jar"/>
+					<include name="javax.servlet.jar"/>
+					<include name="jetty-continuation.jar"/>
+					<include name="jetty-deploy.jar"/>
+					<include name="jetty-http.jar"/>
+					<include name="jetty-io.jar"/>
+					<include name="jetty-security.jar"/>
+					<include name="jetty-server.jar"/>
+					<include name="jetty-servlet.jar"/>
+					<include name="jetty-util.jar"/>
+					<include name="jetty-webapp.jar"/>
+					<include name="jetty-xml.jar"/>
 				</fileset>
 			</pack>
 			<pack name="Sources" required="no" preselected="no">

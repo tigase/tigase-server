@@ -57,7 +57,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String getCondition() {
@@ -68,7 +68,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public int getErrorCode() {
@@ -79,7 +79,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String getErrorType() {
@@ -94,7 +94,7 @@ public enum Authorization {
 		 * @param t
 		 * @param i
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public Packet getResponseMessage(Packet p, String t, boolean i) {
@@ -110,7 +110,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String getCondition() {
@@ -121,7 +121,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public int getErrorCode() {
@@ -132,7 +132,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String getErrorType() {
@@ -148,7 +148,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String getCondition() {
@@ -159,7 +159,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public int getErrorCode() {
@@ -170,7 +170,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String getErrorType() {
@@ -186,7 +186,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String getCondition() {
@@ -197,7 +197,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public int getErrorCode() {
@@ -208,7 +208,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String getErrorType() {
@@ -224,7 +224,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String getCondition() {
@@ -235,7 +235,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public int getErrorCode() {
@@ -246,7 +246,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String getErrorType() {
@@ -262,7 +262,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String getCondition() {
@@ -273,7 +273,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public int getErrorCode() {
@@ -284,7 +284,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String getErrorType() {
@@ -300,7 +300,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String getCondition() {
@@ -311,7 +311,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public int getErrorCode() {
@@ -322,7 +322,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String getErrorType() {
@@ -338,7 +338,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String getCondition() {
@@ -349,7 +349,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public int getErrorCode() {
@@ -360,7 +360,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String getErrorType() {
@@ -376,7 +376,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String getCondition() {
@@ -387,7 +387,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public int getErrorCode() {
@@ -398,7 +398,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public String getErrorType() {
@@ -414,7 +414,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getCondition() {
 			return "not-acceptable";
@@ -424,7 +424,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public int getErrorCode() {
 			return 406;
@@ -434,7 +434,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getErrorType() {
 			return ERR_TYPE_MODIFY;
@@ -446,7 +446,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getCondition() {
 			return "not-allowed";
@@ -456,7 +456,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public int getErrorCode() {
 			return 405;
@@ -466,7 +466,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getErrorType() {
 			return ERR_TYPE_CANCEL;
@@ -478,7 +478,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getCondition() {
 			return "not-authorized";
@@ -488,7 +488,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public int getErrorCode() {
 			return 401;
@@ -498,7 +498,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getErrorType() {
 			return ERR_TYPE_AUTH;
@@ -510,7 +510,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getCondition() {
 			return "payment-required";
@@ -520,7 +520,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public int getErrorCode() {
 			return 402;
@@ -530,7 +530,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getErrorType() {
 			return ERR_TYPE_AUTH;
@@ -542,7 +542,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getCondition() {
 			return "policy-violation";
@@ -552,7 +552,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public int getErrorCode() {
 			return 0;
@@ -562,7 +562,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getErrorType() {
 			return ERR_TYPE_CANCEL;
@@ -574,7 +574,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getCondition() {
 			return "recipient-unavailable";
@@ -584,7 +584,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public int getErrorCode() {
 			return 404;
@@ -594,7 +594,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getErrorType() {
 			return ERR_TYPE_WAIT;
@@ -606,7 +606,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getCondition() {
 			return "redirect";
@@ -616,7 +616,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public int getErrorCode() {
 			return 302;
@@ -626,7 +626,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getErrorType() {
 			return ERR_TYPE_MODIFY;
@@ -638,7 +638,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getCondition() {
 			return "registration-required";
@@ -648,7 +648,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public int getErrorCode() {
 			return 407;
@@ -658,7 +658,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getErrorType() {
 			return ERR_TYPE_AUTH;
@@ -670,7 +670,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getCondition() {
 			return "remote-server-not-found";
@@ -680,7 +680,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public int getErrorCode() {
 			return 404;
@@ -690,7 +690,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getErrorType() {
 			return ERR_TYPE_CANCEL;
@@ -702,7 +702,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getCondition() {
 			return "remote-server-timeout";
@@ -712,7 +712,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public int getErrorCode() {
 			return 504;
@@ -722,7 +722,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getErrorType() {
 			return ERR_TYPE_WAIT;
@@ -734,7 +734,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getCondition() {
 			return "resource-constraint";
@@ -744,7 +744,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public int getErrorCode() {
 			return 500;
@@ -754,7 +754,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getErrorType() {
 			return ERR_TYPE_WAIT;
@@ -766,7 +766,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getCondition() {
 			return "service-unavailable";
@@ -776,7 +776,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public int getErrorCode() {
 			return 503;
@@ -786,7 +786,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getErrorType() {
 			return ERR_TYPE_CANCEL;
@@ -798,7 +798,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getCondition() {
 			return "subscription-required";
@@ -808,7 +808,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public int getErrorCode() {
 			return 407;
@@ -818,7 +818,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getErrorType() {
 			return ERR_TYPE_AUTH;
@@ -830,7 +830,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getCondition() {
 			return "undefined-condition";
@@ -840,7 +840,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public int getErrorCode() {
 			return 500;
@@ -850,7 +850,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getErrorType() {
 			return "[undefined]";
@@ -862,7 +862,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getCondition() {
 			return "unexpected-request";
@@ -872,7 +872,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public int getErrorCode() {
 			return 400;
@@ -882,7 +882,7 @@ public enum Authorization {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public String getErrorType() {
 			return ERR_TYPE_WAIT;
@@ -900,7 +900,7 @@ public enum Authorization {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public abstract String getCondition();
 
@@ -908,7 +908,7 @@ public enum Authorization {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public abstract int getErrorCode();
 
@@ -916,7 +916,7 @@ public enum Authorization {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public abstract String getErrorType();
 

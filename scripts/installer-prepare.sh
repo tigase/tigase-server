@@ -9,7 +9,7 @@ PATCHED_IZPACK_DIR="izpack.patched"
 GIT_URL="git://git.codehaus.org/izpack.git"
 
 # create installer directory
-if [ ! -e $INSTALLER_DIR ] ; then
+if [ !  -e $INSTALLER_DIR ] ; then
 	mkdir $INSTALLER_DIR || exit -1
 fi
 
@@ -21,7 +21,7 @@ fi
 # clone IzPack git repository
 git clone $GIT_URL $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR || exit -1
 cd $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR/
-	git checkout fde79de81836dbf4c594d6a6f184e27d756ae009 || exit -1
+	git checkout -b original fde79de81836dbf4c594d6a6f184e27d756ae009 || exit -1
 cd ../../
 
 # create patched directory
@@ -32,7 +32,7 @@ cp -r $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR $INSTALLER_DIR/$PATCHED_IZPACK_DIR || 
 
 #checkout correct revision of the sources from local repository
 cd $INSTALLER_DIR/$PATCHED_IZPACK_DIR/
-git checkout v4.3.0
+git checkout -b v4 v4.3.0
 cd ../../
 
 # apply patch
@@ -49,7 +49,7 @@ fi
 
 # add tigase classes to installer build path
 mkdir $INSTALLER_DIR/$PATCHED_IZPACK_DIR/tigaseLib
-for tigase_lib in jars/tigase-server.jar libs/tigase-utils.jar libs/tigase-xmltools.jar
+for tigase_lib in jars/tigase-server.jar jars/tigase-utils.jar jars/tigase-xmltools.jar
 do
 	cp $tigase_lib $INSTALLER_DIR/$PATCHED_IZPACK_DIR/tigaseLib/`basename $tigase_lib`
 done

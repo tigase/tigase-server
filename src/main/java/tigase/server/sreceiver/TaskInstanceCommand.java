@@ -74,7 +74,7 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public static String[] strValues() {
 			String[] possible_values = new String[values().length];
@@ -100,7 +100,7 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public static String[] strValues() {
 			String[] possible_values = new String[values().length];
@@ -126,7 +126,7 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 		 * Method description
 		 *
 		 *
-		 * @return
+		 * 
 		 */
 		public static String[] strValues() {
 			String[] possible_values = new String[values().length];

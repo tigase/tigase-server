@@ -83,12 +83,16 @@ create_postgresql() {
 
   read -p "Press [Enter] key to start, otherwise abort..."
 
-  createuser -d -h $DB_HOST -U postgres ${USER_NAME}
-  createdb -h $DB_HOST -U ${USER_NAME} ${DB_NAME}
+  export PGPASSWORD=${ROOT_PASS}
+  echo "CREATE ROLE ${USER_NAME} WITH PASSWORD '${USER_PASS}' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN;" | psql -h $DB_HOST -U ${ROOT_NAME}
+  echo "CREATE DATABASE ${DB_NAME} OWNER ${USER_NAME} ENCODING 'UTF8' TEMPLATE template0;" | psql -h $DB_HOST -U ${ROOT_NAME}
+
+  export PGPASSWORD=${USER_PASS}
   psql -h $DB_HOST -q -U ${USER_NAME} -d $DB_NAME -f database/postgresql-schema-${FILE_VERSION}.sql
 
   echo -e "\n\n\nconfiguration:\n\n--user-db=pgsql\n--user-db-uri=jdbc:postgresql://$DB_HOST/$DB_NAME?user=$USER_NAME&password=$USER_PASS&useUnicode=true&characterEncoding=UTF-8&autoCreateUser=true\n\n"
 }
+
 
 
 while getopts ":t:v:u:p:r:a:d:h:" optname

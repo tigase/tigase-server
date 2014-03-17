@@ -138,7 +138,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 	 *
 	 * @param params
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -270,7 +270,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 	 *
 	 * @param from
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
@@ -285,7 +285,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 	 * @param jid
 	 * @param from
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
@@ -304,7 +304,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 	 * @param jid
 	 * @param from
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public List<Element> getDiscoItems(String node, JID jid, JID from) {
@@ -358,7 +358,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 	 *
 	 * @param serv
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Queue<Packet> processSocketData(XMPPIOService<Object> serv) {
@@ -456,7 +456,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 	 *
 	 * @param service
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean serviceStopped(XMPPIOService<Object> service) {
@@ -544,7 +544,7 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 	 * @param service
 	 * @param attribs
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String xmppStreamOpened(XMPPIOService<Object> service, Map<String, String> attribs) {

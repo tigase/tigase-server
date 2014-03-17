@@ -164,7 +164,7 @@ public class DrupalForumTask extends SenderTask {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean cancel() {

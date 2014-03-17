@@ -29,11 +29,12 @@ import tigase.xml.Element;
 import tigase.xml.ElementFactory;
 import tigase.xml.SimpleHandler;
 
+import static tigase.server.ConnectionManager.ELEMENTS_NUMBER_LIMIT_PROP_KEY;
+
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
@@ -65,11 +66,7 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
-	private static Logger log = Logger.getLogger(XMPPDomBuilderHandler.class.getName());
-
-	public static int ELEMENTS_NUMBER_LIMIT = 1000;
-	public static final String ELEMENTS_NUMBER_LIMIT_PROP_KEY =
-		"tigase.xmpp.elements_number_limit";
+	private static final Logger log = Logger.getLogger(XMPPDomBuilderHandler.class.getName());
 
 	private static final String ELEM_STREAM_STREAM = "stream:stream";
 	private static ElementFactory defaultFactory = new DefaultElementFactory();
@@ -80,17 +77,19 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 	private Object parserState = null;
 	private XMPPIOService<RefObject> service = null;
 	private String top_xmlns = null;
-	private Map<String, String> namespaces = new TreeMap<String, String>();
+	private Map<String, String> namespaces = new TreeMap<>();
 	private boolean error = false;
-	private ArrayDeque<Element> el_stack = new ArrayDeque<Element>(10);
-	private ArrayDeque<Element> all_roots = new ArrayDeque<Element>(1);
+	private ArrayDeque<Element> el_stack = new ArrayDeque<>(10);
+	private ArrayDeque<Element> all_roots = new ArrayDeque<>(1);
 
 	/**
 	 * Protection from the system overload and DOS attack. We want to limit number
 	 * of elements created within a single XMPP stanza.
 	 *
 	 */
-	private int elements_number_limit = 0;
+	private int elements_number_limit_count = 0;
+	private int elements_number_limit;
+
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -103,8 +102,7 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 	public XMPPDomBuilderHandler(XMPPIOService<RefObject> ioserv) {
 		customFactory = defaultFactory;
 		service = ioserv;
-		ELEMENTS_NUMBER_LIMIT =
-			Integer.getInteger(ELEMENTS_NUMBER_LIMIT_PROP_KEY, ELEMENTS_NUMBER_LIMIT);
+//		elements_number_limit = (int)service.getSessionData().get( ELEMENTS_NUMBER_LIMIT_PROP_KEY);
 	}
 
 	/**
@@ -117,8 +115,7 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 	public XMPPDomBuilderHandler(XMPPIOService<RefObject> ioserv, ElementFactory factory) {
 		customFactory = factory;
 		service = ioserv;
-		ELEMENTS_NUMBER_LIMIT =
-			Integer.getInteger(ELEMENTS_NUMBER_LIMIT_PROP_KEY, ELEMENTS_NUMBER_LIMIT);
+//		elements_number_limit = (int)service.getSessionData().get( ELEMENTS_NUMBER_LIMIT_PROP_KEY);
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -168,7 +165,7 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 		Element elem = el_stack.pop();
 
 		if (el_stack.isEmpty()) {
-			elements_number_limit = 0;
+			elements_number_limit_count = 0;
 			all_roots.offer(elem);
 
 			if (log.isLoggable(Level.FINEST)) {
@@ -202,7 +199,7 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public Queue<Element> getParsedElements() {
 		return all_roots;
@@ -229,7 +226,7 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean parseError() {
 		return error;
@@ -239,7 +236,7 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public Object restoreParserState() {
@@ -255,6 +252,10 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 	@Override
 	public void saveParserState(Object state) {
 		parserState = state;
+	}
+
+	public void setElementsLimit(int limit) {
+		elements_number_limit = limit;
 	}
 
 	/**
@@ -372,13 +373,16 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 		el_stack.push(elem);
 	}
 
-	private Element newElement(String name, String cdata, StringBuilder[] attnames,
-			StringBuilder[] attvals) {
-		++elements_number_limit;
-		if (elements_number_limit > ELEMENTS_NUMBER_LIMIT) {
-			throw new XMPPParserException("Too many elements for staza, possible DOS attack.");
+	private Element newElement( String name, String cdata, StringBuilder[] attnames,
+															StringBuilder[] attvals ) {
+		++elements_number_limit_count;
+		Element el = customFactory.elementInstance( name, cdata, attnames, attvals );
+
+		if ( elements_number_limit_count > elements_number_limit ){
+			throw new XMPPParserException( "Too many elements for staza, possible DoS attack."
+																		 + "Current service " + service.getClass() + " limit of elements: " + elements_number_limit );
 		}
-		return customFactory.elementInstance(name, cdata, attnames, attvals);
+		return el;
 	}
 }    // XMPPDomBuilderHandler
 

@@ -1,10 +1,13 @@
 /*
+ * ConnectionRecord.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,136 +18,75 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev: 2411 $
- * Last modified by $Author: kobit $
- * $Date: 2010-10-27 20:27:58 -0600 (Wed, 27 Oct 2010) $
- * 
  */
+
+
+
 package tigase.cluster.strategy;
 
+//~--- non-JDK imports --------------------------------------------------------
+
 import tigase.xml.Element;
-import tigase.xmpp.BareJID;
+
 import tigase.xmpp.JID;
 
 /**
  * @author Artur Hefczyc Created Mar 15, 2011
  */
-public class ConnectionRecord implements Comparable<ConnectionRecord> {
-
-	private static final String TOP_ELEMENT = "conn-rec";
-	private static final String NODE_ELEMENT = "node-jid";
-	private static final String JID_ELEMENT = "user-jid";
+public class ConnectionRecord
+				implements ConnectionRecordIfc, Comparable<ConnectionRecord> {
 	private static final String CONNECTION_ID_ELEMENT = "connection-id";
-	private static final String SESSION_ID_ELEMENT = "session-id";
-	private static final String PRESENCE_ELEMENT = "presence";
+	private static final String JID_ELEMENT           = "user-jid";
+	private static final String NODE_ELEMENT          = "node-jid";
+	private static final String SESSION_ID_ELEMENT    = "session-id";
+	private static final String TOP_ELEMENT           = "conn-rec";
 
-	private JID node;
-	private JID userJid;
-	private JID connectionId;
+	//~--- fields ---------------------------------------------------------------
+
+	private JID    connectionId;
+	private JID    node;
 	private String sessionId;
-	private Element lastPresence;
+	private JID    userJid;
+
+	//~--- constructors ---------------------------------------------------------
 
 	/**
-	 * @param node
-	 * @param user_jid
-	 * @param sessionId
-	 * @param connectionId
+	 * Constructs ...
+	 *
 	 */
-	public ConnectionRecord(JID node, JID userJid, String sessionId, JID connectionId) {
+	public ConnectionRecord() {
 		super();
-		this.node = node;
-		this.userJid = userJid;
-		this.connectionId = connectionId;
-		this.sessionId = sessionId;
 	}
 
-	public ConnectionRecord(Element elem) {
-		super();
-		this.node = JID.jidInstanceNS(elem.getChild(NODE_ELEMENT).getCData());
-		this.userJid = JID.jidInstanceNS(elem.getChild(JID_ELEMENT).getCData());
-		this.connectionId =
-			JID.jidInstanceNS(elem.getChild(CONNECTION_ID_ELEMENT).getCData());
-		this.sessionId = elem.getChild(SESSION_ID_ELEMENT).getCData();
-		this.lastPresence = elem.getChild(PRESENCE_ELEMENT);
-	}
-
-	public Element toElement() {
-		Element result = new Element(TOP_ELEMENT);
-		result.addChild(new Element(NODE_ELEMENT, node.toString()));
-		result.addChild(new Element(JID_ELEMENT, userJid.toString()));
-		result.addChild(new Element(CONNECTION_ID_ELEMENT, connectionId.toString()));
-		result.addChild(new Element(SESSION_ID_ELEMENT, sessionId));
-		if (lastPresence != null) {
-			result.addChild(lastPresence);
-		}
-		return result;
-	}
-
-	/**
-	 * @return the node
-	 */
-	public JID getNode() {
-		return node;
-	}
-
-	/**
-	 * @return the user_jid
-	 */
-	public JID getUserJid() {
-		return userJid;
-	}
-
-	/**
-	 * @return the sessionId
-	 */
-	public String getSessionId() {
-		return sessionId;
-	}
-
-	/**
-	 * @return the connectionId
-	 */
-	public JID getConnectionId() {
-		return connectionId;
-	}
-
-	/**
-	 * @param last_presence
-	 *          the last_presence to set
-	 */
-	public void setLastPresence(Element lastPresence) {
-		this.lastPresence = lastPresence;
-	}
-
-	/**
-	 * @return the last_presence
-	 */
-	public Element getLastPresence() {
-		return lastPresence;
-	}
-
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("ConnectionRecord=[");
-		sb.append("node: ").append(node);
-		sb.append(", userJid: ").append(userJid);
-		sb.append(", connectionId: ").append(connectionId);
-		sb.append(", sessionId: ").append(sessionId);
-		sb.append(", lastPresence: ").append(lastPresence);
-		sb.append("]");
-		return sb.toString();
-	}
+	//~--- methods --------------------------------------------------------------
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param rec
+	 *
+	 *
 	 */
 	@Override
 	public int compareTo(ConnectionRecord rec) {
 		return connectionId.compareTo(rec.connectionId);
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param rec
+	 *
+	 *
+	 */
 	@Override
 	public boolean equals(Object rec) {
 		boolean result = false;
@@ -156,8 +98,120 @@ public class ConnectionRecord implements Comparable<ConnectionRecord> {
 		return result;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 */
+	@Override
 	public int hashCode() {
 		return connectionId.hashCode();
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 */
+	@Override
+	public Element toElement() {
+		Element result = new Element(TOP_ELEMENT);
+
+		result.addChild(new Element(NODE_ELEMENT, node.toString()));
+		result.addChild(new Element(JID_ELEMENT, userJid.toString()));
+		result.addChild(new Element(CONNECTION_ID_ELEMENT, connectionId.toString()));
+		result.addChild(new Element(SESSION_ID_ELEMENT, sessionId));
+
+		return result;
+	}
+
+	/**
+	 * Method description
+	 *
+	 *
+	 *
+	 */
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("ConnectionRecord=[");
+		sb.append("node: ").append(node);
+		sb.append(", userJid: ").append(userJid);
+		sb.append(", connectionId: ").append(connectionId);
+		sb.append(", sessionId: ").append(sessionId);
+		sb.append("]");
+
+		return sb.toString();
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * @return the connectionId
+	 */
+	@Override
+	public JID getConnectionId() {
+		return connectionId;
+	}
+
+	/**
+	 * @return the node
+	 */
+	@Override
+	public JID getNode() {
+		return node;
+	}
+
+	/**
+	 * @return the sessionId
+	 */
+	@Override
+	public String getSessionId() {
+		return sessionId;
+	}
+
+	/**
+	 * @return the user_jid
+	 */
+	@Override
+	public JID getUserJid() {
+		return userJid;
+	}
+
+	//~--- set methods ----------------------------------------------------------
+
+	/**
+	 * Constructs ...
+	 *
+	 *
+	 * @param elem
+	 */
+	@Override
+	public void setElement(Element elem) {
+		this.node         = JID.jidInstanceNS(elem.getChild(NODE_ELEMENT).getCData());
+		this.userJid      = JID.jidInstanceNS(elem.getChild(JID_ELEMENT).getCData());
+		this.connectionId = JID.jidInstanceNS(elem.getChild(CONNECTION_ID_ELEMENT)
+				.getCData());
+		this.sessionId = elem.getChild(SESSION_ID_ELEMENT).getCData();
+	}
+
+	/**
+	 * @param node
+	 * @param userJid
+	 * @param sessionId
+	 * @param connectionId
+	 */
+	@Override
+	public void setRecordFields(JID node, JID userJid, String sessionId, JID connectionId) {
+		this.node         = node;
+		this.userJid      = userJid;
+		this.connectionId = connectionId;
+		this.sessionId    = sessionId;
+	}
 }
+
+
+//~ Formatted in Tigase Code Convention on 13/07/06

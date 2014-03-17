@@ -36,6 +36,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -100,17 +102,34 @@ public abstract class TLSUtil {
 	 * @param protocol
 	 * @param hostname
 	 *
-	 * @return
+	 * 
 	 */
 	public static SSLContext getSSLContext(String protocol, String hostname) {
-		return sslContextContainer.getSSLContext(protocol, hostname);
+		return sslContextContainer.getSSLContext(protocol, hostname, false);
 	}
 
 	/**
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * @param protocol
+	 * @param hostname
+	 *
+	 * 
+	 */
+	public static SSLContext getSSLContext(String protocol, String hostname, boolean clientMode) {
+		return sslContextContainer.getSSLContext(protocol, hostname, clientMode);
+	}
+
+	public static SSLContext getSSLContext(String protocol, String hostname, boolean clientMode, TrustManager... tm) {
+		return sslContextContainer.getSSLContext(protocol, hostname, clientMode, tm);
+	}
+
+        /**
+	 * Method description
+	 *
+	 *
+	 * 
 	 */
 	public static KeyStore getTrustStore() {
 		return sslContextContainer.getTrustStore();

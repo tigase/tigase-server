@@ -96,7 +96,7 @@ public class AuthRepositoryPool implements AuthRepository {
 	 * @param id
 	 * @param alg
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws AuthorizationException
 	 * @throws TigaseDBException
@@ -127,7 +127,7 @@ public class AuthRepositoryPool implements AuthRepository {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getResourceUri() {
@@ -150,7 +150,7 @@ public class AuthRepositoryPool implements AuthRepository {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getUsersCount() {
@@ -175,7 +175,7 @@ public class AuthRepositoryPool implements AuthRepository {
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getUsersCount(String domain) {
@@ -239,7 +239,7 @@ public class AuthRepositoryPool implements AuthRepository {
 	 *
 	 * @param authProps
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws AuthorizationException
 	 * @throws TigaseDBException
@@ -270,7 +270,7 @@ public class AuthRepositoryPool implements AuthRepository {
 	 * @param user
 	 * @param password
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws AuthorizationException
 	 * @throws TigaseDBException
@@ -344,7 +344,7 @@ public class AuthRepositoryPool implements AuthRepository {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public AuthRepository takeRepo() {
 		try {

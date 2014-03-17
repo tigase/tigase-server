@@ -100,7 +100,7 @@ public class S2SIOService extends XMPPIOService<Object> {
 // * Method description
 // *
 // *
-// * @return
+// * 
 // */
 //public Set<String> getAuthenticatedDomains() {
 //  return authenticatedDomains;
@@ -110,7 +110,7 @@ public class S2SIOService extends XMPPIOService<Object> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public Set<CID> getCIDs() {
 		return authenticatedCIDs;
@@ -120,7 +120,7 @@ public class S2SIOService extends XMPPIOService<Object> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public S2SConnection getS2SConnection() {
 		return s2s_conn;
@@ -130,7 +130,7 @@ public class S2SIOService extends XMPPIOService<Object> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public String getSessionId() {
 		return session_id;
@@ -142,7 +142,7 @@ public class S2SIOService extends XMPPIOService<Object> {
 // *
 // * @param domain
 // *
-// * @return
+// * 
 // */
 //public boolean isAuthenticated(String domain) {
 //  return authenticatedDomains.contains(domain);
@@ -154,7 +154,7 @@ public class S2SIOService extends XMPPIOService<Object> {
 	 *
 	 * @param cid
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isAuthenticated(CID cid) {
 		return authenticatedCIDs.contains(cid);
@@ -164,7 +164,7 @@ public class S2SIOService extends XMPPIOService<Object> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isAuthenticated() {
 		return authenticatedCIDs.size() > 0;
@@ -174,7 +174,7 @@ public class S2SIOService extends XMPPIOService<Object> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public boolean isHandshakingOnly() {
 		return getSessionData().get(HANDSHAKING_ONLY_KEY) != null;
@@ -219,7 +219,7 @@ public class S2SIOService extends XMPPIOService<Object> {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String toString() {

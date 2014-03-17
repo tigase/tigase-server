@@ -1,10 +1,13 @@
 /*
- *   Tigase Jabber/XMPP Server
- *  Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * BoshSessionCache.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,14 +18,17 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.server.bosh;
 
 //~--- non-JDK imports --------------------------------------------------------
+
+import tigase.server.Iq;
+import tigase.server.Message;
+import tigase.server.Packet;
 
 import tigase.xml.Element;
 
@@ -35,11 +41,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Map;
 
 /**
  * Describe class BoshSessionCache here.
@@ -51,34 +55,35 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class BoshSessionCache {
-	private static final Logger log = Logger.getLogger("tigase.server.bosh.BoshSessionCache");
-
 	/** Field description */
 	public static final String DEF_ID = "";
 
 	/** Field description */
-	public static final String ROSTER_ID = "bosh-roster";
+	public static final String MESSAGE_ID = "bosh-message";
 
 	/** Field description */
 	public static final String RESOURCE_BIND_ID = "bosh-resource-bind";
 
 	/** Field description */
-	public static final String MESSAGE_ID = "bosh-message";
-	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+	public static final String ROSTER_ID = "bosh-roster";
+	private static final Logger log      =
+		Logger.getLogger("tigase.server.bosh.BoshSessionCache");
+	private static final SimpleDateFormat sdf =
+		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
 	//~--- fields ---------------------------------------------------------------
-
-	/**
-	 * Cache elements stored by the Bosh client. The cache elements are grouped
-	 * by IDs. There can be any number of Elements under each ID.
-	 */
-	private Map<String, List<Element>> id_cache = null;
 
 	/**
 	 * Cached time of the first message to/from some jid
 	 * to speedup message caching processing
 	 */
 	protected Map<String, Long> jid_msg_start = null;
+
+	/**
+	 * Cache elements stored by the Bosh client. The cache elements are grouped
+	 * by IDs. There can be any number of Elements under each ID.
+	 */
+	private Map<String, List<Element>> id_cache = null;
 
 	/**
 	 * Cached presence elements automaticaly stored by the Bosh component.
@@ -94,8 +99,8 @@ public class BoshSessionCache {
 	 *
 	 */
 	public BoshSessionCache() {
-		id_cache = new LinkedHashMap<String, List<Element>>();
-		jid_presence = new LinkedHashMap<String, Element>();
+		id_cache      = new LinkedHashMap<String, List<Element>>();
+		jid_presence  = new LinkedHashMap<String, Element>();
 		jid_msg_start = new LinkedHashMap<String, Long>();
 	}
 
@@ -119,9 +124,7 @@ public class BoshSessionCache {
 			cached_data = new ArrayList<Element>();
 			id_cache.put(id, cached_data);
 		}
-
 		cached_data.addAll(data);
-
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("ADD, id = " + id + ", DATA: " + data.toString());
 		}
@@ -134,15 +137,15 @@ public class BoshSessionCache {
 	 * @param message
 	 */
 	public void addFromMessage(Element message) {
-		Element body = message.findChild("/message/body");
+		Element body = message.findChildStaticStr(Message.MESSAGE_BODY_PATH);
 
 		if (body == null) {
 			return;
 		}
 
-		String jid = message.getAttribute("from");
+		String jid = message.getAttributeStaticStr(Packet.FROM_ATT);
 
-		addMsgBody(jid, "from", body);
+		addMsgBody(jid, Packet.FROM_ATT, body);
 	}
 
 	/**
@@ -152,10 +155,9 @@ public class BoshSessionCache {
 	 * @param presence
 	 */
 	public void addPresence(Element presence) {
-		String from = presence.getAttribute("from");
+		String from = presence.getAttributeStaticStr(Packet.FROM_ATT);
 
 		jid_presence.put(from, presence);
-
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("ADD_PRESENCE, from = " + from + ", PRESENCE: " + presence.toString());
 		}
@@ -168,12 +170,12 @@ public class BoshSessionCache {
 	 * @param roster
 	 */
 	public void addRoster(Element roster) {
+
 		// Pushing roster with 'result' packet type will not work
 		Element roster_mod = roster.clone();
-		roster_mod.setAttribute("type", "set");
-		
-		add(ROSTER_ID, Arrays.asList(roster_mod));
 
+		roster_mod.setAttribute(Packet.TYPE_ATT, "set");
+		add(ROSTER_ID, Arrays.asList(roster_mod));
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("ADD_ROSTER, ROSTER: " + roster_mod.toString());
 		}
@@ -186,15 +188,15 @@ public class BoshSessionCache {
 	 * @param message
 	 */
 	public void addToMessage(Element message) {
-		Element body = message.findChild("/message/body");
+		Element body = message.findChildStaticStr(Message.MESSAGE_BODY_PATH);
 
 		if (body == null) {
 			return;
 		}
 
-		String jid = message.getAttribute("to");
+		String jid = message.getAttributeStaticStr(Packet.TO_ATT);
 
-		addMsgBody(jid, "to", body);
+		addMsgBody(jid, Packet.TO_ATT, body);
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -205,7 +207,7 @@ public class BoshSessionCache {
 	 *
 	 * @param id
 	 *
-	 * @return
+	 * 
 	 */
 	public List<Element> get(String id) {
 		if (id == null) {
@@ -225,7 +227,7 @@ public class BoshSessionCache {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public List<Element> getAll() {
 		List<Element> result = new ArrayList<Element>();
@@ -233,9 +235,7 @@ public class BoshSessionCache {
 		for (List<Element> cache_data : id_cache.values()) {
 			result.addAll(cache_data);
 		}
-
 		result.addAll(jid_presence.values());
-
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("GET_ALL, DATA: " + result.toString());
 		}
@@ -247,7 +247,7 @@ public class BoshSessionCache {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public List<Element> getAllPresences() {
 		return new ArrayList<Element>(jid_presence.values());
@@ -259,7 +259,7 @@ public class BoshSessionCache {
 	 *
 	 * @param from
 	 *
-	 * @return
+	 * 
 	 */
 	public List<Element> getPresence(String... from) {
 		List<Element> result = new ArrayList<Element>();
@@ -283,7 +283,7 @@ public class BoshSessionCache {
 	 *
 	 * @param id
 	 *
-	 * @return
+	 * 
 	 */
 	public List<Element> remove(String id) {
 		if (id == null) {
@@ -317,7 +317,6 @@ public class BoshSessionCache {
 
 		id_cache.put(id, cached_data);
 		cached_data.addAll(data);
-
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("SET, id = " + id + ", DATA: " + data.toString());
 		}
@@ -326,9 +325,9 @@ public class BoshSessionCache {
 	//~--- methods --------------------------------------------------------------
 
 	private void addMsgBody(String jid, String direction, Element body) {
-		long start_time = getMsgStartTime(jid);
+		long start_time             = getMsgStartTime(jid);
 		List<Element> msg_history_l = id_cache.get(MESSAGE_ID + jid);
-		Element msg_history = null;
+		Element msg_history         = null;
 
 		if (msg_history_l == null) {
 			msg_history = createMessageHistory(jid);
@@ -339,8 +338,9 @@ public class BoshSessionCache {
 
 		long current_secs = (System.currentTimeMillis() / 1000) - start_time;
 
-		msg_history.findChild("/iq/chat").addChild(new Element(direction, new Element[] { body },
-				new String[] { "secs" }, new String[] { "" + current_secs }));
+		msg_history.findChildStaticStr(Iq.IQ_CHAT_PATH).addChild(new Element(direction,
+						new Element[] { body }, new String[] { "secs" },
+						new String[] { "" + current_secs }));
 	}
 
 	private Element createMessageHistory(String jid) {
@@ -351,9 +351,9 @@ public class BoshSessionCache {
 		}
 
 		return new Element("iq", new Element[] { new Element("chat", new String[] { "xmlns",
-				"with", "start" }, new String[] { "urn:xmpp:tmp:archive", jid,
-				sdf_string }) }, new String[] { "type",
-				"id" }, new String[] { "set", "" + System.currentTimeMillis() });
+						"with", "start" }, new String[] { "urn:xmpp:tmp:archive", jid,
+						sdf_string }) }, new String[] { "type",
+						"id" }, new String[] { "set", "" + System.currentTimeMillis() });
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -371,7 +371,4 @@ public class BoshSessionCache {
 }
 
 
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/02/20

@@ -1,10 +1,13 @@
 /*
+ * JabberIqSi.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,16 +18,23 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
+
 package tigase.xmpp.impl;
 
-import java.util.Arrays;
-import java.util.logging.Logger;
-import tigase.xmpp.XMPPResourceConnection;
+//~--- non-JDK imports --------------------------------------------------------
+
+import tigase.server.Iq;
+
 import tigase.xml.Element;
+
+import tigase.xmpp.XMPPResourceConnection;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.logging.Logger;
 
 /**
  * XEP-0096: File Transfer
@@ -42,34 +52,68 @@ import tigase.xml.Element;
  * future releases.
  */
 @Deprecated
-public abstract class JabberIqSi extends SimpleForwarder {
-
-  private static final Logger log =
-		Logger.getLogger("tigase.xmpp.impl.JabberIqSi");
-
-  private static final String XMLNS = "http://jabber.org/protocol/si";
-	private static final String ID = XMLNS;
-  private static final String[] ELEMENTS = {"si"};
-  private static final String[] XMLNSS = {XMLNS};
-  private static final Element[] DISCO_FEATURES =
-	{
-		new Element("feature",
-			new String[] {"var"},
-			new String[] {"http://jabber.org/protocol/si"}),
-		new Element("feature",
-			new String[] {"var"},
-			new String[] {"http://jabber.org/protocol/si/profile/file-transfer"})
+public abstract class JabberIqSi
+				extends SimpleForwarder {
+	private static final Logger     log = Logger.getLogger(JabberIqSi.class.getName());
+	private static final String     XMLNS    = "http://jabber.org/protocol/si";
+	private static final String     ID       = XMLNS;
+	private static final String[][] ELEMENTS = {
+		{ Iq.ELEM_NAME, "si" }
 	};
+	private static final String[]   XMLNSS   = { XMLNS };
+	private static final Element[]  DISCO_FEATURES = { new Element("feature",
+			new String[] { "var" }, new String[] { "http://jabber.org/protocol/si" }),
+			new Element("feature", new String[] { "var" }, new String[] {
+					"http://jabber.org/protocol/si/profile/file-transfer" }) };
 
-	public String id() { return ID; }
+	//~--- methods --------------------------------------------------------------
 
-	public String[] supElements()
-	{ return ELEMENTS; }
+	/**
+	 * Method description
+	 *
+	 *
+	 * 
+	 */
+	@Override
+	public String id() {
+		return ID;
+	}
 
-  public String[] supNamespaces()
-	{ return XMLNSS; }
+	/**
+	 * Method description
+	 *
+	 *
+	 * 
+	 */
+	@Override
+	public String[][] supElementNamePaths() {
+		return ELEMENTS;
+	}
 
-  public Element[] supDiscoFeatures(final XMPPResourceConnection session)
-	{ return DISCO_FEATURES; }
+	/**
+	 * Method description
+	 *
+	 *
+	 * 
+	 */
+	@Override
+	public String[] supNamespaces() {
+		return XMLNSS;
+	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param session
+	 *
+	 * 
+	 */
+	@Override
+	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
+		return DISCO_FEATURES;
+	}
 }
+
+
+//~ Formatted in Tigase Code Convention on 13/03/12

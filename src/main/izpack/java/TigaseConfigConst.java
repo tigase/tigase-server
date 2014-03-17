@@ -58,7 +58,7 @@ public abstract class TigaseConfigConst {
     new LinkedHashMap<String, String>();
 
 	public static String[] ALL_PLUGINS =
-	{"nonSaslAuthPlugin", "saslAuthPlugin", "resBindPlugin",
+	{"messageArchivePlugin", "nonSaslAuthPlugin", "saslAuthPlugin", "resBindPlugin",
 	 "sessionBindPlugin", "registerPlugin", "rosterPlugin", "presencePlugin", "privacyPlugin",
 	 "versionPlugin", "statsPlugin", "tlsPlugin", "msgOfflinePlugin",
 	 "vcardPlugin", "commandsPlugin", "privatePlugin", "pingPlugin",
@@ -71,11 +71,29 @@ public abstract class TigaseConfigConst {
 	public static final String AUTH_DB = "authDB";
 	public static final String AUTH_HANDLE = "dbAuthHandle";
 	public static final String MUC_COMP = "mucComponent";
-	public static final String PUBSUB_COMP = "pubsubComponent";
+	public static final String PUBSUB_COMP = "PubSubComponent";
+	public static final String STUN_COMP = "stunComponent";
+	public static final String SOCKS5_COMP = "socks5Component";
+	public static final String ARCHIVE_COMP = "messageArchiveComponent";
+	public static final String HTTP_COMP = "httpApiComponent";
+	public static final String ACS_COMP = "acsComponent";
+	public static final String ACS_MUC_COMP = "acsMUCComponent";
+	public static final String ACS_PUBSUB_COMP = "acsPubSubComponent";
 	public static final String PLUGINS = "plugins";
 	public static final String DEBUG = "debug";
 	public static final String USER_DB_URI = "userDBUri";
 	public static final String AUTH_DB_URI = "dbAuthType";
+
+	// classes
+	public static final String MUC_COMP_CLASS = "tigase.muc.MUCComponent";
+	public static final String PUBSUB_COMP_CLASS = "tigase.pubsub.PubSubComponent";
+	public static final String SOCKS5_COMP_CLASS = "tigase.socks5.Socks5ProxyComponent";
+	public static final String STUN_COMP_CLASS = "tigase.stun.StunComponent";
+	public static final String ARCHIVE_COMP_CLASS = "tigase.archive.MessageArchiveComponent";
+	public static final String HTTP_COMP_CLASS = "tigase.http.rest.RestMessageReceiver";
+	public static final String ACS_COMP_CLASS = "tigase.cluster.strategy.OnlineUsersCachingStrategy";
+	public static final String ACS_MUC_COMP_CLASS = "tigase.muc.cluster.MUCComponentClustered";
+	public static final String ACS_PUBSUB_COMP_CLASS = "tigase.pubsub.cluster.PubSubComponentClustered";
 
 	static {
 		tigaseIzPackMap.put("config-type", "configType");
@@ -85,12 +103,19 @@ public abstract class TigaseConfigConst {
 		tigaseIzPackMap.put("--auth-db", AUTH_HANDLE);
 		tigaseIzPackMap.put("--muc", MUC_COMP);
 		tigaseIzPackMap.put("--pubsub", PUBSUB_COMP);
+		tigaseIzPackMap.put("--socks5", SOCKS5_COMP);
+		tigaseIzPackMap.put("--stun", STUN_COMP);
+		tigaseIzPackMap.put("--http", HTTP_COMP);
+		tigaseIzPackMap.put("--archive", ARCHIVE_COMP);
 		tigaseIzPackMap.put("--cluster-mode", "clusterMode");
-		tigaseIzPackMap.put("--cluster-nodes", "clusterNodes");
+//		tigaseIzPackMap.put("--cluster-nodes", "clusterNodes");
 		tigaseIzPackMap.put("--debug", DEBUG);
 		tigaseIzPackMap.put("--sm-plugins", PLUGINS);
 		tigaseIzPackMap.put("--user-db-uri", USER_DB_URI);
 		tigaseIzPackMap.put("--auth-db-uri", AUTH_DB_URI);
+		tigaseIzPackMap.put("--sm-cluster-strategy-class", ACS_COMP);
+		tigaseIzPackMap.put("--muc_acs", ACS_MUC_COMP);
+		tigaseIzPackMap.put("--pubsub_acs", ACS_PUBSUB_COMP);
 // 		for (Map.Entry entry: tigaseIzPackMap.entrySet()) {
 // 			izPackTigaseMap.put(entry.getValue(), entry.getKey());
 // 		}
@@ -98,12 +123,13 @@ public abstract class TigaseConfigConst {
 		userDBMap.put("Derby", "derby");
 		userDBMap.put("MySQL", "mysql");
 		userDBMap.put("PostgreSQL", "pgsql");
-		userDBMap.put("SQLServer", "jtds:sqlserver");
+		userDBMap.put("SQLServer", "sqlserver");
 
 		userDBUriMap.put("derby", "Derby");
 		userDBUriMap.put("mysql", "MySQL");
 		userDBUriMap.put("postgresql", "PostgreSQL");
 		userDBUriMap.put("pgsql", "PostgreSQL");
+		userDBUriMap.put("sqlserver", "SQLServer");
 		userDBUriMap.put("jtds:sqlserver", "SQLServer");
 
 		debugMap.put("server", SERVER_DEBUG);
@@ -131,6 +157,7 @@ public abstract class TigaseConfigConst {
 		pluginsMap.put("domain-filter", "domainFilterPlugin");
 		pluginsMap.put("pep", "pepPlugin");
 		pluginsMap.put("zlib", "zlibPlugin");
+		pluginsMap.put("message-archive-xep-0136", "messageArchivePlugin");
 	}
 
 	public static String getPluginId(String pluginVarNameToFind) {
@@ -142,10 +169,11 @@ public abstract class TigaseConfigConst {
 		}
 		return null;
 	}
-	
+
 	public static final String PGSQL_DRIVER = "org.postgresql.Driver";
 	public static final String MYSQL_DRIVER = "com.mysql.jdbc.Driver";
 	public static final String DERBY_DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
+	public static final String SQLSERVER_DRIVER = "net.sourceforge.jtds.jdbc.Driver";
 
 	public static final String JDBC_CHECKUSERTABLE_QUERY
     = "select count(*) from tig_users";
@@ -154,5 +182,7 @@ public abstract class TigaseConfigConst {
     = "select TigGetDBProperty('schema-version')";
 	public static final String DERBY_GETSCHEMAVER_QUERY
     = "values TigGetDBProperty('schema-version')";
+	public static final String SQLSERVER_GETSCHEMAVER_QUERY
+    = "select dbo.TigGetDBProperty('schema-version')";
 
 }

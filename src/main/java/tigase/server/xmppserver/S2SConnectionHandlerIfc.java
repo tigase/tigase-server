@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TimerTask;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 //~--- interfaces -------------------------------------------------------------
@@ -59,7 +60,7 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 	 *
 	 *
 	 * @param serv
-	 * @return
+	 * 
 	 */
 	public List<Element> getStreamFeatures(S2SIOService serv);
 
@@ -67,7 +68,7 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 
 	boolean addOutPacket(Packet packet);
 
-	void addTimerTask(TimerTask task, long delay, TimeUnit unit);
+	void addTimerTask(tigase.util.TimerTask task, long delay, TimeUnit unit);
 
 	//~--- get methods ----------------------------------------------------------
 
@@ -85,6 +86,8 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 
 	void initNewConnection(Map<String, Object> port_props);
 
+	boolean isTlsWantClientAuthEnabled();
+	
 	boolean sendVerifyResult(String elem_name, CID connCid, CID keyCid, Boolean valid,
 			String key_sessionId, String serv_sessionId, String cdata, boolean handshakingOnly);
 

@@ -13,8 +13,11 @@
 ##
 ### END INIT INFO
 
+# Enable Tigase as OSGi bundle
+# OSGI=true
+
 # Settings paths and other variables
-JAVA_HOME=
+# JAVA_HOME=
 
 USERNAME=tigase
 USERGROUP=tigase
@@ -22,7 +25,6 @@ NAME=tigase
 DESC="Tigase XMPP server"
 
 TIGASE_HOME=/usr/share/tigase
-TIGASE_LIB=${TIGASE_HOME}/libs
 TIGASE_CONFIG=/etc/tigase/tigase-server.xml
 TIGASE_OPTIONS=
 TIGASE_PARAMS=
@@ -63,11 +65,19 @@ fi
 PATH=/sbin:/bin:/usr/sbin:/usr/bin:${JAVA_HOME}/bin
 
 # Find tigase-server jar
-for j in ${TIGASE_HOME}/jars/tigase-server*.jar ; do
-        if [ -f ${j} ] ; then
-          TIGASE_JAR=${j}
-          break
-        fi
+if [ -n "${OSGI}" ] && ${OSGI} ; then
+	LIB_DIR=jars
+	JAR_FILE=${LIB_DIR}/org.apache.felix.main*.jar
+else
+	LIB_DIR=jars
+	JAR_FILE=${LIB_DIR}/tigase-server*.jar
+fi
+
+for j in ${TIGASE_HOME}/${JAR_FILE} ; do
+	if [ -f ${j} ] ; then
+	  TIGASE_JAR=${j}
+	  break
+	fi
 done
 
 if [ -z "${TIGASE_CONSOLE_LOG}" ] ; then
@@ -104,11 +114,17 @@ fi
 
 CLASSPATH="${CLASSPATH}${TIGASE_JAR}"
 
-for lib in ${TIGASE_LIB}/*.jar ; do
+for lib in ${TIGASE_HOME}/${LIB_DIR}/*.jar ; do
   CLASSPATH="${CLASSPATH}:$lib"
 done
 
-TIGASE_CMD="${JAVA_OPTIONS} -cp ${CLASSPATH} ${TIGASE_RUN}"
+LOGBACK="-Dlogback.configurationFile=$TIGASE_HOME/etc/logback.xml"
+
+if [ -n "${OSGI}" ] && ${OSGI} ; then
+	TIGASE_CMD="${JAVA_OPTIONS} ${LOGBACK} -jar ${JAR_FILE}"
+else
+	TIGASE_CMD="${JAVA_OPTIONS} ${LOGBACK} -cp ${CLASSPATH} ${TIGASE_RUN}"
+fi
 
 if [ -d "${TIGASE_HOME}" ] ; then
         cd ${TIGASE_HOME}
@@ -131,7 +147,7 @@ start() {
             return 1
         fi
 
-	su ${USERNAME} -c "start-stop-daemon --start --quiet --make-pidfile --chdir ${TIGASE_HOME} --pidfile $PIDFILE --chuid $USERNAME:$USERGROUP --exec $JAVA -- $TIGASE_CMD >>${TIGASE_CONSOLE_LOG} 2>&1 &"
+	su ${USERNAME} -c "/sbin/start-stop-daemon --start --quiet --make-pidfile --chdir ${TIGASE_HOME} --pidfile $PIDFILE --chuid $USERNAME:$USERGROUP --exec $JAVA -- $TIGASE_CMD >>${TIGASE_CONSOLE_LOG} 2>&1 &"
 
 	sleep 3
 	PID=`cat $PIDFILE`
@@ -142,12 +158,10 @@ start() {
 	else
 		return 0
 	fi
-
-
 }
 
 stop() {
-        su ${USERNAME} -c "start-stop-daemon --stop --quiet  --chdir ${TIGASE_HOME} --pidfile $PIDFILE --chuid $USERNAME:$USERGROUP  --exec $JAVA > /dev/null"
+        su ${USERNAME} -c "/sbin/start-stop-daemon --stop --quiet  --chdir ${TIGASE_HOME} --pidfile $PIDFILE --chuid $USERNAME:$USERGROUP  --exec $JAVA > /dev/null"
         
 	rm -f "$PIDFILE"
 }
@@ -172,7 +186,7 @@ case "$1" in
   restart|force-reload)
 	log_daemon_msg "Restarting $DESC"
 	stop
-	sleep 1
+	sleep 5
 	if start; then
 		log_end_msg 0
 	else
@@ -187,6 +201,8 @@ case "$1" in
 	echo "USERGROUP           =  $USERGROUP"
 	echo "USER                =  $USER"
 	echo "HOME                =  $HOME"
+	echo
+    echo "OSGI                =  $OSGI"
 	echo
 	echo "TIGASE_HOME         =  $TIGASE_HOME"
 	echo "TIGASE_JAR          =  $TIGASE_JAR"

@@ -130,7 +130,7 @@ public class UserRepositoryPool implements UserRepository {
 	 * @param key
 	 * @param def
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 * @throws UserNotFoundException
@@ -167,7 +167,7 @@ public class UserRepositoryPool implements UserRepository {
 	 * @param subnode
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 * @throws UserNotFoundException
@@ -203,7 +203,7 @@ public class UserRepositoryPool implements UserRepository {
 	 * @param user
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 * @throws UserNotFoundException
@@ -240,7 +240,7 @@ public class UserRepositoryPool implements UserRepository {
 	 * @param subnode
 	 * @param key
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 * @throws UserNotFoundException
@@ -270,7 +270,7 @@ public class UserRepositoryPool implements UserRepository {
 	 * @param user
 	 * @param subnode
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 * @throws UserNotFoundException
@@ -299,7 +299,7 @@ public class UserRepositoryPool implements UserRepository {
 	 *
 	 * @param user
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 * @throws UserNotFoundException
@@ -325,7 +325,7 @@ public class UserRepositoryPool implements UserRepository {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String getResourceUri() {
@@ -339,7 +339,7 @@ public class UserRepositoryPool implements UserRepository {
 	 * @param user
 	 * @param subnode
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 * @throws UserNotFoundException
@@ -368,7 +368,7 @@ public class UserRepositoryPool implements UserRepository {
 	 *
 	 * @param user
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 * @throws UserNotFoundException
@@ -396,7 +396,7 @@ public class UserRepositoryPool implements UserRepository {
 	 *
 	 * @param user
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 */
@@ -421,7 +421,7 @@ public class UserRepositoryPool implements UserRepository {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 *
 	 * @throws TigaseDBException
 	 */
@@ -446,7 +446,7 @@ public class UserRepositoryPool implements UserRepository {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getUsersCount() {
@@ -471,7 +471,7 @@ public class UserRepositoryPool implements UserRepository {
 	 *
 	 * @param domain
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public long getUsersCount(String domain) {
@@ -716,7 +716,7 @@ public class UserRepositoryPool implements UserRepository {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	public UserRepository takeRepo() {
 		try {
@@ -734,7 +734,7 @@ public class UserRepositoryPool implements UserRepository {
 	 *
 	 * @param user
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public boolean userExists(BareJID user) {
@@ -776,7 +776,7 @@ public class UserRepositoryPool implements UserRepository {
 		 *
 		 * @param key
 		 *
-		 * @return
+		 * 
 		 */
 		@Override
 		public Object remove(Object key) {

@@ -1,10 +1,13 @@
 /*
+ * SocketIO.java
+ *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License.
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +18,9 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
+
+
 
 package tigase.io;
 
@@ -36,48 +38,49 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
-import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- classes ----------------------------------------------------------------
+import java.util.Queue;
+import tigase.net.IOUtil;
 
 /**
  * Describe class SocketIO here.
- * 
- * 
+ *
+ *
  * Created: Sat May 14 07:18:30 2005
- * 
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class SocketIO implements IOInterface {
-	private static final Logger log = Logger.getLogger(SocketIO.class.getName());
+public class SocketIO
+				implements IOInterface {
+	private static final Logger log                          =
+		Logger.getLogger(SocketIO.class.getName());
+	private static final int MAX_USER_IO_QUEUE_SIZE_PROP_DEF = 1000;
 
 	// ~--- fields ---------------------------------------------------------------
-
 	private static final String MAX_USER_IO_QUEUE_SIZE_PROP_KEY = "max-user-io-queue-size";
-	private static final int MAX_USER_IO_QUEUE_SIZE_PROP_DEF = 1000;
-	private int bytesRead = 0;
-	private SocketChannel channel = null;
+
+	//~--- fields ---------------------------------------------------------------
+
+	private long buffOverflow            = 0;
+	private int bytesRead                = 0;
+	private long bytesReceived           = 0;
+	private long bytesSent               = 0;
+	private SocketChannel channel        = null;
 	private Queue<ByteBuffer> dataToSend = null;
-	private String remoteAddress = null;
-	private String logId = null;
+	private String logId                 = null;
+	private String remoteAddress         = null;
+	private long totalBuffOverflow       = 0;
+	private long totalBytesReceived      = 0;
+	private long totalBytesSent          = 0;
 
-	private long totalBuffOverflow = 0;
-	private long totalBytesSent = 0;
-	private long totalBytesReceived = 0;
-	private long buffOverflow = 0;
-	private long bytesSent = 0;
-	private long bytesReceived = 0;
-
-
-	// ~--- constructors ---------------------------------------------------------
+	//~--- constructors ---------------------------------------------------------
 
 	/**
 	 * Creates a new <code>SocketIO</code> instance.
-	 * 
+	 *
 	 * @param sock
 	 * @throws IOException
 	 */
@@ -86,25 +89,25 @@ public class SocketIO implements IOInterface {
 		channel.configureBlocking(false);
 		channel.socket().setSoLinger(false, 0);
 		channel.socket().setReuseAddress(true);
+		channel.socket().setKeepAlive(true);
 		remoteAddress = channel.socket().getInetAddress().getHostAddress();
-
 		if (channel.socket().getTrafficClass() == ConnectionOpenListener.IPTOS_THROUGHPUT) {
 			dataToSend = new LinkedBlockingQueue<ByteBuffer>(100000);
 		} else {
-			int queue_size =
-					Integer.getInteger(MAX_USER_IO_QUEUE_SIZE_PROP_KEY,
-							MAX_USER_IO_QUEUE_SIZE_PROP_DEF);
+			int queue_size = Integer.getInteger(MAX_USER_IO_QUEUE_SIZE_PROP_KEY,
+												 MAX_USER_IO_QUEUE_SIZE_PROP_DEF);
+
 			dataToSend = new LinkedBlockingQueue<ByteBuffer>(queue_size);
 		}
 	}
 
-	// ~--- methods --------------------------------------------------------------
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
+	 *
+	 *
 	 * 
-	 * 
-	 * @return
 	 */
 	@Override
 	public int bytesRead() {
@@ -113,25 +116,25 @@ public class SocketIO implements IOInterface {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param caps
+	 *
 	 * 
-	 * @return
 	 */
 	@Override
 	public boolean checkCapabilities(String caps) {
 		return false;
 	}
 
-	// ~--- get methods ----------------------------------------------------------
+	//~--- get methods ----------------------------------------------------------
 
 	/**
 	 * Method description
+	 *
+	 *
 	 * 
-	 * 
-	 * @return
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Override
@@ -141,9 +144,9 @@ public class SocketIO implements IOInterface {
 
 	/**
 	 * Method description
+	 *
+	 *
 	 * 
-	 * 
-	 * @return
 	 */
 	@Override
 	public SocketChannel getSocketChannel() {
@@ -152,8 +155,8 @@ public class SocketIO implements IOInterface {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param list
 	 * @param reset
 	 */
@@ -165,55 +168,102 @@ public class SocketIO implements IOInterface {
 		list.add("socketio", "Total bytes sent", totalBytesSent, Level.FINE);
 		list.add("socketio", "Total bytes received", totalBytesReceived, Level.FINE);
 		list.add("socketio", "Ttoal buffers overflow", totalBuffOverflow, Level.FINE);
-
 		if (reset) {
-			bytesSent = 0;
+			bytesSent     = 0;
 			bytesReceived = 0;
-			buffOverflow = 0;
+			buffOverflow  = 0;
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param reset
+	 *
+	 * 
+	 */
 	public long getBytesSent(boolean reset) {
 		long tmp = bytesSent;
+
 		if (reset) {
 			bytesSent = 0;
 		}
+
 		return tmp;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * 
+	 */
 	public long getTotalBytesSent() {
 		return totalBytesSent;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param reset
+	 *
+	 * 
+	 */
 	public long getBytesReceived(boolean reset) {
 		long tmp = bytesReceived;
+
 		if (reset) {
 			bytesReceived = 0;
 		}
+
 		return tmp;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * 
+	 */
 	public long getTotalBytesReceived() {
 		return totalBytesReceived;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param reset
+	 *
+	 * 
+	 */
 	public long getBuffOverflow(boolean reset) {
 		long tmp = buffOverflow;
+
 		if (reset) {
 			buffOverflow = 0;
 		}
+
 		return tmp;
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * 
+	 */
 	public long getTotalBuffOverflow() {
 		return totalBuffOverflow;
 	}
 
 	/**
 	 * Method description
+	 *
+	 *
 	 * 
-	 * 
-	 * @return
 	 */
 	@Override
 	public boolean isConnected() {
@@ -226,45 +276,55 @@ public class SocketIO implements IOInterface {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param addr
+	 *
 	 * 
-	 * @return
 	 */
 	@Override
 	public boolean isRemoteAddress(String addr) {
 		return remoteAddress.equals(addr);
 	}
 
-	// ~--- methods --------------------------------------------------------------
+	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param buff
+	 *
 	 * 
-	 * @return
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Override
 	public ByteBuffer read(final ByteBuffer buff) throws IOException {
-		bytesRead = channel.read(buff);
-
+		ByteBuffer tmp = IOUtil.getDirectBuffer(buff.remaining());
+		try {
+			bytesRead = channel.read(tmp);
+			tmp.flip();
+			if (bytesRead > 0) {
+				buff.put(tmp);
+			}
+		} finally {
+			IOUtil.returnDirectBuffer(tmp);
+		}
+		
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "Read from channel {0} bytes, {1}", new Object[] { bytesRead,
-					toString() });
+							toString() });
 		}
-
 		if (bytesRead == -1) {
-			throw new EOFException("Channel has been closed.");
-		} // end of if (result == -1)
-
+			// we need to close channel but we should not throw exception as
+			// in other way we will lose data from higher level internal buffers
+			channel.close();
+//			throw new EOFException("Channel has been closed.");
+		}    // end of if (result == -1)
 		if (bytesRead > 0) {
 			buff.flip();
-			bytesReceived += bytesRead;
+			bytesReceived      += bytesRead;
 			totalBytesReceived += bytesRead;
 		}
 
@@ -273,8 +333,8 @@ public class SocketIO implements IOInterface {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @throws IOException
 	 */
 	@Override
@@ -291,20 +351,22 @@ public class SocketIO implements IOInterface {
 
 	/**
 	 * Method description
+	 *
+	 *
 	 * 
-	 * 
-	 * @return
 	 */
 	@Override
 	public String toString() {
-		return logId + ((channel == null) ? null : channel.socket());
+		return logId + ((channel == null)
+										? null
+										: channel.socket());
 	}
 
 	/**
 	 * Method description
+	 *
+	 *
 	 * 
-	 * 
-	 * @return
 	 */
 	@Override
 	public boolean waitingToSend() {
@@ -313,9 +375,9 @@ public class SocketIO implements IOInterface {
 
 	/**
 	 * Method description
+	 *
+	 *
 	 * 
-	 * 
-	 * @return
 	 */
 	@Override
 	public int waitingToSendSize() {
@@ -324,12 +386,12 @@ public class SocketIO implements IOInterface {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param buff
+	 *
 	 * 
-	 * @return
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Override
@@ -345,81 +407,91 @@ public class SocketIO implements IOInterface {
 		// } // end of while (out.hasRemaining())
 		// log.finer("Wrote to channel " + result + " bytes.");
 		// return result;
-		if (buff != null && buff.hasRemaining()) {
+		if ((buff != null) && buff.hasRemaining()) {
 			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER, "SOCKET - Writing data, remaining: {0}, {1}", new Object[] {
-						buff.remaining(), toString() });
+				log.log(Level.FINER, "SOCKET - Writing data, remaining: {0}, {1}",
+								new Object[] { buff.remaining(),
+															 toString() });
 			}
-
 			if (!dataToSend.offer(buff)) {
 				++buffOverflow;
 				++totalBuffOverflow;
 			}
 		}
 
-		int result = 0;
+		int result            = 0;
 		ByteBuffer dataBuffer = null;
-
-		if (dataToSend.size() > 1) {
-			ByteBuffer[] buffs = dataToSend.toArray(new ByteBuffer[dataToSend.size()]);
-			long res = channel.write(buffs);
-
+		
+		// we are processing all buffers one by one to reduce need for direct 
+		// memory, and we use our own cache of DirectByteBuffers as cache from JDK
+		// may keep up to 1024 buffers for single thread!!
+		while ((dataBuffer = dataToSend.peek()) != null) {
+			int pos = dataBuffer.position();
+			int lim = dataBuffer.limit();
+			int rem = (pos <= lim ? lim - pos : 0);
+			int res = 0;
+			
+			ByteBuffer tmp = IOUtil.getDirectBuffer(rem);
+			try {
+				tmp.put(dataBuffer);
+				tmp.flip();
+				dataBuffer.position(pos);
+				res = channel.write(tmp);
+				if (res > 0) {
+					dataBuffer.position(pos + res);
+				}
+			} finally {
+				IOUtil.returnDirectBuffer(tmp);
+			}
+			
 			if (res == -1) {
 				throw new EOFException("Channel has been closed.");
-			}
-
-			if (res > 0) {
+			} else {
 				result += res;
-
-				for (ByteBuffer byteBuffer : buffs) {
-					if (!byteBuffer.hasRemaining()) {
-						dataToSend.poll();
-					} else {
-						break;
-					}
-				}
 			}
-		} else {
-			if ((dataBuffer = dataToSend.peek()) != null) {
-				int res = channel.write(dataBuffer);
-
-				if (res == -1) {
-					throw new EOFException("Channel has been closed.");
-				} else {
-					result += res;
-				}
-
-				if (!dataBuffer.hasRemaining()) {
-					dataToSend.poll();
-				}
+			
+			if (!dataBuffer.hasRemaining()) {
+				dataToSend.poll();
+			}
+			else {
+				break;
 			}
 		}
-
+		
+		
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "Wrote to channel {0} bytes, {1}", new Object[] { result,
-					toString() });
+							toString() });
 		}
 
 		// if (isRemoteAddress("81.142.228.219")) {
 		// log.warning("Wrote to channel " + result + " bytes.");
 		// }
-		bytesSent += result;
+		bytesSent      += result;
 		totalBytesSent += result;
 
 		return result;
 	}
 
+	//~--- set methods ----------------------------------------------------------
+
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see tigase.io.IOInterface#setLogId(java.lang.String)
+	 */
+
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param logId
 	 */
 	@Override
 	public void setLogId(String logId) {
 		this.logId = logId + " ";
 	}
-} // SocketIO
+}    // SocketIO
 
-// ~ Formatted in Sun Code Convention
 
-// ~ Formatted by Jindent --- http://www.jindent.com
+//~ Formatted in Tigase Code Convention on 13/03/08

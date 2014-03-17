@@ -46,7 +46,7 @@ public class ComponentIOService extends XMPPIOService<List<ComponentConnection>>
 	 * Method description
 	 * 
 	 * 
-	 * @return
+	 * 
 	 */
 	public boolean isAuthenticated() {
 		return authenticated;

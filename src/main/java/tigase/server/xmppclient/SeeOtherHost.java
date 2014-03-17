@@ -26,9 +26,13 @@ package tigase.server.xmppclient;
 
 import tigase.xmpp.BareJID;
 import tigase.util.TigaseStringprepException;
+import tigase.xml.Element;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -44,13 +48,15 @@ import java.util.logging.Logger;
  */
 public class SeeOtherHost implements SeeOtherHostIfc {
 
-	BareJID defaulHost = null;
 	private static final Logger log = Logger.getLogger(SeeOtherHost.class.getName());
+	
+	protected List<BareJID> defaultHost = null;
+	private ArrayList<Phase> active = new ArrayList<Phase>();
 
 	@Override
 	public BareJID findHostForJID(BareJID jid, BareJID host) {
-		if (defaulHost != null) {
-			return defaulHost;
+		if (defaultHost != null && !defaultHost.isEmpty()) {
+			return defaultHost.get( 0 );
 		} else {
 			return host;
 		}
@@ -61,22 +67,60 @@ public class SeeOtherHost implements SeeOtherHostIfc {
 	}
 
 	@Override
-	public void setProperties(Map<String, Object> props) {
+	public void setProperties(final Map<String, Object> props) {
+		if (props.containsKey(SeeOtherHostIfc.CM_SEE_OTHER_HOST_ACTIVE)) {
+			
+			String[] phase =  ((String)props.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_ACTIVE)).split( ";");
+			for ( String ph : phase) {
+				try {
+					active.add( Phase.valueOf( ph ) );
+				} catch ( IllegalArgumentException e ) {
+					log.log( Level.FINEST, "unsupported phase configuration item: " + ph + e  );
+				}
+			}
+
+		} else {
+			active.add( Phase.OPEN );
+		}
+		log.log( Level.CONFIG, props.get( "component-id" ) + " :: see-other-redirect active in: " + Arrays.asList( active ) );
+
 		if ((props.containsKey(SeeOtherHostIfc.CM_SEE_OTHER_HOST_DEFAULT_HOST))
 			&& !props.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_DEFAULT_HOST).toString().trim().isEmpty()) {
-			try {
-				defaulHost = BareJID.bareJIDInstance((String) props.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_DEFAULT_HOST));
-			} catch (TigaseStringprepException ex) {
-				log.log(Level.CONFIG, "From JID violates RFC6122 (XMPP:Address Format): ", ex);
+			defaultHost = new ArrayList<BareJID>();
+			for (String host : ((String) props.get(SeeOtherHostIfc.CM_SEE_OTHER_HOST_DEFAULT_HOST)).split(",")) {
+				try {
+					defaultHost.add(BareJID.bareJIDInstance(host));
+				} catch (TigaseStringprepException ex) {
+					log.log(Level.CONFIG, "From JID violates RFC6122 (XMPP:Address Format): ", ex);
+				}
 			}
+			Collections.sort(defaultHost);
 		} else {
-			defaulHost = null;
+			defaultHost = null;
 		}
 	}
 
 	@Override
 	public void setNodes(List<BareJID> nodes) {
-		// throw new
-		// UnsupportedOperationException("Action invalid for current implementation.");
+		 log.log(Level.CONFIG, "Action invalid for current implementation.");
 	}
+
+	@Override
+	public Element getStreamError( String xmlns, BareJID destination ) {
+		Element error = new Element( "stream:error" );
+		Element seeOtherHost = new Element( "see-other-host", destination.toString() );
+
+		seeOtherHost.setXMLNS( xmlns );
+		error.addChild( seeOtherHost );
+
+		return error;
+	}
+
+	@Override
+	public boolean isEnabled(Phase ph) {
+		return active.contains( ph );
+	}
+
+
+
 }

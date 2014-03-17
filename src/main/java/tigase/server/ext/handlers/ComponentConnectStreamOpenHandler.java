@@ -12,7 +12,8 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. Look for COPYING file in the top folder.
+
+* along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
  * $Rev$
@@ -57,7 +58,7 @@ public class ComponentConnectStreamOpenHandler implements StreamOpenHandler {
 	 * Method description
 	 *
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String[] getXMLNSs() {
@@ -72,7 +73,7 @@ public class ComponentConnectStreamOpenHandler implements StreamOpenHandler {
 	 *
 	 * @param s
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String serviceStarted(ComponentIOService s) {
@@ -87,7 +88,7 @@ public class ComponentConnectStreamOpenHandler implements StreamOpenHandler {
 	 * @param attribs
 	 * @param handler
 	 *
-	 * @return
+	 * 
 	 */
 	@Override
 	public String streamOpened(ComponentIOService serv, Map<String, String> attribs,

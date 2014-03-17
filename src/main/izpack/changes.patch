@@ -2926,6 +2926,41 @@ index fbda7e9..5e46d4e 100644
                  }
              }
          }
+diff --git a/src/lib/com/izforge/izpack/panels/UserInputPanel.java b/src/lib/com/izforge/izpack/panels/UserInputPanel.java
+index 73b9c58..308941f 100644
+--- a/src/lib/com/izforge/izpack/panels/UserInputPanel.java
++++ b/src/lib/com/izforge/izpack/panels/UserInputPanel.java
+@@ -69,10 +69,7 @@ import com.izforge.izpack.gui.ButtonFactory;
+ import com.izforge.izpack.gui.LabelFactory;
+ import com.izforge.izpack.gui.TwoColumnConstraints;
+ import com.izforge.izpack.gui.TwoColumnLayout;
+-import com.izforge.izpack.installer.InstallData;
+-import com.izforge.izpack.installer.InstallerFrame;
+-import com.izforge.izpack.installer.IzPanel;
+-import com.izforge.izpack.installer.ResourceManager;
++import com.izforge.izpack.installer.*;
+ import com.izforge.izpack.rules.RulesEngine;
+ import com.izforge.izpack.rules.VariableExistenceCondition;
+ import com.izforge.izpack.util.Debug;
+@@ -372,11 +369,16 @@ public class UserInputPanel extends IzPanel implements ActionListener, ItemListe
+             String resource = LANG_FILE_NAME + "_" + idata.localeISO3;
+             this.langpack.add(ResourceManager.getInstance().getInputStream(resource));
+         }
+-        catch (Throwable exception)
++        catch (ResourceNotFoundException e)
+         {
+-            exception.printStackTrace();
++            Debug.trace(e);
++        }
++        catch (Exception e)
++        {
++            e.printStackTrace();
+         }
+ 
++
+         // ----------------------------------------------------
+         // read the specifications
+         // ----------------------------------------------------
 diff --git a/src/lib/com/izforge/izpack/panels/UserInputPanelConsoleHelper.java b/src/lib/com/izforge/izpack/panels/UserInputPanelConsoleHelper.java
 index ca9a659..1245897 100644
 --- a/src/lib/com/izforge/izpack/panels/UserInputPanelConsoleHelper.java

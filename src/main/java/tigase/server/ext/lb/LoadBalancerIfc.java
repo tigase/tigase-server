@@ -18,11 +18,11 @@
 * $Rev: 2411 $
 * Last modified by $Author: kobit $
 * $Date: 2010-10-27 20:27:58 -0600 (Wed, 27 Oct 2010) $
- * 
+ *
  */
 package tigase.server.ext.lb;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import tigase.server.Packet;
 import tigase.server.ext.ComponentConnection;
@@ -37,8 +37,8 @@ public interface LoadBalancerIfc {
 	/**
 	 * @param p
 	 * @param conns
-	 * @return
+	 * 
 	 */
-	ComponentIOService selectConnection(Packet p, ArrayList<ComponentConnection> conns);
+	ComponentIOService selectConnection(Packet p, List<ComponentConnection> conns);
 
 }
