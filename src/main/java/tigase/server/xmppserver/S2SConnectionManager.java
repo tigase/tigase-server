@@ -61,6 +61,8 @@ import java.util.Queue;
 import java.util.TimerTask;
 
 import javax.script.Bindings;
+import tigase.vhosts.VHostItem;
+import tigase.vhosts.VHostListener;
 
 /**
  * Created: Jun 14, 2010 11:59:38 AM
@@ -781,9 +783,27 @@ public class S2SConnectionManager
 	 * @return
 	 */
 	@Override
-	public String getSecretForDomain(String domain) {
-		// TODO: #979 - https://projects.tigase.org/issues/979
-		return "s3cr3tf0rd14lb4ck";
+	public String getSecretForDomain(String domain) throws NotLocalhostException {
+		VHostItem item = vHostManager.getVHostItem(domain);
+		if (item == null) {
+			if (this.isLocalDomainOrComponent(domain)) {
+				int idx = domain.indexOf('.');
+				if (idx > 0) {
+					String        basedomain = domain.substring(idx + 1);
+					item = vHostManager.getVHostItem(basedomain);
+				}
+				
+				if (item == null) {
+					item = vHostManager.getVHostItem(vHostManager.getDefVHostItem().toString());
+				}
+			}
+		}
+		
+		if (item == null) {
+			throw new NotLocalhostException("This is not a valid localhost: " + domain);
+		}
+		
+		return item.getS2sSecret();
 	}
 		
 	/**

@@ -394,20 +394,29 @@ public class Dialback
 			}
 		}
 		if ((p.getElemName() == VERIFY_EL_NAME) || (p.getElemName() == DB_VERIFY_EL_NAME)) {
-			if (p.getType() == null) {                                
-                                String secret = handler.getSecretForDomain(cid_packet.getLocalHost());                                
-				String local_key = Algorithms.generateDialbackKey(cid_packet.getLocalHost(), 
+			if (p.getType() == null) {                          
+				boolean result;
+				try {
+					String secret = handler.getSecretForDomain(cid_packet.getLocalHost());                                
+					String local_key = Algorithms.generateDialbackKey(cid_packet.getLocalHost(), 
                                                 cid_packet.getRemoteHost(), secret, p.getStanzaId());
 
-				if (local_key == null) {
-					if (log.isLoggable(Level.FINER)) {
-						log.log(Level.FINER, "The key is not available for connection CID: {0}, "
-								+ "or the packet CID: {1} ", new Object[] { cid_main, cid_packet });
+					if (local_key == null) {
+						if (log.isLoggable(Level.FINER)) {
+							log.log(Level.FINER, "The key is not available for connection CID: {0}, "
+									+ "or the packet CID: {1} ", new Object[] { cid_main, cid_packet });
+						}
 					}
-                                }
+					result = local_key != null && local_key.equals(remote_key);
+				}
+				catch (NotLocalhostException ex) {
+					if (log.isLoggable(Level.FINER)) {
+						log.log(Level.FINER, "Could not retreive secret for " + cid_packet.getLocalHost(), ex);
+					}
+					result = false;
+				}
 				handler.sendVerifyResult(DB_VERIFY_EL_NAME, cid_main, cid_packet,
-						local_key != null && local_key.equals(remote_key), p.getStanzaId(), 
-                                                serv.getSessionId(), null, false);
+						result , p.getStanzaId(), serv.getSessionId(), null, false);
 			} else {
 				if (wasVerifyRequested(serv, p.getStanzaFrom().toString())) {
 					handler.sendVerifyResult(DB_RESULT_EL_NAME, cid_main, cid_packet,
