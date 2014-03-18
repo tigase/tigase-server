@@ -79,9 +79,6 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
        
     String getSecretForDomain(String domain) throws NotLocalhostException;
         
-    @Deprecated
-	String getLocalDBKey(CID cid, CID keyCid, String remote_key, String stanzaId, String sessionId);
-
 	//~--- methods --------------------------------------------------------------
 
 	void initNewConnection(Map<String, Object> port_props);

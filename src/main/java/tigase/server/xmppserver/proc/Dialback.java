@@ -288,7 +288,6 @@ public class Dialback
 	private void initDialback(S2SIOService serv, String remote_id) {
 		try {
 			CID cid                  = (CID) serv.getSessionData().get("cid");
-			CIDConnections cid_conns = handler.getCIDConnections(cid, false);
 
 			String secret = handler.getSecretForDomain(cid.getLocalHost());
 			String key = Algorithms.generateDialbackKey(cid.getLocalHost(), cid.getRemoteHost(), 
@@ -306,8 +305,6 @@ public class Dialback
 			serv.getS2SConnection().sendAllControlPackets();
 		} catch (NotLocalhostException ex) {
 			generateStreamError(false, "host-unknown", serv);
-		} catch (LocalhostException ex) {
-			generateStreamError(false, "invalid-from", serv);
 		}
 	}
 

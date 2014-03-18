@@ -79,11 +79,6 @@ public class S2SConnectionClustered
 
 	private ClusterControllerIfc clusterController = null;
 	private List<JID>            cl_nodes_array    = new CopyOnWriteArrayList<JID>();
-	@Deprecated
-	private CommandListener      checkDBKeyResult = new CheckDBKeyResult(
-			CHECK_DB_KEY_RESULT_CMD);
-	@Deprecated
-	private CommandListener checkDBKey = new CheckDBKey(CHECK_DB_KEY_CMD);
 
 	//~--- methods --------------------------------------------------------------
 
@@ -127,55 +122,6 @@ public class S2SConnectionClustered
 		return super.getDiscoDescription() + " clustered";
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param connectionCid
-	 * @param keyCid
-	 * @param key
-	 * @param key_sessionId
-	 * @param asking_sessionId
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
-	@Override
-	@Deprecated
-	public String getLocalDBKey(CID connectionCid, CID keyCid, String key,
-			String key_sessionId, String asking_sessionId) {
-		String local_key = super.getLocalDBKey(connectionCid, keyCid, key, key_sessionId,
-				asking_sessionId);
-
-		if (local_key != null) {
-			return local_key;
-		}
-
-		JID toNode = getFirstClusterNode();
-
-		if (toNode != null) {
-			Map<String, String> params = new LinkedHashMap<String, String>(6, 0.25f);
-
-			params.put(CONN_CID, connectionCid.toString());
-			params.put(KEY_CID, keyCid.toString());
-			params.put(KEY_P, key);
-			params.put(FORKEY_SESSION_ID, key_sessionId);
-			params.put(ASKING_SESSION_ID, asking_sessionId);
-			clusterController.sendToNodes(CHECK_DB_KEY_CMD, params, getComponentId(), toNode);
-
-			// If null is returned then the underlying API waits for the key to be
-			// delivered
-			// at later time
-			return null;
-		} else {
-
-			// If there is no cluster node available to ask for the db key then we
-			// just return something here to generate invalid key result.
-			return "invalid-key";
-		}
-	}
-
 	//~--- set methods ----------------------------------------------------------
 
 	/**
@@ -187,10 +133,6 @@ public class S2SConnectionClustered
 	@Override
 	public void setClusterController(ClusterControllerIfc cl_controller) {
 		clusterController = cl_controller;
-		clusterController.removeCommandListener(checkDBKey);
-		clusterController.removeCommandListener(checkDBKeyResult);
-		clusterController.setCommandListener(checkDBKey);
-		clusterController.setCommandListener(checkDBKeyResult);
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -217,153 +159,6 @@ public class S2SConnectionClustered
 		return cluster_node;
 	}
 
-	//~--- inner classes --------------------------------------------------------
-	@Deprecated
-	private class CheckDBKey
-					extends CommandListenerAbstract {
-		private CheckDBKey(String name) {
-			super(name);
-		}
-
-		//~--- methods ------------------------------------------------------------
-
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param fromNode
-		 * @param visitedNodes
-		 * @param data
-		 * @param packets
-		 *
-		 * @throws ClusterCommandException
-		 */
-		@Override
-		public void executeCommand(JID fromNode, Set<JID> visitedNodes, Map<String,
-				String> data, Queue<Element> packets)
-				throws ClusterCommandException {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST,
-						"Called fromNode: {0}, visitedNodes: {1}, data: {2}, packets: {3}",
-						new Object[] { fromNode,
-						visitedNodes, data, packets });
-			}
-
-			CID    connCid          = new CID(data.get(CONN_CID));
-			CID    keyCid           = new CID(data.get(KEY_CID));
-			String key              = data.get(KEY_P);
-			String forkey_sessionId = data.get(FORKEY_SESSION_ID);
-			String asking_sessionId = data.get(ASKING_SESSION_ID);
-
-			if (fromNode.equals(getComponentId())) {
-
-				// If the request came back to the first sending node then no one had a
-				// valid key for this connection, therefore we are sending invalid back
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST,
-							"the request came back to the first sending node then no one had a " +
-							"valid key for this connection, therefore we are sending invalid back. " +
-							"fromNode: {0}, compId: {1}, connCid: {2}, keyCid: {3}, " +
-							"forkey_sessionId: {4}, asking_sessionId: {5}", new Object[] {
-						fromNode, getComponentId(), connCid, keyCid, forkey_sessionId,
-								asking_sessionId
-					});
-				}
-				sendVerifyResult(DB_VERIFY_EL_NAME, connCid, keyCid, false, forkey_sessionId,
-						asking_sessionId, null, false);
-
-				return;
-			}
-
-			String local_key = S2SConnectionClustered.super.getLocalDBKey(connCid, keyCid, key,
-					forkey_sessionId, asking_sessionId);
-
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "LocalDBKey: {0}", local_key);
-			}
-
-			boolean valid = false;
-
-			if (local_key == null) {
-
-				// Forward the request to the next node
-				JID nextNode = getNextNode(fromNode, visitedNodes);
-
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "No local db key, sending to next node: {0}", nextNode);
-				}
-				clusterController.sendToNodes(CHECK_DB_KEY_CMD, data, fromNode, visitedNodes,
-						nextNode);
-
-				return;
-			}
-			valid = local_key.equals(key);
-			data.put(VALID, "" + valid);
-			clusterController.sendToNodes(CHECK_DB_KEY_RESULT_CMD, data, getComponentId(),
-					fromNode);
-		}
-
-		//~--- get methods --------------------------------------------------------
-
-		private JID getNextNode(JID fromNode, Set<JID> visitedNodes) {
-			JID result = fromNode;
-
-			for (JID jid : cl_nodes_array) {
-				if (!fromNode.equals(jid) &&!visitedNodes.contains(jid)) {
-					result = jid;
-
-					break;
-				}
-			}
-
-			return result;
-		}
-	}
-
-	@Deprecated
-	private class CheckDBKeyResult
-					extends CommandListenerAbstract {
-		private CheckDBKeyResult(String name) {
-			super(name);
-		}
-
-		//~--- methods ------------------------------------------------------------
-
-		/**
-		 *   Method description
-		 *
-		 *
-		 *   @param fromNode
-		 *   @param visitedNodes
-		 *   @param data
-		 *   @param packets
-		 *
-		 *   @throws ClusterCommandException
-		 */
-		@Override
-		public void executeCommand(JID fromNode, Set<JID> visitedNodes, Map<String,
-				String> data, Queue<Element> packets)
-				throws ClusterCommandException {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST,
-						"Called fromNode: {0}, visitedNodes: {1}, data: {2}, packets: {3}",
-						new Object[] { fromNode,
-						visitedNodes, data, packets });
-			}
-
-			CID     connCid          = new CID(data.get(CONN_CID));
-			CID     keyCid           = new CID(data.get(KEY_CID));
-			String  forkey_sessionId = data.get(FORKEY_SESSION_ID);
-			String  asking_sessionId = data.get(ASKING_SESSION_ID);
-			boolean valid            = "true".equals(data.get(VALID));
-
-			// String key = data.get(KEY_P);
-			// String from = connCid.getLocalHost();
-			// String to = connCid.getRemoteHost();
-			sendVerifyResult(DB_VERIFY_EL_NAME, connCid, keyCid, valid, forkey_sessionId,
-					asking_sessionId, null, false);
-		}
-	}
 }
 
 

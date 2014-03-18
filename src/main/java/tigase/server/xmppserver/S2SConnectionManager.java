@@ -743,40 +743,6 @@ public class S2SConnectionManager
 	}
 
 	/**
-	 *
-	 * @param connectionCid
-	 * @param keyCid
-	 * @param key
-	 * @param key_sessionId
-	 * @param asking_sessionId
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
-	@Override
-	@Deprecated
-	public String getLocalDBKey(CID connectionCid, CID keyCid, String key,
-			String key_sessionId, String asking_sessionId) {
-		CIDConnections cid_conns = getCIDConnections(keyCid);
-		String         result    = (cid_conns == null)
-				? null
-				: cid_conns.getDBKey(key_sessionId);
-
-		if (result == null) {
-
-			// In piggybacking mode the DB key can be available in the connectionCID
-			// rather then
-			// keyCID
-			cid_conns = getCIDConnections(connectionCid);
-			result    = (cid_conns == null)
-					? null
-					: cid_conns.getDBKey(key_sessionId);
-		}
-
-		return result;
-	}
-
-	/**
 	 * Method returns secret used for domain for generation of dialback key
 	 *
 	 * @param domain
