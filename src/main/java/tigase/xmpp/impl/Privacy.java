@@ -211,7 +211,9 @@ public class Privacy {
 			String defaultListName = getDefaultListName( session );
 			if ( defaultListName != null ){
 				sessionDefaultList = Privacy.getList( session, defaultListName);
-				session.putCommonSessionData( DEFAULT, sessionDefaultList );
+				if ( null != sessionDefaultList ){
+					session.putCommonSessionData( DEFAULT, sessionDefaultList );
+				}
 			}
 		}
 		return sessionDefaultList;
@@ -405,6 +407,7 @@ public class Privacy {
 					throws NotAuthorizedException, TigaseDBException {
 		if ((list != null) && (list.getAttributeStaticStr(NAME) != null)) {
 			session.setData(PRIVACY, DEFAULT, list.getAttributeStaticStr(NAME));
+			session.putCommonSessionData( DEFAULT, list);
 		} else {
 			session.removeData(PRIVACY, DEFAULT);
 			session.removeCommonSessionData( DEFAULT );

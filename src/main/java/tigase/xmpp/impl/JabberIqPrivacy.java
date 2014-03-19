@@ -530,6 +530,7 @@ public class JabberIqPrivacy
 				List<Element> items = child.getChildren();
 
 				if ((items == null) || items.isEmpty()) {
+					// if the list is in use then forbid changes
 					boolean inUse = name.equals(getDefaultListName(session));
 
 					if (!inUse) {
@@ -555,6 +556,10 @@ public class JabberIqPrivacy
 								Privacy.setActiveList(activeSession, name);
 							}
 						}
+						// update default list
+						if (name.equals( Privacy.getDefaultListName( session))) {
+							Privacy.setDefaultList( session, child );
+						}
 						results.offer(packet.okResult((String) null, 0));
 					} else {
 						results.offer(error.getResponseMessage(packet, null, true));
@@ -562,8 +567,19 @@ public class JabberIqPrivacy
 				}
 			}      // end of if (child.getName().equals("list))
 			if (child.getName() == DEFAULT_EL_NAME) {
-				Privacy.setDefaultList(session, child);
-				results.offer(packet.okResult((String) null, 0));
+
+				// User selects a different default list
+				String  listName = child.getAttributeStaticStr(NAME);
+				Element list     = Privacy.getList(session, listName);
+
+				if ((listName != null) && (list == null)) {
+					results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
+							"Selected list was not found on the server", true));
+				} else {
+					// This is either declining of default list use or setting a new default list
+					Privacy.setDefaultList( session, list );
+					results.offer(packet.okResult((String) null, 0));
+				}
 			}      // end of if (child.getName().equals("list))
 			if (child.getName() == ACTIVE_EL_NAME) {
 
@@ -573,7 +589,7 @@ public class JabberIqPrivacy
 
 				if ((listName != null) && (list == null)) {
 					results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
-							"Selected list not found on the server", true));
+							"Selected list was not found on the server", true));
 				} else {
 
 					// This is either declining of active list use or setting a new active list
