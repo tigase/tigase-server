@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.script.Bindings;
 
@@ -522,11 +523,32 @@ public class VHostManager
 				repo_tmp.setProperties(properties);
 				repo = repo_tmp;
 				log.warning(repo.toString());
+				initializeRepository();
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Can not create VHost repository instance for class: " +
 						repo_class, e);
 			}
 		}
+	}
+	
+	public void initializeRepository() throws TigaseDBException {
+		// loading all items
+		repo.reload();
+		
+		List<VHostItem> items = new ArrayList<VHostItem>(repo.allItems());
+		for (VHostItem item : items) {
+			// if there is no S2S secret set for vhost, then we need to generate it
+			if (item.getS2sSecret() == null) {
+				String secret = generateSecret();
+				item.setS2sSecret(secret);
+				repo.addItem(item);
+			}
+		}	
+	}
+	
+	public String generateSecret() {
+		String random = UUID.randomUUID().toString();
+		return random;
 	}
 }
 

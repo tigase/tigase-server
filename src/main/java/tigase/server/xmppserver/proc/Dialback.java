@@ -288,19 +288,11 @@ public class Dialback
 	private void initDialback(S2SIOService serv, String remote_id) {
 		try {
 			CID cid                  = (CID) serv.getSessionData().get("cid");
-			CIDConnections cid_conns = handler.getCIDConnections(cid, false);
 
-			// It must be always set for connect connection type
-			String uuid = UUID.randomUUID().toString();
-			String key  = null;
+			String secret = handler.getSecretForDomain(cid.getLocalHost());
+			String key = Algorithms.generateDialbackKey(cid.getLocalHost(), cid.getRemoteHost(), 
+                                        secret, remote_id);
 
-			try {
-				key = Algorithms.hexDigest(remote_id, uuid, "SHA");
-			} catch (NoSuchAlgorithmException e) {
-				key = uuid;
-			}    // end of try-catch
-			serv.setDBKey(key);
-			cid_conns.addDBKey(remote_id, key);
 			if (!serv.isHandshakingOnly()) {
 				Element elem = new Element(DB_RESULT_EL_NAME, key, new String[] { XMLNS_DB_ATT },
 																	 new String[] { XMLNS_DB_VAL });
@@ -313,8 +305,6 @@ public class Dialback
 			serv.getS2SConnection().sendAllControlPackets();
 		} catch (NotLocalhostException ex) {
 			generateStreamError(false, "host-unknown", serv);
-		} catch (LocalhostException ex) {
-			generateStreamError(false, "invalid-from", serv);
 		}
 	}
 
@@ -401,23 +391,29 @@ public class Dialback
 			}
 		}
 		if ((p.getElemName() == VERIFY_EL_NAME) || (p.getElemName() == DB_VERIFY_EL_NAME)) {
-			if (p.getType() == null) {
-				String local_key = handler.getLocalDBKey(cid_main, cid_packet, remote_key,
-														 p.getStanzaId(), serv.getSessionId());
+			if (p.getType() == null) {                          
+				boolean result;
+				try {
+					String secret = handler.getSecretForDomain(cid_packet.getLocalHost());                                
+					String local_key = Algorithms.generateDialbackKey(cid_packet.getLocalHost(), 
+                                                cid_packet.getRemoteHost(), secret, p.getStanzaId());
 
-				if (local_key == null) {
-					if (log.isLoggable(Level.FINER)) {
-						log.log(Level.FINER,
-										"The key is not available for connection CID: {0}, " +
-										"or the packet CID: {1} maybe it is " +
-										"located on a different node...", new Object[] { cid_main,
-										cid_packet });
+					if (local_key == null) {
+						if (log.isLoggable(Level.FINER)) {
+							log.log(Level.FINER, "The key is not available for connection CID: {0}, "
+									+ "or the packet CID: {1} ", new Object[] { cid_main, cid_packet });
+						}
 					}
-				} else {
-					handler.sendVerifyResult(DB_VERIFY_EL_NAME, cid_main, cid_packet,
-																	 local_key.equals(remote_key), p.getStanzaId(),
-																	 serv.getSessionId(), null, false);
+					result = local_key != null && local_key.equals(remote_key);
 				}
+				catch (NotLocalhostException ex) {
+					if (log.isLoggable(Level.FINER)) {
+						log.log(Level.FINER, "Could not retreive secret for " + cid_packet.getLocalHost(), ex);
+					}
+					result = false;
+				}
+				handler.sendVerifyResult(DB_VERIFY_EL_NAME, cid_main, cid_packet,
+						result , p.getStanzaId(), serv.getSessionId(), null, false);
 			} else {
 				if (wasVerifyRequested(serv, p.getStanzaFrom().toString())) {
 					handler.sendVerifyResult(DB_RESULT_EL_NAME, cid_main, cid_packet,

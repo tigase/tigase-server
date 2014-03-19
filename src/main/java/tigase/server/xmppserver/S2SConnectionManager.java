@@ -61,6 +61,8 @@ import java.util.Queue;
 import java.util.TimerTask;
 
 import javax.script.Bindings;
+import tigase.vhosts.VHostItem;
+import tigase.vhosts.VHostListener;
 
 /**
  * Created: Jun 14, 2010 11:59:38 AM
@@ -713,7 +715,7 @@ public class S2SConnectionManager
 
 		return props;
 	}
-
+        
 	/**
 	 * Method description
 	 *
@@ -741,38 +743,35 @@ public class S2SConnectionManager
 	}
 
 	/**
+	 * Method returns secret used for domain for generation of dialback key
 	 *
-	 * @param connectionCid
-	 * @param keyCid
-	 * @param key
-	 * @param key_sessionId
-	 * @param asking_sessionId
-	 *
-	 *
-	 * @return a value of <code>String</code>
+	 * @param domain
+	 * @return
 	 */
 	@Override
-	public String getLocalDBKey(CID connectionCid, CID keyCid, String key,
-			String key_sessionId, String asking_sessionId) {
-		CIDConnections cid_conns = getCIDConnections(keyCid);
-		String         result    = (cid_conns == null)
-				? null
-				: cid_conns.getDBKey(key_sessionId);
-
-		if (result == null) {
-
-			// In piggybacking mode the DB key can be available in the connectionCID
-			// rather then
-			// keyCID
-			cid_conns = getCIDConnections(connectionCid);
-			result    = (cid_conns == null)
-					? null
-					: cid_conns.getDBKey(key_sessionId);
+	public String getSecretForDomain(String domain) throws NotLocalhostException {
+		VHostItem item = vHostManager.getVHostItem(domain);
+		if (item == null) {
+			if (this.isLocalDomainOrComponent(domain)) {
+				int idx = domain.indexOf('.');
+				if (idx > 0) {
+					String        basedomain = domain.substring(idx + 1);
+					item = vHostManager.getVHostItem(basedomain);
+				}
+				
+				if (item == null) {
+					item = vHostManager.getVHostItem(vHostManager.getDefVHostItem().toString());
+				}
+			}
 		}
-
-		return result;
+		
+		if (item == null) {
+			throw new NotLocalhostException("This is not a valid localhost: " + domain);
+		}
+		
+		return item.getS2sSecret();
 	}
-
+		
 	/**
 	 * Method description
 	 *
