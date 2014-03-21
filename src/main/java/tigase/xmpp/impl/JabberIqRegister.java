@@ -222,7 +222,10 @@ public class JabberIqRegister
 								IQ_QUERY_USERNAME_PATH );
 						String password = request.getChildCDataStaticStr(
 								IQ_QUERY_PASSWORD_PATH );
-						String pass_enc = XMLUtils.unescape( password );
+						String pass_enc = null;
+						if ( null != password ){
+							XMLUtils.unescape( password );
+						}
 						String email = request.getChildCDataStaticStr(
 								IQ_QUERY_EMAIL_PATH );
 						Map<String, String> reg_params = null;
