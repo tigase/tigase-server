@@ -102,6 +102,11 @@ public class Dialback
 
 	// ~--- methods --------------------------------------------------------------
 
+	@Override
+	public int order() {
+		return Order.Dialback.ordinal();
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -204,13 +209,23 @@ public class Dialback
 						log.log(Level.INFO, "{0}, Incorrect remote hostname name, packet: {1}",
 										new Object[] { serv,
 																	 p });
-						serv.forceStop();
+						serv.stop();
 					}
 
 					return true;
 				}
 			}
 
+			// we need to check if TLS is required
+			if (!skipTLS && cid != null && !serv.getSessionData().containsKey("TLS") 
+					&& handler.isTlsRequired(cid.getLocalHost())) {
+				log.log(Level.FINER, "{0}, TLS is required for domain {1} but STARTTLS was not "
+						+ "offered by {2} - policy-violation", new Object[] { serv, 
+							cid.getLocalHost(), cid.getRemoteHost() });
+				serv.forceStop();
+				return true;
+			}
+			
 			// Nothing else can be done right now except the dialback
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "{0}, Initializing dialback, packet: {1}",
@@ -362,10 +377,22 @@ public class Dialback
 		// Dummy dialback implementation for now....
 		if ((p.getElemName() == RESULT_EL_NAME) || (p.getElemName() == DB_RESULT_EL_NAME)) {
 			if (p.getType() == null) {
-				String conn_sessionId = serv.getSessionId();
-
-				handler.sendVerifyResult(DB_VERIFY_EL_NAME, cid_main, cid_packet, null,
+				CID cid = (CID) serv.getSessionData().get("cid");
+				boolean skipTls = this.skipTLSForHost(cid.getRemoteHost());
+				if (!skipTls && !serv.getSessionData().containsKey("TLS") && handler.isTlsRequired(cid.getLocalHost())) {
+					log.log(Level.FINER, "{0}, rejecting S2S connection from {1} to {2} due to policy violation - STARTTLS is required",
+							new Object[] { serv, cid.getRemoteHost(), cid.getLocalHost() });
+					handler.sendVerifyResult(DB_RESULT_EL_NAME, cid_main, cid_packet, false, null, serv.getSessionId(), 
+							null, false, new Element("error", new Element[] {
+								new Element("policy-violation", new String[] { "xmlns" },
+										new String[] { "urn:ietf:params:xml:ns:xmpp-stanzas" } )},
+									new String[] { "type" }, new String[] { "cancel" } ));
+				}
+				else {
+					String conn_sessionId = serv.getSessionId();
+					handler.sendVerifyResult(DB_VERIFY_EL_NAME, cid_main, cid_packet, null,
 																 conn_sessionId, null, p.getElemCData(), true);
+				}
 			} else {
 				if (p.getType() == StanzaType.valid) {
 					if (wasResultRequested(serv, p.getStanzaFrom().toString())) {

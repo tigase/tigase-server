@@ -67,6 +67,11 @@ public class PacketChecker extends S2SAbstractProcessor {
         
         //~--- methods --------------------------------------------------------------
 
+		@Override
+		public int order() {
+			return 0;
+		}
+		
         @Override
         public void init(S2SConnectionHandlerIfc<S2SIOService> handler, Map<String, Object> props) {
                 super.init(handler, props);

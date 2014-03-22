@@ -42,8 +42,16 @@ import java.util.Queue;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface S2SProcessor {
+public interface S2SProcessor extends Comparable<S2SProcessor> {
 
+	/**
+	 * Returns order of processor which is used to set order in which processors
+	 * will be processing packet
+	 * 
+	 * @return 
+	 */
+	public int order();
+	
 	/**
 	 * Method description
 	 *

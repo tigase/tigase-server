@@ -52,6 +52,9 @@ public class StartTLS
 	private static final Element features = new Element(START_TLS_EL,
 																						new String[] { "xmlns" },
 																						new String[] { START_TLS_NS });
+	private static final Element features_required = new Element(START_TLS_EL, new Element[] { new Element( "required" ) },
+																						new String[] { "xmlns" },
+																						new String[] { START_TLS_NS });
 	private static final Element starttls_el = new Element(START_TLS_EL,
 																							 new String[] { "xmlns" },
 																							 new String[] { START_TLS_NS });
@@ -61,6 +64,11 @@ public class StartTLS
 
 	//~--- methods --------------------------------------------------------------
 
+	@Override
+	public int order() {
+		return Order.StartTLS.ordinal();
+	}	
+	
 	/**
 	 * Method description
 	 *
@@ -143,7 +151,14 @@ public class StartTLS
 	@Override
 	public void streamFeatures(S2SIOService serv, List<Element> results) {
 		if (!serv.getSessionData().containsKey("TLS")) {
-			results.add(features);
+			CID cid = (CID) serv.getSessionData().get("cid");
+			boolean skipTls = this.skipTLSForHost(cid.getRemoteHost());
+			if (!skipTls && handler.isTlsRequired(cid.getLocalHost())) {
+				results.add(features_required);
+			}
+			else {
+				results.add(features);
+			}
 		}
 	}
 }

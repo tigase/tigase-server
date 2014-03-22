@@ -26,6 +26,20 @@ package tigase.server.xmppserver;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.script.Bindings;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.server.Permissions;
@@ -36,33 +50,13 @@ import tigase.server.xmppserver.proc.StartZlib;
 import tigase.server.xmppserver.proc.StreamError;
 import tigase.server.xmppserver.proc.StreamFeatures;
 import tigase.server.xmppserver.proc.StreamOpen;
-
 import tigase.stats.StatisticsList;
-
+import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
-
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
-import java.util.TimerTask;
-
-import javax.script.Bindings;
-import tigase.vhosts.VHostItem;
-import tigase.vhosts.VHostListener;
+import tigase.xmpp.StanzaType;
 
 /**
  * Created: Jun 14, 2010 11:59:38 AM
@@ -173,8 +167,9 @@ public class S2SConnectionManager
 	 * network. In most cases if not all, these processors handle just protocol
 	 * traffic, all the rest traffic should be passed on to MR.
 	 */
-	private Map<String, S2SProcessor> processors = new LinkedHashMap<String, S2SProcessor>(
+	private Map<String, S2SProcessor> processorsMap = new LinkedHashMap<String, S2SProcessor>(
 			10);
+	private List<S2SProcessor> processors = Collections.emptyList();
 	private Map<String, S2SProcessor> filters = new LinkedHashMap<String, S2SProcessor>(10);
 
 	//~--- methods --------------------------------------------------------------
@@ -407,7 +402,7 @@ public class S2SConnectionManager
 
 			boolean processed = false;
 
-			for (S2SProcessor proc : processors.values()) {
+			for (S2SProcessor proc : processors) {
 				processed |= proc.process(p, serv, results);
 				writePacketsToSocket(serv, results);
 			}
@@ -519,12 +514,53 @@ public class S2SConnectionManager
 	public boolean sendVerifyResult(String elem_name, CID connCid, CID keyCid,
 			Boolean valid, String key_sessionId, String serv_sessionId, String cdata,
 			boolean handshakingOnly) {
+		return this.sendVerifyResult(elem_name, connCid, keyCid, valid, key_sessionId, serv_sessionId, cdata, handshakingOnly, null);
+	}
+	
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param elem_name
+	 * @param connCid
+	 * @param keyCid
+	 * @param valid
+	 * @param key_sessionId
+	 * @param serv_sessionId
+	 * @param cdata
+	 * @param handshakingOnly
+	 * @param errorElem
+	 *
+	 *
+	 *
+	 * @return a value of <code>boolean</code>
+	 */
+	@Override
+	public boolean sendVerifyResult(String elem_name, CID connCid, CID keyCid,
+			Boolean valid, String key_sessionId, String serv_sessionId, String cdata,
+			boolean handshakingOnly, Element errorElem) {	
 		CIDConnections cid_conns = getCIDConnections(connCid);
 
 		if (cid_conns != null) {
-			Packet verify_valid = getValidResponse(elem_name, keyCid, key_sessionId, valid,
+			StanzaType type = null;
+			if (valid != null) {
+				if (valid) {
+					type = StanzaType.valid;
+				}
+				else {
+					type = StanzaType.invalid;
+				}
+			}
+			if (errorElem != null) {
+				type = StanzaType.error;
+			}
+			Packet verify_valid = getValidResponse(elem_name, keyCid, key_sessionId, type,
 					cdata);
 
+			if (errorElem != null) {
+				verify_valid.getElement().addChild(errorElem);
+			}
+			
 			if (handshakingOnly) {
 				cid_conns.sendHandshakingOnly(verify_valid);
 
@@ -553,7 +589,7 @@ public class S2SConnectionManager
 	public void serviceStarted(S2SIOService serv) {
 		super.serviceStarted(serv);
 		log.log(Level.FINEST, "s2s connection opened: {0}", serv);
-		for (S2SProcessor proc : processors.values()) {
+		for (S2SProcessor proc : processors) {
 			proc.serviceStarted(serv);
 		}
 	}
@@ -573,7 +609,7 @@ public class S2SConnectionManager
 		boolean result = super.serviceStopped(serv);
 
 		if (result) {
-			for (S2SProcessor proc : processors.values()) {
+			for (S2SProcessor proc : processors) {
 				proc.serviceStopped(serv);
 			}
 		}
@@ -591,7 +627,7 @@ public class S2SConnectionManager
 	 */
 	@Override
 	public void tlsHandshakeCompleted(S2SIOService serv) {
-		for (S2SProcessor proc : processors.values()) {
+		for (S2SProcessor proc : processors) {
 			proc.serviceStarted(serv);
 		}
 	}
@@ -619,7 +655,7 @@ public class S2SConnectionManager
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "{0}, Stream closed.", new Object[] { serv });
 		}
-		for (S2SProcessor proc : processors.values()) {
+		for (S2SProcessor proc : processors) {
 			proc.streamClosed(serv);
 		}
 	}
@@ -643,7 +679,7 @@ public class S2SConnectionManager
 
 		StringBuilder sb = new StringBuilder(256);
 
-		for (S2SProcessor proc : processors.values()) {
+		for (S2SProcessor proc : processors) {
 			String res = proc.streamOpened(serv, attribs);
 
 			if (res != null) {
@@ -850,13 +886,25 @@ public class S2SConnectionManager
 	public List<Element> getStreamFeatures(S2SIOService serv) {
 		List<Element> results = new ArrayList<Element>(10);
 
-		for (S2SProcessor proc : processors.values()) {
+		for (S2SProcessor proc : processors) {
 			proc.streamFeatures(serv, results);
 		}
 
 		return results;
 	}
 
+	/**
+	 * Checks if TLS is required for particular domain
+	 * 
+	 * @param domain
+	 * @return 
+	 */
+	@Override
+	public boolean isTlsRequired(String domain) {
+		VHostItem item = vHostManager.getVHostItem(domain);
+		return item.isTlsRequired();
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -895,14 +943,14 @@ public class S2SConnectionManager
 
 		// it needs to be here as we need properties for plugins
 		// TODO: Make used processors list a configurable thing
-		processors.clear();
-		processors.put(Dialback.class.getSimpleName(), new Dialback());
-		processors.put(StartTLS.class.getSimpleName(), new StartTLS());
-		processors.put(StartZlib.class.getSimpleName(), new StartZlib());
-		processors.put(StreamError.class.getSimpleName(), new StreamError());
-		processors.put(StreamFeatures.class.getSimpleName(), new StreamFeatures());
-		processors.put(StreamOpen.class.getSimpleName(), new StreamOpen());
-		for (S2SProcessor proc : processors.values()) {
+		processorsMap.clear();
+		processorsMap.put(Dialback.class.getSimpleName(), new Dialback());
+		processorsMap.put(StartTLS.class.getSimpleName(), new StartTLS());
+		processorsMap.put(StartZlib.class.getSimpleName(), new StartZlib());
+		processorsMap.put(StreamError.class.getSimpleName(), new StreamError());
+		processorsMap.put(StreamFeatures.class.getSimpleName(), new StreamFeatures());
+		processorsMap.put(StreamOpen.class.getSimpleName(), new StreamOpen());
+		for (S2SProcessor proc : processorsMap.values()) {
 			Map<String, Object> proc_props = new ConcurrentHashMap<String, Object>(4);
 
 			for (Map.Entry<String, Object> entry : props.entrySet()) {
@@ -920,6 +968,10 @@ public class S2SConnectionManager
 			}
 			proc.init(this, proc_props);
 		}
+		List<S2SProcessor> tmp_processors = new ArrayList<>(processorsMap.values());
+		Collections.sort(tmp_processors);
+		this.processors = Collections.unmodifiableList(tmp_processors);
+		
 		filters.clear();
 		filters.put(PacketChecker.class.getSimpleName(), new PacketChecker());
 		for (S2SProcessor filter : filters.values()) {
@@ -1040,19 +1092,15 @@ public class S2SConnectionManager
 		return cidConnections.get(cid);
 	}
 
-	private Packet getValidResponse(String elem_name, CID cid, String id, Boolean valid,
+	private Packet getValidResponse(String elem_name, CID cid, String id, StanzaType type,
 			String cdata) {
 		Element elem = new Element(elem_name);
 
 		if (cdata != null) {
 			elem.setCData(cdata);
 		}
-		if (valid != null) {
-			if (valid.booleanValue()) {
-				elem.addAttribute("type", "valid");
-			} else {
-				elem.addAttribute("type", "invalid");
-			}
+		if (type != null) {
+			elem.addAttribute("type", type.name());
 		}
 		if (id != null) {
 			elem.addAttribute("id", id);

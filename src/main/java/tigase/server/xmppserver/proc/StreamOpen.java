@@ -52,6 +52,11 @@ public class StreamOpen extends S2SAbstractProcessor {
 
 	// ~--- methods --------------------------------------------------------------
 
+	@Override
+	public int order() {
+		return Order.StreamOpen.ordinal();
+	}
+	
 	/**
 	 * Method description
 	 * 
