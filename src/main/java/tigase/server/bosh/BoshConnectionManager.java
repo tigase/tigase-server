@@ -29,15 +29,12 @@ package tigase.server.bosh;
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Packet;
+import tigase.server.Presence;
 import tigase.server.ReceiverTimeoutHandler;
+
+import static tigase.server.bosh.Constants.*;
 import tigase.server.xmppclient.ClientConnectionManager;
 import tigase.server.xmppclient.SeeOtherHostIfc.Phase;
-
-import tigase.stats.StatisticsList;
-
-import tigase.util.TigaseStringprepException;
-
-import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
@@ -46,19 +43,23 @@ import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
 
-import static tigase.server.bosh.Constants.*;
-
-//~--- JDK imports ------------------------------------------------------------
+import tigase.stats.StatisticsList;
+import tigase.util.TigaseStringprepException;
+import tigase.xml.Element;
+import tigase.xml.db.DBElement;
 
 import java.util.ArrayDeque;
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.script.Bindings;
 
 /**
  * Describe class BoshConnectionManager here.
@@ -182,6 +183,48 @@ public class BoshConnectionManager
 	}
 
 	// ~--- methods --------------------------------------------------------------
+
+
+	protected Map<String,String> preBindSession(Map<String,String> attr) {
+		String hostname = attr.get( TO_ATTR );
+
+		Queue<Packet> out_results = new ArrayDeque<Packet>( 2 );
+
+		BoshSession bs = new BoshSession( getDefVHostItem().getDomain(),
+																			JID.jidInstanceNS( routings.computeRouting( hostname ) ), this );
+
+		String jid = attr.get( FROM_ATTR );
+		String uuid = UUID.randomUUID().toString();
+		JID userId = JID.jidInstanceNS( jid );
+		if ( null == userId.getResource() ){
+			userId.copyWithResourceNS( uuid );
+			attr.put( FROM_ATTR, userId.toString() );
+			bs.setUserJid( jid );
+		}
+		long rid = (long) (Math.random() * 10000000);
+
+		attr.put( RID_ATTR, Long.toString( rid ) );
+
+		UUID sid = bs.getSid();
+		sessions.put( sid, bs );
+		attr.put( SID_ATTR, sid.toString());
+
+		Packet p = null;
+		try {
+			Element el = new Element( "body" );
+			el.setAttributes( attr );
+			p = Packet.packetInstance( el);
+		} catch ( TigaseStringprepException ex ) {
+			Logger.getLogger( BoshConnectionManager.class.getName() ).log( Level.SEVERE, null, ex );
+		}
+		bs.init( p, null, max_wait, min_polling, max_inactivity,
+						 concurrent_requests, hold_requests, max_pause, max_batch_size,
+						 batch_queue_timeout, out_results, true );
+		addOutPackets( out_results, bs );
+		return attr;
+	}
+
+
 
 	/**
 	 * Method description
@@ -782,18 +825,6 @@ public class BoshConnectionManager
 
 	//~--- get methods ----------------------------------------------------------
 
-	// ~--- get methods ----------------------------------------------------------
-	// public void processPacket(Packet packet) {
-	// log.finer("Processing packet: " + packet.getElemName()
-	// + ", type: " + packet.getType());
-	// log.finest("Processing packet: " + packet.toString());
-	// if (packet.isCommand() && packet.getCommand() != Command.OTHER) {
-	// processCommand(packet);
-	// } else {
-	// writePacketToSocket(packet);
-	// }
-	// }
-
 	/**
 	 * Method description
 	 *
@@ -852,6 +883,12 @@ public class BoshConnectionManager
 	@Override
 	protected long getMaxInactiveTime() {
 		return 10 * MINUTE;
+
+	}
+	@Override
+	public void initBindings(Bindings binds) {
+		super.initBindings(binds);
+		binds.put("boshCM", this);
 	}
 
 	/**
@@ -885,11 +922,33 @@ public class BoshConnectionManager
 		 * @param response
 		 */
 		@Override
-		public void responseReceived(Packet packet, Packet response) {
+		public void responseReceived( Packet packet, Packet response ) {
+			String pb = Command.getFieldValue( packet, PRE_BIND_ATTR );
+			boolean prebind = Boolean.valueOf( pb );
 
-			// We are now ready to ask for features....
-			addOutPacket(Command.GETFEATURES.getPacket(packet.getFrom(), packet.getTo(),
-					StanzaType.get, UUID.randomUUID().toString(), null));
+			String sessionId = Command.getFieldValue( packet, SESSION_ID_ATTR );
+			String userID = Command.getFieldValue( packet, USER_ID_ATTR );
+
+			if ( prebind ){
+				// we are doing pre-bind, send user-login command, bind resource
+				Packet packetOut
+							 = Command.USER_STATUS.getPacket( packet.getFrom(), packet.getTo(),
+																								StanzaType.get, UUID.randomUUID().toString() );
+
+//				Element presence = new Element( "presence" );
+				Command.addFieldValue( packetOut, USER_ID_ATTR, userID );
+				if ( null != sessionId ){
+					Command.addFieldValue( packetOut, SESSION_ID_ATTR, sessionId );
+				}
+				Command.addFieldValue( packetOut, PRE_BIND_ATTR, String.valueOf( prebind ) );
+
+				addOutPacket( packetOut );
+			} else {
+
+				// We are now ready to ask for features....
+				addOutPacket( Command.GETFEATURES.getPacket( packet.getFrom(), packet.getTo(),
+																										 StanzaType.get, UUID.randomUUID().toString(), null ) );
+			}
 		}
 
 		/**

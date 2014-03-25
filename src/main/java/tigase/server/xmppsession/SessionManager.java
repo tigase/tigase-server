@@ -46,6 +46,7 @@ import tigase.server.Iq;
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.server.Permissions;
+import tigase.server.Priority;
 import tigase.server.ReceiverTimeoutHandler;
 import tigase.server.script.CommandIfc;
 import tigase.server.XMPPServer;
@@ -1443,9 +1444,10 @@ public class SessionManager
 			conn.authorizeJID(user_id, false);
 			if (conn.isAuthorized()) {
 				handleLogin(user_id, conn);
-				if (resource != null) {
-					conn.setResource(resource);
+				if ( resource == null ){
+					resource = UUID.randomUUID().toString();
 				}
+				conn.setResource( resource );
 			} else {
 				connectionsByFrom.remove(conn_id);
 
@@ -1661,10 +1663,29 @@ public class SessionManager
 
 		case USER_STATUS :
 			try {
-				if (isTrusted(iqc.getStanzaFrom()) || isTrusted(iqc.getStanzaFrom()
-						.getDomain())) {
+			final boolean isTrusted = isTrusted(iqc.getStanzaFrom())
+															|| isTrusted(iqc.getStanzaFrom().getDomain());
+				String pb = Command.getFieldValue( pc, "prebind" );
+				boolean prebind = ( ( pb != null ) && pb.equalsIgnoreCase( "true" ) );
+
+				if (prebind || isTrusted) {
 					String  av        = Command.getFieldValue(pc, "available");
 					boolean available = !((av != null) && av.equalsIgnoreCase("false"));
+
+					JID user_jid = JID.jidInstance( Command.getFieldValue( iqc, "jid" ) );
+
+					if ( prebind ){
+						String id = Command.getFieldValue( pc, "session-id" );
+						if ( id == null ){
+							id = UUID.randomUUID().toString();
+						}
+
+						loginUserSession( iqc.getStanzaFrom(), user_jid.getDomain(),
+															user_jid.getBareJID(), user_jid.getResource(),
+															id, false );
+						fastAddOutPacket( iqc.okResult( (String) null, 0 ) );
+
+					}
 
 					if (available) {
 						Packet  presence = null;
@@ -1681,9 +1702,7 @@ public class SessionManager
 							presence = Packet.packetInstance(elem);
 						}
 						connection = connectionsByFrom.get(iqc.getStanzaFrom());
-						if (connection == null) {
-							JID user_jid = JID.jidInstance(Command.getFieldValue(iqc, "jid"));
-
+						if (!prebind && connection == null) {
 							connection = loginUserSession(iqc.getStanzaFrom(), user_jid.getDomain(),
 									user_jid.getBareJID(), user_jid.getResource(), "USER_STATUS", false);
 							connection.putSessionData("jingle", "active");
@@ -2347,11 +2366,7 @@ public class SessionManager
 	 * @return a value of <code>boolean</code>
 	 */
 	protected boolean isTrusted(String jid) {
-		if (trusted.contains(jid)) {
-			return true;
-		}
-
-		return false;
+		return trusted.contains(jid);
 	}
 
 	//~--- methods --------------------------------------------------------------
