@@ -231,9 +231,8 @@ public class ConnectionOpenThread
 						}
 					} else {
 						log.log(Level.WARNING,
-								"Can't obtain socket channel from selection key, throttling activated = {0}, for port: {1}",
-								new Object[] { throttled,
-								port_no });
+								"Can not obtain socket channel from selection key, throttling activated = {0}, for port: {1}",
+								new Object[] { throttled, port_no });
 					}    // end of if (sc != null) else
 					++accept_counter;
 				}

@@ -474,7 +474,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 				// Is it at all possible to happen???
 				// let's log it for now....
-				log.log(Level.WARNING,
+				log.log(Level.FINE,
 						"{0}: Attempt to add different service with the same ID: {1}", new Object[] {
 						getName(),
 						service });

@@ -928,7 +928,7 @@ public class BoshSession {
 			}
 			handler.cancelTask(timer);
 		} else {
-			log.info("No waitTimer for the Bosh connection! " + serv);
+			log.fine("No waitTimer for the Bosh connection! " + serv);
 		}
 
 		Element body = body_par;
