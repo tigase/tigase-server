@@ -230,7 +230,7 @@ public class ConnectionOpenThread
 							al.accept(sc);
 						}
 					} else {
-						log.log(Level.WARNING,
+						log.log(Level.INFO,
 								"Can not obtain socket channel from selection key, throttling activated = {0}, for port: {1}",
 								new Object[] { throttled, port_no });
 					}    // end of if (sc != null) else
