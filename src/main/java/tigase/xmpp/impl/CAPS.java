@@ -45,6 +45,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.conf.Configurable;
 
 /**
  *
@@ -166,7 +167,11 @@ public class CAPS
 					}
 				} else if ((packet.getElemName() == Iq.ELEM_NAME) && ((packet.getType() ==
 						StanzaType.error) || (packet.getType() == StanzaType.result))) {
-					PresenceCapabilitiesManager.processCapsQueryResponse(packet);
+						String nick = packet.getStanzaTo().getLocalpart();
+
+						if ((nick == null) || Configurable.DEF_SM_NAME.equals(nick)) {
+							PresenceCapabilitiesManager.processCapsQueryResponse(packet);
+						}
 				}
 			} catch (NotAuthorizedException ex) {
 				Logger.getLogger(CAPS.class.getName()).log(Level.SEVERE, null, ex);
@@ -176,7 +181,11 @@ public class CAPS
 		} else if (((session == null) || session.isServerSession()) && (packet
 				.getElemName() == Iq.ELEM_NAME) && ((packet.getType() == StanzaType.error) ||
 				(packet.getType() == StanzaType.result))) {
-			PresenceCapabilitiesManager.processCapsQueryResponse(packet);
+			String nick = packet.getStanzaTo().getLocalpart();
+
+			if ((nick == null) || Configurable.DEF_SM_NAME.equals(nick)) {
+				PresenceCapabilitiesManager.processCapsQueryResponse(packet);
+			}
 		}
 	}
 
