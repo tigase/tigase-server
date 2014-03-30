@@ -73,6 +73,7 @@ import java.util.Map;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.TrustManager;
+import tigase.util.IOListener;
 
 /**
  * <code>IOService</code> offers thread safe
@@ -101,7 +102,8 @@ import javax.net.ssl.TrustManager;
  * @version $Rev$
  */
 public abstract class IOService<RefObject>
-				implements Callable<IOService<?>>, TLSEventHandler {
+				implements Callable<IOService<?>>, TLSEventHandler,
+				IOListener {
 	/**
 	 * Field description
 	 */
@@ -187,6 +189,7 @@ public abstract class IOService<RefObject>
 	private final ReentrantLock readInProgress  = new ReentrantLock();
 	private List<String>        peersJIDsFromCert;
 	private TrustManager[]      x509TrustManagers;
+	private int bufferLimit = 0;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -272,6 +275,11 @@ public abstract class IOService<RefObject>
 		return readLock
 				? this
 				: null;
+	}
+	
+	@Override
+	public boolean checkBufferLimit(int bufferSize) {
+		return (bufferLimit == 0 || bufferSize <= bufferLimit);
 	}
 
 	/**
@@ -455,6 +463,7 @@ public abstract class IOService<RefObject>
 			throw new IllegalStateException("ZLIB mode is already activated.");
 		}
 		socketIO = new ZLibIO(socketIO, level);
+		((ZLibIO) socketIO).setIOListener(this);
 	}
 
 	/**
@@ -751,6 +760,10 @@ public abstract class IOService<RefObject>
 
 	//~--- set methods ----------------------------------------------------------
 
+	public void setBufferLimit(int bufferLimit) {
+		this.bufferLimit = bufferLimit;
+	}
+	
 	/**
 	 * @param connectionId the connectionId to set
 	 */
@@ -1313,6 +1326,9 @@ public abstract class IOService<RefObject>
 
 			// int newSize = netSize + socketInput.capacity();
 			int newSize = socketInput.capacity() + socketInputSize;
+			if (!checkBufferLimit(bufferLimit)) {
+				throw new IOException("Input buffer size limit exceeded");
+			}
 
 			if (log.isLoggable(Level.FINE)) {
 				log.log(Level.FINE, "Socket: {0}, Resizing socketInput to {1} bytes.",

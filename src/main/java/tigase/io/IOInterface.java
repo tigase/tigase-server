@@ -24,6 +24,7 @@ package tigase.io;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.util.IOListener;
 import tigase.stats.StatisticsList;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -68,7 +69,7 @@ public interface IOInterface {
 	long getBuffOverflow(boolean reset);
 
 	long getTotalBuffOverflow();
-
+	
 	boolean isConnected();
 
 	boolean isRemoteAddress(String addr);
