@@ -24,15 +24,3 @@
 run 'database/derby-schema-4-schema.sql';
 -- QUERY END:
 
--- QUERY START:
-alter table tig_pairs ADD column pval2 CLOB;
--- QUERY END:
--- QUERY START:
-update tig_pairs set pval2=pval;
--- QUERY END:
--- QUERY START:
-alter table tig_pairs drop column pval;
--- QUERY END:
--- QUERY START:
-RENAME COLUMN tig_pairs.pval2 to pval;
--- QUERY END:

@@ -24,15 +24,3 @@
 run 'database/derby-schema-4-sp.sql';
 -- QUERY END:
 
--- QUERY START:
-drop procedure TigUpdatePairs;
--- QUERY END:
-
-
--- QUERY START:
-CREATE procedure TigUpdatePairs(nid bigint, uid bigint, tkey varchar(255), tval clob) 
-	PARAMETER STYLE JAVA
-	LANGUAGE JAVA
-	MODIFIES SQL DATA
-	EXTERNAL NAME 'tigase.db.derby.StoredProcedures.tigUpdatePairs';
--- QUERY END:
