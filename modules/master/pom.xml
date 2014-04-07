@@ -13,7 +13,7 @@
 
 	<groupId>tigase</groupId>
 	<artifactId>tigase-server-master</artifactId>
-	<version>5.2.1-SNAPSHOT</version>
+	<version>5.2.1</version>
 	
 	<name>Tigase XMPP Server Master project</name>
 
@@ -58,20 +58,19 @@
 
 	<modules>
 		<module>../../</module>
+		<module>../distribution</module>
+		<module>../izpack-installer</module>
 	</modules>
 
 	<profiles>
 		<profile>
 			<id>dist</id>
 			<activation>
+				<activeByDefault>true</activeByDefault>
 				<property>
 					<name>dist</name>
 				</property>
 			</activation>
-			<modules>
-				<module>../distribution</module>
-				<module>../izpack-installer</module>
-			</modules>
 			<properties>
 				<maven.javadoc.skip>false</maven.javadoc.skip>
 				<packaging.type>bundle</packaging.type>
