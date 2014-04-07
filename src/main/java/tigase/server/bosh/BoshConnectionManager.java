@@ -29,10 +29,7 @@ package tigase.server.bosh;
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Packet;
-import tigase.server.Presence;
 import tigase.server.ReceiverTimeoutHandler;
-
-import static tigase.server.bosh.Constants.*;
 import tigase.server.xmppclient.ClientConnectionManager;
 import tigase.server.xmppclient.SeeOtherHostIfc.Phase;
 
@@ -46,10 +43,9 @@ import tigase.xmpp.XMPPIOService;
 import tigase.stats.StatisticsList;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
-import tigase.xml.db.DBElement;
 
+import java.io.IOException;
 import java.util.ArrayDeque;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -60,6 +56,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.script.Bindings;
+
+import static tigase.server.bosh.Constants.*;
 
 /**
  * Describe class BoshConnectionManager here.
@@ -271,14 +269,19 @@ public class BoshConnectionManager
 						log.log(Level.INFO, "Invalid hostname. Closing invalid connection: {0}", p);
 						try {
 							serv.sendErrorAndStop(Authorization.NOT_ALLOWED, p, "Invalid hostname.");
-						} catch (Exception e) {
+						} catch (IOException e) {
 							log.log(Level.WARNING,
 									"Problem sending invalid hostname error for sid =  " + sid, e);
 						}
 					}
 				} else {
-					sid = UUID.fromString(sid_str);
-					bs  = sessions.get(sid);
+					try {
+						sid = UUID.fromString( sid_str );
+						bs = sessions.get( sid );
+					} catch ( IllegalArgumentException e ) {
+						log.log(Level.WARNING, "Problem processing socket data, sid =  " + sid_str
+																	 + " does not conform to the UUID string representation.", e);
+					}
 				}
 			}
 			try {
@@ -297,7 +300,7 @@ public class BoshConnectionManager
 					serv.sendErrorAndStop(Authorization.ITEM_NOT_FOUND, p, "Invalid SID");
 				}
 				addOutPackets(out_results, bs);
-			} catch (Exception e) {
+			} catch (IOException e) {
 				log.log(Level.WARNING, "Problem processing socket data for sid =  " + sid_str, e);
 			}
 
