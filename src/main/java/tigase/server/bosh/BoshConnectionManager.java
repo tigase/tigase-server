@@ -205,13 +205,13 @@ public class BoshConnectionManager
 
 		UUID sid = bs.getSid();
 		sessions.put( sid, bs );
-		attr.put( SID_ATTR, sid.toString());
+		attr.put( SID_ATTR, sid.toString() );
 
 		Packet p = null;
 		try {
 			Element el = new Element( "body" );
 			el.setAttributes( attr );
-			p = Packet.packetInstance( el);
+			p = Packet.packetInstance( el );
 		} catch ( TigaseStringprepException ex ) {
 			Logger.getLogger( BoshConnectionManager.class.getName() ).log( Level.SEVERE, null, ex );
 		}
@@ -219,6 +219,9 @@ public class BoshConnectionManager
 						 concurrent_requests, hold_requests, max_pause, max_batch_size,
 						 batch_queue_timeout, out_results, true );
 		addOutPackets( out_results, bs );
+
+		attr.put( "hostname", getDefHostName().toString() );
+
 		return attr;
 	}
 

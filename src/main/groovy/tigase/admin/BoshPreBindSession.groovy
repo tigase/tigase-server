@@ -39,6 +39,7 @@ def RID = "rid"
 def HOLD = "hold"
 def WAIT = "wait"
 def SID = "sid"
+def HOSTNAME = "hostname"
 
 def p = (Iq)packet
 
@@ -52,14 +53,14 @@ def rid = 0
 def hold = Command.getFieldValue(p,HOLD)
 def wait = Command.getFieldValue(p,WAIT)
 
-if (userJid == null) {
+if (userJid == null || userJid.isEmpty() ) {
 	def res = (Iq)p.commandResult(Command.DataType.form);
   Command.addTitle(res, "Pre-bind BOSH user session")
   Command.addInstructions(res, "Fill out this form to create and pre-bind BOSH user session.")
 
   Command.addFieldValue(res, "FORM_TYPE", "http://jabber.org/protocol/admin", "hidden")
 
-  Command.addFieldValue(res, USER_JID, p.getStanzaFrom().toString(), "jid-single", "JID of the user for which session should be created - either BareJID or FullJID, the former will result in randomly generated resource")
+  Command.addFieldValue(res, USER_JID, "", "jid-single", "JID of the user for which session should be created - either BareJID or FullJID, the former will result in randomly generated resource")
   Command.addFieldValue(res, HOLD, hold ?: "1","text-single", "HOLD value (optional)")
   Command.addFieldValue(res, WAIT, wait ?: "60","text-single", "WAIT value (optional)")
 
@@ -87,8 +88,10 @@ if (vhost == null ) {
 
 	rid = args.get(RID);
 	def sid = args.get(SID);
+	def hostname = args.get(HOSTNAME)
 
   Command.addFieldValue(result, USER_JID, userJid,"jid-single",  "JID")
+  Command.addFieldValue(result, HOSTNAME, hostname,"jid-single",  "hostname")
   Command.addFieldValue(result, RID, rid, "text-single", "RID")
   Command.addFieldValue(result, SID, sid, "text-single", "SID")
   Command.addFieldValue(result, HOLD, hold, "text-single", "HOLD")
