@@ -34,70 +34,77 @@ import tigase.db.*
 import tigase.xml.*
 import tigase.vhosts.*
 
-def USER_JID = "from";
-def RID = "rid"
-def HOLD = "hold"
-def WAIT = "wait"
-def SID = "sid"
-def HOSTNAME = "hostname"
+try {
 
-def p = (Iq)packet
+	def USER_JID = "from";
+	def RID = "rid"
+	def HOLD = "hold"
+	def WAIT = "wait"
+	def SID = "sid"
+	def HOSTNAME = "hostname"
 
-def vhost_man = (VHostManagerIfc)vhostMan
-def admins = (Set)adminsSet
-def stanzaFromBare = p.getStanzaFrom().getBareJID()
-def isServiceAdmin = admins.contains(stanzaFromBare)
+	def p = (Iq)packet
 
-def userJid = Command.getFieldValue(p, USER_JID)
-def rid = 0
-def hold = Command.getFieldValue(p,HOLD)
-def wait = Command.getFieldValue(p,WAIT)
+	def vhost_man = (VHostManagerIfc)vhostMan
+	def admins = (Set)adminsSet
+	def stanzaFromBare = p.getStanzaFrom().getBareJID()
+	def isServiceAdmin = admins.contains(stanzaFromBare)
 
-if (userJid == null || userJid.isEmpty() ) {
-	def res = (Iq)p.commandResult(Command.DataType.form);
-  Command.addTitle(res, "Pre-bind BOSH user session")
-  Command.addInstructions(res, "Fill out this form to create and pre-bind BOSH user session.")
+	def userJid = Command.getFieldValue(p, USER_JID)
+	def rid = 0
+	def hold = Command.getFieldValue(p,HOLD)
+	def wait = Command.getFieldValue(p,WAIT)
 
-  Command.addFieldValue(res, "FORM_TYPE", "http://jabber.org/protocol/admin", "hidden")
+	if (userJid == null || userJid.isEmpty() ) {
+		def res = (Iq)p.commandResult(Command.DataType.form);
+		Command.addTitle(res, "Pre-bind BOSH user session")
+		Command.addInstructions(res, "Fill out this form to create and pre-bind BOSH user session.")
 
-  Command.addFieldValue(res, USER_JID, "", "jid-single", "JID of the user for which session should be created - either BareJID or FullJID, the former will result in randomly generated resource")
-  Command.addFieldValue(res, HOLD, hold ?: "1","text-single", "HOLD value (optional)")
-  Command.addFieldValue(res, WAIT, wait ?: "60","text-single", "WAIT value (optional)")
+		Command.addFieldValue(res, "FORM_TYPE", "http://jabber.org/protocol/admin", "hidden")
 
-	return res
-}
+		Command.addFieldValue(res, USER_JID, "", "jid-single", "JID of the user for which session should be created - either BareJID or FullJID, the former will result in randomly generated resource")
+		Command.addFieldValue(res, HOLD, hold ?: "1","text-single", "HOLD value (optional)")
+		Command.addFieldValue(res, WAIT, wait ?: "60","text-single", "WAIT value (optional)")
 
-bareJID = BareJID.bareJIDInstance(userJid)
-VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
-
-def result = (Iq)p.commandResult(Command.DataType.result)
-
-if (vhost == null ) {
-	Command.addTextField(result, "Error", "Domain of the JID doesn't exists");
-} else if (isServiceAdmin ||
-	(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
-
-	Map args = new HashMap();
-	if (userJid != null && !userJid.isEmpty()) {
-		args.put(USER_JID,userJid)
+		return res
 	}
-	if (hold != null && !hold.isEmpty()) args.put(HOLD,hold)
-	if (wait != null && !wait.isEmpty()) args.put(WAIT,wait)
 
-	args = boshCM.preBindSession(args)
+	bareJID = BareJID.bareJIDInstance(userJid)
+	VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
 
-	rid = args.get(RID);
-	def sid = args.get(SID);
-	def hostname = args.get(HOSTNAME)
+	def result = (Iq)p.commandResult(Command.DataType.result)
 
-  Command.addFieldValue(result, USER_JID, userJid,"jid-single",  "JID")
-  Command.addFieldValue(result, HOSTNAME, hostname,"jid-single",  "hostname")
-  Command.addFieldValue(result, RID, rid, "text-single", "RID")
-  Command.addFieldValue(result, SID, sid, "text-single", "SID")
-  Command.addFieldValue(result, HOLD, hold, "text-single", "HOLD")
-  Command.addFieldValue(result, WAIT, wait, "text-single", "WAIT")
-} else {
-	Command.addTextField(result, "Error", "You do not have enough permissions");
-}
-return result
+	if (vhost == null ) {
+		Command.addTextField(result, "Error", "Domain of the JID doesn't exists");
+	} else if (isServiceAdmin ||
+		(vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
 
+		Map args = new HashMap();
+		if (userJid != null && !userJid.isEmpty()) {
+			args.put(USER_JID,userJid)
+		}
+		if (hold != null && !hold.isEmpty()) args.put(HOLD,hold)
+		if (wait != null && !wait.isEmpty()) args.put(WAIT,wait)
+
+		args = boshCM.preBindSession(args)
+
+		rid = args.get(RID);
+		def sid = args.get(SID);
+		def hostname = args.get(HOSTNAME)
+
+		if (hostname != null ) {
+		Command.addFieldValue(result, USER_JID, userJid,"jid-single",  "JID")
+		Command.addFieldValue(result, HOSTNAME, hostname,"jid-single",  "hostname")
+		Command.addFieldValue(result, RID, rid, "text-single", "RID")
+		Command.addFieldValue(result, SID, sid, "text-single", "SID")
+		Command.addFieldValue(result, HOLD, hold, "text-single", "HOLD")
+		Command.addFieldValue(result, WAIT, wait, "text-single", "WAIT")
+		} else {
+			Command.addTextField(result, "Error", "Error processing request, provided data is invalid");
+		}
+	} else {
+		Command.addTextField(result, "Error", "You do not have enough permissions");
+	}
+	return result
+
+}  catch (Exception ex) { ex.printStackTrace(); }
