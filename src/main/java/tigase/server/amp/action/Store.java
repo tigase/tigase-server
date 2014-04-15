@@ -68,10 +68,13 @@ public class Store
 	private Thread expiredProcessor          = null;
 	private MsgRepository repo               = null;
 	private final SimpleDateFormat formatter;
+	private final SimpleDateFormat formatter2;
 
 	{
-		this.formatter = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" );
-		this.formatter.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+		formatter = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" );
+		formatter.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+		formatter2 = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss'Z'" );
+		formatter2.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -102,17 +105,28 @@ public class Store
 				removeExpireAtRule(packet);
 				rule = null;
 			}
-			synchronized (formatter) {
-				if (rule != null) {
-					try {
-						expired = formatter.parse(rule.getAttributeStaticStr("value"));
-					} catch (Exception e) {
-						log.log(Level.INFO,
-										"Incorrect expire-at value: " + rule.getAttributeStaticStr("value"),
-										e);
-						expired = null;
+			if (rule != null) {
+				try {
+					String value = rule.getAttributeStaticStr("value");
+					if (value != null) {
+						if (value.contains(".")) {
+							synchronized (formatter) {
+								expired = formatter.parse(value);
+							}
+						} else {
+							synchronized (formatter2) {
+								expired = formatter2.parse(value);
+							}
+						}
 					}
+				} catch (Exception e) {
+					log.log(Level.INFO,
+									"Incorrect expire-at value: " + rule.getAttributeStaticStr("value"),
+									e);
+					expired = null;
 				}
+			}
+			synchronized (formatter) {
 				stamp = formatter.format(new Date());
 			}
 			removeTigasePayload(packet);
@@ -153,7 +167,7 @@ public class Store
 		String db_uri            = (String) params.get(AMP_MSG_REPO_URI_PARAM);
 
 		if (db_uri == null) {
-			db_uri = (String) params.get(RepositoryFactory.USER_REPO_URL_PROP_KEY);
+			db_uri = (String) params.get(RepositoryFactory.GEN_USER_DB_URI);
 		}
 		if (db_uri != null) {
 			defs.put(AMP_MSG_REPO_URI_PROP_KEY, db_uri);
@@ -215,7 +229,7 @@ public class Store
 				repo = null;
 				log.log(Level.WARNING, "Problem initializing connection to DB: ", ex);
 			}
-		}
+		}	
 		if ((repo != null) && (expiredProcessor == null)) {
 			expiredProcessor = new Thread("expired-processor") {
 				@Override
