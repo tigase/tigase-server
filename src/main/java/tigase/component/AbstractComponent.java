@@ -234,6 +234,13 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 		}
 	}
 
+	/**
+	 * Is this component discoverable by disco#items for domain by non admin users
+	 * 
+	 * @return true - if yes
+	 */
+	public abstract boolean isDiscoNonAdmin();
+	
 	public boolean isRegistered(final String id) {
 		return this.modulesManager.isRegistered(id);
 	}
@@ -375,4 +382,10 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 			log.log(Level.WARNING, "Can't initialize modules!", e);
 		}
 	}
+	
+	@Override
+	public void updateServiceEntity() {
+		super.updateServiceEntity();
+		this.updateServiceDiscoveryItem(getName(), null, getDiscoDescription(), !isDiscoNonAdmin());
+	}	
 }
