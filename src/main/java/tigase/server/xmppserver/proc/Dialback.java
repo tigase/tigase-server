@@ -102,6 +102,11 @@ public class Dialback
 
 	// ~--- methods --------------------------------------------------------------
 
+	@Override
+	public int order() {
+		return Order.Dialback.ordinal();
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -204,13 +209,23 @@ public class Dialback
 						log.log(Level.INFO, "{0}, Incorrect remote hostname name, packet: {1}",
 										new Object[] { serv,
 																	 p });
-						serv.forceStop();
+						serv.stop();
 					}
 
 					return true;
 				}
 			}
 
+			// we need to check if TLS is required
+			if (!skipTLS && cid != null && !serv.getSessionData().containsKey("TLS") 
+					&& handler.isTlsRequired(cid.getLocalHost())) {
+				log.log(Level.FINER, "{0}, TLS is required for domain {1} but STARTTLS was not "
+						+ "offered by {2} - policy-violation", new Object[] { serv, 
+							cid.getLocalHost(), cid.getRemoteHost() });
+				serv.forceStop();
+				return true;
+			}
+			
 			// Nothing else can be done right now except the dialback
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "{0}, Initializing dialback, packet: {1}",
@@ -288,19 +303,11 @@ public class Dialback
 	private void initDialback(S2SIOService serv, String remote_id) {
 		try {
 			CID cid                  = (CID) serv.getSessionData().get("cid");
-			CIDConnections cid_conns = handler.getCIDConnections(cid, false);
 
-			// It must be always set for connect connection type
-			String uuid = UUID.randomUUID().toString();
-			String key  = null;
+			String secret = handler.getSecretForDomain(cid.getLocalHost());
+			String key = Algorithms.generateDialbackKey(cid.getLocalHost(), cid.getRemoteHost(), 
+                                        secret, remote_id);
 
-			try {
-				key = Algorithms.hexDigest(remote_id, uuid, "SHA");
-			} catch (NoSuchAlgorithmException e) {
-				key = uuid;
-			}    // end of try-catch
-			serv.setDBKey(key);
-			cid_conns.addDBKey(remote_id, key);
 			if (!serv.isHandshakingOnly()) {
 				Element elem = new Element(DB_RESULT_EL_NAME, key, new String[] { XMLNS_DB_ATT },
 																	 new String[] { XMLNS_DB_VAL });
@@ -313,8 +320,6 @@ public class Dialback
 			serv.getS2SConnection().sendAllControlPackets();
 		} catch (NotLocalhostException ex) {
 			generateStreamError(false, "host-unknown", serv);
-		} catch (LocalhostException ex) {
-			generateStreamError(false, "invalid-from", serv);
 		}
 	}
 
@@ -372,10 +377,22 @@ public class Dialback
 		// Dummy dialback implementation for now....
 		if ((p.getElemName() == RESULT_EL_NAME) || (p.getElemName() == DB_RESULT_EL_NAME)) {
 			if (p.getType() == null) {
-				String conn_sessionId = serv.getSessionId();
-
-				handler.sendVerifyResult(DB_VERIFY_EL_NAME, cid_main, cid_packet, null,
+				CID cid = (CID) serv.getSessionData().get("cid");
+				boolean skipTls = this.skipTLSForHost(cid.getRemoteHost());
+				if (!skipTls && !serv.getSessionData().containsKey("TLS") && handler.isTlsRequired(cid.getLocalHost())) {
+					log.log(Level.FINER, "{0}, rejecting S2S connection from {1} to {2} due to policy violation - STARTTLS is required",
+							new Object[] { serv, cid.getRemoteHost(), cid.getLocalHost() });
+					handler.sendVerifyResult(DB_RESULT_EL_NAME, cid_main, cid_packet, false, null, serv.getSessionId(), 
+							null, false, new Element("error", new Element[] {
+								new Element("policy-violation", new String[] { "xmlns" },
+										new String[] { "urn:ietf:params:xml:ns:xmpp-stanzas" } )},
+									new String[] { "type" }, new String[] { "cancel" } ));
+				}
+				else {
+					String conn_sessionId = serv.getSessionId();
+					handler.sendVerifyResult(DB_VERIFY_EL_NAME, cid_main, cid_packet, null,
 																 conn_sessionId, null, p.getElemCData(), true);
+				}
 			} else {
 				if (p.getType() == StanzaType.valid) {
 					if (wasResultRequested(serv, p.getStanzaFrom().toString())) {
@@ -401,23 +418,29 @@ public class Dialback
 			}
 		}
 		if ((p.getElemName() == VERIFY_EL_NAME) || (p.getElemName() == DB_VERIFY_EL_NAME)) {
-			if (p.getType() == null) {
-				String local_key = handler.getLocalDBKey(cid_main, cid_packet, remote_key,
-														 p.getStanzaId(), serv.getSessionId());
+			if (p.getType() == null) {                          
+				boolean result;
+				try {
+					String secret = handler.getSecretForDomain(cid_packet.getLocalHost());                                
+					String local_key = Algorithms.generateDialbackKey(cid_packet.getLocalHost(), 
+                                                cid_packet.getRemoteHost(), secret, p.getStanzaId());
 
-				if (local_key == null) {
-					if (log.isLoggable(Level.FINER)) {
-						log.log(Level.FINER,
-										"The key is not available for connection CID: {0}, " +
-										"or the packet CID: {1} maybe it is " +
-										"located on a different node...", new Object[] { cid_main,
-										cid_packet });
+					if (local_key == null) {
+						if (log.isLoggable(Level.FINER)) {
+							log.log(Level.FINER, "The key is not available for connection CID: {0}, "
+									+ "or the packet CID: {1} ", new Object[] { cid_main, cid_packet });
+						}
 					}
-				} else {
-					handler.sendVerifyResult(DB_VERIFY_EL_NAME, cid_main, cid_packet,
-																	 local_key.equals(remote_key), p.getStanzaId(),
-																	 serv.getSessionId(), null, false);
+					result = local_key != null && local_key.equals(remote_key);
 				}
+				catch (NotLocalhostException ex) {
+					if (log.isLoggable(Level.FINER)) {
+						log.log(Level.FINER, "Could not retreive secret for " + cid_packet.getLocalHost(), ex);
+					}
+					result = false;
+				}
+				handler.sendVerifyResult(DB_VERIFY_EL_NAME, cid_main, cid_packet,
+						result , p.getStanzaId(), serv.getSessionId(), null, false);
 			} else {
 				if (wasVerifyRequested(serv, p.getStanzaFrom().toString())) {
 					handler.sendVerifyResult(DB_RESULT_EL_NAME, cid_main, cid_packet,

@@ -210,6 +210,33 @@ public class XMPPIOService<RefObject>
 		waitingPackets.offer(packet);
 	}
 
+	@Override
+	public boolean checkBufferLimit(int bufferSize) {
+		if (!super.checkBufferLimit(bufferSize)) {
+			try {
+				writeRawData("<stream:error>" + "<policy-violation "
+						+ "xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
+						+ "</stream:error></stream:stream>");
+				int counter = 0;
+
+				while (isConnected() && waitingToSend() && (++counter < 10)) {
+					writeData(null);
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException ex) {
+					}
+				}
+			}
+			catch (IOException ex) {
+				log.log(Level.FINEST, "{0}, Exception sending policy-violation stream error", 
+						new Object[]{toString()});
+			}
+			this.forceStop();
+			return false;
+		}
+		return true;
+	}	
+	
 	/**
 	 *
 	 * @param data

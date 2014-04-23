@@ -208,6 +208,15 @@ public class BoshSession {
 			inactivityTimer = handler.scheduleTask(this, max_inactivity * SECOND);
 		}
 	}
+	public void init(Packet packet, BoshIOService service, long max_wait, long min_polling,
+			long max_inactivity, int concurrent_requests, int hold_requests, long max_pause,
+			int max_batch_size, long batch_queue_timeout, Queue<Packet> out_results) {
+
+		init( packet, service, max_wait, min_polling, max_inactivity,
+					concurrent_requests, hold_requests, max_pause, max_batch_size,
+					batch_queue_timeout, out_results, false );
+	}
+
 
 	/**
 	 * Method description
@@ -225,9 +234,10 @@ public class BoshSession {
 	 * @param batch_queue_timeout
 	 * @param out_results
 	 */
-	public void init(Packet packet, BoshIOService service, long max_wait, long min_polling,
+	protected void init(Packet packet, BoshIOService service, long max_wait, long min_polling,
 			long max_inactivity, int concurrent_requests, int hold_requests, long max_pause,
-			int max_batch_size, long batch_queue_timeout, Queue<Packet> out_results) {
+			int max_batch_size, long batch_queue_timeout, Queue<Packet> out_results,
+			boolean preBindEnabled) {
 		String cache_action = packet.getAttributeStaticStr(CACHE_ATTR);
 
 		if ((cache_action != null) && cache_action.equals(CacheAction.on.toString())) {
@@ -291,17 +301,16 @@ public class BoshSession {
 		if (lang == null) {
 			lang = "en";
 		}
-		service.setContentType(content_type);
 
 		Element body = new Element(BODY_EL_NAME, new String[] {
 			WAIT_ATTR, INACTIVITY_ATTR, POLLING_ATTR, REQUESTS_ATTR, HOLD_ATTR, MAXPAUSE_ATTR,
 			SID_ATTR, VER_ATTR, FROM_ATTR, SECURE_ATTR, "xmpp:version", "xmlns:xmpp",
 			"xmlns:stream", HOST_ATTR
 		}, new String[] {
-			Long.valueOf(this.max_wait).toString(),
-			Long.valueOf(this.max_inactivity).toString(),
-			Long.valueOf(this.min_polling).toString(),
-			Integer.valueOf(this.concurrent_requests).toString(),
+			Long.toString(this.max_wait),
+			Long.toString(this.max_inactivity),
+			Long.toString(this.min_polling),
+			Integer.toString(this.concurrent_requests),
 			Integer.valueOf(this.hold_requests).toString(),
 			Long.valueOf(this.max_pause).toString(), this.sid.toString(), BOSH_VERSION,
 			this.domain, "true", "1.0", "urn:xmpp:xbosh", "http://etherx.jabber.org/streams",
@@ -313,13 +322,14 @@ public class BoshSession {
 		if (getCurrentRidTail() > 0) {
 			body.setAttribute(ACK_ATTR, "" + takeCurrentRidTail());
 		}
+		JID userId = null;
 		try {
-			BareJID userId = (packet.getAttributeStaticStr(Packet.FROM_ATT) != null)
-					? BareJID.bareJIDInstance(packet.getAttributeStaticStr(Packet.FROM_ATT))
+			userId = (packet.getAttributeStaticStr(Packet.FROM_ATT) != null)
+					? JID.jidInstance(packet.getAttributeStaticStr(Packet.FROM_ATT))
 					: null;
 
 			if (userId != null) {
-				BareJID hostJid = handler.getSeeOtherHostForJID(userId, Phase.OPEN);
+				BareJID hostJid = handler.getSeeOtherHostForJID(userId.getBareJID(), Phase.OPEN);
 
 				if (hostJid != null) {
 					Element error        = new Element("stream:error");
@@ -334,15 +344,36 @@ public class BoshSession {
 			Logger.getLogger(BoshSession.class.getName()).log(Level.SEVERE, null, ex);
 		}
 		body.setXMLNS(BOSH_XMLNS);
-		sendBody(service, body);
+		// we are just doing session pre-bind, ignore sending back
+
 
 		// service.writeRawData(body.toString());
 		Packet streamOpen = Command.STREAM_OPENED.getPacket(null, null, StanzaType.set, UUID
 				.randomUUID().toString(), Command.DataType.submit);
 
-		Command.addFieldValue(streamOpen, "session-id", sessionId);
+		Command.addFieldValue(streamOpen, SESSION_ID_ATTR, sessionId);
 		Command.addFieldValue(streamOpen, "hostname", domain);
 		Command.addFieldValue(streamOpen, LANG_ATTR, lang);
+
+		if (null != service ) {
+			service.setContentType(content_type);
+			sendBody(service, body);
+		}
+		if ( preBindEnabled ){
+
+			inactivityTimer = handler.scheduleTask(this, max_inactivity * SECOND);
+			
+			if ( null != userId ){
+				Command.addFieldValue( streamOpen, USER_ID_ATTR, userId.toString() );
+			}
+			String ridString = packet.getAttributeStaticStr( RID_ATTR );
+			if ( null != ridString ){
+				long rid = Long.valueOf( ridString );
+				processRid( rid, null );
+			}
+			Command.addFieldValue( streamOpen, PRE_BIND_ATTR, String.valueOf( preBindEnabled ) );
+		}
+
 		handler.addOutStreamOpen(streamOpen, this);
 
 		// out_results.offer(streamOpen);
@@ -928,7 +959,7 @@ public class BoshSession {
 			}
 			handler.cancelTask(timer);
 		} else {
-			log.info("No waitTimer for the Bosh connection! " + serv);
+			log.fine("No waitTimer for the Bosh connection! " + serv);
 		}
 
 		Element body = body_par;

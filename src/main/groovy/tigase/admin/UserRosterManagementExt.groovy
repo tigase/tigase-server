@@ -142,22 +142,27 @@ try {
 			}
 			rosterUtil.updateBuddyChange(conn, results, item)
 		} else if (i_original_node) {
-			// Update offline and only on original node
-			String rosterStr = repository.getData(jid.getBareJID(), null, RosterAbstract.ROSTER, null) ?: ""
-			Map<BareJID, RosterElement> roster = new LinkedHashMap<BareJID, RosterElement>()
-			RosterFlat.parseRosterUtil(rosterStr, roster, null)
-			if (remove_item) {
-				roster.remove(i_jid.getBareJID())
-			} else {
-				RosterElement rel = new RosterElement(i_jid, i_name, i_groups ? i_groups.split(",") : null, null)
-				rel.setSubscription(RosterAbstract.SubscriptionType.valueOf(i_subscr))
-				rel.setPersistent(true);
-				roster.put(i_jid, rel)
+			// We need to synchronize on some object (ie. on UserRepository instance) to fix issue with
+			// race condition when we modify roster of user which is offline
+			// Is there a better object to use for synchronization?
+			synchronized (repository) {
+				// Update offline and only on original node
+				String rosterStr = repository.getData(jid.getBareJID(), null, RosterAbstract.ROSTER, null) ?: ""
+				Map<BareJID, RosterElement> roster = new LinkedHashMap<BareJID, RosterElement>()
+				RosterFlat.parseRosterUtil(rosterStr, roster, null)
+				if (remove_item) {
+					roster.remove(i_jid.getBareJID())
+				} else {
+					RosterElement rel = new RosterElement(i_jid, i_name, i_groups ? i_groups.split(",") : null, null)
+					rel.setSubscription(RosterAbstract.SubscriptionType.valueOf(i_subscr))
+					rel.setPersistent(true);
+					roster.put(i_jid, rel)
+				}
+				StringBuilder sb = new StringBuilder(200)
+				for (RosterElement relem: roster.values())
+				sb.append(relem.getRosterElement().toString())
+				repository.setData(jid.getBareJID(), null, RosterAbstract.ROSTER, sb.toString());
 			}
-			StringBuilder sb = new StringBuilder(200)
-			for (RosterElement relem: roster.values())
-			sb.append(relem.getRosterElement().toString())
-			repository.setData(jid.getBareJID(), null, RosterAbstract.ROSTER, sb.toString());
 		}
 	}
 

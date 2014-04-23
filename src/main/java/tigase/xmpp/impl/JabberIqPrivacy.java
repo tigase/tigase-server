@@ -89,7 +89,6 @@ public class JabberIqPrivacy
 	private static final String    PRESENCE_EL_NAME     = "presence";
 	private static final String    PRESENCE_IN_EL_NAME  = "presence-in";
 	private static final String    PRESENCE_OUT_EL_NAME = "presence-out";
-	private static final String    PRIVACY_INIT_KEY     = "privacy-init";
 	private static final String    XMLNS                = "jabber:iq:privacy";
 	private static final String    ID                   = XMLNS;
 	private static final String[]  XMLNSS               = { XMLNS };
@@ -308,22 +307,11 @@ public class JabberIqPrivacy
 
 			Element list = Privacy.getActiveList(session);
 
-			if ((list == null) && (session.getSessionData(PRIVACY_INIT_KEY) == null)) {
-
-				// First mark the session as privacy lists loaded for it, this way if there
-				// is an exception thrown during database call for this user we won't
-				// call it again for the same user.
-				session.putSessionData(PRIVACY_INIT_KEY, "");
-
-				String lName = Privacy.getDefaultList(session);
-
-				if (lName != null) {
-					Privacy.setActiveList(session, lName);
-					list = Privacy.getActiveList(session);
-				}                // end of if (lName != null)
+			if ((list == null) ) {
+				list = Privacy.getDefaultList( session );
 			}                  // end of if (lName == null)
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Active privcy list: {0}", list);
+				log.log(Level.FINEST, "Using privcy list: {0}", list);
 			}
 			if (list != null) {
 				List<Element> items = list.getChildren();
@@ -455,6 +443,11 @@ public class JabberIqPrivacy
 					}          // end of for (Element item: items)
 				}            // end of if (items != null)
 			}              // end of if (lName != null)
+			// there is no active nor default list, as per XEP-0016 2.2 Business rules
+			// such stanza should be processed normally
+			else {
+				return true;
+			}
 		} catch (NoConnectionIdException e) {
 
 			// Always allow, this is server dummy session
@@ -484,7 +477,7 @@ public class JabberIqPrivacy
 					sblists.append("<list name=\"").append(list).append("\"/>");
 				}
 
-				String list = Privacy.getDefaultList(session);
+				String list = Privacy.getDefaultListName(session);
 
 				if (list != null) {
 					sblists.append("<default name=\"").append(list).append("\"/>");
@@ -537,7 +530,8 @@ public class JabberIqPrivacy
 				List<Element> items = child.getChildren();
 
 				if ((items == null) || items.isEmpty()) {
-					boolean inUse = name.equals(getDefaultList(session));
+					// if the list is in use then forbid changes
+					boolean inUse = name.equals(getDefaultListName(session));
 
 					if (!inUse) {
 						for (XMPPResourceConnection activeSession : session.getActiveSessions()) {
@@ -562,6 +556,10 @@ public class JabberIqPrivacy
 								Privacy.setActiveList(activeSession, name);
 							}
 						}
+						// update default list
+						if (name.equals( Privacy.getDefaultListName( session))) {
+							Privacy.setDefaultList( session, child );
+						}
 						results.offer(packet.okResult((String) null, 0));
 					} else {
 						results.offer(error.getResponseMessage(packet, null, true));
@@ -569,8 +567,19 @@ public class JabberIqPrivacy
 				}
 			}      // end of if (child.getName().equals("list))
 			if (child.getName() == DEFAULT_EL_NAME) {
-				Privacy.setDefaultList(session, child);
-				results.offer(packet.okResult((String) null, 0));
+
+				// User selects a different default list
+				String  listName = child.getAttributeStaticStr(NAME);
+				Element list     = Privacy.getList(session, listName);
+
+				if ((listName != null) && (list == null)) {
+					results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
+							"Selected list was not found on the server", true));
+				} else {
+					// This is either declining of default list use or setting a new default list
+					Privacy.setDefaultList( session, list );
+					results.offer(packet.okResult((String) null, 0));
+				}
 			}      // end of if (child.getName().equals("list))
 			if (child.getName() == ACTIVE_EL_NAME) {
 
@@ -580,7 +589,7 @@ public class JabberIqPrivacy
 
 				if ((listName != null) && (list == null)) {
 					results.offer(Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
-							"Selected list not found on the server", true));
+							"Selected list was not found on the server", true));
 				} else {
 
 					// This is either declining of active list use or setting a new active list

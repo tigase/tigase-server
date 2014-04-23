@@ -24,23 +24,14 @@ package tigase.server.xmppserver;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.io.TLSEventHandler;
-
-import tigase.server.Packet;
-
-import tigase.xml.Element;
-
-import tigase.xmpp.BareJID;
-import tigase.xmpp.XMPPIOService;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.TimerTask;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import tigase.server.Packet;
+import tigase.xml.Element;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.XMPPIOService;
 
 //~--- interfaces -------------------------------------------------------------
 
@@ -76,17 +67,22 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 			throws NotLocalhostException, LocalhostException;
 
 	BareJID getDefHostName();
-
-	String getLocalDBKey(CID cid, CID keyCid, String remote_key, String stanzaId, String sessionId);
-
+       
+    String getSecretForDomain(String domain) throws NotLocalhostException;
+	
 	//~--- methods --------------------------------------------------------------
 
 	void initNewConnection(Map<String, Object> port_props);
 
+	boolean isTlsRequired(String domain);
+        
 	boolean isTlsWantClientAuthEnabled();
 	
 	boolean sendVerifyResult(String elem_name, CID connCid, CID keyCid, Boolean valid,
 			String key_sessionId, String serv_sessionId, String cdata, boolean handshakingOnly);
+
+	boolean sendVerifyResult(String elem_name, CID connCid, CID keyCid, Boolean valid,
+			String key_sessionId, String serv_sessionId, String cdata, boolean handshakingOnly, Element errorElem);
 
 	boolean writePacketToSocket(IO serv, Packet packet);
 

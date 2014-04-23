@@ -111,6 +111,14 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	/** Field description */
 	protected static final int NET_BUFFER_ST_PROP_VAL = 2 * 1024;
 
+	/** Field description */
+	protected static final int NET_BUFFER_LIMIT_HT_PROP_VAL = 20*1024*1024;
+	
+	/** Field description */
+	protected static final String NET_BUFFER_LIMIT_PROP_KEY= "net-buffer-limit";
+	
+	/** Field description */
+	protected static final int NET_BUFFER_LIMIT_ST_PROP_VAL = 2*1024*1024;	
 	/**
 	 * Key name of the system property for configuration protection
 	 * from system overload and DOS attack.
@@ -228,6 +236,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			LAST_MINUTE_PACKETS_LIMIT_PROP_VAL;
 	private long                      last_minute_bin_limit =
 			LAST_MINUTE_BIN_LIMIT_PROP_VAL;
+	private int net_buffer_limit = 0;
 	private IOServiceStatisticsGetter ioStatsGetter = new IOServiceStatisticsGetter();
 	private boolean                   initializationCompleted = false;
 
@@ -474,7 +483,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 				// Is it at all possible to happen???
 				// let's log it for now....
-				log.log(Level.WARNING,
+				log.log(Level.FINE,
 						"{0}: Attempt to add different service with the same ID: {1}", new Object[] {
 						getName(),
 						service });
@@ -668,6 +677,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				getDefTrafficThrottling(), TRAFFIC_THROTTLING_PROP_KEY, String.class, params,
 				props);
 
+		props.put(NET_BUFFER_LIMIT_PROP_KEY, isHighThroughput()
+				? NET_BUFFER_LIMIT_HT_PROP_VAL : NET_BUFFER_LIMIT_ST_PROP_VAL);
+		
 		if ( params.get( "--" + ELEMENTS_NUMBER_LIMIT_PROP_KEY ) != null ){
 			elements_number_limit = Integer.valueOf( (String)params.get( "--" + ELEMENTS_NUMBER_LIMIT_PROP_KEY ) );
 		} else {
@@ -834,6 +846,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		}
 		if (props.get(NET_BUFFER_PROP_KEY) != null) {
 			net_buffer = (Integer) props.get(NET_BUFFER_PROP_KEY);
+		}
+		if (props.get(NET_BUFFER_LIMIT_PROP_KEY) != null) {
+			net_buffer_limit = (Integer) props.get(NET_BUFFER_LIMIT_PROP_KEY);
 		}
 		if (props.get(TRAFFIC_THROTTLING_PROP_KEY) != null) {
 			String[] tmp = ((String) props.get(TRAFFIC_THROTTLING_PROP_KEY)).split(",");
@@ -1318,6 +1333,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			}
 
 			IO serv = getXMPPIOServiceInstance();
+			serv.setBufferLimit( net_buffer_limit );
 
 			( (XMPPDomBuilderHandler) serv.getSessionData().get( DOM_HANDLER ) ).setElementsLimit( elements_number_limit );
 

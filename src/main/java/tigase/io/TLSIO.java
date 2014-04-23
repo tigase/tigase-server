@@ -63,7 +63,7 @@ public class TLSIO implements IOInterface {
 	// ~--- fields ---------------------------------------------------------------
 
 	private IOInterface io = null;
-
+	
 	/**
 	 * <code>tlsInput</code> buffer keeps data decoded from tlsWrapper.
 	 */

@@ -26,29 +26,26 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.conf.Configurable;
-
-import tigase.server.Iq;
-import tigase.server.Packet;
-
-import tigase.xml.Element;
-
-import tigase.xmpp.JID;
-import tigase.xmpp.StanzaType;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.Arrays;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import tigase.conf.Configurable;
+import tigase.server.Iq;
+import tigase.server.Packet;
+import tigase.xml.Element;
+import tigase.xmpp.JID;
+import tigase.xmpp.StanzaType;
 
 /**
  * Class description
@@ -63,9 +60,9 @@ public class PresenceCapabilitiesManager {
 		Logger.getLogger(PresenceCapabilitiesManager.class.getName());
 
 	// Map<capsNode,Set<feature>>
-	private static Map<String, String[]> nodeFeatures = new ConcurrentHashMap<String,
-																												String[]>(250);
-	private static List<PresenceCapabilitiesListener> handlers =
+	private static final Map<String, String[]> nodeFeatures = new ConcurrentHashMap<String,String[]>(250);
+	private static final ConcurrentMap<String,Set<String>> featureNodes = new ConcurrentHashMap<String,Set<String>>(250);
+	private static final List<PresenceCapabilitiesListener> handlers =
 		new CopyOnWriteArrayList<PresenceCapabilitiesListener>();
 
 	//~--- set methods ----------------------------------------------------------
@@ -83,6 +80,17 @@ public class PresenceCapabilitiesManager {
 		}
 		Arrays.sort(features);
 		nodeFeatures.put(capsNode, features);
+		for (String feature : features) {
+			Set<String> caps = featureNodes.get(feature);
+			if (caps == null) {
+				Set<String> tmp = new CopyOnWriteArraySet<String>();
+				caps = featureNodes.putIfAbsent(feature, tmp);
+				if (caps == null) {
+					caps = tmp;
+				}
+			}
+			caps.add(capsNode);
+		}
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -97,6 +105,15 @@ public class PresenceCapabilitiesManager {
 	 */
 	public static String[] getNodeFeatures(String capsNode) {
 		return nodeFeatures.get(capsNode);
+	}
+	
+	public static Set<String> getNodesWithFeature(String feature) {
+		Set<String> nodes = featureNodes.get(feature);
+		if (nodes == null) {
+			return Collections.emptySet();
+		} else {
+			return Collections.unmodifiableSet(nodes);
+		}
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -262,9 +279,6 @@ public class PresenceCapabilitiesManager {
 
 		// No need for checking to domain - processors and components should do this
 //  if (VHostManager.isLocalDomainOrComponent(packet.getStanzaTo().getDomain())) {
-		String nick = packet.getStanzaTo().getLocalpart();
-
-		if ((nick == null) || Configurable.DEF_SM_NAME.equals(nick)) {
 			Element query = packet.getElement().getChild("query",
 												"http://jabber.org/protocol/disco#info");
 
@@ -298,7 +312,6 @@ public class PresenceCapabilitiesManager {
 //          getInstance().setNodeFeatures(query.getAttribute("node"), NULL_NODES);
 //      }
 //      return;
-			}
 		}
 
 //  }

@@ -49,6 +49,11 @@ public class StartZlib extends S2SAbstractProcessor {
 
 	//~--- methods --------------------------------------------------------------
 
+	@Override
+	public int order() {
+		return Order.StartZlib.ordinal();
+	}
+	
 	/**
 	 * Method description
 	 *

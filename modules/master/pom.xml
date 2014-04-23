@@ -146,14 +146,20 @@
 								<script>git rev-list HEAD --count</script>
 							</properties>
 							<source>
-								def command = project.properties.script
-								def process = command.execute()
-								process.waitFor()
+								def version
+								try {
+									def command = project.properties.script
+									def process = command.execute()
+									process.waitFor()
 
-								def describe = process.in.text.trim()
-								println "setting revision to: " + describe
+									version = process.in.text.trim()
+								} catch (Exception e) {
+									version = '0'
+								}
+								println "setting revision to: " + version
 
-								project.properties.setProperty('gitVersion',describe)
+								project.properties.setProperty( 'gitVersion' , version )
+
 							</source>
 						</configuration>
 					</execution>

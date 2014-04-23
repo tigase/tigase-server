@@ -499,8 +499,7 @@ public class JabberIqRoster
 					}
 					if ( session.isUserId( buddy.getBareJID() ) ){
 						results.offer( Authorization.NOT_ALLOWED.getResponseMessage( packet,
-																																				 "User can't add himself to the roster, RFC says NO.", true ) );
-
+													 "User can't add himself to the roster, RFC says NO.", true ) );
 						return;
 					}
 
@@ -596,7 +595,8 @@ public class JabberIqRoster
 							results.offer( Packet.packetInstance( pres, session.getJID(), buddy ) );
 
 							if ( autoAuthorize ){
-								Presence.sendPresence( StanzaType.subscribe, session.getJID(), buddy, results, null );
+								Presence.sendPresence( StanzaType.subscribe, session.getJID().copyWithoutResource(),
+																			 buddy.copyWithoutResource(), results, null );
 							}
 						}
 

@@ -110,6 +110,10 @@ public abstract class Constants {
 	/** Field description */
 	protected static final String LANG_ATTR = "xml:lang";
 
+	protected static final String PRE_BIND_ATTR = "prebind";
+	protected static final String SESSION_ID_ATTR = "session-id";
+	protected static final String USER_ID_ATTR = "jid";
+
 	/** Field description */
 	protected static final String MAX_BATCH_SIZE_KEY = "max-batch-size";
 

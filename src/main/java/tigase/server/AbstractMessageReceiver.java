@@ -1179,7 +1179,7 @@ public abstract class AbstractMessageReceiver
 	 *
 	 * @return a value of <code>boolean</code>
 	 */
-	protected boolean addOutPacketWithTimeout(Packet packet,
+	public boolean addOutPacketWithTimeout(Packet packet,
 			ReceiverTimeoutHandler handler, long delay, TimeUnit unit) {
 
 		// It is automatically added to collections and the Timer

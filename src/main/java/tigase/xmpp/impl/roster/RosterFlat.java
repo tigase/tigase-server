@@ -110,10 +110,16 @@ public class RosterFlat
 	 */
 	public RosterElement addTempBuddy(JID buddy, XMPPResourceConnection session)
 					throws NotAuthorizedException, TigaseDBException {
-		RosterElement relem = getRosterElementInstance(buddy, null, null, session);
+		RosterElement relem = getRosterElementInstance(buddy.copyWithoutResource(), null, null, session);
 
 		relem.setPersistent(false);
 		addBuddy(relem, getUserRoster(session));
+
+		if ( log.isLoggable( Level.FINEST ) ){
+			log.log( Level.FINEST, "Added temporary buddy to roster: {0}, name: {1}, item: {2}",
+							 new Object[] { relem.getJid(), relem.getName(),
+															relem.getRosterItem(), relem.toString() } );
+		}
 
 		return relem;
 	}
@@ -523,7 +529,8 @@ public class RosterFlat
 			}
 		}
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Saving user roster: {0}", sb);
+			log.log(Level.FINEST, "{0} | Saving user roster: {1}",
+														new String [] {session.getBareJID().toString(), sb.toString()});
 		}
 		session.setData(null, ROSTER, sb.toString());
 	}

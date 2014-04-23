@@ -409,8 +409,8 @@ public class Presence
 					return;
 				}    // end of if (type == null)
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "{0} presence found: {1}", new Object[] { pres_type,
-							packet });
+					log.log(Level.FINEST, "{0} | {1} presence found: {2}",
+									new Object[] { session.getBareJID().toString(), pres_type, packet });
 				}
 
 				// All 'in' subscription presences must have a valid from address
@@ -438,6 +438,17 @@ public class Presence
 
 						return;
 					}
+
+					// as per http://xmpp.org/rfcs/rfc6121.html#sub
+					// Implementation Note: When a server processes or generates an outbound
+					// presence stanza of type "subscribe", "subscribed", "unsubscribe",
+					// or "unsubscribed", the server MUST stamp the outgoing presence
+					// stanza with the bare JID <localpart@domainpart> of the sending entity,
+					// not the full JID <localpart@domainpart/resourcepart>.
+					//
+					// we enforce this rule also for incomming presence subscirption packets
+					packet.initVars( packet.getStanzaFrom().copyWithoutResource(),
+													 session.getJID().copyWithoutResource() );
 
 					break;
 
