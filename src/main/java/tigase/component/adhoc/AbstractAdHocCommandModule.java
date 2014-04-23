@@ -123,7 +123,9 @@ public abstract class AbstractAdHocCommandModule<CTX extends Context> extends Ab
 			}
 		}
 
-		result.addAll(scriptProcessor.getScriptItems(node, stanzaTo, stanzaFrom));
+		List<Element> scripts = scriptProcessor.getScriptItems(node, stanzaTo, stanzaFrom);
+		if (scripts != null)
+			result.addAll(scripts);
 
 		return result;
 	}
