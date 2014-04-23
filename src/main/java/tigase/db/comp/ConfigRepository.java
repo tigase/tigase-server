@@ -111,7 +111,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public String toString() {
@@ -124,7 +124,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	public abstract String getConfigKey();
 
@@ -132,7 +132,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	public abstract String[] getDefaultPropetyItems();
 
@@ -140,7 +140,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	public abstract String getPropertyKey();
 
@@ -184,7 +184,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 * @param oldItem
 	 * @param newItem
 	 *
-	 * 
+	 *
 	 */
 	public boolean itemChanged(Item oldItem, Item newItem) {
 		return true;
@@ -194,7 +194,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public Collection<Item> allItems() {
@@ -207,7 +207,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 *
 	 * @param key
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public boolean contains(String key) {
@@ -229,6 +229,9 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 		if (params.get(getPropertyKey()) != null) {
 			items_arr = ((String) params.get(getPropertyKey())).split(",");
+			for (int i = 0; i < items_arr.length; i++) {
+				items_arr[i] = items_arr[i].trim();
+			}
 		}
 		defs.put(getConfigKey(), items_arr);
 	}
@@ -239,7 +242,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 *
 	 * @param key
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public Item getItem(String key) {
@@ -252,7 +255,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public Iterator<Item> iterator() {
@@ -318,7 +321,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public int size() {
@@ -338,7 +341,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 *
 	 * @param item
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public String validateItem(Item item) {
