@@ -214,7 +214,7 @@ public class Store
 					// Entry happens to be null for (shared-user-repo-params, null)
 					// TODO: Not sure if this is supposed to happen, more investigation is needed.
 					if (entry.getValue() != null) {
-						log.log(Level.WARNING,
+						log.log(Level.CONFIG,
 										"Reading properties: (" + entry.getKey() + ", " + entry.getValue() +
 										")");
 						db_props.put(entry.getKey(), entry.getValue().toString());

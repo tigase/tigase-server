@@ -1172,11 +1172,23 @@ public class BasicComponent
 							}
 
 							// What components should load the script....
-							String[] comp_names = comp.split(",");
+							String[] comp_names_or_class = comp.split(",");
 							boolean  found      = false;
 
-							for (String cmp : comp_names) {
+							for (String cmp : comp_names_or_class) {
+								cmp = cmp.trim();
 								found = getName().equals(cmp);
+								try {
+									// we also check whether script is loaded for particular class or it's subclasses
+									Class<?> loadClass = this.getClass().getClassLoader().loadClass( cmp );
+									found |= this.getClass().isAssignableFrom( loadClass );
+
+								} catch ( NoClassDefFoundError  ex ) {
+									log.log(Level.WARNING, "Tried loading script with class defined as: {0} for class: {1}",
+																				 new String[] {cmp,this.getClass().getCanonicalName()});
+								} catch (  ClassNotFoundException ex ) {
+									// just ignore
+								}
 								if (found) {
 									break;
 								}
