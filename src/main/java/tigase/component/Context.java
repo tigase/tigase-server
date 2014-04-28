@@ -20,15 +20,44 @@ package tigase.component;
 import tigase.component.eventbus.EventBus;
 import tigase.component.modules.ModuleProvider;
 
+/**
+ * Interface to provide configuration for an component.<br/>
+ * This interface should be extended if component requires access to database or
+ * any other resources or informations.
+ * 
+ * @author bmalkow
+ * 
+ */
 public interface Context {
 
-	String getComponentCategory();
-
-	String getComponentName();
-
-	String getComponentType();
-
+	/**
+	 * Returns version of component. Used for Service Discovery purposes.
+	 * 
+	 * @return version of component.
+	 */
 	String getComponentVersion();
+
+	/**
+	 * Returns category of component. Used for Service Discovery purposes.
+	 * 
+	 * @return category of component.
+	 */
+	String getDiscoCategory();
+
+	/**
+	 * Returns type of component. Used for Service Discovery purposes.
+	 * 
+	 * @return type of component.
+	 */
+	String getDiscoCategoryType();
+
+	/**
+	 * Returns human readable component name. Used for Service Discovery
+	 * purposes.
+	 * 
+	 * @return name of component.
+	 */
+	String getDiscoDescription();
 
 	/**
 	 * Returns {@link EventBus}.
@@ -38,14 +67,14 @@ public interface Context {
 	EventBus getEventBus();
 
 	/**
-	 * Returns {@link ModuleProvider}
+	 * Returns {@link ModuleProvider}.
 	 * 
 	 * @return {@link ModuleProvider} instance.
 	 */
 	ModuleProvider getModuleProvider();
 
 	/**
-	 * Returns {@link PacketWriter}
+	 * Returns {@link PacketWriter}.
 	 * 
 	 * @return {@link PacketWriter} instance.
 	 */

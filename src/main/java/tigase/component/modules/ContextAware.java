@@ -19,6 +19,13 @@ package tigase.component.modules;
 
 import tigase.component.Context;
 
+/**
+ * Interface to be implemented by {@link Module} that wished to be aware of its
+ * context.
+ * 
+ * @author bmalkow
+ * 
+ */
 public interface ContextAware {
 
 	void setContext(Context context);

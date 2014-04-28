@@ -22,12 +22,43 @@ import tigase.criteria.Criteria;
 import tigase.server.Packet;
 import tigase.util.TigaseStringprepException;
 
+/**
+ * Basic interface to implement component module. Single module should implement
+ * fragment of component logic. Is easy to add or remove in component (Server)
+ * configuration.
+ * 
+ * @author bmalkow
+ * 
+ */
 public interface Module {
 
+	/**
+	 * Returns XMPP features offered by module. Features will be returned by
+	 * Service Discovery.
+	 * 
+	 * @return array of features or <code>null</code>.
+	 */
 	String[] getFeatures();
 
+	/**
+	 * Returns critera used by Component to select module to handle incoming
+	 * stanza.
+	 * 
+	 * @return criteria of selecting module.
+	 */
 	Criteria getModuleCriteria();
 
+	/**
+	 * Process incoming stanza.
+	 * 
+	 * @param packet
+	 *            received {@link Packet stanza}.
+	 * @throws ComponentException
+	 *             if stanza can't be processed correctly. ComponentException is
+	 *             converted to error stanza and returned to stanza sender.
+	 * @throws TigaseStringprepException
+	 *             if there was an error during stringprep processing.
+	 */
 	void process(final Packet packet) throws ComponentException, TigaseStringprepException;
 
 }

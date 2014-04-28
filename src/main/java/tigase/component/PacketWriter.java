@@ -21,10 +21,28 @@ import java.util.Collection;
 
 import tigase.server.Packet;
 
+/**
+ * Interface for writing {@linkplain Packet Packets} to XMPP stream.
+ * 
+ * @author bmalkow
+ * 
+ */
 public interface PacketWriter {
 
-	void write(Collection<Packet> elements);
+	/**
+	 * Writes collection of {@linkplain Packet Packets}.
+	 * 
+	 * @param packets
+	 *            collection of {@linkplain Packet Packets} to be written.
+	 */
+	void write(Collection<Packet> packets);
 
-	void write(final Packet element);
+	/**
+	 * Writes single {@linkplain Packet}.
+	 * 
+	 * @param packet
+	 *            {@link Packet} to be written.
+	 */
+	void write(final Packet packet);
 
 }

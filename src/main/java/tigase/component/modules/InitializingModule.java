@@ -17,12 +17,28 @@
  */
 package tigase.component.modules;
 
+/**
+ * Interface to be implemented by {@link Module modules} that need to be
+ * informed about moments in module lifecycle.
+ * 
+ * @author bmalkow
+ * 
+ */
 public interface InitializingModule {
 
-	void beforeRegister();
-
+	/**
+	 * Called after registration.
+	 */
 	void afterRegistration();
 
+	/**
+	 * Called before registering.
+	 */
+	void beforeRegister();
+
+	/**
+	 * Called before module is unregistered.
+	 */
 	void unregisterModule();
 
 }

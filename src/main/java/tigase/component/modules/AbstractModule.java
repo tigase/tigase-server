@@ -23,36 +23,70 @@ import tigase.component.Context;
 import tigase.component.eventbus.Event;
 import tigase.server.Packet;
 
+/**
+ * Abstract class for help building a module. It has implemented few default
+ * methods from {@link Module}, {@link ContextAware} and
+ * {@link InitializingModule}.
+ * 
+ * @author bmalkow
+ * 
+ * @param <CTX>
+ *            context of component.
+ */
 public abstract class AbstractModule<CTX extends Context> implements Module, ContextAware, InitializingModule {
-
-	protected final Logger log = Logger.getLogger(this.getClass().getName());
 
 	protected CTX context;
 
-	protected void fireEvent(Event<?> event) {
-		context.getEventBus().fire(event, this);
+	protected final Logger log = Logger.getLogger(this.getClass().getName());
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void afterRegistration() {
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void beforeRegister() {
 		if (context == null)
 			throw new RuntimeException("Context is not initialized!");
 	}
 
-	@Override
-	public void afterRegistration() {
+	/**
+	 * Fires event.
+	 * 
+	 * @param event
+	 *            event to fire.
+	 */
+	protected void fireEvent(Event<?> event) {
+		context.getEventBus().fire(event, this);
 	}
 
-	@Override
-	public void unregisterModule() {
-	}
-
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void setContext(Context context) {
 		this.context = (CTX) context;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void unregisterModule() {
+	}
+
+	/**
+	 * Writes single {@linkplain Packet}.
+	 * 
+	 * @param packet
+	 *            {@link Packet} to be written.
+	 */
 	protected void write(Packet packet) {
 		context.getWriter().write(packet);
 	}

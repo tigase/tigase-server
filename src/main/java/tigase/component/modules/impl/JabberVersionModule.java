@@ -35,6 +35,8 @@ public class JabberVersionModule<CTX extends Context> extends AbstractModule<CTX
 	private static final Criteria CRIT = ElementCriteria.nameType("iq", "get").add(
 			ElementCriteria.name("query", "jabber:iq:version"));
 
+	public final static String ID = "jabber:iq:version";
+
 	public JabberVersionModule() {
 	}
 
@@ -75,7 +77,7 @@ public class JabberVersionModule<CTX extends Context> extends AbstractModule<CTX
 	public void process(Packet packet) throws ComponentException {
 		Element query = new Element("query", new String[] { "xmlns" }, new String[] { "jabber:iq:version" });
 
-		query.addChild(new Element("name", context.getComponentName()));
+		query.addChild(new Element("name", context.getDiscoDescription()));
 		query.addChild(new Element("version", context.getComponentVersion()));
 		query.addChild(new Element("os", System.getProperty("os.name") + "-" + System.getProperty("os.arch") + "-"
 				+ System.getProperty("os.version") + ", " + System.getProperty("java.vm.name") + "-"
@@ -83,7 +85,5 @@ public class JabberVersionModule<CTX extends Context> extends AbstractModule<CTX
 
 		write(packet.okResult(query, 0));
 	}
-
-	public final static String ID = "jabber:iq:version";
 
 }

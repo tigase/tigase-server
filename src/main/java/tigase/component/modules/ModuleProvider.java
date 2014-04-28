@@ -21,16 +21,12 @@ import java.util.Set;
 
 public interface ModuleProvider {
 
-	public Set<String> getAvailableFeatures();
-
 	/**
-	 * Return module implementation by module class.
+	 * Returns features offered by registered modules.
 	 * 
-	 * @param moduleClass
-	 *            module class
-	 * @return module implementation
+	 * @return collection of available features.
 	 */
-	// public <T extends Module> T getModule(Class<T> moduleClass);
+	public Set<String> getAvailableFeatures();
 
 	/**
 	 * Return module implementation by module identifier.

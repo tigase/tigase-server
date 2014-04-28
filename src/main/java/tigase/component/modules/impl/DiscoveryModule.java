@@ -20,7 +20,6 @@ package tigase.component.modules.impl;
 import java.util.List;
 
 import tigase.component.Context;
-import tigase.component.adhoc.AbstractAdHocCommandModule;
 import tigase.component.exceptions.ComponentException;
 import tigase.component.exceptions.RepositoryException;
 import tigase.component.modules.AbstractModule;
@@ -38,6 +37,8 @@ public class DiscoveryModule<CTX extends Context> extends AbstractModule<CTX> {
 	public final static String DISCO_INFO_XMLNS = "http://jabber.org/protocol/disco#info";
 
 	public final static String DISCO_ITEMS_XMLNS = "http://jabber.org/protocol/disco#items";
+
+	public final static String ID = "disco";
 
 	private Criteria criteria;
 
@@ -66,7 +67,7 @@ public class DiscoveryModule<CTX extends Context> extends AbstractModule<CTX> {
 		try {
 			if (q.getXMLNS().equals(DISCO_INFO_XMLNS)) {
 				processDiscoInfo(packet, jid, node, senderJID);
-			} else if (q.getXMLNS().equals(DISCO_ITEMS_XMLNS) && node != null && node.equals(AbstractAdHocCommandModule.XMLNS)) {
+			} else if (q.getXMLNS().equals(DISCO_ITEMS_XMLNS) && node != null && node.equals(AdHocCommandModule.XMLNS)) {
 				processAdHocCommandItems(packet, jid, node, senderJID);
 			} else if (q.getXMLNS().equals(DISCO_ITEMS_XMLNS)) {
 				processDiscoItems(packet, jid, node, senderJID);
@@ -80,15 +81,9 @@ public class DiscoveryModule<CTX extends Context> extends AbstractModule<CTX> {
 		}
 	}
 
-	protected void processDiscoItems(Packet packet, JID jid, String node, JID senderJID) throws ComponentException,
-			RepositoryException {
-		Element resultQuery = new Element("query", new String[] { Packet.XMLNS_ATT }, new String[] { DISCO_ITEMS_XMLNS });
-		write(packet.okResult(resultQuery, 0));
-	}
-
 	protected void processAdHocCommandItems(Packet packet, JID jid, String node, JID senderJID) throws ComponentException,
 			RepositoryException {
-		AbstractAdHocCommandModule<?> module = context.getModuleProvider().getModule(AbstractAdHocCommandModule.ID);
+		AdHocCommandModule<?> module = context.getModuleProvider().getModule(AdHocCommandModule.ID);
 		if (module == null)
 			throw new ComponentException(Authorization.ITEM_NOT_FOUND);
 
@@ -108,7 +103,7 @@ public class DiscoveryModule<CTX extends Context> extends AbstractModule<CTX> {
 		Packet resultIq = packet.okResult(resultQuery, 0);
 
 		resultQuery.addChild(new Element("identity", new String[] { "category", "type", "name" }, new String[] {
-				context.getComponentCategory(), context.getComponentType(), context.getComponentName() }));
+				context.getDiscoCategory(), context.getDiscoCategoryType(), context.getDiscoDescription() }));
 		for (String f : context.getModuleProvider().getAvailableFeatures()) {
 			resultQuery.addChild(new Element("feature", new String[] { "var" }, new String[] { f }));
 		}
@@ -116,6 +111,10 @@ public class DiscoveryModule<CTX extends Context> extends AbstractModule<CTX> {
 		write(resultIq);
 	}
 
-	public final static String ID = "disco";
+	protected void processDiscoItems(Packet packet, JID jid, String node, JID senderJID) throws ComponentException,
+			RepositoryException {
+		Element resultQuery = new Element("query", new String[] { Packet.XMLNS_ATT }, new String[] { DISCO_ITEMS_XMLNS });
+		write(packet.okResult(resultQuery, 0));
+	}
 
 }

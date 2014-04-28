@@ -26,11 +26,15 @@ import tigase.xmpp.Authorization;
  * 
  */
 public class AdHocCommandException extends Exception {
+
 	private static final long serialVersionUID = 1L;
 
 	private Authorization errorCondition;
+
 	private Element item;
+
 	private String message;
+
 	private String xmlns = "urn:ietf:params:xml:ns:xmpp-stanzas";
 
 	/**

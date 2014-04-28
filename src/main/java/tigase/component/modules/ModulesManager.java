@@ -34,9 +34,20 @@ import tigase.criteria.Criteria;
 import tigase.server.Packet;
 import tigase.util.TigaseStringprepException;
 
+/**
+ * Implementation of modules provider. It keeps all registered modules and
+ * decides what modules may handle incoming stanza.
+ * 
+ * @author bmalkow
+ * 
+ */
 public class ModulesManager implements ModuleProvider {
 
 	private Context context;
+
+	private boolean dirty = true;
+
+	private final Set<Module> initializationRequired = Collections.newSetFromMap(new ConcurrentHashMap<Module, Boolean>());
 
 	private Logger log = Logger.getLogger(this.getClass().getName());
 
@@ -69,15 +80,25 @@ public class ModulesManager implements ModuleProvider {
 		return (T) this.modulesById.get(id);
 	}
 
-	public boolean isRegistered(String id) {
-		return this.modulesById.containsKey(id);
+	public void initIfRequired() {
+		Iterator<Module> it = this.initializationRequired.iterator();
+		while (it.hasNext()) {
+			Module module = it.next();
+			it.remove();
+			if (module instanceof InitializingModule) {
+				((InitializingModule) module).afterRegistration();
+			}
+		}
+		dirty = false;
 	}
 
 	public boolean isRegistered(final Module module) {
 		return this.modules.contains(module);
 	}
 
-	private boolean dirty = true;
+	public boolean isRegistered(String id) {
+		return this.modulesById.containsKey(id);
+	}
 
 	public boolean process(final Packet packet) throws ComponentException, TigaseStringprepException {
 		if (dirty)
@@ -104,8 +125,6 @@ public class ModulesManager implements ModuleProvider {
 		}
 		return handled;
 	}
-
-	private final Set<Module> initializationRequired = Collections.newSetFromMap(new ConcurrentHashMap<Module, Boolean>());
 
 	public synchronized <T extends Module> T register(final String id, final T module) {
 		if (log.isLoggable(Level.CONFIG))
@@ -139,18 +158,6 @@ public class ModulesManager implements ModuleProvider {
 		initializationRequired.add(module);
 
 		return module;
-	}
-
-	public void initIfRequired() {
-		Iterator<Module> it = this.initializationRequired.iterator();
-		while (it.hasNext()) {
-			Module module = it.next();
-			it.remove();
-			if (module instanceof InitializingModule) {
-				((InitializingModule) module).afterRegistration();
-			}
-		}
-		dirty = false;
 	}
 
 	public synchronized void reset() {

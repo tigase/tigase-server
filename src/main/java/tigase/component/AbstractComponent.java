@@ -19,7 +19,7 @@ package tigase.component;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -29,12 +29,16 @@ import java.util.logging.Logger;
 
 import javax.script.Bindings;
 
-import tigase.component.adhoc.AbstractAdHocCommandModule.ScriptCommandProcessor;
+import tigase.component.AbstractComponent.ModuleRegisteredHandler.ModuleRegisteredEvent;
+import tigase.component.eventbus.DefaultEventBus;
 import tigase.component.eventbus.Event;
+import tigase.component.eventbus.EventBus;
 import tigase.component.eventbus.EventHandler;
 import tigase.component.exceptions.ComponentException;
 import tigase.component.modules.Module;
+import tigase.component.modules.ModuleProvider;
 import tigase.component.modules.ModulesManager;
+import tigase.component.modules.impl.AdHocCommandModule.ScriptCommandProcessor;
 import tigase.disco.XMPPService;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.DisableDisco;
@@ -47,17 +51,24 @@ import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
 /**
- * Class description
+ * Base class for implement XMPP Component.
  * 
+ * @author bmalkow
  * 
- * @param <T>
- * 
+ * @param <CTX>
+ *            {@link Context} of component Should be extended.
  */
 public abstract class AbstractComponent<CTX extends Context> extends AbstractMessageReceiver implements XMPPService,
 		DisableDisco {
 
+	/**
+	 * Implemented by handlers of {@link ModuleRegisteredEvent}.
+	 */
 	public interface ModuleRegisteredHandler extends EventHandler {
 
+		/**
+		 * Fired when new module is registered.
+		 */
 		public static class ModuleRegisteredEvent extends Event<ModuleRegisteredHandler> {
 
 			private String id;
@@ -91,11 +102,22 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 
 		}
 
+		/**
+		 * Called when {@link ModuleRegisteredEvent} is fired.
+		 * 
+		 * @param id
+		 *            module identifier.
+		 * @param module
+		 *            module instance.
+		 */
 		void onModuleRegistered(String id, Module module);
 	}
 
-	private static final String COMPONENT = "component";
+	protected static final String COMPONENT = "component";
 
+	/**
+	 * Context of component.
+	 */
 	protected final CTX context;
 
 	protected final ScriptCommandProcessor defaultScriptCommandProcessor = new ScriptCommandProcessor() {
@@ -111,11 +133,35 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 		}
 	};
 
-	/** Field description */
+	protected EventBus eventBus = new DefaultEventBus();
+
+	/** Logger */
 	protected final Logger log = Logger.getLogger(this.getClass().getName());
 
-	/** Field description */
+	/** Modules manager */
 	protected final ModulesManager modulesManager;
+
+	protected PacketWriter writer = new PacketWriter() {
+		@Override
+		public void write(Collection<Packet> elements) {
+			if (elements != null) {
+				for (Packet element : elements) {
+					if (element != null) {
+						write(element);
+					}
+				}
+			}
+		}
+
+		@Override
+		public void write(Packet packet) {
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("Sent: " + packet.getElement());
+			}
+			addOutPacket(packet);
+		}
+
+	};
 
 	/**
 	 * Constructs ...
@@ -125,12 +171,6 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 		this(null);
 	}
 
-	/**
-	 * Constructs ...
-	 * 
-	 * 
-	 * @param writer
-	 */
 	@SuppressWarnings("unchecked")
 	public AbstractComponent(Context context) {
 		if (context == null) {
@@ -142,12 +182,31 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 		this.modulesManager = new ModulesManager(this.context);
 	}
 
+	/**
+	 * Adds {@link ModuleRegisteredEvent} handler.
+	 * 
+	 * @param handler
+	 *            a module registered handler
+	 */
 	public void addModuleRegisteredHandler(ModuleRegisteredHandler handler) {
 		this.context.getEventBus().addHandler(ModuleRegisteredHandler.ModuleRegisteredEvent.class, handler);
 	}
 
+	/**
+	 * Creates {@link Context} particular for component implementation. Called
+	 * once.
+	 * 
+	 * @return context instance.
+	 */
 	protected abstract CTX createContext();
 
+	/**
+	 * Creates instance of module.
+	 * 
+	 * @param moduleClass
+	 *            class of module
+	 * @return instance of module.
+	 */
 	protected Module createModuleInstance(Class<Module> moduleClass) throws InstantiationException, IllegalAccessException,
 			IllegalArgumentException, InvocationTargetException {
 		log.finer("Create instance of: " + moduleClass.getName());
@@ -181,21 +240,36 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 		return null;
 	}
 
+	/**
+	 * Returns version of component. Used for Service Discovery purposes.
+	 * 
+	 * @return version of component.
+	 */
 	public abstract String getComponentVersion();
 
-	protected Context getContext() {
+	/**
+	 * Returns {@link Context} of component.
+	 * 
+	 * @return
+	 */
+	protected CTX getContext() {
 		return context;
 	}
 
+	/**
+	 * Returns default map of components. Keys in map are used as component
+	 * identifiers.<br/>
+	 * 
+	 * This map may be modified by <code>init.properties</code>:<br/>
+	 * <code>&lt;component_name&gt;/modules/&lt;module_name&gt;[S]=&lt;module_class&gt;</code>
+	 * 
+	 * 
+	 * @return map of default modules.
+	 */
 	protected abstract Map<String, Class<? extends Module>> getDefaultModulesList();
 
 	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param params
-	 * 
-	 * @return
+	 * {@inheritDoc}
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -210,6 +284,37 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 		return props;
 	}
 
+	/**
+	 * Returns {@link EventBus}.
+	 * 
+	 * @return {@link EventBus}.
+	 */
+	public EventBus getEventBus() {
+		return eventBus;
+	}
+
+	/**
+	 * Returns {@link ModuleProvider}. It allows to retrieve instance of module
+	 * by given ID.
+	 * 
+	 * @return {@link ModuleProvider}.
+	 */
+	public ModuleProvider getModuleProvider() {
+		return modulesManager;
+	}
+
+	/**
+	 * Returns {@link PacketWriter}.
+	 * 
+	 * @return {@link PacketWriter}.
+	 */
+	public PacketWriter getWriter() {
+		return writer;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void initBindings(Bindings binds) {
 		super.initBindings(binds); // To change body of generated methods,
@@ -218,12 +323,19 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 		binds.put(COMPONENT, this);
 	}
 
+	/**
+	 * Initialising component modules.
+	 * 
+	 * @param props
+	 *            component properties.
+	 */
 	protected void initModules(Map<String, Object> props) throws InstantiationException, IllegalAccessException,
 			IllegalArgumentException, InvocationTargetException {
 		for (Entry<String, Object> e : props.entrySet()) {
 			try {
 				if (e.getKey().startsWith("modules/")) {
 					final String id = e.getKey().substring(8);
+					@SuppressWarnings("unchecked")
 					final Class<Module> moduleClass = (Class<Module>) Class.forName(e.getValue().toString());
 					Module module = createModuleInstance(moduleClass);
 					registerModule(id, module);
@@ -235,56 +347,30 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 	}
 
 	/**
-	 * Is this component discoverable by disco#items for domain by non admin users
+	 * Is this component discoverable by disco#items for domain by non admin
+	 * users.
 	 * 
-	 * @return true - if yes
+	 * @return <code>true</code> - if yes
 	 */
 	public abstract boolean isDiscoNonAdmin();
-	
+
+	/**
+	 * Checks if module with given identifier is registered already.
+	 * 
+	 * @param id
+	 *            module identifier.
+	 * @return <code>true</code> if module is registered. Otherwise
+	 *         <code>false</code>.
+	 */
 	public boolean isRegistered(final String id) {
 		return this.modulesManager.isRegistered(id);
 	}
 
 	/**
-	 * @param packet
-	 */
-	protected void processCommandPacket(Packet packet) {
-		Queue<Packet> results = new ArrayDeque<Packet>();
-
-		processScriptCommand(packet, results);
-		if (results.size() > 0) {
-			for (Packet res : results) {
-
-				// No more recurrential calls!!
-				addOutPacketNB(res);
-
-				// processPacket(res);
-			} // end of for ()
-		}
-	}
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param packet
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void processPacket(Packet packet) {
-		// if (packet.isCommand()) {
-		// processCommandPacket(packet);
-		// } else {
-		processStanzaPacket(packet);
-		// }
-	}
-
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param packet
-	 */
-	protected void processStanzaPacket(final Packet packet) {
 		try {
 			boolean handled = this.modulesManager.process(packet);
 
@@ -318,6 +404,16 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 		}
 	}
 
+	/**
+	 * Registers module. If there is module registered with given ID, it will be
+	 * unregistered.
+	 * 
+	 * @param id
+	 *            identifier of module.
+	 * @param module
+	 *            module instance.
+	 * @return currently registered module instance.
+	 */
 	public <M extends Module> M registerModule(final String id, final M module) {
 		if (this.modulesManager.isRegistered(id)) {
 			this.modulesManager.unregister(id);
@@ -329,16 +425,25 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 		return r;
 	}
 
+	/**
+	 * Removes {@link ModuleRegisteredEvent} handler.
+	 * 
+	 * @param handler
+	 *            handler to remove.
+	 */
 	public void removeModuleRegisteredHandler(ModuleRegisteredHandler handler) {
 		this.context.getEventBus().remove(ModuleRegisteredHandler.ModuleRegisteredEvent.class, handler);
 	}
 
 	/**
-	 * Method description
+	 * Converts {@link ComponentException} to XMPP error stanza and sends it to
+	 * sender of packet.
 	 * 
 	 * 
 	 * @param packet
+	 *            packet what caused exception.
 	 * @param e
+	 *            exception.
 	 */
 	protected void sendException(final Packet packet, final ComponentException e) {
 		try {
@@ -368,10 +473,7 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 	}
 
 	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param props
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void setProperties(Map<String, Object> props) {
@@ -382,10 +484,13 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 			log.log(Level.WARNING, "Can't initialize modules!", e);
 		}
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void updateServiceEntity() {
 		super.updateServiceEntity();
 		this.updateServiceDiscoveryItem(getName(), null, getDiscoDescription(), !isDiscoNonAdmin());
-	}	
+	}
 }

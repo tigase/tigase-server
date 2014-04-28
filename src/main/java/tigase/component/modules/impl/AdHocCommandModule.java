@@ -15,7 +15,7 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  */
-package tigase.component.adhoc;
+package tigase.component.modules.impl;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.Queue;
 
 import tigase.component.Context;
+import tigase.component.adhoc.AdHocCommand;
+import tigase.component.adhoc.AdHocCommandException;
+import tigase.component.adhoc.AdHocCommandManager;
 import tigase.component.exceptions.ComponentException;
 import tigase.component.modules.AbstractModule;
 import tigase.criteria.Criteria;
@@ -32,14 +35,22 @@ import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.JID;
 
-public abstract class AbstractAdHocCommandModule<CTX extends Context> extends AbstractModule<CTX> {
+public class AdHocCommandModule<CTX extends Context> extends AbstractModule<CTX> {
 
-	public final static String ID = "commands";
+	public static interface ScriptCommandProcessor {
+
+		List<Element> getScriptItems(String node, JID jid, JID from);
+
+		boolean processScriptCommand(Packet pc, Queue<Packet> results);
+
+	}
 
 	private static final String[] COMMAND_PATH = { "iq", "command" };
 
 	private static final Criteria CRIT = ElementCriteria.nameType("iq", "set").add(
 			ElementCriteria.name("command", Command.XMLNS));
+
+	public final static String ID = "commands";
 
 	public static final String XMLNS = Command.XMLNS;
 
@@ -47,7 +58,7 @@ public abstract class AbstractAdHocCommandModule<CTX extends Context> extends Ab
 
 	private ScriptCommandProcessor scriptProcessor;
 
-	public AbstractAdHocCommandModule(ScriptCommandProcessor scriptProcessor) {
+	public AdHocCommandModule(ScriptCommandProcessor scriptProcessor) {
 		this.scriptProcessor = scriptProcessor;
 	}
 
@@ -76,12 +87,22 @@ public abstract class AbstractAdHocCommandModule<CTX extends Context> extends Ab
 		return CRIT;
 	}
 
-	public static interface ScriptCommandProcessor {
+	public List<Element> getScriptItems(String node, JID stanzaTo, JID stanzaFrom) {
+		ArrayList<Element> result = new ArrayList<Element>();
 
-		boolean processScriptCommand(Packet pc, Queue<Packet> results);
+		for (AdHocCommand c : commandsManager.getAllCommands()) {
+			if (c.isAllowedFor(stanzaFrom)) {
+				Element i = new Element("item", new String[] { "jid", "node", "name" }, new String[] { stanzaTo.toString(),
+						c.getNode(), c.getName() });
+				result.add(i);
+			}
+		}
 
-		List<Element> getScriptItems(String node, JID jid, JID from);
+		List<Element> scripts = scriptProcessor.getScriptItems(node, stanzaTo, stanzaFrom);
+		if (scripts != null)
+			result.addAll(scripts);
 
+		return result;
 	}
 
 	@Override
@@ -110,24 +131,6 @@ public abstract class AbstractAdHocCommandModule<CTX extends Context> extends Ab
 
 	public void register(AdHocCommand command) {
 		this.commandsManager.registerCommand(command);
-	}
-
-	public List<Element> getScriptItems(String node, JID stanzaTo, JID stanzaFrom) {
-		ArrayList<Element> result = new ArrayList<Element>();
-
-		for (AdHocCommand c : commandsManager.getAllCommands()) {
-			if (c.isAllowedFor(stanzaFrom)) {
-				Element i = new Element("item", new String[] { "jid", "node", "name" }, new String[] { stanzaTo.toString(),
-						c.getNode(), c.getName() });
-				result.add(i);
-			}
-		}
-
-		List<Element> scripts = scriptProcessor.getScriptItems(node, stanzaTo, stanzaFrom);
-		if (scripts != null)
-			result.addAll(scripts);
-
-		return result;
 	}
 
 }
