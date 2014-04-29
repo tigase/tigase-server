@@ -39,7 +39,7 @@
 
 function usage()
 {
-  echo "Usage: $0 {start|stop|run|restart|check} [params-file.conf]"
+  echo "Usage: $0 {start|stop|run|clear|clearrestart|restart|check|status} [params-file.conf]"
   exit 1
 }
 
@@ -195,10 +195,18 @@ case "${1}" in
     $0 start $2
     ;;
 
+  clearrestart)
+    $0 stop $2
+    sleep 5
+    $0 clear $2
+    sleep 2
+    $0 start $2
+    ;;
+
   clear)
 	echo "Clearing logs"
 	rm -rf "${TIGASE_HOME}/logs"/*;
-	if ! [ $OSGI ] ; then
+	if [ $OSGI ] ; then
 		echo "Clearing osgi cache"
 		rm -rf "${TIGASE_HOME}/felix-cache"/*;
 	fi
@@ -216,7 +224,7 @@ case "${1}" in
     sh -c "exec $TIGASE_CMD"
     ;;
 
-  check)
+  check|status)
     echo "Checking arguments to Tigase: "
     echo "OSGI            =  $OSGI"
     echo "TIGASE_HOME     =  $TIGASE_HOME"
@@ -233,7 +241,7 @@ case "${1}" in
     echo "TIGASE_CONSOLE_LOG  =  $TIGASE_CONSOLE_LOG"
     echo
 
-    if [ -f ${TIGASE_PID} ]
+    if [ -f ${TIGASE_PID} ] && kill -0 $(<${TIGASE_PID}) 2>/dev/null
     then
       echo "Tigase running pid="`cat ${TIGASE_PID}`
       exit 0

@@ -240,6 +240,23 @@ case "$1" in
 	exit 1
 	;;
 
+  clearrestart)
+    $0 stop $2
+    sleep 5
+    $0 clear $2
+    sleep 2
+    $0 start $2
+    ;;
+
+  clear)
+	echo "Clearing logs"
+	rm -rf "${TIGASE_HOME}/logs"/*;
+	if [ $OSGI ] ; then
+		echo "Clearing osgi cache"
+		rm -rf "${TIGASE_HOME}/felix-cache"/*;
+	fi
+    ;;
+
 	check)
 	getPid
 	echo "Checking arguments to Tigase: "
@@ -273,7 +290,7 @@ case "$1" in
 
 	*)
 	N=/etc/init.d/$NAME
-	echo "Usage: $N {start|stop|restart|force-reload|check}" >&2
+	echo "Usage: $N {start|stop|restart|clearrestart|clear|force-reload|check|status}" >&2
 	exit 1
 	;;
 esac

@@ -194,7 +194,28 @@ case "$1" in
 	fi
 	;;
 
-  check)
+  clearrestart)
+    $0 stop $2
+    sleep 5
+    $0 clear $2
+    sleep 2
+    $0 start $2
+    ;;
+
+  clear)
+    log_daemon_msg "Clearing logs $DESC"
+	rm -rf "${TIGASE_HOME}/logs"/*;
+	log_end_msg 0
+	if [ $OSGI ] ; then
+	    log_daemon_msg "Clearing osgi cache $DESC"
+		rm -rf "${TIGASE_HOME}/felix-cache"/*;
+		log_end_msg 0
+	fi
+	log_end_msg 0
+    ;;
+
+
+  check|status)
 	echo "Checking arguments to Tigase: "
 	echo
 	echo "USERNAME            =  $USERNAME"
@@ -227,7 +248,7 @@ case "$1" in
 
   *)
 	N=/etc/init.d/$NAME
-	echo "Usage: $N {start|stop|restart|force-reload|check}" >&2
+	echo "Usage: $N {start|stop|restart|clearrestart|clear|force-reload|check|status}" >&2
 	exit 1
 	;;
 esac
