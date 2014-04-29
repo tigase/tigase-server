@@ -95,6 +95,9 @@ public interface CommandIfc {
 	public static final String SCRIPT_COMPONENT = "AS:Component:";
 
 	/** Field description */
+	public static final String SCRIPT_CLASS = "AS:ComponentClass:";
+
+	/** Field description */
 	public static final String LANGUAGE = "Language";
 
 	/** Field description */

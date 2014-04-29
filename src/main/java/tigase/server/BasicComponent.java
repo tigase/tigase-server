@@ -1121,6 +1121,9 @@ public class BasicComponent
 
 		String[] dirs = new String[] { scriptsBaseDir, scriptsCompDir };
 
+		// check class only from main directory
+
+
 		for (String scriptsPath : dirs) {
 			log.log(Level.CONFIG, "{0}: Loading scripts from directory: {1}", new Object[] {
 					getName(),
@@ -1136,6 +1139,7 @@ public class BasicComponent
 							String cmdId    = null;
 							String cmdDescr = null;
 							String comp     = null;
+							String compClass = null;
 
 							file = f;
 
@@ -1161,9 +1165,14 @@ public class BasicComponent
 									comp = line.substring(idx + CommandIfc.SCRIPT_COMPONENT.length())
 											.trim();
 								}
+								idx = line.indexOf(CommandIfc.SCRIPT_CLASS);
+								if (idx >= 0) {
+									compClass = line.substring(idx + CommandIfc.SCRIPT_CLASS.length())
+											.trim();
+								}
 							}
 							buffr.close();
-							if ((cmdId == null) || (cmdDescr == null) || (comp == null)) {
+							if ((cmdId == null) || (cmdDescr == null) || (comp == null) ) {
 								log.log(Level.WARNING,
 										"Admin script found but it has no command ID or command" +
 										"description: " + "{0}", file);
@@ -1171,26 +1180,40 @@ public class BasicComponent
 								continue;
 							}
 
-							// What components should load the script....
-							String[] comp_names_or_class = comp.split(",");
+							// Which components should load the script
+							String[] comp_names = comp.split(",");
+
 							boolean  found      = false;
 
-							for (String cmp : comp_names_or_class) {
+							// check component names
+							for (String cmp : comp_names) {
 								cmp = cmp.trim();
 								found = getName().equals(cmp);
-								try {
-									// we also check whether script is loaded for particular class or it's subclasses
-									Class<?> loadClass = this.getClass().getClassLoader().loadClass( cmp );
-									found |= this.getClass().isAssignableFrom( loadClass );
+							}
 
-								} catch ( NoClassDefFoundError  ex ) {
-									log.log(Level.WARNING, "Tried loading script with class defined as: {0} for class: {1}",
-																				 new String[] {cmp,this.getClass().getCanonicalName()});
-								} catch (  ClassNotFoundException ex ) {
-									// just ignore
+							// check component classes
+							if ( null != compClass ){
+								if ( scriptsPath.endsWith( getName() ) ){
+									// ok, this is script for component of particular name, skip
+									// loading based on class
+									continue;
 								}
-								if (found) {
-									break;
+								String[] comp_classes = compClass.split( "," );
+								for ( String cmp : comp_classes ) {
+									try {
+										// we also check whether script is loaded for particular class or it's subclasses
+										Class<?> loadClass = this.getClass().getClassLoader().loadClass( cmp );
+										found |= this.getClass().isAssignableFrom( loadClass );
+
+									} catch ( NoClassDefFoundError ex ) {
+										log.log( Level.WARNING, "Tried loading script with class defined as: {0} for class: {1}",
+														 new String[] { cmp, this.getClass().getCanonicalName() } );
+									} catch ( ClassNotFoundException ex ) {
+										// just ignore
+									}
+									if ( found ){
+										break;
+									}
 								}
 							}
 							if (!found) {
