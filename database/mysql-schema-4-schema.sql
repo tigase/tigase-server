@@ -65,13 +65,15 @@ create table if not exists tig_users (
 	primary key (uid),
 	unique key sha1_user_id (sha1_user_id),
 	key user_pw (user_pw),
-	key user_id (user_id(765)),
+--	key user_id (user_id(765)),
 	key last_login (last_login),
 	key last_logout (last_logout),
 	key account_status (account_status),
 	key online_status (online_status)
 )
 ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
+
+CREATE INDEX part_of_user_id ON tig_users (user_id(255));
 
 -- QUERY END:
 
