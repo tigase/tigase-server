@@ -252,6 +252,26 @@ public class XMPPIOService<RefObject>
 	}
 
 	/**
+	 * Clears queue of packets waiting to send.
+	 * In case of connection close this packets may be sent to offline store 
+	 * but some processors may want stop this from happening - for that they 
+	 * may use this method
+	 */
+	public void clearWaitingPackets() {
+		this.waitingPackets.clear();
+	}
+	
+	/**
+	 * Returns queue with packets waiting to send. For use by ConnectionManager
+	 * which may need to get undelivered packets 
+	 * 
+	 * @return 
+	 */
+	public Queue<Packet> getWaitingPackets() {
+		return waitingPackets;
+	}
+	
+	/**
 	 * Method description
 	 *
 	 */
@@ -280,7 +300,9 @@ public class XMPPIOService<RefObject>
 
 		// int cnt = 0;
 		// while ((packet = waitingPackets.poll()) != null && (cnt < 1000)) {
-		while ((packet = waitingPackets.poll()) != null) {
+		
+		// we should only peek for packet now, and poll it after sending it
+		while ((packet = waitingPackets.peek()) != null) {
 
 			// ++cnt;
 			if (log.isLoggable(Level.FINEST)) {
@@ -288,6 +310,10 @@ public class XMPPIOService<RefObject>
 						packet });
 			}
 			writeRawData(packet.getElement().toString());
+			
+			// and after sending it we should remove it to minimalize chances of lost packets
+			waitingPackets.poll();
+			
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "{0}, SENT: {1}", new Object[] { toString(),
 						packet.getElement().toString() });

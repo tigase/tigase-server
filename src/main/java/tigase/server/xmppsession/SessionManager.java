@@ -98,6 +98,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.script.Bindings;
+import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
 
 /**
  * Class SessionManager
@@ -1277,6 +1278,9 @@ public class SessionManager
 					if (log.isLoggable(Level.FINE)) {
 						log.log(Level.FINE, "Found parent session for: {0}", userJid);
 					}
+					// as we are closing this connection we should ensure that it is removed
+					// from list of active resources before going any further
+					session.removeResourceConnection(conn);
 					if (session.getActiveResourcesSize() <= 1) {
 
 						// we should check if other this is the only connection on session
@@ -1580,14 +1584,24 @@ public class SessionManager
 		case STREAM_CLOSED : {
 			fastAddOutPacket(iqc.okResult((String) null, 0));
 
-			ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(sessionCloseProc
-					.id());
-
-			if (pt == null) {
-				pt = workerThreads.get(defPluginsThreadsPool);
+			try {
+//			ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(sessionCloseProc
+//					.id());
+//
+//			if (pt == null) {
+//				pt = workerThreads.get(defPluginsThreadsPool);
+//			}
+//			pt.addItem(sessionCloseProc, iqc, connection);
+				// Replaced code above with new code below to execute STREAM_CLOSE in same 
+				// thread as other packets from connection so next packets will know there 
+				// is no session available after STREAM_CLOSE
+				// This should not have bigger impact on performance as SessionCloseProc was 
+				// reimplemented to speed up process of closing connections (using maps instead 
+				// of list, etc.)
+				sessionCloseProc.process(iqc, connection, naUserRepository, packetWriterQueue, plugin_config.get(sessionCloseProc.id()));
+			} catch (XMPPException ex) {
+				log.log(Level.WARNING, "Exception while processing STREAM_CLOSE command", ex);
 			}
-			pt.addItem(sessionCloseProc, iqc, connection);
-
 			// closeConnection(pc.getFrom(), false);
 			processing_result = true;
 		}
@@ -2313,6 +2327,11 @@ public class SessionManager
 				return true;
 			}
 
+			// this is special case in which we know and expect that there will be 
+			// no session for this packet but we still need to process it
+			if (C2SDeliveryErrorProcessor.isDeliveryError(p))
+				return false;
+			
 			// It doesn't look good, there should really be a connection for
 			// this packet....
 			// returning error back...

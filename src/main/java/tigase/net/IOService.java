@@ -268,6 +268,13 @@ public abstract class IOService<RefObject>
 					}    // end of if (receivedPackets.size() > 0)
 				} finally {
 					readInProgress.unlock();
+					if (!isConnected()) {
+						// added to sooner detect disconnection of peer - ie. client
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "{0}, stopping connection due to the fact that it was disconnected, forceStop()", toString());
+						}
+						forceStop();
+					}
 				}
 			}
 		}

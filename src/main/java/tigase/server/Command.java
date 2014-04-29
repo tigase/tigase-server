@@ -1165,6 +1165,12 @@ public enum Command {
 		Element elem  = createIqCommand(from, to, type, id, this.toString(), null);
 		Packet result = Packet.packetInstance(elem, from, to);
 
+		// Added to ensure that command will be executed in proper thread
+		// and to ensure that multiple threads will be used for processing
+		// command packets
+		result.setPacketFrom(from);
+		result.setPacketTo(to);
+		
 		result.setPriority(priority);
 
 		return result;

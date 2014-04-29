@@ -26,35 +26,30 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.RepositoryFactory;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import tigase.db.NonAuthUserRepository;
+import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
-
+import tigase.server.Packet;
 import tigase.server.amp.AmpFeatureIfc;
 import tigase.server.amp.MsgRepository;
-import tigase.server.Packet;
-
 import tigase.util.DNSResolver;
-
 import tigase.xml.Element;
-
 import tigase.xmpp.JID;
+import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPException;
+import tigase.xmpp.XMPPPacketFilterIfc;
 import tigase.xmpp.XMPPPostprocessorIfc;
+import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.sql.SQLException;
-
-import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
 
 /**
  * Created: Apr 29, 2010 5:00:25 PM
@@ -64,7 +59,8 @@ import java.util.Queue;
  */
 public class MessageAmp
 				extends XMPPProcessor
-				implements XMPPPostprocessorIfc, XMPPProcessorIfc {
+				implements XMPPPacketFilterIfc, XMPPPostprocessorIfc, 
+						XMPPPreprocessorIfc, XMPPProcessorIfc {
 	private static final String     AMP_JID_PROP_KEY     = "amp-jid";
 	private static final String[][] ELEMENTS             = {
 		{ "message" }, { "presence" }
@@ -166,6 +162,11 @@ public class MessageAmp
 		}
 	}
 
+	@Override
+	public void filter(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results) {
+		C2SDeliveryErrorProcessor.filter(packet, session, repo, results, ampJID);
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -202,6 +203,18 @@ public class MessageAmp
 		}
 	}
 
+	@Override
+	public boolean preProcess(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
+		boolean result = C2SDeliveryErrorProcessor.preProcess(packet, session, repo, results, settings);
+		if (result && packet.getPacketFrom() != null && packet.getPacketFrom().equals(ampJID)) {
+			result = false;
+		}
+		if (result) {
+			packet.processedBy(ID);
+		}
+		return result;
+	}
+	
 	/**
 	 * Method description
 	 *

@@ -239,7 +239,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 			return;
 		
 		OutQueue outQueue = (OutQueue) service.getSessionData().get(OUT_COUNTER_KEY);		
-		if (outQueue.waitingForAck() >= default_ack_request_count) {
+		if (outQueue != null && outQueue.waitingForAck() >= default_ack_request_count) {
 			service.writeRawData("<" + REQ_NAME + " xmlns='" + XMLNS + "' />");
 		}
 	}
@@ -329,8 +329,12 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 	
 	@Override
 	public boolean serviceStopped(XMPPIOService service, boolean streamClosed) {
-		if (!isEnabled(service))
+		if (!isEnabled(service)) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "{0}, service stopped - StreamManagement disabled", new Object[] { service });
+			}
 			return false;
+		}
 
 		String id = (String) service.getSessionData().get(STREAM_ID_KEY);
 		
@@ -346,14 +350,18 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 //		}
 		Long resumptionTimeoutStart = (Long) service.getSessionData().get(RESUMPTION_TIMEOUT_START_KEY);
 		if (resumptionTimeoutStart != null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "{0}, service stopped - checking resumption timeout", new Object[] { service });
+			}
 			// if resumptionTimeoutStart is set let's check if resumption was 
 			// not started for longer time than twice value of resumption_timeout
 			if ((System.currentTimeMillis() - resumptionTimeoutStart) > (2 * resumption_timeout * 1000)) {
 				// if so we should assume that resumption failed so we should 
 				// send errors, remove reference to service and stop this service
-				sendErrorsForQueuedPackets(service);	
 				services.remove(id, service);
+				service.clearWaitingPackets();
 				connectionManager.serviceStopped(service);
+				sendErrorsForQueuedPackets(service);	
 			}
 			return false;
 		}
@@ -363,8 +371,12 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		// resumption but those clients are not compatible with XEP-0198 and 
 		// resumption so this should not happen
 		if (isResumptionEnabled(service)) {
-			if (!services.containsKey(id))
+			if (!services.containsKey(id)) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "{0}, service stopped - resumption enabled but service not available", new Object[] { service });
+				}
 				return false;
+			}
 
 			// ConnectionManager must not be notified about closed connection
 			// but connection needs to be closed so this is this case we still 
@@ -383,6 +395,10 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 					// still kept in connection manager services as active service
 					// after twice as long as resumption timeout
 					service.getSessionData().put(RESUMPTION_TIMEOUT_START_KEY, System.currentTimeMillis());
+					service.clearWaitingPackets();
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "{0}, service stopped - resumption enabled and timeout started", new Object[] { service });
+					}
 				}
 			}
 			
@@ -391,7 +407,13 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		else if (id != null) {
 			services.remove(id, service);
 		}
+
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "{0}, service stopped - resumption disabled, sending unacked packets", new Object[] { service });
+		}		
 		
+		service.clearWaitingPackets();
+		connectionManager.serviceStopped(service);
 		sendErrorsForQueuedPackets(service);
 		return false;
 	}
@@ -439,6 +461,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 					timerTask.cancel();
 				}
 				oldService.getSessionData().put(RESUMPTION_TASK_KEY, true);
+				oldService.clearWaitingPackets();
 			}
 
 			// get old out queue
@@ -494,27 +517,14 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 	 * @param service 
 	 */
 	private void sendErrorsForQueuedPackets(XMPPIOService service) {
+		service.clearWaitingPackets();
+		
 		OutQueue outQueue = (OutQueue) service.getSessionData().remove(OUT_COUNTER_KEY);		
 		if (outQueue != null) {
 			Packet packet = null;
 			
-			while ((packet = outQueue.queue.poll()) != null) {
-				try {
-					// we should not send errors for presences as Presence module does not
-					// allow to send presence with type error from users and presences
-					// with type error resulting from presences sent to barejid are
-					// messing up a lot on client side. moreover presences with type
-					// unavailable will be send by Presence plugin from SessionManager
-					// when session will be closed just after sending this errors
-					if (packet.getElemName() == Presence.ELEM_NAME && ignoreUndeliveredPresence)
-						continue;
-					
-					connectionManager.processOutPacket(Authorization.RECIPIENT_UNAVAILABLE
-							.getResponseMessage(packet, null, true));
-				} catch (PacketErrorTypeException ex) {
-					log.log(Level.FINER, "exception prepareing request for returning error, data = {0}", 
-							packet);
-				}
+			while ((packet = outQueue.queue.poll()) != null) {				
+				connectionManager.processUndeliveredPacket(packet);
 			}
 		}
 	}
@@ -535,9 +545,9 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		public void run() {	
 			String id = (String) service.getSessionData().get(STREAM_ID_KEY);			
 			if (services.remove(id, service)) {
-				sendErrorsForQueuedPackets(service);
 				//service.getSessionData().put(SERVICE_STOP_ALLOWED_KEY, true);
 				connectionManager.serviceStopped(service);
+				sendErrorsForQueuedPackets(service);
 			}
 		}
 		

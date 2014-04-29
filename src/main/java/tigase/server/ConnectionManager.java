@@ -438,6 +438,14 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	public abstract Queue<Packet> processSocketData(IO serv);
 
 	/**
+	 * Processes undelivered packets
+	 * @param packet
+	 */
+	public boolean processUndeliveredPacket(Packet packet) {
+		return false;
+	}	
+	
+	/**
 	 * Method description
 	 *
 	 *

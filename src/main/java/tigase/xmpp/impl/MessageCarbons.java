@@ -149,7 +149,11 @@ public class MessageCarbons
 		}
 		else if (packet.getElemName() == Message.ELEM_NAME && packet.getType() == StanzaType.chat 
 				&& packet.getStanzaTo() != null) {
-						
+
+			// ignoring if message packet was resent from c2s for redelivery
+			if (C2SDeliveryErrorProcessor.isDeliveryError(packet))
+				return;
+			
 			Map<JID,Boolean> resources = (Map<JID,Boolean>) session.getCommonSessionData(ENABLED_RESOURCES_KEY);
 			if (resources == null || resources.isEmpty()) {
 				// no session has enabled message carbons

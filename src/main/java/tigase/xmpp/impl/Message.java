@@ -26,31 +26,27 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import tigase.db.NonAuthUserRepository;
-
+import tigase.db.TigaseDBException;
 import tigase.server.Packet;
-
 import tigase.xml.Element;
-
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;
+import tigase.xmpp.XMPPPacketFilterIfc;
+import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
-import tigase.db.TigaseDBException;
-import tigase.xmpp.StanzaType;
 
 /**
  * Message forwarder class. Forwards <code>Message</code> packet to it's destination
@@ -63,7 +59,7 @@ import tigase.xmpp.StanzaType;
  */
 public class Message
 				extends XMPPProcessor
-				implements XMPPProcessorIfc {
+				implements XMPPProcessorIfc, XMPPPreprocessorIfc, XMPPPacketFilterIfc {
 	
 	private static final String     ELEM_NAME = tigase.server.Message.ELEM_NAME;
 	private static final String[][] ELEMENTS  = {
@@ -99,6 +95,11 @@ public class Message
 				? MessageDeliveryRules.valueOf((String) settings.get(DELIVERY_RULES_KEY))
 				: MessageDeliveryRules.inteligent;
 	}
+	
+	@Override
+	public void filter(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results) {
+		C2SDeliveryErrorProcessor.filter(packet, session, repo, results, null);
+	}	
 	
 	/**
 	 * Method description
@@ -297,12 +298,21 @@ public class Message
 				results.offer(result);
 			}
 		} catch (NotAuthorizedException e) {
-			log.warning("NotAuthorizedException for packet: " + packet);
+			log.log(Level.WARNING, "NotAuthorizedException for packet: " + packet, e);
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
 		}    // end of try-catch
 	}
 
+	@Override
+	public boolean preProcess(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
+		boolean result = C2SDeliveryErrorProcessor.preProcess(packet, session, repo, results, settings);
+		if (result) {
+			packet.processedBy(ID);
+		}
+		return result;
+	}
+	
 	/**
 	 * Method description
 	 *

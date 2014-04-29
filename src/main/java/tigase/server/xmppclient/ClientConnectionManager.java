@@ -66,6 +66,9 @@ import java.util.zip.Deflater;
 
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import tigase.server.Message;
+import tigase.server.Presence;
+import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
 
 /**
  * Class ClientConnectionManager Created: Tue Nov 22 07:07:11 2005
@@ -287,6 +290,42 @@ public class ClientConnectionManager
 	}
 
 	/**
+	 * Processes undelivered packets
+	 * @param packet
+	 * @return true - if packet was processed
+	 */
+	@Override
+	public boolean processUndeliveredPacket(Packet packet) {
+		try {
+			// we should not send errors for presences as Presence module does not
+			// allow to send presence with type error from users and presences
+			// with type error resulting from presences sent to barejid are
+			// messing up a lot on client side. moreover presences with type
+			// unavailable will be send by Presence plugin from SessionManager
+			// when session will be closed just after sending this errors
+			if (packet.getElemName() == Presence.ELEM_NAME) {
+				return false;
+			}
+
+			if (packet.getElemName() == Message.ELEM_NAME) {
+				// we should mark this message packet so that SM will know that it is
+				// resent from here due to connection failure
+				Packet result = C2SDeliveryErrorProcessor.makeDeliveryError(packet);
+				
+				processOutPacket(result);
+				return true;
+			}
+			
+			processOutPacket(Authorization.RECIPIENT_UNAVAILABLE
+					.getResponseMessage(packet, null, true));
+		} catch (PacketErrorTypeException ex) {
+			log.log(Level.FINER, "exception prepareing request for returning error, data = {0}",
+					packet);
+		}
+		return true;
+	}
+	
+	/**
 	 * Method description
 	 *
 	 * @param port_props
@@ -322,6 +361,14 @@ public class ClientConnectionManager
 	public boolean serviceStopped(XMPPIOService<Object> service) {
 		boolean result = super.serviceStopped(service);
 
+		if (result) {
+			Queue<Packet> undeliveredPackets = service.getWaitingPackets();
+			Packet p = null;
+			while ((p = undeliveredPackets.poll()) != null) {
+				processUndeliveredPacket(p);
+			}
+		}
+		
 		xmppStreamClosed(service);
 
 		return result;
