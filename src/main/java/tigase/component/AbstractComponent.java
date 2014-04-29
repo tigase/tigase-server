@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 
 import javax.script.Bindings;
 
-import tigase.component.AbstractComponent.ModuleRegisteredHandler.ModuleRegisteredEvent;
 import tigase.component.eventbus.DefaultEventBus;
 import tigase.component.eventbus.Event;
 import tigase.component.eventbus.EventBus;
