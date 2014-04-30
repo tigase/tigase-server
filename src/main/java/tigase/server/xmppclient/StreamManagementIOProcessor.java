@@ -524,7 +524,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 			Packet packet = null;
 			
 			while ((packet = outQueue.queue.poll()) != null) {				
-				connectionManager.processUndeliveredPacket(packet);
+				connectionManager.processUndeliveredPacket(packet, null);
 			}
 		}
 	}

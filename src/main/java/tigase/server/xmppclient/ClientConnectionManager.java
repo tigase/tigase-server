@@ -292,11 +292,16 @@ public class ClientConnectionManager
 	/**
 	 * Processes undelivered packets
 	 * @param packet
+	 * @param errorMessage
 	 * @return true - if packet was processed
 	 */
 	@Override
-	public boolean processUndeliveredPacket(Packet packet) {
+	public boolean processUndeliveredPacket(Packet packet, String errorMessage) {
 		try {
+			// is there a point in trying to redeliver stanza of type error?
+			if (packet.getType() == StanzaType.error)
+				return false;
+			
 			// we should not send errors for presences as Presence module does not
 			// allow to send presence with type error from users and presences
 			// with type error resulting from presences sent to barejid are
@@ -317,7 +322,7 @@ public class ClientConnectionManager
 			}
 			
 			processOutPacket(Authorization.RECIPIENT_UNAVAILABLE
-					.getResponseMessage(packet, null, true));
+					.getResponseMessage(packet, errorMessage, true));
 		} catch (PacketErrorTypeException ex) {
 			log.log(Level.FINER, "exception prepareing request for returning error, data = {0}",
 					packet);
@@ -365,7 +370,7 @@ public class ClientConnectionManager
 			Queue<Packet> undeliveredPackets = service.getWaitingPackets();
 			Packet p = null;
 			while ((p = undeliveredPackets.poll()) != null) {
-				processUndeliveredPacket(p);
+				processUndeliveredPacket(p, null);
 			}
 		}
 		

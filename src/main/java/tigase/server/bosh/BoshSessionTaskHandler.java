@@ -24,6 +24,7 @@ import java.util.TimerTask;
 import tigase.server.Packet;
 import tigase.server.xmppclient.SeeOtherHostIfc;
 import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 
 /**
  * Describe interface BoshSessionTaskHandler here.
@@ -36,6 +37,8 @@ import tigase.xmpp.BareJID;
  */
 public interface BoshSessionTaskHandler {
 
+	JID getJidForBoshSession(BoshSession bs);
+	
 	BoshTask scheduleTask( BoshSession bs, long delay );
 
 	BoshSendQueueTask scheduleSendQueueTask( BoshSession tt, long delay );
@@ -53,4 +56,6 @@ public interface BoshSessionTaskHandler {
 	BareJID getDefHostName();
 	
 	BareJID getSeeOtherHostForJID( BareJID userId, SeeOtherHostIfc.Phase ph );
+	
+	boolean processUndeliveredPacket(Packet packet, String errorMessage);
 }

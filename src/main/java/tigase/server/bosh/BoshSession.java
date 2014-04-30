@@ -348,8 +348,8 @@ public class BoshSession {
 
 
 		// service.writeRawData(body.toString());
-		Packet streamOpen = Command.STREAM_OPENED.getPacket(null, null, StanzaType.set, UUID
-				.randomUUID().toString(), Command.DataType.submit);
+		Packet streamOpen = Command.STREAM_OPENED.getPacket(handler.getJidForBoshSession(this),
+				null, StanzaType.set, UUID.randomUUID().toString(), Command.DataType.submit);
 
 		Command.addFieldValue(streamOpen, SESSION_ID_ATTR, sessionId);
 		Command.addFieldValue(streamOpen, "hostname", domain);
@@ -495,9 +495,11 @@ public class BoshSession {
 					max_inactivity = 2;    // Max pause changed to 2 secs
 					terminate      = true;
 
-					Packet command = Command.STREAM_CLOSED.getPacket(null, null, StanzaType.set,
-							UUID.randomUUID().toString());
-
+					Packet command = Command.STREAM_CLOSED.getPacket(handler.getJidForBoshSession(this),
+							getDataReceiver(), StanzaType.set, UUID.randomUUID().toString());
+					if (userJid != null) {
+						Command.addFieldValue(command, "user-jid", userJid.toString());
+					}	
 					handler.addOutStreamClosed(command, this);
 
 					// out_results.offer(command);
@@ -569,9 +571,11 @@ public class BoshSession {
 				waiting_packets.add(error.getElement());
 				terminate = true;
 
-				Packet command = Command.STREAM_CLOSED.getPacket(null, null, StanzaType.set, UUID
-						.randomUUID().toString());
-
+				Packet command = Command.STREAM_CLOSED.getPacket(handler.getJidForBoshSession(this),
+						getDataReceiver(), StanzaType.set, UUID.randomUUID().toString());
+				if (userJid != null) {
+					Command.addFieldValue(command, "user-jid", userJid.toString());
+				}	
 				handler.addOutStreamClosed(command, this);
 
 				// out_results.offer(command);
@@ -621,8 +625,21 @@ public class BoshSession {
 	 * 
 	 */
 	public boolean task(Queue<Packet> out_results, TimerTask tt) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "task called for {0}, inactivityTimer = {1}, tt = {2}", new Object[] { getSid(), inactivityTimer, tt });
+		}
 		if (tt == inactivityTimer) {
 			if (connections.size() > 0) {
+				if (log.isLoggable(Level.FINEST)) {
+					String conns = "";
+					for (BoshIOService serv : connections.values()) {
+						if (!conns.isEmpty()) {
+							conns += ", ";
+						}
+						conns += "[" + serv.toString() + "]";
+					}
+					log.log(Level.FINEST, "ignoring inactivityTimer - we have connections: {0} - {1}", new Object[] { connections.size(), conns });
+				}
 				return false;
 			}
 			if (log.isLoggable(Level.FINEST)) {
@@ -636,30 +653,43 @@ public class BoshSession {
 					handler.cancelTask(waitTimer);
 				}
 			}
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Closing session, inactivity timeout expired: " + getSid());
+			}
+
+			// we need to set packetFrom as it is later used as packet from and to
+			// pick thread on which it will be processed
+			Packet command = Command.STREAM_CLOSED.getPacket(handler.getJidForBoshSession(this), 
+					getDataReceiver(), StanzaType.set, UUID.randomUUID().toString());
+			if (userJid != null) {
+				Command.addFieldValue(command, "user-jid", userJid.toString());
+			}			
+
+			handler.addOutStreamClosed(command, this);
+
 			for (Element packet : waiting_packets) {
 				try {
 
 					// Do not send stream:features back with an error
 					if (packet.getName() != "stream:features") {
-						out_results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(
-								Packet.packetInstance(packet), "Bosh = disconnected", true));
+//						out_results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(
+//								Packet.packetInstance(packet), "Bosh = disconnected", true));
+						Packet p = Packet.packetInstance(packet);
+						// we need to set packetTo as it is later used as packet from and to
+						// pick thread on which it will be processed
+						p.setPacketTo(handler.getJidForBoshSession(this));
+						p.setPacketFrom(getDataReceiver());
+						handler.processUndeliveredPacket(p, "Bosh = disconnected");
 					}
 				} catch (TigaseStringprepException ex) {
 					log.warning(
 							"Packet addressing problem, stringprep processing failed, dropping: " +
 							packet);
-				} catch (PacketErrorTypeException e) {
-					log.info("Packet processing exception: " + e);
+//				} catch (PacketErrorTypeException e) {
+//					log.info("Packet processing exception: " + e);
 				}
 			}
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Closing session, inactivity timeout expired: " + getSid());
-			}
-
-			Packet command = Command.STREAM_CLOSED.getPacket(null, null, StanzaType.set, UUID
-					.randomUUID().toString());
-
-			handler.addOutStreamClosed(command, this);
+			
 			closeAllConnections();
 
 			// out_results.offer(command);

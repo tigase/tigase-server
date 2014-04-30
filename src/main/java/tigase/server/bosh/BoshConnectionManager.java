@@ -361,7 +361,8 @@ public class BoshConnectionManager
 	 *
 	 * @param service
 	 */
-	public void serviceStarted(BoshIOService service) {
+	@Override
+	public void serviceStarted(XMPPIOService<Object> service) {
 		super.serviceStarted(service);
 	}
 
@@ -369,10 +370,13 @@ public class BoshConnectionManager
 	 * Method description
 	 *
 	 *
-	 * @param service
+	 * @param xmppService
+	 * @return 
 	 */
-	public void serviceStopped(BoshIOService service) {
-		super.serviceStopped(service);
+	@Override
+	public boolean serviceStopped(XMPPIOService<Object> xmppService) {
+		BoshIOService service = (BoshIOService) xmppService;
+		boolean result = super.serviceStopped(service);
 
 		UUID sid = service.getSid();
 
@@ -383,6 +387,7 @@ public class BoshConnectionManager
 				bs.disconnected(service);
 			}
 		}
+		return result;
 	}
 
 	// ~--- methods --------------------------------------------------------------
@@ -493,6 +498,17 @@ public class BoshConnectionManager
 		return "Bosh connection manager";
 	}
 
+	/**
+	 * Returns full jid of passed BoshSession instance
+	 * 
+	 * @param bs
+	 * @return 
+	 */
+	@Override
+	public JID getJidForBoshSession(BoshSession bs) {
+		return getFromAddress(bs.getSid().toString());
+	}
+	
 	/**
 	 * Method description
 	 *

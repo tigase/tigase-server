@@ -440,8 +440,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	/**
 	 * Processes undelivered packets
 	 * @param packet
+	 * @param errorMessage
 	 */
-	public boolean processUndeliveredPacket(Packet packet) {
+	public boolean processUndeliveredPacket(Packet packet, String errorMessage) {
 		return false;
 	}	
 	
