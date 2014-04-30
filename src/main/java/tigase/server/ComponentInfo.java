@@ -18,7 +18,7 @@
 package tigase.server;
 
 import java.util.HashMap;
-
+import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.xml.Element;
 
 /**
@@ -202,6 +202,17 @@ public class ComponentInfo {
 
 		String version = p == null ? null : p.getImplementationVersion();
 
+		if (ClusteredComponentIfc.class.isAssignableFrom(c)) {
+			Class<?> superClass = c.getSuperclass();
+			Package superPackage = getImplementation( superClass );
+			if (p != superPackage && superPackage != null) {
+				String superVersion  = superPackage.getImplementationVersion();
+				if (superVersion != null) {
+					version += "-" + superVersion;
+				}
+			}
+		}
+		
 		return ( version == null ) ? "" : version;
 	}
 
