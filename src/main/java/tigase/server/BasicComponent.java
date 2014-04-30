@@ -1188,7 +1188,7 @@ public class BasicComponent
 							// check component names
 							for (String cmp : comp_names) {
 								cmp = cmp.trim();
-								found = getName().equals(cmp);
+								found |= getName().equals(cmp);
 							}
 
 							// check component classes
@@ -1211,16 +1211,12 @@ public class BasicComponent
 									} catch ( ClassNotFoundException ex ) {
 										// just ignore
 									}
-									if ( found ){
-										break;
-									}
 								}
 							}
 							if (!found) {
 								log.log(Level.CONFIG,
-										"{0}: skipping admin script {1} for component: {2}", new Object[] {
-										getName(),
-										scriptsPath, comp });
+										"{0}: skipping admin script {1}, id: {2}, descr: {3} for component: {4}", new Object[] {
+										getName(), file, cmdId, cmdDescr, comp });
 
 								continue;
 							}
