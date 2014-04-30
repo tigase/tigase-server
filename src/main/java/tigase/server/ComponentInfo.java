@@ -205,9 +205,9 @@ public class ComponentInfo {
 		if (ClusteredComponentIfc.class.isAssignableFrom(c)) {
 			Class<?> superClass = c.getSuperclass();
 			Package superPackage = getImplementation( superClass );
-			if (p != superPackage && superPackage != null) {
+			if (p != superPackage && superPackage != null && !p.equals(superPackage)) {
 				String superVersion  = superPackage.getImplementationVersion();
-				if (superVersion != null) {
+				if (superVersion != null && version != null && !version.equals(superVersion)) {
 					version += "-" + superVersion;
 				}
 			}
