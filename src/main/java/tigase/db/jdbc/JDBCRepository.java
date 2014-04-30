@@ -1300,9 +1300,7 @@ public class JDBCRepository
 				user_add_sp.setString(1, user_id.toString());
 				user_add_sp.setNull(2, Types.VARCHAR);
 
-				String out = String.format("Jid %1$s;", user_id.toString());
-				log.log(Level.ALL, out );
-				System.out.println( out );
+				log.log(Level.FINEST, "Adding non existing user to user-repository: " + user_id.toString() );
 
 				switch ( data_repo.getDatabaseType() ) {
 					case sqlserver:
