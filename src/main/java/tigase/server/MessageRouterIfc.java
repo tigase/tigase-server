@@ -22,6 +22,7 @@
 
 package tigase.server;
 
+import tigase.conf.ConfigurationException;
 import tigase.conf.ConfiguratorAbstract;
 
 /**
@@ -32,7 +33,7 @@ import tigase.conf.ConfiguratorAbstract;
  */
 public interface MessageRouterIfc extends ServerComponent {
 
-	void setConfig(ConfiguratorAbstract config);
+	void setConfig(ConfiguratorAbstract config) throws ConfigurationException;
 
 	void start();
 

@@ -24,6 +24,7 @@ package tigase.server;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import tigase.conf.ConfigurationException;
 
 /**
  * This is an archetype of a special types of classes which collect some data
@@ -70,7 +71,7 @@ public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 	 *
 	 * @param component is a reference to the component just added to the collection.
 	 */
-	public abstract void componentAdded(E component);
+	public abstract void componentAdded(E component) throws ConfigurationException;
 
 	/**
 	 * Method provides a callback mechanism signaling that a component implementing
@@ -109,7 +110,7 @@ public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public boolean addComponent(ServerComponent component) {
+	public boolean addComponent(ServerComponent component) throws ConfigurationException {
 		if (isCorrectType(component)) {
 			components.put(component.getName(), (E) component);
 			componentAdded((E) component);

@@ -26,21 +26,33 @@ package tigase.server.xmppclient;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.zip.Deflater;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import tigase.conf.ConfigurationException;
 import tigase.net.IOService;
 import tigase.net.SocketThread;
-
 import tigase.server.Command;
 import tigase.server.ConnectionManager;
 import tigase.server.Iq;
+import tigase.server.Message;
 import tigase.server.Packet;
+import tigase.server.Presence;
 import tigase.server.ReceiverTimeoutHandler;
-
 import tigase.util.DNSResolver;
 import tigase.util.RoutingsContainer;
 import tigase.util.TigaseStringprepException;
-
 import tigase.xml.Element;
-
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
@@ -48,26 +60,6 @@ import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.XMPPResourceConnection;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.io.IOException;
-
-import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
-import java.util.UUID;
-import java.util.zip.Deflater;
-
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import tigase.server.Message;
-import tigase.server.Presence;
 import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
 
 /**
@@ -693,9 +685,10 @@ public class ClientConnectionManager
 	 * Method description
 	 *
 	 * @param props
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
-	public void setProperties(Map<String, Object> props) {
+	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
 		clientTrustManagerFactory.setProperties(props);
 		if (props.get(SOCKET_CLOSE_WAIT_PROP_KEY) != null) {

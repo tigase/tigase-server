@@ -51,6 +51,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.script.Bindings;
+import tigase.conf.ConfigurationException;
 
 /**
  * Describe class VHostManager here.
@@ -507,10 +508,11 @@ public class VHostManager
 	 *
 	 *
 	 * @param properties
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
 	@SuppressWarnings({ "unchecked" })
-	public void setProperties(Map<String, Object> properties) {
+	public void setProperties(Map<String, Object> properties) throws ConfigurationException {
 		super.setProperties(properties);
 
 		String repo_class = (String) properties.get(VHOSTS_REPO_CLASS_PROP_KEY);

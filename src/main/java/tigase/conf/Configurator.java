@@ -45,7 +45,7 @@ public class Configurator extends ConfiguratorAbstract {
 	}
 
 	@Override
-	public void componentAdded(Configurable component) {
+	public void componentAdded(Configurable component) throws ConfigurationException {
 		try {
 			super.componentAdded(component);
 		} catch (NullPointerException ex) {

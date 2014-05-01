@@ -121,7 +121,7 @@ public class ConfiguratorOld
 	 * @param component
 	 */
 	@Override
-	public void componentAdded(Configurable component) {
+	public void componentAdded(Configurable component) throws ConfigurationException {
 		super.componentAdded(component);
 		if (log.isLoggable(Level.CONFIG)) {
 			log.config(" component: " + component.getName());
@@ -580,8 +580,9 @@ public class ConfiguratorOld
 	 *
 	 *
 	 * @param name
+	 * @throws tigase.conf.ConfigurationException
 	 */
-	public void setup(String name) {
+	public void setup(String name) throws ConfigurationException {
 		Configurable component = getComponent(name);
 
 		setup(component);
@@ -773,9 +774,10 @@ public class ConfiguratorOld
 	/**
 	 * Sets all configuration properties for object.
 	 * @param props
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
-	public void setProperties(final Map<String, Object> props) {
+	public void setProperties(final Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
 
 		// setupLogManager(props);

@@ -26,39 +26,32 @@ package tigase.cluster;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.script.Bindings;
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.cluster.api.SessionManagerClusteredIfc;
 import tigase.cluster.strategy.ClusteringStrategyIfc;
-
+import tigase.conf.ConfigurationException;
+import tigase.osgi.ModulesManagerImpl;
 import tigase.server.ComponentInfo;
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
-
 import tigase.stats.StatisticsList;
-
 import tigase.util.DNSResolver;
 import tigase.util.TigaseStringprepException;
-
 import tigase.xml.Element;
-
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPSession;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.Arrays;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-
-import javax.script.Bindings;
 
 /**
  * Class SessionManagerClusteredOld
@@ -614,13 +607,13 @@ public class SessionManagerClustered
 	 * @param props
 	 */
 	@Override
-	public void setProperties(Map<String, Object> props) {
+	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
 		if (props.get(STRATEGY_CLASS_PROP_KEY) != null) {
 			String strategy_class = (String) props.get(STRATEGY_CLASS_PROP_KEY);
 
 			try {
-				ClusteringStrategyIfc strategy_tmp = (ClusteringStrategyIfc) Class.forName(
+				ClusteringStrategyIfc strategy_tmp = (ClusteringStrategyIfc) ModulesManagerImpl.getInstance().forName(
 						strategy_class).newInstance();
 
 				strategy_tmp.setSessionManagerHandler(this);
@@ -639,6 +632,8 @@ public class SessionManagerClustered
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Cannot instance clustering strategy class: " +
 						strategy_class, e);
+				throw new ConfigurationException("Can not instantiate clustering strategy for class: " +
+					strategy_class);		
 			}
 		}
 		updateServiceEntity();

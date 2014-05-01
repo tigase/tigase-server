@@ -22,6 +22,8 @@
 
 package tigase.server;
 
+import tigase.conf.ConfigurationException;
+
 /**
  * Interface ComponentRegistrator
  *
@@ -40,7 +42,7 @@ public interface ComponentRegistrator extends ServerComponent {
    * @return a <code>boolean</code> value indicating whehether component has
    * been successfuly added or not.
    */
-	boolean addComponent(ServerComponent component);
+	boolean addComponent(ServerComponent component) throws ConfigurationException;
 
   /**
    *

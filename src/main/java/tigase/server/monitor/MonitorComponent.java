@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.script.Bindings;
+import tigase.conf.ConfigurationException;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -140,9 +141,10 @@ public class MonitorComponent extends AbstractMessageReceiver {
 	 *
 	 *
 	 * @param props
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
-	public void setProperties(Map<String, Object> props) {
+	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
 	}
 }

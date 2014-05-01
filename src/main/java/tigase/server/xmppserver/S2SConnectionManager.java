@@ -40,6 +40,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.script.Bindings;
+import tigase.conf.ConfigurationException;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.server.Permissions;
@@ -925,9 +926,10 @@ public class S2SConnectionManager
 	 *
 	 *
 	 * @param props
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
-	public void setProperties(Map<String, Object> props) {
+	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
 		if (props.containsKey(CID_CONNECTIONS_TASKS_THREADS_KEY)) {
 			CIDConnections.setOutgoingOpenThreadsSize((Integer) props.get(

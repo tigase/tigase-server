@@ -26,20 +26,26 @@ package tigase.server.xmppsession;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.script.Bindings;
 import tigase.auth.mechanisms.SaslEXTERNAL;
-
 import tigase.conf.Configurable;
+import tigase.conf.ConfigurationException;
+import tigase.db.AuthRepository;
 
 import tigase.db.AuthorizationException;
-import tigase.db.AuthRepository;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.NonAuthUserRepositoryImpl;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
-
 import tigase.disco.XMPPService;
-
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Command;
 import tigase.server.Iq;
@@ -48,26 +54,24 @@ import tigase.server.Packet;
 import tigase.server.Permissions;
 import tigase.server.Priority;
 import tigase.server.ReceiverTimeoutHandler;
-import tigase.server.script.CommandIfc;
 import tigase.server.XMPPServer;
+import tigase.server.script.CommandIfc;
+
+import static tigase.server.xmppsession.SessionManagerConfig.*;
+
+//~--- JDK imports ------------------------------------------------------------
 
 import tigase.stats.StatisticsList;
-
 import tigase.sys.OnlineJidsReporter;
 import tigase.sys.TigaseRuntime;
-
 import tigase.util.ProcessingThreads;
 import tigase.util.QueueItem;
 import tigase.util.TigaseStringprepException;
 import tigase.util.WorkerThread;
-
 import tigase.vhosts.VHostItem;
-
 import tigase.xml.Element;
-
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
-import tigase.xmpp.impl.PresenceCapabilitiesManager;
 import tigase.xmpp.JID;
 import tigase.xmpp.NoConnectionIdException;
 import tigase.xmpp.NotAuthorizedException;
@@ -84,21 +88,8 @@ import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPSession;
 import tigase.xmpp.XMPPStopListenerIfc;
-
-import static tigase.server.xmppsession.SessionManagerConfig.*;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.script.Bindings;
 import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
+import tigase.xmpp.impl.PresenceCapabilitiesManager;
 
 /**
  * Class SessionManager
@@ -916,9 +907,10 @@ public class SessionManager
 	 *
 	 *
 	 * @param props
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
-	public void setProperties(Map<String, Object> props) {
+	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
 		if (props.get(SKIP_PRIVACY_PROP_KEY) != null) {
 			skipPrivacy = (Boolean) props.get(SKIP_PRIVACY_PROP_KEY);

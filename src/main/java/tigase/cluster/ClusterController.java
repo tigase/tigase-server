@@ -41,6 +41,7 @@ import tigase.cluster.api.ClusterElement;
 import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.cluster.api.CommandListener;
 import tigase.conf.Configurable;
+import tigase.conf.ConfigurationException;
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
@@ -494,9 +495,10 @@ public class ClusterController
 	 *
 	 *
 	 * @param properties
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
-	public void setProperties(Map<String, Object> properties) {
+	public void setProperties(Map<String, Object> properties) throws ConfigurationException {
 		super.setProperties(properties);
 	}
 

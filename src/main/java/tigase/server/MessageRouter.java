@@ -26,31 +26,8 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.conf.ConfiguratorAbstract;
-
-import tigase.disco.XMPPService;
-
-import tigase.stats.StatisticsList;
-
-import tigase.sys.TigaseRuntime;
-
-import tigase.util.TigaseStringprepException;
-import tigase.util.UpdatesChecker;
-
-import tigase.xml.Element;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.JID;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.StanzaType;
-
-import static tigase.server.MessageRouterConfig.*;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
-
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
@@ -59,6 +36,19 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.conf.ConfigurationException;
+import tigase.conf.ConfiguratorAbstract;
+import tigase.disco.XMPPService;
+import static tigase.server.MessageRouterConfig.*;
+import tigase.stats.StatisticsList;
+import tigase.sys.TigaseRuntime;
+import tigase.util.TigaseStringprepException;
+import tigase.util.UpdatesChecker;
+import tigase.xml.Element;
+import tigase.xmpp.Authorization;
+import tigase.xmpp.JID;
+import tigase.xmpp.PacketErrorTypeException;
+import tigase.xmpp.StanzaType;
 
 /**
  * Class MessageRouter
@@ -106,7 +96,7 @@ public class MessageRouter
 	 *
 	 * @param component
 	 */
-	public void addComponent(ServerComponent component) {
+	public void addComponent(ServerComponent component) throws ConfigurationException {
 		log.log(Level.INFO, "Adding component: ", component.getClass().getSimpleName());
 		for (ComponentRegistrator registr : registrators.values()) {
 			if (registr != component) {
@@ -131,7 +121,7 @@ public class MessageRouter
 	 *
 	 * @param registr
 	 */
-	public void addRegistrator(ComponentRegistrator registr) {
+	public void addRegistrator(ComponentRegistrator registr) throws ConfigurationException {
 		log.log(Level.INFO, "Adding registrator: {0}", registr.getClass().getSimpleName());
 		registrators.put(registr.getName(), registr);
 		addComponent(registr);
@@ -150,7 +140,7 @@ public class MessageRouter
 	 *
 	 * @param receiver
 	 */
-	public void addRouter(MessageReceiver receiver) {
+	public void addRouter(MessageReceiver receiver) throws ConfigurationException {
 		log.info("Adding receiver: " + receiver.getClass().getSimpleName());
 		addComponent(receiver);
 		receivers.put(receiver.getName(), receiver);
@@ -528,6 +518,19 @@ public class MessageRouter
 		}
 	}
 
+	public void removeRegistrator(ComponentRegistrator registr) {
+		log.log(Level.INFO, "Removing registrator: {0}", registr.getClass().getSimpleName());
+		registrators.remove(registr.getName(), registr);
+		removeComponent(registr);
+		for (ServerComponent comp : components.values()) {
+
+			// if (comp != registr) {
+			registr.deleteComponent(comp);
+
+			// } // end of if (comp != registr)
+		}    // end of for (ServerComponent comp : components)
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -688,9 +691,10 @@ public class MessageRouter
 	 *
 	 *
 	 * @param config
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
-	public void setConfig(ConfiguratorAbstract config) {
+	public void setConfig(ConfiguratorAbstract config) throws ConfigurationException {
 		components.put(getName(), this);
 		this.config = config;
 		addRegistrator(config);
@@ -703,7 +707,7 @@ public class MessageRouter
 	 * @param props
 	 */
 	@Override
-	public void setProperties(Map<String, Object> props) {
+	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		if (inProperties) {
 			return;
 		} else {
@@ -751,6 +755,11 @@ public class MessageRouter
 						cr.setName(name);
 					}    // end of if (cr == null)
 					addRegistrator(cr);
+				} catch (ConfigurationException ex) {
+					log.log(Level.WARNING, "configuration of component " + name + " failed - disabling component", ex);
+					if (cr != null) {
+						removeRegistrator(cr);
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}      // end of try-catch
@@ -793,6 +802,7 @@ public class MessageRouter
 //            start = true;
 						}
 					}    // end of if (cr == null)
+					
 					if (mr instanceof MessageReceiver) {
 						addRouter((MessageReceiver) mr);
 					} else {
@@ -804,13 +814,23 @@ public class MessageRouter
 //                ((MessageReceiver) mr).start();
 //        }
 				}      // end of try
-						catch (ClassNotFoundException e) {
+				catch (ClassNotFoundException e) {
 					log.log(Level.WARNING, "class for component = {0} could not be found " +
-							"- disabling component", name);
-
+							"- disabling component", name);					
 //        conf.setComponentActive(name, false);
 				}    // end of try
-						catch (Exception e) {
+				catch (ConfigurationException ex) {
+					log.log(Level.WARNING, "configuration of component " + name + " failed - disabling component", ex);
+					if (mr != null) {
+						if (mr instanceof MessageReceiver) {
+							removeRouter((MessageReceiver) mr);
+							((MessageReceiver) mr).stop();
+						} else {
+							removeComponent(mr);
+						}
+					}
+				}
+				catch (Exception e) {
 					e.printStackTrace();
 				}    // end of try-catch
 			}      // end of for (String name: reg_names)

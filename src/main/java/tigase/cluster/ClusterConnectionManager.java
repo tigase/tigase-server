@@ -26,58 +26,45 @@ package tigase.cluster;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.zip.Deflater;
+import javax.script.Bindings;
 import tigase.cluster.api.ClusterCommandException;
 import tigase.cluster.api.ClusterControllerIfc;
-import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.cluster.api.ClusterElement;
+import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.cluster.api.CommandListener;
 import tigase.cluster.api.CommandListenerAbstract;
 import tigase.cluster.repo.ClusterRepoItem;
-
+import tigase.conf.ConfigurationException;
 import tigase.db.comp.ComponentRepository;
 import tigase.db.comp.RepositoryChangeListenerIfc;
-
 import tigase.net.ConnectionType;
-
-//import tigase.net.IOService;
 import tigase.net.SocketType;
-
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.server.ServiceChecker;
-
 import tigase.stats.StatisticsList;
-
 import tigase.util.Algorithms;
 import tigase.util.TigaseStringprepException;
 import tigase.util.TimeUtils;
-
 import tigase.xml.Element;
-
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.XMPPIOService;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.security.NoSuchAlgorithmException;
-
-import java.util.Arrays;
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
-import java.util.LinkedHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.UUID;
-import java.util.zip.Deflater;
-
-import javax.script.Bindings;
 
 /**
  * Class ClusterConnectionManager
@@ -879,10 +866,11 @@ public class ClusterConnectionManager
 	 *
 	 *
 	 * @param props
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public void setProperties(Map<String, Object> props) {
+	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		if (props.get(IDENTITY_TYPE_KEY) != null) {
 			identity_type = (String) props.get(IDENTITY_TYPE_KEY);
 		}

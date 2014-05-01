@@ -24,31 +24,7 @@ package tigase.server.xmppcomponent;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.disco.ServiceEntity;
-import tigase.disco.ServiceIdentity;
-import tigase.disco.XMPPService;
-
-import tigase.net.ConnectionType;
-import tigase.net.SocketType;
-
-import tigase.server.ConnectionManager;
-import tigase.server.Packet;
-
-import tigase.util.Algorithms;
-import tigase.util.TigaseStringprepException;
-
-import tigase.xml.Element;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.XMPPIOService;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.security.NoSuchAlgorithmException;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +33,22 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.conf.ConfigurationException;
+import tigase.disco.ServiceEntity;
+import tigase.disco.ServiceIdentity;
+import tigase.disco.XMPPService;
+import tigase.net.ConnectionType;
+import tigase.net.SocketType;
+import tigase.server.ConnectionManager;
+import tigase.server.Packet;
+import tigase.util.Algorithms;
+import tigase.util.TigaseStringprepException;
+import tigase.xml.Element;
+import tigase.xmpp.Authorization;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
+import tigase.xmpp.PacketErrorTypeException;
+import tigase.xmpp.XMPPIOService;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -498,9 +490,10 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 	 *
 	 *
 	 * @param props
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
-	public void setProperties(Map<String, Object> props) {
+	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
 		pack_routed = (Boolean) props.get(PACK_ROUTED_KEY);
 

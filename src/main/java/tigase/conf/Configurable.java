@@ -617,6 +617,7 @@ public interface Configurable
 	/**
 	 * Returns default configuration settings for this object.
 	 * @param params
+	 * @return 
 	 * 
 	 */
 	Map<String, Object> getDefaults(Map<String, Object> params);
@@ -626,8 +627,9 @@ public interface Configurable
 	/**
 	 * Sets all configuration properties for the object.
 	 * @param properties
+	 * @throws tigase.conf.ConfigurationException - if setting configuration will fail which will make it unable to work
 	 */
-	void setProperties(Map<String, Object> properties);
+	void setProperties(Map<String, Object> properties) throws ConfigurationException;
 }
 
 

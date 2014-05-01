@@ -26,12 +26,27 @@ package tigase.server.ext;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.comp.ComponentRepository;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.TimerTask;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.script.Bindings;
+import tigase.conf.ConfigurationException;
+import tigase.db.comp.ComponentRepository;
 import tigase.net.ConnectionType;
 import tigase.net.SocketType;
-
 import tigase.server.ConnectionManager;
+import tigase.server.Packet;
 import tigase.server.ext.handlers.BindProcessor;
 import tigase.server.ext.handlers.ComponentAcceptStreamOpenHandler;
 import tigase.server.ext.handlers.ComponentConnectStreamOpenHandler;
@@ -42,34 +57,11 @@ import tigase.server.ext.handlers.StartTLSProcessor;
 import tigase.server.ext.handlers.StreamFeaturesProcessor;
 import tigase.server.ext.handlers.UnknownXMLNSStreamOpenHandler;
 import tigase.server.ext.lb.LoadBalancerIfc;
-import tigase.server.Packet;
-
 import tigase.stats.StatisticsList;
-
 import tigase.util.TigaseStringprepException;
-
 import tigase.xml.Element;
-
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
-import java.util.TimerTask;
-
-import javax.script.Bindings;
 
 /**
  * Created: Sep 30, 2009 8:28:13 PM
@@ -659,10 +651,11 @@ public class ComponentProtocol
 	 *
 	 *
 	 * @param properties
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
 	@SuppressWarnings({ "unchecked" })
-	public void setProperties(Map<String, Object> properties) {
+	public void setProperties(Map<String, Object> properties) throws ConfigurationException {
 		if (properties.size() == 1) {
 
 			// If props.size() == 1, it means this is a single property update

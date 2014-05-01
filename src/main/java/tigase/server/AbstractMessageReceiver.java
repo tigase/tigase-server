@@ -26,14 +26,6 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.annotations.TODO;
-
-import tigase.stats.StatisticsContainer;
-import tigase.stats.StatisticsList;
-import tigase.stats.StatisticType;
-
-import tigase.util.PatternComparator;
-import tigase.util.PriorityQueueAbstract;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -48,6 +40,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import tigase.annotations.TODO;
+import tigase.conf.ConfigurationException;
+import tigase.stats.StatisticType;
+import tigase.stats.StatisticsContainer;
+import tigase.stats.StatisticsList;
+import tigase.util.PatternComparator;
+import tigase.util.PriorityQueueAbstract;
 
 /**
  * This is an archetype for all classes processing user-level packets. The
@@ -1006,10 +1005,11 @@ public abstract class AbstractMessageReceiver
 	 * Sets all configuration properties for object.
 	 *
 	 * @param props
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
 	@TODO(note = "Replace fixed filers loading with configurable options for that")
-	public void setProperties(Map<String, Object> props) {
+	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
 		if (props.get(MAX_QUEUE_SIZE_PROP_KEY) != null) {
 			int queueSize = (Integer) props.get(MAX_QUEUE_SIZE_PROP_KEY);

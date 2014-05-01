@@ -26,55 +26,44 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.conf.Configurable;
-
-import tigase.disco.ServiceEntity;
-import tigase.disco.ServiceIdentity;
-import tigase.disco.XMPPService;
-
-import tigase.osgi.OSGiScriptEngineManager;
-
-import tigase.server.script.AddScriptCommand;
-import tigase.server.script.CommandIfc;
-import tigase.server.script.RemoveScriptCommand;
-
-import tigase.util.DNSResolver;
-import tigase.util.TigaseStringprepException;
-
-import tigase.vhosts.VHostItem;
-import tigase.vhosts.VHostListener;
-import tigase.vhosts.VHostManagerIfc;
-
-import tigase.xml.Element;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-
 import java.util.Arrays;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.script.Bindings;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import tigase.conf.Configurable;
+import tigase.conf.ConfigurationException;
+import tigase.disco.ServiceEntity;
+import tigase.disco.ServiceIdentity;
+import tigase.disco.XMPPService;
+import tigase.osgi.OSGiScriptEngineManager;
+import tigase.server.script.AddScriptCommand;
+import tigase.server.script.CommandIfc;
+import tigase.server.script.RemoveScriptCommand;
+import tigase.util.DNSResolver;
+import tigase.util.TigaseStringprepException;
+import tigase.vhosts.VHostItem;
+import tigase.vhosts.VHostListener;
+import tigase.vhosts.VHostManagerIfc;
+import tigase.xml.Element;
+import tigase.xmpp.Authorization;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 
 /**
  * Created: Oct 17, 2009 7:49:05 PM
@@ -904,9 +893,10 @@ public class BasicComponent
 	 *
 	 *
 	 * @param props
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
-	public void setProperties(Map<String, Object> props) {
+	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		if (isInitializationComplete()) {
 
 			// Do we really need to do this again?

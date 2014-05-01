@@ -28,14 +28,20 @@ import tigase.xmpp.XMPPImplIfc;
  */
 public interface ModulesManager {
 
-        public void registerPluginClass(Class<? extends XMPPImplIfc> pluginCls);
+		void registerClass(Class<?> cls);
+		
+		void unregisterClass(Class<?> cls);
+	
+        void registerPluginClass(Class<? extends XMPPImplIfc> pluginCls);
 
-        public void unregisterPluginClass(Class<? extends XMPPImplIfc> pluginCls);
+        void unregisterPluginClass(Class<? extends XMPPImplIfc> pluginCls);
 
-        public void registerServerComponentClass(Class<? extends Configurable> compCls);
+        void registerServerComponentClass(Class<? extends Configurable> compCls);
 
-        public void unregisterServerComponentClass(Class<? extends Configurable> compCls);
+        void unregisterServerComponentClass(Class<? extends Configurable> compCls);
 
-        public void update();
+        void update();
         
+		Class<?> forName(String className) throws ClassNotFoundException;
+		
 }

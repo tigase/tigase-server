@@ -176,7 +176,7 @@ public abstract class ConfiguratorAbstract
 	 * @param component
 	 */
 	@Override
-	public void componentAdded(Configurable component) {
+	public void componentAdded(Configurable component) throws ConfigurationException {
 		if (log.isLoggable(Level.CONFIG)) {
 			log.log(Level.CONFIG, " component: {0}", component.getName());
 		}
@@ -340,7 +340,12 @@ public abstract class ConfiguratorAbstract
 			Map<String, Object> prop = Collections.singletonMap(item.getConfigKey(), item
 					.getConfigVal());
 
-			component.setProperties(prop);
+			try {
+				component.setProperties(prop);
+			}
+			catch (ConfigurationException ex) {
+				log.log(Level.SEVERE, "Component reconfiguration failed: " + ex.getMessage(), ex);
+			}
 		} else {
 			log.log(Level.WARNING, "Cannot find component for configuration item: {0}", item);
 		}
@@ -511,7 +516,7 @@ public abstract class ConfiguratorAbstract
 	 *
 	 * @param component
 	 */
-	public void setup(Configurable component) {
+	public void setup(Configurable component) throws ConfigurationException {
 
 		// Try to avoid recursive execution of the method
 		if (component == this) {
@@ -806,9 +811,10 @@ public abstract class ConfiguratorAbstract
 	 * Sets all configuration properties for object.
 	 *
 	 * @param props
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
-	public void setProperties(Map<String, Object> props) {
+	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		if (props.size() == 0) {
 			log.log(Level.WARNING,
 					"Properties size is 0, incorrect system state, probably OSGI mode and configuration is not yet loaded.");

@@ -26,20 +26,6 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.server.script.CommandIfc;
-
-import tigase.xmpp.JID;
-import tigase.xmpp.XMPPDomBuilderHandler;
-import tigase.xmpp.XMPPIOService;
-import static tigase.xmpp.XMPPIOService.DOM_HANDLER;
-import tigase.xmpp.XMPPIOServiceListener;
-
-import tigase.annotations.TODO;
-import tigase.net.*;
-import tigase.stats.StatisticsList;
-import tigase.util.DataTypes;
-import tigase.xml.Element;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
@@ -47,8 +33,19 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.script.Bindings;
+import tigase.annotations.TODO;
+import tigase.conf.ConfigurationException;
+import tigase.net.*;
+import tigase.server.script.CommandIfc;
+import tigase.stats.StatisticsList;
+import tigase.util.DataTypes;
+import tigase.xml.Element;
+import tigase.xmpp.JID;
+import tigase.xmpp.XMPPDomBuilderHandler;
+import tigase.xmpp.XMPPIOService;
+import static tigase.xmpp.XMPPIOService.DOM_HANDLER;
+import tigase.xmpp.XMPPIOServiceListener;
 
 /**
  * Describe class ConnectionManager here.
@@ -842,7 +839,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 
 	@Override
-	public void setProperties(Map<String, Object> props) {
+	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
 		if (props.get(MAX_INACTIVITY_TIME) != null) {
 			maxInactivityTime = (Long) props.get(MAX_INACTIVITY_TIME) * SECOND;

@@ -40,6 +40,7 @@ public class ModulesManagerImpl implements ModulesManager {
         private static ModulesManagerImpl instance = null;
         private Map<String, XMPPImplIfc> plugins = null;
         private Map<String, Class<? extends Configurable>> componentsClasses = null;
+		private Map<String, Class<?>> classes = null;
         private boolean active = false;
 
         public static ModulesManagerImpl getInstance() {
@@ -52,6 +53,7 @@ public class ModulesManagerImpl implements ModulesManager {
         private ModulesManagerImpl() {
                 plugins = new ConcurrentHashMap<String, XMPPImplIfc>();
                 componentsClasses = new ConcurrentHashMap<String, Class<? extends Configurable>>();
+				classes = new ConcurrentHashMap<String, Class<?>>();
         }
 
         @Override
@@ -136,6 +138,43 @@ public class ModulesManagerImpl implements ModulesManager {
                 }
         }
 
+		@Override
+		public void registerClass(Class<?> cls) {
+			synchronized (this) {
+				String clsName = cls.getCanonicalName();
+				classes.put(clsName, cls);
+				if (XMPPImplIfc.class.isAssignableFrom(cls)) {
+					registerPluginClass((Class<? extends XMPPImplIfc>) cls);
+				}
+				if (Configurable.class.isAssignableFrom(cls)) {
+					registerServerComponentClass((Class<? extends Configurable>) cls);
+				}
+			}
+		}
+		
+		@Override
+		public void unregisterClass(Class<?> cls) {
+			synchronized (this) {
+				String clsName = cls.getCanonicalName();
+				classes.remove(clsName, cls);
+				if (XMPPImplIfc.class.isAssignableFrom(cls)) {
+					unregisterPluginClass((Class<? extends XMPPImplIfc>) cls);
+				}
+				if (Configurable.class.isAssignableFrom(cls)) {
+					unregisterServerComponentClass((Class<? extends Configurable>) cls);
+				}
+			}			
+		}
+		
+		@Override
+		public Class<?> forName(String className) throws ClassNotFoundException {
+			Class<?> cls = classes.get(className);
+			if (cls == null) {
+				cls = this.getClass().getClassLoader().loadClass(className);
+			}
+			return cls;
+		}
+		
         @Override
         public void update() {
                 //synchronized (this) {
