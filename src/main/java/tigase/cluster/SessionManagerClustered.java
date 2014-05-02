@@ -42,6 +42,7 @@ import tigase.osgi.ModulesManagerImpl;
 import tigase.server.ComponentInfo;
 import tigase.server.Message;
 import tigase.server.Packet;
+import tigase.server.XMPPServer;
 import tigase.server.xmppsession.SessionManager;
 import tigase.stats.StatisticsList;
 import tigase.util.DNSResolver;
@@ -413,7 +414,7 @@ public class SessionManagerClustered
 		}
 		props.put(STRATEGY_CLASS_PROP_KEY, strategy_class);
 		try {
-			ClusteringStrategyIfc strat_tmp = (ClusteringStrategyIfc) Class.forName(
+			ClusteringStrategyIfc strat_tmp = (ClusteringStrategyIfc) ModulesManagerImpl.getInstance().forName(
 					strategy_class).newInstance();
 			Map<String, Object> strat_defs = strat_tmp.getDefaults(params);
 
@@ -605,6 +606,7 @@ public class SessionManagerClustered
 	 *
 	 *
 	 * @param props
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
@@ -613,8 +615,8 @@ public class SessionManagerClustered
 			String strategy_class = (String) props.get(STRATEGY_CLASS_PROP_KEY);
 
 			try {
-				ClusteringStrategyIfc strategy_tmp = (ClusteringStrategyIfc) ModulesManagerImpl.getInstance().forName(
-						strategy_class).newInstance();
+				Class<?> cls = ModulesManagerImpl.getInstance().forName(strategy_class);
+				ClusteringStrategyIfc strategy_tmp = (ClusteringStrategyIfc) cls.newInstance();
 
 				strategy_tmp.setSessionManagerHandler(this);
 				strategy_tmp.setProperties(props);
@@ -630,8 +632,10 @@ public class SessionManagerClustered
 					strategy.setClusterController(clusterController);
 				}
 			} catch (Exception e) {
-				log.log(Level.SEVERE, "Cannot instance clustering strategy class: " +
-						strategy_class, e);
+				if (!XMPPServer.isOSGi()) {
+					log.log(Level.SEVERE, "Cannot instance clustering strategy class: " +
+							strategy_class, e);
+				}
 				throw new ConfigurationException("Can not instantiate clustering strategy for class: " +
 					strategy_class);		
 			}

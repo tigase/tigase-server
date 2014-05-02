@@ -137,9 +137,10 @@ public abstract class WorkerThread extends Thread {
 					averageProcessingTime = (averageProcessingTime + end) / 2;
 				}
 			} catch (Exception e) {
-				log.log(Level.SEVERE,
-						this.getClass().getName() + ",(" + getName() + ") Exception during packet processing: "
-							+ item.getPacket(), e);
+				if (!stopped)
+					log.log(Level.SEVERE,
+							this.getClass().getName() + ",(" + getName() + ") Exception during packet processing: "
+								+ item.getPacket(), e);
 			}
 
 			++runsCnt;
@@ -176,9 +177,13 @@ public abstract class WorkerThread extends Thread {
 		return queue.size();
 	}
         
-        public void shutdown() {
-                stopped = true;
-        }
+	public void shutdown() {
+		stopped = true;
+		try {
+			this.interrupt();
+		} catch (Exception ex) {
+		}
+	}
         
 }
 

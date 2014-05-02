@@ -92,8 +92,7 @@ public interface MessageReceiver extends ServerComponent {
 	//~--- methods --------------------------------------------------------------
 
 	void start();
-	
-	void stop();
+
 }
 
 

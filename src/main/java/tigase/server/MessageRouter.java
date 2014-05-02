@@ -504,7 +504,7 @@ public class MessageRouter
 		for (ComponentRegistrator registr : registrators.values()) {
 			if (registr != component) {
 				if (log.isLoggable(Level.FINER)) {
-					log.log(Level.FINER, "Adding: {0} component to {1} registrator.",
+					log.log(Level.FINER, "Removing: {0} component from {1} registrator.",
 							new Object[] { component.getName(),
 							registr.getName() });
 				}
@@ -756,7 +756,7 @@ public class MessageRouter
 					}    // end of if (cr == null)
 					addRegistrator(cr);
 				} catch (ConfigurationException ex) {
-					log.log(Level.WARNING, "configuration of component " + name + " failed - disabling component", ex);
+					log.log(Level.WARNING, "configuration of component " + name + " failed - disabling component, error: " + ex.getMessage());
 					if (cr != null) {
 						removeRegistrator(cr);
 					}
@@ -820,11 +820,11 @@ public class MessageRouter
 //        conf.setComponentActive(name, false);
 				}    // end of try
 				catch (ConfigurationException ex) {
-					log.log(Level.WARNING, "configuration of component " + name + " failed - disabling component", ex);
+					log.log(Level.WARNING, "configuration of component " + name + " failed - disabling component, error: " + ex.getMessage());
 					if (mr != null) {
 						if (mr instanceof MessageReceiver) {
 							removeRouter((MessageReceiver) mr);
-							((MessageReceiver) mr).stop();
+							((MessageReceiver) mr).release();
 						} else {
 							removeComponent(mr);
 						}

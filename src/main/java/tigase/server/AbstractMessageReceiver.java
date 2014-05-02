@@ -1507,8 +1507,12 @@ public abstract class AbstractMessageReceiver
 					// log.log(Level.SEVERE, "Exception during packet processing: ", e);
 					// stopped = true;
 				} catch (Exception e) {
-					log.log(Level.SEVERE, "[" + getName() +
-							"] Exception during packet processing: " + packet, e);
+					if (!threadStopped)
+						log.log(Level.SEVERE, "[" + getName() +
+								"] Exception during packet processing: " + packet, e);
+					else {
+						//log.log(Level.FINEST, "[" + getName() + "] Stopping processing thread");
+					}
 				}    // end of try-catch
 			}      // end of while (! threadStopped)
 		}

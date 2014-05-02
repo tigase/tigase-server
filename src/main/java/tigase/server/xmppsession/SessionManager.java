@@ -609,6 +609,20 @@ public class SessionManager
 		return skipPrivacy;
 	}
 
+	@Override
+	public void stop() {
+		super.stop();
+		List<String> pluginsToStop = new ArrayList<String>(workerThreads.keySet());
+		for (String plugin_id : pluginsToStop) {
+			try {
+				removePlugin(plugin_id);
+			} catch (Exception ex) {
+				log.log(Level.WARNING, "Exception while stopping plugin", ex);
+			}
+			
+		}
+	}
+	
 	//~--- get methods ----------------------------------------------------------
 
 	/**
