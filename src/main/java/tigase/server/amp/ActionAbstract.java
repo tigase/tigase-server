@@ -176,7 +176,7 @@ public abstract class ActionAbstract
 		Packet result = null;
 
 		if (error_result) {
-			result = Authorization.NOT_ACCEPTABLE.getResponseMessage(packet, null, false);
+			result = Authorization.NOT_ACCEPTABLE.getResponseMessage(packet, "Subscription between users not valid", false);
 		} else {
 			JID old_from        = packet.getStanzaFrom();
 			JID old_to          = packet.getStanzaTo();
