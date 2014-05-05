@@ -573,24 +573,22 @@ public abstract class AbstractMessageReceiver
 	}
 
 	/**
-	 * Method description
+	 * Concurrency control method. Returns preferable number of threads set for
+	 * this component.
 	 *
 	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
+	 * @return preferable number of threads set for this component.
 	 */
 	public int processingInThreads() {
 		return 1;
 	}
 
 	/**
-	 * Method description
+	 * Concurrency control method. Returns preferable number of threads set for
+	 * this component.
 	 *
 	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
+	 * @return preferable number of threads set for this component.
 	 */
 	public int processingOutThreads() {
 		return 1;

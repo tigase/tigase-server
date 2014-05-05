@@ -353,17 +353,7 @@ public class SessionManager
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
-	@Override
+@Override
 	public boolean containsJid(BareJID jid) {
 		return sessionsByNodeId.containsKey(jid);
 	}
@@ -495,13 +485,7 @@ public class SessionManager
 		return true;
 	}
 
-	/**
-	 * Initialize a mapping of key/value pairs which can be used in scripts
-	 * loaded by the server
-	 *
-	 * @param binds A mapping of key/value pairs, all of whose keys are Strings.
-	 */
-	@Override
+@Override
 	public void initBindings(Bindings binds) {
 		super.initBindings(binds);
 		binds.put(CommandIfc.AUTH_REPO, auth_repository);
@@ -510,27 +494,11 @@ public class SessionManager
 		binds.put(CommandIfc.USER_SESS, sessionsByNodeId);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
-	@Override
+@Override
 	public int processingInThreads() {
 		return Runtime.getRuntime().availableProcessors() * 8;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int processingOutThreads() {
 		return Runtime.getRuntime().availableProcessors() * 8;

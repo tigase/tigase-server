@@ -43,13 +43,17 @@ public interface OnlineJidsReporter {
 	boolean hasCompleteJidsInfo();
 
 	/**
-	 * Checks whether there is an online session for the given user BareJID.
+	 * The method checks whether the given JID is known to the installation,
+	 * either user connected to local machine or any of the cluster nodes. False
+	 * result does not mean the user is not connected. It means the method does
+	 * not know anything about the JID. Some clustering strategies may not cache
+	 * online users information.
 	 *
-	 * @param jid id of the user which we want to check.
+	 * @param jid
+	 *          a user's JID for whom we query information.
 	 *
-	 * @return {@code true} if there is user session for the given JID,
-	 *         {@code false} otherwise.
-	 *
+	 * @return true if the user is known as online to the installation, false if
+	 *         the method does not know.
 	 */
 	boolean containsJid( BareJID jid );
 
