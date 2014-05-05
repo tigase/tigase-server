@@ -97,6 +97,8 @@ public class SessionManagerClustered
 	private static final Logger log = Logger.getLogger(SessionManagerClustered.class
 			.getName());
 
+	private enum STATUS {CONNECETED, DISCONNECTED};
+
 	//~--- fields ---------------------------------------------------------------
 
 	private ClusterControllerIfc  clusterController = null;
@@ -108,19 +110,6 @@ public class SessionManagerClustered
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * The method checks whether the given JID is known to the installation,
-	 * either user connected to local machine or any of the cluster nodes. False
-	 * result does not mean the user is not connected. It means the method does
-	 * not know anything about the JID. Some clustering strategies may not cache
-	 * online users information.
-	 *
-	 * @param jid
-	 *          a user's JID for whom we query information.
-	 *
-	 * @return true if the user is known as online to the installation, false if
-	 *         the method does not know.
-	 */
 	@Override
 	public boolean containsJid(BareJID jid) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -130,28 +119,11 @@ public class SessionManagerClustered
 		return super.containsJid(jid) || strategy.containsJid(jid);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean fastAddOutPacket(Packet packet) {
 		return super.fastAddOutPacket(packet);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param conn
-	 */
 	@Override
 	public void handleLocalPacket(Packet packet, XMPPResourceConnection conn) {
 		if (strategy != null) {
@@ -159,13 +131,6 @@ public class SessionManagerClustered
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param userId
-	 * @param conn
-	 */
 	@Override
 	public void handleLogin(BareJID userId, XMPPResourceConnection conn) {
 		super.handleLogin(userId, conn);
@@ -192,25 +157,12 @@ public class SessionManagerClustered
 		strategy.handleLocalResourceBind(conn);
 	}
 	
-	/**
-	 * Initialize a mapping of key/value pairs which can be used in scripts
-	 * loaded by the server
-	 *
-	 * @param binds A mapping of key/value pairs, all of whose keys are Strings.
-	 */
 	@Override
 	public void initBindings(Bindings binds) {
 		super.initBindings(binds);
 		binds.put(CLUSTER_STRATEGY_VAR, strategy);
 	}
 
-	/**
-	 * The method is called on cluster node connection event. This is a
-	 * notification to the component that a new node has connected to the system.
-	 *
-	 * @param node
-	 *          is a hostname of a new cluster node connected to the system.
-	 */
 	@Override
 	public void nodeConnected(String node) {
 		log.log(Level.FINE, "Nodes connected: {0}", node);
@@ -218,18 +170,11 @@ public class SessionManagerClustered
 		JID jid = JID.jidInstanceNS(getName(), node, null);
 
 		strategy.nodeConnected(jid);
-		sendAdminNotification("Cluster node '" + node + "' connected (" + (new Date()) + ")",
-				"New cluster node connected: " + node, node);
+
+		sendAdminNotification( node, STATUS.CONNECETED );
+
 	}
 
-	/**
-	 * Method is called on cluster node disconnection event. This is a
-	 * notification to the component that there was network connection lost to one
-	 * of the cluster nodes.
-	 *
-	 * @param node
-	 *          is a hostname of a cluster node generating the event.
-	 */
 	@Override
 	public void nodeDisconnected(String node) {
 		log.log(Level.FINE, "Nodes disconnected: {0}", node);
@@ -241,29 +186,16 @@ public class SessionManagerClustered
 		// Not sure what to do here, there might be still packets
 		// from the cluster node waiting....
 		// delTrusted(jid);
-		sendAdminNotification("Cluster node '" + node + "' disconnected (" + (new Date()) +
-				")", "Cluster node disconnected: " + node, node);
+
+		sendAdminNotification( node, STATUS.DISCONNECTED );
+
 	}
 
-	/**
-	 * Concurrency control method. Returns preferable number of threads set for
-	 * this component.
-	 *
-	 *
-	 * @return preferable number of threads set for this component.
-	 */
 	@Override
 	public int processingInThreads() {
 		return Math.max(nodesNo, super.processingInThreads());
 	}
 
-	/**
-	 * Concurrency control method. Returns preferable number of threads set for
-	 * this component.
-	 *
-	 *
-	 * @return preferable number of threads set for this component.
-	 */
 	@Override
 	public int processingOutThreads() {
 		return Math.max(nodesNo, super.processingOutThreads());
@@ -283,17 +215,9 @@ public class SessionManagerClustered
 			log.log(Level.FINEST, "Received packet: {0}", packet);
 		}
 
-		// long startTime = System.currentTimeMillis();
-		// int idx = tIdx;
-		// tIdx = (tIdx + 1) % maxIdx;
-		// long cmdTm = 0;
-		// long clTm = 0;
-		// long chTm = 0;
-		// long smTm = 0;
 		if (packet.isCommand() && processCommand(packet)) {
 			packet.processedBy("SessionManager");
 
-			// cmdTm = System.currentTimeMillis() - startTime;
 		} else {
 			XMPPResourceConnection conn = getXMPPResourceConnection(packet);
 
@@ -303,7 +227,6 @@ public class SessionManagerClustered
 
 			boolean clusterOK = strategy.processPacket(packet, conn);
 
-			// clTm = System.currentTimeMillis() - startTime;
 			if (conn == null) {
 				if (isBrokenPacket(packet) || processAdminsOrDomains(packet)) {
 					if (log.isLoggable(Level.FINEST)) {
@@ -326,31 +249,13 @@ public class SessionManagerClustered
 			}
 		}
 
-		// commandTime[idx] = cmdTm;
-		// clusterTime[idx] = clTm;
-		// checkingTime[idx] = chTm;
-		// smTime[idx] = smTm;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param conn
-	 */
 	@Override
 	public void processPacket(Packet packet, XMPPResourceConnection conn) {
 		super.processPacket(packet, conn);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session is a <code>XMPPSession</code>
-	 * @param packet is a <code>Element</code>
-	 */
 	@Override
 	public void processPresenceUpdate(XMPPSession session, Element packet) {
 		super.processPresenceUpdate(session, packet);
@@ -358,11 +263,6 @@ public class SessionManagerClustered
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Allows to obtain various informations about components
-	 *
-	 * @return information about particular component
-	 */
 	@Override
 	public ComponentInfo getComponentInfo() {
 		cmpInfo = super.getComponentInfo();
@@ -449,14 +349,6 @@ public class SessionManagerClustered
 		return props;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getDiscoDescription() {
 		if (log.isLoggable(Level.FINEST)) {
@@ -471,41 +363,14 @@ public class SessionManagerClustered
 
 		return result;
 
-//  return super.getDiscoDescription() + " clustered, " + strategy;
 	}
 
-	// private long calcAverage(long[] timings) {
-	// long res = 0;
-	//
-	// for (long ppt : timings) {
-	// res += ppt;
-	// }
-	//
-	// long processingTime = res / timings.length;
-	// return processingTime;
-	// }
 
-	/**
-	 * Method generates and returns component's statistics.
-	 *
-	 * @param list
-	 *          is a collection with statistics to which this component can add
-	 *          own metrics.
-	 */
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
 		strategy.getStatistics(list);
 
-		// list.add(getName(), "Average commandTime on last " + commandTime.length
-		// + " runs [ms]", calcAverage(commandTime), Level.FINE);
-		// list.add(getName(), "Average clusterTime on last " + clusterTime.length
-		// + " runs [ms]", calcAverage(clusterTime), Level.FINE);
-		// list.add(getName(), "Average checkingTime on last " + checkingTime.length
-		// + " runs [ms]", calcAverage(checkingTime), Level.FINE);
-		// list.add(getName(), "Average smTime on last " + smTime.length +
-		// " runs [ms]",
-		// calcAverage(smTime), Level.FINE);
 	}
 
 	/**
@@ -517,43 +382,16 @@ public class SessionManagerClustered
 		return strategy;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @param p
-	 *
-	 *
-	 *
-	 * @return a value of <code>XMPPResourceConnection</code>
-	 */
 	@Override
 	public XMPPResourceConnection getXMPPResourceConnection(Packet p) {
 		return super.getXMPPResourceConnection(p);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>ConcurrentHashMap<JID,XMPPResourceConnection></code>
-	 */
 	@Override
 	public ConcurrentHashMap<JID, XMPPResourceConnection> getXMPPResourceConnections() {
 		return connectionsByFrom;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>ConcurrentHashMap<BareJID,XMPPSession></code>
-	 */
 	@Override
 	public ConcurrentHashMap<BareJID, XMPPSession> getXMPPSessions() {
 		return sessionsByNodeId;
@@ -636,7 +474,7 @@ public class SessionManagerClustered
 				if (clusterController != null) {
 					strategy.setClusterController(clusterController);
 				}
-			} catch (Exception e) {
+			} catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
 				log.log(Level.SEVERE, "Cannot instance clustering strategy class: " +
 						strategy_class, e);
 			}
@@ -696,23 +534,33 @@ public class SessionManagerClustered
 		}
 	}
 
-	private void sendAdminNotification(String msg, String subject, String node) {
-		String message = msg;
+	private void sendAdminNotification(String node, STATUS stat) {
+		String message = "Cluster ";
+		String subject = null;
 
 		if (node != null) {
-			message = msg + "\n";
+			message += "node " + node + " ";
 		}
 
-		int cnt = 0;
+		switch ( stat ) {
+			case CONNECETED:
+				message += "connected to ";
+//				subject = "New cluster node connected";
+				break;
+			case DISCONNECTED:
+				message += "disconnected from ";
+//				subject = "Cluster node disconnected";
+				break;
 
-		message += node + " connected to " + getDefHostName();
+		}
 
-		Packet p_msg = Message.getMessage(my_address, my_hostname, StanzaType.normal,
-				message, subject, "xyz", newPacketId(null));
+		message += getDefHostName() + " (" + new Date() + ")";
+
+		Packet p_msg = Message.getMessage(my_address, my_hostname, StanzaType.chat,
+				message, subject, "cluster_status_update", newPacketId(null));
 
 		sendToAdmins(p_msg);
+
 	}
 }
 
-
-//~ Formatted in Tigase Code Convention on 13/11/29
