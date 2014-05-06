@@ -1040,8 +1040,9 @@ public class MessageRouter
 			return comp;
 		}
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "None compId matches (fast lookup): {0}, for map: {1}", new Object[] { jid,
-					components_byId });
+			log.log( Level.FINEST, "No componentID matches (fast lookup against exact address): "
+														 + "{0}, for map: {1}; trying VHost lookup",
+							 new Object[] { jid, components_byId.keySet() } );
 		}
 
 		// Note, component ID consists of the component name + default hostname
@@ -1057,11 +1058,11 @@ public class MessageRouter
 				return comp;
 			}
 		}
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST,
-					"Still no comp name matches (VHost lookup): {0}, for map: {1}, for all VHosts: {3}",
-					new Object[] { jid,
-					components, vHostManager.getAllVHosts() });
+		if ( log.isLoggable( Level.FINEST ) ){
+			log.log( Level.FINEST,
+							 "No component name matches (VHost lookup against component name): "
+							 + "{0}, for map: {1}, for all VHosts: {2}; trying other forms of addressing",
+							 new Object[] { jid, components.keySet(), vHostManager.getAllVHosts() } );
 		}
 
 		// Instead of a component ID built of: component name + "@" domain name
@@ -1077,13 +1078,17 @@ public class MessageRouter
 			comp = components.get(cmpName);
 			if ((comp != null) && (isLocalDomain(basename) || basename.equals(getDefHostName()
 					.getDomain()))) {
+				if ( log.isLoggable( Level.FINEST ) ){
+					log.log( Level.FINEST,
+									 "Component matched: {0}, for comp: {1}, basename: {3}",
+									 new Object[] { jid, components.keySet(), comp, basename } );
+				}
 				return comp;
 			}
 			if ( log.isLoggable( Level.FINEST ) ){
 				log.log( Level.FINEST,
 								 "Component match failed: {0}, for comp: {1}, basename: {3}",
-								 new Object[] { jid,
-																components, comp, basename } );
+								 new Object[] { jid, components.keySet(), comp, basename } );
 			}
 		}
 
