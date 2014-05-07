@@ -195,7 +195,7 @@ public class BoshConnectionManager
 		String uuid = UUID.randomUUID().toString();
 		JID userId = JID.jidInstanceNS( jid );
 		if ( null == userId.getResource() ){
-			userId.copyWithResourceNS( uuid );
+			userId = userId.copyWithResourceNS( uuid );
 			attr.put( FROM_ATTR, userId.toString() );
 			bs.setUserJid( jid );
 		}

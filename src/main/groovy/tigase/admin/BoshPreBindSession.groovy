@@ -91,6 +91,7 @@ try {
 		rid = args.get(RID);
 		def sid = args.get(SID);
 		def hostname = args.get(HOSTNAME)
+		userJid = args.get(USER_JID)
 
 		if (hostname != null ) {
 		Command.addFieldValue(result, USER_JID, userJid,"jid-single",  "JID")
