@@ -26,6 +26,7 @@ package tigase.vhosts;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.Arrays;
 import tigase.db.comp.RepositoryItemAbstract;
 import tigase.server.Command;
 import tigase.server.Packet;
@@ -109,6 +110,15 @@ public class VHostItem
 	 */
 	public static final String COMPONENTS_ELEM = "comps";
 
+	/**
+	 * This is an attribute name for storing information on which ports VHost
+	 * should be enabled.
+	 */
+	public static final String C2S_PORTS_ALLOWED_ATT = "c2s-ports-allowed";
+	
+	/** Field description */
+	public static final String C2S_PORTS_ALLOWED_LABEL = "Allowed C2S,BOSH,WebSocket ports";
+	
 	/** Field description */
 	public static final String DOMAIN_FILTER_POLICY_ATT = "domain-filter";
 
@@ -253,6 +263,7 @@ public class VHostItem
 	//~--- fields ---------------------------------------------------------------
 
 	private String[] comps = null;
+	private int[] c2sPortsAllowed = null;
 	private long     maxUsersNumber = Long.getLong(VHOST_MAX_USERS_PROP_KEY,
 			VHOST_MAX_USERS_PROP_DEF);
 	private JID messageForward = JID.jidInstanceNS(System.getProperty(
@@ -344,6 +355,9 @@ public class VHostItem
 				DOMAIN_FILTER_POLICY_LABEL, DomainFilterPolicy.valuesStr(), DomainFilterPolicy
 				.valuesStr());
 		Command.addFieldValue(packet, MAX_USERS_NUMBER_LABEL, "" + maxUsersNumber);
+		String c2sPortsAllowedStr = intArrayToString(c2sPortsAllowed,",");
+		Command.addFieldValue(packet, C2S_PORTS_ALLOWED_LABEL, 
+				c2sPortsAllowedStr != null ? c2sPortsAllowedStr : "");
 		Command.addFieldValue(packet, PRESENCE_FORWARD_ADDRESS_LABEL, ((presenceForward !=
 				null)
 				? presenceForward.toString()
@@ -425,6 +439,8 @@ public class VHostItem
 			}
 		}
 		otherDomainParams = Command.getFieldValue(packet, OTHER_PARAMS_LABEL);
+		tmp = Command.getFieldValue(packet, C2S_PORTS_ALLOWED_LABEL);
+		c2sPortsAllowed = parseIntArray(tmp, ",");
 	}
 
 	/**
@@ -482,6 +498,8 @@ public class VHostItem
 			comps = comps_str.split(",");
 		}
 		otherDomainParams = elem.getCDataStaticStr(VHOST_OTHER_PARAMS_PATH);
+		
+		this.c2sPortsAllowed = parseIntArray(elem.getAttributeStaticStr(C2S_PORTS_ALLOWED_ATT), ",");
 	}
 
 	/**
@@ -575,6 +593,11 @@ public class VHostItem
 							"Incorrect presence forwarding address, address parsing error: {0}", tmp);
 				}
 			}
+			if (tmp.startsWith(C2S_PORTS_ALLOWED_ATT)) {
+				String[] mu = tmp.split("=");
+				
+				c2sPortsAllowed = parseIntArray(mu[1], ";");
+			}
 		}
 	}
 
@@ -621,6 +644,10 @@ public class VHostItem
 		if (messageForward != null) {
 			elem.addAttribute(MESSAGE_FORWARD_ADDRESS_ATT, messageForward.toString());
 		}
+		if (c2sPortsAllowed != null) {
+			String c2sPortsAllowedStr = intArrayToString(c2sPortsAllowed, ",");
+			elem.addAttribute(C2S_PORTS_ALLOWED_ATT, c2sPortsAllowedStr);
+		}
 
 		return elem;
 	}
@@ -663,6 +690,9 @@ public class VHostItem
 			sb.append(':').append(MESSAGE_FORWARD_ADDRESS_ATT).append('=').append(messageForward
 					.toString());
 		}
+		if (c2sPortsAllowed != null) {
+			sb.append(':').append(C2S_PORTS_ALLOWED_ATT).append('=').append(intArrayToString(c2sPortsAllowed, ";"));
+		}
 
 		return sb.toString();
 	}
@@ -680,7 +710,7 @@ public class VHostItem
 		return "Domain: " + vhost + ", enabled: " + enabled + ", anonym: " +
 				anonymousEnabled + ", register: " + registerEnabled + ", maxusers: " +
 				maxUsersNumber + ", tls: " + tlsRequired + ", s2sSecret: " + s2sSecret +
-				", domainFilter: " + domainFilter;
+				", domainFilter: " + domainFilter + ", c2sPortsAllowed: " + intArrayToString(c2sPortsAllowed, ",");
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -696,6 +726,16 @@ public class VHostItem
 		return comps;
 	}
 
+	/**
+	 * Returns an array with ports on which C2S connections for this VHosts 
+	 * are allowed.
+	 * 
+	 * @return a <code>int[]</code> object with allowed C2S ports.
+	 */
+	public int[] getC2SPortsAllowed() {
+		return c2sPortsAllowed;
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -913,6 +953,17 @@ public class VHostItem
 	}
 
 	/**
+	 * Sets an array of ports for which C2S connections for this VHost will be
+	 * allowed.
+	 * 
+	 * @param ports 
+	 *			is an <code>int[]</code> array of allowed C2S ports.
+	 */
+	public void setC2SPortsAllowed(int[] ports) {
+		this.c2sPortsAllowed = ports;
+	}
+	
+	/**
 	 * Method description
 	 *
 	 *
@@ -1030,6 +1081,47 @@ public class VHostItem
 		this.vhost = vhost;
 	}
 
+	private int[] parseIntArray(String tmp, String separator) {
+		int[] c2s_ports_allowed = null;
+		if (tmp != null && !tmp.isEmpty()) {
+			String[] tmpPorts = tmp.split(separator);
+			c2s_ports_allowed = new int[tmpPorts.length];
+			int filled = 0;
+			for (String portStr : tmpPorts) {
+				try {
+					c2s_ports_allowed[filled] = Integer.parseInt(portStr);
+					filled++;
+				} catch (Exception ex) {
+					log.log(Level.WARNING, "Can not parse allowed c2s port: {0}", portStr);
+				}
+			}
+			if (filled == 0) {
+				c2s_ports_allowed = null;
+			}
+			else if (filled < c2s_ports_allowed.length) {
+				c2s_ports_allowed = Arrays.copyOf(c2s_ports_allowed, filled);
+			}
+			if (c2s_ports_allowed != null) {
+				Arrays.sort(c2s_ports_allowed);
+			}
+		}
+		return c2s_ports_allowed;
+	}
+	
+	private String intArrayToString(int[] arr, String separator) {
+		if (arr == null) {
+			return null;
+		}
+		StringBuilder buf = new StringBuilder();
+		for (int i = 0; i < arr.length; i++) {
+			if (i > 0) {
+				buf.append(separator);
+			}
+			buf.append(arr[i]);
+		}
+		return buf.toString();
+	}
+	
 	//~--- inner classes --------------------------------------------------------
 
 	private class UnmodifiableVHostItem
@@ -1272,6 +1364,17 @@ public class VHostItem
 					"This is unmodifiable instance of VHostItem");
 		}
 
+		/**
+		 * Method description
+		 * 
+		 * @param ports 
+		 */
+		@Override
+		public void setC2SPortsAllowed(int[] ports) {
+			throw new UnsupportedOperationException(
+					"This is unmodifiable instance of VHostItem");
+		}
+		
 		/**
 		 * Method description
 		 *

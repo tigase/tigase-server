@@ -264,10 +264,23 @@ public class BoshConnectionManager
 					String hostname = p.getAttributeStaticStr(Packet.TO_ATT);
 
 					if ((hostname != null) && isLocalDomain(hostname)) {
-						bs = new BoshSession(getDefVHostItem().getDomain(), JID.jidInstanceNS(routings
+						if (!isAllowed(srv, hostname)) {
+							if (log.isLoggable(Level.FINE)) {
+								log.log(Level.FINE, "Policy violation. Closing connection: {0}", p);
+							}
+							try {
+								serv.sendErrorAndStop(Authorization.NOT_ALLOWED, p, "Policy violation.");
+							} catch (IOException e) {
+								log.log(Level.WARNING,
+										"Problem sending invalid hostname error for sid =  " + sid, e);
+							}
+						}
+						else {
+							bs = new BoshSession(getDefVHostItem().getDomain(), JID.jidInstanceNS(routings
 								.computeRouting(hostname)), this);
-						sid = bs.getSid();
-						sessions.put(sid, bs);
+							sid = bs.getSid();
+							sessions.put(sid, bs);
+						}
 					} else {
 						log.log(Level.INFO, "Invalid hostname. Closing invalid connection: {0}", p);
 						try {

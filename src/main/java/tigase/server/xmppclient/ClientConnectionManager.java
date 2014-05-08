@@ -26,21 +26,33 @@ package tigase.server.xmppclient;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.zip.Deflater;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import tigase.net.IOService;
 import tigase.net.SocketThread;
-
 import tigase.server.Command;
 import tigase.server.ConnectionManager;
 import tigase.server.Iq;
+import tigase.server.Message;
 import tigase.server.Packet;
+import tigase.server.Presence;
 import tigase.server.ReceiverTimeoutHandler;
-
 import tigase.util.DNSResolver;
 import tigase.util.RoutingsContainer;
 import tigase.util.TigaseStringprepException;
-
+import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
-
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
@@ -48,26 +60,6 @@ import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.XMPPResourceConnection;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.io.IOException;
-
-import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
-import java.util.UUID;
-import java.util.zip.Deflater;
-
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import tigase.server.Message;
-import tigase.server.Presence;
 import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
 
 /**
@@ -518,6 +510,14 @@ public class ClientConnectionManager
 					"<host-unknown xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
 					"</stream:error>" + "</stream:stream>";
 		}    // end of if (!hostnames.contains(hostname))
+		if (!isAllowed(serv, hostname)) {
+			return "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'" +
+					" xmlns:stream='http://etherx.jabber.org/streams'" +
+					" id='tigase-error-tigase'" + " from='" + hostname + "'" +
+					" version='1.0' xml:lang='en'>" + "<stream:error>" +
+					"<policy-violation xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
+					"</stream:error>" + "</stream:stream>";			
+		}		
 		if ((fromJID != null) && (see_other_host_strategy != null) && see_other_host_strategy
 				.isEnabled(SeeOtherHostIfc.Phase.OPEN)) {
 			BareJID see_other_host = see_other_host_strategy.findHostForJID(fromJID,
@@ -773,6 +773,17 @@ public class ClientConnectionManager
 		return null;
 	}
 
+	protected boolean isAllowed(XMPPIOService<Object> serv, String hostname) {
+		VHostItem vhost = this.vHostManager.getVHostItem(hostname);
+		if (vhost != null) {
+			int[] allowedPorts = vhost.getC2SPortsAllowed();
+			if (allowedPorts != null && Arrays.binarySearch(allowedPorts, serv.getLocalPort()) < 0) {
+				return false;
+			}
+		}		
+		return true;
+	}
+	
 	/**
 	 * Method description
 	 *
