@@ -312,7 +312,7 @@ public class BoshConnectionManager
 						}
 					}
 				} else {
-					log.info("There is no session with given SID. Closing invalid connection");
+					log.log(Level.INFO, "There is no session with given SID = {0}. Closing invalid connection", sid_str);
 					serv.sendErrorAndStop(Authorization.ITEM_NOT_FOUND, p, "Invalid SID");
 				}
 				addOutPackets(out_results, bs);
