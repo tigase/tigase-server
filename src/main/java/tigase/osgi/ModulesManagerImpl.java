@@ -37,6 +37,8 @@ import tigase.xmpp.XMPPImplIfc;
  */
 public class ModulesManagerImpl implements ModulesManager {
 
+		private static final Logger log = Logger.getLogger(ModulesManagerImpl.class.getCanonicalName());
+	
         private static ModulesManagerImpl instance = null;
         private Map<String, XMPPImplIfc> plugins = null;
         private Map<String, Class<? extends Configurable>> componentsClasses = null;
@@ -137,14 +139,9 @@ public class ModulesManagerImpl implements ModulesManager {
                         componentsClasses.remove(compCls.getCanonicalName());
                 }
         }
-
-		@Override
-		public void registerClass(Class<?> cls) {
-			registerClass(cls, null);
-		}
 		
 		@Override
-		public void registerClass(Class<?> cls, String[] altClassNames) {
+		public void registerClass(Class<?> cls) {
 			synchronized (this) {
 				String clsName = cls.getCanonicalName();
 				classes.put(clsName, cls);
@@ -154,21 +151,11 @@ public class ModulesManagerImpl implements ModulesManager {
 				if (Configurable.class.isAssignableFrom(cls)) {
 					registerServerComponentClass((Class<? extends Configurable>) cls);
 				}
-				if (altClassNames != null) { 
-					for (String altClassName : altClassNames) {
-						classes.put(altClassName, cls);
-					}
-				}
 			}
 		}
 		
 		@Override
 		public void unregisterClass(Class<?> cls) {
-			unregisterClass(cls, null);
-		}
-		
-		@Override
-		public void unregisterClass(Class<?> cls, String[] altClassNames) {
 			synchronized (this) {
 				String clsName = cls.getCanonicalName();
 				classes.remove(clsName, cls);
@@ -178,16 +165,18 @@ public class ModulesManagerImpl implements ModulesManager {
 				if (Configurable.class.isAssignableFrom(cls)) {
 					unregisterServerComponentClass((Class<? extends Configurable>) cls);
 				}
-				if (altClassNames != null) {
-					for (String altClassName : altClassNames) {
-						classes.remove(altClassName);
-					}
-				}
 			}			
 		}
 		
 		@Override
 		public Class<?> forName(String className) throws ClassNotFoundException {
+			if ("tigase.cluster.strategy.OnlineUsersCachingStrategy".equals(className)) {
+				log.warning("You are using old name for SM clustering strategy in property "
+						+ "--sm-cluster-strategy-class\nYou are using name: " + className + "\n"
+						+ " while name: tigase.server.cluster.strategy.OnlineUsersCachingStrategy"
+						+ " should be used.");
+				className = "tigase.server.cluster.strategy.OnlineUsersCachingStrategy";
+			}
 			Class<?> cls = classes.get(className);
 			if (cls == null) {
 				cls = this.getClass().getClassLoader().loadClass(className);
