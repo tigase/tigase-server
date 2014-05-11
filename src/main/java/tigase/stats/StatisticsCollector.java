@@ -66,6 +66,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.management.ObjectName;
+import tigase.conf.ConfigurationException;
 
 /**
  * Class StatisticsCollector
@@ -614,9 +615,10 @@ public class StatisticsCollector
 	 *
 	 *
 	 * @param props
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
-	public void setProperties(Map<String, Object> props) {
+	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
 
 		String[] archivs = (String[]) props.get(STATS_ARCHIVIZERS_PROP_KEY);

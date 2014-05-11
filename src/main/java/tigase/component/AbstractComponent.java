@@ -26,9 +26,7 @@ import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.script.Bindings;
-
 import tigase.component.eventbus.DefaultEventBus;
 import tigase.component.eventbus.Event;
 import tigase.component.eventbus.EventBus;
@@ -38,6 +36,7 @@ import tigase.component.modules.Module;
 import tigase.component.modules.ModuleProvider;
 import tigase.component.modules.ModulesManager;
 import tigase.component.modules.impl.AdHocCommandModule.ScriptCommandProcessor;
+import tigase.conf.ConfigurationException;
 import tigase.disco.XMPPService;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.DisableDisco;
@@ -473,9 +472,10 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 
 	/**
 	 * {@inheritDoc}
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
-	public void setProperties(Map<String, Object> props) {
+	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
 		try {
 			initModules(props);

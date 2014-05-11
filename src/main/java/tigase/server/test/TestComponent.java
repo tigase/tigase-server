@@ -48,6 +48,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.script.Bindings;
+import tigase.conf.ConfigurationException;
 
 /**
  * A test component used to demonstrate API and for running different kinds of
@@ -297,9 +298,10 @@ public class TestComponent
 	 *
 	 *
 	 * @param props
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
-	public void setProperties(Map<String, Object> props) {
+	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
 		Collections.addAll(badWords, (String[]) props.get(BAD_WORDS_KEY));
 		Collections.addAll(whiteList, (String[]) props.get(WHITELIST_KEY));

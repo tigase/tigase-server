@@ -56,6 +56,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.script.Bindings;
+import tigase.conf.ConfigurationException;
 
 import static tigase.server.bosh.Constants.*;
 
@@ -590,9 +591,10 @@ public class BoshConnectionManager
 	 *
 	 *
 	 * @param props
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
-	public void setProperties(Map<String, Object> props) {
+	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
 		if (props.get(MAX_WAIT_DEF_PROP_KEY) != null) {
 			max_wait = (Long) props.get(MAX_WAIT_DEF_PROP_KEY);

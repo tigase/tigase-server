@@ -24,34 +24,8 @@ package tigase.server.xmppserver;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.net.ConnectionType;
-
-//import tigase.net.IOService;
-import tigase.net.SocketType;
-
-import tigase.server.ConnectionManager;
-import tigase.server.Packet;
-
-import tigase.stats.StatisticsList;
-
-import tigase.util.Algorithms;
-import tigase.util.DNSEntry;
-import tigase.util.DNSResolver;
-
-import tigase.xml.Element;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.JID;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPIOService;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.net.UnknownHostException;
-
 import java.security.NoSuchAlgorithmException;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Queue;
@@ -63,6 +37,21 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.conf.ConfigurationException;
+import tigase.net.ConnectionType;
+import tigase.net.SocketType;
+import tigase.server.ConnectionManager;
+import tigase.server.Packet;
+import tigase.stats.StatisticsList;
+import tigase.util.Algorithms;
+import tigase.util.DNSEntry;
+import tigase.util.DNSResolver;
+import tigase.xml.Element;
+import tigase.xmpp.Authorization;
+import tigase.xmpp.JID;
+import tigase.xmpp.PacketErrorTypeException;
+import tigase.xmpp.StanzaType;
+import tigase.xmpp.XMPPIOService;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -831,9 +820,10 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	 *
 	 *
 	 * @param props
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
-	public void setProperties(Map<String, Object> props) {
+	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
 
 //  hostnames = (String[])props.get(HOSTNAMES_PROP_KEY);

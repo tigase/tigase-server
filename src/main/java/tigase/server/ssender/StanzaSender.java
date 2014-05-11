@@ -32,6 +32,7 @@ import java.util.Timer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.conf.Configurable;
+import tigase.conf.ConfigurationException;
 import tigase.db.RepositoryFactory;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Packet;
@@ -139,9 +140,10 @@ public class StanzaSender extends AbstractMessageReceiver implements Configurabl
 	 * 
 	 * @param props
 	 *          a <code>Map</code> value
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
-	public void setProperties(final Map<String, Object> props) {
+	public void setProperties(final Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
 
 		if (props.size() == 1) {

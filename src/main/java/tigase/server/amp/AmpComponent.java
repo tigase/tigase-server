@@ -50,6 +50,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
+import tigase.conf.ConfigurationException;
 
 /**
  * Created: Apr 26, 2010 3:22:06 PM
@@ -304,9 +305,10 @@ public class AmpComponent
 	 *
 	 *
 	 * @param props
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
-	public void setProperties(Map<String, Object> props) {
+	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
 		if (props.size() == 1) {
 

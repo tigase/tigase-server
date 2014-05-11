@@ -39,6 +39,7 @@ import java.util.logging.Logger;
 import java.util.zip.Deflater;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import tigase.conf.ConfigurationException;
 import tigase.net.IOService;
 import tigase.net.SocketThread;
 import tigase.server.Command;
@@ -693,9 +694,10 @@ public class ClientConnectionManager
 	 * Method description
 	 *
 	 * @param props
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
-	public void setProperties(Map<String, Object> props) {
+	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
 		clientTrustManagerFactory.setProperties(props);
 		if (props.get(SOCKET_CLOSE_WAIT_PROP_KEY) != null) {

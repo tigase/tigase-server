@@ -24,37 +24,6 @@ package tigase.server.sreceiver;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.conf.Configurable;
-
-import tigase.db.RepositoryFactory;
-import tigase.db.TigaseDBException;
-import tigase.db.UserExistsException;
-import tigase.db.UserRepository;
-
-import tigase.disco.ServiceEntity;
-import tigase.disco.ServiceIdentity;
-import tigase.disco.XMPPService;
-
-import tigase.server.AbstractMessageReceiver;
-import tigase.server.Command;
-import tigase.server.Iq;
-import tigase.server.Packet;
-
-import tigase.stats.StatisticsList;
-
-import tigase.util.ClassUtil;
-import tigase.util.DNSResolver;
-import tigase.util.TigaseStringprepException;
-
-import tigase.xml.Element;
-
-import tigase.xmpp.JID;
-import tigase.xmpp.StanzaType;
-
-import static tigase.server.sreceiver.PropertyConstants.*;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -66,6 +35,34 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.conf.Configurable;
+import tigase.conf.ConfigurationException;
+import tigase.db.RepositoryFactory;
+import tigase.db.TigaseDBException;
+import tigase.db.UserExistsException;
+import tigase.db.UserRepository;
+import tigase.disco.ServiceEntity;
+import tigase.disco.ServiceIdentity;
+import tigase.disco.XMPPService;
+import tigase.server.AbstractMessageReceiver;
+import tigase.server.Command;
+import tigase.server.Iq;
+import tigase.server.Packet;
+
+import static tigase.server.sreceiver.PropertyConstants.*;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import tigase.server.sreceiver.PropertyConstants.MessageType;
+import tigase.server.sreceiver.PropertyConstants.SenderAddress;
+import tigase.server.sreceiver.PropertyConstants.SenderRestrictions;
+import tigase.stats.StatisticsList;
+import tigase.util.ClassUtil;
+import tigase.util.DNSResolver;
+import tigase.util.TigaseStringprepException;
+import tigase.xml.Element;
+import tigase.xmpp.JID;
+import tigase.xmpp.StanzaType;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -620,9 +617,10 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 	 * 
 	 * @param props
 	 *          a <code>Map</code> value
+	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
-	public void setProperties(final Map<String, Object> props) {
+	public void setProperties(final Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
 		if (props.size() == 1) {
 			// If props.size() == 1, it means this is a single property update 
