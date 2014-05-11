@@ -140,6 +140,11 @@ public class ModulesManagerImpl implements ModulesManager {
 
 		@Override
 		public void registerClass(Class<?> cls) {
+			registerClass(cls, null);
+		}
+		
+		@Override
+		public void registerClass(Class<?> cls, String[] altClassNames) {
 			synchronized (this) {
 				String clsName = cls.getCanonicalName();
 				classes.put(clsName, cls);
@@ -149,11 +154,21 @@ public class ModulesManagerImpl implements ModulesManager {
 				if (Configurable.class.isAssignableFrom(cls)) {
 					registerServerComponentClass((Class<? extends Configurable>) cls);
 				}
+				if (altClassNames != null) { 
+					for (String altClassName : altClassNames) {
+						classes.put(altClassName, cls);
+					}
+				}
 			}
 		}
 		
 		@Override
 		public void unregisterClass(Class<?> cls) {
+			unregisterClass(cls, null);
+		}
+		
+		@Override
+		public void unregisterClass(Class<?> cls, String[] altClassNames) {
 			synchronized (this) {
 				String clsName = cls.getCanonicalName();
 				classes.remove(clsName, cls);
@@ -162,6 +177,11 @@ public class ModulesManagerImpl implements ModulesManager {
 				}
 				if (Configurable.class.isAssignableFrom(cls)) {
 					unregisterServerComponentClass((Class<? extends Configurable>) cls);
+				}
+				if (altClassNames != null) {
+					for (String altClassName : altClassNames) {
+						classes.remove(altClassName);
+					}
 				}
 			}			
 		}

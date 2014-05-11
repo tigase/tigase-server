@@ -30,7 +30,11 @@ public interface ModulesManager {
 
 		void registerClass(Class<?> cls);
 		
+		void registerClass(Class<?> cls, String[] altClassNames);
+		
 		void unregisterClass(Class<?> cls);
+		
+		void unregisterClass(Class<?> cls, String[] altClassNames);
 	
         void registerPluginClass(Class<? extends XMPPImplIfc> pluginCls);
 
