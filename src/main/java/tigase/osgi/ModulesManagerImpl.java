@@ -42,7 +42,7 @@ public class ModulesManagerImpl implements ModulesManager {
         private static ModulesManagerImpl instance = null;
         private Map<String, XMPPImplIfc> plugins = null;
         private Map<String, Class<? extends Configurable>> componentsClasses = null;
-		private Map<String, Class<?>> classes = null;
+				private ConcurrentHashMap<String, Class<?>> classes = null;
         private boolean active = false;
 
         public static ModulesManagerImpl getInstance() {

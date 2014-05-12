@@ -80,7 +80,7 @@ public class MessageRouter
 			DISCO_SHOW_VERSION_PROP_VAL;
 	private UpdatesChecker                    updates_checker = null;
 	private Map<String, XMPPService>          xmppServices = new ConcurrentHashMap<>();
-	private Map<String, ComponentRegistrator> registrators = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<String, ComponentRegistrator> registrators = new ConcurrentHashMap<>();
 	private Map<String, MessageReceiver>      receivers = new ConcurrentHashMap<>();
 	private boolean                           inProperties    = false;
 	private Set<String>                       connectionManagerNames =
