@@ -206,7 +206,7 @@ case "$1" in
     log_daemon_msg "Clearing logs $DESC"
 	rm -rf "${TIGASE_HOME}/logs"/*;
 	log_end_msg 0
-	if [ $OSGI ] ; then
+	if [ -n "${OSGI}" ] && ${OSGI} ; then
 	    log_daemon_msg "Clearing osgi cache $DESC"
 		rm -rf "${TIGASE_HOME}/felix-cache"/*;
 		log_end_msg 0

@@ -251,7 +251,7 @@ case "$1" in
   clear)
 	echo "Clearing logs"
 	rm -rf "${TIGASE_HOME}/logs"/*;
-	if [ $OSGI ] ; then
+	if [ -n "${OSGI}" ] && ${OSGI} ; then
 		echo "Clearing osgi cache"
 		rm -rf "${TIGASE_HOME}/felix-cache"/*;
 	fi
