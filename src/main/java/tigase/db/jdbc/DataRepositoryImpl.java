@@ -498,9 +498,14 @@ public class DataRepositoryImpl implements DataRepository {
 
 	private PreparedStatement prepareQuery(String query) throws SQLException {
 		if (query.startsWith(SP_STARTS_WITH)) {
-			return conn.prepareCall(query);
+			return conn.prepareCall( query );
 		} else {
-			return conn.prepareStatement(query);
+			switch ( database ) {
+				case sqlserver:
+					return conn.prepareStatement( query, Statement.RETURN_GENERATED_KEYS );
+				default:
+					return conn.prepareStatement( query );
+			}
 		}
 	}
 
