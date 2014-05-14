@@ -129,7 +129,12 @@ public class CompSQLRepository
 		configRepo.removeRepoChangeListener(repoChangeListener);
 	}
 
-	/**
+	@Override
+	public void addItemNoStore(CompRepoItem item) {
+
+	}
+
+		/**
 	 * Method description
 	 *
 	 *
@@ -191,7 +196,7 @@ public class CompSQLRepository
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public Collection<CompRepoItem> allItems() {
@@ -226,7 +231,7 @@ public class CompSQLRepository
 	 *
 	 * @param key
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public boolean contains(String key) {
@@ -262,7 +267,7 @@ public class CompSQLRepository
 	 *
 	 * @param key
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public CompRepoItem getItem(String key) {
@@ -296,7 +301,7 @@ public class CompSQLRepository
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public CompRepoItem getItemInstance() {
@@ -336,7 +341,7 @@ public class CompSQLRepository
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public Iterator<CompRepoItem> iterator() {
@@ -402,7 +407,7 @@ public class CompSQLRepository
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public int size() {
@@ -427,7 +432,7 @@ public class CompSQLRepository
 	 *
 	 * @param item
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public String validateItem(CompRepoItem item) {

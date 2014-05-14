@@ -72,7 +72,7 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	public abstract BareJID getRepoUser();
 
@@ -112,7 +112,7 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	public String getItemsListPKey() {
 		return items_list_pkey;
@@ -145,7 +145,7 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 						Item item = getItemInstance();
 
 						item.initFromElement(elem);
-						addItem(item);
+						addItemNoStore(item);
 					}
 				}
 			}
