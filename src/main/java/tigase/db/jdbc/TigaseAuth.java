@@ -467,7 +467,7 @@ public class TigaseAuth implements AuthRepository {
 
 	//~--- get methods ----------------------------------------------------------
 
-	private String getPassword(BareJID user) throws SQLException, UserNotFoundException {
+	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException {
 		ResultSet rs = null;
 
 		try {
@@ -483,6 +483,8 @@ public class TigaseAuth implements AuthRepository {
 					throw new UserNotFoundException("User does not exist: " + user);
 				}    // end of if (isnext) else
 			}
+		} catch (SQLException e) {
+			throw new TigaseDBException("Problem with retrieving user password.", e);
 		} finally {
 			data_repo.release(null, rs);
 		}

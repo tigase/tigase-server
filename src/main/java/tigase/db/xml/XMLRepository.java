@@ -31,14 +31,13 @@ import tigase.db.AuthRepositoryImpl;
 import tigase.db.UserExistsException;
 import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
-
 import tigase.xml.db.NodeExistsException;
 import tigase.xml.db.NodeNotFoundException;
 import tigase.xml.db.XMLDB;
-
 import tigase.xmpp.BareJID;
 
 //~--- JDK imports ------------------------------------------------------------
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -799,6 +798,11 @@ public class XMLRepository implements AuthRepository, UserRepository {
 	@Override
 	public synchronized boolean userExists(BareJID user) {
 		return xmldb.findNode1(user.toString()) != null;
+	}
+
+	@Override
+	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException {
+		return auth.getPassword(user);
 	}
 }    // XMLRepository
 

@@ -350,7 +350,7 @@ public class AuthRepositoryImpl
 	//~--- get methods ----------------------------------------------------------
 
 	// ~--- get methods ----------------------------------------------------------
-	private String getPassword(BareJID user)
+	public String getPassword(BareJID user)
 					throws UserNotFoundException, TigaseDBException {
 		return repo.getData(user, PASSWORD_KEY);
 	}

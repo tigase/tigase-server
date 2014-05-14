@@ -817,8 +817,7 @@ public class TigaseCustomAuth implements AuthRepository {
 		return result;
 	}
 
-	private String getPassword(BareJID user) throws TigaseDBException,
-			UserNotFoundException {
+	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException  {
 		if (getpassword_query == null) {
 			return null;
 		}
