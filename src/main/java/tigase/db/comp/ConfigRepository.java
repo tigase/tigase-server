@@ -146,6 +146,8 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 	//~--- methods --------------------------------------------------------------
 
+
+
 	/**
 	 * Method description
 	 *
@@ -154,9 +156,15 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 */
 	@Override
 	public void addItem(Item item) {
-		Item old = items.put(item.getKey(), item);
+		addItemNoStore(item);
 
 		store();
+	}
+
+	@Override
+	public void addItemNoStore(Item item) {
+		Item old = items.put(item.getKey(), item);
+
 		if (repoChangeList != null) {
 			if (old == null) {
 				log.log(Level.INFO, "Calling itemAdded for: {0}", item);

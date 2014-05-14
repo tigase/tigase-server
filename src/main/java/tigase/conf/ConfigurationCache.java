@@ -134,6 +134,11 @@ public class ConfigurationCache
 		}
 	}
 
+	@Override
+	public void addItemNoStore(ConfigItem item) {
+		addItem(item.getCompName(), item);
+	}
+
 	/**
 	 * Method description
 	 *
@@ -144,7 +149,7 @@ public class ConfigurationCache
 	 */
 	@Override
 	public void addItem(ConfigItem item) throws TigaseDBException {
-		addItem(item.getCompName(), item);
+		addItemNoStore(item);
 	}
 
 	/**
@@ -184,7 +189,7 @@ public class ConfigurationCache
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 *
 	 * @throws TigaseDBException
 	 */
@@ -205,7 +210,7 @@ public class ConfigurationCache
 	 *
 	 * @param key
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public boolean contains(String key) {
@@ -223,7 +228,7 @@ public class ConfigurationCache
 	 * @param key
 	 * @param def
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public Object get(String compName, String node, String key, Object def) {
@@ -240,7 +245,7 @@ public class ConfigurationCache
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public String[] getCompNames() {
@@ -251,7 +256,7 @@ public class ConfigurationCache
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	public String getDefHostname() {
 		return this.hostname;
@@ -273,7 +278,7 @@ public class ConfigurationCache
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public Map<String, Object> getInitProperties() {
@@ -288,7 +293,7 @@ public class ConfigurationCache
 	 * @param node
 	 * @param key
 	 *
-	 * 
+	 *
 	 */
 	public ConfigItem getItem(String compName, String node, String key) {
 		Set<ConfigItem> confItems = getItemsForComponent(compName);
@@ -310,7 +315,7 @@ public class ConfigurationCache
 	 *
 	 * @param key
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public ConfigItem getItem(String key) {
@@ -337,7 +342,7 @@ public class ConfigurationCache
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public ConfigItem getItemInstance() {
@@ -350,7 +355,7 @@ public class ConfigurationCache
 	 *
 	 * @param compName
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public Set<ConfigItem> getItemsForComponent(String compName) {
@@ -364,7 +369,7 @@ public class ConfigurationCache
 	 * @param compName
 	 * @param node
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public String[] getKeys(String compName, String node) {
@@ -389,7 +394,7 @@ public class ConfigurationCache
 	 *
 	 * @param compName
 	 *
-	 * 
+	 *
 	 *
 	 * @throws ConfigurationException
 	 */
@@ -435,7 +440,7 @@ public class ConfigurationCache
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public Iterator<ConfigItem> iterator() {
@@ -586,7 +591,7 @@ public class ConfigurationCache
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public int size() {
@@ -644,7 +649,7 @@ public class ConfigurationCache
 	 *
 	 * @param item
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public String validateItem(ConfigItem item) {
