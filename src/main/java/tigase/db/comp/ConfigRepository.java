@@ -51,6 +51,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	/** Field description */
 	protected ConcurrentSkipListMap<String, Item> items = new ConcurrentSkipListMap<String,
 			Item>();
+	protected int itemsHash = 0;
 	private Timer                             autoLoadTimer  = null;
 	private RepositoryChangeListenerIfc<Item> repoChangeList = null;
 
@@ -181,7 +182,9 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 				}
 			}
 		} else {
-			log.log(Level.INFO, "No repoChangeListener for: {0}", item);
+			if ( log.isLoggable( Level.FINEST ) ){
+				log.log( Level.FINEST, "No repoChangeListener for: {0}", item );
+			}
 		}
 	}
 
@@ -291,6 +294,9 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 			store();
 			if (repoChangeList != null) {
 				repoChangeList.itemRemoved(item);
+			}
+			if ( log.isLoggable( Level.FINEST ) ){
+				log.log( Level.FINEST, "Removing item: {0}", item );
 			}
 		}
 	}

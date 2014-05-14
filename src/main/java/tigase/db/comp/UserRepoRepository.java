@@ -27,6 +27,7 @@ package tigase.db.comp;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.RepositoryFactory;
+import tigase.db.TigaseDBException;
 import tigase.db.UserExistsException;
 import tigase.db.UserRepository;
 
@@ -126,33 +127,39 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 	 */
 	@Override
 	public void reload() {
+		int hashCode = 0;
 		super.reload();
 		try {
 
 			// It is now time to load all Items' settings from the database:
 			String items_list = repo.getData(getRepoUser(), getItemsListPKey());
 
-			if ((items_list != null) &&!items_list.isEmpty()) {
-				DomBuilderHandler domHandler = new DomBuilderHandler();
-				SimpleParser parser          = SingletonFactory.getParserInstance();
+			if ( items_list != null ){
+				hashCode = items_list.hashCode();
 
-				parser.parse(domHandler, items_list.toCharArray(), 0, items_list.length());
+				if ( !items_list.isEmpty() && hashCode != itemsHash ){
+					DomBuilderHandler domHandler = new DomBuilderHandler();
+					SimpleParser parser = SingletonFactory.getParserInstance();
 
-				Queue<Element> elems = domHandler.getParsedElements();
+					parser.parse( domHandler, items_list.toCharArray(), 0, items_list.length() );
 
-				if ((elems != null) && (elems.size() > 0)) {
-					for (Element elem : elems) {
-						Item item = getItemInstance();
+					Queue<Element> elems = domHandler.getParsedElements();
 
-						item.initFromElement(elem);
-						addItemNoStore(item);
+					if ( ( elems != null ) && ( elems.size() > 0 ) ){
+						for ( Element elem : elems ) {
+							Item item = getItemInstance();
+
+							item.initFromElement( elem );
+							addItemNoStore( item );
+						}
 					}
+					log.log( Level.CONFIG, "All loaded items: {0}", items );
+					itemsHash = hashCode;
 				}
 			}
-		} catch (Exception ex) {
+		} catch (TigaseDBException ex) {
 			log.log(Level.SEVERE, "Problem with loading items list from the database.", ex);
 		}
-		log.log(Level.CONFIG, "All loaded items: {0}", items);
 	}
 
 	//~--- set methods ----------------------------------------------------------
