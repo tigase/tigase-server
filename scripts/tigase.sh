@@ -204,8 +204,10 @@ case "${1}" in
     ;;
 
   clear)
-	echo "Clearing logs"
-	rm -rf "${TIGASE_HOME}/logs"/*;
+    LOGBACK="${TIGASE_HOME}/logs"`date "+%Y-%m-%d--%H:%M:%S"`
+	echo "Clearing logs, moving backup to " ${LOGBACK}
+	mkdir -p ${LOGBACK}
+	mv "${TIGASE_HOME}/logs"/* ${LOGBACK}/
 	if [ -n "${OSGI}" ] && ${OSGI} ; then
 		echo "Clearing osgi cache"
 		rm -rf "${TIGASE_HOME}/felix-cache"/*;

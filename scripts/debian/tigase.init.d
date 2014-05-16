@@ -203,8 +203,10 @@ case "$1" in
     ;;
 
   clear)
-    log_daemon_msg "Clearing logs $DESC"
-	rm -rf "${TIGASE_HOME}/logs"/*;
+    LOGBACK="${TIGASE_HOME}/logs"`date "+%Y-%m-%d--%H:%M:%S"`
+    log_daemon_msg "Clearing logs $DESC, moving backup to " ${LOGBACK}
+	mkdir -p ${LOGBACK}
+	mv "${TIGASE_HOME}/logs"/* ${LOGBACK}/
 	log_end_msg 0
 	if [ -n "${OSGI}" ] && ${OSGI} ; then
 	    log_daemon_msg "Clearing osgi cache $DESC"
