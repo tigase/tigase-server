@@ -28,17 +28,15 @@ package tigase.xmpp;
 
 import tigase.util.TigaseStringprepException;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
 
 /**
  * Describe class XMPPSession here.
@@ -107,7 +105,7 @@ public class XMPPSession {
 
 			for (XMPPResourceConnection act_conn : activeResources) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Resource checking: " + act_conn.getResource() +
+					log.finest("Resource checking for: " + username + " :: " + act_conn.getResource() +
 							", connectionID: " + act_conn);
 				}
 				if (resource.equalsIgnoreCase(act_conn.getResource())) {
@@ -123,12 +121,12 @@ public class XMPPSession {
 				// command where the user session is artificially created....
 				if (old_res != conn) {
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("Found old resource connection, id: " + old_res);
+						log.finest("Found old resource connection for: " + username + ", id: " + old_res);
 					}
 					try {
 						old_res.putSessionData(XMPPResourceConnection.ERROR_KEY, "conflict");
 						old_res.logout();
-					} catch (Exception e) {
+					} catch (NotAuthorizedException e) {
 						log.log(Level.INFO, "Exception during closing old connection, ignoring.", e);
 					}
 					removeResourceConnection(old_res);
@@ -150,14 +148,8 @@ public class XMPPSession {
 			conn.setParentSession(this);
 		}
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Number of active resources is: " + activeResources.size());
-			if (activeResources.size() > 1) {
-				int i = 0;
-
-				for (XMPPResourceConnection res : activeResources) {
-					log.finest("RES " + (++i) + ": " + res);
-				}    // end of for (XMPPResourceConnection res: activeResources)
-			}      // end of if (activeResources.size() > 1)
+			log.finest("Number of active resources of [" + username + "] = "
+								 + activeResources.size() + " : " + activeResources);
 		}
 	}
 
@@ -189,12 +181,7 @@ public class XMPPSession {
 		removeResourceConnection(conn);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 
