@@ -26,27 +26,21 @@ package tigase.server.websocket;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.util.Base64;
-
-import tigase.xmpp.XMPPIOService;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.io.IOException;
-
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CoderResult;
 import java.nio.charset.MalformedInputException;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.util.Base64;
+import tigase.xmpp.XMPPIOService;
 
 /**
  * Class implements basic support for WebSocket protocol. It extends
@@ -80,13 +74,13 @@ public class WebSocketXMPPIOService<RefObject>
 
 	//~--- fields ---------------------------------------------------------------
 
-	private byte[] buf        = null;
+	//private byte[] buf        = null;
 	private long frameLength  = -1;
 	private byte[] maskingKey = null;
-	private int pos           = 0;
+	//private int pos           = 0;
 	private int version       = 0;
 
-	private byte[] partialFrame = null;
+	private byte[] partialData = null;
 	
 	// internal properties
 	private boolean websocket = false;
@@ -109,19 +103,20 @@ public class WebSocketXMPPIOService<RefObject>
 			return null;
 		}
 
+		// handling partialy decoded frame
+		if (partialData != null) {
+			ByteBuffer oldtmp = cb;
+			cb = ByteBuffer.allocate(partialData.length + oldtmp.remaining());
+			cb.order(oldtmp.order());
+			cb.put(partialData);
+			cb.put(oldtmp);
+			cb.flip();
+			oldtmp.clear();
+			partialData = null;
+		}
+		
 		if (websocket) {
-			// handling partialy decoded frame
-			if (partialFrame != null) {
-				ByteBuffer oldtmp = cb;
-				cb = ByteBuffer.allocate(partialFrame.length + oldtmp.remaining());
-				cb.order(oldtmp.order());
-				cb.put(partialFrame);
-				cb.put(oldtmp);
-				cb.flip();
-				oldtmp.clear();
-				partialFrame = null;
-				
-			}
+
 			
 			// data needs to be decoded fully not just first frame!!
 			ByteBuffer tmp = ByteBuffer.allocate(cb.remaining());	
@@ -136,8 +131,8 @@ public class WebSocketXMPPIOService<RefObject>
 			
 			// handling data which were not decoded - not complete data
 			if (cb.hasRemaining()) {
-				partialFrame = new byte[cb.remaining()];
-				cb.get(partialFrame);
+				partialData = new byte[cb.remaining()];
+				cb.get(partialData);
 			}
 			
 			// compact buffer after reading all frames
@@ -156,27 +151,29 @@ public class WebSocketXMPPIOService<RefObject>
 			return null;
 		}
 		
-		if ((pos == 0) && (cb.get(0) != (byte) 'G')) {
-			started = true;
-
-			return decode(cb);
-		}
-		if (buf == null) {
-			buf = new byte[1024];
-		}
 		try {
-			int read = cb.remaining();
+/*			if (!started && (cb.get(0) != (byte) 'G')) {
+				started = true;
 
-			cb.get(buf, pos, read);
-			pos += read;
+				return decode(cb);
+			}*/
+			
+			int remaining = cb.remaining();
+			byte[] buf = new byte[remaining];
+			
+			cb.get(buf, 0, remaining);
+			//pos += read;
 			cb.compact();
+			int pos = remaining;
 			if ((pos > 100) &&
 					(((buf[pos - 1] == '\n') && (buf[pos - 1] == buf[pos - 3])) ||
 					 ((buf[pos - 9] == '\n') && (buf[pos - 9] == buf[pos - 11])))) {
 				started = true;
-				processWebSocketHandshake();
+				processWebSocketHandshake(buf);
 				websocket = true;
-				buf       = null;
+			}
+			else {
+				partialData = buf;
 			}
 		} catch (Exception ex) {
 			if (log.isLoggable(Level.FINE)) {
@@ -258,7 +255,7 @@ public class WebSocketXMPPIOService<RefObject>
 	 * @throws NoSuchAlgorithmException
 	 * @throws IOException
 	 */
-	private void processWebSocketHandshake() throws NoSuchAlgorithmException, IOException {
+	private void processWebSocketHandshake(byte[] buf) throws NoSuchAlgorithmException, IOException {
 		HashMap<String, String> headers = new HashMap<String, String>();
 		int i                           = 0;
 
@@ -273,7 +270,7 @@ public class WebSocketXMPPIOService<RefObject>
 		StringBuilder builder = new StringBuilder(64);
 		String key            = null;
 
-		for (; i < pos; i++) {
+		for (; i < buf.length; i++) {
 			switch (buf[i]) {
 			case ':' :
 				if (key == null) {
@@ -358,93 +355,97 @@ public class WebSocketXMPPIOService<RefObject>
 		boolean masked = false;
 		byte type      = 0x00;
 		int position   = buf.position();
-		
-		if (frameLength == -1) {
-			type = buf.get();
-			if ((type & 0x08) == 0x08) {
+		ByteBuffer unmasked = null;
 
-				// close request
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest("closing connection due to client request");
+		try {
+			if (frameLength == -1) {
+				type = buf.get();
+				if ((type & 0x08) == 0x08) {
+
+					// close request
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("closing connection due to client request");
+					}
+					forceStop();
+
+					return null;
 				}
-				forceStop();
 
+				byte b2 = buf.get();
+
+				// check if content is masked
+				masked = (b2 & 0x80) == 0x80;
+
+				// ignore sign bit
+				frameLength = (b2 & 0x7F);
+				if (frameLength > 125) {
+
+				// if frame length is bigger than 125 then
+					// if is 126 - size is short
+					// is is 127 - size is long
+					frameLength = (frameLength == 126)
+							? buf.getShort()
+							: buf.getLong();
+				}
+				if (masked) {
+
+					// if content is masked get masking key
+					buf.get(maskingKey);
+				}
+			}
+
+			if (buf.remaining() >= frameLength) {
+				byte[] data = new byte[(int) frameLength];
+
+				buf.get(data);
+
+				// if content is masked then unmask content
+				if (masked) {
+					for (int i = 0; i < data.length; i++) {
+						data[i] = (byte) (data[i] ^ maskingKey[i % 4]);
+					}
+				}
+				unmasked = ByteBuffer.wrap(data);
+				frameLength = -1;
+			} else {
+				// not enought data so reset buffer position
+				buf.position(position);
+				frameLength = -1;
 				return null;
 			}
 
-			byte b2 = buf.get();
+			if (frameLength == -1) {
 
-			// check if content is masked
-			masked = (b2 & 0x80) == 0x80;
+				// we need to ignore pong frame
+				if ((type & 0x0A) == 0x0A) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("ignoring pong frame");
+					}
+					unmasked = null;
+				} // if it ping request send pong response
+				else if ((type & 0x09) == 0x09) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest("sending response on ping frame");
+					}
+					type = (byte) (((byte) (type ^ 0x09)) | 0x0A);
+					try {
+						ByteBuffer header = createFrameHeader(type, unmasked.remaining());
 
-			// ignore sign bit
-			frameLength = (b2 & 0x7F);
-			if (frameLength > 125) {
-
-				// if frame length is bigger than 125 then
-				// if is 126 - size is short
-				// is is 127 - size is long
-				frameLength = (frameLength == 126)
-											? buf.getShort()
-											: buf.getLong();
-			}
-			if (masked) {
-
-				// if content is masked get masking key
-				buf.get(maskingKey);
-			}
-		}
-
-		ByteBuffer unmasked = null;
-
-		if (buf.remaining() >= frameLength) {
-			byte[] data = new byte[(int) frameLength];
-
-			buf.get(data);
-
-			// if content is masked then unmask content
-			if (masked) {
-				for (int i = 0; i < data.length; i++) {
-					data[i] = (byte) (data[i] ^ maskingKey[i % 4]);
+						writeInProgress.lock();
+						writeBytes(header);
+						writeBytes(unmasked);
+					} finally {
+						writeInProgress.unlock();
+					}
+					unmasked = null;
 				}
 			}
-			unmasked    = ByteBuffer.wrap(data);
-			frameLength = -1;
-		}
-		else {
-			// not enought data so reset buffer position
+		} catch (BufferUnderflowException ex) {
+			// if for some reason we do not have full frame header then we need to 
+			// reset buffer to original position and wait for the rest of data
 			buf.position(position);
 			frameLength = -1;
-			return null;
-		}	
-		
-		if (frameLength == -1) {
-
-			// we need to ignore pong frame
-			if ((type & 0x0A) == 0x0A) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest("ignoring pong frame");
-				}
-				unmasked = null;
-			}
-
-			// if it ping request send pong response
-			else if ((type & 0x09) == 0x09) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.finest("sending response on ping frame");
-				}
-				type = (byte) (((byte) (type ^ 0x09)) | 0x0A);
-				try {
-					ByteBuffer header = createFrameHeader(type, unmasked.remaining());
-
-					writeInProgress.lock();
-					writeBytes(header);
-					writeBytes(unmasked);
-				} finally {
-					writeInProgress.unlock();
-				}
-				unmasked = null;
-			}
+			unmasked = null;
 		}
 
 		return unmasked;
