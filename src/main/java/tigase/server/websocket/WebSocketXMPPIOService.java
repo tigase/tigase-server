@@ -304,7 +304,7 @@ public class WebSocketXMPPIOService<RefObject>
 			writeRawData(BAD_REQUEST);
 			
 			dumpHeaders(headers);
-
+			forceStop();
 			return;
 		}
 		if (!headers.containsKey(WS_PROTOCOL_KEY) ||
@@ -312,7 +312,7 @@ public class WebSocketXMPPIOService<RefObject>
 			writeRawData(BAD_REQUEST);
 
 			dumpHeaders(headers);
-
+			forceStop();
 			return;
 		}
 
