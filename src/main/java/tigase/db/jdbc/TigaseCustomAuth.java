@@ -541,7 +541,7 @@ public class TigaseCustomAuth implements AuthRepository {
 				data_repo.initPreparedStatement(deluser_query, deluser_query);
 			}
 
-			getpassword_query = getParamWithDef(params, DEF_GETPASSWORD_KEY, null);
+			getpassword_query = getParamWithDef(params, DEF_GETPASSWORD_KEY, DEF_GETPASSWORD_QUERY);
 
 			if ((getpassword_query != null)) {
 				data_repo.initPreparedStatement(getpassword_query, getpassword_query);
