@@ -1193,7 +1193,7 @@ public class BasicComponent
 									try {
 										// we also check whether script is loaded for particular class or it's subclasses
 										Class<?> loadClass = this.getClass().getClassLoader().loadClass( cmp );
-										found |= this.getClass().isAssignableFrom( loadClass );
+										found |= loadClass.isAssignableFrom( this.getClass());
 
 									} catch ( NoClassDefFoundError ex ) {
 										log.log( Level.WARNING, "Tried loading script with class defined as: {0} for class: {1}",
@@ -1205,8 +1205,8 @@ public class BasicComponent
 							}
 							if (!found) {
 								log.log(Level.CONFIG,
-										"{0}: skipping admin script {1}, id: {2}, descr: {3} for component: {4}", new Object[] {
-										getName(), file, cmdId, cmdDescr, comp });
+										"{0}: skipping admin script {1}, id: {2}, descr: {3} for component: {4} or class: {5}", new Object[] {
+										getName(), file, cmdId, cmdDescr, comp, compClass });
 
 								continue;
 							}
@@ -1217,8 +1217,7 @@ public class BasicComponent
 							addCommand.addAdminScript(cmdId, cmdDescr, sb.toString(), null, ext, binds);
 							log.log(Level.CONFIG,
 									"{0}: Loaded admin command from file: {1}, id: {2}, ext: {3}, descr: {4}",
-									new Object[] { getName(),
-									file, cmdId, ext, cmdDescr });
+									new Object[] { getName(), file, cmdId, ext, cmdDescr });
 						}
 					}
 				} 
