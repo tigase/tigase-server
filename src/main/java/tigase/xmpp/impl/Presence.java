@@ -355,7 +355,7 @@ public class Presence
 		tmp = (String) settings.get(OFFLINE_ROSTER_LAST_SEEN_PROP_KEY);
 		if (tmp != null) {
 			offlineRosterLastSeen = tmp.split(",");
-			log.config("Loaded roster offline last seen config: " + tmp);
+			log.log(Level.CONFIG, "Loaded roster offline last seen config: {0}", tmp);
 		} else {
 			log.config("No configuration found for Loaded roster offline last seen.");
 		}
@@ -365,7 +365,7 @@ public class Presence
 				presenceGLobalForward = JID.jidInstance(tmp);
 			} catch (TigaseStringprepException ex) {
 				presenceGLobalForward = null;
-				log.warning("Presence global forward misconfiguration, cannot parse JID " + tmp);
+				log.log(Level.WARNING, "Presence global forward misconfiguration, cannot parse JID {0}", tmp);
 			}
 		}
 	}
