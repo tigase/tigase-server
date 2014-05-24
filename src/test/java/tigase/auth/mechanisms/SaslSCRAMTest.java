@@ -1,21 +1,18 @@
 package tigase.auth.mechanisms;
 
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.sasl.AuthorizeCallback;
 import javax.security.sasl.SaslException;
-
 import org.junit.Assert;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
-
+import org.junit.experimental.categories.Category;
 import tigase.auth.callbacks.PBKDIterationsCallback;
 import tigase.auth.callbacks.SaltCallback;
 import tigase.auth.callbacks.SaltedPasswordCallback;
@@ -88,8 +85,17 @@ public class SaslSCRAMTest {
 			Assert.assertArrayEquals(new byte[] { (byte) 0x4b, (byte) 0x00, (byte) 0x79, (byte) 0x01, (byte) 0xb7, (byte) 0x65,
 					(byte) 0x48, (byte) 0x9a, (byte) 0xbe, (byte) 0xad, (byte) 0x49, (byte) 0xd9, (byte) 0x26, (byte) 0xf7,
 					(byte) 0x21, (byte) 0xd0, (byte) 0x65, (byte) 0xa4, (byte) 0x29, (byte) 0xc1 }, r);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	}
 
-			r = AbstractSaslSCRAM.hi("SHA1", "password".getBytes(), "salt".getBytes(), 16777216);
+	@Category(tigase.tests.SlowTest.class)
+	@Test
+	public void testHiLong() {		
+		try {
+			byte[] r = AbstractSaslSCRAM.hi("SHA1", "password".getBytes(), "salt".getBytes(), 16777216);
 			Assert.assertArrayEquals(new byte[] { (byte) 0xee, (byte) 0xfe, (byte) 0x3d, (byte) 0x61, (byte) 0xcd, (byte) 0x4d,
 					(byte) 0xa4, (byte) 0xe4, (byte) 0xe9, (byte) 0x94, (byte) 0x5b, (byte) 0x3d, (byte) 0x6b, (byte) 0xa2,
 					(byte) 0x15, (byte) 0x8c, (byte) 0x26, (byte) 0x34, (byte) 0xe9, (byte) 0x84 }, r);
