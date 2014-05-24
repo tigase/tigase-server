@@ -65,6 +65,7 @@ public interface VHostManagerIfc {
 	 *
 	 *
 	 * @param domain
+	 * @return 
 	 *
 	 * 
 	 */
@@ -115,6 +116,14 @@ public interface VHostManagerIfc {
 	 */
 	VHostItem getVHostItem(String domain);
 
+	/**
+	 * Returns an object with all domain properties for a given domain or base domain
+	 * if passed domain is name of subdomain used by  component.
+	 * @param domain is a domain name
+	 * @return a VHostItem object with all domain properties.
+	 */
+	VHostItem getVHostItemDomainOrComponent(String domain);
+	
 	//~--- methods --------------------------------------------------------------
 
 	/**
