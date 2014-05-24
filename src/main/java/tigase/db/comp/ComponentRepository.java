@@ -86,9 +86,20 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	void addItem(Item item) throws TigaseDBException;
 
 	/**
+	 * The method adds a new or updates existing Item. It needs
+	 * to have all fields set correctly. After this method call is finished a new
+	 * added item must be available in the component repository. The method adds
+	 * the item to memory cache but not to a permanent storage.
+	 *
+	 * @param item
+	 *          a <code>Item</code> with all it's configuration parameters.
+	 */
+	void addItemNoStore(Item item);
+
+	/**
 	 * Returns a collection with all items stored in the repository.
 	 *
-	 * 
+	 *
 	 * @throws TigaseDBException
 	 */
 	Collection<Item> allItems() throws TigaseDBException;

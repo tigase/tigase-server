@@ -1246,7 +1246,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	//~--- methods --------------------------------------------------------------
 
 	private void putDefPortParams(Map<String, Object> props, int port, SocketType sock) {
-		log.log(Level.CONFIG, "Generating defaults for port: {0}", port);
+		log.log(Level.CONFIG, "Generating defaults for port: {0,number,#}", port);
 		props.put(PROP_KEY + port + "/" + PORT_TYPE_PROP_KEY, ConnectionType.accept);
 		props.put(PROP_KEY + port + "/" + PORT_SOCKET_PROP_KEY, sock);
 		props.put(PROP_KEY + port + "/" + PORT_IFC_PROP_KEY, PORT_IFC_PROP_VAL);
@@ -1286,7 +1286,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 				if (log.isLoggable(Level.FINE)) {
 					log.log(Level.FINE,
-							"Reconnecting service for component: {0}, to remote host: {1} on port: {2}",
+							"Reconnecting service for component: {0}, to remote host: {1} on port: {2,number,#}",
 							new Object[] { getName(),
 							host, port });
 				}

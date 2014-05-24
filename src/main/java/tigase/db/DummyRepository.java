@@ -28,6 +28,7 @@ import tigase.xmpp.BareJID;
 
 //~--- JDK imports ------------------------------------------------------------
 
+
 import java.util.List;
 import java.util.Map;
 
@@ -478,6 +479,12 @@ public class DummyRepository implements UserRepository, AuthRepository {
 	@Override
 	public boolean userExists(BareJID user) {
 		return false;
+	}
+
+	@Override
+	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
 

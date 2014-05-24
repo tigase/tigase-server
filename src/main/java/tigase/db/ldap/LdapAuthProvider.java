@@ -289,4 +289,9 @@ public class LdapAuthProvider implements AuthRepository {
 		throw new TigaseDBException("Not available");
 	}
 
+	@Override
+	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException {
+		throw new TigaseDBException("Not available");
+	}
+
 }

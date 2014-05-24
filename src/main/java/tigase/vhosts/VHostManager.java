@@ -402,6 +402,24 @@ public class VHostManager
 		return repo.getItem(domain);
 	}
 
+	@Override
+	public VHostItem getVHostItemDomainOrComponent(String domain) {
+		VHostItem item = getVHostItem(domain);
+		if (item == null) {
+			int idx = domain.indexOf('.');
+
+			if (idx > 0) {
+				String        name       = domain.substring(0, idx);
+				String        basedomain = domain.substring(idx + 1);
+				VHostListener listener   = components.get(name);
+				if (listener != null && listener.handlesNameSubdomains()) {
+					item = getVHostItem(basedomain);
+				}
+			}
+		}
+		return item;
+	}
+	
 	/**
 	 * Method description
 	 *

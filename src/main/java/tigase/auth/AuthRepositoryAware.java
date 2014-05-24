@@ -8,7 +8,7 @@ import tigase.db.AuthRepository;
  * Interface should be implemented by {@linkplain CallbackHandler} instance if
  * {@linkplain AuthRepository} from session should be injected.
  */
-public interface AuthRepositoryAware {
+public interface AuthRepositoryAware extends Aware {
 
 	/**
 	 * Sets {@linkplain AuthRepository}.

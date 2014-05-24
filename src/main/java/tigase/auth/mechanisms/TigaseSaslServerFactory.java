@@ -39,7 +39,9 @@ public class TigaseSaslServerFactory implements SaslServerFactory {
 	@Override
 	public SaslServer createSaslServer(final String mechanism, final String protocol, final String serverName,
 			final Map<String, ?> props, final CallbackHandler callbackHandler) throws SaslException {
-		if (mechanism.equals("PLAIN")) {
+		if (mechanism.equals("SCRAM-SHA-1")) {
+			return new SaslSCRAM(props, callbackHandler);
+		} else if (mechanism.equals("PLAIN")) {
 			return new SaslPLAIN(props, callbackHandler);
 		} else if (mechanism.equals("ANONYMOUS")) {
 			return new SaslANONYMOUS(props, callbackHandler);

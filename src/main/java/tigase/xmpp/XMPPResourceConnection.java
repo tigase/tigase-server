@@ -436,19 +436,11 @@ public class XMPPResourceConnection
 		sessionId = null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String toString() {
-		return "user_jid=" + userJid + ", packets=" + packets_counter + ", connectioId=" +
+		return "XMPPResourceConnection=[user_jid=" + userJid + ", packets=" + packets_counter + ", connectioId=" +
 				connectionId + ", domain=" + domain.getVhost().getDomain() + ", authState=" +
-				getAuthState().name() + ", isAnon=" + isAnonymous() + ", isTmp=" + isTmpSession();
+				getAuthState().name() + ", isAnon=" + isAnonymous() + ", isTmp=" + isTmpSession() + "]";
 	}
 
 	/**
@@ -470,16 +462,6 @@ public class XMPPResourceConnection
 					throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
 		Authorization auth_res = super.unregister(name_param);
 
-		// if (auth_res == Authorization.AUTHORIZED) {
-		// List<XMPPResourceConnection> res_conn =
-		// parentSession.getActiveResources();
-		// for (XMPPResourceConnection res: res_conn) {
-		// if (res != this) {
-		// res.logout();
-		// } // end of if (res != this)
-		// } // end of for (XMPPResourceConnection res: res_conn)
-		// logout();
-		// } // end of if (res == Authorization.AUTHORIZED)
 		return auth_res;
 	}
 

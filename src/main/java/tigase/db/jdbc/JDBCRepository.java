@@ -27,9 +27,7 @@ package tigase.db.jdbc;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.*;
-
 import tigase.xmpp.BareJID;
-
 import tigase.util.SimpleCache;
 
 import java.sql.*;
@@ -1594,6 +1592,12 @@ public class JDBCRepository
 
 			return val;
 		}
+	}
+
+	@Override
+	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }    // JDBCRepository
 

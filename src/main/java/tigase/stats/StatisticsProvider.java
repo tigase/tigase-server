@@ -1107,6 +1107,7 @@ public class StatisticsProvider
 
 	// ~--- inner classes --------------------------------------------------------
 	private class StatisticsCache {
+		private static final String WS2S_COMP = "ws2s";
 		private static final String BOSH_COMP = "bosh";
 		private static final String C2S_COMP  = "c2s";
 		private static final String CL_COMP   = "cl-comp";
@@ -1279,8 +1280,9 @@ public class StatisticsProvider
 			}
 			prevSmPacketsPerSec = temp;
 			prevSmPackets       = smPackets;
-			clientConnections = allStats.getCompConnections(C2S_COMP) + allStats
-					.getCompConnections(BOSH_COMP);
+			clientConnections = allStats.getCompConnections(C2S_COMP)
+													+ allStats.getCompConnections( BOSH_COMP )
+													+ allStats.getCompConnections( WS2S_COMP );
 			if (conns_history != null) {
 				conns_history.addItem(clientConnections);
 			}

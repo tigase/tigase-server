@@ -8,7 +8,7 @@ import tigase.xmpp.XMPPResourceConnection;
  * Interface should be implemented by {@linkplain CallbackHandler} instance if
  * current XMPP Session should be injected.
  */
-public interface SessionAware {
+public interface SessionAware extends Aware {
 
 	/**
 	 * Sets XMPP Session.

@@ -30,6 +30,7 @@ import tigase.xmpp.BareJID;
 
 //~--- JDK imports ------------------------------------------------------------
 
+
 import java.util.Map;
 
 /**
@@ -270,6 +271,10 @@ public interface AuthRepository {
 	 */
 	void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException;
 
+	 String getPassword(BareJID user)
+			throws UserNotFoundException, TigaseDBException ;
+
+	
 	/**
 	 * Describe <code>updatePassword</code> method here.
 	 *

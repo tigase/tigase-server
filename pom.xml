@@ -114,12 +114,6 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>tigase</groupId>
-			<artifactId>tigase-xmltools</artifactId>
-			<version>3.4.5-SNAPSHOT</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.osgi.core</artifactId>
 			<version>1.4.0</version>

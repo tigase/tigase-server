@@ -27,6 +27,7 @@ import tigase.xmpp.BareJID;
 
 //~--- JDK imports ------------------------------------------------------------
 
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
@@ -374,6 +375,19 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 			log.log(Level.WARNING,
 					"Couldn't obtain user repository for domain: " + user.getDomain()
 						+ ", not even default one!");
+		}
+	}
+
+	@Override
+	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException {
+		AuthRepository repo = getRepo(user.getDomain());
+
+		if (repo != null) {
+			return repo.getPassword(user);
+		} else {
+			log.log(Level.WARNING, "Couldn't obtain user repository for domain: " + user.getDomain()
+					+ ", not even default one!");
+			return null;
 		}
 	}
 }

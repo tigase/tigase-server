@@ -1032,7 +1032,6 @@ public class BoshSession {
 			body.addAttribute( "type", "terminate" );
 			body.addAttribute( "xmlns:stream", "http://etherx.jabber.org/streams" );
 			this.terminate = true;
-			System.out.println( "stream:error termination" );
 		}
 
 		try {
