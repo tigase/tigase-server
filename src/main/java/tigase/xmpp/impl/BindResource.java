@@ -32,10 +32,6 @@ import tigase.db.TigaseDBException;
 import tigase.server.Iq;
 import tigase.server.Packet;
 
-import tigase.util.TigaseStringprepException;
-
-import tigase.xml.Element;
-
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
@@ -44,12 +40,14 @@ import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 
-//~--- JDK imports ------------------------------------------------------------
+import tigase.util.DNSResolver;
+import tigase.util.TigaseStringprepException;
+import tigase.xml.Element;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * RFC-3920, 7. Resource Binding
@@ -109,9 +107,13 @@ public class BindResource
 	@Override
 	public void init(Map<String, Object> settings) throws TigaseDBException {
 
+		int hostnameHash = Math.abs( DNSResolver.getDefaultHostname().hashCode() );
+		
 		// Init plugin configuration
 		if (settings.get(DEF_RESOURCE_PREFIX_PROP_KEY) != null) {
-			resourceDefPrefix = settings.get(DEF_RESOURCE_PREFIX_PROP_KEY).toString();
+			resourceDefPrefix = hostnameHash + "-" + settings.get(DEF_RESOURCE_PREFIX_PROP_KEY).toString();
+		} else {
+			resourceDefPrefix = hostnameHash + "-" + resourceDefPrefix;
 		}
 	}
 
