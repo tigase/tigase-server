@@ -23,6 +23,8 @@
 
 package tigase.server.bosh;
 
+import java.util.logging.Level;
+
 /**
  * Describe class Constants here.
  *
@@ -188,6 +190,10 @@ public abstract class Constants {
 
 	/** Field description */
 	protected static final int MAX_BATCH_SIZE_VAL = MAX_PACKETS;
+
+	protected static final String SID_LOGGER_KEY = "sid-logger-level";
+	protected static final String SID_LOGGER_VAL = Level.OFF.toString();
+
 
 	//~--- constant enums -------------------------------------------------------
 

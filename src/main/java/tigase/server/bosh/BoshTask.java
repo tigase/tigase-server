@@ -20,13 +20,14 @@
  */
 package tigase.server.bosh;
 
-import java.util.Queue;
+import tigase.server.Packet;
+
+import tigase.util.TimerTask;
+
 import java.util.ArrayDeque;
+import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import tigase.server.Packet;
-import tigase.util.TimerTask;
 
 /**
  * Describe class BoshWaitTimer here.

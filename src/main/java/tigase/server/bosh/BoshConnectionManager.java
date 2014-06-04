@@ -40,6 +40,7 @@ import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
 
+import tigase.conf.ConfigurationException;
 import tigase.stats.StatisticsList;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
@@ -52,11 +53,12 @@ import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.script.Bindings;
-import tigase.conf.ConfigurationException;
 
 import static tigase.server.bosh.Constants.*;
 
@@ -97,6 +99,13 @@ public class BoshConnectionManager
 	private long                   batch_queue_timeout = BATCH_QUEUE_TIMEOUT_VAL;
 	private boolean				   sendNodeHostname	   = SEND_NODE_HOSTNAME_VAL;
 
+	protected enum BOSH_OPERATION_TYPE {
+		CREATE, REMOVE, INVALID_SID,
+		TIMER
+	};
+	private static final Logger sidLogger = Logger.getLogger( "tigase-bosh-logger" );
+	private static Handler sidFilehandler;
+
 	// This should be actually a multi-thread save variable.
 	// Changing it to
 
@@ -126,6 +135,12 @@ public class BoshConnectionManager
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("closing BOSH session with sid = " + bs.getSid().toString());
 		}
+		if ( sidLogger.isLoggable( Level.FINEST ) ){
+			sidLogger.log( Level.FINEST, "{0} : {1} ({2})",
+										 new Object[] { bs.getSid(), BOSH_OPERATION_TYPE.REMOVE,
+																		"Closing bosh session" } );
+		}
+
 		sessions.remove(bs.getSid());
 
 		return addOutPacketWithTimeout(packet, stoppedHandler, 15l, TimeUnit.SECONDS);
@@ -184,6 +199,25 @@ public class BoshConnectionManager
 
 	// ~--- methods --------------------------------------------------------------
 
+	protected static Logger getSIDLogger () {
+		return sidLogger;
+	}
+
+	private static void setupSidlogger( Level lvl ) {
+		if ( !Level.OFF.equals( lvl ) ){
+			sidLogger.setLevel( lvl );
+			try {
+				if ( null == sidFilehandler ){
+					sidFilehandler = new FileHandler( "logs/bosh_sid.log", false );
+					sidFilehandler.setLevel( lvl );
+					sidLogger.addHandler( sidFilehandler );
+				}
+
+			} catch ( IOException ex ) {
+				log.log( Level.CONFIG, "Error creating BOSH SID logger" + ex );
+			}
+		}
+	}
 
 	protected Map<String,String> preBindSession(Map<String,String> attr) {
 		String hostname = attr.get( TO_ATTR );
@@ -208,6 +242,12 @@ public class BoshConnectionManager
 
 		UUID sid = bs.getSid();
 		sessions.put( sid, bs );
+		if ( sidLogger.isLoggable( Level.FINE ) ){
+			sidLogger.log( Level.FINE, "{0} : {1} ({2})",
+										 new Object[] { bs.getSid(), BOSH_OPERATION_TYPE.CREATE,
+																		"Pre-bind" } );
+		}
+
 		attr.put( SID_ATTR, sid.toString() );
 
 		Packet p = null;
@@ -283,6 +323,11 @@ public class BoshConnectionManager
 								.computeRouting(hostname)), this, sendNodeHostname ? getDefHostName().getDomain() : null);
 							sid = bs.getSid();
 							sessions.put(sid, bs);
+
+							if ( sidLogger.isLoggable( Level.FINE ) ){
+								sidLogger.log( Level.FINE, "{0} : {1} ({2})",
+															 new Object[] { sid, BOSH_OPERATION_TYPE.CREATE, "Socket bosh session" } );
+							}
 						}
 					} else {
 						log.log(Level.INFO, "Invalid hostname. Closing invalid connection: {0}", p);
@@ -315,7 +360,11 @@ public class BoshConnectionManager
 						}
 					}
 				} else {
-					log.log(Level.INFO, "There is no session with given SID = {0}. Closing invalid connection", sid_str);
+					log.log( Level.INFO, "There is no session with given SID = {0}. Closing invalid connection", sid_str );
+					if ( sidLogger.isLoggable( Level.FINE ) ){
+						sidLogger.log( Level.FINE, "{0} : {1} ({2})",
+													 new Object[] { sid_str, BOSH_OPERATION_TYPE.INVALID_SID, "Invalid SID" } );
+					}
 					serv.sendErrorAndStop(Authorization.ITEM_NOT_FOUND, p, "Invalid SID");
 				}
 				addOutPackets(out_results, bs);
@@ -328,6 +377,7 @@ public class BoshConnectionManager
 
 		return null;
 	}
+
 
 	/**
 	 * Method description
@@ -400,6 +450,12 @@ public class BoshConnectionManager
 			BoshSession bs = sessions.get(sid);
 
 			if (bs != null) {
+				if ( sidLogger.isLoggable( Level.FINE ) ){
+					sidLogger.log( Level.FINE, "{0} : {1} ({2})",
+												 new Object[] { bs.getSid(), BOSH_OPERATION_TYPE.REMOVE,
+																				"Closing bosh session" } );
+				}
+
 				bs.disconnected(service);
 			}
 		}
@@ -485,6 +541,7 @@ public class BoshConnectionManager
 		props.put(MAX_BATCH_SIZE_KEY, MAX_BATCH_SIZE_VAL);
 		props.put(BATCH_QUEUE_TIMEOUT_KEY, BATCH_QUEUE_TIMEOUT_VAL);
 		props.put(SEND_NODE_HOSTNAME_KEY, SEND_NODE_HOSTNAME_VAL );
+		props.put(SID_LOGGER_KEY, SID_LOGGER_VAL);
 
 		return props;
 	}
@@ -589,6 +646,8 @@ public class BoshConnectionManager
 
 	// ~--- set methods ----------------------------------------------------------
 
+
+
 	/**
 	 * Method description
 	 *
@@ -631,9 +690,13 @@ public class BoshConnectionManager
 			batch_queue_timeout = (Long) props.get(BATCH_QUEUE_TIMEOUT_KEY);
 			log.info("Setting batch_queue_timeout to: " + batch_queue_timeout);
 		}
-		if (props.get(SEND_NODE_HOSTNAME_KEY) != null) {
-			sendNodeHostname = (Boolean) props.get(SEND_NODE_HOSTNAME_KEY);
+
+		if (props.get(SID_LOGGER_KEY) != null) {
+			Level lvl = Level.parse( (String)props.get(SID_LOGGER_KEY) );
+			setupSidlogger( lvl );
+			log.info("Setting SID log level to: " + lvl);
 		}
+
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -744,6 +807,11 @@ public class BoshConnectionManager
 							writePacketToSocket(redirectPacket);
 							session.sendWaitingPackets();
 							session.close();
+							if ( sidLogger.isLoggable( Level.FINE ) ){
+								sidLogger.log( Level.FINE, "{0} : {1} ({2})",
+															 new Object[] { session.getSid(), BOSH_OPERATION_TYPE.REMOVE,
+																							"See other host" } );
+							}
 							sessions.remove(session.getSid());
 						} else {
 							session.setUserJid(jid);
@@ -799,6 +867,11 @@ public class BoshConnectionManager
 					}
 				}
 				session.close();
+				if ( sidLogger.isLoggable( Level.FINE ) ){
+					sidLogger.log( Level.FINE, "{0} : {1} ({2})",
+												 new Object[] { session.getSid(), BOSH_OPERATION_TYPE.REMOVE,
+																				"Closing session for command CLOSE" } );
+				}
 				sessions.remove(session.getSid());
 			} else {
 				if (log.isLoggable(Level.FINE)) {
@@ -1011,22 +1084,18 @@ public class BoshConnectionManager
 
 			BoshSession session = getBoshSession(packet.getFrom());
 
-			if (session != null) {
-				log.fine("Closing session for timeout: " + session.getSid());
+			if ( session != null ){
+				log.fine( "Closing session for timeout: " + session.getSid() );
 				session.close();
-				sessions.remove(session.getSid());
+				if ( sidLogger.isLoggable( Level.FINE ) ){
+					sidLogger.log( Level.FINE, "{0} : {1} ({2})",
+												 new Object[] { session.getSid(), BOSH_OPERATION_TYPE.REMOVE,
+																				 "Closing session for timeout" } );
+				}
+				sessions.remove( session.getSid() );
 			} else {
 				log.info("Session does not exist for packet: " + packet.toString());
 			}
 		}
 	}
 }
-
-
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-
-//~ Formatted in Tigase Code Convention on 13/10/15

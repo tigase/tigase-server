@@ -29,13 +29,9 @@ package tigase.server.bosh;
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Message;
-import tigase.server.xmppclient.SeeOtherHostIfc.Phase;
-
 import tigase.server.Packet;
-
-import tigase.util.TigaseStringprepException;
-
-import tigase.xml.Element;
+import tigase.server.bosh.Constants.CacheAction;
+import tigase.server.xmppclient.SeeOtherHostIfc.Phase;
 
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
@@ -43,25 +39,29 @@ import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 
-import static tigase.server.bosh.Constants.*;
-
-//~--- JDK imports ------------------------------------------------------------
+import tigase.util.TigaseStringprepException;
+import tigase.util.TimerTask;
+import tigase.xml.Element;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
 import java.util.regex.Pattern;
-import java.util.Set;
-import java.util.UUID;
-import tigase.util.TimerTask;
+
+import static tigase.server.bosh.Constants.*;
+
+//~--- JDK imports ------------------------------------------------------------
+
 
 /**
  * Describe class BoshSession here.
@@ -199,12 +199,26 @@ public class BoshSession {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Canceling inactivityTimer: " + getSid());
 			}
-			handler.cancelTask(inactivityTimer);
+			if ( BoshConnectionManager.getSIDLogger().isLoggable( Level.FINEST ) ){
+				BoshConnectionManager.getSIDLogger().log( Level.FINEST, "{0} : {1} ({2})",
+																									new Object[] { getSid(),
+																																 BoshConnectionManager.BOSH_OPERATION_TYPE.TIMER,
+																																 "Canceling inactivityTimer: " + bios.getUniqueId() } );
+			}
+
 		}
 		if (connections.isEmpty()) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Setting inactivityTimer for " + max_inactivity + ": " + getSid());
 			}
+			if ( BoshConnectionManager.getSIDLogger().isLoggable( Level.FINEST ) ){
+				BoshConnectionManager.getSIDLogger().log( Level.FINEST, "{0} : {1} ({2})",
+																									new Object[] { getSid(),
+																																 BoshConnectionManager.BOSH_OPERATION_TYPE.TIMER,
+																																 "Setting inactivityTimer for " + max_inactivity +
+																																 " on: " + bios.getUniqueId()} );
+			}
+
 			inactivityTimer = handler.scheduleTask(this, max_inactivity * SECOND);
 		}
 	}
@@ -365,6 +379,14 @@ public class BoshSession {
 		if ( preBindEnabled ){
 
 			inactivityTimer = handler.scheduleTask(this, max_inactivity * SECOND);
+			if ( BoshConnectionManager.getSIDLogger().isLoggable( Level.FINEST ) ){
+				BoshConnectionManager.getSIDLogger().log( Level.FINEST, "{0} : {1} ({2})",
+																									new Object[] { getSid(),
+																																 BoshConnectionManager.BOSH_OPERATION_TYPE.TIMER,
+																																 "Setting inactivityTimer for " + max_inactivity +
+																																 " on " + service} );
+			}
+
 			
 			if ( null != userId ){
 				Command.addFieldValue( streamOpen, USER_ID_ATTR, userId.toString() );
@@ -444,11 +466,23 @@ public class BoshSession {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Canceling waitTimer: " + getSid());
 			}
+			if ( BoshConnectionManager.getSIDLogger().isLoggable( Level.FINEST ) ){
+				BoshConnectionManager.getSIDLogger().log( Level.FINEST, "{0} : {1} ({2})",
+																									new Object[] { getSid(),
+																																 BoshConnectionManager.BOSH_OPERATION_TYPE.TIMER,
+																																 "Canceling waitTimer: " + service.getUniqueId() } );
+			}
 			handler.cancelTask(waitTimer);
 		}
 		if (inactivityTimer != null) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Canceling inactivityTimer: " + getSid());
+			}
+			if ( BoshConnectionManager.getSIDLogger().isLoggable( Level.FINEST ) ){
+				BoshConnectionManager.getSIDLogger().log( Level.FINEST, "{0} : {1} ({2})",
+																									new Object[] { getSid(),
+																																 BoshConnectionManager.BOSH_OPERATION_TYPE.TIMER,
+																																 "Canceling inactivityTimer: " + service.getUniqueId() } );
 			}
 			handler.cancelTask(inactivityTimer);
 		}
@@ -488,6 +522,12 @@ public class BoshSession {
 			waitTimer = handler.scheduleTask(this, max_wait * SECOND);
 			service.setWaitTimer(waitTimer);
 			connections.put(waitTimer, service);
+			if ( BoshConnectionManager.getSIDLogger().isLoggable( Level.FINEST ) ){
+				BoshConnectionManager.getSIDLogger().log( Level.FINEST, "{0} : {1} ({2})",
+																									new Object[] { getSid(),
+																																 BoshConnectionManager.BOSH_OPERATION_TYPE.TIMER,
+																																 "Scheduling waitTimer: " + service.getUniqueId() } );
+			}
 			if (!duplicate) {
 				if ((packet.getType() != null) && (packet.getType() == StanzaType.terminate)) {
 
@@ -642,24 +682,49 @@ public class BoshSession {
 						conns += "[" + serv.toString() + "]";
 					}
 					log.log(Level.FINEST, "ignoring inactivityTimer - we have connections: {0} - {1}", new Object[] { connections.size(), conns });
+
+					if ( BoshConnectionManager.getSIDLogger().isLoggable( Level.FINEST ) ){
+						BoshConnectionManager.getSIDLogger().log( Level.FINEST, "{0} : {1} ({2})",
+																											new Object[] { getSid(),
+																																		 BoshConnectionManager.BOSH_OPERATION_TYPE.TIMER,
+																																		 "ignoring inactivityTimer" } );
+					}
 				}
 				return false;
 			}
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("inactivityTimer fired: " + getSid());
 			}
+			if ( BoshConnectionManager.getSIDLogger().isLoggable( Level.FINEST ) ){
+				BoshConnectionManager.getSIDLogger().log( Level.FINEST, "{0} : {1} ({2})",
+																									new Object[] { getSid(),
+																																 BoshConnectionManager.BOSH_OPERATION_TYPE.TIMER,
+																																 "inactivityTimer fired" } );
+			}
 			for (BoshTask waitTimer : waitTimerSet) {
 				if (waitTimer != null) {
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("Canceling waitTimer: " + getSid());
 					}
+			if ( BoshConnectionManager.getSIDLogger().isLoggable( Level.FINEST ) ){
+				BoshConnectionManager.getSIDLogger().log( Level.FINEST, "{0} : {1} ({2})",
+																									new Object[] { getSid(),
+																																 BoshConnectionManager.BOSH_OPERATION_TYPE.TIMER,
+																																 "Canceling waitTimer" } );
+			}
+
 					handler.cancelTask(waitTimer);
 				}
 			}
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Closing session, inactivity timeout expired: " + getSid());
 			}
-
+			if ( BoshConnectionManager.getSIDLogger().isLoggable( Level.FINEST ) ){
+				BoshConnectionManager.getSIDLogger().log( Level.FINEST, "{0} : {1} ({2})",
+																									new Object[] { getSid(),
+																																 BoshConnectionManager.BOSH_OPERATION_TYPE.REMOVE,
+																																 "Closing session, inactivity timeout expired" } );
+			}
 			// we need to set packetFrom as it is later used as packet from and to
 			// pick thread on which it will be processed
 			Packet command = Command.STREAM_CLOSED.getPacket(handler.getJidForBoshSession(this), 

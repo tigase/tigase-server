@@ -20,11 +20,12 @@
  */
 package tigase.server.bosh;
 
-import java.util.TimerTask;
 import tigase.server.Packet;
 import tigase.server.xmppclient.SeeOtherHostIfc;
+
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
+
 
 /**
  * Describe interface BoshSessionTaskHandler here.
