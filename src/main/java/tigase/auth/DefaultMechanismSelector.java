@@ -51,8 +51,9 @@ public class DefaultMechanismSelector implements MechanismSelector {
 	}
 
 	protected boolean isAllowedForDomain(final String mechanismName, final VHostItem vhost) {
-		if (vhost.getSaslAllowedMechanisms() != null && vhost.getSaslAllowedMechanisms().length > 0) {
-			for (String allowed : vhost.getSaslAllowedMechanisms()) {
+		final String[] saslAllowedMechanisms = vhost.getSaslAllowedMechanisms();
+		if (saslAllowedMechanisms != null && saslAllowedMechanisms.length > 0) {
+			for (String allowed : saslAllowedMechanisms) {
 				if (allowed.equals(mechanismName))
 					return true;
 			}

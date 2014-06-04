@@ -739,10 +739,12 @@ public class VHostItem
 	 */
 	@Override
 	public String toString() {
-		return "Domain: " + vhost + ", enabled: " + enabled + ", anonym: " +
-				anonymousEnabled + ", register: " + registerEnabled + ", maxusers: " +
-				maxUsersNumber + ", tls: " + tlsRequired + ", s2sSecret: " + s2sSecret +
-				", domainFilter: " + domainFilter + ", c2sPortsAllowed: " + intArrayToString(c2sPortsAllowed, ",");
+		return "Domain: " + vhost + ", enabled: " + enabled + ", anonym: "
+					 + anonymousEnabled + ", register: " + registerEnabled + ", maxusers: "
+					 + maxUsersNumber + ", tls: " + tlsRequired + ", s2sSecret: " + s2sSecret
+					 + ", domainFilter: " + domainFilter + ", c2sPortsAllowed: "
+					 + intArrayToString( c2sPortsAllowed, ",")
+					 + ", saslAllowedMechanisms: " + Arrays.toString( saslAllowedMechanisms );
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -1300,6 +1302,14 @@ public class VHostItem
 		@Override
 		public String getS2sSecret() {
 			return VHostItem.this.getS2sSecret();
+		}
+
+		/**
+		 * @return the saslAllowedMechanisms
+		 */
+		@Override
+		public String[] getSaslAllowedMechanisms() {
+			return VHostItem.this.getSaslAllowedMechanisms();
 		}
 
 		/**
