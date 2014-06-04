@@ -160,13 +160,13 @@ public class BoshSession {
 	 * @param handler
 	 */
 	public BoshSession(String def_domain, JID dataReceiver,
-			BoshSessionTaskHandler handler) {
+			BoshSessionTaskHandler handler, String hostname) {
 		this.sid            = UUID.randomUUID();
 		this.domain         = def_domain;
 		this.dataReceiver   = dataReceiver;
 		this.handler        = handler;
 		this.last_send_time = System.currentTimeMillis();
-		this.hostname       = handler.getDefHostName().getDomain();
+		this.hostname       = hostname;
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -305,7 +305,7 @@ public class BoshSession {
 		Element body = new Element(BODY_EL_NAME, new String[] {
 			WAIT_ATTR, INACTIVITY_ATTR, POLLING_ATTR, REQUESTS_ATTR, HOLD_ATTR, MAXPAUSE_ATTR,
 			SID_ATTR, VER_ATTR, FROM_ATTR, SECURE_ATTR, "xmpp:version", "xmlns:xmpp",
-			"xmlns:stream", HOST_ATTR
+			"xmlns:stream"
 		}, new String[] {
 			Long.toString(this.max_wait),
 			Long.toString(this.max_inactivity),
@@ -313,9 +313,12 @@ public class BoshSession {
 			Integer.toString(this.concurrent_requests),
 			Integer.valueOf(this.hold_requests).toString(),
 			Long.valueOf(this.max_pause).toString(), this.sid.toString(), BOSH_VERSION,
-			this.domain, "true", "1.0", "urn:xmpp:xbosh", "http://etherx.jabber.org/streams",
-			this.hostname
+			this.domain, "true", "1.0", "urn:xmpp:xbosh", "http://etherx.jabber.org/streams"
 		});
+		
+		if (this.hostname != null) {
+			body.addAttribute(HOST_ATTR, this.hostname);
+		}
 
 		sessionId = UUID.randomUUID().toString();
 		body.setAttribute(AUTHID_ATTR, sessionId);
@@ -1063,9 +1066,13 @@ public class BoshSession {
 
 	private Element getBodyElem() {
 		Element body = new Element(BODY_EL_NAME, new String[] { FROM_ATTR, SECURE_ATTR,
-				"xmpp:version", "xmlns:xmpp", "xmlns:stream", HOST_ATTR }, new String[] { this.domain,
-				"true", "1.0", "urn:xmpp:xbosh", "http://etherx.jabber.org/streams", this.hostname });
+				"xmpp:version", "xmlns:xmpp", "xmlns:stream" }, new String[] { this.domain,
+				"true", "1.0", "urn:xmpp:xbosh", "http://etherx.jabber.org/streams" });
 
+		if (this.hostname != null) {
+			body.addAttribute(HOST_ATTR, this.hostname);
+		}
+		
 		body.setXMLNS(BOSH_XMLNS);
 
 		return body;
