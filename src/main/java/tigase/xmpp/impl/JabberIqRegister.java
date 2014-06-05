@@ -26,35 +26,34 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
-
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.Priority;
-
 import tigase.util.TigaseStringprepException;
-
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
-
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.LinkedHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
 
 /**
  * JEP-0077: In-Band Registration
@@ -68,11 +67,26 @@ import java.util.Queue;
 public class JabberIqRegister
 				extends XMPPProcessor
 				implements XMPPProcessorIfc {
+	private static final int REMOTE_ADDRESS_IDX = 2;
 	private static final String[][] ELEMENTS = {
 		Iq.IQ_QUERY_PATH
 	};
 	private static final String     ID       = "jabber:iq:register";
 
+	/**
+	 * Whitelist properties
+	 */
+	
+	public static final String REGISTRATION_BLACKLIST_PROP_KEY = "registration-blacklist";
+
+	public static final String REGISTRATION_WHITELIST_PROP_KEY = "registration-whitelist";
+	
+	public static final String WHITELIST_REGISTRATION_ONLY_PROP_KEY = "whitelist-registration-only";
+
+	private List<CIDRAddress> registrationWhitelist = new LinkedList<CIDRAddress>();
+	private List<CIDRAddress> registrationBlacklist = new LinkedList<CIDRAddress>();
+	private boolean whitelistRegistrationOnly = false;
+	
 	/**
 	 * Private logger for class instances.
 	 */
@@ -166,12 +180,18 @@ public class JabberIqRegister
 				Element request = packet.getElement();
 				boolean remove  = request.findChildStaticStr(IQ_QUERY_REMOVE_PATH) != null;
 
-				if ((!session.isAuthorized() || remove) &&!session.getDomain()
-						.isRegisterEnabled()) {
-					results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
-							"Registration is not allowed for this domain.", true));
-
-					return;
+				if (!session.isAuthorized() || remove) {
+					if (!isRegistrationAllowedForConnection(packet.getFrom())) {
+						results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
+								"Registration is not allowed for this connection.", true));
+						return;
+					}
+					
+					if (!session.getDomain().isRegisterEnabled()) {
+						results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
+								"Registration is not allowed for this domain.", true));
+						return;
+					}
 				}
 
 				Authorization result = Authorization.NOT_AUTHORIZED;
@@ -293,6 +313,125 @@ public class JabberIqRegister
 			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
 					"Database access problem, please contact administrator.", true));
 		}    // end of try-catch
+	}
+
+	protected boolean isRegistrationAllowedForConnection(JID from) {
+		String remoteAdress = parseRemoteAddressFromJid(from);
+		if (whitelistRegistrationOnly) {
+			return contains(registrationWhitelist, remoteAdress);
+		}
+		return !contains(registrationBlacklist, remoteAdress);
+	}
+
+	private static String parseRemoteAddressFromJid(JID from) {
+		String connectionId = from.getResource();
+		return connectionId.split("_")[REMOTE_ADDRESS_IDX];
+	}
+	
+	@Override
+	public void init(Map<String, Object> settings) throws TigaseDBException {
+		String whitelistRegistrationOnlyStr = (String) settings.get(
+				WHITELIST_REGISTRATION_ONLY_PROP_KEY);
+		if (whitelistRegistrationOnlyStr != null) {
+			whitelistRegistrationOnly = Boolean.parseBoolean(
+					whitelistRegistrationOnlyStr);
+		}
+		
+		String registrationWhitelistStr = (String) settings.get(
+				REGISTRATION_WHITELIST_PROP_KEY);
+		if (registrationWhitelistStr != null) {
+			registrationWhitelist = parseList(registrationWhitelistStr);
+		}
+		
+		String registrationBlacklistStr = (String) settings.get(
+				REGISTRATION_BLACKLIST_PROP_KEY);
+		if (registrationBlacklistStr != null) {
+			registrationBlacklist = parseList(registrationBlacklistStr);
+		}
+	}
+
+	private static boolean contains(List<CIDRAddress> addresses, String address) {
+		for (CIDRAddress cidrAddress : addresses) {
+			if (cidrAddress.inRange(address)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private static List<CIDRAddress> parseList(String listStr) {
+		String[] splitArray = listStr.split(",");
+		List<CIDRAddress> splitList = new LinkedList<CIDRAddress>();
+		for (String listEl : splitArray) {
+			splitList.add(CIDRAddress.parse(listEl.trim()));
+		}
+		return splitList;
+	}
+	
+	/**
+	 * As in http://commons.apache.org/proper/commons-net/jacoco/org.apache.commons.net.util/SubnetUtils.java.html
+	 */
+	private static class CIDRAddress {
+
+		static final int NBITS = 32;
+		static final String IP_ADDRESS_MASK = "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})";
+		static final String CIDR_ADDRESS_MASK = IP_ADDRESS_MASK + "/(\\d{1,3})";
+
+		static final Pattern IP_PATTERN = Pattern.compile(IP_ADDRESS_MASK);
+		static final Pattern CIDR_PATTERN = Pattern.compile(CIDR_ADDRESS_MASK);
+		
+		final int high;
+		final int low;
+		
+		private CIDRAddress(int high, int low) {
+			this.high = high;
+			this.low = low;
+		}
+		
+		boolean inRange(String address) {
+			int diff = toInteger(address) - low;
+            return diff >= 0 && (diff <= (high - low));
+		}
+
+		static int toInteger(String address) {
+			Matcher matcher = IP_PATTERN.matcher(address);
+			matcher.matches();
+			return matchAddress(matcher);
+		}
+		
+		static int matchAddress(Matcher matcher) {
+	        int addr = 0;
+	        for (int i = 1; i <= 4; ++i) {
+	            int n = Integer.parseInt(matcher.group(i));
+	            addr |= ((n & 0xff) << 8*(4-i));
+	        }
+	        return addr;
+	    }
+
+		static CIDRAddress parse(String mask) {
+			if (!mask.contains("/")) {
+				mask = mask + "/" + NBITS;
+			}
+			Matcher matcher = CIDR_PATTERN.matcher(mask);
+			matcher.matches();
+			int address = matchAddress(matcher);
+
+            /* Create a binary netmask from the number of bits specification /x */
+            int cidrPart = Integer.parseInt(matcher.group(5));
+            int netmask = 0;
+            int broadcast = 0;
+            int network = 0;
+            for (int j = 0; j < cidrPart; ++j) {
+                netmask |= (1 << 31-j);
+            }
+
+            /* Calculate base network address */
+            network = (address & netmask);
+
+            /* Calculate broadcast address */
+            broadcast = network | ~(netmask);
+            return new CIDRAddress(broadcast, network);
+		}
 	}
 
 	/**
