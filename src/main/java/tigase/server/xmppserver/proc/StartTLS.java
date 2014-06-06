@@ -152,8 +152,8 @@ public class StartTLS
 	public void streamFeatures(S2SIOService serv, List<Element> results) {
 		if (!serv.getSessionData().containsKey("TLS")) {
 			CID cid = (CID) serv.getSessionData().get("cid");
-			boolean skipTls = this.skipTLSForHost(cid.getRemoteHost());
-			if (!skipTls && handler.isTlsRequired(cid.getLocalHost())) {
+			if (cid != null && !skipTLSForHost(cid.getRemoteHost()) 
+					&& handler.isTlsRequired(cid.getLocalHost())) {
 				results.add(features_required);
 			}
 			else {

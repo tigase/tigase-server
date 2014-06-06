@@ -96,9 +96,16 @@ public class VHostItem
 	 * can login for this domain.
 	 */
 	public static final String ANONYMOUS_ENABLED_ATT = "anon";
-
+	
 	/** Field description */
 	public static final String ANONYMOUS_ENABLED_LABEL = "Anonymous enabled";
+
+	/**
+	 * List of SASL mechanisms allowed for domain
+	 */
+	public static final String SASL_MECHANISM_ATT = "sasl-mechanisms";
+
+	public static final String SASL_MECHANISM_LABEL = "Allowed SASL mechanisms";
 
 	/** Field description */
 	public static final String COMPONENTS_ATT = "comps";
@@ -264,6 +271,7 @@ public class VHostItem
 
 	private String[] comps = null;
 	private int[] c2sPortsAllowed = null;
+	private String[] saslAllowedMechanisms = null;
 	private long     maxUsersNumber = Long.getLong(VHOST_MAX_USERS_PROP_KEY,
 			VHOST_MAX_USERS_PROP_DEF);
 	private JID messageForward = JID.jidInstanceNS(System.getProperty(
@@ -368,6 +376,9 @@ public class VHostItem
 		Command.addFieldValue(packet, OTHER_PARAMS_LABEL, (otherDomainParams != null)
 				? otherDomainParams
 				: "");
+		Command.addFieldValue(packet, SASL_MECHANISM_LABEL,
+				saslAllowedMechanisms != null ? stringArrayToString(saslAllowedMechanisms, ",") : "");
+
 		super.addCommandFields(packet);
 	}
 
@@ -441,6 +452,12 @@ public class VHostItem
 		otherDomainParams = Command.getFieldValue(packet, OTHER_PARAMS_LABEL);
 		tmp = Command.getFieldValue(packet, C2S_PORTS_ALLOWED_LABEL);
 		c2sPortsAllowed = parseIntArray(tmp, ",");
+		
+		tmp = Command.getFieldValue(packet, SASL_MECHANISM_LABEL);
+		if ((tmp != null) && !tmp.trim().isEmpty()) {
+			setSaslAllowedMechanisms(tmp.split(","));
+		} 
+
 	}
 
 	/**
@@ -500,6 +517,11 @@ public class VHostItem
 		otherDomainParams = elem.getCDataStaticStr(VHOST_OTHER_PARAMS_PATH);
 		
 		this.c2sPortsAllowed = parseIntArray(elem.getAttributeStaticStr(C2S_PORTS_ALLOWED_ATT), ",");
+		
+		tmp = elem.getAttributeStaticStr(SASL_MECHANISM_ATT);
+		if (tmp != null) {
+			setSaslAllowedMechanisms(tmp.split(";"));
+		} 
 	}
 
 	/**
@@ -598,6 +620,10 @@ public class VHostItem
 				
 				c2sPortsAllowed = parseIntArray(mu[1], ";");
 			}
+			if(tmp.startsWith(SASL_MECHANISM_ATT)){
+				String[] mu = tmp.split("=");
+				setSaslAllowedMechanisms(mu[1].split(";"));
+			}
 		}
 	}
 
@@ -629,6 +655,8 @@ public class VHostItem
 		elem.addAttribute(HOSTNAME_ATT, vhost.getDomain());
 		elem.addAttribute(ENABLED_ATT, "" + enabled);
 		elem.addAttribute(ANONYMOUS_ENABLED_ATT, "" + anonymousEnabled);
+		if (saslAllowedMechanisms != null)
+			elem.addAttribute(SASL_MECHANISM_ATT, stringArrayToString(saslAllowedMechanisms, ";"));
 		elem.addAttribute(REGISTER_ENABLED_ATT, "" + registerEnabled);
 		elem.addAttribute(TLS_REQUIRED_ATT, "" + tlsRequired);
 		if (s2sSecret != null) {
@@ -693,6 +721,10 @@ public class VHostItem
 		if (c2sPortsAllowed != null) {
 			sb.append(':').append(C2S_PORTS_ALLOWED_ATT).append('=').append(intArrayToString(c2sPortsAllowed, ";"));
 		}
+		
+		if (saslAllowedMechanisms != null) {
+			sb.append(':').append(SASL_MECHANISM_ATT).append('=').append(stringArrayToString(saslAllowedMechanisms, ";"));
+		}
 
 		return sb.toString();
 	}
@@ -707,10 +739,12 @@ public class VHostItem
 	 */
 	@Override
 	public String toString() {
-		return "Domain: " + vhost + ", enabled: " + enabled + ", anonym: " +
-				anonymousEnabled + ", register: " + registerEnabled + ", maxusers: " +
-				maxUsersNumber + ", tls: " + tlsRequired + ", s2sSecret: " + s2sSecret +
-				", domainFilter: " + domainFilter + ", c2sPortsAllowed: " + intArrayToString(c2sPortsAllowed, ",");
+		return "Domain: " + vhost + ", enabled: " + enabled + ", anonym: "
+					 + anonymousEnabled + ", register: " + registerEnabled + ", maxusers: "
+					 + maxUsersNumber + ", tls: " + tlsRequired + ", s2sSecret: " + s2sSecret
+					 + ", domainFilter: " + domainFilter + ", c2sPortsAllowed: "
+					 + intArrayToString( c2sPortsAllowed, ",")
+					 + ", saslAllowedMechanisms: " + Arrays.toString( saslAllowedMechanisms );
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -1122,6 +1156,20 @@ public class VHostItem
 		return buf.toString();
 	}
 	
+	private String stringArrayToString(String[] arr, String separator) {
+		if (arr == null) {
+			return null;
+		}
+		StringBuilder buf = new StringBuilder();
+		for (int i = 0; i < arr.length; i++) {
+			if (i > 0) {
+				buf.append(separator);
+			}
+			buf.append(arr[i]);
+		}
+		return buf.toString();
+	}
+	
 	//~--- inner classes --------------------------------------------------------
 
 	private class UnmodifiableVHostItem
@@ -1254,6 +1302,14 @@ public class VHostItem
 		@Override
 		public String getS2sSecret() {
 			return VHostItem.this.getS2sSecret();
+		}
+
+		/**
+		 * @return the saslAllowedMechanisms
+		 */
+		@Override
+		public String[] getSaslAllowedMechanisms() {
+			return VHostItem.this.getSaslAllowedMechanisms();
 		}
 
 		/**
@@ -1486,6 +1542,21 @@ public class VHostItem
 			throw new UnsupportedOperationException(
 					"This is unmodifiable instance of VHostItem");
 		}
+	}
+
+	/**
+	 * @return the saslAllowedMechanisms
+	 */
+	public String[] getSaslAllowedMechanisms() {
+		return saslAllowedMechanisms;
+	}
+
+	/**
+	 * @param saslAllowedMechanisms the saslAllowedMechanisms to set
+	 */
+	public void setSaslAllowedMechanisms(String[] saslAllowedMechanisms) {
+		this.saslAllowedMechanisms = saslAllowedMechanisms == null || saslAllowedMechanisms.length == 0 ? null
+				: saslAllowedMechanisms;
 	}
 }
 

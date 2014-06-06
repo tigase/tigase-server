@@ -776,12 +776,12 @@ public class ClusterConnectionManager
 		props.put(COMPRESS_STREAM_PROP_KEY, COMPRESS_STREAM_PROP_VAL);
 
 		String conns     = (String) params.get(CLUSTER_CONNECTIONS_PER_NODE_PAR);
-		int    conns_int = CLUSTER_CONNECTIONS_PER_NODE_VAL;
+		int    conns_int = Runtime.getRuntime().availableProcessors();
 
 		if (conns != null) {
 			try {
 				conns_int = Integer.parseInt(conns);
-			} catch (Exception e) {
+			} catch (NumberFormatException e) {
 				conns_int = CLUSTER_CONNECTIONS_PER_NODE_VAL;
 			}
 		}

@@ -164,6 +164,12 @@ public abstract class Constants {
 
 	/** Field description */
 	protected static final String SECURE_ATTR = "secure";
+	
+	/**	Field description */
+	protected static final String SEND_NODE_HOSTNAME_KEY = "send-node-hostname";
+	
+	/** Field description */
+	protected static final boolean SEND_NODE_HOSTNAME_VAL = true;
 
 	/** Field description */
 	protected static final String SID_ATTR = "sid";

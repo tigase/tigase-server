@@ -132,7 +132,7 @@ public class DomainFilter
 					break;
 
 				case OWN :
-					if ((outDomain != null) &&!outDomain.equals(session.getDomain().getVhost()
+					if ((outDomain != null) &&!outDomain.endsWith(session.getDomain().getVhost()
 							.getDomain())) {
 						removePacket(it, res, errors,
 								"You can only communicate within your own domain.");
@@ -270,7 +270,7 @@ public class DomainFilter
 				break;
 
 			case OWN :
-				if ((outDomain != null) &&!outDomain.equals(session.getDomain().getVhost()
+				if ((outDomain != null) &&!outDomain.endsWith(session.getDomain().getVhost()
 						.getDomain())) {
 					removePacket(null, packet, results,
 							"You can only communicate within your own domain.");
