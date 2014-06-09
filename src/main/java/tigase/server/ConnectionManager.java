@@ -1557,7 +1557,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 											 * ping type. */
 											switch ( watchdogPingType ) {
 												case XMPP:
-													writePacketToSocket( getPingPacket( service ));
+													if (! writePacketToSocket( getPingPacket( service )) ) {
+														// writing failed, stopp service
+														++watchdogStopped;
+														service.stop();
+													}
 													break;
 
 												case WHITESPACE:
