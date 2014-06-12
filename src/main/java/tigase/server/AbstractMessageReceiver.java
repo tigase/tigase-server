@@ -36,6 +36,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -215,6 +216,19 @@ public abstract class AbstractMessageReceiver
 	private long                                                statSentPacketsOk     = 0;
 	private ArrayDeque<QueueListener>                           threadsQueue          =
 			null;
+	private final ThreadFactory									threadFactory		  = 
+			new ThreadFactory() {
+
+					private final ThreadFactory internal = Executors.defaultThreadFactory();
+					
+					@Override
+					public Thread newThread(Runnable r) {
+						Thread th = internal.newThread(r);
+						th.setName("scheduler_" + th.getName() + "-" + getName());
+						return th;
+					}
+					
+				};
 	private final ConcurrentHashMap<String, PacketReceiverTask> waitingTasks =
 			new ConcurrentHashMap<String, PacketReceiverTask>(16, 0.75f, 4);
 	private final Set<Pattern> regexRoutings = new ConcurrentSkipListSet<Pattern>(
@@ -1022,7 +1036,7 @@ public abstract class AbstractMessageReceiver
 
 				ScheduledExecutorService scheduler = receiverScheduler;
 
-				receiverScheduler = Executors.newScheduledThreadPool(threads);
+				receiverScheduler = Executors.newScheduledThreadPool(threads, threadFactory);
 				scheduler.shutdown();
 			}
 		}
@@ -1270,7 +1284,7 @@ public abstract class AbstractMessageReceiver
 		// out_thread.setName("out_" + getName());
 		// out_thread.start();
 		// } // end of if (thread == null || ! thread.isAlive())
-		receiverScheduler = Executors.newScheduledThreadPool(schedulerThreads_size);
+		receiverScheduler = Executors.newScheduledThreadPool(schedulerThreads_size, threadFactory);
 		receiverTasks     = new Timer(getName() + " tasks", true);
 		receiverTasks.scheduleAtFixedRate(new TimerTask() {
 			@Override
