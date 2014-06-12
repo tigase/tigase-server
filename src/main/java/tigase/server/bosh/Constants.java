@@ -133,6 +133,10 @@ public abstract class Constants {
 
 	/** Field description */
 	protected static final long MAX_PAUSE_PROP_VAL = 10;
+	
+	protected static final String MAX_SESSION_WAITING_PACKETS_KEY = "max-session-waiting-packets";
+	
+	protected static final int MAX_SESSION_WAITING_PACKETS_VAL = 100;
 
 	/** Field description */
 	protected static final String MAX_WAIT_DEF_PROP_KEY = "max-wait";

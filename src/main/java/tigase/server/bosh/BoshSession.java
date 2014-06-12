@@ -132,7 +132,7 @@ public class BoshSession {
 	// new EnumMap<TimedTask, TimerTask>(TimedTask.class);
 	private Set<BoshTask> waitTimerSet = new ConcurrentSkipListSet<BoshTask>(
 			timerTaskComparator);
-	private Queue<Element> waiting_packets = new ConcurrentLinkedQueue<Element>();
+	private Queue<Element> waiting_packets = null;//new ConcurrentLinkedQueue<Element>();
 	private boolean        terminate       = false;
 	private long           min_polling     = MIN_POLLING_PROP_VAL;
 	private long           max_wait        = MAX_WAIT_DEF_PROP_VAL;
@@ -160,13 +160,14 @@ public class BoshSession {
 	 * @param handler
 	 */
 	public BoshSession(String def_domain, JID dataReceiver,
-			BoshSessionTaskHandler handler, String hostname) {
+			BoshSessionTaskHandler handler, String hostname, int maxWaitingPackets) {
 		this.sid            = UUID.randomUUID();
 		this.domain         = def_domain;
 		this.dataReceiver   = dataReceiver;
 		this.handler        = handler;
 		this.last_send_time = System.currentTimeMillis();
 		this.hostname       = hostname;
+		this.waiting_packets = new LinkedBlockingQueue(maxWaitingPackets);
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -418,7 +419,10 @@ public class BoshSession {
 						.toString());
 			}
 			if (filterInPacket(packet)) {
-				waiting_packets.offer(packet.getElement());
+				if (!waiting_packets.offer(packet.getElement())) {
+					if (log.isLoggable(Level.FINEST))
+						log.log(Level.INFO, "waiting_packets queue exceeded, dropping packet: " + packet.toString());
+				}
 			} else {
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("[" + connections.size() + "] In packet filtered: " + packet
@@ -611,7 +615,11 @@ public class BoshSession {
 			try {
 				Packet error = Authorization.BAD_REQUEST.getResponseMessage(packet, er_msg, true);
 
-				waiting_packets.add(error.getElement());
+				if (!waiting_packets.offer(error.getElement())) {
+					if (log.isLoggable(Level.FINEST))
+						log.log(Level.INFO, "waiting_packets queue exceeded, dropping packet: " + error.toString());
+				}
+				
 				terminate = true;
 
 				Packet command = Command.STREAM_CLOSED.getPacket(handler.getJidForBoshSession(this),
@@ -969,7 +977,11 @@ public class BoshSession {
 			for (Element elem : cache_res) {
 				elem.addAttribute("reload-counter", "" + cache_reload_counter);
 				elem.addAttribute("packet-counter", "" + (++packet_counter));
-				waiting_packets.add(elem);
+				if (!waiting_packets.offer(elem)) {
+					if (log.isLoggable(Level.FINEST))
+						log.log(Level.INFO, "waiting_packets queue exceeded, dropping packet: " + elem.toString());
+				}
+
 			}
 		}
 	}

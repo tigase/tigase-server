@@ -97,6 +97,7 @@ public class BoshConnectionManager
 	private long                   bosh_session_close_delay =
 			BOSH_SESSION_CLOSE_DELAY_DEF_VAL;
 	private long                   batch_queue_timeout = BATCH_QUEUE_TIMEOUT_VAL;
+	private int					   maxSessionWaitingPackets = MAX_SESSION_WAITING_PACKETS_VAL;
 	private boolean				   sendNodeHostname	   = SEND_NODE_HOSTNAME_VAL;
 
 	protected enum BOSH_OPERATION_TYPE {
@@ -226,7 +227,8 @@ public class BoshConnectionManager
 
 		BoshSession bs = new BoshSession( getDefVHostItem().getDomain(),
 				JID.jidInstanceNS( routings.computeRouting( hostname ) ), 
-				this, sendNodeHostname ? getDefHostName().getDomain() : null);
+				this, sendNodeHostname ? getDefHostName().getDomain() : null,
+				maxSessionWaitingPackets);
 
 		String jid = attr.get( FROM_ATTR );
 		String uuid = UUID.randomUUID().toString();
@@ -320,7 +322,8 @@ public class BoshConnectionManager
 						}
 						else {
 							bs = new BoshSession(getDefVHostItem().getDomain(), JID.jidInstanceNS(routings
-								.computeRouting(hostname)), this, sendNodeHostname ? getDefHostName().getDomain() : null);
+								.computeRouting(hostname)), this, sendNodeHostname ? getDefHostName().getDomain() : null,
+								maxSessionWaitingPackets);
 							sid = bs.getSid();
 							sessions.put(sid, bs);
 
@@ -540,6 +543,7 @@ public class BoshConnectionManager
 		props.put(MAX_PAUSE_PROP_KEY, MAX_PAUSE_PROP_VAL);
 		props.put(MAX_BATCH_SIZE_KEY, MAX_BATCH_SIZE_VAL);
 		props.put(BATCH_QUEUE_TIMEOUT_KEY, BATCH_QUEUE_TIMEOUT_VAL);
+		props.put(MAX_SESSION_WAITING_PACKETS_KEY, MAX_SESSION_WAITING_PACKETS_VAL);
 		props.put(SEND_NODE_HOSTNAME_KEY, SEND_NODE_HOSTNAME_VAL );
 		props.put(SID_LOGGER_KEY, SID_LOGGER_VAL);
 
@@ -690,7 +694,13 @@ public class BoshConnectionManager
 			batch_queue_timeout = (Long) props.get(BATCH_QUEUE_TIMEOUT_KEY);
 			log.info("Setting batch_queue_timeout to: " + batch_queue_timeout);
 		}
-
+		if (props.get(MAX_SESSION_WAITING_PACKETS_KEY) != null) {
+			maxSessionWaitingPackets = (Integer) props.get(MAX_SESSION_WAITING_PACKETS_KEY);
+			log.info("Setting max session waiting packets to: " + maxSessionWaitingPackets);
+		}
+		if (props.get(SEND_NODE_HOSTNAME_KEY) != null) {
+			sendNodeHostname = (Boolean) props.get(SEND_NODE_HOSTNAME_KEY);
+		}
 		if (props.get(SID_LOGGER_KEY) != null) {
 			Level lvl = Level.parse( (String)props.get(SID_LOGGER_KEY) );
 			setupSidlogger( lvl );
