@@ -7,7 +7,9 @@ else
   SERVERS=`cat $1`
 fi
 
-DIR="/home/tigase/tigase-server"
+
+TIGASE_USER="tigase"
+DIR="/home/${TIGASE_USER}/tigase-server"
 PROP_FILE="cluster.properties"
 JARS="target/tigase-server.jar"
 LOG_TIMESTAMP=`date +"%Y-%m-%d_%H-%M-%S"`
@@ -36,7 +38,7 @@ for s in ${SERVERS} ; do
 
 	  echo -e "\n\n===\trestarting ${s} ==="
 
-    ssh root@${s} "service tigase stop ; sleep 10 ; cp -r ${DIR}/logs ${DIR}/logs_${LOG_TIMESTAMP} ; rm -f ${DIR}/logs/* ; service tigase start"
+    ssh root@${s} "chown -r ${TIGASE_USER}:${TIGASE_USER} /home/${TIGASE_USER} ; service tigase stop ; sleep 10 ; cp -r ${DIR}/logs ${DIR}/logs_${LOG_TIMESTAMP} ; rm -f ${DIR}/logs/* ; service tigase start"
 
 	  echo -e "===\trestart of ${s} FINISHED ==="
 
