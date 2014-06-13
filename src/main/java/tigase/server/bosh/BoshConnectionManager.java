@@ -207,6 +207,7 @@ public class BoshConnectionManager
 	private static void setupSidlogger( Level lvl ) {
 		if ( !Level.OFF.equals( lvl ) ){
 			sidLogger.setLevel( lvl );
+			sidLogger.setUseParentHandlers( false );
 			try {
 				if ( null == sidFilehandler ){
 					sidFilehandler = new FileHandler( "logs/bosh_sid.log", false );
