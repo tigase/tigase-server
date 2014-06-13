@@ -28,15 +28,15 @@ import tigase.util.TimerTask;
  */
 public class BoshSendQueueTask extends TimerTask {
 
-        private final BoshSession bs;
-        
-        public BoshSendQueueTask(BoshSession bs) {
-                this.bs = bs;
-        }
+	private final BoshSession bs;
 
-        @Override
-        public void run() {
-                bs.sendWaitingPackets();
-        }
-        
+	public BoshSendQueueTask( BoshSession bs ) {
+		this.bs = bs;
+	}
+
+	@Override
+	public void run() {
+		bs.sendWaitingPackets();
+	}
+
 }

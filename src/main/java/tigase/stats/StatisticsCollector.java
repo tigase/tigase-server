@@ -26,47 +26,40 @@ package tigase.stats;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.conf.ConfiguratorAbstract;
-
-import tigase.disco.ServiceEntity;
-import tigase.disco.ServiceIdentity;
-
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.ServerComponent;
 
-import tigase.sys.ShutdownHook;
-import tigase.sys.TigaseRuntime;
-
-import tigase.util.ElementUtils;
-
-import tigase.xml.Element;
-import tigase.xml.XMLUtils;
-
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
-//~--- JDK imports ------------------------------------------------------------
+import tigase.conf.ConfigurationException;
+import tigase.conf.ConfiguratorAbstract;
+import tigase.disco.ServiceEntity;
+import tigase.disco.ServiceIdentity;
+import tigase.sys.ShutdownHook;
+import tigase.sys.TigaseRuntime;
+import tigase.util.ElementUtils;
+import tigase.xml.Element;
+import tigase.xml.XMLUtils;
 
 import java.lang.management.ManagementFactory;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.management.ObjectName;
-import tigase.conf.ConfigurationException;
 
 /**
  * Class StatisticsCollector
@@ -117,23 +110,17 @@ public class StatisticsCollector
 	private TimerTask                            initializationCompletedTask = null;
 	private ServiceEntity                        serviceEntity               = null;
 	private StatisticsProvider                   sp                          = null;
-	private Map<String, StatisticsArchivizerIfc> archivizers =
+	private final Map<String, StatisticsArchivizerIfc> archivizers =
 			new ConcurrentSkipListMap<>();
-	private ArchivizerRunner arch_runner = new ArchivizerRunner();
+	private final ArchivizerRunner arch_runner = new ArchivizerRunner();
 
 	// private ServiceEntity stats_modules = null;
 	private Level statsLevel       = Level.INFO;
-	private Timer statsArchivTasks = new Timer("stats-archivizer-tasks", true);
+	private final Timer statsArchivTasks = new Timer("stats-archivizer-tasks", true);
 	private long  updateInterval   = 10;
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param component
-	 */
 	@Override
 	public void componentAdded(StatisticsContainer component) {
 		ServiceEntity item = serviceEntity.findNode(component.getName());
@@ -148,19 +135,9 @@ public class StatisticsCollector
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param component
-	 */
 	@Override
 	public void componentRemoved(StatisticsContainer component) {}
 
-	/**
-	 * Method description
-	 *
-	 */
 	@Override
 	public void initializationCompleted() {
 		if (isInitializationComplete()) {
@@ -186,13 +163,6 @@ public class StatisticsCollector
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param results
-	 */
 	@Override
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
 		if (!packet.isCommand() || (packet.getType() == StanzaType.result)) {
@@ -333,25 +303,21 @@ public class StatisticsCollector
 		}    // end of switch (packet.getCommand())
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
 	@Override
 	public void release() {
 		super.release();
 		sp.stop();
 		statsArchivTasks.cancel();
+
+		for (String stat_arch_key : archivizers.keySet()) {
+			StatisticsArchivizerIfc stat_arch = archivizers.remove(stat_arch_key);
+
+			if (stat_arch != null) {
+				stat_arch.release();
+			}
+		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String shutdown() {
 		StatisticsList allStats = getAllStats();
@@ -431,16 +397,6 @@ public class StatisticsCollector
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 *
-	 *
-	 * @return a value of <code>Map<String,Object></code>
-	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defs             = super.getDefaults(params);
@@ -461,14 +417,14 @@ public class StatisticsCollector
 
 			try {
 				hSize = Integer.parseInt(st_pars[0]);
-			} catch (Exception ex) {
+			} catch (NumberFormatException ex) {
 				log.log(Level.CONFIG, "Invalid statistics history size settings: {0}",
 						st_pars[0]);
 			}
 			if (st_pars.length > 1) {
 				try {
 					updateInt = Long.parseLong(st_pars[1]);
-				} catch (Exception ex) {
+				} catch (NumberFormatException ex) {
 					log.log(Level.CONFIG, "Invalid statistics update interval: {0}", st_pars[1]);
 				}
 			}
@@ -479,33 +435,11 @@ public class StatisticsCollector
 		return defs;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param from
-	 *
-	 *
-	 *
-	 * @return a value of <code>List<Element></code>
-	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param node
-	 * @param jid
-	 * @param from
-	 *
-	 *
-	 *
-	 * @return a value of <code>Element</code>
-	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
 		if ((jid != null) && getName().equals(jid.getLocalpart()) && isAdmin(from)) {
@@ -515,18 +449,6 @@ public class StatisticsCollector
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param node
-	 * @param jid
-	 * @param from
-	 *
-	 *
-	 *
-	 * @return a value of <code>List<Element></code>
-	 */
 	@Override
 	public List<Element> getDiscoItems(String node, JID jid, JID from) {
 		if (isAdmin(from)) {
@@ -562,29 +484,11 @@ public class StatisticsCollector
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getName() {
 		return super.getName();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param component
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean isCorrectType(ServerComponent component) {
 		return component instanceof StatisticsContainer;
@@ -592,12 +496,6 @@ public class StatisticsCollector
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param name
-	 */
 	@Override
 	public void setName(String name) {
 		super.setName(name);
@@ -610,13 +508,6 @@ public class StatisticsCollector
 		serviceEntity.addFeatures(CMD_FEATURES);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param props
-	 * @throws tigase.conf.ConfigurationException
-	 */
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
@@ -737,10 +628,6 @@ public class StatisticsCollector
 
 		//~--- methods ------------------------------------------------------------
 
-		/**
-		 * Method description
-		 *
-		 */
 		@Override
 		public void run() {
 			while (!stopped) {
