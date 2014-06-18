@@ -185,13 +185,14 @@ public class TLSWrapper {
 			tlsEngine.setWantClientAuth(true);
 		}
 
-		log.info("Created "
-				+ (clientMode ? "client" : "server")
-				+ " TLSWrapper. Protocols:"
-				+ (tlsEngine.getEnabledProtocols() == null ? " default" : Arrays.toString(tlsEngine.getEnabledProtocols()))
-				+ "; Ciphers:"
-				+ (tlsEngine.getEnabledCipherSuites() == null ? " default"
-						: Arrays.toString(tlsEngine.getEnabledCipherSuites())));
+		if (log.isLoggable(Level.FINEST))
+			log.finest("Created "
+					+ (clientMode ? "client" : "server")
+					+ " TLSWrapper. Protocols:"
+					+ (tlsEngine.getEnabledProtocols() == null ? " default" : Arrays.toString(tlsEngine.getEnabledProtocols()))
+					+ "; Ciphers:"
+					+ (tlsEngine.getEnabledCipherSuites() == null ? " default"
+							: Arrays.toString(tlsEngine.getEnabledCipherSuites())));
 
 	}
 
