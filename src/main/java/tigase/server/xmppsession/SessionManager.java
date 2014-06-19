@@ -136,6 +136,7 @@ public class SessionManager
 			XMPPStopListenerIfc>(10);
 	private boolean          skipPrivacy = false;
 	private Set<XMPPImplIfc> allPlugins  = new ConcurrentSkipListSet<XMPPImplIfc>();
+	private long authTimeout = 120;
 
 	/**
 	 * A Map with bare user JID as a key and a user session object as a value.
@@ -391,12 +392,12 @@ public class SessionManager
 
 		// we need to make sure that session has no other connections as it might
 		// have one connection but not this one, so condition
-		// session.getActiveResourcesSize() <= 1 
+		// session.getActiveResourcesSize() <= 1
 		// was not enough
-		//if ((session != null) && (session.getActiveResourcesSize() <= 1)) {	
-		boolean onlyConnectionForSession = session != null && (session.getActiveResourcesSize() == 0 
+		//if ((session != null) && (session.getActiveResourcesSize() <= 1)) {
+		boolean onlyConnectionForSession = session != null && (session.getActiveResourcesSize() == 0
 				|| (session.getActiveResourcesSize() == 1 && session.getActiveResources().contains(conn)));
-						
+
 		if (onlyConnectionForSession) {
 			sessionsByNodeId.remove(userId);
 		}    // end of if (session.getActiveResourcesSize() == 0)
@@ -587,10 +588,10 @@ public class SessionManager
 			} catch (Exception ex) {
 				log.log(Level.WARNING, "Exception while stopping plugin", ex);
 			}
-			
+
 		}
 	}
-	
+
 	//~--- get methods ----------------------------------------------------------
 
 	/**
@@ -634,6 +635,7 @@ public class SessionManager
 		props.put(FORCE_DETAIL_STALE_CONNECTION_CHECK, true);
 		props.put(STALE_CONNECTION_CLOSER_QUEUE_SIZE_KEY, StaleConnectionCloser
 				.DEF_QUEUE_SIZE);
+		props.put(AUTH_TIMEOUT_PROP_KEY, AUTH_TIMEOUT_PROP_VAL);
 
 		return props;
 	}
@@ -921,6 +923,11 @@ public class SessionManager
 		if (!staleConnectionCloser.isScheduled()) {
 			addTimerTask(staleConnectionCloser, staleConnectionCloser.getTimeout());
 		}
+
+		if (props.get(AUTH_TIMEOUT_PROP_KEY) != null) {
+			authTimeout = (Long)props.get(AUTH_TIMEOUT_PROP_KEY);
+		}
+
 		if (props.size() == 1) {
 
 			// If props.size() == 1, it means this is a single property update
@@ -1566,11 +1573,11 @@ public class SessionManager
 //				pt = workerThreads.get(defPluginsThreadsPool);
 //			}
 //			pt.addItem(sessionCloseProc, iqc, connection);
-				// Replaced code above with new code below to execute STREAM_CLOSE in same 
-				// thread as other packets from connection so next packets will know there 
+				// Replaced code above with new code below to execute STREAM_CLOSE in same
+				// thread as other packets from connection so next packets will know there
 				// is no session available after STREAM_CLOSE
-				// This should not have bigger impact on performance as SessionCloseProc was 
-				// reimplemented to speed up process of closing connections (using maps instead 
+				// This should not have bigger impact on performance as SessionCloseProc was
+				// reimplemented to speed up process of closing connections (using maps instead
 				// of list, etc.)
 				sessionCloseProc.process(iqc, connection, naUserRepository, packetWriterQueue, plugin_config.get(sessionCloseProc.id()));
 			} catch (XMPPException ex) {
@@ -2301,11 +2308,11 @@ public class SessionManager
 				return true;
 			}
 
-			// this is special case in which we know and expect that there will be 
+			// this is special case in which we know and expect that there will be
 			// no session for this packet but we still need to process it
 			if (C2SDeliveryErrorProcessor.isDeliveryError(p))
 				return false;
-			
+
 			// It doesn't look good, there should really be a connection for
 			// this packet....
 			// returning error back...
@@ -2851,7 +2858,7 @@ public class SessionManager
 
 					return;
 				}
-				addTimerTask(new AuthenticationTimer(packet.getFrom()), 2, TimeUnit.MINUTES);
+				addTimerTask(new AuthenticationTimer(packet.getFrom()), authTimeout, TimeUnit.SECONDS);
 			} else {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Stream opened for existing session, authorized: {0}",
