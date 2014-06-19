@@ -11,6 +11,7 @@ fi
 TIGASE_USER="tigase"
 DIR="/home/${TIGASE_USER}/tigase-server"
 PROP_FILE="cluster.properties"
+CONF_FILE="cluster.tigase.conf"
 JARS="target/tigase-server.jar"
 LOG_TIMESTAMP=`date +"%Y-%m-%d_%H-%M-%S"`
 
@@ -23,9 +24,23 @@ for s in ${SERVERS} ; do
 
   if [[ ${s} != "#"* ]] ; then
 
-    echo -e "\n\n Copying ${PROP_FILE} file to ${s}"
+    if [ -f ${PROP_FILE} ] ; then
+			echo -e "\n\n Copying ${PROP_FILE} file to ${s}"
 
-    [[ -f ${PROP_FILE} ]]  && scp ${PROP_FILE} root@${s}:${DIR}/etc/init.properties
+      scp ${PROP_FILE} root@${s}:${DIR}/etc/init.properties
+    fi
+
+    if [ -f ${CONF_FILE} ] ; then
+			echo -e "\n\n Copying ${CONF_FILE} file to ${s}"
+
+			s_ip=`host ${s} | sed -e "s/.*has address \(.*\)/\1/"`
+
+			echo "The cluster node ${s} IP is: ${s_ip}"
+
+			sed -e "s/\(Djava.rmi.server.hostname=.*\"\)/Djava.rmi.server.hostname=${s_ip}\"/" ${CONF_FILE} > ${CONF_FILE}_${s}
+
+			scp ${CONF_FILE}_${s} root@${s}:${DIR}/etc/tigase.conf
+    fi
 
     echo "Copying jar files"
 
