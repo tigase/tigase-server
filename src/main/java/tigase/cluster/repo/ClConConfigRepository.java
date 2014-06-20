@@ -26,15 +26,12 @@ package tigase.cluster.repo;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.comp.ConfigRepository;
-
-import tigase.sys.TigaseRuntime;
-
-import tigase.util.DNSResolver;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import tigase.db.comp.ConfigRepository;
+import tigase.sys.TigaseRuntime;
+import tigase.util.DNSResolver;
 
 /**
  * Class description
@@ -45,6 +42,8 @@ import java.util.Map;
  */
 public class ClConConfigRepository
 				extends ConfigRepository<ClusterRepoItem> {
+	private static final Logger log = Logger.getLogger(ClConConfigRepository.class.getName());
+
 	/** Field description */
 	public static final String AUTORELOAD_INTERVAL_PROP_KEY = "repo-autoreload-interval";
 
@@ -209,7 +208,11 @@ public class ClConConfigRepository
 	public void storeItem(ClusterRepoItem item) {}
 
 	private boolean clusterRecordValid(ClusterRepoItem item) {
-		return !item.getHostname().equalsIgnoreCase("localhost");
+		boolean isCorrect = !item.getHostname().equalsIgnoreCase("localhost");
+		if (!isCorrect && log.isLoggable(Level.WARNING)) {
+			log.log(Level.WARNING, "Incorrect entry in cluster table, skipping: {0}", item);
+		}
+		return isCorrect;
 	}
 }
 
