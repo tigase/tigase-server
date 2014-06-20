@@ -61,7 +61,7 @@ public class ClConConfigRepository
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public String[] getDefaultPropetyItems() {
@@ -72,7 +72,7 @@ public class ClConConfigRepository
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public String getPropertyKey() {
@@ -83,7 +83,7 @@ public class ClConConfigRepository
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public String getConfigKey() {
@@ -94,7 +94,7 @@ public class ClConConfigRepository
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public ClusterRepoItem getItemInstance() {
@@ -131,7 +131,7 @@ public class ClConConfigRepository
 	 * @param item
 	 */
 	public void itemLoaded(ClusterRepoItem item) {
-		if (System.currentTimeMillis() - item.getLastUpdate() <= 5000 * autoreload_interval) {
+		if (System.currentTimeMillis() - item.getLastUpdate() <= 5000 * autoreload_interval && clusterRecordValid(item)) {
 			addItem(item);
 		} else {
 			removeItem(item.getHostname());
@@ -145,7 +145,7 @@ public class ClConConfigRepository
 	 * @param oldItem
 	 * @param newItem
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public boolean itemChanged(ClusterRepoItem oldItem, ClusterRepoItem newItem) {
@@ -207,6 +207,10 @@ public class ClConConfigRepository
 	 * @param item
 	 */
 	public void storeItem(ClusterRepoItem item) {}
+
+	private boolean clusterRecordValid(ClusterRepoItem item) {
+		return !item.getHostname().equalsIgnoreCase("localhost");
+	}
 }
 
 
