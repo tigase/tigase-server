@@ -389,8 +389,8 @@ public class ClusterConnectionManager
 		} else {
 
 			// This should, actually, not happen. Let's log it here
-			if (log.isLoggable(Level.INFO)) {
-				log.log(Level.INFO, "Unexpected packet on cluster connection: {0}", packet);
+			if (log.isLoggable(Level.FINER)) {
+				log.log(Level.FINER, "Unexpected packet on cluster connection: {0}", packet);
 			}
 			super.processOutPacket(packet);
 		}
@@ -420,7 +420,13 @@ public class ClusterConnectionManager
 		if (packet.getElemName() == ClusterElement.CLUSTER_EL_NAME) {
 			writePacketToSocket(packet);
 		} else {
-			writePacketToSocket(packet.packRouted());
+
+			// For now we do not want to allow for such traffic. It should really not happen with current design.
+			// writePacketToSocket(packet.packRouted());
+			if (log.isLoggable(Level.FINER)) {
+				log.log(Level.FINER, "Unexpected packet for the cluster connetcion: {0}", packet);
+			}
+
 		}
 	}
 
