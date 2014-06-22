@@ -110,6 +110,9 @@ public class ClusterConnectionManager
 	/** Field description */
 	public static final String CONNECT_ALL_PROP_KEY = "connect-all";
 
+	public static final String NON_CLUSTER_TRAFFIC_ALLOWED_PROP_KEY = "non-cluster-traffic-allowed";
+	public static final boolean NON_CLUSTER_TRAFFIC_ALLOWED_PROP_VAL = true;
+
 	/**
 	 * Default value for the system property for configuration protection
 	 * from system overload and DOS attack.
@@ -180,6 +183,7 @@ public class ClusterConnectionManager
 	// private long packetsReceived = 0;
 	private CommandListener sendPacket = new SendPacket(ClusterControllerIfc
 			.DELIVER_CLUSTER_PACKET_CMD);
+	private boolean nonClusterTrafficAllowed = true;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -421,10 +425,12 @@ public class ClusterConnectionManager
 			writePacketToSocket(packet);
 		} else {
 
-			// For now we do not want to allow for such traffic. It should really not happen with current design.
-			// writePacketToSocket(packet.packRouted());
-			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER, "Unexpected packet for the cluster connetcion: {0}", packet);
+			if (nonClusterTrafficAllowed) {
+				writePacketToSocket(packet.packRouted());
+			} else {
+				if (log.isLoggable(Level.FINER)) {
+					log.log(Level.FINER, "Unexpected packet for the cluster connetcion: {0}", packet);
+				}
 			}
 
 		}
@@ -780,6 +786,7 @@ public class ClusterConnectionManager
 		}
 		props.put(CLUSTER_CONTR_ID_PROP_KEY, DEF_CLUST_CONTR_NAME + "@" + getDefHostName());
 		props.put(COMPRESS_STREAM_PROP_KEY, COMPRESS_STREAM_PROP_VAL);
+		props.put(NON_CLUSTER_TRAFFIC_ALLOWED_PROP_KEY, NON_CLUSTER_TRAFFIC_ALLOWED_PROP_VAL);
 
 		String conns     = (String) params.get(CLUSTER_CONNECTIONS_PER_NODE_PAR);
 		int    conns_int = Runtime.getRuntime().availableProcessors();
@@ -885,6 +892,10 @@ public class ClusterConnectionManager
 		}
 		if (props.get(CONNECT_ALL_PROP_KEY) != null) {
 			connect_all = (Boolean) props.get(CONNECT_ALL_PROP_KEY);
+		}
+
+		if (props.get(NON_CLUSTER_TRAFFIC_ALLOWED_PROP_KEY) != null) {
+			nonClusterTrafficAllowed = (Boolean)props.get(NON_CLUSTER_TRAFFIC_ALLOWED_PROP_KEY);
 		}
 
 		// cluster_controller_id = (String) props.get(CLUSTER_CONTR_ID_PROP_KEY);
