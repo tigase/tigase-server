@@ -172,10 +172,11 @@ public abstract class AbstractMessageReceiver
 	private int  out_queues_size     = 1;
 
 	/** Field description */
-	protected int maxOutQueueSize = MAX_QUEUE_SIZE_PROP_VAL;
 
 	/** Field description */
+	protected int                    maxQueueSize          = MAX_QUEUE_SIZE_PROP_VAL;
 	protected int                    maxInQueueSize        = MAX_QUEUE_SIZE_PROP_VAL;
+	protected int                    maxOutQueueSize       = MAX_QUEUE_SIZE_PROP_VAL;
 	private QueueListener            out_thread            = null;
 	private long                     packetId              = 0;
 	private long                     packets_per_hour      = 0;
@@ -216,18 +217,18 @@ public abstract class AbstractMessageReceiver
 	private long                                                statSentPacketsOk     = 0;
 	private ArrayDeque<QueueListener>                           threadsQueue          =
 			null;
-	private final ThreadFactory									threadFactory		  = 
+	private final ThreadFactory									threadFactory		  =
 			new ThreadFactory() {
 
 					private final ThreadFactory internal = Executors.defaultThreadFactory();
-					
+
 					@Override
 					public Thread newThread(Runnable r) {
 						Thread th = internal.newThread(r);
 						th.setName("scheduler_" + th.getName() + "-" + getName());
 						return th;
 					}
-					
+
 				};
 	private final ConcurrentHashMap<String, PacketReceiverTask> waitingTasks =
 			new ConcurrentHashMap<String, PacketReceiverTask>(16, 0.75f, 4);
@@ -950,6 +951,7 @@ public abstract class AbstractMessageReceiver
 	 *
 	 */
 	public void setMaxQueueSize(int maxQueueSize) {
+		this.maxQueueSize = maxQueueSize;
 		if ((this.maxInQueueSize != maxQueueSize) || (in_queues.size() == 0)) {
 
 			// out_queue = PriorityQueueAbstract.getPriorityQueue(pr_cache.length,
@@ -958,28 +960,29 @@ public abstract class AbstractMessageReceiver
 			// So real processing threads number of in_queues is processingThreads()/2
 			this.maxInQueueSize  = (maxQueueSize / processingInThreads()) * 2;
 			this.maxOutQueueSize = (maxQueueSize / processingOutThreads()) * 2;
+			log.log(Level.FINEST, "{0} maxQueueSize: {1}, maxInQueueSize: {2}, maxOutQueueSize: {3}", new Object[] {getName(), maxQueueSize, maxInQueueSize, maxOutQueueSize});
 			if (in_queues.size() == 0) {
 				for (int i = 0; i < in_queues_size; i++) {
 					PriorityQueueAbstract<Packet> queue = PriorityQueueAbstract.getPriorityQueue(
-							pr_cache.length, maxQueueSize);
+							pr_cache.length, maxInQueueSize);
 
 					in_queues.add(queue);
 				}
 			} else {
 				for (int i = 0; i < in_queues.size(); i++) {
-					in_queues.get(i).setMaxSize(maxQueueSize);
+					in_queues.get(i).setMaxSize(maxInQueueSize);
 				}
 			}
 			if (out_queues.size() == 0) {
 				for (int i = 0; i < out_queues_size; i++) {
 					PriorityQueueAbstract<Packet> queue = PriorityQueueAbstract.getPriorityQueue(
-							pr_cache.length, maxQueueSize);
+							pr_cache.length, maxOutQueueSize);
 
 					out_queues.add(queue);
 				}
 			} else {
 				for (int i = 0; i < out_queues.size(); i++) {
-					out_queues.get(i).setMaxSize(maxQueueSize);
+					out_queues.get(i).setMaxSize(maxOutQueueSize);
 				}
 			}
 

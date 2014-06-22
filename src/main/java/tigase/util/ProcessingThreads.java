@@ -103,6 +103,7 @@ public class ProcessingThreads<E extends WorkerThread> {
 			t.setName(name + " Queue Worker " + j);
 			t.start();
 			workerThreads.add((E) t);
+			log.log(Level.FINEST, "Created worker thread: {0}, queueSize: {1}", new Object[] {t.getName(), maxQueueSize});
 		}
 
 //  }
@@ -118,7 +119,7 @@ public class ProcessingThreads<E extends WorkerThread> {
 	 * @param packet
 	 * @param conn
 	 *
-	 * 
+	 *
 	 */
 	public boolean addItem(XMPPProcessorIfc processor, Packet packet, XMPPResourceConnection conn) {
 		boolean ret = false;
@@ -190,7 +191,7 @@ public class ProcessingThreads<E extends WorkerThread> {
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	public long getAverageProcessingTime() {
 		long average = 0;
@@ -214,7 +215,7 @@ public class ProcessingThreads<E extends WorkerThread> {
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	public long getDroppedPackets() {
 		return droppedPackets;
@@ -224,7 +225,7 @@ public class ProcessingThreads<E extends WorkerThread> {
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	public String getName() {
 		return name;
@@ -234,7 +235,7 @@ public class ProcessingThreads<E extends WorkerThread> {
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	public int getTotalQueueSize() {
 		int ret = 0;
@@ -250,7 +251,7 @@ public class ProcessingThreads<E extends WorkerThread> {
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	public int getTotalRuns() {
 		int ret = 0;
@@ -271,7 +272,7 @@ public class ProcessingThreads<E extends WorkerThread> {
 // * Method description
 // *
 // *
-// * 
+// *
 // */
 //public E getWorkerThread() {
 //  try {

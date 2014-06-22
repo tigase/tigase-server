@@ -221,7 +221,7 @@ public class SessionManager
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
 	 */
-	public XMPPImplIfc addPlugin(String plug_id, Integer conc)
+	public XMPPImplIfc addPlugin(String plug_id, String conc)
 					throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		XMPPImplIfc      result = null;
 		XMPPProcessorIfc proc   = null;
@@ -244,13 +244,33 @@ public class SessionManager
 		}
 
 		boolean loaded = false;
-
 		if (proc != null) {
-			int concurrency = ((conc != null)
-					? conc
-					: ((proc != null)
-					? proc.concurrentQueuesNo()
-					: 0));
+			int threadsNo = proc.concurrentQueuesNo();
+			int queueSize = maxQueueSize / threadsNo;
+			if (conc != null && !conc.trim().isEmpty()) {
+					String[] plug_conc = conc.split(":");
+					try {
+						threadsNo = Integer.parseInt(plug_conc[0]);
+						queueSize = maxQueueSize / threadsNo;
+						log.log(Level.CONFIG, "Concurrency for plugin: {0} set to: {1}",
+										new Object[] { plug_id,
+											threadsNo });
+					} catch (Exception e) {
+						log.log(Level.WARNING, "Plugin " + plug_id + " concurrency parsing error for: " + conc, e);
+						threadsNo = proc.concurrentQueuesNo();
+					}
+					if (plug_conc.length > 1) {
+					try {
+						queueSize = Integer.parseInt(plug_conc[1]);
+						log.log(Level.CONFIG, "Queue for plugin: {0} set to: {1} per thread",
+										new Object[] { plug_id,
+											queueSize });
+					} catch (Exception e) {
+						log.log(Level.WARNING, "Plugin " + plug_id + " queueSize parsing error for: " + conc, e);
+						queueSize = maxQueueSize / threadsNo;
+					}
+					}
+			}
 
 			// If there is not default processors thread pool or the processor does
 			// have thread pool specific settings create a separate thread pool
@@ -262,14 +282,14 @@ public class SessionManager
 				if (!workerThreads.containsKey(proc.id())) {
 					ProcessorWorkerThread                    worker = new ProcessorWorkerThread();
 					ProcessingThreads<ProcessorWorkerThread> pt =
-							new ProcessingThreads<ProcessorWorkerThread>(worker, concurrency,
-							maxInQueueSize, proc.id());
+							new ProcessingThreads<ProcessorWorkerThread>(worker, threadsNo,
+							queueSize, proc.id());
 
 					workerThreads.put(proc.id(), pt);
 					log.log(Level.CONFIG,
-							"Created thread pool: {0}, queue: {1} for plugin id: {2}", new Object[] {
-							concurrency,
-							maxInQueueSize, proc.id() });
+							"Created thread pool: {0}, queue per thread: {1} for plugin id: {2}", new Object[] {
+							threadsNo,
+							queueSize, proc.id() });
 				}
 			}
 			processors.put(proc.id(), proc);
@@ -279,8 +299,8 @@ public class SessionManager
 			loaded  = true;
 			result  = proc;
 			version = result.getComponentInfo().getComponentVersion();
-			System.out.println("Loading plugin: " + plug_id + "=" + concurrency + " ... " +
-					(version.isEmpty()
+			System.out.println("Loading plugin: " + plug_id + "=" + threadsNo + ":" + queueSize +
+							" ... " +	(version.isEmpty()
 					? ""
 					: "\t, version: " + version));
 		}
@@ -1007,8 +1027,8 @@ public class SessionManager
 		naUserRepository = new NonAuthUserRepositoryImpl(user_repository, getDefHostName(),
 				Boolean.parseBoolean((String) props.get(AUTO_CREATE_OFFLINE_USER_PROP_KEY)));
 		synchronized (this) {
-			LinkedHashMap<String, Integer> plugins_concurrency = new LinkedHashMap<String,
-					Integer>(20);
+			LinkedHashMap<String, String> plugins_concurrency = new LinkedHashMap<String,
+					String>(20);
 			String[] plugins_conc = ((String) props.get(PLUGINS_CONCURRENCY_PROP_KEY)).split(
 					",");
 
@@ -1019,18 +1039,7 @@ public class SessionManager
 					log.log(Level.CONFIG, "Loading: {0}", plugc);
 					if (!plugc.trim().isEmpty()) {
 						String[] pc = plugc.split("=");
-
-						try {
-							int conc = Integer.parseInt(pc[1]);
-
-							plugins_concurrency.put(pc[0], conc);
-							log.log(Level.CONFIG, "Concurrency for plugin: {0} set to: {1}",
-									new Object[] { pc[0],
-									conc });
-						} catch (Exception e) {
-							log.log(Level.WARNING, "Plugin concurrency parsing error for: " + plugc +
-									", ", e);
-						}
+						plugins_concurrency.put(pc[0], pc[1]);
 					}
 				}
 			}
@@ -1059,7 +1068,7 @@ public class SessionManager
 						ProcessorWorkerThread                    worker = new ProcessorWorkerThread();
 						ProcessingThreads<ProcessorWorkerThread> pt =
 								new ProcessingThreads<ProcessorWorkerThread>(worker, def_pool_size,
-								maxInQueueSize, defPluginsThreadsPool);
+								maxQueueSize, defPluginsThreadsPool);
 
 						workerThreads.put(defPluginsThreadsPool, pt);
 						log.log(Level.CONFIG, "Created a default thread pool: {0}", def_pool_size);
