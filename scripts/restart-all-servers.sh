@@ -96,6 +96,10 @@ for s in ${SERVERS} ; do
 done
 
 echo -e "nodes="
+COLORS=('green' 'yellow' 'orange' 'blue' 'white' 'lightblue' 'gray' 'pink' 'lightgreen' 'red')
+cnt=0
 for i in ${IPS} ; do
-  echo -e "${i},"
+  echo -e "${COLORS[$cnt]}:${i},"
+  let "cnt++"
 done
+echo ""
