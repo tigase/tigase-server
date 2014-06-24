@@ -83,11 +83,13 @@ for s in ${SERVERS} ; do
     done
 
 	  echo "Checking the system....."
-		ssh root@${s} "${DIR}/scripts/machine-check.sh ${s} ${TIGASE_USER} ${VHOST} ; chown -R ${TIGASE_USER}:${TIGASE_USER} /home/${TIGASE_USER}"
+		#ssh root@${s} "${DIR}/scripts/machine-check.sh ${s} ${TIGASE_USER} ${VHOST} ; chown -R ${TIGASE_USER}:${TIGASE_USER} /home/${TIGASE_USER}"
+
 
 		echo -e "\n\n===\trestarting ${s} ==="
 
-    ssh root@${s} "service tigase stop ; sleep 10 ; cp -r ${DIR}/logs ${DIR}/logs_${LOG_TIMESTAMP} ; rm -f ${DIR}/logs/* ; service tigase start"
+    ssh root@${s} "chown -R ${TIGASE_USER}:${TIGASE_USER} \
+/home/${TIGASE_USER} ; service tigase stop ; sleep 10 ; cp -r ${DIR}/logs ${DIR}/logs_${LOG_TIMESTAMP} ; rm -f ${DIR}/logs/* ; service tigase start"
 
 	  echo -e "===\trestart of ${s} FINISHED ==="
 
