@@ -294,6 +294,9 @@ public class XMPPSession {
 			log.finest("Called for: " + jid);
 		}
 		if (activeResources.size() == 0) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("No active resources found!");
+			}
 			return null;
 		}    // end of if (activeResources.size() == 0)
 		if (jid.getResource() != null) {
@@ -329,7 +332,7 @@ public class XMPPSession {
 
 		for ( XMPPResourceConnection conn_tmp : activeResources ) {
 			if (!conn_tmp.isAuthorized()) {
-				if (log.isLoggable(Level.INFO)) {
+				if (log.isLoggable(Level.FINE)) {
 					log.finest("Connection either not yet authorized or already gone, ignoring while processing: " + conn_tmp);
 				}
 				continue;
@@ -348,7 +351,9 @@ public class XMPPSession {
 			}
 		}
 		if (al.size() == 0) {
-			// There is not active connection at this time
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("No active resources found!");
+			}
 			return null;
 		}
 		if (al.size() == 1) {
