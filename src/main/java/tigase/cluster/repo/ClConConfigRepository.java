@@ -26,12 +26,18 @@ package tigase.cluster.repo;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.db.comp.ConfigRepository;
+
+import tigase.sys.TigaseRuntime;
+import tigase.util.DNSResolver;
+
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.db.comp.ConfigRepository;
-import tigase.sys.TigaseRuntime;
-import tigase.util.DNSResolver;
 
 /**
  * Class description
@@ -56,45 +62,21 @@ public class ClConConfigRepository
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 */
 	@Override
 	public String[] getDefaultPropetyItems() {
 		return ClConRepoDefaults.getDefaultPropetyItems();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 */
 	@Override
 	public String getPropertyKey() {
 		return ClConRepoDefaults.getPropertyKey();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 */
 	@Override
 	public String getConfigKey() {
 		return ClConRepoDefaults.getConfigKey();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 */
 	@Override
 	public ClusterRepoItem getItemInstance() {
 		return ClConRepoDefaults.getItemInstance();
@@ -102,10 +84,6 @@ public class ClConConfigRepository
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 */
 	@Override
 	public void reload() {
 		super.reload();
@@ -123,12 +101,6 @@ public class ClConConfigRepository
 		storeItem(item);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param item
-	 */
 	public void itemLoaded(ClusterRepoItem item) {
 		if (System.currentTimeMillis() - item.getLastUpdate() <= 5000 * autoreload_interval && clusterRecordValid(item)) {
 			addItem(item);
@@ -137,15 +109,6 @@ public class ClConConfigRepository
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param oldItem
-	 * @param newItem
-	 *
-	 *
-	 */
 	@Override
 	public boolean itemChanged(ClusterRepoItem oldItem, ClusterRepoItem newItem) {
 		return !oldItem.getPassword().equals(newItem.getPassword()) || (oldItem
@@ -154,13 +117,6 @@ public class ClConConfigRepository
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param defs
-	 * @param params
-	 */
 	@Override
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
 		super.getDefaults(defs, params);
@@ -184,12 +140,6 @@ public class ClConConfigRepository
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param props
-	 */
 	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
@@ -199,22 +149,24 @@ public class ClConConfigRepository
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param item
-	 */
 	public void storeItem(ClusterRepoItem item) {}
 
-	private boolean clusterRecordValid(ClusterRepoItem item) {
-		boolean isCorrect = !item.getHostname().equalsIgnoreCase("localhost");
-		if (!isCorrect && log.isLoggable(Level.WARNING)) {
-			log.log(Level.WARNING, "Incorrect entry in cluster table, skipping: {0}", item);
+	private boolean clusterRecordValid( ClusterRepoItem item ) {
+		InetAddress addr;
+		boolean isCorrect = false;
+		
+		try {
+			addr = InetAddress.getByName( item.getHostname() );
+
+			// we ignore any local addresses
+			isCorrect = !addr.isAnyLocalAddress() && !addr.isLoopbackAddress()
+									&& !( NetworkInterface.getByInetAddress( addr ) != null );
+			if ( !isCorrect && log.isLoggable( Level.WARNING ) ){
+				log.log( Level.WARNING, "Incorrect entry in cluster table, skipping: {0}", item );
+			}
+		} catch ( UnknownHostException | SocketException ex ) {
+			log.log( Level.WARNING, "Incorrect entry in cluster table, skipping: " + item, ex );
 		}
 		return isCorrect;
 	}
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/03/11

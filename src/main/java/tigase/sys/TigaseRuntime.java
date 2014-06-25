@@ -26,19 +26,18 @@ package tigase.sys;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.server.XMPPServer;
 import tigase.server.monitor.MonitorRuntime;
 
 import tigase.xmpp.JID;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.ThreadMXBean;
-
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -173,10 +172,6 @@ public abstract class TigaseRuntime {
 			prevCputime = currCputime;
 		}
 
-//  System.out.println("currUptime: " + currUptime +
-//          "- prevUptime: " + prevUptime + " = elapsedTime: " + elapsedTime +
-//          "\n, currCputime: " + currCputime +
-//          " - prevCputime: " + prevCputime + " = elapsedCpu: " + elapsedCpu);
 		return cpuUsage;
 	}
 
@@ -418,7 +413,21 @@ public abstract class TigaseRuntime {
 	 * @return a value of <code>boolean</code>
 	 */
 	public abstract boolean isJidOnline(JID jid);
+
+	public void shutdownTigase(String[] msg) {
+			if (XMPPServer.isOSGi()) {
+				// for some reason System.out.println is not working in OSGi
+				for (String line : msg) {
+					log.log(Level.SEVERE, line);
+				}
+			}
+			else {
+				for (String line : msg) {
+					System.out.println(line);
+				}
+			}
+
+			System.exit(1);
+	}
+
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/11/29
