@@ -20,8 +20,6 @@
  *
  */
 
-
-
 package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -30,9 +28,6 @@ import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 
 import tigase.server.Packet;
-
-import tigase.vhosts.DomainFilterPolicy;
-import tigase.vhosts.VHostItem;
 
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NoConnectionIdException;
@@ -44,14 +39,16 @@ import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPResourceConnection;
 
-//~--- JDK imports ------------------------------------------------------------
+import tigase.util.DNSResolver;
+import tigase.vhosts.DomainFilterPolicy;
+import tigase.vhosts.VHostItem;
 
 import java.util.ArrayDeque;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created: Dec 30, 2008 12:43:28 PM
@@ -76,20 +73,18 @@ public class DomainFilter
 	private static final String[][] ELEMENTS = ALL_PATHS;
 	private static final String[]   XMLNSS   = { ALL_NAMES };
 
+	private static String local_hostname;
+
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 */
+
+
 	@Override
 	public void filter(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Filtering (packet): {0}", packet);
+		}
 		if ((session == null) || (results == null) || (results.size() == 0)) {
 			return;
 		}
@@ -106,6 +101,10 @@ public class DomainFilter
 			for (Iterator<Packet> it = results.iterator(); it.hasNext(); ) {
 				Packet res = it.next();
 
+				if ( log.isLoggable( Level.FINEST ) ){
+					log.log( Level.FINEST, "Filtering (result): {0}", res );
+				}
+				
 				if (domains == DomainFilterPolicy.BLOCK) {
 					if ((res.getType() != StanzaType.error) && ((((res.getStanzaFrom() != null) &&
 							!session.isUserId(res.getStanzaFrom().getBareJID())) || ((res
@@ -124,18 +123,33 @@ public class DomainFilter
 				}
 				switch (domains) {
 				case LOCAL :
-					if ((outDomain != null) &&!session.isLocalDomain(outDomain, true)) {
-						removePacket(it, res, errors,
-								"You can only communicate within the server local domains.");
+					if ((outDomain != null) &&!session.isLocalDomain(outDomain, true) && !outDomain.equals( local_hostname )) {
+						removePacket( it, res, errors,
+													"You can only communicate within the server local domains." );
+						if ( log.isLoggable( Level.FINEST ) ){
+							log.log( Level.FINEST, "LOCAL Domains only, blocking packet (filter): {0}", res );
+						}
+					} else {
+						if ( log.isLoggable( Level.FINEST ) ){
+							log.log( Level.FINEST, "LOCAL Domains only, packet not blocked (filter): {0}", res );
+						}
 					}
 
 					break;
 
 				case OWN :
-					if ((outDomain != null) &&!outDomain.endsWith(session.getDomain().getVhost()
-							.getDomain())) {
-						removePacket(it, res, errors,
-								"You can only communicate within your own domain.");
+					if ((outDomain != null) && !outDomain.equals( local_hostname )
+							&&!outDomain.endsWith(session.getDomain().getVhost().getDomain())) {
+
+						removePacket( it, res, errors,
+													"You can only communicate within your own domain." );
+						if ( log.isLoggable( Level.FINEST ) ){
+							log.log( Level.FINEST, "OWN Domain only, blocking packet (filter): {0}", res );
+						}
+					} else {
+						if ( log.isLoggable( Level.FINEST ) ){
+							log.log( Level.FINEST, "OWN Domain only, packet not blocked (filter): {0}", res );
+						}
 					}
 
 					break;
@@ -174,28 +188,17 @@ public class DomainFilter
 		}
 	}
 
-	/**
-	 * Describe <code>id</code> method here.
-	 *
-	 * @return a <code>String</code> value
-	 */
 	@Override
 	public String id() {
 		return ID;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 *
-	 * @param settings
-	 * 
-	 */
+	@Override
+	public void init( Map<String, Object> settings ) throws TigaseDBException {
+		super.init( settings );
+		local_hostname = DNSResolver.getDefaultHostname();
+	}
+
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
@@ -270,8 +273,8 @@ public class DomainFilter
 				break;
 
 			case OWN :
-				if ((outDomain != null) &&!outDomain.endsWith(session.getDomain().getVhost()
-						.getDomain())) {
+				if ((outDomain != null) && !outDomain.equals( local_hostname )
+						&&!outDomain.endsWith(session.getDomain().getVhost().getDomain())) {
 					removePacket(null, packet, results,
 							"You can only communicate within your own domain.");
 					stop = true;
@@ -325,22 +328,11 @@ public class DomainFilter
 		return stop;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
-	/**
-	 * Describe <code>supNamespaces</code> method here.
-	 *
-	 * @return a <code>String[]</code> value
-	 */
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
@@ -434,6 +426,3 @@ public class DomainFilter
 		}
 	}
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/03/16
