@@ -59,6 +59,8 @@ import tigase.xml.Element;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -264,10 +266,21 @@ public class ClusterConnectionManager
 
 		String host = repoItem.getHostname();
 
-		if (!host.equals(getDefHostName().getDomain())
+		boolean isCorrect = false;
+		try {
+			InetAddress addr = InetAddress.getByName( host );
 
-//  && ((host.hashCode() > getDefHostName().hashCode()) || connect_all)
-		) {
+			// we ignore any local addresses
+			isCorrect = !addr.isAnyLocalAddress() && !addr.isLoopbackAddress()
+									&& !( NetworkInterface.getByInetAddress( addr ) != null );
+			if ( !isCorrect && log.isLoggable( Level.WARNING ) ){
+				log.log( Level.WARNING, "Incorrect ClusterRepoItem, skipping connection attempt: {0}", repoItem );
+			}
+		} catch ( UnknownHostException | SocketException ex ) {
+			log.log( Level.WARNING, "Incorrect ClusterRepoItem, skipping connection attempt: " + repoItem, ex );
+		}
+
+		if (isCorrect) {
 			for (int i = 0; i < per_node_conns; ++i) {
 				log.log(Level.CONFIG, "Trying to connect to cluster node: {0}", host);
 
@@ -880,9 +893,10 @@ public class ClusterConnectionManager
 			InetAddress addr = InetAddress.getByName( serv_addr );
 
 			// we ignore any local addresses
-			if ( !addr.isAnyLocalAddress() && !addr.isLoopbackAddress()
-					 && !( NetworkInterface.getByInetAddress( addr ) != null ) ){
+			if ( ( addr.isAnyLocalAddress() || addr.isLoopbackAddress() )
+					 || NetworkInterface.getByInetAddress( addr ) != null ){
 				log.log( Level.WARNING, "Cluster handshake received from this instance, terminating: {0}", serv_addr );
+				serv.stop();
 				return;
 			}
 		} catch ( Exception ex ) {

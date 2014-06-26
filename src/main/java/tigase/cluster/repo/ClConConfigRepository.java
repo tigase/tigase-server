@@ -31,10 +31,6 @@ import tigase.db.comp.ConfigRepository;
 import tigase.sys.TigaseRuntime;
 import tigase.util.DNSResolver;
 
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -152,20 +148,12 @@ public class ClConConfigRepository
 	public void storeItem(ClusterRepoItem item) {}
 
 	private boolean clusterRecordValid( ClusterRepoItem item ) {
-		InetAddress addr;
-		boolean isCorrect = false;
-		
-		try {
-			addr = InetAddress.getByName( item.getHostname() );
 
-			// we ignore any local addresses
-			isCorrect = !addr.isAnyLocalAddress() && !addr.isLoopbackAddress()
-									&& !( NetworkInterface.getByInetAddress( addr ) != null );
-			if ( !isCorrect && log.isLoggable( Level.WARNING ) ){
-				log.log( Level.WARNING, "Incorrect entry in cluster table, skipping: {0}", item );
-			}
-		} catch ( UnknownHostException | SocketException ex ) {
-			log.log( Level.WARNING, "Incorrect entry in cluster table, skipping: " + item, ex );
+		// we ignore faulty addresses
+		boolean isCorrect = !item.getHostname().equalsIgnoreCase( "localhost" );
+
+		if ( !isCorrect && log.isLoggable( Level.FINE ) ){
+			log.log( Level.FINE, "Incorrect entry in cluster table, skipping: {0}", item );
 		}
 		return isCorrect;
 	}
