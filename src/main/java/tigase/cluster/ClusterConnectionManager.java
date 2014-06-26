@@ -901,6 +901,7 @@ public class ClusterConnectionManager
 			}
 		} catch ( Exception ex ) {
 			log.log( Level.WARNING, "Cluster handshake received from this instance, terminating: " + serv_addr, ex );
+			serv.stop();
 		}
 
 
