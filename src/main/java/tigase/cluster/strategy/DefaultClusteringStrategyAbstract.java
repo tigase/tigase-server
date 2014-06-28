@@ -94,6 +94,7 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 	 */
 	public DefaultClusteringStrategyAbstract() {
 		super();
+		addCommandListener(new PacketForwardCmd(PACKET_FORWARD_CMD, this));
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -348,16 +349,18 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 	@Override
 	public void setProperties(Map<String, Object> props) {
 
-		// we need to remember that this method can be called more than once
-		// and we need to clean list of commands if we are adding any command here
-		CommandListener[] oldCmds = commands.toArray(new CommandListener[commands.size()]);
-
-		for (CommandListener oldCmd : oldCmds) {
-			if (PACKET_FORWARD_CMD.equals(oldCmd.getName())) {
-				commands.remove(oldCmd);
-			}
-		}
-		addCommandListener(new PacketForwardCmd(PACKET_FORWARD_CMD, sm, this));
+		// This code is bad as some commands are added in other methods and in
+		// constructors - this code would break those commands!
+//		// we need to remember that this method can be called more than once
+//		// and we need to clean list of commands if we are adding any command here
+//		CommandListener[] oldCmds = commands.toArray(new CommandListener[commands.size()]);
+//
+//		for (CommandListener oldCmd : oldCmds) {
+//			if (PACKET_FORWARD_CMD.equals(oldCmd.getName())) {
+//				commands.remove(oldCmd);
+//			}
+//		}
+//		addCommandListener(new PacketForwardCmd(PACKET_FORWARD_CMD, sm, this));
 		if (props.containsKey(ERROR_FORWARDING_KEY)) {
 			errorForwarding = ErrorForwarding.valueOf((String) props.get(ERROR_FORWARDING_KEY));
 		}
@@ -436,6 +439,10 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 		}
 
 		return true;
+	}
+	
+	public SessionManagerClusteredIfc getSM() {
+		return this.sm;
 	}
 }
 

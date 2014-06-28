@@ -453,9 +453,13 @@ public class SessionManagerClustered
 			String strategy_class = (String) props.get(STRATEGY_CLASS_PROP_KEY);
 
 			try {
-				Class<?> cls = ModulesManagerImpl.getInstance().forName(strategy_class);
-				ClusteringStrategyIfc strategy_tmp = (ClusteringStrategyIfc) cls.newInstance();
-
+				// we should not replace instance of ClusteringStrategyIfc if it
+				// is not required as instance may contain data!!
+				ClusteringStrategyIfc strategy_tmp = strategy;
+				if (strategy == null || !strategy_class.equals(strategy.getClass().getCanonicalName())) {
+					Class<?> cls = ModulesManagerImpl.getInstance().forName(strategy_class);
+					strategy_tmp = (ClusteringStrategyIfc) cls.newInstance();
+				}
 				strategy_tmp.setSessionManagerHandler(this);
 				strategy_tmp.setProperties(props);
 

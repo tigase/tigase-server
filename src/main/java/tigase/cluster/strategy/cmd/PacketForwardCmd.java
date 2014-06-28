@@ -70,7 +70,6 @@ public class PacketForwardCmd
 
 	//~--- fields ---------------------------------------------------------------
 
-	private SessionManagerClusteredIfc        sm;
 	private DefaultClusteringStrategyAbstract strategy;
 
 	//~--- constructors ---------------------------------------------------------
@@ -81,13 +80,10 @@ public class PacketForwardCmd
 	 *
 	 *
 	 * @param name
-	 * @param sm
 	 * @param strategy
 	 */
-	public PacketForwardCmd(String name, SessionManagerClusteredIfc sm,
-			DefaultClusteringStrategyAbstract strategy) {
+	public PacketForwardCmd(String name, DefaultClusteringStrategyAbstract strategy) {
 		super(name);
-		this.sm       = sm;
 		this.strategy = strategy;
 	}
 
@@ -121,6 +117,7 @@ public class PacketForwardCmd
 					visitedNodes, data, packets });
 		}
 		if ((packets != null) && (packets.size() > 0)) {
+			SessionManagerClusteredIfc sm = getSM();
 			for (Element elem : packets) {
 				try {
 					Packet                 el_packet = Packet.packetInstance(elem);
@@ -181,6 +178,10 @@ public class PacketForwardCmd
 		} else {
 			log.finest("Empty packets list in the forward command");
 		}
+	}
+	
+	private SessionManagerClusteredIfc getSM() {
+		return strategy.getSM();
 	}
 }
 
