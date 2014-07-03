@@ -122,6 +122,10 @@ public class Script extends AbstractScriptCommand {
 
 		ScriptEngineManager scriptEngineManager = (ScriptEngineManager) binds.get(SCRI_MANA);
 
+		log.log( Level.FINEST,
+						 "Trying to load admin command: {0}, description: {1}, language: {2}, ext: {3}",
+						 new Object[] { id, description, this.language, this.ext } );
+
 		if (language != null) {
 			scriptEngine = scriptEngineManager.getEngineByName(language);
 		}
@@ -134,17 +138,16 @@ public class Script extends AbstractScriptCommand {
 			compiledScript = ((Compilable) scriptEngine).compile(script);
 		}
 
-		if (this.language == null) {
+		if (this.language == null && scriptEngine != null) {
 			this.language = scriptEngine.getFactory().getLanguageName();
 		}
 
-		if (this.ext == null) {
+		if (this.ext == null && scriptEngine != null) {
 			this.ext = scriptEngine.getFactory().getExtensions().get(0);
 		}
 
-		log.log(Level.INFO, "Initialized script command, lang: {0}, ext: {1}",
-				new Object[] { this.language,
-				this.ext });
+		log.log(Level.INFO, "Initialized script command, id: {0}, lang: {1}, ext: {2}",
+				new Object[] { id, this.language, this.ext });
 
 		// ", script text: \n" + this.script);
 	}
