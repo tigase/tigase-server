@@ -324,8 +324,12 @@ public class JabberIqRegister
 	}
 
 	private static String parseRemoteAddressFromJid(JID from) {
-		String connectionId = from.getResource();
-		return connectionId.split("_")[REMOTE_ADDRESS_IDX];
+		try {
+			String connectionId = from.getResource();
+			return connectionId.split("_")[REMOTE_ADDRESS_IDX];
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return null;
+		}
 	}
 	
 	@Override
@@ -351,6 +355,8 @@ public class JabberIqRegister
 	}
 
 	private static boolean contains(List<CIDRAddress> addresses, String address) {
+		if (address == null)
+			return false;
 		for (CIDRAddress cidrAddress : addresses) {
 			if (cidrAddress.inRange(address)) {
 				return true;
