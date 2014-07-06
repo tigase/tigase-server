@@ -29,10 +29,13 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.Socket;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
+import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
@@ -45,15 +48,21 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import javax.net.ssl.ExtendedSSLSession;
 import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SNIHostName;
+import javax.net.ssl.SNIServerName;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.StandardConstants;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509ExtendedKeyManager;
+import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
-
 import tigase.cert.CertificateEntry;
 import tigase.cert.CertificateUtil;
 
@@ -163,15 +172,15 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 			return false;
 		}
 	}
-
+	
 	private static final Logger log = Logger.getLogger(SSLContextContainer.class.getName());
 	public final static String PER_DOMAIN_CERTIFICATE_KEY = "virt-hosts-cert-";
 	private ArrayList<X509Certificate> acceptedIssuers = new ArrayList<X509Certificate>(200);
 	private File[] certsDirs = null;
-	private String def_cert_alias = null;
+	protected String def_cert_alias = null;
 	private String email = "admin@tigase.org";
 	private char[] emptyPass = new char[0];
-	private Map<String, KeyManagerFactory> kmfs = new ConcurrentSkipListMap<String, KeyManagerFactory>();
+	protected Map<String, KeyManagerFactory> kmfs = new ConcurrentSkipListMap<String, KeyManagerFactory>();
 	private String o = "Tigase.org";
 	private String ou = "XMPP Service";
 	private SecureRandom secureRandom = new SecureRandom();
@@ -179,12 +188,13 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 	// ~--- methods
 	// --------------------------------------------------------------
 
-	private Map<String, SSLContext> sslContexts = new ConcurrentSkipListMap<String, SSLContext>();
+	protected Map<String, SSLContext> sslContexts = new ConcurrentSkipListMap<String, SSLContext>();
 
 	// ~--- get methods
 	// ----------------------------------------------------------
 
 	private X509TrustManager[] tms = new X509TrustManager[] { new FakeTrustManager() };
+	protected X509KeyManager[] kms = null;
 
 	private KeyStore trustKeyStore = null;
 
@@ -344,7 +354,7 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 				}
 
 				sslContext = SSLContext.getInstance(protocol);
-				sslContext.init(kmf.getKeyManagers(), tms, secureRandom);
+				sslContext.init((hostname == null && kms != null) ? kms : kmf.getKeyManagers(), tms, secureRandom);
 				sslContexts.put(alias, sslContext);
 			}
 		} catch (Exception e) {

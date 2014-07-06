@@ -26,9 +26,33 @@ package tigase.net;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.CharBuffer;
+import java.nio.channels.SocketChannel;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CoderResult;
+import java.nio.charset.MalformedInputException;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.TrustManager;
 import tigase.cert.CertCheckResult;
 import tigase.cert.CertificateUtil;
-
 import tigase.io.BufferUnderflowException;
 import tigase.io.IOInterface;
 import tigase.io.SocketIO;
@@ -37,43 +61,9 @@ import tigase.io.TLSIO;
 import tigase.io.TLSUtil;
 import tigase.io.TLSWrapper;
 import tigase.io.ZLibIO;
-
 import tigase.stats.StatisticsList;
-
-import tigase.xmpp.JID;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.io.IOException;
-
-import java.net.Socket;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.channels.SocketChannel;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.CoderResult;
-import java.nio.charset.MalformedInputException;
-
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLPeerUnverifiedException;
-import javax.net.ssl.TrustManager;
 import tigase.util.IOListener;
+import tigase.xmpp.JID;
 
 /**
  * <code>IOService</code> offers thread safe
@@ -400,8 +390,16 @@ public abstract class IOService<RefObject>
 			throw new IllegalStateException("SSL mode is already activated.");
 		}
 
-		TLSWrapper wrapper = new TLSWrapper(TLSUtil.getSSLContext("SSL", (String) sessionData.get(HOSTNAME_KEY), clientMode),
-				this, clientMode, wantClientAuth);
+		String tls_hostname = null;
+		int port = 0;
+		if (clientMode) {
+			tls_hostname = (String) this.getSessionData().get("remote-host");
+			if (tls_hostname == null) 
+				tls_hostname = (String) this.getSessionData().get("remote-hostname");
+			port = ((InetSocketAddress) socketIO.getSocketChannel().getRemoteAddress()).getPort();
+		}
+		TLSWrapper wrapper = new TLSWrapper(TLSUtil.getSSLContext("SSL", tls_hostname, clientMode),
+				this, tls_hostname, port, clientMode, wantClientAuth);
 
 		socketIO = new TLSIO(socketIO, wrapper, byteOrder());
 		setLastTransferTime();
@@ -435,7 +433,16 @@ public abstract class IOService<RefObject>
 			stop();
 		} else {
 			String tls_hostname = (String) sessionData.get(HOSTNAME_KEY);
-
+			int port = 0;
+			if (clientMode) {
+				port = ((InetSocketAddress) socketIO.getSocketChannel().getRemoteAddress()).getPort();
+				if (tls_hostname == null) {
+					tls_hostname = (String) this.getSessionData().get("remote-host");
+					if (tls_hostname == null) 
+						tls_hostname = (String) this.getSessionData().get("remote-hostname");
+				}
+			}
+			
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "{0}, Starting TLS for domain: {1}", new Object[] { this,
 						tls_hostname });
@@ -450,7 +457,7 @@ public abstract class IOService<RefObject>
 				sslContext = TLSUtil.getSSLContext("TLS", tls_hostname, clientMode);
 			}
 
-			TLSWrapper wrapper = new TLSWrapper(sslContext, this, clientMode, wantClientAuth);
+			TLSWrapper wrapper = new TLSWrapper(sslContext, this, tls_hostname, port, clientMode, wantClientAuth);
 
 			socketIO = new TLSIO(socketIO, wrapper, byteOrder());
 			setLastTransferTime();
