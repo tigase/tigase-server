@@ -1,0 +1,3 @@
+Specification-Title: Tigase Extensions for JDK 1.8
+Specification-Vendor: Tigase
+Specification-Version: 1.0
