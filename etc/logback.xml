@@ -13,6 +13,9 @@
     <logger name="tigase.osgi" level="trace"/>
     <logger name="tigase.xmpp" level="trace"/>
 
+		<!--jetty / http-api configuration-->
+    <logger name="org.eclipse.jetty" level="warn"/>
+		
     <root level="trace">
         <appender-ref ref="FILE"/>
     </root>
