@@ -1302,15 +1302,17 @@ public class JDBCRepository
 
 				switch ( data_repo.getDatabaseType() ) {
 					case sqlserver:
-						user_add_sp.executeUpdate();
-						rs = user_add_sp.getGeneratedKeys();
+						int result_count = user_add_sp.executeUpdate();
+						if ( result_count > 0 ){
+							rs = user_add_sp.getGeneratedKeys();
+						}
 						break;
 					default:
 						rs = user_add_sp.executeQuery();
 						break;
 				}
 
-				if (rs.next()) {
+				if (rs != null && rs.next()) {
 					uid = rs.getLong(1);
 
 					// addNode(uid, -1, root_node);
