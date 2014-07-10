@@ -291,8 +291,6 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 										true));
 								return;
 							}
-							// XXX
-							throw new RuntimeException("DEBUG");
 						} else {
 							// No, so assuming this is registration of a new
 							// user or change registration details for existing
