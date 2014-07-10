@@ -139,11 +139,11 @@ public class PacketCounter
 		long iqs = iqCounters[0];
 
 		for (Entry<String, Integer> iqCounter : iqCounterIdx.entrySet()) {
-			list.add(name, qType.name() + "processed IQ " + iqCounter.getKey(),
+			list.add(name, qType.name() + " processed IQ " + iqCounter.getKey(),
 					iqCounters[iqCounter.getValue()], Level.FINER);
 			iqs += iqCounters[iqCounter.getValue()];
 		}
-		list.add(name, qType.name() + "processed total IQ", iqs, Level.FINER);
+		list.add(name, qType.name() + " processed total IQ", iqs, Level.FINER);
 	}
 
 	//~--- methods --------------------------------------------------------------
