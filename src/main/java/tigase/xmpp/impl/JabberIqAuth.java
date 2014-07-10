@@ -242,7 +242,8 @@ public class JabberIqAuth
 					response.append("<resource/>");
 					results.offer(packet.okResult(response.toString(), 1));
 				} catch (NullPointerException ex) {
-					log.warning("Database problem, most likely misconfiguration error: " + ex);
+					if (log.isLoggable(Level.FINE))
+						log.fine("Database problem, most likely misconfiguration error: " + ex);
 					results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
 							"Database access problem, please contact administrator.", true));
 				}
