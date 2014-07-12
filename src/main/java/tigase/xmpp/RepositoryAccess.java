@@ -473,14 +473,13 @@ public abstract class RepositoryAccess {
 			authRepo.addUser(BareJID.bareJIDInstance(user_name, getDomain().getVhost()
 					.getDomain()), pass_param);
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("User added: " + BareJID.toString(user_name, getDomain().getVhost()
-						.getDomain()) + ", pass: " + pass_param);
+				log.log(Level.FINEST, "User added: {0}, pass: {1}", new Object[]{BareJID.toString(user_name, getDomain().getVhost()
+								.getDomain()), pass_param});
 			}
 			setRegistration(user_name, pass_param, reg_params);
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Registration data set for: " + BareJID.toString(user_name, getDomain()
-						.getVhost().getDomain()) + ", pass: " + pass_param + ", reg_params: " +
-						reg_params);
+				log.log(Level.FINEST, "Registration data set for: {0}, pass: {1}, reg_params: {2}", new Object[]{BareJID.toString(user_name, getDomain()
+								.getVhost().getDomain()), pass_param, reg_params});
 			}
 
 			return Authorization.AUTHORIZED;
