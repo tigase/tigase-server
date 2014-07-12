@@ -280,7 +280,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 */
 	public long getCompIqReceived(String comp) {
-		return getValue(comp, QueueType.IN_QUEUE.name() + " IQ", 0L);
+		return getValue(comp, QueueType.IN_QUEUE.name() + " processed IQ", 0L);
 	}
 
 	/**
@@ -292,7 +292,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 */
 	public long getCompIqSent(String comp) {
-		return getValue(comp, QueueType.OUT_QUEUE.name() + " IQ", 0L);
+		return getValue(comp, QueueType.OUT_QUEUE.name() + " processed IQ", 0L);
 	}
 
 	/**
@@ -316,7 +316,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 */
 	public long getCompMsgReceived(String comp) {
-		return getValue(comp, QueueType.IN_QUEUE.name() + " messages", 0L);
+		return getValue(comp, QueueType.IN_QUEUE.name() + " processed messages", 0L);
 	}
 
 	/**
@@ -328,7 +328,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 */
 	public long getCompMsgSent(String comp) {
-		return getValue(comp, QueueType.OUT_QUEUE.name() + " messages", 0L);
+		return getValue(comp, QueueType.OUT_QUEUE.name() + " processed messages", 0L);
 	}
 
 	/**
@@ -364,7 +364,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 */
 	public long getCompPresReceived(String comp) {
-		return getValue(comp, QueueType.IN_QUEUE.name() + " presences", 0L);
+		return getValue(comp, QueueType.IN_QUEUE.name() + " processed presences", 0L);
 	}
 
 	/**
@@ -376,7 +376,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 */
 	public long getCompPresSent(String comp) {
-		return getValue(comp, QueueType.OUT_QUEUE.name() + " presences", 0L);
+		return getValue(comp, QueueType.OUT_QUEUE.name() + " processed presences", 0L);
 	}
 
 	/**

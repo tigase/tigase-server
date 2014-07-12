@@ -130,20 +130,20 @@ public class PacketCounter
 	 */
 	@Override
 	public void getStatistics(StatisticsList list) {
-		list.add(name, qType.name() + "processed messages", msgCounter, Level.FINER);
-		list.add(name, qType.name() + "processed presences", presCounter, Level.FINER);
-		list.add(name, qType.name() + "processed cluster", clusterCounter, Level.FINER);
-		list.add(name, qType.name() + "processed other", otherCounter, Level.FINER);
-		list.add(name, qType.name() + "processed IQ no XMLNS", iqCounters[0], Level.FINER);
+		list.add(name, qType.name() + " processed messages", msgCounter, Level.FINER);
+		list.add(name, qType.name() + " processed presences", presCounter, Level.FINER);
+		list.add(name, qType.name() + " processed cluster", clusterCounter, Level.FINER);
+		list.add(name, qType.name() + " processed other", otherCounter, Level.FINER);
+		list.add(name, qType.name() + " processed IQ no XMLNS", iqCounters[0], Level.FINER);
 
 		long iqs = iqCounters[0];
 
 		for (Entry<String, Integer> iqCounter : iqCounterIdx.entrySet()) {
-			list.add(name, qType.name() + "processed IQ " + iqCounter.getKey(),
+			list.add(name, qType.name() + " processed IQ " + iqCounter.getKey(),
 					iqCounters[iqCounter.getValue()], Level.FINER);
 			iqs += iqCounters[iqCounter.getValue()];
 		}
-		list.add(name, qType.name() + "processed total IQ", iqs, Level.FINER);
+		list.add(name, qType.name() + " processed total IQ", iqs, Level.FINER);
 	}
 
 	//~--- methods --------------------------------------------------------------

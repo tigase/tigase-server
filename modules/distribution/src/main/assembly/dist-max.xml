@@ -123,6 +123,7 @@
 				<include>tigase:tigase-stats-collector-library</include>
 				<include>tigase:tigase-stats-collector-provider</include>
 				<include>tigase:tigase-http-api</include>
+				<include>tigase:tigase-http-api-jetty</include>
 				<include>tigase:tigase-message-archiving</include>
 				<include>tigase:tigase-socks5</include>
 				<include>tigase:tigase-stun</include>
@@ -143,6 +144,7 @@
 				<include>de.javawi:jstun</include>
 
 				<!--HTTP API component dependencies-->
+				<include>javax.servlet:javax.servlet-api</include>
 				<include>org.eclipse.jetty.orbit:javax.servlet</include>
 				<include>org.eclipse.jetty:jetty-continuation</include>
 				<include>org.eclipse.jetty:jetty-deploy</include>

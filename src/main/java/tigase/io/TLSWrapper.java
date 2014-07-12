@@ -163,10 +163,16 @@ public class TLSWrapper {
 	 * 
 	 * @param sslc
 	 * @param eventHandler
+	 * @param hostname
+	 * @param port
 	 * @param clientMode
+	 * @param wantClientAuth
 	 */
-	public TLSWrapper(SSLContext sslc, TLSEventHandler eventHandler, boolean clientMode, boolean wantClientAuth) {
-		tlsEngine = sslc.createSSLEngine();
+	public TLSWrapper(SSLContext sslc, TLSEventHandler eventHandler, String hostname, int port, boolean clientMode, boolean wantClientAuth) {
+		if (clientMode && hostname != null)
+			tlsEngine = sslc.createSSLEngine(hostname, port);
+		else
+			tlsEngine = sslc.createSSLEngine();
 		tlsEngine.setUseClientMode(clientMode);
 
 		if (enabledCiphers != null) {

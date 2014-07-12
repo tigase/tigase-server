@@ -24,20 +24,16 @@ package tigase.io;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import static tigase.io.SSLContextContainerIfc.*;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.security.KeyStore;
 import java.security.cert.CertificateParsingException;
-
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import static tigase.io.SSLContextContainerIfc.*;
+import tigase.osgi.ModulesManagerImpl;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -85,7 +81,8 @@ public abstract class TLSUtil {
 		}
 
 		try {
-			sslContextContainer = (SSLContextContainerIfc) Class.forName(sslCC_class).newInstance();
+			sslContextContainer = (SSLContextContainerIfc) ModulesManagerImpl.getInstance().forName(sslCC_class).newInstance();
+			//sslContextContainer = (SSLContextContainerIfc) Class.forName(sslCC_class).newInstance();
 			sslContextContainer.init(params);
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can not initialize SSL Container: " + sslCC_class, e);

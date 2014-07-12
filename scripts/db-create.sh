@@ -26,7 +26,7 @@ create_derby() {
 
   java -Dij.protocol=jdbc:derby: -Dij.database="${DB_NAME};create=true" \
 		  -Dderby.system.home=`pwd` \
-		  -cp libs/derby.jar:libs/derbytools.jar:jars/tigase-server.jar \
+		  -cp jars/derby.jar:jars/derbytools.jar:jars/tigase-server.jar \
 		  org.apache.derby.tools.ij database/derby-schema-${FILE_VERSION}.sql
 
   echo -e "\n\n\nconfiguration:\n\n--user-db=derby\n--user-db-uri=jdbc:derby:${DB_NAME}\n\n"
