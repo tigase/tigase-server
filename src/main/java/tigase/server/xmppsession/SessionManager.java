@@ -179,6 +179,7 @@ public class SessionManager
 	 */
 	protected ConcurrentHashMap<JID, XMPPResourceConnection> connectionsByFrom =
 			new ConcurrentHashMap<JID, XMPPResourceConnection>(100000);
+	private int activeUserNumber = 0;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -820,7 +821,7 @@ public class SessionManager
 		list.add(getName(), "Open user sessions", sessionsByNodeId.size(), Level.INFO);
 		list.add(getName(), "Maximum user sessions", maxUserSessions, Level.FINE);
 		list.add(getName(), "Total user sessions", totalUserSessions, Level.FINER);
-		list.add(getName(), "Active user connections", getActiveUserNumber(), Level.FINER);
+		list.add(getName(), "Active user connections", activeUserNumber, Level.FINER);
 		list.add(getName(), "Authentication timouts", authTimeouts, Level.INFO);
 		if (list.checkLevel(Level.INFO)) {
 			int  totalQueuesWait     = list.getValue(getName(), "Total queues wait", 0);
@@ -2435,12 +2436,10 @@ public class SessionManager
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Calculates number of Active Users, i.e. users which session wasn't idle longer than 5 minutes
-	 * @return number of Active Users
-	 */
-	private long getActiveUserNumber() {
-		int count = 0;
+	@Override
+	public void everyMinute() {
+		super.everyMinute();
+			int count = 0;
 
 		for (BareJID bareJID : sessionsByNodeId.keySet()) {
 			if (!bareJID.toString().startsWith("sess-man")) {
@@ -2454,7 +2453,8 @@ public class SessionManager
 			}
 		}
 
-		return count;
+		activeUserNumber = count;
+
 	}
 
 	private List<Element> getFeatures(XMPPResourceConnection session) {
