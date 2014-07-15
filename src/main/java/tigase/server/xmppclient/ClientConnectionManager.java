@@ -268,9 +268,9 @@ public class ClientConnectionManager
 			} else {
 
 				// Hm, receiver is not set yet..., ignoring
-				if (log.isLoggable(Level.INFO)) {
-					log.log(Level.INFO,
-							"Hm, receiver is not set yet (misconfiguration error)..., ignoring: {0}, connection: {1}",
+				if (log.isLoggable(Level.FINE)) {
+					log.log(Level.FINE,
+							"Hm, receiver is not set yet stream open was not send by a client or server misconfiguration..., ignoring: {0}, connection: {1}",
 							new Object[] { p.toStringSecure(),
 							serv });
 				}
@@ -294,7 +294,7 @@ public class ClientConnectionManager
 			// is there a point in trying to redeliver stanza of type error?
 			if (packet.getType() == StanzaType.error)
 				return false;
-			
+
 			// we should not send errors for presences as Presence module does not
 			// allow to send presence with type error from users and presences
 			// with type error resulting from presences sent to barejid are
@@ -309,11 +309,11 @@ public class ClientConnectionManager
 				// we should mark this message packet so that SM will know that it is
 				// resent from here due to connection failure
 				Packet result = C2SDeliveryErrorProcessor.makeDeliveryError(packet);
-				
+
 				processOutPacket(result);
 				return true;
 			}
-			
+
 			processOutPacket(Authorization.RECIPIENT_UNAVAILABLE
 					.getResponseMessage(packet, errorMessage, true));
 		} catch (PacketErrorTypeException ex) {
@@ -322,7 +322,7 @@ public class ClientConnectionManager
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Method description
 	 *
@@ -366,7 +366,7 @@ public class ClientConnectionManager
 				processUndeliveredPacket(p, null);
 			}
 		}
-		
+
 		xmppStreamClosed(service);
 
 		return result;
@@ -517,8 +517,8 @@ public class ClientConnectionManager
 					" id='tigase-error-tigase'" + " from='" + hostname + "'" +
 					" version='1.0' xml:lang='en'>" + "<stream:error>" +
 					"<policy-violation xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
-					"</stream:error>" + "</stream:stream>";			
-		}		
+					"</stream:error>" + "</stream:stream>";
+		}
 		if ((fromJID != null) && (see_other_host_strategy != null) && see_other_host_strategy
 				.isEnabled(SeeOtherHostIfc.Phase.OPEN)) {
 			BareJID see_other_host = see_other_host_strategy.findHostForJID(fromJID,
@@ -782,10 +782,10 @@ public class ClientConnectionManager
 			if (allowedPorts != null && Arrays.binarySearch(allowedPorts, serv.getLocalPort()) < 0) {
 				return false;
 			}
-		}		
+		}
 		return true;
 	}
-	
+
 	/**
 	 * Method description
 	 *
