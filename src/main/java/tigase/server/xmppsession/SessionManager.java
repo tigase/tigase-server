@@ -1575,24 +1575,27 @@ public class SessionManager
 		case STREAM_CLOSED : {
 			fastAddOutPacket(iqc.okResult((String) null, 0));
 
-			try {
-//			ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(sessionCloseProc
-//					.id());
-//
-//			if (pt == null) {
-//				pt = workerThreads.get(defPluginsThreadsPool);
-//			}
-//			pt.addItem(sessionCloseProc, iqc, connection);
-				// Replaced code above with new code below to execute STREAM_CLOSE in same
-				// thread as other packets from connection so next packets will know there
-				// is no session available after STREAM_CLOSE
-				// This should not have bigger impact on performance as SessionCloseProc was
-				// reimplemented to speed up process of closing connections (using maps instead
-				// of list, etc.)
-				sessionCloseProc.process(iqc, connection, naUserRepository, packetWriterQueue, plugin_config.get(sessionCloseProc.id()));
-			} catch (XMPPException ex) {
-				log.log(Level.WARNING, "Exception while processing STREAM_CLOSE command", ex);
+			//try {
+			ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(sessionCloseProc
+					.id());
+
+			if (pt == null) {
+				pt = workerThreads.get(defPluginsThreadsPool);
 			}
+			pt.addItem(sessionCloseProc, iqc, connection);
+			// Replaced code above with new code below to execute STREAM_CLOSE in same
+			// thread as other packets from connection so next packets will know there
+			// is no session available after STREAM_CLOSE
+			// This should not have bigger impact on performance as SessionCloseProc was
+			// reimplemented to speed up process of closing connections (using maps instead
+			// of list, etc.)
+			// Updated by Artur: It does have a big impact. In most cases a DB is accessed during the
+			// session close processing. If this is done in the main SM thread everything is slowed down.
+			// If we work under load of 100 logins/logouts per second this bring down the whole system.
+			//sessionCloseProc.process(iqc, connection, naUserRepository, packetWriterQueue, plugin_config.get(sessionCloseProc.id()));
+			//			} catch (XMPPException ex) {
+			//				log.log(Level.WARNING, "Exception while processing STREAM_CLOSE command", ex);
+			//			}
 			// closeConnection(pc.getFrom(), false);
 			processing_result = true;
 		}
