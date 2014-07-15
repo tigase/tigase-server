@@ -2581,7 +2581,7 @@ public class SessionManager
 								XMPPResourceConnection.AUTHENTICATION_TIMEOUT_KEY);
 						connectionsByFrom.remove(connId);
 						++authTimeouts;
-						log.log(Level.INFO,
+						log.log(Level.FINE,
 								"Authentication timeout expired, closing connection: {0}", connId);
 						fastAddOutPacket(Command.CLOSE.getPacket(getComponentId(), connId, StanzaType
 								.set, conn.nextStanzaId()));
