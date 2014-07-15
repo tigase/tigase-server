@@ -118,6 +118,11 @@ public class StatisticsProvider
 	 */
 	@Override
 	public Map<String, String> getAllStats(int level) {
+//		if (log.isLoggable(Level.FINEST)) {
+//			log.log(Level.FINEST, "Get all stats called for level: {0}", level);
+//		}
+
+
 		StatisticsList list = new StatisticsList(Level.parse("" + level));
 
 		theRef.getAllStats(list);
@@ -1226,6 +1231,10 @@ public class StatisticsProvider
 		}
 
 		private void update() {
+//			if (log.isLoggable(Level.FINEST)) {
+//				log.log(Level.FINEST, "Update started");
+//			}
+
 			float temp = cpuUsage;
 
 			cpuUsage = (prevCpuUsage + (temp * 2) + TigaseRuntime.getTigaseRuntime()
@@ -1353,6 +1362,9 @@ public class StatisticsProvider
 			// System.out.println("clusterPackets: " + clusterPackets +
 			// ", smPackets: " + smPackets +
 			// ", clientConnections: " + clientConnections);
+//			if (log.isLoggable(Level.FINEST)) {
+//				log.log(Level.FINEST, "Update finished");
+//			}
 		}
 
 		private void updateSystemDetails() {
