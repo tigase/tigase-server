@@ -90,7 +90,7 @@ public class PacketDefaultHandler {
 	 * @param packet
 	 * @param session
 	 *
-	 * 
+	 *
 	 */
 	public boolean canHandle(Packet packet, XMPPResourceConnection session) {
 		if (session == null) {
@@ -107,8 +107,8 @@ public class PacketDefaultHandler {
 				// Nothing to do....
 				return true;
 			}
-			if (log.isLoggable(Level.INFO)) {
-				log.log(Level.INFO, "No ''to'' address, can''t deliver packet: {0}", packet);
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "No ''to'' address, can''t deliver packet: {0}", packet);
 			}
 
 			return false;
@@ -126,7 +126,7 @@ public class PacketDefaultHandler {
 	 * @param repo
 	 * @param results
 	 *
-	 * 
+	 *
 	 */
 	public boolean forward(final Packet packet, final XMPPResourceConnection session,
 			final NonAuthUserRepository repo, final Queue<Packet> results) {
@@ -156,7 +156,7 @@ public class PacketDefaultHandler {
 	 * @param repo
 	 * @param results
 	 *
-	 * 
+	 *
 	 */
 	public boolean preprocess(final Packet packet, final XMPPResourceConnection session,
 			final NonAuthUserRepository repo, final Queue<Packet> results) {
@@ -373,9 +373,9 @@ public class PacketDefaultHandler {
 			try {
 				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 						"You must authorize session first.", true));
-				log.log(Level.INFO, "NotAuthorizedException for packet: {0}", packet.toString());
+				log.log(Level.FINE, "NotAuthorizedException for packet: {0}", packet.toString());
 			} catch (PacketErrorTypeException e2) {
-				log.log(Level.INFO, "Packet processing exception: {0}", e2);
+				log.log(Level.FINE, "Packet processing exception: {0}", e2);
 			}
 		}    // end of try-catch
 	}
