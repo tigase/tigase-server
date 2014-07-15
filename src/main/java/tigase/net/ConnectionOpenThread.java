@@ -183,9 +183,9 @@ public class ConnectionOpenThread
 						if (port_throttling != null) {
 							++port_throttling.lastSecondConnections;
 							if (port_throttling.lastSecondConnections > port_throttling.throttling) {
-								if (log.isLoggable(Level.FINER)) {
-									log.log(Level.FINER,
-											"New connections throttling level exceeded, closing: {0}", sc);
+								if (log.isLoggable(Level.INFO)) {
+									log.log(Level.INFO,
+											"New connections throttling level {0} exceeded, closing: {0}", new Object[] {port_throttling.lastSecondConnections, sc});
 								}
 								sc.close();
 								sc        = null;
@@ -276,7 +276,7 @@ public class ConnectionOpenThread
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	public static ConnectionOpenThread getInstance() {
 
