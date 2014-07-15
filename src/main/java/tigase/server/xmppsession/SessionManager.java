@@ -2437,7 +2437,7 @@ public class SessionManager
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
-	public void everyMinute() {
+	public synchronized void everyMinute() {
 		super.everyMinute();
 			int count = 0;
 
