@@ -1153,18 +1153,21 @@ public class SessionManager
 	/**
 	 * Method description
 	 *
-	 *
+	 * @param connection - instance of XMPPResourceConnection if available when calling
 	 * @param connectionId
 	 * @param userId
 	 * @param closeOnly
 	 */
-	protected void closeConnection(JID connectionId, String userId, boolean closeOnly) {
+	protected void closeConnection(XMPPResourceConnection connection, JID connectionId, 
+			String userId, boolean closeOnly) {
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "Stream closed from: {0}", connectionId);
 		}
 
 		// for test let's assume connection is not found
-		XMPPResourceConnection connection = connectionsByFrom.remove(connectionId);
+		if (connection == null) {
+			connection = connectionsByFrom.remove(connectionId);
+		}
 
 		if (connection != null) {
 
@@ -1576,13 +1579,13 @@ public class SessionManager
 			fastAddOutPacket(iqc.okResult((String) null, 0));
 
 			//try {
-			ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(sessionCloseProc
-					.id());
-
-			if (pt == null) {
-				pt = workerThreads.get(defPluginsThreadsPool);
-			}
-			pt.addItem(sessionCloseProc, iqc, connection);
+//			ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(sessionCloseProc
+//					.id());
+//
+//			if (pt == null) {
+//				pt = workerThreads.get(defPluginsThreadsPool);
+//			}
+//			pt.addItem(sessionCloseProc, iqc, connection);
 			// Replaced code above with new code below to execute STREAM_CLOSE in same
 			// thread as other packets from connection so next packets will know there
 			// is no session available after STREAM_CLOSE
@@ -1592,11 +1595,42 @@ public class SessionManager
 			// Updated by Artur: It does have a big impact. In most cases a DB is accessed during the
 			// session close processing. If this is done in the main SM thread everything is slowed down.
 			// If we work under load of 100 logins/logouts per second this bring down the whole system.
+			// see below!!
 			//sessionCloseProc.process(iqc, connection, naUserRepository, packetWriterQueue, plugin_config.get(sessionCloseProc.id()));
 			//			} catch (XMPPException ex) {
 			//				log.log(Level.WARNING, "Exception while processing STREAM_CLOSE command", ex);
 			//			}
 			// closeConnection(pc.getFrom(), false);
+			//
+			// we need to use other aproach then, as we need to remove session ASAP,
+			// so let's at first remove XMPPResourceConnection in this thread and later add packet to 
+			// queue to close it later on
+			if (connection != null) {
+				// first remove connection from connections map
+				connectionsByFrom.remove(iqc.getFrom(), connection);
+				
+				// ok, now remove connection from session
+				XMPPSession session = connection.getParentSession();
+				if (session != null) {
+					session.removeResourceConnection(connection);
+					// now set parent session to let processors properly close XMPPResourceConnection
+					try {
+						connection.setParentSession(session);
+					} catch (TigaseStringprepException ex) {
+						log.log(Level.FINE, "this should not happen as JID was already created once", ex);
+					}
+				}
+			}
+			
+			// now we add packet to processing thread to let it close properly in separate thread
+			ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(sessionCloseProc
+					.id());
+
+			if (pt == null) {
+				pt = workerThreads.get(defPluginsThreadsPool);
+			}
+			pt.addItem(sessionCloseProc, iqc, connection);
+			
 			processing_result = true;
 		}
 
@@ -2616,7 +2650,7 @@ public class SessionManager
 				// The connection is not longer active, closing the user session here.
 				String userJid = Command.getFieldValue(packet, "user-jid");
 
-				closeConnection(packet.getTo(), userJid, false);
+				closeConnection(null, packet.getTo(), userJid, false);
 			}
 		}
 
@@ -2636,7 +2670,7 @@ public class SessionManager
 
 			String userJid = Command.getFieldValue(packet, "user-jid");
 
-			closeConnection(packet.getTo(), userJid, false);
+			closeConnection(null, packet.getTo(), userJid, false);
 		}
 	}
 
@@ -2801,7 +2835,7 @@ public class SessionManager
 
 			String userJid = Command.getFieldValue(packet, "user-jid");
 
-			closeConnection(packet.getFrom(), userJid, false);
+			closeConnection(session, packet.getFrom(), userJid, false);
 		}
 	}
 
