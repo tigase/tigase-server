@@ -256,6 +256,14 @@ public class ClientConnectionManager
 							id });
 				}
 			}
+			
+			// If client is sending packet with 'from' attribute set then packets
+			// are being duplicated in clustered environment, so best it would be
+			// to remove 'from' attribute as it will be set later during processing
+			// by SessionManager
+			if (p.getStanzaFrom() != null) {
+				p.initVars(null, p.getStanzaTo());
+			}
 
 			// p.setPacketFrom(getFromAddress(id));
 			p.setPacketFrom(id);
