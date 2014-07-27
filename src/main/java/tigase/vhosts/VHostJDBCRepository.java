@@ -242,6 +242,11 @@ public class VHostJDBCRepository
 			return "Maximum number of domains exceeded for the user! Current number is: " +
 						 vhost_count;
 		}
+		
+		if (item.getS2sSecret() == null) {
+			return "S2S Secret is required";
+		}
+		
 		if (System.getProperty("vhost-disable-dns-check") != null) {
 			return null;
 		}

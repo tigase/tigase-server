@@ -27,6 +27,9 @@ package tigase.vhosts;
 //~--- non-JDK imports --------------------------------------------------------
 
 import java.util.Arrays;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import tigase.db.comp.RepositoryItemAbstract;
 import tigase.server.Command;
 import tigase.server.Packet;
@@ -35,12 +38,6 @@ import tigase.util.DataTypes;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.JID;
-
-//~--- JDK imports ------------------------------------------------------------
-
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Objects of this class represent virtual host with all hosts configuration
@@ -299,7 +296,13 @@ public class VHostItem
 	 * Constructs ...
 	 *
 	 */
-	public VHostItem() {}
+	public VHostItem() {
+		// added to ensure that we have s2sSecret set, as without it S2S connections
+		// will always fail (needed mostly for newly added vhosts).
+		if (s2sSecret == null) {
+			s2sSecret = UUID.randomUUID().toString();
+		}
+	}
 
 	/**
 	 * The constructor creates the <code>VHostItem</code> instance from a given
