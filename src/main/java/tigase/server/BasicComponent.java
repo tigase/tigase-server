@@ -51,6 +51,7 @@ import tigase.conf.ConfigurationException;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
+import tigase.osgi.ModulesManagerImpl;
 import tigase.osgi.OSGiScriptEngineManager;
 import tigase.server.script.AddScriptCommand;
 import tigase.server.script.CommandIfc;
@@ -265,6 +266,7 @@ public class BasicComponent
 		binds.put(CommandIfc.SCRIPT_BASE_DIR, scriptsBaseDir);
 		binds.put(CommandIfc.SCRIPT_COMP_DIR, scriptsCompDir);
 		binds.put(CommandIfc.COMPONENT_NAME, getName());
+		binds.put(CommandIfc.COMPONENT, this);
 	}
 
 	/**
@@ -668,9 +670,9 @@ public class BasicComponent
 					result = new LinkedList<Element>();
 					for (CommandIfc comm : scriptCommands.values()) {
 						if (!comm.isAdminOnly() || isAdminFrom) {
-							result.add(new Element("item", new String[] { "node", "name", "jid" },
+							result.add(new Element("item", new String[] { "node", "name", "jid", "group" },
 									new String[] { comm.getCommandId(),
-									comm.getDescription(), jid.toString() }));
+									comm.getDescription(), jid.toString(), comm.getGroup() }));
 						}
 					}
 				} else {
@@ -952,10 +954,10 @@ public class BasicComponent
 
 		CommandIfc command = new AddScriptCommand();
 
-		command.init(CommandIfc.ADD_SCRIPT_CMD, "New command script");
+		command.init(CommandIfc.ADD_SCRIPT_CMD, "New command script", "Scripts");
 		scriptCommands.put(command.getCommandId(), command);
 		command = new RemoveScriptCommand();
-		command.init(CommandIfc.DEL_SCRIPT_CMD, "Remove command script");
+		command.init(CommandIfc.DEL_SCRIPT_CMD, "Remove command script", "Scripts");
 		scriptCommands.put(command.getCommandId(), command);
 		if (props.get(SCRIPTS_DIR_PROP_KEY) != null) {
 			scriptsBaseDir = (String) props.get(SCRIPTS_DIR_PROP_KEY);
@@ -1128,6 +1130,7 @@ public class BasicComponent
 						if (f.isFile() &&!f.toString().endsWith("~") &&!f.isHidden())  {
 							String cmdId    = null;
 							String cmdDescr = null;
+							String cmdGroup = null;
 							String comp     = null;
 							String compClass = null;
 
@@ -1160,9 +1163,14 @@ public class BasicComponent
 									compClass = line.substring(idx + CommandIfc.SCRIPT_CLASS.length())
 											.trim();
 								}
+								idx = line.indexOf(CommandIfc.SCRIPT_GROUP);
+								if (idx >= 0) {
+									cmdGroup = line.substring(idx + CommandIfc.SCRIPT_GROUP.length())
+											.trim();
+								}
 							}
 							buffr.close();
-							if ((cmdId == null) || (cmdDescr == null) || (comp == null) ) {
+							if ((cmdId == null) || (cmdDescr == null)) {
 								log.log(Level.WARNING,
 										"Admin script found but it has no command ID or command" +
 										"description: " + "{0}", file);
@@ -1170,29 +1178,34 @@ public class BasicComponent
 								continue;
 							}
 
-							// Which components should load the script
-							String[] comp_names = comp.split(",");
-
 							boolean  found      = false;
 
-							// check component names
-							for (String cmp : comp_names) {
-								cmp = cmp.trim();
-								found |= getName().equals(cmp);
+							if (comp != null) {
+								// Which components should load the script
+								String[] comp_names = comp.split(",");
+
+								// check component names
+								for (String cmp : comp_names) {
+									cmp = cmp.trim();
+									found |= getName().equals(cmp);
+								}
 							}
 
 							// check component classes
 							if ( null != compClass ){
-								if ( scriptsPath.endsWith( getName() ) ){
-									// ok, this is script for component of particular name, skip
-									// loading based on class
-									continue;
-								}
+								// do we need this check? it blocks us from loading adhoc
+								// commands from component named directory if it is marked
+								// as for a specific component class - this should be allowed
+//								if ( scriptsPath.endsWith( getName() ) ){
+//									// ok, this is script for component of particular name, skip
+//									// loading based on class
+//									continue;
+//								}
 								String[] comp_classes = compClass.split( "," );
 								for ( String cmp : comp_classes ) {
 									try {
 										// we also check whether script is loaded for particular class or it's subclasses
-										Class<?> loadClass = this.getClass().getClassLoader().loadClass( cmp );
+										Class<?> loadClass = ModulesManagerImpl.getInstance().forName(cmp);
 										found |= loadClass.isAssignableFrom( this.getClass());
 
 									} catch ( NoClassDefFoundError ex ) {
@@ -1205,8 +1218,8 @@ public class BasicComponent
 							}
 							if (!found) {
 								log.log(Level.CONFIG,
-										"{0}: skipping admin script {1}, id: {2}, descr: {3} for component: {4} or class: {5}", new Object[] {
-										getName(), file, cmdId, cmdDescr, comp, compClass });
+										"{0}: skipping admin script {1}, id: {2}, descr: {3}, group: {4} for component: {5} or class: {6}", new Object[] {
+										getName(), file, cmdId, cmdDescr, cmdGroup, comp, compClass });
 
 								continue;
 							}
@@ -1214,7 +1227,7 @@ public class BasicComponent
 							int    idx = file.toString().lastIndexOf('.');
 							String ext = file.toString().substring(idx + 1);
 
-							addCommand.addAdminScript(cmdId, cmdDescr, sb.toString(), null, ext, binds);
+							addCommand.addAdminScript(cmdId, cmdDescr, cmdGroup, sb.toString(), null, ext, binds);
 							log.log(Level.CONFIG,
 									"{0}: Loaded admin command from file: {1}, id: {2}, ext: {3}, descr: {4}",
 									new Object[] { getName(), file, cmdId, ext, cmdDescr });

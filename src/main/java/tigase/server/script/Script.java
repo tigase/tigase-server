@@ -105,6 +105,7 @@ public class Script extends AbstractScriptCommand {
 	 *
 	 * @param id
 	 * @param description
+	 * @param group
 	 * @param script
 	 * @param lang
 	 * @param ext
@@ -112,10 +113,10 @@ public class Script extends AbstractScriptCommand {
 	 *
 	 * @throws ScriptException
 	 */
-	public void init(String id, String description, String script, String lang, String ext,
+	public void init(String id, String description, String group, String script, String lang, String ext,
 			Bindings binds)
 			throws ScriptException {
-		super.init(id, description);
+		super.init(id, description, group);
 		this.script = script;
 		this.language = lang;
 		this.ext = ext;

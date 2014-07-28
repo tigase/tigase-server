@@ -122,7 +122,6 @@
 					<threadCount>10</threadCount>	
 				</configuration>
 			</plugin>
-
 		</plugins>
 	</build>
 	<dependencies>

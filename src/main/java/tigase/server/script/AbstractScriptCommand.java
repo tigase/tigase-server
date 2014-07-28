@@ -65,6 +65,7 @@ public abstract class AbstractScriptCommand implements CommandIfc {
 
 	private String commandId = null;
 	private String description = null;
+	private String group = null;
 	private boolean adminOnly = true;
 
 	//~--- get methods ----------------------------------------------------------
@@ -91,6 +92,17 @@ public abstract class AbstractScriptCommand implements CommandIfc {
 		return this.description;
 	}
 
+	/**
+	 * Method description
+	 * 
+	 * 
+	 * 
+	 */
+	@Override
+	public String getGroup() {
+		return this.group;
+	}
+	
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -101,9 +113,10 @@ public abstract class AbstractScriptCommand implements CommandIfc {
 	 * @param description
 	 */
 	@Override
-	public void init(String id, String description) {
+	public void init(String id, String description, String group) {
 		this.commandId = id;
 		this.description = description;
+		this.group = group;
 	}
 
 	//~--- get methods ----------------------------------------------------------
