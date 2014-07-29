@@ -670,9 +670,13 @@ public class BasicComponent
 					result = new LinkedList<Element>();
 					for (CommandIfc comm : scriptCommands.values()) {
 						if (!comm.isAdminOnly() || isAdminFrom) {
-							result.add(new Element("item", new String[] { "node", "name", "jid", "group" },
+							Element item = new Element("item", new String[] { "node", "name", "jid" },
 									new String[] { comm.getCommandId(),
-									comm.getDescription(), jid.toString(), comm.getGroup() }));
+									comm.getDescription(), jid.toString() });
+							if (comm.getGroup() != null) {
+								item.setAttribute("group", comm.getGroup());
+							}
+							result.add(item);
 						}
 					}
 				} else {
