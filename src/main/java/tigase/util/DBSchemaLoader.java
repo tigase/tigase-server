@@ -482,20 +482,48 @@ class DBSchemaLoader {
 		if ( db_conn == null ){
 			log.log( Level.WARNING, "Missing DB connection URL" );
 		} else {
-			try {
+			try ( Connection conn = DriverManager.getConnection( db_conn ) ) {
 				Enumeration<Driver> drivers = DriverManager.getDrivers();
 				ArrayList<String> availableDrivers = new ArrayList<>();
 				while ( drivers.hasMoreElements() ) {
 					availableDrivers.add( drivers.nextElement().toString() );
 				}
 				log.log( Level.CONFIG, "DriverManager (available drivers): " + Arrays.asList( availableDrivers ) );
-				Connection conn = DriverManager.getConnection( db_conn );
+				conn.commit();
 				conn.close();
 				connection_ok = true;
 				log.log( Level.INFO, "Connection OK" );
 			} catch ( SQLException e ) {
 				//e.printStackTrace();
 				log.log( Level.WARNING, e.getMessage() );
+			}
+		}
+	}
+
+	public void shutdownDerby( Properties variables ) {
+		String db_conn = getDBUri( variables, false, true );
+		String database = variables.getProperty( DATABASE_TYPE_KEY );
+		if ( "derby".equals( database ) ){
+			log.log( Level.INFO, "Validating DBConnection, URI: " + db_conn );
+			if ( db_conn == null ){
+				log.log( Level.WARNING, "Missing DB connection URL" );
+			} else {
+				db_conn += ";shutdown=true";
+				try ( Connection conn = DriverManager.getConnection( db_conn ) ) {
+					Enumeration<Driver> drivers = DriverManager.getDrivers();
+					ArrayList<String> availableDrivers = new ArrayList<>();
+					while ( drivers.hasMoreElements() ) {
+						availableDrivers.add( drivers.nextElement().toString() );
+					}
+					log.log( Level.CONFIG, "DriverManager (available drivers): " + Arrays.asList( availableDrivers ) );
+					conn.commit();
+					conn.close();
+					connection_ok = true;
+					log.log( Level.INFO, "Connection OK" );
+				} catch ( SQLException e ) {
+					//e.printStackTrace();
+					log.log( Level.WARNING, e.getMessage() );
+				}
 			}
 		}
 	}
@@ -521,9 +549,8 @@ class DBSchemaLoader {
 		if ( db_conn == null ){
 			log.log( Level.WARNING, "Missing DB connection URL" );
 		} else {
-			Connection conn = null;
-			try {
-				conn = DriverManager.getConnection( db_conn );
+			try
+				( Connection conn = DriverManager.getConnection( db_conn ) ) {
 				conn.close();
 				db_ok = true;
 				log.log( Level.INFO, "Exists OK" );
@@ -531,16 +558,15 @@ class DBSchemaLoader {
 				log.log( Level.INFO, "Doesn't exist, creating..." );
 
 				db_conn = getDBUri( variables, false, true );
-				try {
-					conn = DriverManager.getConnection( db_conn );
+				try
+					(Connection conn = DriverManager.getConnection( db_conn ) ) {
 					ArrayList<String> queries = loadSQLQueries( res_prefix + "-installer-create-db", res_prefix, variables );
 					for ( String query : queries ) {
 						log.log( Level.FINE, "Executing query: " + query );
 						if ( !query.isEmpty() ){
-							Statement stmt = conn.createStatement();
 							// Some queries may fail and this is still fine
 							// the user or the database may already exist
-							try {
+							try ( Statement stmt = conn.createStatement() ) {
 								stmt.execute( query );
 								stmt.close();
 							} catch ( SQLException ex ) {
@@ -965,6 +991,12 @@ class DBSchemaLoader {
 			public void execute( DBSchemaLoader helper, Properties variables ) {
 				helper.postInstallation( variables );
 			}
+		},
+		SHUTDOWN_DATABASE( "Shutting Down Database" ) {
+			@Override
+			public void execute( DBSchemaLoader helper, Properties variables ) {
+				helper.shutdownDerby( variables );
+			}
 		};
 		private final String description;
 
@@ -978,16 +1010,22 @@ class DBSchemaLoader {
 		}
 
 		public static TigaseDBTask[] getTasksInOrder() {
-			return new TigaseDBTask[] { VALIDATE_CONNECTION, VALIDATE_DB_EXISTS,
-																	VALIDATE_DB_SCHEMA, ADD_ADMIN_XMPP_ACCOUNT, POST_INSTALLATION };
+			return new TigaseDBTask[] {
+				VALIDATE_CONNECTION
+					,VALIDATE_DB_EXISTS
+					,VALIDATE_DB_SCHEMA
+					,ADD_ADMIN_XMPP_ACCOUNT
+					,POST_INSTALLATION
+					,SHUTDOWN_DATABASE
+			};
 		}
 
 		public static TigaseDBTask[] getSchemaTasks() {
-			return new TigaseDBTask[] { VALIDATE_CONNECTION, VALIDATE_DB_EXISTS, LOAD_SCHEMA_FILE };
+			return new TigaseDBTask[] { VALIDATE_CONNECTION, VALIDATE_DB_EXISTS, LOAD_SCHEMA_FILE, SHUTDOWN_DATABASE };
 		}
 
 		public static TigaseDBTask[] getQueryTasks() {
-			return new TigaseDBTask[] { VALIDATE_CONNECTION, VALIDATE_DB_EXISTS, EXECUTE_SIMPLE_QUERY };
+			return new TigaseDBTask[] { VALIDATE_CONNECTION, VALIDATE_DB_EXISTS, EXECUTE_SIMPLE_QUERY, SHUTDOWN_DATABASE };
 		}
 	}
 

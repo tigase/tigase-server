@@ -21,7 +21,7 @@
 --
 
 -- QUERY START:
-run 'database/derby-schema-4-schema.sql';
+run 'database/derby-schema-5-1-schema.sql';
 -- QUERY END:
 
 -- QUERY START:
