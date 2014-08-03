@@ -72,15 +72,17 @@ public class Activator implements BundleActivator {
                                 log.log(Level.SEVERE, "Plugin loading excepton", e);
                         }
                         
+						// we need to export this before we start, so if start will fail due to missing
+						// dependencies we would be able to add them later and recorver from this
+						ModulesManagerImpl.getInstance().setActive(true);
+                        bc.registerService(ModulesManager.class.getName(), ModulesManagerImpl.getInstance(), new Hashtable());
+						
                         XMPPServer.start(new String[]{
                                 ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY, "etc/init.properties"
                         });
                         
                         // if it is not too late
                         SLF4JBridgeHandler.install();
-
-                        ModulesManagerImpl.getInstance().setActive(true);
-                        bc.registerService(ModulesManager.class.getName(), ModulesManagerImpl.getInstance(), new Hashtable());
                 }
                 catch (Exception ex) {
                         log.log(Level.SEVERE, "Error starting bundle: ", ex);

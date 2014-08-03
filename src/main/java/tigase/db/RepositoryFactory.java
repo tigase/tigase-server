@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import tigase.osgi.ModulesManagerImpl;
 
 /**
  * Describe class RepositoryFactory here.
@@ -320,18 +321,18 @@ public abstract class RepositoryFactory {
 					repo_pool_size));
 			params.put(RepositoryFactory.DATABASE_TYPE_PROP_KEY, class_name);
 			if (repo_pool_cls != null) {
-				AuthRepositoryPool repo_pool = (AuthRepositoryPool) Class.forName(repo_pool_cls)
+				AuthRepositoryPool repo_pool = (AuthRepositoryPool) ModulesManagerImpl.getInstance().forName(repo_pool_cls)
 						.newInstance();
 
 				repo_pool.initRepository(resource, params);
 				for (int i = 0; i < repo_pool_size; i++) {
-					repo = (AuthRepository) Class.forName(cls).newInstance();
+					repo = (AuthRepository) ModulesManagerImpl.getInstance().forName(cls).newInstance();
 					repo.initRepository(resource, params);
 					repo_pool.addRepo(repo);
 				}
 				repo = repo_pool;
 			} else {
-				repo = (AuthRepository) Class.forName(cls).newInstance();
+				repo = (AuthRepository) ModulesManagerImpl.getInstance().forName(cls).newInstance();
 				repo.initRepository(resource, params);
 			}
 			auth_repos.put(cls + resource, repo);
@@ -383,13 +384,13 @@ public abstract class RepositoryFactory {
 			}
 			params.put(RepositoryFactory.DATABASE_TYPE_PROP_KEY, class_name);
 
-			DataRepositoryPool repo_pool = (DataRepositoryPool) Class.forName(System
+			DataRepositoryPool repo_pool = (DataRepositoryPool) ModulesManagerImpl.getInstance().forName(System
 					.getProperty(DATA_REPO_POOL_CLASS_PROP_KEY, DATA_REPO_POOL_CLASS_PROP_VAL))
 					.newInstance();
 
 			repo_pool.initRepository(resource, params);
 			for (int i = 0; i < repo_pool_size; i++) {
-				repo = (DataRepository) Class.forName(cls).newInstance();
+				repo = (DataRepository) ModulesManagerImpl.getInstance().forName(cls).newInstance();
 				repo.initRepository(resource, params);
 				repo_pool.addRepo(repo);
 			}
@@ -487,18 +488,18 @@ public abstract class RepositoryFactory {
 					repo_pool_size));
 			params.put(RepositoryFactory.DATABASE_TYPE_PROP_KEY, class_name);
 			if (repo_pool_cls != null) {
-				UserRepositoryPool repo_pool = (UserRepositoryPool) Class.forName(repo_pool_cls)
+				UserRepositoryPool repo_pool = (UserRepositoryPool) ModulesManagerImpl.getInstance().forName(repo_pool_cls)
 						.newInstance();
 
 				repo_pool.initRepository(resource, params);
 				for (int i = 0; i < repo_pool_size; i++) {
-					repo = (UserRepository) Class.forName(cls).newInstance();
+					repo = (UserRepository) ModulesManagerImpl.getInstance().forName(cls).newInstance();
 					repo.initRepository(resource, params);
 					repo_pool.addRepo(repo);
 				}
 				repo = repo_pool;
 			} else {
-				repo = (UserRepository) Class.forName(cls).newInstance();
+				repo = (UserRepository) ModulesManagerImpl.getInstance().forName(cls).newInstance();
 				repo.initRepository(resource, params);
 			}
 			user_repos.put(cls + resource, repo);
