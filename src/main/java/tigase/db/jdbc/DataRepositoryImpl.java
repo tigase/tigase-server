@@ -21,20 +21,19 @@
  */
 package tigase.db.jdbc;
 
-import tigase.db.DataRepository;
-import tigase.xmpp.BareJID;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.db.DBInitException;
+import tigase.db.DataRepository;
+import tigase.xmpp.BareJID;
 
 /**
  * Created: Sep 3, 2010 5:55:41 PM
@@ -262,7 +261,7 @@ public class DataRepositoryImpl implements DataRepository {
 	 */
 	@Override
 	public void initRepository(String resource_uri, Map<String, String> params)
-			throws SQLException {
+			throws SQLException, DBInitException {
 		String driverClass = null;
 
 		if ( resource_uri.startsWith( "jdbc:postgresql" ) ){
@@ -276,7 +275,11 @@ public class DataRepositoryImpl implements DataRepository {
 		} else if ( resource_uri.startsWith( "jdbc:sqlserver" ) ){
 			database = dbTypes.sqlserver;
 		}
-
+		
+		if (database == null) {
+			throw new DBInitException("Database not supported");
+		}
+		
 		switch ( database ) {
 			case postgresql:
 				driverClass = "org.postgresql.Driver";

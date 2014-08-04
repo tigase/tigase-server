@@ -26,30 +26,25 @@ package tigase.server.amp.action;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.RepositoryFactory;
-
-import tigase.db.UserNotFoundException;
-
-import tigase.server.amp.ActionAbstract;
-import tigase.server.amp.ActionResultsHandlerIfc;
-import tigase.server.amp.cond.ExpireAt;
-import tigase.server.amp.MsgRepository;
-import tigase.server.Packet;
-
-import tigase.util.TigaseStringprepException;
-
-import tigase.xml.Element;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.sql.SQLException;
-
 import java.text.SimpleDateFormat;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map.Entry;
+import tigase.db.MsgRepositoryIfc;
+import tigase.db.RepositoryFactory;
+import tigase.db.TigaseDBException;
+import tigase.db.UserNotFoundException;
+import tigase.server.Packet;
+import tigase.server.amp.ActionAbstract;
+import tigase.server.amp.ActionResultsHandlerIfc;
+import tigase.server.amp.JDBCMsgRepository;
+import tigase.server.amp.MsgRepository;
+import tigase.server.amp.cond.ExpireAt;
+import tigase.util.TigaseStringprepException;
+import tigase.xml.Element;
 
 /**
  * Created: May 1, 2010 11:32:59 AM
@@ -66,7 +61,7 @@ public class Store
 
 	// ~--- fields ---------------------------------------------------------------
 	private Thread expiredProcessor          = null;
-	private MsgRepository repo               = null;
+	private MsgRepositoryIfc repo               = null;
 	private final SimpleDateFormat formatter;
 	private final SimpleDateFormat formatter2;
 
@@ -165,12 +160,19 @@ public class Store
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defs = super.getDefaults(params);
 		String db_uri            = (String) params.get(AMP_MSG_REPO_URI_PARAM);
+		String db_cls			 = (String) params.get(AMP_MSG_REPO_CLASS_PARAM);
 
 		if (db_uri == null) {
 			db_uri = (String) params.get(RepositoryFactory.GEN_USER_DB_URI);
 		}
 		if (db_uri != null) {
 			defs.put(AMP_MSG_REPO_URI_PROP_KEY, db_uri);
+		}
+		if (db_cls == null) {
+			db_cls = DEF_AMP_MSG_REPO_CLASS_PROP_VAL;
+		}
+		if (db_cls != null) {
+			defs.put(AMP_MSG_REPO_CLASS_PROP_KEY, db_cls);
 		}
 
 		return defs;
@@ -203,10 +205,11 @@ public class Store
 		super.setProperties(props, handler);
 
 		String db_uri = (String) props.get(AMP_MSG_REPO_URI_PROP_KEY);
-
-		if (db_uri != null) {
-			repo = MsgRepository.getInstance(db_uri);
+		String db_cls = (String) props.get(AMP_MSG_REPO_CLASS_PROP_KEY);
+		
+		if (db_cls != null && db_uri != null) {
 			try {
+				repo = MsgRepository.getInstance(db_cls, db_uri);
 				Map<String, String> db_props = new HashMap<String, String>(4);
 
 				for (Map.Entry<String, Object> entry : props.entrySet()) {
@@ -222,10 +225,10 @@ public class Store
 				}
 
 				// Initialization of repository can be done here and in MessageAmp
-				// class so repository related parameters for MsgRepository
+				// class so repository related parameters for JDBCMsgRepository
 				// should be specified for AMP plugin and AMP component
 				repo.initRepository(db_uri, db_props);
-			} catch (SQLException ex) {
+			} catch (TigaseDBException ex) {
 				repo = null;
 				log.log(Level.WARNING, "Problem initializing connection to DB: ", ex);
 			}

@@ -234,7 +234,7 @@ public class DataRepositoryPool implements DataRepository {
 	 */
 	@Override
 	public void initRepository(String resource_uri, Map<String, String> params)
-			throws SQLException {
+			throws SQLException, DBInitException {
 		this.resource_uri = resource_uri;
 		
 		for (DataRepository dataRepository : repoPool) {

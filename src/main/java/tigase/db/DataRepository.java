@@ -153,9 +153,10 @@ public interface DataRepository {
 	 *           implementations, though, perform so called lazy initialization so
 	 *           even though there is a problem with the underlying repository it
 	 *           may not be signaled through this method call.
+	 * @throws tigase.db.DBInitException
 	 */
 	void initRepository(String resource_uri, Map<String, String> params)
-					throws SQLException;
+					throws SQLException, DBInitException;
 
 	/**
 	 * A helper method to release resources from the statement and result set.

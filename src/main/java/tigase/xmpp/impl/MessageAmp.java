@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
@@ -82,7 +83,7 @@ public class MessageAmp
 	//~--- fields ---------------------------------------------------------------
 
 	private JID             ampJID           = null;
-	private MsgRepository   msg_repo         = null;
+	private MsgRepositoryIfc   msg_repo         = null;
 	private OfflineMessages offlineProcessor = new OfflineMessages();
 	private Message         messageProcessor = new Message();
 
@@ -135,11 +136,18 @@ public class MessageAmp
 		}
 
 		String msg_repo_uri = (String) settings.get(AmpFeatureIfc.AMP_MSG_REPO_URI_PROP_KEY);
-
+		String msg_repo_cls = (String) settings.get(AmpFeatureIfc.AMP_MSG_REPO_CLASS_PROP_KEY);
+		
 		if (msg_repo_uri == null) {
 			msg_repo_uri = System.getProperty(AmpFeatureIfc.AMP_MSG_REPO_URI_PROP_KEY);
 			if (msg_repo_uri == null) {
 				msg_repo_uri = System.getProperty(RepositoryFactory.GEN_USER_DB_URI_PROP_KEY);
+			}
+		}
+		if (msg_repo_cls == null) {
+			msg_repo_cls = System.getProperty(AmpFeatureIfc.AMP_MSG_REPO_CLASS_PROP_KEY);
+			if (msg_repo_cls == null) {
+				msg_repo_cls = AmpFeatureIfc.DEF_AMP_MSG_REPO_CLASS_PROP_VAL;
 			}
 		}
 		if (msg_repo_uri != null) {
@@ -150,12 +158,12 @@ public class MessageAmp
 			}
 
 			// Initialization of repository can be done here and in Store
-			// class so repository related parameters for MsgRepository
+			// class so repository related parameters for JDBCMsgRepository
 			// should be specified for AMP plugin and AMP component
-			msg_repo = MsgRepository.getInstance(msg_repo_uri);
 			try {
+				msg_repo = MsgRepository.getInstance(msg_repo_cls, msg_repo_uri);
 				msg_repo.initRepository(msg_repo_uri, db_props);
-			} catch (SQLException ex) {
+			} catch (TigaseDBException ex) {
 				msg_repo = null;
 				log.log(Level.WARNING, "Problem initializing connection to DB: ", ex);
 			}

@@ -428,6 +428,11 @@ public class OfflineMessages
 			this.conn = conn;
 		}
 
+		@Override
+		public void initRepository(String conn_str, Map<String, String> map) throws TigaseDBException {
+			// nothing to do here as we base on UserRepository which is already initialized
+		}
+		
 		//~--- get methods --------------------------------------------------------
 		@Override
 		public Element getMessageExpired( long time, boolean delete ) {

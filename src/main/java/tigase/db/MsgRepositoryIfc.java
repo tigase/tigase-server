@@ -27,6 +27,7 @@ import tigase.xmpp.JID;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.Date;
+import java.util.Map;
 import java.util.Queue;
 
 //~--- interfaces -------------------------------------------------------------
@@ -54,6 +55,16 @@ public interface MsgRepositoryIfc {
 	 * retrieved.
 	 */
 	Element getMessageExpired( long time, boolean delete );
+	
+	/**
+	 * Method to initialize this instance of MsgResitoryIfc including creation
+	 * of tables when needed
+	 * 
+	 * @param conn_str
+	 * @param map 
+	 * @throws tigase.db.TigaseDBException 
+	 */
+	void initRepository(String conn_str, Map<String, String> map) throws TigaseDBException;
 
 	//~--- methods --------------------------------------------------------------
 	/**

@@ -37,6 +37,12 @@ import java.util.Map;
 public interface AmpFeatureIfc {
 
 	/** Field description */
+	public static final String AMP_MSG_REPO_CLASS_PROP_KEY = "amp-repo-class";
+	
+	/** Field description */
+	public static final String AMP_MSG_REPO_CLASS_PARAM = "--amp-repo-class";
+	
+	/** Field description */
 	public static final String AMP_MSG_REPO_URI_PARAM = "--amp-repo-uri";
 
 	/** Field description */
@@ -44,6 +50,9 @@ public interface AmpFeatureIfc {
 
 	/** Field description */
 	public static final String AMP_XMLNS = "http://jabber.org/protocol/amp";
+	
+	/** Field description */
+	public static final String DEF_AMP_MSG_REPO_CLASS_PROP_VAL = "tigase.server.amp.JDBCMsgRepository";
 
 	/** Field description */
 	public static final String FROM_CONN_ID = "from-conn-id";

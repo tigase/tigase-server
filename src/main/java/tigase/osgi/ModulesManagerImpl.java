@@ -188,7 +188,9 @@ public class ModulesManagerImpl implements ModulesManager {
         public void update() {
                 //synchronized (this) {
                 if (active) {
-                        ((Configurator) XMPPServer.getConfigurator()).updateMessageRouter();
+					Configurator configurator = ((Configurator) XMPPServer.getConfigurator());
+					if (configurator != null)
+						configurator.updateMessageRouter();
                 }
                 //}
         }
