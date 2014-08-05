@@ -64,7 +64,7 @@ import tigase.xmpp.JID;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class JDBCMsgRepository implements MsgRepositoryIfc {
+public class JDBCMsgRepository extends MsgRepository<Long> {
 	private static final Logger log = Logger.getLogger(JDBCMsgRepository.class.getName());
 	private static final String MSG_TABLE = "msg_history";
 	private static final String MSG_ID_COLUMN = "msg_id";
@@ -201,20 +201,15 @@ public class JDBCMsgRepository implements MsgRepositoryIfc {
 		"insert into " + JID_TABLE + " ( " + JID_SHA_COLUMN + ", " + JID_COLUMN + ") values (?, ?)";
 	/* @formatter:on */
 	private static final String GET_USER_UID_PROP_KEY = "user-uid-query";
-	private static final String MSGS_STORE_LIMIT_KEY = "store-limit";
 	private static final String MSGS_COUNT_LIMIT_PROP_KEY = "count-limit-query";
-	private static final long MSGS_STORE_LIMIT_VAL = 100;
 	private static final int MAX_UID_CACHE_SIZE = 100000;
 	private static final long MAX_UID_CACHE_TIME = 3600000;
 //	private static final Map<String, JDBCMsgRepository> repos =
 //			new ConcurrentSkipListMap<String, JDBCMsgRepository>();
-	private static final int MAX_QUEUE_SIZE = 1000;
 
 	// ~--- fields ---------------------------------------------------------------
 
 	private DataRepository data_repo = null;
-	private long earliestOffline = Long.MAX_VALUE;
-	private SimpleParser parser = SingletonFactory.getParserInstance();
 	private String uid_query = GET_USER_UID_DEF_QUERY;
 	private String msg_count_for_limit_query = MSG_COUNT_FOR_TO_AND_FROM_QUERY_DEF;
 	private long msgs_store_limit = MSGS_STORE_LIMIT_VAL;
@@ -222,7 +217,6 @@ public class JDBCMsgRepository implements MsgRepositoryIfc {
 	private Map<BareJID, Long> uids_cache = Collections
 			.synchronizedMap(new SimpleCache<BareJID, Long>(MAX_UID_CACHE_SIZE,
 					MAX_UID_CACHE_TIME));
-	private DelayQueue<MsgDBItem> expiredQueue = new DelayQueue<MsgDBItem>();
 
 	// ~--- get methods ----------------------------------------------------------
 
@@ -243,53 +237,6 @@ public class JDBCMsgRepository implements MsgRepositoryIfc {
 //
 //		return result;
 //	}
-
-	/**
-	 * Method description
-	 * 
-	 * @param time
-	 * @param delete
-	 * 
-	 */
-	@Override
-	public Element getMessageExpired(long time, boolean delete) {
-		if (expiredQueue.size() == 0) {
-
-			// If the queue is empty load it with some elements
-			loadExpiredQueue(MAX_QUEUE_SIZE);
-		} else {
-
-			// If the queue is not empty, check whether recently saved off-line
-			// message
-			// is due to expire sooner then the head of the queue.
-			MsgDBItem item = expiredQueue.peek();
-
-			if ((item != null) && (earliestOffline < item.expired.getTime())) {
-
-				// There is in fact off-line message due to expire sooner then the head
-				// of the
-				// queue. Load all off-line message due to expire sooner then the first
-				// element
-				// in the queue.
-				loadExpiredQueue(item.expired);
-			}
-		}
-
-		MsgDBItem item = null;
-
-		while (item == null) {
-			try {
-				item = expiredQueue.take();
-			} catch (InterruptedException ex) {
-			}
-		}
-
-		if (delete) {
-			deleteMessage(item.db_id);
-		}
-
-		return item.msg;
-	}
 
 	// ~--- methods --------------------------------------------------------------
 
@@ -558,7 +505,8 @@ public class JDBCMsgRepository implements MsgRepositoryIfc {
 		}
 	}
 
-	private void deleteMessage(long msg_id) {
+	@Override
+	protected void deleteMessage(Long msg_id) {
 		try {
 			PreparedStatement delete_id_st =
 					data_repo.getPreparedStatement(null, MSG_DELETE_ID_QUERY);
@@ -646,7 +594,8 @@ public class JDBCMsgRepository implements MsgRepositoryIfc {
 
 	// ~--- methods --------------------------------------------------------------
 
-	private void loadExpiredQueue(int min_elements) {
+	@Override
+	protected void loadExpiredQueue(int min_elements) {
 		ResultSet rs = null;
 
 		try {
@@ -689,7 +638,8 @@ public class JDBCMsgRepository implements MsgRepositoryIfc {
 		earliestOffline = Long.MAX_VALUE;
 	}
 
-	private void loadExpiredQueue(Date expired) {
+	@Override
+	protected void loadExpiredQueue(Date expired) {
 		ResultSet rs = null;
 
 		try {
@@ -736,55 +686,6 @@ public class JDBCMsgRepository implements MsgRepositoryIfc {
 		earliestOffline = Long.MAX_VALUE;
 	}
 
-	// ~--- inner classes --------------------------------------------------------
-
-	private class MsgDBItem implements Delayed {
-		private long db_id = -1;
-		private Date expired = null;
-		private Element msg = null;
-
-		// ~--- constructors -------------------------------------------------------
-
-		/**
-		 * Constructs ...
-		 * 
-		 * @param db_id
-		 * @param msg
-		 * @param expired
-		 */
-		public MsgDBItem(long db_id, Element msg, Date expired) {
-			this.db_id = db_id;
-			this.msg = msg;
-			this.expired = expired;
-		}
-
-		// ~--- methods ------------------------------------------------------------
-
-		/**
-		 * Method description
-		 * 
-		 * @param o
-		 * 
-		 */
-		@Override
-		public int compareTo(Delayed o) {
-			return (int) (getDelay(TimeUnit.NANOSECONDS) - o.getDelay(TimeUnit.NANOSECONDS));
-		}
-
-		// ~--- get methods --------------------------------------------------------
-
-		/**
-		 * Method description
-		 * 
-		 * @param unit
-		 * 
-		 */
-		@Override
-		public long getDelay(TimeUnit unit) {
-			return unit.convert(expired.getTime() - System.currentTimeMillis(),
-					TimeUnit.MILLISECONDS);
-		}
-	}
 }
 
 // ~ Formatted in Sun Code Convention
