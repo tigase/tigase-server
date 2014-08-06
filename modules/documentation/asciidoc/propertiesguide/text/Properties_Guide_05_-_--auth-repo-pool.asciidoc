@@ -1,0 +1,20 @@
+[[authRepoPool]]
+--auth-repo-pool
+================
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2013-02-09 20:59
+
+*Default value:* +tigase.db.AuthRepositoryPool+
+
+*Example:* +--auth-repo-pool = tigase.db.AuthRepositoryPool+
+
+*Possible values:* 'class implementing AuthRepository.'
+
+*Description:* Allows to specify an implementation for the authentication repository connection pool. This is used only if the implementation provided by a default Tigase server package is not sufficient in the particular deployment. The implementation provides a DB (AuthRepository to be more specific) connection pool to improve the data access performance. The repository pool can offer data caching for improved performance or any other features necessary.
+
+*Available since:* 5.1.0
+

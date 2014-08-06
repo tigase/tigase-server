@@ -1,0 +1,22 @@
+[[dataRepoPoolSize]]
+--data-repo-pool-size
+=====================
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2013-05-28 04:19
+
+*Default value:* +10+
+
+*Example:* +--data-repo-pool-size = 25+
+
+*Possible values:* 'Number of db connections as integer.'
+
+*Description:* +DataRepository+ is an abstraction layer between any higher level data access repositories such as +UserRepository+ or +AuthRepository+ and SQL database or JDBC driver to be more specific. Many implementations use +DataRepository+ for DB connections and in fact on many installations they also share the same DataRepository instance if they connect to the same DB. In such a case it is desired to specific a connection pool on this level to avoid excessive number of connections to the database.
+
+It recommended to control number of DB connection using this property rather than --user-repo-pool-size or --auth-repo-pool-size.
+
+*Available since:* 5.1.0
+

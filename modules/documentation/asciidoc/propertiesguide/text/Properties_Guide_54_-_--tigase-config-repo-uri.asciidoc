@@ -1,0 +1,20 @@
+[[tigaseConfigRepoUri]]
+--tigase-config-repo-uri
+========================
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2013-02-10 01:38
+
+*Default value:* 'none'
+
+*Example:* +--tigase-config-repo-uri = jdbc:mysql://localhost/tigase?user=root&amp;password=mypass+
+
+*Possible values:* 'DB connection URI string.'
+
+*Description:* This property is a parameter which allows to provide database connection string for configuration storage engines which keep server settings in database.
+
+*Available since:* 5.0.0
+

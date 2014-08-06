@@ -1,0 +1,15 @@
+Experimental
+============
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2010-04-06 21:22
+
+The guide contains description of non-standard or experimental functionality of the server. Some of them are based on never published extensions, some of them are just test implementation for new ideas or performance improvements.
+
+- Dynamic Rosters
+- Mobile Optimizations
+- Bosh Session Cache
+

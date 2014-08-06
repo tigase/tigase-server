@@ -1,0 +1,22 @@
+//[[externalComponentConfiguration]]
+External Component Configuration
+================================
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net
+:Date: 2010-04-06
+
+In the Tigase server version 4.4.x a new implementation for connecting external components has been introduced. 
+
+It is much simpler to setup and follows the same configuration standards as all other components. It is also much more powerful as a single instance can control many TCP/IP ports and many external components on each port and even allows for multiple connections for the same component. It supports both XEP-0114 and XEP-0225 with protocol auto-detection mechanisms. Protocols are pluggable so in future more protocols can be supported or custom extensions to existing protocols can be added.
+
+The implementation also supports scripting API and new domains with passwords can be added at run-time using ad-hoc commands. New scripts can be loaded to even further control all connected external components.
+
+Even though it is much simpler to setup and to use it also offers a lot of new functionality and features. Pages in this guide describe in details all the administration aspects of setting up and managing external components.
+
+- ////<<4xbasicConfiguration,////Basic Configuration Options (External Component)
+- ////<<4xexternalComponent,////Tigase as External Component
+- ////<<loadBalancingExternalComponent,////Load Balancing External Components in Cluster Mode
+

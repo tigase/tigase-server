@@ -1,0 +1,22 @@
+[[bindExtHostnames]]
+--bind-ext-hostnames
+====================
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2013-02-09 21:06
+
+*Default value:* none
+
+*Example:* +--bind-ext-hostnames = pubsub.host.domain+
+
+*Possible values:* 'comma separated list of domains.'
+
+*Description:* This property allows to set a list of domains to be bound to the external component connection. Let's say we have a Tigase instance with only MUC and PubSub components loaded and we want to connect this instance to the main server via external component protocol. Using --external property we can define a domain (maybe muc.devel.tigase.org), password, TCP/IP port, remote host address, connection type, etc.... This would make one of our component (MUC) visible on the remote server. 
+
+To make visible the second component (PubSub) we would need to open another connection with the domain name (pubsub.devel.tigase.org) for the another component. Of course the second connection is redundant as all communication could go through a single connection. This is what this property is used. In our example with 2 components you can just put the 'pubsub.devel.tigase.org' domain as a value to this property and it will bind the second domain to a single connection on top of the domain which has been authenticated during protocol handshaking.
+
+*Available since:* 5.0.0
+

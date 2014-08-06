@@ -1,0 +1,27 @@
+[[cmTrafficThrottling]]
+--cm-traffic-throttling
+=======================
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2013-02-09 21:35
+
+*Default value:* +xmpp:2500:0:disc,bin:20m:0:disc+
+
+*Example:* +--cm-traffic-throttling = xmpp:2500:0:disc,bin:20m:0:disc+
+
+*Possible values:* 'comma separated list of traffic limits settings.'
+
+*Description:* The property allows you to limit traffic on user connections. These limits are applied to each user connection and if a limit is exceeded then a specified action is applied.
+
+The property value is a comma separated list of traffic limits settings. For example the first part: +xmpp:2500:0:disc+ specifies traffic limits for XMPP data to 2,500 packets allowed within last minute either sent to or received from a user and unlimited (0) total traffic on the user connection, in case any limit is exceeded the action is to *disconnect* the user.
+
+- *[xmpp|bin]* traffic type, xmpp - XMPP traffic, that is limits refer to a number of XMPP packets transmitted, bin - binary traffic, that is limits refer to a number of bytes transmitted.
+- *2500* maximum traffic allowed within 1 minute. 0 means unlimited, or no limits.
+- *0* maximum traffic allowed for the life span of the connection. 0 means unlimited or no limits.
+- *[disc|drop]* action performed on the connection if limits are exceeded. disc - means disconnect, drop - means drop data.
+
+*Available since:* 5.1.3
+

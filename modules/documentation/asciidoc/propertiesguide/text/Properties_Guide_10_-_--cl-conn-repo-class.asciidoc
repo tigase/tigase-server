@@ -1,0 +1,48 @@
+[[clConnRepoClass]]
+--cl-conn-repo-class
+====================
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2013-03-28 14:02
+
+*Default value:* +tigase.cluster.repo.ClConSQLRepository+
+
+*Example:* +--cl-conn-repo-class = tigase.cluster.repo.ClConDirRepository+
+
+*Possible values:* 'class implementing ComponentRepository.'
+
+*Description:* This property allows to set class controlling cluster connections repository. The cluster connections repository is responsible for discovering cluster nodes which are part of the installation. Tigase in cluster mode establishes TCP/IP connections between cluster nodes to allow for user communication and exchanging cluster state metadata.
+
+From the Tigase XMPP Server 5.2.0 the server supports cluster auto-configuration so no action, configuring or any maintenance action is required to add  a new cluster node. 
+
+As everything in the Tigase it is also a pluggable system so it is possible to implement/add new ways to synchronize information about cluster nodes on the system. Currently following cluster connection repositories are implemented:
+
+. *ClConSQLRepository* a default implementation which synchronizes cluster nodes information through SQL database. By default it uses the same database as the main Tigase DB, that is the UserRepository database. All the cluster nodes need an access to the same database for cluster nodes information synchronization.
++
+For backward compatibility this mode reads the list of the cluster nodes from a configuration file (+init.properties+) as well. However, this is used only as an initial setup and, after startup time the cluster nodes are synchronized through the database.
++
+It is recommended however, that the --cluster-nodes property is not used (should be removed or commented out) when the automatic reconfiguration mode is used. This is because we found out that when the network configuration and DNS names are not perfect than automatic mode may conflict with manual settings.
++
+By default the same database as for the user repository is used for the cluster automatic cluster mode but, a different, separate database can be used as well. A DB URI for a different SQL database can be set using following configuration property:
++
+[source,bash]
+------------------------------
+cl-comp/repo-uri=jdbc:mysql://localhost/tigasedb?user=user&password=mypass
+------------------------------
+. *ClConDirRepository* an alternative way to synchronize information about cluster nodes on the installation through filesystem. This might be used in case where DB is not accessible by the clustering code for some reason or synchronization through DB is not desired.
+To make use of the filesystem based cluster nodes synchronization you need to mount a directory via some network filesystem mechanism (like NFS for example) and point the Tigase to the directory. The rest works the same way as through the DB. However, instead of writing cluster node metadata to some DB table, each node writes it's metadata to a separate file in the given directory.
+This mode is also compatible with the manual nodes configuration through --cluster-nodes but the same precautions and suggestions as for DB based automatic node hold.
++
+A default location of the directory is probably not very useful, as it points to etc/ directory, therefore, normally a correct location has to be set through the repo-uri property in a following way:
++
+[source,bash]
+------------------------------
+cl-comp/repo-uri=/mount/tigase-cluster-repo
+------------------------------
+. *ClConConfigRepository* is an implementation which allows you to revert back to the previous and manual cluster configuration through '--cluster-nodes'. However, since version *5.2.0* the <<clusterNodes,+--cluster-nodes+>> has been extended with ability to set password and port number for each cluster node.
+
+*Available since:* 5.2.0
+

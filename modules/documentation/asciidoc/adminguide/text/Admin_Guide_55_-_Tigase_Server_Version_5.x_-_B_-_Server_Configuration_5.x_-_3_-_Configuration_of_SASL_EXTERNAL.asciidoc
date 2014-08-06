@@ -1,0 +1,25 @@
+//[[saslExternal]]
+Configuration SASL EXTERNAL
+===========================
+Bartosz Malkowski <bmalkowski@tigase.pl>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net
+:Date: 2013-11-27 13:34
+
+In order to enable SASL External add following line to the  +init.properties+ file
+
+[source,bash]
+-------------------------------------
+c2s/clientCertCA=/path/to/cacert.pem
+-------------------------------------
+
+File +cacert.pem+ contains Certificate Authority certificate which is used to sign clients certificate.
+
+Client certificate must include user's Jabber ID as +XmppAddr+ in +subjectAltName+:
+
+_As specified in RFC 3920 and updated in RFC 6120, during the stream negotiation process an XMPP client can present a certificate (a “client certificate”). If a JabberID is included in a client certificate, it is encapsulated as an id-on-xmppAddr Object Identifier (“xmppAddr”), i.e., a subjectAltName entry of type otherName with an ASN.1 Object Identifier of “id-on-xmppAddr” as specified in Section 13.7.1.4 of RFC 6120. [1]_
+
+link:http://xmpp.org/extensions/xep-0178.html#c2s[XEP-0178]
+

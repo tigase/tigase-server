@@ -1,0 +1,26 @@
+[[vhostPresenceForwardJid]]
+--vhost-presence-forward-jid
+============================
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2013-02-22 02:57
+
+*Default value:* +<null>+
+
+*Example:* +--vhost-presence-forward-jid = presence-collector@domain.com+
+
+*Possible values:* 'valid JID.'
+
+*Description:* This is a global property for presence forwarding function for the installation. All user status presences will be forwarded to given XMPP address which can be a component or any other XMPP entity. If the destination entity is a bot connected via c2s connection it probably should be addressed via full JID (with resource part) or the standard XMPP presence processing would refuse to deliver presences from users who are not in the contact list.
+
+This is a global property which is overridden by settings for particular vhost.
+
+A default settings for all virtual hosts for which the configuration is not defined. This settings is useful mostly for installations with many virtual hosts listed in the +init.property+ file for which there is no individual settings specified. It allows to configure a default values for all of them, instead of having to provide individual configuration for each vhost.
+
+It is also applied as a default value for all new vhosts added at run-time.
+
+*Available since:* 5.2.0
+

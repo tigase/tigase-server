@@ -1,0 +1,20 @@
+[[rosterImplementation]]
+--roster-implementation
+=======================
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2013-04-24 20:44
+
+*Default value:* +RosterFlat.class.getCanonicalName()+
+
+*Example:* +--roster-implementation=my.pack.CustomRosterImpl+
+
+*Possible values:* 'Class extending tigase.xmpp.impl.roster.RosterAbstract.'
+
+*Description:* This property allows you to specify a different RosterAbstract implementation. This might be useful for a customized roster storage, or extended roster content or in some cases for some custom logic for certain roster elements.
+
+*Available since:* 5.2.0
+

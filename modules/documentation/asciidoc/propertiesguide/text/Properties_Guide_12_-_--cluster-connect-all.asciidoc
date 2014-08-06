@@ -1,0 +1,21 @@
+[[clusterConnectAll]]
+--cluster-connect-all
+=====================
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2013-02-09 21:25
+
+*Default value:* +false+
+
+*Example:* +--cluster-connect-all = true+
+
+*Possible values:* +true|false+
+
+*Description:* The property is used to open active connections to all nodes
+listed in the --cluster-nodes configuration property. This property should be used only on the node which is added to the live cluster at later time. Normally this new cluster node is not listed in configuration of the existing cluster nodes. This is why they can not open connections the new node. The new node opens connection to all existing nodes instead. False is the default value and you can skip this option if you want to have it switched off.
+
+*Available since:* 4.3.0
+

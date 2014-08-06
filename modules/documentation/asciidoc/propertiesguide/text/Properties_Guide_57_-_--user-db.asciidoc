@@ -1,0 +1,20 @@
+[[userdb]]
+--user-db
+=========
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2013-02-10 01:45
+
+*Default value:* +mysql+
+
+*Example:* +--user-db = ldap+
+
+*Possible values:* 'UserRepository implementation class name or predefined string.'
+
+*Description:* The property allows to specify UserRepository implementation - a storage where all users' data are located. Users' data include contact list (roster), privacy lists, vCards, and similar. Everything except user authentication information. The implementation can be defined by one of possible values: +mysql, pgsql, xml+ or the class name. For SQL database this is normally: +tigase.db.jdbc.JDBCRepository+.
+
+*Available since:* 2.0.0
+

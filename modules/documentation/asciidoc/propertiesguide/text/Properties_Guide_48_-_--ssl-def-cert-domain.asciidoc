@@ -1,0 +1,20 @@
+[[sslDefCertDomain]]
+--ssl-def-cert-domain
+=====================
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2013-02-10 01:13
+
+*Default value:* +default+
+
+*Example:* +--ssl-def-cert-domain =+
+
+*Possible values:* 'DNS domain name.'
+
+*Description:* The property allows you to specify a default alias/domain name for certificate. It is mostly used to load certificate for unknown domain name during SSL negotiation. Unlike in TLS protocol, where the domain name is known at the handshaking time, for SSL domain name is not known, therefore, the server does not know which certificate to use. Specifying domain name in this property allows you to use certificate for specific domain in such case. This property value is also sometimes used if there is no certificate for one of virtual domains and the container does not automatically generate a self-signed certificate, then it can use the default one.
+
+*Available since:* 5.1.0
+

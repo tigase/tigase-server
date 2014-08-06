@@ -1,0 +1,20 @@
+[[cmHtTrafficThrottling]]
+--cm-ht-traffic-throttling
+==========================
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2013-02-09 21:38
+
+*Default value:* +xmpp:25k:0:disc,bin:200m:0:disc+
+
+*Example:* +--cm-ht-traffic-throttling = xmpp:25k:0:disc,bin:200m:0:disc+
+
+*Possible values:* 'comma separated list of traffic limits settings.'
+
+*Description:* The property is used to specify traffic limit of non-user connections, that is s2s, external components and other high traffic server connections. Meaning of the property and values encoded are in the same way as for the --cm-traffic-throttling property.
+
+*Available since:* 5.1.3
+

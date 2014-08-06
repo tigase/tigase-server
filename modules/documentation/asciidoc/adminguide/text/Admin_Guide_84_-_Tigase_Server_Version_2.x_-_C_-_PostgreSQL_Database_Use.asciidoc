@@ -1,0 +1,56 @@
+//[[postgresDB2]]
+PostgreSQL Database Use
+=======================
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net
+:Date: 2010-04-06 21:16
+
+This guide describes how to configure Tigase server to use link:http://www.postgresql.org/[PostgreSQL] database as user repository.
+
+If you used XML based user repository before you can copy all user data to PostgreSQL database using repository management tool. All steps are described below.
+
+PostgreSQL Database Preparation
+-------------------------------
+
+Create new database user account which will be used to connect to your database:
+
+[source,sh]
+-------------------------------------
+# createuser
+Enter name of user to add: tigase
+Shall the new user be allowed to create databases? (y/n) y
+Shall the new user be allowed to create more new users? (y/n) y
+-------------------------------------
+
+Now using new database user account create database for your service:
+
+[source,sh]
+-------------------------------------
+# createdb -U tigase tigasedb
+CREATE DATABASE
+-------------------------------------
+
+Now you can load link:http://server.tigase.org/browser/trunk/database/postgresql-schema.sql[database schema]:
+
+[source,sh]
+-------------------------------------
+# psql -U tigase -d tigasedb -f postgresql-schema.sql
+-------------------------------------
+
+Now database is ready for Tigase server to use it.
+
+Server Configuration
+--------------------
+
+Server configuration is identical as for MySQL database setup. The same jdbc module is used to connect to PostgreSQL database as for MySQL. The only difference is connection string which usually looks like:
+
+[source,bash]
+-------------------------------------
+jdbc:postgresql://localhost/tigasdb?user=tigase
+-------------------------------------
+
+So for more detailed guide how to change configuration refer to ////<<mysql2database,////MySQL database use guide or if you look for more automatic config file generation refer to ////<<3xconfiguration,////configuration wizards page.
+

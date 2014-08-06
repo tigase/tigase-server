@@ -1,0 +1,17 @@
+//[[5xServerConfig]]
+Server Configuration 5.x
+========================
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net
+:Date: 2010-01-06 20:22
+
+Collection of documents and guides for the Tigase server version 5.x and later.
+
+- ////<<confChanges5x,////Configuration Changes in the Tigase Server 5.x
+- ////<<amp0079,////Advanced Message Processing - AMP XEP-0079
+- ////<<saslExternal,////Configuration SASL EXTERNAL
+- ////<<s2sps,////Server to Server Protocol Settings
+

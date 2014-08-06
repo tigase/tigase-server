@@ -1,0 +1,20 @@
+//[[51schemaUpgeade]]
+Tigase 5.1 Database Schema Upgrade
+==================================
+Wojciech Kapcia <wojciech.kapcia@tigase.org>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net
+:Date: 2012-07-16 11:10
+
+Unfortunately we had to make a small change to the database schema for 5.1.0 version of the Tigase server.
+
+It does not affect data or data structure, only the way some data is accessed in database. We added one more stored procedure which has to be installed in database if you upgrade your installation from a previous Tigase version.
+
+Please follow detailed guide for the database applicable to your installation: ////<<derby,////Derby, ////<<mysql,////MySQL, ////<<postgresql,////PostgreSQL
+
+- ////<<derby,////Derby Database Schema Upgrade for Tigase 5.1
+- ////<<mysql,////MySQL Database Schema Upgrade for Tigase 5.1
+- ////<<postgresql,////PostgreSQL Database Schema Upgrade for Tigase 5.1
+

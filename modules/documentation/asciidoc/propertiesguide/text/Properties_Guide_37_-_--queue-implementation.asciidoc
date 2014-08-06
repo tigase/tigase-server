@@ -1,0 +1,27 @@
+[[queueImplementation]]
+--queue-implementation
+======================
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2013-02-09 23:16
+
+*Default value:* +tigase.util.PriorityQueueRelaxed+
+
+*Example:* +--queue-implementation = tigase.util.PriorityQueueStrict+
+
+*Possible values:* 'class name extending +tigase.util.PriorityQueueAbstract+.'
+
+*Description:* The property sets the Tigase internal queue implementation. You can choose between already available and ready to use or you can create own queue implementation and let the Tigase load it instead of the default one.
+Currently following queue implementations are available:
+
+. *tigase.util.PriorityQueueRelaxed* - specialized priority queue designed to efficiently handle very high load and prevent packets loss for higher priority queues. This means that sometimes, under the system overload packets may arrive out of order in cases when they could have been dropped. Packets loss (drops) can typically happen for the lowest priority packets (presences) under a very high load.
+. *tigase.util.PriorityQueueStrict* - specialized priority queue designed to efficiently handle very high load but prefers packet loss over packet reordering. It is suitable for systems with a very high load where the packets order is the critical to proper system functioning. It means that packets of the same priority with the same source and destination address are never reordered. Packets loss (drops) can typically happen for all packets with the same probability, depending which priority queue is overloaded.
+. *tigase.util.NonpriorityQueue* - specialized non-priority queue. All packets are stored in a single physical collection, hence they are never reordered. Packets are not prioritized, hence system critical packets may have to wait for low priority packets to be processed. This may impact the server functioning and performance in many cases. Therefore this queue type should be choosen very carefully. Packets of the same type are never reordered. Packets loss (drops) can typically happen for all packets which do not fit into the single queue.
+
+*Please note!* _Since the packets are processed by plugins in the SessionManager component and each plugin has own thread-pool with own queues packet reordering may happen regardless what queue type you set. The reordering may only happen, however between different packet types. That is 'message' may take over 'iq' packet or 'iq' packet may take over 'presence' packet and so on... This is unpredictable._
+
+*Available since:* 5.1.0
+

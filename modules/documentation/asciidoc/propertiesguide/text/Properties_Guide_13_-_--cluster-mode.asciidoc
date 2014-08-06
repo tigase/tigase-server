@@ -1,0 +1,20 @@
+[[clusterMode]]
+--cluster-mode
+==============
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2013-02-09 21:27
+
+*Default value:* +false+
+
+*Example:* +--cluster-mode = true+
+
+*Possible values:* +true|false+
+
+*Description:* The property is used to switch cluster mode on. The default value is 'false' so you can normally skip the parameter if you don't want the server to run in the cluster mode. You can run the server in the cluster mode even if there is only one node running. The performance impact is insignificant and you have the opportunity to connect mode cluster nodes at any time without restarting the server.
+
+*Available since:* 4.0.0
+

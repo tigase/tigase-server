@@ -1,0 +1,27 @@
+//[[commandLineTools2]]
+Command Line Admin Tools
+========================
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net
+:Date: 2010-04-06 21:16
+
+Two command line tools have been created to make it easier to manage server configuration and user repository.
+
+Configuration tool allows to look at configuration settings and modify parameters. It takes care about proper parameters types and encoding.
+
+Repository management tool allows to print repository content for all or for selected users. Modify repository data, add, delete users and copy data from one repository to another.
+
+This guide describe how to efficiently use command line tools which are available for user repository and configuration management.
+
+These 2 command line tools for managing configuration and repository are:
+
+. link:http://server.tigase.org/browser/trunk/scripts/config.sh[config.sh] for configuration management.
+. link:http://server.tigase.org/browser/trunk/scripts/repo.sh[repo.sh] for repository management.
+
+Both scripts call class from Tigase package. If you run any of those script with *-h* parameter you will get help screen describing all available parameters. 
+
+I will not concentrate on that help information which is easily accessible anyway. This guide will focus on particular use cases. So it will answer to questions: "How to do it with the tool?".
+

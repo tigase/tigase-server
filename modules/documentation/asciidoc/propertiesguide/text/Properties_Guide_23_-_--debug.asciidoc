@@ -1,0 +1,20 @@
+[[debug]]
+--debug
+=======
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2013-02-09 21:57
+
+*Default value:* 'none'
+
+*Example:* +--debug = server,xmpp.impl+
+
+*Possible values:* 'comma separated list of Tigase\'s package names.'
+
+*Description:* This property is used to turn on debugs log for selected tigase package. For example if you want to turn debug logs on for package: +tigase.server+ then you have to put parameter: +--debug server+. If you have any problems with your server the best way to get help from me is to generate configuration with '--debug = server' and run the server. Then from the +logs/tigase-console.log+ log file I can get all information I need to give you a help. More details about server logging and adjusting logging level is described in article Debugging Tigase.
+
+*Available since:* 2.0.0
+

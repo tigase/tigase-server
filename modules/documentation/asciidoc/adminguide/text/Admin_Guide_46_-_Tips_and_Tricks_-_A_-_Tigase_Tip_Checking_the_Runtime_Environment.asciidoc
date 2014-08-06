@@ -1,0 +1,48 @@
+//[[ttRuntimeEnvironment]]
+Tigase Tip: Checking the Runtime Environment
+============================================
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net
+:Date: 2010-01-06 20:22
+
+It has happened recently that we have tried very hard to fix a few annoying problems on one of the Tigase installations. Whatever we did, however the problems still existed after uploading a new version and the server restart. It worked fine in our development environment and it just didn't on the target system.
+
+It turned out that due to a specific environment settings on the target system an old version of the Tigase server was always started regardless updates we were uploading. When I finally started looking at the installation the first indication that something is wrong was lack of any log files in place where I expected them.
+
+The best way to check all the environment settings used to start the Tigase server is to use..... *check* command line parameter:
+
+[source,sh]
+-------------------------------------
+./scripts/tigase.sh check etc/tigase.conf
+Checking arguments to Tigase
+TIGASE_HOME = .
+TIGASE_JAR = jars/tigase-server.jar
+TIGASE_PARAMS = etc/tigase.conf
+TIGASE_CONFIG = etc/tigase.xml
+TIGASE_RUN = tigase.server.XMPPServer -c etc/tigase.xml --property-file etc/init.properties
+TIGASE_PID = ./logs/tigase.pid
+TIGASE_OPTIONS = --property-file etc/init.properties
+JAVA_OPTIONS = -Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8 \
+    -Djdbc.drivers=com.mysql.jdbc.Driver:org.postgresql.Driver \
+    -server -Xms100M -Xmx200M -XX:PermSize=32m -XX:MaxPermSize=256m
+JAVA = /System/Library/Frameworks/JavaVM.framework/Versions/1.6/Home/bin/java
+JAVA_CMD = 
+CLASSPATH = ./jars/tigase-server.jar:./libs/jdbc-mysql.jar:./libs/jdbc-postgresql.jar:\
+    ./libs/tigase-extras.jar:./libs/tigase-muc.jar:./libs/tigase-pubsub.jar:\
+    ./libs/tigase-utils.jar:./libs/tigase-xmltools.jar
+TIGASE_CMD = /System/Library/Frameworks/JavaVM.framework/Versions/1.6/Home/bin/java \
+    -Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8 \
+    -Djdbc.drivers=com.mysql.jdbc.Driver:org.postgresql.Driver \
+    -server -Xms100M -Xmx200M -XX:PermSize=32m -XX:MaxPermSize=256m \
+    -cp ./jars/tigase-server.jar:./libs/jdbc-mysql.jar:./libs/jdbc-postgresql.jar:\
+    ./libs/tigase-extras.jar:./libs/tigase-muc.jar:./libs/tigase-pubsub.jar:\
+    ./libs/tigase-utils.jar:./libs/tigase-xmltools.jar tigase.server.XMPPServer \
+    -c etc/tigase.xml --property-file etc/init.properties
+TIGASE_CONSOLE_LOG = ./logs/tigase-console.log
+-------------------------------------
+
+In our case *TIGASE_HOME* was set to a fixed location pointing to an old version of the server files. The quick *check* command may be a real time saver.
+

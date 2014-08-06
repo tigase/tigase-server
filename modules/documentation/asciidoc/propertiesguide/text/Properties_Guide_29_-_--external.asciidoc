@@ -1,0 +1,79 @@
+[[external]]
+--external
+==========
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2013-02-09 22:40
+
+*Default value:* 'none'
+
+*Example:* +--external = muc1.devel.tigase.org:passwd1:connect:5270:devel.tigase.org:accept:lb-class+
+
+*Possible values:* 'external domains parameters list.'
+
+*Description:* The property defines parameters for external component connections.
+
+The component is loaded the same way as all other Tigase components. In your +init.properties+ file you need to add 2 lines:
+
+[source,bash]
+------------------------------
+--comp-name-1 = ext
+--comp-class-1 = tigase.server.ext.ComponentProtocol
+------------------------------
+
+This will load the component with an empty configuration and is practically useless. You have to tell the component on what port to listen to (or on what port to connect to) and external domains list with passwords.
+
+As a value you have to put comma separated list of external domains settings. Each domain settings consist of a few, colon separated parameters. For example:
+
+[source,bash]
+------------------------------
+--external = muc1.devel.tigase.org:passwd1,muc2.devel.tigase.org:passwd2
+------------------------------
+
+This sets passwords for 2 external domains but does not say anything about port number or about connection. The above list is a simplified syntax. The full syntax looks like this:
+
+[source,bash]
+------------------------------
+--external = muc1.devel.tigase.org:passwd1:listen:5270
+------------------------------
+or
+[source,bash]
+------------------------------
+--external = muc1.devel.tigase.org:passwd1:connect:5270:\
+devel.tigase.org:accept:lb-class
+------------------------------
+
+Meaning of each colon separated part:
+
+. external component *domain*;
+. *password* for this domain;
+. *connection type* - 'listen' for incoming connections or 'connect' for the remote server;
+. *port number* for the TCP/IP connection (listening on or connecting to);
+. *remote hostname address(es)* - if the connection type is 'connect' then here should the remote hostname address to connect to can be skipped for 'listen' connection type; the first item on the list is always the remote domain name, if there are more entries, the rest is just addresses to connect to for this domain separated by semicolon (;)
+. *protocol* - if the connection type is 'connect' then here is protocol to use -  'accept' for XEP-0114, 'client' for XEP-0225, possible others in the future, can be skipped for 'listen' connection type;
+. *lb-class* - is a class name for load-balancer plugin. This is used only where there are multiple connections from the external component and you want to spread load among them. More details and examples are in this guide.
+
+Only 2 first parts are mandatory, the rest is optional. The simplified form is used to provide a list of domains:password elements for external components connections.
+
+The settings on the server side may most likely looks like this:
+
+[source,bash]
+------------------------------
+--external=muc1.devel.tigase.org:passwd1:listen:5270,\
+muc2.devel.tigase.org:passwd2,muc3.devel.tigase.org:passwd3
+------------------------------
+
+It specifies 3 domains with passwords and one TCP/IP port to listen to. On the other hand you can specify a configuration which would establish connection to the server:
+
+[source,bash]
+------------------------------
+--external = muc1.devel.tigase.org:passwd1:connect:5270:devel.tigase.org:accept
+------------------------------
+
+We use one of the domains configured on the server side, the same port number and the server address. (Assuming the main server works at devel.tigase.org address).
+
+*Available since:* 4.3.0
+

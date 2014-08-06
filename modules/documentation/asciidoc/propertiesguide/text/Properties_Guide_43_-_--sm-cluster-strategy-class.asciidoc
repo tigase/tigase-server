@@ -1,0 +1,20 @@
+[[smClusterStrategyClass]]
+--sm-cluster-strategy-class
+===========================
+Wojciech Kapcia <wojciech.kapcia@tigase.org>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2013-08-06 11:20
+
+*Default value:* +tigase.cluster.strategy.SMNonCachingAllNodes+
+
+*Example:* +--sm-cluster-strategy-class=tigase.cluster.strategy.SMNonCachingAllNodes+
+
+*Possible values:* 'any class implementing +tigase.cluster.strategy.ClusteringStrategyIfc+ interface.'
+
+*Description:* +--sm-cluster-strategy-class+ property allows specify Clustering Strategy class which should be used for handling clustering environment; by default +SMNonCachingAllNodes+ is used.
+
+*Available since:* 4.0.0
+

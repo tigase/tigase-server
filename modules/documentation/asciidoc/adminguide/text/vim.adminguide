@@ -1,0 +1,316 @@
+let SessionLoad = 1
+if &cp | set nocp | endif
+let s:cpo_save=&cpo
+set cpo&vim
+noremap! <silent> <S-F12> l:set cul!
+noremap! <silent> <F12> :set hlsearch!li
+noremap! <silent> <S-F11> :set list!li
+noremap! <silent> <F11> :set wrap!li
+noremap! <silent> <F10> :set spell!a
+noremap! <silent> <F9> l:ls>
+noremap! <S-F8> l:bp
+noremap! <F8> :bn
+map! <S-F6> mmg$x`ma
+map! <S-F5> mmg0xx`mhi
+map! <F5> mmg0i//`mllli
+map! <S-F4> mmg0xxxxg$xxx`mhhhi
+map! <F4> mmg0i<!--g$a-->`mllllli
+map! <S-F3> mm0xxg$xx`mhi
+map! <F3> mmg0i/*g$a*/`mllli
+map! <S-F2> mmg0x`mi
+map! <F2> mmg0i#`mlli
+map Q gq
+vmap [% [%m'gv``
+vmap ]% ]%m'gv``
+vmap a% [%v]%
+nmap gx <Plug>NetrwBrowseX
+nnoremap <silent> <Plug>NetrwBrowseX :call netrw#NetrwBrowseX(expand("<cWORD>"),0)
+nnoremap <silent> <S-F12> :set cul!
+nnoremap <silent> <F12> :set hlsearch!
+nnoremap <silent> <S-F11> :set list!
+nnoremap <silent> <F11> :set wrap!
+nnoremap <silent> <F10> :set spell!
+nnoremap <silent> <F9> :ls
+nnoremap <S-F8> :bp
+nnoremap <F8> :bn
+map <F7> a=strftime("%c")
+map <S-F6> mmg$x`ml
+map <S-F5> mmg0xx`mhh
+map <F5> mmg0i//`mll
+map <S-F4> mmg0xxxxg$xxx`mhhhh
+map <F4> mmg0i<!--g$a-->`mllll
+map <S-F3> mmg0xxg$xx`mhh
+map <F3> mmg0i/*g$a*/`mll
+map <S-F2> mmg0x`mh
+map <F2> mmg0i#`ml
+nnoremap <S-F1> :tabe ~/.vimrc
+nnoremap <F1> :tabe /a/lit/CheatSheet/card_VI\ Cheatsheet.txt
+nnoremap <M-Left> gT
+nnoremap <M-Right> gt
+let &cpo=s:cpo_save
+unlet s:cpo_save
+set background=dark
+set backspace=indent,eol,start
+set backup
+set dictionary=/home/lit/Wordlists/Dictionaries/Unabr.txt
+set directory=~/.vim/.cache
+set noequalalways
+set fileencodings=ucs-bom,utf-8,default,latin1
+set helplang=en
+set history=200
+set hlsearch
+set incsearch
+set iskeyword=@,48-57,_,192-255,-
+set laststatus=2
+set nomodeline
+set mouse=a
+set patchmode=.orig
+set printoptions=paper:letter
+set report=1
+set ruler
+set runtimepath=~/.vim,/var/lib/vim/addons,/usr/share/vim/vimfiles,/usr/share/vim/vim73,/usr/share/vim/vimfiles/after,/var/lib/vim/addons/after,~/.vim/after
+set scrolloff=3
+set shiftwidth=4
+set showcmd
+set sidescroll=50
+set smartcase
+set spelllang=en_us
+set splitbelow
+set splitright
+set statusline=%(%M%1*\ %)%*%{mode()}%1*\ %*%f%1*\ %*%(%R%1*\ %)%*%Y%1*\ %*%{&ff}%1*\ %*b%n\ %{bufnr('$')}%1*\ %*0x%B%1*\ %*%c%V%1*\ %*%l\ (%L)%1*\ %*%o%1*\ %*%{getfperm(expand(\"%\"))}%1*\ %*%=%{synIDattr(synID(line('.'),col('.'),1),'name')}%*\ %a%1*\ %*%{v:register}\ %{((exists(\"+bomb\")\ &&\ &bomb)?\"B,\":\"\")}
+set suffixes=.bak,~,.swp,.o,.info,.aux,.log,.dvi,.bbl,.blg,.brf,.cb,.ind,.idx,.ilg,.inx,.out,.toc
+set tabstop=4
+set thesaurus=/home/lit/Wordlists/thesaurus/mthes/roget13a.txt
+set notimeout
+set timeoutlen=100
+set ttimeout
+set visualbell
+set whichwrap=b,s,<,>,[,]
+set wildmenu
+set wildmode=longest,list
+set nowrapscan
+let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0
+let v:this_session=expand("<sfile>:p")
+silent only
+cd /home/documentation/adminguide/text
+if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
+  let s:wipebuf = bufnr('%')
+endif
+set shortmess=aoO
+badd +1 Admin\ Guide\ 01\ -\ Scripting\ Support\ in\ Tigase.txt
+badd +1 Admin\ Guide\ 02\ -\ Scripting\ Support\ in\ Tigase\ -\ A\ -\ Scripting\ Introduction\ -\ Hello\ World.txt
+badd +1 Admin\ Guide\ 03\ -\ Scripting\ Support\ in\ Tigase\ -\ B\ -\ Tigase\ Scripting\ Version\ 4.4.x\ Update\ for\ Administrators.txt
+badd +1 Admin\ Guide\ 04\ -\ Scripting\ Support\ in\ Tigase\ -\ C\ -\ Tigase\ and\ Python.txt
+badd +1 Admin\ Guide\ 05\ -\ About\ Tigase\ Jabber\ XMPP\ Server.txt
+badd +1 Admin\ Guide\ 06\ -\ Quick\ Start.txt
+badd +1 Admin\ Guide\ 07\ -\ Quick\ Start\ -\ A\ -\ Installation\ Using\ GUI\ Installer.txt
+badd +1 Admin\ Guide\ 08\ -\ Quick\ Start\ -\ B\ -\ Installing\ Using\ Console\ Installer.txt
+badd +1 Admin\ Guide\ 09\ -\ Quick\ Start\ -\ C\ -\ Manual\ Installation\ in\ Console\ Mode.txt
+badd +1 Admin\ Guide\ 10\ -\ Quick\ Start\ -\ D\ -\ Tigase\ Server\ Binary\ Updates.txt
+badd +1 Admin\ Guide\ 11\ -\ Tigase\ Server\ and\ Multiple\ Databases.txt
+badd +1 Admin\ Guide\ 12\ -\ Basic\ System\ Checks.txt
+badd +1 Admin\ Guide\ 13\ -\ Linux\ Settings\ for\ High\ Load\ Systems.txt
+badd +1 Admin\ Guide\ 14\ -\ Generic\ Documents.txt
+badd +1 Admin\ Guide\ 15\ -\ Generic\ Documents\ -\ A\ -\ Configuration.txt
+badd +1 Admin\ Guide\ 16\ -\ Generic\ Documents\ -\ A\ -\ Configuration\ -\ 1\ -\ Tigase\ XMPP\ Server\ Configuration\ Properties.txt
+badd +1 Admin\ Guide\ 17\ -\ Generic\ Documents\ -\ A\ -\ Configuration\ -\ 2\ -\ init.properties.txt
+badd +1 Admin\ Guide\ 18\ -\ Generic\ Documents\ -\ A\ -\ Configuration\ -\ 3\ -\ XML\ Configuration\ File\ Description.txt
+badd +1 Admin\ Guide\ 19\ -\ Generic\ Documents\ -\ A\ -\ Configuration\ -\ 4\ -\ Old\ Way\ -\ Editing\ Configuration\ File\ Manually.txt
+badd +1 Admin\ Guide\ 20\ -\ Generic\ Documents\ -\ A\ -\ Configuration\ -\ 5\ -\ Startup\ Files\ tigase.sh\ and\ tigase.conf.txt
+badd +1 Admin\ Guide\ 21\ -\ Generic\ Documents\ -\ B\ -\ Server\ Certificates.txt
+badd +1 Admin\ Guide\ 22\ -\ Generic\ Documents\ -\ B\ -\ Server\ Certificates\ -\ 1\ -\ Creating\ and\ Loading\ the\ Server\ Certificate\ in\ PEM\ Files.txt
+badd +1 Admin\ Guide\ 23\ -\ Generic\ Documents\ -\ B\ -\ Server\ Certificates\ -\ 2\ -\ Installing\ StartCom\ Certificate\ in\ your\ Linux\ System.txt
+badd +1 Admin\ Guide\ 24\ -\ Generic\ Documents\ -\ B\ -\ Server\ Certificates\ -\ 3\ -\ Server\ Certificate\ Using\ Keytool\ and\ Keystore.txt
+badd +1 Admin\ Guide\ 25\ -\ Generic\ Documents\ -\ C\ -\ Tigase\ and\ PyMSN-t\ Transport.txt
+badd +1 Admin\ Guide\ 26\ -\ Generic\ Documents\ -\ D\ -\ Two\ or\ more\ SessionManagers.txt
+badd +1 Admin\ Guide\ 27\ -\ Generic\ Documents\ -\ E\ -\ Database\ Preparation.txt
+badd +1 Admin\ Guide\ 28\ -\ Generic\ Documents\ -\ E\ -\ Database\ Preparation\ -\ 1\ -\ Prepare\ the\ MySQL\ Database\ for\ Tigase\ Server.txt
+badd +1 Admin\ Guide\ 29\ -\ Generic\ Documents\ -\ E\ -\ Database\ Preparation\ -\ 2\ -\ Hashed\ User\ Passwords\ in\ Database.txt
+badd +1 Admin\ Guide\ 30\ -\ Generic\ Documents\ -\ E\ -\ Database\ Preparation\ -\ 3\ -\ Prepare\ the\ Derby\ Database\ for\ Tigase\ Server.txt
+badd +1 Admin\ Guide\ 31\ -\ Generic\ Documents\ -\ E\ -\ Database\ Preparation\ -\ 4\ -\ Prepare\ the\ MS\ SQL\ Server\ Database\ for\ Tigase\ Server.txt
+badd +1 Admin\ Guide\ 32\ -\ Generic\ Documents\ -\ E\ -\ Database\ Preparation\ -\ 5\ -\ Prepare\ the\ PostgreSQL\ Database\ for\ Tigase\ Server.txt
+badd +1 Admin\ Guide\ 33\ -\ Generic\ Documents\ -\ F\ -\ Tigase\ Database\ Minor\ but\ Useful\ Schema\ Change\ in\ Version\ 5.1.0.txt
+badd +1 Admin\ Guide\ 34\ -\ Generic\ Documents\ -\ G\ -\ Tigase\ Load\ Balancing.txt
+badd +1 Admin\ Guide\ 35\ -\ Generic\ Documents\ -\ H\ -\ StanzaSender.txt
+badd +1 Admin\ Guide\ 36\ -\ Generic\ Documents\ -\ I\ -\ Debugging\ Tigase.txt
+badd +1 Admin\ Guide\ 37\ -\ Generic\ Documents\ -\ J\ -\ Importing\ User\ Data.txt
+badd +1 Admin\ Guide\ 38\ -\ Generic\ Documents\ -\ K\ -\ Drupal\ Authentication\ Added.txt
+badd +1 Admin\ Guide\ 39\ -\ Tigase\ Services.txt
+badd +1 Admin\ Guide\ 40\ -\ Tigase\ Services\ -\ A\ -\ Add\ and\ Manage\ Domain.txt
+badd +1 Admin\ Guide\ 41\ -\ Tigase\ Services\ -\ B\ -\ Presence\ Forwarding.txt
+badd +1 Admin\ Guide\ 42\ -\ Tigase\ Services\ -\ C\ -\ Register\ Own\ XMPP\ Domain.txt
+badd +1 Admin\ Guide\ 43\ -\ Server\ Monitoring.txt
+badd +1 Admin\ Guide\ 44\ -\ Server\ Monitoring\ -\ A\ -\ Setting\ up\ Remote\ Monitoring\ in\ the\ Server.txt
+badd +1 Admin\ Guide\ 45\ -\ Tips\ and\ Tricks.txt
+badd +1 Admin\ Guide\ 46\ -\ Tips\ and\ Tricks\ -\ A\ -\ Tigase\ Tip\ Checking\ the\ Runtime\ Environment.txt
+badd +1 Admin\ Guide\ 47\ -\ Tigase\ Server\ Version\ 5.x.txt
+badd +1 Admin\ Guide\ 48\ -\ Tigase\ Server\ Version\ 5.x\ -\ A\ -\ Tigase\ 5.1\ Database\ Schema\ Upgrade.txt
+badd +1 Admin\ Guide\ 49\ -\ Tigase\ Server\ Version\ 5.x\ -\ A\ -\ Tigase\ 5.1\ Database\ Schema\ Upgrade\ -\ 1\ -\ Derby\ Database\ Schema\ Upgrade\ for\ Tigase\ 5.1.txt
+badd +1 Admin\ Guide\ 50\ -\ Tigase\ Server\ Version\ 5.x\ -\ A\ -\ Tigase\ 5.1\ Database\ Schema\ Upgrade\ -\ 2\ -\ MySQL\ Database\ Schema\ Upgrade\ for\ Tigase\ 5.1.txt
+badd +1 Admin\ Guide\ 51\ -\ Tigase\ Server\ Version\ 5.x\ -\ A\ -\ Tigase\ 5.1\ Database\ Schema\ Upgrade\ -\ 3\ -\ PostgreSQL\ Database\ Schema\ Upgrade\ for\ Tigase\ 5.1.txt
+badd +1 Admin\ Guide\ 52\ -\ Tigase\ Server\ Version\ 5.x\ -\ B\ -\ Server\ Configuration\ 5.x.txt
+badd +1 Admin\ Guide\ 53\ -\ Tigase\ Server\ Version\ 5.x\ -\ B\ -\ Server\ Configuration\ 5.x\ -\ 1\ -\ Configuration\ Changes\ in\ Tigase\ Server\ 5.x.txt
+badd +1 Admin\ Guide\ 54\ -\ Tigase\ Server\ Version\ 5.x\ -\ B\ -\ Server\ Configuration\ 5.x\ -\ 2\ -\ Advanced\ Message\ Processing\ -\ AMP\ XEP-0079.txt
+badd +1 Admin\ Guide\ 55\ -\ Tigase\ Server\ Version\ 5.x\ -\ B\ -\ Server\ Configuration\ 5.x\ -\ 3\ -\ Configuration\ of\ SASL\ EXTERNAL.txt
+badd +1 Admin\ Guide\ 56\ -\ Tigase\ Server\ Version\ 5.x\ -\ B\ -\ Server\ Configuration\ 5.x\ -\ 4\ -\ Server\ to\ Server\ Protocol\ Settings.txt
+badd +1 Admin\ Guide\ 57\ -\ Tigase\ Server\ Version\ 4.x.txt
+badd +1 Admin\ Guide\ 58\ -\ Tigase\ Server\ Version\ 4.x\ -\ A\ -\ MySQL\ Database\ Schema\ Upgrade\ for\ Tigase\ 4.0.txt
+badd +1 Admin\ Guide\ 59\ -\ Tigase\ Server\ Version\ 4.x\ -\ B\ -\ Virtual\ Components\ for\ Cluster\ Mode.txt
+badd +1 Admin\ Guide\ 60\ -\ Tigase\ Server\ Version\ 4.x\ -\ C\ -\ External\ Component\ Configuration.txt
+badd +1 Admin\ Guide\ 61\ -\ Tigase\ Server\ Version\ 4.x\ -\ C\ -\ External\ Component\ Configuration\ -\ 1\ -\ Basic\ Configuration\ Options\ (external\ component).txt
+badd +1 Admin\ Guide\ 62\ -\ Tigase\ Server\ Version\ 4.x\ -\ C\ -\ External\ Component\ Configuration\ -\ 2\ -\ Tigase\ as\ an\ External\ Component.txt
+badd +1 Admin\ Guide\ 63\ -\ Tigase\ Server\ Version\ 4.x\ -\ C\ -\ External\ Component\ Configuration\ -\ 3\ -\ Load\ Balancing\ External\ Components\ in\ Cluster\ Mode.txt
+badd +1 Admin\ Guide\ 64\ -\ Tigase\ Server\ Version\ 4.x\ -\ D\ -\ Packet\ Filtering.txt
+badd +1 Admin\ Guide\ 65\ -\ Tigase\ Server\ Version\ 4.x\ -\ D\ -\ Packet\ Filtering\ -\ 1\ -\ Domain\ Based\ Packet\ Filtering.txt
+badd +1 Admin\ Guide\ 66\ -\ Tigase\ Server\ Version\ 4.x\ -\ E\ -\ Virtual\ Hosts\ in\ the\ Tigase\ Server.txt
+badd +1 Admin\ Guide\ 67\ -\ Tigase\ Server\ Version\ 4.x\ -\ E\ -\ Virtual\ Hosts\ in\ the\ Tigase\ Server\ -\ 1\ -\ Specification\ for\ ad-hoc\ Commands\ Used\ to\ Manage\ Virtual\ Domains.txt
+badd +1 Admin\ Guide\ 68\ -\ Tigase\ Server\ Version\ 4.x\ -\ F\ -\ Configuration.txt
+badd +1 Admin\ Guide\ 69\ -\ Tigase\ Server\ Version\ 4.x\ -\ F\ -\ Configuration\ -\ 1\ -\ Configuring\ Tigase\ Server\ to\ Load\ a\ Component.txt
+badd +1 Admin\ Guide\ 70\ -\ Tigase\ Server\ Version\ 4.x\ -\ F\ -\ Configuration\ -\ 2\ -\ Custom\ Authentication\ Connectors.txt
+badd +1 Admin\ Guide\ 71\ -\ Tigase\ Server\ Version\ 4.x\ -\ F\ -\ Configuration\ -\ 3\ -\ Tigase\ Custom\ Auth\ Connector.txt
+badd +1 Admin\ Guide\ 72\ -\ Tigase\ Server\ Version\ 4.x\ -\ F\ -\ Configuration\ -\ 4\ -\ LDAP\ Authentication\ Connector.txt
+badd +1 Admin\ Guide\ 73\ -\ Tigase\ Server\ Version\ 4.x\ -\ F\ -\ Configuration\ -\ 5\ -\ Tigase\ Auth\ Connector.txt
+badd +1 Admin\ Guide\ 74\ -\ Tigase\ Server\ Version\ 3.x.txt
+badd +1 Admin\ Guide\ 75\ -\ Tigase\ Server\ Version\ 3.x\ -\ A\ -\ Connecting\ Tigase\ Server\ to\ MySQL\ Database.txt
+badd +1 Admin\ Guide\ 76\ -\ Tigase\ Server\ Version\ 3.x\ -\ B\ -\ Integrating\ Tigase\ Server\ with\ Drupal.txt
+badd +1 Admin\ Guide\ 77\ -\ Tigase\ Server\ Version\ 3.x\ -\ C\ -\ Integrating\ Tigase\ Server\ with\ LibreSource.txt
+badd +1 Admin\ Guide\ 78\ -\ Tigase\ Server\ Version\ 3.x\ -\ D\ -\ Windows\ Installation.txt
+badd +1 Admin\ Guide\ 79\ -\ Tigase\ Server\ Version\ 3.x\ -\ E\ -\ Configuration.txt
+badd +1 Admin\ Guide\ 80\ -\ Tigase\ Server\ Version\ 3.x\ -\ E\ -\ Configuration\ -\ 1\ -\ Configuration\ Wizards.txt
+badd +1 Admin\ Guide\ 81\ -\ Tigase\ Server\ Version\ 2.x.txt
+badd +1 Admin\ Guide\ 82\ -\ Tigase\ Server\ Version\ 2.x\ -\ A\ -\ Installation.txt
+badd +1 Admin\ Guide\ 83\ -\ Tigase\ Server\ Version\ 2.x\ -\ B\ -\ MySQL\ Database\ Use.txt
+badd +1 Admin\ Guide\ 84\ -\ Tigase\ Server\ Version\ 2.x\ -\ C\ -\ PostgreSQL\ Database\ Use.txt
+badd +1 Admin\ Guide\ 85\ -\ Tigase\ Server\ Version\ 2.x\ -\ D\ -\ Configuration.txt
+badd +1 Admin\ Guide\ 86\ -\ Tigase\ Server\ Version\ 2.x\ -\ D\ -\ Configuration\ -\ 1\ -\ Short\ Configuration\ Guide.txt
+badd +1 Admin\ Guide\ 87\ -\ Tigase\ Server\ Version\ 2.x\ -\ E\ -\ Command\ Line\ Admin\ Tools.txt
+badd +1 Admin\ Guide\ 88\ -\ Tigase\ Server\ Version\ 2.x\ -\ E\ -\ Command\ Line\ Admin\ Tools\ -\ 1\ -\ Configuration\ Management\ Tool.txt
+badd +1 Admin\ Guide\ 89\ -\ Best\ Practices\ for\ Connecting\ From\ Web\ Browser\ to\ Tigase\ XMPP\ Server.txt
+args Admin\ Guide\ 01\ -\ Scripting\ Support\ in\ Tigase.txt Admin\ Guide\ 02\ -\ Scripting\ Support\ in\ Tigase\ -\ A\ -\ Scripting\ Introduction\ -\ Hello\ World.txt Admin\ Guide\ 03\ -\ Scripting\ Support\ in\ Tigase\ -\ B\ -\ Tigase\ Scripting\ Version\ 4.4.x\ Update\ for\ Administrators.txt Admin\ Guide\ 04\ -\ Scripting\ Support\ in\ Tigase\ -\ C\ -\ Tigase\ and\ Python.txt Admin\ Guide\ 05\ -\ About\ Tigase\ Jabber\ XMPP\ Server.txt Admin\ Guide\ 06\ -\ Quick\ Start.txt Admin\ Guide\ 07\ -\ Quick\ Start\ -\ A\ -\ Installation\ Using\ GUI\ Installer.txt Admin\ Guide\ 08\ -\ Quick\ Start\ -\ B\ -\ Installing\ Using\ Console\ Installer.txt Admin\ Guide\ 09\ -\ Quick\ Start\ -\ C\ -\ Manual\ Installation\ in\ Console\ Mode.txt Admin\ Guide\ 10\ -\ Quick\ Start\ -\ D\ -\ Tigase\ Server\ Binary\ Updates.txt Admin\ Guide\ 11\ -\ Tigase\ Server\ and\ Multiple\ Databases.txt Admin\ Guide\ 12\ -\ Basic\ System\ Checks.txt Admin\ Guide\ 13\ -\ Linux\ Settings\ for\ High\ Load\ Systems.txt Admin\ Guide\ 14\ -\ Generic\ Documents.txt Admin\ Guide\ 15\ -\ Generic\ Documents\ -\ A\ -\ Configuration.txt Admin\ Guide\ 16\ -\ Generic\ Documents\ -\ A\ -\ Configuration\ -\ 1\ -\ Tigase\ XMPP\ Server\ Configuration\ Properties.txt Admin\ Guide\ 17\ -\ Generic\ Documents\ -\ A\ -\ Configuration\ -\ 2\ -\ init.properties.txt Admin\ Guide\ 18\ -\ Generic\ Documents\ -\ A\ -\ Configuration\ -\ 3\ -\ XML\ Configuration\ File\ Description.txt Admin\ Guide\ 19\ -\ Generic\ Documents\ -\ A\ -\ Configuration\ -\ 4\ -\ Old\ Way\ -\ Editing\ Configuration\ File\ Manually.txt Admin\ Guide\ 20\ -\ Generic\ Documents\ -\ A\ -\ Configuration\ -\ 5\ -\ Startup\ Files\ tigase.sh\ and\ tigase.conf.txt Admin\ Guide\ 21\ -\ Generic\ Documents\ -\ B\ -\ Server\ Certificates.txt Admin\ Guide\ 22\ -\ Generic\ Documents\ -\ B\ -\ Server\ Certificates\ -\ 1\ -\ Creating\ and\ Loading\ the\ Server\ Certificate\ in\ PEM\ Files.txt Admin\ Guide\ 23\ -\ Generic\ Documents\ -\ B\ -\ Server\ Certificates\ -\ 2\ -\ Installing\ StartCom\ Certificate\ in\ your\ Linux\ System.txt Admin\ Guide\ 24\ -\ Generic\ Documents\ -\ B\ -\ Server\ Certificates\ -\ 3\ -\ Server\ Certificate\ Using\ Keytool\ and\ Keystore.txt Admin\ Guide\ 25\ -\ Generic\ Documents\ -\ C\ -\ Tigase\ and\ PyMSN-t\ Transport.txt Admin\ Guide\ 26\ -\ Generic\ Documents\ -\ D\ -\ Two\ or\ more\ SessionManagers.txt Admin\ Guide\ 27\ -\ Generic\ Documents\ -\ E\ -\ Database\ Preparation.txt Admin\ Guide\ 28\ -\ Generic\ Documents\ -\ E\ -\ Database\ Preparation\ -\ 1\ -\ Prepare\ the\ MySQL\ Database\ for\ Tigase\ Server.txt Admin\ Guide\ 29\ -\ Generic\ Documents\ -\ E\ -\ Database\ Preparation\ -\ 2\ -\ Hashed\ User\ Passwords\ in\ Database.txt Admin\ Guide\ 30\ -\ Generic\ Documents\ -\ E\ -\ Database\ Preparation\ -\ 3\ -\ Prepare\ the\ Derby\ Database\ for\ Tigase\ Server.txt Admin\ Guide\ 31\ -\ Generic\ Documents\ -\ E\ -\ Database\ Preparation\ -\ 4\ -\ Prepare\ the\ MS\ SQL\ Server\ Database\ for\ Tigase\ Server.txt Admin\ Guide\ 32\ -\ Generic\ Documents\ -\ E\ -\ Database\ Preparation\ -\ 5\ -\ Prepare\ the\ PostgreSQL\ Database\ for\ Tigase\ Server.txt Admin\ Guide\ 33\ -\ Generic\ Documents\ -\ F\ -\ Tigase\ Database\ Minor\ but\ Useful\ Schema\ Change\ in\ Version\ 5.1.0.txt Admin\ Guide\ 34\ -\ Generic\ Documents\ -\ G\ -\ Tigase\ Load\ Balancing.txt Admin\ Guide\ 35\ -\ Generic\ Documents\ -\ H\ -\ StanzaSender.txt Admin\ Guide\ 36\ -\ Generic\ Documents\ -\ I\ -\ Debugging\ Tigase.txt Admin\ Guide\ 37\ -\ Generic\ Documents\ -\ J\ -\ Importing\ User\ Data.txt Admin\ Guide\ 38\ -\ Generic\ Documents\ -\ K\ -\ Drupal\ Authentication\ Added.txt Admin\ Guide\ 39\ -\ Tigase\ Services.txt Admin\ Guide\ 40\ -\ Tigase\ Services\ -\ A\ -\ Add\ and\ Manage\ Domain.txt Admin\ Guide\ 41\ -\ Tigase\ Services\ -\ B\ -\ Presence\ Forwarding.txt Admin\ Guide\ 42\ -\ Tigase\ Services\ -\ C\ -\ Register\ Own\ XMPP\ Domain.txt Admin\ Guide\ 43\ -\ Server\ Monitoring.txt Admin\ Guide\ 44\ -\ Server\ Monitoring\ -\ A\ -\ Setting\ up\ Remote\ Monitoring\ in\ the\ Server.txt Admin\ Guide\ 45\ -\ Tips\ and\ Tricks.txt Admin\ Guide\ 46\ -\ Tips\ and\ Tricks\ -\ A\ -\ Tigase\ Tip\ Checking\ the\ Runtime\ Environment.txt Admin\ Guide\ 47\ -\ Tigase\ Server\ Version\ 5.x.txt Admin\ Guide\ 48\ -\ Tigase\ Server\ Version\ 5.x\ -\ A\ -\ Tigase\ 5.1\ Database\ Schema\ Upgrade.txt Admin\ Guide\ 49\ -\ Tigase\ Server\ Version\ 5.x\ -\ A\ -\ Tigase\ 5.1\ Database\ Schema\ Upgrade\ -\ 1\ -\ Derby\ Database\ Schema\ Upgrade\ for\ Tigase\ 5.1.txt Admin\ Guide\ 50\ -\ Tigase\ Server\ Version\ 5.x\ -\ A\ -\ Tigase\ 5.1\ Database\ Schema\ Upgrade\ -\ 2\ -\ MySQL\ Database\ Schema\ Upgrade\ for\ Tigase\ 5.1.txt Admin\ Guide\ 51\ -\ Tigase\ Server\ Version\ 5.x\ -\ A\ -\ Tigase\ 5.1\ Database\ Schema\ Upgrade\ -\ 3\ -\ PostgreSQL\ Database\ Schema\ Upgrade\ for\ Tigase\ 5.1.txt Admin\ Guide\ 52\ -\ Tigase\ Server\ Version\ 5.x\ -\ B\ -\ Server\ Configuration\ 5.x.txt Admin\ Guide\ 53\ -\ Tigase\ Server\ Version\ 5.x\ -\ B\ -\ Server\ Configuration\ 5.x\ -\ 1\ -\ Configuration\ Changes\ in\ Tigase\ Server\ 5.x.txt Admin\ Guide\ 54\ -\ Tigase\ Server\ Version\ 5.x\ -\ B\ -\ Server\ Configuration\ 5.x\ -\ 2\ -\ Advanced\ Message\ Processing\ -\ AMP\ XEP-0079.txt Admin\ Guide\ 55\ -\ Tigase\ Server\ Version\ 5.x\ -\ B\ -\ Server\ Configuration\ 5.x\ -\ 3\ -\ Configuration\ of\ SASL\ EXTERNAL.txt Admin\ Guide\ 56\ -\ Tigase\ Server\ Version\ 5.x\ -\ B\ -\ Server\ Configuration\ 5.x\ -\ 4\ -\ Server\ to\ Server\ Protocol\ Settings.txt Admin\ Guide\ 57\ -\ Tigase\ Server\ Version\ 4.x.txt Admin\ Guide\ 58\ -\ Tigase\ Server\ Version\ 4.x\ -\ A\ -\ MySQL\ Database\ Schema\ Upgrade\ for\ Tigase\ 4.0.txt Admin\ Guide\ 59\ -\ Tigase\ Server\ Version\ 4.x\ -\ B\ -\ Virtual\ Components\ for\ Cluster\ Mode.txt Admin\ Guide\ 60\ -\ Tigase\ Server\ Version\ 4.x\ -\ C\ -\ External\ Component\ Configuration.txt Admin\ Guide\ 61\ -\ Tigase\ Server\ Version\ 4.x\ -\ C\ -\ External\ Component\ Configuration\ -\ 1\ -\ Basic\ Configuration\ Options\ (external\ component).txt Admin\ Guide\ 62\ -\ Tigase\ Server\ Version\ 4.x\ -\ C\ -\ External\ Component\ Configuration\ -\ 2\ -\ Tigase\ as\ an\ External\ Component.txt Admin\ Guide\ 63\ -\ Tigase\ Server\ Version\ 4.x\ -\ C\ -\ External\ Component\ Configuration\ -\ 3\ -\ Load\ Balancing\ External\ Components\ in\ Cluster\ Mode.txt Admin\ Guide\ 64\ -\ Tigase\ Server\ Version\ 4.x\ -\ D\ -\ Packet\ Filtering.txt Admin\ Guide\ 65\ -\ Tigase\ Server\ Version\ 4.x\ -\ D\ -\ Packet\ Filtering\ -\ 1\ -\ Domain\ Based\ Packet\ Filtering.txt Admin\ Guide\ 66\ -\ Tigase\ Server\ Version\ 4.x\ -\ E\ -\ Virtual\ Hosts\ in\ the\ Tigase\ Server.txt Admin\ Guide\ 67\ -\ Tigase\ Server\ Version\ 4.x\ -\ E\ -\ Virtual\ Hosts\ in\ the\ Tigase\ Server\ -\ 1\ -\ Specification\ for\ ad-hoc\ Commands\ Used\ to\ Manage\ Virtual\ Domains.txt Admin\ Guide\ 68\ -\ Tigase\ Server\ Version\ 4.x\ -\ F\ -\ Configuration.txt Admin\ Guide\ 69\ -\ Tigase\ Server\ Version\ 4.x\ -\ F\ -\ Configuration\ -\ 1\ -\ Configuring\ Tigase\ Server\ to\ Load\ a\ Component.txt Admin\ Guide\ 70\ -\ Tigase\ Server\ Version\ 4.x\ -\ F\ -\ Configuration\ -\ 2\ -\ Custom\ Authentication\ Connectors.txt Admin\ Guide\ 71\ -\ Tigase\ Server\ Version\ 4.x\ -\ F\ -\ Configuration\ -\ 3\ -\ Tigase\ Custom\ Auth\ Connector.txt Admin\ Guide\ 72\ -\ Tigase\ Server\ Version\ 4.x\ -\ F\ -\ Configuration\ -\ 4\ -\ LDAP\ Authentication\ Connector.txt Admin\ Guide\ 73\ -\ Tigase\ Server\ Version\ 4.x\ -\ F\ -\ Configuration\ -\ 5\ -\ Tigase\ Auth\ Connector.txt Admin\ Guide\ 74\ -\ Tigase\ Server\ Version\ 3.x.txt Admin\ Guide\ 75\ -\ Tigase\ Server\ Version\ 3.x\ -\ A\ -\ Connecting\ Tigase\ Server\ to\ MySQL\ Database.txt Admin\ Guide\ 76\ -\ Tigase\ Server\ Version\ 3.x\ -\ B\ -\ Integrating\ Tigase\ Server\ with\ Drupal.txt Admin\ Guide\ 77\ -\ Tigase\ Server\ Version\ 3.x\ -\ C\ -\ Integrating\ Tigase\ Server\ with\ LibreSource.txt Admin\ Guide\ 78\ -\ Tigase\ Server\ Version\ 3.x\ -\ D\ -\ Windows\ Installation.txt Admin\ Guide\ 79\ -\ Tigase\ Server\ Version\ 3.x\ -\ E\ -\ Configuration.txt Admin\ Guide\ 80\ -\ Tigase\ Server\ Version\ 3.x\ -\ E\ -\ Configuration\ -\ 1\ -\ Configuration\ Wizards.txt Admin\ Guide\ 81\ -\ Tigase\ Server\ Version\ 2.x.txt Admin\ Guide\ 82\ -\ Tigase\ Server\ Version\ 2.x\ -\ A\ -\ Installation.txt Admin\ Guide\ 83\ -\ Tigase\ Server\ Version\ 2.x\ -\ B\ -\ MySQL\ Database\ Use.txt Admin\ Guide\ 84\ -\ Tigase\ Server\ Version\ 2.x\ -\ C\ -\ PostgreSQL\ Database\ Use.txt Admin\ Guide\ 85\ -\ Tigase\ Server\ Version\ 2.x\ -\ D\ -\ Configuration.txt Admin\ Guide\ 86\ -\ Tigase\ Server\ Version\ 2.x\ -\ D\ -\ Configuration\ -\ 1\ -\ Short\ Configuration\ Guide.txt Admin\ Guide\ 87\ -\ Tigase\ Server\ Version\ 2.x\ -\ E\ -\ Command\ Line\ Admin\ Tools.txt Admin\ Guide\ 88\ -\ Tigase\ Server\ Version\ 2.x\ -\ E\ -\ Command\ Line\ Admin\ Tools\ -\ 1\ -\ Configuration\ Management\ Tool.txt Admin\ Guide\ 89\ -\ Best\ Practices\ for\ Connecting\ From\ Web\ Browser\ to\ Tigase\ XMPP\ Server.txt
+edit Admin\ Guide\ 88\ -\ Tigase\ Server\ Version\ 2.x\ -\ E\ -\ Command\ Line\ Admin\ Tools\ -\ 1\ -\ Configuration\ Management\ Tool.txt
+set splitbelow splitright
+wincmd t
+set winheight=1 winwidth=1
+argglobal
+89argu
+edit Admin\ Guide\ 88\ -\ Tigase\ Server\ Version\ 2.x\ -\ E\ -\ Command\ Line\ Admin\ Tools\ -\ 1\ -\ Configuration\ Management\ Tool.txt
+setlocal keymap=
+setlocal noarabic
+setlocal noautoindent
+setlocal nobinary
+setlocal bufhidden=
+setlocal buflisted
+setlocal buftype=
+setlocal nocindent
+setlocal cinkeys=0{,0},0),:,0#,!^F,o,O,e
+setlocal cinoptions=
+setlocal cinwords=if,else,while,do,for,switch
+setlocal colorcolumn=
+setlocal comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-
+setlocal commentstring=/*%s*/
+setlocal complete=.,w,b,u,t,i
+setlocal concealcursor=
+setlocal conceallevel=0
+setlocal completefunc=
+setlocal nocopyindent
+setlocal cryptmethod=
+setlocal nocursorbind
+setlocal nocursorcolumn
+setlocal nocursorline
+setlocal define=
+setlocal dictionary=
+setlocal nodiff
+setlocal equalprg=
+setlocal errorformat=
+setlocal noexpandtab
+if &filetype != 'text'
+setlocal filetype=text
+endif
+setlocal foldcolumn=0
+setlocal foldenable
+setlocal foldexpr=0
+setlocal foldignore=#
+setlocal foldlevel=0
+setlocal foldmarker={{{,}}}
+setlocal foldmethod=manual
+setlocal foldminlines=1
+setlocal foldnestmax=20
+setlocal foldtext=foldtext()
+setlocal formatexpr=
+setlocal formatoptions=tcq
+setlocal formatlistpat=^\\s*\\d\\+[\\]:.)}\\t\ ]\\s*
+setlocal grepprg=
+setlocal iminsert=0
+setlocal imsearch=0
+setlocal include=
+setlocal includeexpr=
+setlocal indentexpr=
+setlocal indentkeys=0{,0},:,0#,!^F,o,O,e
+setlocal noinfercase
+setlocal iskeyword=@,48-57,_,192-255,-
+setlocal keywordprg=
+setlocal nolinebreak
+setlocal nolisp
+setlocal nolist
+setlocal makeprg=
+setlocal matchpairs=(:),{:},[:]
+setlocal nomodeline
+setlocal modifiable
+setlocal nrformats=octal,hex
+setlocal nonumber
+setlocal numberwidth=4
+setlocal omnifunc=
+setlocal path=
+setlocal nopreserveindent
+setlocal nopreviewwindow
+setlocal quoteescape=\\
+setlocal noreadonly
+setlocal norelativenumber
+setlocal norightleft
+setlocal rightleftcmd=search
+setlocal noscrollbind
+setlocal shiftwidth=4
+setlocal noshortname
+setlocal nosmartindent
+setlocal softtabstop=0
+setlocal nospell
+setlocal spellcapcheck=[.?!]\\_[\\])'\"\	\ ]\\+
+setlocal spellfile=
+setlocal spelllang=en_us
+setlocal statusline=
+setlocal suffixesadd=
+setlocal swapfile
+setlocal synmaxcol=3000
+if &syntax != 'text'
+setlocal syntax=text
+endif
+setlocal tabstop=4
+setlocal tags=
+setlocal textwidth=0
+setlocal thesaurus=
+setlocal noundofile
+setlocal nowinfixheight
+setlocal nowinfixwidth
+setlocal wrap
+setlocal wrapmargin=0
+silent! normal! zE
+let s:l = 1 - ((0 * winheight(0) + 26) / 52)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+1
+normal! 0
+tabnext 1
+if exists('s:wipebuf')
+  silent exe 'bwipe ' . s:wipebuf
+endif
+unlet! s:wipebuf
+set winheight=1 winwidth=20 shortmess=filnxtToO
+let s:sx = expand("<sfile>:p:r")."x.vim"
+if file_readable(s:sx)
+  exe "source " . fnameescape(s:sx)
+endif
+let &so = s:so_save | let &siso = s:siso_save
+doautoall SessionLoadPost
+unlet SessionLoad
+" vim: set ft=vim :

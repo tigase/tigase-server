@@ -1,0 +1,17 @@
+Tigase Test Suite
+=================
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2010-04-06 21:22
+
+Tigase Test Suite is an engine which allows you to run tests. Essentially it just executes *TestCase* implementations. The tests may depend on other tests which means they are executed in specific order. For example authentication test is executed after the stream open test which in turn is executed after network socket connection test.
+
+The tests may have parameters. Each *TestCase* implementation may have it's own set of specific parameters. There is a set of common parameters which may be applied to any *TestCase*. As an example of the common parameter you can take *-loop = 10* which specified that the *TestCase* must be execited 10 times. The test specific parameter might be *-user-name = tester* which may set the user name for authentication test.
+
+The engine is very generic and allows you to write any kind of tests but for the Tigase projects the current TestCase implementations mimic an XMPP client and are designed to test XMPP servers.
+
+The suite contains also kind of scripting language which allows you to combine test cases into a test scenarios. The test scenario may contain full set of functional tests for example, another test scenario may contain performance tests and so on.
+

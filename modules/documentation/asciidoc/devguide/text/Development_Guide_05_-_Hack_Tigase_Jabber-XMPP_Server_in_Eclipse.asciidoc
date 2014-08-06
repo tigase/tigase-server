@@ -1,0 +1,54 @@
+Hack Tigase Jabber/XMPP Server in Eclipse
+=========================================
+Bartosz Malkowski <bmalkowski@tigase.pl>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2010-04-06 21:22
+
+link:files/tigase-server.psf[tigase-server.psf  424 bytes]
+
+link:files/eclipse-config.tar_.gz[eclipse-config.tar_.gz  1.01 KB]
+
+
+If you want to write a code for *Tigase* server you might want to use link:http://www.eclipse.org/[Eclipse]. Here is a guide how to start working on source code using this IDE.
+
+All you need to start is:
+
+. Installed and working copy of link:http://www.eclipse.org/[Eclipse]
+. Installed and working copy of link:http://java.sun.com/javase/downloads/ea.jsp[JDK-1.6.0Beta2] at least.
+. Installed and working link:http://subclipse.tigris.org/[Subclipse] pluggin for Eclipse.
+
+
+JDK-1.6.0 Setup
+---------------
+After installation JDK-1.6.0 in your operating system, run Eclipse and select  Window/Preferences.
+
+image:images/preferences-jre.png[]
+
+In section Java/Installed JREs press *Add* button. In the new opened window enter path to installed JDK-6. In my case it is */opt/jdk1.6.0*. It also good to set name to *sun-jdk-1.6.0*.
+
+image:images/preferences-jre-add.png[]
+
+Subclipse Installation
+----------------------
+As Eclipse doesn't contain built-in support for Subversion repositories you have to add new plugin.  Detailed instruction for Subclipse installation is on page:
+
+link:http://subclipse.tigris.org/install.html[subclipse.tigris.org/install.html].
+
+Project Import
+--------------
+From menu File in Eclipse execute *Import*. Next, highlight section *Team/Team
+Project Set* and press *Next*.
+
+image:images/import-project.png[]
+
+Enter file name *tigase-server.psf* in field *File* and press *Finish*.
+
+The file is attached to this article.
+
+Because link:http://www.tigase.net/user/1[kobit] has objections to add Eclipse configuration files to subversion repository you have to do it on your own.
+
+That's it. Start hacking now!
+

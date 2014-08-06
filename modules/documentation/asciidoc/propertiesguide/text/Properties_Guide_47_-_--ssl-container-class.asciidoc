@@ -1,0 +1,20 @@
+[[sslContainerClass]]
+--ssl-container-class
+=====================
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2013-02-10 01:11
+
+*Default value:* +tigase.io.SSLContextContainer+
+
+*Example:* +--ssl-container-class =+
+
+*Possible values:* a class implementing tigase.io.SSLContectContainerIfc.
+
+*Description:* The property allows you to specify a class implementing storage for SSL/TLS certificates. The class presented in the example to this description allows for loading certificates from PEM files which is a common storage used on many systems.
+
+*Available since:* 5.0.0
+

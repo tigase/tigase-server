@@ -1,0 +1,69 @@
+//[[domainBasedPacketFiltering]]
+Domain Based Packet Filtering
+=============================
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net
+:Date: 2010-04-06 21:18
+
+Domain based packets filter is a simple filter allowing to restrict user communication based on the source/destination domain name. This is especially useful if we want to limit user communication within a single - own domain only or a list of domains.
+
+A company might not wish and allow employers to chat during work hours with anybody in the world. A company may also have a few different domains used by different branches or departments. An administrator may restrict communication to a list of domains.
+
+Introduction
+------------
+
+The restriction is on per-user basis. So the administrator can set a different filtering rules for each user. This does make sense sometimes. Perhaps we want to allow sales talk with anybody while programmers should not talk to anybody outside company? Brrrr..., not nice scenario but possible.
+
+In anyway the user himself can not change the setting. So this is not like a privacy list where the user control the filter. Domain filter can not be changed or controlled by the user. System administrator can change the settings based on the company policy.
+
+There are 4 simple rules for packet filtering:
+
+. *ALL* - the user can send and receive packets from anybody.
+. *LOCAL* - the user can send and receive packets within the server installation only and all it's virtual domains.
+. *OWN* - the user can send and receive packets within his own domains only
+. *LIST* - the user can send and receive packets within listed domains only. There is actually no rule *LIST.* There are only the first 3 rules listed above. If the database contains none of the above 3 but it contains some string it is assumed this string contains comma separated list of allowed domains. Then *LIST* rule is applied.
+
+Those rules are stored in the user repository and are loaded for each user session. If there are no rules stored for a particular user the server applies defaults based on following criteria:
+
+. If this is *Anonymous* user then *LOCAL* rule is applied
+. For all *other* users *ALL* rule is applied.
+
+Configuration
+-------------
+
+Filtering is performed by domain filter plugin which must be loaded at startup time. It is loaded by default if plugins list is not set in the configuration file. However if you have a list of loaded plugins in the configuration file make sure *domain-filter* is on the list.
+
+There is no other configuration required for the plugin to work.
+
+Administration, Rules Management
+--------------------------------
+
+Although controlling domain filtering rules are possible for each user separately it is normally not practical for large installations. In most cases users are stored in the database and third-party system keeps all the user information.
+
+To change the rule for a single user you can use loadable link:http://www.tigase.org/content/extensibility-extended[administration scripts] feature and load link:https://svn.tigase.org/reps/tigase-server/trunk/src/main/groovy/tigase/admin/UserDomainFilter.groovy[UserDomainFilter.groovy] script. It allows to modify rules for a given user id.
+
+Implementation
+--------------
+
+If you have a third party system which keeps and manages all user information than you probably have your own UserRepository implementation which allows the Tigase server to access user data. Filtering rules are loaded from user repository using following command:
+
+[source,java]
+-------------------------------------
+repo.getData(user_id, null, DomainFilter.ALLOWED_DOMAINS_KEY, null)
+-------------------------------------
+
+Where *user_id* is user Jabber ID without resource part. *DomainFilter.ALLOWED_DOMAINS_KEY* is a property key: "allowed-domains". The user repository MUST return one of following only:
+
+. *ALL* - if the user is allowed to communicate with anybody
+. *LOCAL* - if the user is allowed to communicate with users on the same server installation.
+. *OWN* - if the user is allowed to communicate with users within his own domain only.
+. Comma separated list of domains within which the user is allowed to communicate with other users: *domain1.example.com,domain2.example.net,domain3.example.org.* No wild-cards are supported. Don't forget to put there user's own domain too.
+. *null* - a java null if there are no settings for the user.
+
+Please note, an empty string would block communication for the user completely.
+
+The filtering is performed by *tigase.xmpp.impl.DomainFilter* plugin. Please refer to source code for more implementation details.
+

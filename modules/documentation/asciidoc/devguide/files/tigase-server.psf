@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<psf version="2.0">
+	<provider id="org.tigris.subversion.subclipse.core.svnnature">
+		<project reference="0.9.3,https://svn.tigase.org/reps/tigase-server/trunk,tigase-server"/>
+		<project reference="0.9.3,https://svn.tigase.org/reps/tigase-utils/trunk,tigase-utils"/>
+		<project reference="0.9.3,https://svn.tigase.org/reps/tigase-xmltools/trunk,tigase-xmltools"/>
+	</provider>
+</psf>

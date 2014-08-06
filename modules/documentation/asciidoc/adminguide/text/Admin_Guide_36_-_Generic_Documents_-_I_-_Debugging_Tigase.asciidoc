@@ -1,0 +1,116 @@
+//[[genericDebuggingTigase]]
+Debuging Tigase
+===============
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net
+:Date: 2010-04-06 21:18
+
+If something goes wrong and you can't find out why it is not working as you expect you might want more detailed debugging options switched on.
+
+Tigase is a Java application and it uses Java logging library this gives you flexibility to switch logging on for selected java package or even for a single Java class.
+
+Logs files are stored in +logs/+ directory. +tigase-console.log+ keeps all the data but only basic logs. +tigase.log.N+ files keep all the detailed logging entries. So this is the place where you should look in case of problems.
+
+The easy way - init.properties file
+-----------------------------------
+
+The easiest way to change logging for the Tigase package is modifying in +init.properies+ following line:
+
+[source,bash]
+-------------------------------------
+--debug=server
+-------------------------------------
+
+The line above says: "_Switch on ALL debug messages for packet: tigase.server_". The +tigase.server+ packet keeps all component's classes. So it allows you to monitor what is going on in each component. What packets it receives and what it is sending out.
+
+Usually people want to see what is going on the network level. That is what has been sent and what has been received by the server - the actual character data. The class which would print all received and sent character data is: +tigase.xmpp.XMPPIOService+. To enable all debugging info for this class you have to modify the debug line:
+
+[source,bash]
+-------------------------------------
+--debug=xmpp.XMPPIOService
+-------------------------------------
+
+_Note, you skip the tigase. part._
+
+You can also have debugging switched on for many packages/classes at the same time:
+
+[source,bash]
+-------------------------------------
+--debug=server,xmpp.XMPPIOService
+-------------------------------------
+
+Other packages you might be interested in are:
+
+- +tiagse.io+ and +tigase.net+ which can print out what is going on a very low level network level including TLS/SSL stuff.
+- +tigase.xml+ would print the XML parser debugging data.
+- +tigase.cluster+ would print all the clustering related stuff. So if you have clustered installation you might be interested in debug settings:
++
+[source,bash]
+-------------------------------------
+--debug=server,cluster
+-------------------------------------
+- +tigase.xmpp.impl+ would print logs from all plugins loaded to the Tigase server.
+
+and so on...
+
+This method, however has 2 main disadvantages:
+
+. You have to remove your XML config file and regenerate it which might be inconvenient. (only applicable to versions before 5.0.0)
+. You can't set logging this way for classes and packages other than tigase. package. And this might be a problem if you include your own code in and load it into the server.
+
+To enable logging for your own packages from packages different than tigase. you have to use another option which has been made available for this:
+
+[source,bash]
+-------------------------------------
+--debug-packages = your.com.package
+-------------------------------------
+
+You can also specify more parameters for the Tigase logging mechanisms like the file size, number of file rotated and location where all Tigase logs are stored. You have to include following lines in the +init.properties+ file:
+
+[source,bash]
+-------------------------------------
+basic-conf/logging/java.util.logging.FileHandler.limit=100000000
+basic-conf/logging/java.util.logging.FileHandler.count=20
+basic-conf/logging/java.util.logging.FileHandler.pattern=/var/log/tigase/tigase.log
+-------------------------------------
+
+The more difficult but more powerful - tigase.xml file (only applicable to versions before 5.0.0)
+-------------------------------------------------------------------------------------------------
+
+If you want to modify debugging settings without regenerating the whole XML config file you can modify it yourself manually and add debug entries. This must be done very carefully or you break the XML file and configuration won't work.
+
+Anyway. Open the XML config file with some good text editor (or XML editor) and find the line:
+
+[source,bash]
+-------------------------------------
+<node name="logging">
+-------------------------------------
+
+Below is a long list of all logging settings. One of them is:
+
+[source,bash]
+-------------------------------------
+<entry value="INFO" type="String" key=".level"/>
+-------------------------------------
+
+Which says: +INFO+ debug level for all the code. This level gives you very little debugging information. Therefore for example your +init.properties+ line +--debug=server+ adds one extra line in there:
+
+[source,bash]
+-------------------------------------
+<entry value="ALL" type="String" key="tigase.server.level"/>
+-------------------------------------
+
+I think now everything should be clear. You need to add a similar line changing only "key" attribute. If you need to switch logging on for a specific class - +tigase.xmpp.XMPPIOService+ for example, add:
+
+[source,bash]
+-------------------------------------
+<entry value="ALL" type="String" key="tigase.xmpp.XMPPIOService.level"/>
+-------------------------------------
+
+You can also put there your own package or class name. After you changed the config file you have to restart the server.
+
+_Note, don't overdose the debugging or your logs are full of trash you can read._
+

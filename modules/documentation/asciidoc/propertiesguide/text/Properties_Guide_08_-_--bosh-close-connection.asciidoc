@@ -1,0 +1,22 @@
+[[boshCloseConnection]]
+--bosh-close-connection
+=======================
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2013-03-20 00:51
+
+*Default value:* +false+
+
+*Example:* +--bosh-close-connection = true+
+
+*Possible values:* +true|false+
+
+*Description:* The property globally disables Bosh keep-alive support for the Tigase server. It causes the Bosh connection manager to force closed HTTP connection each time data is sent to the Bosh client. To continue communication the client must open a new HTTP connection.
+
+This setting is rarely required on some installations where the client cannot control/disable keep-alive Bosh connections and keep-alive does not work correctly for some reason.
+
+*Available since:* 5.1.0
+

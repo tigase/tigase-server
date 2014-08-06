@@ -1,0 +1,20 @@
+[[scriptDir]]
+--script-dir
+============
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2013-02-10 01:01
+
+*Default value:* +scripts/admin+
+
+*Example:* +--script-dir = /opt/admin-scripts+
+
+*Possible values:* 'path to a directory on the filesystem.'
+
+*Description:* The property sets the directory where all administrator scripts for ad-hoc command are stored.
+
+*Available since:* 4.3.0
+

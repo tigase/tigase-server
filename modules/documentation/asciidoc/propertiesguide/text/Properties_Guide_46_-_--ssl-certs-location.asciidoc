@@ -1,0 +1,20 @@
+[[sslCertsLocation]]
+--ssl-certs-location
+====================
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2013-02-10 01:11
+
+*Default value:* +certs/+
+
+*Example:* +--ssl-certs-location = /etc/vhost-certs+
+
+*Possible values:* 'location of SSL certificates directory on the filesystem.'
+
+*Description:* The option allows you to specify location where SSL certificates are stored. Meaning of this property depends on the SSL container <sslContainerClass,class implementation>>. By default it just points to the directory where the server SSL certificates are stored in files in PEM format.
+
+*Available since:* 5.1.0
+

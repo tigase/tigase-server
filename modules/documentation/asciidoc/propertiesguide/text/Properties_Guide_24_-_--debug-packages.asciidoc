@@ -1,0 +1,20 @@
+[[debugPackages]]
+--debug-packages
+================
+Artur Hefczyc <artur.hefczyc@tigase.net>
+v2.0, June 2014: Reformatted for AsciiDoc.
+:toc:
+:numbered:
+:website: http://tigase.net/
+:Date: 2013-02-09 22:00
+
+*Default value:* 'none'
+
+*Example:* +--debug-packages = com.company.CustomPlugin,com.company.custom+
+
+*Possible values:* 'comma separated list of java packages or classes.'
+
+*Description:* The property is used to turn debugging on for any package not necessarily within tigase packages.
+
+*Available since:* 5.0.0
+
