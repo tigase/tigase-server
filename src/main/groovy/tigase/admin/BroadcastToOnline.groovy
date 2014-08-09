@@ -28,6 +28,7 @@ http://xmpp.org/extensions/xep-0133.html#announce
 AS:Description: Send Announcement to Online Users
 AS:CommandId: http://jabber.org/protocol/admin#announce
 AS:Component: sess-man
+AS:Group: Notifications
 */
 
 package tigase.admin

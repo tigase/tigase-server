@@ -27,6 +27,7 @@
  AS:Description: Add user
  AS:CommandId: http://jabber.org/protocol/admin#add-user
  AS:Component: sess-man
+ AS:Group: Users
  */
 
 package tigase.admin

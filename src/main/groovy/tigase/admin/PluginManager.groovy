@@ -27,6 +27,7 @@ Manage active server plugins
 AS:Description: Manage active server plugins
 AS:CommandId: plugin-manager
 AS:Component: basic-conf
+AS:Group: Configuration
  */
 
 package tigase.admin

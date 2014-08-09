@@ -25,6 +25,7 @@
  AS:Description: Get top active users
  AS:CommandId: http://jabber.org/protocol/admin#get-top-active-users
  AS:Component: sess-man
+ AS:Group: Statistics
  */
 
 package tigase.admin

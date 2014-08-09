@@ -27,6 +27,7 @@
  AS:Description: Get registered user list
  AS:CommandId: http://jabber.org/protocol/admin#get-registered-users-list
  AS:Component: sess-man
+ AS:Group: Users
  */
 
 package tigase.admin

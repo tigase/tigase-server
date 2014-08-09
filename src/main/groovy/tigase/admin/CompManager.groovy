@@ -27,6 +27,7 @@ Manage active server components
 AS:Description: Manage active server components
 AS:CommandId: comp-manager
 AS:Component: basic-conf
+AS:Group: Configuration
  */
 
 package tigase.admin

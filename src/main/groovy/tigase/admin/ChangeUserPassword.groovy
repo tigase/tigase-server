@@ -26,6 +26,7 @@
  AS:Description: Change user password
  AS:CommandId: http://jabber.org/protocol/admin#change-user-password
  AS:Component: sess-man
+ AS:Group: Users
  */
 
 package tigase.admin

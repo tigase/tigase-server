@@ -26,6 +26,7 @@
  AS:Description: Get User Statistics
  AS:CommandId: http://jabber.org/protocol/admin#user-stats
  AS:Component: sess-man
+ AS:Group: Statistics
  */
 
 package tigase.admin

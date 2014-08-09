@@ -27,6 +27,7 @@
  AS:Description: Get list of online users
  AS:CommandId: http://jabber.org/protocol/admin#get-online-users-list
  AS:Component: sess-man
+ AS:Group: Statistics
  */
 
 package tigase.admin

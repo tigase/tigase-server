@@ -26,6 +26,7 @@
  AS:Description: Delete user
  AS:CommandId: http://jabber.org/protocol/admin#delete-user
  AS:Component: sess-man
+ AS:Group: Users
  */
 
 package tigase.admin

@@ -27,6 +27,7 @@ List server/component configuration
 AS:Description: List server/component configuration
 AS:CommandId: config-list
 AS:Component: basic-conf
+AS:Group: Configuration
 */
 
 package tigase.admin

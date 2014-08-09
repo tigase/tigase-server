@@ -26,6 +26,7 @@
  AS:Description: Get number of active users
  AS:CommandId: http://jabber.org/protocol/admin#get-active-users-num
  AS:Component: sess-man
+ AS:Group: Statistics
  */
 package tigase.admin
 import tigase.server.*
