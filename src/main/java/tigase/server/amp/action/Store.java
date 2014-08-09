@@ -168,9 +168,6 @@ public class Store
 		if (db_uri != null) {
 			defs.put(AMP_MSG_REPO_URI_PROP_KEY, db_uri);
 		}
-		if (db_cls == null) {
-			db_cls = DEF_AMP_MSG_REPO_CLASS_PROP_VAL;
-		}
 		if (db_cls != null) {
 			defs.put(AMP_MSG_REPO_CLASS_PROP_KEY, db_cls);
 		}
@@ -207,7 +204,7 @@ public class Store
 		String db_uri = (String) props.get(AMP_MSG_REPO_URI_PROP_KEY);
 		String db_cls = (String) props.get(AMP_MSG_REPO_CLASS_PROP_KEY);
 		
-		if (db_cls != null && db_uri != null) {
+		if (db_uri != null) {
 			try {
 				repo = MsgRepository.getInstance(db_cls, db_uri);
 				Map<String, String> db_props = new HashMap<String, String>(4);

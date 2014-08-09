@@ -429,7 +429,7 @@ public class OfflineMessages
 		}
 
 		@Override
-		public void initRepository(String conn_str, Map<String, String> map) throws TigaseDBException {
+		public void initRepository(String conn_str, Map<String, String> map) {
 			// nothing to do here as we base on UserRepository which is already initialized
 		}
 		

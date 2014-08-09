@@ -146,9 +146,6 @@ public class MessageAmp
 		}
 		if (msg_repo_cls == null) {
 			msg_repo_cls = System.getProperty(AmpFeatureIfc.AMP_MSG_REPO_CLASS_PROP_KEY);
-			if (msg_repo_cls == null) {
-				msg_repo_cls = AmpFeatureIfc.DEF_AMP_MSG_REPO_CLASS_PROP_VAL;
-			}
 		}
 		if (msg_repo_uri != null) {
 			Map<String, String> db_props = new HashMap<String, String>(4);

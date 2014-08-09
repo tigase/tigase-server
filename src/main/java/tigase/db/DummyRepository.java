@@ -46,6 +46,7 @@ import java.util.Map;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Repository.Meta( supportedUris = { "dummy" } )
 public class DummyRepository implements UserRepository, AuthRepository {
 
 	/**

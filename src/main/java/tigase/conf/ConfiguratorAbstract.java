@@ -636,9 +636,9 @@ public abstract class ConfiguratorAbstract
 		}
 		defaults.put(RepositoryFactory.AUTH_DOMAIN_POOL_CLASS_PROP_KEY, repo_pool);
 
-		String user_repo_class = RepositoryFactory.DUMMY_REPO_CLASS_PROP_VAL;
+		String user_repo_class = null;//RepositoryFactory.DUMMY_REPO_CLASS_PROP_VAL;
 		String user_repo_url   = RepositoryFactory.DERBY_REPO_URL_PROP_VAL;
-		String auth_repo_class = RepositoryFactory.DUMMY_REPO_CLASS_PROP_VAL;
+		String auth_repo_class = null;//RepositoryFactory.DUMMY_REPO_CLASS_PROP_VAL;
 		String auth_repo_url   = RepositoryFactory.DERBY_REPO_URL_PROP_VAL;
 
 		if (params.get(RepositoryFactory.GEN_USER_DB) != null) {
@@ -685,9 +685,11 @@ public abstract class ConfiguratorAbstract
 			defaults.put(RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, RepositoryFactory
 					.AUTH_REPO_POOL_SIZE_PROP_VAL);
 		}
-		defaults.put(RepositoryFactory.USER_REPO_CLASS_PROP_KEY, user_repo_class);
+		if (user_repo_class != null)
+			defaults.put(RepositoryFactory.USER_REPO_CLASS_PROP_KEY, user_repo_class);
 		defaults.put(RepositoryFactory.USER_REPO_URL_PROP_KEY, user_repo_url);
-		defaults.put(RepositoryFactory.AUTH_REPO_CLASS_PROP_KEY, auth_repo_class);
+		if (auth_repo_class != null)
+			defaults.put(RepositoryFactory.AUTH_REPO_CLASS_PROP_KEY, auth_repo_class);
 		defaults.put(RepositoryFactory.AUTH_REPO_URL_PROP_KEY, auth_repo_url);
 
 		List<String> user_repo_domains = new ArrayList<String>(10);

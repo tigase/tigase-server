@@ -33,6 +33,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.db.DBInitException;
 import tigase.db.DataRepository;
+import tigase.db.Repository;
 import tigase.xmpp.BareJID;
 
 /**
@@ -41,6 +42,7 @@ import tigase.xmpp.BareJID;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Repository.Meta( isDefault=true, supportedUris = { "jdbc:[^:]+:.*" } )
 public class DataRepositoryImpl implements DataRepository {
 	private static final Logger log = Logger.getLogger(DataRepositoryImpl.class.getName());
 
@@ -261,7 +263,7 @@ public class DataRepositoryImpl implements DataRepository {
 	 */
 	@Override
 	public void initRepository(String resource_uri, Map<String, String> params)
-			throws SQLException, DBInitException {
+			throws DBInitException {
 		String driverClass = null;
 
 		if ( resource_uri.startsWith( "jdbc:postgresql" ) ){
@@ -335,11 +337,14 @@ public class DataRepositoryImpl implements DataRepository {
 			log.log( Level.INFO, "Table schema found: {0}, database type: {1}, database driver: {2}",
 							 new Object[] { table_schema, database.toString(), driverClass } );
 		}
-		initRepo();
+		try {
+			initRepo();
 
-
-		if (!check_table_query.isEmpty()) {
-			initPreparedStatement(check_table_query, check_table_query);
+			if (!check_table_query.isEmpty()) {
+				initPreparedStatement(check_table_query, check_table_query);
+			}
+		} catch (SQLException ex) {
+			throw new DBInitException("Database initialization failed", ex);
 		}
 
 		log.log(Level.INFO, "Initialized database connection: {0}", resource_uri);

@@ -109,6 +109,7 @@ import javax.security.sasl.SaslServer;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Meta( isDefault=true, supportedUris = { "jdbc:[^:]+:.*" } )
 public class TigaseCustomAuth implements AuthRepository {
 
 	/**

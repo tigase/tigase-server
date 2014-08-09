@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
@@ -46,11 +45,11 @@ import javax.security.sasl.RealmCallback;
 import javax.security.sasl.Sasl;
 import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
-
 import tigase.db.AuthRepository;
 import tigase.db.AuthorizationException;
 import tigase.db.DBInitException;
 import tigase.db.DataRepository;
+import tigase.db.Repository.Meta;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserExistsException;
@@ -71,6 +70,7 @@ import tigase.xmpp.BareJID;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Meta( supportedUris = { "jdbc:[^:]+:.*" } )
 public class DrupalWPAuth implements AuthRepository {
 
 	/**

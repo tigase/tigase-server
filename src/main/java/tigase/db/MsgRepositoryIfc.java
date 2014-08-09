@@ -38,7 +38,7 @@ import java.util.Queue;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
-public interface MsgRepositoryIfc {
+public interface MsgRepositoryIfc extends Repository {
 
 	/**
 	 * Loads head of the payloads queue which holds items that would be expired after
@@ -55,16 +55,6 @@ public interface MsgRepositoryIfc {
 	 * retrieved.
 	 */
 	Element getMessageExpired( long time, boolean delete );
-	
-	/**
-	 * Method to initialize this instance of MsgResitoryIfc including creation
-	 * of tables when needed
-	 * 
-	 * @param conn_str
-	 * @param map 
-	 * @throws tigase.db.TigaseDBException 
-	 */
-	void initRepository(String conn_str, Map<String, String> map) throws TigaseDBException;
 
 	//~--- methods --------------------------------------------------------------
 	/**

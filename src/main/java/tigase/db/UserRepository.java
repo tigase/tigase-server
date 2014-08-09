@@ -41,7 +41,7 @@ import java.util.Map;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface UserRepository {
+public interface UserRepository extends Repository {
 
 	/**
 	 * <code>addDataList</code> method adds mode entries to existing data list
@@ -262,21 +262,6 @@ public interface UserRepository {
 	long getUsersCount(String domain);
 
 	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * The method is called to initialize the data repository. Depending on the implementation
-	 * all the initialization parameters can be passed either via <code>resource_uri</code>
-	 * parameter as the database connection string or via <code>params</code> map if
-	 * the required repository parameters are more complex or both.
-	 * @param resource_uri value in most cases representing the database connection string.
-	 * @param params is a <code>Map</code> with repository properties necessary to initialize
-	 * and perform all the functions. The initialization parameters are implementation dependent.
-	 * @throws tigase.db.DBInitException if there was an error during repository initialization.
-	 * Some implementations, though, perform so called lazy initialization so even though there
-	 * is a problem with the underlying repository it may not be signaled through this method
-	 * call.
-	 */
-	void initRepository(String resource_uri, Map<String, String> params) throws DBInitException;
 
 	/**
 	 * <code>removeData</code> method removes pair (key, value) from user

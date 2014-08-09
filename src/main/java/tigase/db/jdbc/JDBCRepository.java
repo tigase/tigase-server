@@ -47,6 +47,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:piras@tiscali.com">Daniele</a>
  * @version $Rev$
  */
+@Repository.Meta( supportedUris = { "jdbc:[^:]+:.*" } )
 public class JDBCRepository
 				implements AuthRepository, UserRepository {
 	/** Field description */

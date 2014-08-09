@@ -46,7 +46,7 @@ import java.util.Map;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface AuthRepository {
+public interface AuthRepository extends Repository {
 	/**
 	 * Property key name for <code>otherAuth</code> method call. It is used to provide an
 	 * extra authentication data by the client to the authentication logic.
@@ -188,22 +188,6 @@ public interface AuthRepository {
 	long getUsersCount(String domain);
 
 	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * <code>initRepository</code> method is doing initialization for database
-	 * connection. It may also do lazy initialization with database.
-	 * Connection to database might be established during the first authentication
-	 * request.
-	 *
-	 * @param resource_uri a <code>String</code> value of database connection string.
-	 * The string must also contain database user name and password if required
-	 * for connection.
-	 * @param params
-	 * @exception DBInitException if an error occurs during access database. It won't
-	 * happen however as in this method we do simple variable assigment.
-	 */
-	void initRepository(String resource_uri, Map<String, String> params)
-					throws DBInitException;
 
 	/**
 	 * Describe <code>logout</code> method here.

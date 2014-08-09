@@ -21,7 +21,6 @@
  */
 package tigase.osgi;
 
-import tigase.osgi.util.ClassUtil;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -33,7 +32,10 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import tigase.conf.ConfiguratorAbstract;
+import tigase.db.Repository;
+import tigase.db.RepositoryFactory;
 import tigase.osgi.ModulesManager;
+import tigase.osgi.util.ClassUtil;
 import tigase.server.XMPPServer;
 import tigase.xmpp.XMPPImplIfc;
 
@@ -72,6 +74,13 @@ public class Activator implements BundleActivator {
                                 log.log(Level.SEVERE, "Plugin loading excepton", e);
                         }
                         
+						try {
+								Set<Class<Repository>> repos = ClassUtil.getClassesImplementing(Repository.class);
+								RepositoryFactory.initialize(repos);
+						} catch (Exception e) {
+								log.log(Level.SEVERE, "Could not initialize properly ResourceFactory", e);
+						}
+						
 						// we need to export this before we start, so if start will fail due to missing
 						// dependencies we would be able to add them later and recorver from this
 						ModulesManagerImpl.getInstance().setActive(true);

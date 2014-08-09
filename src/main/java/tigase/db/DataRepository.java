@@ -48,7 +48,7 @@ import java.util.Map;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface DataRepository {
+public interface DataRepository extends Repository {
 	/**
 	 * Helper enumeration with types of supported databases.
 	 *
@@ -134,29 +134,6 @@ public interface DataRepository {
 	 * @throws SQLException
 	 */
 	void initPreparedStatement(String stIdKey, String query) throws SQLException;
-
-	/**
-	 * The method is called to initialize the data repository. Depending on the
-	 * implementation all the initialization parameters can be passed either via
-	 * <code>resource_uri</code> parameter as the database connection string or
-	 * via <code>params</code> map if the required repository parameters are more
-	 * complex or both.
-	 *
-	 * @param resource_uri
-	 *          value in most cases representing the database connection string.
-	 * @param params
-	 *          is a <code>Map</code> with repository properties necessary to
-	 *          initialize and perform all the functions. The initialization
-	 *          parameters are implementation dependent.
-	 * @throws SQLException
-	 *           if there was an error during repository initialization. Some
-	 *           implementations, though, perform so called lazy initialization so
-	 *           even though there is a problem with the underlying repository it
-	 *           may not be signaled through this method call.
-	 * @throws tigase.db.DBInitException
-	 */
-	void initRepository(String resource_uri, Map<String, String> params)
-					throws SQLException, DBInitException;
 
 	/**
 	 * A helper method to release resources from the statement and result set.

@@ -28,6 +28,7 @@ import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 import tigase.db.MsgRepositoryIfc;
+import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.xml.Element;
@@ -51,6 +52,9 @@ public abstract class MsgRepository<T> implements MsgRepositoryIfc {
 
 	public static MsgRepositoryIfc getInstance(String cls, String id_string) throws TigaseDBException {
 		try {
+			if (cls == null) {
+				cls = RepositoryFactory.getRepoClassName(MsgRepositoryIfc.class, id_string);
+			}
 			String key = cls + "#" + id_string;
 			MsgRepositoryIfc result = repos.get(key);
 

@@ -63,6 +63,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Meta( supportedUris = { "jdbc:[^:]+:.*" } )
 public class TigaseAuth implements AuthRepository {
 
 	/**

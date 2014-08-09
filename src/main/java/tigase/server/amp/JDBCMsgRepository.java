@@ -41,8 +41,10 @@ import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.db.DBInitException;
 import tigase.db.DataRepository;
 import tigase.db.MsgRepositoryIfc;
+import tigase.db.Repository;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
@@ -64,6 +66,7 @@ import tigase.xmpp.JID;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Repository.Meta( isDefault=true, supportedUris = { "jdbc:[^:]+:.*" } )
 public class JDBCMsgRepository extends MsgRepository<Long> {
 	private static final Logger log = Logger.getLogger(JDBCMsgRepository.class.getName());
 	private static final String MSG_TABLE = "msg_history";
@@ -249,7 +252,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 	 */
 	@Override
 	public void initRepository(String conn_str, Map<String, String> map)
-			throws TigaseDBException {
+			throws DBInitException {
 		if (initialized) {
 			return;
 		}

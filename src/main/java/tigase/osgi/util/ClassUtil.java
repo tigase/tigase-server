@@ -25,10 +25,9 @@ package tigase.osgi.util;
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-
 import java.lang.reflect.Modifier;
 import java.net.URL;
-
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -251,7 +250,7 @@ public class ClassUtil {
         }
 
         @SuppressWarnings({"unchecked"})
-        public static <T extends Class> Set<T> getClassesImplementing(Set<Class> classes, T cls) {
+        public static <T extends Class> Set<T> getClassesImplementing(Collection<Class> classes, T cls) {
 
                 Set<T> classes_set = new TreeSet<T>(new ClassComparator());
 

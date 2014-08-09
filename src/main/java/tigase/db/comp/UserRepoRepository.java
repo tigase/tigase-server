@@ -180,7 +180,7 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 		String repo_class = (String) properties.get(REPO_CLASS_PROP_KEY);
 		String repo_uri   = (String) properties.get(REPO_URI_PROP_KEY);
 
-		if ((repo_class != null) && (repo_uri != null)) {
+		if (repo_uri != null) {
 			log.log(Level.INFO,
 							"Initializing custom component repository: {0}, db connection: {1}",
 							new Object[] { repo_class,
