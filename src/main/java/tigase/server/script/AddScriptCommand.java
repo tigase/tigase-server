@@ -24,17 +24,9 @@ package tigase.server.script;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.server.CmdAcl;
-import tigase.server.Command;
-import tigase.server.Iq;
-import tigase.server.Packet;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -43,11 +35,15 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.script.Bindings;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import tigase.server.BasicComponent;
+import tigase.server.CmdAcl;
+import tigase.server.Command;
+import tigase.server.Iq;
+import tigase.server.Packet;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -161,6 +157,13 @@ public class AddScriptCommand extends AbstractScriptCommand {
 			}
 
 			try {
+				String originalGroup = group;
+				if (group != null && group.contains("${componentName}")) {
+					BasicComponent component = (BasicComponent) binds.get("component");
+					if (component != null) {
+						group = group.replace("${componentName}", component.getDiscoDescription());
+					}
+				}			
 				Script s = addAdminScript(commandId, description, group, sb.toString(), language, null, binds);
 				Packet result = packet.commandResult(Command.DataType.result);
 
@@ -168,7 +171,7 @@ public class AddScriptCommand extends AbstractScriptCommand {
 				results.offer(result);
 
 				if (saveToDisk) {
-					saveCommandToDisk(commandId, description, group, sb, s.getFileExtension(), binds);
+					saveCommandToDisk(commandId, description, originalGroup, sb, s.getFileExtension(), binds);
 				}
 			} catch (Exception e) {
 				log.log(Level.WARNING, "Can't initialize script: ", e);

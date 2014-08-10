@@ -1231,6 +1231,10 @@ public class BasicComponent
 							int    idx = file.toString().lastIndexOf('.');
 							String ext = file.toString().substring(idx + 1);
 
+							if (cmdGroup != null && cmdGroup.contains("${componentName}")) {
+								cmdGroup = cmdGroup.replace("${componentName}", this.getDiscoDescription());
+							}
+							
 							addCommand.addAdminScript(cmdId, cmdDescr, cmdGroup, sb.toString(), null, ext, binds);
 							log.log(Level.CONFIG,
 									"{0}: Loaded admin command from file: {1}, id: {2}, ext: {3}, descr: {4}",
