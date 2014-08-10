@@ -331,7 +331,9 @@ public abstract class RepositoryFactory {
 			params = new LinkedHashMap<String, String>(10);
 		}
 		cls = getRepoClass(cls);
-		log.severe("for " + resource + " as AuthRepository using " + cls);
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("for " + resource + " as AuthRepository using " + cls);
+		}
 
 		AuthRepository repo = auth_repos.get(cls + resource);
 
@@ -403,7 +405,9 @@ public abstract class RepositoryFactory {
 			params = new LinkedHashMap<String, String>(10);
 		}
 		cls = getRepoClass(cls);
-		log.severe("for " + resource + " as DataRepository using " + cls);
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("for " + resource + " as DataRepository using " + cls);
+		}
 
 		DataRepository repo = data_repos.get(cls + resource);
 
@@ -446,11 +450,11 @@ public abstract class RepositoryFactory {
 	 *
 	 * 
 	 */
-	public static <T extends Class<? extends Repository>> Class<? extends T> getRepoClass(T cls, String uri) throws DBInitException {
+	public static <T extends Class<? extends Repository>> T getRepoClass(T cls, String uri) throws DBInitException {
 		Set<T> classes = ModulesManagerImpl.getInstance().getImplementations(cls);
 		classes.addAll(getRepoInternalClasses(cls));
-		Set<Class> supported = new HashSet<Class>();
-		for (Class clazz : classes) {
+		Set<T> supported = new HashSet<T>();
+		for (T clazz : classes) {
 			Repository.Meta annotation = (Repository.Meta) clazz.getAnnotation(Repository.Meta.class);
 			if (annotation != null) {
 				String[] supportedUris = annotation.supportedUris();
@@ -472,8 +476,8 @@ public abstract class RepositoryFactory {
 		}
 		if (supported.isEmpty())
 			throw new DBInitException("Not found class supporting uri = " + uri);
-		Class result = null;
-		for (Class clazz : supported) {
+		T result = null;
+		for (T clazz : supported) {
 			if (result == null)
 				result = clazz;
 			else {
@@ -581,8 +585,9 @@ public abstract class RepositoryFactory {
 			params = new LinkedHashMap<String, String>(10);
 		}
 		cls = getRepoClass(cls);
-		log.severe("for " + resource + " as UserRepository using " + cls);
-
+		if (log.isLoggable(Level.FINEST)) {
+			log.finest("for " + resource + " as UserRepository using " + cls);
+		}
 
 		UserRepository repo = user_repos.get(cls + resource);
 
