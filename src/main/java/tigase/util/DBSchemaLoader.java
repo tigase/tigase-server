@@ -489,7 +489,6 @@ class DBSchemaLoader {
 					availableDrivers.add( drivers.nextElement().toString() );
 				}
 				log.log( Level.CONFIG, "DriverManager (available drivers): " + Arrays.asList( availableDrivers ) );
-				conn.commit();
 				conn.close();
 				connection_ok = true;
 				log.log( Level.INFO, "Connection OK" );
@@ -516,7 +515,6 @@ class DBSchemaLoader {
 						availableDrivers.add( drivers.nextElement().toString() );
 					}
 					log.log( Level.CONFIG, "DriverManager (available drivers): " + Arrays.asList( availableDrivers ) );
-					conn.commit();
 					conn.close();
 					connection_ok = true;
 					log.log( Level.INFO, "Connection OK" );
