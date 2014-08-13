@@ -66,8 +66,6 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 	<jar src="jars/derby.jar"/>
 	<jar src="jars/jtds.jar"/>
 	<jar src="jars/tigase-server.jar"/>
-	<jar src="jars/tigase-xmltools.jar"/>
-	<jar src="jars/tigase-utils.jar"/>
 
 	<native type="izpack" name="ShellLink.dll"/>
 	<native type="izpack" name="ShellLink_x64.dll"/>
@@ -339,8 +337,6 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 				</fileset>
 				<fileset dir="./jars" targetdir="$INSTALL_PATH/${jarsDir}">
 					<include name="tigase-server.jar"/>
-					<!--<include name="tigase-utils.jar"/>-->
-					<!--<include name="tigase-xmltools.jar"/>-->
 				</fileset>
 
 				<parsable targetfile="$INSTALL_PATH/etc/init.properties"/>
