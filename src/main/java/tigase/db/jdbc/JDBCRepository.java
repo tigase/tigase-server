@@ -1247,10 +1247,10 @@ public class JDBCRepository
 				node_add_sp.setString(3, node_name);
 
 				switch ( data_repo.getDatabaseType() ) {
-					case sqlserver:
-						node_add_sp.executeUpdate();
-						rs = node_add_sp.getGeneratedKeys();
-						break;
+//					case sqlserver:
+//						node_add_sp.executeUpdate();
+//						rs = node_add_sp.getGeneratedKeys();
+//						break;
 					default:
 						rs = node_add_sp.executeQuery();
 						break;
@@ -1302,12 +1302,12 @@ public class JDBCRepository
 				log.log(Level.FINEST, "Adding non existing user to user-repository: " + user_id.toString() );
 
 				switch ( data_repo.getDatabaseType() ) {
-					case sqlserver:
-						int result_count = user_add_sp.executeUpdate();
-						if ( result_count > 0 ){
-							rs = user_add_sp.getGeneratedKeys();
-						}
-						break;
+//					case sqlserver:
+//						int result_count = user_add_sp.executeUpdate();
+//						if ( result_count > 0 ){
+//							rs = user_add_sp.getGeneratedKeys();
+//						}
+//						break;
 					default:
 						rs = user_add_sp.executeQuery();
 						break;
