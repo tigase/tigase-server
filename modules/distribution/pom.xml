@@ -177,6 +177,7 @@
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.basedir}/../..</outputDirectory>
 									<includes>**/*.groovy</includes>
+									<includes>**/*.html</includes>
 								</artifactItem>
 
 								<artifactItem>
