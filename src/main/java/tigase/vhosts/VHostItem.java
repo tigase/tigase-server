@@ -93,7 +93,7 @@ public class VHostItem
 	 * can login for this domain.
 	 */
 	public static final String ANONYMOUS_ENABLED_ATT = "anon";
-	
+
 	/** Field description */
 	public static final String ANONYMOUS_ENABLED_LABEL = "Anonymous enabled";
 
@@ -119,10 +119,10 @@ public class VHostItem
 	 * should be enabled.
 	 */
 	public static final String C2S_PORTS_ALLOWED_ATT = "c2s-ports-allowed";
-	
+
 	/** Field description */
 	public static final String C2S_PORTS_ALLOWED_LABEL = "Allowed C2S,BOSH,WebSocket ports";
-	
+
 	/** Field description */
 	public static final String DOMAIN_FILTER_POLICY_ATT = "domain-filter";
 
@@ -367,7 +367,7 @@ public class VHostItem
 				.valuesStr());
 		Command.addFieldValue(packet, MAX_USERS_NUMBER_LABEL, "" + maxUsersNumber);
 		String c2sPortsAllowedStr = intArrayToString(c2sPortsAllowed,",");
-		Command.addFieldValue(packet, C2S_PORTS_ALLOWED_LABEL, 
+		Command.addFieldValue(packet, C2S_PORTS_ALLOWED_LABEL,
 				c2sPortsAllowedStr != null ? c2sPortsAllowedStr : "");
 		Command.addFieldValue(packet, PRESENCE_FORWARD_ADDRESS_LABEL, ((presenceForward !=
 				null)
@@ -455,11 +455,11 @@ public class VHostItem
 		otherDomainParams = Command.getFieldValue(packet, OTHER_PARAMS_LABEL);
 		tmp = Command.getFieldValue(packet, C2S_PORTS_ALLOWED_LABEL);
 		c2sPortsAllowed = parseIntArray(tmp, ",");
-		
+
 		tmp = Command.getFieldValue(packet, SASL_MECHANISM_LABEL);
 		if ((tmp != null) && !tmp.trim().isEmpty()) {
 			setSaslAllowedMechanisms(tmp.split(","));
-		} 
+		}
 
 	}
 
@@ -518,13 +518,13 @@ public class VHostItem
 			comps = comps_str.split(",");
 		}
 		otherDomainParams = elem.getCDataStaticStr(VHOST_OTHER_PARAMS_PATH);
-		
+
 		this.c2sPortsAllowed = parseIntArray(elem.getAttributeStaticStr(C2S_PORTS_ALLOWED_ATT), ",");
-		
+
 		tmp = elem.getAttributeStaticStr(SASL_MECHANISM_ATT);
 		if (tmp != null) {
 			setSaslAllowedMechanisms(tmp.split(";"));
-		} 
+		}
 	}
 
 	/**
@@ -620,7 +620,7 @@ public class VHostItem
 			}
 			if (tmp.startsWith(C2S_PORTS_ALLOWED_ATT)) {
 				String[] mu = tmp.split("=");
-				
+
 				c2sPortsAllowed = parseIntArray(mu[1], ";");
 			}
 			if(tmp.startsWith(SASL_MECHANISM_ATT)){
@@ -724,7 +724,7 @@ public class VHostItem
 		if (c2sPortsAllowed != null) {
 			sb.append(':').append(C2S_PORTS_ALLOWED_ATT).append('=').append(intArrayToString(c2sPortsAllowed, ";"));
 		}
-		
+
 		if (saslAllowedMechanisms != null) {
 			sb.append(':').append(SASL_MECHANISM_ATT).append('=').append(stringArrayToString(saslAllowedMechanisms, ";"));
 		}
@@ -764,15 +764,15 @@ public class VHostItem
 	}
 
 	/**
-	 * Returns an array with ports on which C2S connections for this VHosts 
+	 * Returns an array with ports on which C2S connections for this VHosts
 	 * are allowed.
-	 * 
+	 *
 	 * @return a <code>int[]</code> object with allowed C2S ports.
 	 */
 	public int[] getC2SPortsAllowed() {
 		return c2sPortsAllowed;
 	}
-	
+
 	/**
 	 * Method description
 	 *
@@ -844,7 +844,7 @@ public class VHostItem
 	 * @return a value of <code>JID</code>
 	 */
 	public JID getMessageForwardAddress() {
-		return presenceForward;
+		return messageForward;
 	}
 
 	/**
@@ -992,14 +992,14 @@ public class VHostItem
 	/**
 	 * Sets an array of ports for which C2S connections for this VHost will be
 	 * allowed.
-	 * 
-	 * @param ports 
+	 *
+	 * @param ports
 	 *			is an <code>int[]</code> array of allowed C2S ports.
 	 */
 	public void setC2SPortsAllowed(int[] ports) {
 		this.c2sPortsAllowed = ports;
 	}
-	
+
 	/**
 	 * Method description
 	 *
@@ -1144,7 +1144,7 @@ public class VHostItem
 		}
 		return c2s_ports_allowed;
 	}
-	
+
 	private String intArrayToString(int[] arr, String separator) {
 		if (arr == null) {
 			return null;
@@ -1158,7 +1158,7 @@ public class VHostItem
 		}
 		return buf.toString();
 	}
-	
+
 	private String stringArrayToString(String[] arr, String separator) {
 		if (arr == null) {
 			return null;
@@ -1172,7 +1172,7 @@ public class VHostItem
 		}
 		return buf.toString();
 	}
-	
+
 	//~--- inner classes --------------------------------------------------------
 
 	private class UnmodifiableVHostItem
@@ -1425,15 +1425,15 @@ public class VHostItem
 
 		/**
 		 * Method description
-		 * 
-		 * @param ports 
+		 *
+		 * @param ports
 		 */
 		@Override
 		public void setC2SPortsAllowed(int[] ports) {
 			throw new UnsupportedOperationException(
 					"This is unmodifiable instance of VHostItem");
 		}
-		
+
 		/**
 		 * Method description
 		 *
