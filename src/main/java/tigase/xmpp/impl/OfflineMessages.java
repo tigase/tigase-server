@@ -22,22 +22,29 @@
 package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
+import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
-
-import tigase.server.Packet;
+import tigase.osgi.ModulesManagerImpl;
 import static tigase.server.Message.ELEM_NAME;
-
+import tigase.server.Packet;
 import tigase.util.DNSResolver;
 import tigase.util.TigaseStringprepException;
-
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
-
 import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
@@ -45,20 +52,6 @@ import tigase.xmpp.XMPPPostprocessorIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.text.SimpleDateFormat;
-
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-import java.util.TimeZone;
-import java.util.Queue;
 
 /**
  * OfflineMessages plugin implementation which follows <a
@@ -110,11 +103,13 @@ public class OfflineMessages
 	 * processing capabilities. In case of {@code msgoffline} plugin it is
 	 * <em>presence</em> stanza */
 	public static final String[] MESSAGE_HEADER_PATH = { ELEM_NAME, "header" };
+	private static final String MSG_REPO_CLASS_KEY = "msg-repo-class";
 	//~--- fields ---------------------------------------------------------------
 	/** Field holds class for formatting and parsing dates in a locale-sensitive
 	 * manner */
 	private final SimpleDateFormat formatter;
-
+	private String msgRepoCls = null;
+	
 	{
 		this.formatter = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" );
 		this.formatter.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
@@ -131,6 +126,12 @@ public class OfflineMessages
 		return ID;
 	}
 
+	@Override
+	public void init(Map<String, Object> settings) throws TigaseDBException {
+		super.init(settings);
+		msgRepoCls = (String) settings.get(MSG_REPO_CLASS_KEY);
+	}
+	
 	/**
 	 * OfflineMessages postprocessor simply calls {@code savePacketForOffLineUser}
 	 * method to store packet to offline repository.
@@ -339,7 +340,17 @@ public class OfflineMessages
 	 */
 	protected MsgRepositoryIfc getMsgRepoImpl( NonAuthUserRepository repo,
 																						 XMPPResourceConnection conn ) {
-		return new MsgRepositoryImpl( repo, conn );
+		if (msgRepoCls == null) {
+			return new MsgRepositoryImpl( repo, conn );
+		} else {
+			try {
+				OfflineMsgRepositoryIfc msgRepo = (OfflineMsgRepositoryIfc) ModulesManagerImpl.getInstance().forName(msgRepoCls).newInstance();
+				msgRepo.init(repo, conn);
+				return msgRepo;
+			} catch (Exception ex) {
+				return null;
+			}
+		}
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -396,13 +407,18 @@ public class OfflineMessages
 		return false;
 	}
 
+	public static interface OfflineMsgRepositoryIfc extends MsgRepositoryIfc {
+		
+		void init( NonAuthUserRepository repo, XMPPResourceConnection conn);
+		
+	}
+	
 	//~--- inner classes --------------------------------------------------------
 	/**
 	 * Implementation of {@code MsgRepositoryIfc} interface providing basic
 	 * support for storing and loading of Elements from repository.
 	 */
-	private class MsgRepositoryImpl
-			implements MsgRepositoryIfc {
+	private class MsgRepositoryImpl implements OfflineMsgRepositoryIfc {
 
 		/** Field holds user session which keeps all the user session data and also
 		 * gives an access to the user's repository data. */
@@ -423,7 +439,12 @@ public class OfflineMessages
 		 * @param conn user session which keeps all the user session data and also
 		 *             gives an access to the user's repository data.
 		 */
-		private MsgRepositoryImpl( NonAuthUserRepository repo, XMPPResourceConnection conn ) {
+		private MsgRepositoryImpl(NonAuthUserRepository repo, XMPPResourceConnection conn) {
+			init(repo, conn);
+		}
+		
+		@Override
+		public void init(NonAuthUserRepository repo, XMPPResourceConnection conn) {
 			this.repo = repo;
 			this.conn = conn;
 		}
