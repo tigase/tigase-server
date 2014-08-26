@@ -839,21 +839,6 @@ public abstract class ConfiguratorAbstract
 		configRepo.setProperties(props);
 		TLSUtil.configureSSLContext(props);
 
-		int user_repo_pool_size;
-		int auth_repo_pool_size;
-
-		try {
-			user_repo_pool_size = Integer.parseInt((String) props.get(RepositoryFactory
-					.USER_REPO_POOL_SIZE_PROP_KEY));
-		} catch (Exception e) {
-			user_repo_pool_size = RepositoryFactory.USER_REPO_POOL_SIZE_PROP_VAL;
-		}
-		try {
-			auth_repo_pool_size = Integer.parseInt((String) props.get(RepositoryFactory
-					.AUTH_REPO_POOL_SIZE_PROP_KEY));
-		} catch (Exception e) {
-			auth_repo_pool_size = RepositoryFactory.AUTH_REPO_POOL_SIZE_PROP_VAL;
-		}
 
 		String[] user_repo_domains = (String[]) props.get(RepositoryFactory
 				.USER_REPO_DOMAINS_PROP_KEY);
@@ -888,7 +873,7 @@ public abstract class ConfiguratorAbstract
 		if (user_repo_domains != null) {
 			for (String domain : user_repo_domains) {
 				try {
-					addUserRepo(props, domain, user_repo_pool_size);
+					addUserRepo(props, domain);
 				} catch (Exception e) {
 					log.log(Level.SEVERE, "Can't initialize user repository for domain: " + domain,
 							e);
@@ -897,7 +882,7 @@ public abstract class ConfiguratorAbstract
 		}
 		if (user_repository == null) {
 			try {
-				addUserRepo(props, null, user_repo_pool_size);
+				addUserRepo(props, null);
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Can't initialize user default repository: ", e);
 			}
@@ -905,7 +890,7 @@ public abstract class ConfiguratorAbstract
 		if (auth_repo_domains != null) {
 			for (String domain : auth_repo_domains) {
 				try {
-					addAuthRepo(props, domain, auth_repo_pool_size);
+					addAuthRepo(props, domain);
 				} catch (Exception e) {
 					log.log(Level.SEVERE, "Can't initialize user repository for domain: " + domain,
 							e);
@@ -914,7 +899,7 @@ public abstract class ConfiguratorAbstract
 		}
 		if (auth_repository == null) {
 			try {
-				addAuthRepo(props, null, auth_repo_pool_size);
+				addAuthRepo(props, null);
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Can't initialize auth default repository: ", e);
 			}
@@ -923,7 +908,7 @@ public abstract class ConfiguratorAbstract
 
 	//~--- methods --------------------------------------------------------------
 
-	private void addAuthRepo(Map<String, Object> props, String domain, int pool_size)
+	private void addAuthRepo(Map<String, Object> props, String domain)
 					throws DBInitException, ClassNotFoundException, InstantiationException,
 							IllegalAccessException {
 		Map<String, String> params = getRepoParams(props, RepositoryFactory
@@ -937,11 +922,6 @@ public abstract class ConfiguratorAbstract
 				 ? ""
 				 : "/" + domain));
 
-		if (params.get(RepositoryFactory.AUTH_REPO_POOL_SIZE_PROP_KEY) == null) {
-			params.put(RepositoryFactory.AUTH_REPO_POOL_SIZE_PROP_KEY, String.valueOf(
-					pool_size));
-		}
-
 		AuthRepository repo = RepositoryFactory.getAuthRepository(cls_name, conn_url, params);
 
 		if ((domain == null) || domain.trim().isEmpty()) {
@@ -952,13 +932,13 @@ public abstract class ConfiguratorAbstract
 			auth_repo_impl.addRepo(domain, repo);
 		}
 		log.log(Level.INFO,
-				"[{0}] Initialized {1} as user auth repository pool: {2}, url: {3}",
+				"[{0}] Initialized {1} as user auth repository pool, url: {3}",
 				new Object[] { ((domain != null)
 				? domain
-				: "DEFAULT"), cls_name, pool_size, conn_url });
+				: "DEFAULT"), cls_name, conn_url });
 	}
 
-	private void addUserRepo(Map<String, Object> props, String domain, int pool_size)
+	private void addUserRepo(Map<String, Object> props, String domain)
 					throws DBInitException, ClassNotFoundException, InstantiationException,
 							IllegalAccessException {
 		Map<String, String> params = getRepoParams(props, RepositoryFactory
@@ -972,10 +952,6 @@ public abstract class ConfiguratorAbstract
 				 ? ""
 				 : "/" + domain));
 
-		if (params.get(RepositoryFactory.USER_REPO_POOL_SIZE_PROP_KEY) == null) {
-			params.put(RepositoryFactory.USER_REPO_POOL_SIZE_PROP_KEY, String.valueOf(
-					pool_size));
-		}
 
 		UserRepository repo = RepositoryFactory.getUserRepository(cls_name, conn_url, params);
 
@@ -986,10 +962,10 @@ public abstract class ConfiguratorAbstract
 		} else {
 			user_repo_impl.addRepo(domain, repo);
 		}
-		log.log(Level.INFO, "[{0}] Initialized {1} as user repository pool:, {2} url: {3}",
+		log.log(Level.INFO, "[{0}] Initialized {1} as user repository pool, url: {2}",
 				new Object[] { ((domain != null)
 				? domain
-				: "DEFAULT"), cls_name, pool_size, conn_url });
+				: "DEFAULT"), cls_name, conn_url });
 	}
 
 	private void initMonitoring(String settings, String configDir) {

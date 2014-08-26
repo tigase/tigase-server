@@ -123,6 +123,9 @@ public abstract class RepositoryFactory {
 	/** Field description */
 	public static final String DATA_REPO_POOL_SIZE_PROP_KEY = "data-repo-pool-size";
 
+	private static final String REPO_POOL_SIZE_PROP_KEY = "repo-pool-size";
+	private static final String DEF_REPO_POOL_SIZE_PROP_KEY = "def-repo-pool-size";
+
 	// DataRepository properties
 
 	/** Field description */
@@ -331,30 +334,41 @@ public abstract class RepositoryFactory {
 			params = new LinkedHashMap<String, String>(10);
 		}
 		cls = getRepoClass(cls);
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("for " + resource + " as AuthRepository using " + cls);
-		}
 
 		AuthRepository repo = auth_repos.get(cls + resource);
+
+		if ( log.isLoggable( Level.FINEST ) ){
+			log.log( Level.FINEST, "Getting AuthRepository using: {0} for: {1}; repository instance: ",
+							 new Object[] { cls, resource, repo } );
+		}
 
 		if (repo == null) {
 			String repo_pool_cls = System.getProperty(AUTH_REPO_POOL_CLASS_PROP_KEY,
 					AUTH_REPO_POOL_CLASS_PROP_VAL);
 			int repo_pool_size;
 
-			if (params.get(RepositoryFactory.AUTH_REPO_POOL_SIZE_PROP_KEY) != null) {
-				repo_pool_size = Integer.parseInt(params.get(RepositoryFactory
-						.AUTH_REPO_POOL_SIZE_PROP_KEY));
+			if ( params.get( RepositoryFactory.AUTH_REPO_POOL_SIZE_PROP_KEY ) != null ){
+				repo_pool_size = Integer.parseInt( params.get( RepositoryFactory.AUTH_REPO_POOL_SIZE_PROP_KEY ) );
+				params.put( RepositoryFactory.REPO_POOL_SIZE_PROP_KEY, String.valueOf(
+										repo_pool_size ) );
+			} else if ( Integer.getInteger( AUTH_REPO_POOL_SIZE_PROP_KEY ) != null ){
+				repo_pool_size = Integer.getInteger( AUTH_REPO_POOL_SIZE_PROP_KEY );
+				params.put( RepositoryFactory.REPO_POOL_SIZE_PROP_KEY, String.valueOf(
+										repo_pool_size ) );
 			} else {
-				repo_pool_size = Integer.getInteger(AUTH_REPO_POOL_SIZE_PROP_KEY,
-						AUTH_REPO_POOL_SIZE_PROP_VAL);
+				repo_pool_size = AUTH_REPO_POOL_SIZE_PROP_VAL;
+				params.put( RepositoryFactory.DEF_REPO_POOL_SIZE_PROP_KEY, String.valueOf(
+										repo_pool_size ) );
 			}
-			params.put(RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, String.valueOf(
-					repo_pool_size));
 			params.put(RepositoryFactory.DATABASE_TYPE_PROP_KEY, class_name);
 			if (repo_pool_cls != null) {
 				AuthRepositoryPool repo_pool = (AuthRepositoryPool) ModulesManagerImpl.getInstance().forName(repo_pool_cls)
 						.newInstance();
+
+				if ( log.isLoggable( Level.FINEST ) ){
+					log.log( Level.FINEST, "No AuthRepository, creating new; repo_pool_cls: {0}, repo_pool_size: {1}",
+								 new Object[] { repo_pool_cls, repo_pool_size } );
+				}
 
 				repo_pool.initRepository(resource, params);
 				for (int i = 0; i < repo_pool_size; i++) {
@@ -405,27 +419,38 @@ public abstract class RepositoryFactory {
 			params = new LinkedHashMap<String, String>(10);
 		}
 		cls = getRepoClass(cls);
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("for " + resource + " as DataRepository using " + cls);
-		}
 
 		DataRepository repo = data_repos.get(cls + resource);
+
+		if ( log.isLoggable( Level.FINEST ) ){
+			log.log( Level.FINEST, "Getting DataRepository: {0} for: {1}; repository instance: ",
+							 new Object[] { cls, resource, repo } );
+		}
 
 		if (repo == null) {
 			int repo_pool_size;
 
 			if (params.get(RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY) != null) {
-				repo_pool_size = Integer.parseInt(params.get(RepositoryFactory
-						.DATA_REPO_POOL_SIZE_PROP_KEY));
+				repo_pool_size = Integer.parseInt(params.get(RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY));
+			} else if (params.get(RepositoryFactory.REPO_POOL_SIZE_PROP_KEY) != null) {
+				repo_pool_size = Integer.parseInt(params.get(RepositoryFactory.REPO_POOL_SIZE_PROP_KEY));
+			} else if (Integer.getInteger(DATA_REPO_POOL_SIZE_PROP_KEY) != null) {
+				repo_pool_size = Integer.getInteger(DATA_REPO_POOL_SIZE_PROP_KEY);
+			} else if (params.get(RepositoryFactory.DEF_REPO_POOL_SIZE_PROP_KEY) != null) {
+				repo_pool_size = Integer.parseInt(params.get(RepositoryFactory.DEF_REPO_POOL_SIZE_PROP_KEY));
 			} else {
-				repo_pool_size = Integer.getInteger(DATA_REPO_POOL_SIZE_PROP_KEY,
-						DATA_REPO_POOL_SIZE_PROP_VAL);
+				repo_pool_size = Integer.getInteger(DATA_REPO_POOL_SIZE_PROP_KEY,DATA_REPO_POOL_SIZE_PROP_VAL);
 			}
 			params.put(RepositoryFactory.DATABASE_TYPE_PROP_KEY, class_name);
+			String repo_pool_cls = System.getProperty(DATA_REPO_POOL_CLASS_PROP_KEY, DATA_REPO_POOL_CLASS_PROP_VAL);
 
-			DataRepositoryPool repo_pool = (DataRepositoryPool) ModulesManagerImpl.getInstance().forName(System
-					.getProperty(DATA_REPO_POOL_CLASS_PROP_KEY, DATA_REPO_POOL_CLASS_PROP_VAL))
+			DataRepositoryPool repo_pool = (DataRepositoryPool) ModulesManagerImpl.getInstance().forName(repo_pool_cls)
 					.newInstance();
+
+			if ( log.isLoggable( Level.FINEST ) ){
+				log.log( Level.FINEST, "No DataRepository, creating new; repo_pool_cls: {0}, repo_pool_size: {1}",
+								 new Object[] { repo_pool_cls, repo_pool_size } );
+			}
 
 			repo_pool.initRepository(resource, params);
 			for (int i = 0; i < repo_pool_size; i++) {
@@ -585,27 +610,40 @@ public abstract class RepositoryFactory {
 			params = new LinkedHashMap<String, String>(10);
 		}
 		cls = getRepoClass(cls);
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("for " + resource + " as UserRepository using " + cls);
-		}
 
 		UserRepository repo = user_repos.get(cls + resource);
+
+		if ( log.isLoggable( Level.FINEST ) ){
+			log.log( Level.FINEST, "Getting UserRepository: {0} for: {1}; repository instance: ",
+							 new Object[] { cls, resource, repo } );
+		}
 
 		if (repo == null) {
 			String repo_pool_cls = System.getProperty(USER_REPO_POOL_CLASS_PROP_KEY,
 					USER_REPO_POOL_CLASS_PROP_VAL);
 			int repo_pool_size;
 
-			if (params.get(RepositoryFactory.USER_REPO_POOL_SIZE_PROP_KEY) != null) {
-				repo_pool_size = Integer.parseInt(params.get(RepositoryFactory
-						.USER_REPO_POOL_SIZE_PROP_KEY));
+			if ( params.get( RepositoryFactory.USER_REPO_POOL_SIZE_PROP_KEY ) != null ){
+				repo_pool_size = Integer.parseInt( params.get( RepositoryFactory.USER_REPO_POOL_SIZE_PROP_KEY ) );
+				params.put( RepositoryFactory.REPO_POOL_SIZE_PROP_KEY, String.valueOf(
+										repo_pool_size ) );
+			} else if ( Integer.getInteger( USER_REPO_POOL_SIZE_PROP_KEY ) != null ){
+				repo_pool_size = Integer.getInteger( USER_REPO_POOL_SIZE_PROP_KEY );
+				params.put( RepositoryFactory.REPO_POOL_SIZE_PROP_KEY, String.valueOf(
+										repo_pool_size ) );
 			} else {
-				repo_pool_size = Integer.getInteger(USER_REPO_POOL_SIZE_PROP_KEY,
-						USER_REPO_POOL_SIZE_PROP_VAL);
+				repo_pool_size = USER_REPO_POOL_SIZE_PROP_VAL;
+				params.put( RepositoryFactory.DEF_REPO_POOL_SIZE_PROP_KEY, String.valueOf(
+										repo_pool_size ) );
 			}
-			params.put(RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, String.valueOf(
-					repo_pool_size));
+
 			params.put(RepositoryFactory.DATABASE_TYPE_PROP_KEY, class_name);
+
+			if ( log.isLoggable( Level.FINEST ) ){
+				log.log( Level.FINEST, "No UserRepository, creating new; repo_pool_cls: {0}, repo_pool_size: {1}",
+								 new Object[] { repo_pool_cls, repo_pool_size } );
+			}
+
 			if (repo_pool_cls != null) {
 				UserRepositoryPool repo_pool = (UserRepositoryPool) ModulesManagerImpl.getInstance().forName(repo_pool_cls)
 						.newInstance();
