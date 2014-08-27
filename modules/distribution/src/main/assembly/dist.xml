@@ -41,6 +41,13 @@
 			</includes>
 		</fileSet>
 		<fileSet>
+			<directory>../../win-stuff</directory>
+			<outputDirectory>win-stuff</outputDirectory>
+			<includes>
+				<include>*/**</include>
+			</includes>
+		</fileSet>
+		<fileSet>
 			<directory>../../etc</directory>
 			<outputDirectory>etc</outputDirectory>
 			<includes>
