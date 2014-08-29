@@ -227,7 +227,7 @@
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.basedir}/../..</outputDirectory>
-									<includes>**/*.sql,**/*.sh,**/*.txt</includes>
+									<includes>**/*.sql,**/*.sh,**/*.cmd,**/*.txt</includes>
 								</artifactItem>
 
 								<artifactItem>
