@@ -94,10 +94,13 @@ public abstract class RosterAbstract {
 
 	/** Field description */
 	public static final String XMLNS = "jabber:iq:roster";
-
+	
 	/** Field description */
 	public static final String XMLNS_DYNAMIC = "jabber:iq:roster-dynamic";
 
+	/** Field description */
+	public static final String XMLNS_LOAD = XMLNS + "-load";
+	
 	// ~--- static fields --------------------------------------------------------
 
 	/**
@@ -1083,6 +1086,14 @@ public abstract class RosterAbstract {
 		return transition.getStateTransition(presence);
 	}
 
+	/**
+	 * Check if data containing user roster for this session is loaded from database
+	 * 
+	 * @param conn
+	 * @return 
+	 */
+	public abstract boolean isRosterLoaded(XMPPResourceConnection session);	
+	
 	/**
 	 * Method description
 	 *

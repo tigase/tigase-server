@@ -362,6 +362,11 @@ public class RosterFlat
 	}
 
 	@Override
+	public boolean isRosterLoaded(XMPPResourceConnection session) {
+		return session.getCommonSessionData(ROSTER) != null;
+	}
+	
+	@Override
 	public boolean isOnline(XMPPResourceConnection session, JID buddy)
 					throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
@@ -480,6 +485,7 @@ public class RosterFlat
 
 	// ~--- get methods ----------------------------------------------------------
 
+	@Override
 	public RosterElement getRosterElement(XMPPResourceConnection session, JID buddy)
 					throws NotAuthorizedException, TigaseDBException {
 		Map<BareJID, RosterElement> roster = getUserRoster(session);

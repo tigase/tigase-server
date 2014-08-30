@@ -51,6 +51,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.server.Iq;
 
 /**
  * Class responsible for handling Presence packets
@@ -107,14 +108,14 @@ public class Presence
 	private static final Logger     log = Logger.getLogger(Presence.class.getName());
 	private static final long       MAX_DIRECT_PRESENCES_NO = 1000;
 	private static final String[]   PRESENCE_PRIORITY_PATH  = { "presence", "priority" };
-	private static final String[]   XMLNSS                  = { XMLNS };
+	private static final String[]   XMLNSS                  = { XMLNS, RosterAbstract.XMLNS_LOAD };
 	private static boolean          skipOfflineSys          = true;
 	private static boolean          skipOffline             = false;
 	private static final String[]   PRESENCE_C_PATH         = { PRESENCE_ELEMENT_NAME,
 			"c" };
 	private static final String     ID                      = PRESENCE_ELEMENT_NAME;
 	private static final String[][] ELEMENTS                = {
-		{ PRESENCE_ELEMENT_NAME }
+		{ PRESENCE_ELEMENT_NAME }, { Iq.ELEM_NAME, Iq.QUERY_NAME }
 	};
 
 	/**
@@ -397,6 +398,41 @@ public class Presence
 			return;
 		}
 
+	if (packet.getElemName() == Iq.ELEM_NAME) {
+			// here we process results of roster loading process requests
+			boolean finishProcessing = true;
+			switch (packet.getType()) {
+				case result:
+					synchronized (session) {
+						Element presEl = session.getPresence();
+						if (presEl != null) {
+							session.removeSessionData(XMPPResourceConnection.PRESENCE_KEY);
+							presEl.removeAttribute("from");
+							presEl.removeAttribute("to");
+							Packet pres = Packet.packetInstance(presEl, packet.getStanzaFrom(), packet.getStanzaTo());
+							pres.setPacketFrom(packet.getPacketFrom());
+							pres.setPacketTo(packet.getPacketTo());
+							try {
+								processOutInitial(pres, session, results, settings, PresenceType.out_initial);
+							} catch (NotAuthorizedException e) {
+								log.log(Level.INFO,
+										"Can not access user Roster, user session is not authorized yet: {0}",
+										packet);
+								log.log(Level.FINEST, "presence problem...", e);
+							} catch (TigaseDBException e) {
+								log.log(Level.WARNING, "Error accessing database for presence data: {0}", e);
+							}    // end of try-catch
+						}
+					}
+					break;
+				default:
+					// ignore this
+					break;
+			}
+			if (finishProcessing)
+				return;
+		}
+		
 		// Synchronization to avoid conflict with login/logout events
 		// processed in the SessionManager asynchronously
 		synchronized (session) {
@@ -1587,44 +1623,56 @@ public class Presence
 			// To send response to presence probes for example.
 			session.setPresence(packet.getElement());
 
-			// Special actions on the first availability presence
-			if ((packet.getType() == null) || (packet.getType() == StanzaType.available)) {
-				session.removeSessionData(OFFLINE_BUD_SENT);
-				session.removeSessionData(OFFLINE_RES_SENT);
-				if (first) {
-					try {
-						sendRosterOfflinePresence(session, results);
-					} catch (NotAuthorizedException | TigaseDBException
-							| NoConnectionIdException ex) {
-						log.log(Level.INFO, "Experimental code throws exception: ", ex);
+			// here we need to check if roster is loaded
+			if (roster_util.isRosterLoaded(session)) {
+				// if it is already loaded then continue processing
+				// Special actions on the first availability presence
+				if ((packet.getType() == null) || (packet.getType() == StanzaType.available)) {
+					session.removeSessionData(OFFLINE_BUD_SENT);
+					session.removeSessionData(OFFLINE_RES_SENT);
+					if (first) {
+						try {
+							sendRosterOfflinePresence(session, results);
+						} catch (NotAuthorizedException | TigaseDBException | NoConnectionIdException ex) {
+							log.log(Level.INFO, "Experimental code throws exception: ", ex);
+						}
+
+						// Send presence probes to 'to' or 'both' contacts
+						broadcastProbe(session, results, settings);
+
+						// Resend pending in subscription requests
+						resendPendingInRequests(session, results);
+					} else {
+
+						// Broadcast initial presence to 'from' or 'both' contacts
+						sendPresenceBroadcast(StanzaType.available, session, FROM_SUBSCRIBED, results,
+								packet.getElement(), settings, roster_util);
 					}
 
-					// Send presence probes to 'to' or 'both' contacts
-					broadcastProbe(session, results, settings);
-
-					// Resend pending in subscription requests
-					resendPendingInRequests(session, results);
+					// Broadcast initial presence to other available user resources
+					updateUserResources(packet.getElement(), session, results, first);
 				} else {
-
-					// Broadcast initial presence to 'from' or 'both' contacts
-					sendPresenceBroadcast(StanzaType.available, session, FROM_SUBSCRIBED, results,
-							packet.getElement(), settings, roster_util);
+					stopped(session, results, settings);
 				}
 
-				// Broadcast initial presence to other available user resources
-				updateUserResources(packet.getElement(), session, results, first);
+				// Presence forwarding
+				JID forwardTo = session.getDomain().getPresenceForward();
+
+				if (forwardTo == null) {
+					forwardTo = presenceGLobalForward;
+				}
+				if (forwardTo != null) {
+					sendPresence(null, session.getJID(), forwardTo, results, packet.getElement());
+				}
 			} else {
-				stopped(session, results, settings);
-			}
-
-			// Presence forwarding
-			JID forwardTo = session.getDomain().getPresenceForward();
-
-			if (forwardTo == null) {
-				forwardTo = presenceGLobalForward;
-			}
-			if (forwardTo != null) {
-				sendPresence(null, session.getJID(), forwardTo, results, packet.getElement());
+				// if roster is not yet loaded we need to trigger roster load by Roster plugin
+				Element iq = new Element(Iq.ELEM_NAME, new String[] { "type" }, new String[] { "set" });
+				Element query = new Element(Iq.QUERY_NAME, new String[] { Iq.XMLNS_ATT }, new String[] { RosterAbstract.XMLNS_LOAD });
+				iq.addChild(query);
+				Packet loadCmd = Packet.packetInstance(iq, packet.getStanzaFrom(), packet.getStanzaTo());
+				loadCmd.setPacketFrom(packet.getPacketFrom());
+				loadCmd.setPacketTo(packet.getPacketTo());
+				results.add(loadCmd);
 			}
 		}
 	}

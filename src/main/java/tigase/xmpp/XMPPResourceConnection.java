@@ -960,6 +960,13 @@ public class XMPPResourceConnection
 				pr = 1;
 			}
 			setPriority(pr);
+		} else {
+			// workaround for case when presence update came before presence was broadcasted due to 
+			// loading of roster data in roster processing thread
+			if (getPriority() != 0 && !"unavailable".equals(packet.getAttributeStaticStr("type"))) {
+				packet.addChild(new Element("priority", String.valueOf(getPriority())));
+			}
+			putSessionData(PRESENCE_KEY, packet);
 		}
 		loginHandler.handlePresenceSet(this);
 	}

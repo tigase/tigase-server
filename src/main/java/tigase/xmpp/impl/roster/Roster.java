@@ -222,6 +222,11 @@ public class Roster extends RosterAbstract {
 
 		return null;
 	}
+	
+	@Override
+	public boolean isRosterLoaded(XMPPResourceConnection session) {
+		return true;
+	}
 
 	/**
 	 * Method description

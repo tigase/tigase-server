@@ -53,12 +53,12 @@ public class JabberIqRoster
 	/** Field description */
 	public static final String ANON = "anon";
 	private static final String[][] ELEMENTS = {
-		{ Iq.ELEM_NAME, Iq.QUERY_NAME }, { Iq.ELEM_NAME, Iq.QUERY_NAME }
+		{ Iq.ELEM_NAME, Iq.QUERY_NAME }, { Iq.ELEM_NAME, Iq.QUERY_NAME }, { Iq.ELEM_NAME, Iq.QUERY_NAME }
 	};
 	/** Private logger for class instance. */
 	private static final Logger log = Logger.getLogger( JabberIqRoster.class.getName() );
 	private static final String[] XMLNSS = { RosterAbstract.XMLNS,
-																					 RosterAbstract.XMLNS_DYNAMIC };
+																					 RosterAbstract.XMLNS_DYNAMIC, RosterAbstract.XMLNS_LOAD };
 	private static final String[] IQ_QUERY_ITEM_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME,
 																											 "item" };
 	/** unique ID of the plugin */
@@ -132,7 +132,7 @@ public class JabberIqRoster
 				return;
 			}
 		} else {
-
+			
 			// Packet probably to the user, let's check where it came from
 			if ( session.isUserId( packet.getStanzaTo().getBareJID() ) ){
 				if ( packet.getStanzaTo().getResource() != null ){
@@ -202,6 +202,24 @@ public class JabberIqRoster
 																																					 "Request type is incorrect", false ) );
 							break;
 					}    // end of switch (type)
+				} else if (xmlns == RosterAbstract.XMLNS_LOAD) {
+					switch ( type ) {
+						case set:
+							if (!roster_util.isRosterLoaded(session)) {
+								// here we do not care about result as we only trigger 
+								// loading of roster from database
+								roster_util.getRosterElement(session, session.getJID());
+							}
+							Element resultEl = packet.getElement().clone();
+							resultEl.setAttribute("type", StanzaType.result.name());
+							Packet result = Packet.packetInstance(resultEl, packet.getStanzaFrom(), packet.getStanzaTo());
+							result.setPacketFrom(packet.getPacketFrom());
+							result.setPacketTo(packet.getPacketTo());
+							results.add(result);
+							break;
+						default:
+							break;
+					}
 				} else {
 					// Hm, don't know what to do, unexpected name space, let's record it
 					log.log( Level.WARNING, "Unknown XMLNS for the roster plugin: {0}", packet );
