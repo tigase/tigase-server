@@ -763,8 +763,12 @@ class DBSchemaLoader {
 		log.log( Level.INFO, "Adding XMPP Admin Account, URI: " + dbUri );
 
 		try {
-			log.log( Level.CONFIG, "RepositoryFactory.getAuthRepository(" + null + ", " + dbUri + ",  + null)" );
-			AuthRepository repo = RepositoryFactory.getAuthRepository( null, dbUri, null );
+			Map<String, String> params = new HashMap<>();
+			params.put( RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, String.valueOf( 1 ) );
+
+			log.log( Level.CONFIG, "RepositoryFactory.getAuthRepository(" + null + ", "
+														 + dbUri + "," + Arrays.asList( params ) + ")" );
+			AuthRepository repo = RepositoryFactory.getAuthRepository( null, dbUri, params );
 			for ( BareJID jid : jids ) {
 				repo.addUser( jid, pwd );
 			}

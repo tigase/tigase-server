@@ -71,7 +71,11 @@ create table if not exists tig_users (
 	key account_status (account_status),
 	key online_status (online_status)
 )
-ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
+ENGINE=InnoDB default character set utf8 ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+
+-- QUERY END:
+
+-- QUERY START:
 
 CREATE INDEX part_of_user_id ON tig_users (user_id(255));
 
@@ -112,7 +116,7 @@ create table if not exists tig_pairs (
 			 constraint tig_pairs_constr_1 foreign key (uid) references tig_users (uid),
 			 constraint tig_pairs_constr_2 foreign key (nid) references tig_nodes (nid)
 )
-ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;
+ENGINE=InnoDB default character set utf8 ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 
 -- QUERY END:
 
