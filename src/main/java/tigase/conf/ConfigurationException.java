@@ -48,7 +48,7 @@ public class ConfigurationException extends IOException {
 		super(msg);
 	}
 
-	ConfigurationException(String string, Exception e) {
+	public ConfigurationException(String string, Exception e) {
 		super(string, e);
 	}
 
