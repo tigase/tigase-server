@@ -73,6 +73,8 @@ public class Presence
 	 */
 	public static final String DIRECT_PRESENCE = "direct-presences";
 
+	public static final String DISABLE_ROSTER_LAZY_LOADING_KEY = "disable-roster-lazy-loading";
+	
 	/** Field description */
 	public static final String OFFLINE_BUD_SENT = "offline-bud-sent";
 
@@ -109,6 +111,7 @@ public class Presence
 	private static final long       MAX_DIRECT_PRESENCES_NO = 1000;
 	private static final String[]   PRESENCE_PRIORITY_PATH  = { "presence", "priority" };
 	private static final String[]   XMLNSS                  = { XMLNS, RosterAbstract.XMLNS_LOAD };
+	private static boolean			rosterLazyLoading       = true;
 	private static boolean          skipOfflineSys          = true;
 	private static boolean          skipOffline             = false;
 	private static final String[]   PRESENCE_C_PATH         = { PRESENCE_ELEMENT_NAME,
@@ -369,6 +372,8 @@ public class Presence
 				log.log(Level.WARNING, "Presence global forward misconfiguration, cannot parse JID {0}", tmp);
 			}
 		}
+		tmp = (String) settings.get(DISABLE_ROSTER_LAZY_LOADING_KEY);
+		rosterLazyLoading = (tmp == null || !Boolean.parseBoolean(tmp));
 	}
 
 	/**
@@ -1624,7 +1629,7 @@ public class Presence
 			session.setPresence(packet.getElement());
 
 			// here we need to check if roster is loaded
-			if (roster_util.isRosterLoaded(session)) {
+			if (!rosterLazyLoading || roster_util.isRosterLoaded(session)) {
 				// if it is already loaded then continue processing
 				// Special actions on the first availability presence
 				if ((packet.getType() == null) || (packet.getType() == StanzaType.available)) {
