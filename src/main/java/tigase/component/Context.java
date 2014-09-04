@@ -17,8 +17,9 @@
  */
 package tigase.component;
 
-import tigase.component.eventbus.EventBus;
 import tigase.component.modules.ModuleProvider;
+import tigase.disteventbus.EventBus;
+import tigase.xmpp.JID;
 
 /**
  * Interface to provide configuration for an component.<br/>
@@ -29,6 +30,8 @@ import tigase.component.modules.ModuleProvider;
  * 
  */
 public interface Context {
+
+	JID getComponentID();
 
 	/**
 	 * Returns version of component. Used for Service Discovery purposes.

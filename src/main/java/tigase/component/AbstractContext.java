@@ -1,7 +1,8 @@
 package tigase.component;
 
-import tigase.component.eventbus.EventBus;
 import tigase.component.modules.ModuleProvider;
+import tigase.disteventbus.EventBus;
+import tigase.xmpp.JID;
 
 /**
  * Abstract basic implementation of {@linkplain Context} as delegator of
@@ -16,6 +17,14 @@ public abstract class AbstractContext implements Context {
 
 	public AbstractContext(AbstractComponent<?> component) {
 		this.component = component;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public JID getComponentID() {
+		return component.getComponentId();
 	}
 
 	/**

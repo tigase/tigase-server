@@ -20,8 +20,9 @@ package tigase.component.modules;
 import java.util.logging.Logger;
 
 import tigase.component.Context;
-import tigase.component.eventbus.Event;
+import tigase.component.responses.AsyncCallback;
 import tigase.server.Packet;
+import tigase.xml.Element;
 
 /**
  * Abstract class for help building a module. It has implemented few default
@@ -61,8 +62,8 @@ public abstract class AbstractModule<CTX extends Context> implements Module, Con
 	 * @param event
 	 *            event to fire.
 	 */
-	protected void fireEvent(Event<?> event) {
-		context.getEventBus().fire(event, this);
+	protected void fireEvent(Element event) {
+		context.getEventBus().fire(event);
 	}
 
 	/**
@@ -91,4 +92,7 @@ public abstract class AbstractModule<CTX extends Context> implements Module, Con
 		context.getWriter().write(packet);
 	}
 
+	protected void write(Packet packet, AsyncCallback asyncCallback) {
+		context.getWriter().write(packet, asyncCallback);
+	}
 }

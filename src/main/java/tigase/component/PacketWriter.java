@@ -19,6 +19,7 @@ package tigase.component;
 
 import java.util.Collection;
 
+import tigase.component.responses.AsyncCallback;
 import tigase.server.Packet;
 
 /**
@@ -45,4 +46,5 @@ public interface PacketWriter {
 	 */
 	void write(final Packet packet);
 
+	public void write(Packet packet, AsyncCallback callback);
 }

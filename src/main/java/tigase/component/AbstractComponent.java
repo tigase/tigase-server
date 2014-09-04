@@ -26,18 +26,21 @@ import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.script.Bindings;
-import tigase.component.eventbus.DefaultEventBus;
-import tigase.component.eventbus.Event;
-import tigase.component.eventbus.EventBus;
-import tigase.component.eventbus.EventHandler;
+
 import tigase.component.exceptions.ComponentException;
 import tigase.component.modules.Module;
 import tigase.component.modules.ModuleProvider;
 import tigase.component.modules.ModulesManager;
 import tigase.component.modules.impl.AdHocCommandModule.ScriptCommandProcessor;
+import tigase.component.responses.AsyncCallback;
+import tigase.component.responses.ResponseManager;
 import tigase.conf.ConfigurationException;
 import tigase.disco.XMPPService;
+import tigase.disteventbus.EventBus;
+import tigase.disteventbus.EventBusFactory;
+import tigase.disteventbus.EventHandler;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.DisableDisco;
 import tigase.server.Packet;
@@ -59,58 +62,6 @@ import tigase.xmpp.StanzaType;
 public abstract class AbstractComponent<CTX extends Context> extends AbstractMessageReceiver implements XMPPService,
 		DisableDisco {
 
-	/**
-	 * Implemented by handlers of {@link ModuleRegisteredEvent}.
-	 */
-	public interface ModuleRegisteredHandler extends EventHandler {
-
-		/**
-		 * Fired when new module is registered.
-		 */
-		public static class ModuleRegisteredEvent extends Event<ModuleRegisteredHandler> {
-
-			private String id;
-
-			private Module module;
-
-			public ModuleRegisteredEvent(String id, Module module) {
-				this.module = module;
-				this.id = id;
-			}
-
-			@Override
-			protected void dispatch(ModuleRegisteredHandler handler) {
-				handler.onModuleRegistered(id, module);
-			}
-
-			/**
-			 * @return the module
-			 */
-			public Module getModule() {
-				return module;
-			}
-
-			/**
-			 * @param module
-			 *            the module to set
-			 */
-			public void setModule(Module module) {
-				this.module = module;
-			}
-
-		}
-
-		/**
-		 * Called when {@link ModuleRegisteredEvent} is fired.
-		 * 
-		 * @param id
-		 *            module identifier.
-		 * @param module
-		 *            module instance.
-		 */
-		void onModuleRegistered(String id, Module module);
-	}
-
 	protected static final String COMPONENT = "component";
 
 	/**
@@ -131,13 +82,36 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 		}
 	};
 
-	protected EventBus eventBus = new DefaultEventBus();
+	private EventBus eventBus = new EventBus() {
+
+		private final EventBus eventBus = EventBusFactory.getInstance();
+
+		@Override
+		public void addHandler(String name, String xmlns, EventHandler handler) {
+			eventBus.addHandler(name, xmlns, handler);
+		}
+
+		@Override
+		public void fire(Element event) {
+			event.addChild(new Element("eventSource", getComponentId().toString()));
+			event.addChild(new Element("eventTimestamp", Long.toString(System.currentTimeMillis())));
+
+			eventBus.fire(event);
+		}
+
+		@Override
+		public void removeHandler(String name, String xmlns, EventHandler handler) {
+			eventBus.removeHandler(name, xmlns, handler);
+		}
+	};
 
 	/** Logger */
 	protected final Logger log = Logger.getLogger(this.getClass().getName());
 
 	/** Modules manager */
 	protected final ModulesManager modulesManager;
+
+	private ResponseManager responseManager;;
 
 	protected PacketWriter writer = new PacketWriter() {
 		@Override
@@ -159,6 +133,14 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 			addOutPacket(packet);
 		}
 
+		@Override
+		public void write(Packet packet, AsyncCallback callback) {
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("Sent: " + packet.getElement());
+			}
+			addOutPacket(packet, callback);
+		}
+
 	};
 
 	/**
@@ -178,16 +160,13 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 		}
 
 		this.modulesManager = new ModulesManager(this.context);
+
+		this.responseManager = new ResponseManager(this.context);
 	}
 
-	/**
-	 * Adds {@link ModuleRegisteredEvent} handler.
-	 * 
-	 * @param handler
-	 *            a module registered handler
-	 */
-	public void addModuleRegisteredHandler(ModuleRegisteredHandler handler) {
-		this.context.getEventBus().addHandler(ModuleRegisteredHandler.ModuleRegisteredEvent.class, handler);
+	protected void addOutPacket(Packet packet, AsyncCallback asyncCallback) {
+		responseManager.registerResponseHandler(packet, ResponseManager.DEFAULT_TIMEOUT, asyncCallback);
+		addOutPacket(packet);
 	}
 
 	/**
@@ -238,6 +217,12 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 		return null;
 	}
 
+	@Override
+	public synchronized void everyMinute() {
+		super.everyMinute();
+		responseManager.checkTimeouts();
+	}
+
 	/**
 	 * Returns version of component. Used for Service Discovery purposes.
 	 * 
@@ -282,12 +267,7 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 		return props;
 	}
 
-	/**
-	 * Returns {@link EventBus}.
-	 * 
-	 * @return {@link EventBus}.
-	 */
-	public EventBus getEventBus() {
+	EventBus getEventBus() {
 		return eventBus;
 	}
 
@@ -370,7 +350,15 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 	@Override
 	public void processPacket(Packet packet) {
 		try {
-			boolean handled = this.modulesManager.process(packet);
+			Runnable responseHandler = responseManager.getResponseHandler(packet);
+
+			boolean handled;
+			if (responseHandler != null) {
+				handled = true;
+				responseHandler.run();
+			} else {
+				handled = this.modulesManager.process(packet);
+			}
 
 			if (!handled) {
 				final String t = packet.getElement().getAttributeStaticStr(Packet.TYPE_ATT);
@@ -417,20 +405,7 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 			this.modulesManager.unregister(id);
 		}
 		M r = this.modulesManager.register(id, module);
-		if (r != null) {
-			context.getEventBus().fire(new ModuleRegisteredHandler.ModuleRegisteredEvent(id, r), this);
-		}
 		return r;
-	}
-
-	/**
-	 * Removes {@link ModuleRegisteredEvent} handler.
-	 * 
-	 * @param handler
-	 *            handler to remove.
-	 */
-	public void removeModuleRegisteredHandler(ModuleRegisteredHandler handler) {
-		this.context.getEventBus().remove(ModuleRegisteredHandler.ModuleRegisteredEvent.class, handler);
 	}
 
 	/**
@@ -472,6 +447,7 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 
 	/**
 	 * {@inheritDoc}
+	 * 
 	 * @throws tigase.conf.ConfigurationException
 	 */
 	@Override
