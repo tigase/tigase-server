@@ -127,7 +127,7 @@ try {
 	def updateRoster = { jid, i_jid, i_name, i_groups, i_subscr, i_original_node ->
 
 		def sess = sessions == null ? null : sessions.get(jid.getBareJID());
-		def conn = sess != null ? sess.getActiveResources().get(0) : null;
+		def conn = (sess != null && sess.getActiveResourcesSize() > 0) ? sess.getActiveResources().get(0) : null;
 		if (conn) {
 			// Update online
 			RosterAbstract rosterUtil = RosterFactory.getRosterImplementation(true)
