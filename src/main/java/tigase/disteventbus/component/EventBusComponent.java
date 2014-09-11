@@ -1,11 +1,13 @@
 package tigase.disteventbus.component;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
@@ -17,9 +19,11 @@ import tigase.component.modules.impl.DiscoveryModule;
 import tigase.component.modules.impl.JabberVersionModule;
 import tigase.component.modules.impl.XmppPingModule;
 import tigase.disteventbus.EventBusFactory;
-import tigase.disteventbus.LocalEventBus;
+import tigase.disteventbus.component.stores.AffiliationStore;
+import tigase.disteventbus.component.stores.SubscriptionStore;
+import tigase.disteventbus.impl.LocalEventBus;
+import tigase.stats.StatisticsList;
 import tigase.xml.Element;
-import tigase.xmpp.JID;
 
 public class EventBusComponent extends AbstractComponent<EventBusContext> implements ClusteredComponentIfc {
 
@@ -33,18 +37,18 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 		}
 
 		@Override
+		public AffiliationStore getAffiliationStore() {
+			return affiliationStore;
+		}
+
+		@Override
 		public Collection<String> getConnectedNodes() {
-			return connectedNodes;
+			return Collections.unmodifiableCollection(connectedNodes);
 		}
 
 		@Override
 		public LocalEventBus getEventBusInstance() {
 			return eventBusInstance;
-		}
-
-		@Override
-		public SubscriptionStore getNonClusterSubscriptionStore() {
-			return nonClusterSubscriptionStore;
 		}
 
 		@Override
@@ -55,18 +59,16 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 
 	public static final String COMPONENT_EVENTS_XMLNS = "tigase:eventbus";
 
-	private final Set<String> connectedNodes = new HashSet<String>();
+	private static long counter = 0;
 
-	/**
-	 * For non-cluster nodes. For example: standalone clients (Psi?) separated
-	 * components, etc.
-	 */
-	private final SubscriptionStore<NonClusterSubscription> nonClusterSubscriptionStore = new SubscriptionStore<NonClusterSubscription>();
+	private final AffiliationStore affiliationStore = new AffiliationStore();
+
+	private final Set<String> connectedNodes = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
 
 	/**
 	 * For cluster nodes.
 	 */
-	private final SubscriptionStore<JID> subscriptionStore = new SubscriptionStore<JID>();
+	private final SubscriptionStore subscriptionStore = new SubscriptionStore();
 
 	public EventBusComponent() {
 	}
@@ -84,6 +86,7 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 		Element event = new Element("Time", new String[] { "xmlns" }, new String[] { COMPONENT_EVENTS_XMLNS });
 		event.addChild(new Element("time", "" + t.getTime()));
 		event.addChild(new Element("timeDesc", t.toString()));
+		event.addChild(new Element("counter", "" + (++counter)));
 
 		context.getEventBus().fire(event);
 
@@ -134,6 +137,13 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 	}
 
 	@Override
+	public void getStatistics(StatisticsList list) {
+		super.getStatistics(list);
+
+		list.add(getName(), "Known cluster nodes", connectedNodes.size(), Level.INFO);
+	}
+
+	@Override
 	public boolean isDiscoNonAdmin() {
 		return false;
 	}
@@ -147,6 +157,9 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 	public void nodeConnected(String node) {
 		connectedNodes.add(node);
 
+		if (log.isLoggable(Level.FINEST))
+			log.finest("Node added. Known nodes: " + connectedNodes);
+
 		Module module = modulesManager.getModule(SubscribeModule.ID);
 		if (module != null && module instanceof SubscribeModule) {
 			((SubscribeModule) module).clusterNodeConnected(node);
@@ -157,6 +170,10 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 	@Override
 	public void nodeDisconnected(String node) {
 		connectedNodes.remove(node);
+
+		if (log.isLoggable(Level.FINEST))
+			log.finest("Node removed. Known nodes: " + connectedNodes);
+
 		Module module = modulesManager.getModule(SubscribeModule.ID);
 		if (module != null && module instanceof SubscribeModule) {
 			((SubscribeModule) module).clusterNodeDisconnected(node);

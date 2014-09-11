@@ -1,19 +1,19 @@
-package tigase.disteventbus.component;
+package tigase.disteventbus.component.stores;
 
 import tigase.xmpp.JID;
 
-public class NonClusterSubscription {
+public class Subscription {
 
 	private final JID jid;
 
 	private JID serviceJID;
 
-	public NonClusterSubscription(JID jid) {
+	public Subscription(JID jid) {
 		super();
 		this.jid = jid;
 	}
 
-	public NonClusterSubscription(JID jid, JID serviceJID) {
+	public Subscription(JID jid, JID serviceJID) {
 		super();
 		this.jid = jid;
 		this.serviceJID = serviceJID;
@@ -27,7 +27,7 @@ public class NonClusterSubscription {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		NonClusterSubscription other = (NonClusterSubscription) obj;
+		Subscription other = (Subscription) obj;
 		if (jid == null) {
 			if (other.jid != null)
 				return false;
@@ -40,7 +40,7 @@ public class NonClusterSubscription {
 		return jid;
 	}
 
-	JID getServiceJID() {
+	public JID getServiceJID() {
 		return serviceJID;
 	}
 
@@ -52,7 +52,7 @@ public class NonClusterSubscription {
 		return result;
 	}
 
-	void setServiceJID(JID serviceJID) {
+	public void setServiceJID(JID serviceJID) {
 		this.serviceJID = serviceJID;
 	}
 

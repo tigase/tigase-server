@@ -6,7 +6,8 @@ import java.util.logging.Level;
 import tigase.component.exceptions.ComponentException;
 import tigase.criteria.Criteria;
 import tigase.disteventbus.EventHandler;
-import tigase.disteventbus.LocalEventBus.LocalEventBusListener;
+import tigase.disteventbus.component.stores.Subscription;
+import tigase.disteventbus.impl.LocalEventBus.LocalEventBusListener;
 import tigase.server.Packet;
 import tigase.server.Permissions;
 import tigase.util.TigaseStringprepException;
@@ -65,18 +66,16 @@ public class EventPublisherModule extends AbstractEventBusModule {
 		message.setXMLNS(Packet.CLIENT_XMLNS);
 
 		message.setPermissions(Permissions.ADMIN);
+
 		write(message);
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void publishEvent(String name, String xmlns, Element event) {
-		final Collection subscribers = context.getSubscriptionStore().getSubscribersJIDs(name, xmlns);
-		subscribers.addAll(context.getNonClusterSubscriptionStore().getSubscribersJIDs(name, xmlns));
-
+		final Collection<Subscription> subscribers = context.getSubscriptionStore().getSubscribersJIDs(name, xmlns);
 		publishEvent(name, xmlns, event, subscribers);
 	}
 
-	public void publishEvent(String name, String xmlns, Element event, Collection<?> subscribers) {
+	public void publishEvent(String name, String xmlns, Element event, Collection<Subscription> subscribers) {
 		try {
 			final Element eventElem = new Element("event", new String[] { "xmlns" },
 					new String[] { "http://jabber.org/protocol/pubsub#event" });
@@ -90,17 +89,15 @@ public class EventPublisherModule extends AbstractEventBusModule {
 			if (log.isLoggable(Level.FINER))
 				log.finer("Sending event (" + name + ", " + xmlns + ") to " + subscribers);
 
-			for (Object subscriber : subscribers) {
+			for (Subscription subscriber : subscribers) {
+
 				String from;
-				JID toJID;
-				if (subscriber instanceof JID) {
+				if (subscriber.getServiceJID() == null) {
 					from = context.getComponentID().toString();
-					toJID = (JID) subscriber;
-				} else if (subscriber instanceof NonClusterSubscription) {
-					from = ((NonClusterSubscription) subscriber).getServiceJID().toString();
-					toJID = ((NonClusterSubscription) subscriber).getJid();
-				} else
-					throw new RuntimeException("Unknown Subscriber object");
+				} else {
+					from = subscriber.getServiceJID().toString();
+				}
+				JID toJID = subscriber.getJid();
 
 				publishEvent(eventElem, from, toJID);
 			}

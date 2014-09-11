@@ -5,9 +5,12 @@ import java.util.logging.Level;
 
 import tigase.component.exceptions.ComponentException;
 import tigase.criteria.Criteria;
+import tigase.disteventbus.component.stores.Affiliation;
+import tigase.disteventbus.component.stores.Subscription;
 import tigase.server.Packet;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
+import tigase.xmpp.Authorization;
 
 public class EventReceiverModule extends AbstractEventBusModule {
 
@@ -37,13 +40,20 @@ public class EventReceiverModule extends AbstractEventBusModule {
 
 	@Override
 	public void process(Packet packet) throws ComponentException, TigaseStringprepException {
+		final Affiliation affiliation = context.getAffiliationStore().getAffiliation(packet.getStanzaFrom());
+		if (!affiliation.isPublishItem())
+			throw new ComponentException(Authorization.FORBIDDEN);
+
 		final String type = packet.getElement().getAttributeStaticStr("type");
 
 		if (type != null && type.equals("error")) {
 			if (log.isLoggable(Level.FINE))
-				log.fine("Ignoring error message!");
+				log.fine("Ignoring error message! " + packet);
 			return;
 		}
+
+		if (log.isLoggable(Level.FINER))
+			log.finer("Received event stanza: " + packet.toStringFull());
 
 		Element eventElem = packet.getElement().getChild("event", "http://jabber.org/protocol/pubsub#event");
 		Element itemsElem = eventElem.getChild("items");
@@ -56,12 +66,12 @@ public class EventReceiverModule extends AbstractEventBusModule {
 				String eventXmlns = event.getXMLNS();
 
 				if (log.isLoggable(Level.FINER))
-					log.finer("Received event (" + eventName + ", " + eventXmlns + ").");
+					log.finer("Received event (" + eventName + ", " + eventXmlns + "): " + event);
 
 				context.getEventBusInstance().doFire(eventName, eventXmlns, event);
 
-				final Collection<NonClusterSubscription> subscribers = context.getNonClusterSubscriptionStore().getSubscribersJIDs(
-						eventName, eventXmlns);
+				final Collection<Subscription> subscribers = context.getSubscriptionStore().getSubscribersJIDs(eventName,
+						eventXmlns);
 				eventPublisherModule.publishEvent(eventName, eventXmlns, event, subscribers);
 			}
 		}

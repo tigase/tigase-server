@@ -3,16 +3,17 @@ package tigase.disteventbus.component;
 import java.util.Collection;
 
 import tigase.component.Context;
-import tigase.disteventbus.LocalEventBus;
-import tigase.xmpp.JID;
+import tigase.disteventbus.component.stores.AffiliationStore;
+import tigase.disteventbus.component.stores.SubscriptionStore;
+import tigase.disteventbus.impl.LocalEventBus;
 
 public interface EventBusContext extends Context {
+
+	AffiliationStore getAffiliationStore();
 
 	Collection<String> getConnectedNodes();
 
 	LocalEventBus getEventBusInstance();
 
-	SubscriptionStore<NonClusterSubscription> getNonClusterSubscriptionStore();
-
-	SubscriptionStore<JID> getSubscriptionStore();
+	SubscriptionStore getSubscriptionStore();
 }
