@@ -123,6 +123,8 @@ public class SessionManager
 	private int                              maxIdx                          = 100;
 	private int                              maxUserConnections              = 0;
 	private int                              maxUserSessions                 = 0;
+	private int                              maxUserSessionsDaily            = 0;
+	private int                              maxUserSessionsYesterday        = 0;
 	private NonAuthUserRepository            naUserRepository                = null;
 	private SessionCloseProc                 sessionCloseProc                = null;
 	private SessionOpenProc                  sessionOpenProc                 = null;
@@ -855,6 +857,9 @@ public class SessionManager
 						.length + " runs [ms]", calcAverage(entry.getValue()), Level.FINE);
 			}
 		}
+		list.add(getName(), "Maximum user sessions today", maxUserSessionsDaily, Level.INFO);
+		list.add(getName(), "Maximum user sessions yesterday", maxUserSessionsYesterday, Level.INFO);
+
 		for (XMPPImplIfc plugin : allPlugins) {
 			plugin.getStatistics(list);
 		}
@@ -2152,6 +2157,10 @@ public class SessionManager
 				if (currSize > maxUserSessions) {
 					maxUserSessions = currSize;
 				}
+				if (currSize > maxUserSessionsDaily) {
+					maxUserSessionsDaily = currSize;
+				}
+				
 				++totalUserSessions;
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Created new XMPPSession for: {0}", userId);
@@ -2492,8 +2501,21 @@ public class SessionManager
 
 		activeUserNumber = count;
 
+		final Calendar now = Calendar.getInstance();
+		if (now.get(Calendar.YEAR) != lastDailyStatsReset.get(Calendar.YEAR)
+				|| now.get(Calendar.DAY_OF_YEAR) != lastDailyStatsReset.get(Calendar.DAY_OF_YEAR)) {
+			lastDailyStatsReset = Calendar.getInstance();
+			
+			maxUserSessionsYesterday = maxUserSessionsDaily;
+			maxUserSessionsDaily = sessionsByNodeId.size();
+		}
 	}
 
+	/*
+	 * Date of moment where daily stats was resetted.
+	 */
+	private Calendar lastDailyStatsReset = Calendar.getInstance();
+	
 	private List<Element> getFeatures(XMPPResourceConnection session) {
 		List<Element> results = new LinkedList<Element>();
 
