@@ -596,6 +596,16 @@ public abstract class IOService<RefObject>
 	}
 
 	/**
+	 * Method returns local port of opened socket
+	 *
+	 * @return
+	 */
+	public int getLocalPort() {
+        Socket sock = socketIO.getSocketChannel().socket();
+        return sock.getLocalPort();
+	}
+	
+	/**
 	 * Method description
 	 *
 	 *

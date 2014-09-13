@@ -26,6 +26,10 @@ package tigase.server.websocket;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import tigase.conf.ConfigurationException;
 import tigase.xmpp.XMPPIOService;
 
 /**
@@ -36,6 +40,21 @@ import tigase.xmpp.XMPPIOService;
  */
 public class WebSocketClientConnectionManager
 				extends tigase.server.xmppclient.ClientConnectionManager {
+	
+	private static final String PROTOCOL_VERSIONS_KEY = "protocol-versions";
+	private static final String[] PROTOCOL_VERSIONS_DEF = { WebSocketHybi.ID };
+	
+	private static final WebSocketProtocolIfc[] SUPPORTED_PROTOCOL_VERSIONS = { new WebSocketHybi(), new WebSocketHixie76() };
+	
+	private WebSocketProtocolIfc[] enabledProtocolVersions = null;
+	
+	@Override
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		Map<String,Object> defs = super.getDefaults(params);
+		defs.put(PROTOCOL_VERSIONS_KEY, PROTOCOL_VERSIONS_DEF);
+		return defs;
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -47,6 +66,23 @@ public class WebSocketClientConnectionManager
 		return "Websocket connection manager";
 	}
 
+	@Override
+	public void setProperties(Map<String, Object> props) {
+		if (props.containsKey(PROTOCOL_VERSIONS_KEY)) {
+			String[] versions = (String[]) props.get(PROTOCOL_VERSIONS_KEY);
+			List<WebSocketProtocolIfc> value = new ArrayList<WebSocketProtocolIfc>();
+			for (String version : versions) {
+				for (WebSocketProtocolIfc v : SUPPORTED_PROTOCOL_VERSIONS) {
+					if (version.equals(v.getId())) {
+						value.add(v);
+					}
+				}
+			}
+			enabledProtocolVersions = value.toArray(new WebSocketProtocolIfc[value.size()]);
+		}
+		super.setProperties(props);
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -82,7 +118,7 @@ public class WebSocketClientConnectionManager
 	 */
 	@Override
 	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
-		return new WebSocketXMPPIOService<Object>();
+		return new WebSocketXMPPIOService<Object>(enabledProtocolVersions);
 	}
 }
 
