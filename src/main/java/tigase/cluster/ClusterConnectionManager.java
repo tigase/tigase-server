@@ -26,43 +26,13 @@ package tigase.cluster;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.cluster.api.ClusterCommandException;
-import tigase.cluster.api.ClusterControllerIfc;
-import tigase.cluster.api.ClusterElement;
-import tigase.cluster.api.ClusteredComponentIfc;
-import tigase.cluster.api.CommandListener;
-import tigase.cluster.api.CommandListenerAbstract;
-import tigase.cluster.repo.ClusterRepoItem;
-
-import tigase.db.comp.ComponentRepository;
-import tigase.db.comp.RepositoryChangeListenerIfc;
-
-import tigase.server.ConnectionManager;
-import tigase.server.Packet;
-import tigase.server.ServiceChecker;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.XMPPIOService;
-
-import tigase.conf.ConfigurationException;
-import tigase.net.ConnectionType;
-import tigase.net.SocketType;
-import tigase.stats.StatisticsList;
-import tigase.sys.TigaseRuntime;
-import tigase.util.Algorithms;
-import tigase.util.TigaseStringprepException;
-import tigase.util.TimeUtils;
-import tigase.xml.Element;
-
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Queue;
@@ -74,8 +44,37 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.Deflater;
-
 import javax.script.Bindings;
+import tigase.cluster.api.ClusterCommandException;
+import tigase.cluster.api.ClusterControllerIfc;
+import tigase.cluster.api.ClusterElement;
+import tigase.cluster.api.ClusteredComponentIfc;
+import tigase.cluster.api.CommandListener;
+import tigase.cluster.api.CommandListenerAbstract;
+import tigase.cluster.repo.ClConConfigRepository;
+import tigase.cluster.repo.ClusterRepoConstants;
+import tigase.cluster.repo.ClusterRepoItem;
+import tigase.conf.ConfigurationException;
+import tigase.db.RepositoryFactory;
+import tigase.db.comp.ComponentRepository;
+import tigase.db.comp.RepositoryChangeListenerIfc;
+import tigase.net.ConnectionType;
+import tigase.net.SocketType;
+import tigase.osgi.ModulesManagerImpl;
+import tigase.server.ConnectionManager;
+import tigase.server.Packet;
+import tigase.server.ServiceChecker;
+import tigase.stats.StatisticsList;
+import tigase.sys.TigaseRuntime;
+import tigase.util.Algorithms;
+import tigase.util.TigaseStringprepException;
+import tigase.util.TimeUtils;
+import tigase.xml.Element;
+import tigase.xmpp.Authorization;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
+import tigase.xmpp.PacketErrorTypeException;
+import tigase.xmpp.XMPPIOService;
 
 /**
  * Class ClusterConnectionManager
@@ -609,14 +608,21 @@ public class ClusterConnectionManager
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defs       = new LinkedHashMap<String, Object>(50);
 		String              repo_class = (String) params.get(CLCON_REPO_CLASS_PROPERTY);
+		String				repo_uri   = (String) params.get(RepositoryFactory.GEN_USER_DB_URI);
 
-		if (repo_class == null) {
-			repo_class = CLCON_REPO_CLASS_PROP_VAL;
+		if (repo_class != null) {
+			defs.put(CLCON_REPO_CLASS_PROP_KEY, repo_class);
 		}
-		defs.put(CLCON_REPO_CLASS_PROP_KEY, repo_class);
+		
 		try {
+			Class<?> cls;
+			if (repo_class == null) {
+				cls = RepositoryFactory.getRepoClass(ClConConfigRepository.class, repo_uri);
+			} else {
+				cls = ModulesManagerImpl.getInstance().forName(repo_class);
+			}
 			ComponentRepository<ClusterRepoItem> repoTmp =
-					(ComponentRepository<ClusterRepoItem>) Class.forName(repo_class).newInstance();
+					(ComponentRepository<ClusterRepoItem>) cls.newInstance();
 
 			repoTmp.getDefaults(defs, params);
 			if (repo == null) {
@@ -763,12 +769,23 @@ public class ClusterConnectionManager
 		String repo_class = (String) props.get(CLCON_REPO_CLASS_PROP_KEY);
 
 		try {
-			ComponentRepository<ClusterRepoItem> repo_tmp =
-					(ComponentRepository<ClusterRepoItem>) Class.forName(repo_class).newInstance();
+			String repo_uri = (String) props.get(ClusterRepoConstants.REPO_URI_PROP_KEY);
+			Class<ClConConfigRepository> cls;
+			if (repo_class == null) {
+				cls = RepositoryFactory.getRepoClass(ClConConfigRepository.class, repo_uri);
+			} else {
+				cls = (Class<ClConConfigRepository>) ModulesManagerImpl.getInstance().forName(repo_class);
+			}
+			ComponentRepository<ClusterRepoItem> repo_tmp = cls.newInstance();
 
 			repo_tmp.addRepoChangeListener(this);
 			repo_tmp.setProperties(props);
+			repo_tmp.initRepository(repo_uri, new HashMap<String,String>());
+			ComponentRepository<ClusterRepoItem> old_repo = repo;
 			repo = repo_tmp;
+			if (old_repo != null) {
+				old_repo.destroy();
+			}
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can not create items repository instance for class: " +
 					repo_class, e);

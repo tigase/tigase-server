@@ -26,17 +26,8 @@ package tigase.conf;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.TigaseDBException;
-
-import tigase.xml.db.NodeNotFoundException;
-import tigase.xml.db.XMLDB;
-import tigase.xml.db.XMLDBException;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.io.File;
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -47,6 +38,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.db.DBInitException;
+import tigase.db.TigaseDBException;
+import tigase.xml.db.NodeNotFoundException;
+import tigase.xml.db.XMLDB;
+import tigase.xml.db.XMLDBException;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -337,13 +333,13 @@ public class ConfigXMLRepository extends ConfigurationCache {
 	 * @throws ConfigurationException
 	 */
 	@Override
-	public void init(Map<String, Object> params) throws ConfigurationException {
+	public void initRepository(String repo_uri, Map<String, String> params) throws DBInitException {
 		config_file = (String) params.get("-c");
 
 		try {
 			init();
 		} catch (XMLDBException ex) {
-			throw new ConfigurationException("Can not initialize configuration repository: ",
+			throw new DBInitException("Can not initialize configuration repository: ",
 																			 ex);
 		}
 	}

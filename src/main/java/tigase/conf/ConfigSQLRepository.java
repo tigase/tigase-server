@@ -24,19 +24,10 @@ package tigase.conf;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.DataRepository;
-import tigase.db.RepositoryFactory;
-import tigase.db.TigaseDBException;
-
-import tigase.util.DataTypes;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -45,6 +36,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.db.DBInitException;
+import tigase.db.DataRepository;
+import tigase.db.RepositoryFactory;
+import tigase.db.TigaseDBException;
+import tigase.util.DataTypes;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -164,7 +160,7 @@ public class ConfigSQLRepository extends ConfigurationCache {
 	 * @throws ConfigurationException
 	 */
 	@Override
-	public void init(Map<String, Object> params) throws ConfigurationException {
+	public void initRepository(String repo_uri, Map<String, String> params) throws DBInitException {
 		String config_db_uri = System.getProperty(CONFIG_REPO_URI_PROP_KEY);
 
 		if (config_db_uri == null) {

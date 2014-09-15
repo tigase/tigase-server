@@ -26,12 +26,10 @@ package tigase.db.comp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.TigaseDBException;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.Collection;
 import java.util.Map;
+import tigase.db.Repository;
+import tigase.db.TigaseDBException;
 
 /**
  * A convenience interface for a unified access to component specific repository
@@ -55,7 +53,7 @@ import java.util.Map;
  * @version $Rev$
  */
 public interface ComponentRepository<Item extends RepositoryItem>
-				extends Iterable<Item> {
+				extends Iterable<Item>, Repository {
 	/** Field description */
 	public static final String COMP_REPO_BIND = "comp_repo";
 
@@ -113,6 +111,12 @@ public interface ComponentRepository<Item extends RepositoryItem>
 	 *         in the repository or <code>false</code> of it does not.
 	 */
 	boolean contains(String key);
+	
+	/**
+	 * Method destroys this instance of ComponentRepository releasing resources
+	 * allocated for this instance of ComponentRepository if possible
+	 */
+	void destroy();
 
 	//~--- get methods ----------------------------------------------------------
 

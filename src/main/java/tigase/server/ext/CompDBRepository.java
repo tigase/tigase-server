@@ -24,6 +24,8 @@ package tigase.server.ext;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.Map;
+import tigase.db.DBInitException;
 import tigase.db.comp.UserRepoRepository;
 
 import tigase.xmpp.BareJID;
@@ -38,6 +40,11 @@ import tigase.xmpp.BareJID;
  */
 public class CompDBRepository extends UserRepoRepository<CompRepoItem> {
 
+	@Override
+	public void destroy() {
+		// Nothing to destroy here
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -92,6 +99,12 @@ public class CompDBRepository extends UserRepoRepository<CompRepoItem> {
 	public BareJID getRepoUser() {
 		return CompRepoDefaults.getRepoUser();
 	}
+	
+	@Override
+	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
+		// Nothing to do here
+	}
+
 }
 
 

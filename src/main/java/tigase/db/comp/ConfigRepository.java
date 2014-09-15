@@ -27,13 +27,14 @@ package tigase.db.comp;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.Collection;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import tigase.db.Repository;
 
 /**
  * Created: Oct 3, 2009 2:58:41 PM

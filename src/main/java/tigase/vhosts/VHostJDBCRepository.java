@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
+import tigase.db.DBInitException;
 
 /**
  * This implementation stores virtual domains in the UserRepository database. It
@@ -101,6 +102,11 @@ public class VHostJDBCRepository
 	private String def_srv_address   = null;
 	private int max_domains_per_user = DOMAINS_PER_USER_LIMIT_PROP_VAL;
 
+	@Override
+	public void destroy() {
+		// Nothing to do
+	}
+	
 	//~--- get methods ----------------------------------------------------------
 
 	/**
@@ -193,6 +199,11 @@ public class VHostJDBCRepository
 		return VHostRepoDefaults.getRepoUser();
 	}
 
+	@Override
+	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
+		// Nothing to do
+	}
+	
 	//~--- set methods ----------------------------------------------------------
 
 	/**

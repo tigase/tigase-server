@@ -37,15 +37,17 @@ import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
+import tigase.db.DBInitException;
+import tigase.db.Repository;
 
 /**
  *
  * @author kobit
  */
+@Repository.Meta( supportedUris = { "file://.*" } )
 public class ClConDirRepository
 				extends ClConConfigRepository
 				implements ClusterRepoConstants {
@@ -65,6 +67,12 @@ public class ClConDirRepository
 	private File      repo_dir  = new File(REPO_URI_DB_DEF_VAL);
 	private DirFilter dirFilter = new DirFilter();
 
+	@Override
+	public void destroy() {
+		// Nothing to do here
+		super.destroy();
+	}
+	
 	//~--- get methods ----------------------------------------------------------
 
 	/**
@@ -80,6 +88,20 @@ public class ClConDirRepository
 		defs.put(REPO_URI_PROP_KEY, REPO_URI_DB_DEF_VAL);
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param conn_str
+	 * @param params
+	 * @throws tigase.db.DBInitException
+	 */
+	@Override
+	public void initRepository(String conn_str, Map<String, String> params) throws DBInitException {
+		// Nothing to do here
+		super.initRepository(conn_str, params);
+	}
+	
 	//~--- set methods ----------------------------------------------------------
 
 	/**

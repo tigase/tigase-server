@@ -47,15 +47,6 @@ public interface ConfigRepositoryIfc
 	/** Field description */
 	public static final String RESOURCE_URI = "--resource-uri";
 
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Initializes the configuration repository.
-	 * @param params
-	 * @throws ConfigurationException
-	 */
-	void init(Map<String, Object> params) throws ConfigurationException;
-
 	//~--- get methods ----------------------------------------------------------
 
 	/**

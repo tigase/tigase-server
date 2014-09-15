@@ -34,6 +34,7 @@ import tigase.util.DNSResolver;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.db.DBInitException;
 
 /**
  * Class description
@@ -56,6 +57,11 @@ public class ClConConfigRepository
 
 	private long autoreload_interval = AUTORELOAD_INTERVAL_PROP_VAL;
 
+	@Override
+	public void destroy() {
+		// Nothing to do
+	}
+	
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
@@ -80,6 +86,11 @@ public class ClConConfigRepository
 
 	//~--- methods --------------------------------------------------------------
 
+	@Override
+	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
+		// Nothing to do
+	}
+	
 	@Override
 	public void reload() {
 		super.reload();

@@ -26,19 +26,17 @@ package tigase.cluster.repo;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.DataRepository;
-import tigase.db.RepositoryFactory;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
+import tigase.db.DBInitException;
+import tigase.db.DataRepository;
+import tigase.db.Repository;
+import tigase.db.RepositoryFactory;
 
 /**
  * Class description
@@ -47,6 +45,7 @@ import java.util.Map;
  * @version        5.2.0, 13/03/09
  * @author         <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
+@Repository.Meta( supportedUris = { "jdbc:[^:]+:.*" } )
 public class ClConSQLRepository
 				extends ClConConfigRepository
 				implements ClusterRepoConstants {
@@ -137,6 +136,14 @@ public class ClConSQLRepository
 
 	private DataRepository data_repo = null;
 
+	@Override
+	public void destroy() {
+		// This implementation of ClConConfigRepository is using shared connection
+		// pool to database which is cached by RepositoryFactory and maybe be used
+		// in other places, so we can not destroy it.
+		super.destroy();
+	}
+	
 	//~--- get methods ----------------------------------------------------------
 
 	/**
@@ -166,11 +173,12 @@ public class ClConSQLRepository
 	 *
 	 * @param conn_str
 	 * @param params
-	 *
-	 * @throws SQLException
+	 * @throws tigase.db.DBInitException
 	 */
+	@Override
 	public void initRepository(String conn_str, Map<String, String> params)
-					throws SQLException {
+					throws DBInitException {
+		super.initRepository(conn_str, params);
 		try {
 			data_repo = RepositoryFactory.getDataRepository(null, conn_str, params);
 			checkDB();
@@ -271,14 +279,6 @@ public class ClConSQLRepository
 	@Override
 	public void setProperties(Map<String, Object> properties) {
 		super.setProperties(properties);
-
-		String repo_uri = (String) properties.get(REPO_URI_PROP_KEY);
-
-		try {
-			initRepository(repo_uri, null);
-		} catch (SQLException ex) {
-			log.log(Level.WARNING, "Problem initializing database.", ex);
-		}
 	}
 
 	//~--- methods --------------------------------------------------------------

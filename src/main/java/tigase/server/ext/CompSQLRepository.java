@@ -26,32 +26,28 @@ package tigase.server.ext;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.comp.ComponentRepository;
-import tigase.db.comp.RepositoryChangeListenerIfc;
-import tigase.db.DataRepository;
-import tigase.db.RepositoryFactory;
-
-import tigase.xml.DomBuilderHandler;
-import tigase.xml.Element;
-import tigase.xml.SimpleParser;
-import tigase.xml.SingletonFactory;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import tigase.db.DBInitException;
+import tigase.db.DataRepository;
+import tigase.db.RepositoryFactory;
+import tigase.db.comp.ComponentRepository;
+import tigase.db.comp.RepositoryChangeListenerIfc;
+import tigase.xml.DomBuilderHandler;
+import tigase.xml.Element;
+import tigase.xml.SimpleParser;
+import tigase.xml.SingletonFactory;
 
 /**
  * Created: Nov 7, 2009 11:26:10 AM
@@ -240,6 +236,13 @@ public class CompSQLRepository
 		return result;
 	}
 
+	@Override
+	public void destroy() {
+		// This implementation of CompSQLRepository is using shared connection
+		// pool to database which is cached by RepositoryFactory and maybe be used
+		// in other places, so we can not destroy it.
+	}
+	
 	//~--- get methods ----------------------------------------------------------
 
 	/**
@@ -319,8 +322,9 @@ public class CompSQLRepository
 	 *
 	 * @throws SQLException
 	 */
+	@Override
 	public void initRepository(String conn_str, Map<String, String> params)
-					throws SQLException {
+					throws DBInitException {
 		try {
 			data_repo = RepositoryFactory.getDataRepository(null, conn_str, params);
 			checkDB();
@@ -396,7 +400,7 @@ public class CompSQLRepository
 
 		try {
 			initRepository(repo_uri, null);
-		} catch (SQLException ex) {
+		} catch (DBInitException ex) {
 			log.log(Level.WARNING, "Problem initializing database.", ex);
 		}
 	}

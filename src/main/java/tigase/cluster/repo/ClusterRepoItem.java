@@ -362,7 +362,7 @@ public class ClusterRepoItem
 	 *
 	 * @param cpuUsage
 	 */
-	void setCpuUsage(float cpuUsage) {
+	protected void setCpuUsage(float cpuUsage) {
 		this.cpuUsage = cpuUsage;
 	}
 
@@ -373,7 +373,7 @@ public class ClusterRepoItem
 	 *
 	 * @param hostname
 	 */
-	void setHostname(String hostname) {
+	protected void setHostname(String hostname) {
 		this.hostname = hostname;
 	}
 
@@ -384,7 +384,7 @@ public class ClusterRepoItem
 	 *
 	 * @param update
 	 */
-	void setLastUpdate(long update) {
+	protected void setLastUpdate(long update) {
 		this.lastUpdate = update;
 	}
 
@@ -394,7 +394,7 @@ public class ClusterRepoItem
 	 *
 	 * @param memUsage
 	 */
-	void setMemUsage(float memUsage) {
+	protected void setMemUsage(float memUsage) {
 		this.memUsage = memUsage;
 	}
 
@@ -404,7 +404,7 @@ public class ClusterRepoItem
 	 *
 	 * @param password
 	 */
-	void setPassword(String password) {
+	protected void setPassword(String password) {
 		this.password = password;
 	}
 
@@ -414,7 +414,7 @@ public class ClusterRepoItem
 	 *
 	 * @param port
 	 */
-	void setPort(int port) {
+	protected void setPort(int port) {
 		this.portNo = port;
 	}
 

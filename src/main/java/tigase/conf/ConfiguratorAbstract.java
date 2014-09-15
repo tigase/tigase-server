@@ -149,13 +149,13 @@ public abstract class ConfiguratorAbstract
 	private boolean        setup_in_progress = false;
 
 	/**
-	 * Configuration settings read from the init.properties file or any other
+	 * Configuration settings read from the initRepository.properties file or any other
 	 * source which provides startup configuration.
 	 */
 	private List<String> initSettings = new LinkedList<String>();
 
 	/**
-	 * Properties from the command line parameters and init.properties file or any
+	 * Properties from the command line parameters and initRepository.properties file or any
 	 * other source which are used to generate default configuration. All the
 	 * settings starting with '--'
 	 */
@@ -231,7 +231,15 @@ public abstract class ConfiguratorAbstract
 		}
 		configRepo.addRepoChangeListener(this);
 		configRepo.setDefHostname(getDefHostName().getDomain());
-		configRepo.init(initProperties);
+		try {
+			// loss of generic types is intentional to make parameter match API
+			// and internally all requests are done like:
+			// String x = (String) initProperties.get("param");
+			// so it should be safe to loss generic types of Map
+			configRepo.initRepository(null, (Map) initProperties);
+		} catch (DBInitException ex) {
+			throw new ConfigurationException(ex.getMessage(), ex);
+		}
 		for (String prop : initSettings) {
 			ConfigItem item = configRepo.getItemInstance();
 
@@ -246,7 +254,7 @@ public abstract class ConfiguratorAbstract
 		}
 
 		// Not sure if this is the correct pleace to initialize monitoring
-		// maybe it should be initialized init initializationCompleted but
+		// maybe it should be initialized initRepository initializationCompleted but
 		// Then some stuff might be missing. Let's try to do it here for now
 		// and maybe change it later.
 		String property_filenames = (String) initProperties.get(PROPERTY_FILENAME_PROP_KEY);

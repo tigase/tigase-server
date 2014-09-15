@@ -23,6 +23,8 @@
 package tigase.vhosts;
 
 
+import java.util.Map;
+import tigase.db.DBInitException;
 import tigase.db.comp.ConfigRepository;
 
 /**
@@ -33,6 +35,10 @@ import tigase.db.comp.ConfigRepository;
  */
 public class VhostConfigRepository extends ConfigRepository<VHostItem> {
 	
+	@Override
+	public void destroy() {
+		// Nothing to do
+	}
 
 	@Override
 	public String[] getDefaultPropetyItems() {
@@ -52,6 +58,11 @@ public class VhostConfigRepository extends ConfigRepository<VHostItem> {
 	@Override
 	public VHostItem getItemInstance() {
 		return VHostRepoDefaults.getItemInstance();
+	}
+
+	@Override
+	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
+		// Nothing to do
 	}
 
 }

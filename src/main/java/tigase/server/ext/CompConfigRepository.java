@@ -22,6 +22,8 @@
 
 package tigase.server.ext;
 
+import java.util.Map;
+import tigase.db.DBInitException;
 import tigase.db.comp.ConfigRepository;
 
 /**
@@ -32,6 +34,11 @@ import tigase.db.comp.ConfigRepository;
  */
 public class CompConfigRepository extends ConfigRepository<CompRepoItem> {
 
+	@Override
+	public void destroy() {
+		// Nothing to do
+	}
+	
 	@Override
 	public String[] getDefaultPropetyItems() {
 		return CompRepoDefaults.getDefaultPropetyItems();
@@ -50,6 +57,11 @@ public class CompConfigRepository extends ConfigRepository<CompRepoItem> {
 	@Override
 	public CompRepoItem getItemInstance() {
 		return CompRepoDefaults.getItemInstance();
+	}
+
+	@Override
+	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
+		// Nothing to do
 	}
 
 }

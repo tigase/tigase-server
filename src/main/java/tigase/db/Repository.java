@@ -60,4 +60,5 @@ public interface Repository {
 	 * call.
 	 */
 	void initRepository(String resource_uri, Map<String, String> params) throws DBInitException;	
+	
 }

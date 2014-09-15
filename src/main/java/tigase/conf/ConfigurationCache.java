@@ -45,6 +45,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Set;
+import tigase.db.DBInitException;
 
 /**
  * Created: Dec 10, 2009 2:02:41 PM
@@ -217,6 +218,15 @@ public class ConfigurationCache
 		return getItem(key) != null;
 	}
 
+	@Override
+	public void destroy() {
+		// Nothing to do now, maybe later we would add some logic here to move 
+		// deinitialization of config repository here - added to implement all methods
+		// needed by ComponentRepository interface which was extended while
+		// implementing support for autodiscovery based on URI and adding
+		// more flexibility in use of repositories
+	}
+	
 	//~--- get methods ----------------------------------------------------------
 
 	/**
@@ -425,17 +435,11 @@ public class ConfigurationCache
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 * @throws ConfigurationException
-	 */
 	@Override
-	public void init(Map<String, Object> params) throws ConfigurationException {}
-
+	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
+		// Nothing to do..
+	}	
+	
 	/**
 	 * Method description
 	 *

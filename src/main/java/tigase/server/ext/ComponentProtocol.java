@@ -673,7 +673,11 @@ public class ComponentProtocol
 					(ComponentRepository<CompRepoItem>) Class.forName(repo_class).newInstance();
 
 			repo_tmp.setProperties(properties);
+			ComponentRepository<CompRepoItem> old_repo = repo;
 			repo = repo_tmp;
+			if (old_repo != null) {
+				repo.destroy();
+			}
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can not create items repository instance for class: " +
 					repo_class, e);
