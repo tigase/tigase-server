@@ -292,8 +292,8 @@ public class Privacy {
 		String lNode   = listNode(list);
 		String[] items = session.getDataGroups(lNode);
 
-		if (items != null) {
-			Element eList = new Element(LIST, new String[] { NAME }, new String[] { list });
+		if ( items != null && list != null ){
+			Element eList = new Element( LIST, new String[] { NAME }, new String[] { list } );
 
 			for (String item : items) {
 				String iNode     = lNode + "/" + item;
