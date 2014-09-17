@@ -570,6 +570,10 @@ public class VHostManager
 		String random = UUID.randomUUID().toString();
 		return random;
 	}
+
+	public ComponentRepository<VHostItem> getComponentRepository() {
+		return repo;
+	}
 }
 
 
