@@ -44,6 +44,8 @@ public interface MsgRepositoryIfc extends Repository {
 	 * Loads head of the payloads queue which holds items that would be expired after
 	 * stated time with an option to delete them from repository after being
 	 * retrieved.
+	 * This is blocking method, which means if there is not data to return, implementation
+	 * should block the call until data is available.
 	 *
 	 * @param time   time in milliseconds representing time after which given
 	 *               message would be considered as expired
