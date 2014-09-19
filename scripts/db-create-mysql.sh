@@ -79,8 +79,9 @@ echo "GRANT SELECT, INSERT, UPDATE ON mysql.proc TO ${USR_NAME};" | mysql -h $DB
 echo "FLUSH PRIVILEGES;" | mysql -h $DB_HOST -u $DB_USER -p$DB_PASS $DB_NAME
 
 echo "Loading schema"
-
 mysql -h $DB_HOST -u $DB_USER -p$DB_PASS $DB_NAME < database/mysql-schema-5-1.sql
+echo "Loading PubSub3 schema"
+mysql -h $DB_HOST -u $DB_USER -p$DB_PASS $DB_NAME < database/mysql-pubsub-schema-3.0.0.sql
 
 
 echo -e "\n\n\nconfiguration:\n\n--user-db=mysql\n--user-db-uri=jdbc:mysql://$DB_HOST:3306/$DB_NAME?user=$DB_USER&password=$DB_PASS&useUnicode=true&characterEncoding=UTF-8&autoCreateUser=true\n\n"
