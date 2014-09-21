@@ -26,31 +26,31 @@ package tigase.server.amp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import tigase.conf.ConfigurationException;
 import tigase.disco.XMPPService;
-
 import tigase.server.AbstractMessageReceiver;
+import tigase.server.Packet;
+import tigase.server.ServerComponent;
+import tigase.server.XMPPServer;
 import tigase.server.amp.action.Alert;
+import tigase.server.amp.action.Broadcast;
 import tigase.server.amp.action.Drop;
 import tigase.server.amp.action.Notify;
 import tigase.server.amp.action.Store;
 import tigase.server.amp.cond.Deliver;
 import tigase.server.amp.cond.ExpireAt;
 import tigase.server.amp.cond.MatchResource;
-import tigase.server.Packet;
-
+import tigase.server.xmppsession.SessionManager;
+import tigase.server.xmppsession.SessionManagerHandler;
 import tigase.xml.Element;
-
 import tigase.xmpp.JID;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
-import tigase.conf.ConfigurationException;
 
 /**
  * Created: Apr 26, 2010 3:22:06 PM
@@ -77,6 +77,7 @@ public class AmpComponent
 	private Map<String, ConditionIfc> conditions = new ConcurrentSkipListMap<String,
 																									 ConditionIfc>();
 
+	protected final Broadcast broadcast = new Broadcast();
 	//~--- methods --------------------------------------------------------------
 
 	// ~--- methods --------------------------------------------------------------
@@ -108,7 +109,7 @@ public class AmpComponent
 	}
 
 	//~--- get methods ----------------------------------------------------------
-
+	
 	// ~--- get methods ----------------------------------------------------------
 
 	/**
@@ -151,6 +152,11 @@ public class AmpComponent
 			}
 		}
 
+		Map<String,Object> d = broadcast.getDefaults(params);
+		if (d != null) {
+			defs.putAll(d);
+		}
+		
 		// for (ConditionIfc c : conditions.values()) {
 		// Map<String, Object> d = c.getDefaults(params);
 		//
@@ -254,6 +260,10 @@ public class AmpComponent
 			log.finest("My packet: " + packet);
 		}
 
+		if (broadcast.preprocess(packet)) {
+			return;
+		}
+		
 		ActionIfc def = null;
 
 		if (packet.getAttributeStaticStr(AmpFeatureIfc.OFFLINE) == null) {
@@ -321,6 +331,7 @@ public class AmpComponent
 			a.setProperties(props, this);
 		}
 
+		broadcast.setProperties(props, this);
 		// for (ConditionIfc c : conditions.values()) {
 		// c.setProperties(props, this);
 		// }

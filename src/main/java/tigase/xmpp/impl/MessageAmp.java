@@ -252,6 +252,13 @@ public class MessageAmp
 				} catch (UserNotFoundException e) {
 					log.info("Something wrong, DB problem, cannot load offline messages. " + e);
 				}      // end of try-catch
+				
+				// notify AMP component that user is online now
+				if (packet.getStanzaTo() == null) {
+					Packet notification = packet.copyElementOnly();
+					notification.initVars(session.getJID(), ampJID);
+					results.offer(notification);
+				}
 			}
 		} else {
 			Element amp = packet.getElement().getChild("amp", XMLNS);

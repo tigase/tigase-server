@@ -55,6 +55,7 @@ import tigase.server.Permissions;
 import tigase.server.Priority;
 import tigase.server.ReceiverTimeoutHandler;
 import tigase.server.XMPPServer;
+import tigase.server.script.AbstractScriptCommand;
 import tigase.server.script.CommandIfc;
 
 import static tigase.server.xmppsession.SessionManagerConfig.*;
@@ -1878,6 +1879,65 @@ public class SessionManager
 
 			break;
 
+		case BROADCAST_TO_ONLINE: {
+			Element packetToBroadcast = null;
+			for (Element elem : pc.getElement().getChildren()) {
+				if (elem.getXMLNS() == "http://tigase.org/protocol/broadcast") {
+					packetToBroadcast = elem;
+					packetToBroadcast.setAttribute("xmlns", Packet.CLIENT_XMLNS);
+				}
+			}
+			String to = Command.getFieldValue(pc, "to");
+			if (to == null) {
+			for (XMPPSession session : sessionsByNodeId.values()) {
+					JID[] jids = session.getJIDs();
+
+					if (jids == null) {
+						continue;
+					}
+
+					for (JID jid : jids) {
+						Element msg = packetToBroadcast.clone();
+						msg.setAttribute("to", jid.toString());
+						try {
+							Packet toSend = Packet.packetInstance(msg);
+						// it is better to send by addOutPacket as in other case results
+							// collection could be very large!!
+							addOutPacket(toSend);
+						} catch (TigaseStringprepException ex) {
+							log.log(Level.FINEST, "could not create packet for message to broadcast", ex);
+						}
+					}
+				}
+			} else {
+				BareJID userJid = BareJID.bareJIDInstanceNS(to);
+				XMPPSession session = sessionsByNodeId.get(userJid);
+				if (session != null) {
+					JID[] jids = session.getJIDs();
+
+					if (jids != null) {
+						for (JID jid : jids) {
+							if (log.isLoggable(Level.FINEST)) {
+								log.log(Level.FINEST, "broadcasting packet to {0}", jid);
+							}
+							Element msg = packetToBroadcast.clone();
+							msg.setAttribute("to", jid.toString());
+							try {
+								Packet toSend = Packet.packetInstance(msg);
+								// it is better to send by addOutPacket as in other case results
+								// collection could be very large!!
+								addOutPacket(toSend);
+							} catch (TigaseStringprepException ex) {
+								log.log(Level.FINEST, "could not create packet for message to broadcast", ex);
+							}
+						}
+					}
+				}
+			}
+			}
+			processing_result = true;
+			break;
+			
 		default :
 			if (getComponentId().equals(iqc.getStanzaTo()) && getComponentId().equals(iqc
 					.getPacketFrom())) {

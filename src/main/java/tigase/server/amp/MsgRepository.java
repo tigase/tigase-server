@@ -21,12 +21,19 @@
  */
 package tigase.server.amp;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
+import tigase.db.DBInitException;
 import tigase.db.MsgRepositoryIfc;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
@@ -34,6 +41,8 @@ import tigase.osgi.ModulesManagerImpl;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 
 /**
  *
@@ -72,10 +81,72 @@ public abstract class MsgRepository<T> implements MsgRepositoryIfc {
 	protected SimpleParser parser = SingletonFactory.getParserInstance();	
 	protected long earliestOffline = Long.MAX_VALUE;
 	protected DelayQueue<MsgDBItem> expiredQueue = new DelayQueue<MsgDBItem>();
+	protected long broadcastMessagesLastCleanup = 0;
+	protected Map<String,BroadcastMsg> broadcastMessages = new ConcurrentHashMap<String,BroadcastMsg>();
 		
 	protected abstract void loadExpiredQueue(int max);
 	protected abstract void loadExpiredQueue(Date expired);
 	protected abstract void deleteMessage(T db_id);
+	
+	public abstract void loadMessagesToBroadcast();
+	protected abstract void ensureBroadcastMessageRecipient(String id, BareJID recipient);
+	protected abstract void insertBroadcastMessage(String id, Element msg, Date expire, BareJID recipient);
+	
+	public BroadcastMsg getBroadcastMsg(String id) {
+		return broadcastMessages.get(id);
+	}
+	
+	public String dumpBroadcastMessageKeys() {
+		StringBuilder sb = new StringBuilder();
+		for (String key : broadcastMessages.keySet()) {
+			if (sb.length() == 0)
+				sb.append("[");
+			else
+				sb.append(",");
+			sb.append(key);
+		}
+		return sb.append("]").toString();
+	}
+	
+	public Collection<BroadcastMsg> getBroadcastMessages() { 
+		long now = System.currentTimeMillis();
+		if (now - broadcastMessagesLastCleanup > 60 * 1000) {
+			broadcastMessagesLastCleanup = now;
+			List<String> toRemove = new ArrayList<String>();
+			for (Map.Entry<String,BroadcastMsg> e : broadcastMessages.entrySet()) {
+				if (e.getValue().getDelay(TimeUnit.MILLISECONDS) < 0) {
+					toRemove.add(e.getKey());
+				}
+			}
+			for (String key : toRemove)
+				broadcastMessages.remove(key);
+		}
+		return Collections.unmodifiableCollection(broadcastMessages.values());
+	}
+	
+	/**
+	 * 
+	 * @param id
+	 * @param msg
+	 * @param expire
+	 * @return true - if new broadcast message is added
+	 */
+	public boolean updateBroadcastMessage(String id, Element msg, Date expire, BareJID recipient) {
+		boolean isNew = false;
+		synchronized (broadcastMessages) {
+			MsgRepository.BroadcastMsg bmsg = broadcastMessages.get(id);
+			if (bmsg == null) {
+				bmsg = new MsgRepository.BroadcastMsg(null, msg, expire);
+				broadcastMessages.put(id, bmsg);
+				isNew = true;
+				insertBroadcastMessage(id, msg, expire, recipient);
+			}
+			if (bmsg.addRecipient(recipient)) {
+				ensureBroadcastMessageRecipient(id, recipient);
+			}
+			return isNew;
+		}
+	}
 	
 	/**
 	 * Method description
@@ -122,6 +193,10 @@ public abstract class MsgRepository<T> implements MsgRepositoryIfc {
 		}
 
 		return item.msg;
+	}
+
+	public String getStanzaTo() {
+		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 	}
 	
 	// ~--- inner classes --------------------------------------------------------
@@ -173,4 +248,30 @@ public abstract class MsgRepository<T> implements MsgRepositoryIfc {
 					TimeUnit.MILLISECONDS);
 		}
 	}	
+		
+	public class BroadcastMsg extends MsgDBItem {
+		
+		private JidResourceMap<Boolean> recipients = new JidResourceMap<Boolean>();
+		
+		public BroadcastMsg(T db_id, Element msg, Date expired) {
+			super(db_id, msg, expired);
+		}
+				
+		protected boolean addRecipient(BareJID jid) {
+			if (recipients.containsKey(jid))
+				return false;
+			recipients.put(JID.jidInstance(jid), Boolean.TRUE);
+			return true;
+		}
+		
+		public boolean needToSend(JID jid) {
+			return recipients.containsKey(jid.getBareJID()) 
+					&& (jid.getResource() == null || !recipients.containsKey(jid));
+		}
+		
+		public void markAsSent(JID jid) {
+			recipients.put(jid, Boolean.TRUE);
+		}
+		
+	}
 }

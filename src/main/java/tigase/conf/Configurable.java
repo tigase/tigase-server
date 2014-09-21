@@ -56,6 +56,9 @@ public interface Configurable
 	public static final String AMP_CLASS_NAME = "tigase.server.amp.AmpComponent";
 
 	/** Field description */
+	public static final String AMP_CLUST_CLASS_NAME = "tigase.cluster.AmpComponentClustered";
+	
+	/** Field description */
 	public static final String BOSH_CLUST_COMP_CLASS_NAME =
 			"tigase.cluster.BoshConnectionClustered";
 
