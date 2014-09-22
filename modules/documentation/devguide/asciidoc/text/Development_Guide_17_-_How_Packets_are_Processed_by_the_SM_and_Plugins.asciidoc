@@ -1,10 +1,8 @@
-[[hpapbtsmap]]
+[[How_Packets_are_Processed_by_the_SM_and_Plugins]]
 How Packets are Processed by the SM and Plugins 
 ===============================================
 Artur Hefczyc <artur.hefczyc@tigase.net>
 v2.0, June 2014: Reformatted for AsciiDoc.
-:toc:
-:numbered:
 :website: http://tigase.net/
 :Date: 2010-04-06 21:22
 

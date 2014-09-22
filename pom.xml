@@ -96,8 +96,8 @@
 							<source>1.7</source>
 							<quiet>true</quiet>
 							<aggregate>true</aggregate>
-							<reportOutputDirectory>${project.reporting.outputDirectory}/docs</reportOutputDirectory>
-							<destDir>docs</destDir>
+							<reportOutputDirectory>${project.reporting.outputDirectory}/docs/javadoc</reportOutputDirectory>
+							<destDir>docs/javadoc</destDir>
 
 							<finalName>${project.artifactId}-${project.version}-b${gitVersion}</finalName>
 							<jarOutputDirectory>pack</jarOutputDirectory>

@@ -69,6 +69,7 @@
 				</property>
 			</activation>
 			<modules>
+				<module>../documentation</module>
 				<module>../distribution</module>
 				<module>../izpack-installer</module>
 			</modules>
@@ -183,8 +184,8 @@
 						</goals>
 						<configuration>
 							<quiet>true</quiet>
-							<reportOutputDirectory>${project.reporting.outputDirectory}/docs</reportOutputDirectory>
-							<destDir>docs</destDir>
+							<reportOutputDirectory>${project.reporting.outputDirectory}/docs/javadoc</reportOutputDirectory>
+							<destDir>docs/javadoc</destDir>
 							<maxmemory>512m</maxmemory>
 						</configuration>
 					</execution>
