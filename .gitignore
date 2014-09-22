@@ -63,3 +63,4 @@ database/postgresql-pubsub-schema-3.0.0.sql
 database/pubsub-db-create-derby.sh
 database/pubsub-db-migrate.sh
 database/sqlserver-pubsub-schema-3.0.0.sql
+derby.log
