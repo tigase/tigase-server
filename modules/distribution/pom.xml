@@ -176,8 +176,7 @@
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.basedir}/../..</outputDirectory>
-									<includes>**/*.groovy</includes>
-									<includes>**/*.html</includes>
+									<includes>**/*.groovy, **/*.html</includes>
 								</artifactItem>
 
 								<artifactItem>
