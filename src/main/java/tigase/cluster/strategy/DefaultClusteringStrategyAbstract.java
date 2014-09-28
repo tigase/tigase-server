@@ -115,6 +115,11 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 	}
 
 	@Override
+	public boolean containsJidLocally(BareJID jid) {
+		return false;
+	}
+	
+	@Override
 	public void handleLocalPacket(Packet packet, XMPPResourceConnection conn) {}
 
 	@Override

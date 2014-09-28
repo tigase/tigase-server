@@ -32,6 +32,7 @@ import tigase.sys.MemoryChangeListener;
 import tigase.sys.OnlineJidsReporter;
 import tigase.sys.ShutdownHook;
 import tigase.sys.TigaseRuntime;
+import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
 /**
@@ -114,6 +115,20 @@ public class MonitorRuntime extends TigaseRuntime {
 		return false;
 	}
 
+	@Override
+	public boolean isJidOnlineLocally(BareJID jid) {
+		if (onlineJidsReporters.size() == 1) {
+			return onlineJidsReporters.getFirst().containsJidLocally(jid);
+		} else {
+			for (OnlineJidsReporter onlineJidsReporter : onlineJidsReporters) {
+				if (onlineJidsReporter.containsJidLocally(jid)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	/**
 	 *
 	 * @param jid

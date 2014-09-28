@@ -369,8 +369,13 @@ public class SessionManager
 		return result;
 	}
 
-@Override
+	@Override
 	public boolean containsJid(BareJID jid) {
+		return sessionsByNodeId.containsKey(jid);
+	}
+	
+	@Override
+	public boolean containsJidLocally(BareJID jid) {
 		return sessionsByNodeId.containsKey(jid);
 	}
 

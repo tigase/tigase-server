@@ -39,6 +39,7 @@ import java.lang.management.ThreadMXBean;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.xmpp.BareJID;
 
 /**
  * Created: Feb 19, 2009 12:15:02 PM
@@ -413,6 +414,8 @@ public abstract class TigaseRuntime {
 	 * @return a value of <code>boolean</code>
 	 */
 	public abstract boolean isJidOnline(JID jid);
+	
+	public abstract boolean isJidOnlineLocally(BareJID jid);
 
 	public void shutdownTigase(String[] msg) {
 			if (XMPPServer.isOSGi()) {
