@@ -60,7 +60,7 @@ import tigase.xmpp.XMPPResourceConnection;
 public class Message
 				extends XMPPProcessor
 				implements XMPPProcessorIfc, XMPPPreprocessorIfc, XMPPPacketFilterIfc {
-	
+
 	private static final String     ELEM_NAME = tigase.server.Message.ELEM_NAME;
 	private static final String[][] ELEMENTS  = {
 		{ ELEM_NAME }
@@ -90,17 +90,17 @@ public class Message
 	@Override
 	public void init(Map<String, Object> settings) throws TigaseDBException {
 		super.init(settings);
-		
-		deliveryRules = settings.containsKey(DELIVERY_RULES_KEY) 
+
+		deliveryRules = settings.containsKey(DELIVERY_RULES_KEY)
 				? MessageDeliveryRules.valueOf((String) settings.get(DELIVERY_RULES_KEY))
 				: MessageDeliveryRules.inteligent;
 	}
-	
+
 	@Override
 	public void filter(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results) {
 		C2SDeliveryErrorProcessor.filter(packet, session, repo, results, null);
-	}	
-	
+	}
+
 	/**
 	 * Method description
 	 *
@@ -139,15 +139,15 @@ public class Message
 							// try to deliver this message to all available resources so we should
 							// treat it as a stanza with bare "to" attribute
 							Packet result = packet.copyElementOnly();
-							result.initVars(packet.getStanzaFrom(), 
+							result.initVars(packet.getStanzaFrom(),
 									packet.getStanzaTo().copyWithoutResource());
-							results.offer(result);							
+							results.offer(result);
 							break;
-							
+
 						case error:
 							// for error packet we should ignore stanza according to RFC 6121
 							break;
-							
+
 						case headline:
 						case groupchat:
 						case normal:
@@ -160,7 +160,7 @@ public class Message
 					}
 				}
 				else {
-					results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet, 
+					results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet,
 							"The recipient is no longer available.", true));
 				}
 			}
@@ -180,13 +180,13 @@ public class Message
 							new Object[] { packet,
 							session });
 				}
-				
+
 				if (packet.getStanzaFrom() != null && session.isUserId(packet.getStanzaFrom().getBareJID())) {
 					JID connectionId = session.getConnectionId();
 					if (connectionId.equals(packet.getPacketFrom())) {
 						results.offer(packet.copyElementOnly());
 						// this would cause message packet to be stored in offline storage and will not
-						// send recipient-unavailable error but it will behave the same as a message to 
+						// send recipient-unavailable error but it will behave the same as a message to
 						// unavailable resources from other sessions or servers
 						return;
 					}
@@ -219,7 +219,7 @@ public class Message
 
 				// MessageCarbons: message cloned to all resources? why? it should be copied only
 				// to resources with non negative priority!!
-				
+
 				if (conns.size() > 0) {
 					for (XMPPResourceConnection con : conns) {
 						Packet result = packet.copyElementOnly();
@@ -298,7 +298,7 @@ public class Message
 				results.offer(result);
 			}
 		} catch (NotAuthorizedException e) {
-			log.log(Level.WARNING, "NotAuthorizedException for packet: " + packet, e);
+			log.log(Level.WARNING, "NotAuthorizedException for packet: " + packet + " for session: " + session, e);
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
 		}    // end of try-catch
@@ -312,12 +312,12 @@ public class Message
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public String[][] supElementNamePaths() {
@@ -328,13 +328,13 @@ public class Message
 	 * Method description
 	 *
 	 *
-	 * 
+	 *
 	 */
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
 	}
-	
+
 	private static enum MessageDeliveryRules {
 		strict,
 		inteligent
