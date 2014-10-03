@@ -109,6 +109,8 @@ public class Privacy {
 	/** Field description */
 	protected static final String VALUE = "value";
 
+	private static final String PRIVACY_LIST_LOADED = "privacy-lists-loaded";
+
 	/**
 	 * Private logger for class instances.
 	 */
@@ -167,7 +169,7 @@ public class Privacy {
 	 *
 	 * @param session
 	 *
-	 * 
+	 *
 	 *
 	 * @throws NotAuthorizedException
 	 */
@@ -182,7 +184,7 @@ public class Privacy {
 	 *
 	 * @param session
 	 *
-	 * 
+	 *
 	 *
 	 * @throws NotAuthorizedException
 	 */
@@ -206,15 +208,19 @@ public class Privacy {
 	 */
 	public static Element getDefaultList(XMPPResourceConnection session)
 					throws NotAuthorizedException, TigaseDBException {
-		Element sessionDefaultList = (Element) session.getCommonSessionData( DEFAULT );
-		if ( sessionDefaultList == null ){
-			String defaultListName = getDefaultListName( session );
-			if ( defaultListName != null ){
-				sessionDefaultList = Privacy.getList( session, defaultListName);
-				if ( null != sessionDefaultList ){
-					session.putCommonSessionData( DEFAULT, sessionDefaultList );
+		Element sessionDefaultList = null;
+		if (session.getCommonSessionData(PRIVACY_LIST_LOADED) == null) {
+			sessionDefaultList = (Element) session.getCommonSessionData( DEFAULT );
+			if ( sessionDefaultList == null ){
+				String defaultListName = getDefaultListName( session );
+				if ( defaultListName != null ){
+					sessionDefaultList = Privacy.getList( session, defaultListName);
+					if ( null != sessionDefaultList ){
+						session.putCommonSessionData( DEFAULT, sessionDefaultList );
+					}
 				}
 			}
+			session.putCommonSessionData(PRIVACY_LIST_LOADED, PRIVACY_LIST_LOADED);
 		}
 		return sessionDefaultList;
 	}
@@ -225,7 +231,7 @@ public class Privacy {
 	 *
 	 * @param session
 	 *
-	 * 
+	 *
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -242,7 +248,7 @@ public class Privacy {
 	 * @param session
 	 * @param list
 	 *
-	 * 
+	 *
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -282,7 +288,7 @@ public class Privacy {
 	 * @param session
 	 * @param list
 	 *
-	 * 
+	 *
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -336,7 +342,7 @@ public class Privacy {
 	 *
 	 * @param session
 	 *
-	 * 
+	 *
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
@@ -354,7 +360,7 @@ public class Privacy {
 	 *
 	 * @param list
 	 *
-	 * 
+	 *
 	 */
 	public static String listNode(final String list) {
 		return PRIVACY + "/" + list;
