@@ -59,7 +59,7 @@ import tigase.xmpp.BareJID;
  *
  * @author wojtek
  */
-class DBSchemaLoader {
+class DBSchemaLoader extends SchemaLoader {
 
 	/** Denotes whether there wasn't any problem establishing connection to the
 	 * database */
@@ -475,12 +475,14 @@ class DBSchemaLoader {
 	 *
 	 * @param variables set of {@code Properties} with all configuration options
 	 */
-	public void validateDBConnection( Properties variables ) {
+	@Override
+	public Result validateDBConnection( Properties variables ) {
 		connection_ok = false;
 		String db_conn = getDBUri( variables, false, true );
 		log.log( Level.INFO, "Validating DBConnection, URI: " + db_conn );
 		if ( db_conn == null ){
 			log.log( Level.WARNING, "Missing DB connection URL" );
+			return Result.ok;
 		} else {
 			try ( Connection conn = DriverManager.getConnection( db_conn ) ) {
 				Enumeration<Driver> drivers = DriverManager.getDrivers();
@@ -492,14 +494,20 @@ class DBSchemaLoader {
 				conn.close();
 				connection_ok = true;
 				log.log( Level.INFO, "Connection OK" );
+				return Result.ok;
 			} catch ( SQLException e ) {
 				//e.printStackTrace();
 				log.log( Level.WARNING, e.getMessage() );
+				return Result.error;
 			}
 		}
 	}
 
-	public void shutdownDerby( Properties variables ) {
+	public Result shutdown( Properties variables ) {
+		return shutdownDerby(variables);
+	}
+	
+	public Result shutdownDerby( Properties variables ) {
 		String db_conn = getDBUri( variables, false, true );
 		String database = variables.getProperty( DATABASE_TYPE_KEY );
 		if ( "derby".equals( database ) ){
@@ -524,6 +532,7 @@ class DBSchemaLoader {
 				}
 			}
 		}
+		return Result.ok;
 	}
 
 	/**
@@ -534,10 +543,11 @@ class DBSchemaLoader {
 	 *
 	 * @param variables set of {@code Properties} with all configuration options
 	 */
-	public void validateDBExists( Properties variables ) {
+	@Override
+	public Result validateDBExists( Properties variables ) {
 		if ( !connection_ok ){
 			log.log( Level.WARNING, "Connection not validated" );
-			return;
+			return Result.error;
 		}
 
 		String res_prefix = variables.get( DATABASE_TYPE_KEY ).toString();
@@ -546,18 +556,22 @@ class DBSchemaLoader {
 		log.log( Level.INFO, "Validating whether DB Exists, URI: " + db_conn );
 		if ( db_conn == null ){
 			log.log( Level.WARNING, "Missing DB connection URL" );
+			return Result.error;
 		} else {
 			try
 				( Connection conn = DriverManager.getConnection( db_conn ) ) {
 				conn.close();
 				db_ok = true;
 				log.log( Level.INFO, "Exists OK" );
+				return Result.ok;
 			} catch ( SQLException e ) {
 				log.log( Level.INFO, "Doesn't exist, creating..." );
 
 				db_conn = getDBUri( variables, false, true );
+			
 				try
 					(Connection conn = DriverManager.getConnection( db_conn ) ) {
+					Result result = Result.ok;
 					ArrayList<String> queries = loadSQLQueries( res_prefix + "-installer-create-db", res_prefix, variables );
 					for ( String query : queries ) {
 						log.log( Level.FINE, "Executing query: " + query );
@@ -568,6 +582,7 @@ class DBSchemaLoader {
 								stmt.execute( query );
 								stmt.close();
 							} catch ( SQLException ex ) {
+								result = Result.warning;
 								log.log( Level.WARNING, "Query failed: " + ex.getMessage() );
 							}
 						}
@@ -575,8 +590,10 @@ class DBSchemaLoader {
 					conn.close();
 					log.log( Level.INFO, " OK" );
 					db_ok = true;
+					return result;
 				} catch ( SQLException | IOException ex ) {
 					log.log( Level.WARNING, ex.getMessage() );
+					return Result.error;
 				}
 			}
 		}
@@ -589,14 +606,14 @@ class DBSchemaLoader {
 	 *
 	 * @param variables set of {@code Properties} with all configuration options
 	 */
-	public void validateDBSchema( Properties variables ) {
+	public Result validateDBSchema( Properties variables ) {
 		if ( !connection_ok ){
 			log.log( Level.WARNING, "Connection not validated" );
-			return;
+			return Result.error;
 		}
 		if ( !db_ok ){
 			log.log( Level.WARNING, "Database not validated" );
-			return;
+			return Result.error;
 		}
 		schema_exists = false;
 		schema_ok = false;
@@ -635,11 +652,11 @@ class DBSchemaLoader {
 				}
 			}
 		} catch ( SQLException e ) {
-			log.log( Level.INFO, "Exception, posibly schema hasn't been loaded yet.");
+			log.log( Level.WARNING, "Exception, posibly schema hasn't been loaded yet.");
 		}
 		if ( schema_ok ){
 			log.log( Level.INFO, "Schema OK, accounts number: " + users );
-			return;
+			return Result.ok;
 		}
 		if ( !schema_exists ){
 			db_conn = getDBUri( variables, true, true );
@@ -658,11 +675,14 @@ class DBSchemaLoader {
 				}
 				schema_ok = true;
 				log.log( Level.INFO, "New schema loaded OK" );
+				return Result.ok;
 			} catch ( SQLException | IOException ex ) {
-				log.log( Level.INFO, "Can't load schema: " + ex.getMessage() );
+				log.log( Level.WARNING, "Can't load schema: " + ex.getMessage() );
+				return Result.error;
 			}
 		} else {
 			log.log( Level.INFO, "Old schema, accounts number: " + users );
+			return Result.warning;
 		}
 	}
 
@@ -673,20 +693,20 @@ class DBSchemaLoader {
 	 *
 	 * @param variables set of {@code Properties} with all configuration options
 	 */
-	public void postInstallation( Properties variables ) {
+	public Result postInstallation( Properties variables ) {
 		// part 1, check db preconditions
 		if ( !connection_ok ){
-			log.log( Level.INFO, "Connection not validated" );
-			return;
+			log.log( Level.WARNING, "Connection not validated" );
+			return Result.error;
 		}
 		if ( !db_ok ){
-			log.log( Level.INFO, "Database not validated" );
-			return;
+			log.log( Level.WARNING, "Database not validated" );
+			return Result.error;
 		}
 
 		if ( !schema_ok ){
-			log.log( Level.INFO, "Database schema is invalid" );
-			return;
+			log.log( Level.WARNING, "Database schema is invalid" );
+			return Result.error;
 		}
 
 		// part 2, acquire reqired fields and validate them
@@ -708,8 +728,10 @@ class DBSchemaLoader {
 			}
 			schema_ok = true;
 			log.log( Level.INFO, " completed OK" );
+			return Result.ok;
 		} catch ( SQLException | IOException ex ) {
-			log.log( Level.INFO, "Can't finalize: " + ex.getMessage() );
+			log.log( Level.WARNING, "Can't finalize: " + ex.getMessage() );
+			return Result.error;
 		}
 	}
 
@@ -719,20 +741,21 @@ class DBSchemaLoader {
 	 *
 	 * @param variables set of {@code Properties} with all configuration options
 	 */
-	protected void addXmppAdminAccount( Properties variables ) {
+	@Override
+	public Result addXmppAdminAccount( Properties variables ) {
 		// part 1, check db preconditions
 		if ( !connection_ok ){
 			log.log( Level.WARNING, "Connection not validated" );
-			return;
+			return Result.error;
 		}
 		if ( !db_ok ){
 			log.log( Level.WARNING, "Database not validated" );
-			return;
+			return Result.error;
 		}
 
 		if ( !schema_ok ){
 			log.log( Level.WARNING, "Database schema is invalid" );
-			return;
+			return Result.error;
 		}
 
 		// part 2, acquire reqired fields and validate them
@@ -749,13 +772,13 @@ class DBSchemaLoader {
 		}
 		if ( jids.size() < 1 ){
 			log.log( Level.WARNING, "Error: No admin users entered" );
-			return;
+			return Result.warning;
 		}
 
 		Object pwdObj = variables.get( ADMIN_JID_PASS_KEY );
 		if ( pwdObj == null ){
 			log.log( Level.WARNING, "Error: No admin password enetered" );
-			return;
+			return Result.warning;
 		}
 		String pwd = pwdObj.toString();
 
@@ -774,8 +797,10 @@ class DBSchemaLoader {
 			}
 
 			log.log( Level.INFO, "All users added" );
+			return Result.ok;
 		} catch ( TigaseDBException | ClassNotFoundException | InstantiationException | IllegalAccessException e ) {
 			log.log( Level.WARNING, "Error initializing DB" + e );
+			return Result.error;
 		}
 	}
 
@@ -786,22 +811,23 @@ class DBSchemaLoader {
 	 *
 	 * @param variables set of {@code Properties} with all configuration options
 	 */
-	protected void loadSchemaFile( Properties variables ) {
+	@Override
+	public Result loadSchemaFile( Properties variables ) {
 
 		// part 1, check db preconditions
 		if ( !connection_ok ){
 			log.log( Level.INFO, "Connection not validated" );
-			return;
+			return Result.error;
 		}
 		if ( !db_ok ){
 			log.log( Level.INFO, "Database not validated" );
-			return;
+			return Result.error;
 		}
 
 		Object fileNameObj = variables.get( FILE_KEY );
 		if ( fileNameObj == null ){
 			log.log( Level.WARNING, "Error: empty query" );
-			return;
+			return Result.error;
 		}
 		String fileName = fileNameObj.toString();
 
@@ -823,8 +849,10 @@ class DBSchemaLoader {
 			}
 			schema_ok = true;
 			log.log( Level.INFO, " completed OK" );
-		} catch ( SQLException | IOException ex ) {
+			return Result.ok;
+		} catch ( SQLException | IOException | NullPointerException ex ) {
 			log.log( Level.WARNING, "Can't finalize: " + ex.getMessage() );
+			return Result.error;
 		}
 	}
 
