@@ -47,6 +47,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.db.DBInitException;
 import tigase.db.DataRepository;
+import tigase.db.DataRepository.dbTypes;
 import tigase.db.MsgRepositoryIfc;
 import tigase.db.Repository;
 import tigase.db.RepositoryFactory;
@@ -250,12 +251,21 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			"insert into broadcast_msgs (id, expired, msg) values (?, ?, ?) where not exists (select 1 from broadcast_msgs where id = ?)";
 	private static final String SQL_MSG_INSERT_MESSAGE_TO_BROADCAST =
 			"insert into broadcast_msgs (id, expired, msg) select ?, ?, ? from (select 1) x where not exists (select 1 from broadcast_msgs where id = ?)";
+	private static final String DERBY_MSG_INSERT_MESSAGE_TO_BROADCAST1 = 
+			"select id from broadcast_msgs where id = ?";
+	private static final String DERBY_MSG_INSERT_MESSAGE_TO_BROADCAST2 = 
+			"insert into broadcast_msgs (id, expired, msg) values (?,?,?)";
 	private static final String MSG_SELECT_BROADCAST_RECIPIENTS = 
 			"select j." + JID_COLUMN + " from broadcast_msgs_recipients r join " + JID_TABLE + " j on j." + JID_ID_COLUMN + " = r.jid_id where r.msg_id = ?";
 	private static final String SQLSERVER_MSG_ENSURE_BROADCAT_RECIPIETN = 
 			"insert into broadcast_msgs_recipients (msg_id, jid_id) values (?, ?) where not exists (select 1 from broadcast_msgs_recipients where msg_id = ? and jid_id = ?)";
 	private static final String SQL_MSG_ENSURE_BROADCAT_RECIPIETN = 
 			"insert into broadcast_msgs_recipients (msg_id, jid_id) select ?, ? from (select 1) x where not exists (select 1 from broadcast_msgs_recipients where msg_id = ? and jid_id = ?)";
+	private static final String DERBY_MSG_ENSURE_BROADCAT_RECIPIETN1 = 
+			"select 1 from broadcast_msgs_recipients where msg_id = ? and jid_id = ?";
+	private static final String DERBY_MSG_ENSURE_BROADCAT_RECIPIETN2 = 
+			"insert into broadcast_msgs_recipients (msg_id, jid_id) values (?, ?)";
+	
 	private static final String GET_USER_UID_DEF_QUERY =
 		"select " + 
 		  JID_ID_COLUMN + ", " + 
@@ -373,8 +383,15 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			data_repo.initPreparedStatement(ADD_USER_JID_ID_QUERY, ADD_USER_JID_ID_QUERY);
 			data_repo.initPreparedStatement(MSG_SELECT_BROADCAST_RECIPIENTS, MSG_SELECT_BROADCAST_RECIPIENTS);
 			data_repo.initPreparedStatement(MSG_SELECT_MESSAGES_TO_BROADCAST, MSG_SELECT_MESSAGES_TO_BROADCAST);
-			data_repo.initPreparedStatement(msg_ensure_broadcast_recipient, msg_ensure_broadcast_recipient);
-			data_repo.initPreparedStatement(msg_insert_message_to_broadcast, msg_insert_message_to_broadcast);
+			if (data_repo.getDatabaseType() == dbTypes.derby) {
+				data_repo.initPreparedStatement(DERBY_MSG_ENSURE_BROADCAT_RECIPIETN1, DERBY_MSG_ENSURE_BROADCAT_RECIPIETN1);
+				data_repo.initPreparedStatement(DERBY_MSG_ENSURE_BROADCAT_RECIPIETN2, DERBY_MSG_ENSURE_BROADCAT_RECIPIETN2);
+				data_repo.initPreparedStatement(DERBY_MSG_INSERT_MESSAGE_TO_BROADCAST1, DERBY_MSG_INSERT_MESSAGE_TO_BROADCAST1);
+				data_repo.initPreparedStatement(DERBY_MSG_INSERT_MESSAGE_TO_BROADCAST2, DERBY_MSG_INSERT_MESSAGE_TO_BROADCAST2);
+			} else {
+				data_repo.initPreparedStatement(msg_ensure_broadcast_recipient, msg_ensure_broadcast_recipient);
+				data_repo.initPreparedStatement(msg_insert_message_to_broadcast, msg_insert_message_to_broadcast);
+			}
 		} catch (Exception e) {
 			log.log(Level.WARNING, "MsgRepository not initialized due to exception", e);
 			// Ignore for now....
@@ -601,13 +618,33 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 	@Override
 	protected void insertBroadcastMessage(String id, Element msg, Date expire, BareJID recipient) {
 		try {
-			PreparedStatement stmt = data_repo.getPreparedStatement(recipient, msg_insert_message_to_broadcast);
-			synchronized (stmt) {
-				stmt.setString(1, id);
-				stmt.setTimestamp(2, new Timestamp(expire.getTime()));
-				stmt.setString(3, msg.toString());
-				stmt.setString(4, id);
-				stmt.executeUpdate();
+			if (data_repo.getDatabaseType() == dbTypes.derby) {
+				boolean exists = false;
+				PreparedStatement stmt = data_repo.getPreparedStatement(recipient, DERBY_MSG_INSERT_MESSAGE_TO_BROADCAST1);
+				synchronized (stmt) {
+					stmt.setString(1, id);
+					ResultSet rs = stmt.executeQuery();
+					exists = rs.next();
+					data_repo.release(null, rs);
+				}
+				if (!exists) {
+					stmt = data_repo.getPreparedStatement(recipient, DERBY_MSG_INSERT_MESSAGE_TO_BROADCAST2);
+					synchronized (stmt) {
+						stmt.setString(1, id);
+						stmt.setTimestamp(2, new Timestamp(expire.getTime()));
+						stmt.setString(3, msg.toString());
+						stmt.executeUpdate();
+					}					
+				}
+			} else {			
+				PreparedStatement stmt = data_repo.getPreparedStatement(recipient, msg_insert_message_to_broadcast);
+				synchronized (stmt) {
+					stmt.setString(1, id);
+					stmt.setTimestamp(2, new Timestamp(expire.getTime()));
+					stmt.setString(3, msg.toString());
+					stmt.setString(4, id);
+					stmt.executeUpdate();
+				}
 			}
 		} catch (Exception ex) {
 			log.log(Level.WARNING, "Problem with updating broadcast message", ex);
@@ -621,15 +658,35 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			if (uid == -1) {
 				uid = addUserJID(recipient);
 			}
-			PreparedStatement stmt = data_repo.getPreparedStatement(recipient, msg_ensure_broadcast_recipient);
-			synchronized (stmt) {
-				stmt.setString(1, id);
-				stmt.setLong(2, uid);
-				stmt.setString(3, id);
-				stmt.setLong(4, uid);
-				stmt.executeUpdate();
-			}
 			
+			if (data_repo.getDatabaseType() == dbTypes.derby) {
+				boolean exists = false;
+				PreparedStatement stmt = data_repo.getPreparedStatement(recipient, DERBY_MSG_ENSURE_BROADCAT_RECIPIETN1);
+				synchronized (stmt) {
+					stmt.setString(1, id);
+					stmt.setLong(2, uid);
+					ResultSet rs = stmt.executeQuery();
+					exists = rs.next();
+					data_repo.release(null, rs);
+				}
+				if (!exists) {
+					stmt = data_repo.getPreparedStatement(recipient, DERBY_MSG_ENSURE_BROADCAT_RECIPIETN2);
+					synchronized (stmt) {
+						stmt.setString(1, id);
+						stmt.setLong(2, uid);
+						stmt.executeUpdate();
+					}					
+				}
+			} else {
+				PreparedStatement stmt = data_repo.getPreparedStatement(recipient, msg_ensure_broadcast_recipient);
+				synchronized (stmt) {
+					stmt.setString(1, id);
+					stmt.setLong(2, uid);
+					stmt.setString(3, id);
+					stmt.setLong(4, uid);
+					stmt.executeUpdate();
+				}
+			}
 		} catch (Exception ex) {
 			log.log(Level.WARNING, "Problem with updating broadcast message", ex);
 		}
