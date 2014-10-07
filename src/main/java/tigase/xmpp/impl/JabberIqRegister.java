@@ -46,6 +46,7 @@ import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.Priority;
+import tigase.stats.StatisticsList;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
@@ -72,7 +73,7 @@ import tigase.xmpp.XMPPResourceConnection;
 public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc {
 	private static final int REMOTE_ADDRESS_IDX = 2;
 	private static final String[][] ELEMENTS = { Iq.IQ_QUERY_PATH };
-	private static final String ID = "jabber:iq:register";
+	public static final String ID = "jabber:iq:register";
 
 	/**
 	 * Whitelist properties
@@ -99,6 +100,15 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 	private String oauthConsumerSecret;
 	private boolean signedFormRequired = false;
 
+	public void setOAuthCredentials(String oauthConsumerKey, String oauthConsumerSecret){
+		this.oauthConsumerKey = oauthConsumerKey;
+		this.oauthConsumerSecret = oauthConsumerSecret;
+	}
+	
+	public void setSignedFormRequired(boolean required){
+		this.signedFormRequired = required;
+	}
+	
 	/**
 	 * Private logger for class instances.
 	 */
@@ -200,12 +210,14 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 					if (!isRegistrationAllowedForConnection(packet.getFrom())) {
 						results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
 								"Registration is not allowed for this connection.", true));
+						++statsInvalidRegistrations;
 						return;
 					}
 
 					if (!session.getDomain().isRegisterEnabled()) {
 						results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
 								"Registration is not allowed for this domain.", true));
+						++statsInvalidRegistrations;
 						return;
 					}
 				}
@@ -266,18 +278,21 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 							if (formEl == null) {
 								results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
 										"Use Signed Registration Form", true));
+								++statsInvalidRegistrations;
 								return;
 							}
 							Form form = new Form(formEl);
 							if (!expectedToken.equals(form.getAsString("oauth_token"))) {
 								log.finest("Received oauth_token is different that sent one.");
 								results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Unknown oauth_token", true));
+								++statsInvalidRegistrations;
 								return;
 							}
 							if (!oauthConsumerKey.equals(form.getAsString("oauth_consumer_key"))) {
 								log.finest("Unknown oauth_consumer_key");
 								results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
 										"Unknown oauth_consumer_key", true));
+								++statsInvalidRegistrations;
 								return;
 							}
 							try {
@@ -289,6 +304,7 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 								log.fine("Form Signature Validation Problem: " + e.getMessage());
 								results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Invalid form signature",
 										true));
+								++statsInvalidRegistrations;
 								return;
 							}
 						} else {
@@ -313,6 +329,7 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 						if (result == Authorization.AUTHORIZED) {
 							results.offer(result.getResponseMessage(packet, null, false));
 						} else {
+							++statsInvalidRegistrations;
 							results.offer(result.getResponseMessage(packet, "Unsuccessful registration attempt", true));
 						}
 					}
@@ -408,6 +425,17 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 		}
 	}
 
+	private long statsRegisteredUsers;
+	
+	private long statsInvalidRegistrations;
+	
+	@Override
+	public void getStatistics(StatisticsList list) {
+		super.getStatistics(list);
+		list.add(getComponentInfo().getName(), "Registered users", statsRegisteredUsers, Level.INFO);
+		list.add(getComponentInfo().getName(), "Invalid registrations", statsInvalidRegistrations, Level.INFO);
+	}
+	
 	@Override
 	public void init(Map<String, Object> settings) throws TigaseDBException {
 		this.oauthConsumerKey = (String) settings.get(OAUTH_CONSUMERKEY_PROP_KEY);
@@ -583,6 +611,10 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 		} else {
 			return null;
 		}
+	}
+
+	public boolean isSignedFormRequired() {
+		return signedFormRequired;
 	}
 } // JabberIqRegister
 

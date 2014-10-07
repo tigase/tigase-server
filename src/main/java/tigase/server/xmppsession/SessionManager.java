@@ -26,20 +26,48 @@ package tigase.server.xmppsession;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.*;
+import static tigase.server.xmppsession.SessionManagerConfig.AUTH_TIMEOUT_PROP_KEY;
+import static tigase.server.xmppsession.SessionManagerConfig.AUTH_TIMEOUT_PROP_VAL;
+import static tigase.server.xmppsession.SessionManagerConfig.AUTO_CREATE_OFFLINE_USER_PROP_KEY;
+import static tigase.server.xmppsession.SessionManagerConfig.FORCE_DETAIL_STALE_CONNECTION_CHECK;
+import static tigase.server.xmppsession.SessionManagerConfig.PLUGINS_CONCURRENCY_PROP_KEY;
+import static tigase.server.xmppsession.SessionManagerConfig.PLUGINS_CONF_PROP_KEY;
+import static tigase.server.xmppsession.SessionManagerConfig.SKIP_PRIVACY_PROP_KEY;
+import static tigase.server.xmppsession.SessionManagerConfig.SM_THREADS_POOL_PROP_KEY;
+import static tigase.server.xmppsession.SessionManagerConfig.SM_THREADS_POOL_PROP_VAL;
+import static tigase.server.xmppsession.SessionManagerConfig.STALE_CONNECTION_CLOSER_QUEUE_SIZE_KEY;
+import static tigase.server.xmppsession.SessionManagerConfig.defaultHandlerProcId;
+import static tigase.server.xmppsession.SessionManagerConfig.getProcessor;
+import static tigase.server.xmppsession.SessionManagerConfig.sessionCloseProcId;
+import static tigase.server.xmppsession.SessionManagerConfig.sessionOpenProcId;
+
+import java.util.AbstractQueue;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.script.Bindings;
+
 import tigase.auth.mechanisms.SaslEXTERNAL;
 import tigase.conf.Configurable;
 import tigase.conf.ConfigurationException;
 import tigase.db.AuthRepository;
-
-import tigase.db.AuthorizationException;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.NonAuthUserRepositoryImpl;
 import tigase.db.RepositoryFactory;
@@ -52,17 +80,9 @@ import tigase.server.Iq;
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.server.Permissions;
-import tigase.server.Priority;
 import tigase.server.ReceiverTimeoutHandler;
 import tigase.server.XMPPServer;
-import tigase.server.script.AbstractScriptCommand;
 import tigase.server.script.CommandIfc;
-
-import static tigase.server.xmppsession.SessionManagerConfig.*;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import tigase.stats.StatisticsList;
 import tigase.sys.OnlineJidsReporter;
 import tigase.sys.TigaseRuntime;
 import tigase.util.ProcessingThreads;
@@ -90,7 +110,10 @@ import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPSession;
 import tigase.xmpp.XMPPStopListenerIfc;
 import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
+import tigase.xmpp.impl.JabberIqRegister;
 import tigase.xmpp.impl.PresenceCapabilitiesManager;
+//~--- JDK imports ------------------------------------------------------------
+import tigase.stats.StatisticsList;
 
 /**
  * Class SessionManager
@@ -513,6 +536,10 @@ public class SessionManager
 		binds.put(CommandIfc.USER_CONN, connectionsByFrom);
 		binds.put(CommandIfc.USER_REPO, user_repository);
 		binds.put(CommandIfc.USER_SESS, sessionsByNodeId);
+		XMPPProcessorIfc registerModule = getProcessor(JabberIqRegister.ID);
+		if (registerModule != null)
+			binds.put("JabberIqRegister", registerModule);
+
 	}
 
 @Override
