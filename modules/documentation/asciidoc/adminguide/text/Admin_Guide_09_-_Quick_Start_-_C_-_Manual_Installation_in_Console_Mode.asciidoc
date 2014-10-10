@@ -129,11 +129,11 @@ This is enough basic configuration to have your Tigase server installation runni
 Prepare Database
 ----------------
 
-Normally the database is prepared for you during the installation process. Now you are on your own. As in section above we prepare your first installation to run with the *Derby* database. Creating and preparing the Derby database is actually quite easy if you use a helper script: link:https://svn.tigase.org/reps/tigase-server/trunk/scripts/derby-db-create.sh[./scripts/derby-db-create.sh]. The file might not be in your *scripts/* directory if you have an earlier version of the package. Simply download it from the link provided if it is missing and put it in the *scripts/* directory and execute it with the database location as the parameter:
+Normally the database is prepared for you during the installation process. Now you are on your own. As in section above we prepare your first installation to run with the *Derby* database. Creating and preparing the Derby database is actually quite easy if you use a helper script: link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/scripts/db-create-derby.sh[./scripts/db-create-derby.sh]. The file might not be in your *scripts/* directory if you have an earlier version of the package. Simply download it from the link provided if it is missing and put it in the *scripts/* directory and execute it with the database location as the parameter:
 
 [source,sh]
 -------------------------------------
- $ ./scripts/derby-db-create.sh /var/lib/tigase/derby
+ $ ./scripts/db-create-derby.sh /var/lib/tigase/derby
 -------------------------------------
 
 There will be lots of output but if there is no error at the end of the output it means your database has been created and it is ready to use and you are ready to....
