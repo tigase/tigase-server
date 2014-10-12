@@ -88,4 +88,10 @@ public interface WebSocketProtocolIfc {
 	 */
 	void encodeFrameAndWrite(WebSocketXMPPIOService service, ByteBuffer buf) throws IOException;
 	
+	/**
+	 * Method closes connection by sending close frame
+	 * @param service
+	 */
+	void closeConnection(WebSocketXMPPIOService service);
+	
 }

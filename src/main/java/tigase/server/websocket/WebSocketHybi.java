@@ -77,8 +77,13 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 		MessageDigest md = MessageDigest.getInstance("SHA1");
 		byte[] resp = md.digest(key.getBytes());
 
-		response.append(WS_PROTOCOL_KEY);
-		response.append(": xmpp\r\n");
+		response.append(WS_PROTOCOL_KEY).append(": ");
+		if (headers.get(WS_PROTOCOL_KEY).contains("xmpp-framing")) {
+			response.append("xmpp-framing");
+		} else {
+			response.append("xmpp");
+		}
+		response.append("\r\n");
 		response.append(WS_ACCEPT_KEY + ": ");
 		response.append(Base64.encode(resp));
 		response.append("\r\n");
@@ -213,6 +218,12 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 		service.writeBytes(bbuf);
 
 		service.writeBytes(buf);							
+	}
+	
+	@Override
+	public void closeConnection(WebSocketXMPPIOService service) {
+		ByteBuffer bbuf = createFrameHeader((byte) 0x88, 0);
+		service.writeBytes(bbuf);
 	}
 	
 	/**

@@ -34,9 +34,13 @@ import java.nio.charset.CoderResult;
 import java.nio.charset.MalformedInputException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.server.Packet;
+import tigase.xml.Element;
+import tigase.xmpp.BareJID;
 import tigase.xmpp.XMPPIOService;
 
 /**
@@ -54,6 +58,15 @@ public class WebSocketXMPPIOService<RefObject>
 	private static final Logger log            =
 		Logger.getLogger(WebSocketXMPPIOService.class.getCanonicalName());
 
+	private static final String CLOSE_EL = "close";
+	private static final String OPEN_EL = "open";
+	private static final String XMLNS_FRAMING = "urn:ietf:params:xml:ns:xmpp-framing";
+	
+	public static enum WebSocketXMPPSpec {
+		hybi,
+		xmpp
+	}
+	
 	/* static variables used by WebSocket protocol */
 	
 	//~--- fields ---------------------------------------------------------------
@@ -68,13 +81,47 @@ public class WebSocketXMPPIOService<RefObject>
 
 	private final WebSocketProtocolIfc[] protocols;
 	private WebSocketProtocolIfc protocol = null;
+	private WebSocketXMPPSpec webSocketXMPPSpec = WebSocketXMPPSpec.hybi;
 	
 	public WebSocketXMPPIOService(WebSocketProtocolIfc[] enabledProtocols) {
 		this.protocols = enabledProtocols;
 	}
+
+	@Override
+	public void stop() {
+		protocol.closeConnection(this);
+		super.stop(); //To change body of generated methods, choose Tools | Templates.
+	}
 	
 	//~--- methods --------------------------------------------------------------
 
+	@Override
+	protected void addReceivedPacket(Packet packet) {
+		if (packet.getXMLNS() == XMLNS_FRAMING) {
+			// it is framing packet, so it should be <open/> or <close/>
+			if (packet.getElemName() == OPEN_EL) {
+				webSocketXMPPSpec = WebSocketXMPPSpec.xmpp;
+				xmppStreamOpened(packet.getElement().getAttributes());
+				return;
+			} else if (packet.getElemName() == CLOSE_EL) {
+				xmppStreamClosed();
+				return;
+			}
+		}
+		super.addReceivedPacket(packet); //To change body of generated methods, choose Tools | Templates.
+	}
+	
+	protected WebSocketXMPPSpec getWebSocketXMPPSpec() {
+		return webSocketXMPPSpec;
+	}
+	
+	@Override
+	protected String prepareStreamClose() {
+		if (webSocketXMPPSpec == WebSocketXMPPSpec.hybi)
+			return "</stream:stream>";
+		return "<close xmlns='urn:ietf:params:xml:ns:xmpp-framing' />";
+	}		
+	
 	/**
 	 * Custom implementation of readData function which decodes WebSocket
 	 * protocol frames
@@ -412,6 +459,7 @@ public class WebSocketXMPPIOService<RefObject>
 			log.log(Level.FINEST, "received headers = \n{0}", builder.toString());
 		}		
 	}
+	
 }
 
 

@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import tigase.conf.ConfigurationException;
+import tigase.xml.Element;
+import tigase.xmpp.BareJID;
 import tigase.xmpp.XMPPIOService;
 
 /**
@@ -41,6 +43,7 @@ import tigase.xmpp.XMPPIOService;
 public class WebSocketClientConnectionManager
 				extends tigase.server.xmppclient.ClientConnectionManager {
 	
+	private static final String XMLNS_FRAMING = "urn:ietf:params:xml:ns:xmpp-framing";
 	private static final String PROTOCOL_VERSIONS_KEY = "protocol-versions";
 	private static final String[] PROTOCOL_VERSIONS_DEF = { WebSocketHybi.ID };
 	
@@ -119,6 +122,67 @@ public class WebSocketClientConnectionManager
 	@Override
 	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
 		return new WebSocketXMPPIOService<Object>(enabledProtocolVersions);
+	}
+	
+	@Override
+	protected String prepareStreamClose(XMPPIOService<Object> serv) {
+		if (isPreRFC(serv)) {
+			return super.prepareStreamClose(serv);
+		}
+		return "<close xmlns='urn:ietf:params:xml:ns:xmpp-framing' />";
+	}
+	
+	@Override
+	protected String prepareStreamOpen(XMPPIOService<Object> serv, String id, String hostname) {
+		if (isPreRFC(serv)) {
+			return super.prepareStreamOpen(serv, id, hostname);
+		}		
+		return "<open" + " xmlns='" + XMLNS_FRAMING + "'" + " from='" + hostname + "'" 
+				+ " id='" + id + "'" + " version='1.0' xml:lang='en' />";
+	}
+	
+	@Override
+	protected String prepareStreamError(XMPPIOService<Object> serv, List<Element> err_el) {
+		if (isPreRFC(serv)) {
+			return super.prepareStreamError(serv, err_el);
+		}			
+		return "<stream:error xmlns:stream=\"http://etherx.jabber.org/streams\">" + err_el.get(0).toString() + "</stream:error>";
+	}
+	
+	@Override
+	protected String prepareStreamError(XMPPIOService<Object> serv, String errorName, String hostname) {
+		if (isPreRFC(serv)) {
+			return super.prepareStreamError(serv, errorName, hostname);
+		}	
+		return "<open" + " xmlns='" + XMLNS_FRAMING + "'" + " from='" + hostname + "'" 
+				+ " id='tigase-error-tigase'" + " version='1.0' xml:lang='en' />" 
+				+ "<stream:error xmlns:stream=\"http://etherx.jabber.org/streams\">"
+				+ "<" + errorName + " xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
+				+ "</stream:error>" + "<close xmlns='" + XMLNS_FRAMING + "'/>";
+	}
+	
+	@Override
+	protected String prepareSeeOtherHost(XMPPIOService<Object> serv, BareJID see_other_host) {
+		if (isPreRFC(serv)) {
+			return super.prepareSeeOtherHost(serv, see_other_host);
+		}		
+		boolean ssl = "ssl".equals(serv.getSessionData().get("socket"));
+		int localPort = serv.getLocalPort();
+		String see_other_uri = (ssl ? "wss://" : "ws://") + see_other_host + ":" + localPort + "/";
+		return "<open" + " xmlns='" + XMLNS_FRAMING + "'" + " from='" + getDefVHostItem() + "'" 
+				+ " id='tigase-error-tigase'" + " version='1.0' xml:lang='en' />"
+				+ "<close xmlns='urn:ietf:params:xml:ns:xmpp-framing' see-other-uri='" + see_other_uri + "' />";
+	}	
+	
+	@Override
+	protected void preprocessStreamFeatures(XMPPIOService<Object> serv, Element elem_features) {
+		if (!isPreRFC(serv)) {
+			elem_features.setAttribute("xmlns:stream", "http://etherx.jabber.org/streams");
+		}
+	}
+	
+	private boolean isPreRFC(XMPPIOService<Object> serv) {
+		return serv == null || ((WebSocketXMPPIOService<Object>) serv).getWebSocketXMPPSpec() == WebSocketXMPPIOService.WebSocketXMPPSpec.hybi;
 	}
 }
 

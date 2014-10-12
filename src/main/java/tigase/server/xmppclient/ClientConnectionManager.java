@@ -492,40 +492,20 @@ public class ClientConnectionManager
 			} catch (TigaseStringprepException ex) {
 				log.log(Level.CONFIG, "From JID violates RFC6122 (XMPP:Address Format): ", ex);
 
-				return "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'" +
-						" xmlns:stream='http://etherx.jabber.org/streams'" +
-						" id='tigase-error-tigase'" + " from='" + getDefVHostItem() + "'" +
-						" version='1.0' xml:lang='en'>" + "<stream:error>" +
-						"<improper-addressing xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
-						"</stream:error>" + "</stream:stream>";
+				return prepareStreamError(serv, "improper-addressing", null);
 			}    // end of: try-catch
 		}      // end of: if (from != null) {
 		if (lang == null) {
 			lang = "en";
 		}
 		if (hostname == null) {
-			return "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'" +
-					" xmlns:stream='http://etherx.jabber.org/streams'" +
-					" id='tigase-error-tigase'" + " from='" + getDefVHostItem() + "'" +
-					" version='1.0' xml:lang='en'>" + "<stream:error>" +
-					"<improper-addressing xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
-					"</stream:error>" + "</stream:stream>";
+			return prepareStreamError(serv, "improper-addressing", null);
 		}    // end of if (hostname == null)
 		if (!isLocalDomain(hostname)) {
-			return "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'" +
-					" xmlns:stream='http://etherx.jabber.org/streams'" +
-					" id='tigase-error-tigase'" + " from='" + getDefVHostItem() + "'" +
-					" version='1.0' xml:lang='en'>" + "<stream:error>" +
-					"<host-unknown xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
-					"</stream:error>" + "</stream:stream>";
+			return prepareStreamError(serv, "host-unknown", null);
 		}    // end of if (!hostnames.contains(hostname))
 		if (!isAllowed(serv, hostname)) {
-			return "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'" +
-					" xmlns:stream='http://etherx.jabber.org/streams'" +
-					" id='tigase-error-tigase'" + " from='" + hostname + "'" +
-					" version='1.0' xml:lang='en'>" + "<stream:error>" +
-					"<policy-violation xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
-					"</stream:error>" + "</stream:stream>";
+			return prepareStreamError(serv, "policy-violation", null);
 		}
 		if ((fromJID != null) && (see_other_host_strategy != null) && see_other_host_strategy
 				.isEnabled(SeeOtherHostIfc.Phase.OPEN)) {
@@ -539,12 +519,7 @@ public class ClientConnectionManager
 							see_other_host, serv });
 				}
 
-				return "<stream:stream" + " xmlns='" + XMLNS + "'" +
-						" xmlns:stream='http://etherx.jabber.org/streams'" +
-						" id='tigase-error-tigase'" + " from='" + getDefVHostItem() + "'" +
-						" version='1.0' xml:lang='en'>" + see_other_host_strategy.getStreamError(
-						"urn:ietf:params:xml:ns:xmpp-streams", see_other_host).toString() +
-						"</stream:stream>";
+				return prepareSeeOtherHost(serv, see_other_host);
 			}
 		}    // of if (from != null )
 
@@ -560,9 +535,7 @@ public class ClientConnectionManager
 			serv.getSessionData().put(IOService.HOSTNAME_KEY, hostname);
 			serv.setDataReceiver(JID.jidInstanceNS(routings.computeRouting(hostname)));
 
-			String streamOpenData = "<?xml version='1.0'?><stream:stream" + " xmlns='" +
-					XMLNS + "'" + " xmlns:stream='http://etherx.jabber.org/streams'" + " from='" +
-					hostname + "'" + " id='" + id + "'" + " version='1.0' xml:lang='en'>";
+			String streamOpenData = prepareStreamOpen(serv, id, hostname);
 
 			if (log.isLoggable(Level.FINER)) {
 				log.log(Level.FINER, "Writing raw data to the socket: {0}", streamOpenData);
@@ -588,9 +561,7 @@ public class ClientConnectionManager
 			if (log.isLoggable(Level.FINER)) {
 				log.log(Level.FINER, "Session ID is: {0}", id);
 			}
-			writeRawData(serv, "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS +
-					"'" + " xmlns:stream='http://etherx.jabber.org/streams'" + " from='" +
-					hostname + "'" + " id='" + id + "'" + " version='1.0' xml:lang='en'>");
+			writeRawData(serv, prepareStreamOpen(serv, id, hostname)	);
 			addOutPacket(Command.GETFEATURES.getPacket(serv.getConnectionId(), serv
 					.getDataReceiver(), StanzaType.get, UUID.randomUUID().toString(), null));
 		}
@@ -835,6 +806,8 @@ public class ClientConnectionManager
 				elem_features.addChildren(features);
 				elem_features.addChildren(Command.getData(iqc));
 
+				preprocessStreamFeatures(serv, elem_features);
+				
 				Packet result = Packet.packetInstance(elem_features, null, null);
 
 				// Is it actually needed?? Yes, it is needed, IOService is
@@ -870,13 +843,8 @@ public class ClientConnectionManager
 										see_other_host, serv });
 							}
 
-							String redirectMessage = "<stream:stream" + " xmlns='" + XMLNS + "'" +
-									" xmlns:stream='http://etherx.jabber.org/streams'" +
-									" id='tigase-error-tigase'" + " from='" + getDefVHostItem() + "'" +
-									" version='1.0' xml:lang='en'>" + see_other_host_strategy
-									.getStreamError("urn:ietf:params:xml:ns:xmpp-streams", see_other_host)
-									.toString() + "</stream:stream>";
-
+							String redirectMessage = prepareSeeOtherHost(serv, see_other_host);
+						
 							try {
 								SocketThread.removeSocketService(serv);
 								serv.writeRawData(redirectMessage);
@@ -1007,14 +975,13 @@ public class ClientConnectionManager
 
 		case CLOSE :
 			if (serv != null) {
-				String        streamClose = "</stream:stream>";
+				String        streamClose = prepareStreamClose(serv);
 				List<Element> err_el = packet.getElement().getChildrenStaticStr(Iq
 						.IQ_COMMAND_PATH);
 				boolean moreToSend = false;
 
 				if ((err_el != null) && (err_el.size() > 0)) {
-					streamClose = "<stream:error>" + err_el.get(0).toString() + "</stream:error>" +
-							streamClose;
+					streamClose = prepareStreamError(serv, err_el) + streamClose;
 					moreToSend = true;
 				}
 				try {
@@ -1158,7 +1125,43 @@ public class ClientConnectionManager
 	protected boolean isTlsWantClientAuthEnabled() {
 		return clientTrustManagerFactory.isSaslExternalAvailable();
 	}
-
+	
+	protected String prepareStreamClose(XMPPIOService<Object> serv) {
+		return "</stream:stream>";
+	}
+	
+	protected String prepareStreamOpen(XMPPIOService<Object> serv, String id, String hostname) {
+		return "<?xml version='1.0'?><stream:stream" + " xmlns='" +
+					XMLNS + "'" + " xmlns:stream='http://etherx.jabber.org/streams'" + " from='" +
+					hostname + "'" + " id='" + id + "'" + " version='1.0' xml:lang='en'>";
+	}
+	
+	protected String prepareStreamError(XMPPIOService<Object> serv, List<Element> err_el) {
+		return "<stream:error>" + err_el.get(0).toString() + "</stream:error>";
+	}
+	
+	protected String prepareStreamError(XMPPIOService<Object> serv, String errorName, String hostname) {
+		return "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
+				+ " xmlns:stream='http://etherx.jabber.org/streams'"
+				+ " id='tigase-error-tigase'" + " from='" + (hostname != null ? hostname : getDefVHostItem()) + "'"
+				+ " version='1.0' xml:lang='en'>" + "<stream:error>"
+				+ "<" + errorName + " xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
+				+ "</stream:error>" + "</stream:stream>";
+	}
+	
+	protected String prepareSeeOtherHost(XMPPIOService<Object> serv, BareJID see_other_host) {
+		return "<stream:stream" + " xmlns='" + XMLNS + "'"
+				+ " xmlns:stream='http://etherx.jabber.org/streams'"
+				+ " id='tigase-error-tigase'" + " from='" + getDefVHostItem() + "'"
+				+ " version='1.0' xml:lang='en'>" + see_other_host_strategy.getStreamError(
+						"urn:ietf:params:xml:ns:xmpp-streams", see_other_host).toString()
+				+ "</stream:stream>";	
+	}	
+	
+	protected void preprocessStreamFeatures(XMPPIOService<Object> serv, Element elem_features) {
+		
+	}
+	
 	private List<Element> getFeatures(XMPPIOService service) {
 		List<Element> results = new LinkedList<Element>();
 

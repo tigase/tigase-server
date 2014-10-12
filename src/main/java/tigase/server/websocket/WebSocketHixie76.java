@@ -96,7 +96,13 @@ public class WebSocketHixie76 implements WebSocketProtocolIfc {
 		response.append(RESPONSE_HEADER);
 
 		response.append("Content-Length: ").append(resp.length).append("\r\n");
-		response.append(WS_PROTOCOL_KEY).append(": xmpp\r\n");
+		response.append(WS_PROTOCOL_KEY).append(": ");
+		if (headers.get(WS_PROTOCOL_KEY).contains("xmpp-framing")) {
+			response.append("xmpp-framing");
+		} else {
+			response.append("xmpp");
+		}
+		response.append("\r\n");		
 		if (headers.containsKey(ORIGIN_KEY)) {
 			response.append(WS_ORIGIN_KEY).append(": ").append(headers.get(ORIGIN_KEY)).append("\r\n");
 		}
@@ -193,6 +199,11 @@ public class WebSocketHixie76 implements WebSocketProtocolIfc {
 		service.writeBytes(ByteBuffer.wrap(FRAME_FOOTER));
 	}
 
+	@Override
+	public void closeConnection(WebSocketXMPPIOService service) {
+		service.writeBytes(ByteBuffer.wrap(new byte[] { (byte) 0xFF, (byte) 0x00 }));
+	}
+	
 	private void uintToBytes(byte[] arr, int offset, long val) {
 		for (int i=3; i>=0; i--) {
 			arr[offset + i] = (byte) (val % 256);

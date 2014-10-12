@@ -652,6 +652,10 @@ public class XMPPIOService<RefObject>
 		}
 	}
 
+	protected String prepareStreamClose() {
+		return "</stream:stream>";
+	}	
+	
 	/**
 	 * Describe <code>processSocketData</code> method here.
 	 *
@@ -792,7 +796,7 @@ public class XMPPIOService<RefObject>
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "{0}, Sending data: </stream:stream>", toString());
 			}
-			writeRawData("</stream:stream>");
+			writeRawData(prepareStreamClose());
 		} catch (IOException e) {
 			log.log(Level.INFO, "{0}, Error sending stream closed data: {1}", new Object[] {
 					toString(),
