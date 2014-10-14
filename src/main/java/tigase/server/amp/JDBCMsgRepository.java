@@ -148,7 +148,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 							+ HISTORY_FLAG_COLUMN + " int default 0,"
 							+ " primary key (" + JID_ID_COLUMN + "),"
 							+ " unique key " + JID_SHA_COLUMN + " (" + JID_SHA_COLUMN + "),"
-							+ " key " + JID_COLUMN + " (" + JID_COLUMN + "(765)))";
+							+ " key " + JID_COLUMN + " (" + JID_COLUMN + "(255)))";
 	private static final String PGSQL_CREATE_JID_TABLE =
 							"create table " + JID_TABLE + " ( " + "  "
 							+ JID_ID_COLUMN + " serial," + "  "
