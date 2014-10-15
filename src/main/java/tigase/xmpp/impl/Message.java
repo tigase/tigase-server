@@ -298,7 +298,7 @@ public class Message
 				results.offer(result);
 			}
 		} catch (NotAuthorizedException e) {
-			log.log(Level.WARNING, "NotAuthorizedException for packet: " + packet + " for session: " + session, e);
+			log.log(Level.FINE, "NotAuthorizedException for packet: " + packet + " for session: " + session, e);
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
 		}    // end of try-catch
