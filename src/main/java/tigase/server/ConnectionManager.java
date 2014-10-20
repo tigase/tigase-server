@@ -26,6 +26,7 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
@@ -33,19 +34,27 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.script.Bindings;
+
 import tigase.annotations.TODO;
 import tigase.conf.ConfigurationException;
 import tigase.net.*;
+
 import tigase.server.script.CommandIfc;
+
 import tigase.stats.StatisticsList;
 import tigase.util.DataTypes;
 import tigase.xml.Element;
+
 import tigase.xmpp.JID;
 import tigase.xmpp.XMPPDomBuilderHandler;
 import tigase.xmpp.XMPPIOService;
+
 import static tigase.xmpp.XMPPIOService.DOM_HANDLER;
+
 import tigase.xmpp.XMPPIOServiceListener;
+
 
 /**
  * Describe class ConnectionManager here.
@@ -195,8 +204,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	protected static final String WATCHDOG_TIMEOUT = "watchdog_timeout";
 	protected static final String WATCHDOG_PING_TYPE_KEY = "watchdog_ping_type";
 
-
-  //J+
+	protected static final Element pingElement = new Element( "iq",
+								new Element[] { new Element( "ping", new String[] { "xmlns" }, new String[] { "urn:xmpp:ping" } ) },
+								new String[] { "type", "id" },
+								new String[] { "get", "tigase-ping" } );
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -392,7 +403,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			reconnectService(params, connectionDelay);
 		}
 		waitingTasks.clear();
-		watchdog.start();
+		if ( null != watchdog ){
+			watchdog.start();
+		}
 	}
 
 	@Override
@@ -834,11 +847,13 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	@Override
 	public void setName(String name) {
 		super.setName(name);
+		setupWatchdogThread();
+	}
+
+	protected void setupWatchdogThread() {
 		watchdog = new Thread(new Watchdog(), "Watchdog - " + getName());
 		watchdog.setDaemon(true);
 	}
-
-
 
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
@@ -1503,11 +1518,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	private class Watchdog
 					implements Runnable {
 
-		private final Element pingElement = new Element( "ping",
-																										 new String[] { "xmlns" },
-																										 new String[] { "urn:xmpp:ping" } );
-		private long pingCount = 0;
-
+		Packet pingPacket;
+		
 		@Override
 		public void run() {
 			while (true) {
@@ -1559,7 +1571,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 											 * ping type. */
 											switch ( watchdogPingType ) {
 												case XMPP:
-													if (! writePacketToSocket( getPingPacket( service )) ) {
+													 pingPacket = Iq.packetInstance( pingElement.clone(),
+														 JID.jidInstanceNS( (String) service.getSessionData().get( XMPPIOService.HOSTNAME_KEY ) ),
+														 JID.jidInstanceNS( service.getUserJid() ) );
+													if ( !writePacketToSocket( (IO) service, pingPacket ) ){
 														// writing failed, stopp service
 														++watchdogStopped;
 														service.stop();
@@ -1594,28 +1609,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			}
 		}
 
-		/**
-		 * Creates {@code ping} {@link Packet} addressed to the {@link JID}
-		 * pertaining to the {@link XMPPIOService} object passed as argument.
-		 *
-		 * @param service {@link XMPPIOService} object for which {@code ping} packet
-		 *                should be generated.
-		 *
-		 * @return {@code ping} {@link Packet} addressed to the {@link JID} owner of
-		 *         {@link XMPPIOService}.
-		 */
-		private Packet getPingPacket( XMPPIOService service ) {
-			JID from = JID.jidInstanceNS( (String) service.getSessionData().get(XMPPIOService.HOSTNAME_KEY) );
-			JID to = JID.jidInstanceNS( service.getUserJid() );
-
-			Element iq = new Element( "iq",
-																new String[] { "type", "id" },
-																new String[] { "get", "tigase-ping-" + pingCount++ } );
-			Packet ping = Packet.packetInstance( iq, from, to );
-			ping.setPacketTo( service.getConnectionId() );
-			ping.getElement().addChild( pingElement );
-			return ping;
-		}
 	}
 }    // ConnectionManager
 

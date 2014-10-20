@@ -221,6 +221,11 @@ public class BoshConnectionManager
 		}
 	}
 
+	@Override
+	protected void setupWatchdogThread() {
+		// having watchdog for bosh connections is not needed
+	}
+
 	protected Map<String,String> preBindSession(Map<String,String> attr) {
 		String hostname = attr.get( TO_ATTR );
 
@@ -707,7 +712,6 @@ public class BoshConnectionManager
 			setupSidlogger( lvl );
 			log.info("Setting SID log level to: " + lvl);
 		}
-
 	}
 
 	//~--- methods --------------------------------------------------------------
