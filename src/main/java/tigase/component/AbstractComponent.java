@@ -349,6 +349,9 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 	 */
 	@Override
 	public void processPacket(Packet packet) {
+		if ( log.isLoggable( Level.FINER ) ){
+			log.finer( "Received: " + packet.getElement() );
+		}
 		try {
 			Runnable responseHandler = responseManager.getResponseHandler(packet);
 
