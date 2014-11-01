@@ -402,6 +402,12 @@ public class SessionManager
 		return sessionsByNodeId.containsKey(jid);
 	}
 
+	@Override
+	public boolean containsJidLocally(JID jid) {
+		XMPPSession session = sessionsByNodeId.get(jid.getBareJID());
+		return session != null && session.getResourceForJID(jid) != null;
+	}	
+	
 	/**
 	 * Method description
 	 *

@@ -70,6 +70,20 @@ public interface OnlineJidsReporter {
 	 *			it is not connected to local node
 	 */
 	boolean containsJidLocally( BareJID jid);
+
+	/**
+	 * The method checks whether the given JID is known to local cluster node
+	 * as connected user. False result means that given JID is not connected
+	 * to local cluster node but it may be connected to other cluster node.
+	 * Result of this method should be independent of used clustering strategy.
+	 * 
+	 * @param jid
+	 *			a user's JID for whom we query information
+	 * 
+	 * @return true if user is known as connected to local cluster node, false if
+	 *			it is not connected to local node
+	 */
+	boolean containsJidLocally( JID jid);	
 	
 	/**
 	 * Retrieve all connection IDs (CIDs) for the given user.

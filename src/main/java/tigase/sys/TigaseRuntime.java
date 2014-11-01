@@ -416,6 +416,8 @@ public abstract class TigaseRuntime {
 	public abstract boolean isJidOnline(JID jid);
 	
 	public abstract boolean isJidOnlineLocally(BareJID jid);
+	
+	public abstract boolean isJidOnlineLocally(JID jid);
 
 	public void shutdownTigase(String[] msg) {
 			if (XMPPServer.isOSGi()) {
