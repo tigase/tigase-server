@@ -42,6 +42,10 @@ public class CallbackHandlerFactory {
 			((AuthRepositoryAware) handler).setAuthRepository(session.getAuthRepository());
 		}
 
+        if (handler instanceof PluginSettingsAware) {
+            ((PluginSettingsAware) handler).setPluginSettings(settings);
+        }
+
 		return handler;
 	}
 
