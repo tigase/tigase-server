@@ -215,7 +215,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 							"create table broadcast_msgs ( " + "  "
 							+ "id varchar(128) NOT NULL,  "
 							+ "expired datetime NOT NULL,  "
-							+ "msg nvarchar(4096) NOT NULL, "
+							+ "msg nvarchar(4000) NOT NULL, "
 							+ " primary key (id))";
 	private static final String DERBY_CREATE_BROADCAST_MSGS_TABLE =
 							"create table broadcast_msgs ( " + "  "
