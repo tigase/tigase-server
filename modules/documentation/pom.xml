@@ -4,6 +4,7 @@
 		<packaging.type>pom</packaging.type>
 		<dist_path>../..</dist_path>
 		<guide_path>${dist_path}/docs/${guide_directory}_guide</guide_path>
+		<guide_filename>index</guide_filename>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 
@@ -115,7 +116,7 @@
 							</goals>
 							<configuration>
 								<targetDirectory>${guide_path}/webhelp/</targetDirectory>
-								<imgSrcPath>${project.build.directory}/docbook/</imgSrcPath>
+								<imgSrcPath>../html/</imgSrcPath>
 								<ignoreImageScaling>true</ignoreImageScaling>
 							</configuration>
 						</execution>
@@ -129,6 +130,11 @@
 								<imgSrcPath>${project.build.directory}/docbook/</imgSrcPath>
 								<ignoreImageScaling>true</ignoreImageScaling>
 								<fopLogLevel>OFF</fopLogLevel>
+								<!--<defaultImageWidth>3cm</defaultImageWidth>-->
+								<!--<ignoreImageScaling>true</ignoreImageScaling>-->
+								<postProcess>
+									<move file="${guide_path}/pdf/index.pdf" tofile="${guide_path}/pdf/${guide_name}Guide.pdf" failonerror="false" />
+								</postProcess>
 							</configuration>
 						</execution>
 						<execution>

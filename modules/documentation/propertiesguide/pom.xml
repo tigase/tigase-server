@@ -3,14 +3,14 @@
 	<properties>
 		<packaging.type>pom</packaging.type>
 		<dist_path>../../..</dist_path>
-		<guide_directory>propertiesguide</guide_directory>
-		<guide_filename>PropertiesGuide</guide_filename>
+		<guide_directory>properties</guide_directory>
+		<guide_name>Properties</guide_name>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>tigase</groupId>
 	<artifactId>tigase-server-docs-properties</artifactId>
-	<name>Tigase XMPP Server Documentation - Properties Guide</name>
+	<name>Tigase XMPP Server Documentation - ${guide_name} Guide</name>
 
 	<packaging>pom</packaging>
 
