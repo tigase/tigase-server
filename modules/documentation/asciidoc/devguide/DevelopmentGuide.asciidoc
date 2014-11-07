@@ -15,7 +15,7 @@ include::text/Development_Guide_02_-_Tigase_DB_Schema_Explained.asciidoc[]
 
 include::text/Development_Guide_03_-_Basic_Information.asciidoc[]
 
-include::text/Development_Guide_04_-_Why_the_Most_Recent_JDK.asciidoc[]
+include::text/Development_Guide_04_-_Why_the_Most_Recent_JDK?.asciidoc[]
 
 include::text/Development_Guide_05_-_Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.asciidoc[]
 
