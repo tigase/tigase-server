@@ -90,7 +90,8 @@ import tigase.xmpp.JID;
  * @version $Rev$
  */
 public class VHostItem
-				extends RepositoryItemAbstract {
+				extends RepositoryItemAbstract
+				implements Comparable<VHostItem> {
 	
 	public static class DataType { 
 		private final String name;
@@ -484,6 +485,26 @@ public class VHostItem
 				Command.addCheckBoxField(packet, type.getName(), val);
 			}
 		}
+	}
+
+	@Override
+	public int compareTo( VHostItem o ) {
+		return vhost.compareTo( o.vhost );
+	}
+
+	@Override
+	public boolean equals( Object v ) {
+		boolean result = false;
+		if ( v instanceof VHostItem ){
+
+			result = vhost.equals( ( (VHostItem) v ).vhost );
+		}
+		return result;
+	}
+
+	@Override
+	public int hashCode() {
+		return vhost.hashCode();
 	}
 
 	/**
