@@ -27,7 +27,10 @@ package tigase.vhosts;
 //~--- non-JDK imports --------------------------------------------------------
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.db.comp.RepositoryItemAbstract;
@@ -88,6 +91,72 @@ import tigase.xmpp.JID;
  */
 public class VHostItem
 				extends RepositoryItemAbstract {
+	
+	public static class DataType { 
+		private final String name;
+		private final String key;
+		private final Class cls;
+		private final Object defValue;
+		private final Object[] options;
+		private final String[] optionsNames;
+		
+		public DataType(String key, String name, Class cls, Object defValue, Object[] options, String[] optionsNames) {
+			this.key = key;
+			this.name = name;
+			this.cls = cls;
+			this.defValue = defValue;
+			this.options = options;
+			this.optionsNames = optionsNames;
+			
+			if (defValue != null && !cls.isAssignableFrom(defValue.getClass())) {
+				throw new IllegalArgumentException("default value paratemeter must of class " + cls.getCanonicalName());
+			}
+			
+			if (options != null) {
+				for (Object option : options) {
+					if (option != null && !cls.isAssignableFrom(option.getClass())) {
+						throw new IllegalArgumentException("option values must of class " + cls.getCanonicalName());
+					}
+				}
+				if (optionsNames != null && options.length != optionsNames.length) {
+					throw new IllegalArgumentException("if passed options name must be specified for each option");
+				}
+			}
+		}
+		
+		public DataType(String key, String name, Class cls, Object defValue, Object[] options) {
+			this(key, name, cls, defValue, options, null);
+		}
+		
+		public DataType(String key, String name, Class cls, Object defValue) {
+			this(key, name, cls, defValue, null, null);
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public String getKey() {
+			return key;
+		}
+
+		public Class getCls() {
+			return cls;
+		}
+		
+		public <T> T getDefValue() {
+			return (T) defValue;
+		}
+		
+		public <T> T[] getOptions() {
+			return (T[]) options;
+		}
+		
+		public String[] getOptionsNames() {
+			return optionsNames;
+		}
+	}
+	
 	/**
 	 * This is an attribute name for storing information whether anonymous user
 	 * can login for this domain.
@@ -264,6 +333,14 @@ public class VHostItem
 	/** Field description */
 	protected static final String[] VHOST_COMPONENTS_PATH = { VHOST_ELEM, COMPONENTS_ELEM };
 
+	protected static final Map<String,DataType> dataTypes = new ConcurrentHashMap<String,DataType>();
+	
+	public static void registerData(List<DataType> types) {
+		for (DataType type : types) {
+			dataTypes.put(type.getKey(), type);
+		}
+	}
+	
 	//~--- fields ---------------------------------------------------------------
 
 	private String[] comps = null;
@@ -289,7 +366,8 @@ public class VHostItem
 			DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString()));
 	private boolean anonymousEnabled = DataTypes.getProperty(
 			VHOST_ANONYMOUS_ENABLED_PROP_KEY, VHOST_ANONYMOUS_ENABLED_PROP_DEF);
-
+	private Map<String,Object> data = new ConcurrentHashMap<String,Object>();
+	
 	//~--- constructors ---------------------------------------------------------
 
 	/**
@@ -383,6 +461,29 @@ public class VHostItem
 				saslAllowedMechanisms != null ? stringArrayToString(saslAllowedMechanisms, ",") : "");
 
 		super.addCommandFields(packet);
+		
+		for (DataType type : dataTypes.values()) {
+			if (type.cls != Boolean.class) {
+				Object[] options = type.getOptions();
+				Object val = getData(type.getKey());
+				String valueStr = val != null ? DataTypes.valueToString(val) : "";
+				if (options == null || options.length == 0) {
+					Command.addFieldValue(packet, type.getName(), valueStr);
+				} else {
+					String[] optionsStr = new String[options.length];
+					for (int i=0; i<options.length; i++) {
+						optionsStr[i] = (options[i] != null) ? DataTypes.valueToString(options[i]) : "";
+					}
+					String[] optionsNames = type.getOptionsNames();
+					if (optionsNames == null) 
+						optionsNames = optionsStr;
+					Command.addFieldValue(packet, type.getName(), valueStr, type.getName(), optionsNames, optionsStr);
+				}
+			} else {
+				boolean val = isData(type.getKey());
+				Command.addCheckBoxField(packet, type.getName(), val);
+			}
+		}
 	}
 
 	/**
@@ -461,6 +562,12 @@ public class VHostItem
 			setSaslAllowedMechanisms(tmp.split(","));
 		}
 
+		for (DataType type : dataTypes.values()) {
+			String valueStr = Command.getFieldValue(packet, type.getName());
+			char typeId = DataTypes.typesMap.get(type.cls.getName());
+			Object value = (valueStr == null || valueStr.isEmpty()) ? null :DataTypes.decodeValueType(typeId, valueStr);
+			setData(type.getKey(), value);
+		}
 	}
 
 	/**
@@ -524,6 +631,18 @@ public class VHostItem
 		tmp = elem.getAttributeStaticStr(SASL_MECHANISM_ATT);
 		if (tmp != null) {
 			setSaslAllowedMechanisms(tmp.split(";"));
+		}
+		
+		Element data = elem.getChild("data");
+		if (data != null) {
+			List<Element> items = data.getChildren();
+			if (items != null) {
+				for (Element item : data.getChildren()) {
+					char type = item.getAttributeStaticStr("type").charAt(0);
+					Object value = DataTypes.decodeValueType(type, item.getCData());
+					setData(item.getName(), value);
+				}
+			}
 		}
 	}
 
@@ -680,6 +799,17 @@ public class VHostItem
 			elem.addAttribute(C2S_PORTS_ALLOWED_ATT, c2sPortsAllowedStr);
 		}
 
+		if (!data.isEmpty()) {
+			Element data = new Element("data");
+			for (Map.Entry<String,Object> e : this.data.entrySet()) {
+				Element item = new Element(e.getKey());
+				item.addAttribute("type", String.valueOf(DataTypes.getTypeId(e.getValue())));
+				item.setCData(DataTypes.valueToString(e.getValue()));
+				data.addChild(item);
+			}
+			elem.addChild(data);
+		}
+		
 		return elem;
 	}
 
@@ -742,12 +872,18 @@ public class VHostItem
 	 */
 	@Override
 	public String toString() {
-		return "Domain: " + vhost + ", enabled: " + enabled + ", anonym: "
+		String str = "Domain: " + vhost + ", enabled: " + enabled + ", anonym: "
 					 + anonymousEnabled + ", register: " + registerEnabled + ", maxusers: "
 					 + maxUsersNumber + ", tls: " + tlsRequired + ", s2sSecret: " + s2sSecret
 					 + ", domainFilter: " + domainFilter + ", c2sPortsAllowed: "
 					 + intArrayToString( c2sPortsAllowed, ",")
 					 + ", saslAllowedMechanisms: " + Arrays.toString( saslAllowedMechanisms );
+		
+		for (Map.Entry<String,Object> e : data.entrySet()) {
+			str += ", " + e.getKey() + ": " + DataTypes.valueToString(e.getValue());
+		}
+		
+		return str;
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -773,6 +909,24 @@ public class VHostItem
 		return c2sPortsAllowed;
 	}
 
+	/**
+	 * Return value for key for this VHost
+	 * 
+	 * @param <T>
+	 * @param key
+	 * @return 
+	 */
+	public <T> T getData(String key) {
+		T val = (T) data.get(key);
+		if (val == null) {
+			DataType type = dataTypes.get(key);
+			if (type != null) {
+				val = type.getDefValue();
+			}
+		}
+		return val;
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -928,6 +1082,22 @@ public class VHostItem
 	}
 
 	/**
+	 * Get boolean value contained by this VHost for key
+	 * 
+	 * @param key
+	 * @return 
+	 */
+	public boolean isData(String key) {
+		if (data.containsKey(key))
+			return (Boolean) data.get(key);
+		else {
+			DataType type = dataTypes.get(key);
+			Boolean defValue = (type == null) ? null : (Boolean)type.getDefValue();
+			return defValue != null ? defValue : false;
+		}
+	}
+	
+	/**
 	 * Checks whether this domain is set as enabled or not. This is domain own
 	 * configuration parameter which allows to temporarly disable domain so
 	 * packets for this domain are not processed normally. Instead the server
@@ -939,7 +1109,7 @@ public class VHostItem
 	public boolean isEnabled() {
 		return enabled;
 	}
-
+	
 	/**
 	 * The method checks whether user registration is enabled for this domain or
 	 * not. This is the domain own configuration parameter which allows to disable
@@ -1000,6 +1170,20 @@ public class VHostItem
 		this.c2sPortsAllowed = ports;
 	}
 
+	/**
+	 * Set value for specified key for this VHost
+	 * 
+	 * @param key
+	 * @param value 
+	 */
+	public void setData(String key, Object value) {
+		if (value == null) {
+			this.data.remove(key);
+		} else {
+			this.data.put(key, value);
+		}
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -1239,6 +1423,11 @@ public class VHostItem
 			return VHostItem.this.getComps();
 		}
 
+		@Override
+		public <T> T getData(String key) {
+			return VHostItem.this.getData(key);
+		}
+		
 		/**
 		 * Method description
 		 *
@@ -1351,6 +1540,11 @@ public class VHostItem
 			return VHostItem.this.isAnonymousEnabled();
 		}
 
+		@Override
+		public boolean isData(String key) {
+			return VHostItem.this.isData(key);
+		}
+		
 		/**
 		 * Checks whether this domain is set as enabled or not. This is domain own
 		 * configuration parameter which allows to temporarly disable domain so
@@ -1434,6 +1628,12 @@ public class VHostItem
 					"This is unmodifiable instance of VHostItem");
 		}
 
+		@Override
+		public void setData(String key, Object value) {
+			throw new UnsupportedOperationException(
+					"This is unmodifiable instance of VHostItem");
+		}
+		
 		/**
 		 * Method description
 		 *
