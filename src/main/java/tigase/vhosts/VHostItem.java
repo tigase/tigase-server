@@ -87,7 +87,8 @@ import tigase.xmpp.JID;
  * @version $Rev$
  */
 public class VHostItem
-				extends RepositoryItemAbstract {
+		extends RepositoryItemAbstract
+		implements Comparable<VHostItem> {
 	/**
 	 * This is an attribute name for storing information whether anonymous user
 	 * can login for this domain.
@@ -383,6 +384,26 @@ public class VHostItem
 				saslAllowedMechanisms != null ? stringArrayToString(saslAllowedMechanisms, ",") : "");
 
 		super.addCommandFields(packet);
+	}
+
+	@Override
+	public int compareTo( VHostItem o ) {
+		return vhost.compareTo( o.vhost );
+	}
+
+	@Override
+	public boolean equals( Object v ) {
+		boolean result = false;
+		if ( v instanceof VHostItem ){
+
+			result = vhost.equals( ( (VHostItem) v ).vhost );
+		}
+		return result;
+	}
+
+	@Override
+	public int hashCode() {
+		return vhost.hashCode();
 	}
 
 	/**

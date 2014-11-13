@@ -50,8 +50,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
-	protected ConcurrentSkipListMap<String, Item> items = new ConcurrentSkipListMap<String,
-			Item>();
+	protected Map<String, Item> items;
 	protected int itemsHash = 0;
 	private Timer                             autoLoadTimer  = null;
 	private RepositoryChangeListenerIfc<Item> repoChangeList = null;
@@ -190,6 +189,16 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	}
 
 	/**
+	 * Method create instance of items Map. By overriding it it's possible to
+	 * change implementation and it's settings.
+	 */
+	protected void initItemsMap() {
+		if ( null == items ){
+			items = new ConcurrentSkipListMap<String, Item>( String.CASE_INSENSITIVE_ORDER );
+		}
+	}
+	
+	/**
 	 * Method description
 	 *
 	 *
@@ -237,6 +246,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 */
 	@Override
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
+		initItemsMap();
 		String[] items_arr = getDefaultPropetyItems();
 
 		if (params.get(getPropertyKey()) != null) {
@@ -312,6 +322,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	 */
 	@Override
 	public void setProperties(Map<String, Object> properties) {
+		initItemsMap();
 		String[] items_arr = (String[]) properties.get(getConfigKey());
 
 		if ((items_arr != null) && (items_arr.length > 0)) {
