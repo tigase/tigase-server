@@ -1,11 +1,6 @@
-//[[setUpRemoteMonitoring]]
-Setting Up Remote Monitoring in the Server
-==========================================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
-:toc:
-:numbered:
-:website: http://tigase.net
+[[setUpRemoteMonitoring]]
+== Setting Up Remote Monitoring in the Server
+
 :Date: 2010-04-06 21:18
 
 The Tigase server can be remotely monitored over following protocols: *JMX/RMI*, *SNMP* and *HTTP*. Even though JMX offers the biggest control and visibility to the server states all of the monitoring services give the same basic set of the server statistics: 
@@ -21,8 +16,7 @@ The monitoring itself causes very low overhead in terms of the resources and CPU
 
 *Note.* _This works with the Tigase server from version_ *4.2.0* _or SVN revision_ *1418*.
 
-What You Need.
---------------
+=== What You Need.
 
 If you use binary build for version 4.2.0 or later you can skip this section as all required libraries are included in the installation package: Extras pack. Please install the pack and you don't have to worry about libraries any more.
 
@@ -35,8 +29,8 @@ The remote monitoring requires an external library therefore it is implemented i
  
 Download both libraries and put them in the libs/ directory.
  
-Activation
-----------
+[[monitoring_activation]]
+=== Activation
 
 You can either run the Tigase installer and use configuration wizard to activate the monitoring or edit etc/init.properties file and add following line:
 
@@ -53,13 +47,13 @@ As you see there is only a single line where you put list of monitoring servers 
  
 You can have all protocols active at the same time or any combination of them or none. 
 
-Security
---------
+=== Security
 
 Both JMX and SNMP offer security protection to limit access to monitoring data. The security configuration is a bit different for both.
 
-JMX
-~~~
+[[monitoring_jmx]]
+==== JMX
+
 
 After the server installation or in the SVN repository you can find 2 files in the *etc/* directory: *jmx.access* and *jmx.password*. 
      
