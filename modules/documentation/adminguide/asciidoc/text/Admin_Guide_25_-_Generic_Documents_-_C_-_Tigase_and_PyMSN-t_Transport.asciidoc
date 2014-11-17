@@ -85,7 +85,7 @@ PyMSN-t - /etc/jabber/pymsn-t.xml file
 -------------------------------------
 
 PyMSN-t - run command
------------------------------------------
+---------------------
 
 [source,sh]
 -------------------------------------
@@ -96,7 +96,7 @@ python /usr/lib/python2.4/site-packages/pymsn-t/pymsn-t.py \
 *Note!* the full path to PyMSN-t config file is important.
 
 PyMSN-t - expected output
--------------------------------------------------
+-------------------------
 
 [source,bash]
 -------------------------------------
