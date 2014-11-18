@@ -116,8 +116,20 @@
 							</goals>
 							<configuration>
 								<targetDirectory>${guide_path}/webhelp/</targetDirectory>
-								<imgSrcPath>../html/</imgSrcPath>
+								<!--<imgSrcPath>../html/</imgSrcPath>-->
 								<ignoreImageScaling>true</ignoreImageScaling>
+								<postProcess>
+									<copy todir="${guide_path}/webhelp/css">
+										<fileset dir="asciidoc/css"></fileset>
+									</copy>
+									<copy todir="${guide_path}/webhelp/images">
+										<fileset dir="asciidoc/images"></fileset>
+									</copy>
+									<copy todir="${guide_path}/webhelp/files">
+										<fileset dir="asciidoc/files"></fileset>
+									</copy>
+								</postProcess>
+
 							</configuration>
 						</execution>
 						<execution>
@@ -149,7 +161,18 @@
 								<useIdAsFilename>true</useIdAsFilename>
 								<cssDecoration>true</cssDecoration>
 								<annotationCss>true</annotationCss>
-								<htmlStylesheet>../html/css/docbook-xsl.css</htmlStylesheet>
+								<htmlStylesheet>css/docbook-xsl.css</htmlStylesheet>
+								<postProcess>
+									<copy todir="${guide_path}/html_chunk/css">
+										<fileset dir="asciidoc/css"></fileset>
+									</copy>
+									<copy todir="${guide_path}/html_chunk/images">
+										<fileset dir="asciidoc/images"></fileset>
+									</copy>
+									<copy todir="${guide_path}/html_chunk/files">
+										<fileset dir="asciidoc/files"></fileset>
+									</copy>
+								</postProcess>
 							</configuration>
 						</execution>
 					</executions>
@@ -157,7 +180,7 @@
 						<chunkedOutput>true</chunkedOutput>
 						<sourceDirectory>${project.build.directory}/docbook/</sourceDirectory>
 						<includes>${guide_filename}.xml</includes>
-						<imgSrcPath>../html/</imgSrcPath>
+						<!--<imgSrcPath>../html/</imgSrcPath>-->
 						<highlightSource>1</highlightSource>
 						<!--<foCustomization>src/docbkx/docbook-fo.xsl</foCustomization>-->
 						<hyphenate>true</hyphenate>

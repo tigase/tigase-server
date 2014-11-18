@@ -37,7 +37,15 @@
 			<directory>../../docs</directory>
 			<outputDirectory>docs</outputDirectory>
 			<includes>
-				<include>*/**</include>
+				<include>admin_guide/html_chunk/**/*</include>
+				<include>admin_guide/pdf/**/*</include>
+				<include>dev_guide/html_chunk/**/*</include>
+				<include>dev_guide/pdf/**/*</include>
+				<include>properties_guide/html_chunk/**/*</include>
+				<include>properties_guide/pdf/**/*</include>
+				<include>user_guide/html_chunk/**/*</include>
+				<include>user_guide/pdf/**/*</include>
+				<include>javadoc/**/*</include>
 			</includes>
 		</fileSet>
 		<fileSet>
