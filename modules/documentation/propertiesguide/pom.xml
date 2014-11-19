@@ -3,7 +3,6 @@
 	<properties>
 		<packaging.type>pom</packaging.type>
 		<dist_path>../../..</dist_path>
-		<guide_directory>properties</guide_directory>
 		<guide_name>Properties</guide_name>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>

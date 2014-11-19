@@ -3,7 +3,7 @@
 	<properties>
 		<packaging.type>pom</packaging.type>
 		<dist_path>../..</dist_path>
-		<guide_path>${dist_path}/docs/${guide_directory}_guide</guide_path>
+		<guide_path>${dist_path}/docs/${guide_name}_Guide</guide_path>
 		<guide_filename>index</guide_filename>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
