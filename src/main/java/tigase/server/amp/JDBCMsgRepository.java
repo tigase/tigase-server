@@ -97,7 +97,8 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 							+ MSG_BODY_COLUMN + " varchar(4096) NOT NULL," + "  "
 							+ " key (" + MSG_EXPIRED_COLUMN + "), "
 							+ " key (" + MSG_FROM_UID_COLUMN + ", " + MSG_TO_UID_COLUMN + "),"
-							+ " key (" + MSG_TO_UID_COLUMN + ", " + MSG_FROM_UID_COLUMN + "))";
+							+ " key (" + MSG_TO_UID_COLUMN + ", " + MSG_FROM_UID_COLUMN + "))"
+							+ " ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC;";
 	private static final String PGSQL_CREATE_MSG_TABLE =
 							"create table " + MSG_TABLE + " ( " + "  "
 							+ MSG_ID_COLUMN + " serial," + "  "
