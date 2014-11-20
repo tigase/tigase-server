@@ -674,14 +674,14 @@ public class MessageRouter
 		}
 		list.add(getName(), "Max Heap mem", format.format(heap.getMax() / 1024), Level.INFO);
 		list.add(getName(), "Used Heap", format.format(heap.getUsed() / 1024), Level.INFO);
-		list.add(getName(), "Free Heap", format.format((heap.getMax() - heap.getUsed()) /
-				1024), Level.FINE);
+		list.add(getName(), "Free Heap", format.format( heap.getMax() == -1 ? 0 :
+				(heap.getMax() - heap.getUsed()) / 1024), Level.FINE);
 		list.add(getName(), "Max NonHeap mem", format.format(nonHeap.getMax() / 1024), Level
 				.FINE);
 		list.add(getName(), "Used NonHeap", format.format(nonHeap.getUsed() / 1024), Level
 				.FINE);
-		list.add(getName(), "Free NonHeap", format.format((nonHeap.getMax() - nonHeap
-				.getUsed()) / 1024), Level.FINE);
+		list.add(getName(), "Free NonHeap", format.format( nonHeap.getMax() == -1 ? 0 :
+				(nonHeap.getMax() - nonHeap.getUsed()) / 1024), Level.FINE);
 	}
 
 	//~--- set methods ----------------------------------------------------------
