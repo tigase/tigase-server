@@ -125,6 +125,9 @@ public interface CommandIfc {
 	public static final String SAVE_TO_DISK = "Save to disk";
 
 	/** Field description */
+	public static final String REMOVE_FROM_DISK = "Remove from disk";
+
+	/** Field description */
 	public static final String PACKET = "packet";
 
 	/** Field description */

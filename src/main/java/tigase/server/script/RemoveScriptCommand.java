@@ -22,15 +22,21 @@
 
 package tigase.server.script;
 
+import tigase.server.Command;
+import tigase.server.Iq;
+import tigase.server.Packet;
+
+import tigase.disco.ServiceEntity;
+
+import java.io.File;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.script.Bindings;
-import tigase.disco.ServiceEntity;
-import tigase.server.Command;
-import tigase.server.Iq;
-import tigase.server.Packet;
 
 /**
  * Created: Jan 2, 2009 2:30:41 PM
@@ -40,6 +46,8 @@ import tigase.server.Packet;
  */
 public class RemoveScriptCommand extends AbstractScriptCommand {
 
+	private static final Logger log = Logger.getLogger(RemoveScriptCommand.class.getName());
+
 	@Override
 	@SuppressWarnings({"unchecked"})
 	public void runCommand(Iq packet, Bindings binds, Queue<Packet> results) {
@@ -47,17 +55,24 @@ public class RemoveScriptCommand extends AbstractScriptCommand {
 		if (isEmpty(commandId)) {
 			results.offer(prepareScriptCommand(packet, binds));
 		} else {
+			boolean removeFromDisk = Command.getCheckBoxFieldValue(packet, REMOVE_FROM_DISK);
+
 			Map<String, CommandIfc> adminCommands =
 							(Map<String, CommandIfc>) binds.get(ADMN_CMDS);
-			adminCommands.remove(commandId);
+			Script command = (Script)adminCommands.remove(commandId);
 			ServiceEntity serviceEntity = (ServiceEntity) binds.get(ADMN_DISC);
 			ServiceEntity item =
 							serviceEntity.findNode("http://jabber.org/protocol/admin#" +
 							commandId);
 			serviceEntity.removeItems(item);
+
+			if (removeFromDisk) {
+				deleteCommandFromDisk(command.getCommandId(), command.getFileExtension(),binds);
+			}
+
 			Packet result = packet.commandResult(Command.DataType.result);
 			Command.addTextField(result, "Note",
-							"There is no command script to remove");
+							"Script removed correctly");
 			results.offer(result);
 		}
 	}
@@ -75,12 +90,23 @@ public class RemoveScriptCommand extends AbstractScriptCommand {
 			String[] commandIds = ids.toArray(new String[ids.size()]);
 			Command.addFieldValue(result, COMMAND_ID, commandIds[0], "Command Id",
 							commandIds, commandIds);
+			Command.addCheckBoxField(result, REMOVE_FROM_DISK, true);
 		} else {
 			result = packet.commandResult(Command.DataType.result);
 			Command.addTextField(result, "Note",
 							"There is no command script to remove");
 		}
 		return result;
+	}
+
+
+	private void deleteCommandFromDisk(String commandId, String fileExtension,Bindings binds) {
+		File fileName = new File((String) binds.get(SCRIPT_COMP_DIR), commandId + "." + fileExtension);
+
+		if (fileName.exists()) {
+			log.log(Level.CONFIG, "Deleting file: {0}", fileName);
+			fileName.delete();
+		}
 	}
 
 	@Override
