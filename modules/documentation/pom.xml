@@ -175,6 +175,35 @@
 								</postProcess>
 							</configuration>
 						</execution>
+						<execution>
+							<id>generate-epub3</id>
+							<goals>
+								<goal>generate-epub3</goal>
+							</goals>
+							<configuration>
+								<targetDirectory>${project.build.directory}/epub3/</targetDirectory>
+								<targetsFilename>true</targetsFilename>
+								<useIdAsFilename>true</useIdAsFilename>
+								<cssDecoration>true</cssDecoration>
+								<annotationCss>true</annotationCss>
+								<preProcess>
+									<copy todir="${project.build.directory}/epub3/css">
+										<fileset dir="asciidoc/css"></fileset>
+									</copy>
+									<copy todir="${project.build.directory}/epub3/images">
+										<fileset dir="asciidoc/images"></fileset>
+									</copy>
+									<copy todir="${project.build.directory}/epub3/files">
+										<fileset dir="asciidoc/files"></fileset>
+									</copy>
+								</preProcess>
+								<postProcess>
+									<move file="${project.build.directory}/index.epub"
+												tofile="${guide_path}/epub/${guide_name}Guide.epub"
+												failonerror="false" />
+								</postProcess>
+							</configuration>
+						</execution>
 					</executions>
 					<configuration>
 						<chunkedOutput>true</chunkedOutput>
