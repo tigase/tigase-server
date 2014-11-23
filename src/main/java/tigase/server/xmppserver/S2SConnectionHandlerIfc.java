@@ -69,6 +69,8 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 	BareJID getDefHostName();
        
     String getSecretForDomain(String domain) throws NotLocalhostException;
+
+	String getServerNameForDomain(String domain);
 	
 	//~--- methods --------------------------------------------------------------
 

@@ -98,6 +98,11 @@ public abstract class IOService<RefObject>
 	 * Field description
 	 */
 	public static final String CERT_CHECK_RESULT = "cert-check-result";
+	
+	/**
+	 * Field description
+	 */
+	public static final String CERT_REQUIRED_DOMAIN = "cert-required-domain";
 
 	/**
 	 * Field description
@@ -343,8 +348,28 @@ public abstract class IOService<RefObject>
 	 */
 	@Override
 	public void handshakeCompleted(TLSWrapper wrapper) {
+		String reqCertDomain = (String) getSessionData().get(CERT_REQUIRED_DOMAIN);
 		CertCheckResult certCheckResult = wrapper.getCertificateStatus(false);
-
+		if (reqCertDomain != null) { 
+			// if reqCertDomain is set then verify if certificate got from server
+			// is allowed for reqCertDomain
+			try {
+				Certificate[] certs = wrapper.getTlsEngine().getSession()
+						.getPeerCertificates();
+				if (certs != null && certs.length > 0) {
+					Certificate peerCert = certs[0];
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "{0}, TLS handshake veryfing if certificate from connection matches domain {1}", 
+								new Object[]{this, reqCertDomain});
+					}
+					if (!CertificateUtil.verifyCertificateForDomain((X509Certificate) peerCert, reqCertDomain)) {
+						certCheckResult = CertCheckResult.invalid;
+					}
+				}
+			} catch (Exception e) {
+				certCheckResult = CertCheckResult.invalid;
+			}
+		}
 		sessionData.put(CERT_CHECK_RESULT, certCheckResult);
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "{0}, TLS handshake completed: {1}", new Object[] { this,

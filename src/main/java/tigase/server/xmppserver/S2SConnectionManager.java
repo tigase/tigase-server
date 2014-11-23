@@ -36,10 +36,13 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.script.Bindings;
+import tigase.cert.CertificateUtil;
 import tigase.conf.ConfigurationException;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
@@ -108,6 +111,12 @@ public class S2SConnectionManager
 			"tigase.server.xmppserver.S2SRandomSelector";
 
 	/** Field description */
+	public static final String S2S_DOMAIN_MAPPING_PROP_KEY = "s2s-domain-mapping";
+	
+	/** Field description */
+	public static final String S2S_DOMAIN_MAPPING_PROP_VAL = "";
+	
+	/** Field description */
 	protected static final String DB_RESULT_EL_NAME = "db:result";
 
 	/** Field description */
@@ -162,6 +171,12 @@ public class S2SConnectionManager
 	 */
 	private Map<CID, CIDConnections> cidConnections = new ConcurrentHashMap<CID,
 			CIDConnections>(10000);
+	
+	/**
+	 * Holds list of manually entered mappings which provide substitutions for domains
+	 * matching pattens with names of servers to which we should connect.
+	 */
+	private DomainServerNameMapper domainServerNameMapper = new DomainServerNameMapper();
 
 	/**
 	 * List of processors which should handle all traffic incoming from the
@@ -749,6 +764,7 @@ public class S2SConnectionManager
 		props.put(MAX_OUT_PER_IP_CONNECTIONS_PROP_KEY, MAX_OUT_PER_IP_CONNECTIONS_PROP_VAL);
 		props.put(S2S_CONNECTION_SELECTOR_PROP_KEY, S2S_CONNECTION_SELECTOR_PROP_VAL);
 		props.put(CID_CONNECTIONS_TASKS_THREADS_KEY, CID_CONNECTIONS_TASKS_THREADS_VAL);
+		props.put(S2S_DOMAIN_MAPPING_PROP_KEY, S2S_DOMAIN_MAPPING_PROP_VAL);
 
 		return props;
 	}
@@ -808,6 +824,11 @@ public class S2SConnectionManager
 		
 		return item.getS2sSecret();
 	}
+
+	@Override
+	public String getServerNameForDomain(String domain) {
+		return domainServerNameMapper.getServerNameForDomain(domain);
+	}	
 		
 	/**
 	 * Method description
@@ -1010,6 +1031,18 @@ public class S2SConnectionManager
 					selector_str);
 			log.log(Level.SEVERE, "Selector initialization exception: ", e);
 		}
+		
+		String tmp = (String) props.get(S2S_DOMAIN_MAPPING_PROP_KEY);
+		DomainServerNameMapper tmp_domainServerNameMapper = new DomainServerNameMapper();
+		if (tmp != null) {
+			for(String part : tmp.split(",")) {
+				String[] kv = part.split("=");
+				if (kv.length >= 2) {
+					tmp_domainServerNameMapper.addEntry(kv[0], kv[1]);
+				} 
+			}
+		}
+		domainServerNameMapper = tmp_domainServerNameMapper;
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -1112,6 +1145,94 @@ public class S2SConnectionManager
 				.jidInstanceNS(cid.getRemoteHost()));
 
 		return result;
+	}
+	
+	protected static class DomainServerNameMapper {
+		
+		private class Entry implements Comparable<Entry>{
+			private final String pattern;
+			private final String serverName;
+
+			public Entry(String pattern, String serverName) {
+				this.pattern = pattern.toLowerCase();
+				this.serverName = serverName;
+			}
+
+			public String getServerName() {
+				return serverName;
+			}
+
+			public boolean matches(String domain) {
+				if ("*".equals(pattern)) {
+					return true;
+				}
+				return CertificateUtil.match(domain, pattern);
+			}
+
+			@Override
+			public boolean equals(Object obj) {
+				if (obj instanceof Entry) {
+					return pattern.equals(((Entry) obj).pattern);
+				}
+				return false;
+			}
+			
+			@Override
+			public int hashCode() {
+				return pattern.hashCode();
+			}
+
+			@Override
+			public int compareTo(Entry o) {
+				if (o.pattern.contains("*")) {
+					if (!pattern.contains("*"))
+						return -1;
+				} else {
+					if (pattern.contains("*"))
+						return 1;
+				}
+				int val = (pattern.split(".").length - o.pattern.split(".").length) * -1;
+				if (val != 0)
+					return val;
+				return o.pattern.length() - pattern.length();
+			}
+		}
+		
+		private CopyOnWriteArrayList<Entry> entries = new CopyOnWriteArrayList<Entry>();
+		
+		public DomainServerNameMapper() {}
+		
+		protected void addEntry(String pattern, String serverName) {
+			Entry e = new Entry(pattern, serverName);
+			entries.add(e);
+			Collections.sort(entries);
+		}
+		
+		public String getServerNameForDomain(String domain) {
+			for (Entry e : entries) {
+				if (e.matches(domain))
+					return e.getServerName();
+			}
+			return domain;
+		}
+
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			sb.append(getClass().getName()).append("[");
+			boolean first = true;
+			for (Entry e : entries) {
+				if (!first)
+					sb.append(",");
+				sb.append(e.pattern);
+				sb.append("=");
+				sb.append(e.serverName);
+				first = false;
+			} 
+			sb.append("]");
+			return sb.toString();
+		}
+		
 	}
 }
 

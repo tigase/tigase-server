@@ -183,6 +183,14 @@ public class CIDConnections {
 			serv.setS2SConnection(s2s_conn);
 		}
 
+		CID cid = (CID) serv.getSessionData().get("cid");
+		if (cid != null) {
+			// using additional mapping/masking of incoming connections to allow 
+			// usage of intermediate server also for incoming connections
+			String serverName = handler.getServerNameForDomain(cid.getRemoteHost());
+			serv.getSessionData().put(S2SIOService.CERT_REQUIRED_DOMAIN, serverName);
+		}
+		
 		// TODO: check if this should be moved inside the IF
 		incoming.add(s2s_conn);
 	}
@@ -570,12 +578,16 @@ public class CIDConnections {
 			@Override
 			public void run() {
 				try {
-					DNSEntry dns_entry     = DNSResolver.getHostSRV_Entry(cid.getRemoteHost());
+					// using additional domain name mapping to allow usage of intermediate server
+					String serverName = handler.getServerNameForDomain(cid.getRemoteHost());
+					
+					DNSEntry dns_entry     = DNSResolver.getHostSRV_Entry(serverName);
 					S2SConnection s2s_conn = new S2SConnection(handler, dns_entry.getIp());
 
 					s2s_conn.addControlPacket(verify_req);
 
 					Map<String, Object> port_props = new TreeMap<String, Object>();
+					port_props.put(S2SIOService.CERT_REQUIRED_DOMAIN, serverName);
 
 					port_props.put(S2SIOService.HANDSHAKING_ONLY_KEY,
 												 S2SIOService.HANDSHAKING_ONLY_KEY);
@@ -801,8 +813,11 @@ public class CIDConnections {
 				}
 			}
 
+			// using additional domain name mapping to allow usage of intermediate server
+			String serverName = handler.getServerNameForDomain(cid.getRemoteHost());
+					
 			// Check DNS entries
-			DNSEntry[] dns_entries = DNSResolver.getHostSRV_Entries(cid.getRemoteHost());
+			DNSEntry[] dns_entries = DNSResolver.getHostSRV_Entries(serverName);
 
 			// Activate 'missing' connections
 			for (DNSEntry dNSEntry : dns_entries) {
@@ -827,6 +842,7 @@ public class CIDConnections {
 					// Create a new connection
 					S2SConnection s2s_conn         = new S2SConnection(handler, dNSEntry.getIp());
 					Map<String, Object> port_props = new TreeMap<String, Object>();
+					port_props.put(S2SIOService.CERT_REQUIRED_DOMAIN, serverName);
 
 					initNewConnection(dNSEntry.getIp(), dNSEntry.getPort(), s2s_conn, port_props);
 					result = true;
