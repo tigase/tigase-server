@@ -1,12 +1,8 @@
 //[[packetFiltering]]
 Packet Filtering
 ================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+
 :toc:
-:numbered:
-:website: http://tigase.net
-:Date: 2010-04-06 21:18
 
 Tigase offers different ways to filter XMPP packets flying through the server. The most common case to use packet filtering is to restrict users from sending or receiving packets based on the sender or received address.
 
@@ -14,5 +10,4 @@ There are also possible different scenarios: time based filtering, content filte
 
 All pages in this section describe different filtering strategies.
 
-- ////<<domainBasedPacketFiltering,////Domain Based Packets Filtering
-
+include::Admin_Guide_65_-_Tigase_Server_Version_4.x_-_D_-_Packet_Filtering_-_1_-_Domain_Based_Packet_Filtering.asciidoc[]

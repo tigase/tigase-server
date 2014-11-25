@@ -1,11 +1,6 @@
 [[virtHosts]]
---virt-hosts
-============
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
-:toc:
-:numbered:
-:website: http://tigase.net/
+= --virt-hosts
+
 :Date: 2013-02-10 01:53
 
 *Default value:* 'hostname'
@@ -25,7 +20,7 @@ Here is an example:
 --virt-hosts=domain1:-anon:register:-tls-required:s2s-secret=s2spasswd:\
   domain-filter=LOCAL:max-users=1000,domain2,\
   domain3:c2s-ports-allowed=5222;5223;5280;5290
+  domain3:domain-filter=LIST=whitedomain1;whitedomain2;whitedomain3
 ------------------------------
 
 *Available since:* 4.3.0
-

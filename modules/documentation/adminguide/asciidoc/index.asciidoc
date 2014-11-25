@@ -1,7 +1,6 @@
-Tigase Administration Guide
-===========================
+= Tigase Administration Guide
 Tigase Team <team@tigase.net>
-v1.0, July 2014: Initial
+v7.0.0
 :toc:
 :numbered:
 :website: http://tigase.net
@@ -139,8 +138,6 @@ include::text/Admin_Guide_63_-_Tigase_Server_Version_4.x_-_C_-_External_Componen
 
 include::text/Admin_Guide_64_-_Tigase_Server_Version_4.x_-_D_-_Packet_Filtering.asciidoc[]
 
-include::text/Admin_Guide_65_-_Tigase_Server_Version_4.x_-_D_-_Packet_Filtering_-_1_-_Domain_Based_Packet_Filtering.asciidoc[]
-
 include::text/Admin_Guide_66_-_Tigase_Server_Version_4.x_-_E_-_Virtual_Hosts_in_the_Tigase_Server.asciidoc[]
 
 include::text/Admin_Guide_67_-_Tigase_Server_Version_4.x_-_E_-_Virtual_Hosts_in_the_Tigase_Server_-_1_-_Specification_for_ad-hoc_Commands_Used_to_Manage_Virtual_Domains.asciidoc[]
@@ -188,4 +185,3 @@ include::text/Admin_Guide_87_-_Tigase_Server_Version_2.x_-_E_-_Command_Line_Admi
 include::text/Admin_Guide_88_-_Tigase_Server_Version_2.x_-_E_-_Command_Line_Admin_Tools_-_1_-_Configuration_Management_Tool.asciidoc[]
 
 include::text/Admin_Guide_89_-_Best_Practices_for_Connecting_From_Web_Browser_to_Tigase_XMPP_Server.asciidoc[]
-

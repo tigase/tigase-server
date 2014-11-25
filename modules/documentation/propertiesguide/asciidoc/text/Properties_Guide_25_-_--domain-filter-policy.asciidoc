@@ -1,32 +1,26 @@
 [[domainFilterPolicy]]
 --domain-filter-policy
 ======================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
-:toc:
-:numbered:
-:website: http://tigase.net/
-:Date: 2013-03-28 15:10
 
 *Default value:* +ALL+
 
 *Example:* +--domain-filter-policy = LOCAL+
 
-*Possible values:* +ALL|LOCAL|OWN|BLOCK|LIST+
+*Possible values:* +ALL|LOCAL|OWN|BLOCK|LIST=domain1;domain2|BLACKLIST=domain1;domain2+
 
 *Description:* The property is a global settings for setting communication filtering for vhosts. This function is kind of extension of the same property which could be set on a single user level. However, in many cases it is desired to control users communication not on per user-level but on the domain level. Domain filtering (communication filtering) allows you to specify with whom users can communicate for a particular domain. It allows to restrict communication for a selected domains or for the entire installation. A default value +ALL+ that users for the domain (by default for all domains) are allowed to communicate with any user on any other domain. Other possible values are:
 
-. *ALL* a default value allowing users to communicate with anybody on any other domain, including external servers.
-. *LOCAL* allows users to communicate with all users on the same installation on any domain. It only blocks communication with external servers.
-. *OWN* allows users to communicate with all other users on the same domain. Plus it allows users to communicate with subdomains such as *muc.domain*, *pubsub.domain*, etc....
-. *BLOCK* value completely blocks communication for the domain or for the user with anybody else. This could be used as a means to temporarily disable account or domain.
-. *LIST* property allows to set a list of domains (users' JIDs) with which users on the domain can communicate.
+. `ALL` a default value allowing users to communicate with anybody on any other domain, including external servers.
+. `LOCAL` allows users to communicate with all users on the same installation on any domain. It only blocks communication with external servers.
+. `OWN` allows users to communicate with all other users on the same domain. Plus it allows users to communicate with subdomains such as *muc.domain*, *pubsub.domain*, etc…
+. `BLOCK` value completely blocks communication for the domain or for the user with anybody else. This could be used as a means to temporarily disable account or domain.
+. `LIST` property allows to set a list of domains (users' JIDs) with which users on the domain can communicate (i.e. _whitelist_).
+. `BLACKLIST` - user can communicate with everybody (like `ALL`), except contacts on listed domains.
 
-This is a global property which is overridden by settings for particular vhost.
+This is a global property which is overridden by settings for particular vhost and settings or particular user
 
 A default settings for all virtual hosts for which the configuration is not defined. This settings is useful mostly for installations with many virtual hosts listed in the init.property file for which there is no individual settings specified. It allows to configure a default values for all of them, instead of having to provide individual configuration for each vhost.
 
 It is also applied as a default value for all new vhosts added at run-time.
 
 *Available since:* 5.2.0
-
