@@ -33,14 +33,20 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import tigase.db.comp.RepositoryItemAbstract;
+
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.XMPPServer;
+
 import tigase.util.DataTypes;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
+
 import tigase.xmpp.JID;
+
+import tigase.util.StringUtilities;
 
 /**
  * Objects of this class represent virtual host with all hosts configuration
@@ -197,7 +203,13 @@ public class VHostItem
 	public static final String DOMAIN_FILTER_POLICY_ATT = "domain-filter";
 
 	/** Field description */
+	public static final String DOMAIN_FILTER_POLICY_DOMAINS_ATT = "domain-filter-domains";
+
+	/** Field description */
 	public static final String DOMAIN_FILTER_POLICY_LABEL = "Domain filter policy";
+
+	/** Field description */
+	public static final String DOMAIN_FILTER_POLICY_DOMAINS_LABEL = "Domain filter domains (only LIST and BLACKLIST)";
 
 	/**
 	 * This is an attribute name for storing information whether the VHost is
@@ -365,6 +377,7 @@ public class VHostItem
 	private boolean            enabled = true;
 	private DomainFilterPolicy domainFilter = DomainFilterPolicy.valueof(System.getProperty(
 			DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString()));
+	private String[] domainFilterDomains = null;
 	private boolean anonymousEnabled = DataTypes.getProperty(
 			VHOST_ANONYMOUS_ENABLED_PROP_KEY, VHOST_ANONYMOUS_ENABLED_PROP_DEF);
 	private Map<String,Object> data = new ConcurrentHashMap<String,Object>();
@@ -444,6 +457,8 @@ public class VHostItem
 		Command.addFieldValue(packet, DOMAIN_FILTER_POLICY_LABEL, domainFilter.toString(),
 				DOMAIN_FILTER_POLICY_LABEL, DomainFilterPolicy.valuesStr(), DomainFilterPolicy
 				.valuesStr());
+		Command.addFieldValue(packet, DOMAIN_FILTER_POLICY_DOMAINS_LABEL,
+							domainFilterDomains != null ? stringArrayToString( domainFilterDomains, ";") : "");
 		Command.addFieldValue(packet, MAX_USERS_NUMBER_LABEL, "" + maxUsersNumber);
 		String c2sPortsAllowedStr = intArrayToString(c2sPortsAllowed,",");
 		Command.addFieldValue(packet, C2S_PORTS_ALLOWED_LABEL,
@@ -541,7 +556,13 @@ public class VHostItem
 			if (domainFilter == null) {
 				domainFilter = DomainFilterPolicy.valueof(System.getProperty(
 						DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString()));
+			} else if (domainFilter == DomainFilterPolicy.LIST || domainFilter == DomainFilterPolicy.BLACKLIST) {
+				tmp = Command.getFieldValue(packet, DOMAIN_FILTER_POLICY_DOMAINS_LABEL);
+				if ( tmp != null && !tmp.trim().isEmpty() ){
+					domainFilterDomains = StringUtilities.stringToArrayOfString( tmp, ";" );
+				}
 			}
+
 		} catch (Exception ex) {
 			domainFilter = DOMAIN_FILTER_POLICY_PROP_DEF;
 		}
@@ -589,6 +610,9 @@ public class VHostItem
 			Object value = (valueStr == null || valueStr.isEmpty()) ? null :DataTypes.decodeValueType(typeId, valueStr);
 			setData(type.getKey(), value);
 		}
+
+		log.log( Level.FINE, "Initialized from command: {0}", this);
+
 	}
 
 	/**
@@ -618,6 +642,11 @@ public class VHostItem
 			if (domainFilter == null) {
 				domainFilter = DomainFilterPolicy.valueof(System.getProperty(
 						DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString()));
+			} else if (domainFilter == DomainFilterPolicy.LIST || domainFilter == DomainFilterPolicy.BLACKLIST) {
+				String tmp = elem.getAttributeStaticStr(DOMAIN_FILTER_POLICY_DOMAINS_ATT);
+				if ( tmp != null && !tmp.trim().isEmpty() ){
+					domainFilterDomains = StringUtilities.stringToArrayOfString( tmp, ";" );
+				}
 			}
 		} catch (Exception e) {
 			domainFilter = DOMAIN_FILTER_POLICY_PROP_DEF;
@@ -665,6 +694,7 @@ public class VHostItem
 				}
 			}
 		}
+		log.log( Level.FINE, "Initialized from element: {0}", this);
 	}
 
 	/**
@@ -713,12 +743,20 @@ public class VHostItem
 			}
 			if (tmp.startsWith(DOMAIN_FILTER_POLICY_ATT)) {
 				String[] df = tmp.split("=");
+				String[] domains;
 
 				try {
-					domainFilter = DomainFilterPolicy.valueof(df[1]);
-					if (domainFilter == null) {
-						domainFilter = DomainFilterPolicy.valueof(System.getProperty(
-								DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString()));
+					if ( df.length == 2 ){
+						domainFilter = DomainFilterPolicy.valueof( df[1] );
+					} else if ( df.length == 3 ){
+						domainFilter = DomainFilterPolicy.valueof( df[1] );
+						if ( df[2] != null && !df[2].trim().isEmpty() ){
+							domainFilterDomains = StringUtilities.stringToArrayOfString( df[2], ";" );
+						}
+					}
+					if ( domainFilter == null ){
+						domainFilter = DomainFilterPolicy.valueof( System.getProperty(
+								DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString() ) );
 					}
 				} catch (Exception e) {
 					domainFilter = DOMAIN_FILTER_POLICY_PROP_DEF;
@@ -768,6 +806,7 @@ public class VHostItem
 				setSaslAllowedMechanisms(mu[1].split(";"));
 			}
 		}
+		log.log( Level.FINE, "Initialized from property string: {0}", this);
 	}
 
 	/**
@@ -807,6 +846,9 @@ public class VHostItem
 		}
 		if (domainFilter != null) {
 			elem.addAttribute(DOMAIN_FILTER_POLICY_ATT, domainFilter.toString());
+		}
+		if (domainFilterDomains != null) {
+			elem.addAttribute(DOMAIN_FILTER_POLICY_DOMAINS_ATT, stringArrayToString( domainFilterDomains, ";"));
 		}
 		elem.addAttribute(MAX_USERS_NUMBER_ATT, "" + maxUsersNumber);
 		if (presenceForward != null) {
@@ -861,6 +903,9 @@ public class VHostItem
 		}
 		sb.append(':').append(DOMAIN_FILTER_POLICY_ATT).append('=').append(domainFilter
 				.toString());
+		if (domainFilterDomains!=null) {
+			sb.append( "=").append( stringArrayToString( domainFilterDomains, ";"));
+		}
 		if (maxUsersNumber > 0) {
 			sb.append(':').append(MAX_USERS_NUMBER_ATT).append('=').append(maxUsersNumber);
 		}
@@ -893,12 +938,13 @@ public class VHostItem
 	 */
 	@Override
 	public String toString() {
-		String str = "Domain: " + vhost + ", enabled: " + enabled + ", anonym: "
-					 + anonymousEnabled + ", register: " + registerEnabled + ", maxusers: "
-					 + maxUsersNumber + ", tls: " + tlsRequired + ", s2sSecret: " + s2sSecret
-					 + ", domainFilter: " + domainFilter + ", c2sPortsAllowed: "
-					 + intArrayToString( c2sPortsAllowed, ",")
-					 + ", saslAllowedMechanisms: " + Arrays.toString( saslAllowedMechanisms );
+		String str = "Domain: " + vhost + ", enabled: " + enabled
+								 + ", anonym: " + anonymousEnabled + ", register: " + registerEnabled
+								 + ", maxusers: " + maxUsersNumber + ", tls: " + tlsRequired
+								 + ", s2sSecret: " + s2sSecret + ", domainFilter: " + domainFilter
+								 + ", domainFilterDomains: " + stringArrayToString( domainFilterDomains, ";")
+								 + ", c2sPortsAllowed: " + intArrayToString( c2sPortsAllowed, "," )
+								 + ", saslAllowedMechanisms: " + Arrays.toString( saslAllowedMechanisms );
 		
 		for (Map.Entry<String,Object> e : data.entrySet()) {
 			str += ", " + e.getKey() + ": " + DataTypes.valueToString(e.getValue());
@@ -965,6 +1011,10 @@ public class VHostItem
 		return domainFilter;
 	}
 
+	public String[] getDomainFilterDomains() {
+		return domainFilterDomains;
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -1206,13 +1256,24 @@ public class VHostItem
 	}
 	
 	/**
-	 * Method description
+	 * This method allow configure DomainFilterPolicy to be applied during packet
+	 * filtering.
 	 *
-	 *
-	 * @param domainFilter
+	 * @param domainFilter name of the DomainFilterPolicy to be applied
 	 */
 	public void setDomainFilter(DomainFilterPolicy domainFilter) {
 		this.domainFilter = domainFilter;
+	}
+
+	/**
+	 * This method allow specify list of domains that will be used for packet
+	 * filtering when DomainFilteringPolicy is set to either LIST or BLACKLIST.
+	 *
+	 * @param domainFilter array of domains to be applied during filtering
+	 */
+	public void setDomainFilterDomains(String[] domainFilterDomains) {
+		this.domainFilterDomains = StringUtilities.internStringArray( domainFilterDomains);
+
 	}
 
 	/**
@@ -1462,6 +1523,12 @@ public class VHostItem
 			return VHostItem.this.getDomainFilter();
 		}
 
+		@Override
+		public String[] getDomainFilterDomains() {
+			return VHostItem.this.getDomainFilterDomains();
+		}
+
+
 		/**
 		 * This method returns the maximum number of user accounts allowed for this
 		 * domain. This parameter is to allow for limiting number of users on per
@@ -1667,6 +1734,18 @@ public class VHostItem
 					"This is unmodifiable instance of VHostItem");
 		}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param domainFilter
+	 */
+		@Override
+	public void setDomainFilterDomains(String[] domainFilterDomains) {
+			throw new UnsupportedOperationException(
+					"This is unmodifiable instance of VHostItem");
+	}
+
 		/**
 		 * This method allows to enable or disable local domain. If the domain is
 		 * disabled packets sent for this domain are not processed normally, instead
@@ -1784,5 +1863,3 @@ public class VHostItem
 	}
 }
 
-
-//~ Formatted in Tigase Code Convention on 13/10/05

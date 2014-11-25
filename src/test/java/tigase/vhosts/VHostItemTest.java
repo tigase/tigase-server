@@ -18,8 +18,10 @@
  */
 package tigase.vhosts;
 
-
 import tigase.util.TigaseStringprepException;
+import tigase.xml.Element;
+
+import java.util.Arrays;
 
 import junit.framework.TestCase;
 
@@ -30,10 +32,54 @@ import junit.framework.TestCase;
 public class VHostItemTest extends TestCase {
 
 	public void testVHostItem() throws TigaseStringprepException {
-		assertEquals(new VHostItem("lowercase.com"),new VHostItem("lowercase.com"));
-		assertEquals(new VHostItem("CAPITAL.COM"),new VHostItem("capital.com"));
-		assertNotSame(new VHostItem("CAPITAL.COM"),new VHostItem("lowercase.com"));
+		assertEquals( new VHostItem( "lowercase.com" ), new VHostItem( "lowercase.com" ) );
+		assertEquals( new VHostItem( "CAPITAL.COM" ), new VHostItem( "capital.com" ) );
+		assertNotSame( new VHostItem( "CAPITAL.COM" ), new VHostItem( "lowercase.com" ) );
+
 	}
 
+	public void testVHostDomainPolicy() throws TigaseStringprepException {
+
+		Element el;
+		VHostItem vHostItem;
+
+		vHostItem = new VHostItem();
+		vHostItem.initFromPropertyString( "domain1:domain-filter=LOCAL:max-users=1000" );
+		assertEquals( DomainFilterPolicy.LOCAL, vHostItem.getDomainFilter() );
+		assertTrue( vHostItem.getDomainFilterDomains() == null );
+
+		vHostItem = new VHostItem();
+		vHostItem.initFromPropertyString( "domain1:domain-filter=LIST=domain1;domain2;domain3:max-users=1000" );
+		assertEquals( DomainFilterPolicy.LIST, vHostItem.getDomainFilter() );
+		assertTrue( Arrays.asList( vHostItem.getDomainFilterDomains() ).contains( "domain1" ) );
+		assertTrue( Arrays.asList( vHostItem.getDomainFilterDomains() ).contains( "domain3" ) );
+		assertFalse( Arrays.asList( vHostItem.getDomainFilterDomains() ).contains( "domain5" ) );
+
+		vHostItem = new VHostItem();
+		el = new Element( "vhost",
+											new String[] { "hostname", "domain-filter", "domain-filter-domains" },
+											new String[] { "domain3", "ALL", "domain1;domain2;domain3" }
+		);
+
+		vHostItem.initFromElement( el );
+
+		assertEquals( DomainFilterPolicy.ALL, vHostItem.getDomainFilter() );
+		assertTrue( vHostItem.getDomainFilterDomains() == null );
+		assertTrue( vHostItem.toPropertyString().contains( "domain-filter=ALL" ) );
+
+		vHostItem = new VHostItem();
+		el = new Element( "vhost",
+											new String[] { "hostname", "domain-filter", "domain-filter-domains" },
+											new String[] { "domain3", "BLACKLIST", "domain1;domain2;domain3" }
+		);
+
+		vHostItem.initFromElement( el );
+		assertEquals( DomainFilterPolicy.BLACKLIST, vHostItem.getDomainFilter() );
+		assertTrue( Arrays.asList( vHostItem.getDomainFilterDomains() ).contains( "domain1" ) );
+		assertTrue( Arrays.asList( vHostItem.getDomainFilterDomains() ).contains( "domain3" ) );
+		assertFalse( Arrays.asList( vHostItem.getDomainFilterDomains() ).contains( "domain5" ) );
+		assertTrue( vHostItem.toPropertyString().contains( "domain-filter=BLACKLIST" ) );
+
+	}
 
 }

@@ -84,14 +84,23 @@ if ( !(isServiceAdmin || (vhost != null && (vhost.isOwner(stanzaFromBare.toStrin
 try {
 	def old_value = repo.getData(bareJID, null,
 		DomainFilter.ALLOWED_DOMAINS_KEY, null)
+	def old_value_domains = "";
+
+	if (old_value ==  DomainFilterPolicy.LIST.name()
+		|| old_value ==  DomainFilterPolicy.BLACKLIST.name()) {
+		old_value_domains = repo.getData(bareJID, null,
+			DomainFilter.ALLOWED_DOMAINS_LIST_KEY, null)
+	}
 
 	def new_value = domain
-	if (domain == DomainFilterPolicy.LIST.name()) {
-		new_value = domainList
+	if (domain == DomainFilterPolicy.LIST.name()
+		|| domain == DomainFilterPolicy.BLACKLIST.name()) {
+//		new_value = domainList
+			repo.setData(bareJID, null, DomainFilter.ALLOWED_DOMAINS_LIST_KEY, domainList)
 	}
 	repo.setData(bareJID, null, DomainFilter.ALLOWED_DOMAINS_KEY, new_value)
 
-	return "Changed an old value: $old_value to a new value: $new_value for user: $jid"
+	return "Changed an old value: $old_value (domains list: $old_value_domains) to a new value: $new_value (domains list: $domainList) for user: $jid"
 } catch (e) {
   if (e in UserNotFoundException)	{
 		return "The user $jid was not found in the user repository"

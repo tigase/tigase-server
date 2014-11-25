@@ -1,12 +1,10 @@
 /*
- * DomainFilter.java
- *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
+ * Copyright (C) 2004-2014 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License,
+ * the Free Software Foundation, version 3 of the License,
  * or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -17,12 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- *
  */
 
 package tigase.xmpp.impl;
-
-//~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
@@ -40,10 +35,12 @@ import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPResourceConnection;
 
 import tigase.util.DNSResolver;
+import tigase.util.StringUtilities;
 import tigase.vhosts.DomainFilterPolicy;
 import tigase.vhosts.VHostItem;
 
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Queue;
@@ -54,30 +51,28 @@ import java.util.logging.Logger;
  * Created: Dec 30, 2008 12:43:28 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
  */
 public class DomainFilter
 				extends XMPPProcessor
 				implements XMPPPacketFilterIfc, XMPPPreprocessorIfc {
-	/** Field description */
+	/** constant domain key name */
 	public static final String ALLOWED_DOMAINS_KEY = "allowed-domains";
 
-	/** Field description */
+	/** constant domain list key name */
 	public static final String  ALLOWED_DOMAINS_LIST_KEY = "allowed-domains-list";
+	/** id of the plugin */
 	private static final String ID                       = "domain-filter";
 
-	/**
-	 * Private logger for class instances.
-	 */
+	/** Private logger for class instances. */
 	private static final Logger     log = Logger.getLogger(DomainFilter.class.getName());
+	/** paths for which plugin should be enabled */
 	private static final String[][] ELEMENTS = ALL_PATHS;
+
+	/** xmlns for which plugin should be enabled */
 	private static final String[]   XMLNSS   = { ALL_NAMES };
 
+	/** default local hostname */
 	private static String local_hostname;
-
-	//~--- methods --------------------------------------------------------------
-
-
 
 	@Override
 	public void filter(Packet packet, XMPPResourceConnection session,
@@ -154,10 +149,50 @@ public class DomainFilter
 
 					break;
 
+				case BLACKLIST :
+					String[] blacklistedDomains = getDomainsList(session);
+					boolean  blacklist_match          = false;
+
+					if ( ( outDomain == null ) || outDomain.equals( local_hostname ) ){
+						// don't filter system packets, breaks things
+						break;
+					}
+					for (String domain : blacklistedDomains) {
+
+						// Intentionally comparing domains by reference instead of value
+						// domain is processed through the String.intern() method
+						if (domain == outDomain) {
+							blacklist_match = true;
+
+							break;
+						}
+					}
+					if (blacklist_match) {
+						removePacket(it, res, errors,
+								"You attempted to communicate with the blacklisted domain - FORBIDDEN");
+						if ( log.isLoggable( Level.FINEST ) ){
+							log.log( Level.FINEST, "BLACKLIST domain {1}, blocking packet (filter): {0}",
+																		 new Object [] {res,outDomain} );
+						}
+					} else {
+						if ( log.isLoggable( Level.FINEST ) ){
+							log.log( Level.FINEST, "BLACKLIST domain {1], packet not blocked (filter): {0}",
+																		 new Object [] {res,outDomain} );
+						}
+					}
+
+
+					break;
+
 				case LIST :
+
 					String[] allowedDomains = getDomainsList(session);
 					boolean  found          = false;
 
+					if ( ( outDomain == null ) || outDomain.equals( local_hostname ) ){
+						// don't filter system packets, breaks things
+						break;
+					}
 					for (String domain : allowedDomains) {
 
 						// Intentionally comparing domains by reference instead of value
@@ -169,9 +204,19 @@ public class DomainFilter
 						}
 					}
 					if (!found) {
-						removePacket(it, res, errors,
-								"You can only communicate within selected list of domains.");
+						removePacket( it, res, errors,
+													"You can only communicate within selected list of domains." );
+						if ( log.isLoggable( Level.FINEST ) ){
+							log.log( Level.FINEST, "LIST Domain only {1}, blocking packet (filter): {0}",
+											 new Object[] { res, outDomain } );
+						}
+					} else {
+						if ( log.isLoggable( Level.FINEST ) ){
+							log.log( Level.FINEST, "LIST Domain only {1}, packet not blocked (filter): {0}",
+											 new Object[] { res, outDomain } );
+						}
 					}
+
 
 					break;
 				}
@@ -262,11 +307,13 @@ public class DomainFilter
 							"You can only communicate within the server local domains.");
 					stop = true;
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "LOCAL Domains only, blocking packet: {0}", packet);
+						log.log(Level.FINEST, "LOCAL Domains only {1}, blocking packet: {0}",
+																	new Object [] {packet,outDomain});
 					}
 				} else {
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "LOCAL Domains only, packet not blocked: {0}", packet);
+						log.log(Level.FINEST, "LOCAL Domains only {1}, packet not blocked: {0}",
+																	new Object [] {packet,outDomain});
 					}
 				}
 
@@ -279,11 +326,48 @@ public class DomainFilter
 							"You can only communicate within your own domain.");
 					stop = true;
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "OWN Domain only, blocking packet: {0}", packet);
+						log.log(Level.FINEST, "OWN Domain only {1}, blocking packet: {0}",
+																	new Object [] {packet,outDomain});
 					}
 				} else {
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "OWN Domain only, packet not blocked: {0}", packet);
+						log.log(Level.FINEST, "OWN Domain only {1}, packet not blocked: {0}",
+																	new Object [] {packet,outDomain});
+					}
+				}
+
+				break;
+
+			case BLACKLIST :
+				String[] disallowedDomains = getDomainsList(session);
+				boolean  blacklist_match          = false;
+				if ( ( outDomain == null ) || outDomain.equals( local_hostname ) ){
+					// don't filter system packets, breaks things
+					break;
+				}
+
+				for (String domain : disallowedDomains) {
+
+					// Intentionally comparing domains by reference instead of value
+					// domain is processed through the String.intern() method
+					if (domain == outDomain) {
+						blacklist_match = true;
+
+						break;
+					}
+				}
+				if (blacklist_match) {
+					removePacket(null, packet, results,
+												"You attempted to communicate with the blacklisted domain - FORBIDDEN" );
+					stop = true;
+					if ( log.isLoggable( Level.FINEST ) ){
+						log.log( Level.FINEST, "Packet to blacklisted domain {1}, blocking packet: {0}",
+										 new Object[] { packet, outDomain } );
+					}
+				} else {
+					if ( log.isLoggable( Level.FINEST ) ){
+						log.log( Level.FINEST, "Packet NOT TO blacklisted domain {1}, NOT blocking packet: {0}",
+										 new Object[] { packet, outDomain } );
 					}
 				}
 
@@ -293,7 +377,14 @@ public class DomainFilter
 				String[] allowedDomains = getDomainsList(session);
 				boolean  found          = false;
 
+				if ( ( outDomain == null ) || outDomain.equals( local_hostname ) ){
+					// don't filter system packets, breaks things
+					break;
+				}
 				for (String domain : allowedDomains) {
+
+					// Intentionally comparing domains by reference instead of value
+					// domain is processed through the String.intern() method
 					if (domain == outDomain) {
 						found = true;
 
@@ -304,12 +395,14 @@ public class DomainFilter
 					removePacket(null, packet, results,
 							"You can only communicate within selected list of domains.");
 					stop = true;
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "LISTED Domains only, blocking packet: {0}", packet);
+					if ( log.isLoggable( Level.FINEST ) ){
+						log.log( Level.FINEST, "LISTED Domains only {1}, blocking packet: {0}",
+																	 new Object[] { packet, outDomain } );
 					}
 				} else {
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "LISTED Domain only, packet not blocked: {0}", packet);
+					if ( log.isLoggable( Level.FINEST ) ){
+						log.log( Level.FINEST, "LISTED Domain only {1}, packet not blocked: {0}",
+																	 new Object[] { packet, outDomain } );
 					}
 				}
 
@@ -338,84 +431,122 @@ public class DomainFilter
 		return XMLNSS;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
-	 * Method description
+	 * Method retrieves filtering policy based on user session, from most specific to most general,
+	 * i.e.: first user session is checked, if that fails then user repository and if there is no
+	 * rules configured then domain filtering policy from VHost is being returned (if present).
 	 *
+	 * @param session  user session which keeps all the user session data and also
+	 *                 gives an access to the user's repository data. It allows
+	 *                 for storing information in a permanent storage or in memory
+	 *                 only during the live of the online session. This parameter
+	 *                 can be null if there is no online user session at the time
+	 *                 of the packet processing.
 	 *
-	 * @param session
-	 *
+	 * @return relevant domain filtering policy
 	 * 
-	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
 	public DomainFilterPolicy getDomains(XMPPResourceConnection session)
 					throws NotAuthorizedException, TigaseDBException {
 		VHostItem domain = session.getDomain();
-		DomainFilterPolicy domains = (DomainFilterPolicy) session.getCommonSessionData(
-				ALLOWED_DOMAINS_KEY);
+		DomainFilterPolicy domainFilterPolicy
+											 = (DomainFilterPolicy) session.getCommonSessionData(ALLOWED_DOMAINS_KEY );
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Domains read from user session: {0} for VHost: {1}", new Object[] {domains, domain} );
+			log.log(Level.FINEST, "Domains read from user session: {0} for VHost: {1}",
+														new Object[] {domainFilterPolicy, domain} );
 		}
-		if (domains == null) {
+		if (domainFilterPolicy == null) {
 			String dbDomains = session.getData(null, ALLOWED_DOMAINS_KEY, null);
 
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Domains read from database: {0} for VHost: {1}", new Object[] {dbDomains, domain});
+				log.log(Level.FINEST, "Domains read from database: {0} for VHost: {1}",
+															new Object[] {dbDomains, domain});
 			}
-			domains = DomainFilterPolicy.valueof(dbDomains);
-			if (domains == null) {
+			domainFilterPolicy = DomainFilterPolicy.valueof(dbDomains);
+			if (domainFilterPolicy == null) {
 				if (session.isAnonymous()) {
-					domains = DomainFilterPolicy.LOCAL;
+					domainFilterPolicy = DomainFilterPolicy.LOCAL;
 				} else {
-					domains = domain.getDomainFilter();
+					// by default ALL
+					domainFilterPolicy = domain.getDomainFilter();
 				}
 			}
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Domains read from VHost item: {0} for VHost: {1}", new Object[] {domains, domain});
+				log.log(Level.FINEST, "Domains read from VHost item: {0} for VHost: {1}",
+															new Object[] {domainFilterPolicy, domain});
 			}
-			session.putCommonSessionData( ALLOWED_DOMAINS_KEY, domains );
+			session.putCommonSessionData( ALLOWED_DOMAINS_KEY, domainFilterPolicy );
 		}
 
-		return domains;
+		return domainFilterPolicy;
 	}
 
 	/**
-	 * Method description
+	 * Method retrieves list of domains to be applied to {@code LIST} and
+	 * {@code BLACKLIST} filtering policies based on user session, from most
+	 * specific to most general, i.e.: first user session is checked, if that
+	 * fails then user repository and if there is no rules configured then list of
+	 * domains from VHost is being returned (if present).
 	 *
-	 *
-	 * @param session
-	 *
-	 * 
+	 * @param session user session which keeps all the user session data and also
+	 *                gives an access to the user's repository data. It allows for
+	 *                storing information in a permanent storage or in memory only
+	 *                during the live of the online session. This parameter can be
+	 *                null if there is no online user session at the time of the
+	 *                packet processing.
+		 *
+	 * @return list of domains to be whitelisted/blacklisted
 	 *
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
 	public String[] getDomainsList(XMPPResourceConnection session)
 					throws NotAuthorizedException, TigaseDBException {
-		String[] allowedDomains = (String[]) session.getCommonSessionData(
-				ALLOWED_DOMAINS_LIST_KEY);
+		VHostItem domain = session.getDomain();
 
-		if (allowedDomains == null) {
-			String dbDomains = session.getData(null, ALLOWED_DOMAINS_KEY, null);
+		String[] domainsList = (String[]) session.getCommonSessionData( ALLOWED_DOMAINS_LIST_KEY );
 
-			allowedDomains = dbDomains.split(",");
-			for (int i = 0; i < allowedDomains.length; ++i) {
-				allowedDomains[i] = allowedDomains[i].intern();
-			}
-			session.putCommonSessionData(ALLOWED_DOMAINS_LIST_KEY, allowedDomains);
+		if ( log.isLoggable( Level.FINEST ) ){
+			log.log( Level.FINEST, "Getting list of domains from user session: {0} for VHost: {1}",
+														 new Object[] { domainsList != null? Arrays.asList( domainsList) : "", domain } );
 		}
 
-		return allowedDomains;
+		if ( domainsList == null ){
+			String dbDomains = session.getData( null, ALLOWED_DOMAINS_LIST_KEY, null );
+
+			if ( log.isLoggable( Level.FINEST ) ){
+				log.log( Level.FINEST, "Domains list read from database: {0} for VHost: {1}",
+															 new Object[] { dbDomains, domain } );
+			}
+
+			if ( dbDomains != null ){
+				domainsList = StringUtilities.stringToArrayOfString( dbDomains, ";" );
+			} else {
+				domainsList = domain.getDomainFilterDomains();
+				if ( log.isLoggable( Level.FINEST ) ){
+					log.log( Level.FINEST, "Domains list read from VHost: {0} for VHost: {1}",
+																 new Object[] { domainsList != null? Arrays.asList( domainsList) : "", domain } );
+				}
+			}
+			session.putCommonSessionData( ALLOWED_DOMAINS_LIST_KEY, domainsList );
+		}
+
+		return domainsList;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
-	private void removePacket(Iterator<Packet> it, Packet res, Queue<Packet> errors,
-			String msg) {
+	/**
+	 * Helper method removing packets from processing queue and generating
+	 * appropriate error packet to be send back to client
+	 *
+	 * @param it iterator over collection of packets being filtered
+	 * @param res currently processed packet
+	 * @param errors collection of outgoing errors
+	 * @param msg human readable error message
+	 */
+	private void removePacket(Iterator<Packet> it, Packet res, Queue<Packet> errors, String msg) {
 		if (it != null) {
 			it.remove();
 		}
