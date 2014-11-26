@@ -1198,14 +1198,21 @@ public class S2SConnectionManager
 			}
 		}
 		
-		private CopyOnWriteArrayList<Entry> entries = new CopyOnWriteArrayList<Entry>();
+		private List<Entry> entries = new ArrayList<Entry>();
 		
 		public DomainServerNameMapper() {}
 		
 		protected void addEntry(String pattern, String serverName) {
-			Entry e = new Entry(pattern, serverName);
-			entries.add(e);
-			Collections.sort(entries);
+			// clone list to fix possible concurrency issues with collection
+			// could use CopyOnWriteArrayList but sorting this collection 
+			// is not possible on JDK7
+			synchronized (this) {
+				List<Entry> entries = new ArrayList<Entry>(this.entries);
+				Entry e = new Entry(pattern, serverName);
+				entries.add(e);
+				Collections.sort(entries);
+				this.entries = entries;
+			}
 		}
 		
 		public String getServerNameForDomain(String domain) {
