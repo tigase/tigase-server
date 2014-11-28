@@ -60,7 +60,7 @@ if (itemKey == null) {
 	def itemsStr = []
 	if (items.size() > 0) {
 		items.each {
-			if (isServiceAdmin || it.isOwner(stanzaFromBare.toString())) {
+			if (isServiceAdmin || it.isOwner(stanzaFromBare.toString()) || it.isAdmin(stanzaFromBare.toString())) {
 				itemsStr += it.getKey()
 			}
 		}
@@ -124,7 +124,10 @@ def oldItem = repo.getItem(item.getKey())
 if (oldItem == null) {
 	Command.addTextField(result, "Error", "The item you try to update does not exist.");
 } else {
-	if (isServiceAdmin || oldItem.isOwner(stanzaFromBare.toString())) {
+	if (isServiceAdmin || oldItem.isOwner(stanzaFromBare.toString())
+		// we allow changes by admins, except for changing the owner of the domain.
+		|| oldItem.isAdmin(stanzaFromBare.toString()) && oldItem.getOwner().equals(item.getOwner())
+	) {
 		repo.addItem(item)
 		Command.addTextField(result, "Note", "Operation successful");
 	} else {
