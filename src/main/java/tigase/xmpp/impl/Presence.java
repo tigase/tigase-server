@@ -51,7 +51,10 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import tigase.server.Iq;
+
+import tigase.osgi.ModulesManagerImpl;
 
 /**
  * Class responsible for handling Presence packets
@@ -74,6 +77,8 @@ public class Presence
 	public static final String DIRECT_PRESENCE = "direct-presences";
 
 	public static final String DISABLE_ROSTER_LAZY_LOADING_KEY = "disable-roster-lazy-loading";
+
+	public static final String EXTENDED_PRESENCE_PROCESSORS_KEY = "extended-presence-processors";
 	
 	/** Field description */
 	public static final String OFFLINE_BUD_SENT = "offline-bud-sent";
@@ -134,8 +139,7 @@ public class Presence
 	private String[]         offlineRosterLastSeen = null;
 	private JID              presenceGLobalForward = null;
 	private long             usersStatusChanges    = 0;
-
-	//~--- methods --------------------------------------------------------------
+	private static final List<ExtendedPresenceProcessorIfc> extendedPresenceProcessors = new ArrayList<>();
 
 	// ~--- methods --------------------------------------------------------------
 
@@ -374,6 +378,24 @@ public class Presence
 		}
 		tmp = (String) settings.get(DISABLE_ROSTER_LAZY_LOADING_KEY);
 		rosterLazyLoading = (tmp == null || !Boolean.parseBoolean(tmp));
+
+		tmp = (String) settings.get(EXTENDED_PRESENCE_PROCESSORS_KEY);
+
+		String[] extPresenceProcessorsClasses = tmp != null ? tmp.split( ",") : null ;
+
+		if ( extPresenceProcessorsClasses != null ){
+			for ( String clazz : extPresenceProcessorsClasses ) {
+				try {
+					ExtendedPresenceProcessorIfc processor = (ExtendedPresenceProcessorIfc) ModulesManagerImpl.getInstance().forName( clazz ).newInstance();
+
+					extendedPresenceProcessors.add( processor );
+					log.log(Level.CONFIG, "Loadeded ExtendedPresenceProcessor: {0}", processor.getClass());
+
+				} catch ( ClassNotFoundException | InstantiationException | IllegalAccessException ex ) {
+					Logger.getLogger( Presence.class.getName() ).log( Level.SEVERE, null, ex );
+				}
+			}
+		}
 	}
 
 	/**
@@ -869,6 +891,28 @@ public class Presence
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
+	}
+
+	public static void rebroadcastPresence(XMPPResourceConnection session, Queue<Packet> results) throws NotAuthorizedException, TigaseDBException {
+		Element presence = session.getPresence();
+
+		for ( ExtendedPresenceProcessorIfc processor : extendedPresenceProcessors ) {
+			Element extendContent = processor.extend( session, results );
+			if ( extendContent != null ){
+				// avoid duplicate
+				Element child = presence.getChild( extendContent.getName(), extendContent.getXMLNS() );
+				if ( child != null ){
+					presence.removeChild( child );
+				}
+				presence.addChild( extendContent );
+			}
+		}
+		
+		sendPresenceBroadcast(StanzaType.available, session, FROM_SUBSCRIBED, results, presence, null, getRosterUtil());
+
+		updateUserResources(presence, session, results, false);
+
+//		sendPresenceBroadcast( StanzaType.get, session, SUB_TO, results, presence, null, null );
 	}
 
 	/**
@@ -1623,10 +1667,18 @@ public class Presence
 				first = true;
 			}
 			packet.initVars(session.getJID(), packet.getStanzaTo());
+			final Element presenceEl = packet.getElement();
+
+			for ( ExtendedPresenceProcessorIfc processor : extendedPresenceProcessors ) {
+				Element extendContent = processor.extend( session, results );
+				if ( extendContent != null ){
+					presenceEl.addChild( extendContent );
+				}
+			}
 
 			// Store user presence for later time...
 			// To send response to presence probes for example.
-			session.setPresence(packet.getElement());
+			session.setPresence(presenceEl);
 
 			// here we need to check if roster is loaded
 			if (!rosterLazyLoading || roster_util.isRosterLoaded(session)) {
@@ -1650,12 +1702,12 @@ public class Presence
 					} else {
 
 						// Broadcast initial presence to 'from' or 'both' contacts
-						sendPresenceBroadcast(StanzaType.available, session, FROM_SUBSCRIBED, results,
-								packet.getElement(), settings, roster_util);
+						sendPresenceBroadcast(StanzaType.available, session, FROM_SUBSCRIBED,
+															 results, presenceEl, settings, roster_util);
 					}
 
 					// Broadcast initial presence to other available user resources
-					updateUserResources(packet.getElement(), session, results, first);
+					updateUserResources(presenceEl, session, results, first);
 				} else {
 					stopped(session, results, settings);
 				}
@@ -1667,7 +1719,7 @@ public class Presence
 					forwardTo = presenceGLobalForward;
 				}
 				if (forwardTo != null) {
-					sendPresence(null, session.getJID(), forwardTo, results, packet.getElement());
+					sendPresence(null, session.getJID(), forwardTo, results, presenceEl);
 				}
 			} else {
 				// if roster is not yet loaded we need to trigger roster load by Roster plugin
@@ -2029,7 +2081,7 @@ public class Presence
 	 *
 	 * @return shared instance of class implementing {@link RosterAbstract}
 	 */
-	protected RosterAbstract getRosterUtil() {
+	protected static RosterAbstract getRosterUtil() {
 		return RosterFactory.getRosterImplementation(true);
 	}
 
@@ -2081,7 +2133,9 @@ public class Presence
 
 		return result;
 	}
-}    // Presence
 
+	public interface ExtendedPresenceProcessorIfc {
+		Element extend( XMPPResourceConnection session, Queue<Packet> results );
+	}
 
-//~ Formatted in Tigase Code Convention on 14/03/12
+} 
