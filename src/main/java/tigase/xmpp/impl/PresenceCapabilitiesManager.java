@@ -76,7 +76,8 @@ public class PresenceCapabilitiesManager {
 	 */
 	public static void setNodeFeatures(String capsNode, String[] features) {
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "setting features for node = {0}", capsNode);
+			log.log( Level.FINER, "setting features for node = {0}, features = {1}",
+							 new Object[] { capsNode, Arrays.asList( features ) } );
 		}
 		Arrays.sort(features);
 		nodeFeatures.put(capsNode, features);
@@ -257,9 +258,9 @@ public class PresenceCapabilitiesManager {
 	 */
 	public static Element prepareCapsQueryEl(JID to, JID from, String node) {
 		String id  = String.valueOf(idCounter++);
-		Element iq = new Element("iq", new String[] { "from", "to", "id", "type" },
+		Element iq = new Element("iq", new String[] { "from", "to", "id", "type", Packet.XMLNS_ATT },
 														 new String[] { from.toString(),
-						to.toString(), id, "get" });
+						to.toString(), id, "get", Packet.CLIENT_XMLNS });
 		Element query = new Element("query", new String[] { "xmlns", "node" },
 																new String[] { "http://jabber.org/protocol/disco#info",
 						node });
