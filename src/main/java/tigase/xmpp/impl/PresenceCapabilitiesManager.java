@@ -242,8 +242,10 @@ public class PresenceCapabilitiesManager {
 	 */
 	public static Packet prepareCapsQuery(JID to, JID from, String node) {
 		Element iq = prepareCapsQueryEl(to, from, node);
+		final Iq iqPacket = new Iq(iq, from, to);
+		iqPacket.setXMLNS( Packet.CLIENT_XMLNS);
 
-		return new Iq(iq, from, to);
+		return iqPacket;
 	}
 
 	/**
