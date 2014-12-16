@@ -21,6 +21,11 @@
 --
 
 -- QUERY START:
+SET QUOTED_IDENTIFIER ON
+-- QUERY END:
+GO
+
+-- QUERY START:
 -- This is a dummy user who keeps all the database-properties
 exec dbo.TigAddUserPlainPw 'db-properties', NULL;
 -- QUERY END:
