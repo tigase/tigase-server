@@ -72,7 +72,7 @@
 						</execution>
 					</executions>
 					<configuration>
-						<gemPath>${project.build.directory}/gems-provided</gemPath>
+						<gemPath>gems-provided</gemPath>
 						<sourceDirectory>./asciidoc</sourceDirectory>
 						<sourceDocumentName>${guide_filename}.asciidoc</sourceDocumentName>
 						<attributes>
