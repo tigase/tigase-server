@@ -2,23 +2,27 @@ package tigase.auth.mechanisms;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.sasl.AuthorizeCallback;
 import javax.security.sasl.SaslException;
+
+import junit.framework.TestCase;
+
 import org.junit.Assert;
-import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+
 import tigase.auth.callbacks.PBKDIterationsCallback;
 import tigase.auth.callbacks.SaltCallback;
 import tigase.auth.callbacks.SaltedPasswordCallback;
 import tigase.util.Base64;
 
-public class SaslSCRAMTest {
+public class SaslSCRAMTest extends TestCase {
 
 	private class TestCallbackHandler implements CallbackHandler {
 
@@ -35,12 +39,12 @@ public class SaslSCRAMTest {
 						throw new RuntimeException(e);
 					}
 				} else if (callback instanceof NameCallback) {
-					((NameCallback) callback).setName("user");
+					((NameCallback) callback).setName("user@domain.com");
 				} else if (callback instanceof SaltCallback) {
 					((SaltCallback) callback).setSalt(Base64.decode("QSXCR+Q6sek8bf92"));
 				} else if (callback instanceof AuthorizeCallback) {
 					((AuthorizeCallback) callback).setAuthorized(true);
-					((AuthorizeCallback) callback).setAuthorizedID("user");
+					((AuthorizeCallback) callback).setAuthorizedID("user@domain.com");
 				} else {
 					throw new UnsupportedCallbackException(callback, "Unrecognized Callback " + callback);
 				}
@@ -50,6 +54,7 @@ public class SaslSCRAMTest {
 
 	private AbstractSaslSCRAM m;
 
+	@Override
 	@Before
 	public void setUp() throws Exception {
 		m = new AbstractSaslSCRAM("SCRAM-SHA-1", "SHA1", "Client Key".getBytes(), "Server Key".getBytes(), null,
@@ -93,7 +98,7 @@ public class SaslSCRAMTest {
 
 	@Category(tigase.tests.SlowTest.class)
 	@Test
-	public void testHiLong() {		
+	public void testHiLong() {
 		try {
 			byte[] r = AbstractSaslSCRAM.hi("SHA1", "password".getBytes(), "salt".getBytes(), 16777216);
 			Assert.assertArrayEquals(new byte[] { (byte) 0xee, (byte) 0xfe, (byte) 0x3d, (byte) 0x61, (byte) 0xcd, (byte) 0x4d,
@@ -134,6 +139,10 @@ public class SaslSCRAMTest {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}
+
+		assertTrue(m.isComplete());
+		assertEquals("user@domain.com", m.getAuthorizationID());
+
 	}
 
 }

@@ -8,19 +8,17 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.sasl.SaslException;
 
 import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import tigase.auth.XmppSaslException;
-
 public class SaslANONYMOUSTest extends TestCase {
 
 	private SaslANONYMOUS sasl;
 
+	@Override
 	@Before
 	public void setUp() {
 		Map<? super String, ?> props = new HashMap<String, Object>();
@@ -30,7 +28,7 @@ public class SaslANONYMOUSTest extends TestCase {
 			public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
 				for (Callback callback : callbacks) {
 					if (callback instanceof NameCallback) {
-						((NameCallback) callback).setName("somerandomname");
+						((NameCallback) callback).setName("somerandomname@domain.com");
 					} else
 						throw new UnsupportedCallbackException(callback);
 				}
@@ -50,7 +48,7 @@ public class SaslANONYMOUSTest extends TestCase {
 		}
 
 		assertTrue(sasl.isComplete());
-		assertEquals("somerandomname", sasl.getAuthorizationID());
+		assertEquals("somerandomname@domain.com", sasl.getAuthorizationID());
 		assertTrue((Boolean) sasl.getNegotiatedProperty(SaslANONYMOUS.IS_ANONYMOUS_PROPERTY));
 
 	}
