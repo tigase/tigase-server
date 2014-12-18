@@ -459,6 +459,16 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 					<include name="jtds.jar"/>
 				</fileset>
 			</pack>
+
+			<pack name="MongoDB Database support (DB not included)" required="no" preselected="yes">
+<!-- 						installGroups="SQL Server Database"> -->
+				<description>Libraries need to use MongoDB from Tigase (includes driver)</description>
+				<fileset dir="./jars" targetdir="$INSTALL_PATH/${jarsDir}">
+					<include name="mongo-java-driver.jar"/>
+					<include name="tigase-mongodb.jar"/>
+				</fileset>
+			</pack>
+
 			<pack name="OSGi dependencies" required="no" preselected="no" id="osgi">
 				<description>If you intend to run Tigase in OSGi mode you need additional libraries. Enabling this Pack will also setup configuration files to start Tigase XMPP server in OSGi mode.</description>
 				<fileset dir="./conf" targetdir="${INSTALL_PATH}/conf">
