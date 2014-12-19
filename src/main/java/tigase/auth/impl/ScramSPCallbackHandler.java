@@ -22,17 +22,17 @@ import tigase.xmpp.BareJID;
 
 /**
  * Handler for SCRAM with Salted Password.
- * 
+ *
  * Password should be encoded as:<br/>
- * 
+ *
  * <pre>
  * base64(salt | saltedPassword)
  * </pre>
- * 
+ *
  * Where:<br/>
  * <code>salt</code> - 20 bytes,<br/>
  * <code>saltedPassword</code> - 20 bytes.
- * 
+ *
  */
 public class ScramSPCallbackHandler implements CallbackHandler, AuthRepositoryAware, DomainAware {
 
@@ -75,7 +75,7 @@ public class ScramSPCallbackHandler implements CallbackHandler, AuthRepositoryAw
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "AuthorizeCallback: authorId: {0}", authorId);
 		}
-		if (authenId.equals(authorId) || authorId.equals(authenId + "@" + domain)) {
+		if (authenId.equals(authorId)) {
 			authCallback.setAuthorized(true);
 		}
 	}
@@ -99,8 +99,8 @@ public class ScramSPCallbackHandler implements CallbackHandler, AuthRepositoryAw
 
 	protected void handleNameCallback(NameCallback nc) throws IOException {
 		String user_name = nc.getDefaultName();
-		nc.setName(user_name);
 		jid = BareJID.bareJIDInstanceNS(user_name, domain);
+		nc.setName(jid.toString());
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "NameCallback: {0}", user_name);
 		}

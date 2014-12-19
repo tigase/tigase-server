@@ -63,7 +63,7 @@ public class ScramCallbackHandler implements CallbackHandler, AuthRepositoryAwar
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "AuthorizeCallback: authorId: {0}", authorId);
 		}
-		if (authenId.equals(authorId) || authorId.equals(authenId + "@" + domain)) {
+		if (authenId.equals(authorId)) {
 			authCallback.setAuthorized(true);
 		}
 	}
@@ -87,8 +87,8 @@ public class ScramCallbackHandler implements CallbackHandler, AuthRepositoryAwar
 
 	protected void handleNameCallback(NameCallback nc) throws IOException {
 		String user_name = nc.getDefaultName();
-		nc.setName(user_name);
 		jid = BareJID.bareJIDInstanceNS(user_name, domain);
+		nc.setName(jid.toString());
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "NameCallback: {0}", user_name);
 		}

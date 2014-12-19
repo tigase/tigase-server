@@ -22,6 +22,8 @@
 
 package tigase.auth.impl;
 
+//~--- JDK imports ------------------------------------------------------------
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -39,8 +41,6 @@ import tigase.auth.DomainAware;
 import tigase.auth.callbacks.VerifyPasswordCallback;
 import tigase.db.AuthRepository;
 import tigase.xmpp.BareJID;
-//~--- JDK imports ------------------------------------------------------------
-import java.io.IOException;
 
 /**
  * This is implementation of {@linkplain CallbackHandler} to use with old
@@ -59,10 +59,10 @@ public class AuthRepoPlainCallbackHandler implements CallbackHandler, AuthReposi
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param callbacks
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws UnsupportedCallbackException
 	 */
@@ -76,6 +76,47 @@ public class AuthRepoPlainCallbackHandler implements CallbackHandler, AuthReposi
 		}
 	}
 
+	protected void handleAuthorizeCallback(AuthorizeCallback authCallback) {
+		String authenId = authCallback.getAuthenticationID();
+
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "AuthorizeCallback: authenId: {0}", authenId);
+		}
+
+		String authorId = authCallback.getAuthorizationID();
+
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "AuthorizeCallback: authorId: {0}", authorId);
+		}
+		if (authenId.equals(authorId)) {
+			authCallback.setAuthorized(true);
+		}
+	}
+
+	protected void handleCallback(Callback callback) throws UnsupportedCallbackException, IOException {
+		if (callback instanceof RealmCallback) {
+			handleRealmCallback((RealmCallback) callback);
+		} else if (callback instanceof NameCallback) {
+			handleNameCallback((NameCallback) callback);
+		} else if (callback instanceof VerifyPasswordCallback) {
+			handleVerifyPasswordCallback((VerifyPasswordCallback) callback);
+		} else if (callback instanceof AuthorizeCallback) {
+			handleAuthorizeCallback((AuthorizeCallback) callback);
+		} else {
+			throw new UnsupportedCallbackException(callback, "Unrecognized Callback");
+		}
+
+	}
+
+	protected void handleNameCallback(NameCallback nc) throws IOException {
+		String user_name = nc.getDefaultName();
+		jid = BareJID.bareJIDInstanceNS(user_name, domain);
+		nc.setName(jid.toString());
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "NameCallback: {0}", user_name);
+		}
+	}
+
 	protected void handleRealmCallback(RealmCallback rc) throws IOException {
 		String realm = domain;
 
@@ -84,15 +125,6 @@ public class AuthRepoPlainCallbackHandler implements CallbackHandler, AuthReposi
 		} // end of if (realm == null)
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "RealmCallback: {0}", realm);
-		}
-	}
-
-	protected void handleNameCallback(NameCallback nc) throws IOException {
-		String user_name = nc.getDefaultName();
-		nc.setName(user_name);
-		jid = BareJID.bareJIDInstanceNS(user_name, domain);
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "NameCallback: {0}", user_name);
 		}
 	}
 
@@ -118,42 +150,10 @@ public class AuthRepoPlainCallbackHandler implements CallbackHandler, AuthReposi
 		}
 	}
 
-	protected void handleAuthorizeCallback(AuthorizeCallback authCallback) {
-		String authenId = authCallback.getAuthenticationID();
-
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "AuthorizeCallback: authenId: {0}", authenId);
-		}
-
-		String authorId = authCallback.getAuthorizationID();
-
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "AuthorizeCallback: authorId: {0}", authorId);
-		}
-		if (authenId.equals(authorId) || authorId.equals(authenId + "@" + domain)) {
-			authCallback.setAuthorized(true);
-		}
-	}
-
-	protected void handleCallback(Callback callback) throws UnsupportedCallbackException, IOException {
-		if (callback instanceof RealmCallback) {
-			handleRealmCallback((RealmCallback) callback);
-		} else if (callback instanceof NameCallback) {
-			handleNameCallback((NameCallback) callback);
-		} else if (callback instanceof VerifyPasswordCallback) {
-			handleVerifyPasswordCallback((VerifyPasswordCallback) callback);
-		} else if (callback instanceof AuthorizeCallback) {
-			handleAuthorizeCallback((AuthorizeCallback) callback);
-		} else {
-			throw new UnsupportedCallbackException(callback, "Unrecognized Callback");
-		}
-
-	}
-
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param repo
 	 */
 	@Override
@@ -163,8 +163,8 @@ public class AuthRepoPlainCallbackHandler implements CallbackHandler, AuthReposi
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param domain
 	 */
 	@Override

@@ -142,6 +142,7 @@
 				<include>tigase:tigase-message-archiving</include>
 				<include>tigase:tigase-socks5</include>
 				<include>tigase:tigase-stun</include>
+				<include>tigase:tigase-mongodb</include>
 
 				<!--database libraries-->
 				<include>org.apache.derby:derby</include>
@@ -149,6 +150,7 @@
 				<include>mysql:mysql-connector-java</include>
 				<include>postgresql:postgresql</include>
 				<include>net.sourceforge.jtds:jtds</include>
+				<include> org.mongodb:mongo-java-driver</include>
 				
 				<!-- other libraries-->
 				<include>org.codehaus.groovy:groovy-all</include>
@@ -160,18 +162,18 @@
 
 				<!--HTTP API component dependencies-->
 				<include>javax.servlet:javax.servlet-api</include>
-				<include>org.eclipse.jetty.orbit:javax.servlet</include>
-				<include>org.eclipse.jetty:jetty-continuation</include>
-				<include>org.eclipse.jetty:jetty-deploy</include>
+				<!--<include>org.eclipse.jetty.orbit:javax.servlet</include>-->
+				<!--<include>org.eclipse.jetty:jetty-continuation</include>-->
+				<!--<include>org.eclipse.jetty:jetty-deploy</include>-->
 				<include>org.eclipse.jetty:jetty-http</include>
 				<include>org.eclipse.jetty:jetty-io</include>
 				<include>org.eclipse.jetty:jetty-security</include>
 				<include>org.eclipse.jetty:jetty-server</include>
 				<include>org.eclipse.jetty:jetty-servlet</include>
 				<include>org.eclipse.jetty:jetty-util</include>
-				<include>org.eclipse.jetty:jetty-webapp</include>
-				<include>org.eclipse.jetty:jetty-xml</include>
-				<include>org.eclipse.jetty.osgi:jetty-osgi-boot</include>
+				<!--<include>org.eclipse.jetty:jetty-webapp</include>-->
+				<!--<include>org.eclipse.jetty:jetty-xml</include>-->
+				<!--<include>org.eclipse.jetty.osgi:jetty-osgi-boot</include>-->
 
 				<!--OSGi dependencies-->
 				<include>org.osgi:org.osgi.core</include>

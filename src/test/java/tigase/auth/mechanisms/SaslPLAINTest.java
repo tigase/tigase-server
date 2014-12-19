@@ -23,6 +23,7 @@ public class SaslPLAINTest extends TestCase {
 
 	private SaslPLAIN sasl;
 
+	@Override
 	@Before
 	public void setUp() {
 		Map<? super String, ?> props = new HashMap<String, Object>();
@@ -34,9 +35,10 @@ public class SaslPLAINTest extends TestCase {
 			public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
 				for (Callback callback : callbacks) {
 					if (callback instanceof NameCallback) {
-						username = ((NameCallback) callback).getDefaultName();
+						username = ((NameCallback) callback).getDefaultName() + "@domain.com";
+						((NameCallback) callback).setName(username);
 					} else if (callback instanceof VerifyPasswordCallback) {
-						((VerifyPasswordCallback) callback).setVerified("juliet:xsecret".equals(username + ":"
+						((VerifyPasswordCallback) callback).setVerified("juliet@domain.com:xsecret".equals(username + ":"
 								+ ((VerifyPasswordCallback) callback).getPassword()));
 					} else if (callback instanceof AuthorizeCallback) {
 						boolean a = ((AuthorizeCallback) callback).getAuthorizationID().equals(
@@ -211,7 +213,7 @@ public class SaslPLAINTest extends TestCase {
 		}
 
 		assertTrue(sasl.isComplete());
-		assertEquals("juliet", sasl.getAuthorizationID());
+		assertEquals("juliet@domain.com", sasl.getAuthorizationID());
 
 	}
 
@@ -219,14 +221,14 @@ public class SaslPLAINTest extends TestCase {
 	public void testSuccessWithAuthzId() {
 
 		try {
-			sasl.evaluateResponse("juliet\0juliet\0xsecret".getBytes());
+			sasl.evaluateResponse("juliet@domain.com\0juliet\0xsecret".getBytes());
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}
 
 		assertTrue(sasl.isComplete());
-		assertEquals("juliet", sasl.getAuthorizationID());
+		assertEquals("juliet@domain.com", sasl.getAuthorizationID());
 	}
 
 	@Test
