@@ -1,13 +1,10 @@
-Tips and Tricks
-===============
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+[[TipsAndTricks]]
+= Tips and Tricks
+
 :toc:
-:numbered:
-:website: http://tigase.net
-:Date: 2010-04-06 21:18
 
 The section contains some short trick and tips helping in different kind of issues related to the server administration and maintenance.
-  
-- ////<<////ttRuntimeEnvironment,////Tigase Tip: Checking the runtime environment
 
+include::Admin_Guide_46_-_Tips_and_Tricks_-_A_-_Tigase_Tip_Checking_the_Runtime_Environment.asciidoc[]
+
+include::Admin_Guide_46_-_Tips_and_Tricks_-_B_-_Tigase_Tip_Checking_Cluster_Connections.asciidoc[]

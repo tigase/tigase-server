@@ -100,8 +100,6 @@ include::text/Admin_Guide_43_-_Server_Monitoring.asciidoc[]
 
 include::text/Admin_Guide_45_-_Tips_and_Tricks.asciidoc[]
 
-include::text/Admin_Guide_46_-_Tips_and_Tricks_-_A_-_Tigase_Tip_Checking_the_Runtime_Environment.asciidoc[]
-
 include::text/Admin_Guide_47_-_Tigase_Server_Version_5.x.asciidoc[]
 
 include::text/Admin_Guide_48_-_Tigase_Server_Version_5.x_-_A_-_Tigase_5.1_Database_Schema_Upgrade.asciidoc[]
