@@ -336,7 +336,7 @@ public class ConnectionOpenThread
 
 			ssc.socket().setReceiveBufferSize(al.getReceiveBufferSize());
 			ssc.configureBlocking(false);
-			ssc.socket().bind(isa);
+			ssc.socket().bind(isa, (int) (port_throttling));
 			ssc.register(selector, SelectionKey.OP_ACCEPT, al);
 
 			break;
