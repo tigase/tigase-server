@@ -26,7 +26,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.osgi.ModulesManagerImpl;
 import tigase.server.ConnectionManager;
 
 /**
@@ -39,10 +41,10 @@ public class XMPPIOProcessorsFactory {
 	
 	private static final String IO_PROCESSORS_PROP_KEY = "processors";
 	
-	private static final Map<String,Class<? extends XMPPIOProcessor>> PROCESSORS = new HashMap<String,Class<? extends XMPPIOProcessor>>();
+	private static final Map<String,String> DEF_PROCESSORS = new HashMap<String,String>();
 	
 	static {
-		PROCESSORS.put(StreamManagementIOProcessor.XMLNS, StreamManagementIOProcessor.class);
+		DEF_PROCESSORS.put(StreamManagementIOProcessor.XMLNS, StreamManagementIOProcessor.class.getCanonicalName());
 	}
 	
 	public static XMPPIOProcessor[] updateIOProcessors(ConnectionManager connectionManager,
@@ -52,10 +54,13 @@ public class XMPPIOProcessorsFactory {
 			String[] processorsArr = (String[]) props.get(IO_PROCESSORS_PROP_KEY);
 			List<XMPPIOProcessor> processors = new ArrayList<XMPPIOProcessor>();
 			
-			if (processorsArr != null) {
-				
-				for (String procId : processorsArr) {
-					XMPPIOProcessor proc = findProcessor(activeProcessors, procId);
+			if (processorsArr != null) {			
+				for (String procStr : processorsArr) {
+					String[] procStrArr = procStr.split("=");
+					String procId = procStrArr[0];
+					String procClass = procStrArr.length > 1 ? procStrArr[1] : DEF_PROCESSORS.get(procId);
+					
+					XMPPIOProcessor proc = findProcessor(activeProcessors, procId, procClass);
 					
 					if (proc != null) {
 						proc.setConnectionManager(connectionManager);
@@ -93,18 +98,28 @@ public class XMPPIOProcessorsFactory {
 		return results;
 	}
 	
-	public static XMPPIOProcessor findProcessor(XMPPIOProcessor[] activeProcessors, String procId) {
+	public static XMPPIOProcessor findProcessor(XMPPIOProcessor[] activeProcessors, String procId, String procClassName) {
+		Class<? extends XMPPIOProcessor> procCls = null;
+		try {
+			procCls = (Class<? extends XMPPIOProcessor>) ModulesManagerImpl.getInstance().forName(procClassName);
+		} catch (ClassNotFoundException ex) {
+			// we ignore this exception
+		}
+		
 		for (XMPPIOProcessor proc : activeProcessors) {
-			if (procId.equals(proc.getId())) {
+			if (procId.equals(proc.getId()) && proc.getClass().equals(procCls)) {
 				return proc;
 			}
 		}
 		
 		try {
-			return PROCESSORS.get(procId).newInstance() ;
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "looking for XMPP processors of id = {0} of class {1} and found {2}", 
+						new Object[]{procId, procClassName, procCls != null ? procCls.toString() : "null"});
+			}
+			return procCls.newInstance() ;
 		}
 		catch (Exception ex) {
-			
 			return null;
 		}
 	}

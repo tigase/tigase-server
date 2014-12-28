@@ -35,13 +35,9 @@ import tigase.net.SocketThread;
 import tigase.server.Command;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
-import tigase.server.Presence;
 import tigase.util.TimerTask;
 import tigase.xml.Element;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
-import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
 
@@ -72,6 +68,8 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 	private static final String PREVID_ATTR = "previd";
 		
 	// various strings used as key to store data in maps
+	private static final String ACK_REQUEST_COUNT_KEY = "ack-request-count";
+	private static final int DEF_ACK_REQUEST_COUNT_VAL = 10;
 	private static final String INGORE_UNDELIVERED_PRESENCE_KEY = "ignore-undelivered-presence";
 	private static final String IN_COUNTER_KEY = XMLNS + "_in";
 	private static final String MAX_RESUMPTION_TIMEOUT_KEY = XMLNS + "_resumption-timeout";
@@ -88,7 +86,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 	
 	private boolean ignoreUndeliveredPresence = true;
 	private int resumption_timeout = 60;
-	private int default_ack_request_count = 10;
+	private int ack_request_count = DEF_ACK_REQUEST_COUNT_VAL;
 	
 	private ConnectionManager connectionManager;
 			
@@ -239,9 +237,18 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 			return;
 		
 		OutQueue outQueue = (OutQueue) service.getSessionData().get(OUT_COUNTER_KEY);		
-		if (outQueue != null && outQueue.waitingForAck() >= default_ack_request_count) {
+		if (outQueue != null && shouldRequestAck(service, outQueue)) {
 			service.writeRawData("<" + REQ_NAME + " xmlns='" + XMLNS + "' />");
 		}
+	}
+	
+	/**
+	 * Override this method to define a custom behaviour for request ack.
+	 * The default implementation will request an ack if there are more than {@link #ack_request_count}
+	 * packets waiting, so you probably want to OR your behaviour with this.
+	 */
+	protected boolean shouldRequestAck(XMPPIOService service, OutQueue outQueue) {
+		return outQueue.waitingForAck() >= ack_request_count;
 	}
 	
 	@Override
@@ -425,6 +432,9 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		}
 		if (props.containsKey(INGORE_UNDELIVERED_PRESENCE_KEY)) {
 			this.ignoreUndeliveredPresence = (Boolean) props.get(INGORE_UNDELIVERED_PRESENCE_KEY);
+		}
+		if (props.containsKey(ACK_REQUEST_COUNT_KEY)) {
+			this.ack_request_count = (Integer) props.get(ACK_REQUEST_COUNT_KEY);
 		}
 	}
 	

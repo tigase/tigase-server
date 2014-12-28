@@ -313,12 +313,12 @@ public class ConfigItem
 	@Override
 	public void initFromPropertyString(String propString) {
 		int idx_eq    = propString.indexOf('=');
-		String[] prop = propString.split("=");
-
+	
 		// String key = prop[0].trim();
 		// Object val = prop[1];
 		String key = propString.substring(0, idx_eq);
 		Object val = propString.substring(idx_eq + 1);
+		String[] prop = idx_eq == -1 ? new String[] { propString } : new String[] { key, (String) val };
 
 		if (key.matches(".*\\[[LISBlisb]\\]$")) {
 			char c = key.charAt(key.length() - 2);
