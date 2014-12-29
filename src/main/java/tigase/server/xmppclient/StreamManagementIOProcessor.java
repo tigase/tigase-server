@@ -135,8 +135,8 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 				return false;
 			}
 			else if (packet.getElemName() == ENABLE_NAME) {
-				service.getSessionData().putIfAbsent(OUT_COUNTER_KEY, new OutQueue());
-				service.getSessionData().putIfAbsent(IN_COUNTER_KEY, new Counter());
+				service.getSessionData().putIfAbsent(OUT_COUNTER_KEY, newOutQueue());
+				service.getSessionData().putIfAbsent(IN_COUNTER_KEY, newCounter());
 				
 				
 				String id = null;
@@ -563,10 +563,18 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		
 	}
 	
+	protected Counter newCounter() {
+		return new Counter();
+	}
+	
+	protected OutQueue newOutQueue() {
+		return new OutQueue();
+	}
+	
 	/**
 	 * Counter class implements proper counter with overflow from 2^32-1 to 0
 	 */
-	private static class Counter {
+	public static class Counter {
 		
 		private int counter = 0;
 		
