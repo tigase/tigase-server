@@ -47,6 +47,8 @@ import tigase.xml.Element;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
+import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -54,6 +56,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.FileHandler;
+import java.util.logging.Filter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -101,10 +104,25 @@ public class BoshConnectionManager
 	private boolean				   sendNodeHostname	   = SEND_NODE_HOSTNAME_VAL;
 
 	protected enum BOSH_OPERATION_TYPE {
+
 		CREATE, REMOVE, INVALID_SID,
-		TIMER
+		TIMER;
+
+		private static final Map<String, BOSH_OPERATION_TYPE> nameToValueMap
+																													= new HashMap<String, BOSH_OPERATION_TYPE>();
+
+		static {
+			for ( BOSH_OPERATION_TYPE value : EnumSet.allOf( BOSH_OPERATION_TYPE.class ) ) {
+				nameToValueMap.put( value.name(), value );
+			}
+		}
+
+		public static BOSH_OPERATION_TYPE forName( String name ) {
+			return nameToValueMap.get( name );
+		}
+
 	};
-	private static final Logger sidLogger = Logger.getLogger( "tigase-bosh-logger" );
+
 	private static Handler sidFilehandler;
 
 	// This should be actually a multi-thread save variable.
@@ -133,12 +151,9 @@ public class BoshConnectionManager
 		packet.setPacketTo(bs.getDataReceiver());
 		packet.initVars(packet.getPacketFrom(), packet.getPacketTo());
 		bs.close();
-		if (log.isLoggable(Level.FINEST)) {
-			log.finest("closing BOSH session with sid = " + bs.getSid().toString());
-		}
-		if ( sidLogger.isLoggable( Level.FINEST ) ){
-			sidLogger.log( Level.FINEST, "{0} : {1} ({2})",
-										 new Object[] { bs.getSid(), BOSH_OPERATION_TYPE.REMOVE,
+		if ( log.isLoggable( Level.FINEST ) ){
+			log.log( Level.FINEST, "{0} : {1} ({2})",
+										 new Object[] { BOSH_OPERATION_TYPE.REMOVE, bs.getSid(),
 																		"Closing bosh session" } );
 		}
 
@@ -200,21 +215,30 @@ public class BoshConnectionManager
 
 	// ~--- methods --------------------------------------------------------------
 
-	protected static Logger getSIDLogger () {
-		return sidLogger;
-	}
-
-	private static void setupSidlogger( Level lvl ) {
+	protected static void setupSidlogger( Level lvl ) {
 		if ( !Level.OFF.equals( lvl ) ){
-			sidLogger.setLevel( lvl );
-			sidLogger.setUseParentHandlers( false );
+			Filter bslf = new BoshSidLoggerFilter();
+
+			Logger BoshConnectionManagerLogger = Logger.getLogger(BoshConnectionManager.class.getName());
+			Logger BoshSessionLogger = Logger.getLogger(BoshSession.class.getName());
+
+			if (BoshConnectionManagerLogger.getLevel() == null || BoshSessionLogger.getLevel() == null
+					|| BoshConnectionManagerLogger.getLevel().intValue() < lvl.intValue()) {
+				BoshConnectionManagerLogger.setLevel( lvl );
+				BoshConnectionManagerLogger.setFilter( bslf );
+				BoshSessionLogger.setLevel( lvl );
+				BoshSessionLogger.setFilter( bslf );
+
+				BoshConnectionManagerLogger.getParent().setFilter( bslf );
+			}
+
 			try {
 				if ( null == sidFilehandler ){
 					sidFilehandler = new FileHandler( "logs/bosh_sid.log", false );
 					sidFilehandler.setLevel( lvl );
-					sidLogger.addHandler( sidFilehandler );
+					sidFilehandler.setFilter( bslf );
+					BoshConnectionManagerLogger.getParent().addHandler( sidFilehandler );
 				}
-
 			} catch ( IOException ex ) {
 				log.log( Level.CONFIG, "Error creating BOSH SID logger" + ex );
 			}
@@ -250,9 +274,9 @@ public class BoshConnectionManager
 
 		UUID sid = bs.getSid();
 		sessions.put( sid, bs );
-		if ( sidLogger.isLoggable( Level.FINE ) ){
-			sidLogger.log( Level.FINE, "{0} : {1} ({2})",
-										 new Object[] { bs.getSid(), BOSH_OPERATION_TYPE.CREATE,
+		if ( log.isLoggable( Level.FINE ) ){
+			log.log( Level.FINE, "{0} : {1} ({2})",
+										 new Object[] { BOSH_OPERATION_TYPE.CREATE, bs.getSid(),
 																		"Pre-bind" } );
 		}
 
@@ -333,13 +357,12 @@ public class BoshConnectionManager
 							sid = bs.getSid();
 							sessions.put(sid, bs);
 
-							if ( sidLogger.isLoggable( Level.FINE ) ){
-								sidLogger.log( Level.FINE, "{0} : {1} ({2})",
-															 new Object[] { sid, BOSH_OPERATION_TYPE.CREATE, "Socket bosh session" } );
+							if ( log.isLoggable( Level.FINE ) ){
+								log.log( Level.FINE, "{0} : {1} ({2})",
+															 new Object[] { BOSH_OPERATION_TYPE.CREATE, sid, "Socket bosh session" } );
 							}
 						}
 					} else {
-						log.log(Level.INFO, "Invalid hostname. Closing invalid connection: {0}", p);
 						try {
 							serv.sendErrorAndStop(Authorization.NOT_ALLOWED, p, "Invalid hostname.");
 						} catch (IOException e) {
@@ -369,10 +392,9 @@ public class BoshConnectionManager
 						}
 					}
 				} else {
-					log.log( Level.INFO, "There is no session with given SID = {0}. Closing invalid connection", sid_str );
-					if ( sidLogger.isLoggable( Level.FINE ) ){
-						sidLogger.log( Level.FINE, "{0} : {1} ({2})",
-													 new Object[] { sid_str, BOSH_OPERATION_TYPE.INVALID_SID, "Invalid SID" } );
+					if ( log.isLoggable( Level.FINE ) ){
+						log.log( Level.FINE, "{0} : {1} ({2})",
+													 new Object[] { BOSH_OPERATION_TYPE.INVALID_SID, sid_str, "Invalid SID" } );
 					}
 					serv.sendErrorAndStop(Authorization.ITEM_NOT_FOUND, p, "Invalid SID");
 				}
@@ -459,9 +481,9 @@ public class BoshConnectionManager
 			BoshSession bs = sessions.get(sid);
 
 			if (bs != null) {
-				if ( sidLogger.isLoggable( Level.FINE ) ){
-					sidLogger.log( Level.FINE, "{0} : {1} ({2})",
-												 new Object[] { bs.getSid(), BOSH_OPERATION_TYPE.REMOVE,
+				if ( log.isLoggable( Level.FINE ) ){
+					log.log( Level.FINE, "{0} : {1} ({2})",
+												 new Object[] { BOSH_OPERATION_TYPE.REMOVE, bs.getSid(),
 																				"Closing bosh session" } );
 				}
 
@@ -707,7 +729,7 @@ public class BoshConnectionManager
 		if (props.get(SEND_NODE_HOSTNAME_KEY) != null) {
 			sendNodeHostname = (Boolean) props.get(SEND_NODE_HOSTNAME_KEY);
 		}
-		if (props.get(SID_LOGGER_KEY) != null) {
+		if (props.size() == 1 && props.get(SID_LOGGER_KEY) != null) {
 			Level lvl = Level.parse( (String)props.get(SID_LOGGER_KEY) );
 			setupSidlogger( lvl );
 			log.info("Setting SID log level to: " + lvl);
@@ -822,9 +844,9 @@ public class BoshConnectionManager
 							writePacketToSocket(redirectPacket);
 							session.sendWaitingPackets();
 							session.close();
-							if ( sidLogger.isLoggable( Level.FINE ) ){
-								sidLogger.log( Level.FINE, "{0} : {1} ({2})",
-															 new Object[] { session.getSid(), BOSH_OPERATION_TYPE.REMOVE,
+							if ( log.isLoggable( Level.FINE ) ){
+								log.log( Level.FINE, "{0} : {1} ({2})",
+															 new Object[] { BOSH_OPERATION_TYPE.REMOVE, session.getSid(),
 																							"See other host" } );
 							}
 							sessions.remove(session.getSid());
@@ -882,10 +904,10 @@ public class BoshConnectionManager
 					}
 				}
 				session.close();
-				if ( sidLogger.isLoggable( Level.FINE ) ){
-					sidLogger.log( Level.FINE, "{0} : {1} ({2})",
-												 new Object[] { session.getSid(), BOSH_OPERATION_TYPE.REMOVE,
-																				"Closing session for command CLOSE" } );
+				if ( log.isLoggable( Level.FINE ) ){
+					log.log( Level.FINE, "{0} : {1} ({2})",
+									 new Object[] { BOSH_OPERATION_TYPE.REMOVE, session.getSid(),
+																	"Closing session for command CLOSE" } );
 				}
 				sessions.remove(session.getSid());
 			} else {
@@ -1102,10 +1124,10 @@ public class BoshConnectionManager
 			if ( session != null ){
 				log.fine( "Closing session for timeout: " + session.getSid() );
 				session.close();
-				if ( sidLogger.isLoggable( Level.FINE ) ){
-					sidLogger.log( Level.FINE, "{0} : {1} ({2})",
-												 new Object[] { session.getSid(), BOSH_OPERATION_TYPE.REMOVE,
-																				 "Closing session for timeout" } );
+				if ( log.isLoggable( Level.FINE ) ){
+					log.log( Level.FINE, "{0} : {1} ({2})",
+									 new Object[] { BOSH_OPERATION_TYPE.REMOVE, session.getSid(),
+																	"Closing session for timeout" } );
 				}
 				sessions.remove( session.getSid() );
 			} else {
