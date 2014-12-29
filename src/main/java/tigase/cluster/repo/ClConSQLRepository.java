@@ -194,6 +194,23 @@ public class ClConSQLRepository
 		}
 	}
 
+	@Override
+	public void removeItem( String key ) {
+		super.removeItem( key );
+
+		try {
+			PreparedStatement removeItem = data_repo.getPreparedStatement( null, DELETE_ITEM_QUERY );
+			synchronized ( removeItem ) {
+				removeItem.setString( 1, key );
+				removeItem.executeUpdate();
+			}
+
+		} catch (SQLException e) {
+			log.log(Level.WARNING, "Problem removing elements from DB: ", e);
+		}
+
+	}
+
 	/**
 	 * Method description
 	 *

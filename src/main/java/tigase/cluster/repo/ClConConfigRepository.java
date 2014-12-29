@@ -34,7 +34,10 @@ import tigase.util.DNSResolver;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import tigase.db.DBInitException;
+
+import tigase.sys.ShutdownHook;
 
 /**
  * Class description
@@ -44,7 +47,9 @@ import tigase.db.DBInitException;
  * @author         <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
 public class ClConConfigRepository
-				extends ConfigRepository<ClusterRepoItem> {
+		extends ConfigRepository<ClusterRepoItem>
+		implements ShutdownHook {
+
 	private static final Logger log = Logger.getLogger(ClConConfigRepository.class.getName());
 
 	/** Field description */
@@ -67,6 +72,11 @@ public class ClConConfigRepository
 	@Override
 	public String[] getDefaultPropetyItems() {
 		return ClConRepoDefaults.getDefaultPropetyItems();
+	}
+
+	@Override
+	public String getName() {
+		return "Cluster repository clean-up";
 	}
 
 	@Override
@@ -152,6 +162,14 @@ public class ClConConfigRepository
 		super.setProperties(props);
 		autoreload_interval = (Long) props.get(AUTORELOAD_INTERVAL_PROP_KEY);
 		setAutoloadTimer(autoreload_interval);
+		TigaseRuntime.getTigaseRuntime().addShutdownHook(this);
+	}
+
+	@Override
+	public String shutdown() {
+		String host = DNSResolver.getDefaultHostname();
+		removeItem( host );
+		return "== " + "Removing cluster_nodes item: " + host + "\n";
 	}
 
 	//~--- methods --------------------------------------------------------------
