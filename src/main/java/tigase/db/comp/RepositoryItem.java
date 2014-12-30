@@ -36,7 +36,6 @@ import tigase.xml.Element;
  * Created: Oct 3, 2009 2:35:58 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
  */
 public interface RepositoryItem {
 
@@ -70,7 +69,7 @@ public interface RepositoryItem {
 	 * Returns the owner ID of the item.  This is used for a management to allow fine tuned
 	 * service administration with roles assigned to specific elements and items. Normally only
 	 * owner can perform some critical actions like removing the item, managing item
-	 * administrators or changing owner.<p/>
+	 * administrators or changing owner.<br>
 	 * There can be only one Item owner.
 	 * @return an ID of the Item owner.
 	 */
@@ -139,7 +138,7 @@ public interface RepositoryItem {
 	 * Set the Item owner.  This is used for a management to allow fine tuned
 	 * service administration with roles assigned to specific elements and items. Normally only
 	 * owner can perform some critical actions like removing the item, managing item
-	 * administrators or changing owner.<p/>
+	 * administrators or changing owner.<br>
 	 * There can be only one Item owner.
 	 * @param owner is the Item owner ID.
 	 */

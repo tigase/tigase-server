@@ -230,16 +230,6 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param fromNode is a <code>JID</code>
-	 * @param visitedNodes is a <code>Set<JID></code>
-	 * @param packet is a <code>Packet</code>
-	 *
-	 * @return a value of <code>List<JID></code>
-	 */
 	@Override
 	public List<JID> getNodesForPacketForward(JID fromNode, Set<JID> visitedNodes,
 			Packet packet) {

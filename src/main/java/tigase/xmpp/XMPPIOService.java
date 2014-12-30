@@ -456,7 +456,7 @@ public class XMPPIOService<RefObject>
 	 *
 	 *
 	 *
-	 * @return a value of <code>Queue<Packet></code>
+	 * @return a value of {@code Queue<Packet>}
 	 */
 	public Queue<Packet> getReceivedPackets() {
 		return receivedPackets;
@@ -502,7 +502,7 @@ public class XMPPIOService<RefObject>
 	 *
 	 *
 	 *
-	 * @return a value of <code>Map<String,Packet></code>
+	 * @return a value of {@code Map<String,Packet>}
 	 */
 	public Map<String, Packet> getWaitingForAct() {
 		for (Packet p : waitingForAck.values()) {

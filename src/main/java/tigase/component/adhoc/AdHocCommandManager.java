@@ -58,13 +58,9 @@ public class AdHocCommandManager {
 	}
 
 	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param element
-	 * 
+	 *
+	 * @param packet
 	 * @return
-	 * 
 	 * @throws AdHocCommandException
 	 */
 	public Packet process(Packet packet) throws AdHocCommandException {

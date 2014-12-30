@@ -51,7 +51,7 @@ import java.util.logging.Logger;
  *  It also supports creation multiple, sperate document trees if parsed
  *  buffer contains a few <em>XML</em> documents. As a result of work it returns
  *  always <code>Queue</code> containing all found <em>XML</em> trees in the
- *  same order as they were found in network data.<br/>
+ *  same order as they were found in network data.<br>
  *  Document trees created by this <em>DOM</em> builder consist of instances of
  *  <code>Element</code> class or instances of class extending
  *  <code>Element</code> class. To receive trees built with instances of proper

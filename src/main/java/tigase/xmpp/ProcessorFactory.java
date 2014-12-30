@@ -47,7 +47,7 @@ import java.util.TreeMap;
  * provide all classes which are <code>XMPPProcessor</code> extensions (not
  * abstract extensions) available in classpath.
  * These extensions are normally used for processing data transfered between
- * <em>XMPP</em> entities.<br/>
+ * <em>XMPP</em> entities.<br>
  * It automatically loads and provides all available processors unless
  * configuration says to behave differently. You can for example exclude in
  * configuration some processors from loading or even you can turn off automatic

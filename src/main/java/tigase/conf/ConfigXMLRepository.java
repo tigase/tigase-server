@@ -330,7 +330,7 @@ public class ConfigXMLRepository extends ConfigurationCache {
 	 *
 	 * @param params
 	 *
-	 * @throws ConfigurationException
+	 * @throws DBInitException
 	 */
 	@Override
 	public void initRepository(String repo_uri, Map<String, String> params) throws DBInitException {

@@ -56,14 +56,14 @@ import tigase.util.PriorityQueueAbstract;
  * of the class can process normall user packets and administrator packets via
  * ad-hoc commands. Good examples of such components are <code>MUC</code>,
  * <code>PubSub</code>, <code>SessionManager</code>.
- * <p/>
+ * <br>
  * The class offers scripting API for administrator ad-hoc commands.
- * <p/>
+ * <br>
  * By default it internally uses priority queues which in some rare cases may
  * lead to packets reordering. When this happens and it is unacceptable for the
  * deployment non-priority queues can be used. The queues size is limited and
  * depends on the available memory size.
- * <p/>
+ * <br>
  * Packets are processed by <code>processPacket(Packet packet)</code> method
  * which is concurrently called from multiple threads.
  *
@@ -84,7 +84,7 @@ public abstract class AbstractMessageReceiver
 	/**
 	 * Configuration property default vakue with a default incoming packet filter
 	 * loaded by Tigase server.
-	 * <p/>
+	 * <br>
 	 * This is a comma-separated list of classes which should be loaded as packet
 	 * filters. The classes must implement <code>PacketFilterIfc</code> interface.
 	 */
@@ -101,7 +101,7 @@ public abstract class AbstractMessageReceiver
 
 	/**
 	 * A default value for max queue size property. The value is calculated at the
-	 * server startup time using following formula: <br/>
+	 * server startup time using following formula: <br>
 	 * <code>Runtime.getRuntime().maxMemory() / 400000L</code> You can change the
 	 * default queue size by setting a different value for the
 	 * <code>MAX_QUEUE_SIZE_PROP_KEY</code> property in the server configuration.
@@ -120,7 +120,7 @@ public abstract class AbstractMessageReceiver
 	/**
 	 * Configuration property default vakue with a default outgoing packet filter
 	 * loaded by Tigase server.
-	 * <p/>
+	 * <br>
 	 * This is a comma-separated list of classes which should be loaded as packet
 	 * filters. The classes must implement <code>PacketFilterIfc</code> interface.
 	 */
@@ -242,17 +242,17 @@ public abstract class AbstractMessageReceiver
 	 * Packets from the input queue are later passed to the
 	 * <code>processPacket(Packet)</code> method. This is a blocking method
 	 * waiting if necessary for the room if the queue is full.
-	 * <p/>
+	 * <br>
 	 * The method returns a <code>boolean</code> value of <code>true</code> if the
 	 * packet has been successfully added to the queue and <code>false</code>
 	 * otherwise.
-	 * <p/>
+	 * <br>
 	 * There can be many queues and many threads processing packets for the
 	 * component, however the method makes the best effort to guarantee that
 	 * packets are later processed in the correct order. For example that packets
 	 * for a single user always end up in the same exact queue. You can tweak the
 	 * packets distribution among threads by overwriting
-	 * <code>hashCodeForPacket(Packet)</code> method.<br/>
+	 * <code>hashCodeForPacket(Packet)</code> method.<br>
 	 * If there is <code>N</code> threads the packets are distributed among thread
 	 * using following logic:
 	 *
@@ -299,18 +299,18 @@ public abstract class AbstractMessageReceiver
 	/**
 	 * This is a variant of <code>addPacket(Packet)</code> method which adds
 	 * <code>Packet</code> to in the internal input queue without blocking.
-	 * <p/>
+	 * <br>
 	 * The method returns a <code>boolean</code> value of <code>true</code> if the
 	 * packet has been successful added to the queue and <code>false</code>
 	 * otherwise.
-	 * <p/>
+	 * <br>
 	 * Use of the non-blocking methods is not recommended for most of the
 	 * components implementations. The only component which is allowed to use them
 	 * is the server <code>MessageRouter</code> implementation which can not hang
 	 * on any method. This would cause a dead-lock in the application. All other
 	 * components must use blocking methods and wait if the system is under so
 	 * high load that it's queues are full.
-	 * <p/>
+	 * <br>
 	 * See <code>addPacket(Packet)</code> method's documentation for some more
 	 * details.
 	 *
@@ -351,12 +351,12 @@ public abstract class AbstractMessageReceiver
 
 	/**
 	 * This is a convenience method for adding all packets stored in given queue
-	 * to the component's internal input queue.<br/>
+	 * to the component's internal input queue.<br>
 	 * The method calls <code>addPacket(Packet)</code> in a loop for each packet
 	 * in the queue. If the call returns <code>true</code> then the packet is
 	 * removed from the given queue, otherwise the methods ends the loop and
 	 * returns <code>false</code>.
-	 * <p/>
+	 * <br>
 	 * Please note, if the method returns <code>true</code> it means that all the
 	 * packets from the queue passed as a parameter have been successfuly run
 	 * through the <code>addPacket(Packet)</code> method and the queue passed as a
@@ -405,7 +405,7 @@ public abstract class AbstractMessageReceiver
 	 * used by the <code>MessageRouter</code> to calculate packet's destination.
 	 * If the packet's destination address matches one of the component's routing
 	 * addresses the packet is added to the component's internal input queue.
-	 * <p/>
+	 * <br>
 	 * By default all components accept packets addressed to the componentId and
 	 * to:
 	 *
@@ -420,7 +420,7 @@ public abstract class AbstractMessageReceiver
 	 * </pre>
 	 *
 	 *        instead.
-	 *        <p/>
+	 *        <br>
 	 *        The routings are passed as Java regular expression strings are the
 	 *        extra addresses accepted by the component. In most cases this is
 	 *        used by the external component protocol implementations which can
@@ -483,7 +483,7 @@ public abstract class AbstractMessageReceiver
 	/**
 	 * Utility method executed precisely every hour. A component can overwrite the
 	 * method to put own code to be executed at the regular intervals of time.
-	 * <p/>
+	 * <br>
 	 * Note, no extensive calculations should happen in this method nor long
 	 * lasting operations. It is essential that the method processing does not
 	 * exceed 1 hour. The overriding method must call the the super method first
@@ -497,7 +497,7 @@ public abstract class AbstractMessageReceiver
 	/**
 	 * Utility method executed precisely every minute. A component can overwrite
 	 * the method to put own code to be executed at the regular intervals of time.
-	 * <p/>
+	 * <br>
 	 * Note, no extensive calculations should happen in this method nor long
 	 * lasting operations. It is essential that the method processing does not
 	 * exceed 1 minute. The overriding method must call the the super method first
@@ -512,7 +512,7 @@ public abstract class AbstractMessageReceiver
 	/**
 	 * Utility method executed precisely every second. A component can overwrite
 	 * the method to put own code to be executed at the regular intervals of time.
-	 * <p/>
+	 * <br>
 	 * Note, no extensive calculations should happen in this method nor long
 	 * lasting operations. It is essential that the method processing does not
 	 * exceed 1 second. The overriding method must call the the super method first
@@ -527,7 +527,7 @@ public abstract class AbstractMessageReceiver
 	 * This method decides how incoming packets are distributed among processing
 	 * threads. Different components needs different distribution to efficient use
 	 * all threads and avoid packets re-ordering.
-	 * <p/>
+	 * <br>
 	 * If there are N processing threads, packets are distributed among threads
 	 * using following code:
 	 *
@@ -653,12 +653,12 @@ public abstract class AbstractMessageReceiver
 	 * This is the main <code>Packet</code> processing method. It is called
 	 * concurrently from many threads so implementing it in thread save manner is
 	 * essential. The method is called for each packet addressed to the component.
-	 * <p/>
+	 * <br>
 	 * Please note, the <code>Packet</code> instance may be processed by different
 	 * parts of the server, different components or plugins at the same time.
 	 * Therefore this is very important to tread the <code>Packet</code> instance
 	 * as unmodifiable object.
-	 * <p/>
+	 * <br>
 	 * Processing in this method is asynchronous, therefore there is no result
 	 * value. If there are some 'result' packets generated during processing, they
 	 * should be passed back using <code>addOutPacket(Packet)</code> method.
@@ -801,7 +801,7 @@ public abstract class AbstractMessageReceiver
 	 * <code>Level.FINEST</code> assigned and must be put inside the level guard
 	 * to prevent generating them by the system monitor. The system monitor does
 	 * not collect <code>FINEST</code> statistics.
-	 * <p/>
+	 * <br>
 	 * Level guard code looks like the example below:
 	 *
 	 * <pre>
@@ -810,7 +810,7 @@ public abstract class AbstractMessageReceiver
 	 *   list.add(getName(), "Statistic description", stat_value, Level.FINEST);
 	 * }
 	 *
-	 * <pre>
+	 * </pre>
 	 * This way you make sure your extensive operation is not executed every second by the
 	 * monitoring system and does not affect the server performance.
 	 *

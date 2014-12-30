@@ -445,9 +445,9 @@ public class ConfigItem
 
 	/**
 	 * Checks if the given node and key are equal to this item nodeName and
-	 * keyName. This method call works the same way as following statement: <code>
+	 * keyName. This method call works the same way as following statement: {@code
 	 * isNode(node) && isKey(key)
-	 * </code>
+	 * }
 	 *
 	 * @param node
 	 * @param key

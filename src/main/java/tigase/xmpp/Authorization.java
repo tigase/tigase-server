@@ -36,7 +36,7 @@ import tigase.server.Packet;
  * It has also capability to build error response message relevant to
  * specific error code (or success code). It is used not only for authorization
  * process but also by other features implementation accessing session
- * data.<br/>
+ * data.<br>
  * All defined errors comes directly from <em>XMPP</em> core RFC. For each error
  * has assigned error code - from old <em>Jabber</em> spec. and error condition -
  * <em>XMPP</em> error spec.

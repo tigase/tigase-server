@@ -274,7 +274,7 @@ public class DataRepositoryImpl implements DataRepository {
 	 * @param params
 	 * 
 	 * 
-	 * @throws SQLException
+	 * @throws DBInitException
 	 */
 	@Override
 	public void initRepository(String resource_uri, Map<String, String> params)

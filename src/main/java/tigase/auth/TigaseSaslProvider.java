@@ -32,11 +32,9 @@ import javax.security.sasl.SaslServerFactory;
 /**
  * Describe class TigaseSaslProvider here.
  * 
- * 
  * Created: Sun Nov 5 22:31:20 2006
  * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
  */
 public class TigaseSaslProvider extends Provider {
 
@@ -52,12 +50,6 @@ public class TigaseSaslProvider extends Provider {
 
 	private static final double VERSION = 1.0;
 
-	/**
-	 * Creates a new <code>TigaseSaslProvider</code> instance.
-	 * 
-	 * @param settings
-	 * 
-	 */
 	@SuppressWarnings("unchecked")
 	public TigaseSaslProvider(Map<String, Object> settings) {
 		super(MY_NAME, VERSION, INFO);
@@ -85,5 +77,4 @@ public class TigaseSaslProvider extends Provider {
 			throw new RuntimeException(e);
 		}
 	}
-
 }

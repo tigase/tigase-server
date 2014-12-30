@@ -241,9 +241,9 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 
 	/**
 	 * Returns default map of components. Keys in map are used as component
-	 * identifiers.<br/>
+	 * identifiers.<br>
 	 * 
-	 * This map may be modified by <code>init.properties</code>:<br/>
+	 * This map may be modified by <code>init.properties</code>:<br>
 	 * <code>&lt;component_name&gt;/modules/&lt;module_name&gt;[S]=&lt;module_class&gt;</code>
 	 * 
 	 * 

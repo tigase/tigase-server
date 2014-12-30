@@ -42,14 +42,14 @@ import java.util.Map;
  * entries when the user requests the roster content. The dynamic roster
  * feature doesn't replace the normal roster with entries added by the
  * user. It just allows you to inject extra contacts lists to the user roster.
- * <p/>
+ * <br>
  * There is a very simple example implementing this interface which creates
  * roster entries for anonymous users - <code>tigase.xmpp.impl.AnonymousRoster</code>.
  * You can use it as a starting point for your code.
- * <p/>
+ * <br>
  * You can have as many implementations of this interface loaded at the same
  * time as you need and all of them are called for each user roster request.
- * <p/>
+ * <br>
  * To load your implementations you have to specify them in the configuration
  * file. The simplest way is to use <code>init.properties</code> file. Have a look
  * at the example file available in the SVN repository. Following line added to
@@ -66,12 +66,12 @@ import java.util.Map;
  * Basically all parameters starting with string:
  * <code>sess-man/plugins-conf/</code> will be provided at
  * initialization time in the <code>init(....)</code> method.
- * <p/>
+ * <br>
  * There is also a simplified form for providing configuration parameters. It is
  * used if you want to provide just one parameter to the object (like database
  * connection string):
  * <pre>sess-man/plugins-conf/roster-presence/tigase.xmpp.impl.AnonymousRoster.init=configuration-string</pre>
- * <p/>
+ * <br>
  * Created: Mon Oct 29 08:52:22 2007
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
@@ -84,7 +84,7 @@ public interface DynamicRosterIfc {
 	 * before it's <code>init(...)</code> method is called but it might be
 	 * used straight away after the method has finished.
 	 *
-	 * @param props a <code>Map<String, Object> props</code> is a configuration
+	 * @param props a {@code Map<String, Object> props} is a configuration
 	 * parameters map in the form: key:value exactly as they were specified
 	 * in the configuration file.
 	 */
@@ -175,7 +175,7 @@ public interface DynamicRosterIfc {
 	 * subscription (typically always both) and groups. Please have a look at
 	 * <code>getBuddyItem(...)</code> description for details how to create
 	 * an Element entry for the roster item.
-	 * <p/>
+	 * <br>
 	 * In theory you could here
 	 * call the <code>getBuddies(...)</code> method and then for each entry from
 	 * the array call the <code>getBuddyItem(...)</code>. I strongly advice to
@@ -185,7 +185,7 @@ public interface DynamicRosterIfc {
 	 *
 	 * @param session a <code>XMPPResourceConnection</code> value of the connection
 	 * session object.
-	 * @return a <code>List<Element></code> value
+	 * @return a {@code List<Element>} value
 	 * @exception NotAuthorizedException may be thrown if the connection session
 	 * is not yet authenticated but authorization is required to access roster data.
 	 * @exception RosterRetrievingException may be thrown when an unknown error in the

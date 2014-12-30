@@ -39,7 +39,7 @@ public interface StatisticsProviderMBean {
 	/**
 	 * Operation exposed for management
 	 * @param level Statistics level, 0 - All, 500 - Medium, 800 - Minimal
-	 * @return java.util.Map<String, String>
+	 * @return {@code java.util.Map<String, String>}
 	 */
 	public Map<String, String> getAllStats(int level);
 
@@ -145,7 +145,7 @@ public interface StatisticsProviderMBean {
 	 *
 	 *
 	 *
-	 * @return a value of <code>List<String></code>
+	 * @return a value of {@code List<String>}
 	 */
 	public List<String> getComponentsNames();
 
@@ -153,7 +153,7 @@ public interface StatisticsProviderMBean {
 	 * Operation exposed for management
 	 * @param compName The component name to provide statistics for
 	 * @param level Statistics level, 0 - All, 500 - Medium, 800 - Minimal
-	 * @return java.util.Map<String, String>
+	 * @return {@code java.util.Map<String, String>}
 	 */
 	public Map<String, String> getComponentStats(String compName, int level);
 
@@ -213,7 +213,7 @@ public interface StatisticsProviderMBean {
 	 *
 	 * @param statsKeys is a <code>String[]</code>
 	 *
-	 * @return a value of <code>Map<String,Object></code>
+	 * @return a value of {@code Map<String,Object>}
 	 */
 	public Map<String, Object> getCurStats(String[] statsKeys);
 
@@ -438,7 +438,7 @@ public interface StatisticsProviderMBean {
 	 *
 	 * @param statsKeys is a <code>String[]</code>
 	 *
-	 * @return a value of <code>Map<String,LinkedList<Object>></code>
+	 * @return a value of {@code Map<String,LinkedList<Object>>}
 	 */
 	public Map<String, LinkedList<Object>> getStatsHistory(String[] statsKeys);
 

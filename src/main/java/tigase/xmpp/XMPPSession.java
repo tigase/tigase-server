@@ -381,7 +381,7 @@ public class XMPPSession {
 	 * In case there is no session that match given ConnectionID then {@code null}
 	 * is returned.
 	 *
-	 * @param jid ConnectionID for which {@code XMPPResourceConnection} should be
+	 * @param connectionId  ConnectionID for which {@code XMPPResourceConnection} should be
 	 *            returned
 	 */
 	public XMPPResourceConnection getResourceForConnectionId(JID connectionId) {
@@ -418,7 +418,7 @@ public class XMPPSession {
 	 * {@code resource}. In case there is no session that match - {@code null} is
 	 * returned.
 	 *
-	 * @param jid FullJID for which a {@code XMPPResourceConnection} should be
+	 * @param resource resource string for which a {@code XMPPResourceConnection} should be
 	 *            returned
 	 */
 	public XMPPResourceConnection getResourceForResource(String resource) {

@@ -194,7 +194,7 @@ public abstract class DynamicRoster {
 	 *
 	 *
 	 *
-	 * @return a value of <code>List<JID></code>
+	 * @return a value of {@code List<JID>}
 	 * @throws NotAuthorizedException
 	 * @throws RepositoryAccessException
 	 * @throws RosterRetrievingException
@@ -331,7 +331,7 @@ public abstract class DynamicRoster {
 	 *
 	 *
 	 *
-	 * @return a value of <code>List<Element></code>
+	 * @return a value of {@code List<Element>}
 	 * @throws NotAuthorizedException
 	 * @throws RepositoryAccessException
 	 * @throws RosterRetrievingException

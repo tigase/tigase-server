@@ -23,14 +23,14 @@ import tigase.xmpp.BareJID;
 /**
  * Handler for SCRAM with Salted Password.
  *
- * Password should be encoded as:<br/>
+ * Password should be encoded as:<br>
  *
  * <pre>
  * base64(salt | saltedPassword)
  * </pre>
  *
- * Where:<br/>
- * <code>salt</code> - 20 bytes,<br/>
+ * Where:<br>
+ * <code>salt</code> - 20 bytes,<br>
  * <code>saltedPassword</code> - 20 bytes.
  *
  */

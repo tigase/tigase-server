@@ -62,17 +62,6 @@ public class JabberVersionModule<CTX extends Context> extends AbstractModule<CTX
 		return CRIT;
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param packet
-	 * @param packetWriter
-	 * 
-	 * @return
-	 * 
-	 * @throws PubSubException
-	 */
 	@Override
 	public void process(Packet packet) throws ComponentException {
 		Element query = new Element("query", new String[] { "xmlns" }, new String[] { "jabber:iq:version" });

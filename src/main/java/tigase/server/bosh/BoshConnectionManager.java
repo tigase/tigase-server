@@ -310,7 +310,7 @@ public class BoshConnectionManager
 	 *
 	 *
 	 *
-	 * @return a value of <code>Queue<Packet></code>
+	 * @return a value of {@code Queue<Packet>}
 	 */
 	@Override
 	public Queue<Packet> processSocketData(XMPPIOService<Object> srv) {
@@ -557,7 +557,7 @@ public class BoshConnectionManager
 	 *
 	 *
 	 *
-	 * @return a value of <code>Map<String,Object></code>
+	 * @return a value of {@code Map<String,Object>}
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {

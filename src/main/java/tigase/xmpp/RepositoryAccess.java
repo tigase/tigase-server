@@ -1047,16 +1047,16 @@ public abstract class RepositoryAccess {
 	 * hierarchy of data base. This method is similar to
 	 * <code>setData(String, String)</code> and differs in one additional
 	 * parameter which point to user data base subnode where data must be stored.
-	 * It helps to organize user data in more logical hierarchy.<br/>
+	 * It helps to organize user data in more logical hierarchy.<br>
 	 * User data is kind of tree where you can store data in each tree node. The
 	 * most relevant sample might be structure like typical file system or XML
 	 * like or LDAP data base. The first implementation is actually done as XML
 	 * file to make it easier test application and deploy simple installation
-	 * where there is no more users than 1000.<br/>
+	 * where there is no more users than 1000.<br>
 	 * To find out more about user repository refer to <code>UserRepository</code>
 	 * interface for general info and to <code>XMLRepository</code> for detailed
 	 * explanation regarding XML implementation of user repository.
-	 * <p>
+	 * <br>
 	 * Thus <code>subnode</code> is kind of path to data node. If you specify
 	 * <code>null</code> or empty node data will be stored in root user node. This
 	 * has exactly the same effect as you call
@@ -1074,7 +1074,7 @@ public abstract class RepositoryAccess {
 	 * /just/like/path/to/file
 	 * </pre>
 	 *
-	 * </p>
+	 * <br>
 	 * If given node does not yet exist it will be automaticaly created with all
 	 * nodes in given path so there is no need for developer to perform additional
 	 * action to create node. There is, however method

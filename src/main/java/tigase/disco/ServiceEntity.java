@@ -392,7 +392,7 @@ public class ServiceEntity {
 	 * @param node is a <code>String</code>
 	 * @param jid is a <code>String</code>
 	 *
-	 * @return a value of <code>List<Element></code>
+	 * @return a value of {@code List<Element>}
 	 */
 	public List<Element> getDiscoItems(String node, String jid) {
 		return getDiscoItems(node, jid, true);
@@ -406,7 +406,7 @@ public class ServiceEntity {
 	 * @param jid is a <code>String</code>
 	 * @param admin is a <code>boolean</code>
 	 *
-	 * @return a value of <code>List<Element></code>
+	 * @return a value of {@code List<Element>}
 	 */
 	public List<Element> getDiscoItems(String node, String jid, boolean admin) {
 
@@ -447,7 +447,7 @@ public class ServiceEntity {
 	 * @param node is a <code>String</code>
 	 * @param jid is a <code>String</code>
 	 *
-	 * @return a value of <code>List<Element></code>
+	 * @return a value of {@code List<Element>}
 	 */
 	public List<Element> getItems(String node, String jid) {
 		return getItems(node, jid, true);
@@ -461,7 +461,7 @@ public class ServiceEntity {
 	 * @param jid is a <code>String</code>
 	 * @param admin is a <code>boolean</code>
 	 *
-	 * @return a value of <code>List<Element></code>
+	 * @return a value of {@code List<Element>}
 	 */
 	public List<Element> getItems(String node, String jid, boolean admin) {
 		List<Element> result = null;

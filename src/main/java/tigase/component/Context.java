@@ -22,7 +22,7 @@ import tigase.disteventbus.EventBus;
 import tigase.xmpp.JID;
 
 /**
- * Interface to provide configuration for an component.<br/>
+ * Interface to provide configuration for an component.<br>
  * This interface should be extended if component requires access to database or
  * any other resources or informations.
  * 

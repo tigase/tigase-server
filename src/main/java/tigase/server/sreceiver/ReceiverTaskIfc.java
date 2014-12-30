@@ -67,7 +67,7 @@ public interface ReceiverTaskIfc {
 	 * <strong>presence</strong> or any other stanza which does make sense to
 	 * send at startup time.
 	 *
-	 * @param results a <code>Queue<Packet></code> is a collection of
+	 * @param results a {@code Queue<Packet>} is a collection of
 	 * result packets to send out.
 	 */
 	void init(Queue<Packet> results);
@@ -79,7 +79,7 @@ public interface ReceiverTaskIfc {
 	 * should be included in the <code>results</code> queue.
 	 *
 	 * @param packet a <code>Packet</code> input packet for processing.
-	 * @param results a <code>Queue<Packet></code> is a collection of
+	 * @param results a {@code Queue<Packet>} is a collection of
 	 * result packets to send out.
 	 */
 	void processPacket(Packet packet, Queue<Packet> results);
@@ -88,7 +88,7 @@ public interface ReceiverTaskIfc {
 	 * Method description
 	 *
 	 *
-	 * @param results is a <code>Queue<Packet></code>
+	 * @param results is a {@code Queue<Packet>}
 	 * @param subscr is a <code>JID</code>
 	 */
 	void removeSubscribers(Queue<Packet> results, JID... subscr);

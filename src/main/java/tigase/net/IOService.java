@@ -71,7 +71,7 @@ import tigase.xmpp.JID;
  * methods can be called simultaneously like
  * <code>stop()</code>,
  * <code>getProtocol()</code> or
- * <code>isConnected()</code>. <br/> It is recommended that developers extend
+ * <code>isConnected()</code>. <br> It is recommended that developers extend
  * <code>AbsractServerService</code> rather then implement
  * <code>ServerService</code> interface directly. <p> If you directly implement
  * <code>ServerService</code> interface you must take care about

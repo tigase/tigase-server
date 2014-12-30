@@ -408,7 +408,7 @@ public class ClusterController
 	 *
 	 *
 	 *
-	 * @return a value of <code>Map<String,Object></code>
+	 * @return a value of {@code Map<String,Object>}
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {

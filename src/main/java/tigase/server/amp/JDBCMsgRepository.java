@@ -324,7 +324,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 	 * 
 	 * @param conn_str
 	 * @param map
-	 * @throws SQLException
+	 * @throws DBInitException
 	 */
 	@Override
 	public void initRepository(String conn_str, Map<String, String> map)

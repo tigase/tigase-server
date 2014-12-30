@@ -320,7 +320,7 @@ public class CompSQLRepository
 	 * @param conn_str
 	 * @param params
 	 *
-	 * @throws SQLException
+	 * @throws DBInitException
 	 */
 	@Override
 	public void initRepository(String conn_str, Map<String, String> params)

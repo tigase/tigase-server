@@ -70,7 +70,7 @@ public enum DomainFilterPolicy {
 	/**
 	 * Helper method to generate string array with mode values
 	 *
-	 * @returnstring array with mode values
+	 * @return String array with mode values
 	 */
 	public static String[] valuesStr() {
 		if ( valuesStr == null ){

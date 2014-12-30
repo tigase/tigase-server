@@ -45,6 +45,7 @@ import java.util.Queue;
 /**
  * Class defining data structure for privacy lists.
  * Sample data storage:
+ * {@code
  * <node name="privacy">
  *  <map>
  *   <entry value="private" type="String" key="default"/>
@@ -65,12 +66,11 @@ import java.util.Queue;
  *     </map>
  *   </node>
  * </node>
- *
+ * }
  *
  * Created: Mon Oct  9 20:50:09 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
  */
 public class Privacy {
 	/** Field description */

@@ -19,9 +19,8 @@ public interface AsyncCallback {
 	 * 
 	 * @param responseStanza
 	 *            received IQ stanza
-	 * @param error
+	 * @param errorCondition 
 	 *            error condition
-	 * @throws JaxmppException
 	 */
 	void onError(Packet responseStanza, String errorCondition);
 
@@ -31,14 +30,11 @@ public interface AsyncCallback {
 	 * 
 	 * @param responseStanza
 	 *            received stanza
-	 * @throws JaxmppException
 	 */
 	void onSuccess(Packet responseStanza);
 
 	/**
 	 * Called when response wasn't received in given time.
-	 * 
-	 * @throws JaxmppException
 	 */
 	void onTimeout();
 

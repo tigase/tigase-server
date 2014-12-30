@@ -294,7 +294,7 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 	 *
 	 *
 	 *
-	 * @return a value of <code>List<JID></code>
+	 * @return a value of {@code List<JID>}
 	 */
 	public List<JID> getNodesForPacketForward(JID fromNode, Set<JID> visitedNodes,
 			Packet packet) {

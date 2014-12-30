@@ -75,14 +75,11 @@ public class ResponseManager {
 	}
 
 	/**
-	 * Returns handler for response of sent <code><iq/></code> stanza.
+	 * Returns handler for response of sent {@code  <iq/>} stanza.
 	 * 
 	 * @param element
-	 *            reponse <code><iq/></code> stanza.
-	 * @param writer
-	 *            Packet writer
+	 *            response {@code  <iq/>} stanza.
 	 * @return Runnable object with handler
-	 * @throws XMLException
 	 */
 	public Runnable getResponseHandler(final Packet element) {
 		if (!"iq".equals(element.getElemName()))
@@ -109,10 +106,10 @@ public class ResponseManager {
 	}
 
 	/**
-	 * Register callback for response of sent <code><iq/></code> stanza.
+	 * Register callback for response of sent {@code <iq/>} stanza.
 	 * 
 	 * @param stanza
-	 *            sent <code><iq/></code> stanza.
+	 *            sent {@code <iq/>} stanza.
 	 * @param timeout
 	 *            timeout. After it method
 	 *            {@linkplain AsyncCallback#onTimeout() onTimeout()} will be
@@ -120,7 +117,6 @@ public class ResponseManager {
 	 * @param callback
 	 *            callback
 	 * @return id of stanza
-	 * @throws XMLException
 	 */
 	public String registerResponseHandler(final Packet stanza, final Long timeout, final AsyncCallback callback) {
 		if (stanza == null)

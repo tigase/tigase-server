@@ -374,9 +374,9 @@ public class XMPPResourceConnection
 	/**
 	 * Saves given session data. Data are saved to temporary storage only and are
 	 * accessible during this session life only and only from this session
-	 * instance.<br/>
+	 * instance.<br>
 	 * Any <code>Object</code> can be stored and retrieved through
-	 * <code>getSessionData(...)</code>.<br/>
+	 * <code>getSessionData(...)</code>.<br>
 	 * To access permanent storage to keep data between session instances you must
 	 * use one of <code>get/setData...(...)</code> methods familly. They gives you
 	 * access to hierachical permanent data base. Permanent data base however can
@@ -501,7 +501,7 @@ public class XMPPResourceConnection
 	 *
 	 *
 	 *
-	 * @return a value of <code>List<XMPPResourceConnection></code>
+	 * @return a value of {@code List<XMPPResourceConnection>}
 	 * @throws NotAuthorizedException
 	 */
 	public List<XMPPResourceConnection> getActiveSessions() throws NotAuthorizedException {
@@ -554,7 +554,7 @@ public class XMPPResourceConnection
 	/**
 	 * Returns user JID but without <em>resource</em> part. This is real user ID
 	 * not session ID. To retrieve session ID - full JID refer to
-	 * <code>getJID()</code> method.<br/>
+	 * <code>getJID()</code> method.<br>
 	 * If session has not been authorized yet this method throws
 	 * <code>NotAuthorizedException</code>.
 	 *

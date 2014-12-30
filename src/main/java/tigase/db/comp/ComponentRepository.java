@@ -37,14 +37,14 @@ import tigase.db.TigaseDBException;
  * more like for storing Component dynamic configuration data. In simple cases
  * this data can be stored in configuration file, in more complex cases it can
  * be a database represented by UserRepository or even something else.
- * <p/>
+ * <br>
  * The repository is intended to store elements of a single type only. Each
  * element is identified by a unique key. All elements are cached in memory for
  * a fast retrieval so this kind of repository is recommended for small data
- * only when you need very fast and efficient access to all the information.<br/>
+ * only when you need very fast and efficient access to all the information.<br>
  * Some implementations however may behave differently and not cache all the
  * repository items in memory.
- * <p/>
+ * <br>
  * Created: Oct 3, 2009 1:46:25 PM
  *
  * @param <Item>

@@ -68,7 +68,7 @@ public interface UserRepository extends Repository {
 	 * This <code>addUser</code> method allows to add new user to repository.
 	 * It <b>must</b> throw en exception <code>UserExistsException</code> if such
 	 * user already exists because user <b>must</b> be unique within user
-	 * repository data base.<br/>
+	 * repository data base.<br>
 	 * As one <em>XMPP</em> server can support many virtual internet domains it
 	 * is required that <code>user</code> id consists of user name and domain
 	 * address: <em>username@domain.address.net</em> for example.

@@ -310,7 +310,7 @@ public class JavaJMXProxy
 	 *
 	 *
 	 *
-	 * @return a value of <code>Map<String,String></code>
+	 * @return a value of {@code Map<String,String>}
 	 */
 	@Override
 	public Map<String, String> getAllStats(int level) {
@@ -444,7 +444,7 @@ public class JavaJMXProxy
 	 *
 	 *
 	 *
-	 * @return a value of <code>List<String></code>
+	 * @return a value of {@code List<String>}
 	 */
 	@Override
 	public List<String> getComponentsNames() {
@@ -464,7 +464,7 @@ public class JavaJMXProxy
 	 *
 	 *
 	 *
-	 * @return a value of <code>Map<String,String></code>
+	 * @return a value of {@code Map<String,String>}
 	 */
 	@Override
 	public Map<String, String> getComponentStats(String compName, int level) {
@@ -551,7 +551,7 @@ public class JavaJMXProxy
 	 *
 	 * @param statsKeys is a <code>String[]</code>
 	 *
-	 * @return a value of <code>Map<String,Object></code>
+	 * @return a value of {@code Map<String,Object>}
 	 */
 	@Override
 	public Map<String, Object> getCurStats(String[] statsKeys) {
@@ -881,7 +881,7 @@ public class JavaJMXProxy
 	 *
 	 * @param statsKeys is a <code>String[]</code>
 	 *
-	 * @return a value of <code>Map<String,LinkedList<Object>></code>
+	 * @return a value of {@code Map<String,LinkedList<Object>>}
 	 */
 	@Override
 	public Map<String, LinkedList<Object>> getStatsHistory(String[] statsKeys) {

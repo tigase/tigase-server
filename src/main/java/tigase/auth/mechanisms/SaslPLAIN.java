@@ -14,17 +14,13 @@ import tigase.auth.callbacks.VerifyPasswordCallback;
 
 /**
  * SASL-PLAIN mechanism.
- *
- * <p>
+ * <br>
  * Called {@linkplain Callback callbacks} in order:
  * <ul>
  * <li>{@link NameCallback}</li>
  * <li>{@link VerifyPasswordCallback}</li>
  * <li>{@link AuthorizeCallback}</li>
  * </ul>
- * </p>
- *
- *
  */
 public class SaslPLAIN extends AbstractSasl {
 

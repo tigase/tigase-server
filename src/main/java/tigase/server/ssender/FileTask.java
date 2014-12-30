@@ -31,40 +31,37 @@ import java.util.logging.Logger;
 /**
  * <code>FileTask</code> implements tasks for cyclic retrieving stanzas from
  * a directory and sending them to the StanzaHandler object.
- * </p>
+ * <br>
  * It looks for any new stanza to send. Any single file can contain only single
  * stanza to send and any entry in database table can also contain only single
  * stanza to send. File on hard disk and record in database is deleted after
  * it is read.
- * <p>
+ * <br>
  * Any file in given directory is treated the same way - Tigase assumes it
  * contains valid XML data with XMPP stanza to send. You can however set in
  * configuration, using wildchars which files contain stanzas.
  * All stanzas must contain complete data including correct <em>"from"</em>
  * and <em>"to"</em> attributes.
- * </p>
- * <p>
+ * <br>
  * By default it looks for <code>*.stanza</code> files in
  * <code>/var/spool/jabber/</code> folder but you can specify different
  * directory name in initialization string. Sample initialization strings:
- * </p>
+ * <br>
  * <pre>/var/spool/jabber/*.stanza</pre>
  * <pre>/var/spool/jabber/*</pre>
- * <p>
+ * <br>
  * The last is equal to:
- * </p>
+ * <br>
  * <pre>/var/spool/jabber/</pre>
- * <p>
+ * <br>
  * Note the last forward slash '/' is required in such case if the last element
  * of the path is a directory.
- * </p>
- * <p>
+ * <br>
  * <strong>Please note! Tigase must have writing permissions for this directory,
  * otherwise it may not function properly.</strong>
- * </p>
- * <p>
+ * <br>
  * Created: Fri Apr 20 12:10:55 2007
- * </p>
+ * <br>
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */

@@ -47,16 +47,16 @@ import tigase.server.ComponentInfo;
  * <code>XMPPProcessor</code> abstract class contains basic definition for
  * <em>XMPP</em> processor.
  * To create new processor implementing particular <em>XMPP</em> functionality
- * it is enough to extend this class and implement one abstract method.<br/>
+ * it is enough to extend this class and implement one abstract method.<br>
  * Additionally to allow system properly recognise this processor you need also
  * to implement own constructor which sets proper values to parent constructor.
  * You must implement exactly one constructor with zero parameters which calls
  * parent constructor with proper values. Refer to constructor documentation
- * for information about required parameters.<br/>
+ * for information about required parameters.<br>
  * To fully interact with entity connected to the session or with other entities
  * in <em>XMPP</em> network you should be also familiar with
  * <code>addReply(...)</code>, <code>addMessage(...)</code> and
- * <code>addBroadcast(...)</code> methods.<br/>
+ * <code>addBroadcast(...)</code> methods.<br>
  * There is also partially implemented functionality to send messages to entities
  * in other networks like <em>SMTP</em> or other implemented by the server.
  * Once this implementation is finished there will be more information available.

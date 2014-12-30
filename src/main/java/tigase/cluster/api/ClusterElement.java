@@ -49,7 +49,7 @@ import java.util.Set;
  * Class ClusterElement is a utility class for handling tigase cluster specific
  * packets. The cluster packet has the following form:
  *
- * <pre>
+ * {@code
  * <cluster xmlns="tigase:cluster" from="source" to="dest" type="set">
  *   <data>
  *     <message xmlns="jabber:client" from="source-u" to="dest-x" type="chat">
@@ -72,7 +72,7 @@ import java.util.Set;
  *     </method-call>
  *   </control>
  * </cluster>
- * </pre>
+ * }
  *
  * If none of nodes could process the packet it goes back to the first node as
  * this node is the most likely to process the packet correctly.

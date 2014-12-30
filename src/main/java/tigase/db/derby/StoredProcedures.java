@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  *
  *
  * @version        5.1.0, 2010.09.11 at 02:08:58 BST
- * @author         Artur Hefczyc <artur.hefczyc@tigase.org>
+ * @author         Artur Hefczyc
  */
 public class StoredProcedures {
 	private static final Logger log = Logger.getLogger(StoredProcedures.class.getName());

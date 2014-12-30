@@ -105,7 +105,7 @@ public interface SessionManagerClusteredIfc
 	 *
 	 *
 	 *
-	 * @return a value of <code>ConcurrentHashMap<JID,XMPPResourceConnection></code>
+	 * @return a value of {@code ConcurrentHashMap<JID,XMPPResourceConnection>}
 	 */
 	ConcurrentHashMap<JID, XMPPResourceConnection> getXMPPResourceConnections();
 
@@ -115,7 +115,7 @@ public interface SessionManagerClusteredIfc
 	 *
 	 *
 	 *
-	 * @return a value of <code>ConcurrentHashMap<BareJID,XMPPSession></code>
+	 * @return a value of {@code ConcurrentHashMap<BareJID,XMPPSession>}
 	 */
 	ConcurrentHashMap<BareJID, XMPPSession> getXMPPSessions();
 	

@@ -205,7 +205,7 @@ public class Presence
 	/**
 	 * <code>sendPresenceBroadcast</code> method broadcasts given presence to all
 	 * buddies from roster and to all users to which direct presence was sent.
-	 * Before sending presence method calls {@link  requiresPresenceSending()},
+	 * Before sending presence method calls {@code  requiresPresenceSending()},
 	 * configured to only check local environment status (if enabled) to verify
 	 * whether presence needs to be sent.
 	 *
@@ -332,7 +332,7 @@ public class Presence
 	 * Method description
 	 *
 	 *
-	 * @param settings is a <code>Map<String,Object></code>
+	 * @param settings is a {@code Map<String,Object>}
 	 *
 	 * @throws TigaseDBException
 	 */
@@ -747,7 +747,7 @@ public class Presence
 	/**
 	 * <code>sendPresenceBroadcast</code> method broadcasts given presence to all
 	 * buddies from roster and to all users to which direct presence was sent.
-	 * Before sending presence method calls {@link  requiresPresenceSending()}
+	 * Before sending presence method calls {@code  requiresPresenceSending()}
 	 * performing, if configured, both system and roster check to verify whether
 	 * presence needs to be sent.
 	 *
@@ -825,14 +825,6 @@ public class Presence
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session is a <code>XMPPResourceConnection</code>
-	 * @param results is a <code>Queue<Packet></code>
-	 * @param settings is a <code>Map<String,Object></code>
-	 */
 	@Override
 	public void stopped(XMPPResourceConnection session, Queue<Packet> results, Map<String,
 			Object> settings) {

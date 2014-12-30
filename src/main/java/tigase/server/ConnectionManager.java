@@ -445,7 +445,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 *
 	 *
 	 *
-	 * @return a value of <code>Queue<Packet></code>
+	 * @return a value of {@code Queue<Packet>}
 	 */
 	public abstract Queue<Packet> processSocketData(IO serv);
 
@@ -1160,7 +1160,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 *
 	 *
 	 *
-	 * @return a value of <code>Map<String,Object></code>
+	 * @return a value of {@code Map<String,Object>}
 	 */
 	protected Map<String, Object> getParamsForPort(int port) {
 		return null;

@@ -466,7 +466,7 @@ public abstract class RosterAbstract {
 		 *
 		 *
 		 *
-		 * @return a value of <code>Map<String,String></code>
+		 * @return a value of {@code Map<String,String>}
 		 */
 		public Map<String, String> getSubscriptionAttr() {
 			return attrs;
@@ -1041,7 +1041,7 @@ public abstract class RosterAbstract {
 	 *
 	 *
 	 *
-	 * @return a value of <code>List<Element></code>
+	 * @return a value of {@code List<Element>}
 	 * @throws NotAuthorizedException
 	 * @throws TigaseDBException
 	 */
@@ -1089,7 +1089,7 @@ public abstract class RosterAbstract {
 	/**
 	 * Check if data containing user roster for this session is loaded from database
 	 * 
-	 * @param conn
+	 * @param session
 	 * @return 
 	 */
 	public abstract boolean isRosterLoaded(XMPPResourceConnection session);	

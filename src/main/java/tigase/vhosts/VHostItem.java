@@ -59,7 +59,7 @@ import tigase.util.StringUtilities;
  * instance of the class or can be exported to the XML form for permanent
  * storage:
  *
- * <pre>
+ * {@code
  * <vhost hostname="vhost.something.com"
  *        enabled="true"
  *        anon="true"
@@ -67,7 +67,7 @@ import tigase.util.StringUtilities;
  *        max-users="99999999999L">
  *   <comps/>
  *   <other/>
- * </pre>
+ * }
  *
  * From the init.property file it is also possible to set additional parameters
  * for the vhost. By default everything is enabled and max accounts set to
@@ -1269,7 +1269,7 @@ public class VHostItem
 	 * This method allow specify list of domains that will be used for packet
 	 * filtering when DomainFilteringPolicy is set to either LIST or BLACKLIST.
 	 *
-	 * @param domainFilter array of domains to be applied during filtering
+	 * @param domainFilterDomains  array of domains to be applied during filtering
 	 */
 	public void setDomainFilterDomains(String[] domainFilterDomains) {
 		this.domainFilterDomains = StringUtilities.internStringArray( domainFilterDomains);

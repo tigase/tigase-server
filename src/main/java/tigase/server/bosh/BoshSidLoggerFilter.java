@@ -25,7 +25,7 @@ import java.util.logging.LogRecord;
 
 /**
  *
- * @author Wojciech Kapcia <wojciech.kapcia@tigase.org>
+ * @author Wojciech Kapcia
  */
 
 public class BoshSidLoggerFilter implements Filter {

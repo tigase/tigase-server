@@ -117,7 +117,7 @@ public class WebSocketClientConnectionManager
 	 *
 	 *
 	 *
-	 * @return a value of <code>XMPPIOService<Object></code>
+	 * @return a value of {@code XMPPIOService<Object>}
 	 */
 	@Override
 	protected XMPPIOService<Object> getXMPPIOServiceInstance() {

@@ -18,7 +18,7 @@
 package tigase.component.eventbus;
 
 /**
- * Interface for listeners.<br/>
+ * Interface for listeners.<br>
  * Listener is special viariant of handler. Instead of invoking method
  * {@linkplain Event#dispatch(EventHandler) dispatch()},
  * {@linkplain EventListener#onEvent(Event) onEvent()} will be invoked.

@@ -687,7 +687,7 @@ public class SessionManager
 	 *
 	 *
 	 *
-	 * @return a value of <code>Map<String,Object></code>
+	 * @return a value of {@code Map<String,Object>}
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -736,7 +736,7 @@ public class SessionManager
 	 *
 	 *
 	 *
-	 * @return a value of <code>List<Element></code>
+	 * @return a value of {@code List<Element>}
 	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
@@ -3264,7 +3264,7 @@ public class SessionManager
 		 * Method description
 		 *
 		 *
-		 * @return a value of <code>Iterator<E></code>
+		 * @return a value of {@code Iterator<E>}
 		 */
 		@Override
 		public Iterator<E> iterator() {

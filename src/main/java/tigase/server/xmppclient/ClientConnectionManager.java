@@ -220,7 +220,7 @@ public class ClientConnectionManager
 	 *
 	 * @param serv
 	 *
-	 * @return a value of <code>Queue<Packet></code>
+	 * @return a value of {@code Queue<Packet>}
 	 */
 	@Override
 	public Queue<Packet> processSocketData(XMPPIOService<Object> serv) {
@@ -576,7 +576,7 @@ public class ClientConnectionManager
 	 *
 	 * @param params
 	 *
-	 * @return a value of <code>Map<String,Object></code>
+	 * @return a value of {@code Map<String,Object>}
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -1108,7 +1108,7 @@ public class ClientConnectionManager
 	 *
 	 *
 	 *
-	 * @return a value of <code>XMPPIOService<Object></code>
+	 * @return a value of {@code XMPPIOService<Object>}
 	 */
 	@Override
 	protected XMPPIOService<Object> getXMPPIOServiceInstance() {

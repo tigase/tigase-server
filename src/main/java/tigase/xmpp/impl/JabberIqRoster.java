@@ -298,7 +298,7 @@ public class JabberIqRoster
 	 * Method processes roster
 	 * <code>get</code> request related to dynamic roster. Generates output packet
 	 * with data from the DynamicRoster implementation for every
-	 * <em>item<em>element from processed packet or error otherwise.
+	 * <em>item</em>element from processed packet or error otherwise.
 	 *
 	 * @param packet   packet is which being processed.
 	 * @param session  user session which keeps all the user session data and also
@@ -337,7 +337,7 @@ public class JabberIqRoster
 	 * Method processes roster
 	 * <code>set</code> request related to dynamic roster. Sets extra data for
 	 * every
-	 * <em>item<em>element from processed packet with the DynamicRoster
+	 * <em>item</em>element from processed packet with the DynamicRoster
 	 * implementation and generates success packet or, in case of failure
 	 * generates error.
 	 *

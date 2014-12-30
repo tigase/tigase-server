@@ -13,13 +13,11 @@ import tigase.auth.XmppSaslException.SaslError;
 
 /**
  * SASL-ANONYMOUS mechanism.
- * 
- * <p>
+ * <br>
  * Called {@linkplain Callback callbacks} in order:
  * <ul>
  * <li>{@link NameCallback}</li>
  * </ul>
- * </p>
  */
 public class SaslANONYMOUS extends AbstractSasl {
 

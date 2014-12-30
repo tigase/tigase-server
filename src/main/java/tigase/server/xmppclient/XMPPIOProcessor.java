@@ -55,7 +55,6 @@ public interface XMPPIOProcessor {
 	 * @param service
 	 * @param packet
 	 * @return true if packet should not be forwarded
-	 * @throws IOException 
 	 */
 	boolean processIncoming(XMPPIOService service, Packet packet);
 	
@@ -66,7 +65,6 @@ public interface XMPPIOProcessor {
 	 * @param service
 	 * @param packet
 	 * @return true if packet should be removed
-	 * @throws IOException 
 	 */
 	boolean processOutgoing(XMPPIOService service, Packet packet);
 

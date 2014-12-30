@@ -28,10 +28,6 @@ import tigase.cluster.api.*;
 import tigase.vhosts.VHostManager;
 import tigase.xmpp.JID;
 
-/**
- *
- * @author Wojciech Kapcia <wojciech.kapcia@tigase.org>
- */
 public class VHostManagerClustered extends VHostManager implements ClusteredComponentIfc {
 
 	private static final Logger log = Logger.getLogger( VHostManagerClustered.class.getName() );

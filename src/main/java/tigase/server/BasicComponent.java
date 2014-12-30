@@ -455,7 +455,7 @@ public class BasicComponent
 	 *
 	 *
 	 *
-	 * @return a value of <code>Map<String,Object></code>
+	 * @return a value of {@code Map<String,Object>}
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -552,7 +552,7 @@ public class BasicComponent
 	 *
 	 *
 	 *
-	 * @return a value of <code>List<Element></code>
+	 * @return a value of {@code List<Element>}
 	 */
 	@Deprecated
 	public List<Element> getDiscoFeatures() {
@@ -567,7 +567,7 @@ public class BasicComponent
 	 *
 	 *
 	 *
-	 * @return a value of <code>List<Element></code>
+	 * @return a value of {@code List<Element>}
 	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
@@ -630,7 +630,7 @@ public class BasicComponent
 	 *
 	 *
 	 *
-	 * @return a value of <code>List<Element></code>
+	 * @return a value of {@code List<Element>}
 	 */
 	@Deprecated
 	public List<Element> getDiscoItems(String node, JID jid) {
@@ -647,7 +647,7 @@ public class BasicComponent
 	 *
 	 *
 	 *
-	 * @return a value of <code>List<Element></code>
+	 * @return a value of {@code List<Element>}
 	 */
 	@Override
 	public List<Element> getDiscoItems(String node, JID jid, JID from) {
@@ -769,7 +769,7 @@ public class BasicComponent
 	 *
 	 *
 	 *
-	 * @return a value of <code>List<Element></code>
+	 * @return a value of {@code List<Element>}
 	 */
 	public List<Element> getScriptItems(String node, JID jid, JID from) {
 		LinkedList<Element> result      = null;
@@ -1073,7 +1073,7 @@ public class BasicComponent
 	 *
 	 *
 	 *
-	 * @return a value of <code>Map<String,CommandIfc></code>
+	 * @return a value of {@code Map<String,CommandIfc>}
 	 */
 	protected Map<String, CommandIfc> getScriptCommands() {
 		return scriptCommands;

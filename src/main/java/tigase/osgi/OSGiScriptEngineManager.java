@@ -69,6 +69,7 @@ import org.osgi.framework.BundleContext;
  * might result in unexpected errors. Future versions may wrap the ScriptEngine with a OSGiScriptEngine to solve this
  * issue, but for the moment it is not needed.
  * </li>
+ * </ul>
  * 
  */
 public class OSGiScriptEngineManager extends ScriptEngineManager{

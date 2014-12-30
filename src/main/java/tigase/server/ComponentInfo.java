@@ -24,7 +24,7 @@ import tigase.xml.Element;
 /**
  * Helper class for storing and handling additional informations about components
  *
- * @author Wojciech Kapcia <wojciech.kapcia@tigase.org>
+ * @author Wojciech Kapcia
  */
 public class ComponentInfo {
 	private String name = null;

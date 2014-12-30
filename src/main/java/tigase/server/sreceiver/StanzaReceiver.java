@@ -99,8 +99,8 @@ import tigase.xmpp.StanzaType;
  * forums where you can post messages from Web site as well as from your Jabber
  * client.</li>
  * </ul>
- * <p>
- * <strong>Task creation parameters:</strong><br/>
+ * <br>
+ * <strong>Task creation parameters:</strong><br>
  * <ul>
  * <li><strong>Task short name</strong> - the nick name of the task which is
  * used to create Jabber ID for the task.</li>
@@ -135,10 +135,8 @@ import tigase.xmpp.StanzaType;
  * <code>owner</code>, <code>list</code></li>
  * </ul>
  * There can be also some per task specific settings...
- * </p>
- * <p>
+ * <br>
  * Created: Wed May 9 08:27:22 2007
- * </p>
  * 
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$

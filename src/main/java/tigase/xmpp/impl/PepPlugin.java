@@ -61,7 +61,7 @@ import java.util.Queue;
  *
  *
  * @version 5.0.0, 2010.03.01 at 03:12:30 GMT
- * @author Artur Hefczyc <artur.hefczyc@tigase.org>
+ * @author Artur Hefczyc
  */
 public class PepPlugin
 				extends XMPPProcessorAbstract {

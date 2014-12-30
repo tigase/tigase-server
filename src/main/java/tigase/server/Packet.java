@@ -43,9 +43,9 @@ import java.util.Set;
  * Objects of this class carry a single XMPP packet (stanza).
  * The XMPP stanza is carried as an XML element in DOM structure by the
  * Packet object which contains some extra information and convenience methods
- * to quickly access the most important stanza information.<p/>
+ * to quickly access the most important stanza information.<br>
  * The stanza is accessible directly through the <code>getElement()</code> method
- * and then it can be handles as an XML object. <br/>
+ * and then it can be handles as an XML object. <br>
  * <strong>Please note! Even though the <code>Packet</code> object and carried the
  * stanza <code>Element</code> is not unmodifiable it should be treated as such. This
  * particular <code>Packet</code> can be processed concurrently at the same time in
@@ -54,7 +54,7 @@ import java.util.Set;
  * update the object you should obtaina a copy of it using one of the utility methods:
  * <code>copyElementOnly()</code>, <code>swapFromTo(...)</code>,
  * <code>errorResult(...)</code>, <code>okResult(...)</code>,
- * <code>swapStanzaFromTo(...)</code></strong><p/>
+ * <code>swapStanzaFromTo(...)</code></strong><br>
  * There are no public constructors for the class, instead you have to use factory
  * methods: <code>packetInstance(...)</code> which return instance of one of the
  * classes: <code>Iq</code>, <code>Message</code> or <code>Presence</code>.
@@ -63,9 +63,9 @@ import java.util.Set;
  * <code>TigaseStringprepException</code> exception. You can avoid this by using
  * the methods which accept preparsed JIDs. Reusing preparsed JIDs is highly
  * recommended.
- * <p/>
+ * <br>
  * There are 3 kinds of addresses available from the <code>Packet</code> object:
- * <em>PacketFrom/To</em>, <em>StanzaFrom/To</em> and <em>From/To</em>.<br/>
+ * <em>PacketFrom/To</em>, <em>StanzaFrom/To</em> and <em>From/To</em>.<br>
  * <em>Stanza</em> addresses are the normal XMPP addresses parsed from the XML
  * stanza and as a convenience are available through methods as JID objects. This is
  * not only convenient to the developer but also this is important for performance
@@ -73,7 +73,7 @@ import java.util.Set;
  * operation so it is better to do it once and reuse the parsed objects. Please note
  * that any of them can be null. Note also. You should avoid parsing stanza JIDs
  * from the XML element in your code as this may impact the server performance.
- * Reuse the JIDs provided from the <code>Packet</code> methods.<br/>
+ * Reuse the JIDs provided from the <code>Packet</code> methods.<br>
  * <em>Packet</em> addresses are also JID objects but they may contain a different
  * values from the <em>Stanza</em> addresses. These are the Tigase internal
  * addresses used by the server and they usually contain Tigase component source
@@ -81,7 +81,7 @@ import java.util.Set;
  * and session managers and can be ignored by other code. One advantage of setting
  * <code>PacketFrom</code> address to address of your component
  * (<code>getComponentId()</code>) address is that if there is a packet delivery problem
- * it will be returned back to the sender with apropriate error message.<br/>
+ * it will be returned back to the sender with apropriate error message.<br>
  * <em>Simple From/To</em> addresses contains values following the logic: If
  * PacketFrom/To is not null then it contains PacketFrom/To values otherwise it
  * contains StanzaFrom/To values. This is because the Tigase server tries always
@@ -128,7 +128,7 @@ public class Packet {
 	 * the variable is set to 'false' to protect users' privacy and not reveal chat content.
 	 * This is the value to be used in all production/live systems. For the debug purposes
 	 * on the test or development system it can be set to 'true' to help diagnose run-time
-	 * problems.<p/>
+	 * problems.<br>
 	 * You can change value of the field by setting system property:
 	 * <code>'packet.debug.full'</code> to <code>'true'</code>.
 	 */
@@ -228,7 +228,7 @@ public class Packet {
 	 * element as an arguments, parses some the most commonly used data and created an
 	 * object.
 	 * Pre-parsed information are: stanza from/to addresses, stanza id, type and presets
-	 * the <code>Packet</code> priority.<p/>
+	 * the <code>Packet</code> priority.<br>
 	 * If there is a stringprep processing error for either the stanza source or destination
 	 * address <code>TigaseStringprepException</code> exception is thrown.
 	 * @param elem is a stanza XML <code>Element</code>
@@ -263,7 +263,7 @@ public class Packet {
 	 * element as an arguments and pre-parsed stanza from and to addresses. The method
 	 * parses some other, the most commonly used data and created an object.
 	 * Pre-parsed information are: stanza id, type and presets the <code>Packet</code>
-	 * priority.<p/>
+	 * priority.<br>
 	 * This method does not parses stanza from and stanza to address from the given XML
 	 * document, hence it does not throw <code>TigaseStringprepException</code>. Even
 	 * though reusing parsed from and to address is highly recommended an extra care
@@ -301,7 +301,7 @@ public class Packet {
 	 * The method creates XML stanza from given parameters and returns
 	 * <code>Packet</code> instance for this XML stanza.
 	 * More specifically it returns instance of one of the following classes:
-	 * <code>Iq</code>, <code>Message</code> or <code>Presence</code>. <p/>
+	 * <code>Iq</code>, <code>Message</code> or <code>Presence</code>. <br>
 	 * The method first builds an XML stanza from given parameters: element name,
 	 * from and to addresses and stanza type, then it creates a Packet instance for the
 	 * stanza. It also runs all the parsing and stringprep processing, hence it throws
@@ -329,7 +329,7 @@ public class Packet {
 	/**
 	 * <code>copyElementOnly</code> method creates a copy of the packet with stanza
 	 * information copied only. The <code>Packet</code> specific information stays
-	 * blank (NULL): (packetFrom, packetTo, etc...).<p/>
+	 * blank (NULL): (packetFrom, packetTo, etc...).<br>
 	 * This method should be used to obtain a copy of the packet without setting
 	 * packet specific fields (packetFrom or packetTo). The method reuses preparsed
 	 * stanza JIDs and does not throw any exception.
@@ -522,8 +522,8 @@ public class Packet {
 	}
 
 	/**
-	 * The method always returns NULL. It is overwritten in the <code>Iq</code> class
-	 * where it returns a command identifier if the <em>iq</code> stanza represnts an
+	 * The method always returns NULL. It is overwritten in the {@link Iq} class
+	 * where it returns a command identifier if the {@code iq} stanza represents an
 	 * ad-hoc command. It is provided here is a convenience so the developer does not
 	 * have to cast the packet to IQ before retrieving the command id.
 	 *
@@ -783,7 +783,7 @@ public class Packet {
 	 * Returns the packet internal source address.
 	 *
 	 *
-	 * @return a <code>JID>/code> instance of the packet internal source address or
+	 * @return a {@link JID} instance of the packet internal source address or
 	 * NULL if the packet internal source address has not been set
 	 */
 	public JID getPacketFrom() {
@@ -794,7 +794,7 @@ public class Packet {
 	 * Returns the packet internal destination address.
 	 *
 	 *
-	 * @return a <code>JID>/code> instance of the packet internal destination address or
+	 * @return a {@link JID} instance of the packet internal destination address or
 	 * NULL if the packet internal destination address has not been set.
 	 */
 	public JID getPacketTo() {
@@ -1019,10 +1019,10 @@ public class Packet {
 	 * That is, it checks whether the stanza element name and XMLNS is exactly
 	 * the same as given parameters.
 	 * This is a convenience method which logic is equal to the code below:
-	 * <pre>
+	 * {@code
 	 * return packet.getElement().getName() == name
 	 *             && packet.getElement().getXMLNS() == xmlns;
-	 * </pre>
+	 * }
 	 *
 	 * @param name is a <code>String</code> representing the XML element name.
 	 * @param xmlns is a <code>String</code> representing the XML xmlns value.
@@ -1386,7 +1386,7 @@ public class Packet {
 	 * destination addresses. Please note the new packet contains unchanged copy of the
 	 * original stanza. Stanza source and destination addresses are no swapped.
 	 *
-	 * @return a new <code>Packet>/code> instance.
+	 * @return a new {@link Packet} instance.
 	 */
 	public Packet swapFromTo() {
 		Element el    = elem.clone();

@@ -42,7 +42,7 @@ public class XmppSaslException extends SaslException {
 		 */
 		invalid_mechanism("invalid-mechanism"),
 		/**
-		 * The request is malformed (e.g., the <auth/> element includes initial
+		 * The request is malformed (e.g., the {@code <auth/>} element includes initial
 		 * response data but the mechanism does not allow that, or the data sent
 		 * violates the syntax for the specified SASL mechanism).
 		 */
@@ -84,6 +84,7 @@ public class XmppSaslException extends SaslException {
 
 	/**
 	 * 
+	 * @param saslError
 	 */
 	public XmppSaslException(SaslError saslError) {
 		super();
@@ -91,6 +92,8 @@ public class XmppSaslException extends SaslException {
 	}
 
 	/**
+	 *
+	 * @param saslError
 	 * @param detail
 	 */
 	public XmppSaslException(SaslError saslError, String detail) {
@@ -98,6 +101,10 @@ public class XmppSaslException extends SaslException {
 		this.saslError = saslError;
 	}
 
+	/**
+	 *
+	 * @return
+	 */
 	public String getSaslErrorElementName() {
 		return saslError == null ? null : saslError.getElementName();
 	}

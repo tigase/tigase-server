@@ -376,7 +376,7 @@ public class StatisticsCollector
 	 *
 	 *
 	 *
-	 * @return a value of <code>List<String></code>
+	 * @return a value of {@code List<String>}
 	 */
 	public List<String> getComponentsNames() {
 		return new ArrayList<String>(components.keySet());

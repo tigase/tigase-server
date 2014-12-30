@@ -33,7 +33,8 @@ import java.lang.annotation.RetentionPolicy; // NOPMD
  * something to do with annotated code. Additional parameters can provide
  * detailed information what exatcly is suposed to correct in code, how
  * important it is for project the time when it should be done and name of
- * developer to which correction is assigned.<br/>
+ * developer to which correction is assigned.
+ *
  * <code>TODO</code> annotation has a few properties which can be set to better
  * describe code to be changed like <code>note</code> - allows you to add some
  * description, <code>severity</code> - allows you to set severity level for
@@ -41,7 +42,7 @@ import java.lang.annotation.RetentionPolicy; // NOPMD
  * when code change should be ready to use and <code>assignedTo</code> - allows
  * you to set name of developer who should make the change to code. All this
  * properties has some default values so it is not necessary to set them all
- * every time you use <code>TODO</code> annotation.<br/>
+ * every time you use <code>TODO</code> annotation.<br>
  * Below you can find a few samples how to use <code>TODO</code> annotation:
  * <p>Sample of use all annotation with all possible properties:</p>
  * <pre>  @TODO(
@@ -88,7 +89,7 @@ public @interface TODO {
     /**
      * <code>IMPORTANT</code> severity means that this code does not block
      * implementation of any functionality but might be inefficient, insecure
-     * or contain some temporary solution.<br/>
+     * or contain some temporary solution.<br>
      * <code>IMPORTANT</code> severity can be also assigned to code which needs
      * some medium or major refactoring.
      */
@@ -96,7 +97,7 @@ public @interface TODO {
     /**
      * <code>TRIVIAL</code> severity means that this code works correctly and
      * is implemented according to design but there is still some minor
-     * improvement that can be done or just cleaning the code.<br/>
+     * improvement that can be done or just cleaning the code.<br>
      * <code>TRIVIAL</code> severity can be assigned also to code which needs
      * some minor refactoring.
      */
@@ -105,11 +106,11 @@ public @interface TODO {
      * <code>DOCUMENTATION</code> severity refers to code which should be
      * documented. It does not refer to API documentation. It refers to in-line
      * documentation which should be added due to complicity of some code or
-     * unusual algorithm used.<br/>
+     * unusual algorithm used.<br>
      * Usually I try to avoid "smart" code but in certain cases it is required
      * to use code which might be difficult to understand. In all such cases
      * code should be detaily documented. This annotation can help to remind
-     * what parts of code needs more documentation.<br/>
+     * what parts of code needs more documentation.<br>
      * This annotation should be also added by other developer who is not owner
      * of some part of code but tried to read it and found it difficult to
      * understand. In such case it is recommended that this developers should
@@ -122,21 +123,25 @@ public @interface TODO {
   /**
    * <code>severity</code> property allows you to set and retrieve severity of
    * expected code change described by this <code>TODO</code> annotation.
+	 * @return
    */
   Severity severity() default Severity.IMPORTANT;
   /**
    * <code>note</code> property allows you to set and retrieve description
    * text for expected code change.
+	 * @return
    */
   String note() default "Functionality not fully implemented.";
   /**
    * <code>timeLine</code> property allows you to set and retrieve expected
    * time by when the change should be done to this code.
+	 * @return
    */
   String timeLine() default "2004/12/31";
   /**
    * <code>assignedTo</code> property allows you to assign developer for the code
    * change described by this annotation.
+	 * @return
    */
   String assignedTo() default "Artur Hefczyc";
 

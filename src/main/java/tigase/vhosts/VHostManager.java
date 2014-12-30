@@ -180,7 +180,7 @@ public class VHostManager
 	 *
 	 *
 	 *
-	 * @return a value of <code>List<JID></code>
+	 * @return a value of {@code List<JID>}
 	 */
 	@Override
 	public List<JID> getAllVHosts() {
@@ -299,7 +299,7 @@ public class VHostManager
 	 *
 	 *
 	 *
-	 * @return a value of <code>Map<String,Object></code>
+	 * @return a value of {@code Map<String,Object>}
 	 */
 	@Override
 	@SuppressWarnings({ "unchecked" })

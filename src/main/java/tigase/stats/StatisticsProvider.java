@@ -114,7 +114,7 @@ public class StatisticsProvider
 	 * Operation exposed for management
 	 *
 	 * @param level
-	 * @return java.util.Map<String, String>
+	 * @return {@code java.util.Map<String, String>}
 	 */
 	@Override
 	public Map<String, String> getAllStats(int level) {
@@ -309,7 +309,7 @@ public class StatisticsProvider
 	 *
 	 *
 	 *
-	 * @return a value of <code>List<String></code>
+	 * @return a value of {@code List<String>}
 	 */
 	@Override
 	public List<String> getComponentsNames() {
@@ -321,7 +321,7 @@ public class StatisticsProvider
 	 *
 	 * @param compName
 	 * @param level
-	 * @return java.util.Map<String, String>
+	 * @return {@code java.util.Map<String, String>}
 	 */
 	@Override
 	public Map<String, String> getComponentStats(String compName, int level) {
@@ -437,7 +437,7 @@ public class StatisticsProvider
 	 *
 	 * @param statsKeys is a <code>String[]</code>
 	 *
-	 * @return a value of <code>Map<String,Object></code>
+	 * @return a value of {@code Map<String,Object>}
 	 */
 	public Map<String, Object> getCurStats(String[] statsKeys) {
 		Map<String, Object> result = new LinkedHashMap<String, Object>();
@@ -863,7 +863,7 @@ public class StatisticsProvider
 	 *
 	 * @param statsKeys is a <code>String[]</code>
 	 *
-	 * @return a value of <code>Map<String,LinkedList<Object>></code>
+	 * @return a value of {@code Map<String,LinkedList<Object>>}
 	 */
 	public Map<String, LinkedList<Object>> getStatsHistory(String[] statsKeys) {
 		log.log(Level.INFO, "Generating history for metrics: {0}", Arrays.toString(

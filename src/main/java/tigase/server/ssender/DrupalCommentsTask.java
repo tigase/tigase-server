@@ -58,7 +58,7 @@ import java.util.logging.Logger;
  * Then it can sends this to one selected JID. Thus it should be used toghether
  * with StanzaReceiver task which can distribute this informatin to all interested
  * (subscribed) users.
- * <p>
+ * <br>
  * You have to specify destination JID where comments have to be sent.
  * It is not very useful to
  * send post to just one person so to ditribute forum posts to biger number of
@@ -66,10 +66,9 @@ import java.util.logging.Logger;
  * can distribute it to all interested users.
  * Sample connection string:
  * <pre>jdbc:mysql://localhost/tigasedb?user=tigase&amp;password=pass&amp;id=nick@domain.com</pre>
- * </p>
- * <p>
+ * <br>
  * Created: Fri Apr 20 12:10:55 2007
- * </p>
+ * <br>
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */

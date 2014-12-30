@@ -400,7 +400,7 @@ public class S2SConnectionManager
 	 *
 	 *
 	 *
-	 * @return a value of <code>Queue<Packet></code>
+	 * @return a value of {@code Queue<Packet>}
 	 */
 	@Override
 	public Queue<Packet> processSocketData(S2SIOService serv) {
@@ -749,7 +749,7 @@ public class S2SConnectionManager
 	 *
 	 *
 	 *
-	 * @return a value of <code>Map<String,Object></code>
+	 * @return a value of {@code Map<String,Object>}
 	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -902,7 +902,7 @@ public class S2SConnectionManager
 	 * @param serv
 	 *
 	 *
-	 * @return a value of <code>List<Element></code>
+	 * @return a value of {@code List<Element>}
 	 */
 	@Override
 	public List<Element> getStreamFeatures(S2SIOService serv) {

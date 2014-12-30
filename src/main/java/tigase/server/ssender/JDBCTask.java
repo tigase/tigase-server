@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 /**
  * <code>JDBCTask</code> implements tasks for cyclic retrieving stanzas from
  * database and sending them to the StanzaHandler object.
- * <p>
+ * <br>
  * Database table format:
  * <ul>
  * <li><b>id</b> - numerical unique record indetifier.</li>
@@ -47,15 +47,13 @@ import java.util.logging.Logger;
  * valid XML data with XMPP stanza to send. No other data are allowed in this
  * table. All stanzas must be complete including correct <em>"from"</em>
  * and <em>"to"</em> attriutes.
- * </p>
- * <p>
+ * <br>
  * By default it looks for stanzas in <code>xmpp_stanza</code> table but you can
  * specify different table name in connection string. Sample connection string:
  * <pre>jdbc:mysql://localhost/tigasedb?user=tigase&amp;password=pass&amp;table=xmpp_stanza</pre>
- * </p>
- * <p>
+ * <br>
  * Created: Fri Apr 20 12:10:55 2007
- * </p>
+ * <br>
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
