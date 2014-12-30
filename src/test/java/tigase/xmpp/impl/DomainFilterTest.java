@@ -22,17 +22,14 @@ import tigase.db.AuthRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
 import tigase.db.xml.XMLRepository;
-
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManagerHandler;
-
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPSession;
-
 import tigase.util.LogFormatter;
 import tigase.util.TigaseStringprepException;
 import tigase.vhosts.DomainFilterPolicy;
@@ -487,6 +484,10 @@ public class DomainFilterTest {
 		@Override
 		public boolean isLocalDomain( String domain, boolean includeComponents ) {
 			return !domain.contains( "-ext" );
+		}
+
+		@Override
+		public void handleDomainChange(String domain, XMPPResourceConnection conn) {
 		}
 	}
 

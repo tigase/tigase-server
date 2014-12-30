@@ -3321,6 +3321,25 @@ public class SessionManager
 					"Not supported yet.");    // To change body of generated methods, choose Tools | Templates.
 		}
 	}
+
+
+	@Override
+	public void handleDomainChange(final String domain, final XMPPResourceConnection conn) {
+		try {
+			VHostItem vHostItem = getVHostItem(domain);
+			if (vHostItem == null) {
+				if (log.isLoggable(Level.INFO)) {
+					log.log(Level.INFO, "Can't get VHostItem for domain: {0}, using default one instead: {1}", new Object[] {
+							domain, getDefHostName() });
+				}
+				vHostItem = new VHostItem(getDefHostName().getDomain());
+			}
+			conn.setDomain(vHostItem.getUnmodifiableVHostItem());
+		} catch (TigaseStringprepException ex) {
+			log.log(Level.INFO, "Stringprep problem for resource connection: {0}", conn);
+			// handleLogout(userId, conn);
+		}
+	}
 }
 
 

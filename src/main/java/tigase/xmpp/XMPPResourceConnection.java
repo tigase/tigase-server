@@ -31,12 +31,17 @@ import tigase.db.AuthRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
 import tigase.server.Presence;
+import tigase.server.XMPPServer;
+import tigase.server.xmppsession.SessionManager;
 import tigase.server.xmppsession.SessionManagerHandler;
 import tigase.util.TigaseStringprepException;
 import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
 
 //~--- JDK imports ------------------------------------------------------------
+
+
+
 
 
 
@@ -162,11 +167,32 @@ public class XMPPResourceConnection
 	 *
 	 * @param jid
 	 * @param anonymous
+	 * @throws TigaseStringprepException 
 	 */
-	public void authorizeJID(BareJID jid, boolean anonymous) {
-		authState    = Authorization.AUTHORIZED;
+	public void authorizeJID(BareJID jid, boolean anonymous) throws TigaseStringprepException {
+		authState = Authorization.AUTHORIZED;
 		is_anonymous = anonymous;
+		if (jid != null && getDomain().getVhost() != null && !jid.getDomain().equals(getDomain().getVhost().getDomain())) {
+			loginHandler.handleDomainChange(jid.getDomain(), this);
+		}
 		loginHandler.handleLogin(jid, this);
+//		if (jid != null && getDomain().getVhost() != null && !jid.getDomain().equals(getDomain().getVhost().getDomain())) {
+//			if (log.isLoggable(Level.INFO)) {
+//				log.log(Level.INFO, "Replacing session VHost: {0} instead of {1}", new Object[] { jid.getDomain(),
+//						getDomain().getVhost().getDomain() });
+//			}
+//			this.userJid = JID.jidInstanceNS(jid.getLocalpart(), jid.getDomain(), this.userJid.getResource());
+//			SessionManager sessMan = (SessionManager) XMPPServer.getConfigurator().getComponent("sess-man");
+//			VHostItem vHostItem = sessMan.getVHostItem(this.userJid.getDomain());
+//			if (vHostItem == null) {
+//				if (log.isLoggable(Level.INFO)) {
+//					log.log(Level.INFO, "Can't get VHostItem for domain: {0}, using default one instead: {1}", new Object[] {
+//							domain, sessMan.getDefHostName() });
+//				}
+//				vHostItem = new VHostItem(sessMan.getDefHostName().getDomain());
+//			}
+//			setDomain(vHostItem.getUnmodifiableVHostItem());
+//		}
 		login();
 	}
 

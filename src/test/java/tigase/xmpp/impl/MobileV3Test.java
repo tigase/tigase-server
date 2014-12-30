@@ -28,9 +28,12 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import junit.framework.TestCase;
+
 import org.junit.Assert;
 import org.junit.Test;
+
 import tigase.db.TigaseDBException;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManagerHandler;
@@ -355,6 +358,10 @@ public class MobileV3Test extends TestCase {
 		@Override
 		public boolean isLocalDomain(String domain, boolean includeComponents) {
 			return true;
+		}
+
+		@Override
+		public void handleDomainChange(String domain, XMPPResourceConnection conn) {
 		}
 	}
 	

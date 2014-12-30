@@ -43,6 +43,8 @@ public interface SessionManagerHandler {
 	JID getComponentId();
 
 	void handleLogin(BareJID userId, XMPPResourceConnection conn);
+	
+	void handleDomainChange(String domain,XMPPResourceConnection conn);
 
 	void handleLogout(BareJID userId, XMPPResourceConnection conn);
 
