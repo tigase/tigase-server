@@ -146,16 +146,6 @@ public class MessageRouter
 		receivers.put(receiver.getName(), receiver);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int hashCodeForPacket(Packet packet) {
 
@@ -198,54 +188,18 @@ public class MessageRouter
 		return 1;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int processingInThreads() {
 		return Runtime.getRuntime().availableProcessors() * 4;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int processingOutThreads() {
 		return 1;
 	}
 
 	// ~--- methods --------------------------------------------------------------
-	// private String isToLocalComponent(String jid) {
-	// String nick = JIDUtils.getNodeNick(jid);
-	// if (nick == null) {
-	// return null;
-	// }
-	// String host = JIDUtils.getNodeHost(jid);
-	// if (isLocalDomain(host) && components.get(nick) != null) {
-	// return nick;
-	// }
-	// return null;
-	// }
-	// private boolean isLocalDomain(String domain) {
-	// return localAddresses.contains(domain);
-	// }
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
 	@Override
 	public void processPacket(Packet packet) {
 
@@ -543,19 +497,11 @@ public class MessageRouter
 		removeComponent(receiver);
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
 	@Override
 	public void start() {
 		super.start();
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
 	@Override
 	public void stop() {
 		Set<String> comp_names = new TreeSet<String>();
@@ -573,16 +519,6 @@ public class MessageRouter
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 *
-	 *
-	 * @return a value of {@code Map<String,Object>}
-	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defs = super.getDefaults(params);
@@ -592,27 +528,11 @@ public class MessageRouter
 		return defs;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getDiscoCategoryType() {
 		return "im";
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getDiscoDescription() {
 		return disco_name + (disco_show_version
@@ -620,16 +540,6 @@ public class MessageRouter
 				: "");
 	}
 
-	// public List<Element> getDiscoItems(String node, String jid) {
-	// return null;
-	// }
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 */
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
@@ -686,13 +596,6 @@ public class MessageRouter
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param config
-	 * @throws tigase.conf.ConfigurationException
-	 */
 	@Override
 	public void setConfig(ConfiguratorAbstract config) throws ConfigurationException {
 		components.put(getName(), this);
@@ -700,12 +603,6 @@ public class MessageRouter
 		addRegistrator(config);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param props
-	 */
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		if (inProperties) {
@@ -881,16 +778,6 @@ public class MessageRouter
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param def
-	 *
-	 *
-	 *
-	 * @return a value of <code>Integer</code>
-	 */
 	@Override
 	protected Integer getMaxQueueSize(int def) {
 		return def * 10;

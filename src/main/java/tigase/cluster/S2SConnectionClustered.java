@@ -24,37 +24,21 @@
 
 package tigase.cluster;
 
-//~--- non-JDK imports --------------------------------------------------------
-
-import tigase.cluster.api.ClusterCommandException;
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
-import tigase.cluster.api.CommandListener;
-import tigase.cluster.api.CommandListenerAbstract;
 
-import tigase.server.xmppserver.CID;
 import tigase.server.xmppserver.S2SConnectionManager;
-
-import tigase.xml.Element;
 
 import tigase.xmpp.JID;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.logging.Level;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
 
 /**
  * Created: Jun 27, 2010 10:33:51 AM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
  */
 public class S2SConnectionClustered
 				extends S2SConnectionManager
@@ -67,9 +51,6 @@ public class S2SConnectionClustered
 	private static final String KEY_CID                 = "key-cid";
 	private static final String KEY_P                   = "key";
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(S2SConnectionClustered.class
 			.getName());
 
@@ -82,26 +63,11 @@ public class S2SConnectionClustered
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method is called on cluster node connection event. This is a
-	 * notification to the component that a new cluster node has connected.
-	 *
-	 * @param node
-	 *          is a hostname of a cluster node generating the event.
-	 */
 	@Override
 	public void nodeConnected(String node) {
 		cl_nodes_array.add(JID.jidInstanceNS(getName(), node, null));
 	}
 
-	/**
-	 * Method is called on cluster node disconnection event. This is a
-	 * notification to the component that there was network connection lost to one
-	 * of the cluster nodes.
-	 *
-	 * @param node
-	 *          is a hostname of a cluster node generating the event.
-	 */
 	@Override
 	public void nodeDisconnected(String node) {
 		cl_nodes_array.remove(JID.jidInstanceNS(getName(), node, null));
@@ -109,14 +75,6 @@ public class S2SConnectionClustered
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getDiscoDescription() {
 		return super.getDiscoDescription() + " clustered";
@@ -124,26 +82,15 @@ public class S2SConnectionClustered
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Set's the configures the cluster controller object for cluster
-	 * communication and API.
-	 *
-	 * @param cl_controller
-	 */
 	@Override
 	public void setClusterController(ClusterControllerIfc cl_controller) {
 		clusterController = cl_controller;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
-	 * Method description
+	 * Returns JID of first cluster node that doesn't match name of the component
 	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>JID</code>
+	 * @return a node ID as  <code>JID</code>
 	 */
 	protected JID getFirstClusterNode() {
 		JID cluster_node = null;
@@ -155,11 +102,6 @@ public class S2SConnectionClustered
 				break;
 			}
 		}
-
 		return cluster_node;
 	}
-
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/10/15

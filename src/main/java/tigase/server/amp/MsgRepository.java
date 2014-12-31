@@ -148,13 +148,6 @@ public abstract class MsgRepository<T> implements MsgRepositoryIfc {
 		}
 	}
 	
-	/**
-	 * Method description
-	 * 
-	 * @param time
-	 * @param delete
-	 * 
-	 */
 	@Override
 	public Element getMessageExpired(long time, boolean delete) {
 		if (expiredQueue.size() == 0) {
@@ -223,12 +216,6 @@ public abstract class MsgRepository<T> implements MsgRepositoryIfc {
 
 		// ~--- methods ------------------------------------------------------------
 
-		/**
-		 * Method description
-		 * 
-		 * @param o
-		 * 
-		 */
 		@Override
 		public int compareTo(Delayed o) {
 			return (int) (getDelay(TimeUnit.NANOSECONDS) - o.getDelay(TimeUnit.NANOSECONDS));
@@ -236,12 +223,6 @@ public abstract class MsgRepository<T> implements MsgRepositoryIfc {
 
 		// ~--- get methods --------------------------------------------------------
 
-		/**
-		 * Method description
-		 * 
-		 * @param unit
-		 * 
-		 */
 		@Override
 		public long getDelay(TimeUnit unit) {
 			return unit.convert(expired.getTime() - System.currentTimeMillis(),

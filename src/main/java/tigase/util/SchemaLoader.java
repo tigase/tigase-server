@@ -37,11 +37,41 @@ public abstract class SchemaLoader {
 		return new DBSchemaLoader(props);
 	}
 	
+	/**
+	 * Method validates whether the connection can at least be established. If yes
+	 * then appropriate flag is set.
+	 *
+	 * @param variables set of {@code Properties} with all configuration options
+	 */
 	public abstract Result validateDBConnection( Properties variables );
+
+	/**
+	 * Method, if the connection is validated by {@code validateDBConnection},
+	 * checks whether desired database exists. If not it creates such database
+	 * using {@code *-installer-create-db.sql} schema file substituting it's
+	 * variables with ones provided.
+	 *
+	 * @param variables set of {@code Properties} with all configuration options
+	 */
 	public abstract Result validateDBExists( Properties variables );
 	public abstract Result validateDBSchema( Properties variables );
 	public abstract Result postInstallation( Properties variables );
+
+	/**
+	 * Method attempts to add XMPP admin user account to the database using
+	 * {@code AuthRepository}.
+	 *
+	 * @param variables set of {@code Properties} with all configuration options
+	 */
 	public abstract Result addXmppAdminAccount( Properties variables );
+
+	/**
+	 * Method checks whether the connection to the database is possible and that
+	 * database of specified name exists. If yes then a schema file from
+	 * properties is loaded.
+	 *
+	 * @param variables set of {@code Properties} with all configuration options
+	 */
 	public abstract Result loadSchemaFile( Properties variables );
 	public abstract Result shutdown( Properties variables );
 }

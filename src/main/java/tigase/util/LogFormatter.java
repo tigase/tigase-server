@@ -65,14 +65,6 @@ public class LogFormatter
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param record
-	 *
-	 * 
-	 */
 	@Override
 	public synchronized String format(LogRecord record) {
 		StringBuilder sb = new StringBuilder(200);

@@ -318,12 +318,6 @@ public class RosterElement
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String toString() {
 		return getRosterItem().toString();

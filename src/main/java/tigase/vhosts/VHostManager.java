@@ -105,23 +105,11 @@ public class VHostManager
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 */
 	@Override
 	public void addComponentDomain(String domain) {
 		registeredComponentDomains.add(domain);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param component
-	 */
 	@Override
 	public void componentAdded(VHostListener component) {
 		component.setVHostManager(this);
@@ -136,12 +124,6 @@ public class VHostManager
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param component
-	 */
 	@Override
 	public void componentRemoved(VHostListener component) {
 		localDomainsHandlers.remove(component);
@@ -149,24 +131,12 @@ public class VHostManager
 		nameSubdomainsHandlers.remove(component);
 	}
 
-	/**
-	 * Initialize a mapping of key/value pairs which can be used in scripts
-	 * loaded by the server
-	 *
-	 * @param binds A mapping of key/value pairs, all of whose keys are Strings.
-	 */
 	@Override
 	public void initBindings(Bindings binds) {
 		super.initBindings(binds);
 		binds.put(ComponentRepository.COMP_REPO_BIND, repo);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 */
 	@Override
 	public void removeComponentDomain(String domain) {
 		registeredComponentDomains.remove(domain);
@@ -174,14 +144,6 @@ public class VHostManager
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of {@code List<JID>}
-	 */
 	@Override
 	public List<JID> getAllVHosts() {
 		List<JID> list = new ArrayList<JID>();
@@ -197,16 +159,6 @@ public class VHostManager
 		return list;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 *
-	 *
-	 *
-	 * @return a value of <code>ServerComponent[]</code>
-	 */
 	@Override
 	public ServerComponent[] getComponentsForLocalDomain(String domain) {
 		++getComponentsForLocalDomainCalls;
@@ -268,16 +220,6 @@ public class VHostManager
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 *
-	 *
-	 *
-	 * @return a value of <code>ServerComponent[]</code>
-	 */
 	@Override
 	public ServerComponent[] getComponentsForNonLocalDomain(String domain) {
 		++getComponentsForNonLocalDomainCalls;
@@ -291,16 +233,6 @@ public class VHostManager
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 *
-	 *
-	 * @return a value of {@code Map<String,Object>}
-	 */
 	@Override
 	@SuppressWarnings({ "unchecked" })
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -324,14 +256,6 @@ public class VHostManager
 		return defs;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>BareJID</code>
-	 */
 	@Override
 	public BareJID getDefVHostItem() {
 		Iterator<VHostItem> vhosts = repo.iterator();
@@ -343,38 +267,16 @@ public class VHostManager
 		return getDefHostName();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getDiscoCategoryType() {
 		return identity_type;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getDiscoDescription() {
 		return "VHost Manager";
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 */
 	@Override
 	public void getStatistics(StatisticsList list) {
 		list.add(getName(), "Number of VHosts", repo.size(), Level.FINE);
@@ -387,16 +289,6 @@ public class VHostManager
 				getComponentsForNonLocalDomainCalls, Level.FINER);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 *
-	 *
-	 *
-	 * @return a value of <code>VHostItem</code>
-	 */
 	@Override
 	public VHostItem getVHostItem(String domain) {
 		return repo.getItem(domain);
@@ -420,16 +312,6 @@ public class VHostManager
 		return item;
 	}
 	
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean isAnonymousEnabled(String domain) {
 		++isAnonymousEnabledCalls;
@@ -443,31 +325,11 @@ public class VHostManager
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param component
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean isCorrectType(ServerComponent component) {
 		return component instanceof VHostListener;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean isLocalDomain(String domain) {
 		++isLocalDomainCalls;
@@ -475,16 +337,6 @@ public class VHostManager
 		return repo.contains(domain);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean isLocalDomainOrComponent(String domain) {
 		boolean result = isLocalDomain(domain);
@@ -510,24 +362,11 @@ public class VHostManager
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param name
-	 */
 	@Override
 	public void setName(String name) {
 		super.setName(name);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param properties
-	 * @throws tigase.conf.ConfigurationException
-	 */
 	@Override
 	@SuppressWarnings({ "unchecked" })
 	public void setProperties(Map<String, Object> properties) throws ConfigurationException {

@@ -126,14 +126,6 @@ public class CompRepoItem
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
 	@Override
 	public void addCommandFields(Packet packet) {
 		Command.addFieldValue(packet, DOMAIN_NAME_LABEL, ((domain != null)
@@ -211,23 +203,11 @@ public class CompRepoItem
 		return domain;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getElemName() {
 		return REPO_ITEM_ELEM_NAME;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getKey() {
 		return domain;
@@ -275,14 +255,6 @@ public class CompRepoItem
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
 	@Override
 	public void initFromCommand(Packet packet) {
 		super.initFromCommand(packet);
@@ -360,12 +332,6 @@ public class CompRepoItem
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param elem
-	 */
 	@Override
 	public void initFromElement(Element elem) {
 		if (elem.getName() != REPO_ITEM_ELEM_NAME) {
@@ -400,12 +366,6 @@ public class CompRepoItem
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param propString
-	 */
 	@Override
 	public void initFromPropertyString(String propString) {
 		String[] props = propString.split(":");
@@ -450,14 +410,6 @@ public class CompRepoItem
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public Element toElement() {
 		Element elem = super.toElement();
@@ -487,32 +439,18 @@ public class CompRepoItem
 		return elem;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String toPropertyString() {
 		return domain + ":" + auth_pass + ":" + type.name() + ":" + port + ":" + remoteHost +
 					 ":" + prop_xmlns + ":" + lb.getClass().getName();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String toString() {
 		return toPropertyString();
 	}
 
 	//~--- set methods ----------------------------------------------------------
-
-	// ~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description

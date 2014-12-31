@@ -169,12 +169,6 @@ public abstract class ConfiguratorAbstract
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param component
-	 */
 	@Override
 	public void componentAdded(Configurable component) throws ConfigurationException {
 		if (log.isLoggable(Level.CONFIG)) {
@@ -183,12 +177,6 @@ public abstract class ConfiguratorAbstract
 		setup(component);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param component
-	 */
 	@Override
 	public void componentRemoved(Configurable component) {}
 
@@ -267,12 +255,6 @@ public abstract class ConfiguratorAbstract
 		}
 	}
 
-	/**
-	 * Initialize a mapping of key/value pairs which can be used in scripts
-	 * loaded by the server
-	 *
-	 * @param binds A mapping of key/value pairs, all of whose keys are Strings.
-	 */
 	@Override
 	public void initBindings(Bindings binds) {
 		super.initBindings(binds);
@@ -280,10 +262,6 @@ public abstract class ConfiguratorAbstract
 		binds.put(INIT_PROPERTIES_MAP_BIND, initProperties);
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
 	@Override
 	public void initializationCompleted() {
 		if (isInitializationComplete()) {
@@ -304,12 +282,6 @@ public abstract class ConfiguratorAbstract
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param item
-	 */
 	@Override
 	public void itemAdded(ConfigItem item) {
 
@@ -318,12 +290,6 @@ public abstract class ConfiguratorAbstract
 		// log.log(Level.INFO, "Adding configuration item not supported yet: {0}", item);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param item
-	 */
 	@Override
 	public void itemRemoved(ConfigItem item) {
 
@@ -332,12 +298,6 @@ public abstract class ConfiguratorAbstract
 		log.log(Level.INFO, "Removing configuration item not supported yet: {0}", item);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param item
-	 */
 	@Override
 	public void itemUpdated(ConfigItem item) {
 		log.log(Level.INFO, "Updating configuration item: {0}", item);
@@ -585,13 +545,6 @@ public abstract class ConfiguratorAbstract
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Returns default configuration settings in case if there is no configuration
-	 * file.
-	 *
-	 * @param params
-	 * 
-	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defaults = super.getDefaults(params);
@@ -802,14 +755,6 @@ public abstract class ConfiguratorAbstract
 		return configRepo.getProperties(nodeId);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param component
-	 *
-	 * 
-	 */
 	@Override
 	public boolean isCorrectType(ServerComponent component) {
 		return component instanceof Configurable;
@@ -817,12 +762,6 @@ public abstract class ConfiguratorAbstract
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Sets all configuration properties for object.
-	 *
-	 * @param props
-	 * @throws tigase.conf.ConfigurationException
-	 */
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		if (props.size() == 0) {

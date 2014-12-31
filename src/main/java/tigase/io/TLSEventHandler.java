@@ -31,7 +31,6 @@ package tigase.io;
  * Created: Wed Feb  7 23:20:14 2007
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
  */
 public interface TLSEventHandler {
 	void handshakeCompleted(TLSWrapper wrapper);

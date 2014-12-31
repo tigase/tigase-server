@@ -36,7 +36,6 @@ import tigase.xmpp.BareJID;
  * Created: Oct 24, 2009 3:55:41 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
  */
 public class CompDBRepository extends UserRepoRepository<CompRepoItem> {
 
@@ -45,56 +44,26 @@ public class CompDBRepository extends UserRepoRepository<CompRepoItem> {
 		// Nothing to destroy here
 	}
 	
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getConfigKey() {
 		return CompRepoDefaults.getConfigKey();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String[] getDefaultPropetyItems() {
 		return CompRepoDefaults.getDefaultPropetyItems();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public CompRepoItem getItemInstance() {
 		return CompRepoDefaults.getItemInstance();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getPropertyKey() {
 		return CompRepoDefaults.getPropertyKey();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public BareJID getRepoUser() {
 		return CompRepoDefaults.getRepoUser();
@@ -106,9 +75,3 @@ public class CompDBRepository extends UserRepoRepository<CompRepoItem> {
 	}
 
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

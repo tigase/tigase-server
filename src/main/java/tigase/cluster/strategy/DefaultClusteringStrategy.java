@@ -125,13 +125,6 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param conn
-	 */
 	@Override
 	public void handleLocalPacket(Packet packet, XMPPResourceConnection conn) {
 		if (packet.getElemName() == Presence.ELEM_NAME) {
@@ -169,12 +162,6 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 		super.handleLocalPacket(packet, conn);
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param conn 
-	 */	
 	@Override
 	public void handleLocalResourceBind(XMPPResourceConnection conn) {
 		try {
@@ -189,13 +176,6 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 		}
 	}	
 	
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param userId
-	 * @param conn
-	 */
 	@Override
 	public void handleLocalUserLogout(BareJID userId, XMPPResourceConnection conn) {
 		try {
@@ -430,23 +410,6 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 
 		//~--- methods ------------------------------------------------------------
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see tigase.cluster.api.CommandListener#executeCommand(java.util.Map)
-		 */
-
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param fromNode is a <code>JID</code>
-		 * @param visitedNodes is a <code>Set<JID></code>
-		 * @param data is a <code>Map<String,String></code>
-		 * @param packets is a <code>Queue<Element></code>
-		 *
-		 * @throws ClusterCommandException
-		 */
 		@Override
 		public void executeCommand(JID fromNode, Set<JID> visitedNodes, Map<String,
 				String> data, Queue<Element> packets)
@@ -515,23 +478,6 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 
 		//~--- methods ------------------------------------------------------------
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see tigase.cluster.api.CommandListener#executeCommand(java.util.Map)
-		 */
-
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param fromNode is a <code>JID</code>
-		 * @param visitedNodes is a <code>Set<JID></code>
-		 * @param data is a <code>Map<String,String></code>
-		 * @param packets is a <code>Queue<Element></code>
-		 *
-		 * @throws ClusterCommandException
-		 */
 		@Override
 		public void executeCommand(JID fromNode, Set<JID> visitedNodes, Map<String,
 				String> data, Queue<Element> packets)

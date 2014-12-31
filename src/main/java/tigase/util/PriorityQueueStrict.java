@@ -70,13 +70,6 @@ public class PriorityQueueStrict<E> extends PriorityQueueAbstract<E> {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param maxPriority
-	 * @param maxSize
-	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public final void init(int maxPriority, int maxSize) {
@@ -93,15 +86,6 @@ public class PriorityQueueStrict<E> extends PriorityQueueAbstract<E> {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param element
-	 * @param priority
-	 *
-	 * 
-	 */
 	@Override
 	public boolean offer(E element, int priority) {
 		try {
@@ -117,15 +101,6 @@ public class PriorityQueueStrict<E> extends PriorityQueueAbstract<E> {
 
 	// public void put(E element, int priority, String owner) throws InterruptedException {
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param element
-	 * @param priority
-	 *
-	 * @throws InterruptedException
-	 */
 	@Override
 	public void put(E element, int priority) throws InterruptedException {
 
@@ -135,12 +110,6 @@ public class PriorityQueueStrict<E> extends PriorityQueueAbstract<E> {
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param maxSize
-	 */
 	@Override
 	public void setMaxSize(int maxSize) {
 		for (int i = 0; i < qs.length; i++) {
@@ -157,12 +126,6 @@ public class PriorityQueueStrict<E> extends PriorityQueueAbstract<E> {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public int[] size() {
 		int[] result = new int[qs.length];
@@ -174,16 +137,6 @@ public class PriorityQueueStrict<E> extends PriorityQueueAbstract<E> {
 		return result;
 	}
 
-	// public E take(String owner) throws InterruptedException {
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 *
-	 * @throws InterruptedException
-	 */
 	@Override
 	public E take() throws InterruptedException {
 		E e = null;
@@ -222,12 +175,6 @@ public class PriorityQueueStrict<E> extends PriorityQueueAbstract<E> {
 		return e;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public int totalSize() {
 		int result = 0;

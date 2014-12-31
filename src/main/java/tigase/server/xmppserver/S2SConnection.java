@@ -83,14 +83,6 @@ public class S2SConnection implements Comparable<S2SConnection> {
 		waitingControlPackets.add(packet);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param o
-	 *
-	 * 
-	 */
 	@Override
 	public int compareTo(S2SConnection o) {
 		return hashCode() - o.hashCode();
@@ -184,20 +176,8 @@ public class S2SConnection implements Comparable<S2SConnection> {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String toString() {
 		return "S2S: " + service;
 	}
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

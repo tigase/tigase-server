@@ -50,16 +50,6 @@ public class StreamError extends S2SAbstractProcessor {
 		return Order.StreamError.ordinal();
 	}
 	
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param p
-	 * @param serv
-	 * @param results
-	 *
-	 * 
-	 */
 	@Override
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
 		if (p.getElemName() == "error") {
@@ -71,9 +61,3 @@ public class StreamError extends S2SAbstractProcessor {
 		}
 	}
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

@@ -72,29 +72,11 @@ public class Jingle
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String id() {
 		return ID;
 	}
 
-	// Implementation of tigase.xmpp.XMPPProcessorIfc
-
-	/**
-	 * Describe <code>process</code> method here.
-	 *
-	 * @param packet a <code>Packet</code> value
-	 * @param conn a <code>XMPPResourceConnection</code> value
-	 * @param nonAuthUserRepo a <code>NonAuthUserRepository</code> value
-	 * @param results a <code>Queue</code> value
-	 * @param settings
-	 * @throws XMPPException
-	 */
 	@Override
 	public void process(final Packet packet, final XMPPResourceConnection conn,
 			final NonAuthUserRepository nonAuthUserRepo, final Queue<Packet> results,
@@ -155,28 +137,13 @@ public class Jingle
 		}    // end of try-catch
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
 	}
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/03/12

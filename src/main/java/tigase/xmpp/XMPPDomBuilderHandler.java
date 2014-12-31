@@ -120,12 +120,6 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param cdata
-	 */
 	@Override
 	public void elementCData(StringBuilder cdata) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -138,12 +132,6 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param name
-	 */
 	@Override
 	public void endElement(StringBuilder name) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -176,12 +164,6 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 		}    // end of if (el_stack.isEmpty()) else
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param errorMessage
-	 */
 	@Override
 	public void error(String errorMessage) {
 		log.warning("XML content parse error.");
@@ -207,12 +189,6 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param other
-	 */
 	@Override
 	public void otherXML(StringBuilder other) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -232,23 +208,11 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 		return error;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public Object restoreParserState() {
 		return parserState;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param state
-	 */
 	@Override
 	public void saveParserState(Object state) {
 		parserState = state;
@@ -258,14 +222,6 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 		elements_number_limit = limit;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param name
-	 * @param attr_names
-	 * @param attr_values
-	 */
 	@Override
 	public void startElement(StringBuilder name, StringBuilder[] attr_names,
 			StringBuilder[] attr_values) {

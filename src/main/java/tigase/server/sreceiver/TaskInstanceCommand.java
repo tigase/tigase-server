@@ -155,21 +155,11 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Describe <code>getDescription</code> method here.
-	 *
-	 * @return a <code>String</code> value
-	 */
 	@Override
 	public String getDescription() {
 		return "Manage task exiting instance";
 	}
 
-	/**
-	 * Describe <code>getNodeName</code> method here.
-	 *
-	 * @return a <code>String</code> value
-	 */
 	@Override
 	public String getNodeName() {
 		return "*";
@@ -177,13 +167,6 @@ public class TaskInstanceCommand implements TaskCommandIfc {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Describe <code>processCommand</code> method here.
-	 *
-	 * @param packet a <code>Packet</code> value
-	 * @param result a <code>Packet</code> value
-	 * @param receiv
-	 */
 	@Override
 	public void processCommand(Packet packet, Packet result, StanzaReceiver receiv) {
 		String task_name = packet.getStanzaTo().toString();

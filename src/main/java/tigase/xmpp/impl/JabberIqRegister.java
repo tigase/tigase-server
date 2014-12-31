@@ -126,28 +126,15 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 	// ~--- methods
 	// --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * 
-	 */
 	@Override
 	public String id() {
 		return ID;
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 * @param settings
-	 * 
-	 * @throws XMPPException
+	/**{@inheritDoc}
+	 *
+	 * <br><br>
+	 *
 	 *             TODO: Implement registration form configurable and loading
 	 *             all the fields from the registration form TODO: rewrite the
 	 *             plugin using the XMPPProcessorAbstract API
@@ -551,14 +538,6 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 		}
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * 
-	 * 
-	 */
 	@Override
 	public Element[] supDiscoFeatures(XMPPResourceConnection session) {
 		if (log.isLoggable(Level.FINEST) && (session != null)) {
@@ -571,36 +550,16 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 		}
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * 
-	 */
 	@Override
 	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * 
-	 */
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param session
-	 * 
-	 * 
-	 */
 	@Override
 	public Element[] supStreamFeatures(XMPPResourceConnection session) {
 		if (log.isLoggable(Level.FINEST) && (session != null)) {
@@ -617,5 +576,3 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 		return signedFormRequired;
 	}
 } // JabberIqRegister
-
-// ~ Formatted in Tigase Code Convention on 13/03/12

@@ -48,842 +48,414 @@ import tigase.server.Packet;
  * @version $Rev$
  */
 public enum Authorization {
-	/**
-	 *
-	 */
 	AUTHORIZED {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public String getCondition() {
 			return null;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public int getErrorCode() {
 			return 0;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public String getErrorType() {
 			return null;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param p
-		 * @param t
-		 * @param i
-		 *
-		 * 
-		 */
 		@Override
 		public Packet getResponseMessage(Packet p, String t, boolean i) {
 			return p.okResult(t, 0);
 		}
 	},
-	/**
-	 *
-	 */
 	BAD_REQUEST {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public String getCondition() {
 			return "bad-request";
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public int getErrorCode() {
 			return 400;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public String getErrorType() {
 			return ERR_TYPE_MODIFY;
 		}
 	},
-	/**
-	 *
-	 */
 	CONFLICT {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public String getCondition() {
 			return "conflict";
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public int getErrorCode() {
 			return 409;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public String getErrorType() {
 			return ERR_TYPE_CANCEL;
 		}
 	},
-	/**
-	 *
-	 */
 	FEATURE_NOT_IMPLEMENTED {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public String getCondition() {
 			return "feature-not-implemented";
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public int getErrorCode() {
 			return 501;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public String getErrorType() {
 			return ERR_TYPE_CANCEL;
 		}
 	},
-	/**
-	 *
-	 */
 	FORBIDDEN {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public String getCondition() {
 			return "forbidden";
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public int getErrorCode() {
 			return 403;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public String getErrorType() {
 			return ERR_TYPE_AUTH;
 		}
 	},
-	/**
-	 *
-	 */
 	GONE {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public String getCondition() {
 			return "gone";
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public int getErrorCode() {
 			return 302;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public String getErrorType() {
 			return ERR_TYPE_MODIFY;
 		}
 	},
-	/**
-	 *
-	 */
 	INTERNAL_SERVER_ERROR {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public String getCondition() {
 			return "internal-server-error";
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public int getErrorCode() {
 			return 500;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public String getErrorType() {
 			return ERR_TYPE_WAIT;
 		}
 	},
-	/**
-	 *
-	 */
 	ITEM_NOT_FOUND {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public String getCondition() {
 			return "item-not-found";
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public int getErrorCode() {
 			return 404;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public String getErrorType() {
 			return ERR_TYPE_CANCEL;
 		}
 	},
-	/**
-	 *
-	 */
 	JID_MALFORMED {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public String getCondition() {
 			return "jid-malformed";
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public int getErrorCode() {
 			return 400;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
 		@Override
 		public String getErrorType() {
 			return ERR_TYPE_MODIFY;
 		}
 	},
-	/**
-	 * 
-	 */
 	NOT_ACCEPTABLE {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getCondition() {
 			return "not-acceptable";
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public int getErrorCode() {
 			return 406;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getErrorType() {
 			return ERR_TYPE_MODIFY;
 		}
 	},
 	NOT_ALLOWED {
-
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getCondition() {
 			return "not-allowed";
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public int getErrorCode() {
 			return 405;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getErrorType() {
 			return ERR_TYPE_CANCEL;
 		}
 	},
 	NOT_AUTHORIZED {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getCondition() {
 			return "not-authorized";
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public int getErrorCode() {
 			return 401;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getErrorType() {
 			return ERR_TYPE_AUTH;
 		}
 	},
 	PAYMENT_REQUIRED {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getCondition() {
 			return "payment-required";
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public int getErrorCode() {
 			return 402;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getErrorType() {
 			return ERR_TYPE_AUTH;
 		}
 	},
 	POLICY_VIOLATION {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getCondition() {
 			return "policy-violation";
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public int getErrorCode() {
 			return 0;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getErrorType() {
 			return ERR_TYPE_CANCEL;
 		}
 	},
 	RECIPIENT_UNAVAILABLE {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getCondition() {
 			return "recipient-unavailable";
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public int getErrorCode() {
 			return 404;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getErrorType() {
 			return ERR_TYPE_WAIT;
 		}
 	},
 	REDIRECT {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getCondition() {
 			return "redirect";
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public int getErrorCode() {
 			return 302;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getErrorType() {
 			return ERR_TYPE_MODIFY;
 		}
 	},
 	REGISTRATION_REQUIRED {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getCondition() {
 			return "registration-required";
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public int getErrorCode() {
 			return 407;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getErrorType() {
 			return ERR_TYPE_AUTH;
 		}
 	},
 	REMOTE_SERVER_NOT_FOUND {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getCondition() {
 			return "remote-server-not-found";
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public int getErrorCode() {
 			return 404;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getErrorType() {
 			return ERR_TYPE_CANCEL;
 		}
 	},
 	REMOTE_SERVER_TIMEOUT {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getCondition() {
 			return "remote-server-timeout";
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public int getErrorCode() {
 			return 504;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getErrorType() {
 			return ERR_TYPE_WAIT;
 		}
 	},
 	RESOURCE_CONSTRAINT {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getCondition() {
 			return "resource-constraint";
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public int getErrorCode() {
 			return 500;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getErrorType() {
 			return ERR_TYPE_WAIT;
 		}
 	},
 	SERVICE_UNAVAILABLE {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getCondition() {
 			return "service-unavailable";
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public int getErrorCode() {
 			return 503;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getErrorType() {
 			return ERR_TYPE_CANCEL;
 		}
 	},
 	SUBSCRIPTION_REQUIRED {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getCondition() {
 			return "subscription-required";
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public int getErrorCode() {
 			return 407;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getErrorType() {
 			return ERR_TYPE_AUTH;
 		}
 	},
 	UNDEFINED_CONDITION {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getCondition() {
 			return "undefined-condition";
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public int getErrorCode() {
 			return 500;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getErrorType() {
 			return "[undefined]";
 		}
 	},
 	UNEXPECTED_REQUEST {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getCondition() {
 			return "unexpected-request";
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public int getErrorCode() {
 			return 400;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * 
-		 */
+		@Override
 		public String getErrorType() {
 			return ERR_TYPE_WAIT;
 		}

@@ -66,12 +66,6 @@ public class JabberClientStreamOpenHandler implements StreamOpenHandler {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String[] getXMLNSs() {
 		return xmlnss;
@@ -79,14 +73,6 @@ public class JabberClientStreamOpenHandler implements StreamOpenHandler {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 *
-	 * 
-	 */
 	@Override
 	public String serviceStarted(ComponentIOService serv) {
 		switch (serv.connectionType()) {
@@ -115,16 +101,6 @@ public class JabberClientStreamOpenHandler implements StreamOpenHandler {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 * @param attribs
-	 * @param handler
-	 *
-	 * 
-	 */
 	@Override
 	public String streamOpened(ComponentIOService serv, Map<String, String> attribs,
 			ComponentProtocolHandler handler) {

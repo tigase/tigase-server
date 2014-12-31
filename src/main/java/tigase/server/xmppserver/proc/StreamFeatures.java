@@ -57,16 +57,6 @@ public class StreamFeatures extends S2SAbstractProcessor {
 		return Order.StreamFeatures.ordinal();
 	}
 	
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param p
-	 * @param serv
-	 * @param results
-	 *
-	 * 
-	 */
 	@Override
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
 		if (p.isElement(FEATURES_EL, FEATURES_NS)) {
@@ -80,15 +70,6 @@ public class StreamFeatures extends S2SAbstractProcessor {
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 * @param attribs
-	 *
-	 * 
-	 */
 	@Override
 	public String streamOpened(S2SIOService serv, Map<String, String> attribs) {
 		if (attribs.containsKey("version")) {

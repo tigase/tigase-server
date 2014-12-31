@@ -114,12 +114,6 @@ public class SaslAuth
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public int concurrentQueuesNo() {
 		return Runtime.getRuntime().availableProcessors();
@@ -136,25 +130,11 @@ public class SaslAuth
 		return reply;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String id() {
 		return ID;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param settings
-	 *
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public void init(Map<String, Object> settings) throws TigaseDBException {
 		if (settings != null) {
@@ -191,16 +171,6 @@ public class SaslAuth
 		session.removeSessionData(SASL_SERVER_KEY);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 * @param settings
-	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public void process(final Packet packet, final XMPPResourceConnection session,
@@ -396,49 +366,21 @@ public class SaslAuth
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 * 
-	 */
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
 		return DISCO_FEATURES;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 * 
-	 */
 	@Override
 	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
 		if ((session == null) || session.isAuthorized()) {

@@ -57,18 +57,6 @@ public class UserRepositoryPool implements UserRepository {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param subnode
-	 * @param key
-	 * @param list
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public void addDataList(BareJID user, String subnode, String key, String[] list)
 			throws UserNotFoundException, TigaseDBException {
@@ -95,15 +83,6 @@ public class UserRepositoryPool implements UserRepository {
 		repoPool.offer(repo);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserExistsException
-	 */
 	@Override
 	public void addUser(BareJID user) throws UserExistsException, TigaseDBException {
 		UserRepository repo = takeRepo();
@@ -121,20 +100,6 @@ public class UserRepositoryPool implements UserRepository {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param subnode
-	 * @param key
-	 * @param def
-	 *
-	 * 
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public String getData(BareJID user, String subnode, String key, String def)
 			throws UserNotFoundException, TigaseDBException {
@@ -159,19 +124,6 @@ public class UserRepositoryPool implements UserRepository {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param subnode
-	 * @param key
-	 *
-	 * 
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public String getData(BareJID user, String subnode, String key)
 			throws UserNotFoundException, TigaseDBException {
@@ -196,18 +148,6 @@ public class UserRepositoryPool implements UserRepository {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param key
-	 *
-	 * 
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public String getData(BareJID user, String key)
 			throws UserNotFoundException, TigaseDBException {
@@ -232,19 +172,6 @@ public class UserRepositoryPool implements UserRepository {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param subnode
-	 * @param key
-	 *
-	 * 
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public String[] getDataList(BareJID user, String subnode, String key)
 			throws UserNotFoundException, TigaseDBException {
@@ -263,18 +190,6 @@ public class UserRepositoryPool implements UserRepository {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param subnode
-	 *
-	 * 
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public String[] getKeys(BareJID user, String subnode)
 			throws UserNotFoundException, TigaseDBException {
@@ -293,17 +208,6 @@ public class UserRepositoryPool implements UserRepository {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 *
-	 * 
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public String[] getKeys(BareJID user) throws UserNotFoundException, TigaseDBException {
 		UserRepository repo = takeRepo();
@@ -321,29 +225,11 @@ public class UserRepositoryPool implements UserRepository {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getResourceUri() {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param subnode
-	 *
-	 * 
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public String[] getSubnodes(BareJID user, String subnode)
 			throws UserNotFoundException, TigaseDBException {
@@ -362,17 +248,6 @@ public class UserRepositoryPool implements UserRepository {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 *
-	 * 
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public String[] getSubnodes(BareJID user) throws UserNotFoundException, TigaseDBException {
 		UserRepository repo = takeRepo();
@@ -390,16 +265,6 @@ public class UserRepositoryPool implements UserRepository {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 *
-	 * 
-	 *
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public long getUserUID(BareJID user) throws TigaseDBException {
 		UserRepository repo = takeRepo();
@@ -417,14 +282,6 @@ public class UserRepositoryPool implements UserRepository {
 		return -1;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 *
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public List<BareJID> getUsers() throws TigaseDBException {
 		UserRepository repo = takeRepo();
@@ -442,12 +299,6 @@ public class UserRepositoryPool implements UserRepository {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public long getUsersCount() {
 		UserRepository repo = takeRepo();
@@ -465,14 +316,6 @@ public class UserRepositoryPool implements UserRepository {
 		return 0;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 *
-	 * 
-	 */
 	@Override
 	public long getUsersCount(String domain) {
 		UserRepository repo = takeRepo();
@@ -492,15 +335,6 @@ public class UserRepositoryPool implements UserRepository {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param resource_uri
-	 * @param params
-	 *
-	 * @throws DBInitException
-	 */
 	@Override
 	public void initRepository(String resource_uri, Map<String, String> params)
 			throws DBInitException {
@@ -512,17 +346,6 @@ public class UserRepositoryPool implements UserRepository {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param subnode
-	 * @param key
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public void removeData(BareJID user, String subnode, String key)
 			throws UserNotFoundException, TigaseDBException {
@@ -541,16 +364,6 @@ public class UserRepositoryPool implements UserRepository {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param key
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public void removeData(BareJID user, String key)
 			throws UserNotFoundException, TigaseDBException {
@@ -569,16 +382,6 @@ public class UserRepositoryPool implements UserRepository {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param subnode
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public void removeSubnode(BareJID user, String subnode)
 			throws UserNotFoundException, TigaseDBException {
@@ -597,15 +400,6 @@ public class UserRepositoryPool implements UserRepository {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException {
 		UserRepository repo = takeRepo();
@@ -623,18 +417,6 @@ public class UserRepositoryPool implements UserRepository {
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param subnode
-	 * @param key
-	 * @param value
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public void setData(BareJID user, String subnode, String key, String value)
 			throws UserNotFoundException, TigaseDBException {
@@ -653,17 +435,6 @@ public class UserRepositoryPool implements UserRepository {
 		cache.put(user + "/" + subnode + "/" + key, value);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param key
-	 * @param value
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public void setData(BareJID user, String key, String value)
 			throws UserNotFoundException, TigaseDBException {
@@ -682,18 +453,6 @@ public class UserRepositoryPool implements UserRepository {
 		cache.put(user + "/" + key, value);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param subnode
-	 * @param key
-	 * @param list
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public void setDataList(BareJID user, String subnode, String key, String[] list)
 			throws UserNotFoundException, TigaseDBException {
@@ -728,14 +487,6 @@ public class UserRepositoryPool implements UserRepository {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 *
-	 * 
-	 */
 	@Override
 	public boolean userExists(BareJID user) {
 		UserRepository repo = takeRepo();
@@ -770,14 +521,6 @@ public class UserRepositoryPool implements UserRepository {
 
 		//~--- methods ------------------------------------------------------------
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param key
-		 *
-		 * 
-		 */
 		@Override
 		public Object remove(Object key) {
 			if (cache_off) {

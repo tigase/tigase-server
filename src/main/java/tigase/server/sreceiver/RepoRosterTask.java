@@ -70,14 +70,6 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 *
-	 * 
-	 */
 	@Override
 	public RosterItem addToRoster(JID jid) {
 		RosterItem ri = super.addToRoster(jid);
@@ -127,14 +119,6 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 		}        // end of if (roster != null)
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 *
-	 * 
-	 */
 	@Override
 	public RosterItem removeFromRoster(JID jid) {
 		RosterItem ri = super.removeFromRoster(jid);
@@ -188,13 +172,6 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 		saveToRepository(ri);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param ri
-	 * @param accepted
-	 */
 	@Override
 	public void setRosterItemModerationAccepted(RosterItem ri, boolean accepted) {
 		super.setRosterItemModerationAccepted(ri, accepted);
@@ -213,13 +190,6 @@ public abstract class RepoRosterTask extends AbstractReceiverTask {
 		saveToRepository(ri);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param ri
-	 * @param subscribed
-	 */
 	@Override
 	public void setRosterItemSubscribed(RosterItem ri, boolean subscribed) {
 		super.setRosterItemSubscribed(ri, subscribed);

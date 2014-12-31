@@ -43,7 +43,6 @@ import java.nio.channels.SocketChannel;
  * Created: Sat May 14 08:07:38 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
  */
 public interface IOInterface {
 	int bytesRead();

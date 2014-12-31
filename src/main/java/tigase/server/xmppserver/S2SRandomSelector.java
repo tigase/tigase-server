@@ -50,15 +50,6 @@ public class S2SRandomSelector implements S2SConnectionSelector {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param outgoing
-	 *
-	 * 
-	 */
 	@Override
 	public S2SConnection selectConnection(Packet packet, Set<S2SConnection> outgoing) {
 		int size = outgoing.size();

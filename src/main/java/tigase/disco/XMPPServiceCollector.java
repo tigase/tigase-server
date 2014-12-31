@@ -97,14 +97,6 @@ public abstract class XMPPServiceCollector
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param component
-	 *
-	 * 
-	 */
 	@Override
 	public boolean isCorrectType(ServerComponent component) {
 		return component instanceof XMPPService;
@@ -112,13 +104,6 @@ public abstract class XMPPServiceCollector
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param results
-	 */
 	@Override
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
 		if (packet.isXMLNSStaticStr(Iq.IQ_QUERY_PATH, INFO_XMLNS) ||

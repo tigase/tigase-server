@@ -125,14 +125,6 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 *
-	 * 
-	 */
 	@Override
 	public boolean addOutPacket(Packet packet) {
 		return super.addOutPacket(packet);
@@ -140,14 +132,6 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 * 
-	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
@@ -184,34 +168,16 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		return props;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getDiscoCategoryType() {
 		return "s2s";
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getDiscoDescription() {
 		return "Server connection manager";
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 */
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
@@ -249,25 +215,11 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public boolean handlesNonLocalDomains() {
 		return true;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 *
-	 * 
-	 */
 	@Override
 	public int hashCodeForPacket(Packet packet) {
 
@@ -496,12 +448,6 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		}        // end of if (packet != null && packet.getType() != null)
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
 	@Override
 	public void processPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -587,14 +533,6 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		}    // end of else
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 *
-	 * 
-	 */
 	@Override
 	public Queue<Packet> processSocketData(XMPPIOService<Object> serv) {
 		Queue<Packet> packets = serv.getReceivedPackets();
@@ -636,12 +574,6 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param port_props
-	 */
 	@Override
 	public void reconnectionFailed(Map<String, Object> port_props) {
 
@@ -676,12 +608,6 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 */
 	@Override
 	public void serviceStarted(XMPPIOService<Object> serv) {
 		super.serviceStarted(serv);
@@ -713,14 +639,6 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		}    // end of switch (service.connectionType())
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 *
-	 * 
-	 */
 	@Override
 	public boolean serviceStopped(XMPPIOService<Object> serv) {
 		boolean result = super.serviceStopped(serv);
@@ -815,13 +733,6 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param props
-	 * @throws tigase.conf.ConfigurationException
-	 */
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
@@ -838,12 +749,6 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param service
-	 */
 	@Override
 	public void tlsHandshakeCompleted(XMPPIOService<Object> service) {}
 
@@ -866,12 +771,6 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 */
 	@Override
 	public void xmppStreamClosed(XMPPIOService<Object> serv) {
 		if (log.isLoggable(Level.FINER)) {
@@ -879,15 +778,6 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 * @param attribs
-	 *
-	 * 
-	 */
 	@Override
 	public String xmppStreamOpened(XMPPIOService<Object> serv, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINER)) {
@@ -998,11 +888,11 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 	}
 
 	/**
-	 * Method <code>getMaxInactiveTime</code> returns max keep-alive time
-	 * for inactive connection. Let's assume s2s should send something
-	 * at least once every 15 minutes....
+	 * {@inheritDoc}
 	 *
-	 * @return a <code>long</code> value
+	 * <br><br>
+	 *
+	 * Let's assume s2s should send something at least once every 15 minutes....
 	 */
 	@Override
 	protected long getMaxInactiveTime() {
@@ -1376,10 +1266,6 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 		//~--- methods ------------------------------------------------------------
 
-		/**
-		 * Method description
-		 *
-		 */
 		@Override
 		public void run() {
 			String key = localhost + remotehost;

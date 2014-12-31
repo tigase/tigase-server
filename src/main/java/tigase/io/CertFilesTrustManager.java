@@ -98,13 +98,11 @@ public class CertFilesTrustManager implements X509TrustManager {
 		this.parameters = cpp;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
 		checkServerTrusted(chain, authType);
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
 		// TODO Auto-generated method stub
@@ -127,7 +125,6 @@ public class CertFilesTrustManager implements X509TrustManager {
 
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public X509Certificate[] getAcceptedIssuers() {
 		return parameters.getTrustAnchors().toArray(new X509Certificate[] {});

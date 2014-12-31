@@ -121,12 +121,6 @@ public class PubSubTestsTask
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public Map<String, PropertyItem> getDefaultParams() {
 		Map<String, PropertyItem> defs = super.getDefaultParams();
@@ -150,23 +144,11 @@ public class PubSubTestsTask
 		return defs;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getHelp() {
 		return TASK_HELP;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getType() {
 		return TASK_TYPE;
@@ -174,14 +156,6 @@ public class PubSubTestsTask
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 *
-	 * 
-	 */
 	@Override
 	protected boolean addOutPacket(Packet packet) {
 		++packetsGenerated;
@@ -189,13 +163,6 @@ public class PubSubTestsTask
 		return super.addOutPacket(packet);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param results
-	 */
 	@Override
 	protected void processMessage(Packet packet, Queue<Packet> results) {
 		if (isPostCommand(packet)) {

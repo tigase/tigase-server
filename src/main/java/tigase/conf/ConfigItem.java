@@ -110,12 +110,6 @@ public class ConfigItem
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
 	@Override
 	public void addCommandFields(Packet packet) {
 
@@ -200,32 +194,22 @@ public class ConfigItem
 					 : DataTypes.valueToString(value);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getElemName() {
 		return REPO_ITEM_ELEM_NAME;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public FLAGS getFlag() {
 		return flag;
 	}
 
 	/**
-	 * Returns ConfigItem key which is constructed in a following way: <code>
-	 * compName + "/" + nodeName + "/" + keyName
-	 * </code>
+	 * {@inheritDoc}
 	 *
+	 * <br><br>
+	 *
+	 * Returns ConfigItem key which is constructed in a following way:
+	 * {@code compName + "/" + nodeName + "/" + keyName}
 	 * 
 	 */
 	@Override
@@ -238,11 +222,8 @@ public class ConfigItem
 	}
 
 	/**
-	 * Returns a property key which is constructed in a following way: <code>
-	 * keyName
-	 * </code>
-	 *
-	 * 
+	 * Returns a property key which is constructed in a following way:
+	 * {@code keyName}
 	 */
 	public String getKeyName() {
 		return keyName;
@@ -260,12 +241,6 @@ public class ConfigItem
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
 	@Override
 	public void initFromCommand(Packet packet) {
 		super.initFromCommand(packet);

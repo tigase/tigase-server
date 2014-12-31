@@ -538,23 +538,11 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	// ~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 */
 	@Override
 	public Iterator<StatRecord> iterator() {
 		return new StatsIterator();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 */
 	@Override
 	public String toString() {
 		return stats.toString();
@@ -568,12 +556,6 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 		// ~--- get methods --------------------------------------------------------
 
-		/**
-		 * Method description
-		 *
-		 *
-		 *
-		 */
 		@Override
 		public boolean hasNext() {
 			if ((recIt == null) || !recIt.hasNext()) {
@@ -589,14 +571,6 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 		// ~--- methods ------------------------------------------------------------
 
-		/**
-		 * Method description
-		 *
-		 *
-		 *
-		 *
-		 * @throws NoSuchElementException
-		 */
 		@Override
 		public StatRecord next() throws NoSuchElementException {
 			if ((recIt == null) || !recIt.hasNext()) {
@@ -610,17 +584,9 @@ public class StatisticsList implements Iterable<StatRecord> {
 			return recIt.next();
 		}
 
-		/**
-		 * Method description
-		 *
-		 */
 		@Override
 		public void remove() {
 			throw new UnsupportedOperationException("Not supported yet.");
 		}
 	}
 }
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com

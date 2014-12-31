@@ -138,17 +138,9 @@ public class Message
 		return packetInstance(message, from, to);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	protected String[] getElNameErrorPath() {
 		return MESSAGE_ERROR_PATH;
 	}
 }
 
-
-//~ Formatted in Tigase Code Convention on 13/07/06

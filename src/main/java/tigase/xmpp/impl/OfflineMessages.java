@@ -133,14 +133,12 @@ public class OfflineMessages
 	}
 	
 	/**
-	 * OfflineMessages postprocessor simply calls {@code savePacketForOffLineUser}
-	 * method to store packet to offline repository.
-	 * <p>
-	 *
 	 * {@inheritDoc}
 	 *
-	 * @param conn
-	 * @param queue
+	 * <br><br>
+	 *
+	 * OfflineMessages postprocessor simply calls {@code savePacketForOffLineUser}
+	 * method to store packet to offline repository.
 	 */
 	@Override
 	public void postProcess( final Packet packet, final XMPPResourceConnection conn,
@@ -162,15 +160,13 @@ public class OfflineMessages
 	}
 
 	/**
+	 * {@inheritDoc}
+	 *
+	 * <br><br>
+	 *
 	 * {@code OfflineMessages} processor is triggered by {@code <presence>}
 	 * stanza. Upon receiving it plugin tries to load messages from repository
 	 * and, if the result is not empty, sends them to the user
-	 *
-	 * {@inheritDoc}
-	 *
-	 *
-	 * @param conn
-	 * @throws NotAuthorizedException
 	 */
 	@Override
 	public void process( final Packet packet, final XMPPResourceConnection conn,

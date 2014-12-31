@@ -192,21 +192,6 @@ public class JDBCRepository
 		// cache.put(user_id+"/"+subnode+"/"+key, list);
 	}
 
-	/**
-	 * Describe <code>addDataList</code> method here.
-	 *
-	 * @param user_id
-	 *          a <code>String</code> value
-	 * @param subnode
-	 *          a <code>String</code> value
-	 * @param key
-	 *          a <code>String</code> value
-	 * @param list
-	 *          a <code>String[]</code> value
-	 * @exception UserNotFoundException
-	 *              if an error occurs
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public void addDataList(BareJID user_id, final String subnode, final String key,
 													final String[] list)
@@ -218,15 +203,6 @@ public class JDBCRepository
 		}
 	}
 
-	/**
-	 * Describe <code>addUser</code> method here.
-	 *
-	 * @param user_id
-	 *          a <code>String</code> value
-	 * @exception UserExistsException
-	 *              if an error occurs
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public void addUser(BareJID user_id) throws UserExistsException, TigaseDBException {
 		try {
@@ -236,43 +212,12 @@ public class JDBCRepository
 		}
 	}
 
-	/**
-	 * Describe <code>addUser</code> method here.
-	 *
-	 * @param user
-	 *          a <code>String</code> value
-	 * @param password
-	 *          a <code>String</code> value
-	 * @exception UserExistsException
-	 *              if an error occurs
-	 * @exception TigaseDBException
-	 *              if an error occurs
-	 */
 	@Override
 	public void addUser(BareJID user, final String password)
 					throws UserExistsException, TigaseDBException {
 		auth.addUser(user, password);
 	}
 
-	/**
-	 * Describe <code>digestAuth</code> method here.
-	 *
-	 * @param user
-	 *          a <code>String</code> value
-	 * @param digest
-	 *          a <code>String</code> value
-	 * @param id
-	 *          a <code>String</code> value
-	 * @param alg
-	 *          a <code>String</code> value
-	 * @return a <code>boolean</code> value
-	 *
-	 * @throws AuthorizationException
-	 * @exception UserNotFoundException
-	 *              if an error occurs
-	 * @exception TigaseDBException
-	 *              if an error occurs
-	 */
 	@Override
 	@Deprecated
 	public boolean digestAuth(BareJID user, final String digest, final String id,
@@ -283,24 +228,6 @@ public class JDBCRepository
 
 	//~--- get methods ----------------------------------------------------------
 
-	// ~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Describe <code>getData</code> method here.
-	 *
-	 * @param user_id
-	 *          a <code>String</code> value
-	 * @param subnode
-	 *          a <code>String</code> value
-	 * @param key
-	 *          a <code>String</code> value
-	 * @param def
-	 *          a <code>String</code> value
-	 * @return a <code>String</code> value
-	 * @exception UserNotFoundException
-	 *              if an error occurs
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public String getData(BareJID user_id, final String subnode, final String key,
 												final String def)
@@ -350,58 +277,18 @@ public class JDBCRepository
 		}
 	}
 
-	/**
-	 * Describe <code>getData</code> method here.
-	 *
-	 * @param user_id
-	 *          a <code>String</code> value
-	 * @param subnode
-	 *          a <code>String</code> value
-	 * @param key
-	 *          a <code>String</code> value
-	 * @return a <code>String</code> value
-	 * @exception UserNotFoundException
-	 *              if an error occurs
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public String getData(BareJID user_id, final String subnode, final String key)
 					throws UserNotFoundException, TigaseDBException {
 		return getData(user_id, subnode, key, null);
 	}
 
-	/**
-	 * Describe <code>getData</code> method here.
-	 *
-	 * @param user_id
-	 *          a <code>String</code> value
-	 * @param key
-	 *          a <code>String</code> value
-	 * @return a <code>String</code> value
-	 * @exception UserNotFoundException
-	 *              if an error occurs
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public String getData(BareJID user_id, final String key)
 					throws UserNotFoundException, TigaseDBException {
 		return getData(user_id, null, key, null);
 	}
 
-	/**
-	 * Describe <code>getDataList</code> method here.
-	 *
-	 * @param user_id
-	 *          a <code>String</code> value
-	 * @param subnode
-	 *          a <code>String</code> value
-	 * @param key
-	 *          a <code>String</code> value
-	 * @return a <code>String[]</code> value
-	 * @exception UserNotFoundException
-	 *              if an error occurs
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public String[] getDataList(BareJID user_id, final String subnode, final String key)
 					throws UserNotFoundException, TigaseDBException {
@@ -457,18 +344,6 @@ public class JDBCRepository
 		}
 	}
 
-	/**
-	 * Describe <code>getKeys</code> method here.
-	 *
-	 * @param user_id
-	 *          a <code>String</code> value
-	 * @param subnode
-	 *          a <code>String</code> value
-	 * @return a <code>String[]</code> value
-	 * @exception UserNotFoundException
-	 *              if an error occurs
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public String[] getKeys(BareJID user_id, final String subnode)
 					throws UserNotFoundException, TigaseDBException {
@@ -503,45 +378,17 @@ public class JDBCRepository
 		}
 	}
 
-	/**
-	 * Describe <code>getKeys</code> method here.
-	 *
-	 * @param user_id
-	 *          a <code>String</code> value
-	 * @return a <code>String[]</code> value
-	 * @exception UserNotFoundException
-	 *              if an error occurs
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public String[] getKeys(BareJID user_id)
 					throws UserNotFoundException, TigaseDBException {
 		return getKeys(user_id, null);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getResourceUri() {
 		return data_repo.getResourceUri();
 	}
 
-	/**
-	 * Describe <code>getSubnodes</code> method here.
-	 *
-	 * @param user_id
-	 *          a <code>String</code> value
-	 * @param subnode
-	 *          a <code>String</code> value
-	 * @return a <code>String[]</code> value
-	 * @exception UserNotFoundException
-	 *              if an error occurs
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public String[] getSubnodes(BareJID user_id, final String subnode)
 					throws UserNotFoundException, TigaseDBException {
@@ -576,32 +423,12 @@ public class JDBCRepository
 		}
 	}
 
-	/**
-	 * Describe <code>getSubnodes</code> method here.
-	 *
-	 * @param user_id
-	 *          a <code>String</code> value
-	 * @return a <code>String[]</code> value
-	 * @exception UserNotFoundException
-	 *              if an error occurs
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public String[] getSubnodes(BareJID user_id)
 					throws UserNotFoundException, TigaseDBException {
 		return getSubnodes(user_id, null);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user_id
-	 *
-	 * 
-	 *
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public long getUserUID(BareJID user_id) throws TigaseDBException {
 		Long cache_res = (Long) cache.get(user_id.toString());
@@ -622,17 +449,6 @@ public class JDBCRepository
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param repo
-	 * @param user_id
-	 *
-	 * 
-	 *
-	 * @throws SQLException
-	 */
 	public long getUserUID(DataRepository repo, BareJID user_id) throws SQLException {
 		ResultSet rs = null;
 		long result  = -1;
@@ -661,13 +477,6 @@ public class JDBCRepository
 		return result;
 	}
 
-	/**
-	 * <code>getUsers</code> method is thread safe.
-	 *
-	 * @return a <code>List</code> of user IDs from database.
-	 *
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public List<BareJID> getUsers() throws TigaseDBException {
 		ResultSet rs        = null;
@@ -696,12 +505,6 @@ public class JDBCRepository
 		return users;
 	}
 
-	/**
-	 * <code>getUsersCount</code> method is thread safe. It uses local variable
-	 * for storing <code>Statement</code>.
-	 *
-	 * @return a <code>long</code> number of user accounts in database.
-	 */
 	@Override
 	public long getUsersCount() {
 		ResultSet rs = null;
@@ -732,14 +535,6 @@ public class JDBCRepository
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 *
-	 * 
-	 */
 	@Override
 	public long getUsersCount(String domain) {
 		ResultSet rs = null;
@@ -773,17 +568,6 @@ public class JDBCRepository
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
-
-	/**
-	 * Describe <code>initRepository</code> method here.
-	 *
-	 * @param connection_str
-	 *          a <code>String</code> value
-	 * @param params
-	 *
-	 * @throws DBInitException
-	 */
 	@Override
 	public void initRepository(final String connection_str, Map<String, String> params)
 					throws DBInitException {
@@ -830,33 +614,11 @@ public class JDBCRepository
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public void logout(BareJID user) throws UserNotFoundException, TigaseDBException {
 		auth.logout(user);
 	}
 
-	/**
-	 * Describe <code>otherAuth</code> method here.
-	 *
-	 * @param props
-	 *          a <code>Map</code> value
-	 * @return a <code>boolean</code> value
-	 * @exception UserNotFoundException
-	 *              if an error occurs
-	 * @exception TigaseDBException
-	 *              if an error occurs
-	 * @exception AuthorizationException
-	 *              if an error occurs
-	 */
 	@Override
 	public boolean otherAuth(final Map<String, Object> props)
 					throws UserNotFoundException, TigaseDBException, AuthorizationException {
@@ -865,21 +627,6 @@ public class JDBCRepository
 
 	// Implementation of tigase.db.AuthRepository
 
-	/**
-	 * Describe <code>plainAuth</code> method here.
-	 *
-	 * @param user
-	 *          a <code>String</code> value
-	 * @param password
-	 *          a <code>String</code> value
-	 * @return a <code>boolean</code> value
-	 *
-	 * @throws AuthorizationException
-	 * @exception UserNotFoundException
-	 *              if an error occurs
-	 * @exception TigaseDBException
-	 *              if an error occurs
-	 */
 	@Override
 	@Deprecated
 	public boolean plainAuth(BareJID user, final String password)
@@ -887,30 +634,11 @@ public class JDBCRepository
 		return auth.plainAuth(user, password);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param authProps
-	 */
 	@Override
 	public void queryAuth(Map<String, Object> authProps) {
 		auth.queryAuth(authProps);
 	}
 
-	/**
-	 * Describe <code>removeData</code> method here.
-	 *
-	 * @param user_id
-	 *          a <code>String</code> value
-	 * @param subnode
-	 *          a <code>String</code> value
-	 * @param key
-	 *          a <code>String</code> value
-	 * @exception UserNotFoundException
-	 *              if an error occurs
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public void removeData(BareJID user_id, final String subnode, final String key)
 					throws UserNotFoundException, TigaseDBException {
@@ -952,34 +680,12 @@ public class JDBCRepository
 		}
 	}
 
-	/**
-	 * Describe <code>removeData</code> method here.
-	 *
-	 * @param user_id
-	 *          a <code>String</code> value
-	 * @param key
-	 *          a <code>String</code> value
-	 * @exception UserNotFoundException
-	 *              if an error occurs
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public void removeData(BareJID user_id, final String key)
 					throws UserNotFoundException, TigaseDBException {
 		removeData(user_id, null, key);
 	}
 
-	/**
-	 * Describe <code>removeSubnode</code> method here.
-	 *
-	 * @param user_id
-	 *          a <code>String</code> value
-	 * @param subnode
-	 *          a <code>String</code> value
-	 * @exception UserNotFoundException
-	 *              if an error occurs
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public void removeSubnode(BareJID user_id, final String subnode)
 					throws UserNotFoundException, TigaseDBException {
@@ -1054,23 +760,6 @@ public class JDBCRepository
 
 	//~--- set methods ----------------------------------------------------------
 
-	// ~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Describe <code>setData</code> method here.
-	 *
-	 * @param user_id
-	 *          a <code>String</code> value
-	 * @param subnode
-	 *          a <code>String</code> value
-	 * @param key
-	 *          a <code>String</code> value
-	 * @param value
-	 *          a <code>String</code> value
-	 * @exception UserNotFoundException
-	 *              if an error occurs
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public void setData(BareJID user_id, final String subnode, final String key,
 											final String value)
@@ -1130,40 +819,12 @@ public class JDBCRepository
 		}
 	}
 
-	/**
-	 * Describe <code>setData</code> method here.
-	 *
-	 * @param user_id
-	 *          a <code>String</code> value
-	 * @param key
-	 *          a <code>String</code> value
-	 * @param value
-	 *          a <code>String</code> value
-	 * @exception UserNotFoundException
-	 *              if an error occurs
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public void setData(BareJID user_id, final String key, final String value)
 					throws UserNotFoundException, TigaseDBException {
 		setData(user_id, null, key, value);
 	}
 
-	/**
-	 * Describe <code>setDataList</code> method here.
-	 *
-	 * @param user_id
-	 *          a <code>String</code> value
-	 * @param subnode
-	 *          a <code>String</code> value
-	 * @param key
-	 *          a <code>String</code> value
-	 * @param list
-	 *          a <code>String[]</code> value
-	 * @exception UserNotFoundException
-	 *              if an error occurs
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public void setDataList(BareJID user_id, final String subnode, final String key,
 													final String[] list)
@@ -1192,29 +853,12 @@ public class JDBCRepository
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param password
-	 *
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public void updatePassword(BareJID user, final String password)
 					throws TigaseDBException {
 		auth.updatePassword(user, password);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 *
-	 * 
-	 */
 	@Override
 	public boolean userExists(BareJID user) {
 		try {
@@ -1457,7 +1101,6 @@ public class JDBCRepository
 
 	//~--- get methods ----------------------------------------------------------
 
-	// ~--- get methods ----------------------------------------------------------
 	private long getNodeNID(DataRepository repo, long uid, String node_path)
 					throws SQLException, UserNotFoundException {
 		String query = buildNodeQuery(uid, node_path);
@@ -1565,16 +1208,6 @@ public class JDBCRepository
 
 		//~--- methods ------------------------------------------------------------
 
-		// ~--- methods ------------------------------------------------------------
-
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param key
-		 *
-		 * 
-		 */
 		@Override
 		public Object remove(Object key) {
 			if (cache_off) {
@@ -1604,11 +1237,3 @@ public class JDBCRepository
 	}
 }    // JDBCRepository
 
-
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-
-//~ Formatted in Tigase Code Convention on 13/03/04

@@ -63,16 +63,6 @@ public abstract class SimpleForwarder
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Describe <code>process</code> method here.
-	 *
-	 * @param packet a <code>Packet</code> value
-	 * @param session a <code>XMPPResourceConnection</code> value
-	 * @param repo a <code>NonAuthUserRepository</code> value
-	 * @param results a <code>Queue</code> value
-	 * @param settings
-	 * @throws XMPPException
-	 */
 	@Override
 	public void process(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)

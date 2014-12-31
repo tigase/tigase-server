@@ -44,12 +44,6 @@ import java.util.Map;
  */
 public class UnknownXMLNSStreamOpenHandler implements StreamOpenHandler {
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String[] getXMLNSs() {
 		return null;
@@ -57,29 +51,11 @@ public class UnknownXMLNSStreamOpenHandler implements StreamOpenHandler {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param s
-	 *
-	 * 
-	 */
 	@Override
 	public String serviceStarted(ComponentIOService s) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 * @param attribs
-	 * @param handler
-	 *
-	 * 
-	 */
 	@Override
 	public String streamOpened(ComponentIOService serv, Map<String, String> attribs,
 			ComponentProtocolHandler handler) {

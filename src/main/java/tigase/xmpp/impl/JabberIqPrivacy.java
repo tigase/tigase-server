@@ -120,15 +120,6 @@ public class JabberIqPrivacy
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 */
 	@Override
 	public void filter(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results) {
@@ -156,27 +147,18 @@ public class JabberIqPrivacy
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String id() {
 		return ID;
 	}
 
 	/**
+	 * {@inheritDoc}
+	 *
+	 * <br><br>
+	 *
 	 * <code>preProcess</code> method checks only incoming stanzas
 	 * so it doesn't check for presence-out at all.
-	 *
-	 * @param packet a <code>Packet</code> value
-	 * @param session a <code>XMPPResourceConnection</code> value
-	 * @param repo a <code>NonAuthUserRepository</code> value
-	 * @param results
-	 * @param settings
-	 * @return a <code>boolean</code> value
 	 */
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
@@ -189,18 +171,6 @@ public class JabberIqPrivacy
 		return !allowed(packet, session);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 * @param settings
-	 *
-	 * @throws XMPPException
-	 */
 	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
 			final NonAuthUserRepository repo, final Queue<Packet> results, final Map<String,
@@ -247,36 +217,16 @@ public class JabberIqPrivacy
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 * 
-	 */
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
 		return DISCO_FEATURES;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;

@@ -45,12 +45,6 @@ public class EchoComponent extends AbstractMessageReceiver {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
 	@Override
 	public void processPacket(Packet packet) {
 		log.log(Level.FINEST, "Received: {0}", packet);
@@ -61,9 +55,3 @@ public class EchoComponent extends AbstractMessageReceiver {
 		log.log(Level.FINEST, "Sent back: {0}", result);
 	}
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

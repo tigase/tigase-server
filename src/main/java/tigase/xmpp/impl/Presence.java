@@ -306,36 +306,16 @@ public class Presence
 		}      // end of if (buddies == null)
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int concurrentQueuesNo() {
 		return Runtime.getRuntime().availableProcessors() * 2;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String id() {
 		return ID;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param settings is a {@code Map<String,Object>}
-	 *
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public void init(Map<String, Object> settings) throws TigaseDBException {
 
@@ -399,10 +379,13 @@ public class Presence
 	}
 
 	/**
+	 * {@inheritDoc}
+	 *
+	 * <br><br>
+	 *
 	 * Performs processing of <em>presence</em> packets and calls different
 	 * methods for particular {@link PresenceType}
 	 *
-	 * {@inheritDoc}
 	 */
 	@SuppressWarnings({ "unchecked", "fallthrough" })
 	@Override
@@ -863,23 +846,11 @@ public class Presence
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>String[][]</code>
-	 */
 	@Override
 	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>String[]</code>
-	 */
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
@@ -1033,12 +1004,6 @@ public class Presence
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list is a <code>StatisticsList</code>
-	 */
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);

@@ -163,49 +163,20 @@ public abstract class S2SAbstractProcessor
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param handler
-	 * @param props
-	 */
 	@Override
 	public void init(S2SConnectionHandlerIfc<S2SIOService> handler,
 									 Map<String, Object> props) {
 		this.handler = handler;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param p
-	 * @param serv
-	 * @param results
-	 *
-	 * 
-	 */
 	@Override
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 */
 	@Override
 	public void serviceStarted(S2SIOService serv) {}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 */
 	@Override
 	public void serviceStopped(S2SIOService serv) {}
 
@@ -240,35 +211,12 @@ public abstract class S2SAbstractProcessor
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 */
 	@Override
 	public void streamClosed(S2SIOService serv) {}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @param serv
-	 * @param results
-	 */
 	@Override
 	public void streamFeatures(S2SIOService serv, List<Element> results) {}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 * @param attribs
-	 *
-	 * 
-	 */
 	@Override
 	public String streamOpened(S2SIOService serv, Map<String, String> attribs) {
 		return null;
@@ -279,6 +227,3 @@ public abstract class S2SAbstractProcessor
 		return (-1) * (proc.order() - order());
 	}
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/03/05

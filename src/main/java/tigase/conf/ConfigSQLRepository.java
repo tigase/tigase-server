@@ -69,26 +69,11 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param compName
-	 * @param item
-	 */
 	@Override
 	public void addItem(String compName, ConfigItem item) {
 		dbAccess.addItem(item);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 *
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public Collection<ConfigItem> allItems() throws TigaseDBException {
 		return dbAccess.getAllItems();
@@ -96,54 +81,21 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String[] getCompNames() {
 		return dbAccess.getComponentNames();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param compName
-	 * @param node
-	 * @param key
-	 *
-	 * 
-	 */
 	@Override
 	public ConfigItem getItem(String compName, String node, String key) {
 		return dbAccess.getItem(compName, node, key);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param compName
-	 *
-	 * 
-	 */
 	@Override
 	public Set<ConfigItem> getItemsForComponent(String compName) {
 		return dbAccess.getCompItems(compName);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param compName
-	 * @param node
-	 *
-	 * 
-	 */
 	@Override
 	public String[] getKeys(String compName, String node) {
 		return dbAccess.getKeys(compName, node);
@@ -151,14 +103,6 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 * @throws DBInitException
-	 */
 	@Override
 	public void initRepository(String repo_uri, Map<String, String> params) throws DBInitException {
 		String config_db_uri = System.getProperty(CONFIG_REPO_URI_PROP_KEY);
@@ -195,24 +139,11 @@ public class ConfigSQLRepository extends ConfigurationCache {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param compName
-	 * @param item
-	 */
 	@Override
 	public void removeItem(String compName, ConfigItem item) {
 		dbAccess.removeItem(item);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public int size() {
 		return dbAccess.getPropertiesCount();

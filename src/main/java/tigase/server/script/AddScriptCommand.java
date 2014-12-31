@@ -100,26 +100,11 @@ public class AddScriptCommand extends AbstractScriptCommand {
 			}
 		}
 
-//  ServiceEntity serviceEntity = (ServiceEntity) binds.get(ADMN_DISC);
-//  ServiceEntity item = new ServiceEntity(as.getCommandId(),
-//          "http://jabber.org/protocol/admin#" + as.getCommandId(),
-//          cmdDescr);
-//  item.addIdentities(
-//          new ServiceIdentity("component", "generic", cmdDescr),
-//          new ServiceIdentity("automation", "command-node", cmdDescr));
-//  item.addFeatures(XMPPService.CMD_FEATURES);
-//  serviceEntity.addItems(item);
 		return as;
 	}
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public Bindings getBindings() {
 		return null;
@@ -127,14 +112,6 @@ public class AddScriptCommand extends AbstractScriptCommand {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param binds
-	 * @param results
-	 */
 	@Override
 	@SuppressWarnings({ "unchecked" })
 	public void runCommand(Iq packet, Bindings binds, Queue<Packet> results) {

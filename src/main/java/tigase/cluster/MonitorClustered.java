@@ -45,41 +45,14 @@ public class MonitorClustered extends MonitorComponent implements ClusteredCompo
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method is called on cluster node connection event. This is a
-	 * notification to the component that a new cluster node has connected.
-	 *
-	 * @param node
-	 *          is a hostname of a cluster node generating the event.
-	 */
 	@Override
 	public void nodeConnected(String node) {}
 
-	/**
-	 * Method is called on cluster node disconnection event. This is a
-	 * notification to the component that there was network connection lost to one
-	 * of the cluster nodes.
-	 *
-	 * @param node
-	 *          is a hostname of a cluster node generating the event.
-	 */
 	@Override
 	public void nodeDisconnected(String node) {}
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Set's the configures the cluster controller object for cluster
-	 * communication and API.
-	 *
-	 * @param cl_controller
-	 */
 	@Override
 	public void setClusterController(ClusterControllerIfc cl_controller) {}
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

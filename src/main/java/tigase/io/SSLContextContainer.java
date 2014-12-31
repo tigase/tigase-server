@@ -90,47 +90,21 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		}
 
 		// ~--- methods
-		// ------------------------------------------------------------
 
 		// Implementation of javax.net.ssl.X509TrustManager
 
-		/**
-		 * Method description
-		 * 
-		 * 
-		 * @param x509CertificateArray
-		 * @param string
-		 * 
-		 * @throws CertificateException
-		 */
 		@Override
 		public void checkClientTrusted(final X509Certificate[] x509CertificateArray, final String string)
 				throws CertificateException {
 		}
 
-		/**
-		 * Method description
-		 * 
-		 * 
-		 * @param x509CertificateArray
-		 * @param string
-		 * 
-		 * @throws CertificateException
-		 */
 		@Override
 		public void checkServerTrusted(final X509Certificate[] x509CertificateArray, final String string)
 				throws CertificateException {
 		}
 
 		// ~--- get methods
-		// --------------------------------------------------------
 
-		/**
-		 * Method description
-		 * 
-		 * 
-		 * 
-		 */
 		@Override
 		public X509Certificate[] getAcceptedIssuers() {
 			return issuers;
@@ -138,18 +112,9 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 	}
 
 	// ~--- fields
-	// ---------------------------------------------------------------
 
 	private class PEMFileFilter implements FileFilter {
 
-		/**
-		 * Method description
-		 * 
-		 * 
-		 * @param pathname
-		 * 
-		 * 
-		 */
 		@Override
 		public boolean accept(File pathname) {
 			if (pathname.isFile()
@@ -211,14 +176,6 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		return kmf;
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param params
-	 * 
-	 * @throws CertificateParsingException
-	 */
 	@Override
 	public void addCertificates(Map<String, String> params) throws CertificateParsingException {
 		String pemCert = params.get(PEM_CERTIFICATE_KEY);
@@ -287,15 +244,6 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param protocol
-	 * @param hostname
-	 * 
-	 * 
-	 */
 	@Override
 	public SSLContext getSSLContext(String protocol, String hostname, boolean clientMode, TrustManager... tms) {
 		SSLContext sslContext = null;
@@ -355,23 +303,11 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		return sslContext;
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * 
-	 */
 	@Override
 	public KeyStore getTrustStore() {
 		return trustKeyStore;
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param params
-	 */
 	@Override
 	public void init(Map<String, Object> params) {
 		try {

@@ -109,35 +109,16 @@ public class VHostJDBCRepository
 	
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getConfigKey() {
 		return VHostRepoDefaults.getConfigKey();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String[] getDefaultPropetyItems() {
 		return VHostRepoDefaults.getDefaultPropetyItems();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param defs
-	 * @param params
-	 */
 	@Override
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
 
@@ -155,45 +136,21 @@ public class VHostJDBCRepository
 		defs.put(DOMAINS_PER_USER_LIMIT_PROP_KEY, DOMAINS_PER_USER_LIMIT_PROP_VAL);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public VHostItem getItemInstance() {
 		return VHostRepoDefaults.getItemInstance();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getItemsListPKey() {
 		return VHostRepoDefaults.getItemsListPKey();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getPropertyKey() {
 		return VHostRepoDefaults.getPropertyKey();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public BareJID getRepoUser() {
 		return VHostRepoDefaults.getRepoUser();
@@ -206,12 +163,6 @@ public class VHostJDBCRepository
 	
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param properties
-	 */
 	@Override
 	public void setProperties(Map<String, Object> properties) {
 
@@ -229,12 +180,6 @@ public class VHostJDBCRepository
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Performs validation of given VHostItem
-	 *
-	 * @param item VHostItem which should be validated
-	 * 
-	 */
 	@Override
 	public String validateItem(VHostItem item) {
 		if ((item.getVhost() == null) || (item.getVhost().getDomain() == null) ||

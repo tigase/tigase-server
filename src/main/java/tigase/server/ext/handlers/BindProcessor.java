@@ -68,26 +68,11 @@ public class BindProcessor
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getId() {
 		return ID;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 * @param handler
-	 *
-	 * 
-	 */
 	@Override
 	public List<Element> getStreamFeatures(ComponentIOService serv,
 					ComponentProtocolHandler handler) {
@@ -96,17 +81,6 @@ public class BindProcessor
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param p
-	 * @param serv
-	 * @param handler
-	 * @param results
-	 *
-	 * 
-	 */
 	@Override
 	public boolean process(Packet p, ComponentIOService serv,
 												 ComponentProtocolHandler handler, Queue<Packet> results) {
@@ -138,15 +112,6 @@ public class BindProcessor
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param p
-	 * @param serv
-	 * @param handler
-	 * @param results
-	 */
 	@Override
 	public void startProcessing(Packet p, ComponentIOService serv,
 															ComponentProtocolHandler handler, Queue<Packet> results) {

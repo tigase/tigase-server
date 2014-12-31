@@ -50,8 +50,9 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 	 *
 	 *
 	 *
-	 * @param serv
-	 * 
+	 * @param serv {@link S2SIOService} for which stream features should be retrieved
+	 *
+	 * @return list of stream features
 	 */
 	public List<Element> getStreamFeatures(S2SIOService serv);
 
@@ -67,15 +68,30 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 			throws NotLocalhostException, LocalhostException;
 
 	BareJID getDefHostName();
-       
-    String getSecretForDomain(String domain) throws NotLocalhostException;
 
-	String getServerNameForDomain(String domain);
-	
+	/**
+	 * Returns secret used for particular domain
+	 *
+	 * @param domain for which secret should be returned
+	 * 
+	 * @return for particular domain
+	 * @throws NotLocalhostException if the domain is not local
+	 */
+	String getSecretForDomain( String domain ) throws NotLocalhostException;
+
+	String getServerNameForDomain( String domain );
+
 	//~--- methods --------------------------------------------------------------
 
 	void initNewConnection(Map<String, Object> port_props);
 
+	/**
+	 * Checks if TLS is required for particular domain
+	 *
+	 * @param domain for which secret should be returned
+	 *
+	 * @return boolean indicating whether TLS is required
+	 */
 	boolean isTlsRequired(String domain);
         
 	boolean isTlsWantClientAuthEnabled();

@@ -121,25 +121,11 @@ public class MobileV3
 	
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String id() {
 		return ID;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param settings
-	 *
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public void init(Map<String, Object> settings) throws TigaseDBException {
 		super.init(settings);
@@ -151,16 +137,6 @@ public class MobileV3
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 * @param settings
-	 */
 	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
 			final NonAuthUserRepository repo, final Queue<Packet> results, final Map<String,
@@ -214,36 +190,16 @@ public class MobileV3
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String[][] supElementNamePaths() {
 		return ELEMENT_PATHS;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 * 
-	 */
 	@Override
 	public Element[] supStreamFeatures(XMPPResourceConnection session) {
 		if (session == null) {
@@ -256,15 +212,6 @@ public class MobileV3
 		return SUP_FEATURES;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param _packet
-	 * @param sessionFromSM
-	 * @param repo
-	 * @param results
-	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public void filter(Packet _packet, XMPPResourceConnection sessionFromSM,

@@ -58,12 +58,6 @@ public class WebSocketClientConnectionManager
 		return defs;
 	}
 	
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getDiscoDescription() {
 		return "Websocket connection manager";
@@ -86,39 +80,16 @@ public class WebSocketClientConnectionManager
 		super.setProperties(props);
 	}
 	
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int[]</code>
-	 */
 	@Override
 	protected int[] getDefPlainPorts() {
 		return new int[] { 5290 };
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int[]</code>
-	 */
 	@Override
 	protected int[] getDefSSLPorts() {
 		return null;
 	}
 
-	/**
-	 * Method returns XMPPIOService instance implementing WebSocketXMPPIOService
-	 *
-	 *
-	 *
-	 * @return a value of {@code XMPPIOService<Object>}
-	 */
 	@Override
 	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
 		return new WebSocketXMPPIOService<Object>(enabledProtocolVersions);

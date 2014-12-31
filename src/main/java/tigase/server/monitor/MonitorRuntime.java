@@ -146,11 +146,6 @@ public class MonitorRuntime extends TigaseRuntime {
 		return false;
 	}	
 	
-	/**
-	 *
-	 * @param jid
-	 * 
-	 */
 	@Override
 	public JID[] getConnectionIdsForJid(JID jid) {
 		if (onlineJidsReporters.size() == 1) {

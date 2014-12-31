@@ -469,12 +469,6 @@ class DBSchemaLoader extends SchemaLoader {
 		return is;
 	}
 
-	/**
-	 * Method validates whether the connection can at least be established. If yes
-	 * then appropriate flag is set.
-	 *
-	 * @param variables set of {@code Properties} with all configuration options
-	 */
 	@Override
 	public Result validateDBConnection( Properties variables ) {
 		connection_ok = false;
@@ -535,14 +529,6 @@ class DBSchemaLoader extends SchemaLoader {
 		return Result.ok;
 	}
 
-	/**
-	 * Method, if the connection is validated by {@code validateDBConnection},
-	 * checks whether desired database exists. If not it creates such database
-	 * using {@code *-installer-create-db.sql} schema file substituting it's
-	 * variables with ones provided.
-	 *
-	 * @param variables set of {@code Properties} with all configuration options
-	 */
 	@Override
 	public Result validateDBExists( Properties variables ) {
 		if ( !connection_ok ){
@@ -735,12 +721,6 @@ class DBSchemaLoader extends SchemaLoader {
 		}
 	}
 
-	/**
-	 * Method attempts to add XMPP admin user account to the database using
-	 * {@link AuthRepository}.
-	 *
-	 * @param variables set of {@code Properties} with all configuration options
-	 */
 	@Override
 	public Result addXmppAdminAccount( Properties variables ) {
 		// part 1, check db preconditions
@@ -804,13 +784,6 @@ class DBSchemaLoader extends SchemaLoader {
 		}
 	}
 
-	/**
-	 * Method checks whether the connection to the database is possible and that
-	 * database of specified name exists. If yes then a schema file from
-	 * properties is loaded.
-	 *
-	 * @param variables set of {@code Properties} with all configuration options
-	 */
 	@Override
 	public Result loadSchemaFile( Properties variables ) {
 

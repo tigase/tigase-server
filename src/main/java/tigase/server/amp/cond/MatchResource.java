@@ -56,12 +56,6 @@ public class MatchResource
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getName() {
 		return name;
@@ -69,16 +63,6 @@ public class MatchResource
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @param packet
-	 * @param rule
-	 *
-	 * 
-	 */
 	@Override
 	public boolean match(Packet packet, Element rule) {
 		String value   = rule.getAttributeStaticStr("value");
@@ -119,6 +103,3 @@ public class MatchResource
 		return result;
 	}
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/02/20

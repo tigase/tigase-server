@@ -71,25 +71,11 @@ public abstract class SMNonCachingAllNodes
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 *
-	 * 
-	 */
 	@Override
 	public boolean containsJid(BareJID jid) {
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 */
 	@Override
 	public void nodeConnected(JID jid) {
 		boolean result = cl_nodes_list.addIfAbsent(jid);
@@ -98,12 +84,6 @@ public abstract class SMNonCachingAllNodes
 				result });
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 */
 	@Override
 	public void nodeDisconnected(JID jid) {
 		boolean result = cl_nodes_list.remove(jid);
@@ -114,63 +94,21 @@ public abstract class SMNonCachingAllNodes
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public List<JID> getAllNodes() {
 		return cl_nodes_list;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 *
-	 * 
-	 */
 	@Override
 	public JID[] getConnectionIdsForJid(BareJID jid) {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * tigase.cluster.strategy.ClusteringStrategyIfc#getConnectionRecords(tigase
-	 * .xmpp.BareJID)
-	 */
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param bareJID
-	 *
-	 * 
-	 */
 	@Override
 	public Set<ConnectionRecord> getConnectionRecords(BareJID bareJID) {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see tigase.cluster.strategy.ClusteringStrategyIfc#getInternalCache()
-	 */
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	@Deprecated
 	public Object getInternalCacheData() {
@@ -289,23 +227,11 @@ public abstract class SMNonCachingAllNodes
 		return getAllNodes();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 */
 	@Override
 	public void getStatistics(StatisticsList list) {
 		list.add("cl-caching-strat", "Connected nodes", cl_nodes_list.size(), Level.INFO);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public boolean hasCompleteJidsInfo() {
 		return false;
@@ -313,12 +239,6 @@ public abstract class SMNonCachingAllNodes
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param props
-	 */
 	@Override
 	public void setProperties(Map<String, Object> props) {}
 
@@ -453,5 +373,3 @@ public abstract class SMNonCachingAllNodes
 	}
 }
 
-
-//~ Formatted in Tigase Code Convention on 13/07/06

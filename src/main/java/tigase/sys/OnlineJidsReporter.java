@@ -28,17 +28,18 @@ import tigase.xmpp.JID;
  * Created: Apr 19, 2009 12:15:07 AM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
  */
 public interface OnlineJidsReporter {
 
 	/**
-	 * Indicates whether given {@code OnlineJidsReporter} contains complete
-	 * information about connected JIDs.
+	 * Method checks whether the clustering strategy has a complete JIDs info.
+	 * That is whether the strategy knows about all users connected to all nodes.
+	 * Some strategies may choose not to share this information among nodes, hence
+	 * the methods returns false. Other may synchronize this information and can
+	 * provide it to further optimize cluster traffic.
 	 *
-	 *
-	 * @return {@code true} if the informations are complete, {@code false}
-	 *         otherwise.
+	 * @return a true boolean value if the strategy has a complete information
+	 *         about all users connected to all cluster nodes.
 	 */
 	boolean hasCompleteJidsInfo();
 

@@ -94,22 +94,7 @@ public class AuthRepositoryImpl
 		this.repo = repo;
 	}
 
-	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
-
-	/**
-	 * Describe <code>addUser</code> method here.
-	 *
-	 * @param user
-	 *          a <code>String</code> value
-	 * @param password
-	 *          a <code>String</code> value
-	 * @exception UserExistsException
-	 *              if an error occurs
-	 * @exception TigaseDBException
-	 *              if an error occurs
-	 */
 	@Override
 	public void addUser(BareJID user, final String password)
 					throws UserExistsException, TigaseDBException {
@@ -119,25 +104,6 @@ public class AuthRepositoryImpl
 		log.info("Password updated: " + user + ":" + password);
 	}
 
-	/**
-	 * Describe <code>digestAuth</code> method here.
-	 *
-	 * @param user
-	 *          a <code>String</code> value
-	 * @param digest
-	 *          a <code>String</code> value
-	 * @param id
-	 *          a <code>String</code> value
-	 * @param alg
-	 *          a <code>String</code> value
-	 * @return a <code>boolean</code> value
-	 * @exception UserNotFoundException
-	 *              if an error occurs
-	 * @exception TigaseDBException
-	 *              if an error occurs
-	 * @exception AuthorizationException
-	 *              if an error occurs
-	 */
 	@Override
 	@Deprecated
 	public boolean digestAuth(BareJID user, final String digest, final String id,
@@ -158,84 +124,28 @@ public class AuthRepositoryImpl
 		}    // end of try-catch
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getResourceUri() {
 		return repo.getResourceUri();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public long getUsersCount() {
 		return repo.getUsersCount();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 *
-	 * 
-	 */
 	@Override
 	public long getUsersCount(String domain) {
 		return repo.getUsersCount(domain);
 	}
 
-	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
-
-	/**
-	 * Describe <code>initRepository</code> method here.
-	 *
-	 * @param string
-	 *          a <code>String</code> value
-	 * @param params
-	 * @exception DBInitException
-	 *              if an error occurs
-	 */
 	@Override
 	public void initRepository(final String string, Map<String, String> params)
 					throws DBInitException {}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 */
 	@Override
 	public void logout(BareJID user) {}
 
-	/**
-	 * Describe <code>otherAuth</code> method here.
-	 *
-	 * @param props
-	 *          a <code>Map</code> value
-	 * @return a <code>boolean</code> value
-	 * @exception UserNotFoundException
-	 *              if an error occurs
-	 * @exception TigaseDBException
-	 *              if an error occurs
-	 * @exception AuthorizationException
-	 *              if an error occurs
-	 */
 	@Override
 	public boolean otherAuth(final Map<String, Object> props)
 					throws UserNotFoundException, TigaseDBException, AuthorizationException {
@@ -270,19 +180,6 @@ public class AuthRepositoryImpl
 		throw new AuthorizationException("Protocol is not supported.");
 	}
 
-	/**
-	 * Describe <code>plainAuth</code> method here.
-	 *
-	 * @param user
-	 *          a <code>String</code> value
-	 * @param password
-	 *          a <code>String</code> value
-	 * @return a <code>boolean</code> value
-	 * @exception UserNotFoundException
-	 *              if an error occurs
-	 * @exception TigaseDBException
-	 *              if an error occurs
-	 */
 	@Override
 	@Deprecated
 	public boolean plainAuth(BareJID user, final String password)
@@ -298,12 +195,6 @@ public class AuthRepositoryImpl
 
 	// Implementation of tigase.db.AuthRepository
 
-	/**
-	 * Describe <code>queryAuth</code> method here.
-	 *
-	 * @param authProps
-	 *          a <code>Map</code> value
-	 */
 	@Override
 	public void queryAuth(final Map<String, Object> authProps) {
 		String protocol = (String) authProps.get(PROTOCOL_KEY);
@@ -316,31 +207,11 @@ public class AuthRepositoryImpl
 		}    // end of if (protocol.equals(PROTOCOL_VAL_NONSASL))
 	}
 
-	/**
-	 * Describe <code>removeUser</code> method here.
-	 *
-	 * @param user
-	 *          a <code>String</code> value
-	 * @exception UserNotFoundException
-	 *              if an error occurs
-	 * @exception TigaseDBException
-	 *              if an error occurs
-	 */
 	@Override
 	public void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException {
 		repo.removeUser(user);
 	}
 
-	/**
-	 * Describe <code>updatePassword</code> method here.
-	 *
-	 * @param user
-	 *          a <code>String</code> value
-	 * @param password
-	 *          a <code>String</code> value
-	 * @exception TigaseDBException
-	 *              if an error occurs
-	 */
 	@Override
 	public void updatePassword(BareJID user, final String password)
 					throws TigaseDBException {
@@ -349,13 +220,11 @@ public class AuthRepositoryImpl
 
 	//~--- get methods ----------------------------------------------------------
 
-	// ~--- get methods ----------------------------------------------------------
 	public String getPassword(BareJID user)
 					throws UserNotFoundException, TigaseDBException {
 		return repo.getData(user, PASSWORD_KEY);
 	}
 
-	//~--- methods --------------------------------------------------------------
 
 	// ~--- methods --------------------------------------------------------------
 	private boolean saslAuth(final Map<String, Object> props)
@@ -407,33 +276,16 @@ public class AuthRepositoryImpl
 
 	//~--- inner classes --------------------------------------------------------
 
-	// ~--- inner classes --------------------------------------------------------
 	private class SaslCallbackHandler
 					implements CallbackHandler {
 		private Map<String, Object> options = null;
 
 		//~--- constructors -------------------------------------------------------
 
-		// ~--- constructors -------------------------------------------------------
 		private SaslCallbackHandler(final Map<String, Object> options) {
 			this.options = options;
 		}
 
-		//~--- methods ------------------------------------------------------------
-
-		// ~--- methods ------------------------------------------------------------
-		// Implementation of javax.security.auth.callback.CallbackHandler
-
-		/**
-		 * Describe <code>handle</code> method here.
-		 *
-		 * @param callbacks
-		 *          a <code>Callback[]</code> value
-		 * @exception IOException
-		 *              if an error occurs
-		 * @exception UnsupportedCallbackException
-		 *              if an error occurs
-		 */
 		@Override
 		public void handle(final Callback[] callbacks)
 				throws IOException, UnsupportedCallbackException {
@@ -506,12 +358,3 @@ public class AuthRepositoryImpl
 		}
 	}
 }    // AuthRepositoryImpl
-
-
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-
-//~ Formatted in Tigase Code Convention on 13/03/12

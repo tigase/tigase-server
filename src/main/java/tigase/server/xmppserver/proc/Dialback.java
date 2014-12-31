@@ -100,23 +100,11 @@ public class Dialback
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
-
 	@Override
 	public int order() {
 		return Order.Dialback.ordinal();
 	}
 	
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param p
-	 * @param serv
-	 * @param results
-	 *
-	 * 
-	 */
 	@Override
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
 		CID cid         = (CID) serv.getSessionData().get("cid");
@@ -238,26 +226,12 @@ public class Dialback
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 */
 	@Override
 	public void serviceStarted(S2SIOService serv) {
 		handler.addTimerTask(new AuthenticationTimer(serv), authenticationTimeOut,
 												 TimeUnit.SECONDS);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @param serv
-	 * @param results
-	 */
 	@Override
 	public void streamFeatures(S2SIOService serv, List<Element> results) {
 		CertCheckResult certCheckResult =
@@ -270,15 +244,6 @@ public class Dialback
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 * @param attribs
-	 *
-	 * 
-	 */
 	@Override
 	public String streamOpened(S2SIOService serv, Map<String, String> attribs) {
 		if (attribs.containsKey("version")) {
@@ -516,26 +481,18 @@ public class Dialback
 
 	//~--- inner classes --------------------------------------------------------
 
-	// ~--- inner classes --------------------------------------------------------
 	private class AuthenticationTimer
 					extends tigase.util.TimerTask {
 		private S2SIOService serv = null;
 
 		//~--- constructors -------------------------------------------------------
 
-		// ~--- constructors -------------------------------------------------------
 		private AuthenticationTimer(S2SIOService serv) {
 			this.serv = serv;
 		}
 
 		//~--- methods ------------------------------------------------------------
 
-		// ~--- methods ------------------------------------------------------------
-
-		/**
-		 * Method description
-		 *
-		 */
 		@Override
 		public void run() {
 			if (!serv.isAuthenticated() && serv.isConnected()) {
@@ -548,12 +505,3 @@ public class Dialback
 		}
 	}
 }
-
-
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-
-//~ Formatted in Tigase Code Convention on 13/02/16

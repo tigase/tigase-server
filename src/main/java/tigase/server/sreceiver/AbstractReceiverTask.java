@@ -154,12 +154,6 @@ public abstract class AbstractReceiverTask
 		return ri;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param results
-	 */
 	@Override
 	public void destroy(Queue<Packet> results) {
 		for (RosterItem ri : roster.values()) {
@@ -173,12 +167,6 @@ public abstract class AbstractReceiverTask
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public Map<String, PropertyItem> getDefaultParams() {
 		Map<String, PropertyItem> defs = new TreeMap<String, PropertyItem>();
@@ -219,21 +207,11 @@ public abstract class AbstractReceiverTask
 		return defs;
 	}
 
-	/**
-	 * Describe <code>getDescription</code> method here.
-	 *
-	 * @return a <code>String</code> value
-	 */
 	@Override
 	public String getDescription() {
 		return description;
 	}
 
-	/**
-	 * Describe <code>getInstance</code> method here.
-	 *
-	 * @return a <code>ReceiverTaskIfc</code> value
-	 */
 	@Override
 	public ReceiverTaskIfc getInstance() {
 		try {
@@ -246,32 +224,16 @@ public abstract class AbstractReceiverTask
 		}    // end of try-catch
 	}
 
-	/**
-	 * Describe <code>getJID</code> method here.
-	 *
-	 * @return a <code>String</code> value
-	 */
 	@Override
 	public JID getJID() {
 		return jid;
 	}
 
-	/**
-	 * Describe <code>getParams</code> method here.
-	 *
-	 * @return a <code>Map</code> value
-	 */
 	@Override
 	public Map<String, PropertyItem> getParams() {
 		return props;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public Map<JID, RosterItem> getRoster() {
 		return roster;
@@ -289,21 +251,9 @@ public abstract class AbstractReceiverTask
 		return roster.get(jid.copyWithoutResource());
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 */
 	@Override
 	public void getStatistics(StatisticsList list) {}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public List<StatRecord> getStats() {
 		List<StatRecord> stats = new LinkedList<StatRecord>();
@@ -330,12 +280,6 @@ public abstract class AbstractReceiverTask
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param results
-	 */
 	@Override
 	public void init(final Queue<Packet> results) {
 		for (RosterItem ri : roster.values()) {
@@ -354,14 +298,6 @@ public abstract class AbstractReceiverTask
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 *
-	 * 
-	 */
 	@Override
 	public boolean isAdmin(JID jid) {
 		RosterItem ri = getRosterItem(jid);
@@ -438,12 +374,6 @@ public abstract class AbstractReceiverTask
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Describe <code>processPacket</code> method here.
-	 *
-	 * @param packet a <code>Packet</code> value
-	 * @param results a <code>Queue</code> value
-	 */
 	@Override
 	public void processPacket(final Packet packet, final Queue<Packet> results) {
 		++packets_received;
@@ -485,13 +415,6 @@ public abstract class AbstractReceiverTask
 		return roster.remove(jid.copyWithoutResource());
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param results
-	 * @param subscr
-	 */
 	@Override
 	public void removeSubscribers(Queue<Packet> results, JID... subscr) {
 		for (JID buddy : subscr) {
@@ -506,27 +429,13 @@ public abstract class AbstractReceiverTask
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Describe <code>setJID</code> method here.
-	 *
-	 * @param jid a <code>String</code> value
-	 */
 	@Override
 	public void setJID(JID jid) {
 		this.jid = jid;
 		log.fine("JID set to: " + this.jid);
 
-//  int idx = jid.indexOf(".");
-//  this.local_domain = jid.substring(idx+1);
-//  log.fine("Local domain set to: " + this.local_domain);
-//  this.name = JIDUtils.getNodeNick(jid);
 	}
 
-	/**
-	 * Describe <code>setParams</code> method here.
-	 *
-	 * @param map a <code>Map</code> value
-	 */
 	@Override
 	public void setParams(final Map<String, Object> map) {
 		if (props == null) {
@@ -648,13 +557,6 @@ public abstract class AbstractReceiverTask
 		ri.setAdmin(admin);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param ri
-	 * @param accepted
-	 */
 	@Override
 	public void setRosterItemModerationAccepted(RosterItem ri, boolean accepted) {
 		ri.setModerationAccepted(accepted);
@@ -697,12 +599,6 @@ public abstract class AbstractReceiverTask
 
 	// Implementation of tigase.server.sreceiver.ReceiverTaskIfc
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param srecv
-	 */
 	@Override
 	public void setStanzaReceiver(StanzaReceiverIfc srecv) {
 		this.srecv = srecv;

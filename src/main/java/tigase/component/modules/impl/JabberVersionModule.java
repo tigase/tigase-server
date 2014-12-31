@@ -40,23 +40,11 @@ public class JabberVersionModule<CTX extends Context> extends AbstractModule<CTX
 	public JabberVersionModule() {
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @return
-	 */
 	@Override
 	public String[] getFeatures() {
 		return new String[] { "jabber:iq:version" };
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @return
-	 */
 	@Override
 	public Criteria getModuleCriteria() {
 		return CRIT;

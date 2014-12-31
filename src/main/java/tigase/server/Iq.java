@@ -234,12 +234,6 @@ public class Iq
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public Command getCommand() {
 		return command;
@@ -275,12 +269,6 @@ public class Iq
 		return iqQueryXMLNS;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	protected String[] getElNameErrorPath() {
 		return IQ_ERROR_PATH;
@@ -296,23 +284,11 @@ public class Iq
 		return strCommand;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public boolean isCommand() {
 		return cmd;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public boolean isServiceDisco() {
 		return serviceDisco;

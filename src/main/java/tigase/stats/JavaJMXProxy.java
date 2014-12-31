@@ -175,13 +175,6 @@ public class JavaJMXProxy
 		jmxc.connect();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param notification
-	 * @param handback
-	 */
 	@Override
 	public void handleNotification(Notification notification, Object handback) {
 		if (notification.getType().equals(JMXConnectionNotification.OPENED)) {
@@ -302,16 +295,6 @@ public class JavaJMXProxy
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param level
-	 *
-	 *
-	 *
-	 * @return a value of {@code Map<String,String>}
-	 */
 	@Override
 	public Map<String, String> getAllStats(int level) {
 		if (tigBean != null) {
@@ -321,131 +304,51 @@ public class JavaJMXProxy
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int getCLIOQueueSize() {
 		return clIOQueueSize;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float[]</code>
-	 */
 	@Override
 	public float[] getCLPacketsPerSecHistory() {
 		return clpacks_history;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int getCLQueueSize() {
 		return clQueueSize;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int getClusterCacheSize() {
 		return clusterCacheSize;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	@Override
 	public float getClusterCompressionRatio() {
 		return clCompressionRatio;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	@Override
 	public long getClusterNetworkBytes() {
 		return clNetworkBytes;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	@Override
 	public float getClusterNetworkBytesPerSecond() {
 		return clNetworkBytesPerSec;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	@Override
 	public long getClusterPackets() {
 		return clusterPacketsNumber;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	@Override
 	public float getClusterPacketsPerSec() {
 		return clPacketsPerSec;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of {@code List<String>}
-	 */
 	@Override
 	public List<String> getComponentsNames() {
 		if (tigBean != null) {
@@ -455,17 +358,6 @@ public class JavaJMXProxy
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param compName
-	 * @param level
-	 *
-	 *
-	 *
-	 * @return a value of {@code Map<String,String>}
-	 */
 	@Override
 	public Map<String, String> getComponentStats(String compName, int level) {
 		if (tigBean != null) {
@@ -475,236 +367,89 @@ public class JavaJMXProxy
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int getConnectionsNumber() {
 		return connectionsNumber;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int[]</code>
-	 */
 	@Override
 	public int[] getConnectionsNumberHistory() {
 		return conns_history;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int getCPUsNumber() {
 		return cpuNo;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	@Override
 	public float getCPUUsage() {
 		return cpuUsage;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float[]</code>
-	 */
 	@Override
 	public float[] getCPUUsageHistory() {
 		return cpu_history;
 	}
 
-	/*
-	 *  (non-Javadoc)
-	 * @see tigase.stats.StatisticsProviderMBean#getCurStats(java.lang.String[])
-	 */
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param statsKeys is a <code>String[]</code>
-	 *
-	 * @return a value of {@code Map<String,Object>}
-	 */
 	@Override
 	public Map<String, Object> getCurStats(String[] statsKeys) {
-
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	@Override
 	public long getDirectMemUsed() {
 		return directUsed;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>long[]</code>
-	 */
 	@Override
 	public long[] getDirectMemUsedHistory() {
 		return direct_history;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	@Override
 	public float getHeapMemUsage() {
 		return heapUsage;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float[]</code>
-	 */
 	@Override
 	public float[] getHeapUsageHistory() {
 		return heap_history;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	public String getId() {
 		return id;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	@Override
 	public long getIQAuthNumber() {
 		return iqAuthNumber;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	@Override
 	public long getIQOtherNumber() {
 		return iqOtherNumber;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	@Override
 	public float getIQOtherNumberPerSec() {
 		return iqOtherPerSec;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getLastCacheUpdate() {
 		return lastCacheUpdate;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	@Override
 	public long getMessagesNumber() {
 		return messagesNumber;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	@Override
 	public float getMessagesNumberPerSec() {
 		return messagesPerSec;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getName() {
 		if (tigBean != null) {
@@ -714,228 +459,85 @@ public class JavaJMXProxy
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	@Override
 	public float getNonHeapMemUsage() {
 		return nonHeapUsage;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	@Override
 	public long getPresencesNumber() {
 		return presencesNumber;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	@Override
 	public float getPresencesNumberPerSec() {
 		return presencesPerSec;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	@Override
 	public long getProcesCPUTime() {
 		return processCPUTime;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	@Override
 	public long getQueueOverflow() {
 		return queueOverflow;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int getQueueSize() {
 		return queueSize;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int getServerConnections() {
 		return serverConnections;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int[]</code>
-	 */
 	@Override
 	public int[] getServerConnectionsHistory() {
 		return serverConnectionsHistory;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	@Override
 	public long getSMPacketsNumber() {
 		return smPacketsNumber;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	@Override
 	public float getSMPacketsNumberPerSec() {
 		return smPacketsPerSec;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float[]</code>
-	 */
 	@Override
 	public float[] getSMPacketsPerSecHistory() {
 		return smpacks_history;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int getSMQueueSize() {
 		return smQueueSize;
 	}
 
-	/*
-	 *  (non-Javadoc)
-	 * @see tigase.stats.StatisticsProviderMBean#getStatsHistory(java.lang.String[])
-	 */
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param statsKeys is a <code>String[]</code>
-	 *
-	 * @return a value of {@code Map<String,LinkedList<Object>>}
-	 */
 	@Override
 	public Map<String, LinkedList<Object>> getStatsHistory(String[] statsKeys) {
-
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getSystemDetails() {
 		return sysDetails;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	@Override
 	public long getUptime() {
 		return uptime;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	public boolean isConnected() {
 		return tigBean != null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	public boolean isInitialized() {
 		return isConnected() && initialized;
 	}
@@ -977,6 +579,3 @@ public class JavaJMXProxy
 		}
 	}
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/11/29

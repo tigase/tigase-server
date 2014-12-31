@@ -75,26 +75,11 @@ public class MessageCarbons
 	private static final String ENABLE_ELEM_NAME = "enable";
 	private static final String DISABLE_ELEM_NAME = "disable";
 	
-	/**
-	 * Returns plugins unique identifier
-	 * 
-	 * 
-	 */
 	@Override
 	public String id() {
 		return ID;
 	}
 
-	/**
-	 * Process packet received by SM for processing
-	 * 
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 * @param settings
-	 * @throws XMPPException 
-	 */
 	@Override
 	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, 
 			Queue<Packet> results, Map<String, Object> settings) throws XMPPException {
@@ -237,32 +222,16 @@ public class MessageCarbons
 		}
 	}
 
-	/**
-	 * Return array of element containing supported disco features
-	 * 
-	 * @param session
-	 * 
-	 */
 	@Override
 	public Element[] supDiscoFeatures(XMPPResourceConnection session) {
 		return DISCO_FEATURES;
 	}
 	
-	/**
-	 * Returns array of split path of supported elements
-	 * 
-	 * 
-	 */
 	@Override
 	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
-	/**
-	 * Returns array of supported namespaces
-	 * 
-	 * 
-	 */
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
@@ -415,14 +384,6 @@ public class MessageCarbons
 
 	}	
 
-	/**
-	 * Method processes outgoing packets from SessionManager
-	 * 
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results 
-	 */
 	@Override
 	public void filter(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results) {
 		if ((session == null) ||!session.isAuthorized() || (results == null) || (results

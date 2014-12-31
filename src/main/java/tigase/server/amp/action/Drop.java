@@ -42,16 +42,6 @@ public class Drop extends ActionAbstract {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param rule
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public boolean execute(Packet packet, Element rule) {
 		return false;
@@ -59,20 +49,8 @@ public class Drop extends ActionAbstract {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getName() {
 		return name;
 	}
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

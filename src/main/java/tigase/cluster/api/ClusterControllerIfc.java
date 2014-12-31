@@ -49,17 +49,27 @@ public interface ClusterControllerIfc {
 	 * Method description
 	 *
 	 *
-	 * @param packet
+	 * @param packet which should be handled
 	 */
 	void handleClusterPacket(Element packet);
 
 	/**
+	 * Method is called on cluster node connection event. This is a
+	 * notification to the component that a new cluster node has connected.
+	 *
 	 * @param addr
+	 *          is a hostname of a cluster node generating the event.
 	 */
 	void nodeConnected(String addr);
 
 	/**
+	 * Method is called on cluster node disconnection event. This is a
+	 * notification to the component that there was network connection lost to one
+	 * of the cluster nodes.
+	 *
 	 * @param addr
+	 *          is a hostname of a cluster node generating the event.
+
 	 */
 	void nodeDisconnected(String addr);
 
@@ -67,95 +77,90 @@ public interface ClusterControllerIfc {
 	 * Method description
 	 *
 	 *
-	 * @param listener
+	 * @param listener CommandListener object
 	 */
 	void removeCommandListener(CommandListener listener);
 
 	/**
-	 * Method description
+	 * Method which sends command to desired nodes
 	 *
-	 *
-	 * @param command
-	 * @param data
-	 * @param packets
-	 * @param fromNode
-	 * @param visitedNodes
-	 * @param toNodes
+	 * @param command ID string of the command
+	 * @param data additional data to be included in the packet
+	 * @param packets collection of elements to be send to desired nodes
+	 * @param fromNode address of the source node
+	 * @param visitedNodes list of all already visited nodes
+	 * @param toNodes list of nodes to which packet should be sent
 	 */
 	void sendToNodes(String command, Map<String, String> data, Queue<Element> packets,
 			JID fromNode, Set<JID> visitedNodes, JID... toNodes);
 
 	/**
-	 * Method description
+	 * Method which sends command to desired nodes
 	 *
+	 * @param command ID string of the command
+	 * @param packets collection of elements to be send to desired nodes
+	 * @param fromNode address of the source node
+	 * @param visitedNodes list of all already visited nodes
+	 * @param toNodes list of nodes to which packet should be sent
 	 *
-	 * @param command
-	 * @param packets
-	 * @param fromNode
-	 * @param visitedNodes
-	 * @param toNodes
 	 */
 	void sendToNodes(String command, Queue<Element> packets, JID fromNode,
 			Set<JID> visitedNodes, JID... toNodes);
 
 	/**
-	 * Method description
+	 * Method which sends command to desired nodes
 	 *
+	 * @param command ID string of the command
+	 * @param data additional data to be included in the packet
+	 * @param fromNode address of the source node
+	 * @param visitedNodes list of all already visited nodes
+	 * @param toNodes list of nodes to which packet should be sent
 	 *
-	 * @param command
-	 * @param data
-	 * @param fromNode
-	 * @param visitedNodes
-	 * @param toNodes
 	 */
 	void sendToNodes(String command, Map<String, String> data, JID fromNode,
 			Set<JID> visitedNodes, JID... toNodes);
 
 	/**
-	 * Method description
+	 * Method which sends command to desired nodes
 	 *
-	 *
-	 * @param command
-	 * @param data
-	 * @param fromNode
-	 * @param toNodes
+	 * @param command ID string of the command
+	 * @param data additional data to be included in the packet
+	 * @param fromNode address of the source node
+	 * @param toNodes list of nodes to which packet should be sent
 	 */
 	void sendToNodes(String command, Map<String, String> data, JID fromNode,
 			JID... toNodes);
 
 	/**
-	 * Method description
+	 * Method which sends command to desired nodes
 	 *
-	 *
-	 * @param command
-	 * @param fromNode
-	 * @param toNodes
+	 * @param command ID string of the command
+	 * @param fromNode address of the source node
+	 * @param toNodes list of nodes to which packet should be sent
 	 */
 	void sendToNodes(String command, JID fromNode, JID... toNodes);
 
 	/**
-	 * Method description
+	 * Method which sends command to desired nodes
 	 *
-	 *
-	 * @param command
-	 * @param packet
-	 * @param fromNode
-	 * @param visitedNodes
-	 * @param toNodes
+	 * @param command ID string of the command
+	 * @param packet collection of elements to be send to desired nodes
+	 * @param fromNode address of the source node
+	 * @param visitedNodes list of all already visited nodes
+	 * @param toNodes list of nodes to which packet should be sent
 	 */
 	void sendToNodes(String command, Element packet, JID fromNode, Set<JID> visitedNodes,
 			JID... toNodes);
 
 	/**
-	 * Method description
+	 * Method which sends command to desired nodes
 	 *
-	 *
-	 * @param command
-	 * @param data
-	 * @param packet
-	 * @param fromNode
-	 * @param visitedNodes
-	 * @param toNodes
+	 * @param command ID string of the command
+	 * @param data additional data to be included in the packet
+	 * @param packet element to be send to desired nodes
+	 * @param fromNode address of the source node
+	 * @param visitedNodes list of all already visited nodes
+	 * @param toNodes list of nodes to which packet should be sent
 	 */
 	void sendToNodes(String command, Map<String, String> data, Element packet,
 			JID fromNode, Set<JID> visitedNodes, JID... toNodes);
@@ -166,10 +171,8 @@ public interface ClusterControllerIfc {
 	 * Method description
 	 *
 	 *
-	 * @param listener
+	 * @param listener CommandListener object
 	 */
 	void setCommandListener(CommandListener listener);
 }
 
-
-//~ Formatted in Tigase Code Convention on 13/07/06

@@ -107,7 +107,6 @@ import java.util.Queue;
  * Created: Dec 13, 2008 7:44:35 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
  */
 public class VirtualComponent
 				implements ServerComponent, XMPPService, Configurable, DisableDisco,
@@ -181,7 +180,6 @@ public class VirtualComponent
 
 	//~--- fields ---------------------------------------------------------------
 
-	/** Field description */
 	protected VHostManagerIfc vHostManager  = null;
 	private JID               componentId   = null;
 	private String            discoCategory = null;
@@ -197,53 +195,24 @@ public class VirtualComponent
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public boolean handlesLocalDomains() {
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public boolean handlesNameSubdomains() {
 		return true;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public boolean handlesNonLocalDomains() {
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
 	@Override
 	public void initializationCompleted() {}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param results
-	 */
 	@Override
 	public void processPacket(Packet packet, Queue<Packet> results) {
 		if (redirectTo != null) {
@@ -254,31 +223,14 @@ public class VirtualComponent
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
 	@Override
 	public void release() {}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public JID getComponentId() {
 		return componentId;
 	}
 
-	/**
-	 * Allows to obtain various informations about components
-	 *
-	 * @return information about particular component
-	 */
 	@Override
 	public ComponentInfo getComponentInfo() {
 		if ( cmpInfo == null ){
@@ -287,14 +239,6 @@ public class VirtualComponent
 		return cmpInfo;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 * 
-	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defs = new LinkedHashMap<String, Object>();
@@ -321,44 +265,16 @@ public class VirtualComponent
 		return defs;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param from
-	 *
-	 * 
-	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param node
-	 * @param jid
-	 * @param from
-	 *
-	 * 
-	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param node
-	 * @param jid
-	 * @param from
-	 *
-	 * 
-	 */
 	@Override
 	public List<Element> getDiscoItems(String node, JID jid, JID from) {
 		String domain = jid.toString();
@@ -372,48 +288,22 @@ public class VirtualComponent
 		return Arrays.asList(result);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getName() {
 		return name;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public boolean isInitializationComplete() {
 		return false;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param name
-	 */
 	@Override
 	public void setName(String name) {
 		this.name        = name;
 		this.componentId = JID.jidInstanceNS(name, DNSResolver.getDefaultHostname(), null);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param properties
-	 */
 	@Override
 	public void setProperties(Map<String, Object> properties) {
 		fixedDomain = (String) properties.get(FIXED_DOMAIN_PROP_KEY);
@@ -466,17 +356,8 @@ public class VirtualComponent
 		cmpInfo = new ComponentInfo( getName(), this.getClass() );
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param manager
-	 */
 	@Override
 	public void setVHostManager(VHostManagerIfc manager) {
 		this.vHostManager = manager;
 	}
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/06/08

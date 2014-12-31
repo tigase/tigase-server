@@ -69,12 +69,6 @@ public class ExpireAt
 	}
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getName() {
 		return NAME;
@@ -82,16 +76,6 @@ public class ExpireAt
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @param packet
-	 * @param rule
-	 *
-	 * 
-	 */
 	@Override
 	public boolean match(Packet packet, Element rule) {
 		String value = rule.getAttributeStaticStr("value");

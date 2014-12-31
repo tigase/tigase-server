@@ -66,33 +66,15 @@ public class Script extends AbstractScriptCommand {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public Bindings getBindings() {
 		return scriptEngine.createBindings();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public String getFileExtension() {
 		return ext;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public String getLanguageName() {
 		return language;
 	}
@@ -150,17 +132,8 @@ public class Script extends AbstractScriptCommand {
 		log.log(Level.INFO, "Initialized script command, id: {0}, lang: {1}, ext: {2}",
 				new Object[] { id, this.language, this.ext });
 
-		// ", script text: \n" + this.script);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param binds
-	 * @param results
-	 */
 	@Override
 	@SuppressWarnings({ "unchecked" })
 	public void runCommand(Iq packet, Bindings binds, Queue<Packet> results) {

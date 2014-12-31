@@ -64,16 +64,6 @@ public class PacketCounter
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 *
-	 * 
-	 */
 	@Override
 	public Packet filter(Packet packet) {
 		if (packet.getElemName() == "message") {
@@ -105,13 +95,6 @@ public class PacketCounter
 
 	// ~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param name
-	 * @param qType
-	 */
 	@Override
 	public void init(String name, QueueType qType) {
 		this.name  = name;
@@ -120,14 +103,6 @@ public class PacketCounter
 
 	//~--- get methods ----------------------------------------------------------
 
-	// ~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 */
 	@Override
 	public void getStatistics(StatisticsList list) {
 		list.add(name, qType.name() + " processed messages", msgCounter, Level.FINER);

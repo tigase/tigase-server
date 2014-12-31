@@ -82,27 +82,11 @@ public class AmpComponent
 
 	// ~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 *
-	 * 
-	 */
 	@Override
 	public boolean addOutPacket(Packet packet) {
 		return super.addOutPacket(packet);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packets
-	 *
-	 * 
-	 */
 	@Override
 	public boolean addOutPackets(Queue<Packet> packets) {
 		return super.addOutPackets(packets);
@@ -110,16 +94,6 @@ public class AmpComponent
 
 	//~--- get methods ----------------------------------------------------------
 	
-	// ~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 * 
-	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defs = super.getDefaults(params);
@@ -157,48 +131,19 @@ public class AmpComponent
 			defs.putAll(d);
 		}
 		
-		// for (ConditionIfc c : conditions.values()) {
-		// Map<String, Object> d = c.getDefaults(params);
-		//
-		// if (d != null) {
-		// defs.putAll(d);
-		// }
-		// }
 		return defs;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getDiscoCategoryType() {
 		return "generic";
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getDiscoDescription() {
 		return "IM AMP Support";
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param node
-	 * @param jid
-	 * @param from
-	 *
-	 * 
-	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
 		Element query = super.getDiscoInfo(node, jid, from);
@@ -246,14 +191,6 @@ public class AmpComponent
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
 	@Override
 	public void processPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -308,15 +245,6 @@ public class AmpComponent
 
 	//~--- set methods ----------------------------------------------------------
 
-	// ~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param props
-	 * @throws tigase.conf.ConfigurationException
-	 */
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);

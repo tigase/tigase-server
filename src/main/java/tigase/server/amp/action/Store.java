@@ -74,18 +74,6 @@ public class Store
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param rule
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public boolean execute(Packet packet, Element rule) {
 		if (repo != null) {
@@ -146,16 +134,6 @@ public class Store
 
 	//~--- get methods ----------------------------------------------------------
 
-	// ~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 * 
-	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defs = super.getDefaults(params);
@@ -175,12 +153,6 @@ public class Store
 		return defs;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getName() {
 		return name;
@@ -188,15 +160,6 @@ public class Store
 
 	//~--- set methods ----------------------------------------------------------
 
-	// ~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param props
-	 * @param handler
-	 */
 	@Override
 	public void setProperties(Map<String, Object> props, ActionResultsHandlerIfc handler) {
 		super.setProperties(props, handler);

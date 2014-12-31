@@ -76,12 +76,6 @@ public class Message
 	private MessageDeliveryRules deliveryRules = MessageDeliveryRules.inteligent;
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Returns plugin unique identifier.
-	 *
-	 *
-	 * @return pugin unique identifier.
-	 */
 	@Override
 	public String id() {
 		return ID;
@@ -101,18 +95,6 @@ public class Message
 		C2SDeliveryErrorProcessor.filter(packet, session, repo, results, null);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 * @param settings
-	 *
-	 * @throws XMPPException
-	 */
 	@Override
 	public void process(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
@@ -313,23 +295,11 @@ public class Message
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 */
 	@Override
 	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 */
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
@@ -341,5 +311,3 @@ public class Message
 	}
 }    // Message
 
-
-//~ Formatted in Tigase Code Convention on 13/03/12

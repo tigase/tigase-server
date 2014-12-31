@@ -1176,15 +1176,6 @@ public class BoshSession {
 
 	private static class TimerTaskComparator
 					implements Comparator<BoshTask> {
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param o1
-		 * @param o2
-		 *
-		 * 
-		 */
 		@Override
 		public int compare(BoshTask o1, BoshTask o2) {
 			if (o1.timerOrder > o2.timerOrder) {
@@ -1198,6 +1189,3 @@ public class BoshSession {
 		}
 	}
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/04/22

@@ -239,10 +239,6 @@ public class SocketThread implements Runnable {
 		// wakeupHelper.wakeup();
 	}
 
-	/**
-	 * Describe <code>run</code> method here.
-	 *
-	 */
 	@SuppressWarnings({ "unchecked" })
 	@Override
 	public void run() {
@@ -543,15 +539,6 @@ public class SocketThread implements Runnable {
 
 	private class IOServiceComparator implements Comparator<IOService<?>> {
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param o1
-		 * @param o2
-		 *
-		 * 
-		 */
 		@Override
 		public int compare(IOService<?> o1, IOService<?> o2) {
 			return o1.getUniqueId().compareTo(o2.getUniqueId());
@@ -575,10 +562,6 @@ public class SocketThread implements Runnable {
 
 		//~--- methods ------------------------------------------------------------
 
-		/**
-		 * Method description
-		 *
-		 */
 		@Override
 		public void run() {
 			for (;;) {

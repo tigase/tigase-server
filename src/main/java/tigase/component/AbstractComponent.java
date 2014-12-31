@@ -251,9 +251,6 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 	 */
 	protected abstract Map<String, Class<? extends Module>> getDefaultModulesList();
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		final Map<String, Object> props = super.getDefaults(params);
@@ -290,9 +287,6 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 		return writer;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public void initBindings(Bindings binds) {
 		super.initBindings(binds); // To change body of generated methods,
@@ -344,9 +338,6 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 		return this.modulesManager.isRegistered(id);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public void processPacket(Packet packet) {
 		if ( log.isLoggable( Level.FINER ) ){
@@ -448,11 +439,6 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @throws tigase.conf.ConfigurationException
-	 */
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
@@ -463,9 +449,6 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public void updateServiceEntity() {
 		super.updateServiceEntity();

@@ -52,41 +52,16 @@ public class NonpriorityQueue<E> extends PriorityQueueAbstract<E> {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param maxPriority
-	 * @param maxSize
-	 */
 	@Override
 	public final void init(int maxPriority, int maxSize) {
 		queue = new LinkedBlockingQueue<E>(maxSize);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param element
-	 * @param priority
-	 *
-	 * 
-	 */
 	@Override
 	public boolean offer(E element, int priority) {
 		return queue.offer(element);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param element
-	 * @param priority
-	 *
-	 * @throws InterruptedException
-	 */
 	@Override
 	public void put(E element, int priority) throws InterruptedException {
 		queue.put(element);
@@ -94,12 +69,6 @@ public class NonpriorityQueue<E> extends PriorityQueueAbstract<E> {
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param maxSize
-	 */
 	@Override
 	public void setMaxSize(int maxSize) {
 
@@ -116,12 +85,6 @@ public class NonpriorityQueue<E> extends PriorityQueueAbstract<E> {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public int[] size() {
 		int[] result = new int[1];
@@ -131,33 +94,13 @@ public class NonpriorityQueue<E> extends PriorityQueueAbstract<E> {
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 *
-	 * @throws InterruptedException
-	 */
 	@Override
 	public E take() throws InterruptedException {
 		return queue.take();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public int totalSize() {
 		return queue.size();
 	}
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

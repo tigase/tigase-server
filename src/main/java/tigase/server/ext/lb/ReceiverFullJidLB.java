@@ -34,9 +34,6 @@ import tigase.server.ext.ComponentIOService;
  */
 public class ReceiverFullJidLB implements LoadBalancerIfc {
 
-	/* (non-Javadoc)
-	 * @see tigase.server.ext.lb.LoadBalancerIfc#selectConnection(tigase.server.Packet, java.util.ArrayList)
-	 */
 	@Override
 	public ComponentIOService selectConnection(Packet p, List<ComponentConnection> conns) {
 		ComponentIOService result = null;

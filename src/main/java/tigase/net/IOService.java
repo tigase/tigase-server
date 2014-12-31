@@ -237,14 +237,6 @@ public abstract class IOService<RefObject>
 		setLastTransferTime();
 	}
 
-	/**
-	 * Method
-	 * <code>run</code> is used to perform
-	 *
-	 *
-	 * 
-	 * @throws IOException
-	 */
 	@Override
 	public IOService<?> call() throws IOException {
 		writeData(null);
@@ -340,12 +332,6 @@ public abstract class IOService<RefObject>
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param wrapper
-	 */
 	@Override
 	public void handshakeCompleted(TLSWrapper wrapper) {
 		String reqCertDomain = (String) getSessionData().get(CERT_REQUIRED_DOMAIN);
@@ -518,12 +504,6 @@ public abstract class IOService<RefObject>
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String toString() {
 		return getConnectionId() + ", type: " + connectionType + ", Socket: " + socketIO;

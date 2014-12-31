@@ -63,16 +63,6 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 		repos.put(domain, repo);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param password
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserExistsException
-	 */
 	@Override
 	public void addUser(BareJID user, String password)
 			throws UserExistsException, TigaseDBException {
@@ -87,21 +77,6 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param digest
-	 * @param id
-	 * @param alg
-	 *
-	 * 
-	 *
-	 * @throws AuthorizationException
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	@Deprecated
 	public boolean digestAuth(BareJID user, String digest, String id, String alg)
@@ -139,23 +114,11 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getResourceUri() {
 		return def.getResourceUri();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public long getUsersCount() {
 		long result = 0;
@@ -167,14 +130,6 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 *
-	 * 
-	 */
 	@Override
 	public long getUsersCount(String domain) {
 		AuthRepository repo = getRepo(domain);
@@ -189,17 +144,6 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 		return -1;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param resource_uri
-	 * @param params
-	 *
-	 * @throws DBInitException
-	 */
 	@Override
 	public void initRepository(String resource_uri, Map<String, String> params)
 			throws DBInitException {
@@ -207,15 +151,6 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 				+ params);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public void logout(BareJID user) throws UserNotFoundException, TigaseDBException {
 		AuthRepository repo = getRepo(user.getDomain());
@@ -229,18 +164,6 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param authProps
-	 *
-	 * 
-	 *
-	 * @throws AuthorizationException
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public boolean otherAuth(Map<String, Object> authProps)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
@@ -257,19 +180,6 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param password
-	 *
-	 * 
-	 *
-	 * @throws AuthorizationException
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	@Deprecated
 	public boolean plainAuth(BareJID user, String password)
@@ -287,12 +197,6 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param authProps
-	 */
 	@Override
 	public void queryAuth(Map<String, Object> authProps) {
 		AuthRepository repo = getRepo((String) authProps.get(SERVER_NAME_KEY));
@@ -318,15 +222,6 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 		return repos.remove(domain);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException {
 		AuthRepository repo = getRepo(user.getDomain());
@@ -354,16 +249,6 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param password
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public void updatePassword(BareJID user, String password)
 			throws UserNotFoundException, TigaseDBException {
@@ -391,9 +276,3 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 		}
 	}
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

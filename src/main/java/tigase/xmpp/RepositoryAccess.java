@@ -712,16 +712,21 @@ public abstract class RepositoryAccess {
 	// ~--- get methods ----------------------------------------------------------
 
 	/**
-	 * Method description
+	 * Returns user JID but without <em>resource</em> part. This is real user ID
+	 * not session ID. To retrieve session ID - full JID refer to
+	 * <code>getJID()</code> method.<br>
+	 * If session has not been authorized yet this method throws
+	 * <code>NotAuthorizedException</code>.
 	 *
+	 * @return a <code>String</code> value of user ID - this is user JID without
+	 *         resource part. To obtain full user JID please refer to
+	 *         <code>getJID</code> method.
 	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>BareJID</code>
-	 * @throws NotAuthorizedException
+	 * @exception NotAuthorizedException when this session has not been authorized
+	 *                                   yet and some parts of user JID are not
+	 *                                   known yet.
 	 */
-	public abstract BareJID getBareJID() throws NotAuthorizedException;
+public abstract BareJID getBareJID() throws NotAuthorizedException;
 
 	/**
 	 * <code>getData</code> method is a twin sister (brother?) of

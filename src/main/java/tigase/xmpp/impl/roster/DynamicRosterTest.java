@@ -58,32 +58,11 @@ public class DynamicRosterTest
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 * 
-	 *
-	 * @throws NotAuthorizedException
-	 */
 	@Override
 	public JID[] getBuddies(XMPPResourceConnection session) throws NotAuthorizedException {
 		return new JID[] { JID.jidInstanceNS("dynrost@test-d") };
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param buddy
-	 *
-	 * 
-	 *
-	 * @throws NotAuthorizedException
-	 */
 	@Override
 	public Element getBuddyItem(XMPPResourceConnection session, JID buddy)
 					throws NotAuthorizedException {
@@ -94,14 +73,6 @@ public class DynamicRosterTest
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param item
-	 *
-	 * 
-	 */
 	@Override
 	public Element getItemExtraData(Element item) {
 		String jid     = item.getAttributeStaticStr("jid");
@@ -115,16 +86,6 @@ public class DynamicRosterTest
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 * 
-	 *
-	 * @throws NotAuthorizedException
-	 */
 	@Override
 	public List<Element> getRosterItems(XMPPResourceConnection session)
 					throws NotAuthorizedException {
@@ -133,32 +94,14 @@ public class DynamicRosterTest
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param props
-	 */
 	@Override
 	public void init(Map<String, Object> props) {}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param par
-	 */
 	@Override
 	public void init(String par) {}
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param item
-	 */
 	@Override
 	public void setItemExtraData(Element item) {
 		String jid = item.getAttributeStaticStr("jid");
@@ -179,5 +122,3 @@ public class DynamicRosterTest
 	}
 }
 
-
-//~ Formatted in Tigase Code Convention on 13/02/20

@@ -138,12 +138,6 @@ public class SystemMonitorTask
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param results
-	 */
 	@Override
 	public void destroy(Queue<Packet> results) {
 		tasks.cancel();
@@ -153,12 +147,6 @@ public class SystemMonitorTask
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public Map<String, PropertyItem> getDefaultParams() {
 		Map<String, PropertyItem> defs = super.getDefaultParams();
@@ -189,23 +177,11 @@ public class SystemMonitorTask
 		return defs;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getHelp() {
 		return TASK_HELP;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public Map<String, PropertyItem> getParams() {
 		Map<String, PropertyItem> props = super.getParams();
@@ -223,12 +199,6 @@ public class SystemMonitorTask
 		return props;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 */
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
@@ -237,12 +207,6 @@ public class SystemMonitorTask
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getType() {
 		return TASK_TYPE;
@@ -250,12 +214,6 @@ public class SystemMonitorTask
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param results
-	 */
 	@Override
 	public void init(Queue<Packet> results) {
 		super.init(results);
@@ -288,12 +246,6 @@ public class SystemMonitorTask
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param map
-	 */
 	@Override
 	public void setParams(Map<String, Object> map) {
 		super.setParams(map);
@@ -346,13 +298,6 @@ public class SystemMonitorTask
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param results
-	 */
 	@Override
 	protected void processMessage(Packet packet, Queue<Packet> results) {
 		if (isPostCommand(packet)) {

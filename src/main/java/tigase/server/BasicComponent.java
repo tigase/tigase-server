@@ -86,9 +86,6 @@ public class BasicComponent
 	/** Field description */
 	public static final String SCRIPTS_DIR_PROP_KEY = "scripts-dir";
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(BasicComponent.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
@@ -109,9 +106,6 @@ public class BasicComponent
 	private Map<String, EnumSet<CmdAcl>> commandsACL = new ConcurrentHashMap<String,
 			EnumSet<CmdAcl>>(20);
 
-	/**
-	 * List of the component administrators
-	 */
 	protected Set<BareJID>      admins = new ConcurrentSkipListSet<BareJID>();
 	private ScriptEngineManager scriptEngineManager     = null;
 	private String              scriptsBaseDir          = null;
@@ -211,40 +205,16 @@ public class BasicComponent
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean handlesLocalDomains() {
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean handlesNameSubdomains() {
 		return true;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean handlesNonLocalDomains() {
 		return false;
@@ -269,10 +239,6 @@ public class BasicComponent
 		binds.put(CommandIfc.COMPONENT, this);
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
 	@Override
 	public void initializationCompleted() {
 		initializationCompleted = true;
@@ -284,13 +250,6 @@ public class BasicComponent
 //  Thread.dumpStack();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param results
-	 */
 	@Override
 	public void processPacket(Packet packet, Queue<Packet> results) {
 		if (packet.isCommand() && getName().equals(packet.getStanzaTo().getLocalpart()) &&
@@ -299,10 +258,6 @@ public class BasicComponent
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
 	@Override
 	public void release() {}
 
@@ -420,24 +375,11 @@ public class BasicComponent
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>JID</code>
-	 */
 	@Override
 	public JID getComponentId() {
 		return compId;
 	}
 
-	/**
-	 * Allows to obtain various informations about components
-	 *
-	 * @return information about particular component
-	 */
 	@Override
 	public ComponentInfo getComponentInfo() {
 		if (cmpInfo == null) {
@@ -447,16 +389,6 @@ public class BasicComponent
 		return cmpInfo;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 *
-	 *
-	 * @return a value of {@code Map<String,Object>}
-	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defs = new LinkedHashMap<String, Object>(50);
@@ -559,16 +491,6 @@ public class BasicComponent
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param from
-	 *
-	 *
-	 *
-	 * @return a value of {@code List<Element>}
-	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
 		return getDiscoFeatures();
@@ -589,18 +511,6 @@ public class BasicComponent
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param node
-	 * @param jid
-	 * @param from
-	 *
-	 *
-	 *
-	 * @return a value of <code>Element</code>
-	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
 
@@ -637,18 +547,6 @@ public class BasicComponent
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param node
-	 * @param jid
-	 * @param from
-	 *
-	 *
-	 *
-	 * @return a value of {@code List<Element>}
-	 */
 	@Override
 	public List<Element> getDiscoItems(String node, JID jid, JID from) {
 
@@ -746,14 +644,6 @@ public class BasicComponent
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getName() {
 		return name;
@@ -820,14 +710,6 @@ public class BasicComponent
 		return admins.contains(jid.getBareJID());
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean isInitializationComplete() {
 		return initializationCompleted;
@@ -878,12 +760,6 @@ public class BasicComponent
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param name
-	 */
 	@Override
 	public void setName(String name) {
 		this.name = name;
@@ -894,13 +770,6 @@ public class BasicComponent
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param props
-	 * @throws tigase.conf.ConfigurationException
-	 */
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		if (isInitializationComplete()) {
@@ -971,12 +840,6 @@ public class BasicComponent
 		cmpInfo = new ComponentInfo(getName(), this.getClass());
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param manager
-	 */
 	@Override
 	public void setVHostManager(VHostManagerIfc manager) {
 		this.vHostManager = manager;

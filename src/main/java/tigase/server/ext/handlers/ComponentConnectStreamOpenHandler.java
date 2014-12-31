@@ -54,12 +54,6 @@ public class ComponentConnectStreamOpenHandler implements StreamOpenHandler {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String[] getXMLNSs() {
 		return xmlnss;
@@ -67,29 +61,11 @@ public class ComponentConnectStreamOpenHandler implements StreamOpenHandler {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param s
-	 *
-	 * 
-	 */
 	@Override
 	public String serviceStarted(ComponentIOService s) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 * @param attribs
-	 * @param handler
-	 *
-	 * 
-	 */
 	@Override
 	public String streamOpened(ComponentIOService serv, Map<String, String> attribs,
 			ComponentProtocolHandler handler) {
@@ -99,9 +75,3 @@ public class ComponentConnectStreamOpenHandler implements StreamOpenHandler {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

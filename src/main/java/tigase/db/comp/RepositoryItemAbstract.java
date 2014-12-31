@@ -68,12 +68,6 @@ public abstract class RepositoryItemAbstract
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
 	@Override
 	public void addCommandFields(Packet packet) {
 		Command.addFieldValue(packet, OWNER_LABEL, (owner != null)
@@ -84,23 +78,11 @@ public abstract class RepositoryItemAbstract
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String[] getAdmins() {
 		return admins;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getOwner() {
 		return owner;
@@ -108,12 +90,6 @@ public abstract class RepositoryItemAbstract
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
 	@Override
 	public void initFromCommand(Packet packet) {
 		owner = Command.getFieldValue(packet, OWNER_LABEL);
@@ -123,12 +99,6 @@ public abstract class RepositoryItemAbstract
 		admins = adminsFromString(Command.getFieldValue(packet, ADMINS_LABEL));
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param elem
-	 */
 	@Override
 	public void initFromElement(Element elem) {
 		owner  = elem.getAttributeStaticStr(OWNER_ATT);
@@ -137,14 +107,6 @@ public abstract class RepositoryItemAbstract
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param id
-	 *
-	 * 
-	 */
 	@Override
 	public boolean isAdmin(String id) {
 		if (admins == null) {
@@ -159,14 +121,6 @@ public abstract class RepositoryItemAbstract
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param id
-	 *
-	 * 
-	 */
 	@Override
 	public boolean isOwner(String id) {
 		return ((owner == null)
@@ -176,23 +130,11 @@ public abstract class RepositoryItemAbstract
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param admins
-	 */
 	@Override
 	public void setAdmins(String[] admins) {
 		this.admins = admins;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param owner
-	 */
 	@Override
 	public void setOwner(String owner) {
 		this.owner = owner;
@@ -200,12 +142,6 @@ public abstract class RepositoryItemAbstract
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public Element toElement() {
 		Element elem = new Element(getElemName());
@@ -252,5 +188,3 @@ public abstract class RepositoryItemAbstract
 	}
 }
 
-
-//~ Formatted in Tigase Code Convention on 13/02/20

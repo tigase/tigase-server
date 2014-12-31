@@ -40,16 +40,10 @@ public abstract class AbstractModule<CTX extends Context> implements Module, Con
 
 	protected final Logger log = Logger.getLogger(this.getClass().getName());
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public void afterRegistration() {
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public void beforeRegister() {
 		if (context == null)
@@ -66,18 +60,12 @@ public abstract class AbstractModule<CTX extends Context> implements Module, Con
 		context.getEventBus().fire(event);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void setContext(Context context) {
 		this.context = (CTX) context;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public void unregisterModule() {
 	}

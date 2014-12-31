@@ -94,12 +94,6 @@ public class CounterDataArchivizer
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param sp
-	 */
 	@Override
 	public void execute(StatisticsProvider sp) {
 		NumberFormat format = NumberFormat.getNumberInstance();
@@ -115,12 +109,6 @@ public class CounterDataArchivizer
 		initData(VHOSTS_TEXT, format.format(sp.getStats("vhost-man", "Number of VHosts", 0)));
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param conf
-	 */
 	@Override
 	public void init(Map<String, Object> conf) {
 		String prop = (String) conf.get(TABLE_NAME_PROP_KEY);
@@ -211,10 +199,6 @@ public class CounterDataArchivizer
 		data_repo.initPreparedStatement(update_entry_query, update_entry_query);
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
 	@Override
 	public void release() {
 

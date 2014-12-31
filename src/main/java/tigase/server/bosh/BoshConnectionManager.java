@@ -134,17 +134,6 @@ public class BoshConnectionManager
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param bs
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean addOutStreamClosed(Packet packet, BoshSession bs) {
 		packet.setPacketFrom(getFromAddress(bs.getSid().toString()));
@@ -162,14 +151,6 @@ public class BoshConnectionManager
 		return addOutPacketWithTimeout(packet, stoppedHandler, 15l, TimeUnit.SECONDS);
 	}
 
-	/**
-	 *
-	 * @param packet
-	 * @param bs
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean addOutStreamOpen(Packet packet, BoshSession bs) {
 		packet.initVars(getFromAddress(bs.getSid().toString()), bs.getDataReceiver());
@@ -177,34 +158,16 @@ public class BoshConnectionManager
 		return addOutPacketWithTimeout(packet, startedHandler, 15l, TimeUnit.SECONDS);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param tt
-	 */
 	@Override
 	public void cancelSendQueueTask(BoshSendQueueTask tt) {
 		tt.cancel();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param tt
-	 */
 	@Override
 	public void cancelTask(BoshTask tt) {
 		tt.cancel();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
 	@Override
 	public void processPacket(final Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -300,18 +263,6 @@ public class BoshConnectionManager
 		return attr;
 	}
 
-
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param srv
-	 *
-	 *
-	 *
-	 * @return a value of {@code Queue<Packet>}
-	 */
 	@Override
 	public Queue<Packet> processSocketData(XMPPIOService<Object> srv) {
 		BoshIOService serv = (BoshIOService) srv;
@@ -409,18 +360,6 @@ public class BoshConnectionManager
 		return null;
 	}
 
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param bs
-	 * @param delay
-	 *
-	 *
-	 *
-	 * @return a value of <code>BoshSendQueueTask</code>
-	 */
 	@Override
 	public BoshSendQueueTask scheduleSendQueueTask(final BoshSession bs, long delay) {
 		BoshSendQueueTask bt = new BoshSendQueueTask(bs);
@@ -431,17 +370,6 @@ public class BoshConnectionManager
 		return bt;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param bs
-	 * @param delay
-	 *
-	 *
-	 *
-	 * @return a value of <code>BoshTask</code>
-	 */
 	@Override
 	public BoshTask scheduleTask(BoshSession bs, long delay) {
 		BoshTask bt = new BoshTask(bs, this);
@@ -452,24 +380,11 @@ public class BoshConnectionManager
 		return bt;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param service
-	 */
 	@Override
 	public void serviceStarted(XMPPIOService<Object> service) {
 		super.serviceStarted(service);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param xmppService
-	 * @return 
-	 */
 	@Override
 	public boolean serviceStopped(XMPPIOService<Object> xmppService) {
 		BoshIOService service = (BoshIOService) xmppService;
@@ -495,42 +410,20 @@ public class BoshConnectionManager
 
 	// ~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param ios
-	 * @param data
-	 */
 	@Override
 	public void writeRawData(BoshIOService ios, String data) {
 		super.writeRawData(ios, data);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 */
-	public void xmppStreamClosed(BoshIOService serv) {
+	@Override
+	public void xmppStreamClosed(XMPPIOService<Object>  serv) {
 		if (log.isLoggable(Level.FINER)) {
 			log.finer("Stream closed.");
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 * @param attribs
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
-	public String xmppStreamOpened(BoshIOService serv, Map<String, String> attribs) {
+	@Override
+	public String xmppStreamOpened(XMPPIOService<Object> serv, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINE)) {
 			log.fine(
 					"Ups, what just happened? Stream open. Hey, this is a Bosh connection manager." +
@@ -549,16 +442,6 @@ public class BoshConnectionManager
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 *
-	 *
-	 * @return a value of {@code Map<String,Object>}
-	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
@@ -578,27 +461,11 @@ public class BoshConnectionManager
 		return props;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getDiscoCategoryType() {
 		return "c2s";
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getDiscoDescription() {
 		return "Bosh connection manager";
@@ -607,25 +474,15 @@ public class BoshConnectionManager
 	/**
 	 * Returns full jid of passed BoshSession instance
 	 * 
-	 * @param bs
-	 * @return 
+	 * @param bs {@link BoshSession} for which JID should be retrieved
+	 * 
+	 * @return JID address related to particular {@link BoshSession}
 	 */
 	@Override
 	public JID getJidForBoshSession(BoshSession bs) {
 		return getFromAddress(bs.getSid().toString());
 	}
 	
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param fromJID
-	 * @param ph
-	 *
-	 *
-	 *
-	 * @return a value of <code>BareJID</code>
-	 */
 	@Override
 	public BareJID getSeeOtherHostForJID(BareJID fromJID, Phase ph) {
 		if (see_other_host_strategy == null) {
@@ -658,12 +515,6 @@ public class BoshConnectionManager
 				: null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 */
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
@@ -676,17 +527,6 @@ public class BoshConnectionManager
 
 	//~--- set methods ----------------------------------------------------------
 
-	// ~--- set methods ----------------------------------------------------------
-
-
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param props
-	 * @throws tigase.conf.ConfigurationException
-	 */
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
@@ -739,11 +579,11 @@ public class BoshConnectionManager
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * Method description
+	 * Method adds packets to the output queue stamping it with the appropriate
+	 * {@link BoshSession} data
 	 *
-	 *
-	 * @param out_results
-	 * @param bs
+	 * @param out_results collection of {@link Packet} objects to be added to queue
+	 * @param bs related {@link BoshSession}
 	 */
 	protected void addOutPackets(Queue<Packet> out_results, BoshSession bs) {
 		for (Packet res : out_results) {
@@ -767,19 +607,6 @@ public class BoshConnectionManager
 		out_results.clear();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param newAddress
-	 * @param command_sessionId
-	 * @param serv
-	 *
-	 *
-	 *
-	 * @return a value of <code>JID</code>
-	 */
 	@Override
 	protected JID changeDataReceiver(Packet packet, JID newAddress,
 			String command_sessionId, XMPPIOService<Object> serv) {
@@ -802,25 +629,11 @@ public class BoshConnectionManager
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>ReceiverTimeoutHandler</code>
-	 */
 	@Override
 	protected ReceiverTimeoutHandler newStartedHandler() {
 		return new StartedHandler();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
 	@Override
 	protected void processCommand(Packet packet) {
 		BoshSession session = getBoshSession(packet.getTo());
@@ -946,16 +759,6 @@ public class BoshConnectionManager
 		}    // end of switch (pc.getCommand())
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	protected boolean writePacketToSocket(Packet packet) {
 		BoshSession session = getBoshSession(packet.getTo());
@@ -979,14 +782,11 @@ public class BoshConnectionManager
 	//~--- get methods ----------------------------------------------------------
 
 	/**
-	 * Method description
+	 * Method retrieves {@link BoshSession} related to the particular user address
 	 *
+	 * @param jid address for which {@link BoshSession} should be returned
 	 *
-	 * @param jid
-	 *
-	 *
-	 *
-	 * @return a value of <code>BoshSession</code>
+	 * @return a value of {@link BoshSession}
 	 */
 	protected BoshSession getBoshSession(JID jid) {
 		String res = jid.getResource();
@@ -1000,27 +800,11 @@ public class BoshConnectionManager
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int[]</code>
-	 */
 	@Override
 	protected int[] getDefPlainPorts() {
 		return PORTS;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int[]</code>
-	 */
 	@Override
 	protected int[] getDefSSLPorts() {
 		return null;
@@ -1044,14 +828,6 @@ public class BoshConnectionManager
 		binds.put("boshCM", this);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>BoshIOService</code>
-	 */
 	@Override
 	protected BoshIOService getXMPPIOServiceInstance() {
 		return new BoshIOService();
@@ -1067,13 +843,6 @@ public class BoshConnectionManager
 	// ~--- inner classes --------------------------------------------------------
 	private class StartedHandler
 					implements ReceiverTimeoutHandler {
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param packet
-		 * @param response
-		 */
 		@Override
 		public void responseReceived( Packet packet, Packet response ) {
 			String pb = Command.getFieldValue( packet, PRE_BIND_ATTR );
@@ -1104,12 +873,6 @@ public class BoshConnectionManager
 			}
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param packet
-		 */
 		@Override
 		public void timeOutExpired(Packet packet) {
 

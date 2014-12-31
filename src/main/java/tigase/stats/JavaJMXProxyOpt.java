@@ -155,13 +155,6 @@ public class JavaJMXProxyOpt
 		jmxc.connect();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param notification is a <code>Notification</code>
-	 * @param handback is a <code>Object</code>
-	 */
 	@Override
 	public void handleNotification(Notification notification, Object handback) {
 		if (notification.getType().equals(JMXConnectionNotification.OPENED)) {

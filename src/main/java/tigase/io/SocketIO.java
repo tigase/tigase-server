@@ -103,25 +103,11 @@ public class SocketIO
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public int bytesRead() {
 		return bytesRead;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param caps
-	 *
-	 * 
-	 */
 	@Override
 	public boolean checkCapabilities(String caps) {
 		return false;
@@ -129,37 +115,16 @@ public class SocketIO
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 *
-	 * @throws IOException
-	 */
 	@Override
 	public int getInputPacketSize() throws IOException {
 		return channel.socket().getReceiveBufferSize();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public SocketChannel getSocketChannel() {
 		return channel;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 * @param reset
-	 */
 	@Override
 	public void getStatistics(StatisticsList list, boolean reset) {
 		list.add("socketio", "Bytes sent", bytesSent, Level.FINE);
@@ -231,14 +196,7 @@ public class SocketIO
 		return totalBytesReceived;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param reset
-	 *
-	 * 
-	 */
+	@Override
 	public long getBuffOverflow(boolean reset) {
 		long tmp = buffOverflow;
 
@@ -249,23 +207,11 @@ public class SocketIO
 		return tmp;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public long getTotalBuffOverflow() {
 		return totalBuffOverflow;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public boolean isConnected() {
 
@@ -275,14 +221,6 @@ public class SocketIO
 		return channel.isOpen();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param addr
-	 *
-	 * 
-	 */
 	@Override
 	public boolean isRemoteAddress(String addr) {
 		return remoteAddress.equals(addr);
@@ -290,16 +228,6 @@ public class SocketIO
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param buff
-	 *
-	 * 
-	 *
-	 * @throws IOException
-	 */
 	@Override
 	public ByteBuffer read(final ByteBuffer buff) throws IOException {
 		ByteBuffer tmp = IOUtil.getDirectBuffer(buff.remaining());
@@ -332,12 +260,6 @@ public class SocketIO
 		return buff;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @throws IOException
-	 */
 	@Override
 	public void stop() throws IOException {
 		if (log.isLoggable(Level.FINEST)) {
@@ -350,12 +272,6 @@ public class SocketIO
 		channel.close();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String toString() {
 		return logId + ((channel == null)
@@ -363,38 +279,16 @@ public class SocketIO
 										: channel.socket());
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public boolean waitingToSend() {
 		return isConnected() && (dataToSend.size() > 0);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public int waitingToSendSize() {
 		return dataToSend.size();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param buff
-	 *
-	 * 
-	 *
-	 * @throws IOException
-	 */
 	@Override
 	public int write(final ByteBuffer buff) throws IOException {
 
@@ -476,23 +370,8 @@ public class SocketIO
 
 	//~--- set methods ----------------------------------------------------------
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see tigase.io.IOInterface#setLogId(java.lang.String)
-	 */
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param logId
-	 */
 	@Override
 	public void setLogId(String logId) {
 		this.logId = logId + " ";
 	}		
 }    // SocketIO
-
-
-//~ Formatted in Tigase Code Convention on 13/03/08

@@ -89,23 +89,6 @@ public class PacketForwardCmd
 
 	//~--- methods --------------------------------------------------------------
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see tigase.cluster.api.CommandListener#executeCommand(java.util.Map)
-	 */
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param fromNode
-	 * @param visitedNodes
-	 * @param data
-	 * @param packets
-	 *
-	 * @throws ClusterCommandException
-	 */
 	@Override
 	public void executeCommand(JID fromNode, Set<JID> visitedNodes, Map<String,
 			String> data, Queue<Element> packets)

@@ -146,13 +146,6 @@ public class ClConSQLRepository
 	
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param defs
-	 * @param params
-	 */
 	@Override
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
 		super.getDefaults(defs, params);
@@ -167,14 +160,6 @@ public class ClConSQLRepository
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param conn_str
-	 * @param params
-	 * @throws tigase.db.DBInitException
-	 */
 	@Override
 	public void initRepository(String conn_str, Map<String, String> params)
 					throws DBInitException {
@@ -211,12 +196,6 @@ public class ClConSQLRepository
 
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param item
-	 */
 	@Override
 	public void storeItem(ClusterRepoItem item) {
 		try {
@@ -250,10 +229,6 @@ public class ClConSQLRepository
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
 	@Override
 	public void reload() {
 		super.reload();
@@ -287,12 +262,6 @@ public class ClConSQLRepository
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param properties
-	 */
 	@Override
 	public void setProperties(Map<String, Object> properties) {
 		super.setProperties(properties);
@@ -300,10 +269,6 @@ public class ClConSQLRepository
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 */
 	@Override
 	public void store() {
 

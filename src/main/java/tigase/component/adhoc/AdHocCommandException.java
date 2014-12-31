@@ -107,12 +107,6 @@ public class AdHocCommandException extends Exception {
 		return item;
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @return
-	 */
 	@Override
 	public String getMessage() {
 		return message;

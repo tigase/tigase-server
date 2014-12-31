@@ -55,19 +55,9 @@ public class PlainSPCallbackHandler implements CallbackHandler, AuthRepositoryAw
 	protected String domain;
 
 	protected BareJID jid = null;
-	/** Field description */
 	protected Logger log = Logger.getLogger(this.getClass().getName());
 	protected AuthRepository repo;
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param callbacks
-	 *
-	 * @throws IOException
-	 * @throws UnsupportedCallbackException
-	 */
 	@Override
 	public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
 		for (int i = 0; i < callbacks.length; i++) {
@@ -154,23 +144,11 @@ public class PlainSPCallbackHandler implements CallbackHandler, AuthRepositoryAw
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param repo
-	 */
 	@Override
 	public void setAuthRepository(AuthRepository repo) {
 		this.repo = repo;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 */
 	@Override
 	public void setDomain(String domain) {
 		this.domain = domain;

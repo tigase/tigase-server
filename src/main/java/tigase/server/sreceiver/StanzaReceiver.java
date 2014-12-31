@@ -252,14 +252,6 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 
 	// ~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param packet
-	 * 
-	 * 
-	 */
 	@Override
 	public boolean addOutPacket(Packet packet) {
 		return super.addOutPacket(packet);
@@ -267,14 +259,6 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 
 	// ~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param params
-	 * 
-	 * 
-	 */
 	@Override
 	public Map<String, Object> getDefaults(final Map<String, Object> params) {
 		Map<String, Object> defs = super.getDefaults(params);
@@ -392,29 +376,11 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 		return defs;
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param from
-	 * 
-	 * 
-	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
 		return null;
 	}
 
-	/**
-	 * Describe <code>getDiscoInfo</code> method here.
-	 * 
-	 * @param node
-	 *          a <code>String</code> value
-	 * @param jid
-	 *          a <code>String</code> value
-	 * @param from
-	 * @return an <code>Element</code> value
-	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
 		if ((jid != null) && jid.toString().startsWith(getName() + ".")) {
@@ -424,16 +390,6 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 		return null;
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param node
-	 * @param jid
-	 * @param from
-	 * 
-	 * 
-	 */
 	@Override
 	public List<Element> getDiscoItems(String node, JID jid, JID from) {
 		if (jid.toString().startsWith(getName() + ".")) {
@@ -447,12 +403,6 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 		}
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param list
-	 */
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
@@ -484,14 +434,6 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 		return task;
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param jid
-	 * 
-	 * 
-	 */
 	@Override
 	public boolean isAdmin(JID jid) {
 		log.log(Level.INFO, "Looking for JID: {0} in admins array: {1}", new Object[] {
@@ -501,12 +443,6 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 
 	// ~--- methods --------------------------------------------------------------
 
-	/**
-	 * Describe <code>processPacket</code> method here.
-	 * 
-	 * @param packet
-	 *          a <code>Packet</code> value
-	 */
 	@Override
 	public void processPacket(final Packet packet) {
 		if (packet.isCommand()) {
@@ -587,13 +523,6 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 
 	// ~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Describe <code>setProperties</code> method here.
-	 * 
-	 * @param props
-	 *          a <code>Map</code> value
-	 * @throws tigase.conf.ConfigurationException
-	 */
 	@Override
 	public void setProperties(final Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);

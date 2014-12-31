@@ -68,45 +68,17 @@ public abstract class CommandListenerAbstract
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param cl
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int compareTo(CommandListener cl) {
 		return commandName.compareTo(cl.getName());
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param cl
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean equals(Object cl) {
 		return ((cl != null) && (cl instanceof CommandListener) && commandName.equals(
 				((CommandListener) cl).getName()));
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int hashCode() {
 		int hash = 265;
@@ -136,25 +108,11 @@ public abstract class CommandListenerAbstract
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getName() {
 		return commandName;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 */
 	@Override
 	public void getStatistics(StatisticsList list) {}
 
@@ -182,17 +140,8 @@ public abstract class CommandListenerAbstract
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param name
-	 */
 	@Override
 	public final void setName(String name) {
 		commandName = name;
 	}
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/11/02

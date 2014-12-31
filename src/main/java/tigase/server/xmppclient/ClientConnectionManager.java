@@ -118,16 +118,6 @@ public class ClientConnectionManager
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * This method can be overwritten in extending classes to get a different
-	 * packets distribution to different threads. For PubSub, probably better
-	 * packets distribution to different threads would be based on the sender
-	 * address rather then destination address.
-	 *
-	 * @param packet
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int hashCodeForPacket(Packet packet) {
 		if ((packet.getPacketFrom() != null) && getComponentId().getBareJID().equals(packet
@@ -138,11 +128,6 @@ public class ClientConnectionManager
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param packet
-	 */
 	@Override
 	public void processPacket(final Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -215,13 +200,6 @@ public class ClientConnectionManager
 		}    // end of else
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param serv
-	 *
-	 * @return a value of {@code Queue<Packet>}
-	 */
 	@Override
 	public Queue<Packet> processSocketData(XMPPIOService<Object> serv) {
 
@@ -290,12 +268,6 @@ public class ClientConnectionManager
 		return null;
 	}
 
-	/**
-	 * Processes undelivered packets
-	 * @param packet
-	 * @param errorMessage
-	 * @return true - if packet was processed
-	 */
 	@Override
 	public boolean processUndeliveredPacket(Packet packet, String errorMessage) {
 		try {
@@ -331,20 +303,9 @@ public class ClientConnectionManager
 		return true;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param port_props
-	 */
 	@Override
 	public void reconnectionFailed(Map<String, Object> port_props) {}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param service
-	 */
 	@Override
 	public void serviceStarted(XMPPIOService<Object> service) {
 		super.serviceStarted(service);
@@ -356,13 +317,6 @@ public class ClientConnectionManager
 		service.setProcessors(processors);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param service
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean serviceStopped(XMPPIOService<Object> service) {
 		boolean result = super.serviceStopped(service);
@@ -380,9 +334,6 @@ public class ClientConnectionManager
 		return result;
 	}
 
-	/**
-	 * Method description
-	 */
 	@Override
 	public void start() {
 		super.start();
@@ -390,21 +341,12 @@ public class ClientConnectionManager
 		ipMonitor.start();
 	}
 
-	/**
-	 * Method description
-	 */
 	@Override
 	public void stop() {
 		super.stop();
 		ipMonitor.stopThread();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 */
 	@Override
 	public void tlsHandshakeCompleted(XMPPIOService<Object> serv) {
 		if ((serv.getPeersJIDsFromCert() != null) && clientTrustManagerFactory.isActive()) {
@@ -420,11 +362,6 @@ public class ClientConnectionManager
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param serv
-	 */
 	@Override
 	public void xmppStreamClosed(XMPPIOService<Object> serv) {
 		if (log.isLoggable(Level.FINER)) {
@@ -466,14 +403,6 @@ public class ClientConnectionManager
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param serv
-	 * @param attribs
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String xmppStreamOpened(XMPPIOService<Object> serv, Map<String,
 			String> attribs) {
@@ -571,13 +500,6 @@ public class ClientConnectionManager
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param params
-	 *
-	 * @return a value of {@code Map<String,Object>}
-	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
@@ -615,34 +537,20 @@ public class ClientConnectionManager
 		return props;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getDiscoCategoryType() {
 		return "c2s";
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getDiscoDescription() {
 		return "Client connection manager";
 	}
 
 	/**
-	 * Method description
+	 * Method retrieves object of particular class implementing {@link SeeOtherHostIfc}
 	 *
-	 *
-	 * @param see_other_host_class
-	 *
+	 * @param see_other_host_class class of {@link SeeOtherHostIfc} implementation
 	 *
 	 * @return a value of <code>SeeOtherHostIfc</code>
 	 */
@@ -669,12 +577,6 @@ public class ClientConnectionManager
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param props
-	 * @throws tigase.conf.ConfigurationException
-	 */
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
@@ -1053,74 +955,38 @@ public class ClientConnectionManager
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @return a value of <code>int[]</code>
-	 */
 	@Override
 	protected int[] getDefPlainPorts() {
 		return new int[] { 5222 };
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @return a value of <code>int[]</code>
-	 */
 	@Override
 	protected int[] getDefSSLPorts() {
 		return new int[] { 5223 };
 	}
 
 	/**
-	 * Method <code>getMaxInactiveTime</code> returns max keep-alive time for
-	 * inactive connection. Let's assume user should send something at least
-	 * once every 24 hours....
+	 * {@inheritDoc}
 	 *
-	 * @return a <code>long</code> value
+	 * <br><br>
+	 *
+	 * Let's assume user should send something at least once every 24 hours....
 	 */
 	@Override
 	protected long getMaxInactiveTime() {
 		return 24 * HOUR;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param def
-	 *
-	 *
-	 * @return a value of <code>Integer</code>
-	 */
 	@Override
 	protected Integer getMaxQueueSize(int def) {
 		return def * 10;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @return a value of {@code XMPPIOService<Object>}
-	 */
 	@Override
 	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
 		return new XMPPIOService<Object>();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	protected boolean isTlsWantClientAuthEnabled() {
 		return clientTrustManagerFactory.isSaslExternalAvailable();
@@ -1192,12 +1058,6 @@ public class ClientConnectionManager
 
 	private class StartedHandler
 					implements ReceiverTimeoutHandler {
-		/**
-		 * Method description
-		 *
-		 * @param packet
-		 * @param response
-		 */
 		@Override
 		public void responseReceived(Packet packet, Packet response) {
 
@@ -1206,11 +1066,6 @@ public class ClientConnectionManager
 					StanzaType.get, UUID.randomUUID().toString(), null));
 		}
 
-		/**
-		 * Method description
-		 *
-		 * @param packet
-		 */
 		@Override
 		public void timeOutExpired(Packet packet) {
 
@@ -1235,12 +1090,6 @@ public class ClientConnectionManager
 
 	private class StoppedHandler
 					implements ReceiverTimeoutHandler {
-		/**
-		 * Method description
-		 *
-		 * @param packet
-		 * @param response
-		 */
 		@Override
 		public void responseReceived(Packet packet, Packet response) {
 
@@ -1250,11 +1099,6 @@ public class ClientConnectionManager
 			}
 		}
 
-		/**
-		 * Method description
-		 *
-		 * @param packet
-		 */
 		@Override
 		public void timeOutExpired(Packet packet) {
 
@@ -1266,6 +1110,3 @@ public class ClientConnectionManager
 		}
 	}
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/09/21

@@ -84,31 +84,11 @@ public class JabberIqPrivate
 
 	//~--- methods --------------------------------------------------------------
 
-	// Implementation of tigase.xmpp.XMPPImplIfc
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String id() {
 		return ID;
 	}
 
-	// Implementation of tigase.xmpp.XMPPProcessorIfc
-
-	/**
-	 * Describe <code>process</code> method here.
-	 *
-	 * @param packet a <code>Packet</code> value
-	 * @param session a <code>XMPPResourceConnection</code> value
-	 * @param repo a <code>NonAuthUserRepository</code> value
-	 * @param results a <code>Queue</code> value
-	 * @param settings
-	 * @throws XMPPException
-	 */
 	@Override
 	public void process(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
@@ -193,36 +173,16 @@ public class JabberIqPrivate
 		}    // end of try-catch
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 * 
-	 */
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
 		return DISCO_FEATURES;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
@@ -244,6 +204,3 @@ public class JabberIqPrivate
 		return result;
 	}
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/03/12

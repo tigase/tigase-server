@@ -59,26 +59,11 @@ public class StreamFeaturesProcessor implements ExtProcessor {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getId() {
 		return ID;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 * @param handler
-	 *
-	 * 
-	 */
 	@Override
 	public List<Element> getStreamFeatures(ComponentIOService serv,
 			ComponentProtocolHandler handler) {
@@ -87,17 +72,6 @@ public class StreamFeaturesProcessor implements ExtProcessor {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param p
-	 * @param serv
-	 * @param handler
-	 * @param results
-	 *
-	 * 
-	 */
 	@Override
 	public boolean process(Packet p, ComponentIOService serv, ComponentProtocolHandler handler,
 			Queue<Packet> results) {
@@ -128,24 +102,9 @@ public class StreamFeaturesProcessor implements ExtProcessor {
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param p
-	 * @param serv
-	 * @param handler
-	 * @param results
-	 */
 	@Override
 	public void startProcessing(Packet p, ComponentIOService serv,
 			ComponentProtocolHandler handler, Queue<Packet> results) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

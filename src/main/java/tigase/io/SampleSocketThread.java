@@ -109,10 +109,6 @@ public class SampleSocketThread extends Thread {
 
 	// Implementation of java.lang.Runnable
 
-	/**
-	 * Describe <code>run</code> method here.
-	 *
-	 */
 	@Override
 	public void run() {
     while (!stopping) {

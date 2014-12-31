@@ -65,23 +65,11 @@ public class TesterTask
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getHelp() {
 		return TASK_HELP;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getType() {
 		return TASK_TYPE;

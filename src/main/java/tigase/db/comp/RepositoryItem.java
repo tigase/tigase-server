@@ -147,7 +147,7 @@ public interface RepositoryItem {
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * Item data can be stored in a more comlex form than a simple property string.
+	 * Item data can be stored in a more complex form than a simple property string.
 	 * The XML Element can contain much more detailed information about the element
 	 * than the simplified form and is used to store the repository item in more advanced
 	 * repositories then just property file. XML repository or SQL database can keep many

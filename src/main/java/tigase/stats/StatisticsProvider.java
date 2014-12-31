@@ -108,14 +108,7 @@ public class StatisticsProvider
 
 	//~--- get methods ----------------------------------------------------------
 
-	// ~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Operation exposed for management
-	 *
-	 * @param level
-	 * @return {@code java.util.Map<String, String>}
-	 */
 	@Override
 	public Map<String, String> getAllStats(int level) {
 //		if (log.isLoggable(Level.FINEST)) {
@@ -130,27 +123,11 @@ public class StatisticsProvider
 		return getMapFromList(list);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int getCLIOQueueSize() {
 		return cache.clIOQueue;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float[]</code>
-	 */
 	@Override
 	public float[] getCLPacketsPerSecHistory() {
 		return (cache.clpacks_history != null)
@@ -158,27 +135,11 @@ public class StatisticsProvider
 				: null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int getCLQueueSize() {
 		return cache.clQueue;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int getClusterCacheSize() {
 
@@ -186,53 +147,21 @@ public class StatisticsProvider
 		return cache.clusterCache;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	@Override
 	public float getClusterCompressionRatio() {
 		return cache.clusterCompressionRatio;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	@Override
 	public long getClusterNetworkBytes() {
 		return cache.clusterNetworkBytes;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	@Override
 	public float getClusterNetworkBytesPerSecond() {
 		return cache.clusterNetworkBytesPerSecond;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	@Override
 	public long getClusterPackets() {
 
@@ -240,89 +169,28 @@ public class StatisticsProvider
 		return cache.clusterPackets;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	@Override
 	public float getClusterPacketsPerSec() {
 		return cache.clusterPacketsPerSec;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	public int getCompConnections(String comp) {
 		return cache.allStats.getCompConnections(comp);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getCompIqs(String comp) {
 		return cache.allStats.getCompIq(comp);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getCompMessages(String comp) {
 		return cache.allStats.getCompMsg(comp);
 	}
 
-	// /**
-	// * Get Attribute exposed for management
-	// * @return java.util.Map<String, String>
-	// */
-	// @Override
-	// public Map getAllStats() {
-	// return getAllStats(0);
-	// }
-
-	/**
-	 * Get Attribute exposed for management
-	 *
-	 *
-	 *
-	 * @return a value of {@code List<String>}
-	 */
 	@Override
 	public List<String> getComponentsNames() {
 		return theRef.getComponentsNames();
 	}
 
-	/**
-	 * Operation exposed for management
-	 *
-	 * @param compName
-	 * @param level
-	 * @return {@code java.util.Map<String, String>}
-	 */
 	@Override
 	public Map<String, String> getComponentStats(String compName, int level) {
 		StatisticsList list = new StatisticsList(Level.parse("" + level));
@@ -332,42 +200,14 @@ public class StatisticsProvider
 		return getMapFromList(list);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getCompPackets(String comp) {
 		return cache.allStats.getCompPackets(comp);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getCompPresences(String comp) {
 		return cache.allStats.getCompPres(comp);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int getConnectionsNumber() {
 
@@ -375,14 +215,6 @@ public class StatisticsProvider
 		return cache.clientConnections;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int[]</code>
-	 */
 	@Override
 	public int[] getConnectionsNumberHistory() {
 		return (cache.conns_history != null)
@@ -390,40 +222,16 @@ public class StatisticsProvider
 				: null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int getCPUsNumber() {
 		return TigaseRuntime.getTigaseRuntime().getCPUsNumber();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	@Override
 	public float getCPUUsage() {
 		return cache.cpuUsage;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float[]</code>
-	 */
 	@Override
 	public float[] getCPUUsageHistory() {
 		return (cache.cpu_usage_history != null)
@@ -431,14 +239,6 @@ public class StatisticsProvider
 				: null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param statsKeys is a <code>String[]</code>
-	 *
-	 * @return a value of {@code Map<String,Object>}
-	 */
 	public Map<String, Object> getCurStats(String[] statsKeys) {
 		Map<String, Object> result = new LinkedHashMap<String, Object>();
 
@@ -449,23 +249,11 @@ public class StatisticsProvider
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	@Override
 	public long getDirectMemUsed() {
 		return TigaseRuntime.getTigaseRuntime().getDirectMemUsed();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>long[]</code>
-	 */
 	@Override
 	public long[] getDirectMemUsedHistory() {
 		return (cache.direct_used_history != null)
@@ -473,27 +261,11 @@ public class StatisticsProvider
 				: null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	@Override
 	public float getHeapMemUsage() {
 		return TigaseRuntime.getTigaseRuntime().getHeapMemUsage();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float[]</code>
-	 */
 	@Override
 	public float[] getHeapUsageHistory() {
 		return (cache.heap_usage_history != null)
@@ -501,14 +273,6 @@ public class StatisticsProvider
 				: null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	@Override
 	public long getIQAuthNumber() {
 
@@ -516,14 +280,6 @@ public class StatisticsProvider
 		return cache.iqAuthNumber;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	@Override
 	public long getIQOtherNumber() {
 
@@ -531,27 +287,11 @@ public class StatisticsProvider
 		return cache.iqOtherNumber;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	@Override
 	public float getIQOtherNumberPerSec() {
 		return cache.iqOtherNumberPerSec;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>MBeanInfo</code>
-	 */
 	@Override
 	public MBeanInfo getMBeanInfo() {
 		MBeanInfo mbinfo = super.getMBeanInfo();
@@ -561,14 +301,6 @@ public class StatisticsProvider
 				getNotificationInfo());
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	@Override
 	public long getMessagesNumber() {
 
@@ -576,64 +308,25 @@ public class StatisticsProvider
 		return cache.messagesNumber;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	@Override
 	public float getMessagesNumberPerSec() {
 		return cache.messagesPerSec;
 	}
 
-	/**
-	 * Get Attribute exposed for management
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getName() {
 		return theRef.getName();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	@Override
 	public float getNonHeapMemUsage() {
 		return TigaseRuntime.getTigaseRuntime().getNonHeapMemUsage();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>MBeanNotificationInfo[]</code>
-	 */
 	public MBeanNotificationInfo[] getNotificationInfo() {
 		return new MBeanNotificationInfo[] {};
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	@Override
 	public long getPresencesNumber() {
 
@@ -641,40 +334,16 @@ public class StatisticsProvider
 		return cache.presencesNumber;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	@Override
 	public float getPresencesNumberPerSec() {
 		return cache.presencesPerSec;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	@Override
 	public long getProcesCPUTime() {
 		return TigaseRuntime.getTigaseRuntime().getProcessCPUTime();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	@Override
 	public long getQueueOverflow() {
 
@@ -682,14 +351,6 @@ public class StatisticsProvider
 		return cache.queueOverflow;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int getQueueSize() {
 
@@ -697,26 +358,10 @@ public class StatisticsProvider
 		return cache.queueSize;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getRegistered() {
 		return cache.registered;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int getServerConnections() {
 
@@ -724,14 +369,6 @@ public class StatisticsProvider
 		return cache.serverConnections;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int[]</code>
-	 */
 	@Override
 	public int[] getServerConnectionsHistory() {
 		return (cache.server_conns_history != null)
@@ -739,40 +376,16 @@ public class StatisticsProvider
 				: null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	@Override
 	public long getSMPacketsNumber() {
 		return cache.smPackets;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	@Override
 	public float getSMPacketsNumberPerSec() {
 		return cache.smPacketsPerSec;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>float[]</code>
-	 */
 	@Override
 	public float[] getSMPacketsPerSecHistory() {
 		return (cache.smpacks_history != null)
@@ -780,91 +393,27 @@ public class StatisticsProvider
 				: null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int getSMQueueSize() {
 		return cache.smQueue;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param cmp_name
-	 * @param stat
-	 * @param def
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getStats(String cmp_name, String stat, long def) {
 		return cache.allStats.getValue(cmp_name, stat, def);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param cmp_name
-	 * @param stat
-	 * @param def
-	 *
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	public float getStats(String cmp_name, String stat, float def) {
 		return cache.allStats.getValue(cmp_name, stat, def);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param cmp_name
-	 * @param stat
-	 * @param def
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	public String getStats(String cmp_name, String stat, String def) {
 		return cache.allStats.getValue(cmp_name, stat, def);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param cmp_name
-	 * @param stat
-	 * @param def
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	public int getStats(String cmp_name, String stat, int def) {
 		return cache.allStats.getValue(cmp_name, stat, def);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param statsKeys is a <code>String[]</code>
-	 *
-	 * @return a value of {@code Map<String,LinkedList<Object>>}
-	 */
 	public Map<String, LinkedList<Object>> getStatsHistory(String[] statsKeys) {
 		log.log(Level.INFO, "Generating history for metrics: {0}", Arrays.toString(
 				statsKeys));
@@ -892,14 +441,6 @@ public class StatisticsProvider
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getSystemDetails() {
 
@@ -907,27 +448,19 @@ public class StatisticsProvider
 		return cache.systemDetails;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	@Override
 	public long getUptime() {
 		return TigaseRuntime.getTigaseRuntime().getUptime();
 	}
 
 	/**
+	 * {@inheritDoc}
+	 *
+	 * <br><br>
+	 *
 	 * Override customization hook: You can supply a customized description for
 	 * MBeanInfo.getDescription()
 	 *
-	 * @param info
-	 *
-	 *
-	 * @return a value of <code>String</code>
 	 */
 	@Override
 	protected String getDescription(MBeanInfo info) {
@@ -935,13 +468,12 @@ public class StatisticsProvider
 	}
 
 	/**
+	 * {@inheritDoc}
+	 *
+	 * <br><br>
+	 *
 	 * Override customization hook: You can supply a customized description for
 	 * MBeanAttributeInfo.getDescription()
-	 *
-	 * @param info
-	 *
-	 *
-	 * @return a value of <code>String</code>
 	 */
 	@Override
 	protected String getDescription(MBeanAttributeInfo info) {
@@ -972,15 +504,12 @@ public class StatisticsProvider
 	}
 
 	/**
+	 * {@inheritDoc}
+	 *
+	 * <br><br>
+	 *
 	 * Override customization hook: You can supply a customized description for
 	 * MBeanParameterInfo.getDescription()
-	 *
-	 * @param op
-	 * @param param
-	 * @param sequence
-	 *
-	 *
-	 * @return a value of <code>String</code>
 	 */
 	@Override
 	protected String getDescription(MBeanOperationInfo op, MBeanParameterInfo param,
@@ -1012,13 +541,12 @@ public class StatisticsProvider
 	}
 
 	/**
+	 * {@inheritDoc}
+	 *
+	 * <br><br>
+	 *
 	 * Override customization hook: You can supply a customized description for
 	 * MBeanOperationInfo.getDescription()
-	 *
-	 * @param info
-	 *
-	 *
-	 * @return a value of <code>String</code>
 	 */
 	@Override
 	protected String getDescription(MBeanOperationInfo info) {
@@ -1049,15 +577,13 @@ public class StatisticsProvider
 	}
 
 	/**
+	 * {@inheritDoc}
+	 *
+	 * <br><br>
+	 *
 	 * Override customization hook: You can supply a customized description for
 	 * MBeanParameterInfo.getName()
 	 *
-	 * @param op
-	 * @param param
-	 * @param sequence
-	 *
-	 *
-	 * @return a value of <code>String</code>
 	 */
 	@Override
 	protected String getParameterName(MBeanOperationInfo op, MBeanParameterInfo param,

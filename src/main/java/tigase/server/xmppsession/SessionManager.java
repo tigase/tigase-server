@@ -209,16 +209,6 @@ public class SessionManager
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean addOutPacket(Packet packet) {
 
@@ -233,21 +223,6 @@ public class SessionManager
 		return super.addOutPacket(packet);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param plug_id
-	 * @param conc
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>XMPPImplIfc</code>
-	 * @throws ClassNotFoundException
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
-	 */
 	public XMPPImplIfc addPlugin(String plug_id, String conc)
 					throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		XMPPImplIfc      result = null;
@@ -408,25 +383,11 @@ public class SessionManager
 		return session != null && session.getResourceForJID(jid) != null;
 	}	
 	
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param conn
-	 */
 	public void handleLocalPacket(Packet packet, XMPPResourceConnection conn) {
 
 		// Do nothing here. Maybe we will attach some handlers later
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param userId
-	 * @param conn
-	 */
 	@Override
 	public void handleLogin(BareJID userId, XMPPResourceConnection conn) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -437,13 +398,6 @@ public class SessionManager
 		registerNewSession(userId, conn);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param userId
-	 * @param conn
-	 */
 	@Override
 	public void handleLogout(BareJID userId, XMPPResourceConnection conn) {
 		XMPPSession session = sessionsByNodeId.get(userId);
@@ -478,12 +432,6 @@ public class SessionManager
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param conn
-	 */
 	@Override
 	public void handlePresenceSet(XMPPResourceConnection conn) {
 		XMPPSession parentSession = conn.getParentSession();
@@ -497,12 +445,6 @@ public class SessionManager
 		this.processPresenceUpdate(parentSession, presence);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param conn
-	 */
 	@Override
 	public void handleResourceBind(XMPPResourceConnection conn) {
 		if (!conn.isServerSession() && (!"USER_STATUS".equals(conn.getSessionId())) &&!conn
@@ -522,21 +464,13 @@ public class SessionManager
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean handlesLocalDomains() {
 		return true;
 	}
 
-@Override
-	public void initBindings(Bindings binds) {
+	@Override
+	public void initBindings( Bindings binds ) {
 		super.initBindings(binds);
 		binds.put(CommandIfc.AUTH_REPO, auth_repository);
 		binds.put(CommandIfc.USER_CONN, connectionsByFrom);
@@ -548,7 +482,7 @@ public class SessionManager
 
 	}
 
-@Override
+	@Override
 	public int processingInThreads() {
 		return Runtime.getRuntime().availableProcessors() * 16;
 	}
@@ -558,12 +492,6 @@ public class SessionManager
 		return Runtime.getRuntime().availableProcessors() * 16;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
 	@Override
 	public void processPacket(final Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -584,12 +512,6 @@ public class SessionManager
 		processPacket(packet, conn);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param plug_id
-	 */
 	public void removePlugin(String plug_id) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Removing plugin {0}", plug_id);
@@ -628,14 +550,6 @@ public class SessionManager
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	public boolean skipPrivacy() {
 		return skipPrivacy;
 	}
@@ -656,16 +570,6 @@ public class SessionManager
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 *
-	 *
-	 *
-	 * @return a value of <code>JID[]</code>
-	 */
 	@Override
 	public JID[] getConnectionIdsForJid(BareJID jid) {
 		if (skipPrivacy()) {
@@ -679,16 +583,6 @@ public class SessionManager
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 *
-	 *
-	 * @return a value of {@code Map<String,Object>}
-	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
@@ -702,42 +596,16 @@ public class SessionManager
 		return props;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getDiscoCategoryType() {
 		return "sm";
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getDiscoDescription() {
 		return "Session manager";
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param from
-	 *
-	 *
-	 *
-	 * @return a value of {@code List<Element>}
-	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
 		List<Element> features = new LinkedList<Element>();
@@ -757,18 +625,6 @@ public class SessionManager
 		return features;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param node
-	 * @param jid
-	 * @param from
-	 *
-	 *
-	 *
-	 * @return a value of <code>Element</code>
-	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
 		if ((jid != null) && (getName().equals(jid.getLocalpart()) || isLocalDomain(jid
@@ -805,16 +661,6 @@ public class SessionManager
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 *
-	 *
-	 *
-	 * @return a value of <code>XMPPResourceConnection</code>
-	 */
 	public XMPPResourceConnection getResourceConnection(JID jid) {
 		XMPPSession session = getSession(jid.getBareJID());
 
@@ -841,12 +687,6 @@ public class SessionManager
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public void getStatistics(StatisticsList list) {
@@ -904,30 +744,11 @@ public class SessionManager
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean hasCompleteJidsInfo() {
 		return true;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 * @param includeComponents
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean isLocalDomain(String domain, boolean includeComponents) {
 		if (includeComponents) {
@@ -939,25 +760,12 @@ public class SessionManager
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param name
-	 */
 	@Override
 	public void setName(String name) {
 		super.setName(name);
 		TigaseRuntime.getTigaseRuntime().addOnlineJidsReporter(this);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param props
-	 * @throws tigase.conf.ConfigurationException
-	 */
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
@@ -1164,14 +972,6 @@ public class SessionManager
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param conn
-	 * @param results
-	 */
 	protected void addOutPackets(Packet packet, XMPPResourceConnection conn,
 			Queue<Packet> results) {
 		for (XMPPPacketFilterIfc outfilter : outFilters.values()) {
@@ -1180,28 +980,10 @@ public class SessionManager
 		addOutPackets(results);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	protected boolean addTrusted(JID jid) {
 		return trusted.add(jid.getBareJID().toString());
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param connection - instance of XMPPResourceConnection if available when calling
-	 * @param connectionId
-	 * @param userId
-	 * @param closeOnly
-	 */
 	protected void closeConnection(XMPPResourceConnection connection, JID connectionId, 
 			String userId, boolean closeOnly) {
 		if (log.isLoggable(Level.FINER)) {
@@ -1286,13 +1068,6 @@ public class SessionManager
 		}    // end of if (conn != null) else
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param conn
-	 * @param closeOnly
-	 */
 	protected void closeSession(XMPPResourceConnection conn, boolean closeOnly) {
 		if (!closeOnly) {
 			Queue<Packet> results = new ArrayDeque<Packet>(50);
@@ -1375,19 +1150,6 @@ public class SessionManager
 		conn.streamClosed();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param conn_id
-	 * @param domain
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>XMPPResourceConnection</code>
-	 * @throws TigaseStringprepException
-	 */
 	protected XMPPResourceConnection createUserSession(JID conn_id, String domain)
 					throws TigaseStringprepException {
 		XMPPResourceConnection connection = new XMPPResourceConnection(conn_id,
@@ -1429,49 +1191,14 @@ public class SessionManager
 		return connection;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	protected boolean delTrusted(JID jid) {
 		return trusted.remove(jid.getBareJID().toString());
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	protected boolean fastAddOutPacket(Packet packet) {
 		return addOutPacket(packet);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param conn_id
-	 * @param domain
-	 * @param user_id
-	 * @param resource
-	 * @param xmpp_sessionId
-	 * @param tmpSession is a <code>boolean</code>
-	 *
-	 *
-	 *
-	 * @return a value of <code>XMPPResourceConnection</code>
-	 */
 	@SuppressWarnings("deprecation")
 	protected XMPPResourceConnection loginUserSession(JID conn_id, String domain,
 			BareJID user_id, String resource, String xmpp_sessionId, boolean tmpSession) {
@@ -1504,16 +1231,6 @@ public class SessionManager
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	protected boolean processAdminsOrDomains(Packet packet) {
 		if ((packet.getStanzaFrom() == null) && (packet.getPacketFrom() != null)) {
 
@@ -1554,16 +1271,6 @@ public class SessionManager
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param pc
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	protected boolean processCommand(Packet pc) {
 		if ((pc.getStanzaTo() == null) ||!(getComponentId().equals(pc.getStanzaTo()) ||
 				isLocalDomain(pc.getStanzaTo().toString()))) {
@@ -1999,13 +1706,6 @@ public class SessionManager
 		return processing_result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param conn
-	 */
 	protected void processPacket(Packet packet, XMPPResourceConnection conn) {
 		long startTime = System.currentTimeMillis();
 		int  idx       = tIdx;
@@ -2194,13 +1894,6 @@ public class SessionManager
 		// postTime[idx] = postTm;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session is a <code>XMPPSession</code>
-	 * @param packet is a <code>Element</code>
-	 */
 	protected void processPresenceUpdate(XMPPSession session, Element packet) {
 		try {
 			if (presenceProcessors.isEmpty()) {
@@ -2229,13 +1922,6 @@ public class SessionManager
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param userId
-	 * @param conn
-	 */
 	protected void registerNewSession(BareJID userId, XMPPResourceConnection conn) {
 		synchronized (conn) {
 			if (conn.getSessionData(XMPPResourceConnection.CLOSING_KEY) != null) {
@@ -2315,12 +2001,6 @@ public class SessionManager
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
 	protected void sendToAdmins(Packet packet) {
 		for (BareJID admin : admins) {
 			if (log.isLoggable(Level.FINER)) {
@@ -2336,59 +2016,19 @@ public class SessionManager
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param def
-	 *
-	 *
-	 *
-	 * @return a value of <code>Integer</code>
-	 */
 	@Override
 	protected Integer getMaxQueueSize(int def) {
 		return def * 10;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 *
-	 *
-	 *
-	 * @return a value of <code>XMPPSession</code>
-	 */
 	protected XMPPSession getSession(BareJID jid) {
 		return sessionsByNodeId.get(jid);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param connId
-	 *
-	 *
-	 *
-	 * @return a value of <code>XMPPResourceConnection</code>
-	 */
 	protected XMPPResourceConnection getXMPPResourceConnection(JID connId) {
 		return connectionsByFrom.get(connId);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param p
-	 *
-	 *
-	 *
-	 * @return a value of <code>XMPPResourceConnection</code>
-	 */
 	protected XMPPResourceConnection getXMPPResourceConnection(Packet p) {
 		XMPPResourceConnection conn = null;
 		JID                    from = p.getPacketFrom();
@@ -2420,16 +2060,6 @@ public class SessionManager
 		return conn;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param p
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	protected boolean isBrokenPacket(Packet p) {
 
 		// TODO: check this out to make sure it does not lead to an infinite
@@ -2491,16 +2121,6 @@ public class SessionManager
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	protected boolean isTrusted(JID jid) {
 		if (trusted.contains(jid.getBareJID().toString())) {
 			return true;
@@ -2509,16 +2129,6 @@ public class SessionManager
 		return isAdmin(jid);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	protected boolean isTrusted(String jid) {
 		return trusted.contains(jid);
 	}
@@ -2723,10 +2333,6 @@ public class SessionManager
 
 		//~--- methods ------------------------------------------------------------
 
-		/**
-		 * Method description
-		 *
-		 */
 		@Override
 		public void run() {
 			XMPPResourceConnection conn = connectionsByFrom.get(connId);
@@ -2751,13 +2357,6 @@ public class SessionManager
 
 	private class ConnectionCheckCommandHandler
 					implements ReceiverTimeoutHandler {
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param packet
-		 * @param response
-		 */
 		@Override
 		public void responseReceived(Packet packet, Packet response) {
 			if (response.getType() == StanzaType.error) {
@@ -2774,12 +2373,6 @@ public class SessionManager
 			}
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param packet
-		 */
 		@Override
 		public void timeOutExpired(Packet packet) {
 			if (log.isLoggable(Level.FINER)) {
@@ -2798,44 +2391,16 @@ public class SessionManager
 	private class DefaultHandlerProc
 					extends XMPPProcessor
 					implements XMPPProcessorIfc {
-		/**
-		 * Method description
-		 *
-		 *
-		 *
-		 *
-		 * @return a value of <code>int</code>
-		 */
 		@Override
 		public int concurrentQueuesNo() {
 			return 4;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 *
-		 *
-		 * @return a value of <code>String</code>
-		 */
 		@Override
 		public String id() {
 			return defaultHandlerProcId;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param packet
-		 * @param session
-		 * @param repo
-		 * @param results
-		 * @param settings
-		 *
-		 * @throws XMPPException
-		 */
 		@Override
 		public void process(Packet packet, XMPPResourceConnection session,
 				NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
@@ -2854,14 +2419,6 @@ public class SessionManager
 
 		//~--- methods ------------------------------------------------------------
 
-		// ~--- methods ------------------------------------------------------------
-
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param item
-		 */
 		@Override
 		public void process(QueueItem item) {
 			XMPPProcessorIfc processor = item.getProcessor();
@@ -2884,17 +2441,6 @@ public class SessionManager
 
 		//~--- get methods --------------------------------------------------------
 
-		// ~--- get methods --------------------------------------------------------
-
-		/**
-		 * Method description
-		 *
-		 *
-		 *
-		 *
-		 *
-		 * @return a value of <code>WorkerThread</code>
-		 */
 		@Override
 		public WorkerThread getNewInstance() {
 			ProcessorWorkerThread worker = new ProcessorWorkerThread();
@@ -2907,44 +2453,16 @@ public class SessionManager
 	private class SessionCloseProc
 					extends XMPPProcessor
 					implements XMPPProcessorIfc {
-		/**
-		 * Method description
-		 *
-		 *
-		 *
-		 *
-		 * @return a value of <code>int</code>
-		 */
 		@Override
 		public int concurrentQueuesNo() {
 			return 4;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 *
-		 *
-		 * @return a value of <code>String</code>
-		 */
 		@Override
 		public String id() {
 			return sessionCloseProcId;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param packet
-		 * @param session
-		 * @param repo
-		 * @param results
-		 * @param settings
-		 *
-		 * @throws XMPPException
-		 */
 		@Override
 		public void process(Packet packet, XMPPResourceConnection session,
 				NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
@@ -2963,44 +2481,16 @@ public class SessionManager
 	private class SessionOpenProc
 					extends XMPPProcessor
 					implements XMPPProcessorIfc {
-		/**
-		 * Method description
-		 *
-		 *
-		 *
-		 *
-		 * @return a value of <code>int</code>
-		 */
 		@Override
 		public int concurrentQueuesNo() {
 			return 4;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 *
-		 *
-		 * @return a value of <code>String</code>
-		 */
 		@Override
 		public String id() {
 			return sessionOpenProcId;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param packet
-		 * @param session
-		 * @param repo
-		 * @param results
-		 * @param settings
-		 *
-		 * @throws XMPPException
-		 */
 		@Override
 		public void process(Packet packet, XMPPResourceConnection session,
 				NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
@@ -3061,21 +2551,10 @@ public class SessionManager
 
 		//~--- constructors -------------------------------------------------------
 
-		/**
-		 * Constructs ...
-		 *
-		 */
 		public StaleConnectionCloser() {
 			this(DEF_QUEUE_SIZE, DEF_TIMEOUT);
 		}
 
-		/**
-		 * Constructs ...
-		 *
-		 *
-		 * @param queueSize
-		 * @param timeout
-		 */
 		public StaleConnectionCloser(int queueSize, long timeout) {
 			this.timeout      = timeout;
 			this.maxQueueSize = queueSize;
@@ -3085,10 +2564,6 @@ public class SessionManager
 
 		//~--- methods ------------------------------------------------------------
 
-		/**
-		 * Method description
-		 *
-		 */
 		public void closeConnections() {
 
 			// nothing waiting to remove
@@ -3137,16 +2612,6 @@ public class SessionManager
 			}
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param connectionId
-		 *
-		 *
-		 *
-		 * @return a value of <code>boolean</code>
-		 */
 		public boolean queueForClose(JID connectionId) {
 			boolean result;
 
@@ -3165,10 +2630,6 @@ public class SessionManager
 			return result;
 		}
 
-		/**
-		 * Method description
-		 *
-		 */
 		@Override
 		public void run() {
 			if ((thread != null) && thread.isAlive()) {
@@ -3186,38 +2647,16 @@ public class SessionManager
 
 		//~--- get methods --------------------------------------------------------
 
-		/**
-		 * Method description
-		 *
-		 *
-		 *
-		 *
-		 * @return a value of <code>int</code>
-		 */
 		public int getMaxQueueSize() {
 			return maxQueueSize;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 *
-		 *
-		 * @return a value of <code>long</code>
-		 */
 		public long getTimeout() {
 			return timeout;
 		}
 
 		//~--- set methods --------------------------------------------------------
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param queueSize
-		 */
 		public void setMaxQueueSize(int queueSize) {
 			this.maxQueueSize = queueSize;
 		}
@@ -3249,72 +2688,31 @@ public class SessionManager
 	}
 
 
-	/**
-	 * Class description
-	 *
-	 *
-	 * @param <E>
-	 *
-	 * @version        5.2.0, 13/11/02
-	 * @author         <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
-	 */
 	protected class WriterQueue<E extends Packet>
 					extends AbstractQueue<E> {
-		/**
-		 * Method description
-		 *
-		 *
-		 * @return a value of {@code Iterator<E>}
-		 */
 		@Override
 		public Iterator<E> iterator() {
 			throw new UnsupportedOperationException(
 					"Not supported yet.");    // To change body of generated methods, choose Tools | Templates.
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param packet is a <code>E</code>
-		 *
-		 * @return a value of <code>boolean</code>
-		 */
 		@Override
 		public boolean offer(E packet) {
 			return SessionManager.this.addOutPacket(packet);
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * @return a value of <code>E</code>
-		 */
 		@Override
 		public E peek() {
 			throw new UnsupportedOperationException(
 					"Not supported yet.");    // To change body of generated methods, choose Tools | Templates.
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * @return a value of <code>E</code>
-		 */
 		@Override
 		public E poll() {
 			throw new UnsupportedOperationException(
 					"Not supported yet.");    // To change body of generated methods, choose Tools | Templates.
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * @return a value of <code>int</code>
-		 */
 		@Override
 		public int size() {
 			throw new UnsupportedOperationException(
@@ -3341,6 +2739,3 @@ public class SessionManager
 		}
 	}
 }
-
-
-//~ Formatted in Tigase Code Convention on 14/01/07

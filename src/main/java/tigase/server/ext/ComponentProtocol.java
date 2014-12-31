@@ -182,14 +182,6 @@ public class ComponentProtocol
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 */
 	@Override
 	public void authenticated(ComponentIOService serv) {
 		serv.setAuthenticated(true);
@@ -211,13 +203,6 @@ public class ComponentProtocol
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 * @param packet
-	 */
 	@Override
 	public void authenticationFailed(ComponentIOService serv, Packet packet) {
 		writePacketToSocket(serv, packet);
@@ -236,12 +221,6 @@ public class ComponentProtocol
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	protected String getDefTrafficThrottling() {
 		return "xmpp:25m:0:disc,bin:20000m:0:disc";
@@ -249,13 +228,6 @@ public class ComponentProtocol
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param hostname
-	 * @param serv
-	 */
 	@Override
 	public void bindHostname(String hostname, ComponentIOService serv) {
 		String[] routings = new String[] { hostname, ".*@" + hostname, ".*\\." + hostname };
@@ -299,27 +271,11 @@ public class ComponentProtocol
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param hostname
-	 *
-	 * 
-	 */
 	@Override
 	public CompRepoItem getCompRepoItem(String hostname) {
 		return repo.getItem(hostname);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 * 
-	 */
 	@Override
 	@SuppressWarnings({ "unchecked" })
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
@@ -358,47 +314,21 @@ public class ComponentProtocol
 		return defs;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getDiscoCategoryType() {
 		return identity_type;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getDiscoDescription() {
 		return "External component";
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param key
-	 *
-	 * 
-	 */
 	@Override
 	public ExtProcessor getProcessor(String key) {
 		return processors.get(key);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 */
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
@@ -416,14 +346,6 @@ public class ComponentProtocol
 		list.add(getName(), "Number of external component connections", size, Level.FINER);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 *
-	 * 
-	 */
 	@Override
 	public List<Element> getStreamFeatures(ComponentIOService serv) {
 		List<Element> results = new LinkedList<Element>();
@@ -439,14 +361,6 @@ public class ComponentProtocol
 		return results;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param xmlns
-	 *
-	 * 
-	 */
 	@Override
 	public StreamOpenHandler getStreamOpenHandler(String xmlns) {
 		return streamOpenHandlers.get(xmlns);
@@ -454,28 +368,12 @@ public class ComponentProtocol
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param binds
-	 */
 	@Override
 	public void initBindings(Bindings binds) {
 		super.initBindings(binds);
 		binds.put(ComponentRepository.COMP_REPO_BIND, repo);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 *
-	 * 
-	 */
 	@Override
 	public Queue<Packet> processSocketData(ComponentIOService serv) {
 		Queue<Packet> packets = serv.getReceivedPackets();
@@ -539,24 +437,12 @@ public class ComponentProtocol
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param port_props
-	 */
 	@Override
 	public void reconnectionFailed(Map<String, Object> port_props) {
 
 		// TODO: handle this somehow
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 */
 	@Override
 	public void serviceStarted(ComponentIOService serv) {
 		super.serviceStarted(serv);
@@ -588,14 +474,6 @@ public class ComponentProtocol
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param service
-	 *
-	 * 
-	 */
 	@Override
 	public boolean serviceStopped(ComponentIOService service) {
 		boolean result = super.serviceStopped(service);
@@ -644,15 +522,6 @@ public class ComponentProtocol
 
 	//~--- set methods ----------------------------------------------------------
 
-	// ~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param properties
-	 * @throws tigase.conf.ConfigurationException
-	 */
 	@Override
 	@SuppressWarnings({ "unchecked" })
 	public void setProperties(Map<String, Object> properties) throws ConfigurationException {
@@ -751,22 +620,9 @@ public class ComponentProtocol
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param service
-	 */
 	@Override
 	public void tlsHandshakeCompleted(ComponentIOService service) {}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param hostname
-	 * @param serv
-	 */
 	@Override
 	public void unbindHostname(String hostname, ComponentIOService serv) {
 		CopyOnWriteArrayList<ComponentConnection> conns = connections.get(hostname);
@@ -789,15 +645,6 @@ public class ComponentProtocol
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param ios
-	 * @param p
-	 *
-	 * 
-	 */
 	@Override
 	public boolean writePacketToSocket(ComponentIOService ios, Packet p) {
 
@@ -810,24 +657,9 @@ public class ComponentProtocol
 		return super.writePacketToSocket(ios, p);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 */
 	@Override
 	public void xmppStreamClosed(ComponentIOService serv) {}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 * @param attribs
-	 *
-	 * 
-	 */
 	@Override
 	public String xmppStreamOpened(ComponentIOService serv, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -856,40 +688,16 @@ public class ComponentProtocol
 
 	//~--- get methods ----------------------------------------------------------
 
-	// ~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	protected long getMaxInactiveTime() {
 		return 1000 * 24 * HOUR;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param def
-	 *
-	 * 
-	 */
 	@Override
 	protected Integer getMaxQueueSize(int def) {
 		return def * 10;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param p
-	 *
-	 * 
-	 */
 	@Override
 	protected ComponentIOService getXMPPIOService(Packet p) {
 		if (p.getStanzaTo() == null) {
@@ -975,23 +783,11 @@ public class ComponentProtocol
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	protected ComponentIOService getXMPPIOServiceInstance() {
 		return new ComponentIOService();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	protected boolean isHighThroughput() {
 		return true;
@@ -999,7 +795,6 @@ public class ComponentProtocol
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
 	private synchronized void addComponentConnection(String hostname,
 			ComponentIOService s) {
 		ComponentConnection       conn      = new ComponentConnection(hostname, s);
@@ -1127,26 +922,18 @@ public class ComponentProtocol
 
 	//~--- inner classes --------------------------------------------------------
 
-	// ~--- inner classes --------------------------------------------------------
 	private class AuthenticationTimerTask
 					extends tigase.util.TimerTask {
 		private ComponentIOService serv = null;
 
 		//~--- constructors -------------------------------------------------------
 
-		// ~--- constructors -------------------------------------------------------
 		private AuthenticationTimerTask(ComponentIOService serv) {
 			this.serv = serv;
 		}
 
 		//~--- methods ------------------------------------------------------------
 
-		// ~--- methods ------------------------------------------------------------
-
-		/**
-		 * Method description
-		 *
-		 */
 		@Override
 		public void run() {
 			if (!serv.isAuthenticated()) {
@@ -1155,12 +942,3 @@ public class ComponentProtocol
 		}
 	}
 }
-
-
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com
-
-
-//~ Formatted in Tigase Code Convention on 13/03/11

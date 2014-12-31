@@ -52,7 +52,6 @@ import java.util.logging.Logger;
  * Created: Sat Jun 21 22:23:18 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
  */
 public class WebSocketClientConnectionClustered
 				extends WebSocketClientConnectionManager
@@ -75,13 +74,6 @@ public class WebSocketClientConnectionClustered
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method is called on cluster node connection event. This is a
-	 * notification to the component that a new cluster node has connected.
-	 *
-	 * @param node
-	 *          is a hostname of a cluster node generating the event.
-	 */
 	@Override
 	public void nodeConnected(String node) {
 		BareJID nodeJID = BareJID.bareJIDInstanceNS(null, node);
@@ -104,14 +96,6 @@ public class WebSocketClientConnectionClustered
 		}
 	}
 
-	/**
-	 * Method is called on cluster node disconnection event. This is a
-	 * notification to the component that there was network connection lost to one
-	 * of the cluster nodes.
-	 *
-	 * @param node
-	 *          is a hostname of a cluster node generating the event.
-	 */
 	@Override
 	public void nodeDisconnected(String node) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -150,27 +134,11 @@ public class WebSocketClientConnectionClustered
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getDiscoDescription() {
 		return super.getDiscoDescription() + " clustered";
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param see_other_host_class is a <code>String</code>
-	 *
-	 * @return a value of <code>SeeOtherHostIfc</code>
-	 */
 	@Override
 	public SeeOtherHostIfc getSeeOtherHostInstance(String see_other_host_class) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -190,15 +158,6 @@ public class WebSocketClientConnectionClustered
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Set's the configures the cluster controller object for cluster
-	 * communication and API.
-	 *
-	 * @param cl_controller
-	 */
 	@Override
 	public void setClusterController(ClusterControllerIfc cl_controller) {}
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/10/15

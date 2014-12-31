@@ -123,25 +123,29 @@ public @interface TODO {
   /**
    * <code>severity</code> property allows you to set and retrieve severity of
    * expected code change described by this <code>TODO</code> annotation.
-	 * @return
+	 *
+	 * @return priority of code change
    */
   Severity severity() default Severity.IMPORTANT;
   /**
    * <code>note</code> property allows you to set and retrieve description
    * text for expected code change.
-	 * @return
+	 *
+	 * @return description text for code change
    */
   String note() default "Functionality not fully implemented.";
   /**
    * <code>timeLine</code> property allows you to set and retrieve expected
    * time by when the change should be done to this code.
-	 * @return
+	 *
+	 * @return due date of the change
    */
   String timeLine() default "2004/12/31";
   /**
    * <code>assignedTo</code> property allows you to assign developer for the code
    * change described by this annotation.
-	 * @return
+	 *
+	 * @return Name of the developer
    */
   String assignedTo() default "Artur Hefczyc";
 

@@ -148,10 +148,6 @@ public class ConnectionOpenThread
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
 	@Override
 	public void run() {
 		while (!stopping) {

@@ -78,12 +78,6 @@ public class ZLibIO implements IOInterface {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public int bytesRead() {
 		return io.bytesRead();
@@ -119,14 +113,6 @@ public class ZLibIO implements IOInterface {
 		return io.getTotalBuffOverflow();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param caps
-	 *
-	 * 
-	 */
 	@Override
 	public boolean checkCapabilities(String caps) {
 		return caps.contains(ZLIB_CAPS) || io.checkCapabilities(caps);
@@ -134,37 +120,16 @@ public class ZLibIO implements IOInterface {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 *
-	 * @throws IOException
-	 */
 	@Override
 	public int getInputPacketSize() throws IOException {
 		return io.getInputPacketSize();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public SocketChannel getSocketChannel() {
 		return io.getSocketChannel();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 * @param reset
-	 */
 	@Override
 	public void getStatistics(StatisticsList list, boolean reset) {
 		if (io != null) {
@@ -177,25 +142,11 @@ public class ZLibIO implements IOInterface {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public boolean isConnected() {
 		return io.isConnected();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param addr
-	 *
-	 * 
-	 */
 	@Override
 	public boolean isRemoteAddress(String addr) {
 		return io.isRemoteAddress(addr);
@@ -203,16 +154,6 @@ public class ZLibIO implements IOInterface {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param buff
-	 *
-	 * 
-	 *
-	 * @throws IOException
-	 */
 	@Override
 	public ByteBuffer read(ByteBuffer buff) throws IOException {
 		ByteBuffer tmpBuffer = io.read(buff);
@@ -231,12 +172,6 @@ public class ZLibIO implements IOInterface {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @throws IOException
-	 */
 	@Override
 	public void stop() throws IOException {
 		if (log.isLoggable(Level.FINEST)) {
@@ -247,49 +182,21 @@ public class ZLibIO implements IOInterface {
 		zlib.end();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String toString() {
 		return "ZLIB: " + io.toString();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public boolean waitingToSend() {
 		return io.waitingToSend();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public int waitingToSendSize() {
 		return io.waitingToSendSize();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param buff
-	 *
-	 * 
-	 *
-	 * @throws IOException
-	 */
 	@Override
 	public int write(ByteBuffer buff) throws IOException {
 		if (buff == null) {
@@ -306,9 +213,6 @@ public class ZLibIO implements IOInterface {
 		return io.write(compressed_buff);
 	}
 
-	/* (non-Javadoc)
-	 * @see tigase.io.IOInterface#setLogId(java.lang.String)
-	 */
 	@Override
 	public void setLogId(String logId) {
 		io.setLogId(logId);
@@ -319,8 +223,3 @@ public class ZLibIO implements IOInterface {
 	}	
 }
 
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

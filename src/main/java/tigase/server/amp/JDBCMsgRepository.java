@@ -300,32 +300,11 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 	// ~--- get methods ----------------------------------------------------------
 
 	// Moved to MsgRepository class
-//	/**
-//	 * Method description
-//	 * 
-//	 * @param id_string
-//	 * 
-//	 */
 //	public static JDBCMsgRepository getInstance(String id_string) {
-//		JDBCMsgRepository result = repos.get(id_string);
-//
-//		if (result == null) {
-//			result = new JDBCMsgRepository();
-//			repos.put(id_string, result);
-//		}
-//
-//		return result;
 //	}
 
 	// ~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 * 
-	 * @param conn_str
-	 * @param map
-	 * @throws DBInitException
-	 */
 	@Override
 	public void initRepository(String conn_str, Map<String, String> map)
 			throws DBInitException {
@@ -399,14 +378,6 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 		}
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * @param to
-	 * @param delete
-	 * 
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public Queue<Element> loadMessagesToJID(JID to, boolean delete)
 			throws UserNotFoundException {
@@ -459,15 +430,6 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 		return result;
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * @param from
-	 * @param to
-	 * @param expired
-	 * @param msg
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public void storeMessage(JID from, JID to, Date expired, Element msg)
 			throws UserNotFoundException {

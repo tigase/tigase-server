@@ -552,12 +552,6 @@ public class ServerConnections {
 //  }
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String toString() {
 		return "cid: " + cid + ", conn_state: " + conn_state.name() + ", outgoing: " + outgoing

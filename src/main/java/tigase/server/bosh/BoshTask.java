@@ -60,10 +60,6 @@ public class BoshTask extends TimerTask {
 
 	// ~--- methods ------------------------------------------------------------
 
-	/**
-	 * Method description
-	 * 
-	 */
 	@Override
 	public void run() {
 		Queue<Packet> out_results = new ArrayDeque<Packet>();

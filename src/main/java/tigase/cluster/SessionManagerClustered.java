@@ -61,7 +61,6 @@ import tigase.xmpp.XMPPSession;
  * Created: Tue Nov 22 07:07:11 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
  */
 public class SessionManagerClustered
 				extends SessionManager
@@ -196,12 +195,15 @@ public class SessionManagerClustered
 	}
 
 	/**
+	 * {@inheritDoc}
+	 *
+	 * <br>
+	 * 
 	 * This is a standard component method for processing packets. The method
 	 * takes care of cases where the packet cannot be processed locally, in such a
 	 * case it is forwarded to another node.
 	 *
-	 *
-	 * @param packet
+	 * @param packet to be processed
 	 */
 	@Override
 	public void processPacket(Packet packet) {
@@ -268,6 +270,10 @@ public class SessionManagerClustered
 	}
 
 	/**
+	 * {@inheritDoc}
+	 *
+	 * <br><br>
+	 *
 	 * If the installation knows about user's JID, that he is connected to the
 	 * system, then this method returns all user's connection IDs. As an
 	 * optimization we can forward packets to all user's connections directly from
@@ -293,17 +299,6 @@ public class SessionManagerClustered
 		return ids;
 	}
 
-	/**
-	 * Loads the component's default configuration to the configuration management
-	 * subsystem.
-	 *
-	 * @param params
-	 *          is a Map with system-wide default settings found in
-	 *          init.properties file or similar location.
-	 *
-	 * @return a Map with all default component settings generated from the
-	 *         default parameters in init.properties file.
-	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props          = super.getDefaults(params);
@@ -391,17 +386,6 @@ public class SessionManagerClustered
 		return sessionsByNodeId;
 	}
 
-	/**
-	 * Method checks whether the clustering strategy has a complete JIDs info.
-	 * That is whether the strategy knows about all users connected to all nodes.
-	 * Some strategies may choose not to share this information among nodes, hence
-	 * the methods returns false. Other may synchronize this information and can
-	 * provide it to further optimize cluster traffic.
-	 *
-	 *
-	 * @return a true boolean value if the strategy has a complete information
-	 *         about all users connected to all cluster nodes.
-	 */
 	@Override
 	public boolean hasCompleteJidsInfo() {
 		return strategy.hasCompleteJidsInfo();
@@ -412,14 +396,6 @@ public class SessionManagerClustered
 		return this.connectionsByFrom.containsKey(connJid);
 	}
 	
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Set's the configures the cluster controller object for cluster
-	 * communication and API.
-	 *
-	 * @param cl_controller
-	 */
 	@Override
 	public void setClusterController(ClusterControllerIfc cl_controller) {
 		clusterController = cl_controller;
@@ -439,13 +415,6 @@ public class SessionManagerClustered
 //  clusterController.setCommandListener(RESPOND_SYNCONLINE_CMD, respondSyncOnline);
 	}
 
-	/**
-	 * Standard component's configuration method.
-	 *
-	 *
-	 * @param props
-	 * @throws tigase.conf.ConfigurationException
-	 */
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
@@ -506,8 +475,8 @@ public class SessionManagerClustered
 	 *
 	 * @see SessionManager#closeSession
 	 *
-	 * @param conn
-	 * @param closeOnly
+	 * @param conn {@link XMPPResourceConnection} to be closed
+	 * @param closeOnly whether to perform additional processing before closing
 	 */
 	@Override
 	protected void closeSession(XMPPResourceConnection conn, boolean closeOnly) {

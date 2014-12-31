@@ -60,33 +60,11 @@ public class ConnectionRecord
 
 	//~--- methods --------------------------------------------------------------
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param rec
-	 *
-	 *
-	 */
 	@Override
 	public int compareTo(ConnectionRecord rec) {
 		return connectionId.compareTo(rec.connectionId);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param rec
-	 *
-	 *
-	 */
 	@Override
 	public boolean equals(Object rec) {
 		boolean result = false;
@@ -98,23 +76,11 @@ public class ConnectionRecord
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 */
 	@Override
 	public int hashCode() {
 		return connectionId.hashCode();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 */
 	@Override
 	public Element toElement() {
 		Element result = new Element(TOP_ELEMENT);
@@ -127,12 +93,6 @@ public class ConnectionRecord
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 */
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -149,33 +109,21 @@ public class ConnectionRecord
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * @return the connectionId
-	 */
 	@Override
 	public JID getConnectionId() {
 		return connectionId;
 	}
 
-	/**
-	 * @return the node
-	 */
 	@Override
 	public JID getNode() {
 		return node;
 	}
 
-	/**
-	 * @return the sessionId
-	 */
 	@Override
 	public String getSessionId() {
 		return sessionId;
 	}
 
-	/**
-	 * @return the user_jid
-	 */
 	@Override
 	public JID getUserJid() {
 		return userJid;
@@ -183,12 +131,6 @@ public class ConnectionRecord
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 *
-	 * @param elem
-	 */
 	@Override
 	public void setElement(Element elem) {
 		this.node         = JID.jidInstanceNS(elem.getChild(NODE_ELEMENT).getCData());
@@ -198,12 +140,6 @@ public class ConnectionRecord
 		this.sessionId = elem.getChild(SESSION_ID_ELEMENT).getCData();
 	}
 
-	/**
-	 * @param node
-	 * @param userJid
-	 * @param sessionId
-	 * @param connectionId
-	 */
 	@Override
 	public void setRecordFields(JID node, JID userJid, String sessionId, JID connectionId) {
 		this.node         = node;
@@ -212,6 +148,3 @@ public class ConnectionRecord
 		this.sessionId    = sessionId;
 	}
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/07/06

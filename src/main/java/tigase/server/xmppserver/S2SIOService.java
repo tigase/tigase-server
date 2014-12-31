@@ -215,12 +215,6 @@ public class S2SIOService extends XMPPIOService<Object> {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String toString() {
 		CID cid = (CID) getSessionData().get("cid");
@@ -228,9 +222,3 @@ public class S2SIOService extends XMPPIOService<Object> {
 		return "CID: " + cid + ", " + super.toString();
 	}
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

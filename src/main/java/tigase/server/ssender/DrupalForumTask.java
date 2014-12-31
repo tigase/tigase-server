@@ -159,12 +159,6 @@ public class DrupalForumTask extends SenderTask {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public boolean cancel() {
 		boolean result = super.cancel();
@@ -184,12 +178,6 @@ public class DrupalForumTask extends SenderTask {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * <code>getInitString</code> method returns initialization string passed
-	 * to it in <code>init()</code> method.
-	 *
-	 * @return a <code>String</code> value of initialization string.
-	 */
 	@Override
 	public String getInitString() {
 		return db_conn;
@@ -197,18 +185,6 @@ public class DrupalForumTask extends SenderTask {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * <code>init</code> method is a task specific initialization rountine.
-	 *
-	 * @param handler a <code>StanzaHandler</code> value is a reference to object
-	 * which handles all stanza retrieved from data source. The handler is
-	 * responsible for delivering stanza to destination address.
-	 * @param initString a <code>String</code> value is an initialization string
-	 * for this task. For example database tasks would expect database connection
-	 * string here, filesystem task would expect directory here.
-	 * @exception IOException if an error occurs during task or data storage
-	 * initialization.
-	 */
 	@Override
 	public void init(StanzaHandler handler, String initString) throws IOException {
 		this.handler = handler;
@@ -230,9 +206,6 @@ public class DrupalForumTask extends SenderTask {
 		}
 	}
 
-	/**
-	 * <code>run</code> method is where all task work is done.
-	 */
 	@Override
 	public void run() {
 

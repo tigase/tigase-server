@@ -72,34 +72,13 @@ public class SMResourceConnection extends XMPPResourceConnection {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Returns information whether this is a server (SessionManager) session or normal user
-	 * session. The server session is used to handle packets addressed to the server itself
-	 * (local domain name).
-	 * @return a <code>boolean</code> value of <code>true</code> if this is the server session
-	 * and <code>false</code> otherwise.
-	 */
 	@Override
 	public boolean isServerSession() {
 		return true;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param bareJID
-	 *
-	 * 
-	 */
 	@Override
 	public boolean isUserId(BareJID bareJID) {
 		return isLocalDomain(bareJID.toString(), false);
 	}
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

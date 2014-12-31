@@ -76,12 +76,6 @@ public class ClusterController
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param component
-	 */
 	@Override
 	public void componentAdded(ClusteredComponentIfc component) {
 		// we are not passing wrapper to ClusterConnectionManager as we need to
@@ -96,29 +90,9 @@ public class ClusterController
 				.getName(), true);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param component
-	 */
 	@Override
 	public void componentRemoved(ClusteredComponentIfc component) {}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * tigase.cluster.api.ClusterControllerIfc#handleClusterPacket(tigase.xml.
-	 * Element)
-	 */
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
 	@Override
 	public void handleClusterPacket(Element packet) {
 		ClusterElement  clel    = new ClusterElement(packet);
@@ -146,12 +120,6 @@ public class ClusterController
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param node
-	 */
 	@Override
 	public void nodeConnected(String node) {
 		for (ClusteredComponentIfc comp : components.values()) {
@@ -159,12 +127,6 @@ public class ClusterController
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param node
-	 */
 	@Override
 	public void nodeDisconnected(String node) {
 		for (ClusteredComponentIfc comp : components.values()) {
@@ -172,54 +134,14 @@ public class ClusterController
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param results
-	 */
 	@Override
 	public void processPacket(final Packet packet, final Queue<Packet> results) {}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * tigase.cluster.api.ClusterControllerIfc#removeCommandListener(java.lang
-	 * .String, tigase.cluster.api.CommandListener)
-	 */
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param listener
-	 */
 	@Override
 	public void removeCommandListener(CommandListener listener) {
 		removeCommandListener(listener.getName(), listener);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see tigase.cluster.api.ClusterControllerIfc#sendToNodes(java.lang.String,
-	 * java.util.Map, tigase.xml.Element, tigase.xmpp.JID, java.util.List,
-	 * tigase.xmpp.JID[])
-	 */
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param command
-	 * @param data
-	 * @param packets
-	 * @param fromNode
-	 * @param visitedNodes
-	 * @param toNodes
-	 */
 	@Override
 	public void sendToNodes(String command, Map<String, String> data,
 			Queue<Element> packets, JID fromNode, Set<JID> visitedNodes, JID... toNodes) {
@@ -259,136 +181,35 @@ public class ClusterController
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see tigase.cluster.api.ClusterControllerIfc#sendToNodes(java.lang.String,
-	 * tigase.xml.Element, tigase.xmpp.JID, java.util.List, tigase.xmpp.JID[])
-	 */
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param command
-	 * @param packets
-	 * @param fromNode
-	 * @param visitedNodes
-	 * @param toNodes
-	 */
 	@Override
 	public void sendToNodes(String command, Queue<Element> packets, JID fromNode,
 			Set<JID> visitedNodes, JID... toNodes) {
 		sendToNodes(command, null, packets, fromNode, visitedNodes, toNodes);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see tigase.cluster.api.ClusterControllerIfc#sendToNodes(java.lang.String,
-	 * java.util.Map, tigase.xmpp.JID, java.util.List, tigase.xmpp.JID[])
-	 */
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param command
-	 * @param data
-	 * @param fromNode
-	 * @param visitedNodes
-	 * @param toNodes
-	 */
 	@Override
 	public void sendToNodes(String command, Map<String, String> data, JID fromNode,
 			Set<JID> visitedNodes, JID... toNodes) {
 		sendToNodes(command, data, (Queue<Element>) null, fromNode, visitedNodes, toNodes);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see tigase.cluster.api.ClusterControllerIfc#sendToNodes(java.lang.String,
-	 * java.util.Map, tigase.xmpp.JID, tigase.xmpp.JID[])
-	 */
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param command
-	 * @param data
-	 * @param fromNode
-	 * @param toNodes
-	 */
 	@Override
 	public void sendToNodes(String command, Map<String, String> data, JID fromNode,
 			JID... toNodes) {
 		sendToNodes(command, data, (Queue<Element>) null, fromNode, null, toNodes);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see tigase.cluster.api.ClusterControllerIfc#sendToNodes(java.lang.String,
-	 * tigase.xmpp.JID, tigase.xmpp.JID[])
-	 */
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param command
-	 * @param fromNode
-	 * @param toNodes
-	 */
 	@Override
 	public void sendToNodes(String command, JID fromNode, JID... toNodes) {
 		sendToNodes(command, null, (Queue<Element>) null, fromNode, null, toNodes);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see tigase.cluster.api.ClusterControllerIfc#sendToNodes(java.lang.String,
-	 * tigase.xml.Element, tigase.xmpp.JID, java.util.List, tigase.xmpp.JID[])
-	 */
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param command
-	 * @param packet
-	 * @param fromNode
-	 * @param visitedNodes
-	 * @param toNodes
-	 */
 	@Override
 	public void sendToNodes(String command, Element packet, JID fromNode,
 			Set<JID> visitedNodes, JID... toNodes) {
 		sendToNodes(command, null, packet, fromNode, visitedNodes, toNodes);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see tigase.cluster.api.ClusterControllerIfc#sendToNodes(java.lang.String,
-	 * java.util.Map, tigase.xml.Element, tigase.xmpp.JID, java.util.List,
-	 * tigase.xmpp.JID[])
-	 */
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param command
-	 * @param data
-	 * @param packet
-	 * @param fromNode
-	 * @param visitedNodes
-	 * @param toNodes
-	 */
 	@Override
 	public void sendToNodes(String command, Map<String, String> data, Element packet,
 			JID fromNode, Set<JID> visitedNodes, JID... toNodes) {
@@ -398,18 +219,6 @@ public class ClusterController
 		sendToNodes(command, data, packets, fromNode, visitedNodes, toNodes);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 *
-	 *
-	 * @return a value of {@code Map<String,Object>}
-	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defs = super.getDefaults(params);
@@ -417,86 +226,31 @@ public class ClusterController
 		return defs;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getDiscoCategoryType() {
 		return "load";
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getDiscoDescription() {
 		return "Cluster controller";
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param component
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean isCorrectType(ServerComponent component) {
 		return component instanceof ClusteredComponentIfc;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * tigase.cluster.api.ClusterControllerIfc#setCommandListener(java.lang.String
-	 * , tigase.cluster.api.CommandListener)
-	 */
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param listener
-	 */
 	@Override
 	public void setCommandListener(CommandListener listener) {
 		setCommandListener(listener.getName(), listener);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param name
-	 */
 	@Override
 	public void setName(String name) {
 		super.setName(name);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param properties
-	 * @throws tigase.conf.ConfigurationException
-	 */
 	@Override
 	public void setProperties(Map<String, Object> properties) throws ConfigurationException {
 		super.setProperties(properties);

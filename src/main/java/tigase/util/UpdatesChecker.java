@@ -100,10 +100,6 @@ public class UpdatesChecker extends Thread {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 */
 	@Override
 	public void run() {
 		String version = XMPPServer.getImplementationVersion();

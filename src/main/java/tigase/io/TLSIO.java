@@ -118,12 +118,6 @@ public class TLSIO implements IOInterface {
 
 	// ~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * 
-	 */
 	@Override
 	public int bytesRead() {
 		return io.bytesRead();
@@ -159,14 +153,6 @@ public class TLSIO implements IOInterface {
 		return io.getTotalBuffOverflow();
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param caps
-	 * 
-	 * 
-	 */
 	@Override
 	public boolean checkCapabilities(String caps) {
 		return caps.contains(TLS_CAPS) || io.checkCapabilities(caps);
@@ -174,37 +160,16 @@ public class TLSIO implements IOInterface {
 
 	// ~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * 
-	 * 
-	 * @throws IOException
-	 */
 	@Override
 	public int getInputPacketSize() throws IOException {
 		return tlsWrapper.getPacketBuffSize();
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * 
-	 */
 	@Override
 	public SocketChannel getSocketChannel() {
 		return io.getSocketChannel();
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param list
-	 * @param reset
-	 */
 	@Override
 	public void getStatistics(StatisticsList list, boolean reset) {
 		if (io != null) {
@@ -212,25 +177,11 @@ public class TLSIO implements IOInterface {
 		}
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * 
-	 */
 	@Override
 	public boolean isConnected() {
 		return io.isConnected();
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param addr
-	 * 
-	 * 
-	 */
 	@Override
 	public boolean isRemoteAddress(String addr) {
 		return io.isRemoteAddress(addr);
@@ -238,16 +189,6 @@ public class TLSIO implements IOInterface {
 
 	// ~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param buff
-	 * 
-	 * 
-	 * 
-	 * @throws IOException
-	 */
 	@Override
 	public ByteBuffer read(ByteBuffer buff) throws IOException {
 
@@ -271,12 +212,6 @@ public class TLSIO implements IOInterface {
 		} // end of else
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @throws IOException
-	 */
 	@Override
 	public void stop() throws IOException {
 		if (log.isLoggable(Level.FINEST)) {
@@ -289,49 +224,21 @@ public class TLSIO implements IOInterface {
 		tlsWrapper.close();
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * 
-	 */
 	@Override
 	public String toString() {
 		return "TLS: " + io.toString();
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * 
-	 */
 	@Override
 	public boolean waitingToSend() {
 		return io.waitingToSend();
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * 
-	 */
 	@Override
 	public int waitingToSendSize() {
 		return io.waitingToSendSize();
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * @param buff
-	 * 
-	 * 
-	 * 
-	 * @throws IOException
-	 */
 	@Override
 	public int write(ByteBuffer buff) throws IOException {
 		TLSStatus stat = tlsWrapper.getStatus();
@@ -601,17 +508,8 @@ public class TLSIO implements IOInterface {
 		return result;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see tigase.io.IOInterface#setLogId(java.lang.String)
-	 */
 	@Override
 	public void setLogId(String logId) {
 		io.setLogId(logId);
 	}
 } // TLSIO
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com

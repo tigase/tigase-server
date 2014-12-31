@@ -436,12 +436,6 @@ public class VHostItem
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
 	@Override
 	public void addCommandFields(Packet packet) {
 		Command.addFieldValue(packet, HOSTNAME_LABEL, (vhost != null)
@@ -522,12 +516,6 @@ public class VHostItem
 		return vhost.hashCode();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
 	@Override
 	public void initFromCommand(Packet packet) {
 		super.initFromCommand(packet);
@@ -615,12 +603,6 @@ public class VHostItem
 
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param elem
-	 */
 	@Override
 	public void initFromElement(Element elem) {
 		if (elem.getName() != VHOST_ELEM) {
@@ -697,12 +679,6 @@ public class VHostItem
 		log.log( Level.FINE, "Initialized from element: {0}", this);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param propString
-	 */
 	@Override
 	public void initFromPropertyString(String propString) {
 		String[] props = propString.split(":");
@@ -810,9 +786,13 @@ public class VHostItem
 	}
 
 	/**
+	 * {@inheritDoc}
+	 *
+	 * <br><br>
+	 *
 	 * The method exports the <code>VHostItem</code> object to XML representation.
 	 *
-	 * @return an <code>Element</code> object with vhost information.
+	 * @return an <code>Element</code> object with VHost information.
 	 */
 	@Override
 	public Element toElement() {
@@ -876,14 +856,6 @@ public class VHostItem
 		return elem;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String toPropertyString() {
 		StringBuilder sb = new StringBuilder();
@@ -928,14 +900,6 @@ public class VHostItem
 		return sb.toString();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String toString() {
 		String str = "Domain: " + vhost + ", enabled: " + enabled
@@ -1015,27 +979,11 @@ public class VHostItem
 		return domainFilterDomains;
 	}
 	
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getElemName() {
 		return VHOST_ELEM;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getKey() {
 		return this.vhost.getDomain();
@@ -1443,49 +1391,23 @@ public class VHostItem
 
 	private class UnmodifiableVHostItem
 					extends VHostItem {
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param elem
-		 */
 		@Override
 		public void initFromElement(Element elem) {
 			throw new UnsupportedOperationException(
 					"This is unmodifiable instance of VHostItem");
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param propString
-		 */
 		@Override
 		public void initFromPropertyString(String propString) {
 			throw new UnsupportedOperationException(
 					"This is unmodifiable instance of VHostItem");
 		}
 
-		/**
-		 * The method exports the <code>VHostItem</code> object to XML
-		 * representation.
-		 *
-		 * @return an <code>Element</code> object with vhost information.
-		 */
 		@Override
 		public Element toElement() {
 			return VHostItem.this.toElement();
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 *
-		 *
-		 * @return a value of <code>String</code>
-		 */
 		@Override
 		public String toString() {
 			return VHostItem.this.toString();
@@ -1493,13 +1415,6 @@ public class VHostItem
 
 		//~--- get methods --------------------------------------------------------
 
-		/**
-		 * Returns an array with the server components names which should process
-		 * packets sent to this domain or <code>null</code> (default) if there is no
-		 * specific component assigned to this domain.
-		 *
-		 * @return a <code>String[]</code> object with server component names.
-		 */
 		@Override
 		public String[] getComps() {
 			return VHostItem.this.getComps();
@@ -1510,14 +1425,6 @@ public class VHostItem
 			return VHostItem.this.getData(key);
 		}
 		
-		/**
-		 * Method description
-		 *
-		 *
-		 *
-		 *
-		 * @return a value of <code>DomainFilterPolicy</code>
-		 */
 		@Override
 		public DomainFilterPolicy getDomainFilter() {
 			return VHostItem.this.getDomainFilter();
@@ -1529,100 +1436,46 @@ public class VHostItem
 		}
 
 
-		/**
-		 * This method returns the maximum number of user accounts allowed for this
-		 * domain. This parameter is to allow for limiting number of users on per
-		 * domain basis.
-		 *
-		 * @return a <code>long</code> value indicating the maximum number of user
-		 *         accounts allowed for this domain.
-		 */
 		@Override
 		public long getMaxUsersNumber() {
 			return VHostItem.this.getMaxUsersNumber();
 		}
 
-		/**
-		 * @return the messageForward
-		 */
 		@Override
 		public JID getMessageForward() {
 			return VHostItem.this.messageForward;
 		}
 
-		/**
-		 * This method allows to access the virtual domain other configuration
-		 * parameters. This is future feature API and it is not used right now. It
-		 * allows to access configuration parameters which are not specified at the
-		 * time of API definition.
-		 *
-		 * @return a <code>String</code> value with domain extra parameters.
-		 */
 		@Override
 		public String getOtherDomainParams() {
 			return VHostItem.this.getOtherDomainParams();
 		}
 
-		/**
-		 * @return the presenceForward
-		 */
 		@Override
 		public JID getPresenceForward() {
 			return VHostItem.this.presenceForward;
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 *
-		 *
-		 * @return a value of <code>String</code>
-		 */
 		@Override
 		public String getS2sSecret() {
 			return VHostItem.this.getS2sSecret();
 		}
 
-		/**
-		 * @return the saslAllowedMechanisms
-		 */
 		@Override
 		public String[] getSaslAllowedMechanisms() {
 			return VHostItem.this.getSaslAllowedMechanisms();
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 *
-		 *
-		 * @return a value of <code>VHostItem</code>
-		 */
 		@Override
 		public VHostItem getUnmodifiableVHostItem() {
 			return this;
 		}
 
-		/**
-		 * This method return a virtual host name as a <code>String</code> value.
-		 *
-		 * @return a <code>String</code> value with the virtual domain name.
-		 */
 		@Override
 		public JID getVhost() {
 			return VHostItem.this.getVhost();
 		}
 
-		/**
-		 * This method checks whether anonymous login is enabled for this domain.
-		 * This is the domain own configuration parameter which allows to disable
-		 * anonymous logins on per domain basis.
-		 *
-		 * @return a <code>boolean</code> value indicating whether anonymous logins
-		 *         are allowed for this domain.
-		 */
 		@Override
 		public boolean isAnonymousEnabled() {
 			return VHostItem.this.isAnonymousEnabled();
@@ -1633,41 +1486,16 @@ public class VHostItem
 			return VHostItem.this.isData(key);
 		}
 		
-		/**
-		 * Checks whether this domain is set as enabled or not. This is domain own
-		 * configuration parameter which allows to temporarly disable domain so
-		 * packets for this domain are not processed normally. Instead the server
-		 * returns an error.
-		 *
-		 * @return a <code>boolean</code> value <code>true</code> if the domain is
-		 *         enabled and <code>false</code> if the domain is disabled.
-		 */
 		@Override
 		public boolean isEnabled() {
 			return VHostItem.this.isEnabled();
 		}
 
-		/**
-		 * The method checks whether user registration is enabled for this domain or
-		 * not. This is the domain own configuration parameter which allows to
-		 * disable user accounts registration via XMPP per domain basis.
-		 *
-		 * @return a <code>boolean</code> value indicating whether user account
-		 *         registration is allowed for this domain.
-		 */
 		@Override
 		public boolean isRegisterEnabled() {
 			return VHostItem.this.isRegisterEnabled();
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 *
-		 *
-		 * @return a value of <code>boolean</code>
-		 */
 		@Override
 		public boolean isTlsRequired() {
 			return VHostItem.this.isTlsRequired();
@@ -1675,41 +1503,18 @@ public class VHostItem
 
 		//~--- set methods --------------------------------------------------------
 
-		/**
-		 * This method allows to enable or disable anonymous logins for this domain.
-		 * By default anonymous logins are enabled.
-		 *
-		 * @param enabled
-		 *          is a <code>boolean</code> value indicating whether anonymous
-		 *          logins are allowed for this domain.
-		 */
 		@Override
 		public void setAnonymousEnabled(boolean enabled) {
 			throw new UnsupportedOperationException(
 					"This is unmodifiable instance of VHostItem");
 		}
 
-		/**
-		 * Sets an array with the server component names by which packets to this
-		 * domain can be processed. Every local domain will be handled by
-		 * <code>VHostListener</code> which returns <code>true</code> for
-		 * <code>handlesLocalDomains()</code> method call and by all components set
-		 * via this method.
-		 *
-		 * @param comps
-		 *          is an <code>String[]</code> array with server component names.
-		 */
 		@Override
 		public void setComps(String[] comps) {
 			throw new UnsupportedOperationException(
 					"This is unmodifiable instance of VHostItem");
 		}
 
-		/**
-		 * Method description
-		 *
-		 * @param ports
-		 */
 		@Override
 		public void setC2SPortsAllowed(int[] ports) {
 			throw new UnsupportedOperationException(
@@ -1722,124 +1527,60 @@ public class VHostItem
 					"This is unmodifiable instance of VHostItem");
 		}
 		
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param filter
-		 */
 		@Override
 		public void setDomainFilter(DomainFilterPolicy filter) {
 			throw new UnsupportedOperationException(
 					"This is unmodifiable instance of VHostItem");
 		}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domainFilter
-	 */
 		@Override
 	public void setDomainFilterDomains(String[] domainFilterDomains) {
 			throw new UnsupportedOperationException(
 					"This is unmodifiable instance of VHostItem");
 	}
 
-		/**
-		 * This method allows to enable or disable local domain. If the domain is
-		 * disabled packets sent for this domain are not processed normally, instead
-		 * the server returns an error to the sender. Domain is enabled by default.
-		 *
-		 * @param enabled
-		 *          is a <code>boolean</code> value indicating whether the domain is
-		 *          enabled or not.
-		 */
 		@Override
 		public void setEnabled(boolean enabled) {
 			throw new UnsupportedOperationException(
 					"This is unmodifiable instance of VHostItem");
 		}
 
-		/**
-		 * This method allows to set the maximum number of user accounts allowed for
-		 * this domain. The default value of this parameter is: <code>0L</code>.
-		 *
-		 * @param maxUsersNumber
-		 *          is a <code>long</code> value specifying the maximum number of
-		 *          user accounts allowed for this domain.
-		 */
 		@Override
 		public void setMaxUsersNumber(long maxUsersNumber) {
 			throw new UnsupportedOperationException(
 					"This is unmodifiable instance of VHostItem");
 		}
 
-		/**
-		 * @param messageForward the messageForward to set
-		 */
 		@Override
 		public void setMessageForward(JID messageForward) {
 			throw new UnsupportedOperationException(
 					"This is unmodifiable instance of VHostItem");
 		}
 
-		/**
-		 * This method allows to set extra configuration parameters for the virtual
-		 * domain. This is future feature API and it is not used right now. It
-		 * allows to access configuration parameters which are not specified at the
-		 * time of API definition.
-		 *
-		 * @param otherParams
-		 *          is a <code>String</code> value with domain extra parameters.
-		 */
 		@Override
 		public void setOtherDomainParams(String otherParams) {
 			throw new UnsupportedOperationException(
 					"This is unmodifiable instance of VHostItem");
 		}
 
-		/**
-		 * @param presenceForward the presenceForward to set
-		 */
 		@Override
 		public void setPresenceForward(JID presenceForward) {
 			throw new UnsupportedOperationException(
 					"This is unmodifiable instance of VHostItem");
 		}
 
-		/**
-		 * This method allows to enable or disable user account registration for
-		 * this domain. By default user account registration is enabled.
-		 *
-		 * @param enabled
-		 *          is a <code>boolean</code> value indicating whether user account
-		 *          registration is allowed for this domain or not.
-		 */
 		@Override
 		public void setRegisterEnabled(boolean enabled) {
 			throw new UnsupportedOperationException(
 					"This is unmodifiable instance of VHostItem");
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param s2sSecret
-		 */
 		@Override
 		public void setS2sSecret(String s2sSecret) {
 			throw new UnsupportedOperationException(
 					"This is unmodifiable instance of VHostItem");
 		}
 
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param enabled
-		 */
 		@Override
 		public void setTlsRequired(boolean enabled) {
 			throw new UnsupportedOperationException(

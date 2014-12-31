@@ -99,17 +99,6 @@ public class LocalEventBus implements EventBus {
 
 	private boolean throwingExceptionOn = true;
 
-	/**
-	 * Registers handler to receive events with given name and namespace.
-	 * 
-	 * @param name
-	 *            name of events. Can be {@code null}, then handler will be
-	 *            received all events with given {@code xmlns}.
-	 * @param xmlns
-	 *            namespace of events.
-	 * @param handler
-	 *            event handler.
-	 */
 	@Override
 	public void addHandler(final String name, final String xmlns, final EventHandler handler) {
 		final String eventName = name == null ? NULL_NAME : name;

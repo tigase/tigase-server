@@ -77,20 +77,13 @@ public abstract class ActionAbstract
 
 	//~--- constant enums -------------------------------------------------------
 
-	private enum SECURITY { NONE, PERFORMANCE, STRICT }
+	private enum SECURITY {
 
-	;
+		NONE, PERFORMANCE, STRICT
+	};
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 * 
-	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defs = new LinkedHashMap<String, Object>();
@@ -111,13 +104,6 @@ public abstract class ActionAbstract
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param props
-	 * @param resultsHandler
-	 */
 	@Override
 	public void setProperties(Map<String, Object> props,
 														ActionResultsHandlerIfc resultsHandler) {

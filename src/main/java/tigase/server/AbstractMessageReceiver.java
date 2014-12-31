@@ -154,9 +154,6 @@ public abstract class AbstractMessageReceiver
 	// String added intentionally!!
 	// Don't change to AbstractMessageReceiver.class.getName()
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(
 			"tigase.debug.AbstractMessageReceiver");
 
@@ -171,9 +168,6 @@ public abstract class AbstractMessageReceiver
 	private long last_second_packets = 0;
 	private int  out_queues_size     = 1;
 
-	/** Field description */
-
-	/** Field description */
 	protected int                    maxQueueSize          = MAX_QUEUE_SIZE_PROP_VAL;
 	protected int                    maxInQueueSize        = MAX_QUEUE_SIZE_PROP_VAL;
 	protected int                    maxOutQueueSize       = MAX_QUEUE_SIZE_PROP_VAL;
@@ -670,22 +664,11 @@ public abstract class AbstractMessageReceiver
 	 */
 	public abstract void processPacket(Packet packet);
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param results
-	 */
 	@Override
 	public final void processPacket(final Packet packet, final Queue<Packet> results) {
 		addPacketNB(packet);
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
 	@Override
 	public void release() {
 		stop();
@@ -716,10 +699,6 @@ public abstract class AbstractMessageReceiver
 		return 1;
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
 	@Override
 	public void start() {
 		if (log.isLoggable(Level.FINER)) {
@@ -909,16 +888,6 @@ public abstract class AbstractMessageReceiver
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param address
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean isInRegexRoutings(String address) {
 
@@ -990,12 +959,6 @@ public abstract class AbstractMessageReceiver
 		}    // end of if (this.maxQueueSize != maxQueueSize)
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param name
-	 */
 	@Override
 	public void setName(String name) {
 		super.setName(name);
@@ -1005,23 +968,11 @@ public abstract class AbstractMessageReceiver
 		setMaxQueueSize(maxInQueueSize);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param parent
-	 */
 	@Override
 	public void setParent(MessageReceiver parent) {
 		this.parent = parent;
 	}
 
-	/**
-	 * Sets all configuration properties for object.
-	 *
-	 * @param props
-	 * @throws tigase.conf.ConfigurationException
-	 */
 	@Override
 	@TODO(note = "Replace fixed filers loading with configurable options for that")
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
@@ -1091,16 +1042,6 @@ public abstract class AbstractMessageReceiver
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	protected boolean addOutPacket(Packet packet) {
 		int queueIdx = Math.abs(hashCodeForPacket(packet) % out_queues_size);
 
@@ -1393,10 +1334,6 @@ public abstract class AbstractMessageReceiver
 			handler.timeOutExpired(packet);
 		}
 
-		/**
-		 * Method description
-		 *
-		 */
 		@Override
 		public void run() {
 			handleTimeout();
@@ -1413,8 +1350,6 @@ public abstract class AbstractMessageReceiver
 		private PriorityQueueAbstract<Packet> queue;
 
 		//~--- constructors -------------------------------------------------------
-
-		// ~--- constructors -------------------------------------------------------
 		private QueueListener(PriorityQueueAbstract<Packet> q, QueueType type) {
 			this.queue = q;
 			this.type  = type;
@@ -1423,12 +1358,6 @@ public abstract class AbstractMessageReceiver
 
 		//~--- methods ------------------------------------------------------------
 
-		// ~--- methods ------------------------------------------------------------
-
-		/**
-		 * Method description
-		 *
-		 */
 		@Override
 		public void run() {
 			if (log.isLoggable(Level.FINEST)) {

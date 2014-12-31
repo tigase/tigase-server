@@ -39,15 +39,6 @@ import java.util.List;
  */
 public class ReceiverBareJidLB
 				implements LoadBalancerIfc {
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param p
-	 * @param conns
-	 *
-	 * 
-	 */
 	@Override
 	public ComponentIOService selectConnection(Packet p, List<ComponentConnection> conns) {
 		ComponentIOService  result = null;
@@ -62,6 +53,3 @@ public class ReceiverBareJidLB
 		return result;
 	}
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/03/16

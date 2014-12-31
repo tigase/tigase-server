@@ -57,12 +57,6 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param delay
-	 */
 	@Override
 	public void setAutoloadTimer(long delay) {
 		long interval = delay * 1000;
@@ -84,36 +78,18 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param repoChangeListener
-	 */
 	@Override
 	public void addRepoChangeListener(
 			RepositoryChangeListenerIfc<Item> repoChangeListener) {
 		this.repoChangeList = repoChangeListener;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param repoChangeListener
-	 */
 	@Override
 	public void removeRepoChangeListener(
 			RepositoryChangeListenerIfc<Item> repoChangeListener) {
 		this.repoChangeList = null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 */
 	@Override
 	public String toString() {
 		return items.toString();
@@ -149,12 +125,6 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param item
-	 */
 	@Override
 	public void addItem(Item item) {
 		addItemNoStore(item);
@@ -211,25 +181,11 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 		return true;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 */
 	@Override
 	public Collection<Item> allItems() {
 		return items.values();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param key
-	 *
-	 *
-	 */
 	@Override
 	public boolean contains(String key) {
 		return items.keySet().contains(key);
@@ -237,13 +193,6 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param defs
-	 * @param params
-	 */
 	@Override
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
 		initItemsMap();
@@ -258,14 +207,6 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 		defs.put(getConfigKey(), items_arr);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param key
-	 *
-	 *
-	 */
 	@Override
 	public Item getItem(String key) {
 		return items.get(key);
@@ -273,30 +214,14 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 */
 	@Override
 	public Iterator<Item> iterator() {
 		return items.values().iterator();
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
 	@Override
 	public void reload() {}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param key
-	 */
 	@Override
 	public void removeItem(String key) {
 		Item item = items.remove(key);
@@ -314,12 +239,6 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param properties
-	 */
 	@Override
 	public void setProperties(Map<String, Object> properties) {
 		initItemsMap();
@@ -343,37 +262,16 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 */
 	@Override
 	public int size() {
 		return items.size();
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
 	@Override
 	public void store() {}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param item
-	 *
-	 *
-	 */
 	@Override
 	public String validateItem(Item item) {
 		return null;
 	}
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/03/11

@@ -115,10 +115,6 @@ public abstract class WorkerThread extends Thread {
 		return queue.offer(item);
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
 	@Override
 	public void run() {
 		QueueItem item = null;

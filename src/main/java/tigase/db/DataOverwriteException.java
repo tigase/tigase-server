@@ -24,11 +24,10 @@ package tigase.db;
 /**
  * The <code>DataOverwriteException</code> exception is thrown when application
  * tries to ovrewrite data in repository but does not have permission to do so.
- * <p>
+ * <br>
  * Created: Wed Oct 27 14:17:44 2004
- * </p>
+ * <br>
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
  */
 public class DataOverwriteException extends TigaseDBException {
 

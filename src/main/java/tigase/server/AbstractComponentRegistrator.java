@@ -178,13 +178,6 @@ public abstract class AbstractComponentRegistrator<E extends ServerComponent>
 		return sb.toString();
 	}
 
-	/**
-	 * Method is called when the component is being stopped and potentially removed from
-	 * the system to release all resources associated with the component. After a call to
-	 * this method no further processing or calls to <code>processPacket</code> or any
-	 * ad-hoc commands is expected.
-	 *
-	 */
 	@Override
 	public void release() {}
 }    // AbstractComponentRegistrator

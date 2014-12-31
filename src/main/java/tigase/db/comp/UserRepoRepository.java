@@ -77,13 +77,6 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 	 */
 	public abstract BareJID getRepoUser();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param defs
-	 * @param params
-	 */
 	@Override
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
 

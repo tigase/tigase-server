@@ -129,12 +129,6 @@ public abstract class XMPPProcessor
 		return result;
 	}
 
-	/**
-	 * Method <code>compareTo</code> is used to perform
-	 *
-	 * @param proc an <code>XMPPProcessor</code> value
-	 * @return an <code>int</code> value
-	 */
 	@Override
 	public final int compareTo(XMPPImplIfc proc) {
 		return getClass().getName().compareTo(proc.getClass().getName());

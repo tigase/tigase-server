@@ -248,11 +248,6 @@ public class ServiceEntity {
 		}
 	}
 
-	/**
-	 * Describe <code>toString</code> method here.
-	 *
-	 * @return a <code>String</code> value
-	 */
 	@Override
 	public String toString() {
 		return getDiscoItem(null, null).toString();

@@ -67,15 +67,6 @@ public class BoshConnectionClustered
 		}
 	};
 
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method is called on cluster node connection event. This is a
-	 * notification to the component that a new cluster node has connected.
-	 *
-	 * @param node
-	 *          is a hostname of a cluster node generating the event.
-	 */
 	@Override
 	public void nodeConnected(String node) {
 		BareJID nodeJID = BareJID.bareJIDInstanceNS(null, node);
@@ -98,14 +89,6 @@ public class BoshConnectionClustered
 		}
 	}
 
-	/**
-	 * Method is called on cluster node disconnection event. This is a
-	 * notification to the component that there was network connection lost to one
-	 * of the cluster nodes.
-	 *
-	 * @param node
-	 *          is a hostname of a cluster node generating the event.
-	 */
 	@Override
 	public void nodeDisconnected(String node) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -142,29 +125,11 @@ public class BoshConnectionClustered
 		});
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getDiscoDescription() {
 		return super.getDiscoDescription() + " clustered";
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param see_other_host_class is a <code>String</code>
-	 *
-	 * @return a value of <code>SeeOtherHostIfc</code>
-	 */
 	@Override
 	public SeeOtherHostIfc getSeeOtherHostInstance(String see_other_host_class) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -182,17 +147,6 @@ public class BoshConnectionClustered
 		return see_other_host_strategy;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param cl_controller
-	 */
 	@Override
 	public void setClusterController(ClusterControllerIfc cl_controller) {}
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/10/15

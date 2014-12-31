@@ -70,34 +70,16 @@ public abstract class AbstractScriptCommand implements CommandIfc {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getCommandId() {
 		return this.commandId;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getDescription() {
 		return this.description;
 	}
 
-	/**
-	 * Method description
-	 * 
-	 * 
-	 * 
-	 */
 	@Override
 	public String getGroup() {
 		return this.group;
@@ -105,13 +87,6 @@ public abstract class AbstractScriptCommand implements CommandIfc {
 	
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param id
-	 * @param description
-	 */
 	@Override
 	public void init(String id, String description, String group) {
 		this.commandId = id;
@@ -121,12 +96,6 @@ public abstract class AbstractScriptCommand implements CommandIfc {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public boolean isAdminOnly() {
 		return adminOnly;
@@ -134,12 +103,6 @@ public abstract class AbstractScriptCommand implements CommandIfc {
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param adminOnly
-	 */
 	@Override
 	public void setAdminOnly(boolean adminOnly) {
 		this.adminOnly = adminOnly;
@@ -151,9 +114,3 @@ public abstract class AbstractScriptCommand implements CommandIfc {
 		return (val == null) || val.isEmpty();
 	}
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

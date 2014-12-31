@@ -40,16 +40,9 @@ import java.util.Map;
  *
  * @param <IO>
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
  */
 public interface XMPPIOServiceListener<IO extends XMPPIOService<?>> extends IOServiceListener<IO> {
 	void xmppStreamClosed(IO serv);
 
 	String xmppStreamOpened(IO serv, Map<String, String> attribs);
 }    // XMPPIOServiceListener
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

@@ -76,14 +76,6 @@ public class CID {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param o
-	 *
-	 * 
-	 */
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof CID) {
@@ -117,23 +109,11 @@ public class CID {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public int hashCode() {
 		return hash;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String toString() {
 		return to_string;
@@ -145,9 +125,3 @@ public class CID {
 		hash = 47 * hash + ((this.remoteHost != null) ? this.remoteHost.hashCode() : 0);
 	}
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

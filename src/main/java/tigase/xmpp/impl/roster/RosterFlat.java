@@ -238,11 +238,7 @@ public class RosterFlat
 
 	//~--- get methods ----------------------------------------------------------
 
-	// ~--- get methods ----------------------------------------------------------
-
 	@Override
-	// public String[] getBuddies(XMPPResourceConnection session,
-	// boolean onlineOnly)
 	public JID[] getBuddies(XMPPResourceConnection session)
 					throws NotAuthorizedException, TigaseDBException {
 		Map<BareJID, RosterElement> roster = getUserRoster(session);

@@ -53,14 +53,6 @@ public class ComponentConnection
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param o
-	 *
-	 * 
-	 */
 	@Override
 	public int compareTo(ComponentConnection o) {
 		if (o == null) {

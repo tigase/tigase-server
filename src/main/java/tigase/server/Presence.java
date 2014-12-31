@@ -77,12 +77,6 @@ public class Presence
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	protected String[] getElNameErrorPath() {
 		return PRESENCE_ERROR_PATH;

@@ -75,18 +75,6 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param subnode
-	 * @param key
-	 * @param value
-	 *
-	 * @throws DataOverwriteException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public void addOfflineData(BareJID user, String subnode, String key, String value)
 			throws UserNotFoundException, DataOverwriteException {
@@ -105,17 +93,6 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 		}      // end of try-catch
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param subnode
-	 * @param key
-	 * @param list
-	 *
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public void addOfflineDataList(BareJID user, String subnode, String key, String[] list)
 			throws UserNotFoundException {
@@ -137,19 +114,6 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 * @param subnode
-	 * @param key
-	 * @param def
-	 *
-	 * 
-	 *
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public String getDomainTempData(BareJID domain, String subnode, String key, String def)
 			throws TigaseDBException {
@@ -158,19 +122,6 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 		return rep.getData(domain, subnode, key, def);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param subnode
-	 * @param key
-	 * @param def
-	 *
-	 * 
-	 *
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public String getPublicData(BareJID user, String subnode, String key, String def)
 			throws UserNotFoundException {
@@ -184,18 +135,6 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 		}    // end of try-catch
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param subnode
-	 * @param key
-	 *
-	 * 
-	 *
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public String[] getPublicDataList(BareJID user, String subnode, String key)
 			throws UserNotFoundException {
@@ -209,18 +148,6 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 		}    // end of try-catch
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param subnode
-	 * @param key
-	 * @param def
-	 *
-	 * 
-	 *
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public String getTempData(String subnode, String key, String def) throws TigaseDBException {
 		checkDomain(defDomain);
@@ -230,17 +157,6 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 * @param subnode
-	 * @param key
-	 * @param value
-	 *
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public void putDomainTempData(BareJID domain, String subnode, String key, String value)
 			throws TigaseDBException {
@@ -248,32 +164,12 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 		rep.setData(domain, subnode, key, value);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param subnode
-	 * @param key
-	 * @param value
-	 *
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public void putTempData(String subnode, String key, String value) throws TigaseDBException {
 		checkDomain(defDomain);
 		rep.setData(defDomain, subnode, key, value);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 * @param subnode
-	 * @param key
-	 *
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public void removeDomainTempData(BareJID domain, String subnode, String key)
 			throws TigaseDBException {
@@ -281,15 +177,6 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 		rep.removeData(domain, subnode, key);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param subnode
-	 * @param key
-	 *
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public void removeTempData(String subnode, String key) throws TigaseDBException {
 		checkDomain(defDomain);
@@ -311,9 +198,3 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 		}
 	}
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

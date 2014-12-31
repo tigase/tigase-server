@@ -122,13 +122,6 @@ public class WebSocketXMPPIOService<RefObject>
 		return "<close xmlns='urn:ietf:params:xml:ns:xmpp-framing' />";
 	}		
 	
-	/**
-	 * Custom implementation of readData function which decodes WebSocket
-	 * protocol frames
-	 *
-	 * 
-	 * @throws IOException
-	 */
 	@Override
 	protected char[] readData() throws IOException {
 		ByteBuffer cb = super.readBytes();

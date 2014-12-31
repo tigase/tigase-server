@@ -69,16 +69,6 @@ public class StartTLS
 		return Order.StartTLS.ordinal();
 	}	
 	
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param p
-	 * @param serv
-	 * @param results
-	 *
-	 * 
-	 */
 	@Override
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
 		if (p.isElement(START_TLS_EL, START_TLS_NS)) {
@@ -140,14 +130,6 @@ public class StartTLS
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @param serv
-	 * @param results
-	 */
 	@Override
 	public void streamFeatures(S2SIOService serv, List<Element> results) {
 		if (!serv.getSessionData().containsKey("TLS")) {
@@ -162,6 +144,3 @@ public class StartTLS
 		}
 	}
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/02/16

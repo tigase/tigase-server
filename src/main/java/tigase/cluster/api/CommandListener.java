@@ -44,15 +44,16 @@ import java.util.Set;
 public interface CommandListener
 				extends Comparable<CommandListener> {
 	/**
-	 * Method description
+	 * Method is responsible for executing commands from other nodes and
+	 * appropriate processing
 	 *
+	 * @param fromNode     address of the node from which command was received
+	 * @param visitedNodes collection of already visited nodes
+	 * @param data         additional data associated with the command in addition
+	 *                     to the main {@link Element}
+	 * @param packets      collection of {@link Element} commands to be executed
 	 *
-	 * @param fromNode
-	 * @param visitedNodes
-	 * @param data
-	 * @param packets
-	 *
-	 * @throws ClusterCommandException
+	 * @throws ClusterCommandException execution exception
 	 */
 	void executeCommand(JID fromNode, Set<JID> visitedNodes, Map<String, String> data,
 			Queue<Element> packets)
@@ -61,33 +62,25 @@ public interface CommandListener
 	//~--- get methods ----------------------------------------------------------
 
 	/**
-	 * Method description
+	 * Method allows retrieval name of the particular command
 	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
+	 * @return a value of <code>String</code> name of the command
 	 */
 	String getName();
 
 	/**
-	 * Method description
+	 * Method allows retrieval possible statistics for particular command
 	 *
-	 *
-	 * @param list
+	 * @param list collection to which statistics should be appended
 	 */
 	void getStatistics(StatisticsList list);
 
 	//~--- set methods ----------------------------------------------------------
 
 	/**
-	 * Method description
+	 * Method allows setting name of the command
 	 *
-	 *
-	 * @param name
+	 * @param name to be used
 	 */
 	void setName(String name);
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/11/29

@@ -124,14 +124,6 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 * 
-	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		String config_type = (String) params.get("config-type");
@@ -256,29 +248,11 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 		return props;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param from
-	 *
-	 * 
-	 */
 	@Override
 	public List<Element> getDiscoFeatures(JID from) {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param node
-	 * @param jid
-	 * @param from
-	 *
-	 * 
-	 */
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
 		if ((jid != null) && getName().equals(jid.getLocalpart())) {
@@ -288,16 +262,6 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param node
-	 * @param jid
-	 * @param from
-	 *
-	 * 
-	 */
 	@Override
 	public List<Element> getDiscoItems(String node, JID jid, JID from) {
 		if (getName().equals(jid.getLocalpart())) {
@@ -310,12 +274,6 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
 	@Override
 	public void processPacket(Packet packet) {
 		if (log.isLoggable(Level.FINER)) {
@@ -344,14 +302,6 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 *
-	 * 
-	 */
 	@Override
 	public Queue<Packet> processSocketData(XMPPIOService<Object> serv) {
 		Packet p = null;
@@ -387,24 +337,12 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param port_props
-	 */
 	@Override
 	public void reconnectionFailed(Map<String, Object> port_props) {
 
 		// TODO: handle this somehow
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 */
 	@Override
 	public void serviceStarted(XMPPIOService<Object> serv) {
 		super.serviceStarted(serv);
@@ -442,14 +380,6 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 		}    // end of switch (service.connectionType())
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param service
-	 *
-	 * 
-	 */
 	@Override
 	public boolean serviceStopped(XMPPIOService<Object> service) {
 		boolean result = super.serviceStopped(service);
@@ -485,13 +415,6 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param props
-	 * @throws tigase.conf.ConfigurationException
-	 */
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
@@ -508,21 +431,9 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param service
-	 */
 	@Override
 	public void tlsHandshakeCompleted(XMPPIOService<Object> service) {}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 */
 	@Override
 	public void xmppStreamClosed(XMPPIOService<Object> serv) {
 		if (log.isLoggable(Level.FINER)) {
@@ -530,15 +441,6 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param service
-	 * @param attribs
-	 *
-	 * 
-	 */
 	@Override
 	public String xmppStreamOpened(XMPPIOService<Object> service, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINER)) {
@@ -600,11 +502,12 @@ public class ComponentConnectionManager extends ConnectionManager<XMPPIOService<
 	}
 
 	/**
-	 * Method <code>getMaxInactiveTime</code> returns max keep-alive time
-	 * for inactive connection. we shoulnd not really close external component
-	 * connection at all, so let's say something like: 1000 days...
+	 * {@inheritDoc}
 	 *
-	 * @return a <code>long</code> value
+	 * <br><br>
+	 * 
+	 * We should not really close external component connection at all, so let's
+	 * say something like: 1000 days...
 	 */
 	@Override
 	protected long getMaxInactiveTime() {

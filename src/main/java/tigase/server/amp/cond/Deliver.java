@@ -74,12 +74,6 @@ public class Deliver
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getName() {
 		return name;
@@ -87,16 +81,6 @@ public class Deliver
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @param packet
-	 * @param rule
-	 *
-	 * 
-	 */
 	@Override
 	public boolean match(Packet packet, Element rule) {
 		String value   = rule.getAttributeStaticStr("value");

@@ -307,14 +307,6 @@ public class BoshIOService
 		return sb;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param data
-	 *
-	 * @throws IOException
-	 */
 	@Override
 	public void writeRawData(String data) throws IOException {
 		if ((data != null) && data.startsWith("<body")) {
@@ -333,16 +325,6 @@ public class BoshIOService
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param data
-	 *
-	 * 
-	 *
-	 * @throws IOException
-	 */
 	@Override
 	public boolean checkData(char[] data) throws IOException {
 		// we need to check this every time as Webkit based browser are reusing

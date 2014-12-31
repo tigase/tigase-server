@@ -256,20 +256,6 @@ public class XMPPResourceConnection
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param props
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>Authorization</code>
-	 * @throws AuthorizationException
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	@Override
 	@Deprecated
 	public final Authorization loginOther(Map<String, Object> props)
@@ -319,12 +305,6 @@ public class XMPPResourceConnection
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @throws NotAuthorizedException
-	 */
 	@Override
 	public final void logout() throws NotAuthorizedException {
 		loginHandler.handleLogout(getBareJID(), this);
@@ -394,13 +374,6 @@ public class XMPPResourceConnection
 		sessionData.put(key, value);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param authProps
-	 * @throws TigaseDBException
-	 */
 	@Override
 	public void queryAuth(Map<String, Object> authProps) throws TigaseDBException {
 		super.queryAuth(authProps);
@@ -469,20 +442,6 @@ public class XMPPResourceConnection
 				getAuthState().name() + ", isAnon=" + isAnonymous() + ", isTmp=" + isTmpSession() + "]";
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param name_param
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>Authorization</code>
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 * @throws TigaseStringprepException
-	 */
 	@Override
 	public Authorization unregister(String name_param)
 					throws NotAuthorizedException, TigaseDBException, TigaseStringprepException {
@@ -551,21 +510,6 @@ public class XMPPResourceConnection
 		return authenticationTime - creationTime;
 	}
 
-	/**
-	 * Returns user JID but without <em>resource</em> part. This is real user ID
-	 * not session ID. To retrieve session ID - full JID refer to
-	 * <code>getJID()</code> method.<br>
-	 * If session has not been authorized yet this method throws
-	 * <code>NotAuthorizedException</code>.
-	 *
-	 * @return a <code>String</code> value of user ID - this is user JID without
-	 *         resource part. To obtain full user JID please refer to
-	 *         <code>getJID</code> method.
-	 * @exception NotAuthorizedException
-	 *              when this session has not been authorized yet and some parts
-	 *              of user JID are not known yet.
-	 * @see #getJID()
-	 */
 	@Override
 	public final BareJID getBareJID() throws NotAuthorizedException {
 		if (!isAuthorized()) {
@@ -807,16 +751,6 @@ public class XMPPResourceConnection
 		return this.getBareJID();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 * @throws NotAuthorizedException
-	 */
 	@Override
 	public final String getUserName() throws NotAuthorizedException {
 		if (!isAuthorized()) {
@@ -828,14 +762,6 @@ public class XMPPResourceConnection
 
 	// ~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean isAuthorized() {
 		return super.isAuthorized() && (parentSession != null);
@@ -1059,10 +985,6 @@ public class XMPPResourceConnection
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 */
 	@Override
 	protected void login() {
 		authenticationTime = System.currentTimeMillis();

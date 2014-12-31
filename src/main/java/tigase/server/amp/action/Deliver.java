@@ -45,16 +45,6 @@ public class Deliver
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param rule
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public boolean execute(Packet packet, Element rule) {
 		Packet result     = packet.copyElementOnly();
@@ -71,17 +61,8 @@ public class Deliver
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getName() {
 		return name;
 	}
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/02/20

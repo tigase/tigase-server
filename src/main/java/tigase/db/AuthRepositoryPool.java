@@ -62,16 +62,6 @@ public class AuthRepositoryPool implements AuthRepository {
 		repoPool.offer(repo);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param password
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserExistsException
-	 */
 	@Override
 	public void addUser(BareJID user, String password)
 			throws UserExistsException, TigaseDBException {
@@ -88,21 +78,6 @@ public class AuthRepositoryPool implements AuthRepository {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param digest
-	 * @param id
-	 * @param alg
-	 *
-	 * 
-	 *
-	 * @throws AuthorizationException
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	@Deprecated
 	public boolean digestAuth(BareJID user, String digest, String id, String alg)
@@ -124,12 +99,6 @@ public class AuthRepositoryPool implements AuthRepository {
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getResourceUri() {
 		AuthRepository repo = takeRepo();
@@ -147,12 +116,6 @@ public class AuthRepositoryPool implements AuthRepository {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public long getUsersCount() {
 		AuthRepository repo = takeRepo();
@@ -170,14 +133,6 @@ public class AuthRepositoryPool implements AuthRepository {
 		return -1;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 *
-	 * 
-	 */
 	@Override
 	public long getUsersCount(String domain) {
 		AuthRepository repo = takeRepo();
@@ -197,28 +152,10 @@ public class AuthRepositoryPool implements AuthRepository {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param resource_uri
-	 * @param params
-	 *
-	 * @throws DBInitException
-	 */
 	@Override
 	public void initRepository(String resource_uri, Map<String, String> params)
 			throws DBInitException {}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public void logout(BareJID user) throws UserNotFoundException, TigaseDBException {
 		AuthRepository repo = takeRepo();
@@ -234,18 +171,6 @@ public class AuthRepositoryPool implements AuthRepository {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param authProps
-	 *
-	 * 
-	 *
-	 * @throws AuthorizationException
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public boolean otherAuth(Map<String, Object> authProps)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
@@ -264,19 +189,6 @@ public class AuthRepositoryPool implements AuthRepository {
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param password
-	 *
-	 * 
-	 *
-	 * @throws AuthorizationException
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	@Deprecated
 	public boolean plainAuth(BareJID user, String password)
@@ -296,12 +208,6 @@ public class AuthRepositoryPool implements AuthRepository {
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param authProps
-	 */
 	@Override
 	public void queryAuth(Map<String, Object> authProps) {
 		AuthRepository repo = takeRepo();
@@ -317,15 +223,6 @@ public class AuthRepositoryPool implements AuthRepository {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException {
 		AuthRepository repo = takeRepo();
@@ -357,16 +254,6 @@ public class AuthRepositoryPool implements AuthRepository {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param user
-	 * @param password
-	 *
-	 * @throws TigaseDBException
-	 * @throws UserNotFoundException
-	 */
 	@Override
 	public void updatePassword(BareJID user, String password)
 			throws UserNotFoundException, TigaseDBException {
@@ -399,9 +286,3 @@ public class AuthRepositoryPool implements AuthRepository {
 		}
 	}
 }
-
-
-//~ Formatted in Sun Code Convention
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

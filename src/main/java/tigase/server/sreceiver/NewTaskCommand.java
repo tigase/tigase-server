@@ -60,13 +60,6 @@ public class NewTaskCommand
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Describe <code>processCommand</code> method here.
-	 *
-	 * @param packet a <code>Packet</code> value
-	 * @param result a <code>Packet</code> value
-	 * @param receiv is a <code>StanzaReceiver</code>
-	 */
 	@Override
 	public void processCommand(Packet packet, Packet result, StanzaReceiver receiv) {
 		String task_name = Command.getFieldValue(packet, TASK_NAME_FIELD);
@@ -123,21 +116,11 @@ public class NewTaskCommand
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Describe <code>getDescription</code> method here.
-	 *
-	 * @return a <code>String</code> value
-	 */
 	@Override
 	public String getDescription() {
 		return "Add new task...";
 	}
 
-	/**
-	 * Describe <code>getNodeName</code> method here.
-	 *
-	 * @return a <code>String</code> value
-	 */
 	@Override
 	public String getNodeName() {
 		return "new-task";

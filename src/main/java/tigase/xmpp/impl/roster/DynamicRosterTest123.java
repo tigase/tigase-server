@@ -38,57 +38,30 @@ public class DynamicRosterTest123 implements DynamicRosterIfc {
 
 	private static final String[] buddy_names = { "test1", "test2", "test3" };
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see tigase.xmpp.impl.DynamicRosterIfc#setItemExtraData(tigase.xml.Element)
-	 */
 	@Override
 	public void setItemExtraData(Element item) {
 		// TODO Auto-generated method stub
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see tigase.xmpp.impl.DynamicRosterIfc#getItemExtraData(tigase.xml.Element)
-	 */
 	@Override
 	public Element getItemExtraData(Element item) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see tigase.xmpp.impl.DynamicRosterIfc#init(java.util.Map)
-	 */
 	@Override
 	public void init(Map<String, Object> props) {
 		// TODO Auto-generated method stub
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see tigase.xmpp.impl.DynamicRosterIfc#init(java.lang.String)
-	 */
 	@Override
 	public void init(String par) {
 		// TODO Auto-generated method stub
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * tigase.xmpp.impl.DynamicRosterIfc#getBuddies(tigase.xmpp.XMPPResourceConnection
-	 * )
-	 */
 	@Override
 	public JID[] getBuddies(XMPPResourceConnection session) throws NotAuthorizedException {
 		String domain = session.getDomain().getVhost().getDomain();
@@ -101,12 +74,6 @@ public class DynamicRosterTest123 implements DynamicRosterIfc {
 		return result.toArray(new JID[result.size()]);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see tigase.xmpp.impl.DynamicRosterIfc#getBuddyItem(tigase.xmpp.
-	 * XMPPResourceConnection, tigase.xmpp.JID)
-	 */
 	@Override
 	public Element getBuddyItem(XMPPResourceConnection session, JID buddy)
 			throws NotAuthorizedException {
@@ -115,12 +82,6 @@ public class DynamicRosterTest123 implements DynamicRosterIfc {
 						buddy.getBareJID().toString(), buddy.getLocalpart(), "both" });
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see tigase.xmpp.impl.DynamicRosterIfc#getRosterItems(tigase.xmpp.
-	 * XMPPResourceConnection)
-	 */
 	@Override
 	public List<Element> getRosterItems(XMPPResourceConnection session)
 			throws NotAuthorizedException {

@@ -59,6 +59,7 @@ import java.util.Queue;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Deprecated
 public class RosterPresence
 				extends XMPPProcessor
 				implements XMPPProcessorIfc, XMPPStopListenerIfc {
@@ -86,53 +87,22 @@ public class RosterPresence
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public int concurrentQueuesNo() {
 		return Runtime.getRuntime().availableProcessors() * 2;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String id() {
 		return ID;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param session
-	 * @param repo
-	 * @param results
-	 * @param settings
-	 *
-	 * @throws XMPPException
-	 */
 	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
 			final NonAuthUserRepository repo, final Queue<Packet> results, final Map<String,
 			Object> settings)
 					throws XMPPException {
 
-//  if (session == null) {
-//    if (log.isLoggable(Level.FINE)) {
-//      log.fine("Session is null, ignoring packet: " + packet.toString());
-//    }
-//
-//    return;
-//  }    // end of if (session == null)
 		if (!session.isAuthorized()) {
 			if (log.isLoggable(Level.FINE)) {
 				log.log(Level.FINE, "Session is not authorized, ignoring packet: {0}", packet);
@@ -227,68 +197,30 @@ public class RosterPresence
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param results
-	 * @param settings
-	 */
 	@Override
 	public void stopped(final XMPPResourceConnection session, final Queue<Packet> results,
 			final Map<String, Object> settings) {
 		presenceProc.stopped(session, results, settings);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 * 
-	 */
 	@Override
 	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
 		return DISCO_FEATURES;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String[][] supElementNamePaths() {
 		return ELEMENTS;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 * 
-	 */
 	@Override
 	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
 		return FEATURES;
 	}
 }
 
-
-//~ Formatted in Tigase Code Convention on 13/03/12

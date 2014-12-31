@@ -270,14 +270,6 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 		;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param ioifc
-	 *
-	 * @throws IOException
-	 */
 	@Override
 	public void handleIOInterface(IOInterface ioifc) throws IOException {
 		ByteBuffer socketInput =
@@ -302,14 +294,6 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 		reader.addIOInterface(ioifc);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param sc
-	 *
-	 * @throws IOException
-	 */
 	@Override
 	public void handleSocketAccept(SocketChannel sc) throws IOException {
 		iosock = new SocketIO(sc);

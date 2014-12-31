@@ -117,12 +117,6 @@ public class ClusterRepoItem
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
 	@Override
 	public void addCommandFields(Packet packet) {
 		Command.addFieldValue(packet, HOSTNAME_LABEL, ((hostname != null)
@@ -140,12 +134,6 @@ public class ClusterRepoItem
 		super.addCommandFields(packet);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
 	@Override
 	public void initFromCommand(Packet packet) {
 		super.initFromCommand(packet);
@@ -175,12 +163,6 @@ public class ClusterRepoItem
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param elem
-	 */
 	@Override
 	public void initFromElement(Element elem) {
 		if (elem.getName() != REPO_ITEM_ELEM_NAME) {
@@ -196,12 +178,6 @@ public class ClusterRepoItem
 		memUsage   = Float.parseFloat(elem.getAttributeStaticStr(MEM_USAGE_ATTR));
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param propString
-	 */
 	@Override
 	public void initFromPropertyString(String propString) {
 		String[] props = propString.split(":");
@@ -226,12 +202,6 @@ public class ClusterRepoItem
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public Element toElement() {
 		Element elem = super.toElement();
@@ -246,24 +216,12 @@ public class ClusterRepoItem
 		return elem;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String toPropertyString() {
 		return hostname + ":" + password + ":" + portNo + ":" + lastUpdate + ":" + cpuUsage +
 				":" + memUsage;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String toString() {
 		return toPropertyString();
@@ -281,12 +239,6 @@ public class ClusterRepoItem
 		return cpuUsage;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getElemName() {
 		return REPO_ITEM_ELEM_NAME;
@@ -302,12 +254,6 @@ public class ClusterRepoItem
 		return hostname;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	@Override
 	public String getKey() {
 		return hostname;

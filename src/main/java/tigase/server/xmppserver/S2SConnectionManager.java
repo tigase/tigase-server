@@ -190,42 +190,16 @@ public class S2SConnectionManager
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean addOutPacket(Packet packet) {
 		return super.addOutPacket(packet);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param task
-	 * @param delay
-	 * @param unit
-	 */
 	@Override
 	public void addTimerTask(tigase.util.TimerTask task, long delay, TimeUnit unit) {
 		super.addTimerTask(task, delay, unit);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param task
-	 * @param delay
-	 * @param unit
-	 */
 	@Override
 	@Deprecated
 	public void addTimerTask(TimerTask task, long delay, TimeUnit unit) {
@@ -234,29 +208,11 @@ public class S2SConnectionManager
 
 	// ~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean handlesNonLocalDomains() {
 		return true;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 *
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int hashCodeForPacket(Packet packet) {
 
@@ -275,35 +231,17 @@ public class S2SConnectionManager
 
 	// ~--- methods --------------------------------------------------------------
 
-	/**
-	 * Initialize a mapping of key/value pairs which can be used in scripts
-	 * loaded by the server
-	 *
-	 * @param binds A mapping of key/value pairs, all of whose keys are Strings.
-	 */
 	@Override
 	public void initBindings(Bindings binds) {
 		super.initBindings(binds);
 		binds.put(CID_CONNECTIONS_BIND, cidConnections);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param port_props
-	 */
 	@Override
 	public void initNewConnection(Map<String, Object> port_props) {
 		addWaitingTask(port_props);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 */
 	@Override
 	public void processPacket(Packet packet) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -392,16 +330,6 @@ public class S2SConnectionManager
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 *
-	 *
-	 *
-	 * @return a value of {@code Queue<Packet>}
-	 */
 	@Override
 	public Queue<Packet> processSocketData(S2SIOService serv) {
 		Queue<Packet> packets = serv.getReceivedPackets();
@@ -467,12 +395,6 @@ public class S2SConnectionManager
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param port_props
-	 */
 	@Override
 	public void reconnectionFailed(Map<String, Object> port_props) {
 		CID cid = (CID) port_props.get("cid");
@@ -496,12 +418,6 @@ public class S2SConnectionManager
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	@Override
 	public int schedulerThreads() {
 
@@ -509,23 +425,6 @@ public class S2SConnectionManager
 		return Runtime.getRuntime().availableProcessors();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param elem_name
-	 * @param connCid
-	 * @param keyCid
-	 * @param valid
-	 * @param key_sessionId
-	 * @param serv_sessionId
-	 * @param cdata
-	 * @param handshakingOnly
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean sendVerifyResult(String elem_name, CID connCid, CID keyCid,
 			Boolean valid, String key_sessionId, String serv_sessionId, String cdata,
@@ -533,24 +432,6 @@ public class S2SConnectionManager
 		return this.sendVerifyResult(elem_name, connCid, keyCid, valid, key_sessionId, serv_sessionId, cdata, handshakingOnly, null);
 	}
 	
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param elem_name
-	 * @param connCid
-	 * @param keyCid
-	 * @param valid
-	 * @param key_sessionId
-	 * @param serv_sessionId
-	 * @param cdata
-	 * @param handshakingOnly
-	 * @param errorElem
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean sendVerifyResult(String elem_name, CID connCid, CID keyCid,
 			Boolean valid, String key_sessionId, String serv_sessionId, String cdata,
@@ -595,12 +476,6 @@ public class S2SConnectionManager
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 */
 	@Override
 	public void serviceStarted(S2SIOService serv) {
 		super.serviceStarted(serv);
@@ -610,16 +485,6 @@ public class S2SConnectionManager
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean serviceStopped(S2SIOService serv) {
 		boolean result = super.serviceStopped(serv);
@@ -635,12 +500,6 @@ public class S2SConnectionManager
 
 	// ~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 */
 	@Override
 	public void tlsHandshakeCompleted(S2SIOService serv) {
 		for (S2SProcessor proc : processors) {
@@ -648,24 +507,11 @@ public class S2SConnectionManager
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param ios
-	 * @param data
-	 */
 	@Override
 	public void writeRawData(S2SIOService ios, String data) {
 		super.writeRawData(ios, data);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 */
 	@Override
 	public void xmppStreamClosed(S2SIOService serv) {
 		if (log.isLoggable(Level.FINER)) {
@@ -676,17 +522,6 @@ public class S2SConnectionManager
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param serv
-	 * @param attribs
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String xmppStreamOpened(S2SIOService serv, Map<String, String> attribs) {
 		if (log.isLoggable(Level.FINER)) {
@@ -713,22 +548,6 @@ public class S2SConnectionManager
 
 	//~--- get methods ----------------------------------------------------------
 
-	// ~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param cid
-	 * @param createNew
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>CIDConnections</code>
-	 * @throws LocalhostException
-	 * @throws NotLocalhostException
-	 */
 	@Override
 	public CIDConnections getCIDConnections(CID cid, boolean createNew)
 					throws NotLocalhostException, LocalhostException {
@@ -741,16 +560,6 @@ public class S2SConnectionManager
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param params
-	 *
-	 *
-	 *
-	 * @return a value of {@code Map<String,Object>}
-	 */
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
@@ -769,37 +578,22 @@ public class S2SConnectionManager
 		return props;
 	}
         
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getDiscoCategoryType() {
 		return "s2s";
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	@Override
 	public String getDiscoDescription() {
 		return "S2S connection manager";
 	}
 
 	/**
-	 * Method returns secret used for domain for generation of dialback key
+	 * {@inheritDoc}
 	 *
-	 * @param domain
-	 * @return
+	 * <br><br>
+	 *
+	 * Secret is used in generation of dialback key
 	 */
 	@Override
 	public String getSecretForDomain(String domain) throws NotLocalhostException {
@@ -830,12 +624,6 @@ public class S2SConnectionManager
 		return domainServerNameMapper.getServerNameForDomain(domain);
 	}	
 		
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 */
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
@@ -894,16 +682,6 @@ public class S2SConnectionManager
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @param serv
-	 *
-	 *
-	 * @return a value of {@code List<Element>}
-	 */
 	@Override
 	public List<Element> getStreamFeatures(S2SIOService serv) {
 		List<Element> results = new ArrayList<Element>(10);
@@ -915,24 +693,12 @@ public class S2SConnectionManager
 		return results;
 	}
 
-	/**
-	 * Checks if TLS is required for particular domain
-	 * 
-	 * @param domain
-	 * @return 
-	 */
 	@Override
 	public boolean isTlsRequired(String domain) {
 		VHostItem item = vHostManager.getVHostItemDomainOrComponent(domain);
 		return item.isTlsRequired();
 	}
 	
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	public boolean isTlsWantClientAuthEnabled() {
 		return true;
@@ -940,15 +706,6 @@ public class S2SConnectionManager
 
 	//~--- set methods ----------------------------------------------------------
 
-	// ~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param props
-	 * @throws tigase.conf.ConfigurationException
-	 */
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
@@ -1047,47 +804,21 @@ public class S2SConnectionManager
 
 	//~--- get methods ----------------------------------------------------------
 
-	// ~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>int[]</code>
-	 */
 	@Override
 	protected int[] getDefPlainPorts() {
 		return new int[] { 5269 };
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	@Override
 	protected long getMaxInactiveTime() {
 		return maxInactivityTime;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>S2SIOService</code>
-	 */
 	@Override
 	protected S2SIOService getXMPPIOServiceInstance() {
 		return new S2SIOService();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	@Override
 	protected boolean isHighThroughput() {
 		return true;
@@ -1095,7 +826,6 @@ public class S2SConnectionManager
 
 	//~--- methods --------------------------------------------------------------
 
-	// ~--- methods --------------------------------------------------------------
 	private CIDConnections createNewCIDConnections(CID cid)
 					throws NotLocalhostException, LocalhostException {
 		if (!isLocalDomainOrComponent(cid.getLocalHost())) {
