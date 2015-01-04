@@ -152,6 +152,27 @@
 						</configuration>
 					</execution>
 					<execution>
+						<id>copy-sureim</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>tigase.sure.web</groupId>
+									<artifactId>site</artifactId>
+									<version>2.0-SNAPSHOT</version>
+									<destFileName>tigase-web-ui.war</destFileName>
+									<type>war</type>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.basedir}/../../jars</outputDirectory>
+							<stripVersion>false</stripVersion>
+							<useBaseVersion>true</useBaseVersion>
+						</configuration>
+					</execution>					
+					<execution>
 						<id>tigase-resources</id>
 						<phase>validate</phase>
 						<goals>
