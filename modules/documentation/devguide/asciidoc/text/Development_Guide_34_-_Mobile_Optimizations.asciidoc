@@ -2,6 +2,7 @@
 Mobile Optimizations
 ====================
 Andrzej Wojcik <andrzejw@tigase.org>
+v2.1, January 2015: Added info about MobileV3
 v2.0, June 2014: Reformatted for AsciiDoc.
 :toc:
 :numbered:
@@ -24,43 +25,48 @@ When mobile client is entering inactive state it notifies server about it by sen
 ------------------------------------------------------------------
 <iq type="set" id="xx">
 <mobile 
-  xmlns="http://tigase.org/protocol/mobile#v2" 
+  xmlns="http://tigase.org/protocol/mobile#v3" 
   enable="true"/>
 </iq>
 ------------------------------------------------------------------
 
-After receiving stanza server starts queueing presence stanza which should be send to mobile client. Any other stanza (such as iq or messenge) is sent immediately to the client.
+After receiving stanza server starts queueing stanza which should be send to mobile client. Kind of queued stanzas depends on used plugin and in case of *Mobile v3* presence stanzas are queued as well as message stanzas which are Message Carbons. Any other stanza (such as iq or plain messenge) is sent immediately to the client and every stanza from queue is also sent at this time.
 
 When mobile client is entering active state it notifies server by sending following stanza:
 
-[source,java]
+[source,xml]
 ------------------------------------------------------------------
 <iq type="set" id="xx">
 <mobile 
-  xmlns="http://tigase.org/protocol/mobile#v2" 
+  xmlns="http://tigase.org/protocol/mobile#v3" 
   enable="false"/>
 </iq>
 ------------------------------------------------------------------
 
-After receiving stanza server sends all queued presence stanzas to the client.
+After receiving stanza server sends all queued stanzas to the client.
 
-Also all presence stanzas from queue will be sent if number of presence stanzas in queue will reach queue size limit. By default this limit is set to 50.
+Also all stanzas from queue will be sent if number of stanzas in queue will reach queue size limit. By default this limit is set to 50.
 
 Queueing Algorithms
 -------------------
 
-There are two mobile optimization plugins for Tigase:
+There are three mobile optimization plugins for Tigase:
 
 - *Mobile v1* - all presence stanzas are kept in queue
 - *Mobile v2* - only last presence from each source is kept in queue
+- *Mobile v3* - only last presence from each source is kept in queue, also Message Carbons are queued
 
 
 If you wish to activate you Mobile v1 plugin you need to send presented above with xmlns attribute value replaced with _http://tigase.org/protocol/mobile#v1_
+
+If you wish to activate you Mobile v2 plugin you need to send presented above with xmlns attribute value replaced with _http://tigase.org/protocol/mobile#v2_
 
 Configuration
 -------------
 
 Mentioned plugins are not activated by default thus additional entries in the init.properties are required:
 
-+--sm-plugins=+mobile_v1,+mobile_v2+
++--sm-plugins=+mobile_v1,+mobile_v2,+mobile_v3
+
+*Only one of this plugins should be enabled*
 
