@@ -84,7 +84,8 @@ public class ClConSQLRepository
 					+ "  " + PORT_COLUMN + " int,"
 					+ "  " + CPU_USAGE_COLUMN + " double precision unsigned not null,"
 					+ "  " + MEM_USAGE_COLUMN + " double precision unsigned not null,"
-					+ "  primary key(" + HOSTNAME_COLUMN + "))";
+					+ "  primary key(" + HOSTNAME_COLUMN + "))"
+					+ " ENGINE=InnoDB default character set utf8 ROW_FORMAT=DYNAMIC";
 	private static final String CREATE_TABLE_QUERY =
 					"create table " + TABLE_NAME + " ("
 					+ "  " + HOSTNAME_COLUMN + " varchar(512) not null,"
