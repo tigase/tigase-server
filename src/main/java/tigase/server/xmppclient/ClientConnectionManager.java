@@ -448,7 +448,7 @@ public class ClientConnectionManager
 							see_other_host, serv });
 				}
 
-				return prepareSeeOtherHost(serv, see_other_host);
+				return prepareSeeOtherHost(serv, fromJID.getDomain(), see_other_host);
 			}
 		}    // of if (from != null )
 
@@ -745,7 +745,7 @@ public class ClientConnectionManager
 										see_other_host, serv });
 							}
 
-							String redirectMessage = prepareSeeOtherHost(serv, see_other_host);
+							String redirectMessage = prepareSeeOtherHost(serv, fromJID.getDomain(), see_other_host);
 						
 							try {
 								SocketThread.removeSocketService(serv);
@@ -1015,10 +1015,10 @@ public class ClientConnectionManager
 				+ "</stream:error>" + "</stream:stream>";
 	}
 	
-	protected String prepareSeeOtherHost(XMPPIOService<Object> serv, BareJID see_other_host) {
+	protected String prepareSeeOtherHost(XMPPIOService<Object> serv, String hostname, BareJID see_other_host) {
 		return "<stream:stream" + " xmlns='" + XMLNS + "'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
-				+ " id='tigase-error-tigase'" + " from='" + getDefVHostItem() + "'"
+				+ " id='tigase-error-tigase'" + " from='" + (hostname != null ? hostname : getDefVHostItem()) + "'"
 				+ " version='1.0' xml:lang='en'>" + see_other_host_strategy.getStreamError(
 						"urn:ietf:params:xml:ns:xmpp-streams", see_other_host).toString()
 				+ "</stream:stream>";	
