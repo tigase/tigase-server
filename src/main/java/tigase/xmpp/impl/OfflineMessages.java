@@ -379,6 +379,11 @@ public class OfflineMessages
 			return false;
 		}
 
+		// if we are using XEP-0013: Flexible offline messages retrieval then we skip loading
+		if ( conn.getCommonSessionData(FlexibleOfflineMessageRetrieval.FLEXIBLE_OFFLINE_XMLNS) != null ){
+			return false;
+		}
+
 		StanzaType type = packet.getType();
 
 		if ( ( type == null ) || ( type == StanzaType.available ) ){
@@ -506,7 +511,7 @@ public class OfflineMessages
 	 * Elements retrieved from the repository by the timestamp stored in
 	 * {@code delay} element.
 	 */
-	private class StampComparator
+	public class StampComparator
 			implements Comparator<Packet> {
 
 		@Override

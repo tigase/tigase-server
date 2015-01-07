@@ -23,45 +23,42 @@ package tigase.server.amp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.db.DBInitException;
+import tigase.db.DataRepository;
+import tigase.db.DataRepository.dbTypes;
+import tigase.db.Repository;
+import tigase.db.RepositoryFactory;
+import tigase.db.UserNotFoundException;
+
+import tigase.server.Packet;
+
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
+
+import tigase.util.Algorithms;
+import tigase.util.SimpleCache;
+import tigase.xml.DomBuilderHandler;
+import tigase.xml.Element;
+
 import java.security.NoSuchAlgorithmException;
 import java.sql.DataTruncation;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.DelayQueue;
-import java.util.concurrent.Delayed;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.db.DBInitException;
-import tigase.db.DataRepository;
-import tigase.db.DataRepository.dbTypes;
-import tigase.db.MsgRepositoryIfc;
-import tigase.db.Repository;
-import tigase.db.RepositoryFactory;
-import tigase.db.TigaseDBException;
-import tigase.db.UserNotFoundException;
-import tigase.server.Packet;
-import tigase.util.Algorithms;
-import tigase.util.SimpleCache;
-import tigase.xml.DomBuilderHandler;
-import tigase.xml.Element;
-import tigase.xml.SimpleParser;
-import tigase.xml.SingletonFactory;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -80,12 +77,14 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 	private static final String MSG_EXPIRED_COLUMN = "expired";
 	private static final String MSG_FROM_UID_COLUMN = "sender_uid";
 	private static final String MSG_TO_UID_COLUMN = "receiver_uid";
+	private static final String MSG_TYPE_COLUMN = "msg_type";
 	private static final String MSG_BODY_COLUMN = "message";
 	private static final String HISTORY_FLAG_COLUMN = "history_enabled";
 	private static final String JID_TABLE = "user_jid";
 	private static final String JID_ID_COLUMN = "jid_id";
 	private static final String JID_SHA_COLUMN = "jid_sha";
 	private static final String JID_COLUMN = "jid";
+	private static final int StatementsCount = 2;
 	/* @formatter:off */
 	private static final String MYSQL_CREATE_MSG_TABLE =
 							"create table " + MSG_TABLE + " ( " + "  "
@@ -94,6 +93,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 							+ MSG_EXPIRED_COLUMN + " DATETIME," + "  "
 							+ MSG_FROM_UID_COLUMN + " bigint unsigned," + "  "
 							+ MSG_TO_UID_COLUMN + " bigint unsigned NOT NULL," + "  "
+							+ MSG_TYPE_COLUMN + " int NOT NULL," + "  "
 							+ MSG_BODY_COLUMN + " varchar(4096) NOT NULL," + "  "
 							+ " key (" + MSG_EXPIRED_COLUMN + "), "
 							+ " key (" + MSG_FROM_UID_COLUMN + ", " + MSG_TO_UID_COLUMN + "),"
@@ -106,6 +106,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 							+ MSG_EXPIRED_COLUMN + " TIMESTAMP," + "  "
 							+ MSG_FROM_UID_COLUMN + " bigint," + "  "
 							+ MSG_TO_UID_COLUMN + " bigint NOT NULL," + "  "
+							+ MSG_TYPE_COLUMN + " int NOT NULL," + "  "
 							+ MSG_BODY_COLUMN + " varchar(4096) NOT NULL);"
 							+ "create index index_" + MSG_EXPIRED_COLUMN + " on " + MSG_TABLE
 							+ " (" + MSG_EXPIRED_COLUMN + ");"
@@ -120,6 +121,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 							+ MSG_EXPIRED_COLUMN + " [datetime] ," + "  "
 							+ MSG_FROM_UID_COLUMN + " bigint," + "  "
 							+ MSG_TO_UID_COLUMN + " bigint NOT NULL," + "  "
+							+ MSG_TYPE_COLUMN + " int NOT NULL," + "  "
 							+ MSG_BODY_COLUMN + " nvarchar(4000) NOT NULL);"
 							+ "create index index_" + MSG_EXPIRED_COLUMN + " on " + MSG_TABLE
 							+ " (" + MSG_EXPIRED_COLUMN + ");"
@@ -134,6 +136,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 							+ MSG_EXPIRED_COLUMN + " TIMESTAMP," + "  "
 							+ MSG_FROM_UID_COLUMN + " bigint," + "  "
 							+ MSG_TO_UID_COLUMN + " bigint NOT NULL," + "  "
+							+ MSG_TYPE_COLUMN + " int NOT NULL," + "  "
 							+ MSG_BODY_COLUMN + " varchar(4096) NOT NULL);"
 							+ "create index index_" + MSG_EXPIRED_COLUMN + " on " + MSG_TABLE
 							+ " (" + MSG_EXPIRED_COLUMN + ");"
@@ -188,11 +191,25 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 							+ MSG_EXPIRED_COLUMN + ", "
 							+ MSG_FROM_UID_COLUMN + ", "
 							+ MSG_TO_UID_COLUMN + ", "
-							+ MSG_BODY_COLUMN + ") values (?, ?, ?, ?)";
+							+ MSG_TYPE_COLUMN + ", "
+							+ MSG_BODY_COLUMN + ") values (?, ?, ?, ?, ?)";
 	private static final String MSG_SELECT_TO_JID_QUERY =
 															"select * from " + MSG_TABLE + " where " + MSG_TO_UID_COLUMN + " = ?";
+	private static final String MSG_SELECT_IDS_TO_JID_QUERY =
+															MSG_SELECT_TO_JID_QUERY + " AND "+ MSG_ID_COLUMN + " IN ( ";
+	private static final String MSG_SELECT_COUNT_TO_JID_QUERY
+															= "select " + MSG_TYPE_COLUMN + " , count(" + MSG_TYPE_COLUMN + ") from " + MSG_TABLE
+																+ " where " + MSG_TO_UID_COLUMN + " = ? "
+																+ " group by " + MSG_TYPE_COLUMN;
+	private static final String MSG_SELECT_LIST_TO_JID_QUERY
+															= "select " + MSG_ID_COLUMN + ","+ MSG_TYPE_COLUMN + ","+ JID_COLUMN + " from "
+																+ MSG_TABLE + "  left join " + JID_TABLE
+																+ " ON " + MSG_TABLE + "." + MSG_FROM_UID_COLUMN + "=" +  JID_TABLE + "." + JID_ID_COLUMN
+																+ " where " + MSG_TO_UID_COLUMN + " = ? ";
 	private static final String MSG_DELETE_TO_JID_QUERY =
 															"delete from " + MSG_TABLE + " where " + MSG_TO_UID_COLUMN + " = ?";
+	private static final String MSG_DELETE_IDS_TO_JID_QUERY =
+															MSG_DELETE_TO_JID_QUERY + " AND " + MSG_ID_COLUMN + " IN ( ";
 	private static final String MSG_DELETE_ID_QUERY =
 															"delete from " + MSG_TABLE + " where " + MSG_ID_COLUMN + " = ?";
 	private static final String MSG_SELECT_EXPIRED_QUERY =
@@ -297,14 +314,6 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			.synchronizedMap(new SimpleCache<BareJID, Long>(MAX_UID_CACHE_SIZE,
 					MAX_UID_CACHE_TIME));
 
-	// ~--- get methods ----------------------------------------------------------
-
-	// Moved to MsgRepository class
-//	public static JDBCMsgRepository getInstance(String id_string) {
-//	}
-
-	// ~--- methods --------------------------------------------------------------
-
 	@Override
 	public void initRepository(String conn_str, Map<String, String> map)
 			throws DBInitException {
@@ -353,6 +362,8 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			data_repo.initPreparedStatement(uid_query, uid_query);
 			data_repo.initPreparedStatement(MSG_INSERT_QUERY, MSG_INSERT_QUERY);
 			data_repo.initPreparedStatement(MSG_SELECT_TO_JID_QUERY, MSG_SELECT_TO_JID_QUERY);
+			data_repo.initPreparedStatement(MSG_SELECT_COUNT_TO_JID_QUERY, MSG_SELECT_COUNT_TO_JID_QUERY);
+			data_repo.initPreparedStatement(MSG_SELECT_LIST_TO_JID_QUERY, MSG_SELECT_LIST_TO_JID_QUERY);
 			data_repo.initPreparedStatement(MSG_DELETE_TO_JID_QUERY, MSG_DELETE_TO_JID_QUERY);
 			data_repo.initPreparedStatement(MSG_DELETE_ID_QUERY, MSG_DELETE_ID_QUERY);
 			data_repo.initPreparedStatement(MSG_SELECT_EXPIRED_QUERY, MSG_SELECT_EXPIRED_QUERY);
@@ -372,6 +383,31 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 				data_repo.initPreparedStatement(msg_ensure_broadcast_recipient, msg_ensure_broadcast_recipient);
 				data_repo.initPreparedStatement(msg_insert_message_to_broadcast, msg_insert_message_to_broadcast);
 			}
+
+			for (int i=1; i<= StatementsCount; i++) {
+				StringBuilder select = new StringBuilder().append(MSG_DELETE_IDS_TO_JID_QUERY);
+				for (int j=1; j<=i; j++) {
+					if (j > 1)
+						select.append(" , ");
+					select.append(" ? ");
+				}
+				select.append(")");
+
+				data_repo.initPreparedStatement(MSG_DELETE_IDS_TO_JID_QUERY + "_" + i, select.toString());
+			}
+
+			for (int i=1; i<= StatementsCount; i++) {
+				StringBuilder select = new StringBuilder().append(MSG_SELECT_IDS_TO_JID_QUERY);
+				for (int j=1; j<=i; j++) {
+					if (j > 1)
+						select.append(" , ");
+					select.append(" ? ");
+				}
+				select.append(")");
+				data_repo.initPreparedStatement(MSG_SELECT_IDS_TO_JID_QUERY + "_" + i, select.toString());
+			}
+
+
 		} catch (Exception e) {
 			log.log(Level.WARNING, "MsgRepository not initialized due to exception", e);
 			// Ignore for now....
@@ -379,7 +415,193 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 	}
 
 	@Override
-	public Queue<Element> loadMessagesToJID(JID to, boolean delete)
+	public Map<MSG_TYPES,Long> getMessagesCount(JID to) throws UserNotFoundException {
+
+		Map<MSG_TYPES,Long> result = new HashMap<>(MSG_TYPES.values().length);
+
+		try {
+
+			ResultSet rs = null;
+
+			long to_uid = getUserUID( to.getBareJID() );
+
+			if ( to_uid < 0 ){
+				throw new UserNotFoundException( "User: " + to + " was not found in database." );
+			}
+
+			// get number of messages
+			PreparedStatement number_of_messages
+												= data_repo.getPreparedStatement( to.getBareJID(), MSG_SELECT_COUNT_TO_JID_QUERY );
+
+			synchronized ( number_of_messages ) {
+				number_of_messages.setLong( 1, to_uid );
+				rs = number_of_messages.executeQuery();
+
+				while ( rs.next() ) {
+					int msgType = rs.getInt( 1 );
+					long msgCount = rs.getLong( 2 );
+					result.put( MSG_TYPES.getFromInt( msgType ), msgCount );
+				}
+			}
+
+		} catch ( SQLException e ) {
+			log.log( Level.WARNING, "Problem getting offline messages for user: " + to, e );
+		}
+
+		return result;
+	}
+
+	@Override
+	public List<Element> getMessagesList( JID to) throws UserNotFoundException {
+			List<Element> result = new LinkedList<Element>();
+			ResultSet rs = null;
+
+			try {
+				long to_uid = getUserUID( to.getBareJID() );
+
+				if ( to_uid < 0 ){
+					throw new UserNotFoundException( "User: " + to + " was not found in database." );
+				}
+
+				PreparedStatement select_messages_list
+													= data_repo.getPreparedStatement( to.getBareJID(), MSG_SELECT_LIST_TO_JID_QUERY );
+
+				synchronized ( select_messages_list ) {
+					select_messages_list.setLong( 1, to_uid );
+
+					rs = select_messages_list.executeQuery();
+
+					while ( rs.next() ) {
+						long msgId = rs.getLong(MSG_ID_COLUMN );
+						int mType = rs.getInt(MSG_TYPE_COLUMN );
+						MSG_TYPES messageType = MSG_TYPES.getFromInt( mType );
+						String sender = rs.getString( JID_COLUMN );
+
+						if (msgId != 0 && messageType != MSG_TYPES.none && sender != null ) {
+							Element item = new Element( "item",
+									new String[] { "jid", "node", "type", "name" },
+									new String[] { to.getBareJID().toString(), String.valueOf( msgId),
+																																			messageType.name(), sender } );
+							result.add( item );
+						}
+					}
+				}
+
+			} catch ( SQLException e ) {
+				log.log( Level.WARNING, "Problem getting offline messages for user: " + to, e );
+			} finally {
+				data_repo.release( null, rs );
+			}
+			return result;
+
+	}
+
+	@Override
+	public Queue<Element> loadMessagesToJID( List<String> db_ids, JID to, boolean delete, OfflineMessagesProcessor proc) throws UserNotFoundException {
+
+			Queue<Element> result = null;
+			ResultSet rs = null;
+
+			try {
+				long to_uid = getUserUID( to.getBareJID() );
+
+				if ( to_uid < 0 ){
+					throw new UserNotFoundException( "User: " + to + " was not found in database." );
+				}
+
+				if ( db_ids == null || db_ids.size() == 0 ){
+					// fetch
+					return loadMessagesToJID( to, delete, proc );
+				} else {
+					result = new LinkedList<Element>();
+
+					Iterator<String> ids = db_ids.iterator();
+
+					int iters = ( db_ids.size() / StatementsCount ) + 1;
+					for ( int i = 0 ; i < iters ; i++ ) {
+						int params = ( i == ( iters - 1 ) ) ? db_ids.size() % StatementsCount : StatementsCount;
+						PreparedStatement select_ids_to_jid_st = data_repo.getPreparedStatement( to.getBareJID(),
+																																							 MSG_SELECT_IDS_TO_JID_QUERY + "_" + params );
+
+						synchronized ( select_ids_to_jid_st ) {
+							select_ids_to_jid_st.setLong( 1, to_uid );
+							for ( int j = 0 ; j < params ; j++ ) {
+								String id = ids.next();
+								select_ids_to_jid_st.setString( j + 2, id );
+							}
+							rs = select_ids_to_jid_st.executeQuery();
+							result.addAll( parseLoadedMessages( proc, rs ) );
+							data_repo.release( null, rs );
+							rs = null;
+						}
+					}
+				}
+
+				if ( delete ){
+					deleteMessagesToJID( null, to );
+				}
+			} catch ( SQLException e ) {
+				log.log( Level.WARNING, "Problem getting offline messages for user: " + to, e );
+			} finally {
+				data_repo.release( null, rs );
+			}
+			return result;
+
+	}
+
+	@Override
+	public int deleteMessagesToJID( List<String> db_ids, JID to ) throws UserNotFoundException {
+
+		int affectedRows = 0;
+		try {
+			long to_uid = getUserUID( to.getBareJID() );
+
+			if ( to_uid < 0 ){
+				throw new UserNotFoundException( "User: " + to + " was not found in database." );
+			}
+
+			if ( db_ids == null || db_ids.size() == 0 ){
+				// purge
+				PreparedStatement delete_to_jid_st
+													= data_repo.getPreparedStatement( to.getBareJID(), MSG_DELETE_TO_JID_QUERY );
+
+				synchronized ( delete_to_jid_st ) {
+					delete_to_jid_st.setLong( 1, to_uid );
+					affectedRows += delete_to_jid_st.executeUpdate();
+				}
+			} else {
+				Iterator<String> ids = db_ids.iterator();
+
+				int iters = ( db_ids.size() / StatementsCount ) + 1;
+					for ( int i = 0 ; i < iters ; i++ ) {
+						int params = ( i == ( iters - 1 ) ) ? db_ids.size() % StatementsCount : StatementsCount;
+					PreparedStatement delete_to_jid_st = data_repo.getPreparedStatement( to.getBareJID(),
+																																							 MSG_DELETE_IDS_TO_JID_QUERY + "_" + params );
+
+					synchronized ( delete_to_jid_st ) {
+						delete_to_jid_st.setLong( 1, to_uid );
+						for ( int j = 0 ; j < params ; j++ ) {
+							String id = ids.next();
+							delete_to_jid_st.setString( j + 2, id );
+						}
+						affectedRows = affectedRows + delete_to_jid_st.executeUpdate();
+					}
+				}
+			}
+		} catch ( SQLException e ) {
+			log.log( Level.WARNING, "Problem getting offline messages for user: " + to, e );
+		}
+		return affectedRows;
+	}
+
+
+	@Override
+	public Queue<Element> loadMessagesToJID( JID to, boolean delete )
+			throws UserNotFoundException {
+		return loadMessagesToJID( to, delete, null );
+	}
+
+	public Queue<Element> loadMessagesToJID(JID to, boolean delete, OfflineMessagesProcessor proc)
 			throws UserNotFoundException {
 		Queue<Element> result = null;
 		ResultSet rs = null;
@@ -400,16 +622,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 
 				StringBuilder sb = new StringBuilder(1000);
 
-				while (rs.next()) {
-					sb.append(rs.getString(MSG_BODY_COLUMN));
-				}
-
-				if (sb.length() > 0) {
-					DomBuilderHandler domHandler = new DomBuilderHandler();
-
-					parser.parse(domHandler, sb.toString().toCharArray(), 0, sb.length());
-					result = domHandler.getParsedElements();
-				}
+				result = parseLoadedMessages( proc, rs);
 			}
 
 			if (delete) {
@@ -427,6 +640,44 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			data_repo.release(null, rs);
 		}
 
+		return result;
+	}
+
+	private Queue<Element> parseLoadedMessages( OfflineMessagesProcessor proc, ResultSet rs) throws SQLException {
+		StringBuilder sb = new StringBuilder( 1000 );
+		Queue<Element> result = new LinkedList<Element>();
+		if ( proc == null ){
+			while ( rs.next() ) {
+				sb.append( rs.getString( MSG_BODY_COLUMN ) );
+			}
+
+			if ( sb.length() > 0 ){
+				DomBuilderHandler domHandler = new DomBuilderHandler();
+
+				parser.parse( domHandler, sb.toString().toCharArray(), 0, sb.length() );
+				result = domHandler.getParsedElements();
+			}
+		} else {
+			result = new LinkedList<Element>();
+			while ( rs.next() ) {
+				final String msg = rs.getString( MSG_BODY_COLUMN );
+				final long msgId = rs.getLong( MSG_ID_COLUMN );
+
+				if ( msg != null ){
+					DomBuilderHandler domHandler = new DomBuilderHandler();
+
+					parser.parse( domHandler, msg.toCharArray(), 0, msg.length() );
+					final Queue<Element> parsedElements = domHandler.getParsedElements();
+					Element msgEl = parsedElements.poll();
+					if ( msgEl != null && msgId > 0 ){
+
+						proc.stamp( msgEl, msgId );
+
+						result.add( msgEl );
+					}
+				}
+			}
+		}
 		return result;
 	}
 
@@ -494,8 +745,19 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 				}
 
 				insert_msg_st.setLong(3, to_uid);
+
+				int msg_type;
+				try {
+					final String name = msg.getName();
+					final MSG_TYPES valueOf = MSG_TYPES.valueOf(name);
+					msg_type = valueOf.ordinal();
+				} catch (IllegalArgumentException e) {
+					msg_type = Integer.MAX_VALUE;
+				}
+
+				insert_msg_st.setLong(4, msg_type);
 				// TODO: deal with messages bigger than the database can fit....
-				insert_msg_st.setString(4, msg.toString());
+				insert_msg_st.setString(5, msg.toString());
 				insert_msg_st.executeUpdate();
 			}
 
@@ -896,9 +1158,4 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 
 		earliestOffline = Long.MAX_VALUE;
 	}
-
 }
-
-// ~ Formatted in Sun Code Convention
-
-// ~ Formatted by Jindent --- http://www.jindent.com

@@ -21,6 +21,19 @@
  */
 package tigase.server.amp;
 
+import tigase.db.MsgRepositoryIfc;
+import tigase.db.RepositoryFactory;
+import tigase.db.TigaseDBException;
+import tigase.db.UserNotFoundException;
+
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
+
+import tigase.osgi.ModulesManagerImpl;
+import tigase.xml.Element;
+import tigase.xml.SimpleParser;
+import tigase.xml.SingletonFactory;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,23 +46,13 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
-import tigase.db.DBInitException;
-import tigase.db.MsgRepositoryIfc;
-import tigase.db.RepositoryFactory;
-import tigase.db.TigaseDBException;
-import tigase.osgi.ModulesManagerImpl;
-import tigase.xml.Element;
-import tigase.xml.SimpleParser;
-import tigase.xml.SingletonFactory;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
 
 /**
  *
  * @author andrzej
  */
 public abstract class MsgRepository<T> implements MsgRepositoryIfc {
-	
+
 	public static final long MSGS_STORE_LIMIT_VAL = 100;
 	public static final String MSGS_STORE_LIMIT_KEY = "store-limit";
 	
@@ -58,6 +61,31 @@ public abstract class MsgRepository<T> implements MsgRepositoryIfc {
 	private static final Map<String, MsgRepositoryIfc> repos =
 			new ConcurrentSkipListMap<String, MsgRepositoryIfc>();
 	
+public enum MSG_TYPES { none(0), message(1), presence(2);
+
+    private final int numVal;
+
+    MSG_TYPES(int numVal) {
+        this.numVal = numVal;
+    }
+
+    public int getNumVal() {
+        return numVal;
+    }
+
+    public static MSG_TYPES getFromInt(int type) {
+        switch (type) {
+        case 1:
+            return message;
+        case 2:
+            return presence;
+        case 0:
+				default:
+            return none;
+        }
+		}
+
+	};
 
 	public static MsgRepositoryIfc getInstance(String cls, String id_string) throws TigaseDBException {
 		try {
@@ -91,7 +119,15 @@ public abstract class MsgRepository<T> implements MsgRepositoryIfc {
 	public abstract void loadMessagesToBroadcast();
 	protected abstract void ensureBroadcastMessageRecipient(String id, BareJID recipient);
 	protected abstract void insertBroadcastMessage(String id, Element msg, Date expire, BareJID recipient);
-	
+
+	public abstract Map<MSG_TYPES,Long> getMessagesCount(JID to)  throws UserNotFoundException;
+	public abstract List<Element> getMessagesList(JID to)  throws UserNotFoundException;
+	public abstract	Queue<Element> loadMessagesToJID(List<String> db_ids, JID to, boolean delete,
+																		OfflineMessagesProcessor proc ) throws UserNotFoundException;
+	public abstract	int deleteMessagesToJID( List<String> db_ids, JID to) throws UserNotFoundException;
+
+
+
 	public BroadcastMsg getBroadcastMsg(String id) {
 		return broadcastMessages.get(id);
 	}
@@ -124,13 +160,6 @@ public abstract class MsgRepository<T> implements MsgRepositoryIfc {
 		return Collections.unmodifiableCollection(broadcastMessages.values());
 	}
 	
-	/**
-	 * 
-	 * @param id
-	 * @param msg
-	 * @param expire
-	 * @return true - if new broadcast message is added
-	 */
 	public boolean updateBroadcastMessage(String id, Element msg, Date expire, BareJID recipient) {
 		boolean isNew = false;
 		synchronized (broadcastMessages) {
@@ -201,13 +230,6 @@ public abstract class MsgRepository<T> implements MsgRepositoryIfc {
 
 		// ~--- constructors -------------------------------------------------------
 
-		/**
-		 * Constructs ...
-		 * 
-		 * @param db_id
-		 * @param msg
-		 * @param expired
-		 */
 		public MsgDBItem(T db_id, Element msg, Date expired) {
 			this.db_id = db_id;
 			this.msg = msg;
@@ -255,4 +277,9 @@ public abstract class MsgRepository<T> implements MsgRepositoryIfc {
 		}
 		
 	}
+
+	public interface OfflineMessagesProcessor {
+		public void stamp(Element msg, Long msgID);
+	}
+
 }
