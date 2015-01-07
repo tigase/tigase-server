@@ -139,6 +139,7 @@
 				<include>tigase:tigase-stats-collector-provider</include>
 				<include>tigase:tigase-http-api</include>
 				<include>tigase:tigase-http-api-jetty</include>
+				<include>tigase.sure.web:tigase-web-ui</include>
 				<include>tigase:tigase-message-archiving</include>
 				<include>tigase:tigase-socks5</include>
 				<include>tigase:tigase-stun</include>
