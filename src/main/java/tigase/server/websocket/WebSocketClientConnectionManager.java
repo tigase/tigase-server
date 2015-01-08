@@ -133,9 +133,9 @@ public class WebSocketClientConnectionManager
 	}
 	
 	@Override
-	protected String prepareSeeOtherHost(XMPPIOService<Object> serv, BareJID see_other_host) {
+	protected String prepareSeeOtherHost(XMPPIOService<Object> serv, String hostname, BareJID see_other_host) {
 		if (isPreRFC(serv)) {
-			return super.prepareSeeOtherHost(serv, see_other_host);
+			return super.prepareSeeOtherHost(serv, hostname, see_other_host);
 		}		
 		boolean ssl = "ssl".equals(serv.getSessionData().get("socket"));
 		int localPort = serv.getLocalPort();
