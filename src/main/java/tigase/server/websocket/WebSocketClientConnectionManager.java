@@ -140,7 +140,7 @@ public class WebSocketClientConnectionManager
 		boolean ssl = "ssl".equals(serv.getSessionData().get("socket"));
 		int localPort = serv.getLocalPort();
 		String see_other_uri = (ssl ? "wss://" : "ws://") + see_other_host + ":" + localPort + "/";
-		return "<open" + " xmlns='" + XMLNS_FRAMING + "'" + " from='" + getDefVHostItem() + "'" 
+		return "<open" + " xmlns='" + XMLNS_FRAMING + "'" + " from='" +  (hostname != null ? hostname : getDefVHostItem()) + "'"
 				+ " id='tigase-error-tigase'" + " version='1.0' xml:lang='en' />"
 				+ "<close xmlns='urn:ietf:params:xml:ns:xmpp-framing' see-other-uri='" + see_other_uri + "' />";
 	}	
