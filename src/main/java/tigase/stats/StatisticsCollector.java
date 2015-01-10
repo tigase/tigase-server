@@ -238,6 +238,8 @@ public class StatisticsCollector
 
 			String tmp_val = Command.getFieldValue(iqc, "Stats level");
 
+			// copying default value of stats level to local variable to not override default value
+			Level statsLevel = this.statsLevel;
 			if (tmp_val != null) {
 				statsLevel = Level.parse(tmp_val);
 				if (log.isLoggable(Level.FINEST)) {
