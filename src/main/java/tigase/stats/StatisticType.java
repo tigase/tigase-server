@@ -32,25 +32,21 @@ package tigase.stats;
  */
 public enum StatisticType {
 
-	QUEUE_WAITING("Total waiting packets", "int"),
-	MAX_QUEUE_SIZE("Max queue size", "int"),
-	MSG_RECEIVED_OK("Packets received", "long"),
-	MSG_SENT_OK("Packets sent", "long"),
-	IN_QUEUE_OVERFLOW("IN Queue overflow", "long"),
-	OUT_QUEUE_OVERFLOW("OUT Queue overflow", "long"),
-	LIST(null, "list"),
-	OTHER(null, null);
+	QUEUE_WAITING("Total waiting packets"),
+	MAX_QUEUE_SIZE("Max queue size"),
+	MSG_RECEIVED_OK("Packets received"),
+	MSG_SENT_OK("Packets sent"),
+	IN_QUEUE_OVERFLOW("IN Queue overflow"),
+	OUT_QUEUE_OVERFLOW("OUT Queue overflow"),
+	OTHER(null);
 
 
 	private String description = null;
-	private String unit = null;
 
-	private StatisticType(String description, String unit) {
+	private StatisticType(String description) {
 		this.description = description;
-		this.unit = unit;
 	}
 
 	public String getDescription() { return description; }
-	public String getUnit() { return unit; }
 
 } // StatisticType

@@ -202,7 +202,6 @@ public class StatisticsCollector
 
 					item.addAttribute("name", record.getComponent() + "/" + record
 							.getDescription());
-					item.addAttribute("units", record.getUnit());
 					item.addAttribute("value", record.getValue());
 					query.addChild(item);
 				}    // end of for ()
@@ -274,17 +273,11 @@ public class StatisticsCollector
 
 			Packet result = iqc.commandResult(Command.DataType.form);
 
-			if (list != null) {
-				for (StatRecord rec : list) {
-					if (rec.getType() == StatisticType.LIST) {
-						Command.addFieldMultiValue(result, XMLUtils.escape(rec.getComponent() + "/" +
-								rec.getDescription()), rec.getListValue());
-					} else {
-						Command.addFieldValue(result, XMLUtils.escape(rec.getComponent() + "/" + rec
-								.getDescription()), XMLUtils.escape(rec.getValue()));
-					}
-				}
+			for (StatRecord rec : list) {
+				Command.addFieldValue(result, XMLUtils.escape(rec.getComponent() + "/" + rec
+						.getDescription()), XMLUtils.escape(rec.getValue()));
 			}
+
 			Command.addFieldValue(result, "Stats level", statsLevel.getName(), "Stats level",
 					new String[] { Level.INFO.getName(),
 					Level.FINE.getName(), Level.FINER.getName(), Level.FINEST.getName() },

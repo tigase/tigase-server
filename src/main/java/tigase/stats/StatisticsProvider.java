@@ -622,9 +622,6 @@ public class StatisticsProvider
 				String key   = rec.getComponent() + "/" + rec.getDescription();
 				String value = rec.getValue();
 
-				if (rec.getType() == StatisticType.LIST) {
-					value = rec.getListValue().toString();
-				}
 				result.put(key, value);
 			}
 

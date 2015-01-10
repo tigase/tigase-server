@@ -22,7 +22,6 @@
 package tigase.stats;
 
 import java.util.logging.Level;
-import java.util.List;
 
 /**
  * Describe class StatRecord here.
@@ -37,66 +36,53 @@ public class StatRecord {
 
 	private StatisticType type = StatisticType.OTHER;
 	private Level level = Level.INFO;
-  private long longValue = -1;
+	private long longValue = -1;
  	private int intValue = -1;
 	private float floatValue = -1f;
 
 	private String description = null;
-	private String unit = null;
 	private String value = null;
-	private List<String> listValue = null;
 	private String component = null;
 
-	public StatRecord(String comp, String description, String unit,	String value,
+	public StatRecord(String comp, String description,	String value,
 		Level level) {
 		this.description = description;
-		this.unit = unit;
 		this.value = value;
 		this.level = level;
 		this.component = comp;
 	}
 
-	public StatRecord(String comp, String description, String unit, int value,
+	public StatRecord(String comp, String description, int value,
 		Level level) {
-		this(comp, description, unit, "" + value, level);
+		this(comp, description, "" + value, level);
 		this.intValue = value;
 	}
 
 	public StatRecord(String comp, StatisticType type, long value, Level level) {
-		this(comp, type.getDescription(), type.getUnit(), "" + value, level);
+		this(comp, type.getDescription(), "" + value, level);
 		this.type = type;
 		this.longValue = value;
 	}
 
 	public StatRecord(String comp, StatisticType type, int value, Level level) {
-		this(comp, type.getDescription(), type.getUnit(), "" + value, level);
+		this(comp, type.getDescription(), "" + value, level);
 		this.type = type;
 		this.intValue = value;
 	}
 
-	public StatRecord(String comp, String description, List<String> value, Level level) {
-		this(comp, description, StatisticType.LIST.getUnit(), null, level);
-		this.type = StatisticType.LIST;
-		this.listValue = value;
-	}
-
-	public StatRecord(String comp, String description, String unit, long value,
+	public StatRecord(String comp, String description, long value,
 		Level level) {
-		this(comp, description, unit, "" + value, level);
+		this(comp, description, "" + value, level);
 		this.longValue = value;
 	}
 
-	StatRecord(String comp, String description, String unit, float value, Level level) {
-		this(comp, description, unit, "" + value, level);
+	StatRecord(String comp, String description, float value, Level level) {
+		this(comp, description, "" + value, level);
 		this.floatValue = value;
 	}
 
 	public String getDescription() {
 		return description;
-	}
-
-	public String getUnit() {
-		return unit;
 	}
 
 	public String getValue() {
@@ -105,10 +91,6 @@ public class StatRecord {
 
 	public StatisticType getType() {
 		return type;
-	}
-
-	public List<String> getListValue() {
-		return listValue;
 	}
 
 	public Level getLevel() {
@@ -131,7 +113,7 @@ public class StatRecord {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(component).append('/').append(description);
-		sb.append('[').append(unit).append(']').append(" = ").append(value);
+		sb.append(" = ").append(value);
 		return sb.toString();
 	}
 

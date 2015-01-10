@@ -46,7 +46,7 @@ import java.util.logging.Logger;
 public class StatisticsList implements Iterable<StatRecord> {
 	private static final Logger log = Logger.getLogger(StatisticsList.class.getName());
 	private Level statLevel = Level.ALL;
-	private LinkedHashMap<String, LinkedHashMap<String, StatRecord>> stats =
+	private final LinkedHashMap<String, LinkedHashMap<String, StatRecord>> stats =
 			new LinkedHashMap<String, LinkedHashMap<String, StatRecord>>();
 
 	// ~--- constructors ---------------------------------------------------------
@@ -71,6 +71,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 * @param description
 	 * @param value
 	 * @param recordLevel
+	 * @return 
 	 *
 	 *
 	 */
@@ -82,7 +83,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 				compStats = addCompStats(comp);
 			}
 
-			compStats.put(description, new StatRecord(comp, description, "long", value,
+			compStats.put(description, new StatRecord(comp, description, value,
 					recordLevel));
 
 			return true;
@@ -99,6 +100,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 * @param description
 	 * @param value
 	 * @param recordLevel
+	 * @return 
 	 *
 	 *
 	 */
@@ -110,7 +112,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 				compStats = addCompStats(comp);
 			}
 
-			compStats.put(description, new StatRecord(comp, description, "int", value,
+			compStats.put(description, new StatRecord(comp, description, value,
 					recordLevel));
 
 			return true;
@@ -127,6 +129,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 * @param description
 	 * @param value
 	 * @param recordLevel
+	 * @return 
 	 *
 	 *
 	 */
@@ -138,7 +141,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 				compStats = addCompStats(comp);
 			}
 
-			compStats.put(description, new StatRecord(comp, description, "String", value,
+			compStats.put(description, new StatRecord(comp, description, value,
 					recordLevel));
 
 			return true;
@@ -155,6 +158,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 * @param description
 	 * @param value
 	 * @param recordLevel
+	 * @return 
 	 *
 	 *
 	 */
@@ -166,7 +170,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 				compStats = addCompStats(comp);
 			}
 
-			compStats.put(description, new StatRecord(comp, description, "float", value,
+			compStats.put(description, new StatRecord(comp, description, value,
 					recordLevel));
 
 			return true;
@@ -180,6 +184,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 *
 	 * @param comp
+	 * @return 
 	 *
 	 *
 	 */
@@ -196,6 +201,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 *
 	 * @param recordLevel
+	 * @return 
 	 *
 	 *
 	 */
@@ -209,6 +215,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 * @param recordLevel
 	 * @param value
+	 * @return 
 	 *
 	 *
 	 */
@@ -230,6 +237,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 * @param recordLevel
 	 * @param value
+	 * @return 
 	 *
 	 *
 	 */
@@ -252,6 +260,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 *
 	 * @param comp
+	 * @return 
 	 *
 	 *
 	 */
@@ -264,6 +273,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 *
 	 * @param comp
+	 * @return 
 	 *
 	 *
 	 */
@@ -276,6 +286,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 *
 	 * @param comp
+	 * @return 
 	 *
 	 *
 	 */
@@ -288,6 +299,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 *
 	 * @param comp
+	 * @return 
 	 *
 	 *
 	 */
@@ -300,6 +312,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 *
 	 * @param comp
+	 * @return 
 	 *
 	 *
 	 */
@@ -312,6 +325,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 *
 	 * @param comp
+	 * @return 
 	 *
 	 *
 	 */
@@ -324,6 +338,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 *
 	 * @param comp
+	 * @return 
 	 *
 	 *
 	 */
@@ -336,6 +351,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 *
 	 * @param comp
+	 * @return 
 	 *
 	 *
 	 */
@@ -348,6 +364,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 *
 	 * @param comp
+	 * @return 
 	 *
 	 *
 	 */
@@ -360,6 +377,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 *
 	 * @param comp
+	 * @return 
 	 *
 	 *
 	 */
@@ -372,6 +390,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 *
 	 * @param comp
+	 * @return 
 	 *
 	 *
 	 */
@@ -384,6 +403,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 *
 	 * @param comp
+	 * @return 
 	 *
 	 *
 	 */
@@ -396,6 +416,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 *
 	 * @param comp
+	 * @return 
 	 *
 	 *
 	 */
@@ -408,6 +429,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 *
 	 *
 	 * @param comp
+	 * @return 
 	 *
 	 *
 	 */
@@ -422,6 +444,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 * @param comp
 	 * @param description
 	 * @param def
+	 * @return 
 	 *
 	 *
 	 */
@@ -447,6 +470,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 * @param comp
 	 * @param description
 	 * @param def
+	 * @return 
 	 *
 	 *
 	 */
@@ -472,6 +496,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 * @param comp
 	 * @param description
 	 * @param def
+	 * @return 
 	 *
 	 *
 	 */
@@ -497,6 +522,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	 * @param comp
 	 * @param description
 	 * @param def
+	 * @return 
 	 *
 	 *
 	 */

@@ -258,11 +258,11 @@ public abstract class AbstractReceiverTask
 	public List<StatRecord> getStats() {
 		List<StatRecord> stats = new LinkedList<StatRecord>();
 
-		stats.add(new StatRecord(getJID().toString(), "Roster size", "int", roster.size(),
+		stats.add(new StatRecord(getJID().toString(), "Roster size", roster.size(),
 														 Level.INFO));
-		stats.add(new StatRecord(getJID().toString(), "Packets received", "long",
+		stats.add(new StatRecord(getJID().toString(), "Packets received",
 														 packets_received, Level.INFO));
-		stats.add(new StatRecord(getJID().toString(), "Packets sent", "long", packets_sent,
+		stats.add(new StatRecord(getJID().toString(), "Packets sent", packets_sent,
 														 Level.INFO));
 
 		int moderation_needed = 0;
@@ -272,7 +272,7 @@ public abstract class AbstractReceiverTask
 														? 0
 														: 1);
 		}    // end of for (RosterItem ri: roster)
-		stats.add(new StatRecord(getJID().toString(), "Awaiting moderation", "int",
+		stats.add(new StatRecord(getJID().toString(), "Awaiting moderation",
 														 moderation_needed, Level.INFO));
 
 		return stats;
