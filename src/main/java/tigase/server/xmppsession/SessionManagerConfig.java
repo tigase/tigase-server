@@ -224,6 +224,7 @@ public abstract class SessionManagerConfig {
 		String plugin_concurrency = "";
 
 		if (str_plugins != null) {
+			str_plugins = str_plugins.replaceAll("\\s+","");
 			String[] conf_plugins = str_plugins.split(",");
 
 			for (String plugin : conf_plugins) {
