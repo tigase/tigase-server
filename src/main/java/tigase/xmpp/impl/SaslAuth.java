@@ -48,7 +48,6 @@ import tigase.xml.Element;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 
@@ -78,7 +77,7 @@ import javax.security.sasl.SaslServer;
  * @version $Rev$
  */
 public class SaslAuth
-				extends XMPPProcessor
+				extends AbstractAuthPreprocessor
 				implements XMPPProcessorIfc {
 	/** Field description */
 	public static final String     ID = "urn:ietf:params:xml:ns:xmpp-sasl";

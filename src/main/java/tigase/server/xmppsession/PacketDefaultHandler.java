@@ -28,7 +28,6 @@ package tigase.server.xmppsession;
 
 import tigase.db.NonAuthUserRepository;
 
-import tigase.server.Iq;
 import tigase.server.Packet;
 
 import tigase.xmpp.Authorization;
@@ -68,8 +67,6 @@ public class PacketDefaultHandler {
 	// private static TigaseRuntime runtime = TigaseRuntime.getTigaseRuntime();
 	// private RosterAbstract roster_util =
 	// RosterFactory.getRosterImplementation(true);
-	private String[]     AUTH_ONLY_ELEMS = { "message", "presence" };
-	private String[]     COMPRESS_PATH   = { "compress" };
 	private String[]     IGNORE_PACKETS  = { "stream:features" };
 	private StanzaType[] IGNORE_TYPES    = { StanzaType.error };
 
@@ -175,108 +172,6 @@ public class PacketDefaultHandler {
 				return true;
 			}
 		}
-		if ((session == null) || session.isServerSession()) {
-			return false;
-		}    // end of if (session == null)
-		try {
-
-			// For all messages coming from the owner of this account set
-			// proper 'from' attribute. This is actually needed for the case
-			// when the user sends a message to himself.
-			if (session.getConnectionId().equals(packet.getPacketFrom())) {
-				if (!session.isAuthorized()) {
-
-					// We allow only certain packets here...
-					// For now it is simpler to disallow all messages and presences
-					// packets, the rest should be bounced back anyway
-					for (String elem : AUTH_ONLY_ELEMS) {
-						if (packet.getElemName() == elem) {
-							results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-									"You must authenticate session first, before you" +
-									" can send any message or presence packet.", true));
-							if (log.isLoggable(Level.FINE)) {
-								log.log(Level.FINE,
-										"Packet received before the session has been authenticated." +
-										"Session details: connectionId=" + "{0}, sessionId={1}, packet={2}",
-										new Object[] { session.getConnectionId(),
-										session.getSessionId(), packet.toStringSecure() });
-							}
-
-							return true;
-						}
-					}
-
-					return false;
-				}
-
-				// After authentication we require resource binding packet and
-				// nothing else:
-				// actually according to XEP-0170:
-				// http://xmpp.org/extensions/xep-0170.html
-				// stream compression might occur between authentication and resource
-				// binding
-				if (session.isResourceSet() || packet.isXMLNSStaticStr(Iq.IQ_BIND_PATH,
-						"urn:ietf:params:xml:ns:xmpp-bind") || packet.isXMLNSStaticStr(COMPRESS_PATH,
-						"http://jabber.org/protocol/compress")) {
-					JID from_jid = session.getJID();
-
-					if (from_jid != null) {
-
-						// Do not replace current settings if there is at least correct
-						// BareJID
-						// already set.
-						if ((packet.getStanzaFrom() == null) ||!from_jid.getBareJID().equals(packet
-								.getStanzaFrom().getBareJID())) {
-							if (log.isLoggable(Level.FINEST)) {
-								log.log(Level.FINEST, "Setting correct from attribute: {0}", from_jid);
-							}
-
-							// No need for the line below, initVars(...) takes care of that
-							// packet.getElement().setAttribute("from", from_jid.toString());
-							packet.initVars(from_jid, packet.getStanzaTo());
-						} else {
-							if (log.isLoggable(Level.FINEST)) {
-								log.log(Level.FINEST,
-										"Skipping setting correct from attribute: {0}, is already correct.",
-										from_jid);
-							}
-						}
-					} else {
-						log.log(Level.WARNING,
-								"Session is authenticated but session.getJid() is empty: {0}", packet
-								.toStringSecure());
-					}
-				} else {
-
-					// We do not accept anything without resource binding....
-					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
-							"You must bind the resource first: " +
-							"http://www.xmpp.org/rfcs/rfc3920.html#bind", true));
-					if (log.isLoggable(Level.INFO)) {
-						log.log(Level.INFO, "Session details: connectionId={0}, sessionId={1}",
-								new Object[] { session.getConnectionId(),
-								session.getSessionId() });
-					}
-					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "Session more detais: JID={0}", session.getjid());
-					}
-
-					return true;
-				}
-			}
-		} catch (PacketErrorTypeException e) {
-
-			// Ignore this packet
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST,
-						"Ignoring packet with an error to non-existen user session: {0}", packet
-						.toStringSecure());
-			}
-		} catch (Exception e) {
-			log.log(Level.FINEST, "Packet preprocessing exception: ", e);
-
-			return false;
-		}    // end of try-catch
 
 		return false;
 	}

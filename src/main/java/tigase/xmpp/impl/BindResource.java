@@ -48,6 +48,9 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.xmpp.JID;
+import tigase.xmpp.PacketErrorTypeException;
+import tigase.xmpp.XMPPPreprocessorIfc;
 
 /**
  * RFC-3920, 7. Resource Binding
@@ -60,8 +63,9 @@ import java.util.logging.Logger;
  */
 public class BindResource
 				extends XMPPProcessor
-				implements XMPPProcessorIfc {
+				implements XMPPProcessorIfc, XMPPPreprocessorIfc {
 	/** Field description */
+	private static final String[]   COMPRESS_PATH   = { "compress" };
 	public static final String      DEF_RESOURCE_PREFIX_PROP_KEY = "def-resource-prefix";
 	private static final String     EL_NAME                      = "bind";
 	private static final String[][] ELEMENTS                     = {
@@ -72,7 +76,7 @@ public class BindResource
 
 	// protected static final String RESOURCE_KEY = "Resource-Binded";
 	private static final String    XMLNS  = "urn:ietf:params:xml:ns:xmpp-bind";
-	private static final String    ID     = XMLNS;
+	private static final String    ID     = XMLNS;	
 	private static final String[]  XMLNSS = { XMLNS };
 	private static final Element[] FEATURES = { new Element(EL_NAME, new String[] {
 			"xmlns" }, new String[] { XMLNS }) };
@@ -80,7 +84,6 @@ public class BindResource
 			"var" }, new String[] { XMLNS }) };
 
 	//~--- fields ---------------------------------------------------------------
-
 	private String resourceDefPrefix = "tigase-";
 
 	//~--- methods --------------------------------------------------------------
@@ -101,6 +104,87 @@ public class BindResource
 		} else {
 			resourceDefPrefix = hostnameHash + "-" + resourceDefPrefix;
 		}
+	}
+
+	@Override
+	public boolean preProcess(Packet packet, XMPPResourceConnection session,
+			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
+		if ((session == null) || session.isServerSession() || !session.isAuthorized()) {
+			return false;
+		}
+		
+		try {
+			if (session.getConnectionId().equals(packet.getPacketFrom())) {
+				// After authentication we require resource binding packet and
+				// nothing else:
+				// actually according to XEP-0170:
+				// http://xmpp.org/extensions/xep-0170.html
+				// stream compression might occur between authentication and resource
+				// binding
+				if (session.isResourceSet() || packet.isXMLNSStaticStr(Iq.IQ_BIND_PATH,
+						"urn:ietf:params:xml:ns:xmpp-bind") || packet.isXMLNSStaticStr(COMPRESS_PATH,
+						"http://jabber.org/protocol/compress")) {
+					JID from_jid = session.getJID();
+
+					if (from_jid != null) {
+
+						// Do not replace current settings if there is at least correct
+						// BareJID
+						// already set.
+						if ((packet.getStanzaFrom() == null) ||!from_jid.getBareJID().equals(packet
+								.getStanzaFrom().getBareJID())) {
+							if (log.isLoggable(Level.FINEST)) {
+								log.log(Level.FINEST, "Setting correct from attribute: {0}", from_jid);
+							}
+
+							// No need for the line below, initVars(...) takes care of that
+							// packet.getElement().setAttribute("from", from_jid.toString());
+							packet.initVars(from_jid, packet.getStanzaTo());
+						} else {
+							if (log.isLoggable(Level.FINEST)) {
+								log.log(Level.FINEST,
+										"Skipping setting correct from attribute: {0}, is already correct.",
+										from_jid);
+							}
+						}
+					} else {
+						log.log(Level.WARNING,
+								"Session is authenticated but session.getJid() is empty: {0}", packet
+								.toStringSecure());
+					}
+				} else {
+
+					// We do not accept anything without resource binding....
+					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+							"You must bind the resource first: " +
+							"http://www.xmpp.org/rfcs/rfc3920.html#bind", true));
+					if (log.isLoggable(Level.INFO)) {
+						log.log(Level.INFO, "Session details: connectionId={0}, sessionId={1}",
+								new Object[] { session.getConnectionId(),
+								session.getSessionId() });
+					}
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Session more detais: JID={0}", session.getjid());
+					}
+
+					return true;
+				}			
+			}
+		} catch (PacketErrorTypeException e) {
+
+			// Ignore this packet
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST,
+						"Ignoring packet with an error to non-existen user session: {0}", packet
+						.toStringSecure());
+			}
+		} catch (Exception e) {
+			log.log(Level.FINEST, "Packet preprocessing exception: ", e);
+
+			return false;
+		}    // end of try-catch	
+		
+		return false;
 	}
 
 	@Override

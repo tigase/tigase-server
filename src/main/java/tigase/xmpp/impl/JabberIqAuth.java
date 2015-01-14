@@ -47,7 +47,6 @@ import tigase.xmpp.BareJID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 
@@ -78,7 +77,7 @@ import javax.security.sasl.Sasl;
  * @version $Rev$
  */
 public class JabberIqAuth
-				extends XMPPProcessor
+				extends AbstractAuthPreprocessor
 				implements XMPPProcessorIfc {
 	private static final String[][] ELEMENT_PATHS = {
 		Iq.IQ_QUERY_PATH
