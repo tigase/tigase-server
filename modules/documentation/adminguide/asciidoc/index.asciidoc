@@ -32,6 +32,8 @@ include::text/Admin_Guide_09_-_Quick_Start_-_C_-_Manual_Installation_in_Console_
 
 include::text/Admin_Guide_10_-_Quick_Start_-_D_-_Tigase_Server_Binary_Updates.asciidoc[]
 
+include::text/Admin_Guide_90_-_Quick_Start_-_E_-_Installation_Using_Web_Installer.asciidoc[]
+
 include::text/Admin_Guide_11_-_Tigase_Server_and_Multiple_Databases.asciidoc[]
 
 include::text/Admin_Guide_12_-_Basic_System_Checks.asciidoc[]
