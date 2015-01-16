@@ -1,15 +1,7 @@
-[[confapi]]
-Configuration API
-=================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
-:toc:
-:numbered:
-:website: http://tigase.net/
-:Date: 2010-04-06 21:22
+[[ConfigurationAPI]]
+== Configuration API
 
-Introduction
-------------
+=== Introduction
 
 The component configuration API is actually very simple, it consists of two methods:
 
@@ -21,8 +13,7 @@ void setProperties(Map<String, Object> properties);
 
 The first method retrieves configuration defaults from the component while the second sets the new configuration for the component. It does look very simple and it is very simple, however there is something more to know about that to use it effectively.
 
-Component Startup Sequence
---------------------------
+=== Component Startup Sequence
 
 Before we go into all the details it might be very helpful to know the full component initialisation sequence, how the component is brought to life and when the configuration is set. Component loading and starting sequence looks like this:
 
@@ -36,8 +27,7 @@ Before we go into all the details it might be very helpful to know the full comp
 
 The important thing about all the configuration stuff is that the component does not read/ask/request configuration. *The configuration is pushed to the component by the configuration manager.* The +setProperties()+ method can be called at any time and any number of times while the server is running. This design allows for the server reconfiguration at run-time and developers should be aware of this and properly code the method to allow for the component reconfiguration at run-time.
 
-Configuration API
------------------
+=== Configuration API
 
 Both API methods operate on Map<String, Object>, hence, essentially the component configuration is just a list of +(key, value)+ pairs. The Object can any of following:
 
@@ -50,8 +40,8 @@ Both API methods operate on Map<String, Object>, hence, essentially the componen
 
 It is guaranteed that if the component returns a default configuration entry in any of above types, the +setProperties()+ method sets the configuration entry in the same exact type. This is quite convenient as you can limit type conversions (numbers parsing for example) in your code.
 
-getDefaults()
--------------
+=== getDefaults()
+
 
 [source,java]
 Map<String, Object> getDefaults(Map<String, Object> params);
@@ -68,8 +58,7 @@ public Map<String, Object> getDefaults(Map<String, Object> params) {
 }
 ------------------------------------------------------------------
 
-setProperties()
----------------
+=== setProperties()
 
 [source,java]
 void setProperties(Map<String, Object> properties);
@@ -85,17 +74,15 @@ public void setProperties(Map properties) {
 }
 ------------------------------------------------------------------
 
-Useful Presets
---------------
+=== Useful Presets
 
 Normally configuration presets depend on the component implementation and are different for each component. There are a few presets however which are often used commonly by different components:
 
-- --+test+ if set it means that the server runs in a test mode, which may mean different things for different components. The component may use this parameter to turn testing mode on.
-- --+admins+ if set it provides a list of administrator IDs. These user may have special access permissions for the component. They usually can execute administrator ad-hoc commands.
-- --+user-db-uri+ if set it contains the main database connection string. The component may keep there own data.
+- +test+ if set it means that the server runs in a test mode, which may mean different things for different components. The component may use this parameter to turn testing mode on.
+- +admins+ if set it provides a list of administrator IDs. These user may have special access permissions for the component. They usually can execute administrator ad-hoc commands.
+- +user-db-uri+ if set it contains the main database connection string. The component may keep there own data.
 
-Global Configuration Settings
------------------------------
+=== Global Configuration Settings
 
 There are some global settings which are provided to all components and can be used by all of them. Usually they point so some shared resources which can be used by all components.
 
@@ -126,4 +113,3 @@ To access the use repository instance you can use the following code:
 UserAuthRepository auth_repo;
 auth_repo = (UserAuthRepository) properties.get(SHARED_AUTH_REPO_PROP_KEY);
 ------------------------------------------------------------------
-
