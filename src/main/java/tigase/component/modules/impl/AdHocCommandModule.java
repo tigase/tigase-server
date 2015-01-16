@@ -45,20 +45,21 @@ public class AdHocCommandModule<CTX extends Context> extends AbstractModule<CTX>
 
 	}
 
-	private static final String[] COMMAND_PATH = { "iq", "command" };
+	protected static final String[] COMMAND_PATH = { "iq", "command" };
 
-	private static final Criteria CRIT = ElementCriteria.nameType("iq", "set").add(
+	protected static final Criteria CRIT = ElementCriteria.nameType("iq", "set").add(
 			ElementCriteria.name("command", Command.XMLNS));
 
 	public final static String ID = "commands";
 
 	public static final String XMLNS = Command.XMLNS;
 
-	private final AdHocCommandManager commandsManager = new AdHocCommandManager();
+	protected AdHocCommandManager commandsManager;
 
-	private ScriptCommandProcessor scriptProcessor;
+	protected ScriptCommandProcessor scriptProcessor;
 
 	public AdHocCommandModule(ScriptCommandProcessor scriptProcessor) {
+		this.commandsManager = new AdHocCommandManager();
 		this.scriptProcessor = scriptProcessor;
 	}
 

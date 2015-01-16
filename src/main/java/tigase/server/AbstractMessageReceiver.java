@@ -452,6 +452,11 @@ public abstract class AbstractMessageReceiver
 
 		task.setScheduledFuture(future);
 	}
+	
+	public void addTimerTask(tigase.util.TimerTask task, long initialDelay, long period) {
+		ScheduledFuture<?> future = receiverScheduler.scheduleAtFixedRate(task, initialDelay, period, TimeUnit.MILLISECONDS);
+		task.setScheduledFuture(future);
+	}
 
 	/**
 	 * Method queues and executes all timer tasks on Timer SINGLE thread.

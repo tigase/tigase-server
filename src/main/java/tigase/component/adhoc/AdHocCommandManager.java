@@ -29,8 +29,8 @@ import tigase.xmpp.JID;
 
 /**
  * Class description
- * 
- * 
+ *
+ *
  */
 public class AdHocCommandManager {
 	private final Map<String, AdHocCommand> commands = new HashMap<String, AdHocCommand>();
@@ -38,18 +38,22 @@ public class AdHocCommandManager {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public Collection<AdHocCommand> getAllCommands() {
 		return this.commands.values();
 	}
 
+	public AdHocCommand getCommand(String nodeName) {
+		return this.commands.get(nodeName);
+	}
+
 	/**
 	 * Method checks if exists implementation for this command in this
 	 * CommandManager
-	 * 
+	 *
 	 * @param node
 	 * @return true - if command exists for this node
 	 */
@@ -58,9 +62,13 @@ public class AdHocCommandManager {
 	}
 
 	/**
+	 * Method description
 	 *
-	 * @param packet
+	 *
+	 * @param element
+	 *
 	 * @return
+	 *
 	 * @throws AdHocCommandException
 	 */
 	public Packet process(Packet packet) throws AdHocCommandException {
@@ -70,44 +78,49 @@ public class AdHocCommandManager {
 		final String node = command.getAttributeStaticStr("node");
 		final String action = command.getAttributeStaticStr("action");
 		final String sessionId = command.getAttributeStaticStr("sessionid");
-		AdHocCommand adHocCommand = this.commands.get(node);
+		AdHocCommand adHocCommand = getCommand(node);
 
 		if (adHocCommand == null) {
 		} else {
-			State currentState = null;
-			final AdhHocRequest request = new AdhHocRequest(packet, command, node, senderJid, action, sessionId);
-			final AdHocResponse response = new AdHocResponse(sessionId, currentState);
-			final AdHocSession session = (sessionId == null) ? new AdHocSession() : this.sessions.get(sessionId);
-
-			adHocCommand.execute(request, response);
-
-			Element commandResult = new Element("command", new String[] { "xmlns", "node", }, new String[] {
-					"http://jabber.org/protocol/commands", node });
-
-			commandResult.addAttribute("status", response.getNewState().name());
-			if ((response.getCurrentState() == null) && (response.getNewState() == State.executing)) {
-				this.sessions.put(response.getSessionid(), session);
-			} else if ((response.getSessionid() != null)
-					&& ((response.getNewState() == State.canceled) || (response.getNewState() == State.completed))) {
-				this.sessions.remove(response.getSessionid());
-			}
-			if (response.getSessionid() != null) {
-				commandResult.addAttribute("sessionid", response.getSessionid());
-			}
-			for (Element r : response.getElements()) {
-				commandResult.addChild(r);
-			}
-
-			return packet.okResult(commandResult, 0);
+			return process(packet, command, node, action, sessionId, adHocCommand);
 		}
 
 		return null;
 	}
 
+	public Packet process(Packet packet, Element commandElement, String node, String action, String sessionId,
+			AdHocCommand adHocCommand) throws AdHocCommandException {
+		State currentState = null;
+		final AdhHocRequest request = new AdhHocRequest(packet, commandElement, node, packet.getStanzaFrom(), action, sessionId);
+		final AdHocResponse response = new AdHocResponse(sessionId, currentState);
+		final AdHocSession session = (sessionId == null) ? new AdHocSession() : this.sessions.get(sessionId);
+
+		adHocCommand.execute(request, response);
+
+		Element commandResult = new Element("command", new String[] { "xmlns", "node", }, new String[] {
+				"http://jabber.org/protocol/commands", node });
+
+		commandResult.addAttribute("status", response.getNewState().name());
+		if ((response.getCurrentState() == null) && (response.getNewState() == State.executing)) {
+			this.sessions.put(response.getSessionid(), session);
+		} else if ((response.getSessionid() != null)
+				&& ((response.getNewState() == State.canceled) || (response.getNewState() == State.completed))) {
+			this.sessions.remove(response.getSessionid());
+		}
+		if (response.getSessionid() != null) {
+			commandResult.addAttribute("sessionid", response.getSessionid());
+		}
+		for (Element r : response.getElements()) {
+			commandResult.addChild(r);
+		}
+
+		return packet.okResult(commandResult, 0);
+	}
+
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param command
 	 */
 	public void registerCommand(AdHocCommand command) {
