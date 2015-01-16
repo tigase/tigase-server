@@ -23,7 +23,13 @@ package tigase.xmpp.impl.annotation;
 
 import org.junit.Assert;
 import org.junit.Test;
+import tigase.server.Packet;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
+import tigase.xmpp.Authorization;
+import tigase.xmpp.ProcessorFactory;
+import tigase.xmpp.XMPPProcessorIfc;
+import tigase.xmpp.impl.SessionBind;
 
 /**
  *
@@ -58,4 +64,44 @@ public class AnnotatedXMPPProcessorTest {
 		Assert.assertNull("Wrong stream features", test2.supStreamFeatures(null));
 	}
 
+	@Test
+	public void testSessionBind() {
+		SessionBind sessionBind = new SessionBind();
+		Assert.assertEquals("Wrong processor id", "urn:ietf:params:xml:ns:xmpp-session", sessionBind.id());
+		for (String[] path : sessionBind.supElementNamePaths()) {
+			Assert.assertArrayEquals("Wrong element paths", new String[] { "iq", "session" }, path);
+		}
+		Assert.assertArrayEquals("Wrong xmlnss", new String[] { "urn:ietf:params:xml:ns:xmpp-session" }, sessionBind.supNamespaces());
+		
+		Assert.assertArrayEquals("Wrong disco features", new Element[] { 
+			new Element("feature", new String[] { "var" }, new String[] { "urn:ietf:params:xml:ns:xmpp-session" })
+		}, sessionBind.supDiscoFeatures(null));
+//		Assert.assertArrayEquals("Wrong stream features", new Element[] {
+//			new Element("session", new String[] { "xmlns" }, new String[] { "urn:ietf:params:xml:ns:xmpp-session" })
+//		}, sessionBind.supStreamFeatures(null));		
+	}
+	
+	@Test
+	public void testProcessorFactorySessionBind() throws TigaseStringprepException {
+		XMPPProcessorIfc sessionBind = ProcessorFactory.getProcessor("urn:ietf:params:xml:ns:xmpp-session");
+		Assert.assertEquals("Wrong processor id", "urn:ietf:params:xml:ns:xmpp-session", sessionBind.id());
+		for (String[] path : sessionBind.supElementNamePaths()) {
+			Assert.assertArrayEquals("Wrong element paths", new String[] { "iq", "session" }, path);
+		}
+		Assert.assertArrayEquals("Wrong xmlnss", new String[] { "urn:ietf:params:xml:ns:xmpp-session" }, sessionBind.supNamespaces());
+		
+		Assert.assertArrayEquals("Wrong disco features", new Element[] { 
+			new Element("feature", new String[] { "var" }, new String[] { "urn:ietf:params:xml:ns:xmpp-session" })
+		}, sessionBind.supDiscoFeatures(null));
+//		Assert.assertArrayEquals("Wrong stream features", new Element[] {
+//			new Element("session", new String[] { "xmlns" }, new String[] { "urn:ietf:params:xml:ns:xmpp-session" })
+//		}, sessionBind.supStreamFeatures(null));			
+		
+		Element iqEl = new Element("iq", new String[] {"type", "id"}, new String[] { "set", "test1" });
+		iqEl.addChild(new Element("session", new String[] { "xmlns" }, new String[] { "urn:ietf:params:xml:ns:xmpp-session" }));
+		
+		Packet iq = Packet.packetInstance(iqEl);
+		Assert.assertTrue("Packet not handled!", sessionBind.canHandle(iq, null) == Authorization.AUTHORIZED);
+	}
+	
 }

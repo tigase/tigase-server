@@ -43,7 +43,7 @@ public abstract class AnnotatedXMPPProcessor extends XMPPProcessor {
 	
 	private String ID;
 	
-	AnnotatedXMPPProcessor() {
+	protected AnnotatedXMPPProcessor() {
 		Class cls = this.getClass();
 		
 		cmpInfo = null;
@@ -111,12 +111,17 @@ public abstract class AnnotatedXMPPProcessor extends XMPPProcessor {
 	
 	private static void processHandle(Handle handle, List<String[]> elems, List<String> xmlnss) {
 		if (handle != null) {
+			String[] path = null;
 			if (handle.path().length > 0) {
-				elems.add(handle.path());
+				path = handle.path();
 			} else {
-				elems.add(handle.pathStr().split("/"));
+				path = handle.pathStr().split("/");
 			}
-			xmlnss.add(handle.xmlns());
+			for (int i=0; i<path.length; i++) {
+				path[i] = path[i].intern();
+			}
+			elems.add(path);
+			xmlnss.add(handle.xmlns().intern());
 		}
 	}
 	
