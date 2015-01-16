@@ -93,7 +93,7 @@ To access the use repository instance you can use the following code:
 [source,java]
 ------------------------------------------------------------------
 UserRepository user_repo;
-user_repo = (UserRepository) properties.get(SHARED_USER_REPO_PROP_KEY);
+user_repo = (UserRepository) properties.get(RepositoryFactory.SHARED_USER_REPO_PROP_KEY);
 ------------------------------------------------------------------
 - SHARED_USER_REPO_POOL_PROP_KEY is a configuration key for the user repository pool. In most cases the user repository is just an SQL database. To improve the access to the database a connection pool is created which is realised by creating many UserRepository instances connecting to the same database.
 +
@@ -102,7 +102,7 @@ To access the use repository instance you can use the following code:
 [source,java]
 ------------------------------------------------------------------
 UserRepository user_repo;
-user_repo = (UserRepository) properties.get(SHARED_USER_REPO_POOL_PROP_KEY);
+user_repo = (UserRepository) properties.get(RepositoryFactory.SHARED_USER_REPO_POOL_PROP_KEY);
 ------------------------------------------------------------------
 - SHARED_AUTH_REPO_PROP_KEY is a configuration key for the authentication repository. Components normally do not need access to this repository unless they deal with user authentication and authentication data is kept separately from the rest of the user data.
 +
@@ -110,6 +110,6 @@ To access the use repository instance you can use the following code:
 +
 [source,java]
 ------------------------------------------------------------------
-UserAuthRepository auth_repo;
-auth_repo = (UserAuthRepository) properties.get(SHARED_AUTH_REPO_PROP_KEY);
+AuthRepository auth_repo;
+auth_repo = (AuthRepository) properties.get(RepositoryFactory.SHARED_AUTH_REPO_PROP_KEY);
 ------------------------------------------------------------------
