@@ -110,8 +110,9 @@
 			<includes>
 				<!--tigase libraries-->
 				<include>tigase:tigase-server</include>
-				<!--<include>tigase:tigase-utils</include>-->
-				<!--<include>tigase:tigase-xmltools</include>-->
+				<include>tigase:tigase-http-api</include>
+				<include>tigase.sure.web:tigase-web-ui</include>
+				<include>javax.servlet:javax.servlet-api</include>
 
 				<!--database libraries-->
 				<include>org.apache.derby:derby</include>

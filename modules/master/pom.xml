@@ -71,7 +71,6 @@
 			<modules>
 				<module>../documentation</module>
 				<module>../distribution</module>
-				<module>../izpack-installer</module>
 			</modules>
 			<properties>
 				<maven.javadoc.skip>false</maven.javadoc.skip>
