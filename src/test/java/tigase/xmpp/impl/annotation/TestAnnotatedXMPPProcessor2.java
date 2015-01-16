@@ -25,6 +25,6 @@ package tigase.xmpp.impl.annotation;
  *
  * @author andrzej
  */
-public class TestAnnotatedXMPPProcessor2 extends TestAnnotatedXMPPProcessor {
+class TestAnnotatedXMPPProcessor2 extends TestAnnotatedXMPPProcessor {
 	
 }

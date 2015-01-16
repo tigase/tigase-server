@@ -39,7 +39,7 @@ import static tigase.xmpp.impl.annotation.TestAnnotatedXMPPProcessor.*;
 @StreamFeatures({
 	@StreamFeature(elem="bind", xmlns="urn:ietf:params:xml:ns:xmpp-bind")
 })
-public class TestAnnotatedXMPPProcessor extends AnnotatedXMPPProcessor {
+class TestAnnotatedXMPPProcessor extends AnnotatedXMPPProcessor {
 	
 	protected static final String ID = "test-123";
 	protected static final String XMLNS1 = "tigase:test1";
