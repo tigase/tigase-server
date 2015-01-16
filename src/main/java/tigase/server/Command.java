@@ -176,16 +176,19 @@ public enum Command {
 	public static final String COMMAND_EL = "command";
 
 	/** Field description */
-	public static final String FIELD_EL = "field";
+	@Deprecated
+	public static final String FIELD_EL = DataForm.FIELD_EL;
 
 	/** Field description */
-	public static final String VALUE_EL = "value";
+	@Deprecated
+	public static final String VALUE_EL = DataForm.VALUE_EL;
 
 	/** Field description */
 	public static final String XMLNS = "http://jabber.org/protocol/commands";
 
 	/** Field description */
-	protected static final String[] FIELD_VALUE_PATH = { FIELD_EL, VALUE_EL };
+	@Deprecated
+	protected static final String[] FIELD_VALUE_PATH = DataForm.FIELD_VALUE_PATH;
 
 	/**
 	 * Variable <code>log</code> is a class logger.
@@ -310,7 +313,10 @@ public enum Command {
 	 * @param f_value
 	 */
 	public static void addCheckBoxField(Packet packet, String f_name, boolean f_value) {
-		addFieldValue(packet, f_name, Boolean.toString(f_value), "boolean");
+		Element iq      = packet.getElement();
+		Element command = iq.getChild(COMMAND_EL);
+		
+		DataForm.addCheckBoxField( command, f_name, f_value);
 	}
 
 	/**
@@ -333,68 +339,16 @@ public enum Command {
 					final List<String> f_value) {
 		Element iq      = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL);
-		Element x       = command.getChild("x", "jabber:x:data");
+		DataForm.addFieldMultiValue( command, f_name, f_value);
 
-		if (x == null) {
-			x = addDataForm(command, DataType.submit);
-		}
-		if (f_value != null) {
-			Element field = new Element(FIELD_EL, new String[] { "var", "type" },
-																	new String[] { XMLUtils.escape(f_name),
-							"text-multi" });
-
-			for (String val : f_value) {
-				if (val != null) {
-					Element value = new Element(VALUE_EL, XMLUtils.escape(val));
-
-					field.addChild(value);
-				}
-			}
-			x.addChild(field);
-		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param f_name
-	 * @param ex
-	 */
 	public static void addFieldMultiValue(final Packet packet, final String f_name,
 					final Throwable ex) {
 		Element iq      = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL);
-		Element x       = command.getChild("x", "jabber:x:data");
+		DataForm.addFieldMultiValue( command, f_name, ex);
 
-		if (x == null) {
-			x = addDataForm(command, DataType.submit);
-		}
-
-		List<String> f_value = null;
-
-		if (ex != null) {
-			f_value = new ArrayList<String>(100);
-			f_value.add(ex.getLocalizedMessage());
-			for (StackTraceElement ste : ex.getStackTrace()) {
-				f_value.add("  " + ste.toString());
-			}
-		}
-		if (f_value != null) {
-			Element field = new Element(FIELD_EL, new String[] { "var", "type" },
-																	new String[] { XMLUtils.escape(f_name),
-							"text-multi" });
-
-			for (String val : f_value) {
-				if (val != null) {
-					Element value = new Element(VALUE_EL, XMLUtils.escape(val));
-
-					field.addChild(value);
-				}
-			}
-			x.addChild(field);
-		}
 	}
 
 	/**
@@ -415,19 +369,7 @@ public enum Command {
 																	 final String f_value) {
 		Element iq      = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL);
-		Element x       = command.getChild("x", "jabber:x:data");
-
-		if (x == null) {
-			x = addDataForm(command, DataType.submit);
-		}
-
-		Element field = new Element(FIELD_EL,
-																new Element[] {
-																	new Element(VALUE_EL,
-																		XMLUtils.escape(f_value)) }, new String[] { "var" },
-																			new String[] { XMLUtils.escape(f_name) });
-
-		x.addChild(field);
+		DataForm.addFieldValue( command, f_name, f_value);
 	}
 
 	/**
@@ -464,28 +406,7 @@ public enum Command {
 																	 final String[] labels, final String[] options) {
 		Element iq      = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL);
-		Element x       = command.getChild("x", "jabber:x:data");
-
-		if (x == null) {
-			x = addDataForm(command, DataType.submit);
-		}
-
-		Element field = new Element(FIELD_EL,
-																new Element[] {
-																	new Element(VALUE_EL,
-																		XMLUtils.escape(f_value)) }, new String[] { "var",
-						"type", "label" }, new String[] { XMLUtils.escape(f_name), "list-single",
-						XMLUtils.escape(label) });
-
-		for (int i = 0; i < labels.length; i++) {
-			field.addChild(new Element("option",
-																 new Element[] {
-																	 new Element(VALUE_EL,
-																		 XMLUtils.escape(options[i])) }, new String[] {
-																			 "label" }, new String[] {
-																			 XMLUtils.escape(labels[i]) }));
-		}
-		x.addChild(field);
+		DataForm.addFieldValue( command, f_name, f_value, label, labels, options);
 	}
 
 	/**
@@ -522,168 +443,45 @@ public enum Command {
 																	 final String[] labels, final String[] options) {
 		Element iq      = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL);
-		Element x       = command.getChild("x", "jabber:x:data");
-
-		if (x == null) {
-			x = addDataForm(command, DataType.submit);
-		}
-
-		Element field = new Element(FIELD_EL, new String[] { "var", "type", "label" },
-																new String[] { XMLUtils.escape(f_name),
-						"list-multi", XMLUtils.escape(label) });
-
-		for (int i = 0; i < labels.length; i++) {
-			field.addChild(new Element("option",
-																 new Element[] {
-																	 new Element(VALUE_EL,
-																		 XMLUtils.escape(options[i])) }, new String[] {
-																			 "label" }, new String[] {
-																			 XMLUtils.escape(labels[i]) }));
-		}
-		for (int i = 0; i < f_values.length; i++) {
-			field.addChild(new Element(VALUE_EL, XMLUtils.escape(f_values[i])));
-		}
-		x.addChild(field);
+		DataForm.addFieldValue( command, f_name, f_values, label, labels, options);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param f_name
-	 * @param f_value
-	 * @param label
-	 * @param labels
-	 * @param options
-	 * @param type
-	 */
 	public static void addFieldValue(final Packet packet, final String f_name,
 																	 final String f_value, final String label,
 																	 final String[] labels, final String[] options,
 																	 final String type) {
 		Element iq      = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL);
-		Element x       = command.getChild("x", "jabber:x:data");
-
-		if (x == null) {
-			x = addDataForm(command, DataType.submit);
-		}
-
-		Element field = new Element(FIELD_EL,
-																new Element[] {
-																	new Element(VALUE_EL,
-																		XMLUtils.escape(f_value)) }, new String[] { "var",
-						"type", "label" }, new String[] { XMLUtils.escape(f_name), type,
-						XMLUtils.escape(label) });
-
-		for (int i = 0; i < labels.length; i++) {
-			field.addChild(new Element("option",
-																 new Element[] {
-																	 new Element(VALUE_EL,
-																		 XMLUtils.escape(options[i])) }, new String[] {
-																			 "label" }, new String[] {
-																			 XMLUtils.escape(labels[i]) }));
-		}
-		x.addChild(field);
+		DataForm.addFieldValue( command, f_name, f_value, label, labels, options, type);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param f_name
-	 * @param f_value
-	 * @param type
-	 */
 	public static void addFieldValue(final Packet packet, final String f_name,
 																	 final String f_value, final String type) {
 		Element iq      = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL);
-		Element x       = command.getChild("x", "jabber:x:data");
-
-		if (x == null) {
-			x = addDataForm(command, DataType.submit);
-		}
-
-		Element field = new Element(FIELD_EL,
-																new Element[] {
-																	new Element(VALUE_EL,
-																		XMLUtils.escape(f_value)) }, new String[] { "var",
-						"type" }, new String[] { XMLUtils.escape(f_name), type });
-
-		x.addChild(field);
+		DataForm.addFieldValue( command, f_name, f_value, type );
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param f_name
-	 * @param f_value
-	 * @param type
-	 * @param label
-	 */
 	public static void addFieldValue(final Packet packet, final String f_name,
 																	 final String f_value, final String type,
 																	 final String label) {
 		Element iq      = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL);
-		Element x       = command.getChild("x", "jabber:x:data");
-
-		if (x == null) {
-			x = addDataForm(command, DataType.submit);
-		}
-
-		Element field = new Element(FIELD_EL,
-																new Element[] {
-																	new Element(VALUE_EL,
-																		XMLUtils.escape(f_value)) }, new String[] { "var",
-						"type", "label" }, new String[] { XMLUtils.escape(f_name), type,
-						XMLUtils.escape(label) });
-
-		x.addChild(field);
+		DataForm.addFieldValue( command, f_name, f_value, type, label);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param f_name
-	 * @param f_value
-	 */
 	public static void addHiddenField(Packet packet, String f_name, String f_value) {
-		addFieldValue(packet, f_name, f_value, "hidden");
+		Element iq      = packet.getElement();
+		Element command = iq.getChild(COMMAND_EL);
+		DataForm.addFieldValue(command, f_name, f_value, "hidden");
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param instructions
-	 */
 	public static void addInstructions(final Packet packet, final String instructions) {
 		Element iq      = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL);
-		Element x       = command.getChild("x", "jabber:x:data");
-
-		if (x == null) {
-			x = addDataForm(command, DataType.submit);
-		}
-		x.addChild(new Element("instructions", instructions));
+		DataForm.addInstructions( command, instructions);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param note
-	 */
 	public static void addNote(final Packet packet, final String note) {
 		Element iq      = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL);
@@ -696,49 +494,18 @@ public enum Command {
 		notes.setCData(XMLUtils.escape(note));
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param f_name
-	 * @param f_value
-	 */
 	public static void addTextField(Packet packet, String f_name, String f_value) {
-		addFieldValue(packet, f_name, f_value, "fixed");
+		Element iq      = packet.getElement();
+		Element command = iq.getChild(COMMAND_EL);
+		DataForm.addFieldValue(command, f_name, f_value, "fixed");
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param title
-	 */
 	public static void addTitle(final Packet packet, final String title) {
 		Element iq      = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL);
-		Element x       = command.getChild("x", "jabber:x:data");
-
-		if (x == null) {
-			x = addDataForm(command, DataType.submit);
-		}
-		x.addChild(new Element("title", title));
+		DataForm.addTitle( command, title);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param from
-	 * @param to
-	 * @param type
-	 * @param id
-	 * @param node
-	 * @param data_type
-	 *
-	 * 
-	 */
 	public static Element createIqCommand(JID from, JID to, final StanzaType type,
 					final String id, final String node, final DataType data_type) {
 		Element iq = createCommandEl(from, to, type, id, node, data_type);
@@ -746,18 +513,6 @@ public enum Command {
 		return iq;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 *
-	 * 
-	 */
 	public static Action getAction(final Packet packet) {
 		String action = packet.getAttributeStaticStr(Iq.IQ_COMMAND_PATH, "action");
 
@@ -768,15 +523,6 @@ public enum Command {
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param f_name
-	 *
-	 * 
-	 */
 	public static boolean getCheckBoxFieldValue(Packet packet, String f_name) {
 		String result = getFieldValue(packet, f_name);
 
@@ -788,14 +534,6 @@ public enum Command {
 		return result.equalsIgnoreCase("true") || result.equals("1");
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 *
-	 * 
-	 */
 	public static List<Element> getData(final Packet packet) {
 		Element iq      = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL);
@@ -803,16 +541,6 @@ public enum Command {
 		return command.getChildren();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param el_name
-	 * @param xmlns
-	 *
-	 * 
-	 */
 	public static Element getData(final Packet packet, final String el_name,
 																final String xmlns) {
 		Element iq      = packet.getElement();
@@ -821,15 +549,6 @@ public enum Command {
 		return command.getChild(el_name, xmlns);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param f_name
-	 *
-	 * 
-	 */
 	public static String getFieldValue(Packet packet, String f_name) {
 		Element iq      = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL, XMLNS);
@@ -855,16 +574,6 @@ public enum Command {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param f_name
-	 * @param debug
-	 *
-	 * 
-	 */
 	public static String getFieldValue(final Packet packet, final String f_name,
 																		 boolean debug) {
 		Element iq = packet.getElement();
@@ -905,126 +614,27 @@ public enum Command {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param f_name
-	 *
-	 * 
-	 */
 	public static String[] getFieldValues(final Packet packet, final String f_name) {
 		Element iq      = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL, XMLNS);
-		Element x       = command.getChild("x", "jabber:x:data");
 
-		if (x != null) {
-			List<Element> children = x.getChildren();
-
-			if (children != null) {
-				for (Element child : children) {
-					if (child.getName().equals(FIELD_EL) &&
-							child.getAttributeStaticStr("var").equals(f_name)) {
-						List<String> values        = new LinkedList<String>();
-						List<Element> val_children = child.getChildren();
-
-						if (val_children != null) {
-							for (Element val_child : val_children) {
-								if (val_child.getName().equals(VALUE_EL)) {
-									String value = val_child.getCData();
-
-									if (value != null) {
-										values.add(XMLUtils.unescape(value));
-									}
-								}
-							}
-						}
-
-						return values.toArray(new String[0]);
-					}
-				}
-			}
-		}
-
-		return null;
+		return DataForm.getFieldValues( command, f_name);
 	}
 
-	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param f_name
-	 *
-	 * 
-	 */
 	public static boolean removeFieldValue(final Packet packet, final String f_name) {
 		Element iq      = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL, XMLNS);
-		Element x       = command.getChild("x", "jabber:x:data");
 
-		if (x != null) {
-			List<Element> children = x.getChildren();
-
-			if (children != null) {
-				for (Element child : children) {
-					if (child.getName().equals(FIELD_EL) &&
-							child.getAttributeStaticStr("var").equals(f_name)) {
-						return x.removeChild(child);
-					}
-				}
-			}
-		}
-
-		return false;
+		return DataForm.removeFieldValue( command, f_name);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param f_name
-	 *
-	 * 
-	 */
 	public static String getFieldKeyStartingWith(Packet packet, String f_name) {
 		Element iq      = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL, XMLNS);
-		Element x       = command.getChild("x", "jabber:x:data");
 
-		if (x != null) {
-			List<Element> children = x.getChildren();
-
-			if (children != null) {
-				for (Element child : children) {
-					if (child.getName().equals(FIELD_EL) &&
-							child.getAttributeStaticStr("var").startsWith(f_name)) {
-						return child.getAttributeStaticStr("var");
-					}
-				}
-			}
-		}
-
-		return null;
+		return DataForm.getFieldKeyStartingWith( command, f_name);
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param data
-	 */
 	public static void setData(final Packet packet, final Element data) {
 		Element iq      = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL);
@@ -1032,13 +642,6 @@ public enum Command {
 		command.addChild(data);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param data
-	 */
 	public static void setData(final Packet packet, final List<Element> data) {
 		Element iq      = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL);
@@ -1046,13 +649,6 @@ public enum Command {
 		command.addChildren(data);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param packet
-	 * @param status
-	 */
 	public static void setStatus(final Packet packet, final Status status) {
 		Element iq      = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL);
@@ -1060,18 +656,6 @@ public enum Command {
 		command.setAttribute("status", status.toString());
 	}
 
-	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param cmd
-	 *
-	 * 
-	 */
 	public static Command valueof(String cmd) {
 		try {
 			return Command.valueOf(cmd);
@@ -1148,19 +732,6 @@ public enum Command {
 		command.setAttribute("status", status.name());
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param from
-	 * @param to
-	 * @param type
-	 * @param id
-	 *
-	 * 
-	 */
 	public Packet getPacket(JID from, JID to, final StanzaType type, final String id) {
 		Element elem  = createIqCommand(from, to, type, id, this.toString(), null);
 		Packet result = Packet.packetInstance(elem, from, to);
@@ -1176,18 +747,6 @@ public enum Command {
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param from
-	 * @param to
-	 * @param type
-	 * @param id
-	 * @param data_type
-	 *
-	 * 
-	 */
 	public Packet getPacket(JID from, JID to, StanzaType type, String id,
 													DataType data_type) {
 		Element elem  = createIqCommand(from, to, type, id, this.toString(), data_type);
@@ -1199,5 +758,3 @@ public enum Command {
 	}
 }    // Command
 
-
-//~ Formatted in Tigase Code Convention on 13/03/04
