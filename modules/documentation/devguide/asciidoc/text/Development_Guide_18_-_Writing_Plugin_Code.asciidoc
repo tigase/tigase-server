@@ -23,14 +23,55 @@ If you look inside any of these interfaces you find only a single method. This i
 - *Queue<Packet> results* - this a collection with packets which have been generated as input packet processing results. Regardless a response to a user request is sent or the packet is forwarded to it's destination it is always required that a copy of the input packet is created and stored in the *results* queue.
 - *Map<String, Object> settings* - this map keeps plugin specific settings loaded from the Tigase server configuration. In most cases it is unused, however if the plugin needs to access an external database that this is a way to pass database connection string to the plugin.
 
-After a closer look in some of the interfaces you can see that they extend another interface: link:https://svn.tigase.org/reps/tigase-server/trunk/src/main/java/tigase/xmpp/XMPPImplIfc.java[XMPPImplIfc] which provides a basic meta information about the plugin implementation. Please refer to JavaDoc documentation for all details.
+After a closer look in some of the interfaces you can see that they extend another interface: link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/xmpp/XMPPImplIfc.java[XMPPImplIfc] which provides a basic meta information about the plugin implementation. Please refer to JavaDoc documentation for all details.
 
-For purpose of this guide we are implementing a simple plugin handling all *<message/>* packets, that is forwarding packets to the destination address. Incoming packets are forwarded to the user connection and outgoing packets are forwarded to the external destination address. This link:https://svn.tigase.org/reps/tigase-server/trunk/src/main/java/tigase/xmpp/impl/Message.java[message plugin] is actually implemented already and it is available in our SVN repository. The code has some comments inside already but this guide goes deeper into the implementation details.
+For purpose of this guide we are implementing a simple plugin handling all *<message/>* packets, that is forwarding packets to the destination address. Incoming packets are forwarded to the user connection and outgoing packets are forwarded to the external destination address. This link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/xmpp/impl/Message.java[message plugin] is actually implemented already and it is available in our Git repository. The code has some comments inside already but this guide goes deeper into the implementation details.
 
-First of all you have to chose what kind of plugin you want to implement. If this is going to be a packet processor you have to implement *XMPPProcessorIfc* interface, if this is going to be pre-processor then you have to implement *XMPPPreprocessorIfc* interface. Of course your implementation can implement more than one interface, even all. It depends on your use case and needs. There is also an abstract helper class which you should use as a base for all you plugins. The class declaration should look like this (assuming you implement just packet processor):
+First of all you have to chose what kind of plugin you want to implement. If this is going to be a packet processor you have to implement *XMPPProcessorIfc* interface, if this is going to be pre-processor then you have to implement *XMPPPreprocessorIfc* interface. Of course your implementation can implement more than one interface, even all. It depends on your use case and needs. There are also two abstract helper classes from which you should use one as a base for all you plugins *XMPPProcessor* or *AnnotatedXMPPProcessor* for annotation support.
+
+
+Using annotation support
+------------------------
+The class declaration should look like this (assuming you implement just packet processor):
 
 [source,java]
-public class Message extends XMPPProcessor 
+public class Message extends AnnotatedXMPPProcessor
+   implements XMPPProcessorIfc
+
+The first thing to create is the plugin *ID*. This is a unique string which you put in the configuration file to tell the server to load and use the plugin. In most cases you can use XMLNS if the plugin wants packets with elements with a very specific name space. Of course there is no guarantee there is no other packet for this specific XML element too. As I want to process all messages and I don't want to spend whole day on thinking about a cool ID let's say our ID is: \'message'.
+
+A plugin informs about it's using static *ID* field and *@Id* annotation placed on class:
+
+[source,java]
+------------------------------------------------------------------------------------
+@Id(ID)
+public class Message extends AnnotatedXMPPProcessor
+   implements XMPPProcessorIfc {
+  protected static final String ID = "message";
+}
+------------------------------------------------------------------------------------
+
+As I mentioned before such a plugin receives only this kind of packets for processing which it is interested in. My plugin is interested only in packets with *<message/>* elements and only if they are in "*jabber:client*" namespace. To indicate all supported elements and namespaces we have to add 2 more annotations:
+
+[source,java]
+------------------------------------------------------------------------------------
+@Id(ID)
+@Handles({
+  @Handle(path={ "message" },xmlns="jabber:client")
+})
+public class Message extends AnnotatedXMPPProcessor
+   implements XMPPProcessorIfc {
+  private static final String ID = "message";
+}
+------------------------------------------------------------------------------------
+
+
+Using older non-annotation based implementation
+-----------------------------------------------
+The class declaration should look like this (assuming you implement just packet processor):
+
+[source,java]
+public class Message extends XMPPProcessor
    implements XMPPProcessorIfc
 
 
@@ -46,16 +87,19 @@ As I mentioned before such a plugin receives only this kind of packets for proce
 
 [source,java]
 ----------------------------------------
-public String[] supElements() { 
-  return new String[] {"message"}; 
+public String[] supElements() {
+  return new String[] {"message"};
 }
 
-public String[] supNamespaces()	{ 
-  return new String[] {"jabber:client"}; 
+public String[] supNamespaces()	{
+  return new String[] {"jabber:client"};
 }
 ----------------------------------------
 
-Now we have our plugin prepared for loading it to the Tigase server. The next step is the actual packet processing method. For the complete code, please refer to the plugin in the SVN. I will only comment here on elements which might be confusing or add a few more lines of code which might be helpful in your case.
+Implementation of processing method
+-----------------------------------
+
+Now we have our plugin prepared for loading it to the Tigase server. The next step is the actual packet processing method. For the complete code, please refer to the plugin in the Git. I will only comment here on elements which might be confusing or add a few more lines of code which might be helpful in your case.
 
 [source,java,numbered]
 ------------------------------------------------------------------------------------
@@ -151,4 +195,3 @@ public void process(Packet packet, XMPPResourceConnection session,
 	}    // end of try-catch
 }
 ------------------------------------------------------------------------------------
-
