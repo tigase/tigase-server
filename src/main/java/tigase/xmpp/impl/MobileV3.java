@@ -45,6 +45,9 @@ import tigase.server.Packet;
 import tigase.xml.Element;
 
 import tigase.xmpp.*;
+import tigase.xmpp.impl.annotation.*;
+
+import static tigase.xmpp.impl.MobileV3.*;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -55,8 +58,15 @@ import tigase.xmpp.*;
  *
  * @author andrzej
  */
+@Id(ID)
+@Handles({
+	@Handle(path={Iq.ELEM_NAME, MOBILE_EL_NAME},xmlns=XMLNS)
+})
+@StreamFeatures({
+	@StreamFeature(elem=MOBILE_EL_NAME,xmlns=XMLNS)
+})
 public class MobileV3
-				extends XMPPProcessor
+				extends AnnotatedXMPPProcessor
 				implements XMPPProcessorIfc, XMPPPacketFilterIfc {
 	
 	private static class StateHolder { 
@@ -87,19 +97,13 @@ public class MobileV3
 	
 	// default values
 	private static final int    DEF_MAX_QUEUE_SIZE_VAL = 50;
-	private static final String ID                     = "mobile_v3";
+	protected static final String ID                     = "mobile_v3";
 	private static final Logger log = Logger.getLogger(MobileV3.class.getCanonicalName());
 
 	// keys
 	private static final String     MAX_QUEUE_SIZE_KEY = "max-queue-size";
-	private static final String     MOBILE_EL_NAME     = "mobile";
-	private static final String     XMLNS = "http://tigase.org/protocol/mobile#v3";
-	private static final String[][] ELEMENT_PATHS      = {
-		{ Iq.ELEM_NAME, MOBILE_EL_NAME }
-	};
-	private static final String[]   XMLNSS             = { XMLNS };
-	private static final Element[]  SUP_FEATURES = { new Element(MOBILE_EL_NAME,
-			new String[] { "xmlns" }, new String[] { XMLNS }) };
+	protected static final String     MOBILE_EL_NAME     = "mobile";
+	protected static final String     XMLNS = "http://tigase.org/protocol/mobile#v3";
 	private static final String PRESENCE_QUEUE_KEY = ID + "-presence-queue";
 	private static final String PACKET_QUEUE_KEY = ID + "-packet-queue";
 
@@ -120,11 +124,6 @@ public class MobileV3
 	}
 	
 	//~--- methods --------------------------------------------------------------
-
-	@Override
-	public String id() {
-		return ID;
-	}
 
 	@Override
 	public void init(Map<String, Object> settings) throws TigaseDBException {
@@ -189,17 +188,7 @@ public class MobileV3
 			Logger.getLogger(MobileV3.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
-
-	@Override
-	public String[][] supElementNamePaths() {
-		return ELEMENT_PATHS;
-	}
-
-	@Override
-	public String[] supNamespaces() {
-		return XMLNSS;
-	}
-
+	
 	@Override
 	public Element[] supStreamFeatures(XMPPResourceConnection session) {
 		if (session == null) {
@@ -209,7 +198,7 @@ public class MobileV3
 			return null;
 		}
 
-		return SUP_FEATURES;
+		return super.supStreamFeatures(session);
 	}
 
 	@Override

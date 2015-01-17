@@ -22,8 +22,13 @@
 package tigase.xmpp.impl.annotation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import tigase.xml.Element;
+import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPResourceConnection;
 
@@ -40,6 +45,7 @@ public abstract class AnnotatedXMPPProcessor extends XMPPProcessor {
 	private String[] XMLNSS;
 	private Element[] DISCO_FEATURES;
 	private Element[] STREAM_FEATURES;
+	private Set<StanzaType> STANZA_TYPES;
 	
 	private String ID;
 	
@@ -56,12 +62,15 @@ public abstract class AnnotatedXMPPProcessor extends XMPPProcessor {
 		// support for supported elements paths and xmlnss
 		processHandleAnnotation(cls);
 		
+		// support for supported type of stanzas
+		processHandleStazaTypesAnnotation(cls);		
+		
 		// support for stream features
 		processStreamFeaturesAnnotation(cls);
 		
 		// support for disco features
 		processDiscoFeaturesAnnotation(cls);
-
+		
 		cmpInfo = null;
 	}
 	
@@ -90,6 +99,11 @@ public abstract class AnnotatedXMPPProcessor extends XMPPProcessor {
 		return STREAM_FEATURES;
 	}
 
+	@Override
+	public Set<StanzaType> supTypes() {
+		return STANZA_TYPES;
+	}
+	
 	private void processHandleAnnotation(Class cls) {
 		List<String[]> elems = new ArrayList<String[]>();
 		List<String> xmlnss = new ArrayList<String>();
@@ -145,5 +159,15 @@ public abstract class AnnotatedXMPPProcessor extends XMPPProcessor {
 			}
 			DISCO_FEATURES = values.toArray(new Element[values.size()]);
 		}		
+	}
+
+	private void processHandleStazaTypesAnnotation(Class cls) {
+		HandleStanzaTypes handleStanzaTypes = (HandleStanzaTypes) cls.getAnnotation(HandleStanzaTypes.class);
+		if (handleStanzaTypes != null) {
+			StanzaType[] types = handleStanzaTypes.value();
+			EnumSet<StanzaType> tmp = EnumSet.noneOf(StanzaType.class);
+			tmp.addAll(Arrays.asList(types));
+			STANZA_TYPES = tmp;
+		}
 	}
 }

@@ -44,9 +44,11 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPPacketFilterIfc;
 import tigase.xmpp.XMPPPreprocessorIfc;
-import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.impl.annotation.*;
+
+import static tigase.xmpp.impl.Message.*;
 
 /**
  * Message forwarder class. Forwards <code>Message</code> packet to it's destination
@@ -57,29 +59,23 @@ import tigase.xmpp.XMPPResourceConnection;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Id(ELEM_NAME)
+@Handles({
+	@Handle(path={ ELEM_NAME },xmlns=XMLNS)
+})
 public class Message
-				extends XMPPProcessor
+				extends AnnotatedXMPPProcessor
 				implements XMPPProcessorIfc, XMPPPreprocessorIfc, XMPPPacketFilterIfc {
 
-	private static final String     ELEM_NAME = tigase.server.Message.ELEM_NAME;
-	private static final String[][] ELEMENTS  = {
-		{ ELEM_NAME }
-	};
-	private static final String     ID        = ELEM_NAME;
+	protected static final String     ELEM_NAME = tigase.server.Message.ELEM_NAME;
 
 	/** Class logger */
 	private static final Logger   log    = Logger.getLogger(Message.class.getName());
 	private static final String   DELIVERY_RULES_KEY = "delivery-rules";
-	private static final String   XMLNS  = "jabber:client";
-	private static final String[] XMLNSS = { XMLNS };
+	protected static final String   XMLNS  = "jabber:client";
 
 	private MessageDeliveryRules deliveryRules = MessageDeliveryRules.inteligent;
 	//~--- methods --------------------------------------------------------------
-
-	@Override
-	public String id() {
-		return ID;
-	}
 
 	@Override
 	public void init(Map<String, Object> settings) throws TigaseDBException {
@@ -290,19 +286,9 @@ public class Message
 	public boolean preProcess(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
 		boolean result = C2SDeliveryErrorProcessor.preProcess(packet, session, repo, results, settings);
 		if (result) {
-			packet.processedBy(ID);
+			packet.processedBy(id());
 		}
 		return result;
-	}
-
-	@Override
-	public String[][] supElementNamePaths() {
-		return ELEMENTS;
-	}
-
-	@Override
-	public String[] supNamespaces() {
-		return XMLNSS;
 	}
 
 	private static enum MessageDeliveryRules {

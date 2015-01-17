@@ -1,5 +1,5 @@
 /*
- * TestAnnotatedXMPPProcessor.java
+ * HandleStanzaTypes.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2015 "Tigase, Inc." <office@tigase.com>
@@ -21,33 +21,17 @@
  */
 package tigase.xmpp.impl.annotation;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import tigase.xmpp.StanzaType;
-import static tigase.xmpp.impl.annotation.TestAnnotatedXMPPProcessor.*;
 
 /**
- *
+ * Annotation which placed on {@link tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor AnnotatedXMPPProcessor}
+ * can define which stanza types are supported by implemented processor
+ * 
  * @author andrzej
  */
-@Id(ID)
-@Handles({
-	@Handle(path={ "iq", "query" }, xmlns=XMLNS1),
-	@Handle(pathStr=IQ_QUERY_PATH, xmlns=XMLNS2)
-})
-@DiscoFeatures({
-	XMLNS1,
-	XMLNS2
-})
-@StreamFeatures({
-	@StreamFeature(elem="bind", xmlns="urn:ietf:params:xml:ns:xmpp-bind")
-})
-@HandleStanzaTypes({
-	StanzaType.get
-})
-class TestAnnotatedXMPPProcessor extends AnnotatedXMPPProcessor {
-	
-	protected static final String ID = "test-123";
-	protected static final String XMLNS1 = "tigase:test1";
-	protected static final String XMLNS2 = "tigase:test2";
-	protected static final String IQ_QUERY_PATH = "iq/query";
-	
+@Retention(RetentionPolicy.RUNTIME)
+public @interface HandleStanzaTypes {
+	StanzaType[] value();
 }

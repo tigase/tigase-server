@@ -36,7 +36,6 @@ import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 
@@ -45,7 +44,9 @@ import tigase.xmpp.XMPPResourceConnection;
 import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
+import tigase.xmpp.impl.annotation.*;
 
+import static tigase.xmpp.impl.SessionBind.*;
 /**
  * Describe class SessionBind here.
  *
@@ -55,28 +56,20 @@ import java.util.Queue;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Id(XMLNS)
+@Handle(path={ Iq.ELEM_NAME, "session" }, xmlns=XMLNS)
+@StreamFeatures(
+	@StreamFeature(elem="session", xmlns=XMLNS)
+)
+@DiscoFeatures({ XMLNS })
 public class SessionBind
-				extends XMPPProcessor
+				extends AnnotatedXMPPProcessor
 				implements XMPPProcessorIfc {
 	private static final String     SESSION_KEY = "Session-Set";
-	private static final String     XMLNS       = "urn:ietf:params:xml:ns:xmpp-session";
+	protected static final String     XMLNS       = "urn:ietf:params:xml:ns:xmpp-session";
 	private static final Logger     log = Logger.getLogger(SessionBind.class.getName());
-	private static final String     ID          = XMLNS;
-	private static final String[][] ELEMENTS    = {
-		{ Iq.ELEM_NAME, "session" }
-	};
-	private static final String[]   XMLNSS      = { XMLNS };
-	private static final Element[]  FEATURES = { new Element("session", new String[] {
-			"xmlns" }, new String[] { XMLNS }) };
-	private static final Element[] DISCO_FEATURES = { new Element("feature", new String[] {
-			"var" }, new String[] { XMLNS }) };
 
 	//~--- methods --------------------------------------------------------------
-
-	@Override
-	public String id() {
-		return ID;
-	}
 
 	@Override
 	public void process(final Packet packet, final XMPPResourceConnection session,
@@ -112,25 +105,10 @@ public class SessionBind
 	}
 
 	@Override
-	public Element[] supDiscoFeatures(final XMPPResourceConnection session) {
-		return DISCO_FEATURES;
-	}
-
-	@Override
-	public String[][] supElementNamePaths() {
-		return ELEMENTS;
-	}
-
-	@Override
-	public String[] supNamespaces() {
-		return XMLNSS;
-	}
-
-	@Override
 	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
 		if ((session != null) && (session.getSessionData(SESSION_KEY) == null) && session
 				.isAuthorized()) {
-			return FEATURES;
+			return super.supStreamFeatures(session);
 		} else {
 			return null;
 		}    // end of if (session.isAuthorized()) else

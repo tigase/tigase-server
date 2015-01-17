@@ -28,6 +28,7 @@ import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.ProcessorFactory;
+import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.impl.SessionBind;
 
@@ -51,6 +52,7 @@ public class AnnotatedXMPPProcessorTest {
 		Assert.assertArrayEquals("Wrong stream features", new Element[] {
 			new Element("bind", new String[] { "xmlns" }, new String[] { "urn:ietf:params:xml:ns:xmpp-bind" })
 		}, test1.supStreamFeatures(null));
+		Assert.assertTrue("Stanza type not set as 'get'", test1.supTypes().contains(StanzaType.get));
 	}
 
 	@Test

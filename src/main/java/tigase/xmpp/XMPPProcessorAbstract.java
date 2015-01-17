@@ -39,6 +39,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
+import tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor;
 
 /**
  * Utility abstract class detecting what kind of packet is processed. Releases developers from
@@ -51,7 +52,7 @@ import java.util.Queue;
  * @version $Rev$
  */
 public abstract class XMPPProcessorAbstract
-				extends XMPPProcessor
+				extends AnnotatedXMPPProcessor
 				implements XMPPProcessorIfc {
 	private static final Logger log = Logger.getLogger(XMPPProcessorAbstract.class
 			.getName());
