@@ -112,5 +112,12 @@ $ scripts/tigase.sh stop
 $ scripts/tigase.sh start
 -------------------------------------
 
-Everything should be running smooth at this point. Check the logfiles in logs/ if you experience any problems.
+To further fine tune the server you should edit etc/tigase.conf. Ensure *JAVA_HOME* path is correct, and increase memory if needed using *JAVA_OPTIONS* -Xmx (max), and -Xms (initial). You will need to direct Tigase to read settings from this file on startup as follows.
+
+[source,bash]
+-------------------------------------
+$ scripts/tigase.sh start etc/tigase.conf
+-------------------------------------
+
+Everything should be running smooth at this point. Check the logfiles in logs/ if you experience any problems. 
 

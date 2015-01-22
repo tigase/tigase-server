@@ -19,7 +19,7 @@ Before you can start the GUI installer you will need to have working Java enviro
 Download the Installer
 ----------------------
 
-You can always find the newest Tigase packages in the link:http://www.tigase.org/content/tigase-downloads?fid=1624[download section].  When you enter the page, you will be presented a list of files to choose from.  You may be sceptic at the beginning as there are lot of choices, but you don't have to. All Tigase binary packages have conventional names, which help to differentiate them easily. They are of form *tigase-server-x.y.z-bv.ext* where 'x', 'y', 'z' and 'v' are version numbers and they change from a release to release. Ext is the file extension which in the case of our GUI installation program is *.jar*. We recommend you to download the latest version (highest version number) of the server as it contains latest functions and improvements
+You can always find the newest Tigase packages in the link:https://projects.tigase.org/projects/tigase-server/files[download section].  When you enter the page, you will be presented a list of files to choose from.  You may be sceptic at the beginning as there are lot of choices, but you don't have to. All Tigase binary packages have conventional names, which help to differentiate them easily. They are of form *tigase-server-x.y.z-bv.ext* where 'x', 'y', 'z' and 'v' are version numbers and they change from a release to release. Ext is the file extension which in the case of our GUI installation program is *.jar*. We recommend you to download the latest version (highest version number) of the server as it contains latest functions and improvements
 
 Run the jar File
 ----------------
