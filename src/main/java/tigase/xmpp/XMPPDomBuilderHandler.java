@@ -81,6 +81,7 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 	private boolean error = false;
 	private ArrayDeque<Element> el_stack = new ArrayDeque<>(10);
 	private ArrayDeque<Element> all_roots = new ArrayDeque<>(1);
+	private boolean streamClosed = false;
 
 	/**
 	 * Protection from the system overload and DOS attack. We want to limit number
@@ -141,8 +142,10 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 		String tmp_name = name.toString();
 
 		if (tmp_name.equals(ELEM_STREAM_STREAM)) {
-			service.xmppStreamClosed();
-
+			// we should not call xmppStreamClosed() as we still may have received 
+			// some packets which may not be processed correctly if we close stream now!
+			//service.xmppStreamClosed();
+			streamClosed = true;
 			return;
 		}    // end of if (tmp_name.equals(ELEM_STREAM_STREAM))
 
@@ -189,6 +192,10 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 
 	//~--- methods --------------------------------------------------------------
 
+	public boolean isStreamClosed() {
+		return streamClosed;
+	}
+	
 	@Override
 	public void otherXML(StringBuilder other) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -257,6 +264,7 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 		String tmp_name = name.toString();
 
 		if (tmp_name.equals(ELEM_STREAM_STREAM)) {
+			streamClosed = false;
 			Map<String, String> attribs = new HashMap<String, String>();
 
 			if (attr_names != null) {

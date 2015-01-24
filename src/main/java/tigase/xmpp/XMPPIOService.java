@@ -727,7 +727,10 @@ public class XMPPIOService<RefObject>
 					log.log(Level.INFO, toString() + ", Incorrect XML data: " + new String(data) +
 							", stopping connection: " + getConnectionId() + ", exception: ", ex);
 					forceStop();
-				}    // end of try-catch
+				} finally {
+					if (domHandler.isStreamClosed())
+						xmppStreamClosed();
+				}  // end of try-catch
 				data = readData();
 			}
 		} else {
