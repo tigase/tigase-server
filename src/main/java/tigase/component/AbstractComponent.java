@@ -53,14 +53,14 @@ import tigase.xmpp.StanzaType;
 
 /**
  * Base class for implement XMPP Component.
- * 
+ *
  * @author bmalkow
- * 
+ *
  * @param <CTX>
  *            {@link Context} of component Should be extended.
  */
 public abstract class AbstractComponent<CTX extends Context> extends AbstractMessageReceiver implements XMPPService,
-		DisableDisco {
+DisableDisco {
 
 	protected static final String COMPONENT = "component";
 
@@ -93,8 +93,8 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 
 		@Override
 		public void fire(Element event) {
-			event.addChild(new Element("eventSource", getComponentId().toString()));
-			event.addChild(new Element("eventTimestamp", Long.toString(System.currentTimeMillis())));
+			event.setAttribute("eventSource", getComponentId().toString());
+			event.setAttribute("eventTimestamp", Long.toString(System.currentTimeMillis()));
 
 			eventBus.fire(event);
 		}
@@ -145,7 +145,7 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 
 	/**
 	 * Constructs ...
-	 * 
+	 *
 	 */
 	public AbstractComponent() {
 		this(null);
@@ -172,20 +172,20 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 	/**
 	 * Creates {@link Context} particular for component implementation. Called
 	 * once.
-	 * 
+	 *
 	 * @return context instance.
 	 */
 	protected abstract CTX createContext();
 
 	/**
 	 * Creates instance of module.
-	 * 
+	 *
 	 * @param moduleClass
 	 *            class of module
 	 * @return instance of module.
 	 */
 	protected Module createModuleInstance(Class<Module> moduleClass) throws InstantiationException, IllegalAccessException,
-			IllegalArgumentException, InvocationTargetException {
+	IllegalArgumentException, InvocationTargetException {
 		log.finer("Create instance of: " + moduleClass.getName());
 		for (Constructor<?> x : moduleClass.getConstructors()) {
 			Object[] args = new Object[x.getParameterTypes().length];
@@ -225,14 +225,14 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 
 	/**
 	 * Returns version of component. Used for Service Discovery purposes.
-	 * 
+	 *
 	 * @return version of component.
 	 */
 	public abstract String getComponentVersion();
 
 	/**
 	 * Returns {@link Context} of component.
-	 * 
+	 *
 	 * @return
 	 */
 	protected CTX getContext() {
@@ -242,11 +242,11 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 	/**
 	 * Returns default map of components. Keys in map are used as component
 	 * identifiers.<br>
-	 * 
+	 *
 	 * This map may be modified by <code>init.properties</code>:<br>
 	 * <code>&lt;component_name&gt;/modules/&lt;module_name&gt;[S]=&lt;module_class&gt;</code>
-	 * 
-	 * 
+	 *
+	 *
 	 * @return map of default modules.
 	 */
 	protected abstract Map<String, Class<? extends Module>> getDefaultModulesList();
@@ -271,7 +271,7 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 	/**
 	 * Returns {@link ModuleProvider}. It allows to retrieve instance of module
 	 * by given ID.
-	 * 
+	 *
 	 * @return {@link ModuleProvider}.
 	 */
 	public ModuleProvider getModuleProvider() {
@@ -280,7 +280,7 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 
 	/**
 	 * Returns {@link PacketWriter}.
-	 * 
+	 *
 	 * @return {@link PacketWriter}.
 	 */
 	public PacketWriter getWriter() {
@@ -297,12 +297,12 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 
 	/**
 	 * Initialising component modules.
-	 * 
+	 *
 	 * @param props
 	 *            component properties.
 	 */
 	protected void initModules(Map<String, Object> props) throws InstantiationException, IllegalAccessException,
-			IllegalArgumentException, InvocationTargetException {
+	IllegalArgumentException, InvocationTargetException {
 		for (Entry<String, Object> e : props.entrySet()) {
 			try {
 				if (e.getKey().startsWith("modules/")) {
@@ -321,14 +321,14 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 	/**
 	 * Is this component discoverable by disco#items for domain by non admin
 	 * users.
-	 * 
+	 *
 	 * @return <code>true</code> - if yes
 	 */
 	public abstract boolean isDiscoNonAdmin();
 
 	/**
 	 * Checks if module with given identifier is registered already.
-	 * 
+	 *
 	 * @param id
 	 *            module identifier.
 	 * @return <code>true</code> if module is registered. Otherwise
@@ -340,8 +340,8 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 
 	@Override
 	public void processPacket(Packet packet) {
-		if ( log.isLoggable( Level.FINER ) ){
-			log.finer( "Received: " + packet.getElement() );
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("Received: " + packet.getElement());
 		}
 		try {
 			Runnable responseHandler = responseManager.getResponseHandler(packet);
@@ -387,7 +387,7 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 	/**
 	 * Registers module. If there is module registered with given ID, it will be
 	 * unregistered.
-	 * 
+	 *
 	 * @param id
 	 *            identifier of module.
 	 * @param module
@@ -405,8 +405,8 @@ public abstract class AbstractComponent<CTX extends Context> extends AbstractMes
 	/**
 	 * Converts {@link ComponentException} to XMPP error stanza and sends it to
 	 * sender of packet.
-	 * 
-	 * 
+	 *
+	 *
 	 * @param packet
 	 *            packet what caused exception.
 	 * @param e

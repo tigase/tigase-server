@@ -2,7 +2,6 @@ package tigase.disteventbus.component;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -23,7 +22,6 @@ import tigase.disteventbus.component.stores.AffiliationStore;
 import tigase.disteventbus.component.stores.SubscriptionStore;
 import tigase.disteventbus.impl.LocalEventBus;
 import tigase.stats.StatisticsList;
-import tigase.xml.Element;
 
 public class EventBusComponent extends AbstractComponent<EventBusContext> implements ClusteredComponentIfc {
 
@@ -76,20 +74,6 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 	@Override
 	protected EventBusContext createContext() {
 		return new EventBusContextImpl(this);
-	}
-
-	@Override
-	public synchronized void everyMinute() {
-		super.everyMinute();
-
-		Date t = new Date();
-		Element event = new Element("Time", new String[] { "xmlns" }, new String[] { COMPONENT_EVENTS_XMLNS });
-		event.addChild(new Element("time", "" + t.getTime()));
-		event.addChild(new Element("timeDesc", t.toString()));
-		event.addChild(new Element("counter", "" + (++counter)));
-
-		context.getEventBus().fire(event);
-
 	}
 
 	@Override
