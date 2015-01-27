@@ -65,7 +65,7 @@ public class AdHocCommandManager {
 	 * Method description
 	 *
 	 *
-	 * @param element
+	 * @param packet
 	 *
 	 * @return
 	 *
