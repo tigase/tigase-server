@@ -502,6 +502,7 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 				<fileset dir="./jars" targetdir="${INSTALL_PATH}/${jarsDir}">
 					<include name="jetty-osgi-boot.jar"/>
 					<include name="tigase-http-api.jar"/>
+					<include name="tigase-web-ui.war"/>
 					<include name="javax.servlet.jar"/>
 					<include name="jetty-continuation.jar"/>
 					<include name="jetty-deploy.jar"/>
