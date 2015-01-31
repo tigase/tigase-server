@@ -43,6 +43,8 @@ import tigase.net.*;
 
 import tigase.server.script.CommandIfc;
 
+import tigase.xmpp.BareJID;
+
 import tigase.stats.StatisticsList;
 import tigase.util.DataTypes;
 import tigase.xml.Element;
@@ -1286,9 +1288,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 					"remote-hostname");
 
 			log.log(Level.FINER,
-					"Reconnecting service for: {0}, scheduling next try in {1}secs, cid: {2}",
-					new Object[] { getName(),
-					delay / 1000, cid });
+					"Reconnecting service for: {0}, scheduling next try in {1}secs, cid: {2}, props: {3}",
+					new Object[] { getName(), delay / 1000, cid, port_props });
 		}
 		addTimerTask(new tigase.util.TimerTask() {
 			@Override
@@ -1351,8 +1352,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			String cid = "" + port_props.get("local-hostname") + "@" + port_props.get(
 					"remote-hostname");
 
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Accept called for service: {0}", cid);
+			if ( log.isLoggable( Level.FINEST ) ){
+				log.log( Level.FINEST, "Accept called for service: {0}, port_props: {1}", new Object[] {cid, port_props} );
 			}
 
 			IO serv = getXMPPIOServiceInstance();
@@ -1375,9 +1376,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 					// Accept side for component service is not ready yet?
 					// Let's wait for a few secs and try again.
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, "Problem reconnecting the service: {0}, cid: {1}",
-								new Object[] { serv,
-								cid });
+						log.log(Level.FINEST, "Problem reconnecting the service: {0}, port_props: {1}, exception: {2}",
+								new Object[] { serv, port_props, e });
 					}
 					updateConnectionDetails(port_props);
 

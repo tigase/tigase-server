@@ -209,6 +209,10 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 	@Override
 	public Item getItem(String key) {
+		if ( log.isLoggable( Level.FINEST ) ){
+			log.log( Level.FINEST, "Getting item: {0} of items: {1}", new Object[] {key, items.keySet()} );
+		}
+
 		return items.get(key);
 	}
 

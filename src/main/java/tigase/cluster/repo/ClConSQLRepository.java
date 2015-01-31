@@ -26,6 +26,11 @@ package tigase.cluster.repo;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.db.DBInitException;
+import tigase.db.DataRepository;
+import tigase.db.Repository;
+import tigase.db.RepositoryFactory;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -33,10 +38,6 @@ import java.sql.Statement;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.db.DBInitException;
-import tigase.db.DataRepository;
-import tigase.db.Repository;
-import tigase.db.RepositoryFactory;
 
 /**
  * Class description
@@ -232,6 +233,14 @@ public class ClConSQLRepository
 
 	@Override
 	public void reload() {
+		if ( ( System.currentTimeMillis() - lastReloadTime ) <= ( autoreload_interval * lastReloadTimeFactor ) ){
+			if ( log.isLoggable( Level.FINEST ) ){
+				log.log( Level.FINEST, "Last reload performed in {0}, skipping: ", ( System.currentTimeMillis() - lastReloadTime ) );
+			}
+			return;
+		}
+		lastReloadTime = System.currentTimeMillis();
+
 		super.reload();
 
 		ResultSet rs = null;
@@ -251,7 +260,7 @@ public class ClConSQLRepository
 					item.setPort(rs.getInt(PORT_COLUMN));
 					item.setCpuUsage(rs.getFloat(CPU_USAGE_COLUMN));
 					item.setMemUsage(rs.getFloat(MEM_USAGE_COLUMN));
-					itemLoaded(item);
+					itemLoaded( item );
 				}
 			}
 		} catch (SQLException e) {

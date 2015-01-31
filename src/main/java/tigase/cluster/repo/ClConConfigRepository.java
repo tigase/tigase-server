@@ -60,7 +60,9 @@ public class ClConConfigRepository
 
 	//~--- fields ---------------------------------------------------------------
 
-	private long autoreload_interval = AUTORELOAD_INTERVAL_PROP_VAL;
+	protected long autoreload_interval = AUTORELOAD_INTERVAL_PROP_VAL;
+	protected long lastReloadTime = 0;
+	protected long lastReloadTimeFactor = 10;
 
 	@Override
 	public void destroy() {

@@ -2,7 +2,7 @@
  * ClusterConnectionManager.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
+ * Copyright (C) 2004-2015 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -44,7 +44,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.Deflater;
+
 import javax.script.Bindings;
+
 import tigase.cluster.api.ClusterCommandException;
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusterElement;
@@ -54,22 +56,29 @@ import tigase.cluster.api.CommandListenerAbstract;
 import tigase.cluster.repo.ClConConfigRepository;
 import tigase.cluster.repo.ClusterRepoConstants;
 import tigase.cluster.repo.ClusterRepoItem;
+
 import tigase.conf.ConfigurationException;
+
 import tigase.db.RepositoryFactory;
+import tigase.db.TigaseDBException;
 import tigase.db.comp.ComponentRepository;
 import tigase.db.comp.RepositoryChangeListenerIfc;
+
 import tigase.net.ConnectionType;
 import tigase.net.SocketType;
 import tigase.osgi.ModulesManagerImpl;
+
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.server.ServiceChecker;
+
 import tigase.stats.StatisticsList;
 import tigase.sys.TigaseRuntime;
 import tigase.util.Algorithms;
 import tigase.util.TigaseStringprepException;
 import tigase.util.TimeUtils;
 import tigase.xml.Element;
+
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
@@ -421,6 +430,11 @@ public class ClusterConnectionManager
 
 	@Override
 	public void serviceStarted(XMPPIOService<Object> serv) {
+		try {
+			repo.reload();
+		} catch ( TigaseDBException ex ) {
+			log.log( Level.WARNING, "Items reloading failed", ex );
+		}
 		ServiceConnectedTimerTask task = new ServiceConnectedTimerTask(serv);
 
 		serv.getSessionData().put(SERVICE_CONNECTED_TASK_FUTURE, task);
@@ -468,12 +482,9 @@ public class ClusterConnectionManager
 		// Make sure it runs just once for each disconnect
 		if (result) {
 			Map<String, Object> sessionData = service.getSessionData();
-			String[]            routings = (String[]) sessionData.get(
-					PORT_ROUTING_TABLE_PROP_KEY);
-
-			String                                      addr = (String) sessionData.get(
-					PORT_REMOTE_HOST_PROP_KEY);
-			CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(addr);
+			String[] routings = (String[]) sessionData.get( PORT_ROUTING_TABLE_PROP_KEY );
+			String addr = (String) sessionData.get( PORT_REMOTE_HOST_PROP_KEY );
+			CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get( addr );
 
 			if (conns == null) {
 				conns = new CopyOnWriteArrayList<>();
@@ -482,10 +493,15 @@ public class ClusterConnectionManager
 
 			int size = conns.size();
 
-			conns.remove(service);
-			if (size == 1) {
-				if (routings != null) {
-					updateRoutings(routings, false);
+			conns.remove( service );
+			if ( log.isLoggable( Level.FINEST ) ){
+				log.log( Level.FINEST, "serviceStopped: result={0} / size={1} / connPool={2} / serv={3} / conns={4} / type={5}",
+								 new Object[] { result, size, connectionsPool, service, conns, service.connectionType() } );
+			}
+
+			if (size != 0 && conns.size() == 0) {
+				if ( routings != null ){
+					updateRoutings( routings, false );
 				}
 
 				// removeRouting(serv.getRemoteHost());
@@ -546,7 +562,7 @@ public class ClusterConnectionManager
 	@Override
 	public String xmppStreamOpened(XMPPIOService<Object> service, Map<String,
 			String> attribs) {
-		log.log(Level.INFO, "Stream opened: {0}", attribs);
+		log.log(Level.INFO, "Stream opened: {0}, service: {1}", new Object[] {attribs, service});
 		switch (service.connectionType()) {
 		case connect : {
 			String id = attribs.get("id");
@@ -560,9 +576,8 @@ public class ClusterConnectionManager
 				String digest = Algorithms.hexDigest(id, secret, "SHA");
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Calculating digest: id={0}, secret={1}, digest={2}",
-							new Object[] { id,
-							secret, digest });
+					log.log(Level.FINEST, "Calculating digest: id={0}, secret={1}, digest={2}, item={3}",
+							new Object[] { id, secret, digest, item });
 				}
 
 				return "<handshake>" + digest + "</handshake>";
@@ -817,8 +832,14 @@ public class ClusterConnectionManager
 
 		int size = conns.size();
 
-		conns.add(serv);
-		if (size == 0) {
+		if ( log.isLoggable( Level.FINEST ) ){
+			log.log( Level.FINEST, "New service connected: size = {0} / connectionsPool={1} / serv={2} / conns={3}",
+							 new Object[] { size, connectionsPool, serv, conns } );
+		}
+
+
+		conns.add( serv );
+		if ( size == 0 && conns.size() > 0 ){
 			updateRoutings(routings, true);
 			log.log(Level.INFO, "Connected to: {0}", addr);
 			updateServiceDiscoveryItem(addr, addr, XMLNS + " connected", true);
@@ -904,7 +925,11 @@ public class ClusterConnectionManager
 
 	private void processHandshake(Packet p, XMPPIOService<Object> serv) {
 
-		//
+		if ( log.isLoggable( Level.FINEST ) ){
+			log.log( Level.FINEST, "Processing handshake: packet={0} / service={1} / sessionData={2}",
+							 new Object[] { p, serv, serv.getSessionData() } );
+		}
+
 		String serv_addr = (String) serv.getSessionData().get( PORT_REMOTE_HOST_PROP_KEY );
 		try {
 			InetAddress addr = InetAddress.getByName( serv_addr );
@@ -956,12 +981,26 @@ public class ClusterConnectionManager
 					serviceConnected(serv);
 				} else {
 					if (secret == null) {
-						log.log(Level.WARNING,
-								"Remote hostname not found in local configuration or time difference between cluster nodes is too big. Connection not accepted: {0}",
-								serv);
+						log.log( Level.WARNING,
+										 "Remote hostname not found in local configuration or time difference between cluster nodes is too big. Connection not accepted: {0}", serv );
+
+						if ( log.isLoggable( Level.FINEST ) ){
+							log.log( Level.FINEST,
+											 "Remote hostname not found in local configuration or time difference between cluster nodes is too big. Connection not accepted! Remote host: {0}, sessionData: {1}, repoItem: {2}, service: {3}",
+											 new Object[] { serv_addr, serv.getSessionData(), repo.getItem( serv_addr ), serv } );
+						}
+
 					} else {
 						log.log(Level.WARNING,
 								"Handshaking password doesn''t match, disconnecting: {0}", serv);
+
+						if ( log.isLoggable( Level.FINEST ) ){
+							log.log( Level.WARNING,
+											 "Handshaking password doesn''t match, disconnecting! Remote host: {0}, sessionData: {1}, repoItem: {2}, service: {3}", new Object[] { serv_addr, serv.getSessionData(), repo.getItem( serv_addr ), serv } );
+
+						}
+
+
 					}
 					serv.stop();
 				}
