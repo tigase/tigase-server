@@ -279,7 +279,7 @@ public enum MSG_TYPES { none(0), message(1), presence(2);
 	}
 
 	public interface OfflineMessagesProcessor {
-		public void stamp(Element msg, Long msgID);
+		public void stamp(Element msg, String msgID);
 	}
 
 }

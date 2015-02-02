@@ -671,7 +671,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 					Element msgEl = parsedElements.poll();
 					if ( msgEl != null && msgId > 0 ){
 
-						proc.stamp( msgEl, msgId );
+						proc.stamp( msgEl, String.valueOf( msgId ) );
 
 						result.add( msgEl );
 					}

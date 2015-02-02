@@ -353,10 +353,10 @@ public class FlexibleOfflineMessageRetrieval
 																													 new String[] { FLEXIBLE_OFFLINE_XMLNS } );
 
 		@Override
-		public void stamp( Element msg, Long msgID ) {
+		public void stamp( Element msg, String msgID ) {
 			Element clone = offlineElementIns.clone();
 			final Element item = clone.getChild( FlexibleOfflineMessageRetrieval.ITEM_ELEMENT_NAME );
-			item.setAttribute( FlexibleOfflineMessageRetrieval.NODE_ATTRIBUTE_NAME, String.valueOf( msgID ) );
+			item.setAttribute( FlexibleOfflineMessageRetrieval.NODE_ATTRIBUTE_NAME, msgID );
 			msg.addChild( clone );
 
 		}
