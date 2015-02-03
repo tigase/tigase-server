@@ -1,15 +1,7 @@
-[[dynamicrosters]]
-Dynamic Rosters
-===============
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
-:toc:
-:numbered:
-:website: http://tigase.net/
-:Date: 2010-04-06 21:22
+[[DynamicRosters]]
+== Dynamic Rosters
 
-Problem Description
--------------------
+=== Problem Description
 
 Normal roster contacts stored created as so called dynamic roster part are delivered to the end user transparently. The XMPP client doesn't really know what contacts come from his own *static* roster created manually by the user and what contacts come from *dynamic* roster part that is contacts and groups generated dynamically by the server logic.
 
@@ -17,8 +9,7 @@ Some specialized clients need to store extra bits of information about roster co
 
 The protocol defined here allows exchanging information, saving and retrieving extra data about the contacts.
 
-Syntax and Semantics
---------------------
+=== Syntax and Semantics
 
 Extra contact data is accessed using IQ stanzas, specifically by means of a  child element qualified by the \'*jabber:iq:roster-dynamic*' namespace. The  child element MAY contain one or more  children, each describing a unique contact item. Content of the  element is not specified and is implementation dependent. From the Tigase server point of view it can contain any valid XML data. Whole  element is passed to the DynamicRoster? implementation class as is and without any verification. Upon retrieving the contact extra data the DynamicRoster? implementation is supposed to provide a valid XML  element with all the required data for requested \'*jid*'.
 
@@ -29,8 +20,7 @@ Following actions on the extra contact data are allowed:
 - \'*set*' - stores extra information about the contact
 - \'*get*' - retrieves extra information about the contact
 
-Retrieving Contact Data
------------------------
+=== Retrieving Contact Data
 
 Upon connecting to the server and becoming an active resource, a client can request the contact extra data. This request can be made either after or before requesting the user roster. The client's request for the extra contact data is *OPTIONAL*.
 
@@ -39,9 +29,9 @@ Example: Client requests contact extra data from the server using \'*get*' reque
 [source,xml]
 ------------------------------------------------------------------
 <iq type='get' id='rce_1'>
-  <query xmlns='jabber:iq:roster-dynamic'>
-    <item jid='archimedes@eureka.com'/>
-  </query>
+<query xmlns='jabber:iq:roster-dynamic'>
+<item jid='archimedes@eureka.com'/>
+</query>
 </iq>
 ------------------------------------------------------------------
 
@@ -50,9 +40,9 @@ Example: Client receives contact extra data from the server, but there were eith
 [source,xml]
 ------------------------------------------------------------------
 <iq type='result' id='rce_1'>
-  <query xmlns='jabber:iq:roster-dynamic'>
-    <item jid='archimedes@eureka.com'/>
-  </query>
+<query xmlns='jabber:iq:roster-dynamic'>
+<item jid='archimedes@eureka.com'/>
+</query>
 </iq>
 ------------------------------------------------------------------
 
@@ -61,18 +51,17 @@ Example: Client receives contact extra data from the server, and there was some 
 [source,xml]
 ------------------------------------------------------------------
 <iq type='result' id='rce_1'>
-  <query xmlns='jabber:iq:roster-dynamic'>
-    <item jid='archimedes@eureka.com'>
-      <phone>+12 3234 322342</phone>
-      <note>This is short note about the contact</note>
-      <fax>+98 2343 3453453</fax>
-    </item>
-  </query>
+<query xmlns='jabber:iq:roster-dynamic'>
+<item jid='archimedes@eureka.com'>
+<phone>+12 3234 322342</phone>
+<note>This is short note about the contact</note>
+<fax>+98 2343 3453453</fax>
+</item>
+</query>
 </iq>
 ------------------------------------------------------------------
 
-Updating/Saving Extra Information About the Contact
----------------------------------------------------
+=== Updating/Saving Extra Information About the Contact
 
 At any time, a client *MAY* update contact extra information on the server.
 
@@ -81,19 +70,21 @@ Example: Client sends contact extra information using \'*set*' request.
 [source,xml]
 ------------------------------------------------------------------
 <iq type='set' id='a78b4q6ha463'>
-  <query xmlns='jabber:iq:roster-dynamic'>
-    <item jid='archimedes@eureka.com'>
-      <phone>+22 3344 556677</phone>
-      <note>he is a smart guy, he knows whether the crown is made from pure gold or not.</note>
-   </item>
-  </query>
+<query xmlns='jabber:iq:roster-dynamic'>
+<item jid='archimedes@eureka.com'>
+<phone>+22 3344 556677</phone>
+<note>he is a smart guy, he knows whether the crown is made from pure gold or not.</note>
+</item>
+</query>
 </iq>
 ------------------------------------------------------------------
 
 Client responds to the server:
 
 [source,xml]
+------------------------------------------------------------------
 <iq type='result' id='a78b4q6ha463'/>
+------------------------------------------------------------------
 
 A client *MAY* update contact extra information for more than a single item in one request:
 
@@ -102,25 +93,42 @@ Example: Client sends contact extra information using \'*set*' request with many
 [source,xml]
 ------------------------------------------------------------------
 <iq type='set' id='a78b4q6ha464'>
-  <query xmlns='jabber:iq:roster-dynamic'>  
-    <item jid='archimedes@eureka.com'>
-      <phone>+22 3344 556677</phone>
-      <note>he is a smart guy, he knows whether the crown is made from pure gold or not.</note>
-   </item>
-    <item jid='newton@eureka.com'>
-      <phone>+22 3344 556688</phone>
-      <note>He knows how heavy I am.</note>
-   </item>
-    <item jid='pascal@eureka.com'>
-      <phone>+22 3344 556699</phone>
-      <note>This guy helped me cure my sickness!</note>
-   </item>
-  </query>
+<query xmlns='jabber:iq:roster-dynamic'>
+<item jid='archimedes@eureka.com'>
+<phone>+22 3344 556677</phone>
+<note>he is a smart guy, he knows whether the crown is made from pure gold or not.</note>
+</item>
+<item jid='newton@eureka.com'>
+<phone>+22 3344 556688</phone>
+<note>He knows how heavy I am.</note>
+</item>
+<item jid='pascal@eureka.com'>
+<phone>+22 3344 556699</phone>
+<note>This guy helped me cure my sickness!</note>
+</item>
+</query>
 </iq>
 ------------------------------------------------------------------
 
 Client responds to the server:
 
 [source,xml]
+------------------------------------------------------------------
 <iq type='result' id='a78b4q6ha464'/>
+------------------------------------------------------------------
 
+=== Configuration
+
+DynamicRoster implementation class should be configured in the *init.properties* file. As it's an extension to the *Presence* and *Roster* plugins class should be configured either for both plugins:
+[source,bash]
+------------------------------------------------------------------
+sess-man/plugins-conf/jabber\:iq\:roster/dynamic-roster-classes=<class list>
+sess-man/plugins-conf/presence/dynamic-roster-classes=<classes list>
+------------------------------------------------------------------
+
+or globally:
+[source,bash]
+------------------------------------------------------------------
+sess-man/plugins-conf/dynamic-roster-classes=<classes list>
+------------------------------------------------------------------
+*<classes list>* is a comma separated list of classes.

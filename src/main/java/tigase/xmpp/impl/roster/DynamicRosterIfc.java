@@ -2,7 +2,7 @@
  * DynamicRosterIfc.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
+ * Copyright (C) 2004-2015 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -52,9 +52,9 @@ import java.util.Map;
  * <br>
  * To load your implementations you have to specify them in the configuration
  * file. The simplest way is to use <code>init.properties</code> file. Have a look
- * at the example file available in the SVN repository. Following line added to
+ * at the example file available in the repository. Following line added to
  * the end of the file tell the server to load the dynamic roster implementation:
- * <pre>sess-man/plugins-conf/roster-presence/dynamic-roster-classes=tigase.xmpp.impl.AnonymousRoster</pre>
+ * <pre>sess-man/plugins-conf/dynamic-roster-classes=tigase.xmpp.impl.AnonymousRoster</pre>
  * If you want to load more implementations you just put a comma separated list
  * of classes instead. If your implementation needs to connect to a database
  * or any other resource or just needs extra configuration parameters you can
@@ -70,11 +70,10 @@ import java.util.Map;
  * There is also a simplified form for providing configuration parameters. It is
  * used if you want to provide just one parameter to the object (like database
  * connection string):
- * <pre>sess-man/plugins-conf/roster-presence/tigase.xmpp.impl.AnonymousRoster.init=configuration-string</pre>
+ * <pre>sess-man/plugins-conf/tigase.xmpp.impl.AnonymousRoster.init=configuration-string</pre>
  * <br>
  * Created: Mon Oct 29 08:52:22 2007
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
  */
 public interface DynamicRosterIfc {
 	/**
@@ -93,7 +92,7 @@ public interface DynamicRosterIfc {
 	/**
 	 * <code>init</code> method is called at the initialization time when simple
 	 * form of startup parameters are used:
-	 * <pre>sess-man/plugins-conf/roster-presence/class-name.init=configuration-string</pre>
+	 * <pre>sess-man/plugins-conf/class-name.init=configuration-string</pre>
 	 * The <code>configuration-string</code> is passed to this <code>init(...)</code>
 	 * method in exact form as it was found in the configuration file.
 	 *
