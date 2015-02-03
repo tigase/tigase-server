@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Wojciech Kapcia <wojciech.kapcia@tigase.org>
+ * @author Wojciech Kapcia
  */
 public class DataForm {
 
