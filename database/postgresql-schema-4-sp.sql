@@ -343,10 +343,10 @@ begin
 	then
 		update tig_users
 			set online_status = online_status + 1, last_login = now()
-			where user_id = _user_id;
+			where lower(user_id) = lower(_user_id);
     select _user_id into res_user_id;
 	else
-		update tig_users set failed_logins = failed_logins + 1 where user_id = _user_id;
+		update tig_users set failed_logins = failed_logins + 1 where lower(user_id) = lower(_user_id);
     select NULL into res_user_id;
 	end if;
   return res_user_id;
@@ -363,7 +363,7 @@ begin
 	update tig_users
 		set online_status = greatest(online_status - 1, 0),
 			last_logout = now()
-		where user_id = _user_id;
+		where lower(user_id) = lower(_user_id);
   return;
 end;
 ' LANGUAGE 'plpgsql';

@@ -49,7 +49,7 @@ create table tig_users (
 );
 -- QUERY END:
 -- QUERY START:
-create unique index user_id on tig_users ( user_id );
+create unique index user_id on tig_users ( lower(user_id) );
 -- QUERY END:
 -- QUERY START:
 create index user_pw on tig_users (user_pw);
