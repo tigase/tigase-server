@@ -197,7 +197,7 @@ public class BoshConnectionManager
 
 			try {
 				if ( null == sidFilehandler ){
-					sidFilehandler = new FileHandler( "logs/bosh_sid.log", false );
+					sidFilehandler = new FileHandler( "logs/bosh_sid.log", 10000000, 5, false );
 					sidFilehandler.setLevel( lvl );
 					sidFilehandler.setFilter( bslf );
 					BoshConnectionManagerLogger.getParent().addHandler( sidFilehandler );
