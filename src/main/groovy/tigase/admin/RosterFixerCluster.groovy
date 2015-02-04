@@ -71,7 +71,6 @@ def repository = (UserRepository)userRepository
 def sessions = (Map<BareJID, XMPPSession>)userSessions
 def vhost_man = (VHostManagerIfc)vhostMan
 def admins = (Set)adminsSet
-def cluster = (ClusteringStrategyIfc)clusterStrategy
 
 def stanzaFromBare = p.getStanzaFrom().getBareJID();
 def isServiceAdmin = admins.contains(stanzaFromBare);
@@ -81,6 +80,11 @@ def rosterAction = Command.getFieldValue(packet, ROSTER_ACTION)
 def rosterBuddyList = Command.getFieldValues(packet, ROSTER_BUDDY_LIST)
 
 //def rosterNotifyCluster = Command.getFieldValue(packet, ROSTER_NOTIFY_CLUSTER)
+
+boolean clusterMode =  Boolean.valueOf( System.getProperty("cluster-mode", false.toString()) );
+if 	( clusterMode && null != clusterStrategy) {
+	def cluster = (ClusteringStrategyIfc)clusterStrategy
+}
 
 if (rosterOwnerJid == null || rosterBuddyList == null ||
 rosterAction == null) {
@@ -136,16 +140,19 @@ if (!disconnected) {
 		online = true
 	}
 
-	Set<ConnectionRecord> cl_conns = cluster.getConnectionRecords(jidRosterOwnerJid.getBareJID())
-	if (cl_conns && cl_conns.size() > 0) {
-		cl_conns.each {
-			def commandClose = Command.CLOSE.getPacket(p.getStanzaTo(), it.getConnectionId(),
-					StanzaType.set, "77")
-			results.offer(commandClose)
-			res_report += "User: " + it.getUserJid() + " is online on node: " + it.getNode() + ", disconnected."
 
+	if 	( clusterMode ) {
+		Set<ConnectionRecord> cl_conns = cluster.getConnectionRecords(jidRosterOwnerJid.getBareJID())
+		if (cl_conns && cl_conns.size() > 0) {
+			cl_conns.each {
+				def commandClose = Command.CLOSE.getPacket(p.getStanzaTo(), it.getConnectionId(),
+					StanzaType.set, "77")
+				results.offer(commandClose)
+				res_report += "User: " + it.getUserJid() + " is online on node: " + it.getNode() + ", disconnected."
+
+			}
+			online = true
 		}
-		online = true
 	}
 
 	if (online) {

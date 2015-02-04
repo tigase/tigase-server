@@ -46,6 +46,7 @@ import tigase.cluster.strategy.*;
 
 
 try {
+	println "=========================="
 
 	def ROSTER_OWNER_JID = "roster-owner-jid"
 	def ROSTER_OWNER_PRESENCE = "roster-owner-presence"
@@ -56,7 +57,7 @@ try {
 	def ROSTER_ITEM_GROUPS = "roster-item-groups"
 	def ROSTER_ITEM_SUBSCR = "roster-item-subscr"
 	def ROSTER_ACTION = "roster-action"
-	def ROSTER_NOTIFY_CLUSTER = "notify-cluster"
+	def NOTIFY_CLUSTER = "notify-cluster"
 
 	def UPDATE = "update"
 	def REMOVE = "remove"
@@ -84,7 +85,8 @@ try {
 	def rosterItemGroups = Command.getFieldValue(packet, ROSTER_ITEM_GROUPS)
 	def rosterItemSubscr = Command.getFieldValue(packet, ROSTER_ITEM_SUBSCR)
 	def rosterAction = Command.getFieldValue(packet, ROSTER_ACTION)
-	boolean rosterNotifyCluster = Boolean.valueOf( Command.getFieldValue(packet, ROSTER_NOTIFY_CLUSTER) )
+	boolean clusterMode =  Boolean.valueOf( System.getProperty("cluster-mode", false.toString()) );
+	boolean notifyCluster = Boolean.valueOf( Command.getFieldValue(packet, NOTIFY_CLUSTER) )
 
 	if (rosterOwnerJid == null || rosterItemJid == null ||
 		rosterItemSubscr == null || rosterAction == null) {
@@ -97,21 +99,22 @@ try {
 		Command.addFieldValue(res, ROSTER_ITEM_GROUPS, rosterItemGroups ?: "", "text-single", "Comma separated list of item groups")
 		Command.addFieldValue(res, ROSTER_ITEM_SUBSCR, subscriptions[0], "Roster item Subscription", (String[])subscriptions, (String[])subscriptions)
 		Command.addFieldValue(res, ROSTER_ACTION, actions[0], "Action", (String[])actions_descr, (String[])actions)
-		Command.addHiddenField(res, ROSTER_NOTIFY_CLUSTER, true.toString())
-
+		if 	( clusterMode  ) {
+			Command.addHiddenField(res, NOTIFY_CLUSTER, true.toString())
+		}
 		return res
 	}
 
-	if 	( rosterNotifyCluster ) {
-		if (this.hasProperty("clusterStrategy")) {
-	        def cluster = (ClusteringStrategyIfc) clusterStrategy
+	if 	( clusterMode && notifyCluster ) {
+		if ( null != clusterStrategy ) {
+			def cluster = (ClusteringStrategyIfc) clusterStrategy
 			List<JID> cl_conns = cluster.getAllNodes()
 			if (cl_conns && cl_conns.size() > 0) {
 				cl_conns.each { node ->
 
 					def forward = p.copyElementOnly();
-					Command.removeFieldValue(forward, ROSTER_NOTIFY_CLUSTER)
-					Command.addHiddenField(forward, ROSTER_NOTIFY_CLUSTER, false.toString())
+					Command.removeFieldValue(forward, NOTIFY_CLUSTER)
+					Command.addHiddenField(forward, NOTIFY_CLUSTER, false.toString())
 					forward.setPacketTo( node );
 					forward.setPermissions( Permissions.ADMIN );
 
@@ -177,7 +180,7 @@ try {
 		return results;
 	}
 
-	updateRoster(jidRosterOwnerJid, jidRosterItemJid, rosterItemName, rosterItemGroups, rosterItemSubscr, rosterNotifyCluster)
+	updateRoster(jidRosterOwnerJid, jidRosterItemJid, rosterItemName, rosterItemGroups, rosterItemSubscr, notifyCluster)
 
 	Element pres;
 	if (rosterAction == UPDATE_EXT || rosterAction == REMOVE_EXT) {
@@ -194,7 +197,7 @@ try {
 			return results;
 		}
 
-		updateRoster(jidRosterItemJid, jidRosterOwnerJid, rosterOwnerName, rosterOwnerGroups, subscr, rosterNotifyCluster)
+		updateRoster(jidRosterItemJid, jidRosterOwnerJid, rosterOwnerName, rosterOwnerGroups, subscr, notifyCluster)
 		
 		if (!remove_item) {
 			pres = new Element("presence", (String[])["from", "to", "type"], (String[])[rosterOwnerJid, rosterItemJid, "probe"])

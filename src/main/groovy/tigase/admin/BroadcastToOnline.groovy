@@ -89,22 +89,22 @@ if (fromJid == null || subject == null || msg_type == null || body == null) {
 
 Queue results = new LinkedList()
 if 	( clusterMode && notifyCluster ) {
-		if (this.hasProperty("clusterStrategy")) {
-	        def cluster = (ClusteringStrategyIfc) clusterStrategy
-			List<JID> cl_conns = cluster.getAllNodes()
-			if (cl_conns && cl_conns.size() > 0) {
-				cl_conns.each { node ->
+	if ( null != clusterStrategy ) {
+		def cluster = (ClusteringStrategyIfc) clusterStrategy
+		List<JID> cl_conns = cluster.getAllNodes()
+		if (cl_conns && cl_conns.size() > 0) {
+			cl_conns.each { node ->
 
-					def forward = p.copyElementOnly();
-					Command.removeFieldValue(forward, ROSTER_NOTIFY_CLUSTER)
-					Command.addHiddenField(forward, ROSTER_NOTIFY_CLUSTER, false.toString())
-					forward.setPacketTo( node );
-					forward.setPermissions( Permissions.ADMIN );
+				def forward = p.copyElementOnly();
+				Command.removeFieldValue(forward, NOTIFY_CLUSTER)
+				Command.addHiddenField(forward, NOTIFY_CLUSTER, false.toString())
+				forward.setPacketTo( node );
+				forward.setPermissions( Permissions.ADMIN );
 
-					results.offer(forward)
-				}
+				results.offer(forward)
 			}
 		}
+	}
 }
 
 
