@@ -520,6 +520,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 					int iters = ( db_ids.size() / StatementsCount ) + 1;
 					for ( int i = 0 ; i < iters ; i++ ) {
 						int params = ( i == ( iters - 1 ) ) ? db_ids.size() % StatementsCount : StatementsCount;
+						if (params == 0 ) continue;
 						PreparedStatement select_ids_to_jid_st = data_repo.getPreparedStatement( to.getBareJID(),
 																																							 MSG_SELECT_IDS_TO_JID_QUERY + "_" + params );
 
@@ -575,6 +576,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 				int iters = ( db_ids.size() / StatementsCount ) + 1;
 					for ( int i = 0 ; i < iters ; i++ ) {
 						int params = ( i == ( iters - 1 ) ) ? db_ids.size() % StatementsCount : StatementsCount;
+						if (params == 0 ) continue;
 					PreparedStatement delete_to_jid_st = data_repo.getPreparedStatement( to.getBareJID(),
 																																							 MSG_DELETE_IDS_TO_JID_QUERY + "_" + params );
 

@@ -273,8 +273,10 @@ public class FlexibleOfflineMessageRetrieval
 				}
 			}
 
-		} catch ( NotAuthorizedException | UserNotFoundException ex ) {
+		} catch ( NotAuthorizedException ex ) {
 			log.log( Level.WARNING, "Problem retrieving messages from repository: ", ex );
+		} catch ( UserNotFoundException ex ) {
+			
 		}
 	}
 
