@@ -22,20 +22,20 @@
 
 
 /*
- The roster fixer scripts is used in a case if for whatever reason user's roster got
- broken, lost or otherwise messed up. If we know the user's contact list, this script
- can be used to restore the contact list. It adds missing entries to the user's roster.
- If the user is online, he gets a roster push with updated entries to make sure
- he is up to date with all the changes.
- The script accepts a user JID, action (update or remove) and a list of buddies in
- a following format:
- buddy_jid,buddy_name,subscription
- buddy_jid is a JID (bare JID)
- buddy_name is just a string, it is optional, if omit, localpart of the JID is used
- subscription is one of following (none, from, to, both), it is optional, if omit 'both' is used
- AS:Description: Fixes user's roster on Tigase cluster
- AS:CommandId: roster-fixer-cluster
- AS:Component: sess-man
+The roster fixer scripts is used in a case if for whatever reason user's roster got
+broken, lost or otherwise messed up. If we know the user's contact list, this script
+can be used to restore the contact list. It adds missing entries to the user's roster.
+If the user is online, he gets a roster push with updated entries to make sure
+he is up to date with all the changes.
+The script accepts a user JID, action (update or remove) and a list of buddies in
+a following format:
+buddy_jid,buddy_name,subscription
+buddy_jid is a JID (bare JID)
+buddy_name is just a string, it is optional, if omit, localpart of the JID is used
+subscription is one of following (none, from, to, both), it is optional, if omit 'both' is used
+AS:Description: Fixes user's roster on Tigase cluster
+AS:CommandId: roster-fixer-cluster
+AS:Component: sess-man
  */
 
 package tigase.admin
@@ -82,12 +82,9 @@ def rosterBuddyList = Command.getFieldValues(packet, ROSTER_BUDDY_LIST)
 //def rosterNotifyCluster = Command.getFieldValue(packet, ROSTER_NOTIFY_CLUSTER)
 
 boolean clusterMode =  Boolean.valueOf( System.getProperty("cluster-mode", false.toString()) );
-if 	( clusterMode && null != clusterStrategy) {
-	def cluster = (ClusteringStrategyIfc)clusterStrategy
-}
 
 if (rosterOwnerJid == null || rosterBuddyList == null ||
-rosterAction == null) {
+	rosterAction == null) {
 	def res = p.commandResult(Command.DataType.form);
 	Command.addFieldValue(res, ROSTER_OWNER_JID, rosterOwnerJid ?: "",
 			"jid-single", "Roster owner JID")
@@ -113,9 +110,9 @@ def Queue<Packet> results = new LinkedList<Packet>()
 Packet result = p.commandResult(Command.DataType.result)
 def vhost = vhost_man.getVHostItem(jidRosterOwnerJid.getDomain());
 if (vhost == null ||
-(!isServiceAdmin &&
-!vhost.isOwner(stanzaFromBare.toString()) &&
-!vhost.isAdmin(stanzaFromBare.toString()))) {
+	(!isServiceAdmin &&
+		!vhost.isOwner(stanzaFromBare.toString()) &&
+		!vhost.isAdmin(stanzaFromBare.toString()))) {
 	Command.addTextField(result, "Error", "You do not have enough permissions to modify roster of "+rosterOwnerJid);
 	results.offer(result);
 	return results;
@@ -133,25 +130,27 @@ if (!disconnected) {
 	if (sess && sess.getActiveResourcesSize() > 0) {
 		sess.getActiveResources().each{ conn ->
 			def commandClose = Command.CLOSE.getPacket(p.getStanzaTo(), conn.getConnectionId(),
-					StanzaType.set, conn.nextStanzaId())
+				StanzaType.set, conn.nextStanzaId())
 			results.offer(commandClose)
 			res_report += "User: " + conn.getjid() + " is online, disconnected."
 		}
 		online = true
 	}
 
-
 	if 	( clusterMode ) {
-		Set<ConnectionRecord> cl_conns = cluster.getConnectionRecords(jidRosterOwnerJid.getBareJID())
-		if (cl_conns && cl_conns.size() > 0) {
-			cl_conns.each {
-				def commandClose = Command.CLOSE.getPacket(p.getStanzaTo(), it.getConnectionId(),
-					StanzaType.set, "77")
-				results.offer(commandClose)
-				res_report += "User: " + it.getUserJid() + " is online on node: " + it.getNode() + ", disconnected."
+		if ( null != clusterStrategy ) {
+			def cluster = (ClusteringStrategyIfc)clusterStrategy
+			Set<ConnectionRecord> cl_conns = cluster.getConnectionRecords(jidRosterOwnerJid.getBareJID())
+			if (cl_conns && cl_conns.size() > 0) {
+				cl_conns.each {
+					def commandClose = Command.CLOSE.getPacket(p.getStanzaTo(), it.getConnectionId(),
+						StanzaType.set, "77")
+					results.offer(commandClose)
+					res_report += "User: " + it.getUserJid() + " is online on node: " + it.getNode() + ", disconnected."
 
+				}
+				online = true
 			}
-			online = true
 		}
 	}
 
@@ -179,7 +178,7 @@ def updateRoster = { sess, online, jid, i_jid, i_name, i_subscr ->
 
 	// Update offline
 	String rosterStr = repository.getData(jid.getBareJID(), null,
-			RosterAbstract.ROSTER, null) ?: ""
+		RosterAbstract.ROSTER, null) ?: ""
 	Map<BareJID, RosterElement> roster = new LinkedHashMap<BareJID, RosterElement>()
 	RosterFlat.parseRosterUtil(rosterStr, roster, null)
 	if (remove_item) {
@@ -197,7 +196,7 @@ def updateRoster = { sess, online, jid, i_jid, i_name, i_subscr ->
 	}
 	StringBuilder sb = new StringBuilder(200)
 	for (RosterElement relem: roster.values())
-		sb.append(relem.getRosterElement().toString())
+	sb.append(relem.getRosterElement().toString())
 	repository.setData(jid.getBareJID(), null, RosterAbstract.ROSTER, sb.toString());
 
 }
@@ -229,11 +228,11 @@ rosterBuddyList.each {
 	if (!remove_item) {
 
 		Element pres = new Element("presence",
-				(String[])["from", "to", "type"], (String[])[rosterOwnerJid, rosterItemJid,
+			(String[])["from", "to", "type"], (String[])[rosterOwnerJid, rosterItemJid,
 					"probe"])
 		results.offer(Packet.packetInstance(pres))
 		pres = new Element("presence",
-				(String[])["from", "to", "type"], (String[])[rosterItemJid, rosterOwnerJid,
+			(String[])["from", "to", "type"], (String[])[rosterItemJid, rosterOwnerJid,
 					"probe"])
 		results.offer(Packet.packetInstance(pres))
 	}
