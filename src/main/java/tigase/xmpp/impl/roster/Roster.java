@@ -26,13 +26,12 @@ package tigase.xmpp.impl.roster;
 
 import tigase.db.TigaseDBException;
 
-import tigase.util.TigaseStringprepException;
-
 import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
 
-//~--- JDK imports ------------------------------------------------------------
+import tigase.util.TigaseStringprepException;
+import tigase.xml.Element;
 
 import java.util.logging.Logger;
 
@@ -189,7 +188,7 @@ public class Roster extends RosterAbstract {
 			throws NotAuthorizedException, TigaseDBException {}
 
 	@Override
-	public RosterElementIfc getRosterElement(XMPPResourceConnection session, JID jid)
+	public RosterElement getRosterElement(XMPPResourceConnection session, JID jid)
 			throws NotAuthorizedException, TigaseDBException {
 		// TODO Auto-generated method stub
 		return null;
@@ -197,13 +196,10 @@ public class Roster extends RosterAbstract {
 
 	@Override
 	public void logout(XMPPResourceConnection session) {
-		// TODO Auto-generated method stub
-		
 	}
 	
-	public String getCustomStatus(XMPPResourceConnection session, JID buddy) {
+	@Override
+	public Element getCustomChild(XMPPResourceConnection session, JID buddy) {
 		return null;
 	}
-
-
-}    // Roster
+}

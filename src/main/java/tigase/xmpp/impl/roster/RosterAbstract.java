@@ -408,20 +408,6 @@ public abstract class RosterAbstract {
 			stateTransition.put(PresenceType.out_unsubscribe, out_unsubscribe);
 		}
 
-		//~--- get methods --------------------------------------------------------
-
-		// ~--- get methods --------------------------------------------------------
-
-		/**
-		 * Method description
-		 *
-		 *
-		 * @param pres_type
-		 *
-		 *
-		 *
-		 * @return a value of <code>SubscriptionType</code>
-		 */
 		public SubscriptionType getStateTransition(PresenceType pres_type) {
 			SubscriptionType res = stateTransition.get(pres_type);
 
@@ -434,10 +420,6 @@ public abstract class RosterAbstract {
 		}
 	}
 
-	/**
-	 * Enum description
-	 *
-	 */
 	public enum SubscriptionType {
 		none("none", null), none_pending_out("none", "subscribe"), none_pending_in("none",
 				null), none_pending_out_in("none", "subscribe"), to("to", null), to_pending_in(
@@ -446,9 +428,6 @@ public abstract class RosterAbstract {
 
 		private Map<String, String> attrs = new LinkedHashMap<String, String>(2, 1.0f);
 
-		//~--- constructors -------------------------------------------------------
-
-		// ~--- constructors -------------------------------------------------------
 		private SubscriptionType(String subscr, String ask) {
 			attrs.put("subscription", subscr);
 			if (ask != null) {
@@ -456,176 +435,36 @@ public abstract class RosterAbstract {
 			}    // end of if (ask != null)
 		}
 
-		//~--- get methods --------------------------------------------------------
-
-		// ~--- get methods --------------------------------------------------------
-
-		/**
-		 * Method description
-		 *
-		 *
-		 *
-		 *
-		 * @return a value of {@code Map<String,String>}
-		 */
 		public Map<String, String> getSubscriptionAttr() {
 			return attrs;
 		}
 	}
 
-	//~--- methods --------------------------------------------------------------
-
-	// ~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param jid
-	 * @param name
-	 * @param groups
-	 * @param otherData
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public abstract void addBuddy(XMPPResourceConnection session, JID jid, String name,
 			String[] groups, String otherData)
 					throws NotAuthorizedException, TigaseDBException;
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param buddy
-	 * @param groups
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public abstract boolean addBuddyGroup(final XMPPResourceConnection session, JID buddy,
 			final String[] groups)
 					throws NotAuthorizedException, TigaseDBException;
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param buddy
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public abstract boolean containsBuddy(final XMPPResourceConnection session, JID buddy)
 					throws NotAuthorizedException, TigaseDBException;
 
-	// ~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param buddy
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	public String groupNode(JID buddy) {
 		return ROSTER + "/" + buddy.getBareJID();
 	}
 
-	// public abstract void setBuddyOnline(final XMPPResourceConnection session,
-	// final String buddy, final boolean online)
-	// throws NotAuthorizedException, TigaseDBException;
-	//
-	// public abstract boolean isBuddyOnline(final XMPPResourceConnection session,
-	// final String buddy)
-	// throws NotAuthorizedException, TigaseDBException;
-	// public abstract void setBuddyGroups(XMPPResourceConnection session,
-	// String buddy, String[] groups)
-	// throws NotAuthorizedException, TigaseDBException;
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param repo
-	 *
-	 * @throws TigaseDBException
-	 * @throws TigaseDBException
-	 */
 	public void init(UserRepository repo) throws TigaseDBException, TigaseDBException {}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session is a <code>XMPPResourceConnection</code>
-	 */
 	public abstract void logout(XMPPResourceConnection session);
 
-	// ~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param jid
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public abstract boolean presenceSent(XMPPResourceConnection session, JID jid)
 					throws NotAuthorizedException, TigaseDBException;
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param jid
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public abstract boolean removeBuddy(final XMPPResourceConnection session, JID jid)
 					throws NotAuthorizedException, TigaseDBException;
 
-	// ~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param results
-	 * @param item
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 * @throws NoConnectionIdException
-	 */
 	public void updateBuddyChange(final XMPPResourceConnection session,
 			final Queue<Packet> results, final Element item)
 					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
@@ -655,21 +494,6 @@ public abstract class RosterAbstract {
 		}    // end of for (XMPPResourceConnection conn: sessions)
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param presence
-	 * @param jid
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public boolean updateBuddySubscription(final XMPPResourceConnection session,
 			final PresenceType presence, JID jid)
 					throws NotAuthorizedException, TigaseDBException {
@@ -713,28 +537,8 @@ public abstract class RosterAbstract {
 			return false;
 		}
 
-		// if ((SUB_NONE.contains(current_subscription)
-		// && SUB_NONE.contains(new_subscription))
-		// || (SUB_TO.contains(current_subscription)
-		// && SUB_TO.contains(new_subscription))
-		// || (SUB_FROM.contains(current_subscription)
-		// && SUB_FROM.contains(new_subscription))
-		// || (SUB_BOTH.contains(current_subscription)
-		// && SUB_BOTH.contains(new_subscription))) {
-		// return false;
-		// } else {
-		// setBuddySubscription(session, new_subscription, jid);
-		// return true;
-		// }
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param roster_str
-	 * @param session
-	 */
 	public void updateRosterHash(String roster_str, XMPPResourceConnection session) {
 		String roster_hash = null;
 
@@ -746,47 +550,9 @@ public abstract class RosterAbstract {
 		session.putCommonSessionData(ROSTERHASH, roster_hash);
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	// ~--- get methods ----------------------------------------------------------
-	// public abstract String[] getBuddies(final XMPPResourceConnection session,
-	// boolean onlineOnly)
-	// throws NotAuthorizedException, TigaseDBException;
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>JID[]</code>
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public abstract JID[] getBuddies(final XMPPResourceConnection session)
 					throws NotAuthorizedException, TigaseDBException;
 
-	// ~--- get methods ----------------------------------------------------------
-	// public String[] getBuddies(final XMPPResourceConnection session,
-	// final EnumSet<SubscriptionType> subscrs, boolean onlineOnly)
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param subscrs
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>JID[]</code>
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public JID[] getBuddies(final XMPPResourceConnection session,
 			final EnumSet<SubscriptionType> subscrs)
 					throws NotAuthorizedException, TigaseDBException {
@@ -811,16 +577,6 @@ public abstract class RosterAbstract {
 		return list.toArray(new JID[list.size()]);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	public String getBuddiesHash(final XMPPResourceConnection session) {
 		String hash = (String) session.getCommonSessionData(ROSTERHASH);
 
@@ -829,37 +585,9 @@ public abstract class RosterAbstract {
 				: "");
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param buddy
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String[]</code>
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public abstract String[] getBuddyGroups(final XMPPResourceConnection session, JID buddy)
 					throws NotAuthorizedException, TigaseDBException;
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param buddy
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>Element</code>
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public Element getBuddyItem(final XMPPResourceConnection session, JID buddy)
 					throws NotAuthorizedException, TigaseDBException {
 		SubscriptionType subscr = getBuddySubscription(session, buddy);
@@ -894,66 +622,16 @@ public abstract class RosterAbstract {
 		return item;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param buddy
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public abstract String getBuddyName(final XMPPResourceConnection session, JID buddy)
 					throws NotAuthorizedException, TigaseDBException;
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param buddy
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>SubscriptionType</code>
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public abstract SubscriptionType getBuddySubscription(
 			final XMPPResourceConnection session, JID buddy)
 					throws NotAuthorizedException, TigaseDBException;
 
-	/**
-	 * @param session
-	 * @param buddy
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 * @throws TigaseDBException
-	 * @throws NotAuthorizedException
-	 */
-	public abstract String getCustomStatus(XMPPResourceConnection session, JID buddy)
+	public abstract Element getCustomChild(XMPPResourceConnection session, JID buddy)
 					throws NotAuthorizedException, TigaseDBException;
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param packet
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>PresenceType</code>
-	 * @throws NotAuthorizedException
-	 */
 	public PresenceType getPresenceType(final XMPPResourceConnection session,
 			final Packet packet)
 					throws NotAuthorizedException {
@@ -1015,36 +693,10 @@ public abstract class RosterAbstract {
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session is a <code>XMPPResourceConnection</code>
-	 * @param jid is a <code>JID</code>
-	 *
-	 * @return a value of <code>RosterElementIfc</code>
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
-	public abstract RosterElementIfc getRosterElement(XMPPResourceConnection session,
+	public abstract RosterElement getRosterElement(XMPPResourceConnection session,
 			JID jid)
 					throws NotAuthorizedException, TigaseDBException;
 
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of {@code List<Element>}
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public List<Element> getRosterItems(XMPPResourceConnection session)
 					throws NotAuthorizedException, TigaseDBException {
 		LinkedList<Element> items = new LinkedList<Element>();
@@ -1060,21 +712,9 @@ public abstract class RosterAbstract {
 				items.add(buddy_item);
 			}
 		}
-
 		return items;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param subscription
-	 * @param presence
-	 *
-	 *
-	 *
-	 * @return a value of <code>SubscriptionType</code>
-	 */
 	public static SubscriptionType getStateTransition(final SubscriptionType subscription,
 			final PresenceType presence) {
 		StateTransition transition = subsToStateMap.get(subscription);
@@ -1094,39 +734,9 @@ public abstract class RosterAbstract {
 	 */
 	public abstract boolean isRosterLoaded(XMPPResourceConnection session);	
 	
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param jid
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public abstract boolean isOnline(XMPPResourceConnection session, JID jid)
 					throws NotAuthorizedException, TigaseDBException;
 
-	// ~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param jid
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public boolean isPendingIn(final XMPPResourceConnection session, JID jid)
 					throws NotAuthorizedException, TigaseDBException {
 		SubscriptionType subscr = getBuddySubscription(session, jid);
@@ -1134,20 +744,6 @@ public abstract class RosterAbstract {
 		return PENDING_IN.contains(subscr);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param jid
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public boolean isSubscribedFrom(final XMPPResourceConnection session, JID jid)
 					throws NotAuthorizedException, TigaseDBException {
 		SubscriptionType subscr = getBuddySubscription(session, jid);
@@ -1155,34 +751,10 @@ public abstract class RosterAbstract {
 		return FROM_SUBSCRIBED.contains(subscr);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param subscr
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	public boolean isSubscribedFrom(SubscriptionType subscr) {
 		return FROM_SUBSCRIBED.contains(subscr);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param jid
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public boolean isSubscribedTo(final XMPPResourceConnection session, JID jid)
 					throws NotAuthorizedException, TigaseDBException {
 		SubscriptionType subscr = getBuddySubscription(session, jid);
@@ -1190,69 +762,18 @@ public abstract class RosterAbstract {
 		return TO_SUBSCRIBED.contains(subscr);
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	// ~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param buddy
-	 * @param name
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public abstract void setBuddyName(final XMPPResourceConnection session, JID buddy,
 			final String name)
 					throws NotAuthorizedException, TigaseDBException;
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param subscription
-	 * @param buddy
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public abstract void setBuddySubscription(final XMPPResourceConnection session,
 			final SubscriptionType subscription, JID buddy)
 					throws NotAuthorizedException, TigaseDBException;
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param jid
-	 * @param online
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public abstract void setOnline(XMPPResourceConnection session, JID jid, boolean online)
 					throws NotAuthorizedException, TigaseDBException;
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param session
-	 * @param jid
-	 * @param sent
-	 *
-	 * @throws NotAuthorizedException
-	 * @throws TigaseDBException
-	 */
 	public abstract void setPresenceSent(XMPPResourceConnection session, JID jid,
 			boolean sent)
 					throws NotAuthorizedException, TigaseDBException;
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/10/09

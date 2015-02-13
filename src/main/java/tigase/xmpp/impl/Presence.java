@@ -340,12 +340,17 @@ public class Presence
 			log.config(
 					"Automatic presence autorization enabled, results in less strict XMPP specs compatibility ");
 		}
-		tmp = (String) settings.get(OFFLINE_ROSTER_LAST_SEEN_PROP_KEY);
-		if (tmp != null) {
-			offlineRosterLastSeen = tmp.split(",");
-			log.log(Level.CONFIG, "Loaded roster offline last seen config: {0}", tmp);
+		tmp = (String) settings.get( OFFLINE_ROSTER_LAST_SEEN_PROP_KEY );
+		if ( tmp != null ){
+			if ( tmp.contains( "off" ) ){
+				offlineRosterLastSeen = null;
+			} else {
+				offlineRosterLastSeen = tmp.split( "," );
+				log.log( Level.CONFIG, "Loaded roster offline last seen config: {0}", tmp );
+			}
 		} else {
-			log.config("No configuration found for Loaded roster offline last seen.");
+			offlineRosterLastSeen = new String[] {"*"};
+			log.config("No configuration found for Loaded roster offline last seen. - enabling for All clients");
 		}
 		tmp = (String) settings.get(PRESENCE_GLOBAL_FORWARD);
 		if (tmp != null) {
@@ -1228,10 +1233,10 @@ public class Presence
 		}
 		if (roster_util.isSubscribedTo(session, presBuddy) || (dynItem != null)) {
 			if (online) {
-				RosterElementIfc rel = roster_util.getRosterElement(session, presBuddy);
+				RosterElement rel = roster_util.getRosterElement( session, presBuddy );
 
-				if ((rel != null) && (rel instanceof RosterElement)) {
-					((RosterElement) rel).setLastSeen(System.currentTimeMillis());
+				if ( rel != null ){
+					rel.setLastSeen( System.currentTimeMillis() );
 				}
 			}
 			if (log.isLoggable(Level.FINEST)) {
@@ -1879,12 +1884,16 @@ public class Presence
 		boolean validClient = false;
 		int     i           = 0;
 
-		while ((i < offlineRosterLastSeen.length) &&!(validClient |= node.contains(
-				offlineRosterLastSeen[i++])));
-		if (!validClient) {
-			log.finest("Client does not match, skipping...");
+		if ( offlineRosterLastSeen.length > 0 && !offlineRosterLastSeen[0].equals( "*" ) ){
+			while ( ( i < offlineRosterLastSeen.length ) && !( validClient |= node.contains(
+					offlineRosterLastSeen[i++] ) ) );
+			if ( !validClient ){
+				log.finest( "Client does not match, skipping..." );
 
-			return;
+				return;
+			}
+		} else {
+			// enabled for all clients
 		}
 
 		JID[] buddies = roster_util.getBuddies(session, TO_SUBSCRIBED);
@@ -1898,9 +1907,9 @@ public class Presence
 			int      pres_cnt      = 0;
 
 			for (JID buddy : buddies) {
-				String status = roster_util.getCustomStatus(session, buddy);
+				Element child = roster_util.getCustomChild(session, buddy);
 
-				if (status != null) {
+				if (child != null) {
 					Packet pack = sendPresence(StanzaType.unavailable, buddy, session.getJID(),
 							results, null);
 
@@ -1910,7 +1919,7 @@ public class Presence
 					}
 					pack.setPriority(pack_priority);
 					pack.setPacketTo(session.getConnectionId());
-					pack.getElement().addChild(new Element("status", status));
+					pack.getElement().addChild(child);
 				}
 			}    // end of for (String buddy: buddies)
 		}

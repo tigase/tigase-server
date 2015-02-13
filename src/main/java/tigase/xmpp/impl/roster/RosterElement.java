@@ -20,42 +20,31 @@
  *
  */
 
-
-
 package tigase.xmpp.impl.roster;
-
-//~--- non-JDK imports --------------------------------------------------------
-
-import tigase.util.TigaseStringprepException;
-import tigase.util.XMPPStringPrepFactory;
-
-import tigase.xml.Element;
-import tigase.xml.XMLUtils;
 
 import tigase.xmpp.JID;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
 
-import static tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
+import tigase.util.TigaseStringprepException;
+import tigase.util.XMPPStringPrepFactory;
+import tigase.xml.Element;
+import tigase.xml.XMLUtils;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashSet;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 /**
  * Describe class RosterElement here.
  *
- *
  * Created: Wed Oct 29 14:21:16 2008
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
  */
-public class RosterElement
-				implements RosterElementIfc {
+public class RosterElement {
 	/** Field description */
 	protected static final long INITIAL_LAST_SEEN_VAL = 1000l;
 	private static final String ACTIVITY_ATT          = "activity";
@@ -95,14 +84,6 @@ public class RosterElement
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Creates a new <code>RosterElement</code> instance.
-	 *
-	 *
-	 * @param roster_el
-	 * @param session
-	 * @throws TigaseStringprepException
-	 */
 	public RosterElement(Element roster_el, XMPPResourceConnection session)
 					throws TigaseStringprepException {
 		this.session = session;
@@ -162,15 +143,6 @@ public class RosterElement
 		}
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 *
-	 * @param jid
-	 * @param name
-	 * @param groups
-	 * @param session
-	 */
 	public RosterElement(JID jid, String name, String[] groups,
 											 XMPPResourceConnection session) {
 		this.stringpreped = XMPPStringPrepFactory.STRINGPREP_PROCESSOR;
@@ -181,14 +153,6 @@ public class RosterElement
 		this.subscription = SubscriptionType.none;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param groups
-	 */
 	public void addGroups(String[] groups) {
 		if (groups != null) {
 			if (this.groups == null) {
@@ -208,57 +172,24 @@ public class RosterElement
 			}
 		}
 
-		// item = null;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public String[] getGroups() {
 		return groups;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public JID getJid() {
 		return jid;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public String getName() {
 		return name;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public String getOtherData() {
 		return otherData;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public Element getRosterElement() {
 		Element elem = new Element(ELEM_NAME, new String[] { JID_ATT, SUBS_ATT, NAME_ATT,
 						STRINGPREP_ATT }, new String[] { jid.toString(), subscription.toString(),
@@ -284,12 +215,6 @@ public class RosterElement
 		return elem;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public Element getRosterItem() {
 
 		// This is actually not a good idea to cache the item element.
@@ -311,68 +236,30 @@ public class RosterElement
 				item.addChild(group);
 			}    // end of for ()
 		}      // end of if-else
-
-		// }
 		return item;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public String toString() {
 		return getRosterItem().toString();
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public SubscriptionType getSubscription() {
 		return subscription;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public boolean isModified() {
 		return modified;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public boolean isOnline() {
 		return onlineMap.size() > 0;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public boolean isPresence_sent() {
 		return presence_sent;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param groups
-	 */
 	public final void setGroups(String[] groups) {
 		if ((groups != null) && (groups.length > 0)) {
 			this.groups = new String[groups.length];
@@ -383,12 +270,6 @@ public class RosterElement
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param name
-	 */
 	public final void setName(String name) {
 		String old_name = this.name;
 
@@ -405,14 +286,6 @@ public class RosterElement
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @param resource
-	 * @param online
-	 */
 	public void setOnline(String resource, boolean online) {
 		if ((onlineMap != null) && (resource != null)) {
 			if (online) {
@@ -423,32 +296,14 @@ public class RosterElement
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param other_data
-	 */
 	public void setOtherData(String other_data) {
 		otherData = other_data;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param presence_sent
-	 */
 	public void setPresence_sent(boolean presence_sent) {
 		this.presence_sent = presence_sent;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param subscription
-	 */
 	public void setSubscription(SubscriptionType subscription) {
 		if (subscription == null) {
 			this.subscription = SubscriptionType.none;
@@ -456,8 +311,6 @@ public class RosterElement
 			this.subscription = subscription;
 		}
 		modified = true;
-
-		// item = null;
 	}
 
 	private void setJid(JID jid) {
@@ -475,42 +328,18 @@ public class RosterElement
 		stringpreped = XMPPStringPrepFactory.STRINGPREP_PROCESSOR;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * 
-	 */
 	public boolean isPersistent() {
 		return persistent;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param persistent
-	 */
 	public void setPersistent(boolean persistent) {
 		this.persistent = persistent;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * @return the activity
-	 */
 	public double getActivity() {
 		return activity;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * @param activity
-	 *          the activity to set
-	 */
 	public void setActivity(double activity) {
 		this.activity = activity;
 		if (activity != 0) {
@@ -519,45 +348,21 @@ public class RosterElement
 		modified = true;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * @return the weight
-	 */
 	public double getWeight() {
 		return weight;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * @param weight
-	 *          the weight to set
-	 */
 	public void setWeight(double weight) {
 		this.weight = weight;
 		modified    = true;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * @return the lastSeen
-	 */
 	public long getLastSeen() {
 		return lastSeen;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * @param lastSeen the lastSeen to set
-	 */
 	public void setLastSeen(long lastSeen) {
 		this.lastSeen = lastSeen;
 		modified      = true;
 	}
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/02/28
