@@ -131,8 +131,11 @@ public class BindResource
 						// Do not replace current settings if there is at least correct
 						// BareJID
 						// already set.
-						if ((packet.getStanzaFrom() == null) ||!from_jid.getBareJID().equals(packet
-								.getStanzaFrom().getBareJID())) {
+						if ((packet.getStanzaFrom() == null) 
+								|| (packet.getElemName() == tigase.server.Presence.ELEM_NAME 
+									&& !from_jid.getBareJID().equals(packet.getStanzaFrom().getBareJID()))
+								|| (packet.getElemName() != tigase.server.Presence.ELEM_NAME
+									&& !from_jid.equals(packet.getStanzaFrom()))) {
 							if (log.isLoggable(Level.FINEST)) {
 								log.log(Level.FINEST, "Setting correct from attribute: {0}", from_jid);
 							}
