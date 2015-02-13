@@ -20,20 +20,13 @@
  *
  */
 
-
-
 package tigase.server;
-
-//~--- non-JDK imports --------------------------------------------------------
-
-import tigase.util.TigaseStringprepException;
-
-import tigase.xml.Element;
 
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
-//~--- JDK imports ------------------------------------------------------------
+import tigase.util.TigaseStringprepException;
+import tigase.xml.Element;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -120,6 +113,10 @@ public class Packet {
 
 	/** Field description */
 	public static final String XMLNS_ATT = "xmlns";
+
+	/**
+	 *
+	 */
 	private static final String ERROR_NS = "urn:ietf:params:xml:ns:xmpp-stanzas";
 
 	/**
@@ -181,15 +178,12 @@ public class Packet {
 		initVars(stanzaFrom, stanzaTo);
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	/**
-	 * Method description
+	 * Method trims {@link Element} stanza to 1024 characters and returns String
+	 * representation of the element
 	 *
-	 *
-	 * @param el
-	 *
-	 * 
+	 * @param el Element which should be converted
+	 * @return
 	 */
 	public static String elemToString(Element el) {
 		String elemData = el.toString();
@@ -203,12 +197,12 @@ public class Packet {
 	}
 
 	/**
-	 * Method description
+	 * Method trims {@link Element} stanza to 1024 characters and returns String
+	 * representation of the element. This version uses secure representation of
+	 * CData of the elements.
 	 *
-	 *
-	 * @param el
-	 *
-	 * 
+	 * @param el Element which should be converted
+	 * @return
 	 */
 	public static String elemToStringSecure(Element el) {
 		String elemData = el.toStringSecure();
@@ -424,8 +418,6 @@ public class Packet {
 		return swapFromTo(reply, getStanzaTo(), getStanzaFrom());
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	/**
 	 * A convenience method for accessing stanza top element attributes. This call is
 	 * equal to the call:
@@ -445,12 +437,15 @@ public class Packet {
 	}
 
 	/**
-	 * Method description
+	 * A convenience method for accessing stanza top element attributes. This call is
+	 * equal to the call:
+	 * <pre>
+	 * packet.getElement().getAttribute(key);
+	 * </pre>
 	 *
+	 * @param key is an attribute key.
 	 *
-	 * @param key
-	 *
-	 * 
+	 * @return an attribute value or NULL if there is no such attribute.
 	 */
 	public String getAttributeStaticStr(String key) {
 		return elem.getAttributeStaticStr(key);
@@ -487,8 +482,6 @@ public class Packet {
 	 * <strong>For performance reasons please consider using
 	 * {@link #getAttributeStaticStr(java.lang.String[], java.lang.String) }
 	 * instead.</strong>
-	 *
-	 *
 	 *
 	 * @param path
 	 * @param key
@@ -727,7 +720,6 @@ public class Packet {
 	/**
 	 * Method returns the stanza XML element in DOM format.
 	 *
-	 *
 	 * @return the stanza XML element in DOM format.
 	 */
 	public Element getElement() {
@@ -736,7 +728,6 @@ public class Packet {
 
 	/**
 	 * Method parses the stanza and returns the error condition if there is any.
-	 *
 	 *
 	 * @return parsed stanza error condition or NULL if there is not error condition.
 	 */
@@ -781,7 +772,6 @@ public class Packet {
 
 	/**
 	 * Returns the packet internal source address.
-	 *
 	 *
 	 * @return a {@link JID} instance of the packet internal source address or
 	 * NULL if the packet internal source address has not been set
@@ -1026,8 +1016,8 @@ public class Packet {
 	 *
 	 * @param name is a <code>String</code> representing the XML element name.
 	 * @param xmlns is a <code>String</code> representing the XML xmlns value.
-	 *
-	 * 
+	 * @return {@code true} if stanza element name and XMLNS is exactly
+	 * the same as given parameters, {@code false} otherwise.
 	 */
 	public boolean isElement(String name, String xmlns) {
 		return (elem.getName() == name) && (xmlns == elem.getXMLNS());
@@ -1179,14 +1169,17 @@ public class Packet {
 		Element old_child = elem;
 		Element new_child = reply;
 
-		for (int i = 0; i < originalXML; i++) {
-			old_child = old_child.getChildren().get(0);
-
-			Element tmp = new Element(old_child.getName());
-
-			tmp.setXMLNS(old_child.getXMLNS());
-			new_child.addChild(tmp);
-			new_child = tmp;
+		for ( int i = 0 ; i < originalXML ; i++ ) {
+			final List<Element> old_children = old_child.getChildren();
+			if ( old_children != null && old_children.size() > 0 ){
+				old_child = old_children.get( 0 );
+				Element tmp = new Element( old_child.getName() );
+				tmp.setAttributes( old_child.getAttributes() );
+				new_child.addChild( tmp );
+				new_child = tmp;
+			} else {
+				break;
+			}
 		}    // end of for (int i = 0; i < originalXML; i++)
 		if (includeXML != null) {
 			new_child.setCData(includeXML);
@@ -1213,36 +1206,39 @@ public class Packet {
 	 * @return a new <code>Packet</code> instance with an OK (result) type stanza
 	 * which is a response to this <code>Packet</code> instance.
 	 */
-	public Packet okResult(Element includeXML, int originalXML) {
-		Element reply = new Element(elem.getName());
+	public Packet okResult( Element includeXML, int originalXML ) {
+		Element reply = new Element( elem.getName() );
 
-		if (getXMLNS() != null) {
-			reply.setXMLNS(getXMLNS());
+		if ( getXMLNS() != null ){
+			reply.setXMLNS( getXMLNS() );
 		}
-		reply.setAttribute(TYPE_ATT, StanzaType.result.toString());
-		if (getStanzaId() != null) {
-			reply.setAttribute(ID_ATT, getStanzaId());
+		reply.setAttribute( TYPE_ATT, StanzaType.result.toString() );
+		if ( getStanzaId() != null ){
+			reply.setAttribute( ID_ATT, getStanzaId() );
 		}    // end of if (getElemId() != null)
 
 		Element old_child = elem;
 		Element new_child = reply;
 
-		for (int i = 0; i < originalXML; i++) {
-			old_child = old_child.getChildren().get(0);
-
-			Element tmp = new Element(old_child.getName());
-
-			tmp.setXMLNS(old_child.getXMLNS());
-			new_child.addChild(tmp);
-			new_child = tmp;
+		for ( int i = 0 ; i < originalXML ; i++ ) {
+			final List<Element> old_children = old_child.getChildren();
+			if ( old_children != null && old_children.size() > 0 ){
+				old_child = old_children.get( 0 );
+				Element tmp = new Element( old_child.getName() );
+				tmp.setAttributes( old_child.getAttributes() );
+				new_child.addChild( tmp );
+				new_child = tmp;
+			} else {
+				break;
+			}
 		}    // end of for (int i = 0; i < originalXML; i++)
-		if (includeXML != null) {
-			new_child.addChild(includeXML);
+		if ( includeXML != null ){
+			new_child.addChild( includeXML );
 		}    // end of if (includeOriginalXML)
 
-		Packet result = swapFromTo(reply, getStanzaTo(), getStanzaFrom());
+		Packet result = swapFromTo( reply, getStanzaTo(), getStanzaFrom() );
 
-		result.setPriority(priority);
+		result.setPriority( priority );
 
 		return result;
 	}
@@ -1280,7 +1276,6 @@ public class Packet {
 	/**
 	 * The method sets a source address for the <code>Packet</code> instance.
 	 *
-	 *
 	 * @param from is a <code>JID</code> instance of the packet new source address.
 	 */
 	public void setPacketFrom(JID from) {
@@ -1289,7 +1284,6 @@ public class Packet {
 
 	/**
 	 * The method sets a destination address for the <code>Packet</code> instance.
-	 *
 	 *
 	 * @param to is a <code>JID</code> instance of the packet new destination
 	 * address.
@@ -1455,9 +1449,6 @@ public class Packet {
 			String elemData = elemToString(elem);
 
 			packetToString = calcToString(elemData);
-
-//    ", DATA=" + elemData + ", SIZE=" + elem.toString().length() + ", XMLNS="
-//    + elem.getXMLNS() + ", PRIORITY=" + priority + ", PERMISSION=" + permissions;
 		}
 
 		return "from=" + packetFrom + ", to=" + packetTo + packetToString;
@@ -1466,9 +1457,8 @@ public class Packet {
 	/**
 	 * Provides human-readable string presentation of the <code>Packet</code> object. It is
 	 * not a XMPP stanza only, it also contains some Tigase specific meta-data.
-	 *
-	 *
 	 * 
+	 * @return human-readable string presentation of the <code>Packet</code> object.
 	 */
 	@Override
 	public String toString() {
@@ -1513,10 +1503,6 @@ public class Packet {
 				String elemData = elemToStringSecure(elem);
 
 				packetToStringSecure = calcToString(elemData);
-
-//      ", DATA=" + elemData + ", SIZE=" + elem.toString().length()
-//      + ", XMLNS=" + elem.getXMLNS() + ", PRIORITY=" + priority + ", PERMISSION="
-//        + permissions;
 			}
 
 			return "from=" + packetFrom + ", to=" + packetTo + packetToStringSecure;
@@ -1572,6 +1558,14 @@ public class Packet {
 		return processorsIds.contains(id);
 	}
 
+	/**
+	 * Common method for creating debugging string representation of {@code Packet}
+	 * objects pre-processed either by regular or secure {@code toString()} {@link Element}
+	 * methods
+	 *
+	 * @param elemData string representation of the Element
+	 * @return debug string representation with additional data.
+	 */
 	private String calcToString(String elemData) {
 		return ", DATA=" + elemData + ", SIZE=" + elem.toString().length() + ", XMLNS=" +
 					 elem.getXMLNS() + ", PRIORITY=" + priority + ", PERMISSION=" + permissions +
@@ -1607,6 +1601,3 @@ public class Packet {
 		}
 	}
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/02/20
