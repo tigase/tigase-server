@@ -1557,6 +1557,13 @@ public class SessionManager
 			break;
 
 		case OTHER :
+			//#2682: Commands addressed to domain should be processed by sess-man
+			if ( iqc.isCommand() && isLocalDomain( iqc.getStanzaTo().getDomain() ) ){
+				Queue<Packet> results = new ArrayDeque<Packet>();
+				processing_result = processScriptCommand( iqc, results );
+				addOutPackets( results );
+			}
+
 			if (getComponentId().equals(iqc.getStanzaTo()) && getComponentId().equals(iqc
 					.getPacketFrom())) {
 
