@@ -38,6 +38,7 @@ import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
+import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.XMPPProcessorAbstract;
 import tigase.xmpp.XMPPResourceConnection;
@@ -47,6 +48,7 @@ import tigase.xmpp.XMPPResourceConnection;
 import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
 
 /**
  * Implementation of JEP-030.
@@ -55,7 +57,6 @@ import java.util.Queue;
  * Created: Mon Mar 27 20:45:36 2006
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
  */
 public class ServiceDiscovery
 				extends XMPPProcessorAbstract {
@@ -86,7 +87,10 @@ public class ServiceDiscovery
 					throws PacketErrorTypeException {
 
 		// Handled elsewhere (in MessageRouter)
-		results.offer(packet.copyElementOnly());
+		if ( packet.getStanzaTo() != null ){
+			log.log( Level.FINEST, "forwarding packet to MR" + packet.toString() );
+			results.offer( packet.copyElementOnly() );
+		}
 	}
 
 	@Override
