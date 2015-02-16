@@ -45,6 +45,7 @@ import java.sql.DataTruncation;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Collections;
@@ -946,6 +947,28 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 	 * @throws SQLException
 	 */
 	private void checkDB() throws SQLException {
+
+		Statement stmt = null;
+
+		try {
+			stmt = data_repo.createStatement( null );
+			stmt.executeQuery( "select " + MSG_TYPE_COLUMN + " from " + MSG_TABLE + " where " + MSG_ID_COLUMN + " = 0" );
+		} catch ( SQLException ex ) {
+			log.log( Level.INFO, MSG_TABLE + " table was in old version, performing update to add missing column" );
+			// if this happens then we have issue with old database schema and missing body columns in MSGS_TABLE
+			String alterTable = null;
+			try {
+				alterTable = "alter table " + MSG_TABLE + " add " + MSG_TYPE_COLUMN + " int NOT NULL;";
+				if ( stmt == null ){
+					stmt = data_repo.createStatement( null );
+				}
+				stmt.execute( alterTable );
+			} catch ( SQLException ex1 ) {
+				log.log( Level.SEVERE, "could not alter table " + MSG_TABLE + " to add missing column by SQL:\n"
+															 + alterTable, ex1 );
+			}
+		}
+
 		DataRepository.dbTypes databaseType = data_repo.getDatabaseType();
 		switch ( databaseType ) {
 			case mysql:
