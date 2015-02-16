@@ -156,7 +156,7 @@ public class FlexibleOfflineMessageRetrieval
 				session.putCommonSessionData( FLEXIBLE_OFFLINE_XMLNS, FLEXIBLE_OFFLINE_XMLNS );
 			}
 
-			if ( queryXmlns != null ){
+			if ( node != null && queryXmlns != null ){
 				switch ( queryXmlns ) {
 					case INFO_XMLNS:
 						addDiscoInfo( session, query );
@@ -165,8 +165,8 @@ public class FlexibleOfflineMessageRetrieval
 						addDiscoItems( session, query );
 						break;
 				}
-			}
 			results.offer( packet.okResult( query, 0 ) );
+			}
 
 		} else if ( null != offlineElement ){
 			// processing retrieve/remove stored message/presence query
