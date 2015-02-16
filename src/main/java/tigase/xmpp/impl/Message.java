@@ -32,14 +32,19 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
+
 import tigase.server.Packet;
+
 import tigase.xml.Element;
+
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPPacketFilterIfc;
@@ -106,42 +111,7 @@ public class Message
 
 		// You may want to skip processing completely if the user is offline.
 		if (session == null) {
-			if (packet.getStanzaTo() != null && packet.getStanzaTo().getResource() != null) {
-				if (deliveryRules != MessageDeliveryRules.strict) {
-					StanzaType type = packet.getType();
-					if (type == null) {
-						type = StanzaType.normal;
-					}
-					switch (type) {
-						case chat:
-							// try to deliver this message to all available resources so we should
-							// treat it as a stanza with bare "to" attribute
-							Packet result = packet.copyElementOnly();
-							result.initVars(packet.getStanzaFrom(),
-									packet.getStanzaTo().copyWithoutResource());
-							results.offer(result);
-							break;
-
-						case error:
-							// for error packet we should ignore stanza according to RFC 6121
-							break;
-
-						case headline:
-						case groupchat:
-						case normal:
-						default:
-							// for each of this types RFC 6121 recomends silent ignoring of stanza
-							// or to return error recipient-unavailable - we will send error as
-							// droping packet without response may not be a good idea
-							results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(
-									packet, "The recipient is no longer available.", true));
-					}
-				}
-				else {
-					results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet,
-							"The recipient is no longer available.", true));
-				}
-			}
+			processOfflineUser( packet, results );
 			return;
 		}    // end of if (session == null)
 		try {
@@ -218,15 +188,10 @@ public class Message
 						}
 					}
 				} else {
-					Packet result = Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet,
-							"The recipient is no longer available.", true);
-
-					result.setPacketFrom(null);
-					result.setPacketTo(null);
-
-					// Don't forget to add the packet to the results queue or it
-					// will be lost.
-					results.offer(result);
+					// if there are no user connections we should process packet
+					// the same as with missing session (i.e. should be stored if
+					// has type 'chat'
+					processOfflineUser( packet, results );
 				}
 
 				return;
@@ -280,6 +245,45 @@ public class Message
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
 		}    // end of try-catch
+	}
+
+	private void processOfflineUser( Packet packet, Queue<Packet> results ) throws PacketErrorTypeException {
+		if (packet.getStanzaTo() != null && packet.getStanzaTo().getResource() != null) {
+			if (deliveryRules != MessageDeliveryRules.strict) {
+				StanzaType type = packet.getType();
+				if (type == null) {
+					type = StanzaType.normal;
+				}
+				switch (type) {
+					case chat:
+						// try to deliver this message to all available resources so we should
+						// treat it as a stanza with bare "to" attribute
+						Packet result = packet.copyElementOnly();
+						result.initVars(packet.getStanzaFrom(),
+															packet.getStanzaTo().copyWithoutResource());
+						results.offer(result);
+						break;
+
+					case error:
+						// for error packet we should ignore stanza according to RFC 6121
+						break;
+
+					case headline:
+					case groupchat:
+					case normal:
+					default:
+						// for each of this types RFC 6121 recomends silent ignoring of stanza
+						// or to return error recipient-unavailable - we will send error as
+						// droping packet without response may not be a good idea
+						results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(
+								packet, "The recipient is no longer available.", true));
+				}
+			}
+			else {
+				results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet,
+																																							 "The recipient is no longer available.", true));
+			}
+		}
 	}
 
 	@Override
