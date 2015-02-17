@@ -1231,19 +1231,17 @@ public class Presence
 		} catch (RosterRetrievingException | RepositoryAccessException ex) {
 			dynItem = null;
 		}
-		if (roster_util.isSubscribedTo(session, presBuddy) || (dynItem != null)) {
-			if (online) {
-				RosterElement rel = roster_util.getRosterElement( session, presBuddy );
+		if ( roster_util.isSubscribedTo( session, presBuddy ) || ( dynItem != null ) ){
+			RosterElement rel = roster_util.getRosterElement( session, presBuddy );
 
-				if ( rel != null ){
-					rel.setLastSeen( System.currentTimeMillis() );
-				}
+			if ( rel != null ){
+				rel.setLastSeen( System.currentTimeMillis() );
 			}
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST,
-						"Received initial presence, setting buddy: {0} online status to: {1}",
-						new Object[] { packet.getStanzaFrom(),
-						online });
+			if ( log.isLoggable( Level.FINEST ) ){
+				log.log( Level.FINEST,
+								 "Received initial presence, setting buddy: {0} online status to: {1}",
+								 new Object[] { packet.getStanzaFrom(),
+																online } );
 			}
 			updatePresenceChange(packet, session, results);
 		}
