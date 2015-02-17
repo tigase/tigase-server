@@ -339,7 +339,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			}
 
 			String msgs_store_limit_str = map.get(MSGS_STORE_LIMIT_KEY);
-
+			
 			if (msgs_store_limit_str != null) {
 				msgs_store_limit = Long.parseLong(msgs_store_limit_str);
 			}
@@ -707,21 +707,26 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			}
 
 			long count = 0;
-			PreparedStatement count_msgs_st =
-					data_repo.getPreparedStatement(to.getBareJID(), msg_count_for_limit_query);
-
-			synchronized (count_msgs_st) {
-				count_msgs_st.setLong(1, to_uid);
-				count_msgs_st.setLong(2, from_uid);
-
-				rs = count_msgs_st.executeQuery();
-
-				if (rs.next()) {
-					count = rs.getLong(1);
+			
+			// If the msgs_store_limit is set to 0, skip the select because the message will be saved anyway
+			if (msgs_store_limit > 0) {
+				PreparedStatement count_msgs_st =
+						data_repo.getPreparedStatement(to.getBareJID(), msg_count_for_limit_query);
+	
+				synchronized (count_msgs_st) {
+					count_msgs_st.setLong(1, to_uid);
+					count_msgs_st.setLong(2, from_uid);
+	
+					rs = count_msgs_st.executeQuery();
+	
+					if (rs.next()) {
+						count = rs.getLong(1);
+					}
 				}
 			}
 
-			if (msgs_store_limit <= count) {
+			// The insertion will be skipped if the msgs_store_limit is higher than 0 and it was passed
+			if (msgs_store_limit > 0 && msgs_store_limit <= count) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Message store limit ({0}) exceeded for message: {1}",
 							new Object[] { msgs_store_limit, Packet.elemToString(msg) });
