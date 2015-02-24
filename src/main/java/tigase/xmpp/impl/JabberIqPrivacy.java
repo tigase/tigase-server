@@ -269,6 +269,7 @@ public class JabberIqPrivacy
 				if (items != null) {
 					Collections.sort(items, compar);
 					for (Element item : items) {
+						final ITEM_ACTION action = ITEM_ACTION.valueOf(item.getAttributeStaticStr(ACTION));
 						boolean   type_matched = false;
 						boolean   elem_matched = false;
 						ITEM_TYPE type         = ITEM_TYPE.all;
@@ -359,26 +360,15 @@ public class JabberIqPrivacy
 							elem_matched = true;
 						} else {
 							for (Element elem : elems) {
-								if ((packet.getElemName() == PRESENCE_EL_NAME) && ((packetIn && (elem
-										.getName() == PRESENCE_IN_EL_NAME)) || (!packetIn && (elem
-										.getName() == PRESENCE_OUT_EL_NAME))) && ((packet.getType() ==
-										null) || (packet.getType() == StanzaType.unavailable))) {
+								if (matchToPrivacyListElement(packetIn, packet, elem, action)) {
 									elem_matched = true;
-
 									break;
 								}
-								if (packetIn && (elem.getName() == packet.getElemName())) {
-									elem_matched = true;
-
-									break;
-								}    // end of if (elem.getName().equals(packet.getElemName()))
-							}      // end of for (Element elem: elems)
-						}        // end of else
+							}
+						} // end of else
 						if (!elem_matched) {
 							break;
 						}        // end of if (!elem_matched)
-
-						ITEM_ACTION action = ITEM_ACTION.valueOf(item.getAttributeStaticStr(ACTION));
 
 						switch (action) {
 						case allow :
@@ -410,6 +400,18 @@ public class JabberIqPrivacy
 		}
 
 		return true;
+	}
+	
+	protected boolean matchToPrivacyListElement(boolean packetIn, Packet packet, Element elem, ITEM_ACTION action) {
+		if ((packet.getElemName() == PRESENCE_EL_NAME)
+				&& ((packetIn && (elem.getName() == PRESENCE_IN_EL_NAME)) || (!packetIn && (elem.getName() == PRESENCE_OUT_EL_NAME)))
+				&& ((packet.getType() == null) || (packet.getType() == StanzaType.unavailable))) {
+			return true;
+		}
+		if (packetIn && (elem.getName() == packet.getElemName())) {
+			return true;
+		}
+		return false;
 	}
 
 	private void processGetRequest(final Packet packet,
