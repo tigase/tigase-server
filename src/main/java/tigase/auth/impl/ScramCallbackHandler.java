@@ -16,6 +16,7 @@ import tigase.auth.DomainAware;
 import tigase.auth.callbacks.PBKDIterationsCallback;
 import tigase.auth.callbacks.SaltCallback;
 import tigase.auth.callbacks.SaltedPasswordCallback;
+import tigase.auth.mechanisms.AbstractSasl;
 import tigase.auth.mechanisms.AbstractSaslSCRAM;
 import tigase.db.AuthRepository;
 import tigase.xmpp.BareJID;
@@ -63,7 +64,7 @@ public class ScramCallbackHandler implements CallbackHandler, AuthRepositoryAwar
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "AuthorizeCallback: authorId: {0}", authorId);
 		}
-		if (authenId.equals(authorId)) {
+		if (AbstractSasl.isAuthzIDIgnored() || authenId.equals(authorId)) {
 			authCallback.setAuthorized(true);
 		}
 	}

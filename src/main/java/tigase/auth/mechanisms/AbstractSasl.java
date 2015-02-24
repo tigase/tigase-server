@@ -13,6 +13,13 @@ import javax.security.sasl.SaslServer;
 
 public abstract class AbstractSasl implements SaslServer {
 
+	public static final String SASL_STRICT_MODE_KEY = "sasl-strict";
+
+	public static boolean isAuthzIDIgnored() {
+		String x = System.getProperty(SASL_STRICT_MODE_KEY, "false");
+		return !Boolean.parseBoolean(x);
+	}
+
 	protected static final boolean isEmpty(Object x) {
 		return x == null || x.toString().length() == 0;
 	}

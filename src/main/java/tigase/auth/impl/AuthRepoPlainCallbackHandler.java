@@ -39,6 +39,7 @@ import javax.security.sasl.RealmCallback;
 import tigase.auth.AuthRepositoryAware;
 import tigase.auth.DomainAware;
 import tigase.auth.callbacks.VerifyPasswordCallback;
+import tigase.auth.mechanisms.AbstractSasl;
 import tigase.db.AuthRepository;
 import tigase.xmpp.BareJID;
 
@@ -66,6 +67,7 @@ public class AuthRepoPlainCallbackHandler implements CallbackHandler, AuthReposi
 		}
 	}
 
+	@SuppressWarnings("unused")
 	protected void handleAuthorizeCallback(AuthorizeCallback authCallback) {
 		String authenId = authCallback.getAuthenticationID();
 
@@ -78,7 +80,7 @@ public class AuthRepoPlainCallbackHandler implements CallbackHandler, AuthReposi
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "AuthorizeCallback: authorId: {0}", authorId);
 		}
-		if (authenId.equals(authorId)) {
+		if (AbstractSasl.isAuthzIDIgnored() || authenId.equals(authorId)) {
 			authCallback.setAuthorized(true);
 		}
 	}
