@@ -108,7 +108,7 @@ public class JabberIqPrivacy
 
 	//~--- constant enums -------------------------------------------------------
 
-	private enum ITEM_ACTION { allow, deny }
+	public enum ITEM_ACTION { allow, deny }
 
 	private enum ITEM_SUBSCRIPTIONS {
 		both, to, from, none
