@@ -39,6 +39,7 @@ import javax.security.sasl.SaslException;
 import tigase.auth.AuthRepositoryAware;
 import tigase.auth.DomainAware;
 import tigase.auth.callbacks.VerifyPasswordCallback;
+import tigase.auth.mechanisms.AbstractSasl;
 import tigase.auth.mechanisms.AbstractSaslSCRAM;
 import tigase.db.AuthRepository;
 import tigase.util.Base64;
@@ -80,7 +81,7 @@ public class PlainSPCallbackHandler implements CallbackHandler, AuthRepositoryAw
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "AuthorizeCallback: authorId: {0}", authorId);
 		}
-		if (authenId.equals(authorId)) {
+		if (AbstractSasl.isAuthzIDIgnored() || authenId.equals(authorId)) {
 			authCallback.setAuthorized(true);
 		}
 	}
