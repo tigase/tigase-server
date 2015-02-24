@@ -963,7 +963,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			// if this happens then we have issue with old database schema and missing body columns in MSGS_TABLE
 			String alterTable = null;
 			try {
-				alterTable = "alter table " + MSG_TABLE + " add " + MSG_TYPE_COLUMN + " int NOT NULL;";
+				alterTable = "alter table " + MSG_TABLE + " add " + MSG_TYPE_COLUMN + " int NOT NULL";
 				if ( stmt == null ){
 					stmt = data_repo.createStatement( null );
 				}
