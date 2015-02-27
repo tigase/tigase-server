@@ -28,12 +28,9 @@ package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
-
 import tigase.server.Iq;
 import tigase.server.Packet;
-
 import tigase.xml.Element;
-
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.impl.roster.RosterAbstract;
@@ -48,10 +45,7 @@ import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
-
 import static tigase.xmpp.impl.Privacy.*;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -75,28 +69,28 @@ import java.util.Queue;
 public class JabberIqPrivacy
 				extends XMPPProcessor
 				implements XMPPProcessorIfc, XMPPPreprocessorIfc, XMPPPacketFilterIfc {
-	private static final String     ACTIVE_EL_NAME  = "active";
-	private static final String     DEFAULT_EL_NAME = "default";
-	private static final String[][] ELEMENTS        = {
+	protected static final String     ACTIVE_EL_NAME  = "active";
+	protected static final String     DEFAULT_EL_NAME = "default";
+	protected static final String[][] ELEMENTS        = {
 		Iq.IQ_QUERY_PATH
 	};
-	private static final String     LIST_EL_NAME    = "list";
+	protected static final String     LIST_EL_NAME    = "list";
 
 	/**
 	 * Private logger for class instances.
 	 */
-	private static Logger          log = Logger.getLogger(JabberIqPrivacy.class.getName());
-	private static final String    PRESENCE_EL_NAME     = "presence";
-	private static final String    PRESENCE_IN_EL_NAME  = "presence-in";
-	private static final String    PRESENCE_OUT_EL_NAME = "presence-out";
-	private static final String    XMLNS                = "jabber:iq:privacy";
-	private static final String    ID                   = XMLNS;
-	private static final String[]  XMLNSS               = { XMLNS };
-	private static RosterAbstract  roster_util = RosterFactory.getRosterImplementation(
+	protected static Logger          log = Logger.getLogger(JabberIqPrivacy.class.getName());
+	protected static final String    PRESENCE_EL_NAME     = "presence";
+	protected static final String    PRESENCE_IN_EL_NAME  = "presence-in";
+	protected static final String    PRESENCE_OUT_EL_NAME = "presence-out";
+	protected static final String    XMLNS                = "jabber:iq:privacy";
+	protected static final String    ID                   = XMLNS;
+	protected static final String[]  XMLNSS               = { XMLNS };
+	protected static RosterAbstract  roster_util = RosterFactory.getRosterImplementation(
 			true);
-	private static final Element[] DISCO_FEATURES = { new Element("feature", new String[] {
+	protected static final Element[] DISCO_FEATURES = { new Element("feature", new String[] {
 			"var" }, new String[] { XMLNS }) };
-	private static final Comparator<Element> compar = new Comparator<Element>() {
+	protected static final Comparator<Element> compar = new Comparator<Element>() {
 		@Override
 		public int compare(Element el1, Element el2) {
 			String or1 = el1.getAttributeStaticStr(ORDER);
@@ -108,13 +102,13 @@ public class JabberIqPrivacy
 
 	//~--- constant enums -------------------------------------------------------
 
-	public enum ITEM_ACTION { allow, deny }
+	protected enum ITEM_ACTION { allow, deny }
 
-	private enum ITEM_SUBSCRIPTIONS {
+	protected enum ITEM_SUBSCRIPTIONS {
 		both, to, from, none
 	}
 
-	private enum ITEM_TYPE {
+	protected enum ITEM_TYPE {
 		jid, group, subscription, all
 	}
 
@@ -232,7 +226,7 @@ public class JabberIqPrivacy
 		return XMLNSS;
 	}
 
-	private boolean allowed(Packet packet, XMPPResourceConnection session) {
+	protected boolean allowed(Packet packet, XMPPResourceConnection session) {
 		try {
 
 			// If this is a preprocessing phase, always allow all packets to
@@ -414,7 +408,7 @@ public class JabberIqPrivacy
 		return false;
 	}
 
-	private void processGetRequest(final Packet packet,
+	protected void processGetRequest(final Packet packet,
 			final XMPPResourceConnection session, final Queue<Packet> results)
 					throws NotAuthorizedException, XMPPException, TigaseDBException {
 		List<Element> children = packet.getElemChildrenStaticStr(Iq.IQ_QUERY_PATH);
@@ -460,7 +454,7 @@ public class JabberIqPrivacy
 		}        // end of else
 	}
 
-	private void processSetRequest(final Packet packet,
+	protected void processSetRequest(final Packet packet,
 			final XMPPResourceConnection session, final Queue<Packet> results)
 					throws NotAuthorizedException, XMPPException, TigaseDBException {
 		List<Element> children = packet.getElemChildrenStaticStr(Iq.IQ_QUERY_PATH);

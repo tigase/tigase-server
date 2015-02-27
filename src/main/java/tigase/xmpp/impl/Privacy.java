@@ -74,42 +74,42 @@ import java.util.Queue;
  */
 public class Privacy {
 	/** Field description */
-	protected static final String ACTION = "action";
+	public static final String ACTION = "action";
 
 	/** Field description */
-	protected static final String ACTIVE = "active-list";
+	public static final String ACTIVE = "active-list";
 
 	/** Field description */
-	protected static final String DEFAULT = "default-list";
+	public static final String DEFAULT = "default-list";
 
 	/** Field description */
-	protected static final String ITEM = "item";
+	public static final String ITEM = "item";
 
 	/** Field description */
-	protected static final String LIST = "list";
+	public static final String LIST = "list";
 
 	/** Field description */
-	protected static final String NAME = "name";
+	public static final String NAME = "name";
 
 	/** Field description */
-	protected static final String ORDER = "order";
+	public static final String ORDER = "order";
 
 	/** Field description */
-	protected static final String PRIVACY = "privacy";
+	public static final String PRIVACY = "privacy";
 
 	/** Field description */
-	protected static final String PRIVACY_LIST = "privacy-list";
+	public static final String PRIVACY_LIST = "privacy-list";
 
 	/** Field description */
-	protected static final String STANZAS = "stanzas";
+	public static final String STANZAS = "stanzas";
 
 	/** Field description */
-	protected static final String TYPE = "type";
+	public static final String TYPE = "type";
 
 	/** Field description */
-	protected static final String VALUE = "value";
+	public static final String VALUE = "value";
 
-	private static final String PRIVACY_LIST_LOADED = "privacy-lists-loaded";
+	public static final String PRIVACY_LIST_LOADED = "privacy-lists-loaded";
 
 	/**
 	 * Private logger for class instances.
