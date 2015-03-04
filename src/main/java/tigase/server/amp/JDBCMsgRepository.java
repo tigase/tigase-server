@@ -956,56 +956,61 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 		Statement stmt = null;
 
 		try {
-			stmt = data_repo.createStatement( null );
-			stmt.executeQuery( "select " + MSG_TYPE_COLUMN + " from " + MSG_TABLE + " where " + MSG_ID_COLUMN + " = 0" );
-		} catch ( SQLException ex ) {
-			log.log( Level.INFO, MSG_TABLE + " table was in old version, performing update to add missing column" );
-			// if this happens then we have issue with old database schema and missing body columns in MSGS_TABLE
-			String alterTable = null;
-			try {
-				alterTable = "alter table " + MSG_TABLE + " add " + MSG_TYPE_COLUMN + " int NOT NULL";
-				if ( stmt == null ){
-					stmt = data_repo.createStatement( null );
-				}
-				stmt.execute( alterTable );
-			} catch ( SQLException ex1 ) {
-				log.log( Level.SEVERE, "could not alter table " + MSG_TABLE + " to add missing column by SQL:\n"
-															 + alterTable, ex1 );
+			DataRepository.dbTypes databaseType = data_repo.getDatabaseType();
+			switch ( databaseType ) {
+				case mysql:
+					data_repo.checkTable( JID_TABLE, MYSQL_CREATE_JID_TABLE );
+					data_repo.checkTable( MSG_TABLE, MYSQL_CREATE_MSG_TABLE );
+
+					data_repo.checkTable( "broadcast_msgs", MYSQL_CREATE_BROADCAST_MSGS_TABLE );
+					data_repo.checkTable( "broadcast_msgs_recipients", MYSQL_CREATE_BROADCAST_MSGS_RECIPIENTS_TABLE );
+					break;
+				case postgresql:
+					data_repo.checkTable( JID_TABLE, PGSQL_CREATE_JID_TABLE );
+					data_repo.checkTable( MSG_TABLE, PGSQL_CREATE_MSG_TABLE );
+
+					data_repo.checkTable( "broadcast_msgs", PGSQL_CREATE_BROADCAST_MSGS_TABLE );
+					data_repo.checkTable( "broadcast_msgs_recipients", PGSQL_CREATE_BROADCAST_MSGS_RECIPIENTS_TABLE );
+					break;
+				case derby:
+					data_repo.checkTable( JID_TABLE, DERBY_CREATE_JID_TABLE );
+					data_repo.checkTable( MSG_TABLE, DERBY_CREATE_MSG_TABLE );
+
+					data_repo.checkTable( "broadcast_msgs", DERBY_CREATE_BROADCAST_MSGS_TABLE );
+					data_repo.checkTable( "broadcast_msgs_recipients", DERBY_CREATE_BROADCAST_MSGS_RECIPIENTS_TABLE );
+					break;
+				case jtds:
+				case sqlserver:
+					data_repo.checkTable( JID_TABLE, SQLSERVER_CREATE_JID_TABLE );
+					data_repo.checkTable( MSG_TABLE, SQLSERVER_CREATE_MSG_TABLE );
+
+					data_repo.checkTable( "broadcast_msgs", SQLSERVER_CREATE_BROADCAST_MSGS_TABLE );
+					data_repo.checkTable( "broadcast_msgs_recipients", SQLSERVER_CREATE_BROADCAST_MSGS_RECIPIENTS_TABLE );
+					break;
 			}
+
+			try {
+				stmt = data_repo.createStatement( null );
+				stmt.executeQuery( "select " + MSG_TYPE_COLUMN + " from " + MSG_TABLE + " where " + MSG_ID_COLUMN + " = 0" );
+			} catch ( SQLException ex ) {
+				log.log( Level.INFO, MSG_TABLE + " table was in old version, performing update to add missing column" );
+				// if this happens then we have issue with old database schema and missing body columns in MSGS_TABLE
+				String alterTable = null;
+				try {
+					alterTable = "alter table " + MSG_TABLE + " add " + MSG_TYPE_COLUMN + " int NOT NULL";
+					if ( stmt == null ){
+						stmt = data_repo.createStatement( null );
+					}
+					stmt.execute( alterTable );
+				} catch ( SQLException ex1 ) {
+					log.log( Level.SEVERE, "could not alter table " + MSG_TABLE + " to add missing column by SQL:\n"
+																 + alterTable, ex1 );
+				}
+			}
+		} finally {
+			data_repo.release( stmt, null );
 		}
 
-		DataRepository.dbTypes databaseType = data_repo.getDatabaseType();
-		switch ( databaseType ) {
-			case mysql:
-				data_repo.checkTable( JID_TABLE, MYSQL_CREATE_JID_TABLE );
-				data_repo.checkTable( MSG_TABLE, MYSQL_CREATE_MSG_TABLE );
-				
-				data_repo.checkTable( "broadcast_msgs", MYSQL_CREATE_BROADCAST_MSGS_TABLE);
-				data_repo.checkTable( "broadcast_msgs_recipients", MYSQL_CREATE_BROADCAST_MSGS_RECIPIENTS_TABLE);
-				break;
-			case postgresql:
-				data_repo.checkTable( JID_TABLE, PGSQL_CREATE_JID_TABLE );
-				data_repo.checkTable( MSG_TABLE, PGSQL_CREATE_MSG_TABLE );
-
-				data_repo.checkTable( "broadcast_msgs", PGSQL_CREATE_BROADCAST_MSGS_TABLE);
-				data_repo.checkTable( "broadcast_msgs_recipients", PGSQL_CREATE_BROADCAST_MSGS_RECIPIENTS_TABLE);
-				break;
-			case derby:
-				data_repo.checkTable( JID_TABLE, DERBY_CREATE_JID_TABLE );
-				data_repo.checkTable( MSG_TABLE, DERBY_CREATE_MSG_TABLE );
-
-				data_repo.checkTable( "broadcast_msgs", DERBY_CREATE_BROADCAST_MSGS_TABLE);
-				data_repo.checkTable( "broadcast_msgs_recipients", DERBY_CREATE_BROADCAST_MSGS_RECIPIENTS_TABLE);
-				break;
-			case jtds:
-			case sqlserver:
-				data_repo.checkTable( JID_TABLE, SQLSERVER_CREATE_JID_TABLE );
-				data_repo.checkTable( MSG_TABLE, SQLSERVER_CREATE_MSG_TABLE );
-
-				data_repo.checkTable( "broadcast_msgs", SQLSERVER_CREATE_BROADCAST_MSGS_TABLE);
-				data_repo.checkTable( "broadcast_msgs_recipients", SQLSERVER_CREATE_BROADCAST_MSGS_RECIPIENTS_TABLE);
-				break;
-		}
 	}
 
 	@Override
