@@ -1588,8 +1588,8 @@ public class SessionManager
 
 				connection.putSessionData(SaslEXTERNAL.SASL_EXTERNAL_ALLOWED, Boolean.TRUE);
 				connection.putSessionData(SaslEXTERNAL.SESSION_AUTH_JIDS_KEY, jids);
-				processing_result = true;
 			}
+			processing_result = true;
 
 			break;
 
