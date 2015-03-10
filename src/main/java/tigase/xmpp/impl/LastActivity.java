@@ -23,6 +23,7 @@ package tigase.xmpp.impl;
 
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import tigase.db.NonAuthUserRepository;
@@ -43,7 +44,12 @@ import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPProcessorAbstract;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPStopListenerIfc;
-import java.util.logging.Level;
+import tigase.xmpp.impl.annotation.DiscoFeatures;
+import tigase.xmpp.impl.annotation.Handle;
+import tigase.xmpp.impl.annotation.Handles;
+import tigase.xmpp.impl.annotation.Id;
+import static tigase.xmpp.impl.LastActivity.ID;
+import static tigase.xmpp.impl.LastActivity.XMLNS;
 
 /**
  * Implementation of <a
@@ -52,12 +58,16 @@ import java.util.logging.Level;
  * @author bmalkow
  *
  */
+@Id(ID)
+@DiscoFeatures({ XMLNS })
+@Handles({ @Handle(path = { Iq.ELEM_NAME, Iq.QUERY_NAME }, xmlns = XMLNS), @Handle(path = { Presence.ELEM_NAME }, xmlns = "jabber:client"),
+                @Handle(path = { Message.ELEM_NAME }, xmlns = "jabber:client") })
 public class LastActivity extends XMPPProcessorAbstract implements XMPPStopListenerIfc {
-	private static final String XMLNS = "jabber:iq:last";
+	protected static final String XMLNS = "jabber:iq:last";
 	private final static String[] XMLNSS = new String[] { XMLNS, "jabber:client", "jabber:client" };
 	private static final Element[] DISCO_FEATURES = { new Element("feature", new String[] { "var" }, new String[] { XMLNS }) };
 	private static final String[][] ELEMENTS = { Iq.IQ_QUERY_PATH, { Presence.ELEM_NAME }, { Message.ELEM_NAME } };
-	private final static String ID = XMLNS;
+    protected final static String ID = XMLNS;
 	private final static String LAST_ACTIVITY_KEY = "LAST_ACTIVITY_KEY";
 	private final static String LAST_STATUS_KEY = "LAST_STATUS_KEY";
 	private static final Logger log = Logger.getLogger(LastActivity.class.getName());
