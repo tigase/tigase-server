@@ -220,7 +220,7 @@ public class TLSWrapper {
 	 */
 	public void close() throws SSLException {
 		tlsEngine.closeOutbound();
-
+		tlsEngine.getSession().invalidate();
 		// tlsEngine.closeInbound();
 	}
 
