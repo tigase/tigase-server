@@ -43,7 +43,7 @@ public class ElemPathCriteria implements Criteria {
 
 		boolean match = element.getName().equals(names[0]);
 		if (match && xmlns[0] != null)
-			match &= element.getXMLNS().equals(xmlns[0]);
+			match &= xmlns[0].equals(element.getXMLNS());
 
 		Element child = element;
 		int i = 1;
@@ -51,10 +51,7 @@ public class ElemPathCriteria implements Criteria {
 			String n = names[i];
 			String x = xmlns[i];
 
-			if (x == null)
-				child = child.getChild(n);
-			else
-				child = child.getChild(n, x);
+			child = child.getChildStaticStr(n, x);
 
 			match &= child != null;
 
