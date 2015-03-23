@@ -997,11 +997,16 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 				// if this happens then we have issue with old database schema and missing body columns in MSGS_TABLE
 				String alterTable = null;
 				try {
-					alterTable = "alter table " + MSG_TABLE + " add " + MSG_TYPE_COLUMN + " int NOT NULL";
+					alterTable = "alter table " + MSG_TABLE + " add " + MSG_TYPE_COLUMN + " int";
 					if ( stmt == null ){
 						stmt = data_repo.createStatement( null );
 					}
 					stmt.execute( alterTable );
+					alterTable = "update " + MSG_TABLE + " set " + MSG_TYPE_COLUMN + " = 0";
+					stmt.execute( alterTable );
+					alterTable = "alter table " + MSG_TABLE + " alter column " + MSG_TYPE_COLUMN + " int NOT NULL";
+					stmt.execute( alterTable );
+
 				} catch ( SQLException ex1 ) {
 					log.log( Level.SEVERE, "could not alter table " + MSG_TABLE + " to add missing column by SQL:\n"
 																 + alterTable, ex1 );
