@@ -114,6 +114,21 @@ public class DataForm {
 		}
 	}
 
+	public static void addField( final Element el, final String f_name,
+																		final String f_label, final String type ) {
+		Element x = el.getChild( "x", "jabber:x:data" );
+
+		if ( x == null ){
+			x = addDataForm( el, DataType.submit );
+		}
+
+		Element field = new Element( FIELD_EL,
+																 new String[] { "var", "type", "label" },
+																 new String[] { XMLUtils.escape( f_name ), type, f_label } );
+
+		x.addChild( field );
+	}
+
 	public static void addFieldValue( final Element el, final String f_name,
 																		final String f_value ) {
 		Element x = el.getChild( "x", "jabber:x:data" );
