@@ -28,6 +28,7 @@ package tigase.xmpp.impl;
 
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
@@ -52,6 +53,8 @@ import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 
+import static tigase.server.amp.AmpFeatureIfc.*;
+
 /**
  * Created: Apr 29, 2010 5:00:25 PM
  *
@@ -66,13 +69,8 @@ public class MessageAmp
 	private static final String[][] ELEMENTS             = {
 		{ "message" }, { "presence" }
 	};
-	private static final String     FROM_CONN_ID         = "from-conn-id";
 	private static final String     ID                   = "amp";
 	private static final Logger     log = Logger.getLogger(MessageAmp.class.getName());
-	private static final String     MSG_OFFLINE_PROP_KEY = "msg-offline";
-	private static final String     OFFLINE              = "offline";
-	private static final String     TO_CONN_ID           = "to-conn-id";
-	private static final String     TO_RES               = "to-res";
 	private static final String     XMLNS                = "http://jabber.org/protocol/amp";
 	private static final String[]   XMLNSS = { "jabber:client", "jabber:client" };
 	private static Element[]        DISCO_FEATURES = { new Element("feature",
@@ -186,14 +184,51 @@ public class MessageAmp
 
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
-		boolean result = C2SDeliveryErrorProcessor.preProcess(packet, session, repo, results, settings);
-		if (result && packet.getPacketFrom() != null && packet.getPacketFrom().equals(ampJID)) {
-			result = false;
+		boolean processed = C2SDeliveryErrorProcessor.preProcess(packet, session, repo, results, settings);
+		if (processed && packet.getPacketFrom() != null && packet.getPacketFrom().equals(ampJID)) {
+			processed = false;
 		}
-		if (result) {
+		if (processed) {
 			packet.processedBy(ID);
+		} else if (packet.getElemName() == Message.ELEM_NAME) {
+			Element amp = packet.getElement().getChild("amp", XMLNS);
+			if (amp == null || (amp.getAttributeStaticStr("status") != null) || ampJID.equals(packet.getPacketFrom())) {
+				return false;
+			}
+			
+			try {
+				Packet result = packet.copyElementOnly();
+
+				result.setPacketTo(ampJID);
+				results.offer(result);
+				if (session == null) {
+					result.getElement().addAttribute(OFFLINE, "1");
+					packet.processedBy(ID);
+	
+					return true;
+				}
+				if (session.isUserId(packet.getStanzaTo().getBareJID())) {
+					List<XMPPResourceConnection> conns = session.getActiveSessions();
+					if (conns.isEmpty()) {
+						result.getElement().addAttribute(OFFLINE, "1");
+						packet.processedBy(ID);
+	
+						return true;					
+					}
+				} else {
+					JID connectionId = session.getConnectionId();
+
+					if (connectionId.equals(packet.getPacketFrom())) {
+						result.getElement().addAttribute(FROM_CONN_ID, connectionId.toString());
+					}
+				}
+				packet.processedBy(ID);
+				return true;
+			} catch (XMPPException ex) {
+				log.log(Level.SEVERE, "this should not happen", ex);
+			}
 		}
-		return result;
+		return processed;
 	}
 	
 	@Override
@@ -227,29 +262,10 @@ public class MessageAmp
 		} else {
 			Element amp = packet.getElement().getChild("amp", XMLNS);
 
-			if ((amp == null) || (amp.getAttributeStaticStr("status") != null)) {
+			if ((amp == null) || (amp.getAttributeStaticStr("status") != null) || ampJID.equals(packet.getPacketFrom())) {
 				messageProcessor.process(packet, session, repo, results, settings);
 			} else {
-				Packet result = packet.copyElementOnly();
-
-				result.setPacketTo(ampJID);
-				results.offer(result);
-				if (session == null) {
-					result.getElement().addAttribute(OFFLINE, "1");
-
-					return;
-				}
-				if (session.isUserId(packet.getStanzaTo().getBareJID())) {
-					result.getElement().addAttribute(TO_CONN_ID, session.getConnectionId()
-							.toString());
-					result.getElement().addAttribute(TO_RES, session.getResource());
-				} else {
-					JID connectionId = session.getConnectionId();
-
-					if (connectionId.equals(packet.getPacketFrom())) {
-						result.getElement().addAttribute(FROM_CONN_ID, connectionId.toString());
-					}
-				}
+				// this should not happen as it is already handled in preprocessing stage
 			}
 		}
 	}
