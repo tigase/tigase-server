@@ -93,7 +93,7 @@
 							<goal>jar</goal>
 						</goals>
 						<configuration>
-							<source>1.7</source>
+							<source>1.8</source>
 							<quiet>true</quiet>
 							<aggregate>true</aggregate>
 							<reportOutputDirectory>${project.reporting.outputDirectory}/docs/javadoc</reportOutputDirectory>
