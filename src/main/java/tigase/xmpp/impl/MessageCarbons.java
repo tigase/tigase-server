@@ -23,9 +23,13 @@
 
 package tigase.xmpp.impl;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -75,6 +79,8 @@ public class MessageCarbons
 	
 	private static final String ENABLE_ELEM_NAME = "enable";
 	private static final String DISABLE_ELEM_NAME = "disable";
+	
+	private tigase.xmpp.impl.Message messageProcessor = new tigase.xmpp.impl.Message();
 	
 	@Override
 	public String id() {
@@ -151,72 +157,61 @@ public class MessageCarbons
 			//if (isErrorDeliveringForkedMessage(packet, session))
 			//	return;
 			
-			if (session.isUserId(packet.getStanzaTo().getBareJID()) && packet.getStanzaTo().getResource() == null) {
-				// message is cloned to all resources by Message.java, it violates RFC6121 
-				// while it should be copied only to resources with non negative priority!!
-				// until it is not solved there is no need to fork messages
-				
-/*				// we need to fork this message
-				JID sessionJid = session.getJID();	
-				
-				for (JID jid : enabledJids) {
-					// do not fork if message would be sent to this connection by default
-					if (sessionJid.equals(jid))
-						continue;
-					
-					
-					Packet msgClone = Packet.packetInstance(packet.getElement().clone(), packet.getStanzaFrom(), jid);//packet.copyElementOnly();
-					msgClone.setPacketFrom(packet.getPacketTo());
-					
-					try {						
-						msgClone.setPacketTo(session.getConnectionId(jid));
-						
-						results.offer(msgClone);
-					}
-					catch (NoConnectionIdException ex) {
-						// no connection for this resource, so this jid needs to
-						// be removed from list of enabled resources
-						enabledJids.remove(jid);
-					}
-				}*/
-			}
-			else if (packet.getType() == StanzaType.chat) {
+			if (packet.getType() == StanzaType.chat) {
 				
 				// if this is error delivering forked message we should not fork it
 				// but we need to fork only messsages with type chat so no need to check it
 				//if (isErrorDeliveringForkedMessage(packet, session))
 				//	return;
-				
-				if (packet.getElement().getChild("received", XMLNS) != null 
-						|| packet.getElement().getChild("sent", XMLNS) != null)
+				if (packet.getElement().getChild("received", XMLNS) != null
+						|| packet.getElement().getChild("sent", XMLNS) != null) {
 					return;
-				
+				}
+
 				// if this is private message then do not send carbon copy
 				Element privateEl = packet.getElement().getChild("private", XMLNS);
-				
+
 				if (privateEl != null) {
 					// TODO: is it enought to just remove this element?
 					packet.getElement().removeChild(privateEl);
 					return;
 				}
-			
+
 				String type = session.isUserId(packet.getStanzaTo().getBareJID()) ? "received" : "sent";
 				JID srcJid = JID.jidInstance(session.getBareJID());
+				// collections of jid to which message will be delivered by default so we need to skip them
+				Set<JID> skipForkingTo = null;
+							
+				if (session.isUserId(packet.getStanzaTo().getBareJID()) && packet.getStanzaTo().getResource() == null) {
+					// message is cloned to all resources by Message.java, it violates RFC6121 
+					// while it should be copied only to resources with non negative priority!!
+					// until it is not solved there is no need to fork messages
+
+					// as we started to respect connection priority we need to implement proper 
+					// forking of messages sent to bare jid
+					// we need to fork this message
+					skipForkingTo = messageProcessor.getJIDsForMessageDelivery(session);
+				} else {
+					skipForkingTo = Collections.singleton(session.getJID());
+				}
 				
-				for (Map.Entry<JID,Boolean> entry : resources.entrySet()) {
-					
-					if (!entry.getValue())
+				for (Map.Entry<JID, Boolean> entry : resources.entrySet()) {
+
+					if (!entry.getValue()) {
 						continue;
-					
+					}
+
 					JID jid = entry.getKey();
-					
+
 					// do not send carbon copy to session to which it is addressed
-					// or from which it is sent
-					if (session.getJID().equals(entry.getKey()))
+					// or from which it is sent or to which it will be delivered due
+					// to default routing
+					if (skipForkingTo.contains(entry.getKey())) {
 						continue;
-					
+					}
+
 					// prepare carbon copy of message					
-					Packet msgClone = prepareCarbonCopy(packet, session, srcJid, jid, type);
+					Packet msgClone = prepareCarbonCopy(packet, srcJid, jid, type);
 					results.offer(msgClone);
 				}
 			}
@@ -249,7 +244,7 @@ public class MessageCarbons
 	 * 
 	 * @throws NoConnectionIdException 
 	 */
-	private static Packet prepareCarbonCopy(Packet packet, XMPPResourceConnection session, 
+	private static Packet prepareCarbonCopy(Packet packet, 
 			JID srcJid, JID jid, String type) { //throws NoConnectionIdException {
 		Packet msgClone = Message.getMessage(srcJid, jid, packet.getType(), null, 
 				null, null, packet.getStanzaId());

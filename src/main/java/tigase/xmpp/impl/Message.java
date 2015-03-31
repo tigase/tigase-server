@@ -27,9 +27,11 @@ package tigase.xmpp.impl;
 //~--- non-JDK imports --------------------------------------------------------
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -153,7 +155,7 @@ public class Message
 
 					// If the message is sent to BareJID then the message is delivered to
 					// all resources
-					conns.addAll(session.getActiveSessions());
+					conns.addAll(getConnectionsForMessageDelivery(session));
 				} else {
 
 					// Otherwise only to the given resource or sent back as error.
@@ -298,6 +300,59 @@ public class Message
 	private static enum MessageDeliveryRules {
 		strict,
 		inteligent
+	}
+
+	/**
+	 * Method returns list of XMPPResourceConnections to which message should be delivered for 
+	 * session passes as parameter if message was sent to bare JID
+	 * 
+	 * @param session
+	 * @return
+	 * @throws NotAuthorizedException 
+	 */
+	public List<XMPPResourceConnection> getConnectionsForMessageDelivery(XMPPResourceConnection session) throws NotAuthorizedException {
+		List<XMPPResourceConnection> conns = new ArrayList<XMPPResourceConnection>();
+		for (XMPPResourceConnection conn : session.getActiveSessions()) {
+			if (conn.getPresence() != null &&  conn.getPriority() >= 0)
+				conns.add(conn);
+		}
+		return conns;
+	}
+
+	/**
+	 * Method returns list of JIDs to which message should be delivered for 
+	 * session passes as parameter if message was sent to bare JID
+	 * 
+	 * @param session
+	 * @return
+	 * @throws NotAuthorizedException 
+	 */
+	public Set<JID> getJIDsForMessageDelivery(XMPPResourceConnection session) throws NotAuthorizedException {
+		Set<JID> jids = new HashSet<JID>();
+		for (XMPPResourceConnection conn : session.getActiveSessions()) {
+			if (conn.getPresence() != null &&  conn.getPriority() >= 0)
+				jids.add(conn.getJID());
+		}
+		return jids;
+	}	
+	
+	/**
+	 * Method returns true if there is at least one XMPPResourceConnection which is allowed to 
+	 * receive message for XMPPResourceConnection
+	 * 
+	 * @param session
+	 * @return 
+	 */
+	public boolean hasConnectionForMessageDelivery(XMPPResourceConnection session) {
+		try {
+			for (XMPPResourceConnection conn : session.getActiveSessions()) {
+				if (conn.getPresence() != null && conn.getPriority() >= 0)
+					return true;
+			}
+		} catch (NotAuthorizedException ex) {
+			// should not happen, end even if it happend then we should return false
+		}
+		return false;
 	}
 }    // Message
 

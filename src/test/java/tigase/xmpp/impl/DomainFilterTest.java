@@ -53,9 +53,8 @@ import static tigase.xmpp.impl.DomainFilter.ALLOWED_DOMAINS_LIST_KEY;
  *
  * @author Wojciech Kapcia <wojciech.kapcia@tigase.org>
  */
-public class DomainFilterTest {
+public class DomainFilterTest extends ProcessorTestCase {
 
-	private SessionManagerHandler loginHandler;
 	private DomainFilter domainFilter;
 	private static Logger log;
 	String domain = "domain";
@@ -84,16 +83,18 @@ public class DomainFilterTest {
 	}
 
 	@Before
-	public void setUp() throws TigaseDBException, IOException {
-		loginHandler = new SessionManagerHandlerImpl();
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
 		domainFilter = new DomainFilter();
 		domainFilter.init( new HashMap<String, Object>() );
 		results = new ArrayDeque<Packet>();
 	}
 
 	@After
+	@Override
 	public void tearDown() throws Exception {
-		loginHandler = null;
+		super.tearDown();
 		domainFilter = null;
 	}
 
@@ -420,75 +421,11 @@ public class DomainFilterTest {
 	}
 
 	private XMPPResourceConnection getSession( JID connId, JID userJid, DomainFilterPolicy dfp, String[] domains ) throws NotAuthorizedException, TigaseStringprepException {
-
-		String xmlRepositoryURI = "memory://xmlRepo?autoCreateUser=true";
-		XMLRepository xmlRepository = new XMLRepository();
-		xmlRepository.initRepository( xmlRepositoryURI, null );
-
-		XMPPResourceConnection conn = new XMPPResourceConnection( connId, (UserRepository) xmlRepository, (AuthRepository) xmlRepository, loginHandler );
-		VHostItem vhost = new VHostItem();
-		vhost.setVHost( userJid.getDomain() );
+		XMPPResourceConnection conn = super.getSession(connId, userJid);
+		VHostItem vhost = conn.getDomain();
 		vhost.setDomainFilter( dfp );
 		vhost.setDomainFilterDomains( domains );
-		conn.setDomain( vhost );
-		conn.authorizeJID( userJid.getBareJID(), false );
-		conn.setResource( userJid.getResource() );
 
 		return conn;
 	}
-
-	private class SessionManagerHandlerImpl implements SessionManagerHandler {
-
-		public SessionManagerHandlerImpl() {
-		}
-		Map<BareJID, XMPPSession> sessions = new HashMap<BareJID, XMPPSession>();
-
-		@Override
-		public JID getComponentId() {
-			return JID.jidInstanceNS( "sess-man@localhost" );
-		}
-
-		@Override
-		public void handleLogin( BareJID userId, XMPPResourceConnection conn ) {
-			XMPPSession session = sessions.get( userId );
-			if ( session == null ){
-				session = new XMPPSession( userId.getLocalpart() );
-				sessions.put( userId, session );
-			}
-			try {
-				session.addResourceConnection( conn );
-			} catch ( TigaseStringprepException ex ) {
-				log.log( Level.SEVERE, null, ex );
-			}
-		}
-
-		@Override
-		public void handleLogout( BareJID userId, XMPPResourceConnection conn ) {
-			XMPPSession session = sessions.get( conn );
-			if ( session != null ){
-				session.removeResourceConnection( conn );
-				if ( session.getActiveResourcesSize() == 0 ){
-					sessions.remove( userId );
-				}
-			}
-		}
-
-		@Override
-		public void handlePresenceSet( XMPPResourceConnection conn ) {
-		}
-
-		@Override
-		public void handleResourceBind( XMPPResourceConnection conn ) {
-		}
-
-		@Override
-		public boolean isLocalDomain( String domain, boolean includeComponents ) {
-			return !domain.contains( "-ext" );
-		}
-
-		@Override
-		public void handleDomainChange(String domain, XMPPResourceConnection conn) {
-		}
-	}
-
 }
