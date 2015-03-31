@@ -109,6 +109,7 @@ public class OfflineMessages
 	 * manner */
 	private final SimpleDateFormat formatter;
 	private String msgRepoCls = null;
+	private Message message = new Message();
 	
 	{
 		this.formatter = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" );
@@ -144,7 +145,7 @@ public class OfflineMessages
 	public void postProcess( final Packet packet, final XMPPResourceConnection conn,
 													 final NonAuthUserRepository repo, final Queue<Packet> queue,
 													 Map<String, Object> settings ) {
-		if ( conn == null ){
+		if ( conn == null || !message.hasConnectionForMessageDelivery(conn) ){
 			try {
 				MsgRepositoryIfc msg_repo = getMsgRepoImpl( repo, conn );
 
@@ -378,6 +379,10 @@ public class OfflineMessages
 		if ( conn.getSessionData( ID ) != null ){
 			return false;
 		}
+		
+		// make sure this is broadcast presence as only in this case we should sent offline messages
+		if (packet.getStanzaTo() != null)
+			return false;		
 
 		// if we are using XEP-0013: Flexible offline messages retrieval then we skip loading
 		if ( conn.getCommonSessionData(FlexibleOfflineMessageRetrieval.FLEXIBLE_OFFLINE_XMLNS) != null ){
