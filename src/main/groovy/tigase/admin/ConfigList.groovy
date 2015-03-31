@@ -46,32 +46,37 @@ def admins = (Set)adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 
-if (!isServiceAdmin) {
-    def result = p.commandResult(Command.DataType.result)
-    Command.addTextField(result, "Error", "You do not have enough permissions to access this data.");
-    return result
-}
+try {
 
-if (comp_name == null) {
-	def res = (Iq)p.commandResult(Command.DataType.form)
-  def compNames = []
-  conf_repo.getCompNames().each { compNames += it }
-	Command.addFieldValue(res, COMP_NAME, comp_name ?: compNames[0], "Components",
-		(String[])compNames, (String[])compNames)
-	return res
-}
-
-def params_set = Command.getFieldValue(p, PARAMS_SET)
-
-if (params_set == null) {
-	def res = (Iq)p.commandResult(Command.DataType.result)
-  def compNames = []
-  conf_repo.getCompNames().each { compNames += it }
-	Command.addTextField(res, COMP_NAME, comp_name ?: compNames[0])
-  Command.addHiddenField(res, PARAMS_SET, PARAMS_SET)
-	conf_repo.getItemsForComponent(comp_name).each {
-		Command.addFieldValue(res, it.getKey(), it.getConfigValToString())
+	if (!isServiceAdmin) {
+			def result = p.commandResult(Command.DataType.result)
+			Command.addTextField(result, "Error", "You do not have enough permissions to access this data.");
+			return result
 	}
-	return res
-}
 
+	if (comp_name == null) {
+		def res = (Iq)p.commandResult(Command.DataType.form)
+		def compNames = []
+		conf_repo.getCompNames().each { compNames += it }
+		Command.addFieldValue(res, COMP_NAME, comp_name ?: compNames[0], "Components",
+			(String[])compNames, (String[])compNames)
+		return res
+	}
+
+	def params_set = Command.getFieldValue(p, PARAMS_SET)
+
+	if (params_set == null) {
+		def res = (Iq)p.commandResult(Command.DataType.result)
+		def compNames = []
+		conf_repo.getCompNames().each { compNames += it }
+		Command.addTextField(res, COMP_NAME, comp_name ?: compNames[0])
+		Command.addHiddenField(res, PARAMS_SET, PARAMS_SET)
+		conf_repo.getItemsForComponent(comp_name).each {
+			Command.addFieldValue(res, it.getKey(), it.getConfigValToString())
+		}
+		return res
+	}
+
+} catch (Exception e) {
+	e.printStackTrace();
+}
