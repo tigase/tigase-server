@@ -194,10 +194,10 @@ public class FlexibleOfflineMessageRetrieval
 				// we don't have any items elements, only purge or fetch
 				try {
 					if ( fetch && !purge ){
-						Queue<Packet> restorePacketForOffLineUser = restorePacketForOffLineUser( null, session, msg_repo );
+						Queue<Packet> restorePacketForOffLineUser = restorePacketForOffLineUser( null, session, msg_repo );					
 						results.addAll( restorePacketForOffLineUser );
 					} else if ( purge && !fetch ){
-						msg_repo.deleteMessagesToJID( null, session.getJID() );
+						msg_repo.deleteMessagesToJID( null, session );
 					}
 				} catch ( UserNotFoundException | NotAuthorizedException ex ) {
 					log.log( Level.WARNING, "Problem retrieving messages from repository: ", ex );
@@ -235,7 +235,7 @@ public class FlexibleOfflineMessageRetrieval
 						}
 					} else if ( itemsView.isEmpty() && !itemsRemove.isEmpty() ){
 						// ok, all items are 'remove' type
-						int deleteMessagesToJID = msg_repo.deleteMessagesToJID( itemsRemove, session.getJID() );
+						int deleteMessagesToJID = msg_repo.deleteMessagesToJID( itemsRemove, session );
 						if ( deleteMessagesToJID == 0 ){
 							Packet err = Authorization.ITEM_NOT_FOUND.getResponseMessage( packet,
 																																						"Requested item was not found", true );
@@ -259,7 +259,7 @@ public class FlexibleOfflineMessageRetrieval
 
 		try {
 
-			Map<MsgRepository.MSG_TYPES, Long> messagesCount = msg_repo.getMessagesCount( session.getJID() );
+			Map<Enum, Long> messagesCount = msg_repo.getMessagesCount( session.getJID() );
 
 			if ( messagesCount != null && !messagesCount.isEmpty() ){
 				query.addChild( identity );
@@ -268,7 +268,7 @@ public class FlexibleOfflineMessageRetrieval
 				DataForm.addDataForm( query, Command.DataType.result );
 				DataForm.addHiddenField( query, form_type, FLEXIBLE_OFFLINE_XMLNS );
 
-				for ( Map.Entry<MsgRepository.MSG_TYPES, Long> entrySet : messagesCount.entrySet() ) {
+				for ( Map.Entry<Enum, Long> entrySet : messagesCount.entrySet() ) {
 					DataForm.addFieldValue( query, NUMBER_OF_ + entrySet.getKey(), entrySet.getValue().toString() );
 				}
 			}
@@ -295,7 +295,7 @@ public class FlexibleOfflineMessageRetrieval
 	public Queue<Packet> restorePacketForOffLineUser( List<String> db_ids, XMPPResourceConnection conn,
 																										MsgRepository repo )
 			throws UserNotFoundException, NotAuthorizedException {
-		Queue<Element> elems = repo.loadMessagesToJID( db_ids, conn.getJID(), false, offlineMessagesStamper );
+		Queue<Element> elems = repo.loadMessagesToJID( db_ids, conn, false, offlineMessagesStamper );
 
 		if ( elems != null ){
 			LinkedList<Packet> pacs = new LinkedList<Packet>();

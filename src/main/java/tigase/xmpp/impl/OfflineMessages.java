@@ -41,6 +41,7 @@ import static tigase.server.Message.ELEM_NAME;
 import tigase.server.Packet;
 import tigase.util.DNSResolver;
 import tigase.util.TigaseStringprepException;
+import tigase.vhosts.VHostItem;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
@@ -147,6 +148,8 @@ public class OfflineMessages
 													 Map<String, Object> settings ) {
 		if ( conn == null || !message.hasConnectionForMessageDelivery(conn) ){
 			try {
+				if (conn != null && packet.getStanzaTo() != null && !conn.isUserId(packet.getStanzaTo().getBareJID()))
+					return;
 				MsgRepositoryIfc msg_repo = getMsgRepoImpl( repo, conn );
 
 				savePacketForOffLineUser( packet, msg_repo );
@@ -155,6 +158,11 @@ public class OfflineMessages
 					log.finest(
 							"UserNotFoundException at trying to save packet for off-line user."
 							+ packet );
+				}
+			} catch (NotAuthorizedException ex) {
+				if ( log.isLoggable( Level.FINEST ) ){
+					log.log(Level.FINEST, "NotAuthorizedException when checking if message is to this "
+							+ "user at trying to save packet for off-line user, {0}, {1}", new Object[]{ packet, conn });
 				}
 			}    // end of try-catch
 		}      // end of if (conn == null)
@@ -211,7 +219,7 @@ public class OfflineMessages
 	public Queue<Packet> restorePacketForOffLineUser( XMPPResourceConnection conn,
 																										MsgRepositoryIfc repo )
 			throws UserNotFoundException, NotAuthorizedException {
-		Queue<Element> elems = repo.loadMessagesToJID( conn.getJID(), true );
+		Queue<Element> elems = repo.loadMessagesToJID( conn, true );
 
 		if ( elems != null ){
 			LinkedList<Packet> pacs = new LinkedList<Packet>();
@@ -470,7 +478,7 @@ public class OfflineMessages
 
 		//~--- methods ------------------------------------------------------------
 		@Override
-		public Queue<Element> loadMessagesToJID( JID to, boolean delete )
+		public Queue<Element> loadMessagesToJID( XMPPResourceConnection session, boolean delete )
 				throws UserNotFoundException {
 			try {
 				DomBuilderHandler domHandler = new DomBuilderHandler();

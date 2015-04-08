@@ -46,6 +46,8 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
+import tigase.vhosts.VHostItem;
+import tigase.xmpp.XMPPResourceConnection;
 
 /**
  *
@@ -61,7 +63,7 @@ public abstract class MsgRepository<T> implements MsgRepositoryIfc {
 	private static final Map<String, MsgRepositoryIfc> repos =
 			new ConcurrentSkipListMap<String, MsgRepositoryIfc>();
 	
-public enum MSG_TYPES { none(0), message(1), presence(2);
+	public enum MSG_TYPES { none(0), message(1), presence(2);
 
     private final int numVal;
 
@@ -120,11 +122,11 @@ public enum MSG_TYPES { none(0), message(1), presence(2);
 	protected abstract void ensureBroadcastMessageRecipient(String id, BareJID recipient);
 	protected abstract void insertBroadcastMessage(String id, Element msg, Date expire, BareJID recipient);
 
-	public abstract Map<MSG_TYPES,Long> getMessagesCount(JID to)  throws UserNotFoundException;
+	public abstract Map<Enum,Long> getMessagesCount(JID to)  throws UserNotFoundException;
 	public abstract List<Element> getMessagesList(JID to)  throws UserNotFoundException;
-	public abstract	Queue<Element> loadMessagesToJID(List<String> db_ids, JID to, boolean delete,
+	public abstract	Queue<Element> loadMessagesToJID(List<String> db_ids,  XMPPResourceConnection session, boolean delete,
 																		OfflineMessagesProcessor proc ) throws UserNotFoundException;
-	public abstract	int deleteMessagesToJID( List<String> db_ids, JID to) throws UserNotFoundException;
+	public abstract	int deleteMessagesToJID( List<String> db_ids, XMPPResourceConnection session) throws UserNotFoundException;
 
 
 

@@ -29,6 +29,8 @@ import tigase.xmpp.JID;
 import java.util.Date;
 import java.util.Map;
 import java.util.Queue;
+import tigase.vhosts.VHostItem;
+import tigase.xmpp.XMPPResourceConnection;
 
 //~--- interfaces -------------------------------------------------------------
 /**
@@ -72,7 +74,7 @@ public interface MsgRepositoryIfc extends Repository {
 	 *
 	 * @throws UserNotFoundException
 	 */
-	Queue<Element> loadMessagesToJID( JID to, boolean delete ) throws UserNotFoundException;
+	Queue<Element> loadMessagesToJID( XMPPResourceConnection session, boolean delete ) throws UserNotFoundException;
 
 	/**
 	 * Saves the massage to the repository

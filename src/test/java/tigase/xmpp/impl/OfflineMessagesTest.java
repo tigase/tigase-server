@@ -37,6 +37,7 @@ import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.UserNotFoundException;
 import tigase.server.Packet;
+import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
@@ -181,7 +182,7 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 		}
 
 		@Override
-		public Queue<Element> loadMessagesToJID(JID to, boolean delete) throws UserNotFoundException {
+		public Queue<Element> loadMessagesToJID(XMPPResourceConnection session, boolean delete) throws UserNotFoundException {
 			throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 		}
 		

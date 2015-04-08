@@ -2272,15 +2272,22 @@ public class SessionManager
 		for (Map.Entry<String, Object> entry : props.entrySet()) {
 			if (entry.getKey().startsWith(PLUGINS_CONF_PROP_KEY)) {
 
+				// Workaround for plugin id containing "/" in id
+				String key = entry.getKey();
+				if (plug_id.contains("/")) {
+					if (!key.contains(plug_id))
+						continue;
+					key = key.replace(plug_id, "plugin-id");
+				}
 				// Split the key to configuration nodes separated with '/'
-				String[] nodes = entry.getKey().split("/");
+				String[] nodes = key.split("/");
 
 				// The plugin ID part may contain many IDs separated with comma ','
 				if (nodes.length > 2) {
 					String[] ids = nodes[1].split(",");
 
 					Arrays.sort(ids);
-					if (Arrays.binarySearch(ids, plug_id) >= 0) {
+					if (Arrays.binarySearch(ids, plug_id) >= 0 || Arrays.binarySearch(ids, "plugin-id") >= 0) {
 						plugin_settings.put(nodes[2], entry.getValue());
 						log.log(Level.CONFIG, "Adding a specific plugins option [{0}]: {1} = {2}",
 								new Object[] { plug_id,

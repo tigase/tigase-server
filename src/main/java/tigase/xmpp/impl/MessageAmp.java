@@ -170,13 +170,21 @@ public class MessageAmp
 			if ((amp == null) || (amp.getXMLNS() != XMLNS) || (amp.getAttributeStaticStr(
 					"status") != null)) {
 				try {
-					offlineProcessor.savePacketForOffLineUser(packet, msg_repo);
+					if (session != null && packet.getStanzaTo() != null && !session.isUserId(packet.getStanzaTo().getBareJID()))
+						return;
+					
+					offlineProcessor.savePacketForOffLineUser(packet, msg_repo);					
 				} catch (UserNotFoundException ex) {
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest(
 								"UserNotFoundException at trying to save packet for off-line user." +
 								packet);
 					}
+				} catch (NotAuthorizedException ex) {
+					if ( log.isLoggable( Level.FINEST ) ){
+						log.log(Level.FINEST, "NotAuthorizedException when checking if message is to this "
+								+ "user at trying to save packet for off-line user, {0}, {1}", new Object[]{ packet, session });
+					}					
 				}
 			}
 		}

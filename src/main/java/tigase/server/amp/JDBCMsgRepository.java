@@ -60,6 +60,9 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.vhosts.VHostItem;
+import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.XMPPResourceConnection;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -416,9 +419,9 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 	}
 
 	@Override
-	public Map<MSG_TYPES,Long> getMessagesCount(JID to) throws UserNotFoundException {
+	public Map<Enum,Long> getMessagesCount(JID to) throws UserNotFoundException {
 
-		Map<MSG_TYPES,Long> result = new HashMap<>(MSG_TYPES.values().length);
+		Map<Enum,Long> result = new HashMap<>(MSG_TYPES.values().length);
 
 		try {
 
@@ -498,13 +501,15 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 	}
 
 	@Override
-	public Queue<Element> loadMessagesToJID( List<String> db_ids, JID to, boolean delete, OfflineMessagesProcessor proc) throws UserNotFoundException {
+	public Queue<Element> loadMessagesToJID( List<String> db_ids, XMPPResourceConnection session, boolean delete, OfflineMessagesProcessor proc) throws UserNotFoundException {
 
 			Queue<Element> result = null;
 			ResultSet rs = null;
-
+			BareJID to = null;
+		
 			try {
-				long to_uid = getUserUID( to.getBareJID() );
+				to = session.getBareJID();		
+				long to_uid = getUserUID( to );
 
 				if ( to_uid < 0 ){
 					throw new UserNotFoundException( "User: " + to + " was not found in database." );
@@ -512,7 +517,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 
 				if ( db_ids == null || db_ids.size() == 0 ){
 					// fetch
-					return loadMessagesToJID( to, delete, proc );
+					return loadMessagesToJID( session, delete, proc );
 				} else {
 					result = new LinkedList<Element>();
 
@@ -522,7 +527,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 					for ( int i = 0 ; i < iters ; i++ ) {
 						int params = ( i == ( iters - 1 ) ) ? db_ids.size() % StatementsCount : StatementsCount;
 						if (params == 0 ) continue;
-						PreparedStatement select_ids_to_jid_st = data_repo.getPreparedStatement( to.getBareJID(),
+						PreparedStatement select_ids_to_jid_st = data_repo.getPreparedStatement( to,
 																																							 MSG_SELECT_IDS_TO_JID_QUERY + "_" + params );
 
 						synchronized ( select_ids_to_jid_st ) {
@@ -540,10 +545,12 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 				}
 
 				if ( delete ){
-					deleteMessagesToJID( null, to );
+					deleteMessagesToJID( null, session );
 				}
 			} catch ( SQLException e ) {
 				log.log( Level.WARNING, "Problem getting offline messages for user: " + to, e );
+			} catch (NotAuthorizedException ex) {
+				log.log(Level.WARNING, "Session not authorized yet!", ex);				
 			} finally {
 				data_repo.release( null, rs );
 			}
@@ -552,11 +559,15 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 	}
 
 	@Override
-	public int deleteMessagesToJID( List<String> db_ids, JID to ) throws UserNotFoundException {
+	public int deleteMessagesToJID( List<String> db_ids, XMPPResourceConnection session ) throws UserNotFoundException {
 
 		int affectedRows = 0;
+		BareJID to = null;
+		
 		try {
-			long to_uid = getUserUID( to.getBareJID() );
+			to = session.getBareJID();
+			
+			long to_uid = getUserUID( to );
 
 			if ( to_uid < 0 ){
 				throw new UserNotFoundException( "User: " + to + " was not found in database." );
@@ -565,7 +576,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			if ( db_ids == null || db_ids.size() == 0 ){
 				// purge
 				PreparedStatement delete_to_jid_st
-													= data_repo.getPreparedStatement( to.getBareJID(), MSG_DELETE_TO_JID_QUERY );
+													= data_repo.getPreparedStatement( to, MSG_DELETE_TO_JID_QUERY );
 
 				synchronized ( delete_to_jid_st ) {
 					delete_to_jid_st.setLong( 1, to_uid );
@@ -578,7 +589,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 					for ( int i = 0 ; i < iters ; i++ ) {
 						int params = ( i == ( iters - 1 ) ) ? db_ids.size() % StatementsCount : StatementsCount;
 						if (params == 0 ) continue;
-					PreparedStatement delete_to_jid_st = data_repo.getPreparedStatement( to.getBareJID(),
+					PreparedStatement delete_to_jid_st = data_repo.getPreparedStatement( to,
 																																							 MSG_DELETE_IDS_TO_JID_QUERY + "_" + params );
 
 					synchronized ( delete_to_jid_st ) {
@@ -593,31 +604,35 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			}
 		} catch ( SQLException e ) {
 			log.log( Level.WARNING, "Problem getting offline messages for user: " + to, e );
+		} catch (NotAuthorizedException ex) {
+			log.log(Level.WARNING, "Session not authorized yet!", ex);			
 		}
 		return affectedRows;
 	}
 
 
 	@Override
-	public Queue<Element> loadMessagesToJID( JID to, boolean delete )
+	public Queue<Element> loadMessagesToJID( XMPPResourceConnection session, boolean delete )
 			throws UserNotFoundException {
-		return loadMessagesToJID( to, delete, null );
+		return loadMessagesToJID( session, delete, null );
 	}
 
-	public Queue<Element> loadMessagesToJID(JID to, boolean delete, OfflineMessagesProcessor proc)
+	public Queue<Element> loadMessagesToJID(XMPPResourceConnection session, boolean delete, OfflineMessagesProcessor proc)
 			throws UserNotFoundException {
 		Queue<Element> result = null;
 		ResultSet rs = null;
-
+		BareJID to = null;
+		
 		try {
-			long to_uid = getUserUID(to.getBareJID());
+			to = session.getBareJID();
+			long to_uid = getUserUID(to);
 
 			if (to_uid < 0) {
 				throw new UserNotFoundException("User: " + to + " was not found in database.");
 			}
 
 			PreparedStatement select_to_jid_st =
-					data_repo.getPreparedStatement(to.getBareJID(), MSG_SELECT_TO_JID_QUERY);
+					data_repo.getPreparedStatement(to, MSG_SELECT_TO_JID_QUERY);
 
 			synchronized (select_to_jid_st) {
 				select_to_jid_st.setLong(1, to_uid);
@@ -630,7 +645,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 
 			if (delete) {
 				PreparedStatement delete_to_jid_st =
-						data_repo.getPreparedStatement(to.getBareJID(), MSG_DELETE_TO_JID_QUERY);
+						data_repo.getPreparedStatement(to, MSG_DELETE_TO_JID_QUERY);
 
 				synchronized (delete_to_jid_st) {
 					delete_to_jid_st.setLong(1, to_uid);
@@ -639,6 +654,8 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			}
 		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem getting offline messages for user: " + to, e);
+		} catch (NotAuthorizedException ex) {
+			log.log(Level.WARNING, "Session not authorized yet!", ex);
 		} finally {
 			data_repo.release(null, rs);
 		}
@@ -646,7 +663,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 		return result;
 	}
 
-	private Queue<Element> parseLoadedMessages( OfflineMessagesProcessor proc, ResultSet rs) throws SQLException {
+	protected Queue<Element> parseLoadedMessages( OfflineMessagesProcessor proc, ResultSet rs) throws SQLException {
 		StringBuilder sb = new StringBuilder( 1000 );
 		Queue<Element> result = new LinkedList<Element>();
 		if ( proc == null ){
