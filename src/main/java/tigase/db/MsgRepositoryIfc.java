@@ -64,8 +64,8 @@ public interface MsgRepositoryIfc extends Repository {
 	/**
 	 * Loads all payloads for the given user's {@link JID} from repository.
 	 *
-	 * @param to     {@link JID} denotes address of the receiver for which payload
-	 *               stored in the repository should be retrieved.
+	 * @param session user session which keeps all the user session data and also
+	 *                gives an access to the user's repository data.
 	 * @param delete boolean parameter controlling whether messages should be
 	 *               removed from repository after they retrieved.
 	 *
