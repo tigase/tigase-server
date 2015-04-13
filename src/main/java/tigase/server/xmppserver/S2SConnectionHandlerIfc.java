@@ -96,6 +96,8 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
         
 	boolean isTlsWantClientAuthEnabled();
 	
+	boolean isTlsNeedClientAuthEnabled();
+	
 	boolean sendVerifyResult(String elem_name, CID connCid, CID keyCid, Boolean valid,
 			String key_sessionId, String serv_sessionId, String cdata, boolean handshakingOnly);
 
@@ -107,6 +109,7 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 	void writePacketsToSocket(IO serv, Queue<Packet> packets);
 
 	void writeRawData(IO serv, String strError);
+
 }
 
 

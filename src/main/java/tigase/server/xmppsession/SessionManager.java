@@ -41,6 +41,9 @@ import static tigase.server.xmppsession.SessionManagerConfig.getProcessor;
 import static tigase.server.xmppsession.SessionManagerConfig.sessionCloseProcId;
 import static tigase.server.xmppsession.SessionManagerConfig.sessionOpenProcId;
 
+import java.io.ByteArrayInputStream;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
 import java.util.AbstractQueue;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -65,6 +68,8 @@ import java.util.logging.Logger;
 import javax.script.Bindings;
 
 import tigase.auth.mechanisms.SaslEXTERNAL;
+import tigase.cert.CertificateEntry;
+import tigase.cert.CertificateUtil;
 import tigase.conf.Configurable;
 import tigase.conf.ConfigurationException;
 import tigase.db.AuthRepository;
@@ -85,6 +90,7 @@ import tigase.server.XMPPServer;
 import tigase.server.script.CommandIfc;
 import tigase.sys.OnlineJidsReporter;
 import tigase.sys.TigaseRuntime;
+import tigase.util.Base64;
 import tigase.util.ProcessingThreads;
 import tigase.util.QueueItem;
 import tigase.util.TigaseStringprepException;
@@ -1584,10 +1590,19 @@ public class SessionManager
 
 		case CLIENT_AUTH :
 			if (connection != null) {
-				String[] jids = Command.getFieldValues(pc, "jids");
+				try {
+					String encodedCertificate = Command.getFieldValue(pc, "peer-certificate");
 
-				connection.putSessionData(SaslEXTERNAL.SASL_EXTERNAL_ALLOWED, Boolean.TRUE);
-				connection.putSessionData(SaslEXTERNAL.SESSION_AUTH_JIDS_KEY, jids);
+					byte[] bytes = Base64.decode(encodedCertificate);
+
+					ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+					CertificateFactory cf = CertificateFactory.getInstance("X.509");
+					Certificate certificate = cf.generateCertificate(bais);
+
+					connection.putSessionData(SaslEXTERNAL.PEER_CERTIFICATE_KEY, certificate);
+				} catch (Exception ex) {
+					log.log(Level.FINEST, "could not decode peer certificate", ex);
+				}
 			}
 			processing_result = true;
 

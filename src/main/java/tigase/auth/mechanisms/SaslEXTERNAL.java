@@ -15,9 +15,7 @@ public class SaslEXTERNAL extends AbstractSasl {
 
 	private static final String MECHANISM = "EXTERNAL";
 
-	public static final String SASL_EXTERNAL_ALLOWED = "SASL_EXTERNAL_ALLOWED";
-
-	public static final String SESSION_AUTH_JIDS_KEY = "SESSION_AUTH_JIDS_KEY";
+	public static final String PEER_CERTIFICATE_KEY = "PEER_CERTIFICATE_ENTRY_KEY";
 
 	SaslEXTERNAL(Map<? super String, ?> props, CallbackHandler callbackHandler) {
 		super(props, callbackHandler);

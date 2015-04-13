@@ -704,6 +704,11 @@ public class S2SConnectionManager
 		return true;
 	}
 
+	@Override
+	public boolean isTlsNeedClientAuthEnabled() {
+		return false;
+	}
+	
 	//~--- set methods ----------------------------------------------------------
 
 	@Override

@@ -27,6 +27,7 @@ package tigase.server.xmppclient;
 //~--- non-JDK imports --------------------------------------------------------
 
 import java.io.IOException;
+import java.security.cert.CertificateEncodingException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,8 +38,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.Deflater;
+
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
 import tigase.conf.ConfigurationException;
 import tigase.net.IOService;
 import tigase.net.SocketThread;
@@ -49,6 +52,7 @@ import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.server.Presence;
 import tigase.server.ReceiverTimeoutHandler;
+import tigase.util.Base64;
 import tigase.util.DNSResolver;
 import tigase.util.RoutingsContainer;
 import tigase.util.TigaseStringprepException;
@@ -349,15 +353,20 @@ public class ClientConnectionManager
 
 	@Override
 	public void tlsHandshakeCompleted(XMPPIOService<Object> serv) {
-		if ((serv.getPeersJIDsFromCert() != null) && clientTrustManagerFactory.isActive()) {
-			Packet clientAuthCommand = Command.CLIENT_AUTH.getPacket(serv.getConnectionId(),
-					serv.getDataReceiver(), StanzaType.set, this.newPacketId("c2s-"), Command
-					.DataType.submit);
+		if ((serv.getPeerCertificate() != null)) {
+			Packet clientAuthCommand = Command.CLIENT_AUTH.getPacket(serv.getConnectionId(), serv.getDataReceiver(),
+					StanzaType.set, this.newPacketId("c2s-"), Command.DataType.submit);
 			final String id = (String) serv.getSessionData().get(IOService.SESSION_ID_KEY);
 
 			Command.addFieldValue(clientAuthCommand, "session-id", id);
-			Command.addFieldValue(clientAuthCommand, "peer-certificate", "true");
-			Command.addFieldMultiValue(clientAuthCommand, "jids", serv.getPeersJIDsFromCert());
+
+			try {
+				String encodedPeerCertificate = Base64.encode(serv.getPeerCertificate().getEncoded());
+				Command.addFieldValue(clientAuthCommand, "peer-certificate", encodedPeerCertificate);
+			} catch (CertificateEncodingException e) {
+				log.log(Level.WARNING, "Can't encode certificate", e);
+			}
+
 			addOutPacket(clientAuthCommand);
 		}
 	}
@@ -828,7 +837,7 @@ public class ClientConnectionManager
 					TrustManager[] x = clientTrustManagerFactory.getManager(serv);
 
 					serv.setX509TrustManagers(x);
-					serv.startTLS(false, isTlsWantClientAuthEnabled());
+					serv.startTLS(false, isTlsWantClientAuthEnabled(), isTlsNeedClientAuthEnabled());
 					SocketThread.addSocketService(serv);
 				} catch (Exception e) {
 					log.log(Level.WARNING, "Error starting TLS: {0}", e);
@@ -990,6 +999,11 @@ public class ClientConnectionManager
 	@Override
 	protected boolean isTlsWantClientAuthEnabled() {
 		return clientTrustManagerFactory.isSaslExternalAvailable();
+	}
+	
+	@Override
+	protected boolean isTlsNeedClientAuthEnabled() {
+		return clientTrustManagerFactory.isPeerCertificateRequired();
 	}
 	
 	protected String prepareStreamClose(XMPPIOService<Object> serv) {

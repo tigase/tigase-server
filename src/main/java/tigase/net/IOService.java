@@ -40,7 +40,6 @@ import java.nio.charset.CoderResult;
 import java.nio.charset.MalformedInputException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -182,9 +181,10 @@ public abstract class IOService<RefObject>
 	protected CharBuffer        cb              = CharBuffer.allocate(2048);
 	private final ReentrantLock writeInProgress = new ReentrantLock();
 	private final ReentrantLock readInProgress  = new ReentrantLock();
-	private List<String>        peersJIDsFromCert;
 	private TrustManager[]      x509TrustManagers;
 	private int bufferLimit = 0;
+
+	private Certificate peerCertificate;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -334,7 +334,7 @@ public abstract class IOService<RefObject>
 
 	@Override
 	public void handshakeCompleted(TLSWrapper wrapper) {
-		String reqCertDomain = (String) getSessionData().get(CERT_REQUIRED_DOMAIN);
+		String reqCertDomain = "dip";//(String) getSessionData().get(CERT_REQUIRED_DOMAIN);
 		CertCheckResult certCheckResult = wrapper.getCertificateStatus(false);
 		if (reqCertDomain != null) { 
 			// if reqCertDomain is set then verify if certificate got from server
@@ -361,19 +361,16 @@ public abstract class IOService<RefObject>
 			log.log(Level.FINEST, "{0}, TLS handshake completed: {1}", new Object[] { this,
 					certCheckResult });
 		}
-		if (!wrapper.getTlsEngine().getUseClientMode() && wrapper.getTlsEngine().getWantClientAuth()) {
+		if (!wrapper.getTlsEngine().getUseClientMode() && ( wrapper.getTlsEngine().getWantClientAuth() || wrapper.getTlsEngine().getNeedClientAuth())) {
 			try {
 				Certificate[] certs    = wrapper.getTlsEngine().getSession()
 						.getPeerCertificates();
-				Certificate   peerCert = certs[certs.length - 1];
-				List<String>  xmppJIDs = CertificateUtil.extractXmppAddrs(
-						(X509Certificate) peerCert);
-
-				this.peersJIDsFromCert = xmppJIDs;
+				this.peerCertificate = certs[certs.length - 1];
+				
 			} catch (SSLPeerUnverifiedException e) {
-				this.peersJIDsFromCert = null;
+				this.peerCertificate = null;
 			} catch (Exception e) {
-				this.peersJIDsFromCert = null;
+				this.peerCertificate = null;
 				log.log(Level.WARNING, "Problem with extracting subjectAltName", e);
 			}
 		}
@@ -396,7 +393,7 @@ public abstract class IOService<RefObject>
 	 *
 	 * @throws IOException
 	 */
-	public void startSSL(boolean clientMode, boolean wantClientAuth) throws IOException {
+	public void startSSL(boolean clientMode, boolean wantClientAuth, boolean needClientAuth) throws IOException {
 		if (socketIO instanceof TLSIO) {
 			throw new IllegalStateException("SSL mode is already activated.");
 		}
@@ -410,7 +407,7 @@ public abstract class IOService<RefObject>
 			port = ((InetSocketAddress) socketIO.getSocketChannel().getRemoteAddress()).getPort();
 		}
 		TLSWrapper wrapper = new TLSWrapper(TLSUtil.getSSLContext("SSL", tls_hostname, clientMode),
-				this, tls_hostname, port, clientMode, wantClientAuth);
+				this, tls_hostname, port, clientMode, wantClientAuth, needClientAuth);
 
 		socketIO = new TLSIO(socketIO, wrapper, byteOrder());
 		setLastTransferTime();
@@ -426,7 +423,7 @@ public abstract class IOService<RefObject>
 	 *
 	 * @throws IOException
 	 */
-	public void startTLS(boolean clientMode, boolean wantClientAuth) throws IOException {
+	public void startTLS(boolean clientMode, boolean wantClientAuth, boolean needClientAuth) throws IOException {
 		if (socketIO.checkCapabilities(TLSIO.TLS_CAPS)) {
 			throw new IllegalStateException("TLS mode is already activated " + connectionId);
 		}
@@ -468,7 +465,7 @@ public abstract class IOService<RefObject>
 				sslContext = TLSUtil.getSSLContext("TLS", tls_hostname, clientMode);
 			}
 
-			TLSWrapper wrapper = new TLSWrapper(sslContext, this, tls_hostname, port, clientMode, wantClientAuth);
+			TLSWrapper wrapper = new TLSWrapper(sslContext, this, tls_hostname, port, clientMode, wantClientAuth, needClientAuth);
 
 			socketIO = new TLSIO(socketIO, wrapper, byteOrder());
 			setLastTransferTime();
@@ -622,16 +619,6 @@ public abstract class IOService<RefObject>
 	public int getLocalPort() {
 		Socket sock = socketIO.getSocketChannel().socket();
 		return sock.getLocalPort();
-	}
-	
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
-	public List<String> getPeersJIDsFromCert() {
-		return peersJIDsFromCert;
 	}
 
 	/**
@@ -1406,6 +1393,10 @@ public abstract class IOService<RefObject>
 
 	private void setLastTransferTime() {
 		lastTransferTime = System.currentTimeMillis();
+	}
+
+	public Certificate getPeerCertificate() {
+		return peerCertificate;
 	}
 }    // IOService
 

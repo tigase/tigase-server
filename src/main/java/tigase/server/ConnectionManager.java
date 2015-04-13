@@ -43,8 +43,6 @@ import tigase.net.*;
 
 import tigase.server.script.CommandIfc;
 
-import tigase.xmpp.BareJID;
-
 import tigase.stats.StatisticsList;
 import tigase.util.DataTypes;
 import tigase.xml.Element;
@@ -282,7 +280,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 *
 	 * @return a value of <code>boolean</code>
 	 */
-	@SuppressWarnings("empty-statement")
 	public boolean checkTrafficLimits(IO serv) {
 		boolean xmppLimitHit = false;
 
@@ -1261,6 +1258,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	protected boolean isTlsWantClientAuthEnabled() {
 		return false;
 	}
+	
+	protected boolean isTlsNeedClientAuthEnabled() {
+		return false;
+	}
 
 	//~--- methods --------------------------------------------------------------
 
@@ -1366,7 +1367,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			try {
 				serv.accept(sc);
 				if (getSocketType() == SocketType.ssl) {
-					serv.startSSL(false, isTlsWantClientAuthEnabled());
+					serv.startSSL(false, isTlsWantClientAuthEnabled(), isTlsNeedClientAuthEnabled());
 				}    // end of if (socket == SocketType.ssl)
 				serviceStarted(serv);
 				SocketThread.addSocketService(serv);

@@ -26,8 +26,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -157,6 +155,10 @@ public class TLSWrapper {
 
 	}
 
+	public TLSWrapper(SSLContext sslc, TLSEventHandler eventHandler, String hostname, int port, final boolean clientMode, final boolean wantClientAuth) {
+		this(sslc, eventHandler, hostname, port, clientMode, wantClientAuth, false);
+	}
+	
 	/**
 	 * Creates a new <code>TLSWrapper</code> instance.
 	 * 
@@ -168,7 +170,7 @@ public class TLSWrapper {
 	 * @param clientMode
 	 * @param wantClientAuth
 	 */
-	public TLSWrapper(SSLContext sslc, TLSEventHandler eventHandler, String hostname, int port, boolean clientMode, boolean wantClientAuth) {
+	public TLSWrapper(SSLContext sslc, TLSEventHandler eventHandler, String hostname, int port, final boolean clientMode, final boolean wantClientAuth, final boolean needClientAuth) {
 		if (clientMode && hostname != null)
 			tlsEngine = sslc.createSSLEngine(hostname, port);
 		else
@@ -189,6 +191,9 @@ public class TLSWrapper {
 
 		if (!clientMode && wantClientAuth) {
 			tlsEngine.setWantClientAuth(true);
+		}
+		if (!clientMode && needClientAuth) {
+			tlsEngine.setNeedClientAuth(true);
 		}
 
 		if (log.isLoggable(Level.FINEST))
@@ -402,7 +407,6 @@ public class TLSWrapper {
 	 */
 	public void wrap(ByteBuffer app, ByteBuffer net) throws SSLException {
 		tlsEngineResult = tlsEngine.wrap(app, net);
-
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "{0}, tlsEngineRsult.getStatus() = {1}, tlsEngineRsult.getHandshakeStatus() = {2}",
 					new Object[] { debugId, tlsEngineResult.getStatus(), tlsEngineResult.getHandshakeStatus() });

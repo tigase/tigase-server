@@ -20,19 +20,23 @@ public class ClientTrustManagerFactory {
 
 	public static final String CA_CERT_PATH = "clientCertCA";
 
+	public static final String CERT_REQUIRED_KEY = "clientCertRequired";
+
 	private final static char[] EMPTY_PASS = new char[0];
 
 	private final ArrayList<X509Certificate> acceptedIssuers = new ArrayList<X509Certificate>();
 
 	private final KeyStore keystore;
 
+	private boolean peerCertificateRequired = false;
+
+	private boolean saslExternalAvailable = false;
+
 	private TrustManagerFactory tmf;
 
 	private X509TrustManager trustManager;
 
 	private final TrustManager[] trustWrapper;
-
-	private boolean saslExternalAvailable = false;
 
 	public ClientTrustManagerFactory() {
 		this.trustWrapper = new TrustManager[] { new X509TrustManager() {
@@ -78,6 +82,14 @@ public class ClientTrustManagerFactory {
 		return acceptedIssuers.size() > 0;
 	}
 
+	public boolean isPeerCertificateRequired() {
+		return peerCertificateRequired;
+	}
+
+	public boolean isSaslExternalAvailable() {
+		return saslExternalAvailable;
+	}
+
 	protected void loadTrustedCert(String caCertFile) {
 		try {
 			CertificateEntry certEntry = CertificateUtil.loadCertificate(caCertFile);
@@ -104,14 +116,12 @@ public class ClientTrustManagerFactory {
 	}
 
 	public void setProperties(Map<String, Object> props) {
+		if (props.containsKey(CERT_REQUIRED_KEY)) {
+			this.peerCertificateRequired = (Boolean) props.get(CERT_REQUIRED_KEY);
+		}
 		if (props.containsKey(CA_CERT_PATH)) {
 			loadTrustedCert((String) props.get(CA_CERT_PATH));
 		}
 	}
-
-	public boolean isSaslExternalAvailable() {
-		return saslExternalAvailable;
-	}
-	
 
 }
