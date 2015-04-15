@@ -1004,7 +1004,15 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 					stmt.execute( alterTable );
 					alterTable = "update " + MSG_TABLE + " set " + MSG_TYPE_COLUMN + " = 0";
 					stmt.execute( alterTable );
-					alterTable = "alter table " + MSG_TABLE + " alter column " + MSG_TYPE_COLUMN + " int NOT NULL";
+
+					switch ( databaseType ) {
+						case mysql:
+							alterTable = "alter table " + MSG_TABLE + " modify column " + MSG_TYPE_COLUMN + " int NOT NULL";
+							break;
+						default:
+							alterTable = "alter table " + MSG_TABLE + " alter column " + MSG_TYPE_COLUMN + " int NOT NULL";
+							break;
+					}
 					stmt.execute( alterTable );
 
 				} catch ( SQLException ex1 ) {
