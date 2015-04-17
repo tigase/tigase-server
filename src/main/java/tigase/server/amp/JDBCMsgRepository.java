@@ -97,7 +97,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 							+ MSG_EXPIRED_COLUMN + " DATETIME," + "  "
 							+ MSG_FROM_UID_COLUMN + " bigint unsigned," + "  "
 							+ MSG_TO_UID_COLUMN + " bigint unsigned NOT NULL," + "  "
-							+ MSG_TYPE_COLUMN + " int NOT NULL," + "  "
+							+ MSG_TYPE_COLUMN + " int NOT NULL default 0," + "  "
 							+ MSG_BODY_COLUMN + " varchar(4096) NOT NULL," + "  "
 							+ " key (" + MSG_EXPIRED_COLUMN + "), "
 							+ " key (" + MSG_FROM_UID_COLUMN + ", " + MSG_TO_UID_COLUMN + "),"
@@ -110,7 +110,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 							+ MSG_EXPIRED_COLUMN + " TIMESTAMP," + "  "
 							+ MSG_FROM_UID_COLUMN + " bigint," + "  "
 							+ MSG_TO_UID_COLUMN + " bigint NOT NULL," + "  "
-							+ MSG_TYPE_COLUMN + " int NOT NULL," + "  "
+							+ MSG_TYPE_COLUMN + " int NOT NULL default 0," + "  "
 							+ MSG_BODY_COLUMN + " varchar(4096) NOT NULL);"
 							+ "create index index_" + MSG_EXPIRED_COLUMN + " on " + MSG_TABLE
 							+ " (" + MSG_EXPIRED_COLUMN + ");"
@@ -125,7 +125,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 							+ MSG_EXPIRED_COLUMN + " [datetime] ," + "  "
 							+ MSG_FROM_UID_COLUMN + " bigint," + "  "
 							+ MSG_TO_UID_COLUMN + " bigint NOT NULL," + "  "
-							+ MSG_TYPE_COLUMN + " int NOT NULL," + "  "
+							+ MSG_TYPE_COLUMN + " int NOT NULL default 0," + "  "
 							+ MSG_BODY_COLUMN + " nvarchar(4000) NOT NULL);"
 							+ "create index index_" + MSG_EXPIRED_COLUMN + " on " + MSG_TABLE
 							+ " (" + MSG_EXPIRED_COLUMN + ");"
@@ -140,7 +140,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 							+ MSG_EXPIRED_COLUMN + " TIMESTAMP," + "  "
 							+ MSG_FROM_UID_COLUMN + " bigint," + "  "
 							+ MSG_TO_UID_COLUMN + " bigint NOT NULL," + "  "
-							+ MSG_TYPE_COLUMN + " int NOT NULL," + "  "
+							+ MSG_TYPE_COLUMN + " int NOT NULL default 0," + "  "
 							+ MSG_BODY_COLUMN + " varchar(4096) NOT NULL);"
 							+ "create index index_" + MSG_EXPIRED_COLUMN + " on " + MSG_TABLE
 							+ " (" + MSG_EXPIRED_COLUMN + ");"
@@ -1014,24 +1014,11 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 				// if this happens then we have issue with old database schema and missing body columns in MSGS_TABLE
 				String alterTable = null;
 				try {
-					alterTable = "alter table " + MSG_TABLE + " add " + MSG_TYPE_COLUMN + " int";
+					alterTable = "alter table " + MSG_TABLE + " add " + MSG_TYPE_COLUMN + " int NOT NULL default 0";
 					if ( stmt == null ){
 						stmt = data_repo.createStatement( null );
 					}
 					stmt.execute( alterTable );
-					alterTable = "update " + MSG_TABLE + " set " + MSG_TYPE_COLUMN + " = 0";
-					stmt.execute( alterTable );
-
-					switch ( databaseType ) {
-						case mysql:
-							alterTable = "alter table " + MSG_TABLE + " modify column " + MSG_TYPE_COLUMN + " int NOT NULL";
-							break;
-						default:
-							alterTable = "alter table " + MSG_TABLE + " alter column " + MSG_TYPE_COLUMN + " int NOT NULL";
-							break;
-					}
-					stmt.execute( alterTable );
-
 				} catch ( SQLException ex1 ) {
 					log.log( Level.SEVERE, "could not alter table " + MSG_TABLE + " to add missing column by SQL:\n"
 																 + alterTable, ex1 );
