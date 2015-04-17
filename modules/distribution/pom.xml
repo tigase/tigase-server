@@ -112,7 +112,38 @@
 				</executions>
 			</plugin>
 
-
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.6.1</version>
+				<executions>
+					<execution>
+						<id>default-clean</id>
+						<phase>clean</phase>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>clean-deps</id>
+						<phase>clean</phase>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+						<configuration>
+							<filesets>
+								<fileset>
+									<directory>${project.basedir}/../../jars</directory>
+									<includes>
+										<include>**/*.jar</include>
+									</includes>
+									<followSymlinks>false</followSymlinks>
+								</fileset>
+							</filesets>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -128,6 +159,9 @@
 							<outputDirectory>${project.basedir}/../../jars</outputDirectory>
 							<stripVersion>true</stripVersion>
 							<excludeTransitive>true</excludeTransitive>
+							<overWriteIfNewer>true</overWriteIfNewer>
+							<overWriteReleases>true></overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
 						</configuration>
 					</execution>
 					<execution>
