@@ -26,6 +26,7 @@ package tigase.server.script;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import tigase.stats.StatisticHolderImpl;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -35,7 +36,7 @@ import java.util.Map;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class AbstractScriptCommand implements CommandIfc {
+public abstract class AbstractScriptCommand extends StatisticHolderImpl implements CommandIfc {
 
 	/** Field description */
 	public static final Map<String, String> lineCommentStart = new LinkedHashMap<String, String>(20);
@@ -104,6 +105,7 @@ public abstract class AbstractScriptCommand implements CommandIfc {
 	public void init(String id, String description) {
 		this.commandId = id;
 		this.description = description;
+		setStatisticsPrefix(id);
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -136,7 +138,7 @@ public abstract class AbstractScriptCommand implements CommandIfc {
 
 	protected boolean isEmpty(String val) {
 		return (val == null) || val.isEmpty();
-	}
+	}	
 }
 
 

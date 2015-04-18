@@ -55,6 +55,7 @@ import tigase.osgi.OSGiScriptEngineManager;
 import tigase.server.script.AddScriptCommand;
 import tigase.server.script.CommandIfc;
 import tigase.server.script.RemoveScriptCommand;
+import tigase.stats.StatisticsList;
 import tigase.util.DNSResolver;
 import tigase.util.TigaseStringprepException;
 import tigase.vhosts.VHostItem;
@@ -210,6 +211,24 @@ public class BasicComponent
 		return false;
 	}
 
+	public void everyHour() {
+		for (CommandIfc comm : scriptCommands.values()) {
+			comm.everyHour();
+		}		
+	}
+	
+	public void everyMinute() {
+		for (CommandIfc comm : scriptCommands.values()) {
+			comm.everyMinute();
+		}		
+	}
+	
+	public void everySecond() {
+		for (CommandIfc comm : scriptCommands.values()) {
+			comm.everySecond();
+		}		
+	}	
+	
 	/**
 	 * Method description
 	 *
@@ -753,6 +772,13 @@ public class BasicComponent
 		return name;
 	}
 
+	public void getStatistics(StatisticsList list) {
+		String compName = getName();
+		for (CommandIfc comm : scriptCommands.values()) {
+			comm.getStatistics(compName, list);
+		}
+	}
+	
 	/**
 	 * Method description
 	 *

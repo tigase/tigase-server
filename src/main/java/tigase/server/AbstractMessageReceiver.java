@@ -489,9 +489,11 @@ public abstract class AbstractMessageReceiver
 	 * exceed 1 hour. The overriding method must call the the super method first
 	 * and only then run own code.
 	 */
+	@Override
 	public synchronized void everyHour() {
 		packets_per_hour  = statReceivedPacketsOk - last_hour_packets;
 		last_hour_packets = statReceivedPacketsOk;
+		super.everyHour();
 	}
 
 	/**
@@ -503,10 +505,12 @@ public abstract class AbstractMessageReceiver
 	 * exceed 1 minute. The overriding method must call the the super method first
 	 * and only then run own code.
 	 */
+	@Override
 	public synchronized void everyMinute() {
 		packets_per_minute  = statReceivedPacketsOk - last_minute_packets;
 		last_minute_packets = statReceivedPacketsOk;
 		receiverTasks.purge();
+		super.everyMinute();
 	}
 
 	/**
@@ -518,9 +522,11 @@ public abstract class AbstractMessageReceiver
 	 * exceed 1 second. The overriding method must call the the super method first
 	 * and only then run own code.
 	 */
+	@Override
 	public synchronized void everySecond() {
 		packets_per_second  = statReceivedPacketsOk - last_second_packets;
 		last_second_packets = statReceivedPacketsOk;
+		super.everySecond();
 	}
 
 	/**
@@ -907,6 +913,7 @@ public abstract class AbstractMessageReceiver
 						.packetCounter, Level.FINEST);
 			}
 		}
+		super.getStatistics(list);
 	}
 
 	/**
