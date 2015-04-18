@@ -78,7 +78,7 @@ public class Script extends AbstractScriptCommand {
 	public String getLanguageName() {
 		return language;
 	}
-
+	
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -141,7 +141,7 @@ public class Script extends AbstractScriptCommand {
 		StringWriter writer = null;
 
 		try {
-
+			long start = System.currentTimeMillis();
 			// Bindings localBinds = scriptEngine.createBindings();
 			binds.put(PACKET, packet);
 
@@ -201,6 +201,8 @@ public class Script extends AbstractScriptCommand {
 					results.offer(result);
 				}
 			}
+			long end = System.currentTimeMillis();
+			statisticExecutedIn(end-start);
 		} catch (Exception e) {
 			Packet result = packet.commandResult(Command.DataType.result);
 
@@ -232,7 +234,7 @@ public class Script extends AbstractScriptCommand {
 			Command.addFieldMultiValue(result, "Debug info", Arrays.asList(error));
 			results.offer(result);
 		}
-	}
+	}	
 }
 
 

@@ -39,8 +39,11 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+
 import tigase.osgi.ModulesManagerImpl;
 import tigase.util.ClassUtil;
+
+import java.util.Properties;
 
 /**
  * Describe class RepositoryFactory here.
@@ -157,13 +160,12 @@ public abstract class RepositoryFactory {
 	public static final String GEN_AUTH_DB_URI = "--auth-db-uri";
 
 	/** Field description */
-	public static final String GEN_USER_DB = "--user-db";
-
-	/** Field description */
-	public static final String GEN_USER_DB_URI = "--user-db-uri";
+	public static final String GEN_USER_DB_PROP_KEY = "user-db";
+	public static final String GEN_USER_DB = "--" + GEN_USER_DB_PROP_KEY;
 
 	/** Field description */
 	public static final String GEN_USER_DB_URI_PROP_KEY = "user-db-uri";
+	public static final String GEN_USER_DB_URI = "--" + GEN_USER_DB_URI_PROP_KEY;
 
 	/** Field description */
 	public static final String LIBRESOURCE_REPO_CLASS_PROP_VAL =
@@ -600,11 +602,18 @@ public abstract class RepositoryFactory {
 							DBInitException {
 		String cls = class_name;
 
-		if (cls == null) {
-			cls = System.getProperty(USER_REPO_CLASS_PROP_KEY);
-			if (cls == null) {
-				cls = getRepoClassName(UserRepository.class, resource);
-			}	
+		if (resource == null ) {
+			resource = System.getProperty( GEN_USER_DB_URI_PROP_KEY );
+		}
+
+		if ( cls == null ){
+			cls = System.getProperty( USER_REPO_CLASS_PROP_KEY );
+			if ( cls == null ){
+				cls = getRepoClassName( UserRepository.class, resource );
+				if ( cls == null ){
+					cls = System.getProperty( GEN_USER_DB_PROP_KEY );
+				}
+			}
 		}
 		if (params == null) {
 			params = new LinkedHashMap<String, String>(10);

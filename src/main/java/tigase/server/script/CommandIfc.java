@@ -32,6 +32,7 @@ import tigase.server.Packet;
 import java.util.Queue;
 
 import javax.script.Bindings;
+import tigase.stats.StatisticHolder;
 
 //~--- interfaces -------------------------------------------------------------
 
@@ -41,7 +42,7 @@ import javax.script.Bindings;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface CommandIfc {
+public interface CommandIfc extends StatisticHolder {
 
 	/** Field description */
 	public static final String VHOST_MANAGER = "vhostMan";
@@ -135,7 +136,7 @@ public interface CommandIfc {
 
 	/** Field description */
 	public static final String DEL_SCRIPT_CMD = "del-script";
-
+	
 	//~--- get methods ----------------------------------------------------------
 
 	/**

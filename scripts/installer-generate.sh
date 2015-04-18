@@ -17,7 +17,7 @@ if [ ! -e logs ] ; then
 fi
 
 # get dependencies
-mvn -f modules/distribution/pom.xml dependency:copy-dependencies -DoutputDirectory=jars -Dmdep.stripVersion=true
+mvn -f modules/distribution/pom.xml dependency:copy-dependencies -DoutputDirectory=${PWD}/jars -Dmdep.stripVersion=true
 
 # copy socks5 schema
 if [ -d ../socks5 ] ; then
