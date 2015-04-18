@@ -83,8 +83,13 @@ public interface MsgRepositoryIfc extends Repository {
 	 * @param to      {@link JID} denotes address of the receiver
 	 * @param expired {@link Date} object denoting expiration date of the message
 	 * @param msg     {@link Element} payload of the stanza to be saved
+	 * @param userRepo {@link NonAuthUserRepository} instance of non auth user repository 
+	 *					to get user settings for offline messages
+	 * 
+	 * @return {@code true} if the packet was correctly saved to repository,
+	 *         {@code false} otherwise.
 	 *
 	 * @throws UserNotFoundException
 	 */
-	void storeMessage( JID from, JID to, Date expired, Element msg ) throws UserNotFoundException;
+	boolean storeMessage( JID from, JID to, Date expired, Element msg, NonAuthUserRepository userRepo ) throws UserNotFoundException;
 }

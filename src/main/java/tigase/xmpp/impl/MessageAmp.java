@@ -54,6 +54,8 @@ import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 
 import static tigase.server.amp.AmpFeatureIfc.*;
+import tigase.xmpp.Authorization;
+import tigase.xmpp.PacketErrorTypeException;
 
 /**
  * Created: Apr 29, 2010 5:00:25 PM
@@ -67,12 +69,12 @@ public class MessageAmp
 						XMPPPreprocessorIfc, XMPPProcessorIfc {
 	private static final String     AMP_JID_PROP_KEY     = "amp-jid";
 	private static final String[][] ELEMENTS             = {
-		{ "message" }, { "presence" }
+		{ "message" }, { "presence" }, { "iq", "msgoffline" }
 	};
 	private static final String     ID                   = "amp";
 	private static final Logger     log = Logger.getLogger(MessageAmp.class.getName());
 	private static final String     XMLNS                = "http://jabber.org/protocol/amp";
-	private static final String[]   XMLNSS = { "jabber:client", "jabber:client" };
+	private static final String[]   XMLNSS = { "jabber:client", "jabber:client", "msgoffline" };
 	private static Element[]        DISCO_FEATURES = { new Element("feature",
 			new String[] { "var" }, new String[] { XMLNS }),
 			new Element("feature", new String[] { "var" }, new String[] { "msgoffline" }) };
@@ -84,6 +86,7 @@ public class MessageAmp
 	private MsgRepositoryIfc   msg_repo         = null;
 	private OfflineMessages offlineProcessor = new OfflineMessages();
 	private Message         messageProcessor = new Message();
+	private QuotaRule quotaExceededRule = QuotaRule.error;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -118,6 +121,8 @@ public class MessageAmp
 			DISCO_FEATURES = new Element[] { new Element("feature", new String[] { "var" },
 					new String[] { XMLNS }) };
 		}
+		
+		quotaExceededRule = QuotaRule.valueof((String) settings.get("quota-exceeded"));
 
 		String msg_repo_uri = (String) settings.get(AmpFeatureIfc.AMP_MSG_REPO_URI_PROP_KEY);
 		String msg_repo_cls = (String) settings.get(AmpFeatureIfc.AMP_MSG_REPO_CLASS_PROP_KEY);
@@ -173,7 +178,25 @@ public class MessageAmp
 					if (session != null && packet.getStanzaTo() != null && !session.isUserId(packet.getStanzaTo().getBareJID()))
 						return;
 					
-					offlineProcessor.savePacketForOffLineUser(packet, msg_repo);					
+					Authorization saveResult = offlineProcessor.savePacketForOffLineUser(packet, msg_repo, repo);
+					Packet result = null;
+
+					switch (saveResult) {
+						case SERVICE_UNAVAILABLE:
+							switch (quotaExceededRule) {
+								case error:
+									result = saveResult.getResponseMessage(packet, "Offline messages queue is full", true);
+									break;									
+								case drop:
+									break;
+							}
+							break;
+						default:
+							break;
+					}
+					if (result != null) {
+						results.offer(result);
+					}		
 				} catch (UserNotFoundException ex) {
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest(
@@ -184,7 +207,10 @@ public class MessageAmp
 					if ( log.isLoggable( Level.FINEST ) ){
 						log.log(Level.FINEST, "NotAuthorizedException when checking if message is to this "
 								+ "user at trying to save packet for off-line user, {0}, {1}", new Object[]{ packet, session });
-					}					
+					}	
+				} catch (PacketErrorTypeException ex) {
+					log.log(Level.FINE, "Could not sent error to packet sent to offline user which storage to offline "
+							+ "store failed. Packet is error type already: {0}", packet.toStringSecure());					
 				}
 			}
 		}
@@ -243,38 +269,48 @@ public class MessageAmp
 	public void process(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 					throws XMPPException {
-		if (packet.getElemName() == "presence") {
-			if ((offlineProcessor != null) && offlineProcessor.loadOfflineMessages(packet,
-					session)) {
-				try {
-					Queue<Packet> packets = offlineProcessor.restorePacketForOffLineUser(session,
-							msg_repo);
+		switch (packet.getElemName()) {
+			case "presence":
+				if ((offlineProcessor != null) && offlineProcessor.loadOfflineMessages(packet,
+						session)) {
+					try {
+						Queue<Packet> packets = offlineProcessor.restorePacketForOffLineUser(session,
+								msg_repo);
 
-					if (packets != null) {
-						if (log.isLoggable(Level.FINER)) {
-							log.finer("Sending off-line messages: " + packets.size());
-						}
-						results.addAll(packets);
-					}    // end of if (packets != null)
-				} catch (UserNotFoundException e) {
-					log.info("Something wrong, DB problem, cannot load offline messages. " + e);
-				}      // end of try-catch
-				
-				// notify AMP component that user is online now
-				if (packet.getStanzaTo() == null) {
-					Packet notification = packet.copyElementOnly();
-					notification.initVars(session.getJID(), ampJID);
-					results.offer(notification);
+						if (packets != null) {
+							if (log.isLoggable(Level.FINER)) {
+								log.finer("Sending off-line messages: " + packets.size());
+							}
+							results.addAll(packets);
+						}    // end of if (packets != null)
+					} catch (UserNotFoundException e) {
+						log.info("Something wrong, DB problem, cannot load offline messages. " + e);
+					}      // end of try-catch
+
+					// notify AMP component that user is online now
+					if (packet.getStanzaTo() == null) {
+						Packet notification = packet.copyElementOnly();
+						notification.initVars(session.getJID(), ampJID);
+						results.offer(notification);
+					}
 				}
-			}
-		} else {
-			Element amp = packet.getElement().getChild("amp", XMLNS);
+				break;
+			case "message":
+				Element amp = packet.getElement().getChild("amp", XMLNS);
 
-			if ((amp == null) || (amp.getAttributeStaticStr("status") != null) || ampJID.equals(packet.getPacketFrom())) {
-				messageProcessor.process(packet, session, repo, results, settings);
-			} else {
-				// this should not happen as it is already handled in preprocessing stage
-			}
+				if ((amp == null) || (amp.getAttributeStaticStr("status") != null) || ampJID.equals(packet.getPacketFrom())) {
+					messageProcessor.process(packet, session, repo, results, settings);
+				} else {
+					// this should not happen as it is already handled in preprocessing stage
+				}
+				break;
+			case "iq":
+				if (offlineProcessor != null) {
+					offlineProcessor.processIq(packet, session, repo, results);
+				} else {
+					results.offer(Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet, ID, true));
+				}
+				break;
 		}
 	}
 
@@ -291,5 +327,18 @@ public class MessageAmp
 	@Override
 	public String[] supNamespaces() {
 		return XMLNSS;
+	}
+	
+	private enum QuotaRule {
+		error,
+		drop;
+		
+		public static QuotaRule valueof(String name) {
+			try {
+				return QuotaRule.valueOf(name);
+			} catch (IllegalArgumentException ex) {
+				return QuotaRule.error;
+			}
+		}
 	}
 }

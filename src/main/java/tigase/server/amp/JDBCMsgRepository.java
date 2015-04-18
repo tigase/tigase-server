@@ -60,6 +60,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.db.NonAuthUserRepository;
+import tigase.db.NonAuthUserRepositoryImpl;
 import tigase.vhosts.VHostItem;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
@@ -312,7 +314,6 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 	private String msg_count_for_limit_query = MSG_COUNT_FOR_TO_AND_FROM_QUERY_DEF;
 	private String msg_insert_message_to_broadcast = SQL_MSG_INSERT_MESSAGE_TO_BROADCAST;
 	private String msg_ensure_broadcast_recipient = SQL_MSG_ENSURE_BROADCAT_RECIPIETN;
-	private long msgs_store_limit = MSGS_STORE_LIMIT_VAL;
 	private boolean initialized = false;
 	private Map<BareJID, Long> uids_cache = Collections
 			.synchronizedMap(new SimpleCache<BareJID, Long>(MAX_UID_CACHE_SIZE,
@@ -340,14 +341,10 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			if (query != null) {
 				msg_count_for_limit_query = query;
 			}
-
-			String msgs_store_limit_str = map.get(MSGS_STORE_LIMIT_KEY);
-			
-			if (msgs_store_limit_str != null) {
-				msgs_store_limit = Long.parseLong(msgs_store_limit_str);
-			}
 		}
 
+		super.initRepository(conn_str, map);
+		
 		try {
 			data_repo = RepositoryFactory.getDataRepository(null, conn_str, map);
 			switch (data_repo.getDatabaseType()) {
@@ -702,7 +699,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 	}
 
 	@Override
-	public void storeMessage(JID from, JID to, Date expired, Element msg)
+	public boolean storeMessage(JID from, JID to, Date expired, Element msg, NonAuthUserRepository userRepo)
 			throws UserNotFoundException {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Storring expired: {0} message: {1}", new Object[] { expired,
@@ -725,6 +722,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 
 			long count = 0;
 			
+			long msgs_store_limit = getMsgsStoreLimit(to.getBareJID(), userRepo);
 			// If the msgs_store_limit is set to 0, skip the select because the message will be saved anyway
 			if (msgs_store_limit > 0) {
 				PreparedStatement count_msgs_st =
@@ -748,7 +746,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 					log.log(Level.FINEST, "Message store limit ({0}) exceeded for message: {1}",
 							new Object[] { msgs_store_limit, Packet.elemToString(msg) });
 				}
-				return;
+				return false;
 			}
 
 			PreparedStatement insert_msg_st =
@@ -802,7 +800,9 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			data_repo.release(null, rs);
 		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem adding new entry to DB: ", e);
+			data_repo.release(null, rs);
 		}
+		return true;
 	}
 	
 	@Override

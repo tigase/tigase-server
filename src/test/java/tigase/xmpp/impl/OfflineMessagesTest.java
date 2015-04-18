@@ -187,8 +187,8 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 		}
 		
 		@Override
-		public void storeMessage(JID from, JID to, Date expired, Element msg) throws UserNotFoundException {
-			stored.offer(Packet.packetInstance(msg, from, to));
+		public boolean storeMessage(JID from, JID to, Date expired, Element msg, NonAuthUserRepository userRepo) throws UserNotFoundException {
+			return stored.offer(Packet.packetInstance(msg, from, to));
 		}
 		
 		@Override

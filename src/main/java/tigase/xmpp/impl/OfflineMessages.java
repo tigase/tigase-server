@@ -37,8 +37,10 @@ import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
 import tigase.osgi.ModulesManagerImpl;
+import tigase.server.Iq;
 import static tigase.server.Message.ELEM_NAME;
 import tigase.server.Packet;
+import tigase.server.amp.MsgRepository;
 import tigase.util.DNSResolver;
 import tigase.util.TigaseStringprepException;
 import tigase.vhosts.VHostItem;
@@ -46,8 +48,11 @@ import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
+import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
+import tigase.xmpp.NoConnectionIdException;
 import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPPostprocessorIfc;
 import tigase.xmpp.XMPPProcessor;
@@ -83,11 +88,11 @@ public class OfflineMessages
 	 * processing capabilities. In case of {@code msgoffline} plugin it is
 	 * <em>presence</em> stanza */
 	private static final String[][] ELEMENTS = {
-		{ Presence.PRESENCE_ELEMENT_NAME } };
+		{ Presence.PRESENCE_ELEMENT_NAME }, { "iq", "msgoffline" } };
 	/** Field holds an array of name-spaces for stanzas which can be processed by
 	 * this plugin. In case of {@code msgoffline} plugin it is
 	 * <em>jabber:client</em> */
-	private static final String[] XMLNSS = { XMLNS };
+	private static final String[] XMLNSS = { XMLNS, ID };
 	/** Field holds an array of XML Elements with service discovery features which
 	 * have to be returned to the client uppon request. In case of
 	 * {@code msgoffline} plugin it is the same as plugin name -
@@ -152,7 +157,19 @@ public class OfflineMessages
 					return;
 				MsgRepositoryIfc msg_repo = getMsgRepoImpl( repo, conn );
 
-				savePacketForOffLineUser( packet, msg_repo );
+				Authorization saveResult = savePacketForOffLineUser( packet, msg_repo, repo );
+				Packet result = null;
+				
+				switch (saveResult) {
+					case SERVICE_UNAVAILABLE:
+						result = saveResult.getResponseMessage(packet, "Offline messages queue is full", true);
+						break;
+					default:
+						break;
+				}
+				if (result != null) {
+					queue.offer(result);
+				}
 			} catch ( UserNotFoundException e ) {
 				if ( log.isLoggable( Level.FINEST ) ){
 					log.finest(
@@ -164,6 +181,9 @@ public class OfflineMessages
 					log.log(Level.FINEST, "NotAuthorizedException when checking if message is to this "
 							+ "user at trying to save packet for off-line user, {0}, {1}", new Object[]{ packet, conn });
 				}
+			} catch (PacketErrorTypeException ex) {
+				log.log(Level.FINE, "Could not sent error to packet sent to offline user which storage to offline "
+						+ "store failed. Packet is error type already: {0}", packet.toStringSecure());
 			}    // end of try-catch
 		}      // end of if (conn == null)
 	}
@@ -182,23 +202,74 @@ public class OfflineMessages
 											 final NonAuthUserRepository repo, final Queue<Packet> results,
 											 final Map<String, Object> settings )
 			throws NotAuthorizedException {
-		if ( loadOfflineMessages( packet, conn ) ){
-			try {
-				MsgRepositoryIfc msg_repo = getMsgRepoImpl( repo, conn );
-				Queue<Packet> packets = restorePacketForOffLineUser( conn, msg_repo );
+		switch (packet.getElemName()) {
+			case tigase.server.Presence.ELEM_NAME:
+				if (loadOfflineMessages(packet, conn)) {
+					try {
+						MsgRepositoryIfc msg_repo = getMsgRepoImpl(repo, conn);
+						Queue<Packet> packets = restorePacketForOffLineUser(conn, msg_repo);
 
-				if ( packets != null ){
-					if ( log.isLoggable( Level.FINER ) ){
-						log.finer( "Sending off-line messages: " + packets.size() );
-					}
-					results.addAll( packets );
-				}    // end of if (packets != null)
-			} catch ( UserNotFoundException e ) {
-				log.info( "Something wrong, DB problem, cannot load offline messages. " + e );
-			}      // end of try-catch
+						if (packets != null) {
+							if (log.isLoggable(Level.FINER)) {
+								log.finer("Sending off-line messages: " + packets.size());
+							}
+							results.addAll(packets);
+						}    // end of if (packets != null)
+					} catch (UserNotFoundException e) {
+						log.info("Something wrong, DB problem, cannot load offline messages. " + e);
+					}      // end of try-catch
+				}
+				break;
+			case Iq.ELEM_NAME:
+				processIq(packet, conn, repo, results);
+				break;
 		}
 	}
 
+	public void processIq(Packet packet, XMPPResourceConnection conn, NonAuthUserRepository repo, Queue<Packet> results) throws NotAuthorizedException {
+		try {
+			if (conn != null && packet.getFrom().equals(conn.getConnectionId())) {
+				Element msgoffline = packet.getElement().getChild("msgoffline");
+				String limitStr = null;
+				switch (packet.getType()) {
+					case set:
+						limitStr = msgoffline.getAttributeStaticStr("limit");
+						Long limit = (limitStr != null) ? Long.parseLong(limitStr) : null;
+						if (limit == null) {
+							results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Value of limit attribute is incorrect", false));
+							break;
+						} else {
+							if (limit > 0) {
+								conn.setPublicData(MsgRepository.OFFLINE_MSGS_KEY, MsgRepository.MSGS_STORE_LIMIT_KEY, limitStr);
+							} else {
+								conn.removePublicData(MsgRepository.OFFLINE_MSGS_KEY, MsgRepository.MSGS_STORE_LIMIT_KEY);
+							}
+						}
+						// following get case will return result for set as well
+					case get:
+						if (limitStr == null)
+							limitStr = conn.getPublicData(MsgRepository.OFFLINE_MSGS_KEY, MsgRepository.MSGS_STORE_LIMIT_KEY, null);
+						if (limitStr == null)
+							limitStr = "0";
+						msgoffline = new Element("msgoffline", new String[] { "xmlns", "limit" }, new String[] { "msgoffline", limitStr });
+						packet.okResult(msgoffline, 0);
+						break;
+					default:
+						results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, 
+								"Request type is incorrect", false));
+						break;
+				}
+			} else {
+				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet, 
+						"You are not authorized to access this private storage.", false));
+			}
+		} catch (TigaseDBException ex) {
+		} catch (NoConnectionIdException ex) {
+		} catch (PacketErrorTypeException ex) {
+			
+		}
+	}
+	
 	/**
 	 * Method restores all messages from repository for the JID of the current
 	 * session. All retrieved elements are then instantiated as {@code Packet}
@@ -273,7 +344,7 @@ public class OfflineMessages
 	 *
 	 * @throws UserNotFoundException
 	 */
-	public boolean savePacketForOffLineUser( Packet pac, MsgRepositoryIfc repo )
+	public Authorization savePacketForOffLineUser( Packet pac, MsgRepositoryIfc repo, NonAuthUserRepository userRepo )
 			throws UserNotFoundException {
 		StanzaType type = pac.getType();
 
@@ -305,10 +376,13 @@ public class OfflineMessages
 				"stamp", "xmlns" }, new String[] { from, stamp, "urn:xmpp:delay" } );
 
 			elem.addChild( x );
-			repo.storeMessage( pac.getStanzaFrom(), pac.getStanzaTo(), null, elem );
 			pac.processedBy( ID );
-
-			return true;
+			
+			if (repo.storeMessage( pac.getStanzaFrom(), pac.getStanzaTo(), null, elem, userRepo) ) {
+				return Authorization.AUTHORIZED;		
+			} else {
+				return Authorization.SERVICE_UNAVAILABLE;
+			}
 		} else {
 			if ( log.isLoggable( Level.FINEST ) ){
 				log.log( Level.FINEST, "Packet for offline user not suitable for storing: {0}",
@@ -316,7 +390,7 @@ public class OfflineMessages
 			}
 		}
 
-		return false;
+		return Authorization.FEATURE_NOT_IMPLEMENTED;
 	}
 
 	@Override
@@ -512,10 +586,11 @@ public class OfflineMessages
 		}
 
 		@Override
-		public void storeMessage( JID from, JID to, Date expired, Element msg )
+		public boolean storeMessage( JID from, JID to, Date expired, Element msg, NonAuthUserRepository userRepo )
 				throws UserNotFoundException {
 			repo.addOfflineDataList( to.getBareJID(), ID, "messages",
 															 new String[] { msg.toString() } );
+			return true;
 		}
 	}
 
