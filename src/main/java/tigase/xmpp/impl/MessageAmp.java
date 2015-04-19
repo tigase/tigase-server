@@ -56,6 +56,7 @@ import tigase.xmpp.XMPPResourceConnection;
 import static tigase.server.amp.AmpFeatureIfc.*;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
+import tigase.xmpp.StanzaType;
 
 /**
  * Created: Apr 29, 2010 5:00:25 PM
@@ -335,10 +336,11 @@ public class MessageAmp
 		
 		public static QuotaRule valueof(String name) {
 			try {
-				return QuotaRule.valueOf(name);
+				if (name != null)
+					return QuotaRule.valueOf(name);
 			} catch (IllegalArgumentException ex) {
-				return QuotaRule.error;
 			}
+			return QuotaRule.error;
 		}
 	}
 }

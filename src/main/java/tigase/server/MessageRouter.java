@@ -245,7 +245,8 @@ public class MessageRouter
 		// let't try to relax restriction and block all packets with error type
 		// 2008-06-16
 		if (((packet.getType() == StanzaType.error) && (packet.getFrom() != null) && packet
-				.getFrom().equals(packet.getTo()))) {
+				.getFrom().equals(packet.getTo()) 
+				&& (packet.getStanzaFrom() == null || packet.getStanzaFrom().equals(packet.getStanzaTo())))) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Possible infinite loop, dropping packet: {0}", packet);
 			}

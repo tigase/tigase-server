@@ -252,7 +252,7 @@ public class OfflineMessages
 						if (limitStr == null)
 							limitStr = "0";
 						msgoffline = new Element("msgoffline", new String[] { "xmlns", "limit" }, new String[] { "msgoffline", limitStr });
-						packet.okResult(msgoffline, 0);
+						results.offer(packet.okResult(msgoffline, 0));
 						break;
 					default:
 						results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, 
@@ -338,6 +338,7 @@ public class OfflineMessages
 	 *             verified and saved
 	 * @param repo a {@link MsgRepositoryIfc} repository handler responsible for
 	 *             storing messages
+	 * @param userRepo
 	 *
 	 * @return {@code true} if the packet was correctly saved to repository,
 	 *         {@code false} otherwise.
