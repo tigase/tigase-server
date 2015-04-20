@@ -234,12 +234,18 @@ public class OfflineMessages
 				switch (packet.getType()) {
 					case set:
 						limitStr = msgoffline.getAttributeStaticStr("limit");
-						Long limit = (limitStr != null) ? Long.parseLong(limitStr) : null;
+						Long limit = null;
+						if (limitStr != null) {
+							if ("none".equals(limitStr) || "false".equals(limitStr))
+								limit = (long)-1;
+							else
+								limit = Long.parseLong(limitStr);
+						}
 						if (limit == null) {
 							results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Value of limit attribute is incorrect", false));
 							break;
 						} else {
-							if (limit > 0) {
+							if (limit >= 0) {
 								conn.setPublicData(MsgRepository.OFFLINE_MSGS_KEY, MsgRepository.MSGS_STORE_LIMIT_KEY, limitStr);
 							} else {
 								conn.removePublicData(MsgRepository.OFFLINE_MSGS_KEY, MsgRepository.MSGS_STORE_LIMIT_KEY);
@@ -250,7 +256,7 @@ public class OfflineMessages
 						if (limitStr == null)
 							limitStr = conn.getPublicData(MsgRepository.OFFLINE_MSGS_KEY, MsgRepository.MSGS_STORE_LIMIT_KEY, null);
 						if (limitStr == null)
-							limitStr = "0";
+							limitStr = "false";
 						msgoffline = new Element("msgoffline", new String[] { "xmlns", "limit" }, new String[] { "msgoffline", limitStr });
 						results.offer(packet.okResult(msgoffline, 0));
 						break;

@@ -158,9 +158,13 @@ public abstract class MsgRepository<T> implements MsgRepositoryIfc {
 	protected long getMsgsStoreLimit(BareJID userJid, NonAuthUserRepository userRepo) {
 		if (msgs_user_store_limit) {
 			try {
-				String limit = userRepo.getPublicData(userJid, OFFLINE_MSGS_KEY, MSGS_STORE_LIMIT_KEY, null);
-				if (limit != null) {
-					return Long.parseLong(limit);
+				String limitStr = userRepo.getPublicData(userJid, OFFLINE_MSGS_KEY, MSGS_STORE_LIMIT_KEY, null);
+				if (limitStr != null) {
+					long limit = Long.parseLong(limitStr);
+					// in case of 0 we need to disable offline storage - not to save all as in case of store-limit
+					if (limit == 0)
+						limit = -1;
+					return limit;
 				}
 			} catch (UserNotFoundException ex) {
 				// should not happen

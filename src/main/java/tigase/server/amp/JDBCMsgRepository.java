@@ -724,7 +724,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			
 			long msgs_store_limit = getMsgsStoreLimit(to.getBareJID(), userRepo);
 			// If the msgs_store_limit is set to 0, skip the select because the message will be saved anyway
-			if (msgs_store_limit > 0) {
+			if (msgs_store_limit != 0) {
 				PreparedStatement count_msgs_st =
 						data_repo.getPreparedStatement(to.getBareJID(), msg_count_for_limit_query);
 	
@@ -741,7 +741,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 			}
 
 			// The insertion will be skipped if the msgs_store_limit is higher than 0 and it was passed
-			if (msgs_store_limit > 0 && msgs_store_limit <= count) {
+			if (msgs_store_limit != 0 && msgs_store_limit <= count) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Message store limit ({0}) exceeded for message: {1}",
 							new Object[] { msgs_store_limit, Packet.elemToString(msg) });
