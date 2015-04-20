@@ -96,7 +96,7 @@ public class CounterDataFileLogger
 			for ( Map.Entry<String,String> entry : stats.entrySet() ) {
 				writer.write( entry.getKey() );
 				writer.write( "\t" );
-				writer.write( stats.get( entry.getValue() ) );
+				writer.write( entry.getValue() );
 				writer.newLine();
 			}
 		} catch ( IOException ex ) {
