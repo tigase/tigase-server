@@ -26,6 +26,8 @@ package tigase.vhosts;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.vhosts.filter.DomainFilterPolicy;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -624,7 +626,8 @@ public class VHostItem
 			if (domainFilter == null) {
 				domainFilter = DomainFilterPolicy.valueof(System.getProperty(
 						DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString()));
-			} else if (domainFilter == DomainFilterPolicy.LIST || domainFilter == DomainFilterPolicy.BLACKLIST) {
+			} else if (domainFilter == DomainFilterPolicy.LIST || domainFilter == DomainFilterPolicy.BLACKLIST
+					|| domainFilter == DomainFilterPolicy.CUSTOM) {
 				String tmp = elem.getAttributeStaticStr(DOMAIN_FILTER_POLICY_DOMAINS_ATT);
 				if ( tmp != null && !tmp.trim().isEmpty() ){
 					domainFilterDomains = StringUtilities.stringToArrayOfString( tmp, ";" );

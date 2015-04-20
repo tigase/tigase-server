@@ -18,12 +18,14 @@
  */
 package tigase.vhosts;
 
+import tigase.vhosts.filter.DomainFilterPolicy;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 
 import java.util.Arrays;
 
 import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  *
@@ -79,6 +81,29 @@ public class VHostItemTest extends TestCase {
 		assertTrue( Arrays.asList( vHostItem.getDomainFilterDomains() ).contains( "domain3" ) );
 		assertFalse( Arrays.asList( vHostItem.getDomainFilterDomains() ).contains( "domain5" ) );
 		assertTrue( vHostItem.toPropertyString().contains( "domain-filter=BLACKLIST" ) );
+
+
+		vHostItem = new VHostItem();
+		el = new Element( "vhost",
+											new String[] { "hostname", "domain-filter", "domain-filter-domains" },
+											new String[] { "domain3", "CUSTOM", "4,deny,all;1,allow,self;3,allow,jid,pubsub@test.com;2,allow,jid,admin@test2.com" }
+		);
+
+		vHostItem.initFromElement( el );
+		assertEquals( DomainFilterPolicy.CUSTOM, vHostItem.getDomainFilter() );
+		assertTrue( vHostItem.toPropertyString().contains( "domain-filter=CUSTOM=4,deny,all;1,allow,self;3,allow,jid,pubsub@test.com;2,allow,jid,admin@test2.com" ) );
+
+
+
+		vHostItem = new VHostItem();
+		vHostItem.initFromPropertyString("domain1:domain-filter=CUSTOM=4|deny|all;1|allow|self;3|allow|jid|pubsub@test.com;2|allow|jid|admin@test2.com" );
+		assertEquals( DomainFilterPolicy.CUSTOM, vHostItem.getDomainFilter() );
+		final String toPropertyString = vHostItem.toPropertyString();
+		System.out.println( "to property string: " + toPropertyString );
+		assertTrue("different" , toPropertyString.contains( "domain-filter=CUSTOM=4|deny|all;1|allow|self;3|allow|jid|pubsub@test.com;2|allow|jid|admin@test2.com" )  );
+
+
+
 
 	}
 
