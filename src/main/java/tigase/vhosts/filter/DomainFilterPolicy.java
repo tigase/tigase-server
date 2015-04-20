@@ -17,7 +17,7 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-package tigase.vhosts;
+package tigase.vhosts.filter;
 
 /**
  *	Enumeration of all possible filtering modes
@@ -39,6 +39,18 @@ public enum DomainFilterPolicy {
 
 	/** user can communicate with anyone except of the users within listed domains */
 	BLACKLIST,
+
+	/** Custom rules defining communication policies in CSV (using semicolon) in the
+	 * format of {@code rule_number;(allow|deny);[type_of_value];[value]}
+	 * where {@code type_of_value::(jid)}
+	 * <pre>
+	 * 1|allow|self;
+	 * 2|allow|jid|admin@test2.com;
+	 * 3|allow|jid|pubsub@test.com;
+	 * 4|deny|all;
+	 * </pre>
+	 */
+	CUSTOM,
 
 	/** user can not communicate with anyone, account virtually disabled */
 	BLOCK;
@@ -84,4 +96,5 @@ public enum DomainFilterPolicy {
 
 		return valuesStr;
 	}
+
 }
