@@ -19,26 +19,29 @@
 
 package tigase.vhosts.filter;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+
 /**
  *	Enumeration of all possible filtering modes
  */
 public enum DomainFilterPolicy {
 
 	/** user can communicate with anyone */
-	ALL,
+	ALL(false),
 
 	/** user can communicate with other local users
 	 * (i.e. of the domains hosted on the same Tigase instance) */
-	LOCAL,
+	LOCAL(false),
 
 	/** user can communicate with other users of the same domain */
-	OWN,
+	OWN(false),
 
 	/** user can communicate with users of the domains within listen domains */
-	LIST,
+	LIST(true),
 
 	/** user can communicate with anyone except of the users within listed domains */
-	BLACKLIST,
+	BLACKLIST(true),
 
 	/** Custom rules defining communication policies in CSV (using semicolon) in the
 	 * format of {@code rule_number;(allow|deny);[type_of_value];[value]}
@@ -50,15 +53,20 @@ public enum DomainFilterPolicy {
 	 * 4|deny|all;
 	 * </pre>
 	 */
-	CUSTOM,
+	CUSTOM(true),
 
 	/** user can not communicate with anyone, account virtually disabled */
-	BLOCK;
+	BLOCK(false);
 
-	/**
-	 *
-	 */
+	boolean domainListRequired;
+
+	DomainFilterPolicy(boolean domainListRequired) {
+		this.domainListRequired = domainListRequired;
+	}
+
 	private static String[] valuesStr = null;
+	private static HashSet<String> valuesDomainsListStr = null;
+
 
 	/**
 	 * Helper method returning proper defaults in case parsed value doesn't
@@ -95,6 +103,25 @@ public enum DomainFilterPolicy {
 		}
 
 		return valuesStr;
+	}
+
+	public static HashSet<String> valuePoliciesWithDomainListStr() {
+		if ( valuesDomainsListStr == null ){
+			DomainFilterPolicy[] vals = values();
+
+			valuesDomainsListStr = new HashSet<>();
+			for ( DomainFilterPolicy val : vals ) {
+				if ( val.isDomainListRequired() ){
+					valuesDomainsListStr.add( val.name() );
+				}
+			}
+		}
+
+		return valuesDomainsListStr;
+	}
+
+	public boolean isDomainListRequired() {
+		return domainListRequired;
 	}
 
 }

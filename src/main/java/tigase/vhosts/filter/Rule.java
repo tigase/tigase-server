@@ -94,6 +94,11 @@ public class Rule implements Comparable<Rule> {
 		return "Rule{" + "id=" + id + ", allow=" + allow + ", type=" + type + ", value=" + value + '}';
 	}
 
+	public String toConfigurationString() {
+		return id + "|" + (allow ? "allow" : "deny") + "|" + type +
+					 (type == RuleType.domain || type == RuleType.jid ? "|" + value :  "") + ";";
+	}
+
 	boolean isMatched( JID source, JID destination ) {
 		boolean result = false;
 		switch ( type ) {

@@ -90,7 +90,7 @@ public class CustomDomainFilterTest {
 	@Test
 	public void testParseRulesString() throws TigaseStringprepException, ParseException {
 		System.out.println( "parseRules" );
-		String rules = "4|deny|all;1|allow|self;3|allow|jid|pubsub@test.com;2|allow|jid|admin@test2.com";
+		String rulseString = "4|deny|all;1|allow|self;3|allow|jid|pubsub@test.com;2|allow|jid|admin@test2.com";
 
 		Set<Rule> expResult = new TreeSet<>();
 		Rule rule = new Rule( 1, true, RuleType.self, null );
@@ -111,8 +111,16 @@ public class CustomDomainFilterTest {
 			expResult.add( rule );
 		}
 
-		Set<Rule> result = CustomDomainFilter.parseRules( rules );
+		Set<Rule> result = CustomDomainFilter.parseRules( rulseString );
 		assertEquals( expResult, result );
+
+		rulseString = "1|allow|self;2|allow|jid|admin@test2.com;3|allow|jid|pubsub@test.com;4|deny|all;";
+		String resultString = new String();
+		for ( Rule res : result) {
+			resultString += res.toConfigurationString();
+		}
+		assertEquals( rulseString, resultString );
+
 	}
 
 	@Test(expected = ParseException.class)
