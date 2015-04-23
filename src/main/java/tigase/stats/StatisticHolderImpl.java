@@ -27,56 +27,42 @@ import java.util.logging.Level;
  *
  * @author andrzej
  */
-public class StatisticHolderImpl implements StatisticHolder {
+public class StatisticHolderImpl extends Counter implements StatisticHolder {
 	
-	private String prefix = null;
-	
-	private long last_hour_packets = 0;
-	private long last_minute_packets = 0;
-	private long last_second_packets = 0;
-	private long packets_per_hour = 0;
-	private long packets_per_minute = 0;
-	private long packets_per_second = 0;
-	private long requestsOk = 0;
+//	private String prefix = null;
+//	
+//	private long last_hour_packets = 0;
+//	private long last_minute_packets = 0;
+//	private long last_second_packets = 0;
+//	private long packets_per_hour = 0;
+//	private long packets_per_minute = 0;
+//	private long packets_per_second = 0;
+//	private long requestsOk = 0;
 	private long avgProcessingTime = 0;		
 	
+	public StatisticHolderImpl() {
+		super("NULL", Level.FINEST);
+	}
+	
+	public StatisticHolderImpl(String name) {
+		super(name, Level.FINEST);
+	}	
+
 	@Override
 	public void statisticExecutedIn(long executionTime) {
 		avgProcessingTime = (avgProcessingTime + executionTime) / 2;
-		++requestsOk;
+		inc();
 	}
-	
-	@Override
-	public synchronized void everyHour() {
-		packets_per_hour = requestsOk - last_hour_packets;
-		last_hour_packets = requestsOk;
-	}
-	
-	@Override
-	public synchronized void everyMinute() {
-		packets_per_minute = requestsOk - last_minute_packets;
-		last_minute_packets = requestsOk;
-	}
-	
-	@Override
-	public synchronized void everySecond() {
-		packets_per_second = requestsOk - last_second_packets;
-		last_second_packets = requestsOk;
-	}		
 	
 	@Override
 	public void getStatistics(String compName, StatisticsList list) {
-		if (list.checkLevel(Level.FINEST)) {
-			list.add(compName, prefix +"/Last hour packets", packets_per_hour, Level.FINEST);
-			list.add(compName, prefix +"/Last minute packets", packets_per_minute, Level.FINEST);
-			list.add(compName, prefix +"/Last second packets", packets_per_second, Level.FINEST);
-		}
-		list.add(compName, prefix +"/Average processing time", avgProcessingTime, Level.FINE);
+		super.getStatistics(compName, list);
+		list.add(compName, getName() +"/Average processing time", avgProcessingTime, Level.FINE);
 	}	
 	
 	@Override
 	public void setStatisticsPrefix(String prefix) {
-		this.prefix = prefix;
+		setName(prefix);
 	}
 	
 	
