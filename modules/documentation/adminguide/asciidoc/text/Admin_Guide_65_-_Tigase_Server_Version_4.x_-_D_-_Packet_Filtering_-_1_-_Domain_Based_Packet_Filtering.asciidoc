@@ -19,6 +19,7 @@ There are predefined rules for packet filtering:
 . `BLOCK` - user can't communicate with anyone. This could be used as a means to temporarily disable account or domain.
 . `LIST` - user can send and receive packets within listed domains only (i.e. _whitelist_).
 . `BLACKLIST` - user can communicate with everybody (like `ALL`), except contacts on listed domains.
+. `CUSTOM` - user can communicate only within custom created rules set.
 
 Whitelist (`LIST`) and blacklist (`BLACKLIST`) settings are mutually exclusive, i.e. at any given point of time only one of them can be used.
 
@@ -56,6 +57,26 @@ Where *user_id* is user Jabber ID without resource part. *DomainFilter.ALLOWED_D
 . `OWN` - if the user is allowed to communicate with users within his own domain only.
 . `LIST` - list of domains within which the user is allowed to communicate with other users. No wild-cards are supported. User's own domain should be included too.
 . `BLACKLIST` - list of domains within which the user is NOT allowed to communicate with other users. No wild-cards are supported. User's own domain should NOT be included.
+. `CUSTOM` - list of rules defining custom communication permissions (server processes stanza according to first matched rule, similar to XEP-0016) in the following format:
+[source]
+-------------------------------------
+ruleSet = rule1;rule2;ruleX;
+
+rule = order_number|policy|UID_type[|UID]
+
+order_number = any integer;
+policy = (allow|deny);
+UID_type = [jid|domain|all];
+UID = user JID or domain, for example pubsub@test.com; if UID_type is ALL then this is ignored.
+-------------------------------------
+for example
+[source]
+-------------------------------------
+1|allow|self;
+2|allow|jid|admin@test2.com;
+3|allow|jid|pubsub@test.com;
+4|deny|all;
+-------------------------------------
 . `null` - a java null if there are no settings for the user.
 
 In case of `LIST` and `BLACKLIST` filtering options, it's essential to provide list of domains for the whitelisting/blacklisting. *DomainFilter.ALLOWED_DOMAINS_LIST_KEY* is a property key: "allowed-domains-list". The user repository MUST return semicolon separated list of domains: `domain1.com;domain2.com,domain3.org`
