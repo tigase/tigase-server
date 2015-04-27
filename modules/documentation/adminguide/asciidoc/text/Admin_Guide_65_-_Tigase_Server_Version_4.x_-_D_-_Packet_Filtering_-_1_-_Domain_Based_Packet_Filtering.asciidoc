@@ -58,6 +58,7 @@ Where *user_id* is user Jabber ID without resource part. *DomainFilter.ALLOWED_D
 . `LIST` - list of domains within which the user is allowed to communicate with other users. No wild-cards are supported. User's own domain should be included too.
 . `BLACKLIST` - list of domains within which the user is NOT allowed to communicate with other users. No wild-cards are supported. User's own domain should NOT be included.
 . `CUSTOM` - list of rules defining custom communication permissions (server processes stanza according to first matched rule, similar to XEP-0016) in the following format:
+
 [source]
 -------------------------------------
 ruleSet = rule1;rule2;ruleX;
@@ -70,6 +71,7 @@ UID_type = [jid|domain|all];
 UID = user JID or domain, for example pubsub@test.com; if UID_type is ALL then this is ignored.
 -------------------------------------
 for example
+
 [source]
 -------------------------------------
 1|allow|self;
