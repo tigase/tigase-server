@@ -32,6 +32,7 @@ import java.util.Queue;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
@@ -110,12 +111,16 @@ public class OfflineMessages
 	 * <em>presence</em> stanza */
 	public static final String[] MESSAGE_HEADER_PATH = { ELEM_NAME, "header" };
 	private static final String MSG_REPO_CLASS_KEY = "msg-repo-class";
+	private static final Object MSG_PUBSUB_JID = "msg-pubsub-jid";
+	private static final Object MSG_PUBSUB_NODE = "msg-pubsub-node";
 	//~--- fields ---------------------------------------------------------------
 	/** Field holds class for formatting and parsing dates in a locale-sensitive
 	 * manner */
 	private final SimpleDateFormat formatter;
 	private String msgRepoCls = null;
 	private Message message = new Message();
+	private String pubSubJID;
+	private String pubSubNode;
 	
 	{
 		this.formatter = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" );
@@ -137,6 +142,10 @@ public class OfflineMessages
 	public void init(Map<String, Object> settings) throws TigaseDBException {
 		super.init(settings);
 		msgRepoCls = (String) settings.get(MSG_REPO_CLASS_KEY);
+		if (settings.containsKey(MSG_PUBSUB_JID))
+			this.pubSubJID = (String) settings.get(MSG_PUBSUB_JID);
+		if (settings.containsKey(MSG_PUBSUB_NODE))
+			this.pubSubNode = (String) settings.get(MSG_PUBSUB_NODE);
 	}
 	
 	/**
@@ -157,6 +166,8 @@ public class OfflineMessages
 					return;
 				MsgRepositoryIfc msg_repo = getMsgRepoImpl( repo, conn );
 
+				publishInPubSub(packet, conn, queue, settings);
+				
 				Authorization saveResult = savePacketForOffLineUser( packet, msg_repo, repo );
 				Packet result = null;
 				
@@ -504,6 +515,43 @@ public class OfflineMessages
 		return false;
 	}
 
+	public void publishInPubSub(final Packet packet, final XMPPResourceConnection conn, final Queue<Packet> queue,
+			Map<String, Object> settings) {
+		if (pubSubJID == null || pubSubNode == null)
+			return;
+		final StanzaType type = packet.getType();
+
+		if ((packet.getElemName().equals("message")
+				&& ((packet.getElemCDataStaticStr(tigase.server.Message.MESSAGE_BODY_PATH) != null)
+						|| (packet.getElemChildrenStaticStr(MESSAGE_EVENT_PATH) != null) || (packet.getElemChildrenStaticStr(MESSAGE_HEADER_PATH) != null)) && ((type == null)
+				|| (type == StanzaType.normal) || (type == StanzaType.chat)))
+				|| (packet.getElemName().equals("presence") && ((type == StanzaType.subscribe)
+						|| (type == StanzaType.subscribed) || (type == StanzaType.unsubscribe) || (type == StanzaType.unsubscribed)))) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Publishing packet in pubsub: {0}", packet);
+			}
+			try {
+				Element iq = new Element("iq", new String[] { "type", "id", "to", "from" }, new String[] { "set",
+						"" + System.nanoTime(), pubSubJID, packet.getFrom().toString() });
+				Element pubsub = new Element("pubsub", new String[] { "xmlns" },
+						new String[] { "http://jabber.org/protocol/pubsub" });
+				iq.addChild(pubsub);
+				Element publish = new Element("publish", new String[] { "node" }, new String[] { this.pubSubNode });
+				pubsub.addChild(publish);
+				Element item = new Element("item");
+				publish.addChild(item);
+
+				item.addChild(packet.getElement());
+
+				Packet out = Packet.packetInstance(iq);
+				out.setXMLNS(Packet.CLIENT_XMLNS);
+				queue.add(out);
+			} catch (Exception e) {
+				log.log(Level.WARNING, "Problem during publish packet in pubsub", e);
+				e.printStackTrace();
+			}
+		}}
+	
 	public static interface OfflineMsgRepositoryIfc extends MsgRepositoryIfc {
 		
 		void init( NonAuthUserRepository repo, XMPPResourceConnection conn);

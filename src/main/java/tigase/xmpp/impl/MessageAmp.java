@@ -100,6 +100,9 @@ public class MessageAmp
 	public void init(Map<String, Object> settings) throws TigaseDBException {
 		super.init(settings);
 
+		if(offlineProcessor!=null)
+			offlineProcessor.init(settings);
+		
 		String ampJIDstr = (String) settings.get(AMP_JID_PROP_KEY);
 
 		if (null != ampJIDstr) {
@@ -179,6 +182,7 @@ public class MessageAmp
 					if (session != null && packet.getStanzaTo() != null && !session.isUserId(packet.getStanzaTo().getBareJID()))
 						return;
 					
+					offlineProcessor.publishInPubSub(packet, session, results, settings);
 					Authorization saveResult = offlineProcessor.savePacketForOffLineUser(packet, msg_repo, repo);
 					Packet result = null;
 
