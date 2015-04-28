@@ -334,7 +334,7 @@ public abstract class IOService<RefObject>
 
 	@Override
 	public void handshakeCompleted(TLSWrapper wrapper) {
-		String reqCertDomain = "dip";//(String) getSessionData().get(CERT_REQUIRED_DOMAIN);
+		String reqCertDomain = (String) getSessionData().get(CERT_REQUIRED_DOMAIN);
 		CertCheckResult certCheckResult = wrapper.getCertificateStatus(false);
 		if (reqCertDomain != null) { 
 			// if reqCertDomain is set then verify if certificate got from server

@@ -834,10 +834,16 @@ public class ClientConnectionManager
 					serv.addPacketToSend(p_proceed);
 					serv.processWaitingPackets();
 
-					TrustManager[] x = clientTrustManagerFactory.getManager(serv);
+
+					String hostname = (String) serv.getSessionData().get(IOService.HOSTNAME_KEY);
+					VHostItem vhost = getVHostItem(hostname);
+
+					TrustManager[] x = clientTrustManagerFactory.getManager(vhost);
+					boolean wantClientAuth = clientTrustManagerFactory.isTlsWantClientAuthEnabled(vhost);
+					boolean needClientAuth = clientTrustManagerFactory.isTlsNeedClientAuthEnabled(vhost);
 
 					serv.setX509TrustManagers(x);
-					serv.startTLS(false, isTlsWantClientAuthEnabled(), isTlsNeedClientAuthEnabled());
+					serv.startTLS(false, wantClientAuth, needClientAuth);
 					SocketThread.addSocketService(serv);
 				} catch (Exception e) {
 					log.log(Level.WARNING, "Error starting TLS: {0}", e);
@@ -994,16 +1000,6 @@ public class ClientConnectionManager
 	@Override
 	protected XMPPIOService<Object> getXMPPIOServiceInstance() {
 		return new XMPPIOService<Object>();
-	}
-
-	@Override
-	protected boolean isTlsWantClientAuthEnabled() {
-		return clientTrustManagerFactory.isSaslExternalAvailable();
-	}
-	
-	@Override
-	protected boolean isTlsNeedClientAuthEnabled() {
-		return clientTrustManagerFactory.isPeerCertificateRequired();
 	}
 	
 	protected String prepareStreamClose(XMPPIOService<Object> serv) {

@@ -1249,20 +1249,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
-	protected boolean isTlsWantClientAuthEnabled() {
-		return false;
-	}
-	
-	protected boolean isTlsNeedClientAuthEnabled() {
-		return false;
-	}
-
 	//~--- methods --------------------------------------------------------------
 
 	private void putDefPortParams(Map<String, Object> props, int port, SocketType sock) {
@@ -1367,7 +1353,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			try {
 				serv.accept(sc);
 				if (getSocketType() == SocketType.ssl) {
-					serv.startSSL(false, isTlsWantClientAuthEnabled(), isTlsNeedClientAuthEnabled());
+					serv.startSSL(false, false, false);
 				}    // end of if (socket == SocketType.ssl)
 				serviceStarted(serv);
 				SocketThread.addSocketService(serv);

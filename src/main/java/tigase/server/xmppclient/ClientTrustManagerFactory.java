@@ -6,6 +6,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.TrustManager;
@@ -14,6 +15,8 @@ import javax.net.ssl.X509TrustManager;
 
 import tigase.cert.CertificateEntry;
 import tigase.cert.CertificateUtil;
+import tigase.vhosts.VHostItem;
+import tigase.vhosts.VHostItem.DataType;
 import tigase.xmpp.XMPPIOService;
 
 public class ClientTrustManagerFactory {
@@ -38,6 +41,8 @@ public class ClientTrustManagerFactory {
 
 	private final TrustManager[] trustWrapper;
 
+	private TrustManager[] defaultTrustManagers;
+
 	public ClientTrustManagerFactory() {
 		this.trustWrapper = new TrustManager[] { new X509TrustManager() {
 
@@ -55,6 +60,7 @@ public class ClientTrustManagerFactory {
 				return trustManager.getAcceptedIssuers();
 			}
 		} };
+
 		try {
 			keystore = KeyStore.getInstance(KeyStore.getDefaultType());
 			keystore.load(null, EMPTY_PASS);
@@ -74,23 +80,44 @@ public class ClientTrustManagerFactory {
 		return acceptedIssuers.toArray(new X509Certificate[] {});
 	}
 
-	public TrustManager[] getManager(final XMPPIOService<Object> serv) {
-		return isActive() ? trustWrapper : null;
+	private static String VHOST_TRUST_MANAGER_KEY = "VHOST_TRUST_MANAGER";
+
+
+	public TrustManager[] getManager(final VHostItem vHost) {
+		TrustManager[] result = vHost.getData(VHOST_TRUST_MANAGER_KEY);
+
+		if (result == null) {
+			result = defaultTrustManagers;
+			String path = vHost.getData(CA_CERT_PATH);
+			if (path != null) {
+				TrustManager[] tmp = loadTrustedCert(path);
+				if (tmp != null) {
+					result = tmp;
+					vHost.setData(VHOST_TRUST_MANAGER_KEY, result);
+				}
+			}
+		}
+
+		return result;
 	}
 
 	public boolean isActive() {
 		return acceptedIssuers.size() > 0;
 	}
 
-	public boolean isPeerCertificateRequired() {
-		return peerCertificateRequired;
+	public boolean isTlsNeedClientAuthEnabled(final VHostItem vhost) {
+		Boolean result = vhost.getData(CERT_REQUIRED_KEY);
+		if (result == null)
+			result = peerCertificateRequired;
+		return result;
 	}
 
-	public boolean isSaslExternalAvailable() {
-		return saslExternalAvailable;
+	public boolean isTlsWantClientAuthEnabled(final VHostItem vhost) {
+		TrustManager[] tmp = getManager(vhost);
+		return tmp != null && tmp.length > 0;
 	}
 
-	protected void loadTrustedCert(String caCertFile) {
+	protected TrustManager[] loadTrustedCert(String caCertFile) {
 		try {
 			CertificateEntry certEntry = CertificateUtil.loadCertificate(caCertFile);
 			Certificate[] chain = certEntry.getCertChain();
@@ -107,9 +134,8 @@ public class ClientTrustManagerFactory {
 				}
 			}
 			tmf.init(keystore);
-			TrustManager[] trustManagers = tmf.getTrustManagers();
-			trustManager = (X509TrustManager) trustManagers[0];
-			this.saslExternalAvailable = true;
+			return tmf.getTrustManagers();
+			// this.saslExternalAvailable = true;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -120,7 +146,7 @@ public class ClientTrustManagerFactory {
 			this.peerCertificateRequired = (Boolean) props.get(CERT_REQUIRED_KEY);
 		}
 		if (props.containsKey(CA_CERT_PATH)) {
-			loadTrustedCert((String) props.get(CA_CERT_PATH));
+			this.defaultTrustManagers = loadTrustedCert((String) props.get(CA_CERT_PATH));
 		}
 	}
 

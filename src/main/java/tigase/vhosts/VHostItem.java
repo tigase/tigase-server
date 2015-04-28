@@ -28,6 +28,7 @@ package tigase.vhosts;
 
 import tigase.vhosts.filter.DomainFilterPolicy;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -37,17 +38,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import tigase.db.comp.RepositoryItemAbstract;
-
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.XMPPServer;
-
+import tigase.server.xmppclient.ClientTrustManagerFactory;
 import tigase.util.DataTypes;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
-
 import tigase.xmpp.JID;
-
 import tigase.util.StringUtilities;
 
 /**
@@ -355,6 +353,15 @@ public class VHostItem
 			dataTypes.put(type.getKey(), type);
 		}
 	}
+	
+	static {
+		List<DataType> types = new ArrayList<VHostItem.DataType>();
+		types.add(new DataType(ClientTrustManagerFactory.CA_CERT_PATH, "Client Certificate CA", String.class, null));
+		types.add(new DataType(ClientTrustManagerFactory.CERT_REQUIRED_KEY, "Client Certificate Required", Boolean.class,
+				Boolean.FALSE));
+		VHostItem.registerData(types);
+	}
+
 	
 	//~--- fields ---------------------------------------------------------------
 
@@ -784,6 +791,12 @@ public class VHostItem
 				String[] mu = tmp.split("=");
 				setSaslAllowedMechanisms(mu[1].split(";"));
 			}
+
+			String[] mu = tmp.split("=");
+			if (mu != null && mu.length == 2 && dataTypes.containsKey(mu[0])) {
+				parseDataValue(mu[0], mu[1]);
+			}
+
 		}
 		log.log( Level.FINE, "Initialized from property string: {0}", this);
 	}
@@ -1203,6 +1216,20 @@ public class VHostItem
 			this.data.remove(key);
 		} else {
 			this.data.put(key, value);
+		}
+	}
+	
+	public void parseDataValue(String key, String valueStr) {
+		DataType type = dataTypes.get(key);
+		if (type == null)
+			throw new RuntimeException("Key " + key + " is not registered");
+
+		if (valueStr == null) {
+			this.data.remove(key);
+		} else {
+			char typeId = DataTypes.typesMap.get(type.cls.getName());
+			Object value = (valueStr == null || valueStr.isEmpty()) ? null : DataTypes.decodeValueType(typeId, valueStr);
+			setData(type.getKey(), value);
 		}
 	}
 	
