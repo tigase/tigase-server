@@ -761,20 +761,28 @@ public class XMPPIOService<RefObject>
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "{0}, Received STREAM-CLOSE from the client", toString());
 		}
-		try {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "{0}, Sending data: </stream:stream>", toString());
-			}
-			writeRawData(prepareStreamClose());
-		} catch (IOException e) {
-			log.log(Level.INFO, "{0}, Error sending stream closed data: {1}", new Object[] {
-					toString(),
-					e });
-		}
+
 		if (processors != null) {
 			for (XMPPIOProcessor processor : processors) {
 				processor.serviceStopped(this, true);
 			}
+		}
+		
+		try {
+			if (isConnected()) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "{0}, Sending data: </stream:stream>, as socket is still connected", toString());
+				}
+				writeRawData(prepareStreamClose());
+			} else {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "{0}, Not sending data: </stream:stream>, as socket is alreadt closed", toString());
+				}				
+			}
+		} catch (IOException e) {
+			log.log(Level.INFO, "{0}, Error sending stream closed data: {1}", new Object[] {
+					toString(),
+					e });
 		}
 
 		// streamClosed = true;
