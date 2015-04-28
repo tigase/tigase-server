@@ -362,12 +362,17 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 			}
 			// if resumptionTimeoutStart is set let's check if resumption was 
 			// not started for longer time than twice value of resumption_timeout
-			if ((System.currentTimeMillis() - resumptionTimeoutStart) > (2 * resumption_timeout * 1000)) {
+			if (((System.currentTimeMillis() - resumptionTimeoutStart) > (2 * resumption_timeout * 1000))
+				|| streamClosed) {
 				// if so we should assume that resumption failed so we should 
 				// send errors, remove reference to service and stop this service
 				services.remove(id, service);
 				service.clearWaitingPackets();
 				connectionManager.serviceStopped(service);
+				// for case in which task was started but later </stream:stream> was found in remaining data
+				TimerTask timerTask = (TimerTask) service.getSessionData().get(RESUMPTION_TASK_KEY);
+				if (timerTask != null)
+					timerTask.cancel();
 				sendErrorsForQueuedPackets(service);	
 			}
 			return false;

@@ -424,7 +424,7 @@ public class TLSIO implements IOInterface {
 						log.finer("TLS Socket closed..." + toString());
 					}
 
-					throw new EOFException("Socket has been closed.");
+					//throw new EOFException("Socket has been closed.");
 
 					// } // end of if (tlsWrapper.getStatus() == TLSStatus.CLOSED)
 					// break do_loop;
