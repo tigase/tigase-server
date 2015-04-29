@@ -113,6 +113,9 @@ public class OfflineMessages
 	private static final String MSG_REPO_CLASS_KEY = "msg-repo-class";
 	private static final Object MSG_PUBSUB_JID = "msg-pubsub-jid";
 	private static final Object MSG_PUBSUB_NODE = "msg-pubsub-node";
+	public static final String[] PUBSUB_NODE_PATH = { Message.ELEM_NAME, "event", "items" };
+	public static final String PUBSUB_NODE_KEY = "node";
+
 	//~--- fields ---------------------------------------------------------------
 	/** Field holds class for formatting and parsing dates in a locale-sensitive
 	 * manner */
@@ -520,13 +523,20 @@ public class OfflineMessages
 		if (pubSubJID == null || pubSubNode == null)
 			return;
 		final StanzaType type = packet.getType();
-
 		if ((packet.getElemName().equals("message")
 				&& ((packet.getElemCDataStaticStr(tigase.server.Message.MESSAGE_BODY_PATH) != null)
 						|| (packet.getElemChildrenStaticStr(MESSAGE_EVENT_PATH) != null) || (packet.getElemChildrenStaticStr(MESSAGE_HEADER_PATH) != null)) && ((type == null)
 				|| (type == StanzaType.normal) || (type == StanzaType.chat)))
 				|| (packet.getElemName().equals("presence") && ((type == StanzaType.subscribe)
 						|| (type == StanzaType.subscribed) || (type == StanzaType.unsubscribe) || (type == StanzaType.unsubscribed)))) {
+			String tmpNode = packet.getElement().getAttributeStaticStr(PUBSUB_NODE_PATH, PUBSUB_NODE_KEY);
+			if (tmpNode != null && tmpNode.equals(this.pubSubNode)) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Publishing skipped to prevent loops: {0}", packet);
+				}
+				return;
+			}
+
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Publishing packet in pubsub: {0}", packet);
 			}
