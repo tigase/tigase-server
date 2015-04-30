@@ -37,6 +37,7 @@ import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
+import tigase.net.IOService;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.server.Iq;
 import static tigase.server.Message.ELEM_NAME;
@@ -541,8 +542,9 @@ public class OfflineMessages
 				log.log(Level.FINEST, "Publishing packet in pubsub: {0}", packet);
 			}
 			try {
+				String hostname = (String) conn.getDomain().getVhost().toString();
 				Element iq = new Element("iq", new String[] { "type", "id", "to", "from" }, new String[] { "set",
-						"" + System.nanoTime(), pubSubJID, packet.getFrom().toString() });
+						"" + System.nanoTime(), pubSubJID, "sess-man@" + hostname });
 				Element pubsub = new Element("pubsub", new String[] { "xmlns" },
 						new String[] { "http://jabber.org/protocol/pubsub" });
 				iq.addChild(pubsub);
