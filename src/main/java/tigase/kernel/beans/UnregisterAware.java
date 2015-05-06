@@ -1,4 +1,4 @@
-package tigase.kernel;
+package tigase.kernel.beans;
 
 public interface UnregisterAware {
 

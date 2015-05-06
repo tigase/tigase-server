@@ -1,4 +1,4 @@
-package tigase.kernel;
+package tigase.kernel.core;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -6,17 +6,31 @@ import java.util.Map;
 
 public class BeanConfig {
 
+	public enum State {
+		initialized,
+		instanceCreated,
+		registered;
+	}
+
 	private final String beanName;
 
 	private final Class<?> clazz;
 
+	private boolean exportable;
+
+	private BeanConfig factory;
+
 	private final Map<Field, Dependency> fieldDependencies = new HashMap<Field, Dependency>();
+
+	private Kernel kernel;
+
+	private State state;
 
 	BeanConfig(String id, Class<?> clazz) {
 		super();
 		this.beanName = id;
 		this.clazz = clazz;
-	}
+	};
 
 	@Override
 	public boolean equals(Object obj) {
@@ -43,8 +57,20 @@ public class BeanConfig {
 		return clazz;
 	}
 
+	public BeanConfig getFactory() {
+		return factory;
+	}
+
 	public Map<Field, Dependency> getFieldDependencies() {
 		return fieldDependencies;
+	}
+
+	public Kernel getKernel() {
+		return kernel;
+	}
+
+	public State getState() {
+		return state;
 	}
 
 	@Override
@@ -53,6 +79,31 @@ public class BeanConfig {
 		int result = 1;
 		result = prime * result + ((beanName == null) ? 0 : beanName.hashCode());
 		return result;
+	}
+
+	public boolean isExportable() {
+		return exportable;
+	}
+
+	void setExportable(boolean value) {
+		this.exportable = value;
+	}
+
+	void setFactory(final BeanConfig bfc) {
+		this.factory = bfc;
+	}
+
+	void setKernel(Kernel kernel) {
+		this.kernel = kernel;
+	}
+
+	void setState(State state) {
+		this.state = state;
+	}
+
+	@Override
+	public String toString() {
+		return beanName + ":" + clazz.getName();
 	}
 
 }

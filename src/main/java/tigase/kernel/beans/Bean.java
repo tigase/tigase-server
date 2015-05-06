@@ -1,4 +1,4 @@
-package tigase.kernel;
+package tigase.kernel.beans;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -7,19 +7,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ ElementType.FIELD })
+@Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-public @interface Inject {
+public @interface Bean {
 
-	public static final class EMPTY {
-		private EMPTY() {
-		}
-	}
-
-	String bean() default "";
-
-	Class<?> type() default EMPTY.class;
-
+	String name();
 }
