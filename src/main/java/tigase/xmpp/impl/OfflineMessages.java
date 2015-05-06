@@ -22,6 +22,8 @@
 package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
+import static tigase.server.Message.ELEM_NAME;
+
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,15 +39,12 @@ import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
-import tigase.net.IOService;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.server.Iq;
-import static tigase.server.Message.ELEM_NAME;
 import tigase.server.Packet;
 import tigase.server.amp.MsgRepository;
 import tigase.util.DNSResolver;
 import tigase.util.TigaseStringprepException;
-import tigase.vhosts.VHostItem;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
@@ -112,8 +111,9 @@ public class OfflineMessages
 	 * <em>presence</em> stanza */
 	public static final String[] MESSAGE_HEADER_PATH = { ELEM_NAME, "header" };
 	private static final String MSG_REPO_CLASS_KEY = "msg-repo-class";
-	private static final Object MSG_PUBSUB_JID = "msg-pubsub-jid";
-	private static final Object MSG_PUBSUB_NODE = "msg-pubsub-node";
+	private static final String MSG_PUBSUB_JID = "msg-pubsub-jid";
+	private static final String MSG_PUBSUB_NODE = "msg-pubsub-node";
+	private static final String MSG_PUBSUB_PUBLISHER = "msg-pubsub-publisher";
 	public static final String[] PUBSUB_NODE_PATH = { Message.ELEM_NAME, "event", "items" };
 	public static final String PUBSUB_NODE_KEY = "node";
 
@@ -125,6 +125,7 @@ public class OfflineMessages
 	private Message message = new Message();
 	private String pubSubJID;
 	private String pubSubNode;
+	private String defaultPublisher;
 	
 	{
 		this.formatter = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" );
@@ -150,6 +151,10 @@ public class OfflineMessages
 			this.pubSubJID = (String) settings.get(MSG_PUBSUB_JID);
 		if (settings.containsKey(MSG_PUBSUB_NODE))
 			this.pubSubNode = (String) settings.get(MSG_PUBSUB_NODE);
+		if (settings.containsKey(MSG_PUBSUB_NODE))
+			this.pubSubNode = (String) settings.get(MSG_PUBSUB_NODE);
+		if (settings.containsKey(MSG_PUBSUB_PUBLISHER))
+			this.defaultPublisher = (String) settings.get(MSG_PUBSUB_PUBLISHER);
 	}
 	
 	/**
@@ -542,28 +547,50 @@ public class OfflineMessages
 				log.log(Level.FINEST, "Publishing packet in pubsub: {0}", packet);
 			}
 			try {
-				String hostname = (String) conn.getDomain().getVhost().toString();
-				Element iq = new Element("iq", new String[] { "type", "id", "to", "from" }, new String[] { "set",
-						"" + System.nanoTime(), pubSubJID, "sess-man@" + hostname });
-				Element pubsub = new Element("pubsub", new String[] { "xmlns" },
-						new String[] { "http://jabber.org/protocol/pubsub" });
-				iq.addChild(pubsub);
-				Element publish = new Element("publish", new String[] { "node" }, new String[] { this.pubSubNode });
-				pubsub.addChild(publish);
-				Element item = new Element("item");
-				publish.addChild(item);
+				String publisher;
+				if (conn == null) {
+					if (log.isLoggable(Level.FINEST))
+						log.log(Level.FINEST, "Connection is null? Why, oh why? Using default publisher.", packet);
+					publisher = defaultPublisher;
+				} else if (conn.getDomain() == null) {
+					if (log.isLoggable(Level.FINEST))
+						log.log(Level.FINEST, "Domain in connection is null. Using default publisher.", packet);
+					publisher = defaultPublisher;
+				} else if (conn.getDomain().getVhost() == null) {
+					if (log.isLoggable(Level.FINEST))
+						log.log(Level.FINEST, "VHost is domain is null. Using default publisher.", packet);
+					publisher = defaultPublisher;
+				} else {
+					publisher = "sess-man@" + (String) conn.getDomain().getVhost().toString();
+				}
 
-				item.addChild(packet.getElement());
+				if (publisher != null) {
+					Element iq = new Element("iq", new String[] { "type", "id", "to", "from" }, new String[] { "set",
+							"" + System.nanoTime(), pubSubJID, publisher });
+					Element pubsub = new Element("pubsub", new String[] { "xmlns" },
+							new String[] { "http://jabber.org/protocol/pubsub" });
+					iq.addChild(pubsub);
+					Element publish = new Element("publish", new String[] { "node" }, new String[] { this.pubSubNode });
+					pubsub.addChild(publish);
+					Element item = new Element("item");
+					publish.addChild(item);
 
-				Packet out = Packet.packetInstance(iq);
-				out.setXMLNS(Packet.CLIENT_XMLNS);
-				queue.add(out);
+					item.addChild(packet.getElement());
+
+					Packet out = Packet.packetInstance(iq);
+					out.setXMLNS(Packet.CLIENT_XMLNS);
+					queue.add(out);
+				} else if (log.isLoggable(Level.WARNING))
+					log.log(Level.WARNING,
+							"Cannot publish message in PubSub, because cannot determine publisher. Please define default publisher JID.",
+							packet);
 			} catch (Exception e) {
 				log.log(Level.WARNING, "Problem during publish packet in pubsub", e);
 				e.printStackTrace();
 			}
-		}}
-	
+		}
+	}
+
 	public static interface OfflineMsgRepositoryIfc extends MsgRepositoryIfc {
 		
 		void init( NonAuthUserRepository repo, XMPPResourceConnection conn);
