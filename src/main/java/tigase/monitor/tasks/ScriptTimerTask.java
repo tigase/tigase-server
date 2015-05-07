@@ -1,67 +1,64 @@
 package tigase.monitor.tasks;
 
+import javax.script.Bindings;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import tigase.form.Field;
-import tigase.form.Form;
-import tigase.kernel.Inject;
+import tigase.kernel.beans.Inject;
 import tigase.monitor.ConfigurableTask;
-import tigase.monitor.TimerTaskService;
-import tigase.util.TimerTask;
 
-public class ScriptTimerTask extends ScriptTask implements ConfigurableTask {
+public class ScriptTimerTask extends AbstractConfigurableTimerTask implements ConfigurableTask {
 
-	private long delay = 1000l;
+	@Inject
+	protected Bindings bindings;
+
+	private ScriptEngine engine;
 
 	private String script;
 
+	@Inject
+	protected ScriptEngineManager scriptEngineManager;
+
 	private String scriptExtension;
 
-	protected long taskDelay;
-
-	@Inject(bean = "timerTaskService")
-	private TimerTaskService timerTaskService;
-
-	private final TimerTask worker = new TimerTask() {
-
-		@Override
-		public void run() {
-			try {
-				ScriptTimerTask.super.run(script, scriptExtension);
-			} catch (ScriptException e) {
-				e.printStackTrace();
-			}
-		}
-	};
-
-	@Override
-	public Form getCurrentConfiguration() {
-		Form f = new Form("form", "Script configuration", null);
-
-		f.addField(Field.fieldTextSingle("delay", String.valueOf(delay), "Delay"));
-
-		return f;
+	public Bindings getBindings() {
+		return bindings;
 	}
 
-	public void run(String script, String scriptExtension, long delay) throws ScriptException {
-		this.script = script;
-		this.scriptExtension = scriptExtension;
-		this.delay = delay;
+	public String getScript() {
+		return script;
+	}
 
-		timerTaskService.addTimerTask(worker, 1000l, this.delay);
+	public ScriptEngineManager getScriptEngineManager() {
+		return scriptEngineManager;
+	}
+
+	public String getScriptExtension() {
+		return scriptExtension;
 	}
 
 	@Override
-	public void setNewConfiguration(Form form) {
-		Long d = form.getAsLong("delay");
+	protected void run() {
 		try {
-			if (d != delay) {
-				worker.cancel();
-				this.delay = d;
-				timerTaskService.addTimerTask(worker, 1000l, this.delay);
-			}
-		} catch (Exception e) {
+			engine.eval(script, bindings);
+		} catch (ScriptException e) {
 			e.printStackTrace();
 		}
 	}
+
+	public void setBindings(Bindings bindings) {
+		this.bindings = bindings;
+	}
+
+	public void setScript(String script, String scriptExtension) {
+		this.engine = scriptEngineManager.getEngineByExtension(scriptExtension);
+		this.script = script;
+		this.scriptExtension = scriptExtension;
+	}
+
+	public void setScriptEngineManager(ScriptEngineManager scriptEngineManager) {
+		this.scriptEngineManager = scriptEngineManager;
+	}
+
 }

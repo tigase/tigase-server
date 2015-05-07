@@ -65,6 +65,8 @@ public class EventReceiverModule extends AbstractEventBusModule {
 				String eventName = event.getName();
 				String eventXmlns = event.getXMLNS();
 
+				event.setAttribute("remote", "true");
+
 				if (log.isLoggable(Level.FINER))
 					log.finer("Received event (" + eventName + ", " + eventXmlns + "): " + event);
 

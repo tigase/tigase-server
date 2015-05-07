@@ -7,7 +7,7 @@ import tigase.component.adhoc.AdhHocRequest;
 import tigase.form.Field;
 import tigase.form.Form;
 import tigase.monitor.MonitorContext;
-import tigase.monitor.tasks.ScriptTimerTask;
+import tigase.monitor.TasksScriptRegistrar;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
@@ -46,9 +46,8 @@ public class AddTimerScriptTaskCommand implements AdHocCommand {
 					String scriptContent = form.getAsString("scriptContent");
 					Long delay = form.getAsLong("delay");
 
-					monitorContext.getKernel().registerBeanClass(scriptName, ScriptTimerTask.class);
-					ScriptTimerTask scriptTask = monitorContext.getKernel().getInstance(scriptName);
-					scriptTask.run(scriptContent, scriptExtension, delay);
+					((TasksScriptRegistrar) monitorContext.getKernel().getInstance(TasksScriptRegistrar.ID)).registerTimerScript(
+							scriptName, scriptExtension, scriptContent, delay);
 				}
 
 				response.completeSession();

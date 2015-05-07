@@ -1,7 +1,10 @@
 package tigase.monitor;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
 
 import javax.script.ScriptEngineManager;
 
@@ -14,13 +17,16 @@ import tigase.component.modules.impl.DiscoveryModule;
 import tigase.component.modules.impl.JabberVersionModule;
 import tigase.component.modules.impl.XmppPingModule;
 import tigase.conf.ConfigurationException;
-import tigase.kernel.Kernel;
+import tigase.db.comp.ComponentRepository;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.core.Kernel;
 import tigase.monitor.modules.AdHocCommandMonitorModule;
 import tigase.monitor.modules.AddScriptTaskCommand;
 import tigase.monitor.modules.AddTimerScriptTaskCommand;
 import tigase.monitor.modules.DeleteScriptTaskCommand;
 import tigase.monitor.modules.DiscoveryMonitorModule;
 import tigase.server.monitor.MonitorRuntime;
+import tigase.util.ClassUtil;
 import tigase.util.TimerTask;
 
 public class MonitorComponent extends AbstractComponent<MonitorContext> {
@@ -36,6 +42,8 @@ public class MonitorComponent extends AbstractComponent<MonitorContext> {
 			return kernel;
 		}
 	}
+
+	public static final String EVENTS_XMLNS = "tigase:monitor:event";
 
 	private Kernel kernel = new Kernel();
 
@@ -97,32 +105,86 @@ public class MonitorComponent extends AbstractComponent<MonitorContext> {
 
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
+		if (props.size() <= 1)
+			return;
 		super.setProperties(props);
 
-		// kernel.registerBeanClass("memory-monitor", MemoryMonitorTask.class);
+		kernel.registerBean("eventBus").asInstance(context.getEventBus()).exec();
 
-		kernel.registerBeanClass(TasksScriptRegistrar.ID, TasksScriptRegistrar.class);
+		kernel.registerBean(TasksScriptRegistrar.ID).asClass(TasksScriptRegistrar.class).exec();
 
 		ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
-		kernel.registerBean("scriptEngineManager", scriptEngineManager);
-		kernel.registerBean("bindings", scriptEngineManager.getBindings());
-		kernel.registerBean("context", getContext());
-		kernel.registerBean("monitorComponent", this);
-		kernel.registerBean("timerTaskService", timerTaskService);
-		kernel.registerBean("runtime", MonitorRuntime.getMonitorRuntime());
-		kernel.registerBean("kernel", kernel);
+		kernel.registerBean("scriptEngineManager").asInstance(scriptEngineManager).exec();
+
+		kernel.registerBean("bindings").asInstance(scriptEngineManager.getBindings()).exec();
+		kernel.registerBean("context").asInstance(getContext()).exec();
+		kernel.registerBean("monitorComponent").asInstance(this).exec();
+		kernel.registerBean("timerTaskService").asInstance(timerTaskService).exec();
+		kernel.registerBean("runtime").asInstance(MonitorRuntime.getMonitorRuntime()).exec();
+		kernel.registerBean("kernel").asInstance(kernel).exec();
 
 		AdHocCommand ahc;
 
+		String repoClass = TaskConfigItemJDBCRepository.class.getName();
+
+		try {
+			ComponentRepository<TaskConfigItem> repo_tmp = (ComponentRepository<TaskConfigItem>) Class.forName(repoClass).newInstance();
+
+			repo_tmp.setProperties(props);
+			log.warning(repo_tmp.toString());
+			repo_tmp.reload();
+
+			kernel.registerBean("tasksRepo").asInstance(repo_tmp).exec();
+		} catch (Exception e) {
+			log.log(Level.SEVERE, "Can not create T repository instance for class: " + repoClass, e);
+		}
+
 		ahc = new AddScriptTaskCommand(context);
 		((AdHocCommandMonitorModule) getModuleProvider().getModule(AdHocCommandModule.ID)).register(ahc);
-		kernel.registerBean(ahc.getName(), ahc);
+		kernel.registerBean(ahc.getName()).asInstance(ahc).exec();
 		ahc = new AddTimerScriptTaskCommand(context);
 		((AdHocCommandMonitorModule) getModuleProvider().getModule(AdHocCommandModule.ID)).register(ahc);
-		kernel.registerBean(ahc.getName(), ahc);
+		kernel.registerBean(ahc.getName()).asInstance(ahc).exec();
 		ahc = new DeleteScriptTaskCommand(context);
 		((AdHocCommandMonitorModule) getModuleProvider().getModule(AdHocCommandModule.ID)).register(ahc);
-		kernel.registerBean(ahc.getName(), ahc);
+		kernel.registerBean(ahc.getName()).asInstance(ahc).exec();
+
+		try {
+			Set<Class<MonitorTask>> classes = ClassUtil.getClassesImplementing(MonitorTask.class);
+			if (log.isLoggable(Level.FINER))
+				log.finer("Found monitor tasks classes: " + classes.toString());
+
+			for (Class<MonitorTask> class1 : classes) {
+				if (class1.getAnnotation(Bean.class) != null)
+					kernel.registerBean(class1).exec();
+			}
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			Set<Class<MonitorExtension>> classes = ClassUtil.getClassesImplementing(MonitorExtension.class);
+			if (log.isLoggable(Level.FINER))
+				log.finer("Found monitor ext classes: " + classes.toString());
+
+			for (Class<MonitorExtension> class1 : classes) {
+				if (class1.getAnnotation(Bean.class) != null)
+					kernel.registerBean(class1).exec();
+			}
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		if (kernel.isBeanClassRegistered("monitor-mailer")) {
+			Object mailerExt = kernel.getInstance("monitor-mailer");
+			if (mailerExt instanceof MonitorExtension) {
+				((MonitorExtension) mailerExt).setProperties(props);
+			}
+		}
 
 		// initialization
 		((TasksScriptRegistrar) kernel.getInstance(TasksScriptRegistrar.ID)).load();

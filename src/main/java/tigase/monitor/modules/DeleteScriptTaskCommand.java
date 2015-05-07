@@ -10,6 +10,7 @@ import tigase.form.Field;
 import tigase.form.Form;
 import tigase.monitor.MonitorContext;
 import tigase.monitor.MonitorTask;
+import tigase.monitor.TasksScriptRegistrar;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
@@ -46,9 +47,9 @@ public class DeleteScriptTaskCommand implements AdHocCommand {
 					String taskName = form.getAsString("delete_task");
 
 					Object i = monitorContext.getKernel().getInstance(taskName);
-					if (i instanceof MonitorTask)
-						monitorContext.getKernel().unregister(taskName);
-					else
+					if (i instanceof MonitorTask) {
+						((TasksScriptRegistrar) monitorContext.getKernel().getInstance(TasksScriptRegistrar.ID)).delete(taskName);
+					} else
 						throw new RuntimeException("Are you kidding me?");
 				}
 
