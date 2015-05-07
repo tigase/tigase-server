@@ -5,8 +5,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -54,22 +57,32 @@ public class ClientTrustManagerFactory {
 		return acceptedIssuers.toArray(new X509Certificate[] {});
 	}
 
+	private static final Logger log = Logger.getLogger(ClientTrustManagerFactory.class.getName());
+
 	private final ConcurrentHashMap<VHostItem, TrustManager[]> trustManagers = new ConcurrentHashMap<VHostItem, TrustManager[]>();
 
 	public TrustManager[] getManager(final VHostItem vHost) {
 		TrustManager[] result = trustManagers.get(vHost);
 
 		if (result == null) {
+			if (log.isLoggable(Level.FINEST))
+				log.finest("Creating new TrustManager for VHost " + vHost);
+
 			result = defaultTrustManagers;
 			String path = vHost.getData(CA_CERT_PATH);
+			if (log.isLoggable(Level.FINEST))
+				log.finest("CA cert path=" + path + " for VHost " + vHost);
 			if (path != null) {
 				TrustManager[] tmp = loadTrustedCert(path);
 				if (tmp != null) {
+					if (log.isLoggable(Level.FINEST))
+						log.finest("Using custom TrustManager for VHost " + vHost);
 					result = tmp;
 					trustManagers.put(vHost, result);
 				}
 			}
-		}
+		} else if (log.isLoggable(Level.FINEST))
+			log.finest("Found TrustManager for VHost " + vHost);
 
 		return result;
 	}
@@ -95,11 +108,19 @@ public class ClientTrustManagerFactory {
 			CertificateEntry certEntry = CertificateUtil.loadCertificate(caCertFile);
 			Certificate[] chain = certEntry.getCertChain();
 
+			if (log.isLoggable(Level.FINEST))
+				log.finest("Loaded certificate from file " + caCertFile + " : " + certEntry);
+
 			if (chain != null) {
+				if (log.isLoggable(Level.FINEST))
+					log.finest("Loaded cert chain: " + Arrays.toString(chain));
 				for (Certificate cert : chain) {
 					if (cert instanceof X509Certificate) {
 						X509Certificate crt = (X509Certificate) cert;
 						String alias = crt.getSubjectX500Principal().getName();
+
+						if (log.isLoggable(Level.FINEST))
+							log.finest("Adding certificate to keystore: alias=" + alias + "; cert=" + crt);
 
 						keystore.setCertificateEntry(alias, crt);
 						acceptedIssuers.add(crt);
@@ -110,6 +131,7 @@ public class ClientTrustManagerFactory {
 			return tmf.getTrustManagers();
 			// this.saslExternalAvailable = true;
 		} catch (Exception e) {
+			log.log(Level.WARNING, "Can't create TrustManager with certificate from file.", e);
 			throw new RuntimeException(e);
 		}
 	}

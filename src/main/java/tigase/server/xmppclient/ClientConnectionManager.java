@@ -837,6 +837,10 @@ public class ClientConnectionManager
 					boolean wantClientAuth = clientTrustManagerFactory.isTlsWantClientAuthEnabled(vhost);
 					boolean needClientAuth = clientTrustManagerFactory.isTlsNeedClientAuthEnabled(vhost);
 
+					if (log.isLoggable(Level.FINEST))
+						log.log(Level.FINEST, "TLS: wantClientAuth=" + wantClientAuth + "; needClientAuth=" + needClientAuth
+								+ " for connection {0}", serv);
+					
 					serv.setX509TrustManagers(x);
 
 					serv.addPacketToSend(p_proceed);
