@@ -830,11 +830,6 @@ public class ClientConnectionManager
 					// SocketThread readThread = SocketThread.getInstance();
 					SocketThread.removeSocketService(serv);
 
-					// writePacketToSocket(serv, p_proceed);
-					serv.addPacketToSend(p_proceed);
-					serv.processWaitingPackets();
-
-
 					String hostname = (String) serv.getSessionData().get(IOService.HOSTNAME_KEY);
 					VHostItem vhost = getVHostItem(hostname);
 
@@ -843,6 +838,10 @@ public class ClientConnectionManager
 					boolean needClientAuth = clientTrustManagerFactory.isTlsNeedClientAuthEnabled(vhost);
 
 					serv.setX509TrustManagers(x);
+
+					serv.addPacketToSend(p_proceed);
+					serv.processWaitingPackets();
+					
 					serv.startTLS(false, wantClientAuth, needClientAuth);
 					SocketThread.addSocketService(serv);
 				} catch (Exception e) {

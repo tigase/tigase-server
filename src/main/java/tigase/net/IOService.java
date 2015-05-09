@@ -156,6 +156,7 @@ public abstract class IOService<RefObject>
 	private RefObject                               refObject        = null;
 	private String                                  remote_address   = null;
 	private IOServiceListener<IOService<RefObject>> serviceListener  = null;
+	private boolean socketServiceReady = false;
 
 	/**
 	 * <code>socketInput</code> buffer keeps data read from socket.
@@ -266,7 +267,7 @@ public abstract class IOService<RefObject>
 			}
 		}
 
-		return readLock
+		return readLock && socketServiceReady
 				? this
 				: null;
 	}
@@ -1319,6 +1320,14 @@ public abstract class IOService<RefObject>
 			writeInProgress.unlock();
 		}
 	}
+	
+	protected boolean isSocketServiceReady() {
+		return socketServiceReady;
+	}
+	
+	protected void setSocketServiceReady(boolean value) {
+		this.socketServiceReady = value;
+	}	
 
 	//~--- get methods ----------------------------------------------------------
 

@@ -181,15 +181,15 @@ public class SocketThread implements Runnable {
 	 * @param s
 	 */
 	public static void addSocketService(IOService<?> s) {
-
+		s.setSocketServiceReady(true);
 		// Due to a delayed SelectionKey cancelling deregistering
 		// nature this distribution doesn't work well, it leads to
 		// dead-lock. Let's make sure the service is always processed
 		// by the same thread thus the same Selector.
 		// socketReadThread[incrementAndGet()].addSocketServicePriv(s);
-                if (s.waitingToRead()) {
-                        socketReadThread[s.hashCode() % socketReadThread.length].addSocketServicePriv(s);
-                }
+		if (s.waitingToRead()) {
+			socketReadThread[s.hashCode() % socketReadThread.length].addSocketServicePriv(s);
+		}
 
 		if (s.waitingToSend()) {
 			socketWriteThread[s.hashCode() % socketWriteThread.length].addSocketServicePriv(s);
@@ -203,19 +203,9 @@ public class SocketThread implements Runnable {
 	 * @param s
 	 */
 	public static void removeSocketService(IOService<Object> s) {
-		Selector clientsSel = socketReadThread[s.hashCode() % socketReadThread.length].clientsSel;
-		SelectionKey key = s.getSocketChannel().keyFor(clientsSel);
-
-		if ((key != null) && (key.attachment() == s)) {
-			key.cancel();
-		}    // end of if (key != null)
-
-		clientsSel = socketWriteThread[s.hashCode() % socketWriteThread.length].clientsSel;
-		key = s.getSocketChannel().keyFor(clientsSel);
-
-		if ((key != null) && (key.attachment() == s)) {
-			key.cancel();
-		}    // end of if (key != null)
+		s.setSocketServiceReady(false);
+		socketReadThread[s.hashCode() % socketReadThread.length].removeSocketServicePriv(s);
+		socketWriteThread[s.hashCode() % socketWriteThread.length].removeSocketServicePriv(s);
 	}
 
 	/**
@@ -239,6 +229,15 @@ public class SocketThread implements Runnable {
 		// wakeupHelper.wakeup();
 	}
 
+	public void removeSocketServicePriv(IOService<?> s) {
+		waiting.remove(s);
+		
+		SelectionKey key = s.getSocketChannel().keyFor(clientsSel);
+		if ((key != null) && (key.attachment() == s)) {
+			key.cancel();
+		}
+	}
+	
 	@SuppressWarnings({ "unchecked" })
 	@Override
 	public void run() {
