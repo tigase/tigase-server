@@ -239,6 +239,12 @@ public class TigaseCustomAuth implements AuthRepository {
 	/** Field description */
 	public static final String DEF_USERS_DOMAIN_COUNT_KEY = "" + "users-domain-count-query";
 
+	public static final String DEF_LISTDISABLEDACCOUNTS_KEY= "users-list-disabled-accounts-query";
+	
+	public static final String DEF_DISABLEACCOUNT_KEY = "user-disable-account-query";
+	
+	public static final String DEF_ENABLEACCOUNT_KEY = "user-enable-account-query";	
+	
 	/**
 	 * Comma separated list of NON-SASL authentication mechanisms. Possible
 	 * mechanisms are: <code>password</code> and <code>digest</code>.
@@ -290,6 +296,12 @@ public class TigaseCustomAuth implements AuthRepository {
 	public static final String DEF_USERS_DOMAIN_COUNT_QUERY = ""
 			+ "select count(*) from tig_users where user_id like ?";
 
+	public static final String DEF_LISTDISABLEDACCOUNTS_QUERY = "{ call TigDisabledAccounts() }";
+	
+	public static final String DEF_DISABLEACCOUNT_QUERY = "{ call TigDisableAccount(?) }";
+	
+	public static final String DEF_ENABLEACCOUNT_QUERY = "{ call TigEnableAccount(?) }";	
+	
 	/** Field description */
 	public static final String DEF_NONSASL_MECHS = "password";
 
@@ -309,6 +321,10 @@ public class TigaseCustomAuth implements AuthRepository {
 	private String updatepassword_query = DEF_UPDATEPASSWORD_QUERY;
 	private String userlogin_query = DEF_USERLOGIN_QUERY;
 	private String userdomaincount_query = DEF_USERS_DOMAIN_COUNT_QUERY;
+	private String listdisabledaccounts_query = DEF_LISTDISABLEDACCOUNTS_QUERY;
+	private String disableaccount_query = DEF_DISABLEACCOUNT_QUERY;
+	private String enableaccount_query = DEF_ENABLEACCOUNT_QUERY;
+	
 
 	// It is better just to not call the query if it is not defined by the user
 	// By default it is null then and not called.
@@ -534,7 +550,25 @@ public class TigaseCustomAuth implements AuthRepository {
 			if ((userdomaincount_query != null)) {
 				data_repo.initPreparedStatement(userdomaincount_query, userdomaincount_query);
 			}
+			
+			listdisabledaccounts_query = getParamWithDef(params, DEF_LISTDISABLEDACCOUNTS_KEY, 
+					DEF_LISTDISABLEDACCOUNTS_QUERY);
+			if (listdisabledaccounts_query != null) {
+				data_repo.initPreparedStatement(listdisabledaccounts_query, listdisabledaccounts_query);
+			}
 
+			disableaccount_query = getParamWithDef(params, DEF_DISABLEACCOUNT_KEY, 
+					DEF_DISABLEACCOUNT_QUERY);
+			if (disableaccount_query != null) {
+				data_repo.initPreparedStatement(disableaccount_query, disableaccount_query);
+			}
+			
+			enableaccount_query = getParamWithDef(params, DEF_ENABLEACCOUNT_KEY, 
+					DEF_ENABLEACCOUNT_QUERY);
+			if (enableaccount_query != null) {
+				data_repo.initPreparedStatement(enableaccount_query, enableaccount_query);
+			}
+			
 			nonsasl_mechs =
 					getParamWithDef(params, DEF_NONSASL_MECHS_KEY, DEF_NONSASL_MECHS).split(",");
 			sasl_mechs = getParamWithDef(params, DEF_SASL_MECHS_KEY, DEF_SASL_MECHS).split(",");
@@ -734,6 +768,49 @@ public class TigaseCustomAuth implements AuthRepository {
 		}
 	}
 
+		@Override
+	public boolean isUserDisabled(BareJID user) 
+					throws UserNotFoundException, TigaseDBException {
+		ResultSet rs = null;
+		
+		try {
+			PreparedStatement list_disabledaccounts = 
+					data_repo.getPreparedStatement(user, listdisabledaccounts_query);
+			
+			synchronized (list_disabledaccounts) {
+				rs = list_disabledaccounts.executeQuery();
+				while (rs.next()) {
+					String accountJid = rs.getString(1);
+					if (user.toString().equals(accountJid)) {
+						return true;
+					}
+				}
+			}
+		} catch (SQLException e) {
+			throw new TigaseDBException("Problem with checking if user account is disabled", e);
+		} finally {
+			data_repo.release(null, rs);
+		}
+		return false;
+	}
+	
+	@Override
+	public void setUserDisabled(BareJID user, Boolean value) 
+					throws UserNotFoundException, TigaseDBException {
+		try {
+			String query = (value == null || !value)
+					? enableaccount_query : disableaccount_query;
+			PreparedStatement changeState = data_repo.getPreparedStatement(user, query);
+			
+			synchronized (changeState) {
+				changeState.setString(1, user.toString());
+				changeState.execute();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new TigaseDBException("Problem with changing user account state", e);
+		}
+	}
 	// ~--- methods --------------------------------------------------------------
 
 	private void initDb() throws SQLException {

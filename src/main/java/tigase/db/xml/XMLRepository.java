@@ -456,4 +456,16 @@ public class XMLRepository implements AuthRepository, UserRepository {
 	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException {
 		return auth.getPassword(user);
 	}
+	
+	@Override
+	public boolean isUserDisabled(BareJID user) 
+					throws UserNotFoundException, TigaseDBException {
+		return false;
+	}
+	
+	@Override
+	public void setUserDisabled(BareJID user, Boolean value) 
+					throws UserNotFoundException, TigaseDBException {
+		throw new TigaseDBException("Feature not supported");
+	}	
 }

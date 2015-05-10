@@ -275,4 +275,29 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 			return null;
 		}
 	}
+	
+	@Override
+	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
+		AuthRepository repo = getRepo(user.getDomain());
+
+		if (repo != null) {
+			return repo.isUserDisabled(user);
+		} else {
+			log.log(Level.WARNING, "Couldn't obtain user repository for domain: " + user.getDomain()
+					+ ", not even default one!");
+			return false;
+		}		
+	}
+	
+	@Override
+	public void setUserDisabled(BareJID user, Boolean value) throws UserNotFoundException, TigaseDBException {
+		AuthRepository repo = getRepo(user.getDomain());
+
+		if (repo != null) {
+			repo.setUserDisabled(user, value);
+		} else {
+			log.log(Level.WARNING, "Couldn't obtain user repository for domain: " + user.getDomain()
+					+ ", not even default one!");
+		}		
+	}		
 }

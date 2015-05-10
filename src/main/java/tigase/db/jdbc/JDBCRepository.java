@@ -1228,12 +1228,22 @@ public class JDBCRepository
 
 			return val;
 		}
-	}
-
+	}	
+	
 	@Override
 	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
+		return auth.isUserDisabled(user);
+	}
+	
+	@Override
+	public void setUserDisabled(BareJID user, Boolean value) throws UserNotFoundException, TigaseDBException {
+		auth.setUserDisabled(user, value);
+	}	
 }    // JDBCRepository
 

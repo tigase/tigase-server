@@ -1,0 +1,180 @@
+<html>
+<head>
+<title>Tigase XMPP Server - Admin console</title>
+<style>
+body {
+    margin: 0px;
+}
+.root {
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+}
+.header {
+    height: 100px;
+    background-color: #306799;
+    color: white;
+    box-shadow: 0px 3px 3px 0px lightgray;
+}
+.header > div {
+	float: left;
+}
+.header > div > span.title {
+padding-left: 30px;
+display: block;
+width: 300px;
+padding-top: 30px;
+/*float: left;*/
+font-size: 1.6em;
+}
+.header > div > span.subtitle {
+/*float: left;*/
+display: block;
+margin: 5px 0px;
+font-size: 0.9em;
+/*clear: left;*/
+}
+.content {
+    min-height: 600px;
+}
+.content > form > h3, .content > form > div {
+	clear: both;
+}
+.content > form > * {
+	display: block;
+	float: left;
+	padding: 3px;
+}
+.footer {
+    font-size: 0.9em;
+    text-align: center;
+	clear: both;
+}
+ul {
+	padding: 0px 0px;
+	list-style: none;
+}
+li {
+	padding: 0px 1em;
+}
+li > ul > li {
+	margin: 0px -1em;
+	padding: 0px 2em;
+}
+li > a {
+	color: darkblue;
+	font-weight: bold;
+	text-decoration: none;
+}
+table {
+	clear: both;
+	border-spacing: 0px;
+	
+}
+th, td {
+	padding: 5px 10px;	
+	border: 1px solid gray;
+}
+label {
+	clear: both;
+	min-width: 220px;
+}
+input {
+	min-width: 300px;
+}
+input.submit {
+	clear: both;
+}
+</style>
+<% imports.each { 
+      if (it.type == 'css' && it.src) { %>
+<link rel='stylesheet' type='text/css' href='${src}'></link>
+<%    } else if (it.type == 'css' && it.content) { %>
+<style>.test { ${it.content} }</style>
+<%    } else if (it.type == 'script') { %>
+<script src="${it.src}"></script>
+<%    } %>
+<%  } %>
+</head>
+<body>
+<div class="root">
+<div class="header">
+<img src="http://www.tigase.org/files/logo.png" style="width: 70px;
+height: 70px;
+padding: 15 15;
+float: left;
+background: radial-gradient(white 5%, rgba(255,255,255,0) 72%);"/>
+<div>
+<span class="title" style="padding-left: 20px;">Tigase XMPP Server</span>
+<% def currentCommand = model.commands.find { command -> command.node == request.getParameter('node') && command.jid == request.getParameter('jid') };
+if (currentCommand) { %><span class="subtitle" style="padding-left: 20px;">${currentCommand.name}</span><% } %>
+</div>
+</div>
+<div class="sidebar" style="width:300px; float: left; background: lightgray;">
+	<ul>
+<% model.commands.findAll { !it.group }.each { it.group = "Other" };
+def groups = model.commands.collect { it.group }.unique().sort().each { group -> %>
+<li ${ (group == request.getParameter('group')) ? 'style="background: rgba(255,255,255,0.3)"' : '' }><a href="?group=${java.net.URLEncoder.encode(group ?: '')}">${group}</a><% if (request.getParameter("group") == group) { %>
+	<ul><% model.commands.findAll { it.group == group }.sort { it.name }.each { command -> %>
+		<li ${ (command.node == request.getParameter('node') && command.jid == request.getParameter('jid')) ? 'style="background: rgba(255,255,255,0.4)"' : ''}><a href="?group=${java.net.URLEncoder.encode(group ?: '')}&jid=${java.net.URLEncoder.encode(command.jid)}&node=${java.net.URLEncoder.encode(command.node)}">${command.name}</a><br/><small>${command.jid}</small></li>
+	<% } %></ul><% } %>
+</li>
+<% } %>		
+	</ul>
+</div>
+<div class="content" style="float:left; padding: 0px 50px;">
+<% if (model.formFields) { %>
+<% def table = null; %>
+<form method="POST">
+<% model.formFields?.each { formField -> %>
+<% if (formField.getName() == 'item' && table) { 
+%><tr><% table.each { col ->
+%><td>${ formField.getChildren().find { it.getAttribute("var") == col }?.getChildCData('field/value') ?: '' }</td><%
+	} %></tr><%
+	return;
+} 
+if (table != null) {%></table><%}
+table = null;
+%>
+<% if (formField.getName() == 'title') { %><div class="title"><h3>${formField.getCData()}</h3></div><% return; } %>
+<% if (formField.getName() == 'instructions') { %><div class="instructions">${formField.getCData()}</div><% return; } %>
+<% if (formField.getName() == 'reported') { 
+%><div><b>${formField.getAttribute("label")}</b></div><%
+table = formField.getChildren().findAll { it.getName() == 'field' }.collect { it.getAttribute("var") } %>
+<table><thead><% table.each { %><th>${it}</th><% } %></thead>
+<% return; } %>
+<% def type = formField.getAttribute('type') ?: 'text-single'; 
+if (type == 'hidden') { %>
+		<input type='hidden' name="${formField.getAttribute('var')}" value="${formField.getChildCData('field/value') ?: ''}" /><br/>
+<% } else if (type == 'boolean') { %>
+		<label for="${formField.getAttribute('var')}">${formField.getAttribute('label') ?: (formField.getAttribute('var') ?: '')}</label>
+		<input type="checkbox" name="${formField.getAttribute('var')}" ${(formField.getChildCData('field/value') == 'true') ? 'checked' : ''}/><br/>
+<% } else if (type == 'text-private') { %>
+		<label for="${formField.getAttribute('var')}">${formField.getAttribute('label') ?: (formField.getAttribute('var') ?: '')}</label>
+		<input type="password" name="${formField.getAttribute('var')}" value="${formField.getChildCData('field/value') ?: ''}"/><br/>
+<% } else if (type == 'text-multi' || type == 'jid-multi') { %>
+		<label for="${formField.getAttribute('var')}">${formField.getAttribute('label') ?: (formField.getAttribute('var') ?: '')}</label>
+		<textarea name="${formField.getAttribute('var')}" rows='6' cols='50'>
+<% formField.getChildren().findAll{ it.getName() == 'value' }.each { %>${it.getCData()?:''}\n<% } %>
+		</textarea><br/>
+<% } else if (type == 'list-single' || type == 'list-multi') { %>
+		<label for="${formField.getAttribute('var')}">${formField.getAttribute('label') ?: (formField.getAttribute('var') ?: '')}</label>
+		<select name="${formField.getAttribute('var')}" ${ (type == 'list-multi') ? 'multiple' : ''}><% formField.getChildren().findAll { it.getName() == 'option' }.each { %>
+			<option value='${it.getChildCData('value') ?: it.getAttribute('label')}' ${formField.getChildren().find{ child -> (child.getName() == 'value') && (child.getCData() == (it.getChildCData('value') ?: it.getAttribute('label'))) } ? 'selected' : ''}>${it.getAttribute('label') ?: it.getChildCData('value')}</option>
+<% } %></select><br/>
+<% } else if (type == 'text-single' || type == 'jid-single') { %>
+		<label for="${formField.getAttribute('var')}">${formField.getAttribute('label') ?: (formField.getAttribute('var') ?: '')}</label><input type="text" name="${formField.getAttribute('var')}" value="${formField.getChildCData('field/value') ?: ''}"/><br/>
+<% } else if (type == 'fixed') { %>
+		<input style="clear:both;" disabled type="text" name="${formField.getAttribute('var')}" value="${formField.getChildCData('field/value') ?: ''}"/><br/>		
+<% } else { %>
+		<label>${formField.getCData() ?: ''}</label>
+<% } %>
+<% } %>
+<% if (table != null) { %></table><% } %>
+<input class='submit' type="submit"/>
+</form>
+<% } %>
+</div>
+<div class="footer">Powered by Tigase XMPP Server ${tigase.server.XMPPServer.getImplementationVersion()}</div>
+</body>
+</html>

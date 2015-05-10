@@ -398,6 +398,18 @@ public class DrupalWPAuth implements AuthRepository {
 		}
 	}
 
+	@Override
+	public boolean isUserDisabled(BareJID user) 
+					throws UserNotFoundException, TigaseDBException {
+		return false;
+	}
+	
+	@Override
+	public void setUserDisabled(BareJID user, Boolean value) 
+					throws UserNotFoundException, TigaseDBException {
+		throw new TigaseDBException("Feature not supported");		
+	}
+	
 	private boolean isActive(BareJID user) throws SQLException, UserNotFoundException {
 		ResultSet rs = null;
 

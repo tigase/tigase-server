@@ -269,6 +269,13 @@ public interface AuthRepository extends Repository {
 	 */
 	void updatePassword(BareJID user, String password)
 					throws UserNotFoundException, TigaseDBException;
+	
+	boolean isUserDisabled(BareJID user) 
+					throws UserNotFoundException, TigaseDBException;
+	
+	void setUserDisabled(BareJID user, Boolean value) 
+					throws UserNotFoundException, TigaseDBException;
+	
 }    // AuthRepository
 
 

@@ -285,4 +285,35 @@ public class AuthRepositoryPool implements AuthRepository {
 			return null;
 		}
 	}
+	
+	@Override
+	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
+		AuthRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.isUserDisabled(user);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+			return false;
+		}
+	}
+	
+	@Override
+	public void setUserDisabled(BareJID user, Boolean value) throws UserNotFoundException, TigaseDBException {
+		AuthRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				repo.setUserDisabled(user, value);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+		}
+	}		
 }
