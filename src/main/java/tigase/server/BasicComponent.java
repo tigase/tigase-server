@@ -43,9 +43,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.script.Bindings;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+
 import tigase.conf.Configurable;
 import tigase.conf.ConfigurationException;
 import tigase.disco.ServiceEntity;
@@ -53,9 +55,11 @@ import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.osgi.OSGiScriptEngineManager;
+
 import tigase.server.script.AddScriptCommand;
 import tigase.server.script.CommandIfc;
 import tigase.server.script.RemoveScriptCommand;
+
 import tigase.stats.StatisticsList;
 import tigase.util.DNSResolver;
 import tigase.util.TigaseStringprepException;
@@ -63,9 +67,15 @@ import tigase.vhosts.VHostItem;
 import tigase.vhosts.VHostListener;
 import tigase.vhosts.VHostManagerIfc;
 import tigase.xml.Element;
+
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
+
+import java.io.FileFilter;
+import java.util.ArrayList;
+
+import javax.script.ScriptEngineFactory;
 
 /**
  * Created: Oct 17, 2009 7:49:05 PM
@@ -1009,6 +1019,10 @@ public class BasicComponent
 		File             file       = null;
 		AddScriptCommand addCommand = new AddScriptCommand();
 		Bindings         binds      = scriptEngineManager.getBindings();
+		List<String>     extensions = new ArrayList<>();
+		for ( ScriptEngineFactory engineFactory :  scriptEngineManager.getEngineFactories()) {
+			extensions.addAll( engineFactory.getExtensions());
+		}
 
 		initBindings(binds);
 
@@ -1025,7 +1039,7 @@ public class BasicComponent
 				File adminDir = new File(scriptsPath);
 
 				if ((adminDir != null) && adminDir.exists()) {
-					for (File f : adminDir.listFiles()) {
+					for ( File f : adminDir.listFiles( new ExtFilter( extensions ) ) ) {
 
 						// Just regular files here....
 						if (f.isFile() &&!f.toString().endsWith("~") &&!f.isHidden())  {
@@ -1142,6 +1156,26 @@ public class BasicComponent
 			} catch (IOException | ScriptException e) {
 				log.log(Level.WARNING, "Can't load the admin script file: " + file, e);
 			}
+		}
+	}
+
+	private class ExtFilter
+					implements FileFilter {
+
+		List<String> extensions;
+
+		public ExtFilter( List<String> extensions ) {
+			this.extensions = extensions;
+		}
+
+		@Override
+		public boolean accept( File file ) {
+
+			boolean matched = false;
+			for ( String extension : extensions ) {
+				matched |= file.isFile() && file.getName().toLowerCase().endsWith( extension );
+			}
+			return matched;
 		}
 	}
 }
