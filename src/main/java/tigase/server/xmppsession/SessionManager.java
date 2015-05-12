@@ -2306,7 +2306,7 @@ public class SessionManager
 						plugin_settings.put(nodes[2], entry.getValue());
 						log.log(Level.CONFIG, "Adding a specific plugins option [{0}]: {1} = {2}",
 								new Object[] { plug_id,
-								nodes[1], entry.getValue() });
+								nodes[2], entry.getValue() });
 					}
 				}
 			}
