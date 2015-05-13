@@ -70,7 +70,11 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 			autoLoadTimer.schedule(new TimerTask() {
 				@Override
 				public void run() {
-					reload();
+					try {
+						reload();
+					} catch (Exception ex) {
+						log.log(Level.SEVERE, "exception during reload of config repository items", ex);
+					}
 				}
 			}, interval, interval);
 		}
