@@ -281,8 +281,8 @@ public class ClusterConnectionManager
 			// we ignore any local addresses
 			isCorrect = !addr.isAnyLocalAddress() && !addr.isLoopbackAddress()
 									&& !( NetworkInterface.getByInetAddress( addr ) != null );
-			if ( !isCorrect && log.isLoggable( Level.WARNING ) ){
-				log.log( Level.WARNING, "Incorrect ClusterRepoItem, skipping connection attempt: {0}", repoItem );
+			if ( !isCorrect && log.isLoggable( Level.CONFIG ) ){
+				log.log( Level.CONFIG, "ClusterRepoItem of local machine, skipping connection attempt: {0}", repoItem );
 			}
 		} catch ( UnknownHostException | SocketException ex ) {
 			log.log( Level.WARNING, "Incorrect ClusterRepoItem, skipping connection attempt: " + repoItem, ex );
