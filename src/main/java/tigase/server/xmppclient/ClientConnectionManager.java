@@ -492,7 +492,7 @@ public class ClientConnectionManager
 			}
 			writeRawData(serv, prepareStreamOpen(serv, id, hostname)	);
 			addOutPacket(Command.GETFEATURES.getPacket(serv.getConnectionId(), serv
-					.getDataReceiver(), StanzaType.get, UUID.randomUUID().toString(), null));
+					.getDataReceiver(), StanzaType.get, "ssl_" + UUID.randomUUID().toString(), null ));
 		}
 
 		return null;
@@ -1025,7 +1025,7 @@ public class ClientConnectionManager
 	}	
 	
 	protected void preprocessStreamFeatures(XMPPIOService<Object> serv, Element elem_features) {
-		
+
 	}
 	
 	private List<Element> getFeatures(XMPPIOService service) {
@@ -1063,7 +1063,7 @@ public class ClientConnectionManager
 
 			// We are now ready to ask for features....
 			addOutPacket(Command.GETFEATURES.getPacket(packet.getFrom(), packet.getTo(),
-					StanzaType.get, UUID.randomUUID().toString(), null));
+					StanzaType.get, "ssl_" + UUID.randomUUID().toString(), null));
 		}
 
 		@Override
