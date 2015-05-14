@@ -1321,7 +1321,13 @@ public class SessionManager
 
 		case GETFEATURES : {
 			if (iqc.getType() == StanzaType.get) {
-				List<Element> features = getFeatures(connectionsByFrom.get(iqc.getFrom()));
+
+				boolean ssl = iqc.getStanzaId().startsWith( "ssl_");
+				if (ssl) {
+					connection.putSessionData( "SSL", ssl);
+				}
+
+				List<Element> features = getFeatures(connection);
 				Packet        result   = iqc.commandResult(null);
 
 				Command.setData(result, features);

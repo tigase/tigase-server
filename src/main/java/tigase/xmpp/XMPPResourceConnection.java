@@ -998,7 +998,10 @@ public class XMPPResourceConnection
 	public boolean isTlsRequired() {
 		VHostItem vhost = getDomain();
 		try {
-			if ("c2s".equals(getConnectionId().getLocalpart()))
+			if ( null != getSessionData( "SSL" ) && (boolean) getSessionData( "SSL" ) ){
+				return false;
+			}
+			if ("c2s".equals(getConnectionId().getLocalpart()) )
 				return vhost.isTlsRequired();
 			else
 				return false;
