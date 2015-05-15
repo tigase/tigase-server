@@ -1795,6 +1795,8 @@ public class SessionManager
 			}    // end of for (XMPPPreprocessorIfc preproc: preProcessors)
 		}
 
+		setPermissions( conn, packet );
+
 		// prepTm = System.currentTimeMillis() - startTime;
 		if (!stop) {
 			if (defPacketHandler.forward(packet, conn, naUserRepository, results)) {
@@ -2324,9 +2326,20 @@ public class SessionManager
 
 	//~--- set methods ----------------------------------------------------------
 
-	private void setPermissions(XMPPResourceConnection conn, Queue<Packet> results) {
-		Permissions perms = Permissions.NONE;
+	private void setPermissions( XMPPResourceConnection conn, Packet packet ) {
+		Permissions perms = getPermissionForConnection( conn );
+		packet.setPermissions( perms );
+	}
 
+	private void setPermissions(XMPPResourceConnection conn, Queue<Packet> results) {
+		Permissions perms = getPermissionForConnection( conn );
+		for (Packet res : results) {
+			res.setPermissions(perms);
+		}
+	}
+
+	private Permissions getPermissionForConnection( XMPPResourceConnection conn ) {
+		Permissions perms = Permissions.NONE;
 		if (conn != null) {
 			perms = Permissions.LOCAL;
 			if (conn.isAuthorized()) {
@@ -2349,9 +2362,7 @@ public class SessionManager
 				}
 			}
 		}
-		for (Packet res : results) {
-			res.setPermissions(perms);
-		}
+		return perms;
 	}
 
 	//~--- inner classes --------------------------------------------------------
