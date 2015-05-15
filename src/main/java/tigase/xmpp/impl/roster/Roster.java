@@ -15,9 +15,6 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev$
- * Last modified by $Author$
- * $Date$
  */
 
 package tigase.xmpp.impl.roster;
@@ -43,9 +40,10 @@ import java.util.logging.Logger;
  *
  * Created: Tue Feb 21 18:05:53 2006
  *
- * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
+ * @deprecated RosterFlat should be used instead
+ *
  */
+@Deprecated
 public class Roster extends RosterAbstract {
 
 	/**

@@ -288,7 +288,7 @@ public class RosterFlat
 
 			// Skip temporary roster elements added only for online presence tracking
 			// from dynamic roster
-			if (relem.isPersistent()) {
+			if (relem.isPersistent() && !relem.getSubscription().equals( SubscriptionType.none_pending_in)) {
 				items.add(getBuddyItem(relem));
 			}
 		}
