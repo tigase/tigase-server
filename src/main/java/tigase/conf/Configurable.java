@@ -263,7 +263,7 @@ public interface Configurable
 
 	/** Field description */
 	public static final String MONITOR_CLASS_NAME =
-			"tigase.server.monitor.MonitorComponent";
+			"tigase.monitor.MonitorComponent";
 
 	/** Field description */
 	public static final String MONITOR_CLUST_CLASS_NAME = "tigase.cluster.MonitorClustered";

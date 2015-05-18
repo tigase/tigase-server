@@ -100,7 +100,7 @@ public class MonitorComponent extends AbstractComponent<MonitorContext> {
 
 	@Override
 	public boolean isDiscoNonAdmin() {
-		return true;
+		return false;
 	}
 
 	@Override
