@@ -492,7 +492,7 @@ public class BoshConnectionManager
 
 			return null;
 		}
-		if (!see_other_host_strategy.isEnabled(ph)) {
+		if (!see_other_host_strategy.isEnabled(vHostManager.getVHostItem( fromJID.getDomain()), ph)) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("see-other-host not enabled for the Phase: " + ph.toString());
 			}

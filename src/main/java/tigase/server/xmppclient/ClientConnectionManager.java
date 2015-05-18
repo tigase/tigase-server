@@ -445,8 +445,9 @@ public class ClientConnectionManager
 		if (!isAllowed(serv, hostname)) {
 			return prepareStreamError(serv, "policy-violation", null);
 		}
-		if ((fromJID != null) && (see_other_host_strategy != null) && see_other_host_strategy
-				.isEnabled(SeeOtherHostIfc.Phase.OPEN)) {
+		if ((fromJID != null) && (see_other_host_strategy != null)
+				&& see_other_host_strategy.isEnabled(vHostManager.getVHostItem( fromJID.getDomain()),
+																						 SeeOtherHostIfc.Phase.OPEN)) {
 			BareJID see_other_host = see_other_host_strategy.findHostForJID(fromJID,
 					getDefHostName());
 
@@ -742,7 +743,8 @@ public class ClientConnectionManager
 						log.log(Level.SEVERE, null, ex);
 					}
 					if ((fromJID != null) && ((see_other_host_strategy != null) &&
-							see_other_host_strategy.isEnabled(SeeOtherHostIfc.Phase.LOGIN))) {
+							see_other_host_strategy.isEnabled(vHostManager.getVHostItem( fromJID.getDomain()),
+																								SeeOtherHostIfc.Phase.LOGIN))) {
 						BareJID see_other_host = see_other_host_strategy.findHostForJID(fromJID,
 								getDefHostName());
 

@@ -23,11 +23,14 @@
 
 package tigase.server.xmppclient;
 
-import java.util.List;
-import java.util.Map;
+import tigase.xmpp.BareJID;
+
+import tigase.vhosts.VHostItem;
+import tigase.vhosts.VHostManagerIfc;
 import tigase.xml.Element;
 
-import tigase.xmpp.BareJID;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Wojtek
@@ -93,9 +96,10 @@ public interface SeeOtherHostIfc {
 	 * Performs check whether redirect is enabled in the given phase
 	 * by default see-other-host redirect is only active in stream:open phase
 	 *
+	 * @param vHost vHost for which redirection should be performed
 	 * @param ph phase for which the check should be performed
 	 * @return boolean value indicating whether to perform or not redirect for
 	 * the phase passed as argument
 	 */
-	boolean isEnabled(Phase ph);
+	boolean isEnabled(VHostItem vHost, Phase ph);
 }
