@@ -49,6 +49,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -2046,6 +2047,24 @@ public class SessionManager
 
 	//~--- get methods ----------------------------------------------------------
 
+	public Map<String, XMPPProcessorIfc> getProcessors() {
+		return Collections.unmodifiableMap(processors);
+	}
+
+	public Map<String, XMPPPreprocessorIfc> getPreProcessors() {
+		return Collections.unmodifiableMap(preProcessors);
+	}
+
+	public Map<String, XMPPPostprocessorIfc> getPostProcessors() {
+		return Collections.unmodifiableMap(postProcessors);
+	}
+
+	public Map<String, XMPPPacketFilterIfc> getOutFilters() {
+		return Collections.unmodifiableMap(outFilters);
+	}
+
+	
+	
 	@Override
 	protected Integer getMaxQueueSize(int def) {
 		return def * 10;

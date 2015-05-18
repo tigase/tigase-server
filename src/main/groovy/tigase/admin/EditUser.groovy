@@ -1,6 +1,6 @@
 /*
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2015 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -77,12 +77,11 @@ try {
 			result = p.commandResult(Command.DataType.form);
 
 			Command.addTitle(result, "Modifying a User")
-			Command.addInstructions(result, "Fill out this form to modify a user.")
+			Command.addInstructions(result, "Fill out this form to modify a user " + (userJid ?: ""))
 
 			Command.addFieldValue(result, "FORM_TYPE", "http://jabber.org/protocol/admin",
 					"hidden")
-			Command.addFieldValue(result, JID, userJid ?: "", "jid-single",
-					"The Jabber ID")	
+			Command.addFieldValue(result, JID, userJid ?: "", "hidden")	
 			Command.addFieldValue(result, EMAIL, user_repo.getData(bareJID, "email") ?: "", "text-single",
 					"Email address")
 			
