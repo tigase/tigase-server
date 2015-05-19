@@ -70,8 +70,8 @@ public class RegistrarKernelTest {
 		Assert.assertEquals(krnl.getInstance("bean1"), m1k.getInstance(Module1Service.class).getBean1());
 		Assert.assertEquals(krnl.getInstance("bean1"), m2k.getInstance(Module2Service.class).getBean1());
 
-		Assert.assertEquals(krnl.getInstance("Module1Service"), m1k.getInstance("service"));
-		Assert.assertEquals(krnl.getInstance("Module2Service"), m2k.getInstance("service"));
+		Assert.assertEquals((Object) krnl.getInstance("Module1Service"), (Object) m1k.getInstance("service"));
+		Assert.assertEquals((Object) krnl.getInstance("Module2Service"), (Object) m2k.getInstance("service"));
 
 	}
 }
