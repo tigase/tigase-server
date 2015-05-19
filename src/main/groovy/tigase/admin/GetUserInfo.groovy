@@ -1,6 +1,6 @@
 /*
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2015 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -76,13 +76,14 @@ if (isServiceAdmin ||
 
 		Command.addTextField(result, "JID", "JID: " + userJid)
 		boolean handled = false;
-		if (this.hasProperty("clusterStrategy")) {
+		if (binding.variables.containsKey("clusterStrategy")) { 
             def cluster = (ClusteringStrategyIfc) clusterStrategy
 			def conns = cluster.getConnectionRecords(bareJID);
 			if (cluster.containsJid(bareJID) && (conns != null)) {
 				handled = true;
 				def recs = [];
-				recs.addAll(conns).sort { it.getUserJid().getResource() }
+				recs.addAll(conns)
+				recs.sort { it.getUserJid().getResource() }
 				Command.addTextField(result, "Status", "Status: " + (conns.size() ? "online" : "offline"))
 				Command.addTextField(result, "Active connections", "Active connections: " + conns.size())
 				if (resourcesAsTable) {
@@ -104,7 +105,7 @@ if (isServiceAdmin ||
 					
 						Element node = new Element("field");
 						node.setAttribute("var", "Cluster node");
-						node.addChild(new Element("value", con.getNode().toString()));
+						node.addChild(new Element("value", rec.getNode().toString()));
 						item.addChild(node);
 						result.getElement().getChild('command').getChild('x').addChild(item);
 					}
