@@ -24,12 +24,9 @@ import tigase.util.TigaseStringprepException;
 import tigase.vhosts.filter.Rule.RuleType;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
