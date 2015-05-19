@@ -89,6 +89,8 @@ public class TasksScriptRegistrar {
 			e.printStackTrace();
 		} catch (ScriptException e) {
 			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 	}

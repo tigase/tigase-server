@@ -100,7 +100,7 @@ public class MonitorComponent extends AbstractComponent<MonitorContext> {
 
 	@Override
 	public boolean isDiscoNonAdmin() {
-		return false;
+		return true;
 	}
 
 	@Override
@@ -110,6 +110,8 @@ public class MonitorComponent extends AbstractComponent<MonitorContext> {
 		super.setProperties(props);
 
 		kernel.registerBean("eventBus").asInstance(context.getEventBus()).exec();
+
+		kernel.registerBean(BeanConfigurator.class).exec();
 
 		kernel.registerBean(TasksScriptRegistrar.ID).asClass(TasksScriptRegistrar.class).exec();
 
@@ -188,6 +190,8 @@ public class MonitorComponent extends AbstractComponent<MonitorContext> {
 
 		// initialization
 		((TasksScriptRegistrar) kernel.getInstance(TasksScriptRegistrar.ID)).load();
+
+		((BeanConfigurator) kernel.getInstance(BeanConfigurator.NAME)).configureBeans(props);
 	}
 
 }
