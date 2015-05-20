@@ -157,7 +157,12 @@ if (isServiceAdmin ||
 		def sessionManager = component;
 		def offlineMsgsRepo = sessionManager.processors.values().find { it.hasProperty("msg_repo") }?.msg_repo;
 		if (offlineMsgsRepo && offlineMsgsRepo.metaClass.respondsTo(offlineMsgsRepo, "getMessagesCount", [tigase.xmpp.JID] as Object[])) {
-			def offlineStats = offlineMsgsRepo.getMessagesCount(tigase.xmpp.JID.jidInstance(bareJID));
+			def offlineStats = 0;
+			try {
+				offlineStats = offlineMsgsRepo.getMessagesCount(tigase.xmpp.JID.jidInstance(bareJID));
+			} catch (tigase.db.UserNotFoundException ex) {
+				// ignoring this error for now as it is not important
+			}
 			def msg = "Offline messages: " + (offlineStats ? (offlineStats[offlineStats.keySet().find { it.name() == "message" }] ?: 0) : 0);
 			Command.addTextField(result, msg, msg);
 		}		
