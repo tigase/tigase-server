@@ -39,7 +39,9 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
+ * @deprecated Use {@link tigase.monitor.MonitorComponent} instead.
  */
+@Deprecated
 public class MonitorClustered extends MonitorComponent implements ClusteredComponentIfc {
 	private static final Logger log = Logger.getLogger(MonitorClustered.class.getName());
 
