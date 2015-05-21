@@ -29,6 +29,8 @@ package tigase.util;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created: May 28, 2009 7:39:07 AM
@@ -41,6 +43,7 @@ public class DataTypes {
 	public static final Map<String, Character> typesMap = new LinkedHashMap<String,
 																													Character>();
 
+	private static final Logger log = Logger.getLogger(DataTypes.class.getName());
 	//~--- static initializers --------------------------------------------------
 
 	static {
@@ -85,33 +88,49 @@ public class DataTypes {
 
 		T result        = def;
 		String toParse  = num;
-		long multiplier = 1;
+		Long multiplier = 1L;
 
 		try {
 			switch (num.charAt(num.length() - 1)) {
 			case 'k' :
 			case 'K' :
-				multiplier = 1024;
+				multiplier = 1024L;
 				toParse    = num.substring(0, num.length() - 1);
 
 				break;
 
 			case 'm' :
 			case 'M' :
-				multiplier = 1024 * 1024;
+				multiplier = 1024L * 1024L;
 				toParse    = num.substring(0, num.length() - 1);
 
 				break;
 
 			case 'g' :
 			case 'G' :
-				multiplier = 1024 * 1024 * 1024;
+				multiplier = 1024L * 1024L * 1024L;
 				toParse    = num.substring(0, num.length() - 1);
 
 				break;
 			}
-			result = cls.cast(Long.valueOf(Long.parseLong(toParse) * multiplier));
+
+			if(cls.equals(Integer.class)) {
+				result = cls.cast(Integer.valueOf(toParse) * multiplier.intValue());
+			} else if(cls.equals(Long.class)) {
+				result = cls.cast(Long.valueOf(toParse) * multiplier);
+			} else if(cls.equals(Double.class)) {
+				result = cls.cast(Double.valueOf(toParse) * multiplier.doubleValue());
+			} else if(cls.equals(Float.class)) {
+				result = cls.cast(Float.valueOf(toParse) * multiplier.floatValue());
+			} else if(cls.equals(Byte.class)) {
+				Integer res = Byte.valueOf(toParse) * multiplier.byteValue();
+				result = cls.cast(res.byteValue());
+			} else if(cls.equals(Short.class)) {
+				Integer res = Short.valueOf(toParse) * multiplier.shortValue();
+				result = cls.cast(res.shortValue());
+			}
 		} catch (Exception e) {
+			log.log( Level.WARNING, "Error parsing value: {0} as {1}, using default: {2}", new Object[] {num,cls,def});
 			return def;
 		}
 
@@ -438,7 +457,14 @@ public class DataTypes {
 
 		return parseBool(val);
 	}
+	public static void main( String[] args ) {
+		System.out.println( parseSizeInt( "256k", 1 ) );
+		System.out.println( parseNum("256k", Integer.class, 1 ) );
+		System.out.println( parseNum("655k", Double.class, 1D ) );
+		System.out.println( parseNum("256k", Float.class, 1F ) );
+		System.out.println( parseNum("256k", Long.class, 1L ) );
+		System.out.println( parseNum("25", Short.class, Short.valueOf( "1") ) );
+		System.out.println( parseNum("25", Byte.class, (byte)1 ) );
+	}
 }
-
-
 //~ Formatted in Tigase Code Convention on 13/03/04
