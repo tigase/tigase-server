@@ -221,7 +221,7 @@ public abstract class TigaseRuntime {
 	 * @return a value of <code>float</code>
 	 */
 	public float getHeapMemUsage() {
-		return  getHeapMemMax() == -1 ? 0F : (getHeapMemUsed() * 100F) / getHeapMemMax();
+		return  getHeapMemMax() == -1 ? -1.0F : (getHeapMemUsed() * 100F) / getHeapMemMax();
 	}
 
 	/**
@@ -278,7 +278,7 @@ public abstract class TigaseRuntime {
 	 * @return a value of <code>float</code>
 	 */
 	public float getNonHeapMemUsage() {
-		return getNonHeapMemMax() == -1 ? 0F : (getNonHeapMemUsed() * 100F) / getNonHeapMemMax();
+		return getNonHeapMemMax() == -1 ? -1.0F : (getNonHeapMemUsed() * 100F) / getNonHeapMemMax();
 	}
 
 	/**

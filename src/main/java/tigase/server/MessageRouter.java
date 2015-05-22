@@ -568,14 +568,7 @@ public class MessageRouter
 		format = NumberFormat.getNumberInstance();
 		format.setMaximumFractionDigits(1);
 
-		// if (format instanceof DecimalFormat) {
-		// DecimalFormat decf = (DecimalFormat)format;
-		// decf.applyPattern(decf.toPattern()+"%");
-		// }
 		list.add(getName(), "CPU usage", format.format(cpuUsage) + "%", Level.INFO);
-
-		MemoryUsage heap    = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
-		MemoryUsage nonHeap = ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage();
 
 		format = NumberFormat.getIntegerInstance();
 		if (format instanceof DecimalFormat) {
@@ -583,16 +576,16 @@ public class MessageRouter
 
 			decf.applyPattern(decf.toPattern() + " KB");
 		}
-		list.add(getName(), "Max Heap mem", format.format(heap.getMax() / 1024), Level.INFO);
-		list.add(getName(), "Used Heap", format.format(heap.getUsed() / 1024), Level.INFO);
-		list.add(getName(), "Free Heap", format.format( heap.getMax() == -1 ? 0 :
-				(heap.getMax() - heap.getUsed()) / 1024), Level.FINE);
-		list.add(getName(), "Max NonHeap mem", format.format(nonHeap.getMax() / 1024), Level
+		list.add(getName(), "Max Heap mem", format.format(runtime.getHeapMemMax() / 1024), Level.INFO);
+		list.add(getName(), "Used Heap", format.format(runtime.getHeapMemUsed() / 1024), Level.INFO);
+		list.add(getName(), "Free Heap", format.format( runtime.getHeapMemMax() == -1 ? -1.0 :
+				(runtime.getHeapMemMax() - runtime.getHeapMemUsed()) / 1024), Level.FINE);
+		list.add(getName(), "Max NonHeap mem", format.format(runtime.getNonHeapMemMax() / 1024), Level
 				.FINE);
-		list.add(getName(), "Used NonHeap", format.format(nonHeap.getUsed() / 1024), Level
+		list.add(getName(), "Used NonHeap", format.format(runtime.getNonHeapMemUsed() / 1024), Level
 				.FINE);
-		list.add(getName(), "Free NonHeap", format.format( nonHeap.getMax() == -1 ? 0 :
-				(nonHeap.getMax() - nonHeap.getUsed()) / 1024), Level.FINE);
+		list.add(getName(), "Free NonHeap", format.format( runtime.getNonHeapMemMax() == -1 ? -1.0 :
+				(runtime.getNonHeapMemMax() - runtime.getNonHeapMemUsed()) / 1024), Level.FINE);
 	}
 
 	//~--- set methods ----------------------------------------------------------
