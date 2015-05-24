@@ -236,33 +236,35 @@ public class MessageAmp
 			}
 			
 			try {
-				Packet result = packet.copyElementOnly();
-
-				result.setPacketTo(ampJID);
-				results.offer(result);
 				if (session == null) {
+					Packet result = packet.copyElementOnly();
+					result.setPacketTo(ampJID);
+					results.offer(result);
 					result.getElement().addAttribute(OFFLINE, "1");
 					packet.processedBy(ID);
 	
 					return true;
 				}
 				if (session.isUserId(packet.getStanzaTo().getBareJID())) {
+					Packet result = packet.copyElementOnly();
+					result.setPacketTo(ampJID);
+					results.offer(result);
 					boolean offline = !messageProcessor.hasConnectionForMessageDelivery(session);
 					if (offline) {
 						result.getElement().addAttribute(OFFLINE, "1");
-						packet.processedBy(ID);
-	
-						return true;					
 					}
-				} else {
-					JID connectionId = session.getConnectionId();
-
-					if (connectionId.equals(packet.getPacketFrom())) {
-						result.getElement().addAttribute(FROM_CONN_ID, connectionId.toString());
-					}
+					packet.processedBy(ID);
+					return true;					
+//				} else {
+					// this needs to be handled in process() method so we need to allow packet 
+					// to be processed in this method
+//					JID connectionId = session.getConnectionId();
+//
+//					if (connectionId.equals(packet.getPacketFrom())) {
+//						result.getElement().addAttribute(FROM_CONN_ID, connectionId.toString());
+//					}
 				}
-				packet.processedBy(ID);
-				return true;
+				return false;
 			} catch (XMPPException ex) {
 				log.log(Level.SEVERE, "this should not happen", ex);
 			}
@@ -306,7 +308,16 @@ public class MessageAmp
 				if ((amp == null) || (amp.getAttributeStaticStr("status") != null) || ampJID.equals(packet.getPacketFrom())) {
 					messageProcessor.process(packet, session, repo, results, settings);
 				} else {
-					// this should not happen as it is already handled in preprocessing stage
+					// when packet from user with AMP is sent we need to forward it to AMP
+					// for processing but we need to do this here and not in preProcess method
+					// as in other case other processors would not receive this packet at all!
+					JID connectionId = session.getConnectionId();
+					Packet result = packet.copyElementOnly();
+					if (connectionId.equals(packet.getPacketFrom())) {
+						result.getElement().addAttribute(FROM_CONN_ID, connectionId.toString());
+					}					
+					result.setPacketTo(ampJID);
+					results.offer(result);
 				}
 				break;
 			case "iq":

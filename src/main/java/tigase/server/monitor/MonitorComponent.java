@@ -24,7 +24,6 @@ package tigase.server.monitor;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import sun.launcher.resources.launcher;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Packet;
 import tigase.stats.StatisticsList;
