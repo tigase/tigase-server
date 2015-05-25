@@ -128,26 +128,30 @@ public class BindResource
 
 					if (from_jid != null) {
 
-						// Do not replace current settings if there is at least correct
-						// BareJID
-						// already set.
-						if ((packet.getStanzaFrom() == null) 
-								|| (packet.getElemName() == tigase.server.Presence.ELEM_NAME 
-									&& !from_jid.getBareJID().equals(packet.getStanzaFrom().getBareJID()))
-								|| (packet.getElemName() != tigase.server.Presence.ELEM_NAME
-									&& !from_jid.equals(packet.getStanzaFrom()))) {
-							if (log.isLoggable(Level.FINEST)) {
-								log.log(Level.FINEST, "Setting correct from attribute: {0}", from_jid);
+						// http://xmpp.org/rfcs/rfc6120.html#stanzas-attributes-from
+							if ( packet.getElemName() == tigase.server.Presence.ELEM_NAME
+								 && StanzaType.getSubsTypes().contains( packet.getType() )
+								 && ( packet.getStanzaFrom() == null
+											|| !from_jid.getBareJID().equals( packet.getStanzaFrom().getBareJID() )
+											|| packet.getStanzaFrom().getResource() != null ) ){
+							if ( log.isLoggable( Level.FINEST ) ){
+								log.log( Level.FINEST, "Setting correct from attribute: {0}", from_jid );
 							}
-
-							// No need for the line below, initVars(...) takes care of that
-							// packet.getElement().setAttribute("from", from_jid.toString());
-							packet.initVars(from_jid, packet.getStanzaTo());
+							packet.initVars( JID.jidInstance( from_jid.getBareJID() ), packet.getStanzaTo() );
+						} else if ( ( packet.getStanzaFrom() == null )
+												|| ( ( packet.getElemName() == tigase.server.Presence.ELEM_NAME
+															 && !StanzaType.getSubsTypes().contains( packet.getType() )
+															 || packet.getElemName() != tigase.server.Presence.ELEM_NAME )
+														 && !from_jid.equals( packet.getStanzaFrom() ) ) ){
+							if ( log.isLoggable( Level.FINEST ) ){
+								log.log( Level.FINEST, "Setting correct from attribute: {0}", from_jid );
+							}
+							packet.initVars( from_jid, packet.getStanzaTo() );
 						} else {
 							if (log.isLoggable(Level.FINEST)) {
 								log.log(Level.FINEST,
 										"Skipping setting correct from attribute: {0}, is already correct.",
-										from_jid);
+										packet.getStanzaFrom());
 							}
 						}
 					} else {

@@ -21,6 +21,9 @@
  */
 package tigase.xmpp;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Describe class StanzaType here.
  *
@@ -41,12 +44,25 @@ public enum StanzaType {
 		terminate,                                // Bosh - session termination stanza
     invisible;                                // Other unknown types...
 
+	private static Set<StanzaType> subTypes;
+
 	public static StanzaType valueof(String cmd) {
 		try {
 			return StanzaType.valueOf(cmd);
 		} catch (IllegalArgumentException e) {
 			return null;
 		} // end of try-catch
+	}
+
+	public static Set<StanzaType> getSubsTypes() {
+		if ( subTypes == null ){
+			subTypes = new HashSet<>();
+			subTypes.add( subscribe );
+			subTypes.add( subscribed );
+			subTypes.add( unsubscribe );
+			subTypes.add( unsubscribed );
+		}
+		return subTypes;
 	}
 
 } // StanzaType
