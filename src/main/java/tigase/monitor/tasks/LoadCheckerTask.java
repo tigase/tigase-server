@@ -22,6 +22,9 @@ public class LoadCheckerTask extends AbstractConfigurableTimerTask implements In
 	public static final String MONITOR_EVENT_NAME = "LoadAverageMonitorEvent";
 
 	@Inject
+	private MonitorComponent component;
+
+	@Inject
 	private EventBus eventBus;
 
 	private long maxAverageLoad = 10;
@@ -56,6 +59,7 @@ public class LoadCheckerTask extends AbstractConfigurableTimerTask implements In
 			Element event = new Element(MONITOR_EVENT_NAME, new String[] { "xmlns" },
 					new String[] { MonitorComponent.EVENTS_XMLNS });
 			event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
+			event.addChild(new Element("hostname", component.getDefHostName().toString()));
 			event.addChild(new Element("averageLoad", Double.toString(curAverageLoad)));
 			event.addChild(new Element("message", "Average Load is higher than " + maxAverageLoad + " and it is equals "
 					+ Double.toString(curAverageLoad)));

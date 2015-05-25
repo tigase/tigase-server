@@ -24,6 +24,9 @@ public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements 
 	public final static String NONHEAP_MEMORY_MONITOR_EVENT_NAME = "NonHeapMemoryMonitorEvent";
 
 	@Inject
+	private MonitorComponent component;
+
+	@Inject
 	private EventBus eventBus;
 
 	private int maxHeapMemUsagePercent = 90;
@@ -67,6 +70,7 @@ public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements 
 		if (curHeapMemUsagePercent >= maxHeapMemUsagePercent) {
 			Element event = new Element(HEAP_MEMORY_MONITOR_EVENT_NAME, new String[] { "xmlns" },
 					new String[] { MonitorComponent.EVENTS_XMLNS });
+			event.addChild(new Element("hostname", component.getDefHostName().toString()));
 			event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
 			event.addChild(new Element("heapMemUsage", Float.toString(curHeapMemUsagePercent)));
 			event.addChild(new Element("heapMemMax", Long.toString(runtime.getHeapMemMax())));
@@ -89,6 +93,7 @@ public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements 
 		if (curNonHeapMemUsagePercent >= maxNonHeapMemUsagePercent) {
 			Element event = new Element(NONHEAP_MEMORY_MONITOR_EVENT_NAME, new String[] { "xmlns" },
 					new String[] { MonitorComponent.EVENTS_XMLNS });
+			event.addChild(new Element("hostname", component.getDefHostName().toString()));
 			event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
 			event.addChild(new Element("nonHeapMemUsage", Float.toString(curNonHeapMemUsagePercent)));
 			event.addChild(new Element("heapMemMax", Long.toString(runtime.getHeapMemMax())));
