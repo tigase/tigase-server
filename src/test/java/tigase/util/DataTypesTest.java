@@ -35,7 +35,7 @@ public class DataTypesTest {
 		assertEquals( new Long( 262144L ), Long.class.cast( DataTypes.parseNum( "256k", Long.class, 1L ) ) );
 		assertEquals( new Double( 670720.0D ), Double.class.cast( DataTypes.parseNum( "655k", Double.class, 1D ) ) );
 		assertEquals( new Double( 262144F ), Double.valueOf( Float.class.cast( DataTypes.parseNum( "256k", Float.class, 1F ) ) ) );
-		assertEquals( new Long( 25 ), Long.valueOf( DataTypes.parseNum( "25", Short.class, Short.valueOf( "1" ) ) ) );
+		assertEquals( new Long( 25 ), Long.valueOf( (long) DataTypes.parseNum( "25", Short.class, Short.valueOf( "1" ) ) ) );
 		assertEquals( new Long( 25 ), Long.valueOf( Byte.class.cast( DataTypes.parseNum( "25", Byte.class, Byte.valueOf( "1" ) ) ) ) );
 	}
 
