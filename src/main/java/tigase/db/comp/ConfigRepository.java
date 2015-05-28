@@ -85,6 +85,9 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	@Override
 	public void addRepoChangeListener(
 			RepositoryChangeListenerIfc<Item> repoChangeListener) {
+		if ( log.isLoggable( Level.FINEST ) ){
+			log.log( Level.FINEST, "Adding new repository listener: {0}", repoChangeListener );
+		}
 		this.repoChangeList = repoChangeListener;
 	}
 

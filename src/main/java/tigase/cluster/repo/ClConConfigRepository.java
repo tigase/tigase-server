@@ -121,6 +121,9 @@ public class ClConConfigRepository
 	}
 
 	public void itemLoaded(ClusterRepoItem item) {
+		if ( log.isLoggable( Level.FINEST ) ){
+			log.log( Level.FINEST, "Item loaded: {0}", item );
+		}
 		if (System.currentTimeMillis() - item.getLastUpdate() <= 5000 * autoreload_interval && clusterRecordValid(item)) {
 			addItem(item);
 		} else {
