@@ -129,7 +129,7 @@ public class Script extends AbstractScriptCommand {
 			this.ext = scriptEngine.getFactory().getExtensions().get(0);
 		}
 
-		log.log(Level.INFO, "Initialized script command, id: {0}, lang: {1}, ext: {2}",
+		log.log(Level.FINE, "Initialized script command, id: {0}, lang: {1}, ext: {2}",
 				new Object[] { id, this.language, this.ext });
 
 	}

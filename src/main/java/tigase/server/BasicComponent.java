@@ -1132,9 +1132,9 @@ public class BasicComponent
 								}
 							}
 							if (!found) {
-								log.log(Level.CONFIG,
-										"{0}: skipping admin script {1}, id: {2}, descr: {3}, group: {4} for component: {5} or class: {6}", new Object[] {
-										getName(), file, cmdId, cmdDescr, cmdGroup, comp, compClass });
+								log.log( Level.FINEST,
+												 "{0}: skipping admin script {1}, id: {2}, descr: {3}, group: {4} for component: {5} or class: {6}",
+												 new Object[] { getName(), file, cmdId, cmdDescr, cmdGroup, comp, compClass } );
 
 								continue;
 							}
