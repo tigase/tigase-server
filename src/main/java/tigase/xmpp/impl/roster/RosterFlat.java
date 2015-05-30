@@ -151,8 +151,11 @@ public class RosterFlat
 															 relem.getName(), relem.getRosterItem() });
 			}
 		} else {
-			if ((name != null) &&!name.isEmpty()) {
-				relem.setName(name);
+			if ( emptyNameAllowed ){
+				relem.setName( "" );
+			} else {
+				if (name.isEmpty()) name = null;
+				relem.setName( name );
 			}
 
 			// Hm, as one user reported this make it impossible to remove the user

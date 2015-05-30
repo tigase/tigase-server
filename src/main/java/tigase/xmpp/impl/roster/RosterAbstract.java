@@ -158,6 +158,8 @@ public abstract class RosterAbstract {
 	private static EnumMap<SubscriptionType, StateTransition> subsToStateMap =
 			new EnumMap<SubscriptionType, StateTransition>(SubscriptionType.class);
 
+	protected static boolean emptyNameAllowed = false;
+
 	//~--- static initializers --------------------------------------------------
 
 	// ~--- static initializers --------------------------------------------------
@@ -778,4 +780,10 @@ public abstract class RosterAbstract {
 	public abstract void setPresenceSent(XMPPResourceConnection session, JID jid,
 			boolean sent)
 					throws NotAuthorizedException, TigaseDBException;
+
+	public void setProperties( Map<String, Object> settings ) {
+		if ( settings.get( "empty_name_enabled" ) != null ){
+			emptyNameAllowed = Boolean.valueOf( (String) settings.get( "empty_name_enabled" ) );
+		}
+	}
 }

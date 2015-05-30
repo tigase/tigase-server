@@ -88,6 +88,9 @@ public class JabberIqRoster
 			log.config( "Automatic presence subscription of new roster items enabled,"
 									+ "results in less strict XMPP specs compatibility " );
 		}
+		if ( roster_util != null ){
+			roster_util.setProperties( settings );
+		}
 	}
 
 	/**

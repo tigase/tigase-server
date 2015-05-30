@@ -185,6 +185,9 @@ public class ClConSQLRepository
 	public void removeItem( String key ) {
 		super.removeItem( key );
 
+		if ( log.isLoggable( Level.FINEST ) ){
+			log.log( Level.FINEST, "Removing item form database: {0}", key );
+		}
 		try {
 			PreparedStatement removeItem = data_repo.getPreparedStatement( null, DELETE_ITEM_QUERY );
 			synchronized ( removeItem ) {
@@ -200,6 +203,9 @@ public class ClConSQLRepository
 
 	@Override
 	public void storeItem(ClusterRepoItem item) {
+		if ( log.isLoggable( Level.FINEST ) ){
+			log.log( Level.FINEST, "Storing item to repository: {0}", item );
+		}
 		try {
 			PreparedStatement updateItemSt = data_repo.getPreparedStatement(null,	UPDATE_ITEM_QUERY);
 			PreparedStatement insertItemSt = data_repo.getPreparedStatement(null, INSERT_ITEM_QUERY);
@@ -233,9 +239,13 @@ public class ClConSQLRepository
 
 	@Override
 	public void reload() {
+		if ( log.isLoggable( Level.FINEST ) ){
+			log.log( Level.FINEST, "Reloading items" );
+		}
+
 		if ( ( System.currentTimeMillis() - lastReloadTime ) <= ( autoreload_interval * lastReloadTimeFactor ) ){
-			if ( log.isLoggable( Level.FINEST ) ){
-				log.log( Level.FINEST, "Last reload performed in {0}, skipping: ", ( System.currentTimeMillis() - lastReloadTime ) );
+			if ( log.isLoggable( Level.FINE ) ){
+				log.log( Level.FINE, "Last reload performed in {0}, skipping: ", ( System.currentTimeMillis() - lastReloadTime ) );
 			}
 			return;
 		}

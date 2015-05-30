@@ -39,6 +39,8 @@ import tigase.db.DBInitException;
 
 import tigase.sys.ShutdownHook;
 
+import java.util.Date;
+
 /**
  * Class description
  *
@@ -121,10 +123,20 @@ public class ClConConfigRepository
 	}
 
 	public void itemLoaded(ClusterRepoItem item) {
+		if ( log.isLoggable( Level.FINEST ) ){
+			log.log( Level.FINEST, "Item loaded: {0}", item );
+		}
 		if (System.currentTimeMillis() - item.getLastUpdate() <= 5000 * autoreload_interval && clusterRecordValid(item)) {
 			addItem(item);
 		} else {
-			removeItem(item.getHostname());
+			if ( log.isLoggable( Level.FINEST ) ){
+				log.log( Level.FINEST,
+								 "Removing stale item: {0}; current time: {1}, last update: {2} ({3}), diff: {4}, autoreload {5}",
+								 new Object[] { item, System.currentTimeMillis(), item.getLastUpdate(),
+																new Date( item.getLastUpdate() ), System.currentTimeMillis() - item.getLastUpdate(),
+																5000 * autoreload_interval } );
+			}
+			removeItem( item.getHostname() );
 		}
 	}
 

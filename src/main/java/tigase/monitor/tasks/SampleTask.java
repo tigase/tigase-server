@@ -38,7 +38,6 @@ public class SampleTask extends AbstractConfigurableTimerTask {
 
 	@Override
 	protected void run() {
-		System.out.println("Sample task!");
 	}
 
 	@Override

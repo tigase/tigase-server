@@ -6,7 +6,7 @@ INSTALLER_DIR="installer"
 ORIGINAL_IZPACK_DIR="izpack.original"
 PATCHED_IZPACK_DIR="izpack.patched"
 
-GIT_URL="git://git.codehaus.org/izpack.git"
+GIT_URL="git://github.com/izpack/izpack.git"
 
 # create installer directory
 if [ !  -e $INSTALLER_DIR ] ; then
