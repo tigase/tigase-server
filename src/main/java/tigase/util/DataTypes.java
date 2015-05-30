@@ -31,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.xmpp.JID;
 
 /**
  * Created: May 28, 2009 7:39:07 AM
@@ -53,6 +54,7 @@ public class DataTypes {
 		typesMap.put(Boolean.class.getName(), 'B');
 		typesMap.put(Float.class.getName(), 'F');
 		typesMap.put(Double.class.getName(), 'D');
+		typesMap.put(JID.class.getName(), 'J');
 		typesMap.put(String[].class.getName(), 's');
 		typesMap.put(Long[].class.getName(), 'l');
 		typesMap.put(Integer[].class.getName(), 'i');
@@ -64,6 +66,7 @@ public class DataTypes {
 		typesMap.put(boolean[].class.getName(), 'b');
 		typesMap.put(float[].class.getName(), 'f');
 		typesMap.put(double[].class.getName(), 'd');
+		typesMap.put(JID[].class.getName(), 'j');
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -215,6 +218,11 @@ public class DataTypes {
 				result = Double.parseDouble(value.trim());
 
 				break;
+				
+			case 'J' :
+				result = JID.jidInstance(value);
+				
+				break;
 
 			case 's' :
 
@@ -299,6 +307,18 @@ public class DataTypes {
 				result = doubles;
 
 				break;
+						
+			case 'j' :
+				String[] jids_str = value.split(",");
+				JID[] jids = new JID[jids_str.length];
+				int j = 0;
+				
+				for (String s : jids_str) {
+					jids[j++] = JID.jidInstance(s);
+				}
+				result = jids;
+				
+				break;
 
 			default :
 
@@ -353,6 +373,11 @@ public class DataTypes {
 		case 'd' :
 			varr = Arrays.toString((double[]) value);
 
+			break;
+			
+		case 'j' :
+			varr = Arrays.toString((JID[]) value);
+			
 			break;
 
 		default :

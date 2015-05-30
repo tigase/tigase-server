@@ -47,6 +47,7 @@ import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.JID;
 import tigase.util.StringUtilities;
+import tigase.xmpp.BareJID;
 
 /**
  * Objects of this class represent virtual host with all hosts configuration
@@ -359,6 +360,7 @@ public class VHostItem
 		types.add(new DataType(ClientTrustManagerFactory.CA_CERT_PATH, "Client Certificate CA", String.class, null));
 		types.add(new DataType(ClientTrustManagerFactory.CERT_REQUIRED_KEY, "Client Certificate Required", Boolean.class,
 				Boolean.FALSE));
+		types.add(new DataType("trusted-jids", "Trusted JIDs", JID[].class, null));
 		VHostItem.registerData(types);
 	}
 
@@ -1079,6 +1081,10 @@ public class VHostItem
 		return s2sSecret;
 	}
 
+	public JID[] getTrustedJIDs() {
+		return getData("trusted-jids");
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -1165,6 +1171,31 @@ public class VHostItem
 	 */
 	public boolean isTlsRequired() {
 		return tlsRequired || XMPPServer.isHardenedModeEnabled();
+	}
+	
+	public boolean isTrustedJID(JID jid) {
+		JID[] trustedJids = getTrustedJIDs();
+		if (trustedJids == null)
+			return false;
+		
+		for (JID trustedJid : trustedJids) {
+
+			if (trustedJid.getResource() != null)
+				if (jid.equals(trustedJid))
+					return true;
+				else
+					continue;
+			
+			if (trustedJid.getLocalpart() != null)
+				if (jid.getBareJID().equals(trustedJid.getBareJID()))
+					return true;
+				else
+					continue;
+			
+			if (jid.getDomain().equals(trustedJid.getDomain()))
+				return true;
+		}		
+		return false;
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -1337,6 +1368,10 @@ public class VHostItem
 		this.tlsRequired = value;
 	}
 
+	public void setTrustedJIDs(JID[] trustedJids) {
+		setData("trusted-jids", trustedJids);
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -1495,6 +1530,11 @@ public class VHostItem
 		public String[] getSaslAllowedMechanisms() {
 			return VHostItem.this.getSaslAllowedMechanisms();
 		}
+		
+		@Override
+		public JID[] getTrustedJIDs() {
+			return VHostItem.this.getTrustedJIDs();
+		}
 
 		@Override
 		public VHostItem getUnmodifiableVHostItem() {
@@ -1531,6 +1571,11 @@ public class VHostItem
 			return VHostItem.this.isTlsRequired();
 		}
 
+		@Override
+		public boolean isTrustedJID(JID jid) {
+			return VHostItem.this.isTrustedJID(jid);
+		}
+		
 		//~--- set methods --------------------------------------------------------
 
 		@Override

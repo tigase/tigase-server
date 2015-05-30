@@ -582,6 +582,10 @@ public class Presence
 
 					break;
 
+				case out_probe :
+					forwardPresence(results, packet, session.getJID());
+					break;
+					
 				case error :
 					processError(packet, session, results, settings, pres_type);
 
@@ -1321,20 +1325,37 @@ public class Presence
 				}
 			}
 		} else {
-
 			// acording to spec 4.3.2. Server Processing of Inbound Presence Probe
 			// http://xmpp.org/rfcs/rfc6121.html#presence-probe-inbound
 			// If the user's bare JID is in the contact's roster with a subscription
 			// state other
 			// than "From", "From + Pending Out", or "Both", then the contact's server
 			// SHOULD return a presence stanza of type "unsubscribed"
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST,
-						"Received probe, users bare JID: {0} is not in the roster. Responding with unsubscribed",
-						packet.getStanzaFrom().getBareJID());
+			if (!isAllowedForPresenceProbe(session, packet.getStanzaFrom())) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST,
+							"Received probe, users bare JID: {0} is not in the roster. Responding with unsubscribed",
+							packet.getStanzaFrom().getBareJID());
+				}
+				sendPresence(StanzaType.unsubscribed, session.getBareJID(), packet.getStanzaFrom()
+						.getBareJID(), results, null);
+			} else {
+				// However, if a server receives a presence probe from a configured
+				// domain of the server itself or another such trusted service, it MAY
+				// provide presence information about the user to that entity.
+				for (XMPPResourceConnection conn : session.getActiveSessions()) {
+					Element pres = conn.getPresence();
+
+					if (pres != null) {
+						sendPresence(null, null, packet.getStanzaFrom(),
+								results, pres);
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "Received probe, sending presence response to: {0}",
+									packet.getStanzaFrom());
+						}
+					}
+				}
 			}
-			sendPresence(StanzaType.unsubscribed, session.getBareJID(), packet.getStanzaFrom()
-					.getBareJID(), results, null);
 		}    // end of if (roster_util.isSubscribedFrom(session, packet.getElemFrom()))
 	}
 
@@ -2051,6 +2072,13 @@ public class Presence
 
 	//~--- methods --------------------------------------------------------------
 
+	private boolean isAllowedForPresenceProbe(XMPPResourceConnection session, JID jid) {
+		if (jid == null)
+			return false;
+		
+		return session.getDomain().isTrustedJID(jid);
+	}
+	
 	/**
 	 * Method checks whether a given contact requires sending presence. In case of
 	 * enabling option {@code skipOffline} and user being offline in the roster

@@ -663,7 +663,9 @@ public abstract class RosterAbstract {
 			if (type == StanzaType.unsubscribed) {
 				return PresenceType.out_unsubscribed;
 			}    // end of if (type == StanzaType.unsubscribed)
-
+			if (type == StanzaType.probe) {
+				return PresenceType.out_probe;
+			}
 			// StanzaType.probe is invalid here....
 			// if (type == StanzaType.probe) {
 			// return PresenceType.out_probe;
