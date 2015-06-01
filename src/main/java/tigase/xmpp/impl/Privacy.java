@@ -208,9 +208,8 @@ public class Privacy {
 	 */
 	public static Element getDefaultList(XMPPResourceConnection session)
 					throws NotAuthorizedException, TigaseDBException {
-		Element sessionDefaultList = null;
+		Element sessionDefaultList = (Element) session.getCommonSessionData( DEFAULT );
 		if (session.getCommonSessionData(PRIVACY_LIST_LOADED) == null) {
-			sessionDefaultList = (Element) session.getCommonSessionData( DEFAULT );
 			if ( sessionDefaultList == null ){
 				String defaultListName = getDefaultListName( session );
 				if ( defaultListName != null ){
