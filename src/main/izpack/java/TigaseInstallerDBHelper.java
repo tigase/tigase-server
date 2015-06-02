@@ -689,11 +689,6 @@ class TigaseInstallerDBHelper {
 				helper.addXmppAdminAccount(variables, msgTarget);
 			}
 		},
-		POST_INSTALLATION("Post installation actions") {
-			public void execute(TigaseInstallerDBHelper helper, Properties variables, MsgTarget msgTarget) {
-				helper.postInstallation(variables, msgTarget);
-			}
-		},
 		SOCKS5_COMPONENT("Loading socks5 component schema") {
 			public void execute(TigaseInstallerDBHelper helper, Properties variables, MsgTarget msgTarget) {
 				helper.socks5SchemaLoad(variables, msgTarget);
@@ -702,6 +697,11 @@ class TigaseInstallerDBHelper {
 		PUBSUB_COMPONENT("Loading PubSub component schema") {
 			public void execute(TigaseInstallerDBHelper helper, Properties variables, MsgTarget msgTarget) {
 				helper.pubsubSchemaLoad(variables, msgTarget);
+			}
+		},
+		POST_INSTALLATION("Post installation actions") {
+			public void execute(TigaseInstallerDBHelper helper, Properties variables, MsgTarget msgTarget) {
+				helper.postInstallation(variables, msgTarget);
 			}
 		}
 
