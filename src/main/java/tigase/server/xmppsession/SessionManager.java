@@ -1323,13 +1323,15 @@ public class SessionManager
 		case GETFEATURES : {
 			if (iqc.getType() == StanzaType.get) {
 
-				boolean ssl = iqc.getStanzaId().startsWith( "ssl_");
-				if (ssl) {
-					connection.putSessionData( "SSL", ssl);
+				boolean ssl = iqc.getStanzaId().startsWith( "ssl_" );
+
+				connection = connectionsByFrom.get( iqc.getStanzaFrom() );
+				if ( connection != null && ssl ){
+					connection.putSessionData( "SSL", ssl );
 				}
 
-				List<Element> features = getFeatures(connection);
-				Packet        result   = iqc.commandResult(null);
+				List<Element> features = getFeatures( connection );
+				Packet result = iqc.commandResult( null );
 
 				Command.setData(result, features);
 				addOutPacket(result);
