@@ -159,10 +159,14 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 					service.writeRawData("<" + ENABLED_NAME + " xmlns='" + XMLNS + "'"
 							+ ( id != null ? " id='" + id + "' " + RESUME_ATTR + "='true' "+ MAX_ATTR + "='" + max + "'" : "" ) 
 							+ ( location != null ? " " + LOCATION_ATTR + "='" + location + "'" : "" ) + " />");
+					if (log.isLoggable(Level.FINE)) {
+						log.log(Level.FINE, "{0}, started StreamManagement with resumption timeout set to = {1}", 
+								new Object[] { service.toString(), (id != null ? resumption_timeout : null) });
+					}
 				}
 				catch (IOException ex) {
 					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE, "exception during sending <enabled/>, stopping...", ex);
+						log.log(Level.FINE, service.toString() + ", exception during sending <enabled/>, stopping...", ex);
 					}
 					service.forceStop();
 				}
@@ -176,7 +180,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 					resumeStream(service, id, Integer.parseInt(h));
 				} catch (IOException ex) {
 					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE, "exception while resuming stream for user " 
+						log.log(Level.FINE, service.toString() + ", exception while resuming stream for user " 
 								+ service.getUserJid() + " with id " + id, ex);
 					}
 					
@@ -194,7 +198,13 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 				
 				int val = Integer.parseInt(valStr);
 				OutQueue outQueue = (OutQueue) service.getSessionData().get(OUT_COUNTER_KEY);
-				outQueue.ack(val);
+				if (outQueue != null) {
+					outQueue.ack(val);
+				} else {
+					if (log.isLoggable(Level.FINE)) {
+						log.log(Level.FINE, "{0}, outQueue already null while processing: {1}", new Object[] { service, packet });
+					}
+				}
 			}
 			else if (packet.getElemName() == REQ_NAME) {
 				int value = ((Counter) service.getSessionData().get(IN_COUNTER_KEY)).get();
@@ -205,10 +215,11 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 				}
 				catch (IOException ex) {
 					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE, "exception during sending <a/> as "
-								+ "response for <r/>, stopping...", ex);
+						log.log(Level.FINE, service.toString() + ", exception during sending <a/> as "
+								+ "response for <r/>, not stopping serivce as it "
+								+ "will be stopped after processing all incoming data...", ex);
 					}
-					service.forceStop();
+					//service.forceStop();
 				}
 			}
 			return true;
