@@ -389,6 +389,10 @@ public class JDBCRepository
 		return data_repo.getResourceUri();
 	}
 
+	protected DataRepository getRepository() {
+		return data_repo;
+	}
+
 	@Override
 	public String[] getSubnodes(BareJID user_id, final String subnode)
 					throws UserNotFoundException, TigaseDBException {
