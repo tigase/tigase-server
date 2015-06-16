@@ -45,6 +45,7 @@ import javax.net.ssl.X509TrustManager;
 import tigase.conf.ConfigurationException;
 import tigase.net.IOService;
 import tigase.net.SocketThread;
+import tigase.net.SocketType;
 import tigase.server.Command;
 import tigase.server.ConnectionManager;
 import tigase.server.Iq;
@@ -501,8 +502,10 @@ public class ClientConnectionManager
 				log.log(Level.FINER, "Session ID is: {0}", id);
 			}
 			writeRawData(serv, prepareStreamOpen(serv, id, hostname)	);
+			final SocketType socket = (SocketType)serv.getSessionData().get("socket");
+			boolean ssl = socket.equals( SocketType.ssl);
 			addOutPacket(Command.GETFEATURES.getPacket(serv.getConnectionId(), serv
-					.getDataReceiver(), StanzaType.get, "ssl_" + UUID.randomUUID().toString(), null ));
+					.getDataReceiver(), StanzaType.get, (ssl ? "ssl_" : "") + UUID.randomUUID().toString(), null ));
 		}
 
 		return null;
@@ -1077,8 +1080,11 @@ public class ClientConnectionManager
 		public void responseReceived(Packet packet, Packet response) {
 
 			// We are now ready to ask for features....
+			XMPPIOService<Object> serv = getXMPPIOService( response );
+			SocketType socket = (SocketType) serv.getSessionData().get( "socket" );
+			boolean ssl = socket.equals( SocketType.ssl );
 			addOutPacket(Command.GETFEATURES.getPacket(packet.getFrom(), packet.getTo(),
-					StanzaType.get, "ssl_" + UUID.randomUUID().toString(), null));
+					StanzaType.get, (ssl ? "ssl_" : "") + UUID.randomUUID().toString(), null));
 		}
 
 		@Override
