@@ -154,9 +154,7 @@ if (type == 'hidden') { %>
 		<input type="password" name="${formField.getAttribute('var')}" value="${formField.getChildCData('field/value') ?: ''}"/><br/>
 <% } else if (type == 'text-multi' || type == 'jid-multi') { %>
 		<label for="${formField.getAttribute('var')}">${formField.getAttribute('label') ?: (formField.getAttribute('var') ?: '')}</label>
-		<textarea name="${formField.getAttribute('var')}" rows='6' cols='50'>
-<% formField.getChildren().findAll{ it.getName() == 'value' }.each { %>${it.getCData()?:''}\n<% } %>
-		</textarea><br/>
+		<textarea name="${formField.getAttribute('var')}" rows='6' cols='50'>${formField.getChildren().findAll{ it.getName() == 'value' }.collect {it.getCData()?:''}.join('\n')}</textarea><br/>
 <% } else if (type == 'list-single' || type == 'list-multi') { %>
 		<label for="${formField.getAttribute('var')}">${formField.getAttribute('label') ?: (formField.getAttribute('var') ?: '')}</label>
 		<select name="${formField.getAttribute('var')}" ${ (type == 'list-multi') ? 'multiple' : ''}><% formField.getChildren().findAll { it.getName() == 'option' }.each { %>
