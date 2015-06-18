@@ -768,6 +768,8 @@ public class ClientConnectionManager
 								Thread.sleep(socket_close_wait_time);
 								serv.stop();
 							} catch (Exception e) {}
+						} else {
+							serv.setUserJid(jid);
 						}
 					} else {
 						serv.setUserJid(jid);

@@ -1047,6 +1047,10 @@ public class SessionManager
 
 			// Maybe we should move this loop based check to separe thread for performance reason
 			// Check if our Set<JID> of not found sessions contains each of available connections from each session
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "queuing connection {0} for user {1} for detail stale connection check - should not happen!!", 
+						new Object[] { connectionId, userId });
+			}
 			if (!forceDetailStaleConnectionCheck) {
 				return;
 			}
