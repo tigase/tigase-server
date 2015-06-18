@@ -75,85 +75,61 @@ if (isServiceAdmin ||
 (vhost != null && (vhost.isOwner(stanzaFromBare.toString()) || vhost.isAdmin(stanzaFromBare.toString())))) {
 
 		Command.addTextField(result, "JID", "JID: " + userJid)
-		boolean handled = false;
+		def userRes = [];
 		if (binding.variables.containsKey("clusterStrategy")) { 
             def cluster = (ClusteringStrategyIfc) clusterStrategy
 			def conns = cluster.getConnectionRecords(bareJID);
 			if (cluster.containsJid(bareJID) && (conns != null)) {
-				handled = true;
-				def recs = [];
-				recs.addAll(conns)
-				recs.sort { it.getUserJid().getResource() }
-				Command.addTextField(result, "Status", "Status: " + (conns.size() ? "online" : "offline"))
-				Command.addTextField(result, "Active connections", "Active connections: " + conns.size())
-				if (resourcesAsTable) {
-					Element reported = new Element("reported");
-					reported.addAttribute("label", "Connected resources");
-					def cols = ["Resource", "Cluster node"];
-					cols.each {
-						Element el = new Element("field");
-						el.setAttribute("var", it);
-						reported.addChild(el);
-					}
-					result.getElement().getChild('command').getChild('x').addChild(reported);
-					recs.each { rec ->
-						Element item = new Element("item");
-						Element res = new Element("field");
-						res.setAttribute("var", "Resource");
-						res.addChild(new Element("value", rec.getUserJid().getResource()));
-						item.addChild(res);
-					
-						Element node = new Element("field");
-						node.setAttribute("var", "Cluster node");
-						node.addChild(new Element("value", rec.getNode().toString()));
-						item.addChild(node);
-						result.getElement().getChild('command').getChild('x').addChild(item);
-					}
-				} else {
-					recs.each { rec ->
-						Command.addTextField(result, rec.getUserJid().getResource() + " is connected to", rec.getUserJid().getResource() + " is connected to " + con.getNode().toString());
-					}
+				conns.each { rec ->
+					userRes.add([res:rec.getUserJid().getResource(), node:rec.getNode().getDomain()]);
 				}
 			}
 		} 
-		if (!handled) {
-			XMPPSession session = sessions.get(BareJID.bareJIDInstanceNS(userJid))
-			if (session != null) {
-				List<XMPPResourceConnection> conns = session.getActiveResources()
-				Command.addTextField(result, "Status", "Status: " + (conns.size() ? "online" : "offline"))
-				Command.addTextField(result, "Active connections", "Active connections: " + conns.size())
-				if (resourcesAsTable) {
-					Element reported = new Element("reported");
-					reported.addAttribute("label", "Connected resources");
-					def cols = ["Resource", "Cluster node"];
-					cols.each {
-						Element el = new Element("field");
-						el.setAttribute("var", it);
-						reported.addChild(el);
-					}
-					result.getElement().getChild('command').getChild('x').addChild(reported);
-					conns.each { con ->	
-						Element item = new Element("item");
-						Element res = new Element("field");
-						res.setAttribute("var", "Resource");
-						res.addChild(new Element("value", con.getResource()));
-						item.addChild(res);
-					
-						Element node = new Element("field");
-						node.setAttribute("var", "Cluster node");
-						node.addChild(new Element("value", con.getConnectionId()?.getDomain()));
-						item.addChild(node);
-						result.getElement().getChild('command').getChild('x').addChild(item);
-					}				
-				} else {
-					for (XMPPResourceConnection con: conns) {
-						Command.addTextField(result, con.getResource() + " is connected to", con.getResource() + " is connected to " + con.getResource()?.getDomain());
-					}
-				}
-			} else {
-				Command.addTextField(result, "Status", "Status: offline")
+
+		XMPPSession session = sessions.get(BareJID.bareJIDInstanceNS(userJid))
+		if (session != null) {
+			List<XMPPResourceConnection> conns = session.getActiveResources()
+			conns.each { con ->
+				userRes.add([res:con.getResource(), node:con.getConnectionId()?.getDomain()]);
 			}
+			
 		}
+		if (userRes.isEmpty()) {
+			Command.addTextField(result, "Status", "Status: offline")
+		} else {
+			userRes.sort { it.res };
+			Command.addTextField(result, "Status", "Status: " + (userRes.size() ? "online" : "offline"))
+			Command.addTextField(result, "Active connections", "Active connections: " + userRes.size())
+			if (resourcesAsTable) {
+				Element reported = new Element("reported");
+				reported.addAttribute("label", "Connected resources");
+				def cols = ["Resource", "Cluster node"];
+				cols.each {
+					Element el = new Element("field");
+					el.setAttribute("var", it);
+					reported.addChild(el);
+				}
+				result.getElement().getChild('command').getChild('x').addChild(reported);
+				userRes.each { con ->	
+					Element item = new Element("item");
+					Element res = new Element("field");
+					res.setAttribute("var", "Resource");
+					res.addChild(new Element("value", con.res));
+					item.addChild(res);
+				
+					Element node = new Element("field");
+					node.setAttribute("var", "Cluster node");
+					node.addChild(new Element("value", con.node));
+					item.addChild(node);
+					result.getElement().getChild('command').getChild('x').addChild(item);
+				}				
+			} else {
+				for (XMPPResourceConnection con: conns) {
+					Command.addTextField(result, con.res + " is connected to", con.res + " is connected to " + con.node);
+				}
+			}				
+		}
+
 		def sessionManager = component;
 		def offlineMsgsRepo = sessionManager.processors.values().find { it.hasProperty("msg_repo") }?.msg_repo;
 		if (offlineMsgsRepo && offlineMsgsRepo.metaClass.respondsTo(offlineMsgsRepo, "getMessagesCount", [tigase.xmpp.JID] as Object[])) {
