@@ -32,6 +32,7 @@ import tigase.server.*
 import tigase.util.*
 import tigase.xmpp.*
 import tigase.xmpp.impl.DomainFilter
+import tigase.vhosts.filter.CustomDomainFilter
 import tigase.vhosts.filter.DomainFilterPolicy
 import tigase.db.UserRepository
 import tigase.db.UserNotFoundException
@@ -95,7 +96,15 @@ try {
 	}
 	def new_value = domain
 	if ( DomainFilterPolicy.valuePoliciesWithDomainListStr().contains(domain) ) {
-			repo.setData(bareJID, null, DomainFilter.ALLOWED_DOMAINS_LIST_KEY, domainList)
+		if (DomainFilterPolicy.valueof(domain) == DomainFilterPolicy.CUSTOM)
+		{
+			try {
+				CustomDomainFilter.parseRules(domainList)
+			} catch (Exception e) {
+				return "Error parsing rules: " + domainList
+			}
+		}
+		repo.setData(bareJID, null, DomainFilter.ALLOWED_DOMAINS_LIST_KEY, domainList)
 	}
 	repo.setData(bareJID, null, DomainFilter.ALLOWED_DOMAINS_KEY, new_value)
 

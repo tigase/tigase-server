@@ -108,7 +108,10 @@ public final class CustomDomainFilter {
 		try {
 			parseRules = parseRules( rules );
 		} catch ( ParseException e ) {
-			return true;
+			if (log.isLoggable( Level.FINE)) {
+				log.log( Level.FINE, "Error while parsing rules: " + rules, e);
+			}
+			return false;
 		}
 		if ( parseRules != null ){
 			return isAllowed( source, destination, parseRules );

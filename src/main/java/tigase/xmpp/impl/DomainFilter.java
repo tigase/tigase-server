@@ -372,7 +372,7 @@ public class DomainFilter
 					String[] customRules = getDomainsList( session );
 
 					if ( ( outDomain == null ) || outDomain.equals( local_hostname )
-							 || packet.getType().equals( StanzaType.error)
+							 || (packet.getType() == StanzaType.error)
 							 || ( packet.getStanzaFrom() == null && packet.getStanzaTo() != null
 										&& session.isUserId( packet.getStanzaTo().getBareJID() ) ) ){
 						// don't filter system packets, breaks things
