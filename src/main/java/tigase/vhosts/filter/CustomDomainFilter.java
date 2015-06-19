@@ -24,6 +24,7 @@ import tigase.xmpp.impl.DomainFilter;
 import tigase.vhosts.filter.Rule.RuleType;
 
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -108,10 +109,10 @@ public final class CustomDomainFilter {
 		try {
 			parseRules = parseRules( rules );
 		} catch ( ParseException e ) {
-			if (log.isLoggable( Level.FINE)) {
-				log.log( Level.FINE, "Error while parsing rules: " + rules, e);
+			if (log.isLoggable( Level.WARNING)) {
+				log.log( Level.WARNING, "Error while parsing rules: " + Arrays.toString( rules ), e);
 			}
-			return false;
+			return true;
 		}
 		if ( parseRules != null ){
 			return isAllowed( source, destination, parseRules );
