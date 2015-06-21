@@ -169,7 +169,7 @@ public class S2SConnectionManager
 	 * Outgoing and incoming connections for a given domains pair (localdomain,
 	 * remotedomain)
 	 */
-	private Map<CID, CIDConnections> cidConnections = new ConcurrentHashMap<CID,
+	protected Map<CID, CIDConnections> cidConnections = new ConcurrentHashMap<CID,
 			CIDConnections>(10000);
 	
 	/**
@@ -831,7 +831,7 @@ public class S2SConnectionManager
 
 	//~--- methods --------------------------------------------------------------
 
-	private CIDConnections createNewCIDConnections(CID cid)
+	protected CIDConnections createNewCIDConnections(CID cid)
 					throws NotLocalhostException, LocalhostException {
 		if (!isLocalDomainOrComponent(cid.getLocalHost())) {
 			throw new NotLocalhostException("This is not a valid localhost: " + cid

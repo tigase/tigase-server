@@ -201,7 +201,7 @@ public class CIDConnections {
 	 *
 	 * @param serv
 	 */
-	public void connectionAuthenticated(S2SIOService serv) {
+	public void connectionAuthenticated(S2SIOService serv, CID cid) {
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "{0}, connection is authenticated.", serv);
 		}
@@ -226,11 +226,11 @@ public class CIDConnections {
 	 *
 	 * @param sessionId
 	 */
-	public void connectionAuthenticated(String sessionId) {
+	public void connectionAuthenticated(String sessionId, CID cid) {
 		S2SConnection s2s_conn = getS2SConnectionForSessionId(sessionId);
 
 		if (s2s_conn != null) {
-			connectionAuthenticated(s2s_conn.getS2SIOService());
+			connectionAuthenticated(s2s_conn.getS2SIOService(), cid);
 		}
 	}
 

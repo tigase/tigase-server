@@ -183,7 +183,7 @@ public class Dialback
 
 					try {
 						cid_conns = handler.getCIDConnections(cid, true);
-						cid_conns.connectionAuthenticated(serv);
+						cid_conns.connectionAuthenticated(serv, cid);
 					} catch (NotLocalhostException ex) {
 
 						// Should not happen....
@@ -364,7 +364,7 @@ public class Dialback
 
 						// serv.addCID(new CID(p.getStanzaTo().getDomain(),
 						// p.getStanzaFrom().getDomain()));
-						cid_conns.connectionAuthenticated(serv);
+						cid_conns.connectionAuthenticated(serv, cid_packet);
 					} else if (log.isLoggable(Level.FINE)) {
 						log.log(Level.FINE,
 										"Received result with type valid for {0} but it was not requested!",
@@ -411,7 +411,9 @@ public class Dialback
 					handler.sendVerifyResult(DB_RESULT_EL_NAME, cid_main, cid_packet,
 																	 (p.getType() == StanzaType.valid), null,
 																	 p.getStanzaId(), null, false);
-					cid_conns.connectionAuthenticated(p.getStanzaId());
+					if (p.getType() == StanzaType.valid) {
+						cid_conns.connectionAuthenticated(p.getStanzaId(), cid_packet);
+					}
 				} else {
 					if (log.isLoggable(Level.FINE)) {
 						log.log(Level.FINE, "received verify for {0} but it was not requested!",
@@ -457,7 +459,7 @@ public class Dialback
 	 * 
 	 */
 	@SuppressWarnings("unchecked")
-	private boolean wasResultRequested(S2SIOService serv, String domain) {
+	protected boolean wasResultRequested(S2SIOService serv, String domain) {
 		Set<String> requested =
 			(Set<String>) serv.getSessionData().get(REQUESTED_RESULT_DOMAINS_KEY);
 
@@ -472,7 +474,7 @@ public class Dialback
 	 * @param domain
 	 * 
 	 */
-	private boolean wasVerifyRequested(S2SIOService serv, String domain) {
+	protected boolean wasVerifyRequested(S2SIOService serv, String domain) {
 		String requested =
 			(String) serv.getSessionData().get(S2SIOService.HANDSHAKING_DOMAIN_KEY);
 
