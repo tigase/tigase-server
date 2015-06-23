@@ -547,26 +547,9 @@ public class OfflineMessages
 				log.log(Level.FINEST, "Publishing packet in pubsub: {0}", packet);
 			}
 			try {
-				String publisher;
-				if (conn == null) {
-					if (log.isLoggable(Level.FINEST))
-						log.log(Level.FINEST, "Connection is null? Why, oh why? Using default publisher.", packet);
-					publisher = defaultPublisher;
-				} else if (conn.getDomain() == null) {
-					if (log.isLoggable(Level.FINEST))
-						log.log(Level.FINEST, "Domain in connection is null. Using default publisher.", packet);
-					publisher = defaultPublisher;
-				} else if (conn.getDomain().getVhost() == null) {
-					if (log.isLoggable(Level.FINEST))
-						log.log(Level.FINEST, "VHost is domain is null. Using default publisher.", packet);
-					publisher = defaultPublisher;
-				} else {
-					publisher = "sess-man@" + (String) conn.getDomain().getVhost().toString();
-				}
-
-				if (publisher != null) {
+				if (defaultPublisher != null) {
 					Element iq = new Element("iq", new String[] { "type", "id", "to", "from" }, new String[] { "set",
-							"" + System.nanoTime(), pubSubJID, publisher });
+							"" + System.nanoTime(), pubSubJID, defaultPublisher });
 					Element pubsub = new Element("pubsub", new String[] { "xmlns" },
 							new String[] { "http://jabber.org/protocol/pubsub" });
 					iq.addChild(pubsub);
