@@ -354,24 +354,29 @@ public class ClientConnectionManager
 
 	@Override
 	public void tlsHandshakeCompleted(XMPPIOService<Object> serv) {
-		if ((serv.getPeerCertificate() != null)) {
-			Packet clientAuthCommand = Command.CLIENT_AUTH.getPacket(serv.getConnectionId(), serv.getDataReceiver(),
-					StanzaType.set, this.newPacketId("c2s-"), Command.DataType.submit);
-			final String id = (String) serv.getSessionData().get(IOService.SESSION_ID_KEY);
-
-			Command.addFieldValue(clientAuthCommand, "session-id", id);
-
-			try {
-				String encodedPeerCertificate = Base64.encode(serv.getPeerCertificate().getEncoded());
-				Command.addFieldValue(clientAuthCommand, "peer-certificate", encodedPeerCertificate);
-			} catch (CertificateEncodingException e) {
-				log.log(Level.WARNING, "Can't encode certificate", e);
-			}
-
-			addOutPacket(clientAuthCommand);
-		}
+		sendClientAuthToSessionManager(serv);
 	}
 
+	private void sendClientAuthToSessionManager(XMPPIOService<Object> serv) {
+		if ((serv.getPeerCertificate() != null)) {
+			final String id = (String) serv.getSessionData().get(IOService.SESSION_ID_KEY);
+			if (id != null) {
+				Packet clientAuthCommand = Command.CLIENT_AUTH.getPacket(serv.getConnectionId(), serv.getDataReceiver(),
+						StanzaType.set, this.newPacketId("c2s-"), Command.DataType.submit);
+
+				Command.addFieldValue(clientAuthCommand, "session-id", id);
+
+				try {
+					String encodedPeerCertificate = Base64.encode(serv.getPeerCertificate().getEncoded());
+					Command.addFieldValue(clientAuthCommand, "peer-certificate", encodedPeerCertificate);
+				} catch (CertificateEncodingException e) {
+					log.log(Level.WARNING, "Can't encode certificate", e);
+				}
+				addOutPacket(clientAuthCommand);
+			}
+		}
+	}
+	
 	@Override
 	public void xmppStreamClosed(XMPPIOService<Object> serv) {
 		if (log.isLoggable(Level.FINER)) {
@@ -496,7 +501,9 @@ public class ClientConnectionManager
 				log.log(Level.FINER, "Sending a system command to SM: {0}", streamOpen);
 			}
 			addOutPacketWithTimeout(streamOpen, startedHandler, 45l, TimeUnit.SECONDS);
-			log.log(Level.FINER, "DOEN 2");
+
+			sendClientAuthToSessionManager(serv);			
+			log.log(Level.FINER, "DONE 2");
 		} else {
 			if (log.isLoggable(Level.FINER)) {
 				log.log(Level.FINER, "Session ID is: {0}", id);
@@ -507,7 +514,7 @@ public class ClientConnectionManager
 			addOutPacket(Command.GETFEATURES.getPacket(serv.getConnectionId(), serv
 					.getDataReceiver(), StanzaType.get, (ssl ? "ssl_" : "") + UUID.randomUUID().toString(), null ));
 		}
-
+		
 		return null;
 	}
 
