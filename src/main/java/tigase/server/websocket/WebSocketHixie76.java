@@ -28,6 +28,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.net.SocketType;
 import static tigase.server.websocket.WebSocketHybi.ID;
 
 /**
@@ -107,7 +108,7 @@ public class WebSocketHixie76 implements WebSocketProtocolIfc {
 			response.append(WS_ORIGIN_KEY).append(": ").append(headers.get(ORIGIN_KEY)).append("\r\n");
 		}
 
-		boolean ssl = "ssl".equals(service.getSessionData().get("socket"));
+		boolean ssl = SocketType.ssl == ((SocketType) service.getSessionData().get("socket"));
 		int localPort = service.getLocalPort();
 		String location = (ssl ? "wss://" : "ws://")
 				+ headers.get(HOST_KEY) + (((ssl && localPort == 443) || (!ssl && localPort == 80) || headers.get(HOST_KEY).contains(":")) ? "" : (":" + localPort)) + "/";

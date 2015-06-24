@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import tigase.conf.ConfigurationException;
+import tigase.net.SocketType;
 import tigase.xml.Element;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.XMPPIOService;
@@ -137,7 +138,7 @@ public class WebSocketClientConnectionManager
 		if (isPreRFC(serv)) {
 			return super.prepareSeeOtherHost(serv, hostname, see_other_host);
 		}		
-		boolean ssl = "ssl".equals(serv.getSessionData().get("socket"));
+		boolean ssl = SocketType.ssl == ((SocketType) serv.getSessionData().get("socket"));
 		int localPort = serv.getLocalPort();
 		String see_other_uri = (ssl ? "wss://" : "ws://") + see_other_host + ":" + localPort + "/";
 		return "<open" + " xmlns='" + XMLNS_FRAMING + "'" + " from='" +  (hostname != null ? hostname : getDefVHostItem()) + "'"

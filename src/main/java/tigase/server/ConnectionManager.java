@@ -951,8 +951,17 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 					}    // end of if (entry.getKey().startsWith())
 				}      // end of for ()
 				port_props.put(PORT_KEY, ports[i]);
+				if (port_props.containsKey(PORT_TYPE_PROP_KEY) 
+						&& !(port_props.get(PORT_TYPE_PROP_KEY) instanceof ConnectionType)) {
+					Object val = port_props.get(PORT_TYPE_PROP_KEY);
+					port_props.put(PORT_TYPE_PROP_KEY, ConnectionType.valueOf(val.toString()));
+				}
+				if (port_props.containsKey(PORT_SOCKET_PROP_KEY) 
+						&& !(port_props.get(PORT_SOCKET_PROP_KEY) instanceof SocketType)) {
+					Object val = port_props.get(PORT_SOCKET_PROP_KEY);
+					port_props.put(PORT_SOCKET_PROP_KEY, SocketType.valueOf(val.toString()));
+				}				
 				addWaitingTask(port_props);
-
 				// reconnectService(port_props, startDelay);
 			}        // end of for (int i = 0; i < ports.length; i++)
 		}          // end of if (ports != null)
