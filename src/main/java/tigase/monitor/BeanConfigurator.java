@@ -39,8 +39,7 @@ public class BeanConfigurator {
 			}
 			try {
 				final Object bean = kernel.getInstance(tmp[0]);
-				Field field = getField(tmp[1], bean);
-				BeanUtils.setValue(bean, field, entry.getValue());
+				BeanUtils.setValue(bean, tmp[1], entry.getValue());
 				log.config("Property has set: " + tmp[0] + "." + tmp[1] + "=" + entry.getValue());
 			} catch (Exception e) {
 				log.log(Level.CONFIG, "Cannot set property " + tmp[1] + " of bean " + tmp[0], e);

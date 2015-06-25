@@ -81,6 +81,10 @@ public abstract class AbstractConfigurableTimerTask extends AbstractConfigurable
 		}
 	}
 
+	public void setPeriod(String value) {
+		setPeriod(Long.parseLong(value));
+	}
+
 	public void setTimerTaskService(TimerTaskService timerTaskService) {
 		this.timerTaskService = timerTaskService;
 	}
