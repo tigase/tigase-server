@@ -2110,15 +2110,26 @@ public class Presence
 		// if non-system check is enabled during broadcast of non-first initial
 		// presence or offline presence
 		if (!systemCheck) {
-			if (skipOffline &&!roster.isOnline(session, buddy)) {
+			boolean isOnline = roster.isOnline( session, buddy );
+			if ( skipOffline && !isOnline ){
+				if ( log.isLoggable( Level.FINEST ) ){
+					log.log( Level.FINEST, "{0} | buddy: {1} is online: {2}",
+									 new Object[] { session.getJID(), buddy, isOnline } );
+				}
 				result = result && false;
 			}
 		}
 		if (skipOfflineSys) {
 			TigaseRuntime runtime = TigaseRuntime.getTigaseRuntime();
+			boolean isJidOnline = runtime.isJidOnline( buddy );
 
-			if (runtime.hasCompleteJidsInfo() && session.isLocalDomain(buddy.getDomain(),
-					false) &&!runtime.isJidOnline(buddy)) {
+			if ( runtime.hasCompleteJidsInfo()
+					 && session.isLocalDomain( buddy.getDomain(), false )
+					 && !isJidOnline ){
+				if ( log.isLoggable( Level.FINEST ) ){
+					log.log( Level.FINEST, "{0} | buddy: {1} is online (sys): {2}",
+																 new Object[] { session.getJID(), buddy, isJidOnline } );
+				}
 				result = result && false;
 			}
 		}
