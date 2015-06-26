@@ -122,13 +122,17 @@ public class LoggerTask extends AbstractConfigurableTask {
 	public Form getCurrentConfiguration() {
 		Form f = super.getCurrentConfiguration();
 
-		Field.fieldListSingle("logger#level", levelTreshold.getName(), "Log level threshold",
+		Field.fieldListSingle("levelTreshold", levelTreshold.getName(), "Log level threshold",
 				new String[] { Level.SEVERE.getName(), Level.WARNING.getName(), Level.INFO.getName(), Level.CONFIG.getName(),
 			Level.FINE.getName(), Level.FINER.getName(), Level.FINEST.getName(), Level.ALL.getName() },
 			new String[] { Level.SEVERE.getName(), Level.WARNING.getName(), Level.INFO.getName(), Level.CONFIG.getName(),
 			Level.FINE.getName(), Level.FINER.getName(), Level.FINEST.getName(), Level.ALL.getName() });
 
 		return f;
+	}
+
+	public Level getLevelTreshold() {
+		return levelTreshold;
 	}
 
 	private void registerHandler() {
@@ -159,12 +163,10 @@ public class LoggerTask extends AbstractConfigurableTask {
 		eventBus.fire(event);
 	}
 
-	@Override
-	public void setNewConfiguration(Form form) {
-		Field f = form.get("logger#level");
+	public void setLevelTreshold(String levelTreshold) {
 		boolean reregister = false;
-		if (f != null) {
-			Level v = Level.parse(f.getValue());
+		if (levelTreshold != null) {
+			Level v = Level.parse(levelTreshold);
 			reregister |= !v.equals(this.levelTreshold);
 			this.levelTreshold = v;
 		}
@@ -172,7 +174,13 @@ public class LoggerTask extends AbstractConfigurableTask {
 		if (reregister) {
 			registerHandler();
 		}
+	}
 
+	@Override
+	public void setNewConfiguration(Form form) {
+		Field f = form.get("levelTreshold");
+		if (f != null)
+			setLevelTreshold(f.getValue());
 		super.setNewConfiguration(form);
 	}
 

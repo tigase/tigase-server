@@ -21,24 +21,28 @@ public class LoadCheckerTask extends AbstractConfigurableTimerTask implements In
 
 	public static final String MONITOR_EVENT_NAME = "LoadAverageMonitorEvent";
 
+	private long averageLoadThreshold = 10;
+
 	@Inject
 	private MonitorComponent component;
 
 	@Inject
 	private EventBus eventBus;
 
-	private long maxAverageLoad = 10;
-
 	@Inject
 	private MonitorRuntime runtime;
 
 	private final HashSet<String> triggeredEvents = new HashSet<String>();
 
+	public long getAverageLoadThreshold() {
+		return averageLoadThreshold;
+	}
+
 	@Override
 	public Form getCurrentConfiguration() {
 		Form form = super.getCurrentConfiguration();
 
-		form.addField(Field.fieldTextSingle("maxAverageLoad", String.valueOf(maxAverageLoad),
+		form.addField(Field.fieldTextSingle("averageLoadThreshold", String.valueOf(averageLoadThreshold),
 				"Alarm when AverageLoad is bigger than"));
 
 		return form;
@@ -55,13 +59,13 @@ public class LoadCheckerTask extends AbstractConfigurableTimerTask implements In
 	@Override
 	protected void run() {
 		double curAverageLoad = runtime.getLoadAverage();
-		if (curAverageLoad >= maxAverageLoad) {
+		if (curAverageLoad >= averageLoadThreshold) {
 			Element event = new Element(MONITOR_EVENT_NAME, new String[] { "xmlns" },
 					new String[] { MonitorComponent.EVENTS_XMLNS });
 			event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
 			event.addChild(new Element("hostname", component.getDefHostName().toString()));
 			event.addChild(new Element("averageLoad", Double.toString(curAverageLoad)));
-			event.addChild(new Element("message", "Average Load is higher than " + maxAverageLoad + " and it is equals "
+			event.addChild(new Element("message", "Average Load is higher than " + averageLoadThreshold + " and it is equals "
 					+ Double.toString(curAverageLoad)));
 
 			if (!triggeredEvents.contains(event.getName())) {
@@ -73,11 +77,15 @@ public class LoadCheckerTask extends AbstractConfigurableTimerTask implements In
 		}
 	}
 
+	public void setAverageLoadThreshold(Long averageLoadThreshold) {
+		this.averageLoadThreshold = averageLoadThreshold;
+	}
+
 	@Override
 	public void setNewConfiguration(Form form) {
-		Field tmp = form.get("maxAverageLoad");
+		Field tmp = form.get("averageLoadThreshold");
 		if (tmp != null) {
-			this.maxAverageLoad = Long.parseLong(tmp.getValue());
+			this.averageLoadThreshold = Long.parseLong(tmp.getValue());
 		}
 
 		super.setNewConfiguration(form);

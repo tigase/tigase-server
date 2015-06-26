@@ -80,7 +80,7 @@ public class DiskTask extends AbstractConfigurableTimerTask implements Initializ
 	@Override
 	public Form getCurrentConfiguration() {
 		Form x = super.getCurrentConfiguration();
-		x.addField(Field.fieldTextSingle("disk#usageRatio", "" + threshold, "Disk usage ratio threshold"));
+		x.addField(Field.fieldTextSingle("threshold", "" + threshold, "Disk usage ratio threshold"));
 		return x;
 	}
 
@@ -167,12 +167,16 @@ public class DiskTask extends AbstractConfigurableTimerTask implements Initializ
 
 	@Override
 	public void setNewConfiguration(Form form) {
-		Field diskUsageField = form.get("disk#usageRatio");
+		Field diskUsageField = form.get("threshold");
 		if (diskUsageField != null) {
 			this.threshold = Float.parseFloat(diskUsageField.getValue());
 		}
 
 		super.setNewConfiguration(form);
+	}
+
+	public void setThreshold(Float threshold) {
+		this.threshold = threshold;
 	}
 
 }

@@ -108,14 +108,18 @@ public class CpuTempTask extends AbstractConfigurableTimerTask {
 		}
 	}
 
+	public int getCpuTempThreshold() {
+		return cpuTempThreshold;
+	}
+
 	@Override
 	public Form getCurrentConfiguration() {
 		Form x = super.getCurrentConfiguration();
-		x.addField(Field.fieldTextSingle("N270#cpuTemp", "" + cpuTempThreshold, "CPU Temp threshold"));
+		x.addField(Field.fieldTextSingle("cpuTempThreshold", "" + cpuTempThreshold, "CPU Temp threshold"));
 		// x.addField(Field.fieldTextSingle("N270#cpuTemp", "" +
 		// cpuTempThreshold, "CPU Temp threshold"));
 		return x;
-	}
+	};
 
 	@Override
 	protected void run() {
@@ -138,11 +142,15 @@ public class CpuTempTask extends AbstractConfigurableTimerTask {
 		} else {
 			triggeredEvents.remove(CPU_TEMP_MONITOR_EVENT_NAME);
 		}
-	};
+	}
+
+	public void setCpuTempThreshold(Integer cpuTempThreshold) {
+		this.cpuTempThreshold = cpuTempThreshold;
+	}
 
 	@Override
 	public void setNewConfiguration(Form form) {
-		Field cpuTempField = form.get("N270#cpuTemp");
+		Field cpuTempField = form.get("cpuTempThreshold");
 		if (cpuTempField != null) {
 			this.cpuTempThreshold = Integer.parseInt(cpuTempField.getValue());
 		}

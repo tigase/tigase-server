@@ -29,9 +29,15 @@ public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements 
 	@Inject
 	private EventBus eventBus;
 
-	private int maxHeapMemUsagePercent = 90;
+	/**
+	 * Percent
+	 */
+	private int maxHeapMemUsagePercentThreshold = 90;
 
-	private int maxNonHeapMemUsagePercent = 90;
+	/**
+	 * Percent
+	 */
+	private int maxNonHeapMemUsagePercentThreshold = 90;
 
 	@Inject
 	private MonitorRuntime runtime;
@@ -42,13 +48,21 @@ public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements 
 	public Form getCurrentConfiguration() {
 		Form form = super.getCurrentConfiguration();
 
-		form.addField(Field.fieldTextSingle("maxHeapMemUsage", String.valueOf(maxHeapMemUsagePercent),
+		form.addField(Field.fieldTextSingle("maxHeapMemUsagePercentThreshold", String.valueOf(maxHeapMemUsagePercentThreshold),
 				"Alarm when heap mem usage is bigger than [%]"));
 
-		form.addField(Field.fieldTextSingle("maxNonHeapMemUsage", String.valueOf(maxNonHeapMemUsagePercent),
-				"Alarm when non-heap mem usage is bigger than [%]"));
+		form.addField(Field.fieldTextSingle("maxNonHeapMemUsagePercentThreshold",
+				String.valueOf(maxNonHeapMemUsagePercentThreshold), "Alarm when non-heap mem usage is bigger than [%]"));
 
 		return form;
+	}
+
+	public int getMaxHeapMemUsagePercentThreshold() {
+		return maxHeapMemUsagePercentThreshold;
+	}
+
+	public int getMaxNonHeapMemUsagePercentThreshold() {
+		return maxNonHeapMemUsagePercentThreshold;
 	}
 
 	@Override
@@ -67,7 +81,7 @@ public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements 
 	@Override
 	protected void run() {
 		float curHeapMemUsagePercent = runtime.getHeapMemUsage();
-		if (curHeapMemUsagePercent >= maxHeapMemUsagePercent) {
+		if (curHeapMemUsagePercent >= maxHeapMemUsagePercentThreshold) {
 			Element event = new Element(HEAP_MEMORY_MONITOR_EVENT_NAME, new String[] { "xmlns" },
 					new String[] { MonitorComponent.EVENTS_XMLNS });
 			event.addChild(new Element("hostname", component.getDefHostName().toString()));
@@ -78,7 +92,7 @@ public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements 
 			event.addChild(new Element("nonHeapMemMax", Long.toString(runtime.getNonHeapMemMax())));
 			event.addChild(new Element("nonHeapMemUsed", Long.toString(runtime.getNonHeapMemUsed())));
 			event.addChild(new Element("directMemUsed", Long.toString(runtime.getDirectMemUsed())));
-			event.addChild(new Element("message", "Heap memory usage is higher than " + maxHeapMemUsagePercent
+			event.addChild(new Element("message", "Heap memory usage is higher than " + maxHeapMemUsagePercentThreshold
 					+ " and it equals " + curHeapMemUsagePercent));
 
 			if (!triggeredEvents.contains(event.getName())) {
@@ -90,7 +104,7 @@ public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements 
 		}
 
 		float curNonHeapMemUsagePercent = runtime.getNonHeapMemUsage();
-		if (curNonHeapMemUsagePercent >= maxNonHeapMemUsagePercent) {
+		if (curNonHeapMemUsagePercent >= maxNonHeapMemUsagePercentThreshold) {
 			Element event = new Element(NONHEAP_MEMORY_MONITOR_EVENT_NAME, new String[] { "xmlns" },
 					new String[] { MonitorComponent.EVENTS_XMLNS });
 			event.addChild(new Element("hostname", component.getDefHostName().toString()));
@@ -101,7 +115,7 @@ public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements 
 			event.addChild(new Element("nonHeapMemMax", Long.toString(runtime.getNonHeapMemMax())));
 			event.addChild(new Element("nonHeapMemUsed", Long.toString(runtime.getNonHeapMemUsed())));
 			event.addChild(new Element("directMemUsed", Long.toString(runtime.getDirectMemUsed())));
-			event.addChild(new Element("message", "Non-Heap memory usage is higher than " + maxNonHeapMemUsagePercent
+			event.addChild(new Element("message", "Non-Heap memory usage is higher than " + maxNonHeapMemUsagePercentThreshold
 					+ " and it equals " + curHeapMemUsagePercent));
 
 			if (!triggeredEvents.contains(event.getName())) {
@@ -113,15 +127,23 @@ public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements 
 		}
 	}
 
+	public void setMaxHeapMemUsagePercentThreshold(Integer maxHeapMemUsagePercentThreshold) {
+		this.maxHeapMemUsagePercentThreshold = maxHeapMemUsagePercentThreshold;
+	}
+
+	public void setMaxNonHeapMemUsagePercentThreshold(Integer maxNonHeapMemUsagePercentThreshold) {
+		this.maxNonHeapMemUsagePercentThreshold = maxNonHeapMemUsagePercentThreshold;
+	}
+
 	@Override
 	public void setNewConfiguration(Form form) {
-		Field heapMemUsage = form.get("maxHeapMemUsage");
+		Field heapMemUsage = form.get("maxHeapMemUsagePercentThreshold");
 		if (heapMemUsage != null) {
-			this.maxHeapMemUsagePercent = Integer.parseInt(heapMemUsage.getValue());
+			this.maxHeapMemUsagePercentThreshold = Integer.parseInt(heapMemUsage.getValue());
 		}
-		Field nonHeapMemUsage = form.get("maxNonHeapMemUsage");
+		Field nonHeapMemUsage = form.get("maxNonHeapMemUsagePercentThreshold");
 		if (nonHeapMemUsage != null) {
-			this.maxNonHeapMemUsagePercent = Integer.parseInt(nonHeapMemUsage.getValue());
+			this.maxNonHeapMemUsagePercentThreshold = Integer.parseInt(nonHeapMemUsage.getValue());
 		}
 		super.setNewConfiguration(form);
 	}
