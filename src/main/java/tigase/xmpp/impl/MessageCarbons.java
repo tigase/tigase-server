@@ -194,7 +194,12 @@ public class MessageCarbons
 				} else {
 					skipForkingTo = Collections.singleton(session.getJID());
 				}
-				
+
+				if ( log.isLoggable( Level.FINER ) ){
+					log.log( Level.FINER, "Sending message carbon copy, packet: {0}, resources {1}, skipForkingTo: {2}, session: {3}",
+									 new Object[] { packet, resources, skipForkingTo, session } );
+				}
+
 				for (Map.Entry<JID, Boolean> entry : resources.entrySet()) {
 
 					if (!entry.getValue()) {
