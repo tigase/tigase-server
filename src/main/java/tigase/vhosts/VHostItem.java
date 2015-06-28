@@ -1259,6 +1259,8 @@ public class VHostItem
 			this.data.remove(key);
 		} else {
 			char typeId = DataTypes.typesMap.get(type.cls.getName());
+			if (valueStr.contains(";")) 
+				valueStr = valueStr.replace(';', ',');
 			Object value = (valueStr == null || valueStr.isEmpty()) ? null : DataTypes.decodeValueType(typeId, valueStr);
 			setData(type.getKey(), value);
 		}

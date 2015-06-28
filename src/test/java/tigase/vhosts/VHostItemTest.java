@@ -25,7 +25,9 @@ import tigase.xml.Element;
 import java.util.Arrays;
 
 import junit.framework.TestCase;
+import org.junit.Assert;
 import org.junit.Test;
+import tigase.xmpp.JID;
 
 /**
  *
@@ -107,4 +109,36 @@ public class VHostItemTest extends TestCase {
 
 	}
 
+	public void testInitFromPropertyString() throws TigaseStringprepException {
+		VHostItem item = new VHostItem();
+		JID jid = JID.jidInstanceNS("comp1@example.com");
+		JID notTrusted = JID.jidInstanceNS("not-trusted@example.com");
+		item.initFromPropertyString("example.com:trusted-jids=comp1@example.com");
+		Assert.assertArrayEquals(new JID[] { jid }, item.getTrustedJIDs());
+		Assert.assertTrue(item.isTrustedJID(jid));
+		Assert.assertTrue(item.isTrustedJID(jid.copyWithResource("test")));
+		Assert.assertFalse(item.isTrustedJID(notTrusted));
+		
+		item = new VHostItem();
+		item.initFromPropertyString("example.com:trusted-jids=comp1@example.com,comp2@example.com");
+		Assert.assertArrayEquals(new JID[] { jid, JID.jidInstanceNS("comp2@example.com") }, item.getTrustedJIDs());
+		Assert.assertTrue(item.isTrustedJID(jid));
+		Assert.assertTrue(item.isTrustedJID(jid.copyWithResource("test")));
+		Assert.assertFalse(item.isTrustedJID(notTrusted));
+		
+		item = new VHostItem();
+		item.initFromPropertyString("example.com:trusted-jids=comp1@example.com;comp2@example.com");
+		Assert.assertArrayEquals(new JID[] { jid, JID.jidInstanceNS("comp2@example.com") }, item.getTrustedJIDs());
+		Assert.assertTrue(item.isTrustedJID(jid));
+		Assert.assertTrue(item.isTrustedJID(jid.copyWithResource("test")));
+		Assert.assertFalse(item.isTrustedJID(notTrusted));
+		
+		item = new VHostItem();
+		item.initFromPropertyString("example.com:trusted-jids=example.com");
+		Assert.assertArrayEquals(new JID[] { JID.jidInstanceNS("example.com") }, item.getTrustedJIDs());
+		Assert.assertTrue(item.isTrustedJID(jid));
+		Assert.assertTrue(item.isTrustedJID(jid.copyWithResource("test")));
+		Assert.assertTrue(item.isTrustedJID(notTrusted));		
+	}
+	
 }
