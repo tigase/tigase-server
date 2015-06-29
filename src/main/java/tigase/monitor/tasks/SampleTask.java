@@ -27,6 +27,8 @@ public class SampleTask extends AbstractConfigurableTimerTask {
 		event.addChild(new Element("message", this.message));
 		this.message = "<->";
 		eventBus.fire(event);
+
+		setEnabled(false);
 	}
 
 	@Override
