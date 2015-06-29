@@ -30,8 +30,10 @@ import tigase.vhosts.filter.DomainFilterPolicy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -281,6 +283,9 @@ public class VHostItem
 	/** Field description */
 	public static final String TLS_REQUIRED_LABEL = "TLS required";
 
+	/** Field description */
+	public static final String TRUSTED_JIDS_ATT = "trusted-jids";
+	
 	/**
 	 * Element name to for the VHostItem XML storage.
 	 */
@@ -349,9 +354,31 @@ public class VHostItem
 
 	protected static final Map<String,DataType> dataTypes = new ConcurrentHashMap<String,DataType>();
 	
+	private static JID[] GLOBAL_TRUSTED_JIDS = null;
+	
 	public static void registerData(List<DataType> types) {
 		for (DataType type : types) {
 			dataTypes.put(type.getKey(), type);
+		}
+	}
+	
+	protected static void initGlobalTrustedJids() {
+		String trustedJidsStr = System.getProperty("trusted");
+		if (trustedJidsStr == null || trustedJidsStr.isEmpty())
+			GLOBAL_TRUSTED_JIDS = null;
+		else {
+			Set<JID> trusted = new HashSet<JID>();
+			for (String trustedStr : trustedJidsStr.split(",")) {
+				try { 
+					trusted.add(JID.jidInstance(trustedStr));
+				} catch (TigaseStringprepException ex) {
+					log.log(Level.WARNING, "could not set " + trustedStr + " as trusted JID as it is not valid JID", ex);
+				}
+			}
+			if (trusted.isEmpty())
+				GLOBAL_TRUSTED_JIDS = null;
+			else
+				GLOBAL_TRUSTED_JIDS = trusted.toArray(new JID[trusted.size()]);
 		}
 	}
 	
@@ -360,8 +387,10 @@ public class VHostItem
 		types.add(new DataType(ClientTrustManagerFactory.CA_CERT_PATH, "Client Certificate CA", String.class, null));
 		types.add(new DataType(ClientTrustManagerFactory.CERT_REQUIRED_KEY, "Client Certificate Required", Boolean.class,
 				Boolean.FALSE));
-		types.add(new DataType("trusted-jids", "Trusted JIDs", JID[].class, null));
+		types.add(new DataType(TRUSTED_JIDS_ATT, "Trusted JIDs", JID[].class, null));
 		VHostItem.registerData(types);
+		
+		initGlobalTrustedJids();
 	}
 
 	
@@ -404,6 +433,9 @@ public class VHostItem
 		// will always fail (needed mostly for newly added vhosts).
 		if (s2sSecret == null) {
 			s2sSecret = UUID.randomUUID().toString();
+		}
+		if (GLOBAL_TRUSTED_JIDS != null) {
+			data.put(TRUSTED_JIDS_ATT, GLOBAL_TRUSTED_JIDS);
 		}
 	}
 
@@ -1082,7 +1114,7 @@ public class VHostItem
 	}
 
 	public JID[] getTrustedJIDs() {
-		return getData("trusted-jids");
+		return getData(TRUSTED_JIDS_ATT);
 	}
 	
 	/**
@@ -1371,7 +1403,7 @@ public class VHostItem
 	}
 
 	public void setTrustedJIDs(JID[] trustedJids) {
-		setData("trusted-jids", trustedJids);
+		setData(TRUSTED_JIDS_ATT, trustedJids);
 	}
 	
 	/**
