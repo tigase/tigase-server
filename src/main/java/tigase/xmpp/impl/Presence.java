@@ -228,11 +228,7 @@ public class Presence
 
 		// Probe is always broadcasted with initial presence
 		Element presInit  = session.getPresence();
-		Element presProbe = new Element(PRESENCE_ELEMENT_NAME);
-
-		presProbe.setXMLNS(XMLNS);
-		presProbe.setAttribute("type", StanzaType.probe.toString());
-		presProbe.setAttribute("from", session.getBareJID().toString());
+		Element presProbe = prepareProbe( session );
 
 		JID[] buddies = roster_util.getBuddies(session, SUB_BOTH);
 
@@ -304,6 +300,14 @@ public class Presence
 				}
 			}    // end of for (String buddy: buddies)
 		}      // end of if (buddies == null)
+	}
+
+	private Element prepareProbe( XMPPResourceConnection session ) throws NotAuthorizedException {
+		Element presProbe = new Element(PRESENCE_ELEMENT_NAME);
+		presProbe.setXMLNS(XMLNS);
+		presProbe.setAttribute("type", StanzaType.probe.toString());
+		presProbe.setAttribute("from", session.getBareJID().toString());
+		return presProbe;
 	}
 
 	@Override
@@ -1464,6 +1468,14 @@ public class Presence
 			}
 			roster_util.updateBuddyChange(session, results, roster_util.getBuddyItem(session,
 					packet.getStanzaFrom()));
+
+			Element delay = packet.getElement().getChild( "delay", "urn:xmpp:delay");
+			if (delay != null ) {
+				// offline packet, lets send probe
+				Element presProbe = prepareProbe( session );
+				sendPresence( null, null, packet.getStanzaFrom(), results, presProbe );
+			}
+
 		}
 	}
 
