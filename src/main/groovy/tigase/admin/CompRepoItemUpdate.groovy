@@ -15,9 +15,6 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  *
- * $Rev: $
- * Last modified by $Author: $
- * $Date: $
  */
 
 /*
@@ -29,6 +26,7 @@ Works only for some components which actually use the repository that way.
 AS:Description: Update item configuration
 AS:CommandId: comp-repo-item-update
 AS:Component: vhost-man,ext,basic-conf
+AS:ComponentClass: tigase.server.ext.ComponentProtocol
  */
 
 package tigase.admin

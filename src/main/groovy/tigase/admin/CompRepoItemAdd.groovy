@@ -29,6 +29,7 @@ Works only for some components which actually use the repository that way.
 AS:Description: Add new item
 AS:CommandId: comp-repo-item-add
 AS:Component: vhost-man,ext
+AS:ComponentClass: tigase.server.ext.ComponentProtocol
  */
 
 package tigase.admin
