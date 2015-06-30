@@ -250,6 +250,8 @@ public class MessageRouterConfig {
 			}
 		}
 		Arrays.sort(rcv_names);
+		log.log(Level.CONFIG, "Configured type: {0}, loading components: {1}",
+													new Object[] {config_type, Arrays.asList( rcv_names )});
 
 		// Now init defaults for all extra components:
 		for (String key : params.keySet()) {

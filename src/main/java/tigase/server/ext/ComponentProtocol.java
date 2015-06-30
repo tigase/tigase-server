@@ -382,8 +382,7 @@ public class ComponentProtocol
 
 		while ((p = packets.poll()) != null) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Processing socket: {0}, data: {0}", new Object[] { serv,
-						p });
+				log.log(Level.FINEST, "Processing socket data: {0}, from socket: {1}", new Object[] { p, serv });
 			}
 
 			boolean processed = false;
@@ -753,7 +752,7 @@ public class ComponentProtocol
 			// connection
 			if (result == null) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("LB could not select connection, trying traditional way");
+					log.finest("LB could not select connection, or there is only one connection, trying traditional way");
 				}
 				for (ComponentConnection componentConnection : conns) {
 					ComponentIOService serv = componentConnection.getService();
