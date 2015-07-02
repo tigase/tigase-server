@@ -88,15 +88,6 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 	}
 
 	@Override
-	public synchronized void everySecond() {
-		super.everySecond();
-
-		Element event = new Element("CurrentTime", new String[] { "xmlns" }, new String[] { "tigase:events" });
-		event.addChild(new Element("time", (new Date()).toString()));
-		context.getEventBus().fire(event);
-	}
-
-	@Override
 	public String getComponentVersion() {
 		String version = this.getClass().getPackage().getImplementationVersion();
 		return version == null ? "0.0.0" : version;

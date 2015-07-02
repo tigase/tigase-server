@@ -1,7 +1,6 @@
 package tigase.monitor.tasks;
 
-import java.util.Date;
-import java.util.HashSet;
+import tigase.server.monitor.MonitorRuntime;
 
 import tigase.disteventbus.EventBus;
 import tigase.form.Field;
@@ -10,9 +9,11 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.monitor.InfoTask;
 import tigase.monitor.MonitorComponent;
-import tigase.server.monitor.MonitorRuntime;
 import tigase.util.DateTimeFormatter;
 import tigase.xml.Element;
+
+import java.util.Date;
+import java.util.HashSet;
 
 @Bean(name = "memory-checker-task")
 public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements InfoTask {
@@ -70,9 +71,13 @@ public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements 
 		Form result = new Form("", "Memory Information", "");
 		result.addField(Field.fieldTextSingle("heapMemMax", Long.toString(runtime.getHeapMemMax()), "Heap Memory Max"));
 		result.addField(Field.fieldTextSingle("heapMemUsed", Long.toString(runtime.getHeapMemUsed()), "Heap Memory Used"));
+		result.addField(Field.fieldTextSingle("heapMemUsedPercentage", Float.toString(runtime.getHeapMemUsage()),
+																																"Heap Memory Used [%]"));
 		result.addField(Field.fieldTextSingle("nonHeapMemMax", Long.toString(runtime.getNonHeapMemMax()), "Non-Heap Memory Max"));
 		result.addField(Field.fieldTextSingle("nonHeapMemUsed", Long.toString(runtime.getNonHeapMemUsed()),
 				"Non-Heap Memory Used"));
+		result.addField(Field.fieldTextSingle("nonHeapMemUsedPercentage", Float.toString(runtime.getNonHeapMemUsage()),
+				"Non-Heap Memory Used [%]"));
 		result.addField(Field.fieldTextSingle("directMemUsed", Long.toString(runtime.getDirectMemUsed()), "Direct Memory Used"));
 
 		return result;

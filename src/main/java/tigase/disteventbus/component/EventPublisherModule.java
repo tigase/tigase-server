@@ -1,18 +1,20 @@
 package tigase.disteventbus.component;
 
-import java.util.Collection;
-import java.util.logging.Level;
+import tigase.server.Packet;
+import tigase.server.Permissions;
+
+import tigase.xmpp.JID;
 
 import tigase.component.exceptions.ComponentException;
 import tigase.criteria.Criteria;
 import tigase.disteventbus.EventHandler;
 import tigase.disteventbus.component.stores.Subscription;
 import tigase.disteventbus.impl.LocalEventBus.LocalEventBusListener;
-import tigase.server.Packet;
-import tigase.server.Permissions;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
-import tigase.xmpp.JID;
+
+import java.util.Collection;
+import java.util.logging.Level;
 
 public class EventPublisherModule extends AbstractEventBusModule {
 
@@ -86,8 +88,9 @@ public class EventPublisherModule extends AbstractEventBusModule {
 			itemElem.addChild(event);
 			itemsElem.addChild(itemElem);
 
-			if (log.isLoggable(Level.FINER))
-				log.finer("Sending event (" + name + ", " + xmlns + ") to " + subscribers);
+			if ( log.isLoggable( Level.FINER ) ){
+				log.log( Level.FINER, "Sending event ({0}, {1}, {2}) to {3}", new Object[] {name, xmlns, event, subscribers });
+			}
 
 			for (Subscription subscriber : subscribers) {
 
