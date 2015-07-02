@@ -133,7 +133,7 @@ public class MonitorComponent extends AbstractComponent<MonitorContext> {
 			ComponentRepository<TaskConfigItem> repo_tmp = (ComponentRepository<TaskConfigItem>) Class.forName(repoClass).newInstance();
 
 			repo_tmp.setProperties(props);
-			log.warning(repo_tmp.toString());
+			log.log(Level.WARNING, "Monitoring Tasks: {0} with items: {1}", new Object[] {repo_tmp, repo_tmp.toString()});
 			repo_tmp.reload();
 
 			kernel.registerBean("tasksRepo").asInstance(repo_tmp).exec();

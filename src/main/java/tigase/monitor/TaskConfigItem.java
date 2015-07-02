@@ -7,6 +7,14 @@ import tigase.xml.Element;
 
 public class TaskConfigItem extends RepositoryItemAbstract implements Comparable<TaskConfigItem> {
 
+	@Override
+	public String toString() {
+		return "taskName=" + taskName
+					 + ", taskClass=" + taskClass
+					 + ", type=" + type
+					 + ", configuration=" + configuration;
+	}
+
 	public static enum Type {
 		scriptTask,
 		scriptTimerTask,
