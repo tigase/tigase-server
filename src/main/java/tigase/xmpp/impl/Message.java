@@ -290,7 +290,7 @@ public class Message
 
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
-		boolean result = C2SDeliveryErrorProcessor.preProcess(packet, session, repo, results, settings);
+		boolean result = C2SDeliveryErrorProcessor.preProcess(packet, session, repo, results, settings, this);
 		if (result) {
 			packet.processedBy(id());
 		}

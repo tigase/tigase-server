@@ -22,14 +22,19 @@
 
 package tigase.xmpp.impl;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.JID;
+import tigase.xmpp.NoConnectionIdException;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
 
@@ -45,6 +50,14 @@ public class C2SDeliveryErrorProcessor {
 	
 	public static final String ELEM_NAME = "delivery-error";
 	public static final String XMLNS = "http://tigase.org/delivery-error";
+	private static final String[] DELAY_PATH = { Message.ELEM_NAME, "delay" };
+	
+	private static final SimpleDateFormat formatter;
+	
+	static {
+		formatter = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" );
+		formatter.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+	}		
 	
 	/**
 	 * Filters packets created by processors to remove delivery-error payload
@@ -84,7 +97,7 @@ public class C2SDeliveryErrorProcessor {
 	 * @return 
 	 */
 	public static boolean preProcess(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, 
-			Queue<Packet> results, Map<String, Object> settings) {
+			Queue<Packet> results, Map<String, Object> settings, Message messageProcessor) {
 		if (packet.getElemName() != tigase.server.Message.ELEM_NAME)
 			return false;
 
@@ -95,9 +108,55 @@ public class C2SDeliveryErrorProcessor {
 			// We should ignore messages sent to bare jid if message contains delivery-error 
 			// payload and other connection is currently active - this is needed to reduce
 			// issues related to duplication of messages
-			return (packet.getStanzaTo() != null && packet.getStanzaTo().getResource() == null 
-					&& session != null && !session.getActiveSessions().isEmpty());
+			// This would be better if we would check if there is any active session but also
+			// if there was any active session then message was processed!
+			if (packet.getStanzaTo() != null && packet.getStanzaTo().getResource() == null && session != null) {
+				if (packet.getElemName() != Message.ELEM_NAME)
+					return true;
+				
+				List<XMPPResourceConnection> sessionsForMessageDelivery = messageProcessor.getConnectionsForMessageDelivery(session);
+				
+				if (sessionsForMessageDelivery.isEmpty())
+					return false;
+				
+				// we need to get last delay element as last one contains info from StreamManagement about delivery time
+				List<Element> delays = packet.getElement().findChildren((Element e) -> e.getName() == "delay" && e.getXMLNS() == "urn:xmpp:delay");
+				if (delays.isEmpty())
+					return true;
+				
+				String delay = delays.get(delays.size() - 1).getAttributeStaticStr("stamp");
+				if (delay == null)
+					return true;
+				
+				// maybe we should forward data to only active sessions which were not available at this point??
+				// how to get time of error? or maybe original time of message? timestamp might be slow while 
+				// in other case we might get issues with servers in other timezones!
+				long time = formatter.parse(delay).getTime();
+				
+				for (XMPPResourceConnection conn : sessionsForMessageDelivery) {
+					if (conn.getCreationTime() <= time)
+						continue;
+					
+					Packet result = packet.copyElementOnly();
+					result.setPacketFrom(packet.getPacketTo());
+					result.setPacketTo(conn.getConnectionId());
+					results.offer(result);
+				}
+				return true;
+			}
+			
+			return false;
 		} catch (NotAuthorizedException ex) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("NotAuthorizedException while processing undelivered message from "
+					+ "C2S, packet = " + packet);
+			}
+		} catch (NoConnectionIdException ex) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("NotAuthorizedException while processing undelivered message from "
+					+ "C2S, packet = " + packet);
+			}
+		} catch (ParseException ex) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("NotAuthorizedException while processing undelivered message from "
 					+ "C2S, packet = " + packet);

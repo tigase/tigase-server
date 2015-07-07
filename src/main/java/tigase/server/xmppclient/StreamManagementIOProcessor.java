@@ -22,10 +22,13 @@
 package tigase.server.xmppclient;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -34,6 +37,7 @@ import tigase.net.IOServiceListener;
 import tigase.net.SocketThread;
 import tigase.server.Command;
 import tigase.server.ConnectionManager;
+import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.util.TimerTask;
 import tigase.xml.Element;
@@ -70,6 +74,8 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 	// various strings used as key to store data in maps
 	private static final String ACK_REQUEST_COUNT_KEY = "ack-request-count";
 	private static final int DEF_ACK_REQUEST_COUNT_VAL = 10;
+	private static final String[] DELAY_PATH = { Message.ELEM_NAME, "delay" };
+	private static final String DELAY_XMLNS = "urn:xmpp:delay";
 	private static final String INGORE_UNDELIVERED_PRESENCE_KEY = "ignore-undelivered-presence";
 	private static final String IN_COUNTER_KEY = XMLNS + "_in";
 	private static final String MAX_RESUMPTION_TIMEOUT_KEY = XMLNS + "_resumption-timeout";
@@ -82,6 +88,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 	private static final Element[] FEATURES = { new Element("sm", new String[] { "xmlns" },
 			new String[] { XMLNS }) };
 	
+	private static final SimpleDateFormat formatter;
 	private final ConcurrentHashMap<String,XMPPIOService> services = new ConcurrentHashMap<String,XMPPIOService>();
 	
 	private boolean ignoreUndeliveredPresence = true;
@@ -89,7 +96,12 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 	private int ack_request_count = DEF_ACK_REQUEST_COUNT_VAL;
 	
 	private ConnectionManager connectionManager;
-			
+		
+	static {
+		formatter = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" );
+		formatter.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+	}	
+	
 	/**
 	 * Method returns true if XMPPIOService has enabled SM.
 	 * 
@@ -639,6 +651,18 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		public void append(Packet packet) {
 			if (!packet.wasProcessedBy(XMLNS)) {
 				packet.processedBy(XMLNS);
+				// add delay to message if not does not have one
+				// what about sessions without resumption? do we need this there?
+				if (!packet.isXMLNSStaticStr(DELAY_PATH, DELAY_XMLNS)) {
+					String stamp = null;
+					synchronized (formatter) {
+						stamp = formatter.format(new Date());
+					}
+					String from = packet.getStanzaTo() != null ? packet.getStanzaTo().getDomain() : packet.getPacketTo().getDomain();
+					Element x = new Element( "delay", new String[] {
+						"from", "stamp", "xmlns" }, new String[] { from, stamp, "urn:xmpp:delay" } );
+					packet.getElement().addChild(x);
+				}
 				queue.offer(packet);
 				inc();
 			}

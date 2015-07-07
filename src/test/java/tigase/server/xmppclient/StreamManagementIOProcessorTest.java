@@ -1,8 +1,8 @@
 /*
- * ClientConnectionManager.java
+ * StreamManagementIOProcessorTest.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
+ * Copyright (C) 2004-2015 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -50,8 +50,8 @@ public class StreamManagementIOProcessorTest extends TestCase {
 		
 		for (int i=start; i<=Integer.MAX_VALUE && i > 0; i++) {
 			try {
-				Packet p = Packet.packetInstance(new Element("message", new String[] { "id" },
-						new String[] { String.valueOf(i) }));
+				Packet p = Packet.packetInstance(new Element("message", new String[] { "id", "from", "to" },
+						new String[] { String.valueOf(i), "from@example.com", "to@example.com" }));
 				queue.append(p);
 			} catch (TigaseStringprepException ex) {
 				Logger.getLogger(StreamManagementIOProcessorTest.class.getName()).log(Level.SEVERE, null, ex);
@@ -74,8 +74,8 @@ public class StreamManagementIOProcessorTest extends TestCase {
 		
 		for (int i=start; i<=Integer.MAX_VALUE && i > 0; i++) {
 			try {
-				Packet p = Packet.packetInstance(new Element("message", new String[] { "id" },
-						new String[] { String.valueOf(i) }));
+				Packet p = Packet.packetInstance(new Element("message", new String[] { "id", "from", "to" },
+						new String[] { String.valueOf(i), "from@example.com", "to@example.com" }));
 				queue.append(p);
 			} catch (TigaseStringprepException ex) {
 				Logger.getLogger(StreamManagementIOProcessorTest.class.getName()).log(Level.SEVERE, null, ex);
@@ -84,8 +84,8 @@ public class StreamManagementIOProcessorTest extends TestCase {
 
 		for (int i=0; i<3; i++) {
 			try {
-				Packet p = Packet.packetInstance(new Element("message", new String[] { "id" },
-						new String[] { String.valueOf(i) }));
+				Packet p = Packet.packetInstance(new Element("message", new String[] { "id", "from", "to" },
+						new String[] { String.valueOf(i), "from@example.com", "to@example.com" }));
 				queue.append(p);
 			} catch (TigaseStringprepException ex) {
 				Logger.getLogger(StreamManagementIOProcessorTest.class.getName()).log(Level.SEVERE, null, ex);
