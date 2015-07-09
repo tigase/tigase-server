@@ -1,0 +1,19 @@
+[[configuration]]
+Configuration
+=============
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 12:28
+:revision: 2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+The main and actually the only configuration for the Tigase server is kept in the XML file. Let's call it *tigase.xml* for further discussion.
+
+When the user tries to setup the client for the first time he comes across 2 other configuration files: *tigase.conf* and *init.properties* which might be confusing. Here is a brief explanation what all those files are about and in other sections you can learn all the details needed to configure the server.
+
+. xref:tigasexmlconfig[Tigase.xml] is the only Tigase server configuration file. It stores all the runtime settings and if it is missing the server generates a new file with whole configuration with some default settings + settings read from the *init.properties* file. You may edit the file manually to adjust settings but this is not recommended as manual editing the XML is error prone. Another way of changing this file and changing the configuration is to use ad-hoc commands which allow you to modify configuration at run-time and cause updating the XML file too. Ad-hoc commands method is not polished yet thus it is also not recommended. The safest way to tweak server runtime parameters is to put them in the init.properties file.
+. xref:initPropertiesGuide[init.properties] file is a simple text file with server parameters in form: *key* = *value*. When the XML configuration file is missing the Tigase server reads *init.properties* file and uses parameters found there as defaults for generation of the XML file. Therefore if you change the *init.properties* file you normally have to stop the server, remove the XML file and start the server again. All the settings from the *init.properties* are read and applied to the XML configuration. The properties file is easy to read and very safe to modify. At the moment this is the recommended way change the server configuration.
+. ////<<genericTigaseConf,////tigase.conf is the Tigase server startup configuration. It is actually not used by the server itself. It rather contains operating system settings and environment parameters to correctly run the link:http://java.sun.com/[Java Virtual Machine]. It is only useful on the unix-like systems with Bash shell. If you run the server on MS Windows systems *tigase.bat* and *wrapper.conf* files are used instead. The *tigase.conf* file is read and loaded by the *scripts/tigase.sh* shell script which also scans the operating system environment for Java VM and other tools needed.

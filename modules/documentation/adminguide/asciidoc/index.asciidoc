@@ -12,176 +12,262 @@ v7.0.0
 
 :no author:
 
-include::text/Admin_Guide_01_-_Scripting_Support_in_Tigase.asciidoc[]
+include::text/Admin_Guide_01_-_About_Tigase_Jabber_XMPP_Server.asciidoc[]
 
-include::text/Admin_Guide_02_-_Scripting_Support_in_Tigase_-_A_-_Scripting_Introduction_-_Hello_World.asciidoc[]
+include::text/Admin_Guide_02_-_Quick_Start.asciidoc[]
 
-include::text/Admin_Guide_03_-_Scripting_Support_in_Tigase_-_B_-_Tigase_Scripting_Version_4.4.x_Update_for_Administrators.asciidoc[]
+:leveloffset: 2
 
-include::text/Admin_Guide_04_-_Scripting_Support_in_Tigase_-_C_-_Tigase_and_Python.asciidoc[]
+include::text/Admin_Guide_03_-_Quick_Start_-_A_-_Installation_Using_GUI_Installer.asciidoc[]
 
-include::text/Admin_Guide_05_-_About_Tigase_Jabber_XMPP_Server.asciidoc[]
+include::text/Admin_Guide_04_-_Quick_Start_-_B_-_Installing_Using_Console_Installer.asciidoc[]
 
-include::text/Admin_Guide_06_-_Quick_Start.asciidoc[]
+include::text/Admin_Guide_05_-_Quick_Start_-_C_-_Manual_Installation_in_Console_Mode.asciidoc[]
 
-include::text/Admin_Guide_07_-_Quick_Start_-_A_-_Installation_Using_GUI_Installer.asciidoc[]
+include::text/Admin_Guide_06_-_Quick_Start_-_D_-_Installation_Using_Web_Installer.asciidoc[]
 
-include::text/Admin_Guide_08_-_Quick_Start_-_B_-_Installing_Using_Console_Installer.asciidoc[]
+include::text/Admin_Guide_07_-_Quick_Start_-_E_-_Tigase_Server_Binary_Updates.asciidoc[]
 
-include::text/Admin_Guide_09_-_Quick_Start_-_C_-_Manual_Installation_in_Console_Mode.asciidoc[]
+:leveloffset: 1
 
-include::text/Admin_Guide_10_-_Quick_Start_-_D_-_Tigase_Server_Binary_Updates.asciidoc[]
+include::text/Admin_Guide_08_-_Configuration.asciidoc[]
 
-include::text/Admin_Guide_90_-_Quick_Start_-_E_-_Installation_Using_Web_Installer.asciidoc[]
+:leveloffset: 2
 
-include::text/Admin_Guide_11_-_Tigase_Server_and_Multiple_Databases.asciidoc[]
+include::text/Admin_Guide_09_-_Configuration_-_A_-_XML_Configuration_File_Description.asciidoc[]
 
-include::text/Admin_Guide_12_-_Basic_System_Checks.asciidoc[]
+include::text/Admin_Guide_10_-_Configuration_-_B_-_Tigase_XMPP_Server_Configuration_Properties.asciidoc[]
 
-include::text/Admin_Guide_13_-_Linux_Settings_for_High_Load_Systems.asciidoc[]
+include::text/Admin_Guide_11_-_Configuration_-_C_-_init.properties.asciidoc[]
 
-include::text/Admin_Guide_14_-_Generic_Documents.asciidoc[]
+include::text/Admin_Guide_12_-_Configuration_-_D_-_Server_Certificates.asciidoc[]
 
-include::text/Admin_Guide_15_-_Generic_Documents_-_A_-_Configuration.asciidoc[]
+include::text/Admin_Guide_13_-_Configuration_-_D_-_Server_Certificates_-_1_-_Creating_and_Loading_the_Server_Certificate_in_PEM_Files
 
-include::text/Admin_Guide_16_-_Generic_Documents_-_A_-_Configuration_-_1_-_Tigase_XMPP_Server_Configuration_Properties.asciidoc[]
+include::text/Admin_Guide_14_-_Configuration_-_D_-_Server_Certificates_-_2_-_Installing_StartCom_Certificate_in_your_Linux_System.asciidoc[]
 
-include::text/Admin_Guide_17_-_Generic_Documents_-_A_-_Configuration_-_2_-_init.properties.asciidoc[]
+include::text/Admin_Guide_15_-_Configuration_-_D_-_Server_Certificates_-_3_-_Server_Certificate_Using_Keytool_and_Keystore.asciidoc[]
 
-include::text/Admin_Guide_18_-_Generic_Documents_-_A_-_Configuration_-_3_-_XML_Configuration_File_Description.asciidoc[]
+include::text/Admin_Guide_16_-_Configuration_-_E_-_Old_Way_-_Editing_Configuration_File_Manually
 
-include::text/Admin_Guide_19_-_Generic_Documents_-_A_-_Configuration_-_4_-_Old_Way_-_Editing_Configuration_File_Manually.asciidoc[]
+include::text\Admin_Guide_17_-_Configuration_-_F_-_Startup_Files_tigase.sh_and_tigase.asciidoc[]
 
-include::text/Admin_Guide_20_-_Generic_Documents_-_A_-_Configuration_-_5_-_Startup_Files_tigase.sh_and_tigase.conf.asciidoc[]
+include::text/Admin_Guide_18_-_Configuration_-_G_-_Tigase_and_PyMSN-t_Transport.asciidoc[]
 
-include::text/Admin_Guide_21_-_Generic_Documents_-_B_-_Server_Certificates.asciidoc[]
+include::text/Admin_Guide_19_-_Configuration_-_H_-_Two_or_more_SessionManagers.asciidoc[]
 
-include::text/Admin_Guide_22_-_Generic_Documents_-_B_-_Server_Certificates_-_1_-_Creating_and_Loading_the_Server_Certificate_in_PEM_Files.asciidoc[]
+include::text/Admin_Guide_20_-_Configuration_-_I_-_Linux_Settings_for_High_Load_Systems.asciidoc[]
 
-include::text/Admin_Guide_23_-_Generic_Documents_-_B_-_Server_Certificates_-_2_-_Installing_StartCom_Certificate_in_your_Linux_System.asciidoc[]
+:leveloffset: 1
 
-include::text/Admin_Guide_24_-_Generic_Documents_-_B_-_Server_Certificates_-_3_-_Server_Certificate_Using_Keytool_and_Keystore.asciidoc[]
+include::text/Admin_Guide_21_-_Database_Preparation.asciidoc[]
 
-include::text/Admin_Guide_25_-_Generic_Documents_-_C_-_Tigase_and_PyMSN-t_Transport.asciidoc[]
+:leveloffset: 2
 
-include::text/Admin_Guide_26_-_Generic_Documents_-_D_-_Two_or_more_SessionManagers.asciidoc[]
+include::text/Admin_Guide_22_-_Database_Preparation_-_A_-_Prepare_the_MySQL_Database_for_Tigase_Server.asciidoc[]
 
-include::text/Admin_Guide_27_-_Generic_Documents_-_E_-_Database_Preparation.asciidoc[]
+include::text/Admin_Guide_23_-_Database_Preparation_-_B_-_Hashed_User_Passwords_in_Database.asciidoc[]
 
-include::text/Admin_Guide_28_-_Generic_Documents_-_E_-_Database_Preparation_-_1_-_Prepare_the_MySQL_Database_for_Tigase_Server.asciidoc[]
+include::text/Admin_Guide_24_-_Database_Preparation_-_C_-_Prepare_the_Derby_Database_for_Tigase_Server.asciidoc[]
 
-include::text/Admin_Guide_29_-_Generic_Documents_-_E_-_Database_Preparation_-_2_-_Hashed_User_Passwords_in_Database.asciidoc[]
+include::text/Admin_Guide_25_-_Database_Preparation_-_D_-_Prepare_the_MS_SQL_Server_Database_for_Tigase_Server.asciidoc[]
 
-include::text/Admin_Guide_30_-_Generic_Documents_-_E_-_Database_Preparation_-_3_-_Prepare_the_Derby_Database_for_Tigase_Server.asciidoc[]
+include::text/Admin_Guide_26_-_Database_Preparation_-_E_-_Prepare_the_PostgreSQL_Database_for_Tigase_Server.asciidoc[]
 
-include::text/Admin_Guide_31_-_Generic_Documents_-_E_-_Database_Preparation_-_4_-_Prepare_the_MS_SQL_Server_Database_for_Tigase_Server.asciidoc[]
+:leveloffset: 1
 
-include::text/Admin_Guide_32_-_Generic_Documents_-_E_-_Database_Preparation_-_5_-_Prepare_the_PostgreSQL_Database_for_Tigase_Server.asciidoc[]
+include::text/Admin_Guide_27_-_Using_Tigase.asciidoc[]
 
-include::text/Admin_Guide_33_-_Generic_Documents_-_F_-_Tigase_Database_Minor_but_Useful_Schema_Change_in_Version_5.1.0.asciidoc[]
+:leveloffset: 2
 
-include::text/Admin_Guide_34_-_Generic_Documents_-_G_-_Tigase_Load_Balancing.asciidoc[]
+include::text/Admin_Guide_28_-_Using_Tigase_-_A_-_Scripting_Support_in_Tigase.asciidoc[]
 
-include::text/Admin_Guide_35_-_Generic_Documents_-_H_-_StanzaSender.asciidoc[]
+:leveloffset: 3
 
-include::text/Admin_Guide_36_-_Generic_Documents_-_I_-_Debugging_Tigase.asciidoc[]
+include::text/Admin_Guide_29_-_Using_Tigase_-_A_-_Scripting_Support_in_Tigase_-_1_-_Scripting_Introduction_-_Hello_World.asciidoc[]
 
-include::text/Admin_Guide_37_-_Generic_Documents_-_J_-_Importing_User_Data.asciidoc[]
+include::text/Admin_Guide_30_-_Using_Tigase_-_A_-_Scripting_Support_in_Tigase_-_2_-_Tigase_Scripting_Version_4.4.x_Update_for_Administrators.asciidoc[]
 
-include::text/Admin_Guide_38_-_Generic_Documents_-_K_-_Drupal_Authentication_Added.asciidoc[]
+include::text/Admin_Guide_31_-_Using_Tigase_-_A_-_Scripting_Support_in_Tigase_-_3_-_Tigase_and_Python.asciidoc[]
 
-include::text/Admin_Guide_39_-_Tigase_Services.asciidoc[]
+:leveloffset: 2
 
-include::text/Admin_Guide_40_-_Tigase_Services_-_A_-_Add_and_Manage_Domain.asciidoc[]
+include::text/Admin_Guide_32_-_Using_Tigase_-_B_-_Database_Management_-_1_-_Tigase_Server_and_Multiple_Databases.asciidoc[]
 
-include::text/Admin_Guide_41_-_Tigase_Services_-_B_-_Presence_Forwarding.asciidoc[]
+include::text/Admin_Guide_33_-_Using_Tigase_-_B_-_Database_Management_-_2_-_Importing_User_Data.asciidoc[]
 
-include::text/Admin_Guide_42_-_Tigase_Services_-_C_-_Register_Own_XMPP_Domain.asciidoc[]
+include::text/Admin_Guide_34_-_Using_Tigase_-_B_-_Database_Management_-_3_-_Tigase_Database_Minor_but_Useful_Schema_Change_in_Version_5.1.asciidoc
 
-include::text/Admin_Guide_43_-_Server_Monitoring.asciidoc[]
+include::text/Admin_Guide_35_-_Using_Tigase_-_B_-_Database_Management_-_4_-_Drupal_Authentication_Added.asciidoc[]
 
-include::text/Admin_Guide_45_-_Tips_and_Tricks.asciidoc[]
+include::text/Admin_Guide_36_-_Using_Tigase_-_C_-_Basic_System_Checks.asciidoc[]
 
-include::text/Admin_Guide_47_-_Tigase_Server_Version_5.x.asciidoc[]
+include::text/Admin_Guide_37_-_Using_Tigase_-_D_-_StanzaSender.asciidoc[]
 
-include::text/Admin_Guide_48_-_Tigase_Server_Version_5.x_-_A_-_Tigase_5.1_Database_Schema_Upgrade.asciidoc[]
+include::text/Admin_Guide_38_-_Using_Tigase_-_E_-_Debugging_Tigase.asciidoc[]
 
-include::text/Admin_Guide_49_-_Tigase_Server_Version_5.x_-_A_-_Tigase_5.1_Database_Schema_Upgrade_-_1_-_Derby_Database_Schema_Upgrade_for_Tigase_5.1.asciidoc[]
+include::text/Admin_Guide_39_-_Using_Tigase_-_F_-_Tigase_Load_Balancing.asciidoc[]
 
-include::text/Admin_Guide_50_-_Tigase_Server_Version_5.x_-_A_-_Tigase_5.1_Database_Schema_Upgrade_-_2_-_MySQL_Database_Schema_Upgrade_for_Tigase_5.1.asciidoc[]
+include::text/Admin_Guide_40_-_Using_Tigase_-_G_-_Tigase_Services.asciidoc[]
 
-include::text/Admin_Guide_51_-_Tigase_Server_Version_5.x_-_A_-_Tigase_5.1_Database_Schema_Upgrade_-_3_-_PostgreSQL_Database_Schema_Upgrade_for_Tigase_5.1.asciidoc[]
+:leveloffset: 3
 
-include::text/Admin_Guide_52_-_Tigase_Server_Version_5.x_-_B_-_Server_Configuration_5.x.asciidoc[]
+include::text/Admin_Guide_41_-_Using_Tigase_-_G_-_Tigase_Services_-_1_-_Add_and_Manage_Domain.asciidoc[]
 
-include::text/Admin_Guide_53_-_Tigase_Server_Version_5.x_-_B_-_Server_Configuration_5.x_-_1_-_Configuration_Changes_in_Tigase_Server_5.x.asciidoc[]
+include::text/Admin_Guide_42_-_Using_Tigase_-_G_-_Tigase_Services_-_2_-_Presence_Forwarding.asciidoc[]
 
-include::text/Admin_Guide_54_-_Tigase_Server_Version_5.x_-_B_-_Server_Configuration_5.x_-_2_-_Advanced_Message_Processing_-_AMP_XEP-0079.asciidoc[]
+include::text/Admin_Guide_43_-_Using_Tigase_-_G_-_Tigase_Services_-_3_-_Register_Own_XMPP_Domain.asciidoc[]
 
-include::text/Admin_Guide_55_-_Tigase_Server_Version_5.x_-_B_-_Server_Configuration_5.x_-_3_-_Configuration_of_SASL_EXTERNAL.asciidoc[]
+:leveloffset: 2
 
-include::text/Admin_Guide_56_-_Tigase_Server_Version_5.x_-_B_-_Server_Configuration_5.x_-_4_-_Server_to_Server_Protocol_Settings.asciidoc[]
+include::text/Admin_Guide_44_-_Using_Tigase_-_H_-_Server_Monitoring.asciidoc[]
 
-include::text/Admin_Guide_57_-_Tigase_Server_Version_4.x.asciidoc[]
+:leveloffset: 3
 
-include::text/Admin_Guide_58_-_Tigase_Server_Version_4.x_-_A_-_MySQL_Database_Schema_Upgrade_for_Tigase_4.0.asciidoc[]
+include::text/Admin_Guide_45_-_Using_Tigase_-_H_-_Server_Monitoring_-_1_-_Setting_up_Remote_Monitoring_in_the_Server.asciidoc[]
 
-include::text/Admin_Guide_59_-_Tigase_Server_Version_4.x_-_B_-_Virtual_Components_for_Cluster_Mode.asciidoc[]
+include::text/Admin_Guide_46_-_Using_Tigase_-_H_-_Server_Monitoring_-_2_-_Retrieving_statistics.asciidoc[]
 
-include::text/Admin_Guide_60_-_Tigase_Server_Version_4.x_-_C_-_External_Component_Configuration.asciidoc[]
+:leveloffset: 2
 
-include::text/Admin_Guide_61_-_Tigase_Server_Version_4.x_-_C_-_External_Component_Configuration_-_1_-_Basic_Configuration_Options_(external_component).asciidoc[]
+include::text/Admin_Guide_47_-_Using_Tigase_-_I_-_Tips_and_Tricks.asciidoc[]
 
-include::text/Admin_Guide_62_-_Tigase_Server_Version_4.x_-_C_-_External_Component_Configuration_-_2_-_Tigase_as_an_External_Component.asciidoc[]
+:leveloffset: 3
 
-include::text/Admin_Guide_63_-_Tigase_Server_Version_4.x_-_C_-_External_Component_Configuration_-_3_-_Load_Balancing_External_Components_in_Cluster_Mode.asciidoc[]
+include::text/Admin_Guide_48_-_Using_Tigase_-_I_-_Tips_and_Tricks_-_1_-_Tigase_Tip_Checking_the_Runtime_Environment.asciidoc[]
 
-include::text/Admin_Guide_64_-_Tigase_Server_Version_4.x_-_D_-_Packet_Filtering.asciidoc[]
+include::text/Admin_Guide_49_-_Using_Tigase_-_I_-_Tips_and_Tricks_-_2_-_Tigase_Tip_Checking_Cluster_Connections.asciidoc[]
 
-include::text/Admin_Guide_66_-_Tigase_Server_Version_4.x_-_E_-_Virtual_Hosts_in_the_Tigase_Server.asciidoc[]
+:leveloffset: 2
 
-include::text/Admin_Guide_67_-_Tigase_Server_Version_4.x_-_E_-_Virtual_Hosts_in_the_Tigase_Server_-_1_-_Specification_for_ad-hoc_Commands_Used_to_Manage_Virtual_Domains.asciidoc[]
+include::text/Admin_Guide_50_-_Using_Tigase_-_J_-_Best_Practices_for_Connecting_From_Web_Browser_to_Tigase_XMPP_Server.asciidoc
 
-include::text/Admin_Guide_68_-_Tigase_Server_Version_4.x_-_F_-_Configuration.asciidoc[]
+:leveloffset: 1
 
-include::text/Admin_Guide_69_-_Tigase_Server_Version_4.x_-_F_-_Configuration_-_1_-_Configuring_Tigase_Server_to_Load_a_Component.asciidoc[]
+include::text/Admin_Guide_51_-_Tigase_Server_Version_5.x.asciidoc[]
 
-include::text/Admin_Guide_70_-_Tigase_Server_Version_4.x_-_F_-_Configuration_-_2_-_Custom_Authentication_Connectors.asciidoc[]
+:leveloffset: 2
 
-include::text/Admin_Guide_71_-_Tigase_Server_Version_4.x_-_F_-_Configuration_-_3_-_Tigase_Custom_Auth_Connector.asciidoc[]
+include::text/Admin_Guide_52_-_Tigase_Server_Version_5.x_-_A_-_Tigase_5.1_Database_Schema_Upgrade.asciidoc[]
 
-include::text/Admin_Guide_72_-_Tigase_Server_Version_4.x_-_F_-_Configuration_-_4_-_LDAP_Authentication_Connector.asciidoc[]
+:leveloffset: 3
 
-include::text/Admin_Guide_73_-_Tigase_Server_Version_4.x_-_F_-_Configuration_-_5_-_Tigase_Auth_Connector.asciidoc[]
+include::text/Admin_Guide_53_-_Tigase_Server_Version_5.x_-_A_-_Tigase_5.1_Database_Schema_Upgrade_-_1_-_Derby_Database_Schema_Upgrade_for_Tigase_5.1.asciidoc[]
 
-include::text/Admin_Guide_74_-_Tigase_Server_Version_3.x.asciidoc[]
+include::text/Admin_Guide_54_-_Tigase_Server_Version_5.x_-_A_-_Tigase_5.1_Database_Schema_Upgrade_-_2_-_MySQL_Database_Schema_Upgrade_for_Tigase_5.1.asciidoc[]
 
-include::text/Admin_Guide_75_-_Tigase_Server_Version_3.x_-_A_-_Connecting_Tigase_Server_to_MySQL_Database.asciidoc[]
+include::text/Admin_Guide_55_-_Tigase_Server_Version_5.x_-_A_-_Tigase_5.1_Database_Schema_Upgrade_-_3_-_PostgreSQL_Database_Schema_Upgrade_for_Tigase_5.1.asciidoc[]
 
-include::text/Admin_Guide_76_-_Tigase_Server_Version_3.x_-_B_-_Integrating_Tigase_Server_with_Drupal.asciidoc[]
+:leveloffset: 2
 
-include::text/Admin_Guide_77_-_Tigase_Server_Version_3.x_-_C_-_Integrating_Tigase_Server_with_LibreSource.asciidoc[]
+include::text/Admin_Guide_56_-_Tigase_Server_Version_5.x_-_B_-_Server_Configuration_5.x.asciidoc[]
 
-include::text/Admin_Guide_78_-_Tigase_Server_Version_3.x_-_D_-_Windows_Installation.asciidoc[]
+:leveloffset: 3
 
-include::text/Admin_Guide_79_-_Tigase_Server_Version_3.x_-_E_-_Configuration.asciidoc[]
+include::text/Admin_Guide_57_-_Tigase_Server_Version_5.x_-_B_-_Server_Configuration_5.x_-_1_-_Configuration_Changes_in_Tigase_Server_5.x.asciidoc[]
 
-include::text/Admin_Guide_80_-_Tigase_Server_Version_3.x_-_E_-_Configuration_-_1_-_Configuration_Wizards.asciidoc[]
+include::text/Admin_Guide_58_-_Tigase_Server_Version_5.x_-_B_-_Server_Configuration_5.x_-_2_-_Advanced_Message_Processing_-_AMP_XEP-0079.asciidoc[]
 
-include::text/Admin_Guide_81_-_Tigase_Server_Version_2.x.asciidoc[]
+include::text/Admin_Guide_59_-_Tigase_Server_Version_5.x_-_B_-_Server_Configuration_5.x_-_3_-_Configuration_of_SASL_EXTERNAL.asciidoc[]
 
-include::text/Admin_Guide_82_-_Tigase_Server_Version_2.x_-_A_-_Installation.asciidoc[]
+include::text/Admin_Guide_60_-_Tigase_Server_Version_5.x_-_B_-_Server_Configuration_5.x_-_4_-_Server_to_Server_Protocol_Settings.asciidoc[]
 
-include::text/Admin_Guide_83_-_Tigase_Server_Version_2.x_-_B_-_MySQL_Database_Use.asciidoc[]
+:leveloffset: 1
 
-include::text/Admin_Guide_84_-_Tigase_Server_Version_2.x_-_C_-_PostgreSQL_Database_Use.asciidoc[]
+include::text/Admin_Guide_61_-_Tigase_Server_Version_4.x.asciidoc[]
 
-include::text/Admin_Guide_85_-_Tigase_Server_Version_2.x_-_D_-_Configuration.asciidoc[]
+:leveloffset: 2
 
-include::text/Admin_Guide_86_-_Tigase_Server_Version_2.x_-_D_-_Configuration_-_1_-_Short_Configuration_Guide.asciidoc[]
+include::text/Admin_Guide_62_-_Tigase_Server_Version_4.x_-_A_-_MySQL_Database_Schema_Upgrade_for_Tigase_4.0.asciidoc[]
 
-include::text/Admin_Guide_87_-_Tigase_Server_Version_2.x_-_E_-_Command_Line_Admin_Tools.asciidoc[]
+include::text/Admin_Guide_63_-_Tigase_Server_Version_4.x_-_B_-_Virtual_Components_for_Cluster_Mode.asciidoc[]
 
-include::text/Admin_Guide_88_-_Tigase_Server_Version_2.x_-_E_-_Command_Line_Admin_Tools_-_1_-_Configuration_Management_Tool.asciidoc[]
+include::text/Admin_Guide_64_-_Tigase_Server_Version_4.x_-_C_-_External_Component_Configuration.asciidoc[]
 
-include::text/Admin_Guide_89_-_Best_Practices_for_Connecting_From_Web_Browser_to_Tigase_XMPP_Server.asciidoc[]
+:leveloffset: 3
+
+include::text/Admin_Guide_65_-_Tigase_Server_Version_4.x_-_C_-_External_Component_Configuration_-_1_-_Basic_Configuration_Options_(external_component).asciidoc[]
+
+include::text/Admin_Guide_66_-_Tigase_Server_Version_4.x_-_C_-_External_Component_Configuration_-_2_-_Tigase_as_External_Component.asciidoc[]
+
+include::text/Admin_Guide_67_-_Tigase_Server_Version_4.x_-_C_-_External_Component_Configuration_-_3_-_Load_Balancing_External_Components_in_Cluster_Mode.asciidoc[]
+
+:leveloffset: 2
+
+include::text\Admin_Guide_68_-_Tigase_Server_Version_4.x_-_D_-_Packet_Filtering.asciidoc[]
+
+:leveloffset: 3
+
+include::text\Admin_Guide_69_-_Tigase_Server_Version_4.x_-_D_-_Packet_Filtering_-_1_-_Domain_Based_Packet_Filtering[]
+
+:leveloffset: 2
+
+include::text/Admin_Guide_70_-_Tigase_Server_Version_4.x_-_E_-_Virtual_Hosts_in_the_Tigase_Server.asciidoc[]
+
+:leveloffset: 3
+
+include::text/Admin_Guide_71_-_Tigase_Server_Version_4.x_-_E_-_Virtual_Hosts_in_the_Tigase_Server_-_1_-_Specification_for_ad-hoc_Commands_Used_to_Manage_Virtual_Domains.asciidoc[]
+
+:leveloffset: 2
+
+include::text/Admin_Guide_72_-_Tigase_Server_Version_4.x_-_F_-_Configuration.asciidoc[]
+
+:leveloffset: 3
+
+include::text/Admin_Guide_73_-_Tigase_Server_Version_4.x_-_F_-_Configuration_-_1_-_Configuring_Tigase_Server_to_Load_a_Component.asciidoc[]
+
+include::text/Admin_Guide_74_-_Tigase_Server_Version_4.x_-_F_-_Configuration_-_2_-_Custom_Authentication_Connectors.asciidoc[]
+
+include::text/Admin_Guide_75_-_Tigase_Server_Version_4.x_-_F_-_Configuration_-_3_-_Tigase_Custom_Auth_Connector.asciidoc[]
+
+include::text/Admin_Guide_76_-_Tigase_Server_Version_4.x_-_F_-_Configuration_-_4_-_LDAP_Authentication_Connector.asciidoc[]
+
+include::text/Admin_Guide_77_-_Tigase_Server_Version_4.x_-_F_-_Configuration_-_5_-_Tigase_Auth_Connector.asciidoc[]
+
+:leveloffset: 1
+
+include::text/Admin_Guide_78_-_Tigase_Server_Version_3.x.asciidoc[]
+
+:leveloffset: 2
+
+include::text/Admin_Guide_79_-_Tigase_Server_Version_3.x_-_A_-_Connecting_Tigase_Server_to_MySQL_Database.asciidoc[]
+
+include::text/Admin_Guide_80_-_Tigase_Server_Version_3.x_-_B_-_Integrating_Tigase_Server_with_Drupal.asciidoc[]
+
+include::text/Admin_Guide_81_-_Tigase_Server_Version_3.x_-_C_-_Integrating_Tigase_Server_with_LibreSource.asciidoc[]
+
+include::text/Admin_Guide_82_-_Tigase_Server_Version_3.x_-_D_-_Windows_Installation.asciidoc[]
+
+include::text/Admin_Guide_83_-_Tigase_Server_Version_3.x_-_E_-_Configuration.asciidoc[]
+
+:leveloffset: 3
+
+include::text/Admin_Guide_84_-_Tigase_Server_Version_3.x_-_E_-_Configuration_-_1_-_Configuration_Wizards.asciidoc[]
+
+:leveloffset: 1
+
+include::text/Admin_Guide_85_-_Tigase_Server_Version_2.x.asciidoc[]
+
+:leveloffset: 2
+
+include::text/Admin_Guide_86_-_Tigase_Server_Version_2.x_-_A_-_Installation.asciidoc[]
+
+include::text/Admin_Guide_87_-_Tigase_Server_Version_2.x_-_B_-_MySQL_Database_Use.asciidoc[]
+
+include::text/Admin_Guide_88_-_Tigase_Server_Version_2.x_-_C_-_PostgreSQL_Database_Use.asciidoc[]
+
+include::text/Admin_Guide_89_-_Tigase_Server_Version_2.x_-_D_-_Configuration.asciidoc[]
+
+:leveloffset: 3
+
+include::text/Admin_Guide_90_-_Tigase_Server_Version_2.x_-_D_-_Configuration_-_1_-_Short_Configuration_Guide.asciidoc[]
+
+:leveloffset: 2
+
+include::text/Admin_Guide_91_-_Tigase_Server_Version_2.x_-_E_-_Command_Line_Tools.asciidoc[]
+
+:leveloffset: 3
+
+include::text/Admin_Guide_92_-_Tigase_Server_Version_2.x_-_E_-_Command_Line_Tools_-_1_-_Configuration_Managament_Tool.asciidoc[]
+
+:leveloffset: 1

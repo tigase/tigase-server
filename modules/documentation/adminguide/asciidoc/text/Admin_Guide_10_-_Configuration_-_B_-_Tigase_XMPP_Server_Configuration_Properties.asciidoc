@@ -1,4 +1,4 @@
-//[[initPropertiesGuide]]
+[[initPropertiesGuide]]
 Tigase XMPP Server Configuration Properties
 ===========================================
 Artur Hefczyc <artur.hefczyc@tigase.net>
@@ -177,4 +177,3 @@ There are a bunch of parameters which have broader meaning than just one propert
 *Property name:* ////<<watchdog_timeout,////--watchdog_timeout
 
 *Property name:* ////<<config-type,////config-type
-

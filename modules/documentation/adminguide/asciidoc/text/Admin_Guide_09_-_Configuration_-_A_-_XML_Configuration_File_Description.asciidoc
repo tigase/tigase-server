@@ -1,4 +1,4 @@
-//[[tigaseXMLconfiguration]]
+[[tigasexmlconfig]]
 XML Configuration File Description
 ==================================
 Artur Hefczyc <artur.hefczyc@tigase.net>
@@ -8,11 +8,11 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 :website: http://tigase.net
 :Date: 2010-04-06 21:18
 
-If you look inside configuration file you can see that this is just normal XML file with a few top-level separate sections. These sections are called components. 
+If you look inside configuration file you can see that this is just normal XML file with a few top-level separate sections. These sections are called components.
 
-This is it. Tigase server consists of components and without components there is no application at all. This is why the only configuration settings you can find there are only under some component level. 
+This is it. Tigase server consists of components and without components there is no application at all. This is why the only configuration settings you can find there are only under some component level.
 
-More precisely top level element in this XML file is called: +&lt;tigase-config/&gt;+ and it doesn't contain any top level configuration settings. 
+More precisely top level element in this XML file is called: +&lt;tigase-config/&gt;+ and it doesn't contain any top level configuration settings.
 
 Under the top level element there are at least 2 or more +&lt;component/&gt;+ elements. Each component can be distinguished from others by it's 'name'. That is, 'name' attribute is mandatory and must be distinct within configuration file. It is just component ID. Each component can be named any way you like it doesn't need to mean anything. It is just easier to manage configuration if you select sensible names.
 
@@ -91,4 +91,3 @@ Example 3:
 -------------------------------------
 
 Detailed description for all possible settings is split to per-component chapter. Please look for particular component description for details.
-

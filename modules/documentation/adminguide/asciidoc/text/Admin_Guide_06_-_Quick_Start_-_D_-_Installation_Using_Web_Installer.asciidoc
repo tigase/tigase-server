@@ -1,12 +1,14 @@
-//[[webInstaller]]
+[[webinstall]]
 Installation Using Web Installer
 ================================
-Eric Dziewa
-v1.0, January 2015: New Web Installer!
+:author: Eric Dziewa
+:version: v1.0, January 2015: New Web Installer!
+:Date: 2015-01-15
+:revision: v1.1
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2015-01-15
 
 When Tigase XMPP Server starts up, it looks for the default configuration file: *etc/init.properties*. If this file has not been modified you can run the web installer. Which will step you through the process of configuring Tigase.
 
@@ -119,5 +121,4 @@ To further fine tune the server you should edit etc/tigase.conf. Ensure *JAVA_HO
 $ scripts/tigase.sh start etc/tigase.conf
 -------------------------------------
 
-Everything should be running smooth at this point. Check the logfiles in logs/ if you experience any problems. 
-
+Everything should be running smooth at this point. Check the logfiles in logs/ if you experience any problems.

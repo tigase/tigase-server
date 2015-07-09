@@ -1,14 +1,16 @@
-//[[manualInstaller]]
+[[manualinstall]]
 Manual Installation in Console Mode
 ===================================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2010-04-06 21:18
 
-Our preferred way to install the Tigase server is using GUI installer and configuration program which comes with one of the binary packages. Please pick up the latest version of the JAR file in our link:http://www.tigase.org/filebrowser/tigase-server[download section].
+Our preferred way to install the Tigase server is using xref:guiinstall[GUI installer] and configuration program which comes with one of the binary packages. Please pick up the latest version of the JAR file in our link:http://www.tigase.org/filebrowser/tigase-server[download section].
 
 In many cases however this is not always possible to use the GUI installer. In many cases you have just an ssh access or even a direct access in console mode only. We are going to provide a text-only installer in one of the next releases but for the time being you can use our binary packages to install the server manually. Please continue reading to learn how to install and setup the server in a few easy steps...
 
@@ -78,7 +80,7 @@ total 8.0K
 -rw-r--r-- 1 333 2008-12-15 22:24 tigase.conf
 -------------------------------------
 
-Small change in the tigase.conf file is needed. Find a line setting correct *JAVA_HOME*:
+A Small change in the tigase.conf file is needed. Find the line setting for *JAVA_HOME*:
 
 [source,sh]
 -------------------------------------
@@ -87,11 +89,11 @@ JAVA_HOME="${JDKPath}"
 
 and replace *$\{JDKPath}* with a path to Java installation on your system.
 
-You need also to edit the init.properties file. It contains initial parameters normally set by the configuration program. As you do the installation manually you have to edit this file yourself. It contains already a few lines:
+You need also to edit the init.properties file. It contains initial parameters normally set by the configuration program. As this is a manual installation, you will have to edit this document yourself. It contains already a few lines:
 
 [source,sh]
 -------------------------------------
- $ cat etc/init.properties 
+ $ cat etc/init.properties
 config-type=--gen-config-def
 --admins=admin@$HOST_NAME
 --virt-hosts = $HOST_NAME
@@ -102,20 +104,20 @@ You have to replace *$HOST_NAME* with a domain name used for your XMPP (Jabber) 
 
 [source,sh]
 -------------------------------------
- $ cat etc/init.properties 
+ $ cat etc/init.properties
 config-type=--gen-config-def
 --admins=admin@jabber.your-great.net
 --virt-hosts = jabber.your-great.net
 --debug=server
 -------------------------------------
 
-You can also use multiple virtual domains if you want. Please have a look at the detailed description for *--virt-hosts* property in the ////<<initPropertiesGuide,////init.properties guide and also more detailed information in the ////<<VHtigaseServerGuide,////Virtual Hosts in the Tigase Server guide.
+You can also use multiple virtual domains if you want. Please have a look at the detailed description for *--virt-hosts* property in the init.properties guide and also more detailed information in the Virtual Hosts section of the Tigase Server guide.
 
-Unfortunately this is not all. You also need to configure connection to the database. First you have to decide what database you want to use: *Derby*, *MySQL* or *PostgreSQL*. Then there are to more properties you have to add to the *init.properties:* *--user-db* and *--user-db-uri.* The first property specifies the database type you use and the second the database connection string. For simplicity let's assume you want to use *Derby* database with files located in directory */var/lib/tigase/derby*. 2 more lines need to be added to the *init.properties* file:
+You will also need to configure connection to the database. First you have to decide what database you want to use: *Derby*, *MySQL* or *PostgreSQL*. Then there are to more properties you have to add to the *init.properties:* *--user-db* and *--user-db-uri.* The first property specifies the database type you use and the second the database connection string. For simplicity let's assume you want to use *Derby* database with files located in directory */var/lib/tigase/derby*. 2 more lines need to be added to the *init.properties* file:
 
 [source,sh]
 -------------------------------------
- $ cat etc/init.properties 
+ $ cat etc/init.properties
 config-type=--gen-config-def
 --admins=admin@jabber.your-great.net
 --virt-hosts = jabber.your-great.net
@@ -136,9 +138,9 @@ Normally the database is prepared for you during the installation process. Now y
  $ ./scripts/db-create-derby.sh /var/lib/tigase/derby
 -------------------------------------
 
-There will be lots of output but if there is no error at the end of the output it means your database has been created and it is ready to use and you are ready to....
+There will be lots of output but if there is no error at the end of the output it means your database has been created and it is ready to use.
 
-There might be filesystem access restrictions for the directory: */var/lib/* and you might want/need to select a different location.
+*NOTE:* There might be filesystem access restrictions for the directory: */var/lib/* and you might want/need to select a different location.
 
 Start the Server
 ----------------
@@ -154,7 +156,7 @@ and you should get the output like this:
 
 [source,sh]
 -------------------------------------
-Starting Tigase: 
+Starting Tigase:
 nohup: redirecting stderr to stdout
 Tigase running pid=18103
 -------------------------------------
@@ -174,7 +176,6 @@ total 40K
 -rw-r--r-- 1   6 2009-02-03 21:48 tigase.pid
 -------------------------------------
 
-2 first files are the most interesting for us: *tigase-console.log* and *tigase.log.0*. The first one contains very limited information and only the most important entries. Have a look inside and check if there are any *WARNING* or *SEVERE* entries. If not everything should be fine.
+The first 2 files are the most interesting for us: *tigase-console.log* and *tigase.log.0*. The first one contains very limited information and only the most important entries. Have a look inside and check if there are any *WARNING* or *SEVERE* entries. If not everything should be fine.
 
 Now you can connect with a Jabber (XMPP) client of your choice. The first thing to do would be registering the first account - the admin account from your init.properties file: admin@jabber.your-great.net. Refer to your client documentation how to register a new account.
-
