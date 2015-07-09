@@ -154,7 +154,7 @@ public class RosterFlat
 			if ( emptyNameAllowed ){
 				relem.setName( "" );
 			} else {
-				if (name.isEmpty()) name = null;
+				if (name != null && name.isEmpty()) name = null;
 				relem.setName( name );
 			}
 
