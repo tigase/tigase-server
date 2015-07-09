@@ -83,7 +83,7 @@ public class DefaultMechanismSelector implements MechanismSelector {
 		if (factory instanceof TigaseSaslServerFactory) {
 			if (!session.getDomain().isAnonymousEnabled() && "ANONYMOUS".equals(mechanismName))
 				return false;
-			if ("EXTERNAL".equals(mechanismName) && isJIDInCertificate(session))
+			if ("EXTERNAL".equals(mechanismName) && !isJIDInCertificate(session))
 				return false;
 			return true;
 		}
