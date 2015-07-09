@@ -1,4 +1,4 @@
-//[[prepareMysql]]
+[[prepareMysql]]
 Prepare the MySQL Database for the Tigase Server
 ================================================
 Artur Hefczyc <artur.hefczyc@tigase.net>
@@ -256,5 +256,4 @@ innodb_lock_wait_timeout = 50
 innodb_thread_concurrency = 16
 -------------------------------------
 
-I am certainly not a database expert nor MySQL expert and I do not pretend to be one. So any comments or suggestions you may have are very welcome and appreciated.  
-
+I am certainly not a database expert nor MySQL expert and I do not pretend to be one. So any comments or suggestions you may have are very welcome and appreciated.
