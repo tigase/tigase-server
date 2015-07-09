@@ -1,13 +1,16 @@
+[[manualediting]]
 Old Way - Editing Configuration File Manually
 =============================================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2010-04-06 21:18
 
-Options you most likely have to change at deployment time are:
+Options you most likely have to change at deployment are:
 
 . *Admin* *accounts* -  account names where all admin messages are sent.
 . *Hostnames* -  real and virtual hostnames your server has to serve for.
@@ -59,7 +62,7 @@ Obviously you can have admin accounts as many as you like:
     <item value="luck%40jabber.example.com"/>
 </entry>
 -------------------------------------
- 
+
 Hostnames
 ---------
 
@@ -109,13 +112,13 @@ In such case users' _JIDs_ on your Jabber server may include any of defined abov
 Your server will accept connections only for domains defined in configuration file.
 
 In majority cases it does not matter whether you leave "*localhost*" or remove it. It is sometimes better to leave it though. So if you are not sure if you can remove it in your environment just leave it as is.
- 
+
 Logs
 ----
 
-Logging mechanism is very flexible in Tigase server. You can adjust separate logging level for each single component. You can also direct loggin to many different destinations like console, file, network socket and so on. Unfortunately it also mean it is a bit complex. The general idea however is quite simple so once you understand it it shouldn't be difficult for you anymore. This guide however describes logging very briefly. Loot at full configuration documentation for detailed explanation.
+The logging mechanism is very flexible in Tigase server. You can adjust separate logging levels for each component. You can also directly login to different destinations like console, file, network socket and so on. Unfortunately that comes with some added complexity. The general idea however is quite simple so once you understand it it shouldn't be difficult for you anymore. This guide however describes logging very briefly. Look at full configuration documentation for detailed explanation.
 
-In standard sever configuration you usually want to turn off all logging to console and all warning and more serious notices directed to log file. Let's say logs will be written to +/var/log/tigase-server.log+ which shouldn't get bigger than 10MB and 5 old logs will be preserved. Here are instructions how to set options.
+In a standard sever configuration you usually want to turn off all logging to console and only have warnings or more serious notices directed to the log file. Let's say logs will be written to +/var/log/tigase-server.log+ which shouldn't get bigger than 10MB and 5 old logs will be preserved. Here are instructions how to set those options.
 
 Open +tigase-config.xml+ in you favorite text editor and search for string: "*logging*". You should find section looking like this:
 
@@ -138,7 +141,7 @@ Open +tigase-config.xml+ in you favorite text editor and search for string: "*lo
 </node>
 -------------------------------------
 
-Assuming we make this guide easy and strightforward let me show how this section should look like after modification. So you could just copy and paste it to your config file without going into details. After the configuration code I will briefly explain what each line means so you should be able to further adjust settings for your needs.
+Assuming we make this guide easy and strightforward let me show how this section should look like after modification. So you could just copy and paste it to your config file without going into details.
 
 [source,bash]
 -------------------------------------
@@ -174,7 +177,7 @@ Effectively we set +WARNING+ level for all possible logs for all possible compon
 <entry value="java.util.logging.ConsoleHandler+java.util.logging.FileHandler" type="String" key="handlers"/>
 -------------------------------------
 
-We set 2 handlers for logging information: console and file handler. As we are going to turn off logging to console we could remove all configuration settings for console handler as well. It would simplify configuration file. I don't recommend it though. If there are any problems with your installation switching console logging on might be very helpful and if you remove these settings from config file it may be difficult to bring them back. Hm... maybe not with such excellent documentation.... ;-)
+We set 2 handlers for logging information: a console and a file handler. If we are going to turn off logging to console we could remove all configuration settings for the console handler as well as it would simplify configuration file. However this is not recommended. If there are any problems with your installation switching console logging on might be very helpful, but if you remove these settings from config file it may be difficult to bring them back without a backup.
 
 [source,bash]
 -------------------------------------
@@ -182,21 +185,21 @@ We set 2 handlers for logging information: console and file handler. As we are g
 <entry value="tigase.util.LogFormatter" type="String" key="java.util.logging.FileHandler.formatter"/>
 -------------------------------------
 
-We set here log formatter for console and file handler. Standard Java handlers print each log message in 2 lines. Tigase formatter prints all logging info in 1 line which make it much easier to filter logs by log type, logging component or log level or whatever you wish. You can just use simple sed command and that's it.
+Here we set the log formatter for console and file handlers. Standard Java handlers print each log message into 2 lines. Tigase formatter prints all logging info in 1 line making it much easier to filter logs by log type, logging component or log level for example. You can just use simple sed command to locate them.
 
 [source,bash]
 -------------------------------------
 <entry value="OFF" type="String" key="java.util.logging.ConsoleHandler.level"/>
 -------------------------------------
 
-Here we just switch console handler off. To switch it on back set any different level from the list above.
+This line switches the console handler off. To switch it on back set it to any different level from the list above.
 
 [source,bash]
 -------------------------------------
 <entry value="true" type="String" key="java.util.logging.FileHandler.append"/>
 -------------------------------------
 
-This settings is to controll whether we want to append logs into old log file or we want to create new log file (removing old content) each time server is restarted.
+This settings is to control whether we want to append logs into old log file or if we want to create new log file (removing the old content) each time server is restarted.
 
 [source,bash]
 -------------------------------------
@@ -210,7 +213,7 @@ Sets number of old log files to preserve to 5.
 <entry value="ALL" type="String" key="java.util.logging.FileHandler.level"/>
 -------------------------------------
 
-This line sets the logging level for file handler. Here we set that we want all possible logs to be written to the file. The global level setting however says that only +WARNING+ logs will be generated. So if you want to have more detailed logs you need to adjust global logging level.
+This line sets the logging level for file handler. By entering ALL, we send all possible logs to the file. The global level setting says however, that only +WARNING+ logs will be generated. So if you want to have more detailed logs you need to adjust global logging level.
 
 [source,bash]
 -------------------------------------
@@ -232,4 +235,3 @@ Location of the log file and file name: +/var/log/tigase-server.log+. Please not
 -------------------------------------
 
 This setting requires going into more details so it is explained in comprehensive configuration guide.
-

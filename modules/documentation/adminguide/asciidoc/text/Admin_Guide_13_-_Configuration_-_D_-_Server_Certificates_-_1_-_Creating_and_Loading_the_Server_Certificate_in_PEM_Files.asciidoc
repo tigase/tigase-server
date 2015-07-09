@@ -1,26 +1,28 @@
-//[[serverCertificatesPEM]]
+[[certspem]]
 Creating and Loading the Server Certificate in pem Files
 ========================================================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:Revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2010-04-06 21:18
 
-Server Certificate
-------------------
+Server Certificates
+-------------------
 
-Server certificate is needed when you use secure socket connections - SSL/TLS.
+Server certificates are needed when you use secure socket connections - SSL/TLS.
 
-For secure socket connection proper certificate is needed. You can either generate your own, self-signed certificate or obtain certificate from trusted third party organization.
+For secure socket connection a proper certificate is needed. You can either generate your own self-signed certificate or obtain certificate from trusted third party organization.
 
 Here are steps how to obtain certificate from a trusted organization.
 
 Certificate Request
 ~~~~~~~~~~~~~~~~~~~
 
-Before you can obtain/generate server certificate you need to have a private key and generate certificate request which contain essential information about you (the entity requesting certificate) and the domain for which you want the certificate.
+Before you can obtain/generate server certificate you need to have a private key and generate a certificate request which contain essential information about you (the entity requesting certificate) and the domain for which you want the certificate.
 
 . Generate the certificate request:
 +
@@ -54,52 +56,52 @@ An optional company name []:
 Certificate From Other Providers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There is number of certificate providers offering certificates either for free or for money. You can use any of them, however you have to be aware that sometimes certificates might not be recognized by all other XMPP servers, especially if this is a new provider. Here is an example list of providers:
+There is number of certificate providers offering certificates either for free or for money. You can use any of them, however you have to be aware that sometimes certificates might not be recognized by all XMPP servers, especially if it's one from a new provider. Here is an example list of providers:
 
 - link:https://www.cacert.org/[CAcert] - free certificates with an excellent Web GUI for managing generated certificates and identities.
 - link:https://www.startssl.com/[StartCom] - both free and paid certificates, class 1, 2 and 3. Very good GUI for managing certificates and identities.
 - link:https://www.verisign.com/[Verisign] - very expensive certificates comparing to above provides but the provider is recognized by everybody. If you have a certificate from Verisign you can be sure it is identified as a valid certificate.
 - link:http://www.comodo.com/business-security/digital-certificates/ssl-certificates.php[Comodo Certificate Authority] offers different kind of commercial certificates
 
-To obtain certificate from such a third party authority you have to go to its Website and request the certificate using certificate request generated above. I can not provide any instructions for this as each of above providers have a different offer and a different user interface.
+To obtain certificate from a third party authority you have to go to its website and request the certificate using certificate request generated above. I cannot provide any instructions for this as each of the providers listed have different requirements and interfaces.
 
 Self-Signed Certificate
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Another option, *highly not recommended* is to use self-signed certificate. Such a certificate won't be recognized by any entity on the Internet but your own. So if any other Jabber server allows for connections only with valid certificate your installation won't be able to connect. On the other hand self-signed certificate is a very good way for testing environment where you can create many artificial domains and you can test your service for supporting many virtual domains. You can generate as many certificates as you want and load them onto your server and play around.
+Another option, *highly not recommended* is to use a self-signed certificate. Such certificates won't be recognized by any entity on the Internet but your own. So if other Jabber servers allows for connections only with valid certificate, your installation will not be able to connect. On the other hand self-signed certificates are a very good way for testing environments where you can create many artificial domains and you can test your service for supporting many virtual domains. You can generate as many certificates as you want and load them onto your server to test and work with.
 
-Tigase, version 5.0.0 and newer automatically generates self-signed certificates for each Virtual Host configured. Alternatively such certificate can be created by hand - just execute following command using the same as above *openssl* tool:
+Tigase, version 5.0.0 and newer automatically generates self-signed certificates for each Virtual Host configured. Alternatively self-signed certificates can be created by hand - just execute following command using the same as above *openssl* tool:
 
 [source,sh]
 -------------------------------------
 openssl x509 -req -days 365 -in yourdomain.com.csr -signkey yourdomain.com.key -out yourdomain.com.crt
 -------------------------------------
 
-You can, of course put there any number of days you like.
+You can, of course use any number of days you like.
 
 Installing/Loading Certificate To the Tigase Server
 ---------------------------------------------------
 
-From the version *3.1.0-b802* of Tigase server installing/loading certificates is very easy. The server can load all certificates directly from *pem* files. You just need to create a separate pem file for each of your virtual domains and put the file in a directory accessible by the server. Tigase server can automatically load all *pem* files found in given directory.
+From version *3.1.0-b802* of Tigase server, installing and loading certificates is very easy. The server can load all certificates directly from *pem* files. You just need to create a separate pem file for each of your virtual domains and put the file in a directory accessible by the server. Tigase server can automatically load all *pem* files found in given directory.
 
 PEM File
 ~~~~~~~~
 
-*PEM* file is a file containing server certificate, certificate private key and certificate chain if it exists. For self-signed certificates there is no certificate chain so creating pem file is very simple:
+A *PEM* file is a file containing server certificate, certificate private key and certificate chain if any exists. For self-signed certificates there is no certificate chain so creating pem file is very simple:
 
 [source,sh]
 -------------------------------------
 cat yourdomain.com.crt yourdomain.com.key > yourdomain.com.pem
 -------------------------------------
 
-If the certificate is issued by third-party authority you have also to attach certificate chain, that is certificate of the authority who has generated your certificate. You normally need to obtain certificates for your chain from the authority who has generated your certificate. For example, of you have a certificate from XMPP federation you need to download link:http://www.startssl.com/certs/ca.pem[StartCom root certificate] and link:http://www.startssl.com/certs/sub.class1.server.ca.pem[intermediate ICA certificate]. In such case pem file is created using following command:
+If the certificate is issued by third-party authority you will have to attach the certificate chain, that being certificate of the authority who has generated your certificate. You normally need to obtain certificates for your chain from the authority who has generated your certificate. For example, if you have a certificate from XMPP federation you need to download link:http://www.startssl.com/certs/ca.pem[StartCom root certificate] *and* link:http://www.startssl.com/certs/sub.class1.server.ca.pem[intermediate ICA certificate]. In such cases the pem file is created using following command:
 
 [source,sh]
 -------------------------------------
 cat yourdomain.com.crt yourdomain.com.key sub.class1.xmpp.ca.crt ca.crt > yourdomain.com.pem
 -------------------------------------
 
-Result file should looks similar to:
+The result file should looks similar to:
 
 [source,sh]
 -------------------------------------
@@ -126,21 +128,21 @@ xV/stleh
 -----END CERTIFICATE-----
 -------------------------------------
 
-For Tigase server and many other servers (Apache 2.x) the order is following: your domain certificate, your private key, authority issuing your certificate, root certificate.
+For Tigase server as well as many other servers (Apache 2.x), the order is following; your domain certificate, your private key, authority issuing your certificate, root certificate.
 
-*Note! Tigase requires full certificate chain in PEM file (described above)! Different applications may require pem file with certificates and private key in different order. So the same file may not be necessarily used by other services like Web server or e-mail server. Currenty Tigase can automatically sort sertificates in PEM file while loading it.*
+*Note! Tigase requires full certificate chain in PEM file (described above)! Different applications may require pem file with certificates and private key in different order. So the same file may not be necessarily used by other services like Web server or e-mail server. Currently, Tigase can automatically sort certificates in PEM file while loading it.*
 
 Tigase Server Configuration
 ---------------------------
 
-Starting from version 5.1.0 and newer it's not needed to use external libraries nor extra configuration in init.properties file. With this version Tigase uses, loaded by default thus no need to configure it, following class:
+Starting from version 5.1.0 and newer it's not needed to use external libraries nor extra configuration in the init.properties file. With this version Tigase uses, loaded by default thus no need to configure it, following class:
 
 [source,bash]
 -------------------------------------
 --ssl-container-class=tigase.io.SSLContextContainer
 -------------------------------------
 
-Older versions require different cofiguration. In order to be able to load server certificates directly from *pem* files you need to have *tigase-extras* package installed in your server *libs/* directory in version at least *0.1.0*. If you use Tigase server binary package other than *mini* this library is included by default. If you haven't changed manually anything in your XML configuration file put following line in your +initial.properties+ file:
+Older versions require different configurations. In order to be able to load server certificates directly from *pem* files you need to have *tigase-extras* package installed in your server *libs/* directory in version at least *0.1.0*. If you use a Tigase server binary package other than *mini*, this library is included by default. If you haven't changed anything in your XML configuration file, put following line in your +initial.properties+ file:
 
 [source,bash]
 -------------------------------------
@@ -149,5 +151,4 @@ Older versions require different cofiguration. In order to be able to load serve
 
 Copy all your *pem* files with certificates into certs/ subdirectory in Tigase server installation, stop the server, remove XML configuration file and start the server. XML configuration will be automatically regenerated with the new SSLContainer used by all components and all certificates will be automatically loaded.
 
-If you have changed your XML configuration file manually and you can not lost those changes you have now to manually change the existing SSLContainer class with the new one. Just replace all occurrences of the default SSLContainer - tigase.io.SSLContextContainer with the new - tigase.extras.io.PEMSSLContextContainer, copy all your *pem* files with certificates into certs/ subdirectory in Tigase server installation and restart the server.  
-
+If you have changed your XML configuration file, and do not want to lose those changes, you will now have to manually change the existing SSLContainer class with the new one. Just replace all occurrences of the default SSLContainer - tigase.io.SSLContextContainer with the new - tigase.extras.io.PEMSSLContextContainer, copy all your *pem* files with certificates into certs/ subdirectory in Tigase server installation and restart the server.

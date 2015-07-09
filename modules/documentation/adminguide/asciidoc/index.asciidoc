@@ -42,7 +42,9 @@ include::text/Admin_Guide_11_-_Configuration_-_C_-_init.properties.asciidoc[]
 
 include::text/Admin_Guide_12_-_Configuration_-_D_-_Server_Certificates.asciidoc[]
 
-include::text/Admin_Guide_13_-_Configuration_-_D_-_Server_Certificates_-_1_-_Creating_and_Loading_the_Server_Certificate_in_PEM_Files
+:leveloffset: 3
+
+include::text/Admin_Guide_13_-_Configuration_-_D_-_Server_Certificates_-_1_-_Creating_and_Loading_the_Server_Certificate_in_PEM_Files.asciidoc[]
 
 include::text/Admin_Guide_14_-_Configuration_-_D_-_Server_Certificates_-_2_-_Installing_StartCom_Certificate_in_your_Linux_System.asciidoc[]
 

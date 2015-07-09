@@ -1,15 +1,18 @@
+[[linuxhighload]]
 Linux Settings for High Load Systems
 ====================================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2010-04-06 21:18
 
-There are a few basic settings you have to adjust for high load systems to make sure the server have enough resources to handle big number of network connections.
+There are a few basic settings you have to adjust for high load systems to make sure the server has enough resources to handle a big number of network connections.
 
-The main parameter is a maximum number of opened files allowed for the process to keep at the same time. Each network connection uses a file handler therefore if the limit is too low you can quickly run out of handlers and the server can not accept any more connections.
+The main parameter is a maximum number of opened files allowed for the process to keep at the same time. Each network connection uses a file handler, therefore if the limit is too low you can quickly run out of handlers and the server can not accept any more connections.
 
 This limit is set on 2 levels - on the kernel level (*fs.file-max*) and on the system level (*nofile*).
 
@@ -18,7 +21,7 @@ Another kernel property which can be important in certain configurations (like t
 fs.file-max
 -----------
 
-The *fs.file-max* kernel property is set via sysctl command. You can see current settings executing command:
+The *fs.file-max* kernel property is set via sysctl command. You can see current settings by executing the command:
 
 [source,sh]
 -------------------------------------
@@ -26,7 +29,7 @@ The *fs.file-max* kernel property is set via sysctl command. You can see current
 fs.file-max = 358920
 -------------------------------------
 
-If you plan to run high load service with big number of server connections then this parameter should be at least as twice big as the number of network connections you expect to support. You can change this setting executing command:
+If you plan to run high load service with large number of server connections, then this parameter should be at least as twice big as the number of network connections you expect to support. You can change this setting by executing the command:
 
 [source,java]
 -------------------------------------
@@ -37,7 +40,7 @@ fs.file-max = 360000
 net.ipv4.ip_local_port_range
 ----------------------------
 
-You can see current settings executing command:
+You can see current settings by executing the command:
 
 [source,sh]
 -------------------------------------
@@ -45,7 +48,7 @@ You can see current settings executing command:
 net.ipv4.ip_local_port_range = 32768	61000
 -------------------------------------
 
-You can change this setting executing command:
+You can change this setting by executing the command:
 
 [source,sh]
 -------------------------------------
@@ -71,7 +74,7 @@ net.ipv4.tcp_keepalive_intvl = 90
 /etc/sysctl.conf
 ----------------
 
-Above commands let the system remember new settings until the next system restart. If you want to make the change permanent you have to edit file: /etc/sysctl.conf and add the property at the end of the file:
+The above commands let the system remember new settings until the next system restart. If you want to make the change permanent you have to edit the file: */etc/sysctl.conf* and add the property at the end of the file:
 
 [source,sh]
 -------------------------------------
@@ -81,14 +84,16 @@ net.ipv4.tcp_keepalive_probes=3
 net.ipv4.tcp_keepalive_intvl=90
 -------------------------------------
 
-It will be automatically loaded next time you start the server. Command:
+It will be automatically loaded next time you start the server.
+
+Command:
 
 [source,sh]
 -------------------------------------
 # sysctl -p
 -------------------------------------
 
-Causes the +/etc/systcl.conf+ to be reloaded which is useful when you added more parameters to the file and don't want to restart the server.
+Causes the +/etc/systcl.conf+ to be reloaded which is useful when you have added more parameters to the file and don't want to restart the server.
 
 nofile
 ------
@@ -114,7 +119,10 @@ virtual memory          (kbytes, -v) unlimited
 file locks                      (-x) unlimited
 -------------------------------------
 
-To make it even more interesting and more complex there are 2 types of system limits: *soft limit* which can be temporarily exceeded by the user and *hard limit* which can not be exceeded. To see your *hard limit* execute command:
+To make it even more interesting and more complex, there are 2 types of system limits:
+*soft limit* which can be temporarily exceeded by the user and
+*hard limit* which can not be exceeded.
+To see your *hard limit* execute command:
 
 [source,sh]
 -------------------------------------
@@ -158,12 +166,11 @@ For those changes to make an effect you have to logout from the modified account
 su and init script
 ------------------
 
-If one intends to use init scripts for startup purposes (or simply wants to be able to start the server utilizing su command it's necessary to adjust PAM configuration by modifying /etc/pam.d/su file and uncomment following line:
+If one intends to use init scripts for startup purposes (or simply wants to be able to start the server utilizing su command) it's necessary to adjust PAM configuration by modifying /etc/pam.d/su file and uncomment following line:
 
 [source,sh]
 -------------------------------------
 session    required   pam_limits.so
 -------------------------------------
 
-Afterwards that init scripts will respect configured limits.    
-
+Afterwards the init scripts will respect configured limits.

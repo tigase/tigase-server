@@ -1,22 +1,24 @@
 [[tigasexmlconfig]]
 XML Configuration File Description
 ==================================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2010-04-06 21:18
 
 If you look inside configuration file you can see that this is just normal XML file with a few top-level separate sections. These sections are called components.
 
-This is it. Tigase server consists of components and without components there is no application at all. This is why the only configuration settings you can find there are only under some component level.
+Tigase server consists of components and without them, there is no application at all. This is why the only configuration settings you can find there are only ones under the component level.
 
-More precisely top level element in this XML file is called: +&lt;tigase-config/&gt;+ and it doesn't contain any top level configuration settings.
+The top level element in this XML file is called: +&lt;tigase-config/&gt;+ and it doesn't contain any top level configuration settings.
 
-Under the top level element there are at least 2 or more +&lt;component/&gt;+ elements. Each component can be distinguished from others by it's 'name'. That is, 'name' attribute is mandatory and must be distinct within configuration file. It is just component ID. Each component can be named any way you like it doesn't need to mean anything. It is just easier to manage configuration if you select sensible names.
+Under the top level element there are at least 2 or more +&lt;component/&gt;+ elements. Each component can be distinguished from others by it's 'name'. That is, the 'name' attribute is mandatory and must be distinct within the configuration file this is the component ID. Each component can be named any way you like, however recommend some sense in naming them so it was easier to keep track of.
 
-+&lt;component/&gt;+ elements keep configuration settings for server modules.
++&lt;component/&gt;+ elements keep the configuration settings for server modules.
 
 Example 1:
 
@@ -35,10 +37,10 @@ Example 1:
 Configuration settings are kept in "simple" maps like structures (key, values, type) triplets.
 
 - *key* is a configuration parameter identifier or a name of the parameter.
-- *values* are just values of the parameter identified by the key. Usually this is just a single value but in some cases there can me more than just one value.
+- *values* are just values of the parameter identified by the key. Usually this is just a single value but can me more than just one.
 - *type* all configuration parameters have a type. In most cases this is just a String. Other possible types are: Boolean, Integer, Long and corresponding array types: +String[]+, +Boolean[]+, +int[]+, +long[]+.
 
-Configuration settings are stored in +&lt;map/&gt;+ element which contains list of +&lt;entry/&gt;+ elements. If there are multiple values for a parameter they are stored as a list of +&lt;item&gt;+ elements.
+Configuration settings are stored in the +&lt;map/&gt;+ element which contains list of +&lt;entry/&gt;+ elements. If there are multiple values for a parameter they are stored as a list of +&lt;item&gt;+ elements.
 
 Example 2:
 
@@ -59,7 +61,7 @@ Example 2:
 </map>
 -------------------------------------
 
-Configuration settings can be organised hierarchically using +&lt;node&gt;+ elements:
+Configuration settings can be organized hierarchically using +&lt;node&gt;+ elements:
 
 Example 3:
 
