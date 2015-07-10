@@ -1,16 +1,18 @@
-//[[newElements]]
+[[newElements]]
 Tigase Scripting Version 4.4.x Update for Administrators
 ========================================================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-01-06 20:18
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2010-01-06 20:18
 
 image:images/tiger-looking-left-small.png[]
 
-Scripting functionality is quite useful in the Tigase server for all sorts of administrator tasks. The possibility to load new scripts or replace old ones at the server runtime opens quite new area for the service maintenance.
+Scripting functionality is quite useful in Tigase server for all sorts of administrator tasks. The possibility to load new scripts or replace old ones at the server runtime opens quite new area for the service maintenance.
 
 In earlier versions of the Tigase server scripting capabilities was available only in the session manager component while it might be very useful in many other places - connection managers, MUC, PubSub, VHostManager and what even more important in completely new, custom components created for specific needs. It would be quite wasteful to reinvent the wheel every time and implementing scripting capabilities for each component separately.
 
@@ -43,4 +45,3 @@ This option is enabled by default as this seems to be a logical choice that the 
 As in previous version only users with administrator permissions can execute commands and access all the critical elements on the server. There has been, however, another change made, long time requested by users. In the new version all the administrator specific elements are hidden for the rest of users.
 
 Server components don't show up on the service discovery, the user can't see administrator commands nor he can execute them. This hasn't been implemented to improve the server security but to reduce confusion for general users who would otherwise see a lot of stuff which can't be used by them anyway.
-

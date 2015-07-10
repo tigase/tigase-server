@@ -1,3 +1,4 @@
+[[multidb]]
 Tigase Server and Multiple Databases
 ====================================
 Artur Hefczyc <artur.hefczyc@tigase.net>
@@ -25,7 +26,7 @@ Typically the well known lines:
 --user-db-uri=jdbc:mysql://db2.tigase/dbname?user&password
 -------------------------------------
 
-Define just a default databases for both user repository and authentication repository. Default means it is used when there is no repository specified for a particular virtual domain. However, you can have a separate, both user and authentication repository for each virtual domain. 
+Define just a default databases for both user repository and authentication repository. Default means it is used when there is no repository specified for a particular virtual domain. However, you can have a separate, both user and authentication repository for each virtual domain.
 
 Here is, how it works:
 
@@ -51,7 +52,7 @@ Here is, how it works:
 # Pretty standard Tigase's definition for the database (repository)
 #  connection string
 --auth-db-uri[domain2.com]=ldap://ldap.domain2.com:389
-# Now is something new, we have a custom authentication repository 
+# Now is something new, we have a custom authentication repository
 # settings for a single domain.
 # Please note how we define the VHost for which we set custom parameters
 basic-conf/auth-repo-params/domain2.com/user-dn-pattern=cn=,ou=,dc=,dc=
@@ -60,13 +61,13 @@ basic-conf/auth-repo-params/domain2.com/user-dn-pattern=cn=,ou=,dc=,dc=
 --user-db-uri[domain2.com]=jdbc:mysql://db2.tigase/dbname?user&password
 
 # Next VHost: domain3.com
-# Again user authentication is in LDAP server but pointing to 
+# Again user authentication is in LDAP server but pointing to
 # a different LDAP server with different access credentials
 --auth-db[domain3.com]=tigase.db.ldap.LdapAuthProvider
 # Pretty standard Tigase's definition for the database
 # (repository) connection string
 --auth-db-uri[domain3.com]=ldap://ldap.domain3.com:389
-# Now is something new, we have a custom authentication 
+# Now is something new, we have a custom authentication
 # repository settings for a single domain
 # Please note how we define the VHost for which we set custom parameters
 basic-conf/auth-repo-params/domain3.com/user-dn-pattern=cn=,ou=,dc=,dc=
@@ -76,7 +77,7 @@ basic-conf/auth-repo-params/domain3.com/user-dn-pattern=cn=,ou=,dc=,dc=
 
 # For VHost: domain4.com all the data, both authentication and
 # user XMPP data are stored on a separate
-# MySQL server with custom stored procedures for both user 
+# MySQL server with custom stored procedures for both user
 # login and user logout processing.
 --auth-db[domain4.com]=tigase-custom
 --auth-db-uri[domain4.com]=jdbc:mysql://db14.domain4.com/dbname?user&password
@@ -90,4 +91,3 @@ basic-conf/auth-repo-params/domain4.com/sasl-mechs=PLAIN,DIGEST-MD5
 As you can see, it requires some writing but flexibility is very extensive and you can setup as many separate databases as you need or want. If one database (recognized by the database connection string) is shared among different VHosts, Tigase still uses a single connection pool, so it won't create an excessive number of connections to the database.
 
 I hope this helps with more complex setups and configuration cases.
-

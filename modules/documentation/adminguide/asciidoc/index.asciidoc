@@ -98,13 +98,13 @@ include::text/Admin_Guide_32_-_Using_Tigase_-_B_-_Database_Management_-_1_-_Tiga
 
 include::text/Admin_Guide_33_-_Using_Tigase_-_B_-_Database_Management_-_2_-_Importing_User_Data.asciidoc[]
 
-include::text/Admin_Guide_34_-_Using_Tigase_-_B_-_Database_Management_-_3_-_Tigase_Database_Minor_but_Useful_Schema_Change_in_Version_5.1.asciidoc
+include::text\Admin_Guide_34_-_Using_Tigase_-_B_-_Database_Management_-_3_-_Tigase_Database_Minor_but_Useful_Schema_Change_in_Version_5.1.asciidoc[]
 
 include::text/Admin_Guide_35_-_Using_Tigase_-_B_-_Database_Management_-_4_-_Drupal_Authentication_Added.asciidoc[]
 
 include::text/Admin_Guide_36_-_Using_Tigase_-_C_-_Basic_System_Checks.asciidoc[]
 
-include::text/Admin_Guide_37_-_Using_Tigase_-_D_-_StanzaSender.asciidoc[]
+include::text/Admin_Guide_37_-_Using-Tigase_-_D_-_StanzaSender.asciidoc[]
 
 include::text/Admin_Guide_38_-_Using_Tigase_-_E_-_Debugging_Tigase.asciidoc[]
 

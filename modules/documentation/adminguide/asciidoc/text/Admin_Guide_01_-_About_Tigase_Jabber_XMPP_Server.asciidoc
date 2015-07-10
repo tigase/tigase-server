@@ -18,7 +18,8 @@ About Tigase Jabber/XMPP Server
 . Make an extensible server which takes full advantage of XMPP protocol extensibility.
 . Make the server easy to setup and maintain.
 
-*Robust and reliable*.
+Robust and reliable
+-------------------
 
 This means that the server can handle many concurrent requests/connections and can run for a long time reliably. The server is designed and implemented to handle millions of simultaneous connections.
 

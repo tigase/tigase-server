@@ -1,19 +1,21 @@
-//[[preparePostgresql]]
+[[preparePostgresql]]
 Prepare the PostgreSQL Database for the Tigase Server
 =====================================================
-Andrzej Wojcik <andrzejw@tigase.org>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Andrzej Wojcik <andrzejw@tigase.org>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2012-06-16 09:38
+:Revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2012-06-16 09:38
 
-This guide describes how to prepare the PostgreSQL database for connecting the Tigase server to it.
+This guide describes how to prepare PostgreSQL database for connecting to Tigase server.
 
 Basic Setup
 -----------
 
-The PostgreSQL database can be prepared in many ways. Below are presented two of them. Following assumptions apply to both methods:
+The PostgreSQL database can be prepared in many ways. Below are presented two possible ways. The following assumptions apply to both methods:
 
 - +admin_db_user+ - database user with admin rights
 - +tigase_user+ - database user for Tigase
@@ -36,21 +38,21 @@ psql=# create role tigase_user with login password 'tigase123';
 -------------------------------------
 psql=# create database tigasedb owner tigase_user;
 -------------------------------------
-. Load database schema to initialize the Tigase server from the file that corresponds to the Tigase version you want to use. First you need to switch to +tigasedb+.
+. Load database schema to initialize the Tigase server from the file that corresponds to the version of Tigase you want to use. First you need to switch to +tigasedb+.
 +
 [source,sql]
 -------------------------------------
 psql=# \connect tigasedb
 -------------------------------------
 +
-For the Tigase server version 5.0 and later you have to use proper schema version:
+For Tigase server version 5.0 you have to use schema version 5:
 +
 [source,sql]
 -------------------------------------
 psql=# \i database/postgresql-schema-5.sql
 -------------------------------------
 +
-For the Tigase server version 5.1 and later you have to use proper schema version:
+For Tigase server version 5.1 and later you have to use schema version 5.1:
 +
 [source,sql]
 -------------------------------------
@@ -76,19 +78,18 @@ You will be asked for credentials for admin_db_user and password for new databas
 -------------------------------------
 createdb -U admin_db_user -W -O tigase_user tigasedb
 -------------------------------------
-. Load database schema to initialize the Tigase server from the file that corresponds to the Tigase version you want to use. For the *Tigase server version 5.0 and later* you have to use proper schema version:
+. Load database schema to initialize the Tigase server from the file that corresponds to the Tigase version you want to use. For *Tigase server version 5.0 and later* you have to use schema version 5:
 +
 [source,sql]
 -------------------------------------
 psql -q -U tigase_user -W tigasedb -f database/postgresql-schema-5.sql
 -------------------------------------
 +
-For the *Tigase server version 5.1 and later* you have to use proper schema version:
+For *Tigase server version 5.1 and later* you have to use schema version 5.1:
 +
 [source,sql]
 -------------------------------------
 psql -q -U tigase_user -W tigasedb -f database/postgresql-schema-5-1.sql
 -------------------------------------
 +
-Above commands should be executed from the main Tigase directory. The initialization schema file should be also available locally in database/ directory of your Tigase installation.
-
+The above commands should be executed from the main Tigase directory. The initialization schema file should be also available locally in database/ directory of your Tigase installation.

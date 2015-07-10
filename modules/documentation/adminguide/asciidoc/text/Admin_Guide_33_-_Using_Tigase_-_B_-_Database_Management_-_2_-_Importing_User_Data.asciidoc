@@ -1,16 +1,18 @@
-//[[genericImportingData]]
+[[dbImportingData]]
 Importing User Data
 ===================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2010-04-06 21:18
 
-You can easily copy data between Tigase compatible repositories that is repositories for which there is a database connector. It is not that easy however to import data from an external source. Therefore a simple data import functionality has been added to repository utilities package.
+You can easily copy data between Tigase compatible repositories that is repositories for which there is a database connector. However, it is not that easy to import data from an external source. Therefore a simple data import functionality has been added to repository utilities package.
 
-You can access repository utilities through command +./bin/repo.sh+ or +./scripts/repo.sh+ depending on whether you use binary package or source distribution.
+You can access repository utilities through command +./bin/repo.sh+ or +./scripts/repo.sh+ depending on whether you use a binary package or source distribution.
 
 +-h+ parameter gives you a list of all possible parameters:
 
@@ -51,7 +53,7 @@ Note! If you put UserAuthRepository implementation as a class name
       Alternatively look for admin tools guide on web site.
 -------------------------------------
 
-The most critical parameters are source repository class name and initialization string. Therefore there are a few example, preset parameters which you can use an example and adjust for your system. If you look inside the +repo.sh+ script you can find at the end of the script following lines:
+The most critical parameters are the source repository class name and the initialization string. Therefore there are a few example preset parameters which you can use and adjust for your system. If you look inside the +repo.sh+ script you can find at the end of the script following lines:
 
 [source,sh]
 -------------------------------------
@@ -82,13 +84,12 @@ The format of the import file is very simple. This is a flat file with comma sep
 jid,password,roster_jid,roster_nick,subscriptio,group
 -------------------------------------
 
-To create such a file from MySQL database you have to execute command like this one:
+To create such a file from MySQL database you will have to execute a command like this one:
 
 [source,sql]
 -------------------------------------
-SELECT a, b, c, d INTO OUTFILE 'import-file.txt' 
+SELECT a, b, c, d INTO OUTFILE 'import-file.txt'
 FIELDS TERMINATED BY ','
-LINES TERMINATED BY '\n' 
+LINES TERMINATED BY '\n'
 FROM test_table;
 -------------------------------------
-

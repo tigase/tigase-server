@@ -1,19 +1,21 @@
 [[prepareMysql]]
 Prepare the MySQL Database for the Tigase Server
 ================================================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2010-04-06 21:18
 
-This guide describes how to prepare the MySQL database for connecting the Tigase server to it.
+This guide describes how to prepare MySQL database for connecting Tigase server.
 
 Basic Setup
 -----------
 
-The MySQL database can be prepared in many ways. Most of Linux distributions contain tools which allow you to go through all steps from the shell command line. To make sure, however it works on all platforms the same way I show first how to do it under MySQL command line client.
+The MySQL database can be prepared in many ways. Most Linux distributions contain tools which allow you to go through all steps from the shell command line. To make sure it works on all platforms in the same way, we will first show how to do it under MySQL command line client.
 
 Configuring from MySQL command line tool
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -107,7 +109,7 @@ Follow steps below to prepare the MySQL database:
 -------------------------------------
 mysqladmin -p create tigasedb
 -------------------------------------
-. Add the +tigase_user+ user and grant him access to the tigasedb database. Depending on how you plan to connect to the database (locally or over the network) use one of following commands or all if you are not sure:
+. Add the +tigase_user+ user and grant access to the tigasedb database. Depending on how you plan to connect to the database (locally or over the network) use one of following commands or all if you are not sure:
 *Grant access to tigase_user connecting from any network address.*
 [source,sql]
 -------------------------------------
@@ -144,7 +146,7 @@ The initialization schema file should be also available locally in database/ dir
 Configuring MySQL for UTF-8 Support
 -----------------------------------
 
-In the my.conf put following lines:
+In my.conf put following lines:
 
 [source,bash]
 -------------------------------------
@@ -162,7 +164,7 @@ collation-server=utf8_general_ci
 skip-character-set-client-handshake
 -------------------------------------
 
-Then connect to the database and from the command line shell check settings:
+Then connect to the database from the command line shell check settings:
 
 [source,sql]
 -------------------------------------
@@ -170,28 +172,28 @@ SHOW VARIABLES LIKE 'character_set_database';
 SHOW VARIABLES LIKE 'character_set_client';
 -------------------------------------
 
-If any of these shows something else then 'utf8' then you have to correct it:
+If any of these shows something else then 'utf8' then you need to fix it using the command:
 
 [source,sql]
 -------------------------------------
 ALTER DATABASE tigasedb DEFAULT CHARACTER SET utf8;
 -------------------------------------
 
-You can now also test your database installation if it accepts UTF-8 data. Best way is just to create an account with UTF-8 characters:
+You can now also test your database installation if it accepts UTF-8 data. The easiest way to ensure this is to just to create an account with UTF-8 characters:
 
 [source,sql]
 -------------------------------------
 call TigAddUserPlainPw('żółw@some.domain.com', 'żółw');
 -------------------------------------
 
-And then check of the account has been created:
+And then check that the account has been created:
 
 [source,sql]
 -------------------------------------
 SELECT * FROM tig_users WHERE user_id = 'żółw@some.domain.com';
 -------------------------------------
 
-If the last command gives you no results it means there is still something wrong with settings. You might also check you shell settings to make sure your command line shell supports UTF-8 characters and passes them correctly to MySQL:
+If the last command gives you no results it means there is still something wrong with your settings. You might also want to check your shell settings to make sure your command line shell supports UTF-8 characters and passes them correctly to MySQL:
 
 [source,sh]
 -------------------------------------
@@ -200,14 +202,14 @@ export LOCALE=UTF-8
 export LESSCHARSET='utf-8'
 -------------------------------------
 
-It seems to me that MySQL 5.0.x also needs an extra parameters in the connection string: '&amp;useUnicode=true&amp;characterEncoding=UTF-8' while MySQL 5.1.x seems to not need it but it doesn't hurt to have it for both versions. You have to edit 'etc/init.properties' file and append this to the database connection string.
+It seems that MySQL 5.0.x also needs extra parameters in the connection string: '&amp;useUnicode=true&amp;characterEncoding=UTF-8' while MySQL 5.1.x seems to not need it but it doesn't hurt to have it for both versions. You have to edit 'etc/init.properties' file and append this to the database connection string.
 
-For MySQL 5.1.x, however, you need also updated code for all database stored procedures and functions used by the Tigase. They are updated for Tigase version 4.4.x and up, for the time being if you use older version of the Tigase server you can reload stored procedures using the file from SVN.
+For MySQL 5.1.x, however, you need to also update code for all database stored procedures and functions used by the Tigase. They are updated for Tigase version 4.4.x and up, however if you use an older version of the Tigase server, you can reload stored procedures using the file from SVN.
 
-Other MySQL Setting Worth Considering
--------------------------------------
+Other MySQL Settings Worth Considering
+--------------------------------------
 
-There is a number of other options useful, especially for a performance reasons. Please note, you have to review them as some of them may impact data reliability and are useful for performance or load tests installations only.
+There are a number of other useful options, especially for performance improvements. Please note, you will have to review them as some of them may impact data reliability and are useful for performance or load tests installations only.
 
 [source,bash]
 -------------------------------------
@@ -256,4 +258,5 @@ innodb_lock_wait_timeout = 50
 innodb_thread_concurrency = 16
 -------------------------------------
 
-I am certainly not a database expert nor MySQL expert and I do not pretend to be one. So any comments or suggestions you may have are very welcome and appreciated.
+These settings may not be fully optimized for your system, and have been only tested on our systems. If you have found better settings for your systems, feel free to link:http://tigase.net/contact[let us know].
+//I am certainly not a database expert nor MySQL expert and I do not pretend to be one. So any comments or suggestions you may have are very welcome and appreciated.
