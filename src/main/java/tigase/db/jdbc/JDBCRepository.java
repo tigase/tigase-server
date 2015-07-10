@@ -86,7 +86,7 @@ public class JDBCRepository
 
 	/** Field description */
 	public static final String SCHEMA_UPGRADE_LINK =
-		"http://www.tigase.org/content/tigase-51-database-schema-upgrade";
+		"http://docs.tigase.org/tigase-server/7.0.0/Administration_Guide/html/#_tigase_5_1_database_schema_upgrade";
 	private static final String ADD_NODE_QUERY          = "{ call TigAddNode(?, ?, ?) }";
 	private static final String ADD_USER_PLAIN_PW_QUERY =
 		"{ call TigAddUserPlainPw(?, ?) }";
