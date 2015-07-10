@@ -169,6 +169,41 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 		assertTrue(offlineProcessor.loadOfflineMessages(packet, session1));	
 	}	
 	
+	@Test
+	public void testIsAllowedForOfflineStorage() throws Exception {
+		Packet packet = Packet.packetInstance(new Element("message", new Element[]{
+			new Element("body", "Test message")
+		}, new String[] { "from", "to" }, new String[] { "from@example.com/res1", "to@example.com/res2" }));
+		assertTrue(offlineProcessor.isAllowedForOfflineStorage(packet));
+		
+		packet = Packet.packetInstance(new Element("message", new Element[]{
+			new Element("storeMe1", new String[] { "xmlns" }, new String[] { "custom_xmlns" })
+		}, new String[] { "from", "to" }, new String[] { "from@example.com/res1", "to@example.com/res2" }));		
+		
+		assertFalse(offlineProcessor.isAllowedForOfflineStorage(packet));
+		
+		Map<String,Object> settings = new HashMap<>();
+		settings.put("msg-store-offline-paths", new String[] {
+			"/message/storeMe1[custom_xmlns]",
+			"/message/storeMe2"
+		});
+		offlineProcessor.init(settings);	
+
+		assertTrue(offlineProcessor.isAllowedForOfflineStorage(packet));
+
+		packet = Packet.packetInstance(new Element("message", new Element[]{
+			new Element("storeMe2", new String[] { "xmlns" }, new String[] { "custom_xmlns" })
+		}, new String[] { "from", "to" }, new String[] { "from@example.com/res1", "to@example.com/res2" }));		
+
+		assertTrue(offlineProcessor.isAllowedForOfflineStorage(packet));
+		
+		packet = Packet.packetInstance(new Element("message", new Element[]{
+			new Element("storeMe3", new String[] { "xmlns" }, new String[] { "custom_xmlns" })
+		}, new String[] { "from", "to" }, new String[] { "from@example.com/res1", "to@example.com/res2" }));	
+		
+		assertFalse(offlineProcessor.isAllowedForOfflineStorage(packet));		
+	}
+	
 	private static class MsgRepositoryIfcImpl implements MsgRepositoryIfc {
 
 		private final Queue<Packet> stored = new ArrayDeque();

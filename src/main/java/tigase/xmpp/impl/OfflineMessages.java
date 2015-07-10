@@ -25,10 +25,12 @@ package tigase.xmpp.impl;
 import static tigase.server.Message.ELEM_NAME;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TimeZone;
@@ -110,6 +112,7 @@ public class OfflineMessages
 	 * processing capabilities. In case of {@code msgoffline} plugin it is
 	 * <em>presence</em> stanza */
 	public static final String[] MESSAGE_HEADER_PATH = { ELEM_NAME, "header" };
+	private static final String MSG_OFFLINE_STORAGE_PATHS = "msg-store-offline-paths";
 	private static final String MSG_REPO_CLASS_KEY = "msg-repo-class";
 	private static final String MSG_PUBSUB_JID = "msg-pubsub-jid";
 	private static final String MSG_PUBSUB_NODE = "msg-pubsub-node";
@@ -126,6 +129,7 @@ public class OfflineMessages
 	private String pubSubJID;
 	private String pubSubNode;
 	private String defaultPublisher;
+	private ElementMatcher[] offlineStorageMatchers = new ElementMatcher[0];
 	
 	{
 		this.formatter = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" );
@@ -155,6 +159,17 @@ public class OfflineMessages
 			this.pubSubNode = (String) settings.get(MSG_PUBSUB_NODE);
 		if (settings.containsKey(MSG_PUBSUB_PUBLISHER))
 			this.defaultPublisher = (String) settings.get(MSG_PUBSUB_PUBLISHER);
+		if (settings.containsKey(MSG_OFFLINE_STORAGE_PATHS)) {
+			String[] matcherStrs = (String[]) settings.get(MSG_OFFLINE_STORAGE_PATHS);
+			List<ElementMatcher> matchers = new ArrayList<>();
+			for (String matcherStr : matcherStrs) {
+				ElementMatcher matcher = ElementMatcher.create(matcherStr);
+				if (matcher != null) {
+					matchers.add(matcher);
+				}
+			}
+			offlineStorageMatchers = matchers.toArray(new ElementMatcher[0]);
+		}
 	}
 	
 	/**
@@ -378,14 +393,7 @@ public class OfflineMessages
 		// save only:
 		// message stanza with either {@code <body>} or {@code <event>} child element and only of type normal, chat
 		// presence stanza of type subscribe, subscribed, unsubscribe and unsubscribed
-		if ( ( pac.getElemName().equals( "message" )
-					 && ( ( pac.getElemCDataStaticStr( tigase.server.Message.MESSAGE_BODY_PATH ) != null )
-								|| ( pac.getElemChildrenStaticStr( MESSAGE_EVENT_PATH ) != null )
-								|| ( pac.getElemChildrenStaticStr( MESSAGE_HEADER_PATH ) != null ) )
-					 && ( ( type == null ) || ( type == StanzaType.normal ) || ( type == StanzaType.chat ) ) )
-				 || ( pac.getElemName().equals( "presence" )
-							&& ( ( type == StanzaType.subscribe ) || ( type == StanzaType.subscribed )
-									 || ( type == StanzaType.unsubscribe ) || ( type == StanzaType.unsubscribed ) ) ) ){
+		if ( isAllowedForOfflineStorage(pac) ){
 			if ( log.isLoggable( Level.FINEST ) ){
 				log.log( Level.FINEST, "Storing packet for offline user: {0}", pac );
 			}
@@ -462,6 +470,43 @@ public class OfflineMessages
 	}
 
 	//~--- methods --------------------------------------------------------------
+	
+	/** 
+	 * Method determines whether packet sent to offline user should be stored in
+	 * offline storage or not
+	 * @param pac
+	 * @return 
+	 */
+	protected boolean isAllowedForOfflineStorage(Packet pac) {
+		StanzaType type = pac.getType();
+		switch (pac.getElemName()) {
+			case "message":
+				if (type == null || type == StanzaType.normal || type == StanzaType.chat) {
+					if (pac.getElemCDataStaticStr( tigase.server.Message.MESSAGE_BODY_PATH ) != null)
+						return true;
+					if (pac.getElemChildrenStaticStr( MESSAGE_EVENT_PATH ) != null)
+						return true;
+					if (pac.getElemChildrenStaticStr( MESSAGE_HEADER_PATH ) != null)
+						return true;
+				}
+				break;
+			case "presence":
+				if ( ( type == StanzaType.subscribe ) || ( type == StanzaType.subscribed )
+						 || ( type == StanzaType.unsubscribe ) || ( type == StanzaType.unsubscribed ) )
+					return true;
+				break;
+			default:
+				break;
+		}
+		
+		for (ElementMatcher matcher : offlineStorageMatchers) {
+			if (matcher.matches(pac))
+				return true;
+		}
+		
+		return false;	
+	}
+	
 	/**
 	 * Method determines whether offline messages should be loaded - the process
 	 * should be run only once per user session and only for available/null
@@ -671,6 +716,60 @@ public class OfflineMessages
 		}
 	}
 
+	public static class ElementMatcher {
+		
+		private final String[] path;
+		private final String xmlns;
+		
+		public static ElementMatcher create(String str) {
+			List<String> path = new ArrayList<String>();
+			String xmlns = null;
+			int offset = 0;
+			while (true) {
+				String elemName = null;
+				
+				int slashIdx = str.indexOf('/', offset);
+				int sIdx = str.indexOf('[', offset);
+				if (slashIdx < 0)
+					slashIdx = str.length();
+				
+				Element c = null;
+				if (slashIdx < sIdx || sIdx < 0) {
+					elemName = str.substring(offset, slashIdx);
+					xmlns = null;
+				} else {
+					int eIdx = str.indexOf(']', sIdx);
+					elemName = str.substring(offset, sIdx);
+					xmlns = str.substring(sIdx+1, eIdx);
+					slashIdx = str.indexOf('/', eIdx);
+					if (slashIdx < 0)
+						slashIdx = str.length();
+				}
+				
+				if (elemName != null && !elemName.isEmpty())
+					path.add(elemName.intern());
+				
+				if (slashIdx == str.length())
+					break;
+				offset = slashIdx + 1;
+			}
+			if (xmlns != null)
+				xmlns = xmlns.intern();
+			
+			return new ElementMatcher(path.toArray(new String[0]), xmlns);
+		}
+		
+		public ElementMatcher(String[] path, String xmlns) {
+			this.path = path;
+			this.xmlns = xmlns;
+		}
+		
+		public boolean matches(Packet packet) {
+			Element child = packet.getElement().findChildStaticStr(path);
+			return child != null && (xmlns == null || xmlns == child.getXMLNS());
+		}
+	}
+	
 	/**
 	 * {@link Comparator} interface implementation for the purpose of sorting
 	 * Elements retrieved from the repository by the timestamp stored in
