@@ -719,7 +719,7 @@ public class BoshSession {
 						// pick thread on which it will be processed
 						p.setPacketTo(handler.getJidForBoshSession(this));
 						p.setPacketFrom(getDataReceiver());
-						handler.processUndeliveredPacket(p, "Bosh = disconnected");
+						handler.processUndeliveredPacket(p, null, "Bosh = disconnected");
 					}
 				} catch (TigaseStringprepException ex) {
 					log.warning(

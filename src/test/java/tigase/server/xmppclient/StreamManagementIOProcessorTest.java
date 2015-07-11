@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import junit.framework.TestCase;
 import static junit.framework.TestCase.assertEquals;
 import org.junit.Test;
+import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.server.xmppclient.StreamManagementIOProcessor.OutQueue;
 import tigase.util.TigaseStringprepException;
@@ -40,6 +41,9 @@ import tigase.xml.Element;
  */
 public class StreamManagementIOProcessorTest extends TestCase {
 	
+	private static final String[] DELAY_PATH = { Message.ELEM_NAME, "delay" };
+	private static final String DELAY_XMLNS = "urn:xmpp:delay";
+		
 	@Test
 	public void testValidateOutQueueOverflowToZero() {
 		OutQueue queue = new OutQueue();
@@ -62,7 +66,10 @@ public class StreamManagementIOProcessorTest extends TestCase {
 		
 		int size = queue.waitingForAck();
 		assertEquals(5, size);
-		assertEquals(queue.getQueue().peek().getElement().getAttributeStaticStr("id"), String.valueOf(packetToAck+1));
+		assertEquals(queue.getQueue().peek().getPacketWithStamp().getElement().getAttributeStaticStr("id"), String.valueOf(packetToAck+1));
+		queue.getQueue().forEach((OutQueue.Entry e) -> 
+				assertTrue(e.getPacketWithStamp().isXMLNSStaticStr(DELAY_PATH, DELAY_XMLNS))
+		);
 	}		
 
 	@Test
@@ -96,6 +103,83 @@ public class StreamManagementIOProcessorTest extends TestCase {
 		
 		int size = queue.waitingForAck();
 		assertEquals(5, size);
-		assertEquals(queue.getQueue().peek().getElement().getAttributeStaticStr("id"), String.valueOf(packetToAck+1));
+		assertEquals(queue.getQueue().peek().getPacketWithStamp().getElement().getAttributeStaticStr("id"), String.valueOf(packetToAck+1));
+		queue.getQueue().forEach((OutQueue.Entry e) ->
+				assertTrue(e.getPacketWithStamp().isXMLNSStaticStr(DELAY_PATH, DELAY_XMLNS))
+		);
 	}
+	
+	@Test
+	public void testNoDelayForIq() {
+		OutQueue queue = new OutQueue();
+		int start = Integer.MAX_VALUE-10;
+		queue.setCounter(start-1);
+		
+		int packetToAck = start+5;
+		
+		for (int i=start; i<=Integer.MAX_VALUE && i > 0; i++) {
+			try {
+				Packet p = Packet.packetInstance(new Element("iq", new String[] { "id", "from", "to" },
+						new String[] { String.valueOf(i), "from@example.com", "to@example.com" }));
+				queue.append(p);
+			} catch (TigaseStringprepException ex) {
+				Logger.getLogger(StreamManagementIOProcessorTest.class.getName()).log(Level.SEVERE, null, ex);
+			}
+		}
+
+		queue.getQueue().forEach((OutQueue.Entry e) ->
+				assertFalse(e.getPacketWithStamp().isXMLNSStaticStr(new String[] { "iq", "delay" }, DELAY_XMLNS))
+		);
+	}
+	
+	@Test
+	public void testForceDelayForResumption() {
+		OutQueue queue = new OutQueue();
+		
+		try {
+			Packet p = Packet.packetInstance(new Element("message", new Element[]{
+				new Element("delay", new String[]{"xmlns", "stamp"}, new String[]{DELAY_XMLNS, "2015-07-10T00:00:00.000Z"})
+			}, new String[]{"id", "from", "to"},
+					new String[]{String.valueOf("id-1"), "from@example.com", "to@example.com"}));
+			queue.append(p);
+		} catch (TigaseStringprepException ex) {
+			Logger.getLogger(StreamManagementIOProcessorTest.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		
+		queue.getQueue().forEach((OutQueue.Entry e) ->
+				assertEquals(1, e.getPacketWithStamp().getElement().findChildren((Element el) -> el.getName() == "delay").size())
+		);		
+
+		queue.getQueue().clear();
+		
+		queue.setResumptionEnabled(true);
+		
+		try {
+			Packet p = Packet.packetInstance(new Element("message", new Element[]{
+				new Element("delay", new String[]{"xmlns", "stamp"}, new String[]{DELAY_XMLNS, "2015-07-10T00:00:00.000Z"})
+			}, new String[]{"id", "from", "to"},
+					new String[]{String.valueOf("id-1"), "from@example.com", "to@example.com"}));
+			queue.append(p);
+		} catch (TigaseStringprepException ex) {
+			Logger.getLogger(StreamManagementIOProcessorTest.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		
+		queue.getQueue().forEach((OutQueue.Entry e) ->
+				assertEquals(1, e.getPacketWithStamp().getElement().findChildren((Element el) -> el.getName() == "delay").size())
+		);		
+
+		queue.getQueue().clear();
+		
+		try {
+			Packet p = Packet.packetInstance(new Element("iq", new String[]{"id", "from", "to"},
+					new String[]{String.valueOf("id-2"), "from@example.com", "to@example.com"}));
+			queue.append(p);
+		} catch (TigaseStringprepException ex) {
+			Logger.getLogger(StreamManagementIOProcessorTest.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		
+		queue.getQueue().forEach((OutQueue.Entry e) ->
+				assertFalse(e.getPacketWithStamp().isXMLNSStaticStr(new String[] { "iq", "delay" }, DELAY_XMLNS))
+		);
+	}	
 }

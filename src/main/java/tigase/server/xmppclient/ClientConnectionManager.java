@@ -274,7 +274,7 @@ public class ClientConnectionManager
 	}
 
 	@Override
-	public boolean processUndeliveredPacket(Packet packet, String errorMessage) {
+	public boolean processUndeliveredPacket(Packet packet, Long stamp, String errorMessage) {
 		try {
 			// is there a point in trying to redeliver stanza of type error?
 			if (packet.getType() == StanzaType.error)
@@ -293,7 +293,7 @@ public class ClientConnectionManager
 			if (packet.getElemName() == Message.ELEM_NAME) {
 				// we should mark this message packet so that SM will know that it is
 				// resent from here due to connection failure
-				Packet result = C2SDeliveryErrorProcessor.makeDeliveryError(packet);
+				Packet result = C2SDeliveryErrorProcessor.makeDeliveryError(packet, stamp);
 
 				processOutPacket(result);
 				return true;
@@ -330,7 +330,7 @@ public class ClientConnectionManager
 			Queue<Packet> undeliveredPackets = service.getWaitingPackets();
 			Packet p = null;
 			while ((p = undeliveredPackets.poll()) != null) {
-				processUndeliveredPacket(p, null);
+				processUndeliveredPacket(p, null, null);
 			}
 		}
 

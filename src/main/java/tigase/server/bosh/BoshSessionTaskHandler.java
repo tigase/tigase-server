@@ -58,5 +58,5 @@ public interface BoshSessionTaskHandler {
 	
 	BareJID getSeeOtherHostForJID( BareJID userId, SeeOtherHostIfc.Phase ph );
 	
-	boolean processUndeliveredPacket(Packet packet, String errorMessage);
+	boolean processUndeliveredPacket(Packet packet, Long stamp, String errorMessage);
 }

@@ -451,9 +451,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	/**
 	 * Processes undelivered packets
 	 * @param packet
+	 * @param stamp - timestamp when packet was received to be written to XMPPIOService
 	 * @param errorMessage
 	 */
-	public boolean processUndeliveredPacket(Packet packet, String errorMessage) {
+	public boolean processUndeliveredPacket(Packet packet, Long stamp, String errorMessage) {
 		return false;
 	}
 

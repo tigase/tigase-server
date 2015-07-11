@@ -37,6 +37,7 @@ import tigase.net.IOServiceListener;
 import tigase.net.SocketThread;
 import tigase.server.Command;
 import tigase.server.ConnectionManager;
+import tigase.server.Iq;
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.util.TimerTask;
@@ -147,7 +148,8 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 				return false;
 			}
 			else if (packet.getElemName() == ENABLE_NAME) {
-				service.getSessionData().putIfAbsent(OUT_COUNTER_KEY, newOutQueue());
+				OutQueue outQueue = newOutQueue();
+				service.getSessionData().putIfAbsent(OUT_COUNTER_KEY, outQueue);
 				service.getSessionData().putIfAbsent(IN_COUNTER_KEY, newCounter());
 				
 				
@@ -156,6 +158,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 				int max = resumption_timeout;
 
 				if (resumption_timeout > 0 && packet.getElement().getAttributeStaticStr(RESUME_ATTR) != null) {
+					outQueue.setResumptionEnabled(true);
 					String maxStr = packet.getElement().getAttributeStaticStr(MAX_ATTR);
 					if (maxStr != null) {
 						max = Math.min(max, Integer.parseInt(maxStr));
@@ -304,9 +307,9 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 					
 					// resending packets thru new connection
 					OutQueue outQueue = (OutQueue) newService.getSessionData().get(OUT_COUNTER_KEY);
-					List<Packet> packetsToResend = new ArrayList<Packet>(outQueue.getQueue());
-					for (Packet packet : packetsToResend) {
-						newService.addPacketToSend(packet);
+					List<OutQueue.Entry> packetsToResend = new ArrayList<OutQueue.Entry>(outQueue.getQueue());
+					for (OutQueue.Entry entry : packetsToResend) {
+						newService.addPacketToSend(entry.getPacketWithStamp());
 					}
 										
 					// if there is any packet waiting we need to write them to socket
@@ -559,10 +562,10 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		
 		OutQueue outQueue = (OutQueue) service.getSessionData().remove(OUT_COUNTER_KEY);		
 		if (outQueue != null) {
-			Packet packet = null;
+			OutQueue.Entry e = null;
 			
-			while ((packet = outQueue.queue.poll()) != null) {				
-				connectionManager.processUndeliveredPacket(packet, null);
+			while ((e = outQueue.queue.poll()) != null) {
+				connectionManager.processUndeliveredPacket(e.getPacketWithStamp(), e.stamp, null);
 			}
 		}
 	}
@@ -641,7 +644,9 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 	 */
 	public static class OutQueue extends Counter {
 		
-		private final ArrayDeque<Packet> queue = new ArrayDeque<Packet>();
+		private final ArrayDeque<Entry> queue = new ArrayDeque<Entry>();
+		
+		private boolean resumptionEnabled = false;
 		
 		/**
 		 * Append packet to waiting for ack queue
@@ -651,19 +656,8 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		public void append(Packet packet) {
 			if (!packet.wasProcessedBy(XMLNS)) {
 				packet.processedBy(XMLNS);
-				// add delay to message if not does not have one
-				// what about sessions without resumption? do we need this there?
-				if (!packet.isXMLNSStaticStr(DELAY_PATH, DELAY_XMLNS)) {
-					String stamp = null;
-					synchronized (formatter) {
-						stamp = formatter.format(new Date());
-					}
-					String from = packet.getStanzaTo() != null ? packet.getStanzaTo().getDomain() : packet.getPacketTo().getDomain();
-					Element x = new Element( "delay", new String[] {
-						"from", "stamp", "xmlns" }, new String[] { from, stamp, "urn:xmpp:delay" } );
-					packet.getElement().addChild(x);
-				}
-				queue.offer(packet);
+
+				queue.offer(new Entry(packet));
 				inc();
 			}
 		}
@@ -685,6 +679,10 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 			}
 		}
 		
+		public void setResumptionEnabled(boolean enabled) {
+			resumptionEnabled = enabled;
+		}
+		
 		/**
 		 * Returns size of queue containing packets waiting for ack
 		 * 
@@ -700,9 +698,31 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		 * 
 		 * 
 		 */
-		protected ArrayDeque<Packet> getQueue() {
+		protected ArrayDeque<Entry> getQueue() {
 			return queue;
 		}
 		
+		public class Entry {
+			private final Packet packet;
+			private final long stamp = System.currentTimeMillis();
+			
+			public Entry(Packet packet) {
+				this.packet = packet;
+			}
+			
+			public Packet getPacketWithStamp() {
+				if (packet.getElemName() != Iq.ELEM_NAME && !packet.isXMLNSStaticStr(DELAY_PATH, DELAY_XMLNS)) {
+					String stamp = null;
+					synchronized (formatter) {
+						stamp = formatter.format(new Date());
+					}
+					String from = packet.getStanzaTo() != null ? packet.getStanzaTo().getDomain() : packet.getPacketTo().getDomain();
+					Element x = new Element( "delay", new String[] {
+						"from", "stamp", "xmlns" }, new String[] { from, stamp, "urn:xmpp:delay" } );
+					packet.getElement().addChild(x);					
+				}
+				return packet;
+			}
+		}
 	}
 }

@@ -51,14 +51,7 @@ public class C2SDeliveryErrorProcessor {
 	public static final String ELEM_NAME = "delivery-error";
 	public static final String XMLNS = "http://tigase.org/delivery-error";
 	private static final String[] DELAY_PATH = { Message.ELEM_NAME, "delay" };
-	
-	private static final SimpleDateFormat formatter;
-	
-	static {
-		formatter = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" );
-		formatter.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
-	}		
-	
+		
 	/**
 	 * Filters packets created by processors to remove delivery-error payload
 	 * 
@@ -101,7 +94,8 @@ public class C2SDeliveryErrorProcessor {
 		if (packet.getElemName() != tigase.server.Message.ELEM_NAME)
 			return false;
 
-		if (!isDeliveryError(packet))
+		Element deliveryError = getDeliveryError(packet);
+		if (deliveryError == null)
 			return false;
 		
 		try {
@@ -119,19 +113,14 @@ public class C2SDeliveryErrorProcessor {
 				if (sessionsForMessageDelivery.isEmpty())
 					return false;
 				
-				// we need to get last delay element as last one contains info from StreamManagement about delivery time
-				List<Element> delays = packet.getElement().findChildren((Element e) -> e.getName() == "delay" && e.getXMLNS() == "urn:xmpp:delay");
-				if (delays.isEmpty())
-					return true;
-				
-				String delay = delays.get(delays.size() - 1).getAttributeStaticStr("stamp");
+				String delay = deliveryError.getAttributeStaticStr("stamp");
 				if (delay == null)
 					return true;
 				
 				// maybe we should forward data to only active sessions which were not available at this point??
 				// how to get time of error? or maybe original time of message? timestamp might be slow while 
 				// in other case we might get issues with servers in other timezones!
-				long time = formatter.parse(delay).getTime();
+				long time = Long.parseLong(delay);
 				
 				for (XMPPResourceConnection conn : sessionsForMessageDelivery) {
 					if (conn.getCreationTime() <= time)
@@ -156,13 +145,7 @@ public class C2SDeliveryErrorProcessor {
 				log.finest("NotAuthorizedException while processing undelivered message from "
 					+ "C2S, packet = " + packet);
 			}
-		} catch (ParseException ex) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("NotAuthorizedException while processing undelivered message from "
-					+ "C2S, packet = " + packet);
-			}
 		}
-
 		return false;
 	}
 	
@@ -179,16 +162,32 @@ public class C2SDeliveryErrorProcessor {
 	}
 
 	/**
+	 * Finds delivery-error element in packet and returns it
+	 * 
+	 * @param packet
+	 * @return true - if packet is delivery-error
+	 */
+	public static Element getDeliveryError(Packet packet) {
+		Element elem = packet.getElement();
+		Element error = elem.getChildStaticStr(ELEM_NAME);
+		return (error != null && error.getXMLNS() == XMLNS) ? error : null;
+	}	
+	
+	/**
 	 * Creates delivery-error packets to send to session manager to reprocess
 	 * undelivered packets
 	 * 
 	 * @param packet
 	 * @return 
 	 */
-	public static Packet makeDeliveryError(Packet packet)  {
+	public static Packet makeDeliveryError(Packet packet, Long stamp)  {
 		Packet result = packet.copyElementOnly();
 		result.setPacketFrom(packet.getPacketTo());
-		result.getElement().addChild(new Element(ELEM_NAME, new String[] { "xmlns" }, new String[] { XMLNS }));
+		Element error = new Element(ELEM_NAME, new String[] { "xmlns" }, new String[] { XMLNS });
+		if (stamp != null) {
+			error.setAttribute("stamp", String.valueOf(stamp));
+		}
+		result.getElement().addChild(error);
 		return result;
 	}
 }
