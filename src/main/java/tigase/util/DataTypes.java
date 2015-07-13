@@ -31,7 +31,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import tigase.xmpp.JID;
+
+import java.lang.reflect.Array;
 
 /**
  * Created: May 28, 2009 7:39:07 AM
@@ -340,57 +343,49 @@ public class DataTypes {
 	 *
 	 * 
 	 */
-	public static String valueToString(Object value) {
-		char t = getTypeId(value);
-		String varr;
+public static String valueToString(final Object value) {
 
-		if (value == null) {
-			varr = "<null>";
-		} else {
-			varr = value.toString();
-		}
-		switch (t) {
-		case 'l' :
-			varr = Arrays.toString((long[]) value);
+  if (value == null) {
+    return "<null>";
+  }
 
-			break;
+  if(value.getClass().isArray()) {
 
-		case 'i' :
-			varr = Arrays.toString((int[]) value);
+    if(Array.getLength(value) == 0) {
+      return "";
+    }
 
-			break;
+    String varr = null;
+    char t = DataTypes.getTypeId(value);
+    switch (t) {
+    case 'l' :
+      varr = value instanceof long[] ? Arrays.toString((long[]) value) : Arrays.toString((Long[]) value);
+      break;
 
-		case 'b' :
-			varr = Arrays.toString((boolean[]) value);
+    case 'i' :
+      varr = value instanceof int[] ? Arrays.toString((int[]) value) : Arrays.toString((Integer[]) value);
+      break;
 
-			break;
+    case 'b' :
+      varr = value instanceof boolean[] ? Arrays.toString((boolean[]) value) : Arrays.toString((Boolean[]) value);
+      break;
 
-		case 'f' :
-			varr = Arrays.toString((float[]) value);
+    case 'f' :
+      varr = value instanceof float[] ? Arrays.toString((float[]) value) : Arrays.toString((Float[]) value);
+      break;
 
-			break;
+    case 'd' :
+      varr = value instanceof double[] ? Arrays.toString((double[]) value) : Arrays.toString((Double[]) value);
+      break;
 
-		case 'd' :
-			varr = Arrays.toString((double[]) value);
+    default :
+      varr = Arrays.toString((Object[]) value);
+    }
+    return varr.substring(1, varr.length() - 1);
+  }
 
-			break;
-			
-		case 'j' :
-			varr = Arrays.toString((JID[]) value);
-			
-			break;
-
-		default :
-			if ((value != null) && value.getClass().isArray()) {
-				varr = Arrays.toString((Object[]) value);
-			}
-		}
-		if ((value != null) && value.getClass().isArray()) {
-			varr = varr.substring(1, varr.length() - 1);
-		}
-
-		return varr;
-	}
+  return value.toString();
+}
 
 	/**
 	 * Method description
