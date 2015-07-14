@@ -320,9 +320,8 @@ public class ConnectionOpenThread
 			throttling.put(isa.getPort(), new PortThrottlingData(port_throttling));
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST,
-						"Setting up throttling for the port {0} to {1} connections per second.",
-						new Object[] { isa.getPort(),
-						port_throttling });
+						"Setting up throttling for the port {0} to {1} connections per second. isa: {2}",
+						new Object[] { isa.getPort(), port_throttling, isa });
 			}
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Setting up 'accept' channel...");

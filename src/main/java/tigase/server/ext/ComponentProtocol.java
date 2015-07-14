@@ -40,11 +40,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.script.Bindings;
+
 import tigase.conf.ConfigurationException;
+
 import tigase.db.comp.ComponentRepository;
+
 import tigase.net.ConnectionType;
 import tigase.net.SocketType;
+
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.server.ext.handlers.BindProcessor;
@@ -57,11 +62,15 @@ import tigase.server.ext.handlers.StartTLSProcessor;
 import tigase.server.ext.handlers.StreamFeaturesProcessor;
 import tigase.server.ext.handlers.UnknownXMLNSStreamOpenHandler;
 import tigase.server.ext.lb.LoadBalancerIfc;
+
 import tigase.stats.StatisticsList;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
+
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
+
+import java.text.MessageFormat;
 
 /**
  * Created: Sep 30, 2009 8:28:13 PM
@@ -462,9 +471,9 @@ public class ComponentProtocol
 			// Well, that's a but, we should not be here...
 			log.fine("XMLNS not set, accepting a new connection with xmlns auto-detection.");
 		} else {
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("cid: " + (String) serv.getSessionData().get("cid") + ", sending: " +
-						result);
+			if ( log.isLoggable( Level.FINEST ) ){
+				log.log( Level.FINEST, "cid: {0}, sending: {1}, sessionData: {2}",
+								 new Object[] { serv.getSessionData().get( "cid" ), result, serv.getSessionData() } );
 			}
 			result = handler.serviceStarted(serv);
 		}
