@@ -87,19 +87,24 @@ public class JabberIqVersion
 																		 NonAuthUserRepository repo, Queue<Packet> results,
 																		 Map<String, Object> settings )
 			throws PacketErrorTypeException {
-		try {
-
-			// Check whether the packet is addressed to some XMPP entity or the server;
-			if ( ( packet.getStanzaTo() != null ) && session.isUserId( packet.getStanzaTo().getBareJID() ) ){
-				processFromUserOutPacket( connectionId, packet, session, repo, results, settings );
+			// Check whether the packet is addressed to the server or some other, XMPP entity
+			if ((packet.getStanzaTo() == null)
+					|| session.isLocalDomain(packet.getStanzaTo().toString(), false)) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Calling method: {0}, for packet={1}, for session={2}",
+							new Object[] { "processFromUserToServerPacket",
+							packet, session });
+				}
+				processFromUserToServerPacket(connectionId, packet, session, repo, results,
+						settings);
 			} else {
-				processFromUserToServerPacket( connectionId, packet, session, repo, results,
-																			 settings );
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Calling method: {0}, for packet={1}, for session={2}",
+							new Object[] { "processFromUserOutPacket",
+							packet, session });
+				}
+				processFromUserOutPacket(connectionId, packet, session, repo, results, settings);
 			}
-		} catch ( NotAuthorizedException ex ) {
-			log.info( "Session not yet authorized to send ping requests: " + session
-								+ ", packet: " + packet );
-		}
 	}
 
 	@Override
