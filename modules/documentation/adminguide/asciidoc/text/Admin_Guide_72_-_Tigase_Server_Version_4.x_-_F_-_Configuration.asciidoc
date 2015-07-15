@@ -1,18 +1,19 @@
-//[[4xconfiguration]]
-Configuration
-=============
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+[[tigase4xconfiguration]]
+Tigase v4.x Configuration
+=========================
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2010-04-06 21:18
 
 This section contains some specific description for non-standard Tigase installations.
 
-- ////<<loadComponent,////Configuring the Tigase Server to Load a Component
-- ////<<customAuthentication,////Custom Authentication Connectors
-- ////<<custonAuthConnector,////Tigase Custom Auth Connector
-- ////<<LDAPauth,////LDAP Authentication Connector
-- ////<<tigaseAuthConnector,////Tigase Auth Connector
-
+- xref:loadComponent[Configuring the Tigase Server to Load a Component]
+- xref:customAuthentication[Custom Authentication Connectors]
+- xref:custonAuthConnector[Tigase Custom Auth Connector]
+- xref:LDAPauth[LDAP Authentication Connector]
+- xref:tigaseAuthConnector[Tigase Auth Connector]

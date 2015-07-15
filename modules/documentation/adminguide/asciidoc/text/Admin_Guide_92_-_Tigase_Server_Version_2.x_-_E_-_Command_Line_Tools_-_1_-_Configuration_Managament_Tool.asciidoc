@@ -1,22 +1,24 @@
-//[[configurationManagement2]]
+[[configurationManagement2]]
 Configuration Management Tool
 =============================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:16
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2010-04-06 21:16
 
-Configuration tool allows to look at configuration settings and modify parameters. It takes care about proper parameters types and encoding.
+The configuration tool allows a user to look at configuration settings and modify parameters.
 
-First answer to the question: "Why to use configuration tool instead of directly, manually edit config file?"
+First, an answer to the question: "Why use this configuration tool instead of directly, manually editing the config file?"
 
-There are a couple of reason why you should NOT manually edit configuration file and use the tool to modify settings:
+There are a couple of reasons why you should NOT manually edit configuration file and use the tool instead to modify settings:
 
 . Configuration is kept in XML file which can be easily broken if not edited carefully. The tool takes care of creating valid XML configuration file for you. So you can focus on your task - setting proper parameters for your server.
-. Configuration values are kept *UUEncoded* in config file. If you edit file manually you have to take care fo proper encoding special characters. The tool presents parameters to you in decoded form which is easy to read and accept all settings also in decoded form which is easier for you to write. Then when writing your parameters to configuration file settings are automaticly encoded to correct form.
-. Data in configuration file have *TYPES*. That is some parameters are expected to be *Strings* other are expected to be *Integers*, *Booleans* or arrays keeping data in any of that type. If data type is set incorrectly then server may have problems with reading configuration data. Configuration tool takes care of propert data type in configuration file.
+. Configuration values are kept *UUEncoded* in the config file. If you edit file manually you have to take care of proper encoding of special characters. The tool presents parameters to you in decoded form which is easy to read and can accept all settings also in decoded form which is easier for you to write. Then when writing your parameters to configuration file settings are automatically encoded to correct form.
+. Data in configuration file have *TYPES*. That is some parameters are expected to be *Strings* other are expected to be *Integers*, *Booleans* or arrays keeping data in any of that type. If data type is set incorrectly then Tigase may have problems with reading configuration data. The configuration tool takes care of proper data types in configuration file.
 
 Configuration management tool is a Java class - link:http://server.tigase.org/browser/trunk/src/tigase/conf/Configurator.java[tigase.conf.Configurator]. To make it easier to use this class there is also shell script available - link:http://server.tigase.org/browser/trunk/scripts/config.sh[config.sh].
 
@@ -51,4 +53,3 @@ Note: adding -print option is useful always, even with -set or -add
 -------------------------------------
 
 Let's assume configuration for your server is located in *tigase-config.xml* file. So the first thing you need to set when calling the tool is location of the configuration file.
-

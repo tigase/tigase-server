@@ -1,18 +1,18 @@
 Tigase Server Version 3.x
 =========================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:16
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2010-04-06 21:16
 
-Admin manuals and guides for the Tigase server version 3.x line.
+Admin manuals and guides for Tigase server version 3.x line.
 
-- ////<<connectingTigaseToMysql,////Connecting the Tigase Server to MySQL Database
-- ////<<integrateWithDrupal,////Integrating Tigase Server with Drupal
-- ////<<integrateWithLibreSource,////Integrating Tigase Server with LibreSource
-- ////<<windowsInstallation,////Windows Installation
-- ////<<windowsInstallation,////Instalacja Pod Windows
-- ////<<3xconfiguration,////Configuration
-
+- xref:connectingTigaseToMysql[Connecting the Tigase Server to MySQL Database]
+- xref:integrateWithDrupal[Integrating Tigase Server with Drupal]
+- xref:integrateWithLibreSource[Integrating Tigase Server with LibreSource]
+- xref:windowsInstallation[Windows Installation]
+- xref:tigase3xconfig[Configuration]

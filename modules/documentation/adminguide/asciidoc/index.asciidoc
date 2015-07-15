@@ -142,7 +142,7 @@ include::text/Admin_Guide_49_-_Using_Tigase_-_I_-_Tips_and_Tricks_-_2_-_Tigase_T
 
 :leveloffset: 2
 
-include::text/Admin_Guide_50_-_Using_Tigase_-_J_-_Best_Practices_for_Connecting_From_Web_Browser_to_Tigase_XMPP_Server.asciidoc
+include::text/Admin_Guide_50_-_Using_Tigase_-_J_-_Best_Practices_for_Connecting_From_Web_Browser_to_Tigase_XMPP_Server.asciidoc[]
 
 :leveloffset: 1
 

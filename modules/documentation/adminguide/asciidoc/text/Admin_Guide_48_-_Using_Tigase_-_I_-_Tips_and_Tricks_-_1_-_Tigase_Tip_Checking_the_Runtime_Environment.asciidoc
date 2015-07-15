@@ -1,11 +1,16 @@
-//[[TigaseTip_RuntimeEnvironment]]
-== Tigase Tip: Checking the Runtime Environment
+[[tigaseTip_RuntimeEnvironment]]
+Tigase Tip: Checking the Runtime Environment
+============================================
+:author:  not known
+:version: v1.0 inital ver
+:date: not known
+
 
 :toc:
 
-It has happened recently that we have tried very hard to fix a few annoying problems on one of the Tigase installations. Whatever we did, however the problems still existed after uploading a new version and the server restart. It worked fine in our development environment and it just didn't on the target system.
+It has happened recently that we have tried very hard to fix a few annoying problems on one of the Tigase installations. Whatever we did, the problem still existed after uploading a new version and restarting the server. It worked fine in our development environment and it just didn't on the target system.
 
-It turned out that due to a specific environment settings on the target system an old version of the Tigase server was always started regardless updates we were uploading. When I finally started looking at the installation the first indication that something is wrong was lack of any log files in place where I expected them.
+It turned out that due to specific environment settings on the target system, an old version of Tigase server was always started regardless of what updates uploaded. We finally located the problem by noticing that the logs were not being generated in the proper locations.  This led us to finding the issue: improper environment settings.
 
 The best way to check all the environment settings used to start the Tigase server is to use..... *check* command line parameter:
 

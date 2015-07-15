@@ -1,13 +1,15 @@
-Configuration
-=============
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+[[tigase3xconfig]]
+Tigase v3.x Configuration
+=========================
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:16
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2010-04-06 21:16
 
 This section contains the Tigase server configuration manuals and guides.
 
 _Please note, this guides are for the Tigase server 2.x line which is no longer supported. Please upgrade to the last stable version and contact us if you have any problems._
-

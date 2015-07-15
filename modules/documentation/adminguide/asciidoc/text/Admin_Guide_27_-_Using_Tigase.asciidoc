@@ -21,10 +21,16 @@ This section keeps set of documents which apply to all the Tigase server version
 . xref:drupalAuthentication[Drupal Authentication]
 - xref:systemchecks[Basic System Checks]
 - xref:stanzaSender[StanzaSender]
-
-- ////<<genericLoadBalancing,////Tigase Load Balancing
-- ////<<genericSchemaChange51,////Tigase database minor but useful schema change in version 5.1.0
-- ////<<genericStanzaSender,////StanzaSender
-- ////<<genericDebuggingTigase,////Debuging Tigase
-- ////<<genericImportingData,////Importing user data
-- ////<<genericDrupalAuthentication,////Drupal authentication added
+- xref:debuggingTigase[Debugging Tigase]
+- xref:loadBalancing[Server Load Balancing]
+- xref:tigaseServices[Tigase Services]
+. xref:addManageDomain[Add and Manage Domains]
+. xref:presenceForwarding[Presence Forwarding]
+. xref:registerXMPP[Register Your Own XMPP Domain]
+- xref:serverMonitoring[Server Monitoring]
+. xref:setupRemoteMonitoring[Setting up Remote Monitoring in the Server]
+. xref:retrievingStatisticsFromTheServer[Retrieving Statistics from the Server]
+- xref:tipsandTricks[Tips And Tricks]
+. xref:tigaseTip_RuntimeEnvironment[Runtime Environment Tip]
+. xref:tigaseTip_CheckingClusterConnections[Checking Cluster Connections]
+- xref:bestWebPrax[Best Practices for Connecting to Tigase XMPP server From Web Browser]

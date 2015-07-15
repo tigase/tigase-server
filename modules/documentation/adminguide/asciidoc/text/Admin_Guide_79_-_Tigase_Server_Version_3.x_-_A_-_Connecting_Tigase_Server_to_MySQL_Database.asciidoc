@@ -1,27 +1,29 @@
-//[[connectingTigaseToMysql]]
+[[connectingTigaseToMysql]]
 Connecting the Tigase Server to MySQL Database
 ==============================================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:16
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2010-04-06 21:16
 
-Please before continuing reading of this manual have a look at the ////<<prepareMysql,////initial MySQL database setup. It will help you with database preparation for connecting the Tigase server.
+Please before continuing reading of this manual have a look at the xref:prepareMysql[initial MySQL database setup]. It will help you with database preparation for connecting with Tigase server.
 
-The easiest way to setup the Tigase server for connecting with MySQL database is to use so called ////<<3xconfiguration,////configuration wizards (configuration generators) which release you from manually editing the XML configuration file and allow you quickly regenerate the XML configuration file in case of problems.
+The easiest way to setup Tigase server for connecting with MySQL database is to use the xref:tigase3xconfiguration[configuration wizards] (configuration generators) which release you from manually editing the XML configuration file and allow you quickly regenerate the XML configuration file in case of problems.
 
-The article above describes the older way for using configuration generators which is a bit more difficult and doesn't work on Windows system. The guide below describes a new way to use them which is simpler and can be applied for Windows systems as well. It is using +init.properties+ file where you can put all your initial configuration parameters.
+The article describes an older way for using configuration generators which is a bit more difficult and doesn't work on Windows systems. The guide below describes a new way to use them which is simpler and can be applied to Windows systems as well. It is using the +init.properties+ file where you can put all your initial configuration parameters.
 
 This guide describes MySQL database connection parameters.
 
-Well the guide is actually very short as there are example configuration files which can be used and customized for your environment. 
+This guide is actually very short as there are example configuration files which can be used and customized for your environment.
 
 Unfortunately these files are not included yet in the server version 3.x binary release and you have to download them from the SVN repository using following links:
 
-. link:https://svn.tigase.org/reps/tigase-server/trunk/etc/tigase-mysql.conf[tigase-mysql.conf] - the Tigase server startup file. The only difference from the default one is that it points to the file described below to load initial parameters.
-. link:https://svn.tigase.org/reps/tigase-server/trunk/etc/init-mysql.properties[init-mysql.properties] - the file contains a few initial parameters which can/should be adjusted to your environment. Here is a content of the file with each line described:
+. link:https://projects.tigase.org/projects/tigase-server/repository/changes/etc/tigase-mysql.conf[tigase-mysql.conf] - the Tigase server startup file. The only difference from the default one is that it points to the file described below to load initial parameters.
+. link:https://projects.tigase.org/projects/tigase-server/repository/changes/etc/init-mysql.properties[init-mysql.properties] - the file contains a few initial parameters which can/should be adjusted to your environment. Here is a content of the file with each line described:
 +
 [source,bash]
 -------------------------------------
@@ -66,4 +68,3 @@ Start the server using following command:
 -------------------------------------
 
 _Ask more questions if you got stuck or need any help with this._
-

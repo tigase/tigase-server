@@ -1,18 +1,15 @@
-//[[derby]]
+[[derby51upgrade]]
 Derby Database Schema Upgrade for Tigase 5.1
 ============================================
-Wojciech Kapcia <wojciech.kapcia@tigase.org>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2012-06-20 19:12
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2012-06-20 19:12
 
-Unfortunately we had to make a small change to the database schema for 5.1.0 version of the Tigase server.
-
-The good news is that it does not affect data or data structure, only the way some data is accessed in database. We added one more stored procedure which has to be installed in database if you upgrade your installation from a previous Tigase version.
-
-Therefore the schema upgrade is very simple and safe but make sure the current database schema is in version 4.0.
+The schema upgrade is very simple and safe but make sure the current database schema is in version 4.0.
 
 First things first - make a database backup:
 
@@ -38,4 +35,3 @@ java -Dij.protocol=jdbc:derby: -Dij.database="/path/to/derbyDB" \
 		-cp libs/derby.jar:libs/derbytools.jar:jars/tigase-server.jar \
 		org.apache.derby.tools.ij database/postgresql-schema-upgrade-to-5-1.sql
 -------------------------------------
-

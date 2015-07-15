@@ -1,13 +1,17 @@
+[[tigaseServices]]
 Tigase Services
 ===============
-Wojciech Kapcia <wojciech.kapcia@tigase.org>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2012-08-23 20:49
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2012-08-23 20:49
 
-- ////<<addManageDomain,////Add and Manage Domain
-- ////<<presenceForwarding,////Presence Forwarding
-- ////<<registerXMPP,////Register Own XMPP Domain
+This is a short section on services available with Tigase.
 
+- xref:addManageDomain[Add and Manage Domains]
+- xref:presenceForwarding[Presence Forwarding]
+- xref:registerXMPP[Register Your Own XMPP Domain]

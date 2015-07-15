@@ -1,10 +1,13 @@
-[[TipsAndTricks]]
-= Tips and Tricks
+[[tipsAndTricks]]
+Tips and Tricks
+===============
+:author: Daniel Wisnewski
+:version: v1.0
+:date: 2015-13-07 11:32
 
 :toc:
 
-The section contains some short trick and tips helping in different kind of issues related to the server administration and maintenance.
+The section contains some short tricks and tips helping in different kinds of issues related to the server administration and maintenance.
 
-include::Admin_Guide_46_-_Tips_and_Tricks_-_A_-_Tigase_Tip_Checking_the_Runtime_Environment.asciidoc[]
-
-include::Admin_Guide_46_-_Tips_and_Tricks_-_B_-_Tigase_Tip_Checking_Cluster_Connections.asciidoc[]
+- xref:tigaseTip_RuntimeEnvironment[Runtime Environment Tip]
+- xref:tigaseTip_CheckingClusterConnections[Checking Cluster Connections]

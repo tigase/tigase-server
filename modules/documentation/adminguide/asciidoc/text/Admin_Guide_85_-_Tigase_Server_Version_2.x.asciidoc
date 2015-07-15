@@ -1,19 +1,22 @@
+[[tigasev2x]]
 Tigase Server version 2.x
 =========================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:16
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2010-04-06 21:16
 
-Administration manuals and guides for the Tigase server 2.x line.
+Administration manuals and guides for Tigase server 2.x line.
 
-_Please note, this guides are for the Tigase server 2.x line which is no longer supported. Please upgrade to the last stable version and contact us if you have any problems._
+_Please note, this guides are for Tigase server 2.x line which is no longer supported. Please upgrade to the last stable version and contact us if you have any problems._
 
-- ////<<installation2,////Installation
-- ////<<mysql2database,////MySQL Database Use
-- ////<<postgresDB2,////PostgreSQL Database Use
-- ////<<configuration2,////Configuration
-- ////<<commandLineTools2,////Command Line Admin Tools
-
+- xref:installation2x[Installation]
+- xref:mysql2database[MySQL Database Use]
+- xref:postgresDB2[PostgreSQL Database Use]
+- xref:configuration2x[Configuration]
+- xref:commandLineTools2[Command Line Admin Tools]
+- xref:configurationManagement2[Configuration Management Tool]

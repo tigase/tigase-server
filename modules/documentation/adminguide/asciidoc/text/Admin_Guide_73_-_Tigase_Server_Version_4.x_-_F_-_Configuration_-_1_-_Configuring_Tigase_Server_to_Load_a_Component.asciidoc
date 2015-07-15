@@ -1,22 +1,24 @@
-//[[loadComponent]]
+[[loadComponent]]
 Configuring the Tigase Server to Load a Component
 =================================================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2010-04-06 21:18
 
-A detailed description of all the configuration options is in the ////<<initPropertiesGuide,////init.properties guide where you can also find information described below and much more. Purpose of this document however is to give you a quite and brief information how to load a component into the Tigase server without need to dig through all the details.
+A detailed description of all the configuration options is in the +init.properties+ guide where you can also find information described below and much more. The purpose of this document is to give you a brief introduction on how to load a component into Tigase server without the need to dig through all the details.
 
-I will show how to load 2 components into the Tigase server using configuration in the init.properties file: link:https://projects.tigase.org/projects/tigase-muc[MUC] and link:https://projects.tigase.org/projects/tigase-pubsub[PubSub]. Please remember, every time you change something in the *init.properties* file you have to remove the XML configuration file in order to force the server to regenerate the main configuration which is stored in XML file. 
+I will show how to load 2 components into Tigase server using a configuration in the init.properties file: link:https://projects.tigase.org/projects/tigase-muc[MUC] and link:https://projects.tigase.org/projects/tigase-pubsub[PubSub]. Please remember, every time you change something in the *init.properties* file you have to remove the XML configuration file in order to force the server to regenerate the main configuration which is stored in XML file.
 
-The first thing you need is the component implementation. Component implementation is a class or set of classes extending link:http://projects.tigase.org/server/trac/browser/trunk/src/main/java/tigase/server/AbstractMessageReceiver.java[tigase.server.AbstractMessageReceiver]. What you need to do is just putting the jar file in the +libs/+ directory in the Tigase server installation. Then the Tigase server will find all classes automatically at the startup time. 
+The first thing you need do is conduct component implementation. Component implementation is a class or set of classes extending link:http://projects.tigase.org/server/trac/browser/trunk/src/main/java/tigase/server/AbstractMessageReceiver.java[tigase.server.AbstractMessageReceiver]. What you need to do is just put the jar file in the +libs/+ directory in Tigase server installation. Then Tigase server will find all classes automatically at the startup time.
 
-Next step is to tell the server what components to load, how to name them and optionally give some extra parameters. To do so please open the init.properties file you use in your installation. It might be init-mysql.properties or init-pgsql.properties or even your own properties file.
+Next step is to tell the server what components to load, how to name them and optionally give some extra parameters. To do so open the +init.properties+ file you use in your installation. It might be init-mysql.properties or init-pgsql.properties or even your own properties file.
 
-Let's say you want to add just PubSub for now. All you need to do is adding just 2 lines to the properties file: 
+Let's say you want to just add PubSub for now. All you need to do is add 2 lines to the properties file:
 
 [source,bash]
 -------------------------------------
@@ -24,9 +26,9 @@ Let's say you want to add just PubSub for now. All you need to do is adding just
 --comp-class-1=tigase.pubsub.PubSubComponent
 -------------------------------------
 
-They mean: the first component name is 'pubsub' and the main class for this component is: 'tigase.pubsub.PubSubClusterComponent'. It doesn't really matter what the component name is the only requirement is that it must be unique among other components names. It does also help to give it a name which means something thus 'pubsub' is a good name for a 'PubSub' component but it would be a bad name for the 'MUC' component.
+The first line contains the component name 'pubsub' and the main class for this component is: 'tigase.pubsub.PubSubClusterComponent'. It doesn't really matter what the component name is, the only requirement is that it must be unique among other components names. Because you can load many components, it helps to provide descriptive names thus 'pubsub' is a good name for a 'PubSub' component.
 
-We can of course add more components even PubSub components to the same server. Each of them would need to have a different name then. For example:
+You can of course add more components, even PubSub components to the same server. Just remember that each of them would need to have a different name then. For example:
 
 [source,bash]
 -------------------------------------
@@ -34,9 +36,9 @@ We can of course add more components even PubSub components to the same server. 
 --comp-class-2=tigase.pubsub.PubSubComponent
 -------------------------------------
 
-Which is needed in really rare cases. 
+Although this may be rare, it allows for wide compatibility and platform stability.
 
-Normally, however we want to load few different components like PubSub, MUC, MSN Transport and so on.... Therefore instead of the above second PubSub we can load the MUC component: 
+Normally, however we want to load few different components like PubSub, MUC, MSN Transport and so on.... Therefore instead of the above second PubSub we can load the MUC component:
 
 [source,bash]
 -------------------------------------
@@ -44,4 +46,3 @@ Normally, however we want to load few different components like PubSub, MUC, MSN
 --comp-class-2=tigase.muc.MUCComponent
 -------------------------------------
 Again! Don't forget to remove your XML config file before restarting the server.
-

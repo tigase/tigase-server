@@ -1,15 +1,19 @@
-//[[domainBasedPacketFiltering]]
-== Domain Based Packet Filtering
+[[domainBasedPacketFiltering]]
+Domain Based Packet Filtering
+=============================
+:author: not known
+:version: v1.0 initial release
+:date: 2015-07-13 16:43
 
-Domain based packets filter is a simple filter allowing to restrict user communication based on the source/destination domain name. This is especially useful if we want to limit user communication within a single - own domain only or a list of domains.
+Domain based packet filtering is a simple filter allowing to restrict user communication based on the source/destination domain name. This is especially useful if we want to limit user communication within a single - own domain only or a list of domains.
 
-A company might not wish and allow employers to chat during work hours with anybody in the world. A company may also have a few different domains used by different branches or departments. An administrator may restrict communication to a list of domains.
+A company might not wish to allow employers to chat during work hours with anybody in the world. A company may also have a few different domains used by different branches or departments. An administrator may restrict communication to a list of domains.
 
 === Introduction
 
-The restriction is on per-user basis. So the administrator can set a different filtering rules for each user. There is also a per-domain configuration and global-installation setting (applied from most general to most specific, i.e. from installation to user).
+The restriction is on a per-user basis. So the administrator can set a different filtering rules for each user. There is also a per-domain configuration and global-installation setting (applied from most general to most specific, i.e. from installation to user).
 
-Regular user can not change the setting. So this is not like a privacy list where the user control the filter. Domain filter can not be changed or controlled by the user. System administrator can change the settings based on the company policy.
+Regular users can not change the settings. So this is not like a privacy list where the user control the filter. Domain filter can not be changed or controlled by the user. The system administrator can change the settings based on the company policy.
 
 There are predefined rules for packet filtering:
 
@@ -23,22 +27,22 @@ There are predefined rules for packet filtering:
 
 Whitelist (`LIST`) and blacklist (`BLACKLIST`) settings are mutually exclusive, i.e. at any given point of time only one of them can be used.
 
-Those rules applicable to particular user are stored in the user repository and are loaded for each user session. If there are no rules stored for a particular user server tries to apply rules for a VHost of particular user, and if there is no VHost filtering policy server uses global server configuration. If there is no filtering policy altogether server applies defaults based on following criteria:
+Those rules applicable to particular users are stored in the user repository and are loaded for each user session. If there are no rules stored for a particular user server tries to apply rules for a VHost of particular user, and if there is no VHost filtering policy server uses global server configuration. If there is no filtering policy altogether server applies defaults based on following criteria:
 
 . If this is *Anonymous* user then *LOCAL* rule is applied
 . For all *other* users *ALL* rule is applied.
 
 === Configuration
 
-Filtering is performed by domain filter plugin which must be loaded at startup time. It is loaded by default if plugins list is not set in the configuration file. However if you have a list of loaded plugins in the configuration file make sure *domain-filter* is on the list.
+Filtering is performed by the domain filter plugin which must be loaded at startup time. It is loaded by default if the plugins list is not set in the configuration file. However if you have a list of loaded plugins in the configuration file make sure *domain-filter* is on the list.
 
 There is no other configuration required for the plugin to work.
 
 === Administration, Rules Management
 
-Although controlling domain filtering rules are possible for each user separately it is normally not practical for large installations. In most cases users are stored in the database and third-party system keeps all the user information.
+Although controlling domain filtering rules is possible for each user separately, it is not practical for large installations. In most cases users are stored in the database and a third-party system keeps all the user information.
 
-To change the rule for a single user you can use loadable administration scripts feature and load link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/groovy/tigase/admin/UserDomainFilter.groovy[UserDomainFilter.groovy] script. It allows to modify rules for a given user JID.
+To change the rule for a single user you can use loadable administration scripts feature and load link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/groovy/tigase/admin/UserDomainFilter.groovy[UserDomainFilter.groovy] script. It enables modifying rules for a given user JID.
 
 === Implementation
 
@@ -50,7 +54,7 @@ repo.getData(user_id, null, DomainFilter.ALLOWED_DOMAINS_KEY, null)
 repo.getData(user_id, null, DomainFilter.ALLOWED_DOMAINS_LIST_KEY, null)
 -------------------------------------
 
-Where *user_id* is user Jabber ID without resource part. *DomainFilter.ALLOWED_DOMAINS_KEY* is a property key: "allowed-domains". The user repository MUST return one of following only:
+Where *user_id* is user Jabber ID without resource part, *DomainFilter.ALLOWED_DOMAINS_KEY* is a property key: "allowed-domains". The user repository MUST return one of following only:
 
 . `ALL` - if the user is allowed to communicate with anybody
 . `LOCAL` - if the user is allowed to communicate with users on the same server installation.
@@ -70,7 +74,8 @@ policy = (allow|deny);
 UID_type = [jid|domain|all];
 UID = user JID or domain, for example pubsub@test.com; if UID_type is ALL then this is ignored.
 -------------------------------------
-for example
+
+For example:
 
 [source]
 -------------------------------------
@@ -83,6 +88,4 @@ for example
 
 In case of `LIST` and `BLACKLIST` filtering options, it's essential to provide list of domains for the whitelisting/blacklisting. *DomainFilter.ALLOWED_DOMAINS_LIST_KEY* is a property key: "allowed-domains-list". The user repository MUST return semicolon separated list of domains: `domain1.com;domain2.com,domain3.org`
 
-
-
-The filtering is performed by link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/xmpp/impl/DomainFilter.java[`tigase.xmpp.impl.DomainFilter`] plugin. Please refer to source code for more implementation details.
+The filtering is performed by the link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/xmpp/impl/DomainFilter.java[`tigase.xmpp.impl.DomainFilter`] plugin. Please refer to source code for more implementation details.

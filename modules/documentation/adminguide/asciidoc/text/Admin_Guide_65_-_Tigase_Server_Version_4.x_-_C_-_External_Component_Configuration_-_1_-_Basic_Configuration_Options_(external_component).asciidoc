@@ -1,18 +1,20 @@
-//[[4xbasicConfiguration]]
+[[4xbasicConfiguration]]
 Basic Configuration Options (External Component)
 ================================================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:vesion: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2010-04-06 21:18
 
-As for all Tigase components you can load it and configure it via ////<<initPropertiesGuide,////init.properties file described in details in ////<<4xconfiguration,////another guide. This document describes how to load the component and set the initial configuration to accept or initiate connections for an external component.
+As for all Tigase components you can load it and configure it via +init.properties+ file described in details in another guide. This document describes how to load the component and set the initial configuration to accept or initiate connections for an external component.
 
 First thing to do is to specify the component class and the component name which must be unique within the Tigase installation. The most commonly name used is +ext+ and the class is +tigase.server.ext.ComponentProtocol+.
- 
-Following 2 lines in the ////<<initPropertiesGuide,////init.properties will load the component during the server startup time:
+
+Following 2 lines in the +init.properties+ will load the component during the server startup time:
 
 [source,bash]
 -------------------------------------
@@ -20,18 +22,18 @@ Following 2 lines in the ////<<initPropertiesGuide,////init.properties will load
 --comp-class-1 = tigase.server.ext.ComponentProtocol
 -------------------------------------
 
-While this would load the component there is no additional configuration provided to the component would be practically useless. It is possible to add necessary parameters (external domains, passwords) during run-time via ad-hoc commands but this is generally a good practise to provide some initial parameters in the configuration file too.
+While this would load the component, there are no additional configurations provided to the component would be practically useless. It is possible to add necessary parameters (external domains, passwords) during run-time via ad-hoc commands. It is generally a good practice to provide some initial parameters in the configuration file too.
 
-There are two additional properties used for setting initial configuration for external components connections: ////<<initProperties_external,////--external and ////<<initProperties_bind-ext-hostnames,////--bind-ext-hostnames. 
+There are two additional properties used for setting initial configuration for external components connections: --external and --bind-ext-hostnames.
 
-These two properties are very well described on page under the given links, therefore I will focus on practical and working examples here.
+These two properties are very well described on the online documentation, therefore I will focus on practical and working examples here.
 
 Simple Case
 -----------
 
-The most common scenario is to connect an external component which works for a specific, given domain to the main server. The component authenticates with a defined password and the external component connects to a TCP/IP port the server listens on.
+The most common scenario is to connect an external component which works for a specific given domain to the main server. The component authenticates with a defined password and the external component connects to a TCP/IP port the server listens on.
 
-For example lat's say our server works for a virtual domain: +devel.tigase.org+. We want it to listen on port +5270+ for incoming connections from an external component working for a domain: +muc.devel.tigase.org+. The authentication password for the domain is +muc-secret+.
+For example let's say our server works for a virtual domain: +devel.tigase.org+. We want it to listen on port +5270+ for incoming connections from an external component working for a domain: +muc.devel.tigase.org+. The authentication password for the domain is +muc-secret+.
 
 For such a scenario we need 3 lines in the +init.properties+ file:
 
@@ -45,11 +47,11 @@ For such a scenario we need 3 lines in the +init.properties+ file:
 More External Components/Domains
 --------------------------------
 
-Suppose you want to connect more than one external component. Let's say you want to connect PubSub and MSN components to the Tigase server as well.
+Suppose you want to connect more than one external component. Let's say you want to connect PubSub and MSN components to Tigase server as well.
 
-In such a case you don't have to open another port on the server. All the components can connect to the same port. Of course each of the components connect for a different domain and probably should use a different password. 
+In that case you don't have to open another port on the server, all the components can connect to the same port. Of course each of the components connect for a different domain and probably should use a different password.
 
-Let's say then that we want the Tigase server accept two more domains with corresponding passwords: (pubsub.devel.tigase.org:pubsub_pass) and (msn.devel.tigase.org:msn_pass). Your counfiguration properties should look like this:
+Let's say then that we want Tigase server accept two more domains with corresponding passwords: (pubsub.devel.tigase.org:pubsub_pass) and (msn.devel.tigase.org:msn_pass). Your configuration properties should look like this:
 
 [source,bash]
 -------------------------------------
@@ -60,12 +62,12 @@ Let's say then that we want the Tigase server accept two more domains with corre
     msn.devel.tigase.org:msn_pass
 -------------------------------------
 
-_Please note, the --external property with value should be written in a single line. Above example has split the line for readibility._
+_Please note, the --external property with value should be written in a single line. The above example has split the line for readability._
 
 More TCP/IP Ports
 -----------------
 
-You can make the Tigase to listen on more than one TCP/IP port for incoming external component connections. Please be aware however that there is no way, currently to bind an external component to a particular port. If the Tigase listens on two or more ports it accepts any external component on any of the ports. Therefore there is no practical reason for opening more than one port.
+You can make Tigase listen on more than one TCP/IP port for incoming external component connections. Please be aware that there is no way, currently to bind an external component to a particular port. If Tigase listens on two or more ports it accepts any external component on any of the ports. Therefore there is no practical reason for opening more than one port.
 
 However, if for some reason you need Tigase to listen on more ports then this is an example configuration:
 
@@ -78,16 +80,16 @@ However, if for some reason you need Tigase to listen on more ports then this is
    msn.devel.tigase.org:msn_pass:listen:5272
 -------------------------------------
 
-_Please note, the --external property with value should be written in a single line. Above example has split the line for readibility._
+_Please note, the --external property with value should be written in a single line. The above example has split the line for readability._
 
-Above setting sets three TCP/IP ports to listen on: 5270, 5271 and 5272. It also specifies 3 different external domains with passwords which are accepted by the Tigase. Even though each port is specified with conjunction with a domain they are not bound together in any way. Any of specified domains can connect through any of specified ports.
+These settings set three TCP/IP ports to listen on: 5270, 5271 and 5272. They also specify 3 different external domains with passwords which are accepted by Tigase. Even though each port is specified with conjunction with a domain they are not bound together in any way. Any of specified domains can connect through any of specified ports.
 
 Outgoing Connections
 --------------------
 
-The Tigase server can, not only, accept connections from external components, it can also open connections to external components. 
+Tigase server can not only accept connections from external components, it can also open connections to external components.
 
-To make the Tigase connect to external component you have to change 'listen' parameter to 'connect' and of course you have to tell where to connect - the address of the external component:
+To make Tigase connect to an external component you have to change 'listen' parameter to 'connect' and of course you have to tell where to connect - the address of the external component:
 
 [source,bash]
 -------------------------------------
@@ -96,9 +98,9 @@ To make the Tigase connect to external component you have to change 'listen' par
 --external = devel.tigase.org:muc-secret:connect:5270:muc.devel.tigase.org
 -------------------------------------
 
-Assuming the MUC component listens on the port '5270' at the DNS address: 'muc.devel.tigase.org' the Tigase will connect to the component.
+Assuming the MUC component listens on the port '5270' at the DNS address: 'muc.devel.tigase.org' Tigase will connect to the component.
 
-You can of course set as many as you need external components to which you want the Tigase to connect to:
+You can of course set as many as you need external components to which you want Tigase to connect to:
 
 [source,bash]
 -------------------------------------
@@ -109,18 +111,20 @@ You can of course set as many as you need external components to which you want 
   devel.tigase.org:msn_pass:connect:5272:msn.devel.tigase.org
 -------------------------------------
 
-If external components run on a separate machines you can of course us the same port number for each of them.
+If external components run on a separate machines you can use the same port number for each of them.
 
 Specifying Protocol
 -------------------
 
-One of the last parameters you can set for the external component/domain is a protocol which should be used for the connection. At the moment the Tigase server supports two protocols defined in link:http://xmpp.org/extensions/xep-0114.html[XEP-0114] and link:http://xmpp.org/extensions/xep-0225.html[XEP-0225] and possibly in the future it may support more.
+One of the last parameters you can set for the external component/domain is a protocol which should be used for the connection. At the moment the Tigase server supports two protocols defined in link:http://xmpp.org/extensions/xep-0114.html[XEP-0114] and link:http://xmpp.org/extensions/xep-0225.html[XEP-0225] and possibly further protocols.
 
 You don't have to specify a protocol if you setup a connection in 'listen' mode as the server automatically detects a protocol which is used in incoming connections.
 
-You can, however specify the protocol which is used for outgoing connections. You have to add one more parameter to the connection string. There are two possibilities: 
+You can specify the protocol which is used for outgoing connections but you have to add one more parameters to the connection string.
 
-. 'accept' which is an identifier for protocol defined in link:http://xmpp.org/extensions/xep-0114.html[XEP-0114] (and is a default if you do not specify anything)
+There are two possibilities:
+
+. 'accept' which is an identifier for protocol defined in link:http://xmpp.org/extensions/xep-0114.html[XEP-0114] (and is default if you do not specify anything)
 . 'client' which is identifier for protocol defined in link:http://xmpp.org/extensions/xep-0225.html[XEP-0225] and is based on the client-to-server protocol.
 
 An example configuration with protocol specified:
@@ -133,14 +137,14 @@ An example configuration with protocol specified:
   devel.tigase.org:pubsub_pass:connect:5270:pubsub.devel.tigase.org:client
 -------------------------------------
 
-It defines two outgoing connections to external protocols, the first uses link:http://xmpp.org/extensions/xep-0114.html[XEP-0114] protocol and the second uses link:http://xmpp.org/extensions/xep-0225.html[XEP-0225].
+It defines two outgoing connections to external protocols, the first uses the link:http://xmpp.org/extensions/xep-0114.html[XEP-0114] protocol and the second uses the link:http://xmpp.org/extensions/xep-0225.html[XEP-0225] protocol.
 
 Load Balancer Plugin
 --------------------
 
 The last option you can set for external component connections is load balancer class.
 
-The load balancer plugin is used if you have multiple connections for the same component (external domain name) and you want to spread load over all connections. Perhaps you have an installation with huge number of MUC rooms and you want to spread the load over all MUC instances.
+The load balancer plugin is used if you have multiple connections for the same component (external domain name) and you want to spread the load over all connections. Perhaps you have an installation with huge number of MUC rooms and you want to spread the load over all MUC instances.
 
 An example configuration with load balancer plugin specified:
 
@@ -154,7 +158,6 @@ An example configuration with load balancer plugin specified:
 
 It defines two listeners for external component with different load balancer plugins. The first load-balance traffic by a packet destination BareJID, which makes sense for MUC component. This way each MUC instance handles a different set of rooms which allows for a good load distribution.
 
-For PubSub component we use a different load balancer plugin which distributes load by the sender BareJID instead. This is because for PubSub destination BareJID is always the same so we cannot use it to distribute the load.
+For the PubSub component we use a different load balancer plugin which distributes load by the sender BareJID instead. This is because for the PubSub destination BareJID is always the same so we cannot use it to distribute the load.
 
-Either the *ReceiverBareJidLB* or *SenderBareJidLB* are class names from package: *tigase.server.ext.lb* however, you can use any class name as a plugin, you just have to provide a full class name and the class name must implement *LoadBalancerIfc* interface.  
-
+Either the *ReceiverBareJidLB* or *SenderBareJidLB* are class names from package: *tigase.server.ext.lb* however, you can use any class name as a plugin, you just have to provide a full class name and the class name must implement *LoadBalancerIfc* interface.

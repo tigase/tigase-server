@@ -1,12 +1,14 @@
-//[[saslExternal]]
-Configuration SASL EXTERNAL
-===========================
-Bartosz Malkowski <bmalkowski@tigase.pl>
-v2.0, June 2014: Reformatted for AsciiDoc.
+[[saslExternal]]
+Configuration of SASL EXTERNAL
+==============================
+:author: Bartosz Malkowski <bmalkowski@tigase.pl>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-11-27 13:34
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2013-11-27 13:34
 
 In order to enable SASL External add following line to the  +init.properties+ file
 
