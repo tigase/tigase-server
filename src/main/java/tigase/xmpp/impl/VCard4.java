@@ -1,8 +1,8 @@
 /*
- * VCardTemp.java
+ * VCard4.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
+ * Copyright (C) 2004-2015 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,78 +20,76 @@
  *
  */
 
-
-
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
-
 import tigase.server.Iq;
 import tigase.server.Packet;
-
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
-
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 import tigase.xmpp.NoConnectionIdException;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPProcessorAbstract;
 import tigase.xmpp.XMPPResourceConnection;
-
-import tigase.xmpp.impl.annotation.*;
-import static tigase.xmpp.impl.VCardTemp.*;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
+import static tigase.xmpp.impl.VCard4.*;
+import tigase.xmpp.impl.annotation.DiscoFeatures;
+import tigase.xmpp.impl.annotation.Handle;
+import tigase.xmpp.impl.annotation.Handles;
+import tigase.xmpp.impl.annotation.Id;
 
 /**
- * Describe class VCardTemp here.
  *
- *
- * Created: Thu Oct 19 23:37:23 2006
- *
- * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
+ * @author andrzej
  */
-@Id(XMLNS)
+@Id(ID)
 @Handles({
-	@Handle(path={ Iq.ELEM_NAME, vCard },xmlns=XMLNS),
-	@Handle(path={ Iq.ELEM_NAME, VCARD },xmlns=XMLNS)
+	@Handle(path={ Iq.ELEM_NAME, VCARD_EL },xmlns=XMLNS)
 })
 @DiscoFeatures({
 	XMLNS
 })
-public class VCardTemp
-				extends VCardXMPPProcessorAbstract {
-	/** Field description */
-	public static final String VCARD_KEY = "vCard";
+public class VCard4 extends VCardXMPPProcessorAbstract {
+	
+	private static final Logger log = Logger.getLogger(VCard4.class.getCanonicalName());
+	
+	// private varibles reused in public variables
+	static final String ID = "vcard-xep-0292";
+	protected static final String VCARD_EL = "vcard";
+	protected static final String XMLNS = "urn:ietf:params:xml:ns:vcard-4.0";
+	
+	// public variables used in other places which depends on private variables above
+	public static final String REPO_NODE = ID;
+	
+	// private variables used only by this processor
+	static final String VCARD_KEY = ID;
+		
+	private static final SimpleParser parser   = SingletonFactory.getParserInstance();
 
 	/**
-	 * Private logger for class instances.
+	 * Method description
+	 *
+	 *
+	 * @param connectionId
+	 * @param packet
+	 * @param session
+	 * @param repo
+	 * @param results
+	 * @param settings
+	 *
+	 * @throws PacketErrorTypeException
 	 */
-	private static Logger log = Logger.getLogger(VCardTemp.class.getName());
-
-	// VCARD element is added to support old vCard protocol where element
-	// name was all upper cases. Now the plugin should catch both cases.
-	protected static final String       vCard    = "vCard";
-	protected static final String       VCARD    = "VCARD";
-	protected static final String       XMLNS    = "vcard-temp";
-	protected static final String       ID       = XMLNS;
-	private static final SimpleParser parser   = SingletonFactory.getParserInstance();
-	
+	@Override
 	public void processFromUserOutPacket(JID connectionId, Packet packet,
 			XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
 			Map<String, Object> settings)
@@ -122,6 +120,19 @@ public class VCardTemp
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param connectionId
+	 * @param packet
+	 * @param session
+	 * @param repo
+	 * @param results
+	 * @param settings
+	 *
+	 * @throws PacketErrorTypeException
+	 */
 	@Override
 	public void processFromUserToServerPacket(JID connectionId, Packet packet,
 			XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results,
@@ -144,14 +155,8 @@ public class VCardTemp
 					break;
 
 				case set :
-					Element elvCard = packet.getElement().getChild(vCard);
+					Element elvCard = packet.getElement().getChild(VCARD_EL, XMLNS);
 
-					// This is added to support old vCard protocol where element
-					// name was all upper cases. So here I am checking both
-					// possibilities
-					if (elvCard == null) {
-						elvCard = packet.getElement().getChild(VCARD);
-					}
 					setVCard(session, elvCard);
 					result = packet.okResult((String) null, 0);
 
@@ -191,6 +196,17 @@ public class VCardTemp
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param repo
+	 * @param results
+	 * @param settings
+	 *
+	 * @throws PacketErrorTypeException
+	 */
 	@Override
 	public void processNullSessionPacket(Packet packet, NonAuthUserRepository repo,
 			Queue<Packet> results, Map<String, Object> settings)
@@ -217,6 +233,16 @@ public class VCardTemp
 		}
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param session
+	 * @param repo
+	 * @param results
+	 * @param settings
+	 */
 	@Override
 	public void processServerSessionPacket(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
@@ -224,6 +250,18 @@ public class VCardTemp
 		// TODO: Hm, the server vCard should be sent here, not yet implemented....
 	}
 
+	/**
+	 * Method description
+	 *
+	 *
+	 * @param packet
+	 * @param session
+	 * @param repo
+	 * @param results
+	 * @param settings
+	 *
+	 * @throws PacketErrorTypeException
+	 */
 	@Override
 	public void processToUserPacket(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
@@ -253,11 +291,11 @@ public class VCardTemp
 			}
 		}
 	}
-	
+
 	@Override
 	protected String getVCardXMLNS() {
 		return XMLNS;
-	}
+	}	
 	
 	@Override
 	protected void storeVCard(XMPPResourceConnection session, Element elvCard) throws TigaseDBException, NotAuthorizedException {
@@ -271,8 +309,8 @@ public class VCardTemp
 				log.finer("Removing vCard");
 			}
 			session.removePublicData(ID, VCARD_KEY);
-		}    // end of else
-	}
+		}    // end of else		
+	}	
 	
 	private Packet parseXMLData(String data, Packet packet) {
 		DomBuilderHandler domHandler = new DomBuilderHandler();
@@ -290,6 +328,5 @@ public class VCardTemp
 
 		return result;
 	}
-}    // VCardTemp
-
-
+	
+}
