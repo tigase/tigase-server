@@ -100,7 +100,7 @@ config-type=--gen-config-def
 --debug=server
 -------------------------------------
 
-You have to replace *$HOST_NAME* with a domain name used for your XMPP (Jabber) installation. Let's say this is \'*jabber.your-great.net*'. Your init.properties should look like this then:
+You have to replace *$HOST_NAME* with a domain name used for your XMPP installation. Let's say this is \'*jabber.your-great.net*'. Your init.properties should look like this then:
 
 [source,sh]
 -------------------------------------
@@ -178,4 +178,4 @@ total 40K
 
 The first 2 files are the most interesting for us: *tigase-console.log* and *tigase.log.0*. The first one contains very limited information and only the most important entries. Have a look inside and check if there are any *WARNING* or *SEVERE* entries. If not everything should be fine.
 
-Now you can connect with a Jabber (XMPP) client of your choice. The first thing to do would be registering the first account - the admin account from your init.properties file: admin@jabber.your-great.net. Refer to your client documentation how to register a new account.
+Now you can connect with an XMPP client of your choice. The first thing to do would be registering the first account - the admin account from your init.properties file: admin@jabber.your-great.net. Refer to your client documentation how to register a new account.

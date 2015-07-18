@@ -31,7 +31,7 @@ And yes, you can just remove the admin account: +"admin@localhost"+ unless you r
 
 If however, the account does not exists the message is discarded and a warning will be printed in a log file.
 
-It means that the admin account has to be also created in the normal way on the Jabber server. Just register it using your Jabber client. The admin accounts setting works just as a forward instruction. So as a result all system and admin messages are forwarded to all admin accounts if they exist.
+It means that the admin account has to be also created in the normal way on the XMPP server. Just register it using your XMPP client. The admin accounts setting works just as a forward instruction. So as a result all system and admin messages are forwarded to all admin accounts if they exist.
 
 Obviously you can have as many admin accounts as you like:
 
@@ -121,11 +121,11 @@ session_1/hostnames = localhost
 
 Depending how successful the mechanism was for automatic hostname detection, you may have more or less results. This depends on network configuration on your server.
 
-The first form is more useful as it includes also hostnames recognized in the network environment. If it is correct, then you can just leave it as it is. If it is incorrect you have to change it. Please remember, if you want your server to be able to communicate with other _Jabber/XMPP_ servers the hostname you put there must resolve in DNS to your Jabber server machine IP address. In other words, if you try to connect from the Internet to machine with this hostname the connection should reach your Jabber server.
+The first form is more useful as it includes also hostnames recognized in the network environment. If it is correct, then you can just leave it as it is. If it is incorrect you have to change it. Please remember, if you want your server to be able to communicate with other _XMPP_ servers the hostname you put there must resolve in DNS to your XMPP server machine IP address. In other words, if you try to connect from the Internet to machine with this hostname the connection should reach your XMPP server.
 
-Remember your Jabber server users' JIDs (_Jabber IDs_) can include only those hostnames which are included in the configuration. So in this example case you can use only _JIDs_: +"user2@your.hostname.com",+ +"user1@your.hostname.com"+ and so on.
+Remember your XMPP server users' JIDs (_Jabber IDs_) can include only those hostnames which are included in the configuration. So in this example case you can use only _JIDs_: +"user2@your.hostname.com",+ +"user1@your.hostname.com"+ and so on.
 
-If you server have more Internet addresses (virtual domains) assigned to it your Jabber server, you can use them all. So your configuration may look ike:
+If you server have more Internet addresses (virtual domains) assigned to it your XMPP server, you can use them all. So your configuration may look ike:
 
 [source,bash]
 -------------------------------------
@@ -135,7 +135,7 @@ server_1/hostnames = yourhost, localhost, your.hostname.com, clien1.hostname.com
 session_1/hostnames = yourhost, localhost, your.hostname.com, clien1.hostname.com
 -------------------------------------
 
-In such case users' _JIDs_ on your Jabber server may include any of defined above domains like: "user1@your.hostname.com", _"user1@clien1.hostname.com",_ _"user1@yourhost"._ Each of these 3 sample _JIDs_ refer to different user account.
+In such case users' _JIDs_ on your XMPP server may include any of defined above domains like: "user1@your.hostname.com", _"user1@clien1.hostname.com",_ _"user1@yourhost"._ Each of these 3 sample _JIDs_ refer to different user account.
 
 Your server will accept connections only for domains defined in configuration file.
 

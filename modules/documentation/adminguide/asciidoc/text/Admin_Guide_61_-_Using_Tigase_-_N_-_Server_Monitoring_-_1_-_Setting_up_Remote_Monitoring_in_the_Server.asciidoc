@@ -27,7 +27,7 @@ If you run the server from sources or SVN continue reading:
 Remote monitoring requires an external library which is implemented in the tigase-extras package to comply with the basic rules - no third-party libraries are needed for the core Tigase server. But you will still need 2 more jar files to conduct remote monitoring activation:
 
 . link:https://projects.tigase.org/projects/tigase-extras/files[tigase-extras] or the link:https://projects.tigase.org/projects/tigase-server/repositoryr[current snapshot].
-. *jdmkrt.jar* file from link:https://opendmk.java.net/[OpenDMK] project version 5.1 or later. // *removed due to local removal* A copy of this jar file in also available in our maven repository: link:http://maven.tigase.org/openDMK/jdmkrt/1.0-b02/jdmkrt-1.0-b02.jar[jdmkrt.jar].
+. *jdmkrt.jar* file from link:https://opendmk.java.net/[OpenDMK] project version 5.1 or later. A copy of this jar file in also available in our maven repository: link:http://maven.tigase.org/openDMK/jdmkrt/1.0-b02/[jdmkrt.jar].
 
 Download both libraries and put them in the libs/ directory.
 

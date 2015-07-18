@@ -1,12 +1,14 @@
 [[installation2x]]
 Installation
 ============
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:16
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2010-04-06 21:16
 
 To get the server up and running you have to download from our site the most recent version of the binary package.
 
@@ -44,7 +46,7 @@ Now all you need is _Java 6 (1.6 beta2 at the moment)_ compliant virtual machine
 
 You can now see a few messages with warning about missing configuration file and missin user repository file. These 2 files will be automaticaly created. Config file will be created just during first execution of the server and user repository file will be created when the first user is added to the system.
 
-You should be able now to connect to the server with Jabber/XMPP client of your choice.
+You should be able now to connect to the server with an XMPP client of your choice.
 
 First parameter is a command, second parameter is a config file for startup script. Possible commands are:
 

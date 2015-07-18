@@ -10,9 +10,9 @@ StanzaSender
 :numbered:
 :website: http://tigase.net
 
-StanzaSender is a component which makes it easier to integrate Jabber/XMPP server with other third-party tools.
+StanzaSender is a component which makes it easier to integrate XMPP server with other third-party tools.
 
-It simply allows you to send stanzas from your application without implementing any Jabber/XMPP specific code. The component regularly reads specified data source for XMPP packets to send. The data source can be a SQL database, directory on your filesystem, or anything you might want.
+It simply allows you to send stanzas from your application without implementing any XMPP specific code. The component regularly reads specified data source for XMPP packets to send. The data source can be a SQL database, directory on your filesystem, or anything you might want.
 
 If you have a Web application for example for which you want to send notifications of an event to selected users you can install link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/show/src/main/java/tigase/server/ssender[StanzaSender] component on your Tigase server. It will help you to easily distribute your messages to end-users.
 

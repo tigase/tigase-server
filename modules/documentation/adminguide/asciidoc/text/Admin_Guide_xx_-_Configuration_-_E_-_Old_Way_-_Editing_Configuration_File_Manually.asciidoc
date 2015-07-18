@@ -48,7 +48,7 @@ And yes, you can just remove second entry with admin account: "*admin@localhost*
 
 Well, if the account does not exists the message is discarded and a warning is be printed in log file. Again, read it again, the previous sentence...
 
-It means that the admin account has to be also created in normal way on the Jabber server. Just register it using your Jabber client. The admin accounts setting works just as a forward instruction. So as a result all system and admin messages are forwarded to all admin accounts if they exist.
+It means that the admin account has to be also created in normal way on the XMPP server. Just register it using your XMPP client. The admin accounts setting works just as a forward instruction. So as a result all system and admin messages are forwarded to all admin accounts if they exist.
 
 Obviously you can have admin accounts as many as you like:
 
@@ -89,11 +89,11 @@ It may also look like:
 
 Depending how successful was mechanism for automatic hostname detection. It of course does not depends on your luck. It depends on network configuration on your server.
 
-The first form is more useful as it includes also hostname recognized in network environment. If it is correct then you can just leave it as it is. If it is incorrect you have to change it. Please remember, if you want your server to be able to communicate with other _Jabber/XMPP_ servers the hostname you put there must resolve in DNS to your Jabber server machine IP address. In other words. If you try to connect from the Internet to machine with this hostname the connection should reach your Jabber server.
+The first form is more useful as it includes also hostname recognized in network environment. If it is correct then you can just leave it as it is. If it is incorrect you have to change it. Please remember, if you want your server to be able to communicate with other _XMPP_ servers the hostname you put there must resolve in DNS to your XMPP server machine IP address. In other words. If you try to connect from the Internet to machine with this hostname the connection should reach your XMPP server.
 
-And remember your Jabber server users' _JIDs (Jabber IDs)_ can include only those hostnames which are included in the configuration. So for our case you can use only _JIDs:_ "_user2@your.hostname.com_", "_user1@your.hostname.com_" and so on.
+And remember your XMPP server users' _JIDs (XMPP IDs)_ can include only those hostnames which are included in the configuration. So for our case you can use only _JIDs:_ "_user2@your.hostname.com_", "_user1@your.hostname.com_" and so on.
 
-If you server have more Internet addresses (virtual domains) assigned to it your Jabber server can use them all. So your configuration may look like:
+If you server have more Internet addresses (virtual domains) assigned to it your XMPP server can use them all. So your configuration may look like:
 
 [source,bash]
 -------------------------------------
@@ -107,7 +107,7 @@ If you server have more Internet addresses (virtual domains) assigned to it your
 </entry>
 -------------------------------------
 
-In such case users' _JIDs_ on your Jabber server may include any of defined above domains like: "_user1@your.hostname.com_", "_user1@clien1.hostname.com_", "_user1@jabber.sample-domain.com_". Each of these 3 sample JIDs refer to different user account.
+In such case users' _JIDs_ on your XMPP server may include any of defined above domains like: "_user1@your.hostname.com_", "_user1@clien1.hostname.com_", "_user1@jabber.sample-domain.com_". Each of these 3 sample JIDs refer to different user account.
 
 Your server will accept connections only for domains defined in configuration file.
 
@@ -116,7 +116,7 @@ In majority cases it does not matter whether you leave "*localhost*" or remove i
 Logs
 ----
 
-The logging mechanism is very flexible in Tigase server. You can adjust separate logging levels for each component. You can also directly login to different destinations like console, file, network socket and so on. Unfortunately that comes with some added complexity. The general idea however is quite simple so once you understand it it shouldn't be difficult for you anymore. This guide however describes logging very briefly. Look at full configuration documentation for detailed explanation.
+The logging mechanism is very flexible in Tigase server. You can adjust separate logging levels for each component. You can also directly login to different destinations like console, file, network socket and so on. Unfortunately that comes with some added complexity. The general idea however is quite simple so once you understand it it shouldn't be difficult for you anymore. This guide however describes logging very briefly. Look at xref:debuggingTigase[full configuration] documentation for detailed explanation.
 
 In a standard sever configuration you usually want to turn off all logging to console and only have warnings or more serious notices directed to the log file. Let's say logs will be written to +/var/log/tigase-server.log+ which shouldn't get bigger than 10MB and 5 old logs will be preserved. Here are instructions how to set those options.
 

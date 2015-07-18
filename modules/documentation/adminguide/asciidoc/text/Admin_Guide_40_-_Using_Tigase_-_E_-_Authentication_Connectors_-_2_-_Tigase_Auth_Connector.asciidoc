@@ -15,7 +15,7 @@ You can find more details how to setup a custom connector in the xref:customAuth
 
 To make this connector working you have to prepare your database to offer set of stored procedures for Tigase server to perform all the authentication actions. The best description is the example schema with all the stored procedures defined. Please refer to the Tigase link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/show/database[SVN repository] for the schema definition files.
 
-Files with the stored procedures implementations are located in link:https://projects.tigase.org/projects/tigase-server/repository/changes/database/mysql-schema-4.sql[postgresql-schema-4.sql] file for PostgreSQL database.
+Files with the stored procedures implementations are located in link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/show/database[postgresql-schema-4.sql] file for PostgreSQL database.
 
 The absolute minimum of stored procedures you have to implement is:
 

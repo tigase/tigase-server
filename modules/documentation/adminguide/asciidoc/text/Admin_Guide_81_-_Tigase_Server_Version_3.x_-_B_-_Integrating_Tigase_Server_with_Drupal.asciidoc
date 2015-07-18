@@ -12,7 +12,7 @@ Integrating Tigase Server with Drupal
 
 Tigase supports integration with Drupal on many levels. At the moment this guide can work with Drupal version 4.x and 5.x. They may also work with Drupal 6.x but this version hasn't been tested.
 
-First of all, Tigase can authenticate users against a Drupal database which means you have the same user account for both Drupal website and XMPP (Jabber) server. Moreover in such a configuration all account management is done via Drupal web interface like account creation, password change update user details and so on. Administrator can temporarily disable user account and this is followed by Tigase server too.
+First of all, Tigase can authenticate users against a Drupal database which means you have the same user account for both Drupal website and the XMPP server. Moreover in such a configuration all account management is done via Drupal web interface like account creation, password change update user details and so on. Administrator can temporarily disable user account and this is followed by Tigase server too.
 
 Connecting to Drupal Database
 -----------------------------
@@ -105,6 +105,6 @@ If you run the Tigase server installed from sources the command would be:
 
 There are system startup scripts for Gentoo and Mandriva Linux on +bin/+ or +scripts/+ directory which can be used to automatically start the server when system starts.
 
-Now you can register an account on your Drupal website and connect with Jabber client using the account details.
+Now you can register an account on your Drupal website and connect with an XMPP client using the account details.
 
-*Note!* _You have to enable plain password authentication in your Jabber client to connect to Tigase server with Drupal database_
+*Note!* _You have to enable plain password authentication in your XMPP client to connect to Tigase server with Drupal database_

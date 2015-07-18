@@ -18,6 +18,6 @@ The implementation also supports a scripting API and new domains with passwords 
 
 Even though it is much simpler to setup and to use it also offers a lot of new functionality and features. Pages in this guide describe in details all the administration aspects of setting up and managing external components.
 
-- xref:4xbasicConfiguration[Basic Configuration Options] (External Component)
-- xref:4xexternalComponent[Tigase as an External Component]
+- xref:tigase4xbasicConfiguration[Basic Configuration Options] (External Component)
+- xref:tigase4xexternalComponent[Tigase as an External Component]
 - xref:loadBalancingExternalComponent[Load Balancing External Components in Cluster Mode]

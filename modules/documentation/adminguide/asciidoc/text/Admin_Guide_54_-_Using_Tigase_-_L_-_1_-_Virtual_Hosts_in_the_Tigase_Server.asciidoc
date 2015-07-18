@@ -37,4 +37,5 @@ Please refer to documents listed below for more detailed information on the foll
 
 // - ////<<managingVirtualDomainsMissing,////Managing Virtual Domains Using Psi Client.
 - xref:ad-hocCommands[Specification for ad-hoc Commands Used to Manage Virtual Domains.]
-// - ////<<apiVirtualDomain,////API Description for Virtual Domains Management in the Tigase Server.
+- xref:addManageDomain[API Description for Virtual Domains Management in Tigase Server].
+- link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html_chunk/virtHosts.html[virtHosts Property guide]

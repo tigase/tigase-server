@@ -110,6 +110,6 @@ There is a small configuration bug in the installation of Tigase version 3.x. If
 
 You can now restart your machine and all services including the MySQL database and the Tigase server should be running. Alternatively if you don't want to restart your computer you can start both services manually if you know how to do it.
 
-When the system is up and running you can connect with any Jabber client (Psi for example) to your server to see if it is working.
+When the system is up and running you can connect with any XMPP client (Psi for example) to your server to see if it is working.
 
 Now, you can tweak the server configuration further. Use the guide describing init.properties file for configuration details.

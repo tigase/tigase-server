@@ -33,4 +33,4 @@ c2s/clientCertRequired[B]=true
 
 If this option will be enabled, then client must provide certificate. This certificate will be verified against +c2s/clientCertCA+. If client does not provide certificate or certificate will be invalid, TLS handshake will be interrupted and client will be disconnected.
 
-Using this options does not forced client to use SASL EXTERNAL. Client still may authenticate with other SASL mechanisms.
+Using this options does not force client to use SASL EXTERNAL. Client still may authenticate with other SASL mechanisms.

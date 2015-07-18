@@ -1,12 +1,14 @@
 [[newConnectionsThrottling]]
 --new-connections-throttling
 ============================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-09 23:08
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-02-09 23:08
 
 *Default value:* +5222:200,5223:50,5269:100,5280:1000+
 
@@ -14,9 +16,8 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* 'a list of port numbers with throttling thresholds as integer.'
 
-*Description:* The property allows you to limit how many new users' connection per second the server accepts on a particular port. Connections established within the limit are processed normally, all others are simply disconnected. This allows you to avoid server overload in case there is a huge number of users trying to connect at the same time. Mostly this happens after the server restart.
+*Description:* The property allows you to limit how many new users' connection per second the server accepts on a particular port. Connections established within the limit are processed normally, all others are simply disconnected. This allows you to avoid server overload in case there is a huge number of users trying to connect at the same time. Mostly this happens after a server restart.
 
 The property value is a list of comma separated port settings. Each port setting is formatted in a following way: +PORT_NO:LIMIT_VAL+
 
 *Available since:* 5.1.0
-

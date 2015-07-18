@@ -1,4 +1,4 @@
-[[4xbasicConfiguration]]
+[[tigase4xbasicConfiguration]]
 Basic Configuration Options (External Component)
 ================================================
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>

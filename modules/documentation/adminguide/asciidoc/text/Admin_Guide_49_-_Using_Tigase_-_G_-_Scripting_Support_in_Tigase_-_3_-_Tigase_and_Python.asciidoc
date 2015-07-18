@@ -75,7 +75,7 @@ else:
 
 Except this minor difference, the rest part of scripting in Python for the Tigase administrator commands is the same as all other languages. As all languages can return execution results via these special variables, it could be argued there is no difference at all.
 
-In next articles, I am going to present the Tigase server API available for scripting framework. My main language is Groovy as it offers the best integration with JVM and Tigase API, however I will try to include Python example code as well.
+link:http://docs.tigase.org/tigase-server/snapshot/Development_Guide/html_chunk/cil6.html[In another article], I am going to present the Tigase server API available for scripting framework. My main language is Groovy as it offers the best integration with JVM and Tigase API, however I will try to include Python example code as well.
 
 I hope this article encourages you to try the scripting support in the Tigase server. If you have any suggestions or questions please do not hesitate to send me your comments. I have also created a new link:http://www.tigase.org/forums/tigase-scripts[tigase scripts] forum on the website. If you have an interesting script to share or want to discuss some aspects of this functionality do not hesitate to add your post.
 

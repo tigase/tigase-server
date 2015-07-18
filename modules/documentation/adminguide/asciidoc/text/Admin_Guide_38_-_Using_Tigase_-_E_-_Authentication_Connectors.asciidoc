@@ -1,0 +1,12 @@
+[[authconnectorintro]]
+Authentication Connectors
+=========================
+:author: Daniel Wisnewski
+:version: v1.0 July 2015
+:date: 2015-07-16 12:52
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+Authentication Connector Intro

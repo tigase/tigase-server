@@ -68,7 +68,7 @@ To obtain certificate from a third party authority you have to go to its website
 Self-Signed Certificate
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Another option, *highly not recommended* is to use a self-signed certificate. Such certificates won't be recognized by any entity on the Internet but your own. So if other Jabber servers allows for connections only with valid certificate, your installation will not be able to connect. On the other hand self-signed certificates are a very good way for testing environments where you can create many artificial domains and you can test your service for supporting many virtual domains. You can generate as many certificates as you want and load them onto your server to test and work with.
+Another option, *highly not recommended* is to use a self-signed certificate. Such certificates won't be recognized by any entity on the Internet but your own. So if other XMPP servers allows for connections only with valid certificate, your installation will not be able to connect. On the other hand self-signed certificates are a very good way for testing environments where you can create many artificial domains and you can test your service for supporting many virtual domains. You can generate as many certificates as you want and load them onto your server to test and work with.
 
 Tigase, version 5.0.0 and newer automatically generates self-signed certificates for each Virtual Host configured. Alternatively self-signed certificates can be created by hand - just execute following command using the same as above *openssl* tool:
 

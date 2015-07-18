@@ -1,0 +1,12 @@
+[[databasemgnt]]
+Database Management
+===================
+:author: daniel wisnewski
+:version: v1.0 July 2015
+:date: 2015-07-16 12:49
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+Database Management introduction and placeholder

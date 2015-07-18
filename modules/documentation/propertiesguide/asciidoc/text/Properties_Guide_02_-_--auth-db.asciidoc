@@ -1,12 +1,14 @@
 [[authDb]]
 --auth-db
 =========
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-09 07:50
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-02-09 07:50
 
 *Default value:* +tigase-custom+
 
@@ -17,4 +19,3 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 *Description:* Specifies authentication repository, where +db-type+ can be one of possible values: +mysql, pgsql, drupal, wp, tigase-auth+ and +tigase-custom+ (if omitted: +user-db+ is used in versions up to 5.0 and +tigase-custom+ is the new default value starting from version 5.1 ) or the class name. For SQL database this is normally: +tigase.db.jdbc.JDBCRepository+.
 
 *Available since:* 2.0.0
-

@@ -1,12 +1,14 @@
 [[monitoring]]
 --monitoring
 ============
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-09 22:48
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-02-09 22:48
 
 *Default value:* 'none'
 
@@ -14,7 +16,6 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* 'list of monitoring protocols with port numbers.'
 
-*Description:* The property activates monitoring interfaces through selected protocols on selected TCP/IP port numbers. For more details please refer to the monitoring guide for details.
+*Description:* This property activates monitoring interfaces through selected protocols on selected TCP/IP port numbers. For more details please refer to the monitoring guide in the user guide for details.
 
 *Available since:* 4.0.0
-

@@ -9,16 +9,16 @@ Tigase and PyMSN-t Transport
 :numbered:
 :website: http://tigase.net
 
-Any Jabber server and any transport can connect with each other through an external component protocol (link:http://www.xmpp.org/extensions/xep-0114.html[XEP-0114]). So all you need to do is to correctly prepare configuration for this protocol on both sides.
+Any XMPP server and any transport can connect with each other through an external component protocol (link:http://www.xmpp.org/extensions/xep-0114.html[XEP-0114]). So all you need to do is to correctly prepare configuration for this protocol on both sides.
 
 _Continue reading to learn how to setup Tigase and PyMSN for working together..._
 
 There are a few basic parameters to set for this protocol:
 
 - *PORT number* - this is a standard thing for any TCP/IP connection. Usually the port number should be above 1024 and for PyMSN-t transport it is usually *5347*.
-- *IP address* - again, a standard thing for any TCP/IP connection. If both applications - Jabber server and transport run on the same machine the IP address should be *127.0.0.1*.
-- *SECRET* - this is kind of connection password. Transport connects to the Jabber server and authenticates itself using this password. So no other unauthorized transport can connect to the Jabber server. For now lets use the password *secret*.
-- *Transport ID* - is an ID in Jabber network. Let's say we want to setup transport for *MSN* for the server *tigase.org*. Transport ID can be: msn.tigase.org. It could be also: *anything.tigase.org* but this name while still valid would be confusing for users and my suggestion is to avoid confusing names. *Note!* Transport ID should resolve to correct IP address. For your tests you can add the ID to +/etc/hosts+ file.
+- *IP address* - again, a standard thing for any TCP/IP connection. If both applications - XMPP server and transport run on the same machine the IP address should be *127.0.0.1*.
+- *SECRET* - this is kind of connection password. Transport connects to the XMPP server and authenticates itself using this password. So no other unauthorized transport can connect to the XMPP server. For now lets use the password *secret*.
+- *Transport ID* - is an ID in XMPP network. Let's say we want to setup transport for *MSN* for the server *tigase.org*. Transport ID can be: msn.tigase.org. It could be also: *anything.tigase.org* but this name while still valid would be confusing for users and my suggestion is to avoid confusing names. *Note!* Transport ID should resolve to correct IP address. For your tests you can add the ID to +/etc/hosts+ file.
 
 Here is side by side configuration for both applications: PyMSN-t and Tigase to make them work together. Both services are setup with the hostname *test-d*. To make sure both *test-d* and *msn.test-d* resolve to correct IP address an entry to the +/etc/hosts+ file is added:
 
@@ -51,20 +51,20 @@ PyMSN-t - /etc/jabber/pymsn-t.xml file
     itself when run, we don't want to do this right
     now. -->
   <!-- <background/> -->
-  <!-- The IP address of the main Jabber server
+  <!-- The IP address of the main XMPP server
     to connect to -->
   <mainServer>127.0.0.1</mainServer>
-  <!-- The TCP port to connect to the Jabber
+  <!-- The TCP port to connect to the XMPP
     server on (this is the default for Jabberd2) -->
   <port>5347</port>
   <!-- The authentication token to use when
-    connecting to the Jabber server -->
+    connecting to the XMPP server -->
   <secret>secret</secret>
   <lang>en</lang>
   <website>http://test-d/</website>
   <allowRegister/>
   <getAllAvatars/>
-  <!-- Please give the port to listen for Jabber
+  <!-- Please give the port to listen for XMPP
     socks5 transfers on. Note the standard port number
     set here is <strong>8010</strong>. This port
     however is in use on my machine so this is why

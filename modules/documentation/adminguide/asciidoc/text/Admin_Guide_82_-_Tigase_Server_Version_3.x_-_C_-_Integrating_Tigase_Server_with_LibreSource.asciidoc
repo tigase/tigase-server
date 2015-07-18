@@ -21,14 +21,14 @@ Short Introduction.
 
 Integration between *Tigase* server and *LibreSource* is on a database level. It is implemented in the same way as integration with *Drupal* but with slightly more functions available.
 
-Basically LibreSource system maintains own database with all it's data and Tigase connects to LibreSource database to authenticate users. All user data specific to Jabber/XMPP service are kept in separate tables which can be located in the same database as LibreSource data or in different database.
+Basically LibreSource system maintains own database with all it's data and Tigase connects to LibreSource database to authenticate users. All user data specific to XMPP service are kept in separate tables which can be located in the same database as LibreSource data or in different database.
 
 Current list of features included in the integration:
 
-- Jabber users authentication against user data stored in LibreSource database.
-- Recording Jabber user on-line status in LibreSource database. This can be displayed on the Web page as additional user info.
+- XMPP users authentication against user data stored in LibreSource database.
+- Recording XMPP user on-line status in LibreSource database. This can be displayed on the Web page as additional user info.
 - Recording user last login time and this information can also be available on Web page.
-- Checking user account status. So if the user account is disabled in LibreSource system then this user will not be able to login to Jabber/XMPP service too.
+- Checking user account status. So if the user account is disabled in LibreSource system then this user will not be able to login to XMPP service too.
 - User account creation. This feature might be useful during testing time or user data transition from an old Tigase installation to LibreSource system. _Please note! This feature should be normally disabled on live system. All user account management should be done from LibreSource system because of data caching._
 - User account deletion. _Please note! This feature should be normally disabled on live system. All user account management should be done from LibreSource system because of data caching._
 

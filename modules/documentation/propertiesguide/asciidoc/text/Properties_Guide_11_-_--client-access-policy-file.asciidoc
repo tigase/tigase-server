@@ -1,12 +1,14 @@
 [[clientAccessPolicyFile]]
 --client-access-policy-file
 ===========================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-03-20 01:09
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-03-20 01:09
 
 *Default value:* +etc/client-access-policy.xml+
 
@@ -14,9 +16,8 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* 'path to a file on the filesystem.'
 
-*Description:* The property allows to control the cross domain access policy for Silverlight based web applications. The cross domain policy is controlled via XML file which contains the policy and rules.
-+
-By default Tigase is distributed with an example policy file which allows for full access from all sources to the whole installation. This is generally correct for most Bosh server installations. The configuration through the property and the XML file allows for a very easy and flexible modification of the policy on your installation.
+*Description:* The --client-access-policy-file property allows control of the cross domain access policy for Silverlight based web applications. The cross domain policy is controlled via XML file which contains the policy and rules.
+
+By default Tigase is distributed with an example policy file which allows for full access from all sources to the whole installation. This is generally okay for most Bosh server installations. The configuration through the property and XML files allows for a very easy and flexible modification of the policy on any installation.
 
 *Available since:* 5.2.0
-
