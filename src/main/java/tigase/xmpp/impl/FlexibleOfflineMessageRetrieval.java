@@ -96,6 +96,19 @@ public class FlexibleOfflineMessageRetrieval
 	private final MsgRepository.OfflineMessagesProcessor offlineMessagesStamper = new MsgStamper();
 
 	@Override
+	public Authorization canHandle(Packet packet, XMPPResourceConnection conn) {
+		if (packet.isServiceDisco()) {
+			if (packet.getStanzaTo() == null) {
+				String node = packet.getAttributeStaticStr(Iq.IQ_QUERY_PATH, "node");
+				if (FLEXIBLE_OFFLINE_XMLNS.equals(node))
+					return Authorization.AUTHORIZED;
+			}
+			return null;
+		}
+		return super.canHandle(packet, conn);
+	}	
+	
+	@Override
 	public void init( Map<String, Object> settings ) throws TigaseDBException {
 
 		String msg_repo_uri = (String) settings.get( AmpFeatureIfc.AMP_MSG_REPO_URI_PROP_KEY );

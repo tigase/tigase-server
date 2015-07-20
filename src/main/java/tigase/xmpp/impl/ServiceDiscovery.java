@@ -76,6 +76,20 @@ public class ServiceDiscovery
 	//~--- methods --------------------------------------------------------------
 
 	@Override
+	public Authorization canHandle(Packet packet, XMPPResourceConnection conn) {
+		if (packet.isServiceDisco()) {
+			try {
+				if (packet.getStanzaTo() != null && packet.getStanzaTo().getLocalpart() != null 
+						&& packet.getStanzaTo().getResource() == null
+						&& (conn == null || conn.isUserId(packet.getStanzaTo().getBareJID())))
+					return null;
+			} catch (NotAuthorizedException ex) {
+			}
+		}
+		return super.canHandle(packet, conn);
+	}	
+	
+	@Override
 	public String id() {
 		return ID;
 	}
