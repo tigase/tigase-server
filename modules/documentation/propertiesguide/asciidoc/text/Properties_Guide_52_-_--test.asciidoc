@@ -1,12 +1,15 @@
 [[test]]
 --test
 ======
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-10 01:34
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-02-10 01:34
 
 *Default value:* +false+
 
@@ -14,9 +17,8 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* +true|false|empty-string+
 
-*Description:* This property sets the server for a test mode, which means that all loggings are turned off, message offline storage is off and possibly some other changes to the system configuration are being made.
+*Description:* This property sets the server for test mode, which means that all logging is turned off, offline message storage is off, and possibly some other changes to the system configuration are being made.
 
-The idea behind this mode is to test the Tigase XMPP Server with minimal performance impact from environment such as hard drive, database and others...
+The idea behind this mode is to test Tigase XMPP Server with minimal performance impact from environment such as hard drive, database and others...
 
 *Available since:* 2.0.0
-

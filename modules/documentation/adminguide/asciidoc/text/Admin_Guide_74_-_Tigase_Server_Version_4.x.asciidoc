@@ -13,8 +13,4 @@ Tigase Server Version 4.x
 Administration manuals and guides for Tigase server version 4.x.
 
 - xref:tigase40schemaUpgrade[MySQL Database Schema Upgrade for Tigase 4.0]
-- xref:virtualComponents[Virtual Components for the Cluster Mode]
-- xref:externalComponentConfiguration[External Component Configuration]
-- xref:tigase41packetFiltering[Packet filtering]
-- xref:tigase41virtualHosts[Virtual Hosts in Tigase Server]
 - xref:tigase4xconfiguration[Configuration]

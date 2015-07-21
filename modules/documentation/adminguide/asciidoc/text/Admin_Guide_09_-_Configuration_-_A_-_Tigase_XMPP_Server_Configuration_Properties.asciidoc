@@ -40,144 +40,144 @@ There are a bunch of parameters which have broader meaning than just one propert
 Reference the property guide for a description of properties.
 
 //properties list is commented to see if xref can be made to different directories...
-//*Property name:* ////<<admins,////--admins
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#admins[--admins]
 
-//*Property name:* ////<<auth-db,////--auth-db
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#authDb[--auth-db]
 
-//*Property name:* ////<<auth-db-uri,////--auth-db-uri
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#authDbUri[--auth-db-uri]
 
-//*Property name:* ////<<auth-domain-repo-pool,////--auth-domain-repo-pool
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#authDomainRepoPool[--auth-domain-repo-pool]
 
-//*Property name:* ////<<auth-repo-pool,////--auth-repo-pool
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#authRepoPool[--auth-repo-pool]
 
-//*Property name:* ////<<auth-repo-pool-size,////--auth-repo-pool-size
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#authRepoPoolSize[--auth-repo-pool-size]
 
-//*Property name:* ////<<bind-ext-hostnames,////--bind-ext-hostnames
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#bindExtHostnames[--bind-ext-hostnames]
 
-//*Property name:* ////<<bosh-close-connection,////--bosh-close-connection
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#boshCloseConnection[--bosh-close-connection]
 
-//*Property name:* ////<<bosh-extra-headers-file,////--bosh-extra-headers-file
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#boshExtraHeadersFile[--bosh-extra-headers-file]
 
-//*Property name:* ////<<cl-conn-repo-class,////--cl-conn-repo-class
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#clConnRepoClass[--cl-conn-repo-class]
 
-//*Property name:* ////<<client-access-policy-file,////--client-access-policy-file
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#clientAccessPolicyFile[--client-access-policy-file]
 
-//*Property name:* ////<<cluster-connect-all,////--cluster-connect-all
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#clusterConnectAll[--cluster-connect-all]
 
-//*Property name:* ////<<cluster-mode,////--cluster-mode
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#clusterMode[--cluster-mode]
 
-//*Property name:* ////<<cluster-nodes,////--cluster-nodes
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#clusterNodes[--cluster-nodes]
 
-//*Property name:* ////<<cm-ht-traffic-throttling,////--cm-ht-traffic-throttling
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#cmHtTrafficThrottling[--cm-ht-traffic-throttling]
 
-//*Property name:* ////<<cm-see-other-host,////--cm-see-other-host
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#cmSeeOtherHost[--cm-see-other-host]
 
-//*Property name:* ////<<cm-traffic-throttling,////--cm-traffic-throttling
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#cmTrafficThrottling[--cm-traffic-throttling]
 
-//*Property name:* ////<<cmpname-ports,////--cmpname-ports
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#cmpnamePorts[--cmpname-ports]
 
-//*Property name:* ////<<comp-class,////--comp-class
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#compClass[--comp-class]
 
-//*Property name:* ////<<comp-name,////--comp-name
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#compName[--comp-name]
 
-//*Property name:* ////<<cross-domain-policy-file,////--cross-domain-policy-file
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#crossDomainPolicyFile[--cross-domain-policy-file]
 
-//*Property name:* ////<<data-repo-pool-size,////--data-repo-pool-size
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#dataRepoPoolSize[--data-repo-pool-size]
 
-//*Property name:* ////<<debug,////--debug
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#debug[--debug]
 
-//*Property name:* ////<<debug-packages,////--debug-packages
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#debugPackages[--debug-packages]
 
-//*Property name:* ////<<domain-filter-policy,////--domain-filter-policy
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#domainFilterPolicy[--domain-filter-policy]
 
-//*Property name:* ////<<elements-number-limit,////--elements-number-limit
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#elementsNumberLimit[--elements-number-limit]
 
-//*Property name:* ////<<ext-comp,////--ext-comp
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#extComp[--ext-comp]
 
-//*Property name:* ////<<extcomp-repo-class,////--extcomp-repo-class
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#extcompRepoClass[--extcomp-repo-class]
 
-//*Property name:* ////<<external,////--external
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#external[--external]
 
-//*Property name:* ////<<hardened-mode,////--hardened-mode
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#hardenedMode[--hardened-mode]
 
-//*Property name:* ////<<max-queue-size,////--max-queue-size
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#maxQueueSize[--max-queue-size]
 
-//*Property name:* ////<<monitoring,////--monitoring
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#monitoring[--monitoring]
 
-//*Property name:* ////<<net-buff-high-throughput,////--net-buff-high-throughput
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#netBuffHighThroughput[--net-buff-high-throughput]
 
-//*Property name:* ////<<net-buff-standard,////--net-buff-standard
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#netBuffStandard[--net-buff-standard]
 
-//*Property name:* ////<<new-connections-throttling,////--new-connections-throttling
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#newConnectionsThrottling[--new-connections-throttling]
 
-//*Property name:* ////<<nonpriority-queue,////--nonpriority-queue
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#nonpriorityQueue[--nonpriority-queue]
 
-//*Property name:* ////<<queue-implementation,////--queue-implementation
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#queueImplementation[--queue-implementation]
 
-//*Property name:* ////<<roster-implementation,////--roster-implementation
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#rosterImplementation[--roster-implementation]
 
-//*Property name:* ////<<s2s-ejabberd-bug-workaround-active,////--s2s-ejabberd-bug-workaround-active
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#s2sEjabberdBugWorkaroundActive[--s2s-ejabberd-bug-workaround-active]
 
-//*Property name:* ////<<s2s-secret,////--s2s-secret
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#s2sSecret[--s2s-secret]
 
-//*Property name:* ////<<s2s-skip-tls-hostnames,////--s2s-skip-tls-hostnames
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#s2sSkipTlsHostnames[--s2s-skip-tls-hostnames]
 
-//*Property name:* ////<<script-dir,////--script-dir
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#scriptDir[--script-dir]
 
-//*Property name:* ////<<sm-cluster-strategy-class,////--sm-cluster-strategy-class
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#smClusterStrategyClass[--sm-cluster-strategy-class]
 
-//*Property name:* ////<<sm-plugins,////--sm-plugins
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#smPlugins[--sm-plugins]
 
-//*Property name:* ////<<sm-threads-pool,////--sm-threads-pool
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#smThreadsPool[--sm-threads-pool]
 
-//*Property name:* ////<<ssl-certs-location,////--ssl-certs-location
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#sslCertsLocation[--ssl-certs-location]
 
-//*Property name:* ////<<ssl-container-class,////--ssl-container-class
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#sslContainerClass[--ssl-container-class]
 
-//*Property name:* ////<<ssl-def-cert-domain,////--ssl-def-cert-domain
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#sslDefCertDomain[--ssl-def-cert-domain]
 
-//*Property name:* ////<<stats-history,////--stats-history
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#statsHistory[--stats-history]
 
-//*Property name:* ////<<stringprep-processor,////--stringprep-processor
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#stringprepProcessor[--stringprep-processor]
 
-//*Property name:* ////<<test,////--test
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#test[--test]
 
-//*Property name:* ////<<tigase-config-repo-class,////--tigase-config-repo-class
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#tigaseConfigRepoClass[--tigase-config-repo-class]
 
-//*Property name:* ////<<tigase-config-repo-uri,////--tigase-config-repo-uri
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#tigaseConfigRepoUri[--tigase-config-repo-uri]
 
-//*Property name:* ////<<tls-jdk-nss-bug-workaround-active,////--tls-jdk-nss-bug-workaround-active
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#tlsJdkNssBugWorkaroundActive[--tls-jdk-nss-bug-workaround-active]
 
-//*Property name:* ////<<trusted,////--trusted
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#trusted[--trusted]
 
-//*Property name:* ////<<user-db,////--user-db
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#userDb[--user-db]
 
-//*Property name:* ////<<user-db-uri,////--user-db-uri
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#userDbUri[--user-db-uri]
 
-//*Property name:* ////<<user-domain-repo-pool,////--user-domain-repo-pool
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#userDomainRepoPool[--user-domain-repo-pool]
 
-//*Property name:* ////<<user-repo-pool,////--user-repo-pool
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#userRepoPool[--user-repo-pool]
 
-//*Property name:* ////<<user-repo-pool-size,////--user-repo-pool-size
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#userRepoPoolSize[--user-repo-pool-size]
 
-//*Property name:* ////<<vhost-anonymous-enabled,////--vhost-anonymous-enabled
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#vhostAnonymousEnabled[--vhost-anonymous-enabled]
 
-//*Property name:* ////<<vhost-max-users,////--vhost-max-users
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#vhostMaxUsers[--vhost-max-users]
 
-//*Property name:* ////<<vhost-message-forward-jid,////--vhost-message-forward-jid
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#vhostMessageForwardJid[--vhost-message-forward-jid]
 
-//*Property name:* ////<<vhost-presence-forward-jid,////--vhost-presence-forward-jid
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#vhostPresenceForwardJid[--vhost-presence-forward-jid]
 
-//*Property name:* ////<<vhost-register-enabled,////--vhost-register-enabled
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#vhostRegisterEnabled[--vhost-register-enabled]
 
-//*Property name:* ////<<vhost-tls-required,////--vhost-tls-required
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#vhostTlsRequired[--vhost-tls-required]
 
-//*Property name:* ////<<virt-hosts,////--virt-hosts
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#virtHosts[--virt-hosts]
 
-//*Property name:* ////<<watchdog_delay,////--watchdog_delay
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#watchdogDelay[--watchdog_delay]
 
-//*Property name:* ////<<watchdog_ping_type,////--watchdog_ping_type
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#watchdogPingType[--watchdog_ping_type]
 
-//*Property name:* ////<<watchdog_timeout,////--watchdog_timeout
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#watchdogTimeout[--watchdog_timeout]
 
-//*Property name:* ////<<config-type,////config-type
+*Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#configType[config-type]

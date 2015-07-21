@@ -1,12 +1,14 @@
 [[tigaseConfigRepoUri]]
 --tigase-config-repo-uri
 ========================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-10 01:38
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-02-10 01:38
 
 *Default value:* 'none'
 
@@ -14,7 +16,6 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* 'DB connection URI string.'
 
-*Description:* This property is a parameter which allows to provide database connection string for configuration storage engines which keep server settings in database.
+*Description:* The +--tigase-config-repo-uri+ property is a parameter which allows to provide database connection string for configuration storage engines which keep server settings in a database.
 
 *Available since:* 5.0.0
-

@@ -1,12 +1,14 @@
 [[tigaseConfigRepoClass]]
 --tigase-config-repo-class
 ==========================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-10 01:37
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-02-10 01:37
 
 *Default value:* +tigase.conf.ConfigurationCache+
 
@@ -14,7 +16,8 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* 'name of class implementing +tigase.conf.ConfigRepositoryIfc+'
 
-*Description:* This property is a parameter which allows loading different configuration storage engines. The default one stores configuration in memory only. Other possible are: +tigase.conf.ConfigXMLRepository+ which keeps configuration in the old XML file and +tigase.conf.ConfigSQLRepository+ which stores configuration in SQL database. Please note, in all cases the +init.properties+ file can still be read and works the same way - provides an initial settings for the Tigase startup time.
+*Description:* This property is a parameter which allows loading of different configuration storage engines. The default setting stores configuration in memory only.
+Other possible are: +tigase.conf.ConfigXMLRepository+ which keeps configuration in the old XML file and +tigase.conf.ConfigSQLRepository+ which stores configuration in SQL database.
+*Please note* in all cases the +init.properties+ file can still be read and works the same way - provides an initial settings for Tigase at startup.
 
 *Available since:* 5.0.0
-

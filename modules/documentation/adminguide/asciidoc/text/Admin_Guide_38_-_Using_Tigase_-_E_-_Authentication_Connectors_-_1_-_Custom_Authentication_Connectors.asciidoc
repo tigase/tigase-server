@@ -10,8 +10,6 @@ Custom Authentication Connectors
 :numbered:
 :website: http://tigase.net
 
-Tigase server offers you quite a few authentication connectors which allow you to connect to almost any SQL database for user authentication data as well as share user accounts between the XMPP server and any different system. This feature makes it possible to integrate Tigase server with other systems without any development effort or coding.
-
 This article presents configuration options available to the administrator and describe how to set Tigase server up to use user accounts data from a different database.
 
 The first thing to know is that Tigase server always opens 2 separate connections to the database. One connection is used for user login data and the other is for all other user data like the user roster, vCard, private data storage, privacy lists and so on...

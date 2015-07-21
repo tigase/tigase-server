@@ -13,6 +13,3 @@ Server Configuration 5.x
 Collection of documents and guides for the Tigase server version 5.x and later.
 
 - xref:confChanges5x[Configuration Changes in the Tigase Server 5.x]
-- xref:amp0079[Advanced Message Processing - AMP XEP-0079]
-- xref:saslExternal[Configuration of SASL EXTERNAL]
-- xref:v5xs2sps[Server to Server Protocol Settings]

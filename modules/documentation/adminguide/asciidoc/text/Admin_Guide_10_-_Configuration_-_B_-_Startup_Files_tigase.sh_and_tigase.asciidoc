@@ -10,7 +10,7 @@ Startup File for tigase.sh - tigase.conf
 :numbered:
 :website: http://tigase.net
 
-Property file name for +tigase.sh+ startup script is a second parameter for the startup script. It can be skipped if environmental variables are set in different location or in different way.
+Property file names for +tigase.sh+ startup script is a second parameter for the startup script. It can be skipped if environmental variables are set in different location or in different way.
 
 Config file for startup script simply sets number of environment variables with the location of required components. Possible variables to set in this file are:
 

@@ -1,0 +1,12 @@
+[[databasemgnt]]
+Database Management
+===================
+:author: daniel wisnewski
+:version: v1.0 July 2015
+:date: 2015-07-16 12:49
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+Tigase is coded to perform with multiple database types and numbers.  Owing to it's versitile nature, there are some tools and procedures that may be of use to certain administrators.  These are included below.
