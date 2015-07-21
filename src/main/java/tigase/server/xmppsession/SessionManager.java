@@ -2152,6 +2152,11 @@ public class SessionManager
 			if (C2SDeliveryErrorProcessor.isDeliveryError(p))
 				return false;
 
+			// if this is packet to bare jid then we need to process it on behalf of a user
+			// even if there is no session for this user
+			if (p.getStanzaTo() != null && p.getStanzaTo().getResource() == null)
+				return false;
+			
 			// It doesn't look good, there should really be a connection for
 			// this packet....
 			// returning error back...
