@@ -1,25 +1,25 @@
+[[compile]]
 Tigase XMPP Server 5.2.0 and later - Compilation and Generating Distribution Packages
 =====================================================================================
-Wojciech Kapcia <wojciech.kapcia@tigase.org>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-08-08 12:42
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-08-08 12:42
 
-Starting with version 5.2.0 Tigase Server we switch for generating distribution packages from Ant to Maven. This will allow better depencency management as well as build repeatability.
+Starting with version 5.2.0 Tigase Server package distribution generation has switched from Ant to Maven. This will allow better dependency management as well as build repeatability.
 
-Guides:
-
-A Very Short Maven Guide
-Maven 2.x Support
+For details on Maven and it's use, please see the xref:usingMaven[Maven Guide.]
 
 Distribution Packages
 ---------------------
-Starting from version 5.2.0 there will be two separate archives:
+Starting from version 5.2.0 there will be two separate distribution archives:
 
-- minimal version (-dist) containing only tigase-server, tigase-xmltools and tigase-utils
-- max version (-dist-max) containing all additional tigase components (MUC, PubSub, HTTP API, OSGi support, etc.) as well as dependencies required by those components.
+- *-dist* is a minimal version containing only tigase-server, tigase-xmltools and tigase-utils
+- *-dist-max* is a version containing all additional tigase components (MUC, PubSub, HTTP API, OSGi support, etc.) as well as dependencies required by those components.
 
 They will be available as both zip and tarball.
 
@@ -38,12 +38,12 @@ mvn -Pdist -f modules/master/pom.xml clean install
 
 This will:
 
-- compile server
-- generate javadoc
-- grab all latest versions of all declared depencencies and put them in jars/ directory
+- compile server binaries
+- generate javadoc documentation
+- grab all latest versions of all declared dependencies and put them in jars/ directory
 - create both types of distribution packages (-dist and -dist-max) and place them in pack/ directory
 
-In order to create instalator packages you have to execute two shell scripts:
+In order to create installer packages you have to execute two shell scripts:
 
 [source,bash]
 -------------------------------
@@ -51,7 +51,7 @@ In order to create instalator packages you have to execute two shell scripts:
 ./scripts/installer-generate.sh
 -------------------------------
 
-However, in order for them to succeed you have to build server first using maven as described earlier. You should also have git, python2, docutils and LaTeX distribution installed (please see src/main/izpack/README.txt for details).
+However, in order for them to succeed you have to build the server first using maven as described earlier. You should also have git, python2, docutils and LaTeX distributions installed (please see src/main/izpack/README.txt for details).
 
 Running Server
 --------------
@@ -62,5 +62,4 @@ Afterwards you can run the server with the regular shell script:
 ./scripts/tigase.sh start etc/tigase.conf
 -----------------------------------------
 
-Please bear in mind, that you should provide correct setup in etc/init.properties configuration files for the server to work correctly.
-
+Please bear in mind, that you need to provide correct setup in etc/init.properties configuration files for the server to work correctly.

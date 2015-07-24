@@ -1,46 +1,48 @@
-[[wpc]]
+[[writePluginCode]]
 Writing Plugin Code
 ===================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:22
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2010-04-06 21:22
 
-Previous guide describes a basic idea behind the XMPP stanza processing in the session manager. As it was already point out the processing takes place in 4 steps. A different kind of plugin is responsible for each step of processing:
+Stanza processing takes place in 4 steps. A different kind of plugin is responsible for each step of processing:
 
-. link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/xmpp/XMPPPreprocessorIfc.java[XMPPPreprocessorIfc] - is the interface for packets pre-processing plugins.
-.  link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/xmpp/XMPPProcessor.java[XMPPProcessorIfc] - is the interface for packets processing plugins.
-. link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/xmpp/XMPPPostprocessorIfc.java[XMPPPostprocessorIfc] - is the interface for packets post-processing plugins.
-. link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/xmpp/XMPPPacketFilterIfc.java[XMPPPacketFilterIfc] - is the interface for processing results filtering.
+. link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/xmpp/XMPPPreprocessorIfc.java[XMPPPreprocessorIfc] - is the interface for packets pre-processing plugins.
+. link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/xmpp/XMPPProcessor.java[XMPPProcessorIfc] - is the interface for packets processing plugins.
+. link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/xmpp/XMPPPostprocessorIfc.java[XMPPPostprocessorIfc] - is the interface for packets post-processing plugins.
+. link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/xmpp/XMPPPacketFilterIfc.java[XMPPPacketFilterIfc] - is the interface for processing results filtering.
 
-If you look inside any of these interfaces you find only a single method. This is it. This is where all the packet processing takes place. All of them take a similar set of parameters and below is a description for all of them:
+If you look inside any of these interfaces you will only find a single method. This is where all the packet processing takes place. All of them take a similar set of parameters and below is a description for all of them:
 
-- *Packet packet* - packet is which being processed. This parameter may never be null. Even though this is not immutable object it mustn't be altered. None of it's fields or attributes can be changed during processing.
-- *XMPPResourceConnection session* - user session which keeps all the user session data and also gives an access to the user's repository data. It allows for storing information in a permanent storage or in memory only during the live of the online session. This parameter can be null if there is no online user session at the time of the packet processing.
-- *NonAuthUserRepository repo* - this is a user data storage which is normally used when the user session (parameter above) is null. This is repository allows for a very restricted access only. It allows for storing some user private data (doesn't allow overwriting existing data) like messages for offline users and it also allows for reading user public data like VCard.
+- *Packet packet* - packet is which being processed. This parameter may never be null. Even though this is not an immutable object it mustn't be altered. None of it's fields or attributes can be changed during processing.
+- *XMPPResourceConnection session* - user session which keeps all the user session data and also gives access to the user's data repository. It allows for the storing of information in permanent storage or in memory only during the life of the session. This parameter can be null if there is no online user session at the time of the packet processing.
+- *NonAuthUserRepository repo* - this is a user data storage which is normally used when the user session (parameter above) is null. This repository allows for a very restricted access only. It allows for storing some user private data (but doesn't allow overwriting existing data) like messages for offline users and it also allows for reading user public data like VCards.
 - *Queue<Packet> results* - this a collection with packets which have been generated as input packet processing results. Regardless a response to a user request is sent or the packet is forwarded to it's destination it is always required that a copy of the input packet is created and stored in the *results* queue.
-- *Map<String, Object> settings* - this map keeps plugin specific settings loaded from the Tigase server configuration. In most cases it is unused, however if the plugin needs to access an external database that this is a way to pass database connection string to the plugin.
+- *Map<String, Object> settings* - this map keeps plugin specific settings loaded from the Tigase server configuration. In most cases it is unused, however if the plugin needs to access an external database that this is a way to pass the database connection string to the plugin.
 
-After a closer look in some of the interfaces you can see that they extend another interface: link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/xmpp/XMPPImplIfc.java[XMPPImplIfc] which provides a basic meta information about the plugin implementation. Please refer to JavaDoc documentation for all details.
+After a closer look in some of the interfaces you can see that they extend another interface: link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/xmpp/XMPPImplIfc.java[XMPPImplIfc] which provides a basic meta information about the plugin implementation. Please refer to link:http://docs.tigase.org/tigase-server/snapshot/javadoc/tigase/xmpp/impl/package-summary.html[JavaDoc] documentation for all details.
 
-For purpose of this guide we are implementing a simple plugin handling all *<message/>* packets, that is forwarding packets to the destination address. Incoming packets are forwarded to the user connection and outgoing packets are forwarded to the external destination address. This link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/entry/src/main/java/tigase/xmpp/impl/Message.java[message plugin] is actually implemented already and it is available in our Git repository. The code has some comments inside already but this guide goes deeper into the implementation details.
+For purpose of this guide we are implementing a simple plugin for handling all *<message/>* packets that is forwarding packets to the destination address. Incoming packets are forwarded to the user connection and outgoing packets are forwarded to the external destination address. This link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/java/tigase/xmpp/impl/Message.java[message plugin] is actually implemented already and it is available in our Git repository. The code has some comments inside already but this guide goes deeper into the implementation details.
 
-First of all you have to chose what kind of plugin you want to implement. If this is going to be a packet processor you have to implement *XMPPProcessorIfc* interface, if this is going to be pre-processor then you have to implement *XMPPPreprocessorIfc* interface. Of course your implementation can implement more than one interface, even all. It depends on your use case and needs. There are also two abstract helper classes from which you should use one as a base for all you plugins *XMPPProcessor* or *AnnotatedXMPPProcessor* for annotation support.
+First of all you have to choose what kind of plugin you want to implement. If this is going to be a packet processor you have to implement the *XMPPProcessorIfc* interface, if this is going to be a pre-processor then you have to implement the *XMPPPreprocessorIfc* interface. Of course your implementation can implement more than one interface, even all of them. There are also two abstract helper classes, one of which you should use as a base for all you plugins *XMPPProcessor* or use *AnnotatedXMPPProcessor* for annotation support.
 
 
 Using annotation support
 ------------------------
-The class declaration should look like this (assuming you implement just packet processor):
+The class declaration should look like this (assuming you are implementing just the packet processor):
 
 [source,java]
 public class Message extends AnnotatedXMPPProcessor
    implements XMPPProcessorIfc
 
-The first thing to create is the plugin *ID*. This is a unique string which you put in the configuration file to tell the server to load and use the plugin. In most cases you can use XMLNS if the plugin wants packets with elements with a very specific name space. Of course there is no guarantee there is no other packet for this specific XML element too. As I want to process all messages and I don't want to spend whole day on thinking about a cool ID let's say our ID is: \'message'.
+The first thing to create is the plugin *ID*. This is a unique string which you put in the configuration file to tell the server to load and use the plugin. In most cases you can use XMLNS if the plugin wants packets with elements with a very specific name space. Of course there is no guarantee there is no other packet for this specific XML element too. As we want to process all messages and don't want to spend whole day on thinking about a cool ID, let's say our ID is: \'message'.
 
-A plugin informs about it's using static *ID* field and *@Id* annotation placed on class:
+A plugin informs about it's presence using a static *ID* field and *@Id* annotation placed on class:
 
 [source,java]
 ------------------------------------------------------------------------------------
@@ -51,7 +53,7 @@ public class Message extends AnnotatedXMPPProcessor
 }
 ------------------------------------------------------------------------------------
 
-As I mentioned before such a plugin receives only this kind of packets for processing which it is interested in. My plugin is interested only in packets with *<message/>* elements and only if they are in "*jabber:client*" namespace. To indicate all supported elements and namespaces we have to add 2 more annotations:
+As mentioned before, this plugin receives only this kind of packets for processing which it is interested in. In this example, the plugin is interested only in packets with *<message/>* elements and only if they are in the "*jabber:client*" namespace. To indicate all supported elements and namespaces we have to add 2 more annotations:
 
 [source,java]
 ------------------------------------------------------------------------------------
@@ -65,17 +67,16 @@ public class Message extends AnnotatedXMPPProcessor
 }
 ------------------------------------------------------------------------------------
 
-
 Using older non-annotation based implementation
 -----------------------------------------------
-The class declaration should look like this (assuming you implement just packet processor):
+The class declaration should look like this (assuming you are implementing just the packet processor):
 
 [source,java]
 public class Message extends XMPPProcessor
    implements XMPPProcessorIfc
 
 
-The first thing to create is the plugin *ID*. This is a unique string which you put in the configuration file to tell the server to load and use the plugin. In most cases you can use XMLNS if the plugin wants packets with elements with a very specific name space. Of course there is no guarantee there is no other packet for this specific XML element too. As I want to process all messages and I don't want to spend whole day on thinking about a cool ID let's say our ID is: \'message'.
+The first thing to create is the plugin *ID* like above.
 
 A plugin informs about it's ID using following code:
 
@@ -83,7 +84,7 @@ A plugin informs about it's ID using following code:
 private static final String ID = "message";
 public String id() { return ID; }
 
-As I mentioned before such a plugin receives only this kind of packets for processing which it is interested in. My plugin is interested only in packets with *<message/>* elements and only if they are in "*jabber:client*" namespace. To indicate all supported elements and namespaces we have to add 2 more methods:
+As mentioned before this plugin receives only this kind of packets for processing which it is interested in. In this example, the plugin is interested only in packets with *<message/>* elements and only if they are in "*jabber:client*" namespace. To indicate all supported elements and namespaces we have to add 2 more methods:
 
 [source,java]
 ----------------------------------------
@@ -99,7 +100,7 @@ public String[] supNamespaces()	{
 Implementation of processing method
 -----------------------------------
 
-Now we have our plugin prepared for loading it to the Tigase server. The next step is the actual packet processing method. For the complete code, please refer to the plugin in the Git. I will only comment here on elements which might be confusing or add a few more lines of code which might be helpful in your case.
+Now we have our plugin prepared for loading in Tigase. The next step is the actual packet processing method. For the complete code, please refer to the plugin in the Git. I will only comment here on elements which might be confusing or add a few more lines of code which might be helpful in your case.
 
 [source,java,numbered]
 ------------------------------------------------------------------------------------
@@ -131,12 +132,12 @@ public void process(Packet packet, XMPPResourceConnection session,
 			Packet result = packet.copyElementOnly();
 
 			// This is where and how we set the address of the component
-			// which should rceive the result packet for the final delivery
+			// which should receive the result packet for the final delivery
 			// to the end-user. In most cases this is a c2s or Bosh component
 			// which keep the user connection.
 			result.setPacketTo(session.getConnectionId(packet.getStanzaTo()));
 
-			// In most cases this might be skept, however if there is a
+			// In most cases this might be skipped, however if there is a
 			// problem during packet delivery an error might be sent back
 			result.setPacketFrom(packet.getTo());
 
@@ -154,7 +155,7 @@ public void process(Packet packet, XMPPResourceConnection session,
 		if (session.isUserId(id)) {
 
 			// This is a packet FROM this client, the simplest action is
-			// to forward it to is't destination:
+			// to forward it to its destination:
 			// Simple clone the XML element and....
 			// ... putting it to results queue is enough
 			results.offer(packet.copyElementOnly());

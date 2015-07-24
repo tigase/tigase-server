@@ -1,12 +1,14 @@
 [[cil2]]
 Component Implementation - Lesson 2 - Configuration
 ===================================================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-01-06 20:22
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2010-01-06 20:22
 
 It might be hard to tell what is the first important thing to do with your new component implementation. Different developers may have a different view on this. It seems to me however that it is always a good idea to give to your component a way to configure it and provide some runtime settings.
 
@@ -40,7 +42,7 @@ public Map<String, Object> getDefaults(Map<String, Object> params) {
   defs.put(SECURE_LOGGING_KEY, secureLogging);
   return defs;
 }
- 
+
 @Override
 public void setProperties(Map<String, Object> props) {
   super.setProperties(props);
@@ -85,20 +87,20 @@ import java.util.Map;
 import java.util.logging.Logger;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Packet;
- 
+
 public class TestComponent extends AbstractMessageReceiver {
- 
+
   private static final Logger log =
     Logger.getLogger(TestComponent.class.getName());
- 
+
   private static final String PACKET_TYPES_KEY = "packet-types";
   private static final String PREPEND_TEXT_KEY = "log-prepend";
   private static final String SECURE_LOGGING_KEY = "secure-logging";
- 
+
   private String[] packetTypes = {"message", "presence", "iq"};
   private String prependText = "My packet: ";
   private boolean secureLogging = false;
- 
+
   @Override
   public void processPacket(Packet packet) {
     for (String pType : packetTypes) {
@@ -107,7 +109,7 @@ public class TestComponent extends AbstractMessageReceiver {
       }
     }
   }
- 
+
   @Override
   public Map<String, Object> getDefaults(Map<String, Object> params) {
     Map<String, Object> defs = super.getDefaults(params);
@@ -116,7 +118,7 @@ public class TestComponent extends AbstractMessageReceiver {
     defs.put(SECURE_LOGGING_KEY, secureLogging);
     return defs;
   }
- 
+
   @Override
   public void setProperties(Map<String, Object> props) {
     super.setProperties(props);
@@ -135,9 +137,8 @@ public class TestComponent extends AbstractMessageReceiver {
       secureLogging = (Boolean) props.get( SECURE_LOGGING_KEY );
     }
   }
- 
+
 }
 ---------------------------------------------------------------------
 
 Of course we can do much more useful packet processing in +processPacket(...)+ method. This is just a code example. Please note comparing packet element name with our packet type by reference is intentional and allowed in this context. All *Element* names are processed with +String.intern()+ function to preserve memory and improve performance of string comparison.
-

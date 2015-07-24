@@ -1,44 +1,46 @@
 [[maven2support]]
 Maven 2.x Support
 =================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:22
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2010-04-06 21:22
 
 Addendum: for a more recent guide please follow Tigase XMPP Server 5.2.0 and Later - Compilation and Generating Distribution Packages.
-      
+
 Thanks to link:http://www.tigase.org/user/2[bmalkow] you can now build Tigase server from sources using link:http://maven.apache.org/[Maven 2.x] tool.  This should greatly simplify first steps with Tigase code and it was requested by many of those trying to get the server running from sources.  Maven repository with Tigase packages is located at address: link:http://maven.tigase.org/[maven.tigase.org].  Now all you need to compile sources and generate packages needed to run the server is just a few simple steps below:
 
 . Download and install Maven 2.x
 . Checkout Tigase server sources from link:http://www.tigase.org/content/=[Subversion] repository:
-+
+
 [source,bash]
 ---------------------------------------------------------------------
 svn co https://svn.tigase.org/reps/tigase-server/trunk/ tigase-server
 ---------------------------------------------------------------------
 . Now go to directory with server code:
-+
+
 [source,bash]
 ---------------------------------------------------------------------
 cd tigase-server
 ---------------------------------------------------------------------
 . And run maven command to generate server package:
-+
+
 [source,bash]
 ---------------------------------------------------------------------
 mvn assembly:assembly
 ---------------------------------------------------------------------
 . After maven finished his work there should be new subdirectory created: target. Go to this directory now:
-+
+
 [source,bash]
 ---------------------------------------------------------------------
 cd target/
 ---------------------------------------------------------------------
 . and list content of this directory.  On Linux, Unix system:
-+
+
 [source,bash]
 ---------------------------------------------------------------------
 ls -l
@@ -92,4 +94,3 @@ chmod u+x bin/*
 You can get a few warnings about missing configuration file (which will be automatically created) and user repository file (which will be automatically created when you register first user).
 
 For your convenience there are a few other startup files in +etc/+ directory. You can look and modify them according to your needs.  
-

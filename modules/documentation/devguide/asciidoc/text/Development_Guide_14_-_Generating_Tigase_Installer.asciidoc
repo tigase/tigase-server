@@ -1,22 +1,25 @@
+[[genTigaseInstaller]]
 Generating Tigase Installer
 ===========================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:22
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2010-04-06 21:22
 
 To generate installer:
 
 . Install chosen version of link:http://izpack.org/[IzPack] including source code.
 . In order to compile custom Tigase panels you need to first compile link:http://izpack.org/[IzPack] classes. You can use the included +build.xml+ which is in the src directory of link:http://izpack.org/[IzPack] install. Just enter this dir and type:
-+
+
 [source,bash]
 ant all
 
-. Depending on the IzPack version classes will be compiled directly into the +src/lib+ directory or +_build+ directory of link:http://izpack.org/[IzPack]. You may need to tweak the +build.xml+ file which is in the same dir as the +readme+ and point to the directory where link:http://izpack.org/[IzPack] compiled classess reside.
-+
+. Depending on the IzPack version classes will be compiled directly into the +src/lib+ directory or +_build+ directory of link:http://izpack.org/[IzPack]. You may need to tweak the +build.xml+ file which is in the same dir as the +readme+ and point to the directory where link:http://izpack.org/[IzPack] compiled classes reside.
+
 [source,java]
 ------------------------------------------------------------------------
 <!-- fragment -->
@@ -37,5 +40,4 @@ ant all
 IZPACK_DIR="/usr/local/IzPack421"
 ---------------------------------
 . To start the installation process run the +scripts/generate-installer.sh+ file you will find in the main server source code directory. You should start it from the server root dir.
-. Generated files (jar and exe) will be placed in the packages dir of Tigase codebase. 
-          
+. Generated files (jar and exe) will be placed in the packages dir of Tigase codebase.

@@ -1,13 +1,15 @@
 [[mavenguide]]
 A Very Short Maven Guide
 ========================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:22
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2010-04-06 21:22
-      
+
 If you don't use link:http://maven.apache.org/[Maven] at all or use it once a year you may find the document a useful maven commands reminder:
 
 Snapshot Compilation and Snapshot Package Generation
@@ -27,4 +29,3 @@ Generating tar.gz, tar.bz2 File With Sources Only
 -------------------------------------------------
 
 - +mvn -DdescriptorId=src assembly:assembly+
-
