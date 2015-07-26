@@ -424,7 +424,7 @@ public class DataRepositoryImpl implements DataRepository {
 	private void initRepo() throws SQLException {
 
 		// Statement stmt = null;
-		ResultSet rs = null;
+//		ResultSet rs = null;
 
 		try {
 			synchronized (db_statements) {
@@ -438,11 +438,11 @@ public class DataRepositoryImpl implements DataRepository {
 				// stmt = conn.createStatement();
 			}
 		} finally {
-			release(null, rs);
+			release(null, null);
 
 			// release(stmt, rs);
 			// stmt = null;
-			rs = null;
+//			rs = null;
 		}
 	}
 

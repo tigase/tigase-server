@@ -253,30 +253,31 @@ public class ClConSQLRepository
 
 		super.reload();
 
-		ResultSet rs = null;
-
 		try {
+			ResultSet rs = null;
 			PreparedStatement getAllItemsSt = data_repo.getPreparedStatement(null,
 					GET_ALL_ITEMS_QUERY);
 			
 			synchronized (getAllItemsSt) {
-				rs = getAllItemsSt.executeQuery();
-				while (rs.next()) {
-					ClusterRepoItem item = getItemInstance();
+				try {
+					rs = getAllItemsSt.executeQuery();
+					while (rs.next()) {
+						ClusterRepoItem item = getItemInstance();
 
-					item.setHostname(rs.getString(HOSTNAME_COLUMN));
-					item.setPassword(rs.getString(PASSWORD_COLUMN));
-					item.setLastUpdate(rs.getTimestamp(LASTUPDATE_COLUMN).getTime());
-					item.setPort(rs.getInt(PORT_COLUMN));
-					item.setCpuUsage(rs.getFloat(CPU_USAGE_COLUMN));
-					item.setMemUsage(rs.getFloat(MEM_USAGE_COLUMN));
-					itemLoaded( item );
+						item.setHostname(rs.getString(HOSTNAME_COLUMN));
+						item.setPassword(rs.getString(PASSWORD_COLUMN));
+						item.setLastUpdate(rs.getTimestamp(LASTUPDATE_COLUMN).getTime());
+						item.setPort(rs.getInt(PORT_COLUMN));
+						item.setCpuUsage(rs.getFloat(CPU_USAGE_COLUMN));
+						item.setMemUsage(rs.getFloat(MEM_USAGE_COLUMN));
+						itemLoaded(item);
+					}
+				} finally {
+					data_repo.release(null, rs);
 				}
 			}
 		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem getting elements from DB: ", e);
-		} finally {
-			data_repo.release(null, rs);
 		}
 	}
 
@@ -301,7 +302,6 @@ public class ClConSQLRepository
 	 * @throws SQLException
 	 */
 	private void checkDB() throws SQLException {
-		ResultSet rs = null;
 		Statement st = null;
 
 		DataRepository.dbTypes databaseType = data_repo.getDatabaseType();
@@ -329,8 +329,7 @@ public class ClConSQLRepository
 				log.info("DB for external component created OK");
 			}
 		} finally {
-			data_repo.release(st, rs);
-			rs = null;
+			data_repo.release(st, null);
 			st = null;
 		}
 	}

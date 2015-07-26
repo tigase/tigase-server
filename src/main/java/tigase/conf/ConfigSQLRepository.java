@@ -313,27 +313,29 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 		private Collection<ConfigItem> getAllItems() {
 			List<ConfigItem> result = new ArrayList<ConfigItem>();
-			ResultSet rs = null;
 
 			try {
+				ResultSet rs = null;
 				PreparedStatement getAllItemsSt = data_repo.getPreparedStatement(null, GET_ALL_ITEMS_QUERY);
 
 				synchronized (getAllItemsSt) {
-					getAllItemsSt.setString(1, getDefHostname());
-					rs = getAllItemsSt.executeQuery();
+					try {
+						getAllItemsSt.setString(1, getDefHostname());
+						rs = getAllItemsSt.executeQuery();
 
-					while (rs.next()) {
-						ConfigItem item = createItemFromRS(rs);
+						while (rs.next()) {
+							ConfigItem item = createItemFromRS(rs);
 
-						if (item.getFlag() != ConfigItem.FLAGS.INITIAL) {
-							result.add(item);
+							if (item.getFlag() != ConfigItem.FLAGS.INITIAL) {
+								result.add(item);
+							}
 						}
+					} finally {
+						data_repo.release(null, rs);
 					}
 				}
 			} catch (SQLException e) {
 				log.log(Level.WARNING, "Problem getting elements from DB: ", e);
-			} finally {
-				data_repo.release(null, rs);
 			}
 
 			return result;
@@ -341,29 +343,31 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 		private Set<ConfigItem> getCompItems(String compName) {
 			Set<ConfigItem> result = new LinkedHashSet<ConfigItem>();
-			ResultSet rs = null;
 
 			try {
+				ResultSet rs = null;
 				PreparedStatement getCompItemsSt =
 					data_repo.getPreparedStatement(null, GET_COMPONENT_ITEMS_QUERY);
 
 				synchronized (getCompItemsSt) {
-					getCompItemsSt.setString(1, getDefHostname());
-					getCompItemsSt.setString(2, compName);
-					rs = getCompItemsSt.executeQuery();
+					try {
+						getCompItemsSt.setString(1, getDefHostname());
+						getCompItemsSt.setString(2, compName);
+						rs = getCompItemsSt.executeQuery();
 
-					while (rs.next()) {
-						ConfigItem item = createItemFromRS(rs);
+						while (rs.next()) {
+							ConfigItem item = createItemFromRS(rs);
 
-						if (item.getFlag() != ConfigItem.FLAGS.INITIAL) {
-							result.add(item);
+							if (item.getFlag() != ConfigItem.FLAGS.INITIAL) {
+								result.add(item);
+							}
 						}
+					} finally {
+						data_repo.release(null, rs);
 					}
 				}
 			} catch (SQLException e) {
 				log.log(Level.WARNING, "Problem getting elements from DB: ", e);
-			} finally {
-				data_repo.release(null, rs);
 			}
 
 			return result;
@@ -371,24 +375,26 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 		private String[] getComponentNames() {
 			List<String> result = new ArrayList<String>();
-			ResultSet rs = null;
 
 			try {
+				ResultSet rs = null;
 				PreparedStatement getCompNamesSt =
 					data_repo.getPreparedStatement(null, GET_COMPONENT_NAMES_QUERY);
 
 				synchronized (getCompNamesSt) {
-					getCompNamesSt.setString(1, getDefHostname());
-					rs = getCompNamesSt.executeQuery();
+					try {
+						getCompNamesSt.setString(1, getDefHostname());
+						rs = getCompNamesSt.executeQuery();
 
-					while (rs.next()) {
-						result.add(rs.getString(COMPONENT_NAME_COLUMN));
+						while (rs.next()) {
+							result.add(rs.getString(COMPONENT_NAME_COLUMN));
+						}
+					} finally {
+						data_repo.release(null, rs);
 					}
 				}
 			} catch (SQLException e) {
 				log.log(Level.WARNING, "Problem getting component names from DB: ", e);
-			} finally {
-				data_repo.release(null, rs);
 			}
 
 			return result.toArray(new String[result.size()]);
@@ -396,32 +402,34 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 		private ConfigItem getItem(String compName, String node, String key) {
 			ConfigItem result = null;
-			ResultSet rs = null;
 
 			try {
+				ResultSet rs = null;
 				PreparedStatement getItemSt = data_repo.getPreparedStatement(null, GET_ITEM_QUERY);
 
 				synchronized (getItemSt) {
-					getItemSt.setString(1, getDefHostname());
-					getItemSt.setString(2, compName);
-					getItemSt.setString(3, node);
-					getItemSt.setString(4, key);
-					rs = getItemSt.executeQuery();
+					try {
+						getItemSt.setString(1, getDefHostname());
+						getItemSt.setString(2, compName);
+						getItemSt.setString(3, node);
+						getItemSt.setString(4, key);
+						rs = getItemSt.executeQuery();
 
-					while (rs.next()) {
-						ConfigItem item = createItemFromRS(rs);
+						while (rs.next()) {
+							ConfigItem item = createItemFromRS(rs);
 
-						if (item.getFlag() != ConfigItem.FLAGS.INITIAL) {
-							result = item;
+							if (item.getFlag() != ConfigItem.FLAGS.INITIAL) {
+								result = item;
 
-							break;
+								break;
+							}
 						}
+					} finally {
+						data_repo.release(null, rs);
 					}
 				}
 			} catch (SQLException e) {
 				log.log(Level.WARNING, "Problem getting elements from DB: ", e);
-			} finally {
-				data_repo.release(null, rs);
 			}
 
 			return result;
@@ -429,25 +437,27 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 		private String[] getKeys(String compName, String node) {
 			List<String> result = new ArrayList<String>();
-			ResultSet rs = null;
 
 			try {
+				ResultSet rs = null;
 				PreparedStatement getKeysSt = data_repo.getPreparedStatement(null, GET_KEYS_QUERY);
 
 				synchronized (getKeysSt) {
-					getKeysSt.setString(1, getDefHostname());
-					getKeysSt.setString(2, compName);
-					getKeysSt.setString(3, node);
-					rs = getKeysSt.executeQuery();
+					try {
+						getKeysSt.setString(1, getDefHostname());
+						getKeysSt.setString(2, compName);
+						getKeysSt.setString(3, node);
+						rs = getKeysSt.executeQuery();
 
-					while (rs.next()) {
-						result.add(rs.getString(KEY_NAME_COLUMN));
+						while (rs.next()) {
+							result.add(rs.getString(KEY_NAME_COLUMN));
+						}
+					} finally {
+						data_repo.release(null, rs);
 					}
 				}
 			} catch (SQLException e) {
 				log.log(Level.WARNING, "Problem getting keys from DB: ", e);
-			} finally {
-				data_repo.release(null, rs);
 			}
 
 			return result.toArray(new String[result.size()]);
@@ -455,24 +465,26 @@ public class ConfigSQLRepository extends ConfigurationCache {
 
 		private int getPropertiesCount() {
 			int result = 0;
-			ResultSet rs = null;
 
 			try {
+				ResultSet rs = null;
 				PreparedStatement getPropertiesCountSt =
 					data_repo.getPreparedStatement(null, GET_PROPERTIES_COUNT_QUERY);
 
 				synchronized (getPropertiesCountSt) {
-					getPropertiesCountSt.setString(1, getDefHostname());
-					rs = getPropertiesCountSt.executeQuery();
+					try {
+						getPropertiesCountSt.setString(1, getDefHostname());
+						rs = getPropertiesCountSt.executeQuery();
 
-					while (rs.next()) {
-						result = rs.getInt("count");
+						while (rs.next()) {
+							result = rs.getInt("count");
+						}
+					} finally {
+						data_repo.release(null, rs);
 					}
 				}
 			} catch (SQLException e) {
 				log.log(Level.WARNING, "Problem getting elements count from DB: ", e);
-			} finally {
-				data_repo.release(null, rs);
 			}
 
 			return result;

@@ -345,34 +345,35 @@ public class TigaseCustomAuth implements AuthRepository {
 			return;
 		}
 
-		ResultSet rs = null;
-
 		try {
+			ResultSet rs = null;
 			PreparedStatement add_user = data_repo.getPreparedStatement(user, adduser_query);
 
 			synchronized (add_user) {
-				add_user.setString(1, user.toString());
-				add_user.setString(2, password);
+				try {
+					add_user.setString(1, user.toString());
+					add_user.setString(2, password);
 
-				boolean is_result = add_user.execute();
+					boolean is_result = add_user.execute();
 
-				if (is_result) {
-					rs = add_user.getResultSet();
+					if (is_result) {
+						rs = add_user.getResultSet();
+					}
+				} finally {
+					data_repo.release(null, rs);
 				}
 			}
 		} catch (SQLIntegrityConstraintViolationException e) {
 			throw new UserExistsException(
 					"Error while adding user to repository, user possibly exists: " + user, e);
 		} catch (SQLException e) {
-			if( e.getMessage() != null && e.getMessage().contains("Violation of UNIQUE KEY")) {
+			if (e.getMessage() != null && e.getMessage().contains("Violation of UNIQUE KEY")) {
 				// This is a workaround SQL Server which just throws SLQ Exception
 				throw new UserExistsException(
-								"Error while adding user to repository, user possibly exists: " + user, e);
+						"Error while adding user to repository, user possibly exists: " + user, e);
 			} else {
-			  throw new TigaseDBException("Problem accessing repository for user: " + user, e);
+				throw new TigaseDBException("Problem accessing repository for user: " + user, e);
 			}
-		} finally {
-			data_repo.release(null, rs);
 		}
 	}
 
@@ -420,21 +421,23 @@ public class TigaseCustomAuth implements AuthRepository {
 			return -1;
 		}
 
-		ResultSet rs = null;
-
 		try {
 			long users = -1;
+			ResultSet rs = null;
 			PreparedStatement users_count =
 					data_repo.getPreparedStatement(null, userscount_query);
 
 			synchronized (users_count) {
+				try {
+					// Load all user count from database
+					rs = users_count.executeQuery();
 
-				// Load all user count from database
-				rs = users_count.executeQuery();
-
-				if (rs.next()) {
-					users = rs.getLong(1);
-				} // end of while (rs.next())
+					if (rs.next()) {
+						users = rs.getLong(1);
+					} // end of while (rs.next())
+				} finally {
+					data_repo.release(null, rs);
+				}
 			}
 
 			return users;
@@ -443,9 +446,6 @@ public class TigaseCustomAuth implements AuthRepository {
 
 			// throw new
 			// TigaseDBException("Problem loading user list from repository", e);
-		} finally {
-			data_repo.release(null, rs);
-			rs = null;
 		}
 	}
 
@@ -455,22 +455,25 @@ public class TigaseCustomAuth implements AuthRepository {
 			return -1;
 		}
 
-		ResultSet rs = null;
-
 		try {
 			long users = -1;
+			ResultSet rs = null;
 			PreparedStatement users_domain_count =
 					data_repo.getPreparedStatement(null, userdomaincount_query);
 
 			synchronized (users_domain_count) {
+				try {
+					// Load all user count from database
+					users_domain_count.setString(1, "%@" + domain);
+					rs = users_domain_count.executeQuery();
 
-				// Load all user count from database
-				users_domain_count.setString(1, "%@" + domain);
-				rs = users_domain_count.executeQuery();
-
-				if (rs.next()) {
-					users = rs.getLong(1);
-				} // end of while (rs.next())
+					if (rs.next()) {
+						users = rs.getLong(1);
+					} // end of while (rs.next())
+				} finally {
+					data_repo.release(null, rs);
+					rs = null;
+				}
 			}
 
 			return users;
@@ -479,9 +482,6 @@ public class TigaseCustomAuth implements AuthRepository {
 
 			// throw new
 			// TigaseDBException("Problem loading user list from repository", e);
-		} finally {
-			data_repo.release(null, rs);
-			rs = null;
 		}
 	}
 
@@ -740,56 +740,59 @@ public class TigaseCustomAuth implements AuthRepository {
 		return result;
 	}
 
+	@Override
 	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException  {
 		if (getpassword_query == null) {
 			return null;
 		}
 
-		ResultSet rs = null;
-
 		try {
+			ResultSet rs = null;
 			PreparedStatement get_pass =
 					data_repo.getPreparedStatement(user, getpassword_query);
 
 			synchronized (get_pass) {
-				get_pass.setString(1, user.toString());
-				rs = get_pass.executeQuery();
+				try {
+					get_pass.setString(1, user.toString());
+					rs = get_pass.executeQuery();
 
-				if (rs.next()) {
-					return rs.getString(1);
-				} else {
-					throw new UserNotFoundException("User does not exist: " + user);
-				} // end of if (isnext) else
+					if (rs.next()) {
+						return rs.getString(1);
+					} else {
+						throw new UserNotFoundException("User does not exist: " + user);
+					} // end of if (isnext) else
+				} finally {
+					data_repo.release(null, rs);
+				}
 			}
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem with retrieving user password.", e);
-		} finally {
-			data_repo.release(null, rs);
 		}
 	}
 
 		@Override
 	public boolean isUserDisabled(BareJID user) 
 					throws UserNotFoundException, TigaseDBException {
-		ResultSet rs = null;
-		
 		try {
-			PreparedStatement list_disabledaccounts = 
-					data_repo.getPreparedStatement(user, listdisabledaccounts_query);
-			
+			ResultSet rs = null;
+			PreparedStatement list_disabledaccounts
+					= data_repo.getPreparedStatement(user, listdisabledaccounts_query);
+
 			synchronized (list_disabledaccounts) {
-				rs = list_disabledaccounts.executeQuery();
-				while (rs.next()) {
-					String accountJid = rs.getString(1);
-					if (user.toString().equals(accountJid)) {
-						return true;
+				try {
+					rs = list_disabledaccounts.executeQuery();
+					while (rs.next()) {
+						String accountJid = rs.getString(1);
+						if (user.toString().equals(accountJid)) {
+							return true;
+						}
 					}
+				} finally {
+					data_repo.release(null, rs);
 				}
 			}
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem with checking if user account is disabled", e);
-		} finally {
-			data_repo.release(null, rs);
 		}
 		return false;
 	}
@@ -917,49 +920,51 @@ public class TigaseCustomAuth implements AuthRepository {
 			return false;
 		}
 
-		ResultSet rs = null;
 		String res_string = null;
 
 		try {
+			ResultSet rs = null;
 			PreparedStatement user_login = data_repo.getPreparedStatement(user, userlogin_query);
 
 			synchronized (user_login) {
+				try {
+					user_login.setString(1, user.toString());
+					user_login.setString(2, password);
 
-				user_login.setString( 1, user.toString() );
-				user_login.setString( 2, password );
-
-				switch ( data_repo.getDatabaseType() ) {
-					case sqlserver:
-						user_login.executeUpdate();
-						rs = user_login.getGeneratedKeys();
-						break;
-					default:
-						rs = user_login.executeQuery();
-						break;
-				}
-
-				boolean auth_result_ok = false;
-
-				if (rs.next()) {
-					res_string = rs.getString(1);
-
-					if (res_string != null) {
-						BareJID result = BareJID.bareJIDInstance(res_string);
-
-						auth_result_ok = user.equals(result);
+					switch (data_repo.getDatabaseType()) {
+						case sqlserver:
+							user_login.executeUpdate();
+							rs = user_login.getGeneratedKeys();
+							break;
+						default:
+							rs = user_login.executeQuery();
+							break;
 					}
 
-					if (auth_result_ok) {
-						return true;
-					} else {
-						if (log.isLoggable(Level.FINE)) {
-							log.log(Level.FINE, "Login failed, for user: ''{0}" + "''"
-									+ ", password: ''" + "{1}" + "''" + ", from DB got: " + "{2}",
-									new Object[] { user, password, res_string });
+					boolean auth_result_ok = false;
+
+					if (rs.next()) {
+						res_string = rs.getString(1);
+
+						if (res_string != null) {
+							BareJID result = BareJID.bareJIDInstance(res_string);
+
+							auth_result_ok = user.equals(result);
+						}
+
+						if (auth_result_ok) {
+							return true;
+						} else {
+							if (log.isLoggable(Level.FINE)) {
+								log.log(Level.FINE, "Login failed, for user: ''{0}" + "''"
+										+ ", password: ''" + "{1}" + "''" + ", from DB got: " + "{2}",
+										new Object[]{user, password, res_string});
+							}
 						}
 					}
+				} finally {
+					data_repo.release(null, rs);
 				}
-
 				throw new UserNotFoundException("User does not exist: " + user
 						+ ", in database: " + getResourceUri());
 			}
@@ -967,8 +972,6 @@ public class TigaseCustomAuth implements AuthRepository {
 			throw new AuthorizationException("Stringprep failed for: " + res_string, ex);
 		} catch (SQLException e) {
 			throw new TigaseDBException("Problem accessing repository.", e);
-		} finally {
-			data_repo.release(null, rs);
 		} // end of catch
 	}
 

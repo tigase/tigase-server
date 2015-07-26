@@ -176,22 +176,23 @@ public class CompSQLRepository
 
 		result.addAll(configRepo.allItems());
 
-		ResultSet rs = null;
-
 		try {
+			ResultSet rs = null;
 			PreparedStatement getAllItemsSt = data_repo.getPreparedStatement(null,
 					GET_ALL_ITEMS_QUERY);
 
 			synchronized (getAllItemsSt) {
-				rs = getAllItemsSt.executeQuery();
-				while (rs.next()) {
-					result.add(createItemFromRS(rs));
+				try {
+					rs = getAllItemsSt.executeQuery();
+					while (rs.next()) {
+						result.add(createItemFromRS(rs));
+					}
+				} finally {
+					data_repo.release(null, rs);
 				}
 			}
 		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem getting elements from DB: ", e);
-		} finally {
-			data_repo.release(null, rs);
 		}
 
 		return result;
@@ -230,23 +231,24 @@ public class CompSQLRepository
 		CompRepoItem result = configRepo.getItem(key);
 
 		if (result == null) {
-			ResultSet rs = null;
-
 			try {
+				ResultSet rs = null;
 				PreparedStatement getItemSt = data_repo.getPreparedStatement(null,
 						GET_ITEM_QUERY);
 
 				synchronized (getItemSt) {
-					getItemSt.setString(1, key);
-					rs = getItemSt.executeQuery();
-					if (rs.next()) {
-						result = createItemFromRS(rs);
+					try {
+						getItemSt.setString(1, key);
+						rs = getItemSt.executeQuery();
+						if (rs.next()) {
+							result = createItemFromRS(rs);
+						}
+					} finally {
+						data_repo.release(null, rs);
 					}
 				}
 			} catch (SQLException e) {
 				log.log(Level.WARNING, "Problem getting element from DB for domain: " + key, e);
-			} finally {
-				data_repo.release(null, rs);
 			}
 		}
 
