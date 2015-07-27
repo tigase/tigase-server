@@ -138,6 +138,8 @@ public class RosterElement {
 					lastSeen = INITIAL_LAST_SEEN_VAL;
 				}
 			}
+			// how roster can be modified as it is read from DB?
+			modified = false;
 		} else {
 			log.warning("Incorrect roster data: " + roster_el.toString());
 		}
