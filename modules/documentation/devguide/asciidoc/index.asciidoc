@@ -9,106 +9,117 @@ Tigase Team <team@tigase.com>
 :no title:
 :no author:
 
-Jeff
-
 //intro
-include::text/Development_Guide_03_-_Basic_Information.asciidoc[]
+include::text/Development_Guide_01_-_Basic_Information.asciidoc[]
 
 //writing for Tigase
-include::text/Development_Guide_05_-_Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.asciidoc[]
+include::text/Development_Guide_02_-_Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.asciidoc[]
 :leveloffset: 2
-include::text/Development_Guide_06_-_API_Changes_in_Tigase_Server_5.x.asciidoc[]
+include::text/Development_Guide_03_-_API_Changes_in_Tigase_Server_5.x.asciidoc[]
 :leveloffset: 1
 //compiling
-include::text/Development_Guide_07_-_Server_Compilation.asciidoc[]
+include::text/Development_Guide_04_-_Server_Compilation.asciidoc[]
 
 :leveloffset: 2
 
-include::text/Development_Guide_08_-_Tigase_XMPP_Server_5.2.0_and_Later_-_Compilation_and_Generating_Distribution_Packages.asciidoc[]
+include::text/Development_Guide_05_-_Tigase_XMPP_Server_5.2.0_and_Later_-_Compilation_and_Generating_Distribution_Packages.asciidoc[]
 
-include::text/Development_Guide_09_-_Tigase_Packages_Dependency_Change_-_Server_Compilation_Version_4.x_or_Later.asciidoc[]
+include::text/Development_Guide_06_-_Tigase_Packages_Dependency_Change_-_Server_Compilation_Version_4.x_or_Later.asciidoc[]
 
-include::text/Development_Guide_10_-_Server_Compilation_-_Version_2.x_and_3.x.asciidoc[]
+include::text/Development_Guide_07_-_Server_Compilation_-_Version_2.x_and_3.x.asciidoc[]
+
 :leveloffset: 1
+
 //components
-include::text/Development_Guide_20_-_Component_Development.asciidoc[]
+include::text/Development_Guide_08_-_Component_Development.asciidoc[]
+
 :leveloffset: 2
-include::text/Development_Guide_21_-_Component_Implementation_-_Lesson_1_-_Basics.asciidoc[]
 
-include::text/Development_Guide_22_-_Component_Implementation_-_Lesson_2_-_Configuration.asciidoc[]
+include::text/Development_Guide_09_-_Component_Implementation_-_Lesson_1_-_Basics.asciidoc[]
 
-include::text/Development_Guide_23_-_Component_Implementation_-_Lesson_3_-_Multi-threading.asciidoc[]
+include::text/Development_Guide_10_-_Component_Implementation_-_Lesson_2_-_Configuration.asciidoc[]
 
-include::text/Development_Guide_24_-_Component_Implementation_-_Lesson_4_-_Service_Discovery.asciidoc[]
+include::text/Development_Guide_11_-_Component_Implementation_-_Lesson_3_-_Multi-threading.asciidoc[]
 
-include::text/Development_Guide_25_-_Component_Implementation_-_Lesson_5_-_Statistics.asciidoc[]
+include::text/Development_Guide_12_-_Component_Implementation_-_Lesson_4_-_Service_Discovery.asciidoc[]
 
-include::text/Development_Guide_26_-_Component_Implementation_-_Lesson_6_-_Scripting_Support.asciidoc[]
+include::text/Development_Guide_13_-_Component_Implementation_-_Lesson_5_-_Statistics.asciidoc[]
 
-include::text/Development_Guide_30_-_Component_Implementation_-_Lesson_7_-_Data_Repository.asciidoc[]
+include::text/Development_Guide_14_-_Component_Implementation_-_Lesson_6_-_Scripting_Support.asciidoc[]
 
-include::text/Development_Guide_29_-_Component_Implementation_-_Lesson_8_-_Startup_Time.asciidoc[]
+include::text/Development_Guide_15_-_Component_Implementation_-_Lesson_7_-_Data_Repository.asciidoc[]
 
-include::text/Development_Guide_27_-_Configuration_API.asciidoc[]
+include::text/Development_Guide_16_-_Component_Implementation_-_Lesson_8_-_Startup_Time.asciidoc[]
 
-include::text/Development_Guide_28_-_Packet_Filtering_in_Component.asciidoc[]
+include::text/Development_Guide_17_-_Configuration_API.asciidoc[]
+
+include::text/Development_Guide_18_-_Packet_Filtering_in_Component.asciidoc[]
+
 :leveloffset: 1
+
 //plugins
-include::text/Development_Guide_15_-_Plugin_Development.asciidoc[]
+include::text/Development_Guide_19_-_Plugin_Development.asciidoc[]
+
 :leveloffset: 2
-include::text/Development_Guide_18_-_Writing_Plugin_Code.asciidoc[]
 
-include::text/Development_Guide_19_-_Plugin_Configuration.asciidoc[]
+include::text/Development_Guide_20_-_Writing_Plugin_Code.asciidoc[]
 
-include::text/Development_Guide_17_-_How_Packets_are_Processed_by_the_SM_and_Plugins.asciidoc[]
+include::text/Development_Guide_21_-_Plugin_Configuration.asciidoc[]
 
-include::text/Development_Guide_16_-_SASL_Custom_Mechanisms_and_Configuration.asciidoc[]
+include::text/Development_Guide_22_-_How_Packets_are_Processed_by_the_SM_and_Plugins.asciidoc[]
+
+include::text/Development_Guide_23_-_SASL_Custom_Mechanisms_and_Configuration.asciidoc[]
+
 :leveloffset: 1
+
 //maven
-include::text/Development_Guide_11_-_Using_Maven.asciidoc
+
+include::text/Development_Guide_24_-_Using_Maven.asciidoc[]
 
 :leveloffset: 2
 
-include::text/Development_Guide_12_-_Maven_2.x_Support.asciidoc[]
+include::text/Development_Guide_24_-_A_Very_Short_Maven_Guide.asciidoc[]
 
-include::text/Development_Guide_13_-_A_Very_Short_Maven_Guide.asciidoc[]
+include::text/Development_Guide_25_-_Maven_2.x_Support.asciidoc[]
 
 :leveloffset: 1
 
 //Tests
 
-include::text/Development_Guide_01_-_Tests.asciidoc[]
+include::text/Development_Guide_26_-_Tests.asciidoc[]
 
 :leveloffset: 2
 
-include::text/Development_Guide_36_-_Tigase_Test_Suite.asciidoc[]
+include::text/Development_Guide_27_-_Tigase_Test_Suite.asciidoc[]
 
-include::text/Development_Guide_37_-_Test_Suite_Scripting_Language.asciidoc[]
+include::text/Development_Guide_28_-_Test_Suite_Scripting_Language.asciidoc[]
 
-include::text/Development_Guide_38_-_Writing_Tests_for_Plugins.asciidoc[]
+include::text/Development_Guide_29_-_Writing_Tests_for_Plugins.asciidoc[]
 
-include::text/Development_Guide_39_-_Test_Case_Parameters_Description.asciidoc[]
+include::text/Development_Guide_30_-_Test_Case_Parameters_Description.asciidoc[]
 
 :leveloffset: 1
 
 //experimental
-include::text/Development_Guide_32_-_Experimental.asciidoc[]
+include::text/Development_Guide_31_-_Experimental.asciidoc[]
 
 :leveloffset: 2
 
-include::text/Development_Guide_33_-_Dynamic_Rosters.asciidoc[]
+include::text/Development_Guide_32_-_Dynamic_Rosters.asciidoc[]
 
-include::text/Development_Guide_34_-_Mobile_Optimizations.asciidoc[]
+include::text/Development_Guide_33_-_Mobile_Optimizations.asciidoc[]
 
-include::text/Development_Guide_35_-_Bosh_Session_Cache.asciidoc[]
+include::text/Development_Guide_34_-_Bosh_Session_Cache.asciidoc[]
 //Old
 
 :leveloffset: 1
 
-include::text/Development_Guide_02_-_Tigase_DB_Schema_Explained.asciidoc[]
+include::text/Development_Guide_35_-_Old_Stuff.asciidoc[]
 
-include::text/Development_Guide_04_-_Why_the_Most_Recent_JDK.asciidoc[]
+include::text/Development_Guide_36_-_Tigase_DB_Schema_Explained.asciidoc[]
 
-include::text/Development_Guide_14_-_Generating_Tigase_Installer.asciidoc[]
+include::text/Development_Guide_37_-_Why_the_Most_Recent_JDK.asciidoc[]
 
-include::text/Development_Guide_31_-_API_Description_for_Virtual_Domains_Management_in_the_Tigase_Server.asciidoc[]
+include::text/Development_Guide_38_-_Generating_Tigase_Installer.asciidoc[]
+
+include::text/Development_Guide_39_-_API_Description_for_Virtual_Domains_Management_in_the_Tigase_Server.asciidoc[]

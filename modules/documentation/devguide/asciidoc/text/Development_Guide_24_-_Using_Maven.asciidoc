@@ -10,4 +10,3 @@ Using Maven
 :website: http://tigase.net/
 
 Documents Describing Maven Use with the Tigase Projects
--------------------------------------------------------

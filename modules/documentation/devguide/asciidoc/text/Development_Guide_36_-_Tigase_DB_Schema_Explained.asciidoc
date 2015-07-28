@@ -34,7 +34,7 @@ As a result the *UserRepository* interface is exposed to all of Tigase's code, m
 
 As plugins or components are developed independently it may easily happen that developer choses the same key name to store some information. To avoid key name conflicts in the database a 'node' concept has been introduced. Therefore, most modules when set/get key value they also provide a subnode part, which in most cases is just XMLNS or some other unique string.
 
-The 'node' thing is a little bit like directory in a file system, it may contain subnodes which makes the Tigase database behave like a hierarchical structure. And the notation is also similar to file systems, you use just \'*/*' to separate node levels. In practice you can have the database organized like this:
+The 'node' thing is a little bit like directory in a file system, it may contain subnodes which makes the Tigase database behave like a hierarchical structure. And the notation is also similar to file systems, you use just */* to separate node levels. In practice you can have the database organized like this:
 
 [source,sql]
 user-name@domain  --> (key, value) pairs

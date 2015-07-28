@@ -17,12 +17,12 @@ An example of the best known components is MUC or PubSub. In Tigase however, alm
 Creating components for Tigase server is an essential part of the server development hence there is a lot of useful API and ready to use code available. This guide should help you to get familiar with the API and how to quickly and efficiently create your own component implementations.
 
 . xref:cil1[Component implementation - Lesson 1 - Basics]
-. Component implementation - Lesson 2 - Configuration
-. Component implementation - Lesson 3 - Multi-Threading
-. Component implementation - Lesson 4 - Service Discovery
-. Component implementation - Lesson 5 - Statistics
-. Component implementation - Lesson 6 - Scripting Support
-. Component implementation - Lesson 7 - Data Repository
-. Component implementation - Lesson 8 - Startup Time
-. Configuration API
-. Packet Filtering in Component
+. xref:cil2[Component implementation - Lesson 2 - Configuration]
+. xref:cil3[Component implementation - Lesson 3 - Multi-Threading]
+. xref:cil4[Component implementation - Lesson 4 - Service Discovery]
+. xref:cil5[Component implementation - Lesson 5 - Statistics]
+. xref:cil6[Component implementation - Lesson 6 - Scripting Support]
+. xref:cil7[Component implementation - Lesson 7 - Data Repository]
+. xref:cil8[Component implementation - Lesson 8 - Startup Time]
+. xref:configurationAPI[Configuration API]
+. xref:packetfiltering[Packet Filtering in Component]

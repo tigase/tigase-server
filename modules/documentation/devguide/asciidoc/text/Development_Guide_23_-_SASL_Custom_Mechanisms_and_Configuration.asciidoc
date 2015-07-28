@@ -43,9 +43,9 @@ To add a new mechanism, a new factory for the mechanism has to be registered. It
 
 +sess-man/plugins-conf/urn\:ietf\:params\:xml\:ns\:xmpp-sasl/factory=com.example.OwnFactory+
 
-The class must implement the +\'SaslServerFactory'+ interface. All mechanisms returned by +\'getMechanismNames()'+ method will be registered automatically.
+The class must implement the +SaslServerFactory+ interface. All mechanisms returned by +getMechanismNames()+ method will be registered automatically.
 
-The default factory that is available and registered by default is +\'tigase.auth.TigaseSaslServerFactory'+ which provides +PLAIN+ and +ANONYMOUS+ mechanisms.
+The default factory that is available and registered by default is +tigase.auth.TigaseSaslServerFactory+ which provides +PLAIN+ and +ANONYMOUS+ mechanisms.
 
 [[cbconf]]
 CallbackHandler Configuration
@@ -69,12 +69,12 @@ During the authentication process, Tigase server always checks for a handler spe
 Selecting Mechanisms Available in the Stream
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The +\'tigase.auth.MechanismSelector'+ interface is used for selecting mechanisms available in a stream. Method +\'filterMechanisms()'+ should return a collection with mechanisms available based on:
+The +tigase.auth.MechanismSelector+ interface is used for selecting mechanisms available in a stream. Method +filterMechanisms()+ should return a collection with mechanisms available based on:
 
 . all registered SASL factories
-. XMPP session data (from +\'XMPPResourceConnection'+ class)
+. XMPP session data (from +XMPPResourceConnection+ class)
 
-The default selector returns mechanisms from Tigase's default factory +(\'TigaseSaslServerFactory')+ only.
+The default selector returns mechanisms from Tigase's default factory +(TigaseSaslServerFactory)+ only.
 
 It is possible to use a custom selector by specifying it's class int the +init.properties+ file:
 
@@ -84,11 +84,11 @@ Logging/Authentication
 ----------------------
 After the XMPP stream is opened by a client, the server checks which SASL mechanisms are available for the XMPP session. Depending on whether the stream is encrypted or not, depending on the domain, the server can present different available authentication mechanisms. MechanismSelector is responsible for choosing mechanisms. List of allowed mechanisms is stored in the XMPP session object.
 
-When the client/user begins the authentication procedure it uses one particular mechanism. It must use one of the mechanisms provided by the server as available for this session. The server checks whether mechanisms used by the client is on the list of allowed mechanisms. It the check is successful, the server creates +\'SaslServer'+ class instance and proceeds with exchanging authentication information. Authentication data is different depending on the mechanism used.
+When the client/user begins the authentication procedure it uses one particular mechanism. It must use one of the mechanisms provided by the server as available for this session. The server checks whether mechanisms used by the client is on the list of allowed mechanisms. It the check is successful, the server creates +SaslServer+ class instance and proceeds with exchanging authentication information. Authentication data is different depending on the mechanism used.
 
-When the SASL authentication is completed without any error, Tigase server should have authorized user name or authorized BareJID. In the first case, the server automatically builds user's JID based on the domain used in the stream opening element in \'+to+' attribute.
+When the SASL authentication is completed without any error, Tigase server should have authorized user name or authorized BareJID. In the first case, the server automatically builds user's JID based on the domain used in the stream opening element in +to+ attribute.
 
-If, after a successful authentication, method call: +\'getNegotiatedProperty("IS_ANONYMOUS")\'+ returns +\'Boolean.TRUE'+ then the user session is marked as anonymous. For valid and registered users this can be used for cases when we do not want to load any user data such as roster, vcard, privacy lists and so on. This is a performance and resource usage implication and can be useful for use cases such as support chat. The authorization is performed based on the client database but we do not need to load any XMPP specific data for the user's session.
+If, after a successful authentication, method call: +getNegotiatedProperty("IS_ANONYMOUS")+ returns +Boolean.TRUE+ then the user session is marked as anonymous. For valid and registered users this can be used for cases when we do not want to load any user data such as roster, vcard, privacy lists and so on. This is a performance and resource usage implication and can be useful for use cases such as support chat. The authorization is performed based on the client database but we do not need to load any XMPP specific data for the user's session.
 
 More details about implementation can be found in the xref:cmd[custom mechanisms development] section.
 
@@ -110,9 +110,9 @@ Custom Mechanisms Development
 *Mechanism*
 ~~~~~~~~~~~
 
-+\'getAuthorizationID()\'+ method from +\'SaslServer'+ class *should* return bare JID authorized user. In case that the method returns only user name such as *romeo* for example, the server automatically appends domain name to generate a valid BareJID: _romeo@example.com_. In case the method returns a full, valid BareJID, the server does not change anything.
++getAuthorizationID()+ method from +SaslServer+ class *should* return bare JID authorized user. In case that the method returns only user name such as *romeo* for example, the server automatically appends domain name to generate a valid BareJID: _romeo@example.com_. In case the method returns a full, valid BareJID, the server does not change anything.
 
-+\'handleLogin()\'+ method from +\'SessionManagerHandler'+ will be called with user's Bare JID provided by +getAuthorizationID()+ (or created later using stream domain name).
++handleLogin()+ method from +SessionManagerHandler+ will be called with user's Bare JID provided by +getAuthorizationID()+ (or created later using stream domain name).
 
 *CallbackHandler*
 ~~~~~~~~~~~~~~~~~
@@ -128,7 +128,7 @@ General Remarks
 
 +JabberIqAuth+ used for non-SASL authentication mechanisms uses the same callback as the SASL mechanisms.
 
-Methods +\'auth'+ in +\'Repository'+ interfaces will be deprecated. These interfaces will be treated as user details providers only. There will be new methods available which will allow for additional login operations on the database such as last successful login recording.
+Methods +auth+ in +Repository+ interfaces will be deprecated. These interfaces will be treated as user details providers only. There will be new methods available which will allow for additional login operations on the database such as last successful login recording.
 
 Known Problems
 ~~~~~~~~~~~~~~

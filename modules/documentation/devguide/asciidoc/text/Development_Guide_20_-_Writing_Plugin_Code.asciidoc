@@ -40,7 +40,7 @@ The class declaration should look like this (assuming you are implementing just 
 public class Message extends AnnotatedXMPPProcessor
    implements XMPPProcessorIfc
 
-The first thing to create is the plugin *ID*. This is a unique string which you put in the configuration file to tell the server to load and use the plugin. In most cases you can use XMLNS if the plugin wants packets with elements with a very specific name space. Of course there is no guarantee there is no other packet for this specific XML element too. As we want to process all messages and don't want to spend whole day on thinking about a cool ID, let's say our ID is: \'message'.
+The first thing to create is the plugin *ID*. This is a unique string which you put in the configuration file to tell the server to load and use the plugin. In most cases you can use XMLNS if the plugin wants packets with elements with a very specific name space. Of course there is no guarantee there is no other packet for this specific XML element too. As we want to process all messages and don't want to spend whole day on thinking about a cool ID, let's say our ID is: _message_.
 
 A plugin informs about it's presence using a static *ID* field and *@Id* annotation placed on class:
 
