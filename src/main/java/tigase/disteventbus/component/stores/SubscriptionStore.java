@@ -7,7 +7,9 @@ import java.util.logging.Logger;
 
 import tigase.disteventbus.impl.EventName;
 import tigase.disteventbus.impl.EventsNameMap;
+import tigase.kernel.beans.Bean;
 
+@Bean(name = "subscriptionStore")
 public class SubscriptionStore {
 
 	protected final Logger log = Logger.getLogger(this.getClass().getName());

@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import tigase.component.adhoc.AdHocResponse.State;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
 import tigase.util.SimpleCache;
 import tigase.xml.Element;
@@ -32,8 +34,14 @@ import tigase.xmpp.JID;
  *
  *
  */
+@Bean(name = "adHocCommandManager")
 public class AdHocCommandManager {
+
+	@Inject(nullAllowed = true)
+	private AdHocCommand[] allCommands;
+
 	private final Map<String, AdHocCommand> commands = new HashMap<String, AdHocCommand>();
+
 	private final SimpleCache<String, AdHocSession> sessions = new SimpleCache<String, AdHocSession>(100, 10 * 1000);
 
 	/**
@@ -73,6 +81,7 @@ public class AdHocCommandManager {
 	 */
 	public Packet process(Packet packet) throws AdHocCommandException {
 		final Element element = packet.getElement();
+		@SuppressWarnings("unused")
 		final JID senderJid = packet.getStanzaFrom();
 		final Element command = element.getChild("command", "http://jabber.org/protocol/commands");
 		final String node = command.getAttributeStaticStr("node");
@@ -127,5 +136,14 @@ public class AdHocCommandManager {
 	public void registerCommand(AdHocCommand command) {
 		if (!this.commands.containsKey(command.getNode()))
 			this.commands.put(command.getNode(), command);
+	}
+
+	public void setAllCommands(AdHocCommand[] allCommands) {
+		this.allCommands = allCommands;
+		this.commands.clear();
+		if (allCommands != null)
+			for (AdHocCommand adHocCommand : allCommands) {
+				this.commands.put(adHocCommand.getNode(), adHocCommand);
+			}
 	}
 }

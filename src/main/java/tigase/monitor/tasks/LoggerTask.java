@@ -124,9 +124,9 @@ public class LoggerTask extends AbstractConfigurableTask {
 
 		Field.fieldListSingle("levelTreshold", levelTreshold.getName(), "Log level threshold",
 				new String[] { Level.SEVERE.getName(), Level.WARNING.getName(), Level.INFO.getName(), Level.CONFIG.getName(),
-			Level.FINE.getName(), Level.FINER.getName(), Level.FINEST.getName(), Level.ALL.getName() },
-			new String[] { Level.SEVERE.getName(), Level.WARNING.getName(), Level.INFO.getName(), Level.CONFIG.getName(),
-			Level.FINE.getName(), Level.FINER.getName(), Level.FINEST.getName(), Level.ALL.getName() });
+						Level.FINE.getName(), Level.FINER.getName(), Level.FINEST.getName(), Level.ALL.getName() },
+				new String[] { Level.SEVERE.getName(), Level.WARNING.getName(), Level.INFO.getName(), Level.CONFIG.getName(),
+						Level.FINE.getName(), Level.FINER.getName(), Level.FINEST.getName(), Level.ALL.getName() });
 
 		return f;
 	}

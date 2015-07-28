@@ -49,7 +49,7 @@ public class FireEventException extends DistEventBusException {
 
 	/**
 	 * Returns collection of all Exceptions throwed by handlers or listeners.
-	 * 
+	 *
 	 * @return collection of Exceptions.
 	 */
 	public Collection<Throwable> getCauses() {

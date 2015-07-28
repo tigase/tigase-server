@@ -19,8 +19,10 @@ package tigase.component.modules;
 
 import java.util.logging.Logger;
 
-import tigase.component.Context;
+import tigase.component.PacketWriter;
 import tigase.component.responses.AsyncCallback;
+import tigase.disteventbus.EventBus;
+import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
 import tigase.xml.Element;
 
@@ -28,59 +30,54 @@ import tigase.xml.Element;
  * Abstract class for help building a module. It has implemented few default
  * methods from {@link Module}, {@link ContextAware} and
  * {@link InitializingModule}.
- * 
+ *
  * @author bmalkow
- * 
+ *
  * @param <CTX>
  *            context of component.
  */
-public abstract class AbstractModule<CTX extends Context> implements Module, ContextAware, InitializingModule {
+public abstract class AbstractModule implements Module {
 
-	protected CTX context;
+	@Inject(bean = "eventBus")
+	protected EventBus eventBus;
 
 	protected final Logger log = Logger.getLogger(this.getClass().getName());
 
-	@Override
-	public void afterRegistration() {
-	}
-
-	@Override
-	public void beforeRegister() {
-		if (context == null)
-			throw new RuntimeException("Context is not initialized!");
-	}
+	@Inject
+	protected PacketWriter writer;
 
 	/**
 	 * Fires event.
-	 * 
+	 *
 	 * @param event
 	 *            event to fire.
 	 */
 	protected void fireEvent(Element event) {
-		context.getEventBus().fire(event);
+		eventBus.fire(event);
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public void setContext(Context context) {
-		this.context = (CTX) context;
+	public EventBus getEventBus() {
+		return eventBus;
 	}
 
-	@Override
-	public void unregisterModule() {
+	public PacketWriter getWriter() {
+		return writer;
 	}
 
-	/**
-	 * Writes single {@linkplain Packet}.
-	 * 
-	 * @param packet
-	 *            {@link Packet} to be written.
-	 */
+	public void setEventBus(EventBus eventBus) {
+		this.eventBus = eventBus;
+	}
+
+	public void setWriter(PacketWriter writer) {
+		this.writer = writer;
+	}
+
 	protected void write(Packet packet) {
-		context.getWriter().write(packet);
+		writer.write(packet);
 	}
 
 	protected void write(Packet packet, AsyncCallback asyncCallback) {
-		context.getWriter().write(packet, asyncCallback);
+		writer.write(packet, asyncCallback);
 	}
+
 }

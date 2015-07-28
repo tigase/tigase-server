@@ -3,17 +3,20 @@ package tigase.disteventbus.component;
 import tigase.component.modules.AbstractModule;
 import tigase.xmpp.JID;
 
-public abstract class AbstractEventBusModule extends AbstractModule<EventBusContext> {
+public abstract class AbstractEventBusModule extends AbstractModule {
 
 	private static long id = 0;
 
+	private EventBusComponent component;
+
 	protected boolean isClusteredEventBus(final JID jid) {
-		return jid.getLocalpart().equals("eventbus") && context.getConnectedNodes().contains(jid.getDomain());
+		return jid.getLocalpart().equals("eventbus")
+				&& component.getNodesConnected().contains(JID.jidInstanceNS(jid.getDomain()));
 	}
 
 	protected String nextStanzaID() {
 
-		String prefix = context.getComponentID().getDomain();
+		String prefix = component.getComponentId().getDomain();
 
 		synchronized (this) {
 			return prefix + "-" + (++id);

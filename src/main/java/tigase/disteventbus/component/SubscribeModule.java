@@ -12,9 +12,16 @@ import tigase.component.responses.AsyncCallback;
 import tigase.criteria.Criteria;
 import tigase.disteventbus.EventHandler;
 import tigase.disteventbus.component.stores.Affiliation;
+import tigase.disteventbus.component.stores.AffiliationStore;
 import tigase.disteventbus.component.stores.Subscription;
+import tigase.disteventbus.component.stores.SubscriptionStore;
 import tigase.disteventbus.impl.EventName;
+import tigase.disteventbus.impl.LocalEventBus;
 import tigase.disteventbus.impl.LocalEventBus.LocalEventBusListener;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.UnregisterAware;
 import tigase.server.Packet;
 import tigase.server.Permissions;
 import tigase.util.TigaseStringprepException;
@@ -23,12 +30,19 @@ import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
-public class SubscribeModule extends AbstractEventBusModule {
+@Bean(name = SubscribeModule.ID)
+public class SubscribeModule extends AbstractEventBusModule implements Initializable, UnregisterAware {
 
-	private static final Criteria CRIT = new ElemPathCriteria(new String[] { "iq", "pubsub", "subscribe" }, new String[] {
-			null, "http://jabber.org/protocol/pubsub", null });
+	private static final Criteria CRIT = new ElemPathCriteria(new String[] { "iq", "pubsub", "subscribe" },
+			new String[] { null, "http://jabber.org/protocol/pubsub", null });
 
 	public final static String ID = "subscribe";
+
+	@Inject
+	private AffiliationStore affiliationStore;
+
+	@Inject
+	private EventBusComponent component;
 
 	private final LocalEventBusListener eventBusListener = new LocalEventBusListener() {
 
@@ -46,16 +60,20 @@ public class SubscribeModule extends AbstractEventBusModule {
 		}
 	};
 
-	@Override
-	public void afterRegistration() {
-		super.afterRegistration();
+	@Inject(nullAllowed = false, bean = "localEventBus")
+	private LocalEventBus localEventBus;
 
-		context.getEventBusInstance().addListener(eventBusListener);
+	@Inject
+	private SubscriptionStore subscriptionStore;
+
+	@Override
+	public void beforeUnregister() {
+		localEventBus.removeListener(eventBusListener);
 
 	}
 
 	public void clusterNodeConnected(JID node) {
-		if (context.getComponentID().equals(node))
+		if (component.getComponentId().equals(node))
 			return;
 		// context.getSubscriptionStore().addSubscription(null,
 		// "tigase:eventbus", JID.jidInstanceNS("eventbus", node, null));
@@ -64,17 +82,17 @@ public class SubscribeModule extends AbstractEventBusModule {
 			log.finer("Node " + node + " is connected.");
 
 		Set<Element> pubsubNodes = new HashSet<Element>();
-		for (EventName eventName : context.getEventBusInstance().getAllListenedEvents()) {
-			pubsubNodes.add(prepareSubscribeElement(eventName, context.getComponentID(), null));
+		for (EventName eventName : localEventBus.getAllListenedEvents()) {
+			pubsubNodes.add(prepareSubscribeElement(eventName, component.getComponentId(), null));
 		}
 
-		for (EventName eventName : context.getSubscriptionStore().getSubscribedEvents()) {
-			Collection<Subscription> subscriptions = context.getSubscriptionStore().getSubscribersJIDs(eventName.getName(),
+		for (EventName eventName : subscriptionStore.getSubscribedEvents()) {
+			Collection<Subscription> subscriptions = subscriptionStore.getSubscribersJIDs(eventName.getName(),
 					eventName.getXmlns());
 			for (Subscription subscription : subscriptions) {
 				if (subscription.getServiceJID() != null)
-					pubsubNodes.add(prepareSubscribeElement(eventName, subscription.getJid(),
-							subscription.getServiceJID().toString()));
+					pubsubNodes.add(
+							prepareSubscribeElement(eventName, subscription.getJid(), subscription.getServiceJID().toString()));
 			}
 		}
 
@@ -83,12 +101,12 @@ public class SubscribeModule extends AbstractEventBusModule {
 	}
 
 	public void clusterNodeDisconnected(JID node) {
-		if (context.getComponentID().equals(node))
+		if (component.getComponentId().equals(node))
 			return;
-		
+
 		if (log.isLoggable(Level.FINER))
 			log.finer("Node " + node + " is disconnected.");
-		context.getSubscriptionStore().remove(new Subscription(JID.jidInstanceNS("eventbus", node.getDomain(), null)));
+		subscriptionStore.remove(new Subscription(JID.jidInstanceNS("eventbus", node.getDomain(), null)));
 	}
 
 	@Override
@@ -101,12 +119,17 @@ public class SubscribeModule extends AbstractEventBusModule {
 		return CRIT;
 	}
 
+	@Override
+	public void initialize() {
+		localEventBus.addListener(eventBusListener);
+	}
+
 	protected void onAddHandler(String eventName, String eventXmlns) {
-		for (JID node : context.getConnectedNodes()) {
-			if (context.getComponentID().equals(node))
+		for (JID node : component.getNodesConnected()) {
+			if (component.getComponentId().equals(node))
 				continue;
-			
-			Element se = prepareSubscribeElement(new EventName(eventName, eventXmlns), context.getComponentID(), null);
+
+			Element se = prepareSubscribeElement(new EventName(eventName, eventXmlns), component.getComponentId(), null);
 			sendSubscribeRequest("eventbus@" + node.getDomain(), Collections.singleton(se));
 		}
 	}
@@ -154,7 +177,7 @@ public class SubscribeModule extends AbstractEventBusModule {
 			Subscription subscription = new Subscription(jid);
 			subscription.setServiceJID(JID.jidInstanceNS(service));
 
-			context.getSubscriptionStore().addSubscription(parsedName.getName(), parsedName.getXmlns(), subscription);
+			subscriptionStore.addSubscription(parsedName.getName(), parsedName.getXmlns(), subscription);
 
 		}
 		return null;
@@ -162,13 +185,14 @@ public class SubscribeModule extends AbstractEventBusModule {
 
 	protected Element processNonClusterSubscription(final Packet packet) throws TigaseStringprepException, ComponentException {
 		// subscription from something out of cluster
-		final Affiliation affiliation = context.getAffiliationStore().getAffiliation(packet.getStanzaFrom());
+		final Affiliation affiliation = affiliationStore.getAffiliation(packet.getStanzaFrom());
 
 		if (!affiliation.isSubscribe())
 			throw new ComponentException(Authorization.FORBIDDEN);
 
 		List<Element> subscribeElements = packet.getElemChildrenStaticStr(new String[] { "iq", "pubsub" });
-		Element response = new Element("pubsub", new String[] { "xmlns" }, new String[] { "http://jabber.org/protocol/pubsub" });
+		Element response = new Element("pubsub", new String[] { "xmlns" },
+				new String[] { "http://jabber.org/protocol/pubsub" });
 
 		final Set<Element> subscribedNodes = new HashSet<Element>();
 		for (Element subscribe : subscribeElements) {
@@ -178,21 +202,21 @@ public class SubscribeModule extends AbstractEventBusModule {
 			if (log.isLoggable(Level.FINER))
 				log.finer("Entity " + jid + " subscribed for events " + parsedName);
 
-			context.getSubscriptionStore().addSubscription(parsedName.getName(), parsedName.getXmlns(),
+			subscriptionStore.addSubscription(parsedName.getName(), parsedName.getXmlns(),
 					new Subscription(jid, packet.getStanzaTo()));
 
 			subscribedNodes.add(prepareSubscribeElement(parsedName, jid, packet.getStanzaTo().toString()));
 
-			response.addChild(new Element("subscription", new String[] { "node", "jid", "subscription" }, new String[] {
-					parsedName.toEventBusNode(), jid.toString(), "subscribed" }));
+			response.addChild(new Element("subscription", new String[] { "node", "jid", "subscription" },
+					new String[] { parsedName.toEventBusNode(), jid.toString(), "subscribed" }));
 		}
 
 		if (log.isLoggable(Level.FINER))
-			log.finer("Forwarding subscription to: " + context.getConnectedNodes());
+			log.finer("Forwarding subscription to: " + component.getNodesConnected());
 
-		for (JID node : context.getConnectedNodes()) {
-			if (context.getComponentID().equals(node))
-				 continue;
+		for (JID node : component.getNodesConnected()) {
+			if (component.getComponentId().equals(node))
+				continue;
 			sendSubscribeRequest("eventbus@" + node.getDomain(), subscribedNodes);
 		}
 
@@ -214,8 +238,8 @@ public class SubscribeModule extends AbstractEventBusModule {
 
 	protected void sendSubscribeRequest(String to, Collection<Element> subscriptionElement) {
 		try {
-			Element iq = new Element("iq", new String[] { "from", "to", "type", "id" }, new String[] {
-					context.getComponentID().toString(), to, "set", nextStanzaID() });
+			Element iq = new Element("iq", new String[] { "from", "to", "type", "id" },
+					new String[] { component.getComponentId().toString(), to, "set", nextStanzaID() });
 
 			Element pubsubElem = new Element("pubsub", new String[] { "xmlns" },
 					new String[] { "http://jabber.org/protocol/pubsub" });
@@ -252,12 +276,6 @@ public class SubscribeModule extends AbstractEventBusModule {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public void unregisterModule() {
-		context.getEventBusInstance().removeListener(eventBusListener);
-		super.unregisterModule();
 	}
 
 }

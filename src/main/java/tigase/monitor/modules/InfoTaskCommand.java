@@ -5,8 +5,8 @@ import tigase.component.adhoc.AdHocCommandException;
 import tigase.component.adhoc.AdHocResponse;
 import tigase.component.adhoc.AdhHocRequest;
 import tigase.form.Form;
+import tigase.kernel.core.Kernel;
 import tigase.monitor.InfoTask;
-import tigase.monitor.MonitorContext;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 
@@ -14,10 +14,10 @@ public class InfoTaskCommand implements AdHocCommand {
 
 	public static final String NODE = "x-info";
 
-	private MonitorContext ctx;
+	private Kernel kernel;
 
-	public InfoTaskCommand(MonitorContext ctx) {
-		this.ctx = ctx;
+	public InfoTaskCommand(Kernel kernel) {
+		this.kernel = kernel;
 	}
 
 	@Override
@@ -26,7 +26,7 @@ public class InfoTaskCommand implements AdHocCommand {
 			if (request.getAction() != null && "cancel".equals(request.getAction())) {
 				response.cancelSession();
 			} else {
-				final InfoTask taskInstance = ctx.getKernel().getInstance(request.getIq().getStanzaTo().getResource());
+				final InfoTask taskInstance = kernel.getInstance(request.getIq().getStanzaTo().getResource());
 
 				Form form = taskInstance.getTaskInfo();
 

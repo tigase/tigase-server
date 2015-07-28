@@ -34,7 +34,7 @@ public class ComponentException extends Exception {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param errorCondition
 	 * @param text
 	 *            human readable message will be send to client
@@ -44,7 +44,7 @@ public class ComponentException extends Exception {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param errorCondition
 	 * @param message
 	 *            exception message for logging

@@ -1015,7 +1015,7 @@ public class BasicComponent
 	 *
 	 * @return a value of <code>boolean</code>
 	 */
-	protected boolean processScriptCommand(Packet pc, Queue<Packet> results) {
+	public boolean processScriptCommand(Packet pc, Queue<Packet> results) {
 
 		// TODO: test if this is right
 		// It is not, the packet should actually have packetFrom set at all times

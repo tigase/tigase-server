@@ -1,7 +1,6 @@
 package tigase.disteventbus.component;
 
 import java.util.Collection;
-import java.util.Map;
 
 import tigase.component.adhoc.AdHocCommand;
 import tigase.component.adhoc.AdHocCommandException;
@@ -9,19 +8,19 @@ import tigase.component.adhoc.AdHocResponse;
 import tigase.component.adhoc.AdhHocRequest;
 import tigase.form.Field;
 import tigase.form.Form;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 
+@Bean(name = "remove-listener-script")
 public class RemoveListenerScriptCommand implements AdHocCommand {
 
+	@Inject
 	private ListenerScriptRegistrar listenerScriptRegistrar;
-	private Map<String, ListenerScript> listenersScripts;
 
-	public RemoveListenerScriptCommand(Map<String, ListenerScript> listenersScripts,
-			ListenerScriptRegistrar listenerScriptRegistrar) {
-		this.listenersScripts = listenersScripts;
-		this.listenerScriptRegistrar = listenerScriptRegistrar;
+	public RemoveListenerScriptCommand() {
 	}
 
 	@Override
@@ -34,7 +33,7 @@ public class RemoveListenerScriptCommand implements AdHocCommand {
 			} else if (data == null) {
 				Form form = new Form("form", "Delete listener script", null);
 
-				Collection<String> scriptNames = listenersScripts.keySet();
+				Collection<String> scriptNames = listenerScriptRegistrar.getListenersScripts().keySet();
 
 				form.addField(Field.fieldListSingle("delete_script", "", "Script to delete",
 						scriptNames.toArray(new String[] {}), scriptNames.toArray(new String[] {})));
@@ -48,7 +47,7 @@ public class RemoveListenerScriptCommand implements AdHocCommand {
 					String scriptName = form.getAsString("delete_script");
 
 					listenerScriptRegistrar.delete(scriptName);
-					ListenerScript i = listenersScripts.remove(scriptName);
+					ListenerScript i = listenerScriptRegistrar.getListenersScripts().remove(scriptName);
 					if (i != null) {
 						i.unregister();
 					} else

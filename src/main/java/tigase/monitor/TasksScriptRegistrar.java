@@ -9,12 +9,14 @@ import tigase.db.TigaseDBException;
 import tigase.db.comp.ComponentRepository;
 import tigase.db.comp.RepositoryChangeListenerIfc;
 import tigase.form.Form;
+import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.core.Kernel;
 import tigase.monitor.TaskConfigItem.Type;
 import tigase.monitor.tasks.ScriptTask;
 import tigase.monitor.tasks.ScriptTimerTask;
 
+@Bean(name = TasksScriptRegistrar.ID)
 public class TasksScriptRegistrar {
 
 	public static final String ID = "TasksScriptRegistrar";
@@ -24,7 +26,7 @@ public class TasksScriptRegistrar {
 
 	protected final Logger log = Logger.getLogger(this.getClass().getName());
 
-	@Inject
+	@Inject(nullAllowed = false)
 	private ComponentRepository<TaskConfigItem> repo;
 
 	public void delete(String taskName) {

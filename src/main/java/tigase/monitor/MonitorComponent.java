@@ -1,19 +1,13 @@
 package tigase.monitor;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
 import javax.script.ScriptEngineManager;
 
-import tigase.component.AbstractComponent;
-import tigase.component.AbstractContext;
-import tigase.component.adhoc.AdHocCommand;
-import tigase.component.modules.Module;
-import tigase.component.modules.impl.AdHocCommandModule;
-import tigase.component.modules.impl.DiscoveryModule;
+import tigase.component.AbstractKernelBasedComponent;
 import tigase.component.modules.impl.JabberVersionModule;
 import tigase.component.modules.impl.XmppPingModule;
 import tigase.conf.ConfigurationException;
@@ -29,23 +23,9 @@ import tigase.server.monitor.MonitorRuntime;
 import tigase.util.ClassUtil;
 import tigase.util.TimerTask;
 
-public class MonitorComponent extends AbstractComponent<MonitorContext> {
-
-	private class MonitorContextImpl extends AbstractContext implements MonitorContext {
-
-		public MonitorContextImpl(AbstractComponent<?> component) {
-			super(component);
-		}
-
-		@Override
-		public Kernel getKernel() {
-			return kernel;
-		}
-	}
+public class MonitorComponent extends AbstractKernelBasedComponent {
 
 	public static final String EVENTS_XMLNS = "tigase:monitor:event";
-
-	private Kernel kernel = new Kernel();
 
 	private final TimerTaskService timerTaskService = new TimerTaskService() {
 
@@ -61,26 +41,9 @@ public class MonitorComponent extends AbstractComponent<MonitorContext> {
 	};
 
 	@Override
-	protected MonitorContext createContext() {
-		return new MonitorContextImpl(this);
-	}
-
-	@Override
 	public String getComponentVersion() {
 		String version = this.getClass().getPackage().getImplementationVersion();
 		return version == null ? "0.0.0" : version;
-	}
-
-	@Override
-	protected Map<String, Class<? extends Module>> getDefaultModulesList() {
-		final Map<String, Class<? extends Module>> result = new HashMap<String, Class<? extends Module>>();
-
-		result.put(XmppPingModule.ID, XmppPingModule.class);
-		result.put(JabberVersionModule.ID, JabberVersionModule.class);
-		result.put(AdHocCommandModule.ID, AdHocCommandMonitorModule.class);
-		result.put(DiscoveryModule.ID, DiscoveryMonitorModule.class);
-
-		return result;
 	}
 
 	@Override
@@ -104,36 +67,39 @@ public class MonitorComponent extends AbstractComponent<MonitorContext> {
 	}
 
 	@Override
-	public void setProperties(Map<String, Object> props) throws ConfigurationException {
-		if (props.size() <= 1)
-			return;
-		super.setProperties(props);
-
-		kernel.registerBean("eventBus").asInstance(context.getEventBus()).exec();
+	protected void registerModules(Kernel kernel) {
+		kernel.registerBean(XmppPingModule.class).exec();
+		kernel.registerBean(JabberVersionModule.class).exec();
+		kernel.registerBean(AdHocCommandMonitorModule.class).exec();
+		kernel.registerBean(DiscoveryMonitorModule.class).exec();
 
 		kernel.registerBean(BeanConfigurator.class).exec();
+		kernel.registerBean(TasksScriptRegistrar.class).exec();
 
-		kernel.registerBean(TasksScriptRegistrar.ID).asClass(TasksScriptRegistrar.class).exec();
+		kernel.registerBean(AddScriptTaskCommand.class).exec();
+		kernel.registerBean(AddTimerScriptTaskCommand.class).exec();
+		kernel.registerBean(DeleteScriptTaskCommand.class).exec();
 
 		ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
 		kernel.registerBean("scriptEngineManager").asInstance(scriptEngineManager).exec();
-
 		kernel.registerBean("bindings").asInstance(scriptEngineManager.getBindings()).exec();
-		kernel.registerBean("context").asInstance(getContext()).exec();
-		kernel.registerBean("monitorComponent").asInstance(this).exec();
+
 		kernel.registerBean("timerTaskService").asInstance(timerTaskService).exec();
 		kernel.registerBean("runtime").asInstance(MonitorRuntime.getMonitorRuntime()).exec();
-		kernel.registerBean("kernel").asInstance(kernel).exec();
+	}
 
-		AdHocCommand ahc;
+	@Override
+	public void setProperties(Map<String, Object> props) throws ConfigurationException {
+		if (props.size() <= 1)
+			return;
 
 		String repoClass = TaskConfigItemJDBCRepository.class.getName();
-
 		try {
-			ComponentRepository<TaskConfigItem> repo_tmp = (ComponentRepository<TaskConfigItem>) Class.forName(repoClass).newInstance();
+			ComponentRepository<TaskConfigItem> repo_tmp = (ComponentRepository<TaskConfigItem>) Class.forName(
+					repoClass).newInstance();
 
 			repo_tmp.setProperties(props);
-			log.log(Level.WARNING, "Monitoring Tasks: {0} with items: {1}", new Object[] {repo_tmp, repo_tmp.toString()});
+			log.log(Level.WARNING, "Monitoring Tasks: {0} with items: {1}", new Object[] { repo_tmp, repo_tmp.toString() });
 			repo_tmp.reload();
 
 			kernel.registerBean("tasksRepo").asInstance(repo_tmp).exec();
@@ -141,15 +107,7 @@ public class MonitorComponent extends AbstractComponent<MonitorContext> {
 			log.log(Level.SEVERE, "Can not create T repository instance for class: " + repoClass, e);
 		}
 
-		ahc = new AddScriptTaskCommand(context);
-		((AdHocCommandMonitorModule) getModuleProvider().getModule(AdHocCommandModule.ID)).register(ahc);
-		kernel.registerBean(ahc.getName()).asInstance(ahc).exec();
-		ahc = new AddTimerScriptTaskCommand(context);
-		((AdHocCommandMonitorModule) getModuleProvider().getModule(AdHocCommandModule.ID)).register(ahc);
-		kernel.registerBean(ahc.getName()).asInstance(ahc).exec();
-		ahc = new DeleteScriptTaskCommand(context);
-		((AdHocCommandMonitorModule) getModuleProvider().getModule(AdHocCommandModule.ID)).register(ahc);
-		kernel.registerBean(ahc.getName()).asInstance(ahc).exec();
+		super.setProperties(props);
 
 		try {
 			Set<Class<MonitorTask>> classes = ClassUtil.getClassesImplementing(MonitorTask.class);

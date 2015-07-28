@@ -17,22 +17,28 @@
  */
 package tigase.component.modules.impl;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import tigase.component.Context;
 import tigase.component.exceptions.ComponentException;
 import tigase.component.exceptions.RepositoryException;
 import tigase.component.modules.AbstractModule;
+import tigase.component.modules.Module;
 import tigase.criteria.Criteria;
 import tigase.criteria.ElementCriteria;
 import tigase.criteria.Or;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
+import tigase.server.BasicComponent;
 import tigase.server.Packet;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 
-public class DiscoveryModule<CTX extends Context> extends AbstractModule<CTX> {
+@Bean(name = DiscoveryModule.ID)
+public class DiscoveryModule extends AbstractModule {
 
 	public final static String DISCO_INFO_XMLNS = "http://jabber.org/protocol/disco#info";
 
@@ -40,11 +46,37 @@ public class DiscoveryModule<CTX extends Context> extends AbstractModule<CTX> {
 
 	public final static String ID = "disco";
 
+	@Inject
+	private AdHocCommandModule adHocCommandModule;
+
+	@Inject(bean = "component")
+	private BasicComponent component;
+
 	private Criteria criteria;
+
+	@Inject(type = Module.class)
+	private List<Module> modules;
 
 	public DiscoveryModule() {
 		this.criteria = ElementCriteria.nameType("iq", "get").add(
 				new Or(ElementCriteria.name("query", DISCO_INFO_XMLNS), ElementCriteria.name("query", DISCO_ITEMS_XMLNS)));
+	}
+
+	public AdHocCommandModule getAdHocCommandModule() {
+		return adHocCommandModule;
+	}
+
+	public Set<String> getAvailableFeatures() {
+		final HashSet<String> features = new HashSet<String>();
+		for (Module m : modules) {
+			String[] fs = m.getFeatures();
+			if (fs != null) {
+				for (String string : fs) {
+					features.add(string);
+				}
+			}
+		}
+		return features;
 	}
 
 	@Override
@@ -55,6 +87,10 @@ public class DiscoveryModule<CTX extends Context> extends AbstractModule<CTX> {
 	@Override
 	public Criteria getModuleCriteria() {
 		return criteria;
+	}
+
+	public List<Module> getModules() {
+		return modules;
 	}
 
 	@Override
@@ -81,40 +117,47 @@ public class DiscoveryModule<CTX extends Context> extends AbstractModule<CTX> {
 		}
 	}
 
-	protected void processAdHocCommandItems(Packet packet, JID jid, String node, JID senderJID) throws ComponentException,
-			RepositoryException {
-		AdHocCommandModule<?> module = context.getModuleProvider().getModule(AdHocCommandModule.ID);
-		if (module == null)
+	protected void processAdHocCommandItems(Packet packet, JID jid, String node, JID senderJID)
+			throws ComponentException, RepositoryException {
+		if (adHocCommandModule == null)
 			throw new ComponentException(Authorization.ITEM_NOT_FOUND);
 
 		Element resultQuery = new Element("query", new String[] { Packet.XMLNS_ATT }, new String[] { DISCO_ITEMS_XMLNS });
 		Packet result = packet.okResult(resultQuery, 0);
 
-		List<Element> items = module.getScriptItems(node, packet.getStanzaTo(), packet.getStanzaFrom());
+		List<Element> items = adHocCommandModule.getScriptItems(node, packet.getStanzaTo(), packet.getStanzaFrom());
 
 		resultQuery.addChildren(items);
 
 		write(result);
 	}
 
-	protected void processDiscoInfo(Packet packet, JID jid, String node, JID senderJID) throws ComponentException,
-			RepositoryException {
+	protected void processDiscoInfo(Packet packet, JID jid, String node, JID senderJID)
+			throws ComponentException, RepositoryException {
 		Element resultQuery = new Element("query", new String[] { "xmlns" }, new String[] { DISCO_INFO_XMLNS });
 		Packet resultIq = packet.okResult(resultQuery, 0);
 
 		resultQuery.addChild(new Element("identity", new String[] { "category", "type", "name" }, new String[] {
-				context.getDiscoCategory(), context.getDiscoCategoryType(), context.getDiscoDescription() }));
-		for (String f : context.getModuleProvider().getAvailableFeatures()) {
+				component.getDiscoCategory(), component.getDiscoCategoryType(), component.getDiscoDescription() }));
+		for (String f : getAvailableFeatures()) {
 			resultQuery.addChild(new Element("feature", new String[] { "var" }, new String[] { f }));
 		}
 
 		write(resultIq);
 	}
 
-	protected void processDiscoItems(Packet packet, JID jid, String node, JID senderJID) throws ComponentException,
-			RepositoryException {
+	protected void processDiscoItems(Packet packet, JID jid, String node, JID senderJID)
+			throws ComponentException, RepositoryException {
 		Element resultQuery = new Element("query", new String[] { Packet.XMLNS_ATT }, new String[] { DISCO_ITEMS_XMLNS });
 		write(packet.okResult(resultQuery, 0));
+	}
+
+	public void setAdHocCommandModule(AdHocCommandModule adHocCommandModule) {
+		this.adHocCommandModule = adHocCommandModule;
+	}
+
+	public void setModules(List<Module> modules) {
+		this.modules = modules;
 	}
 
 }

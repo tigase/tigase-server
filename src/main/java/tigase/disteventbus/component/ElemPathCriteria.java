@@ -10,8 +10,8 @@ public class ElemPathCriteria implements Criteria {
 		// "pubsub", "subscribe" }, new String[] { null,
 		// "http://jabber.org/protocol/pubsub", null });
 
-		ElemPathCriteria c = new ElemPathCriteria(new String[] { "iq", "pubsub", "subscribe" }, new String[] { null,
-				"http://jabber.org/protocol/pubsub", null });
+		ElemPathCriteria c = new ElemPathCriteria(new String[] { "iq", "pubsub", "subscribe" },
+				new String[] { null, "http://jabber.org/protocol/pubsub", null });
 
 		Element e = new Element("iq");
 		Element x = new Element("pubsub", new String[] { "xmlns" }, new String[] { "http://jabber.org/protocol/pubsub" });

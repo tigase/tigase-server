@@ -17,18 +17,21 @@
  */
 package tigase.component.modules.impl;
 
-import tigase.component.Context;
 import tigase.component.exceptions.ComponentException;
 import tigase.component.modules.AbstractModule;
 import tigase.criteria.Criteria;
 import tigase.criteria.ElementCriteria;
+import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
 import tigase.xml.Element;
 
-public class XmppPingModule<CTX extends Context> extends AbstractModule<CTX> {
+@Bean(name = XmppPingModule.ID)
+public class XmppPingModule extends AbstractModule {
 
 	private static final Criteria CRIT = ElementCriteria.nameType("iq", "get").add(
 			ElementCriteria.name("ping", "urn:xmpp:ping"));
+
+	public final static String ID = "urn:xmpp:ping";
 
 	public XmppPingModule() {
 	}
@@ -48,7 +51,5 @@ public class XmppPingModule<CTX extends Context> extends AbstractModule<CTX> {
 		Packet reposnse = iq.okResult((Element) null, 0);
 		write(reposnse);
 	}
-
-	public final static String ID = "urn:xmpp:ping";
 
 }

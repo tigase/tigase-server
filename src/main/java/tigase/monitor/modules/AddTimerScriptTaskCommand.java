@@ -12,18 +12,21 @@ import tigase.component.adhoc.AdHocResponse;
 import tigase.component.adhoc.AdhHocRequest;
 import tigase.form.Field;
 import tigase.form.Form;
-import tigase.monitor.MonitorContext;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.core.Kernel;
 import tigase.monitor.TasksScriptRegistrar;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 
+@Bean(name = "x-add-timer-task")
 public class AddTimerScriptTaskCommand implements AdHocCommand {
 
-	private MonitorContext monitorContext;
+	@Inject
+	private Kernel kernel;
 
-	public AddTimerScriptTaskCommand(MonitorContext monitorContext) {
-		this.monitorContext = monitorContext;
+	public AddTimerScriptTaskCommand() {
 	}
 
 	@Override
@@ -36,8 +39,7 @@ public class AddTimerScriptTaskCommand implements AdHocCommand {
 			} else if (data == null) {
 				Form form = new Form("form", "Add monitor script", null);
 
-				List<ScriptEngineFactory> sef = monitorContext.getKernel().getInstance(
-						ScriptEngineManager.class).getEngineFactories();
+				List<ScriptEngineFactory> sef = kernel.getInstance(ScriptEngineManager.class).getEngineFactories();
 				ArrayList<String> labels = new ArrayList<String>();
 				ArrayList<String> values = new ArrayList<String>();
 				for (ScriptEngineFactory scriptEngineFactory : sef) {
@@ -62,8 +64,8 @@ public class AddTimerScriptTaskCommand implements AdHocCommand {
 					String scriptContent = form.getAsString("scriptContent");
 					Long delay = form.getAsLong("delay");
 
-					((TasksScriptRegistrar) monitorContext.getKernel().getInstance(
-							TasksScriptRegistrar.ID)).registerTimerScript(scriptName, scriptExtension, scriptContent, delay);
+					((TasksScriptRegistrar) kernel.getInstance(TasksScriptRegistrar.ID)).registerTimerScript(scriptName,
+							scriptExtension, scriptContent, delay);
 				}
 
 				form = new Form("form", "Completed", null);

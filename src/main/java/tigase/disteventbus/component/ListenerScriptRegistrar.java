@@ -6,25 +6,32 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.core.Kernel;
 import tigase.util.Algorithms;
 import tigase.util.Base64;
 
-public class ListenerScriptRegistrar {
+@Bean(name = "listenerScriptRegistrar")
+public class ListenerScriptRegistrar implements Initializable {
 
-	private EventBusContext context;
-	private Map<String, ListenerScript> listenersScripts;
+	@Inject
+	private Kernel kernel;
+
+	private final Map<String, ListenerScript> listenersScripts = new ConcurrentHashMap<String, ListenerScript>();
+
+	@Inject(nullAllowed = false)
 	private ScriptEngineManager scriptEngineManager;
+
 	private String scriptPath = "./listenerScripts";
 
-	public ListenerScriptRegistrar(Map<String, ListenerScript> listenersScripts, EventBusContext context,
-			ScriptEngineManager scriptEngineManager) {
-		this.context = context;
-		this.listenersScripts = listenersScripts;
-		this.scriptEngineManager = scriptEngineManager;
+	public ListenerScriptRegistrar() {
 	}
 
 	public void delete(String taskName) {
@@ -34,6 +41,15 @@ public class ListenerScriptRegistrar {
 
 		File f = new File(par, Algorithms.sha256(taskName) + ".script");
 		f.delete();
+	}
+
+	public Map<String, ListenerScript> getListenersScripts() {
+		return listenersScripts;
+	}
+
+	@Override
+	public void initialize() {
+		load();
 	}
 
 	public void load() {
@@ -83,11 +99,12 @@ public class ListenerScriptRegistrar {
 			String eventXMLNS) throws ScriptException {
 		ListenerScript ls = new ListenerScript();
 		listenersScripts.put(scriptName, ls);
-		ls.run(context, scriptEngineManager, scriptName, scriptExtension, scriptContent,
+		ls.run(kernel, scriptEngineManager, scriptName, scriptExtension, scriptContent,
 				eventName == null || eventName.isEmpty() ? null : eventName, eventXMLNS);
 	}
 
-	private void saveScript(String scriptName, String scriptExtension, String scriptContent, String eventName, String eventXMLNS) {
+	private void saveScript(String scriptName, String scriptExtension, String scriptContent, String eventName,
+			String eventXMLNS) {
 		File par = new File(scriptPath);
 		if (!par.exists())
 			par.mkdirs();

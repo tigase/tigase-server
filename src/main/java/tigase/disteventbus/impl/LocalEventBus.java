@@ -57,6 +57,10 @@ public class LocalEventBus implements EventBus {
 			throw new NullPointerException("Cannot fire null event");
 		}
 
+		if (xmlns == null) {
+			throw new NullPointerException("Cannot fire event with null XMLNS");
+		}
+
 		final ArrayList<EventHandler> handlers = new ArrayList<EventHandler>();
 		synchronized (this.handlers) {
 			handlers.addAll(getHandlersList(name, xmlns));

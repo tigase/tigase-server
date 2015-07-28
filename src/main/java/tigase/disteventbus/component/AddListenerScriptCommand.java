@@ -12,19 +12,22 @@ import tigase.component.adhoc.AdHocResponse;
 import tigase.component.adhoc.AdhHocRequest;
 import tigase.form.Field;
 import tigase.form.Form;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 
+@Bean(name = "add-listener-script")
 public class AddListenerScriptCommand implements AdHocCommand {
 
+	@Inject
 	private ListenerScriptRegistrar registrar;
 
+	@Inject
 	private ScriptEngineManager scriptEngineManager;
 
-	public AddListenerScriptCommand(ScriptEngineManager scriptEngineManager, ListenerScriptRegistrar registrar) {
-		this.scriptEngineManager = scriptEngineManager;
-		this.registrar = registrar;
+	public AddListenerScriptCommand() {
 	}
 
 	@Override

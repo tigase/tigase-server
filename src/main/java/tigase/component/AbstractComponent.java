@@ -17,103 +17,63 @@
  */
 package tigase.component;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.script.Bindings;
 
-import tigase.component.exceptions.ComponentException;
 import tigase.component.modules.Module;
-import tigase.component.modules.ModuleProvider;
-import tigase.component.modules.ModulesManager;
-import tigase.component.modules.impl.AdHocCommandModule.ScriptCommandProcessor;
+import tigase.component.modules.StanzaProcessor;
 import tigase.component.responses.AsyncCallback;
 import tigase.component.responses.ResponseManager;
 import tigase.conf.ConfigurationException;
 import tigase.disco.XMPPService;
 import tigase.disteventbus.EventBus;
-import tigase.disteventbus.EventBusFactory;
-import tigase.disteventbus.EventHandler;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.core.Kernel;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.DisableDisco;
 import tigase.server.Packet;
-import tigase.util.TigaseStringprepException;
-import tigase.xml.Element;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.StanzaType;
 
 /**
  * Base class for implement XMPP Component.
  *
  * @author bmalkow
  *
- * @param <CTX>
- *            {@link Context} of component Should be extended.
  */
-public abstract class AbstractComponent<CTX extends Context> extends AbstractMessageReceiver implements XMPPService,
-DisableDisco {
+@Deprecated
+public abstract class AbstractComponent extends AbstractMessageReceiver implements XMPPService, DisableDisco {
 
-	protected static final String COMPONENT = "component";
+	public static class DefaultPacketWriter implements PacketWriter {
 
-	/**
-	 * Context of component.
-	 */
-	protected final CTX context;
+		@Inject(bean = "component")
+		private AbstractComponent component;
 
-	protected final ScriptCommandProcessor defaultScriptCommandProcessor = new ScriptCommandProcessor() {
+		protected final Logger log = Logger.getLogger(this.getClass().getName());
 
-		@Override
-		public List<Element> getScriptItems(String node, JID jid, JID from) {
-			return AbstractComponent.this.getScriptItems(node, jid, from);
+		@Inject
+		private ResponseManager responseManager;
+
+		public AbstractComponent getComponent() {
+			return component;
 		}
 
-		@Override
-		public boolean processScriptCommand(Packet pc, Queue<Packet> results) {
-			return AbstractComponent.this.processScriptCommand(pc, results);
-		}
-	};
-
-	private EventBus eventBus = new EventBus() {
-
-		private final EventBus eventBus = EventBusFactory.getInstance();
-
-		@Override
-		public void addHandler(String name, String xmlns, EventHandler handler) {
-			eventBus.addHandler(name, xmlns, handler);
+		public ResponseManager getResponseManager() {
+			return responseManager;
 		}
 
-		@Override
-		public void fire(Element event) {
-			event.setAttribute("eventSource", getComponentId().toString());
-			event.setAttribute("eventTimestamp", Long.toString(System.currentTimeMillis()));
-
-			eventBus.fire(event);
+		public void setComponent(AbstractComponent component) {
+			this.component = component;
 		}
 
-		@Override
-		public void removeHandler(String name, String xmlns, EventHandler handler) {
-			eventBus.removeHandler(name, xmlns, handler);
+		public void setResponseManager(ResponseManager responseManager) {
+			this.responseManager = responseManager;
 		}
-	};
 
-	/** Logger */
-	protected final Logger log = Logger.getLogger(this.getClass().getName());
-
-	/** Modules manager */
-	protected final ModulesManager modulesManager;
-
-	private ResponseManager responseManager;;
-
-	protected PacketWriter writer = new PacketWriter() {
 		@Override
 		public void write(Collection<Packet> elements) {
 			if (elements != null) {
@@ -130,7 +90,7 @@ DisableDisco {
 			if (log.isLoggable(Level.FINER)) {
 				log.finer("Sent: " + packet.getElement());
 			}
-			addOutPacket(packet);
+			component.addOutPacket(packet);
 		}
 
 		@Override
@@ -138,89 +98,45 @@ DisableDisco {
 			if (log.isLoggable(Level.FINER)) {
 				log.finer("Sent: " + packet.getElement());
 			}
-			addOutPacket(packet, callback);
+			responseManager.registerResponseHandler(packet, ResponseManager.DEFAULT_TIMEOUT, callback);
+			component.addOutPacket(packet, callback);
 		}
 
-	};
-
-	/**
-	 * Constructs ...
-	 *
-	 */
-	public AbstractComponent() {
-		this(null);
 	}
 
-	@SuppressWarnings("unchecked")
-	public AbstractComponent(Context context) {
-		if (context == null) {
-			this.context = createContext();
-		} else {
-			this.context = (CTX) context;
-		}
+	protected static final String COMPONENT = "component";
 
-		this.modulesManager = new ModulesManager(this.context);
+	/**
+	 * Context of component.
+	 */
 
-		this.responseManager = new ResponseManager(this.context);
+	@Inject(bean = "eventBus")
+	protected EventBus eventBus;
+
+	@Inject
+	private Kernel kernel;
+
+	/** Logger */
+	protected final Logger log = Logger.getLogger(this.getClass().getName());
+
+	@Inject
+	private ResponseManager responseManager;
+
+	@Inject
+	private StanzaProcessor stanzaProcessor;
+
+	public AbstractComponent() {
 	}
 
 	protected void addOutPacket(Packet packet, AsyncCallback asyncCallback) {
-		responseManager.registerResponseHandler(packet, ResponseManager.DEFAULT_TIMEOUT, asyncCallback);
 		addOutPacket(packet);
-	}
-
-	/**
-	 * Creates {@link Context} particular for component implementation. Called
-	 * once.
-	 *
-	 * @return context instance.
-	 */
-	protected abstract CTX createContext();
-
-	/**
-	 * Creates instance of module.
-	 *
-	 * @param moduleClass
-	 *            class of module
-	 * @return instance of module.
-	 */
-	protected Module createModuleInstance(Class<Module> moduleClass) throws InstantiationException, IllegalAccessException,
-	IllegalArgumentException, InvocationTargetException {
-		log.finer("Create instance of: " + moduleClass.getName());
-		for (Constructor<?> x : moduleClass.getConstructors()) {
-			Object[] args = new Object[x.getParameterTypes().length];
-			boolean ok = true;
-
-			for (int i = 0; i < x.getParameterTypes().length; i++) {
-				final Class<?> type = x.getParameterTypes()[i];
-
-				Object value;
-				if (type.isAssignableFrom(Context.class)) {
-					value = context;
-				} else if (type.isAssignableFrom(ScriptCommandProcessor.class)) {
-					value = defaultScriptCommandProcessor;
-				} else {
-					value = null;
-				}
-
-				ok = ok && value != null;
-
-				args[i] = value;
-			}
-
-			if (ok) {
-				log.finest("Use constructor " + x);
-				return (Module) x.newInstance(args);
-			}
-		}
-
-		return null;
 	}
 
 	@Override
 	public synchronized void everyMinute() {
 		super.everyMinute();
-		responseManager.checkTimeouts();
+		if (responseManager != null)
+			responseManager.checkTimeouts();
 	}
 
 	/**
@@ -229,15 +145,6 @@ DisableDisco {
 	 * @return version of component.
 	 */
 	public abstract String getComponentVersion();
-
-	/**
-	 * Returns {@link Context} of component.
-	 *
-	 * @return
-	 */
-	protected CTX getContext() {
-		return context;
-	}
 
 	/**
 	 * Returns default map of components. Keys in map are used as component
@@ -258,7 +165,7 @@ DisableDisco {
 		Map<String, Class<? extends Module>> modules = getDefaultModulesList();
 		if (modules != null)
 			for (Entry<String, Class<? extends Module>> m : modules.entrySet()) {
-				props.put("modules/" + m.getKey(), m.getValue().getName());
+				props.put("modules/" + m.getKey(), m.getValue());
 			}
 
 		return props;
@@ -268,23 +175,16 @@ DisableDisco {
 		return eventBus;
 	}
 
-	/**
-	 * Returns {@link ModuleProvider}. It allows to retrieve instance of module
-	 * by given ID.
-	 *
-	 * @return {@link ModuleProvider}.
-	 */
-	public ModuleProvider getModuleProvider() {
-		return modulesManager;
+	public Kernel getKernel() {
+		return kernel;
 	}
 
-	/**
-	 * Returns {@link PacketWriter}.
-	 *
-	 * @return {@link PacketWriter}.
-	 */
-	public PacketWriter getWriter() {
-		return writer;
+	public ResponseManager getResponseManager() {
+		return responseManager;
+	}
+
+	public StanzaProcessor getStanzaProcessor() {
+		return stanzaProcessor;
 	}
 
 	@Override
@@ -295,25 +195,12 @@ DisableDisco {
 		binds.put(COMPONENT, this);
 	}
 
-	/**
-	 * Initialising component modules.
-	 *
-	 * @param props
-	 *            component properties.
-	 */
-	protected void initModules(Map<String, Object> props) throws InstantiationException, IllegalAccessException,
-	IllegalArgumentException, InvocationTargetException {
+	protected void initModules(Map<String, Object> props)
+			throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		for (Entry<String, Object> e : props.entrySet()) {
-			try {
-				if (e.getKey().startsWith("modules/")) {
-					final String id = e.getKey().substring(8);
-					@SuppressWarnings("unchecked")
-					final Class<Module> moduleClass = (Class<Module>) Class.forName(e.getValue().toString());
-					Module module = createModuleInstance(moduleClass);
-					registerModule(id, module);
-				}
-			} catch (ClassNotFoundException ex) {
-				log.warning("Cannot find Module class " + e.getValue().toString() + ".");
+			if (e.getKey().startsWith("modules/")) {
+				final String id = e.getKey().substring(8);
+				kernel.registerBean(id).asClass((Class<?>) e.getValue()).exec();
 			}
 		}
 	}
@@ -326,127 +213,39 @@ DisableDisco {
 	 */
 	public abstract boolean isDiscoNonAdmin();
 
-	/**
-	 * Checks if module with given identifier is registered already.
-	 *
-	 * @param id
-	 *            module identifier.
-	 * @return <code>true</code> if module is registered. Otherwise
-	 *         <code>false</code>.
-	 */
-	public boolean isRegistered(final String id) {
-		return this.modulesManager.isRegistered(id);
-	}
-
 	@Override
 	public void processPacket(Packet packet) {
-		if (log.isLoggable(Level.FINER)) {
-			log.finer("Received: " + packet.getElement());
-		}
-		try {
-			Runnable responseHandler = responseManager.getResponseHandler(packet);
-
-			boolean handled;
-			if (responseHandler != null) {
-				handled = true;
-				responseHandler.run();
-			} else {
-				handled = this.modulesManager.process(packet);
-			}
-
-			if (!handled) {
-				final String t = packet.getElement().getAttributeStaticStr(Packet.TYPE_ATT);
-				final StanzaType type = (t == null) ? null : StanzaType.valueof(t);
-
-				if (type != StanzaType.error) {
-					throw new ComponentException(Authorization.FEATURE_NOT_IMPLEMENTED);
-				} else {
-					if (log.isLoggable(Level.FINER)) {
-						log.finer(packet.getElemName() + " stanza with type='error' ignored");
-					}
-				}
-			}
-		} catch (TigaseStringprepException e) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, e.getMessage() + " when processing " + packet.toString());
-			}
-			sendException(packet, new ComponentException(Authorization.JID_MALFORMED));
-		} catch (ComponentException e) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, e.getMessageWithPosition() + " when processing " + packet.toString());
-			}
-			sendException(packet, e);
-		} catch (Exception e) {
-			if (log.isLoggable(Level.SEVERE)) {
-				log.log(Level.SEVERE, e.getMessage() + " when processing " + packet.toString(), e);
-			}
-			sendException(packet, new ComponentException(Authorization.INTERNAL_SERVER_ERROR));
-		}
+		stanzaProcessor.processPacket(packet);
 	}
 
-	/**
-	 * Registers module. If there is module registered with given ID, it will be
-	 * unregistered.
-	 *
-	 * @param id
-	 *            identifier of module.
-	 * @param module
-	 *            module instance.
-	 * @return currently registered module instance.
-	 */
-	public <M extends Module> M registerModule(final String id, final M module) {
-		if (this.modulesManager.isRegistered(id)) {
-			this.modulesManager.unregister(id);
-		}
-		M r = this.modulesManager.register(id, module);
-		return r;
+	public void setEventBus(EventBus eventBus) {
+		this.eventBus = eventBus;
 	}
 
-	/**
-	 * Converts {@link ComponentException} to XMPP error stanza and sends it to
-	 * sender of packet.
-	 *
-	 *
-	 * @param packet
-	 *            packet what caused exception.
-	 * @param e
-	 *            exception.
-	 */
-	protected void sendException(final Packet packet, final ComponentException e) {
-		try {
-			final String t = packet.getElement().getAttributeStaticStr(Packet.TYPE_ATT);
-
-			if ((t != null) && (t == "error")) {
-				if (log.isLoggable(Level.FINER)) {
-					log.finer(packet.getElemName() + " stanza already with type='error' ignored");
-				}
-
-				return;
-			}
-
-			Packet result = e.makeElement(packet, true);
-			Element el = result.getElement();
-
-			el.setAttribute("from", BareJID.bareJIDInstance(el.getAttributeStaticStr(Packet.FROM_ATT)).toString());
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Sending back: " + result.toString());
-			}
-			context.getWriter().write(result);
-		} catch (Exception e1) {
-			if (log.isLoggable(Level.WARNING)) {
-				log.log(Level.WARNING, "Problem during generate error response", e1);
-			}
-		}
+	public void setKernel(Kernel kernel) {
+		this.kernel = kernel;
 	}
 
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
-		super.setProperties(props);
+		try {
+			super.setProperties(props);
+		} catch (Exception e) {
+			log.log(Level.WARNING, "Zjebalo sie", e);
+		}
 		try {
 			initModules(props);
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Can't initialize modules!", e);
 		}
+	}
+
+	public void setResponseManager(ResponseManager responseManager) {
+		this.responseManager = responseManager;
+	}
+
+	public void setStanzaProcessor(StanzaProcessor stanzaProcessor) {
+		this.stanzaProcessor = stanzaProcessor;
 	}
 
 	@Override

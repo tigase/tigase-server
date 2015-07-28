@@ -6,27 +6,36 @@ import java.util.logging.Level;
 import tigase.component.exceptions.ComponentException;
 import tigase.criteria.Criteria;
 import tigase.disteventbus.component.stores.Affiliation;
+import tigase.disteventbus.component.stores.AffiliationStore;
 import tigase.disteventbus.component.stores.Subscription;
+import tigase.disteventbus.component.stores.SubscriptionStore;
+import tigase.disteventbus.impl.LocalEventBus;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 
+@Bean(name = EventReceiverModule.ID)
 public class EventReceiverModule extends AbstractEventBusModule {
 
-	private static final Criteria CRIT = new ElemPathCriteria(new String[] { "message", "event" }, new String[] { null,
-			"http://jabber.org/protocol/pubsub#event" });
+	private static final Criteria CRIT = new ElemPathCriteria(new String[] { "message", "event" },
+			new String[] { null, "http://jabber.org/protocol/pubsub#event" });
 
 	public final static String ID = "receiver";
 
+	@Inject
+	private AffiliationStore affiliationStore;
+
+	@Inject
 	private EventPublisherModule eventPublisherModule;
 
-	@Override
-	public void afterRegistration() {
-		super.afterRegistration();
+	@Inject(nullAllowed = false, bean = "localEventBus")
+	private LocalEventBus localEventBus;
 
-		eventPublisherModule = context.getModuleProvider().getModule(EventPublisherModule.ID);
-	}
+	@Inject
+	private SubscriptionStore subscriptionStore;
 
 	@Override
 	public String[] getFeatures() {
@@ -40,7 +49,7 @@ public class EventReceiverModule extends AbstractEventBusModule {
 
 	@Override
 	public void process(Packet packet) throws ComponentException, TigaseStringprepException {
-		final Affiliation affiliation = context.getAffiliationStore().getAffiliation(packet.getStanzaFrom());
+		final Affiliation affiliation = affiliationStore.getAffiliation(packet.getStanzaFrom());
 		if (!affiliation.isPublishItem())
 			throw new ComponentException(Authorization.FORBIDDEN);
 
@@ -70,10 +79,9 @@ public class EventReceiverModule extends AbstractEventBusModule {
 				if (log.isLoggable(Level.FINER))
 					log.finer("Received event (" + eventName + ", " + eventXmlns + "): " + event);
 
-				context.getEventBusInstance().doFire(eventName, eventXmlns, event);
+				localEventBus.doFire(eventName, eventXmlns, event);
 
-				final Collection<Subscription> subscribers = context.getSubscriptionStore().getSubscribersJIDs(eventName,
-						eventXmlns);
+				final Collection<Subscription> subscribers = subscriptionStore.getSubscribersJIDs(eventName, eventXmlns);
 				eventPublisherModule.publishEvent(eventName, eventXmlns, event, subscribers);
 			}
 		}

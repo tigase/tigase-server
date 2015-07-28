@@ -5,14 +5,18 @@ import tigase.component.adhoc.AdHocCommandException;
 import tigase.component.adhoc.AdHocCommandManager;
 import tigase.component.exceptions.ComponentException;
 import tigase.component.modules.impl.AdHocCommandModule;
-import tigase.monitor.MonitorContext;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.core.Kernel;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 
-public class AdHocCommandMonitorModule extends AdHocCommandModule<MonitorContext> {
+@Bean(name = AdHocCommandModule.ID)
+public class AdHocCommandMonitorModule extends AdHocCommandModule implements Initializable {
 
 	private ConfigureTaskCommand configCommand;
 
@@ -20,15 +24,10 @@ public class AdHocCommandMonitorModule extends AdHocCommandModule<MonitorContext
 
 	private InfoTaskCommand infoCommand;
 
-	public AdHocCommandMonitorModule(ScriptCommandProcessor scriptProcessor) {
-		super(scriptProcessor);
-	}
+	@Inject
+	private Kernel kernel;
 
-	@Override
-	public void afterRegistration() {
-		super.afterRegistration();
-		this.infoCommand = new InfoTaskCommand(context);
-		this.configCommand = new ConfigureTaskCommand(context);
+	public AdHocCommandMonitorModule() {
 	}
 
 	private AdHocCommand getCommand(final Object taskInstance, final String node) {
@@ -41,10 +40,18 @@ public class AdHocCommandMonitorModule extends AdHocCommandModule<MonitorContext
 	}
 
 	@Override
+	public void initialize() {
+		this.infoCommand = new InfoTaskCommand(kernel);
+		this.configCommand = new ConfigureTaskCommand(kernel);
+
+		super.initialize();
+	}
+
+	@Override
 	public void process(Packet packet) throws ComponentException {
 		final JID jid = packet.getStanzaTo();
 
-		final Object taskInstance = jid.getResource() != null ? context.getKernel().getInstance(jid.getResource()) : null;
+		final Object taskInstance = jid.getResource() != null ? kernel.getInstance(jid.getResource()) : null;
 
 		if (jid.getResource() != null && taskInstance != null) {
 			processCommand(packet, taskInstance);

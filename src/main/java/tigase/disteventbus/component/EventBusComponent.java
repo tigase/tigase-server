@@ -1,108 +1,36 @@
 package tigase.disteventbus.component;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import javax.script.ScriptEngineManager;
 
+import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
-import tigase.component.AbstractComponent;
-import tigase.component.AbstractContext;
+import tigase.component.AbstractKernelBasedComponent;
 import tigase.component.modules.Module;
 import tigase.component.modules.impl.AdHocCommandModule;
 import tigase.component.modules.impl.DiscoveryModule;
 import tigase.component.modules.impl.JabberVersionModule;
 import tigase.component.modules.impl.XmppPingModule;
-import tigase.conf.ConfigurationException;
 import tigase.disteventbus.EventBusFactory;
-import tigase.disteventbus.component.stores.Affiliation;
 import tigase.disteventbus.component.stores.AffiliationStore;
 import tigase.disteventbus.component.stores.SubscriptionStore;
-import tigase.disteventbus.impl.LocalEventBus;
+import tigase.kernel.core.Kernel;
 import tigase.stats.StatisticsList;
 import tigase.xmpp.JID;
 
-public class EventBusComponent extends AbstractComponent<EventBusContext> implements ClusteredComponentIfc {
-
-	private class EventBusContextImpl extends AbstractContext implements EventBusContext {
-
-		private final LocalEventBus eventBusInstance;
-
-		public EventBusContextImpl(AbstractComponent<?> component) {
-			super(component);
-			this.eventBusInstance = (LocalEventBus) EventBusFactory.getInstance();
-		}
-
-		@Override
-		public AffiliationStore getAffiliationStore() {
-			return affiliationStore;
-		}
-
-		@Override
-		public Collection<JID> getConnectedNodes() {
-			return Collections.unmodifiableCollection(getNodesConnected());
-		}
-
-		@Override
-		public LocalEventBus getEventBusInstance() {
-			return eventBusInstance;
-		}
-
-		@Override
-		public SubscriptionStore getSubscriptionStore() {
-			return subscriptionStore;
-		}
-	}
+public class EventBusComponent extends AbstractKernelBasedComponent implements ClusteredComponentIfc {
 
 	public static final String COMPONENT_EVENTS_XMLNS = "tigase:eventbus";
-
-	private static long counter = 0;
-
-	private final AffiliationStore affiliationStore = new AffiliationStore();
-
-	private final Map<String, ListenerScript> listenersScripts = new ConcurrentHashMap<String, ListenerScript>();
-
-	private ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
-
-	private ListenerScriptRegistrar scriptsRegistrar;
-
-	/**
-	 * For cluster nodes.
-	 */
-	private final SubscriptionStore subscriptionStore = new SubscriptionStore();
 
 	public EventBusComponent() {
 	}
 
-	@Override
-	protected EventBusContext createContext() {
-		return new EventBusContextImpl(this);
-	}
+	// private final Map<String, ListenerScript> listenersScripts = new
+	// ConcurrentHashMap<String, ListenerScript>();
 
 	@Override
 	public String getComponentVersion() {
 		String version = this.getClass().getPackage().getImplementationVersion();
 		return version == null ? "0.0.0" : version;
-	}
-
-	@Override
-	protected Map<String, Class<? extends Module>> getDefaultModulesList() {
-		final Map<String, Class<? extends Module>> result = new HashMap<String, Class<? extends Module>>();
-
-		result.put(SubscribeModule.ID, SubscribeModule.class);
-		result.put(UnsubscribeModule.ID, UnsubscribeModule.class);
-		result.put(EventReceiverModule.ID, EventReceiverModule.class);
-		result.put(EventPublisherModule.ID, EventPublisherModule.class);
-
-		result.put(XmppPingModule.ID, XmppPingModule.class);
-		result.put(JabberVersionModule.ID, JabberVersionModule.class);
-		result.put(AdHocCommandModule.ID, AdHocCommandModule.class);
-		result.put(DiscoveryModule.ID, DiscoveryModule.class);
-
-		return result;
 	}
 
 	@Override
@@ -139,7 +67,7 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 	protected void onNodeConnected(JID jid) {
 		super.onNodeConnected(jid);
 
-		Module module = modulesManager.getModule(SubscribeModule.ID);
+		Module module = kernel.getInstance(SubscribeModule.ID);
 		if (module != null && module instanceof SubscribeModule) {
 			((SubscribeModule) module).clusterNodeConnected(jid);
 		}
@@ -149,7 +77,7 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 	public void onNodeDisconnected(JID jid) {
 		super.onNodeDisconnected(jid);
 
-		Module module = modulesManager.getModule(SubscribeModule.ID);
+		Module module = kernel.getInstance(SubscribeModule.ID);
 		if (module != null && module instanceof SubscribeModule) {
 			((SubscribeModule) module).clusterNodeDisconnected(jid);
 		}
@@ -161,26 +89,32 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 	}
 
 	@Override
-	public void setProperties(Map<String, Object> props) throws ConfigurationException {
-		super.setProperties(props);
+	protected void registerModules(Kernel kernel) {
+		kernel.registerBean(XmppPingModule.class).exec();
+		kernel.registerBean(JabberVersionModule.class).exec();
+		kernel.registerBean(AdHocCommandModule.class).exec();
+		kernel.registerBean(DiscoveryModule.class).exec();
 
-		scriptsRegistrar = new ListenerScriptRegistrar(listenersScripts, context, scriptEngineManager);
+		// modules
+		kernel.registerBean(SubscribeModule.class).exec();
+		kernel.registerBean(UnsubscribeModule.class).exec();
+		kernel.registerBean(EventReceiverModule.class).exec();
+		kernel.registerBean(EventPublisherModule.class).exec();
 
-		AdHocCommandModule<?> adHocCommandModule = getModuleProvider().getModule(AdHocCommandModule.ID);
-		if (adHocCommandModule != null) {
-			adHocCommandModule.register(new AddListenerScriptCommand(scriptEngineManager, scriptsRegistrar));
-			adHocCommandModule.register(new RemoveListenerScriptCommand(listenersScripts, scriptsRegistrar));
-		}
+		// beans
+		kernel.registerBean(ListenerScriptRegistrar.class).exec();
+		kernel.registerBean("scriptEngineManager").asInstance(new ScriptEngineManager()).exec();
+		kernel.registerBean(AffiliationStore.class).exec();
+		kernel.registerBean("subscriptionStore").asClass(SubscriptionStore.class).exec();
+		kernel.registerBean("localEventBus").asInstance(EventBusFactory.getInstance()).exec();
 
-		if (props.containsKey("allowed-subscribers")) {
-			String t = (String) props.get("allowed-subscribers");
-			String[] x = t.split(",");
-			for (String string : x) {
-				context.getAffiliationStore().putAffiliation(JID.jidInstanceNS(string), Affiliation.member);
-			}
-		}
+		// ad-hoc commands
+		kernel.registerBean(AddListenerScriptCommand.class).exec();
+		kernel.registerBean(RemoveListenerScriptCommand.class).exec();
+	}
 
-		scriptsRegistrar.load();
+	@Override
+	public void setClusterController(ClusterControllerIfc cl_controller) {
 	}
 
 }

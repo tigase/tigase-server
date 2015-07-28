@@ -24,7 +24,7 @@ import tigase.xml.Element;
 import tigase.xmpp.JID;
 
 /**
- * 
+ *
  * @author andrzej
  */
 public interface AdHocScriptCommandManager {

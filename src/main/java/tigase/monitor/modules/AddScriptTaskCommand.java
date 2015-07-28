@@ -12,18 +12,21 @@ import tigase.component.adhoc.AdHocResponse;
 import tigase.component.adhoc.AdhHocRequest;
 import tigase.form.Field;
 import tigase.form.Form;
-import tigase.monitor.MonitorContext;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.core.Kernel;
 import tigase.monitor.TasksScriptRegistrar;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 
+@Bean(name = "x-add-task")
 public class AddScriptTaskCommand implements AdHocCommand {
 
-	private MonitorContext monitorContext;
+	@Inject
+	private Kernel kernel;
 
-	public AddScriptTaskCommand(MonitorContext monitorContext) {
-		this.monitorContext = monitorContext;
+	public AddScriptTaskCommand() {
 	}
 
 	@Override
@@ -36,8 +39,7 @@ public class AddScriptTaskCommand implements AdHocCommand {
 			} else if (data == null) {
 				Form form = new Form("form", "Add monitor script", null);
 
-				List<ScriptEngineFactory> sef = monitorContext.getKernel().getInstance(
-						ScriptEngineManager.class).getEngineFactories();
+				List<ScriptEngineFactory> sef = kernel.getInstance(ScriptEngineManager.class).getEngineFactories();
 				ArrayList<String> labels = new ArrayList<String>();
 				ArrayList<String> values = new ArrayList<String>();
 				for (ScriptEngineFactory scriptEngineFactory : sef) {
@@ -60,8 +62,8 @@ public class AddScriptTaskCommand implements AdHocCommand {
 					String scriptExtension = form.getAsString("scriptExtension");
 					String scriptContent = form.getAsString("scriptContent");
 
-					((TasksScriptRegistrar) monitorContext.getKernel().getInstance(TasksScriptRegistrar.ID)).registerScript(
-							scriptName, scriptExtension, scriptContent);
+					((TasksScriptRegistrar) kernel.getInstance(TasksScriptRegistrar.ID)).registerScript(scriptName,
+							scriptExtension, scriptContent);
 
 				}
 				form = new Form("form", "Completed", null);

@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
-import tigase.component.Context;
 import tigase.component.adhoc.AdHocCommand;
 import tigase.component.adhoc.AdHocCommandException;
 import tigase.component.adhoc.AdHocCommandManager;
@@ -30,12 +29,16 @@ import tigase.component.exceptions.ComponentException;
 import tigase.component.modules.AbstractModule;
 import tigase.criteria.Criteria;
 import tigase.criteria.ElementCriteria;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.Inject;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.JID;
 
-public class AdHocCommandModule<CTX extends Context> extends AbstractModule<CTX> {
+@Bean(name = AdHocCommandModule.ID)
+public class AdHocCommandModule extends AbstractModule implements Initializable {
 
 	public static interface ScriptCommandProcessor {
 
@@ -54,21 +57,22 @@ public class AdHocCommandModule<CTX extends Context> extends AbstractModule<CTX>
 
 	public static final String XMLNS = Command.XMLNS;
 
+	@Inject(nullAllowed = false)
 	protected AdHocCommandManager commandsManager;
 
+	@Inject(nullAllowed = false)
 	protected ScriptCommandProcessor scriptProcessor;
 
-	public AdHocCommandModule(ScriptCommandProcessor scriptProcessor) {
+	public AdHocCommandModule() {
 		this.commandsManager = new AdHocCommandManager();
-		this.scriptProcessor = scriptProcessor;
 	}
 
 	public List<Element> getCommandListItems(final JID senderJid, final JID toJid) {
 		ArrayList<Element> commandsList = new ArrayList<Element>();
 		for (AdHocCommand command : this.commandsManager.getAllCommands()) {
 			if (command.isAllowedFor(senderJid))
-				commandsList.add(new Element("item", new String[] { "jid", "node", "name" }, new String[] { toJid.toString(),
-						command.getNode(), command.getName() }));
+				commandsList.add(new Element("item", new String[] { "jid", "node", "name" },
+						new String[] { toJid.toString(), command.getNode(), command.getName() }));
 		}
 
 		List<Element> scriptCommandsList = scriptProcessor.getScriptItems(Command.XMLNS, toJid, senderJid);
@@ -76,6 +80,10 @@ public class AdHocCommandModule<CTX extends Context> extends AbstractModule<CTX>
 			commandsList.addAll(scriptCommandsList);
 		}
 		return commandsList;
+	}
+
+	public AdHocCommandManager getCommandsManager() {
+		return commandsManager;
 	}
 
 	@Override
@@ -93,8 +101,8 @@ public class AdHocCommandModule<CTX extends Context> extends AbstractModule<CTX>
 
 		for (AdHocCommand c : commandsManager.getAllCommands()) {
 			if (c.isAllowedFor(stanzaFrom)) {
-				Element i = new Element("item", new String[] { "jid", "node", "name" }, new String[] { stanzaTo.toString(),
-						c.getNode(), c.getName() });
+				Element i = new Element("item", new String[] { "jid", "node", "name" },
+						new String[] { stanzaTo.toString(), c.getNode(), c.getName() });
 				result.add(i);
 			}
 		}
@@ -104,6 +112,16 @@ public class AdHocCommandModule<CTX extends Context> extends AbstractModule<CTX>
 			result.addAll(scripts);
 
 		return result;
+	}
+
+	public ScriptCommandProcessor getScriptProcessor() {
+		return scriptProcessor;
+	}
+
+	@Override
+	public void initialize() {
+		if (scriptProcessor == null)
+			throw new RuntimeException("scriptProcessor cannot be null!");
 	}
 
 	@Override
@@ -132,6 +150,14 @@ public class AdHocCommandModule<CTX extends Context> extends AbstractModule<CTX>
 
 	public void register(AdHocCommand command) {
 		this.commandsManager.registerCommand(command);
+	}
+
+	public void setCommandsManager(AdHocCommandManager commandsManager) {
+		this.commandsManager = commandsManager;
+	}
+
+	public void setScriptProcessor(ScriptCommandProcessor scriptProcessor) {
+		this.scriptProcessor = scriptProcessor;
 	}
 
 }

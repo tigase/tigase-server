@@ -24,15 +24,15 @@ import tigase.server.Packet;
 
 /**
  * Interface for writing {@linkplain Packet Packets} to XMPP stream.
- * 
+ *
  * @author bmalkow
- * 
+ *
  */
 public interface PacketWriter {
 
 	/**
 	 * Writes collection of {@linkplain Packet Packets}.
-	 * 
+	 *
 	 * @param packets
 	 *            collection of {@linkplain Packet Packets} to be written.
 	 */
@@ -40,7 +40,7 @@ public interface PacketWriter {
 
 	/**
 	 * Writes single {@linkplain Packet}.
-	 * 
+	 *
 	 * @param packet
 	 *            {@link Packet} to be written.
 	 */

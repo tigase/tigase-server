@@ -7,20 +7,24 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import tigase.disteventbus.EventBus;
 import tigase.disteventbus.EventHandler;
+import tigase.kernel.core.Kernel;
 import tigase.xml.Element;
 
 public class ListenerScript implements EventHandler {
 
 	private CompiledScript compiledScript;
 
-	private EventBusContext context;
-
 	private ScriptEngine engine;
+
+	private EventBus eventBus;
 
 	private String eventName;
 
 	private String eventXMLNS;
+
+	private Kernel kernel;
 
 	private String scriptContent;
 
@@ -31,7 +35,8 @@ public class ListenerScript implements EventHandler {
 			bindings.put("event", event);
 			bindings.put("eventName", name);
 			bindings.put("eventXMLNS", xmlns);
-			bindings.put("context", context);
+			bindings.put("eventXMLNS", xmlns);
+			bindings.put("kernel", kernel);
 
 			if (this.compiledScript != null) {
 				this.compiledScript.eval(bindings);
@@ -43,23 +48,24 @@ public class ListenerScript implements EventHandler {
 		}
 	}
 
-	public void run(EventBusContext context, ScriptEngineManager scriptEngineManager, String scriptName,
-			String scriptExtension, String scriptContent, String eventName, String eventXMLNS) throws ScriptException {
-		this.context = context;
+	public void run(Kernel kernel, ScriptEngineManager scriptEngineManager, String scriptName, String scriptExtension,
+			String scriptContent, String eventName, String eventXMLNS) throws ScriptException {
+		this.kernel = kernel;
 		this.eventName = eventName;
 		this.eventXMLNS = eventXMLNS;
 		this.engine = scriptEngineManager.getEngineByExtension(scriptExtension);
 		this.scriptContent = scriptContent;
+		this.eventBus = kernel.getInstance("eventBus");
 		if (engine instanceof Compilable) {
 			this.compiledScript = ((Compilable) engine).compile(scriptContent);
 		} else {
 			this.compiledScript = null;
 		}
 
-		context.getEventBus().addHandler(this.eventName, this.eventXMLNS, this);
+		eventBus.addHandler(this.eventName, this.eventXMLNS, this);
 	}
 
 	public void unregister() {
-		context.getEventBus().removeHandler(this.eventName, this.eventXMLNS, this);
+		eventBus.removeHandler(this.eventName, this.eventXMLNS, this);
 	}
 }

@@ -3,8 +3,10 @@ package tigase.disteventbus.component.stores;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import tigase.kernel.beans.Bean;
 import tigase.xmpp.JID;
 
+@Bean(name = "affiliationStore")
 public class AffiliationStore {
 
 	private final Map<JID, Affiliation> affiliations = new ConcurrentHashMap<JID, Affiliation>();

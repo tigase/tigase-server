@@ -6,7 +6,7 @@ public interface EventBus {
 
 	/**
 	 * Registers handler to receive events with given name and namespace.
-	 * 
+	 *
 	 * @param name
 	 *            name of events. Can be {@code null}, then handler will be
 	 *            received all events with given {@code xmlns}.

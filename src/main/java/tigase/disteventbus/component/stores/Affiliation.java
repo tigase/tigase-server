@@ -5,7 +5,9 @@ public enum Affiliation {
 	member(2, true, true, false, false, false, false, false),
 	/** */
 	none(1, true, false, false, false, false, false, false),
-	/** An entity that is disallowed from subscribing or publishing to a node. */
+	/**
+	 * An entity that is disallowed from subscribing or publishing to a node.
+	 */
 	outcast(0, false, false, false, false, false, false, false),
 	/**
 	 * The manager of a node, of which there may be more than one; often but not

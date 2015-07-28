@@ -22,8 +22,8 @@ import tigase.xmpp.Authorization;
 
 /**
  * Class description
- * 
- * 
+ *
+ *
  */
 public class AdHocCommandException extends Exception {
 
@@ -39,8 +39,8 @@ public class AdHocCommandException extends Exception {
 
 	/**
 	 * Constructs ...
-	 * 
-	 * 
+	 *
+	 *
 	 * @param errorCondition
 	 */
 	public AdHocCommandException(final Authorization errorCondition) {
@@ -49,8 +49,8 @@ public class AdHocCommandException extends Exception {
 
 	/**
 	 * Constructs ...
-	 * 
-	 * 
+	 *
+	 *
 	 * @param errorCondition
 	 * @param message
 	 */
@@ -60,8 +60,8 @@ public class AdHocCommandException extends Exception {
 
 	/**
 	 * Constructs ...
-	 * 
-	 * 
+	 *
+	 *
 	 * @param item
 	 * @param errorCondition
 	 */
@@ -71,8 +71,8 @@ public class AdHocCommandException extends Exception {
 
 	/**
 	 * Constructs ...
-	 * 
-	 * 
+	 *
+	 *
 	 * @param item
 	 * @param errorCondition
 	 * @param message
@@ -92,8 +92,8 @@ public class AdHocCommandException extends Exception {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public Authorization getErrorCondition() {
@@ -128,8 +128,8 @@ public class AdHocCommandException extends Exception {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public Element makeElement() {
@@ -138,10 +138,10 @@ public class AdHocCommandException extends Exception {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param insertOriginal
-	 * 
+	 *
 	 * @return
 	 */
 	public Element makeElement(boolean insertOriginal) {
@@ -164,10 +164,10 @@ public class AdHocCommandException extends Exception {
 
 	/**
 	 * Method description
-	 * 
-	 * 
+	 *
+	 *
 	 * @param sourceElement
-	 * 
+	 *
 	 * @return
 	 */
 	public Element makeElement(Element sourceElement) {

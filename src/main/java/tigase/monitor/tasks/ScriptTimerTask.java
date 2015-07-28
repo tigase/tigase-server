@@ -3,7 +3,6 @@ package tigase.monitor.tasks;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 
 import tigase.kernel.beans.Inject;
 import tigase.monitor.ConfigurableTask;
@@ -42,7 +41,7 @@ public class ScriptTimerTask extends AbstractConfigurableTimerTask implements Co
 	protected void run() {
 		try {
 			engine.eval(script, bindings);
-		} catch (ScriptException e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 	}

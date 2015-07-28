@@ -20,7 +20,7 @@ public @interface Inject {
 
 	String bean() default "";
 
-	boolean nullAllowed() default true;
+	boolean nullAllowed() default false;
 
-	Class<?> type() default EMPTY.class;
+	Class<?>type() default EMPTY.class;
 }
