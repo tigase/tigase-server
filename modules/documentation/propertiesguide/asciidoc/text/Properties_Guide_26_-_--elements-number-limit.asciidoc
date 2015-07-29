@@ -1,12 +1,14 @@
 [[elementsNumberLimit]]
 --elements-number-limit
 =======================
-Wojciech Kapcia <wojciech.kapcia@tigase.org>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-11-27 10:48
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-11-27 10:48
 
 *Default value:* +1000+
 
@@ -14,7 +16,7 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* 'any integer.'
 
-*Description:* +elements-number-limit+ configuration property allows configuring Denial of Service protection mechanism which limits number of elements send in stanza. It can be configured on per ConnectionManager basis with the following configuration:
+*Description:* +elements-number-limit+ configuration property allows configuring a Denial of Service protection mechanism which limits number of elements sent in stanza. It can be configured on a per ConnectionManager basis with the following configuration:
 
 [source,bash]
 ------------------------------
@@ -29,4 +31,3 @@ cl-comp/elements-number-limit[I]=100000
 ------------------------------
 
 *Available since:* 5.2.0
-

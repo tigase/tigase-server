@@ -1,11 +1,13 @@
 How to Use Tigase Service
 =========================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2009-11-25 15:51
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2009-11-25 15:51
 
 This Article Describes How to use *tigase.org* Service for Instant Communications
 ---------------------------------------------------------------------------------
@@ -15,19 +17,19 @@ You have to install and run a Jabber client application to use the service.
 Short instructions:
 ~~~~~~~~~~~~~~~~~~~
 
-Usually you just need to enter Jabber user name of the form: user@tigase.org. Your Jabber client should take care of all other things as our service doesn't need any special settings.  If you don't have an account on tigase.org server yet just tick the option to register new account. That's it!
+Usually you just need to enter the user name of the form: user@tigase.org. Your XMPP client should take care of all other things as our service doesn't need any special settings.  If you don't have an account on tigase.org server yet just tick the option to register new account. That's it!
 
 Long Instructions:
 ~~~~~~~~~~~~~~~~~~
 
-Good news is that there are many programs to choose from which allow you to communicate through our server. So you can pick up your favorite application or use an existing one that is compatible and start using our service.
+The good news is that there are many programs to choose from which allow you to communicate through our server. So you can pick up your favorite application or use an existing one that is compatible and start using our service.
 
-All clients presented below support multiple accounts on Jabber servers. What this means is that you can have a few Jabber accounts on different Jabber servers and you can still use just one program to connect to all of them at the same time.
+All clients presented below support multiple accounts on Jabber or XMPP servers. What this means is that you can have a few Jabber accounts on different servers and you can still use just one program to connect to all of them at the same time.
 
-Full list of all known Jabber clients is very long. You can obviously try them all but below is a selection which is recommended by Tigase team.  The selected programs might not be the best choice for you but these programs have been tested and we can offer help with using them.  Here is a list of recommended instant messaging clients:
+The full list of all known XMPP clients is very long. You can obviously try them all but below is a selection which is recommended by the Tigase team.  The selected programs might not be the best choice for you, but these programs have been tested and we can offer help with using them.  Here is a list of recommended instant messaging clients:
 
 - http://psi-im.org/about[Psi]
-Pure Jabber client. Although it supports only Jabber network it is a very user friendly and comfortable program. It works on most popular operating systems like Linux, MS Windows, and Apple MacOS X.
+Pure XMPP client. Although it supports only Jabber networks it is a very user friendly and comfortable program. It works on most popular operating systems like Linux, MS Windows, and Apple MacOS X.
 - http://www.gajim.org/[Gajim]
 This is another Jabber only client. Very user friendly and works on most of Linux distributions, FreeBSD, and MS Windows.
 - http://www.pidgin.im/[Pidgin] (previously http://gaim.sourceforge.net/[Gaim])
@@ -35,5 +37,4 @@ This is not just a Jabber client. This type of application is called multicommun
 - http://kopete.kde.org/[Kopete]
 This is a http://www.kde.org/[KDE] component and although it only works on Linux based system it also supports many of the most popular instant messaging protocols apart from Jabber like: AIM, Gadu-Gadu, ICQ, IRC, MSN, Yahoo.
 
-Install the Jabber client of your choice and set up for a Tigase account.
-
+Install the XMPP client of your choice and set up for a Tigase account.

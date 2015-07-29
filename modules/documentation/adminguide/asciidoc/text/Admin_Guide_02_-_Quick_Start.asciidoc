@@ -1,0 +1,19 @@
+[[QuickStart]]
+Quick Start Guide
+=================
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:revision: 2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+This is a set of documents allowing you to quickly start with our software. Every document provides an introduction to a single topic allowing you to start using/developing or just working on the subject.  Please have a look at the documents list below to find a topic you are looking for. If you don't find a document for the topic you need please link:http://www.tigase.net/contact[let us know].
+
+- xref:guiinstall[Installation using GUI installer]
+- xref:consoleinstall[Installing using console installer]
+- xref:manualinstall[Manual installation in console mode]
+- xref:webinstall[Installation Using Web Installer]
+- xref:TSBupdates[Tigase server binary updates]

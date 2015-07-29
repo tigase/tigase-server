@@ -1,0 +1,15 @@
+[[init.properties]]
+init.properties
+===============
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 1:18
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+//possible link to properties guide if we can move directories.  Be sure to edit links when applicaple.
+
+Document has been moved to a new location. Please have a look at the new page with the server properties description: Tigase XMPP Server configuration properties.

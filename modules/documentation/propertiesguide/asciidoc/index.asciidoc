@@ -1,17 +1,15 @@
 Tigase Properties Guide
 =======================
-Tigase Team <team@tigase.net>
-v1.0, July 2014: Initial
+:author: Tigase Team <team@tigase.net>
+:version: v1.0, July 2014: Initial
+:date: 2014-07-23
+:revision: v1.1
+                                                           
 :toc:
 :numbered:
 :website: http://tigase.net
-:Date: 2014-07-23
 
 :leveloffset: 1
-
-:no title:
-
-:no author:
 
 include::text/Properties_Guide_01_-_--admins.asciidoc[]
 
@@ -156,4 +154,3 @@ include::text/Properties_Guide_70_-_--watchdog_ping_type.asciidoc[]
 include::text/Properties_Guide_71_-_--watchdog_timeout.asciidoc[]
 
 include::text/Properties_Guide_72_-_config-type.asciidoc[]
-

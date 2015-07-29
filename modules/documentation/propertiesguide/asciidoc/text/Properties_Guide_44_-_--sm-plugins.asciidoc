@@ -1,12 +1,14 @@
 [[smPlugins]]
 --sm-plugins
 ============
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-10 01:04
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-02-10 01:04
 
 *Default value:* 'none'
 
@@ -14,16 +16,16 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* 'comma separated list of plugins IDs.'
 
-*Description:* The property allows to specify a list of plugins which should be loaded or disabled on the server. Normally you don't have to specify this. Server loads default list of plugins automatically. The default list contains all available plugins. Sometimes however you might want to load only some plugins. Typical use case is when user accounts are managed on your third-party system the Tigase server is integrated with. Then you might not want to allow users to register new accounts via XMPP service. You can then load a list of plugins without the user registration plugin. Another case when you usually have to use this option is when you have your own plugins which replace function of the Tigase default plugins like vCard, roster management, and so on....
+*Description:* The +--sm-plugins+ property allows users to specify a list of plugins which should be loaded or disabled on the server. Normally you don't have to specify this. Tigase server loads a default list of plugins automatically. The default list contains all available plugins. Sometimes however you might want to load only some plugins. Typical use case is when user accounts are managed on a third-party system that Tigase server is integrated with. Then you might not want to allow users to register new accounts via the XMPP service. You can then load a list of plugins without the user registration plugin. Another case when you usually have to use this option is when you have your own plugins which replace function of the Tigase default plugins like vCard, roster management, and so on....
 
-To prevent the plugin from loading add '-' before its ID, to load the plugin add '+' (which is optional). For example, following settings would switch user registration off, while adding a new plugin: 'your-plugin':
+To prevent the plugin from loading add '-' before its ID, to load the plugin add '+' (which is optional). For example, the following setting would switch user registration off, while adding a new plugin: 'your-plugin':
 
 [source,bash]
 ------------------------------
 --sm-plugins=-jabber:iq:register,+your-plugin
 ------------------------------
 
-There is more to this. Each plugin is running in one or more separate threads. Most plugins which deal with database have number of threads equal to number of CPUs or CPU cores. Sometimes it is not enough. If the database is slow or there is a specific kind of traffic at high level you might want to adjust number of threads for the plugin. To set a different from standard number of threads, just add '=N' where 'N' is the number of threads you want. Above example has been modified to assign 8 threads for your plugin and 16 threads for authentication plugin:
+There is more. Each plugin is running in one or more separate threads. Most plugins which deal with databases have a number of threads equal to the number of CPUs or CPU cores. Sometimes this is not enough. If the database is slow or there is a specific kind of traffic at a high level you might want to adjust the number of threads for the plugin. To set a different number of threads, just add '=N' where 'N' is the number of threads you want. The previous example has been modified to assign 8 threads for your plugin and 16 threads for authentication plugin:
 
 [source,bash]
 ------------------------------
@@ -31,4 +33,3 @@ There is more to this. Each plugin is running in one or more separate threads. M
 ------------------------------
 
 *Available since:* 3.0.0
-

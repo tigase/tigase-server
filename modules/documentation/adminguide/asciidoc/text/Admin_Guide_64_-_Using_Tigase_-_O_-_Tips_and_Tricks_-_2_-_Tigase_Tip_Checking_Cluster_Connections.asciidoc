@@ -1,0 +1,40 @@
+[[tigaseTip_CheckingClusterConnections]]
+Tigase Tip: Checking Cluster Connections
+========================================
+:author: not known
+:version: v1.0 initial release
+:date: 2015-13-07 11:40
+
+:toc:
+
+After setting up clustering you may want to verify that the clusters are operational. Right now it can be done in two manners - first by checking that there are actual network connections established between cluster nodes. The other is to check internal status of the server.
+
+=== Established connections
+
+There are number of ways to check for opened connections, simplest one use command line. (Tigase uses port _5277_ for cluster connections)
+
+* Linux
+[source,sh]
+-------------------------------------
+$ lsof -iTCP:5277 -sTCP:ESTABLISHED -P -n
+-------------------------------------
+
+* Windows
+[source,sh]
+-------------------------------------
+C:\WINNT>netstat -anp tcp | find ":5277 "
+-------------------------------------
+
+=== Cluster nodes connected (using XMPP)
+
+Verifying clustering connectivity over XMPP protocol requires any XMPP client capable of http://xmpp.org/extensions/xep-0030.html[XEP-0030: Service Discovery]. It's essential to remember that only an administrator (a user whose JID is configured as administrative) has access.
+
+==== Psi XMPP Client
+
+For the purpose of this guide a http://psi-im.org/[Psi] client will be used. After successfully configuring and connecting to account with administrative privileges we need to access _Service Discovery_, either from application menu or from context menu of the particular account account:
+
+image:images/monitoring_xmpp_1.png[caption="Figure 1: ", title="Access service discovery", alt="roster-discovery", width="233"]
+
+In the _Service Discovery_ window we need to find _Cluster Connection Manager_ component. After expanding the tree node for the component a list of all cluster nodes will be presented with the current status (either _connected_ or _disconnected_). Node column will contain actual hostname of the cluster node:
+
+image:images/monitoring_clustering.png[caption="Figure 2: ", title="List of cluster nodes", alt="discovery-nodes", width="558"]

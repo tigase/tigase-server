@@ -1,12 +1,14 @@
 [[watchdogPingType]]
 --watchdog_ping_type
 ====================
-Wojciech Kapcia <wojciech.kapcia@tigase.org>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2014-02-07 18:05
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2014-02-07 18:05
 
 *Default value:* +whitespace+
 
@@ -14,7 +16,7 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* +whitespace,xmpp+
 
-*Description:* +watchdog_ping_type+ configuration property allows configuring type of ping that ConnectionManager Watchdog (service responsible for detecting broken connections and closing them) will use to check the connection. In addition to global configuration presented above a per component configuration is possible:
+*Description:* +watchdog_ping_type+ configuration property allows configuring the type of ping that ConnectionManager Watchdog (service responsible for detecting broken connections and closing them) will use to check the connection. In addition to global configuration presented above a per component configuration is possible:
 
 [source,bash]
 ------------------------------
@@ -35,4 +37,3 @@ All related configuration options:
 - --watchdog_timeout
 
 *Available since:* 5.2.1
-

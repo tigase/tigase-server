@@ -1,12 +1,14 @@
 [[compClass]]
 --comp-class
 ============
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-09 21:51
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-02-09 21:51
 
 *Default value:* 'depends on component.'
 
@@ -14,7 +16,8 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* 'class name.'
 
-*Description:* Property is used to load an extra component to the server.  Normally this parameter is used if you want to load a component which is not included in the +config-type+ you use. You can, of course, load more than just one component using parameters: +--comp-class-2+, +--comp-class-3+ and so on.... Let's say you want to load the MUC component and the class name for the component is: +tigase.muc.MUCService+. The line in the properties file should look like:
+*Description:* This property is used to load an extra component to the server.  Normally this parameter is used if you want to load a component which is not included in the +config-type+ you use. You can, of course, load more than just one component using parameters: +--comp-class-2+, +--comp-class-3+ and so on....
+Let's say you want to load the MUC component and the class name for the component is: +tigase.muc.MUCService+. The line in the properties file should look like:
 
 [source,bash]
 ------------------------------
@@ -22,4 +25,3 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 ------------------------------
 
 *Available since:* 3.0.0
-

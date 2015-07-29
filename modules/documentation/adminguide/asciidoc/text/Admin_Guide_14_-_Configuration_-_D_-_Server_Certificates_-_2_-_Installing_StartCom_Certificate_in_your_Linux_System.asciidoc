@@ -1,0 +1,58 @@
+[[startcomCertificate]]
+Installing StartCom Certificate in Your Linux System
+====================================================
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:18
+:revision: v2.1
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+The third party authority for free XMPP server certificates is link:http://cert.startcom.org/[Startcom]. Startcom root certificates are not normally known to your system as a valid a certificate and appear as a self-signed certificate.
+
+To make it known to your system as valid you will have to install it in your system.
+
+In any case on any operating system, you have to download the certificate from the issuer link:http://cert.startcom.org/?lang=en&app=110[web site].
+
+Gentoo Linux
+------------
+
+. Copy downloaded ca.crt file to /etc/ssl/certs/starcom_ca.crt file.
+. Run command:
++
+[source,sh]
+-------------------------------------
+update-ca-certificates
+-------------------------------------
+
+All done. To test it, run following command:
+
+[source,sh]
+-------------------------------------
+openssl s_client -connect tigase.org:5223 -CApath /etc/ssl/certs
+-------------------------------------
+
+Scroll the output up and look for something like:
+
+[source,bash]
+-------------------------------------
+verify return:1
+-------------------------------------
+
+Which means certificate verification was successful. If you find however:
+
+[source,bash]
+-------------------------------------
+verify return:0
+-------------------------------------
+
+Look one line up for an error message which may look like this:
+
+[source,bash]
+-------------------------------------
+verify error:num=19:self signed certificate in certificate chain
+-------------------------------------
+
+Which means the root certificate is still not recognized in your system.

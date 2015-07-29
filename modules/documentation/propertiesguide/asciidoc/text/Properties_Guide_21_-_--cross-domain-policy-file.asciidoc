@@ -1,12 +1,14 @@
 [[crossDomainPolicyFile]]
 --cross-domain-policy-file
 ==========================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-03-20 01:14
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-03-20 01:14
 
 *Default value:* +etc/cross-domain-policy.xml+
 
@@ -14,9 +16,8 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* 'path to a file on the filesystem.'
 
-*Description:* The property allows to set path to a file with cross domain access policy for flash based clients. This is a standard XML file which is sent to the flash client upon request.
+*Description:* This property allows you to set a path to a file with cross domain access policy for flash based clients. This is a standard XML file which is sent to the flash client upon request.
 
-A default file distributed with the Tigase installation allows for full access for all. This is good enough for most use cases but it can be changed by simply editing the file.
+A default file distributed with Tigase installations allows for full access for all. This is good enough for most use cases but it can be changed by simply editing the file.
 
 *Available since:* 5.1.0
-

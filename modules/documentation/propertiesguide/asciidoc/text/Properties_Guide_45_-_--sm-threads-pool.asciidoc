@@ -1,12 +1,14 @@
 [[smThreadsPool]]
 --sm-threads-pool
 =================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2013-02-10 01:06
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2013-02-10 01:06
 
 *Default value:* +default+
 
@@ -14,11 +16,11 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 
 *Possible values:* +default|custom:NN+
 
-*Description:* The property allows you to fine-tune the SM plugins (processors) thread pool. With the default settings every plugin gets his own thread pool. This guarantees the best performance and optimal resource usage. The downside of this setting is that packets can arrive out of order if they are processed within a different thread pools.
+*Description:* The +--sm-threads-pool+ property allows you to fine-tune the SM plugin's (processors) thread pool. With the default settings every plugin gets his own thread pool. This guarantees the best performance and optimal resource usage. The downside of this setting is that packets can arrive out of order if they are processed within different thread pools.
 
-If you really need or want to preserve the order for packets processed by different plugins then the solution is to use the 'custom' thread pool. In such a case packets processed by all plugins are handled within a single thread pool. This guarantees that the packets are processed and delivered in the exact order they arrive. The number after the colon ':' specifies the thread pool size.
+If you really need or want to preserve the order for packets processed by different plugins then the solution is to use the 'custom' thread pool. In this case packets processed by all plugins are handled within a single thread pool. This guarantees that the packets are processed and delivered in the exact order they arrive. The number after the colon ':' specifies the thread pool size.
 
-What about fine-tuning then? Yes, there is an option to fine tune this even further. Let's say you want most of the plugins to be executed within a single thread pool to preserve packet ordering for them, but some, selected plugins can/should execute within separate, own thread pools to improve performance.  Let's say, authentication packets and user registration can be actually executed in a separate thread pools as we do not worry about an order for them. User cannot send or receive anything else before he authenticates anyway. The solution is to specify number of threads for selected plugins in the --sm-plugins property as described above. For example, setting a common thread pool for all plugins but registration and authentication can be done with following configuration:
+We can even fine tune this packet processing. Let's say you want most of the plugins to be executed within a single thread pool to preserve packet ordering for them, but for some selected plugins that should execute within separate thread pools to improve performance.  Let's say, authentication packets and user registration can be actually executed in a separate thread pools as we do not worry about an order for them. Users cannot send or receive anything else before they authenticates anyway. The solution is to specify a number of threads for the selected plugins in the +--sm-plugins+ property as described above. For example, setting a common thread pool for all plugins but registration and authentication can be done with following configuration:
 
 [source,bash]
 ------------------------------
@@ -27,4 +29,3 @@ What about fine-tuning then? Yes, there is an option to fine tune this even furt
 ------------------------------
 
 Available since: 5.1.0
-
