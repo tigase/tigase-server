@@ -1,13 +1,7 @@
 Tigase Properties Guide
 =======================
-:author: Tigase Team <team@tigase.net>
-:version: v1.0, July 2014: Initial
-:date: 2014-07-23
-:revision: v1.1
-                                                           
 :toc:
 :numbered:
-:website: http://tigase.net
 
 :leveloffset: 1
 
