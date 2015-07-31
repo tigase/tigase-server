@@ -9,4 +9,4 @@ Database Management
 :numbered:
 :website: http://tigase.net
 
-Tigase is coded to perform with multiple database types and numbers.  Owing to it's versitile nature, there are some tools and procedures that may be of use to certain administrators.  These are included below.
+Tigase is coded to perform with multiple database types and numbers.  Owing to it's versatile nature, there are some tools and procedures that may be of use to certain administrators.  These are included below.

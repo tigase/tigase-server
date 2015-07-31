@@ -10,7 +10,7 @@ About Tigase XMPP Server
 :numbered:
 :website: http://tigase.net
 
-*Tigase XMPP Server* is an *Open Source and Free (GPLv3)* Java based server. The goals behind its design and implementation of the server are:
+*Tigase XMPP Server* is an *Open Source and Free (AGPLv3)* Java based server. The goals behind its design and implementation of the server are:
 
 . Make the server robust and reliable.
 . Make the server a secure communication platform.
