@@ -9,7 +9,8 @@ Tigase Tip: Checking Cluster Connections
 
 After setting up clustering you may want to verify that the clusters are operational. Right now it can be done in two manners - first by checking that there are actual network connections established between cluster nodes. The other is to check internal status of the server.
 
-=== Established connections
+Established connections
+-----------------------
 
 There are number of ways to check for opened connections, simplest one use command line. (Tigase uses port _5277_ for cluster connections)
 
@@ -25,11 +26,13 @@ $ lsof -iTCP:5277 -sTCP:ESTABLISHED -P -n
 C:\WINNT>netstat -anp tcp | find ":5277 "
 -------------------------------------
 
-=== Cluster nodes connected (using XMPP)
+Cluster nodes connected (using XMPP)
+------------------------------------
 
 Verifying clustering connectivity over XMPP protocol requires any XMPP client capable of http://xmpp.org/extensions/xep-0030.html[XEP-0030: Service Discovery]. It's essential to remember that only an administrator (a user whose JID is configured as administrative) has access.
 
-==== Psi XMPP Client
+Psi XMPP Client
+---------------
 
 For the purpose of this guide a http://psi-im.org/[Psi] client will be used. After successfully configuring and connecting to account with administrative privileges we need to access _Service Discovery_, either from application menu or from context menu of the particular account account:
 

@@ -1,12 +1,14 @@
 [[apiVirtualDomain]]
 API Description for Virtual Domains Management in the Tigase Server
 ===================================================================
-Artur Hefczyc <artur.hefczyc@tigase.net>
-v2.0, June 2014: Reformatted for AsciiDoc.
+:author: Artur Hefczyc <artur.hefczyc@tigase.net>
+:version: v2.0, June 2014: Reformatted for AsciiDoc.
+:date: 2010-04-06 21:22
+:revision: v2.1
+
 :toc:
 :numbered:
 :website: http://tigase.net/
-:Date: 2010-04-06 21:22
 
 The purpose of this guide is to introduce vhost management in Tigase server. Please refer to the JavaDoc documentation for all specific details not covered in this guide. All interfaces are well documented and you can use existing implementation as an example code base and reference point. The VHost management files are located in the repository and you can browse them using the link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/show/src/main/java/tigase/vhosts[project tracker].
 

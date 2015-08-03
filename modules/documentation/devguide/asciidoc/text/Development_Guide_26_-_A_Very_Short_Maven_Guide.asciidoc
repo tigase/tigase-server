@@ -29,3 +29,5 @@ Generating tar.gz, tar.bz2 File With Sources Only
 -------------------------------------------------
 
 - +mvn -DdescriptorId=src assembly:assembly+
+
+Any of these commands will work when your commandline is in a directory with a pom.xml file.  This file will instruct what Maven will do.

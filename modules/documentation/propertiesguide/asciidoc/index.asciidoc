@@ -147,4 +147,4 @@ include::text/Properties_Guide_70_-_--watchdog_ping_type.asciidoc[]
 
 include::text/Properties_Guide_71_-_--watchdog_timeout.asciidoc[]
 
-include::text/Properties_Guide_72_-_config-type.asciidoc[]
+include::text/Properties_Guide_72_-_-config-type.asciidoc[]

@@ -36,10 +36,12 @@ Possible types are:
 - *[I]* - Integer number: 123456
 - *[i]* - Integer array: '123, 456, 678'
 
-There are a bunch of parameters which have broader meaning than just one property. Some of them affect many configuration settings or can generate whole sections in the XML file. Most of them starts with \'--' double hyphen. Please note, each property put in the init.properties file starting with \'--' becomes a JVM system property (without \'--' at the beginning).
+There are lots of parameters which have broader meaning than just one property. Some of them affect many configuration settings or can generate whole sections in the XML file. Most of them starts with \'--' double hyphen. Please note, each property put in the init.properties file starting with \'--' becomes a JVM system property (without \'--' at the beginning).
+
+//example init.properties goes here
+
 Reference the property guide for a description of properties.
 
-//properties list is commented to see if xref can be made to different directories...
 *Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#admins[--admins]
 
 *Property name:* link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/#authDb[--auth-db]

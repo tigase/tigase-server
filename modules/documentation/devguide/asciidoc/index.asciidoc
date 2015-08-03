@@ -78,48 +78,50 @@ include::text/Development_Guide_24_-_Using_Maven.asciidoc[]
 
 :leveloffset: 2
 
-include::text/Development_Guide_24_-_A_Very_Short_Maven_Guide.asciidoc[]
+include::text/Development_Guide_25_-_Setting_Up_Maven_In_Windows.asciidoc[]
 
-include::text/Development_Guide_25_-_Maven_2.x_Support.asciidoc[]
+include::text/Development_Guide_26_-_A_Very_Short_Maven_Guide.asciidoc[]
+
+include::text/Development_Guide_27_-_Maven_2.x_Support.asciidoc[]
 
 :leveloffset: 1
 
 //Tests
 
-include::text/Development_Guide_26_-_Tests.asciidoc[]
+include::text/Development_Guide_28_-_Tests.asciidoc[]
 
 :leveloffset: 2
 
-include::text/Development_Guide_27_-_Tigase_Test_Suite.asciidoc[]
+include::text/Development_Guide_29_-_Tigase_Test_Suite.asciidoc[]
 
-include::text/Development_Guide_28_-_Test_Suite_Scripting_Language.asciidoc[]
+include::text/Development_Guide_30_-_Test_Suite_Scripting_Language.asciidoc[]
 
-include::text/Development_Guide_29_-_Writing_Tests_for_Plugins.asciidoc[]
+include::text/Development_Guide_31_-_Writing_Tests_for_Plugins.asciidoc[]
 
-include::text/Development_Guide_30_-_Test_Case_Parameters_Description.asciidoc[]
+include::text/Development_Guide_32_-_Test_Case_Parameters_Description.asciidoc[]
 
 :leveloffset: 1
 
 //experimental
-include::text/Development_Guide_31_-_Experimental.asciidoc[]
+include::text/Development_Guide_33_-_Experimental.asciidoc[]
 
 :leveloffset: 2
 
-include::text/Development_Guide_32_-_Dynamic_Rosters.asciidoc[]
+include::text/Development_Guide_34_-_Dynamic_Rosters.asciidoc[]
 
-include::text/Development_Guide_33_-_Mobile_Optimizations.asciidoc[]
+include::text/Development_Guide_35_-_Mobile_Optimizations.asciidoc[]
 
-include::text/Development_Guide_34_-_Bosh_Session_Cache.asciidoc[]
+include::text/Development_Guide_36_-_Bosh_Session_Cache.asciidoc[]
 //Old
 
 :leveloffset: 1
 
-include::text/Development_Guide_35_-_Old_Stuff.asciidoc[]
+include::text/Development_Guide_37_-_Old_Stuff.asciidoc[]
 
-include::text/Development_Guide_36_-_Tigase_DB_Schema_Explained.asciidoc[]
+include::text/Development_Guide_38_-_Tigase_DB_Schema_Explained.asciidoc[]
 
-include::text/Development_Guide_37_-_Why_the_Most_Recent_JDK.asciidoc[]
+include::text/Development_Guide_39_-_Why_the_Most_Recent_JDK.asciidoc[]
 
-include::text/Development_Guide_38_-_Generating_Tigase_Installer.asciidoc[]
+include::text/Development_Guide_40_-_Generating_Tigase_Installer.asciidoc[]
 
-include::text/Development_Guide_39_-_API_Description_for_Virtual_Domains_Management_in_the_Tigase_Server.asciidoc[]
+include::text/Development_Guide_41_-_API_Description_for_Virtual_Domains_Management_in_the_Tigase_Server.asciidoc[]

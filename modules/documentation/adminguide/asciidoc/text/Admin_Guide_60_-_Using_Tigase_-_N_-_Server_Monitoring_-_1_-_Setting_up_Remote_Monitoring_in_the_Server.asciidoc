@@ -18,7 +18,8 @@ The monitoring itself causes very low overhead in terms of the resources and CPU
 
 *Note.* _This works with the Tigase server from version_ *4.2.0* _or SVN revision_ *1418*.
 
-=== What You Need.
+What You Need.
+--------------
 
 If you use binary build for version 4.2.0 or later you can skip this section as all required libraries are included in the installation package: Extras pack. Please install the pack and you don't have to worry about libraries any more.
 
@@ -32,7 +33,8 @@ Remote monitoring requires an external library which is implemented in the tigas
 Download both libraries and put them in the libs/ directory.
 
 [[monitoring_activation]]
-=== Activation
+Activation
+----------
 
 You can either run the Tigase installer and use the configuration wizard to activate the monitoring or edit etc/init.properties file and add following line:
 
@@ -49,12 +51,14 @@ As you see there is only a single line where you put list of monitoring servers 
 
 You can have all protocols active at the same time or any combination of them or none.
 
-=== Security
+Security
+--------
 
 Both JMX and SNMP offer security protection to limit access to monitoring data. The security configuration is a bit different for both.
 
 [[monitoring_jmx]]
-==== JMX
+JMX
+---
 
 
 After the server installation or in the SVN repository you can find 2 files in the *etc/* directory: *jmx.access* and *jmx.password*.

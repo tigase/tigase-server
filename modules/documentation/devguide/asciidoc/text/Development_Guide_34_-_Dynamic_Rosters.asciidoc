@@ -6,7 +6,8 @@ Dynamic Rosters
 :date: 2015-07-27 18:10
 
 
-=== Problem Description
+Problem Description
+-------------------
 
 Normal roster contacts stored and created as *dynamic roster parts* are delivered to the end user transparently. The XMPP client doesn't really know what contacts come from its own *static* roster created manually by the user and what contacts come from a *dynamic* roster part; contacts and groups generated dynamically by the server logic.
 
@@ -14,7 +15,8 @@ Some specialized clients need to store extra bits of information about roster co
 
 The protocol defined here allows the exchange of information, saving and retrieving extra data about the contacts.
 
-=== Syntax and Semantics
+Syntax and Semantics
+--------------------
 
 Extra contact data is accessed using IQ stanzas, specifically by means of a child element qualified by the *jabber:iq:roster-dynamic* namespace. The child element MAY contain one or more children, each describing a unique contact item. Content of the element is not specified and is implementation dependent. From Tigase's point of view it can contain any valid XML data. Whole element is passed to the DynamicRoster implementation class as is and without any verification. Upon retrieving the contact extra data the DynamicRoster implementation is supposed to provide a valid XML element with all the required data for requested *jid*.
 
@@ -25,7 +27,8 @@ Following actions on the extra contact data are allowed:
 - *set* - stores extra information about the contact
 - *get* - retrieves extra information about the contact
 
-=== Retrieving Contact Data
+Retrieving Contact Data
+-----------------------
 
 Upon connecting to the server and becoming an active resource, a client can request the extra contact data. This request can be made either before or after requesting the user roster. The client's request for the extra contact data is *OPTIONAL*.
 
@@ -66,7 +69,8 @@ Example: Client receives contact extra data from the server, and there was some 
 </iq>
 ------------------------------------------------------------------
 
-=== Updating/Saving Extra Information About the Contact
+Updating/Saving Extra Information About the Contact
+---------------------------------------------------
 
 At any time, a client *MAY* update extra contact information on the server.
 
@@ -122,7 +126,8 @@ Client responds to the server:
 <iq type='result' id='a78b4q6ha464'/>
 ------------------------------------------------------------------
 
-=== Configuration
+Configuration
+-------------
 
 DynamicRoster implementation class should be configured in the *init.properties* file. As it's an extension to the *Presence* and *Roster* plugins classes should be configured either for both plugins:
 [source,bash]

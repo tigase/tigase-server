@@ -5,7 +5,8 @@ Configuration API
 :version: v1.0 initial release
 :date: 2015-07-27 10:25
 
-=== Introduction
+Introduction
+------------
 
 The component configuration API is quite simple, it consists of two methods:
 
@@ -17,7 +18,8 @@ void setProperties(Map<String, Object> properties);
 
 The first method retrieves configuration defaults from the component while the second sets the new configuration for the component. Although it looks simple, and it is, we should go over some details in order to use them more effectively.
 
-=== Component Startup Sequence
+Component Startup Sequence
+--------------------------
 
 Before we go into all the details it might be helpful to know the full component initialization sequence, how the component is brought to life and when the configuration is set. The component loading and starting sequence looks like this:
 
@@ -31,7 +33,8 @@ Before we go into all the details it might be helpful to know the full component
 
 The important thing about all the configuration stuff is that the component does not read/ask/request configuration. *The configuration is pushed to the component by the configuration manager.* The +setProperties()+ method can be called at any time and any number of times while the server is running. This design allows for the server reconfiguration during runtime. Developers should be aware of this and properly code the method to allow for the component reconfiguration at runtime.
 
-=== Configuration API
+Configuration API
+-----------------
 
 Both API methods operate on Map<String, Object>, hence, essentially the component configuration is just a list of +(key, value)+ pairs. The Object can any of following:
 
@@ -44,7 +47,8 @@ Both API methods operate on Map<String, Object>, hence, essentially the componen
 
 It is guaranteed that if the component returns a default configuration entry in any of above types, the +setProperties()+ method sets the configuration entry in the same exact type. This is quite convenient as you can limit type conversions (numbers parsing for example) in your code.
 
-=== getDefaults()
+getDefaults()
+-------------
 
 
 [source,java]
@@ -62,7 +66,8 @@ public Map<String, Object> getDefaults(Map<String, Object> params) {
 }
 ------------------------------------------------------------------
 
-=== setProperties()
+setProperties()
+---------------
 
 [source,java]
 void setProperties(Map<String, Object> properties);
@@ -78,7 +83,8 @@ public void setProperties(Map properties) {
 }
 ------------------------------------------------------------------
 
-=== Useful Presets
+Useful Presets
+--------------
 
 Normally configuration presets depend on the component implementation and are different for each component. There are a few presets however which are often used commonly by different components:
 
@@ -86,7 +92,8 @@ Normally configuration presets depend on the component implementation and are di
 - +admins+ If set it provides a list of administrator IDs. These user may have special access permissions for the component. They usually can execute administrator ad-hoc commands.
 - +user-db-uri+ If set it contains the main database connection string. The component may keep its own data.
 
-=== Global Configuration Settings
+Global Configuration Settings
+-----------------------------
 
 There are some global settings which are provided to all components and can be used by all of them. Usually they point so some shared resources which can be used by all components.
 
