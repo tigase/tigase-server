@@ -70,7 +70,7 @@ public class TLSWrapper {
 	private SSLEngineResult tlsEngineResult = null;
 
 	// TLS/SSL issue with JDK and NSS - bug workaround
-	private static final boolean tls_jdk_nss_workaround = System.getProperty("tls-jdk-nss-bug-workaround-active") == null ? true
+	private static final boolean tls_jdk_nss_workaround = System.getProperty("tls-jdk-nss-bug-workaround-active") == null ? false
 			: Boolean.getBoolean("tls-jdk-nss-bug-workaround-active");
 
 	// Workaround for TLS/SSL bug in new JDK used with new version of
