@@ -130,6 +130,14 @@ public class MessageCarbonsTest extends ProcessorTestCase {
 		carbonsProcessor.process(packet, session1, null, results, null);		
 		assertEquals("not generated result even than 2 resource had nonnegative priority", 1, results.size());
 		assertEquals("packet sent to wrong jids", Arrays.asList(session2.getJID()), collectStanzaTo(results));
+
+		results = new ArrayDeque<Packet>();
+		Packet packet1 = packet.copyElementOnly();
+		packet1.getElement().addChild(new Element("no-copy", new String[] { "xmlns" }, new String[] { "urn:xmpp:hints" }));
+		carbonsProcessor.process(packet1, session1, null, results, null);		
+		assertEquals("generated result even that no-copy was sent", 0, results.size());
+		assertEquals("packet sent to wrong jids", Collections.EMPTY_LIST, collectStanzaTo(results));
+	
 	}	
 
 	protected List<JID> collectStanzaTo(Queue<Packet> packets) {

@@ -80,6 +80,9 @@ public class MessageCarbons
 	private static final String ENABLE_ELEM_NAME = "enable";
 	private static final String DISABLE_ELEM_NAME = "disable";
 	
+	private static final String[] MESSAGE_HINTS_NO_COPY = { Message.ELEM_NAME, "no-copy" };
+	private static final String MESSAGE_HINTS_XMLNS = "urn:xmpp:hints";
+	
 	private tigase.xmpp.impl.Message messageProcessor = new tigase.xmpp.impl.Message();
 	
 	@Override
@@ -165,6 +168,11 @@ public class MessageCarbons
 				//	return;
 				if (packet.getElement().getChild("received", XMLNS) != null
 						|| packet.getElement().getChild("sent", XMLNS) != null) {
+					return;
+				}
+				
+				// support for XEP-0334 Message Processing Hints
+				if (packet.getAttributeStaticStr(MESSAGE_HINTS_NO_COPY, "xmlns") == MESSAGE_HINTS_XMLNS) {
 					return;
 				}
 

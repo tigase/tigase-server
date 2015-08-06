@@ -112,6 +112,8 @@ public class OfflineMessages
 	 * processing capabilities. In case of {@code msgoffline} plugin it is
 	 * <em>presence</em> stanza */
 	public static final String[] MESSAGE_HEADER_PATH = { ELEM_NAME, "header" };
+	public static final String[] MESSAGE_HINTS_NO_STORE = { ELEM_NAME, "no-store" };
+	public static final String MESSAGE_HINTS_XMLNS = "urn:xmpp:hints";
 	private static final String MSG_OFFLINE_STORAGE_PATHS = "msg-store-offline-paths";
 	private static final String MSG_REPO_CLASS_KEY = "msg-repo-class";
 	private static final String MSG_PUBSUB_JID = "msg-pubsub-jid";
@@ -482,6 +484,9 @@ public class OfflineMessages
 		switch (pac.getElemName()) {
 			case "message":
 				if (type == null || type == StanzaType.normal || type == StanzaType.chat) {
+					// support for XEP-0334 Message Processing Hints					
+					if (pac.getAttributeStaticStr( MESSAGE_HINTS_NO_STORE, "xmlns") == MESSAGE_HINTS_XMLNS)
+						return false;
 					if (pac.getElemCDataStaticStr( tigase.server.Message.MESSAGE_BODY_PATH ) != null)
 						return true;
 					if (pac.getElemChildrenStaticStr( MESSAGE_EVENT_PATH ) != null)

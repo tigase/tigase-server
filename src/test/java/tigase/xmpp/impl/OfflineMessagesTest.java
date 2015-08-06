@@ -201,7 +201,14 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 			new Element("storeMe3", new String[] { "xmlns" }, new String[] { "custom_xmlns" })
 		}, new String[] { "from", "to" }, new String[] { "from@example.com/res1", "to@example.com/res2" }));	
 		
-		assertFalse(offlineProcessor.isAllowedForOfflineStorage(packet));		
+		assertFalse(offlineProcessor.isAllowedForOfflineStorage(packet));	
+		
+		packet = Packet.packetInstance(new Element("message", new Element[]{
+			new Element("body", "Test message 123"),
+			new Element("no-store", new String[] { "xmlns" }, new String[] { "urn:xmpp:hints" })
+		}, new String[] { "from", "to" }, new String[] { "from@example.com/res1", "to@example.com/res2" }));
+		
+		assertFalse(offlineProcessor.isAllowedForOfflineStorage(packet));
 	}
 	
 	private static class MsgRepositoryIfcImpl implements MsgRepositoryIfc {
