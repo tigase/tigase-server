@@ -46,6 +46,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.server.Iq;
 
 /**
  * Created: May 13, 2009 9:53:44 AM
@@ -447,6 +448,12 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 		if (!sm.isLocalDomain(packet.getStanzaTo().getDomain(), false)) {
 			return false;
 		}
+		
+		// server needs to respond on Iq stanzas sent to bare jid, but there is
+		// no need to forward it to cluster node with users session
+		if (packet.getElemName() == Iq.ELEM_NAME && packet.getStanzaTo() != null 
+				&& packet.getStanzaTo().getResource() == null)
+			return false;
 
 		return true;
 	}
