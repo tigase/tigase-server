@@ -119,9 +119,10 @@ public class ClusterController
 					.getMethodName());
 		}
 	}
-
+	
 	@Override
 	public void nodeConnected(String node) {
+		super.nodeConnected(node);
 		for (ClusteredComponentIfc comp : components.values()) {
 			comp.nodeConnected(node);
 		}
@@ -129,6 +130,7 @@ public class ClusterController
 
 	@Override
 	public void nodeDisconnected(String node) {
+		super.nodeDisconnected(node);
 		for (ClusteredComponentIfc comp : components.values()) {
 			comp.nodeDisconnected(node);
 		}
@@ -238,7 +240,7 @@ public class ClusterController
 
 	@Override
 	public boolean isCorrectType(ServerComponent component) {
-		return component instanceof ClusteredComponentIfc;
+		return (component instanceof ClusteredComponentIfc) && !(component instanceof ClusterControllerIfc);
 	}
 
 	@Override

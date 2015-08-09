@@ -316,10 +316,14 @@ public class ClusterConnectionManager
 	public void itemUpdated(ClusterRepoItem item) {}
 
 	@Override
-	public void nodeConnected(String node) {}
+	public void nodeConnected(String node) {
+		super.nodeConnected(node);
+	}
 
 	@Override
-	public void nodeDisconnected(String node) {}
+	public void nodeDisconnected(String node) {
+		super.nodeDisconnected(node);
+	}
 
 	@Override
 	public int processingInThreads() {
@@ -745,6 +749,7 @@ public class ClusterConnectionManager
 
 	@Override
 	public void setClusterController(ClusterControllerIfc cl_controller) {
+		super.setClusterController(cl_controller);
 		clusterController = cl_controller;
 		clusterController.removeCommandListener(sendPacket);
 		clusterController.setCommandListener(sendPacket);

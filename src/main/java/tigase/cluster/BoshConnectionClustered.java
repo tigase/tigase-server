@@ -69,6 +69,7 @@ public class BoshConnectionClustered
 
 	@Override
 	public void nodeConnected(String node) {
+		super.nodeConnected(node);
 		BareJID nodeJID = BareJID.bareJIDInstanceNS(null, node);
 
 		// connectedNodes must be synchronized here. If it is executed concurrently,
@@ -94,6 +95,7 @@ public class BoshConnectionClustered
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Disconnected nodes: {0}", node);
 		}
+		super.nodeDisconnected(node);
 
 		BareJID nodeJID = BareJID.bareJIDInstanceNS(null, node);
 
@@ -147,6 +149,4 @@ public class BoshConnectionClustered
 		return see_other_host_strategy;
 	}
 
-	@Override
-	public void setClusterController(ClusterControllerIfc cl_controller) {}
 }

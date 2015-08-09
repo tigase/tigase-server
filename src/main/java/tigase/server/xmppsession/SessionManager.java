@@ -164,7 +164,6 @@ public class SessionManager
 	private long                             totalUserConnections            = 0;
 	private long                             totalUserSessions               = 0;
 	private UserRepository                   user_repository                 = null;
-	private Set<String>                      trusted = new ConcurrentSkipListSet<String>();
 	private Map<String, XMPPStopListenerIfc> stopListeners = new ConcurrentHashMap<String,
 			XMPPStopListenerIfc>(10);
 	private boolean          skipPrivacy = false;
@@ -778,15 +777,6 @@ public class SessionManager
 		super.setProperties(props);
 		if (props.get(SKIP_PRIVACY_PROP_KEY) != null) {
 			skipPrivacy = (Boolean) props.get(SKIP_PRIVACY_PROP_KEY);
-		}
-		if (props.get(TRUSTED_PROP_KEY) != null) {
-			String[] trusted_tmp = (String[]) props.get(TRUSTED_PROP_KEY);
-
-			if (trusted_tmp != null) {
-				for (String trust : trusted_tmp) {
-					trusted.add(trust);
-				}
-			}
 		}
 		if (props.get(FORCE_DETAIL_STALE_CONNECTION_CHECK) != null) {
 			forceDetailStaleConnectionCheck = (Boolean) props.get(
@@ -2179,18 +2169,6 @@ public class SessionManager
 		}
 
 		return false;
-	}
-
-	protected boolean isTrusted(JID jid) {
-		if (trusted.contains(jid.getBareJID().toString())) {
-			return true;
-		}
-
-		return isAdmin(jid);
-	}
-
-	protected boolean isTrusted(String jid) {
-		return trusted.contains(jid);
 	}
 
 	//~--- methods --------------------------------------------------------------

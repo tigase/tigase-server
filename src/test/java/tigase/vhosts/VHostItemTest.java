@@ -118,28 +118,28 @@ public class VHostItemTest extends TestCase {
 		Assert.assertFalse(item.isTrustedJID(jid));
 		
 		item.initFromPropertyString("example.com:trusted-jids=comp1@example.com");
-		Assert.assertArrayEquals(new JID[] { jid }, item.getTrustedJIDs());
+		Assert.assertArrayEquals(new String[] { jid.toString() }, item.getTrustedJIDs().toArray(new String[0]));
 		Assert.assertTrue(item.isTrustedJID(jid));
 		Assert.assertTrue(item.isTrustedJID(jid.copyWithResource("test")));
 		Assert.assertFalse(item.isTrustedJID(notTrusted));
 		
 		item = new VHostItem();
 		item.initFromPropertyString("example.com:trusted-jids=comp1@example.com,comp2@example.com");
-		Assert.assertArrayEquals(new JID[] { jid, JID.jidInstanceNS("comp2@example.com") }, item.getTrustedJIDs());
+		Assert.assertArrayEquals(new String[] { jid.toString(), "comp2@example.com" }, item.getTrustedJIDs().toArray(new String[0]));
 		Assert.assertTrue(item.isTrustedJID(jid));
 		Assert.assertTrue(item.isTrustedJID(jid.copyWithResource("test")));
 		Assert.assertFalse(item.isTrustedJID(notTrusted));
 		
 		item = new VHostItem();
 		item.initFromPropertyString("example.com:trusted-jids=comp1@example.com;comp2@example.com");
-		Assert.assertArrayEquals(new JID[] { jid, JID.jidInstanceNS("comp2@example.com") }, item.getTrustedJIDs());
+		Assert.assertArrayEquals(new String[] { jid.toString(), "comp2@example.com" }, item.getTrustedJIDs().toArray(new String[0]));
 		Assert.assertTrue(item.isTrustedJID(jid));
 		Assert.assertTrue(item.isTrustedJID(jid.copyWithResource("test")));
 		Assert.assertFalse(item.isTrustedJID(notTrusted));
 		
 		item = new VHostItem();
 		item.initFromPropertyString("example.com:trusted-jids=example.com");
-		Assert.assertArrayEquals(new JID[] { JID.jidInstanceNS("example.com") }, item.getTrustedJIDs());
+		Assert.assertArrayEquals(new String[] { "example.com" }, item.getTrustedJIDs().toArray(new String[0]));
 		Assert.assertTrue(item.isTrustedJID(jid));
 		Assert.assertTrue(item.isTrustedJID(jid.copyWithResource("test")));
 		Assert.assertTrue(item.isTrustedJID(notTrusted));	
@@ -147,14 +147,15 @@ public class VHostItemTest extends TestCase {
 		System.setProperty("trusted", "comp3@example.com,comp4@example.com");
 		VHostItem.initGlobalTrustedJids();
 		item = new VHostItem();
-		Assert.assertArrayEquals(new JID[] { JID.jidInstanceNS("comp3@example.com"), JID.jidInstanceNS("comp4@example.com") }, 
-				item.getTrustedJIDs());
+		item.toString();
+		Assert.assertArrayEquals(new String[] { "comp3@example.com", "comp4@example.com" }, 
+				item.getTrustedJIDs().toArray(new String[0]));
 		Assert.assertTrue(item.isTrustedJID(JID.jidInstanceNS("comp3@example.com")));
 		Assert.assertTrue(item.isTrustedJID(JID.jidInstanceNS("comp3@example.com").copyWithResource("test")));
 		Assert.assertFalse(item.isTrustedJID(notTrusted));
 		
 		item.initFromPropertyString("example.com:trusted-jids=comp1@example.com;comp2@example.com");
-		Assert.assertArrayEquals(new JID[] { jid, JID.jidInstanceNS("comp2@example.com") }, item.getTrustedJIDs());
+		Assert.assertArrayEquals(new String[] { jid.toString(), "comp2@example.com" }, item.getTrustedJIDs().toArray(new String[0]));
 		Assert.assertTrue(item.isTrustedJID(jid));
 		Assert.assertTrue(item.isTrustedJID(jid.copyWithResource("test")));
 		Assert.assertFalse(item.isTrustedJID(notTrusted));

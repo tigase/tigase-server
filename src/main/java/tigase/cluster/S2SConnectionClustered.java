@@ -59,17 +59,19 @@ public class S2SConnectionClustered
 	//~--- fields ---------------------------------------------------------------
 
 	private ClusterControllerIfc clusterController = null;
-	private List<JID>            cl_nodes_array    = new CopyOnWriteArrayList<JID>();
+	private CopyOnWriteArrayList<JID> cl_nodes_array    = new CopyOnWriteArrayList<JID>();
 
 	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void nodeConnected(String node) {
-		cl_nodes_array.add(JID.jidInstanceNS(getName(), node, null));
+		super.nodeConnected(node);
+		cl_nodes_array.addIfAbsent(JID.jidInstanceNS(getName(), node, null));
 	}
 
 	@Override
 	public void nodeDisconnected(String node) {
+		super.nodeDisconnected(node);
 		cl_nodes_array.remove(JID.jidInstanceNS(getName(), node, null));
 	}
 
@@ -84,6 +86,7 @@ public class S2SConnectionClustered
 
 	@Override
 	public void setClusterController(ClusterControllerIfc cl_controller) {
+		super.setClusterController(cl_controller);
 		clusterController = cl_controller;
 	}
 

@@ -91,6 +91,7 @@ public class AmpComponentClustered extends AmpComponent implements ClusteredComp
 	
 	@Override
 	public void setClusterController(ClusterControllerIfc cl_controller) {
+		super.setClusterController(cl_controller);
 		if (controller != null) {
 			for (CommandListener listener : commandListeners) {
 				controller.removeCommandListener(listener);
@@ -106,12 +107,14 @@ public class AmpComponentClustered extends AmpComponent implements ClusteredComp
 
 	@Override
 	public void nodeConnected(String node) {
+		super.nodeConnected(node);
 		BareJID nodeJID = BareJID.bareJIDInstanceNS(null, node);
 		connectedNodes.add(nodeJID);
 	}
 
 	@Override
 	public void nodeDisconnected(String node) {
+		super.nodeDisconnected(node);
 		BareJID nodeJID = BareJID.bareJIDInstanceNS(null, node);
 		connectedNodes.remove(nodeJID);
 	}

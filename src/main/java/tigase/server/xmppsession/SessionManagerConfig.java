@@ -263,15 +263,6 @@ public abstract class SessionManagerConfig {
 			HOSTNAMES_PROP_VAL         = DNSResolver.getDefHostNames();
 			ANONYMOUS_DOMAINS_PROP_VAL = DNSResolver.getDefHostNames();
 		}
-		if (params.get(GEN_TRUSTED) != null) {
-			TRUSTED_PROP_VAL = ((String) params.get(GEN_TRUSTED)).split(",");
-		} else {
-			TRUSTED_PROP_VAL = new String[HOSTNAMES_PROP_VAL.length];
-			for (int i = 0; i < TRUSTED_PROP_VAL.length; i++) {
-				TRUSTED_PROP_VAL[i] = "admin@" + HOSTNAMES_PROP_VAL[i];
-			}    // end of for (int i = 0; i < TRUSTED_PROP_VAL.length; i++)
-		}
-		props.put(TRUSTED_PROP_KEY, TRUSTED_PROP_VAL);
 		props.put(AUTO_CREATE_OFFLINE_USER_PROP_KEY, AUTO_CREATE_OFFLINE_USER_PROP_VAL);
 
 		String sm_threads_pool = SM_THREADS_POOL_PROP_VAL;

@@ -74,8 +74,11 @@ import tigase.xmpp.JID;
 
 import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.script.ScriptEngineFactory;
+import tigase.cluster.api.ClusterControllerIfc;
+import tigase.cluster.api.ClusteredComponentIfc;
 
 /**
  * Created: Oct 17, 2009 7:49:05 PM
@@ -84,7 +87,7 @@ import javax.script.ScriptEngineFactory;
  * @version $Rev$
  */
 public class BasicComponent
-				implements Configurable, XMPPService, VHostListener {
+				implements Configurable, XMPPService, VHostListener, ClusteredComponentIfc {
 	/** Field description */
 	public static final String ALL_PROP_KEY = "ALL";
 
@@ -118,11 +121,14 @@ public class BasicComponent
 			EnumSet<CmdAcl>>(20);
 
 	protected Set<BareJID>      admins = new ConcurrentSkipListSet<BareJID>();
+	protected Set<String>       trusted = new ConcurrentSkipListSet<String>();
 	private ScriptEngineManager scriptEngineManager     = null;
 	private String              scriptsBaseDir          = null;
 	private String              scriptsCompDir          = null;
 	private ServiceEntity       serviceEntity           = null;
 	private boolean             initializationCompleted = false;
+	private String[]		    trustedProp = null;
+	private final CopyOnWriteArrayList<String> connectedNodes = new CopyOnWriteArrayList<String>();
 
 	//~--- methods --------------------------------------------------------------
 
@@ -145,7 +151,7 @@ public class BasicComponent
 	 * @return a value of <code>boolean</code>
 	 */
 	public boolean canCallCommand(JID jid, String commandId) {
-		boolean result = isAdmin(jid);
+		boolean result = isAdmin(jid) || isTrusted(jid);
 
 		if (result) {
 			return true;
@@ -286,7 +292,19 @@ public class BasicComponent
 //      getComponentId() });
 //  Thread.dumpStack();
 	}
-
+	
+	@Override
+	public void nodeConnected(String node) {
+		connectedNodes.addIfAbsent(node);
+		refreshTrustedJids();
+	}
+	
+	@Override
+	public void nodeDisconnected(String node) {
+		connectedNodes.remove(node);
+		refreshTrustedJids();
+	}
+	
 	@Override
 	public void processPacket(Packet packet, Queue<Packet> results) {
 		if (packet.isCommand() && getName().equals(packet.getStanzaTo().getLocalpart()) &&
@@ -294,7 +312,7 @@ public class BasicComponent
 			processScriptCommand(packet, results);
 		}
 	}
-
+	
 	@Override
 	public void release() {}
 
@@ -325,6 +343,11 @@ public class BasicComponent
 			log.log(Level.FINEST, "Modifying service-discovery info, removing: {0}", item);
 		}
 		serviceEntity.removeItems(item);
+	}
+	
+	@Override
+	public void setClusterController(ClusterControllerIfc cl_controller) {
+		
 	}
 
 	/**
@@ -451,6 +474,11 @@ public class BasicComponent
 		defs.put(SCRIPTS_DIR_PROP_KEY, scripts_dir);
 		defs.put(COMMAND_PROP_NODE + "/" + ALL_PROP_KEY, CmdAcl.ADMIN.name());
 
+		String trusted_def = System.getProperty(TRUSTED_PROP_KEY);
+		if (trusted_def != null) {
+			defs.put(TRUSTED_PROP_KEY, trusted_def.split(","));
+		}
+		
 		return defs;
 	}
 
@@ -802,6 +830,17 @@ public class BasicComponent
 		return false;
 	}
 
+	public boolean isTrusted(JID jid) {
+		if (trusted.contains(jid.getBareJID().toString()))
+			return true;
+				
+		return isAdmin(jid);
+	}
+	
+	public boolean isTrusted(String jid) {
+		return trusted.contains(jid);
+	}
+	
 	//~--- set methods ----------------------------------------------------------
 
 	@Override
@@ -816,6 +855,13 @@ public class BasicComponent
 
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
+		if (props.size() > 1) {
+			if (props.get(TRUSTED_PROP_KEY) != null) {
+				trustedProp = (String[]) props.get(TRUSTED_PROP_KEY);				
+			}
+		}
+		connectedNodes.add(defHostname.getDomain());
+		refreshTrustedJids();
 		if (isInitializationComplete()) {
 
 			// Do we really need to do this again?
@@ -1156,6 +1202,27 @@ public class BasicComponent
 			} catch (IOException | ScriptException e) {
 				log.log(Level.WARNING, "Can't load the admin script file: " + file, e);
 			}
+		}
+	}
+	
+	private void refreshTrustedJids() {
+		synchronized (connectedNodes) {
+			trusted.clear();
+			if (trustedProp != null) {
+				for (String trustedStr : trustedProp) {
+					if (trustedStr.contains("{clusterNode}")) {
+						for (String node : connectedNodes) {
+							String jid = trustedStr.replace("{clusterNode}", node);
+							trusted.add(jid);	
+						}
+					} else {
+						trusted.add(trustedStr);
+					}
+				}
+			}
+		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "component {0} got trusted jids set as {1}", new Object[] { getName(), trusted });
 		}
 	}
 

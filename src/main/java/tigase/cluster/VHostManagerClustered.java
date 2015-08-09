@@ -35,10 +35,8 @@ public class VHostManagerClustered extends VHostManager implements ClusteredComp
 	private String CONNECTED_NODES_VAR = "connectedNodes";
 
 	@Override
-	public void setClusterController( ClusterControllerIfc cl_controller ) {}
-
-	@Override
 	public void nodeConnected( String node ) {
+		super.nodeConnected(node);
 		JID nodeJID = JID.jidInstanceNS( "vhost-man", node, null );
 		log.log( Level.FINEST, "Node connected: " + nodeJID );
 		synchronized ( connectedNodes ) {
@@ -50,6 +48,7 @@ public class VHostManagerClustered extends VHostManager implements ClusteredComp
 
 	@Override
 	public void nodeDisconnected( String node ) {
+		super.nodeDisconnected(node);
 		JID nodeJID = JID.jidInstanceNS( "vhost-man", node, null);
 		log.log( Level.FINEST, "Node disconnected: " + nodeJID );
 		connectedNodes.remove( nodeJID );

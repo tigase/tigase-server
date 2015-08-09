@@ -144,6 +144,7 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 
 	@Override
 	public void nodeConnected(String node) {
+		super.nodeConnected(node);
 		connectedNodes.add(node);
 
 		if (log.isLoggable(Level.FINEST))
@@ -153,11 +154,11 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 		if (module != null && module instanceof SubscribeModule) {
 			((SubscribeModule) module).clusterNodeConnected(node);
 		}
-
 	}
 
 	@Override
 	public void nodeDisconnected(String node) {
+		super.nodeDisconnected(node);
 		connectedNodes.remove(node);
 
 		if (log.isLoggable(Level.FINEST))
@@ -172,10 +173,6 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 	@Override
 	public void processPacket(tigase.server.Packet packet) {
 		super.processPacket(packet);
-	}
-
-	@Override
-	public void setClusterController(ClusterControllerIfc cl_controller) {
 	}
 
 	@Override

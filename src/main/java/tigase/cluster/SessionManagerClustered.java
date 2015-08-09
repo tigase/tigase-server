@@ -159,6 +159,7 @@ public class SessionManagerClustered
 	@Override
 	public void nodeConnected(String node) {
 		log.log(Level.FINE, "Nodes connected: {0}", node);
+		super.nodeConnected(node);
 
 		JID jid = JID.jidInstanceNS(getName(), node, null);
 
@@ -171,6 +172,7 @@ public class SessionManagerClustered
 	@Override
 	public void nodeDisconnected(String node) {
 		log.log(Level.FINE, "Nodes disconnected: {0}", node);
+		super.nodeDisconnected(node);
 
 		JID jid = JID.jidInstanceNS(getName(), node, null);
 
@@ -398,6 +400,7 @@ public class SessionManagerClustered
 	
 	@Override
 	public void setClusterController(ClusterControllerIfc cl_controller) {
+		super.setClusterController(cl_controller);
 		clusterController = cl_controller;
 		if (strategy != null) {
 			strategy.setClusterController(clusterController);
