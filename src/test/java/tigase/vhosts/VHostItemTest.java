@@ -114,6 +114,7 @@ public class VHostItemTest extends TestCase {
 		JID notTrusted = JID.jidInstanceNS("not-trusted@example.com");
 		
 		VHostItem item = new VHostItem();
+		item.toString();
 		Assert.assertNull(item.getTrustedJIDs());
 		Assert.assertFalse(item.isTrustedJID(jid));
 		
@@ -138,7 +139,9 @@ public class VHostItemTest extends TestCase {
 		Assert.assertFalse(item.isTrustedJID(notTrusted));
 		
 		item = new VHostItem();
+		item.toString();
 		item.initFromPropertyString("example.com:trusted-jids=example.com");
+		item.toString();
 		Assert.assertArrayEquals(new String[] { "example.com" }, item.getTrustedJIDs().toArray(new String[0]));
 		Assert.assertTrue(item.isTrustedJID(jid));
 		Assert.assertTrue(item.isTrustedJID(jid.copyWithResource("test")));

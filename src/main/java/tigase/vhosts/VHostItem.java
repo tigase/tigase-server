@@ -751,9 +751,9 @@ public class VHostItem
 			List<Element> items = data.getChildren();
 			if (items != null) {
 				for (Element item : items) {
-					char typeChar = item.getAttributeStaticStr("type").charAt(0);
-					Object value = DataTypes.decodeValueType(typeChar, item.getCData());
 					DataType type = dataTypes.get(item.getName());
+					char typeChar = type != null ? DataTypes.typesMap.get(type.getCls().getName()) : item.getAttributeStaticStr("type").charAt(0);
+					Object value = DataTypes.decodeValueType(typeChar, item.getCData());
 					if (type != null && type.getCollectionCls() != null && value != null) {
 						try {
 							Collection collection = type.getCollectionCls().newInstance();
