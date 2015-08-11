@@ -138,7 +138,7 @@ About
 Copyright (C) 2004 Tigase.org. <http://www.tigase.org/>
 
 Tigase Jabber/XMPP Server is
-Open Source and Free  (GPLv3)
+Open Source and Free  (AGPLv3)
 Java based server. The goals behind the design and
 implementation of the server are:
 

@@ -12,7 +12,6 @@ Installation Using GUI Installer
 
 If you don't want to install Tigase using a manual method, you can use the GUI installer. It not only copies server files to preferred place, but also assists with configuration of the most important parameters and database setup. Therefore we recommend this as the way to install Tigase.
 
-[[prerequisites]]
 Prerequisites
 -------------
 

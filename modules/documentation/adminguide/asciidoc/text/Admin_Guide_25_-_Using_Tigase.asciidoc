@@ -12,6 +12,7 @@ This section keeps set of documents which apply to all the Tigase server version
 
 
 //- xref:components[Tigase Components]
+- xref:logs[Tigase Log Guide]
 - xref:externalComponentConfiguration[External Components]
 . xref:tigase4xbasicConfiguration[Basic Component Configuration]
 . xref:tigase4xexternalComponent[Tigase as an External Component]

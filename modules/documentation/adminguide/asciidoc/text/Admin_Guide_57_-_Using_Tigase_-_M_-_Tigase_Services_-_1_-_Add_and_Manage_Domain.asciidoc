@@ -45,7 +45,7 @@ Click *Execute* and you get a new window where you can enter all of your VHost c
 
 image:images/add_vhost_window.png[]
 
-When you are ready click the *Finish* button. All done, hopefully. You can get either a window confirming everything went well or a window printing an error message if something went wrong. What can be wrong? There are some restrictions I decided to put on the service to prevent abuse. One of the restrictions is the maximum number of domains a user can register for himself which is *25* right now. Another restriction is that the domain which you add must have a valid DNS entry pointing to our service. The ////[[addXMPP,guide here]]//// add XMPP guide describes all the details about DNS settings. Please refer to these instructions if you need more details.
+When you are ready click the *Finish* button. All done, hopefully. You can get either a window confirming everything went well or a window printing an error message if something went wrong. What can be wrong? There are some restrictions I decided to put on the service to prevent abuse. One of the restrictions is the maximum number of domains a user can register for himself which is *25* right now. Another restriction is that the domain which you add must have a valid DNS entry pointing to our service. The XMPP guide describes all the details about DNS settings. Please refer to these instructions if you need more details.
 
 Adding a New User
 -----------------

@@ -10,7 +10,7 @@
 :numbered:
 :website: http://tigase.net/
 
-*Default value:*
+*Default value:* 'By default, --stats-archiv is not listed in the init.properties file'
 
 *Example:* +--stats-archiv=tigase.stats.CounterDataFileLogger:stats-file-logger:60,tigase.stats.CounterDataLogger:stats-logger:60+
 
