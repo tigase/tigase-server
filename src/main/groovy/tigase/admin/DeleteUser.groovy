@@ -47,6 +47,9 @@ def vhost_man = (VHostManagerIfc)vhostMan
 def admins = (Set)adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
+def NOTIFY_CLUSTER = "notify-cluster"
+boolean clusterMode =  Boolean.valueOf( System.getProperty("cluster-mode", false.toString()) );
+boolean notifyCluster = Boolean.valueOf( Command.getFieldValue(packet, NOTIFY_CLUSTER) )
 
 def user_sessions = (Map)userSessions;
 
@@ -62,12 +65,41 @@ if (userJids == null) {
 			"hidden")
 	Command.addFieldValue(result, JIDS, userJids ?: "", "jid-multi",
 			"The Jabber ID(s) to delete")
+	if 	( clusterMode  ) {
+		Command.addHiddenField(result, NOTIFY_CLUSTER, true.toString())
+	}
 
 	return result
 }
 
-def result = p.commandResult(Command.DataType.result)
 def results = new LinkedList<Packet>();
+if (clusterMode) {
+	if (!notifyCluster) {
+		for (userJid in userJids) {
+			try {
+				def bareJID = BareJID.bareJIDInstance(userJid)
+				def sess = user_sessions.get(bareJID);
+				if (sess != null) {
+					def conns = sess.getConnectionIds();
+					for (conn in conns) {
+						def res = sess.getResourceForConnectionId(conn);
+						if (res != null) {
+							def commandClose = Command.CLOSE.getPacket(p.getStanzaTo(), conn,
+								StanzaType.set, res.nextStanzaId());
+							results.offer(commandClose);
+						}
+					}
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		return results;
+	}
+}
+
+
+def result = p.commandResult(Command.DataType.result)
 results.offer(result);
 def msgs = [];
 def errors = [];
@@ -86,15 +118,30 @@ for (userJid in userJids) {
 					// database, then user has been already removed with the auth_repo.removeUser(...)
 					// then the second call to user_repo may throw the exception which is fine.
 				}
-				def sess = user_sessions.get(bareJID);
-				if (sess != null) {
-					def conns = sess.getConnectionIds();
-					for (conn in conns) {
-						def res = sess.getResourceForConnectionId(conn);
-						if (res != null) {
-							def commandClose = Command.CLOSE.getPacket(p.getStanzaTo(), conn,
-								 StanzaType.set, res.nextStanzaId());
-							results.offer(commandClose);
+				if (clusterMode && notifyCluster) {
+					def nodes = (List)clusterStrategy.getAllNodes();
+					if (nodes && nodes.size() > 0 ) {
+						nodes.each { node ->
+							def forward = p.copyElementOnly();
+							Command.removeFieldValue(forward, NOTIFY_CLUSTER)
+							Command.addHiddenField(forward, NOTIFY_CLUSTER, false.toString())
+							forward.setPacketTo( node );
+							forward.setPermissions( Permissions.ADMIN );
+							
+							results.offer(forward)
+						}
+					}	
+				} else {
+					def sess = user_sessions.get(bareJID);
+					if (sess != null) {
+						def conns = sess.getConnectionIds();
+						for (conn in conns) {
+							def res = sess.getResourceForConnectionId(conn);
+							if (res != null) {
+								def commandClose = Command.CLOSE.getPacket(p.getStanzaTo(), conn,
+									StanzaType.set, res.nextStanzaId());
+								results.offer(commandClose);
+							}
 						}
 					}
 				}
