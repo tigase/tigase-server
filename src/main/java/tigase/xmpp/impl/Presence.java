@@ -872,6 +872,11 @@ public class Presence
 	public static void rebroadcastPresence(XMPPResourceConnection session, Queue<Packet> results) throws NotAuthorizedException, TigaseDBException {
 		Element presence = session.getPresence();
 
+		if (presence == null ) {
+			// user has not sent initial presence yet, ignore
+			return;
+		}
+
 		for ( ExtendedPresenceProcessorIfc processor : extendedPresenceProcessors ) {
 			Element extendContent = processor.extend( session, results );
 			if ( extendContent != null ){
