@@ -1,4 +1,4 @@
-[[init.properties]]
+[[initproperties]]
 init.properties
 ===============
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
@@ -10,6 +10,12 @@ init.properties
 :numbered:
 :website: http://tigase.net
 
-//possible link to properties guide if we can move directories.  Be sure to edit links when applicaple.
 
-Document has been moved to a new location. Please have a look at the new page with the server properties description: Tigase XMPP Server configuration properties.
+
+//possible link to properties guide if we can move directories.  Be sure to edit links when applicable.
+
+<<propertiesguide/index.adoc#propertiesGuide,Click here for Properties Guide>> interref link
+
+link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html/[Click here for Properties Guide] direct link
+
+init.properties guide is in another directory, please click either link above to go to a list of properties that may be found in the init.properties file.

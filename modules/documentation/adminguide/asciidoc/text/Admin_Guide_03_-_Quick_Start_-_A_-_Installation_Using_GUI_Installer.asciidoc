@@ -85,6 +85,7 @@ This is the point where you choose where do you want you server to be installed.
 
 Packages selection
 ~~~~~~~~~~~~~~~~~~
+
 image:images/winInstall7.gif[]
 
 Next important step is package selection. Note that some choices are grayed out and you cannot change them as they are essential. Packages consist of documentation, database drivers, sources of the server and some extras. When you select an item, you will be presented with a short description of it's content.

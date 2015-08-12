@@ -1,3 +1,4 @@
+[[propertiesGuide]]
 Tigase Properties Guide
 =======================
 :toc:

@@ -34,7 +34,7 @@ include::text/Admin_Guide_08_-_Configuration.asciidoc[]
 
 include::text/Admin_Guide_09_-_Configuration_-_A_-_Tigase_XMPP_Server_Configuration_Properties.asciidoc[]
 
-include::text\Admin_Guide_10_-_Configuration_-_B_-_Startup_Files_tigase.sh_and_tigase.asciidoc[]
+include::text/Admin_Guide_10_-_Configuration_-_B_-_Startup_Files_tigase.sh_and_tigase.asciidoc[]
 
 include::text/Admin_Guide_11_-_Configuration_-_C_-_init.properties.asciidoc[]
 
