@@ -49,7 +49,8 @@ def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 def NOTIFY_CLUSTER = "notify-cluster"
 boolean clusterMode =  Boolean.valueOf( System.getProperty("cluster-mode", false.toString()) );
-boolean notifyCluster = Boolean.valueOf( Command.getFieldValue(packet, NOTIFY_CLUSTER) )
+def notifyClusterStr = Command.getFieldValue(packet, NOTIFY_CLUSTER);
+boolean notifyCluster = (notifyClusterStr != null) ? Boolean.valueOf( notifyClusterStr ) : true;
 
 def user_sessions = (Map)userSessions;
 
