@@ -151,13 +151,14 @@ public class RosterFlat
 															 relem.getName(), relem.getRosterItem() });
 			}
 		} else {
-			if ( emptyNameAllowed ){
-				relem.setName( "" );
+			if (emptyNameAllowed && (name == null || name.isEmpty())) {
+				relem.setName("");
+			} else if (name == null || name.isEmpty()) {
+				relem.setName(null);
 			} else {
-				if (name != null && name.isEmpty()) name = null;
-				relem.setName( name );
+				relem.setName(name);
 			}
-
+				
 			// Hm, as one user reported this make it impossible to remove the user
 			// from
 			// all groups. Let's comments it out for now to see how it works.
