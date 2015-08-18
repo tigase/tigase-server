@@ -74,26 +74,31 @@ if (userJids == null) {
 }
 
 def results = new LinkedList<Packet>();
+
+def closeUserSessions = { userJid ->
+	try {
+		def bareJID = BareJID.bareJIDInstance(userJid)
+		def sess = user_sessions.get(bareJID);
+		if (sess != null) {
+			def conns = sess.getConnectionIds();
+			for (conn in conns) {
+				def res = sess.getResourceForConnectionId(conn);
+				if (res != null) {
+					def commandClose = Command.CLOSE.getPacket(p.getStanzaTo(), conn,
+							StanzaType.set, res.nextStanzaId());
+					results.offer(commandClose);
+				}
+			}
+		}
+	} catch (Exception ex) {
+		ex.printStackTrace();
+	}
+};
+
 if (clusterMode) {
 	if (!notifyCluster) {
 		for (userJid in userJids) {
-			try {
-				def bareJID = BareJID.bareJIDInstance(userJid)
-				def sess = user_sessions.get(bareJID);
-				if (sess != null) {
-					def conns = sess.getConnectionIds();
-					for (conn in conns) {
-						def res = sess.getResourceForConnectionId(conn);
-						if (res != null) {
-							def commandClose = Command.CLOSE.getPacket(p.getStanzaTo(), conn,
-								StanzaType.set, res.nextStanzaId());
-							results.offer(commandClose);
-						}
-					}
-				}
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
+			closeUserSessions(userJid);
 		}
 		return results;
 	}
@@ -132,20 +137,9 @@ for (userJid in userJids) {
 							results.offer(forward)
 						}
 					}	
-				} else {
-					def sess = user_sessions.get(bareJID);
-					if (sess != null) {
-						def conns = sess.getConnectionIds();
-						for (conn in conns) {
-							def res = sess.getResourceForConnectionId(conn);
-							if (res != null) {
-								def commandClose = Command.CLOSE.getPacket(p.getStanzaTo(), conn,
-									StanzaType.set, res.nextStanzaId());
-								results.offer(commandClose);
-							}
-						}
-					}
-				}
+				} 
+				closeUserSessions(userJid);
+
 				msgs.add("Operation successful for user "+userJid);
 			}
 			else {
