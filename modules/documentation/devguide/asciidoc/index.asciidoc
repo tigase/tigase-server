@@ -14,9 +14,13 @@ include::text/Development_Guide_01_-_Basic_Information.asciidoc[]
 
 //writing for Tigase
 include::text/Development_Guide_02_-_Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.asciidoc[]
+
 :leveloffset: 2
+
 include::text/Development_Guide_03_-_API_Changes_in_Tigase_Server_5.x.asciidoc[]
+
 :leveloffset: 1
+
 //compiling
 include::text/Development_Guide_04_-_Server_Compilation.asciidoc[]
 

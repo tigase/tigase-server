@@ -1,0 +1,12 @@
+Unified guide
+=============
+
+test text
+
+include::adminguide/asciidoc/index.asciidoc[]
+
+include::propertiesguide/asciidoc/index.asciidoc[]
+
+include::devguide/asciidoc/index.asciidoc[]
+
+include::userguide/asciidoc/index.asciidoc[]

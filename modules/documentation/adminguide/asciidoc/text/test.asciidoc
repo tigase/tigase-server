@@ -1,0 +1,17 @@
+Inter-document test page
+========================
+
+1. using interref link directly to root index file, and then the section within that File
+<<propinclude.asciidoc#propertiesGuide,inter-document link>> uses new index file (propinclude)
+
+
+2. using interref link to current index file (propertiesguide/index.asciidoc)
+<<propertiesguide/asciidoc/text/index.asciidoc#propertiesGuide,Click here for Properties Guide>>
+
+3. using #1 structure to get a heading from inside propinclude
+<<propinclude.asciidoc#clusterNodes,Cluster Nodes inter-document link>>
+
+4. using #2 structure to get a heading from inside index.asciidoc
+<<propertiesguide/asciidoc/text/index.asciidoc#clusterNodes,Cluster Nodes Link>>
+
+*End of test.asciidoc*
