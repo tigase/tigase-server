@@ -139,7 +139,7 @@ Example:
 JDBC: jTDS vs MS JDBC driver
 ----------------------------
 
-Tigase XMPP Server supports two JDBC drivers intended to be used with Microsoft SQL Server - one created and provided by Microsoft itself and the alternative implementation - jTDS. Tigase is shipped with the latter in the distribution packages. However, we do not recommend using jDTS with Tigase and urge users to use JDBC driver created by Microsoft. It can be downloaded from Microsoft website: link:http://www.microsoft.com/en-us/download/details.aspx?displaylang=en&id=11774[JDBC Drivers 4.0, 4.1 for SQL Server] then unpack the archive. Copy sqljdbc_4.0/enu/sqljdbc4.jar file to $\{tigase-server}/jars directory.
+Tigase XMPP Server supports two JDBC drivers intended to be used with Microsoft SQL Server - one created and provided by Microsoft itself and the alternative implementation - jTDS. Tigase is shipped with the latter in the distribution packages. Starting with the version 7.1.0 we recommend using jDTS driver that is shipped with Tigase as JDBC driver created by Microsoft can cause problems with some components in cluster installations. MS driver can be downloaded form the website: link:http://www.microsoft.com/en-us/download/details.aspx?displaylang=en&id=11774[JDBC Drivers 4.0, 4.1 for SQL Server] then unpack the archive. Copy sqljdbc_4.0/enu/sqljdbc4.jar file to $\{tigase-server}/jars directory.
 
 Depending on the driver used --user-db-uri needs to be configured accordingly.
 
