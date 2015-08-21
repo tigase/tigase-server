@@ -1,8 +1,0 @@
-Admin Test file
-===============
-
-includes the test.asciidoc file and replicates current include call structure
-
-include::adminguide/asciidoc/text/test.asciidoc[]
-
-*End of admintest.asciidoc*
