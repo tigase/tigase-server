@@ -96,7 +96,7 @@ include::text/Admin_Guide_30_-_Using_Tigase_-_A_-_Components_-_1_-_External_Comp
 //virtual Components
 include::text/Admin_Guide_31_-_Using_Tigase_-_A_-_Components_-_2_-_Virtual_Components_for_Cluster_Mode.asciidoc[]
 
-include::text/Admin_Guide_32_-_Using_Tigase_-_A_-_Components_-_3_-_Tigase_HTTP_API.asciidoc[]
+//include::text/Admin_Guide_32_-_Using_Tigase_-_A_-_Components_-_3_-_Tigase_HTTP_API.asciidoc[]
 
 //packet filtering
 
