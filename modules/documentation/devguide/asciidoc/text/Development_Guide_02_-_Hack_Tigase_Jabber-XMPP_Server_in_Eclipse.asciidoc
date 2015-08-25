@@ -38,9 +38,11 @@ Please see the Windows coding guide for instructions on how to obtain source cod
 If you don't want to install git software specifically, you can use Eclipse's git plugin to obtain the repository without any new software.
 First click on File, then Import...
 Next select from Git folder and the Projects from Git
+
 image:images/win-git1.jpg[]
 
 Click next, and now select clone URI
+
 image:images/win-git2.jpg[]
 
 Now click next, and in this window enter the following into the URI field
@@ -49,12 +51,15 @@ Now click next, and in this window enter the following into the URI field
 git://repository.tigase.org/git/tigase-server.git
 -----
 The rest of the fields will populate automatically
+
 image:images/win-git3.jpg[]
 
 Select the master branch, and any branches you wish to edit.  *The master branch should be the only one you need, branches are used for specific code changes*
+
 image:images/win-git4.jpg[]
 
 Now select the directory where you wanted to clone the repository to.  This was function as the project root directory you will use later on in the setup.
+
 image:images/win-git5.jpg[]
 
 Once you click next Eclipse will download the repository and any branches you selected to that directory.  Note you will be unable to import this git directory since there are no git a project specific files downloaded.  However, once downloading is complete you may click cancel, and the git repository will remain in the directory you have chosen.
@@ -73,15 +78,18 @@ http://download.eclipse.org/technology/m2e/releases/
 
 
 image:images/Eclipse-m2Einstall.jpg[]
+
 You should see the M2 Eclipse software packages show in the main window.  Click the check-box and click Next.  Once the installer is finished it will need to restart Eclipse.
 
 Once that is done, lets connect Eclipse to the cloned repository.
 
 Click File and Import... to bring up the import dialog window.
 Select Maven and then Existing Maven Project.
+
 image:images/Eclipse-importMaven.jpg[]
 
 Now click Next and point the root directory to where you cloned the git repository, Eclipse should automatically see the pom.xml file and show up in the next window.
+
 image:images/Eclipse-importMaven2.jpg[]
 
 Once the import is finished, you are able to now begin working with Tigase's code inside Eclipse!  Happy coding!
