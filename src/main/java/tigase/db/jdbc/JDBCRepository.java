@@ -208,7 +208,7 @@ public class JDBCRepository
 		try {
 			addUserRepo(null, user_id);
 		} catch (SQLException e) {
-			throw new UserExistsException("Error adding user to repository: ", e);
+			throw new TigaseDBException("Error adding user to repository: ", e);
 		}
 	}
 
@@ -939,10 +939,11 @@ public class JDBCRepository
 	 * @param user_id
 	 *          a <code>String</code> value of the user ID.
 	 * @return a <code>long</code> value of <code>uid</code> database user ID.
-	 * @exception SQLException
-	 *              if an error occurs
+	 * @exception SQLException if an error occurs
+	 * @exception UserExistsException if the user already exists in repository
 	 */
-	private long addUserRepo(DataRepository repo, BareJID user_id) throws SQLException {
+	private long addUserRepo( DataRepository repo, BareJID user_id )
+			throws SQLException, UserExistsException {
 		ResultSet rs                  = null;
 		long uid                      = -1;
 		PreparedStatement user_add_sp = null;
@@ -960,12 +961,6 @@ public class JDBCRepository
 				log.log(Level.FINEST, "Adding non existing user to user-repository: " + user_id.toString() );
 
 				switch ( data_repo.getDatabaseType() ) {
-//					case sqlserver:
-//						int result_count = user_add_sp.executeUpdate();
-//						if ( result_count > 0 ){
-//							rs = user_add_sp.getGeneratedKeys();
-//						}
-//						break;
 					default:
 						rs = user_add_sp.executeQuery();
 						break;
@@ -978,6 +973,13 @@ public class JDBCRepository
 				} else {
 					log.warning("Missing UID after adding new user...");
 				}    // end of if (isnext) else
+			} catch ( SQLException ex ) {
+				if ( isExceptionKeyViolation( ex ) ){
+					throw new UserExistsException(user_id, "User already exist in the database", ex );
+				} else {
+					throw ex;
+				}
+
 			} finally {
 				data_repo.release(null, rs);
 			}
@@ -985,6 +987,21 @@ public class JDBCRepository
 		cache.put(user_id.toString(), Long.valueOf(uid));
 
 		return uid;
+	}
+
+	protected boolean isExceptionKeyViolation( SQLException ex ) {
+		String sqlState = ex.getSQLState();
+		boolean keyViolation = false;
+		switch ( data_repo.getDatabaseType() ) {
+
+			case postgresql:
+				keyViolation = (sqlState.equals( "23505" ) || sqlState.equals( "23000"));
+				break;
+			default:
+				keyViolation = sqlState.equals( "23000");
+				break;
+		}
+		return keyViolation;
 	}
 
 	private String buildNodeQuery(long uid, String node_path) {
@@ -1195,7 +1212,13 @@ public class JDBCRepository
 			if (autoCreate) {
 
 				// OK
-				result = addUserRepo(repo, user_id);
+				try {
+					result = addUserRepo(repo, user_id);
+				} catch (UserExistsException ex) {
+					// there was unique key violation which indicates that the user
+					// already exists in the database therefore we can retrieve it's UID
+					result = getUserUID( repo, user_id );
+				}
 			} else {
 				throw new UserNotFoundException("User does not exist: " + user_id);
 			}    // end of if (autoCreate) else
