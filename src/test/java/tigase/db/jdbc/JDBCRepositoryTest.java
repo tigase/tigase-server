@@ -39,6 +39,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -60,12 +61,13 @@ public class JDBCRepositoryTest {
 		map.put( RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, "2");
 
 		String repositoryURI = null;
-		repositoryURI = "jdbc:mysql://localhost:3306/tigasedb?user=tigase&password=tigase&useUnicode=true&characterEncoding=UTF-8&autoCreateUser=true";
+//		repositoryURI = "jdbc:mysql://localhost:3306/tigasedb?user=tigase&password=tigase&useUnicode=true&characterEncoding=UTF-8&autoCreateUser=true";
 //		repositoryURI = "jdbc:jtds:sqlserver://sqlserverhost:1433;databaseName=tigasedb;user=tigase;password=mypass;schema=dbo;lastUpdateCount=false;autoCreateUser=true";
 //		repositoryURI = "jdbc:sqlserver://sqlserverhost:1433;databaseName=tigasedb;user=tigase;password=mypass;schema=dbo;lastUpdateCount=false;autoCreateUser=true";
 //		repositoryURI = "jdbc:postgresql://localhost/tigasedb?user=tigase&password=tigase&useUnicode=true&characterEncoding=UTF-8&autoCreateUser=true";
 //		repositoryURI = "jdbc:derby:/Users/wojtek/dev/tigase/tigase-server/derbyDb";
 //		repositoryURI = "mongodb://localhost/tigase_test?autoCreateUser=true";
+		Assume.assumeNotNull(repositoryURI);
 		repo = new JDBCRepository();
 		repo.initRepository( repositoryURI, map );
 
