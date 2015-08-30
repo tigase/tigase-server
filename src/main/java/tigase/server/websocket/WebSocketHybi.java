@@ -50,7 +50,8 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 	private static final String RESPONSE_HEADER =
 		"HTTP/1.1 101 Switching Protocols\r\n" + "Upgrade: websocket\r\n" +
 		"Connection: Upgrade\r\n" + "Access-Control-Allow-Origin: *\r\n" +
-		"Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n" +
+		// Removed header below as it creates issues with connectivity using IE11 
+//		"Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n" +
 		"Access-Control-Allow-Headers: Content-Type\r\n" +
 		"Access-Control-Max-Age: 86400\r\n";
 
@@ -98,7 +99,7 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 	public ByteBuffer decodeFrame(WebSocketXMPPIOService service, ByteBuffer buf) {
 		if (!buf.hasRemaining()) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("no content remainging to process");
+				log.log(Level.FINEST, "Socket: {0}, no content remainging to process", new Object[] { service });
 			}
 
 			return null;
@@ -108,15 +109,16 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 		byte type      = 0x00;
 		int position   = buf.position();
 		ByteBuffer unmasked = null;
-
+		
 		try {
 			if (service.frameLength == -1) {
 				type = buf.get();
-				if ((type & 0x08) == 0x08) {
+				if ((type & 0x0F) == 0x08) {
 
 					// close request
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("closing connection due to client request");
+						log.log(Level.FINEST, "Socket: {0}, closing connection due to client request {1}", 
+								new Object[] { service, String.format("%02X ", type) });
 					}
 					service.forceStop();
 
@@ -172,13 +174,13 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 				// we need to ignore pong frame
 				if ((type & 0x0A) == 0x0A) {
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("ignoring pong frame");
+						log.log(Level.FINEST, "Socket: {0}, ignoring pong frame", new Object[] { service });
 					}
 					unmasked = null;
 				} // if it ping request send pong response
 				else if ((type & 0x09) == 0x09) {
 					if (log.isLoggable(Level.FINEST)) {
-						log.finest("sending response on ping frame");
+						log.log(Level.FINEST, "Socket: {0}, sending response on ping frame", new Object[] { service });
 					}
 					type = (byte) (((byte) (type ^ 0x09)) | 0x0A);
 					try {
@@ -209,7 +211,7 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 
 		// set type as finally part (0x80) of message of type text (0x01)
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "sending encoded data size = {0}", size);
+			log.log(Level.FINEST, "Socket: {0}, sending encoded data size = {1}", new Object[] { service, size });
 		}
 
 		ByteBuffer bbuf = createFrameHeader((byte) 0x81, size);
