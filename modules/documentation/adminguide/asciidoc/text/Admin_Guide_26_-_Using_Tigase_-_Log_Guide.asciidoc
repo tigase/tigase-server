@@ -46,19 +46,21 @@ Lets take the value for admins, listing who is administrator for the server.
 -----
 basic-conf/admins[s]=admin@jabber.freehost.org, administrator@jabber.freehost.org, fJones@jabber.freehost.org
 -----
-This line says for the basic-conf module, the basic server settings, the admin parameter which is an array of strings noted by the s, is the 3 users listed.
+The admin parameter which is an array of strings noted by the s, has 3 users listed.
 *NOTE* you can lookup the available Data types in the xref:initPropertiesGuide[init.properties guide].
 
 This file is re-written every time tigase starts.
 
 tigase.log.#
 ------------
-The tigase.log files are where the majority of logging will take place. The rules for writing to these long sacn be manipulated by editing files in the int.properties file.  To see how, see the xref:debuggingTigase[Debugging Tigase] section of this manual for more details about how to turn on debug logging, and how to manipulate log settings.
+The tigase.log files are where the majority of logging will take place. The rules for writing to these longs can be manipulated by editing files in the int.properties file.  To see how, see the xref:debuggingTigase[Debugging Tigase] section of this manual for more details about how to turn on debug logging, and how to manipulate log settings.
 Entries to these logs are made in the following format:
 -----
 2015-08-10 13:09:41.504 [main]      Sctipr.init()         INFO: Initilized script command, id: comp-manager, lang:Groovy, ext: groovy
 -----
-Which lists the date and time followed immediately by the process or component ID.  Next is the command for that component that was run, followed by information by that command might return with a label detailing what level of information it is.  In this case, the Script.init command was issued, and gives us information that the groovy script has been initiated.
+The format of these logs is below:
+<timestamp> <thread_name> <class>.<method>    <log_level>: <message> <thread_name>. This can vary - for components it would be <direction>_<int>_<component name>, for plugins it will just be the plugin name.
+
 Let's look at another example from the log file.
 -----
 2015-08-10 12:31:40.893 [in_14_muc] InMemoryMucRepository.createNewRoom()   FINE: Creating new room 'chatroom@muc.localhost.com'
@@ -77,7 +79,7 @@ basic-conf/logging/java.util.logging.FileHandler.pattern=/var/log/tigase/tigase.
 -------------------------------------
 This code, if entered into the init.properties file increases the size of the files to 15, and enlarges the maximum size to 20mb.  Note the larger the collective log space is, the larger number of sectors on hard disk are active.  Large log blocks may impact system performance.
 
-_ You may see a tigase.log.0.ick file in the directory while the server is running.  This is a temporary file only and is deleted once Tigase is cleanly shut down. _
+_You may see a tigase.log.0.ick file in the directory while the server is running.  This is a temporary file only and is deleted once Tigase is cleanly shut down._
 
 tigase.pid
 ----------
