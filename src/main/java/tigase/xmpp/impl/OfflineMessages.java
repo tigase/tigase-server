@@ -795,8 +795,10 @@ public class OfflineMessages
 
 				// XEP-0091 support - the old one...
 				stamp_el1 = p1.getElement().getChild( "x", "jabber:x:delay" );
+				if ( stamp_el1 != null ){
+					stamp1 = stamp_el1.getAttributeStaticStr( "stamp" );
+				}
 			}
-			stamp1 = stamp_el1.getAttributeStaticStr( "stamp" );
 
 			// Try XEP-0203 - the new XEP...
 			Element stamp_el2 = p2.getElement().getChild( "delay", "urn:xmpp:delay" );
@@ -805,8 +807,10 @@ public class OfflineMessages
 
 				// XEP-0091 support - the old one...
 				stamp_el2 = p2.getElement().getChild( "x", "jabber:x:delay" );
+				if ( stamp_el2 != null ){
+					stamp2 = stamp_el2.getAttributeStaticStr( "stamp" );
+				}
 			}
-			stamp2 = stamp_el2.getAttributeStaticStr( "stamp" );
 
 			return stamp1.compareTo( stamp2 );
 		}

@@ -28,20 +28,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
+
 import org.junit.After;
+
 import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import tigase.db.DBInitException;
 import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.UserNotFoundException;
+
 import tigase.server.Packet;
+
 import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
+
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.XMPPResourceConnection;
+
+import java.util.LinkedList;
 
 /**
  *
@@ -150,6 +159,38 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 		msgRepo.getStored().clear();
 	}		
 
+
+	@Test
+	public void testRestorePacketForOffLineUser() throws Exception {
+		BareJID userJid = BareJID.bareJIDInstance("user1@example.com");
+		JID res1 = JID.jidInstance(userJid, "res1");
+		XMPPResourceConnection session1 = getSession(JID.jidInstance("c2s@example.com/" + UUID.randomUUID().toString()), res1);
+
+		assertEquals(Arrays.asList(session1), session1.getActiveSessions());
+
+		Element packetEl = new Element("iq", new String[] { "type", "from", "to", "time" },
+				new String[] { "set", "dip1@test.com/res1", userJid.toString(), "1440810935000" });
+		packetEl.addChild(new Element("jingle", new String[] { "action", "sid", "offline", "xmlns" },
+				new String[] { "session-terminate", UUID.randomUUID().toString(), "true", "urn:xmpp:jingle:1" }));
+		Packet packet = Packet.packetInstance(packetEl);
+		msgRepo.storeMessage( packet.getFrom(), packet.getTo(), null, packet.getElement(), null);
+
+		packetEl = new Element("iq", new String[] { "type", "from", "to", "time" },
+				new String[] { "set", "dip1@test.com/res1", userJid.toString(), "1440810972000" });
+		packetEl.addChild(new Element("jingle", new String[] { "action", "sid", "offline", "xmlns" },
+				new String[] { "session-terminate", UUID.randomUUID().toString(), "true", "urn:xmpp:jingle:1" }));
+		packet = Packet.packetInstance(packetEl);
+		msgRepo.storeMessage( packet.getFrom(), packet.getTo(), null, packet.getElement(), null);
+
+		assertTrue("no message stored, while it should be stored", !msgRepo.getStored().isEmpty());
+
+		Queue<Packet> restorePacketForOffLineUser = offlineProcessor.restorePacketForOffLineUser( session1, msgRepo );
+
+		assertEquals("number of restored messages differ!", restorePacketForOffLineUser.size(), 2);
+
+		msgRepo.getStored().clear();
+	}
+
 	@Test
 	public void testLoadOfflineMessages() throws Exception {
 		BareJID userJid = BareJID.bareJIDInstance("user1@example.com");
@@ -225,7 +266,11 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 
 		@Override
 		public Queue<Element> loadMessagesToJID(XMPPResourceConnection session, boolean delete) throws UserNotFoundException {
-			throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+			Queue<Element> res = new LinkedList<Element>();
+			for ( Packet pac : stored ) {
+				res.add( pac.getElement());
+			}
+			return res;
 		}
 		
 		@Override
