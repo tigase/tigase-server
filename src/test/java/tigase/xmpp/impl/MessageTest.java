@@ -26,14 +26,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
+
 import org.junit.After;
+
 import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import tigase.server.Packet;
+
 import tigase.xml.Element;
+
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
+import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 
 /**
@@ -58,6 +65,31 @@ public class MessageTest extends ProcessorTestCase {
 		messageProcessor = null;
 		super.tearDown();
 	}	
+
+	@Test
+	public void testSilentlyIgnoringMessages() throws Exception {
+		BareJID userJid = BareJID.bareJIDInstance("user1@example.com");
+		JID res1 = JID.jidInstance(userJid, "res1");
+
+		// testing default behaviour - error message
+		Element packetEl = new Element("message", new String[] { "from", "to" },
+				new String[] { "remote-user@test.com/res1", res1.toString() });
+		Packet packet = Packet.packetInstance(packetEl);
+		Queue<Packet> results = new ArrayDeque<Packet>();
+		messageProcessor.process(packet, null, null, results, null);
+		assertTrue("no error was generated", !results.isEmpty());
+		assertTrue("generated result is not an error", results.poll().getType().equals( StanzaType.error));
+
+
+		// testing silently ignoring error responses
+		results.clear();
+		final HashMap<String, Object> settings = new HashMap<String,Object>();
+		settings.put( "silently-ignore-message", "true");
+		messageProcessor.init(settings);
+
+		messageProcessor.process(packet, null, null, results, null);
+		assertTrue("result was generated", results.isEmpty());
+	}
 	
 	@Test
 	public void testResourceSelectionForMessageDeliveryMethods() throws Exception {

@@ -103,6 +103,9 @@ public class MessageAmp
 		if(offlineProcessor!=null)
 			offlineProcessor.init(settings);
 		
+		if(messageProcessor!=null)
+			messageProcessor.init(settings);
+
 		String ampJIDstr = (String) settings.get(AMP_JID_PROP_KEY);
 
 		if (null != ampJIDstr) {

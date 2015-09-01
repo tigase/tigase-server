@@ -79,9 +79,11 @@ public class Message
 	/** Class logger */
 	private static final Logger   log    = Logger.getLogger(Message.class.getName());
 	private static final String   DELIVERY_RULES_KEY = "delivery-rules";
+	private static final String   SILENTLY_IGNORE_ERROR_KEY = "silently-ignore-message";
 	protected static final String   XMLNS  = "jabber:client";
 
 	private MessageDeliveryRules deliveryRules = MessageDeliveryRules.inteligent;
+	private boolean silentlyIgnoreError = false;
 	//~--- methods --------------------------------------------------------------
 
 	@Override
@@ -91,6 +93,10 @@ public class Message
 		deliveryRules = settings.containsKey(DELIVERY_RULES_KEY)
 				? MessageDeliveryRules.valueOf((String) settings.get(DELIVERY_RULES_KEY))
 				: MessageDeliveryRules.inteligent;
+
+		silentlyIgnoreError = settings.containsKey(SILENTLY_IGNORE_ERROR_KEY)
+				? Boolean.valueOf((String) settings.get(SILENTLY_IGNORE_ERROR_KEY))
+				: Boolean.FALSE;
 	}
 
 	@Override
@@ -277,13 +283,17 @@ public class Message
 						// for each of this types RFC 6121 recomends silent ignoring of stanza
 						// or to return error recipient-unavailable - we will send error as
 						// droping packet without response may not be a good idea
-						results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(
-								packet, "The recipient is no longer available.", true));
+						if (!silentlyIgnoreError) {
+							results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(
+									packet, "The recipient is no longer available.", true));
+						}
 				}
 			}
 			else {
-				results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet,
-																																							 "The recipient is no longer available.", true));
+				if ( !silentlyIgnoreError ){
+					results.offer( Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage( packet,
+																																								 "The recipient is no longer available.", true ) );
+				}
 			}
 		}
 	}
