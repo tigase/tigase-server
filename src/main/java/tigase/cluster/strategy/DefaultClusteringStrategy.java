@@ -126,6 +126,14 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	//~--- methods --------------------------------------------------------------
 
 	@Override
+	public void nodeConnected(JID node) {
+	}
+
+	@Override
+	public void nodeDisconnected(JID node) {
+	}
+
+	@Override
 	public void handleLocalPacket(Packet packet, XMPPResourceConnection conn) {
 		if (packet.getElemName() == Presence.ELEM_NAME) {
 			try {
@@ -166,7 +174,7 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	public void handleLocalResourceBind(XMPPResourceConnection conn) {
 		try {
 			Map<String, String> params = prepareConnectionParams(conn);
-			List<JID> cl_nodes = getAllNodes();
+			List<JID> cl_nodes = getNodesConnected();
 
 			// ++clusterSyncOutTraffic;
 			cluster.sendToNodes(USER_CONNECTED_CMD, params, sm.getComponentId(), cl_nodes
@@ -195,7 +203,7 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 			presence.setAttribute("type", StanzaType.unavailable.name());
 
 			Map<String, String> params   = prepareConnectionParams(conn);
-			List<JID>           cl_nodes = getAllNodes();
+			List<JID>           cl_nodes = getNodesConnected();
 
 			if ((cl_nodes != null) && (cl_nodes.size() > 0)) {
 
@@ -229,7 +237,7 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 		// Presence status change set by the user have a special treatment:
 		if ((packet.getElemName() == "presence") && (packet.getType() != StanzaType.error) &&
 				(packet.getStanzaFrom() != null) && (packet.getStanzaTo() == null)) {
-			List<JID> result = getAllNodes();
+			List<JID> result = getNodesConnected();
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Presence packet found: {0}, selecting all nodes: {1}",
@@ -334,6 +342,7 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 	 */
 	private List<JID> selectNodes(JID fromNode, Set<JID> visitedNodes) {
 		List<JID> result = null;
+		List<JID> cl_nodes_list = getNodesConnected();
 		int       size   = cl_nodes_list.size();
 
 		if (size == 0) {

@@ -6,12 +6,13 @@ import tigase.component.Context;
 import tigase.disteventbus.component.stores.AffiliationStore;
 import tigase.disteventbus.component.stores.SubscriptionStore;
 import tigase.disteventbus.impl.LocalEventBus;
+import tigase.xmpp.JID;
 
 public interface EventBusContext extends Context {
 
 	AffiliationStore getAffiliationStore();
 
-	Collection<String> getConnectedNodes();
+	Collection<JID> getConnectedNodes();
 
 	LocalEventBus getEventBusInstance();
 

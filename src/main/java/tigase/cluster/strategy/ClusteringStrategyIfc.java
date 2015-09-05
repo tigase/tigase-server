@@ -145,11 +145,11 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	//~--- get methods ----------------------------------------------------------
 
 	/**
-	 * The method returns all cluster nodes currently connected to the cluster.
+	 * The method returns all cluster nodes currently connected to the cluster node.
 	 *
-	 * @return List of all cluster nodes currently connected to the cluster.
+	 * @return List of all cluster nodes currently connected to the cluster node.
 	 */
-	List<JID> getAllNodes();
+	List<JID> getNodesConnected();
 
 	/**
 	 * Returns a ConnectionRecord object associated with this user's full JID if

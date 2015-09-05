@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.xmpp.JID;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -102,7 +103,7 @@ public class SeeOtherHost implements SeeOtherHostIfc {
 	}
 
 	@Override
-	public void setNodes(List<BareJID> nodes) {
+	public void setNodes(List<JID> nodes) {
 		 log.log(Level.CONFIG, "Action invalid for current implementation.");
 	}
 

@@ -65,56 +65,30 @@ public class WebSocketClientConnectionClustered
 	//~--- fields ---------------------------------------------------------------
 
 	private SeeOtherHostIfc see_other_host_strategy = null;
-	@SuppressWarnings("serial")
-	private List<BareJID>   connectedNodes          = new CopyOnWriteArrayList<BareJID>() {
-		{
-			add(getDefHostName());
-		}
-	};
 
 	//~--- methods --------------------------------------------------------------
 
 	@Override
-	public void nodeConnected(String node) {
-		super.nodeConnected(node);
-		BareJID nodeJID = BareJID.bareJIDInstanceNS(null, node);
-
-		// connectedNodes must be synchronized here. If it is executed concurrently,
-		// then most likely only one connected node will endup in the collection
-		synchronized (connectedNodes) {
-			if (!connectedNodes.contains(nodeJID)) {
-				connectedNodes.add(nodeJID);
-
-				// ugly workaround to sort CopyOnWriteArrayList
-				BareJID[] arr_list = connectedNodes.toArray(new BareJID[connectedNodes.size()]);
-
-				Arrays.sort(arr_list);
-				connectedNodes = new CopyOnWriteArrayList<BareJID>(arr_list);
-				if (see_other_host_strategy != null) {
-					see_other_host_strategy.setNodes(connectedNodes);
-				}
-			}
+	protected void onNodeConnected(JID jid) {
+		super.onNodeConnected(jid);
+		
+		List<JID> connectedNodes = getNodesConnectedWithLocal();
+		if (see_other_host_strategy != null) {
+			see_other_host_strategy.setNodes(connectedNodes);
 		}
 	}
 
 	@Override
-	public void nodeDisconnected(String node) {
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Disconnected nodes: {0}", node);
-		}
-		super.nodeDisconnected(node);
+	public void onNodeDisconnected(JID jid) {
+		super.onNodeDisconnected(jid);
 
-		BareJID nodeJID = BareJID.bareJIDInstanceNS(null, node);
-
-		// if (connectedNodes.contains(nodeJID)) {
-		connectedNodes.remove(nodeJID);
-
+		List<JID> connectedNodes = getNodesConnectedWithLocal();
 		if (see_other_host_strategy != null) {
 			see_other_host_strategy.setNodes(connectedNodes);
 		}
 		
 		// }
-		final String hostname = node;
+		final String hostname = jid.getDomain();
 
 		doForAllServices(new ServiceChecker<XMPPIOService<Object>>() {
 			@Override
@@ -152,7 +126,7 @@ public class WebSocketClientConnectionClustered
 		}
 		see_other_host_strategy = super.getSeeOtherHostInstance(see_other_host_class);
 		if (see_other_host_strategy != null) {
-			see_other_host_strategy.setNodes(connectedNodes);
+			see_other_host_strategy.setNodes(getNodesConnectedWithLocal());
 		}
 
 		return see_other_host_strategy;

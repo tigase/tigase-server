@@ -67,9 +67,9 @@ public class UnsubscribeModule extends AbstractEventBusModule {
 		boolean listenedByHandlers = context.getEventBusInstance().hasHandlers(eventName, eventXmlns);
 
 		if (!listenedByHandlers) {
-			for (String node : context.getConnectedNodes()) {
+			for (JID node : context.getConnectedNodes()) {
 				Element se = prepareUnsubscribeElement(new EventName(eventName, eventXmlns), context.getComponentID(), null);
-				sendUnsubscribeRequest("eventbus@" + node, Collections.singleton(se));
+				sendUnsubscribeRequest("eventbus@" + node.getDomain(), Collections.singleton(se));
 			}
 		}
 	}
@@ -125,8 +125,8 @@ public class UnsubscribeModule extends AbstractEventBusModule {
 			if (log.isLoggable(Level.FINER))
 				log.finer("Forwarding unsubcribe to: " + context.getConnectedNodes());
 
-			for (String node : context.getConnectedNodes()) {
-				sendUnsubscribeRequest("eventbus@" + node, subscribedNodes);
+			for (JID node : context.getConnectedNodes()) {
+				sendUnsubscribeRequest("eventbus@" + node.getDomain(), subscribedNodes);
 			}
 		}
 		Packet response = packet.okResult((Element) null, 0);

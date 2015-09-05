@@ -157,33 +157,29 @@ public class SessionManagerClustered
 	}
 
 	@Override
-	public void nodeConnected(String node) {
-		log.log(Level.FINE, "Nodes connected: {0}", node);
-		super.nodeConnected(node);
+	public void onNodeConnected(JID jid) {
+		super.onNodeConnected(jid);
 
-		JID jid = JID.jidInstanceNS(getName(), node, null);
-
-		strategy.nodeConnected(jid);
-
-		sendAdminNotification( node, STATUS.CONNECETED );
-
+		if (!getComponentId().equals(jid)) {
+			strategy.nodeConnected(jid);
+			
+			sendAdminNotification( jid.toString(), STATUS.CONNECETED );
+		}
 	}
 
 	@Override
-	public void nodeDisconnected(String node) {
-		log.log(Level.FINE, "Nodes disconnected: {0}", node);
-		super.nodeDisconnected(node);
+	public void onNodeDisconnected(JID jid) {
+		super.onNodeDisconnected(jid);
 
-		JID jid = JID.jidInstanceNS(getName(), node, null);
+		if (!getComponentId().equals(jid)) {
+			strategy.nodeDisconnected(jid);
 
-		strategy.nodeDisconnected(jid);
-
-		// Not sure what to do here, there might be still packets
-		// from the cluster node waiting....
-		// delTrusted(jid);
-
-		sendAdminNotification( node, STATUS.DISCONNECTED );
-
+			// Not sure what to do here, there might be still packets
+			// from the cluster node waiting....
+			// delTrusted(jid);
+			
+			sendAdminNotification(jid.toString(), STATUS.DISCONNECTED);
+		}
 	}
 
 	@Override
@@ -420,7 +416,6 @@ public class SessionManagerClustered
 
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
-		super.setProperties(props);
 		if (props.get(STRATEGY_CLASS_PROP_KEY) != null) {
 			String strategy_class = (String) props.get(STRATEGY_CLASS_PROP_KEY);
 
@@ -440,8 +435,6 @@ public class SessionManagerClustered
 				strategy.setSessionManagerHandler(this);
 				log.log(Level.CONFIG, "Loaded SM strategy: {0}", strategy_class);
 
-				// strategy.nodeConnected(getComponentId());
-				addTrusted(getComponentId());
 				if (clusterController != null) {
 					strategy.setClusterController(clusterController);
 				}
@@ -454,6 +447,7 @@ public class SessionManagerClustered
 					strategy_class);		
 			}
 		}
+		super.setProperties(props);
 		updateServiceEntity();
 		try {
 			if (props.get(MY_DOMAIN_NAME_PROP_KEY) != null) {

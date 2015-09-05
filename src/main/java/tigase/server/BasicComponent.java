@@ -74,6 +74,7 @@ import tigase.xmpp.JID;
 
 import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.script.ScriptEngineFactory;
@@ -128,7 +129,10 @@ public class BasicComponent
 	private ServiceEntity       serviceEntity           = null;
 	private boolean             initializationCompleted = false;
 	private String[]		    trustedProp = null;
-	private final CopyOnWriteArrayList<String> connectedNodes = new CopyOnWriteArrayList<String>();
+	private final CopyOnWriteArrayList<JID> connectedNodes = new CopyOnWriteArrayList<JID>();
+	private final List<JID> connectedNodes_ro = Collections.unmodifiableList(connectedNodes);
+	private final CopyOnWriteArrayList<JID> connectedNodesWithLocal = new CopyOnWriteArrayList<JID>();
+	private final List<JID> connectedNodesWithLocal_ro = Collections.unmodifiableList(connectedNodesWithLocal);
 
 	//~--- methods --------------------------------------------------------------
 
@@ -278,6 +282,8 @@ public class BasicComponent
 		binds.put(CommandIfc.ADMN_DISC, serviceEntity);
 		binds.put(CommandIfc.SCRIPT_BASE_DIR, scriptsBaseDir);
 		binds.put(CommandIfc.SCRIPT_COMP_DIR, scriptsCompDir);
+		binds.put(CommandIfc.CONNECTED_NODES, connectedNodes);
+		binds.put(CommandIfc.CONNECTED_NODES_WITH_LOCAL, connectedNodesWithLocal);
 		binds.put(CommandIfc.COMPONENT_NAME, getName());
 		binds.put(CommandIfc.COMPONENT, this);
 	}
@@ -295,14 +301,56 @@ public class BasicComponent
 	
 	@Override
 	public void nodeConnected(String node) {
-		connectedNodes.addIfAbsent(node);
-		refreshTrustedJids();
+		JID jid = JID.jidInstanceNS(getName(), node, null);
+		boolean added = false;
+		
+		synchronized (connectedNodesWithLocal) {
+			if (!connectedNodesWithLocal.contains(jid)) {
+				JID[] tmp = connectedNodesWithLocal.toArray(new JID[connectedNodesWithLocal.size() + 1]);
+				tmp[tmp.length-1] = jid;
+				Arrays.sort(tmp);
+				int pos = Arrays.binarySearch(tmp, jid);
+				connectedNodesWithLocal.add(pos, jid);
+				added = true;
+			}
+		}
+		
+		synchronized (connectedNodes) {
+			if (!connectedNodes.contains(jid) && !getComponentId().equals(jid)) {
+				JID[] tmp = connectedNodes.toArray(new JID[connectedNodes.size() + 1]);
+				tmp[tmp.length-1] = jid;
+				Arrays.sort(tmp);
+				int pos = Arrays.binarySearch(tmp, jid);
+				connectedNodes.add(pos, jid);
+				added = true;
+			}
+		}
+		
+		if (added) {
+			log.log(Level.FINE, "Node connected: {0}", node);
+			onNodeConnected(jid);
+			refreshTrustedJids();
+		}
 	}
 	
 	@Override
 	public void nodeDisconnected(String node) {
-		connectedNodes.remove(node);
-		refreshTrustedJids();
+		JID jid = JID.jidInstanceNS(getName(), node, null);
+		boolean removed = false;
+		
+		synchronized (connectedNodesWithLocal) {
+			removed |= connectedNodesWithLocal.remove(jid);
+		}
+		
+		synchronized (connectedNodes) {
+			removed |= connectedNodes.remove(jid);
+		}
+		
+		if (removed) {
+			log.log(Level.FINE, "Node disonnected: {0}", node);
+			onNodeDisconnected(jid);
+			refreshTrustedJids();
+		}
 	}
 	
 	@Override
@@ -719,6 +767,9 @@ public class BasicComponent
 		for (CommandIfc comm : scriptCommands.values()) {
 			comm.getStatistics(compName, list);
 		}
+		if (connectedNodes.size() > 0) {
+			list.add(getName(), "Known cluster nodes", connectedNodes.size(), Level.INFO);
+		}
 	}
 	
 	/**
@@ -860,7 +911,7 @@ public class BasicComponent
 				trustedProp = (String[]) props.get(TRUSTED_PROP_KEY);				
 			}
 		}
-		connectedNodes.add(defHostname.getDomain());
+		nodeConnected(defHostname.getDomain());
 		refreshTrustedJids();
 		if (isInitializationComplete()) {
 
@@ -937,6 +988,22 @@ public class BasicComponent
 
 	//~--- methods --------------------------------------------------------------
 
+	public List<JID> getNodesConnected() {
+		return connectedNodes_ro;
+	}
+	
+	public List<JID> getNodesConnectedWithLocal() {
+		return connectedNodesWithLocal_ro;
+	}
+	
+	protected void onNodeConnected(JID jid) {
+		
+	}
+	
+	protected void onNodeDisconnected(JID jid) {
+		
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -1211,7 +1278,8 @@ public class BasicComponent
 			if (trustedProp != null) {
 				for (String trustedStr : trustedProp) {
 					if (trustedStr.contains("{clusterNode}")) {
-						for (String node : connectedNodes) {
+						for (JID nodeJid : connectedNodes) {
+							String node = nodeJid.getDomain();
 							String jid = trustedStr.replace("{clusterNode}", node);
 							trusted.add(jid);	
 						}

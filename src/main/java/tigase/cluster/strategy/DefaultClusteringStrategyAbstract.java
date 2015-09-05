@@ -56,7 +56,7 @@ import tigase.server.Iq;
  *
  * @param <E>
  */
-public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
+public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 				implements ClusteringStrategyIfc<E> {
 	private static final String ERROR_FORWARDING_KEY = "error-forwarding";
 
@@ -78,7 +78,6 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 	protected SessionManagerClusteredIfc sm = null;
 
 	/** Field description */
-	protected CopyOnWriteArrayList<JID> cl_nodes_list   = new CopyOnWriteArrayList<JID>();
 	private Set<CommandListener>        commands =
 			new CopyOnWriteArraySet<CommandListener>();
 	private ErrorForwarding             errorForwarding = ErrorForwarding.drop;
@@ -148,22 +147,6 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 	public void handleLocalUserLogout(BareJID userId, XMPPResourceConnection conn) {
 
 		// Do nothing
-	}
-	
-	@Override
-	public void nodeConnected(JID jid) {
-		boolean result = cl_nodes_list.addIfAbsent(jid);
-
-		log.log(Level.FINE, "Cluster nodes: {0}, added: {1}", new Object[] { cl_nodes_list,
-				result });
-	}
-
-	@Override
-	public void nodeDisconnected(JID jid) {
-		boolean result = cl_nodes_list.remove(jid);
-
-		log.log(Level.FINE, "Cluster nodes: {0}, removed: {1}", new Object[] { cl_nodes_list,
-				result });
 	}
 
 	@Override
@@ -241,8 +224,8 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
-	public List<JID> getAllNodes() {
-		return cl_nodes_list;
+	public List<JID> getNodesConnected() {
+		return sm.getNodesConnected();
 	}
 
 	@Override
@@ -317,7 +300,7 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 		if (isSuitableForForward(packet)) {
 
 			// nodes = metadata.getNodesForJid(jidLookup);
-			nodes = getAllNodes();
+			nodes = getNodesConnected();
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Selected nodes: {0}, for packet: {1}", new Object[] {
 						nodes,
@@ -335,7 +318,6 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 
 	@Override
 	public void getStatistics(StatisticsList list) {
-		list.add("cluster-strat", "Connected nodes", cl_nodes_list.size(), Level.INFO);
 		for (CommandListener cmd : commands) {
 			cmd.getStatistics(list);
 		}

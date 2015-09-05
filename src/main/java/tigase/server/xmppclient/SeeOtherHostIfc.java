@@ -31,6 +31,7 @@ import tigase.xml.Element;
 
 import java.util.List;
 import java.util.Map;
+import tigase.xmpp.JID;
 
 /**
  * @author Wojtek
@@ -76,7 +77,7 @@ public interface SeeOtherHostIfc {
 	 *
 	 * @param nodes current list of nodes
 	 */
-	void setNodes(List<BareJID> nodes);
+	void setNodes(List<JID> nodes);
 
 	// ~--- properties ----------------------------------------------------------
 	void getDefaults( Map<String, Object> defs, Map<String, Object> params );

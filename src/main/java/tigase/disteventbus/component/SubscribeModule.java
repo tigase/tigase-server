@@ -54,7 +54,9 @@ public class SubscribeModule extends AbstractEventBusModule {
 
 	}
 
-	public void clusterNodeConnected(String node) {
+	public void clusterNodeConnected(JID node) {
+		if (context.getComponentID().equals(node))
+			return;
 		// context.getSubscriptionStore().addSubscription(null,
 		// "tigase:eventbus", JID.jidInstanceNS("eventbus", node, null));
 
@@ -77,13 +79,16 @@ public class SubscribeModule extends AbstractEventBusModule {
 		}
 
 		if (!pubsubNodes.isEmpty())
-			sendSubscribeRequest("eventbus@" + node, pubsubNodes);
+			sendSubscribeRequest("eventbus@" + node.getDomain(), pubsubNodes);
 	}
 
-	public void clusterNodeDisconnected(String node) {
+	public void clusterNodeDisconnected(JID node) {
+		if (context.getComponentID().equals(node))
+			return;
+		
 		if (log.isLoggable(Level.FINER))
 			log.finer("Node " + node + " is disconnected.");
-		context.getSubscriptionStore().remove(new Subscription(JID.jidInstanceNS("eventbus", node, null)));
+		context.getSubscriptionStore().remove(new Subscription(JID.jidInstanceNS("eventbus", node.getDomain(), null)));
 	}
 
 	@Override
@@ -97,9 +102,12 @@ public class SubscribeModule extends AbstractEventBusModule {
 	}
 
 	protected void onAddHandler(String eventName, String eventXmlns) {
-		for (String node : context.getConnectedNodes()) {
+		for (JID node : context.getConnectedNodes()) {
+			if (context.getComponentID().equals(node))
+				continue;
+			
 			Element se = prepareSubscribeElement(new EventName(eventName, eventXmlns), context.getComponentID(), null);
-			sendSubscribeRequest("eventbus@" + node, Collections.singleton(se));
+			sendSubscribeRequest("eventbus@" + node.getDomain(), Collections.singleton(se));
 		}
 	}
 
@@ -182,8 +190,10 @@ public class SubscribeModule extends AbstractEventBusModule {
 		if (log.isLoggable(Level.FINER))
 			log.finer("Forwarding subscription to: " + context.getConnectedNodes());
 
-		for (String node : context.getConnectedNodes()) {
-			sendSubscribeRequest("eventbus@" + node, subscribedNodes);
+		for (JID node : context.getConnectedNodes()) {
+			if (context.getComponentID().equals(node))
+				 continue;
+			sendSubscribeRequest("eventbus@" + node.getDomain(), subscribedNodes);
 		}
 
 		return response;

@@ -27,6 +27,7 @@ import tigase.disteventbus.component.stores.SubscriptionStore;
 import tigase.disteventbus.impl.LocalEventBus;
 import tigase.stats.StatisticsList;
 import tigase.xml.Element;
+import tigase.xmpp.JID;
 
 public class EventBusComponent extends AbstractComponent<EventBusContext> implements ClusteredComponentIfc {
 
@@ -45,8 +46,8 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 		}
 
 		@Override
-		public Collection<String> getConnectedNodes() {
-			return Collections.unmodifiableCollection(connectedNodes);
+		public Collection<JID> getConnectedNodes() {
+			return Collections.unmodifiableCollection(getConnectedNodes());
 		}
 
 		@Override
@@ -65,8 +66,6 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 	private static long counter = 0;
 
 	private final AffiliationStore affiliationStore = new AffiliationStore();
-
-	private final Set<String> connectedNodes = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
 
 	private final Map<String, ListenerScript> listenersScripts = new ConcurrentHashMap<String, ListenerScript>();
 
@@ -128,8 +127,6 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
-
-		list.add(getName(), "Known cluster nodes", connectedNodes.size(), Level.INFO);
 	}
 
 	@Override
@@ -143,30 +140,22 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 	}
 
 	@Override
-	public void nodeConnected(String node) {
-		super.nodeConnected(node);
-		connectedNodes.add(node);
-
-		if (log.isLoggable(Level.FINEST))
-			log.finest("Node added. Known nodes: " + connectedNodes);
+	protected void onNodeConnected(JID jid) {
+		super.onNodeConnected(jid);
 
 		Module module = modulesManager.getModule(SubscribeModule.ID);
 		if (module != null && module instanceof SubscribeModule) {
-			((SubscribeModule) module).clusterNodeConnected(node);
+			((SubscribeModule) module).clusterNodeConnected(jid);
 		}
 	}
 
 	@Override
-	public void nodeDisconnected(String node) {
-		super.nodeDisconnected(node);
-		connectedNodes.remove(node);
-
-		if (log.isLoggable(Level.FINEST))
-			log.finest("Node removed. Known nodes: " + connectedNodes);
+	public void onNodeDisconnected(JID jid) {
+		super.onNodeDisconnected(jid);
 
 		Module module = modulesManager.getModule(SubscribeModule.ID);
 		if (module != null && module instanceof SubscribeModule) {
-			((SubscribeModule) module).clusterNodeDisconnected(node);
+			((SubscribeModule) module).clusterNodeDisconnected(jid);
 		}
 	}
 

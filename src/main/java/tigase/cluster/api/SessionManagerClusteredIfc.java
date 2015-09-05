@@ -30,6 +30,7 @@ package tigase.cluster.api;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.List;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManagerHandler;
 
@@ -127,6 +128,8 @@ public interface SessionManagerClusteredIfc
 	 * @return true - if there is XMPPResourceConnection for connection JID
 	 */
 	boolean hasXMPPResourceConnectionForConnectionJid(JID connJid);
+	
+	List<JID> getNodesConnected();
 }
 
 
