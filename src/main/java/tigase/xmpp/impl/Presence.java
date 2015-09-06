@@ -352,9 +352,9 @@ public class Presence
 				offlineRosterLastSeen = tmp.split( "," );
 				log.log( Level.CONFIG, "Loaded roster offline last seen config: {0}", tmp );
 			}
-		} else {
-			offlineRosterLastSeen = new String[] {"*"};
-			log.config("No configuration found for Loaded roster offline last seen. - enabling for All clients");
+//		} else {
+//			offlineRosterLastSeen = new String[] {"*"};
+//			log.config("No configuration found for Loaded roster offline last seen. - enabling for All clients");
 		}
 		tmp = (String) settings.get(PRESENCE_GLOBAL_FORWARD);
 		if (tmp != null) {
