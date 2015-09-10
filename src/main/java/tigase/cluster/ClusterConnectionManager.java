@@ -69,6 +69,7 @@ import tigase.net.SocketType;
 import tigase.osgi.ModulesManagerImpl;
 
 import tigase.server.ConnectionManager;
+import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.ServiceChecker;
 
@@ -404,6 +405,17 @@ public class ClusterConnectionManager
 			if (p.getElemName().equals("handshake")) {
 				processHandshake(p, serv);
 			} else {
+				if (p.getAttributeStaticStr(new String[] { Iq.ELEM_NAME, "ping" }, "xmlns") == "urn:xmpp:ping" 
+						&& getDefHostName().getDomain().equals(p.getStanzaTo().getDomain()) 
+						&& p.getStanzaFrom().getDomain().equals(serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY))) {
+					// received PING between cluster nodes to confirm connectivity
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "{0}, received XMPP ping", serv);
+					}
+					serv.getSessionData().put("lastConnectivityCheck", System.currentTimeMillis());
+					continue;
+				}
+					
 
 				// ++packetsReceived;
 				Packet result = p;
@@ -457,7 +469,7 @@ public class ClusterConnectionManager
 			// Send init xmpp stream here
 			String remote_host = (String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 
-			serv.getSessionData().put(XMPPIOService.HOSTNAME_KEY, remote_host);
+			serv.getSessionData().put(XMPPIOService.HOSTNAME_KEY, getDefHostName().toString());
 			serv.getSessionData().put(PORT_ROUTING_TABLE_PROP_KEY, new String[] { remote_host,
 					".*@" + remote_host, ".*\\." + remote_host });
 
@@ -595,7 +607,7 @@ public class ClusterConnectionManager
 		case accept : {
 			String remote_host = attribs.get("from");
 
-			service.getSessionData().put(XMPPIOService.HOSTNAME_KEY, remote_host);
+			service.getSessionData().put(XMPPIOService.HOSTNAME_KEY, getDefHostName().toString());
 			service.getSessionData().put(PORT_REMOTE_HOST_PROP_KEY, remote_host);
 			service.getSessionData().put(PORT_ROUTING_TABLE_PROP_KEY, new String[] {
 					remote_host,
@@ -691,6 +703,10 @@ public class ClusterConnectionManager
 		props.put(CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY, conns_int);
 		props.put(ELEMENTS_NUMBER_LIMIT_PROP_KEY, ELEMENTS_NUMBER_LIMIT_CLUSTER_PROP_VAL);
 
+		props.put(WATCHDOG_PING_TYPE_KEY, WATCHDOG_PING_TYPE.XMPP);
+		props.put(WATCHDOG_DELAY, 30 * SECOND);
+		props.put(WATCHDOG_TIMEOUT, -1 * SECOND);
+		
 		if (getDefHostName().toString().equalsIgnoreCase( "localhost") ) {
 			TigaseRuntime.getTigaseRuntime().shutdownTigase( new String [] {
 				"",
@@ -842,7 +858,9 @@ public class ClusterConnectionManager
 							 new Object[] { size, connectionsPool, serv, conns } );
 		}
 
-
+		// setting userJid to hostname of remote cluster node
+		serv.setUserJid((String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY));
+		
 		conns.add( serv );
 		if ( size == 0 && conns.size() > 0 ){
 			updateRoutings(routings, true);
@@ -897,7 +915,7 @@ public class ClusterConnectionManager
 
 	@Override
 	protected long getMaxInactiveTime() {
-		return 1000 * 24 * HOUR;
+		return 3 * MINUTE;
 	}
 
 	@Override
@@ -1175,6 +1193,20 @@ public class ClusterConnectionManager
 					"ServiceConnectedTimer timeout expired, closing connection: {0}", serv);
 			serv.forceStop();
 		}
+	}
+	
+	protected class Watchdog extends ConnectionManager.Watchdog {
+
+		@Override
+		protected long getDurationSinceLastTransfer(final XMPPIOService service) {
+			Long lastTransfer = (Long) service.getSessionData().get("lastConnectivityCheck");
+			if (lastTransfer == null) {
+				service.getSessionData().put("lastConnectivityCheck", System.currentTimeMillis() - watchdogTimeout);
+				return watchdogTimeout;
+			}
+			return System.currentTimeMillis() - lastTransfer;
+		}
+		
 	}
 }
 

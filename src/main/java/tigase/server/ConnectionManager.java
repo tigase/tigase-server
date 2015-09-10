@@ -851,10 +851,14 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	}
 
 	protected void setupWatchdogThread() {
-		watchdog = new Thread(new Watchdog(), "Watchdog - " + getName());
+		watchdog = new Thread( newWatchdog(), "Watchdog - " + getName());
 		watchdog.setDaemon(true);
 	}
 
+	protected Watchdog newWatchdog() {
+		return new Watchdog();
+	}
+	
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
@@ -1512,10 +1516,25 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 * respond within defined time then the service is stopped.
 	 *
 	 */
-	private class Watchdog
+	protected class Watchdog
 					implements Runnable {
 
 		Packet pingPacket;
+		
+		protected long getDurationSinceLastTransfer(final XMPPIOService service) {
+			long curr_time = System.currentTimeMillis();
+			long lastTransfer;
+			switch (watchdogPingType) {
+				case XMPP:
+					lastTransfer = service.getLastXmppPacketReceiveTime();
+					break;
+				case WHITESPACE:
+				default:
+					lastTransfer = service.getLastTransferTime();
+					break;
+			}
+			return curr_time - lastTransfer;
+		}
 		
 		@Override
 		public void run() {
@@ -1536,19 +1555,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 						public void check(final XMPPIOService service) {
 							try {
 								if ( null != service ){
-									long curr_time = System.currentTimeMillis();
-									long lastTransfer;
-									switch (watchdogPingType) {
-										case XMPP:
-											lastTransfer = service.getLastXmppPacketReceiveTime();
-											break;
-										case WHITESPACE:
-										default:
-											lastTransfer = service.getLastTransferTime();
-											break;
-									}
-
-									if ( curr_time - lastTransfer >= maxInactivityTime ){
+									long sinceLastTransfer = getDurationSinceLastTransfer(service);
+									if ( sinceLastTransfer >= maxInactivityTime ){
 
 										// Stop the service if max keep-alive time is exceeded
 										// for non-active connections.
@@ -1561,16 +1569,19 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 										++watchdogStopped;
 										service.stop();
 									} else {
-										if ( curr_time - lastTransfer >= ( watchdogTimeout ) ){
+										if ( sinceLastTransfer >= ( watchdogTimeout ) ){
 
 											/** At least once every configured timings check if the
 											 * connection is still alive with the use of configured
 											 * ping type. */
 											switch ( watchdogPingType ) {
 												case XMPP:
-													 pingPacket = Iq.packetInstance( pingElement.clone(),
-														 JID.jidInstanceNS( (String) service.getSessionData().get( XMPPIOService.HOSTNAME_KEY ) ),
-														 JID.jidInstanceNS( service.getUserJid() ) );
+													pingPacket = Iq.packetInstance( pingElement.clone(),
+														JID.jidInstanceNS( (String) service.getSessionData().get( XMPPIOService.HOSTNAME_KEY ) ),
+														JID.jidInstanceNS( service.getUserJid() ) );
+													if (log.isLoggable(Level.FINEST)) {
+														log.log(Level.FINEST, "{0}, sending XMPP ping {1}", new Object[] { service, pingPacket });
+													}
 													if ( !writePacketToSocket( (IO) service, pingPacket ) ){
 														// writing failed, stopp service
 														++watchdogStopped;
