@@ -199,6 +199,12 @@ public class MessageCarbons
 					// forking of messages sent to bare jid
 					// we need to fork this message
 					skipForkingTo = messageProcessor.getJIDsForMessageDelivery(session);
+					
+					// we should skip forking to JID with enabled message carbons if jid is not from local node
+					for (JID jid : resources.keySet()) {
+						if (session.getParentSession().getResourceForJID(jid) == null)
+							skipForkingTo.add(jid);
+					}
 				} else {
 					skipForkingTo = Collections.singleton(session.getJID());
 				}
