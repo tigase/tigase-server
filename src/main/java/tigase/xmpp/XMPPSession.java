@@ -163,8 +163,8 @@ public class XMPPSession {
 	 * @param conn
 	 */
 	public void removeResourceConnection(XMPPResourceConnection conn) {
-		activeResources.remove(conn);
-		conn.removeParentSession(null);
+		if (activeResources.remove(conn))
+			conn.removeParentSession(null);
 	}
 
 	/**

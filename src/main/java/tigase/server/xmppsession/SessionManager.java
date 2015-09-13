@@ -142,6 +142,8 @@ public class SessionManager
 	 */
 	private static final Logger log = Logger.getLogger(SessionManager.class.getName());
 
+	private static final String SESSION_CLOSE_TIMER_KEY = "session-close-timer";
+	
 	//~--- fields ---------------------------------------------------------------
 
 	private AuthRepository                   auth_repository                 = null;
@@ -1334,7 +1336,7 @@ public class SessionManager
 		}
 
 		break;
-
+			
 		case STREAM_CLOSED : {
 			fastAddOutPacket(iqc.okResult((String) null, 0));
 
@@ -1366,9 +1368,13 @@ public class SessionManager
 			// so let's at first remove XMPPResourceConnection in this thread and later add packet to 
 			// queue to close it later on
 			if (connection != null) {
-				// first remove connection from connections map
-				connectionsByFrom.remove(iqc.getFrom(), connection);
-				
+				if (!connection.isAuthorized()) {
+					// first remove connection from connections map
+					// only if connection is not authorized as in other case
+					// it will be removed on end of stream in STREAM_FINISHED
+					connectionsByFrom.remove(iqc.getFrom(), connection);
+				}
+
 				// ok, now remove connection from session
 				XMPPSession session = connection.getParentSession();
 				if (session != null) {
@@ -1382,15 +1388,20 @@ public class SessionManager
 				}
 			}
 			
-			// now we add packet to processing thread to let it close properly in separate thread
-			ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(sessionCloseProc
-					.id());
+			if (connection == null || !connection.isAuthorized()) {
+				// now we add packet to processing thread to let it close properly in separate thread
+				ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(sessionCloseProc
+						.id());
 
-			if (pt == null) {
-				pt = workerThreads.get(defPluginsThreadsPool);
+				if (pt == null) {
+					pt = workerThreads.get(defPluginsThreadsPool);
+				}
+				pt.addItem(sessionCloseProc, iqc, connection);
+			} else {
+				tigase.util.TimerTask task = new SessionCloseTimer(iqc.getFrom(), connection.getSessionId());
+				addTimerTask(task, 10, TimeUnit.SECONDS);
+				connection.putSessionData(SESSION_CLOSE_TIMER_KEY, task);
 			}
-			pt.addItem(sessionCloseProc, iqc, connection);
-			
 			processing_result = true;
 		}
 
@@ -1463,6 +1474,36 @@ public class SessionManager
 
 		break;
 
+		case STREAM_FINISHED:
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "{0} processing command, connection: {1}", new Object[] {
+						iqc.getCommand(), ((connection != null)
+						? connection
+						: " is null") });
+			}
+			if (connection != null) {
+				tigase.util.TimerTask task = (tigase.util.TimerTask) connection.getSessionData(SESSION_CLOSE_TIMER_KEY);
+				if (task != null) {
+					// cancel existing timer task as it will not be needed
+					task.cancel();
+				}
+				// first remove connection from connections map
+				connectionsByFrom.remove(iqc.getFrom(), connection);
+			}
+			
+			// now we add packet to processing thread to let it close properly in separate thread
+			ProcessingThreads<ProcessorWorkerThread> pt = workerThreads.get(sessionCloseProc
+					.id());
+
+			if (pt == null) {
+				pt = workerThreads.get(defPluginsThreadsPool);
+			}
+			pt.addItem(sessionCloseProc, iqc, connection);
+			
+			processing_result = true;
+			
+		break;
+			
 		case USER_STATUS :
 			try {
 			final boolean isTrusted = isTrusted(iqc.getStanzaFrom())
@@ -2586,6 +2627,38 @@ public class SessionManager
 		}
 	}
 
+	/**
+	 * Class implements timer which will be scheduled on STREAM_CLOSED to ensure
+	 * that session is properly closed, even if STREAM_FINISHED would not be received
+	 */
+	private class SessionCloseTimer extends tigase.util.TimerTask {
+		private JID connId = null;
+		private String sessId = null;
+
+		//~--- constructors -------------------------------------------------------
+
+		private SessionCloseTimer(JID connId, String sessId) {
+			this.connId = connId;
+			this.sessId = sessId;
+		}
+
+		//~--- methods ------------------------------------------------------------
+
+		@Override
+		public void run() {
+			XMPPResourceConnection conn = connectionsByFrom.get(connId);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "session closed timer executed for connId = {0}, "
+						+ "sessionId = {1}, conn = {2}", new Object[] { connId, sessId, conn });
+			}
+			// if connection still exists then close it
+			if (conn != null && (sessId == null || sessId.equals(conn.getSessionId()))) {
+				connectionsByFrom.remove(connId, conn);
+			
+				closeConnection(conn, connId, null, false);
+			}
+		}		
+	}
 
 	private class StaleConnectionCloser
 					extends tigase.util.TimerTask {

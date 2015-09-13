@@ -575,6 +575,14 @@ public class BoshSession {
 						}
 					}
 				}
+				if (terminate) {
+					Packet command = Command.STREAM_CLOSED.getPacket(handler.getJidForBoshSession(this),
+							getDataReceiver(), StanzaType.set, UUID.randomUUID().toString());
+					if (userJid != null) {
+						Command.addFieldValue(command, "user-jid", userJid.toString());
+					}
+					handler.addOutStreamClosed(command, this);
+				}
 			} else {
 				log.info("Duplicated packet: " + packet.toString());
 			}
@@ -607,6 +615,13 @@ public class BoshSession {
 				}	
 				handler.addOutStreamClosed(command, this);
 
+				command = Command.STREAM_FINISHED.getPacket(handler.getJidForBoshSession(this),
+						getDataReceiver(), StanzaType.set, UUID.randomUUID().toString());
+				if (userJid != null) {
+					Command.addFieldValue(command, "user-jid", userJid.toString());
+				}	
+				handler.addOutStreamClosed(command, this);
+				
 				// out_results.offer(command);
 			} catch (PacketErrorTypeException e) {
 				log.info("Error type and incorrect from bosh client? Ignoring...");
@@ -729,6 +744,14 @@ public class BoshSession {
 //					log.info("Packet processing exception: " + e);
 				}
 			}
+			
+			command = Command.STREAM_FINISHED.getPacket(handler.getJidForBoshSession(this), 
+					getDataReceiver(), StanzaType.set, UUID.randomUUID().toString());
+			if (userJid != null) {
+				Command.addFieldValue(command, "user-jid", userJid.toString());
+			}			
+
+			handler.addOutStreamClosed(command, this);
 			
 			closeAllConnections();
 

@@ -402,7 +402,7 @@ public class ClientConnectionManager
 				// In case of mass-disconnects, adjust the timeout properly
 				addOutPacketWithTimeout(command, stoppedHandler, 120l, TimeUnit.SECONDS);
 				log.log(Level.FINE, "Service stopped, sending packet: {0}", command);
-
+				
 				//// For testing only.
 				// System.out.println("Service stopped: " +
 				// service.getUniqueId());
@@ -411,6 +411,13 @@ public class ClientConnectionManager
 				// System.out.println("Service stopped: " +
 				// service.getUniqueId());
 				// Thread.dumpStack();
+				processSocketData(serv);
+				
+				if (userJid != null) {
+					command = Command.STREAM_FINISHED.getPacket(serv.getConnectionId(), serv
+							.getDataReceiver(), StanzaType.set, UUID.randomUUID().toString());
+					addOutPacket(command);
+				}
 			} else {
 				log.fine("Service stopped, before stream:stream received");
 			}
