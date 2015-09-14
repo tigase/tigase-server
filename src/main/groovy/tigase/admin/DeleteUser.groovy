@@ -125,7 +125,7 @@ for (userJid in userJids) {
 					// then the second call to user_repo may throw the exception which is fine.
 				}
 				if (clusterMode && notifyCluster) {
-					def nodes = (List)clusterStrategy.getAllNodes();
+					def nodes = (List)clusterStrategy.getNodesConnected();
 					if (nodes && nodes.size() > 0 ) {
 						nodes.each { node ->
 							def forward = p.copyElementOnly();

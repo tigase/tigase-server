@@ -74,7 +74,7 @@ def results = new LinkedList<Packet>();
 
 
 if (clusterMode && notifyCluster) {
-	def nodes = (List)clusterStrategy.getAllNodes();
+	def nodes = (List)clusterStrategy.getNodesConnected();
 	if (nodes && nodes.size() > 0 ) {
 		nodes.each { node ->
 			def forward = p.copyElementOnly();
