@@ -297,8 +297,17 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 		" from " + JID_TABLE + " where " + JID_SHA_COLUMN + " = ?";
         private static final String MSG_COUNT_FOR_TO_AND_FROM_QUERY_DEF =
                 "select count(*) from " + MSG_TABLE + " where " + MSG_TO_UID_COLUMN + " = ? and " + MSG_FROM_UID_COLUMN + " = ?";
-	private static final String ADD_USER_JID_ID_QUERY = 
-		"insert into " + JID_TABLE + " ( " + JID_SHA_COLUMN + ", " + JID_COLUMN + ") values (?, ?)";
+	private static final String ADD_USER_JID_ID_QUERY =
+		"insert into " + JID_TABLE + " ( " + JID_SHA_COLUMN + ", " + JID_COLUMN + ") select ?, ? "
+		+ "WHERE NOT EXISTS (SELECT 1 FROM " + JID_TABLE+ " WHERE " + JID_SHA_COLUMN + " = ? AND " + JID_COLUMN +" = ? )";
+	private static final String ADD_USER_JID_ID_QUERY_MYSQL =
+		"insert into " + JID_TABLE + " ( " + JID_SHA_COLUMN + ", " + JID_COLUMN + ") select ?, ? "
+		+ "from dual "
+		+ "WHERE NOT EXISTS (SELECT 1 FROM " + JID_TABLE+ " WHERE " + JID_SHA_COLUMN + " = ? AND " + JID_COLUMN +" = ? )";
+	private static final String ADD_USER_JID_ID_QUERY_DERBY =
+		"insert into " + JID_TABLE + " ( " + JID_SHA_COLUMN + ", " + JID_COLUMN + ") select ?, ? "
+		+ "FROM SYSIBM.SYSDUMMY1 "
+		+ "WHERE NOT EXISTS (SELECT 1 FROM " + JID_TABLE+ " WHERE " + JID_SHA_COLUMN + " = ? AND " + JID_COLUMN +" = ? )";
 	/* @formatter:on */
 	private static final String GET_USER_UID_PROP_KEY = "user-uid-query";
 	private static final String MSGS_COUNT_LIMIT_PROP_KEY = "count-limit-query";
@@ -314,6 +323,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 	private String msg_count_for_limit_query = MSG_COUNT_FOR_TO_AND_FROM_QUERY_DEF;
 	private String msg_insert_message_to_broadcast = SQL_MSG_INSERT_MESSAGE_TO_BROADCAST;
 	private String msg_ensure_broadcast_recipient = SQL_MSG_ENSURE_BROADCAT_RECIPIETN;
+	private String add_user_jid_id = ADD_USER_JID_ID_QUERY;
 	private boolean initialized = false;
 	private Map<BareJID, Long> uids_cache = Collections
 			.synchronizedMap(new SimpleCache<BareJID, Long>(MAX_UID_CACHE_SIZE,
@@ -357,6 +367,17 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 					msg_insert_message_to_broadcast = SQL_MSG_INSERT_MESSAGE_TO_BROADCAST;
 					break;
 			}
+			switch (data_repo.getDatabaseType()) {
+				case mysql:
+					add_user_jid_id = ADD_USER_JID_ID_QUERY_MYSQL;
+					break;
+				case derby:
+					add_user_jid_id = ADD_USER_JID_ID_QUERY_DERBY;
+					break;
+				default:
+					add_user_jid_id = ADD_USER_JID_ID_QUERY;
+					break;
+			}
 
 			// Check if DB is correctly setup and contains all required tables.
 			checkDB();
@@ -372,7 +393,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 					MSG_SELECT_EXPIRED_BEFORE_QUERY);
 			data_repo.initPreparedStatement(msg_count_for_limit_query,
 					msg_count_for_limit_query);
-			data_repo.initPreparedStatement(ADD_USER_JID_ID_QUERY, ADD_USER_JID_ID_QUERY);
+			data_repo.initPreparedStatement(add_user_jid_id, add_user_jid_id);
 			data_repo.initPreparedStatement(MSG_SELECT_BROADCAST_RECIPIENTS, MSG_SELECT_BROADCAST_RECIPIENTS);
 			data_repo.initPreparedStatement(MSG_SELECT_MESSAGES_TO_BROADCAST, MSG_SELECT_MESSAGES_TO_BROADCAST);
 			if (data_repo.getDatabaseType() == dbTypes.derby) {
@@ -955,11 +976,13 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 		try {
 			String jid_sha = Algorithms.hexDigest(bareJID.toString(), "", "SHA");
 			PreparedStatement add_jid_id_st =
-					data_repo.getPreparedStatement(bareJID, ADD_USER_JID_ID_QUERY);
+					data_repo.getPreparedStatement(bareJID, add_user_jid_id);
 
 			synchronized (add_jid_id_st) {
 				add_jid_id_st.setString(1, jid_sha);
 				add_jid_id_st.setString(2, bareJID.toString());
+				add_jid_id_st.setString( 3, jid_sha );
+				add_jid_id_st.setString( 4, bareJID.toString() );
 				add_jid_id_st.executeUpdate();
 			}
 
