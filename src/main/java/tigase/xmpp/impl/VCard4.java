@@ -182,7 +182,7 @@ public class VCard4 extends VCardXMPPProcessorAbstract {
 				results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 						"You must authorize session first.", true));
 			} catch (TigaseDBException ex) {
-				log.warning("Database problem, please contact admin: " + ex);
+				log.log(Level.WARNING, "Database problem, please contact admin: " + ex, ex);
 				results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
 						"Database access problem, please contact administrator.", true));
 			}
