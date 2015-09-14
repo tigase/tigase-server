@@ -47,7 +47,7 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 
 		@Override
 		public Collection<JID> getConnectedNodes() {
-			return Collections.unmodifiableCollection(getConnectedNodes());
+			return Collections.unmodifiableCollection(getNodesConnected());
 		}
 
 		@Override
