@@ -75,7 +75,7 @@ def isServiceAdmin = admins.contains(stanzaFromBare);
 
 def rosterOwnerJid = Command.getFieldValue(packet, ROSTER_OWNER_JID)
 def rosterAction = Command.getFieldValue(packet, ROSTER_ACTION)
-def rosterBuddyList = Command.getFieldValues(packet, ROSTER_BUDDY_LIST)
+def rosterBuddyList = Command.getFieldValues(packet, ROSTER_BUDDY_LIST) as List;
 
 //def rosterNotifyCluster = Command.getFieldValue(packet, ROSTER_NOTIFY_CLUSTER)
 
