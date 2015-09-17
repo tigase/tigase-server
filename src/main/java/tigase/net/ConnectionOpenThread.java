@@ -152,10 +152,12 @@ public class ConnectionOpenThread
 	public void run() {
 		while (!stopping) {
 			try {
-				selector.select();
+				int select = selector.select();
 
-				// Set<SelectionKey> selected_keys = selector.selectedKeys();
-				// for (SelectionKey sk : selected_keys) {
+				if ( log.isLoggable( Level.FINEST ) ){
+					log.log( Level.FINEST, "Selected: " + select + " from selector: " + selector );
+				}
+
 				for (Iterator i = selector.selectedKeys().iterator(); i.hasNext(); ) {
 					SelectionKey sk = (SelectionKey) i.next();
 
