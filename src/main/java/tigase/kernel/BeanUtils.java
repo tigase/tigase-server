@@ -1,5 +1,9 @@
 package tigase.kernel;
 
+import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.core.BeanConfig;
+import tigase.kernel.core.DependencyManager;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -8,6 +12,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class BeanUtils {
+
+	private BeanUtils() {
+	}
 
 	public static Method[] getAllMethods(Class<?> klass) {
 		List<Method> fields = new ArrayList<Method>();
@@ -28,6 +35,18 @@ public class BeanUtils {
 			return field.get(fromBean);
 		}
 
+	}
+
+	public static java.lang.reflect.Field getField(BeanConfig bc, String fieldName) {
+		final Class<?> cl = bc.getClazz();
+		java.lang.reflect.Field[] fields = DependencyManager.getAllFields(cl);
+		for (java.lang.reflect.Field field : fields) {
+			final ConfigField cf = field.getAnnotation(ConfigField.class);
+			if (cf != null && field.getName().equals(fieldName)) {
+				return field;
+			}
+		}
+		return null;
 	}
 
 	public static String prepareAccessorMainPartName(final String fieldName) {
@@ -136,9 +155,6 @@ public class BeanUtils {
 
 		throw new IllegalArgumentException("Cannot set value type " + valueToSet.getClass().getName() + " to property '"
 				+ fieldName + "'.");
-	}
-
-	private BeanUtils() {
 	}
 
 }

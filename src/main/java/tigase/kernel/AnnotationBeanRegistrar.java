@@ -1,14 +1,14 @@
 package tigase.kernel;
 
-import java.io.IOException;
-import java.util.Set;
-
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.core.Kernel;
 import tigase.util.ClassUtil;
 
-public class AnnotationConfigurator {
+import java.io.IOException;
+import java.util.Set;
+
+public class AnnotationBeanRegistrar {
 
 	@Inject
 	private Kernel kernel;

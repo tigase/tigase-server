@@ -1,14 +1,8 @@
 package tigase.component;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import tigase.component.adhoc.AdHocCommandManager;
 import tigase.component.modules.StanzaProcessor;
+import tigase.component.modules.impl.config.ConfiguratorCommand;
 import tigase.component.responses.AsyncCallback;
 import tigase.component.responses.ResponseManager;
 import tigase.conf.ConfigurationException;
@@ -25,49 +19,20 @@ import tigase.server.DisableDisco;
 import tigase.server.Packet;
 import tigase.xml.Element;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiver implements XMPPService, DisableDisco {
 
-	@Bean(name = "writer")
-	public static final class DefaultPacketWriter implements PacketWriter {
-
-		@Inject(nullAllowed = false)
-		private AbstractKernelBasedComponent component;
-
-		protected final Logger log = Logger.getLogger(this.getClass().getName());
-
-		@Inject(nullAllowed = false)
-		private ResponseManager responseManager;
-
-		@Override
-		public void write(Collection<Packet> elements) {
-			if (elements != null) {
-				for (Packet element : elements) {
-					if (element != null) {
-						write(element);
-					}
-				}
-			}
-		}
-
-		@Override
-		public void write(Packet packet) {
-			if (log.isLoggable(Level.FINER)) {
-				log.finer("Sent: " + packet.getElement());
-			}
-			component.addOutPacket(packet);
-		}
-
-		@Override
-		public void write(Packet packet, AsyncCallback callback) {
-			if (log.isLoggable(Level.FINER)) {
-				log.finer("Sent: " + packet.getElement());
-			}
-			responseManager.registerResponseHandler(packet, ResponseManager.DEFAULT_TIMEOUT, callback);
-			component.addOutPacket(packet);
-		}
-
-	}
-
+	protected final Kernel kernel = new Kernel();
+	/**
+	 * Logger
+	 */
+	protected final Logger log = Logger.getLogger(this.getClass().getName());
 	private final EventBus eventBus = new EventBus() {
 
 		private final EventBus eventBus = EventBusFactory.getInstance();
@@ -90,12 +55,6 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 			eventBus.removeHandler(name, xmlns, handler);
 		}
 	};
-
-	protected final Kernel kernel = new Kernel();
-
-	/** Logger */
-	protected final Logger log = Logger.getLogger(this.getClass().getName());
-
 	private StanzaProcessor stanzaProcessor;
 
 	protected void changeRegisteredBeans(Map<String, Object> props)
@@ -112,8 +71,15 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 
 	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		// TODO Auto-generated method stub
-		return super.getDefaults(params);
+		Map<String, Object> result = super.getDefaults(params);
+		if (kernel.isBeanClassRegistered(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)) {
+			BeanConfigurator bc = kernel.getInstance(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME);
+			if (bc instanceof PropertiesBeanConfigurator) {
+				result.putAll(((PropertiesBeanConfigurator) bc).getCurrentConfigurations());
+			}
+		}
+
+		return result;
 	}
 
 	/**
@@ -146,6 +112,7 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 		kernel.registerBean("stanzaProcessor").asClass(StanzaProcessor.class).exec();
 		kernel.registerBean("responseManager").asClass(ResponseManager.class).exec();
 		kernel.registerBean(PropertiesBeanConfigurator.class).exec();
+		kernel.registerBean(ConfiguratorCommand.class).exec();
 
 		registerModules(kernel);
 
@@ -165,6 +132,45 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 	public void updateServiceEntity() {
 		super.updateServiceEntity();
 		this.updateServiceDiscoveryItem(getName(), null, getDiscoDescription(), !isDiscoNonAdmin());
+	}
+
+	@Bean(name = "writer")
+	public static final class DefaultPacketWriter implements PacketWriter {
+
+		protected final Logger log = Logger.getLogger(this.getClass().getName());
+		@Inject(nullAllowed = false)
+		private AbstractKernelBasedComponent component;
+		@Inject(nullAllowed = false)
+		private ResponseManager responseManager;
+
+		@Override
+		public void write(Collection<Packet> elements) {
+			if (elements != null) {
+				for (Packet element : elements) {
+					if (element != null) {
+						write(element);
+					}
+				}
+			}
+		}
+
+		@Override
+		public void write(Packet packet) {
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("Sent: " + packet.getElement());
+			}
+			component.addOutPacket(packet);
+		}
+
+		@Override
+		public void write(Packet packet, AsyncCallback callback) {
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("Sent: " + packet.getElement());
+			}
+			responseManager.registerResponseHandler(packet, ResponseManager.DEFAULT_TIMEOUT, callback);
+			component.addOutPacket(packet);
+		}
+
 	}
 
 }

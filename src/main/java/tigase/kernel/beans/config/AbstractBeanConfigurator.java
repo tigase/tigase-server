@@ -1,17 +1,17 @@
 package tigase.kernel.beans.config;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import tigase.kernel.BeanUtils;
 import tigase.kernel.KernelException;
+import tigase.kernel.TypesConverter;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.DependencyManager;
 import tigase.kernel.core.Kernel;
+
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 
@@ -50,13 +50,9 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 
 				Object valueToSet = ccc.get(field.getName());
 
-				Method setter = BeanUtils.prepareSetterMethod(field);
-				if (setter != null) {
-					setter.invoke(bean, valueToSet);
-				} else {
-					field.setAccessible(true);
-					field.set(bean, valueToSet);
-				}
+				Object v = TypesConverter.convert(valueToSet, field.getType());
+				BeanUtils.setValue(bean, field, v);
+
 			}
 		} catch (Exception e) {
 			throw new KernelException("Cannot inject configuration to bean " + beanConfig.getBeanName(), e);
@@ -67,6 +63,10 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 
 	public Kernel getKernel() {
 		return kernel;
+	}
+
+	public void setKernel(Kernel kernel) {
+		this.kernel = kernel;
 	}
 
 	public void restoreDefaults(String beanName) {
@@ -92,23 +92,13 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 					continue;
 
 				Object valueToSet = defaultConfig.get(field);
+				BeanUtils.setValue(bean, field, valueToSet);
 
-				Method setter = BeanUtils.prepareSetterMethod(field);
-				if (setter != null) {
-					setter.invoke(bean, valueToSet);
-				} else {
-					field.setAccessible(true);
-					field.set(bean, valueToSet);
-				}
 			}
 		} catch (Exception e) {
 			throw new KernelException("Cannot inject configuration to bean " + beanConfig.getBeanName(), e);
 		}
 
-	}
-
-	public void setKernel(Kernel kernel) {
-		this.kernel = kernel;
 	}
 
 }
