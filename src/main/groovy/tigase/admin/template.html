@@ -158,7 +158,7 @@ if (type == 'hidden') { %>
 <% } else if (type == 'list-single' || type == 'list-multi') { %>
 		<label for="${formField.getAttribute('var')}">${formField.getAttribute('label') ?: (formField.getAttribute('var') ?: '')}</label>
 		<select name="${formField.getAttribute('var')}" ${ (type == 'list-multi') ? 'multiple' : ''}><% formField.getChildren().findAll { it.getName() == 'option' }.each { %>
-			<option value='${it.getChildCData('value') ?: it.getAttribute('label')}' ${formField.getChildren().find{ child -> (child.getName() == 'value') && (child.getCData() == (it.getChildCData('value') ?: it.getAttribute('label'))) } ? 'selected' : ''}>${it.getAttribute('label') ?: it.getChildCData('value')}</option>
+			<option value='${it.getChildCData(it.getName()+'/value') ?: it.getAttribute('label')}' ${formField.getChildren().find{ child -> (child.getName() == 'value') && (child.getCData() == (it.getChildCData(it.getName()+'/value') ?: it.getAttribute('label'))) } ? 'selected' : ''}>${it.getAttribute('label') ?: it.getChildCData(it.getName()+'/value')}</option>
 <% } %></select><br/>
 <% } else if (type == 'text-single' || type == 'jid-single') { %>
 		<label for="${formField.getAttribute('var')}">${formField.getAttribute('label') ?: (formField.getAttribute('var') ?: '')}</label><input type="text" name="${formField.getAttribute('var')}" value="${formField.getChildCData('field/value') ?: ''}"/><br/>
