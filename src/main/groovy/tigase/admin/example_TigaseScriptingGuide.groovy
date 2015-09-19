@@ -27,6 +27,7 @@ This is an example script for Tigase scripting support.
 AS:Description: [example] Tigase scripting guide
 AS:CommandId: groovy-example
 AS:Component: sess-man
+AS:Group: Examples
 */
 
 package tigase.admin
@@ -39,10 +40,10 @@ num1 = Command.getFieldValue(p, "num1")
 num2 = Command.getFieldValue(p, "num2")
 
 if (num1 == null || num2 == null) {
-	Packet res = Packet.commandResultForm(p)
+	Packet res = p.commandResult(Command.DataType.form)
 	Command.addTextField(res, "Note", "This is Groovy script!")
-	Command.addFieldValue(res, "num1", "")
-	Command.addFieldValue(res, "num2", "")
+	Command.addFieldValue(res, "num1", "", "text-single")
+	Command.addFieldValue(res, "num2", "", "text-single")
 	return res
 }
 
