@@ -667,6 +667,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				} finally {
 					ios.writeInProgress.unlock();
 				}
+			} else {
+				return true;
 			}
 
 		} else {

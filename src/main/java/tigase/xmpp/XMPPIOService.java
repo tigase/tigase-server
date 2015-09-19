@@ -210,6 +210,23 @@ public class XMPPIOService<RefObject>
 		waitingPackets.offer(packet);
 	}
 
+		@Override
+	public IOService<?> call() throws IOException {
+		IOService<?> io = super.call();
+		// needed to send packets added by addPacketToSent when it was not able
+		// to acquire lock for write as when this packet would not be followed by
+		// next packet then it would stay in waitingPackets queue, however this
+		// may slow down processing packets in SocketThread thread.
+		if (isConnected() && !waitingPackets.isEmpty() && writeInProgress.tryLock()) {
+			try {
+				processWaitingPackets();
+			} finally {
+				writeInProgress.unlock();
+			}			
+		}
+		return io;
+	}
+	
 	@Override
 	public boolean checkBufferLimit(int bufferSize) {
 		if (!super.checkBufferLimit(bufferSize)) {
