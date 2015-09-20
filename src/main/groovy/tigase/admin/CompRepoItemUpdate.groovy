@@ -122,16 +122,22 @@ def oldItem = repo.getItem(item.getKey())
 if (oldItem == null) {
 	Command.addTextField(result, "Error", "The item you try to update does not exist.");
 } else {
-	if (isServiceAdmin || oldItem.isOwner(stanzaFromBare.toString())
-		// we allow changes by admins, except for changing the owner of the domain.
-		|| oldItem.isAdmin(stanzaFromBare.toString()) && oldItem.getOwner().equals(item.getOwner())
-	) {
-		repo.addItem(item)
-		Command.addTextField(result, "Note", "Operation successful");
+	def validateResult = repo.validateItem(item)
+	if (validateResult == null) {
+		if (isServiceAdmin || oldItem.isOwner(stanzaFromBare.toString())
+			// we allow changes by admins, except for changing the owner of the domain.
+			|| oldItem.isAdmin(stanzaFromBare.toString()) && oldItem.getOwner().equals(item.getOwner())
+		) {
+			repo.addItem(item)
+			Command.addTextField(result, "Note", "Operation successful");
+		} else {
+			Command.addTextField(result, "Error", "You are not the Item owner or you have no "
+				+ "enough permission to change the item.")
+		}
 	} else {
-		Command.addTextField(result, "Error", "You are not the Item owner or you have no "
-			+ "enough permission to change the item.")
-
+		Command.addTextField(result, "Error", "The item did not pass validation checking.")
+		Command.addTextField(result, "Note", "   ")
+		Command.addTextField(result, "Warning", validateResult)
 	}
 }
 

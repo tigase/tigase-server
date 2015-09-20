@@ -64,4 +64,12 @@ public class CompConfigRepository extends ConfigRepository<CompRepoItem> {
 		// Nothing to do
 	}
 
+	@Override
+	public String validateItem(CompRepoItem item) {
+		String result = super.validateItem(item);
+		if (result == null) {
+			result = item.validate();
+		}
+		return result;
+	}
 }
