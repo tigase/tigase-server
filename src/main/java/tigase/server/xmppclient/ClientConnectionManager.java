@@ -1,3 +1,4 @@
+
 /*
  * ClientConnectionManager.java
  *
@@ -1097,10 +1098,12 @@ public class ClientConnectionManager
 
 			// We are now ready to ask for features....
 			XMPPIOService<Object> serv = getXMPPIOService( response );
-			SocketType socket = (SocketType) serv.getSessionData().get( "socket" );
-			boolean ssl = socket.equals( SocketType.ssl );
-			addOutPacket(Command.GETFEATURES.getPacket(packet.getFrom(), packet.getTo(),
-					StanzaType.get, (ssl ? "ssl_" : "") + UUID.randomUUID().toString(), null));
+			if (serv != null) {
+				SocketType socket = (SocketType) serv.getSessionData().get("socket");
+				boolean ssl = socket.equals(SocketType.ssl);
+				addOutPacket(Command.GETFEATURES.getPacket(packet.getFrom(), packet.getTo(),
+						StanzaType.get, (ssl ? "ssl_" : "") + UUID.randomUUID().toString(), null));
+			}
 		}
 
 		@Override
