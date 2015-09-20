@@ -148,7 +148,7 @@ if (type == 'hidden') { %>
 		<input type='hidden' name="${formField.getAttribute('var')}" value="${formField.getChildCData('field/value') ?: ''}" /><br/>
 <% } else if (type == 'boolean') { %>
 		<label for="${formField.getAttribute('var')}">${formField.getAttribute('label') ?: (formField.getAttribute('var') ?: '')}</label>
-		<input type="checkbox" name="${formField.getAttribute('var')}" ${(formField.getChildCData('field/value') == 'true') ? 'checked' : ''}/><br/>
+		<input type="checkbox" name="${formField.getAttribute('var')}" ${(formField.getChildCData('field/value') == 'true' || formField.getChildCData('field/value') == '1') ? 'checked' : ''}/><br/>
 <% } else if (type == 'text-private') { %>
 		<label for="${formField.getAttribute('var')}">${formField.getAttribute('label') ?: (formField.getAttribute('var') ?: '')}</label>
 		<input type="password" name="${formField.getAttribute('var')}" value="${formField.getChildCData('field/value') ?: ''}"/><br/>
