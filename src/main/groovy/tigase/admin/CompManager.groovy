@@ -49,7 +49,7 @@ try {
 	def COMP_NAME = "comp-name";
 	def COMP_CLASS = "comp-class";
 
-	def SUBMIT = "submit";
+	def SUBMIT = "confirm";
 
 	def getComponentProperties = { comp_name, comp_class ->
 		def conf = XMPPServer.getConfigurator();

@@ -164,6 +164,7 @@ if (type == 'hidden') { %>
 		<label for="${formField.getAttribute('var')}">${formField.getAttribute('label') ?: (formField.getAttribute('var') ?: '')}</label><input type="text" name="${formField.getAttribute('var')}" value="${formField.getChildCData('field/value') ?: ''}"/><br/>
 <% } else if (type == 'fixed') { %>
 		<input style="clear:both;" disabled type="text" name="${formField.getAttribute('var')}" value="${formField.getChildCData('field/value') ?: ''}"/><br/>		
+		<input type='hidden' name="${formField.getAttribute('var')}" value="${formField.getChildCData('field/value') ?: ''}" /><br/>
 <% } else { %>
 		<label>${formField.getCData() ?: ''}</label>
 <% } %>
