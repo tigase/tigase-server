@@ -1557,6 +1557,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 						public void check(final XMPPIOService service) {
 							try {
 								if ( null != service ){
+									if ( log.isLoggable( Level.FINEST ) ){
+										log.log( Level.FINEST,
+														 "Testing service: {0}, sinceLastTransfer: {1}, maxInactivityTime: {2}, watchdogTimeout: {3}, watchdogDelay: {4}, watchdogPingType: {5} ",
+														 new Object[] { service, getDurationSinceLastTransfer( service ), maxInactivityTime, watchdogTimeout, watchdogDelay, watchdogPingType } );
+									}
 									long sinceLastTransfer = getDurationSinceLastTransfer(service);
 									if ( sinceLastTransfer >= maxInactivityTime ){
 
@@ -1592,6 +1597,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 													break;
 
 												case WHITESPACE:
+													if (log.isLoggable(Level.FINEST)) {
+														log.log(Level.FINEST, "Sending whitespace ping for service {0}", new Object[] { service });
+													}
 													service.writeRawData( " " );
 													break;
 											}
