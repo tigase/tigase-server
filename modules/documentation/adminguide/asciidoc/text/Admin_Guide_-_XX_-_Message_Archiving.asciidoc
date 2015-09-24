@@ -1,0 +1,85 @@
+[[messageArchiving]]
+Message Archiving Component
+===========================
+:author: Daniel Wisnewski
+:version: v1.0 Sept 2015
+:date: 2015-17-09 13:29
+
+:source: https://projects.tigase.org/projects/message-archiving/wiki/Wiki
+
+:toc:
+:numbered:
+:website: http://www.tigase.org
+
+*NOTE: This component is incomplete and does not support all methods specified in XEP-0136*
+Tigase server supports many of the features in XEP-0136, however it is not yet in full compliance with the XEP. The reason for this is that it uses the archived message date as the thread id of message due to the face that some clients sens messages with no thread id (e.g. Psi, Psi+). Due to this fact it is also possible to query the component about messages without specifying thread ids. For now the component also stores bare JIDs of recipients.
+
+
+Installation
+------------
+The message archiving component is not included with the standard build of Tigase, and thus will need to be compiled or downloaded. Here are the two methods:
+
+Download
+~~~~~~~~
+The easiest way is to download the link:https://projects.tigase.org/attachments/download/3435/tigase-message-archiving-1.2.0-SNAPSHOT.jar[tigase-message-archiving-1.2.0-SNAPSHOT.jar] file into your /jars directory.
+
+Compile
+~~~~~~~
+The Tigase Message Archive component is kept in a separate repository from Tigase-server. It will compile in a similar manner though. Be sure you have Maven 3.0 or later installed. (to check use +mvn version+)
+First, obtain a clone of the repository using the following command:
+-----
+$ git clone https://repository.tigase.org/git/message-archiving.git
+-----
+The repository will be downloaded to the /message-archiving/ directory.
+-----
+$cd message-archiving
+/message-archiving$ mvn clean package
+-----
+Once Maven has finished compiling, go into the /target directory and you will find the required jar there. Move that to Tigase's /jars folder and your component is ready to run.
+
+Configuration
+-------------
+To activate message archiving, place the following lines in the init.properties file:
+-----
+--comp-name-3=message-archive
+--comp-class-3=tigase.archive.MessageArchiveComponent
+-----
+These two lines are the component required to be active. As with activating any component, be sure the component name and class match, and that the number is not used by another component.
+-----
+message-archive/archive-repo-uri=jdbc:mysql://localhost/messagearchivedb?user=test&password=test
+-----
+This next line defines that message archives will be stored in a specific database, in this case +messagearchivedb+ hosted on localhost. If this is blank, the archive will be stored in the default user repository.
+-----
+--sm-plugins=message-archive-xep-0136
+sess-man/plugins-conf/message-archive-xep-0136/component-jid=archive@host.com
+-----
+The next line turns on the message archive plugin, while this is not always necessary, in order to configure extra options, this line is needed.
+Finally, this line specifies the name for the component, if left blank the component's JID will be message-archive@local-machine-name.
+
+*NOTE: Message tagging can take up considerable resources!*
+There are a high number of prepared statements which are used to process and archive messages as they go through the server, and you may experience an increase in resource use with the archive turned on. It is recommended to drecrease the repository connection pool to help balance server load from this component using the following line in init.properties:
+-----
+--data-repo-pool-size=5
+-----
+
+Usage
+-----
+Now that we have the archive component running, how do we use it?  Currently, the only way to activate and modify the component is through XMPP stanzas.  Lets first begin by getting our default settings from the component:
+[source,xml]
+----
+<iq type='get' id='prefq'>
+  <pref xmlns='urn:xmpp:archive'/>
+</iq>
+----
+It's a short stanza, but it will tell us what we need to know, Note that you do not need a from or a to for this stanza. The result is as follows:
+----
+<iq type='result' id='prefq' to='admin@domain.com/cpu'>
+<pref xmlns='urn:xmpp:archive'>
+<auto save='false'/>
+<default otr='forbid' muc-save="false" save="body"/>
+<method use="prefer" type="auto"/>
+<method use="prefer" type="local"/>
+<method use="prefer" type="manual"/>
+</prefq>
+</iq>
+----

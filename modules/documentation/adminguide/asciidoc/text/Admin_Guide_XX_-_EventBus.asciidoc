@@ -34,7 +34,7 @@ The eventbus monitoring components have several pre-defined tasks that can be mo
 Available Options
   . +enabled[B]+ - enable or disable task, Boolean value.
   . +period[I]+ - period of running check, Integer value.
-  . +threshold[F]+ - percentage of used space on disk, Float value.
+  . +threshold[F]+ - percentage of used space on disk, Float value. *NOTE:* float values cannot be set in init.properties.
 
 - *cpu-temp-task* - Used to check CPU temperature. +
 Available Options
@@ -184,7 +184,13 @@ Applied to an XMPP stanza, it will look something like this:
   </pubsub>
 </iq>
 -----
-Don't forget to replace $USER_JID with the bare JID of the user you want to recieve those messages. You can even have them sent to a MUC or any component with a JID.
+Don't forget to replace $USER_JID with the bare JID of the user you want to receive those messages. You can even have them sent to a MUC or any component with a JID.
+Available events are as follows:
+- disk-taskEvent for +disk-task+
+- LoggerMonitorEvent for +logger-task+
+- HeapMemoryMonitorEvent for +memory-checker-task+
+- LoadAverageMonitorEvent for +load-checker-task+
+- CPUTempMonitorEvent for +cpu-temp-task+
 
 Alternatively, you can also subscribe to all events within the eventbus by using a wildcard * in place of the event XMLNS like this example:
 [source,xml]
@@ -201,7 +207,11 @@ Alternatively, you can also subscribe to all events within the eventbus by using
 Mailer Extension
 ~~~~~~~~~~~~~~~~
 Tigase Server Monitor Mailer Extension (TSMME) can send messages from the monitor component to a specified E-mail address so system administrators who are not logged into the XMPP server.
-Enabling this extension, since it's already included in the distributions, is simply a matter of adding these fields to the init.properties file:
+
+TSMME requires two files to operate:
+- A compiled build of tigase mailer from link:https://projects.tigase.org/projects/tigase-server-ext-mailer/repository[its repository]. Place the compiled .jar file into /jars directory.
+- javax.mail.jar file which may be downloaded from link:http://java.net/projects/javamail/downloads/download/javax.mail.jar[this link]. Also place this file in the /jars directory.
+
 -----
 monitor/mailer-smtp-host=mail.tigase.org
 monitor/mailer-smtp-port=587
