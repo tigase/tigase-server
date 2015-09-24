@@ -54,6 +54,8 @@ public interface AmpFeatureIfc {
 	/** Field description */
 	public static final String FROM_CONN_ID = "from-conn-id";
 
+	public static final String SESSION_JID = "from-session-jid";
+
 	/** Field description */
 	public static final String TO_CONN_ID = "to-conn-id";
 

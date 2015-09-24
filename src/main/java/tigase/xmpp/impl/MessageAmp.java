@@ -81,6 +81,8 @@ public class MessageAmp
 			new Element("feature", new String[] { "var" }, new String[] { "msgoffline" }) };
 	private static final String defHost = DNSResolver.getDefaultHostname();
 
+//	private static final String STATUS_ATTRIBUTE_NAME = "status";
+
 	//~--- fields ---------------------------------------------------------------
 
 	private JID             ampJID           = null;
@@ -179,8 +181,11 @@ public class MessageAmp
 			
 			Element amp = packet.getElement().getChild("amp");
 
-			if ((amp == null) || (amp.getXMLNS() != XMLNS) || (amp.getAttributeStaticStr(
-					"status") != null)) {
+			if ((amp == null) || (amp.getXMLNS() != XMLNS)
+//					 "Individual action definitions MAY provide their own requirements." regarding
+//						"status" attribute requirement!!! applies to "alert" and "notify"
+//					|| (amp.getAttributeStaticStr(STATUS_ATTRIBUTE_NAME) != null)
+					) {
 				try {
 					if (session != null && packet.getStanzaTo() != null && !session.isUserId(packet.getStanzaTo().getBareJID()))
 						return;
@@ -234,7 +239,11 @@ public class MessageAmp
 			packet.processedBy(ID);
 		} else if (packet.getElemName() == Message.ELEM_NAME) {
 			Element amp = packet.getElement().getChild("amp", XMLNS);
-			if (amp == null || (amp.getAttributeStaticStr("status") != null) || ampJID.equals(packet.getPacketFrom())) {
+			if (amp == null
+//					 "Individual action definitions MAY provide their own requirements." regarding
+//						"status" attribute requirement!!! applies to "alert" and "notify"
+//					|| (amp.getAttributeStaticStr(STATUS_ATTRIBUTE_NAME) != null)
+					|| ampJID.equals(packet.getPacketFrom())) {
 				return false;
 			}
 			
@@ -251,6 +260,9 @@ public class MessageAmp
 				if (session.isUserId(packet.getStanzaTo().getBareJID())) {
 					Packet result = packet.copyElementOnly();
 					result.setPacketTo(ampJID);
+					if ( packet.getStanzaTo().getResource() != null ){
+						result.getElement().addAttribute( TO_RES, session.getResource() );
+					} 
 					results.offer(result);
 					boolean offline = !messageProcessor.hasConnectionForMessageDelivery(session);
 					if (offline) {
@@ -308,7 +320,11 @@ public class MessageAmp
 			case "message":
 				Element amp = packet.getElement().getChild("amp", XMLNS);
 
-				if ((amp == null) || (amp.getAttributeStaticStr("status") != null) || ampJID.equals(packet.getPacketFrom())) {
+				if ((amp == null)
+//					 "Individual action definitions MAY provide their own requirements." regarding
+//						"status" attribute requirement!!! applies to "alert" and "notify"
+//						|| (amp.getAttributeStaticStr(STATUS_ATTRIBUTE_NAME) != null)
+						|| ampJID.equals(packet.getPacketFrom())) {
 					messageProcessor.process(packet, session, repo, results, settings);
 				} else {
 					// when packet from user with AMP is sent we need to forward it to AMP
@@ -318,6 +334,9 @@ public class MessageAmp
 					Packet result = packet.copyElementOnly();
 					if (connectionId.equals(packet.getPacketFrom())) {
 						result.getElement().addAttribute(FROM_CONN_ID, connectionId.toString());
+						if ( null != session.getBareJID() ){
+							result.getElement().addAttribute(SESSION_JID, session.getJID().toString() );
+						}
 					}					
 					result.setPacketTo(ampJID);
 					results.offer(result);

@@ -206,6 +206,7 @@ public abstract class ActionAbstract
 		packet.getElement().removeAttribute(TO_RES);
 		packet.getElement().removeAttribute(OFFLINE);
 		packet.getElement().removeAttribute(FROM_CONN_ID);
+		packet.getElement().removeAttribute(SESSION_JID);
 		packet.getElement().removeAttribute(EXPIRED);
 	}
 
