@@ -124,7 +124,7 @@ if (isServiceAdmin ||
 					result.getElement().getChild('command').getChild('x').addChild(item);
 				}				
 			} else {
-				for (XMPPResourceConnection con: conns) {
+				for (XMPPResourceConnection con: userRes) {
 					Command.addTextField(result, con.res + " is connected to", con.res + " is connected to " + con.node);
 				}
 			}				
