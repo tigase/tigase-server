@@ -299,7 +299,7 @@ public class VCard4 extends VCardXMPPProcessorAbstract {
 	
 	@Override
 	protected void storeVCard(XMPPResourceConnection session, Element elvCard) throws TigaseDBException, NotAuthorizedException {
-		if (elvCard != null) {
+		if (elvCard != null && elvCard.getChildren() != null) {
 			if (log.isLoggable(Level.FINER)) {
 				log.finer("Adding vCard: " + elvCard);
 			}
