@@ -1995,8 +1995,10 @@ public class Presence
 					pres_update.setAttribute("type", StanzaType.unavailable.toString());
 					pres_update.setXMLNS(XMLNS);
 
-					Packet pack_update = Packet.packetInstance(pres_update, session.getJID(), conn
-							.getJID().copyWithoutResource());
+					// accroding to RFC1621, 4.5.2.  Server Processing of Outbound Unavailable Presence
+					// this presece packet should be addressed to fullJID
+					Packet pack_update = Packet.packetInstance( pres_update, session.getJID(),
+																											conn.getJID() );
 
 					pack_update.setPacketTo(conn.getConnectionId());
 					results.offer(pack_update);

@@ -154,9 +154,9 @@ public class DomainFilter
 					String[] customRules = getDomainsList(session);
 
 					if ( ( outDomain == null ) || outDomain.equals( local_hostname )
-							 || (res.getType() != null && res.getType().equals( StanzaType.error))
-							 || ( packet.getStanzaFrom() == null && packet.getStanzaTo() != null
-										&& session.isUserId( packet.getStanzaTo().getBareJID() ) ) ){
+							 || ( res.getType() != null && res.getType().equals( StanzaType.error ) )
+							 || ( res.getStanzaFrom() == null && res.getStanzaTo() != null
+										&& session.isUserId( res.getStanzaTo().getBareJID() ) ) ){
 						// don't filter system packets, breaks things
 						break;
 					}
