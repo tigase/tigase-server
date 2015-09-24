@@ -56,6 +56,7 @@ public class ClConConfigRepository
 
 	/** Field description */
 	public static final String AUTORELOAD_INTERVAL_PROP_KEY = "repo-autoreload-interval";
+	public static final String AUTO_REMOVE_OBSOLETE_ITEMS_PROP_KEY = "repo-auto-remove-obsolete-items";
 
 	/** Field description */
 	public static final long AUTORELOAD_INTERVAL_PROP_VAL = 15;
@@ -63,6 +64,7 @@ public class ClConConfigRepository
 	//~--- fields ---------------------------------------------------------------
 
 	protected long autoreload_interval = AUTORELOAD_INTERVAL_PROP_VAL;
+	protected boolean auto_remove_obsolete_items = true;
 	protected long lastReloadTime = 0;
 	protected long lastReloadTimeFactor = 10;
 
@@ -136,7 +138,9 @@ public class ClConConfigRepository
 																new Date( item.getLastUpdate() ), System.currentTimeMillis() - item.getLastUpdate(),
 																5000 * autoreload_interval } );
 			}
-			removeItem( item.getHostname() );
+			if ( auto_remove_obsolete_items ){
+				removeItem( item.getHostname() );
+			}
 		}
 	}
 
@@ -152,6 +156,7 @@ public class ClConConfigRepository
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
 		super.getDefaults(defs, params);
 		defs.put(AUTORELOAD_INTERVAL_PROP_KEY, AUTORELOAD_INTERVAL_PROP_VAL);
+		defs.put(AUTO_REMOVE_OBSOLETE_ITEMS_PROP_KEY, true);
 
 		String[] items_arr = (String[]) defs.get(getConfigKey());
 
@@ -175,6 +180,8 @@ public class ClConConfigRepository
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
 		autoreload_interval = (Long) props.get(AUTORELOAD_INTERVAL_PROP_KEY);
+		auto_remove_obsolete_items = (boolean) props.get(AUTO_REMOVE_OBSOLETE_ITEMS_PROP_KEY);
+
 		setAutoloadTimer(autoreload_interval);
 		TigaseRuntime.getTigaseRuntime().addShutdownHook(this);
 	}
