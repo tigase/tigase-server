@@ -145,6 +145,7 @@
 				<include>tigase:tigase-socks5</include>
 				<include>tigase:tigase-stun</include>
 				<include>tigase:tigase-mongodb</include>
+				<include>tigase:tigase-ext-mailer</include>
 
 				<!--database libraries-->
 				<include>org.apache.derby:derby</include>
@@ -152,7 +153,7 @@
 				<include>mysql:mysql-connector-java</include>
 				<include>postgresql:postgresql</include>
 				<include>net.sourceforge.jtds:jtds</include>
-				<include> org.mongodb:mongo-java-driver</include>
+				<include>org.mongodb:mongo-java-driver</include>
 				
 				<!-- other libraries-->
 				<include>org.codehaus.groovy:groovy-all</include>
@@ -186,6 +187,11 @@
 				<include>org.apache.felix:org.apache.felix.shell.remote</include>
 				<include>ch.qos.logback:logback-classic</include>
 				<include>ch.qos.logback:logback-core</include>
+
+				<!--Mailer extension-->
+				<include>javax.activation:activation</include>
+				<include>com.sun.mail:javax.mail</include>
+				<include>com.sun.mail:smtp</include>
 
 			</includes>
 		</dependencySet>
