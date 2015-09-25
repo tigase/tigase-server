@@ -64,7 +64,7 @@ if (userJid == null) {
 	return result
 }
 
-bareJID = BareJID.bareJIDInstance(userJid)
+def bareJID = BareJID.bareJIDInstance(userJid)
 VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
 def result = p.commandResult(Command.DataType.result)
 

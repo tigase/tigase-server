@@ -66,7 +66,7 @@ if (userJid == null) {
 	return result
 }
 
-bareJID = BareJID.bareJIDInstance(userJid)
+def bareJID = BareJID.bareJIDInstance(userJid)
 VHostItem vhost = vhost_man.getVHostItem(bareJID.getDomain())
 def resourcesAsTable = Command.getCheckBoxFieldValue(p, "Show connected resources in table");
 def result = p.commandResult(Command.DataType.result)
@@ -124,7 +124,7 @@ if (isServiceAdmin ||
 					result.getElement().getChild('command').getChild('x').addChild(item);
 				}				
 			} else {
-				for (XMPPResourceConnection con: userRes) {
+				for (def con: userRes) {
 					Command.addTextField(result, con.res + " is connected to", con.res + " is connected to " + con.node);
 				}
 			}				
