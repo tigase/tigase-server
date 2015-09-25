@@ -65,7 +65,7 @@ if (userJid == null || userPass == null /*|| userPassVer == null*/) {
 	Command.addFieldValue(result, JID, userJid ?: "", "jid-single",
 			"The Jabber ID for this account")
 	Command.addFieldValue(result, PASSWORD, userPass ?: "", "text-private",
-			"The password for this account")
+			"The new password for this account")
 //	Command.addFieldValue(result, PASSWORD_VERIFY, userPassVer ?: "", "text-private",
 //			"Retype password")
 
