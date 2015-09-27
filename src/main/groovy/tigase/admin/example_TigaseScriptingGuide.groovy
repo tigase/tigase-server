@@ -27,7 +27,7 @@ This is an example script for Tigase scripting support.
 AS:Description: [example] Tigase scripting guide
 AS:CommandId: groovy-example
 AS:Component: sess-man
-AS:Group: Examples
+AS:Group: Example scripts
 */
 
 package tigase.admin
