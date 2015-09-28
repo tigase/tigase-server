@@ -26,9 +26,6 @@ import tigase.db.UserRepository;
 
 import tigase.xmpp.BareJID;
 
-import tigase.util.TigaseStringprepException;
-
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,9 +36,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 /**
  *
@@ -61,7 +56,7 @@ public class JDBCRepositoryTest {
 		map.put( RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, "2");
 
 		String repositoryURI = null;
-//		repositoryURI = "jdbc:mysql://localhost:3306/tigasedb?user=tigase&password=tigase&useUnicode=true&characterEncoding=UTF-8&autoCreateUser=true";
+		repositoryURI = "jdbc:mysql://localhost:3306/tigasedb?user=tigase&password=tigase&useUnicode=true&characterEncoding=UTF-8&autoCreateUser=true";
 //		repositoryURI = "jdbc:jtds:sqlserver://sqlserverhost:1433;databaseName=tigasedb;user=tigase;password=mypass;schema=dbo;lastUpdateCount=false;autoCreateUser=true";
 //		repositoryURI = "jdbc:sqlserver://sqlserverhost:1433;databaseName=tigasedb;user=tigase;password=mypass;schema=dbo;lastUpdateCount=false;autoCreateUser=true";
 //		repositoryURI = "jdbc:postgresql://localhost/tigasedb?user=tigase&password=tigase&useUnicode=true&characterEncoding=UTF-8&autoCreateUser=true";
@@ -88,6 +83,21 @@ public class JDBCRepositoryTest {
 		}
 
 	}
+
+	@Test
+	public void testLongNode() throws InterruptedException, TigaseDBException {
+
+		BareJID user = BareJID.bareJIDInstanceNS( "user", "domain" );
+		repo.setData( user, "node1/node2/node3", "key", "value" );
+		String node3val;
+		node3val = repo.getData( user, "node1/node2/node3", "key" );
+		Assert.assertEquals("String differ from expected!", "value", node3val);
+		repo.removeSubnode( user, "node1" );
+		node3val = repo.getData( user, "node1/node2/node3", "key" );
+		Assert.assertNull( "Node not removed", node3val );
+
+	}
+
 
 	@Test
 	public void testGetData() throws InterruptedException {

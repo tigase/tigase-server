@@ -708,6 +708,12 @@ public class JDBCRepository
 			return;
 		}    // end of if (subnode == null)
 		try {
+			String[] subnodes = getSubnodes( user_id, subnode );
+			if (subnodes != null && subnodes.length > 0 ) {
+				for ( String innerSubNode : subnodes) {
+					removeSubnode( user_id, subnode + "/" + innerSubNode);
+				}
+			}
 			long nid = getNodeNID(null, user_id, subnode);
 
 			if (nid > 0) {
