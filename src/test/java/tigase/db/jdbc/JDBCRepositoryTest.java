@@ -45,18 +45,19 @@ import org.junit.*;
 public class JDBCRepositoryTest {
 
 	UserRepository repo = null;
+	boolean initialised = false;
 
 	public JDBCRepositoryTest() {
 	}
 
 	@Before
-	public void setUp() throws DBInitException {
+	public void setUp() {
 
 		HashMap map = new LinkedHashMap();
 		map.put( RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, "2");
 
 		String repositoryURI = null;
-		repositoryURI = "jdbc:mysql://localhost:3306/tigasedb?user=tigase&password=tigase&useUnicode=true&characterEncoding=UTF-8&autoCreateUser=true";
+//		repositoryURI = "jdbc:mysql://localhost:3306/tigasedb?user=tigase&password=tigase&useUnicode=true&characterEncoding=UTF-8&autoCreateUser=true";
 //		repositoryURI = "jdbc:jtds:sqlserver://sqlserverhost:1433;databaseName=tigasedb;user=tigase;password=mypass;schema=dbo;lastUpdateCount=false;autoCreateUser=true";
 //		repositoryURI = "jdbc:sqlserver://sqlserverhost:1433;databaseName=tigasedb;user=tigase;password=mypass;schema=dbo;lastUpdateCount=false;autoCreateUser=true";
 //		repositoryURI = "jdbc:postgresql://localhost/tigasedb?user=tigase&password=tigase&useUnicode=true&characterEncoding=UTF-8&autoCreateUser=true";
@@ -64,7 +65,14 @@ public class JDBCRepositoryTest {
 //		repositoryURI = "mongodb://localhost/tigase_test?autoCreateUser=true";
 		Assume.assumeNotNull(repositoryURI);
 		repo = new JDBCRepository();
-		repo.initRepository( repositoryURI, map );
+		try {
+			repo.initRepository( repositoryURI, map );
+			initialised = true;
+		} catch ( DBInitException ex ) {
+			Logger.getLogger( JDBCRepositoryTest.class.getName() ).log( Level.SEVERE, "db initialisation failed", ex );
+		}
+
+		Assume.assumeTrue(initialised);
 
 	}
 
