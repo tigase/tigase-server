@@ -317,12 +317,12 @@ public class FlexibleOfflineMessageRetrieval
 			while ( ( elem = elems.poll() ) != null ) {
 				try {
 					final Packet packetInstance = Packet.packetInstance( elem );
-					packetInstance.setPacketTo( conn.getConnectionId() );
+					if (packetInstance.getElemName() == Iq.ELEM_NAME) {
+						packetInstance.initVars(packetInstance.getStanzaFrom(), conn.getJID());
+					}
 					pacs.offer( packetInstance );
 				} catch ( TigaseStringprepException ex ) {
 					log.warning( "Packet addressing problem, stringprep failed: " + elem );
-				} catch ( NoConnectionIdException ex ) {
-					Logger.getLogger( FlexibleOfflineMessageRetrieval.class.getName() ).log( Level.SEVERE, null, ex );
 				}
 			}    // end of while (elem = elems.poll() != null)
 			try {

@@ -341,7 +341,11 @@ public class OfflineMessages
 
 			while ( ( elem = elems.poll() ) != null ) {
 				try {
-					pacs.offer( Packet.packetInstance( elem ) );
+					Packet p = Packet.packetInstance( elem );
+					if (p.getElemName() == Iq.ELEM_NAME) {
+						p.initVars(p.getStanzaFrom(), conn.getJID());
+					}
+					pacs.offer( p );
 				} catch ( TigaseStringprepException ex ) {
 					log.warning( "Packet addressing problem, stringprep failed: " + elem );
 				}
