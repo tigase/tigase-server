@@ -24,7 +24,7 @@
 
  AS:Description: Get list available commands
  AS:CommandId: list-commands
- AS:Group: Scripts
+ AS:Group: Example scripts
  AS:ComponentClass: tigase.server.BasicComponent
  */
 package tigase.admin
