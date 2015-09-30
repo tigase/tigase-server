@@ -68,3 +68,4 @@ tigase/setup
 .idea/
 tigase-server.iml
 /bin/
+/out/
