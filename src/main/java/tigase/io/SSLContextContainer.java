@@ -45,9 +45,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -77,6 +79,7 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		 * 
 		 */
 		FakeTrustManager() {
+			this(new X509Certificate[0]);
 		}
 
 		/**
@@ -143,7 +146,7 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 	// ~--- methods
 	// --------------------------------------------------------------
 
-	protected Map<String, SSLContext> sslContexts = new ConcurrentSkipListMap<String, SSLContext>();
+	protected Map<String, SSLContextsHolder> sslContexts = new ConcurrentSkipListMap<>();
 
 	// ~--- get methods
 	// ----------------------------------------------------------
@@ -233,17 +236,41 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 		if (data.containsKey(key)) {
 			return data.get(key);
 		}
-		for (Entry<String, T> entry : data.entrySet()) {
-			final String k = entry.getKey();
-			if (k.startsWith("*") && key.endsWith(k.substring(1))) {
-				data.put(key, entry.getValue());
-				return entry.getValue();
+
+		// should be faster than code commented below
+		// in case when there is no value at all
+		int idx = key.indexOf(".");
+		if (idx >= 0) {
+			String asteriskKey = "*" + key.substring(idx);
+			T value = data.get(asteriskKey);
+			if (value != null) {
+				data.put(key, value);
+				return value;
 			}
 		}
+//		for (Entry<String, T> entry : data.entrySet()) {
+//			final String k = entry.getKey();
+//			if (k.startsWith("*") && key.endsWith(k.substring(1))) {
+//				data.put(key, entry.getValue());
+//				return entry.getValue();
+//			}
+//		}
 
 		return null;
 	}
 
+	private class SSLContextsHolder {
+		private final Map<TrustManager[],SSLContext> sslContexts = new ConcurrentHashMap<>(4);
+		
+		public SSLContext getSSLContext(TrustManager[] tms) {
+			return sslContexts.get(tms);
+		}
+		
+		public void putSSLContext(TrustManager[] tms, SSLContext sslContext) {
+			sslContexts.put(tms, sslContext);
+		}
+	}
+	
 	@Override
 	public SSLContext getSSLContext(String protocol, String hostname, boolean clientMode, TrustManager... tms) {
 		SSLContext sslContext = null;
@@ -266,8 +293,10 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 				alias = def_cert_alias;
 			} // end of if (hostname == null)
 
-			sslContext = find(sslContexts, alias);
-
+			SSLContextsHolder sslContextsHolder = find(sslContexts, alias);
+			if (sslContextsHolder != null)
+				sslContext = sslContextsHolder.getSSLContext(tms);
+			
 			if (sslContext == null) {
 				KeyManagerFactory kmf = find(kmfs, alias);
 
@@ -290,10 +319,14 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 					kmf = addCertificateEntry(entry, alias, true);
 					log.log(Level.WARNING, "Auto-generated certificate for domain: {0}", alias);
 				}
-
+				
 				sslContext = SSLContext.getInstance(protocol);
 				sslContext.init((hostname == null && kms != null) ? kms : kmf.getKeyManagers(), tms, secureRandom);
-				sslContexts.put(alias, sslContext);
+				sslContextsHolder = new SSLContextsHolder();
+				sslContextsHolder = sslContexts.putIfAbsent(alias, sslContextsHolder);
+				if (sslContextsHolder == null)
+					sslContextsHolder = sslContexts.get(alias);
+				sslContextsHolder.putSSLContext(tms, sslContext);
 			}
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can not initialize SSLContext for domain: " + alias + ", protocol: " + protocol, e);
