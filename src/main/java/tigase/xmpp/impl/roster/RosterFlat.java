@@ -134,6 +134,17 @@ public class RosterFlat
 			Map<BareJID, RosterElement> roster = getUserRoster(session);
 
 			relem = getRosterElementInstance(buddy, name, groups, session);
+			if (emptyNameAllowed && (name == null || name.isEmpty())) {
+				relem.setName(null);
+			} else if (name == null || name.isEmpty()) {
+				String n = buddy.getLocalpart();
+				if ((n == null) || n.trim().isEmpty()) {
+					n = buddy.getBareJID().toString();
+				}
+				relem.setName(n);
+			} else {
+				relem.setName(name);
+			}
 			relem.setOtherData(otherData);
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "1. Added buddy to roster: {0}, name: {1}, item: {2}",
@@ -152,9 +163,13 @@ public class RosterFlat
 			}
 		} else {
 			if (emptyNameAllowed && (name == null || name.isEmpty())) {
-				relem.setName("");
-			} else if (name == null || name.isEmpty()) {
 				relem.setName(null);
+			} else if (name == null || name.isEmpty()) {
+				String n = buddy.getLocalpart();
+				if ((n == null) || n.trim().isEmpty()) {
+					n = buddy.getBareJID().toString();
+				}
+				relem.setName(n);
 			} else {
 				relem.setName(name);
 			}
@@ -357,7 +372,15 @@ public class RosterFlat
 				log.log(Level.FINEST, "Setting name: ''{0}'' for buddy: {1}", new Object[] { name,
 								buddy });
 			}
-			if ((name != null) &&!name.isEmpty()) {
+			if (emptyNameAllowed && (name == null || name.isEmpty())) {
+				relem.setName(null);
+			} else if (name == null || name.isEmpty()) {
+				String n = buddy.getLocalpart();
+				if ((n == null) || n.trim().isEmpty()) {
+					n = buddy.getBareJID().toString();
+				}
+				relem.setName(n);
+			} else {
 				relem.setName(name);
 			}
 			saveUserRoster(session);
