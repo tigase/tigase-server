@@ -4,6 +4,7 @@ import tigase.component.adhoc.AdHocCommand;
 import tigase.component.adhoc.AdHocCommandException;
 import tigase.component.adhoc.AdHocResponse;
 import tigase.component.adhoc.AdhHocRequest;
+import tigase.form.Field;
 import tigase.form.Form;
 import tigase.monitor.ConfigurableTask;
 import tigase.monitor.MonitorContext;
@@ -44,6 +45,10 @@ public class ConfigureTaskCommand implements AdHocCommand {
 							request.getIq().getStanzaTo().getResource());
 
 					registrar.updateConfig(request.getIq().getStanzaTo().getResource(), form);
+
+					form = new Form("form", "Completed", null);
+					form.addField(Field.fieldFixed("Script configured"));
+					response.getElements().add(form.getElement());
 
 					response.completeSession();
 				}

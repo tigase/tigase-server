@@ -48,10 +48,15 @@ public class DeleteScriptTaskCommand implements AdHocCommand {
 
 					Object i = monitorContext.getKernel().getInstance(taskName);
 					if (i instanceof MonitorTask) {
-						((TasksScriptRegistrar) monitorContext.getKernel().getInstance(TasksScriptRegistrar.ID)).delete(taskName);
+						((TasksScriptRegistrar) monitorContext.getKernel().getInstance(TasksScriptRegistrar.ID)).delete(
+								taskName);
 					} else
 						throw new RuntimeException("Are you kidding me?");
 				}
+
+				form = new Form("form", "Completed", null);
+				form.addField(Field.fieldFixed("Script removed"));
+				response.getElements().add(form.getElement());
 
 				response.completeSession();
 			}

@@ -1,5 +1,11 @@
 package tigase.monitor.modules;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptEngineManager;
+
 import tigase.component.adhoc.AdHocCommand;
 import tigase.component.adhoc.AdHocCommandException;
 import tigase.component.adhoc.AdHocResponse;
@@ -30,9 +36,19 @@ public class AddTimerScriptTaskCommand implements AdHocCommand {
 			} else if (data == null) {
 				Form form = new Form("form", "Add monitor script", null);
 
+				List<ScriptEngineFactory> sef = monitorContext.getKernel().getInstance(
+						ScriptEngineManager.class).getEngineFactories();
+				ArrayList<String> labels = new ArrayList<String>();
+				ArrayList<String> values = new ArrayList<String>();
+				for (ScriptEngineFactory scriptEngineFactory : sef) {
+					labels.add(scriptEngineFactory.getLanguageName());
+					values.add(scriptEngineFactory.getExtensions().get(0));
+				}
+
 				form.addField(Field.fieldTextSingle("scriptName", "", "Script name"));
 				form.addField(Field.fieldTextSingle("delay", "1000", "Delay"));
-				form.addField(Field.fieldTextSingle("scriptExtension", "", "Script extension"));
+				form.addField(Field.fieldListSingle("scriptExtension", "", "Script engine", labels.toArray(new String[] {}),
+						values.toArray(new String[] {})));
 				form.addField(Field.fieldTextMulti("scriptContent", "", "Script"));
 
 				response.getElements().add(form.getElement());
@@ -46,9 +62,13 @@ public class AddTimerScriptTaskCommand implements AdHocCommand {
 					String scriptContent = form.getAsString("scriptContent");
 					Long delay = form.getAsLong("delay");
 
-					((TasksScriptRegistrar) monitorContext.getKernel().getInstance(TasksScriptRegistrar.ID)).registerTimerScript(
-							scriptName, scriptExtension, scriptContent, delay);
+					((TasksScriptRegistrar) monitorContext.getKernel().getInstance(
+							TasksScriptRegistrar.ID)).registerTimerScript(scriptName, scriptExtension, scriptContent, delay);
 				}
+
+				form = new Form("form", "Completed", null);
+				form.addField(Field.fieldFixed("Script added."));
+				response.getElements().add(form.getElement());
 
 				response.completeSession();
 			}

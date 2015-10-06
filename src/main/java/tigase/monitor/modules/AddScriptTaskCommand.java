@@ -36,7 +36,8 @@ public class AddScriptTaskCommand implements AdHocCommand {
 			} else if (data == null) {
 				Form form = new Form("form", "Add monitor script", null);
 
-				List<ScriptEngineFactory> sef = monitorContext.getKernel().getInstance(ScriptEngineManager.class).getEngineFactories();
+				List<ScriptEngineFactory> sef = monitorContext.getKernel().getInstance(
+						ScriptEngineManager.class).getEngineFactories();
 				ArrayList<String> labels = new ArrayList<String>();
 				ArrayList<String> values = new ArrayList<String>();
 				for (ScriptEngineFactory scriptEngineFactory : sef) {
@@ -63,6 +64,9 @@ public class AddScriptTaskCommand implements AdHocCommand {
 							scriptName, scriptExtension, scriptContent);
 
 				}
+				form = new Form("form", "Completed", null);
+				form.addField(Field.fieldFixed("Script added."));
+				response.getElements().add(form.getElement());
 
 				response.completeSession();
 			}
