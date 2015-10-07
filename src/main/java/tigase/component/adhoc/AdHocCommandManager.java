@@ -91,14 +91,15 @@ public class AdHocCommandManager {
 	public Packet process(Packet packet, Element commandElement, String node, String action, String sessionId,
 			AdHocCommand adHocCommand) throws AdHocCommandException {
 		State currentState = null;
-		final AdhHocRequest request = new AdhHocRequest(packet, commandElement, node, packet.getStanzaFrom(), action, sessionId);
+		final AdhHocRequest request = new AdhHocRequest(packet, commandElement, node, packet.getStanzaFrom(), action,
+				sessionId);
 		final AdHocResponse response = new AdHocResponse(sessionId, currentState);
 		final AdHocSession session = (sessionId == null) ? new AdHocSession() : this.sessions.get(sessionId);
 
 		adHocCommand.execute(request, response);
 
-		Element commandResult = new Element("command", new String[] { "xmlns", "node", }, new String[] {
-				"http://jabber.org/protocol/commands", node });
+		Element commandResult = new Element("command", new String[] { "xmlns", "node", },
+				new String[] { "http://jabber.org/protocol/commands", node });
 
 		commandResult.addAttribute("status", response.getNewState().name());
 		if ((response.getCurrentState() == null) && (response.getNewState() == State.executing)) {
@@ -124,6 +125,7 @@ public class AdHocCommandManager {
 	 * @param command
 	 */
 	public void registerCommand(AdHocCommand command) {
-		this.commands.put(command.getNode(), command);
+		if (!this.commands.containsKey(command.getNode()))
+			this.commands.put(command.getNode(), command);
 	}
 }

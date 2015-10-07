@@ -2,16 +2,12 @@ package tigase.disteventbus.component;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
 
 import javax.script.ScriptEngineManager;
 
-import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.component.AbstractComponent;
 import tigase.component.AbstractContext;
@@ -22,11 +18,11 @@ import tigase.component.modules.impl.JabberVersionModule;
 import tigase.component.modules.impl.XmppPingModule;
 import tigase.conf.ConfigurationException;
 import tigase.disteventbus.EventBusFactory;
+import tigase.disteventbus.component.stores.Affiliation;
 import tigase.disteventbus.component.stores.AffiliationStore;
 import tigase.disteventbus.component.stores.SubscriptionStore;
 import tigase.disteventbus.impl.LocalEventBus;
 import tigase.stats.StatisticsList;
-import tigase.xml.Element;
 import tigase.xmpp.JID;
 
 public class EventBusComponent extends AbstractComponent<EventBusContext> implements ClusteredComponentIfc {
@@ -171,9 +167,18 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 		scriptsRegistrar = new ListenerScriptRegistrar(listenersScripts, context, scriptEngineManager);
 
 		AdHocCommandModule<?> adHocCommandModule = getModuleProvider().getModule(AdHocCommandModule.ID);
+		if (adHocCommandModule != null) {
+			adHocCommandModule.register(new AddListenerScriptCommand(scriptEngineManager, scriptsRegistrar));
+			adHocCommandModule.register(new RemoveListenerScriptCommand(listenersScripts, scriptsRegistrar));
+		}
 
-		adHocCommandModule.register(new AddListenerScriptCommand(scriptEngineManager, scriptsRegistrar));
-		adHocCommandModule.register(new RemoveListenerScriptCommand(listenersScripts, scriptsRegistrar));
+		if (props.containsKey("allowed-subscribers")) {
+			String t = (String) props.get("allowed-subscribers");
+			String[] x = t.split(",");
+			for (String string : x) {
+				context.getAffiliationStore().putAffiliation(JID.jidInstanceNS(string), Affiliation.member);
+			}
+		}
 
 		scriptsRegistrar.load();
 	}

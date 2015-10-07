@@ -14,4 +14,8 @@ public class AffiliationStore {
 		return a == null ? Affiliation.none : a;
 	}
 
+	public void putAffiliation(JID jid, Affiliation affiliation) {
+		this.affiliations.put(jid, affiliation);
+	}
+
 }
