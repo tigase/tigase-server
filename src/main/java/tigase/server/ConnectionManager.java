@@ -1269,6 +1269,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	//~--- methods --------------------------------------------------------------
 
+	protected void socketAccepted(IO serv, SocketType type) {
+	}
+	
 	private void putDefPortParams(Map<String, Object> props, int port, SocketType sock) {
 		log.log(Level.CONFIG, "Generating defaults for port: {0,number,#}", port);
 		props.put(PROP_KEY + port + "/" + PORT_TYPE_PROP_KEY, ConnectionType.accept);
@@ -1370,12 +1373,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			serv.setSessionData(port_props);
 			try {
 				serv.accept(sc);
+				socketAccepted(serv, getSocketType());
 				if (getSocketType() == SocketType.ssl) {
-					if ("c2s".equals(getName())) {
-						ClientTrustManagerFactory factory = ((ClientConnectionManager) ConnectionManager.this).getClientTrustManagerFactory();
-						TrustManager[] x = factory.getManager((XMPPIOService<Object>) serv);
-						serv.setX509TrustManagers(x);
-					}
 					serv.startSSL(false, false, false);
 				}    // end of if (socket == SocketType.ssl)
 				serviceStarted(serv);
