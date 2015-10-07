@@ -83,11 +83,11 @@ This is an advanced window for settings and management for the XMPP server.
 Configuration
 ~~~~~~~~~~~~~
 List server/component configuration
-+++++++++++++++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 From a drop-down menu you can view all the active components, or the server configuration (basic-conf). This is a read-only list of the current settings.
 
 Manage active server components
-+++++++++++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 This section gives you a drop-down menu for components
 - *List* will provide a list of active running components with the following format
     component name :: componentInfo{Title=Server, Server version/revision (submission date), Class=component class} For example:
@@ -100,7 +100,7 @@ This section gives you a drop-down menu for components
 - *Remove* allows you to remove components from a dropdown list. Components will be removed upon confirmation, however settings will be reverted on server restart.
 
 Manage active server plugins
-++++++++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Here is a list of all available plugins, and you can activate or deactivate them by checking or un-checking each one and clicking confirm. All changes are made in realtime, however changes will be reverted on server restart.
 
 Notifications
@@ -219,55 +219,56 @@ Statistics
 These statistics might be more useful as script results yield small bits of data, but you may find them useful when looking for server loads or finding user issues.
 
 Get User Statistics
-+++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^
 Provides a script output of user stastics including how many active sessions are in use, number of packets used, specific connections and their packet usage and location. All resources will return individual stats along with IP addresses.
 
 Get Active User List
-++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^
 Provides a list of active users under the selected domain within the server.  An active user is considered a user currently logged into the XMPP server.
 
 Get list of idle users
-++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^
 This will list all idle users separated by vhost.
 
 Get list of online users
-++++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^^^
 This will list users separated by the vhost they are connected to. The list will include the bare JID as well as any resources for that JID.
 
-Get nuymber of active users
-+++++++++++++++++++++++++++
+Get number of active users
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+This displays the number of current active users.
 
 Get number of idle users
-++++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^^^
 This section returns the number of active users per specific vhost.
 
 Get top active users
-++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^
 This will list the top number of active users by packets sent and online time. This list will only be built with users currently online and from all vhosts.
 
 Users
 ~~~~~
 
 Add New User
-++++++++++++
+^^^^^^^^^^^^
 Here you can add new users to any domain handled by vHosts, users are added to database immediately and are able to login.  *NOTE: You cannot bestow admin status to these users in this section.*
 
 Change user password
-++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^
 Allows for admins to change the password of a specific user without needing to know the original password for the selected bare JID. Users currently logged in will not know password has been changed until they attempt to re-login.
 
 Delete user
-+++++++++++
+^^^^^^^^^^^
 Provides a text window for admins to input the bare JID of the user they wish to remove from the server.
 
 Get User Info
-+++++++++++++
+^^^^^^^^^^^^^
 This section allows admins to get information about a specific user including current connections as well as offline and online messages awaiting delivery.
 
 Get registered user list
-++++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^^^
 Provides a list of vhosts to search and a maximum number of users to list. Once run, the script will display a list of registered bare JIDs of users from the selected vhost.
 
 Modify User
-+++++++++++
+^^^^^^^^^^^
 Allows you to modify some user details including E-mail and whether it is an active user.

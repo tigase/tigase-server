@@ -10,7 +10,7 @@ External Component Configuration
 :numbered:
 :website: http://tigase.net
 
-In Tigase server version 4.4.x a new implementation for connecting external components has been introduced.
+In Tigase server version 4.4.x and later a new implementation for connecting external components has been introduced.
 
 It is much simpler to setup and follows the same configuration standards as all other components. It is also much more powerful as a single instance can control many TCP/IP ports and many external components on each port and even allows for multiple connections for the same component. It supports both XEP-0114 and XEP-0225 with protocol auto-detection mechanisms. Protocols are pluggable so in future more protocols can be supported or custom extensions to existing protocols can be added.
 

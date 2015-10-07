@@ -20,8 +20,8 @@ This guide describe how to efficiently use command line tools which are availabl
 
 These 2 command line tools for managing configuration and repository are:
 
-. link:http://server.tigase.org/browser/trunk/scripts/config.sh[config.sh] for configuration management.
-. link:http://server.tigase.org/browser/trunk/scripts/repo.sh[repo.sh] for repository management.
+. link:https://projects.tigase.org/projects/tigase-server/repository/changes/scripts/config.sh[config.sh] for configuration management.
+. link:https://projects.tigase.org/projects/tigase-server/repository/changes/scripts/repo.sh[repo.sh] for repository management.
 
 Both scripts call class from Tigase package. If you run any of those script with *-h* parameter you will get help screen describing all available parameters.
 
