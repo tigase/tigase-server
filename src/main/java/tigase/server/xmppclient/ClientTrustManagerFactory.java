@@ -3,6 +3,7 @@ package tigase.server.xmppclient;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,10 +14,12 @@ import java.util.logging.Logger;
 
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 
 import tigase.cert.CertificateEntry;
 import tigase.cert.CertificateUtil;
 import tigase.vhosts.VHostItem;
+import tigase.xmpp.XMPPIOService;
 
 public class ClientTrustManagerFactory {
 
@@ -26,7 +29,13 @@ public class ClientTrustManagerFactory {
 
 	private final static char[] EMPTY_PASS = new char[0];
 
+	private static final Logger log = Logger.getLogger(ClientTrustManagerFactory.class.getName());
+
 	private final ArrayList<X509Certificate> acceptedIssuers = new ArrayList<X509Certificate>();
+
+	private TrustManager[] defaultTrustManagers;
+
+	private final TrustManager[] emptyTrustManager;
 
 	private final KeyStore keystore;
 
@@ -34,10 +43,24 @@ public class ClientTrustManagerFactory {
 
 	private TrustManagerFactory tmf;
 
-	private TrustManager[] defaultTrustManagers;
+	private final ConcurrentHashMap<VHostItem, TrustManager[]> trustManagers = new ConcurrentHashMap<VHostItem, TrustManager[]>();
 
 	public ClientTrustManagerFactory() {
+		this.emptyTrustManager = new TrustManager[] { new X509TrustManager() {
 
+			@Override
+			public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+			}
+
+			@Override
+			public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+			}
+
+			@Override
+			public X509Certificate[] getAcceptedIssuers() {
+				return new X509Certificate[0];
+			}
+		} };
 		try {
 			keystore = KeyStore.getInstance(KeyStore.getDefaultType());
 			keystore.load(null, EMPTY_PASS);
@@ -56,10 +79,6 @@ public class ClientTrustManagerFactory {
 	protected X509Certificate[] getAcceptedIssuers() {
 		return acceptedIssuers.toArray(new X509Certificate[] {});
 	}
-
-	private static final Logger log = Logger.getLogger(ClientTrustManagerFactory.class.getName());
-
-	private final ConcurrentHashMap<VHostItem, TrustManager[]> trustManagers = new ConcurrentHashMap<VHostItem, TrustManager[]>();
 
 	public TrustManager[] getManager(final VHostItem vHost) {
 		TrustManager[] result = trustManagers.get(vHost);
@@ -85,6 +104,10 @@ public class ClientTrustManagerFactory {
 			log.finest("Found TrustManager for VHost " + vHost);
 
 		return result;
+	}
+
+	public TrustManager[] getManager(final XMPPIOService<Object> serv) {
+		return isActive() ? emptyTrustManager : null;
 	}
 
 	public boolean isActive() {

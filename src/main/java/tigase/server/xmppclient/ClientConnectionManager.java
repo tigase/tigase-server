@@ -1149,4 +1149,9 @@ public class ClientConnectionManager
 			addOutPacketWithTimeout(packet, stoppedHandler, 60l, TimeUnit.SECONDS);
 		}
 	}
+
+
+	public ClientTrustManagerFactory getClientTrustManagerFactory() {
+		return clientTrustManagerFactory;
+	}
 }
