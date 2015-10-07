@@ -1,6 +1,6 @@
-[[eventbus]]
-Eventbus Monitoring
-===================
+[[monitoring]]
+Monitoring
+==========
 :author: Bartosz Malkowski
 :date: 2015-04-09 8:56
 :version: v1.0 September 2015
