@@ -173,5 +173,5 @@ init.properties
 To define list of JIDs allowed to subscribe for events:
 [source, bash]
 -----
-eventbus/allowed-subscribers=francisco@denmark.lit,bernardo@denmark.lit
+eventbus/affiliations/allowedSubscribers=francisco@denmark.lit,bernardo@denmark.lit
 -----
