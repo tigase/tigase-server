@@ -262,8 +262,8 @@ public class KernelTest {
 
 		assertTrue("Bean should be located in parent", krnlChild2.isBeanClassRegistered("bean40"));
 		assertNotNull("Bean should be get from parent!", krnlChild2.getInstance("bean40"));
-		assertEquals("Beans from parent and child2 are different!", krnlParent.getInstance("bean40"),
-				krnlChild2.getInstance("bean40"));
+		assertEquals("Beans from parent and child2 are different!", (Object)krnlParent.getInstance("bean40"),
+				(Object)krnlChild2.getInstance("bean40"));
 
 		assertTrue(bean1.getCollectionOfSpecial().contains(krnlParent.getInstance("bean40")));
 		assertTrue(bean1.getCollectionOfSpecial().contains(krnlParent.getInstance("bean42")));

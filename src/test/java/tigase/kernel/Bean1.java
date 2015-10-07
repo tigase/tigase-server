@@ -8,16 +8,16 @@ import tigase.kernel.beans.Inject;
 @Bean(name = "bean1")
 public class Bean1 {
 
-	@Inject
+	@Inject(nullAllowed = true)
 	private Bean2 bean2;
 
-	@Inject
+	@Inject(nullAllowed = true)
 	private Bean3 bean3;
 
-	@Inject(type = Special.class)
+	@Inject(type = Special.class, nullAllowed = true)
 	private Set<Special> collectionOfSpecial;
 
-	@Inject
+	@Inject(nullAllowed = true)
 	private Special[] tableOfSpecial;
 
 	public Bean2 getBean2() {

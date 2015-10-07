@@ -5,7 +5,7 @@ import tigase.kernel.beans.Inject;
 
 public class Bean5Factory implements BeanFactory<Bean5> {
 
-	@Inject
+	@Inject(nullAllowed = true)
 	private Bean1 bean;
 
 	@Override
