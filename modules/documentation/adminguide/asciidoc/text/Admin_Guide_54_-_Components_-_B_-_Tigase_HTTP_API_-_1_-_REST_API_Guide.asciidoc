@@ -1,6 +1,6 @@
 [[restAPI]]
-REST API Guide
-==============
+REST API & HTTP Guide
+=====================
 :author: many people
 :date: 2015-11-09 10:22
 :version: v1.0 September 2015
@@ -9,6 +9,7 @@ REST API Guide
 :numbered:
 :website: http://www.tigase.org
 
+This component covers both REST API as well as basic HTTP component configuration.
 REST stands for REpresentational State Transfer which is a stateless communication method that in our case passes commands using HTTP GET, PUT, POST, and DELETE commands to resources within the Tigase server.
 Although REST uses HTTP to receive commands, REST itself is not intended for use in a browser.
 
@@ -41,6 +42,8 @@ Here are some additional properties for the +HttpMessageReceiver+ component that
 . +tigase.http.JettyStandaloneHttpServer+ - Starts standalone Jetty HTTP Server instance *(requires Tigase HTTP API - Jetty HTTP Server)*
 . +tigase.http.jetty.JettyOSGIHttpServer+ - Uses Jetty HTTP Server instance available as OSGi service (may be used only in OSGi envoirment) *(require Tigase HTTP API - Jetty HTTP Server)*
 . +tigase.http.java.JavaStandaloneHttpServer+ - Uses +HttpServer+ provided by Java JDK to start standalone HTTP server (may not work on JDK from every JDK provider).
+. +http/http/threads=+ - Sets the number of threads available for HTTP component. Default is 4.
+. +http/http/request-timeout=+ - Sets the timeout time in ms for threads to close on inactive connections. Default is 60 seconds.
 
 Modules
 ~~~~~~~
@@ -53,7 +56,7 @@ the following settings are available for both listed modules:
 - +vhosts[s]+ - Comma separated list of virtual hosts for which the module should be available. If not configured, the module will be available for all vhosts.
 
 Rest Module
-+++++++++++
+^^^^^^^^^^^
 This is the Module that provides support for the REST API.
 Available properties:
 
@@ -69,7 +72,7 @@ http/rest/api-key[s]=a7D2dm3lps138w
 Requests made to the HTTP service must conclude with the same key: +http://localhost:8080/rest/adhoc/sess-man@domain.com?api-key=a7D2dm3lps138w+
 
 +dns-webservice+
-++++++++++++++++
+^^^^^^^^^^^^^^^^
 This module provides resolution of DNS names using HTTP protocol. This particular module might be useful for web applications that need to resolve the DNS address to a particular IP. For example to help discover the IP and port of WebSocket services used to connect to the XMPP server.
 
 Usage Examples
@@ -233,7 +236,7 @@ Lets take a look at some examples.
 _In all examples the data is sent as an HTTP POST request to /rest/stream/?api-key=test-key._
 
 Send XMPP stanza with from set to HTTP API component to bare JID
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 [source,xml]
 -----
 <message xmlns="jabber:client" type="chat" to="test@example.com/resource-1">
@@ -250,7 +253,7 @@ Once this message is sent, the Groovy script adds the remaining information auto
 As you can see, the HTTP component is automatically populated as the sender.
 
 Send XMPP stanza with from set to HTTP API component to full JID
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 [source,xml]
 -----
 <message xmlns="jabber:client" type="chat" to="test@example.com">
@@ -266,7 +269,7 @@ The syntax and formatting is the same, with the recepiant messaging being exactl
 -----
 
 Send XMPP stanza with from set to specified JID
-+++++++++++++++++++++++++++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 You may specify any JID that is registered in the server to send the stanza, ones that use a name that is not registered will return an error.
 [source,xml]
 -----
@@ -281,6 +284,16 @@ Ends with the result being somewhat customized.
     <body>Example message 1</body>
 </message>
 -----
+
+[[avatarRetrievalRequests]]
+Avatar retrieval requests
+~~~~~~~~~~~~~~~~~~~~~~~~~
+There are different formats for avatar retrieval depending on how they are stored, see below for the resources for each type of avatar.
+
+- +/rest/avatar/user@domain+ - which returns first avatar found (PEP, VCard4 or VCardTemp in this order)
+- +/rest/avatar/user@domain/avatar+ - which returns PEP avatar
+- +/rest/avatar/user@domain/vcard4+ - which returns avatar from VCard4
+- +/rest/avatar/user@domain/vcard-temp+ - which returns avatar from VCardTemp
 
 Setting HTTP API Privacy Rules
 ------------------------------
@@ -359,7 +372,7 @@ isAsync::
   If set to true, it will be possible to wait for results pending the arrival of IQ stanzas for instance.
 
 Properties containing closures
-++++++++++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Extended class should also set for closures for one or more of the following properties: +execGet+, +execPut+, +execPost+, +execDelete+, depending on which HTTP action is needed to support the following URI. Each closure has a *dynamic arguments list* generated at runtime. Below is a list of arguments passed to closure which describe how and when the list of arguments change.
 
 service::
@@ -445,4 +458,207 @@ ${ util.include('header', [title:'All users']) }
 </table>
 ${ util.include('footer') }
 -----
-This file builds a table using the user fields from the GET request. *NOTE: Not all scripts need a matching HTML file, basic requests may not need special handling.*
+This file builds a table using the user fields from the GET request. *NOTE:* Not all scripts need a matching HTML file, basic requests may not need special handling.
+
+REST API & PubSub
+-----------------
+All PubSub Scripts are found within the +scripts/rest/pubsub+ directory of Tigase's installation directory.  All examples in this section are prepared for a PubSub component available at pubsub@example.com. To use these examples for your installation, that JID needs to be replaced with with your pubsub JID.
+
+All parameters passed in the content of HTTP request needs to be wrapped with +<data/>+ tag at the root of the XML document. Returned results will be wrapped within the +<result/>+ tag in the root of the XMl document.
+
+Create a Node
+~~~~~~~~~~~~~
+HTTP URL: example.com/rest/pubsub/pubsub@example.com/create-node
+
+Available HTTP methods:
+
+*GET*
+
+Method returns example content which contains all required and optional parameters that may be passed to the newly created node.
+
+*POST*
+
+Command requires fields +node+ and +pubsub#node_type+ to be filled with proper values for execution.
+
+- +node+ Field contains id of node to create
+- +owner+ Field may contain JID or JIDS which will be considered owner of the node. If this field is empty, server will use JID of HTTP API Component (rest@example.com)
+- +pubsub#node_type+ Field should contain one of two types:
+  * +leaf+ Node to items that will be published
+  * +collection+ Node to nodes what will contain other nodes
+
+Below is an example of creating a +leaf+ type node with the owner set to admin@example.com.
+[source,xml]
+-----
+<data>
+  <node>example</node>
+  <owner>admin@example.com</owner>
+  <pubsub prefix="true">
+    <node_type>leaf</node_type>
+  </pubsub>
+</data>
+-----
+Server response:
+[source,xml]
+-----
+<result>
+  <Note type="fixed">
+    <value>Operation successful</value>
+  </Note>
+</result>
+-----
+
+Delete a node
+~~~~~~~~~~~~~
+HTTP URL: example.com/rest/pubsub/pubsub@example.com/delete-node
+
+Available HTTP methods:
+
+*GET*
+
+Command returns example content which contains all required and operational parameters that may be passed.
+
+*POST*
+
+Command requires field +node+ to be filled where +node+ is the id of the node to delete.
+
+Below is an example of removing a node with an id of +example+
+[source,xml]
+-----
+<data>
+  <node>example</node>
+</data>
+-----
+Server response
+[source,xml]
+-----
+<result>
+  <Note type="fixed">
+    <value>Operation successful</value>
+  </Note>
+</result>
+-----
+
+Subscribe to a node
+~~~~~~~~~~~~~~~~~~~
+HTTP URI: example.com/rest/pubsub/pubsub@example.com/subscribe-node
+
+Available HTTP methods:
+
+*GET*
+
+Method returns example content which contains all required and optional parameters that may be passed.
+
+*POST*
+
+Command requires +node+ and +jid+ fields to be filled.
+
+- +node+ is the id of the node to subscribe too.
+- +jid+ is the JID or JIDS to be subscribed to the node.
+
+Below is an example of the XML information passed between client and server with +test1@example.com+ and +test2@example.com+ subscribing to +example+ node.
+[source,xml]
+-----
+<data>
+  <node>example</node>
+  <jids>
+    <value>test1@example.com</value>
+    <value>test2@example.com</value>
+  </jids>
+</data>
+-----
+Server response:
+[source,xml]
+-----
+<result>
+  <Note type="fixed">
+    <value>Operation successful</value>
+  </Note>
+</result>
+-----
+
+Unsubscribe from a node
+~~~~~~~~~~~~~~~~~~~~~~~
+HTTP URI: example.com/rest/pubsub/pubsub@example.com/unsubscribe-node
+
+Available HTTP methods:
+
+*GET*
+
+Method returns example content which contains all required and optional parameters that may be passed.
+
+*POST*
+
+Like the Subscribe to a node section, the command requires both the +node+ and +jid+ fields to be filled.
+
+- +node+ is the id of the node to unsubscribe from.
+- +jid+ is the JID or JIDS to be unsubscribed from the node.
+
+Below is an example of the XML information passed between client and server with +test1@example.com+ and +test2@example.com+ unsubscribing to +example+ node.
+[source,xml]
+-----
+<data>
+  <node>example</node>
+  <jids>
+    <value>test@example.com</value>
+    <value>test2@example.com</value>
+  </jids>
+</data>
+-----
+Server response:
+[source,xml]
+-----
+<result>
+  <Note type="fixed">
+    <value>Operation successful</value>
+  </Note>
+</result>
+-----
+
+Publish an item to a node
+~~~~~~~~~~~~~~~~~~~~~~~~~
+HTTP URI: example.com/rest/pubsub/pubsub@example.com/publish-item
+
+Available HTTP methods:
+
+*GET*
+
+Method returns example content which contains all required and optional parameters that may be passed.
+
+*POST*
+
+Command requires the +node+ and +entry+ fields to be filled.
+Available fields:
+
+- +node+ Field contains the id of the node to be published to.
+- +item-id+ Field to contain the id of the entry to publish.
+- +expire-at+ Field may contain a timestamp after which item should not be delivered to subscribed users.  Timestamp should follow this pattern: YYYY-MM-DDhh:mm:ss with a trailing Z to indicate UTC time in a 24h format.
+- +entry+ Field should contain multi-line entry content which should be valid XML value for an item.
+
+Below is an example exchange between client and server for publishing an item with id +item-1+ to node +example+ .
+[source,xml]
+-----
+<data>
+  <node>example</node>
+  <item-id>item-1</item-id>
+  <expire-at>2015-05-13T16:05:00+02:00</expire-at>
+  <entry>
+    <item-entry>
+      <title>Example 1</title>
+      <content>Example content</content>
+    </item-entry>
+  </entry>
+</data>
+-----
+Server response:
+[source,xml]
+-----
+<result>
+  <Note type="fixed">
+    <value>Operation successful</value>
+  </Note>
+</result>
+-----
+
+Other Example REST Commands and Documentation
+---------------------------------------------
+Other example REST commands, and accompanied documentation can be found at localhost:8080/rest/ on any server running Tigase and the HTTP component.

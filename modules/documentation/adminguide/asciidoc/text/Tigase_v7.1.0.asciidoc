@@ -1,0 +1,282 @@
+[[tigase710]]
+Tigase v7.1.0 announcement
+==========================
+:author: Daniel Wisnewski
+:date: 2015-25-08 22:09
+
+
+Introducing Tigase v7.1.0!  We have been working hard to improve and implement new features to the Tigase Sever program to give you a more secure, leaner, and better working XMPP server.
+
+We have a few new features, components, and lots of fixes to share.
+
+:toc:
+
+Major Changes
+-------------
+Tigase has undergone a few major changes to our code and structure. To continue to use Tigase, a few changes may be needed to be made to your systems.  Please see them below:
+
+New JDK v8 required
+~~~~~~~~~~~~~~~~~~~
+As Oracle has dropped support for version 7 of it's Java runtime environment and developer kit, we have moved to version 8 of the JDK.  Furthermore, some new features and fixes for Tigase Server now require the use of JDK v8 or later. Please upgrade your Java packages from link:http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html[this link].
+
+Changes to Pubsub Schema
+~~~~~~~~~~~~~~~~~~~~~~~~
+The PubSub Schema has been streamlined for better resource use, this change affects all users of Tigase.
+To prepare your database for the new schema, first be sure to create a backup!  Then apply the appropriate pubsub schema to your MySQL and it will add the new storage procedure.
+
+The MySQL schema can be found link:https://projects.tigase.org/projects/tigase-pubsub/repository/revisions/master/entry/database/mysql-pubsub-schema-3.1.0.sql[Here].
+
+The Derby schema can be found link:https://projects.tigase.org/projects/tigase-pubsub/repository/changes/database/derby-pubsub-schema-3.1.0.sql[Here].
+
+The PostGRESQL schema can be found link:https://projects.tigase.org/projects/tigase-pubsub/repository/changes/database/postgresql-pubsub-schema-3.1.0.sql[Here].
+
+The MS SQL schema can be found link:https://projects.tigase.org/projects/tigase-pubsub/repository/changes/database/sqlserver-pubsub-schema-3.1.0.sql[Here].
+
+The same files are also included in all distributions of v7.1.0 in +[tigaseroot]/database/+ . All changes to database schema are meant to be backward compatible.
+
+
+You can use a utility in Tigase to update the schema using the following command from the Tigase root:
+Linux
+-----
+java -cp "jars/*" tigase.util.DBSchemaLoader
+-----
+or from a Windows environment
+-----
+java -cp jars/* tigase.util.DBSchemaLoader
+-----
+*NOTE: Some variation may be necessary depending on how your java build uses -cp option*
+
+Use the following options to customize. Options in bold are required.::
+* *[-dbType database_type {derby, mysql, postgresql, sqlserver}]*
+* [-schemaVersion schema version {4, 5, 5-1} ]
+* *[-dbName database name]*
+* [-dbHostname database hostname] (default is localhost)
+* [-dbUser tigase username]
+* [-dbPass tigase user password]
+* *[-rootUser database root username]*
+* *[-rootPass database root password]*
+* *[-file path to sql schema file]*
+* [-query sql query to execute]
+* [-logLevel java logger Level]
+* [-adminJID comma separated list of admin JIDs]
+* [-adminJIDpass password (one for all entered JIDs]
+
+*Arguments take following precedent: query, file, whole schema*
+
+
+New Features & Components
+-------------------------
+
+New HTTP API
+~~~~~~~~~~~~
+Tigase now features an HTTP API that not only allows web client chat, but administrators can change settings, manage users, and even write and run scripts all from the comfort of a browser window.   Furthermore, commands can be passed through this interface using REST to create and run custom scripts and commands.
+We plan on expanding on the look and feel of this interface as time goes on, but in the meantime enjoy the real-time XMPP experience now with a user-friendly GUI.
+
+New Admin HTTP interface
+~~~~~~~~~~~~~~~~~~~~~~~~
+Tigase now comes with its own build-in web XMPP client!  It can be accessed from http://yourhost.com:8080/ui/. For more details, see the Admin UI guide.
+
+Added support for XEP-0334
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+Added support to store offline messages for messages without body content. See link:http://xmpp.org/extensions/xep-0334.html[XEP-0334] for protocol details.
+Support also added to set a list of paths and xmlns to trigger and place storage of offline messages using the following settings in init.properties:
+-----
+sess-man/plugins-conf/amp/msg-store-offline-paths[s]=/message/received[urn:xmpp:receipts],/message/store-offline
+-----
+
+Maximum users setting for MUC
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Administrators can now set that maximum number of users allowed on specific MUCs.
+See xref:mucRoomConfig[MUC Room Configuration]
+
+HTTP Rest API Support
+~~~~~~~~~~~~~~~~~~~~~~
+Document Rest
+
+Empty Nicknames
+~~~~~~~~~~~~~~~
+Tigase can now support users with empty nicknames so long as the following code is in init.properties
+------
+sess-man/plugins-conf/jabber\:iq\:roster/empty_name_enabled=true
+------
+#3308
+
+Offline Message Limits
+~~~~~~~~~~~~~~~~~~~~~~
+Tigase now has support to enable and change Offline Message Limits as handled by AMP. xref:offlineMessageLimits[Documentation here].
+
+Offline Message Sink
+~~~~~~~~~~~~~~~~~~~~
+A new way to store offline messages has been implemented, it may not replace standard offline messages, but can be used in other ways.
+xref:offlineMessageSink[Documentation here]
+
+Adding Components to trusted list
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Components can now be added to trusted list and will be shared with all clustered servers.
+link:https://projects.tigase.org/issues/3244[#3244]
+
+Tigase Mailer Extension now Included
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Tigase mailed extension is now included in distributions of Tigase server. This extension enables the monitor component to deliver E-mails to and from specified e-mail addresses when monitor are triggered.  For more information see [monitor component].
+
+EventBus implemented
+~~~~~~~~~~~~~~~~~~~~
+Tigase now has a simple PubSub component called EventBus to report tasks and triggers.  More details are available xref:eventbus[Here].
+
+XEP-0191 Blocking Command Support added
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Blocking Command support has been added to Tigase, all functions of link:http://xmpp.org/extensnions/xep-0191/html[XEP-0191] should be implemented.  See xref:blockingCommand[Admin Guide] for details.
+
+JVM Default configuration updated
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Default tigase.conf file has been updated with the following change in JVM options:
+-----
+PRODUCTION_HEAP_SETTINGS=" -Xms5G -Xmx5G " # heap memory settings must be adjusted on per deployment-base!
+JAVA_OPTIONS="${GC} ${EX} ${ENC} ${DRV} ${JMX_REMOTE_IP} -server ${PRODUCTION_HEAP_SETTINGS} -XX:MaxDirectMemorySize=128m "
+-----
+As the comment says, we recommend adjusting the heap memory settings for your specific installations.
+link:https://projects.tigase.org/issues/3567[#3567]
+
+New Rest API added to obtain a JID login time
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++GetUserInfo+ command has been expanded to obtain user login and logout times in addition to standard information. To obtain the information, send a POST request to http://xmpp.domain.net:8080/rest/adhoc/sess-man@xmpp.domain.net?api-key=test-api-key with the following:
+[source,xml]
+-----
+<command>
+  <node>get-user-info</node>
+  <fields>
+    <item>
+      <var>accountjid</var>
+      <value>user@xmpp.domain.net</value>
+    </item>
+    <item>
+      <var>Show connected resources in table</var>
+      <value>true</value>
+    </item>
+  </fields>
+</command>
+-----
+
+New init.properties property
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++--vhost-disable-dns-check=true+
+Disables DNS checking for vhosts when changed or edited.
+When new vhosts are created, Tigase will automatically check for SRV records and proper DNS settings for the new vhosts to ensure connectivity for outside users, however if these validations fail, you will be unable to save those changes. This setting allows you to bypass that checking.
+
+New Documentation Structure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+There has been a lot of changes and fixes to our documentation over the last few months. If you have links to any of our documentation, please update them as the filenames may have changed.
+
+New Minor Features & Behavior Changes
+-------------------------------------
+- JTDS MS SQL Server driver updated to v1.3.1
+- link:https://projects.tigase.org/issues/163[#163] User +LastActivity+ partially implemented, however some features are not available at this time.
+- #811 Plugin API extended allowing more XML parameters to be considered for processing.
+- link:https://projects.tigase.org/issues/1436[#1436] +ClusterConnectionManager+ now sends ping packets every 30 seconds to check status of live cluster connections.
+- link:https://projects.tigase.org/issues/1449[#1449] Monitoring can now be run in OSGI mode.
+- link:https://projects.tigase.org/issues/2561[#2561] & link:https://projects.tigase.org/issues/85[#85] Offline messages now consider sessions without presence & resources negative priority in delivery logic.
+- link:https://projects.tigase.org/issues/2596[#2596] Delivery errors are no longer run through preprocessors.
+- link:https://projects.tigase.org/issues/2823[#2823] +staticStr+ element method now implemented.
+- link:https://projects.tigase.org/issues/2835[#2835] Allowing of +setPermissions+ on incoming packets before they are processed by plugins.
+- link:https://projects.tigase.org/issues/2903[#2903] +see-other-host+ has new option to make it configurable on a per vhost basis.
+- limk:https://projects.tigase.org/issues/3034[#3034] Improved handling of data types and primitives within Tigase.
+- link:https://projects.tigase.org/issues/3180[#3180] Protected access to JDBC repository now enabled.
+- link:https://projects.tigase.org/issues/3230[#3230] Verification added to check against CUSTOM domain rules when submitted.
+- #3258 Retrieval of PubSub/PEP based avatars using REST API now supported. xref:avatarRetrievalRequests[Command URLs here].
+- #3282 VCard4 support added along with VCardTemp compatibility and integration.
+- link:https://projects.tigase.org/issues/3285[#3285] Stream Management changed to fully support XEP-0203.
+- link:https://projects.tigase.org/issues/3330[#3330] Error for adding users already in db now returns Error 409 with +User exists+.
+- #3364 Clustering support has been re-factored to remove duplicate +nodeConnected+ and +nodeDisconnected+ methods.
+- #3463 +offline-roster-last-seen+ feature as a part of presence probe is now disabled by default.
+- link:https://projects.tigase.org/issues/3511[#3511] Stream closing mechanism in SessionManager, new STREAM_CLOSED command has been added to organize shutdown of XMPP streams.
+
+
+Fixes
+-----
+- link:https://projects.tigase.org/issues/1396[#1396] & link:https://projects.tigase.org/issues/663[#663] User roster behaves correctly. Tigase now waits for user authorization before users are added to a Roster.
+
+- link:https://projects.tigase.org/issues/1488[#1488] NPE in ad-hoc for managing external components fixed.
+
+- link:https://projects.tigase.org/issues/2003[#2003] Fixed bug with C2S streams where server would not always overwrite from attribute with full JID in subcription-related presence stanzas.
+
+- link:https://projects.tigase.org/issues/2118[#2118] Username modification bugfix. Tigase now returns "" for blank usernames instead of string after a username has been made blank.
+
+- link:https://projects.tigase.org/issues/2859[#2859] & link:https://projects.tigase.org/issues/2997[#2997] STARTTLS stream error on SSL sockets fixed.
+
+- link:https://projects.tigase.org/issues/2877[#2877] Fixed issue in Message Carbons if message contains AMP payload.
+
+- link:https://projects.tigase.org/issues/3034[#3034] Streamlined primitive and Object array handling.
+
+- link:https://projects.tigase.org/issues/3067[#3067] Fixed Bug where if duplicate commands were sent to MS SQLServer a race condition would occur.
+
+- link:https://projects.tigase.org/issues/3075[#3075] Fixed error when compiling Tigase in Red Hat Enterprise Linux v6.
+
+- link:https://projects.tigase.org/issues/3080[#3080] --net-buff-high-throughput now parses integers properly. Setting no longer reverts to default when new values are set.
+
+- link:https://projects.tigase.org/issues/3126[#3126] Calculation of percentage of heap memory used in Statistics now selects proper heap.
+
+- link:https://projects.tigase.org/issues/3131[#3131] Fixed messages with AMP payload bound for plugins getting redirected to AMP for processing.
+
+- link:https://projects.tigase.org/issues/3150[#3150] Default Log level changed for certain records. All log entries with skipping admin script now have log level +FINEST+ instead of +CONFIG+
+
+- link:https://projects.tigase.org/issues/3158[#3158] Fixed issue with OSGi not reporting proper version, and PubSub errors in OSGi mode.
+
+- link:https://projects.tigase.org/issues/3159[#3159] User Privacy lists now activate properly and does not wait for presence stanza to filter packets.
+
+- link:https://projects.tigase.org/issues/3164[#3164] Fixed NPE in +StreamManagementIOProcessor+ when <a/> is processed after connection is closed.
+
+- link:https://projects.tigase.org/issues/3166[#3166] NPE in SessionManager checking SSL null connections fixed.
+
+- link:https://projects.tigase.org/issues/3181[#3181] S2S connection multiplexing now has consistent behavior.
+
+- link:https://projects.tigase.org/issues/3194[#3194] Fixed issue with single long lasting HTTP connection blocking other HTTP requests. Default timeout set to 4 threads after 60 seconds.
+
+- link:https://projects.tigase.org/issues/3200[#3200] Implemented a faster way to close stale connections using MS SQL server, reducing calm down time after large user disconnects.
+
+- #3203 Correct presence status shows for contacts if authorization was accepted while user was offline.
+
+- link:https://projects.tigase.org/issues/3223[#3223] +GetUserInfo+ ad-hoc command no longer omits information about local sessions when a remote session is active.
+
+- link:https://projects.tigase.org/issues/3245[#3245] Fixed ClassCastException when Websocket is configured to use SSL.
+
+- link:https://projects.tigase.org/issues/3249[#3249] JabberIQVersion plugin now returns proper client information when requested from self.
+
+- link:https://projects.tigase.org/issues/3259[#3259] Websocket no longer loops when receiving stanzas between 32767 and 65535 bytes in size.
+
+- link:https://projects.tigase.org/issues/3261[#3261] Fixed issue with duplicate disco#info responses.
+
+- link:https://projects.tigase.org/issues/3274[#3274] NPE when removing roster nickname fixed.
+
+- link:https://projects.tigase.org/issues/3307[#3307] Rosters are no longer re-saved when a user logs in and roster is read resulting in a performance boost.
+
+- link:https://projects.tigase.org/issues/3336[#3336] Fixed issues with reloading vhosts in trusted after configuration change.
+
+- link:https://projects.tigase.org/issues/3337[#3337] tls-jdk-nss-bug-workaround-active is now disabled by default. This fix is disabled by default which may impact older OpenSSL versions that may no longer be supported.  You may enable this using an init.properties setting.
+
+- #3341 IQ Packet processing changed for packets sent to bare JID in Cluster mode.
+
+- link:https://projects.tigase.org/issues/3372[#3372] Fixed NPE when presence was rebroadcasted to users who did not exit server gracefully.
+
+- link:https://projects.tigase.org/issues/3374[#3374] PubSub Schema changed to be more compatible with MS SQL.
+
+- link:https://projects.tigase.org/issues/3375[#3375] Users removed VIA REST commands are now disconnected immediately.
+
+- link:https://projects.tigase.org/issues/3386[#3386] Fixed AMP logic to avoid querying for (default) Privacy list if user does not exist.
+
+- #3440 Fixed WebSocket error 12030 showing unexpectedly.
+
+- link:https://projects.tigase.org/issues/3446[#3446] Fixed Installer configuring MUC incorrectly.
+
+- #3449 Wrapper.conf updated with current library folder for windows Service wrapper.
+
+- link:https://projects.tigase.org/issues/3453[#3453] Fixed NPE when using comparator when sorting messages.
+
+- link:https://projects.tigase.org/issues/3495[#3495] Fixed messages being duplicated by message carbons.
+
+- #3550 Fixed NPE in sess-man when trying to delete all user information using Pidgin or Psi.
+
+- link:https://projects.tigase.org/issues/3559[#3559] Fixed Web admin UI not updating Cluster node when it id disconnected.
+
+- Added missing classes to IzPack installer
+
+- Tigase.xml removed from documentation and default tigase.conf file.

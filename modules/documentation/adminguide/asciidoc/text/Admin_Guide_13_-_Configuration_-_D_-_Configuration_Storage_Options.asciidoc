@@ -1,6 +1,6 @@
 [[confChanges5x]]
-Configuration Changes in the Tigase Server 5.x
-==============================================
+Configuration Storage Options in Tigase
+=======================================
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-01-06 20:22
@@ -15,34 +15,6 @@ The whole configuration framework for the Tigase server has been redesigned and 
 Although this article is titled configuration changes, version 5.x still follows our policy about backward compatibility. So the changes could be considered extensions rather than complete overhauls.
 
 There is however one change which can affect a few users. Those who use the server and worked with it's configuration remember the mess and confusion related to duality in the server configuration - the +init.properties+ file and +tigase.xml+ file. This is now over.
-
-Reverting To the Old Behavior
-------------------------------
-
-While using the +tigase.xml+ file is still possible and the old behavior can be preserved, it is now disabled by default. By default the Tigase server reads only +init.properties+ file with initial settings and stores all the complete configuration in memory only.
-
-The +init.properties+ works exactly as before and all old parameters are still working exactly as before. The only difference is the lack of the tigase.xml which is not created or read by default if it is present. The main advantage is that you don't have to remove it each time you change something in the +init.properties+ to pick up new settings.
-
-Firstly we will go into how to re-enable the server to check and use the +tigase.xml+ file to retain functionality with older settings. This is actually very simple to accomplish. The Tigase server now, offers pluggable repository support. This means that you can easily extend current functionality with a different configuration storage by writing own class which reads and writes configuration parameters.
-
-By default class +tigase.conf.ConfigurationCache+ is loaded which stores configuration in memory only.
-
-Please note, the +init.properties+ file is always read if it exists at a given location.
-
-To revert to the old behavior you just need to pass a parameter to Tigase server with a class name which is responsible for keeping server parameters in the old XML file. You can do it in two ways:
-
-. Add a parameter to init.properties file:
-+
-[source,bash]
--------------------------------------
---tigase-config-repo-class=tigase.conf.ConfigXMLRepository
--------------------------------------
-. Or you can pass a system property to the JVM at the startup time:
-+
-[source,bash]
--------------------------------------
--Dtigase-config-repo-class=tigase.conf.ConfigXMLRepository
--------------------------------------
 
 Default Behavior
 -----------------
@@ -128,6 +100,34 @@ create table tigase_configuration (
 
 primary key(cluster_node, component_name, key_node,
                   key_node, flag));
+-------------------------------------
+
+Reverting To the Old Behavior
+------------------------------
+
+While using the +tigase.xml+ file is still possible and the old behavior can be preserved, it is now disabled by default. By default the Tigase server reads only +init.properties+ file with initial settings and stores all the complete configuration in memory only.
+
+The +init.properties+ works exactly as before and all old parameters are still working exactly as before. The only difference is the lack of the tigase.xml which is not created or read by default if it is present. The main advantage is that you don't have to remove it each time you change something in the +init.properties+ to pick up new settings.
+
+Firstly we will go into how to re-enable the server to check and use the +tigase.xml+ file to retain functionality with older settings. This is actually very simple to accomplish. The Tigase server now, offers pluggable repository support. This means that you can easily extend current functionality with a different configuration storage by writing own class which reads and writes configuration parameters.
+
+By default class +tigase.conf.ConfigurationCache+ is loaded which stores configuration in memory only.
+
+Please note, the +init.properties+ file is always read if it exists at a given location.
+
+To revert to the old behavior you just need to pass a parameter to Tigase server with a class name which is responsible for keeping server parameters in the old XML file. You can do it in two ways:
+
+. Add a parameter to init.properties file:
++
+[source,bash]
+-------------------------------------
+--tigase-config-repo-class=tigase.conf.ConfigXMLRepository
+-------------------------------------
+. Or you can pass a system property to the JVM at the startup time:
++
+[source,bash]
+-------------------------------------
+-Dtigase-config-repo-class=tigase.conf.ConfigXMLRepository
 -------------------------------------
 
 Going Further

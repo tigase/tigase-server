@@ -13,4 +13,3 @@ Tigase Server Version 4.x
 Administration manuals and guides for Tigase server version 4.x.
 
 - xref:tigase40schemaUpgrade[MySQL Database Schema Upgrade for Tigase 4.0]
-- xref:tigase4xconfiguration[Configuration]
