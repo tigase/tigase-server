@@ -1063,6 +1063,15 @@ public class ClientConnectionManager
 
 	}
 	
+	@Override
+	protected void socketAccepted(XMPPIOService serv, SocketType type) {
+		if (type == SocketType.ssl) {
+			ClientTrustManagerFactory factory = getClientTrustManagerFactory();
+			TrustManager[] x = factory.getManager((XMPPIOService<Object>) serv);
+			serv.setX509TrustManagers(x);
+		}
+	}
+	
 	private List<Element> getFeatures(XMPPIOService service) {
 		List<Element> results = new LinkedList<Element>();
 
