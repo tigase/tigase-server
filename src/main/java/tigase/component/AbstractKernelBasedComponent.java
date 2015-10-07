@@ -102,7 +102,6 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 		if (props.size() <= 1)
 			return;
 
-		super.setProperties(props);
 
 		kernel.registerBean("component").asInstance(this).exec();
 		kernel.registerBean("adHocCommandManager").asClass(AdHocCommandManager.class).exec();
@@ -116,8 +115,11 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 
 		registerModules(kernel);
 
+		
 		PropertiesBeanConfigurator configurator = kernel.getInstance(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME);
 		configurator.setProperties(props);
+
+		super.setProperties(props);
 
 		try {
 			changeRegisteredBeans(props);
