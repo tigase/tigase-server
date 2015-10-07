@@ -407,8 +407,15 @@ public abstract class IOService<RefObject>
 				tls_hostname = (String) this.getSessionData().get("remote-hostname");
 			port = ((InetSocketAddress) socketIO.getSocketChannel().getRemoteAddress()).getPort();
 		}
-		TLSWrapper wrapper = new TLSWrapper(TLSUtil.getSSLContext("SSL", tls_hostname, clientMode),
-				this, tls_hostname, port, clientMode, wantClientAuth, needClientAuth);
+		SSLContext sslContext;
+
+		if (x509TrustManagers != null) {
+			sslContext = TLSUtil.getSSLContext("SSL", tls_hostname, clientMode, x509TrustManagers);
+		} else {
+			sslContext = TLSUtil.getSSLContext("SSL", tls_hostname, clientMode);
+		}
+
+		TLSWrapper wrapper = new TLSWrapper(sslContext, this, tls_hostname, port, clientMode, wantClientAuth, needClientAuth);
 
 		socketIO = new TLSIO(socketIO, wrapper, byteOrder());
 		setLastTransferTime();
@@ -430,7 +437,7 @@ public abstract class IOService<RefObject>
 		}
 
 		// This should not take more then 100ms
-		int counter = 0;
+	int counter = 0;
 
 		while (isConnected() && waitingToSend() && (++counter < 10)) {
 			writeData(null);
