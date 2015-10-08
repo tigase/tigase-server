@@ -319,9 +319,11 @@ public class FlexibleOfflineMessageRetrieval
 					final Packet packetInstance = Packet.packetInstance( elem );
 					if (packetInstance.getElemName() == Iq.ELEM_NAME) {
 						packetInstance.initVars(packetInstance.getStanzaFrom(), conn.getJID());
+					} else {
+						packetInstance.setPacketTo( conn.getConnectionId() );
 					}
 					pacs.offer( packetInstance );
-				} catch ( TigaseStringprepException ex ) {
+				} catch ( TigaseStringprepException | NoConnectionIdException ex ) {
 					log.warning( "Packet addressing problem, stringprep failed: " + elem );
 				}
 			}    // end of while (elem = elems.poll() != null)

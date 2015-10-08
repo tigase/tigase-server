@@ -1,6 +1,8 @@
 package tigase.monitor.tasks;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Date;
 import java.util.HashSet;
@@ -23,11 +25,11 @@ public class CpuTempTask extends AbstractConfigurableTimerTask {
 
 	private final static DateTimeFormatter dtf = new DateTimeFormatter();
 
-	private static final String FREQ_FILE = "/proc/cpuinfo";
+	private static final File FREQ_FILE = new File("/proc/cpuinfo");
 
 	private static final Logger log = Logger.getLogger(CpuTempTask.class.getName());
 
-	private static final String TEMP_FILE = "/proc/acpi/thermal_zone/TZ01/temperature";
+	private static final File TEMP_FILE = new File("/proc/acpi/thermal_zone/TZ01/temperature");
 
 	private static final String THROTT_DIR = "/proc/acpi/processor/CPU";
 
@@ -82,6 +84,9 @@ public class CpuTempTask extends AbstractConfigurableTimerTask {
 				log.warning("Empty file: " + TEMP_FILE);
 			}
 			buffr.close();
+		} catch (FileNotFoundException ex) {
+			log.log(Level.WARNING, "File contains temperature doesn't exists. Disabling task cpu-temp-task");
+			setEnabled(false);
 		} catch (Exception ex) {
 			log.log(Level.WARNING, "Can't read file: " + TEMP_FILE, ex);
 		}
@@ -90,7 +95,8 @@ public class CpuTempTask extends AbstractConfigurableTimerTask {
 	private void checkCPUThrottling() {
 		for (int i = 0; i < cpu_thrott_st.length; i++) {
 			try {
-				BufferedReader buffr = new BufferedReader(new FileReader(THROTT_DIR + i + THROTT_FILE));
+				File file = new File(THROTT_DIR + i + THROTT_FILE);
+				BufferedReader buffr = new BufferedReader(new FileReader(file));
 				String line = null;
 				while ((line = buffr.readLine()) != null) {
 					String line_trimmed = line.trim();
