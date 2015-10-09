@@ -28,13 +28,11 @@ import tigase.xml.Element;
 
 /**
  * Abstract class for help building a module. It has implemented few default
- * methods from {@link Module}, {@link ContextAware} and
- * {@link InitializingModule}.
+ * methods from {@code Module}, {@code ContextAware} and
+ * {@code InitializingModule}.
  *
  * @author bmalkow
  *
- * @param <CTX>
- *            context of component.
  */
 public abstract class AbstractModule implements Module {
 
