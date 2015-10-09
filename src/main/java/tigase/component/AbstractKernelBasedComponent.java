@@ -33,7 +33,7 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 	 * Logger
 	 */
 	protected final Logger log = Logger.getLogger(this.getClass().getName());
-	private final EventBus eventBus = new EventBus() {
+	protected final EventBus eventBus = new EventBus() {
 
 		private final EventBus eventBus = EventBusFactory.getInstance();
 
