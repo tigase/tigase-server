@@ -477,15 +477,20 @@ public class JabberIqPrivacy
 
 				if ((items == null) || items.isEmpty()) {
 					// if the list is in use then forbid changes
-					boolean inUse = name.equals(getDefaultListName(session));
+					boolean inUse = session.getCommonSessionData(PRIVACY_LIST_LOADED) != null
+													&& session.getCommonSessionData(DEFAULT) != null;
 
 					if (!inUse) {
 						for (XMPPResourceConnection activeSession : session.getActiveSessions()) {
+							if (activeSession.equals( session)) {
+								// don't apply to the current session
+								continue;
+							}
 							inUse |= name.equals(Privacy.getActiveListName(activeSession));
 						}
 					}
 					if (inUse) {
-						results.offer(Authorization.CONFLICT.getResponseMessage(packet, null, true));
+						results.offer(Authorization.CONFLICT.getResponseMessage(packet, "Can not modify list while being in use by other session", true));
 					} else {
 						Privacy.removeList(session, child);
 						results.offer(packet.okResult((String) null, 0));
