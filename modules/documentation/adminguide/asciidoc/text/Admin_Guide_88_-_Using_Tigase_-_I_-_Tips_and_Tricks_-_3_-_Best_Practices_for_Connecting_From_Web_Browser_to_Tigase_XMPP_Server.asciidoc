@@ -29,6 +29,13 @@ Tip #1 - BOSH in Cluster Mode Without Load Balancer
 
 There is also a way to use BOSH without load balancer enabled. In this case the XMPP client needs to have more logic and knowledge about all available cluster nodes (with names of nodes which will identify particular cluster nodes from internet). Using this knowledge XMPP client should select one random node from list of available nodes and always establish BOSH connections to this particular node. In case if BOSH connection fails due to network connection issues, the XMPP client should randomly pick other node from list of rest of available nodes.
 
+_Solution:_
+
+Tigase XMPP Server by default provides server side solution for this issue by sending additional +host+ attribute in +body+ element of BOSH response. As value of this attribute Tigase XMPP Server sends domain name of server cluster node to which client connected and to which next connections of this session should be opened.
+It is possible to disable this custom feature by addition of of following line to +etc/init.properties+ config file:
+
++bosh/send-node-hostname[B]=false+
+
 _Example:_
 
 We have servers +t1.example.com+ and +t2.example.com+ which are nodes of a cluster hosting domain +example.com+. Web client retrieves list of cluster nodes from web server and then when it needs to connect to the XMPP server it picks random host from list of retrieved cluster nodes (i.e. +t2.example.com+) and tries to connect using BOSH protocol to host +t2.example.com+ but it should send +example.com+ as name of the server it tries to connect to (+example.com+ should be value of +to+ attribute of XMPP stream).
