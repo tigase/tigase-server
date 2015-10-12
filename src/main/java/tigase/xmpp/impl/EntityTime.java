@@ -7,6 +7,7 @@ import java.util.Queue;
 import java.util.TimeZone;
 
 import tigase.db.NonAuthUserRepository;
+import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
@@ -15,23 +16,26 @@ import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPProcessorAbstract;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.impl.annotation.DiscoFeatures;
+import tigase.xmpp.impl.annotation.Handle;
+import tigase.xmpp.impl.annotation.Handles;
+import tigase.xmpp.impl.annotation.Id;
 
 /**
  * This supports the implementation of
  * <a href='http://xmpp.org/extensions/xep-0202.html'>XEP-0202</a>: Entity Time.
  *
  */
+@Id(EntityTime.XMLNS)
+@Handles({ @Handle(path = { Iq.ELEM_NAME, EntityTime.TIME }, xmlns = EntityTime.XMLNS) })
+@DiscoFeatures({ EntityTime.XMLNS })
 public class EntityTime extends XMPPProcessorAbstract {
 
-	private static final String XMLNS = "urn:xmpp:time";
+	protected static final String XMLNS = "urn:xmpp:time";
 
-	private static final Element[] DISCO_FEATURES = { new Element("feature", new String[] { "var" }, new String[] { XMLNS }) };
-
-	private static final String[] ELEMENTS = { "time" };
+	protected static final String TIME = "time";
 
 	private final static String ID = XMLNS;
-
-	private final static String[] XMLNSS = new String[] { XMLNS };
 
 	private static String getUtcOffset() {
 		SimpleDateFormat sdf = new SimpleDateFormat("Z");
@@ -44,8 +48,7 @@ public class EntityTime extends XMPPProcessorAbstract {
 	private static String getUtcTime() {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-		String dateTimeString = sdf.format(new Date());
-		return dateTimeString;
+		return sdf.format(new Date());
 	}
 
 	@Override
@@ -56,18 +59,16 @@ public class EntityTime extends XMPPProcessorAbstract {
 	@Override
 	public void processFromUserOutPacket(JID connectionId, Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) throws PacketErrorTypeException {
-		if (packet.getType() == StanzaType.get) {
-			sendTimeResult(packet, results);
-		} else if (packet.getType() == StanzaType.set)
-			results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Message type is incorrect", true));
-		else
-			super.processFromUserOutPacket(connectionId, packet, session, repo, results, settings);
+		super.processFromUserOutPacket(connectionId, packet, session, repo, results, settings);
 	}
 
 	@Override
 	public void processFromUserToServerPacket(JID connectionId, Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) throws PacketErrorTypeException {
-		if (packet.getType() == StanzaType.get) {
+		if (packet.getStanzaTo() != null && packet.getStanzaFrom() != null
+				&& packet.getStanzaTo().equals(packet.getStanzaFrom())) {
+			processFromUserOutPacket(connectionId, packet, session, repo, results, settings);
+		} else if (packet.getType() == StanzaType.get) {
 			sendTimeResult(packet, results);
 		} else
 			results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Message type is incorrect", true));
@@ -92,12 +93,7 @@ public class EntityTime extends XMPPProcessorAbstract {
 	@Override
 	public void processToUserPacket(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
 			Queue<Packet> results, Map<String, Object> settings) throws PacketErrorTypeException {
-		if (packet.getType() == StanzaType.get) {
-			sendTimeResult(packet, results);
-		} else if (packet.getType() == StanzaType.set)
-			results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Message type is incorrect", true));
-		else
-			super.processToUserPacket(packet, session, repo, results, settings);
+		super.processToUserPacket(packet, session, repo, results, settings);
 	}
 
 	private void sendTimeResult(Packet packet, Queue<Packet> results) {
@@ -115,21 +111,6 @@ public class EntityTime extends XMPPProcessorAbstract {
 
 		resp.getElement().addChild(time);
 		results.offer(resp);
-	}
-
-	@Override
-	public Element[] supDiscoFeatures(XMPPResourceConnection session) {
-		return DISCO_FEATURES;
-	}
-
-	@Override
-	public String[] supElements() {
-		return ELEMENTS;
-	}
-
-	@Override
-	public String[] supNamespaces() {
-		return XMLNSS;
 	}
 
 }
