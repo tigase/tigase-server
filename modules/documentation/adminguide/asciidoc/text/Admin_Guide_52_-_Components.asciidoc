@@ -12,11 +12,9 @@ Configuring the Tigase Server to Load a Component
 
 A detailed description of all the configuration options is in the +init.properties+ guide where you can also find information described below and much more. The purpose of this document is to give you a brief introduction on how to load a component into Tigase server without the need to dig through all the details.
 
-I will show how to load 2 components into Tigase server using a configuration in the init.properties file: link:https://projects.tigase.org/projects/tigase-muc[MUC] and link:https://projects.tigase.org/projects/tigase-pubsub[PubSub]. Please remember, every time you change something in the *init.properties* file you have to remove the XML configuration file in order to force the server to regenerate the main configuration which is stored in XML file.
+I will show how to load 2 components into Tigase server using a configuration in the init.properties file: link:https://projects.tigase.org/projects/tigase-muc[MUC] and link:https://projects.tigase.org/projects/tigase-pubsub[PubSub].
 
-The first thing you need do is conduct component implementation. Component implementation is a class or set of classes extending link:http://projects.tigase.org/server/trac/browser/trunk/src/main/java/tigase/server/AbstractMessageReceiver.java[tigase.server.AbstractMessageReceiver]. What you need to do is just put the jar file in the +libs/+ directory in Tigase server installation. Then Tigase server will find all classes automatically at the startup time.
-
-Next step is to tell the server what components to load, how to name them and optionally give some extra parameters. To do so open the +init.properties+ file you use in your installation. It might be init-mysql.properties or init-pgsql.properties or even your own properties file.
+The only step is to tell the server what components to load, how to name them and optionally give some extra parameters. To do so open the +init.properties+ file you use in your installation.
 
 Let's say you want to just add PubSub for now. All you need to do is add 2 lines to the properties file:
 
@@ -45,4 +43,5 @@ Normally, however we want to load few different components like PubSub, MUC, MSN
 --comp-name-2=muc
 --comp-class-2=tigase.muc.MUCComponent
 -------------------------------------
-Again! Don't forget to remove your XML config file before restarting the server.
+
+Changes to the init.properties file will take effect upon server restart.
