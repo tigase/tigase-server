@@ -36,6 +36,9 @@ Commands for virtual domain management can be executed using any XMPP client wit
 Please refer to documents listed below for more detailed information on the following topics:
 
 // - ////<<managingVirtualDomainsMissing,////Managing Virtual Domains Using Psi Client.
-- xref:ad-hocCommands[Specification for ad-hoc Commands Used to Manage Virtual Domains.]
+- xref:ad-hocCommands[Specification for ad-hoc Commands Used to Manage Virtual Domains].
+- xref:virtualComponents[Virtual Components for the Tigase Cluster]
+
+You may also want to reference these for additonal information
 - xref:addManageDomain[API Description for Virtual Domains Management in Tigase Server].
 - link:http://docs.tigase.org/tigase-server/snapshot/Properties_Guide/html_chunk/virtHosts.html[virtHosts Property guide]

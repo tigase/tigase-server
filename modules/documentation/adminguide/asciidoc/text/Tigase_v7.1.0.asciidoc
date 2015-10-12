@@ -23,45 +23,7 @@ Changes to Pubsub Schema
 ~~~~~~~~~~~~~~~~~~~~~~~~
 The PubSub Schema has been streamlined for better resource use, this change affects all users of Tigase.
 To prepare your database for the new schema, first be sure to create a backup!  Then apply the appropriate pubsub schema to your MySQL and it will add the new storage procedure.
-
-The MySQL schema can be found link:https://projects.tigase.org/projects/tigase-pubsub/repository/revisions/master/entry/database/mysql-pubsub-schema-3.1.0.sql[Here].
-
-The Derby schema can be found link:https://projects.tigase.org/projects/tigase-pubsub/repository/changes/database/derby-pubsub-schema-3.1.0.sql[Here].
-
-The PostGRESQL schema can be found link:https://projects.tigase.org/projects/tigase-pubsub/repository/changes/database/postgresql-pubsub-schema-3.1.0.sql[Here].
-
-The MS SQL schema can be found link:https://projects.tigase.org/projects/tigase-pubsub/repository/changes/database/sqlserver-pubsub-schema-3.1.0.sql[Here].
-
-The same files are also included in all distributions of v7.1.0 in +[tigaseroot]/database/+ . All changes to database schema are meant to be backward compatible.
-
-
-You can use a utility in Tigase to update the schema using the following command from the Tigase root:
-Linux
------
-java -cp "jars/*" tigase.util.DBSchemaLoader
------
-or from a Windows environment
------
-java -cp jars/* tigase.util.DBSchemaLoader
------
-*NOTE: Some variation may be necessary depending on how your java build uses -cp option*
-
-Use the following options to customize. Options in bold are required.::
-* *[-dbType database_type {derby, mysql, postgresql, sqlserver}]*
-* [-schemaVersion schema version {4, 5, 5-1} ]
-* *[-dbName database name]*
-* [-dbHostname database hostname] (default is localhost)
-* [-dbUser tigase username]
-* [-dbPass tigase user password]
-* *[-rootUser database root username]*
-* *[-rootPass database root password]*
-* *[-file path to sql schema file]*
-* [-query sql query to execute]
-* [-logLevel java logger Level]
-* [-adminJID comma separated list of admin JIDs]
-* [-adminJIDpass password (one for all entered JIDs]
-
-*Arguments take following precedent: query, file, whole schema*
+Details on how to accomplish this are found xref:tigaseServer71[in the schema upgrade guide].
 
 
 New Features & Components
@@ -91,7 +53,7 @@ See xref:mucRoomConfig[MUC Room Configuration]
 
 HTTP Rest API Support
 ~~~~~~~~~~~~~~~~~~~~~~
-Document Rest
+Tigase now supports REST commands via HTTP, they can be sent from ad-hoc commands, a web interface, or other REST tools. See xref:tigase_http_api[documentation] for more.
 
 Empty Nicknames
 ~~~~~~~~~~~~~~~
@@ -171,6 +133,7 @@ New Minor Features & Behavior Changes
 -------------------------------------
 - JTDS MS SQL Server driver updated to v1.3.1
 - link:https://projects.tigase.org/issues/163[#163] User +LastActivity+ partially implemented, however some features are not available at this time.
+- link:https://projects.tigase.org/issues/593[#593] link:http://xmpp.org/extensions/xep-0202.html[XEP-0202 Entity Time] has been implemented.
 - #811 Plugin API extended allowing more XML parameters to be considered for processing.
 - link:https://projects.tigase.org/issues/1436[#1436] +ClusterConnectionManager+ now sends ping packets every 30 seconds to check status of live cluster connections.
 - link:https://projects.tigase.org/issues/1449[#1449] Monitoring can now be run in OSGI mode.
@@ -189,6 +152,7 @@ New Minor Features & Behavior Changes
 - #3364 Clustering support has been re-factored to remove duplicate +nodeConnected+ and +nodeDisconnected+ methods.
 - #3463 +offline-roster-last-seen+ feature as a part of presence probe is now disabled by default.
 - link:https://projects.tigase.org/issues/3511[#3511] Stream closing mechanism in SessionManager, new STREAM_CLOSED command has been added to organize shutdown of XMPP streams.
+- #3609 Added new configuration option for BOSH to disable hostname attribute. xref:tip_1_bosh_in_cluster_mode_without_load_balancer[Details here].
 
 
 Fixes
@@ -276,6 +240,8 @@ Fixes
 - #3550 Fixed NPE in sess-man when trying to delete all user information using Pidgin or Psi.
 
 - link:https://projects.tigase.org/issues/3559[#3559] Fixed Web admin UI not updating Cluster node when it id disconnected.
+
+- link:http://projects.tigase.org/issues/3579[#3579] Fixed NPE in SimpleParser.
 
 - Added missing classes to IzPack installer
 

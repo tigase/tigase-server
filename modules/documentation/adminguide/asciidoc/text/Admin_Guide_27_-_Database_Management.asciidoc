@@ -5,8 +5,31 @@ Database Management
 :version: v1.0 July 2015
 :date: 2015-07-16 12:49
 
-:toc:
-:numbered:
 :website: http://tigase.net
 
-Tigase is coded to perform with multiple database types and numbers.  Owing to it's versatile nature, there are some tools and procedures that may be of use to certain administrators.  These are included below.
+Tigase is coded to perform with multiple database types and numbers.
+Owing to it's versatile nature, there are some tools and procedures that may be of use to certain administrators.
+
+xref:databasePreperation[Database Preparation]
+----------------------------------------------
+Preparing new databases in case installer setup is not an option.
+
+xref:hashedPasswords[Hashed Passwords in User Database]
+-------------------------------------------------------
+Providing more secure password storage.
+
+xref:multidb[Multiple Databases in Tigase]
+------------------------------------------
+Options for using multiple databases for different purposes in Tigase.
+
+xref:dbImportingData[Importing User Data]
+-----------------------------------------
+Tips to move data repositories from one to another database.
+
+xref:existingData[Import Existing Database]
+-------------------------------------------
+This section has some depreciated information, however it may be handy to upgrade, or manually connect databases.
+
+xref:oldVerSchemas[Old Version Schemas and Updates]
+---------------------------------------------------
+Contains our old Schema updates, if you have an old installation of Tigase and want to move to a more current version, see the guides revelant to you.

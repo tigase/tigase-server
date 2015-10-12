@@ -1,0 +1,62 @@
+[[tigaseServer71]]
+Tigase Server v7.1 Schema Updates
+=================================
+:author: Daniel Wisnewski
+:version: v1.0 October 2015
+:Date: 2015-10-12 15:36
+
+:numbered:
+:website: http://www.tigase.org
+
+Tigase has had a change to the PubSub Schema, to upgrade to v7.1 without having to reform your databases, use this guide to update your databases to be compatible with the new version of Tigase.
+
+Changes to Pubsub Schema
+~~~~~~~~~~~~~~~~~~~~~~~~
+The PubSub Schema has been streamlined for better resource use, this change affects all users of Tigase.
+To prepare your database for the new schema, first be sure to create a backup!  Then apply the appropriate PubSub schema to your MySQL and it will add the new storage procedure.
+
+All these files should be in your /database folder within Tigase, however if you are missing the appropriate files, use the links below and place them into that folder.
+
+The MySQL schema can be found link:https://projects.tigase.org/projects/tigase-pubsub/repository/revisions/master/entry/database/mysql-pubsub-schema-3.1.0.sql[Here].
+
+The Derby schema can be found link:https://projects.tigase.org/projects/tigase-pubsub/repository/changes/database/derby-pubsub-schema-3.1.0.sql[Here].
+
+The PostGRESQL schema can be found link:https://projects.tigase.org/projects/tigase-pubsub/repository/changes/database/postgresql-pubsub-schema-3.1.0.sql[Here].
+
+The MS SQL schema can be found link:https://projects.tigase.org/projects/tigase-pubsub/repository/changes/database/sqlserver-pubsub-schema-3.1.0.sql[Here].
+
+The same files are also included in all distributions of v7.1.0 in +[tigaseroot]/database/+ . All changes to database schema are meant to be backward compatible.
+
+
+You can use a utility in Tigase to update the schema using the following command from the Tigase root:
+Linux
+-----
+java -cp "jars/*" tigase.util.DBSchemaLoader
+-----
+or from a Windows environment
+-----
+java -cp jars/* tigase.util.DBSchemaLoader
+-----
+*NOTE: Some variation may be necessary depending on how your java build uses -cp option*
+
+Use the following options to customize. Options in bold are required.::
+* *[-dbType database_type {derby, mysql, postgresql, sqlserver}]*
+* [-schemaVersion schema version {4, 5, 5-1} ]
+* *[-dbName database name]*
+* [-dbHostname database hostname] (default is localhost)
+* [-dbUser tigase username]
+* [-dbPass tigase user password]
+* *[-rootUser database root username]*
+* *[-rootPass database root password]*
+* *[-file path to sql schema file]*
+* [-query sql query to execute]
+* [-logLevel java logger Level]
+* [-adminJID comma separated list of admin JIDs]
+* [-adminJIDpass password (one for all entered JIDs]
+
+*Arguments take following precedent: query, file, whole schema*
+
+As a result your final command should look something like this:
+-----
+java -cp "jars/*" tigase.util.DBSchemaLoader -dbType mysql -dbName tigasedb -dbUser root -dbPass password -file database/mysql-pubsub-schema-3.1.0.sql
+-----

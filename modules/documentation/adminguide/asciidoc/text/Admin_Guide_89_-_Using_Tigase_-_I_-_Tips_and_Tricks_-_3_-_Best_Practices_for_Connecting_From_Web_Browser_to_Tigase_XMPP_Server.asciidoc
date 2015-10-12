@@ -24,6 +24,7 @@ BOSH protocol specified in link:http://xmpp.org/extensions/xep-0124.html[XEP-012
 
 In clustered mode we can deploy it with load balancer deployed with guarantees that each BOSH connection from web browser will be forwarded to same Tigase XMPP Server instance. So in clustered mode if we have two XMPP server +t1+ and +t2+ which are hosting domain +example.com+ we would need to have load balancer which will respond for HTTP request to domain +example.com+ and forward all requests from same IP address to same node of a cluster (i.e. all request from +192.168.122.32+ should be forwarded always to node +t1+.
 
+[[tip_1_bosh_in_cluster_mode_without_load_balancer]]
 Tip #1 - BOSH in Cluster Mode Without Load Balancer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
