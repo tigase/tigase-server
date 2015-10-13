@@ -1,16 +1,30 @@
 package tigase.kernel;
 
+import java.lang.reflect.Array;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.logging.Level;
+
 import tigase.util.Base64;
 import tigase.util.TigaseStringprepException;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
-
+/**
+ * Util class to convert types.
+ */
 public class TypesConverter {
 
+	private TypesConverter() {
+	}
+
+	/**
+	 * Converts object to String.
+	 * 
+	 * @param value
+	 *            object to convert.
+	 * @return text representation of value.
+	 */
 	public static String toString(final Object value) {
 		if (value.getClass().isEnum()) {
 			return ((Enum) value).name();
@@ -38,6 +52,17 @@ public class TypesConverter {
 			return value.toString();
 	}
 
+	/**
+	 * Converts value to expected type.
+	 * 
+	 * @param value
+	 *            value to be converted.
+	 * @param expectedType
+	 *            class of expected type.
+	 * @param <T>
+	 *            expected type.
+	 * @return converted value.
+	 */
 	public static <T> T convert(final Object value, final Class<T> expectedType) {
 		try {
 			if (value == null)
@@ -49,7 +74,9 @@ public class TypesConverter {
 				return expectedType.cast(value);
 			}
 
-			if (expectedType.isEnum()) {
+			if (expectedType.equals(Level.class)) {
+				return expectedType.cast(Level.parse(value.toString().trim()));
+			} else if (expectedType.isEnum()) {
 				final Class<? extends Enum> enumType = (Class<? extends Enum>) expectedType;
 				final Enum<?> theOneAndOnly = Enum.valueOf(enumType, value.toString().trim());
 				return expectedType.cast(theOneAndOnly);
@@ -65,7 +92,8 @@ public class TypesConverter {
 				return expectedType.cast(Integer.valueOf(value.toString().trim()));
 			} else if (expectedType.equals(Boolean.class)) {
 				String val = value.toString().trim();
-				boolean b = (val.equalsIgnoreCase("yes") || val.equalsIgnoreCase("true") || val.equalsIgnoreCase("on") || val.equals("1"));
+				boolean b = (val.equalsIgnoreCase("yes") || val.equalsIgnoreCase("true") || val.equalsIgnoreCase("on")
+						|| val.equals("1"));
 				return expectedType.cast(Boolean.valueOf(b));
 			} else if (expectedType.equals(Float.class)) {
 				return expectedType.cast(Float.valueOf(value.toString().trim()));
@@ -91,7 +119,8 @@ public class TypesConverter {
 				return (T) Float.valueOf(value.toString().trim());
 			} else if (expectedType.equals(boolean.class)) {
 				String val = value.toString().trim();
-				boolean b = (val.equalsIgnoreCase("yes") || val.equalsIgnoreCase("true") || val.equalsIgnoreCase("on") || val.equals("1"));
+				boolean b = (val.equalsIgnoreCase("yes") || val.equalsIgnoreCase("true") || val.equalsIgnoreCase("on")
+						|| val.equals("1"));
 				return (T) Boolean.valueOf(b);
 			} else if (expectedType.equals(byte[].class) && value.toString().startsWith("string:")) {
 				return (T) value.toString().substring(7).getBytes();

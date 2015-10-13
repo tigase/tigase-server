@@ -119,7 +119,7 @@ public class ConfiguratorCommand implements AdHocCommand {
 
 				for (ConfigFieldItem cfi : citems) {
 					final String key = cfi.beanConfig.getBeanName() + "/" + cfi.field.getName();
-					final Object bean = kernel.getInstance(cfi.beanConfig);
+					final Object bean = kernel.getInstance(cfi.beanConfig.getBeanName());
 					final Object value = BeanUtils.getValue(bean, cfi.field);
 
 					if (bc == null || !bc.equals(cfi.beanConfig)) {
@@ -150,6 +150,9 @@ public class ConfiguratorCommand implements AdHocCommand {
 				try {
 					BeanConfig beanConfig = kernel.getDependencyManager().getBeanConfig(bn);
 					final java.lang.reflect.Field beanField = BeanUtils.getField(beanConfig, fn);
+					ConfigField cf = beanField.getAnnotation(ConfigField.class);
+					if (cf == null)
+						throw new RuntimeException("Field '" + fn + "' of bean '" + bn + "' can't be configured!");
 					final Object convertedValue = TypesConverter.convert(value, beanField.getType());
 
 					if (!convertedValues.containsKey(beanConfig)) {
@@ -158,16 +161,16 @@ public class ConfiguratorCommand implements AdHocCommand {
 					HashMap<java.lang.reflect.Field, Object> valuesToSet = convertedValues.get(beanConfig);
 					valuesToSet.put(beanField, convertedValue);
 				} catch (Exception e) {
-					log.log(Level.WARNING,
-							"Can't prepare value of property '" + fn + "' of bean '" + bn + "': '" + value + "'", e);
-					throw new AdHocCommandException(Authorization.INTERNAL_SERVER_ERROR, "Cannot prepare value of field "
-							+ field.getVar());
+					log.log(Level.WARNING, "Can't prepare value of property '" + fn + "' of bean '" + bn + "': '" + value + "'",
+							e);
+					throw new AdHocCommandException(Authorization.INTERNAL_SERVER_ERROR,
+							"Cannot prepare value of field " + field.getVar());
 				}
 			}
 
 			for (Map.Entry<BeanConfig, HashMap<java.lang.reflect.Field, Object>> entry : convertedValues.entrySet()) {
 				final BeanConfig beanConfig = entry.getKey();
-				final Object bean = kernel.getInstance(beanConfig);
+				final Object bean = kernel.getInstance(beanConfig.getBeanName());
 				for (Map.Entry<java.lang.reflect.Field, Object> values : entry.getValue().entrySet()) {
 					if (log.isLoggable(Level.FINEST))
 						log.finest("Setting property '" + values.getKey().getName() + "' of bean '" + beanConfig.getBeanName()
@@ -179,11 +182,10 @@ public class ConfiguratorCommand implements AdHocCommand {
 							log.finest("Property '" + values.getKey().getName() + "' of bean '" + beanConfig.getBeanName()
 									+ "' has been set to " + values.getValue());
 					} catch (Exception e) {
-						log.log(Level.WARNING,
-								"Can't set property '" + values.getKey().getName() + "' of bean '" + beanConfig.getBeanName()
-										+ "' with value '" + values.getValue() + "'", e);
-						throw new AdHocCommandException(Authorization.INTERNAL_SERVER_ERROR, "Cannot set value to field "
-								+ values.getKey().getName());
+						log.log(Level.WARNING, "Can't set property '" + values.getKey().getName() + "' of bean '"
+								+ beanConfig.getBeanName() + "' with value '" + values.getValue() + "'", e);
+						throw new AdHocCommandException(Authorization.INTERNAL_SERVER_ERROR,
+								"Cannot set value to field " + values.getKey().getName());
 					}
 				}
 			}

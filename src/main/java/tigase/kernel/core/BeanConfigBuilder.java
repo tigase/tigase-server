@@ -3,6 +3,28 @@ package tigase.kernel.core;
 import tigase.kernel.KernelException;
 import tigase.kernel.Registrar;
 
+/**
+ * Builder to help register beans in Kernel.<br/>
+ *
+ * Usage:<br/>
+ * 
+ * <pre>
+ * {@code
+ * 
+ *  // If Bean1.class is annotated by @Bean annotation.
+ *  registerBean(Bean1.class).exec();
+ *
+ *  // If Bean2 isn't annotated or should be registered with different name. 
+ *  krnl.registerBean("bean2").asClass(Bean2.class).exec();
+ *
+ *  // To register already created variable bean4 as bean "bean4".
+ *  krnl.registerBean("bean4").asInstance(bean4).exec();
+ *
+ *  // If Bean5 have to been created by Bean5Factory.
+ *  krnl.registerBean("bean5").asClass(Bean5.class).withFactory(Bean5Factory.class).exec();
+ * }
+ * </pre>
+ */
 public class BeanConfigBuilder {
 
 	private BeanConfig beanConfig;
@@ -23,6 +45,13 @@ public class BeanConfigBuilder {
 		this.beanName = beanName;
 	}
 
+	/**
+	 * Registers bean as type to be created when it will be required.
+	 * 
+	 * @param cls
+	 *            class of bean.
+	 * @return {@link BeanConfigBuilder}.
+	 */
 	public BeanConfigBuilder asClass(Class<?> cls) {
 		if (this.beanConfig != null)
 			throwException(new KernelException("Class or instance is already defined for bean '" + beanName + "'"));
@@ -31,6 +60,13 @@ public class BeanConfigBuilder {
 		return this;
 	}
 
+	/**
+	 * Registers class instance as bean.
+	 * 
+	 * @param bean
+	 *            instance of bean.
+	 * @return {@link BeanConfigBuilder}.
+	 */
 	public BeanConfigBuilder asInstance(Object bean) {
 		if (this.beanConfig != null)
 			throwException(new KernelException("Class or instance is already defined for bean '" + beanName + "'"));
@@ -40,6 +76,9 @@ public class BeanConfigBuilder {
 		return this;
 	}
 
+	/**
+	 * Finishing registration of bean.
+	 */
 	public void exec() {
 		if (factoryBeanConfig != null) {
 			kernel.unregisterInt(factoryBeanConfig.getBeanName());
@@ -60,11 +99,22 @@ public class BeanConfigBuilder {
 		}
 	}
 
+	/**
+	 * Mark bean as 'exportable'. It means that bean will be visible for all
+	 * child Kernels registered in current Kernel.
+	 * 
+	 * @return {@link BeanConfigBuilder}.
+	 */
 	public BeanConfigBuilder exportable() {
 		beanConfig.setExportable(true);
 		return this;
 	}
 
+	/**
+	 * Returns name of bean.
+	 * 
+	 * @return name of bean.
+	 */
 	public String getBeanName() {
 		return beanName;
 	}
@@ -74,6 +124,13 @@ public class BeanConfigBuilder {
 		throw e;
 	}
 
+	/**
+	 * Defines factory for currently registered bean.
+	 * 
+	 * @param beanFactoryClass
+	 *            bean factory class.
+	 * @return {@link BeanConfigBuilder}.
+	 */
 	public BeanConfigBuilder withFactory(Class<?> beanFactoryClass) {
 		if (beanInstance != null)
 			throwException(new KernelException("Cannot register factory to bean '" + beanName + "' registered as instance."));

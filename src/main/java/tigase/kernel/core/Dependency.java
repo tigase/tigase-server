@@ -2,6 +2,9 @@ package tigase.kernel.core;
 
 import java.lang.reflect.Field;
 
+/**
+ * Class describing dependency.
+ */
 public class Dependency {
 
 	private BeanConfig beanConfig;
@@ -14,26 +17,59 @@ public class Dependency {
 
 	private Class<?> type;
 
+	/**
+	 * Creates instance of class.
+	 * 
+	 * @param beanConfig
+	 *            definition of bean.
+	 */
 	public Dependency(BeanConfig beanConfig) {
 		this.beanConfig = beanConfig;
 	}
 
+	/**
+	 * Returns definition of bean.
+	 * 
+	 * @return definition of bean.
+	 */
 	public BeanConfig getBeanConfig() {
 		return beanConfig;
 	}
 
+	/**
+	 * Returns name of dependent bean.
+	 * 
+	 * @return name of dependent bean, or <code>null</code> if name is not
+	 *         specified.
+	 * 
+	 */
 	public String getBeanName() {
 		return beanName;
 	}
 
+	/**
+	 * Returns field to be filled by dependency.
+	 * 
+	 * @return field.
+	 */
 	public Field getField() {
 		return field;
 	}
 
+	/**
+	 * Returns type of wanted bean.
+	 * 
+	 * @return type of bean.
+	 */
 	public Class<?> getType() {
 		return type;
 	}
 
+	/**
+	 * Checks if empty value may be injected.
+	 * 
+	 * @return <code>true</code> if dependency is optional.
+	 */
 	public boolean isNullAllowed() {
 		return nullAllowed;
 	}

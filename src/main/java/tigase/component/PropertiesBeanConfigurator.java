@@ -51,18 +51,24 @@ public class PropertiesBeanConfigurator implements BeanConfigurator {
 
 				final Field field = BeanUtils.getField(beanConfig, property);
 				if (field == null) {
-					log.warning("Field '" + property + "' does not exists in bean '" + beanConfig.getBeanName()
-							+ "'. Ignoring!");
+					log.warning(
+							"Field '" + property + "' does not exists in bean '" + beanConfig.getBeanName() + "'. Ignoring!");
 					continue;
 				}
+				ConfigField cf = field.getAnnotation(ConfigField.class);
+				if (cf == null) {
+					log.warning("Field '" + property + "' of bean '" + beanConfig.getBeanName()
+							+ "' Can't be configured (missing @ConfigField). Ignoring!");
+					continue;
+				}
+
 				final Object v = TypesConverter.convert(value, field.getType());
 
 				valuesToSet.put(field, v);
 
 			} catch (Exception e) {
-				log.log(Level.WARNING,
-						"Can't prepare value of property '" + property + "' of bean '" + beanConfig.getBeanName() + "': '"
-								+ value + "'", e);
+				log.log(Level.WARNING, "Can't prepare value of property '" + property + "' of bean '" + beanConfig.getBeanName()
+						+ "': '" + value + "'", e);
 				throw new RuntimeException("Can't prepare value of property '" + property + "' of bean '"
 						+ beanConfig.getBeanName() + "': '" + value + "'");
 			}
@@ -89,7 +95,7 @@ public class PropertiesBeanConfigurator implements BeanConfigurator {
 		HashMap<String, Object> result = new HashMap<>();
 
 		for (BeanConfig bc : kernel.getDependencyManager().getBeanConfigs()) {
-			final Object bean = kernel.getInstance(bc);
+			final Object bean = kernel.getInstance(bc.getBeanName());
 			final Class<?> cl = bc.getClazz();
 			java.lang.reflect.Field[] fields = DependencyManager.getAllFields(cl);
 			for (java.lang.reflect.Field field : fields) {

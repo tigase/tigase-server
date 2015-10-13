@@ -1,15 +1,14 @@
 package tigase.kernel;
 
-import tigase.kernel.beans.config.ConfigField;
-import tigase.kernel.core.BeanConfig;
-import tigase.kernel.core.DependencyManager;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import tigase.kernel.core.BeanConfig;
+import tigase.kernel.core.DependencyManager;
 
 public class BeanUtils {
 
@@ -25,8 +24,8 @@ public class BeanUtils {
 		return fields.toArray(new Method[] {});
 	}
 
-	public static Object getValue(Object fromBean, Field field) throws IllegalAccessException, IllegalArgumentException,
-			InvocationTargetException {
+	public static Object getValue(Object fromBean, Field field)
+			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		Method setter = BeanUtils.prepareGetterMethod(field);
 		if (setter != null) {
 			return setter.invoke(fromBean);
@@ -41,8 +40,7 @@ public class BeanUtils {
 		final Class<?> cl = bc.getClazz();
 		java.lang.reflect.Field[] fields = DependencyManager.getAllFields(cl);
 		for (java.lang.reflect.Field field : fields) {
-			final ConfigField cf = field.getAnnotation(ConfigField.class);
-			if (cf != null && field.getName().equals(fieldName)) {
+			if (field.getName().equals(fieldName)) {
 				return field;
 			}
 		}
@@ -126,8 +124,8 @@ public class BeanUtils {
 		}
 	}
 
-	public static void setValue(Object toBean, Field field, Object valueToSet) throws IllegalAccessException,
-			IllegalArgumentException, InvocationTargetException {
+	public static void setValue(Object toBean, Field field, Object valueToSet)
+			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		Method setter = BeanUtils.prepareSetterMethod(field);
 		if (setter != null) {
 			setter.invoke(toBean, valueToSet);
@@ -137,8 +135,8 @@ public class BeanUtils {
 		}
 	}
 
-	public static void setValue(Object toBean, String fieldName, Object valueToSet) throws IllegalAccessException,
-			IllegalArgumentException, InvocationTargetException, NoSuchMethodException {
+	public static void setValue(Object toBean, String fieldName, Object valueToSet)
+			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException {
 		ArrayList<Method> setters = BeanUtils.prepareSetterMethods(toBean.getClass(), fieldName);
 
 		if (setters == null || setters.isEmpty()) {
@@ -153,8 +151,8 @@ public class BeanUtils {
 			}
 		}
 
-		throw new IllegalArgumentException("Cannot set value type " + valueToSet.getClass().getName() + " to property '"
-				+ fieldName + "'.");
+		throw new IllegalArgumentException(
+				"Cannot set value type " + valueToSet.getClass().getName() + " to property '" + fieldName + "'.");
 	}
 
 }

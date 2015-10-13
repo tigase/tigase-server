@@ -3,15 +3,7 @@ package tigase.kernel.core;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,6 +17,9 @@ import tigase.kernel.beans.UnregisterAware;
 import tigase.kernel.beans.config.BeanConfigurator;
 import tigase.kernel.core.BeanConfig.State;
 
+/**
+ * Main class of Kernel.
+ */
 public class Kernel {
 
 	static class DelegatedBeanConfig extends BeanConfig {
@@ -88,10 +83,19 @@ public class Kernel {
 
 	private Kernel parent;
 
+	/**
+	 * Creates instance of Kernel.
+	 */
 	public Kernel() {
 		this("<unknown>");
 	}
 
+	/**
+	 * Creates instance of kernel.
+	 * 
+	 * @param name
+	 *            kernel name.
+	 */
 	public Kernel(String name) {
 		this.name = name;
 
@@ -105,7 +109,7 @@ public class Kernel {
 	private Object createNewInstance(BeanConfig beanConfig) {
 		try {
 			if (beanConfig.getFactory() != null) {
-				BeanFactory<?> factory = (BeanFactory<?>) beanConfig.getKernel().getInstance(beanConfig.getFactory());
+				BeanFactory<?> factory = beanConfig.getKernel().getInstance(beanConfig.getFactory());
 				return factory.createInstance();
 			} else {
 				if (log.isLoggable(Level.FINER))
@@ -119,11 +123,25 @@ public class Kernel {
 		}
 	}
 
+	/**
+	 * Returns {@link DependencyManager} used in Kernel.
+	 * 
+	 * @return {@link DependencyManager depenency manager}.
+	 */
 	public DependencyManager getDependencyManager() {
 		return dependencyManager;
 	}
 
-	public <T> T getInstance(BeanConfig beanConfig) {
+	/**
+	 * Returns instance of bean.
+	 * 
+	 * @param beanConfig
+	 *            definition of bean to be returned.
+	 * @param <T>
+	 *            type of bean.
+	 * @return bean or <code>null</code> if instance of bean is not created.
+	 */
+	<T> T getInstance(BeanConfig beanConfig) {
 		if (beanConfig instanceof DelegatedBeanConfig) {
 			BeanConfig b = ((DelegatedBeanConfig) beanConfig).original;
 			return (T) beanConfig.getKernel().beanInstances.get(b);
@@ -132,7 +150,21 @@ public class Kernel {
 		}
 	}
 
-	public <T> T getInstance(Class<T> beanClass) {
+	/**
+	 * Returns instance of bean.
+	 * 
+	 * @param beanClass
+	 *            type of requested bean. Note that if more than one instance of
+	 *            bean will match, then Kernel throws exception.
+	 * @param <T>
+	 *            type of bean to be returned.
+	 * @return instance of bean if bean exists and there is only single instance
+	 *         of it.
+	 * @throws KernelException
+	 *             when more than one instance of matching beans will be found
+	 *             or none of matching beans is registered.
+	 */
+	public <T> T getInstance(Class<T> beanClass) throws KernelException {
 		return getInstance(beanClass, true);
 	}
 
@@ -165,6 +197,18 @@ public class Kernel {
 		return (T) result;
 	}
 
+	/**
+	 * Returns instance of bean. It creates bean if it is required.
+	 * 
+	 * @param beanName
+	 *            name of bean to be returned.
+	 * @param <T>
+	 *            type of bean to be returned.
+	 * @return instance of bean if bean exists and there is only single instance
+	 *         of it.
+	 * @throws KernelException
+	 *             when bean with given name doesn't exists.
+	 */
 	@SuppressWarnings("unchecked")
 	public <T> T getInstance(String beanName) {
 		BeanConfig bc = dependencyManager.getBeanConfig(beanName);
@@ -190,10 +234,22 @@ public class Kernel {
 		return (T) result;
 	}
 
+	/**
+	 * Returns name of Kernel.
+	 * 
+	 * @return name of Kernel.
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Returns name of beans matching to given type.
+	 * 
+	 * @param beanType
+	 *            type of searched beans.
+	 * @return collection of matching bean names.
+	 */
 	public Collection<String> getNamesOf(Class<?> beanType) {
 		ArrayList<String> result = new ArrayList<String>();
 		List<BeanConfig> bcs = dependencyManager.getBeanConfigs(beanType);
@@ -203,10 +259,18 @@ public class Kernel {
 		return Collections.unmodifiableCollection(result);
 	}
 
+	/**
+	 * Returns parent Kernel.
+	 * 
+	 * @return parent Kernel or <code>null</code> if there is no parent Kernel.
+	 */
 	public Kernel getParent() {
 		return parent;
 	}
 
+	/**
+	 * Forces initiate all registered beans.
+	 */
 	public void initAll() {
 		try {
 			for (BeanConfig bc : dependencyManager.getBeanConfigs()) {
@@ -375,6 +439,14 @@ public class Kernel {
 		}
 	}
 
+	/**
+	 * Checks if bean with given name is registered in Kernel.
+	 * 
+	 * @param beanName
+	 *            name of bean to check.
+	 * @return <code>true</code> if bean is registered (it may be not
+	 *         initialized!).
+	 */
 	public boolean isBeanClassRegistered(final String beanName) {
 		boolean x = dependencyManager.isBeanClassRegistered(beanName);
 		if (x == false && parent != null) {
@@ -383,6 +455,16 @@ public class Kernel {
 		return x;
 	}
 
+	/**
+	 * Makes symlink to bean in another Kernel.
+	 * 
+	 * @param exportingBeanName
+	 *            name bean to be linked.
+	 * @param destinationKernel
+	 *            destination Kernel.
+	 * @param destinationName
+	 *            name of bean in destination Kernel.
+	 */
 	public void ln(String exportingBeanName, Kernel destinationKernel, String destinationName) {
 		final BeanConfig sbc = dependencyManager.getBeanConfig(exportingBeanName);
 		// Object bean = getInstance(sbc.getBeanName());
@@ -400,6 +482,24 @@ public class Kernel {
 		beanConfig.setState(State.initialized);
 	}
 
+	/**
+	 * Registers bean as class in Kernel. Class must be annotated with
+	 * {@link Bean} annotation.<br/>
+	 * For example:
+	 * 
+	 * <pre>
+	 * {@code
+	 *
+	 *  // If Bean1.class is annotated by @Bean annotation.
+	 *  registerBean(Bean1.class).exec();
+	 * }
+	 * </pre>
+	 * 
+	 * @param beanClass
+	 *            class of bean to register.
+	 * @return {@link BeanConfigBuilder config builder} what allows to finish
+	 *         bean registering.
+	 */
 	public BeanConfigBuilder registerBean(Class<?> beanClass) {
 		if (currentlyUsedConfigBuilder != null)
 			throw new KernelException(
@@ -415,6 +515,27 @@ public class Kernel {
 		return builder;
 	}
 
+	/**
+	 * Registers bean with given name. Class or instance of bean must be defined
+	 * in returned {@link BeanConfigBuilder config builder}.<br/>
+	 * For example:
+	 *
+	 * <pre>
+	 * {@code
+	 *
+	 *  // To register already created variable bean4 as bean "bean4".
+	 *  krnl.registerBean("bean4").asInstance(bean4).exec();
+	 *
+	 *  // If Bean5 have to been created by Bean5Factory.
+	 *  krnl.registerBean("bean5").asClass(Bean5.class).withFactory(Bean5Factory.class).exec();
+	 * }
+	 * </pre>
+	 * 
+	 * @param beanName
+	 *            name of bean.
+	 * @return {@link BeanConfigBuilder config builder} what allows to finish
+	 *         bean registering.
+	 */
 	public BeanConfigBuilder registerBean(String beanName) {
 		if (currentlyUsedConfigBuilder != null)
 			throw new KernelException(
@@ -433,6 +554,10 @@ public class Kernel {
 		this.parent = parent;
 	}
 
+	/**
+	 * Runs all registered {@link Registrar registrars} in current kernel and
+	 * child Kernels.
+	 */
 	public void startSubKernels() {
 		for (BeanConfig bc : dependencyManager.getBeanConfigs(Registrar.class)) {
 			Registrar r = getInstance(bc.getBeanName());
@@ -443,6 +568,12 @@ public class Kernel {
 
 	}
 
+	/**
+	 * Removes bean from Kernel.
+	 * 
+	 * @param beanName
+	 *            name of bean to be removed.
+	 */
 	public void unregister(final String beanName) {
 		if (log.isLoggable(Level.FINER))
 			log.finer("[" + getName() + "] Unregistering bean " + beanName);
