@@ -557,9 +557,10 @@ class TigaseInstallerDBHelper {
 						Statement stmt = conn.createStatement();
 
 						ArrayList<String> queries = loadSQLQueries(res_prefix + "-pubsub-schema", res_prefix, variables);
+						queries.addAll( loadSQLQueries(res_prefix + "-pubsub-schema-3-1", res_prefix, variables) );
 						for (String query : queries) {
 							if (!query.isEmpty()) {
-								Debug.trace("socks5 schema :: Executing query: " + query);
+								Debug.trace("pubsub schema :: Executing query: " + query);
 								stmt.execute(query);
 							}
 						}

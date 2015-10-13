@@ -26,14 +26,14 @@
 --  createdb -U tigase tigase
 --  psql -q -U tigase -d tigase -f postgresql-schema.sql
 
--- QUERY START:
 \i database/postgresql-schema-4-schema.sql
--- QUERY END:
 
--- QUERY START:
 \i database/postgresql-schema-5-1-sp.sql
--- QUERY END:
 
--- QUERY START:
 \i database/postgresql-schema-5-1-props.sql
--- QUERY END:
+
+-- LOAD FILE: database/postgresql-schema-4-schema.sql
+
+-- LOAD FILE: database/postgresql-schema-5-1-sp.sql
+
+-- LOAD FILE: database/postgresql-schema-5-1-props.sql

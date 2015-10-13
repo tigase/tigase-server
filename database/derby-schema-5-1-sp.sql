@@ -20,9 +20,9 @@
 --  $Date: $
 --
 
--- QUERY START:
 run 'database/derby-schema-4-sp.sql';
--- QUERY END:
+
+-- LOAD FILE: database/derby-schema-4-sp.sql
 
 -- QUERY START:
 drop procedure TigUpdatePairs;

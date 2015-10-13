@@ -20,12 +20,14 @@
 --  $Date: $
 --
 
-run 'database/derby-schema-4-schema.sql';
+--  To load schema to PostgreSQL database execute following commands:
+--
+--  createuser tigase
+--  createdb -U tigase tigase
+--  psql -q -U tigase -d tigase -f postgresql-schema.sql
 
-run 'database/derby-schema-4-sp.sql';
+-- LOAD FILE: database/sqlserver-schema-5-1-schema.sql
 
-run 'database/derby-schema-4-props.sql';
+-- LOAD FILE: database/sqlserver-schema-5-1-sp.sql
 
--- LOAD FILE: database/derby-schema-4-schema.sql
--- LOAD FILE: database/derby-schema-4-sp.sql
--- LOAD FILE: database/derby-schema-4-props.sql
+-- LOAD FILE: database/sqlserver-schema-5-1-props.sql

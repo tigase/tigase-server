@@ -21,6 +21,6 @@
 
 -- Database stored procedures and fucntions for Tigase schema version 5.1
 
--- QUERY START:
 \i database/postgresql-schema-4-schema.sql
--- QUERY END:
+
+-- LOAD FILE: database/postgresql-schema-4-schema.sql
