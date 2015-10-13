@@ -14,11 +14,7 @@ import tigase.conf.ConfigurationException;
 import tigase.db.comp.ComponentRepository;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.core.Kernel;
-import tigase.monitor.modules.AdHocCommandMonitorModule;
-import tigase.monitor.modules.AddScriptTaskCommand;
-import tigase.monitor.modules.AddTimerScriptTaskCommand;
-import tigase.monitor.modules.DeleteScriptTaskCommand;
-import tigase.monitor.modules.DiscoveryMonitorModule;
+import tigase.monitor.modules.*;
 import tigase.server.monitor.MonitorRuntime;
 import tigase.util.ClassUtil;
 import tigase.util.TimerTask;
@@ -73,7 +69,6 @@ public class MonitorComponent extends AbstractKernelBasedComponent {
 		kernel.registerBean(AdHocCommandMonitorModule.class).exec();
 		kernel.registerBean(DiscoveryMonitorModule.class).exec();
 
-		kernel.registerBean(BeanConfigurator.class).exec();
 		kernel.registerBean(TasksScriptRegistrar.class).exec();
 
 		kernel.registerBean(AddScriptTaskCommand.class).exec();
@@ -149,7 +144,8 @@ public class MonitorComponent extends AbstractKernelBasedComponent {
 		// initialization
 		((TasksScriptRegistrar) kernel.getInstance(TasksScriptRegistrar.ID)).load();
 
-		((BeanConfigurator) kernel.getInstance(BeanConfigurator.NAME)).configureBeans(props);
+		// ((BeanConfigurator)
+		// kernel.getInstance(BeanConfigurator.NAME)).configureBeans(props);
 	}
 
 }

@@ -16,6 +16,7 @@ import tigase.form.Form;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.MonitorComponent;
 import tigase.util.DateTimeFormatter;
 import tigase.util.OSUtils;
@@ -38,6 +39,7 @@ public class DiskTask extends AbstractConfigurableTimerTask implements Initializ
 
 	private File[] roots;
 
+	@ConfigField(desc = "Disk usage threshold")
 	protected float threshold = 0.8F;
 
 	protected final HashSet<String> triggeredEvents = new HashSet<String>();
@@ -138,7 +140,7 @@ public class DiskTask extends AbstractConfigurableTimerTask implements Initializ
 	@Override
 	public void initialize() {
 		findAllRoots();
-	};
+	}
 
 	@Override
 	protected void run() {

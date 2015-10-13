@@ -1,11 +1,14 @@
 package tigase.kernel;
 
+import static org.junit.Assert.assertArrayEquals;
+
+import java.util.logging.Level;
+
 import org.junit.Assert;
 import org.junit.Test;
+
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
-
-import static org.junit.Assert.assertArrayEquals;
 
 public class TypesConverterTest {
 
@@ -76,9 +79,12 @@ public class TypesConverterTest {
 		assertArrayEquals(new char[] { 48, 49, 50, 52 }, TypesConverter.convert("string:0124", char[].class));
 		assertArrayEquals(new char[] { 48, 49, 50, 53 }, TypesConverter.convert("base64:MDEyNQ==", char[].class));
 
+		Assert.assertEquals(Level.CONFIG, TypesConverter.convert("CONFIG", Level.class));
+		Assert.assertEquals(Level.ALL, TypesConverter.convert("ALL", Level.class));
+
 	}
 
-	public static enum XT {
+	public enum XT {
 		a1,
 		b2,
 		c3

@@ -8,6 +8,7 @@ import tigase.form.Field;
 import tigase.form.Form;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.InfoTask;
 import tigase.monitor.MonitorComponent;
 import tigase.server.monitor.MonitorRuntime;
@@ -32,11 +33,13 @@ public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements 
 	/**
 	 * Percent
 	 */
+	@ConfigField(desc = "Max Heap Mem Usage Threshold [%]")
 	private int maxHeapMemUsagePercentThreshold = 90;
 
 	/**
 	 * Percent
 	 */
+	@ConfigField(desc = "Max Non-Heap Mem Usage Threshold [%]")
 	private int maxNonHeapMemUsagePercentThreshold = 90;
 
 	@Inject

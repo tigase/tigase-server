@@ -8,6 +8,7 @@ import tigase.form.Field;
 import tigase.form.Form;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.InfoTask;
 import tigase.monitor.MonitorComponent;
 import tigase.server.monitor.MonitorRuntime;
@@ -21,6 +22,7 @@ public class LoadCheckerTask extends AbstractConfigurableTimerTask implements In
 
 	public static final String MONITOR_EVENT_NAME = "LoadAverageMonitorEvent";
 
+	@ConfigField(desc = "Average Load Threshold")
 	private long averageLoadThreshold = 10;
 
 	@Inject

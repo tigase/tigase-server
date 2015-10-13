@@ -2,17 +2,14 @@ package tigase.monitor.tasks;
 
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
-import java.util.logging.MemoryHandler;
+import java.util.logging.*;
 
 import tigase.disteventbus.EventBus;
 import tigase.form.Field;
 import tigase.form.Form;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.MonitorComponent;
 import tigase.util.DateTimeFormatter;
 import tigase.util.LogFormatter;
@@ -94,6 +91,7 @@ public class LoggerTask extends AbstractConfigurableTask {
 
 	private long lastWarningSent = 0;
 
+	@ConfigField(desc = "Log Level Threshold")
 	private Level levelTreshold = Level.WARNING;
 
 	private int loggerSize = 50;

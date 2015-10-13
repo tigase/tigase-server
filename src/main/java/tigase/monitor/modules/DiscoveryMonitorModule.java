@@ -26,6 +26,9 @@ public class DiscoveryMonitorModule extends DiscoveryModule {
 	@Inject
 	private Kernel kernel;
 
+	@Inject(nullAllowed = true)
+	private MonitorTask[] takss;
+
 	private boolean isAdHocCompatible(Object taskInstance) {
 		return taskInstance != null && (taskInstance instanceof AdHocTask || taskInstance instanceof InfoTask
 				|| taskInstance instanceof ConfigurableTask);

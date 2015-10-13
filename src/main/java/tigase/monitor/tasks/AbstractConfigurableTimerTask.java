@@ -4,6 +4,7 @@ import tigase.form.Field;
 import tigase.form.Form;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.UnregisterAware;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.TimerTaskService;
 import tigase.util.TimerTask;
 
@@ -11,6 +12,7 @@ public abstract class AbstractConfigurableTimerTask extends AbstractConfigurable
 
 	private final static String PERIOD_VAR = "x-task#period";
 
+	@ConfigField(desc = "Task execute period [ms]")
 	private long period = 1000l;
 
 	@Inject(bean = "timerTaskService")
@@ -79,10 +81,6 @@ public abstract class AbstractConfigurableTimerTask extends AbstractConfigurable
 				timerTaskService.addTimerTask(worker, 1000l, period);
 			}
 		}
-	}
-
-	public void setPeriod(String value) {
-		setPeriod(Long.parseLong(value));
 	}
 
 	public void setTimerTaskService(TimerTaskService timerTaskService) {

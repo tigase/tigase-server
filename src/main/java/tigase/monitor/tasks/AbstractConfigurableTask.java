@@ -3,6 +3,7 @@ package tigase.monitor.tasks;
 import tigase.form.Field;
 import tigase.form.Form;
 import tigase.kernel.beans.UnregisterAware;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.ConfigurableTask;
 import tigase.monitor.MonitorTask;
 
@@ -10,6 +11,7 @@ public abstract class AbstractConfigurableTask implements MonitorTask, Configura
 
 	private final static String ENABLED_VAR = "x-task#enabled";
 
+	@ConfigField(desc = "Enable task")
 	private boolean enabled = false;
 
 	@Override

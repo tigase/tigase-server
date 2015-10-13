@@ -14,6 +14,7 @@ import tigase.form.Field;
 import tigase.form.Form;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.MonitorComponent;
 import tigase.util.DateTimeFormatter;
 import tigase.xml.Element;
@@ -46,6 +47,7 @@ public class CpuTempTask extends AbstractConfigurableTimerTask {
 
 	private int[] cpu_thrott_st = new int[Runtime.getRuntime().availableProcessors()];
 
+	@ConfigField(desc = "CPU Temperature threshold")
 	private int cpuTempThreshold = 90;
 
 	@Inject
@@ -125,7 +127,7 @@ public class CpuTempTask extends AbstractConfigurableTimerTask {
 		// x.addField(Field.fieldTextSingle("N270#cpuTemp", "" +
 		// cpuTempThreshold, "CPU Temp threshold"));
 		return x;
-	};
+	}
 
 	@Override
 	protected void run() {
