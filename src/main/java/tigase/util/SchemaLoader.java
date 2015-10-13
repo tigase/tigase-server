@@ -56,6 +56,7 @@ public abstract class SchemaLoader {
 	public abstract Result validateDBExists( Properties variables );
 	public abstract Result validateDBSchema( Properties variables );
 	public abstract Result postInstallation( Properties variables );
+	public abstract Result printInfo( Properties variables );
 
 	/**
 	 * Method attempts to add XMPP admin user account to the database using

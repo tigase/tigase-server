@@ -21,9 +21,9 @@
 
 -- Database stored procedures and fucntions for Tigase schema version 5.1
 
--- QUERY START:
 \i database/postgresql-schema-4-sp.sql
--- QUERY END:
+
+-- LOAD FILE: database/postgresql-schema-4-sp.sql
 
 -- QUERY START:
 create or replace function TigUpdatePairs(bigint, bigint, varchar(255), text) returns void as '

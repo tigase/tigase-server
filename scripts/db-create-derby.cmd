@@ -31,7 +31,7 @@ java -Dij.protocol=jdbc:derby: -Dij.database="%1;create=true" ^
 java -Dij.protocol=jdbc:derby: -Dij.database="%1;create=true" ^
 		-Dderby.system.home=%PWD% ^
 		-classpath jars/* ^
-		org.apache.derby.tools.ij database/derby-pubsub-schema-3.0.0.sql > derby-db-create-pubsub.txt 2>&1
+		org.apache.derby.tools.ij database/derby-pubsub-schema-3.1.0.sql > derby-db-create-pubsub.txt 2>&1
 
 
 if %errorlevel% neq 0 (

@@ -22,4 +22,5 @@ sqlcmd -S %servername% -U %root_user% -P %root_pass% -d %database% -i database\s
 sqlcmd -S %servername% -U %root_user% -P %root_pass% -d %database% -i database\sqlserver-schema-5-1-props.sql
 
 sqlcmd -S %servername% -U %root_user% -P %root_pass% -d %database% -i database\sqlserver-pubsub-schema-3.0.0.sql
+sqlcmd -S %servername% -U %root_user% -P %root_pass% -d %database% -i database\sqlserver-pubsub-schema-3.1.0.sql
 
