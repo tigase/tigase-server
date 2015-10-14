@@ -44,6 +44,10 @@ import tigase.server.Packet;
  *
  * @author bmalkow
  *
+ * @deprecated Do not use this class at all. Use
+ *             {@link AbstractKernelBasedComponent} instead. This class is here
+ *             just because developer wants to know how some parts of code
+ *             worked before migration to Kernel Based TCF.
  */
 @Deprecated
 public abstract class AbstractComponent extends AbstractMessageReceiver implements XMPPService, DisableDisco {
