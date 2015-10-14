@@ -44,6 +44,15 @@
 				<tests.excludeGroups></tests.excludeGroups>
 			</properties>
 		</profile>
+		<profile>
+			<id>jdk8.profile</id>
+			<properties>
+				<additionalparam>-Xdoclint:none</additionalparam>
+			</properties>
+			<activation>
+				<jdk>1.8</jdk>
+			</activation>
+		</profile>
 	</profiles>
 
 	<licenses>
