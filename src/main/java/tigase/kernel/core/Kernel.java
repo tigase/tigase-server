@@ -484,7 +484,8 @@ public class Kernel {
 
 	/**
 	 * Registers bean as class in Kernel. Class must be annotated with
-	 * {@link Bean} annotation.<br/>
+	 * {@link Bean} annotation.
+	 * <p>
 	 * For example:
 	 * 
 	 * <pre>
@@ -494,6 +495,7 @@ public class Kernel {
 	 *  registerBean(Bean1.class).exec();
 	 * }
 	 * </pre>
+	 * </p>
 	 * 
 	 * @param beanClass
 	 *            class of bean to register.
@@ -517,7 +519,8 @@ public class Kernel {
 
 	/**
 	 * Registers bean with given name. Class or instance of bean must be defined
-	 * in returned {@link BeanConfigBuilder config builder}.<br/>
+	 * in returned {@link BeanConfigBuilder config builder}.
+	 * <p>
 	 * For example:
 	 *
 	 * <pre>
@@ -530,6 +533,7 @@ public class Kernel {
 	 *  krnl.registerBean("bean5").asClass(Bean5.class).withFactory(Bean5Factory.class).exec();
 	 * }
 	 * </pre>
+	 * </p>
 	 * 
 	 * @param beanName
 	 *            name of bean.

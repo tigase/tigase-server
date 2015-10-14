@@ -4,9 +4,9 @@ import tigase.kernel.KernelException;
 import tigase.kernel.Registrar;
 
 /**
- * Builder to help register beans in Kernel.<br/>
- *
- * Usage:<br/>
+ * Builder to help register beans in Kernel.
+ * <p>
+ * Usage:
  * 
  * <pre>
  * {@code
@@ -24,6 +24,7 @@ import tigase.kernel.Registrar;
  *  krnl.registerBean("bean5").asClass(Bean5.class).withFactory(Bean5Factory.class).exec();
  * }
  * </pre>
+ * </p>
  */
 public class BeanConfigBuilder {
 
