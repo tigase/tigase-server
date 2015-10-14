@@ -1,5 +1,6 @@
 package tigase.kernel;
 
+import java.io.File;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
@@ -74,7 +75,9 @@ public class TypesConverter {
 				return expectedType.cast(value);
 			}
 
-			if (expectedType.equals(Level.class)) {
+			if (expectedType.equals(File.class)) {
+				return expectedType.cast(new File(value.toString().trim()));
+			} else if (expectedType.equals(Level.class)) {
 				return expectedType.cast(Level.parse(value.toString().trim()));
 			} else if (expectedType.isEnum()) {
 				final Class<? extends Enum> enumType = (Class<? extends Enum>) expectedType;

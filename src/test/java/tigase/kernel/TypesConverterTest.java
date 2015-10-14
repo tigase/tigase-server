@@ -2,6 +2,7 @@ package tigase.kernel;
 
 import static org.junit.Assert.assertArrayEquals;
 
+import java.io.File;
 import java.util.logging.Level;
 
 import org.junit.Assert;
@@ -60,9 +61,8 @@ public class TypesConverterTest {
 				new JID[] { JID.jidInstanceNS("1@b.c/a"), JID.jidInstanceNS("2@b.c/a"), JID.jidInstanceNS("3@b.c/a") },
 				TypesConverter.convert("1@b.c/a,2@b.c/a,3@b.c/a", JID[].class));
 
-		assertArrayEquals(
-				new BareJID[] { BareJID.bareJIDInstanceNS("1@b.c"), BareJID.bareJIDInstanceNS("2@b.c"),
-						BareJID.bareJIDInstanceNS("3@b.c") }, TypesConverter.convert("1@b.c,2@b.c,3@b.c", BareJID[].class));
+		assertArrayEquals(new BareJID[] { BareJID.bareJIDInstanceNS("1@b.c"), BareJID.bareJIDInstanceNS("2@b.c"),
+				BareJID.bareJIDInstanceNS("3@b.c") }, TypesConverter.convert("1@b.c,2@b.c,3@b.c", BareJID[].class));
 
 		assertArrayEquals(new String[] { "1", "2", "3" }, TypesConverter.convert("1,2,3", String[].class));
 		assertArrayEquals(new XT[] { XT.a1, XT.a1, XT.c3 }, TypesConverter.convert("a1,a1,c3", XT[].class));
@@ -82,6 +82,9 @@ public class TypesConverterTest {
 		Assert.assertEquals(Level.CONFIG, TypesConverter.convert("CONFIG", Level.class));
 		Assert.assertEquals(Level.ALL, TypesConverter.convert("ALL", Level.class));
 
+		Assert.assertEquals(new File("/dupa.txt"), TypesConverter.convert("/dupa.txt", File.class));
+		Assert.assertEquals(new File("/dupa.txt"),
+				TypesConverter.convert(TypesConverter.toString(new File("/dupa.txt")), File.class));
 	}
 
 	public enum XT {
