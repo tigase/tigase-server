@@ -2,11 +2,7 @@ package tigase.monitor.tasks;
 
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
-import java.util.logging.MemoryHandler;
+import java.util.logging.*;
 
 import tigase.disteventbus.EventBus;
 import tigase.form.Field;
@@ -122,11 +118,13 @@ public class LoggerTask extends AbstractConfigurableTask {
 	public Form getCurrentConfiguration() {
 		Form f = super.getCurrentConfiguration();
 
-		Field.fieldListSingle("levelTreshold", levelTreshold.getName(), "Log level threshold",
+		Field x = Field.fieldListSingle("levelTreshold", levelTreshold.getName(), "Log level threshold",
 				new String[] { Level.SEVERE.getName(), Level.WARNING.getName(), Level.INFO.getName(), Level.CONFIG.getName(),
-			Level.FINE.getName(), Level.FINER.getName(), Level.FINEST.getName(), Level.ALL.getName() },
-			new String[] { Level.SEVERE.getName(), Level.WARNING.getName(), Level.INFO.getName(), Level.CONFIG.getName(),
-			Level.FINE.getName(), Level.FINER.getName(), Level.FINEST.getName(), Level.ALL.getName() });
+						Level.FINE.getName(), Level.FINER.getName(), Level.FINEST.getName(), Level.ALL.getName() },
+				new String[] { Level.SEVERE.getName(), Level.WARNING.getName(), Level.INFO.getName(), Level.CONFIG.getName(),
+						Level.FINE.getName(), Level.FINER.getName(), Level.FINEST.getName(), Level.ALL.getName() });
+
+		f.addField(x);
 
 		return f;
 	}
@@ -174,6 +172,8 @@ public class LoggerTask extends AbstractConfigurableTask {
 		if (reregister) {
 			registerHandler();
 		}
+
+		System.out.println("HAAAAA " + this.levelTreshold);
 	}
 
 	@Override
