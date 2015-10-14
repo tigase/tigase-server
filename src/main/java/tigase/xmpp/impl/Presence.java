@@ -57,10 +57,12 @@ import tigase.server.Iq;
 import tigase.osgi.ModulesManagerImpl;
 
 /**
- * Class responsible for handling Presence packets
+ * Class responsible for handling Presence packets - deprecated
+ * Use PresenceState and PresenceSubscription classes
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
+@Deprecated
 public class Presence
 				extends XMPPProcessor
 				implements XMPPProcessorIfc, XMPPStopListenerIfc {

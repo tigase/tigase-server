@@ -122,7 +122,7 @@ public abstract class SessionManagerConfig {
 		"urn:ietf:params:xml:ns:xmpp-session", "jabber:iq:roster", "jabber:iq:privacy",
 		"jabber:iq:version", "http://jabber.org/protocol/stats", "starttls", "vcard-temp",
 		"http://jabber.org/protocol/commands", "jabber:iq:private", "urn:xmpp:ping",
-		"presence",
+		"presence-state", "presence-subscription",
 
 		// "basic-filter",
 		"disco", "domain-filter", "zlib", "amp", "message-carbons", "vcard-xep-0292"
@@ -139,7 +139,7 @@ public abstract class SessionManagerConfig {
 		"jabber:iq:roster", "jabber:iq:privacy", "jabber:iq:version",
 		"http://jabber.org/protocol/stats", "starttls", "vcard-temp",
 		"http://jabber.org/protocol/commands", "jabber:iq:private", "urn:xmpp:ping",
-		"presence",
+		"presence-state", "presence-subscription",
 
 		// "basic-filter",
 		"disco", "domain-filter", "zlib", "amp", "message-carbons", "vcard-xep-0292"
@@ -151,7 +151,7 @@ public abstract class SessionManagerConfig {
 		"jabber:iq:roster", "jabber:iq:privacy", "jabber:iq:version",
 		"http://jabber.org/protocol/stats", "starttls", "vcard-temp",
 		"http://jabber.org/protocol/commands", "jabber:iq:private", "urn:xmpp:ping",
-		"presence",
+		"presence-state", "presence-subscription",
 
 		// "basic-filter",
 		"disco", "domain-filter", "zlib", "amp", "message-carbons", "vcard-xep-0292"

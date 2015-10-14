@@ -91,7 +91,7 @@ public class OfflineMessages
 	 * processing capabilities. In case of {@code msgoffline} plugin it is
 	 * <em>presence</em> stanza */
 	private static final String[][] ELEMENTS = {
-		{ Presence.PRESENCE_ELEMENT_NAME }, { "iq", "msgoffline" } };
+		{ PresenceAbstract.PRESENCE_ELEMENT_NAME }, { "iq", "msgoffline" } };
 	/** Field holds an array of name-spaces for stanzas which can be processed by
 	 * this plugin. In case of {@code msgoffline} plugin it is
 	 * <em>jabber:client</em> */

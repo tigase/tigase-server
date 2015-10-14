@@ -145,8 +145,8 @@ public class InvisibleCommand
 								"unavailable" });
 
 						session.putSessionData(XMPPResourceConnection.PRESENCE_KEY, presence);
-						Presence.broadcastOffline(session, results, settings, roster_util);
-						session.removeSessionData(Presence.OFFLINE_BUD_SENT);
+						PresenceState.broadcastOffline(session, results, settings, roster_util);
+						session.removeSessionData(PresenceState.OFFLINE_BUD_SENT);
 
 						// session.removeSessionData(XMPPResourceConnection.PRESENCE_KEY);
 					} else if (packet.getElement().findChildStaticStr(VISIBLE_PATH) != null) {
