@@ -31,10 +31,14 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
+
 import tigase.server.Packet;
+
 import tigase.xml.Element;
+
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 import tigase.xmpp.NoConnectionIdException;
@@ -42,10 +46,14 @@ import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPResourceConnection;
+
 import static tigase.xmpp.impl.PresenceAbstract.forwardPresence;
+
 import tigase.xmpp.impl.annotation.Handle;
 import tigase.xmpp.impl.annotation.Id;
 import tigase.xmpp.impl.roster.RosterAbstract;
+import tigase.xmpp.impl.roster.RosterAbstract.PresenceType;
+
 import static tigase.xmpp.impl.roster.RosterAbstract.SUB_NONE;
 
 

@@ -34,15 +34,20 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
+
 import tigase.osgi.ModulesManagerImpl;
+
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.Priority;
+
 import tigase.stats.StatisticsList;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
+
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 import tigase.xmpp.NoConnectionIdException;
@@ -52,15 +57,21 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPStopListenerIfc;
+
 import static tigase.xmpp.impl.PresenceAbstract.forwardPresence;
+
 import tigase.xmpp.impl.annotation.Handle;
 import tigase.xmpp.impl.annotation.Handles;
 import tigase.xmpp.impl.annotation.Id;
 import tigase.xmpp.impl.roster.DynamicRoster;
 import tigase.xmpp.impl.roster.RepositoryAccessException;
 import tigase.xmpp.impl.roster.RosterAbstract;
+import tigase.xmpp.impl.roster.RosterAbstract.PresenceType;
+import tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
+
 import static tigase.xmpp.impl.roster.RosterAbstract.FROM_SUBSCRIBED;
 import static tigase.xmpp.impl.roster.RosterAbstract.TO_SUBSCRIBED;
+
 import tigase.xmpp.impl.roster.RosterElement;
 import tigase.xmpp.impl.roster.RosterFactory;
 import tigase.xmpp.impl.roster.RosterRetrievingException;
