@@ -1,5 +1,12 @@
 package tigase.component;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import tigase.component.adhoc.AdHocCommandManager;
 import tigase.component.modules.StanzaProcessor;
 import tigase.component.modules.impl.config.ConfiguratorCommand;
@@ -18,13 +25,6 @@ import tigase.server.AbstractMessageReceiver;
 import tigase.server.DisableDisco;
 import tigase.server.Packet;
 import tigase.xml.Element;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiver implements XMPPService, DisableDisco {
 
@@ -57,8 +57,8 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 	};
 	private StanzaProcessor stanzaProcessor;
 
-	protected void changeRegisteredBeans(Map<String, Object> props)
-			throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	protected void changeRegisteredBeans(Map<String, Object> props) throws ConfigurationException, InstantiationException,
+			IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		for (Entry<String, Object> e : props.entrySet()) {
 			if (e.getKey().startsWith("modules/")) {
 				final String id = e.getKey().substring(8);
@@ -82,6 +82,10 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 		return result;
 	}
 
+	public Kernel getKernel() {
+		return this.kernel;
+	}
+
 	/**
 	 * Is this component discoverable by disco#items for domain by non admin
 	 * users.
@@ -102,7 +106,6 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 		if (props.size() <= 1)
 			return;
 
-
 		kernel.registerBean("component").asInstance(this).exec();
 		kernel.registerBean("adHocCommandManager").asClass(AdHocCommandManager.class).exec();
 		kernel.registerBean("eventBus").asInstance(eventBus).exec();
@@ -115,7 +118,6 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 
 		registerModules(kernel);
 
-		
 		PropertiesBeanConfigurator configurator = kernel.getInstance(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME);
 		configurator.setProperties(props);
 

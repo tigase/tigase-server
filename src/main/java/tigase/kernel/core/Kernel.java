@@ -22,62 +22,15 @@ import tigase.kernel.core.BeanConfig.State;
  */
 public class Kernel {
 
-	static class DelegatedBeanConfig extends BeanConfig {
-
-		private final BeanConfig original;
-
-		DelegatedBeanConfig(String localName, BeanConfig src) {
-			super(localName, src.getClazz());
-			original = src;
-		}
-
-		@Override
-		public Class<?> getClazz() {
-			return original.getClazz();
-		}
-
-		@Override
-		public BeanConfig getFactory() {
-			return original.getFactory();
-		}
-
-		@Override
-		public Map<Field, Dependency> getFieldDependencies() {
-			return original.getFieldDependencies();
-		}
-
-		@Override
-		public Kernel getKernel() {
-			return original.getKernel();
-		}
-
-		public BeanConfig getOriginal() {
-			return original;
-		}
-
-		@Override
-		public State getState() {
-			return original.getState();
-		}
-
-		@Override
-		public boolean isExportable() {
-			return original.isExportable();
-		}
-
-		@Override
-		public String toString() {
-			return original.toString();
-		}
-	}
+	protected final Logger log = Logger.getLogger(this.getClass().getName());
 
 	private final Map<BeanConfig, Object> beanInstances = new HashMap<BeanConfig, Object>();
 
-	BeanConfigBuilder currentlyUsedConfigBuilder;
-
 	private final DependencyManager dependencyManager = new DependencyManager();
 
-	protected final Logger log = Logger.getLogger(this.getClass().getName());
+	BeanConfigBuilder currentlyUsedConfigBuilder;
+
+	private boolean forceAllowNull;
 
 	private String name;
 
@@ -104,6 +57,10 @@ public class Kernel {
 		registerBean("kernel").asInstance(this).exec();
 
 		putBeanInstance(bc, this);
+	}
+
+	public void setForceAllowNull(boolean forceAllowNull) {
+		this.forceAllowNull = forceAllowNull;
 	}
 
 	private Object createNewInstance(BeanConfig beanConfig) {
@@ -243,6 +200,10 @@ public class Kernel {
 		return name;
 	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	/**
 	 * Returns name of beans matching to given type.
 	 * 
@@ -266,6 +227,11 @@ public class Kernel {
 	 */
 	public Kernel getParent() {
 		return parent;
+	}
+
+	void setParent(Kernel parent) {
+		this.dependencyManager.setParent(parent.getDependencyManager());
+		this.parent = parent;
 	}
 
 	/**
@@ -345,8 +311,9 @@ public class Kernel {
 	private void inject(Object[] data, Dependency dependency, Object toBean)
 			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
 
-		if (!dependency.isNullAllowed() && (data == null || data.length == 0))
-			throw new KernelException("Can't inject <null> to field " + dependency.getField());
+		if (!this.forceAllowNull && !dependency.isNullAllowed() && (data == null || data.length == 0))
+			throw new KernelException("Can't inject <null> to field " + dependency.getField().getDeclaringClass().getName()
+					+ "." + dependency.getField().getName());
 
 		Object valueToSet;
 		if (data == null) {
@@ -549,15 +516,6 @@ public class Kernel {
 		return builder;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	void setParent(Kernel parent) {
-		this.dependencyManager.setParent(parent.getDependencyManager());
-		this.parent = parent;
-	}
-
 	/**
 	 * Runs all registered {@link Registrar registrars} in current kernel and
 	 * child Kernels.
@@ -635,6 +593,55 @@ public class Kernel {
 					log.log(Level.WARNING, "Problem during unregistering bean", e);
 				}
 			}
+		}
+	}
+
+	static class DelegatedBeanConfig extends BeanConfig {
+
+		private final BeanConfig original;
+
+		DelegatedBeanConfig(String localName, BeanConfig src) {
+			super(localName, src.getClazz());
+			original = src;
+		}
+
+		@Override
+		public Class<?> getClazz() {
+			return original.getClazz();
+		}
+
+		@Override
+		public BeanConfig getFactory() {
+			return original.getFactory();
+		}
+
+		@Override
+		public Map<Field, Dependency> getFieldDependencies() {
+			return original.getFieldDependencies();
+		}
+
+		@Override
+		public Kernel getKernel() {
+			return original.getKernel();
+		}
+
+		public BeanConfig getOriginal() {
+			return original;
+		}
+
+		@Override
+		public State getState() {
+			return original.getState();
+		}
+
+		@Override
+		public boolean isExportable() {
+			return original.isExportable();
+		}
+
+		@Override
+		public String toString() {
+			return original.toString();
 		}
 	}
 

@@ -121,7 +121,7 @@ public class StanzaProcessor {
 	 * @param e
 	 *            exception.
 	 */
-	protected void sendException(final Packet packet, final ComponentException e) {
+	public void sendException(final Packet packet, final ComponentException e) {
 		try {
 			final String t = packet.getElement().getAttributeStaticStr(Packet.TYPE_ATT);
 
