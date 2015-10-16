@@ -196,6 +196,7 @@ public class PacketDefaultHandler {
 		}
 		try {
 			JID to = packet.getStanzaTo();
+			JID from = packet.getStanzaFrom();
 
 			// If this is simple <iq type="result"/> then ignore it
 			// and consider it OK
@@ -205,7 +206,8 @@ public class PacketDefaultHandler {
 				// Nothing to do....
 				return;
 			}
-			if (session.isUserId(to.getBareJID())) {
+			if (session.isUserId(to.getBareJID()) && (from == null || !session.isUserId(from.getBareJID()) 
+					|| !session.getConnectionId().equals(packet.getPacketFrom()))) {
 
 				// Yes this is message to 'this' client
 				Packet result;
@@ -255,10 +257,8 @@ public class PacketDefaultHandler {
 
 				return;
 			}    // end of else
-			if (packet.getStanzaFrom() != null) {
-				BareJID from = packet.getStanzaFrom().getBareJID();
-
-				if (session.isUserId(from)) {
+			if (from != null) {
+				if (session.isUserId(from.getBareJID())) {
 					Packet result = packet.copyElementOnly();
 
 					results.offer(result);
