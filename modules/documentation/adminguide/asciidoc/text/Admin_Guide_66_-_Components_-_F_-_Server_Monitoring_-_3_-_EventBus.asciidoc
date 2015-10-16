@@ -1,6 +1,6 @@
 [[eventbus]]
-Eventbus Monitoring
-===================
+Eventbus
+========
 :author: Bartosz Malkowski
 :date: 2015-04-09 8:56
 :version: v1.0 September 2015
@@ -67,7 +67,7 @@ The eventbus monitoring components have several pre-defined tasks that can be mo
 Available Options
   . +enabled[B]+ - enable or disable task, Boolean value.
   . +period[I]+ - period of running check, Integer value.
-  . +threshold[F]+ - percentage of used space on disk, Float value. *NOTE:* float values cannot be set in init.properties.
+  . +threshold+ - percentage of used space on disk, Float value.
 
 - *cpu-temp-task* - Used to check CPU temperature. +
 Available Options
@@ -236,7 +236,7 @@ Alternatively, you can also subscribe to all events within the eventbus by using
   </pubsub>
 </iq>
 -----
-
+[[monitorMailer]]
 Mailer Extension
 ~~~~~~~~~~~~~~~~
 Tigase Server Monitor Mailer Extension (TSMME) can send messages from the monitor component to a specified E-mail address so system administrators who are not logged into the XMPP server.

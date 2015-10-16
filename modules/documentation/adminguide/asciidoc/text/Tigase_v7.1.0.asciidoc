@@ -79,7 +79,7 @@ link:https://projects.tigase.org/issues/3244[#3244]
 
 Tigase Mailer Extension now Included
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Tigase mailed extension is now included in distributions of Tigase server. This extension enables the monitor component to deliver E-mails to and from specified e-mail addresses when monitor are triggered.  For more information see [monitor component].
+Tigase mailed extension is now included in distributions of Tigase server. This extension enables the monitor component to deliver E-mails to and from specified e-mail addresses when monitor are triggered.  For more information see xref:monitorMailer[monitor mailer section].
 
 EventBus implemented
 ~~~~~~~~~~~~~~~~~~~~
