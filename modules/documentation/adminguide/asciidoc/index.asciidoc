@@ -242,36 +242,38 @@ include::text/Admin_Guide_84_-_Using_Tigase_-_G_-_Tigase_and_PyMSN-t_Transport.a
 
 include::text/Admin_Guide_85_-_Using_Tigase_-_H_-_Two_or_more_SessionManagers.asciidoc[]
 
-include::text/Admin_Guide_86_-_Using_Tigase_-_I_-_Tips_and_Tricks.asciidoc[]
+include::text/Admin_Guide_86_-_Using_Tigase_-_I_-_Watchdog.asciidoc[]
+
+include::text/Admin_Guide_87_-_Using_Tigase_-_J_-_Tips_and_Tricks.asciidoc[]
 
 :leveloffset: 3
 
-include::text/Admin_Guide_87_-_Using_Tigase_-_I_-_Tips_and_Tricks_-_1_-_Tigase_Tip_Checking_the_Runtime_Environment.asciidoc[]
+include::text/Admin_Guide_88_-_Using_Tigase_-_J_-_Tips_and_Tricks_-_1_-_Tigase_Tip_Checking_the_Runtime_Environment.asciidoc[]
 
-include::text/Admin_Guide_88_-_Using_Tigase_-_I_-_Tips_and_Tricks_-_2_-_Tigase_Tip_Checking_Cluster_Connections.asciidoc[]
+include::text/Admin_Guide_89_-_Using_Tigase_-_J_-_Tips_and_Tricks_-_2_-_Tigase_Tip_Checking_Cluster_Connections.asciidoc[]
 
-include::text/Admin_Guide_89_-_Using_Tigase_-_I_-_Tips_and_Tricks_-_3_-_Best_Practices_for_Connecting_From_Web_Browser_to_Tigase_XMPP_Server.asciidoc[]
+include::text/Admin_Guide_90_-_Using_Tigase_-_J_-_Tips_and_Tricks_-_3_-_Best_Practices_for_Connecting_From_Web_Browser_to_Tigase_XMPP_Server.asciidoc[]
 
 :leveloffset: 2
 
-include::text/Admin_Guide_90_-_Using_Tigase_-_J_-_Command_Line_Tools.asciidoc[]
+include::text/Admin_Guide_91_-_Using_Tigase_-_K_-_Command_Line_Tools.asciidoc[]
 
 :leveloffset: 3
 
-include::text/Admin_Guide_91_-_Using_Tigase_-_J_-_Command_Line_Tools_-_1_-_Configuration_Managament_Tool.asciidoc[]
+include::text/Admin_Guide_92_-_Using_Tigase_-_K_-_Command_Line_Tools_-_1_-_Configuration_Managament_Tool.asciidoc[]
 
 :leveloffset: 2
 
-include::text/Admin_Guide_92_-_Using_Tigase_-_K_-_Scripting_Support_in_Tigase.asciidoc[]
+include::text/Admin_Guide_93_-_Using_Tigase_-_L_-_Scripting_Support_in_Tigase.asciidoc[]
 
 :leveloffset: 3
 
-include::text/Admin_Guide_93_-_Using_Tigase_-_K_-_Scripting_Support_in_Tigase_-_1_-_Scripting_Introduction_-_Hello_World.asciidoc[]
+include::text/Admin_Guide_94_-_Using_Tigase_-_L_-_Scripting_Support_in_Tigase_-_1_-_Scripting_Introduction_-_Hello_World.asciidoc[]
 
-include::text/Admin_Guide_94_-_Using_Tigase_-_K_-_Scripting_Support_in_Tigase_-_2_-_Tigase_Scripting_Version_4.4.x_Update_for_Administrators.asciidoc[]
+include::text/Admin_Guide_95_-_Using_Tigase_-_L_-_Scripting_Support_in_Tigase_-_2_-_Tigase_Scripting_Version_4.4.x_Update_for_Administrators.asciidoc[]
 
-include::text/Admin_Guide_95_-_Using_Tigase_-_K_-_Scripting_Support_in_Tigase_-_3_-_Tigase_and_Python.asciidoc[]
+include::text/Admin_Guide_96_-_Using_Tigase_-_L_-_Scripting_Support_in_Tigase_-_3_-_Tigase_and_Python.asciidoc[]
 
 :leveloffset: 2
 
-include::text/Admin_Guide_96_-_Using_Tigase_-_L_-_Configuration_Wizards.asciidoc[]
+include::text/Admin_Guide_97_-_Using_Tigase_-_M_-_Configuration_Wizards.asciidoc[]

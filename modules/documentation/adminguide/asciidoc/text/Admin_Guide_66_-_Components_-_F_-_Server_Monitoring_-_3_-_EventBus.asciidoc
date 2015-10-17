@@ -1,4 +1,4 @@
-[[eventbus]]
+[[eventBus]]
 Eventbus
 ========
 :author: Bartosz Malkowski
@@ -12,29 +12,9 @@ Eventbus
 New for Tigase version 7.1.0, is an *eventbus* component to help with monitoring has been implemented. This allows you to set thresholds for certain predefined tasks and you or other JIDs can be sent a message when those thresholds are passed. You can even configure a mailer extension to have an E-mail sent to system administrators to let them know!
 Lets begin with setup and requirements.
 
-How it works
-------------
-Eventbus is based on limited http://www.xmpp.org/extensions/xep-0060.html[PubSub] specification. Events are delivered to subscriber as normal PubSub notification.
+Eventbus is based on limited http://www.xmpp.org/extensions/xep-0060.html[PubSub] specification. Events are delivered to subscribers as normal PubSub notification.
 
-Each component or client may subscribe for specific type of event.
-Only components on cluster nodes are allowed to publish events.
-
-
-Event in Eventbus is identified by two elements: name of event and namespace:
-[source, xml]
--------
-<EventName xmlns="tigase:demo">
-  <sample_value>1</sample_value>
-</EventName>
--------
-Where event name is `EventName` and namespace is `tigase:demo`.
-
-Listeners may subscribe for specific event or for all events with specific namespace. Because in pubsub exists only single name of node, we have to add a way to conversion event name and namespace to node name:
-[source]
--------
-nodename := eventname + "|" + namespace
--------
-So for example to subscribe `<EventName xmlns="tigase:demo">`, node must be: `EventName|tigase:demo`. In case of subscribing for all events with specific namespace, use asterisk (`*`) instead of event name: +*|tigase:demo+.
+Each component or client may subscribe for specific type of event. Only components on cluster nodes are allowed to publish events.
 
 Setup
 -----
@@ -49,14 +29,23 @@ This feature requires both the Monitoring component as well as the eventbus comp
 -------
 As with any component, don't forget to keep the numbering sequential and one number for each component.
 
-Subscription Limitations
-------------------------
-To define list of JIDs allowed to subscribe for events:
-[source, bash]
------
-eventbus/affiliations/allowedSubscribers=francisco@denmark.lit,bernardo@denmark.lit
------
-If left blank, all users can subscribe.
+How it Works
+------------
+Event in Eventbus is identified by two elements: name of event and namespace:
+[source, xml]
+-------
+<EventName xmlns="tigase:demo">
+  <sample_value>1</sample_value>
+</EventName>
+-------
+Where event name is `EventName` and namespace is `tigase:demo`.
+
+Listeners may subscribe for specific event or for all events with specific namespace. Because in pubsub, there exists only a single node name, so we have to add a way to convert event name and namespace to a node name:
+[source]
+-------
+nodename := eventname + "|" + namespace
+-------
+So for example to subscribe to `<EventName xmlns="tigase:demo">`, node must be: `EventName|tigase:demo`. In case you wish to subscribe to all events with a specific namespace, use asterisk (`*`) instead of event name: +*|tigase:demo+.
 
 [[availableTasks]]
 Available Tasks
@@ -115,6 +104,15 @@ monitor/$TASKNAME/period=1000
 which sets the check period to 1000 milliseconds.
 
 *NOTE* Once triggers have been activated, they will become dormant.  Think of these as fire-once settings.
+
+Subscription Limitations
+^^^^^^^^^^^^^^^^^^^^^^^^
+To define list of JIDs allowed to subscribe for events:
+[source, bash]
+-----
+eventbus/affiliations/allowedSubscribers=francisco@denmark.lit,bernardo@denmark.lit
+-----
+If this is left blank, all users can subscribe.
 
 Configuration via XMPP
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -236,13 +234,41 @@ Alternatively, you can also subscribe to all events within the eventbus by using
   </pubsub>
 </iq>
 -----
-[[monitorMailer]]
+
+Sample notification from Eventbus
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[source, xml]
+-------
+<message from='eventbus.shakespeare.lit' to='francisco@denmark.lit' id='foo'>
+  <event xmlns='http://jabber.org/protocol/pubsub#event'>
+    <items node='EventName|tigase:demo'>
+      <item>
+        <EventName xmlns="tigase:demo" eventSource="samplecomponent.shakespeare.lit'" eventTimestamp="1444216850">
+          <sample_value>1</sample_value>
+        </EventName>
+      </item>
+    </items>
+  </event>
+</message>
+-------
+
+[NOTE]
+===============================
+If client subscribed node /*|tigase:demo then events will not be sent from
+node /*|tigase:demo, but from *real* node
+(in this case: `EventName|tigase:demo`).
+===============================
+
 Mailer Extension
-~~~~~~~~~~~~~~~~
+----------------
 Tigase Server Monitor Mailer Extension (TSMME) can send messages from the monitor component to a specified E-mail address so system administrators who are not logged into the XMPP server.
 
-TSMME requires two files to operate:
+For v7.1.0 versions and later, TSMME is already included in your distribution package and no extra installation is needed.
+
+For versions older than 7.1.0 TSMME requires two files to operate:
+
 - A compiled build of tigase mailer from link:https://projects.tigase.org/projects/tigase-server-ext-mailer/repository[its repository]. Place the compiled .jar file into /jars directory.
+
 - javax.mail.jar file which may be downloaded from link:http://java.net/projects/javamail/downloads/download/javax.mail.jar[this link]. Also place this file in the /jars directory.
 
 -----

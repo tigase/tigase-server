@@ -83,7 +83,7 @@ Tigase mailed extension is now included in distributions of Tigase server. This 
 
 EventBus implemented
 ~~~~~~~~~~~~~~~~~~~~
-Tigase now has a simple PubSub component called EventBus to report tasks and triggers.  More details are available xref:eventbus[Here].
+Tigase now has a simple PubSub component called EventBus to report tasks and triggers.  More details are available xref:eventBus[Here].
 
 XEP-0191 Blocking Command Support added
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -124,6 +124,10 @@ New init.properties property
 +--vhost-disable-dns-check=true+
 Disables DNS checking for vhosts when changed or edited.
 When new vhosts are created, Tigase will automatically check for SRV records and proper DNS settings for the new vhosts to ensure connectivity for outside users, however if these validations fail, you will be unable to save those changes. This setting allows you to bypass that checking.
+
+Connection Watchdog
+~~~~~~~~~~~~~~~~~~~
+A watchdog property is now available to monitor stale connections and sever them before they become a problem.  More details xref:watchdog[here].
 
 New Documentation Structure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
