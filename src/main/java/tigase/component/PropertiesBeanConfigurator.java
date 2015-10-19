@@ -28,22 +28,24 @@ public class PropertiesBeanConfigurator implements BeanConfigurator {
 	@Inject
 	private Kernel kernel;
 
+	private boolean accessToAllFields = false;
+
 	@Override
 	public void configure(BeanConfig beanConfig, Object bean) {
 		if (props == null)
 			return;
 
-		HashSet<String> propertiesToSet = getBeanProps(beanConfig.getBeanName());
-
 		if (log.isLoggable(Level.CONFIG))
 			log.config("Configuring bean '" + beanConfig.getBeanName() + "'...");
 
-		for (String key : propertiesToSet) {
+		final HashMap<Field, Object> valuesToSet = new HashMap<>();
+
+		// Preparing set of properties based on given properties set
+		HashSet<String> beanProps = getBeanProps(beanConfig.getBeanName());
+		for (String key : beanProps) {
 			String[] tmp = key.split("/");
 			final String property = tmp[1];
 			final Object value = props.get(key);
-
-			final HashMap<Field, Object> valuesToSet = new HashMap<>();
 
 			try {
 				if (log.isLoggable(Level.FINEST))
@@ -56,7 +58,7 @@ public class PropertiesBeanConfigurator implements BeanConfigurator {
 					continue;
 				}
 				ConfigField cf = field.getAnnotation(ConfigField.class);
-				if (cf == null) {
+				if (!accessToAllFields && cf == null) {
 					log.warning("Field '" + property + "' of bean '" + beanConfig.getBeanName()
 							+ "' Can't be configured (missing @ConfigField). Ignoring!");
 					continue;
@@ -72,23 +74,52 @@ public class PropertiesBeanConfigurator implements BeanConfigurator {
 				throw new RuntimeException("Can't prepare value of property '" + property + "' of bean '"
 						+ beanConfig.getBeanName() + "': '" + value + "'");
 			}
+		}
 
-			for (Map.Entry<Field, Object> item : valuesToSet.entrySet()) {
-				if (log.isLoggable(Level.FINEST))
-					log.finest("Setting property '" + property + "' of bean '" + beanConfig.getBeanName() + "'...");
+		// Preparing set of properties based on @ConfigField annotation and
+		// aliases
+		Field[] fields = DependencyManager.getAllFields(beanConfig.getClazz());
+		for (Field field : fields) {
+			final ConfigField cf = field.getAnnotation(ConfigField.class);
+			if (cf != null && !cf.alias().isEmpty() && props.containsKey(cf.alias())) {
+				final Object value = props.get(cf.alias());
+
+				if (valuesToSet.containsKey(field)) {
+					if (log.isLoggable(Level.CONFIG))
+						log.config("Alias '" + cf.alias() + "' for property " + beanConfig.getBeanName() + "." + field.getName() + " will not be used, because there is configuration for this property already.");
+					continue;
+				}
+				if (log.isLoggable(Level.CONFIG))
+					log.config("Using alias '" + cf.alias() + "' for property " + beanConfig.getBeanName() + "." + field.getName());
+
 				try {
-					BeanUtils.setValue(bean, item.getKey(), item.getValue());
-					if (log.isLoggable(Level.FINEST))
-						log.finest("Property '" + property + "' of bean '" + beanConfig.getBeanName() + "' has been set to "
-								+ item.getValue());
+					final Object v = TypesConverter.convert(value, field.getType());
+					valuesToSet.put(field, v);
 				} catch (Exception e) {
-					log.log(Level.WARNING, "Can't set property '" + property + "' of bean '" + beanConfig.getBeanName()
-							+ "' with value '" + value + "'", e);
-					throw new RuntimeException("Can't set property '" + property + "' of bean '" + beanConfig.getBeanName()
-							+ "' with value '" + value + "'");
+					log.log(Level.WARNING, "Can't prepare value of property '" + field.getName() + "' of bean '" + beanConfig.getBeanName()
+							+ "': '" + value + "'", e);
+					throw new RuntimeException("Can't prepare value of property '" + field.getName() + "' of bean '"
+							+ beanConfig.getBeanName() + "': '" + value + "'");
 				}
 			}
 		}
+
+		for (Map.Entry<Field, Object> item : valuesToSet.entrySet()) {
+			if (log.isLoggable(Level.FINEST))
+				log.finest("Setting property '" + item.getKey().getName() + "' of bean '" + beanConfig.getBeanName() + "'...");
+			try {
+				BeanUtils.setValue(bean, item.getKey(), item.getValue());
+				if (log.isLoggable(Level.FINEST))
+					log.finest("Property '" + item.getKey().getName() + "' of bean '" + beanConfig.getBeanName()
+							+ "' has been set to " + item.getValue());
+			} catch (Exception e) {
+				log.log(Level.WARNING, "Can't set property '" + item.getKey().getName() + "' of bean '"
+						+ beanConfig.getBeanName() + "' with value '" + item.getValue() + "'", e);
+				throw new RuntimeException("Can't set property '" + item.getKey().getName() + "' of bean '"
+						+ beanConfig.getBeanName() + "' with value '" + item.getValue() + "'");
+			}
+		}
+
 	}
 
 	public Map<String, Object> getCurrentConfigurations() {
@@ -117,7 +148,7 @@ public class PropertiesBeanConfigurator implements BeanConfigurator {
 	}
 
 	private HashSet<String> getBeanProps(String beanName) {
-		HashSet<String> result = new HashSet<String>();
+		HashSet<String> result = new HashSet<>();
 
 		for (String pn : props.keySet()) {
 			if (pn.startsWith(beanName + "/")) {
@@ -134,6 +165,11 @@ public class PropertiesBeanConfigurator implements BeanConfigurator {
 
 	public void setProperties(Map<String, Object> props) {
 		this.props = props;
+
+		String s = System.getProperty("bean-config-access-to-all");
+		if (s != null && !s.isEmpty()) {
+			this.accessToAllFields = TypesConverter.convert(s, boolean.class);
+		}
 	}
 
 }

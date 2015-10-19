@@ -18,4 +18,15 @@ public @interface ConfigField {
 	 */
 	String desc();
 
+	/**
+	 * Makes alias of "component root level" property in config file.
+	 * <p>
+	 * Not only {@code component/bean/property=value} will be used but also
+	 * {@code component/alias=value}.
+	 * </p>
+	 * 
+	 * @return alias of config field.
+	 */
+	String alias() default "";
+
 }
