@@ -720,7 +720,9 @@ public class Presence
 					else {
 				presence.setAttribute("type", StanzaType.unavailable.toString());
 			}    // end of if (t != null) else
-			presence.setAttribute("from", from.toString());
+			if (null != from ) {
+				presence.setAttribute("from", from.toString());
+			}
 			presence.setXMLNS(XMLNS);
 		} else {
 			presence = pres.clone();
