@@ -66,6 +66,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
+import tigase.server.Priority;
 
 /**
  * Created: May 13, 2009 9:53:44 AM
@@ -414,7 +415,7 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 		 * @param name
 		 */
 		public UserConnectedCommand(String name) {
-			super(name);
+			super(name, Priority.CLUSTER);
 		}
 
 		//~--- methods ------------------------------------------------------------
@@ -482,7 +483,7 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 		 * @param name
 		 */
 		public UserPresenceCommand(String name) {
-			super(name);
+			super(name, Priority.CLUSTER);
 		}
 
 		//~--- methods ------------------------------------------------------------

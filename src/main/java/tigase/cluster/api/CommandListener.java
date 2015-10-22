@@ -37,6 +37,7 @@ import tigase.xmpp.JID;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import tigase.server.Priority;
 
 /**
  * @author Artur Hefczyc Created Mar 16, 2011
@@ -68,6 +69,14 @@ public interface CommandListener
 	 */
 	String getName();
 
+	/**
+	 * Method returns priority of particular command which should be used 
+	 * to assign proper priority for processing of this command
+	 * 
+	 * @return 
+	 */
+	Priority getPriority();
+	
 	/**
 	 * Method allows retrieval possible statistics for particular command
 	 *

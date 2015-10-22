@@ -44,6 +44,7 @@ import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import tigase.server.Priority;
 
 /**
  * Class ClusterElement is a utility class for handling tigase cluster specific
@@ -160,6 +161,7 @@ public class ClusterElement {
 	private Map<String, String> method_params  = null;
 	private Map<String, String> method_results = null;
 	private Queue<Element> packets             = null;
+	private Priority priority				   = null;
 	private Set<JID> visited_nodes             = null;
 
 	//~--- constructors ---------------------------------------------------------
@@ -210,6 +212,11 @@ public class ClusterElement {
 			}
 		}
 
+		String priorityStr = elem.getAttributeStaticStr(Packet.PRIORITY_ATT);
+		if (priorityStr != null) {
+			priority = Priority.valueOf(priorityStr);
+		}
+		
 		Element method_call = elem.findChildStaticStr(CLUSTER_METHOD_PATH);
 
 		if (method_call != null) {
@@ -645,6 +652,10 @@ public class ClusterElement {
 			}
 		}
 	}
+	
+	public Priority getPriority() {
+		return priority;
+	}
 
 	/**
 	 * Method description
@@ -668,6 +679,11 @@ public class ClusterElement {
 		return visited_nodes.contains(node_id);
 	}
 
+	public void setPriority(Priority priority) {
+		this.priority = priority;
+		this.elem.setAttribute(Packet.PRIORITY_ATT, priority.name());
+	}
+	
 	//~--- methods --------------------------------------------------------------
 
 	/**

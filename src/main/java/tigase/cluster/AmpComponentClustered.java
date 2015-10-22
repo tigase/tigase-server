@@ -39,6 +39,7 @@ import tigase.cluster.api.CommandListener;
 import tigase.cluster.api.CommandListenerAbstract;
 import tigase.server.Message;
 import tigase.server.Packet;
+import tigase.server.Priority;
 import tigase.server.amp.AmpComponent;
 import static tigase.server.amp.AmpFeatureIfc.FROM_CONN_ID;
 import tigase.util.TigaseStringprepException;
@@ -103,7 +104,7 @@ public class AmpComponentClustered extends AmpComponent implements ClusteredComp
 	protected class PacketForwardCommand extends CommandListenerAbstract {
 
 		public PacketForwardCommand(String name) {
-			super(name);
+			super(name, Priority.HIGH);
 		}
 
 		@Override

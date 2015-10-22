@@ -26,6 +26,7 @@ package tigase.cluster;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.cluster.api.ClusterConnectionHandler;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -48,6 +49,7 @@ import java.util.zip.Deflater;
 import javax.script.Bindings;
 
 import tigase.cluster.api.ClusterCommandException;
+import tigase.cluster.api.ClusterConnectionSelectorIfc;
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusterElement;
 import tigase.cluster.api.ClusteredComponentIfc;
@@ -96,7 +98,7 @@ import tigase.xmpp.XMPPIOService;
  */
 public class ClusterConnectionManager
 				extends ConnectionManager<XMPPIOService<Object>>
-				implements ClusteredComponentIfc, RepositoryChangeListenerIfc<ClusterRepoItem> {
+				implements ClusteredComponentIfc, RepositoryChangeListenerIfc<ClusterRepoItem>, ClusterConnectionHandler {
 	/** Field description */
 	public static final String CLCON_REPO_CLASS_PROP_KEY = "repository-class";
 
@@ -116,8 +118,13 @@ public class ClusterConnectionManager
 			"cluster-connections-per-node";
 
 	/** Field description */
-	public static final int CLUSTER_CONNECTIONS_PER_NODE_VAL = 2;
+	public static final int CLUSTER_CONNECTIONS_PER_NODE_VAL = 3;
 
+	/** Field description */
+	public static final String CLUSTER_CONNECTIONS_SELECTOR_KEY = "connection-selector";
+	/** Field description */
+	public static final String DEF_CLUSTER_CONNECTIONS_SELECTOR_VAL = ClusterConnectionSelector.class.getCanonicalName();
+	
 	/** Field description */
 	public static final String CLUSTER_CONTR_ID_PROP_KEY = "cluster-controller-id";
 
@@ -184,7 +191,7 @@ public class ClusterConnectionManager
 			new IOServiceStatisticsGetter();
 	private String                                                   identity_type =
 			IDENTITY_TYPE_VAL;
-	private Map<String, CopyOnWriteArrayList<XMPPIOService<Object>>> connectionsPool =
+	private Map<String, ClusterConnection> connectionsPool =
 			new ConcurrentSkipListMap<>();
 	private boolean                              connect_all = CONNECT_ALL_PROP_VAL;
 	private boolean                              compress_stream = COMPRESS_STREAM_PROP_VAL;
@@ -201,6 +208,7 @@ public class ClusterConnectionManager
 
 	// private long packetsSent = 0;
 	// private long packetsReceived = 0;
+	private ClusterConnectionSelectorIfc connectionSelector = null;
 	private CommandListener sendPacket = new SendPacket(ClusterControllerIfc
 			.DELIVER_CLUSTER_PACKET_CMD);
 	private boolean nonClusterTrafficAllowed = true;
@@ -500,16 +508,16 @@ public class ClusterConnectionManager
 			Map<String, Object> sessionData = service.getSessionData();
 			String[] routings = (String[]) sessionData.get( PORT_ROUTING_TABLE_PROP_KEY );
 			String addr = (String) sessionData.get( PORT_REMOTE_HOST_PROP_KEY );
-			CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get( addr );
+			ClusterConnection conns = connectionsPool.get( addr );
 
 			if (conns == null) {
-				conns = new CopyOnWriteArrayList<>();
+				conns = new ClusterConnection(addr);
 				connectionsPool.put(addr, conns);
 			}
 
 			int size = conns.size();
 
-			conns.remove( service );
+			conns.removeConn( service );
 			if ( log.isLoggable( Level.FINEST ) ){
 				log.log( Level.FINEST, "serviceStopped: result={0} / size={1} / connPool={2} / serv={3} / conns={4} / type={5}",
 								 new Object[] { result, size, connectionsPool, service, conns, service.connectionType() } );
@@ -707,6 +715,8 @@ public class ClusterConnectionManager
 		props.put(WATCHDOG_DELAY, 30 * SECOND);
 		props.put(WATCHDOG_TIMEOUT, -1 * SECOND);
 		
+		props.put(CLUSTER_CONNECTIONS_SELECTOR_KEY, DEF_CLUSTER_CONNECTIONS_SELECTOR_VAL);
+		
 		if (getDefHostName().toString().equalsIgnoreCase( "localhost") ) {
 			TigaseRuntime.getTigaseRuntime().shutdownTigase( new String [] {
 				"",
@@ -792,6 +802,19 @@ public class ClusterConnectionManager
 		if (props.get(CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY) != null) {
 			per_node_conns = (Integer) props.get(CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY);
 		}
+
+		if (props.containsKey(CLUSTER_CONNECTIONS_SELECTOR_KEY)) {
+			String selectorClsName = (String) props.get(CLUSTER_CONNECTIONS_SELECTOR_KEY);
+			try {
+				ClusterConnectionSelectorIfc tmp_selector = (ClusterConnectionSelectorIfc) ModulesManagerImpl.getInstance().forName(selectorClsName).newInstance();
+				tmp_selector.setClusterConnectionHandler(this);
+				tmp_selector.setProperties(props);
+				connectionSelector = tmp_selector;
+			} catch (InstantiationException|ClassNotFoundException|IllegalAccessException ex) {
+				log.log(Level.SEVERE, "Coulnd not create instance of cluster connection selector of class " + selectorClsName, ex);
+			}
+		}
+		
 		connectionDelay = 5 * SECOND;
 		if ((props.size() == 1) || isInitializationComplete()) {
 			super.setProperties(props);
@@ -844,10 +867,10 @@ public class ClusterConnectionManager
 		String[] routings = (String[]) serv.getSessionData().get(PORT_ROUTING_TABLE_PROP_KEY);
 		String   addr     = (String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY);
 
-		CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(addr);
+		ClusterConnection conns = connectionsPool.get(addr);
 
 		if (conns == null) {
-			conns = new CopyOnWriteArrayList<XMPPIOService<Object>>();
+			conns = new ClusterConnection(addr);
 			connectionsPool.put(addr, conns);
 		}
 
@@ -861,7 +884,7 @@ public class ClusterConnectionManager
 		// setting userJid to hostname of remote cluster node
 		serv.setUserJid((String) serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY));
 		
-		conns.add( serv );
+		conns.addConn(serv );
 		if ( size == 0 && conns.size() > 0 ){
 			updateRoutings(routings, true);
 			log.log(Level.INFO, "Connected to: {0}", addr);
@@ -884,13 +907,10 @@ public class ClusterConnectionManager
 
 		// ++packetsSent;
 		String ip = p.getTo().getDomain();
+		ClusterConnection conns = connectionsPool.get(ip);
 
-		int                                         code  = Math.abs(hashCodeForPacket(p));
-		CopyOnWriteArrayList<XMPPIOService<Object>> conns = connectionsPool.get(ip);
-
-		if ((conns != null) && (conns.size() > 0)) {
-			XMPPIOService<Object> serv = conns.get(code % conns.size());
-
+		XMPPIOService<Object> serv = connectionSelector.selectConnection(p, conns);
+		if (serv != null) {
 			return super.writePacketToSocket(serv, p);
 		} else {
 			log.log(Level.WARNING, "No cluster connection to send a packet: {0}", p);
@@ -1146,7 +1166,7 @@ public class ClusterConnectionManager
 	private class SendPacket
 					extends CommandListenerAbstract {
 		private SendPacket(String name) {
-			super(name);
+			super(name, null);
 		}
 
 		//~--- methods ------------------------------------------------------------
