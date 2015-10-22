@@ -52,9 +52,11 @@ public class Notify extends ActionAbstract {
 	@Override
 	public boolean execute(Packet packet, Element rule) {
 		try {
-			Packet result = prepareAmpPacket(packet, rule);
+			if (packet.getStanzaFrom() != null && packet.getStanzaFrom().getBareJID().getLocalpart() != null ) {
+				Packet result = prepareAmpPacket(packet, rule);
+				resultsHandler.addOutPacket(result);
+			}
 
-			resultsHandler.addOutPacket(result);
 		} catch (PacketErrorTypeException ex) {
 
 			// Ignore

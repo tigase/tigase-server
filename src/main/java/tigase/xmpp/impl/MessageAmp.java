@@ -257,7 +257,9 @@ public class MessageAmp
 	
 					return true;
 				}
-				if (session.isUserId(packet.getStanzaTo().getBareJID())) {
+				if (session.isUserId(packet.getStanzaTo().getBareJID())
+						&& session.getjid() != null && session.getjid().equals( packet.getStanzaTo())
+						) {
 					Packet result = packet.copyElementOnly();
 					result.setPacketTo(ampJID);
 					if ( packet.getStanzaTo().getResource() != null ){
