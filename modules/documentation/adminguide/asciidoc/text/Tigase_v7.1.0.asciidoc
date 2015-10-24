@@ -57,7 +57,7 @@ Tigase now supports REST commands via HTTP, they can be sent from ad-hoc command
 
 Empty Nicknames
 ~~~~~~~~~~~~~~~
-Tigase can now support users with empty nicknames so long as the following code is in init.properties
+Tigase can now support users with empty nicknames so long as the following code is in init.properties.
 ------
 sess-man/plugins-conf/jabber\:iq\:roster/empty_name_enabled=true
 ------
@@ -79,7 +79,7 @@ link:https://projects.tigase.org/issues/3244[#3244]
 
 Tigase Mailer Extension now Included
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Tigase mailed extension is now included in distributions of Tigase server. This extension enables the monitor component to deliver E-mails to and from specified e-mail addresses when monitor are triggered.  For more information see xref:monitorMailer[monitor mailer section].
+Tigase mailer extension is now included in distributions of Tigase server. This extension enables the monitor component to deliver E-mails to and from specified e-mail addresses when monitor are triggered.  For more information see xref:monitorMailer[monitor mailer section].
 
 EventBus implemented
 ~~~~~~~~~~~~~~~~~~~~
@@ -136,7 +136,7 @@ There has been a lot of changes and fixes to our documentation over the last few
 New Minor Features & Behavior Changes
 -------------------------------------
 - JTDS MS SQL Server driver updated to v1.3.1
-- link:https://projects.tigase.org/issues/163[#163] User +LastActivity+ partially implemented, however some features are not available at this time.
+- link:https://projects.tigase.org/issues/163[#163] link:http://xmpp.org/extensions/xep-0012.html[XEP-0012] User +LastActivity+ implemented
 - link:https://projects.tigase.org/issues/593[#593] link:http://xmpp.org/extensions/xep-0202.html[XEP-0202 Entity Time] has been implemented.
 - #811 Plugin API extended allowing more XML parameters to be considered for processing.
 - link:https://projects.tigase.org/issues/1436[#1436] +ClusterConnectionManager+ now sends ping packets every 30 seconds to check status of live cluster connections.
@@ -146,7 +146,7 @@ New Minor Features & Behavior Changes
 - link:https://projects.tigase.org/issues/2823[#2823] +staticStr+ element method now implemented.
 - link:https://projects.tigase.org/issues/2835[#2835] Allowing of +setPermissions+ on incoming packets before they are processed by plugins.
 - link:https://projects.tigase.org/issues/2903[#2903] +see-other-host+ has new option to make it configurable on a per vhost basis.
-- limk:https://projects.tigase.org/issues/3034[#3034] Improved handling of data types and primitives within Tigase.
+- link:https://projects.tigase.org/issues/3034[#3034] Improved handling of data types and primitives within Tigase.
 - link:https://projects.tigase.org/issues/3180[#3180] Protected access to JDBC repository now enabled.
 - link:https://projects.tigase.org/issues/3230[#3230] Verification added to check against CUSTOM domain rules when submitted.
 - #3258 Retrieval of PubSub/PEP based avatars using REST API now supported. xref:avatarRetrievalRequests[Command URLs here].
@@ -170,6 +170,8 @@ Fixes
 - link:https://projects.tigase.org/issues/2118[#2118] Username modification bugfix. Tigase now returns "" for blank usernames instead of string after a username has been made blank.
 
 - link:https://projects.tigase.org/issues/2859[#2859] & link:https://projects.tigase.org/issues/2997[#2997] STARTTLS stream error on SSL sockets fixed.
+
+- link:https://projects.tigase.org/issues/2860[#2860] Fixed issue with SSL socket client certificate not working.
 
 - link:https://projects.tigase.org/issues/2877[#2877] Fixed issue in Message Carbons if message contains AMP payload.
 
@@ -246,6 +248,12 @@ Fixes
 - link:https://projects.tigase.org/issues/3559[#3559] Fixed Web admin UI not updating Cluster node when it id disconnected.
 
 - link:http://projects.tigase.org/issues/3579[#3579] Fixed NPE in SimpleParser.
+
+- #3598 Fixed error in removing users from blocked list.
+
+- #3599 Fixed +FlexibleOfflineMessages+ not being delivered to connection due to lack of explicit connection addressing.
+
+- #3619 Fixed issue with non-presistent contacts being unable to be added to roster.
 
 - Added missing classes to IzPack installer
 
