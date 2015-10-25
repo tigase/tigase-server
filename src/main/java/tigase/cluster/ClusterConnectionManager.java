@@ -118,7 +118,7 @@ public class ClusterConnectionManager
 			"cluster-connections-per-node";
 
 	/** Field description */
-	public static final int CLUSTER_CONNECTIONS_PER_NODE_VAL = 3;
+	public static final int CLUSTER_CONNECTIONS_PER_NODE_VAL = 5;
 
 	/** Field description */
 	public static final String CLUSTER_CONNECTIONS_SELECTOR_KEY = "connection-selector";

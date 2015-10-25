@@ -41,7 +41,7 @@ public class ClusterConnectionSelector implements ClusterConnectionSelectorIfc {
 	protected static final String CLUSTER_SYS_CONNECTIONS_PER_NODE_PROP_KEY = "cluster-sys-connections-per-node";
 	
 	private int allConns = ClusterConnectionManager.CLUSTER_CONNECTIONS_PER_NODE_VAL;
-	private int sysConns = 1;
+	private int sysConns = 2;
 	private ClusterConnectionHandler handler;
 	
 	@Override

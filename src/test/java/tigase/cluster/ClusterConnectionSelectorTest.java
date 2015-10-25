@@ -52,6 +52,10 @@ public class ClusterConnectionSelectorTest extends TestCase {
 				return packet.getStanzaFrom().hashCode();
 			}
 		});
+
+		Map<String,Object> props = new HashMap<>();
+		props.put(CLUSTER_SYS_CONNECTIONS_PER_NODE_PROP_KEY, 1);
+		selector.setProperties(props);
 		
 		Element el = new Element("iq", new String[] { "from" }, new String[] { "test1" });
 		Packet p = Packet.packetInstance(el);

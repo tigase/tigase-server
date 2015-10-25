@@ -932,9 +932,9 @@ public abstract class AbstractMessageReceiver
 	 *
 	 */
 	public void setMaxQueueSize(int maxQueueSize) {
-		this.maxQueueSize = maxQueueSize;
-		if ((this.maxInQueueSize != maxQueueSize) || (in_queues.size() == 0)) {
-
+		if ((this.maxQueueSize != maxQueueSize) || (in_queues.size() == 0)) {
+			this.maxQueueSize = maxQueueSize;
+			
 			// out_queue = PriorityQueueAbstract.getPriorityQueue(pr_cache.length,
 			// maxQueueSize);
 			// Processing threads number is split to incoming and outgoing queues...
