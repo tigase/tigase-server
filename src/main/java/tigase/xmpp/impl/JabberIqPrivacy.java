@@ -228,26 +228,8 @@ public class JabberIqPrivacy
 
 	protected boolean allowed(Packet packet, XMPPResourceConnection session) {
 		try {
-
-			// If this is a preprocessing phase, always allow all packets to
-			// make it possible for the client to communicate with the server.
-			if (session.getConnectionId().equals(packet.getPacketFrom())) {
+			if (allowedByDefault(packet, session))
 				return true;
-			}
-
-			// allow packets without from attribute and packets with from attribute same as domain name
-			if ((packet.getStanzaFrom() == null) || ((packet.getStanzaFrom().getLocalpart() ==
-					null) && session.getBareJID().getDomain().equals(packet.getStanzaFrom()
-					.getDomain()))) {
-				return true;
-			}
-
-			// allow packets without to attribute and packets with to attribute same as domain name
-			if ((packet.getStanzaTo() == null) || ((packet.getStanzaTo().getLocalpart() ==
-					null) && session.getBareJID().getDomain().equals(packet.getStanzaTo()
-					.getDomain()))) {
-				return true;
-			}
 
 			Element list = Privacy.getActiveList(session);
 
@@ -394,6 +376,38 @@ public class JabberIqPrivacy
 		}
 
 		return true;
+	}
+	
+	protected boolean allowedByDefault(Packet packet, XMPPResourceConnection session) throws NoConnectionIdException, NotAuthorizedException {
+			// If this is a preprocessing phase, always allow all packets to
+		// make it possible for the client to communicate with the server.
+		if (session.getConnectionId().equals(packet.getPacketFrom())) {
+			return true;
+		}
+
+		// allow packets without from attribute and packets with from attribute same as domain name
+		if ((packet.getStanzaFrom() == null) || ((packet.getStanzaFrom().getLocalpart()
+				== null) && session.getBareJID().getDomain().equals(packet.getStanzaFrom()
+						.getDomain()))) {
+			return true;
+		}
+
+		// allow packets without to attribute and packets with to attribute same as domain name
+		if ((packet.getStanzaTo() == null) || ((packet.getStanzaTo().getLocalpart()
+				== null) && session.getBareJID().getDomain().equals(packet.getStanzaTo()
+						.getDomain()))) {
+			return true;
+		}
+
+		// Always allow packets sent between sessions of same user and
+		// packets sent from user to his bare jid and results of this
+		// packets
+		if (packet.getStanzaFrom() != null && packet.getStanzaTo() != null
+				&& packet.getStanzaFrom().getBareJID().equals(packet.getStanzaTo().getBareJID())) {
+			return true;
+		}
+
+		return false;
 	}
 	
 	protected boolean matchToPrivacyListElement(boolean packetIn, Packet packet, Element elem, ITEM_ACTION action) {
