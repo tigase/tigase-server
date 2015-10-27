@@ -454,10 +454,10 @@ public class ClientConnectionManager
 			return prepareStreamError(serv, "improper-addressing", null);
 		}    // end of if (hostname == null)
 		if (!isLocalDomain(hostname)) {
-			return prepareStreamError(serv, "host-unknown", null);
+			return prepareStreamError(serv, "host-unknown", hostname);
 		}    // end of if (!hostnames.contains(hostname))
 		if (!isAllowed(serv, hostname)) {
-			return prepareStreamError(serv, "policy-violation", null);
+			return prepareStreamError(serv, "policy-violation", hostname);
 		}
 		if ((fromJID != null) && (see_other_host_strategy != null)
 				&& see_other_host_strategy.isEnabled(vHostManager.getVHostItem( fromJID.getDomain()),
