@@ -187,7 +187,8 @@ public class MessageAmp
 //					|| (amp.getAttributeStaticStr(STATUS_ATTRIBUTE_NAME) != null)
 					) {
 				try {
-					if (session != null && packet.getStanzaTo() != null && !session.isUserId(packet.getStanzaTo().getBareJID()))
+					if (session != null && packet.getStanzaTo() != null
+							&& (packet.getStanzaTo().getLocalpart() == null || !session.isUserId(packet.getStanzaTo().getBareJID())) )
 						return;
 					
 					offlineProcessor.publishInPubSub(packet, session, results, settings);
