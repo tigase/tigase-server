@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Describe class XMPPResourceConnection here.
@@ -199,6 +200,39 @@ public class XMPPResourceConnection
 	// ~--- methods --------------------------------------------------------------
 
 	/**
+	 * Method checks if in {@code parentSession} in session data there is value
+	 * for passed {@code key} and returns it if exists. If not then it uses
+	 * passed {@code valueFactory} to generate value and sets it in
+	 * {@code parentSession} in session data under passed {@code key} and
+	 * returns newly set value
+	 *
+	 * @param key
+	 * @param valueFactory
+	 * @return 
+	 */
+	public Object computeCommonSessionDataIfAbsent(String key, Function<String,Object> valueFactory) {
+		if (parentSession != null) {
+			return parentSession.computeCommonSessionDataIfAbsent(key, valueFactory);
+		}
+		return valueFactory.apply(key);
+	}
+	
+	/**
+	 * Method checks if in session data is value for passed {@code key} and
+	 * returns it if exists. If not then it uses passed {@code valueFactory} to
+	 * generate value and sets it in session data under passed {@code key} and
+	 * returns newly set value
+	 *
+	 * @param key
+	 * @param valueFactory
+	 * @return
+	 */	
+	public Object computeSessionDataIfAbsent(String key, Function<String,Object> valueFactory) {
+		lastAccessed = System.currentTimeMillis();
+		return sessionData.computeIfAbsent(key, valueFactory);
+	}
+	
+	/**
 	 * Returns full user JID for this session without throwing the
 	 * <code>NotAuthorizedException</code> exception if session is not authorized
 	 * yet and therefore user name and resource is not known yet. Please note this
@@ -332,8 +366,8 @@ public class XMPPResourceConnection
 	}
 
 	/**
-	 * Method description
-	 *
+	 * Method sets passed value under passed key in common sessionData kept
+	 * in parentSession
 	 *
 	 * @param key
 	 * @param value
@@ -342,6 +376,21 @@ public class XMPPResourceConnection
 		if (parentSession != null) {
 			parentSession.putCommonSessionData(key, value);
 		}
+	}
+	
+	/**
+	 * Method sets passed value under passed key in common sessionData kept
+	 * in parentSession but only if there is no value for this key already
+	 *
+	 * @param key
+	 * @param value
+	 * @return previous value
+	 */
+	public Object putCommonSessionDataIfAbsent(String key, Object value) {
+		if (parentSession != null) {
+			return parentSession.putCommonSessionDataIfAbsent(key, value);
+		}
+		return null;
 	}
 
 	// public void setOnHold() {
