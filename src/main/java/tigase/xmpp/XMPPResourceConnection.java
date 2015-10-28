@@ -379,8 +379,8 @@ public class XMPPResourceConnection
 	}
 	
 	/**
-	 * Method sets passed value under passed key in common sessionData kept
-	 * in parentSession but only if there is no value for this key already
+	 * Method sets passed value under passed {@code key} in common {@code sessionData} kept
+	 * in {@code parentSession} but only if there is no value for this {@code key} already
 	 *
 	 * @param key
 	 * @param value
@@ -423,6 +423,19 @@ public class XMPPResourceConnection
 		sessionData.put(key, value);
 	}
 
+	/**
+	 * Method sets passed value under passed {@code key} in {@code sessionData} 
+	 * but only if there is no value for this {@code key} already
+	 *
+	 * @param key
+	 * @param value
+	 * @return previous value
+	 */
+	public Object putSessionDataIfAbsent(String key, Object value) {
+		lastAccessed = System.currentTimeMillis();
+		return sessionData.putIfAbsent(key, value);
+	}	
+	
 	@Override
 	public void queryAuth(Map<String, Object> authProps) throws TigaseDBException {
 		super.queryAuth(authProps);
