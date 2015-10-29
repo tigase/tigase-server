@@ -84,6 +84,8 @@ include::text/Admin_Guide_25_-_Security_-_C_-_Packet_Filtering.asciidoc[]
 
 include::text/Admin_Guide_26_-_Security_-_C_-_Packet_Filtering_-_1_-_Domain_Based_Packet_Filtering.asciidoc[]
 
+:leveloffset: 2
+
 include::text/Admin_Guide_27_-_Security_-_D_-_Access_Control_List.asciidoc[]
 
 :leveloffset: 1
