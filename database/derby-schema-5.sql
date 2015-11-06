@@ -27,5 +27,7 @@ run 'database/derby-schema-4-sp.sql';
 run 'database/derby-schema-4-props.sql';
 
 -- LOAD FILE: database/derby-schema-4-schema.sql
+
 -- LOAD FILE: database/derby-schema-4-sp.sql
+
 -- LOAD FILE: database/derby-schema-4-props.sql
