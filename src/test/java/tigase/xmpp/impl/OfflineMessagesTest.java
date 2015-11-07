@@ -226,7 +226,8 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 		Map<String,Object> settings = new HashMap<>();
 		settings.put("msg-store-offline-paths", new String[] {
 			"/message/storeMe1[custom_xmlns]",
-			"/message/storeMe2"
+			"/message/storeMe2",
+			"-/message/noStore1"
 		});
 		offlineProcessor.init(settings);	
 
@@ -250,6 +251,16 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 		}, new String[] { "from", "to" }, new String[] { "from@example.com/res1", "to@example.com/res2" }));
 		
 		assertFalse(offlineProcessor.isAllowedForOfflineStorage(packet));
+		
+		packet = Packet.packetInstance(new Element("message", new Element[]{
+			new Element("noStore1"), new Element("body", "body of message")
+		}, new String[] { "from", "to" }, new String[] { "from@example.com/res1", "to@example.com/res2" }));	
+		assertFalse(offlineProcessor.isAllowedForOfflineStorage(packet));
+		
+		packet = Packet.packetInstance(new Element("message", new Element[]{
+			new Element("body", "body of message")
+		}, new String[] { "from", "to" }, new String[] { "from@example.com/res1", "to@example.com/res2" }));	
+		assertTrue(offlineProcessor.isAllowedForOfflineStorage(packet));
 	}
 	
 	private static class MsgRepositoryIfcImpl implements MsgRepositoryIfc {
