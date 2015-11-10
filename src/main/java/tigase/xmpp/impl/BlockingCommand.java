@@ -87,7 +87,7 @@ public class BlockingCommand extends XMPPProcessorAbstract implements XMPPProces
 	protected static final String BLOCK_LIST = "blocklist";
 	protected static final String BLOCK = "block";
 	protected static final String UNBLOCK = "unblock";
-	protected static final String BLOCKED = "blcoked";
+	protected static final String BLOCKED = "blocked";
 
 	private static final String[] IQ_BLOCKLIST_PATH = { Iq.ELEM_NAME, BLOCK_LIST };
 	private static final String[] IQ_BLOCK_PATH = { Iq.ELEM_NAME, BLOCK };
