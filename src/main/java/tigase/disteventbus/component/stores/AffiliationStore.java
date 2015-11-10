@@ -18,4 +18,7 @@ public class AffiliationStore {
 		this.affiliations.put(jid, affiliation);
 	}
 
+	public void removeAffiliation(JID jid) {
+		this.affiliations.remove(jid);
+	}
 }

@@ -138,6 +138,8 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 	@Override
 	protected void onNodeConnected(JID jid) {
 		super.onNodeConnected(jid);
+		
+		context.getAffiliationStore().putAffiliation(jid, Affiliation.owner);
 
 		Module module = modulesManager.getModule(SubscribeModule.ID);
 		if (module != null && module instanceof SubscribeModule) {
@@ -153,6 +155,7 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 		if (module != null && module instanceof SubscribeModule) {
 			((SubscribeModule) module).clusterNodeDisconnected(jid);
 		}
+		context.getAffiliationStore().removeAffiliation(jid);
 	}
 
 	@Override
