@@ -81,6 +81,13 @@ Available Options
 . +enabled[B]+ - enable or disable task, Boolean value.
 . +levelThreshold+ - minimal log level that will be the threshold. Possible values are SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST.
 
+- *connections-task* - Use do check users disconnections +
+The event will be generated only if both thresholds (amount and percentage) will be fulfilled. +
+Available Options
+. +enabled[B]+ - enable or disable task, Boolean value.
+. +period[I]+ - period of running check, Integer value.
+. +thresholdMinimal[I]+ - minimal amount of disconnected users required to generate alarm.
+. +threshold[I]+ - minimal percent of disconnected users required to generate alarm.
 
 Configuration
 -------------
