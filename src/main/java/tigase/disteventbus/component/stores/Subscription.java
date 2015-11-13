@@ -66,4 +66,8 @@ public class Subscription {
 		return result;
 	}
 
+	@Override
+	public String toString() {
+		return "Subscription{" + "jid=" + jid + ", serviceJID=" + serviceJID + '}';
+	}
 }
