@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 
 import javax.script.ScriptEngineManager;
 
@@ -27,52 +28,17 @@ import tigase.xmpp.JID;
 
 public class EventBusComponent extends AbstractComponent<EventBusContext> implements ClusteredComponentIfc {
 
-	private class EventBusContextImpl extends AbstractContext implements EventBusContext {
-
-		private final LocalEventBus eventBusInstance;
-
-		public EventBusContextImpl(AbstractComponent<?> component) {
-			super(component);
-			this.eventBusInstance = (LocalEventBus) EventBusFactory.getInstance();
-		}
-
-		@Override
-		public AffiliationStore getAffiliationStore() {
-			return affiliationStore;
-		}
-
-		@Override
-		public Collection<JID> getConnectedNodes() {
-			return Collections.unmodifiableCollection(getNodesConnected());
-		}
-
-		@Override
-		public LocalEventBus getEventBusInstance() {
-			return eventBusInstance;
-		}
-
-		@Override
-		public SubscriptionStore getSubscriptionStore() {
-			return subscriptionStore;
-		}
-	}
-
 	public static final String COMPONENT_EVENTS_XMLNS = "tigase:eventbus";
-
 	private static long counter = 0;
-
 	private final AffiliationStore affiliationStore = new AffiliationStore();
-
 	private final Map<String, ListenerScript> listenersScripts = new ConcurrentHashMap<String, ListenerScript>();
-
-	private ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
-
-	private ListenerScriptRegistrar scriptsRegistrar;
-
 	/**
 	 * For cluster nodes.
 	 */
 	private final SubscriptionStore subscriptionStore = new SubscriptionStore();
+	private ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
+
+	private ListenerScriptRegistrar scriptsRegistrar;
 
 	public EventBusComponent() {
 	}
@@ -138,7 +104,10 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 	@Override
 	protected void onNodeConnected(JID jid) {
 		super.onNodeConnected(jid);
-		
+
+		if (log.isLoggable(Level.FINE))
+			log.fine("Cluster node " + jid + " added to Affiliation Store");
+
 		context.getAffiliationStore().putAffiliation(jid, Affiliation.owner);
 
 		Module module = modulesManager.getModule(SubscribeModule.ID);
@@ -184,6 +153,36 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 		}
 
 		scriptsRegistrar.load();
+	}
+
+	private class EventBusContextImpl extends AbstractContext implements EventBusContext {
+
+		private final LocalEventBus eventBusInstance;
+
+		public EventBusContextImpl(AbstractComponent<?> component) {
+			super(component);
+			this.eventBusInstance = (LocalEventBus) EventBusFactory.getInstance();
+		}
+
+		@Override
+		public AffiliationStore getAffiliationStore() {
+			return affiliationStore;
+		}
+
+		@Override
+		public Collection<JID> getConnectedNodes() {
+			return Collections.unmodifiableCollection(getNodesConnected());
+		}
+
+		@Override
+		public LocalEventBus getEventBusInstance() {
+			return eventBusInstance;
+		}
+
+		@Override
+		public SubscriptionStore getSubscriptionStore() {
+			return subscriptionStore;
+		}
 	}
 
 }
