@@ -219,6 +219,8 @@ Fixes
 
 - link:https://projects.tigase.org/issues/3307[#3307] Rosters are no longer re-saved when a user logs in and roster is read resulting in a performance boost.
 
+- link:https://projects.tigase.org/issues/3328[#3328] Presence processing by PEP plugin optimized.
+
 - link:https://projects.tigase.org/issues/3336[#3336] Fixed issues with reloading vhosts in trusted after configuration change.
 
 - link:https://projects.tigase.org/issues/3337[#3337] tls-jdk-nss-bug-workaround-active is now disabled by default. This fix is disabled by default which may impact older OpenSSL versions that may no longer be supported.  You may enable this using an init.properties setting.

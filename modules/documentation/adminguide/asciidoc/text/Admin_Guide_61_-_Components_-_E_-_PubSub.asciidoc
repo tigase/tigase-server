@@ -20,6 +20,20 @@ To enable the component the following should be in your init.properties file
 --comp-class-2 = tigase.pubsub.PubSubComponent
 -----
 
+Pubsub naming
+-------------
+Within Tigase, all pubsub component address MUST be domain-based address and not a JID style address.  This was made to simplify communications structure. Tigase will automatically set component names to pubsub.domain, however any messages send to pubsub@domain will result in a +SERVICE_UNAVAILABLE+ error.
+
+Pubsub nodes within Tigase can be found as a combination of JID and node where nodes will be identified akin to service discovery.  For example, to address a friendly node, use the following structure:
+
+[source,xml]
+-----
+<iq to='pubsub.domain'>
+  <query node='friendly node'/>
+</iq>
+-----
+
+
 AdHoc Commands
 --------------
 Similar to the HTTP API, AdHoc commands based on groovy scripts can be sent to this component to do a number of tasks. All scripts for these Ad-hoc commands are found at +sec/main/groovy/tigase/admin+ in source distrubitions, or at link:https://projects.tigase.org/projects/tigase-pubsub/repository/revisions/master/show/src/main/groovy/tigase/admin[this link]. To use them, the scripts need to be copied into the +scripts/admin/pubsub+ folder in the Tigase installation directory.
