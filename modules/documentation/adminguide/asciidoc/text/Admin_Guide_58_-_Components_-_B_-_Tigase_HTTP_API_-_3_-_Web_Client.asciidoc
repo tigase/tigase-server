@@ -154,7 +154,7 @@ Allows you to set the default configuration for new MUC rooms. This will not be 
 
 Delete Monitor Task
 ~~~~~~~~~~~~~~~~~~~
-This removes a monitor task from the list of available monitor scripts. This action is not permanent as it will revert to inital settings on server restart.
+This removes a monitor task from the list of available monitor scripts. This action is not permanent as it will revert to initial settings on server restart.
 
 Fix User's Roster
 ~~~~~~~~~~~~~~~~~
@@ -208,7 +208,7 @@ This will show if you have any external components and will reload them in case 
 Scripts
 ~~~~~~~
 This section provides a list of command scripts for all active components. Each component has the following options
-- *Get list available commands* will list script commands for the component dvided by either Scripts or Groups.
+- *Get list available commands* will list script commands for the component divided by either Scripts or Groups.
 - *New command script* provides a method to author new command scripts for specific components written in EMCAScript or Groovy. You do have an option to save the script to disk which will make the script permanent within the server.
 - *Remove command script* allows you to remove the selected script from the repository. If Remove from disk is not checked, the script will be unavailable until server restart. If it is, it will be permanently removed from the server.
 
@@ -220,7 +220,7 @@ These statistics might be more useful as script results yield small bits of data
 
 Get User Statistics
 ^^^^^^^^^^^^^^^^^^^
-Provides a script output of user stastics including how many active sessions are in use, number of packets used, specific connections and their packet usage and location. All resources will return individual stats along with IP addresses.
+Provides a script output of user statistics including how many active sessions are in use, number of packets used, specific connections and their packet usage and location. All resources will return individual stats along with IP addresses.
 
 Get Active User List
 ^^^^^^^^^^^^^^^^^^^^

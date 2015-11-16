@@ -183,3 +183,35 @@ Server response:
   <msgoffline xmlns="msgoffline" limit="false"/>
 </iq>
 -----
+
+[[offlineMessageReceipts]]
+Message Receipts
+----------------
+Tigase AMP component has support for message receipts and storage.  By default, offline message delivery receipts will be sent to offline message storage.  Note this WILL count against the total number of stored offline messages as explored earlier.
+
+Offline Storage
+~~~~~~~~~~~~~~~
+It is possible to set storage of message receipts, and add other types to save:
+-----
+sess-man/plugins-conf/amp/msg-store-offline-paths[s]=/message/received[urn:xmpp:receipts],/message/store-offline,-/message/do-not-store
+-----
+The above setting in the init.properties file will do three things:
+- Messages with a <received> subelement of xmlns set to urn:xmpp:receipts will now be stored.
+- Messages with <store-offline> subelement will be stored without checking for associated xmlns.
+- Messages with <do-not-store> element *will not* be saved.
+
+Any of these can be adjusted for your installation, remember that a '-' will stop storage of messages with the indicated property.
+Messages will be checked by these matchers and if any of them result in a positive they will override default settings.
+Matcher logic uses left to right ordering, in that matches on the first statement will ignore/override later listed matchers.
+
+For example, if you wanted to store messages with <received> element, but not ones with <plain> element:
+*THIS STATEMENT WILL NOT WORK*
+-----
+sess-man/plugins-conf/amp/msg-store-offline-paths[s]=/message/received,-/message/plain
+-----
+
+As it will just store all messages with <receieved> subelement.  The below statement will properly filter your results.
+
+-----
+sess-man/plugins-conf/amp/msg-store-offline-paths[s]=-/message/plain,/message/received
+-----

@@ -129,6 +129,10 @@ Connection Watchdog
 ~~~~~~~~~~~~~~~~~~~
 A watchdog property is now available to monitor stale connections and sever them before they become a problem.  More details xref:watchdog[here].
 
+Offline Message Receipts Storage now Configurable
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Admins may now configure Offline Message Receipts Storage to specify filters and controls as to what they want stored in offline messages. See xref:offlineMessageReceipts[more details here].
+
 New Documentation Structure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 There has been a lot of changes and fixes to our documentation over the last few months. If you have links to any of our documentation, please update them as the filenames may have changed.
@@ -164,6 +168,8 @@ Fixes
 - link:https://projects.tigase.org/issues/1396[#1396] & link:https://projects.tigase.org/issues/663[#663] User roster behaves correctly. Tigase now waits for user authorization before users are added to a Roster.
 
 - link:https://projects.tigase.org/issues/1488[#1488] NPE in ad-hoc for managing external components fixed.
+
+- link:https://projects.tigase.org/issues/1602[#1602] Minor optimization in MessageCarbons with new functions added to XMPPResourceConnection.
 
 - link:https://projects.tigase.org/issues/2003[#2003] Fixed bug with C2S streams where server would not always overwrite from attribute with full JID in subcription-related presence stanzas.
 
@@ -256,6 +262,12 @@ Fixes
 - #3599 Fixed +FlexibleOfflineMessages+ not being delivered to connection due to lack of explicit connection addressing.
 
 - #3619 Fixed issue with non-presistent contacts being unable to be added to roster.
+
+- #3649 Changed privacy list processing to always allow communication between XMPP connections with the same BareJID.
+
+- link:https://projects.tigase.org/issues/3655[#3655] Increased max loop in infinity loop detection logic to 100000 in order to aid larger transfers.
+
+- Patch added to fix ConcurrentModificationException in BlockingCommand plugin.
 
 - Added missing classes to IzPack installer
 

@@ -77,13 +77,12 @@ Available Options
 . +maxHeapMemUsagePercentThreshold[I]+ - alarm when percent of used Heap memory is larger than, Integer value.
 . +maxNonHeapMemUsagePercentThreshold[I]+ - alarm when percent of used Non Heap memory is larger than, Integer value.
 
-- *logger-task* - Used to transmit log entries depending on level entered.
+- *logger-task* - Used to transmit log entries depending on level entered. +
 . +enabled[B]+ - enable or disable task, Boolean value.
-. +levelThreshold+ - minimal log level that will be the threshold. Possible values are SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST.
+. +levelThreshold+ - minimal log level that will be the threshold. Possible values are SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST, and ALL.
 
-- *connections-task* - Use do check users disconnections +
-The event will be generated only if both thresholds (amount and percentage) will be fulfilled. +
-Available Options
+- *connections-task* - Used to check users disconnections. +
+*NOTE: The event will be generated only if both thresholds (amount and percentage) will be fulfilled.* +
 . +enabled[B]+ - enable or disable task, Boolean value.
 . +period[I]+ - period of running check, Integer value.
 . +thresholdMinimal[I]+ - minimal amount of disconnected users required to generate alarm.
