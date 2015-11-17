@@ -26,9 +26,10 @@ import tigase.disteventbus.impl.LocalEventBus;
 import tigase.stats.StatisticsList;
 import tigase.xmpp.JID;
 
-public class EventBusComponent extends AbstractComponent<EventBusContext> implements ClusteredComponentIfc {
+public class EventBusComponent extends AbstractComponent<EventBusContext>implements ClusteredComponentIfc {
 
 	public static final String COMPONENT_EVENTS_XMLNS = "tigase:eventbus";
+	private static final String THREADS_KEY = "threads";
 	private static long counter = 0;
 	private final AffiliationStore affiliationStore = new AffiliationStore();
 	private final Map<String, ListenerScript> listenersScripts = new ConcurrentHashMap<String, ListenerScript>();
@@ -152,6 +153,10 @@ public class EventBusComponent extends AbstractComponent<EventBusContext> implem
 			}
 		}
 
+		if (props.containsKey(THREADS_KEY)) {
+			Integer threads = (Integer) props.get(THREADS_KEY);
+			context.getEventBusInstance().setThreadPool(threads);
+		}
 		scriptsRegistrar.load();
 	}
 

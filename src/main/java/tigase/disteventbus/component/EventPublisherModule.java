@@ -1,38 +1,26 @@
 package tigase.disteventbus.component;
 
-import tigase.server.Packet;
-import tigase.server.Permissions;
-
-import tigase.xmpp.JID;
+import java.util.Collection;
+import java.util.logging.Level;
 
 import tigase.component.exceptions.ComponentException;
 import tigase.criteria.Criteria;
 import tigase.disteventbus.EventHandler;
 import tigase.disteventbus.component.stores.Subscription;
-import tigase.disteventbus.impl.LocalEventBus.LocalEventBusListener;
+import tigase.server.Packet;
+import tigase.server.Permissions;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
-
-import java.util.Collection;
-import java.util.logging.Level;
+import tigase.xmpp.JID;
 
 public class EventPublisherModule extends AbstractEventBusModule {
 
 	public final static String ID = "publisher";
 
-	private final LocalEventBusListener eventBusListener = new LocalEventBusListener() {
-
+	private final EventHandler eventBusEventFiredHandler = new EventHandler() {
 		@Override
-		public void onAddHandler(String name, String xmlns, EventHandler handler) {
-		}
-
-		@Override
-		public void onFire(String name, String xmlns, Element event) {
+		public void onEvent(String name, String xmlns, Element event) {
 			publishEvent(name, xmlns, event);
-		}
-
-		@Override
-		public void onRemoveHandler(String name, String xmlns, EventHandler handler) {
 		}
 	};
 
@@ -40,7 +28,7 @@ public class EventPublisherModule extends AbstractEventBusModule {
 	public void afterRegistration() {
 		super.afterRegistration();
 
-		context.getEventBusInstance().addListener(eventBusListener);
+		context.getEventBusInstance().addHandler(null, null, eventBusEventFiredHandler);
 	}
 
 	@Override
@@ -62,8 +50,8 @@ public class EventPublisherModule extends AbstractEventBusModule {
 	}
 
 	private void publishEvent(Element pubsubEventElem, String from, JID toJID) throws TigaseStringprepException {
-		Packet message = Packet.packetInstance(new Element("message", new String[] { "to", "from", "id" }, new String[] {
-				toJID.toString(), from, nextStanzaID() }));
+		Packet message = Packet.packetInstance(new Element("message", new String[] { "to", "from", "id" },
+				new String[] { toJID.toString(), from, nextStanzaID() }));
 		message.getElement().addChild(pubsubEventElem);
 		message.setXMLNS(Packet.CLIENT_XMLNS);
 
@@ -72,7 +60,12 @@ public class EventPublisherModule extends AbstractEventBusModule {
 		write(message);
 	}
 
-	public void publishEvent(String name, String xmlns, Element event) {
+	public void publishEvent(final String name, final String xmlns, Element event) {
+		final String isLocal = event.getAttributeStaticStr("local");
+		if (isLocal != null && ("true".equals(isLocal) || "1".equals(isLocal))) {
+			// This event is for local subscribers only. Skipping...
+			return;
+		}
 		final Collection<Subscription> subscribers = context.getSubscriptionStore().getSubscribersJIDs(name, xmlns);
 		publishEvent(name, xmlns, event, subscribers);
 	}
@@ -81,15 +74,15 @@ public class EventPublisherModule extends AbstractEventBusModule {
 		try {
 			final Element eventElem = new Element("event", new String[] { "xmlns" },
 					new String[] { "http://jabber.org/protocol/pubsub#event" });
-			final Element itemsElem = new Element("items", new String[] { "node" }, new String[] { NodeNameUtil.createNodeName(
-					name, xmlns) });
+			final Element itemsElem = new Element("items", new String[] { "node" },
+					new String[] { NodeNameUtil.createNodeName(name, xmlns) });
 			eventElem.addChild(itemsElem);
 			final Element itemElem = new Element("item");
 			itemElem.addChild(event);
 			itemsElem.addChild(itemElem);
 
-			if ( log.isLoggable( Level.FINER ) ){
-				log.log( Level.FINER, "Sending event ({0}, {1}, {2}) to {3}", new Object[] {name, xmlns, event, subscribers });
+			if (log.isLoggable(Level.FINER)) {
+				log.log(Level.FINER, "Sending event ({0}, {1}, {2}) to {3}", new Object[] { name, xmlns, event, subscribers });
 			}
 
 			for (Subscription subscriber : subscribers) {
@@ -111,7 +104,7 @@ public class EventPublisherModule extends AbstractEventBusModule {
 
 	@Override
 	public void unregisterModule() {
-		context.getEventBusInstance().removeListener(eventBusListener);
+		context.getEventBusInstance().removeHandler(null, null, eventBusEventFiredHandler);
 		super.unregisterModule();
 	}
 

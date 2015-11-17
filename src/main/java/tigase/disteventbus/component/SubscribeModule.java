@@ -10,7 +10,7 @@ import tigase.disteventbus.EventHandler;
 import tigase.disteventbus.component.stores.Affiliation;
 import tigase.disteventbus.component.stores.Subscription;
 import tigase.disteventbus.impl.EventName;
-import tigase.disteventbus.impl.LocalEventBus.LocalEventBusListener;
+import tigase.disteventbus.impl.LocalEventBus;
 import tigase.server.Packet;
 import tigase.server.Permissions;
 import tigase.util.TigaseStringprepException;
@@ -24,28 +24,25 @@ public class SubscribeModule extends AbstractEventBusModule {
 	public final static String ID = "subscribe";
 	private static final Criteria CRIT = new ElemPathCriteria(new String[] { "iq", "pubsub", "subscribe" },
 			new String[] { null, "http://jabber.org/protocol/pubsub", null });
-	private final LocalEventBusListener eventBusListener = new LocalEventBusListener() {
+
+	private final EventHandler eventBusHandlerAddedHandler = new EventHandler() {
+
+		private final String[] NAME_PATH = new String[] { LocalEventBus.HANDLER_ADDED_EVENT_NAME, "name" };
+		private final String[] XMLNS_PATH = new String[] { LocalEventBus.HANDLER_ADDED_EVENT_NAME, "xmlns" };
 
 		@Override
-		public void onAddHandler(String name, String xmlns, EventHandler handler) {
-			SubscribeModule.this.onAddHandler(name, xmlns);
-		}
-
-		@Override
-		public void onFire(String name, String xmlns, Element event) {
-		}
-
-		@Override
-		public void onRemoveHandler(String name, String xmlns, EventHandler handler) {
+		public void onEvent(String name, String xmlns, Element event) {
+			String n = event.getCData(NAME_PATH);
+			String x = event.getCData(XMLNS_PATH);
+			SubscribeModule.this.onAddHandler(n, x);
 		}
 	};
 
 	@Override
 	public void afterRegistration() {
 		super.afterRegistration();
-
-		context.getEventBusInstance().addListener(eventBusListener);
-
+		context.getEventBusInstance().addHandler(LocalEventBus.HANDLER_ADDED_EVENT_NAME, LocalEventBus.EVENTBUS_EVENTS_XMLNS,
+				eventBusHandlerAddedHandler);
 	}
 
 	public void clusterNodeConnected(JID node) {
@@ -270,7 +267,8 @@ public class SubscribeModule extends AbstractEventBusModule {
 
 	@Override
 	public void unregisterModule() {
-		context.getEventBusInstance().removeListener(eventBusListener);
+		context.getEventBusInstance().removeHandler(LocalEventBus.HANDLER_ADDED_EVENT_NAME, LocalEventBus.EVENTBUS_EVENTS_XMLNS,
+				eventBusHandlerAddedHandler);
 		super.unregisterModule();
 	}
 
