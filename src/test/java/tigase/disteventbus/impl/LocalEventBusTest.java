@@ -3,6 +3,7 @@ package tigase.disteventbus.impl;
 import static org.junit.Assert.*;
 
 import java.util.HashSet;
+import java.util.concurrent.Executor;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
@@ -20,7 +21,13 @@ public class LocalEventBusTest {
 	public void test01() {
 		final HashSet<String> results = new HashSet<>();
 
-		EventBus eb = new LocalEventBus();
+		LocalEventBus eb = new LocalEventBus();
+		eb.setExecutor(new Executor() {
+			@Override
+			public void execute(Runnable command) {
+				command.run();
+			}
+		});
 		eb.addHandler(null, null, new EventHandler() {
 			@Override
 			public void onEvent(String name, String xmlns, Element event) {
