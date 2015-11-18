@@ -14,7 +14,7 @@ import tigase.xml.Element;
 
 public class LocalEventBus implements EventBus {
 
-	public static final String EVENTBUS_EVENTS_XMLNS = "tigase:eventbus:internal:events:0";
+	public static final String EVENTBUS_INTERNAL_EVENTS_XMLNS = "tigase:eventbus:internal:events:0";
 	public static final String HANDLER_ADDED_EVENT_NAME = "HandlerAdded";
 	public static final String HANDLER_REMOVED_EVENT_NAME = "HandlerRemoved";
 	protected final Logger log = Logger.getLogger(this.getClass().getName());
@@ -44,7 +44,7 @@ public class LocalEventBus implements EventBus {
 	}
 
 	protected EventsNameMap<EventHandler> createHandlersMap() {
-		return new EventsNameMap<EventHandler>();
+		return new EventsNameMap<>();
 	}
 
 	public void doFire(final String name, final String xmlns, final Element event) {
@@ -52,7 +52,7 @@ public class LocalEventBus implements EventBus {
 			throw new NullPointerException("Cannot fire null event");
 		}
 
-		final ArrayList<EventHandler> handlers = new ArrayList<EventHandler>();
+		final ArrayList<EventHandler> handlers = new ArrayList<>();
 		synchronized (this.handlers) {
 			handlers.addAll(getHandlersList(name, xmlns));
 			handlers.addAll(getHandlersList(null, xmlns));
@@ -64,16 +64,13 @@ public class LocalEventBus implements EventBus {
 	private void doFireThreadPerHandler(final String name, final String xmlns, final Element event,
 			ArrayList<EventHandler> handlersList) {
 		for (EventHandler eventHandler : handlersList) {
-			Runnable task = new Runnable() {
-				@Override
-				public void run() {
-					try {
-						eventHandler.onEvent(name, xmlns, event);
-					} catch (Throwable e) {
-						if (log.isLoggable(Level.WARNING))
-							log.log(Level.WARNING, "Problem during handling event name=" + name + ", xmlns=" + xmlns
-									+ " in handler " + eventHandler, e);
-					}
+			Runnable task = () -> {
+				try {
+					eventHandler.onEvent(name, xmlns, event);
+				} catch (Throwable e) {
+					if (log.isLoggable(Level.WARNING))
+						log.log(Level.WARNING, "Problem during handling event name=" + name + ", xmlns=" + xmlns
+								+ " in handler " + eventHandler, e);
 				}
 			};
 			executor.execute(task);
@@ -82,17 +79,14 @@ public class LocalEventBus implements EventBus {
 
 	private void doFireThreadPerEvent(final String name, final String xmlns, final Element event,
 			ArrayList<EventHandler> handlersList) {
-		Runnable task = new Runnable() {
-			@Override
-			public void run() {
-				for (EventHandler eventHandler : handlersList) {
-					try {
-						eventHandler.onEvent(name, xmlns, event);
-					} catch (Throwable e) {
-						if (log.isLoggable(Level.WARNING))
-							log.log(Level.WARNING, "Problem during handling event name=" + name + ", xmlns=" + xmlns
-									+ " in handler " + eventHandler, e);
-					}
+		Runnable task = () -> {
+			for (EventHandler eventHandler : handlersList) {
+				try {
+					eventHandler.onEvent(name, xmlns, event);
+				} catch (Throwable e) {
+					if (log.isLoggable(Level.WARNING))
+						log.log(Level.WARNING, "Problem during handling event name=" + name + ", xmlns=" + xmlns
+								+ " in handler " + eventHandler, e);
 				}
 			}
 		};
@@ -110,7 +104,7 @@ public class LocalEventBus implements EventBus {
 	private void fireOnAddHandler(final String name, final String xmlns, final EventHandler handler) {
 		Element event = new Element(HANDLER_ADDED_EVENT_NAME);
 		event.setAttribute("local", "true");
-		event.setXMLNS(EVENTBUS_EVENTS_XMLNS);
+		event.setXMLNS(EVENTBUS_INTERNAL_EVENTS_XMLNS);
 
 		event.addChild(new Element("name", name));
 		event.addChild(new Element("xmlns", xmlns));
@@ -121,7 +115,7 @@ public class LocalEventBus implements EventBus {
 	private void fireOnRemoveHandler(final String name, final String xmlns, final EventHandler handler) {
 		Element event = new Element(HANDLER_REMOVED_EVENT_NAME);
 		event.setAttribute("local", "true");
-		event.setXMLNS(EVENTBUS_EVENTS_XMLNS);
+		event.setXMLNS(EVENTBUS_INTERNAL_EVENTS_XMLNS);
 
 		event.addChild(new Element("name", name));
 		event.addChild(new Element("xmlns", xmlns));
@@ -130,8 +124,7 @@ public class LocalEventBus implements EventBus {
 	}
 
 	public Set<EventName> getAllListenedEvents() {
-		Set<EventName> result = handlers.getAllListenedEvents();
-		return result;
+		return handlers.getAllListenedEvents();
 	}
 
 	protected Collection<EventHandler> getHandlersList(final String name, final String xmlns) {

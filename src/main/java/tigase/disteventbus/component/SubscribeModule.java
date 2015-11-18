@@ -34,15 +34,16 @@ public class SubscribeModule extends AbstractEventBusModule {
 		public void onEvent(String name, String xmlns, Element event) {
 			String n = event.getCData(NAME_PATH);
 			String x = event.getCData(XMLNS_PATH);
-			SubscribeModule.this.onAddHandler(n, x);
+			if (x == null || !x.equals(LocalEventBus.EVENTBUS_INTERNAL_EVENTS_XMLNS))
+				SubscribeModule.this.onAddHandler(n, x);
 		}
 	};
 
 	@Override
 	public void afterRegistration() {
 		super.afterRegistration();
-		context.getEventBusInstance().addHandler(LocalEventBus.HANDLER_ADDED_EVENT_NAME, LocalEventBus.EVENTBUS_EVENTS_XMLNS,
-				eventBusHandlerAddedHandler);
+		context.getEventBusInstance().addHandler(LocalEventBus.HANDLER_ADDED_EVENT_NAME,
+				LocalEventBus.EVENTBUS_INTERNAL_EVENTS_XMLNS, eventBusHandlerAddedHandler);
 	}
 
 	public void clusterNodeConnected(JID node) {
@@ -54,7 +55,7 @@ public class SubscribeModule extends AbstractEventBusModule {
 		if (log.isLoggable(Level.FINER))
 			log.finer("Node " + node + " is connected. Preparing subscribe request.");
 
-		Set<Element> pubsubNodes = new HashSet<Element>();
+		Set<Element> pubsubNodes = new HashSet<>();
 		for (EventName eventName : context.getEventBusInstance().getAllListenedEvents()) {
 			pubsubNodes.add(prepareSubscribeElement(eventName, context.getComponentID(), null));
 		}
@@ -171,7 +172,7 @@ public class SubscribeModule extends AbstractEventBusModule {
 		Element response = new Element("pubsub", new String[] { "xmlns" },
 				new String[] { "http://jabber.org/protocol/pubsub" });
 
-		final Set<Element> subscribedNodes = new HashSet<Element>();
+		final Set<Element> subscribedNodes = new HashSet<>();
 		for (Element subscribe : subscribeElements) {
 			EventName parsedName = NodeNameUtil.parseNodeName(subscribe.getAttributeStaticStr("node"));
 			JID jid = JID.jidInstance(subscribe.getAttributeStaticStr("jid"));
@@ -215,7 +216,7 @@ public class SubscribeModule extends AbstractEventBusModule {
 		write(response);
 	}
 
-	protected void sendSubscribeRequest(final String to, Collection<Element> subscriptionElement) {
+	protected void sendSubscribeRequest(final String to, Collection<Element> subscriptionElements) {
 		try {
 			final String id = nextStanzaID();
 			Element iq = new Element("iq", new String[] { "from", "to", "type", "id" },
@@ -225,9 +226,7 @@ public class SubscribeModule extends AbstractEventBusModule {
 					new String[] { "http://jabber.org/protocol/pubsub" });
 			iq.addChild(pubsubElem);
 
-			for (Element node : subscriptionElement) {
-				pubsubElem.addChild(node);
-			}
+			subscriptionElements.forEach(pubsubElem::addChild);
 
 			final Packet packet = Packet.packetInstance(iq);
 			packet.setPermissions(Permissions.ADMIN);
@@ -267,8 +266,8 @@ public class SubscribeModule extends AbstractEventBusModule {
 
 	@Override
 	public void unregisterModule() {
-		context.getEventBusInstance().removeHandler(LocalEventBus.HANDLER_ADDED_EVENT_NAME, LocalEventBus.EVENTBUS_EVENTS_XMLNS,
-				eventBusHandlerAddedHandler);
+		context.getEventBusInstance().removeHandler(LocalEventBus.HANDLER_ADDED_EVENT_NAME,
+				LocalEventBus.EVENTBUS_INTERNAL_EVENTS_XMLNS, eventBusHandlerAddedHandler);
 		super.unregisterModule();
 	}
 

@@ -32,7 +32,8 @@ public class UnsubscribeModule extends AbstractEventBusModule {
 		public void onEvent(String name, String xmlns, Element event) {
 			String n = event.getCData(NAME_PATH);
 			String x = event.getCData(XMLNS_PATH);
-			UnsubscribeModule.this.onRemoveHandler(n, x);
+			if (x == null || !x.equals(LocalEventBus.EVENTBUS_INTERNAL_EVENTS_XMLNS))
+				UnsubscribeModule.this.onRemoveHandler(n, x);
 		}
 	};
 
@@ -40,8 +41,8 @@ public class UnsubscribeModule extends AbstractEventBusModule {
 	public void afterRegistration() {
 		super.afterRegistration();
 
-		context.getEventBusInstance().addHandler(LocalEventBus.HANDLER_REMOVED_EVENT_NAME, LocalEventBus.EVENTBUS_EVENTS_XMLNS,
-				eventBusHandlerRemovedHandler);
+		context.getEventBusInstance().addHandler(LocalEventBus.HANDLER_REMOVED_EVENT_NAME,
+				LocalEventBus.EVENTBUS_INTERNAL_EVENTS_XMLNS, eventBusHandlerRemovedHandler);
 
 	}
 
@@ -100,7 +101,7 @@ public class UnsubscribeModule extends AbstractEventBusModule {
 			}
 		} else {
 			// request from something out of cluster
-			final Set<Element> subscribedNodes = new HashSet<Element>();
+			final Set<Element> subscribedNodes = new HashSet<>();
 			for (Element subscribe : unsubscribeElements) {
 				EventName parsedName = NodeNameUtil.parseNodeName(subscribe.getAttributeStaticStr("node"));
 				JID jid = JID.jidInstance(subscribe.getAttributeStaticStr("jid"));
@@ -171,7 +172,7 @@ public class UnsubscribeModule extends AbstractEventBusModule {
 	@Override
 	public void unregisterModule() {
 		context.getEventBusInstance().removeHandler(LocalEventBus.HANDLER_REMOVED_EVENT_NAME,
-				LocalEventBus.EVENTBUS_EVENTS_XMLNS, eventBusHandlerRemovedHandler);
+				LocalEventBus.EVENTBUS_INTERNAL_EVENTS_XMLNS, eventBusHandlerRemovedHandler);
 		super.unregisterModule();
 	}
 }
