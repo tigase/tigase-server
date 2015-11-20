@@ -12,7 +12,7 @@ Offline Message Sink
 Description
 -----------
 
-Messages send to offline users is published in PubSub node, from where that message is sent to all the node subscribers as a PubSub notification.
+Messages sent to offline users is published in PubSub node, from where that message is sent to all the node subscribers as a PubSub notification.
 
 [source,xml]
 -----
@@ -65,7 +65,7 @@ Add sess-man as publisher
 </iq>
 -----
 
-Finally, AMP plugins must be configured as well
+Finally, the AMP plugin must be configured as well
 
 init.properties configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

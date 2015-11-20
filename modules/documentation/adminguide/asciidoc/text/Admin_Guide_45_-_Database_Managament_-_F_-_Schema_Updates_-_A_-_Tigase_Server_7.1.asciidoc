@@ -11,7 +11,7 @@ Tigase Server v7.1 Schema Updates
 Tigase has had a change to the PubSub Schema, to upgrade to v7.1 without having to reform your databases, use this guide to update your databases to be compatible with the new version of Tigase.
 
 Changes to Pubsub Schema
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 The PubSub Schema has been streamlined for better resource use, this change affects all users of Tigase.
 To prepare your database for the new schema, first be sure to create a backup!  Then apply the appropriate PubSub schema to your MySQL and it will add the new storage procedure.
 

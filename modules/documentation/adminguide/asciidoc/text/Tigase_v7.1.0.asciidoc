@@ -57,7 +57,7 @@ Tigase now supports REST commands via HTTP, they can be sent from ad-hoc command
 
 Empty Nicknames
 ~~~~~~~~~~~~~~~
-Tigase can now support users with empty nicknames so long as the following code is in init.properties
+Tigase can now support users with empty nicknames so long as the following code is in init.properties.
 ------
 sess-man/plugins-conf/jabber\:iq\:roster/empty_name_enabled=true
 ------
@@ -79,11 +79,11 @@ link:https://projects.tigase.org/issues/3244[#3244]
 
 Tigase Mailer Extension now Included
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Tigase mailed extension is now included in distributions of Tigase server. This extension enables the monitor component to deliver E-mails to and from specified e-mail addresses when monitor are triggered.  For more information see [monitor component].
+Tigase mailer extension is now included in distributions of Tigase server. This extension enables the monitor component to deliver E-mails to and from specified e-mail addresses when monitor are triggered.  For more information see xref:monitorMailer[monitor mailer section].
 
 EventBus implemented
 ~~~~~~~~~~~~~~~~~~~~
-Tigase now has a simple PubSub component called EventBus to report tasks and triggers.  More details are available xref:eventbus[Here].
+Tigase now has a simple PubSub component called EventBus to report tasks and triggers.  More details are available xref:eventBus[Here].
 
 XEP-0191 Blocking Command Support added
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -125,6 +125,14 @@ New init.properties property
 Disables DNS checking for vhosts when changed or edited.
 When new vhosts are created, Tigase will automatically check for SRV records and proper DNS settings for the new vhosts to ensure connectivity for outside users, however if these validations fail, you will be unable to save those changes. This setting allows you to bypass that checking.
 
+Connection Watchdog
+~~~~~~~~~~~~~~~~~~~
+A watchdog property is now available to monitor stale connections and sever them before they become a problem.  More details xref:watchdog[here].
+
+Offline Message Receipts Storage now Configurable
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Admins may now configure Offline Message Receipts Storage to specify filters and controls as to what they want stored in offline messages. See xref:offlineMessageReceipts[more details here].
+
 New Documentation Structure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 There has been a lot of changes and fixes to our documentation over the last few months. If you have links to any of our documentation, please update them as the filenames may have changed.
@@ -132,7 +140,7 @@ There has been a lot of changes and fixes to our documentation over the last few
 New Minor Features & Behavior Changes
 -------------------------------------
 - JTDS MS SQL Server driver updated to v1.3.1
-- link:https://projects.tigase.org/issues/163[#163] User +LastActivity+ partially implemented, however some features are not available at this time.
+- link:https://projects.tigase.org/issues/163[#163] link:http://xmpp.org/extensions/xep-0012.html[XEP-0012] User +LastActivity+ implemented
 - link:https://projects.tigase.org/issues/593[#593] link:http://xmpp.org/extensions/xep-0202.html[XEP-0202 Entity Time] has been implemented.
 - #811 Plugin API extended allowing more XML parameters to be considered for processing.
 - link:https://projects.tigase.org/issues/1436[#1436] +ClusterConnectionManager+ now sends ping packets every 30 seconds to check status of live cluster connections.
@@ -142,7 +150,7 @@ New Minor Features & Behavior Changes
 - link:https://projects.tigase.org/issues/2823[#2823] +staticStr+ element method now implemented.
 - link:https://projects.tigase.org/issues/2835[#2835] Allowing of +setPermissions+ on incoming packets before they are processed by plugins.
 - link:https://projects.tigase.org/issues/2903[#2903] +see-other-host+ has new option to make it configurable on a per vhost basis.
-- limk:https://projects.tigase.org/issues/3034[#3034] Improved handling of data types and primitives within Tigase.
+- link:https://projects.tigase.org/issues/3034[#3034] Improved handling of data types and primitives within Tigase.
 - link:https://projects.tigase.org/issues/3180[#3180] Protected access to JDBC repository now enabled.
 - link:https://projects.tigase.org/issues/3230[#3230] Verification added to check against CUSTOM domain rules when submitted.
 - #3258 Retrieval of PubSub/PEP based avatars using REST API now supported. xref:avatarRetrievalRequests[Command URLs here].
@@ -161,11 +169,15 @@ Fixes
 
 - link:https://projects.tigase.org/issues/1488[#1488] NPE in ad-hoc for managing external components fixed.
 
+- link:https://projects.tigase.org/issues/1602[#1602] Minor optimization in MessageCarbons with new functions added to XMPPResourceConnection.
+
 - link:https://projects.tigase.org/issues/2003[#2003] Fixed bug with C2S streams where server would not always overwrite from attribute with full JID in subcription-related presence stanzas.
 
 - link:https://projects.tigase.org/issues/2118[#2118] Username modification bugfix. Tigase now returns "" for blank usernames instead of string after a username has been made blank.
 
 - link:https://projects.tigase.org/issues/2859[#2859] & link:https://projects.tigase.org/issues/2997[#2997] STARTTLS stream error on SSL sockets fixed.
+
+- link:https://projects.tigase.org/issues/2860[#2860] Fixed issue with SSL socket client certificate not working.
 
 - link:https://projects.tigase.org/issues/2877[#2877] Fixed issue in Message Carbons if message contains AMP payload.
 
@@ -213,6 +225,8 @@ Fixes
 
 - link:https://projects.tigase.org/issues/3307[#3307] Rosters are no longer re-saved when a user logs in and roster is read resulting in a performance boost.
 
+- link:https://projects.tigase.org/issues/3328[#3328] Presence processing by PEP plugin optimized.
+
 - link:https://projects.tigase.org/issues/3336[#3336] Fixed issues with reloading vhosts in trusted after configuration change.
 
 - link:https://projects.tigase.org/issues/3337[#3337] tls-jdk-nss-bug-workaround-active is now disabled by default. This fix is disabled by default which may impact older OpenSSL versions that may no longer be supported.  You may enable this using an init.properties setting.
@@ -242,6 +256,18 @@ Fixes
 - link:https://projects.tigase.org/issues/3559[#3559] Fixed Web admin UI not updating Cluster node when it id disconnected.
 
 - link:http://projects.tigase.org/issues/3579[#3579] Fixed NPE in SimpleParser.
+
+- #3598 Fixed error in removing users from blocked list.
+
+- #3599 Fixed +FlexibleOfflineMessages+ not being delivered to connection due to lack of explicit connection addressing.
+
+- #3619 Fixed issue with non-presistent contacts being unable to be added to roster.
+
+- #3649 Changed privacy list processing to always allow communication between XMPP connections with the same BareJID.
+
+- link:https://projects.tigase.org/issues/3655[#3655] Increased max loop in infinity loop detection logic to 100000 in order to aid larger transfers.
+
+- Patch added to fix ConcurrentModificationException in BlockingCommand plugin.
 
 - Added missing classes to IzPack installer
 

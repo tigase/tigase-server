@@ -18,6 +18,8 @@ This section keeps set of documents which apply to all the Tigase server version
 - xref:presenceForwarding[Presence Forwarding]
 - xref:registerXMPP[Register Your Own XMPP Domain]
 - xref:Pymsn-t[Tigase and PyMSN Transport]
+- xref:multiplesessionmanagers[Multiple Session Managers]
+- xref:watchdog[Watchdog]
 - xref:tipsandTricks[Tips And Tricks]
 . xref:tigaseTip_RuntimeEnvironment[Runtime Environment Tip]
 . xref:tigaseTip_CheckingClusterConnections[Checking Cluster Connections]
@@ -28,3 +30,4 @@ This section keeps set of documents which apply to all the Tigase server version
 . xref:scriptingintro[Scripting Introduction - Hello World!]
 . xref:newElements[Tigase Scripting Version 4.4.x Update for Administrators]
 . xref:tigaseandPython[Tigase and Python Scripting]
+- xref:tigase3xconfiguration[Configuration Wizards]

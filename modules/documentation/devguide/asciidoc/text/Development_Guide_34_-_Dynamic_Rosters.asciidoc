@@ -129,11 +129,12 @@ Client responds to the server:
 Configuration
 -------------
 
-DynamicRoster implementation class should be configured in the *init.properties* file. As it's an extension to the *Presence* and *Roster* plugins classes should be configured either for both plugins:
+DynamicRoster implementation class should be configured in the *init.properties* file. As it's an extension to the *PresenceState*, *PresenceSubscription* and *Roster* plugins classes should be configured either for each plugin:
 [source,bash]
 ------------------------------------------------------------------
 sess-man/plugins-conf/jabber\:iq\:roster/dynamic-roster-classes=<class list>
-sess-man/plugins-conf/presence/dynamic-roster-classes=<classes list>
+sess-man/plugins-conf/presence-state/dynamic-roster-classes=<classes list>
+sess-man/plugins-conf/presence-subscription/dynamic-roster-classes=<classes list>
 ------------------------------------------------------------------
 or globally:
 
