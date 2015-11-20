@@ -30,7 +30,7 @@ import tigase.server.*;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.*;
-import static tigase.xmpp.impl.Presence.AUTO_AUTHORIZE_PROP_KEY;
+import static tigase.xmpp.impl.PresenceSubscription.AUTO_AUTHORIZE_PROP_KEY;
 import tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
 import tigase.xmpp.impl.roster.*;
 
@@ -542,7 +542,7 @@ public class JabberIqRoster
 
 							// Unavailable presence should be sent first, otherwise it will be
 							// blocked by the server after the subscription is canceled
-							Element pres = new Element( Presence.PRESENCE_ELEMENT_NAME );
+							Element pres = new Element( PresenceAbstract.PRESENCE_ELEMENT_NAME );
 
 							pres.setXMLNS( CLIENT_XMLNS );
 							pres.setAttribute( Packet.TO_ATT, buddy.toString() );
@@ -556,14 +556,14 @@ public class JabberIqRoster
 							// to make sure it is delivered before subscription cancellation
 							pres_packet.setPriority( Priority.HIGH );
 							results.offer( pres_packet );
-							pres = new Element( Presence.PRESENCE_ELEMENT_NAME );
+							pres = new Element( PresenceAbstract.PRESENCE_ELEMENT_NAME );
 							pres.setXMLNS( CLIENT_XMLNS );
 							pres.setAttribute( Packet.TO_ATT, buddy.toString() );
 							pres.setAttribute( Packet.FROM_ATT, session.getBareJID().toString() );
 							pres.setAttribute( Packet.TYPE_ATT, "unsubscribe" );
 							results.offer( Packet.packetInstance( pres, session.getJID()
 									.copyWithoutResource(), buddy ) );
-							pres = new Element( Presence.PRESENCE_ELEMENT_NAME );
+							pres = new Element( PresenceAbstract.PRESENCE_ELEMENT_NAME );
 							pres.setXMLNS( CLIENT_XMLNS );
 							pres.setAttribute( Packet.TO_ATT, buddy.toString() );
 							pres.setAttribute( Packet.FROM_ATT, session.getBareJID().toString() );
@@ -609,7 +609,7 @@ public class JabberIqRoster
 							Element pres = (Element) session.getSessionData( XMPPResourceConnection.PRESENCE_KEY );
 
 							if ( pres == null ){
-								pres = new Element( Presence.PRESENCE_ELEMENT_NAME );
+								pres = new Element( PresenceAbstract.PRESENCE_ELEMENT_NAME );
 								pres.setXMLNS( CLIENT_XMLNS );
 							} else {
 								pres = pres.clone();
@@ -619,7 +619,7 @@ public class JabberIqRoster
 							results.offer( Packet.packetInstance( pres, session.getJID(), buddy ) );
 
 							if ( autoAuthorize ){
-								Presence.sendPresence( StanzaType.subscribe, session.getJID().copyWithoutResource(),
+								PresenceAbstract.sendPresence( StanzaType.subscribe, session.getJID().copyWithoutResource(),
 																			 buddy.copyWithoutResource(), results, null );
 							}
 						}

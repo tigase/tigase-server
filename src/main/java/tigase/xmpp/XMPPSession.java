@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -447,6 +448,10 @@ public class XMPPSession {
 
 	//~--- methods --------------------------------------------------------------
 
+	protected Object computeCommonSessionDataIfAbsent(String key, Function<String,Object> valueFactory) {
+		return sessionData.computeIfAbsent(key, valueFactory);
+	}
+	
 	/**
 	 * Method used to store data common for all connections of the user.
 	 *
@@ -457,6 +462,10 @@ public class XMPPSession {
 		sessionData.put(key, value);
 	}
 
+	protected Object putCommonSessionDataIfAbsent(String key, Object value) {
+		return sessionData.putIfAbsent(key, value);
+	}
+	
 	/**
 	 * Method used to remove data common for all connections of the user.
 	 *

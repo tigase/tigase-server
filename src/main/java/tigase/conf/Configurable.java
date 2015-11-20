@@ -129,6 +129,9 @@ public interface Configurable
 	public static final String DEF_COMP_PROT_NAME = "ext";
 
 	/** Field description */
+	public static final String DEF_EVENTBUS_NAME = "eventbus";
+	
+	/** Field description */
 	public static final String DEF_EXT_COMP_NAME = "ext-comp";
 
 	/** Field description */
@@ -158,6 +161,9 @@ public interface Configurable
 	/** Field description */
 	public static final String DEF_WS2S_NAME = "ws2s";
 
+	/** Field description */
+	public static final String EVENTBUS_CLASS_NAME = "tigase.disteventbus.component.EventBusComponent";
+	
 	/** Field description */
 	public static final String EXT_COMP_CLASS_NAME =
 			"tigase.server.xmppcomponent.ComponentConnectionManager";

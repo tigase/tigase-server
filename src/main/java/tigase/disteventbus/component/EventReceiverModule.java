@@ -1,6 +1,7 @@
 package tigase.disteventbus.component;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.logging.Level;
 
 import tigase.component.exceptions.ComponentException;
@@ -20,11 +21,9 @@ import tigase.xmpp.Authorization;
 @Bean(name = EventReceiverModule.ID)
 public class EventReceiverModule extends AbstractEventBusModule {
 
+	public final static String ID = "receiver";
 	private static final Criteria CRIT = new ElemPathCriteria(new String[] { "message", "event" },
 			new String[] { null, "http://jabber.org/protocol/pubsub#event" });
-
-	public final static String ID = "receiver";
-
 	@Inject
 	private AffiliationStore affiliationStore;
 
@@ -81,7 +80,14 @@ public class EventReceiverModule extends AbstractEventBusModule {
 
 				localEventBus.doFire(eventName, eventXmlns, event);
 
+				// forwarding event to _non cluster_ subscribers.
 				final Collection<Subscription> subscribers = subscriptionStore.getSubscribersJIDs(eventName, eventXmlns);
+				Iterator<Subscription> it = subscribers.iterator();
+				while (it.hasNext()) {
+					Subscription subscription = it.next();
+					if (subscription.isInClusterSubscription())
+						it.remove();
+				}
 				eventPublisherModule.publishEvent(eventName, eventXmlns, event, subscribers);
 			}
 		}

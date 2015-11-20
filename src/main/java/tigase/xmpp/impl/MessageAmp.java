@@ -187,7 +187,8 @@ public class MessageAmp
 //					|| (amp.getAttributeStaticStr(STATUS_ATTRIBUTE_NAME) != null)
 					) {
 				try {
-					if (session != null && packet.getStanzaTo() != null && !session.isUserId(packet.getStanzaTo().getBareJID()))
+					if (session != null && packet.getStanzaTo() != null
+							&& (packet.getStanzaTo().getLocalpart() == null || !session.isUserId(packet.getStanzaTo().getBareJID())) )
 						return;
 					
 					offlineProcessor.publishInPubSub(packet, session, results, settings);
@@ -257,7 +258,9 @@ public class MessageAmp
 	
 					return true;
 				}
-				if (session.isUserId(packet.getStanzaTo().getBareJID())) {
+				if (session.isUserId(packet.getStanzaTo().getBareJID())
+						&& session.getjid() != null && session.getjid().equals( packet.getStanzaTo())
+						) {
 					Packet result = packet.copyElementOnly();
 					result.setPacketTo(ampJID);
 					if ( packet.getStanzaTo().getResource() != null ){

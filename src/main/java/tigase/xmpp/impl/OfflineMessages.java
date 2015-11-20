@@ -91,7 +91,7 @@ public class OfflineMessages
 	 * processing capabilities. In case of {@code msgoffline} plugin it is
 	 * <em>presence</em> stanza */
 	private static final String[][] ELEMENTS = {
-		{ Presence.PRESENCE_ELEMENT_NAME }, { "iq", "msgoffline" } };
+		{ PresenceAbstract.PRESENCE_ELEMENT_NAME }, { "iq", "msgoffline" } };
 	/** Field holds an array of name-spaces for stanzas which can be processed by
 	 * this plugin. In case of {@code msgoffline} plugin it is
 	 * <em>jabber:client</em> */
@@ -114,6 +114,8 @@ public class OfflineMessages
 	public static final String[] MESSAGE_HEADER_PATH = { ELEM_NAME, "header" };
 	public static final String[] MESSAGE_HINTS_NO_STORE = { ELEM_NAME, "no-store" };
 	public static final String MESSAGE_HINTS_XMLNS = "urn:xmpp:hints";
+	public static final String[] MESSAGE_RECEIVED_PATH = { ELEM_NAME, "received" };
+	public static final String MESSAGE_RECEIVED_XMLNS = "urn:xmpp:receipts";
 	private static final String MSG_OFFLINE_STORAGE_PATHS = "msg-store-offline-paths";
 	private static final String MSG_REPO_CLASS_KEY = "msg-repo-class";
 	private static final String MSG_PUBSUB_JID = "msg-pubsub-jid";
@@ -484,6 +486,17 @@ public class OfflineMessages
 	 * @return 
 	 */
 	protected boolean isAllowedForOfflineStorage(Packet pac) {
+		// custom element matchers override default values so let's check
+		// this matchers at first
+		for (ElementMatcher matcher : offlineStorageMatchers) {
+			if (matcher.matches(pac))
+				return matcher.getValue();
+		}
+		
+		return isAllowedForOfflineStorageDefaults(pac);
+	}
+	
+	protected boolean isAllowedForOfflineStorageDefaults(Packet pac) {
 		StanzaType type = pac.getType();
 		switch (pac.getElemName()) {
 			case "message":
@@ -497,6 +510,8 @@ public class OfflineMessages
 						return true;
 					if (pac.getElemChildrenStaticStr( MESSAGE_HEADER_PATH ) != null)
 						return true;
+					if (pac.getElement().getXMLNSStaticStr( MESSAGE_RECEIVED_PATH ) == MESSAGE_RECEIVED_XMLNS)
+						return true;
 				}
 				break;
 			case "presence":
@@ -506,11 +521,6 @@ public class OfflineMessages
 				break;
 			default:
 				break;
-		}
-		
-		for (ElementMatcher matcher : offlineStorageMatchers) {
-			if (matcher.matches(pac))
-				return true;
 		}
 		
 		return false;	
@@ -729,11 +739,15 @@ public class OfflineMessages
 		
 		private final String[] path;
 		private final String xmlns;
+		private final boolean value;
 		
 		public static ElementMatcher create(String str) {
 			List<String> path = new ArrayList<String>();
 			String xmlns = null;
 			int offset = 0;
+			boolean value = !str.startsWith("-");
+			if (str.charAt(0) == '-' || str.charAt(0) == '+')
+				str = str.substring(1);
 			while (true) {
 				String elemName = null;
 				
@@ -765,17 +779,22 @@ public class OfflineMessages
 			if (xmlns != null)
 				xmlns = xmlns.intern();
 			
-			return new ElementMatcher(path.toArray(new String[0]), xmlns);
+			return new ElementMatcher(path.toArray(new String[0]), xmlns, value);
 		}
 		
-		public ElementMatcher(String[] path, String xmlns) {
+		public ElementMatcher(String[] path, String xmlns, boolean value) {
 			this.path = path;
 			this.xmlns = xmlns;
+			this.value = value;
 		}
 		
 		public boolean matches(Packet packet) {
 			Element child = packet.getElement().findChildStaticStr(path);
 			return child != null && (xmlns == null || xmlns == child.getXMLNS());
+		}
+		
+		public boolean getValue() {
+			return value;
 		}
 	}
 	

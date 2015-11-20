@@ -9,7 +9,6 @@ import tigase.disteventbus.EventHandler;
 import tigase.disteventbus.component.stores.Subscription;
 import tigase.disteventbus.component.stores.SubscriptionStore;
 import tigase.disteventbus.impl.LocalEventBus;
-import tigase.disteventbus.impl.LocalEventBus.LocalEventBusListener;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
@@ -27,32 +26,20 @@ public class EventPublisherModule extends AbstractEventBusModule implements Init
 
 	@Inject
 	private EventBusComponent component;
-
-	private final LocalEventBusListener eventBusListener = new LocalEventBusListener() {
-
+	@Inject(nullAllowed = false, bean = "localEventBus")
+	private LocalEventBus localEventBus;
+	@Inject
+	private SubscriptionStore subscriptionStore;
+	private final EventHandler eventBusEventFiredHandler = new EventHandler() {
 		@Override
-		public void onAddHandler(String name, String xmlns, EventHandler handler) {
-		}
-
-		@Override
-		public void onFire(String name, String xmlns, Element event) {
+		public void onEvent(String name, String xmlns, Element event) {
 			publishEvent(name, xmlns, event);
-		}
-
-		@Override
-		public void onRemoveHandler(String name, String xmlns, EventHandler handler) {
 		}
 	};
 
-	@Inject(nullAllowed = false, bean = "localEventBus")
-	private LocalEventBus localEventBus;
-
-	@Inject
-	private SubscriptionStore subscriptionStore;
-
 	@Override
 	public void beforeUnregister() {
-		localEventBus.removeListener(eventBusListener);
+		localEventBus.removeHandler(null, null, eventBusEventFiredHandler);
 	}
 
 	@Override
@@ -67,7 +54,7 @@ public class EventPublisherModule extends AbstractEventBusModule implements Init
 
 	@Override
 	public void initialize() {
-		localEventBus.addListener(eventBusListener);
+		localEventBus.addHandler(null, null, eventBusEventFiredHandler);
 
 	}
 
@@ -90,7 +77,12 @@ public class EventPublisherModule extends AbstractEventBusModule implements Init
 		write(message);
 	}
 
-	public void publishEvent(String name, String xmlns, Element event) {
+	public void publishEvent(final String name, final String xmlns, final Element event) {
+		final String isLocal = event.getAttributeStaticStr("local");
+		if (isLocal != null && ("true".equals(isLocal) || "1".equals(isLocal))) {
+			// This event is for local subscribers only. Skipping...
+			return;
+		}
 		final Collection<Subscription> subscribers = subscriptionStore.getSubscribersJIDs(name, xmlns);
 		publishEvent(name, xmlns, event, subscribers);
 	}

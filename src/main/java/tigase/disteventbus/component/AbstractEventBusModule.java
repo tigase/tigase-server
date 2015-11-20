@@ -10,8 +10,7 @@ public abstract class AbstractEventBusModule extends AbstractModule {
 	private EventBusComponent component;
 
 	protected boolean isClusteredEventBus(final JID jid) {
-		return jid.getLocalpart().equals("eventbus")
-				&& component.getNodesConnected().contains(JID.jidInstanceNS(jid.getDomain()));
+		return jid.getLocalpart().equals("eventbus") && component.getNodesConnected().contains(jid);
 	}
 
 	protected String nextStanzaID() {

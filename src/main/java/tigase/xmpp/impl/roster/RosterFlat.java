@@ -85,6 +85,7 @@ public class RosterFlat
 		RosterElement relem = getRosterElementInstance(buddy.copyWithoutResource(), null, null, session);
 
 		relem.setPersistent(false);
+		relem.setSubscription( null );
 		addBuddy(relem, getUserRoster(session));
 
 		if ( log.isLoggable( Level.FINEST ) ){
@@ -182,6 +183,7 @@ public class RosterFlat
 			relem.setGroups(groups);
 
 			// }
+			relem.setPersistent( true );
 			saveUserRoster(session);
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Updated buddy in roster: {0}", buddy);
@@ -283,7 +285,10 @@ public class RosterFlat
 					throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
 
-		if (relem == null) {
+		// either we don't have such contact or it's not persistend in which case it shouldn't
+		// have subscription -- this is simpler solution instead of reworking whole RosterElement
+		// to allow sub==null
+		if ( relem == null || ( !relem.isPersistent() ) ){
 			return null;
 		} else {
 			return relem.getSubscription();
@@ -307,7 +312,7 @@ public class RosterFlat
 
 			// Skip temporary roster elements added only for online presence tracking
 			// from dynamic roster
-			if (relem.isPersistent() && !relem.getSubscription().equals( SubscriptionType.none_pending_in)) {
+			if (relem.isPersistent() && !SubscriptionType.none_pending_in.equals(relem.getSubscription())) {
 				items.add(getBuddyItem(relem));
 			}
 		}

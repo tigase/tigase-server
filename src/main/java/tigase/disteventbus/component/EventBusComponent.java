@@ -1,5 +1,7 @@
 package tigase.disteventbus.component;
 
+import java.util.logging.Level;
+
 import javax.script.ScriptEngineManager;
 
 import tigase.cluster.api.ClusterControllerIfc;
@@ -11,6 +13,7 @@ import tigase.component.modules.impl.DiscoveryModule;
 import tigase.component.modules.impl.JabberVersionModule;
 import tigase.component.modules.impl.XmppPingModule;
 import tigase.disteventbus.EventBusFactory;
+import tigase.disteventbus.component.stores.Affiliation;
 import tigase.disteventbus.component.stores.AffiliationStore;
 import tigase.disteventbus.component.stores.SubscriptionStore;
 import tigase.kernel.core.Kernel;
@@ -67,10 +70,15 @@ public class EventBusComponent extends AbstractKernelBasedComponent implements C
 	protected void onNodeConnected(JID jid) {
 		super.onNodeConnected(jid);
 
+		if (log.isLoggable(Level.FINE))
+			log.fine("Cluster node " + jid + " added to Affiliation Store");
+		kernel.getInstance(AffiliationStore.class).putAffiliation(jid, Affiliation.owner);
+
 		Module module = kernel.getInstance(SubscribeModule.ID);
 		if (module != null && module instanceof SubscribeModule) {
 			((SubscribeModule) module).clusterNodeConnected(jid);
 		}
+
 	}
 
 	@Override
@@ -81,6 +89,7 @@ public class EventBusComponent extends AbstractKernelBasedComponent implements C
 		if (module != null && module instanceof SubscribeModule) {
 			((SubscribeModule) module).clusterNodeDisconnected(jid);
 		}
+		kernel.getInstance(AffiliationStore.class).removeAffiliation(jid);
 	}
 
 	@Override

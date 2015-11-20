@@ -129,6 +129,7 @@ public class BasicComponent
 	private ServiceEntity       serviceEntity           = null;
 	private boolean             initializationCompleted = false;
 	private String[]		    trustedProp = null;
+	
 	private final CopyOnWriteArrayList<JID> connectedNodes = new CopyOnWriteArrayList<JID>();
 	private final List<JID> connectedNodes_ro = Collections.unmodifiableList(connectedNodes);
 	private final CopyOnWriteArrayList<JID> connectedNodesWithLocal = new CopyOnWriteArrayList<JID>();
@@ -1273,12 +1274,12 @@ public class BasicComponent
 	}
 	
 	private void refreshTrustedJids() {
-		synchronized (connectedNodes) {
+		synchronized (connectedNodesWithLocal) {
 			trusted.clear();
 			if (trustedProp != null) {
 				for (String trustedStr : trustedProp) {
 					if (trustedStr.contains("{clusterNode}")) {
-						for (JID nodeJid : connectedNodes) {
+						for (JID nodeJid : connectedNodesWithLocal) {
 							String node = nodeJid.getDomain();
 							String jid = trustedStr.replace("{clusterNode}", node);
 							trusted.add(jid);	

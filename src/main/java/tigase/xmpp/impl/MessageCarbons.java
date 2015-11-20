@@ -32,6 +32,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.db.NonAuthUserRepository;
@@ -82,6 +83,8 @@ public class MessageCarbons
 	
 	private static final String[] MESSAGE_HINTS_NO_COPY = { Message.ELEM_NAME, "no-copy" };
 	private static final String MESSAGE_HINTS_XMLNS = "urn:xmpp:hints";
+	
+	private static final Function<String,Object> RESOURCES_MAP_FACTORY = (k) -> { return new ConcurrentHashMap<JID,Boolean>(); };
 	
 	private tigase.xmpp.impl.Message messageProcessor = new tigase.xmpp.impl.Message();
 	
@@ -361,16 +364,7 @@ public class MessageCarbons
 		}
 
 		ConcurrentHashMap<JID, Boolean> resources = 
-				(ConcurrentHashMap<JID, Boolean>) session.getCommonSessionData(ENABLED_RESOURCES_KEY);
-		if (resources == null) {
-			synchronized (session.getParentSession()) {
-				resources = (ConcurrentHashMap<JID, Boolean>) session.getCommonSessionData(ENABLED_RESOURCES_KEY);
-				if (resources == null) {
-					resources = new ConcurrentHashMap<JID, Boolean>();
-					session.putCommonSessionData(ENABLED_RESOURCES_KEY, resources);
-				}
-			}
-		}
+				(ConcurrentHashMap<JID, Boolean>) session.computeCommonSessionDataIfAbsent(ENABLED_RESOURCES_KEY, RESOURCES_MAP_FACTORY);
 
 		StanzaType type = packet.getType();
 		if (type == null || type == StanzaType.available) {

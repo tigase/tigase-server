@@ -43,6 +43,8 @@ import tigase.conf.ConfiguratorAbstract;
 def MARKER = "command-marker"
 //def ITEMS = "item-list"
 
+try {
+
 def VHOST = "VHost"
 def CERTIFICATE = "Certificate in PEM format"
 def SAVE_TO_DISK = "Save to disk"
@@ -164,3 +166,8 @@ if (item == null) {
 
 results.add(result);
 return results;
+
+} catch (Exception e) {
+			e.printStackTrace();
+			return e.getLocalizedMessage();
+}

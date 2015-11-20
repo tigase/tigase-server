@@ -26,6 +26,7 @@
 
 package tigase.xmpp.impl;
 
+import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +64,7 @@ import tigase.xmpp.impl.annotation.Id;
 
 /**
  * XEP-0191: Blocking Command. Based on privacy lists.
- * 
+ *
  * @author Daniele Ricci
  * @author Behnam Hatami
  */
@@ -86,7 +87,7 @@ public class BlockingCommand extends XMPPProcessorAbstract implements XMPPProces
 	protected static final String BLOCK_LIST = "blocklist";
 	protected static final String BLOCK = "block";
 	protected static final String UNBLOCK = "unblock";
-	protected static final String BLOCKED = "blcoked";
+	protected static final String BLOCKED = "blocked";
 
 	private static final String[] IQ_BLOCKLIST_PATH = { Iq.ELEM_NAME, BLOCK_LIST };
 	private static final String[] IQ_BLOCK_PATH = { Iq.ELEM_NAME, BLOCK };
@@ -152,6 +153,8 @@ public class BlockingCommand extends XMPPProcessorAbstract implements XMPPProces
 		if ((session == null) || !session.isAuthorized() || (results == null) || (results.size() == 0)) {
 			return;
 		}
+
+		Queue<Packet> errors = new ArrayDeque<Packet>(1);
 		for (Iterator<Packet> it = results.iterator(); it.hasNext();) {
 			Packet res = it.next();
 
@@ -169,12 +172,13 @@ public class BlockingCommand extends XMPPProcessorAbstract implements XMPPProces
 				if (res.getElemName() != Presence.ELEM_NAME) {
 					Packet p = preventFromINFLoop(Authorization.NOT_ACCEPTABLE.getResponseMessage(res, null, true));
 					p.getElement().getChild(StanzaType.error.name()).addChild(ERROR);
-					results.offer(p);
-				}	
+					errors.add(p);
+				}
 			} catch (PacketErrorTypeException e) {
 			} // ignore
 			it.remove();
 		}
+		results.addAll(errors);
 	}
 
 	/** Loads the user's block list. */

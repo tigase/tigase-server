@@ -44,6 +44,7 @@ import tigase.conf.Configurable;
 import tigase.conf.ConfigurationException;
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.Packet;
+import tigase.server.Priority;
 import tigase.server.ServerComponent;
 import tigase.xml.Element;
 import tigase.xmpp.JID;
@@ -160,6 +161,10 @@ public class ClusterController
 
 		Queue<Element> results = new ArrayDeque<Element>();
 
+		// retrive listener for command and it's priority to if available
+		CommandListener listener = commandListeners.get(command);
+		Priority priority = listener != null ? listener.getPriority() : null;
+		
 		// TODO: Maybe more optimal would be creating the object once and then clone
 		// it? However, the 'to' parameter must be double-checked whether all
 		// internal states are set properly for each different to parameter
@@ -167,6 +172,9 @@ public class ClusterController
 			ClusterElement clel = ClusterElement.createClusterMethodCall(fromNode, to,
 					StanzaType.set, command, data);
 
+			// set priority to ClusterElement so it will get proper priority for processing
+			if (priority != null)
+				clel.setPriority(priority);
 			clel.addVisitedNodes(visitedNodes);
 			clel.addDataPackets(packets);
 

@@ -30,12 +30,15 @@ public class AffiliationStore {
 		return allowedSubscribers;
 	}
 
-	public void putAffiliation(JID jid, Affiliation affiliation) {
-		this.affiliations.put(jid, affiliation);
-	}
-
 	public void setAllowedSubscribers(JID[] allowedSubscribers) {
 		this.allowedSubscribers = allowedSubscribers;
 	}
 
+	public void putAffiliation(JID jid, Affiliation affiliation) {
+		this.affiliations.put(jid, affiliation);
+	}
+
+	public void removeAffiliation(JID jid) {
+		this.affiliations.remove(jid);
+	}
 }

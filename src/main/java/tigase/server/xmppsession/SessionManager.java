@@ -695,6 +695,10 @@ public class SessionManager
 		return null;
 	}
 
+	public int getOpenUsersConnectionsAmount(){
+		return connectionsByFrom.size();
+	}
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public void getStatistics(StatisticsList list) {
