@@ -24,12 +24,7 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -37,11 +32,7 @@ import java.util.regex.Pattern;
 
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
-import tigase.form.Field;
-import tigase.form.Form;
-import tigase.form.FormSignatureVerifier;
-import tigase.form.FormSignerException;
-import tigase.form.SignatureCalculator;
+import tigase.form.*;
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Packet;
@@ -50,16 +41,7 @@ import tigase.stats.StatisticsList;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.NoConnectionIdException;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPProcessor;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.*;
 
 /**
  * JEP-0077: In-Band Registration
@@ -71,60 +53,82 @@ import tigase.xmpp.XMPPResourceConnection;
  * @version $Rev$
  */
 public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc {
-	private static final int REMOTE_ADDRESS_IDX = 2;
-	private static final String[][] ELEMENTS = { Iq.IQ_QUERY_PATH };
 	public static final String ID = "jabber:iq:register";
-
-	/**
-	 * Whitelist properties
-	 */
-
+	public static final String REGISTRATION_PER_SECOND_PROP_KEY = "registrations-per-second";
 	public static final String REGISTRATION_BLACKLIST_PROP_KEY = "registration-blacklist";
-
 	public static final String REGISTRATION_WHITELIST_PROP_KEY = "registration-whitelist";
-
 	public static final String WHITELIST_REGISTRATION_ONLY_PROP_KEY = "whitelist-registration-only";
-
-	private List<CIDRAddress> registrationWhitelist = new LinkedList<CIDRAddress>();
-	private List<CIDRAddress> registrationBlacklist = new LinkedList<CIDRAddress>();
-	private boolean whitelistRegistrationOnly = false;
-
 	/**
 	 * OAuth details for form verifier.
 	 */
 	public static final String OAUTH_CONSUMERKEY_PROP_KEY = "oauth-consumer-key";
 	public static final String OAUTH_CONSUMERSECRET_PROP_KEY = "oauth-consumer-secret";
 	public static final String SIGNED_FORM_REQUIRED_PROP_KEY = "signed-form-required";
-
-	private String oauthConsumerKey;
-	private String oauthConsumerSecret;
-	private boolean signedFormRequired = false;
-
-	public void setOAuthCredentials(String oauthConsumerKey, String oauthConsumerSecret){
-		this.oauthConsumerKey = oauthConsumerKey;
-		this.oauthConsumerSecret = oauthConsumerSecret;
-	}
-	
-	public void setSignedFormRequired(boolean required){
-		this.signedFormRequired = required;
-	}
-	
-	/**
-	 * Private logger for class instances.
-	 */
-	private static Logger log = Logger.getLogger(JabberIqRegister.class.getName());
+	private static final int REMOTE_ADDRESS_IDX = 2;
+	private static final String[][] ELEMENTS = { Iq.IQ_QUERY_PATH };
 	private static final String[] XMLNSS = { "jabber:iq:register" };
 	private static final String[] IQ_QUERY_USERNAME_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME, "username" };
 	private static final String[] IQ_QUERY_REMOVE_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME, "remove" };
 	private static final String[] IQ_QUERY_PASSWORD_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME, "password" };
 	private static final String[] IQ_QUERY_EMAIL_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME, "email" };
-	private static final Element[] FEATURES = { new Element("register", new String[] { "xmlns" },
-			new String[] { "http://jabber.org/features/iq-register" }) };
-	private static final Element[] DISCO_FEATURES = { new Element("feature", new String[] { "var" },
-			new String[] { "jabber:iq:register" }) };
+	private static final Element[] FEATURES = {
+			new Element("register", new String[] { "xmlns" }, new String[] { "http://jabber.org/features/iq-register" }) };
+	private static final Element[] DISCO_FEATURES = {
+			new Element("feature", new String[] { "var" }, new String[] { "jabber:iq:register" }) };
+	/**
+	 * Private logger for class instances.
+	 */
+	private static Logger log = Logger.getLogger(JabberIqRegister.class.getName());
+	/**
+	 * Whitelist properties
+	 */
+
+	private TokenBucketPool tokenBucket = new TokenBucketPool();
+	private List<CIDRAddress> registrationWhitelist = new LinkedList<CIDRAddress>();
+	private List<CIDRAddress> registrationBlacklist = new LinkedList<CIDRAddress>();
+	private boolean whitelistRegistrationOnly = false;
+	private String oauthConsumerKey;
+	private String oauthConsumerSecret;
+	private boolean signedFormRequired = false;
+	private long statsRegisteredUsers;
+	private long statsInvalidRegistrations;
 
 	// ~--- methods
 	// --------------------------------------------------------------
+
+	private static String parseRemoteAddressFromJid(JID from) {
+		try {
+			String connectionId = from.getResource();
+			return connectionId.split("_")[REMOTE_ADDRESS_IDX];
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return null;
+		}
+	}
+
+	private static boolean contains(List<CIDRAddress> addresses, String address) {
+		if (address == null)
+			return false;
+		for (CIDRAddress cidrAddress : addresses) {
+			if (cidrAddress.inRange(address)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static List<CIDRAddress> parseList(String listStr) {
+		String[] splitArray = listStr.split(",");
+		List<CIDRAddress> splitList = new LinkedList<CIDRAddress>();
+		for (String listEl : splitArray) {
+			splitList.add(CIDRAddress.parse(listEl.trim()));
+		}
+		return splitList;
+	}
+
+	public void setOAuthCredentials(String oauthConsumerKey, String oauthConsumerSecret) {
+		this.oauthConsumerKey = oauthConsumerKey;
+		this.oauthConsumerSecret = oauthConsumerSecret;
+	}
 
 	@Override
 	public String id() {
@@ -207,6 +211,13 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 						++statsInvalidRegistrations;
 						return;
 					}
+
+					if (!isTokenInBucket(packet.getFrom())) {
+						results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
+								"Server is busy. Too many registrations. Try later.", true));
+						++statsInvalidRegistrations;
+						return;
+					}
 				}
 
 				Authorization result = Authorization.NOT_AUTHORIZED;
@@ -271,14 +282,15 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 							Form form = new Form(formEl);
 							if (!expectedToken.equals(form.getAsString("oauth_token"))) {
 								log.finest("Received oauth_token is different that sent one.");
-								results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Unknown oauth_token", true));
+								results.offer(
+										Authorization.BAD_REQUEST.getResponseMessage(packet, "Unknown oauth_token", true));
 								++statsInvalidRegistrations;
 								return;
 							}
 							if (!oauthConsumerKey.equals(form.getAsString("oauth_consumer_key"))) {
 								log.finest("Unknown oauth_consumer_key");
-								results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet,
-										"Unknown oauth_consumer_key", true));
+								results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Unknown oauth_consumer_key",
+										true));
 								++statsInvalidRegistrations;
 								return;
 							}
@@ -289,8 +301,8 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 								email = form.getAsString("email");
 							} catch (FormSignerException e) {
 								log.fine("Form Signature Validation Problem: " + e.getMessage());
-								results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Invalid form signature",
-										true));
+								results.offer(
+										Authorization.BAD_REQUEST.getResponseMessage(packet, "Invalid form signature", true));
 								++statsInvalidRegistrations;
 								return;
 							}
@@ -325,13 +337,12 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 
 				case get: {
 					if (signedFormRequired) {
-						results.offer(packet.okResult(prepareRegistrationForm(session
-							), 0));
+						results.offer(packet.okResult(prepareRegistrationForm(session), 0));
 					} else
-						results.offer(packet.okResult("<instructions>"
-								+ "Choose a user name and password for use with this service."
-								+ "Please provide also your e-mail address." + "</instructions>" + "<username/>"
-								+ "<password/>" + "<email/>", 1));
+						results.offer(
+								packet.okResult("<instructions>" + "Choose a user name and password for use with this service."
+										+ "Please provide also your e-mail address." + "</instructions>" + "<username/>"
+										+ "<password/>" + "<email/>", 1));
 
 					break;
 				}
@@ -388,12 +399,21 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 		form.addField(Field.fieldTextSingle("email", "", "Email"));
 
 		SignatureCalculator sc = new SignatureCalculator(oauthConsumerKey, oauthConsumerSecret);
-		sc.setOauthToken(UUID.nameUUIDFromBytes((session.getConnectionId() + "|" + session.getSessionId()).getBytes()).toString());
+		sc.setOauthToken(
+				UUID.nameUUIDFromBytes((session.getConnectionId() + "|" + session.getSessionId()).getBytes()).toString());
 		sc.addEmptyFields(form);
 
 		query.addChild(form.getElement());
 		return query;
 	}
+	
+	protected boolean isTokenInBucket(final JID from) {
+		String remoteAdress = parseRemoteAddressFromJid(from);
+		if (remoteAdress == null || remoteAdress.isEmpty())
+			remoteAdress = "<default>";
+		return tokenBucket.consume(remoteAdress);
+	}
+
 
 	protected boolean isRegistrationAllowedForConnection(JID from) {
 		String remoteAdress = parseRemoteAddressFromJid(from);
@@ -402,19 +422,6 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 		}
 		return !contains(registrationBlacklist, remoteAdress);
 	}
-
-	private static String parseRemoteAddressFromJid(JID from) {
-		try {
-			String connectionId = from.getResource();
-			return connectionId.split("_")[REMOTE_ADDRESS_IDX];
-		} catch (ArrayIndexOutOfBoundsException e) {
-			return null;
-		}
-	}
-
-	private long statsRegisteredUsers;
-	
-	private long statsInvalidRegistrations;
 	
 	@Override
 	public void getStatistics(StatisticsList list) {
@@ -422,7 +429,7 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 		list.add(getComponentInfo().getName(), "Registered users", statsRegisteredUsers, Level.INFO);
 		list.add(getComponentInfo().getName(), "Invalid registrations", statsInvalidRegistrations, Level.INFO);
 	}
-	
+
 	@Override
 	public void init(Map<String, Object> settings) throws TigaseDBException {
 		this.oauthConsumerKey = (String) settings.get(OAUTH_CONSUMERKEY_PROP_KEY);
@@ -448,94 +455,14 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 		if (registrationBlacklistStr != null) {
 			registrationBlacklist = parseList(registrationBlacklistStr);
 		}
-	}
 
-	private static boolean contains(List<CIDRAddress> addresses, String address) {
-		if (address == null)
-			return false;
-		for (CIDRAddress cidrAddress : addresses) {
-			if (cidrAddress.inRange(address)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private static List<CIDRAddress> parseList(String listStr) {
-		String[] splitArray = listStr.split(",");
-		List<CIDRAddress> splitList = new LinkedList<CIDRAddress>();
-		for (String listEl : splitArray) {
-			splitList.add(CIDRAddress.parse(listEl.trim()));
-		}
-		return splitList;
-	}
-
-	/**
-	 * As in
-	 * http://commons.apache.org/proper/commons-net/jacoco/org.apache.commons
-	 * .net.util/SubnetUtils.java.html
-	 */
-	private static class CIDRAddress {
-
-		static final int NBITS = 32;
-		static final String IP_ADDRESS_MASK = "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})";
-		static final String CIDR_ADDRESS_MASK = IP_ADDRESS_MASK + "/(\\d{1,3})";
-
-		static final Pattern IP_PATTERN = Pattern.compile(IP_ADDRESS_MASK);
-		static final Pattern CIDR_PATTERN = Pattern.compile(CIDR_ADDRESS_MASK);
-
-		final int high;
-		final int low;
-
-		private CIDRAddress(int high, int low) {
-			this.high = high;
-			this.low = low;
+		String registrationsPerSecond = (String) settings.get(REGISTRATION_PER_SECOND_PROP_KEY);
+		if (registrationsPerSecond != null) {
+			this.tokenBucket.setDefaultRate(Long.parseLong(registrationsPerSecond));
+			log.config("Accounts registration limit is set to " + this.tokenBucket.getDefaultRate() + " per "
+					+ this.tokenBucket.getDefaultPer() + " sec");
 		}
 
-		boolean inRange(String address) {
-			int diff = toInteger(address) - low;
-			return diff >= 0 && (diff <= (high - low));
-		}
-
-		static int toInteger(String address) {
-			Matcher matcher = IP_PATTERN.matcher(address);
-			matcher.matches();
-			return matchAddress(matcher);
-		}
-
-		static int matchAddress(Matcher matcher) {
-			int addr = 0;
-			for (int i = 1; i <= 4; ++i) {
-				int n = Integer.parseInt(matcher.group(i));
-				addr |= ((n & 0xff) << 8 * (4 - i));
-			}
-			return addr;
-		}
-
-		static CIDRAddress parse(String mask) {
-			if (!mask.contains("/")) {
-				mask = mask + "/" + NBITS;
-			}
-			Matcher matcher = CIDR_PATTERN.matcher(mask);
-			matcher.matches();
-			int address = matchAddress(matcher);
-
-			/* Create a binary netmask from the number of bits specification /x */
-			int cidrPart = Integer.parseInt(matcher.group(5));
-			int netmask = 0;
-			int broadcast = 0;
-			int network = 0;
-			for (int j = 0; j < cidrPart; ++j) {
-				netmask |= (1 << 31 - j);
-			}
-
-			/* Calculate base network address */
-			network = (address & netmask);
-
-			/* Calculate broadcast address */
-			broadcast = network | ~(netmask);
-			return new CIDRAddress(broadcast, network);
-		}
 	}
 
 	@Override
@@ -574,5 +501,79 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 
 	public boolean isSignedFormRequired() {
 		return signedFormRequired;
+	}
+
+	public void setSignedFormRequired(boolean required) {
+		this.signedFormRequired = required;
+	}
+
+	/**
+	 * As in
+	 * http://commons.apache.org/proper/commons-net/jacoco/org.apache.commons
+	 * .net.util/SubnetUtils.java.html
+	 */
+	private static class CIDRAddress {
+
+		static final int NBITS = 32;
+		static final String IP_ADDRESS_MASK = "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})";
+		static final String CIDR_ADDRESS_MASK = IP_ADDRESS_MASK + "/(\\d{1,3})";
+
+		static final Pattern IP_PATTERN = Pattern.compile(IP_ADDRESS_MASK);
+		static final Pattern CIDR_PATTERN = Pattern.compile(CIDR_ADDRESS_MASK);
+
+		final int high;
+		final int low;
+
+		private CIDRAddress(int high, int low) {
+			this.high = high;
+			this.low = low;
+		}
+
+		static int toInteger(String address) {
+			Matcher matcher = IP_PATTERN.matcher(address);
+			matcher.matches();
+			return matchAddress(matcher);
+		}
+
+		static int matchAddress(Matcher matcher) {
+			int addr = 0;
+			for (int i = 1; i <= 4; ++i) {
+				int n = Integer.parseInt(matcher.group(i));
+				addr |= ((n & 0xff) << 8 * (4 - i));
+			}
+			return addr;
+		}
+
+		static CIDRAddress parse(String mask) {
+			if (!mask.contains("/")) {
+				mask = mask + "/" + NBITS;
+			}
+			Matcher matcher = CIDR_PATTERN.matcher(mask);
+			matcher.matches();
+			int address = matchAddress(matcher);
+
+			/*
+			 * Create a binary netmask from the number of bits specification /x
+			 */
+			int cidrPart = Integer.parseInt(matcher.group(5));
+			int netmask = 0;
+			int broadcast = 0;
+			int network = 0;
+			for (int j = 0; j < cidrPart; ++j) {
+				netmask |= (1 << 31 - j);
+			}
+
+			/* Calculate base network address */
+			network = (address & netmask);
+
+			/* Calculate broadcast address */
+			broadcast = network | ~(netmask);
+			return new CIDRAddress(broadcast, network);
+		}
+
+		boolean inRange(String address) {
+			int diff = toInteger(address) - low;
+			return diff >= 0 && (diff <= (high - low));
+		}
 	}
 } // JabberIqRegister
