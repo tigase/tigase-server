@@ -61,9 +61,18 @@ public class EventPublisherModule extends AbstractEventBusModule {
 	}
 
 	public void publishEvent(final String name, final String xmlns, Element event) {
+		final String isRemote = event.getAttributeStaticStr("remote");
+		if (isRemote != null && ("true".equals(isRemote) || "1".equals(isRemote))) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Remote event. No need to redistribute this way. " + event.toString());
+			}
+			return;
+		}
 		final String isLocal = event.getAttributeStaticStr("local");
 		if (isLocal != null && ("true".equals(isLocal) || "1".equals(isLocal))) {
-			// This event is for local subscribers only. Skipping...
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("Event for local subscribers only. Skipping. " + event.toString());
+			}
 			return;
 		}
 		final Collection<Subscription> subscribers = context.getSubscriptionStore().getSubscribersJIDs(name, xmlns);
