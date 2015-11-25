@@ -14,6 +14,10 @@ include::text/Tigase_v7.1.0.asciidoc[]
 
 include::text/Admin_Guide_01_-_About_Tigase_Jabber_XMPP_Server.asciidoc[]
 
+include::text/Admin_Guide_02_-_Licensing_and_Open_Source.asciidoc[]
+
+include::text/Admin_Guide_08_-_Latest_and_Nightly_Builds.asciidoc[]
+
 include::text/Admin_Guide_02_-_Quick_Start.asciidoc[]
 
 :leveloffset: 2
@@ -30,7 +34,7 @@ include::text/Admin_Guide_07_-_Quick_Start_-_E_-_Windows_Installation.asciidoc[]
 
 :leveloffset: 1
 
-include::text/Admin_Guide_08_-_Latest_and_Nightly_Builds.asciidoc[]
+
 
 include::text/Admin_Guide_09_-_Configuration.asciidoc[]
 

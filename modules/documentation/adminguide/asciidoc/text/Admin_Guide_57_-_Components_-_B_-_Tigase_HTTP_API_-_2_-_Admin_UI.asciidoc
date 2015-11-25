@@ -242,7 +242,7 @@ This window allows you to not only test, but publish an item to the specified no
 
 Read ALL nodes
 ~~~~~~~~~~~~~~
-Here you can display all nodes and items from nodes that are currently in storage.
+This will load a tree of pubsub nodes in memory, it will not output anything as it is mainly for developer use.
 
 Rebuild database
 ~~~~~~~~~~~~~~~~
