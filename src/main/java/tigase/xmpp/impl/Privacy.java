@@ -26,6 +26,9 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import tigase.db.TigaseDBException;
 
 import tigase.xml.DomBuilderHandler;
@@ -419,6 +422,95 @@ public class Privacy {
 		}
 	}
 
+	public static List<String> getBlocked(XMPPResourceConnection session) throws NotAuthorizedException, TigaseDBException {
+		Element list = getDefaultList(session);
+		List<String> ulist = null;
+		if(list != null) {
+			ulist = list.mapChildren(item -> isBlockItem(item), item -> item.getAttributeStaticStr(VALUE));
+		}
+		return ulist;				
+	}
+	
+	public static boolean block(XMPPResourceConnection session, String jid) throws NotAuthorizedException, TigaseDBException {
+		String name = getDefaultListName(session);
+		if(name == null) {
+			name = "default";
+		}
+		Element list = getList(session,name);			
+		if(list != null) {
+			if (list.findChild(item -> jid.equals(item.getAttributeStaticStr(VALUE)) && isBlockItem(item)) != null)
+				return false;
+		}
+		Element list_new = new Element(LIST,new String[]{NAME},new String[]{name});		
+		list_new.addChild(new Element(ITEM,new String[]{TYPE,ACTION,VALUE,ORDER},new String[]{"jid","deny",jid,"0"}));
+		if (list != null) {
+			List<Element> items = list.getChildren();
+			Collections.sort(items, JabberIqPrivacy.compar);
+			for (int i = 0; i < items.size(); i++) {
+				items.get(i).setAttribute(ORDER, "" + (i + 1));
+			}
+			list_new.addChildren(items);
+		}
+		updateList(session, name, list_new);
+		return true;
+	}
+	
+	public static boolean unblock(XMPPResourceConnection session, String jid) throws NotAuthorizedException, TigaseDBException {
+		String name = getDefaultListName(session);
+		Element list = getList(session,name);
+		if(list == null)
+			return false;
+		
+		Element list_new = new Element(LIST,new String[]{NAME},new String[]{name});	
+		List<Element> items = list.findChildren(item -> !jid.equals(item.getAttributeStaticStr(VALUE)) || !isBlockItem(item));
+		Collections.sort(items, JabberIqPrivacy.compar);
+		for (int i=0; i<items.size(); i++) {
+			items.get(i).setAttribute(ORDER, "" + (i+1));
+		}
+		list_new.addChildren(items);
+	
+		updateList(session, name, list_new);
+		
+		return false;		
+	}
+
+	public static List<String> unblockAll(XMPPResourceConnection session) throws NotAuthorizedException, TigaseDBException {
+		String name = getDefaultListName(session);
+		Element list = getList(session,name);
+		if(list == null)
+			return null;
+
+		List<String> ulist = list.mapChildren(item -> isBlockItem(item), item -> item.getAttributeStaticStr(VALUE));
+		
+		Element list_new = new Element(LIST,new String[]{NAME},new String[]{name});			
+		List<Element> items = list.findChildren(item -> !isBlockItem(item));
+		Collections.sort(items, JabberIqPrivacy.compar);
+		for (int i=0; i<items.size(); i++) {
+			items.get(i).setAttribute(ORDER, "" + (i+1));
+		}
+		list_new.addChildren(items);
+	
+		updateList(session, name, list_new);
+		
+		return ulist;				
+	}	
+	
+	private static void updateList(XMPPResourceConnection session, String name, Element list_new) throws NotAuthorizedException, TigaseDBException {
+		addList(session,list_new);
+		Privacy.setDefaultList(session, list_new);
+		if(getDefaultList(session) == null) {
+			Privacy.setActiveList(session, name);
+		}
+		else if(name.equals(getActiveListName(session))) {
+			session.putCommonSessionData(ACTIVE, list_new);
+			session.putSessionData(ACTIVE, list_new);
+		}		
+	}
+	
+	private static boolean isBlockItem(Element item) {
+		return "jid".equals(item.getAttributeStaticStr(TYPE)) && "deny".equals(item.getAttributeStaticStr(ACTION)) && item.getChildren() == null;
+	}
+	
 }    // Privacy
 
 
