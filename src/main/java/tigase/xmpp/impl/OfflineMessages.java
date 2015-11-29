@@ -52,6 +52,7 @@ import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.ElementMatcher;
 import tigase.xmpp.JID;
 import tigase.xmpp.NoConnectionIdException;
 import tigase.xmpp.NotAuthorizedException;
@@ -735,69 +736,6 @@ public class OfflineMessages
 		}
 	}
 
-	public static class ElementMatcher {
-		
-		private final String[] path;
-		private final String xmlns;
-		private final boolean value;
-		
-		public static ElementMatcher create(String str) {
-			List<String> path = new ArrayList<String>();
-			String xmlns = null;
-			int offset = 0;
-			boolean value = !str.startsWith("-");
-			if (str.charAt(0) == '-' || str.charAt(0) == '+')
-				str = str.substring(1);
-			while (true) {
-				String elemName = null;
-				
-				int slashIdx = str.indexOf('/', offset);
-				int sIdx = str.indexOf('[', offset);
-				if (slashIdx < 0)
-					slashIdx = str.length();
-				
-				Element c = null;
-				if (slashIdx < sIdx || sIdx < 0) {
-					elemName = str.substring(offset, slashIdx);
-					xmlns = null;
-				} else {
-					int eIdx = str.indexOf(']', sIdx);
-					elemName = str.substring(offset, sIdx);
-					xmlns = str.substring(sIdx+1, eIdx);
-					slashIdx = str.indexOf('/', eIdx);
-					if (slashIdx < 0)
-						slashIdx = str.length();
-				}
-				
-				if (elemName != null && !elemName.isEmpty())
-					path.add(elemName.intern());
-				
-				if (slashIdx == str.length())
-					break;
-				offset = slashIdx + 1;
-			}
-			if (xmlns != null)
-				xmlns = xmlns.intern();
-			
-			return new ElementMatcher(path.toArray(new String[0]), xmlns, value);
-		}
-		
-		public ElementMatcher(String[] path, String xmlns, boolean value) {
-			this.path = path;
-			this.xmlns = xmlns;
-			this.value = value;
-		}
-		
-		public boolean matches(Packet packet) {
-			Element child = packet.getElement().findChildStaticStr(path);
-			return child != null && (xmlns == null || xmlns == child.getXMLNS());
-		}
-		
-		public boolean getValue() {
-			return value;
-		}
-	}
-	
 	/**
 	 * {@link Comparator} interface implementation for the purpose of sorting
 	 * Elements retrieved from the repository by the timestamp stored in
