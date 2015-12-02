@@ -109,7 +109,7 @@ public class BindResource
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
 			NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
-		if ((session == null) || session.isServerSession() || !session.isAuthorized()) {
+		if ((session == null) || session.isServerSession() || !session.isAuthorized() || C2SDeliveryErrorProcessor.isDeliveryError( packet )) {
 			return false;
 		}
 		
