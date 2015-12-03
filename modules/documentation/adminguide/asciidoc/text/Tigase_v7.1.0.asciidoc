@@ -25,6 +25,13 @@ The PubSub Schema has been streamlined for better resource use, this change affe
 To prepare your database for the new schema, first be sure to create a backup!  Then apply the appropriate pubsub schema to your MySQL and it will add the new storage procedure.
 Details on how to accomplish this are found xref:tigaseServer71[in the schema upgrade guide].
 
+Presence Plugin Split
+~~~~~~~~~~~~~~~~~~~~~
+The plugin handling all presence processing has been split from one plugin (Presence.java) into separate plugins:
+- PresenceAbstract.java handles most common presence-related methods, and is also used by the following two plugins.
+- PresenceSubscription.java to handle subscription presence processing like for roster updates.
+- PresenceState.java to handle initial presences from new logins.
+
 
 New Features & Components
 -------------------------
@@ -61,7 +68,6 @@ Tigase can now support users with empty nicknames so long as the following code 
 ------
 sess-man/plugins-conf/jabber\:iq\:roster/empty_name_enabled=true
 ------
-#3308
 
 Offline Message Limits
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -133,6 +139,38 @@ Offline Message Receipts Storage now Configurable
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Admins may now configure Offline Message Receipts Storage to specify filters and controls as to what they want stored in offline messages. See xref:offlineMessageReceipts[more details here].
 
+Account Registration Limits
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In order to protect Tigase servers from DOS attacks, a limit on number of account registrations per second has been implemented.  This may be configured by adding the following line in the init.properties file:
+-----
+sess-man/plugins-conf/jabber\:iq\:register/registrations-per-second=10
+-----
+This setting allows for 10 registrations from a single IP per second.  If the limit exceeds that, a NOT_ALLOWED error will be returned.
+
+Cluster Connections Improved
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Cluster commands now operate at CLUSTER priority, giving the packets higher status than HIGH which otherwise has caused issues during massive disconnects.
+New Configuration options come with this change.  The first being able to change the number of connections for CLUSTER packets using the following init.property setting:
+-----
+cl-comp/cluster-sys-connections-per-node[I]=2
+-----
+Also a new class which implements the a new connection selection interface, but uses the old mechanism where any connection can send any command.
+-----
+cl-comp/connection-selector=tigase.cluster.ClusterConnectionSelectorOld
+-----
+
+Cluster Connections Testing Implemented
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Watchdog has now been added to test cluster connections by default.  Watchdog sends an XMPP ping to all cluster connections every 30 seconds and checks to see if a ping response has been received in the last 3 minutes. If not, the cluster connection will be dropped automatically. Global watchdog settings will not impact cluster testing feature.
+
+Message Archive expanded to include non-body elements
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Message Archive can now be configured to store messages that may not have body element, or other message types using the following line from init.properties:
+-----
+sess-man/plugins-conf/unified-archive/msg-archive-paths[s]=/message/body,/message/subject
+-----
+Where above will set the archive to store messages with <body/> or <subject/> elements.
+
 New Documentation Structure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 There has been a lot of changes and fixes to our documentation over the last few months. If you have links to any of our documentation, please update them as the filenames may have changed.
@@ -143,8 +181,10 @@ New Minor Features & Behavior Changes
 - link:https://projects.tigase.org/issues/163[#163] link:http://xmpp.org/extensions/xep-0012.html[XEP-0012] User +LastActivity+ implemented
 - link:https://projects.tigase.org/issues/593[#593] link:http://xmpp.org/extensions/xep-0202.html[XEP-0202 Entity Time] has been implemented.
 - #811 Plugin API extended allowing more XML parameters to be considered for processing.
+- link:https://projects.tigase.org/issues/813[#813] Default number of connections between cluster nodes set at 5, default number of connections for CLUSTER level traffic set to 2.
 - link:https://projects.tigase.org/issues/1436[#1436] +ClusterConnectionManager+ now sends ping packets every 30 seconds to check status of live cluster connections.
 - link:https://projects.tigase.org/issues/1449[#1449] Monitoring can now be run in OSGI mode.
+- link:https://projects.tigase.org/issues/1601[#1601] XMPPPresenceUpdateProcessorIFC interface has been removed and replaced with eventbus with dedicated threadpool.
 - link:https://projects.tigase.org/issues/2561[#2561] & link:https://projects.tigase.org/issues/85[#85] Offline messages now consider sessions without presence & resources negative priority in delivery logic.
 - link:https://projects.tigase.org/issues/2596[#2596] Delivery errors are no longer run through preprocessors.
 - link:https://projects.tigase.org/issues/2823[#2823] +staticStr+ element method now implemented.
@@ -261,14 +301,24 @@ Fixes
 
 - #3599 Fixed +FlexibleOfflineMessages+ not being delivered to connection due to lack of explicit connection addressing.
 
+- #3612 Fixed issue when processing packets sent to full JID in cluster mode when user is connected to more than one cluster node at once.
+
 - #3619 Fixed issue with non-presistent contacts being unable to be added to roster.
 
 - #3649 Changed privacy list processing to always allow communication between XMPP connections with the same BareJID.
 
 - link:https://projects.tigase.org/issues/3655[#3655] Increased max loop in infinity loop detection logic to 100000 in order to aid larger transfers.
 
+- link:https://projects.tigase.org/issues/3688[#3688] Issues with Eventbus in cluster mode fixed.
+
+- link:https://projects.tigase.org/issues/3689[#3689] Avoid using sender address when packets are returned from Cluster Manager using stream management.
+
+- #3717 Support added to store messages without <body/> element if storage method other than <body/> is used. Support also added for JAXMPP to retrieve whole element from Message Archiving instead of only <body>.
+
 - Patch added to fix ConcurrentModificationException in BlockingCommand plugin.
 
-- Added missing classes to IzPack installer
+- Added missing classes to IzPack installer.
 
 - Tigase.xml removed from documentation and default tigase.conf file.
+
+- Logs function added to eventbus publisher operations.

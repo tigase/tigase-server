@@ -34,6 +34,12 @@ image:images/admin-home.jpg[]
 
 The commands are broken into categories shown here.  All changes made in these sections are instant and should be seen the same as if you were using an external XMPP client like Psi.
 
+*NOTE* The BOSH client will automatically translate all requests to the server name.  In some rare cases this may not be resolvable by the browser and you will be unable to login.  Should that happen, you may disable that feature using the following line in your init.properties:
+
+bosh/send-node-hostname[B]=false
+
+You may have to specifically designate the bosh URL when using the advanced tag in the login screen.
+
 Chat
 ----
 This is the default window, and your main interface for chatting inside XMPP with this server. *NOTE: you can only communicate to users logged onto the current server, or connected clusters*
