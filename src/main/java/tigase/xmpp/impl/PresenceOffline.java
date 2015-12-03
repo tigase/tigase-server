@@ -120,12 +120,12 @@ public class PresenceOffline extends PresenceAbstract implements XMPPStopListene
 
 		String tmp;
 
-		tmp            = (String) settings.get(DELAY_STAMP_KEY);
-		delayStamp    = (tmp != null)
-				? Boolean.parseBoolean(tmp)
-				: delayStamp;
-			log.log( Level.CONFIG,
-							 "Adding offline presence delay stamp to: {0}", delayStamp );
+		tmp = (String) settings.get( DELAY_STAMP_KEY );
+		delayStamp = ( tmp != null )
+								 ? Boolean.parseBoolean( tmp )
+								 : delayStamp;
+		log.log( Level.CONFIG,
+						 "Adding offline presence delay stamp to: {0}", delayStamp );
 
 		presenceCache = new LRUConcurrentCache<>( 10000 );
 		rosterCache = new LRUConcurrentCache<>( 10000 );
@@ -276,40 +276,46 @@ public class PresenceOffline extends PresenceAbstract implements XMPPStopListene
 //		if ( isNotOnlySession( session ) ){
 //			return;
 //		}
-		if ( session == null ){
+		// Synchronization to avoid conflict with login/logout events
+		// processed in the SessionManager asynchronously
+		if ( session == null || !session.isAuthorized() ){
 			return;
 		}
 
-		sendEvent( "presence", session.getjid().getBareJID() );
+		synchronized ( session ) {
 
-		final Element lastPresence = session.getPresence();
-		if ( lastPresence != null ){
+			sendEvent( "presence", session.getjid().getBareJID() );
 
-			if ( log.isLoggable( Level.FINEST ) ){
-				log.log( Level.FINEST, "Session: {0} stopped, storing to repository last presence: {1}", new Object[] { session, lastPresence } );
-			}
+			final Element lastPresence = session.getPresence() != null ? session.getPresence().clone() : null;
+			if ( lastPresence != null ){
 
-			boolean delayStamp = true;
-			if ( delayStamp ){
-
-				String stamp = null;
-
-				synchronized ( formatter ) {
-					stamp = formatter.format( new Date() );
+				if ( log.isLoggable( Level.FINEST ) ){
+					log.log( Level.FINEST, "Session: {0} stopped, storing to repository last presence: {1}", new Object[] { session, lastPresence } );
 				}
 
-				if ( stamp != null ){
-					synchronized ( lastPresence ) {
+				if ( delayStamp ){
+					String stamp = null;
+
+					synchronized ( formatter ) {
+						stamp = formatter.format( new Date() );
+					}
+
+					if ( stamp != null ){
 						Element x = new Element( "delay", new String[] { "stamp", "xmlns" }, new String[] { stamp, "urn:xmpp:delay" } );
 						lastPresence.addChild( x );
 					}
+
 				}
 
-			}
-			try {
-				userRepository.setData( session.getjid().getBareJID(), LAST_OFFLINE_PRESENCE_KEY, lastPresence.toString() );
-			} catch ( TigaseDBException ex ) {
-				log.log( Level.WARNING, "Error storing last offline presence to repository: " + lastPresence, ex );
+				if ( !StanzaType.unavailable.toString().equals( lastPresence.getAttributeStaticStr( Packet.TYPE_ATT ) ) ){
+					lastPresence.setAttribute( Packet.TYPE_ATT, StanzaType.unavailable.toString() );
+				}
+
+				try {
+					userRepository.setData( session.getjid().getBareJID(), LAST_OFFLINE_PRESENCE_KEY, lastPresence.toString() );
+				} catch ( TigaseDBException ex ) {
+					log.log( Level.WARNING, "Error storing last offline presence to repository: " + lastPresence, ex );
+				}
 			}
 		}
 	}
