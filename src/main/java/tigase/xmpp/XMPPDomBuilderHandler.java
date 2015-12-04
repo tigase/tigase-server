@@ -129,7 +129,7 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 
 		Element elem = el_stack.peek();
 		if (elem != null) {
-			elem.setCData(cdata.toString());
+			elem.addCData(cdata.toString());
 		}
 	}
 
