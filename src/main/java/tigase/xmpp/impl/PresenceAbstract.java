@@ -26,36 +26,25 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 
 import tigase.server.Packet;
-import tigase.server.Priority;
-
-import tigase.stats.StatisticsList;
-
-import tigase.sys.TigaseRuntime;
-
-import tigase.util.TigaseStringprepException;
-
-import tigase.xml.Element;
 
 import tigase.xmpp.*;
+import tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor;
 import tigase.xmpp.impl.roster.*;
 
-import static tigase.xmpp.impl.roster.RosterAbstract.*;
-
-//~--- JDK imports ------------------------------------------------------------
+import tigase.sys.TigaseRuntime;
+import tigase.util.TigaseStringprepException;
+import tigase.xml.Element;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import tigase.server.Iq;
-
-import tigase.osgi.ModulesManagerImpl;
-import tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor;
+import static tigase.xmpp.impl.roster.RosterAbstract.SUB_BOTH;
+import static tigase.xmpp.impl.roster.RosterAbstract.SUB_FROM;
+import static tigase.xmpp.impl.roster.RosterAbstract.SUB_TO;
 
 /**
  * Class responsible for handling Presence packets
@@ -72,6 +61,8 @@ public abstract class PresenceAbstract
 	/** Field description */
 	public static final String SKIP_OFFLINE_PROP_KEY = "skip-offline";
 
+	public static final String PRESENCE_PROBE_FULL_JID_KEY = "probe-full-jid";
+
 	/** Field description */
 	public static final String SKIP_OFFLINE_SYS_PROP_KEY = "skip-offline-sys";
 
@@ -87,6 +78,7 @@ public abstract class PresenceAbstract
 	//private static final String[]   XMLNSS                  = { XMLNS, RosterAbstract.XMLNS_LOAD };
 	private static boolean          skipOfflineSys          = true;
 	protected static boolean          skipOffline             = false;
+	protected static boolean probeFullJID = false;
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -197,7 +189,11 @@ public abstract class PresenceAbstract
 		Element presProbe = new Element(PRESENCE_ELEMENT_NAME);
 		presProbe.setXMLNS(XMLNS);
 		presProbe.setAttribute("type", StanzaType.probe.toString());
-		presProbe.setAttribute("from", session.getBareJID().toString());
+		if (probeFullJID) {
+			presProbe.setAttribute("from", session.getJID().toString());
+		} else {
+			presProbe.setAttribute("from", session.getBareJID().toString());
+		}
 		return presProbe;
 	}
 
@@ -212,6 +208,13 @@ public abstract class PresenceAbstract
 		// Init plugin configuration
 		String tmp;
 
+		tmp            = (String) settings.get(PRESENCE_PROBE_FULL_JID_KEY);
+		probeFullJID    = (tmp != null)
+				? Boolean.parseBoolean(tmp)
+				: probeFullJID;
+			log.log( Level.CONFIG,
+							 "Sending probe from FullJID set to: {0}", probeFullJID );
+
 		tmp            = (String) settings.get(SKIP_OFFLINE_PROP_KEY);
 		skipOffline    = (tmp != null)
 				? Boolean.parseBoolean(tmp)
@@ -221,9 +224,9 @@ public abstract class PresenceAbstract
 				? Boolean.parseBoolean(tmp)
 				: skipOfflineSys;
 		if (skipOffline || skipOfflineSys) {
-			log.config(String.format(
-					"Skipping sending presence to offline contacts enabled :: " +
-					"skipOffline: %1$s, skipOfflineSys: %2$s", skipOffline, skipOfflineSys));
+			log.log( Level.CONFIG,
+							 "Skipping sending presence to offline contacts enabled :: skipOffline: {0}, skipOfflineSys: {1}",
+							 new Object[] { skipOffline, skipOfflineSys } );
 		}
 	}
 

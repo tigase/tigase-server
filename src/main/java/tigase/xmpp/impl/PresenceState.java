@@ -694,12 +694,17 @@ public class PresenceState extends PresenceAbstract implements XMPPStopListenerI
 					Element pres = conn.getPresence();
 
 					if (pres != null) {
-						sendPresence(null, null, packet.getStanzaFrom().copyWithoutResource(),
-								results, pres);
+						JID to;
+						if ( probeFullJID ){
+							to = packet.getStanzaFrom();
+						} else {
+							to = packet.getStanzaFrom().copyWithoutResource();
+						}
+						sendPresence( null, null, to, results, pres );
 						roster_util.setPresenceSent(session, packet.getStanzaFrom(), true);
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST, "Received probe, sending presence response to: {0}",
-									packet.getStanzaFrom());
+									to);
 						}
 					}
 				} catch (NotAuthorizedException | TigaseDBException e) {
