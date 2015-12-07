@@ -52,7 +52,7 @@ public interface BoshSessionTaskHandler {
 
 	boolean addOutStreamOpen( Packet packet, BoshSession bs );
 
-	boolean addOutStreamClosed( Packet packet, BoshSession bs );
+	boolean addOutStreamClosed( Packet packet, BoshSession bs, boolean withTimeout );
 
 	BareJID getDefHostName();
 	

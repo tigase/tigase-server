@@ -135,7 +135,7 @@ public class BoshConnectionManager
 	//~--- methods --------------------------------------------------------------
 
 	@Override
-	public boolean addOutStreamClosed(Packet packet, BoshSession bs) {
+	public boolean addOutStreamClosed(Packet packet, BoshSession bs, boolean withTimeout) {
 		packet.setPacketFrom(getFromAddress(bs.getSid().toString()));
 		packet.setPacketTo(bs.getDataReceiver());
 		packet.initVars(packet.getPacketFrom(), packet.getPacketTo());
@@ -148,7 +148,11 @@ public class BoshConnectionManager
 
 		sessions.remove(bs.getSid());
 
-		return addOutPacketWithTimeout(packet, stoppedHandler, 15l, TimeUnit.SECONDS);
+		if ( withTimeout ){
+			return addOutPacketWithTimeout( packet, stoppedHandler, 15l, TimeUnit.SECONDS );
+		} else {
+			return addOutPacket( packet );
+		}
 	}
 
 	@Override
