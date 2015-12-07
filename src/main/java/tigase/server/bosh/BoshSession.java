@@ -525,7 +525,7 @@ public class BoshSession {
 					if (userJid != null) {
 						Command.addFieldValue(command, "user-jid", userJid.toString());
 					}	
-					handler.addOutStreamClosed(command, this);
+					handler.addOutStreamClosed(command, this, true);
 
 					// out_results.offer(command);
 				}
@@ -581,7 +581,7 @@ public class BoshSession {
 					if (userJid != null) {
 						Command.addFieldValue(command, "user-jid", userJid.toString());
 					}
-					handler.addOutStreamClosed(command, this);
+					handler.addOutStreamClosed(command, this, true);
 				}
 			} else {
 				log.info("Duplicated packet: " + packet.toString());
@@ -613,14 +613,14 @@ public class BoshSession {
 				if (userJid != null) {
 					Command.addFieldValue(command, "user-jid", userJid.toString());
 				}	
-				handler.addOutStreamClosed(command, this);
+				handler.addOutStreamClosed(command, this, true);
 
 				command = Command.STREAM_FINISHED.getPacket(handler.getJidForBoshSession(this),
 						getDataReceiver(), StanzaType.set, UUID.randomUUID().toString());
 				if (userJid != null) {
 					Command.addFieldValue(command, "user-jid", userJid.toString());
 				}	
-				handler.addOutStreamClosed(command, this);
+				handler.addOutStreamClosed(command, this, false);
 				
 				// out_results.offer(command);
 			} catch (PacketErrorTypeException e) {
@@ -720,7 +720,7 @@ public class BoshSession {
 				Command.addFieldValue(command, "user-jid", userJid.toString());
 			}			
 
-			handler.addOutStreamClosed(command, this);
+			handler.addOutStreamClosed(command, this, true);
 
 			for (Element packet : waiting_packets) {
 				try {
@@ -751,7 +751,7 @@ public class BoshSession {
 				Command.addFieldValue(command, "user-jid", userJid.toString());
 			}			
 
-			handler.addOutStreamClosed(command, this);
+			handler.addOutStreamClosed(command, this, false);
 			
 			closeAllConnections();
 
