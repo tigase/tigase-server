@@ -82,9 +82,14 @@ class TigaseInstallerDBHelper {
 			{
 		ArrayList<String> results = new ArrayList<String>();
 		VariableSubstitutor vs = new VariableSubstitutor(variables);
-		BufferedReader br =
-			new BufferedReader(new
-					InputStreamReader(getResource(resource)));
+		BufferedReader br;
+
+		if ( res_prefix == null ){
+			br = new BufferedReader( new InputStreamReader( getResourcePath( resource ) ) );
+		} else {
+			br = new BufferedReader( new InputStreamReader( getResource( resource ) ) );
+		}
+
 		String line = null;
 		String sql_query = "";
 		SQL_LOAD_STATE state = SQL_LOAD_STATE.INIT;
@@ -97,6 +102,14 @@ class TigaseInstallerDBHelper {
 				}
 				if (line.startsWith("-- LOAD SCHEMA:")) {
 					results.addAll(loadSchemaQueries(res_prefix, variables));
+				}
+				if (  line.startsWith( "-- LOAD FILE:" )  && line.trim().contains( "sql" ) )
+				{
+					Matcher matcher = Pattern.compile( "-- LOAD FILE:\\s*(.*\\.sql)" ).matcher( line );
+					if ( matcher.find() ){
+						Debug.trace( String.format( "\n\n *** trying to load schema: %1$s \n", matcher.group( 1 ) ) );
+						results.addAll( loadSQLQueries(  matcher.group( 1 ), null, variables ) );
+					}
 				}
 				break;
 			case IN_SQL:
@@ -135,6 +148,21 @@ class TigaseInstallerDBHelper {
 		return results;
 			}
 
+
+	protected InputStream getResourcePath(String resource)
+	throws ResourceNotFoundException {
+
+
+		File f = new File( resource );
+		InputStream is = null;
+		try {
+			is = new FileInputStream( f );
+		} catch ( FileNotFoundException ex ) {
+			throw new ResourceNotFoundException("could not find: " + resource );
+		}
+		Debug.trace(String.format( "Getting resource: %1$s @ filename: %2$s",resource, f.getAbsolutePath() ));
+		return is;
+	}
 
 	protected InputStream getResource(String resource)
 	throws ResourceNotFoundException {
@@ -556,8 +584,9 @@ class TigaseInstallerDBHelper {
 						// Table does not exist
 						Statement stmt = conn.createStatement();
 
-						ArrayList<String> queries = loadSQLQueries(res_prefix + "-pubsub-schema", res_prefix, variables);
-						queries.addAll( loadSQLQueries(res_prefix + "-pubsub-schema-3-1", res_prefix, variables) );
+						ArrayList<String> queries;
+											queries = loadSQLQueries(res_prefix + "-pubsub-schema-3-1", res_prefix, variables);
+//						queries.addAll( loadSQLQueries(res_prefix + "-pubsub-schema-3-1", res_prefix, variables) );
 						for (String query : queries) {
 							if (!query.isEmpty()) {
 								Debug.trace("pubsub schema :: Executing query: " + query);
