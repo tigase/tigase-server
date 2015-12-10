@@ -105,10 +105,10 @@ class TigaseInstallerDBHelper {
 				}
 				if (  line.startsWith( "-- LOAD FILE:" )  && line.trim().contains( "sql" ) )
 				{
-					Matcher matcher = Pattern.compile( "-- LOAD FILE:\\s*(.*\\.sql)" ).matcher( line );
+					Matcher matcher = Pattern.compile( "-- LOAD FILE:.*" + res_prefix + "-(.*).sql" ).matcher( line );
 					if ( matcher.find() ){
-						Debug.trace( String.format( "\n\n *** trying to load schema: %1$s \n", matcher.group( 1 ) ) );
-						results.addAll( loadSQLQueries(  matcher.group( 1 ), null, variables ) );
+						Debug.trace( String.format( "\n\n *** trying to load schema: %1$s \t", matcher.group( 1 ) ) );
+						results.addAll( loadSQLQueries( res_prefix + "-" + matcher.group( 1 ), res_prefix, variables ) );
 					}
 				}
 				break;
@@ -155,12 +155,12 @@ class TigaseInstallerDBHelper {
 
 		File f = new File( resource );
 		InputStream is = null;
+		Debug.trace(String.format( "Getting resource: %1$s @ filename: %2$s",resource, f.getAbsolutePath() ));
 		try {
 			is = new FileInputStream( f );
 		} catch ( FileNotFoundException ex ) {
 			throw new ResourceNotFoundException("could not find: " + resource );
 		}
-		Debug.trace(String.format( "Getting resource: %1$s @ filename: %2$s",resource, f.getAbsolutePath() ));
 		return is;
 	}
 
