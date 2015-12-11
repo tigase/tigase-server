@@ -1000,6 +1000,9 @@ public class JDBCRepository
 		boolean keyViolation = false;
 		switch ( data_repo.getDatabaseType() ) {
 
+			case derby:
+				keyViolation = (sqlState.equals( "X0Y78" ));
+				break;
 			case postgresql:
 				keyViolation = (sqlState.equals( "23505" ) || sqlState.equals( "23000"));
 				break;

@@ -2403,7 +2403,7 @@ index 0000000..05cd89b
 +		}
 +		if (database.equals("derby")) {
 +			String derby_path = variablesSource.getVariable("DerbyDBPath");
-+			if (OsVersion.IS_WINDOWS) {
++			if (OsVersion.IS_WINDOWS && derby_path != null) {
 +				derby_path = derby_path.replace("\\", "\\\\");
 +			}
 +			db_uri += derby_path;
