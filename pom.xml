@@ -96,11 +96,18 @@
 							<source>1.8</source>
 							<quiet>true</quiet>
 							<aggregate>true</aggregate>
+							<includeDependencySources>true</includeDependencySources>
+							<dependencySourceIncludes>
+								<dependencySourceInclude>tigase:*</dependencySourceInclude>
+							</dependencySourceIncludes>
+
 							<reportOutputDirectory>${project.reporting.outputDirectory}/docs/javadoc</reportOutputDirectory>
 							<destDir>docs/javadoc</destDir>
 
 							<finalName>${project.artifactId}-${project.version}-b${gitVersion}</finalName>
 							<jarOutputDirectory>pack</jarOutputDirectory>
+
+							<additionalparam>-Xdoclint:none</additionalparam>
 						</configuration>
 					</execution>
 				</executions>
@@ -128,6 +135,12 @@
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-utils</artifactId>
+			<version>3.5.0-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>tigase</groupId>
+			<artifactId>tigase-xmltools</artifactId>
 			<version>3.5.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
