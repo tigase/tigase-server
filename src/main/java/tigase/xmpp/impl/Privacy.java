@@ -445,11 +445,13 @@ public class Privacy {
 		list_new.addChild(new Element(ITEM,new String[]{TYPE,ACTION,VALUE,ORDER},new String[]{"jid","deny",jid,"0"}));
 		if (list != null) {
 			List<Element> items = list.getChildren();
-			Collections.sort(items, JabberIqPrivacy.compar);
-			for (int i = 0; i < items.size(); i++) {
-				items.get(i).setAttribute(ORDER, "" + (i + 1));
+			if (items != null) {
+				Collections.sort(items, JabberIqPrivacy.compar);
+				for (int i = 0; i < items.size(); i++) {
+					items.get(i).setAttribute(ORDER, "" + (i + 1));
+				}
+				list_new.addChildren(items);
 			}
-			list_new.addChildren(items);
 		}
 		updateList(session, name, list_new);
 		return true;
@@ -463,11 +465,13 @@ public class Privacy {
 		
 		Element list_new = new Element(LIST,new String[]{NAME},new String[]{name});	
 		List<Element> items = list.findChildren(item -> !jid.equals(item.getAttributeStaticStr(VALUE)) || !isBlockItem(item));
-		Collections.sort(items, JabberIqPrivacy.compar);
-		for (int i=0; i<items.size(); i++) {
-			items.get(i).setAttribute(ORDER, "" + (i+1));
+		if (items != null) {
+			Collections.sort(items, JabberIqPrivacy.compar);
+			for (int i = 0; i < items.size(); i++) {
+				items.get(i).setAttribute(ORDER, "" + (i + 1));
+			}
+			list_new.addChildren(items);
 		}
-		list_new.addChildren(items);
 	
 		updateList(session, name, list_new);
 		
@@ -484,11 +488,13 @@ public class Privacy {
 		
 		Element list_new = new Element(LIST,new String[]{NAME},new String[]{name});			
 		List<Element> items = list.findChildren(item -> !isBlockItem(item));
-		Collections.sort(items, JabberIqPrivacy.compar);
-		for (int i=0; i<items.size(); i++) {
-			items.get(i).setAttribute(ORDER, "" + (i+1));
+		if (items != null) {
+			Collections.sort(items, JabberIqPrivacy.compar);
+			for (int i = 0; i < items.size(); i++) {
+				items.get(i).setAttribute(ORDER, "" + (i + 1));
+			}
+			list_new.addChildren(items);
 		}
-		list_new.addChildren(items);
 	
 		updateList(session, name, list_new);
 		
