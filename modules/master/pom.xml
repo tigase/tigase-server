@@ -62,6 +62,21 @@
 
 	<profiles>
 		<profile>
+			<id>doc</id>
+			<activation>
+				<property>
+					<name>doc</name>
+				</property>
+			</activation>
+			<modules>
+				<module>../documentation</module>
+			</modules>
+			<properties>
+				<maven.javadoc.skip>false</maven.javadoc.skip>
+				<packaging.type>bundle</packaging.type>
+			</properties>
+		</profile>
+		<profile>
 			<id>dist</id>
 			<activation>
 				<property>
@@ -69,11 +84,9 @@
 				</property>
 			</activation>
 			<modules>
-				<module>../documentation</module>
 				<module>../distribution</module>
 			</modules>
 			<properties>
-				<maven.javadoc.skip>false</maven.javadoc.skip>
 				<packaging.type>bundle</packaging.type>
 			</properties>
 		</profile>
