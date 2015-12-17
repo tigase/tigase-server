@@ -30,13 +30,6 @@ echo -e $TIGVER
 sed -e "s/<appversion>\([^<]*\)<\/appversion>/<appversion>$TIGVER<\/appversion>/" \
     src/main/izpack/install.xml > src/main/izpack/install_copy.xml
 
-#ant -verbose -f src/main/izpack/build.xml -Dinstaller.path=$IZPACK_DIR
-
-# generate javadocs
-export WINDOWTITLE=`grep -m 1 "javadoc-windowtitle=" build.properties | sed -e "s/javadoc-windowtitle=\(.*\)/\\1/"`
-export COPYRIGHT=`grep -m 1 "javadoc-copyright=" build.properties | sed -e "s/javadoc-copyright=\(.*\)/\\1/"`
-javadoc -d docs -sourcepath src/main/java/ -subpackages tigase -windowtitle "$WINDOWTITLE" -overview package.html -bottom "$COPYRIGHT" -use -author -version -protected
-
 # compile installer
 $IZPACK_DIR/bin/compile \
      src/main/izpack/install_copy.xml \

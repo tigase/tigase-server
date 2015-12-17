@@ -47,6 +47,9 @@ if [ ! -e $INSTALLER_DIR/$PATCHED_IZPACK_DIR/utils/wrappers/ ] ; then
 	cp -r $INSTALLER_DIR/$ORIGINAL_IZPACK_DIR/izpack-utils/src/main/resources/utils/wrappers $INSTALLER_DIR/$PATCHED_IZPACK_DIR/utils || exit -1
 fi
 
+# get dependencies
+mvn dependency:copy-dependencies -DoutputDirectory=${PWD}/jars -Dmdep.stripVersion=true
+
 # add tigase classes to installer build path
 mkdir $INSTALLER_DIR/$PATCHED_IZPACK_DIR/tigaseLib
 for tigase_lib in jars/tigase-server.jar jars/tigase-utils.jar jars/tigase-xmltools.jar
