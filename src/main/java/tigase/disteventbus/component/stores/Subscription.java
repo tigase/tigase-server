@@ -21,14 +21,6 @@ public class Subscription {
 		this.serviceJID = serviceJID;
 	}
 
-	public boolean isInClusterSubscription() {
-		return inClusterSubscription;
-	}
-
-	public void setInClusterSubscription(boolean inClusterSubscription) {
-		this.inClusterSubscription = inClusterSubscription;
-	}
-
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -64,6 +56,14 @@ public class Subscription {
 		int result = 1;
 		result = prime * result + ((jid == null) ? 0 : jid.hashCode());
 		return result;
+	}
+
+	public boolean isInClusterSubscription() {
+		return inClusterSubscription;
+	}
+
+	public void setInClusterSubscription(boolean inClusterSubscription) {
+		this.inClusterSubscription = inClusterSubscription;
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package tigase.disteventbus.impl;
+package tigase.disteventbus.xmlbus;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,11 +8,9 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import tigase.disteventbus.EventBus;
-import tigase.disteventbus.EventHandler;
 import tigase.xml.Element;
 
-public class LocalEventBus implements EventBus {
+public class DefaultXMLEventsBus implements XMLEventsBus {
 
 	public static final String EVENTBUS_INTERNAL_EVENTS_XMLNS = "tigase:eventbus:internal:events:0";
 	public static final String HANDLER_ADDED_EVENT_NAME = "HandlerAdded";
@@ -21,17 +19,9 @@ public class LocalEventBus implements EventBus {
 	private final EventsNameMap<EventHandler> handlers;
 	private Executor executor;
 
-	public LocalEventBus() {
+	public DefaultXMLEventsBus() {
 		setThreadPool(4);
 		handlers = createHandlersMap();
-	}
-
-	public Executor getExecutor() {
-		return executor;
-	}
-
-	public void setExecutor(Executor executor) {
-		this.executor = executor;
 	}
 
 	@Override
@@ -65,22 +55,6 @@ public class LocalEventBus implements EventBus {
 		doFireThreadPerHandler(name, xmlns, event, handlers);
 	}
 
-	private void doFireThreadPerHandler(final String name, final String xmlns, final Element event,
-			ArrayList<EventHandler> handlersList) {
-		for (EventHandler eventHandler : handlersList) {
-			Runnable task = () -> {
-				try {
-					eventHandler.onEvent(name, xmlns, event);
-				} catch (Throwable e) {
-					if (log.isLoggable(Level.WARNING))
-						log.log(Level.WARNING, "Problem during handling event name=" + name + ", xmlns=" + xmlns
-								+ " in handler " + eventHandler, e);
-				}
-			};
-			executor.execute(task);
-		}
-	}
-
 	private void doFireThreadPerEvent(final String name, final String xmlns, final Element event,
 			ArrayList<EventHandler> handlersList) {
 		Runnable task = () -> {
@@ -95,6 +69,22 @@ public class LocalEventBus implements EventBus {
 			}
 		};
 		executor.execute(task);
+	}
+
+	private void doFireThreadPerHandler(final String name, final String xmlns, final Element event,
+			ArrayList<EventHandler> handlersList) {
+		for (EventHandler eventHandler : handlersList) {
+			Runnable task = () -> {
+				try {
+					eventHandler.onEvent(name, xmlns, event);
+				} catch (Throwable e) {
+					if (log.isLoggable(Level.WARNING))
+						log.log(Level.WARNING, "Problem during handling event name=" + name + ", xmlns=" + xmlns
+								+ " in handler " + eventHandler, e);
+				}
+			};
+			executor.execute(task);
+		}
 	}
 
 	@Override
@@ -129,6 +119,14 @@ public class LocalEventBus implements EventBus {
 
 	public Set<EventName> getAllListenedEvents() {
 		return handlers.getAllListenedEvents();
+	}
+
+	public Executor getExecutor() {
+		return executor;
+	}
+
+	public void setExecutor(Executor executor) {
+		this.executor = executor;
 	}
 
 	protected Collection<EventHandler> getHandlersList(final String name, final String xmlns) {

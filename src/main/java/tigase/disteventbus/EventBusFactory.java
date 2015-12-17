@@ -1,10 +1,8 @@
 package tigase.disteventbus;
 
-import tigase.disteventbus.impl.LocalEventBus;
-
 public class EventBusFactory {
 
-	private final static LocalEventBus eventBus = new LocalEventBus();
+	private final static CombinedEventBus eventBus = new CombinedEventBus();
 
 	private EventBusFactory() {
 	}

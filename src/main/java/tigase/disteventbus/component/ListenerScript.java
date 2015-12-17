@@ -1,11 +1,6 @@
 package tigase.disteventbus.component;
 
-import javax.script.Bindings;
-import javax.script.Compilable;
-import javax.script.CompiledScript;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import javax.script.*;
 
 import tigase.disteventbus.EventBus;
 import tigase.disteventbus.EventHandler;

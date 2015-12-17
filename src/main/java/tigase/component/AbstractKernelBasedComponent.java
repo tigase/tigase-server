@@ -16,7 +16,10 @@ import tigase.conf.ConfigurationException;
 import tigase.disco.XMPPService;
 import tigase.disteventbus.EventBus;
 import tigase.disteventbus.EventBusFactory;
-import tigase.disteventbus.EventHandler;
+import tigase.disteventbus.objbus.Event;
+import tigase.disteventbus.objbus.EventListener;
+import tigase.disteventbus.objbus.ObjEventHandler;
+import tigase.disteventbus.xmlbus.EventHandler;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.BeanConfigurator;
@@ -43,11 +46,62 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 		}
 
 		@Override
+		public <H extends ObjEventHandler> void addHandler(Class<? extends Event<H>> type, H handler) {
+			eventBus.addHandler(type, handler);
+		}
+
+		@Override
+		public <H extends ObjEventHandler> void addHandler(Class<? extends Event<H>> type, Object source, H handler) {
+			eventBus.addHandler(type, source, handler);
+		}
+
+		@Override
+		public <H extends ObjEventHandler> void addListener(Class<? extends Event<H>> type, EventListener listener) {
+			eventBus.addListener(type, listener);
+		}
+
+		@Override
+		public <H extends ObjEventHandler> void addListener(Class<? extends Event<H>> type, Object source,
+				EventListener listener) {
+			eventBus.addListener(type, source, listener);
+		}
+
+		@Override
+		public <H extends ObjEventHandler> void addListener(EventListener listener) {
+			eventBus.addListener(listener);
+		}
+
+		@Override
 		public void fire(Element event) {
 			event.setAttribute("eventSource", getComponentId().toString());
 			event.setAttribute("eventTimestamp", Long.toString(System.currentTimeMillis()));
 
 			eventBus.fire(event);
+		}
+
+		@Override
+		public void fire(Event<?> e) {
+			eventBus.fire(e);
+		}
+
+		@Override
+		public void fire(Event<?> e, Object source) {
+			eventBus.fire(e, source);
+		}
+
+		@Override
+		public void remove(Class<? extends Event<?>> type, ObjEventHandler handler) {
+			eventBus.remove(type, handler);
+		}
+
+		@Override
+		public void remove(Class<? extends Event<?>> type, Object source, ObjEventHandler handler) {
+			eventBus.remove(type, source, handler);
+		}
+
+		@Override
+		public void remove(ObjEventHandler handler) {
+			eventBus.remove(handler);
 		}
 
 		@Override

@@ -1,4 +1,4 @@
-package tigase.disteventbus.impl;
+package tigase.disteventbus.xmlbus;
 
 import java.util.*;
 import java.util.Map.Entry;

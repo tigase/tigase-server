@@ -1,4 +1,4 @@
-package tigase.disteventbus.impl;
+package tigase.disteventbus.xmlbus;
 
 import static org.junit.Assert.*;
 
@@ -8,20 +8,19 @@ import java.util.concurrent.Executor;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
-import tigase.disteventbus.EventBus;
 import tigase.disteventbus.EventHandler;
 import tigase.xml.Element;
 
 /**
  * Created by bmalkow on 17.11.2015.
  */
-public class LocalEventBusTest {
+public class DefaultXMLEventsBusTest {
 
 	@Test
 	public void test01() {
 		final HashSet<String> results = new HashSet<>();
 
-		LocalEventBus eb = new LocalEventBus();
+		DefaultXMLEventsBus eb = new DefaultXMLEventsBus();
 		eb.setExecutor(new Executor() {
 			@Override
 			public void execute(Runnable command) {

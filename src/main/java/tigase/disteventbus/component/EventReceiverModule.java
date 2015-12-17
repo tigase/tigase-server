@@ -6,11 +6,11 @@ import java.util.logging.Level;
 
 import tigase.component.exceptions.ComponentException;
 import tigase.criteria.Criteria;
+import tigase.disteventbus.CombinedEventBus;
 import tigase.disteventbus.component.stores.Affiliation;
 import tigase.disteventbus.component.stores.AffiliationStore;
 import tigase.disteventbus.component.stores.Subscription;
 import tigase.disteventbus.component.stores.SubscriptionStore;
-import tigase.disteventbus.impl.LocalEventBus;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
@@ -31,7 +31,7 @@ public class EventReceiverModule extends AbstractEventBusModule {
 	private EventPublisherModule eventPublisherModule;
 
 	@Inject(nullAllowed = false, bean = "localEventBus")
-	private LocalEventBus localEventBus;
+	private CombinedEventBus localEventBus;
 
 	@Inject
 	private SubscriptionStore subscriptionStore;

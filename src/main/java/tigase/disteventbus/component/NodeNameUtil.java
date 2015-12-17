@@ -1,6 +1,6 @@
 package tigase.disteventbus.component;
 
-import tigase.disteventbus.impl.EventName;
+import tigase.disteventbus.xmlbus.EventName;
 
 public class NodeNameUtil {
 

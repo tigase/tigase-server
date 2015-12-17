@@ -1,4 +1,4 @@
-package tigase.disteventbus.impl;
+package tigase.disteventbus.xmlbus;
 
 import tigase.disteventbus.component.NodeNameUtil;
 

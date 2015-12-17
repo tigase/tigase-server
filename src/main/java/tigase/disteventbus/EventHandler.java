@@ -1,9 +1,11 @@
 package tigase.disteventbus;
 
-import tigase.xml.Element;
-
-public interface EventHandler {
-
-	void onEvent(String name, String xmlns, Element event);
+/**
+ *
+ * @deprecated Please use {@link tigase.disteventbus.xmlbus.EventHandler}
+ *             instead. This insterface is only for backward compatibility.
+ */
+@Deprecated
+public interface EventHandler extends tigase.disteventbus.xmlbus.EventHandler {
 
 }

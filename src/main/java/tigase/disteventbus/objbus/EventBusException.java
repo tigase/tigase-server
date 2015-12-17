@@ -1,13 +1,18 @@
-package tigase.disteventbus;
+package tigase.disteventbus.objbus;
 
 import java.util.Collection;
 
-public class FireEventException extends DistEventBusException {
+/**
+ * Exception collects all exceptions throwed by handlers or listeners during
+ * firing event. This exception is usually throwed after calling all listeners
+ * and handlers.
+ */
+public class EventBusException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 	private final Collection<Throwable> causes;
 
-	public FireEventException(Collection<Throwable> causes) {
+	public EventBusException(Collection<Throwable> causes) {
 		super(createMessage(causes), createThrowable(causes));
 		this.causes = causes;
 	}
@@ -48,7 +53,7 @@ public class FireEventException extends DistEventBusException {
 
 	/**
 	 * Returns collection of all Exceptions throwed by handlers or listeners.
-	 *
+	 * 
 	 * @return collection of Exceptions.
 	 */
 	public Collection<Throwable> getCauses() {

@@ -5,10 +5,10 @@ import java.util.logging.Level;
 
 import tigase.component.exceptions.ComponentException;
 import tigase.criteria.Criteria;
+import tigase.disteventbus.CombinedEventBus;
 import tigase.disteventbus.EventHandler;
 import tigase.disteventbus.component.stores.Subscription;
 import tigase.disteventbus.component.stores.SubscriptionStore;
-import tigase.disteventbus.impl.LocalEventBus;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
@@ -27,7 +27,7 @@ public class EventPublisherModule extends AbstractEventBusModule implements Init
 	@Inject
 	private EventBusComponent component;
 	@Inject(nullAllowed = false, bean = "localEventBus")
-	private LocalEventBus localEventBus;
+	private CombinedEventBus localEventBus;
 	@Inject
 	private SubscriptionStore subscriptionStore;
 	private final EventHandler eventBusEventFiredHandler = new EventHandler() {

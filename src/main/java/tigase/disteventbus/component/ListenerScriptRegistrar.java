@@ -21,11 +21,9 @@ import tigase.util.Base64;
 @Bean(name = "listenerScriptRegistrar")
 public class ListenerScriptRegistrar implements Initializable {
 
+	private final Map<String, ListenerScript> listenersScripts = new ConcurrentHashMap<String, ListenerScript>();
 	@Inject
 	private Kernel kernel;
-
-	private final Map<String, ListenerScript> listenersScripts = new ConcurrentHashMap<String, ListenerScript>();
-
 	@Inject(nullAllowed = false)
 	private ScriptEngineManager scriptEngineManager;
 

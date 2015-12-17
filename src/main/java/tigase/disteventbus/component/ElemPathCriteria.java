@@ -5,6 +5,14 @@ import tigase.xml.Element;
 
 public class ElemPathCriteria implements Criteria {
 
+	private final String[] names;
+	private final String[] xmlns;
+
+	public ElemPathCriteria(String[] elemNames, String[] namespaces) {
+		this.names = elemNames;
+		this.xmlns = namespaces;
+	}
+
 	public static void main(String[] args) {
 		// ElemPathCriteria c = new ElemPathCriteria(new String[] { "iq",
 		// "pubsub", "subscribe" }, new String[] { null,
@@ -22,15 +30,6 @@ public class ElemPathCriteria implements Criteria {
 
 		System.out.println(c.match(e));
 
-	}
-
-	private final String[] names;
-
-	private final String[] xmlns;
-
-	public ElemPathCriteria(String[] elemNames, String[] namespaces) {
-		this.names = elemNames;
-		this.xmlns = namespaces;
 	}
 
 	@Override

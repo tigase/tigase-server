@@ -75,7 +75,13 @@ public class TypesConverter {
 				return expectedType.cast(value);
 			}
 
-			if (expectedType.equals(File.class)) {
+			if (expectedType.equals(Class.class)) {
+				try {
+					return expectedType.cast(Class.forName(value.toString().trim()));
+				} catch (ClassNotFoundException e) {
+					throw new RuntimeException("Cannot convert to " + expectedType, e);
+				}
+			} else if (expectedType.equals(File.class)) {
 				return expectedType.cast(new File(value.toString().trim()));
 			} else if (expectedType.equals(Level.class)) {
 				return expectedType.cast(Level.parse(value.toString().trim()));

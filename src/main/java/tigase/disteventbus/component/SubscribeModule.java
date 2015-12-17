@@ -6,13 +6,14 @@ import java.util.logging.Level;
 import tigase.component.exceptions.ComponentException;
 import tigase.component.responses.AsyncCallback;
 import tigase.criteria.Criteria;
+import tigase.disteventbus.CombinedEventBus;
 import tigase.disteventbus.EventHandler;
 import tigase.disteventbus.component.stores.Affiliation;
 import tigase.disteventbus.component.stores.AffiliationStore;
 import tigase.disteventbus.component.stores.Subscription;
 import tigase.disteventbus.component.stores.SubscriptionStore;
-import tigase.disteventbus.impl.EventName;
-import tigase.disteventbus.impl.LocalEventBus;
+import tigase.disteventbus.xmlbus.DefaultXMLEventsBus;
+import tigase.disteventbus.xmlbus.EventName;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
@@ -39,28 +40,28 @@ public class SubscribeModule extends AbstractEventBusModule implements Initializ
 
 	private final EventHandler eventBusHandlerAddedHandler = new EventHandler() {
 
-		private final String[] NAME_PATH = new String[] { LocalEventBus.HANDLER_ADDED_EVENT_NAME, "name" };
-		private final String[] XMLNS_PATH = new String[] { LocalEventBus.HANDLER_ADDED_EVENT_NAME, "xmlns" };
+		private final String[] NAME_PATH = new String[] { DefaultXMLEventsBus.HANDLER_ADDED_EVENT_NAME, "name" };
+		private final String[] XMLNS_PATH = new String[] { DefaultXMLEventsBus.HANDLER_ADDED_EVENT_NAME, "xmlns" };
 
 		@Override
 		public void onEvent(String name, String xmlns, Element event) {
 			String n = event.getCData(NAME_PATH);
 			String x = event.getCData(XMLNS_PATH);
-			if (x == null || !x.equals(LocalEventBus.EVENTBUS_INTERNAL_EVENTS_XMLNS))
+			if (x == null || !x.equals(DefaultXMLEventsBus.EVENTBUS_INTERNAL_EVENTS_XMLNS))
 				SubscribeModule.this.onAddHandler(n, x);
 		}
 	};
 
 	@Inject(nullAllowed = false, bean = "localEventBus")
-	private LocalEventBus localEventBus;
+	private CombinedEventBus localEventBus;
 
 	@Inject
 	private SubscriptionStore subscriptionStore;
 
 	@Override
 	public void beforeUnregister() {
-		localEventBus.removeHandler(LocalEventBus.HANDLER_ADDED_EVENT_NAME, LocalEventBus.EVENTBUS_INTERNAL_EVENTS_XMLNS,
-				eventBusHandlerAddedHandler);
+		localEventBus.removeHandler(DefaultXMLEventsBus.HANDLER_ADDED_EVENT_NAME,
+				DefaultXMLEventsBus.EVENTBUS_INTERNAL_EVENTS_XMLNS, eventBusHandlerAddedHandler);
 	}
 
 	public void clusterNodeConnected(JID node) {
@@ -112,8 +113,8 @@ public class SubscribeModule extends AbstractEventBusModule implements Initializ
 
 	@Override
 	public void initialize() {
-		localEventBus.addHandler(LocalEventBus.HANDLER_ADDED_EVENT_NAME, LocalEventBus.EVENTBUS_INTERNAL_EVENTS_XMLNS,
-				eventBusHandlerAddedHandler);
+		localEventBus.addHandler(DefaultXMLEventsBus.HANDLER_ADDED_EVENT_NAME,
+				DefaultXMLEventsBus.EVENTBUS_INTERNAL_EVENTS_XMLNS, eventBusHandlerAddedHandler);
 	}
 
 	protected void onAddHandler(String eventName, String eventXmlns) {

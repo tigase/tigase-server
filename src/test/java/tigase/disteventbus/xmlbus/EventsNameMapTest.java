@@ -1,4 +1,4 @@
-package tigase.disteventbus.impl;
+package tigase.disteventbus.xmlbus;
 
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
