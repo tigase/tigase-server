@@ -1,6 +1,8 @@
 package tigase.monitor.tasks;
 
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import tigase.conf.ConfiguratorAbstract;
 import tigase.disteventbus.EventBus;
@@ -20,6 +22,7 @@ import tigase.xml.Element;
 public class ConnectionsTask extends AbstractConfigurableTimerTask implements InfoTask {
 
 	protected final static DateTimeFormatter dtf = new DateTimeFormatter();
+	protected static final Logger log = Logger.getLogger(ConnectionsTask.class.getName());
 	private static final String USERS_DISCONNECTEED_EVENT_NAME = "UsersDisconnected";
 	@Inject
 	protected MonitorComponent component;
@@ -49,7 +52,14 @@ public class ConnectionsTask extends AbstractConfigurableTimerTask implements In
 		final int delta = currentOnlineUsers - lastOnlineUsers;
 		final float percent = (lastOnlineUsers == 0 ? 1 : ((float) delta) / (float) lastOnlineUsers) * 100;
 
+		if (log.isLoggable(Level.FINE))
+			log.fine("Data: lastOnlineUsers=" + lastOnlineUsers + "; currentOnlineUsers=" + currentOnlineUsers + "; delta="
+					+ delta + "; percent=" + percent + "; thresholdMinimal=" + thresholdMinimal + "; threshold=" + threshold);
+
 		if (-1 * delta >= thresholdMinimal && -1 * percent >= threshold) {
+			if (log.isLoggable(Level.FINE))
+				log.fine("Creating event!");
+
 			Element event = new Element(USERS_DISCONNECTEED_EVENT_NAME, new String[] { "xmlns" },
 					new String[] { MonitorComponent.EVENTS_XMLNS });
 			event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
@@ -61,12 +71,19 @@ public class ConnectionsTask extends AbstractConfigurableTimerTask implements In
 			return null;
 	}
 
-	public int getThresholdMinimal() {
-		return thresholdMinimal;
+	@Override
+	public Form getCurrentConfiguration() {
+		Form x = super.getCurrentConfiguration();
+		x.addField(Field.fieldTextSingle("threshold", "" + threshold, "Percent of disconnected users"));
+		x.addField(Field.fieldTextSingle("thresholdMinimal", "" + thresholdMinimal, "Minimal amount of disconnected users"));
+		return x;
 	}
 
-	public void setThresholdMinimal(int thresholdMinimal) {
-		this.thresholdMinimal = thresholdMinimal;
+	@Override
+	public Form getTaskInfo() {
+		Form x = new Form("", "Task Info", "");
+		x.addField(Field.fieldTextSingle("lastUsersOnline", "" + lastOnlineUsers, "Last measured online users"));
+		return x;
 	}
 
 	public int getThreshold() {
@@ -77,15 +94,23 @@ public class ConnectionsTask extends AbstractConfigurableTimerTask implements In
 		this.threshold = threshold;
 	}
 
+	public int getThresholdMinimal() {
+		return thresholdMinimal;
+	}
+
+	public void setThresholdMinimal(int thresholdMinimal) {
+		this.thresholdMinimal = thresholdMinimal;
+	}
+
 	@Override
 	protected void run() {
+		if (log.isLoggable(Level.FINEST))
+			log.finest("Running task...");
+
 		ConfiguratorAbstract configurator = XMPPServer.getConfigurator();
 		SessionManager sess = (SessionManager) configurator.getComponent("sess-man");
 
 		final int currentOnlineUsers = sess.getOpenUsersConnectionsAmount();
-
-		final int delta = currentOnlineUsers - lastOnlineUsers;
-		final float percent = (lastOnlineUsers == 0 ? 1 : ((float) delta) / (float) lastOnlineUsers) * 100;
 
 		Element event = createAlarmEvent(currentOnlineUsers, lastOnlineUsers, thresholdMinimal, threshold);
 		if (event != null) {
@@ -109,20 +134,5 @@ public class ConnectionsTask extends AbstractConfigurableTimerTask implements In
 		}
 
 		super.setNewConfiguration(form);
-	}
-
-	@Override
-	public Form getCurrentConfiguration() {
-		Form x = super.getCurrentConfiguration();
-		x.addField(Field.fieldTextSingle("threshold", "" + threshold, "Percent of disconnected users"));
-		x.addField(Field.fieldTextSingle("thresholdMinimal", "" + thresholdMinimal, "Minimal amount of disconnected users"));
-		return x;
-	}
-
-	@Override
-	public Form getTaskInfo() {
-		Form x = new Form("", "Task Info", "");
-		x.addField(Field.fieldTextSingle("lastUsersOnline", "" + lastOnlineUsers, "Last measured online users"));
-		return x;
 	}
 }
