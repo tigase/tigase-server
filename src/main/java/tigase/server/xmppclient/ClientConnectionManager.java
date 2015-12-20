@@ -143,27 +143,12 @@ public class ClientConnectionManager
 			processCommand(packet);
 		} else {
 			if (!writePacketToSocket(packet)) {
-
+				
 				// Connection closed or broken, send message back to the SM
 				// if this is not IQ result...
 				// Ignore also all presence packets with available, unavailble
-				if ((packet.getType() != StanzaType.result) && (packet.getType() != StanzaType
-						.available) && (packet.getType() != StanzaType.unavailable) && (packet
-						.getType() != StanzaType.error) &&!((packet.getElemName() == "presence") &&
-						(packet.getType() == null))) {
-					try {
-						Packet error = Authorization.ITEM_NOT_FOUND.getResponseMessage(packet,
-								"The user connection is no longer active.", true);
-
-						addOutPacket(error);
-					} catch (PacketErrorTypeException e) {
-						if (log.isLoggable(Level.FINEST)) {
-							log.finest(
-									"Ups, already error packet. Dropping it to prevent infinite loop.");
-						}
-					}
-				}
-
+				processUndeliveredPacket(packet, null, "The user connection is no longer active.");
+				
 				// In case the SessionManager lost synchronization for any
 				// reason, let's
 				// notify it that the user connection no longer exists.
@@ -278,7 +263,7 @@ public class ClientConnectionManager
 	public boolean processUndeliveredPacket(Packet packet, Long stamp, String errorMessage) {
 		try {
 			// is there a point in trying to redeliver stanza of type error?
-			if (packet.getType() == StanzaType.error)
+			if (packet.getType() == StanzaType.error || packet.getType() == StanzaType.result)
 				return false;
 
 			// we should not send errors for presences as Presence module does not
@@ -326,14 +311,6 @@ public class ClientConnectionManager
 	@Override
 	public boolean serviceStopped(XMPPIOService<Object> service) {
 		boolean result = super.serviceStopped(service);
-
-		if (result) {
-			Queue<Packet> undeliveredPackets = service.getWaitingPackets();
-			Packet p = null;
-			while ((p = undeliveredPackets.poll()) != null) {
-				processUndeliveredPacket(p, null, null);
-			}
-		}
 
 		xmppStreamClosed(service);
 
