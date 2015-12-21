@@ -1,5 +1,7 @@
 package tigase.kernel.core;
 
+import java.util.logging.Logger;
+
 import tigase.kernel.KernelException;
 import tigase.kernel.Registrar;
 
@@ -28,17 +30,14 @@ import tigase.kernel.Registrar;
  */
 public class BeanConfigBuilder {
 
-	private BeanConfig beanConfig;
-
-	private Object beanInstance;
-
+	protected final Logger log = Logger.getLogger(this.getClass().getName());
 	private final String beanName;
-
 	private final DependencyManager dependencyManager;
-
-	private BeanConfig factoryBeanConfig;
-
 	private final Kernel kernel;
+	private BeanConfig beanConfig;
+	private Object beanInstance;
+	private BeanConfig factoryBeanConfig;
+	private Class<?> clazz;
 
 	BeanConfigBuilder(Kernel kernel, DependencyManager dependencyManager, String beanName) {
 		this.kernel = kernel;
@@ -54,6 +53,7 @@ public class BeanConfigBuilder {
 	 * @return {@link BeanConfigBuilder}.
 	 */
 	public BeanConfigBuilder asClass(Class<?> cls) {
+		this.clazz = cls;
 		if (this.beanConfig != null)
 			throwException(new KernelException("Class or instance is already defined for bean '" + beanName + "'"));
 
@@ -81,6 +81,12 @@ public class BeanConfigBuilder {
 	 * Finishing registration of bean.
 	 */
 	public void exec() {
+		if (beanConfig == null) {
+			log.warning(
+					"Bean class " + clazz + " cannot be registered, because Kernel cannot create configuration for this bean.");
+			return;
+		}
+
 		if (factoryBeanConfig != null) {
 			kernel.unregisterInt(factoryBeanConfig.getBeanName());
 			dependencyManager.register(factoryBeanConfig);
