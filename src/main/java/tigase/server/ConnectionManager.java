@@ -456,9 +456,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 * @param stamp - timestamp when packet was received to be written to XMPPIOService
 	 * @param errorMessage
 	 */
-	public boolean processUndeliveredPacket(Packet packet, Long stamp, String errorMessage) {
-		return false;
-	}
+	public abstract boolean processUndeliveredPacket(Packet packet, Long stamp, String errorMessage);
 
 	/**
 	 * Method description
@@ -549,6 +547,12 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 			if (result) {
 				--services_size;
+				
+				Queue<Packet> undeliveredPackets = service.getWaitingPackets();
+				Packet p = null;
+				while ((p = undeliveredPackets.poll()) != null) {
+					processUndeliveredPacket(p, null, null);
+				}
 			} else if (log.isLoggable(Level.FINER)) {
 
 				// Is it at all possible to happen???
@@ -651,14 +655,13 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				log.log(Level.FINEST, "{0}, Writing packet: {1}", new Object[] { ios, p });
 			}
 
-			// synchronized (ios) {
+			// if packet is added to waiting packets queue then we can assume it is sent
+			// as if it will fail it will be returned as error by serviceStopped method
 			ios.addPacketToSend(p);
 			if (ios.writeInProgress.tryLock()) {
 				try {
 					ios.processWaitingPackets();
 					SocketThread.addSocketService(ios);
-
-					return true;
 				} catch (Exception e) {
 					log.log(Level.WARNING, ios + "Exception during writing packets: ", e);
 					try {
@@ -669,10 +672,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				} finally {
 					ios.writeInProgress.unlock();
 				}
-			} else {
-				return true;
 			}
-
+			return true;
 		} else {
 			if (log.isLoggable(Level.FINE)) {
 				log.log(Level.FINE, "Can''t find service for packet: <{0}> {1}, service id: {2}",
