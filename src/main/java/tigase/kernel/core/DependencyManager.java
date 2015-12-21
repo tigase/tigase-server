@@ -1,20 +1,26 @@
 package tigase.kernel.core;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import tigase.kernel.beans.Inject;
 import tigase.kernel.core.BeanConfig.State;
 
 public class DependencyManager {
+
+	protected final Logger log = Logger.getLogger(this.getClass().getName());
+	private final Map<String, BeanConfig> beanConfigs = new HashMap<String, BeanConfig>();
+	private DependencyManager parent;
+	/**
+	 * if <code>true</code> then DependencyManager will throw exception if it
+	 * can't create beanConfig. If <code>false</code> then
+	 * {@link DependencyManager#createBeanConfig(Kernel, String, Class)} will
+	 * return null instead of BeanConfig.
+	 */
+	private boolean throwExceptionIfCannotCreate = false;
 
 	public static Field[] getAllFields(Class<?> klass) {
 		List<Field> fields = new ArrayList<Field>();
@@ -34,16 +40,22 @@ public class DependencyManager {
 			throw new RuntimeException("Unsupported dependecy type.");
 	}
 
-	private final Map<String, BeanConfig> beanConfigs = new HashMap<String, BeanConfig>();
-
-	private DependencyManager parent;
-
 	protected BeanConfig createBeanConfig(final Kernel kernel, final String beanName, final Class<?> beanClass) {
-		BeanConfig result = new BeanConfig(beanName, beanClass);
-		result.setKernel(kernel);
-		prepareDependencies(result);
+		try {
+			BeanConfig result = new BeanConfig(beanName, beanClass);
+			result.setKernel(kernel);
+			prepareDependencies(result);
+			return result;
+		} catch (Exception e2) {
+			log.log(Level.WARNING, "Cannot create bean config '" + beanName + "', type=" + beanClass.getName() + "  ("
+					+ e2.getClass().getName() + ": " + e2.getMessage() + ")");
 
-		return result;
+			if (throwExceptionIfCannotCreate) {
+				throw e2;
+			} else {
+				return null;
+			}
+		}
 	}
 
 	private Map<Field, Inject> createFieldsDependencyList(final Class<?> cls) {
@@ -131,8 +143,20 @@ public class DependencyManager {
 		return parent;
 	}
 
+	void setParent(DependencyManager parent) {
+		this.parent = parent;
+	}
+
 	public boolean isBeanClassRegistered(String beanName) {
 		return beanConfigs.containsKey(beanName);
+	}
+
+	public boolean isThrowExceptionIfCannotCreate() {
+		return throwExceptionIfCannotCreate;
+	}
+
+	public void setThrowExceptionIfCannotCreate(boolean throwExceptionIfCannotCreate) {
+		this.throwExceptionIfCannotCreate = throwExceptionIfCannotCreate;
 	}
 
 	protected void prepareDependencies(BeanConfig beanConfig) {
@@ -162,10 +186,6 @@ public class DependencyManager {
 		beanConfigs.put(factoryBeanConfig.getBeanName(), factoryBeanConfig);
 		factoryBeanConfig.setState(State.registered);
 
-	}
-
-	void setParent(DependencyManager parent) {
-		this.parent = parent;
 	}
 
 	public BeanConfig unregister(String beanName) {
