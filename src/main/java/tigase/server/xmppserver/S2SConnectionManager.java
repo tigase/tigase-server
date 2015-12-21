@@ -396,6 +396,14 @@ public class S2SConnectionManager
 	}
 
 	@Override
+	public boolean processUndeliveredPacket(Packet packet, Long stamp, String errorMessage) {
+		// readd packet - this may be good as we would retry to send packet 
+		// which delivery failed due to IO error
+		addPacket(packet);
+		return true;
+	}
+	
+	@Override
 	public void reconnectionFailed(Map<String, Object> port_props) {
 		CID cid = (CID) port_props.get("cid");
 

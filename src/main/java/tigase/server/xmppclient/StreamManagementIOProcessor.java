@@ -587,6 +587,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 			String id = (String) service.getSessionData().get(STREAM_ID_KEY);			
 			if (services.remove(id, service)) {
 				//service.getSessionData().put(SERVICE_STOP_ALLOWED_KEY, true);
+				service.clearWaitingPackets();
 				connectionManager.serviceStopped(service);
 				sendErrorsForQueuedPackets(service);
 			}
