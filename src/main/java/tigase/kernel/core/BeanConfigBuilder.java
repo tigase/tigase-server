@@ -82,8 +82,7 @@ public class BeanConfigBuilder {
 	 */
 	public void exec() {
 		if (beanConfig == null) {
-			log.warning(
-					"Bean class " + clazz + " cannot be registered, because Kernel cannot create configuration for this bean.");
+			log.warning("Bean " + clazz + " cannot be registered, because Kernel cannot create configuration for this bean.");
 			return;
 		}
 

@@ -46,12 +46,12 @@ public class DependencyManager {
 			result.setKernel(kernel);
 			prepareDependencies(result);
 			return result;
-		} catch (Exception e2) {
-			log.log(Level.WARNING, "Cannot create bean config '" + beanName + "', type=" + beanClass.getName() + "  ("
-					+ e2.getClass().getName() + ": " + e2.getMessage() + ")");
+		} catch (java.lang.NoClassDefFoundError e) {
+			log.log(Level.WARNING, "Cannot create bean config '" + beanName + "', type=" + beanClass.getName()
+					+ ". Bean requires unknown class " + e.getMessage());
 
 			if (throwExceptionIfCannotCreate) {
-				throw e2;
+				throw e;
 			} else {
 				return null;
 			}
