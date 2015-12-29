@@ -16,10 +16,9 @@ import tigase.conf.ConfigurationException;
 import tigase.disco.XMPPService;
 import tigase.disteventbus.EventBus;
 import tigase.disteventbus.EventBusFactory;
-import tigase.disteventbus.objbus.Event;
-import tigase.disteventbus.objbus.EventListener;
-import tigase.disteventbus.objbus.ObjEventHandler;
-import tigase.disteventbus.xmlbus.EventHandler;
+import tigase.disteventbus.local.Event;
+import tigase.disteventbus.local.EventHandler;
+import tigase.disteventbus.local.RegistrationException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.BeanConfigurator;
@@ -41,34 +40,18 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 		private final EventBus eventBus = EventBusFactory.getInstance();
 
 		@Override
-		public void addHandler(String name, String xmlns, EventHandler handler) {
+		public void addHandler(String name, String xmlns, tigase.disteventbus.clustered.EventHandler handler) {
 			eventBus.addHandler(name, xmlns, handler);
 		}
 
 		@Override
-		public <H extends ObjEventHandler> void addHandler(Class<? extends Event<H>> type, H handler) {
+		public void addHandler(Class<? extends Event> type, EventHandler handler) {
 			eventBus.addHandler(type, handler);
 		}
 
 		@Override
-		public <H extends ObjEventHandler> void addHandler(Class<? extends Event<H>> type, Object source, H handler) {
-			eventBus.addHandler(type, source, handler);
-		}
-
-		@Override
-		public <H extends ObjEventHandler> void addListener(Class<? extends Event<H>> type, EventListener listener) {
-			eventBus.addListener(type, listener);
-		}
-
-		@Override
-		public <H extends ObjEventHandler> void addListener(Class<? extends Event<H>> type, Object source,
-				EventListener listener) {
-			eventBus.addListener(type, source, listener);
-		}
-
-		@Override
-		public <H extends ObjEventHandler> void addListener(EventListener listener) {
-			eventBus.addListener(listener);
+		public void addHandler(EventHandler handler) {
+			eventBus.addHandler(handler);
 		}
 
 		@Override
@@ -80,34 +63,35 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 		}
 
 		@Override
-		public void fire(Event<?> e) {
+		public void fire(Event e) {
 			eventBus.fire(e);
 		}
 
 		@Override
-		public void fire(Event<?> e, Object source) {
-			eventBus.fire(e, source);
+		public void registerAll(Object consumer) throws RegistrationException {
+			eventBus.registerAll(consumer);
 		}
 
 		@Override
-		public void remove(Class<? extends Event<?>> type, ObjEventHandler handler) {
+		public void remove(Class<? extends Event> type, EventHandler handler) {
 			eventBus.remove(type, handler);
 		}
 
 		@Override
-		public void remove(Class<? extends Event<?>> type, Object source, ObjEventHandler handler) {
-			eventBus.remove(type, source, handler);
-		}
-
-		@Override
-		public void remove(ObjEventHandler handler) {
+		public void remove(EventHandler handler) {
 			eventBus.remove(handler);
 		}
 
 		@Override
-		public void removeHandler(String name, String xmlns, EventHandler handler) {
+		public void removeHandler(String name, String xmlns, tigase.disteventbus.clustered.EventHandler handler) {
 			eventBus.removeHandler(name, xmlns, handler);
 		}
+
+		@Override
+		public void unregisterAll(Object consumer) {
+			eventBus.unregisterAll(consumer);
+		}
+
 	};
 	private StanzaProcessor stanzaProcessor;
 

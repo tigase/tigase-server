@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import tigase.disteventbus.xmlbus.EventName;
+import tigase.disteventbus.clustered.EventName;
 
 public class NodeNameUtilTest {
 

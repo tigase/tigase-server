@@ -3,12 +3,12 @@ package tigase.disteventbus;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
-import tigase.disteventbus.objbus.DefaultObjectsEventsBus;
-import tigase.disteventbus.objbus.Event;
-import tigase.disteventbus.objbus.EventListener;
-import tigase.disteventbus.objbus.ObjEventHandler;
-import tigase.disteventbus.xmlbus.DefaultXMLEventsBus;
-import tigase.disteventbus.xmlbus.EventName;
+import tigase.disteventbus.clustered.DefaultClusteredEventsBus;
+import tigase.disteventbus.clustered.EventName;
+import tigase.disteventbus.local.DefaultLocalEventsBus;
+import tigase.disteventbus.local.Event;
+import tigase.disteventbus.local.EventHandler;
+import tigase.disteventbus.local.RegistrationException;
 import tigase.xml.Element;
 
 /**
@@ -16,38 +16,22 @@ import tigase.xml.Element;
  */
 public class CombinedEventBus implements EventBus {
 
-	private final DefaultObjectsEventsBus objectsEventsBus = new DefaultObjectsEventsBus();
-
-	private final DefaultXMLEventsBus xmlEventsBus = new DefaultXMLEventsBus();
+	private final DefaultLocalEventsBus objectsEventsBus = new DefaultLocalEventsBus();
+	private final DefaultClusteredEventsBus xmlEventsBus = new DefaultClusteredEventsBus();
 
 	@Override
-	public void addHandler(String name, String xmlns, tigase.disteventbus.xmlbus.EventHandler handler) {
+	public void addHandler(String name, String xmlns, tigase.disteventbus.clustered.EventHandler handler) {
 		xmlEventsBus.addHandler(name, xmlns, handler);
 	}
 
 	@Override
-	public <H extends ObjEventHandler> void addHandler(Class<? extends Event<H>> type, H handler) {
+	public void addHandler(Class<? extends Event> type, tigase.disteventbus.local.EventHandler handler) {
 		objectsEventsBus.addHandler(type, handler);
 	}
 
 	@Override
-	public <H extends ObjEventHandler> void addHandler(Class<? extends Event<H>> type, Object source, H handler) {
-		objectsEventsBus.addHandler(type, source, handler);
-	}
-
-	@Override
-	public <H extends ObjEventHandler> void addListener(Class<? extends Event<H>> type, EventListener listener) {
-		objectsEventsBus.addListener(type, listener);
-	}
-
-	@Override
-	public <H extends ObjEventHandler> void addListener(Class<? extends Event<H>> type, Object source, EventListener listener) {
-		objectsEventsBus.addListener(type, source, listener);
-	}
-
-	@Override
-	public <H extends ObjEventHandler> void addListener(EventListener listener) {
-		objectsEventsBus.addListener(listener);
+	public void addHandler(EventHandler handler) {
+		objectsEventsBus.addHandler(handler);
 	}
 
 	public void doFire(String name, String xmlns, Element event) {
@@ -55,18 +39,13 @@ public class CombinedEventBus implements EventBus {
 	}
 
 	@Override
+	public void fire(Event event) {
+		objectsEventsBus.fire(event);
+	}
+
+	@Override
 	public void fire(Element event) {
 		xmlEventsBus.fire(event);
-	}
-
-	@Override
-	public void fire(Event<?> e) {
-		objectsEventsBus.fire(e);
-	}
-
-	@Override
-	public void fire(Event<?> e, Object source) {
-		objectsEventsBus.fire(e, source);
 	}
 
 	public Set<EventName> getAllListenedEvents() {
@@ -86,26 +65,31 @@ public class CombinedEventBus implements EventBus {
 	}
 
 	@Override
-	public void remove(Class<? extends Event<?>> type, ObjEventHandler handler) {
-		objectsEventsBus.remove(type, handler);
+	public void registerAll(Object consumer) throws RegistrationException {
+		objectsEventsBus.registerAll(consumer);
 	}
 
 	@Override
-	public void remove(Class<? extends Event<?>> type, Object source, ObjEventHandler handler) {
-		objectsEventsBus.remove(type, source, handler);
-	}
-
-	@Override
-	public void remove(ObjEventHandler handler) {
+	public void remove(EventHandler handler) {
 		objectsEventsBus.remove(handler);
 	}
 
 	@Override
-	public void removeHandler(String name, String xmlns, tigase.disteventbus.xmlbus.EventHandler handler) {
+	public void remove(Class<? extends Event> type, EventHandler handler) {
+		objectsEventsBus.remove(type, handler);
+	}
+
+	@Override
+	public void removeHandler(String name, String xmlns, tigase.disteventbus.clustered.EventHandler handler) {
 		xmlEventsBus.removeHandler(name, xmlns, handler);
 	}
 
 	public void setThreadPool(int pool) {
 		xmlEventsBus.setThreadPool(pool);
+	}
+
+	@Override
+	public void unregisterAll(Object consumer) {
+		objectsEventsBus.unregisterAll(consumer);
 	}
 }

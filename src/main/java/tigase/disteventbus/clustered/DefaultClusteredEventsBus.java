@@ -1,4 +1,4 @@
-package tigase.disteventbus.xmlbus;
+package tigase.disteventbus.clustered;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 import tigase.xml.Element;
 
-public class DefaultXMLEventsBus implements XMLEventsBus {
+public class DefaultClusteredEventsBus implements EventsBus {
 
 	public static final String EVENTBUS_INTERNAL_EVENTS_XMLNS = "tigase:eventbus:internal:events:0";
 	public static final String HANDLER_ADDED_EVENT_NAME = "HandlerAdded";
@@ -19,7 +19,7 @@ public class DefaultXMLEventsBus implements XMLEventsBus {
 	private final EventsNameMap<EventHandler> handlers;
 	private Executor executor;
 
-	public DefaultXMLEventsBus() {
+	public DefaultClusteredEventsBus() {
 		setThreadPool(4);
 		handlers = createHandlersMap();
 	}

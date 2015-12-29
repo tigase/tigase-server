@@ -1,4 +1,4 @@
-package tigase.disteventbus.xmlbus;
+package tigase.disteventbus.clustered;
 
 import tigase.disteventbus.component.NodeNameUtil;
 

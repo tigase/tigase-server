@@ -3,7 +3,7 @@ package tigase.disteventbus.component;
 import javax.script.*;
 
 import tigase.disteventbus.EventBus;
-import tigase.disteventbus.EventHandler;
+import tigase.disteventbus.clustered.EventHandler;
 import tigase.kernel.core.Kernel;
 import tigase.xml.Element;
 

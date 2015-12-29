@@ -1,4 +1,4 @@
-package tigase.disteventbus.xmlbus;
+package tigase.disteventbus.clustered;
 
 import static org.junit.Assert.*;
 
@@ -14,13 +14,13 @@ import tigase.xml.Element;
 /**
  * Created by bmalkow on 17.11.2015.
  */
-public class DefaultXMLEventsBusTest {
+public class DefaultClusteredEventsBusTest {
 
 	@Test
 	public void test01() {
 		final HashSet<String> results = new HashSet<>();
 
-		DefaultXMLEventsBus eb = new DefaultXMLEventsBus();
+		DefaultClusteredEventsBus eb = new DefaultClusteredEventsBus();
 		eb.setExecutor(new Executor() {
 			@Override
 			public void execute(Runnable command) {

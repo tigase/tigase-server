@@ -1,4 +1,4 @@
-package tigase.disteventbus.objbus;
+package tigase.disteventbus.local;
 
 import java.util.Collection;
 

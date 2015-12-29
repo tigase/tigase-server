@@ -7,7 +7,8 @@ import org.junit.Test;
 
 import tigase.disteventbus.CombinedEventBus;
 import tigase.disteventbus.EventBus;
-import tigase.disteventbus.xmlbus.EventHandler;
+import tigase.disteventbus.local.Event;
+import tigase.disteventbus.local.EventHandler;
 import tigase.xml.Element;
 
 public class ClusterMapFactoryTest {
@@ -19,7 +20,7 @@ public class ClusterMapFactoryTest {
 		final EventBus eventBus = factory.getEventBus();
 
 		final Element[] createdEvent = new Element[] { null };
-		eventBus.addHandler("NewMapCreated", "tigase:clustered:map", new EventHandler() {
+		eventBus.addHandler("NewMapCreated", "tigase:clustered:map", new tigase.disteventbus.clustered.EventHandler() {
 			@Override
 			public void onEvent(String name, String xmlns, Element event) {
 				Assert.assertNull(createdEvent[0]);
@@ -42,7 +43,7 @@ public class ClusterMapFactoryTest {
 		final EventBus eventBus = factory.getEventBus();
 
 		final Element[] destroyedEvent = new Element[] { null };
-		eventBus.addHandler("MapDestroyed", "tigase:clustered:map", new EventHandler() {
+		eventBus.addHandler("MapDestroyed", "tigase:clustered:map", new tigase.disteventbus.clustered.EventHandler() {
 			@Override
 			public void onEvent(String name, String xmlns, Element event) {
 				Assert.assertNull(destroyedEvent[0]);
@@ -69,7 +70,7 @@ public class ClusterMapFactoryTest {
 
 		final Map<String, String> map = factory.createMap("test", String.class, String.class);
 
-		eventBus.addHandler("ElementAdd", "tigase:clustered:map", new EventHandler() {
+		eventBus.addHandler("ElementAdd", "tigase:clustered:map", new tigase.disteventbus.clustered.EventHandler() {
 			@Override
 			public void onEvent(String name, String xmlns, Element event) {
 				received[0] = true;
@@ -101,12 +102,13 @@ public class ClusterMapFactoryTest {
 		final EventBus eventBus = factory.getEventBus();
 
 		final Map[] maps = new Map[] { null };
-		eventBus.addHandler(MapCreatedEventHandler.MapCreatedEvent.class, new MapCreatedEventHandler() {
+		eventBus.addHandler(MapCreatedEvent.class, new EventHandler() {
 			@Override
-			public void onMapCreated(Map map, String type, String... parameters) {
-				maps[0] = map;
-				Assert.assertEquals("test", type);
-				Assert.assertArrayEquals(new String[] { "1", "2" }, parameters);
+			public void onEvent(Event event) {
+				MapCreatedEvent e = (MapCreatedEvent) event;
+				maps[0] = e.getMap();
+				Assert.assertEquals("test", e.getType());
+				Assert.assertArrayEquals(new String[] { "1", "2" }, e.getParameters());
 			}
 		});
 
@@ -151,10 +153,11 @@ public class ClusterMapFactoryTest {
 		Assert.assertEquals(0, maps[0].size());
 
 		final boolean[] received = new boolean[] { false };
-		eventBus.addHandler(MapDestroyedEventHandler.MapDestroyedEvent.class, new MapDestroyedEventHandler() {
+		eventBus.addHandler(MapDestroyedEvent.class, new EventHandler() {
 			@Override
-			public void onMapDestroyed(Map mapX, String type) {
-				Assert.assertEquals(maps[0], mapX);
+			public void onEvent(Event event) {
+				MapDestroyedEvent e = (MapDestroyedEvent) event;
+				Assert.assertEquals(maps[0], e.getMap());
 				received[0] = true;
 			}
 		});

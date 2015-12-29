@@ -10,8 +10,8 @@ import tigase.disteventbus.CombinedEventBus;
 import tigase.disteventbus.EventHandler;
 import tigase.disteventbus.component.stores.Subscription;
 import tigase.disteventbus.component.stores.SubscriptionStore;
-import tigase.disteventbus.xmlbus.DefaultXMLEventsBus;
-import tigase.disteventbus.xmlbus.EventName;
+import tigase.disteventbus.clustered.DefaultClusteredEventsBus;
+import tigase.disteventbus.clustered.EventName;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
@@ -36,14 +36,14 @@ public class UnsubscribeModule extends AbstractEventBusModule implements Initial
 	private CombinedEventBus localEventBus;
 	private final EventHandler eventBusHandlerRemovedHandler = new EventHandler() {
 
-		private final String[] NAME_PATH = new String[] { DefaultXMLEventsBus.HANDLER_REMOVED_EVENT_NAME, "name" };
-		private final String[] XMLNS_PATH = new String[] { DefaultXMLEventsBus.HANDLER_REMOVED_EVENT_NAME, "xmlns" };
+		private final String[] NAME_PATH = new String[] { DefaultClusteredEventsBus.HANDLER_REMOVED_EVENT_NAME, "name" };
+		private final String[] XMLNS_PATH = new String[] { DefaultClusteredEventsBus.HANDLER_REMOVED_EVENT_NAME, "xmlns" };
 
 		@Override
 		public void onEvent(String name, String xmlns, Element event) {
 			String n = event.getCData(NAME_PATH);
 			String x = event.getCData(XMLNS_PATH);
-			if (x == null || !x.equals(DefaultXMLEventsBus.EVENTBUS_INTERNAL_EVENTS_XMLNS))
+			if (x == null || !x.equals(DefaultClusteredEventsBus.EVENTBUS_INTERNAL_EVENTS_XMLNS))
 				UnsubscribeModule.this.onRemoveHandler(n, x);
 		}
 	};
@@ -52,8 +52,8 @@ public class UnsubscribeModule extends AbstractEventBusModule implements Initial
 
 	@Override
 	public void beforeUnregister() {
-		localEventBus.removeHandler(DefaultXMLEventsBus.HANDLER_REMOVED_EVENT_NAME,
-				DefaultXMLEventsBus.EVENTBUS_INTERNAL_EVENTS_XMLNS, eventBusHandlerRemovedHandler);
+		localEventBus.removeHandler(DefaultClusteredEventsBus.HANDLER_REMOVED_EVENT_NAME,
+				DefaultClusteredEventsBus.EVENTBUS_INTERNAL_EVENTS_XMLNS, eventBusHandlerRemovedHandler);
 	}
 
 	@Override
@@ -68,8 +68,8 @@ public class UnsubscribeModule extends AbstractEventBusModule implements Initial
 
 	@Override
 	public void initialize() {
-		localEventBus.addHandler(DefaultXMLEventsBus.HANDLER_REMOVED_EVENT_NAME,
-				DefaultXMLEventsBus.EVENTBUS_INTERNAL_EVENTS_XMLNS, eventBusHandlerRemovedHandler);
+		localEventBus.addHandler(DefaultClusteredEventsBus.HANDLER_REMOVED_EVENT_NAME,
+				DefaultClusteredEventsBus.EVENTBUS_INTERNAL_EVENTS_XMLNS, eventBusHandlerRemovedHandler);
 	}
 
 	protected void onRemoveHandler(String eventName, String eventXmlns) {
