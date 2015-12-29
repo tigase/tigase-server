@@ -78,6 +78,13 @@ public class JabberIqStats
 	//~--- methods --------------------------------------------------------------
 
 	@Override
+	public Authorization canHandle(Packet packet, XMPPResourceConnection conn) {
+		if (conn == null)
+			return null;
+		return super.canHandle(packet, conn);
+	}
+	
+	@Override
 	public String id() {
 		return ID;
 	}
