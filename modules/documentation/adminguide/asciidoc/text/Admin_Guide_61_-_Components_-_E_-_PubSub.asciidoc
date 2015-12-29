@@ -294,3 +294,40 @@ There is extension to filter returned list:
 </iq>
 -----
 In this example will be returned all subscriptions of users from domain "denmark.lit".
+
+[[storeFullXMLLastPresence]]
+Store Full XML of Last Presence
+--------------------------------
+A new feature has been implemented in v7.1.0 that allows Tigase to store a more detailed <unavailable/> presence stanza to include timestamps and other information.
+
+Requirements
+~~~~~~~~~~~~
+Ensure that +presence-offline+ plugin is enabled in init.properties.  To do this, add *+presence-offline* to the *--sm-plugins* line.
+
+The following two lines configure options to broadcast probes to offline users.
+-----
+sess-man/plugins-conf/skip-offline=false
+sess-man/plugins-conf/skip-offline-sys=false
+-----
+Without these lines, Tigase will not send presence probes to users that the server knows to be offline.
+
+The full XML presence is stored under the tig_pairs table with a pkey of +last-unavailable-presence+ will look like this:
+[source,xml]
+-----
+<presence from="user@example.com" xmlns="jabber:client" type="unavailable">
+<status>Logged out</status>
+<delay stamp="2015-12-29T16:51:50.748Z" xmlns="urn:xmpp:delay"/></presence>
+-----
+As you can see, the plugin has added a delay stamp which indicates the last time they were seen online. This may be suppressed by using the following line in your init.properties file.
+-----
+sess-man/plugins-conf/delay-stamp=false
+-----
+
+You may also limit probe responses only to newly connected resources.
+-----
+sess-man/plugins-conf/probe-full-jid=true
+-----
+
+When a user logs on, they will receive the same full unavailable presence statements from contacts not logged in.  Also the repository entry containing their last unavailable presence will be removed.
+
+*NOTE: This will increase traffic with users with many people on their rosters.*
