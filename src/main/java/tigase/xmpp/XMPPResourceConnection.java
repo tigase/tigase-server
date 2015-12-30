@@ -501,7 +501,11 @@ public class XMPPResourceConnection
 	public String toString() {
 		return "XMPPResourceConnection=[user_jid=" + userJid + ", packets=" + packets_counter + ", connectioId=" +
 				connectionId + ", domain=" + domain.getVhost().getDomain() + ", authState=" +
-				getAuthState().name() + ", isAnon=" + isAnonymous() + ", isTmp=" + isTmpSession() + "]";
+				getAuthState().name() + ", isAnon=" + isAnonymous()
+					 + ", isTmp=" + isTmpSession()
+					 + ", parentSession hash=" + System.identityHashCode( parentSession )
+					 + ", parentSession liveTime=" + (parentSession != null ? parentSession.getLiveTime() : "")
+					 + "]";
 	}
 
 	@Override

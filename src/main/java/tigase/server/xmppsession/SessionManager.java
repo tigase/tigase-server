@@ -73,13 +73,16 @@ import tigase.cert.CertificateEntry;
 import tigase.cert.CertificateUtil;
 import tigase.conf.Configurable;
 import tigase.conf.ConfigurationException;
+
 import tigase.db.AuthRepository;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.NonAuthUserRepositoryImpl;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
+
 import tigase.disco.XMPPService;
+
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Command;
 import tigase.server.Iq;
@@ -89,6 +92,7 @@ import tigase.server.Permissions;
 import tigase.server.ReceiverTimeoutHandler;
 import tigase.server.XMPPServer;
 import tigase.server.script.CommandIfc;
+
 import tigase.sys.OnlineJidsReporter;
 import tigase.sys.TigaseRuntime;
 import tigase.util.Base64;
@@ -98,6 +102,7 @@ import tigase.util.TigaseStringprepException;
 import tigase.util.WorkerThread;
 import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
+
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
@@ -120,7 +125,10 @@ import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
 import tigase.xmpp.impl.JabberIqRegister;
 import tigase.xmpp.impl.PresenceCapabilitiesManager;
 //~--- JDK imports ------------------------------------------------------------
+
 import tigase.stats.StatisticsList;
+
+import java.util.Collection;
 
 /**
  * Class SessionManager
@@ -1023,7 +1031,7 @@ public class SessionManager
 				}
 
 				JID         userJid         = JID.jidInstanceNS(userId);
-				XMPPSession sessionByUserId = sessionsByNodeId.get(userJid.getBareJID());
+				XMPPSession sessionByUserId = getSession(userJid.getBareJID());
 
 				if (sessionByUserId != null) {
 					connection = sessionByUserId.getResourceForConnectionId(connectionId);
@@ -1089,42 +1097,48 @@ public class SessionManager
 				JID userJid = conn.getJID();
 
 				if (log.isLoggable(Level.FINE)) {
-					log.log(Level.FINE, "Closing connection for: {0}", userJid);
+					log.log(Level.FINE, "Closing connection for: {0}, conn: {1}", new Object[] {userJid, conn});
 				}
 
-				XMPPSession session = conn.getParentSession();
+				XMPPSession sessionParent = conn.getParentSession();
 
-				if (session != null) {
+				if (sessionParent != null) {
 					if (log.isLoggable(Level.FINE)) {
 						log.log(Level.FINE, "Found parent session for: {0}", userJid);
 					}
 					// as we are closing this connection we should ensure that it is removed
 					// from list of active resources before going any further
-					session.removeResourceConnection(conn);
-					if (session.getActiveResourcesSize() <= 1) {
+					sessionParent.removeResourceConnection(conn);
+					if (sessionParent.getActiveResourcesSize() <= 1) {
 
 						// we should check if other this is the only connection on session
 						// as in some cases connection can be already removed from active
 						// resources but there might be other connection which is active
-						if ((session.getActiveResourcesSize() > 0) &&!session.getActiveResources()
+						if ((sessionParent.getActiveResourcesSize() > 0) &&!sessionParent.getActiveResources()
 								.contains(conn)) {
 							log.log(Level.FINE, "Session contains connection for other " +
 									"resource than: {0}, not removing session", userJid);
 							if (log.isLoggable(Level.FINER)) {
 								StringBuilder sb = new StringBuilder(100);
 
-								for (XMPPResourceConnection res_con : session.getActiveResources()) {
+								for (XMPPResourceConnection res_con : sessionParent.getActiveResources()) {
 									sb.append(", res=").append(res_con.getResource());
 								}
 								log.log(Level.FINER, "Number of connections is {0} for the user: {1}{2}",
-										new Object[] { session.getActiveResourcesSize(),
+										new Object[] { sessionParent.getActiveResourcesSize(),
 										userJid, sb.toString() });
 							}
 
 							return;
 						}
-						session = sessionsByNodeId.remove(userJid.getBareJID());
-						if (session == null) {
+
+						XMPPSession sessionFromMap = getSession( userJid.getBareJID());
+
+						if (sessionParent.equals( sessionFromMap ) && sessionFromMap.getActiveResources().isEmpty() ) {
+							sessionParent = sessionsByNodeId.remove(userJid.getBareJID());
+						}
+
+						if (sessionParent == null) {
 							log.log(Level.INFO, "UPS can't remove, session not found in map: {0}",
 									userJid);
 						} else {
@@ -1138,11 +1152,11 @@ public class SessionManager
 						if (log.isLoggable(Level.FINER)) {
 							StringBuilder sb = new StringBuilder(100);
 
-							for (XMPPResourceConnection res_con : session.getActiveResources()) {
+							for (XMPPResourceConnection res_con : sessionParent.getActiveResources()) {
 								sb.append(", res=").append(res_con.getResource());
 							}
 							log.log(Level.FINER, "Number of connections is {0} for the user: {1}{2}",
-									new Object[] { session.getActiveResourcesSize(),
+									new Object[] { sessionParent.getActiveResourcesSize(),
 									userJid, sb.toString() });
 						}
 					}    // end of else
@@ -2002,7 +2016,7 @@ public class SessionManager
 				return;
 			}
 
-			XMPPSession session = sessionsByNodeId.get(userId);
+			XMPPSession session = getSession(userId);
 
 			if (session == null) {
 				session = new XMPPSession(userId.getLocalpart());
