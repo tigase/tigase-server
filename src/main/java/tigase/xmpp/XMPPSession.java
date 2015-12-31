@@ -183,7 +183,8 @@ public class XMPPSession {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("XMPPSession=[");
-		sb.append("username: ").append(username);
+		sb.append( "hash=" + System.identityHashCode( this ) );
+		sb.append( ", username: " ).append( username );
 		sb.append(", resources: ").append(activeResources.toString());
 		sb.append("];");
 
