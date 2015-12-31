@@ -34,9 +34,9 @@ Arrays of strings are parameters, for example ID of user session.
 Once received, the distributed eventbus will create a local map.
 [source,java]
 -----
-eventBus.addHandler(MapCreatedEventHandler.MapCreatedEvent.class, new MapCreatedEventHandler() {
+eventBus.addHandler(MapCreatedEvent.class, new EventHandler<MapCreatedEvent>() {
     @Override
-    public void onMapCreated(Map map, String type, String... parameters) {
+    public void onEvent(MapCreatedEvent e) {
     }
 });
 -----
@@ -70,7 +70,7 @@ Changes to the map on one cluster will trigger +AddValue+ or +RemoveValue+ event
 Code to handle adding an item:
 [source,java]
 -----
-eventBus.addHandler(ElementAdd, tigase:clustered:map, new EventHandler() {
+eventBus.addHandler("ElementAdd", "tigase:clustered:map", new EventHandler() {
   @Override
   public void onEvent(String name, String xmlns, Element event) {
   });
@@ -93,7 +93,7 @@ This example removes an element from the cluster map.  Removal of items look sim
 with the code also being similar:
 [source,java]
 -----
-eventBus.addHandler(ElementRemove, tigase:clustered:map, new EventHandler() {
+eventBus.addHandler("ElementRemove", "tigase:clustered:map", new EventHandler() {
   @Override
   public void onEvent(String name, String xmlns, Element name) {
   });
@@ -113,9 +113,9 @@ Calling this, the map named clmap will be destroyed on each cluster node.
 The event handler will catch event when map is destroyed on another cluster node:
 [source,java]
 -----
-eventBus.addHandler(MapDestroyedEventHandler.MapDestroyedEvent.class, new MapDestroyedEventHandler() {
+eventBus.addHandler(MapDestroyedEvent.class, new EventHandler<MapDestroyedEvent>() {
     @Override
-    public void onMapDestroyed(Map mapX, String type) {
+    public void onEvent(MapDestroyedEvent event) {
     }
 });
 -----
