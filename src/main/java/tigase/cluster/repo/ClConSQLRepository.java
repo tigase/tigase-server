@@ -35,6 +35,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -120,13 +122,13 @@ public class ClConSQLRepository
 					+ CPU_USAGE_COLUMN + ", "
 					+ MEM_USAGE_COLUMN
 					+ ") "
-					+ " (select ?, ?, CURRENT_TIMESTAMP, ?, ?, ? from " + TABLE_NAME
+					+ " (select ?, ?, ?, ?, ?, ? from " + TABLE_NAME
 					+ " WHERE " + HOSTNAME_COLUMN + "=? HAVING count(*)=0)";
 	private static final String UPDATE_ITEM_QUERY =
 					"update " + TABLE_NAME + " set "
 					+ HOSTNAME_COLUMN + "= ?, "
 					+ PASSWORD_COLUMN + "= ?, "
-					+ LASTUPDATE_COLUMN + " = CURRENT_TIMESTAMP,"
+					+ LASTUPDATE_COLUMN + " = ?,"
 					+ PORT_COLUMN + "= ?, "
 					+ CPU_USAGE_COLUMN + "= ?, "
 					+ MEM_USAGE_COLUMN + "= ? "
@@ -211,24 +213,27 @@ public class ClConSQLRepository
 			PreparedStatement insertItemSt = data_repo.getPreparedStatement(null, INSERT_ITEM_QUERY);
 
 			// relatively most DB compliant UPSERT
+			Date date = new Date();
 
 			synchronized (updateItemSt) {
 				updateItemSt.setString(1, item.getHostname());
 				updateItemSt.setString(2, item.getPassword());
-				updateItemSt.setInt(3, item.getPortNo());
-				updateItemSt.setFloat(4, item.getCpuUsage());
-				updateItemSt.setFloat(5, item.getMemUsage());
-				updateItemSt.setString(6, item.getHostname());
+				updateItemSt.setTimestamp(3, new Timestamp(date.getTime()));
+				updateItemSt.setInt(4, item.getPortNo());
+				updateItemSt.setFloat(5, item.getCpuUsage());
+				updateItemSt.setFloat(6, item.getMemUsage());
+				updateItemSt.setString(7, item.getHostname());
 				updateItemSt.executeUpdate();
 			}
 
 			synchronized (insertItemSt) {
 				insertItemSt.setString(1, item.getHostname());
 				insertItemSt.setString(2, item.getPassword());
-				insertItemSt.setInt(3, item.getPortNo());
-				insertItemSt.setFloat(4, item.getCpuUsage());
-				insertItemSt.setFloat(5, item.getMemUsage());
-				insertItemSt.setString(6, item.getHostname());
+				insertItemSt.setTimestamp(3, new Timestamp(date.getTime()));
+				insertItemSt.setInt(4, item.getPortNo());
+				insertItemSt.setFloat(5, item.getCpuUsage());
+				insertItemSt.setFloat(6, item.getMemUsage());
+				insertItemSt.setString(7, item.getHostname());
 				insertItemSt.executeUpdate();
 			}
 
