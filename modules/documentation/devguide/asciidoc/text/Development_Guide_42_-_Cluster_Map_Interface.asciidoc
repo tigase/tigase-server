@@ -50,6 +50,7 @@ This will fire event MapCreatedEvent on all other cluster nodes. Strings "Very_I
 The event consumer code must know what to do with map with type "Very_Important_Map_In_User_Session". It may retrieve user session "user-session-identifier-123" and put this map in this session.
 It should be used to tell other nodes how to treat the event with a newly created map, and it should be stored in user session.
 
+<<<<<<< HEAD:modules/documentation/devguide/asciidoc/text/Development_Guide_xx_Cluster_Map_Interface.asciidoc
 Map Changes
 -----------
 Changes to the map on one cluster will trigger +AddValue+ or +RemoveValue+ events in eventbus.  Stanzas sent betweeen clusters will look something like this:
@@ -99,6 +100,8 @@ eventBus.addHandler(ElementRemove, tigase:clustered:map, new EventHandler() {
   });
 -----
 
+=======
+>>>>>>> e131a85... Added and cleaned EventBus API, Cluster Map Interface for Dev guide.  Promoted Eventbus Documentation in Administragion Guide.:modules/documentation/devguide/asciidoc/text/Development_Guide_42_-_Cluster_Map_Interface.asciidoc
 Map Destruction
 ---------------
 Java Garbage Collector will normally remove a local map if it is no longer used.  Clustered maps however are not removed in this manner.

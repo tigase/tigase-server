@@ -31,7 +31,7 @@ As with any component, don't forget to keep the numbering sequential and one num
 
 How it Works
 ------------
-Event in Eventbus is identified by two elements: name of event and namespace:
+Events in Eventbus are identified by two elements: name of event and namespace:
 [source, xml]
 -------
 <EventName xmlns="tigase:demo">
