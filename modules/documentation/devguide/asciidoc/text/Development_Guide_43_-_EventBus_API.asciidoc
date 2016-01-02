@@ -1,6 +1,6 @@
 [[eventBus]]
-Distributed EventBus in Tigase
-==============================
+EventBus API in Tigase
+======================
 :author: Bartosz Małkowski <bmalkowski@tigase.pl>
 :version: v1.0, December 2015.
 :date: 2015-12-29
@@ -10,24 +10,24 @@ Distributed EventBus in Tigase
 :numbered:
 :website: http://tigase.net/
 
-EventBus is a publish-subscribe mechanism which allows to use Event Listener Pattern in Tigase Server.
-  EventBus consists of two separated parts: Distributed EventBus and Local EventBus.
+EventBus is a custom publish-subscribe mechanism which allows for the use of Event Listener within Tigase Server.  EventBus consists of two separated parts: Distributed EventBus and Local EventBus.
+Local EventBus is only concerned with local event listener, and will operate events locally.  Distributed EventBus is designed to distribute events among cluster nodes.
+For a more detailed overview of EventBus and it's features, please visit link:http://docs.tigase.org/tigase-server/snapshot/Administration_Guide/html/#eventBus[The Administration Guide].
 
-To create instance of EventBus just do:
-
+EventBus API
+------------
+To create instance of EventBus use the following code:
 [source, xml]
 -------
 EventBus eventBus = EventBusFactory.getInstance();
 -------
 
-[NOTE]
-Remember, that EventBus is asynchronous. All handlers are called in different thread than thread what fired event.
+*NOTE:* Remember, that EventBus is asynchronous. All handlers are called in a different thread than the thread that initially fired the event.
 
 Distributed EventBus
 --------------------
-
 Distributed EventBus is designed to distribute events among cluster nodes.
-  Events must extends `tigase.xml.Element`:
+Events must extends `tigase.xml.Element`:
 
 [source, xml]
 -------
@@ -35,14 +35,12 @@ Distributed EventBus is designed to distribute events among cluster nodes.
   <sample_value>1</sample_value>
 </EventName>
 -------
-
 Events are identified by two elements: name of event and namespace.
 
 
 Registering events handlers
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-To catch and handle event (published in any node of cluster), first must be registered EventsHandler:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To catch and handle an event published in any node of cluster, EventsHandler must be registered first.
 
 [source, java]
 -------
@@ -57,15 +55,14 @@ eventBus.addHandler("EventName", "tigase:demo", handler);
 
 -------
 
-It is possible to register handler for all events with specific xmlns:
+It is possible to register handler for all events with a specific xmlns such as tigase:demo below:
 
 [source, java]
 -------
 eventBus.addHandler(null, "tigase:demo", handler);
 -------
 
-Events created on others cluster node, will have attribute `remote` set to `true`
-  and attribute `source` set to event creator node name:
+Events created on others cluster node, will have attribute `remote` set to `true` and attribute `source` set to event creator node name:
 
 [source, xml]
 -------
@@ -75,9 +72,9 @@ Events created on others cluster node, will have attribute `remote` set to `true
 -------
 
 Publishing events
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 
-The only limitation for events is requirements of name and xmlns. Internal structure is defined by programmer.
+The only limitation for events are the requirements of name and xmlns. Internal structure may be defined by programmer.
 
 [source, java]
 -------
@@ -87,8 +84,7 @@ event.addChild(new Element("sample_value", "1"));
 eventBus.fire(event);
 -------
 
-This event will be received by all handlers (registered for exactly this event or all events with this namespace) on all cluster nodes.
-  It is possible to limit event delivery only to current Tigase instance (current cluster node), by set attribute `local`:
+This event will be received by all handlers that are registered for exactly this event, or all events usint the *tigase:demo* namespace on all cluster nodes. It is possible to limit event delivery only to the current Tigase instance (current cluster node), by setting the attribute `local`:
 
 [source, java]
 -------
@@ -101,12 +97,10 @@ eventBus.fire(event);
 Local EventBus
 --------------
 
-Local EventBus is mechanism to distribute events to all listeners on the same instance of Tigase Server.
-It uses Java Objects as events and allows to transmit instance of object (for example `Map` or `Set`).
+Local EventBus is the mechanism to distribute events to all listeners on the same instance of Tigase Server.  Local EventBus uses Java Objects as events and allows for the transmission instance of object (for example `Map` or `Set`).
 
 Defining events and handlers classes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Local EventBus uses own structures of events and handlers.
 
 [source, java]
@@ -128,9 +122,9 @@ public static class SampleEvent implements Event {
 -------
 
 Registering events handlers
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To catch event, `EventHandler` must be registered in EventBus:
+To catch an event, `EventHandler` must be registered in EventBus:
 
 [source, java]
 -------
@@ -144,8 +138,7 @@ EventHandler handler = new EventHandler() {
 eventBus.addHandler(SampleEvent.class, handler);
 -------
 
-The other way to register handler is using annotations.
-Event consumer class must contains method with single parameter, and its type must be equals to expected event type.
+The other way to register a handler is by using annotations. Event consumer class must contain the method with a single parameter, and its type must be equal to expected event type.
 
 [source, java]
 .SampleConsumer.java
@@ -162,18 +155,17 @@ public static class SampleConsumer {
 }
 -------
 
-Instance of class must be registered in Eventbus:
+The instance of class must be registered in Eventbus:
 
 [source, java]
 -------
 eventBus.registerAll(consumer);
 -------
 
-Thanks to it, to EventBus will be added two events handler for two different events.
+Once this is in place, EventBus will be added as the event handler for two different events.
 
 Publishing events
-^^^^^^^^^^^^^^^^^
-
+~~~~~~~~~~~~~~~~~
 Publishing events is simple:
 
 [source, java]

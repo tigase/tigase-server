@@ -50,55 +50,6 @@ This will fire event MapCreatedEvent on all other cluster nodes. Strings "Very_I
 The event consumer code must know what to do with map with type "Very_Important_Map_In_User_Session". It may retrieve user session "user-session-identifier-123" and put this map in this session.
 It should be used to tell other nodes how to treat the event with a newly created map, and it should be stored in user session.
 
-Map Changes
------------
-Changes to the map on one cluster will trigger +AddValue+ or +RemoveValue+ events in eventbus.  Stanzas sent betweeen clusters will look something like this:
-[source,xml]
------
-<ElementAdd xmlns="tigase:clustered:map">
-  <uid>1-2-3</uid>
-  <item>
-    <key>xKEY</key>
-    <value>xVALUE</value>
-  </item>
-  <item>
-    <key>yKEY</key>
-    <value>yVALUE</value>
-  </item>
-</ElementAdd>
------
-Code to handle adding an item:
-[source,java]
------
-eventBus.addHandler("ElementAdd", "tigase:clustered:map", new EventHandler() {
-  @Override
-  public void onEvent(String name, String xmlns, Element event) {
-  });
------
-
-Where the element 'event' is the UID, and the name string is the name of the map key/value pair.
-
-
-This example removes an element from the cluster map.  Removal of items look similar:
-[source,xml]
------
-<ElementRemove xmlns="tigase:clustered:map">
-  <uid>1-2-3</uid>
-  <item>
-    <key>xKEY</key>
-    <value>xVALUE</value>
-  </item>
-</ElementRemove>
------
-with the code also being similar:
-[source,java]
------
-eventBus.addHandler("ElementRemove", "tigase:clustered:map", new EventHandler() {
-  @Override
-  public void onEvent(String name, String xmlns, Element name) {
-  });
------
-
 Map Destruction
 ---------------
 Java Garbage Collector will normally remove a local map if it is no longer used.  Clustered maps however are not removed in this manner.

@@ -60,6 +60,10 @@ include::text/Development_Guide_17_-_Configuration_API.asciidoc[]
 
 include::text/Development_Guide_18_-_Packet_Filtering_in_Component.asciidoc[]
 
+include::text/Development_Guide_43_-_EventBus_API.asciidoc[]
+
+include::text/Development_Guide_42_-_Cluster_Map_Interface.asciidoc[]
+
 :leveloffset: 1
 
 //plugins
