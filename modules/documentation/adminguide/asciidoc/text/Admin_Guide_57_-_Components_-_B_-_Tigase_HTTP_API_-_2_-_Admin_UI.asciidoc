@@ -126,6 +126,7 @@ Lists the longest and average connection time from clients to servers.
 Create Node
 ~~~~~~~~~~~
 This section allows you to create a new node for the pubsub component.  Here is a breakdown of the fields:
+
 - The node to create: this is the name of the node that will be created.
 - Owner JID: user JID who will be considered the owner of the node.
 - pubsub#node type: sets the type of node the the new node will be.  Options include:
@@ -302,16 +303,19 @@ Typically two entries will be seen for this entry, one for basic-conf and anothe
 
 basic-conf
 ^^^^^^^^^^
-This will prompt a list of nearly every component setting currently available in the Tigase installation.  They are broken down as follows:
-Component/catagory or setting/setting
+This will prompt a list of nearly every component setting currently available in the Tigase installation.  They are broken down as follows: +
+*Component/catagory or setting/setting* +
 So for example, if you wanted to change admins for the eventbus component, you will select 'eventbus/admins'.
+
 Another example might be if you wanted to turn on or off a task in monitor component, lets say disk-checker-task, you would find 'monitor/disk-checker-task/enabled'.
+
 Clicking Submit query will show current status and settings, and possible fields to change.  Most changes done in this manner will be reset to default or as written in init.properties file on server restart.
 
 
 vhost-man
 ^^^^^^^^^
 You will be presented with a list of domains that Tigase is currently hosting, you will be able to change settings for one domain at a time using this function.  Once a domain is selected, you will be able to set or change the following settings:
+
 - Domain name: the full domain name of the new vhost.  Tigase will not add anything to this domain, so if it is ti be a subdomain of example.com, you will need to enter sub.domain.com.
 - Enabled: Whether the domain is turned on or off.
 - Anonymous enabled: Allow anonymous logins.
@@ -358,6 +362,7 @@ This section allows admins to edit individual users rosters, although it provide
 Update user roster entry extended version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This section is an expanded version of the previous one, all fields already specified are the same with these additions:
+
 - Roster owner name: A friendly name or nickname if you wish to change/create one. *not required*
 - Comma separated of owner groups: Groups that the user wants to join/leave. *not required*
 - Roster item JID: The specific JID that needs to be edited.

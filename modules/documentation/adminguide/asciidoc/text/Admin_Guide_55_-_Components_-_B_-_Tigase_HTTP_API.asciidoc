@@ -95,45 +95,6 @@ http/dns-webservice/active[B]=true
 ----
 Assuming that comp-name for the class is +http+
 
-Use of the HTTP API
--------------------
-To begin using the HTTP API, point a browser to the following url
-http://your.server.domain:8080/ui/ and you will be presented with the following image to login with.
-
-image:images/http-login.jpg[]
-
-Use your admin-level XMPP id and it's password to login.  Please use bare JID for logins.
-
-*NOTE: Normal users can login here as well to use chat and basic functions, but they will not have admin privileges as shown in this guide*
-
-Browser interface walk-through
-------------------------------
-
-Chat
-~~~~
-Chat is the first window that you will see after logging in.  It's quite bare here since there is no roster to speak of.  If you had a roster, users would be shown.
-Lets add a user.  Click the user add icon, and then fill in the fields below.
-
-image:images/http-add-new.jpg[]
-
-Once both users have added and authorized each other's roster listing, the users and groups will be shown on the left, with the right side being used for chat functionality.
-
-image:images/http-chat.jpg[]
-
-Discovery
-~~~~~~~~~
-The Discovery tab encapsulates the service discovery function of XMPP servers, and will provide a list of available services. Clicking on the service will give you options for executing commands, checking settings, MUC rooms and more.
-
-Management
-~~~~~~~~~~
-The Management tab is your administration and settings tool for the XMPP server.  Here you can change settings, add and remove users, send server-wide notifications, write and execute scripts, and even obtain server statistics at a glance.
-
-*NOTE: some changes to settings may be instant, and others require a server restart*
-
-Statistics
-~~~~~~~~~~
-The statistics tab lists all running components in the server.
-
 HTTP API Scripting
 ------------------
 Scripts in the HTTP API component are used for processing all of requests.

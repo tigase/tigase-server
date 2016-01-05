@@ -164,10 +164,6 @@ include::text/Admin_Guide_53_-_Components.asciidoc[]
 
 include::text/Admin_Guide_54_-_Components_-_A_-_StanzaSender.asciidoc[]
 
-include::text/Admin_Guide_55_-_Components_-_B_-_Tigase_HTTP_API.asciidoc[]
-
-:leveloffset: 3
-
 include::text/Admin_Guide_56_-_Components_-_B_-_Tigase_HTTP_API_-_1_-_REST_API_Guide.asciidoc[]
 
 include::text/Admin_Guide_57_-_Components_-_B_-_Tigase_HTTP_API_-_2_-_Admin_UI.asciidoc[]
