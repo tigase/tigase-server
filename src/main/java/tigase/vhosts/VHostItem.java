@@ -612,7 +612,8 @@ public class VHostItem
 			if (domainFilter == null) {
 				domainFilter = DomainFilterPolicy.valueof(System.getProperty(
 						DOMAIN_FILTER_POLICY_PROP_KEY, DOMAIN_FILTER_POLICY_PROP_DEF.toString()));
-			} else if (domainFilter == DomainFilterPolicy.LIST || domainFilter == DomainFilterPolicy.BLACKLIST) {
+			} else if (domainFilter == DomainFilterPolicy.LIST || domainFilter == DomainFilterPolicy.BLACKLIST
+					|| domainFilter == DomainFilterPolicy.CUSTOM) {
 				tmp = Command.getFieldValue(packet, DOMAIN_FILTER_POLICY_DOMAINS_LABEL);
 				if ( tmp != null && !tmp.trim().isEmpty() ){
 					domainFilterDomains = StringUtilities.stringToArrayOfString( tmp, ";" );

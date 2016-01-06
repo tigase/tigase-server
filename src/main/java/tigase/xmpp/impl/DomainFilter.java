@@ -74,6 +74,8 @@ public class DomainFilter
 
 	/** default local hostname */
 	private static String local_hostname;
+	
+	private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
 	@Override
 	public void filter(Packet packet, XMPPResourceConnection session,
@@ -591,6 +593,8 @@ public class DomainFilter
 																 new Object[] { domainsList != null? Arrays.asList( domainsList) : "", domain } );
 				}
 			}
+			if (domainsList == null)
+				domainsList = EMPTY_STRING_ARRAY;
 			session.putCommonSessionData( ALLOWED_DOMAINS_LIST_KEY, domainsList );
 		}
 
