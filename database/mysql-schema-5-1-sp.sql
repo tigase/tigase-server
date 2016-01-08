@@ -30,6 +30,10 @@ source database/mysql-schema-4-sp.sql;
 drop procedure if exists TigUpdatePairs;
 -- QUERY END:
  
+-- QUERY START:
+drop procedure if exists TigUserLogout;
+-- QUERY END:
+ 
 delimiter //
 
 -- QUERY START:
@@ -42,6 +46,17 @@ begin
   ELSE
     INSERT INTO tig_pairs (nid, uid, pkey, pval) VALUES (_nid, _uid, _tkey, _tval);
   END IF;
+end //
+-- QUERY END:
+
+-- QUERY START:
+-- It decreases online_status and sets last_logout time to the current timestamp
+create procedure TigUserLogout(_user_id varchar(2049) CHARSET utf8)
+begin
+	update tig_users
+		set online_status = greatest(online_status - 1, 0),
+			last_logout = CURRENT_TIMESTAMP
+		where sha1_user_id = sha1(lower(_user_id));
 end //
 -- QUERY END:
 
