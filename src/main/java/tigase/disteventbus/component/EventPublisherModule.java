@@ -115,7 +115,7 @@ public class EventPublisherModule extends AbstractEventBusModule implements Init
 
 				String from;
 				if (subscriber.getServiceJID() == null) {
-					from = component.toString();
+					from = component.getComponentId().toString();
 				} else {
 					from = subscriber.getServiceJID().toString();
 				}

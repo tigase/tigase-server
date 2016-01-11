@@ -80,6 +80,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.script.ScriptEngineFactory;
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
+import tigase.disteventbus.EventBusFactory;
 
 /**
  * Created: Oct 17, 2009 7:49:05 PM
@@ -287,6 +288,7 @@ public class BasicComponent
 		binds.put(CommandIfc.CONNECTED_NODES_WITH_LOCAL, connectedNodesWithLocal);
 		binds.put(CommandIfc.COMPONENT_NAME, getName());
 		binds.put(CommandIfc.COMPONENT, this);
+		binds.put(CommandIfc.EVENTBUS, EventBusFactory.getInstance());
 	}
 
 	@Override

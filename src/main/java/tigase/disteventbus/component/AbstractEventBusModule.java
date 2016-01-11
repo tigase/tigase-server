@@ -1,12 +1,14 @@
 package tigase.disteventbus.component;
 
 import tigase.component.modules.AbstractModule;
+import tigase.kernel.beans.Inject;
 import tigase.xmpp.JID;
 
 public abstract class AbstractEventBusModule extends AbstractModule {
 
 	private static long id = 0;
 
+	@Inject
 	private EventBusComponent component;
 
 	protected boolean isClusteredEventBus(final JID jid) {

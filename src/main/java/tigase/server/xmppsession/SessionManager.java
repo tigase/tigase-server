@@ -129,6 +129,9 @@ import tigase.xmpp.impl.PresenceCapabilitiesManager;
 import tigase.stats.StatisticsList;
 
 import java.util.Collection;
+import tigase.disteventbus.EventBus;
+import tigase.disteventbus.EventBusFactory;
+import tigase.disteventbus.clustered.EventHandler;
 
 /**
  * Class SessionManager
@@ -160,6 +163,7 @@ public class SessionManager
 	private DefaultHandlerProc               defHandlerProc                  = null;
 	private PacketDefaultHandler             defPacketHandler                = null;
 	private String                           defPluginsThreadsPool = "default-threads-pool";
+	private EventBus						 eventBus						 = EventBusFactory.getInstance();
 	private boolean                          forceDetailStaleConnectionCheck = true;
 	private int                              maxIdx                          = 100;
 	private int                              maxUserConnections              = 0;
@@ -223,6 +227,12 @@ public class SessionManager
 			new ConcurrentHashMap<JID, XMPPResourceConnection>(100000);
 	private int activeUserNumber = 0;
 
+	private EventHandler shutdownEventHandler = (String name, String xmlns, Element event) -> {
+		nodeShutdown(event.getAttributeStaticStr("node"), Integer.parseInt(event.getAttributeStaticStr("delay")), 
+				event.getChildCData((e) -> e.getName().equals("msg")));
+	};
+	private NodeShutdownTask nodeShutdownTask = new NodeShutdownTask();
+	
 	//~--- methods --------------------------------------------------------------
 
 	@Override
@@ -571,7 +581,14 @@ public class SessionManager
 	}
 
 	@Override
+	public void start() {
+		super.start();
+		eventBus.addHandler("shutdown", "tigase:server", shutdownEventHandler);
+	}
+	
+	@Override
 	public void stop() {
+		eventBus.removeHandler("shutdown", "tigase:server", shutdownEventHandler);
 		super.stop();
 		List<String> pluginsToStop = new ArrayList<String>(workerThreads.keySet());
 		for (String plugin_id : pluginsToStop) {
@@ -2100,6 +2117,37 @@ public class SessionManager
 		}
 	}
 
+	@Override
+	public int schedulerThreads() {
+		return 2;
+	}
+
+	protected void nodeShutdown(String node, int delaySecs, String msg) {
+		// if not this node is being shutdown then do nothing
+		if (!node.equals(getComponentId().getDomain()))
+			return;
+		
+		if (msg != null) {
+			Element msgEl = new Element("message", new String[] { Packet.XMLNS_ATT }, new String[] { Packet.CLIENT_XMLNS });
+			msgEl.addChild(new Element("body", msg));
+			for (XMPPResourceConnection conn : connectionsByFrom.values()) {
+				try {
+					Element packetEl = msgEl.clone();
+					packetEl.setAttribute("from", conn.getDomainAsJID().getDomain());
+					packetEl.setAttribute("to", conn.getJID().toString());
+					Packet packet = Packet.packetInstance(msgEl, conn.getDomainAsJID(), conn.getJID());
+					addPacket(packet);
+				} catch (NotAuthorizedException ex) {
+					log.log(Level.FINEST, "could not deliver notification about shutdown as session is not authorized", ex);
+				}
+			}
+		}
+		
+		// schedule close of existing session after 30 seconds to make sure that
+		// other components will be aware that we are stopping this server
+		addTimerTask(nodeShutdownTask, delaySecs * SECOND, 1 * SECOND);
+	}
+	
 	//~--- get methods ----------------------------------------------------------
 
 	public Map<String, XMPPProcessorIfc> getProcessors() {
@@ -2117,8 +2165,6 @@ public class SessionManager
 	public Map<String, XMPPPacketFilterIfc> getOutFilters() {
 		return Collections.unmodifiableMap(outFilters);
 	}
-
-	
 	
 	@Override
 	protected Integer getMaxQueueSize(int def) {
@@ -2525,7 +2571,29 @@ public class SessionManager
 		}
 	}
 
+	private class NodeShutdownTask extends tigase.util.TimerTask {
 
+		@Override
+		public void run() {
+			// we are stopping server so let's check if all session are closed
+			if (sessionsByNodeId.isEmpty() || (sessionsByNodeId.size() == 1 && sessionsByNodeId.get(getComponentId().getBareJID()) != null)) {
+				log.log(Level.INFO, "shutdown - stopping JVM");
+				System.exit(0);
+			} else {
+				log.log(Level.INFO, "shutdown - still waiting for {0} to be closed", sessionsByNodeId.size());
+				if (log.isLoggable(Level.FINEST)) {
+					StringBuilder sb = new StringBuilder();
+					for (XMPPSession session : sessionsByNodeId.values()) {
+						sb.append("\n\t");
+						sb.append(session.toString());
+					}
+					log.log(Level.FINEST, "shutdown - waiting for following sessions:{0}", sb.toString());
+				}
+			}
+		}
+	
+	}
+	
 	private class ProcessorWorkerThread
 					extends WorkerThread {
 		private ArrayDeque<Packet> local_results = new ArrayDeque<Packet>(100);

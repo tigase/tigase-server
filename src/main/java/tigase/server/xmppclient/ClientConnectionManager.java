@@ -44,6 +44,9 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import tigase.conf.ConfigurationException;
+import tigase.disteventbus.EventBus;
+import tigase.disteventbus.EventBusFactory;
+import tigase.disteventbus.clustered.EventHandler;
 import tigase.net.IOService;
 import tigase.net.SocketThread;
 import tigase.net.SocketType;
@@ -58,6 +61,7 @@ import tigase.util.Base64;
 import tigase.util.DNSResolver;
 import tigase.util.RoutingsContainer;
 import tigase.util.TigaseStringprepException;
+import tigase.util.TimerTask;
 import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
@@ -120,7 +124,13 @@ public class ClientConnectionManager
 	private IPMonitor                       ipMonitor = new IPMonitor();
 	private final ClientTrustManagerFactory clientTrustManagerFactory =
 			new ClientTrustManagerFactory();
+	private final EventBus eventBus = EventBusFactory.getInstance();
 	private boolean tlsWantClientAuthEnabled = TLS_WANT_CLIENT_AUTH_ENABLED_DEF;
+	private final EventHandler shutdownEventHandler = (String name, String xmlns, Element event) -> {
+		String node = event.getAttributeStaticStr("node");
+		nodeShutdown(node, Integer.parseInt(event.getAttributeStaticStr("delay")));
+	};
+	private final ShutdownTask shutdownTask = new ShutdownTask();
 
 	//~--- methods --------------------------------------------------------------
 
@@ -316,16 +326,18 @@ public class ClientConnectionManager
 
 		return result;
 	}
-
+	
 	@Override
 	public void start() {
 		super.start();
 		ipMonitor = new IPMonitor();
 		ipMonitor.start();
+		eventBus.addHandler("shutdown", "tigase:server", shutdownEventHandler);
 	}
 
 	@Override
 	public void stop() {
+		eventBus.removeHandler("shutdown", "tigase:server", shutdownEventHandler);
 		super.stop();
 		ipMonitor.stopThread();
 	}
@@ -513,7 +525,7 @@ public class ClientConnectionManager
 		String see_other_host_class = (String) params.get(SeeOtherHostIfc
 				.CM_SEE_OTHER_HOST_CLASS_PROPERTY);
 
-		see_other_host_strategy = getSeeOtherHostInstance(see_other_host_class);
+		SeeOtherHostIfc see_other_host_strategy = getSeeOtherHostInstance(see_other_host_class);
 		props.put(SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_KEY, see_other_host_class);
 		if (see_other_host_strategy != null) {
 			see_other_host_strategy.getDefaults(props, params);
@@ -602,9 +614,13 @@ public class ClientConnectionManager
 		String see_other_host_class = (String) props.get(SeeOtherHostIfc
 				.CM_SEE_OTHER_HOST_CLASS_PROP_KEY);
 
+		if (see_other_host_strategy != null) {
+			see_other_host_strategy.stop();
+		}
 		see_other_host_strategy = getSeeOtherHostInstance(see_other_host_class);
 		if (see_other_host_strategy != null) {
 			see_other_host_strategy.setProperties(props);
+			see_other_host_strategy.start();
 		}
 
 		boolean routing_mode = (Boolean) props.get(ROUTINGS_PROP_KEY + "/" +
@@ -694,6 +710,13 @@ public class ClientConnectionManager
 		return new StoppedHandler();
 	}
 
+	protected void nodeShutdown(String node, int delaySecs) {
+		if (node == null || !getComponentId().getDomain().equals(node))
+			return;
+		
+		addTimerTask(shutdownTask, delaySecs * SECOND);
+	}
+	
 	/**
 	 * Method description
 	 *
@@ -970,6 +993,11 @@ public class ClientConnectionManager
 		}    // end of switch (pc.getCommand())
 	}
 
+	@Override
+	public int schedulerThreads() {
+		return 2;
+	}
+	
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
@@ -1077,6 +1105,35 @@ public class ClientConnectionManager
 
 	//~--- inner classes --------------------------------------------------------
 
+	private class ShutdownTask extends TimerTask {
+
+		@Override
+		public void run() {
+			Element shudownError = new Element("system-shutdown", new String[] { "xmlns" }, new String[] { "urn:ietf:params:xml:ns:xmpp-streams" });
+			doForAllServices((XMPPIOService<Object> service) -> {
+				if (service.getUserJid() == null)
+					return;
+				
+				BareJID userJid = BareJID.bareJIDInstanceNS(service.getUserJid());
+				BareJID seeHost = see_other_host_strategy.findHostForJID(userJid, getDefHostName());
+				
+				Element error = null;
+				if (seeHost == null || seeHost.getDomain().equals(getComponentId().getDomain())) {
+					// if we cannot redirect user notify that this is shutdown
+					error = shudownError.clone();
+				} else {
+					// in other case send redirection
+					error = see_other_host_strategy.getStreamError("urn:ietf:params:xml:ns:xmpp-streams", seeHost).getChild("see-other-host");
+				}
+				Packet packet = Command.CLOSE.getPacket(getComponentId(), service.getConnectionId(), StanzaType.set, "shutdown");
+				Element command = packet.getElement().findChild(Iq.IQ_COMMAND_PATH);
+				command.addChild(error);
+				addPacket(packet);
+			});
+		}
+		
+	}
+	
 	private class StartedHandler
 					implements ReceiverTimeoutHandler {
 		@Override

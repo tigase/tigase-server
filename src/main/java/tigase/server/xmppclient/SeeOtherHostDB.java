@@ -113,17 +113,21 @@ public class SeeOtherHostDB extends SeeOtherHostHashed {
 		
 		
 		BareJID see_other_host = redirectsMap.get(jid);
-		if (see_other_host != null) {
+		if (see_other_host != null && !isNodeShutdown(see_other_host)) {
 			return see_other_host;
-		} else {
-			see_other_host = host;
+//		} else {
+//			see_other_host = host;
 		}
 
 		try {
 			see_other_host = queryDB(jid);
 		} catch (Exception ex) {
-			see_other_host = super.findHostForJID(jid, host);
 			log.log(Level.SEVERE, "DB lookup failed, fallback to SeeOtherHostHashed: ", ex);
+		}
+		
+		if (see_other_host == null || isNodeShutdown(see_other_host)) {
+			log.log(Level.FINE, "DB lookup failed or selected node is being stopped, fallback to SeeOtherHostHashed for {0}", jid);
+			see_other_host = super.findHostForJID(jid, host);
 		}
 
 		return see_other_host;

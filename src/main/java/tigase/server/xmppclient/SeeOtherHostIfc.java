@@ -31,12 +31,13 @@ import tigase.xml.Element;
 
 import java.util.List;
 import java.util.Map;
+import tigase.server.Lifecycle;
 import tigase.xmpp.JID;
 
 /**
  * @author Wojtek
  */
-public interface SeeOtherHostIfc {
+public interface SeeOtherHostIfc extends Lifecycle {
 	public static final String CM_SEE_OTHER_HOST_CLASS_PROPERTY = "--cm-see-other-host";
 
 	public static final String CM_SEE_OTHER_HOST_CLASS_PROP_KEY = "cm-see-other-host";

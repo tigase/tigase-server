@@ -1,6 +1,6 @@
 /*
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,10 +28,16 @@ import tigase.xml.Element;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.disteventbus.EventBus;
+import tigase.disteventbus.EventBusFactory;
+import tigase.disteventbus.clustered.EventHandler;
 import tigase.xmpp.JID;
 
 //~--- classes ----------------------------------------------------------------
@@ -48,8 +54,14 @@ public class SeeOtherHost implements SeeOtherHostIfc {
 	public static final String REDIRECTION_ENABLED = "see-other-host-redirect-enabled";
 	
 	protected List<BareJID> defaultHost = null;
+	protected EventBus eventBus = EventBusFactory.getInstance();
 	private ArrayList<Phase> active = new ArrayList<Phase>();
 	protected VHostManagerIfc vHostManager = null;
+	protected EventHandler shutdownEventHandler = (String name, String xmlns, Element e) -> {
+		String nodeJid = e.getAttributeStaticStr("node");
+		nodeShutdown(nodeJid);
+	};
+	private Set<String> shutdownNodes = new CopyOnWriteArraySet<String>();
 
 	@Override
 	public BareJID findHostForJID(BareJID jid, BareJID host) {
@@ -104,7 +116,24 @@ public class SeeOtherHost implements SeeOtherHostIfc {
 
 	@Override
 	public void setNodes(List<JID> nodes) {
-		 log.log(Level.CONFIG, "Action invalid for current implementation.");
+		// log.log(Level.CONFIG, "Action invalid for current implementation.");
+		synchronized (this) {
+			List<String> toRemove = new ArrayList<String>();
+			Iterator<String> it = shutdownNodes.iterator();
+			while (it.hasNext()) {
+				String shutdownNode = it.next();
+				boolean found = false;
+				for (JID node : nodes) {
+					found |= shutdownNode.equals(node.getDomain());
+				}
+				// remove node from nodes during shutdown if nodes was disconnected 
+				// as it probably was shutdown and should reconnect after restart
+				if (!found) {
+					toRemove.add(shutdownNode);
+				}
+			}
+			shutdownNodes.removeAll(toRemove);
+		}
 	}
 
 	@Override
@@ -123,5 +152,25 @@ public class SeeOtherHost implements SeeOtherHostIfc {
 		return (boolean) vHost.getData( REDIRECTION_ENABLED )
 					 && active.contains( ph );
 	}
+	
+	@Override
+	public void start() {
+		eventBus.addHandler("shutdown", "tigase:server", shutdownEventHandler);
+	}
+	
+	@Override
+	public void stop() {
+		eventBus.removeHandler("shutdown", "tigase:server", shutdownEventHandler);
+	}
 
+	protected boolean isNodeShutdown(BareJID jid) {
+		return jid != null && shutdownNodes.contains(jid.getDomain());
+	}
+	
+	protected void nodeShutdown(String node) {
+		synchronized (this) {
+			shutdownNodes.add(node);
+		}
+	}
+	
 }

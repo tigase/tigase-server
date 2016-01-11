@@ -124,7 +124,7 @@ public class BoshConnectionManager
 	};
 
 	private static Handler sidFilehandler;
-
+	
 	// This should be actually a multi-thread save variable.
 	// Changing it to
 

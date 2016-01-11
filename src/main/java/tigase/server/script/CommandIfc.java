@@ -89,6 +89,8 @@ public interface CommandIfc extends StatisticHolder {
 	public static final String CONNECTED_NODES = "connectedNodes";
 	public static final String CONNECTED_NODES_WITH_LOCAL = "connectedNodesWithLocal";
 	
+	public static final String EVENTBUS = "eventBus";
+	
 	/** Field description */
 	public static final String SERVICES_MAP = "servicesMap";
 

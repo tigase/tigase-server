@@ -24,13 +24,17 @@ package tigase.server.xmppclient;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
 import tigase.xmpp.BareJID;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.xmpp.JID;
 
@@ -68,14 +72,48 @@ public class SeeOtherHostHashed extends SeeOtherHost {
 	public void setNodes(List<JID> connectedNodes) {
 		synchronized (this) {
 			JID[] arr_in = connectedNodes.toArray(new JID[connectedNodes.size()]);
-			BareJID[] arr_out = new BareJID[arr_in.length];
+			List<BareJID> list_out = new ArrayList<BareJID>();
 			
 			for (int i=0; i<arr_in.length; i++) {
-				arr_out[i] = BareJID.bareJIDInstanceNS(null, arr_in[i].getDomain());
+				BareJID jid = BareJID.bareJIDInstanceNS(null, arr_in[i].getDomain());
+				list_out.add(jid);
 			}
 
-			Arrays.sort(arr_out);
-			this.connectedNodes = new CopyOnWriteArrayList<BareJID>(arr_out);
+			setConnectedNodes(list_out);
+		}
+		super.setNodes(connectedNodes);
+	}
+	
+	private void setConnectedNodes(List<BareJID> connectedNodes) {
+		connectedNodes = filterNodes(connectedNodes);
+		synchronized (this) {
+			Collections.sort(connectedNodes);
+			this.connectedNodes = new CopyOnWriteArrayList<>(connectedNodes);
+		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "setting list of connected nodes: {0}", this.connectedNodes);
+		}
+	}
+	
+	private List<BareJID> filterNodes(List<BareJID> list) {
+		Iterator<BareJID> it = list.iterator();
+		while (it.hasNext()) {
+			BareJID jid = it.next();
+			if (isNodeShutdown(jid)) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "removing node {0} from see-other-host list as it is during shutdown", jid);
+				}
+				it.remove();
+			}
+		}
+		return list;
+	}
+
+	@Override
+	protected void nodeShutdown(String node) {
+		super.nodeShutdown(node);
+		synchronized (this) {
+			setConnectedNodes(new ArrayList<>(this.connectedNodes));
 		}
 	}
 }
