@@ -19,20 +19,35 @@ For secure socket connection a proper certificate is needed. You can either gene
 
 Here are steps how to obtain certificate from a trusted organization.
 
-Certificate Request
-~~~~~~~~~~~~~~~~~~~
+Generating your Own Certificates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Self-signed certificates can be generated easily on a Linux system.  Although it may not be considered a 'trusted' certificate authority, it can be useful to test server installations.  *We do not recommend regular use of self-signed certificates*.
 
-Before you can obtain/generate server certificate you need to have a private key and generate a certificate request which contain essential information about you (the entity requesting certificate) and the domain for which you want the certificate.
+Note that Tigase v5.0 and later can automatically create self signed PEM files if needed.  However we will cover doing this process by hand.
 
-. Generate the certificate request:
-+
+This tutorial assumes you are running a Linux-based operating system with access to command shell, and the 'Openssl' package is installed on the system.
+
+The process takes the following steps: +
+1. Create a local private key.  This file ends with .key extension.  It is recommended to create a new private key for the process. +
+2. Generate a certificate request.  This file ends with the .csr extension and is the file sent to the Certificate Authority to be signed. +
+3. CA signs private key.  This can be done by your own computer, but can also be done by private CAs for a fee. +
+4. Results are obtained from the CA.  This is a .crt file which contains a separate public certificate. +
+5. Combine the .csr and .crt file into a unified .pem file.  Tigase requires keys to be non-password protected PEM files. +
+
+.Generate local private key
+[source,sh]
+-----
+openssl genrsa -out[domain.com.key] 1024
+-----
+This command generates a private key using a 1024 bit RSA algorithm.  -out designates the name of the file, in this case it will be *domain.com.key*. The exact name is not important, and the file will be created in whatever directory you are currently in.
+
+.Generate a certificate request:
 [source,sh]
 -------------------------------------
-openssl req -nodes -new -newkey rsa:2048 -keyout yourdomain.com.key -out yourdomain.com.csr
+openssl req -nodes -key domain.com.key -out domain.com.csr
 -------------------------------------
-+
-You will be asked series of questions:
-+
+This command generates a certificate request using the file specified after -key, and the result file will be domain.com.csr.  You will be asked a series of questions to generate the request.
+
 [source,sh]
 -------------------------------------
 Country Name (2 letter code) [AU]:AU
@@ -49,45 +64,20 @@ A challenge password []:
 An optional company name []:
 -------------------------------------
 
-. The command will generate 2 files for you:
-.. yourdomain.com.csr
-.. yourdomain.com.key
+.Sign the Certificate Request:
+Now the .csr file will be signed by a Certificate Authority.  In this tutorial, we will be self-signging our certificate.  This practice however is generally not recommended, and you will receive notifications that your certificate is not trusted.  There are commercial offers from companies to sign your certificate from trusted sources.  Please see the xref:OtherSources[Certificate From Other Providers] section for more information.
+[source,bash]
+-----
+openssl x509 -req -days 365 -in domain.com.csr -signkey domain.com.key -out domain.com.crt
+-----
+This command signs the certificate for 365 days and generates the domain.com.crt file. You can, of course use any number of days you like.
 
-Certificate From Other Providers
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-There is number of certificate providers offering certificates either for free or for money. You can use any of them, however you have to be aware that sometimes certificates might not be recognized by all XMPP servers, especially if it's one from a new provider. Here is an example list of providers:
-
-- link:https://www.cacert.org/[CAcert] - free certificates with an excellent Web GUI for managing generated certificates and identities.
-- link:https://www.startssl.com/[StartCom] - both free and paid certificates, class 1, 2 and 3. Very good GUI for managing certificates and identities.
-- link:https://www.verisign.com/[Verisign] - very expensive certificates comparing to above provides but the provider is recognized by everybody. If you have a certificate from Verisign you can be sure it is identified as a valid certificate.
-- link:http://www.comodo.com/business-security/digital-certificates/ssl-certificates.php[Comodo Certificate Authority] offers different kind of commercial certificates
-
-To obtain certificate from a third party authority you have to go to its website and request the certificate using certificate request generated above. I cannot provide any instructions for this as each of the providers listed have different requirements and interfaces.
-
-Self-Signed Certificate
-~~~~~~~~~~~~~~~~~~~~~~~
-
-Another option, *highly not recommended* is to use a self-signed certificate. Such certificates won't be recognized by any entity on the Internet but your own. So if other XMPP servers allows for connections only with valid certificate, your installation will not be able to connect. On the other hand self-signed certificates are a very good way for testing environments where you can create many artificial domains and you can test your service for supporting many virtual domains. You can generate as many certificates as you want and load them onto your server to test and work with.
-
-Tigase, version 5.0.0 and newer automatically generates self-signed certificates for each Virtual Host configured. Alternatively self-signed certificates can be created by hand - just execute following command using the same as above *openssl* tool:
-
-[source,sh]
--------------------------------------
-openssl x509 -req -days 365 -in yourdomain.com.csr -signkey yourdomain.com.key -out yourdomain.com.crt
--------------------------------------
-
-You can, of course use any number of days you like.
-
-Installing/Loading Certificate To the Tigase Server
----------------------------------------------------
-
-From version *3.1.0-b802* of Tigase server, installing and loading certificates is very easy. The server can load all certificates directly from *pem* files. You just need to create a separate pem file for each of your virtual domains and put the file in a directory accessible by the server. Tigase server can automatically load all *pem* files found in given directory.
-
-PEM File
-~~~~~~~~
-
-A *PEM* file is a file containing server certificate, certificate private key and certificate chain if any exists. For self-signed certificates there is no certificate chain so creating pem file is very simple:
+.Generate PEM file
+You should now have the following files in the working directory:
+..\
+domain.com.key
+domain.com.csr
+domain.com.crt
 
 [source,sh]
 -------------------------------------
@@ -132,8 +122,26 @@ For Tigase server as well as many other servers (Apache 2.x), the order is follo
 
 *Note! Tigase requires full certificate chain in PEM file (described above)! Different applications may require pem file with certificates and private key in different order. So the same file may not be necessarily used by other services like Web server or e-mail server. Currently, Tigase can automatically sort certificates in PEM file while loading it.*
 
-Tigase Server Configuration
----------------------------
+Installing/Loading Certificate To the Tigase Server
+---------------------------------------------------
+
+From version *3.1.0-b802* of Tigase server, installing and loading certificates is very easy. The server can load all certificates directly from *pem* files. You just need to create a separate pem file for each of your virtual domains and put the file in a directory accessible by the server. Tigase server can automatically load all *pem* files found in given directory.  By default, and to make things easy, we recommend the +Tigase/certs+ directory.
+
+[[OtherSources]]
+Certificate From Other Providers
+--------------------------------
+
+There is number of certificate providers offering certificates either for free or for money. You can use any of them, however you have to be aware that sometimes certificates might not be recognized by all XMPP servers, especially if it's one from a new provider. Here is an example list of providers:
+
+- link:https://www.cacert.org/[CAcert] - free certificates with an excellent Web GUI for managing generated certificates and identities.
+- link:https://www.startssl.com/[StartCom] - both free and paid certificates, class 1, 2 and 3. Very good GUI for managing certificates and identities.
+- link:https://www.verisign.com/[Verisign] - very expensive certificates comparing to above provides but the provider is recognized by everybody. If you have a certificate from Verisign you can be sure it is identified as a valid certificate.
+- link:http://www.comodo.com/business-security/digital-certificates/ssl-certificates.php[Comodo Certificate Authority] offers different kind of commercial certificates
+
+To obtain certificate from a third party authority you have to go to its website and request the certificate using certificate request generated above. I cannot provide any instructions for this as each of the providers listed have different requirements and interfaces.
+
+Tigase Server Configuration for 5.1.0 and older
+-----------------------------------------------
 
 Starting from version 5.1.0 and newer it's not needed to use external libraries nor extra configuration in the init.properties file. With this version Tigase uses, loaded by default thus no need to configure it, following class:
 
