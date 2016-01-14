@@ -19,11 +19,16 @@ New JDK v8 required
 ~~~~~~~~~~~~~~~~~~~
 As Oracle has dropped support for version 7 of it's Java runtime environment and developer kit, we have moved to version 8 of the JDK.  Furthermore, some new features and fixes for Tigase Server now require the use of JDK v8 or later. Please upgrade your Java packages from link:http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html[this link].
 
+Changes to Datbase Schema
+~~~~~~~~~~~~~~~~~~~~~~~~~
+Database Schema has changed to introduce primary keys in tig_nodes and tig_pairs tables, improving database performance.  As a result, the schema for your database will need to be upgraded if you are not starting with a fresh database.
+Please see the xref:TigaseServer71[Schema Upgrade] section for instructions on how to prepare and upgrade your database.  *This will affect all users using v7.1.0 b4129 and later.*
+
 Changes to Pubsub Schema
 ~~~~~~~~~~~~~~~~~~~~~~~~
 The PubSub Schema has been streamlined for better resource use, this change affects all users of Tigase.
 To prepare your database for the new schema, first be sure to create a backup!  Then apply the appropriate pubsub schema to your MySQL and it will add the new storage procedure.
-Details on how to accomplish this are found xref:tigaseServer71[in the schema upgrade guide].
+Details on how to accomplish this are found xref:pubSub71[in the schema upgrade guide].
 
 Presence Plugin Split
 ~~~~~~~~~~~~~~~~~~~~~
