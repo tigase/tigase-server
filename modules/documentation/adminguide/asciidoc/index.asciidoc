@@ -62,7 +62,7 @@ include::text/Admin_Guide_16_-_Security_-_A_-_Server_Certificates_-_1_-_Creating
 
 include::text/Admin_Guide_17_-_Security_-_A_-_Server_Certificates_-_2_-_Installing_StartCom_Certificate_in_your_Linux_System.asciidoc[]
 
-include::text/Admin_Guide_18_-_Security_-_A_-_Server_Certificates_-_3_-_Server_Certificate_Using_Keytool_and_Keystore.asciidoc[]
+//include::text/Admin_Guide_18_-_Security_-_A_-_Server_Certificates_-_3_-_Server_Certificate_Using_Keytool_and_Keystore.asciidoc[]
 
 :leveloffset: 2
 

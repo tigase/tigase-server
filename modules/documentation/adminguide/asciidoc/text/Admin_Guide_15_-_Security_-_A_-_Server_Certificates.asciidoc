@@ -10,9 +10,7 @@ Server Certificates
 :numbered:
 :website: http://tigase.net
 
-//some text to offset link problems, lets try?
-
 
 - xref:certspem[Creating and Loading the Server Certificate in pem Files]
 - xref:startcomCertificate[Installing StartCom Certificate in Your Linux System]
-- xref:keytoolKeystore[Server Certificate Using Keytool and Keystore]
+//- xref:keytoolKeystore[Server Certificate Using Keytool and Keystore]
