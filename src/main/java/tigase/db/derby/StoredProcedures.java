@@ -532,7 +532,7 @@ public class StoredProcedures {
 				result = ps.executeUpdate();
 			} else {
 				PreparedStatement ps =
-					conn.prepareStatement("insert into tig_pairs (pkey, pval, uid) select ?, ?, uid from tig_users where (user_id = 'db-properties')");
+					conn.prepareStatement("insert into tig_pairs (pkey, pval, uid, nid) select ?, ?, tu.uid, tn.nid from tig_users tu left join tig_nodes tn on tn.uid=tu.uid where (user_id = 'db-properties' and tn.node='root' ) ");
 
 				ps.setString(1, key);
 				Clob c = conn.createClob();
