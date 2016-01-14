@@ -202,12 +202,20 @@ This setting sets how long UA purging will wait between passes to check for and 
 +unified-archive/remove-expired-messages-period=PT2D+
 
 Configuration of number of days in VHost
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+VHost holds a setting that determines how long a message needs to be in archive for it to be considered old and removed.  This can be set independently per Vhost.  This setting can be modified by either using the HTTP admin, or the update item execution in adhoc command.
 
-
-Sets after how many days message should be removed - however we internally convert day to 24 hours. So if entry is older than 24 hours then it will be removed, ie. entry from yesterday from 10:11 will be removed after 10:11 after next execution of purge.
+Command-line utility
+Sets after how many days message should be removed - by default we use 24 hours. So if entry is older than 24 hours then it will be removed, ie. entry from yesterday from 10:11 will be removed after 10:11 after next execution of purge.
 This configuration is done by execution of Update item configuration adhoc command of vhost-man component, where you should select domain for which messages should be removed and then in field XEP-0136 - retention type select value Number of days and in field XEP-0136 - retention period (in days) enter number of days after which events should be removed from UA.
 
+In adhoc select domain for which messages should be removed and then in field XEP-0136 - retention type select value Number of days and in field XEP-0136 - retention period (in days) enter number of days after which events should be removed from UA.
+
+In HTTP UI select Other, then Update Item Configuration (Vhost-man), select the domain, and from there you can set XEP-0136 retention type, and set number of days at XEP-0136 retention period (in days).
+
 Value of +remove-expired-messages-delay+ and +remove-expired-messages-period+ is in format described at Duration.parse() in Java documentation.
+
+*NOTE* that these commands are also compatible with freely available tigase +message-archive+ component, just replace +unified+ with +message+.
 
 New Documentation Structure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
