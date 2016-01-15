@@ -101,7 +101,7 @@ class DBSchemaLoader extends SchemaLoader {
 	public static final String DASH = "-";
 	// defaults
 	public static final String DATABASE_TYPE_DEF = "mysql";
-	public static final String SCHEMA_VERSION_DEF = "5-1";
+	public static final String SCHEMA_VERSION_DEF = "7-1";
 	public static final String DATABASE_NAME_DEF = "tigasedb";
 	public static final String DATABASE_HOSTNAME_DEF = "localhost";
 	public static final String TIGASE_USERNAME_DEF = "tigase_user";
@@ -322,7 +322,7 @@ class DBSchemaLoader extends SchemaLoader {
 		String help = "Usage:"
 									+ "$ java -cp \"jars/*.jar\" tigase.util.DBSchemaLoader"
 									+ "\n\t -" + DATABASE_TYPE_KEY + " database_type {derby, mysql, postgresql, sqlserver} "
-									+ "\n\t[-" + SCHEMA_VERSION_KEY + " schema_version {4, 5, 5-1} ]"
+									+ "\n\t[-" + SCHEMA_VERSION_KEY + " schema_version {4, 5, 5-1, 7-1} ]"
 									+ "\n\t[-" + DATABASE_NAME_KEY + " database_name]"
 									+ "\n\t[-" + DATABASE_HOSTNAME_KEY + " database hostname]"
 									+ "\n\t[-" + TIGASE_USERNAME_KEY + " tigase_username]"
