@@ -9,16 +9,16 @@ fi
 
 if [ -z "${1}" ] ; then
   echo "No username given. Using: tigase_user"
-  USR_NAME=tigase_user
+  USER_NAME=tigase_user
 else
-  USR_NAME="${1}"
+  USER_NAME="${1}"
 fi
 
 if [ -z "${2}" ] ; then
   echo "No password given. Using: tigase_passwd"
-  USR_PASS=tigase_passwd
+  USER_PASS=tigase_passwd
 else
-  USR_PASS="${2}"
+  USER_PASS="${2}"
 fi
 
 if [ -z "${3}" ] ; then
@@ -39,22 +39,20 @@ fi
 
 if [ -z "$NONINTERACTIVE" ] ; then
   echo ""
-  echo "creating ${DB_NAME} database for user ${USR_NAME} identified by ${USR_PASS} password:"
+  echo "creating ${DB_NAME} database for user ${USER_NAME} identified by ${USR_PASS} password:"
   echo ""
  
   read -p "Press [Enter] key to start, otherwise abort..."
 else
-  echo "User: $USR_NAME, Pass: $USR_PASS, Db: $DB_NAME, Host: $DB_HOST"
+  echo "User: $USER_NAME, Pass: $USR_PASS, Db: $DB_NAME, Host: $DB_HOST"
 fi
 
-echo "Creating user"
-createuser -d -S -R -h $DB_HOST -U postgres ${USR_NAME}
-echo "Creating database"
-createdb -h $DB_HOST -U ${USR_NAME} ${DB_NAME}
-echo "Loading DB schema"
-psql -h $DB_HOST -q -U ${USR_NAME} -d $DB_NAME -f database/postgresql-schema-5-1.sql
-echo "Loading PubSub3 schema"
-psql -h $DB_HOST -q -U ${USR_NAME} -d $DB_NAME -f database/postgresql-pubsub-schema-3.1.0.sql
 
+export DB_TYPE=postgresql
+export DB_VERSION=7-1
+
+java -cp "jars/*" tigase.util.DBSchemaLoader -dbHostname ${DB_HOST} -dbType ${DB_TYPE} -schemaVersion ${VERSION} -dbName ${DB_NAME} -rootUser ${ROOT_NAME} -rootPass ${ROOT_PASS} -dbUser ${USER_NAME} -dbPass ${USER_PASS} -logLevel ALL
+
+java -cp "jars/*" tigase.util.DBSchemaLoader -dbHostname ${DB_HOST} -dbType ${DB_TYPE} -schemaVersion ${VERSION} -dbName ${DB_NAME} -rootUser ${ROOT_NAME} -rootPass ${ROOT_PASS} -dbUser ${USER_NAME} -dbPass ${USER_PASS} -logLevel ALL -file database/${DB_TYPE}-pubsub-schema-3.0.0.sql
 
 echo -e "\n\n\nconfiguration:\n\n--user-db=pgsql\n--user-db-uri=jdbc:postgresql://$DB_HOST/$DB_NAME?user=$USR_NAME&password=$USR_PASS&useUnicode=true&characterEncoding=UTF-8&autoCreateUser=true\n\n"

@@ -1,26 +1,31 @@
 IF [%1]==[] (
-	set servername=localhost
-	set database=tigasedb
-	set user=tigase
-	set password=tigase12
-	set root_user=sa
-	set root_pass=sa
+	set DB_HOST=localhost
+	set DB_NAME=tigasedb
+	set USER_NAME=tigase
+	set USER_PASS=tigase12
+	set ROOT_NAME=sa
+	set ROOT_PASS=sa
 ) ELSE (
-	set servername=%1
-	set database=%2
-	set user=%3
-	set password=%4
-	set root_user=%5
-	set root_pass=%6
+	set DB_HOST=%1
+	set DB_NAME=%2
+	set USER_NAME=%3
+	set USER_PASS=%4
+	set ROOT_NAME=%5
+	set ROOT_PASS=%6
 )
 
-sqlcmd -S %servername% -U %root_user% -P %root_pass% -Q "CREATE DATABASE [%database%]"
-sqlcmd -S %servername% -U %root_user% -P %root_pass% -Q "CREATE LOGIN [%user%] WITH PASSWORD=N'%password%', DEFAULT_DATABASE=[%database%]"
-sqlcmd -S %servername% -U %root_user% -P %root_pass% -d %database% -Q "ALTER AUTHORIZATION ON DATABASE::%database% TO %user%;"
-sqlcmd -S %servername% -U %root_user% -P %root_pass% -d %database% -i database\sqlserver-schema-5-1-schema.sql
-sqlcmd -S %servername% -U %root_user% -P %root_pass% -d %database% -i database\sqlserver-schema-5-1-sp.sql
-sqlcmd -S %servername% -U %root_user% -P %root_pass% -d %database% -i database\sqlserver-schema-5-1-props.sql
+set DB_TYPE=sqlserver
+set DB_VERSION=7-1
 
-sqlcmd -S %servername% -U %root_user% -P %root_pass% -d %database% -i database\sqlserver-pubsub-schema-3.0.0.sql
-sqlcmd -S %servername% -U %root_user% -P %root_pass% -d %database% -i database\sqlserver-pubsub-schema-3.1.0.sql
+java -cp "jars/*" tigase.util.DBSchemaLoader -dbHostname %DB_HOST% -dbType %DB_TYPE% -schemaVersion %DB_VERSION% -dbName %DB_NAME% -rootUser %ROOT_NAME% -rootPass %ROOT_PASS% -dbUser %USER_NAME% -dbPass %USER_PASS% -logLevel ALL
 
+java -cp "jars/*" tigase.util.DBSchemaLoader -dbHostname %DB_HOST% -dbType %DB_TYPE% -schemaVersion %DB_VERSION% -dbName %DB_NAME% -rootUser %ROOT_NAME% -rootPass %ROOT_PASS% -dbUser %USER_NAME% -dbPass %USER_PASS% -logLevel ALL -file database/%DB_TYPE%-pubsub-schema-3.0.0.sql
+
+
+if %errorlevel% neq 0 (
+  echo. && echo Error: please check the logs for more details && echo. && echo.
+  exit /b %errorlevel%
+) else (
+  echo. && echo Success: please look at the logs for more details && echo. && echo.
+  exit /b
+)

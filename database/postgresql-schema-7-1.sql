@@ -20,30 +20,20 @@
 --  $Date: $
 --
 
--- Database stored procedures and functions for Tigase schema version 5.1
+--  To load schema to PostgreSQL database execute following commands:
+--
+--  createuser tigase
+--  createdb -U tigase tigase
+--  psql -q -U tigase -d tigase -f postgresql-schema.sql
 
-source database/mysql-schema-4-sp.sql;
+\i database/postgresql-schema-4-schema.sql
 
--- LOAD FILE: database/mysql-schema-4-sp.sql
+\i database/postgresql-schema-5-1-sp.sql
 
--- QUERY START:
-drop procedure if exists TigUpdatePairs;
--- QUERY END:
- 
-delimiter //
+\i database/postgresql-schema-5-1-props.sql
 
--- QUERY START:
--- Procedure to efficiently and safely update data in tig_pairs table
-create procedure TigUpdatePairs(_nid bigint, _uid bigint, _tkey varchar(255) CHARSET utf8, _tval mediumtext CHARSET utf8)
-begin
-  if exists(SELECT 1 FROM tig_pairs WHERE nid = _nid AND uid = _uid AND pkey = _tkey)
-  then
-    UPDATE tig_pairs SET pval = _tval WHERE nid = _nid AND uid = _uid AND pkey = _tkey;
-  ELSE
-    INSERT INTO tig_pairs (nid, uid, pkey, pval) VALUES (_nid, _uid, _tkey, _tval);
-  END IF;
-end //
--- QUERY END:
+-- LOAD FILE: database/postgresql-schema-4-schema.sql
 
+-- LOAD FILE: database/postgresql-schema-5-1-sp.sql
 
-delimiter ;
+-- LOAD FILE: database/postgresql-schema-5-1-props.sql

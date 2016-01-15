@@ -345,6 +345,9 @@ class TigaseInstallerDBHelper {
                         if ("4.0".equals(schema_version)) {
                             queries = loadSQLQueries(res_prefix + "-schema-upgrade-to-5-1", res_prefix, variables);
                         }
+                        if ("5.1".equals(schema_version)) {
+                            queries = loadSQLQueries(res_prefix + "-schema-upgrade-to-7-1", res_prefix, variables);
+                        }
                         for (String query : queries) {
                             if (!query.isEmpty()) {
                                 Debug.trace("validateDBConversion :: Executing query: " + query);
