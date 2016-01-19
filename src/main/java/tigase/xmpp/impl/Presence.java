@@ -1947,9 +1947,9 @@ public class Presence
 			int      pres_cnt      = 0;
 
 			for ( JID buddy : buddies ) {
-				List<Element> childs = roster_util.getCustomChilds( session, buddy );
+				List<Element> children = roster_util.getCustomChildren( session, buddy );
 
-				if ( childs != null && !childs.isEmpty() ){
+				if ( children != null && !children.isEmpty() ){
 					Packet pack = sendPresence( StanzaType.unavailable, buddy, session.getJID(),
 																			results, null );
 					
@@ -1959,7 +1959,7 @@ public class Presence
 					}
 					pack.setPriority( pack_priority );
 					pack.setPacketTo( session.getConnectionId() );
-					for ( Element child : childs ) {
+					for ( Element child : children ) {
 						pack.getElement().addChild( child );
 					}
 				}
