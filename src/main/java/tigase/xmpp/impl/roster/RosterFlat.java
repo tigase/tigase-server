@@ -28,6 +28,8 @@ package tigase.xmpp.impl.roster;
 
 import tigase.db.TigaseDBException;
 
+import tigase.server.PolicyViolationException;
+
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
@@ -60,8 +62,6 @@ public class RosterFlat
 	 */
 	private static final Logger log          = Logger.getLogger(RosterFlat.class.getName());
 	private static final SimpleParser parser = SingletonFactory.getParserInstance();
-	private static int maxRosterSize         = new Long(Runtime.getRuntime().maxMemory() /
-																							 250000L).intValue();
 
 	private final SimpleDateFormat formatter;
 	{
@@ -126,7 +126,7 @@ public class RosterFlat
 	@Override
 	public void addBuddy(XMPPResourceConnection session, JID buddy, String name,
 											 String[] groups, String otherData)
-					throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException, PolicyViolationException {
 
 		// String buddy = JIDUtils.getNodeID(jid);
 		RosterElement relem = getRosterElement(session, buddy);
@@ -155,7 +155,7 @@ public class RosterFlat
 			if (addBuddy(relem, roster)) {
 				saveUserRoster(session);
 			} else {
-				throw new TigaseDBException("Too many elements in the user roster.");
+				throw new PolicyViolationException("Too many elements in the user roster. Limit: " + maxRosterSize);
 			}
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "2. Added buddy to roster: {0}, name: {1}, item: {2}",
