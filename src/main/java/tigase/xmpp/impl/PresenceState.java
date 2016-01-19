@@ -1051,19 +1051,21 @@ public class PresenceState extends PresenceAbstract implements XMPPStopListenerI
 			int      pres_cnt      = 0;
 
 			for (JID buddy : buddies) {
-				Element child = roster_util.getCustomChild(session, buddy);
+				List<Element> childs = roster_util.getCustomChilds( session, buddy );
 
-				if (child != null) {
-					Packet pack = sendPresence(StanzaType.unavailable, buddy, session.getJID(),
-							results, null);
-
-					if (pres_cnt == HIGH_PRIORITY_PRESENCES_NO) {
+				if ( childs != null && !childs.isEmpty() ){
+					Packet pack = sendPresence( StanzaType.unavailable, buddy, session.getJID(),
+																			results, null );
+					
+					if ( pres_cnt == HIGH_PRIORITY_PRESENCES_NO ){
 						++pres_cnt;
 						pack_priority = Priority.LOWEST;
 					}
-					pack.setPriority(pack_priority);
-					pack.setPacketTo(session.getConnectionId());
-					pack.getElement().addChild(child);
+					pack.setPriority( pack_priority );
+					pack.setPacketTo( session.getConnectionId() );
+					for ( Element child : childs ) {
+						pack.getElement().addChild( child );
+					}
 				}
 			}    // end of for (String buddy: buddies)
 		}

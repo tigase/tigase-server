@@ -634,6 +634,18 @@ public abstract class RosterAbstract {
 	public abstract Element getCustomChild(XMPPResourceConnection session, JID buddy)
 					throws NotAuthorizedException, TigaseDBException;
 
+	public List<Element> getCustomChilds(XMPPResourceConnection session, JID buddy)
+					throws NotAuthorizedException, TigaseDBException {
+
+		List<Element> result = new LinkedList<Element>();
+
+		Element customChild = getCustomChild( session, buddy );
+		if (customChild != null ) {
+			result.add( customChild );
+		}
+		return result;
+	}
+	
 	public PresenceType getPresenceType(final XMPPResourceConnection session,
 			final Packet packet)
 					throws NotAuthorizedException {
