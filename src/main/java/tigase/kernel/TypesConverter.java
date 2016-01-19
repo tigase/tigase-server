@@ -27,6 +27,8 @@ public class TypesConverter {
 	 * @return text representation of value.
 	 */
 	public static String toString(final Object value) {
+		if (value == null)
+			return null;
 		if (value.getClass().isEnum()) {
 			return ((Enum) value).name();
 		} else if (value instanceof Collection) {

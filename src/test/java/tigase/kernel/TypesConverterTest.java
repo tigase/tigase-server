@@ -14,16 +14,6 @@ import tigase.xmpp.JID;
 public class TypesConverterTest {
 
 	@Test
-	public void testToString() throws Exception {
-		Assert.assertEquals("a1", TypesConverter.toString(XT.a1));
-		Assert.assertEquals("a1,a1,b2", TypesConverter.toString(new XT[] { XT.a1, XT.a1, XT.b2 }));
-		Assert.assertEquals("a1,a1,b2", TypesConverter.toString(new String[] { "a1", "a1", "b2" }));
-		Assert.assertEquals("true,true,false,true", TypesConverter.toString(new boolean[] { true, true, false, true }));
-		Assert.assertEquals("1,2,3,4", TypesConverter.toString(new char[] { 49, 50, 51, 52 }));
-		Assert.assertEquals("1,2,3", TypesConverter.toString(new byte[] { 1, 2, 3 }));
-	}
-
-	@Test
 	public void testConvert() throws Exception {
 		Assert.assertEquals(Integer.valueOf(123), TypesConverter.convert("123", Integer.class));
 		Assert.assertEquals(Integer.valueOf(123), TypesConverter.convert(Integer.valueOf(123), Integer.class));
@@ -85,6 +75,18 @@ public class TypesConverterTest {
 		Assert.assertEquals(new File("/dupa.txt"), TypesConverter.convert("/dupa.txt", File.class));
 		Assert.assertEquals(new File("/dupa.txt"),
 				TypesConverter.convert(TypesConverter.toString(new File("/dupa.txt")), File.class));
+	}
+
+	@Test
+	public void testToString() throws Exception {
+		Assert.assertEquals("a1", TypesConverter.toString(XT.a1));
+		Assert.assertEquals("a1,a1,b2", TypesConverter.toString(new XT[] { XT.a1, XT.a1, XT.b2 }));
+		Assert.assertEquals("a1,a1,b2", TypesConverter.toString(new String[] { "a1", "a1", "b2" }));
+		Assert.assertEquals("true,true,false,true", TypesConverter.toString(new boolean[] { true, true, false, true }));
+		Assert.assertEquals("1,2,3,4", TypesConverter.toString(new char[] { 49, 50, 51, 52 }));
+		Assert.assertEquals("1,2,3", TypesConverter.toString(new byte[] { 1, 2, 3 }));
+		Assert.assertEquals("1@b.c/a,2@b.c/a,3@b.c/a", TypesConverter.toString(
+				new JID[] { JID.jidInstanceNS("1@b.c/a"), JID.jidInstanceNS("2@b.c/a"), JID.jidInstanceNS("3@b.c/a") }));
 	}
 
 	public enum XT {

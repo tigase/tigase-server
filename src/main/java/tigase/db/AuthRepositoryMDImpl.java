@@ -23,18 +23,17 @@ package tigase.db;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.xmpp.BareJID;
-
-//~--- JDK imports ------------------------------------------------------------
-
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.disteventbus.EventBus;
-import tigase.disteventbus.EventBusFactory;
+
+import tigase.eventbus.EventBus;
+import tigase.eventbus.EventBusFactory;
 import tigase.xml.Element;
+import tigase.xmpp.BareJID;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -69,7 +68,7 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 
 	@Override
 	public void addUser(BareJID user, String password)
-			throws UserExistsException, TigaseDBException {
+ throws TigaseDBException {
 		AuthRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
@@ -84,7 +83,7 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 	@Override
 	@Deprecated
 	public boolean digestAuth(BareJID user, String digest, String id, String alg)
-			throws UserNotFoundException, TigaseDBException, AuthorizationException {
+			throws TigaseDBException, AuthorizationException {
 		AuthRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
@@ -100,13 +99,26 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 
 	//~--- get methods ----------------------------------------------------------
 
+	@Override
+	public String getPassword(BareJID user) throws TigaseDBException {
+		AuthRepository repo = getRepo(user.getDomain());
+
+		if (repo != null) {
+			return repo.getPassword(user);
+		} else {
+			log.log(Level.WARNING,
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
+			return null;
+		}
+	}
+
 	/**
 	 * Method description
 	 *
 	 *
 	 * @param domain
 	 *
-	 * 
+	 *
 	 */
 	public AuthRepository getRepo(String domain) {
 		AuthRepository result = repos.get(domain);
@@ -156,7 +168,20 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 	}
 
 	@Override
-	public void logout(BareJID user) throws UserNotFoundException, TigaseDBException {
+	public boolean isUserDisabled(BareJID user) throws TigaseDBException {
+		AuthRepository repo = getRepo(user.getDomain());
+
+		if (repo != null) {
+			return repo.isUserDisabled(user);
+		} else {
+			log.log(Level.WARNING,
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
+			return false;
+		}
+	}
+
+	@Override
+	public void logout(BareJID user) throws TigaseDBException {
 		AuthRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
@@ -170,7 +195,7 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 
 	@Override
 	public boolean otherAuth(Map<String, Object> authProps)
-			throws UserNotFoundException, TigaseDBException, AuthorizationException {
+ throws TigaseDBException, AuthorizationException {
 		AuthRepository repo = getRepo((String) authProps.get(SERVER_NAME_KEY));
 
 		if (repo != null) {
@@ -178,7 +203,8 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 		} else {
 			log.log(Level.WARNING,
 					"Couldn't obtain user repository for domain: "
-						+ (String) authProps.get(SERVER_NAME_KEY) + ", not even default one!");
+ + authProps.get(SERVER_NAME_KEY)
+					+ ", not even default one!");
 		}
 
 		return false;
@@ -187,7 +213,7 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 	@Override
 	@Deprecated
 	public boolean plainAuth(BareJID user, String password)
-			throws UserNotFoundException, TigaseDBException, AuthorizationException {
+ throws TigaseDBException, AuthorizationException {
 		AuthRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
@@ -210,9 +236,13 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 		} else {
 			log.log(Level.WARNING,
 					"Couldn't obtain user repository for domain: "
-						+ (String) authProps.get(SERVER_NAME_KEY) + ", not even default one!");
+ + authProps.get(SERVER_NAME_KEY)
+					+ ", not even default one!");
 		}
 	}
+
+	// ~--- set methods
+	// ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -220,20 +250,23 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 	 *
 	 * @param domain
 	 *
-	 * 
+	 *
 	 */
 	public AuthRepository removeRepo(String domain) {
 		return repos.remove(domain);
 	}
 
+	// ~--- methods
+	// --------------------------------------------------------------
+
 	@Override
-	public void removeUser(BareJID user) throws UserNotFoundException, TigaseDBException {
+	public void removeUser(BareJID user) throws TigaseDBException {
 		AuthRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
 			repo.removeUser(user);
-			
-			Element event = new Element("remove", new String[] { "xmlns" }, 
+
+			Element event = new Element("remove", new String[] { "xmlns" },
 					new String[] { "tigase:user" });
 			event.addChild(new Element("jid", user.toString()));
 			eventBus.fire(event);
@@ -243,8 +276,6 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 						+ ", not even default one!");
 		}
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
@@ -256,50 +287,8 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 		def = repo;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@Override
-	public void updatePassword(BareJID user, String password)
-			throws UserNotFoundException, TigaseDBException {
-		AuthRepository repo = getRepo(user.getDomain());
-
-		if (repo != null) {
-			repo.updatePassword(user, password);
-		} else {
-			log.log(Level.WARNING,
-					"Couldn't obtain user repository for domain: " + user.getDomain()
-						+ ", not even default one!");
-		}
-	}
-
-	@Override
-	public String getPassword(BareJID user) throws UserNotFoundException, TigaseDBException {
-		AuthRepository repo = getRepo(user.getDomain());
-
-		if (repo != null) {
-			return repo.getPassword(user);
-		} else {
-			log.log(Level.WARNING, "Couldn't obtain user repository for domain: " + user.getDomain()
-					+ ", not even default one!");
-			return null;
-		}
-	}
-	
-	@Override
-	public boolean isUserDisabled(BareJID user) throws UserNotFoundException, TigaseDBException {
-		AuthRepository repo = getRepo(user.getDomain());
-
-		if (repo != null) {
-			return repo.isUserDisabled(user);
-		} else {
-			log.log(Level.WARNING, "Couldn't obtain user repository for domain: " + user.getDomain()
-					+ ", not even default one!");
-			return false;
-		}		
-	}
-	
-	@Override
-	public void setUserDisabled(BareJID user, Boolean value) throws UserNotFoundException, TigaseDBException {
+	public void setUserDisabled(BareJID user, Boolean value) throws TigaseDBException {
 		AuthRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
@@ -307,6 +296,18 @@ public class AuthRepositoryMDImpl implements AuthRepository {
 		} else {
 			log.log(Level.WARNING, "Couldn't obtain user repository for domain: " + user.getDomain()
 					+ ", not even default one!");
-		}		
-	}		
+		}
+	}
+
+	@Override
+	public void updatePassword(BareJID user, String password) throws TigaseDBException {
+		AuthRepository repo = getRepo(user.getDomain());
+
+		if (repo != null) {
+			repo.updatePassword(user, password);
+		} else {
+			log.log(Level.WARNING,
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
+		}
+	}
 }

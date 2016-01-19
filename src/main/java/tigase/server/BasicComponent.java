@@ -53,6 +53,7 @@ import tigase.conf.ConfigurationException;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
+import tigase.eventbus.EventBusFactory;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.osgi.OSGiScriptEngineManager;
 
@@ -80,7 +81,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.script.ScriptEngineFactory;
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
-import tigase.disteventbus.EventBusFactory;
 
 /**
  * Created: Oct 17, 2009 7:49:05 PM

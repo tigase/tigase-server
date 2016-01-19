@@ -15,6 +15,15 @@ public class BeanUtils {
 	private BeanUtils() {
 	}
 
+	public static Field[] getAllFields(Class<?> klass) {
+		List<Field> fields = new ArrayList<Field>();
+		fields.addAll(Arrays.asList(klass.getDeclaredFields()));
+		if (klass.getSuperclass() != null) {
+			fields.addAll(Arrays.asList(getAllFields(klass.getSuperclass())));
+		}
+		return fields.toArray(new Field[] {});
+	}
+
 	public static Method[] getAllMethods(Class<?> klass) {
 		List<Method> fields = new ArrayList<Method>();
 		fields.addAll(Arrays.asList(klass.getDeclaredMethods()));

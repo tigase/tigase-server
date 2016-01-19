@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 
 import tigase.component.PacketWriter;
 import tigase.component.responses.AsyncCallback;
-import tigase.disteventbus.EventBus;
+import tigase.eventbus.EventBus;
 import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
 import tigase.xml.Element;
@@ -36,11 +36,9 @@ import tigase.xml.Element;
  */
 public abstract class AbstractModule implements Module {
 
+	protected final Logger log = Logger.getLogger(this.getClass().getName());
 	@Inject(bean = "eventBus")
 	protected EventBus eventBus;
-
-	protected final Logger log = Logger.getLogger(this.getClass().getName());
-
 	@Inject
 	protected PacketWriter writer;
 
@@ -58,12 +56,12 @@ public abstract class AbstractModule implements Module {
 		return eventBus;
 	}
 
-	public PacketWriter getWriter() {
-		return writer;
-	}
-
 	public void setEventBus(EventBus eventBus) {
 		this.eventBus = eventBus;
+	}
+
+	public PacketWriter getWriter() {
+		return writer;
 	}
 
 	public void setWriter(PacketWriter writer) {

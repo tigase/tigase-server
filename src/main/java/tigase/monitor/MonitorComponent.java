@@ -21,8 +21,6 @@ import tigase.util.TimerTask;
 
 public class MonitorComponent extends AbstractKernelBasedComponent {
 
-	public static final String EVENTS_XMLNS = "tigase:monitor:event";
-
 	private final TimerTaskService timerTaskService = new TimerTaskService() {
 
 		@Override
