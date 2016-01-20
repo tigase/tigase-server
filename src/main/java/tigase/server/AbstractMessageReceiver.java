@@ -977,7 +977,7 @@ public abstract class AbstractMessageReceiver
 		in_queues_size        = processingInThreads();
 		out_queues_size       = processingOutThreads();
 		schedulerThreads_size = schedulerThreads();
-		setMaxQueueSize(maxInQueueSize);
+		setMaxQueueSize(maxQueueSize);
 	}
 
 	@Override
