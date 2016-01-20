@@ -22,7 +22,7 @@ As Oracle has dropped support for version 7 of it's Java runtime environment and
 Changes to Datbase Schema
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 Database Schema has changed to introduce primary keys in tig_nodes and tig_pairs tables, improving database performance.  As a result, the schema for your database will need to be upgraded if you are not starting with a fresh database.
-Please see the xref:TigaseServer71[Schema Upgrade] section for instructions on how to prepare and upgrade your database.  *This will affect all users using v7.1.0 b4129 and later.*
+Please see the xref:tigaseServer71[Schema Upgrade] section for instructions on how to prepare and upgrade your database.  *This will affect all users using v7.1.0 b4129 and later.*
 
 Changes to Pubsub Schema
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -394,3 +394,5 @@ Fixes
 - Tigase.xml removed from documentation and default tigase.conf file.
 
 - Logs function added to eventbus publisher operations.
+
+- Fixed issue where attempts to delete empty MUC room would create and then destroy room.
