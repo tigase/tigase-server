@@ -109,7 +109,7 @@
 				<exclude>*/**</exclude>
 			</excludes>
 			<fileMode>0744</fileMode>
-			<directoryMode>0744</directoryMode>
+			<directoryMode>0754</directoryMode>
 		</fileSet>
 	</fileSets>
 
