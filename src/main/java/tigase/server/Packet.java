@@ -22,15 +22,14 @@
 
 package tigase.server;
 
-import tigase.xmpp.JID;
-import tigase.xmpp.StanzaType;
-
-import tigase.util.TigaseStringprepException;
-import tigase.xml.Element;
-
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
+import tigase.util.TigaseStringprepException;
+import tigase.xml.Element;
+import tigase.xmpp.JID;
+import tigase.xmpp.StanzaType;
 
 /**
  * Objects of this class carry a single XMPP packet (stanza).
@@ -140,6 +139,7 @@ public class Packet {
 	private String packetToString       = null;
 	private String packetToStringSecure = null;
 	private Set<String> processorsIds   = new LinkedHashSet<String>(4, 0.9f);
+	private LinkedHashSet<String> skippedProcessorsIds   = new LinkedHashSet<String>(4, 0.9f);
 	private JID stanzaFrom              = null;
 	private String stanzaId             = null;
 	private JID stanzaTo                = null;
@@ -830,6 +830,15 @@ public class Packet {
 	}
 
 	/**
+	 * Method returns a set of all processor IDs which skipped processing packets.
+	 *
+	 * @return a <code>Set</code> of stanza processor IDs which skipped the packet.
+	 */
+	public Set<String> getSkippedProcessorsIds() {
+		return skippedProcessorsIds;
+	}
+
+	/**
 	 * Method returns source address of the stanza enclosed by this packet.
 	 * @return a <code>JID</code> instance of the stanza source address or NULL if the
 	 * source address has not been set for the stanza.
@@ -1119,6 +1128,16 @@ public class Packet {
 		String this_xmlns = elem.getXMLNS(elementPath);
 
 		return (this_xmlns == xmlns);
+	}
+
+	/**
+	 * The method marks that the packet has NOT been processed by a packet processor
+	 * with a given ID.
+	 *
+	 * @param id is a <code>String</code> instance of the packet processer identifier.
+	 */
+	public void notProcessedBy(String id) {
+		skippedProcessorsIds.add(id);
 	}
 
 	//~--- set methods ----------------------------------------------------------
@@ -1543,6 +1562,16 @@ public class Packet {
 	 */
 	public boolean wasProcessed() {
 		return processorsIds.size() > 0;
+	}
+
+	/**
+	 * The method determines whether the packet was directed to processing by any packet processor,
+	 * but it wasn't processed by them because of internal queue full.
+	 *
+	 * @return <code>true</code> if packet was skipped by any processor.
+	 */
+	public boolean wasSkipped() {
+		return skippedProcessorsIds.size() > 0;
 	}
 
 	/**
