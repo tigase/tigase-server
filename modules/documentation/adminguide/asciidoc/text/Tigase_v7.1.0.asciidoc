@@ -269,8 +269,10 @@ New Minor Features & Behavior Changes
 - link:https://projects.tigase.org/issues/3330[#3330] Error for adding users already in db now returns Error 409 with +User exists+.
 - #3364 Clustering support has been re-factored to remove duplicate +nodeConnected+ and +nodeDisconnected+ methods.
 - #3463 +offline-roster-last-seen+ feature as a part of presence probe is now disabled by default.
+- link:https://projects.tigase.org/issues/3496[#3496] TigUserLogout has been improved to use +sha1_user_id = sha1(lower(_user_id))+ instead of "_user_id".
 - link:https://projects.tigase.org/issues/3511[#3511] Stream closing mechanism in SessionManager, new STREAM_CLOSED command has been added to organize shutdown of XMPP streams.
 - #3609 Added new configuration option for BOSH to disable hostname attribute. xref:tip_1_bosh_in_cluster_mode_without_load_balancer[Details here].
+- link:https://projects.tigase.org/issues/3849[#3849] New Roster size limit configurable setting. See info xref:rosterLimit[Here].
 
 
 Fixes
@@ -354,6 +356,8 @@ Fixes
 - link:https://projects.tigase.org/issues/3375[#3375] Users removed VIA REST commands are now disconnected immediately.
 
 - link:https://projects.tigase.org/issues/3386[#3386] Fixed AMP logic to avoid querying for (default) Privacy list if user does not exist.
+
+-link:https://projects.tigase.org/issues/3422[#3422] UTC Timestamps now enforced inside cluster_nodes table.
 
 - #3440 Fixed WebSocket error 12030 showing unexpectedly.
 
