@@ -143,6 +143,7 @@ public class TLSWrapper {
 		if (enabledCiphersProp != null) {
 			enabledCiphers = enabledCiphersProp.split(",");
 		} else if (XMPPServer.isHardenedModeEnabled()) {
+			System.setProperty("jdk.tls.ephemeralDHKeySize", "2048");
 			ArrayList<String> ciphers = new ArrayList<String>(Arrays.asList(allEnabledCiphers));
 			ciphers.removeAll(Arrays.asList(HARDENED_MODE_FORBIDDEN_SIPHERS));
 			enabledCiphers = ciphers.toArray(new String[] {});
