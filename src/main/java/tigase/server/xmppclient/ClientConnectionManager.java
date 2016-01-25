@@ -503,6 +503,11 @@ public class ClientConnectionManager
 		return null;
 	}
 
+	@Override
+	public String xmppStreamError(XMPPIOService<Object> serv, List<Element> err_el) {
+		return prepareStreamError(serv, err_el);
+	}
+
 	//~--- get methods ----------------------------------------------------------
 
 	@Override

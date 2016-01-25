@@ -685,6 +685,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		return false;
 	}
 
+	@Override
+	public String xmppStreamError(IO serv, List<Element> err_el) {
+		return "<stream:error>" + err_el.get(0).toString() + "</stream:error>";
+	}
+
 	//~--- get methods ----------------------------------------------------------
 
 	@Override

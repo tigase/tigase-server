@@ -134,7 +134,7 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 	}
 
 	@Override
-	public void endElement(StringBuilder name) {
+	public boolean endElement(StringBuilder name) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("End element name: " + name);
 		}
@@ -146,7 +146,7 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 			// some packets which may not be processed correctly if we close stream now!
 			//service.xmppStreamClosed();
 			streamClosed = true;
-			return;
+			return true;
 		}    // end of if (tmp_name.equals(ELEM_STREAM_STREAM))
 
 		if (el_stack.isEmpty()) {
@@ -154,6 +154,8 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 		}    // end of if (tmp_name.equals())
 
 		Element elem = el_stack.pop();
+		if (elem.getName() != tmp_name.intern())
+			return false;
 
 		if (el_stack.isEmpty()) {
 			elements_number_limit_count = 0;
@@ -165,6 +167,7 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 		} else {
 			el_stack.peek().addChild(elem);
 		}    // end of if (el_stack.isEmpty()) else
+		return true;
 	}
 
 	@Override
