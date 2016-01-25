@@ -42,6 +42,7 @@ import tigase.xml.SingletonFactory;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Collections;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -709,6 +710,11 @@ public class XMPPIOService<RefObject>
 						} else {
 							log.log(Level.WARNING, "{0}, data parsing error, stopping connection",
 									toString());
+						}
+						if (serviceListener != null) {
+							Element err = new Element("not-well-formed", new String[] { "xmlns" }, new String[] { "urn:ietf:params:xml:ns:xmpp-streams" });
+							String streamErrorStr = serviceListener.xmppStreamError(this, Collections.singletonList(err));
+							writeRawData(streamErrorStr);
 						}
 						forceStop();
 

@@ -1962,7 +1962,18 @@ public class SessionManager
 							packet.toStringSecure());
 				}
 			} else {
-				if ((packet.getStanzaFrom() != null) || (conn != null)) {
+				if (((packet.getStanzaFrom() != null) || (conn != null)) && packet.wasSkipped()) {
+					try {
+						error = Authorization.RESOURCE_CONSTRAINT.getResponseMessage(packet,
+								"Server subsystem overloaded, service temporarily unavailable.", true);
+						if (log.isLoggable(Level.FINE)) {
+							log.log(Level.FINE, "Server subsystem overloaded. Packet {0} not processed by processors {1}",
+									new Object[] { packet.toStringSecure(), packet.getSkippedProcessorsIds() });
+						}
+					} catch (PacketErrorTypeException e) {
+						log.log(Level.FINE, "Internal queues full. Packet is error type already: {0}", packet.toStringSecure());
+					}
+				} else if ((packet.getStanzaFrom() != null) || (conn != null)) {
 					try {
 						error = Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet,
 								"Feature not supported yet.", true);
@@ -2312,7 +2323,7 @@ public class SessionManager
 				if (pt.addItem(processor, packet, connection)) {
 					packet.processedBy(processor.id());
 				} else {
-
+					packet.notProcessedBy(processor.id());
 					// proc_t.debugQueue();
 					if (log.isLoggable(Level.FINE)) {
 						log.log(Level.FINE,

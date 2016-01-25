@@ -94,11 +94,27 @@ update tig_pairs set nid = (select nid from tig_nodes where uid=(select uid from
 -- QUERY END:
 
 -- QUERY START:
-select NOW(), 'altering tig_nodes table to add missing indexes';
+select NOW(), 'altering tig_pairs table to add missing indexes';
 -- QUERY END:
 
 -- QUERY START:
-ALTER TABLE tig_pairs ADD PRIMARY KEY(uid,nid,pkey);
+ALTER TABLE tig_pairs DROP FOREIGN KEY tig_pairs_constr_1;
+-- QUERY END:
+
+-- QUERY START:
+ALTER TABLE tig_pairs DROP FOREIGN KEY tig_pairs_constr_2;
+-- QUERY END:
+
+-- QUERY START:
+ALTER TABLE tig_pairs ADD PRIMARY KEY(nid,uid,pkey);
+-- QUERY END:
+
+-- QUERY START:
+ALTER TABLE tig_pairs ADD CONSTRAINT tig_pairs_constr_1 FOREIGN KEY (uid) REFERENCES tig_users (uid);
+-- QUERY END:
+
+-- QUERY START:
+ALTER TABLE tig_pairs ADD CONSTRAINT tig_pairs_constr_2 FOREIGN KEY (nid) REFERENCES tig_nodes (nid);
 -- QUERY END:
 
 -- QUERY START:

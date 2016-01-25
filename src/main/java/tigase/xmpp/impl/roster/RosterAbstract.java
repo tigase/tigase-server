@@ -30,6 +30,7 @@ import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
 
 import tigase.server.Packet;
+import tigase.server.PolicyViolationException;
 
 import tigase.util.Algorithms;
 
@@ -159,6 +160,7 @@ public abstract class RosterAbstract {
 			new EnumMap<SubscriptionType, StateTransition>(SubscriptionType.class);
 
 	protected static boolean emptyNameAllowed = false;
+	protected static int maxRosterSize         = new Long(Runtime.getRuntime().maxMemory() / 250000L).intValue();
 
 	//~--- static initializers --------------------------------------------------
 
@@ -444,7 +446,7 @@ public abstract class RosterAbstract {
 
 	public abstract void addBuddy(XMPPResourceConnection session, JID jid, String name,
 			String[] groups, String otherData)
-					throws NotAuthorizedException, TigaseDBException;
+					throws NotAuthorizedException, TigaseDBException, PolicyViolationException;
 
 	public abstract boolean addBuddyGroup(final XMPPResourceConnection session, JID buddy,
 			final String[] groups)
@@ -498,7 +500,7 @@ public abstract class RosterAbstract {
 
 	public boolean updateBuddySubscription(final XMPPResourceConnection session,
 			final PresenceType presence, JID jid)
-					throws NotAuthorizedException, TigaseDBException {
+					throws NotAuthorizedException, TigaseDBException, PolicyViolationException {
 		SubscriptionType current_subscription = getBuddySubscription(session, jid);
 
 		if (log.isLoggable(Level.FINEST)) {
@@ -634,6 +636,18 @@ public abstract class RosterAbstract {
 	public abstract Element getCustomChild(XMPPResourceConnection session, JID buddy)
 					throws NotAuthorizedException, TigaseDBException;
 
+	public List<Element> getCustomChildren(XMPPResourceConnection session, JID buddy)
+					throws NotAuthorizedException, TigaseDBException {
+
+		List<Element> result = new LinkedList<Element>();
+
+		Element customChild = getCustomChild( session, buddy );
+		if (customChild != null ) {
+			result.add( customChild );
+		}
+		return result;
+	}
+	
 	public PresenceType getPresenceType(final XMPPResourceConnection session,
 			final Packet packet)
 					throws NotAuthorizedException {
@@ -785,5 +799,14 @@ public abstract class RosterAbstract {
 		if ( settings.get( "empty_name_enabled" ) != null ){
 			emptyNameAllowed = Boolean.valueOf( (String) settings.get( "empty_name_enabled" ) );
 		}
+		log.log( Level.CONFIG, "Configuring empty name allowed as: " + emptyNameAllowed );
+		if ( settings.get( "max_roster_size" ) != null ){
+			try {
+				maxRosterSize = Integer.parseInt( (String) settings.get( "max_roster_size" ) );
+			} catch ( NumberFormatException e ) {
+				maxRosterSize = new Long( Runtime.getRuntime().maxMemory() / 250000L ).intValue();
+			}
+		}
+		log.log( Level.CONFIG, "Setting maximum number of roster items as: " + maxRosterSize );
 	}
 }
