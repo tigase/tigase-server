@@ -163,7 +163,7 @@ public class SessionManagerClustered
 		if (!getComponentId().equals(jid)) {
 			strategy.nodeConnected(jid);
 			
-			sendAdminNotification( jid.toString(), STATUS.CONNECETED );
+			sendAdminNotification( jid.getDomain(), STATUS.CONNECETED );
 		}
 	}
 

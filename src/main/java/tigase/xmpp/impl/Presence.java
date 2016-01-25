@@ -53,6 +53,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import tigase.server.Iq;
+import tigase.server.PolicyViolationException;
 
 import tigase.osgi.ModulesManagerImpl;
 
@@ -608,6 +609,8 @@ public class Presence
 						"Can not access user Roster, user session is not authorized yet: {0}",
 						packet);
 				log.log(Level.FINEST, "presence problem...", e);
+			} catch ( PolicyViolationException e ) {
+				log.log( Level.FINE, "Violation of roster items number policy: {0}", packet );
 			} catch (TigaseDBException e) {
 				log.log(Level.WARNING, "Error accessing database for presence data: {0}", e);
 			}    // end of try-catch
@@ -1398,7 +1401,7 @@ public class Presence
 	 */
 	protected void processInSubscribe(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
-					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException, PolicyViolationException {
 
 		// If the buddy is already subscribed then auto-reply with subscribed
 		// presence stanza.
@@ -1455,7 +1458,7 @@ public class Presence
 	 */
 	protected void processInSubscribed(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
-					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException, PolicyViolationException {
 		SubscriptionType curr_sub = roster_util.getBuddySubscription(session, packet
 				.getStanzaFrom());
 
@@ -1514,7 +1517,7 @@ public class Presence
 	 */
 	protected void processInUnsubscribe(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
-					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException, PolicyViolationException {
 		boolean subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
 				packet.getStanzaFrom());
 
@@ -1575,7 +1578,7 @@ public class Presence
 	 */
 	protected void processInUnsubscribed(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
-					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException, PolicyViolationException {
 		SubscriptionType curr_sub = roster_util.getBuddySubscription(session, packet
 				.getStanzaFrom());
 
@@ -1768,7 +1771,7 @@ public class Presence
 	 */
 	protected void processOutSubscribe(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
-					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException, PolicyViolationException {
 
 		// According to RFC-3921 I must forward all these kind presence
 		// requests, it allows to resynchronize
@@ -1842,7 +1845,7 @@ public class Presence
 	 */
 	protected void processOutSubscribed(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, PresenceType pres_type)
-					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException, PolicyViolationException {
 
 		// According to RFC-3921 I must forward all these kind presence
 		// requests, it allows to re-synchronize
@@ -1946,20 +1949,22 @@ public class Presence
 			Priority pack_priority = Priority.PRESENCE;
 			int      pres_cnt      = 0;
 
-			for (JID buddy : buddies) {
-				Element child = roster_util.getCustomChild(session, buddy);
+			for ( JID buddy : buddies ) {
+				List<Element> children = roster_util.getCustomChildren( session, buddy );
 
-				if (child != null) {
-					Packet pack = sendPresence(StanzaType.unavailable, buddy, session.getJID(),
-							results, null);
-
-					if (pres_cnt == HIGH_PRIORITY_PRESENCES_NO) {
+				if ( children != null && !children.isEmpty() ){
+					Packet pack = sendPresence( StanzaType.unavailable, buddy, session.getJID(),
+																			results, null );
+					
+					if ( pres_cnt == HIGH_PRIORITY_PRESENCES_NO ){
 						++pres_cnt;
 						pack_priority = Priority.LOWEST;
 					}
-					pack.setPriority(pack_priority);
-					pack.setPacketTo(session.getConnectionId());
-					pack.getElement().addChild(child);
+					pack.setPriority( pack_priority );
+					pack.setPacketTo( session.getConnectionId() );
+					for ( Element child : children ) {
+						pack.getElement().addChild( child );
+					}
 				}
 			}    // end of for (String buddy: buddies)
 		}

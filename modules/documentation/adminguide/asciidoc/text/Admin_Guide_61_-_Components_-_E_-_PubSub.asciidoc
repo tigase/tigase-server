@@ -33,6 +33,15 @@ Pubsub nodes within Tigase can be found as a combination of JID and node where n
 </iq>
 -----
 
+[[rosterLimit]]
+Configure Roster Maxmimum size
+------------------------------
+Starting with Tigase v7.1.0, administrators can configure the maximum allowable roster size per user via the init.properties file.
+-----
+sess-man/plugins-conf/jabber\:iqa\:roster/max_roster_size=100
+-----
+This sets the roster limit to 100 entries per user.  It can be set to any integer, however by default no limit is set.
+
 
 AdHoc Commands
 --------------

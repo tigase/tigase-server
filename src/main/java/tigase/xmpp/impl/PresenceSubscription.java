@@ -36,6 +36,7 @@ import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 
 import tigase.server.Packet;
+import tigase.server.PolicyViolationException;
 
 import tigase.xml.Element;
 
@@ -246,6 +247,8 @@ public class PresenceSubscription extends PresenceAbstract {
 						"Can not access user Roster, user session is not authorized yet: {0}",
 						packet);
 				log.log(Level.FINEST, "presence problem...", e);
+			} catch ( PolicyViolationException e ) {
+				log.log( Level.FINE, "Violation of roster items number policy: {0}", packet );
 			} catch (TigaseDBException e) {
 				log.log(Level.WARNING, "Error accessing database for presence data: {0}", e);
 			}    // end of try-catch
@@ -279,7 +282,7 @@ public class PresenceSubscription extends PresenceAbstract {
 	 */
 	protected void processInSubscribe(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, RosterAbstract.PresenceType pres_type)
-					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException, PolicyViolationException {
 
 		// If the buddy is already subscribed then auto-reply with subscribed
 		// presence stanza.
@@ -336,7 +339,7 @@ public class PresenceSubscription extends PresenceAbstract {
 	 */
 	protected void processInSubscribed(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, RosterAbstract.PresenceType pres_type)
-					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException, PolicyViolationException {
 		RosterAbstract.SubscriptionType curr_sub = roster_util.getBuddySubscription(session, packet
 				.getStanzaFrom());
 
@@ -395,7 +398,7 @@ public class PresenceSubscription extends PresenceAbstract {
 	 */
 	protected void processInUnsubscribe(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, RosterAbstract.PresenceType pres_type)
-					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException, PolicyViolationException {
 		boolean subscr_changed = roster_util.updateBuddySubscription(session, pres_type,
 				packet.getStanzaFrom());
 
@@ -456,7 +459,7 @@ public class PresenceSubscription extends PresenceAbstract {
 	 */
 	protected void processInUnsubscribed(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, RosterAbstract.PresenceType pres_type)
-					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException, PolicyViolationException {
 		RosterAbstract.SubscriptionType curr_sub = roster_util.getBuddySubscription(session, packet
 				.getStanzaFrom());
 
@@ -527,7 +530,7 @@ public class PresenceSubscription extends PresenceAbstract {
 	 */
 	protected void processOutSubscribe(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, RosterAbstract.PresenceType pres_type)
-					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException, PolicyViolationException {
 
 		// According to RFC-3921 I must forward all these kind presence
 		// requests, it allows to resynchronize
@@ -601,7 +604,7 @@ public class PresenceSubscription extends PresenceAbstract {
 	 */
 	protected void processOutSubscribed(Packet packet, XMPPResourceConnection session,
 			Queue<Packet> results, Map<String, Object> settings, RosterAbstract.PresenceType pres_type)
-					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException {
+					throws NotAuthorizedException, TigaseDBException, NoConnectionIdException, PolicyViolationException {
 
 		// According to RFC-3921 I must forward all these kind presence
 		// requests, it allows to re-synchronize

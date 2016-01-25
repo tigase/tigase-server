@@ -246,6 +246,11 @@ public class JabberIqRoster
 							 "Received roster request but user session is not authorized yet: {0}", packet );
 			results.offer( Authorization.NOT_AUTHORIZED.getResponseMessage( packet,
 																																			"You must authorize session first.", true ) );
+		} catch ( PolicyViolationException e ) {
+			log.log( Level.FINE,
+							 "Roster set request violated items number policy: {0}", packet );
+			results.offer( Authorization.POLICY_VIOLATION.getResponseMessage( packet,
+																																			e.getLocalizedMessage(), true ) );
 		} catch ( TigaseDBException e ) {
 			log.log( Level.WARNING, "Database problem, please contact admin:", e );
 			results.offer( Authorization.INTERNAL_SERVER_ERROR.getResponseMessage( packet,
@@ -498,7 +503,7 @@ public class JabberIqRoster
 	 */
 	protected void processSetRequest( Packet packet, XMPPResourceConnection session,
 																		Queue<Packet> results, final Map<String, Object> settings )
-			throws XMPPException, NotAuthorizedException, TigaseDBException {
+			throws XMPPException, NotAuthorizedException, TigaseDBException, PolicyViolationException {
 
 		// Element request = packet.getElement();
 		List<Element> items = packet.getElemChildrenStaticStr( Iq.IQ_QUERY_PATH );
@@ -798,6 +803,11 @@ public class JabberIqRoster
 
 					break;
 			}
+		} catch ( PolicyViolationException e ) {
+			log.log( Level.WARNING,
+							 "Roster set request violated items number policy: {0}", packet );
+			results.offer( Authorization.POLICY_VIOLATION.getResponseMessage( packet,
+																																			e.getLocalizedMessage(), true ) );
 		} catch ( Throwable ex ) {
 			log.log( Level.WARNING, "Reflection execution exception", ex );
 			results.offer( Authorization.INTERNAL_SERVER_ERROR.getResponseMessage( packet,
