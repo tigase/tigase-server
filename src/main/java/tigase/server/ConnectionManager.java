@@ -1581,9 +1581,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 										// for non-active connections.
 										if ( log.isLoggable( Level.INFO ) ){
 											log.log( Level.INFO,
-															 "{0}: Max inactive time exceeded, stopping: {1}",
-															 new Object[] { getName(),
-																							service } );
+															 "{0}: Max inactive time exceeded, stopping: {1} ( sinceLastTransfer: {2}, maxInactivityTime: {3}, watchdogTimeout: {4}, watchdogDelay: {5}, watchdogPingType: {6} )",
+															 new Object[] { getName(), service, getDurationSinceLastTransfer( service ),
+																							maxInactivityTime, watchdogTimeout, watchdogDelay, watchdogPingType } );
 										}
 										++watchdogStopped;
 										service.stop();
