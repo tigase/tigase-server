@@ -16,6 +16,8 @@ public class Event1 {
 	private String emptyField;
 
 	private Element elementField;
+	
+	private String[] strArrField;
 
 	public Element getElementField() {
 		return elementField;
@@ -64,4 +66,13 @@ public class Event1 {
 	public void setV2(int v2) {
 		this.v2 = v2;
 	}
+
+	public String[] getStrArrField() {
+		return this.strArrField;
+	}
+	
+	public void setStrArrField(String[] v) {
+		this.strArrField = v;
+	}
+	
 }

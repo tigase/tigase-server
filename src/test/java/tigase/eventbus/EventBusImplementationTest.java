@@ -3,6 +3,7 @@ package tigase.eventbus;
 import java.util.Arrays;
 import java.util.concurrent.Executor;
 
+import static org.junit.Assert.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -260,7 +261,55 @@ public class EventBusImplementationTest {
 		Assert.assertNull(c.resp[1]);
 		Assert.assertNull(c.resp[2]);
 	}
+	
+	
+	@Test
+	public void testRegisterAll_MethodVisibilityTest() {
+		ConsumerMethodVisibility cmv = new ConsumerMethodVisibility();
+		eventBus.registerAll(cmv);
 
+		eventBus.fire(new Event1());
+		
+		assertNotNull(cmv.resp[0]);
+		assertNotNull(cmv.resp[1]);
+		assertNotNull(cmv.resp[2]);
+		
+		Arrays.fill(cmv.resp, null);
+		
+		eventBus.unregisterAll(cmv);
+
+		eventBus.fire(new Event1());
+
+		assertNull(cmv.resp[0]);
+		assertNull(cmv.resp[1]);
+		assertNull(cmv.resp[2]);
+	}
+
+	@Test
+	public void testRegisterAll_InheritanceTest() {
+		ConsumerChild c = new ConsumerChild();
+		
+		eventBus.registerAll(c);
+		
+		assertNotNull(c.respChild[0]);
+		assertNotNull(c.respChild[1]);
+		assertNotNull(c.respChild[2]);
+		assertNull(c.respChild[3]);
+		assertNull(c.respChild[4]);
+		assertNotNull(c.respChild[5]);
+		assertNotNull(c.respChild[6]);
+		assertNull(c.respChild[7]);
+		
+		assertNull(c.respParent[0]);
+		assertNull(c.respParent[1]);
+		assertNotNull(c.respParent[2]);
+		assertNotNull(c.respParent[3]);
+		assertNotNull(c.respParent[4]);
+		assertNull(c.respParent[5]);
+		assertNotNull(c.respParent[6]);
+		assertNotNull(c.respParent[7]);
+	}
+	
 	@Test
 	public void testRemoveListener() {
 		final Object resp[] = new Object[] { null, null, null, null, null };
@@ -368,6 +417,115 @@ public class EventBusImplementationTest {
 		public void event2(Event12 e, Object source) {
 			resp[2] = e;
 			Assert.assertTrue(source instanceof EventBusImplementationTest);
+		}
+
+	}
+	
+	public static class ConsumerMethodVisibility {
+
+		private final Object resp[] = new Object[] { null, null, null };
+		
+		@HandleEvent
+		public void event0public(Event1 e) {
+			resp[0] = e;
+		}
+		
+		@HandleEvent
+		protected void event1protected(Event1 e) {
+			resp[1] = e;
+		}
+		
+		@HandleEvent
+		private void event2private(Event1 e) {
+			resp[2] = e;
+		}
+	}
+	
+	public static class ConsumerParent {
+		
+		protected final Object[] respParent = new Object[] { null, null, null, null, null, null, null, null };
+		
+		@HandleEvent
+		public void event0(Event1 e) {
+			respParent[0] = e;
+		}
+		
+		@HandleEvent
+		public void event1(Event1 e) {
+			respParent[1] = e;
+		}
+
+		@HandleEvent
+		public void event2(Event1 e) {
+			respParent[2] = e;
+		}
+
+		@HandleEvent
+		public void event3(Event1 e) {
+			respParent[3] = e;
+		}
+
+		@HandleEvent
+		private void event4(Event1 e) {
+			respParent[4] = e;
+		}
+
+		@HandleEvent
+		protected void event5(Event1 e) {
+			respParent[5] = e;
+		}
+
+		@HandleEvent
+		protected void event6(Event1 e) {
+			respParent[6] = e;
+		}
+	
+		@HandleEvent
+		protected void event7(Event1 e) {
+			respParent[7] = e;
+		}
+		
+	}
+	
+	public static class ConsumerChild extends ConsumerParent {
+		
+		private final Object[] respChild = new Object[] { null, null, null, null, null, null, null, null };
+		
+		@HandleEvent
+		@Override
+		public void event0(Event1 e) {
+			respChild[0] = e;
+		}
+
+		@Override
+		public void event1(Event1 e) {
+			respChild[1] = e;
+		}
+
+		@Override
+		@HandleEvent
+		public void event2(Event1 e) {
+			respChild[2] = e;
+			super.event2(e);
+		}
+		
+		public void event3(Event1 e, String x) {
+			respChild[3] = e;
+		}
+
+		private void event4(Event1 e) {
+			respChild[4] = e;
+		}
+
+		@Override
+		protected void event5(Event1 e) {
+			respChild[5] = e;
+		}
+
+		@Override
+		protected void event6(Event1 e) {
+			respChild[6] = e;
+			super.event6(e);
 		}
 
 	}
