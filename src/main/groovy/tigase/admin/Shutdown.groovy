@@ -30,7 +30,7 @@ package tigase.admin
 import tigase.xml.*;
 import tigase.server.*
 import tigase.server.xmppserver.*
-import tigase.disteventbus.EventBusFactory;
+import tigase.eventbus.EventBusFactory;
 
 def DELAY = "delay";
 def NODE = "node";
@@ -65,10 +65,7 @@ if (nodes == null || nodes.isEmpty()) {
 } else {
 	result = p.commandResult(Command.DataType.result);
 	nodes.each { node ->
-		def event = new Element("shutdown", ["xmlns", "node", "delay"] as String[], ["tigase:server", node, delay] as String[]);
-		if (notify && msg) {
-			event.addChild(new Element("msg", msg.join("\n")));
-		}
+		def event = new tigase.eventbus.events.ShutdownEvent(node, delay as Long, (notify && msg) ? msg.join("\n") : null);
 		eventBus.fire(event);
 	}
 	Command.addTextField(result, "Info", "Shutdown of service started");

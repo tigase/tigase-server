@@ -129,9 +129,10 @@ import tigase.xmpp.impl.PresenceCapabilitiesManager;
 import tigase.stats.StatisticsList;
 
 import java.util.Collection;
-import tigase.disteventbus.EventBus;
-import tigase.disteventbus.EventBusFactory;
-import tigase.disteventbus.clustered.EventHandler;
+import tigase.eventbus.EventBus;
+import tigase.eventbus.EventBusFactory;
+import tigase.eventbus.HandleEvent;
+import tigase.eventbus.events.ShutdownEvent;
 
 /**
  * Class SessionManager
@@ -227,10 +228,6 @@ public class SessionManager
 			new ConcurrentHashMap<JID, XMPPResourceConnection>(100000);
 	private int activeUserNumber = 0;
 
-	private EventHandler shutdownEventHandler = (String name, String xmlns, Element event) -> {
-		nodeShutdown(event.getAttributeStaticStr("node"), Integer.parseInt(event.getAttributeStaticStr("delay")), 
-				event.getChildCData((e) -> e.getName().equals("msg")));
-	};
 	private NodeShutdownTask nodeShutdownTask = new NodeShutdownTask();
 	
 	//~--- methods --------------------------------------------------------------
@@ -583,12 +580,12 @@ public class SessionManager
 	@Override
 	public void start() {
 		super.start();
-		eventBus.addHandler("shutdown", "tigase:server", shutdownEventHandler);
+		eventBus.registerAll(this);
 	}
 	
 	@Override
 	public void stop() {
-		eventBus.removeHandler("shutdown", "tigase:server", shutdownEventHandler);
+		eventBus.unregisterAll(this);
 		super.stop();
 		List<String> pluginsToStop = new ArrayList<String>(workerThreads.keySet());
 		for (String plugin_id : pluginsToStop) {
@@ -2133,14 +2130,15 @@ public class SessionManager
 		return 2;
 	}
 
-	protected void nodeShutdown(String node, int delaySecs, String msg) {
+	@HandleEvent
+	protected void nodeShutdown(ShutdownEvent event) {
 		// if not this node is being shutdown then do nothing
-		if (!node.equals(getComponentId().getDomain()))
+		if (!event.getNode().equals(getComponentId().getDomain()))
 			return;
 		
-		if (msg != null) {
+		if (event.getMessage() != null) {
 			Element msgEl = new Element("message", new String[] { Packet.XMLNS_ATT }, new String[] { Packet.CLIENT_XMLNS });
-			msgEl.addChild(new Element("body", msg));
+			msgEl.addChild(new Element("body", event.getMessage()));
 			for (XMPPResourceConnection conn : connectionsByFrom.values()) {
 				try {
 					Element packetEl = msgEl.clone();
@@ -2156,7 +2154,7 @@ public class SessionManager
 		
 		// schedule close of existing session after 30 seconds to make sure that
 		// other components will be aware that we are stopping this server
-		addTimerTask(nodeShutdownTask, delaySecs * SECOND, 1 * SECOND);
+		addTimerTask(nodeShutdownTask, event.getDelay() * SECOND, 1 * SECOND);
 	}
 	
 	//~--- get methods ----------------------------------------------------------

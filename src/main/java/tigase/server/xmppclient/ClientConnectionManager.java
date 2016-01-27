@@ -44,9 +44,10 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import tigase.conf.ConfigurationException;
-import tigase.disteventbus.EventBus;
-import tigase.disteventbus.EventBusFactory;
-import tigase.disteventbus.clustered.EventHandler;
+import tigase.eventbus.EventBus;
+import tigase.eventbus.EventBusFactory;
+import tigase.eventbus.HandleEvent;
+import tigase.eventbus.events.ShutdownEvent;
 import tigase.net.IOService;
 import tigase.net.SocketThread;
 import tigase.net.SocketType;
@@ -126,10 +127,6 @@ public class ClientConnectionManager
 			new ClientTrustManagerFactory();
 	private final EventBus eventBus = EventBusFactory.getInstance();
 	private boolean tlsWantClientAuthEnabled = TLS_WANT_CLIENT_AUTH_ENABLED_DEF;
-	private final EventHandler shutdownEventHandler = (String name, String xmlns, Element event) -> {
-		String node = event.getAttributeStaticStr("node");
-		nodeShutdown(node, Integer.parseInt(event.getAttributeStaticStr("delay")));
-	};
 	private final ShutdownTask shutdownTask = new ShutdownTask();
 
 	//~--- methods --------------------------------------------------------------
@@ -332,12 +329,12 @@ public class ClientConnectionManager
 		super.start();
 		ipMonitor = new IPMonitor();
 		ipMonitor.start();
-		eventBus.addHandler("shutdown", "tigase:server", shutdownEventHandler);
+		eventBus.registerAll(this);
 	}
 
 	@Override
 	public void stop() {
-		eventBus.removeHandler("shutdown", "tigase:server", shutdownEventHandler);
+		eventBus.unregisterAll(this);
 		super.stop();
 		ipMonitor.stopThread();
 	}
@@ -715,11 +712,12 @@ public class ClientConnectionManager
 		return new StoppedHandler();
 	}
 
-	protected void nodeShutdown(String node, int delaySecs) {
-		if (node == null || !getComponentId().getDomain().equals(node))
+	@HandleEvent
+	protected void nodeShutdown(ShutdownEvent event) {
+		if (event.getNode() == null || !getComponentId().getDomain().equals(event.getNode()))
 			return;
 		
-		addTimerTask(shutdownTask, delaySecs * SECOND);
+		addTimerTask(shutdownTask, event.getDelay() * SECOND);
 	}
 	
 	/**

@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tigase.eventbus.events.ShutdownEvent;
 import tigase.xmpp.JID;
 
 //~--- classes ----------------------------------------------------------------
@@ -110,8 +111,8 @@ public class SeeOtherHostHashed extends SeeOtherHost {
 	}
 
 	@Override
-	protected void nodeShutdown(String node) {
-		super.nodeShutdown(node);
+	protected void nodeShutdown(ShutdownEvent event) {
+		super.nodeShutdown(event);
 		synchronized (this) {
 			setConnectedNodes(new ArrayList<>(this.connectedNodes));
 		}
