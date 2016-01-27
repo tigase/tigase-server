@@ -1,8 +1,5 @@
 package tigase.eventbus;
 
-/**
- * Created by bmalkow on 18.01.2016.
- */
 public abstract class AbstractHandler {
 
 	private final String packageName;
@@ -25,9 +22,21 @@ public abstract class AbstractHandler {
 
 	public abstract Type getRequiredEventType();
 
+	/**
+	 * Defines what type of event is expected by Handler.
+	 */
 	public enum Type {
+		/**
+		 * Only non-XML events. XML events will be ignored.
+		 */
 		object,
+		/**
+		 * Only XML events. Non-XML events will be converted to XML.
+		 */
 		element,
+		/**
+		 * As is. Without conversion.
+		 */
 		asIs
 	}
 

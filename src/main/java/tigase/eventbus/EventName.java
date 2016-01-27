@@ -15,13 +15,13 @@ public class EventName {
 		this.eventName = tmp.equals("*") ? null : tmp;
 	}
 
-	public EventName(String eventName, String eventPackage) {
+	public EventName(String eventPackage, String eventName) {
 		super();
 		this.eventName = eventName;
 		this.eventPackage = eventPackage;
 	}
 
-	public final static String toString(final String eventName, final String eventPackage) {
+	public final static String toString(final String eventPackage, final String eventName) {
 		String result = "";
 		if (eventPackage == null)
 			result += "*";
@@ -80,7 +80,7 @@ public class EventName {
 
 	@Override
 	public String toString() {
-		return toString(eventName, eventPackage);
+		return toString(eventPackage, eventName);
 	}
 
 }

@@ -13,7 +13,7 @@ public abstract class AbstractListenerHandler<T> extends AbstractHandler {
 	public boolean equals(Object o) {
 		if (this == o)
 			return true;
-		if (o == null || getClass() != o.getClass())
+		if (o == null || !(o instanceof AbstractListenerHandler))
 			return false;
 
 		AbstractListenerHandler that = (AbstractListenerHandler) o;

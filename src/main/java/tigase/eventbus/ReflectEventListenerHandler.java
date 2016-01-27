@@ -4,11 +4,11 @@ import java.lang.reflect.Method;
 
 public class ReflectEventListenerHandler extends AbstractHandler {
 
-	private final Object consumerObject;
+	protected final Object consumerObject;
 
-	private final Method handlerMethod;
+	protected final Method handlerMethod;
 
-	private final HandleEvent.Type filter;
+	protected final HandleEvent.Type filter;
 
 	public ReflectEventListenerHandler(HandleEvent.Type filter, final String packageName, final String eventName,
 			Object consumerObject, Method handlerMethod) {
@@ -37,8 +37,6 @@ public class ReflectEventListenerHandler extends AbstractHandler {
 			return true;
 		if (o == null || getClass() != o.getClass())
 			return false;
-		if (!super.equals(o))
-			return false;
 
 		ReflectEventListenerHandler that = (ReflectEventListenerHandler) o;
 
@@ -55,9 +53,9 @@ public class ReflectEventListenerHandler extends AbstractHandler {
 
 	@Override
 	public int hashCode() {
-		int result = super.hashCode();
-		result = 31 * result + consumerObject.hashCode();
+		int result = consumerObject.hashCode();
 		result = 31 * result + handlerMethod.hashCode();
 		return result;
 	}
+
 }

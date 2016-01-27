@@ -18,7 +18,7 @@ public class EventBusImplementation implements EventBus {
 	};
 
 	public void addHandler(AbstractHandler listenerHandler) {
-		listeners.put(listenerHandler.getEventName(), listenerHandler.getPackageName(), listenerHandler);
+		listeners.put(listenerHandler.getPackageName(), listenerHandler.getEventName(), listenerHandler);
 	}
 
 	public <T> void addListener(Class<T> eventClass, EventListener<T> listener) {
@@ -88,6 +88,10 @@ public class EventBusImplementation implements EventBus {
 		fire(event, null, false);
 	}
 
+	public void fire(Object event, Object source) {
+		fire(event, source, false);
+	}
+
 	public void fire(Object event, Object source, boolean remotelyGeneratedEvent) {
 		HashSet<AbstractHandler> listeners;
 		if (event instanceof Element) {
@@ -113,16 +117,20 @@ public class EventBusImplementation implements EventBus {
 		fire(event);
 	}
 
+	public Collection<AbstractHandler> getAllHandlers() {
+		return listeners.getAllData();
+	}
+
 	public Set<EventName> getAllListenedEvents() {
 		return listeners.getAllListenedEvents();
 	}
 
 	List<EventListener> getEventListeners(final String packageName, final String eventName) {
 		ArrayList<EventListener> result = new ArrayList<>();
-		Collection ls = listeners.get(eventName, packageName);
+		Collection ls = listeners.get(packageName, eventName);
 		result.addAll(ls);
 
-		ls = listeners.get(eventName, null);
+		ls = listeners.get(null, eventName);
 		result.addAll(ls);
 
 		return result;
@@ -154,8 +162,8 @@ public class EventBusImplementation implements EventBus {
 			final String packageName = cls.getPackage().getName();
 			final String eventName = cls.getSimpleName();
 
-			result.addAll(listeners.get(eventName, packageName));
-			result.addAll(listeners.get(null, packageName));
+			result.addAll(listeners.get(packageName, eventName));
+			result.addAll(listeners.get(packageName, null));
 		}
 		result.addAll(listeners.get(null, null));
 
@@ -164,15 +172,15 @@ public class EventBusImplementation implements EventBus {
 
 	HashSet<AbstractHandler> getListenersForEvent(final String packageName, final String eventName) {
 		final HashSet<AbstractHandler> result = new HashSet<>();
-		result.addAll(listeners.get(eventName, packageName));
-		result.addAll(listeners.get(null, packageName));
+		result.addAll(listeners.get(packageName, eventName));
+		result.addAll(listeners.get(packageName, null));
 		result.addAll(listeners.get(null, null));
 
 		return result;
 	}
 
-	public boolean isListened(String eventName, String eventPackage) {
-		return listeners.hasData(eventName, eventPackage);
+	public boolean isListened(String eventPackage, String eventName) {
+		return listeners.hasData(eventPackage, eventName);
 	}
 
 	public void registerAll(Object consumer) {

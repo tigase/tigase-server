@@ -12,19 +12,20 @@ public class UsersDisconnectTaskTest {
 	@Test
 	public void testCreateAlarmEvent() throws Exception {
 		Element e = createAlarmEvent(100, 200, 10, 50);
+
 		assertNotNull(e);
-		assertEquals(100, Integer.parseInt(e.getCData(new String[] { "UsersDisconnected", "disconnections" })));
-		assertEquals(50f, Float.parseFloat(e.getCData(new String[] { "UsersDisconnected", "disconnectionsPercent" })), 0);
+		assertEquals(100, Integer.parseInt(e.getCData(new String[] { "tigase.monitor.tasks.UsersDisconnected", "disconnections" })));
+		assertEquals(50f, Float.parseFloat(e.getCData(new String[] { "tigase.monitor.tasks.UsersDisconnected", "disconnectionsPercent" })), 0);
 
 		e = createAlarmEvent(99, 250, 10, 50);
 		assertNotNull(e);
-		assertEquals(151, Integer.parseInt(e.getCData(new String[] { "UsersDisconnected", "disconnections" })));
-		assertEquals(60.4, Float.parseFloat(e.getCData(new String[] { "UsersDisconnected", "disconnectionsPercent" })), 0.01);
+		assertEquals(151, Integer.parseInt(e.getCData(new String[] { "tigase.monitor.tasks.UsersDisconnected", "disconnections" })));
+		assertEquals(60.4, Float.parseFloat(e.getCData(new String[] { "tigase.monitor.tasks.UsersDisconnected", "disconnectionsPercent" })), 0.01);
 
 		e = createAlarmEvent(0, 99, 10, 50);
 		assertNotNull(e);
-		assertEquals(99, Integer.parseInt(e.getCData(new String[] { "UsersDisconnected", "disconnections" })));
-		assertEquals(100.0, Float.parseFloat(e.getCData(new String[] { "UsersDisconnected", "disconnectionsPercent" })), 0.01);
+		assertEquals(99, Integer.parseInt(e.getCData(new String[] { "tigase.monitor.tasks.UsersDisconnected", "disconnections" })));
+		assertEquals(100.0, Float.parseFloat(e.getCData(new String[] { "tigase.monitor.tasks.UsersDisconnected", "disconnectionsPercent" })), 0.01);
 
 		e = createAlarmEvent(99, 250, 152, 50);
 		assertNull(e);

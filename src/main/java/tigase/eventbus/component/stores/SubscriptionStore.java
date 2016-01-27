@@ -16,8 +16,8 @@ public class SubscriptionStore {
 
 	private final EventsNameMap<Subscription> subscribers = new EventsNameMap<Subscription>();
 
-	public void addSubscription(String eventName, String eventPackage, Subscription subscription) {
-		subscribers.put(eventName, eventPackage, subscription);
+	public void addSubscription(String eventPackage, String eventName, Subscription subscription) {
+		subscribers.put(eventPackage, eventName, subscription);
 	}
 
 	public Collection<Subscription> getAllData() {
@@ -28,23 +28,23 @@ public class SubscriptionStore {
 		return subscribers.getAllListenedEvents();
 	}
 
-	public Collection<Subscription> getSubscribersJIDs(String eventName, String eventPackage) {
+	public Collection<Subscription> getSubscribersJIDs(String eventPackage, String eventName) {
 		final HashSet<Subscription> handlers = new HashSet<Subscription>();
-		handlers.addAll(subscribers.get(eventName, eventPackage));
-		handlers.addAll(subscribers.get(null, eventPackage));
+		handlers.addAll(subscribers.get(eventPackage, eventName));
+		handlers.addAll(subscribers.get(eventPackage, null));
 		return handlers;
 	}
 
-	public boolean hasSubscriber(String eventName, String eventPackage) {
-		return subscribers.hasData(eventName, eventPackage);
+	public boolean hasSubscriber(String eventPackage, String eventName) {
+		return subscribers.hasData(eventPackage, eventName);
 	}
 
 	public void remove(Subscription jid) {
 		subscribers.delete(jid);
 	}
 
-	public void removeSubscription(String eventName, String eventPackage, Subscription jidInstanceNS) {
-		subscribers.delete(eventName, eventPackage, jidInstanceNS);
+	public void removeSubscription(String eventPackage, String eventName, Subscription jidInstanceNS) {
+		subscribers.delete(eventPackage, eventName, jidInstanceNS);
 	}
 
 }

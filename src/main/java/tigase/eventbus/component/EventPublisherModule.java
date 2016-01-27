@@ -105,16 +105,16 @@ public class EventPublisherModule extends AbstractEventBusModule implements Init
 			}
 			return;
 		}
-		final Collection<Subscription> subscribers = subscriptionStore.getSubscribersJIDs(en.getName(), en.getPackage());
-		publishEvent(en.getName(), en.getPackage(), event, subscribers);
+		final Collection<Subscription> subscribers = subscriptionStore.getSubscribersJIDs(en.getPackage(), en.getName());
+		publishEvent(en.getPackage(), en.getName(), event, subscribers);
 	}
 
-	public void publishEvent(String name, String eventPackage, Element event, Collection<Subscription> subscribers) {
+	public void publishEvent(String eventPackage, String name, Element event, Collection<Subscription> subscribers) {
 		try {
 			final Element eventElem = new Element("event", new String[] { "xmlns" },
 					new String[] { "http://jabber.org/protocol/pubsub#event" });
 			final Element itemsElem = new Element("items", new String[] { "node" },
-					new String[] { EventName.toString(name, eventPackage) });
+					new String[] { EventName.toString(eventPackage, name) });
 			eventElem.addChild(itemsElem);
 			final Element itemElem = new Element("item");
 			itemElem.addChild(event);
@@ -151,8 +151,8 @@ public class EventPublisherModule extends AbstractEventBusModule implements Init
 
 		Element eventElement = serializer.serialize(event);
 
-		final Collection<Subscription> subscribers = subscriptionStore.getSubscribersJIDs(eventName, packageName);
-		publishEvent(eventName, packageName, eventElement, subscribers);
+		final Collection<Subscription> subscribers = subscriptionStore.getSubscribersJIDs(packageName, eventName);
+		publishEvent(packageName, eventName, eventElement, subscribers);
 	}
 
 }

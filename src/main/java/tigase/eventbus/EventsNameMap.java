@@ -39,7 +39,7 @@ public class EventsNameMap<M> {
 		}
 	}
 
-	public void delete(String name, String pckg, M data) {
+	public void delete(String pckg, String name, M data) {
 		final String eventName = name == null ? NULL_NAME : name;
 		final String eventPackage = pckg == null ? NULL_NAME : pckg;
 
@@ -62,7 +62,7 @@ public class EventsNameMap<M> {
 		}
 	}
 
-	public Collection<M> get(String name, String pckg) {
+	public Collection<M> get(String pckg, String name) {
 		final String eventName = name == null ? NULL_NAME : name;
 		final String eventPackage = pckg == null ? NULL_NAME : pckg;
 
@@ -98,14 +98,14 @@ public class EventsNameMap<M> {
 			Iterator<String> namesIt = e.getValue().keySet().iterator();
 			while (namesIt.hasNext()) {
 				String n = namesIt.next();
-				result.add(new EventName(n == NULL_NAME ? null : n, eventPackage == NULL_NAME ? null : eventPackage));
+				result.add(new EventName(eventPackage == NULL_NAME ? null : eventPackage, n == NULL_NAME ? null : n));
 			}
 		}
 
 		return result;
 	}
 
-	public boolean hasData(String name, String pckg) {
+	public boolean hasData(String pckg, String name) {
 		final String eventName = name == null ? NULL_NAME : name;
 		final String eventPackage = pckg == null ? NULL_NAME : pckg;
 
@@ -117,7 +117,7 @@ public class EventsNameMap<M> {
 		return !(dataList == null || dataList.isEmpty());
 	}
 
-	public void put(String name, String pckg, M data) {
+	public void put(String pckg, String name, M data) {
 		final String eventName = name == null ? NULL_NAME : name;
 		final String eventPackage = pckg == null ? NULL_NAME : pckg;
 

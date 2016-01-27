@@ -71,8 +71,8 @@ public class SubscribeModule extends AbstractEventBusModule implements Initializ
 		}
 
 		for (EventName eventName : subscriptionStore.getSubscribedEvents()) {
-			Collection<Subscription> subscriptions = subscriptionStore.getSubscribersJIDs(eventName.getName(),
-					eventName.getPackage());
+			Collection<Subscription> subscriptions = subscriptionStore.getSubscribersJIDs(eventName.getPackage(), eventName.getName()
+			);
 			for (Subscription subscription : subscriptions) {
 				if (subscription.getServiceJID() != null)
 					pubsubNodes.add(
@@ -113,7 +113,7 @@ public class SubscribeModule extends AbstractEventBusModule implements Initializ
 			if (component.getComponentId().equals(node))
 				continue;
 
-			Element se = prepareSubscribeElement(new EventName(eventName, eventPackage), component.getComponentId(), null);
+			Element se = prepareSubscribeElement(new EventName(eventPackage, eventName), component.getComponentId(), null);
 			sendSubscribeRequest("eventbus@" + node.getDomain(), Collections.singleton(se));
 		}
 	}
@@ -163,7 +163,7 @@ public class SubscribeModule extends AbstractEventBusModule implements Initializ
 			subscription.setInClusterSubscription(true);
 			subscription.setServiceJID(JID.jidInstanceNS(service));
 
-			subscriptionStore.addSubscription(parsedName.getName(), parsedName.getPackage(), subscription);
+			subscriptionStore.addSubscription(parsedName.getPackage(), parsedName.getName(), subscription);
 
 		}
 		return null;
@@ -197,7 +197,7 @@ public class SubscribeModule extends AbstractEventBusModule implements Initializ
 			Subscription subscription = new Subscription(jid, packet.getStanzaTo());
 			subscription.setInClusterSubscription(false);
 
-			subscriptionStore.addSubscription(parsedName.getName(), parsedName.getPackage(), subscription);
+			subscriptionStore.addSubscription(parsedName.getPackage(), parsedName.getName(), subscription);
 
 			subscribedNodes.add(prepareSubscribeElement(parsedName, jid, packet.getStanzaTo().toString()));
 

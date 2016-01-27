@@ -37,7 +37,7 @@ public class UnsubscribeModule extends AbstractEventBusModule implements Initial
 		@Override
 		public void onEvent(final EventBusImplementation.ListenerRemovedEvent event) {
 			if (!event.getPackageName().startsWith("tigase.eventbus"))
-				UnsubscribeModule.this.onRemoveHandler(event.getEventName(), event.getPackageName());
+				UnsubscribeModule.this.onRemoveHandler(event.getPackageName(), event.getEventName());
 		}
 	};
 
@@ -64,12 +64,12 @@ public class UnsubscribeModule extends AbstractEventBusModule implements Initial
 		localEventBus.addListener(EventBusImplementation.ListenerRemovedEvent.class, eventBusHandlerRemovedHandler);
 	}
 
-	protected void onRemoveHandler(String eventName, String eventPackage) {
-		boolean listenedByHandlers = localEventBus.isListened(eventName, eventPackage);
+	protected void onRemoveHandler(String eventPackage, String eventName) {
+		boolean listenedByHandlers = localEventBus.isListened(eventPackage, eventName);
 
 		if (!listenedByHandlers) {
 			for (JID node : component.getNodesConnected()) {
-				Element se = prepareUnsubscribeElement(new EventName(eventName, eventPackage), component.getComponentId(),
+				Element se = prepareUnsubscribeElement(new EventName(eventPackage, eventName), component.getComponentId(),
 						null);
 				sendUnsubscribeRequest("eventbus@" + node.getDomain(), Collections.singleton(se));
 			}
@@ -105,7 +105,7 @@ public class UnsubscribeModule extends AbstractEventBusModule implements Initial
 				EventName parsedName = new EventName(unsubscribe.getAttributeStaticStr("node"));
 				JID jid = JID.jidInstance(unsubscribe.getAttributeStaticStr("jid"));
 
-				subscriptionStore.removeSubscription(parsedName.getName(), parsedName.getPackage(), new Subscription(jid));
+				subscriptionStore.removeSubscription(parsedName.getPackage(), parsedName.getName(), new Subscription(jid));
 			}
 		} else {
 			// request from something out of cluster
@@ -117,7 +117,7 @@ public class UnsubscribeModule extends AbstractEventBusModule implements Initial
 				if (log.isLoggable(Level.FINER))
 					log.finer("Entity " + jid + " subscribed for events " + parsedName);
 
-				subscriptionStore.removeSubscription(parsedName.getName(), parsedName.getPackage(),
+				subscriptionStore.removeSubscription(parsedName.getPackage(), parsedName.getName(),
 						new Subscription(jid, packet.getStanzaTo()));
 
 				subscribedNodes.add(prepareUnsubscribeElement(parsedName, jid, packet.getStanzaTo().toString()));

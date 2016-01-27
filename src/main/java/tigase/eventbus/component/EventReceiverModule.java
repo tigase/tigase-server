@@ -92,15 +92,15 @@ public class EventReceiverModule extends AbstractEventBusModule {
 				fireEventLocally(eventName, event);
 
 				// forwarding event to _non cluster_ subscribers.
-				final Collection<Subscription> subscribers = subscriptionStore.getSubscribersJIDs(eventName.getName(),
-						eventName.getPackage());
+				final Collection<Subscription> subscribers = subscriptionStore.getSubscribersJIDs(eventName.getPackage(), eventName.getName()
+				);
 				Iterator<Subscription> it = subscribers.iterator();
 				while (it.hasNext()) {
 					Subscription subscription = it.next();
 					if (subscription.isInClusterSubscription())
 						it.remove();
 				}
-				eventPublisherModule.publishEvent(eventName.getName(), eventName.getPackage(), event, subscribers);
+				eventPublisherModule.publishEvent(eventName.getPackage(), eventName.getName(), event, subscribers);
 			}
 		}
 
