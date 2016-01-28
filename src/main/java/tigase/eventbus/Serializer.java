@@ -7,6 +7,7 @@ import java.lang.reflect.Modifier;
 import tigase.kernel.BeanUtils;
 import tigase.kernel.TypesConverter;
 import tigase.xml.Element;
+import tigase.xml.XMLUtils;
 
 public class Serializer {
 
@@ -36,7 +37,7 @@ public class Serializer {
 						} else
 							value = null;
 					} else {
-						value = TypesConverter.convert(v.getCData(), f.getType());
+						value = TypesConverter.convert(XMLUtils.unescape(v.getCData()), f.getType());
 					}
 					BeanUtils.setValue(result, f, value);
 				} catch (IllegalAccessException | InvocationTargetException caught) {
@@ -73,7 +74,8 @@ public class Serializer {
 				if (Element.class.isAssignableFrom(f.getType())) {
 					v.addChild((Element) value);
 				} else {
-					v.setCData(TypesConverter.toString(value));
+					String x = TypesConverter.toString(value);
+					v.setCData(XMLUtils.escape(x));
 				}
 				e.addChild(v);
 			} catch (IllegalAccessException | InvocationTargetException caught) {

@@ -290,7 +290,9 @@ public class EventBusImplementationTest {
 		ConsumerChild c = new ConsumerChild();
 		
 		eventBus.registerAll(c);
-		
+
+		eventBus.fire(new Event1());
+
 		assertNotNull(c.respChild[0]);
 		assertNotNull(c.respChild[1]);
 		assertNotNull(c.respChild[2]);

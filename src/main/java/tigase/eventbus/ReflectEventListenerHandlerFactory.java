@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Logger;
 
+import tigase.kernel.BeanUtils;
+
 public class ReflectEventListenerHandlerFactory {
 
 	protected final Logger log = Logger.getLogger(this.getClass().getName());
@@ -12,7 +14,8 @@ public class ReflectEventListenerHandlerFactory {
 	public Collection<AbstractHandler> create(final Object consumer) throws RegistrationException {
 		ArrayList<AbstractHandler> result = new ArrayList<>();
 
-		Method[] methods = consumer.getClass().getMethods();
+		Method[] methods = BeanUtils.getAllMethods(consumer.getClass());
+
 		for (Method method : methods) {
 			final HandleEvent annotation = method.getAnnotation(HandleEvent.class);
 
@@ -37,6 +40,8 @@ public class ReflectEventListenerHandlerFactory {
 				handler = new ReflectEventSourceListenerHandler(annotation.filter(), packageName, eventName, consumer, method);
 			} else
 				throw new RegistrationException("Handler method must have exactly one parameter!");
+
+			method.setAccessible(true);
 
 			result.add(handler);
 		}

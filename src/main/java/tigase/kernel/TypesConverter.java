@@ -5,9 +5,11 @@ import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
 
 import tigase.util.Base64;
 import tigase.util.TigaseStringprepException;
+import tigase.xml.XMLUtils;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
@@ -16,12 +18,19 @@ import tigase.xmpp.JID;
  */
 public class TypesConverter {
 
+	private static final String[] decoded = { "," };
+	private static final String[] encoded = { "\\," };
+	private static final String[] decoded_1 = { "," };
+	private static final String[] encoded_1 = { "\\," };
+
+	private final static String regex = "(?<!\\\\)" + Pattern.quote(",");
+
 	private TypesConverter() {
 	}
 
 	/**
 	 * Converts object to String.
-	 * 
+	 *
 	 * @param value
 	 *            object to convert.
 	 * @return text representation of value.
@@ -35,7 +44,7 @@ public class TypesConverter {
 			StringBuilder sb = new StringBuilder();
 			Iterator it = ((Collection) value).iterator();
 			while (it.hasNext()) {
-				sb.append(toString(it.next()));
+				sb.append(escape(toString(it.next())));
 				if (it.hasNext())
 					sb.append(',');
 			}
@@ -45,7 +54,7 @@ public class TypesConverter {
 			final int l = Array.getLength(value);
 			for (int i = 0; i < l; i++) {
 				Object o = Array.get(value, i);
-				sb.append(toString(o));
+				sb.append(escape(toString(o)));
 				if (i + 1 < l)
 					sb.append(',');
 
@@ -57,7 +66,7 @@ public class TypesConverter {
 
 	/**
 	 * Converts value to expected type.
-	 * 
+	 *
 	 * @param value
 	 *            value to be converted.
 	 * @param expectedType
@@ -142,10 +151,10 @@ public class TypesConverter {
 			} else if (expectedType.equals(char[].class) && value.toString().startsWith("base64:")) {
 				return (T) (new String(Base64.decode(value.toString().substring(7)))).toCharArray();
 			} else if (expectedType.isArray()) {
-				String[] a_str = value.toString().split(",");
+				String[] a_str = value.toString().split(regex);
 				Object result = Array.newInstance(expectedType.getComponentType(), a_str.length);
 				for (int i = 0; i < a_str.length; i++) {
-					Array.set(result, i, TypesConverter.convert(a_str[i], expectedType.getComponentType()));
+					Array.set(result, i, TypesConverter.convert(unescape(a_str[i]), expectedType.getComponentType()));
 				}
 				return (T) result;
 			}
@@ -153,6 +162,22 @@ public class TypesConverter {
 			throw new RuntimeException("Unsupported conversion to " + expectedType);
 		} catch (TigaseStringprepException e) {
 			throw new IllegalArgumentException(e);
+		}
+	}
+
+	private static String escape(String input) {
+		if (input != null) {
+			return XMLUtils.translateAll(input, decoded, encoded);
+		} else {
+			return null;
+		}
+	}
+
+	private static String unescape(String input) {
+		if (input != null) {
+			return XMLUtils.translateAll(input, encoded_1, decoded_1);
+		} else {
+			return null;
 		}
 	}
 
