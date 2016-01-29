@@ -260,7 +260,7 @@ public class StatisticsProvider
 				? cache.direct_used_history.getCurrentHistory()
 				: null;
 	}
-
+	
 	@Override
 	public float getHeapMemUsage() {
 		return TigaseRuntime.getTigaseRuntime().getHeapMemUsage();

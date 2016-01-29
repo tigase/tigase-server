@@ -26,6 +26,8 @@ package tigase.xmpp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import tigase.server.Packet;
 
 //~--- enums ------------------------------------------------------------------
@@ -466,8 +468,22 @@ public enum Authorization {
 	protected static final String ERR_TYPE_MODIFY = "modify";
 	protected static final String ERR_TYPE_WAIT = "wait";
 
+	private static final Map<String,Authorization> BY_CONDITION = new ConcurrentHashMap<String,Authorization>();
+	
+	static {
+		for (Authorization v : values()) {
+			if (v.getCondition() == null)
+				continue;
+			BY_CONDITION.put(v.getCondition(), v);
+		}
+	}
+	
 	//~--- get methods ----------------------------------------------------------
 
+	public static Authorization getByCondition(String condition) {
+		return BY_CONDITION.get(condition);
+	}
+	
 	/**
 	 * Method description
 	 *

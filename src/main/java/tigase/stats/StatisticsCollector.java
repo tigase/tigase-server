@@ -74,6 +74,9 @@ public class StatisticsCollector
 				extends AbstractComponentRegistrator<StatisticsContainer>
 				implements ShutdownHook {
 	/** Field description */
+	public static final String ERRORS_STATISTICS_MBEAN_NAME =
+			"tigase.stats:type=ErrorStatistics";
+	/** Field description */
 	public static final String STATISTICS_MBEAN_NAME =
 			"tigase.stats:type=StatisticsProvider";
 
@@ -110,6 +113,7 @@ public class StatisticsCollector
 	private TimerTask                            initializationCompletedTask = null;
 	private ServiceEntity                        serviceEntity               = null;
 	private StatisticsProvider                   sp                          = null;
+	private ErrorsStatisticsProvider			 esp						 = null;
 	private final Map<String, StatisticsArchivizerIfc> archivizers =
 			new ConcurrentSkipListMap<>();
 	private final ArchivizerRunner arch_runner = new ArchivizerRunner();
@@ -154,6 +158,14 @@ public class StatisticsCollector
 
 			ManagementFactory.getPlatformMBeanServer().registerMBean(sp, on);
 			ConfiguratorAbstract.putMXBean(objName, sp);
+			
+			esp = new ErrorsStatisticsProvider();
+			
+			objName = ERRORS_STATISTICS_MBEAN_NAME;
+			on      = new ObjectName(objName);
+
+			ManagementFactory.getPlatformMBeanServer().registerMBean(esp, on);
+			ConfiguratorAbstract.putMXBean(objName, esp);			
 		} catch (Exception ex) {
 			log.log(Level.SEVERE, "Can not install Statistics MXBean: ", ex);
 		}
@@ -530,6 +542,7 @@ public class StatisticsCollector
 		synchronized (arch_runner) {
 			arch_runner.notifyAll();
 		}
+		esp.update(sp);
 	}
 
 	private void initStatsArchivizers(final String[] archivs, final Map<String,
