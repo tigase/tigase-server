@@ -41,6 +41,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.UUID;
+import tigase.server.xmppclient.XMPPIOProcessor;
+import tigase.xmpp.StreamError;
 
 /**
  * Describe class BoshIOService here.
@@ -209,9 +211,12 @@ public class BoshIOService
 	 *
 	 * @throws IOException
 	 */
-	public void sendErrorAndStop(Authorization errorCode, Packet packet, String errorMsg)
+	public void sendErrorAndStop(Authorization errorCode, StreamError streamError, Packet packet, String errorMsg)
 					throws IOException {
-		String code = "<body type='terminate'" + " condition='item-not-found'" +
+		for (XMPPIOProcessor proc  : processors) {
+			proc.streamError(this, streamError);
+		}
+		String code = "<body type='terminate'" + " condition='" + (streamError != null ? streamError.getCondition() : errorCode.getCondition()) + "'" +
 				" xmlns='http://jabber.org/protocol/httpbind'/>";
 
 		try {

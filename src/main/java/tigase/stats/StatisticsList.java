@@ -32,6 +32,7 @@ import tigase.util.DataTypes;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -307,6 +308,15 @@ public class StatisticsList implements Iterable<StatRecord> {
 		return getValue(comp, QueueType.OUT_QUEUE.name() + " processed IQ", 0L);
 	}
 
+	/**
+	 * Returns names of every component for which statistics are stored in <code>stats</code> variable
+	 * 
+	 * @return 
+	 */
+	public Set<String> getCompNames() {
+		return stats.keySet();
+	}
+	
 	/**
 	 * Method description
 	 *

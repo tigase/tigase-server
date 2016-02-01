@@ -40,10 +40,12 @@ import tigase.server.ConnectionManager;
 import tigase.server.Iq;
 import tigase.server.Message;
 import tigase.server.Packet;
+import tigase.stats.StatisticsList;
 import tigase.util.TimerTask;
 import tigase.xml.Element;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.StreamError;
 import tigase.xmpp.XMPPIOService;
 
 /**
@@ -568,6 +570,14 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 				connectionManager.processUndeliveredPacket(e.getPacketWithStamp(), e.stamp, null);
 			}
 		}
+	}
+
+	@Override
+	public void getStatistics(StatisticsList list) {
+	}
+
+	@Override
+	public void streamError(XMPPIOService service, StreamError streamErrorName) {
 	}
 	
 	/**

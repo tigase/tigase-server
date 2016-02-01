@@ -45,7 +45,9 @@ import javax.management.MBeanOperationInfo;
 import javax.management.MBeanParameterInfo;
 import javax.management.ReflectionException;
 import javax.management.RuntimeOperationsException;
+import tigase.server.xmppclient.StreamErrorCounterIOProcessor;
 import tigase.xmpp.Authorization;
+import tigase.xmpp.StreamError;
 import tigase.xmpp.impl.ErrorCounter;
 
 /**
@@ -71,9 +73,7 @@ public class ErrorsStatisticsProvider
 	private MBeanInfo dMBeanInfo = null;
 
 	private String[] statsKeys;
-	private final Map<String,Long> statsTotal = new ConcurrentHashMap<>();
-	private final Map<String,Float> statsPerSec = new ConcurrentHashMap<>();
-	private final Map<String,Float> statsPerSecPrev = new ConcurrentHashMap<>();
+	private final Map<String,Holder> stats = new ConcurrentHashMap<>();
 	
 	private final Map<String,String> statsKeyToKey = new HashMap<>();
 	private final Map<String,String> attrToKey = new HashMap<>();
@@ -89,12 +89,31 @@ public class ErrorsStatisticsProvider
 		// refreshing totals and per second values using retrieved data
 		for (String statKey : statsKeys) {
 			String key = statsKeyToKey.get(statKey);
-			float prevPerSec = (float) statsPerSecPrev.getOrDefault(key, (float) 0);
-			float temp = (float) statsPerSec.getOrDefault(key, (float) 0);
-			long prevTotal = (long) statsTotal.getOrDefault(key, (long) 0);
-			statsTotal.put(key, (long) data.getOrDefault(statKey, 0));
-			statsPerSec.put(key, (prevPerSec + (temp * 2f) + (statsTotal.getOrDefault(key, (long) 0) - prevTotal)) / 4f);
-			statsPerSecPrev.put(key, temp);
+			long value = (long) data.getOrDefault(statKey, 0);
+			
+			Holder holder = stats.get(key);
+			if (holder == null) {
+				holder = new Holder();
+				stats.put(key, holder);
+			}
+			
+			holder.updateTotal(value);
+		}
+		
+		for (String errorName : StreamErrorCounterIOProcessor.ErrorStatisticsHolder.getErrorNames()) {
+			long total = 0;
+			for (String compName : sp.getCompNames()) {
+				String key = "StreamErrorStats/" + errorName  + "ErrorsNumber";
+				total += sp.getStats(compName, key, 0L);
+			}
+			
+			Holder holder = stats.get(errorName);
+			if (holder == null) {
+				holder = new Holder();
+				stats.put(errorName, holder);
+			}
+			
+			holder.updateTotal(total);
 		}
 	}
 
@@ -104,16 +123,19 @@ public class ErrorsStatisticsProvider
 		boolean perSec = attribute.endsWith(PER_SECOND);
 		
 		attribute = attrToKey.get(attribute);
+		Holder holder = stats.get(attribute);
 		
-		if (total)
-			return statsTotal.get(attribute);
-		else if (perSec)
-			return statsPerSec.get(attribute);
-		else
-			throw new RuntimeOperationsException(
-					new IllegalArgumentException(
-							"Unknown attribute name " + attribute),
-					"Cannot invoke a getter of " + dClassName);
+		if (holder != null) { 
+			if (total)
+				return holder.getTotal();
+			else if (perSec)
+				return holder.getPerSecond();
+		}
+		
+		throw new RuntimeOperationsException(
+				new IllegalArgumentException(
+					"Unknown attribute name " + attribute),
+				"Cannot invoke a getter of " + dClassName);
 	}
 
 	@Override
@@ -195,6 +217,15 @@ public class ErrorsStatisticsProvider
 			attrToKey.put(attrName, errorName);
 		}
 		
+		for (String errorName : StreamErrorCounterIOProcessor.ErrorStatisticsHolder.getErrorNames()) {
+			String attrName = errorName + ERRORS_NUMBER + PER_SECOND;
+			attrs.add(new MBeanAttributeInfo(attrName, TYPE_FLOAT, "Number of errors " + errorName + " per second", true, false, false));
+			attrToKey.put(attrName, errorName);
+			attrName = errorName + ERRORS_NUMBER + TOTAL;
+			attrs.add(new MBeanAttributeInfo(attrName, TYPE_LONG, "Total number of errors " + errorName, true, false, false));
+			attrToKey.put(attrName, errorName);
+		}
+		
 		dAttributes = attrs.toArray(new MBeanAttributeInfo[attrs.size()]);
 		
 		dOperations[0] = new MBeanOperationInfo("getAllStats", "Provides errors statistics", new MBeanParameterInfo[0], "java.util.Map", MBeanOperationInfo.INFO);
@@ -212,6 +243,28 @@ public class ErrorsStatisticsProvider
 			String key = "sess-man/ErrorStats/" + errorNames[i]  + "ErrorsNumber[L]";
 			statsKeys[i] = key;
 			statsKeyToKey.put(key, errorNames[i]);
+		}
+	}
+	
+	private static class Holder {
+		private long total = 0;
+		private float perSec = 0;
+		private float prevPerSec = 0;
+		
+		public void updateTotal(long newValue) {
+			float temp = perSec;
+			long prevTotal = total;
+			total = newValue;
+			perSec = (prevPerSec + (temp * 2f) + (total - prevTotal)) / 4f;
+			prevPerSec = temp;			
+		}
+		
+		public long getTotal() {
+			return total;
+		}
+		
+		public float getPerSecond() {
+			return perSec;
 		}
 	}
 }

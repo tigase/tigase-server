@@ -65,6 +65,7 @@ import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.StreamError;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
@@ -103,7 +104,6 @@ public class ClientConnectionManager
 
 //private final Map<String, XMPPProcessorIfc> processors = new ConcurrentHashMap<String,
 //    XMPPProcessorIfc>();
-	private XMPPIOProcessor[]            processors             = new XMPPIOProcessor[0];
 	private final ReceiverTimeoutHandler stoppedHandler         = newStoppedHandler();
 	private final ReceiverTimeoutHandler startedHandler         = newStartedHandler();
 	private long                         socket_close_wait_time =
@@ -421,20 +421,20 @@ public class ClientConnectionManager
 			} catch (TigaseStringprepException ex) {
 				log.log(Level.CONFIG, "From JID violates RFC6122 (XMPP:Address Format): ", ex);
 
-				return prepareStreamError(serv, "improper-addressing", null);
+				return prepareStreamError(serv, StreamError.ImproperAddressing, null);
 			}    // end of: try-catch
 		}      // end of: if (from != null) {
 		if (lang == null) {
 			lang = "en";
 		}
 		if (hostname == null) {
-			return prepareStreamError(serv, "improper-addressing", null);
+			return prepareStreamError(serv, StreamError.ImproperAddressing, null);
 		}    // end of if (hostname == null)
 		if (!isLocalDomain(hostname)) {
-			return prepareStreamError(serv, "host-unknown", hostname);
+			return prepareStreamError(serv, StreamError.HostUnknown, hostname);
 		}    // end of if (!hostnames.contains(hostname))
 		if (!isAllowed(serv, hostname)) {
-			return prepareStreamError(serv, "policy-violation", hostname);
+			return prepareStreamError(serv, StreamError.PolicyViolation, hostname);
 		}
 		if ((fromJID != null) && (see_other_host_strategy != null)
 				&& see_other_host_strategy.isEnabled(vHostManager.getVHostItem( fromJID.getDomain()),
@@ -1020,19 +1020,30 @@ public class ClientConnectionManager
 	}
 	
 	protected String prepareStreamError(XMPPIOService<Object> serv, List<Element> err_el) {
+		StreamError streamError	= StreamError.getByCondition(err_el.get(0).getName());	
+		
+		for (XMPPIOProcessor proc : processors) {
+			proc.streamError(serv, streamError);
+		}		
 		return "<stream:error>" + err_el.get(0).toString() + "</stream:error>";
 	}
 	
-	protected String prepareStreamError(XMPPIOService<Object> serv, String errorName, String hostname) {
+	protected String prepareStreamError(XMPPIOService<Object> serv, StreamError streamError, String hostname) {
+		for (XMPPIOProcessor proc : processors) {
+			proc.streamError(serv, streamError);
+		}				
 		return "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
 				+ " id='tigase-error-tigase'" + " from='" + (hostname != null ? hostname : getDefVHostItem()) + "'"
 				+ " version='1.0' xml:lang='en'>" + "<stream:error>"
-				+ "<" + errorName + " xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
+				+ "<" + streamError.getCondition() + " xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
 				+ "</stream:error>" + "</stream:stream>";
 	}
 	
 	protected String prepareSeeOtherHost(XMPPIOService<Object> serv, String hostname, BareJID see_other_host) {
+		for (XMPPIOProcessor proc : processors) {
+			proc.streamError(serv, StreamError.SeeOtherHost);
+		}				
 		return "<stream:stream" + " xmlns='" + XMLNS + "'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
 				+ " id='tigase-error-tigase'" + " from='" + (hostname != null ? hostname : getDefVHostItem()) + "'"

@@ -64,6 +64,7 @@ import java.util.logging.Logger;
 import javax.script.Bindings;
 
 import static tigase.server.bosh.Constants.*;
+import tigase.xmpp.StreamError;
 
 /**
  * Describe class BoshConnectionManager here.
@@ -299,7 +300,7 @@ public class BoshConnectionManager
 								log.log(Level.FINE, "Policy violation. Closing connection: {0}", p);
 							}
 							try {
-								serv.sendErrorAndStop(Authorization.NOT_ALLOWED, p, "Policy violation.");
+								serv.sendErrorAndStop(Authorization.NOT_ALLOWED, StreamError.PolicyViolation, p, "Policy violation.");
 							} catch (IOException e) {
 								log.log(Level.WARNING,
 										"Problem sending invalid hostname error for sid =  " + sid, e);
@@ -319,7 +320,8 @@ public class BoshConnectionManager
 						}
 					} else {
 						try {
-							serv.sendErrorAndStop(Authorization.NOT_ALLOWED, p, "Invalid hostname.");
+							serv.sendErrorAndStop(Authorization.NOT_ALLOWED, 
+									hostname == null ? StreamError.ImproperAddressing : StreamError.HostUnknown, p, "Invalid hostname.");
 						} catch (IOException e) {
 							log.log(Level.WARNING,
 									"Problem sending invalid hostname error for sid =  " + sid, e);
@@ -351,7 +353,7 @@ public class BoshConnectionManager
 						log.log( Level.FINE, "{0} : {1} ({2})",
 													 new Object[] { BOSH_OPERATION_TYPE.INVALID_SID, sid_str, "Invalid SID" } );
 					}
-					serv.sendErrorAndStop(Authorization.ITEM_NOT_FOUND, p, "Invalid SID");
+					serv.sendErrorAndStop(Authorization.ITEM_NOT_FOUND, null, p, "Invalid SID");
 				}
 				addOutPackets(out_results, bs);
 			} catch (IOException e) {
