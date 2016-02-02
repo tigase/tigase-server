@@ -481,6 +481,8 @@ public enum Authorization {
 	//~--- get methods ----------------------------------------------------------
 
 	public static Authorization getByCondition(String condition) {
+		if (condition == null)
+			return null;
 		return BY_CONDITION.get(condition);
 	}
 	
