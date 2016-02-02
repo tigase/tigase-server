@@ -98,24 +98,9 @@ select NOW(), 'altering tig_pairs table to add missing indexes';
 -- QUERY END:
 
 -- QUERY START:
-ALTER TABLE tig_pairs DROP FOREIGN KEY tig_pairs_constr_1;
+ALTER TABLE tig_pairs ADD `pid` INT NOT NULL AUTO_INCREMENT PRIMARY KEY
 -- QUERY END:
 
--- QUERY START:
-ALTER TABLE tig_pairs DROP FOREIGN KEY tig_pairs_constr_2;
--- QUERY END:
-
--- QUERY START:
-ALTER TABLE tig_pairs ADD PRIMARY KEY(nid,uid,pkey);
--- QUERY END:
-
--- QUERY START:
-ALTER TABLE tig_pairs ADD CONSTRAINT tig_pairs_constr_1 FOREIGN KEY (uid) REFERENCES tig_users (uid);
--- QUERY END:
-
--- QUERY START:
-ALTER TABLE tig_pairs ADD CONSTRAINT tig_pairs_constr_2 FOREIGN KEY (nid) REFERENCES tig_nodes (nid);
--- QUERY END:
 
 -- QUERY START:
 call TigPutDBProperty('schema-version', '7.1');

@@ -26,14 +26,16 @@ GO
 
 -- LOAD FILE: database/sqlserver-schema-5-1-schema.sql
 
+-- QUERY START:
+IF EXISTS(SELECT * FROM sys.indexes WHERE object_id = object_id('dbo.tig_pairs') AND NAME ='IX_clustered_tig_pairs_nid_uid_pkey')
+    DROP INDEX IX_clustered_tig_pairs_nid_uid_pkey ON dbo.tig_pairs;
+-- QUERY END:
+GO
 
 -- QUERY START:
-CREATE UNIQUE CLUSTERED INDEX [IX_clustered_tig_pairs_nid_uid_pkey] ON [dbo].[tig_pairs]
-(
-	[nid] ASC,
-	[uid] ASC,
-	[pkey] ASC
-) ON [PRIMARY]
+ALTER TABLE [dbo].[tig_pairs]
+   ADD [pid] [bigint] IDENTITY(1,1) NOT NULL,
+   CONSTRAINT [PK_tig_pairs] PRIMARY KEY CLUSTERED ( [pid] ASC ) ON [PRIMARY]
 -- QUERY END:
 GO
 

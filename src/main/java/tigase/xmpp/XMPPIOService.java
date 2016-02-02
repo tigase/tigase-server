@@ -106,7 +106,7 @@ public class XMPPIOService<RefObject>
 	private String                jid                  = null;
 	private long                  packetsReceived      = 0;
 	private long                  packetsSent          = 0;
-	private XMPPIOProcessor[]     processors           = null;
+	protected XMPPIOProcessor[]     processors           = null;
 	private long                  req_idx              = 0;
 	@SuppressWarnings("rawtypes")
 	private XMPPIOServiceListener serviceListener      = null;

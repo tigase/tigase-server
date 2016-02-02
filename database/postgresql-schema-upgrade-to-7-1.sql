@@ -47,7 +47,7 @@ end;
 
 
 -- QUERY START:
-create unique index tpairs on tig_pairs ( nid, uid, pkey );
+ALTER TABLE tig_pairs ADD COLUMN pid BIGSERIAL PRIMARY KEY;
 -- QUERY END:
 
 -- QUERY START:

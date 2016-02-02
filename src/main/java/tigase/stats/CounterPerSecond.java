@@ -1,5 +1,5 @@
 /*
- * Counter.java
+ * CounterPerSecond.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
@@ -22,58 +22,36 @@
 package tigase.stats;
 
 import java.util.logging.Level;
+import tigase.util.EverySecond;
 
 /**
  *
  * @author andrzej
  */
-public class Counter extends CounterValue {
+public class CounterPerSecond extends CounterValue implements EverySecond {
 		
-	private long last_hour_counter = 0;
-	private long last_minute_counter = 0;
 	private long last_second_counter = 0;
 	
-	private long per_hour = 0;
-	private long per_minute = 0;
 	private long per_second = 0;
 
-	public Counter(String name, Level level) {
+	public CounterPerSecond(String name, Level level) {
 		super(name, level);
 	}
-	
-	public synchronized void everyHour() {
-		per_hour = counter - last_hour_counter;
-		last_hour_counter = counter;
-	}
-	
-	public synchronized void everyMinute() {
-		per_minute = counter - last_minute_counter;
-		last_minute_counter = counter;
-	}
-	
+		
+	@Override
 	public synchronized void everySecond() {
 		per_second = counter - last_second_counter;
 		last_second_counter = counter;
 	}		
-	
-	public long getPerHour() {
-		return per_hour;
-	}
-	
-	public long getPerMinute() {
-		return per_minute;
-	}
-	
+		
 	public long getPerSecond() {
 		return per_second;
 	}
 	
 	public void getStatistics(String compName, StatisticsList list) {
 		if (list.checkLevel(level)) {
-			list.add(compName, name + " last hour", per_hour, level);
-			list.add(compName, name + " last minute", per_minute, level);
 			list.add(compName, name + " last second", per_second, level);
 		}
 	}
-	
+		
 }

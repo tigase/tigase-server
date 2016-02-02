@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -260,7 +261,7 @@ public class StatisticsProvider
 				? cache.direct_used_history.getCurrentHistory()
 				: null;
 	}
-
+	
 	@Override
 	public float getHeapMemUsage() {
 		return TigaseRuntime.getTigaseRuntime().getHeapMemUsage();
@@ -614,6 +615,10 @@ public class StatisticsProvider
 		return null;
 	}
 
+	protected Set<String> getCompNames() {
+		return cache.allStats.getCompNames();
+	}
+	
 	private Map<String, String> getMapFromList(StatisticsList list) {
 		if (list != null) {
 			Map<String, String> result = new LinkedHashMap<String, String>(300);
