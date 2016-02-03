@@ -217,6 +217,45 @@ The results will look quite similar to the XML results:
 
 [we should take another approach, and use something more permanent, like add or delete a user]
 
+Sending any XMPP Stanza
+~~~~~~~~~~~~~~~~~~~~~~~
+XMPP messages or any other XMPP stanza can be sent using this API by sending HTTP POST request on http://localhost:8080/rest/stream/api-key=API_KEY with a serialized XMPP stanza as content, where API_KEY is the API key specified in the init.properties file.
+Each request needs to be authorized by sending a valid administrator JID and password as a user/password of BASIC HTTP authorization method.  The content of the HTTP request should be encoded in UTF-8 and +Content-Type+ should be set to application/xml.
+
+Handling of request
+^^^^^^^^^^^^^^^^^^^
+If no +from+ attribute is set in the stanza, the HTTP API component will supplant it's JID instead, however if one is set it will be preserved.  However, in iq stanzas, if no +from+ attribute is set the HTTP response content will be sent back as a response.  Successful requests will return a HTTP response code of 200.
+
+*Examples:*
+Any of these examples must be sent as an HTTP POST request to /rest/stream/?api-key=API_KEY of the HTTP API component.
+
+Sending XMPP message with +from+ set to HTTP API component a full JID
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[source,xml]
+-----
+<message xmlns="jabber:client" type="chat" to="test@example.com/resource-1">
+    <body>Example message 1</body>
+</message>
+-----
+
+Sending XMPP message with +from+ set to HTTP API component with a bare JID
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[source,xml]
+-----
+<message xmlns="jabber:client" type="chat" to="test@example.com">
+    <body>Example message 1</body>
+</message>
+-----
+
+Sending XMPP message with from set to a specified JID to a full JID
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[source,xml]
+-----
+<message xmlns="jabber:client" type="chat" from="sender@example.com" to="test@example.com/resource-1">
+    <body>Example message 1</body>
+</message>
+-----
+
 Sending messages through REST
 -----------------------------
 You can also send messages, or really any XMPP stanza to users and components through REST API. Sending XMPP messages or stanzas using HTTP is realized as a groovy script bundled in the installation package from v7.0.2. If you want to be sure your current install supports this feature, check for the presence of +Stream.groovy+ file in the +scripts/rest/stream/+ directory.

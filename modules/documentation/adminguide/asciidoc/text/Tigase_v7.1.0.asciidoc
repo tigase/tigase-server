@@ -22,7 +22,7 @@ As Oracle has dropped support for version 7 of it's Java runtime environment and
 
 Changes to Datbase Schema
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-Database Schema has changed to introduce primary keys in tig_nodes and tig_pairs tables, improving database performance.  As a result, the schema for your database will need to be upgraded if you are not starting with a fresh database.
+Database Schema has changed to introduce primary keys column in tig_nodes and tig_pairs tables to help improve database performance.  As a result, the schema for your database will need to be upgraded if you are not starting with a fresh database.
 Please see the xref:tigaseServer71[Schema Upgrade] section for instructions on how to prepare and upgrade your database.  *This will affect all users using v7.1.0 b4129 and later.*
 
 Changes to Pubsub Schema
@@ -275,6 +275,7 @@ New Minor Features & Behavior Changes
 - link:https://projects.tigase.org/issues/2835[#2835] Allowing of +setPermissions+ on incoming packets before they are processed by plugins.
 - link:https://projects.tigase.org/issues/2903[#2903] +see-other-host+ has new option to make it configurable on a per vhost basis.
 - link:https://projects.tigase.org/issues/3034[#3034] Improved handling of data types and primitives within Tigase.
+- #3173 Stanzas with unescaped XML special characters are now ignored instead of sending a force-close of connection to sender.
 - link:https://projects.tigase.org/issues/3180[#3180] Protected access to JDBC repository now enabled.
 - link:https://projects.tigase.org/issues/3230[#3230] Verification added to check against CUSTOM domain rules when submitted.
 - #3258 Retrieval of PubSub/PEP based avatars using REST API now supported. xref:avatarRetrievalRequests[Command URLs here].
@@ -288,6 +289,7 @@ New Minor Features & Behavior Changes
 - #3609 Added new configuration option for BOSH to disable hostname attribute. xref:tip_1_bosh_in_cluster_mode_without_load_balancer[Details here].
 - link:https://projects.tigase.org/issues/3670[#3670] Hardened mode now uses long DH keys (2048) by default.
 - link:https://projects.tigase.org/issues/3849[#3849] New Roster size limit configurable setting. See info xref:rosterLimit[Here].
+- link:https://projects.tigase.org/issues/3872[#3872] PostgreSQL driver updated to v9.4
 
 
 Fixes

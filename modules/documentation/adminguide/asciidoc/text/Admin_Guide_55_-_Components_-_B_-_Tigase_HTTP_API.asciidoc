@@ -29,7 +29,7 @@ Once all the requirements in place, all you need to do is add the following line
 
 ----
 --comp-name-3=http
---comp-class-3=tigase.HttpMessageReceiver
+--comp-class-3=tigase.http.HttpMessageReceiver
 ----
 Note that the class and name number is not important, so long as you don't have anything else with the same number.
 
