@@ -2301,15 +2301,20 @@ public class SessionManager
 	@Override
 	public synchronized void everyMinute() {
 		super.everyMinute();
-			int count = 0;
+		int count = 0;
 
 		for (BareJID bareJID : sessionsByNodeId.keySet()) {
 			if (!bareJID.toString().startsWith("sess-man")) {
-				for (XMPPResourceConnection xMPPResourceConnection : sessionsByNodeId.get(bareJID)
-						.getActiveResources()) {
-					if (System.currentTimeMillis() - xMPPResourceConnection.getLastAccessed() < 5 *
-							60 * 1000) {
-						count++;
+				XMPPSession session = sessionsByNodeId.get(bareJID);
+				// check if session is still there as it could be closed 
+				// if sessionsByNodeId is big collection
+				if (session != null) {
+					for (XMPPResourceConnection xMPPResourceConnection : session
+							.getActiveResources()) {
+						if (System.currentTimeMillis() - xMPPResourceConnection.getLastAccessed() < 5
+								* 60 * 1000) {
+							count++;
+						}
 					}
 				}
 			}
