@@ -486,6 +486,23 @@ public class SessionManager
 	}
 
 	@Override
+	public int hashCodeForPacket(Packet packet) {
+		// moved this check from AbstractMessageReceiver as it is related only to SM
+		// and in other components it causes issues as SM sending packet send packetFrom
+		// to SM address which in fact forced other components to process all packets
+		// from SM on single thread !!
+		if ((packet.getPacketFrom() != null) &&!getComponentId().equals(packet
+				.getPacketFrom())) {
+
+			// This comes from connection manager so the best way is to get hashcode
+			// by the connectionId, which is in the getFrom()
+			return packet.getPacketFrom().hashCode();
+		}
+		
+		return super.hashCodeForPacket(packet);
+	}
+	
+	@Override
 	public void initBindings( Bindings binds ) {
 		super.initBindings(binds);
 		binds.put(CommandIfc.AUTH_REPO, auth_repository);
