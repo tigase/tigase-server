@@ -50,14 +50,18 @@ Tip #1 - Encrypted WebSocket Connection
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It is possible to enable encrypted WebSocket connection in Tigase XMPP Server. To do this you need to add following lines to +etc/init.properties+ config file:
+[source,xml]
+-----
+ws2s/connections/ports[i]=5290,5291
+ws2s/connections/5291/socket=plain
+ws2s/connections/5291/type=accept
+ws2s/connections/5290/socket=ssl
+ws2s/connections/5290/type=accept
+-----
+In this example we enabled WebSocket endpoint on port 5290 allowing unencrypted connections, and encrypted WebSocket endpoint on port 5291.
+As this is TLS/SSL connection (no STARTTLS) it uses default certificate installed in Tigase XMPP Server instance. This certificate is located in +certs/default.pem+.
 
-+ws2s/connections/ports[i]=5290,5291+
-
-+ws2s/connections/5291/socket=ssl+
-
-+ws2s/connections/5291/type=accept+
-
-In this example we enabled WebSocket endpoint on port 5290 and encrypted WebSocket endpoint on port 5291. Connections on port 5291 are SSL connections which are encapsulating not encrypted WebSocket connections. As this is TLS/SSL connection (no STARTTLS) it uses default certificate installed in Tigase XMPP Server instance. This certificate is located in +certs/default.pem+.
+*NOTE* There is no default configuration for non-default ports.  All ports outside 443 MUST be configured.
 
 Tip #2 - Encrypted WebSocket Connection - Dealing With Multiple VHosts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
