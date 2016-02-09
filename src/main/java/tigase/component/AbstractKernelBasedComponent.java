@@ -86,6 +86,7 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 		kernel.registerBean("component").asInstance(this).exec();
 		kernel.registerBean("adHocCommandManager").asClass(AdHocCommandManager.class).exec();
 		kernel.registerBean("eventBus").asInstance(eventBus).exec();
+		kernel.registerBean("eventBusRegistrar").asInstance(EventBusFactory.getRegistrar()).exec();
 		kernel.registerBean("scriptCommandProcessor").asClass(ComponenScriptCommandProcessor.class).exec();
 		kernel.registerBean("writer").asClass(DefaultPacketWriter.class).exec();
 		kernel.registerBean("stanzaProcessor").asClass(StanzaProcessor.class).exec();

@@ -134,6 +134,7 @@ public class DiskTask extends AbstractConfigurableTimerTask implements Initializ
 
 	@Override
 	public void initialize() {
+		eventBus.registerEvent(DISK_USAGE_MONITOR_EVENT_NAME, "Fired if disk usage is too high", false);
 		findAllRoots();
 	}
 

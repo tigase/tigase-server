@@ -19,8 +19,11 @@ public class AffiliationStore {
 		Affiliation a = affiliations.get(jid);
 		if (a == null && allowedSubscribers != null) {
 			for (JID j : allowedSubscribers) {
-				if (j.equals(jid))
+				if (j.getResource() != null && j.equals(jid)) {
 					return Affiliation.member;
+				} else if (j.getResource() == null && j.getBareJID().equals(jid.getBareJID())) {
+					return Affiliation.member;
+				}
 			}
 		}
 		return a == null ? Affiliation.none : a;

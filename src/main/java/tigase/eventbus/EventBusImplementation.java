@@ -7,9 +7,11 @@ import tigase.xml.Element;
 
 public class EventBusImplementation implements EventBus {
 
+	private final EventsRegistrar registrar = new EventsRegistrar();
 	private final EventsNameMap<AbstractHandler> listeners = new EventsNameMap<>();
 	private final Serializer serializer = new Serializer();
 	private final ReflectEventListenerHandlerFactory reflectEventListenerFactory = new ReflectEventListenerHandlerFactory();
+	private boolean acceptOnlyRegisteredEvents = false;
 	private Executor executor = new Executor() {
 		@Override
 		public void execute(Runnable command) {
@@ -50,6 +52,12 @@ public class EventBusImplementation implements EventBus {
 		AbstractListenerHandler handler = new ElementSourceListenerHandler(packageName, eventName, listener);
 		addHandler(handler);
 		fireListenerAddedEvent(packageName, eventName);
+	}
+
+	private void checkIfEventIsRegistered(final String eventName) {
+		if (this.acceptOnlyRegisteredEvents && !registrar.isRegistered(eventName)) {
+			throw new EventBusException("Event " + eventName + " is not registered.");
+		}
 	}
 
 	protected void doFireThreadPerHandler(final Object event, final Object source, boolean remotelyGeneratedEvent,
@@ -95,13 +103,14 @@ public class EventBusImplementation implements EventBus {
 	public void fire(Object event, Object source, boolean remotelyGeneratedEvent) {
 		HashSet<AbstractHandler> listeners;
 		if (event instanceof Element) {
-			String tmp = ((Element) event).getName();
-			int i = tmp.lastIndexOf(".");
-			final String packageName = i >= 0 ? tmp.substring(0, i) : "";
-			final String eventName = tmp.substring(i + 1);
-
+			String eventFullName = ((Element) event).getName();
+			int i = eventFullName.lastIndexOf(".");
+			final String packageName = i >= 0 ? eventFullName.substring(0, i) : "";
+			final String eventName = eventFullName.substring(i + 1);
+			checkIfEventIsRegistered(eventFullName);
 			listeners = getListenersForEvent(packageName, eventName);
 		} else {
+			checkIfEventIsRegistered(event.getClass().getName());
 			listeners = getListenersForEvent(event.getClass());
 		}
 
@@ -179,6 +188,18 @@ public class EventBusImplementation implements EventBus {
 		return result;
 	}
 
+	public EventsRegistrar getRegistrar() {
+		return registrar;
+	}
+
+	public boolean isAcceptOnlyRegisteredEvents() {
+		return acceptOnlyRegisteredEvents;
+	}
+
+	public void setAcceptOnlyRegisteredEvents(boolean acceptOnlyRegisteredEvents) {
+		this.acceptOnlyRegisteredEvents = acceptOnlyRegisteredEvents;
+	}
+
 	public boolean isListened(String eventPackage, String eventName) {
 		return listeners.hasData(eventPackage, eventName);
 	}
@@ -188,6 +209,14 @@ public class EventBusImplementation implements EventBus {
 		for (AbstractHandler l : listeners) {
 			addHandler(l);
 		}
+	}
+
+	public void registerEvent(String event, String description, boolean privateEvent) {
+		registrar.register(event, description, privateEvent);
+	}
+
+	public void registerEvent(Class<?> event, String description, boolean privateEvent) {
+		registrar.register(event.getName(), description, privateEvent);
 	}
 
 	public <T> void removeListener(EventSourceListener<T> listener) {
@@ -211,7 +240,7 @@ public class EventBusImplementation implements EventBus {
 		}
 	}
 
-	public static interface InternalEventbusEvent {
+	public interface InternalEventbusEvent {
 	}
 
 	public static class ListenerAddedEvent implements InternalEventbusEvent {

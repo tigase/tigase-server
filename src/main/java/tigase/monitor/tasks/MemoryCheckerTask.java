@@ -7,6 +7,7 @@ import tigase.eventbus.EventBus;
 import tigase.form.Field;
 import tigase.form.Form;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.InfoTask;
@@ -16,7 +17,7 @@ import tigase.util.DateTimeFormatter;
 import tigase.xml.Element;
 
 @Bean(name = "memory-checker-task")
-public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements InfoTask {
+public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements InfoTask, Initializable {
 
 	public final static String HEAP_MEMORY_MONITOR_EVENT_NAME = "tigase.monitor.tasks.HeapMemoryMonitorEvent";
 	public final static String NONHEAP_MEMORY_MONITOR_EVENT_NAME = "tigase.monitor.tasks.NonHeapMemoryMonitorEvent";
@@ -85,6 +86,12 @@ public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements 
 				Field.fieldTextSingle("directMemUsed", Long.toString(runtime.getDirectMemUsed()), "Direct Memory Used"));
 
 		return result;
+	}
+
+	@Override
+	public void initialize() {
+		eventBus.registerEvent(HEAP_MEMORY_MONITOR_EVENT_NAME, "Fired when HEAP memory is too low", false);
+		eventBus.registerEvent(NONHEAP_MEMORY_MONITOR_EVENT_NAME, "Fired when NON-HEAP memory is too low", false);
 	}
 
 	@Override

@@ -34,7 +34,7 @@ public interface EventBus {
 
 	/**
 	 * Fires event.
-	 * 
+	 *
 	 * @param event
 	 *            event to fire.
 	 */
@@ -50,6 +50,8 @@ public interface EventBus {
 	 *             if it is impossible to register all handlers method.
 	 */
 	void registerAll(Object eventConsumer);
+
+	void registerEvent(String event, String description, boolean privateEvent);
 
 	/**
 	 * Removes listener from Eventbus.

@@ -9,6 +9,7 @@ import tigase.eventbus.EventBus;
 import tigase.form.Field;
 import tigase.form.Form;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.InfoTask;
@@ -19,7 +20,7 @@ import tigase.util.DateTimeFormatter;
 import tigase.xml.Element;
 
 @Bean(name = "connections-task")
-public class ConnectionsTask extends AbstractConfigurableTimerTask implements InfoTask {
+public class ConnectionsTask extends AbstractConfigurableTimerTask implements InfoTask, Initializable {
 
 	protected final static DateTimeFormatter dtf = new DateTimeFormatter();
 	protected static final Logger log = Logger.getLogger(ConnectionsTask.class.getName());
@@ -99,6 +100,12 @@ public class ConnectionsTask extends AbstractConfigurableTimerTask implements In
 
 	public void setThresholdMinimal(int thresholdMinimal) {
 		this.thresholdMinimal = thresholdMinimal;
+	}
+
+	@Override
+	public void initialize() {
+		eventBus.registerEvent(USERS_DISCONNECTEED_EVENT_NAME, "Fired when too many users disconnected in the same time",
+				false);
 	}
 
 	@Override

@@ -13,6 +13,7 @@ import tigase.eventbus.EventBus;
 import tigase.form.Field;
 import tigase.form.Form;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.MonitorComponent;
@@ -20,7 +21,7 @@ import tigase.util.DateTimeFormatter;
 import tigase.xml.Element;
 
 @Bean(name = "cpu-temp-task")
-public class CpuTempTask extends AbstractConfigurableTimerTask {
+public class CpuTempTask extends AbstractConfigurableTimerTask implements Initializable {
 
 	public static final String CPU_TEMP_MONITOR_EVENT_NAME = "tigase.monitor.tasks.CPUTempMonitorEvent";
 
@@ -33,7 +34,6 @@ public class CpuTempTask extends AbstractConfigurableTimerTask {
 	private static final File TEMP_FILE = new File("/proc/acpi/thermal_zone/TZ01/temperature");
 
 	private static final String THROTT_DIR = "/proc/acpi/processor/CPU";
-
 	private static final String THROTT_FILE = "/throttling";
 	private final HashSet<String> triggeredEvents = new HashSet<String>();
 	@Inject
@@ -123,6 +123,11 @@ public class CpuTempTask extends AbstractConfigurableTimerTask {
 		// x.addField(Field.fieldTextSingle("N270#cpuTemp", "" +
 		// cpuTempThreshold, "CPU Temp threshold"));
 		return x;
+	}
+
+	@Override
+	public void initialize() {
+		eventBus.registerEvent(CPU_TEMP_MONITOR_EVENT_NAME, "Fired when CPU temperature is too high", false);
 	}
 
 	@Override

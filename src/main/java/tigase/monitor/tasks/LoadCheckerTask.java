@@ -7,6 +7,7 @@ import tigase.eventbus.EventBus;
 import tigase.form.Field;
 import tigase.form.Form;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.InfoTask;
@@ -16,7 +17,7 @@ import tigase.util.DateTimeFormatter;
 import tigase.xml.Element;
 
 @Bean(name = "load-checker-task")
-public class LoadCheckerTask extends AbstractConfigurableTimerTask implements InfoTask {
+public class LoadCheckerTask extends AbstractConfigurableTimerTask implements InfoTask, Initializable {
 
 	public static final String MONITOR_EVENT_NAME = "tigase.monitor.tasks.LoadAverageMonitorEvent";
 	private final static DateTimeFormatter dtf = new DateTimeFormatter();
@@ -54,6 +55,11 @@ public class LoadCheckerTask extends AbstractConfigurableTimerTask implements In
 		result.addField(Field.fieldTextSingle("averageLoad", Double.toString(runtime.getLoadAverage()), "Load Average"));
 
 		return result;
+	}
+
+	@Override
+	public void initialize() {
+		eventBus.registerEvent(MONITOR_EVENT_NAME, "Fired when load is too high", false);
 	}
 
 	@Override

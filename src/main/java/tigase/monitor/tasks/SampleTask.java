@@ -6,11 +6,12 @@ import tigase.eventbus.EventBus;
 import tigase.form.Field;
 import tigase.form.Form;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.xml.Element;
 
 @Bean(name = "sample-task")
-public class SampleTask extends AbstractConfigurableTimerTask {
+public class SampleTask extends AbstractConfigurableTimerTask implements Initializable {
 
 	@Inject
 	private EventBus eventBus;
@@ -34,6 +35,11 @@ public class SampleTask extends AbstractConfigurableTimerTask {
 		Form x = super.getCurrentConfiguration();
 		x.addField(Field.fieldTextSingle("message", "", "Event message"));
 		return x;
+	}
+
+	@Override
+	public void initialize() {
+		eventBus.registerEvent("tigase.monitor.tasks.SampleTaskEnabled", "Sample task", false);
 	}
 
 	@Override

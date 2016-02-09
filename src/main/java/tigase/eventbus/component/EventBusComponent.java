@@ -9,7 +9,6 @@ import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.component.AbstractKernelBasedComponent;
 import tigase.component.modules.Module;
 import tigase.component.modules.impl.AdHocCommandModule;
-import tigase.component.modules.impl.DiscoveryModule;
 import tigase.component.modules.impl.JabberVersionModule;
 import tigase.component.modules.impl.XmppPingModule;
 import tigase.eventbus.EventBusFactory;
@@ -36,12 +35,12 @@ public class EventBusComponent extends AbstractKernelBasedComponent implements C
 
 	@Override
 	public String getDiscoCategory() {
-		return "component";
+		return "pubsub";
 	}
 
 	@Override
 	public String getDiscoCategoryType() {
-		return "generic";
+		return "service";
 	}
 
 	@Override
@@ -100,7 +99,7 @@ public class EventBusComponent extends AbstractKernelBasedComponent implements C
 		kernel.registerBean(XmppPingModule.class).exec();
 		kernel.registerBean(JabberVersionModule.class).exec();
 		kernel.registerBean(AdHocCommandModule.class).exec();
-		kernel.registerBean(DiscoveryModule.class).exec();
+		kernel.registerBean(EventbusDiscoveryModule.class).exec();
 
 		// modules
 		kernel.registerBean(SubscribeModule.class).exec();

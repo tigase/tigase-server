@@ -11,4 +11,8 @@ public class EventBusFactory {
 		return eventBus;
 	}
 
+	public static EventsRegistrar getRegistrar() {
+		return eventBus.getRegistrar();
+	}
+
 }
