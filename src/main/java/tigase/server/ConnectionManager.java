@@ -2,7 +2,7 @@
  * ConnectionManager.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
+ * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -45,11 +45,13 @@ import tigase.net.*;
 import tigase.server.script.CommandIfc;
 import tigase.server.xmppclient.ClientConnectionManager;
 import tigase.server.xmppclient.ClientTrustManagerFactory;
+import tigase.server.xmppclient.XMPPIOProcessor;
 import tigase.stats.StatisticsList;
 import tigase.util.DataTypes;
 import tigase.xml.Element;
 
 import tigase.xmpp.JID;
+import tigase.xmpp.StreamError;
 import tigase.xmpp.XMPPDomBuilderHandler;
 import tigase.xmpp.XMPPIOService;
 
@@ -249,6 +251,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	private int net_buffer_limit = 0;
 	private IOServiceStatisticsGetter ioStatsGetter = new IOServiceStatisticsGetter();
 	private boolean                   initializationCompleted = false;
+	protected XMPPIOProcessor[]       processors              = new XMPPIOProcessor[0];
 
 	/** Field description */
 	protected int net_buffer = NET_BUFFER_ST_PROP_VAL;
@@ -687,6 +690,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	@Override
 	public String xmppStreamError(IO serv, List<Element> err_el) {
+		StreamError streamError	= StreamError.getByCondition(err_el.get(0).getName());	
+		
+		for (XMPPIOProcessor proc : processors) {
+			proc.streamError(serv, streamError);
+		}		
 		return "<stream:error>" + err_el.get(0).toString() + "</stream:error>";
 	}
 
@@ -836,6 +844,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		list.add(getName(), "Watchdog runs", watchdogRuns, Level.FINER);
 		list.add(getName(), "Watchdog tests", watchdogTests, Level.FINE);
 		list.add(getName(), "Watchdog stopped", watchdogStopped, Level.FINE);
+		for (XMPPIOProcessor proc : processors) {
+			proc.getStatistics(list);
+		}
 	}
 
 	/**
@@ -1581,9 +1592,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 										// for non-active connections.
 										if ( log.isLoggable( Level.INFO ) ){
 											log.log( Level.INFO,
-															 "{0}: Max inactive time exceeded, stopping: {1}",
-															 new Object[] { getName(),
-																							service } );
+															 "{0}: Max inactive time exceeded, stopping: {1} ( sinceLastTransfer: {2}, maxInactivityTime: {3}, watchdogTimeout: {4}, watchdogDelay: {5}, watchdogPingType: {6} )",
+															 new Object[] { getName(), service, getDurationSinceLastTransfer( service ),
+																							maxInactivityTime, watchdogTimeout, watchdogDelay, watchdogPingType } );
 										}
 										++watchdogStopped;
 										service.stop();

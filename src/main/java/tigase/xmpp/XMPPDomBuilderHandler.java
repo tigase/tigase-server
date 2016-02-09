@@ -154,7 +154,25 @@ public class XMPPDomBuilderHandler<RefObject> implements SimpleHandler {
 		}    // end of if (tmp_name.equals())
 
 		Element elem = el_stack.pop();
-		if (elem.getName() != tmp_name.intern())
+		int idx = tmp_name.indexOf(':');
+		String tmp_xmlns = null;
+
+		if (idx > 0) {
+			String tmp_name_prefix = tmp_name.substring(0, idx);
+			if (tmp_name_prefix != null) {
+				for (String pref : namespaces.keySet()) {
+					if (tmp_name_prefix.equals(pref)) {
+						tmp_xmlns = namespaces.get(pref);
+						tmp_name = tmp_name.substring(pref.length() + 1, tmp_name.length());
+
+						if (log.isLoggable(Level.FINEST)) {
+							log.finest("new_xmlns = " + tmp_xmlns);
+						}
+					}    // end of if (tmp_name.startsWith(xmlns))
+				}      // end of for (String xmlns: namespaces.keys())
+			}		
+		}		
+		if (elem.getName() != tmp_name.intern() || (tmp_xmlns != null && !tmp_xmlns.equals(elem.getXMLNS())))
 			return false;
 
 		if (el_stack.isEmpty()) {

@@ -412,13 +412,13 @@
 		<dependency>
 			<groupId>org.apache.derby</groupId>
 			<artifactId>derby</artifactId>
-			<version>10.11.1.1</version>
+			<version>10.12.1.1</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.derby</groupId>
 			<artifactId>derbytools</artifactId>
-			<version>10.11.1.1</version>
+			<version>10.12.1.1</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -428,9 +428,9 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
-			<groupId>postgresql</groupId>
+			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>9.1-901-1.jdbc4</version>
+			<version>9.4.1207</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
