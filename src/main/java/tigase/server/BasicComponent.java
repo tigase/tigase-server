@@ -822,6 +822,14 @@ public class BasicComponent
 				: null;
 	}
 
+	protected ScriptEngineManager createScriptEngineManager(){
+		if (XMPPServer.isOSGi()) {
+			return new OSGiScriptEngineManager();
+		} else {
+			return new ScriptEngineManager();
+		}
+	}
+
 	/**
 	 * Method description
 	 *
@@ -922,11 +930,7 @@ public class BasicComponent
 			return;
 		}
 		if (scriptEngineManager == null) {
-			if (XMPPServer.isOSGi()) {
-				scriptEngineManager = new OSGiScriptEngineManager();
-			} else {
-				scriptEngineManager = new ScriptEngineManager();
-			}
+			scriptEngineManager = createScriptEngineManager();
 		}
 		if (props.get(COMPONENT_ID_PROP_KEY) != null) {
 			try {

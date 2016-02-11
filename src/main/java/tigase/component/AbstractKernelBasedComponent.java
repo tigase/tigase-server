@@ -7,6 +7,8 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.script.ScriptEngineManager;
+
 import tigase.component.adhoc.AdHocCommandManager;
 import tigase.component.modules.StanzaProcessor;
 import tigase.component.modules.impl.config.ConfiguratorCommand;
@@ -103,6 +105,13 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 				kernel.registerBean(id).asClass((Class<?>) e.getValue()).exec();
 			}
 		}
+	}
+
+	@Override
+	protected ScriptEngineManager createScriptEngineManager() {
+		ScriptEngineManager result = super.createScriptEngineManager();
+		result.setBindings(new BindingsKernel(kernel));
+		return result;
 	}
 
 	public abstract String getComponentVersion();
