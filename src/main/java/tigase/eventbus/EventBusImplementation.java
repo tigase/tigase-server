@@ -178,29 +178,31 @@ public class EventBusImplementation implements EventBus {
 	}
 
 	HashSet<AbstractHandler> getListenersForEvent(final Class<?> eventClass) {
-		final HashSet<Class<?>> pp = new HashSet<>();
-
-		// interface-based listeners
-		pp.addAll(Arrays.asList(eventClass.getInterfaces()));
-
-		Class<?> tmp = eventClass;
-		do {
-			pp.add(tmp);
-			tmp = tmp.getSuperclass();
-		} while (!tmp.equals(Object.class));
 
 		final HashSet<AbstractHandler> result = new HashSet<>();
 
-		for (Class<?> cls : pp) {
-			final String packageName = cls.getPackage().getName();
-			final String eventName = cls.getSimpleName();
+		// interface-based listeners
+		for (Class<?> cls : eventClass.getInterfaces()) {
+			fillListenersForEvent(result, cls);
+		}
 
-			result.addAll(listeners.get(packageName, eventName));
-			result.addAll(listeners.get(packageName, null));
+		// class-based listeners
+		Class<?> cls = eventClass;
+		while (!cls.equals(Object.class)) {
+			fillListenersForEvent(result, cls);
+			cls = cls.getSuperclass();
 		}
 		result.addAll(listeners.get(null, null));
 
 		return result;
+	}
+	
+	private void fillListenersForEvent(HashSet<AbstractHandler> result, Class<?> cls) {
+		final String packageName = cls.getPackage().getName();
+		final String eventName = cls.getSimpleName();
+
+		result.addAll(listeners.get(packageName, eventName));
+		result.addAll(listeners.get(packageName, null));
 	}
 
 	HashSet<AbstractHandler> getListenersForEvent(final String packageName, final String eventName) {
