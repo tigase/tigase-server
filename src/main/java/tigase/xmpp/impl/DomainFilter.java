@@ -34,11 +34,11 @@ import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPResourceConnection;
 
-import tigase.util.DNSResolver;
+import tigase.util.DNSResolverFactory;
 import tigase.util.StringUtilities;
-import tigase.vhosts.filter.DomainFilterPolicy;
 import tigase.vhosts.VHostItem;
 import tigase.vhosts.filter.CustomDomainFilter;
+import tigase.vhosts.filter.DomainFilterPolicy;
 
 import java.util.ArrayDeque;
 import java.util.Arrays;
@@ -273,7 +273,7 @@ public class DomainFilter
 	@Override
 	public void init( Map<String, Object> settings ) throws TigaseDBException {
 		super.init( settings );
-		local_hostname = DNSResolver.getDefaultHostname();
+		local_hostname = DNSResolverFactory.getInstance().getDefaultHost();
 	}
 
 	@Override

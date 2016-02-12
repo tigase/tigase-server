@@ -27,6 +27,35 @@ package tigase.server.xmppclient;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.server.Command;
+import tigase.server.ConnectionManager;
+import tigase.server.Iq;
+import tigase.server.Message;
+import tigase.server.Packet;
+import tigase.server.Presence;
+import tigase.server.ReceiverTimeoutHandler;
+
+import tigase.xmpp.Authorization;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
+import tigase.xmpp.PacketErrorTypeException;
+import tigase.xmpp.StanzaType;
+import tigase.xmpp.StreamError;
+import tigase.xmpp.XMPPIOService;
+import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
+
+import tigase.conf.ConfigurationException;
+import tigase.net.IOService;
+import tigase.net.SocketThread;
+import tigase.net.SocketType;
+import tigase.util.Base64;
+import tigase.util.DNSResolverFactory;
+import tigase.util.RoutingsContainer;
+import tigase.util.TigaseStringprepException;
+import tigase.vhosts.VHostItem;
+import tigase.xml.Element;
+
 import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
 import java.util.Arrays;
@@ -41,34 +70,6 @@ import java.util.logging.Logger;
 import java.util.zip.Deflater;
 
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
-import tigase.conf.ConfigurationException;
-import tigase.net.IOService;
-import tigase.net.SocketThread;
-import tigase.net.SocketType;
-import tigase.server.Command;
-import tigase.server.ConnectionManager;
-import tigase.server.Iq;
-import tigase.server.Message;
-import tigase.server.Packet;
-import tigase.server.Presence;
-import tigase.server.ReceiverTimeoutHandler;
-import tigase.util.Base64;
-import tigase.util.DNSResolver;
-import tigase.util.RoutingsContainer;
-import tigase.util.TigaseStringprepException;
-import tigase.vhosts.VHostItem;
-import tigase.xml.Element;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.StreamError;
-import tigase.xmpp.XMPPIOService;
-import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
 
 /**
  * Class ClientConnectionManager Created: Tue Nov 22 07:07:11 2005
@@ -538,7 +539,7 @@ public class ClientConnectionManager
 						comp_params[1]);
 			} else {
 				props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY, DEF_SM_NAME + "@" +
-						DNSResolver.getDefaultHostname());
+						DNSResolverFactory.getInstance().getDefaultHost());
 			}
 		}
 		props.put(SOCKET_CLOSE_WAIT_PROP_KEY, SOCKET_CLOSE_WAIT_PROP_DEF);

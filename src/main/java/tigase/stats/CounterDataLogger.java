@@ -23,7 +23,7 @@ import tigase.db.DBInitException;
 import tigase.db.DataRepository;
 import tigase.db.RepositoryFactory;
 
-import tigase.util.DNSResolver;
+import tigase.util.DNSResolverFactory;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -319,7 +319,7 @@ public class CounterDataLogger
 
 	@Override
 	public void init(Map<String, Object> archivizerConf) {
-		defaultHostname = DNSResolver.getDefaultHostname();
+		defaultHostname = DNSResolverFactory.getInstance().getDefaultHost();
 		try {
 			String resource = (String) archivizerConf.get(DB_URL_PROP_KEY);
 			if (resource == null ) {

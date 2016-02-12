@@ -26,25 +26,20 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
+
 import tigase.server.Packet;
 import tigase.server.amp.AmpFeatureIfc;
 import tigase.server.amp.MsgRepository;
-import tigase.util.DNSResolver;
-import tigase.xml.Element;
+
+import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPPacketFilterIfc;
 import tigase.xmpp.XMPPPostprocessorIfc;
@@ -53,10 +48,16 @@ import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 
+import tigase.util.DNSResolverFactory;
+import tigase.xml.Element;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import static tigase.server.amp.AmpFeatureIfc.*;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.StanzaType;
 
 /**
  * Created: Apr 29, 2010 5:00:25 PM
@@ -79,7 +80,7 @@ public class MessageAmp
 	private static Element[]        DISCO_FEATURES = { new Element("feature",
 			new String[] { "var" }, new String[] { XMLNS }),
 			new Element("feature", new String[] { "var" }, new String[] { "msgoffline" }) };
-	private static final String defHost = DNSResolver.getDefaultHostname();
+	private static String defHost;
 
 //	private static final String STATUS_ATTRIBUTE_NAME = "status";
 
@@ -101,6 +102,8 @@ public class MessageAmp
 	@Override
 	public void init(Map<String, Object> settings) throws TigaseDBException {
 		super.init(settings);
+
+		defHost = DNSResolverFactory.getInstance().getDefaultHost();
 
 		if(offlineProcessor!=null)
 			offlineProcessor.init(settings);

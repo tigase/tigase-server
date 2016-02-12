@@ -26,20 +26,17 @@ package tigase.cluster.repo;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.db.DBInitException;
 import tigase.db.comp.ConfigRepository;
 
+import tigase.sys.ShutdownHook;
 import tigase.sys.TigaseRuntime;
-import tigase.util.DNSResolver;
+import tigase.util.DNSResolverFactory;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import tigase.db.DBInitException;
-
-import tigase.sys.ShutdownHook;
-
-import java.util.Date;
 
 /**
  * Class description
@@ -111,7 +108,7 @@ public class ClConConfigRepository
 	public void reload() {
 		super.reload();
 
-		String          host = DNSResolver.getDefaultHostname();
+		String          host = DNSResolverFactory.getInstance().getDefaultHost();
 		ClusterRepoItem item = getItem(host);
 
 		if (item == null) {
@@ -166,10 +163,10 @@ public class ClConConfigRepository
 			item.initFromPropertyString(it);
 			addItem(item);
 		}
-		if (getItem(DNSResolver.getDefaultHostname()) == null) {
+		if (getItem(DNSResolverFactory.getInstance().getDefaultHost()) == null) {
 			ClusterRepoItem item = getItemInstance();
 
-			item.initFromPropertyString(DNSResolver.getDefaultHostname());
+			item.initFromPropertyString(DNSResolverFactory.getInstance().getDefaultHost());
 			addItem(item);
 		}
 	}
@@ -188,7 +185,7 @@ public class ClConConfigRepository
 
 	@Override
 	public String shutdown() {
-		String host = DNSResolver.getDefaultHostname();
+		String host = DNSResolverFactory.getInstance().getDefaultHost();
 		removeItem( host );
 		return "== " + "Removing cluster_nodes item: " + host + "\n";
 	}
