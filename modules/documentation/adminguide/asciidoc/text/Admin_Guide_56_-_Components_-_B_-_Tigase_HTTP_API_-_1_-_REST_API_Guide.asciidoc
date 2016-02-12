@@ -698,6 +698,117 @@ Server response:
 </result>
 -----
 
+List Available Nodes
+~~~~~~~~~~~~~~~~~~~~
+HTTP URI: example.com/rest/pubsub/pubsub.example.com/list-nodes
+
+Available HTTP methods
+
+*GET*
+
+This method returns list of available PubSub nodes for the domain passed as part of the URI (+pubsub.example.com+).
+
+Below is an example exchange between client and server for listing all nodes, the result having +test+, +node_54idf40037+ and +node_3ws5lz0037+
+[source,xml]
+-----
+<result>
+<title>List of available nodes</title>
+<nodes label="Nodes" type="text-multi">
+<value>test</value>
+<value>node_54idf40037</value>
+<value>node_3ws5lz0037</value>
+</nodes>
+</result>
+-----
+
+List Published Items on Node
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+HTTP URI: example.com/rest/pubsub/pubsub.example.com/list-items
+
+Available HTTP methods
+
+*GET*
+
+Method returns example content which contains all required and optional parameters that may be passed.
+
+*POST*
+
+This command requires the +node+ field to be filled.  The +node+ field contains the ID of the node from which we want the list of published items.
+
+Below is an example exchange between client and server asking for all items published in the example node.
+[source,xml]
+-----
+<data>
+<node>example</node>
+</data>
+-----
+
+Server Response
+[source,xml]
+-----
+<result>
+<title>List of PubSub node items</title>
+<node label="Node" type="text-single">
+<value>example</value>
+</node>
+<items label="Items" type="text-multi">
+<value>item-1</value>
+<value>item-2</value>
+</items>
+</result>
+-----
+
+Items item-1 and item-2 are the listed items.
+
+Retrieve Published Item on Node
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+HTTP URI: example.com/rest/pubsub/pubsub.example.com/retrieve-item
+
+Available HTTP methods
+
+*GET*
+
+Method returns example content which contains all required and optional parameters that may be passed.
+
+*POST*
+
+Command requires that fields +node+ and +item-id+ are filled.
+Available Fields:
+- +node+ The node the item is published to.
+- +item-id+ The id of the item you wish to retrieve.
+
+Example communication between client and server:
+[source,xml]
+-----
+<data>
+<node>example</node>
+<item-id>item-1</item>
+</data>
+-----
+
+Server response:
+[source,xml]
+-----
+<result>
+<title>Retrive PubSub node item</title> 
+<node label="Node" type="text-single">
+<value>example</value>
+</node>
+<item-id label="Item ID" type="text-single">
+<value>item-1</value>
+</item-id>
+<item label="Item" type="text-multi">
+<value>&lt;item expire-at=&quot;2015-05-13T14:05:00Z&quot; id=&quot;item-1&quot;&gt;&lt;item-entry&gt;
+&lt;title&gt;Example 1&lt;/title&gt;
+&lt;content&gt;Example content&lt;/content&gt;
+&lt;/item-entry&gt;&lt;/item&gt;
+</value>
+</item>
+</result>
+-----
+
+Node that inside the item element, there is an XML encoded element, this will be retrieved without any decoding.
+
 Other Example REST Commands and Documentation
 ---------------------------------------------
 Other example REST commands, and accompanied documentation can be found at localhost:8080/rest/ on any server running Tigase and the HTTP component.

@@ -442,6 +442,8 @@ Fixes
 
 - #3848 Changes made to JDBCMessageArchiveRepository to fix potential MySQL deadlocks when adding entries to repository.
 
+- #3902 Fixed issue where wss:// connections were closed after 3 minutes of inactivity.
+
 - Patch added to fix ConcurrentModificationException in BlockingCommand plugin.
 
 - Fixed negation in SASL mechanism selector.
