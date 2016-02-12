@@ -1,12 +1,14 @@
 package tigase.eventbus;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.Executor;
 
 import static org.junit.Assert.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import tigase.eventbus.component.stores.Subscription;
 
 import tigase.xml.Element;
 
@@ -246,6 +248,10 @@ public class EventBusImplementationTest {
 		final Consumer c = new Consumer();
 		eventBus.registerAll(c);
 
+		Assert.assertNotNull(eventBus.getEventRoutingSelector(Event1.class));
+		Assert.assertNotNull(eventBus.getEventRoutingSelector(Event12.class));
+		Assert.assertNull(eventBus.getEventRoutingSelector(Event2.class));
+		
 		eventBus.fire(new Event12(), this);
 		Assert.assertNotNull(c.resp[0]);
 		Assert.assertNotNull(c.resp[1]);
@@ -255,6 +261,10 @@ public class EventBusImplementationTest {
 
 		eventBus.unregisterAll(c);
 
+		Assert.assertNull(eventBus.getEventRoutingSelector(Event1.class));
+		Assert.assertNull(eventBus.getEventRoutingSelector(Event12.class));
+		Assert.assertNull(eventBus.getEventRoutingSelector(Event2.class));
+		
 		eventBus.fire(new Event12());
 
 		Assert.assertNull(c.resp[0]);
@@ -421,6 +431,10 @@ public class EventBusImplementationTest {
 			Assert.assertTrue(source instanceof EventBusImplementationTest);
 		}
 
+		@RouteEvent
+		public Collection<Subscription> routeEvent1(Event1 e, Collection<Subscription> subscriptions) {
+			return null;
+		}
 	}
 	
 	public static class ConsumerMethodVisibility {

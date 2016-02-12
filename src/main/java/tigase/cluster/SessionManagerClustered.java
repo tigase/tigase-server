@@ -2,7 +2,7 @@
  * SessionManagerClustered.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
+ * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,8 +27,11 @@ package tigase.cluster;
 //~--- non-JDK imports --------------------------------------------------------
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,13 +40,17 @@ import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.cluster.api.SessionManagerClusteredIfc;
 import tigase.cluster.strategy.ClusteringStrategyIfc;
+import tigase.cluster.strategy.ConnectionRecordIfc;
 import tigase.conf.ConfigurationException;
+import tigase.eventbus.RouteEvent;
+import tigase.eventbus.component.stores.Subscription;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.server.ComponentInfo;
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.server.XMPPServer;
 import tigase.server.xmppsession.SessionManager;
+import tigase.server.xmppsession.UserSessionEvent;
 import tigase.stats.StatisticsList;
 import tigase.util.DNSResolver;
 import tigase.util.TigaseStringprepException;
@@ -394,6 +401,30 @@ public class SessionManagerClustered
 		return this.connectionsByFrom.containsKey(connJid);
 	}
 	
+	@RouteEvent
+	protected Collection<Subscription> routeUserSessionEvent(UserSessionEvent event, Collection<Subscription> subscriptions) {
+		if (strategy.hasCompleteJidsInfo()) {
+			Set<ConnectionRecordIfc> records = strategy.getConnectionRecords(event.getUserJid());
+			Iterator<Subscription> it = subscriptions.iterator();
+			while (it.hasNext()) {
+				Subscription s = it.next();
+				if (!s.isInClusterSubscription())
+					continue;
+				
+				boolean remove = true;
+				
+				for (ConnectionRecordIfc rec : records) {
+					if (rec.getNode().getDomain().equals(s.getJid().getDomain()))
+						remove = false;
+				}
+				
+				if (remove)
+					it.remove();
+			}
+		}
+		return subscriptions;
+	}
+		
 	@Override
 	public void setClusterController(ClusterControllerIfc cl_controller) {
 		super.setClusterController(cl_controller);

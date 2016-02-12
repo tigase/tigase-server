@@ -1,3 +1,24 @@
+/*
+ * EventPublisherModule.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ *
+ */
 package tigase.eventbus.component;
 
 import java.io.Serializable;
@@ -9,6 +30,7 @@ import tigase.criteria.Criteria;
 import tigase.eventbus.AbstractHandler;
 import tigase.eventbus.EventBusImplementation;
 import tigase.eventbus.EventName;
+import tigase.eventbus.EventRoutingSelector;
 import tigase.eventbus.Serializer;
 import tigase.eventbus.component.stores.Subscription;
 import tigase.eventbus.component.stores.SubscriptionStore;
@@ -149,10 +171,23 @@ public class EventPublisherModule extends AbstractEventBusModule implements Init
 		final String packageName = eventClass.getPackage().getName();
 		final String eventName = eventClass.getSimpleName();
 
+		final Collection<Subscription> subscribers = getSubscribers(packageName, eventName, event);
+		if (subscribers.isEmpty())
+			return;
+		
 		Element eventElement = serializer.serialize(event);
 
-		final Collection<Subscription> subscribers = subscriptionStore.getSubscribersJIDs(packageName, eventName);
 		publishEvent(packageName, eventName, eventElement, subscribers);
 	}
 
+	protected Collection<Subscription> getSubscribers(String packageName, String eventName, Object event) {
+		Collection<Subscription> subscribers = subscriptionStore.getSubscribersJIDs(packageName, eventName);
+		
+		EventRoutingSelector selector = localEventBus.getEventRoutingSelector(event.getClass());
+		if (selector != null) {
+			subscribers = selector.getSubscriptions(event, subscribers);
+		}
+		
+		return subscribers;
+	}
 }

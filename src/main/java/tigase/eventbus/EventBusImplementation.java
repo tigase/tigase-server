@@ -1,6 +1,28 @@
+/*
+ * EventBusImplementation.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ *
+ */
 package tigase.eventbus;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 
 import tigase.xml.Element;
@@ -9,8 +31,10 @@ public class EventBusImplementation implements EventBus {
 
 	private final EventsRegistrar registrar = new EventsRegistrar();
 	private final EventsNameMap<AbstractHandler> listeners = new EventsNameMap<>();
+	private final Map<Class<?>,EventRoutingSelector> routingSelectors = new ConcurrentHashMap<>();
 	private final Serializer serializer = new Serializer();
 	private final ReflectEventListenerHandlerFactory reflectEventListenerFactory = new ReflectEventListenerHandlerFactory();
+	private final ReflectEventRoutingSelectorFactory reflectEventRoutingSelectorFactory = new ReflectEventRoutingSelectorFactory();
 	private boolean acceptOnlyRegisteredEvents = false;
 	private Executor executor = new Executor() {
 		@Override
@@ -187,6 +211,19 @@ public class EventBusImplementation implements EventBus {
 
 		return result;
 	}
+	
+	public EventRoutingSelector getEventRoutingSelector(Class<?> eventClass) {
+		Class<?> tmp = eventClass;
+		EventRoutingSelector handler = null;
+		do {
+			handler = routingSelectors.get(tmp);
+			if (handler != null)
+				break;
+			tmp = tmp.getSuperclass();
+		} while (!tmp.equals(Object.class));
+		
+		return handler;
+	}
 
 	public EventsRegistrar getRegistrar() {
 		return registrar;
@@ -208,6 +245,10 @@ public class EventBusImplementation implements EventBus {
 		Collection<AbstractHandler> listeners = this.reflectEventListenerFactory.create(consumer);
 		for (AbstractHandler l : listeners) {
 			addHandler(l);
+		}
+		Collection<EventRoutingSelector> selectors = this.reflectEventRoutingSelectorFactory.create(consumer);
+		for (EventRoutingSelector s : selectors) {
+			routingSelectors.put(s.getEventClass(), s);
 		}
 	}
 
@@ -237,6 +278,10 @@ public class EventBusImplementation implements EventBus {
 		Collection<AbstractHandler> listeners = this.reflectEventListenerFactory.create(consumer);
 		for (AbstractHandler l : listeners) {
 			removeListenerHandler(l);
+		}
+		Collection<EventRoutingSelector> selectors = this.reflectEventRoutingSelectorFactory.create(consumer);
+		for (EventRoutingSelector s : selectors) {
+			routingSelectors.remove(s.getEventClass(), s);
 		}
 	}
 
