@@ -404,7 +404,14 @@ public class SessionManagerClustered
 	@RouteEvent
 	protected Collection<Subscription> routeUserSessionEvent(UserSessionEvent event, Collection<Subscription> subscriptions) {
 		if (strategy.hasCompleteJidsInfo()) {
-			Set<ConnectionRecordIfc> records = strategy.getConnectionRecords(event.getUserJid());
+			Set<ConnectionRecordIfc> records = strategy.getConnectionRecords(event.getUserJid().getBareJID());
+			if (event.getUserJid().getResource() != null) {
+				Iterator<ConnectionRecordIfc> it = records.iterator();
+				while (it.hasNext()) {
+					if (!it.next().getUserJid().equals(event.getUserJid())) 
+						it.remove();
+				}
+			}
 			Iterator<Subscription> it = subscriptions.iterator();
 			while (it.hasNext()) {
 				Subscription s = it.next();
@@ -424,7 +431,7 @@ public class SessionManagerClustered
 		}
 		return subscriptions;
 	}
-		
+	
 	@Override
 	public void setClusterController(ClusterControllerIfc cl_controller) {
 		super.setClusterController(cl_controller);

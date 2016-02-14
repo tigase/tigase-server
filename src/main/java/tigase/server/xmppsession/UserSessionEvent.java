@@ -21,7 +21,7 @@
  */
 package tigase.server.xmppsession;
 
-import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 import tigase.xmpp.XMPPSession;
 
 /**
@@ -35,11 +35,11 @@ public class UserSessionEvent {
 
 	private transient XMPPSession session;
 	
-	private BareJID userJid;
+	private JID userJid;
 	
 	public UserSessionEvent() { }
 	
-	public UserSessionEvent(BareJID userJid, XMPPSession session) {
+	public UserSessionEvent(JID userJid, XMPPSession session) {
 		this.session = session;
 		this.userJid = userJid;
 	}
@@ -48,7 +48,7 @@ public class UserSessionEvent {
 		return session;
 	}
 	
-	public BareJID getUserJid() {
+	public JID getUserJid() {
 		return userJid;
 	}
 	
