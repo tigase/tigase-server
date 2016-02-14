@@ -23,6 +23,7 @@ package tigase.eventbus;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Executor;
 
 import tigase.xml.Element;
@@ -32,8 +33,10 @@ public class EventBusImplementation implements EventBus {
 	private final EventsRegistrar registrar = new EventsRegistrar();
 	private final EventsNameMap<AbstractHandler> listeners = new EventsNameMap<>();
 	private final Map<Class<?>,EventRoutingSelector> routingSelectors = new ConcurrentHashMap<>();
+	private final Map<Class<?>,Set<EventRoutedTransientFiller>> routedTransientFillers = new ConcurrentHashMap<>();
 	private final Serializer serializer = new Serializer();
 	private final ReflectEventListenerHandlerFactory reflectEventListenerFactory = new ReflectEventListenerHandlerFactory();
+	private final ReflectEventRoutedTransientFillerFactory reflectEventRoutedTransientFillerFactory = new ReflectEventRoutedTransientFillerFactory();
 	private final ReflectEventRoutingSelectorFactory reflectEventRoutingSelectorFactory = new ReflectEventRoutingSelectorFactory();
 	private boolean acceptOnlyRegisteredEvents = false;
 	private Executor executor = new Executor() {
@@ -213,6 +216,19 @@ public class EventBusImplementation implements EventBus {
 
 		return result;
 	}
+
+	public Collection<EventRoutedTransientFiller> getEventRoutedTransientFillers(Class<?> eventClass) {
+		final HashSet<EventRoutedTransientFiller> result = new HashSet<>();
+		Class<?> tmp = eventClass;
+		do {
+			Collection<EventRoutedTransientFiller> fillers = routedTransientFillers.get(tmp);
+			if (fillers != null)
+				result.addAll(fillers);
+			tmp = tmp.getSuperclass();
+		} while (!tmp.equals(Object.class));
+		
+		return result;
+	}
 	
 	public EventRoutingSelector getEventRoutingSelector(Class<?> eventClass) {
 		Class<?> tmp = eventClass;
@@ -248,6 +264,12 @@ public class EventBusImplementation implements EventBus {
 		for (AbstractHandler l : listeners) {
 			addHandler(l);
 		}
+		Collection<EventRoutedTransientFiller> fillers = this.reflectEventRoutedTransientFillerFactory.create(consumer);
+		for (EventRoutedTransientFiller f : fillers) {
+			Set<EventRoutedTransientFiller> eventFillers = routedTransientFillers.computeIfAbsent(f.getEventClass(), 
+					(Class<?> c) -> { return new CopyOnWriteArraySet<>(); } );
+			eventFillers.add(f);
+		}
 		Collection<EventRoutingSelector> selectors = this.reflectEventRoutingSelectorFactory.create(consumer);
 		for (EventRoutingSelector s : selectors) {
 			routingSelectors.put(s.getEventClass(), s);
@@ -280,11 +302,18 @@ public class EventBusImplementation implements EventBus {
 		Collection<AbstractHandler> listeners = this.reflectEventListenerFactory.create(consumer);
 		for (AbstractHandler l : listeners) {
 			removeListenerHandler(l);
-		}
+		}	
 		Collection<EventRoutingSelector> selectors = this.reflectEventRoutingSelectorFactory.create(consumer);
 		for (EventRoutingSelector s : selectors) {
 			routingSelectors.remove(s.getEventClass(), s);
 		}
+		Collection<EventRoutedTransientFiller> fillers = this.reflectEventRoutedTransientFillerFactory.create(consumer);
+		for (EventRoutedTransientFiller f : fillers) {
+			Set<EventRoutedTransientFiller> eventFillers = routedTransientFillers.get(f.getEventClass());
+			if (eventFillers != null) {
+				eventFillers.remove(f);
+			}
+		}		
 	}
 
 	public interface InternalEventbusEvent {

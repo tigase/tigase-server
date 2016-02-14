@@ -252,6 +252,10 @@ public class EventBusImplementationTest {
 		Assert.assertNotNull(eventBus.getEventRoutingSelector(Event12.class));
 		Assert.assertNull(eventBus.getEventRoutingSelector(Event2.class));
 		
+		Assert.assertEquals(1, eventBus.getEventRoutedTransientFillers(Event1.class).size());
+		Assert.assertEquals(1, eventBus.getEventRoutedTransientFillers(Event12.class).size());
+		Assert.assertEquals(0, eventBus.getEventRoutedTransientFillers(Event2.class).size());
+		
 		eventBus.fire(new Event12(), this);
 		Assert.assertNotNull(c.resp[0]);
 		Assert.assertNotNull(c.resp[1]);
@@ -264,6 +268,10 @@ public class EventBusImplementationTest {
 		Assert.assertNull(eventBus.getEventRoutingSelector(Event1.class));
 		Assert.assertNull(eventBus.getEventRoutingSelector(Event12.class));
 		Assert.assertNull(eventBus.getEventRoutingSelector(Event2.class));
+		
+		Assert.assertEquals(0, eventBus.getEventRoutedTransientFillers(Event1.class).size());
+		Assert.assertEquals(0, eventBus.getEventRoutedTransientFillers(Event12.class).size());
+		Assert.assertEquals(0, eventBus.getEventRoutedTransientFillers(Event2.class).size());
 		
 		eventBus.fire(new Event12());
 
@@ -431,6 +439,11 @@ public class EventBusImplementationTest {
 			Assert.assertTrue(source instanceof EventBusImplementationTest);
 		}
 
+		@FillRoutedEvent
+		public void fillRoutedEvent1(Event1 e) {
+			
+		}
+		
 		@RouteEvent
 		public Collection<Subscription> routeEvent1(Event1 e, Collection<Subscription> subscriptions) {
 			return null;

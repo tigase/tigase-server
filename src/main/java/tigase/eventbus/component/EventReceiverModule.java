@@ -29,6 +29,7 @@ import tigase.component.exceptions.ComponentException;
 import tigase.criteria.Criteria;
 import tigase.eventbus.EventBusImplementation;
 import tigase.eventbus.EventName;
+import tigase.eventbus.EventRoutedTransientFiller;
 import tigase.eventbus.Serializer;
 import tigase.eventbus.component.stores.Affiliation;
 import tigase.eventbus.component.stores.AffiliationStore;
@@ -64,6 +65,14 @@ public class EventReceiverModule extends AbstractEventBusModule {
 		Object obj = serializer.deserialize(event);
 		if (obj == null)
 			obj = event;
+		else {
+			Collection<EventRoutedTransientFiller> fillers = localEventBus.getEventRoutedTransientFillers(event.getClass());
+			if (fillers != null) {
+				for (EventRoutedTransientFiller f : fillers) {
+					f.fillEvent(event);
+				}
+			}
+		}
 
 		localEventBus.fire(obj, this, true);
 

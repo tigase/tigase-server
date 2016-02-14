@@ -42,6 +42,7 @@ import tigase.cluster.api.SessionManagerClusteredIfc;
 import tigase.cluster.strategy.ClusteringStrategyIfc;
 import tigase.cluster.strategy.ConnectionRecordIfc;
 import tigase.conf.ConfigurationException;
+import tigase.eventbus.FillRoutedEvent;
 import tigase.eventbus.RouteEvent;
 import tigase.eventbus.component.stores.Subscription;
 import tigase.osgi.ModulesManagerImpl;
@@ -399,6 +400,13 @@ public class SessionManagerClustered
 	@Override
 	public boolean hasXMPPResourceConnectionForConnectionJid(JID connJid) {
 		return this.connectionsByFrom.containsKey(connJid);
+	}
+	
+	@FillRoutedEvent
+	protected void fillRoutedUserSessionEvent(UserSessionEvent event) {
+		XMPPSession session = getSession(event.getUserJid().getBareJID());
+		if (session != null && (event.getUserJid().getResource() == null || session.getResourceForResource(event.getUserJid().getResource()) != null))
+			event.setSession(session);
 	}
 	
 	@RouteEvent

@@ -1,5 +1,5 @@
 /*
- * UserSessionEvent.java
+ * FillRoutedEvent.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
@@ -19,40 +19,25 @@
  * If not, see http://www.gnu.org/licenses/.
  *
  */
-package tigase.server.xmppsession;
+package tigase.eventbus;
 
-import tigase.xmpp.JID;
-import tigase.xmpp.XMPPSession;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Base class for implementation of events related to user session. For this event
- * exists additional routing mechanism which will optimize delivery of this event
- * in clustered environment.
+ * Annotation used to mark methods of consumer class as responsible for filling
+ * event transient fields
  *
  * @author andrzej
  */
-public class UserSessionEvent {
-
-	private transient XMPPSession session;
+@Target({ ElementType.METHOD })
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+@Documented
+public @interface FillRoutedEvent {
 	
-	private JID userJid;
-	
-	public UserSessionEvent() { }
-	
-	public UserSessionEvent(JID userJid, XMPPSession session) {
-		this.session = session;
-		this.userJid = userJid;
-	}
-	
-	public XMPPSession getSession() {
-		return session;
-	}
-
-	public JID getUserJid() {
-		return userJid;
-	}
-
-	public void setSession(XMPPSession session) {
-		this.session = session;
-	}
 }
