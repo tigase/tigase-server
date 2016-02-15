@@ -115,6 +115,7 @@ public class ClConConfigRepository
 			item = getItemInstance();
 			item.setHostname(host);
 		}
+		item.setSecondaryHostname( DNSResolverFactory.getInstance().getSecondaryHost() );
 		item.setLastUpdate(System.currentTimeMillis());
 		item.setCpuUsage(TigaseRuntime.getTigaseRuntime().getCPUUsage());
 		item.setMemUsage(TigaseRuntime.getTigaseRuntime().getHeapMemUsage());
@@ -143,8 +144,8 @@ public class ClConConfigRepository
 
 	@Override
 	public boolean itemChanged(ClusterRepoItem oldItem, ClusterRepoItem newItem) {
-		return !oldItem.getPassword().equals(newItem.getPassword()) || (oldItem
-				.getPortNo() != newItem.getPortNo());
+		return !oldItem.getPassword().equals(newItem.getPassword())
+					 || (oldItem.getPortNo() != newItem.getPortNo());
 	}
 
 	//~--- get methods ----------------------------------------------------------

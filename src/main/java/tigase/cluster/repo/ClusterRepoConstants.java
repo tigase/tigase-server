@@ -28,6 +28,8 @@ public interface ClusterRepoConstants {
 
 	public static final String HOSTNAME_COLUMN = "hostname";
 
+	public static final String SECONDARY_HOSTNAME_COLUMN = "secondary";
+
 	public static final String LASTUPDATE_COLUMN = "last_update";
 
 	public static final String MEM_USAGE_COLUMN = "mem_usage";
