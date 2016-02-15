@@ -21,42 +21,23 @@
  */
 
 
-
-/*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
- */
 package tigase.cluster.repo;
 
-/**
- *
- * @author kobit
- */
 public interface ClusterRepoConstants {
-	/** Field description */
 	public static final String CPU_USAGE_COLUMN = "cpu_usage";
 
-	/** Field description */
 	public static final String HOSTNAME_COLUMN = "hostname";
 
-	/** Field description */
 	public static final String LASTUPDATE_COLUMN = "last_update";
 
-	/** Field description */
 	public static final String MEM_USAGE_COLUMN = "mem_usage";
 
-	/** Field description */
 	public static final String PASSWORD_COLUMN = "password";
 
-	/** Field description */
 	public static final String PORT_COLUMN = "port";
 
-	/** Field description */
 	public static final String REPO_URI_PROP_KEY = "repo-uri";
 
-	/** Field description */
 	public static final String TABLE_NAME = "cluster_nodes";
 }
 
-
-//~ Formatted in Tigase Code Convention on 13/03/11

@@ -24,89 +24,56 @@
 
 package tigase.cluster.repo;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.comp.RepositoryItemAbstract;
 
 import tigase.server.Command;
 import tigase.server.Packet;
 
-import tigase.util.Algorithms;
-
-import tigase.xml.Element;
-
 import tigase.xmpp.BareJID;
 
-//~--- JDK imports ------------------------------------------------------------
+import tigase.util.Algorithms;
+import tigase.xml.Element;
 
 import java.text.DateFormat;
 import java.text.ParseException;
-
 import java.util.Date;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.UUID;
 
-/**
- * Class description
- *
- *
- * @version        5.2.0, 13/03/09
- * @author         <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- */
 public class ClusterRepoItem
 				extends RepositoryItemAbstract {
-	/** Field description */
 	public static final String CPU_USAGE_ATTR = "cpu";
 
-	/** Field description */
 	public static final String CPU_USAGE_LABEL = "CPU usage";
 
-	/** Field description */
 	public static final String HOSTNAME_ATTR = "host";
 
-	/** Field description */
 	public static final String HOSTNAME_LABEL = "Hostname";
 
-	/** Field description */
 	public static final String LAST_UPDATE_ATTR = "updated";
 
-	/** Field description */
 	public static final String LAST_UPDATE_LABEL = "Last update";
 
-	/** Field description */
 	public static final String MEM_USAGE_ATTR = "mem";
 
-	/** Field description */
 	public static final String MEM_USAGE_LABEL = "Memory usage";
 
-	/** Field description */
 	public static final String PASSWORD_ATTR = "passwd";
 
-	/** Field description */
 	public static final String PASSWORD_LABEL = "Password";
 
-	/** Field description */
 	public static final String PASSWORD_PROP_VAL = "someSecret";
 
-	/** Field description */
 	public static final String PORT_NO_ATTR = "port";
 
-	/** Field description */
 	public static final String PORT_NO_LABEL = "Port number";
 
-	/** Field description */
 	public static final int PORT_NO_PROP_VAL = 5277;
 
-	/** Field description */
 	public static final String REPO_ITEM_ELEM_NAME = "item";
 
-	/**
-	 * Variable <code>log</code> is a class logger.
-	 */
 	private static final Logger log = Logger.getLogger(ClusterRepoItem.class.getName());
-
-	//~--- fields ---------------------------------------------------------------
 
 	private float  cpuUsage   = 0f;
 	private String hostname   = null;
@@ -227,14 +194,6 @@ public class ClusterRepoItem
 		return toPropertyString();
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public float getCpuUsage() {
 		return cpuUsage;
 	}
@@ -244,12 +203,6 @@ public class ClusterRepoItem
 		return REPO_ITEM_ELEM_NAME;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public String getHostname() {
 		return hostname;
 	}
@@ -259,112 +212,45 @@ public class ClusterRepoItem
 		return hostname;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public long getLastUpdate() {
 		return lastUpdate;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public float getMemUsage() {
 		return memUsage;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public String getPassword() {
 		return password;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
 	public int getPortNo() {
 		return portNo;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @param cpuUsage
-	 */
 	protected void setCpuUsage(float cpuUsage) {
 		this.cpuUsage = cpuUsage;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @param hostname
-	 */
 	protected void setHostname(String hostname) {
 		this.hostname = hostname;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 * @param update
-	 */
 	protected void setLastUpdate(long update) {
 		this.lastUpdate = update;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param memUsage
-	 */
 	protected void setMemUsage(float memUsage) {
 		this.memUsage = memUsage;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param password
-	 */
 	protected void setPassword(String password) {
 		this.password = password;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param port
-	 */
 	protected void setPort(int port) {
 		this.portNo = port;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private int parsePortNo(String input) {
 		int result;
@@ -379,6 +265,3 @@ public class ClusterRepoItem
 		return result;
 	}
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/07/06
