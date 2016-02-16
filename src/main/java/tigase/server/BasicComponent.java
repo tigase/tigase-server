@@ -537,12 +537,6 @@ public class BasicComponent
 	 * @return a value of <code>BareJID</code>
 	 */
 	public BareJID getDefHostName() {
-//		if ( defHostname == null ){
-//			if ( DEF_HOSTNAME_PROP_VAL == null ){
-//				DEF_HOSTNAME_PROP_VAL = DNSResolverFactory.getInstance().getDefaultHost();
-//			}
-//			defHostname = BareJID.bareJIDInstanceNS( DEF_HOSTNAME_PROP_VAL );
-//		}
 		return defHostname;
 	}
 
