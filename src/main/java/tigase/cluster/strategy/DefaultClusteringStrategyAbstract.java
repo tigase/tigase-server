@@ -66,7 +66,7 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	private static final Logger log = Logger.getLogger(
 			DefaultClusteringStrategyAbstract.class.getName());
 	private static final String PACKET_FORWARD_CMD = "packet-forward-sm-cmd";
-
+	
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
@@ -163,9 +163,12 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 
 			Map<String, String> data = null;
 
-			if (conn != null) {
+			if (conn != null || packet.getPacketFrom() != null) {
 				data = new LinkedHashMap<String, String>();
-				data.put(SESSION_FOUND_KEY, sm.getComponentId().toString());
+				if (conn != null)
+					data.put(SESSION_FOUND_KEY, sm.getComponentId().toString());
+				if (packet.getPacketFrom() != null)
+					data.put(PacketForwardCmd.PACKET_FROM_KEY, packet.getPacketFrom().toString());
 			}
 			cluster.sendToNodes(PACKET_FORWARD_CMD, data, packet.getElement(), sm
 					.getComponentId(), null, toNodes.toArray(new JID[toNodes.size()]));

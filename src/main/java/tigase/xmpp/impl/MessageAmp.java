@@ -233,7 +233,7 @@ public class MessageAmp
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
 		boolean processed = C2SDeliveryErrorProcessor.preProcess(packet, session, repo, results, settings, messageProcessor);
-		if (processed && packet.getPacketFrom() != null && packet.getPacketFrom().equals(ampJID)) {
+		if (processed && packet.getPacketFrom() != null && packet.getPacketFrom().getLocalpart().equals(ampJID.getLocalpart())) {
 			processed = false;
 		}
 		if (processed) {
@@ -327,7 +327,7 @@ public class MessageAmp
 //					 "Individual action definitions MAY provide their own requirements." regarding
 //						"status" attribute requirement!!! applies to "alert" and "notify"
 //						|| (amp.getAttributeStaticStr(STATUS_ATTRIBUTE_NAME) != null)
-						|| ampJID.equals(packet.getPacketFrom())) {
+						|| (packet.getPacketFrom() != null && ampJID.getLocalpart().equals(packet.getPacketFrom().getLocalpart()))) {
 					messageProcessor.process(packet, session, repo, results, settings);
 				} else {
 					// when packet from user with AMP is sent we need to forward it to AMP
@@ -336,7 +336,8 @@ public class MessageAmp
 					JID connectionId = session.getConnectionId();
 					Packet result = packet.copyElementOnly();
 					if (connectionId.equals(packet.getPacketFrom())) {
-						result.getElement().addAttribute(FROM_CONN_ID, connectionId.toString());
+						if (!session.isUserId(packet.getStanzaTo().getBareJID()))
+							result.getElement().addAttribute(FROM_CONN_ID, connectionId.toString());
 						if ( null != session.getBareJID() ){
 							result.getElement().addAttribute(SESSION_JID, session.getJID().toString() );
 						}
