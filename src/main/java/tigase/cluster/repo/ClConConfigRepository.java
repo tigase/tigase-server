@@ -26,20 +26,17 @@ package tigase.cluster.repo;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.db.DBInitException;
 import tigase.db.comp.ConfigRepository;
 
+import tigase.sys.ShutdownHook;
 import tigase.sys.TigaseRuntime;
-import tigase.util.DNSResolver;
+import tigase.util.DNSResolverFactory;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import tigase.db.DBInitException;
-
-import tigase.sys.ShutdownHook;
-
-import java.util.Date;
 
 /**
  * Class description
@@ -111,13 +108,14 @@ public class ClConConfigRepository
 	public void reload() {
 		super.reload();
 
-		String          host = DNSResolver.getDefaultHostname();
+		String          host = DNSResolverFactory.getInstance().getDefaultHost();
 		ClusterRepoItem item = getItem(host);
 
 		if (item == null) {
 			item = getItemInstance();
 			item.setHostname(host);
 		}
+		item.setSecondaryHostname( DNSResolverFactory.getInstance().getSecondaryHost() );
 		item.setLastUpdate(System.currentTimeMillis());
 		item.setCpuUsage(TigaseRuntime.getTigaseRuntime().getCPUUsage());
 		item.setMemUsage(TigaseRuntime.getTigaseRuntime().getHeapMemUsage());
@@ -146,8 +144,8 @@ public class ClConConfigRepository
 
 	@Override
 	public boolean itemChanged(ClusterRepoItem oldItem, ClusterRepoItem newItem) {
-		return !oldItem.getPassword().equals(newItem.getPassword()) || (oldItem
-				.getPortNo() != newItem.getPortNo());
+		return !oldItem.getPassword().equals(newItem.getPassword())
+					 || (oldItem.getPortNo() != newItem.getPortNo());
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -166,10 +164,10 @@ public class ClConConfigRepository
 			item.initFromPropertyString(it);
 			addItem(item);
 		}
-		if (getItem(DNSResolver.getDefaultHostname()) == null) {
+		if (getItem(DNSResolverFactory.getInstance().getDefaultHost()) == null) {
 			ClusterRepoItem item = getItemInstance();
 
-			item.initFromPropertyString(DNSResolver.getDefaultHostname());
+			item.initFromPropertyString(DNSResolverFactory.getInstance().getDefaultHost());
 			addItem(item);
 		}
 	}
@@ -188,7 +186,7 @@ public class ClConConfigRepository
 
 	@Override
 	public String shutdown() {
-		String host = DNSResolver.getDefaultHostname();
+		String host = DNSResolverFactory.getInstance().getDefaultHost();
 		removeItem( host );
 		return "== " + "Removing cluster_nodes item: " + host + "\n";
 	}

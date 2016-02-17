@@ -24,6 +24,33 @@ package tigase.server.sreceiver;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.db.RepositoryFactory;
+import tigase.db.TigaseDBException;
+import tigase.db.UserExistsException;
+import tigase.db.UserRepository;
+
+import tigase.server.AbstractMessageReceiver;
+import tigase.server.Command;
+import tigase.server.Iq;
+import tigase.server.Packet;
+import tigase.server.sreceiver.PropertyConstants.MessageType;
+import tigase.server.sreceiver.PropertyConstants.SenderAddress;
+import tigase.server.sreceiver.PropertyConstants.SenderRestrictions;
+
+import tigase.xmpp.JID;
+import tigase.xmpp.StanzaType;
+
+import tigase.conf.Configurable;
+import tigase.conf.ConfigurationException;
+import tigase.disco.ServiceEntity;
+import tigase.disco.ServiceIdentity;
+import tigase.disco.XMPPService;
+import tigase.stats.StatisticsList;
+import tigase.util.ClassUtil;
+import tigase.util.DNSResolverFactory;
+import tigase.util.TigaseStringprepException;
+import tigase.xml.Element;
+
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -35,34 +62,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.conf.Configurable;
-import tigase.conf.ConfigurationException;
-import tigase.db.RepositoryFactory;
-import tigase.db.TigaseDBException;
-import tigase.db.UserExistsException;
-import tigase.db.UserRepository;
-import tigase.disco.ServiceEntity;
-import tigase.disco.ServiceIdentity;
-import tigase.disco.XMPPService;
-import tigase.server.AbstractMessageReceiver;
-import tigase.server.Command;
-import tigase.server.Iq;
-import tigase.server.Packet;
 
 import static tigase.server.sreceiver.PropertyConstants.*;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import tigase.server.sreceiver.PropertyConstants.MessageType;
-import tigase.server.sreceiver.PropertyConstants.SenderAddress;
-import tigase.server.sreceiver.PropertyConstants.SenderRestrictions;
-import tigase.stats.StatisticsList;
-import tigase.util.ClassUtil;
-import tigase.util.DNSResolver;
-import tigase.util.TigaseStringprepException;
-import tigase.xml.Element;
-import tigase.xmpp.JID;
-import tigase.xmpp.StanzaType;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -356,7 +357,7 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 
 		defs.put(ADMINS_PROP_KEY, ADMINS_PROP_VAL);
 
-		String[] local_domains = DNSResolver.getDefHostNames();
+		String[] local_domains = DNSResolverFactory.getInstance().getDefaultHosts();
 
 		if (params.get(GEN_VIRT_HOSTS) != null) {
 			local_domains = ((String) params.get(GEN_VIRT_HOSTS)).split(",");

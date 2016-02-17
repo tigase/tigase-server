@@ -26,11 +26,40 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.cluster.api.ClusterControllerIfc;
+import tigase.cluster.api.ClusteredComponentIfc;
+
+import tigase.server.script.AddScriptCommand;
+import tigase.server.script.CommandIfc;
+import tigase.server.script.RemoveScriptCommand;
+
+import tigase.xmpp.Authorization;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
+
+import tigase.conf.Configurable;
+import tigase.conf.ConfigurationException;
+import tigase.disco.ServiceEntity;
+import tigase.disco.ServiceIdentity;
+import tigase.disco.XMPPService;
+import tigase.osgi.ModulesManagerImpl;
+import tigase.osgi.OSGiScriptEngineManager;
+import tigase.stats.StatisticsList;
+import tigase.util.DNSResolverFactory;
+import tigase.util.TigaseStringprepException;
+import tigase.vhosts.VHostItem;
+import tigase.vhosts.VHostListener;
+import tigase.vhosts.VHostManagerIfc;
+import tigase.xml.Element;
+
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -41,45 +70,14 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.script.Bindings;
+import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-
-import tigase.conf.Configurable;
-import tigase.conf.ConfigurationException;
-import tigase.disco.ServiceEntity;
-import tigase.disco.ServiceIdentity;
-import tigase.disco.XMPPService;
-import tigase.osgi.ModulesManagerImpl;
-import tigase.osgi.OSGiScriptEngineManager;
-
-import tigase.server.script.AddScriptCommand;
-import tigase.server.script.CommandIfc;
-import tigase.server.script.RemoveScriptCommand;
-
-import tigase.stats.StatisticsList;
-import tigase.util.DNSResolver;
-import tigase.util.TigaseStringprepException;
-import tigase.vhosts.VHostItem;
-import tigase.vhosts.VHostListener;
-import tigase.vhosts.VHostManagerIfc;
-import tigase.xml.Element;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-
-import java.io.FileFilter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import javax.script.ScriptEngineFactory;
-import tigase.cluster.api.ClusterControllerIfc;
-import tigase.cluster.api.ClusteredComponentIfc;
 
 /**
  * Created: Oct 17, 2009 7:49:05 PM
@@ -109,10 +107,9 @@ public class BasicComponent
 	protected VHostManagerIfc vHostManager          = null;
 	private ComponentInfo     cmpInfo               = null;
 	private JID               compId                = null;
-	private String            DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefaultHostname();
+	private String            DEF_HOSTNAME_PROP_VAL = null;
 	private String            name                  = null;
-	private BareJID           defHostname = BareJID.bareJIDInstanceNS(
-			DEF_HOSTNAME_PROP_VAL);
+	private BareJID           defHostname = null;
 
 	/** Field description */
 	protected Map<String, CommandIfc> scriptCommands = new ConcurrentHashMap<String,
@@ -503,7 +500,7 @@ public class BasicComponent
 		Map<String, Object> defs = new LinkedHashMap<String, Object>(50);
 
 		defs.put(COMPONENT_ID_PROP_KEY, compId.toString());
-		DEF_HOSTNAME_PROP_VAL = DNSResolver.getDefaultHostname();
+		DEF_HOSTNAME_PROP_VAL = DNSResolverFactory.getInstance().getDefaultHost();
 		defs.put(DEF_HOSTNAME_PROP_KEY, DEF_HOSTNAME_PROP_VAL);
 
 		String[] adm = null;
@@ -898,6 +895,10 @@ public class BasicComponent
 	@Override
 	public void setName(String name) {
 		this.name = name;
+
+		DEF_HOSTNAME_PROP_VAL = DNSResolverFactory.getInstance().getDefaultHost();
+		defHostname = BareJID.bareJIDInstanceNS( DEF_HOSTNAME_PROP_VAL );
+
 		try {
 			compId = JID.jidInstance(name, defHostname.getDomain(), null);
 		} catch (TigaseStringprepException ex) {
@@ -935,7 +936,7 @@ public class BasicComponent
 		}
 		if (props.get(DEF_HOSTNAME_PROP_KEY) != null) {
 			defHostname = BareJID.bareJIDInstanceNS((String) props.get(DEF_HOSTNAME_PROP_KEY));
-		}
+			}
 
 		String[] admins_tmp = (String[]) props.get(ADMINS_PROP_KEY);
 

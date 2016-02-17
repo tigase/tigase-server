@@ -24,34 +24,35 @@ package tigase.server.xmppserver;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.net.UnknownHostException;
-import java.security.NoSuchAlgorithmException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Queue;
-import java.util.TimerTask;
-import java.util.TreeMap;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import tigase.conf.ConfigurationException;
-import tigase.net.ConnectionType;
-import tigase.net.SocketType;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
-import tigase.stats.StatisticsList;
-import tigase.util.Algorithms;
-import tigase.util.DNSEntry;
-import tigase.util.DNSResolver;
-import tigase.xml.Element;
+
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPIOService;
+
+import tigase.conf.ConfigurationException;
+import tigase.net.ConnectionType;
+import tigase.net.SocketType;
+import tigase.stats.StatisticsList;
+import tigase.util.Algorithms;
+import tigase.util.DNSEntry;
+import tigase.util.DNSResolverFactory;
+import tigase.xml.Element;
+
+import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Queue;
+import java.util.TreeMap;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -1181,7 +1182,7 @@ public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Obj
 
 		// dumpCurrentStack(Thread.currentThread().getStackTrace());
 		try {
-			DNSEntry dns_entry = DNSResolver.getHostSRV_Entry(remotehost);
+			DNSEntry dns_entry = DNSResolverFactory.getInstance().getHostSRV_Entry(remotehost);
 			Map<String, Object> port_props = new TreeMap<String, Object>();
 
 			port_props.put("remote-ip", dns_entry.getIp());

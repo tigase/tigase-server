@@ -488,9 +488,21 @@ public class BoshConnectionManager
 	public JID getJidForBoshSession(BoshSession bs) {
 		return getFromAddress(bs.getSid().toString());
 	}
-	
+
 	@Override
-	public BareJID getSeeOtherHostForJID(BareJID fromJID, Phase ph) {
+	public Element getSeeOtherHostError( Packet packet, BareJID destination) {
+
+		XMPPIOService<Object> xmppioService = getXMPPIOService( packet );
+
+		Integer redirect_port = (Integer) xmppioService.getSessionData().get( FORCE_REDIRECT_TO_KEY );
+
+		return see_other_host_strategy.getStreamError( "urn:ietf:params:xml:ns:xmpp-streams",
+																						destination, redirect_port );
+
+	}
+
+	@Override
+	public BareJID getSeeOtherHostForJID(Packet packet, BareJID fromJID, Phase ph) {
 		if (see_other_host_strategy == null) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("no see-other-host implementation set");
@@ -516,9 +528,14 @@ public class BoshConnectionManager
 					: "null") + " in phase: " + ph.toString());
 		}
 
-		return ((see_other_host != null) &&!see_other_host.equals(getDefHostName()))
-				? see_other_host
-				: null;
+		XMPPIOService<Object> xmppioService = getXMPPIOService( packet );
+		Integer redirect_port = (Integer) xmppioService.getSessionData().get( FORCE_REDIRECT_TO_KEY );
+
+		return ( ( see_other_host != null )
+						 && ( redirect_port != null
+									|| see_other_host_strategy.isRedirectionRequired( getDefHostName(), see_other_host ) ) )
+					 ? see_other_host
+					 : null;
 	}
 
 	@Override
@@ -652,11 +669,15 @@ public class BoshConnectionManager
 				if (session != null) {
 					try {
 						BareJID fromJID = BareJID.bareJIDInstance(jid);
-						BareJID hostJid = getSeeOtherHostForJID(fromJID, Phase.LOGIN);
+						BareJID hostJid = getSeeOtherHostForJID( packet, fromJID, Phase.LOGIN );
 
 						if (hostJid != null) {
+
+							XMPPIOService<Object> xmppioService = getXMPPIOService( packet );
+							Integer port = (Integer) xmppioService.getSessionData().get( FORCE_REDIRECT_TO_KEY );
+
 							Element streamErrorElement = see_other_host_strategy.getStreamError(
-									"urn:ietf:params:xml:ns:xmpp-streams", hostJid);
+									"urn:ietf:params:xml:ns:xmpp-streams", hostJid, port);
 							Packet redirectPacket = Packet.packetInstance(streamErrorElement);
 
 							redirectPacket.setPacketTo(packet.getTo());

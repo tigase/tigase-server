@@ -22,13 +22,12 @@
 
 package tigase.vhosts;
 
-//~--- non-JDK imports --------------------------------------------------------
-
-import tigase.util.DNSResolver;
-
 import tigase.xmpp.BareJID;
 
-import static tigase.conf.Configurable.*;
+import tigase.util.DNSResolverFactory;
+
+import static tigase.conf.Configurable.GEN_VIRT_HOSTS;
+import static tigase.conf.Configurable.HOSTNAMES_PROP_KEY;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -61,7 +60,7 @@ public abstract class VHostRepoDefaults {
 	 * 
 	 */
 	public static String[] getDefaultPropetyItems() {
-		return DNSResolver.getDefHostNames();
+		return DNSResolverFactory.getInstance().getDefaultHosts();
 	}
 
 	/**

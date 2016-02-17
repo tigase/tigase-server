@@ -24,8 +24,6 @@
 
 package tigase.xmpp.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 
@@ -33,14 +31,17 @@ import tigase.server.Iq;
 import tigase.server.Packet;
 
 import tigase.xmpp.Authorization;
+import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;
+import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 
-import tigase.util.DNSResolver;
+import tigase.util.DNSResolverFactory;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 
@@ -48,9 +49,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.xmpp.JID;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.XMPPPreprocessorIfc;
 
 /**
  * RFC-3920, 7. Resource Binding
@@ -96,7 +94,7 @@ public class BindResource
 	@Override
 	public void init(Map<String, Object> settings) throws TigaseDBException {
 
-		int hostnameHash = Math.abs( DNSResolver.getDefaultHostname().hashCode() );
+		int hostnameHash = Math.abs( DNSResolverFactory.getInstance().getDefaultHost().hashCode() );
 		
 		// Init plugin configuration
 		if (settings.get(DEF_RESOURCE_PREFIX_PROP_KEY) != null) {

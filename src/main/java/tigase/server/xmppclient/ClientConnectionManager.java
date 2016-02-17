@@ -27,26 +27,6 @@ package tigase.server.xmppclient;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.io.IOException;
-import java.security.cert.CertificateEncodingException;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.zip.Deflater;
-
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
-import tigase.conf.ConfigurationException;
-import tigase.net.IOService;
-import tigase.net.SocketThread;
-import tigase.net.SocketType;
 import tigase.server.Command;
 import tigase.server.ConnectionManager;
 import tigase.server.Iq;
@@ -54,12 +34,7 @@ import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.server.Presence;
 import tigase.server.ReceiverTimeoutHandler;
-import tigase.util.Base64;
-import tigase.util.DNSResolver;
-import tigase.util.RoutingsContainer;
-import tigase.util.TigaseStringprepException;
-import tigase.vhosts.VHostItem;
-import tigase.xml.Element;
+
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
@@ -69,6 +44,35 @@ import tigase.xmpp.StreamError;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
+
+import tigase.conf.ConfigurationException;
+import tigase.net.ConnectionType;
+import tigase.net.IOService;
+import tigase.net.SocketThread;
+import tigase.net.SocketType;
+import tigase.util.Base64;
+import tigase.util.DNSResolverFactory;
+import tigase.util.RoutingsContainer;
+import tigase.util.TigaseStringprepException;
+import tigase.vhosts.VHostItem;
+import tigase.xml.Element;
+
+import java.io.IOException;
+import java.security.cert.CertificateEncodingException;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.zip.Deflater;
+
+import javax.net.ssl.TrustManager;
 
 /**
  * Class ClientConnectionManager Created: Tue Nov 22 07:07:11 2005
@@ -93,6 +97,7 @@ public class ClientConnectionManager
 	private static final String  XMLNS                            = "jabber:client";
 	private static final boolean TLS_WANT_CLIENT_AUTH_ENABLED_DEF = false;
 	private static final boolean ROUTING_MODE_PROP_VAL            = true;
+	protected static final String FORCE_REDIRECT_TO_KEY = "force-redirect-to";
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -436,22 +441,26 @@ public class ClientConnectionManager
 		if (!isAllowed(serv, hostname)) {
 			return prepareStreamError(serv, StreamError.PolicyViolation, hostname);
 		}
+		Integer redirect_port = (Integer)serv.getSessionData().get( FORCE_REDIRECT_TO_KEY );
+
 		if ((fromJID != null) && (see_other_host_strategy != null)
 				&& see_other_host_strategy.isEnabled(vHostManager.getVHostItem( fromJID.getDomain()),
 																						 SeeOtherHostIfc.Phase.OPEN)) {
 			BareJID see_other_host = see_other_host_strategy.findHostForJID(fromJID,
 					getDefHostName());
 
-			if ((see_other_host != null) &&!see_other_host.equals(getDefHostName())) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Sending redirect for {0} to host {1}, connection {2}.",
-							new Object[] { fromJID,
-							see_other_host, serv });
+			if ( ( see_other_host != null )
+					 && ( redirect_port != null
+								|| see_other_host_strategy.isRedirectionRequired( getDefHostName(), see_other_host ) ) ){
+				if ( log.isLoggable( Level.FINEST ) ){
+					log.log( Level.FINEST, "Sending redirect for {0} to host {1}, connection {2}.",
+									 new Object[] { fromJID,
+																	see_other_host, serv } );
 				}
 
 				return prepareSeeOtherHost(serv, fromJID.getDomain(), see_other_host);
 			}
-		}    // of if (from != null )
+		}
 
 		String id = (String) serv.getSessionData().get(IOService.SESSION_ID_KEY);
 
@@ -538,7 +547,7 @@ public class ClientConnectionManager
 						comp_params[1]);
 			} else {
 				props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY, DEF_SM_NAME + "@" +
-						DNSResolver.getDefaultHostname());
+						DNSResolverFactory.getInstance().getDefaultHost());
 			}
 		}
 		props.put(SOCKET_CLOSE_WAIT_PROP_KEY, SOCKET_CLOSE_WAIT_PROP_DEF);
@@ -748,8 +757,12 @@ public class ClientConnectionManager
 						BareJID see_other_host = see_other_host_strategy.findHostForJID(fromJID,
 								getDefHostName());
 
-						if ((see_other_host != null) &&!see_other_host.equals(getDefHostName())) {
-							if (log.isLoggable(Level.FINEST)) {
+						Integer redirect_port = (Integer) serv.getSessionData().get( FORCE_REDIRECT_TO_KEY );
+
+						if ( ( see_other_host != null )
+								 && ( redirect_port != null
+											|| see_other_host_strategy.isRedirectionRequired( getDefHostName(), see_other_host ) ) ){
+							if ( log.isLoggable( Level.FINEST ) ){
 								log.log(Level.FINEST,
 										"Sending redirect for {0} to host {1}, connection {2}.",
 										new Object[] { fromJID,
@@ -1043,12 +1056,16 @@ public class ClientConnectionManager
 	protected String prepareSeeOtherHost(XMPPIOService<Object> serv, String hostname, BareJID see_other_host) {
 		for (XMPPIOProcessor proc : processors) {
 			proc.streamError(serv, StreamError.SeeOtherHost);
-		}				
+		}
+
+		Integer redirect_port = (Integer)serv.getSessionData().get( FORCE_REDIRECT_TO_KEY );
+
 		return "<stream:stream" + " xmlns='" + XMLNS + "'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
 				+ " id='tigase-error-tigase'" + " from='" + (hostname != null ? hostname : getDefVHostItem()) + "'"
-				+ " version='1.0' xml:lang='en'>" + see_other_host_strategy.getStreamError(
-						"urn:ietf:params:xml:ns:xmpp-streams", see_other_host).toString()
+				+ " version='1.0' xml:lang='en'>"
+					 + see_other_host_strategy.getStreamError( "urn:ietf:params:xml:ns:xmpp-streams",
+																										 see_other_host, redirect_port).toString()
 				+ "</stream:stream>";	
 	}	
 	

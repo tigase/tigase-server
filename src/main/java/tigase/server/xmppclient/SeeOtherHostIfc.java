@@ -91,7 +91,15 @@ public interface SeeOtherHostIfc {
 	 * @param destination BareJID address of the redirect destination
 	 * @return element containing stream:error message
 	 */
-	Element getStreamError( String xmlns, BareJID destination );
+	default Element getStreamError( String xmlns, BareJID destination, Integer port ) {
+		Element error = new Element( "stream:error" );
+		Element seeOtherHost = new Element( "see-other-host", destination.toString() + (port != null ? ":"+port : "") );
+
+		seeOtherHost.setXMLNS( xmlns );
+		error.addChild( seeOtherHost );
+
+		return error;
+	}
 
 	/**
 	 * Performs check whether redirect is enabled in the given phase
@@ -103,4 +111,19 @@ public interface SeeOtherHostIfc {
 	 * the phase passed as argument
 	 */
 	boolean isEnabled(VHostItem vHost, Phase ph);
+
+	/**
+	 * Method validates whether a redirection for a particular hostname and
+	 * resulting redirection hastname is required
+	 *
+	 * @param defaultHost     default hostname of the particular machine
+	 * @param redirectionHost destination hostname
+	 *
+	 * @return {@code true} if the redirection is required, otherwise
+	 *         {@code false}
+	 */
+	default boolean isRedirectionRequired( BareJID defaultHost, BareJID redirectionHost ) {
+		return !defaultHost.equals( redirectionHost );
+	}
+
 }

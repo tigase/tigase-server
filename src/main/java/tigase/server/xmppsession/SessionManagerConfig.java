@@ -28,19 +28,16 @@ package tigase.server.xmppsession;
 
 import tigase.db.RepositoryFactory;
 
-import tigase.osgi.ModulesManagerImpl;
-
-import tigase.util.DNSResolver;
-
 import tigase.xmpp.*;
 
-import static tigase.conf.Configurable.*;
-
-//~--- JDK imports ------------------------------------------------------------
+import tigase.osgi.ModulesManagerImpl;
 
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static tigase.conf.Configurable.GEN_SM_PLUGINS;
+import static tigase.conf.Configurable.GEN_TEST;
 
 /**
  * Describe class SessionManagerConfig here.
@@ -105,10 +102,6 @@ public abstract class SessionManagerConfig {
 	/** Field description */
 	protected static final String STALE_CONNECTION_CLOSER_QUEUE_SIZE_KEY =
 			"stale-connection-closer-queue-size";
-	private static String[] ADMINS_PROP_VAL = { "admin@localhost", "admin@hostname" };
-	private static String[] ANONYMOUS_DOMAINS_PROP_VAL = { "localhost", "hostname" };
-	private static String[] CLUSTER_NODES_PROP_VAL     = { "sess-man@localhost" };
-	private static String[] HOSTNAMES_PROP_VAL         = { "localhost", "hostname" };
 
 	// public static final String ANONYMOUS_PEERS_PROP_KEY = "anonymous-peers";
 
@@ -256,13 +249,6 @@ public abstract class SessionManagerConfig {
 
 		props.put(SKIP_PRIVACY_PROP_KEY, (skip_privacy != null) && skip_privacy.equals(
 				"true"));
-		if (params.get(GEN_VIRT_HOSTS) != null) {
-			HOSTNAMES_PROP_VAL         = ((String) params.get(GEN_VIRT_HOSTS)).split(",");
-			ANONYMOUS_DOMAINS_PROP_VAL = ((String) params.get(GEN_VIRT_HOSTS)).split(",");
-		} else {
-			HOSTNAMES_PROP_VAL         = DNSResolver.getDefHostNames();
-			ANONYMOUS_DOMAINS_PROP_VAL = DNSResolver.getDefHostNames();
-		}
 		props.put(AUTO_CREATE_OFFLINE_USER_PROP_KEY, AUTO_CREATE_OFFLINE_USER_PROP_VAL);
 
 		String sm_threads_pool = SM_THREADS_POOL_PROP_VAL;
