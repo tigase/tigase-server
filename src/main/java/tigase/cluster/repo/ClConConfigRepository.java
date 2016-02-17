@@ -144,8 +144,9 @@ public class ClConConfigRepository
 
 	@Override
 	public boolean itemChanged(ClusterRepoItem oldItem, ClusterRepoItem newItem) {
-		return !oldItem.getPassword().equals(newItem.getPassword())
-					 || (oldItem.getPortNo() != newItem.getPortNo());
+		return !oldItem.getPassword().equals( newItem.getPassword() )
+					 || ( oldItem.getPortNo() != newItem.getPortNo() )
+					 || !oldItem.getSecondaryHostname().equals( newItem.getSecondaryHostname() );
 	}
 
 	//~--- get methods ----------------------------------------------------------
