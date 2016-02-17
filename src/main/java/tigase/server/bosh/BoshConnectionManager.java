@@ -516,8 +516,9 @@ public class BoshConnectionManager
 					: "null") + " in phase: " + ph.toString());
 		}
 
-		return ((see_other_host != null) &&!see_other_host.equals(getDefHostName()))
-				? see_other_host
+		return ( ( see_other_host != null )
+						 && see_other_host_strategy.isRedirectionRequired( getDefHostName(), see_other_host ) )
+						? see_other_host
 				: null;
 	}
 

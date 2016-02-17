@@ -103,4 +103,19 @@ public interface SeeOtherHostIfc {
 	 * the phase passed as argument
 	 */
 	boolean isEnabled(VHostItem vHost, Phase ph);
+
+	/**
+	 * Method validates whether a redirection for a particular hostname and
+	 * resulting redirection hastname is required
+	 *
+	 * @param defaultHost     default hostname of the particular machine
+	 * @param redirectionHost destination hostname
+	 *
+	 * @return {@code true} if the redirection is required, otherwise
+	 *         {@code false}
+	 */
+	default boolean isRedirectionRequired( BareJID defaultHost, BareJID redirectionHost ) {
+		return !defaultHost.equals( redirectionHost );
+	}
+
 }

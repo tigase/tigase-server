@@ -443,16 +443,16 @@ public class ClientConnectionManager
 			BareJID see_other_host = see_other_host_strategy.findHostForJID(fromJID,
 					getDefHostName());
 
-			if ((see_other_host != null) &&!see_other_host.equals(getDefHostName())) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Sending redirect for {0} to host {1}, connection {2}.",
-							new Object[] { fromJID,
-							see_other_host, serv });
+			if ( ( see_other_host != null ) && see_other_host_strategy.isRedirectionRequired( getDefHostName(), see_other_host ) ){
+				if ( log.isLoggable( Level.FINEST ) ){
+					log.log( Level.FINEST, "Sending redirect for {0} to host {1}, connection {2}.",
+									 new Object[] { fromJID,
+																	see_other_host, serv } );
 				}
 
 				return prepareSeeOtherHost(serv, fromJID.getDomain(), see_other_host);
 			}
-		}    // of if (from != null )
+		}
 
 		String id = (String) serv.getSessionData().get(IOService.SESSION_ID_KEY);
 
@@ -749,7 +749,8 @@ public class ClientConnectionManager
 						BareJID see_other_host = see_other_host_strategy.findHostForJID(fromJID,
 								getDefHostName());
 
-						if ((see_other_host != null) &&!see_other_host.equals(getDefHostName())) {
+						if ( ( see_other_host != null )
+								 && see_other_host_strategy.isRedirectionRequired( getDefHostName(), see_other_host ) ){
 							if (log.isLoggable(Level.FINEST)) {
 								log.log(Level.FINEST,
 										"Sending redirect for {0} to host {1}, connection {2}.",
