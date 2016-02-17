@@ -46,6 +46,7 @@ import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
 
 import tigase.conf.ConfigurationException;
+import tigase.net.ConnectionType;
 import tigase.net.IOService;
 import tigase.net.SocketThread;
 import tigase.net.SocketType;
@@ -59,11 +60,13 @@ import tigase.xml.Element;
 import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -94,6 +97,7 @@ public class ClientConnectionManager
 	private static final String  XMLNS                            = "jabber:client";
 	private static final boolean TLS_WANT_CLIENT_AUTH_ENABLED_DEF = false;
 	private static final boolean ROUTING_MODE_PROP_VAL            = true;
+	protected static final String FORCE_REDIRECT_TO_KEY = "force-redirect-to";
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -437,13 +441,17 @@ public class ClientConnectionManager
 		if (!isAllowed(serv, hostname)) {
 			return prepareStreamError(serv, StreamError.PolicyViolation, hostname);
 		}
+		Integer redirect_port = (Integer)serv.getSessionData().get( FORCE_REDIRECT_TO_KEY );
+
 		if ((fromJID != null) && (see_other_host_strategy != null)
 				&& see_other_host_strategy.isEnabled(vHostManager.getVHostItem( fromJID.getDomain()),
 																						 SeeOtherHostIfc.Phase.OPEN)) {
 			BareJID see_other_host = see_other_host_strategy.findHostForJID(fromJID,
 					getDefHostName());
 
-			if ( ( see_other_host != null ) && see_other_host_strategy.isRedirectionRequired( getDefHostName(), see_other_host ) ){
+			if ( ( see_other_host != null )
+					 && ( redirect_port != null
+								|| see_other_host_strategy.isRedirectionRequired( getDefHostName(), see_other_host ) ) ){
 				if ( log.isLoggable( Level.FINEST ) ){
 					log.log( Level.FINEST, "Sending redirect for {0} to host {1}, connection {2}.",
 									 new Object[] { fromJID,
@@ -749,9 +757,12 @@ public class ClientConnectionManager
 						BareJID see_other_host = see_other_host_strategy.findHostForJID(fromJID,
 								getDefHostName());
 
+						Integer redirect_port = (Integer) serv.getSessionData().get( FORCE_REDIRECT_TO_KEY );
+
 						if ( ( see_other_host != null )
-								 && see_other_host_strategy.isRedirectionRequired( getDefHostName(), see_other_host ) ){
-							if (log.isLoggable(Level.FINEST)) {
+								 && ( redirect_port != null
+											|| see_other_host_strategy.isRedirectionRequired( getDefHostName(), see_other_host ) ) ){
+							if ( log.isLoggable( Level.FINEST ) ){
 								log.log(Level.FINEST,
 										"Sending redirect for {0} to host {1}, connection {2}.",
 										new Object[] { fromJID,
@@ -1045,12 +1056,16 @@ public class ClientConnectionManager
 	protected String prepareSeeOtherHost(XMPPIOService<Object> serv, String hostname, BareJID see_other_host) {
 		for (XMPPIOProcessor proc : processors) {
 			proc.streamError(serv, StreamError.SeeOtherHost);
-		}				
+		}
+
+		Integer redirect_port = (Integer)serv.getSessionData().get( FORCE_REDIRECT_TO_KEY );
+
 		return "<stream:stream" + " xmlns='" + XMLNS + "'"
 				+ " xmlns:stream='http://etherx.jabber.org/streams'"
 				+ " id='tigase-error-tigase'" + " from='" + (hostname != null ? hostname : getDefVHostItem()) + "'"
-				+ " version='1.0' xml:lang='en'>" + see_other_host_strategy.getStreamError(
-						"urn:ietf:params:xml:ns:xmpp-streams", see_other_host).toString()
+				+ " version='1.0' xml:lang='en'>"
+					 + see_other_host_strategy.getStreamError( "urn:ietf:params:xml:ns:xmpp-streams",
+																										 see_other_host, redirect_port).toString()
 				+ "</stream:stream>";	
 	}	
 	

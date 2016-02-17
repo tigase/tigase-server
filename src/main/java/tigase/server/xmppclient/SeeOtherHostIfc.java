@@ -91,7 +91,15 @@ public interface SeeOtherHostIfc {
 	 * @param destination BareJID address of the redirect destination
 	 * @return element containing stream:error message
 	 */
-	Element getStreamError( String xmlns, BareJID destination );
+	default Element getStreamError( String xmlns, BareJID destination, Integer port ) {
+		Element error = new Element( "stream:error" );
+		Element seeOtherHost = new Element( "see-other-host", destination.toString() + (port != null ? ":"+port : "") );
+
+		seeOtherHost.setXMLNS( xmlns );
+		error.addChild( seeOtherHost );
+
+		return error;
+	}
 
 	/**
 	 * Performs check whether redirect is enabled in the given phase
