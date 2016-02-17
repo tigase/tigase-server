@@ -1,5 +1,5 @@
 /*
- * ObjectEventsSourceListenerHandler.java
+ * ObjectEventsListenerHandler.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
@@ -17,19 +17,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- *
  */
-package tigase.eventbus;
 
-public class ObjectEventsSourceListenerHandler extends AbstractListenerHandler<EventSourceListener> {
+package tigase.eventbus.impl;
 
-	public ObjectEventsSourceListenerHandler(final String packageName, final String eventName, EventSourceListener listener) {
+import tigase.eventbus.EventListener;
+
+public class ObjectEventsListenerHandler extends AbstractListenerHandler<EventListener> {
+
+	public ObjectEventsListenerHandler(final String packageName, final String eventName, EventListener listener) {
 		super(packageName, eventName, listener);
 	}
 
 	@Override
 	public void dispatch(Object event, Object source, boolean remotelyGeneratedEvent) {
-		listener.onEvent(event, source);
+		listener.onEvent(event);
 	}
 
 	@Override

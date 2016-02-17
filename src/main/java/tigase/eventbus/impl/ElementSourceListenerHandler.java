@@ -1,5 +1,5 @@
 /*
- * EventSourceListener.java
+ * ElementSourceListenerHandler.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
@@ -19,10 +19,25 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-package tigase.eventbus;
+package tigase.eventbus.impl;
 
-public interface EventSourceListener<E> {
+import tigase.eventbus.EventSourceListener;
+import tigase.xml.Element;
 
-	void onEvent(E event, Object source);
+class ElementSourceListenerHandler extends AbstractListenerHandler<EventSourceListener<Element>> {
 
+	public ElementSourceListenerHandler(final String packageName, final String eventName,
+			EventSourceListener<Element> listener) {
+		super(packageName, eventName, listener);
+	}
+
+	@Override
+	public void dispatch(Object event, Object source, boolean remotelyGeneratedEvent) {
+		listener.onEvent((Element) event, source);
+	}
+
+	@Override
+	public Type getRequiredEventType() {
+		return Type.element;
+	}
 }

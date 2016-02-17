@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- *
  */
+
 package tigase.eventbus.component.stores;
 
 import java.util.Collection;
@@ -26,8 +26,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import tigase.eventbus.EventName;
-import tigase.eventbus.EventsNameMap;
+import tigase.eventbus.impl.EventName;
+import tigase.eventbus.impl.EventsNameMap;
 import tigase.kernel.beans.Bean;
 
 @Bean(name = "subscriptionStore")

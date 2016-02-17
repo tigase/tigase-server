@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- *
  */
+
 package tigase.eventbus.component;
 
 import java.io.Serializable;
@@ -27,13 +27,13 @@ import java.util.logging.Level;
 
 import tigase.component.exceptions.ComponentException;
 import tigase.criteria.Criteria;
-import tigase.eventbus.AbstractHandler;
-import tigase.eventbus.EventBusImplementation;
-import tigase.eventbus.EventName;
 import tigase.eventbus.EventRoutingSelector;
-import tigase.eventbus.Serializer;
 import tigase.eventbus.component.stores.Subscription;
 import tigase.eventbus.component.stores.SubscriptionStore;
+import tigase.eventbus.impl.AbstractHandler;
+import tigase.eventbus.impl.EventBusImplementation;
+import tigase.eventbus.impl.EventBusSerializer;
+import tigase.eventbus.impl.EventName;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
@@ -54,7 +54,7 @@ public class EventPublisherModule extends AbstractEventBusModule implements Init
 	private EventBusImplementation localEventBus;
 	@Inject
 	private SubscriptionStore subscriptionStore;
-	private Serializer serializer = new Serializer();
+	private EventBusSerializer serializer = new EventBusSerializer();
 	private final AbstractHandler firedEventHandler = new AbstractHandler(null, null) {
 		@Override
 		public void dispatch(Object event, Object source, boolean remotelyGeneratedEvent) {
@@ -76,7 +76,7 @@ public class EventPublisherModule extends AbstractEventBusModule implements Init
 
 	@Override
 	public void beforeUnregister() {
-		localEventBus.removeListenerHandler(firedEventHandler);
+		localEventBus.removeHandler(firedEventHandler);
 	}
 
 	@Override
@@ -87,6 +87,17 @@ public class EventPublisherModule extends AbstractEventBusModule implements Init
 	@Override
 	public Criteria getModuleCriteria() {
 		return null;
+	}
+
+	protected Collection<Subscription> getSubscribers(String packageName, String eventName, Object event) {
+		Collection<Subscription> subscribers = subscriptionStore.getSubscribersJIDs(packageName, eventName);
+
+		EventRoutingSelector selector = localEventBus.getEventRoutingSelector(event.getClass());
+		if (selector != null) {
+			subscribers = selector.getSubscriptions(event, subscribers);
+		}
+
+		return subscribers;
 	}
 
 	@Override
@@ -174,20 +185,9 @@ public class EventPublisherModule extends AbstractEventBusModule implements Init
 		final Collection<Subscription> subscribers = getSubscribers(packageName, eventName, event);
 		if (subscribers.isEmpty())
 			return;
-		
+
 		Element eventElement = serializer.serialize(event);
 
 		publishEvent(packageName, eventName, eventElement, subscribers);
-	}
-
-	protected Collection<Subscription> getSubscribers(String packageName, String eventName, Object event) {
-		Collection<Subscription> subscribers = subscriptionStore.getSubscribersJIDs(packageName, eventName);
-		
-		EventRoutingSelector selector = localEventBus.getEventRoutingSelector(event.getClass());
-		if (selector != null) {
-			subscribers = selector.getSubscriptions(event, subscribers);
-		}
-		
-		return subscribers;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * AbstractEventBusModule.java
+ * ReflectEventSourceListenerHandler.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
@@ -19,31 +19,29 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-package tigase.eventbus.component;
+package tigase.eventbus.impl;
 
-import tigase.component.modules.AbstractModule;
-import tigase.kernel.beans.Inject;
-import tigase.xmpp.JID;
+import java.lang.reflect.Method;
 
-public abstract class AbstractEventBusModule extends AbstractModule {
+import tigase.eventbus.HandleEvent;
 
-	private static long id = 0;
+public class ReflectEventSourceListenerHandler extends ReflectEventListenerHandler {
 
-	@Inject
-	private EventBusComponent component;
-
-	protected boolean isClusteredEventBus(final JID jid) {
-		return jid.getLocalpart().equals("eventbus") && component.getNodesConnected().contains(jid);
+	public ReflectEventSourceListenerHandler(HandleEvent.Type filter, String packageName, String eventName,
+			Object consumerObject, Method handlerMethod) {
+		super(filter, packageName, eventName, consumerObject, handlerMethod);
 	}
 
-	protected String nextStanzaID() {
-
-		String prefix = component.getComponentId().getDomain();
-
-		synchronized (this) {
-			return prefix + "-" + (++id);
+	@Override
+	public void dispatch(final Object event, final Object source, boolean remotelyGeneratedEvent) {
+		if (remotelyGeneratedEvent && filter == HandleEvent.Type.local
+				|| !remotelyGeneratedEvent && filter == HandleEvent.Type.remote)
+			return;
+		try {
+			handlerMethod.invoke(consumerObject, event, source);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 
 	}
-
 }

@@ -1,5 +1,5 @@
 /*
- * ElementSourceListenerHandler.java
+ * ReflectEventListenerHandlerFactoryTest.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
@@ -17,26 +17,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- *
  */
-package tigase.eventbus;
 
-import tigase.xml.Element;
+package tigase.eventbus.impl;
 
-class ElementSourceListenerHandler extends AbstractListenerHandler<EventSourceListener<Element>> {
+import java.util.Collection;
 
-	public ElementSourceListenerHandler(final String packageName, final String eventName,
-			EventSourceListener<Element> listener) {
-		super(packageName, eventName, listener);
-	}
+import org.junit.Assert;
+import org.junit.Test;
 
-	@Override
-	public void dispatch(Object event, Object source, boolean remotelyGeneratedEvent) {
-		listener.onEvent((Element) event, source);
-	}
+/**
+ * Created by bmalkow on 26.01.2016.
+ */
+public class ReflectEventListenerHandlerFactoryTest {
 
-	@Override
-	public Type getRequiredEventType() {
-		return Type.element;
+	@Test
+	public void testCreate() throws Exception {
+		final ReflectEventListenerHandlerFactory f = new ReflectEventListenerHandlerFactory();
+		EventBusImplementationTest.Consumer c = new EventBusImplementationTest.Consumer();
+		Collection<AbstractHandler> handlers1 = f.create(c);
+		Collection<AbstractHandler> handlers2 = f.create(c);
+
+		Assert.assertEquals(handlers1.size(), handlers2.size());
+		Assert.assertEquals(handlers1, handlers2);
 	}
 }

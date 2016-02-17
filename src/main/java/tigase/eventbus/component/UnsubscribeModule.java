@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- *
  */
+
 package tigase.eventbus.component;
 
 import java.util.*;
@@ -27,10 +27,10 @@ import java.util.logging.Level;
 import tigase.component.exceptions.ComponentException;
 import tigase.component.responses.AsyncCallback;
 import tigase.criteria.Criteria;
-import tigase.eventbus.EventBusImplementation;
-import tigase.eventbus.EventName;
 import tigase.eventbus.component.stores.Subscription;
 import tigase.eventbus.component.stores.SubscriptionStore;
+import tigase.eventbus.impl.EventBusImplementation;
+import tigase.eventbus.impl.EventName;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;

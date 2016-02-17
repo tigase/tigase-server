@@ -1,5 +1,5 @@
 /*
- * Serializer.java
+ * EventBusSerializer.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
@@ -17,9 +17,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- *
  */
-package tigase.eventbus;
+
+package tigase.eventbus.impl;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -30,7 +30,7 @@ import tigase.kernel.TypesConverter;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 
-public class Serializer {
+public class EventBusSerializer implements Serializer {
 
 	public <T> T deserialize(final Element element) {
 		try {

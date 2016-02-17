@@ -1,5 +1,5 @@
 /*
- * ReflectEventSourceListenerHandler.java
+ * ObjectEventsSourceListenerHandler.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
@@ -17,29 +17,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- *
  */
-package tigase.eventbus;
 
-import java.lang.reflect.Method;
+package tigase.eventbus.impl;
 
-public class ReflectEventSourceListenerHandler extends ReflectEventListenerHandler {
+import tigase.eventbus.EventSourceListener;
 
-	public ReflectEventSourceListenerHandler(HandleEvent.Type filter, String packageName, String eventName,
-			Object consumerObject, Method handlerMethod) {
-		super(filter, packageName, eventName, consumerObject, handlerMethod);
+public class ObjectEventsSourceListenerHandler extends AbstractListenerHandler<EventSourceListener> {
+
+	public ObjectEventsSourceListenerHandler(final String packageName, final String eventName, EventSourceListener listener) {
+		super(packageName, eventName, listener);
 	}
 
 	@Override
-	public void dispatch(final Object event, final Object source, boolean remotelyGeneratedEvent) {
-		if (remotelyGeneratedEvent && filter == HandleEvent.Type.local
-				|| !remotelyGeneratedEvent && filter == HandleEvent.Type.remote)
-			return;
-		try {
-			handlerMethod.invoke(consumerObject, event, source);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+	public void dispatch(Object event, Object source, boolean remotelyGeneratedEvent) {
+		listener.onEvent(event, source);
+	}
 
+	@Override
+	public Type getRequiredEventType() {
+		return Type.object;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * ObjectEventsListenerHandler.java
+ * Serializer.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
@@ -17,23 +17,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- *
  */
-package tigase.eventbus;
 
-public class ObjectEventsListenerHandler extends AbstractListenerHandler<EventListener> {
+package tigase.eventbus.impl;
 
-	public ObjectEventsListenerHandler(final String packageName, final String eventName, EventListener listener) {
-		super(packageName, eventName, listener);
-	}
+import tigase.xml.Element;
 
-	@Override
-	public void dispatch(Object event, Object source, boolean remotelyGeneratedEvent) {
-		listener.onEvent(event);
-	}
+public interface Serializer {
 
-	@Override
-	public Type getRequiredEventType() {
-		return Type.object;
-	}
+	<T> T deserialize(final Element element);
+
+	Element serialize(final Object object);
+
 }

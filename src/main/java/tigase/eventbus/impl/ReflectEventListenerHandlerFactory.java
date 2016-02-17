@@ -17,24 +17,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- *
  */
-package tigase.eventbus;
+
+package tigase.eventbus.impl;
+
+import static tigase.util.ReflectionHelper.Handler;
+import static tigase.util.ReflectionHelper.collectAnnotatedMethods;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.logging.Logger;
 
-import static tigase.util.ReflectionHelper.*;
+import tigase.eventbus.HandleEvent;
+import tigase.eventbus.RegistrationException;
 
 public class ReflectEventListenerHandlerFactory {
 
-	protected final Logger log = Logger.getLogger(this.getClass().getName());
-
-	public Collection<AbstractHandler> create(final Object consumer) throws RegistrationException {
-		return collectAnnotatedMethods(consumer, HandleEvent.class, HANDLER);
-	}	
-	
 	private static final Handler<HandleEvent,AbstractHandler> HANDLER = (Object consumer, Method method, HandleEvent annotation) -> {
 		if (method.getParameterCount() < 1) {
 			throw new RegistrationException("Handler method must have parameter to receive event!");
@@ -60,8 +58,13 @@ public class ReflectEventListenerHandlerFactory {
 		}
 
 		method.setAccessible(true);
-		
+
 		return handler;
 	};
+	protected final Logger log = Logger.getLogger(this.getClass().getName());
+
+	public Collection<AbstractHandler> create(final Object consumer) throws RegistrationException {
+		return collectAnnotatedMethods(consumer, HandleEvent.class, HANDLER);
+	}
 	
 }

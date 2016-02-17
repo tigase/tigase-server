@@ -17,14 +17,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- *
  */
-package tigase.eventbus;
+
+package tigase.eventbus.impl;
+
+import static tigase.util.ReflectionHelper.Handler;
+import static tigase.util.ReflectionHelper.collectAnnotatedMethods;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
 
-import static tigase.util.ReflectionHelper.*;
+import tigase.eventbus.EventRoutingSelector;
+import tigase.eventbus.RegistrationException;
+import tigase.eventbus.RouteEvent;
 
 /**
  * Class responsible for generation of <code>EventRoutingSelectors</code> based
@@ -33,6 +38,16 @@ import static tigase.util.ReflectionHelper.*;
  * @author andrzej
  */
 public class ReflectEventRoutingSelectorFactory {
+
+	private static final Handler<RouteEvent, EventRoutingSelector> HANDLER = (Object consumer, Method method,
+			RouteEvent annotation) -> {
+		if (method.getParameterCount() < 1) {
+			throw new RegistrationException("Event routing selection method must have parameter to receive event!");
+		}
+
+		final Class eventType = method.getParameters()[0].getType();
+		return new ReflectEventRoutingSelector(eventType, consumer, method);
+	};
 
 	/**
 	 * Method looks for methods of consumer class and returns list of
@@ -45,13 +60,4 @@ public class ReflectEventRoutingSelectorFactory {
 	public Collection<EventRoutingSelector> create(Object consumer) {
 		return collectAnnotatedMethods(consumer, RouteEvent.class, HANDLER);
 	}
-	
-	private static final Handler<RouteEvent,EventRoutingSelector> HANDLER = (Object consumer, Method method, RouteEvent annotation) -> {
-		if (method.getParameterCount() < 1) {
-			throw new RegistrationException("Event routing selection method must have parameter to receive event!");
-		}
-
-		final Class eventType = method.getParameters()[0].getType();
-		return new ReflectEventRoutingSelector(eventType, consumer, method);
-	};
 }

@@ -17,9 +17,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- *
  */
+
 package tigase.eventbus;
+
+import tigase.eventbus.impl.EventBusImplementation;
+import tigase.eventbus.impl.EventsRegistrar;
 
 public class EventBusFactory {
 

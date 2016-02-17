@@ -1,5 +1,5 @@
 /*
- * ReflectEventRoutingSelector.java
+ * ReflectEventRoutedTransientFiller.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
@@ -17,57 +17,57 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- *
  */
-package tigase.eventbus;
+
+package tigase.eventbus.impl;
 
 import java.lang.reflect.Method;
-import java.util.Collection;
-import tigase.eventbus.component.stores.Subscription;
+
+import tigase.eventbus.EventRoutedTransientFiller;
 
 /**
- * This class is implementation of <code>EventRoutingSelector</code> used when
- * this selector is created based on annotated method of consumer class.
+ * Class responsible for calling method on consumer instance which will fill
+ * event transient fields.
  * 
  * @author andrzej
  */
-public class ReflectEventRoutingSelector implements EventRoutingSelector {
+public class ReflectEventRoutedTransientFiller implements EventRoutedTransientFiller {
 
 	private final Class eventClass;
 	private final Object consumer;
 	private final Method method;
 	
-	public ReflectEventRoutingSelector(Class eventClass, Object consumer, Method method) {
+	public ReflectEventRoutedTransientFiller(Class eventClass, Object consumer, Method method) {
 		this.eventClass = eventClass;
 		this.consumer = consumer;
 		this.method = method;
 	}
 
 	@Override
-	public Class getEventClass() {
-		return eventClass;
-	}
-	
-	@Override
-	public Collection<Subscription> getSubscriptions(Object event, Collection<Subscription> subscriptions) {
-		try {
-			return (Collection<Subscription>) method.invoke(consumer, event, subscriptions);
-		} catch (Exception ex) {
-			throw new RuntimeException(ex);
-		}
-	}
-	
-	@Override
 	public boolean equals(Object o) {
 		if (o == this)
 			return true;
 		if (o == null || o.getClass() != getClass())
 			return false;
-		
-		ReflectEventRoutingSelector s = (ReflectEventRoutingSelector) o;
+
+		ReflectEventRoutedTransientFiller s = (ReflectEventRoutedTransientFiller) o;
 		if (!consumer.equals(s.consumer))
 			return false;
 		return method.equals(s.method);
+	}
+
+	@Override
+	public void fillEvent(Object event) {
+		try {
+			method.invoke(consumer, event);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	@Override
+	public Class getEventClass() {
+		return eventClass;
 	}
 	
 	@Override

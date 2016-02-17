@@ -1,5 +1,5 @@
 /*
- * EventSourceListener.java
+ * Event12.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
@@ -19,10 +19,19 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-package tigase.eventbus;
+package tigase.eventbus.impl;
 
-public interface EventSourceListener<E> {
+import java.io.Serializable;
 
-	void onEvent(E event, Object source);
+public class Event12 extends Event1 implements Serializable {
 
+	public Runnable r;
+
+	public Runnable getR() {
+		return r;
+	}
+
+	public void setR(Runnable r) {
+		this.r = r;
+	}
 }

@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- *
  */
+
 package tigase.eventbus.component;
 
 import java.util.Collection;
@@ -27,14 +27,14 @@ import java.util.logging.Level;
 
 import tigase.component.exceptions.ComponentException;
 import tigase.criteria.Criteria;
-import tigase.eventbus.EventBusImplementation;
-import tigase.eventbus.EventName;
 import tigase.eventbus.EventRoutedTransientFiller;
-import tigase.eventbus.Serializer;
 import tigase.eventbus.component.stores.Affiliation;
 import tigase.eventbus.component.stores.AffiliationStore;
 import tigase.eventbus.component.stores.Subscription;
 import tigase.eventbus.component.stores.SubscriptionStore;
+import tigase.eventbus.impl.EventBusImplementation;
+import tigase.eventbus.impl.EventBusSerializer;
+import tigase.eventbus.impl.EventName;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
@@ -59,7 +59,7 @@ public class EventReceiverModule extends AbstractEventBusModule {
 
 	@Inject
 	private SubscriptionStore subscriptionStore;
-	private Serializer serializer = new Serializer();
+	private EventBusSerializer serializer = new EventBusSerializer();
 
 	private void fireEventLocally(final EventName name, final Element event) {
 		Object obj = serializer.deserialize(event);

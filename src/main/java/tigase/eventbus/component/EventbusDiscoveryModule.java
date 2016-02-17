@@ -1,5 +1,5 @@
 /*
- * EventDiscoveryModule.java
+ * EventbusDiscoveryModule.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
- *
  */
+
 package tigase.eventbus.component;
 
 import java.util.*;
@@ -26,10 +26,10 @@ import java.util.*;
 import tigase.component.exceptions.ComponentException;
 import tigase.component.exceptions.RepositoryException;
 import tigase.component.modules.impl.DiscoveryModule;
-import tigase.eventbus.EventName;
-import tigase.eventbus.EventsRegistrar;
 import tigase.eventbus.component.stores.Affiliation;
 import tigase.eventbus.component.stores.AffiliationStore;
+import tigase.eventbus.impl.EventName;
+import tigase.eventbus.impl.EventsRegistrar;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.Packet;

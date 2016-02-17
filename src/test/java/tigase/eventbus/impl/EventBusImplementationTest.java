@@ -1,15 +1,42 @@
-package tigase.eventbus;
+/*
+ * EventBusImplementationTest.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ */
+
+package tigase.eventbus.impl;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.Executor;
 
-import static org.junit.Assert.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import tigase.eventbus.component.stores.Subscription;
 
+import tigase.eventbus.EventListener;
+import tigase.eventbus.FillRoutedEvent;
+import tigase.eventbus.HandleEvent;
+import tigase.eventbus.RouteEvent;
+import tigase.eventbus.component.stores.Subscription;
 import tigase.xml.Element;
 
 public class EventBusImplementationTest {
@@ -139,7 +166,7 @@ public class EventBusImplementationTest {
 
 		Arrays.fill(resp, null);
 
-		eventBus.fire(new Element("tigase.eventbus.Event1"));
+		eventBus.fire(new Element("tigase.eventbus.impl.Event1"));
 		Assert.assertNull(resp[0]);
 		Assert.assertNull(resp[1]);
 		Assert.assertTrue(resp[2] instanceof Element);
@@ -148,7 +175,7 @@ public class EventBusImplementationTest {
 
 		Arrays.fill(resp, null);
 
-		eventBus.fire(new Element("tigase.eventbus.Event12"));
+		eventBus.fire(new Element("tigase.eventbus.impl.Event12"));
 		Assert.assertNull(resp[0]);
 		Assert.assertNull(resp[1]);
 		Assert.assertNull(resp[2]);
@@ -280,33 +307,10 @@ public class EventBusImplementationTest {
 		Assert.assertNull(c.resp[2]);
 	}
 	
-	
-	@Test
-	public void testRegisterAll_MethodVisibilityTest() {
-		ConsumerMethodVisibility cmv = new ConsumerMethodVisibility();
-		eventBus.registerAll(cmv);
-
-		eventBus.fire(new Event1());
-		
-		assertNotNull(cmv.resp[0]);
-		assertNotNull(cmv.resp[1]);
-		assertNotNull(cmv.resp[2]);
-		
-		Arrays.fill(cmv.resp, null);
-		
-		eventBus.unregisterAll(cmv);
-
-		eventBus.fire(new Event1());
-
-		assertNull(cmv.resp[0]);
-		assertNull(cmv.resp[1]);
-		assertNull(cmv.resp[2]);
-	}
-
 	@Test
 	public void testRegisterAll_InheritanceTest() {
 		ConsumerChild c = new ConsumerChild();
-		
+
 		eventBus.registerAll(c);
 
 		eventBus.fire(new Event1());
@@ -319,7 +323,7 @@ public class EventBusImplementationTest {
 		assertNotNull(c.respChild[5]);
 		assertNotNull(c.respChild[6]);
 		assertNull(c.respChild[7]);
-		
+
 		assertNull(c.respParent[0]);
 		assertNull(c.respParent[1]);
 		assertNotNull(c.respParent[2]);
@@ -328,6 +332,28 @@ public class EventBusImplementationTest {
 		assertNull(c.respParent[5]);
 		assertNotNull(c.respParent[6]);
 		assertNotNull(c.respParent[7]);
+	}
+
+	@Test
+	public void testRegisterAll_MethodVisibilityTest() {
+		ConsumerMethodVisibility cmv = new ConsumerMethodVisibility();
+		eventBus.registerAll(cmv);
+
+		eventBus.fire(new Event1());
+
+		assertNotNull(cmv.resp[0]);
+		assertNotNull(cmv.resp[1]);
+		assertNotNull(cmv.resp[2]);
+
+		Arrays.fill(cmv.resp, null);
+
+		eventBus.unregisterAll(cmv);
+
+		eventBus.fire(new Event1());
+
+		assertNull(cmv.resp[0]);
+		assertNull(cmv.resp[1]);
+		assertNull(cmv.resp[2]);
 	}
 	
 	@Test
@@ -408,7 +434,7 @@ public class EventBusImplementationTest {
 		Assert.assertNull(resp[3]);
 		Assert.assertNotNull(resp[4]);
 
-		eventBus.removeListenerHandler(l4);
+		eventBus.removeHandler(l4);
 
 		Arrays.fill(resp, null);
 		eventBus.fire(new Event12());
