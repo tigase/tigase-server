@@ -1,18 +1,41 @@
+/*
+ * ClusterMapFactory.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ */
+
 package tigase.map;
+
+import tigase.eventbus.EventBus;
+import tigase.eventbus.EventBusFactory;
+import tigase.eventbus.HandleEvent;
+import tigase.kernel.DefaultTypesConverter;
+import tigase.kernel.TypesConverter;
 
 import java.io.Serializable;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import tigase.eventbus.EventBus;
-import tigase.eventbus.EventBusFactory;
-import tigase.eventbus.HandleEvent;
-import tigase.kernel.TypesConverter;
-
 public class ClusterMapFactory {
 
 	private static ClusterMapFactory instance;
+	private final TypesConverter typesConverter = new DefaultTypesConverter();
 	private final ConcurrentHashMap<String, DMap> maps = new ConcurrentHashMap<>();
 	private EventBus eventBus;
 	private final DMap.DMapListener mapListener = new DMap.DMapListener() {
@@ -27,8 +50,8 @@ public class ClusterMapFactory {
 		public void onPut(String mapID, Object key, Object value) {
 			ElementAddEvent event = new ElementAddEvent();
 			event.setUid(mapID);
-			event.setKey(TypesConverter.toString(key));
-			event.setValue(TypesConverter.toString(value));
+			event.setKey(typesConverter.toString(key));
+			event.setValue(typesConverter.toString(value));
 			eventBus.fire(event);
 		}
 
@@ -37,8 +60,8 @@ public class ClusterMapFactory {
 			for (Map.Entry<?, ?> en : m.entrySet()) {
 				ElementAddEvent event = new ElementAddEvent();
 				event.setUid(mapID);
-				event.setKey(TypesConverter.toString(en.getKey()));
-				event.setValue(TypesConverter.toString(en.getValue()));
+				event.setKey(typesConverter.toString(en.getKey()));
+				event.setValue(typesConverter.toString(en.getValue()));
 				eventBus.fire(event);
 			}
 		}
@@ -47,7 +70,7 @@ public class ClusterMapFactory {
 		public void onRemove(String mapID, Object key) {
 			ElementRemoveEvent event = new ElementRemoveEvent();
 			event.setUid(mapID);
-			event.setKey(TypesConverter.toString(key));
+			event.setKey(typesConverter.toString(key));
 			eventBus.fire(event);
 		}
 	};
@@ -138,8 +161,8 @@ public class ClusterMapFactory {
 		String k = event.getKey();
 		String v = event.getValue();
 
-		Object key = TypesConverter.convert(k, map.keyClass);
-		Object value = TypesConverter.convert(v, map.valueClass);
+		Object key = typesConverter.convert(k, map.keyClass);
+		Object value = typesConverter.convert(v, map.valueClass);
 
 		map.putNoEvent(key, value);
 	}
@@ -150,7 +173,7 @@ public class ClusterMapFactory {
 		DMap map = this.maps.get(uid);
 
 		String k = event.getKey();
-		Object key = TypesConverter.convert(k, map.keyClass);
+		Object key = typesConverter.convert(k, map.keyClass);
 		map.removeNoEvent(key);
 	}
 

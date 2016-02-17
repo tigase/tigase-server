@@ -1,5 +1,5 @@
 /*
- * TypesConverter.java
+ * ConfigurationChangedAware.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
@@ -19,14 +19,12 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-package tigase.kernel;
+package tigase.kernel.beans.config;
 
-public interface TypesConverter {
+import java.util.Collection;
 
-	<T> T convert(final Object value, final Class<T> expectedType);
+public interface ConfigurationChangedAware {
 
-	<T> T convert(final Object value, final Class<T> expectedType, Class<?> itemType);
-
-	String toString(final Object value);
+	void beanConfigurationChanged(Collection<String> changedFields);
 
 }

@@ -1,5 +1,5 @@
 /*
- * TypesConverter.java
+ * Bean10.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
@@ -21,12 +21,33 @@
 
 package tigase.kernel;
 
-public interface TypesConverter {
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
 
-	<T> T convert(final Object value, final Class<T> expectedType);
+import java.util.Set;
 
-	<T> T convert(final Object value, final Class<T> expectedType, Class<?> itemType);
+@Bean(name = "bean10")
+public class Bean10 {
 
-	String toString(final Object value);
+	@Inject(type = Special.class, nullAllowed = true)
+	private Set<Special> collectionOfSpecial;
 
+	@Inject(nullAllowed = true)
+	private Special[] tableOfSpecial;
+
+	public Set<Special> getCollectionOfSpecial() {
+		return collectionOfSpecial;
+	}
+
+	public void setCollectionOfSpecial(Set<Special> collectionOfSpecial) {
+		this.collectionOfSpecial = collectionOfSpecial;
+	}
+
+	public Special[] getTableOfSpecial() {
+		return tableOfSpecial;
+	}
+
+	public void setTableOfSpecial(Special[] tableOfSpecial) {
+		this.tableOfSpecial = tableOfSpecial;
+	}
 }

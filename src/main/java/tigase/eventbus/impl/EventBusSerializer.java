@@ -21,18 +21,21 @@
 
 package tigase.eventbus.impl;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
-import java.util.Collection;
-
 import tigase.kernel.BeanUtils;
+import tigase.kernel.DefaultTypesConverter;
 import tigase.kernel.TypesConverter;
 import tigase.util.ReflectionHelper;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
+import java.util.Collection;
+
 public class EventBusSerializer implements Serializer {
+
+	private TypesConverter typesConverter = new DefaultTypesConverter();
 
 	public <T> T deserialize(final Element element) {
 		try {
@@ -64,7 +67,7 @@ public class EventBusSerializer implements Serializer {
 						if (Collection.class.isAssignableFrom(f.getType())) {
 							itemType = ReflectionHelper.getItemClassOfGenericCollection(f);
 						}
-						value = TypesConverter.convert(XMLUtils.unescape(v.getCData()), f.getType(), itemType);
+						value = typesConverter.convert(XMLUtils.unescape(v.getCData()), f.getType(), itemType);
 					}
 					BeanUtils.setValue(result, f, value);
 				} catch (IllegalAccessException | InvocationTargetException caught) {
@@ -101,7 +104,7 @@ public class EventBusSerializer implements Serializer {
 				if (Element.class.isAssignableFrom(f.getType())) {
 					v.addChild((Element) value);
 				} else {
-					String x = TypesConverter.toString(value);
+					String x = typesConverter.toString(value);
 					v.setCData(XMLUtils.escape(x));
 				}
 				e.addChild(v);

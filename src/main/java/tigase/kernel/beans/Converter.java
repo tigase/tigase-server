@@ -1,5 +1,5 @@
 /*
- * TypesConverter.java
+ * Converter.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
@@ -19,14 +19,18 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-package tigase.kernel;
+package tigase.kernel.beans;
 
-public interface TypesConverter {
+import tigase.kernel.TypesConverter;
 
-	<T> T convert(final Object value, final Class<T> expectedType);
+import java.lang.annotation.*;
 
-	<T> T convert(final Object value, final Class<T> expectedType, Class<?> itemType);
+@Target({ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+@Documented
+public @interface Converter {
 
-	String toString(final Object value);
+	Class<? extends TypesConverter> converter();
 
 }

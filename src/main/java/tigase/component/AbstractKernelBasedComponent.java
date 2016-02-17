@@ -1,11 +1,25 @@
-package tigase.component;
+/*
+ * AbstractKernelBasedComponent.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ */
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+package tigase.component;
 
 import tigase.component.adhoc.AdHocCommandManager;
 import tigase.component.modules.StanzaProcessor;
@@ -16,6 +30,7 @@ import tigase.conf.ConfigurationException;
 import tigase.disco.XMPPService;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
+import tigase.kernel.DefaultTypesConverter;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.BeanConfigurator;
@@ -23,6 +38,13 @@ import tigase.kernel.core.Kernel;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.DisableDisco;
 import tigase.server.Packet;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiver implements XMPPService, DisableDisco {
 
@@ -83,6 +105,7 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 		if (props.size() <= 1)
 			return;
 
+		kernel.registerBean(DefaultTypesConverter.class).exec();
 		kernel.registerBean("component").asInstance(this).exec();
 		kernel.registerBean("adHocCommandManager").asClass(AdHocCommandManager.class).exec();
 		kernel.registerBean("eventBus").asInstance(eventBus).exec();

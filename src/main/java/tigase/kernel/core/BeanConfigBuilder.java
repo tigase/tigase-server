@@ -1,22 +1,42 @@
+/*
+ * BeanConfigBuilder.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ */
+
 package tigase.kernel.core;
 
-import java.util.logging.Logger;
-
 import tigase.kernel.KernelException;
-import tigase.kernel.Registrar;
+
+import java.util.logging.Logger;
 
 /**
  * Builder to help register beans in Kernel.
  * <p>
  * Usage:
- * 
+ * <p>
  * <pre>
  * {@code
- * 
+ *
  *  // If Bean1.class is annotated by @Bean annotation.
  *  registerBean(Bean1.class).exec();
  *
- *  // If Bean2 isn't annotated or should be registered with different name. 
+ *  // If Bean2 isn't annotated or should be registered with different name.
  *  krnl.registerBean("bean2").asClass(Bean2.class).exec();
  *
  *  // To register already created variable bean4 as bean "bean4".
@@ -47,9 +67,8 @@ public class BeanConfigBuilder {
 
 	/**
 	 * Registers bean as type to be created when it will be required.
-	 * 
-	 * @param cls
-	 *            class of bean.
+	 *
+	 * @param cls class of bean.
 	 * @return {@link BeanConfigBuilder}.
 	 */
 	public BeanConfigBuilder asClass(Class<?> cls) {
@@ -63,9 +82,8 @@ public class BeanConfigBuilder {
 
 	/**
 	 * Registers class instance as bean.
-	 * 
-	 * @param bean
-	 *            instance of bean.
+	 *
+	 * @param bean instance of bean.
 	 * @return {@link BeanConfigBuilder}.
 	 */
 	public BeanConfigBuilder asInstance(Object bean) {
@@ -87,6 +105,8 @@ public class BeanConfigBuilder {
 		}
 
 		if (factoryBeanConfig != null) {
+			factoryBeanConfig.setPinned(beanConfig.isPinned());
+			factoryBeanConfig.setState(beanConfig.getState());
 			kernel.unregisterInt(factoryBeanConfig.getBeanName());
 			dependencyManager.register(factoryBeanConfig);
 		}
@@ -99,16 +119,12 @@ public class BeanConfigBuilder {
 
 		kernel.currentlyUsedConfigBuilder = null;
 		kernel.injectIfRequired(beanConfig);
-
-		for (BeanConfig rbc : kernel.getDependencyManager().getBeanConfigs(Registrar.class)) {
-			kernel.getInstance(rbc.getBeanName());
-		}
 	}
 
 	/**
 	 * Mark bean as 'exportable'. It means that bean will be visible for all
 	 * child Kernels registered in current Kernel.
-	 * 
+	 *
 	 * @return {@link BeanConfigBuilder}.
 	 */
 	public BeanConfigBuilder exportable() {
@@ -118,11 +134,23 @@ public class BeanConfigBuilder {
 
 	/**
 	 * Returns name of bean.
-	 * 
+	 *
 	 * @return name of bean.
 	 */
 	public String getBeanName() {
 		return beanName;
+	}
+
+	public BeanConfigBuilder setActive(boolean active) {
+		if (active) beanConfig.setState(null);
+		else
+			beanConfig.setState(BeanConfig.State.inactive);
+		return this;
+	}
+
+	public BeanConfigBuilder setPinned(boolean pinned) {
+		beanConfig.setPinned(pinned);
+		return this;
 	}
 
 	protected void throwException(KernelException e) {
@@ -132,9 +160,8 @@ public class BeanConfigBuilder {
 
 	/**
 	 * Defines factory for currently registered bean.
-	 * 
-	 * @param beanFactoryClass
-	 *            bean factory class.
+	 *
+	 * @param beanFactoryClass bean factory class.
 	 * @return {@link BeanConfigBuilder}.
 	 */
 	public BeanConfigBuilder withFactory(Class<?> beanFactoryClass) {

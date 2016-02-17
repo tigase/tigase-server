@@ -1,18 +1,40 @@
-package tigase.kernel.core;
+/*
+ * DependencyManager.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ */
 
-import java.lang.reflect.Field;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+package tigase.kernel.core;
 
 import tigase.kernel.beans.Inject;
 import tigase.kernel.core.BeanConfig.State;
 
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class DependencyManager {
 
 	protected final Logger log = Logger.getLogger(this.getClass().getName());
-	private final Map<String, BeanConfig> beanConfigs = new HashMap<String, BeanConfig>();
+	private final Map<String, BeanConfig> beanConfigs = new ConcurrentHashMap<>();
 	private DependencyManager parent;
 	/**
 	 * if <code>true</code> then DependencyManager will throw exception if it
@@ -28,7 +50,7 @@ public class DependencyManager {
 		if (klass.getSuperclass() != null) {
 			fields.addAll(Arrays.asList(getAllFields(klass.getSuperclass())));
 		}
-		return fields.toArray(new Field[] {});
+		return fields.toArray(new Field[]{});
 	}
 
 	public static boolean match(Dependency dependency, BeanConfig beanConfig) {
@@ -74,13 +96,13 @@ public class DependencyManager {
 		if (this.parent != null && this.parent != this) {
 			BeanConfig[] pds = this.parent.getBeanConfig(dependency);
 			for (BeanConfig beanConfig : pds) {
-				if (beanConfig != null && beanConfig.isExportable())
+				if (beanConfig != null && beanConfig.isExportable() && beanConfig.getState() != State.inactive)
 					bcs.add(beanConfig);
 			}
 		}
 		if (dependency.getBeanName() != null) {
 			BeanConfig b = beanConfigs.get(dependency.getBeanName());
-			if (b != null)
+			if (b != null && b.getState() != State.inactive)
 				bcs.add(b);
 			if (bcs.isEmpty())
 				bcs.add(null);
@@ -88,7 +110,7 @@ public class DependencyManager {
 			bcs.addAll(getBeanConfigs(dependency.getType()));
 		} else
 			throw new RuntimeException("Unsupported dependecy type.");
-		return bcs.toArray(new BeanConfig[] {});
+		return bcs.toArray(new BeanConfig[]{});
 	}
 
 	public BeanConfig getBeanConfig(String beanName) {
@@ -106,7 +128,7 @@ public class DependencyManager {
 	public List<BeanConfig> getBeanConfigs(final Class<?> type, final boolean allowNonExportable) {
 		ArrayList<BeanConfig> result = new ArrayList<BeanConfig>();
 		for (BeanConfig bc : beanConfigs.values()) {
-			if (type.isAssignableFrom(bc.getClazz()) && (allowNonExportable || bc.isExportable())) {
+			if (bc.getState() != State.inactive && type.isAssignableFrom(bc.getClazz()) && (allowNonExportable || bc.isExportable())) {
 				result.add(bc);
 			}
 		}
@@ -129,6 +151,7 @@ public class DependencyManager {
 	public HashSet<BeanConfig> getDependentBeans(final BeanConfig beanConfig) {
 		HashSet<BeanConfig> result = new HashSet<BeanConfig>();
 		for (BeanConfig candidate : beanConfigs.values()) {
+			if (candidate.getState() == State.inactive) continue;
 			for (Dependency dp : candidate.getFieldDependencies().values()) {
 				List<BeanConfig> bcs = Arrays.asList(getBeanConfig(dp));
 				if (bcs.contains(beanConfig)) {
@@ -182,10 +205,10 @@ public class DependencyManager {
 		}
 	}
 
-	void register(BeanConfig factoryBeanConfig) {
-		beanConfigs.put(factoryBeanConfig.getBeanName(), factoryBeanConfig);
-		factoryBeanConfig.setState(State.registered);
-
+	void register(BeanConfig beanConfig) {
+		beanConfigs.put(beanConfig.getBeanName(), beanConfig);
+		if (beanConfig.getState() != State.inactive)
+			beanConfig.setState(State.registered);
 	}
 
 	public BeanConfig unregister(String beanName) {
