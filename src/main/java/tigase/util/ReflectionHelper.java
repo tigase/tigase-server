@@ -22,7 +22,10 @@
 package tigase.util;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import tigase.kernel.BeanUtils;
@@ -64,6 +67,19 @@ public class ReflectionHelper {
 		
 		T process(Object consumer, Method method, A annotation);
 		
+	}
+	
+	public static Class<?> getItemClassOfGenericCollection(Field f) {
+		Type genericType = f.getGenericType();
+		if (genericType == null || !(genericType instanceof ParameterizedType))
+			return null;
+		
+		Type[] actualTypeArguments = ((ParameterizedType) genericType).getActualTypeArguments();
+		if (actualTypeArguments == null || actualTypeArguments.length != 1)
+			return null;
+		
+		Type type = actualTypeArguments[0];
+		return (type instanceof Class) ? (Class) type : null;
 	}
 
 }

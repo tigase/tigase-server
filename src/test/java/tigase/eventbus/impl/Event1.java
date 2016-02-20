@@ -21,6 +21,7 @@
 
 package tigase.eventbus.impl;
 
+import java.util.HashSet;
 import tigase.xml.Element;
 import tigase.xmpp.JID;
 
@@ -39,6 +40,8 @@ public class Event1 {
 	private Element elementField;
 	
 	private String[] strArrField;
+	
+	private HashSet<String> setField;
 
 	public Element getElementField() {
 		return elementField;
@@ -96,4 +99,11 @@ public class Event1 {
 		this.v2 = v2;
 	}
 	
+	public HashSet<String> getSetField() {
+		return setField;
+	}
+	
+	public void setSetField(HashSet<String> set) {
+		this.setField = set;
+	}
 }

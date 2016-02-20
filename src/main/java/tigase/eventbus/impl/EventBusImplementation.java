@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,12 +44,7 @@ public class EventBusImplementation implements EventBus {
 	private final ReflectEventRoutedTransientFillerFactory reflectEventRoutedTransientFillerFactory = new ReflectEventRoutedTransientFillerFactory();
 	private final ReflectEventRoutingSelectorFactory reflectEventRoutingSelectorFactory = new ReflectEventRoutingSelectorFactory();
 	private boolean acceptOnlyRegisteredEvents = false;
-	private Executor executor = new Executor() {
-		@Override
-		public void execute(Runnable command) {
-			command.run();
-		}
-	};
+	private Executor executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 4);
 
 	public void addHandler(AbstractHandler listenerHandler) {
 		listeners.put(listenerHandler.getPackageName(), listenerHandler.getEventName(), listenerHandler);
@@ -115,7 +111,7 @@ public class EventBusImplementation implements EventBus {
 				try {
 					listenerHandler.dispatch(eventObject, source, remotelyGeneratedEvent);
 				} catch (Throwable e) {
-					e.printStackTrace();
+					log.log(Level.WARNING, "Exception during execution of event: " + event.getClass().getCanonicalName(), e);
 				}
 			};
 

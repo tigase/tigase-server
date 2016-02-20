@@ -76,8 +76,7 @@ public class ClusterMapFactory {
 		event.setParams(params);
 		eventBus.fire(event);
 
-		DMap<K, V> map = new DMap<K, V>(uid, type, this.mapListener, keyClass, valueClass);
-		maps.put(uid, map);
+		DMap<K, V> map = maps.computeIfAbsent(uid, (u) -> new DMap<K, V>(uid, type, this.mapListener, keyClass, valueClass));
 
 		return map;
 	}
@@ -89,7 +88,7 @@ public class ClusterMapFactory {
 			event.setType(((DMap) map).type);
 
 			eventBus.fire(event);
-			this.maps.remove(((DMap) map).mapID);
+			this.maps.remove(((DMap) map).mapID, map);
 		}
 	}
 

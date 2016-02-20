@@ -24,9 +24,11 @@ package tigase.eventbus.impl;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.util.Collection;
 
 import tigase.kernel.BeanUtils;
 import tigase.kernel.TypesConverter;
+import tigase.util.ReflectionHelper;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 
@@ -58,7 +60,11 @@ public class EventBusSerializer implements Serializer {
 						} else
 							value = null;
 					} else {
-						value = TypesConverter.convert(XMLUtils.unescape(v.getCData()), f.getType());
+						Class<?> itemType = null;
+						if (Collection.class.isAssignableFrom(f.getType())) {
+							itemType = ReflectionHelper.getItemClassOfGenericCollection(f);
+						}
+						value = TypesConverter.convert(XMLUtils.unescape(v.getCData()), f.getType(), itemType);
 					}
 					BeanUtils.setValue(result, f, value);
 				} catch (IllegalAccessException | InvocationTargetException caught) {

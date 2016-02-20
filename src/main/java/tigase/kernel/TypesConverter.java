@@ -2,9 +2,11 @@ package tigase.kernel;
 
 import java.io.File;
 import java.lang.reflect.Array;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import tigase.util.Base64;
@@ -76,6 +78,10 @@ public class TypesConverter {
 	 * @return converted value.
 	 */
 	public static <T> T convert(final Object value, final Class<T> expectedType) {
+		return convert(value, expectedType, null);
+	}
+	
+	public static <T> T convert(final Object value, final Class<T> expectedType, Class<?> itemType) {		
 		try {
 			if (value == null)
 				return null;
@@ -157,6 +163,20 @@ public class TypesConverter {
 					Array.set(result, i, TypesConverter.convert(unescape(a_str[i]), expectedType.getComponentType()));
 				}
 				return (T) result;
+			} else if (Collection.class.isAssignableFrom(expectedType) && itemType != null) {
+				int mod = expectedType.getModifiers();
+				if (!Modifier.isAbstract(mod) && !Modifier.isInterface(mod)) {
+					String[] a_str = value.toString().split(regex);
+					try {
+						Collection result = (Collection) expectedType.newInstance();
+						for (int i = 0; i < a_str.length; i++) {
+							result.add(TypesConverter.convert(unescape(a_str[i]), itemType));
+						}
+						return (T) result;
+					} catch (InstantiationException | IllegalAccessException ex) {
+						throw new RuntimeException("Unsupported conversion to " + expectedType, ex);
+					}
+				}
 			}
 
 			throw new RuntimeException("Unsupported conversion to " + expectedType);
@@ -164,7 +184,7 @@ public class TypesConverter {
 			throw new IllegalArgumentException(e);
 		}
 	}
-
+	
 	private static String escape(String input) {
 		if (input != null) {
 			return XMLUtils.translateAll(input, decoded, encoded);
