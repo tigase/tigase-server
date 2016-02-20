@@ -403,10 +403,17 @@ public class SessionManagerClustered
 	}
 	
 	@FillRoutedEvent
-	protected void fillRoutedUserSessionEvent(UserSessionEvent event) {
+	protected boolean fillRoutedUserSessionEvent(UserSessionEvent event) {
 		XMPPSession session = getSession(event.getUserJid().getBareJID());
-		if (session != null && (event.getUserJid().getResource() == null || session.getResourceForResource(event.getUserJid().getResource()) != null))
+		if (session != null && (event.getUserJid().getResource() == null || session.getResourceForResource(event.getUserJid().getResource()) != null)) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "for event {0} setting session to {1}", new Object[]{event, session});
+			}
 			event.setSession(session);
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	@RouteEvent

@@ -46,6 +46,7 @@ public class ReflectEventRoutingSelectorFactory {
 		}
 
 		final Class eventType = method.getParameters()[0].getType();
+		method.setAccessible(true);
 		return new ReflectEventRoutingSelector(eventType, consumer, method);
 	};
 

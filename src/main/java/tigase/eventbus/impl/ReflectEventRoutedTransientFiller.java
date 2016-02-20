@@ -57,9 +57,9 @@ public class ReflectEventRoutedTransientFiller implements EventRoutedTransientFi
 	}
 
 	@Override
-	public void fillEvent(Object event) {
+	public boolean fillEvent(Object event) {
 		try {
-			method.invoke(consumer, event);
+			return (Boolean) method.invoke(consumer, event);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}

@@ -29,7 +29,7 @@ package tigase.eventbus;
  */
 public interface EventRoutedTransientFiller {
 	
-	void fillEvent(Object event);
+	boolean fillEvent(Object event);
 
 	Class<?> getEventClass();
 	

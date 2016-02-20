@@ -95,6 +95,9 @@ public class EventPublisherModule extends AbstractEventBusModule implements Init
 		EventRoutingSelector selector = localEventBus.getEventRoutingSelector(event.getClass());
 		if (selector != null) {
 			subscribers = selector.getSubscriptions(event, subscribers);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "for event {0}, found subscribers using selector: {1}", new Object[] { event.getClass().getCanonicalName(), selector.getClass() });
+			}
 		}
 
 		return subscribers;

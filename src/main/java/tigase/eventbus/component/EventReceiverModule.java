@@ -24,6 +24,7 @@ package tigase.eventbus.component;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import tigase.component.exceptions.ComponentException;
 import tigase.criteria.Criteria;
@@ -45,6 +46,8 @@ import tigase.xmpp.Authorization;
 @Bean(name = EventReceiverModule.ID)
 public class EventReceiverModule extends AbstractEventBusModule {
 
+	private static final Logger log = Logger.getLogger(EventReceiverModule.class.getCanonicalName());
+	
 	public final static String ID = "receiver";
 	private static final Criteria CRIT = new ElemPathCriteria(new String[] { "message", "event" },
 			new String[] { null, "http://jabber.org/protocol/pubsub#event" });
@@ -66,12 +69,18 @@ public class EventReceiverModule extends AbstractEventBusModule {
 		if (obj == null)
 			obj = event;
 		else {
-			Collection<EventRoutedTransientFiller> fillers = localEventBus.getEventRoutedTransientFillers(event.getClass());
+			boolean ready = true;
+			Collection<EventRoutedTransientFiller> fillers = localEventBus.getEventRoutedTransientFillers(obj.getClass());
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "for event = {0}, found following fillers: {1}", new Object[]{name, fillers});
+			}
 			if (fillers != null) {
 				for (EventRoutedTransientFiller f : fillers) {
-					f.fillEvent(event);
+					ready &= f.fillEvent(obj);
 				}
 			}
+			if (!ready)
+				return;
 		}
 
 		localEventBus.fire(obj, this, true);

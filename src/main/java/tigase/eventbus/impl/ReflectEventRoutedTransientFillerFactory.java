@@ -45,6 +45,7 @@ public class ReflectEventRoutedTransientFillerFactory {
 		}
 
 		final Class eventType = method.getParameters()[0].getType();
+		method.setAccessible(true);
 		return new ReflectEventRoutedTransientFiller(eventType, consumer, method);
 	};
 
