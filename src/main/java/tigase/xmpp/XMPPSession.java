@@ -449,7 +449,7 @@ public class XMPPSession {
 
 	//~--- methods --------------------------------------------------------------
 
-	protected Object computeCommonSessionDataIfAbsent(String key, Function<String,Object> valueFactory) {
+	public Object computeCommonSessionDataIfAbsent(String key, Function<String,Object> valueFactory) {
 		return sessionData.computeIfAbsent(key, valueFactory);
 	}
 	

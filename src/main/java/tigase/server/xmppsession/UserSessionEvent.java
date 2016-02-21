@@ -21,6 +21,7 @@
  */
 package tigase.server.xmppsession;
 
+import java.io.Serializable;
 import tigase.xmpp.JID;
 import tigase.xmpp.XMPPSession;
 
@@ -31,15 +32,18 @@ import tigase.xmpp.XMPPSession;
  *
  * @author andrzej
  */
-public class UserSessionEvent {
+public class UserSessionEvent implements Serializable {
 
 	private transient XMPPSession session;
 	
+	// this is destination to which event will be routed
 	private JID userJid;
+	private JID sender;
 	
 	public UserSessionEvent() { }
 	
-	public UserSessionEvent(JID userJid, XMPPSession session) {
+	public UserSessionEvent(JID sender, JID userJid, XMPPSession session) {
+		this.sender = sender;
 		this.session = session;
 		this.userJid = userJid;
 	}
@@ -52,7 +56,12 @@ public class UserSessionEvent {
 		return userJid;
 	}
 
+	public JID getSender() {
+		return sender;
+	}
+	
 	public void setSession(XMPPSession session) {
 		this.session = session;
 	}
+	
 }

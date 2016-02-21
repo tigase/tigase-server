@@ -115,7 +115,6 @@ import tigase.xmpp.XMPPImplIfc;
 import tigase.xmpp.XMPPPacketFilterIfc;
 import tigase.xmpp.XMPPPostprocessorIfc;
 import tigase.xmpp.XMPPPreprocessorIfc;
-import tigase.xmpp.XMPPPresenceUpdateProcessorIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
@@ -196,8 +195,6 @@ public class SessionManager
 			new StaleConnectionCloser();
 	private Map<String, XMPPProcessorIfc> processors = new ConcurrentHashMap<String,
 			XMPPProcessorIfc>(32);
-	private Map<String, XMPPPresenceUpdateProcessorIfc> presenceProcessors =
-			new ConcurrentHashMap<String, XMPPPresenceUpdateProcessorIfc>();
 	private Map<String, XMPPPreprocessorIfc> preProcessors = new ConcurrentHashMap<String,
 			XMPPPreprocessorIfc>(10);
 
@@ -216,9 +213,6 @@ public class SessionManager
 			XMPPPacketFilterIfc>(10);
 	private ConnectionCheckCommandHandler connectionCheckCommandHandler =
 			new ConnectionCheckCommandHandler();
-
-	/** Field description */
-	protected Queue<Packet> packetWriterQueue = new WriterQueue<Packet>();
 
 	/**
 	 * A Map with connectionID as a key and an object with all the user connection
@@ -377,13 +371,11 @@ public class SessionManager
 			log.log(Level.WARNING, "No implementation found for plugin id: {0}", plug_id);
 		}    // end of if (!loaded)
 		if (result != null) {
-			allPlugins.add(result);
+			if (allPlugins.add(result))
+				eventBus.registerAll(result);
 			if (result instanceof PresenceCapabilitiesManager.PresenceCapabilitiesListener) {
 				PresenceCapabilitiesManager.registerPresenceHandler((PresenceCapabilitiesManager
 						.PresenceCapabilitiesListener) result);
-			}
-			if (result instanceof XMPPPresenceUpdateProcessorIfc) {
-				presenceProcessors.put(result.id(), (XMPPPresenceUpdateProcessorIfc) result);
 			}
 		}
 
@@ -563,12 +555,10 @@ public class SessionManager
 			allPlugins.remove(p);
 		}
 		if (p != null) {
+			eventBus.unregisterAll(p);
 			if (p instanceof PresenceCapabilitiesManager.PresenceCapabilitiesListener) {
 				PresenceCapabilitiesManager.unregisterPresenceHandler((PresenceCapabilitiesManager
 						.PresenceCapabilitiesListener) p);
-			}
-			if (p instanceof XMPPPresenceUpdateProcessorIfc) {
-				presenceProcessors.remove(plug_id);
 			}
 		}
 	}
@@ -2007,23 +1997,8 @@ public class SessionManager
 
 	protected void processPresenceUpdate(XMPPSession session, Element packet) {
 		try {
-			if (presenceProcessors.isEmpty()) {
-				return;
-			}
-
 			Packet presence = Packet.packetInstance(packet);
-
-			for (XMPPResourceConnection conn : session.getActiveResources()) {
-				for (XMPPPresenceUpdateProcessorIfc proc : presenceProcessors.values()) {
-					try {
-						proc.presenceUpdate(conn, presence, packetWriterQueue);
-					} catch (NotAuthorizedException ex) {
-						log.log(Level.SEVERE, "exception processing presence update for " +
-								"session = {0} and packet = {1}", new Object[] { session,
-								packet });
-					}
-				}
-			}
+			eventBus.fire(new UserPresenceChangedEvent(session, presence));
 		} catch (TigaseStringprepException ex) {
 
 			// should not happen
@@ -2908,40 +2883,6 @@ public class SessionManager
 			}
 		}
 	}
-
-
-	protected class WriterQueue<E extends Packet>
-					extends AbstractQueue<E> {
-		@Override
-		public Iterator<E> iterator() {
-			throw new UnsupportedOperationException(
-					"Not supported yet.");    // To change body of generated methods, choose Tools | Templates.
-		}
-
-		@Override
-		public boolean offer(E packet) {
-			return SessionManager.this.addOutPacket(packet);
-		}
-
-		@Override
-		public E peek() {
-			throw new UnsupportedOperationException(
-					"Not supported yet.");    // To change body of generated methods, choose Tools | Templates.
-		}
-
-		@Override
-		public E poll() {
-			throw new UnsupportedOperationException(
-					"Not supported yet.");    // To change body of generated methods, choose Tools | Templates.
-		}
-
-		@Override
-		public int size() {
-			throw new UnsupportedOperationException(
-					"Not supported yet.");    // To change body of generated methods, choose Tools | Templates.
-		}
-	}
-
 
 	@Override
 	public void handleDomainChange(final String domain, final XMPPResourceConnection conn) {

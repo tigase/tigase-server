@@ -28,6 +28,7 @@ package tigase.cluster;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
@@ -420,6 +421,8 @@ public class SessionManagerClustered
 	protected Collection<Subscription> routeUserSessionEvent(UserSessionEvent event, Collection<Subscription> subscriptions) {
 		if (strategy.hasCompleteJidsInfo()) {
 			Set<ConnectionRecordIfc> records = strategy.getConnectionRecords(event.getUserJid().getBareJID());
+			if (records == null)
+				records = Collections.emptySet();
 			if (event.getUserJid().getResource() != null) {
 				Iterator<ConnectionRecordIfc> it = records.iterator();
 				while (it.hasNext()) {
