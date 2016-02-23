@@ -1,0 +1,7 @@
+copy "tigase.ico" "..\"
+copy "wrapper\wrapper.jar" "..\jars"
+copy "wrapper\wrapper.dll" "..\jars"
+copy "wrapper\wrapper.exe" "..\"
+copy "wrapper\wrapper.conf" "..\"
+copy "wrapper\wrapper-community-license-1.2.txt" "..\"
+copy "scripts\*.*" "..\"
