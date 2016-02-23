@@ -146,7 +146,9 @@ public class ClConConfigRepository
 	public boolean itemChanged(ClusterRepoItem oldItem, ClusterRepoItem newItem) {
 		return !oldItem.getPassword().equals( newItem.getPassword() )
 					 || ( oldItem.getPortNo() != newItem.getPortNo() )
-					 || !oldItem.getSecondaryHostname().equals( newItem.getSecondaryHostname() );
+					 || ( oldItem.getSecondaryHostname() != null
+								&& newItem.getSecondaryHostname() != null
+								&& !oldItem.getSecondaryHostname().equals( newItem.getSecondaryHostname() ) );
 	}
 
 	//~--- get methods ----------------------------------------------------------
