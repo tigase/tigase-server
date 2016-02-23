@@ -243,6 +243,14 @@ In HTTP UI select Other, then Update Item Configuration (Vhost-man), select the 
 
 Value of +remove-expired-messages-delay+ and +remove-expired-messages-period+ is in format described at Duration.parse() in Java documentation.
 
+Force Redirection
+-----------------
+It's possible now to redirect connections on one port to be forced to connect to another port using the +force-redirect-to+ setting.  link:http://docs.tigase.org/tigase-server/snapshot/Administration_Guide/html/#_enforcing_redirection[Details here].
+
+SeeOtherHostDualIP
+------------------
+Tigase now has a Dual IP setup which can now use a separate internal and external IP and use a DNS resolver for the connection redirection.  Setup instructions are link:http://docs.tigase.org/tigase-server/snapshot/Administration_Guide/html/#_configuring_hostnames[Located here].
+
 New Documentation Structure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 There has been a lot of changes and fixes to our documentation over the last few months. If you have links to any of our documentation, please update them as the filenames may have changed.
@@ -443,6 +451,12 @@ Fixes
 - #3848 Changes made to JDBCMessageArchiveRepository to fix potential MySQL deadlocks when adding entries to repository.
 
 - #3902 Fixed issue where wss:// connections were closed after 3 minutes of inactivity.
+
+- #3910 Fixed NPE in SessionManager when session was closed during execution of everyMinute method.
+
+- #3911 Fixed load distribution error between threads that could cause high CPU usage.
+
+- #3931 Fixed error caused by AMP running in clustered installations.
 
 - Patch added to fix ConcurrentModificationException in BlockingCommand plugin.
 
