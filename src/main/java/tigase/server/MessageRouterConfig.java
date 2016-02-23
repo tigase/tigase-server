@@ -26,6 +26,7 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecatedComponent;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.util.DNSResolverFactory;
 
@@ -416,6 +417,13 @@ public class MessageRouterConfig {
 			cls = (ServerComponent) this.getClass().getClassLoader().loadClass(cls_name)
 					.newInstance();
 		}
+
+		if ( cls != null && cls.getClass().isAnnotationPresent( TigaseDeprecatedComponent.class ) ){
+			TigaseDeprecatedComponent annotation = cls.getClass().getAnnotation( TigaseDeprecatedComponent.class );
+			log.log( Level.WARNING, "Deprecated Component: " + cls.getClass().getCanonicalName()
+															+ ", INFO: " + annotation.note() + "\n" );
+		}
+
 
 		return cls;
 	}

@@ -55,6 +55,7 @@ import java.util.logging.Logger;
 import tigase.server.Iq;
 import tigase.server.PolicyViolationException;
 
+import tigase.annotations.TigaseDeprecatedComponent;
 import tigase.osgi.ModulesManagerImpl;
 
 /**
@@ -63,7 +64,7 @@ import tigase.osgi.ModulesManagerImpl;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
-@Deprecated
+@TigaseDeprecatedComponent(note = "Please remove \'+presence\' from \'--sm-plugins=\' or switch to \'presence-state\' and \'presence-subscription\' plugins")
 public class Presence
 				extends XMPPProcessor
 				implements XMPPProcessorIfc, XMPPStopListenerIfc {

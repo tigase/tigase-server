@@ -126,6 +126,7 @@ import tigase.xmpp.impl.JabberIqRegister;
 import tigase.xmpp.impl.PresenceCapabilitiesManager;
 //~--- JDK imports ------------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecatedComponent;
 import tigase.stats.StatisticsList;
 
 import java.util.Collection;
@@ -969,6 +970,10 @@ public class SessionManager
 					XMPPImplIfc plugin = addPlugin(plug_id, plugins_concurrency.get(plug_id));
 
 					if (plugin != null) {
+						if (plugin.getClass().isAnnotationPresent(TigaseDeprecatedComponent.class)) {
+							TigaseDeprecatedComponent annotation = plugin.getClass().getAnnotation( TigaseDeprecatedComponent.class );
+							log.log( Level.WARNING, "Deprecated Plugin: " + plugin.id() + ", INFO: " + annotation.note() + "\n" );
+						}
 						Map<String, Object> plugin_settings = getPluginSettings(plug_id, props);
 
 						if (plugin_settings.size() > 0) {
