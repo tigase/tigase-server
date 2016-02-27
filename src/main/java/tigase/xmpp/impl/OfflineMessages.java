@@ -22,7 +22,34 @@
 package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
-import static tigase.server.Message.ELEM_NAME;
+import tigase.db.MsgRepositoryIfc;
+import tigase.db.NonAuthUserRepository;
+import tigase.db.TigaseDBException;
+import tigase.db.UserNotFoundException;
+
+import tigase.server.Iq;
+import tigase.server.Packet;
+import tigase.server.amp.MsgRepository;
+
+import tigase.xmpp.Authorization;
+import tigase.xmpp.ElementMatcher;
+import tigase.xmpp.JID;
+import tigase.xmpp.NoConnectionIdException;
+import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.PacketErrorTypeException;
+import tigase.xmpp.StanzaType;
+import tigase.xmpp.XMPPPostprocessorIfc;
+import tigase.xmpp.XMPPProcessor;
+import tigase.xmpp.XMPPProcessorIfc;
+import tigase.xmpp.XMPPResourceConnection;
+
+import tigase.osgi.ModulesManagerImpl;
+import tigase.util.DNSResolverFactory;
+import tigase.util.TigaseStringprepException;
+import tigase.xml.DomBuilderHandler;
+import tigase.xml.Element;
+import tigase.xml.SimpleParser;
+import tigase.xml.SingletonFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,31 +64,7 @@ import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import tigase.db.MsgRepositoryIfc;
-import tigase.db.NonAuthUserRepository;
-import tigase.db.TigaseDBException;
-import tigase.db.UserNotFoundException;
-import tigase.osgi.ModulesManagerImpl;
-import tigase.server.Iq;
-import tigase.server.Packet;
-import tigase.server.amp.MsgRepository;
-import tigase.util.DNSResolver;
-import tigase.util.TigaseStringprepException;
-import tigase.xml.DomBuilderHandler;
-import tigase.xml.Element;
-import tigase.xml.SimpleParser;
-import tigase.xml.SingletonFactory;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.ElementMatcher;
-import tigase.xmpp.JID;
-import tigase.xmpp.NoConnectionIdException;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPPostprocessorIfc;
-import tigase.xmpp.XMPPProcessor;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
+import static tigase.server.Message.ELEM_NAME;
 
 /**
  * OfflineMessages plugin implementation which follows <a
@@ -104,7 +107,7 @@ public class OfflineMessages
 	private static final Element[] DISCO_FEATURES = {
 		new Element( "feature", new String[] { "var" }, new String[] { "msgoffline" } ) };
 	/** Field holds the default hostname of the machine. */
-	private static final String defHost = DNSResolver.getDefaultHostname();
+	private static String defHost;
 	/** Field holds an array for element paths for which the plugin offers message
 	 * saving capabilities. In case of {@code msgoffline} plugin it is
 	 * <em>presence</em> stanza */
@@ -155,6 +158,7 @@ public class OfflineMessages
 	@Override
 	public void init(Map<String, Object> settings) throws TigaseDBException {
 		super.init(settings);
+		defHost = DNSResolverFactory.getInstance().getDefaultHost();
 		msgRepoCls = (String) settings.get(MSG_REPO_CLASS_KEY);
 		if (settings.containsKey(MSG_PUBSUB_JID))
 			this.pubSubJID = (String) settings.get(MSG_PUBSUB_JID);

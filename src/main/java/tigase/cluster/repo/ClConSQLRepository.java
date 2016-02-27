@@ -61,6 +61,7 @@ public class ClConSQLRepository
 	private static final String GET_ITEM_QUERY =
 					"select "
 					+ HOSTNAME_COLUMN + ", "
+					+ SECONDARY_HOSTNAME_COLUMN + ", "
 					+ PASSWORD_COLUMN + ", "
 					+ LASTUPDATE_COLUMN + ", "
 					+ PORT_COLUMN + ", "
@@ -70,6 +71,7 @@ public class ClConSQLRepository
 	private static final String GET_ALL_ITEMS_QUERY =
 					"select "
 					+ HOSTNAME_COLUMN + ", "
+					+ SECONDARY_HOSTNAME_COLUMN + ", "
 					+ PASSWORD_COLUMN + ", "
 					+ LASTUPDATE_COLUMN + ", "
 					+ PORT_COLUMN + ", "
@@ -81,6 +83,7 @@ public class ClConSQLRepository
 	private static final String CREATE_TABLE_QUERY_MYSQL =
 					"create table " + TABLE_NAME + " ("
 					+ "  " + HOSTNAME_COLUMN + " varchar(255) not null,"
+					+ "  " + SECONDARY_HOSTNAME_COLUMN + " varchar(255),"
 					+ "  " + PASSWORD_COLUMN + " varchar(255) not null,"
 					+ "  " + LASTUPDATE_COLUMN
 					+ " TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
@@ -92,6 +95,7 @@ public class ClConSQLRepository
 	private static final String CREATE_TABLE_QUERY =
 					"create table " + TABLE_NAME + " ("
 					+ "  " + HOSTNAME_COLUMN + " varchar(512) not null,"
+					+ "  " + SECONDARY_HOSTNAME_COLUMN + " varchar(512),"
 					+ "  " + PASSWORD_COLUMN + " varchar(255) not null,"
 					+ "  " + LASTUPDATE_COLUMN
 					+ " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
@@ -102,6 +106,7 @@ public class ClConSQLRepository
 	private static final String CREATE_TABLE_QUERY_SQLSERVER =
 					"create table [dbo].[" + TABLE_NAME + "] ("
 					+ "  " + HOSTNAME_COLUMN + " nvarchar(512) not null,"
+					+ "  " + SECONDARY_HOSTNAME_COLUMN + " nvarchar(512),"
 					+ "  " + PASSWORD_COLUMN + " nvarchar(255) not null,"
 					+ "  " + LASTUPDATE_COLUMN
 					+ " [datetime] NULL,"
@@ -116,17 +121,19 @@ public class ClConSQLRepository
 	private static final String INSERT_ITEM_QUERY =
 					"insert into " + TABLE_NAME + " ("
 					+ HOSTNAME_COLUMN + ", "
+					+ SECONDARY_HOSTNAME_COLUMN + ", "
 					+ PASSWORD_COLUMN + ", "
 					+ LASTUPDATE_COLUMN + ", "
 					+ PORT_COLUMN + ", "
 					+ CPU_USAGE_COLUMN + ", "
 					+ MEM_USAGE_COLUMN
 					+ ") "
-					+ " (select ?, ?, ?, ?, ?, ? from " + TABLE_NAME
+					+ " (select ?, ?, ?, ?, ?, ?, ? from " + TABLE_NAME
 					+ " WHERE " + HOSTNAME_COLUMN + "=? HAVING count(*)=0)";
 	private static final String UPDATE_ITEM_QUERY =
 					"update " + TABLE_NAME + " set "
 					+ HOSTNAME_COLUMN + "= ?, "
+					+ SECONDARY_HOSTNAME_COLUMN + "= ?, "
 					+ PASSWORD_COLUMN + "= ?, "
 					+ LASTUPDATE_COLUMN + " = ?,"
 					+ PORT_COLUMN + "= ?, "
@@ -217,23 +224,25 @@ public class ClConSQLRepository
 
 			synchronized (updateItemSt) {
 				updateItemSt.setString(1, item.getHostname());
-				updateItemSt.setString(2, item.getPassword());
-				updateItemSt.setTimestamp(3, new Timestamp(date.getTime()));
-				updateItemSt.setInt(4, item.getPortNo());
-				updateItemSt.setFloat(5, item.getCpuUsage());
-				updateItemSt.setFloat(6, item.getMemUsage());
-				updateItemSt.setString(7, item.getHostname());
+				updateItemSt.setString(2, item.getSecondaryHostname());
+				updateItemSt.setString(3, item.getPassword());
+				updateItemSt.setTimestamp(4, new Timestamp(date.getTime()));
+				updateItemSt.setInt(5, item.getPortNo());
+				updateItemSt.setFloat(6, item.getCpuUsage());
+				updateItemSt.setFloat(7, item.getMemUsage());
+				updateItemSt.setString(8, item.getHostname());
 				updateItemSt.executeUpdate();
 			}
 
 			synchronized (insertItemSt) {
 				insertItemSt.setString(1, item.getHostname());
-				insertItemSt.setString(2, item.getPassword());
-				insertItemSt.setTimestamp(3, new Timestamp(date.getTime()));
-				insertItemSt.setInt(4, item.getPortNo());
-				insertItemSt.setFloat(5, item.getCpuUsage());
-				insertItemSt.setFloat(6, item.getMemUsage());
-				insertItemSt.setString(7, item.getHostname());
+				insertItemSt.setString(2, item.getSecondaryHostname());
+				insertItemSt.setString(3, item.getPassword());
+				insertItemSt.setTimestamp(4, new Timestamp(date.getTime()));
+				insertItemSt.setInt(5, item.getPortNo());
+				insertItemSt.setFloat(6, item.getCpuUsage());
+				insertItemSt.setFloat(7, item.getMemUsage());
+				insertItemSt.setString(8, item.getHostname());
 				insertItemSt.executeUpdate();
 			}
 
@@ -270,6 +279,7 @@ public class ClConSQLRepository
 						ClusterRepoItem item = getItemInstance();
 
 						item.setHostname(rs.getString(HOSTNAME_COLUMN));
+						item.setSecondaryHostname(rs.getString(SECONDARY_HOSTNAME_COLUMN));
 						item.setPassword(rs.getString(PASSWORD_COLUMN));
 						item.setLastUpdate(rs.getTimestamp(LASTUPDATE_COLUMN).getTime());
 						item.setPort(rs.getInt(PORT_COLUMN));
@@ -325,6 +335,8 @@ public class ClConSQLRepository
 				break;
 		}
 
+		Statement stmt = null;
+		
 		try {
 			if (!data_repo.checkTable(TABLE_NAME)) {
 				log.info("DB for external component is not OK, creating missing tables...");
@@ -333,12 +345,35 @@ public class ClConSQLRepository
 				st.executeUpdate(createTableQuery);
 				log.info("DB for external component created OK");
 			}
+
+			try {
+				stmt = data_repo.createStatement(null);
+				stmt.executeQuery("select " + SECONDARY_HOSTNAME_COLUMN + " from " + TABLE_NAME + " where " + HOSTNAME_COLUMN + " IS NOT NULL");
+			} catch (SQLException ex) {
+				// if this happens then we have issue with old database schema and missing body columns in MSGS_TABLE
+				String alterTable = null;
+				switch (data_repo.getDatabaseType()) {
+					case derby:
+					case mysql:
+					case postgresql:
+						alterTable = "alter table " + TABLE_NAME + " add " + SECONDARY_HOSTNAME_COLUMN + " varchar(512)";
+						break;
+					case jtds:
+					case sqlserver:
+						alterTable = "alter table " + TABLE_NAME + " add " + SECONDARY_HOSTNAME_COLUMN + " nvarchar(512)";
+						break;
+				}
+				try {
+					stmt.execute(alterTable);
+				} catch (SQLException ex1) {
+					log.log(Level.SEVERE, "could not alter table " + TABLE_NAME + " to add missing column by SQL:\n" + alterTable, ex1);
+				}
+			}
+
+
 		} finally {
 			data_repo.release(st, null);
 			st = null;
 		}
 	}
 }
-
-
-//~ Formatted in Tigase Code Convention on 13/03/11

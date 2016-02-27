@@ -550,13 +550,8 @@ public abstract class AbstractMessageReceiver
 	 * @return a hash code generated for the input thread.
 	 */
 	public int hashCodeForPacket(Packet packet) {
-		if ((packet.getPacketFrom() != null) &&!getComponentId().equals(packet
-				.getPacketFrom())) {
-
-			// This comes from connection manager so the best way is to get hashcode
-			// by the connectionId, which is in the getFrom()
-			return packet.getPacketFrom().hashCode();
-		}
+		// use of getPacketFrom was moved to SM as it worked OK only in use case of SM 
+		// where packet may came from connection manager
 		if ((packet.getPacketTo() != null) &&!getComponentId().equals(packet.getPacketTo())) {
 			return packet.getPacketTo().hashCode();
 		}

@@ -49,6 +49,8 @@ import tigase.xml.XMLUtils;
 
 import tigase.xmpp.BareJID;
 
+import tigase.util.DNSResolverFactory;
+
 import static tigase.io.SSLContextContainerIfc.*;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -218,7 +220,8 @@ public abstract class ConfiguratorAbstract
 			}
 		}
 		configRepo.addRepoChangeListener(this);
-		configRepo.setDefHostname(getDefHostName().getDomain());
+		String host = getDefHostName() != null ? getDefHostName().getDomain() : DNSResolverFactory.getInstance().getDefaultHost();
+		configRepo.setDefHostname(host);
 		try {
 			// loss of generic types is intentional to make parameter match API
 			// and internally all requests are done like:

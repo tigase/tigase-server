@@ -26,6 +26,8 @@ import tigase.server.xmppclient.SeeOtherHostIfc;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
+import tigase.xml.Element;
+
 
 /**
  * Describe interface BoshSessionTaskHandler here.
@@ -56,7 +58,9 @@ public interface BoshSessionTaskHandler {
 
 	BareJID getDefHostName();
 	
-	BareJID getSeeOtherHostForJID( BareJID userId, SeeOtherHostIfc.Phase ph );
-	
+	BareJID getSeeOtherHostForJID( Packet packet, BareJID userId, SeeOtherHostIfc.Phase ph );
+
+	Element getSeeOtherHostError( Packet packet, BareJID destination);
+
 	boolean processUndeliveredPacket(Packet packet, Long stamp, String errorMessage);
 }

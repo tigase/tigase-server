@@ -126,6 +126,7 @@ import tigase.xmpp.impl.JabberIqRegister;
 import tigase.xmpp.impl.PresenceCapabilitiesManager;
 //~--- JDK imports ------------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecatedComponent;
 import tigase.stats.StatisticsList;
 
 import java.util.Collection;
@@ -495,6 +496,23 @@ public class SessionManager
 		return true;
 	}
 
+	@Override
+	public int hashCodeForPacket(Packet packet) {
+		// moved this check from AbstractMessageReceiver as it is related only to SM
+		// and in other components it causes issues as SM sending packet send packetFrom
+		// to SM address which in fact forced other components to process all packets
+		// from SM on single thread !!
+		if ((packet.getPacketFrom() != null) &&!getComponentId().equals(packet
+				.getPacketFrom())) {
+
+			// This comes from connection manager so the best way is to get hashcode
+			// by the connectionId, which is in the getFrom()
+			return packet.getPacketFrom().hashCode();
+		}
+		
+		return super.hashCodeForPacket(packet);
+	}
+	
 	@Override
 	public void initBindings( Bindings binds ) {
 		super.initBindings(binds);
@@ -969,6 +987,10 @@ public class SessionManager
 					XMPPImplIfc plugin = addPlugin(plug_id, plugins_concurrency.get(plug_id));
 
 					if (plugin != null) {
+						if (plugin.getClass().isAnnotationPresent(TigaseDeprecatedComponent.class)) {
+							TigaseDeprecatedComponent annotation = plugin.getClass().getAnnotation( TigaseDeprecatedComponent.class );
+							log.log( Level.WARNING, "Deprecated Plugin: " + plugin.id() + ", INFO: " + annotation.note() + "\n" );
+						}
 						Map<String, Object> plugin_settings = getPluginSettings(plug_id, props);
 
 						if (plugin_settings.size() > 0) {
@@ -2347,15 +2369,20 @@ public class SessionManager
 	@Override
 	public synchronized void everyMinute() {
 		super.everyMinute();
-			int count = 0;
+		int count = 0;
 
 		for (BareJID bareJID : sessionsByNodeId.keySet()) {
 			if (!bareJID.toString().startsWith("sess-man")) {
-				for (XMPPResourceConnection xMPPResourceConnection : sessionsByNodeId.get(bareJID)
-						.getActiveResources()) {
-					if (System.currentTimeMillis() - xMPPResourceConnection.getLastAccessed() < 5 *
-							60 * 1000) {
-						count++;
+				XMPPSession session = sessionsByNodeId.get(bareJID);
+				// check if session is still there as it could be closed 
+				// if sessionsByNodeId is big collection
+				if (session != null) {
+					for (XMPPResourceConnection xMPPResourceConnection : session
+							.getActiveResources()) {
+						if (System.currentTimeMillis() - xMPPResourceConnection.getLastAccessed() < 5
+								* 60 * 1000) {
+							count++;
+						}
 					}
 				}
 			}

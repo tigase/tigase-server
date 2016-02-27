@@ -137,17 +137,6 @@ public class SeeOtherHost implements SeeOtherHostIfc {
 	}
 
 	@Override
-	public Element getStreamError( String xmlns, BareJID destination ) {
-		Element error = new Element( "stream:error" );
-		Element seeOtherHost = new Element( "see-other-host", destination.toString() );
-
-		seeOtherHost.setXMLNS( xmlns );
-		error.addChild( seeOtherHost );
-
-		return error;
-	}
-
-	@Override
 	public boolean isEnabled(VHostItem vHost, Phase ph) {
 		return (boolean) vHost.getData( REDIRECTION_ENABLED )
 					 && active.contains( ph );

@@ -335,11 +335,11 @@ public class BoshSession {
 					: null;
 
 			if (userId != null) {
-				BareJID hostJid = handler.getSeeOtherHostForJID(userId.getBareJID(), Phase.OPEN);
+				BareJID hostJid = handler.getSeeOtherHostForJID(packet, userId.getBareJID(), Phase.OPEN);
 
 				if (hostJid != null) {
 					Element error        = new Element("stream:error");
-					Element seeOtherHost = new Element("see-other-host", hostJid.toString());
+					Element seeOtherHost = handler.getSeeOtherHostError( packet, hostJid);
 
 					seeOtherHost.setXMLNS("urn:ietf:params:xml:ns:xmpp-streams");
 					error.addChild(seeOtherHost);

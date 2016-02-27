@@ -26,33 +26,38 @@ package tigase.cluster;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.cluster.api.ClusterControllerIfc;
+import tigase.cluster.api.ClusteredComponentIfc;
+import tigase.cluster.api.SessionManagerClusteredIfc;
+import tigase.cluster.strategy.ClusteringStrategyIfc;
+
+import tigase.server.ComponentInfo;
+import tigase.server.Message;
+import tigase.server.Packet;
+import tigase.server.XMPPServer;
+import tigase.server.xmppsession.SessionManager;
+
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
+import tigase.xmpp.StanzaType;
+import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.XMPPSession;
+
+import tigase.conf.ConfigurationException;
+import tigase.osgi.ModulesManagerImpl;
+import tigase.stats.StatisticsList;
+import tigase.util.DNSResolverFactory;
+import tigase.util.TigaseStringprepException;
+import tigase.xml.Element;
+
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.script.Bindings;
-import tigase.cluster.api.ClusterControllerIfc;
-import tigase.cluster.api.ClusteredComponentIfc;
-import tigase.cluster.api.SessionManagerClusteredIfc;
-import tigase.cluster.strategy.ClusteringStrategyIfc;
-import tigase.conf.ConfigurationException;
-import tigase.osgi.ModulesManagerImpl;
-import tigase.server.ComponentInfo;
-import tigase.server.Message;
-import tigase.server.Packet;
-import tigase.server.XMPPServer;
-import tigase.server.xmppsession.SessionManager;
-import tigase.stats.StatisticsList;
-import tigase.util.DNSResolver;
-import tigase.util.TigaseStringprepException;
-import tigase.xml.Element;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.XMPPSession;
 
 /**
  * Class SessionManagerClusteredOld
@@ -319,7 +324,7 @@ public class SessionManagerClustered
 					strategy_class, e);
 		}
 
-		String[] local_domains = DNSResolver.getDefHostNames();
+		String[] local_domains = DNSResolverFactory.getInstance().getDefaultHosts();
 
 		if (params.get(GEN_VIRT_HOSTS) != null) {
 			local_domains = ((String) params.get(GEN_VIRT_HOSTS)).split(",");

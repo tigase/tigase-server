@@ -26,25 +26,20 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
+
 import tigase.server.Packet;
 import tigase.server.amp.AmpFeatureIfc;
 import tigase.server.amp.MsgRepository;
-import tigase.util.DNSResolver;
-import tigase.xml.Element;
+
+import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
+import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPPacketFilterIfc;
 import tigase.xmpp.XMPPPostprocessorIfc;
@@ -53,10 +48,16 @@ import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 
+import tigase.util.DNSResolverFactory;
+import tigase.xml.Element;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import static tigase.server.amp.AmpFeatureIfc.*;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.StanzaType;
 
 /**
  * Created: Apr 29, 2010 5:00:25 PM
@@ -69,6 +70,7 @@ public class MessageAmp
 				implements XMPPPacketFilterIfc, XMPPPostprocessorIfc, 
 						XMPPPreprocessorIfc, XMPPProcessorIfc {
 	private static final String     AMP_JID_PROP_KEY     = "amp-jid";
+	private static final String     STATUS_ATTRIBUTE_NAME = "status";
 	private static final String[][] ELEMENTS             = {
 		{ "message" }, { "presence" }, { "iq", "msgoffline" }
 	};
@@ -79,7 +81,7 @@ public class MessageAmp
 	private static Element[]        DISCO_FEATURES = { new Element("feature",
 			new String[] { "var" }, new String[] { XMLNS }),
 			new Element("feature", new String[] { "var" }, new String[] { "msgoffline" }) };
-	private static final String defHost = DNSResolver.getDefaultHostname();
+	private static String defHost;
 
 //	private static final String STATUS_ATTRIBUTE_NAME = "status";
 
@@ -101,6 +103,8 @@ public class MessageAmp
 	@Override
 	public void init(Map<String, Object> settings) throws TigaseDBException {
 		super.init(settings);
+
+		defHost = DNSResolverFactory.getInstance().getDefaultHost();
 
 		if(offlineProcessor!=null)
 			offlineProcessor.init(settings);
@@ -233,7 +237,7 @@ public class MessageAmp
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
 		boolean processed = C2SDeliveryErrorProcessor.preProcess(packet, session, repo, results, settings, messageProcessor);
-		if (processed && packet.getPacketFrom() != null && packet.getPacketFrom().equals(ampJID)) {
+		if (processed && packet.getPacketFrom() != null && packet.getPacketFrom().getLocalpart().equals(ampJID.getLocalpart())) {
 			processed = false;
 		}
 		if (processed) {
@@ -243,7 +247,7 @@ public class MessageAmp
 			if (amp == null
 //					 "Individual action definitions MAY provide their own requirements." regarding
 //						"status" attribute requirement!!! applies to "alert" and "notify"
-//					|| (amp.getAttributeStaticStr(STATUS_ATTRIBUTE_NAME) != null)
+					|| (amp.getAttributeStaticStr(STATUS_ATTRIBUTE_NAME) != null)
 					|| ampJID.equals(packet.getPacketFrom())) {
 				return false;
 			}
@@ -326,8 +330,8 @@ public class MessageAmp
 				if ((amp == null)
 //					 "Individual action definitions MAY provide their own requirements." regarding
 //						"status" attribute requirement!!! applies to "alert" and "notify"
-//						|| (amp.getAttributeStaticStr(STATUS_ATTRIBUTE_NAME) != null)
-						|| ampJID.equals(packet.getPacketFrom())) {
+						|| (amp.getAttributeStaticStr(STATUS_ATTRIBUTE_NAME) != null)
+						|| (packet.getPacketFrom() != null && ampJID.getLocalpart().equals(packet.getPacketFrom().getLocalpart()))) {
 					messageProcessor.process(packet, session, repo, results, settings);
 				} else {
 					// when packet from user with AMP is sent we need to forward it to AMP
@@ -336,6 +340,7 @@ public class MessageAmp
 					JID connectionId = session.getConnectionId();
 					Packet result = packet.copyElementOnly();
 					if (connectionId.equals(packet.getPacketFrom())) {
+						//if (!session.isUserId(packet.getStanzaTo().getBareJID()))
 						result.getElement().addAttribute(FROM_CONN_ID, connectionId.toString());
 						if ( null != session.getBareJID() ){
 							result.getElement().addAttribute(SESSION_JID, session.getJID().toString() );

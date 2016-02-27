@@ -22,8 +22,8 @@ As Oracle has dropped support for version 7 of it's Java runtime environment and
 
 Changes to Datbase Schema
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-Database Schema has changed to introduce primary keys in tig_nodes and tig_pairs tables, improving database performance.  As a result, the schema for your database will need to be upgraded if you are not starting with a fresh database.
-Please see the xref:TigaseServer71[Schema Upgrade] section for instructions on how to prepare and upgrade your database.  *This will affect all users using v7.1.0 b4129 and later.*
+Database Schema has changed to introduce primary keys column in tig_nodes and tig_pairs tables to help improve database performance.  As a result, the schema for your database will need to be upgraded if you are not starting with a fresh database.
+Please see the xref:tigaseServer71[Schema Upgrade] section for instructions on how to prepare and upgrade your database.  *This will affect all users using v7.1.0 b4129 and later.*
 
 Changes to Pubsub Schema
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -243,6 +243,14 @@ In HTTP UI select Other, then Update Item Configuration (Vhost-man), select the 
 
 Value of +remove-expired-messages-delay+ and +remove-expired-messages-period+ is in format described at Duration.parse() in Java documentation.
 
+Force Redirection
+-----------------
+It's possible now to redirect connections on one port to be forced to connect to another port using the +force-redirect-to+ setting.  link:http://docs.tigase.org/tigase-server/snapshot/Administration_Guide/html/#_enforcing_redirection[Details here].
+
+SeeOtherHostDualIP
+------------------
+Tigase now has a Dual IP setup which can now use a separate internal and external IP and use a DNS resolver for the connection redirection.  Setup instructions are link:http://docs.tigase.org/tigase-server/snapshot/Administration_Guide/html/#_configuring_hostnames[Located here].
+
 New Documentation Structure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 There has been a lot of changes and fixes to our documentation over the last few months. If you have links to any of our documentation, please update them as the filenames may have changed.
@@ -275,6 +283,7 @@ New Minor Features & Behavior Changes
 - link:https://projects.tigase.org/issues/2835[#2835] Allowing of +setPermissions+ on incoming packets before they are processed by plugins.
 - link:https://projects.tigase.org/issues/2903[#2903] +see-other-host+ has new option to make it configurable on a per vhost basis.
 - link:https://projects.tigase.org/issues/3034[#3034] Improved handling of data types and primitives within Tigase.
+- #3173 Stanzas with unescaped XML special characters are now ignored instead of sending a force-close of connection to sender.
 - link:https://projects.tigase.org/issues/3180[#3180] Protected access to JDBC repository now enabled.
 - link:https://projects.tigase.org/issues/3230[#3230] Verification added to check against CUSTOM domain rules when submitted.
 - #3258 Retrieval of PubSub/PEP based avatars using REST API now supported. xref:avatarRetrievalRequests[Command URLs here].
@@ -288,6 +297,7 @@ New Minor Features & Behavior Changes
 - #3609 Added new configuration option for BOSH to disable hostname attribute. xref:tip_1_bosh_in_cluster_mode_without_load_balancer[Details here].
 - link:https://projects.tigase.org/issues/3670[#3670] Hardened mode now uses long DH keys (2048) by default.
 - link:https://projects.tigase.org/issues/3849[#3849] New Roster size limit configurable setting. See info xref:rosterLimit[Here].
+- link:https://projects.tigase.org/issues/3872[#3872] PostgreSQL driver updated to v9.4
 
 
 Fixes
@@ -439,6 +449,14 @@ Fixes
 - link:https://projects.tigase.org/issues/3800[#3800] Changed Jenkins to always pull latest binaries from repositories.  Windows wrapper changed to use wildcards to load /jars folder.
 
 - #3848 Changes made to JDBCMessageArchiveRepository to fix potential MySQL deadlocks when adding entries to repository.
+
+- #3902 Fixed issue where wss:// connections were closed after 3 minutes of inactivity.
+
+- #3910 Fixed NPE in SessionManager when session was closed during execution of everyMinute method.
+
+- #3911 Fixed load distribution error between threads that could cause high CPU usage.
+
+- #3931 Fixed error caused by AMP running in clustered installations.
 
 - Patch added to fix ConcurrentModificationException in BlockingCommand plugin.
 

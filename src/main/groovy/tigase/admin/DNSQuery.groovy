@@ -56,18 +56,18 @@ if (domain == null) {
 def result = p.commandResult(Command.DataType.result)
 def response_data = []
 try {
-	response_data += "IP: " + DNSResolver.getHostIP(domain)
+	response_data += "IP: " + DNSResolverFactory.getInstance().getHostIP(domain)
 } catch (Exception ex) {
 	response_data += "IP: " + ex.toString()
 }
 try {
-	DNSEntry[] entries = DNSResolver.getHostSRV_Entries(domain)
+	DNSEntry[] entries = DNSResolverFactory.getInstance().getHostSRV_Entries(domain)
 	int cnt = 1
 	entries.each {
 		response_data += "SRV " + (cnt++) + ": " + it.toString()
 	}
-	response_data += "Selected SRV: " + DNSResolver.getHostSRV_Entry(domain).toString()
-	response_data += "Selected SRV IP: " + DNSResolver.getHostSRV_IP(domain)
+	response_data += "Selected SRV: " + DNSResolverFactory.getInstance().getHostSRV_Entry(domain).toString()
+	response_data += "Selected SRV IP: " + DNSResolverFactory.getInstance().getHostSRV_IP(domain)
 
 
 	Command.addFieldMultiValue(result, "DNS Response ", response_data);

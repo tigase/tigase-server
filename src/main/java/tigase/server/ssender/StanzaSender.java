@@ -21,28 +21,32 @@
  */
 package tigase.server.ssender;
 
-import java.io.File;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Timer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import tigase.conf.Configurable;
-import tigase.conf.ConfigurationException;
 import tigase.db.RepositoryFactory;
+
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Packet;
+
+import tigase.xmpp.JID;
+
+import tigase.conf.Configurable;
+import tigase.conf.ConfigurationException;
+import tigase.util.DNSResolverFactory;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
-import tigase.util.DNSResolver;
-import tigase.xmpp.JID;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Timer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * <code>StanzaSender</code> class implements simple cyclic tasks management
@@ -214,7 +218,7 @@ public class StanzaSender extends AbstractMessageReceiver implements Configurabl
 			MY_DOMAIN_NAME_PROP_VAL =
 					"ssend." + ((String) params.get(GEN_VIRT_HOSTS)).split(",")[0];
 		} else {
-			MY_DOMAIN_NAME_PROP_VAL = "ssend." + DNSResolver.getDefHostNames()[0];
+			MY_DOMAIN_NAME_PROP_VAL = "ssend." + DNSResolverFactory.getInstance().getDefaultHosts()[0];
 		}
 		return defs;
 	}
