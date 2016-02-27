@@ -70,6 +70,7 @@ public class MessageAmp
 				implements XMPPPacketFilterIfc, XMPPPostprocessorIfc, 
 						XMPPPreprocessorIfc, XMPPProcessorIfc {
 	private static final String     AMP_JID_PROP_KEY     = "amp-jid";
+	private static final String     STATUS_ATTRIBUTE_NAME = "status";
 	private static final String[][] ELEMENTS             = {
 		{ "message" }, { "presence" }, { "iq", "msgoffline" }
 	};
@@ -246,7 +247,7 @@ public class MessageAmp
 			if (amp == null
 //					 "Individual action definitions MAY provide their own requirements." regarding
 //						"status" attribute requirement!!! applies to "alert" and "notify"
-//					|| (amp.getAttributeStaticStr(STATUS_ATTRIBUTE_NAME) != null)
+					|| (amp.getAttributeStaticStr(STATUS_ATTRIBUTE_NAME) != null)
 					|| ampJID.equals(packet.getPacketFrom())) {
 				return false;
 			}
@@ -329,7 +330,7 @@ public class MessageAmp
 				if ((amp == null)
 //					 "Individual action definitions MAY provide their own requirements." regarding
 //						"status" attribute requirement!!! applies to "alert" and "notify"
-//						|| (amp.getAttributeStaticStr(STATUS_ATTRIBUTE_NAME) != null)
+						|| (amp.getAttributeStaticStr(STATUS_ATTRIBUTE_NAME) != null)
 						|| (packet.getPacketFrom() != null && ampJID.getLocalpart().equals(packet.getPacketFrom().getLocalpart()))) {
 					messageProcessor.process(packet, session, repo, results, settings);
 				} else {
@@ -339,8 +340,8 @@ public class MessageAmp
 					JID connectionId = session.getConnectionId();
 					Packet result = packet.copyElementOnly();
 					if (connectionId.equals(packet.getPacketFrom())) {
-						if (!session.isUserId(packet.getStanzaTo().getBareJID()))
-							result.getElement().addAttribute(FROM_CONN_ID, connectionId.toString());
+						//if (!session.isUserId(packet.getStanzaTo().getBareJID()))
+						result.getElement().addAttribute(FROM_CONN_ID, connectionId.toString());
 						if ( null != session.getBareJID() ){
 							result.getElement().addAttribute(SESSION_JID, session.getJID().toString() );
 						}

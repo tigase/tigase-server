@@ -128,7 +128,9 @@ public interface SessionManagerClusteredIfc
 	 * @return true - if there is XMPPResourceConnection for connection JID
 	 */
 	boolean hasXMPPResourceConnectionForConnectionJid(JID connJid);
-	
+
+	JID getComponentId();
+
 	List<JID> getNodesConnected();
 }
 

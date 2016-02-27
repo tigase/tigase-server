@@ -32,8 +32,10 @@ import tigase.cluster.api.SessionManagerClusteredIfc;
 import static tigase.cluster.api.SessionManagerClusteredIfc.SESSION_FOUND_KEY;
 import tigase.cluster.strategy.cmd.PacketForwardCmd;
 
+import tigase.server.Message;
 import tigase.server.Packet;
 
+import tigase.xml.Element;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
@@ -76,6 +78,8 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 
 	/** Field description */
 	protected SessionManagerClusteredIfc sm = null;
+
+	private JID ampJID = null;
 
 	/** Field description */
 	private Set<CommandListener>        commands =
@@ -365,6 +369,7 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	@Override
 	public void setSessionManagerHandler(SessionManagerClusteredIfc sm) {
 		this.sm = sm;
+		this.ampJID = JID.jidInstanceNS("amp", sm.getComponentId().getDomain());
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -439,6 +444,12 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 		if (packet.getElemName() == Iq.ELEM_NAME && packet.getStanzaTo() != null 
 				&& packet.getStanzaTo().getResource() == null)
 			return false;
+
+		if (packet.getElemName() == Message.ELEM_NAME && packet.getType() != StanzaType.error && ampJID.equals(packet.getPacketFrom())) {
+			Element amp = packet.getElement().getChild("amp", "http://jabber.org/protocol/amp");
+			if (amp != null && amp.getAttributeStaticStr("status") == null)
+				return false;
+		}
 
 		return true;
 	}
