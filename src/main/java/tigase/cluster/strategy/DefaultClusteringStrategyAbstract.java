@@ -32,8 +32,10 @@ import tigase.cluster.api.SessionManagerClusteredIfc;
 import static tigase.cluster.api.SessionManagerClusteredIfc.SESSION_FOUND_KEY;
 import tigase.cluster.strategy.cmd.PacketForwardCmd;
 
+import tigase.server.Message;
 import tigase.server.Packet;
 
+import tigase.xml.Element;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
@@ -65,7 +67,7 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 	private static final Logger log = Logger.getLogger(
 			DefaultClusteringStrategyAbstract.class.getName());
 	private static final String PACKET_FORWARD_CMD = "packet-forward-sm-cmd";
-
+	
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
@@ -75,6 +77,8 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 
 	/** Field description */
 	protected SessionManagerClusteredIfc sm = null;
+
+	private JID ampJID = null;
 
 	/** Field description */
 	protected CopyOnWriteArrayList<JID> cl_nodes_list   = new CopyOnWriteArrayList<JID>();
@@ -179,9 +183,12 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 
 			Map<String, String> data = null;
 
-			if (conn != null) {
+			if (conn != null || packet.getPacketFrom() != null) {
 				data = new LinkedHashMap<String, String>();
-				data.put(SESSION_FOUND_KEY, sm.getComponentId().toString());
+				if (conn != null)
+					data.put(SESSION_FOUND_KEY, sm.getComponentId().toString());
+				if (packet.getPacketFrom() != null)
+					data.put(PacketForwardCmd.PACKET_FROM_KEY, packet.getPacketFrom().toString());
 			}
 			cluster.sendToNodes(PACKET_FORWARD_CMD, data, packet.getElement(), sm
 					.getComponentId(), null, toNodes.toArray(new JID[toNodes.size()]));
@@ -379,6 +386,7 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 	@Override
 	public void setSessionManagerHandler(SessionManagerClusteredIfc sm) {
 		this.sm = sm;
+		this.ampJID = JID.jidInstanceNS("amp", sm.getComponentId().getDomain());
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -446,6 +454,12 @@ public class DefaultClusteringStrategyAbstract<E extends ConnectionRecordIfc>
 		// component.
 		if (!sm.isLocalDomain(packet.getStanzaTo().getDomain(), false)) {
 			return false;
+		}
+
+		if (packet.getElemName() == Message.ELEM_NAME && packet.getType() != StanzaType.error && ampJID.equals(packet.getPacketFrom())) {
+			Element amp = packet.getElement().getChild("amp", "http://jabber.org/protocol/amp");
+			if (amp != null && amp.getAttributeStaticStr("status") == null)
+				return false;
 		}
 
 		return true;

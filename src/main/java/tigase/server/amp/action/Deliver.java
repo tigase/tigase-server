@@ -49,9 +49,9 @@ public class Deliver
 	@Override
 	public boolean execute(Packet packet, Element rule) {
 		Packet result     = packet.copyElementOnly();
-		removeTigasePayload(result);
 		if (packet.getAttributeStaticStr(FROM_CONN_ID) == null)
-			result.setPacketFrom(packet.getPacketTo());		
+			result.setPacketFrom(packet.getPacketTo());
+		removeTigasePayload(result);
 		resultsHandler.addOutPacket(result);
 		return true;
 	}

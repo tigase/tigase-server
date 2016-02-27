@@ -66,6 +66,7 @@ public class MessageAmp
 				implements XMPPPacketFilterIfc, XMPPPostprocessorIfc, 
 						XMPPPreprocessorIfc, XMPPProcessorIfc {
 	private static final String     AMP_JID_PROP_KEY     = "amp-jid";
+	private static final String     STATUS_ATTRIBUTE_NAME = "status";
 	private static final String[][] ELEMENTS             = {
 		{ "message" }, { "presence" }
 	};
@@ -185,45 +186,55 @@ public class MessageAmp
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) {
 		boolean processed = C2SDeliveryErrorProcessor.preProcess(packet, session, repo, results, settings);
-		if (processed && packet.getPacketFrom() != null && packet.getPacketFrom().equals(ampJID)) {
+		if (processed && packet.getPacketFrom() != null && packet.getPacketFrom().getLocalpart().equals(ampJID.getLocalpart())) {
 			processed = false;
 		}
 		if (processed) {
 			packet.processedBy(ID);
 		} else if (packet.getElemName() == Message.ELEM_NAME) {
 			Element amp = packet.getElement().getChild("amp", XMLNS);
-			if (amp == null || (amp.getAttributeStaticStr("status") != null) || ampJID.equals(packet.getPacketFrom())) {
+			if (amp == null
+//                      "Individual action definitions MAY provide their own requirements." regarding
+//                          "status" attribute requirement!!! applies to "alert" and "notify"
+                    || (amp.getAttributeStaticStr(STATUS_ATTRIBUTE_NAME) != null)
+					|| ampJID.equals(packet.getPacketFrom())) {
 				return false;
 			}
 			
 			try {
-				Packet result = packet.copyElementOnly();
 
-				result.setPacketTo(ampJID);
-				results.offer(result);
 				if (session == null) {
+					Packet result = packet.copyElementOnly();
+					result.setPacketTo(ampJID);
+					results.offer(result);
 					result.getElement().addAttribute(OFFLINE, "1");
 					packet.processedBy(ID);
 	
 					return true;
 				}
-				if (session.isUserId(packet.getStanzaTo().getBareJID())) {
+				if (session.isUserId(packet.getStanzaTo().getBareJID()) && session.getjid() != null && session.getjid().equals( packet.getStanzaTo())) {
+					Packet result = packet.copyElementOnly();
+					result.setPacketTo(ampJID);
+					if ( packet.getStanzaTo().getResource() != null ){
+						result.getElement().addAttribute( TO_RES, session.getResource() );
+					}
+					results.offer(result);
 					boolean offline = !messageProcessor.hasConnectionForMessageDelivery(session);
 					if (offline) {
 						result.getElement().addAttribute(OFFLINE, "1");
-						packet.processedBy(ID);
-	
-						return true;					
 					}
-				} else {
-					JID connectionId = session.getConnectionId();
+					packet.processedBy(ID);
 
-					if (connectionId.equals(packet.getPacketFrom())) {
-						result.getElement().addAttribute(FROM_CONN_ID, connectionId.toString());
-					}
+					return true;
+//				} else {
+//					JID connectionId = session.getConnectionId();
+//
+//					if (connectionId.equals(packet.getPacketFrom())) {
+//						result.getElement().addAttribute(FROM_CONN_ID, connectionId.toString());
+//					}
 				}
-				packet.processedBy(ID);
-				return true;
+//				packet.processedBy(ID);
+				return false;
 			} catch (XMPPException ex) {
 				log.log(Level.SEVERE, "this should not happen", ex);
 			}
@@ -248,6 +259,7 @@ public class MessageAmp
 						}
 						results.addAll(packets);
 					}    // end of if (packets != null)
+
 				} catch (UserNotFoundException e) {
 					log.info("Something wrong, DB problem, cannot load offline messages. " + e);
 				}      // end of try-catch
@@ -262,11 +274,26 @@ public class MessageAmp
 		} else {
 			Element amp = packet.getElement().getChild("amp", XMLNS);
 
-			if ((amp == null) || (amp.getAttributeStaticStr("status") != null) || ampJID.equals(packet.getPacketFrom())) {
+			if ((amp == null)
+//					 "Individual action definitions MAY provide their own requirements." regarding
+//						"status" attribute requirement!!! applies to "alert" and "notify"
+					|| (amp.getAttributeStaticStr(STATUS_ATTRIBUTE_NAME) != null)
+					|| (packet.getPacketFrom() != null && ampJID.getLocalpart().equals(packet.getPacketFrom().getLocalpart()))) {
 				messageProcessor.process(packet, session, repo, results, settings);
 			} else {
-				// this should not happen as it is already handled in preprocessing stage
+				// when packet from user with AMP is sent we need to forward it to AMP
+				// for processing but we need to do this here and not in preProcess method
+				// as in other case other processors would not receive this packet at all!
+				JID connectionId = session.getConnectionId();
+				Packet result = packet.copyElementOnly();
+				if (connectionId.equals(packet.getPacketFrom())) {
+//					if (!session.isUserId(packet.getStanzaTo().getBareJID()))
+					result.getElement().addAttribute(FROM_CONN_ID, connectionId.toString());
+				}
+				result.setPacketTo(ampJID);
+				results.offer(result);
 			}
+
 		}
 	}
 

@@ -68,6 +68,8 @@ public class PacketForwardCmd
 	 */
 	private static final Logger log = Logger.getLogger(PacketForwardCmd.class.getName());
 
+	public static final String PACKET_FROM_KEY = "packet-from";
+
 	//~--- fields ---------------------------------------------------------------
 
 	private DefaultClusteringStrategyAbstract strategy;
@@ -104,6 +106,9 @@ public class PacketForwardCmd
 			for (Element elem : packets) {
 				try {
 					Packet                 el_packet = Packet.packetInstance(elem);
+					String packetFromStr  = data.get(PACKET_FROM_KEY);
+					if (packetFromStr != null)
+						el_packet.setPacketFrom(JID.jidInstanceNS(packetFromStr));
 					XMPPResourceConnection conn      = sm.getXMPPResourceConnection(el_packet);
 					Map<String, String>    locdata   = null;
 
