@@ -298,6 +298,7 @@ New Minor Features & Behavior Changes
 - link:https://projects.tigase.org/issues/3670[#3670] Hardened mode now uses long DH keys (2048) by default.
 - link:https://projects.tigase.org/issues/3849[#3849] New Roster size limit configurable setting. See info xref:rosterLimit[Here].
 - link:https://projects.tigase.org/issues/3872[#3872] PostgreSQL driver updated to v9.4
+- link:https://projects.tigase.org/issues/3937[#3937] Windows setup given one-click solution to file initialization.
 
 
 Fixes
