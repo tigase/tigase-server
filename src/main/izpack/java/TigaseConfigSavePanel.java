@@ -261,11 +261,11 @@ class TigaseConfigSaveHelper {
 			if (varName.equals(TigaseConfigConst.HTTP_COMP)) {
 				if (varValue.equals("on")) {
 					++comp_idx;
-					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "rest");
+					TigaseConfigConst.props.setProperty("--comp-name-"+comp_idx, "http");
 					TigaseConfigConst.props.setProperty("--comp-class-"+comp_idx,
 						TigaseConfigConst.HTTP_COMP_CLASS);
 				}
-				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "rest" + " % to:" + "--comp-class-"+comp_idx + "=" + TigaseConfigConst.HTTP_COMP_CLASS);
+				Debug.trace("Set: " + "--comp-name-"+comp_idx + " = " + "http" + " % to:" + "--comp-class-"+comp_idx + "=" + TigaseConfigConst.HTTP_COMP_CLASS);
 				continue;
 			}
 			if (varName.equals(TigaseConfigConst.ARCHIVE_COMP)) {

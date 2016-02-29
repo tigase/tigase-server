@@ -90,7 +90,7 @@ public abstract class TigaseConfigConst {
 	public static final String SOCKS5_COMP_CLASS = "tigase.socks5.Socks5ProxyComponent";
 	public static final String STUN_COMP_CLASS = "tigase.stun.StunComponent";
 	public static final String ARCHIVE_COMP_CLASS = "tigase.archive.MessageArchiveComponent";
-	public static final String HTTP_COMP_CLASS = "tigase.http.rest.RestMessageReceiver";
+	public static final String HTTP_COMP_CLASS = "tigase.http.HttpMessageReceiver";
 	public static final String ACS_COMP_CLASS = "tigase.cluster.strategy.OnlineUsersCachingStrategy";
 	public static final String ACS_MUC_COMP_CLASS = "tigase.muc.cluster.MUCComponentClustered";
 	public static final String ACS_PUBSUB_COMP_CLASS = "tigase.pubsub.cluster.PubSubComponentClustered";
