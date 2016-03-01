@@ -60,16 +60,6 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 	protected Map<String, Object> getConfiguration(BeanConfig beanConfig) {
 		final HashMap<String, Object> valuesToSet = new HashMap<>();
 
-		// Preparing set of properties based on given properties set
-		HashSet<String> beanProps = getBeanProps(beanConfig.getBeanName());
-		for (String key : beanProps) {
-			String[] tmp = key.split("/");
-			final String property = tmp[1];
-			final Object value = props.get(key);
-
-			valuesToSet.put(property, value);
-		}
-
 		// Preparing set of properties based on @ConfigField annotation and
 		// aliases
 		Field[] fields = DependencyManager.getAllFields(beanConfig.getClazz());
@@ -89,6 +79,17 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 				valuesToSet.put(field.getName(), value);
 			}
 		}
+		// Preparing set of properties based on given properties set
+		HashSet<String> beanProps = getBeanProps(beanConfig.getBeanName());
+		for (String key : beanProps) {
+			String[] tmp = key.split("/");
+			final String property = tmp[1];
+			final Object value = props.get(key);
+
+			valuesToSet.put(property, value);
+		}
+
+
 		return valuesToSet;
 	}
 

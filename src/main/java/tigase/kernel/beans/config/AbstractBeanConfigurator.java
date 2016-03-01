@@ -189,6 +189,14 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		}
 	}
 
+	public boolean isAccessToAllFields() {
+		return accessToAllFields;
+	}
+
+	public void setAccessToAllFields(boolean accessToAllFields) {
+		this.accessToAllFields = accessToAllFields;
+	}
+
 	public void restoreDefaults(String beanName) {
 		BeanConfig beanConfig = kernel.getDependencyManager().getBeanConfig(beanName);
 		Object bean = kernel.getInstance(beanName);
