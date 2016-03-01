@@ -6,6 +6,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
+import tigase.kernel.DefaultTypesConverter;
 import tigase.kernel.core.Kernel;
 import tigase.xmpp.JID;
 
@@ -26,6 +27,7 @@ public class PropertiesBeanConfiguratorTest {
 
 
 		Kernel k = new Kernel("test");
+		k.registerBean(DefaultTypesConverter.class).exec();
 		k.registerBean(PropertiesBeanConfigurator.class).exec();
 		k.registerBean(Bean1.class).exec();
 
