@@ -2,9 +2,7 @@ package tigase.map;
 
 import java.util.Map;
 
-import tigase.disteventbus.local.Event;
-
-public class MapDestroyedEvent implements Event {
+public class MapDestroyedEvent {
 
 	private final Map map;
 	private final String type;

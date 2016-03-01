@@ -3,10 +3,11 @@ package tigase.monitor.tasks;
 import java.util.Date;
 import java.util.HashSet;
 
-import tigase.disteventbus.EventBus;
+import tigase.eventbus.EventBus;
 import tigase.form.Field;
 import tigase.form.Form;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.InfoTask;
@@ -16,28 +17,26 @@ import tigase.util.DateTimeFormatter;
 import tigase.xml.Element;
 
 @Bean(name = "load-checker-task")
-public class LoadCheckerTask extends AbstractConfigurableTimerTask implements InfoTask {
+public class LoadCheckerTask extends AbstractConfigurableTimerTask implements InfoTask, Initializable {
 
+	public static final String MONITOR_EVENT_NAME = "tigase.monitor.tasks.LoadAverageMonitorEvent";
 	private final static DateTimeFormatter dtf = new DateTimeFormatter();
-
-	public static final String MONITOR_EVENT_NAME = "LoadAverageMonitorEvent";
-
+	private final HashSet<String> triggeredEvents = new HashSet<String>();
 	@ConfigField(desc = "Average Load Threshold")
 	private long averageLoadThreshold = 10;
-
 	@Inject
 	private MonitorComponent component;
-
 	@Inject
 	private EventBus eventBus;
-
 	@Inject
 	private MonitorRuntime runtime;
 
-	private final HashSet<String> triggeredEvents = new HashSet<String>();
-
 	public long getAverageLoadThreshold() {
 		return averageLoadThreshold;
+	}
+
+	public void setAverageLoadThreshold(Long averageLoadThreshold) {
+		this.averageLoadThreshold = averageLoadThreshold;
 	}
 
 	@Override
@@ -59,11 +58,15 @@ public class LoadCheckerTask extends AbstractConfigurableTimerTask implements In
 	}
 
 	@Override
+	public void initialize() {
+		eventBus.registerEvent(MONITOR_EVENT_NAME, "Fired when load is too high", false);
+	}
+
+	@Override
 	protected void run() {
 		double curAverageLoad = runtime.getLoadAverage();
 		if (curAverageLoad >= averageLoadThreshold) {
-			Element event = new Element(MONITOR_EVENT_NAME, new String[] { "xmlns" },
-					new String[] { MonitorComponent.EVENTS_XMLNS });
+			Element event = new Element(MONITOR_EVENT_NAME);
 			event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
 			event.addChild(new Element("hostname", component.getDefHostName().toString()));
 			event.addChild(new Element("averageLoad", Double.toString(curAverageLoad)));
@@ -77,10 +80,6 @@ public class LoadCheckerTask extends AbstractConfigurableTimerTask implements In
 		} else {
 			triggeredEvents.remove(MONITOR_EVENT_NAME);
 		}
-	}
-
-	public void setAverageLoadThreshold(Long averageLoadThreshold) {
-		this.averageLoadThreshold = averageLoadThreshold;
 	}
 
 	@Override

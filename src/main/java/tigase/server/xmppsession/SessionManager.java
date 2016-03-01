@@ -115,7 +115,6 @@ import tigase.xmpp.XMPPImplIfc;
 import tigase.xmpp.XMPPPacketFilterIfc;
 import tigase.xmpp.XMPPPostprocessorIfc;
 import tigase.xmpp.XMPPPreprocessorIfc;
-import tigase.xmpp.XMPPPresenceUpdateProcessorIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
@@ -130,9 +129,10 @@ import tigase.annotations.TigaseDeprecatedComponent;
 import tigase.stats.StatisticsList;
 
 import java.util.Collection;
-import tigase.disteventbus.EventBus;
-import tigase.disteventbus.EventBusFactory;
-import tigase.disteventbus.clustered.EventHandler;
+import tigase.eventbus.EventBus;
+import tigase.eventbus.EventBusFactory;
+import tigase.eventbus.HandleEvent;
+import tigase.eventbus.events.ShutdownEvent;
 
 /**
  * Class SessionManager
@@ -196,8 +196,6 @@ public class SessionManager
 			new StaleConnectionCloser();
 	private Map<String, XMPPProcessorIfc> processors = new ConcurrentHashMap<String,
 			XMPPProcessorIfc>(32);
-	private Map<String, XMPPPresenceUpdateProcessorIfc> presenceProcessors =
-			new ConcurrentHashMap<String, XMPPPresenceUpdateProcessorIfc>();
 	private Map<String, XMPPPreprocessorIfc> preProcessors = new ConcurrentHashMap<String,
 			XMPPPreprocessorIfc>(10);
 
@@ -217,9 +215,6 @@ public class SessionManager
 	private ConnectionCheckCommandHandler connectionCheckCommandHandler =
 			new ConnectionCheckCommandHandler();
 
-	/** Field description */
-	protected Queue<Packet> packetWriterQueue = new WriterQueue<Packet>();
-
 	/**
 	 * A Map with connectionID as a key and an object with all the user connection
 	 * data as a value
@@ -228,10 +223,6 @@ public class SessionManager
 			new ConcurrentHashMap<JID, XMPPResourceConnection>(100000);
 	private int activeUserNumber = 0;
 
-	private EventHandler shutdownEventHandler = (String name, String xmlns, Element event) -> {
-		nodeShutdown(event.getAttributeStaticStr("node"), Integer.parseInt(event.getAttributeStaticStr("delay")), 
-				event.getChildCData((e) -> e.getName().equals("msg")));
-	};
 	private NodeShutdownTask nodeShutdownTask = new NodeShutdownTask();
 	
 	//~--- methods --------------------------------------------------------------
@@ -381,13 +372,11 @@ public class SessionManager
 			log.log(Level.WARNING, "No implementation found for plugin id: {0}", plug_id);
 		}    // end of if (!loaded)
 		if (result != null) {
-			allPlugins.add(result);
+			if (allPlugins.add(result))
+				eventBus.registerAll(result);
 			if (result instanceof PresenceCapabilitiesManager.PresenceCapabilitiesListener) {
 				PresenceCapabilitiesManager.registerPresenceHandler((PresenceCapabilitiesManager
 						.PresenceCapabilitiesListener) result);
-			}
-			if (result instanceof XMPPPresenceUpdateProcessorIfc) {
-				presenceProcessors.put(result.id(), (XMPPPresenceUpdateProcessorIfc) result);
 			}
 		}
 
@@ -584,12 +573,10 @@ public class SessionManager
 			allPlugins.remove(p);
 		}
 		if (p != null) {
+			eventBus.unregisterAll(p);
 			if (p instanceof PresenceCapabilitiesManager.PresenceCapabilitiesListener) {
 				PresenceCapabilitiesManager.unregisterPresenceHandler((PresenceCapabilitiesManager
 						.PresenceCapabilitiesListener) p);
-			}
-			if (p instanceof XMPPPresenceUpdateProcessorIfc) {
-				presenceProcessors.remove(plug_id);
 			}
 		}
 	}
@@ -601,12 +588,12 @@ public class SessionManager
 	@Override
 	public void start() {
 		super.start();
-		eventBus.addHandler("shutdown", "tigase:server", shutdownEventHandler);
+		eventBus.registerAll(this);
 	}
 	
 	@Override
 	public void stop() {
-		eventBus.removeHandler("shutdown", "tigase:server", shutdownEventHandler);
+		eventBus.unregisterAll(this);
 		super.stop();
 		List<String> pluginsToStop = new ArrayList<String>(workerThreads.keySet());
 		for (String plugin_id : pluginsToStop) {
@@ -2032,23 +2019,8 @@ public class SessionManager
 
 	protected void processPresenceUpdate(XMPPSession session, Element packet) {
 		try {
-			if (presenceProcessors.isEmpty()) {
-				return;
-			}
-
 			Packet presence = Packet.packetInstance(packet);
-
-			for (XMPPResourceConnection conn : session.getActiveResources()) {
-				for (XMPPPresenceUpdateProcessorIfc proc : presenceProcessors.values()) {
-					try {
-						proc.presenceUpdate(conn, presence, packetWriterQueue);
-					} catch (NotAuthorizedException ex) {
-						log.log(Level.SEVERE, "exception processing presence update for " +
-								"session = {0} and packet = {1}", new Object[] { session,
-								packet });
-					}
-				}
-			}
+			eventBus.fire(new UserPresenceChangedEvent(session, presence));
 		} catch (TigaseStringprepException ex) {
 
 			// should not happen
@@ -2155,14 +2127,15 @@ public class SessionManager
 		return 2;
 	}
 
-	protected void nodeShutdown(String node, int delaySecs, String msg) {
+	@HandleEvent
+	protected void nodeShutdown(ShutdownEvent event) {
 		// if not this node is being shutdown then do nothing
-		if (!node.equals(getComponentId().getDomain()))
+		if (!event.getNode().equals(getComponentId().getDomain()))
 			return;
 		
-		if (msg != null) {
+		if (event.getMessage() != null) {
 			Element msgEl = new Element("message", new String[] { Packet.XMLNS_ATT }, new String[] { Packet.CLIENT_XMLNS });
-			msgEl.addChild(new Element("body", msg));
+			msgEl.addChild(new Element("body", event.getMessage()));
 			for (XMPPResourceConnection conn : connectionsByFrom.values()) {
 				try {
 					Element packetEl = msgEl.clone();
@@ -2178,7 +2151,7 @@ public class SessionManager
 		
 		// schedule close of existing session after 30 seconds to make sure that
 		// other components will be aware that we are stopping this server
-		addTimerTask(nodeShutdownTask, delaySecs * SECOND, 1 * SECOND);
+		addTimerTask(nodeShutdownTask, event.getDelay() * SECOND, 1 * SECOND);
 	}
 	
 	//~--- get methods ----------------------------------------------------------
@@ -2937,40 +2910,6 @@ public class SessionManager
 			}
 		}
 	}
-
-
-	protected class WriterQueue<E extends Packet>
-					extends AbstractQueue<E> {
-		@Override
-		public Iterator<E> iterator() {
-			throw new UnsupportedOperationException(
-					"Not supported yet.");    // To change body of generated methods, choose Tools | Templates.
-		}
-
-		@Override
-		public boolean offer(E packet) {
-			return SessionManager.this.addOutPacket(packet);
-		}
-
-		@Override
-		public E peek() {
-			throw new UnsupportedOperationException(
-					"Not supported yet.");    // To change body of generated methods, choose Tools | Templates.
-		}
-
-		@Override
-		public E poll() {
-			throw new UnsupportedOperationException(
-					"Not supported yet.");    // To change body of generated methods, choose Tools | Templates.
-		}
-
-		@Override
-		public int size() {
-			throw new UnsupportedOperationException(
-					"Not supported yet.");    // To change body of generated methods, choose Tools | Templates.
-		}
-	}
-
 
 	@Override
 	public void handleDomainChange(final String domain, final XMPPResourceConnection conn) {

@@ -5,10 +5,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import tigase.conf.ConfiguratorAbstract;
-import tigase.disteventbus.EventBus;
+import tigase.eventbus.EventBus;
 import tigase.form.Field;
 import tigase.form.Form;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.InfoTask;
@@ -19,11 +20,11 @@ import tigase.util.DateTimeFormatter;
 import tigase.xml.Element;
 
 @Bean(name = "connections-task")
-public class ConnectionsTask extends AbstractConfigurableTimerTask implements InfoTask {
+public class ConnectionsTask extends AbstractConfigurableTimerTask implements InfoTask, Initializable {
 
 	protected final static DateTimeFormatter dtf = new DateTimeFormatter();
 	protected static final Logger log = Logger.getLogger(ConnectionsTask.class.getName());
-	private static final String USERS_DISCONNECTEED_EVENT_NAME = "UsersDisconnected";
+	private static final String USERS_DISCONNECTEED_EVENT_NAME = "tigase.monitor.tasks.UsersDisconnected";
 	@Inject
 	protected MonitorComponent component;
 	@Inject
@@ -60,8 +61,7 @@ public class ConnectionsTask extends AbstractConfigurableTimerTask implements In
 			if (log.isLoggable(Level.FINE))
 				log.fine("Creating event!");
 
-			Element event = new Element(USERS_DISCONNECTEED_EVENT_NAME, new String[] { "xmlns" },
-					new String[] { MonitorComponent.EVENTS_XMLNS });
+			Element event = new Element(USERS_DISCONNECTEED_EVENT_NAME);
 			event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
 			event.addChild(new Element("disconnections", "" + (-1 * delta)));
 			event.addChild(new Element("disconnectionsPercent", "" + (-1 * percent)));
@@ -100,6 +100,12 @@ public class ConnectionsTask extends AbstractConfigurableTimerTask implements In
 
 	public void setThresholdMinimal(int thresholdMinimal) {
 		this.thresholdMinimal = thresholdMinimal;
+	}
+
+	@Override
+	public void initialize() {
+		eventBus.registerEvent(USERS_DISCONNECTEED_EVENT_NAME, "Fired when too many users disconnected in the same time",
+				false);
 	}
 
 	@Override

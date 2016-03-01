@@ -42,6 +42,7 @@ import tigase.conf.ConfigurationException;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
+import tigase.eventbus.EventBusFactory;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.osgi.OSGiScriptEngineManager;
 import tigase.stats.StatisticsList;
@@ -76,7 +77,6 @@ import java.util.logging.Logger;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngineFactory;
-import tigase.disteventbus.EventBusFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 

@@ -1,11 +1,25 @@
-package tigase.component;
+/*
+ * AbstractKernelBasedComponent.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ */
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+package tigase.component;
 
 import javax.script.ScriptEngineManager;
 
@@ -16,11 +30,9 @@ import tigase.component.responses.AsyncCallback;
 import tigase.component.responses.ResponseManager;
 import tigase.conf.ConfigurationException;
 import tigase.disco.XMPPService;
-import tigase.disteventbus.EventBus;
-import tigase.disteventbus.EventBusFactory;
-import tigase.disteventbus.local.Event;
-import tigase.disteventbus.local.EventHandler;
-import tigase.disteventbus.local.RegistrationException;
+import tigase.eventbus.EventBus;
+import tigase.eventbus.EventBusFactory;
+import tigase.kernel.DefaultTypesConverter;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.BeanConfigurator;
@@ -28,7 +40,13 @@ import tigase.kernel.core.Kernel;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.DisableDisco;
 import tigase.server.Packet;
-import tigase.xml.Element;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiver implements XMPPService, DisableDisco {
 
@@ -37,64 +55,7 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 	 * Logger
 	 */
 	protected final Logger log = Logger.getLogger(this.getClass().getName());
-	protected final EventBus eventBus = new EventBus() {
-
-		private final EventBus eventBus = EventBusFactory.getInstance();
-
-		@Override
-		public void addHandler(String name, String xmlns, tigase.disteventbus.clustered.EventHandler handler) {
-			eventBus.addHandler(name, xmlns, handler);
-		}
-
-		@Override
-		public void addHandler(Class<? extends Event> type, EventHandler handler) {
-			eventBus.addHandler(type, handler);
-		}
-
-		@Override
-		public void addHandler(EventHandler handler) {
-			eventBus.addHandler(handler);
-		}
-
-		@Override
-		public void fire(Element event) {
-			event.setAttribute("eventSource", getComponentId().toString());
-			event.setAttribute("eventTimestamp", Long.toString(System.currentTimeMillis()));
-
-			eventBus.fire(event);
-		}
-
-		@Override
-		public void fire(Event e) {
-			eventBus.fire(e);
-		}
-
-		@Override
-		public void registerAll(Object consumer) throws RegistrationException {
-			eventBus.registerAll(consumer);
-		}
-
-		@Override
-		public void remove(Class<? extends Event> type, EventHandler handler) {
-			eventBus.remove(type, handler);
-		}
-
-		@Override
-		public void remove(EventHandler handler) {
-			eventBus.remove(handler);
-		}
-
-		@Override
-		public void removeHandler(String name, String xmlns, tigase.disteventbus.clustered.EventHandler handler) {
-			eventBus.removeHandler(name, xmlns, handler);
-		}
-
-		@Override
-		public void unregisterAll(Object consumer) {
-			eventBus.unregisterAll(consumer);
-		}
-
-	};
+	protected final EventBus eventBus = EventBusFactory.getInstance();
 	private StanzaProcessor stanzaProcessor;
 
 	protected void changeRegisteredBeans(Map<String, Object> props) throws ConfigurationException, InstantiationException,
@@ -153,9 +114,11 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 		if (props.size() <= 1)
 			return;
 
+		kernel.registerBean(DefaultTypesConverter.class).exec();
 		kernel.registerBean("component").asInstance(this).exec();
 		kernel.registerBean("adHocCommandManager").asClass(AdHocCommandManager.class).exec();
 		kernel.registerBean("eventBus").asInstance(eventBus).exec();
+		kernel.registerBean("eventBusRegistrar").asInstance(EventBusFactory.getRegistrar()).exec();
 		kernel.registerBean("scriptCommandProcessor").asClass(ComponenScriptCommandProcessor.class).exec();
 		kernel.registerBean("writer").asClass(DefaultPacketWriter.class).exec();
 		kernel.registerBean("stanzaProcessor").asClass(StanzaProcessor.class).exec();

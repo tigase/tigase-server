@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import tigase.disteventbus.EventBus;
+import tigase.eventbus.EventBus;
 import tigase.form.Field;
 import tigase.form.Form;
 import tigase.kernel.beans.Bean;
@@ -25,24 +25,19 @@ import tigase.xml.Element;
 @Bean(name = "disk-task")
 public class DiskTask extends AbstractConfigurableTimerTask implements Initializable {
 
-	public static final String DISK_USAGE_MONITOR_EVENT_NAME = "DiskUsageMonitorEvent";
+	public static final String DISK_USAGE_MONITOR_EVENT_NAME = "tigase.monitor.tasks.DiskUsageMonitorEvent";
 
 	protected final static DateTimeFormatter dtf = new DateTimeFormatter();
 
 	private static final Logger log = Logger.getLogger(DiskTask.class.getName());
-
+	protected final HashSet<String> triggeredEvents = new HashSet<String>();
 	@Inject
 	protected MonitorComponent component;
-
 	@Inject
 	protected EventBus eventBus;
-
-	private File[] roots;
-
 	@ConfigField(desc = "Disk usage threshold")
 	protected float threshold = 0.8F;
-
-	protected final HashSet<String> triggeredEvents = new HashSet<String>();
+	private File[] roots;
 
 	public DiskTask() {
 		setPeriod(1000 * 60);
@@ -139,6 +134,7 @@ public class DiskTask extends AbstractConfigurableTimerTask implements Initializ
 
 	@Override
 	public void initialize() {
+		eventBus.registerEvent(DISK_USAGE_MONITOR_EVENT_NAME, "Fired if disk usage is too high", false);
 		findAllRoots();
 	}
 
@@ -147,8 +143,7 @@ public class DiskTask extends AbstractConfigurableTimerTask implements Initializ
 		for (File file : roots) {
 			if (file.getUsableSpace() < file.getTotalSpace() * (1 - threshold)) {
 
-				Element event = new Element(DISK_USAGE_MONITOR_EVENT_NAME, new String[] { "xmlns" },
-						new String[] { MonitorComponent.EVENTS_XMLNS });
+				Element event = new Element(DISK_USAGE_MONITOR_EVENT_NAME);
 				event.addChild(new Element("hostname", component.getDefHostName().toString()));
 				event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
 				event.addChild(new Element("hostname", component.getDefHostName().toString()));

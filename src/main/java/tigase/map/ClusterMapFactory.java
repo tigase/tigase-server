@@ -1,121 +1,83 @@
+/*
+ * ClusterMapFactory.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ */
+
 package tigase.map;
 
-import java.util.List;
+import tigase.eventbus.EventBus;
+import tigase.eventbus.EventBusFactory;
+import tigase.eventbus.HandleEvent;
+import tigase.kernel.DefaultTypesConverter;
+import tigase.kernel.TypesConverter;
+
+import java.io.Serializable;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import tigase.disteventbus.EventBus;
-import tigase.disteventbus.EventBusFactory;
-import tigase.disteventbus.clustered.EventHandler;
-import tigase.kernel.TypesConverter;
-import tigase.xml.Element;
-
 public class ClusterMapFactory {
 
-	private final static String MAP_XMLNS = "tigase:clustered:map";
-
-	private final static String MAP_CREATED_EVENT_NAME = "NewMapCreated";
-
-	private final static String MAP_DESTROYED_EVENT_NAME = "MapDestroyed";
-
-	private final static String MAP_CLEAR_EVENT_NAME = "MapClear";
-
-	private final static String ELEMENT_REMOVE_EVENT_NAME = "ElementRemove";
-
-	private final static String ELEMENT_ADD_EVENT_NAME = "ElementAdd";
 	private static ClusterMapFactory instance;
+	private final TypesConverter typesConverter = new DefaultTypesConverter();
 	private final ConcurrentHashMap<String, DMap> maps = new ConcurrentHashMap<>();
 	private EventBus eventBus;
-
 	private final DMap.DMapListener mapListener = new DMap.DMapListener() {
 		@Override
 		public void onClear(String mapID) {
-			Element event = new Element(MAP_CLEAR_EVENT_NAME, new String[] { "xmlns" }, new String[] { MAP_XMLNS });
-			event.addChild(new Element("uid", mapID));
+			MapClearEvent event = new MapClearEvent();
+			event.setUid(mapID);
 			eventBus.fire(event);
 		}
 
 		@Override
 		public void onPut(String mapID, Object key, Object value) {
-			Element event = new Element(ELEMENT_ADD_EVENT_NAME, new String[] { "xmlns" }, new String[] { MAP_XMLNS });
-			event.addChild(new Element("uid", mapID));
-
-			Element item = new Element("item");
-			item.addChild(new Element("key", TypesConverter.toString(key)));
-			item.addChild(new Element("value", TypesConverter.toString(value)));
-			event.addChild(item);
-
+			ElementAddEvent event = new ElementAddEvent();
+			event.setUid(mapID);
+			event.setKey(typesConverter.toString(key));
+			event.setValue(typesConverter.toString(value));
 			eventBus.fire(event);
 		}
 
 		@Override
 		public void onPutAll(String mapID, Map<?, ?> m) {
-			Element event = new Element(ELEMENT_ADD_EVENT_NAME, new String[] { "xmlns" }, new String[] { MAP_XMLNS });
-			event.addChild(new Element("uid", mapID));
-
 			for (Map.Entry<?, ?> en : m.entrySet()) {
-				Element item = new Element("item");
-				item.addChild(new Element("key", TypesConverter.toString(en.getKey())));
-				item.addChild(new Element("value", TypesConverter.toString(en.getValue())));
-				event.addChild(item);
+				ElementAddEvent event = new ElementAddEvent();
+				event.setUid(mapID);
+				event.setKey(typesConverter.toString(en.getKey()));
+				event.setValue(typesConverter.toString(en.getValue()));
+				eventBus.fire(event);
 			}
-			eventBus.fire(event);
 		}
 
 		@Override
 		public void onRemove(String mapID, Object key) {
-			Element event = new Element(ELEMENT_REMOVE_EVENT_NAME, new String[] { "xmlns" }, new String[] { MAP_XMLNS });
-			event.addChild(new Element("uid", mapID));
-			Element item = new Element("item");
-			item.addChild(new Element("key", TypesConverter.toString(key)));
-			event.addChild(item);
+			ElementRemoveEvent event = new ElementRemoveEvent();
+			event.setUid(mapID);
+			event.setKey(typesConverter.toString(key));
 			eventBus.fire(event);
 		}
 	};
 
 	ClusterMapFactory() {
 		this.eventBus = EventBusFactory.getInstance();
-		this.eventBus.addHandler(MAP_CREATED_EVENT_NAME, MAP_XMLNS, new EventHandler() {
-			@Override
-			public void onEvent(String name, String xmlns, Element event) {
-				if (event.getAttributeStaticStr("remote") != null) {
-					ClusterMapFactory.this.onNewMapCreated(event);
-				}
-			}
-		});
-		this.eventBus.addHandler(MAP_DESTROYED_EVENT_NAME, MAP_XMLNS, new EventHandler() {
-			@Override
-			public void onEvent(String name, String xmlns, Element event) {
-				if (event.getAttributeStaticStr("remote") != null) {
-					ClusterMapFactory.this.onMapDestroyed(event);
-				}
-			}
-		});
-		this.eventBus.addHandler(MAP_CLEAR_EVENT_NAME, MAP_XMLNS, new EventHandler() {
-			@Override
-			public void onEvent(String name, String xmlns, Element event) {
-				if (event.getAttributeStaticStr("remote") != null) {
-					ClusterMapFactory.this.onMapClear(event);
-				}
-			}
-		});
-		this.eventBus.addHandler(ELEMENT_ADD_EVENT_NAME, MAP_XMLNS, new EventHandler() {
-			@Override
-			public void onEvent(String name, String xmlns, Element event) {
-				if (event.getAttributeStaticStr("remote") != null) {
-					ClusterMapFactory.this.onMapElementAdd(event);
-				}
-			}
-		});
-		this.eventBus.addHandler(ELEMENT_REMOVE_EVENT_NAME, MAP_XMLNS, new EventHandler() {
-			@Override
-			public void onEvent(String name, String xmlns, Element event) {
-				if (event.getAttributeStaticStr("remote") != null) {
-					ClusterMapFactory.this.onMapElementRemove(event);
-				}
-			}
-		});
+		this.eventBus.registerAll(this);
 	}
 
 	public static final ClusterMapFactory get() {
@@ -129,31 +91,27 @@ public class ClusterMapFactory {
 			final String... params) {
 		final String uid = UUID.randomUUID().toString();
 
-		Element event = new Element(MAP_CREATED_EVENT_NAME, new String[] { "xmlns" }, new String[] { MAP_XMLNS });
-		event.addChild(new Element("type", type));
-		event.addChild(new Element("uid", uid));
-		event.addChild(new Element("keyClass", keyClass.getName()));
-		event.addChild(new Element("valueClass", valueClass.getName()));
-		if (params != null) {
-			for (String param : params) {
-				event.addChild(new Element("param", param));
-			}
-		}
+		NewMapCreatedEvent event = new NewMapCreatedEvent();
+		event.setType(type);
+		event.setUid(uid);
+		event.setKeyClass(keyClass);
+		event.setValueClass(valueClass);
+		event.setParams(params);
 		eventBus.fire(event);
 
-		DMap<K, V> map = new DMap<K, V>(uid, type, this.mapListener, keyClass, valueClass);
-		maps.put(uid, map);
+		DMap<K, V> map = maps.computeIfAbsent(uid, (u) -> new DMap<K, V>(uid, type, this.mapListener, keyClass, valueClass));
 
 		return map;
 	}
 
 	public void destroyMap(Map map) {
 		if (map instanceof DMap) {
-			Element event = new Element(MAP_DESTROYED_EVENT_NAME, new String[] { "xmlns" }, new String[] { MAP_XMLNS });
-			event.addChild(new Element("uid", ((DMap) map).mapID));
-			event.addChild(new Element("type", ((DMap) map).type));
+			MapDestroyEvent event = new MapDestroyEvent();
+			event.setUid(((DMap) map).mapID);
+			event.setType(((DMap) map).type);
+
 			eventBus.fire(event);
-			this.maps.remove(((DMap) map).mapID);
+			this.maps.remove(((DMap) map).mapID, map);
 		}
 	}
 
@@ -179,64 +137,196 @@ public class ClusterMapFactory {
 		return this.maps.get(uid);
 	}
 
-	void onMapClear(Element event) {
-		final String uid = event.getCData(new String[] { MAP_CLEAR_EVENT_NAME, "uid" });
+	@HandleEvent(filter = HandleEvent.Type.remote)
+	void onMapClear(MapClearEvent event) {
+		final String uid = event.getUid();
 		DMap map = this.maps.get(uid);
 		map.clearNoEvent();
 	}
 
-	void onMapDestroyed(Element event) {
-		final String uid = event.getCData(new String[] { MAP_DESTROYED_EVENT_NAME, "uid" });
+	@HandleEvent(filter = HandleEvent.Type.remote)
+	void onMapDestroyed(MapDestroyEvent event) {
+		final String uid = event.getUid();
 		DMap map = this.maps.remove(uid);
 		if (map != null) {
 			fireOnMapDestroyed(map, map.type);
 		}
 	}
 
-	void onMapElementAdd(Element event) {
-		final String uid = event.getCData(new String[] { ELEMENT_ADD_EVENT_NAME, "uid" });
+	@HandleEvent(filter = HandleEvent.Type.remote)
+	void onMapElementAdd(ElementAddEvent event) {
+		final String uid = event.getUid();
 		final DMap map = this.maps.get(uid);
 
-		List<Element> items = event.findChildren(e -> e.getName().equals("item"));
-		for (Element el : items) {
-			String k = el.getCData(new String[] { "item", "key" });
-			String v = el.getCData(new String[] { "item", "value" });
+		String k = event.getKey();
+		String v = event.getValue();
 
-			Object key = TypesConverter.convert(k, map.keyClass);
-			Object value = TypesConverter.convert(v, map.valueClass);
+		Object key = typesConverter.convert(k, map.keyClass);
+		Object value = typesConverter.convert(v, map.valueClass);
 
-			map.putNoEvent(key, value);
-		}
-
+		map.putNoEvent(key, value);
 	}
 
-	void onMapElementRemove(Element event) {
-		final String uid = event.getCData(new String[] { ELEMENT_REMOVE_EVENT_NAME, "uid" });
+	@HandleEvent(filter = HandleEvent.Type.remote)
+	void onMapElementRemove(ElementRemoveEvent event) {
+		final String uid = event.getUid();
 		DMap map = this.maps.get(uid);
 
-		List<Element> items = event.findChildren(e -> e.getName().equals("item"));
-		for (Element el : items) {
-			String k = el.getCData(new String[] { "item", "key" });
-			Object key = TypesConverter.convert(k, map.keyClass);
-			map.removeNoEvent(key);
-		}
+		String k = event.getKey();
+		Object key = typesConverter.convert(k, map.keyClass);
+		map.removeNoEvent(key);
 	}
 
-	void onNewMapCreated(final Element event) {
-		final String uid = event.getCData(new String[] { MAP_CREATED_EVENT_NAME, "uid" });
-		final String type = event.getCData(new String[] { MAP_CREATED_EVENT_NAME, "type" });
-		final Class keyClass = TypesConverter.convert(event.getCData(new String[] { MAP_CREATED_EVENT_NAME, "keyClass" }),
-				Class.class);
-		final Class valueClass = TypesConverter.convert(event.getCData(new String[] { MAP_CREATED_EVENT_NAME, "valueClass" }),
-				Class.class);
+	@HandleEvent(filter = HandleEvent.Type.remote)
+	void onNewMapCreated(final NewMapCreatedEvent event) {
+		final String uid = event.getUid();
+		final String type = event.getType();
+		final Class keyClass = event.getKeyClass();
+		final Class valueClass = event.getValueClass();
 
-		String[] parameters = event.mapChildren(element -> element.getName().equals("param"),
-				element -> element.getCData()).toArray(new String[] {});
+		String[] parameters = event.getParams();
 
 		DMap map = new DMap(uid, type, mapListener, keyClass, valueClass);
 		maps.put(uid, map);
 
 		fireOnMapCreated(map, type, parameters);
+	}
+
+	public static class NewMapCreatedEvent implements Serializable {
+
+		private String type;
+		private String uid;
+		private Class keyClass;
+		private Class valueClass;
+		private String[] params;
+
+		public Class getKeyClass() {
+			return keyClass;
+		}
+
+		public void setKeyClass(Class keyClass) {
+			this.keyClass = keyClass;
+		}
+
+		public String[] getParams() {
+			return params;
+		}
+
+		public void setParams(String[] params) {
+			this.params = params;
+		}
+
+		public String getType() {
+			return type;
+		}
+
+		public void setType(String type) {
+			this.type = type;
+		}
+
+		public String getUid() {
+			return uid;
+		}
+
+		public void setUid(String uid) {
+			this.uid = uid;
+		}
+
+		public Class getValueClass() {
+			return valueClass;
+		}
+
+		public void setValueClass(Class valueClass) {
+			this.valueClass = valueClass;
+		}
+	}
+
+	public static class MapDestroyEvent implements Serializable {
+
+		private String uid;
+		private String type;
+
+		public String getType() {
+			return type;
+		}
+
+		public void setType(String type) {
+			this.type = type;
+		}
+
+		public String getUid() {
+			return uid;
+		}
+
+		public void setUid(String uid) {
+			this.uid = uid;
+		}
+	}
+
+	public static class MapClearEvent implements Serializable {
+
+		private String uid;
+
+		public String getUid() {
+			return uid;
+		}
+
+		public void setUid(String uid) {
+			this.uid = uid;
+		}
+	}
+
+	public static class ElementRemoveEvent implements Serializable {
+
+		private String uid;
+		private String key;
+
+		public String getKey() {
+			return key;
+		}
+
+		public void setKey(String key) {
+			this.key = key;
+		}
+
+		public String getUid() {
+			return uid;
+		}
+
+		public void setUid(String uid) {
+			this.uid = uid;
+		}
+	}
+
+	public static class ElementAddEvent implements Serializable {
+
+		private String uid;
+		private String key;
+		private String value;
+
+		public String getKey() {
+			return key;
+		}
+
+		public void setKey(String key) {
+			this.key = key;
+		}
+
+		public String getUid() {
+			return uid;
+		}
+
+		public void setUid(String uid) {
+			this.uid = uid;
+		}
+
+		public String getValue() {
+			return value;
+		}
+
+		public void setValue(String value) {
+			this.value = value;
+		}
 	}
 
 }

@@ -36,9 +36,14 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tigase.db.NonAuthUserRepository;
+import tigase.eventbus.EventBus;
+import tigase.eventbus.EventBusFactory;
+import tigase.eventbus.HandleEvent;
 import tigase.server.Iq;
 import tigase.server.Message;
 import tigase.server.Packet;
+import tigase.server.xmppsession.UserPresenceChangedEvent;
+import tigase.server.xmppsession.UserSessionEvent;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
@@ -47,10 +52,10 @@ import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPPacketFilterIfc;
-import tigase.xmpp.XMPPPresenceUpdateProcessorIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.XMPPSession;
 
 /**
  * MessageCarbons class implements XEP-0280 Message Carbons protocol extension.
@@ -59,8 +64,7 @@ import tigase.xmpp.XMPPResourceConnection;
  */
 public class MessageCarbons 
 				extends XMPPProcessor
-				implements XMPPProcessorIfc, XMPPPacketFilterIfc,
-				XMPPPresenceUpdateProcessorIfc
+				implements XMPPProcessorIfc, XMPPPacketFilterIfc
 				{    
 
 	private static final Logger log = Logger.getLogger(MessageCarbons.class.getCanonicalName());
@@ -86,6 +90,7 @@ public class MessageCarbons
 	
 	private static final Function<String,Object> RESOURCES_MAP_FACTORY = (k) -> { return new ConcurrentHashMap<JID,Boolean>(); };
 	
+	private final EventBus eventBus = EventBusFactory.getInstance();
 	private tigase.xmpp.impl.Message messageProcessor = new tigase.xmpp.impl.Message();
 	
 	@Override
@@ -110,39 +115,9 @@ public class MessageCarbons
 				results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, null, false));
 			}
 			else {
-				JID sessionJid = session.getJID();				
-				if (packet.getStanzaFrom() != null && !sessionJid.equals(packet.getStanzaFrom())
-						&& session.isUserId(packet.getStanzaFrom().getBareJID()) && packet.getStanzaFrom().getResource() != null) {
-					
-					// direct notification about state of MessageCarbons for other resource
-					Map<JID,Boolean> resources = (Map<JID,Boolean>) session.getCommonSessionData(ENABLED_RESOURCES_KEY);
-					if (resources == null) {
-						synchronized (session.getParentSession()) {
-							resources = (Map<JID, Boolean>) session.getCommonSessionData(ENABLED_RESOURCES_KEY);
-							if (resources == null) {
-								resources = new ConcurrentHashMap<JID, Boolean>();
-								session.putCommonSessionData(ENABLED_RESOURCES_KEY, resources);
-							}
-						}
-					}					
-					if (log.isLoggable(Level.FINER)) {
-						log.log(Level.FINER, "received state notification from {0} with value = {1}", 
-								new Object[]{packet.getStanzaFrom(), enable});
-					}
-					Boolean oldValue = resources.put(packet.getStanzaFrom(), enable);
-					if (oldValue == null) {
-						// if it is first info about this resource then notify it about
-						// state of MC for other resources
-						for (XMPPResourceConnection conn : session.getActiveSessions()) {
-							notifyStateChanged(conn.getJID(), packet.getStanzaFrom(), isEnabled(conn), results);
-						}
-					}						
-				}
-				else {
-					setEnabled(session, enable, results);
-					// send result of operation
-					results.offer(packet.okResult((Element) null, 0));
-				}
+				setEnabled(session, enable);
+				// send result of operation
+				results.offer(packet.okResult((Element) null, 0));
 			}
 		}
 		else if (packet.getElemName() == Message.ELEM_NAME && packet.getType() == StanzaType.chat 
@@ -294,27 +269,16 @@ public class MessageCarbons
 	 * @param value
 	 * @throws NotAuthorizedException 
 	 */
-	private static void setEnabled(XMPPResourceConnection session, boolean value, Queue<Packet> results) throws NotAuthorizedException {
+	private void setEnabled(XMPPResourceConnection session, boolean value) throws NotAuthorizedException {
 		session.putSessionData(ENABLED_KEY, value);
 
-		Map<JID,Boolean> resources = (Map<JID,Boolean>) session.getCommonSessionData(ENABLED_RESOURCES_KEY);
-		
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "session = {0}" + " enabling " + XMLNS + 
-					", resources to notify = {1}", new Object[]{
-						session, resources == null ? "null" : resources.size()});
+			log.log(Level.FINER, "session = {0}" + " enabling " + XMLNS, session);
 		}
 		
-		if (resources != null) {
-			JID fromJid = session.getJID();
-			for (JID jid : resources.keySet()) {
-				
-				if (jid.equals(fromJid))
-					continue;
-				
-				notifyStateChanged(fromJid, jid, value, results);
-			}
-		}
+		MessageCarbonsStateChangedEvent event = new MessageCarbonsStateChangedEvent(session.getJID(), session.getJID().copyWithoutResource(), session.getParentSession());
+		event.add(session.getJID(), value);
+		eventBus.fire(event);
 	}
 	
 	/**
@@ -330,34 +294,37 @@ public class MessageCarbons
 	}
 	
 	/**
-	 * Prepares MC state change notification
+	 * Method responsible for handing <code>MessageCarbonsStateChangedEvent</code>
+	 * and marking JIDs of user as MessageCarbons enabled/disabled.
 	 * 
-	 * @param from
-	 * @param to
-	 * @param value
-	 * @param results 
+	 * @param event 
 	 */
-	private static void notifyStateChanged(JID from, JID to, boolean value, Queue<Packet> results) {
-		if (from.equals(to))
-			return;
-		
-		Element iq = new Element("iq", new String[]{"xmlns", "type"},
-				new String[]{Packet.CLIENT_XMLNS, StanzaType.set.name()});
-		Element enable = new Element(value ? ENABLE_ELEM_NAME : DISABLE_ELEM_NAME,
-				new String[]{"xmlns"}, new String[]{XMLNS});
-		iq.addChild(enable);
-		
-		Packet packet = Packet.packetInstance(iq, from, to);
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "sending state notification = {0}", packet);
+	@HandleEvent
+	protected void stateChanged(MessageCarbonsStateChangedEvent event) {
+		XMPPSession session = event.getSession();
+		ConcurrentHashMap<JID, Boolean> resources = 
+				(ConcurrentHashMap<JID, Boolean>) session.computeCommonSessionDataIfAbsent(ENABLED_RESOURCES_KEY, RESOURCES_MAP_FACTORY);
+
+		for (JID jid : event.getEnabledJids()) {
+			resources.put(jid, true);
 		}
-		results.offer(packet);
+		for (JID jid : event.getDisabledJids()) {
+			resources.put(jid, false);
+		}
 	}
 	
-	
-	@Override
-	public void presenceUpdate(XMPPResourceConnection session, Packet packet, Queue<Packet> results) 
+	/**
+	 * Method handles <code>UserPresenceChangedEvent</code> and synchronizes state
+	 * of JIDs for MessageCarbons for particular user.
+	 * 
+	 * @param presenceEvent
+	 * @throws NotAuthorizedException 
+	 */
+	@HandleEvent
+	protected void presenceUpdate(UserPresenceChangedEvent presenceEvent) 
 			throws NotAuthorizedException {
+		XMPPSession session = presenceEvent.getSession();
+		Packet packet = presenceEvent.getPresence();
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "session = {0} processing presence = {1}", 
 					new Object[]{session, packet.toString()});
@@ -372,17 +339,22 @@ public class MessageCarbons
 				return;
 			}
 
+			// if this is first time we see presence from this resource, 
+			// notify this user about every other connected resources
 			if (log.isLoggable(Level.FINER)) {
 				log.log(Level.FINER, "session = {0} adding resource = {1} to list of available resources", 
 						new Object[]{session, packet.getStanzaFrom()});			
 			}
 			
-
-			for (XMPPResourceConnection res : session.getActiveSessions()) {
+			MessageCarbonsStateChangedEvent event = new MessageCarbonsStateChangedEvent(packet.getStanzaFrom().copyWithoutResource(), packet.getStanzaFrom(), session);
+			
+			for (XMPPResourceConnection res : session.getActiveResources()) {
 				if (res.isAuthorized()) {
-					notifyStateChanged(res.getJID(), packet.getStanzaFrom(), isEnabled(res), results);
+					event.add(res.getJID(), isEnabled(res));
 				}
 			}
+			eventBus.fire(event);
+			
 		} else if (type == StanzaType.unavailable) {
 			if (log.isLoggable(Level.FINER)) {
 				log.log(Level.FINER, "session = {0} removing resource = {1} from list of available resources", 
@@ -465,4 +437,63 @@ public class MessageCarbons
 		return false;
 	}
 
+	/**
+	 * Event class responsible for notification other sessions of same user that
+	 * message carbons state was changed.
+	 */
+	public static class MessageCarbonsStateChangedEvent extends UserSessionEvent {
+		
+		private HashSet<String> enabled = null;
+		private HashSet<String> disabled = null;
+
+		/**
+		 * Empty constructor to be able to serialize/deserialize event
+		 */
+		public MessageCarbonsStateChangedEvent() {
+			super();
+		}
+		
+		public MessageCarbonsStateChangedEvent(JID sender, JID userJid, XMPPSession session) {
+			super(sender, userJid, session);
+		}
+		
+		public void add(JID jid, Boolean value) {
+			if (value == null)
+				value = false;
+			
+			HashSet<String> tmp = null;
+			if (value) {
+				if (enabled == null)
+					enabled = new HashSet<>();
+				tmp = enabled;
+			}
+			else {
+				if (disabled == null)
+					disabled = new HashSet<>();
+				tmp = disabled;
+			}
+			tmp.add(jid.getResource());
+		}
+
+		public Set<JID> getEnabledJids() {
+			HashSet<JID> result = new HashSet<>();
+			if (this.enabled != null) {
+				for (String res : this.enabled) {
+					result.add(JID.jidInstanceNS(getUserJid().getBareJID(), res));
+				}
+			}
+			return result;
+		}
+		
+		public Set<JID> getDisabledJids() {
+			HashSet<JID> result = new HashSet<>();
+			if (this.disabled != null) {
+				for (String res : this.disabled) {
+					result.add(JID.jidInstanceNS(getUserJid().getBareJID(), res));
+				}
+			}
+			return result;
+		}
+		
+	}
 }

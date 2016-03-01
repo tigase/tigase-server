@@ -4,10 +4,11 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.logging.*;
 
-import tigase.disteventbus.EventBus;
+import tigase.eventbus.EventBus;
 import tigase.form.Field;
 import tigase.form.Form;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.MonitorComponent;
@@ -16,10 +17,10 @@ import tigase.util.LogFormatter;
 import tigase.xml.Element;
 
 @Bean(name = "logger-task")
-public class LoggerTask extends AbstractConfigurableTask {
+public class LoggerTask extends AbstractConfigurableTask implements Initializable {
 
 	protected final static DateTimeFormatter dtf = new DateTimeFormatter();
-	private static final String LOGGER_MONITOR_EVENT_NAME = "LoggerMonitorEvent";
+	private static final String LOGGER_MONITOR_EVENT_NAME = "tigase.monitor.tasks.LoggerMonitorEvent";
 	@Inject
 	protected MonitorComponent component;
 	@Inject
@@ -78,6 +79,11 @@ public class LoggerTask extends AbstractConfigurableTask {
 		System.out.println("HAAAAA " + this.levelTreshold);
 	}
 
+	@Override
+	public void initialize() {
+		eventBus.registerEvent(LOGGER_MONITOR_EVENT_NAME, "Fired when logger receives with specific level", false);
+	}
+
 	private void registerHandler() {
 		removeHandler();
 		if (monitorHandler == null) {
@@ -96,8 +102,7 @@ public class LoggerTask extends AbstractConfigurableTask {
 	}
 
 	public void sendWarningOut(String logBuff) {
-		Element event = new Element(LOGGER_MONITOR_EVENT_NAME, new String[] { "xmlns" },
-				new String[] { MonitorComponent.EVENTS_XMLNS });
+		Element event = new Element(LOGGER_MONITOR_EVENT_NAME);
 		event.addChild(new Element("hostname", component.getDefHostName().toString()));
 		event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
 		event.addChild(new Element("hostname", component.getDefHostName().toString()));

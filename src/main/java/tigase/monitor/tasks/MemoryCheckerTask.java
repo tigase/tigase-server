@@ -3,10 +3,11 @@ package tigase.monitor.tasks;
 import java.util.Date;
 import java.util.HashSet;
 
-import tigase.disteventbus.EventBus;
+import tigase.eventbus.EventBus;
 import tigase.form.Field;
 import tigase.form.Form;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.InfoTask;
@@ -16,36 +17,28 @@ import tigase.util.DateTimeFormatter;
 import tigase.xml.Element;
 
 @Bean(name = "memory-checker-task")
-public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements InfoTask {
+public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements InfoTask, Initializable {
 
+	public final static String HEAP_MEMORY_MONITOR_EVENT_NAME = "tigase.monitor.tasks.HeapMemoryMonitorEvent";
+	public final static String NONHEAP_MEMORY_MONITOR_EVENT_NAME = "tigase.monitor.tasks.NonHeapMemoryMonitorEvent";
 	private final static DateTimeFormatter dtf = new DateTimeFormatter();
-
-	public final static String HEAP_MEMORY_MONITOR_EVENT_NAME = "HeapMemoryMonitorEvent";
-
-	public final static String NONHEAP_MEMORY_MONITOR_EVENT_NAME = "NonHeapMemoryMonitorEvent";
-
+	private final HashSet<String> triggeredEvents = new HashSet<String>();
 	@Inject
 	private MonitorComponent component;
-
 	@Inject
 	private EventBus eventBus;
-
 	/**
 	 * Percent
 	 */
 	@ConfigField(desc = "Max Heap Mem Usage Threshold [%]")
 	private int maxHeapMemUsagePercentThreshold = 90;
-
 	/**
 	 * Percent
 	 */
 	@ConfigField(desc = "Max Non-Heap Mem Usage Threshold [%]")
 	private int maxNonHeapMemUsagePercentThreshold = 90;
-
 	@Inject
 	private MonitorRuntime runtime;
-
-	private final HashSet<String> triggeredEvents = new HashSet<String>();
 
 	@Override
 	public Form getCurrentConfiguration() {
@@ -64,8 +57,16 @@ public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements 
 		return maxHeapMemUsagePercentThreshold;
 	}
 
+	public void setMaxHeapMemUsagePercentThreshold(Integer maxHeapMemUsagePercentThreshold) {
+		this.maxHeapMemUsagePercentThreshold = maxHeapMemUsagePercentThreshold;
+	}
+
 	public int getMaxNonHeapMemUsagePercentThreshold() {
 		return maxNonHeapMemUsagePercentThreshold;
+	}
+
+	public void setMaxNonHeapMemUsagePercentThreshold(Integer maxNonHeapMemUsagePercentThreshold) {
+		this.maxNonHeapMemUsagePercentThreshold = maxNonHeapMemUsagePercentThreshold;
 	}
 
 	@Override
@@ -88,11 +89,16 @@ public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements 
 	}
 
 	@Override
+	public void initialize() {
+		eventBus.registerEvent(HEAP_MEMORY_MONITOR_EVENT_NAME, "Fired when HEAP memory is too low", false);
+		eventBus.registerEvent(NONHEAP_MEMORY_MONITOR_EVENT_NAME, "Fired when NON-HEAP memory is too low", false);
+	}
+
+	@Override
 	protected void run() {
 		float curHeapMemUsagePercent = runtime.getHeapMemUsage();
 		if (curHeapMemUsagePercent >= maxHeapMemUsagePercentThreshold) {
-			Element event = new Element(HEAP_MEMORY_MONITOR_EVENT_NAME, new String[] { "xmlns" },
-					new String[] { MonitorComponent.EVENTS_XMLNS });
+			Element event = new Element(HEAP_MEMORY_MONITOR_EVENT_NAME);
 			event.addChild(new Element("hostname", component.getDefHostName().toString()));
 			event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
 			event.addChild(new Element("heapMemUsage", Float.toString(curHeapMemUsagePercent)));
@@ -114,8 +120,7 @@ public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements 
 
 		float curNonHeapMemUsagePercent = runtime.getNonHeapMemUsage();
 		if (curNonHeapMemUsagePercent >= maxNonHeapMemUsagePercentThreshold) {
-			Element event = new Element(NONHEAP_MEMORY_MONITOR_EVENT_NAME, new String[] { "xmlns" },
-					new String[] { MonitorComponent.EVENTS_XMLNS });
+			Element event = new Element(NONHEAP_MEMORY_MONITOR_EVENT_NAME);
 			event.addChild(new Element("hostname", component.getDefHostName().toString()));
 			event.addChild(new Element("timestamp", "" + dtf.formatDateTime(new Date())));
 			event.addChild(new Element("nonHeapMemUsage", Float.toString(curNonHeapMemUsagePercent)));
@@ -134,14 +139,6 @@ public class MemoryCheckerTask extends AbstractConfigurableTimerTask implements 
 		} else {
 			triggeredEvents.remove(NONHEAP_MEMORY_MONITOR_EVENT_NAME);
 		}
-	}
-
-	public void setMaxHeapMemUsagePercentThreshold(Integer maxHeapMemUsagePercentThreshold) {
-		this.maxHeapMemUsagePercentThreshold = maxHeapMemUsagePercentThreshold;
-	}
-
-	public void setMaxNonHeapMemUsagePercentThreshold(Integer maxNonHeapMemUsagePercentThreshold) {
-		this.maxNonHeapMemUsagePercentThreshold = maxNonHeapMemUsagePercentThreshold;
 	}
 
 	@Override

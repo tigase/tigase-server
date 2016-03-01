@@ -2,7 +2,7 @@
  * SessionManagerClustered.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
+ * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,13 +30,19 @@ import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.cluster.api.SessionManagerClusteredIfc;
 import tigase.cluster.strategy.ClusteringStrategyIfc;
-
+import tigase.cluster.strategy.ConnectionRecordIfc;
+import tigase.eventbus.FillRoutedEvent;
+import tigase.eventbus.RouteEvent;
+import tigase.eventbus.component.stores.Subscription;
 import tigase.server.ComponentInfo;
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.server.XMPPServer;
 import tigase.server.xmppsession.SessionManager;
-
+import tigase.server.xmppsession.UserSessionEvent;
+import tigase.stats.StatisticsList;
+import tigase.util.TigaseStringprepException;
+import tigase.xml.Element;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
@@ -45,14 +51,9 @@ import tigase.xmpp.XMPPSession;
 
 import tigase.conf.ConfigurationException;
 import tigase.osgi.ModulesManagerImpl;
-import tigase.stats.StatisticsList;
 import tigase.util.DNSResolverFactory;
-import tigase.util.TigaseStringprepException;
-import tigase.xml.Element;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -397,6 +398,53 @@ public class SessionManagerClustered
 	@Override
 	public boolean hasXMPPResourceConnectionForConnectionJid(JID connJid) {
 		return this.connectionsByFrom.containsKey(connJid);
+	}
+	
+	@FillRoutedEvent
+	protected boolean fillRoutedUserSessionEvent(UserSessionEvent event) {
+		XMPPSession session = getSession(event.getUserJid().getBareJID());
+		if (session != null && (event.getUserJid().getResource() == null || session.getResourceForResource(event.getUserJid().getResource()) != null)) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "for event {0} setting session to {1}", new Object[]{event, session});
+			}
+			event.setSession(session);
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	@RouteEvent
+	protected Collection<Subscription> routeUserSessionEvent(UserSessionEvent event, Collection<Subscription> subscriptions) {
+		if (strategy.hasCompleteJidsInfo()) {
+			Set<ConnectionRecordIfc> records = strategy.getConnectionRecords(event.getUserJid().getBareJID());
+			if (records == null)
+				records = Collections.emptySet();
+			if (event.getUserJid().getResource() != null) {
+				Iterator<ConnectionRecordIfc> it = records.iterator();
+				while (it.hasNext()) {
+					if (!it.next().getUserJid().equals(event.getUserJid())) 
+						it.remove();
+				}
+			}
+			Iterator<Subscription> it = subscriptions.iterator();
+			while (it.hasNext()) {
+				Subscription s = it.next();
+				if (!s.isInClusterSubscription())
+					continue;
+				
+				boolean remove = true;
+				
+				for (ConnectionRecordIfc rec : records) {
+					if (rec.getNode().getDomain().equals(s.getJid().getDomain()))
+						remove = false;
+				}
+				
+				if (remove)
+					it.remove();
+			}
+		}
+		return subscriptions;
 	}
 	
 	@Override

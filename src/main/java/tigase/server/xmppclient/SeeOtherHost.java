@@ -35,9 +35,10 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.disteventbus.EventBus;
-import tigase.disteventbus.EventBusFactory;
-import tigase.disteventbus.clustered.EventHandler;
+import tigase.eventbus.EventBus;
+import tigase.eventbus.EventBusFactory;
+import tigase.eventbus.HandleEvent;
+import tigase.eventbus.events.ShutdownEvent;
 import tigase.xmpp.JID;
 
 //~--- classes ----------------------------------------------------------------
@@ -57,10 +58,6 @@ public class SeeOtherHost implements SeeOtherHostIfc {
 	protected EventBus eventBus = EventBusFactory.getInstance();
 	private ArrayList<Phase> active = new ArrayList<Phase>();
 	protected VHostManagerIfc vHostManager = null;
-	protected EventHandler shutdownEventHandler = (String name, String xmlns, Element e) -> {
-		String nodeJid = e.getAttributeStaticStr("node");
-		nodeShutdown(nodeJid);
-	};
 	private Set<String> shutdownNodes = new CopyOnWriteArraySet<String>();
 
 	@Override
@@ -144,21 +141,22 @@ public class SeeOtherHost implements SeeOtherHostIfc {
 	
 	@Override
 	public void start() {
-		eventBus.addHandler("shutdown", "tigase:server", shutdownEventHandler);
+		eventBus.registerAll(this);
 	}
 	
 	@Override
 	public void stop() {
-		eventBus.removeHandler("shutdown", "tigase:server", shutdownEventHandler);
+		eventBus.unregisterAll(this);
 	}
 
 	protected boolean isNodeShutdown(BareJID jid) {
 		return jid != null && shutdownNodes.contains(jid.getDomain());
 	}
-	
-	protected void nodeShutdown(String node) {
+
+	@HandleEvent
+	protected void nodeShutdown(ShutdownEvent event) {
 		synchronized (this) {
-			shutdownNodes.add(node);
+			shutdownNodes.add(event.getNode());
 		}
 	}
 	

@@ -1,3 +1,24 @@
+/*
+ * BeanConfig.java
+ *
+ * Tigase Jabber/XMPP Server
+ * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. Look for COPYING file in the top folder.
+ * If not, see http://www.gnu.org/licenses/.
+ */
+
 package tigase.kernel.core;
 
 import java.lang.reflect.Field;
@@ -10,36 +31,13 @@ import java.util.Map;
  */
 public class BeanConfig {
 
-	/**
-	 * State of bean.
-	 */
-	public enum State {
-		/**
-		 * Bean is initialized and ready to use.
-		 */
-		initialized,
-		/**
-		 * Instance of bean is created, but bean isn't initialized.
-		 */
-		instanceCreated,
-		/**
-		 * Bean class is registered, but instance of bean isn't created yet.
-		 */
-		registered
-	}
-
 	private final String beanName;
-
 	private final Class<?> clazz;
-
-	private boolean exportable;
-
-	private BeanConfig factory;
-
 	private final Map<Field, Dependency> fieldDependencies = new HashMap<Field, Dependency>();
-
+	private boolean exportable;
+	private boolean pinned = true;
+	private BeanConfig factory;
 	private Kernel kernel;
-
 	private State state;
 
 	BeanConfig(String id, Class<?> clazz) {
@@ -67,7 +65,7 @@ public class BeanConfig {
 
 	/**
 	 * Returns name of bean.
-	 * 
+	 *
 	 * @return name of bean.
 	 */
 	public String getBeanName() {
@@ -76,7 +74,7 @@ public class BeanConfig {
 
 	/**
 	 * Returns class of bean.
-	 * 
+	 *
 	 * @return class of bean.
 	 */
 	public Class<?> getClazz() {
@@ -85,18 +83,22 @@ public class BeanConfig {
 
 	/**
 	 * Return factory of bean.
-	 * 
+	 *
 	 * @return factory of bean. It may return <code>null</code> if default
-	 *         factory is used.
+	 * factory is used.
 	 */
 	public BeanConfig getFactory() {
 		return factory;
 	}
 
+	void setFactory(final BeanConfig bfc) {
+		this.factory = bfc;
+	}
+
 	/**
 	 * Returns map of dependencies. Note that Kernel has field-based-dependency
 	 * model, it means that each dependency must be related to field in class.
-	 * 
+	 *
 	 * @return map of dependencies.
 	 */
 	public Map<Field, Dependency> getFieldDependencies() {
@@ -105,20 +107,28 @@ public class BeanConfig {
 
 	/**
 	 * Returns {@link Kernel} managing this bean.
-	 * 
+	 *
 	 * @return {@link Kernel}.
 	 */
 	public Kernel getKernel() {
 		return kernel;
 	}
 
+	void setKernel(Kernel kernel) {
+		this.kernel = kernel;
+	}
+
 	/**
 	 * Returns state of bean.
-	 * 
+	 *
 	 * @return state of bean.
 	 */
 	public State getState() {
 		return state;
+	}
+
+	void setState(State state) {
+		this.state = state;
 	}
 
 	@Override
@@ -131,9 +141,9 @@ public class BeanConfig {
 
 	/**
 	 * Checks if bean may be visible in child Kernels.
-	 * 
+	 *
 	 * @return <code>true</code> if beans will be visible in child Kernel (other
-	 *         Kernels deployed as beans to current Kernel).
+	 * Kernels deployed as beans to current Kernel).
 	 */
 	public boolean isExportable() {
 		return exportable;
@@ -143,21 +153,39 @@ public class BeanConfig {
 		this.exportable = value;
 	}
 
-	void setFactory(final BeanConfig bfc) {
-		this.factory = bfc;
+	public boolean isPinned() {
+		return pinned;
 	}
 
-	void setKernel(Kernel kernel) {
-		this.kernel = kernel;
-	}
-
-	void setState(State state) {
-		this.state = state;
+	public void setPinned(boolean pinned) {
+		this.pinned = pinned;
 	}
 
 	@Override
 	public String toString() {
 		return beanName + ":" + clazz.getName();
+	}
+
+	/**
+	 * State of bean.
+	 */
+	public enum State {
+		/**
+		 * Bean is initialized and ready to use.
+		 */
+		initialized,
+		/**
+		 * Instance of bean is created, but bean isn't initialized.
+		 */
+		instanceCreated,
+		/**
+		 * Bean class is registered, but instance of bean isn't created yet.
+		 */
+		registered,
+		/**
+		 * Bean class is registered, but it CANNOT be used!!! Should be treated as not registered at all.
+		 */
+		inactive,
 	}
 
 }
