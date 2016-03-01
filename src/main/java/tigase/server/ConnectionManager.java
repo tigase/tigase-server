@@ -79,7 +79,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	/** Field description */
 	public static final String HT_TRAFFIC_THROTTLING_PROP_VAL =
-			"xmpp:25k:0:disc,bin:200m:0:disc";
+			"xmpp:50k:0:disc,bin:400m:0:disc";
 
 	/** Field description. */
 	public static final String NET_BUFFER_HT_PROP_KEY = "--net-buff-high-throughput";
@@ -1026,25 +1026,30 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	protected <T> void checkHighThroughputProperty(String ht_def_key, T ht_dev_val,
 			String st_def_key, T st_def_val, String prop_key, Class<T> prop_val_class,
 			Map<String, Object> params, Map<String, Object> props) {
-		T      tmp     = st_def_val;
+		T tmp = st_def_val;
 		String str_tmp = null;
 
 		if (isHighThroughput()) {
-			tmp     = ht_dev_val;
+			tmp = ht_dev_val;
 			str_tmp = (String) params.get(ht_def_key);
 		} else {
-			tmp     = st_def_val;
+			tmp = st_def_val;
 			str_tmp = (String) params.get(st_def_key);
 		}
-		if (prop_val_class.isAssignableFrom(Integer.class)) {
-			tmp = prop_val_class.cast(DataTypes.parseNum(str_tmp, Integer.class,
-					(Integer) tmp));
-		}
-		if (prop_val_class.isAssignableFrom(Long.class)) {
-			tmp = prop_val_class.cast(DataTypes.parseNum(str_tmp, Long.class, (Long) tmp));
-		}
-		if (prop_val_class.isAssignableFrom(String.class)) {
-			tmp = prop_val_class.cast(str_tmp);
+		if (tmp == null)
+			tmp = st_def_val;
+
+		if (str_tmp != null) {
+			if (prop_val_class.isAssignableFrom(Integer.class)) {
+				tmp = prop_val_class.cast(DataTypes.parseNum(str_tmp, Integer.class,
+						(Integer) tmp));
+			}
+			if (prop_val_class.isAssignableFrom(Long.class)) {
+				tmp = prop_val_class.cast(DataTypes.parseNum(str_tmp, Long.class, (Long) tmp));
+			}
+			if (prop_val_class.isAssignableFrom(String.class)) {
+				tmp = prop_val_class.cast(str_tmp);
+			}
 		}
 		props.put(prop_key, tmp);
 
