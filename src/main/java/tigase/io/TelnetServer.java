@@ -24,24 +24,13 @@ package tigase.io;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import static tigase.io.SSLContextContainerIfc.*;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
+import java.io.*;
 import java.net.InetSocketAddress;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.CharBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
-
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -49,6 +38,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+
+import static tigase.io.SSLContextContainerIfc.*;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -299,7 +292,8 @@ public class TelnetServer implements SampleSocketThread.SocketHandler {
 		iosock = new SocketIO(sc);
 
 		if (ssl) {
-			iosock = new TLSIO(iosock, new TLSWrapper(TLSUtil.getSSLContext("SSL", null), null, null, 0, false, false), ByteOrder.BIG_ENDIAN);
+			SSLContextContainerIfc sslContextContainer = TLSUtil.getRootSslContextContainer();
+			iosock = new TLSIO(iosock, new TLSWrapper(sslContextContainer.getSSLContext("SSL", null, false), null, null, 0, false, false), ByteOrder.BIG_ENDIAN);
 		}    // end of if (ssl)
 
 		reader.addIOInterface(iosock);

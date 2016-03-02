@@ -1,6 +1,6 @@
 /*
  *   Tigase Jabber/XMPP Server
- *  Copyright (C) 2004-2012 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ *  Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,6 +24,8 @@ package tigase.io;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import tigase.server.Lifecycle;
+
 import java.io.File;
 import java.security.KeyStore;
 import java.security.cert.CertificateParsingException;
@@ -31,8 +33,6 @@ import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import tigase.io.jdk18.SNISSLContextContainer;
 
 //~--- interfaces -------------------------------------------------------------
 
@@ -45,7 +45,7 @@ import tigase.io.jdk18.SNISSLContextContainer;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface SSLContextContainerIfc {
+public interface SSLContextContainerIfc extends Lifecycle {
 
 	/**
 	 * Constant <code>ALLOW_INVALID_CERTS_KEY</code> is a key pointing to a
@@ -157,7 +157,7 @@ public interface SSLContextContainerIfc {
 	 * Constant <code>SSL_CONTAINER_CLASS_VAL</code> keeps default container
 	 * implementation class loaded if none is specified in configuration file.
 	 */
-	public static final String SSL_CONTAINER_CLASS_VAL = SNISSLContextContainer.class.getName();
+	public static final String SSL_CONTAINER_CLASS_VAL = SSLContextContainer.class.getName();
 
 	/**
 	 * Constant <code>TRUSTED_CERTS_DIR_KEY</code> is a key pointing to a
@@ -227,12 +227,34 @@ public interface SSLContextContainerIfc {
 	 * @param hostname
 	 *            a <code>String</code> value keeps a hostname or domain for
 	 *            SSLContext.
+	 * @param clientMode
+	 *            if set SSLContext will be created for client mode (ie. creation
+	 *            of server certificate will be skipped if there is no certificate)
 	 * @return a <code>SSLContext</code> value
 	 */
 	SSLContext getSSLContext(String protocol, String hostname, boolean clientMode);
 
-	 SSLContext getSSLContext(String protocol, String hostname, boolean clientMode, TrustManager... tms);
-	
+	/**
+	 * Method <code>getSSLContext</code> creates and returns new SSLContext for
+	 * a given domain (hostname). For creation of the SSLContext a certificate
+	 * associated with this domain (hostname) should be used. If there is no
+	 * specific certificate for a given domain then default certificate should
+	 * be used.
+	 *
+	 * @param protocol
+	 *            a <code>String</code> is either 'SSL' or 'TLS' value.
+	 * @param hostname
+	 *            a <code>String</code> value keeps a hostname or domain for
+	 *            SSLContext.
+	 * @param clientMode
+	 *            if set SSLContext will be created for client mode (ie. creation
+	 *            of server certificate will be skipped if there is no certificate)
+	 * @param tms
+	 *            array of TrustManagers which should be used to validate remote certificate
+	 * @return a <code>SSLContext</code> value
+	 */
+	SSLContext getSSLContext(String protocol, String hostname, boolean clientMode, TrustManager[] tms);
+
 	/**
 	 * Returns a trust store with all trusted certificates.
 	 * 
@@ -241,24 +263,6 @@ public interface SSLContextContainerIfc {
 	 */
 	KeyStore getTrustStore();
 
-	// ~--- methods
-	// --------------------------------------------------------------
-
-	/**
-	 * Method <code>init</code> method initializes the container. If the
-	 * container has been already initialized then it should clear all the data
-	 * and re-initialize the container with the "fresh" data. If there is only
-	 * one certificate loaded it is a default one as well. Otherwise the
-	 * certificate from <code>default.pem</code> file should be used as a
-	 * default one. Default certificate can be also set through the settings in
-	 * the <code>Map</code> given as a parameter.
-	 * <code>DEFAULT_DOMAIN_CERT_KEY</code> points to the domain which holds
-	 * default certificate.
-	 * 
-	 * @param params
-	 *            a <code>Map</code> value
-	 */
-	void init(Map<String, Object> params);
 }
 
 // ~ Formatted in Sun Code Convention

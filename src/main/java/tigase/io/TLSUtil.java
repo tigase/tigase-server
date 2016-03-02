@@ -32,6 +32,9 @@ import java.util.logging.Logger;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
+import static tigase.io.CertificateContainerIfc.CERTIFICATE_CONTAINER_CLASS_KEY;
+import static tigase.io.CertificateContainerIfc.CERTIFICATE_CONTAINER_CLASS_VAL;
 import static tigase.io.SSLContextContainerIfc.*;
 import tigase.osgi.ModulesManagerImpl;
 
@@ -52,6 +55,7 @@ public abstract class TLSUtil {
 //private static Map<String, SSLContextContainerIfc> sslContexts =
 //  new HashMap<String, SSLContextContainerIfc>();
 	private static SSLContextContainerIfc sslContextContainer = null;
+	private static CertificateContainerIfc certificateContainer = null;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -74,53 +78,60 @@ public abstract class TLSUtil {
 	 * @param params
 	 */
 	public static void configureSSLContext(Map<String, Object> params) {
+		// we should initialize this only once
+		if (sslContextContainer != null)
+			return;
+
 		String sslCC_class = (String) params.get(SSL_CONTAINER_CLASS_KEY);
+		String certC_class = (String) params.get(CERTIFICATE_CONTAINER_CLASS_KEY);
 
 		if (sslCC_class == null) {
 			sslCC_class = SSL_CONTAINER_CLASS_VAL;
 		}
+		if (sslCC_class.equals("tigase.io.jdk18.SNISSLContextContainer")) {
+			log.log(Level.CONFIG, "You are using '" + sslCC_class + "' as " + SSL_CONTAINER_CLASS_KEY + ".\n" +
+					"This class is not available as SNI support was moved to SSLContextContainer");
+			sslCC_class = SSL_CONTAINER_CLASS_VAL;
+		}
+		if (certC_class == null)
+			certC_class = CERTIFICATE_CONTAINER_CLASS_VAL;
 
 		try {
-			sslContextContainer = (SSLContextContainerIfc) ModulesManagerImpl.getInstance().forName(sslCC_class).newInstance();
+			certificateContainer = (CertificateContainerIfc) ModulesManagerImpl.getInstance().forName(certC_class).newInstance();
+			certificateContainer.init(params);
+			sslContextContainer = (SSLContextContainerIfc) ModulesManagerImpl.getInstance().forName(sslCC_class).getDeclaredConstructor(CertificateContainerIfc.class).newInstance(certificateContainer);
 			//sslContextContainer = (SSLContextContainerIfc) Class.forName(sslCC_class).newInstance();
-			sslContextContainer.init(params);
+			sslContextContainer.start();
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can not initialize SSL Container: " + sslCC_class, e);
 			sslContextContainer = null;
 		}
 	}
 
+	/**
+	 * Method returns singleton instance of class implementing CertificateContainterIfc
+	 * responsible for caching SSL certificates in memory.
+	 *
+	 * @return
+	 */
+	public static CertificateContainerIfc getCertificateContainer() {
+		return certificateContainer;
+	}
+
+	/**
+	 * Method returns singleton instance of class implementing SSLContextContainerIfc
+	 * responsible for caching SSLContext instances.
+	 *
+	 * This instance should be wrapped by new instance of SSLContextContainer
+	 * if method getSSLContext will be used with TrustManager array passed!
+	 *
+	 * @return
+	 */
+	public static SSLContextContainerIfc getRootSslContextContainer() {
+		return sslContextContainer;
+	}
+
 	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param protocol
-	 * @param hostname
-	 *
-	 * 
-	 */
-	public static SSLContext getSSLContext(String protocol, String hostname) {
-		return sslContextContainer.getSSLContext(protocol, hostname, false);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param protocol
-	 * @param hostname
-	 *
-	 * 
-	 */
-	public static SSLContext getSSLContext(String protocol, String hostname, boolean clientMode) {
-		return sslContextContainer.getSSLContext(protocol, hostname, clientMode);
-	}
-
-	public static SSLContext getSSLContext(String protocol, String hostname, boolean clientMode, TrustManager... tm) {
-		return sslContextContainer.getSSLContext(protocol, hostname, clientMode, tm);
-	}
 
         /**
 	 * Method description

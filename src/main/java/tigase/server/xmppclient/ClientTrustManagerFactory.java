@@ -43,7 +43,7 @@ public class ClientTrustManagerFactory {
 
 	private TrustManagerFactory tmf;
 
-	private final ConcurrentHashMap<VHostItem, TrustManager[]> trustManagers = new ConcurrentHashMap<VHostItem, TrustManager[]>();
+	private final ConcurrentHashMap<VHostItem, TrustManager[]> trustManagers = new ConcurrentHashMap<>();
 
 	public ClientTrustManagerFactory() {
 		this.emptyTrustManager = new TrustManager[] { new X509TrustManager() {

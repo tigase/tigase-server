@@ -52,14 +52,7 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.TrustManager;
 import tigase.cert.CertCheckResult;
 import tigase.cert.CertificateUtil;
-import tigase.io.BufferUnderflowException;
-import tigase.io.IOInterface;
-import tigase.io.SocketIO;
-import tigase.io.TLSEventHandler;
-import tigase.io.TLSIO;
-import tigase.io.TLSUtil;
-import tigase.io.TLSWrapper;
-import tigase.io.ZLibIO;
+import tigase.io.*;
 import tigase.stats.StatisticsList;
 import tigase.util.IOListener;
 import tigase.xmpp.JID;
@@ -182,6 +175,7 @@ public abstract class IOService<RefObject>
 	protected CharBuffer        cb              = CharBuffer.allocate(2048);
 	private final ReentrantLock writeInProgress = new ReentrantLock();
 	private final ReentrantLock readInProgress  = new ReentrantLock();
+	private SSLContextContainerIfc sslContextContainer;
 	private TrustManager[]      x509TrustManagers;
 	private int bufferLimit = 0;
 
@@ -398,6 +392,8 @@ public abstract class IOService<RefObject>
 		if (socketIO instanceof TLSIO) {
 			throw new IllegalStateException("SSL mode is already activated.");
 		}
+		if (sslContextContainer == null)
+			throw new IllegalStateException("SSL cannot be activated - sslContextContainer is not set for " + connectionId);
 
 		String tls_hostname = null;
 		int port = 0;
@@ -407,14 +403,8 @@ public abstract class IOService<RefObject>
 				tls_hostname = (String) this.getSessionData().get("remote-hostname");
 			port = ((InetSocketAddress) socketIO.getSocketChannel().getRemoteAddress()).getPort();
 		}
-		SSLContext sslContext;
 
-		if (x509TrustManagers != null) {
-			sslContext = TLSUtil.getSSLContext("SSL", tls_hostname, clientMode, x509TrustManagers);
-		} else {
-			sslContext = TLSUtil.getSSLContext("SSL", tls_hostname, clientMode);
-		}
-
+		SSLContext sslContext = sslContextContainer.getSSLContext("SSL", tls_hostname, clientMode, x509TrustManagers);
 		TLSWrapper wrapper = new TLSWrapper(sslContext, this, tls_hostname, port, clientMode, wantClientAuth, needClientAuth);
 
 		socketIO = new TLSIO(socketIO, wrapper, byteOrder());
@@ -435,9 +425,11 @@ public abstract class IOService<RefObject>
 		if (socketIO.checkCapabilities(TLSIO.TLS_CAPS)) {
 			throw new IllegalStateException("TLS mode is already activated " + connectionId);
 		}
+		if (sslContextContainer == null)
+			throw new IllegalStateException("TLS cannot be activated - sslContextContainer is not set for " + connectionId);
 
 		// This should not take more then 100ms
-	int counter = 0;
+		int counter = 0;
 
 		while (isConnected() && waitingToSend() && (++counter < 10)) {
 			writeData(null);
@@ -464,15 +456,7 @@ public abstract class IOService<RefObject>
 						tls_hostname });
 			}
 
-			SSLContext sslContext;
-
-			if (x509TrustManagers != null) {
-				sslContext = TLSUtil.getSSLContext("TLS", tls_hostname, clientMode,
-						x509TrustManagers);
-			} else {
-				sslContext = TLSUtil.getSSLContext("TLS", tls_hostname, clientMode);
-			}
-
+			SSLContext sslContext = sslContextContainer.getSSLContext("TLS", tls_hostname, clientMode, x509TrustManagers);
 			TLSWrapper wrapper = new TLSWrapper(sslContext, this, tls_hostname, port, clientMode, wantClientAuth, needClientAuth);
 
 			socketIO = new TLSIO(socketIO, wrapper, byteOrder());
@@ -744,16 +728,6 @@ public abstract class IOService<RefObject>
 	}
 
 	/**
-	 * Method description
-	 *
-	 *
-	 * 
-	 */
-	public TrustManager[] getX509TrustManagers() {
-		return x509TrustManagers;
-	}
-
-	/**
 	 * Describe
 	 * <code>isConnected</code> method here.
 	 *
@@ -847,6 +821,10 @@ public abstract class IOService<RefObject>
 		}
 		connectionType = ConnectionType.valueOf(sessionData.get(PORT_TYPE_PROP_KEY)
 				.toString());
+	}
+
+	public void setSslContextContainer(SSLContextContainerIfc sslContextContainer) {
+		this.sslContextContainer = sslContextContainer;
 	}
 
 	/**

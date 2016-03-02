@@ -40,6 +40,9 @@ import javax.script.Bindings;
 
 import tigase.annotations.TODO;
 import tigase.conf.ConfigurationException;
+import tigase.io.SSLContextContainer;
+import tigase.io.SSLContextContainerIfc;
+import tigase.io.TLSUtil;
 import tigase.net.*;
 
 import tigase.server.script.CommandIfc;
@@ -252,6 +255,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	private IOServiceStatisticsGetter ioStatsGetter = new IOServiceStatisticsGetter();
 	private boolean                   initializationCompleted = false;
 	protected XMPPIOProcessor[]       processors              = new XMPPIOProcessor[0];
+	private SSLContextContainerIfc    sslContextContainer     = new SSLContextContainer(TLSUtil.getCertificateContainer(), TLSUtil.getRootSslContextContainer());
 
 	/** Field description */
 	protected int net_buffer = NET_BUFFER_ST_PROP_VAL;
@@ -573,6 +577,12 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	}
 
 	@Override
+	public void start() {
+		sslContextContainer.start();
+		super.start();
+	}
+
+	@Override
 	public void stop() {
 		this.releaseListeners();
 
@@ -581,6 +591,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			service.forceStop();
 		}
 		super.stop();
+		sslContextContainer.stop();
 	}
 
 	/**
@@ -1382,6 +1393,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			}
 
 			IO serv = getXMPPIOServiceInstance();
+			serv.setSslContextContainer(sslContextContainer);
 			serv.setBufferLimit( net_buffer_limit );
 
 			( (XMPPDomBuilderHandler) serv.getSessionData().get( DOM_HANDLER ) ).setElementsLimit( elements_number_limit );
