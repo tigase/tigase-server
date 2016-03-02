@@ -95,6 +95,9 @@ public abstract class SessionManagerConfig {
 
 	/** Field description */
 	protected static final String SM_THREADS_POOL_PROP_VAL = "default";
+	
+	protected static final String SM_THREADS_FACTOR_PROP_KEY = "sm-threads-factor";
+	protected static final int SM_THREADS_FACTOR_PROP_VAL = 1;
 
 	protected static final String AUTH_TIMEOUT_PROP_KEY = "auth-timeout";
 	protected static final long AUTH_TIMEOUT_PROP_VAL = 120;

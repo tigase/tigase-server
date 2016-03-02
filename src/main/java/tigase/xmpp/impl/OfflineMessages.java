@@ -145,10 +145,6 @@ public class OfflineMessages
 	}
 
 	//~--- methods --------------------------------------------------------------
-	@Override
-	public int concurrentQueuesNo() {
-		return Runtime.getRuntime().availableProcessors();
-	}
 
 	@Override
 	public String id() {

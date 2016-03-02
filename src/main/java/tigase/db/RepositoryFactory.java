@@ -97,10 +97,13 @@ public abstract class RepositoryFactory {
 	/** Field description */
 	public static final String AUTH_REPO_POOL_SIZE_PROP_KEY = "auth-repo-pool-size";
 
+	public static final int REPO_POOL_SIZE_FACTOR_PROP_VAL = 4;
+
 	// AuthRepository properties
 
 	/** Field description */
-	public static final int AUTH_REPO_POOL_SIZE_PROP_VAL = 10;
+	public static final int AUTH_REPO_POOL_SIZE_PROP_VAL = Math.max( 10, Runtime.getRuntime().availableProcessors()
+																																			 * REPO_POOL_SIZE_FACTOR_PROP_VAL);
 
 	/** Field description */
 	public static final String AUTH_REPO_URL_PROP_KEY = "auth-repo-url";
@@ -132,7 +135,8 @@ public abstract class RepositoryFactory {
 	// DataRepository properties
 
 	/** Field description */
-	public static final int DATA_REPO_POOL_SIZE_PROP_VAL = 10;
+	public static final int DATA_REPO_POOL_SIZE_PROP_VAL = Math.max( 10, Runtime.getRuntime().availableProcessors()
+																																			 * REPO_POOL_SIZE_FACTOR_PROP_VAL );
 
 	// repositories classes and URLs
 
@@ -266,7 +270,8 @@ public abstract class RepositoryFactory {
 	// UserRepository properties
 
 	/** Field description */
-	public static final int USER_REPO_POOL_SIZE_PROP_VAL = 10;
+	public static final int USER_REPO_POOL_SIZE_PROP_VAL = Math.max( 10, Runtime.getRuntime().availableProcessors()
+																																			 * REPO_POOL_SIZE_FACTOR_PROP_VAL);
 
 	/** Field description */
 	public static final String USER_REPO_URL_PROP_KEY = "user-repo-url";
@@ -284,11 +289,11 @@ public abstract class RepositoryFactory {
 	
 	/** Field description */
 	private static final ConcurrentMap<String, UserRepository> user_repos =
-			new ConcurrentHashMap<String, UserRepository>(5);
+			new ConcurrentHashMap<String, UserRepository>(USER_REPO_POOL_SIZE_PROP_VAL);
 	private static final ConcurrentMap<String, DataRepository> data_repos =
-			new ConcurrentHashMap<String, DataRepository>(10);
+			new ConcurrentHashMap<String, DataRepository>(DATA_REPO_POOL_SIZE_PROP_VAL);
 	private static final ConcurrentMap<String, AuthRepository> auth_repos =
-			new ConcurrentHashMap<String, AuthRepository>(5);
+			new ConcurrentHashMap<String, AuthRepository>(AUTH_REPO_POOL_SIZE_PROP_VAL);
 
 	private static final CopyOnWriteArraySet<Class> internalRepositoryClasses = new CopyOnWriteArraySet<Class>();
 	
@@ -333,7 +338,7 @@ public abstract class RepositoryFactory {
 			}
 		}		
 		if (params == null) {
-			params = new LinkedHashMap<String, String>(10);
+			params = new LinkedHashMap<String, String>(AUTH_REPO_POOL_SIZE_PROP_VAL);
 		}
 		cls = getRepoClass(cls);
 
@@ -418,7 +423,7 @@ public abstract class RepositoryFactory {
 			}
 		}
 		if (params == null) {
-			params = new LinkedHashMap<String, String>(10);
+			params = new LinkedHashMap<String, String>(DATA_REPO_POOL_SIZE_PROP_VAL);
 		}
 		cls = getRepoClass(cls);
 
@@ -616,7 +621,7 @@ public abstract class RepositoryFactory {
 			}
 		}
 		if (params == null) {
-			params = new LinkedHashMap<String, String>(10);
+			params = new LinkedHashMap<String, String>(USER_REPO_POOL_SIZE_PROP_VAL);
 		}
 		cls = getRepoClass(cls);
 

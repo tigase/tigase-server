@@ -73,7 +73,7 @@ public class JabberIqRoster
 	//~--- methods --------------------------------------------------------------
 	@Override
 	public int concurrentQueuesNo() {
-		return Runtime.getRuntime().availableProcessors() * 2;
+		return super.concurrentQueuesNo() * 4;
 	}
 
 	@Override

@@ -135,11 +135,6 @@ public abstract class XMPPProcessor
 	}
 
 	@Override
-	public int concurrentQueuesNo() {
-		return Runtime.getRuntime().availableProcessors();
-	}
-
-	@Override
 	@Deprecated
 	public int concurrentThreadsPerQueue() {
 		return 1;
