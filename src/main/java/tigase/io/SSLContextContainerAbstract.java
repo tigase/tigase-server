@@ -123,6 +123,9 @@ public abstract class SSLContextContainerAbstract implements SSLContextContainer
 	protected KeyManager[] getKeyManagers(String hostname) {
 		return certificateContainer.getKeyManagers(hostname);
 	}
+	protected TrustManager[] getTrustManagers() {
+		return certificateContainer.getTrustManagers();
+	}
 	protected KeyManager[] createCertificate(String alias) throws Exception {
 		return certificateContainer.createCertificate(alias);
 	}

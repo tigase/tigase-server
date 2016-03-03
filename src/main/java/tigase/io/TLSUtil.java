@@ -89,9 +89,17 @@ public abstract class TLSUtil {
 			sslCC_class = SSL_CONTAINER_CLASS_VAL;
 		}
 		if (sslCC_class.equals("tigase.io.jdk18.SNISSLContextContainer")) {
-			log.log(Level.CONFIG, "You are using '" + sslCC_class + "' as " + SSL_CONTAINER_CLASS_KEY + ".\n" +
+			log.log(Level.WARNING, "You are using '" + sslCC_class + "' as " + SSL_CONTAINER_CLASS_KEY + ".\n" +
 					"This class is not available as SNI support was moved to SSLContextContainer");
 			sslCC_class = SSL_CONTAINER_CLASS_VAL;
+		}
+		if (sslCC_class.equals("tigase.extras.io.PEMSSLContextContainer")) {
+			log.log(Level.WARNING, "You are using '" + sslCC_class + "' as " + SSL_CONTAINER_CLASS_KEY + ".\n" +
+					"This class is not available any more. To keep using this feature please replace configuration\n" +
+					"of " + SSL_CONTAINER_CLASS_KEY + " to " + sslCC_class + " with " + CERTIFICATE_CONTAINER_CLASS_KEY + "\n" +
+					"set to tigase.extras.io.PEMCertificateContainer");
+			sslCC_class = SSL_CONTAINER_CLASS_VAL;
+			certC_class = "tigase.extras.io.PEMCertificateContainer";
 		}
 		if (certC_class == null)
 			certC_class = CERTIFICATE_CONTAINER_CLASS_VAL;

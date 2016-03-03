@@ -81,10 +81,13 @@ public class SSLContextContainer extends SSLContextContainerAbstract {
 		String alias = hostname;
 
 		try {
-			if (tms == null && parent != null) {
-				return parent.getSSLContext(protocol, hostname, clientMode, tms);
+			if (tms == null) {
+				if (parent != null) {
+					return parent.getSSLContext(protocol, hostname, clientMode, tms);
+				} else {
+					tms = getTrustManagers();
+				}
 			}
-
 
 			if (alias == null) {
 				alias = getDefCertAlias();
