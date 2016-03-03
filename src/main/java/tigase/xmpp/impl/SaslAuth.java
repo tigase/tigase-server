@@ -115,7 +115,7 @@ public class SaslAuth
 
 	@Override
 	public int concurrentQueuesNo() {
-		return Runtime.getRuntime().availableProcessors();
+		return super.concurrentQueuesNo() * 4;
 	}
 
 	private Element createReply(final ElementType type, final String cdata) {

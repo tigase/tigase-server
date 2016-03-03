@@ -115,7 +115,11 @@ public class S2SConnectionManager
 	
 	/** Field description */
 	public static final String S2S_DOMAIN_MAPPING_PROP_VAL = "";
-	
+
+	/** Field description */
+	public static final String S2S_HT_TRAFFIC_THROTTLING_PROP_VAL =
+			"xmpp:15k:0:disc,bin:120m:0:disc";
+
 	/** Field description */
 	protected static final String DB_RESULT_EL_NAME = "db:result";
 
@@ -820,6 +824,21 @@ public class S2SConnectionManager
 	@Override
 	protected int[] getDefPlainPorts() {
 		return new int[] { 5269 };
+	}
+
+	/**
+	 * Method from ConnectionManager is overriden as it uses local value S2S_HT_TRAFFIC_THROTTLING_PROP_VAL
+	 * @return
+	 */
+	@Override
+	protected String getDefTrafficThrottling() {
+		String result = ST_TRAFFIC_THROTTLING_PROP_VAL;
+
+		if (isHighThroughput()) {
+			result = S2S_HT_TRAFFIC_THROTTLING_PROP_VAL;
+		}
+
+		return result;
 	}
 
 	@Override

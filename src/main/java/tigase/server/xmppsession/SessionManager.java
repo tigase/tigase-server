@@ -182,6 +182,7 @@ public class SessionManager
 	private Map<String, XMPPStopListenerIfc> stopListeners = new ConcurrentHashMap<String,
 			XMPPStopListenerIfc>(10);
 	private boolean          skipPrivacy = false;
+	private int          pluginsThreadFactor = 1;
 	private Set<XMPPImplIfc> allPlugins  = new ConcurrentSkipListSet<XMPPImplIfc>();
 	private long authTimeout = 120;
 
@@ -291,6 +292,8 @@ public class SessionManager
 					}
 					}
 			}
+
+			threadsNo = threadsNo * pluginsThreadFactor;
 
 			// If there is not default processors thread pool or the processor does
 			// have thread pool specific settings create a separate thread pool
@@ -630,6 +633,7 @@ public class SessionManager
 		props.put(STALE_CONNECTION_CLOSER_QUEUE_SIZE_KEY, StaleConnectionCloser
 				.DEF_QUEUE_SIZE);
 		props.put(AUTH_TIMEOUT_PROP_KEY, AUTH_TIMEOUT_PROP_VAL);
+		props.put(SM_THREADS_FACTOR_PROP_KEY, SM_THREADS_FACTOR_PROP_VAL);
 
 		return props;
 	}
@@ -819,6 +823,10 @@ public class SessionManager
 					FORCE_DETAIL_STALE_CONNECTION_CHECK);
 			log.log(Level.CONFIG, "forced detailed stale connection checking is set to = {0}",
 					forceDetailStaleConnectionCheck);
+		}
+		if (props.get(SM_THREADS_FACTOR_PROP_KEY) != null) {
+			pluginsThreadFactor = (Integer) props.get(SM_THREADS_FACTOR_PROP_KEY);
+			log.log(Level.CONFIG, "plugins thread pool multiplication factor set to = {0}", pluginsThreadFactor);
 		}
 		if (props.get(STALE_CONNECTION_CLOSER_QUEUE_SIZE_KEY) != null) {
 			staleConnectionCloser.setMaxQueueSize((Integer) props.get(
@@ -2563,7 +2571,7 @@ public class SessionManager
 					implements XMPPProcessorIfc {
 		@Override
 		public int concurrentQueuesNo() {
-			return 4;
+			return Runtime.getRuntime().availableProcessors() * 4;
 		}
 
 		@Override
@@ -2647,7 +2655,7 @@ public class SessionManager
 					implements XMPPProcessorIfc {
 		@Override
 		public int concurrentQueuesNo() {
-			return 4;
+			return super.concurrentQueuesNo() * 4;
 		}
 
 		@Override
@@ -2675,7 +2683,7 @@ public class SessionManager
 					implements XMPPProcessorIfc {
 		@Override
 		public int concurrentQueuesNo() {
-			return 4;
+			return super.concurrentQueuesNo() * 2;
 		}
 
 		@Override

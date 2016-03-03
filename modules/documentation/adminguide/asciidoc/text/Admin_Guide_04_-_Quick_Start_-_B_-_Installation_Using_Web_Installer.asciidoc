@@ -11,6 +11,7 @@ Installation Using Web Installer
 :website: http://tigase.net
 
 When Tigase XMPP Server starts up, it looks for the default configuration file: *etc/init.properties*. If this file has not been modified you can run the web installer. Which will step you through the process of configuring Tigase.
+If you are installing Tigase in a Windows environment, please see the xref:winWebInstall[Windows Installation] section.
 
 Download and Extract
 --------------------
@@ -51,6 +52,7 @@ java    18387 tigase  151u  IPv6 22185837      0t0  TCP *:5280 (LISTEN)
 java    18387 tigase  152u  IPv6 22185838      0t0  TCP *:5269 (LISTEN)
 -------------------------------------
 
+[[connecttoWebInstall]]
 Connect to the Web Installer
 ----------------------------
 
@@ -122,3 +124,14 @@ $ scripts/tigase.sh start etc/tigase.conf
 -------------------------------------
 
 Everything should be running smooth at this point. Check the logfiles in logs/ if you experience any problems.
+
+[[winWebInstall]]
+Windows Instructions for using Web Installer
+--------------------------------------------
+There are a few steps involved with setting up Tigase with the web installer in a Windows environment.  Please follow this guide.
+
+First step is to extract the dist-max archive in it's entirety to the intended running directory.  Once there, run the Setup.bat file inside the win-stuff folder.  This will move the necessary files to the correct folders before Tigase begins operation.
+
+From here, you have a few options how to run Tigase; run.bat will operate Tigase using a java command, or run.bat which will start Tigase using the wrapper.  You may also install Tigase and run it as a service.
+
+One this setup is finished, web installer will continue the same from xref:connecttoWebInstall[here].
