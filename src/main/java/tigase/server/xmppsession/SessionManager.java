@@ -26,21 +26,6 @@ package tigase.server.xmppsession;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import static tigase.server.xmppsession.SessionManagerConfig.AUTH_TIMEOUT_PROP_KEY;
-import static tigase.server.xmppsession.SessionManagerConfig.AUTH_TIMEOUT_PROP_VAL;
-import static tigase.server.xmppsession.SessionManagerConfig.AUTO_CREATE_OFFLINE_USER_PROP_KEY;
-import static tigase.server.xmppsession.SessionManagerConfig.FORCE_DETAIL_STALE_CONNECTION_CHECK;
-import static tigase.server.xmppsession.SessionManagerConfig.PLUGINS_CONCURRENCY_PROP_KEY;
-import static tigase.server.xmppsession.SessionManagerConfig.PLUGINS_CONF_PROP_KEY;
-import static tigase.server.xmppsession.SessionManagerConfig.SKIP_PRIVACY_PROP_KEY;
-import static tigase.server.xmppsession.SessionManagerConfig.SM_THREADS_POOL_PROP_KEY;
-import static tigase.server.xmppsession.SessionManagerConfig.SM_THREADS_POOL_PROP_VAL;
-import static tigase.server.xmppsession.SessionManagerConfig.STALE_CONNECTION_CLOSER_QUEUE_SIZE_KEY;
-import static tigase.server.xmppsession.SessionManagerConfig.defaultHandlerProcId;
-import static tigase.server.xmppsession.SessionManagerConfig.getProcessor;
-import static tigase.server.xmppsession.SessionManagerConfig.sessionCloseProcId;
-import static tigase.server.xmppsession.SessionManagerConfig.sessionOpenProcId;
-
 import java.io.ByteArrayInputStream;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
@@ -133,6 +118,8 @@ import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.HandleEvent;
 import tigase.eventbus.events.ShutdownEvent;
+
+import static tigase.server.xmppsession.SessionManagerConfig.*;
 
 /**
  * Class SessionManager
