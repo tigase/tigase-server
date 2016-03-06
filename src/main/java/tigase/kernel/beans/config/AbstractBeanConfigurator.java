@@ -24,17 +24,18 @@ package tigase.kernel.beans.config;
 import tigase.kernel.BeanUtils;
 import tigase.kernel.KernelException;
 import tigase.kernel.TypesConverter;
+import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Converter;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.DependencyManager;
 import tigase.kernel.core.Kernel;
+import tigase.osgi.ModulesManagerImpl;
+import tigase.util.ClassUtil;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -57,6 +58,8 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		if (values == null) return;
 		if (log.isLoggable(Level.CONFIG))
 			log.config("Configuring bean '" + beanConfig.getBeanName() + "'...");
+
+		registerBeans(beanConfig, values);
 
 		final HashMap<Field, Object> valuesToSet = new HashMap<>();
 
@@ -197,6 +200,131 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		this.accessToAllFields = accessToAllFields;
 	}
 
+	@Override
+	public void registerBeans(BeanConfig beanConfig, Map<String, Object> values) {
+		Kernel kernel = beanConfig == null ? this.getKernel() : beanConfig.getKernel();
+
+		registerBeansForBeanOfClass(kernel, beanConfig == null ? Kernel.class : beanConfig.getClazz());
+
+		Map<String,BeanPropConfig> beanPropConfigMap = new HashMap<>();
+
+		String beansProp = (String) values.get("beans");
+		if (beansProp != null) {
+			String[] beansPropArr = beansProp.split(",");
+			for (String beanStr : beansPropArr) {
+				String beanName = null;
+				boolean active = true;
+				if (beanStr.startsWith("-")) {
+					beanName = beanStr.substring(1);
+					active = false;
+				} else if (beanStr.startsWith("+")) {
+					beanName = beanStr.substring(1);
+				}
+
+				if (beanPropConfigMap.get(beanName) != null) {
+					throw new RuntimeException("Invalid 'beans' property value - duplicated entry for bean " +
+							beanName + "! in " + beansProp);
+				}
+				BeanPropConfig cfg = new BeanPropConfig();
+				cfg.setBeanName(beanName);
+				cfg.setActive(active);
+				beanPropConfigMap.put(beanName, cfg);
+			}
+		}
+
+		List<String> keys = new ArrayList<>(values.keySet());
+		Collections.sort(keys);
+		for (String key : keys) {
+			String[] keyParts = key.split("/");
+			if (keyParts.length != 2)
+				continue;
+
+			String beanName = keyParts[0];
+			String action = keyParts[1];
+			Object value = values.get(key);
+
+			BeanPropConfig cfg = beanPropConfigMap.get(beanName);
+			switch (action) {
+				case "active":
+				case "class":
+					if (cfg == null) {
+						cfg = new BeanPropConfig();
+						cfg.setBeanName(beanName);
+						beanPropConfigMap.put(beanName, cfg);
+					}
+					break;
+				default:
+					if (kernel.isBeanClassRegistered(cfg.getBeanName()) && cfg == null) {
+						cfg = new BeanPropConfig();
+						cfg.setBeanName(beanName);
+						beanPropConfigMap.put(beanName, cfg);
+					}
+					break;
+			}
+			switch (action) {
+				case "active":
+					cfg.setActive(Boolean.parseBoolean(value.toString()));
+					break;
+				case "class":
+					cfg.setClazzName(value.toString());
+					break;
+				default:
+					break;
+			}
+		}
+
+		for (BeanPropConfig cfg : beanPropConfigMap.values()) {
+			// TODO configuration is not as it should be - unknown class for bean!
+			if (cfg.getClazzName() == null && !kernel.isBeanClassRegistered(cfg.getBeanName()))
+				continue;
+
+			if (kernel.isBeanClassRegistered(cfg.getBeanName())) {
+				kernel.setBeanActive(cfg.getBeanName(), cfg.isActive());
+			} else {
+				try {
+					Class<?> cls = ModulesManagerImpl.getInstance().forName(cfg.getClazzName());
+					kernel.registerBean(cfg.getBeanName()).asClass(cls).setActive(cfg.isActive()).exec();
+				} catch (ClassNotFoundException ex) {
+					log.log(Level.FINER, "could not register bean '" + cfg.getBeanName() + "' as class '" +
+							cfg.getClazzName() + "' is not available", ex);
+				}
+			}
+		}
+
+	}
+
+	protected void registerBeansForBeanOfClass(Kernel kernel, Class<?> cls) {
+		// TODO - needs to be adjusted to support OSGi
+		try {
+			Set<Class<?>> classes = ClassUtil.getClassesFromClassPath();
+			registerBeansForBeanOfClass(kernel, cls, classes);
+		} catch (IOException |ClassNotFoundException ex) {
+			log.log(Level.WARNING, "could not load clases for bean registration", ex);
+		}
+	}
+
+	protected void registerBeansForBeanOfClass(Kernel kernel, Class<?> requiredClass, Set<Class<?>> classes) {
+		for (Class<?> cls : classes) {
+			Bean annotation = registerBeansForBeanOfClassShouldRegister(requiredClass, cls);
+			if (annotation != null) {
+				kernel.registerBean(cls);
+			}
+		}
+	}
+
+	protected Bean registerBeansForBeanOfClassShouldRegister(Class<?> requiredClass, Class<?> cls) {
+		Bean annotation = cls.getAnnotation(Bean.class);
+		if (annotation == null)
+			return null;
+
+		Class parent = annotation.parent();
+		if (parent == Object.class)
+			return null;
+
+		return parent.isAssignableFrom(requiredClass) ? annotation : null;
+	}
+
+
 	public void restoreDefaults(String beanName) {
 		BeanConfig beanConfig = kernel.getDependencyManager().getBeanConfig(beanName);
 		Object bean = kernel.getInstance(beanName);
@@ -227,6 +355,39 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 			throw new KernelException("Cannot inject configuration to bean " + beanConfig.getBeanName(), e);
 		}
 
+	}
+
+	private class BeanPropConfig {
+
+		private String beanName;
+
+		private String clazzName;
+
+		private boolean active = true;
+
+		public String getBeanName() {
+			return beanName;
+		}
+
+		public void setBeanName(String beanName) {
+			this.beanName = beanName;
+		}
+
+		public String getClazzName() {
+			return clazzName;
+		}
+
+		public void setClazzName(String clazzName) {
+			this.clazzName = clazzName;
+		}
+
+		public boolean isActive() {
+			return active;
+		}
+
+		public void setActive(boolean active) {
+			this.active = active;
+		}
 	}
 
 }

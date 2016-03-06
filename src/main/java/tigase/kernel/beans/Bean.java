@@ -21,4 +21,12 @@ public @interface Bean {
 	 * @return name of bean.
 	 */
 	String name();
+
+	/**
+	 * Is active by default
+	 * @return
+	 */
+	boolean active() default true;
+
+	Class parent() default Object.class;
 }

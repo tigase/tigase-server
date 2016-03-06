@@ -2,6 +2,8 @@ package tigase.kernel.beans.config;
 
 import tigase.kernel.core.BeanConfig;
 
+import java.util.Map;
+
 /**
  * Bean configurator.
  * <p>
@@ -32,4 +34,5 @@ public interface BeanConfigurator {
 	 */
 	void configure(BeanConfig beanConfig, Object bean);
 
+	void registerBeans(BeanConfig beanConfig, Map<String, Object> valeus);
 }

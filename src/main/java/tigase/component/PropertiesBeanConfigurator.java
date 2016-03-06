@@ -82,6 +82,7 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 		// Preparing set of properties based on given properties set
 		HashSet<String> beanProps = getBeanProps(beanConfig.getBeanName());
 		for (String key : beanProps) {
+			// TODO: split is a no-go, there can be more than just 1 '/' char - support for multilevel!
 			String[] tmp = key.split("/");
 			final String property = tmp[1];
 			final Object value = props.get(key);
