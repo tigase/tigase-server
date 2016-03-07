@@ -1,5 +1,5 @@
 /*
- * RegistrarKernel.java
+ * Component1.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
@@ -19,22 +19,21 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-package tigase.kernel.core;
+package tigase.kernel.modular.c1;
 
-import tigase.kernel.Registrar;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.modular.Component;
 
-public class RegistrarKernel extends Kernel {
+@Bean(name = "Component1")
+public class Component1 implements Component {
 
-	private Class<? extends Registrar> registrarClass;
+	@Inject
+	private Helper helper;
 
-
-	public void setRegistrar(Registrar registrar) {
-		registrar.register(this);
-		registrar.start(this);
-
-		for (BeanConfig rbc : getDependencyManager().getBeanConfigs(Registrar.class)) {
-			Registrar r = getInstance(rbc.getBeanName());
-		}
+	@Override
+	public String execute(String request) {
+		return "response:Component1(" + request + ")";
 	}
 
 }
