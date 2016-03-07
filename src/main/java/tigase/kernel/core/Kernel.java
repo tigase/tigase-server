@@ -23,7 +23,6 @@ package tigase.kernel.core;
 
 import tigase.kernel.BeanUtils;
 import tigase.kernel.KernelException;
-import tigase.kernel.Registrar;
 import tigase.kernel.beans.*;
 import tigase.kernel.beans.config.BeanConfigurator;
 import tigase.kernel.core.BeanConfig.State;
@@ -73,6 +72,78 @@ public class Kernel {
 		bc.setPinned(true);
 		dependencyManager.register(bc);
 		putBeanInstance(bc, this);
+	}
+
+	protected static void initBean(BeanConfig tmpBC, Set<BeanConfig> createdBeansConfig, int deep)
+			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
+		final BeanConfig beanConfig = tmpBC instanceof DelegatedBeanConfig ? ((DelegatedBeanConfig) tmpBC).original : tmpBC;
+
+		if (beanConfig.getState() == State.initialized)
+			return;
+
+		Object bean;
+		if (beanConfig.getState() == State.registered) {
+			beanConfig.setState(State.instanceCreated);
+			if (beanConfig.getFactory() != null && beanConfig.getFactory().getState() != State.initialized) {
+				initBean(beanConfig.getFactory(), new HashSet<BeanConfig>(), 0);
+			}
+			if (RegistrarBean.class.isAssignableFrom(beanConfig.getClazz())) {
+				RegistrarKernel k = new RegistrarKernel();
+				k.setName(beanConfig.getBeanName());
+				beanConfig.getKernel().registerBean(beanConfig.getBeanName() + "#KERNEL").asInstance(k).exec();
+				beanConfig.setKernel(k);
+			}
+			bean = beanConfig.getKernel().createNewInstance(beanConfig);
+			beanConfig.getKernel().putBeanInstance(beanConfig, bean);
+			createdBeansConfig.add(beanConfig);
+			if (RegistrarBean.class.isAssignableFrom(beanConfig.getClazz())) {
+				Kernel parent = beanConfig.getKernel().getParent();
+				// without this line setBeanActive() fails
+				//parent.ln(beanConfig.getBeanName(), beanConfig.getKernel(), beanConfig.getBeanName());
+				parent.ln(beanConfig.getBeanName(), beanConfig.getKernel(), "service");
+			}
+		} else {
+			bean = beanConfig.getKernel().getInstance(beanConfig);
+		}
+
+		BeanConfigurator beanConfigurator;
+		try {
+			if (beanConfig.getKernel().isBeanClassRegistered(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)
+					&& !beanConfig.getBeanName().equals(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME))
+				beanConfigurator = beanConfig.getKernel().getInstance(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME);
+			else
+				beanConfigurator = null;
+		} catch (KernelException e) {
+			beanConfigurator = null;
+		}
+
+		if (beanConfigurator != null) {
+			beanConfigurator.configure(beanConfig, bean);
+		}
+
+		if (bean instanceof RegistrarBean) {
+			((RegistrarBean) bean).register(beanConfig.getKernel());
+		}
+
+		for (final Dependency dep : beanConfig.getFieldDependencies().values()) {
+			beanConfig.getKernel().injectDependencies(bean, dep, createdBeansConfig, deep);
+		}
+
+		if (deep == 0) {
+			for (BeanConfig bc : createdBeansConfig) {
+				Object bi = bc.getKernel().getInstance(bc);
+				bc.setState(State.initialized);
+				if (bi instanceof Initializable) {
+					((Initializable) bi).initialize();
+				}
+			}
+
+//			if (bean instanceof RegistrarBean) {
+//				Kernel parent = beanConfig.getKernel().getParent();
+//				parent.ln(beanConfig.getBeanName(), beanConfig.getKernel(), beanConfig.getBeanName());
+//			}
+
+		}
 	}
 
 	private Object createNewInstance(BeanConfig beanConfig) {
@@ -303,85 +374,6 @@ public class Kernel {
 			}
 		} catch (Exception e) {
 			throw new KernelException("Can't initialize all beans", e);
-		}
-	}
-
-	protected static void initBean(BeanConfig tmpBC, Set<BeanConfig> createdBeansConfig, int deep)
-			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
-		final BeanConfig beanConfig = tmpBC instanceof DelegatedBeanConfig ? ((DelegatedBeanConfig) tmpBC).original : tmpBC;
-
-		if (beanConfig.getState() == State.initialized)
-			return;
-
-		Object bean;
-		if (beanConfig.getState() == State.registered) {
-			beanConfig.setState(State.instanceCreated);
-			if (beanConfig.getFactory() != null && beanConfig.getFactory().getState() != State.initialized) {
-				initBean(beanConfig.getFactory(), new HashSet<BeanConfig>(), 0);
-			}
-			if (RegistrarBean.class.isAssignableFrom(beanConfig.getClazz())) {
-				RegistrarKernel k = new RegistrarKernel();
-				k.setName(beanConfig.getBeanName());
-				beanConfig.getKernel().registerBean(beanConfig.getBeanName() + "#KERNEL").asInstance(k).exec();
-				beanConfig.setKernel(k);
-			}
-			bean = beanConfig.getKernel().createNewInstance(beanConfig);
-			beanConfig.getKernel().putBeanInstance(beanConfig, bean);
-			createdBeansConfig.add(beanConfig);
-			if (RegistrarBean.class.isAssignableFrom(beanConfig.getClazz())) {
-				Kernel parent = beanConfig.getKernel().getParent();
-				// without this line setBeanActive() fails
-				//parent.ln(beanConfig.getBeanName(), beanConfig.getKernel(), beanConfig.getBeanName());
-				parent.ln(beanConfig.getBeanName(), beanConfig.getKernel(), "service");
-			}
-		} else {
-			bean = beanConfig.getKernel().getInstance(beanConfig);
-		}
-
-		BeanConfigurator beanConfigurator;
-		try {
-			if (beanConfig.getKernel().isBeanClassRegistered(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)
-					&& !beanConfig.getBeanName().equals(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME))
-				beanConfigurator = beanConfig.getKernel().getInstance(BeanConfigurator.DEFAULT_CONFIGURATOR_NAME);
-			else
-				beanConfigurator = null;
-		} catch (KernelException e) {
-			beanConfigurator = null;
-		}
-
-		if (beanConfigurator != null) {
-			beanConfigurator.configure(beanConfig, bean);
-		}
-
-		if (bean instanceof RegistrarBean) {
-			((RegistrarBean) bean).register(beanConfig.getKernel());
-		}
-
-		for (final Dependency dep : beanConfig.getFieldDependencies().values()) {
-			beanConfig.getKernel().injectDependencies(bean, dep, createdBeansConfig, deep);
-		}
-
-		if (deep == 0) {
-			for (BeanConfig bc : createdBeansConfig) {
-				Object bi = bc.getKernel().getInstance(bc);
-				bc.setState(State.initialized);
-				if (bi instanceof Initializable) {
-					((Initializable) bi).initialize();
-				}
-			}
-
-//			if (bean instanceof RegistrarBean) {
-//				Kernel parent = beanConfig.getKernel().getParent();
-//				parent.ln(beanConfig.getBeanName(), beanConfig.getKernel(), beanConfig.getBeanName());
-//			}
-
-			if (Registrar.class.isAssignableFrom(beanConfig.getClazz())) {
-				RegistrarKernel k = new RegistrarKernel();
-				k.setName(beanConfig.getBeanName());
-				beanConfig.getKernel().registerBean(beanConfig.getBeanName() + "#KERNEL").asInstance(k).exec();
-				((Registrar) bean).register(k);
-				// ((Registrar) bean).start(k);
-			}
 		}
 	}
 
@@ -640,31 +632,6 @@ public class Kernel {
 		this.forceAllowNull = forceAllowNull;
 	}
 
-	/**
-	 * Runs all registered {@link Registrar registrars} in current kernel and
-	 * child Kernels.
-	 */
-	public void startSubKernels() {
-		for (BeanConfig bc : dependencyManager.getBeanConfigs(Registrar.class)) {
-			if (bc.getState() == State.inactive)
-				continue;
-
-			Registrar r = getInstance(bc.getBeanName());
-			Kernel k = getInstance(bc.getBeanName() + "#KERNEL");
-			r.start(k);
-			k.startSubKernels();
-		}
-
-//		for (BeanConfig bc : dependencyManager.getBeanConfigs(RegistrarBean.class)) {
-//			if (bc.getState() == State.inactive || DelegatedBeanConfig.class.isAssignableFrom(bc.getClass()))
-//				continue;
-//
-//			RegistrarBean r = getInstance(bc.getBeanName());
-//			Kernel k = getInstance(bc.getBeanName() + "#KERNEL");
-//			ln(bc.getBeanName(), k, bc.getBeanName());
-//			k.startSubKernels();
-//		}
-	}
 
 	/**
 	 * Unload given bean from all previously injected objects.

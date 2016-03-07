@@ -18,6 +18,7 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  */
+
 package tigase.server;
 
 import tigase.component.PropertiesBeanConfigurator;
@@ -72,7 +73,6 @@ public class Bootstrap implements Lifecycle {
 		// if null then we register global subbeans
 		configurator.registerBeans(null, props);
 
-		kernel.startSubKernels();
 	}
 
 	@Override
