@@ -21,11 +21,19 @@
 
 package tigase.kernel.modular.c2;
 
+import tigase.component.PropertiesBeanConfigurator;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
 import tigase.kernel.modular.Component;
 
 @Bean(name = "Component2")
 public class Component2 implements Component {
+
+
+	@Inject
+	private
+	PropertiesBeanConfigurator propertiesBeanConfigurator;
+
 
 	@Override
 	public String execute(String request) {

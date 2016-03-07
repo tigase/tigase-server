@@ -25,4 +25,7 @@ import tigase.kernel.beans.Bean;
 
 @Bean(name = "Helper")
 public class Helper {
+	public String doSomething(String request) {
+		return "h:" + request;
+	}
 }

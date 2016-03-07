@@ -53,7 +53,7 @@ public class ApplicationTest {
 	public void testBootstrapModules() {
 		final RegistrarKernel krnl = new RegistrarKernel();
 		krnl.setName("root");
-		krnl.registerBean(PropertiesBeanConfigurator.class).exec();
+		krnl.registerBean(PropertiesBeanConfigurator.class).exportable().exec();
 
 		// registering our main class of application
 		krnl.registerBean(ComponentsManager.class).exec();
@@ -70,7 +70,7 @@ public class ApplicationTest {
 		Assert.assertEquals(2, componentsManager.getComponents().length);
 
 		Collection<String> response = componentsManager.process("call1");
-		Assert.assertTrue(response.contains("response:Component1(call1)"));
+		Assert.assertTrue(response.contains("response:Component1(h:call1)"));
 		Assert.assertTrue(response.contains("response:Component2(call1)"));
 	}
 

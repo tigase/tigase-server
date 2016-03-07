@@ -33,7 +33,7 @@ public class Component1 implements Component {
 
 	@Override
 	public String execute(String request) {
-		return "response:Component1(" + request + ")";
+		return "response:Component1(" + helper.doSomething(request) + ")";
 	}
 
 }
