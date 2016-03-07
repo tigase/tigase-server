@@ -26,16 +26,15 @@ import tigase.kernel.beans.RegistrarBean;
 import tigase.kernel.core.Kernel;
 
 @Bean(name = "component2Registrar")
-public class Component2Registrar implements RegistrarBean {
+public class Component2Registrar extends Component2 implements RegistrarBean {
 
 
 	@Override
 	public void register(Kernel kernel) {
-		kernel.registerBean(Component2.class).exec();
 	}
 
 	@Override
 	public void unregister(Kernel kernel) {
-		kernel.unregister("Component2");
 	}
+
 }
