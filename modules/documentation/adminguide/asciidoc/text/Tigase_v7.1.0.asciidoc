@@ -260,6 +260,14 @@ Full XML of last available presence may be saved to repository
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 A more detailed last available presence can now be made from some configuration changes, along with a timestamp before the entire presence stanza is saved to the repository.  More information is available xref:storeFullXMLLastPresence[here].
 
+New Program Defaults
+~~~~~~~~~~~~~~~~~~~~
+Tigase has improved default settings to improve performance.  These include:
+- Increase the number of database connections in relation to the number of available CPUs (factor by 4 by default).
+- Plugins code has been revised.
+- Default thread pools have been increased for better performance.
+- New option added to globally increase thread pool counts +sess-man/sm-threads-factor[I]=1+. Setting increases thread factor by specified factor.
+
 New Minor Features & Behavior Changes
 -------------------------------------
 - Old monitor component depreciated and turned off.
@@ -298,8 +306,12 @@ New Minor Features & Behavior Changes
 - #3609 Added new configuration option for BOSH to disable hostname attribute. xref:tip_1_bosh_in_cluster_mode_without_load_balancer[Details here].
 - link:https://projects.tigase.org/issues/3670[#3670] Hardened mode now uses long DH keys (2048) by default.
 - link:https://projects.tigase.org/issues/3849[#3849] New Roster size limit configurable setting. See info xref:rosterLimit[Here].
-- link:https://projects.tigase.org/issues/3872[#3872] PostgreSQL driver updated to v9.4
+- link:https://projects.tigase.org/issues/3872[#3872] PostgreSQL driver updated to v9.4.
+- link:https://projects.tigase.org/issues/3908[#3908] Logs now print whether components or plugins are depreciated, and recommend configuration settings changes.
 - link:https://projects.tigase.org/issues/3937[#3937] Windows setup given one-click solution to file initialization.
+- link:https://projects.tigase.org/issues/3945[#3945] SSLContextContainer has been replaced with JDKv8 extension version now known as SNISSLContextContainer adding support for SNI of SSL/TLS.
+- link:https://projects.tigase.org/issues/3950[#3950] MongoDB driver updated to v2.14.1.
+- #3986 added new index for tig_nodes collection in MongoDB Databases.
 
 
 Fixes
@@ -459,6 +471,16 @@ Fixes
 - #3911 Fixed load distribution error between threads that could cause high CPU usage.
 
 - #3931 Fixed error caused by AMP running in clustered installations.
+
+- #3966 Changed type of msg & body columns in muc_history table for SQLServer to prevent loss of special characters.
+
+- #3973 Adjusted throttling settings for S2S and cluster connections.
+
+- #3977 Fixed MUC History to reflect messages from JID of room and not JID of original sender.
+
+- #3984 Fixed distinct usage on large data which causes errors on lookup of PubSub nodes in MongoDB.
+
+- link:https://projects.tigase.org/issues/3970[#3970] Fixed duplication of messages with AMP payload in cluster mode.
 
 - Patch added to fix ConcurrentModificationException in BlockingCommand plugin.
 
