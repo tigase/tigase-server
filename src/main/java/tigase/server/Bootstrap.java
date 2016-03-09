@@ -23,16 +23,10 @@ package tigase.server;
 
 import tigase.component.PropertiesBeanConfigurator;
 import tigase.kernel.DefaultTypesConverter;
-import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.BeanConfigurator;
 import tigase.kernel.core.Kernel;
-import tigase.osgi.ModulesManager;
-import tigase.osgi.ModulesManagerImpl;
-import tigase.util.ClassUtil;
 
-import java.io.IOException;
-import java.util.*;
-import java.util.logging.Level;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -73,6 +67,7 @@ public class Bootstrap implements Lifecycle {
 		// if null then we register global subbeans
 		configurator.registerBeans(null, props);
 
+		kernel.getInstance("message-router");
 	}
 
 	@Override

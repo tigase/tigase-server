@@ -26,24 +26,36 @@ package tigase.server.xmppsession;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecatedComponent;
+import tigase.auth.mechanisms.SaslEXTERNAL;
+import tigase.conf.Configurable;
+import tigase.conf.ConfigurationException;
+import tigase.db.*;
+import tigase.disco.XMPPService;
+import tigase.eventbus.EventBus;
+import tigase.eventbus.EventBusFactory;
+import tigase.eventbus.HandleEvent;
+import tigase.eventbus.events.ShutdownEvent;
+import tigase.kernel.beans.Inject;
+import tigase.server.*;
+import tigase.server.script.CommandIfc;
+import tigase.stats.StatisticsList;
+import tigase.sys.OnlineJidsReporter;
+import tigase.sys.TigaseRuntime;
+import tigase.util.Base64;
+import tigase.util.*;
+import tigase.vhosts.VHostItem;
+import tigase.xml.Element;
+import tigase.xmpp.*;
+import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
+import tigase.xmpp.impl.JabberIqRegister;
+import tigase.xmpp.impl.PresenceCapabilitiesManager;
+
+import javax.script.Bindings;
 import java.io.ByteArrayInputStream;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
-import java.util.AbstractQueue;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -51,75 +63,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.script.Bindings;
-
-import tigase.auth.mechanisms.SaslEXTERNAL;
-import tigase.cert.CertificateEntry;
-import tigase.cert.CertificateUtil;
-import tigase.conf.Configurable;
-import tigase.conf.ConfigurationException;
-
-import tigase.db.AuthRepository;
-import tigase.db.NonAuthUserRepository;
-import tigase.db.NonAuthUserRepositoryImpl;
-import tigase.db.RepositoryFactory;
-import tigase.db.TigaseDBException;
-import tigase.db.UserRepository;
-
-import tigase.disco.XMPPService;
-
-import tigase.server.AbstractMessageReceiver;
-import tigase.server.Command;
-import tigase.server.Iq;
-import tigase.server.Message;
-import tigase.server.Packet;
-import tigase.server.Permissions;
-import tigase.server.ReceiverTimeoutHandler;
-import tigase.server.XMPPServer;
-import tigase.server.script.CommandIfc;
-
-import tigase.sys.OnlineJidsReporter;
-import tigase.sys.TigaseRuntime;
-import tigase.util.Base64;
-import tigase.util.ProcessingThreads;
-import tigase.util.QueueItem;
-import tigase.util.TigaseStringprepException;
-import tigase.util.WorkerThread;
-import tigase.vhosts.VHostItem;
-import tigase.xml.Element;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.NoConnectionIdException;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPImplIfc;
-import tigase.xmpp.XMPPPacketFilterIfc;
-import tigase.xmpp.XMPPPostprocessorIfc;
-import tigase.xmpp.XMPPPreprocessorIfc;
-import tigase.xmpp.XMPPProcessor;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.XMPPSession;
-import tigase.xmpp.XMPPStopListenerIfc;
-import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
-import tigase.xmpp.impl.JabberIqRegister;
-import tigase.xmpp.impl.PresenceCapabilitiesManager;
-//~--- JDK imports ------------------------------------------------------------
-
-import tigase.annotations.TigaseDeprecatedComponent;
-import tigase.stats.StatisticsList;
-
-import java.util.Collection;
-import tigase.eventbus.EventBus;
-import tigase.eventbus.EventBusFactory;
-import tigase.eventbus.HandleEvent;
-import tigase.eventbus.events.ShutdownEvent;
-
 import static tigase.server.xmppsession.SessionManagerConfig.*;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Class SessionManager
@@ -142,9 +88,10 @@ public class SessionManager
 	private static final Logger log = Logger.getLogger(SessionManager.class.getName());
 
 	private static final String SESSION_CLOSE_TIMER_KEY = "session-close-timer";
-	
+
 	//~--- fields ---------------------------------------------------------------
 
+	@Inject
 	private AuthRepository                   auth_repository                 = null;
 	private long                             authTimeouts                    = 0;
 	private long                             closedConnections               = 0;
@@ -165,6 +112,7 @@ public class SessionManager
 	private int                              tIdx                            = 0;
 	private long                             totalUserConnections            = 0;
 	private long                             totalUserSessions               = 0;
+	@Inject
 	private UserRepository                   user_repository                 = null;
 	private Map<String, XMPPStopListenerIfc> stopListeners = new ConcurrentHashMap<String,
 			XMPPStopListenerIfc>(10);

@@ -28,12 +28,11 @@ import tigase.kernel.beans.config.BeanConfigurator;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.DependencyManager;
+import tigase.kernel.core.Kernel;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 
 @Bean(name = BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)
@@ -42,13 +41,34 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 
 	private Map<String, Object> props;
 
-	private HashSet<String> getBeanProps(String beanName) {
-		HashSet<String> result = new HashSet<>();
+	private HashMap<String, Object> getBeanProps(BeanConfig beanConfig) {
+		HashMap<String, Object> result = new HashMap<>();
 
 		if (props != null) {
-			for (String pn : props.keySet()) {
-				if (pn.startsWith(beanName + "/")) {
-					result.add(pn);
+			StringBuilder sb = new StringBuilder();
+			ArrayDeque<Kernel> kernels = new ArrayDeque<>();
+			Kernel kernel = beanConfig.getKernel();
+			while (kernel.getParent() != null && kernel != this.kernel) {
+				kernels.push(kernel);
+				kernel = kernel.getParent();
+			}
+			while((kernel = kernels.poll()) != null) {
+				if (sb.length() > 0)
+					sb.append("/");
+				sb.append(kernel.getName());
+			}
+
+			if (!beanConfig.getBeanName().equals(beanConfig.getKernel().getName())) {
+				if (sb.length() > 0)
+					sb.append("/");
+				sb.append(beanConfig.getBeanName());
+			}
+
+			String prefix = sb.toString();
+			for (Map.Entry<String, Object> e : props.entrySet()) {
+				if (e.getKey().startsWith(prefix + "/")) {
+					String key = e.getKey().substring(prefix.length() + 1);
+					result.put(key, e.getValue());
 				}
 			}
 		}
@@ -60,6 +80,22 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 	protected Map<String, Object> getConfiguration(BeanConfig beanConfig) {
 		final HashMap<String, Object> valuesToSet = new HashMap<>();
 
+		resolveAliases(beanConfig, props, valuesToSet);
+
+		// Preparing set of properties based on given properties set
+		HashMap<String, Object> beanProps = getBeanProps(beanConfig);
+		resolveAliases(beanConfig, beanProps, valuesToSet);
+		for (Map.Entry<String, Object> e : beanProps.entrySet()) {
+			final String property = e.getKey();
+			final Object value = e.getValue();
+
+			valuesToSet.put(property, value);
+		}
+
+		return valuesToSet;
+	}
+
+	protected void resolveAliases(BeanConfig beanConfig, Map<String, Object> props, Map<String, Object> valuesToSet) {
 		// Preparing set of properties based on @ConfigField annotation and
 		// aliases
 		Field[] fields = DependencyManager.getAllFields(beanConfig.getClazz());
@@ -68,7 +104,7 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 			if (cf != null && !cf.alias().isEmpty() && props.containsKey(cf.alias())) {
 				final Object value = props.get(cf.alias());
 
-				if (valuesToSet.containsKey(field)) {
+				if (props.containsKey(field)) {
 					if (log.isLoggable(Level.CONFIG))
 						log.config("Alias '" + cf.alias() + "' for property " + beanConfig.getBeanName() + "." + field.getName() + " will not be used, because there is configuration for this property already.");
 					continue;
@@ -79,19 +115,6 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 				valuesToSet.put(field.getName(), value);
 			}
 		}
-		// Preparing set of properties based on given properties set
-		HashSet<String> beanProps = getBeanProps(beanConfig.getBeanName());
-		for (String key : beanProps) {
-			// TODO: split is a no-go, there can be more than just 1 '/' char - support for multilevel!
-			String[] tmp = key.split("/");
-			final String property = tmp[1];
-			final Object value = props.get(key);
-
-			valuesToSet.put(property, value);
-		}
-
-
-		return valuesToSet;
 	}
 
 	public Map<String, Object> getCurrentConfigurations() {

@@ -42,7 +42,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class AuthRepositoryPool implements AuthRepository {
+public class AuthRepositoryPool implements AuthRepository, RepositoryPool<AuthRepository> {
 	private static final Logger log = Logger.getLogger(AuthRepositoryPool.class.getName());
 
 	//~--- fields ---------------------------------------------------------------

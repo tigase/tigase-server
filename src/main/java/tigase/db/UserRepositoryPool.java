@@ -46,7 +46,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class UserRepositoryPool implements UserRepository {
+public class UserRepositoryPool implements UserRepository, RepositoryPool<UserRepository> {
 	private static final Logger log = Logger.getLogger(UserRepositoryPool.class.getName());
 
 	//~--- fields ---------------------------------------------------------------

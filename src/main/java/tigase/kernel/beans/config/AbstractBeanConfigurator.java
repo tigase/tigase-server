@@ -206,91 +206,92 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 
 		registerBeansForBeanOfClass(kernel, beanConfig == null ? Kernel.class : beanConfig.getClazz());
 
-		Map<String,BeanPropConfig> beanPropConfigMap = new HashMap<>();
+		if (values != null) {
+			Map<String, BeanPropConfig> beanPropConfigMap = new HashMap<>();
 
-		String beansProp = (String) values.get("beans");
-		if (beansProp != null) {
-			String[] beansPropArr = beansProp.split(",");
-			for (String beanStr : beansPropArr) {
-				String beanName = null;
-				boolean active = true;
-				if (beanStr.startsWith("-")) {
-					beanName = beanStr.substring(1);
-					active = false;
-				} else if (beanStr.startsWith("+")) {
-					beanName = beanStr.substring(1);
-				}
-
-				if (beanPropConfigMap.get(beanName) != null) {
-					throw new RuntimeException("Invalid 'beans' property value - duplicated entry for bean " +
-							beanName + "! in " + beansProp);
-				}
-				BeanPropConfig cfg = new BeanPropConfig();
-				cfg.setBeanName(beanName);
-				cfg.setActive(active);
-				beanPropConfigMap.put(beanName, cfg);
-			}
-		}
-
-		List<String> keys = new ArrayList<>(values.keySet());
-		Collections.sort(keys);
-		for (String key : keys) {
-			String[] keyParts = key.split("/");
-			if (keyParts.length != 2)
-				continue;
-
-			String beanName = keyParts[0];
-			String action = keyParts[1];
-			Object value = values.get(key);
-
-			BeanPropConfig cfg = beanPropConfigMap.get(beanName);
-			switch (action) {
-				case "active":
-				case "class":
-					if (cfg == null) {
-						cfg = new BeanPropConfig();
-						cfg.setBeanName(beanName);
-						beanPropConfigMap.put(beanName, cfg);
+			String beansProp = (String) values.get("beans");
+			if (beansProp != null) {
+				String[] beansPropArr = beansProp.split(",");
+				for (String beanStr : beansPropArr) {
+					String beanName = null;
+					boolean active = true;
+					if (beanStr.startsWith("-")) {
+						beanName = beanStr.substring(1);
+						active = false;
+					} else if (beanStr.startsWith("+")) {
+						beanName = beanStr.substring(1);
 					}
-					break;
-				default:
-					if (kernel.isBeanClassRegistered(cfg.getBeanName()) && cfg == null) {
-						cfg = new BeanPropConfig();
-						cfg.setBeanName(beanName);
-						beanPropConfigMap.put(beanName, cfg);
+
+					if (beanPropConfigMap.get(beanName) != null) {
+						throw new RuntimeException("Invalid 'beans' property value - duplicated entry for bean " +
+								beanName + "! in " + beansProp);
 					}
-					break;
+					BeanPropConfig cfg = new BeanPropConfig();
+					cfg.setBeanName(beanName);
+					cfg.setActive(active);
+					beanPropConfigMap.put(beanName, cfg);
+				}
 			}
-			switch (action) {
-				case "active":
-					cfg.setActive(Boolean.parseBoolean(value.toString()));
-					break;
-				case "class":
-					cfg.setClazzName(value.toString());
-					break;
-				default:
-					break;
+
+			List<String> keys = new ArrayList<>(values.keySet());
+			Collections.sort(keys);
+			for (String key : keys) {
+				String[] keyParts = key.split("/");
+				if (keyParts.length != 2)
+					continue;
+
+				String beanName = keyParts[0];
+				String action = keyParts[1];
+				Object value = values.get(key);
+
+				BeanPropConfig cfg = beanPropConfigMap.get(beanName);
+				switch (action) {
+					case "active":
+					case "class":
+						if (cfg == null) {
+							cfg = new BeanPropConfig();
+							cfg.setBeanName(beanName);
+							beanPropConfigMap.put(beanName, cfg);
+						}
+						break;
+					default:
+						if (kernel.isBeanClassRegistered(beanName) && cfg == null) {
+							cfg = new BeanPropConfig();
+							cfg.setBeanName(beanName);
+							beanPropConfigMap.put(beanName, cfg);
+						}
+						break;
+				}
+				switch (action) {
+					case "active":
+						cfg.setActive(Boolean.parseBoolean(value.toString()));
+						break;
+					case "class":
+						cfg.setClazzName(value.toString());
+						break;
+					default:
+						break;
+				}
 			}
-		}
 
-		for (BeanPropConfig cfg : beanPropConfigMap.values()) {
-			// TODO configuration is not as it should be - unknown class for bean!
-			if (cfg.getClazzName() == null && !kernel.isBeanClassRegistered(cfg.getBeanName()))
-				continue;
+			for (BeanPropConfig cfg : beanPropConfigMap.values()) {
+				// TODO configuration is not as it should be - unknown class for bean!
+				if (cfg.getClazzName() == null && !kernel.isBeanClassRegistered(cfg.getBeanName()))
+					continue;
 
-			if (kernel.isBeanClassRegistered(cfg.getBeanName())) {
-				kernel.setBeanActive(cfg.getBeanName(), cfg.isActive());
-			} else {
-				try {
-					Class<?> cls = ModulesManagerImpl.getInstance().forName(cfg.getClazzName());
-					kernel.registerBean(cfg.getBeanName()).asClass(cls).setActive(cfg.isActive()).exec();
-				} catch (ClassNotFoundException ex) {
-					log.log(Level.FINER, "could not register bean '" + cfg.getBeanName() + "' as class '" +
-							cfg.getClazzName() + "' is not available", ex);
+				if (kernel.isBeanClassRegistered(cfg.getBeanName())) {
+					kernel.setBeanActive(cfg.getBeanName(), cfg.isActive());
+				} else {
+					try {
+						Class<?> cls = ModulesManagerImpl.getInstance().forName(cfg.getClazzName());
+						kernel.registerBean(cfg.getBeanName()).asClass(cls).setActive(cfg.isActive()).exec();
+					} catch (ClassNotFoundException ex) {
+						log.log(Level.FINER, "could not register bean '" + cfg.getBeanName() + "' as class '" +
+								cfg.getClazzName() + "' is not available", ex);
+					}
 				}
 			}
 		}
-
 	}
 
 	protected void registerBeansForBeanOfClass(Kernel kernel, Class<?> cls) {
@@ -307,13 +308,13 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		for (Class<?> cls : classes) {
 			Bean annotation = registerBeansForBeanOfClassShouldRegister(requiredClass, cls);
 			if (annotation != null) {
-				kernel.registerBean(cls);
+				kernel.registerBean(cls).exec();
 			}
 		}
 	}
 
 	protected Bean registerBeansForBeanOfClassShouldRegister(Class<?> requiredClass, Class<?> cls) {
-		Bean annotation = cls.getAnnotation(Bean.class);
+		Bean annotation = cls.getDeclaredAnnotation(Bean.class);
 		if (annotation == null)
 			return null;
 

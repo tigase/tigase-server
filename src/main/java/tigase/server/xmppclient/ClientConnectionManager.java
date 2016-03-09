@@ -32,6 +32,8 @@ import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.HandleEvent;
 import tigase.eventbus.events.ShutdownEvent;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.core.Kernel;
 import tigase.net.IOService;
 import tigase.net.SocketThread;
 import tigase.net.SocketType;
@@ -59,6 +61,7 @@ import java.util.zip.Deflater;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name="c2s", parent=Kernel.class)
 public class ClientConnectionManager
 				extends ConnectionManager<XMPPIOService<Object>> {
 	/**
