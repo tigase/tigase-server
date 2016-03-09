@@ -16,6 +16,7 @@ include::text/Admin_Guide_01_-_About_Tigase_Jabber_XMPP_Server.asciidoc[]
 
 include::text/Admin_Guide_02_-_Quick_Start.asciidoc[]
 
+
 :leveloffset: 2
 
 include::text/Admin_Guide_03_-_Quick_Start_-_A_-_Installation_Using_GUI_Installer.asciidoc[]
@@ -283,3 +284,5 @@ include::text/Admin_Guide_97_-_Using_Tigase_-_L_-_Scripting_Support_in_Tigase_-_
 :leveloffset: 2
 
 include::text/Admin_Guide_98_-_Using_Tigase_-_M_-_Configuration_Wizards.asciidoc[]
+
+include::text/Admin_Guide_99_-_Using_Tigase_-_N_-_Offline_Messages.asciidoc[]

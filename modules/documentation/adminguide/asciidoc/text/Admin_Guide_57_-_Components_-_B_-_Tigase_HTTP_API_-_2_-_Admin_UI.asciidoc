@@ -126,6 +126,7 @@ Lists the longest and average connection time from clients to servers.
 Create Node
 ~~~~~~~~~~~
 This section allows you to create a new node for the pubsub component.  Here is a breakdown of the fields:
+
 - The node to create: this is the name of the node that will be created.
 - Owner JID: user JID who will be considered the owner of the node.
 - pubsub#node type: sets the type of node the the new node will be.  Options include:
@@ -312,6 +313,7 @@ Clicking Submit query will show current status and settings, and possible fields
 vhost-man
 ^^^^^^^^^
 You will be presented with a list of domains that Tigase is currently hosting, you will be able to change settings for one domain at a time using this function.  Once a domain is selected, you will be able to set or change the following settings:
+
 - Domain name: the full domain name of the new vhost.  Tigase will not add anything to this domain, so if it is ti be a subdomain of example.com, you will need to enter sub.domain.com.
 - Enabled: Whether the domain is turned on or off.
 - Anonymous enabled: Allow anonymous logins.
@@ -358,6 +360,7 @@ This section allows admins to edit individual users rosters, although it provide
 Update user roster entry extended version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This section is an expanded version of the previous one, all fields already specified are the same with these additions:
+
 - Roster owner name: A friendly name or nickname if you wish to change/create one. *not required*
 - Comma separated of owner groups: Groups that the user wants to join/leave. *not required*
 - Roster item JID: The specific JID that needs to be edited.

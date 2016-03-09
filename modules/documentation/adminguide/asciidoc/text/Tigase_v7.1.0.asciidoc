@@ -310,8 +310,10 @@ New Minor Features & Behavior Changes
 - link:https://projects.tigase.org/issues/3908[#3908] Logs now print whether components or plugins are depreciated, and recommend configuration settings changes.
 - link:https://projects.tigase.org/issues/3937[#3937] Windows setup given one-click solution to file initialization.
 - link:https://projects.tigase.org/issues/3945[#3945] SSLContextContainer has been replaced with JDKv8 extension version now known as SNISSLContextContainer adding support for SNI of SSL/TLS.
+- link:https://projects.tigase.org/issues/3948[#3948] Tigase PubSub now responds to +disco#info+ requests in line with link:http://xmpp.org/extensions/xep-0060.html#entity-metadata[XEP-0060 - Discover Node Metadata].
 - link:https://projects.tigase.org/issues/3950[#3950] MongoDB driver updated to v2.14.1.
-- #3986 added new index for tig_nodes collection in MongoDB Databases.
+- #3985 Improved disco#info to return extended results for MUC component as per link:http://xmpp.org/extensions/xep-0128.html[XEP-0128 Service Discovery Extensions].
+- #3986 Added new index for tig_nodes collection in MongoDB Databases.
 
 
 Fixes
