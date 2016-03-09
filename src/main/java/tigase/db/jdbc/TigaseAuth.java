@@ -24,33 +24,22 @@ package tigase.db.jdbc;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.AuthorizationException;
-import tigase.db.DBInitException;
-import tigase.db.DataRepository;
-import tigase.db.RepositoryFactory;
-import tigase.db.TigaseDBException;
-import tigase.db.AuthRepository;
-import tigase.db.UserExistsException;
-import tigase.db.UserNotFoundException;
-
+import tigase.db.*;
 import tigase.util.Base64;
 import tigase.util.TigaseStringprepException;
-
 import tigase.xmpp.BareJID;
-
-import static tigase.db.AuthRepository.*;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.sql.Statement;
-
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static tigase.db.AuthRepository.Meta;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -64,7 +53,7 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 @Meta( supportedUris = { "jdbc:[^:]+:.*" } )
-public class TigaseAuth implements AuthRepository {
+public class TigaseAuth implements AuthRepository, DataSourceAware<DataRepository> {
 
 	/**
 	 * Private logger for class instances.
@@ -200,10 +189,16 @@ public class TigaseAuth implements AuthRepository {
 	//~--- methods --------------------------------------------------------------
 
 	@Override
+	public void setDataSource(DataRepository dataSource) {
+		data_repo = dataSource;
+	}
+
+	@Override
 	public void initRepository(final String connection_str, Map<String, String> params)
 			throws DBInitException {
 		try {
-			data_repo = RepositoryFactory.getDataRepository(null, connection_str, params);
+			if (data_repo == null)
+				data_repo = RepositoryFactory.getDataRepository(null, connection_str, params);
 			data_repo.initPreparedStatement(INIT_DB_QUERY, INIT_DB_QUERY);
 			data_repo.initPreparedStatement(ADD_USER_PLAIN_PW_QUERY, ADD_USER_PLAIN_PW_QUERY);
 			data_repo.initPreparedStatement(REMOVE_USER_QUERY, REMOVE_USER_QUERY);

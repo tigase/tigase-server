@@ -40,14 +40,17 @@ public abstract class MDPoolConfigBean<A extends Repository,B extends MDPoolConf
 	protected MDPoolBean<A,B> mdPool;
 	protected String domain;
 
-	@ConfigField(alias = REPO_URI, desc = "URI for repository")
+	@ConfigField(alias = REPO_URI, desc = "URI for repository", allowAliasFromParent = false)
 	protected String uri;
 
-	@ConfigField(alias = REPO_CLASS, desc = "Class implementing repository")
+	@ConfigField(alias = REPO_CLASS, desc = "Class implementing repository", allowAliasFromParent = false)
 	protected String cls;
 
-	@ConfigField(alias = POOL_SIZE, desc = "Pool size")
+	@ConfigField(alias = POOL_SIZE, desc = "Pool size", allowAliasFromParent = false)
 	protected int poolSize = RepositoryFactory.USER_REPO_POOL_SIZE_PROP_VAL;
+
+	@ConfigField(alias = POOL_CLASS, desc = "Class implementing repository pool", allowAliasFromParent = false)
+	protected String poolCls;
 
 	protected void setDomain(String domain) {
 		this.domain = domain;
@@ -57,38 +60,65 @@ public abstract class MDPoolConfigBean<A extends Repository,B extends MDPoolConf
 		this.mdPool = mdPool;
 	}
 
-	protected abstract Class<A> getRepositoryIfc();
-	protected abstract String getRepositoryPoolClassName();
+	protected abstract Class<? extends A> getRepositoryIfc();
+	protected abstract String getRepositoryPoolClassName() throws DBInitException;
+
+	protected String getRepositoryClassName() throws DBInitException {
+		if (cls != null)
+			return cls;
+		return RepositoryFactory.getRepoClassName(getRepositoryIfc(), uri);
+	}
+
+	protected String getUri() {
+		return uri;
+	}
 
 	@Override
 	public void beanConfigurationChanged(Collection<String> changedFields) {
 		// domain not set yet - skip initialization
-		if (domain == null || uri == null)
+		if (domain == null || getUri() == null)
 			return;
 
-		RepositoryPool<A> pool;
 		try {
-			if (cls == null) {
-				cls = RepositoryFactory.getRepoClassName(getRepositoryIfc(), uri);
-			}
+			String cls = getRepositoryClassName();
 
 			Map<String, String> params = new HashMap<>();
-			pool = (RepositoryPool<A>) ModulesManagerImpl.getInstance().forName(getRepositoryPoolClassName()).newInstance();
-			pool.initRepository(uri, params);
-			for (int i = 0; i < poolSize; i++) {
-				A repo = (A) ModulesManagerImpl.getInstance().forName(cls).newInstance();
-				repo.initRepository(uri, params);
-				pool.addRepo(repo);
-			}
-		} catch (DBInitException |ClassNotFoundException|IllegalAccessException|InstantiationException ex) {
-			throw new RuntimeException("Could not initialize " + getRepositoryIfc().getCanonicalName() + " for domain '" + domain + "'");
-		}
+			String poolCls = getRepositoryPoolClassName();
 
-		if ("default".equals(domain)) {
-			mdPool.addRepo("default".equals(domain) ? "" : domain, (A) pool);
-			mdPool.setDefault((A) pool);
+			if (poolCls == null) {
+				A repo = initRepository(cls, params);
+				setRepository(repo);
+			} else {
+				RepositoryPool<A> pool;
+
+				pool = (RepositoryPool<A>) ModulesManagerImpl.getInstance().forName(poolCls).newInstance();
+				pool.initRepository(getUri(), params);
+				for (int i = 0; i < poolSize; i++) {
+					A repo = initRepository(cls, params);
+					pool.addRepo(repo);
+				}
+				setRepository((A) pool);
+			}
+		} catch (DBInitException|ClassNotFoundException|IllegalAccessException|InstantiationException ex) {
+			throw new RuntimeException("Could not initialize " + getRepositoryIfc().getCanonicalName() + " for domain '" + domain + "'", ex);
 		}
 	}
 
+	protected A initRepository(String cls, Map<String, String> params) throws ClassNotFoundException, IllegalAccessException, InstantiationException, DBInitException {
+		A repo = newRepositoryInstance(cls);
+		repo.initRepository(getUri(), params);
+		return repo;
+	}
+
+	protected A newRepositoryInstance(String cls) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+		return (A) ModulesManagerImpl.getInstance().forName(cls).newInstance();
+	}
+
+	protected void setRepository(A repo) {
+		mdPool.addRepo(domain, repo);
+		if ("default".equals(domain)) {
+			mdPool.setDefault((A) repo);
+		}
+	}
 
 }

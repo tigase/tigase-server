@@ -23,15 +23,17 @@ package tigase.db;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import tigase.db.factories.AuthRepositoryMDPoolBean;
+import tigase.db.factories.MDPoolBean;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
 import tigase.xml.Element;
 import tigase.xmpp.BareJID;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -43,7 +45,7 @@ import tigase.xmpp.BareJID;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class AuthRepositoryMDImpl implements AuthRepository {
+public abstract class AuthRepositoryMDImpl extends MDPoolBean<AuthRepository,AuthRepositoryMDPoolBean.AuthRepositoryConfigBean> implements AuthRepository {
 	private static final Logger log = Logger.getLogger(AuthRepositoryMDImpl.class.getName());
 
 	//~--- fields ---------------------------------------------------------------

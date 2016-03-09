@@ -24,49 +24,28 @@ package tigase.db.jdbc;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.AuthRepository;
-import tigase.db.AuthorizationException;
-import tigase.db.DBInitException;
-import tigase.db.DataRepository;
-import tigase.db.RepositoryFactory;
-import tigase.db.TigaseDBException;
-import tigase.db.UserExistsException;
-import tigase.db.UserNotFoundException;
-
+import tigase.db.*;
 import tigase.util.Algorithms;
 import tigase.util.Base64;
 import tigase.util.TigaseStringprepException;
-
 import tigase.xmpp.BareJID;
 
-import static tigase.db.AuthRepository.*;
-
-//~--- JDK imports ------------------------------------------------------------
-
+import javax.security.auth.callback.*;
+import javax.security.sasl.*;
 import java.io.IOException;
-
 import java.security.NoSuchAlgorithmException;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
-
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.sasl.AuthorizeCallback;
-import javax.security.sasl.RealmCallback;
-import javax.security.sasl.Sasl;
-import javax.security.sasl.SaslException;
-import javax.security.sasl.SaslServer;
+import static tigase.db.AuthRepository.Meta;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -110,7 +89,7 @@ import javax.security.sasl.SaslServer;
  * @version $Rev$
  */
 @Meta( isDefault=true, supportedUris = { "jdbc:[^:]+:.*" } )
-public class TigaseCustomAuth implements AuthRepository {
+public class TigaseCustomAuth implements AuthRepository, DataSourceAware<DataRepository> {
 
 	/**
 	 * Private logger for class instances.
@@ -487,12 +466,17 @@ public class TigaseCustomAuth implements AuthRepository {
 	}
 
 	// ~--- methods --------------------------------------------------------------
+	@Override
+	public void setDataSource(DataRepository dataSource) {
+		data_repo = dataSource;
+	}
 
 	@Override
 	public void initRepository(final String connection_str, Map<String, String> params)
 			throws DBInitException {
 		try {
-			data_repo = RepositoryFactory.getDataRepository(null, connection_str, params);
+			if (data_repo == null)
+				data_repo = RepositoryFactory.getDataRepository(null, connection_str, params);
 			initdb_query = getParamWithDef(params, DEF_INITDB_KEY, DEF_INITDB_QUERY);
 
 			if (initdb_query != null) {

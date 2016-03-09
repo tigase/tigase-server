@@ -22,34 +22,74 @@
 package tigase.db.factories;
 
 import tigase.db.Repository;
+import tigase.db.RepositoryFactory;
 import tigase.kernel.beans.RegistrarBean;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by andrzej on 08.03.2016.
  */
-public interface MDPoolBean<S extends Repository,T extends MDPoolConfigBean<S,T>> extends tigase.kernel.beans.config.ConfigurationChangedAware, RegistrarBean {
+public abstract class MDPoolBean<S extends Repository,T extends MDPoolConfigBean<S,T>> implements tigase.kernel.beans.config.ConfigurationChangedAware, RegistrarBean {
 
-	String REPO_URI = "repo-uri";
-	String REPO_CLASS = "repo-class";
-	String POOL_SIZE = "pool-size";
+	public static final String REPO_URI = "repo-uri";
+	public static final String REPO_CLASS = "repo-class";
+	public static final String POOL_CLASS = "pool-class";
+	public static final String POOL_SIZE = "pool-size";
 
-	default void register(Kernel kernel) {
+	@ConfigField(alias = REPO_URI, desc = "URI for repository", allowAliasFromParent = false)
+	protected String uri;
+
+	@ConfigField(alias = REPO_CLASS, desc = "Class implementing repository", allowAliasFromParent = false)
+	private String cls;
+
+
+	@ConfigField(alias = POOL_SIZE, desc = "Pool size", allowAliasFromParent = false)
+	private int poolSize = RepositoryFactory.USER_REPO_POOL_SIZE_PROP_VAL;
+
+	@ConfigField(alias = POOL_CLASS, desc = "Class implementing repository pool", allowAliasFromParent = false)
+	protected String poolCls;
+
+	@ConfigField(desc = "Domains")
+	private String[] domains = {};
+
+	Kernel kernel;
+
+	@Override
+	public void register(Kernel kernel) {
+		this.kernel = kernel;
 		registerConfigBean("default");
 
-		for (String domain : getDomains()) {
+		for (String domain : domains) {
 			registerConfigBean(domain);
 		}
 	}
 
-	default void registerConfigBean(String domain) {
-		Kernel kernel = getKernel();
+	@Override
+	public void unregister(Kernel kernel) {
+		this.kernel = null;
+	}
 
+	public void setDomains(String[] domains) {
+		updateDomains(this.domains, domains);
+		this.domains = domains;
+	}
+
+
+	@Override
+	public void beanConfigurationChanged(Collection<String> changedFields) {
+		if (kernel != null) {
+			if (changedFields.contains("uri") || changedFields.contains("cls") || changedFields.contains("poolSize")) {
+				T defaultBean = kernel.getInstance("default");
+				updateConfigForDefault(defaultBean);
+				defaultBean.beanConfigurationChanged(changedFields);
+			}
+		}
+	}
+
+	protected void registerConfigBean(String domain) {
 		kernel.registerBean(domain).asClass(getConfigClass()).exec();
 		T configBean = kernel.getInstance(domain);
 		configBean.setDomain(domain);
@@ -60,19 +100,18 @@ public interface MDPoolBean<S extends Repository,T extends MDPoolConfigBean<S,T>
 		configBean.beanConfigurationChanged(Collections.singleton("domain"));
 	}
 
-	default void updateConfigForDefault(T defaultBean) {
-		defaultBean.uri = getDefUri();
-		defaultBean.cls = getDefClass();
-		defaultBean.poolSize = getDefPoolSize();
+	protected void updateConfigForDefault(T defaultBean) {
+		defaultBean.uri = uri;
+		defaultBean.cls = cls;
+		defaultBean.poolCls = poolCls;
+		defaultBean.poolSize = poolSize;
 	}
 
-	default void updateDomains(String[] oldDomains, String[] newDomains) {
+	protected void updateDomains(String[] oldDomains, String[] newDomains) {
 		Set<String> removed = new HashSet<>(Arrays.asList(oldDomains));
 		removed.remove(Arrays.asList(newDomains));
 		Set<String> added = new HashSet<>(Arrays.asList(newDomains));
 		added.remove(Arrays.asList(oldDomains));
-
-		Kernel kernel = getKernel();
 
 		for (String domain : removed) {
 			kernel.unregister(domain);
@@ -84,15 +123,10 @@ public interface MDPoolBean<S extends Repository,T extends MDPoolConfigBean<S,T>
 
 	}
 
-	String getDefUri();
-	String getDefClass();
-	int getDefPoolSize();
-	String[] getDomains();
-	Kernel getKernel();
-	Class<? extends T> getConfigClass();
+	protected abstract Class<? extends T> getConfigClass();
 
-	void addRepo(String domain, S repo);
-	S removeRepo(String domain);
-	void setDefault(S repo);
+	protected abstract void addRepo(String domain, S repo);
+	protected abstract S removeRepo(String domain);
+	protected abstract void setDefault(S repo);
 
 }

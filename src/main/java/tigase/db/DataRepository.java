@@ -28,14 +28,12 @@ package tigase.db;
 
 import tigase.xmpp.BareJID;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import java.util.Map;
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * The interface defines a generic data repository for storing arbitrary data in
@@ -48,7 +46,7 @@ import java.util.Map;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public interface DataRepository extends Repository {
+public interface DataRepository extends DataSource {
 	/**
 	 * Helper enumeration with types of supported databases.
 	 *

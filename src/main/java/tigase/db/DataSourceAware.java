@@ -19,30 +19,13 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.db.factories;
-
-import tigase.db.UserRepository;
-import tigase.db.UserRepositoryMDImpl;
-import tigase.kernel.beans.Bean;
-import tigase.kernel.core.Kernel;
+package tigase.db;
 
 /**
- * Created by andrzej on 07.03.2016.
+ * Created by andrzej on 09.03.2016.
  */
-@Bean(name="userRepository", parent = Kernel.class)
-public class UserRepositoryMDPoolBean extends UserRepositoryMDImpl {
+public interface DataSourceAware<T extends DataSource> {
 
-	@Override
-	public Class<? extends UserRepositoryConfigBean> getConfigClass() {
-		return UserRepositoryConfigBean.class;
-	}
+	void setDataSource(T dataSource);
 
-	public static class UserRepositoryConfigBean extends AuthUserRepositoryConfigBean<UserRepository, UserRepositoryConfigBean> {
-
-		@Override
-		protected Class<UserRepository> getRepositoryIfc() {
-			return UserRepository.class;
-		}
-
-	}
 }

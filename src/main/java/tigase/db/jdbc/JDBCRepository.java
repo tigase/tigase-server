@@ -27,8 +27,8 @@ package tigase.db.jdbc;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.*;
-import tigase.xmpp.BareJID;
 import tigase.util.SimpleCache;
+import tigase.xmpp.BareJID;
 
 import java.sql.*;
 import java.util.*;
@@ -49,7 +49,7 @@ import java.util.logging.Logger;
  */
 @Repository.Meta( supportedUris = { "jdbc:[^:]+:.*" } )
 public class JDBCRepository
-				implements AuthRepository, UserRepository {
+				implements AuthRepository, UserRepository, DataSourceAware<DataRepository> {
 	/** Field description */
 	public static final String CURRENT_DB_SCHEMA_VER = "7.1";
 
@@ -582,12 +582,17 @@ public class JDBCRepository
 	}
 
 	//~--- methods --------------------------------------------------------------
+	@Override
+	public void setDataSource(DataRepository dataSource) {
+		data_repo = dataSource;
+	}
 
 	@Override
 	public void initRepository(final String connection_str, Map<String, String> params)
 					throws DBInitException {
 		try {
-			data_repo  = RepositoryFactory.getDataRepository(null, connection_str, params);
+			if (data_repo == null)
+				data_repo = RepositoryFactory.getDataRepository(null, connection_str, params);
 			checkDBSchema();
 			if (connection_str.contains("autoCreateUser=true")) {
 				autoCreateUser = true;

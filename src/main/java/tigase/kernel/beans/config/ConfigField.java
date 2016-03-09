@@ -29,4 +29,5 @@ public @interface ConfigField {
 	 */
 	String alias() default "";
 
+	boolean allowAliasFromParent() default true;
 }

@@ -24,9 +24,9 @@ package tigase.db;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.db.factories.MDPoolBean;
+import tigase.db.factories.UserRepositoryMDPoolBean;
 import tigase.xmpp.BareJID;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +34,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -43,7 +45,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class UserRepositoryMDImpl implements UserRepository {
+public abstract class UserRepositoryMDImpl extends MDPoolBean<UserRepository,UserRepositoryMDPoolBean.UserRepositoryConfigBean> implements UserRepository {
 	private static final Logger log = Logger.getLogger(UserRepositoryMDImpl.class.getName());
 
 	//~--- fields ---------------------------------------------------------------

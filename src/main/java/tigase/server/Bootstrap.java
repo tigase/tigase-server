@@ -22,8 +22,10 @@
 package tigase.server;
 
 import tigase.component.PropertiesBeanConfigurator;
+import tigase.eventbus.EventBusFactory;
 import tigase.kernel.DefaultTypesConverter;
 import tigase.kernel.beans.config.BeanConfigurator;
+import tigase.kernel.core.DependencyGrapher;
 import tigase.kernel.core.Kernel;
 
 import java.util.Map;
@@ -55,6 +57,7 @@ public class Bootstrap implements Lifecycle {
 		// register default types converter and properties bean configurator
 		kernel.registerBean(DefaultTypesConverter.class).exec();
 		kernel.registerBean(PropertiesBeanConfigurator.class).exec();
+		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exportable().exec();
 
 		// moved to AbstractBeanConfigurator
 		//registerBeans();
@@ -66,6 +69,10 @@ public class Bootstrap implements Lifecycle {
 		}
 		// if null then we register global subbeans
 		configurator.registerBeans(null, props);
+
+		DependencyGrapher dg = new DependencyGrapher();
+		dg.setKernel(kernel);
+		System.out.println(dg.getDependencyGraph());
 
 		kernel.getInstance("message-router");
 	}

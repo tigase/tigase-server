@@ -28,5 +28,7 @@ public @interface Bean {
 	 */
 	boolean active() default true;
 
+	boolean exportable() default false;
+
 	Class parent() default Object.class;
 }

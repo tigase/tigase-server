@@ -23,17 +23,16 @@ package tigase.db;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import tigase.xmpp.BareJID;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import tigase.xmpp.BareJID;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -43,7 +42,8 @@ import tigase.xmpp.BareJID;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class DataRepositoryPool implements DataRepository {
+@Repository.Meta( supportedUris = { "jdbc:[^:]+:.*" } )
+public class DataRepositoryPool implements DataRepository, DataSourcePool<DataRepository> {
 	private static final Logger log = Logger.getLogger(DataRepositoryPool.class.getName());
 
 	// ~--- fields ---------------------------------------------------------------
