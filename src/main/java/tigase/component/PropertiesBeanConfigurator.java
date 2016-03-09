@@ -72,6 +72,7 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 				}
 			}
 		}
+		result.put("name", beanConfig.getBeanName());
 
 		return result;
 	}
@@ -101,7 +102,7 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 		Field[] fields = DependencyManager.getAllFields(beanConfig.getClazz());
 		for (Field field : fields) {
 			final ConfigField cf = field.getAnnotation(ConfigField.class);
-			if (cf != null && !cf.alias().isEmpty() && props.containsKey(cf.alias())) {
+			if (cf != null && !cf.alias().isEmpty() && props.containsKey(cf.alias()) && (this.props != props || cf.allowAliasFromParent())) {
 				final Object value = props.get(cf.alias());
 
 				if (props.containsKey(field)) {

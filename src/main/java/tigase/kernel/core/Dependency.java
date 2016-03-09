@@ -17,6 +17,8 @@ public class Dependency {
 
 	private Class<?> type;
 
+	private Class<?> subType;
+
 	/**
 	 * Creates instance of class.
 	 * 
@@ -56,6 +58,10 @@ public class Dependency {
 		return field;
 	}
 
+	public Class<?> getSubType() {
+		return subType;
+	}
+
 	/**
 	 * Returns type of wanted bean.
 	 * 
@@ -84,6 +90,10 @@ public class Dependency {
 
 	public void setNullAllowed(boolean nullAllowed) {
 		this.nullAllowed = nullAllowed;
+	}
+
+	public void setSubType(Class<?> subType) {
+		this.subType = subType;
 	}
 
 	public void setType(Class<?> type) {

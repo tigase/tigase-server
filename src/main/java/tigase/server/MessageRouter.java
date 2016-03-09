@@ -26,23 +26,9 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryUsage;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import com.sun.corba.se.spi.activation.Server;
 import tigase.conf.ConfigurationException;
 import tigase.conf.ConfiguratorAbstract;
 import tigase.disco.XMPPService;
-import static tigase.server.MessageRouterConfig.*;
-
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.core.Kernel;
@@ -55,6 +41,16 @@ import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
+
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static tigase.server.MessageRouterConfig.*;
 
 /**
  * Class MessageRouter
@@ -95,10 +91,10 @@ public class MessageRouter
 	private Map<JID, ServerComponent>         components_byId = new ConcurrentHashMap<>();
 	private Map<String, ServerComponent>      components      = new ConcurrentHashMap<>();
 
-	@Inject(nullAllowed = true)
+	@Inject
 	private Set<ServerComponent> componentsAll;
 
-	private void setComponentsAll(Set<ServerComponent> components) {
+	public void setComponentsAll(Set<ServerComponent> components) {
 		if (components == null)
 			return;
 
@@ -112,6 +108,7 @@ public class MessageRouter
 			} else {
 				removeComponent(comp);
 			}
+			comp.release();
 		}
 
 
@@ -119,6 +116,11 @@ public class MessageRouter
 		newComponents.removeAll(this.components.values());
 		for (ServerComponent comp : newComponents) {
 			try {
+				if (comp instanceof  MessageReceiver) {
+					MessageReceiver mr = (MessageReceiver) comp;
+					mr.setParent(this);
+					mr.start();
+				}
 				if (comp instanceof ComponentRegistrator) {
 					addRegistrator((ComponentRegistrator) comp);
 				} else if (comp instanceof MessageRouter) {

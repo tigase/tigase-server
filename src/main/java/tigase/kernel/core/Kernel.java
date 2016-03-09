@@ -443,7 +443,11 @@ public class Kernel {
 		if (dataToInject.isEmpty()) {
 			d = new Object[]{};
 		} else if (dep.getType() != null) {
-			Object[] z = (Object[]) Array.newInstance(dep.getType(), 1);
+			Class<?> type = dep.getType();
+			if (Collection.class.isAssignableFrom(type)) {
+				type = dep.getSubType();
+			}
+			Object[] z = (Object[]) Array.newInstance(type, 1);
 			d = dataToInject.toArray(z);
 		} else {
 			d = dataToInject.toArray();
@@ -547,6 +551,8 @@ public class Kernel {
 		this.currentlyUsedConfigBuilder = builder;
 		builder.asClass(beanClass);
 		builder.setActive(annotation.active());
+		if (annotation.exportable())
+			builder.exportable();
 		return builder;
 	}
 

@@ -23,6 +23,7 @@ package tigase.kernel.core;
 
 import tigase.kernel.beans.Inject;
 import tigase.kernel.core.BeanConfig.State;
+import tigase.util.ReflectionHelper;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -107,7 +108,11 @@ public class DependencyManager {
 			if (bcs.isEmpty())
 				bcs.add(null);
 		} else if (dependency.getType() != null) {
-			bcs.addAll(getBeanConfigs(dependency.getType()));
+			Class<?> type = dependency.getType();
+			if (Collection.class.isAssignableFrom(type)) {
+				type = dependency.getSubType();
+			}
+			bcs.addAll(getBeanConfigs(type));
 		} else
 			throw new RuntimeException("Unsupported dependecy type.");
 		return bcs.toArray(new BeanConfig[]{});
@@ -188,17 +193,22 @@ public class DependencyManager {
 
 		Map<Field, Inject> deps = createFieldsDependencyList(cls);
 		for (Entry<Field, Inject> e : deps.entrySet()) {
+			Field f = e.getKey();
 			Dependency d = new Dependency(beanConfig);
-			d.setField(e.getKey());
+			d.setField(f);
 			d.setNullAllowed(e.getValue().nullAllowed());
 			if (!e.getValue().bean().isEmpty()) {
 				d.setBeanName(e.getValue().bean());
 			} else if (e.getValue().type() != Inject.EMPTY.class) {
 				d.setType(e.getValue().type());
-			} else if (e.getKey().getType().isArray()) {
-				d.setType(e.getKey().getType().getComponentType());
+			} else if (f.getType().isArray()) {
+				d.setType(f.getType().getComponentType());
 			} else {
-				d.setType(e.getKey().getType());
+				Class<?> type = f.getType();
+				d.setType(type);
+				if (Collection.class.isAssignableFrom(type)) {
+					d.setSubType(ReflectionHelper.getItemClassOfGenericCollection(f));
+				}
 			}
 
 			beanConfig.getFieldDependencies().put(e.getKey(), d);

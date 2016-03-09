@@ -29,25 +29,20 @@ package tigase.server;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import tigase.annotations.TODO;
 import tigase.conf.ConfigurationException;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.stats.StatisticType;
 import tigase.stats.StatisticsContainer;
 import tigase.stats.StatisticsList;
 import tigase.util.PatternComparator;
 import tigase.util.PriorityQueueAbstract;
+
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  * This is an archetype for all classes processing user-level packets. The
@@ -168,6 +163,7 @@ public abstract class AbstractMessageReceiver
 	private long last_second_packets = 0;
 	private int  out_queues_size     = 1;
 
+	@ConfigField(desc = "Maximal size of internal queues")
 	protected int                    maxQueueSize          = MAX_QUEUE_SIZE_PROP_VAL;
 	protected int                    maxInQueueSize        = MAX_QUEUE_SIZE_PROP_VAL;
 	protected int                    maxOutQueueSize       = MAX_QUEUE_SIZE_PROP_VAL;
