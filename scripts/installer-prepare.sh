@@ -48,7 +48,7 @@ if [ ! -e $INSTALLER_DIR/$PATCHED_IZPACK_DIR/utils/wrappers/ ] ; then
 fi
 
 # get dependencies
-mvn dependency:copy-dependencies -DoutputDirectory=${PWD}/jars -Dmdep.stripVersion=true
+mvn -f modules/distribution/pom.xml dependency:copy-dependencies -DoverWriteReleases=true -DoverWriteSnapshots=true -DoutputDirectory=${PWD}/jars -Dmdep.stripVersion=true
 
 # add tigase classes to installer build path
 mkdir $INSTALLER_DIR/$PATCHED_IZPACK_DIR/tigaseLib
