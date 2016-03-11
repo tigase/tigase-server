@@ -21,11 +21,13 @@
 
 package tigase.kernel;
 
+import java.lang.reflect.Type;
+
 public interface TypesConverter {
 
 	<T> T convert(final Object value, final Class<T> expectedType);
 
-	<T> T convert(final Object value, final Class<T> expectedType, Class<?> itemType);
+	<T> T convert(final Object value, final Class<T> expectedType, Type genericType);
 
 	String toString(final Object value);
 

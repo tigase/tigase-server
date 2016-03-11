@@ -25,6 +25,7 @@ import tigase.kernel.BeanUtils;
 import tigase.kernel.KernelException;
 import tigase.kernel.TypesConverter;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.Converter;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.core.BeanConfig;
@@ -89,7 +90,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 				if (cAnn != null) {
 					converter = kernel.getInstance(cAnn.converter());
 				}
-				Object v = converter.convert(value, field.getType());
+				Object v = converter.convert(value, field.getType(), field.getGenericType());
 
 				valuesToSet.put(field, v);
 
@@ -306,14 +307,14 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 
 	protected void registerBeansForBeanOfClass(Kernel kernel, Class<?> requiredClass, Set<Class<?>> classes) {
 		for (Class<?> cls : classes) {
-			Bean annotation = registerBeansForBeanOfClassShouldRegister(requiredClass, cls);
+			Bean annotation = registerBeansForBeanOfClassShouldRegister(kernel, requiredClass, cls);
 			if (annotation != null) {
 				kernel.registerBean(cls).exec();
 			}
 		}
 	}
 
-	protected Bean registerBeansForBeanOfClassShouldRegister(Class<?> requiredClass, Class<?> cls) {
+	protected Bean registerBeansForBeanOfClassShouldRegister(Kernel kernel, Class<?> requiredClass, Class<?> cls) {
 		Bean annotation = cls.getDeclaredAnnotation(Bean.class);
 		if (annotation == null)
 			return null;
@@ -322,7 +323,24 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		if (parent == Object.class)
 			return null;
 
-		return parent.isAssignableFrom(requiredClass) ? annotation : null;
+		if (!parent.isAssignableFrom(requiredClass))
+			return null;
+
+		Class<? extends BeanSelector>[] selectors = annotation.selectors();
+		if (selectors.length == 0)
+			return annotation;
+
+		for (Class<? extends BeanSelector> selectorCls : selectors) {
+			try {
+				BeanSelector selector = selectorCls.newInstance();
+				if (!selector.shouldRegister(kernel))
+					return null;
+			} catch (InstantiationException | IllegalAccessException e) {
+				log.log(Level.SEVERE, "could not instantiate BeanSelector " + selectorCls.getCanonicalName() +
+						" for " + cls.getCanonicalName(), e);
+			}
+		}
+		return annotation;
 	}
 
 

@@ -26,67 +26,46 @@ package tigase.cluster;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.cluster.api.ClusterConnectionHandler;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.zip.Deflater;
-
-import javax.script.Bindings;
-
-import tigase.cluster.api.ClusterCommandException;
-import tigase.cluster.api.ClusterConnectionSelectorIfc;
-import tigase.cluster.api.ClusterControllerIfc;
-import tigase.cluster.api.ClusterElement;
-import tigase.cluster.api.ClusteredComponentIfc;
-import tigase.cluster.api.CommandListener;
-import tigase.cluster.api.CommandListenerAbstract;
+import tigase.cluster.api.*;
 import tigase.cluster.repo.ClConConfigRepository;
 import tigase.cluster.repo.ClusterRepoConstants;
 import tigase.cluster.repo.ClusterRepoItem;
-
 import tigase.conf.ConfigurationException;
-
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.comp.ComponentRepository;
 import tigase.db.comp.RepositoryChangeListenerIfc;
-
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.BeanSelector;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.core.Kernel;
 import tigase.net.ConnectionType;
 import tigase.net.SocketType;
 import tigase.osgi.ModulesManagerImpl;
-
 import tigase.server.ConnectionManager;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.ServiceChecker;
-
 import tigase.stats.StatisticsList;
 import tigase.sys.TigaseRuntime;
 import tigase.util.Algorithms;
 import tigase.util.TigaseStringprepException;
 import tigase.util.TimeUtils;
 import tigase.xml.Element;
+import tigase.xmpp.*;
 
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.XMPPIOService;
+import javax.script.Bindings;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.zip.Deflater;
 
 /**
  * Class ClusterConnectionManager
@@ -96,6 +75,7 @@ import tigase.xmpp.XMPPIOService;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = "cl-comp", parent = Kernel.class, selectors = {BeanSelector.ClusterMode.class})
 public class ClusterConnectionManager
 				extends ConnectionManager<XMPPIOService<Object>>
 				implements ClusteredComponentIfc, RepositoryChangeListenerIfc<ClusterRepoItem>, ClusterConnectionHandler {
@@ -184,6 +164,7 @@ public class ClusterConnectionManager
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
+	@Inject
 	private ClusterControllerIfc clusterController = null;
 
 	// private String cluster_controller_id = null;

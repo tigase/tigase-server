@@ -26,32 +26,25 @@ package tigase.vhosts;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.comp.ComponentRepository;
+import tigase.conf.ConfigurationException;
 import tigase.db.TigaseDBException;
-
+import tigase.db.comp.ComponentRepository;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.core.Kernel;
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.ServerComponent;
-
 import tigase.stats.StatisticsContainer;
 import tigase.stats.StatisticsList;
-
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.ArrayList;
+import javax.script.Bindings;
+import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
-import java.util.UUID;
 
-import javax.script.Bindings;
-import tigase.conf.ConfigurationException;
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class VHostManager here.
@@ -62,6 +55,7 @@ import tigase.conf.ConfigurationException;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = "vhost-man", parent = Kernel.class)
 public class VHostManager
 				extends AbstractComponentRegistrator<VHostListener>
 				implements VHostManagerIfc, StatisticsContainer {

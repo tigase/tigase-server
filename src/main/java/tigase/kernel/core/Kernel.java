@@ -129,21 +129,26 @@ public class Kernel {
 			beanConfig.getKernel().injectDependencies(bean, dep, createdBeansConfig, deep);
 		}
 
-		if (deep == 0) {
-			for (BeanConfig bc : createdBeansConfig) {
-				Object bi = bc.getKernel().getInstance(bc);
-				bc.setState(State.initialized);
-				if (bi instanceof Initializable) {
-					((Initializable) bi).initialize();
-				}
-			}
-
-//			if (bean instanceof RegistrarBean) {
-//				Kernel parent = beanConfig.getKernel().getParent();
-//				parent.ln(beanConfig.getBeanName(), beanConfig.getKernel(), beanConfig.getBeanName());
-//			}
-
+		// there is no need to wait to initialize parent beans, it there any?
+		if (bean instanceof Initializable) {
+			((Initializable) bean).initialize();
+			tmpBC.setState(State.initialized);
 		}
+//		if (deep == 0) {
+//			for (BeanConfig bc : createdBeansConfig) {
+//				Object bi = bc.getKernel().getInstance(bc);
+//				bc.setState(State.initialized);
+//				if (bi instanceof Initializable) {
+//					((Initializable) bi).initialize();
+//				}
+//			}
+//
+////			if (bean instanceof RegistrarBean) {
+////				Kernel parent = beanConfig.getKernel().getParent();
+////				parent.ln(beanConfig.getBeanName(), beanConfig.getKernel(), beanConfig.getBeanName());
+////			}
+//
+//		}
 	}
 
 	private Object createNewInstance(BeanConfig beanConfig) {

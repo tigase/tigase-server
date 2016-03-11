@@ -44,6 +44,19 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 	private HashMap<String, Object> getBeanProps(BeanConfig beanConfig) {
 		HashMap<String, Object> result = new HashMap<>();
 
+		// this map needs to be filled with name of fields or field aliases
+		// which implements Map
+		Set<String> mapFields = new HashSet<>();
+		Field[] fields = DependencyManager.getAllFields(beanConfig.getClazz());
+		for (Field field : fields) {
+			if (Map.class.isAssignableFrom(field.getType())) {
+				mapFields.add(field.getName());
+				ConfigField cf = field.getAnnotation(ConfigField.class);
+				if (cf != null && !cf.alias().isEmpty())
+					mapFields.add(cf.alias());
+			}
+		}
+
 		if (props != null) {
 			StringBuilder sb = new StringBuilder();
 			ArrayDeque<Kernel> kernels = new ArrayDeque<>();
@@ -68,10 +81,26 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 			for (Map.Entry<String, Object> e : props.entrySet()) {
 				if (e.getKey().startsWith(prefix + "/")) {
 					String key = e.getKey().substring(prefix.length() + 1);
+					int idx = key.indexOf("/");
+					// if there is next / char and there is field or alias implementing Map for prefix of this key
+					// then we need to gather all key with this prefix and create map of values
+					if (idx > 0) {
+						String fname = key.substring(0, idx);
+						if (mapFields.contains(fname)) {
+							Map<String,Object> vals = (Map<String, Object>) result.get(fname);
+							if (vals == null) {
+								vals = new HashMap<>();
+								result.put(fname, vals);
+							}
+							vals.put(key.substring(idx+1), e.getValue());
+							continue;
+						}
+					}
 					result.put(key, e.getValue());
 				}
 			}
 		}
+
 		result.put("name", beanConfig.getBeanName());
 
 		return result;

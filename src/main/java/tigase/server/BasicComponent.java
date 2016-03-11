@@ -34,7 +34,10 @@ import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
 import tigase.disco.XMPPService;
 import tigase.eventbus.EventBusFactory;
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.beans.config.ConfigurationChangedAware;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.osgi.OSGiScriptEngineManager;
 import tigase.server.script.AddScriptCommand;
@@ -70,7 +73,7 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public class BasicComponent
-				implements Configurable, XMPPService, VHostListener, ClusteredComponentIfc {
+				implements Configurable, XMPPService, VHostListener, ClusteredComponentIfc, Initializable, ConfigurationChangedAware {
 	/** Field description */
 	public static final String ALL_PROP_KEY = "ALL";
 
@@ -88,28 +91,35 @@ public class BasicComponent
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
+	@Inject
 	protected VHostManagerIfc vHostManager          = null;
 	private ComponentInfo     cmpInfo               = null;
+	@ConfigField(desc = "Component JID")
 	private JID               compId                = null;
 	private String            DEF_HOSTNAME_PROP_VAL = null;
 	@ConfigField(desc = "Component name")
 	private String            name                  = null;
+	@ConfigField(desc = "Default hostname")
 	private BareJID           defHostname = null;
 
 	/** Field description */
 	protected Map<String, CommandIfc> scriptCommands = new ConcurrentHashMap<String,
 			CommandIfc>(20);
 	private boolean                      nonAdminCommands = false;
-	private Map<String, EnumSet<CmdAcl>> commandsACL = new ConcurrentHashMap<String,
+	@ConfigField(alias = "commands", desc = "Commands ACL")
+	private ConcurrentHashMap<String, EnumSet<CmdAcl>> commandsACL = new ConcurrentHashMap<String,
 			EnumSet<CmdAcl>>(20);
 
+	@ConfigField(desc = "List of admins JIDs")
 	protected Set<BareJID>      admins = new ConcurrentSkipListSet<BareJID>();
 	protected Set<String>       trusted = new ConcurrentSkipListSet<String>();
 	private ScriptEngineManager scriptEngineManager     = null;
-	private String              scriptsBaseDir          = null;
+	@ConfigField(desc = "scripts-base-dir")
+	private String              scriptsBaseDir          = SCRIPTS_DIR_PROP_DEF;
 	private String              scriptsCompDir          = null;
 	private ServiceEntity       serviceEntity           = null;
 	private boolean             initializationCompleted = false;
+	@ConfigField(alias = "trusted", desc = "List of trusted JIDs")
 	private String[]		    trustedProp = null;
 	
 	private final CopyOnWriteArrayList<JID> connectedNodes = new CopyOnWriteArrayList<JID>();
@@ -127,6 +137,12 @@ public class BasicComponent
 	 */
 	public void addComponentDomain(String domain) {
 		vHostManager.addComponentDomain(domain);
+	}
+
+	@Override
+	public void beanConfigurationChanged(Collection<String> changedFields) {
+		if (changedFields.contains("trusted"))
+			refreshTrustedJids();
 	}
 
 	/**
@@ -886,6 +902,11 @@ public class BasicComponent
 	
 	//~--- set methods ----------------------------------------------------------
 
+	public void setAdmins(Set<BareJID> admins) {
+		this.admins.addAll(admins);
+		this.admins.retainAll(admins);
+	}
+
 	@Override
 	public void setName(String name) {
 		this.name = name;
@@ -971,6 +992,11 @@ public class BasicComponent
 			loadScripts();
 		}
 		cmpInfo = new ComponentInfo(getName(), this.getClass());
+	}
+
+	public void setScriptsBaseDir(String scriptsBaseDir) {
+		this.scriptsBaseDir = scriptsBaseDir;
+		this.scriptsCompDir = scriptsBaseDir + "/" + getName();
 	}
 
 	@Override
@@ -1284,6 +1310,46 @@ public class BasicComponent
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "component {0} got trusted jids set as {1}", new Object[] { getName(), trusted });
 		}
+	}
+
+	@Override
+	public void initialize() {
+		nodeConnected(defHostname.getDomain());
+		if (scriptEngineManager == null) {
+			scriptEngineManager = createScriptEngineManager();
+		}
+
+		Map<String, Object> props = new HashMap<String, Object>();
+		for (Map.Entry<String, Object> entry : props.entrySet()) {
+			if (entry.getKey().startsWith(COMMAND_PROP_NODE)) {
+				String          cmdId  = entry.getKey().substring(COMMAND_PROP_NODE.length() + 1);
+				String[]        cmdAcl = entry.getValue().toString().split(",");
+				EnumSet<CmdAcl> acl    = EnumSet.noneOf(CmdAcl.class);
+
+				for (String cmda : cmdAcl) {
+					CmdAcl acl_tmp = CmdAcl.valueof(cmda);
+
+					acl.add(acl_tmp);
+					if (acl_tmp != CmdAcl.ADMIN) {
+						nonAdminCommands = true;
+					}
+				}
+				commandsACL.put(cmdId, acl);
+			}
+		}
+		updateServiceEntity();
+
+		CommandIfc command = new AddScriptCommand();
+
+		command.init(CommandIfc.ADD_SCRIPT_CMD, "New command script", "Scripts");
+		scriptCommands.put(command.getCommandId(), command);
+		command = new RemoveScriptCommand();
+		command.init(CommandIfc.DEL_SCRIPT_CMD, "Remove command script", "Scripts");
+		scriptCommands.put(command.getCommandId(), command);
+
+		setScriptsBaseDir(scriptsBaseDir);
+		loadScripts();
+		cmpInfo = new ComponentInfo(getName(), this.getClass());
 	}
 
 	private class ExtFilter

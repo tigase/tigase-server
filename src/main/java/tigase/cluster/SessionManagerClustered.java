@@ -31,9 +31,14 @@ import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.cluster.api.SessionManagerClusteredIfc;
 import tigase.cluster.strategy.ClusteringStrategyIfc;
 import tigase.cluster.strategy.ConnectionRecordIfc;
+import tigase.conf.ConfigurationException;
 import tigase.eventbus.FillRoutedEvent;
 import tigase.eventbus.RouteEvent;
 import tigase.eventbus.component.stores.Subscription;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.BeanSelector;
+import tigase.kernel.core.Kernel;
+import tigase.osgi.ModulesManagerImpl;
 import tigase.server.ComponentInfo;
 import tigase.server.Message;
 import tigase.server.Packet;
@@ -41,24 +46,16 @@ import tigase.server.XMPPServer;
 import tigase.server.xmppsession.SessionManager;
 import tigase.server.xmppsession.UserSessionEvent;
 import tigase.stats.StatisticsList;
+import tigase.util.DNSResolverFactory;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.XMPPSession;
+import tigase.xmpp.*;
 
-import tigase.conf.ConfigurationException;
-import tigase.osgi.ModulesManagerImpl;
-import tigase.util.DNSResolverFactory;
-
+import javax.script.Bindings;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.script.Bindings;
 
 /**
  * Class SessionManagerClusteredOld
@@ -68,6 +65,7 @@ import javax.script.Bindings;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
+@Bean(name = "sess-man", parent = Kernel.class, selectors = {BeanSelector.ClusterMode.class})
 public class SessionManagerClustered
 				extends SessionManager
 				implements ClusteredComponentIfc, SessionManagerClusteredIfc {

@@ -54,6 +54,12 @@ public class Bootstrap implements Lifecycle {
 
 	@Override
 	public void start() {
+		for (Map.Entry<String, Object> e : props.entrySet()) {
+			if (e.getKey().startsWith("--")) {
+				String key = e.getKey().substring(2);
+				System.setProperty(key, e.getValue().toString());
+			}
+		}
 		// register default types converter and properties bean configurator
 		kernel.registerBean(DefaultTypesConverter.class).exec();
 		kernel.registerBean(PropertiesBeanConfigurator.class).exec();
@@ -74,12 +80,14 @@ public class Bootstrap implements Lifecycle {
 		dg.setKernel(kernel);
 		System.out.println(dg.getDependencyGraph());
 
-		kernel.getInstance("message-router");
+		MessageRouter mr = kernel.getInstance("message-router");
+		mr.start();
 	}
 
 	@Override
 	public void stop() {
-
+		MessageRouter mr = kernel.getInstance("message-router");
+		mr.stop();
 	}
 
 	// moved to AbstractBeanConfigurator

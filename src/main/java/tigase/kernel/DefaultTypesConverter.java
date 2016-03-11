@@ -31,8 +31,9 @@ import tigase.xmpp.JID;
 import java.io.File;
 import java.lang.reflect.Array;
 import java.lang.reflect.Modifier;
-import java.util.Collection;
-import java.util.Iterator;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
@@ -74,14 +75,26 @@ public class DefaultTypesConverter implements TypesConverter {
 		return convert(value, expectedType, null);
 	}
 
-	public <T> T convert(final Object value, final Class<T> expectedType, Class<?> itemType) {
+	public <T> T convert(final Object value, final Type type) {
+		if (type instanceof Class)
+			return convert(value, (Class<T>) type);
+		if (type instanceof ParameterizedType) {
+			ParameterizedType pt = (ParameterizedType) type;
+			if (pt.getRawType() instanceof Class)
+				return convert(value, (Class<T>) pt.getRawType(), pt);
+		}
+
+		throw new RuntimeException("Cannot convert to " + type);
+	}
+
+	public <T> T convert(final Object value, final Class<T> expectedType, Type genericType) {
 		try {
 			if (value == null)
 				return null;
 
 			final Class<?> currentType = value.getClass();
 
-			if (expectedType.isAssignableFrom(currentType)) {
+			if (expectedType.isAssignableFrom(currentType) && genericType == null) {
 				return expectedType.cast(value);
 			}
 
@@ -156,14 +169,49 @@ public class DefaultTypesConverter implements TypesConverter {
 					Array.set(result, i, convert(unescape(a_str[i]), expectedType.getComponentType()));
 				}
 				return (T) result;
-			} else if (Collection.class.isAssignableFrom(expectedType) && itemType != null) {
+			} else if (EnumSet.class.isAssignableFrom(expectedType) && genericType instanceof ParameterizedType) {
+				ParameterizedType pt = (ParameterizedType) genericType;
+				Type[] actualTypes = pt.getActualTypeArguments();
+				if (actualTypes[0] instanceof Class) {
+					String[] a_str = value.toString().split(regex);
+					HashSet<Enum> result = new HashSet<>();
+					for (int i = 0; i < a_str.length; i++) {
+						result.add((Enum) convert(unescape(a_str[i]), (Class<?>) actualTypes[0]));
+					}
+
+					return (T) EnumSet.copyOf(result);
+				}
+			} else if (Collection.class.isAssignableFrom(expectedType) && genericType != null) {
+				int mod = expectedType.getModifiers();
+				if (!Modifier.isAbstract(mod) && !Modifier.isInterface(mod) && genericType instanceof ParameterizedType) {
+					ParameterizedType pt = (ParameterizedType) genericType;
+					Type[] actualTypes = pt.getActualTypeArguments();
+					if (actualTypes[0] instanceof Class) {
+						String[] a_str = value.toString().split(regex);
+						try {
+							Collection result = (Collection) expectedType.newInstance();
+							for (int i = 0; i < a_str.length; i++) {
+								result.add(convert(unescape(a_str[i]), (Class<?>) actualTypes[0]));
+							}
+							return (T) result;
+						} catch (InstantiationException | IllegalAccessException ex) {
+							throw new RuntimeException("Unsupported conversion to " + expectedType, ex);
+						}
+					}
+				}
+			} else if (Map.class.isAssignableFrom(expectedType) && genericType instanceof ParameterizedType && value instanceof Map) {
+				// this is additional support for convertion to type of Map, however value needs to be instance of Map
+				// Added mainly for BeanConfigurators to be able to configure Map fields
 				int mod = expectedType.getModifiers();
 				if (!Modifier.isAbstract(mod) && !Modifier.isInterface(mod)) {
-					String[] a_str = value.toString().split(regex);
+					ParameterizedType pt = (ParameterizedType) genericType;
+					Type[] actualTypes = pt.getActualTypeArguments();
 					try {
-						Collection result = (Collection) expectedType.newInstance();
-						for (int i = 0; i < a_str.length; i++) {
-							result.add(convert(unescape(a_str[i]), itemType));
+						Map result = (Map) expectedType.newInstance();
+						for (Map.Entry<String, String> e : ((Map<String, String>) value).entrySet()) {
+							Object k = convert(unescape(e.getKey()), actualTypes[0]);
+							Object v = convert(unescape(e.getValue()), actualTypes[1]);
+							result.put(k, v);
 						}
 						return (T) result;
 					} catch (InstantiationException | IllegalAccessException ex) {
@@ -172,7 +220,9 @@ public class DefaultTypesConverter implements TypesConverter {
 				}
 			}
 
-			throw new RuntimeException("Unsupported conversion to " + expectedType);
+			{
+				throw new RuntimeException("Unsupported conversion to " + expectedType);
+			}
 		} catch (TigaseStringprepException e) {
 			throw new IllegalArgumentException(e);
 		}

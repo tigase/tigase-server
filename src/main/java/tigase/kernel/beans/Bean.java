@@ -31,4 +31,7 @@ public @interface Bean {
 	boolean exportable() default false;
 
 	Class parent() default Object.class;
+
+	Class<? extends BeanSelector>[] selectors() default { };
+
 }

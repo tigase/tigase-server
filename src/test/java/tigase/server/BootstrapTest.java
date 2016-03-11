@@ -7,7 +7,10 @@ import tigase.db.UserRepositoryMDImpl;
 import tigase.kernel.core.Kernel;
 import tigase.server.xmppclient.ClientConnectionManager;
 import tigase.server.xmppserver.S2SConnectionManager;
+import tigase.server.xmppsession.SessionManager;
 
+import java.lang.reflect.Field;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,8 +22,21 @@ import static org.junit.Assert.assertNotNull;
 @Ignore
 public class BootstrapTest {
 
+	private Map<String, Object> props = new HashMap<>();
+
 	@Test
-	public void test1() {
+	public void testNonCluster() throws InterruptedException {
+		props.put("--cluster-mode","false");
+		executeTest();
+		Thread.sleep(10 * 60 * 1000);
+	}
+//
+//	@Test
+//	public void testCluster() {
+//		props.put("--cluster-mode","true");
+//		executeTest();
+//	}
+	public void executeTest() {
 		Bootstrap bootstrap = new Bootstrap();
 
 		bootstrap.setProperties(getProps());
@@ -43,14 +59,45 @@ public class BootstrapTest {
 		assertNotNull(authRepository);
 		assertNotNull(authRepository.getRepo("default"));
 
+		try {
+			SessionManager sm = kernel.getInstance(SessionManager.class);
+			Field commandsAcl = BasicComponent.class.getDeclaredField("commandsACL");
+			commandsAcl.setAccessible(true);
+			Map<String,EnumSet<CmdAcl>> val = (Map<String, EnumSet<CmdAcl>>) commandsAcl.get(sm);
+			System.out.println("ACL = " + val);
+			EnumSet<CmdAcl> acl = val.get("ala-ma-kota");
+			System.out.println("" + acl.getClass() + ", " + acl);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	public Map<String, Object> getProps() {
-		Map<String, Object> props = new HashMap<>();
+		Map<String, Object> props = new HashMap<>(this.props);
 
-		props.put("userRepository/repo-uri", "jdbc:");
-		props.put("repo-uri", "jdbc:");
+		//props.put("userRepository/repo-uri", "jdbc:postgresql://127.0.0.1/tigase?user=test&password=test&autoCreateUser=true");
+		props.put("dataSource/repo-uri", "jdbc:postgresql://127.0.0.1/tigase?user=test&password=test&autoCreateUser=true");
+		props.put("sess-man/commands/ala-ma-kota", "DOMAIN");
 
 		return props;
 	}
+
+//	@Test
+//	public void test1() throws Exception {
+//		Field f = Test1.class.getDeclaredField("map");
+//		assertEquals(Map.class, f.getType());
+//		System.out.println(f.getGenericType());
+//		if (f.getGenericType() instanceof ParameterizedType) {
+//			ParameterizedType pt = (ParameterizedType) f.getGenericType();
+//			System.out.println(pt.getActualTypeArguments());
+//			for (int i=0; i<pt.getActualTypeArguments().length; i++) {
+//				Type x = pt.getActualTypeArguments()[i];
+//				System.out.println(x);
+//			}
+//		}
+//	}
+//
+//	private class Test1 {
+//		private Map<String, EnumSet<CmdAcl>> map;
+//	}
 }

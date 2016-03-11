@@ -27,11 +27,16 @@ import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
 import java.io.File;
+import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.logging.Level;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 public class TypesConverterTest {
+
+	private HashMap<String,EnumSet<XT>> mapEnumSetField;
 
 	@Test
 	public void testConvert() throws Exception {
@@ -97,6 +102,13 @@ public class TypesConverterTest {
 		Assert.assertEquals(new File("/dupa.txt"), converter.convert("/dupa.txt", File.class));
 		Assert.assertEquals(new File("/dupa.txt"),
 				converter.convert(converter.toString(new File("/dupa.txt")), File.class));
+
+		HashMap<String,String> values = new HashMap<>();
+		values.put("t1", "a1,b2");
+		values.put("t2", "b2,c3");
+		mapEnumSetField = converter.convert(values, HashMap.class, this.getClass().getDeclaredField("mapEnumSetField").getGenericType());
+		assertEquals(EnumSet.of(XT.a1, XT.b2), mapEnumSetField.get("t1"));
+		assertEquals(EnumSet.of(XT.b2, XT.c3), mapEnumSetField.get("t2"));
 	}
 
 	@Test

@@ -33,6 +33,7 @@ import tigase.kernel.core.DependencyGrapher;
 import tigase.kernel.core.Kernel;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.ConsoleHandler;
@@ -395,8 +396,8 @@ public class KernelTest {
 	public static class CustomTypesConverter extends DefaultTypesConverter {
 
 		@Override
-		public <T> T convert(Object value, Class<T> expectedType) {
-			return super.convert(value.toString().substring(3), expectedType);
+		public <T> T convert(Object value, Class<T> expectedType, Type type) {
+			return super.convert(value.toString().substring(3), expectedType, type);
 		}
 
 		@Override
