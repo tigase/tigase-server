@@ -27,6 +27,23 @@ package tigase.server;
 //~--- non-JDK imports --------------------------------------------------------
 
 
+import tigase.annotations.TODO;
+import tigase.conf.ConfigurationException;
+import tigase.io.SSLContextContainerIfc;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.RegistrarBean;
+import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.beans.config.ConfigurationChangedAware;
+import tigase.kernel.core.Kernel;
+import tigase.net.*;
+import tigase.server.script.CommandIfc;
+import tigase.server.xmppclient.XMPPIOProcessor;
+import tigase.stats.StatisticsList;
+import tigase.util.DataTypes;
+import tigase.xml.Element;
+import tigase.xmpp.*;
+
+import javax.script.Bindings;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
@@ -35,32 +52,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.net.ssl.TrustManager;
-import javax.script.Bindings;
-
-import tigase.annotations.TODO;
-import tigase.conf.ConfigurationException;
-import tigase.io.SSLContextContainer;
-import tigase.io.SSLContextContainerIfc;
-import tigase.io.TLSUtil;
-import tigase.net.*;
-
-import tigase.server.script.CommandIfc;
-import tigase.server.xmppclient.ClientConnectionManager;
-import tigase.server.xmppclient.ClientTrustManagerFactory;
-import tigase.server.xmppclient.XMPPIOProcessor;
-import tigase.stats.StatisticsList;
-import tigase.util.DataTypes;
-import tigase.xml.Element;
-
-import tigase.xmpp.JID;
-import tigase.xmpp.StreamError;
-import tigase.xmpp.XMPPDomBuilderHandler;
-import tigase.xmpp.XMPPIOService;
-
 import static tigase.xmpp.XMPPIOService.DOM_HANDLER;
-
-import tigase.xmpp.XMPPIOServiceListener;
 
 
 /**
@@ -75,7 +67,7 @@ import tigase.xmpp.XMPPIOServiceListener;
  */
 public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				extends AbstractMessageReceiver
-				implements XMPPIOServiceListener<IO> {
+				implements XMPPIOServiceListener<IO>, RegistrarBean {
 	/** Field description */
 	public static final String HT_TRAFFIC_THROTTLING_PROP_KEY =
 			"--cm-ht-traffic-throttling";
@@ -192,20 +184,20 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	/** Field description */
 	protected static final String PORTS_PROP_KEY = PROP_KEY + "ports";
 
-	/** Field description */
-	protected static final boolean TLS_USE_PROP_VAL = true;
-	//J-
-	/** Field description */
-	protected static final String TLS_PROP_KEY = PROP_KEY + "tls/";
-
-	/** Field description */
-	protected static final String TLS_USE_PROP_KEY = TLS_PROP_KEY + "use";
-
-	/** Field description */
-	protected static final boolean TLS_REQUIRED_PROP_VAL = false;
-
-	/** Field description */
-	protected static final String TLS_REQUIRED_PROP_KEY = TLS_PROP_KEY + "required";
+//	/** Field description */
+//	protected static final boolean TLS_USE_PROP_VAL = true;
+//	//J-
+//	/** Field description */
+//	protected static final String TLS_PROP_KEY = PROP_KEY + "tls/";
+//
+//	/** Field description */
+//	protected static final String TLS_USE_PROP_KEY = TLS_PROP_KEY + "use";
+//
+//	/** Field description */
+//	protected static final boolean TLS_REQUIRED_PROP_VAL = false;
+//
+//	/** Field description */
+//	protected static final String TLS_REQUIRED_PROP_KEY = TLS_PROP_KEY + "required";
 
 	protected static final String WATCHDOG_DELAY = "watchdog_delay";
 	protected static final String WATCHDOG_TIMEOUT = "watchdog_timeout";
@@ -219,6 +211,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description. */
+	@ConfigField(desc = "Interfaces to listen on")
 	public String[]                         PORT_IFC_PROP_VAL = { "*" };
 	private long                            bytesReceived     = 0;
 	private long                            bytesSent         = 0;
@@ -228,42 +221,62 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	private long                            watchdogRuns      = 0;
 	private long                            watchdogStopped   = 0;
 	private long                            watchdogTests     = 0;
+	@ConfigField(desc = "Watchdog delay")
 	protected long                          watchdogDelay     = 10 * MINUTE; // 600 000
+	@ConfigField(desc = "Watchdog timeout")
 	protected long                          watchdogTimeout   = 29 * MINUTE; // 1 740 000
 	private boolean                         white_char_ack    = WHITE_CHAR_ACK_PROP_VAL;
 	private boolean                         xmpp_ack          = XMPP_ACK_PROP_VAL;
 	private LinkedList<Map<String, Object>> waitingTasks = new LinkedList<Map<String,
 			Object>>();
+	@ConfigField(desc = "Limit of total number of packets per connection")
 	private long                          total_packets_limit =
 			TOTAL_PACKETS_LIMIT_PROP_VAL;
+	@ConfigField(desc = "Limit of total numer of bytes per connection")
 	private long                          total_bin_limit     = TOTAL_BIN_LIMIT_PROP_VAL;
 	/**
 	 * Protection from the system overload and DOS attack. We want to limit number
 	 * of elements created within a single XMPP stanza.
 	 *
 	 */
-	protected int elements_number_limit = 0;
+	@ConfigField(desc = "Limit of elements for single XMPP stanza")
+	protected int elements_number_limit = ELEMENTS_NUMBER_LIMIT_PROP_VAL;
 	private ConcurrentHashMap<String, IO> services = new ConcurrentHashMap<String, IO>();
 	private Set<ConnectionListenerImpl>   pending_open = Collections.synchronizedSet(
 			new HashSet<ConnectionListenerImpl>());;
+	@ConfigField(desc = "Maximal allowed time of inactivity of connection")
 	private long                      maxInactivityTime       = getMaxInactiveTime();
+	@ConfigField(desc = "Limit of packets per minute for connection")
 	private long                      last_minute_packets_limit =
 			LAST_MINUTE_PACKETS_LIMIT_PROP_VAL;
+	@ConfigField(desc = "Limit of bytes per minute for connection")
 	private long                      last_minute_bin_limit =
 			LAST_MINUTE_BIN_LIMIT_PROP_VAL;
+	@ConfigField(desc = "Limit of size for network buffer for connection")
 	private int net_buffer_limit = 0;
 	private IOServiceStatisticsGetter ioStatsGetter = new IOServiceStatisticsGetter();
 	private boolean                   initializationCompleted = false;
+	@ConfigField(desc = "Ports for listening")
+	protected HashSet<Integer> ports = getDefPorts();
+	@Inject(nullAllowed = true)
 	protected XMPPIOProcessor[]       processors              = new XMPPIOProcessor[0];
-	private SSLContextContainerIfc    sslContextContainer     = new SSLContextContainer(TLSUtil.getCertificateContainer(), TLSUtil.getRootSslContextContainer());
+	@Inject(bean = "sslContextContainer")
+	private SSLContextContainerIfc    sslContextContainer;
 
 	/** Field description */
 	protected int net_buffer = NET_BUFFER_ST_PROP_VAL;
 
 	/** Field description */
+	@ConfigField(desc = "Delay before connection is established")
 	protected long       connectionDelay = 2 * SECOND;
+	@ConfigField(desc = "Action taken if XMPP limit is exceeded")
 	private LIMIT_ACTION xmppLimitAction = LIMIT_ACTION.DISCONNECT;
+	@ConfigField(desc = "Watchdog ping type")
 	protected WATCHDOG_PING_TYPE watchdogPingType = WATCHDOG_PING_TYPE.WHITESPACE;
+
+	@ConfigField(desc = "Traffic throttling")
+	protected String trafficThrottling = ST_TRAFFIC_THROTTLING_PROP_VAL;
+	private Kernel kernel;
 
 	//~--- constant enums -------------------------------------------------------
 
@@ -278,6 +291,12 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 
 	//~--- methods --------------------------------------------------------------
+
+
+	@Override
+	public void beanConfigurationChanged(Collection<String> changedFields) {
+		super.beanConfigurationChanged(changedFields);
+	}
 
 	/**
 	 * Method description
@@ -472,6 +491,79 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 * @param port_props
 	 */
 	public abstract void reconnectionFailed(Map<String, Object> port_props);
+
+	public HashSet<Integer> getDefPorts() {
+		HashSet<Integer> result = new HashSet<>();
+		int[] ports = getDefPlainPorts();
+		int[] sslPorts = getDefSSLPorts();
+		if (ports != null) {
+			for (int port : ports)
+				result.add(port);
+		}
+
+		if (sslPorts != null) {
+			for (int port : sslPorts)
+				result.add(port);
+		}
+		return result;
+	}
+
+	public void setPorts(HashSet<Integer> ports) {
+		if (ports == null)
+			ports = new HashSet<>();
+
+		Set<Integer> oldPorts = new HashSet<Integer>(this.ports);
+		Set<Integer> newPorts = new HashSet<Integer>(ports);
+		newPorts.removeAll(this.ports);
+		oldPorts.removeAll(ports);
+
+		this.ports = ports;
+		if (kernel == null) {
+			return;
+		}
+
+		for (int port : oldPorts) {
+			unregisterPortConfigBean(port);
+		}
+		for (int port : newPorts) {
+			registerPortConfigBean(port, null);
+		}
+	}
+
+	@Override
+	public void register(Kernel kernel) {
+		this.kernel = kernel;
+
+		HashSet<Integer> sslPorts = new HashSet<>();
+		if (getDefSSLPorts() != null) {
+			for (int port : getDefSSLPorts())
+				sslPorts.add(port);
+		}
+		for (int port : ports) {
+			registerPortConfigBean(port, sslPorts.contains(port) ? SocketType.ssl : SocketType.plain);
+		}
+	}
+
+	@Override
+	public void unregister(Kernel kernel) {
+		this.kernel = null;
+	}
+
+	public void registerPortConfigBean(int port, SocketType defSocketType) {
+		String name = "connections/" + port;
+		kernel.registerBean(name).asClass(PortConfigBean.class).exec();
+		PortConfigBean config = kernel.getInstance(name);
+		config.connectionManager = this;
+		config.port = port;
+		if (defSocketType != null && config.socket == null) {
+			config.socket = defSocketType;
+		}
+		config.beanConfigurationChanged(Collections.singleton("port"));
+	}
+
+	public void unregisterPortConfigBean(int port) {
+		kernel.unregister("connections/" + port);
+	}
 
 	@Override
 	public void release() {
@@ -718,7 +810,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 		Map<String, Object> props = super.getDefaults(params);
 
-		props.put(TLS_USE_PROP_KEY, TLS_USE_PROP_VAL);
 		checkHighThroughputProperty(NET_BUFFER_HT_PROP_KEY, NET_BUFFER_HT_PROP_VAL,
 				NET_BUFFER_ST_PROP_KEY, NET_BUFFER_ST_PROP_VAL, NET_BUFFER_PROP_KEY,
 				Integer.class, params, props);
@@ -890,7 +981,46 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	protected Watchdog newWatchdog() {
 		return new Watchdog();
 	}
-	
+
+	public void setProcessors(XMPPIOProcessor[] processors) {
+		if (processors == null)
+			processors = new XMPPIOProcessor[0];
+		this.processors = processors;
+	}
+
+	public void setTrafficThrottling(String trafficThrottling) {
+		this.trafficThrottling = trafficThrottling;
+
+		String tmp = trafficThrottling;
+		for (String tmp_s : tmp.split(",")) {
+			String[] tmp_thr = tmp_s.split(":");
+
+			if (tmp_thr[0].equalsIgnoreCase("xmpp")) {
+				last_minute_packets_limit = DataTypes.parseNum(tmp_thr[1], Long.class,
+						LAST_MINUTE_PACKETS_LIMIT_PROP_VAL);
+				log.warning(getName() + " last_minute_packets_limit = " +
+						last_minute_packets_limit);
+				total_packets_limit = DataTypes.parseNum(tmp_thr[2], Long.class,
+						TOTAL_PACKETS_LIMIT_PROP_VAL);
+				log.warning(getName() + " total_packets_limit = " + total_packets_limit);
+				if (tmp_thr[3].equalsIgnoreCase("disc")) {
+					xmppLimitAction = LIMIT_ACTION.DISCONNECT;
+				}
+				if (tmp_thr[3].equalsIgnoreCase("drop")) {
+					xmppLimitAction = LIMIT_ACTION.DROP_PACKETS;
+				}
+			}
+			if (tmp_thr[0].equalsIgnoreCase("bin")) {
+				last_minute_bin_limit = DataTypes.parseNum(tmp_thr[1], Long.class,
+						LAST_MINUTE_BIN_LIMIT_PROP_VAL);
+				log.warning(getName() + " last_minute_bin_limit = " + last_minute_bin_limit);
+				total_bin_limit = DataTypes.parseNum(tmp_thr[2], Long.class,
+						TOTAL_BIN_LIMIT_PROP_VAL);
+				log.warning(getName() + " total_bin_limit = " + total_bin_limit);
+			}
+		}
+	}
+
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
@@ -910,35 +1040,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			net_buffer_limit = (Integer) props.get(NET_BUFFER_LIMIT_PROP_KEY);
 		}
 		if (props.get(TRAFFIC_THROTTLING_PROP_KEY) != null) {
-			String[] tmp = ((String) props.get(TRAFFIC_THROTTLING_PROP_KEY)).split(",");
-
-			for (String tmp_s : tmp) {
-				String[] tmp_thr = tmp_s.split(":");
-
-				if (tmp_thr[0].equalsIgnoreCase("xmpp")) {
-					last_minute_packets_limit = DataTypes.parseNum(tmp_thr[1], Long.class,
-							LAST_MINUTE_PACKETS_LIMIT_PROP_VAL);
-					log.warning(getName() + " last_minute_packets_limit = " +
-							last_minute_packets_limit);
-					total_packets_limit = DataTypes.parseNum(tmp_thr[2], Long.class,
-							TOTAL_PACKETS_LIMIT_PROP_VAL);
-					log.warning(getName() + " total_packets_limit = " + total_packets_limit);
-					if (tmp_thr[3].equalsIgnoreCase("disc")) {
-						xmppLimitAction = LIMIT_ACTION.DISCONNECT;
-					}
-					if (tmp_thr[3].equalsIgnoreCase("drop")) {
-						xmppLimitAction = LIMIT_ACTION.DROP_PACKETS;
-					}
-				}
-				if (tmp_thr[0].equalsIgnoreCase("bin")) {
-					last_minute_bin_limit = DataTypes.parseNum(tmp_thr[1], Long.class,
-							LAST_MINUTE_BIN_LIMIT_PROP_VAL);
-					log.warning(getName() + " last_minute_bin_limit = " + last_minute_bin_limit);
-					total_bin_limit = DataTypes.parseNum(tmp_thr[2], Long.class,
-							TOTAL_BIN_LIMIT_PROP_VAL);
-					log.warning(getName() + " total_bin_limit = " + total_bin_limit);
-				}
-			}
+			String tmp = ((String) props.get(TRAFFIC_THROTTLING_PROP_KEY));
+			setTrafficThrottling(tmp);
 		}
 
 		if ( props.get (ELEMENTS_NUMBER_LIMIT_PROP_KEY ) != null ){
@@ -1312,7 +1415,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		props.put(PROP_KEY + port + "/" + PORT_IFC_PROP_KEY, PORT_IFC_PROP_VAL);
 		props.put(PROP_KEY + port + "/" + PORT_REMOTE_HOST_PROP_KEY,
 				PORT_REMOTE_HOST_PROP_VAL);
-		props.put(PROP_KEY + port + "/" + TLS_REQUIRED_PROP_KEY, TLS_REQUIRED_PROP_VAL);
 
 		Map<String, Object> extra = getParamsForPort(port);
 
@@ -1354,6 +1456,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		}, delay);
 	}
 
+	protected void releaseListener(ConnectionOpenListener toStop) {
+		pending_open.remove(toStop);
+		connectThread.removeConnectionOpenListener(toStop);
+	}
+
 	private void releaseListeners() {
 		for (ConnectionListenerImpl cli : pending_open) {
 			connectThread.removeConnectionOpenListener(cli);
@@ -1361,7 +1468,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		pending_open.clear();
 	}
 
-	private void startService(Map<String, Object> port_props) {
+	private ConnectionListenerImpl startService(Map<String, Object> port_props) {
 		if (port_props == null) {
 			throw new NullPointerException("port_props cannot be null.");
 		}
@@ -1372,6 +1479,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			pending_open.add(cli);
 		}
 		connectThread.addConnectionOpenListener(cli);
+		return cli;
 	}
 
 	//~--- inner classes --------------------------------------------------------
@@ -1667,6 +1775,54 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			}
 		}
 
+	}
+
+	public static class PortConfigBean implements ConfigurationChangedAware {
+
+		private ConnectionManager connectionManager;
+		private ConnectionOpenListener connectionOpenListener = null;
+		private Integer port;
+
+		public PortConfigBean() {
+
+		}
+
+		@ConfigField(desc = "Port type")
+		protected ConnectionType type = ConnectionType.accept;
+
+		@ConfigField(desc = "Socket type")
+		protected SocketType socket;
+
+		@ConfigField(desc = "Interface to listen on")
+		protected String[] ifc;
+
+		@Override
+		public void beanConfigurationChanged(Collection<String> changedFields) {
+			if (socket == null)
+				socket = SocketType.plain;
+
+			if (connectionOpenListener != null)
+				connectionManager.releaseListener(connectionOpenListener);
+
+			if (port == null)
+				return;
+
+			connectionOpenListener = connectionManager.startService(getProps());
+		}
+
+		protected Map<String, Object> getProps() {
+			Map<String, Object> props = new HashMap<>();
+			props.put(PORT_KEY, port);
+			props.put(PORT_TYPE_PROP_KEY, type);
+			props.put(PORT_SOCKET_PROP_KEY, socket);
+			if (ifc == null)
+				props.put(PORT_IFC_PROP_KEY, connectionManager.PORT_IFC_PROP_VAL);
+			else
+				props.put(PORT_IFC_PROP_KEY, ifc);
+			props.put(PORT_REMOTE_HOST_PROP_KEY, PORT_REMOTE_HOST_PROP_VAL);
+//			props.put(TLS_REQUIRED_PROP_KEY, TLS_REQUIRED_PROP_VAL);
+			return props;
+		}
 	}
 }    // ConnectionManager
 

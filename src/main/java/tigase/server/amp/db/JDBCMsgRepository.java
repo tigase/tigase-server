@@ -19,52 +19,28 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.server.amp;
+package tigase.server.amp.db;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.DBInitException;
-import tigase.db.DataRepository;
-import tigase.db.DataRepository.dbTypes;
-import tigase.db.Repository;
-import tigase.db.RepositoryFactory;
-import tigase.db.UserNotFoundException;
-
+import tigase.db.*;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Packet;
-
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-
 import tigase.util.Algorithms;
 import tigase.util.SimpleCache;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
-
-import java.security.NoSuchAlgorithmException;
-import java.sql.DataTruncation;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import tigase.db.NonAuthUserRepository;
-import tigase.db.NonAuthUserRepositoryImpl;
-import tigase.vhosts.VHostItem;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
+
+import java.security.NoSuchAlgorithmException;
+import java.sql.*;
+import java.util.*;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -75,7 +51,7 @@ import tigase.xmpp.XMPPResourceConnection;
  * @version $Rev$
  */
 @Repository.Meta( isDefault=true, supportedUris = { "jdbc:[^:]+:.*" } )
-public class JDBCMsgRepository extends MsgRepository<Long> {
+public class JDBCMsgRepository extends MsgRepository<Long,DataRepository> {
 	private static final Logger log = Logger.getLogger(JDBCMsgRepository.class.getName());
 	private static final String MSG_TABLE = "msg_history";
 	private static final String MSG_ID_COLUMN = "msg_id";
@@ -86,10 +62,10 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 	private static final String MSG_TYPE_COLUMN = "msg_type";
 	private static final String MSG_BODY_COLUMN = "message";
 	private static final String HISTORY_FLAG_COLUMN = "history_enabled";
-	private static final String JID_TABLE = "user_jid";
-	private static final String JID_ID_COLUMN = "jid_id";
-	private static final String JID_SHA_COLUMN = "jid_sha";
-	private static final String JID_COLUMN = "jid";
+	public static final String JID_TABLE = "user_jid";
+	public static final String JID_ID_COLUMN = "jid_id";
+	public static final String JID_SHA_COLUMN = "jid_sha";
+	public static final String JID_COLUMN = "jid";
 	private static final int StatementsCount = 2;
 	/* @formatter:off */
 	private static final String MYSQL_CREATE_MSG_TABLE =
@@ -223,96 +199,29 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 	private static final String MSG_SELECT_EXPIRED_BEFORE_QUERY =
 															"select * from " + MSG_TABLE + " where expired is not null and expired <= ? order by expired";
 
-	private static final String MYSQL_CREATE_BROADCAST_MSGS_TABLE =
-							"create table broadcast_msgs ( " + "  "
-							+ "id varchar(128) NOT NULL,  "
-							+ "expired datetime NOT NULL,  "
-							+ "msg varchar(4096) NOT NULL, "
-							+ " primary key (id))";
-	private static final String PGSQL_CREATE_BROADCAST_MSGS_TABLE =
-							"create table broadcast_msgs ( " + "  "
-							+ "id varchar(128) NOT NULL,  "
-							+ "expired timestamp NOT NULL,  "
-							+ "msg varchar(4096) NOT NULL, "
-							+ " primary key (id))";
-	private static final String SQLSERVER_CREATE_BROADCAST_MSGS_TABLE =
-							"create table broadcast_msgs ( " + "  "
-							+ "id varchar(128) NOT NULL,  "
-							+ "expired datetime NOT NULL,  "
-							+ "msg nvarchar(4000) NOT NULL, "
-							+ " primary key (id))";
-	private static final String DERBY_CREATE_BROADCAST_MSGS_TABLE =
-							"create table broadcast_msgs ( " + "  "
-							+ "id varchar(128) NOT NULL,  "
-							+ "expired timestamp NOT NULL,  "
-							+ "msg varchar(4096) NOT NULL, "
-							+ " primary key (id))";
-	
-	private static final String MYSQL_CREATE_BROADCAST_MSGS_RECIPIENTS_TABLE =
-							"create table broadcast_msgs_recipients ( " + "  "
-							+ "msg_id varchar(128) NOT NULL,  "
-							+ "jid_id bigint unsigned NOT NULL,  "
-							+ " primary key (msg_id, jid_id))";
-	private static final String PGSQL_CREATE_BROADCAST_MSGS_RECIPIENTS_TABLE =
-							"create table broadcast_msgs_recipients ( " + "  "
-							+ "msg_id varchar(128) NOT NULL,  "
-							+ "jid_id bigint NOT NULL,  "
-							+ " primary key (msg_id, jid_id))";
-	private static final String SQLSERVER_CREATE_BROADCAST_MSGS_RECIPIENTS_TABLE =
-							"create table broadcast_msgs_recipients ( " + "  "
-							+ "msg_id varchar(128) NOT NULL,  "
-							+ "jid_id bigint NOT NULL,  "
-							+ " primary key (msg_id, jid_id))";
-	private static final String DERBY_CREATE_BROADCAST_MSGS_RECIPIENTS_TABLE =
-							"create table broadcast_msgs_recipients ( " + "  "
-							+ "msg_id varchar(128) NOT NULL,  "
-							+ "jid_id bigint NOT NULL,  "
-							+ " primary key (msg_id, jid_id))";	
-	
-	private static final String MSG_SELECT_MESSAGES_TO_BROADCAST = 
-			"select id, expired, msg from broadcast_msgs where expired >= ?";
-	private static final String SQLSERVER_MSG_INSERT_MESSAGE_TO_BROADCAST =
-			"insert into broadcast_msgs (id, expired, msg) values (?, ?, ?) where not exists (select 1 from broadcast_msgs where id = ?)";
-	private static final String SQL_MSG_INSERT_MESSAGE_TO_BROADCAST =
-			"insert into broadcast_msgs (id, expired, msg) select ?, ?, ? from (select 1) x where not exists (select 1 from broadcast_msgs where id = ?)";
-	private static final String DERBY_MSG_INSERT_MESSAGE_TO_BROADCAST1 = 
-			"select id from broadcast_msgs where id = ?";
-	private static final String DERBY_MSG_INSERT_MESSAGE_TO_BROADCAST2 = 
-			"insert into broadcast_msgs (id, expired, msg) values (?,?,?)";
-	private static final String MSG_SELECT_BROADCAST_RECIPIENTS = 
-			"select j." + JID_COLUMN + " from broadcast_msgs_recipients r join " + JID_TABLE + " j on j." + JID_ID_COLUMN + " = r.jid_id where r.msg_id = ?";
-	private static final String SQLSERVER_MSG_ENSURE_BROADCAT_RECIPIETN = 
-			"insert into broadcast_msgs_recipients (msg_id, jid_id) values (?, ?) where not exists (select 1 from broadcast_msgs_recipients where msg_id = ? and jid_id = ?)";
-	private static final String SQL_MSG_ENSURE_BROADCAT_RECIPIETN = 
-			"insert into broadcast_msgs_recipients (msg_id, jid_id) select ?, ? from (select 1) x where not exists (select 1 from broadcast_msgs_recipients where msg_id = ? and jid_id = ?)";
-	private static final String DERBY_MSG_ENSURE_BROADCAT_RECIPIETN1 = 
-			"select 1 from broadcast_msgs_recipients where msg_id = ? and jid_id = ?";
-	private static final String DERBY_MSG_ENSURE_BROADCAT_RECIPIETN2 = 
-			"insert into broadcast_msgs_recipients (msg_id, jid_id) values (?, ?)";
-	
-	private static final String GET_USER_UID_DEF_QUERY =
+	public static final String GET_USER_UID_DEF_QUERY =
 		"select " + 
 		  JID_ID_COLUMN + ", " + 
 		  JID_COLUMN + 
 		" from " + JID_TABLE + " where " + JID_SHA_COLUMN + " = ?";
         private static final String MSG_COUNT_FOR_TO_AND_FROM_QUERY_DEF =
                 "select count(*) from " + MSG_TABLE + " where " + MSG_TO_UID_COLUMN + " = ? and " + MSG_FROM_UID_COLUMN + " = ?";
-	private static final String ADD_USER_JID_ID_QUERY =
+	public static final String ADD_USER_JID_ID_QUERY =
 		"insert into " + JID_TABLE + " ( " + JID_SHA_COLUMN + ", " + JID_COLUMN + ") select ?, ? "
 		+ "WHERE NOT EXISTS (SELECT 1 FROM " + JID_TABLE+ " WHERE " + JID_SHA_COLUMN + " = ? AND " + JID_COLUMN +" = ? )";
-	private static final String ADD_USER_JID_ID_QUERY_MYSQL =
+	public static final String ADD_USER_JID_ID_QUERY_MYSQL =
 		"insert into " + JID_TABLE + " ( " + JID_SHA_COLUMN + ", " + JID_COLUMN + ") select ?, ? "
 		+ "from dual "
 		+ "WHERE NOT EXISTS (SELECT 1 FROM " + JID_TABLE+ " WHERE " + JID_SHA_COLUMN + " = ? AND " + JID_COLUMN +" = ? )";
-	private static final String ADD_USER_JID_ID_QUERY_DERBY =
+	public static final String ADD_USER_JID_ID_QUERY_DERBY =
 		"insert into " + JID_TABLE + " ( " + JID_SHA_COLUMN + ", " + JID_COLUMN + ") select ?, ? "
 		+ "FROM SYSIBM.SYSDUMMY1 "
 		+ "WHERE NOT EXISTS (SELECT 1 FROM " + JID_TABLE+ " WHERE " + JID_SHA_COLUMN + " = ? AND " + JID_COLUMN +" = ? )";
 	/* @formatter:on */
 	private static final String GET_USER_UID_PROP_KEY = "user-uid-query";
 	private static final String MSGS_COUNT_LIMIT_PROP_KEY = "count-limit-query";
-	private static final int MAX_UID_CACHE_SIZE = 100000;
-	private static final long MAX_UID_CACHE_TIME = 3600000;
+	public static final int MAX_UID_CACHE_SIZE = 100000;
+	public static final long MAX_UID_CACHE_TIME = 3600000;
 //	private static final Map<String, JDBCMsgRepository> repos =
 //			new ConcurrentSkipListMap<String, JDBCMsgRepository>();
 
@@ -320,14 +229,73 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 
 	private DataRepository data_repo = null;
 	private String uid_query = GET_USER_UID_DEF_QUERY;
+	@ConfigField(desc = "Query to count messages for limit")
 	private String msg_count_for_limit_query = MSG_COUNT_FOR_TO_AND_FROM_QUERY_DEF;
-	private String msg_insert_message_to_broadcast = SQL_MSG_INSERT_MESSAGE_TO_BROADCAST;
-	private String msg_ensure_broadcast_recipient = SQL_MSG_ENSURE_BROADCAT_RECIPIETN;
 	private String add_user_jid_id = ADD_USER_JID_ID_QUERY;
 	private boolean initialized = false;
 	private Map<BareJID, Long> uids_cache = Collections
 			.synchronizedMap(new SimpleCache<BareJID, Long>(MAX_UID_CACHE_SIZE,
 					MAX_UID_CACHE_TIME));
+
+	@Override
+	public void setDataSource(DataRepository data_repo) {
+		try {
+			switch (data_repo.getDatabaseType()) {
+				case mysql:
+					add_user_jid_id = ADD_USER_JID_ID_QUERY_MYSQL;
+					break;
+				case derby:
+					add_user_jid_id = ADD_USER_JID_ID_QUERY_DERBY;
+					break;
+				default:
+					add_user_jid_id = ADD_USER_JID_ID_QUERY;
+					break;
+			}
+
+			// Check if DB is correctly setup and contains all required tables.
+			checkDB(data_repo);
+			data_repo.initPreparedStatement(uid_query, uid_query);
+			data_repo.initPreparedStatement(MSG_INSERT_QUERY, MSG_INSERT_QUERY);
+			data_repo.initPreparedStatement(MSG_SELECT_TO_JID_QUERY, MSG_SELECT_TO_JID_QUERY);
+			data_repo.initPreparedStatement(MSG_SELECT_COUNT_TO_JID_QUERY, MSG_SELECT_COUNT_TO_JID_QUERY);
+			data_repo.initPreparedStatement(MSG_SELECT_LIST_TO_JID_QUERY, MSG_SELECT_LIST_TO_JID_QUERY);
+			data_repo.initPreparedStatement(MSG_DELETE_TO_JID_QUERY, MSG_DELETE_TO_JID_QUERY);
+			data_repo.initPreparedStatement(MSG_DELETE_ID_QUERY, MSG_DELETE_ID_QUERY);
+			data_repo.initPreparedStatement(MSG_SELECT_EXPIRED_QUERY, MSG_SELECT_EXPIRED_QUERY);
+			data_repo.initPreparedStatement(MSG_SELECT_EXPIRED_BEFORE_QUERY,
+					MSG_SELECT_EXPIRED_BEFORE_QUERY);
+			data_repo.initPreparedStatement(msg_count_for_limit_query,
+					msg_count_for_limit_query);
+			data_repo.initPreparedStatement(add_user_jid_id, add_user_jid_id);
+
+			for (int i = 1; i <= StatementsCount; i++) {
+				StringBuilder select = new StringBuilder().append(MSG_DELETE_IDS_TO_JID_QUERY);
+				for (int j = 1; j <= i; j++) {
+					if (j > 1)
+						select.append(" , ");
+					select.append(" ? ");
+				}
+				select.append(")");
+
+				data_repo.initPreparedStatement(MSG_DELETE_IDS_TO_JID_QUERY + "_" + i, select.toString());
+			}
+
+			for (int i = 1; i <= StatementsCount; i++) {
+				StringBuilder select = new StringBuilder().append(MSG_SELECT_IDS_TO_JID_QUERY);
+				for (int j = 1; j <= i; j++) {
+					if (j > 1)
+						select.append(" , ");
+					select.append(" ? ");
+				}
+				select.append(")");
+				data_repo.initPreparedStatement(MSG_SELECT_IDS_TO_JID_QUERY + "_" + i, select.toString());
+			}
+		} catch (SQLException ex) {
+			log.log(Level.WARNING, "MsgRepository not initialized due to exception", ex);
+		}
+
+		this.data_repo = data_repo;
+	}
 
 	@Override
 	public void initRepository(String conn_str, Map<String, String> map)
@@ -357,78 +325,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 		
 		try {
 			data_repo = RepositoryFactory.getDataRepository(null, conn_str, map);
-			switch (data_repo.getDatabaseType()) {
-				case sqlserver:
-					msg_ensure_broadcast_recipient = SQLSERVER_MSG_ENSURE_BROADCAT_RECIPIETN;
-					msg_insert_message_to_broadcast = SQLSERVER_MSG_INSERT_MESSAGE_TO_BROADCAST;
-					break;
-				default:
-					msg_ensure_broadcast_recipient = SQL_MSG_ENSURE_BROADCAT_RECIPIETN;
-					msg_insert_message_to_broadcast = SQL_MSG_INSERT_MESSAGE_TO_BROADCAST;
-					break;
-			}
-			switch (data_repo.getDatabaseType()) {
-				case mysql:
-					add_user_jid_id = ADD_USER_JID_ID_QUERY_MYSQL;
-					break;
-				case derby:
-					add_user_jid_id = ADD_USER_JID_ID_QUERY_DERBY;
-					break;
-				default:
-					add_user_jid_id = ADD_USER_JID_ID_QUERY;
-					break;
-			}
-
-			// Check if DB is correctly setup and contains all required tables.
-			checkDB();
-			data_repo.initPreparedStatement(uid_query, uid_query);
-			data_repo.initPreparedStatement(MSG_INSERT_QUERY, MSG_INSERT_QUERY);
-			data_repo.initPreparedStatement(MSG_SELECT_TO_JID_QUERY, MSG_SELECT_TO_JID_QUERY);
-			data_repo.initPreparedStatement(MSG_SELECT_COUNT_TO_JID_QUERY, MSG_SELECT_COUNT_TO_JID_QUERY);
-			data_repo.initPreparedStatement(MSG_SELECT_LIST_TO_JID_QUERY, MSG_SELECT_LIST_TO_JID_QUERY);
-			data_repo.initPreparedStatement(MSG_DELETE_TO_JID_QUERY, MSG_DELETE_TO_JID_QUERY);
-			data_repo.initPreparedStatement(MSG_DELETE_ID_QUERY, MSG_DELETE_ID_QUERY);
-			data_repo.initPreparedStatement(MSG_SELECT_EXPIRED_QUERY, MSG_SELECT_EXPIRED_QUERY);
-			data_repo.initPreparedStatement(MSG_SELECT_EXPIRED_BEFORE_QUERY,
-					MSG_SELECT_EXPIRED_BEFORE_QUERY);
-			data_repo.initPreparedStatement(msg_count_for_limit_query,
-					msg_count_for_limit_query);
-			data_repo.initPreparedStatement(add_user_jid_id, add_user_jid_id);
-			data_repo.initPreparedStatement(MSG_SELECT_BROADCAST_RECIPIENTS, MSG_SELECT_BROADCAST_RECIPIENTS);
-			data_repo.initPreparedStatement(MSG_SELECT_MESSAGES_TO_BROADCAST, MSG_SELECT_MESSAGES_TO_BROADCAST);
-			if (data_repo.getDatabaseType() == dbTypes.derby) {
-				data_repo.initPreparedStatement(DERBY_MSG_ENSURE_BROADCAT_RECIPIETN1, DERBY_MSG_ENSURE_BROADCAT_RECIPIETN1);
-				data_repo.initPreparedStatement(DERBY_MSG_ENSURE_BROADCAT_RECIPIETN2, DERBY_MSG_ENSURE_BROADCAT_RECIPIETN2);
-				data_repo.initPreparedStatement(DERBY_MSG_INSERT_MESSAGE_TO_BROADCAST1, DERBY_MSG_INSERT_MESSAGE_TO_BROADCAST1);
-				data_repo.initPreparedStatement(DERBY_MSG_INSERT_MESSAGE_TO_BROADCAST2, DERBY_MSG_INSERT_MESSAGE_TO_BROADCAST2);
-			} else {
-				data_repo.initPreparedStatement(msg_ensure_broadcast_recipient, msg_ensure_broadcast_recipient);
-				data_repo.initPreparedStatement(msg_insert_message_to_broadcast, msg_insert_message_to_broadcast);
-			}
-
-			for (int i=1; i<= StatementsCount; i++) {
-				StringBuilder select = new StringBuilder().append(MSG_DELETE_IDS_TO_JID_QUERY);
-				for (int j=1; j<=i; j++) {
-					if (j > 1)
-						select.append(" , ");
-					select.append(" ? ");
-				}
-				select.append(")");
-
-				data_repo.initPreparedStatement(MSG_DELETE_IDS_TO_JID_QUERY + "_" + i, select.toString());
-			}
-
-			for (int i=1; i<= StatementsCount; i++) {
-				StringBuilder select = new StringBuilder().append(MSG_SELECT_IDS_TO_JID_QUERY);
-				for (int j=1; j<=i; j++) {
-					if (j > 1)
-						select.append(" , ");
-					select.append(" ? ");
-				}
-				select.append(")");
-				data_repo.initPreparedStatement(MSG_SELECT_IDS_TO_JID_QUERY + "_" + i, select.toString());
-			}
-
+			setDataSource(data_repo);
 
 		} catch (Exception e) {
 			log.log(Level.WARNING, "MsgRepository not initialized due to exception", e);
@@ -830,147 +727,6 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 		}
 		return true;
 	}
-	
-	@Override
-	public void loadMessagesToBroadcast() {
-		try {
-			Set<String> oldMessages = new HashSet<String>(broadcastMessages.keySet());
-
-			ResultSet rs = null;
-			PreparedStatement stmt = data_repo.getPreparedStatement(null, MSG_SELECT_MESSAGES_TO_BROADCAST);
-
-			synchronized (stmt) {
-				try {
-					stmt.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
-					rs = stmt.executeQuery();
-
-					DomBuilderHandler domHandler = new DomBuilderHandler();
-					while (rs.next()) {
-						String msgId = rs.getString(1);
-						oldMessages.remove(msgId);
-						if (broadcastMessages.containsKey(msgId))
-							continue;
-
-						Date expire = rs.getTimestamp(2);
-						char[] msgChars = rs.getString(3).toCharArray();
-
-						parser.parse(domHandler, msgChars, 0, msgChars.length);
-
-						Queue<Element> elems = domHandler.getParsedElements();
-						Element msg = elems.poll();
-						if (msg == null)
-							continue;
-
-						broadcastMessages.put(msgId, new BroadcastMsg(null, msg, expire));
-					}
-				} finally {
-					data_repo.release(null, rs);
-				}
-			}
-			
-			for (String id : oldMessages) {
-				broadcastMessages.remove(id);
-			}
-			
-			rs = null;
-			
-			for (String id : broadcastMessages.keySet()) {
-				BroadcastMsg bmsg = broadcastMessages.get(id);
-				stmt = data_repo.getPreparedStatement(null, MSG_SELECT_BROADCAST_RECIPIENTS);
-				synchronized (stmt) {
-					try {
-						stmt.setString(1, id);
-						rs = stmt.executeQuery();
-						while (rs.next()) {
-							BareJID jid = BareJID.bareJIDInstanceNS(rs.getString(1));
-							bmsg.addRecipient(jid);
-						}
-					} finally {
-						data_repo.release(null, rs);
-					}
-				}
-			}
-		} catch (SQLException ex) {
-			log.log(Level.WARNING, "Problem with retrieving broadcast messages", ex);
-		}
-	}
-	
-	@Override
-	protected void insertBroadcastMessage(String id, Element msg, Date expire, BareJID recipient) {
-		try {
-			if (data_repo.getDatabaseType() == dbTypes.derby) {
-				boolean exists = false;
-				PreparedStatement stmt = data_repo.getPreparedStatement(recipient, DERBY_MSG_INSERT_MESSAGE_TO_BROADCAST1);
-				synchronized (stmt) {
-					stmt.setString(1, id);
-					ResultSet rs = stmt.executeQuery();
-					exists = rs.next();
-					data_repo.release(null, rs);
-				}
-				if (!exists) {
-					stmt = data_repo.getPreparedStatement(recipient, DERBY_MSG_INSERT_MESSAGE_TO_BROADCAST2);
-					synchronized (stmt) {
-						stmt.setString(1, id);
-						stmt.setTimestamp(2, new Timestamp(expire.getTime()));
-						stmt.setString(3, msg.toString());
-						stmt.executeUpdate();
-					}					
-				}
-			} else {			
-				PreparedStatement stmt = data_repo.getPreparedStatement(recipient, msg_insert_message_to_broadcast);
-				synchronized (stmt) {
-					stmt.setString(1, id);
-					stmt.setTimestamp(2, new Timestamp(expire.getTime()));
-					stmt.setString(3, msg.toString());
-					stmt.setString(4, id);
-					stmt.executeUpdate();
-				}
-			}
-		} catch (Exception ex) {
-			log.log(Level.WARNING, "Problem with updating broadcast message", ex);
-		}
-	}
-	
-	@Override
-	protected void ensureBroadcastMessageRecipient(String id, BareJID recipient) {
-		try {
-			long uid = getUserUID(recipient);
-			if (uid == -1) {
-				uid = addUserJID(recipient);
-			}
-			
-			if (data_repo.getDatabaseType() == dbTypes.derby) {
-				boolean exists = false;
-				PreparedStatement stmt = data_repo.getPreparedStatement(recipient, DERBY_MSG_ENSURE_BROADCAT_RECIPIETN1);
-				synchronized (stmt) {
-					stmt.setString(1, id);
-					stmt.setLong(2, uid);
-					ResultSet rs = stmt.executeQuery();
-					exists = rs.next();
-					data_repo.release(null, rs);
-				}
-				if (!exists) {
-					stmt = data_repo.getPreparedStatement(recipient, DERBY_MSG_ENSURE_BROADCAT_RECIPIETN2);
-					synchronized (stmt) {
-						stmt.setString(1, id);
-						stmt.setLong(2, uid);
-						stmt.executeUpdate();
-					}					
-				}
-			} else {
-				PreparedStatement stmt = data_repo.getPreparedStatement(recipient, msg_ensure_broadcast_recipient);
-				synchronized (stmt) {
-					stmt.setString(1, id);
-					stmt.setLong(2, uid);
-					stmt.setString(3, id);
-					stmt.setLong(4, uid);
-					stmt.executeUpdate();
-				}
-			}
-		} catch (Exception ex) {
-			log.log(Level.WARNING, "Problem with updating broadcast message", ex);
-		}
-	}
 
 	private long addUserJID(BareJID bareJID) throws SQLException, UserNotFoundException {
 		try {
@@ -1000,7 +756,7 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 	 *
 	 * @throws SQLException
 	 */
-	private void checkDB() throws SQLException {
+	private void checkDB(DataRepository data_repo) throws SQLException {
 
 		Statement stmt = null;
 
@@ -1010,31 +766,19 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 				case mysql:
 					data_repo.checkTable( JID_TABLE, MYSQL_CREATE_JID_TABLE );
 					data_repo.checkTable( MSG_TABLE, MYSQL_CREATE_MSG_TABLE );
-
-					data_repo.checkTable( "broadcast_msgs", MYSQL_CREATE_BROADCAST_MSGS_TABLE );
-					data_repo.checkTable( "broadcast_msgs_recipients", MYSQL_CREATE_BROADCAST_MSGS_RECIPIENTS_TABLE );
 					break;
 				case postgresql:
 					data_repo.checkTable( JID_TABLE, PGSQL_CREATE_JID_TABLE );
 					data_repo.checkTable( MSG_TABLE, PGSQL_CREATE_MSG_TABLE );
-
-					data_repo.checkTable( "broadcast_msgs", PGSQL_CREATE_BROADCAST_MSGS_TABLE );
-					data_repo.checkTable( "broadcast_msgs_recipients", PGSQL_CREATE_BROADCAST_MSGS_RECIPIENTS_TABLE );
 					break;
 				case derby:
 					data_repo.checkTable( JID_TABLE, DERBY_CREATE_JID_TABLE );
 					data_repo.checkTable( MSG_TABLE, DERBY_CREATE_MSG_TABLE );
-
-					data_repo.checkTable( "broadcast_msgs", DERBY_CREATE_BROADCAST_MSGS_TABLE );
-					data_repo.checkTable( "broadcast_msgs_recipients", DERBY_CREATE_BROADCAST_MSGS_RECIPIENTS_TABLE );
 					break;
 				case jtds:
 				case sqlserver:
 					data_repo.checkTable( JID_TABLE, SQLSERVER_CREATE_JID_TABLE );
 					data_repo.checkTable( MSG_TABLE, SQLSERVER_CREATE_MSG_TABLE );
-
-					data_repo.checkTable( "broadcast_msgs", SQLSERVER_CREATE_BROADCAST_MSGS_TABLE );
-					data_repo.checkTable( "broadcast_msgs_recipients", SQLSERVER_CREATE_BROADCAST_MSGS_RECIPIENTS_TABLE );
 					break;
 			}
 
@@ -1244,4 +988,5 @@ public class JDBCMsgRepository extends MsgRepository<Long> {
 
 		earliestOffline = Long.MAX_VALUE;
 	}
+
 }

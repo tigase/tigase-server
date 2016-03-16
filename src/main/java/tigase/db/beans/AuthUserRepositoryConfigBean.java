@@ -19,7 +19,7 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.db.factories;
+package tigase.db.beans;
 
 import tigase.db.*;
 import tigase.eventbus.EventBus;

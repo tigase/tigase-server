@@ -29,33 +29,28 @@ package tigase.xmpp.impl;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
-
+import tigase.kernel.beans.Bean;
 import tigase.server.Iq;
 import tigase.server.Packet;
-
+import tigase.server.xmppsession.SessionManager;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
+import tigase.xmpp.*;
+import tigase.xmpp.impl.annotation.DiscoFeatures;
+import tigase.xmpp.impl.annotation.Handle;
+import tigase.xmpp.impl.annotation.Handles;
+import tigase.xmpp.impl.annotation.Id;
 
-import tigase.xmpp.Authorization;
-import tigase.xmpp.JID;
-import tigase.xmpp.NoConnectionIdException;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPProcessorAbstract;
-import tigase.xmpp.XMPPResourceConnection;
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import tigase.xmpp.impl.annotation.*;
 import static tigase.xmpp.impl.VCardTemp.*;
 
 //~--- JDK imports ------------------------------------------------------------
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
 
 /**
  * Describe class VCardTemp here.
@@ -74,6 +69,7 @@ import java.util.Queue;
 @DiscoFeatures({
 	XMLNS
 })
+@Bean(name = VCardTemp.ID, parent = SessionManager.class)
 public class VCardTemp
 				extends VCardXMPPProcessorAbstract {
 	/** Field description */

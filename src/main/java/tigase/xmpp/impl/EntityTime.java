@@ -1,25 +1,24 @@
 package tigase.xmpp.impl;
 
+import tigase.db.NonAuthUserRepository;
+import tigase.kernel.beans.Bean;
+import tigase.server.Iq;
+import tigase.server.Packet;
+import tigase.server.xmppsession.SessionManager;
+import tigase.xml.Element;
+import tigase.xmpp.*;
+import tigase.xmpp.impl.annotation.DiscoFeatures;
+import tigase.xmpp.impl.annotation.Handle;
+import tigase.xmpp.impl.annotation.Handles;
+import tigase.xmpp.impl.annotation.Id;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TimeZone;
 
-import tigase.db.NonAuthUserRepository;
-import tigase.server.Iq;
-import tigase.server.Packet;
-import tigase.xml.Element;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.JID;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPProcessorAbstract;
-import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.impl.annotation.DiscoFeatures;
-import tigase.xmpp.impl.annotation.Handle;
-import tigase.xmpp.impl.annotation.Handles;
-import tigase.xmpp.impl.annotation.Id;
+import static tigase.xmpp.impl.EntityTime.ID;
 
 /**
  * This supports the implementation of
@@ -29,13 +28,14 @@ import tigase.xmpp.impl.annotation.Id;
 @Id(EntityTime.XMLNS)
 @Handles({ @Handle(path = { Iq.ELEM_NAME, EntityTime.TIME }, xmlns = EntityTime.XMLNS) })
 @DiscoFeatures({ EntityTime.XMLNS })
+@Bean(name = ID, parent = SessionManager.class)
 public class EntityTime extends XMPPProcessorAbstract {
 
 	protected static final String XMLNS = "urn:xmpp:time";
 
 	protected static final String TIME = "time";
 
-	private final static String ID = XMLNS;
+	protected final static String ID = XMLNS;
 
 	private static String getUtcOffset() {
 		SimpleDateFormat sdf = new SimpleDateFormat("Z");

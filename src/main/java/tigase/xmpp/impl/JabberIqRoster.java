@@ -22,17 +22,25 @@
 package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
-import java.util.*;
-import java.util.logging.*;
-import tigase.db.*;
-import tigase.server.*;
-
+import tigase.db.NonAuthUserRepository;
+import tigase.db.TigaseDBException;
+import tigase.kernel.beans.Bean;
+import tigase.server.Iq;
+import tigase.server.Packet;
+import tigase.server.PolicyViolationException;
+import tigase.server.Priority;
+import tigase.server.xmppsession.SessionManager;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.*;
-import static tigase.xmpp.impl.PresenceSubscription.AUTO_AUTHORIZE_PROP_KEY;
-import tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
 import tigase.xmpp.impl.roster.*;
+import tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
+
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static tigase.xmpp.impl.PresenceSubscription.AUTO_AUTHORIZE_PROP_KEY;
 
 /**
  * Class
@@ -46,6 +54,7 @@ import tigase.xmpp.impl.roster.*;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = JabberIqRoster.ID, parent = SessionManager.class)
 public class JabberIqRoster
 		extends XMPPProcessor
 		implements XMPPProcessorIfc {
@@ -62,7 +71,7 @@ public class JabberIqRoster
 	private static final String[] IQ_QUERY_ITEM_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME,
 																											 "item" };
 	/** unique ID of the plugin */
-	private static final String ID = RosterAbstract.XMLNS;
+	protected static final String ID = RosterAbstract.XMLNS;
 	/** variable holding setting regarding auto authorisation of items added to
 	 * user roset */
 	private static boolean autoAuthorize = false;

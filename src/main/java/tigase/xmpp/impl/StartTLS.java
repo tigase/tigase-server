@@ -27,24 +27,20 @@ package tigase.xmpp.impl;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.NonAuthUserRepository;
+import tigase.kernel.beans.Bean;
 import tigase.server.Command;
 import tigase.server.Packet;
+import tigase.server.xmppsession.SessionManager;
 import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
-import tigase.xmpp.NoConnectionIdException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPPreprocessorIfc;
-import tigase.xmpp.XMPPProcessor;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.*;
 
-//~--- JDK imports ------------------------------------------------------------
-
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class StartTLS here.
@@ -55,6 +51,7 @@ import java.util.Queue;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = StartTLS.ID, parent = SessionManager.class)
 public class StartTLS
 				extends XMPPProcessor
 				implements XMPPProcessorIfc, XMPPPreprocessorIfc {

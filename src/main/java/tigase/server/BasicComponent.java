@@ -91,7 +91,7 @@ public class BasicComponent
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
-	@Inject
+	@Inject(nullAllowed = true)
 	protected VHostManagerIfc vHostManager          = null;
 	private ComponentInfo     cmpInfo               = null;
 	@ConfigField(desc = "Component JID")
@@ -114,7 +114,7 @@ public class BasicComponent
 	protected Set<BareJID>      admins = new ConcurrentSkipListSet<BareJID>();
 	protected Set<String>       trusted = new ConcurrentSkipListSet<String>();
 	private ScriptEngineManager scriptEngineManager     = null;
-	@ConfigField(desc = "scripts-base-dir")
+	@ConfigField(desc = "Base directory for scripts")
 	private String              scriptsBaseDir          = SCRIPTS_DIR_PROP_DEF;
 	private String              scriptsCompDir          = null;
 	private ServiceEntity       serviceEntity           = null;
@@ -989,14 +989,26 @@ public class BasicComponent
 		if (props.get(SCRIPTS_DIR_PROP_KEY) != null) {
 			scriptsBaseDir = (String) props.get(SCRIPTS_DIR_PROP_KEY);
 			scriptsCompDir = scriptsBaseDir + "/" + getName();
-			loadScripts();
+			reloadScripts();
 		}
 		cmpInfo = new ComponentInfo(getName(), this.getClass());
+	}
+
+	public void setCommandsACL(ConcurrentHashMap<String,EnumSet<CmdAcl>> commandsACL) {
+		this.commandsACL = commandsACL;
+		boolean nonAdmin = false;
+		EnumSet<CmdAcl> adminOnlyAcl = EnumSet.of(CmdAcl.ADMIN);
+		for (EnumSet<CmdAcl> acl : commandsACL.values()) {
+			nonAdmin |= !acl.equals(adminOnlyAcl);
+		}
+		this.nonAdminCommands = nonAdmin;
 	}
 
 	public void setScriptsBaseDir(String scriptsBaseDir) {
 		this.scriptsBaseDir = scriptsBaseDir;
 		this.scriptsCompDir = scriptsBaseDir + "/" + getName();
+		if (scriptEngineManager != null)
+			reloadScripts();
 	}
 
 	@Override
@@ -1142,6 +1154,21 @@ public class BasicComponent
 	}
 
 	//~--- methods --------------------------------------------------------------
+
+	private void reloadScripts() {
+		log.log(Level.CONFIG, "Reloading admin scripts for component: {0}.", new Object[] {
+				getName() });
+		scriptCommands.clear();
+		CommandIfc command = new AddScriptCommand();
+
+		command.init(CommandIfc.ADD_SCRIPT_CMD, "New command script", "Scripts");
+		scriptCommands.put(command.getCommandId(), command);
+		command = new RemoveScriptCommand();
+		command.init(CommandIfc.DEL_SCRIPT_CMD, "Remove command script", "Scripts");
+		scriptCommands.put(command.getCommandId(), command);
+
+		loadScripts();
+	}
 
 	private void loadScripts() {
 		log.log(Level.CONFIG, "Loading admin scripts for component: {0}.", new Object[] {
@@ -1319,37 +1346,13 @@ public class BasicComponent
 			scriptEngineManager = createScriptEngineManager();
 		}
 
-		Map<String, Object> props = new HashMap<String, Object>();
-		for (Map.Entry<String, Object> entry : props.entrySet()) {
-			if (entry.getKey().startsWith(COMMAND_PROP_NODE)) {
-				String          cmdId  = entry.getKey().substring(COMMAND_PROP_NODE.length() + 1);
-				String[]        cmdAcl = entry.getValue().toString().split(",");
-				EnumSet<CmdAcl> acl    = EnumSet.noneOf(CmdAcl.class);
-
-				for (String cmda : cmdAcl) {
-					CmdAcl acl_tmp = CmdAcl.valueof(cmda);
-
-					acl.add(acl_tmp);
-					if (acl_tmp != CmdAcl.ADMIN) {
-						nonAdminCommands = true;
-					}
-				}
-				commandsACL.put(cmdId, acl);
-			}
-		}
 		updateServiceEntity();
 
-		CommandIfc command = new AddScriptCommand();
-
-		command.init(CommandIfc.ADD_SCRIPT_CMD, "New command script", "Scripts");
-		scriptCommands.put(command.getCommandId(), command);
-		command = new RemoveScriptCommand();
-		command.init(CommandIfc.DEL_SCRIPT_CMD, "Remove command script", "Scripts");
-		scriptCommands.put(command.getCommandId(), command);
-
 		setScriptsBaseDir(scriptsBaseDir);
-		loadScripts();
+		reloadScripts();
 		cmpInfo = new ComponentInfo(getName(), this.getClass());
+
+		initializationCompleted();
 	}
 
 	private class ExtFilter

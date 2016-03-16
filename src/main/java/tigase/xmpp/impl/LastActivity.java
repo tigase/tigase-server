@@ -25,12 +25,14 @@ import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
 
+import tigase.kernel.beans.Bean;
 import tigase.server.Iq;
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.server.Permissions;
 import tigase.server.Presence;
 
+import tigase.server.xmppsession.SessionManager;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
@@ -73,6 +75,7 @@ import static tigase.xmpp.impl.LastActivity.XMLNS;
 @DiscoFeatures({ XMLNS })
 @Handles({ @Handle(path = { Iq.ELEM_NAME, Iq.QUERY_NAME }, xmlns = XMLNS), @Handle(path = { Presence.ELEM_NAME }, xmlns = Packet.CLIENT_XMLNS),
 		@Handle(path = { Message.ELEM_NAME }, xmlns = Packet.CLIENT_XMLNS) })
+@Bean(name = LastActivity.ID, parent = SessionManager.class, active = false)
 public class LastActivity extends XMPPProcessorAbstract implements XMPPStopListenerIfc {
 
 	enum ProtectionLevel {

@@ -31,6 +31,7 @@ import tigase.db.TigaseDBException;
 import tigase.db.UserExistsException;
 import tigase.db.UserRepository;
 
+import tigase.kernel.beans.Inject;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
@@ -65,6 +66,7 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 	//~--- fields ---------------------------------------------------------------
 
 	private String items_list_pkey = "items-lists";
+	@Inject
 	private UserRepository repo    = null;
 
 	//~--- get methods ----------------------------------------------------------
@@ -210,6 +212,11 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 			}
 			reload();
 		}
+	}
+
+	public void setRepo(UserRepository userRepository) {
+		this.repo = userRepository;
+		reload();
 	}
 
 	//~--- methods --------------------------------------------------------------

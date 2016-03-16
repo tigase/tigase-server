@@ -28,10 +28,12 @@ package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
 
+import tigase.kernel.beans.Bean;
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Packet;
 
+import tigase.server.xmppsession.SessionManager;
 import tigase.util.ElementUtils;
 
 import tigase.xml.Element;
@@ -62,6 +64,7 @@ import java.util.Queue;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = JabberIqStats.ID, parent = SessionManager.class)
 public class JabberIqStats
 				extends XMPPProcessor
 				implements XMPPProcessorIfc {
@@ -70,7 +73,7 @@ public class JabberIqStats
 	};
 	private static final Logger     log = Logger.getLogger(JabberIqStats.class.getName());
 	private static final String     XMLNS    = "http://jabber.org/protocol/stats";
-	private static final String     ID       = XMLNS;
+	protected static final String     ID       = XMLNS;
 	private static final String[]   XMLNSS   = { XMLNS, Command.XMLNS };
 	private static final Element[]  DISCO_FEATURES = { new Element("feature",
 			new String[] { "var" }, new String[] { XMLNS }) };

@@ -125,6 +125,13 @@ public final class XMPPServer {
 			ConfiguratorAbstract.loadLogManagerConfig( initial_config );
 		}
 
+		if (Boolean.valueOf(System.getProperty("experimental", "false"))) {
+			Bootstrap bootstrap = new Bootstrap();
+			bootstrap.init(args);
+			bootstrap.start();
+			return;
+		}
+
 		try {
 			String config_class_name = System.getProperty( CONFIGURATOR_PROP_KEY,
 																										 DEF_CONFIGURATOR );

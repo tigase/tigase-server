@@ -26,37 +26,31 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TigaseDeprecatedComponent;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
-
+import tigase.kernel.beans.Bean;
+import tigase.osgi.ModulesManagerImpl;
+import tigase.server.Iq;
 import tigase.server.Packet;
+import tigase.server.PolicyViolationException;
 import tigase.server.Priority;
-
+import tigase.server.xmppsession.SessionManager;
 import tigase.stats.StatisticsList;
-
 import tigase.sys.TigaseRuntime;
-
 import tigase.util.TigaseStringprepException;
-
 import tigase.xml.Element;
-
 import tigase.xmpp.*;
 import tigase.xmpp.impl.roster.*;
-
-import static tigase.xmpp.impl.roster.RosterAbstract.*;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import tigase.server.Iq;
-import tigase.server.PolicyViolationException;
+import static tigase.xmpp.impl.roster.RosterAbstract.*;
 
-import tigase.annotations.TigaseDeprecatedComponent;
-import tigase.osgi.ModulesManagerImpl;
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Class responsible for handling Presence packets - deprecated
@@ -65,6 +59,7 @@ import tigase.osgi.ModulesManagerImpl;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
 @TigaseDeprecatedComponent(note = "Please remove \'+presence\' from \'--sm-plugins=\' or switch to \'presence-state\' and \'presence-subscription\' plugins")
+@Bean(name = Presence.ID, parent = SessionManager.class, active = false)
 public class Presence
 				extends XMPPProcessor
 				implements XMPPProcessorIfc, XMPPStopListenerIfc {
@@ -125,7 +120,7 @@ public class Presence
 	private static boolean          skipOffline             = false;
 	private static final String[]   PRESENCE_C_PATH         = { PRESENCE_ELEMENT_NAME,
 			"c" };
-	private static final String     ID                      = PRESENCE_ELEMENT_NAME;
+	protected static final String     ID                      = PRESENCE_ELEMENT_NAME;
 	private static final String[][] ELEMENTS                = {
 		{ PRESENCE_ELEMENT_NAME }, { Iq.ELEM_NAME, Iq.QUERY_NAME }
 	};

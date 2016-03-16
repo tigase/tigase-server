@@ -26,6 +26,10 @@ package tigase.io;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.HandleEvent;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.core.Kernel;
+import tigase.server.ConnectionManager;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -43,14 +47,24 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = "sslContextContainer", parent = ConnectionManager.class)
 public class SSLContextContainer extends SSLContextContainerAbstract {
 
 	private static final Logger log = Logger.getLogger(SSLContextContainer.class.getName());
 
-	protected final EventBus eventBus = EventBusFactory.getInstance();
-	private final SSLContextContainerIfc parent;
+	@Inject
+	protected EventBus eventBus = EventBusFactory.getInstance();
+	@Inject(bean = "rootSslContextContainer", type = Root.class, nullAllowed = true)
+	private SSLContextContainerIfc parent;
 
 	protected Map<String, SSLHolder> sslContexts = new ConcurrentSkipListMap<>();
+
+	/**
+	 * Constructor for bean only
+	 */
+	public SSLContextContainer() {
+		this(null, null);
+	}
 
 	/**
 	 * Constructor used to create root SSLContextContainer instance which should cache only SSLContext instances where
@@ -112,6 +126,11 @@ public class SSLContextContainer extends SSLContextContainerAbstract {
 		return holder != null ? holder.getSSLContext() : null;
 	}
 
+	public void setParent(SSLContextContainerIfc parent) {
+		System.out.println(this.getClass().getCanonicalName() + "setting root = " + parent);
+		this.parent = parent;
+	}
+
 	@Override
 	public KeyStore getTrustStore() {
 		return null;
@@ -155,6 +174,19 @@ public class SSLContextContainer extends SSLContextContainerAbstract {
 
 		public boolean isValid(TrustManager[] tms) {
 			return tms == this.tms;
+		}
+	}
+
+	@Bean(name = "rootSslContextContainer", parent = Kernel.class, exportable = true)
+	public static class Root extends SSLContextContainer {
+
+		public Root() {
+			super();
+		}
+
+		// empty method to ensure that parent will not be injected to root instance
+		public void setParent(SSLContextContainerIfc parent) {
+			System.out.println(this.getClass().getCanonicalName() + "setting root = " + parent);
 		}
 	}
 }

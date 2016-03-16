@@ -27,25 +27,23 @@ package tigase.xmpp.impl;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.NonAuthUserRepository;
-
+import tigase.kernel.beans.Bean;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.XMPPServer;
-
+import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
-
 import tigase.xmpp.JID;
-import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.XMPPProcessorAbstract;
 import tigase.xmpp.XMPPResourceConnection;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * XEP-0092: Software Version
@@ -56,11 +54,12 @@ import java.util.logging.Level;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = JabberIqVersion.ID, parent = SessionManager.class)
 public class JabberIqVersion
 				extends XMPPProcessorAbstract {
 	private static final Logger     log = Logger.getLogger(JabberIqVersion.class.getName());
 	private static final String     XMLNS    = "jabber:iq:version";
-	private static final String     ID       = XMLNS;
+	protected static final String     ID       = XMLNS;
 	private static final String[][] ELEMENTS = {
 		Iq.IQ_QUERY_PATH
 	};

@@ -29,9 +29,11 @@ package tigase.xmpp.impl;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 
+import tigase.kernel.beans.Bean;
 import tigase.server.Iq;
 import tigase.server.Packet;
 
+import tigase.server.xmppsession.SessionManager;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
@@ -62,6 +64,7 @@ import java.util.Queue;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = JabberIqPrivate.ID, parent = SessionManager.class)
 public class JabberIqPrivate
 				extends XMPPProcessor
 				implements XMPPProcessorIfc {
@@ -76,7 +79,7 @@ public class JabberIqPrivate
 			.getName());
 	private static final String       XMLNS       = "jabber:iq:private";
 	private static final String       PRIVATE_KEY = XMLNS;
-	private static final String       ID          = XMLNS;
+	protected static final String       ID          = XMLNS;
 	private static final String[]     XMLNSS      = { XMLNS };
 	private static final SimpleParser parser      = SingletonFactory.getParserInstance();
 	private static final Element[]    DISCO_FEATURES = { new Element("feature",

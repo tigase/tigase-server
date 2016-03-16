@@ -23,21 +23,16 @@ package tigase.server.xmppserver.proc;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.kernel.beans.Bean;
 import tigase.net.ConnectionType;
-
-import tigase.server.xmppserver.CID;
-import tigase.server.xmppserver.CIDConnections;
-import tigase.server.xmppserver.LocalhostException;
-import tigase.server.xmppserver.NotLocalhostException;
-import tigase.server.xmppserver.S2SConnection;
-import tigase.server.xmppserver.S2SIOService;
-
-//~--- JDK imports ------------------------------------------------------------
+import tigase.server.xmppserver.*;
 
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -47,6 +42,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = "StreamOpen", parent = S2SConnectionManager.class)
 public class StreamOpen extends S2SAbstractProcessor {
 	private static final Logger log = Logger.getLogger(StreamOpen.class.getName());
 

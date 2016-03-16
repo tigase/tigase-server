@@ -28,9 +28,11 @@ package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
 
+import tigase.kernel.beans.Bean;
 import tigase.server.Iq;
 import tigase.server.Packet;
 
+import tigase.server.xmppsession.SessionManager;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.NotAuthorizedException;
@@ -56,10 +58,11 @@ import java.util.Queue;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = Jingle.ID, parent = SessionManager.class, active = false)
 public class Jingle
 				extends XMPPProcessor
 				implements XMPPProcessorIfc {
-	private static final String     ID          = "http://jabber.org/protocol/jingle";
+	protected static final String     ID          = "http://jabber.org/protocol/jingle";
 	private static final Logger     log         = Logger.getLogger(Jingle.class.getName());
 	private static final String[]   JINGLE_PATH = { Iq.ELEM_NAME, "jingle" };
 	private static final String[][] ELEMENTS    = {

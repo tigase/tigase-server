@@ -29,6 +29,7 @@ package tigase.server.xmppserver;
 import tigase.cert.CertificateUtil;
 import tigase.conf.ConfigurationException;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
 import tigase.kernel.core.Kernel;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
@@ -138,6 +139,7 @@ public class S2SConnectionManager
 	//~--- fields ---------------------------------------------------------------
 
 	// ~--- fields ---------------------------------------------------------------
+	@Inject
 	private S2SConnectionSelector connSelector = null;
 
 	/**
@@ -163,7 +165,10 @@ public class S2SConnectionManager
 	 */
 	protected Map<CID, CIDConnections> cidConnections = new ConcurrentHashMap<CID,
 			CIDConnections>(10000);
-	
+
+	@Inject
+	private CIDConnections.CIDConnectionsOpenerService cidConnectionsOpenerService;
+
 	/**
 	 * Holds list of manually entered mappings which provide substitutions for domains
 	 * matching pattens with names of servers to which we should connect.
@@ -175,10 +180,8 @@ public class S2SConnectionManager
 	 * network. In most cases if not all, these processors handle just protocol
 	 * traffic, all the rest traffic should be passed on to MR.
 	 */
-	private Map<String, S2SProcessor> processorsMap = new LinkedHashMap<String, S2SProcessor>(
-			10);
+	@Inject
 	private List<S2SProcessor> processors = Collections.emptyList();
-	private Map<String, S2SProcessor> filters = new LinkedHashMap<String, S2SProcessor>(10);
 
 	//~--- methods --------------------------------------------------------------
 
@@ -341,12 +344,8 @@ public class S2SConnectionManager
 			for (S2SProcessor proc : processors) {
 				processed |= proc.process(p, serv, results);
 				writePacketsToSocket(serv, results);
-			}
-			if (!processed) {
-				for (S2SProcessor filter : filters.values()) {
-					processed |= filter.process(p, serv, results);
-					writePacketsToSocket(serv, results);
-				}
+				if (proc.stopProcessing())
+					break;
 			}
 			if (!processed) {
 
@@ -561,6 +560,11 @@ public class S2SConnectionManager
 	}
 
 	@Override
+	public CIDConnections.CIDConnectionsOpenerService getConnectionOpenerService() {
+		return cidConnectionsOpenerService;
+	}
+
+	@Override
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
 
@@ -711,11 +715,19 @@ public class S2SConnectionManager
 	
 	//~--- set methods ----------------------------------------------------------
 
+	public void setProcessors(List<S2SProcessor> processors) {
+		List<S2SProcessor> tmp_processors = new ArrayList<>(processors);
+		Collections.sort(tmp_processors);
+		this.processors = Collections.unmodifiableList(tmp_processors);
+	}
+
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
 		super.setProperties(props);
+		if (cidConnectionsOpenerService == null)
+			cidConnectionsOpenerService = new CIDConnections.CIDConnectionsOpenerService();
 		if (props.containsKey(CID_CONNECTIONS_TASKS_THREADS_KEY)) {
-			CIDConnections.setOutgoingOpenThreadsSize((Integer) props.get(
+			cidConnectionsOpenerService.setOutgoingOpenThreads((Integer) props.get(
 					CID_CONNECTIONS_TASKS_THREADS_KEY));
 		}
 		if (props.size() == 1) {
@@ -728,6 +740,7 @@ public class S2SConnectionManager
 
 		// it needs to be here as we need properties for plugins
 		// TODO: Make used processors list a configurable thing
+		Map<String, S2SProcessor> processorsMap = new LinkedHashMap<String, S2SProcessor>(10);
 		processorsMap.clear();
 		processorsMap.put(Dialback.class.getSimpleName(), new Dialback());
 		processorsMap.put(StartTLS.class.getSimpleName(), new StartTLS());
@@ -735,6 +748,7 @@ public class S2SConnectionManager
 		processorsMap.put(StreamError.class.getSimpleName(), new StreamError());
 		processorsMap.put(StreamFeatures.class.getSimpleName(), new StreamFeatures());
 		processorsMap.put(StreamOpen.class.getSimpleName(), new StreamOpen());
+		processorsMap.put(PacketChecker.class.getSimpleName(), new PacketChecker());
 		for (S2SProcessor proc : processorsMap.values()) {
 			Map<String, Object> proc_props = new ConcurrentHashMap<String, Object>(4);
 
@@ -757,26 +771,6 @@ public class S2SConnectionManager
 		Collections.sort(tmp_processors);
 		this.processors = Collections.unmodifiableList(tmp_processors);
 		
-		filters.clear();
-		filters.put(PacketChecker.class.getSimpleName(), new PacketChecker());
-		for (S2SProcessor filter : filters.values()) {
-			Map<String, Object> proc_props = new ConcurrentHashMap<String, Object>(4);
-
-			for (Map.Entry<String, Object> entry : props.entrySet()) {
-				if (entry.getKey().startsWith(PROCESSORS_CONF_PROP_KEY)) {
-					String[] nodes = entry.getKey().split("/");
-
-					if (nodes.length > 2) {
-						String[] ids = nodes[1].split(",");
-
-						if (Arrays.binarySearch(ids, filter.getClass().getSimpleName()) >= 0) {
-							proc_props.put(nodes[2], entry.getValue());
-						}
-					}
-				}
-			}
-			filter.init(this, proc_props);
-		}
 		maxPacketWaitingTime = (Long) props.get(MAX_PACKET_WAITING_TIME_PROP_KEY) * SECOND;
 		maxInactivityTime = (Long) props.get(MAX_CONNECTION_INACTIVITY_TIME_PROP_KEY) *
 				SECOND;

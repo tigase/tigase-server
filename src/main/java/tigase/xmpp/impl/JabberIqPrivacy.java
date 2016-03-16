@@ -26,38 +26,22 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.ArrayDeque;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
+import tigase.kernel.beans.Bean;
 import tigase.server.Iq;
 import tigase.server.Packet;
+import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.*;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterFactory;
-import tigase.xmpp.JID;
-import tigase.xmpp.NoConnectionIdException;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPPacketFilterIfc;
-import tigase.xmpp.XMPPPreprocessorIfc;
-import tigase.xmpp.XMPPProcessor;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
-import static tigase.xmpp.impl.Privacy.*;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
-import tigase.xmpp.PacketErrorTypeException;
+
+import static tigase.xmpp.impl.Privacy.*;
 
 /**
  * Describe class JabberIqPrivacy here.
@@ -68,6 +52,7 @@ import tigase.xmpp.PacketErrorTypeException;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = JabberIqPrivacy.ID, parent = SessionManager.class)
 public class JabberIqPrivacy
 				extends XMPPProcessor
 				implements XMPPProcessorIfc, XMPPPreprocessorIfc, XMPPPacketFilterIfc {

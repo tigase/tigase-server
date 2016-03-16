@@ -21,23 +21,24 @@
  */
 package tigase.osgi;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
+import org.slf4j.bridge.SLF4JBridgeHandler;
+import tigase.conf.ConfiguratorAbstract;
+import tigase.db.DataSourceHelper;
+import tigase.db.Repository;
+import tigase.db.RepositoryFactory;
+import tigase.osgi.util.ClassUtil;
+import tigase.server.XMPPServer;
+import tigase.xmpp.XMPPImplIfc;
+
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.slf4j.bridge.SLF4JBridgeHandler;
-import tigase.conf.ConfiguratorAbstract;
-import tigase.db.Repository;
-import tigase.db.RepositoryFactory;
-import tigase.osgi.ModulesManager;
-import tigase.osgi.util.ClassUtil;
-import tigase.server.XMPPServer;
-import tigase.xmpp.XMPPImplIfc;
 
 public class Activator implements BundleActivator {
 
@@ -77,6 +78,8 @@ public class Activator implements BundleActivator {
 						try {
 								Set<Class<Repository>> repos = ClassUtil.getClassesImplementing(Repository.class);
 								RepositoryFactory.initialize(repos);
+                                Set<Class<?>> annotated = ClassUtil.getClassesAnnotated(bundle, Repository.Meta.class);
+                                DataSourceHelper.initialize(annotated);
 						} catch (Exception e) {
 								log.log(Level.SEVERE, "Could not initialize properly ResourceFactory", e);
 						}

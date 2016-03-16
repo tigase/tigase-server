@@ -19,7 +19,7 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.db.factories;
+package tigase.db.beans;
 
 import tigase.db.Repository;
 import tigase.db.RepositoryFactory;
@@ -108,6 +108,10 @@ public abstract class MDPoolBean<S extends Repository,T extends MDPoolConfigBean
 	}
 
 	protected void updateDomains(String[] oldDomains, String[] newDomains) {
+		// in this case register method will take over
+		if (kernel == null)
+			return;
+
 		Set<String> removed = new HashSet<>(Arrays.asList(oldDomains));
 		removed.remove(Arrays.asList(newDomains));
 		Set<String> added = new HashSet<>(Arrays.asList(newDomains));
@@ -121,6 +125,10 @@ public abstract class MDPoolBean<S extends Repository,T extends MDPoolConfigBean
 			registerConfigBean(domain);
 		}
 
+	}
+
+	public String getDefaultAlias() {
+		return "default";
 	}
 
 	protected abstract Class<? extends T> getConfigClass();

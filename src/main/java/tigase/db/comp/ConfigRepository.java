@@ -26,15 +26,10 @@ package tigase.db.comp;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.db.Repository;
 
 /**
  * Created: Oct 3, 2009 2:58:41 PM
@@ -50,7 +45,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
-	protected Map<String, Item> items;
+	protected Map<String, Item> items = new ConcurrentSkipListMap<String, Item>( String.CASE_INSENSITIVE_ORDER );
 	protected int itemsHash = 0;
 	private Timer                             autoLoadTimer  = null;
 	private RepositoryChangeListenerIfc<Item> repoChangeList = null;

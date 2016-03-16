@@ -19,7 +19,7 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.db.factories;
+package tigase.db.beans;
 
 import tigase.db.*;
 import tigase.kernel.beans.config.ConfigField;
@@ -30,7 +30,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static tigase.db.factories.MDPoolBean.*;
+import static tigase.db.beans.MDPoolBean.*;
 
 /**
  * Created by andrzej on 08.03.2016.

@@ -29,11 +29,11 @@ package tigase.server.xmppclient;
 
 import tigase.conf.ConfigurationException;
 import tigase.eventbus.EventBus;
-import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.HandleEvent;
 import tigase.eventbus.events.ShutdownEvent;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.BeanSelector;
+import tigase.kernel.beans.Inject;
 import tigase.kernel.core.Kernel;
 import tigase.net.IOService;
 import tigase.net.SocketThread;
@@ -85,9 +85,11 @@ public class ClientConnectionManager
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
-	protected RoutingsContainer routings = null;
+	@Inject
+	protected RoutingsContainer.RoutingComputer routings = null;
 
 	/** Field description */
+	@Inject(nullAllowed = true)
 	protected SeeOtherHostIfc see_other_host_strategy = null;
 
 //private final Map<String, XMPPProcessorIfc> processors = new ConcurrentHashMap<String,
@@ -108,11 +110,16 @@ public class ClientConnectionManager
 	private IPMonitor                       ipMonitor = new IPMonitor();
 	private final ClientTrustManagerFactory clientTrustManagerFactory =
 			new ClientTrustManagerFactory();
-	private final EventBus eventBus = EventBusFactory.getInstance();
+	@Inject
+	private EventBus eventBus;
 	private boolean tlsWantClientAuthEnabled = TLS_WANT_CLIENT_AUTH_ENABLED_DEF;
 	private final ShutdownTask shutdownTask = new ShutdownTask();
 
 	//~--- methods --------------------------------------------------------------
+
+	public ClientConnectionManager() {
+
+	}
 
 	@Override
 	public int hashCodeForPacket(Packet packet) {
@@ -286,6 +293,12 @@ public class ClientConnectionManager
 
 	@Override
 	public void reconnectionFailed(Map<String, Object> port_props) {}
+
+//	@Override
+//	public void register(Kernel kernel) {
+//		super.register(kernel);
+//		kernel.registerBean("seeOtherHost").asClass(SeeOtherHost.class).exec();;
+//	}
 
 	@Override
 	public void serviceStarted(XMPPIOService<Object> service) {
@@ -615,7 +628,12 @@ public class ClientConnectionManager
 		boolean routing_mode = (Boolean) props.get(ROUTINGS_PROP_KEY + "/" +
 				ROUTING_MODE_PROP_KEY);
 
-		routings = new RoutingsContainer(routing_mode);
+		if (routing_mode) {
+			routings = new RoutingsContainer.MultiMode();
+		} else {
+			routings = new RoutingsContainer.SingleMode();
+		}
+
 
 		int idx = (ROUTINGS_PROP_KEY + "/").length();
 

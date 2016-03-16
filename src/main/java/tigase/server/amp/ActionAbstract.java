@@ -26,27 +26,25 @@ package tigase.server.amp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.RepositoryFactory;
 import tigase.db.UserRepository;
-
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Packet;
-
 import tigase.xml.Element;
-
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
+import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterElement;
 import tigase.xmpp.impl.roster.RosterFlat;
-import tigase.xmpp.JID;
-import tigase.xmpp.PacketErrorTypeException;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: May 1, 2010 7:44:17 PM
@@ -71,7 +69,9 @@ public abstract class ActionAbstract
 
 	/** Field description */
 	protected ActionResultsHandlerIfc resultsHandler = null;
+	@ConfigField(alias = "security", desc = "Security level")
 	private SECURITY security                        = SECURITY.STRICT;
+	@Inject
 	private UserRepository user_repository           = null;
 	RosterFlat rosterUtil                            = new RosterFlat();
 
@@ -105,26 +105,8 @@ public abstract class ActionAbstract
 	//~--- set methods ----------------------------------------------------------
 
 	@Override
-	public void setProperties(Map<String, Object> props,
-														ActionResultsHandlerIfc resultsHandler) {
+	public void setActionResultsHandler(ActionResultsHandlerIfc resultsHandler) {
 		this.resultsHandler = resultsHandler;
-
-		String sec_str = (String) props.get(SECURITY_PROP_KEY);
-
-		try {
-			SECURITY sec = SECURITY.valueOf(sec_str.toUpperCase());
-
-			security = sec;
-		} catch (NullPointerException e) {
-
-			// Ignore, this is expected here
-		} catch (Exception e) {
-			log.log(Level.WARNING,
-							"Incorrect amp security settings, using defaults: " + security, e);
-		}
-
-		// Is there shared user repository instance? If so I want to use it:
-		user_repository = (UserRepository) props.get(RepositoryFactory.SHARED_USER_REPO_PROP_KEY);
 	}
 
 	//~--- methods --------------------------------------------------------------

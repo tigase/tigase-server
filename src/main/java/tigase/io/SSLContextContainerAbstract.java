@@ -21,6 +21,8 @@
  */
 package tigase.io;
 
+import tigase.kernel.beans.Inject;
+
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -36,6 +38,7 @@ public abstract class SSLContextContainerAbstract implements SSLContextContainer
 
 	private static final Logger log = Logger.getLogger(SSLContextContainerAbstract.class.getCanonicalName());
 
+	@Inject
 	private final CertificateContainerIfc certificateContainer;
 
 	private SecureRandom secureRandom = new SecureRandom();

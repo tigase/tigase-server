@@ -51,7 +51,7 @@ public interface S2SProcessor extends Comparable<S2SProcessor> {
 	 * @return 
 	 */
 	public int order();
-	
+
 	/**
 	 * Method description
 	 *
@@ -81,6 +81,10 @@ public interface S2SProcessor extends Comparable<S2SProcessor> {
 	void init(S2SConnectionHandlerIfc<S2SIOService> handler, Map<String,Object> props);
 
 	boolean process(Packet p, S2SIOService serv, Queue<Packet> results);
+
+	default boolean stopProcessing() {
+		return false;
+	}
 
 	void streamClosed(S2SIOService serv);
 

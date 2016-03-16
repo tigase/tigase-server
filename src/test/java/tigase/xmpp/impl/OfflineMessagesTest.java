@@ -18,39 +18,21 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.UUID;
-
 import org.junit.After;
-
-import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
-
 import tigase.db.DBInitException;
-import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.UserNotFoundException;
-
 import tigase.server.Packet;
-
-import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
-
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.XMPPResourceConnection;
 
-import java.util.LinkedList;
+import java.util.*;
+
+import static org.junit.Assert.*;
 
 /**
  *
@@ -67,7 +49,7 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 		msgRepo = new MsgRepositoryIfcImpl();
 		offlineProcessor = new OfflineMessages() {
 			@Override
-			protected MsgRepositoryIfc getMsgRepoImpl(NonAuthUserRepository repo, XMPPResourceConnection conn) {
+			protected OfflineMessages.OfflineMsgRepositoryIfc getMsgRepoImpl(NonAuthUserRepository repo, XMPPResourceConnection conn) {
 				return msgRepo;
 			}
 		};
@@ -263,7 +245,7 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 		assertTrue(offlineProcessor.isAllowedForOfflineStorage(packet));
 	}
 	
-	private static class MsgRepositoryIfcImpl implements MsgRepositoryIfc {
+	private static class MsgRepositoryIfcImpl implements OfflineMessages.OfflineMsgRepositoryIfc {
 
 		private final Queue<Packet> stored = new ArrayDeque();
 		
@@ -295,6 +277,11 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 		
 		public Queue<Packet> getStored() {
 			return stored;
+		}
+
+		@Override
+		public void init(NonAuthUserRepository repo, XMPPResourceConnection conn) {
+
 		}
 	}
 	

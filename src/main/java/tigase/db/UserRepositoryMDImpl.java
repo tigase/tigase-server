@@ -24,8 +24,8 @@ package tigase.db;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.factories.MDPoolBean;
-import tigase.db.factories.UserRepositoryMDPoolBean;
+import tigase.db.beans.MDPoolBean;
+import tigase.db.beans.UserRepositoryMDPoolBean;
 import tigase.xmpp.BareJID;
 
 import java.util.ArrayList;

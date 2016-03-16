@@ -24,20 +24,20 @@ package tigase.server.xmppserver.proc;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.kernel.beans.Bean;
 import tigase.net.ConnectionType;
-
 import tigase.server.Packet;
+import tigase.server.xmppserver.S2SConnectionManager;
 import tigase.server.xmppserver.S2SIOService;
-
 import tigase.xml.Element;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -47,6 +47,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = "StreamFeatures", parent = S2SConnectionManager.class)
 public class StreamFeatures extends S2SAbstractProcessor {
 	private static final Logger log = Logger.getLogger(StreamFeatures.class.getName());
 

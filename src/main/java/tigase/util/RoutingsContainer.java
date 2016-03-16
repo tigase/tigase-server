@@ -21,12 +21,17 @@
  */
 package tigase.util;
 
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.config.ConfigField;
+import tigase.server.xmppclient.ClientConnectionManager;
+
 import java.util.LinkedHashMap;
-import java.util.Map.Entry;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
+
+import static tigase.conf.Configurable.DEF_SM_NAME;
 
 /**
  * Describe class RoutingsContainer here.
@@ -68,7 +73,7 @@ public class RoutingsContainer {
 		return comp.computeRouting(pattern);
 	}
 
-	protected interface RoutingComputer {
+	public interface RoutingComputer {
 
 		void addRouting(final String pattern, final String address);
 
@@ -76,9 +81,18 @@ public class RoutingsContainer {
 
 	}
 
-	protected static class SingleMode implements RoutingComputer {
+	public static abstract class AbstractRoutingComputer implements RoutingComputer {
 
-		private String routing = null;
+		public AbstractRoutingComputer() {
+			addRouting(".+", DEF_SM_NAME + "@" + DNSResolverFactory.getInstance().getDefaultHost());
+		}
+
+	}
+
+	@Bean(name="routingComputer", parent = ClientConnectionManager.class)
+	public static class SingleMode extends AbstractRoutingComputer {
+
+		private String routing;
 
 		public void addRouting(final String pattern, final String address) {
 			routing = address;
@@ -90,8 +104,9 @@ public class RoutingsContainer {
 
 	}
 
-	protected static class MultiMode implements RoutingComputer {
+	public static class MultiMode extends AbstractRoutingComputer {
 
+		@ConfigField(desc = "Routing patterns")
 		private Map<Pattern, String> routings =	new LinkedHashMap<Pattern, String>();
 		private String def = null;
 

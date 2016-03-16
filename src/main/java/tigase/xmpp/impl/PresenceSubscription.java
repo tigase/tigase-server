@@ -23,37 +23,22 @@
 
 package tigase.xmpp.impl;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
-
+import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
 import tigase.server.PolicyViolationException;
-
+import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.JID;
-import tigase.xmpp.NoConnectionIdException;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPResourceConnection;
-
-import static tigase.xmpp.impl.PresenceAbstract.forwardPresence;
-
+import tigase.xmpp.*;
 import tigase.xmpp.impl.annotation.Handle;
 import tigase.xmpp.impl.annotation.Id;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterAbstract.PresenceType;
+
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static tigase.xmpp.impl.roster.RosterAbstract.SUB_NONE;
 
@@ -64,6 +49,7 @@ import static tigase.xmpp.impl.roster.RosterAbstract.SUB_NONE;
  */
 @Id(PresenceSubscription.ID)
 @Handle(path = { PresenceAbstract.PRESENCE_ELEMENT_NAME }, xmlns = PresenceAbstract.CLIENT_XMLNS)
+@Bean(name = PresenceSubscription.ID, parent = SessionManager.class)
 public class PresenceSubscription extends PresenceAbstract {
 	
 	/**

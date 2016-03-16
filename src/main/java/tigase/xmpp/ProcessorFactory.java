@@ -224,6 +224,10 @@ public class ProcessorFactory {
 	public static boolean hasImplementation(String id) {
 		return processors.containsKey(id);
 	}
+
+	public static XMPPImplIfc getImplementation(String id) {
+		return processors.get(id);
+	}
 }    // ProcessorFactory
 
 

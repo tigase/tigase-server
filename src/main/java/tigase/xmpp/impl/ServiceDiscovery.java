@@ -30,10 +30,12 @@ import tigase.db.NonAuthUserRepository;
 
 import tigase.disco.XMPPServiceCollector;
 
+import tigase.kernel.beans.Bean;
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Packet;
 
+import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
@@ -58,9 +60,10 @@ import java.util.logging.Level;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
+@Bean(name = ServiceDiscovery.ID, parent = SessionManager.class)
 public class ServiceDiscovery
 				extends XMPPProcessorAbstract {
-	private static final String     ID       = "disco";
+	protected static final String     ID       = "disco";
 	private static final Logger     log = Logger.getLogger(ServiceDiscovery.class
 			.getName());
 	private static final String[][] ELEMENTS = {

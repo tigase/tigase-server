@@ -27,10 +27,12 @@ import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
 
+import tigase.kernel.beans.Bean;
 import tigase.server.Iq;
 import tigase.server.Packet;
-import tigase.server.amp.MsgRepository;
+import tigase.server.amp.db.MsgRepository;
 
+import tigase.server.xmppsession.SessionManager;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.ElementMatcher;
 import tigase.xmpp.JID;
@@ -79,6 +81,7 @@ import static tigase.server.Message.ELEM_NAME;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
+@Bean(name = OfflineMessages.ID, parent = SessionManager.class, active = false)
 public class OfflineMessages
 		extends XMPPProcessor
 		implements XMPPPostprocessorIfc, XMPPProcessorIfc {
@@ -88,7 +91,7 @@ public class OfflineMessages
 	protected static final String XMLNS = "jabber:client";
 	/** Field holds identification string for the plugin. In case of
 	 * {@code msgoffline} plugin it is <em>msgoffline</em> */
-	private static final String ID = "msgoffline";
+	protected static final String ID = "msgoffline";
 	/** Private logger for class instances. */
 	private static final Logger log = Logger.getLogger( OfflineMessages.class.getName() );
 	/** Field holds an array for element paths for which the plugin offers
@@ -107,7 +110,7 @@ public class OfflineMessages
 	private static final Element[] DISCO_FEATURES = {
 		new Element( "feature", new String[] { "var" }, new String[] { "msgoffline" } ) };
 	/** Field holds the default hostname of the machine. */
-	private static String defHost;
+	private static String defHost = DNSResolverFactory.getInstance().getDefaultHost();
 	/** Field holds an array for element paths for which the plugin offers message
 	 * saving capabilities. In case of {@code msgoffline} plugin it is
 	 * <em>presence</em> stanza */
@@ -193,7 +196,7 @@ public class OfflineMessages
 			try {
 				if (conn != null && packet.getStanzaTo() != null && !conn.isUserId(packet.getStanzaTo().getBareJID()))
 					return;
-				MsgRepositoryIfc msg_repo = getMsgRepoImpl( repo, conn );
+				OfflineMsgRepositoryIfc msg_repo = getMsgRepoImpl( repo, conn );
 
 				publishInPubSub(packet, conn, queue, settings);
 				
@@ -246,7 +249,7 @@ public class OfflineMessages
 			case tigase.server.Presence.ELEM_NAME:
 				if (loadOfflineMessages(packet, conn)) {
 					try {
-						MsgRepositoryIfc msg_repo = getMsgRepoImpl(repo, conn);
+						OfflineMsgRepositoryIfc msg_repo = getMsgRepoImpl(repo, conn);
 						Queue<Packet> packets = restorePacketForOffLineUser(conn, msg_repo);
 
 						if (packets != null) {
@@ -334,7 +337,7 @@ public class OfflineMessages
 	 * @throws NotAuthorizedException
 	 */
 	public Queue<Packet> restorePacketForOffLineUser( XMPPResourceConnection conn,
-																										MsgRepositoryIfc repo )
+																										tigase.db.OfflineMsgRepositoryIfc repo )
 			throws UserNotFoundException, NotAuthorizedException {
 		Queue<Element> elems = repo.loadMessagesToJID( conn, true );
 
@@ -395,7 +398,7 @@ public class OfflineMessages
 	 *
 	 * @throws UserNotFoundException
 	 */
-	public Authorization savePacketForOffLineUser( Packet pac, MsgRepositoryIfc repo, NonAuthUserRepository userRepo )
+	public Authorization savePacketForOffLineUser( Packet pac, tigase.db.OfflineMsgRepositoryIfc repo, NonAuthUserRepository userRepo )
 			throws UserNotFoundException {
 		StanzaType type = pac.getType();
 
@@ -463,7 +466,7 @@ public class OfflineMessages
 	 *
 	 * @return instance of {@link MsgRepositoryIfc} interface implementation.
 	 */
-	protected MsgRepositoryIfc getMsgRepoImpl( NonAuthUserRepository repo,
+	protected OfflineMsgRepositoryIfc getMsgRepoImpl( NonAuthUserRepository repo,
 																						 XMPPResourceConnection conn ) {
 		if (msgRepoCls == null) {
 			return new MsgRepositoryImpl( repo, conn );
@@ -639,7 +642,7 @@ public class OfflineMessages
 		}
 	}
 
-	public static interface OfflineMsgRepositoryIfc extends MsgRepositoryIfc {
+	public static interface OfflineMsgRepositoryIfc extends tigase.db.OfflineMsgRepositoryIfc {
 		
 		void init( NonAuthUserRepository repo, XMPPResourceConnection conn);
 		
@@ -654,7 +657,7 @@ public class OfflineMessages
 
 		/** Field holds user session which keeps all the user session data and also
 		 * gives an access to the user's repository data. */
-		private XMPPResourceConnection conn = null;
+		//private XMPPResourceConnection conn = null;
 		/** Field holds a reference to user session which keeps all the user session
 		 * data and also gives an access to the user's repository data. */
 		private SimpleParser parser = SingletonFactory.getParserInstance();
@@ -678,7 +681,7 @@ public class OfflineMessages
 		@Override
 		public void init(NonAuthUserRepository repo, XMPPResourceConnection conn) {
 			this.repo = repo;
-			this.conn = conn;
+			//this.conn = conn;
 		}
 
 		@Override
@@ -698,10 +701,10 @@ public class OfflineMessages
 				throws UserNotFoundException {
 			try {
 				DomBuilderHandler domHandler = new DomBuilderHandler();
-				String[] msgs = conn.getOfflineDataList( ID, "messages" );
+				String[] msgs = session.getOfflineDataList( ID, "messages" );
 
 				if ( ( msgs != null ) && ( msgs.length > 0 ) ){
-					conn.removeOfflineData( ID, "messages" );
+					session.removeOfflineData( ID, "messages" );
 
 					StringBuilder sb = new StringBuilder();
 

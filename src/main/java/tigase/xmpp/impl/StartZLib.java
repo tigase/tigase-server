@@ -28,9 +28,11 @@ package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
 
+import tigase.kernel.beans.Bean;
 import tigase.server.Command;
 import tigase.server.Packet;
 
+import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
 
 import tigase.xmpp.StanzaType;
@@ -52,13 +54,14 @@ import java.util.Queue;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = StartZLib.ID, parent = SessionManager.class)
 public class StartZLib
 				extends XMPPProcessor
 				implements XMPPProcessorIfc {
 	private static final String[][] ELEMENTS = {
 		{ "compress" }, { "compressed" }, { "failure" }
 	};
-	private static final String     ID       = "zlib";
+	protected static final String     ID       = "zlib";
 	private static Logger           log      = Logger.getLogger(StartZLib.class.getName());
 	private static final String     XMLNS    = "http://jabber.org/protocol/compress";
 	private static final String[]   XMLNSS   = { XMLNS, XMLNS, XMLNS };

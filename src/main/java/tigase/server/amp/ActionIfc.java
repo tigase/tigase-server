@@ -48,8 +48,7 @@ public interface ActionIfc extends AmpFeatureIfc {
 	Map<String, Object> getDefaults(Map<String, Object> params);
 
 	//~--- set methods ----------------------------------------------------------
-
-	void setProperties(Map<String, Object> props, ActionResultsHandlerIfc resultsHandler);
+	void setActionResultsHandler(ActionResultsHandlerIfc resultsHandler);
 }
 
 

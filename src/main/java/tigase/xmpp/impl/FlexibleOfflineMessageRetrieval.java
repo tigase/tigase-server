@@ -24,13 +24,15 @@ import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
 
+import tigase.kernel.beans.Bean;
 import tigase.server.Command;
 import tigase.server.DataForm;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.amp.AmpFeatureIfc;
-import tigase.server.amp.MsgRepository;
+import tigase.server.amp.db.MsgRepository;
 
+import tigase.server.xmppsession.SessionManager;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 import tigase.xmpp.NoConnectionIdException;
@@ -56,6 +58,7 @@ import static tigase.disco.XMPPService.INFO_XMLNS;
 import static tigase.disco.XMPPService.ITEMS_XMLNS;
 import static tigase.server.Message.ELEM_NAME;
 
+@Bean(name = FlexibleOfflineMessageRetrieval.ID, parent = SessionManager.class, active = false)
 public class FlexibleOfflineMessageRetrieval
 		//		extends XMPPProcessor
 		extends XMPPProcessorAbstract
@@ -75,7 +78,7 @@ public class FlexibleOfflineMessageRetrieval
 	private static final String[] XMLNSS = { INFO_XMLNS, ITEMS_XMLNS, FLEXIBLE_OFFLINE_XMLNS };
 	private static final String[] IQ_OFFLINE = { Iq.ELEM_NAME, OFFLINE_ELEMENT_NAME };
 	private static final String[][] ELEMENTS = { Iq.IQ_QUERY_PATH, Iq.IQ_QUERY_PATH, IQ_OFFLINE };
-	private static final String ID = FLEXIBLE_OFFLINE_XMLNS;
+	protected static final String ID = FLEXIBLE_OFFLINE_XMLNS;
 	private static final Element[] DISCO_FEATURES = {
 		new Element( "feature", new String[] { "var" }, new String[] { FLEXIBLE_OFFLINE_XMLNS } ) };
 	public static final String[] MESSAGE_EVENT_PATH = { ELEM_NAME, "event" };

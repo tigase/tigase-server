@@ -31,6 +31,7 @@ import tigase.conf.ConfiguratorAbstract;
 import tigase.disco.XMPPService;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 import tigase.stats.StatisticsList;
 import tigase.sys.TigaseRuntime;
@@ -78,7 +79,9 @@ public class MessageRouter
 
 	// private static final long startupTime = System.currentTimeMillis();
 	// private Set<String> localAddresses = new CopyOnWriteArraySet<String>();
+	@ConfigField(desc = "Name of server software presented in discovery")
 	private String                            disco_name      = DISCO_NAME_PROP_VAL;
+	@ConfigField(desc = "Show version of server software in discovery")
 	private boolean                           disco_show_version =
 			DISCO_SHOW_VERSION_PROP_VAL;
 	private UpdatesChecker                    updates_checker = null;
@@ -108,6 +111,8 @@ public class MessageRouter
 			} else {
 				removeComponent(comp);
 			}
+			if (comp instanceof ConnectionManager)
+				connectionManagerNames.remove(comp.getName());
 			comp.release();
 		}
 
@@ -121,6 +126,8 @@ public class MessageRouter
 					mr.setParent(this);
 					mr.start();
 				}
+				if (comp instanceof ConnectionManager)
+					connectionManagerNames.add(comp.getName());
 				if (comp instanceof ComponentRegistrator) {
 					addRegistrator((ComponentRegistrator) comp);
 				} else if (comp instanceof MessageRouter) {
@@ -194,6 +201,16 @@ public class MessageRouter
 	}
 
 	@Override
+	public void beanConfigurationChanged(Collection<String> changedFields) {
+		super.beanConfigurationChanged(changedFields);
+		if (getServiceEntity() != null
+				&& (changedFields.contains("disco_name") || changedFields.contains("disco_show_version"))) {
+			updateServiceDiscoveryItem(getName(), null, getDiscoDescription(), "server", "im",
+					false);
+		}
+	}
+
+	@Override
 	public int hashCodeForPacket(Packet packet) {
 
 		// This is actually quite tricky part. We want to both avoid
@@ -233,6 +250,13 @@ public class MessageRouter
 		// If not, then a better way is to get hashCode from the elemTo address
 		// as this would be by the destination address user name:
 		return 1;
+	}
+
+	@Override
+	public void initialize() {
+		super.initialize();
+		updateServiceDiscoveryItem(getName(), null, getDiscoDescription(), "server", "im",
+				false);
 	}
 
 	@Override
@@ -873,7 +897,7 @@ public class MessageRouter
 							query.addChildren(features);
 						}
 					} catch (Exception e) {
-						log.log(Level.WARNING, "Component service disco problem: " + comp.getName(),
+						log.log(Level.WARNING, "Component service disco problem: " + comp.getName() + ", during processing packet: " + packet,
 								e);
 					}
 				}

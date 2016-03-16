@@ -22,47 +22,44 @@
 
 package tigase.server.amp.action;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import tigase.db.RepositoryFactory;
-import tigase.db.TigaseDBException;
+import tigase.kernel.beans.Bean;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.Presence;
-import tigase.server.amp.ActionAbstract;
 import tigase.server.amp.ActionResultsHandlerIfc;
+import tigase.server.amp.AmpComponent;
 import tigase.server.amp.AmpFeatureIfc;
-import static tigase.server.amp.AmpFeatureIfc.AMP_MSG_REPO_CLASS_PARAM;
-import static tigase.server.amp.AmpFeatureIfc.AMP_MSG_REPO_CLASS_PROP_KEY;
-import static tigase.server.amp.AmpFeatureIfc.AMP_MSG_REPO_URI_PARAM;
-import static tigase.server.amp.AmpFeatureIfc.AMP_MSG_REPO_URI_PROP_KEY;
-import static tigase.server.amp.AmpFeatureIfc.AMP_XMLNS;
-import static tigase.server.amp.AmpFeatureIfc.CONDITION_ATT;
-import tigase.server.amp.MsgRepository;
-import static tigase.server.amp.cond.ExpireAt.NAME;
+import tigase.server.amp.db.MsgBroadcastRepository;
+import tigase.server.amp.db.MsgBroadcastRepositoryIfc;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static tigase.server.amp.cond.ExpireAt.NAME;
+
 /**
  *
  * @author andrzej
  */
+@Bean(name = "broadcast", parent = AmpComponent.class)
 public class Broadcast implements AmpFeatureIfc {
 	
 	private static final Logger log  = Logger.getLogger(Broadcast.class.getName());
 	private static final String name = "broadcast";
 	
-	private MsgRepository repo = null;
+	private MsgBroadcastRepositoryIfc repo = null;
 	
 	private final SimpleDateFormat formatter;
 	private final SimpleDateFormat formatter2;
@@ -131,7 +128,7 @@ public class Broadcast implements AmpFeatureIfc {
 
 							String msgId = packet.getAttributeStaticStr("id");
 							
-							MsgRepository.BroadcastMsg bmsg = repo.getBroadcastMsg(msgId);
+							MsgBroadcastRepository.BroadcastMsg bmsg = repo.getBroadcastMsg(msgId);
 							boolean needToBroadcast = bmsg == null || !bmsg.needToSend(packet.getStanzaTo());
 							
 							repo.updateBroadcastMessage(msgId, msg, expire, packet.getStanzaTo().getBareJID());
@@ -155,7 +152,7 @@ public class Broadcast implements AmpFeatureIfc {
 				}
 			} else {
 				String msgId = packet.getAttributeStaticStr("id");
-				MsgRepository.BroadcastMsg msg = repo.getBroadcastMsg(msgId);
+				MsgBroadcastRepository.BroadcastMsg msg = repo.getBroadcastMsg(msgId);
 				if (msg != null) {
 					packet.getElement().removeChild(broadcast);
 					msg.markAsSent(packet.getStanzaTo());
@@ -180,7 +177,7 @@ public class Broadcast implements AmpFeatureIfc {
 	public void sendBroadcastMessage(JID jid) {
 		if (repo != null) {
 			for (Object o : repo.getBroadcastMessages()) {
-				MsgRepository.BroadcastMsg msg = (MsgRepository.BroadcastMsg) o;
+				MsgBroadcastRepository.BroadcastMsg msg = (MsgBroadcastRepository.BroadcastMsg) o;
 				if (msg.getDelay(TimeUnit.MILLISECONDS) > 0 && msg.needToSend(jid)) {
 					try {
 						sendBroadcastMessage(jid, msg);
@@ -192,7 +189,7 @@ public class Broadcast implements AmpFeatureIfc {
 		}		
 	}
 	
-	public void sendBroadcastMessage(JID jid, MsgRepository.BroadcastMsg msg) throws TigaseStringprepException {
+	public void sendBroadcastMessage(JID jid, MsgBroadcastRepository.BroadcastMsg msg) throws TigaseStringprepException {
 		Element msgEl = msg.msg.clone();
 		msgEl.setAttribute("to", jid.toString());
 		Packet p = Packet.packetInstance(msgEl);
@@ -230,47 +227,20 @@ public class Broadcast implements AmpFeatureIfc {
 
 		return defs;
 	}
-	
+
+	public void setRepo(MsgBroadcastRepositoryIfc repo) {
+		repo.loadMessagesToBroadcast();
+		this.repo = repo;
+	}
+
 	/**
 	 * Method description
 	 *
 	 *
-	 * @param props
 	 * @param handler
 	 */
 
-	public void setProperties(Map<String, Object> props, ActionResultsHandlerIfc handler) {
+	public void setActionResultsHandler(ActionResultsHandlerIfc handler) {
 		this.resultsHandler = handler;
-		String db_uri = (String) props.get(AMP_MSG_REPO_URI_PROP_KEY);
-		String db_cls = (String) props.get(AMP_MSG_REPO_CLASS_PROP_KEY);
-		
-		if (db_uri != null) {
-			try {
-				repo = (MsgRepository) MsgRepository.getInstance(db_cls, db_uri);
-				Map<String, String> db_props = new HashMap<String, String>(4);
-
-				for (Map.Entry<String, Object> entry : props.entrySet()) {
-
-					// Entry happens to be null for (shared-user-repo-params, null)
-					// TODO: Not sure if this is supposed to happen, more investigation is needed.
-					if (entry.getValue() != null) {
-						log.log(Level.CONFIG,
-										"Reading properties: (" + entry.getKey() + ", " + entry.getValue() +
-										")");
-						db_props.put(entry.getKey(), entry.getValue().toString());
-					}
-				}
-
-				// Initialization of repository can be done here and in MessageAmp
-				// class so repository related parameters for JDBCMsgRepository
-				// should be specified for AMP plugin and AMP component
-				repo.initRepository(db_uri, db_props);
-				
-				repo.loadMessagesToBroadcast();
-			} catch (TigaseDBException ex) {
-				repo = null;
-				log.log(Level.WARNING, "Problem initializing connection to DB: ", ex);
-			}
-		}
 	}
 }

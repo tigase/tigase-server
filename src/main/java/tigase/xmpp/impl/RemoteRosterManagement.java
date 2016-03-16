@@ -31,8 +31,10 @@ import tigase.db.TigaseDBException;
 
 import tigase.form.*;
 
+import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
 
+import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
@@ -56,10 +58,11 @@ import java.util.Set;
  *
  * @author andrzej
  */
+@Bean(name = RemoteRosterManagement.ID, parent = SessionManager.class, active = false)
 public class RemoteRosterManagement
 				extends XMPPProcessorAbstract {
 	private static final String[][] ELEMENT_PATHS = {{ "iq", "query" }, { "message", "x" }};
-	private static final String ID                = "remote-roster-management";
+	protected static final String ID                = "remote-roster-management";
 	private static final Logger log               =
 		Logger.getLogger("eu.hilow.xtigase.server.xmpp.RemoteRosterManagement");
 	private static final String XMLNS             = "http://spectrum.im/protocol/remote-roster";

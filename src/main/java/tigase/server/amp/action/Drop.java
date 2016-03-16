@@ -24,9 +24,10 @@ package tigase.server.amp.action;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
 import tigase.server.amp.ActionAbstract;
-
+import tigase.server.amp.AmpComponent;
 import tigase.xml.Element;
 
 //~--- classes ----------------------------------------------------------------
@@ -37,6 +38,7 @@ import tigase.xml.Element;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = "drop", parent = AmpComponent.class)
 public class Drop extends ActionAbstract {
 	private static final String name = "drop";
 

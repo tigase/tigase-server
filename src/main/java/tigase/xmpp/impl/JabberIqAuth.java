@@ -27,45 +27,31 @@ package tigase.xmpp.impl;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.auth.CallbackHandlerFactory;
-import tigase.auth.callbacks.VerifyPasswordCallback;
 import tigase.auth.MechanismSelector;
 import tigase.auth.MechanismSelectorFactory;
 import tigase.auth.TigaseSaslProvider;
-
+import tigase.auth.callbacks.VerifyPasswordCallback;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
-
+import tigase.kernel.beans.Bean;
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.Priority;
-
+import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
+import tigase.xmpp.*;
 
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
-
-//~--- JDK imports ------------------------------------------------------------
-
+import javax.security.auth.callback.*;
+import javax.security.sasl.Sasl;
 import java.security.Security;
-
 import java.util.Collection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.sasl.Sasl;
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * JEP-0078: Non-SASL Authentication
@@ -76,6 +62,7 @@ import javax.security.sasl.Sasl;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = JabberIqAuth.ID, parent = SessionManager.class)
 public class JabberIqAuth
 				extends AbstractAuthPreprocessor
 				implements XMPPProcessorIfc {
@@ -88,7 +75,7 @@ public class JabberIqAuth
 	 */
 	private static final Logger   log = Logger.getLogger(JabberIqAuth.class.getName());
 	private static final String   XMLNS  = "jabber:iq:auth";
-	private static final String   ID     = XMLNS;
+	protected static final String   ID     = XMLNS;
 	private static final String[] XMLNSS = { XMLNS };
 	private static final String[] IQ_QUERY_USERNAME_PATH = { Iq.ELEM_NAME, Iq.QUERY_NAME,
 			"username" };

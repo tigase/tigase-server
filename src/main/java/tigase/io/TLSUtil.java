@@ -24,19 +24,18 @@ package tigase.io;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.osgi.ModulesManagerImpl;
+
 import java.security.KeyStore;
 import java.security.cert.CertificateParsingException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import static tigase.io.CertificateContainerIfc.CERTIFICATE_CONTAINER_CLASS_KEY;
 import static tigase.io.CertificateContainerIfc.CERTIFICATE_CONTAINER_CLASS_VAL;
-import static tigase.io.SSLContextContainerIfc.*;
-import tigase.osgi.ModulesManagerImpl;
+import static tigase.io.SSLContextContainerIfc.SSL_CONTAINER_CLASS_KEY;
+import static tigase.io.SSLContextContainerIfc.SSL_CONTAINER_CLASS_VAL;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -55,6 +54,7 @@ public abstract class TLSUtil {
 //private static Map<String, SSLContextContainerIfc> sslContexts =
 //  new HashMap<String, SSLContextContainerIfc>();
 	private static SSLContextContainerIfc sslContextContainer = null;
+
 	private static CertificateContainerIfc certificateContainer = null;
 
 	//~--- methods --------------------------------------------------------------

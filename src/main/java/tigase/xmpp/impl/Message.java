@@ -26,36 +26,24 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import tigase.db.NonAuthUserRepository;
+import tigase.db.TigaseDBException;
+import tigase.kernel.beans.Bean;
+import tigase.server.Packet;
+import tigase.server.xmppsession.SessionManager;
+import tigase.xml.Element;
+import tigase.xmpp.*;
+import tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor;
+import tigase.xmpp.impl.annotation.Handle;
+import tigase.xmpp.impl.annotation.Handles;
+import tigase.xmpp.impl.annotation.Id;
+
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import tigase.db.NonAuthUserRepository;
-import tigase.db.TigaseDBException;
-
-import tigase.server.Packet;
-
-import tigase.xml.Element;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPPacketFilterIfc;
-import tigase.xmpp.XMPPPreprocessorIfc;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.impl.annotation.*;
-
-import static tigase.xmpp.impl.Message.*;
+import static tigase.xmpp.impl.Message.ELEM_NAME;
+import static tigase.xmpp.impl.Message.XMLNS;
 
 /**
  * Message forwarder class. Forwards <code>Message</code> packet to it's destination
@@ -70,6 +58,7 @@ import static tigase.xmpp.impl.Message.*;
 @Handles({
 	@Handle(path={ ELEM_NAME },xmlns=XMLNS)
 })
+@Bean(name = ELEM_NAME, parent = SessionManager.class, active = false)
 public class Message
 				extends AnnotatedXMPPProcessor
 				implements XMPPProcessorIfc, XMPPPreprocessorIfc, XMPPPacketFilterIfc {

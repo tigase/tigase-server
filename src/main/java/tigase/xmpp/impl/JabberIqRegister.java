@@ -24,24 +24,26 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.form.*;
+import tigase.kernel.beans.Bean;
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.Priority;
+import tigase.server.xmppsession.SessionManager;
 import tigase.stats.StatisticsList;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 import tigase.xmpp.*;
+
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * JEP-0077: In-Band Registration
@@ -52,6 +54,7 @@ import tigase.xmpp.*;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = JabberIqRegister.ID, parent = SessionManager.class)
 public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc {
 	public static final String ID = "jabber:iq:register";
 	public static final String REGISTRATION_PER_SECOND_PROP_KEY = "registrations-per-second";

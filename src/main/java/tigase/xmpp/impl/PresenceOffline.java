@@ -19,21 +19,14 @@
  */
 package tigase.xmpp.impl;
 
-import static tigase.xmpp.impl.roster.RosterAbstract.ROSTER;
-
-import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import tigase.db.*;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.HandleEvent;
+import tigase.kernel.beans.Bean;
 import tigase.server.Iq;
 import tigase.server.Packet;
+import tigase.server.xmppsession.SessionManager;
 import tigase.sys.TigaseRuntime;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.DomBuilderHandler;
@@ -48,9 +41,19 @@ import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterElement;
 import tigase.xmpp.impl.roster.RosterFlat;
 
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static tigase.xmpp.impl.roster.RosterAbstract.ROSTER;
+
 @Id(PresenceOffline.ID)
 @Handles({ @Handle(path = { PresenceAbstract.PRESENCE_ELEMENT_NAME }, xmlns = PresenceAbstract.CLIENT_XMLNS),
 		@Handle(path = { Iq.ELEM_NAME, Iq.QUERY_NAME }, xmlns = RosterAbstract.XMLNS) })
+@Bean(name = PresenceOffline.ID, parent = SessionManager.class, active = false)
 public class PresenceOffline extends PresenceAbstract implements XMPPStopListenerIfc {
 
 	public static final String PRESENCE_REPO_CLASS_PROP_KEY = "presence-repo-class";

@@ -23,21 +23,20 @@
 
 package tigase.xmpp.impl;
 
-import java.util.Map;
-import java.util.Queue;
-import java.util.logging.Level;
 import tigase.db.NonAuthUserRepository;
+import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
+import tigase.server.xmppsession.SessionManager;
 import tigase.stats.CounterValue;
 import tigase.stats.StatisticsList;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.*;
 import tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor;
 import tigase.xmpp.impl.annotation.HandleStanzaTypes;
 import tigase.xmpp.impl.annotation.Id;
+
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Level;
 
 /**
  * ErrorCounter class is implementation of XMPPProcessor responsible for counting 
@@ -45,12 +44,15 @@ import tigase.xmpp.impl.annotation.Id;
  * 
  * @author andrzej
  */
-@Id("error-counter")
+@Id(ErrorCounter.ID)
 @HandleStanzaTypes(StanzaType.error)
+@Bean(name = ErrorCounter.ID, parent = SessionManager.class, active = false)
 public class ErrorCounter extends AnnotatedXMPPProcessor implements XMPPProcessorIfc {
 
 	private static final String SM_COMP = "sess-man";
-	
+
+	protected static final String ID = "error-counter";
+
 	private final ErrorStatisticsHolder holder = new ErrorStatisticsHolder();
 	
 	@Override

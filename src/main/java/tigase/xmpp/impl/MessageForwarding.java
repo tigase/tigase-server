@@ -28,8 +28,10 @@ package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
 
+import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
 
+import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
@@ -57,12 +59,13 @@ import java.util.Queue;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev: 2348 $
  */
+@Bean(name = MessageForwarding.ID, parent = SessionManager.class, active = false)
 public class MessageForwarding
 				extends XMPPProcessor
 				implements XMPPProcessorIfc {
 	private static final String FORWARD_EL    = "forward";
 	private static final String FORWARD_XMLNS = "http://tigase.org/protocol/forward#v1";
-	private static final String ID            = "message-vhost-forward";
+	protected static final String ID            = "message-vhost-forward";
 
 	/** Class logger */
 	private static final Logger     log = Logger.getLogger(MessageForwarding.class

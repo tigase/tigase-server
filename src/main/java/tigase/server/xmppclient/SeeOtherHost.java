@@ -18,28 +18,22 @@
  */
 package tigase.server.xmppclient;
 
-import tigase.xmpp.BareJID;
-
+import tigase.eventbus.EventBus;
+import tigase.eventbus.HandleEvent;
+import tigase.eventbus.events.ShutdownEvent;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.util.TigaseStringprepException;
 import tigase.vhosts.VHostItem;
 import tigase.vhosts.VHostManagerIfc;
-import tigase.xml.Element;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.eventbus.EventBus;
-import tigase.eventbus.EventBusFactory;
-import tigase.eventbus.HandleEvent;
-import tigase.eventbus.events.ShutdownEvent;
-import tigase.xmpp.JID;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -49,14 +43,19 @@ import tigase.xmpp.JID;
  *
  * @author Wojtek
  */
+@Bean(name = "seeOtherHost", parent = ClientConnectionManager.class)
 public class SeeOtherHost implements SeeOtherHostIfc {
 
 	private static final Logger log = Logger.getLogger(SeeOtherHost.class.getName());
 	public static final String REDIRECTION_ENABLED = "see-other-host-redirect-enabled";
-	
+
+	@ConfigField(desc = "Default host to redirect to")
 	protected List<BareJID> defaultHost = null;
-	protected EventBus eventBus = EventBusFactory.getInstance();
-	private ArrayList<Phase> active = new ArrayList<Phase>();
+	@Inject
+	protected EventBus eventBus;
+	@ConfigField(desc = "Active phases")
+	private ArrayList<Phase> active = new ArrayList<Phase>(Arrays.asList(Phase.OPEN));
+	@Inject
 	protected VHostManagerIfc vHostManager = null;
 	private Set<String> shutdownNodes = new CopyOnWriteArraySet<String>();
 

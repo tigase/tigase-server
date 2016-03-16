@@ -39,9 +39,11 @@ import tigase.db.NonAuthUserRepository;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.HandleEvent;
+import tigase.kernel.beans.Bean;
 import tigase.server.Iq;
 import tigase.server.Message;
 import tigase.server.Packet;
+import tigase.server.xmppsession.SessionManager;
 import tigase.server.xmppsession.UserPresenceChangedEvent;
 import tigase.server.xmppsession.UserSessionEvent;
 import tigase.xml.Element;
@@ -62,6 +64,7 @@ import tigase.xmpp.XMPPSession;
  * 
  * @author andrzej
  */
+@Bean(name = MessageCarbons.ID, parent = SessionManager.class)
 public class MessageCarbons 
 				extends XMPPProcessor
 				implements XMPPProcessorIfc, XMPPPacketFilterIfc
@@ -69,7 +72,7 @@ public class MessageCarbons
 
 	private static final Logger log = Logger.getLogger(MessageCarbons.class.getCanonicalName());
 	
-	private static final String ID = "message-carbons";
+	protected static final String ID = "message-carbons";
 	
 	public static final String XMLNS = "urn:xmpp:carbons:2";
 	

@@ -26,6 +26,8 @@ package tigase.server.xmppserver;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Packet;
 
 import tigase.xmpp.Authorization;
@@ -62,23 +64,10 @@ public class CIDConnections {
 		Logger.getLogger(CIDConnections.class.getName());
 //	private static final Timer outgoingOpenTasks = new Timer("S2S outgoing open tasks",
 //																									 true);
-	// TODO: #1195 - estimate proper default value 
-	private static int outgoingOpenTasksSize = Runtime.getRuntime().availableProcessors();
-	
-	private static ScheduledExecutorService outgoingOpenTasks = 
-			Executors.newScheduledThreadPool(outgoingOpenTasksSize);
 
-	public static void setOutgoingOpenThreadsSize(int size) {
-		if (outgoingOpenTasksSize != size) {
-			outgoingOpenTasksSize = size;
-			ScheduledExecutorService scheduler = outgoingOpenTasks;
-			outgoingOpenTasks = Executors.newScheduledThreadPool(outgoingOpenTasksSize);
-			scheduler.shutdown();
-		}
-	}
-	
 	//~--- fields ---------------------------------------------------------------
 
+	private CIDConnectionsOpenerService connectionsOpenerService = null;
 	private CID cid                                       = null;
 	private S2SConnectionSelector connectionSelector      = null;
 	private long firstWaitingTime                         = 0;
@@ -122,6 +111,7 @@ public class CIDConnections {
 												int maxOutConnsPerIP, long max_waiting_time) {
 		this.cid                  = cid;
 		this.handler              = handler;
+		this.connectionsOpenerService = handler.getConnectionOpenerService();
 		this.connectionSelector   = selector;
 		this.max_in_conns         = maxInConns;
 		this.max_out_conns        = maxOutConns;
@@ -570,7 +560,7 @@ public class CIDConnections {
 	 * @param verify_req
 	 */
 	public void sendHandshakingOnly(final Packet verify_req) {
-		outgoingOpenTasks.schedule(new Runnable() {
+		connectionsOpenerService.schedule(new Runnable() {
 			@Override
 			public void run() {
 				try {
@@ -682,7 +672,7 @@ public class CIDConnections {
 				log.log(Level.FINEST, "Scheduling task for openning a new connection for: {0}",
 								cid);
 			}
-			outgoingOpenTasks.schedule(new Runnable() {
+			connectionsOpenerService.schedule(new Runnable() {
 				@Override
 				public void run() {
 					boolean result = false;
@@ -868,6 +858,29 @@ public class CIDConnections {
 								new Object[] { p.toString(),
 															 e });
 			}
+		}
+	}
+
+	@Bean(name = "cidConnectionsOpenerService", parent = S2SConnectionManager.class)
+	public static class CIDConnectionsOpenerService {
+		// TODO: #1195 - estimate proper default value
+		@ConfigField(desc = "Numer of threads for opening outgoing connections")
+		private int outgoingOpenThreads = Runtime.getRuntime().availableProcessors();
+
+		private ScheduledExecutorService outgoingOpenTasks =
+				Executors.newScheduledThreadPool(outgoingOpenThreads);
+
+		public void setOutgoingOpenThreads(int size) {
+			if (outgoingOpenThreads != size) {
+				outgoingOpenThreads = size;
+				ScheduledExecutorService scheduler = outgoingOpenTasks;
+				outgoingOpenTasks = Executors.newScheduledThreadPool(outgoingOpenThreads);
+				scheduler.shutdown();
+			}
+		}
+
+		public void schedule(Runnable r, long delay, TimeUnit unit) {
+			outgoingOpenTasks.schedule(r, delay, unit);
 		}
 	}
 }

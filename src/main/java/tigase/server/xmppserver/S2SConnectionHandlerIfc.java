@@ -24,14 +24,15 @@ package tigase.server.xmppserver;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.TimeUnit;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.XMPPIOService;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.TimeUnit;
 
 //~--- interfaces -------------------------------------------------------------
 
@@ -66,6 +67,8 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 
 	CIDConnections getCIDConnections(CID cid, boolean createNew)
 			throws NotLocalhostException, LocalhostException;
+
+	CIDConnections.CIDConnectionsOpenerService getConnectionOpenerService();
 
 	BareJID getDefHostName();
 

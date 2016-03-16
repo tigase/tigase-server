@@ -441,7 +441,11 @@ public class Kernel {
 				}
 				Object beanToInject = b.getKernel().getInstance(b);
 				// if (beanToInject != null)
-				dataToInject.add(beanToInject);
+				// it may happen that we create link in parent kernel to bean in subkernel and both are marked
+				// as exportable - then we have 2 bean configs pointing to same instance - so we need it to
+				// detect this - remove duplicated instances from dataToInject list
+				if (!dataToInject.contains(beanToInject))
+					dataToInject.add(beanToInject);
 			}
 		}
 		Object[] d;

@@ -26,30 +26,16 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.MsgRepositoryIfc;
-import tigase.db.NonAuthUserRepository;
-import tigase.db.RepositoryFactory;
-import tigase.db.TigaseDBException;
-import tigase.db.UserNotFoundException;
-
+import tigase.db.*;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
 import tigase.server.amp.AmpFeatureIfc;
-import tigase.server.amp.MsgRepository;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.JID;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPPacketFilterIfc;
-import tigase.xmpp.XMPPPostprocessorIfc;
-import tigase.xmpp.XMPPPreprocessorIfc;
-import tigase.xmpp.XMPPProcessor;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
-
+import tigase.server.amp.db.MsgRepository;
+import tigase.server.xmppsession.SessionManager;
 import tigase.util.DNSResolverFactory;
 import tigase.xml.Element;
+import tigase.xmpp.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -65,6 +51,7 @@ import static tigase.server.amp.AmpFeatureIfc.*;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = MessageAmp.ID, parent = SessionManager.class)
 public class MessageAmp
 				extends XMPPProcessor
 				implements XMPPPacketFilterIfc, XMPPPostprocessorIfc, 
@@ -74,7 +61,7 @@ public class MessageAmp
 	private static final String[][] ELEMENTS             = {
 		{ "message" }, { "presence" }, { "iq", "msgoffline" }
 	};
-	private static final String     ID                   = "amp";
+	protected static final String     ID                   = "amp";
 	private static final Logger     log = Logger.getLogger(MessageAmp.class.getName());
 	private static final String     XMLNS                = "http://jabber.org/protocol/amp";
 	private static final String[]   XMLNSS = { "jabber:client", "jabber:client", "msgoffline" };
@@ -88,6 +75,7 @@ public class MessageAmp
 	//~--- fields ---------------------------------------------------------------
 
 	private JID             ampJID           = null;
+	@Inject
 	private MsgRepositoryIfc   msg_repo         = null;
 	private OfflineMessages offlineProcessor = new OfflineMessages();
 	private Message         messageProcessor = new Message();

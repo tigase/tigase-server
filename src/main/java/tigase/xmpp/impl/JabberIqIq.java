@@ -30,9 +30,11 @@ import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
 
+import tigase.kernel.beans.Bean;
 import tigase.server.Iq;
 import tigase.server.Packet;
 
+import tigase.server.xmppsession.SessionManager;
 import tigase.util.Base64;
 
 import tigase.xml.Element;
@@ -62,6 +64,7 @@ import java.util.Queue;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = JabberIqIq.ID, parent = SessionManager.class, active = false)
 public class JabberIqIq
 				extends XMPPProcessor
 				implements XMPPProcessorIfc, XMPPPreprocessorIfc {
@@ -84,7 +87,7 @@ public class JabberIqIq
 		"dmFnaW5h", "cG9ybg==", "cGVuaXM=", "cGlzcw==", "c3V4"
 	};
 	private static final String    XMLNS  = "jabber:iq:iq";
-	private static final String    ID     = XMLNS;
+	protected static final String    ID     = XMLNS;
 	private static final String[]  XMLNSS = { XMLNS };
 	private static final Element[] DISCO_FEATURES = { new Element("feature", new String[] {
 			"var" }, new String[] { XMLNS }) };

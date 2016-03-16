@@ -26,46 +26,33 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.auth.CallbackHandlerFactory;
-import tigase.auth.mechanisms.SaslANONYMOUS;
-import tigase.auth.MechanismSelector;
-import tigase.auth.MechanismSelectorFactory;
-import tigase.auth.TigaseSaslProvider;
-import tigase.auth.XmppSaslException;
+import tigase.auth.*;
 import tigase.auth.XmppSaslException.SaslError;
-
+import tigase.auth.mechanisms.SaslANONYMOUS;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
-
+import tigase.kernel.beans.Bean;
 import tigase.server.Command;
 import tigase.server.Packet;
 import tigase.server.Priority;
-
+import tigase.server.xmppsession.SessionManager;
 import tigase.util.Base64;
-
 import tigase.xml.Element;
-
-import tigase.xmpp.BareJID;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.security.Security;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
+import tigase.xmpp.*;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.sasl.Sasl;
 import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
+import java.security.Security;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class SaslAuth here.
@@ -76,6 +63,7 @@ import javax.security.sasl.SaslServer;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = SaslAuth.ID, parent = SessionManager.class)
 public class SaslAuth
 				extends AbstractAuthPreprocessor
 				implements XMPPProcessorIfc {

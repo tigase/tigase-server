@@ -24,14 +24,18 @@ package tigase.db;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.core.Kernel;
 import tigase.xmpp.BareJID;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -41,6 +45,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = "nonAuthUserRepository", parent = Kernel.class)
 public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 
 	/**
@@ -53,8 +58,10 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 
 	private BareJID defDomain = null;
 	private final Set<BareJID> existing_domains = new ConcurrentSkipListSet<BareJID>();
+	@ConfigField(alias = "offline-user-autocreate", desc = "Autocreate offline users")
 	private boolean autoCreateOffline = false;
-	private final UserRepository rep;
+	@Inject
+	private UserRepository rep;
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -71,6 +78,13 @@ public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 		rep = userRep;
 		this.defDomain = defDomain;
 		this.autoCreateOffline = autoCreateOffline;
+	}
+
+	/**
+	 * Constructor for bean
+	 */
+	public NonAuthUserRepositoryImpl() {
+
 	}
 
 	//~--- methods --------------------------------------------------------------

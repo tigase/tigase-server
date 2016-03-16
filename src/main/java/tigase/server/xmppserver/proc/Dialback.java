@@ -26,32 +26,26 @@ package tigase.server.xmppserver.proc;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.cert.CertCheckResult;
-
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.net.ConnectionType;
-
 import tigase.server.Packet;
-import tigase.server.xmppserver.CID;
-import tigase.server.xmppserver.CIDConnections;
-import tigase.server.xmppserver.LocalhostException;
-import tigase.server.xmppserver.NotLocalhostException;
-import tigase.server.xmppserver.S2SIOService;
-
+import tigase.server.xmppserver.*;
 import tigase.util.Algorithms;
-
 import tigase.xml.Element;
-
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.security.NoSuchAlgorithmException;
-
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Dec 9, 2010 2:00:52 PM
@@ -59,6 +53,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = "Dialback", parent = S2SConnectionManager.class)
 public class Dialback
 				extends S2SAbstractProcessor {
 	private static final Logger log                =
@@ -76,9 +71,11 @@ public class Dialback
 	//~--- fields ---------------------------------------------------------------
 
 	// ~--- fields ---------------------------------------------------------------
+	@ConfigField(desc = "Authentication timeout for S2S connections")
 	private long authenticationTimeOut = 30;
 
 	// Ejabberd does not request dialback after TLS (at least some versions don't)
+	@ConfigField(desc = "Workaround for TLS dialback issue in Ejabberd")
 	private boolean ejabberd_bug_workaround_active = false;
 
 	//~--- constructors ---------------------------------------------------------

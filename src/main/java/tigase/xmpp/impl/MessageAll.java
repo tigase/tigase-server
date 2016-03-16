@@ -28,8 +28,10 @@ package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
 
+import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
 
+import tigase.server.xmppsession.SessionManager;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.NotAuthorizedException;
@@ -62,13 +64,14 @@ import java.util.Queue;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = MessageAll.ID, parent = SessionManager.class, active = false)
 public class MessageAll
 				extends XMPPProcessor
 				implements XMPPProcessorIfc {
 	private static final String[][] ELEMENTS = {
 		{ "message" }
 	};
-	private static final String     ID       = "message-all";
+	protected static final String     ID       = "message-all";
 
 	/** Class logger */
 	private static final Logger   log    = Logger.getLogger(MessageAll.class.getName());

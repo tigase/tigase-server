@@ -24,17 +24,14 @@ package tigase.server.amp.action;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
 import tigase.server.amp.ActionAbstract;
-
+import tigase.server.amp.AmpComponent;
 import tigase.xml.Element;
-
 import tigase.xmpp.PacketErrorTypeException;
 
 //~--- JDK imports ------------------------------------------------------------
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -44,6 +41,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = "notify", parent = AmpComponent.class)
 public class Notify extends ActionAbstract {
 	private static final String name = "notify";
 

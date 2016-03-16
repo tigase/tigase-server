@@ -30,6 +30,8 @@ import tigase.conf.ConfigurationException;
 import tigase.db.TigaseDBException;
 import tigase.db.comp.ComponentRepository;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.RegistrarBean;
 import tigase.kernel.core.Kernel;
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.ServerComponent;
@@ -55,10 +57,10 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = "vhost-man", parent = Kernel.class)
+@Bean(name = "vhost-man", parent = Kernel.class, exportable = true)
 public class VHostManager
 				extends AbstractComponentRegistrator<VHostListener>
-				implements VHostManagerIfc, StatisticsContainer {
+				implements VHostManagerIfc, StatisticsContainer, RegistrarBean {
 	/** Field description */
 	public static final String VHOSTS_REPO_CLASS_PROP_KEY = "repository-class";
 
@@ -87,6 +89,7 @@ public class VHostManager
 			new LinkedHashSet<VHostListener>(10);
 	private ConcurrentSkipListSet<String> registeredComponentDomains =
 			new ConcurrentSkipListSet<String>();
+	@Inject
 	protected ComponentRepository<VHostItem> repo = null;
 
 	//~--- constructors ---------------------------------------------------------
@@ -406,6 +409,16 @@ public class VHostManager
 
 	public ComponentRepository<VHostItem> getComponentRepository() {
 		return repo;
+	}
+
+	@Override
+	public void register(Kernel kernel) {
+		kernel.registerBean("vhostRepository").asClass(VHostJDBCRepository.class).exec();
+	}
+
+	@Override
+	public void unregister(Kernel kernel) {
+
 	}
 }
 

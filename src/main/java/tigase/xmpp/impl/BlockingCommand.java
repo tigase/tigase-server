@@ -25,38 +25,26 @@
  */
 package tigase.xmpp.impl;
 
+import tigase.db.NonAuthUserRepository;
+import tigase.db.TigaseDBException;
+import tigase.kernel.beans.Bean;
+import tigase.server.Iq;
+import tigase.server.Packet;
+import tigase.server.xmppsession.SessionManager;
+import tigase.util.TigaseStringprepException;
+import tigase.xml.Element;
+import tigase.xmpp.*;
+import tigase.xmpp.impl.annotation.*;
+import tigase.xmpp.impl.roster.RosterAbstract;
+import tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
+import tigase.xmpp.impl.roster.RosterFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import tigase.db.NonAuthUserRepository;
-import tigase.db.TigaseDBException;
-import tigase.server.Iq;
-import tigase.server.Packet;
-import tigase.util.TigaseStringprepException;
-import tigase.xml.Element;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.JID;
-import tigase.xmpp.NoConnectionIdException;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPProcessorAbstract;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.XMPPSession;
-import tigase.xmpp.impl.annotation.DiscoFeatures;
-import tigase.xmpp.impl.annotation.Handle;
-import tigase.xmpp.impl.annotation.HandleStanzaTypes;
-import tigase.xmpp.impl.annotation.Handles;
-import tigase.xmpp.impl.annotation.Id;
-import tigase.xmpp.impl.roster.RosterAbstract;
-import tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
-import tigase.xmpp.impl.roster.RosterFactory;
 
 /**
  * XEP-0191: Blocking Command. Based on privacy lists.
@@ -74,6 +62,7 @@ import tigase.xmpp.impl.roster.RosterFactory;
 	@Handle(path = {Iq.ELEM_NAME, BlockingCommand.BLOCK}, xmlns = BlockingCommand.XMLNS),
 	@Handle(path = {Iq.ELEM_NAME, BlockingCommand.UNBLOCK}, xmlns = BlockingCommand.XMLNS)})
 @HandleStanzaTypes({StanzaType.set, StanzaType.get})
+@Bean(name = BlockingCommand.ID, parent = SessionManager.class)
 public class BlockingCommand extends XMPPProcessorAbstract implements XMPPProcessorIfc {
 
 	private static final Logger log = Logger.getLogger(BlockingCommand.class.getName());

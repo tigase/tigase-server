@@ -23,8 +23,8 @@ package tigase.db;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.factories.AuthRepositoryMDPoolBean;
-import tigase.db.factories.MDPoolBean;
+import tigase.db.beans.AuthRepositoryMDPoolBean;
+import tigase.db.beans.MDPoolBean;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
 import tigase.xml.Element;

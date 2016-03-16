@@ -26,27 +26,28 @@ package tigase.server.amp.action;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepositoryImpl;
 import tigase.db.RepositoryFactory;
-import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
-import tigase.db.UserRepository;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.UnregisterAware;
 import tigase.server.Packet;
 import tigase.server.amp.ActionAbstract;
-import tigase.server.amp.ActionResultsHandlerIfc;
-import tigase.server.amp.JDBCMsgRepository;
-import tigase.server.amp.MsgRepository;
+import tigase.server.amp.AmpComponent;
 import tigase.server.amp.cond.ExpireAt;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created: May 1, 2010 11:32:59 AM
@@ -54,8 +55,9 @@ import tigase.xml.Element;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = "store", parent = AmpComponent.class)
 public class Store
-				extends ActionAbstract {
+				extends ActionAbstract implements Initializable, UnregisterAware {
 	private static final Logger log  = Logger.getLogger(Store.class.getName());
 	private static final String name = "store";
 
@@ -63,9 +65,11 @@ public class Store
 
 	// ~--- fields ---------------------------------------------------------------
 	private Thread expiredProcessor          = null;
+	@Inject
 	private MsgRepositoryIfc repo               = null;
 	private final SimpleDateFormat formatter;
 	private final SimpleDateFormat formatter2;
+	@Inject
 	private NonAuthUserRepositoryImpl nonAuthUserRepo;
 
 	{
@@ -161,70 +165,6 @@ public class Store
 		return name;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	@Override
-	public void setProperties(Map<String, Object> props, ActionResultsHandlerIfc handler) {
-		super.setProperties(props, handler);
-
-		UserRepository user_repository = (UserRepository) props.get(RepositoryFactory.SHARED_USER_REPO_PROP_KEY);
-		nonAuthUserRepo = new NonAuthUserRepositoryImpl(user_repository, null, true);
-		
-		String db_uri = (String) props.get(AMP_MSG_REPO_URI_PROP_KEY);
-		String db_cls = (String) props.get(AMP_MSG_REPO_CLASS_PROP_KEY);
-		
-		if (db_uri != null) {
-			try {
-				repo = MsgRepository.getInstance(db_cls, db_uri);
-				Map<String, String> db_props = new HashMap<String, String>(4);
-
-				for (Map.Entry<String, Object> entry : props.entrySet()) {
-
-					// Entry happens to be null for (shared-user-repo-params, null)
-					// TODO: Not sure if this is supposed to happen, more investigation is needed.
-					if (entry.getValue() != null) {
-						log.log(Level.CONFIG,
-										"Reading properties: (" + entry.getKey() + ", " + entry.getValue() +
-										")");
-						db_props.put(entry.getKey(), entry.getValue().toString());
-					}
-				}
-
-				// Initialization of repository can be done here and in MessageAmp
-				// class so repository related parameters for JDBCMsgRepository
-				// should be specified for AMP plugin and AMP component
-				repo.initRepository(db_uri, db_props);
-			} catch (TigaseDBException ex) {
-				repo = null;
-				log.log(Level.WARNING, "Problem initializing connection to DB: ", ex);
-			}
-		}	
-		if ((repo != null) && (expiredProcessor == null)) {
-			expiredProcessor = new Thread("expired-processor") {
-				@Override
-				public void run() {
-					while (true) {
-						Element elem = repo.getMessageExpired(0, true);
-
-						if (elem != null) {
-							elem.addAttribute(OFFLINE, "1");
-							elem.addAttribute(EXPIRED, "1");
-							try {
-								resultsHandler.addOutPacket(Packet.packetInstance(elem));
-							} catch (TigaseStringprepException ex) {
-								log.info("Stringprep error for offline message loaded from DB: " + elem);
-							}
-						}
-					}
-				}
-			};
-			expiredProcessor.setDaemon(true);
-			expiredProcessor.start();
-		}
-	}
-
-	//~--- get methods ----------------------------------------------------------
-
 	// ~--- get methods ----------------------------------------------------------
 	private Element getExpireAtRule(Packet packet) {
 		Element amp         = packet.getElement().getChild("amp", AMP_XMLNS);
@@ -268,6 +208,44 @@ public class Store
 		if ((rules == null) || (rules.size() == 0)) {
 			packet.getElement().removeChild(amp);
 		}
+	}
+
+	@Override
+	public void initialize() {
+		if ((repo != null) && (expiredProcessor == null)) {
+			expiredProcessor = new Thread("expired-processor") {
+				@Override
+				public void run() {
+					while (true) {
+						Element elem = repo.getMessageExpired(0, true);
+
+						if (elem != null) {
+							elem.addAttribute(OFFLINE, "1");
+							elem.addAttribute(EXPIRED, "1");
+							try {
+								resultsHandler.addOutPacket(Packet.packetInstance(elem));
+							} catch (TigaseStringprepException ex) {
+								log.info("Stringprep error for offline message loaded from DB: " + elem);
+							}
+						}
+						if (Thread.interrupted()) {
+							log.info("stopping expired-processor");
+							expiredProcessor = null;
+							return;
+						}
+					}
+				}
+			};
+			expiredProcessor.setDaemon(true);
+			expiredProcessor.start();
+		}
+
+	}
+
+	@Override
+	public void beforeUnregister() {
+		if (expiredProcessor != null)
+			expiredProcessor.interrupt();
 	}
 }
 

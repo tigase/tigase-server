@@ -19,21 +19,20 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.db.factories;
+package tigase.db.beans;
 
-import tigase.db.DBInitException;
-import tigase.db.DataSource;
-import tigase.db.DataSourcePool;
-import tigase.db.RepositoryFactory;
+import tigase.db.*;
 import tigase.eventbus.EventBus;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.core.Kernel;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static tigase.db.factories.DataSourceBean.DataSourceMDConfigBean;
+import static tigase.db.beans.DataSourceBean.DataSourceMDConfigBean;
 
 /**
  * Created by andrzej on 09.03.2016.
@@ -70,6 +69,10 @@ public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBea
 		return oldRepo;
 	}
 
+	public Set<String> getDataSourceNames() {
+		return Collections.unmodifiableSet(repositories.keySet());
+	}
+
 	@Override
 	public void setDefault(DataSource repo) {
 		// here we do nothing
@@ -96,7 +99,7 @@ public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBea
 			if (poolCls != null)
 				return poolCls;
 
-			Class<? extends DataSourcePool> poolClass = RepositoryFactory.getRepoClass(DataSourcePool.class, uri);
+			Class<? extends DataSourcePool> poolClass = DataSourceHelper.getDefaultClass(DataSourcePool.class, uri);
 			return poolClass == null ? null : poolClass.getCanonicalName();
 		}
 	}

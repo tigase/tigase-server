@@ -390,6 +390,8 @@ public abstract class SessionManagerConfig {
 			Logger.getLogger(SessionManagerConfig.class.getName()).log(Level.SEVERE, null, ex);
 		}
 
+		proc = ProcessorFactory.getImplementation(plug_id);
+
 		return proc;
 	}
 }    // SessionManagerConfig

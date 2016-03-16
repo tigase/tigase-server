@@ -26,13 +26,11 @@ package tigase.server.amp.action;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.List;
-import tigase.server.amp.ActionAbstract;
+import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
-
+import tigase.server.amp.ActionAbstract;
+import tigase.server.amp.AmpComponent;
 import tigase.xml.Element;
-
-import tigase.xmpp.JID;
 
 /**
  * Created: May 1, 2010 11:28:40 AM
@@ -40,6 +38,7 @@ import tigase.xmpp.JID;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = "deliver", parent = AmpComponent.class)
 public class Deliver
 				extends ActionAbstract {
 	private static final String name = "deliver";

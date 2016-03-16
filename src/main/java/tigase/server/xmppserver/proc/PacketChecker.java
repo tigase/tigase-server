@@ -24,11 +24,13 @@ package tigase.server.xmppserver.proc;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Packet;
 import tigase.server.xmppserver.CID;
 import tigase.server.xmppserver.S2SConnectionHandlerIfc;
+import tigase.server.xmppserver.S2SConnectionManager;
 import tigase.server.xmppserver.S2SIOService;
-
 import tigase.util.DNSEntry;
 import tigase.util.DNSResolverFactory;
 
@@ -49,6 +51,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = "PacketChecker", parent = S2SConnectionManager.class)
 public class PacketChecker extends S2SAbstractProcessor {
 
         private static final Logger log = Logger.getLogger(PacketChecker.class.getName());
@@ -59,9 +62,12 @@ public class PacketChecker extends S2SAbstractProcessor {
                         "allow-packets-from-other-domains-with-same-ip";
         private static final String ALLOW_PACKETS_FROM_OTHER_DOMAINS_WITH_SAME_IP_WHITELIST_KEY = 
                         "allow-packets-from-other-domains-with-same-ip-whitelist";
-        
+
+        @ConfigField(desc = "Allow packets from other domains on connections from domain")
         private Map<String,String[]> allowedOtherDomainsMap = new ConcurrentHashMap<String,String[]>();
+        @ConfigField(desc = "Allow packets from other domains with same IP")
         private boolean allowOtherDomainsWithSameIp = false;
+        @ConfigField(desc = "Whitelist to allow packets from other domains with same IP")
         private String[] allowedOtherDomainsWithSameIpWhitelist = null;
         
         //~--- methods --------------------------------------------------------------
@@ -194,6 +200,11 @@ public class PacketChecker extends S2SAbstractProcessor {
                 }
                 
                 return allowed;
+        }
+
+        @Override
+        public boolean stopProcessing() {
+                return true;
         }
 }
 

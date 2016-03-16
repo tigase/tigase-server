@@ -22,40 +22,37 @@
 
 package tigase.cluster;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import tigase.cluster.api.ClusterCommandException;
-import tigase.cluster.api.ClusterControllerIfc;
-import tigase.cluster.api.ClusteredComponentIfc;
-import tigase.cluster.api.CommandListener;
-import tigase.cluster.api.CommandListenerAbstract;
+import tigase.cluster.api.*;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.BeanSelector;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.core.Kernel;
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.server.Priority;
 import tigase.server.amp.AmpComponent;
-import static tigase.server.amp.AmpFeatureIfc.FROM_CONN_ID;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
-import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
+
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static tigase.server.amp.AmpFeatureIfc.FROM_CONN_ID;
 
 /**
  *
  * @author andrzej
  */
+@Bean(name="amp", parent=Kernel.class, selectors = {BeanSelector.ClusterMode.class})
 public class AmpComponentClustered extends AmpComponent implements ClusteredComponentIfc {
 
 	private static final Logger log = Logger.getLogger(AmpComponentClustered.class.getCanonicalName());
-	
-	private ClusterControllerIfc controller = null;
+
+	@Inject
+	private ClusterControllerIfc clusterController = null;
 	private Set<CommandListener> commandListeners = new CopyOnWriteArraySet<CommandListener>();
 	
 	public AmpComponentClustered() {
@@ -71,7 +68,7 @@ public class AmpComponentClustered extends AmpComponent implements ClusteredComp
 			toNodes.add(jid);
 		}
 		if (!toNodes.isEmpty())
-			controller.sendToNodes("packet-forward", null, packet.getElement(), getComponentId(), null, toNodes.toArray(new JID[toNodes.size()]));
+			clusterController.sendToNodes("packet-forward", null, packet.getElement(), getComponentId(), null, toNodes.toArray(new JID[toNodes.size()]));
 	}
 	
 	@Override
@@ -88,15 +85,15 @@ public class AmpComponentClustered extends AmpComponent implements ClusteredComp
 	@Override
 	public void setClusterController(ClusterControllerIfc cl_controller) {
 		super.setClusterController(cl_controller);
-		if (controller != null) {
+		if (clusterController != null) {
 			for (CommandListener listener : commandListeners) {
-				controller.removeCommandListener(listener);
+				clusterController.removeCommandListener(listener);
 			}
 		}
-		controller = cl_controller;
-		if (controller != null) {
+		clusterController = cl_controller;
+		if (clusterController != null) {
 			for (CommandListener listener : commandListeners) {
-				controller.setCommandListener(listener);
+				clusterController.setCommandListener(listener);
 			}
 		}
 	}

@@ -181,6 +181,8 @@ public class DefaultTypesConverter implements TypesConverter {
 
 					return (T) EnumSet.copyOf(result);
 				}
+			} else if (Pattern.class.isAssignableFrom(expectedType)) {
+				return (T) Pattern.compile(value.toString());
 			} else if (Collection.class.isAssignableFrom(expectedType) && genericType != null) {
 				int mod = expectedType.getModifiers();
 				if (!Modifier.isAbstract(mod) && !Modifier.isInterface(mod) && genericType instanceof ParameterizedType) {

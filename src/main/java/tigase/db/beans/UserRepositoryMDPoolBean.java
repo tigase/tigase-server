@@ -19,34 +19,29 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.db.factories;
+package tigase.db.beans;
 
-import tigase.db.AuthRepository;
-import tigase.db.AuthRepositoryMDImpl;
+import tigase.db.UserRepository;
+import tigase.db.UserRepositoryMDImpl;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.core.Kernel;
 
 /**
- * Created by andrzej on 08.03.2016.
+ * Created by andrzej on 07.03.2016.
  */
-@Bean(name="authRepository", parent = Kernel.class)
-public class AuthRepositoryMDPoolBean extends AuthRepositoryMDImpl {
+@Bean(name="userRepository", parent = Kernel.class, exportable = true)
+public class UserRepositoryMDPoolBean extends UserRepositoryMDImpl {
 
 	@Override
-	public Class<? extends AuthRepositoryConfigBean> getConfigClass() {
-		return AuthRepositoryConfigBean.class;
+	public Class<? extends UserRepositoryConfigBean> getConfigClass() {
+		return UserRepositoryConfigBean.class;
 	}
 
-	public static class AuthRepositoryConfigBean extends AuthUserRepositoryConfigBean<AuthRepository,AuthRepositoryConfigBean> {
+	public static class UserRepositoryConfigBean extends AuthUserRepositoryConfigBean<UserRepository, UserRepositoryConfigBean> {
 
 		@Override
-		protected Class<AuthRepository> getRepositoryIfc() {
-			return AuthRepository.class;
-		}
-
-		@Override
-		protected String getRepositoryPoolClassName() {
-			return null;
+		protected Class<UserRepository> getRepositoryIfc() {
+			return UserRepository.class;
 		}
 
 	}

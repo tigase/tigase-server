@@ -21,38 +21,28 @@ package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
-
+import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.NoConnectionIdException;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPPacketFilterIfc;
-import tigase.xmpp.XMPPPreprocessorIfc;
-import tigase.xmpp.XMPPProcessor;
-import tigase.xmpp.XMPPResourceConnection;
-
+import tigase.server.xmppsession.SessionManager;
 import tigase.util.DNSResolverFactory;
 import tigase.util.StringUtilities;
 import tigase.vhosts.VHostItem;
 import tigase.vhosts.filter.CustomDomainFilter;
 import tigase.vhosts.filter.DomainFilterPolicy;
+import tigase.xmpp.*;
 
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static tigase.xmpp.impl.DomainFilter.ID;
 
 /**
  * Created: Dec 30, 2008 12:43:28 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
+@Bean(name = ID, parent = SessionManager.class)
 public class DomainFilter
 				extends XMPPProcessor
 				implements XMPPPacketFilterIfc, XMPPPreprocessorIfc {
@@ -62,7 +52,7 @@ public class DomainFilter
 	/** constant domain list key name */
 	public static final String  ALLOWED_DOMAINS_LIST_KEY = "allowed-domains-list";
 	/** id of the plugin */
-	private static final String ID                       = "domain-filter";
+	protected static final String ID                       = "domain-filter";
 
 	/** Private logger for class instances. */
 	private static final Logger     log = Logger.getLogger(DomainFilter.class.getName());

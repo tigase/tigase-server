@@ -26,26 +26,21 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.db.NonAuthUserRepository;
+import tigase.db.TigaseDBException;
+import tigase.kernel.beans.Bean;
+import tigase.server.Iq;
+import tigase.server.Packet;
+import tigase.server.xmppsession.SessionManager;
+import tigase.xml.Element;
+import tigase.xmpp.*;
+import tigase.xmpp.impl.annotation.*;
+
 import java.text.SimpleDateFormat;
-import java.util.ArrayDeque;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.db.NonAuthUserRepository;
-import tigase.db.TigaseDBException;
-import tigase.server.Iq;
-import tigase.server.Packet;
-import tigase.xml.Element;
-
-import tigase.xmpp.*;
-import tigase.xmpp.impl.annotation.*;
 
 import static tigase.xmpp.impl.MobileV3.*;
 
@@ -65,6 +60,7 @@ import static tigase.xmpp.impl.MobileV3.*;
 @StreamFeatures({
 	@StreamFeature(elem=MOBILE_EL_NAME,xmlns=XMLNS)
 })
+@Bean(name = MobileV3.ID, parent = SessionManager.class, active = false)
 public class MobileV3
 				extends AnnotatedXMPPProcessor
 				implements XMPPProcessorIfc, XMPPPacketFilterIfc {

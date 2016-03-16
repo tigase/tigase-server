@@ -26,16 +26,18 @@ package tigase.server.xmppserver.proc;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
 import tigase.server.xmppserver.S2SConnectionHandlerIfc;
 import tigase.server.xmppserver.S2SIOService;
 import tigase.server.xmppserver.S2SProcessor;
 import tigase.xml.Element;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created: Dec 10, 2010 3:32:11 PM
@@ -54,7 +56,8 @@ public abstract class S2SAbstractProcessor
 		StreamFeatures,			// 2
 		StartTLS,				// 3
 		StartZlib,				// 4
-		Dialback				// 5
+		Dialback,				// 5
+		PacketChecker           // - needs to be last!
 	}
 	
 	/** Field description */
@@ -122,6 +125,7 @@ public abstract class S2SAbstractProcessor
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
+	@Inject(nullAllowed = true)
 	protected S2SConnectionHandlerIfc<S2SIOService> handler = null;
 
 	//~--- methods --------------------------------------------------------------

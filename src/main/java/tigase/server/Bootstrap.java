@@ -22,12 +22,16 @@
 package tigase.server;
 
 import tigase.component.PropertiesBeanConfigurator;
+import tigase.conf.ConfiguratorAbstract;
 import tigase.eventbus.EventBusFactory;
 import tigase.kernel.DefaultTypesConverter;
 import tigase.kernel.beans.config.BeanConfigurator;
 import tigase.kernel.core.DependencyGrapher;
 import tigase.kernel.core.Kernel;
 
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -45,6 +49,34 @@ public class Bootstrap implements Lifecycle {
 
 	public Bootstrap() {
 		kernel = new Kernel("root");
+	}
+
+	public void init(String[] args) {
+		props = new LinkedHashMap<>();
+		List<String> settings = new LinkedList<>();
+		ConfiguratorAbstract.parseArgs(props, settings, args);
+		loadFromPropertyStrings(settings);
+	}
+
+	private void loadFromPropertyStrings(List<String> settings) {
+		for (String propString : settings) {
+			int idx_eq    = propString.indexOf('=');
+
+			// String key = prop[0].trim();
+			// Object val = prop[1];
+			String key = propString.substring(0, idx_eq);
+			Object val = propString.substring(idx_eq + 1);
+
+			if (key.matches(".*\\[[LISBlisb]\\]$")) {
+				char c = key.charAt(key.length() - 2);
+
+				key = key.substring(0, key.length() - 3);
+				// we do not need to decode value - this will be done by proper BeanConfigurator
+				//val = DataTypes.decodeValueType(c, prop[1]);
+			}
+
+			props.put(key, val);
+		}
 	}
 
 	public void setProperties(Map<String,Object> props) {

@@ -24,14 +24,15 @@ package tigase.server.xmppserver.proc;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.kernel.beans.Bean;
+import tigase.server.xmppserver.S2SConnectionManager;
 import tigase.server.xmppserver.S2SIOService;
-
 import tigase.xml.Element;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.util.List;
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -41,6 +42,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = "StartZlib", parent = S2SConnectionManager.class)
 public class StartZlib extends S2SAbstractProcessor {
 	private static final Logger log = Logger.getLogger(StartZlib.class.getName());
 	private static final Element features = new Element("compression",

@@ -27,26 +27,21 @@ package tigase.xmpp.impl;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.NonAuthUserRepository;
-
+import tigase.kernel.beans.Bean;
 import tigase.server.Iq;
 import tigase.server.Packet;
-
+import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
+import tigase.xmpp.*;
 import tigase.xmpp.impl.annotation.*;
 
-import static tigase.xmpp.impl.SessionBind.*;
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Logger;
+
+import static tigase.xmpp.impl.SessionBind.XMLNS;
+
+//~--- JDK imports ------------------------------------------------------------
 /**
  * Describe class SessionBind here.
  *
@@ -62,6 +57,7 @@ import static tigase.xmpp.impl.SessionBind.*;
 	@StreamFeature(elem="session", xmlns=XMLNS)
 )
 @DiscoFeatures({ XMLNS })
+@Bean(name = SessionBind.XMLNS, parent = SessionManager.class)
 public class SessionBind
 				extends AnnotatedXMPPProcessor
 				implements XMPPProcessorIfc {

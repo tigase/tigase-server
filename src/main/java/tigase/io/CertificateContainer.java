@@ -25,6 +25,10 @@ import tigase.cert.CertificateEntry;
 import tigase.cert.CertificateUtil;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.core.Kernel;
 
 import javax.net.ssl.*;
 import java.io.*;
@@ -46,7 +50,8 @@ import static tigase.io.SSLContextContainerIfc.*;
  *
  * Created by andrzej on 29.02.2016.
  */
-public class CertificateContainer implements CertificateContainerIfc {
+@Bean(name = "certificate-container", parent = Kernel.class, exportable = true)
+public class CertificateContainer implements CertificateContainerIfc, Initializable {
 
 	private static final Logger log = Logger.getLogger(CertificateContainer.class.getCanonicalName());
 	private static final EventBus eventBus = EventBusFactory.getInstance();
@@ -63,11 +68,20 @@ public class CertificateContainer implements CertificateContainerIfc {
 	private X509TrustManager[] tms = new X509TrustManager[] { new FakeTrustManager() };
 	private KeyStore trustKeyStore = null;
 
+	@ConfigField(desc = "Alias for default certificate")
 	private String def_cert_alias = null;
 	private File[] certsDirs = null;
 	private char[] emptyPass = new char[0];
 
+	@ConfigField(desc = "Disable SNI support")
 	private boolean sniDisable = false;
+	@ConfigField(desc = "Location of server SSL certificates")
+	private String[] sslCertsLocation = { SERVER_CERTS_LOCATION_VAL };
+	@ConfigField(desc = "Location of trusted certificates")
+	private String[] trustedCertsDir = { TRUSTED_CERTS_DIR_VAL };
+
+	@ConfigField(desc = "Custom certificates")
+	private Map<String,String> customCerts = new HashMap<>();
 
 	private KeyManagerFactory addCertificateEntry(CertificateEntry entry, String alias, boolean store)
 			throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
@@ -344,6 +358,62 @@ public class CertificateContainer implements CertificateContainerIfc {
 		long seconds = (System.currentTimeMillis() - start) / 1000;
 
 		log.log(Level.CONFIG, "Loaded {0} trust certificates, it took {1} seconds.", new Object[] { counter, seconds });
+	}
+
+	@Override
+	public void initialize() {
+		try {
+			String[] pemDirs = sslCertsLocation;
+			certsDirs = new File[pemDirs.length];
+
+			int certsDirsIdx = -1;
+
+			Map<String, String> predefined = customCerts;
+			log.log(Level.CONFIG, "Loading predefined server certificates");
+			for (final Map.Entry<String, String> entry : predefined.entrySet()) {
+				try {
+					File file = new File(entry.getValue());
+					CertificateEntry certEntry = CertificateUtil.loadCertificate(file);
+					String alias = entry.getKey();
+					addCertificateEntry(certEntry, alias, false);
+					log.log(Level.CONFIG, "Loaded server certificate for domain: {0} from file: {1}", new Object[] { alias,
+							entry.getValue() });
+				} catch (Exception ex) {
+					log.log(Level.WARNING, "Cannot load certficate from file: " + entry.getValue(), ex);
+				}
+			}
+
+			for (String pemDir : pemDirs) {
+				log.log(Level.CONFIG, "Loading server certificates from PEM directory: {0}", pemDir);
+				certsDirs[++certsDirsIdx] = new File(pemDir);
+
+				for (File file : certsDirs[certsDirsIdx].listFiles(new PEMFileFilter())) {
+					try {
+						CertificateEntry certEntry = CertificateUtil.loadCertificate(file);
+						String alias = file.getName();
+						if (alias.endsWith(".pem"))
+							alias = alias.substring(0, alias.length() - 4);
+
+						addCertificateEntry(certEntry, alias, false);
+						log.log(Level.CONFIG, "Loaded server certificate for domain: {0} from file: {1}", new Object[] { alias,
+								file });
+					} catch (Exception ex) {
+						log.log(Level.WARNING, "Cannot load certficate from file: " + file, ex);
+					}
+				}
+			}
+		} catch (Exception ex) {
+			log.log(Level.WARNING, "There was a problem initializing SSL certificates.", ex);
+		}
+
+		// It may take a while, let's do it in background
+		new Thread() {
+			@Override
+			public void run() {
+				loadTrustedCerts(trustedCertsDir);
+			}
+		}.start();
+
 	}
 
 

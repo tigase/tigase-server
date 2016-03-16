@@ -28,9 +28,11 @@ package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
 
+import tigase.kernel.beans.Bean;
 import tigase.server.Iq;
 import tigase.server.Packet;
 
+import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
 
 import tigase.xmpp.Authorization;
@@ -52,6 +54,7 @@ import java.util.Queue;
  * @author <a href="mailto:bmalkow@tigase.org">Bartosz Małkowski</a>
  * @version $Rev$
  */
+@Bean(name = UrnXmppPing.ID, parent = SessionManager.class)
 public class UrnXmppPing
 				extends XMPPProcessorAbstract {
 	private static final Logger     log = Logger.getLogger(UrnXmppPing.class.getName());
@@ -59,7 +62,7 @@ public class UrnXmppPing
 		{ Iq.ELEM_NAME, "ping" }
 	};
 	private static final String     XMLNS    = "urn:xmpp:ping";
-	private static final String     ID       = XMLNS;
+	protected static final String     ID       = XMLNS;
 	private static final Element[]  DISCO_FEATURES = { new Element("feature",
 			new String[] { "var" }, new String[] { XMLNS }) };
 	private static final String[] XMLNSS = { XMLNS };

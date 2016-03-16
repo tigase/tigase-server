@@ -25,20 +25,20 @@ package tigase.server.xmppserver.proc;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
 import tigase.server.xmppserver.CID;
+import tigase.server.xmppserver.S2SConnectionManager;
 import tigase.server.xmppserver.S2SIOService;
-
 import tigase.xml.Element;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.io.IOException;
-
 import java.util.List;
+import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Queue;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: Dec 9, 2010 2:01:01 PM
@@ -46,6 +46,7 @@ import java.util.Queue;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = "StartTLS", parent = S2SConnectionManager.class)
 public class StartTLS
 				extends S2SAbstractProcessor {
 	private static final Logger log       = Logger.getLogger(StartTLS.class.getName());

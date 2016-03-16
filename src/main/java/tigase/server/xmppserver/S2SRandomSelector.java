@@ -24,14 +24,14 @@ package tigase.server.xmppserver;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -41,6 +41,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = "s2sRandomSelector", parent = S2SConnectionManager.class)
 public class S2SRandomSelector implements S2SConnectionSelector {
 	private static final Logger log = Logger.getLogger(S2SRandomSelector.class.getName());
 

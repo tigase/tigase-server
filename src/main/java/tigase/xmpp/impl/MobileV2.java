@@ -29,9 +29,11 @@ package tigase.xmpp.impl;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 
+import tigase.kernel.beans.Bean;
 import tigase.server.Iq;
 import tigase.server.Packet;
 
+import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
 
 import tigase.xmpp.*;
@@ -51,12 +53,13 @@ import java.util.Queue;
  *
  * @author andrzej
  */
+@Bean(name = MobileV2.ID, parent = SessionManager.class, active = false)
 public class MobileV2
 				extends XMPPProcessor
 				implements XMPPProcessorIfc, XMPPPacketFilterIfc {
 	// default values
 	private static final int    DEF_MAX_QUEUE_SIZE_VAL = 50;
-	private static final String ID                     = "mobile_v2";
+	protected static final String ID                     = "mobile_v2";
 	private static final Logger log = Logger.getLogger(MobileV2.class.getCanonicalName());
 
 	// keys

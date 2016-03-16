@@ -28,31 +28,21 @@ package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
-
+import tigase.kernel.beans.Bean;
 import tigase.server.Iq;
 import tigase.server.Packet;
-
+import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
-
-import tigase.xmpp.Authorization;
+import tigase.xmpp.*;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterFactory;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPPreprocessorIfc;
-import tigase.xmpp.XMPPProcessor;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
 
-import static tigase.xmpp.StanzaType.set;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Class InvisibleCommand implements XEP-0186 Invisible Command support
@@ -61,10 +51,11 @@ import java.util.Queue;
  *
  * @author andrzej
  */
+@Bean(name = InvisibleCommand.ID, parent = SessionManager.class, active = false)
 public class InvisibleCommand
 				extends XMPPProcessor
 				implements XMPPProcessorIfc, XMPPPreprocessorIfc {
-	private static final String ID = "invisible-command";
+	protected static final String ID = "invisible-command";
 	private static final Logger log = Logger.getLogger(InvisibleCommand.class
 			.getCanonicalName());
 	private static final String     XMLNS          = "urn:xmpp:invisible:0";

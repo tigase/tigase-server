@@ -1,8 +1,8 @@
 /*
- * MsgRepositoryIfc.java
+ * MsgBroadcastRepositoryIfc.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.org>
+ * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,15 +19,23 @@
  * If not, see http://www.gnu.org/licenses/.
  *
  */
-package tigase.db;
+package tigase.server.amp.db;
 
-import java.util.concurrent.locks.Condition;
+import tigase.xml.Element;
+import tigase.xmpp.BareJID;
+
+import java.util.Collection;
+import java.util.Date;
 
 /**
- * Created by andrzej on 13.03.2016.
+ * Created by andrzej on 15.03.2016.
  */
-public interface MsgRepositoryIfc<T extends DataSource> extends OfflineMsgRepositoryIfc, DataSourceAware<T> {
+public interface MsgBroadcastRepositoryIfc {
 
-	void setCondition(Condition condition);
+	void loadMessagesToBroadcast();
+	MsgBroadcastRepository.BroadcastMsg getBroadcastMsg(String id);
+	String dumpBroadcastMessageKeys();
+	Collection<MsgBroadcastRepository.BroadcastMsg> getBroadcastMessages();
+	boolean updateBroadcastMessage(String id, Element msg, Date expire, BareJID recipient);
 
 }

@@ -99,18 +99,26 @@ public class SessionManager
 	private AuthRepository                   auth_repository                 = null;
 	private long                             authTimeouts                    = 0;
 	private long                             closedConnections               = 0;
+	@Inject
 	private DefaultHandlerProc               defHandlerProc                  = null;
-	private PacketDefaultHandler             defPacketHandler                = null;
+	private PacketDefaultHandler             defPacketHandler                = new PacketDefaultHandler();
 	private String                           defPluginsThreadsPool = "default-threads-pool";
-	private EventBus						 eventBus						 = EventBusFactory.getInstance();
+	// Can not inject eventBus as it is used before injection is done
+	// TODO - Maybe we should allow autoregistration for event bus so that every
+	// annotated bean instance would be registered to eventbus?
+	//@Inject
+	private EventBus						 eventBus = EventBusFactory.getInstance();
 	private boolean                          forceDetailStaleConnectionCheck = true;
 	private int                              maxIdx                          = 100;
 	private int                              maxUserConnections              = 0;
 	private int                              maxUserSessions                 = 0;
 	private int                              maxUserSessionsDaily            = 0;
 	private int                              maxUserSessionsYesterday        = 0;
-	private NonAuthUserRepository            naUserRepository                = null;
+	@Inject
+	private NonAuthUserRepository            naUserRepository;
+	@Inject
 	private SessionCloseProc                 sessionCloseProc                = null;
+	@Inject
 	private SessionOpenProc                  sessionOpenProc                 = null;
 	private SMResourceConnection             smResourceConnection            = null;
 	private int                              tIdx                            = 0;
@@ -122,7 +130,8 @@ public class SessionManager
 			XMPPStopListenerIfc>(10);
 	private boolean          skipPrivacy = false;
 	private int          pluginsThreadFactor = 1;
-	private Set<XMPPImplIfc> allPlugins  = new ConcurrentSkipListSet<XMPPImplIfc>();
+	@Inject
+	private ConcurrentSkipListSet<XMPPImplIfc> allPlugins  = new ConcurrentSkipListSet<XMPPImplIfc>();
 	private long authTimeout = 120;
 
 	/**
@@ -181,12 +190,8 @@ public class SessionManager
 		return super.addOutPacket(packet);
 	}
 
-	public XMPPImplIfc addPlugin(String plug_id, String conc)
-					throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-		XMPPImplIfc      result = null;
-		XMPPProcessorIfc proc   = null;
-		String           version;
-
+	public XMPPImplIfc addPlugin(String plug_id, String conc) throws InstantiationException, IllegalAccessException, ClassNotFoundException, TigaseDBException {
+		XMPPImplIfc proc = null;
 		if (plug_id.equals(sessionOpenProcId)) {
 			sessionOpenProc = new SessionOpenProc();
 			proc            = sessionOpenProc;
@@ -199,12 +204,21 @@ public class SessionManager
 			defHandlerProc = new DefaultHandlerProc();
 			proc           = defHandlerProc;
 		}
+
 		if (proc == null) {
 			proc = SessionManagerConfig.getProcessor(plug_id);
 		}
+		return addPlugin(proc, conc == null ? "" : conc);
+	}
+
+
+	public XMPPImplIfc addPlugin(XMPPImplIfc proc, String conc)
+					throws ClassNotFoundException, InstantiationException, IllegalAccessException, TigaseDBException {
+		String           version;
+
 
 		boolean loaded = false;
-		if (proc != null) {
+		if (proc instanceof XMPPProcessorIfc) {
 			int threadsNo = proc.concurrentQueuesNo();
 			int queueSize = maxQueueSize / threadsNo;
 			if (conc != null && !conc.trim().isEmpty()) {
@@ -213,20 +227,20 @@ public class SessionManager
 						threadsNo = Integer.parseInt(plug_conc[0]);
 						queueSize = maxQueueSize / threadsNo;
 						log.log(Level.CONFIG, "Concurrency for plugin: {0} set to: {1}",
-										new Object[] { plug_id,
+										new Object[] { proc.id(),
 											threadsNo });
 					} catch (Exception e) {
-						log.log(Level.WARNING, "Plugin " + plug_id + " concurrency parsing error for: " + conc, e);
+						log.log(Level.WARNING, "Plugin " + proc.id() + " concurrency parsing error for: " + conc, e);
 						threadsNo = proc.concurrentQueuesNo();
 					}
 					if (plug_conc.length > 1) {
 					try {
 						queueSize = Integer.parseInt(plug_conc[1]);
 						log.log(Level.CONFIG, "Queue for plugin: {0} set to: {1} per thread",
-										new Object[] { plug_id,
+										new Object[] { proc.id(),
 											queueSize });
 					} catch (Exception e) {
-						log.log(Level.WARNING, "Plugin " + plug_id + " queueSize parsing error for: " + conc, e);
+						log.log(Level.WARNING, "Plugin " + proc.id() + " queueSize parsing error for: " + conc, e);
 						queueSize = maxQueueSize / threadsNo;
 					}
 					}
@@ -254,75 +268,68 @@ public class SessionManager
 							queueSize, proc.id() });
 				}
 			}
-			processors.put(proc.id(), proc);
+			processors.put(proc.id(), (XMPPProcessorIfc) proc);
 			log.log(Level.CONFIG, "Added processor: {0} for plugin id: {1}", new Object[] { proc
 					.getClass().getSimpleName(),
 					proc.id() });
 			loaded  = true;
-			result  = proc;
-			version = result.getComponentInfo().getComponentVersion();
-			System.out.println("Loading plugin: " + plug_id + "=" + threadsNo + ":" + queueSize +
+			version = proc.getComponentInfo().getComponentVersion();
+			System.out.println("Loading plugin: " + proc.id() + "=" + threadsNo + ":" + queueSize +
 							" ... " +	(version.isEmpty()
 					? ""
 					: "\t, version: " + version));
 		}
 
-		XMPPPreprocessorIfc preproc = SessionManagerConfig.getPreprocessor(plug_id);
-
-		if (preproc != null) {
-			preProcessors.put(plug_id, preproc);
+		if (proc instanceof XMPPPreprocessorIfc) {
+			preProcessors.put(proc.id(), (XMPPPreprocessorIfc) proc);
 			log.log(Level.CONFIG, "Added preprocessor: {0} for plugin id: {1}", new Object[] {
-					preproc.getClass().getSimpleName(),
-					plug_id });
+					proc.getClass().getSimpleName(),
+					proc.id() });
 			loaded = true;
-			result = preproc;
 		}
 
-		XMPPPostprocessorIfc postproc = SessionManagerConfig.getPostprocessor(plug_id);
-
-		if (postproc != null) {
-			postProcessors.put(plug_id, postproc);
+		if (proc instanceof XMPPPostprocessorIfc) {
+			postProcessors.put(proc.id(), (XMPPPostprocessorIfc) proc);
 			log.log(Level.CONFIG, "Added postprocessor: {0} for plugin id: {1}", new Object[] {
-					postproc.getClass().getSimpleName(),
-					plug_id });
+					proc.getClass().getSimpleName(),
+					proc });
 			loaded = true;
-			result = postproc;
 		}
 
-		XMPPStopListenerIfc stoplist = SessionManagerConfig.getStopListener(plug_id);
-
-		if (stoplist != null) {
-			stopListeners.put(plug_id, stoplist);
+		if (proc instanceof XMPPStopListenerIfc) {
+			stopListeners.put(proc.id(), (XMPPStopListenerIfc) proc);
 			log.log(Level.CONFIG, "Added stopped processor: {0} for plugin id: {1}",
-					new Object[] { stoplist.getClass().getSimpleName(),
-					plug_id });
+					new Object[] { proc.getClass().getSimpleName(),
+					proc.id() });
 			loaded = true;
-			result = stoplist;
 		}
 
-		XMPPPacketFilterIfc filterproc = SessionManagerConfig.getPacketFilter(plug_id);
-
-		if (filterproc != null) {
-			outFilters.put(plug_id, filterproc);
+		if (proc instanceof XMPPPacketFilterIfc) {
+			outFilters.put(proc.id(), (XMPPPacketFilterIfc) proc);
 			log.log(Level.CONFIG, "Added packet filter: {0} for plugin id: {1}", new Object[] {
-					filterproc.getClass().getSimpleName(),
-					plug_id });
+					proc.getClass().getSimpleName(),
+					proc.id() });
 			loaded = true;
-			result = filterproc;
 		}
 		if (!loaded) {
-			log.log(Level.WARNING, "No implementation found for plugin id: {0}", plug_id);
+			log.log(Level.WARNING, "No implementation found for plugin id: {0}", proc.id());
 		}    // end of if (!loaded)
-		if (result != null) {
-			if (allPlugins.add(result))
-				eventBus.registerAll(result);
-			if (result instanceof PresenceCapabilitiesManager.PresenceCapabilitiesListener) {
+		if (proc != null) {
+			if (allPlugins.add(proc)) {
+				if (conc == null) {
+					Map<String, Object> settings = new HashMap<>();
+					settings.put("sm-jid", getComponentId());
+					proc.init(settings);
+				}
+				eventBus.registerAll(proc);
+			}
+			if (proc instanceof PresenceCapabilitiesManager.PresenceCapabilitiesListener) {
 				PresenceCapabilitiesManager.registerPresenceHandler((PresenceCapabilitiesManager
-						.PresenceCapabilitiesListener) result);
+						.PresenceCapabilitiesListener) proc);
 			}
 		}
 
-		return result;
+		return proc;
 	}
 
 	@Override
@@ -486,6 +493,12 @@ public class SessionManager
 		}
 		processPacket(packet, conn);
 	}
+
+	public void removePlugin(XMPPImplIfc proc) {
+		String plug_id = proc.id();
+		removePlugin(plug_id);
+	}
+
 
 	public void removePlugin(String plug_id) {
 		if (log.isLoggable(Level.FINEST)) {
@@ -749,6 +762,23 @@ public class SessionManager
 	public void setName(String name) {
 		super.setName(name);
 		TigaseRuntime.getTigaseRuntime().addOnlineJidsReporter(this);
+	}
+
+	public void setAllPlugins(ConcurrentSkipListSet<XMPPImplIfc> allPlugins) {
+		ConcurrentSkipListSet<XMPPImplIfc> oldPlugins = this.allPlugins;
+		HashSet<XMPPImplIfc> removed = new HashSet<>(oldPlugins);
+		removed.removeAll(allPlugins);
+		for (XMPPImplIfc proc : removed)
+			removePlugin(proc);
+		HashSet<XMPPImplIfc> added = new HashSet<>(allPlugins);
+		added.removeAll(oldPlugins);
+		for (XMPPImplIfc proc : added) {
+			try {
+				addPlugin(proc, null);
+			} catch (ClassNotFoundException|InstantiationException|IllegalAccessException|TigaseDBException e) {
+				log.log(Level.SEVERE, "Failed initialization of processor " + proc.id(), e);
+			}
+		}
 	}
 
 	@Override
@@ -2438,13 +2468,15 @@ public class SessionManager
 
 	//~--- inner classes --------------------------------------------------------
 
-	private class AuthenticationTimer
+	private static class AuthenticationTimer
 					extends tigase.util.TimerTask {
+		private final SessionManager sm;
 		private JID connId = null;
 
 		//~--- constructors -------------------------------------------------------
 
-		private AuthenticationTimer(JID connId) {
+		private AuthenticationTimer(SessionManager sm, JID connId) {
+			this.sm = sm;
 			this.connId = connId;
 		}
 
@@ -2452,18 +2484,18 @@ public class SessionManager
 
 		@Override
 		public void run() {
-			XMPPResourceConnection conn = connectionsByFrom.get(connId);
+			XMPPResourceConnection conn = sm.connectionsByFrom.get(connId);
 
 			if (conn != null) {
 				synchronized (conn) {
 					if (!conn.isAuthorized()) {
 						conn.putSessionData(XMPPResourceConnection.AUTHENTICATION_TIMEOUT_KEY,
 								XMPPResourceConnection.AUTHENTICATION_TIMEOUT_KEY);
-						connectionsByFrom.remove(connId);
-						++authTimeouts;
+						sm.connectionsByFrom.remove(connId);
+						++sm.authTimeouts;
 						log.log(Level.FINE,
 								"Authentication timeout expired, closing connection: {0}", connId);
-						fastAddOutPacket(Command.CLOSE.getPacket(getComponentId(), connId, StanzaType
+						sm.fastAddOutPacket(Command.CLOSE.getPacket(sm.getComponentId(), connId, StanzaType
 								.set, conn.nextStanzaId()));
 					}
 				}
@@ -2505,9 +2537,13 @@ public class SessionManager
 	}
 
 
-	private class DefaultHandlerProc
+	@Bean(name = defaultHandlerProcId, parent = SessionManager.class)
+	public static class DefaultHandlerProc
 					extends XMPPProcessor
 					implements XMPPProcessorIfc {
+		@Inject
+		SessionManager sm;
+
 		@Override
 		public int concurrentQueuesNo() {
 			return Runtime.getRuntime().availableProcessors() * 4;
@@ -2525,7 +2561,7 @@ public class SessionManager
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Executing default packet handler for: {0}", packet);
 			}
-			defPacketHandler.process(packet, session, repo, results);
+			sm.defPacketHandler.process(packet, session, repo, results);
 		}
 	}
 
@@ -2589,9 +2625,14 @@ public class SessionManager
 	}
 
 
-	private class SessionCloseProc
+	@Bean(name = sessionCloseProcId, parent = SessionManager.class)
+	public static class SessionCloseProc
 					extends XMPPProcessor
 					implements XMPPProcessorIfc {
+
+		@Inject
+		SessionManager sm;
+
 		@Override
 		public int concurrentQueuesNo() {
 			return super.concurrentQueuesNo() * 4;
@@ -2612,14 +2653,19 @@ public class SessionManager
 
 			String userJid = Command.getFieldValue(packet, "user-jid");
 
-			closeConnection(session, packet.getFrom(), userJid, false);
+			sm.closeConnection(session, packet.getFrom(), userJid, false);
 		}
 	}
 
 
-	private class SessionOpenProc
+	@Bean(name = sessionOpenProcId, parent = SessionManager.class)
+	public static class SessionOpenProc
 					extends XMPPProcessor
 					implements XMPPProcessorIfc {
+
+		@Inject
+		SessionManager sm;
+
 		@Override
 		public int concurrentQueuesNo() {
 			return super.concurrentQueuesNo() * 2;
@@ -2646,14 +2692,14 @@ public class SessionManager
 				final String hostname = Command.getFieldValue(packet, "hostname");
 
 				try {
-					conn = createUserSession(packet.getFrom(), hostname);
+					conn = sm.createUserSession(packet.getFrom(), hostname);
 				} catch (TigaseStringprepException ex) {
 					log.log(Level.WARNING,
 							"Incrrect hostname, did not pass stringprep processing: {0}", hostname);
 
 					return;
 				}
-				addTimerTask(new AuthenticationTimer(packet.getFrom()), authTimeout, TimeUnit.SECONDS);
+				sm.addTimerTask(new AuthenticationTimer(sm, packet.getFrom()), sm.authTimeout, TimeUnit.SECONDS);
 			} else {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Stream opened for existing session, authorized: {0}",
@@ -2667,7 +2713,7 @@ public class SessionManager
 						new Object[] { conn.getSessionId(),
 						conn });
 			}
-			fastAddOutPacket(packet.okResult((String) null, 0));
+			sm.fastAddOutPacket(packet.okResult((String) null, 0));
 		}
 	}
 

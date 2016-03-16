@@ -26,31 +26,27 @@ package tigase.server.amp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.Collection;
+import tigase.disco.XMPPService;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.BeanSelector;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.core.Kernel;
+import tigase.server.AbstractMessageReceiver;
+import tigase.server.Packet;
+import tigase.server.amp.action.*;
+import tigase.server.amp.cond.Deliver;
+import tigase.server.amp.cond.ExpireAt;
+import tigase.server.amp.cond.MatchResource;
+import tigase.xml.Element;
+import tigase.xmpp.JID;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.conf.ConfigurationException;
-import tigase.disco.XMPPService;
-import tigase.server.AbstractMessageReceiver;
-import tigase.server.Packet;
-import tigase.server.ServerComponent;
-import tigase.server.XMPPServer;
-import tigase.server.amp.action.Alert;
-import tigase.server.amp.action.Broadcast;
-import tigase.server.amp.action.Drop;
-import tigase.server.amp.action.Notify;
-import tigase.server.amp.action.Store;
-import tigase.server.amp.cond.Deliver;
-import tigase.server.amp.cond.ExpireAt;
-import tigase.server.amp.cond.MatchResource;
-import tigase.server.xmppsession.SessionManager;
-import tigase.server.xmppsession.SessionManagerHandler;
-import tigase.xml.Element;
-import tigase.xmpp.JID;
 
 /**
  * Created: Apr 26, 2010 3:22:06 PM
@@ -58,6 +54,7 @@ import tigase.xmpp.JID;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name="amp", parent=Kernel.class, selectors = {BeanSelector.NonClusterMode.class})
 public class AmpComponent
 				extends AbstractMessageReceiver
 				implements ActionResultsHandlerIfc {
@@ -77,7 +74,22 @@ public class AmpComponent
 	private Map<String, ConditionIfc> conditions = new ConcurrentSkipListMap<String,
 																									 ConditionIfc>();
 
-	protected final Broadcast broadcast = new Broadcast();
+	@Inject
+	private List<ActionIfc> allActions = new ArrayList<>();
+
+	@Inject
+	protected Broadcast broadcast = null;
+
+	public AmpComponent() {
+		ConditionIfc condition = new Deliver();
+		conditions.put(condition.getName(), condition);
+		condition = new ExpireAt();
+		conditions.put(condition.getName(), condition);
+		condition = new MatchResource();
+		conditions.put(condition.getName(), condition);
+
+	}
+
 	//~--- methods --------------------------------------------------------------
 
 	// ~--- methods --------------------------------------------------------------
@@ -93,46 +105,6 @@ public class AmpComponent
 	}
 
 	//~--- get methods ----------------------------------------------------------
-	
-	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> defs = super.getDefaults(params);
-		ActionIfc action         = new Drop();
-
-		actions.put(action.getName(), action);
-		action = new tigase.server.amp.action.Error();
-		actions.put(action.getName(), action);
-		action = new Notify();
-		actions.put(action.getName(), action);
-		action = new tigase.server.amp.action.Deliver();
-		actions.put(action.getName(), action);
-		action = new Store();
-		actions.put(action.getName(), action);
-		action = new Alert();
-		actions.put(action.getName(), action);
-
-		ConditionIfc condition = new Deliver();
-
-		conditions.put(condition.getName(), condition);
-		condition = new ExpireAt();
-		conditions.put(condition.getName(), condition);
-		condition = new MatchResource();
-		conditions.put(condition.getName(), condition);
-		for (ActionIfc a : actions.values()) {
-			Map<String, Object> d = a.getDefaults(params);
-
-			if (d != null) {
-				defs.putAll(d);
-			}
-		}
-
-		Map<String,Object> d = broadcast.getDefaults(params);
-		if (d != null) {
-			defs.putAll(d);
-		}
-		
-		return defs;
-	}
 
 	@Override
 	public String getDiscoCategoryType() {
@@ -243,26 +215,13 @@ public class AmpComponent
 		}
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	@Override
-	public void setProperties(Map<String, Object> props) throws ConfigurationException {
-		super.setProperties(props);
-		if (props.size() == 1) {
-
-			// If props.size() == 1, it means this is a single property update
-			// and this component does not support single property change for the rest
-			// of it's settings
-			return;
+	public void setAllActions(List<ActionIfc> actions) {
+		Map<String,ActionIfc> map = new ConcurrentSkipListMap<>();
+		for (ActionIfc action : actions) {
+			action.setActionResultsHandler(this);
+			map.put(action.getName(), action);
 		}
-		for (ActionIfc a : actions.values()) {
-			a.setProperties(props, this);
-		}
-
-		broadcast.setProperties(props, this);
-		// for (ConditionIfc c : conditions.values()) {
-		// c.setProperties(props, this);
-		// }
+		this.actions = map;
 	}
 
 	//~--- methods --------------------------------------------------------------
