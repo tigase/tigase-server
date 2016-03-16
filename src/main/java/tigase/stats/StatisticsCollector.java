@@ -26,40 +26,26 @@ package tigase.stats;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.server.AbstractComponentRegistrator;
-import tigase.server.Command;
-import tigase.server.Iq;
-import tigase.server.Packet;
-import tigase.server.ServerComponent;
-
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.StanzaType;
-
 import tigase.conf.ConfigurationException;
 import tigase.conf.ConfiguratorAbstract;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
+import tigase.server.*;
 import tigase.sys.ShutdownHook;
 import tigase.sys.TigaseRuntime;
 import tigase.util.ElementUtils;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
+import tigase.xmpp.StanzaType;
 
+import javax.management.ObjectName;
 import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.management.ObjectName;
 
 /**
  * Class StatisticsCollector
@@ -102,6 +88,8 @@ public class StatisticsCollector
 	/** Field description */
 	public static final String STATS_UPDATE_INTERVAL_PROP_KEY = "stats-update-interval";
 
+	public static final String STATS_HIGH_MEMORY_LEVEL_KEY = "stats-high-memory-level";
+
 	/** Field description */
 	public static final long    STATS_UPDATE_INTERVAL_PROP_VAL = 10l;
 	private static final String STATS_XMLNS = "http://jabber.org/protocol/stats";
@@ -122,6 +110,7 @@ public class StatisticsCollector
 	private Level statsLevel       = Level.INFO;
 	private final Timer statsArchivTasks = new Timer("stats-archivizer-tasks", true);
 	private long  updateInterval   = 10;
+	private int   highMemoryLevel  = 95;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -151,7 +140,7 @@ public class StatisticsCollector
 		}
 		super.initializationCompleted();
 		try {
-			sp = new StatisticsProvider(this, historySize, updateInterval);
+			sp = new StatisticsProvider(this, historySize, updateInterval, highMemoryLevel);
 
 			String     objName = STATISTICS_MBEAN_NAME;
 			ObjectName on      = new ObjectName(objName);
@@ -438,6 +427,7 @@ public class StatisticsCollector
 		}
 		defs.put(STATS_HISTORY_SIZE_PROP_KEY, hSize);
 		defs.put(STATS_UPDATE_INTERVAL_PROP_KEY, updateInt);
+		defs.put(STATS_HIGH_MEMORY_LEVEL_KEY, highMemoryLevel);
 
 		return defs;
 	}
@@ -529,6 +519,9 @@ public class StatisticsCollector
 		}
 		if (props.get(STATS_UPDATE_INTERVAL_PROP_KEY) != null) {
 			updateInterval = (Long) props.get(STATS_UPDATE_INTERVAL_PROP_KEY);
+		}
+		if (props.get(STATS_HIGH_MEMORY_LEVEL_KEY) != null) {
+			highMemoryLevel = (Integer) props.get(STATS_HIGH_MEMORY_LEVEL_KEY);
 		}
 	}
 
