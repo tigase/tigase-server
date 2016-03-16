@@ -640,6 +640,7 @@ public interface Configurable
 	 *
 	 * @return a <code>Map</code> with the component default configuration.
 	 */
+	@Deprecated
 	Map<String, Object> getDefaults(Map<String, Object> params);
 
 	//~--- set methods ----------------------------------------------------------
@@ -653,5 +654,6 @@ public interface Configurable
 	 *                                            fail which will make it unable
 	 *                                            to work
 	 */
+	@Deprecated
 	void setProperties(Map<String, Object> properties) throws ConfigurationException;
 }

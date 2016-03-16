@@ -26,24 +26,17 @@ package tigase.db;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import tigase.osgi.ModulesManagerImpl;
+import tigase.util.ClassUtil;
+
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-
-import tigase.osgi.ModulesManagerImpl;
-import tigase.util.ClassUtil;
-
-import java.util.Properties;
 
 /**
  * Describe class RepositoryFactory here.
@@ -54,6 +47,7 @@ import java.util.Properties;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Deprecated
 public abstract class RepositoryFactory {
 	/** Field description */
 	public static final String AUTH_DOMAIN_POOL_CLASS = "--auth-domain-repo-pool";
