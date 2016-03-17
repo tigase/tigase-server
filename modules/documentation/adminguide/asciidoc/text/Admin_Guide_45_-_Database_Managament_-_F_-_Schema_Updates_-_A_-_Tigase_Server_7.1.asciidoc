@@ -52,7 +52,7 @@ All variables will be required, they are as follows: +
 * ${DB_USER_PASS} - Password of the specified user. +
 * ${DB_NAME} - Name of the database to be edited. +
 * ${DB_VERSION} - In this case, we want this to be 7.1. +
-* ${ADMIN_JID} - Bare JID of a database user with admin privileges.  Mut be contained within quotation marks. +
+* ${ADMIN_JID} - Bare JID of a database user with admin privileges.  Must be contained within quotation marks. +
 * ${ADMIN_JID_PASS} - Password of associated admin JID. +
 
 Please note that the SQL file for the update will have an associated database with the filename.  i.e. postgresql-update-to-7.1.sql for postgresql database.

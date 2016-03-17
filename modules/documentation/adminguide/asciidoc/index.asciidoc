@@ -99,6 +99,8 @@ include::text/Admin_Guide_29_-_Database_Management_-_A_-_Database_Preparation.as
 
 :leveloffset: 3
 
+include::text/Admin_Guide_29_-_Database_Management_-_A_-_Database_Preperation_-_1_-_DbSchemaLoader.asciidoc[]
+
 include::text/Admin_Guide_30_-_Database_Management_-_A_-_Database_Preparation_-_1_-_Prepare_the_MySQL_Database_for_Tigase_Server.asciidoc[]
 
 include::text/Admin_Guide_31_-_Database_Management_-_A_-_Database_Preparation_-_2_-_Prepare_the_Derby_Database_for_Tigase_Server.asciidoc[]
