@@ -25,12 +25,16 @@ package tigase.util;
 import tigase.stats.StatisticsList;
 import tigase.sys.TigaseRuntime;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * @author Artur Hefczyc
  * Created May 28, 2011
  */
 public class AllHistoryCache {
 
+	private static final Logger log = Logger.getLogger( AllHistoryCache.class.getName());
 	private StatisticsList[] buffer = null;
 	private int start = 0;
 	private int count = 0;
@@ -63,6 +67,7 @@ public class AllHistoryCache {
 				start = (start + count) - minimalSize;
 				count = minimalSize;
 			}
+			log.log( Level.CONFIG, "Shrinking statistics to {0} items for {1} time", new Object[] { minimalSize, highMemoryUsageCount } );
 		} else {
 			highMemoryUsageCount = 0;
 		}
