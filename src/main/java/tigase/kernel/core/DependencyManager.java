@@ -26,6 +26,8 @@ import tigase.kernel.core.BeanConfig.State;
 import tigase.util.ReflectionHelper;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -110,9 +112,10 @@ public class DependencyManager {
 		} else if (dependency.getType() != null) {
 			Class<?> type = dependency.getType();
 			if (Collection.class.isAssignableFrom(type)) {
-				type = dependency.getSubType();
+				type = ReflectionHelper.getCollectionParamter(dependency.getGenericType());
 			}
-			bcs.addAll(getBeanConfigs(type));
+			// TODO - FIXME
+			bcs.addAll(getBeanConfigs(type, dependency.getGenericType()));
 		} else
 			throw new RuntimeException("Unsupported dependecy type.");
 		return bcs.toArray(new BeanConfig[]{});
@@ -126,15 +129,16 @@ public class DependencyManager {
 		return Collections.unmodifiableCollection(beanConfigs.values());
 	}
 
-	public List<BeanConfig> getBeanConfigs(Class<?> type) {
-		return getBeanConfigs(type, true);
+	public List<BeanConfig> getBeanConfigs(Class<?> type, Type genericType) {
+		return getBeanConfigs(type, genericType, true);
 	}
 
-	public List<BeanConfig> getBeanConfigs(final Class<?> type, final boolean allowNonExportable) {
+	public List<BeanConfig> getBeanConfigs(final Class<?> type, Type genericType, final boolean allowNonExportable) {
 		ArrayList<BeanConfig> result = new ArrayList<BeanConfig>();
 		for (BeanConfig bc : beanConfigs.values()) {
 			if (bc.getState() != State.inactive && type.isAssignableFrom(bc.getClazz()) && (allowNonExportable || bc.isExportable())) {
-				result.add(bc);
+				if (genericType == null || (genericType instanceof ParameterizedType && Collection.class.isAssignableFrom((Class) ((ParameterizedType) genericType).getRawType())) || ReflectionHelper.classMatchesType(bc.getClazz(), genericType))
+					result.add(bc);
 			}
 		}
 		return result;
@@ -206,9 +210,7 @@ public class DependencyManager {
 			} else {
 				Class<?> type = f.getType();
 				d.setType(type);
-				if (Collection.class.isAssignableFrom(type)) {
-					d.setSubType(ReflectionHelper.getItemClassOfGenericCollection(f));
-				}
+				d.setGenericType(f.getGenericType());
 			}
 
 			beanConfig.getFieldDependencies().put(e.getKey(), d);

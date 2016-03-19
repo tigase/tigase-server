@@ -26,10 +26,8 @@ package tigase.cluster.repo;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.DBInitException;
-import tigase.db.DataRepository;
-import tigase.db.Repository;
-import tigase.db.RepositoryFactory;
+import tigase.db.*;
+import tigase.db.comp.ComponentRepositoryDataSourceAware;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -51,7 +49,7 @@ import java.util.logging.Logger;
 @Repository.Meta( supportedUris = { "jdbc:[^:]+:.*" } )
 public class ClConSQLRepository
 				extends ClConConfigRepository
-				implements ClusterRepoConstants {
+				implements ClusterRepoConstants, ComponentRepositoryDataSourceAware<ClusterRepoItem,DataRepository> {
 	/**
 	 * Private logger for class instances.
 	 */
@@ -171,13 +169,11 @@ public class ClConSQLRepository
 
 	//~--- methods --------------------------------------------------------------
 
+
 	@Override
-	public void initRepository(String conn_str, Map<String, String> params)
-					throws DBInitException {
-		super.initRepository(conn_str, params);
+	public void setDataSource(DataRepository data_repo) {
 		try {
-			data_repo = RepositoryFactory.getDataRepository(null, conn_str, params);
-			checkDB();
+			checkDB(data_repo);
 
 			// data_repo.initPreparedStatement(CHECK_TABLE_QUERY, CHECK_TABLE_QUERY);
 			data_repo.initPreparedStatement(GET_ITEM_QUERY, GET_ITEM_QUERY);
@@ -185,6 +181,19 @@ public class ClConSQLRepository
 			data_repo.initPreparedStatement(INSERT_ITEM_QUERY, INSERT_ITEM_QUERY);
 			data_repo.initPreparedStatement(UPDATE_ITEM_QUERY, UPDATE_ITEM_QUERY);
 			data_repo.initPreparedStatement(DELETE_ITEM_QUERY, DELETE_ITEM_QUERY);
+			this.data_repo = data_repo;
+		} catch (Exception e) {
+			log.log(Level.WARNING, "Problem initializing database: ", e);
+		}
+	}
+
+	@Override
+	public void initRepository(String conn_str, Map<String, String> params)
+					throws DBInitException {
+		super.initRepository(conn_str, params);
+		try {
+			data_repo = RepositoryFactory.getDataRepository(null, conn_str, params);
+			setDataSource(data_repo);
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Problem initializing database: ", e);
 		}
@@ -316,7 +325,7 @@ public class ClConSQLRepository
 	 *
 	 * @throws SQLException
 	 */
-	private void checkDB() throws SQLException {
+	private void checkDB(DataRepository data_repo) throws SQLException {
 		Statement st = null;
 
 		DataRepository.dbTypes databaseType = data_repo.getDatabaseType();

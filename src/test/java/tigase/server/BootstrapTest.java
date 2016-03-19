@@ -27,16 +27,19 @@ public class BootstrapTest {
 	@Test
 	public void testNonCluster() throws InterruptedException {
 		props.put("--cluster-mode","false");
-		executeTest();
+		Bootstrap  bootstrap = executeTest();
 		Thread.sleep(10 * 60 * 1000);
+		bootstrap.stop();
 	}
-//
-//	@Test
-//	public void testCluster() {
-//		props.put("--cluster-mode","true");
-//		executeTest();
-//	}
-	public void executeTest() {
+
+	@Test
+	public void testCluster() {
+		props.put("--cluster-mode","true");
+		Bootstrap bootstrap = executeTest();
+		bootstrap.stop();
+	}
+
+	public Bootstrap executeTest() {
 		Bootstrap bootstrap = new Bootstrap();
 
 		bootstrap.setProperties(getProps());
@@ -70,6 +73,8 @@ public class BootstrapTest {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+
+		return bootstrap;
 	}
 
 	public Map<String, Object> getProps() {
@@ -82,22 +87,4 @@ public class BootstrapTest {
 		return props;
 	}
 
-//	@Test
-//	public void test1() throws Exception {
-//		Field f = Test1.class.getDeclaredField("map");
-//		assertEquals(Map.class, f.getType());
-//		System.out.println(f.getGenericType());
-//		if (f.getGenericType() instanceof ParameterizedType) {
-//			ParameterizedType pt = (ParameterizedType) f.getGenericType();
-//			System.out.println(pt.getActualTypeArguments());
-//			for (int i=0; i<pt.getActualTypeArguments().length; i++) {
-//				Type x = pt.getActualTypeArguments()[i];
-//				System.out.println(x);
-//			}
-//		}
-//	}
-//
-//	private class Test1 {
-//		private Map<String, EnumSet<CmdAcl>> map;
-//	}
 }

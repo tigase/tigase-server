@@ -1,6 +1,7 @@
 package tigase.kernel.core;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 
 /**
  * Class describing dependency.
@@ -17,7 +18,7 @@ public class Dependency {
 
 	private Class<?> type;
 
-	private Class<?> subType;
+	private Type genericType;
 
 	/**
 	 * Creates instance of class.
@@ -58,8 +59,8 @@ public class Dependency {
 		return field;
 	}
 
-	public Class<?> getSubType() {
-		return subType;
+	public Type getGenericType() {
+		return genericType;
 	}
 
 	/**
@@ -92,9 +93,7 @@ public class Dependency {
 		this.nullAllowed = nullAllowed;
 	}
 
-	public void setSubType(Class<?> subType) {
-		this.subType = subType;
-	}
+	public void setGenericType(Type genericType) { this.genericType = genericType; }
 
 	public void setType(Class<?> type) {
 		this.type = type;

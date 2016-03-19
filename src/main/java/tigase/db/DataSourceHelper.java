@@ -73,10 +73,17 @@ public class DataSourceHelper {
 	 *
 	 */
 	public static <T extends Class<?>> T getDefaultClass(T cls, String uri) throws DBInitException {
+		return getDefaultClass(cls, uri, null);
+	}
+
+	public static <T extends Class<?>> T getDefaultClass(T cls, String uri, Matcher matcher) throws DBInitException {
 		Set<T> classes = ModulesManagerImpl.getInstance().getImplementations(cls);
 		classes.addAll(getAnnotatedClasses(cls));
 		Set<T> supported = new HashSet<T>();
 		for (T clazz : classes) {
+			if (matcher != null && !matcher.matches(clazz))
+				continue;
+
 			Repository.Meta annotation = (Repository.Meta) clazz.getAnnotation(Repository.Meta.class);
 			if (annotation != null) {
 				String[] supportedUris = annotation.supportedUris();
@@ -124,5 +131,8 @@ public class DataSourceHelper {
 		return classes;
 	}
 
+	public static interface Matcher {
+		boolean matches(Class cls);
+	}
 
 }

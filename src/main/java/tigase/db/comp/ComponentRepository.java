@@ -26,10 +26,11 @@ package tigase.db.comp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.Collection;
-import java.util.Map;
 import tigase.db.Repository;
 import tigase.db.TigaseDBException;
+
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * A convenience interface for a unified access to component specific repository

@@ -31,9 +31,11 @@ import tigase.cluster.repo.ClConConfigRepository;
 import tigase.cluster.repo.ClusterRepoConstants;
 import tigase.cluster.repo.ClusterRepoItem;
 import tigase.conf.ConfigurationException;
-import tigase.db.RepositoryFactory;
-import tigase.db.TigaseDBException;
+import tigase.db.*;
+import tigase.db.beans.DataSourceBean;
+import tigase.db.comp.AbstractMDComponentRepositoryBean;
 import tigase.db.comp.ComponentRepository;
+import tigase.db.comp.ComponentRepositoryDataSourceAware;
 import tigase.db.comp.RepositoryChangeListenerIfc;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.BeanSelector;
@@ -49,12 +51,14 @@ import tigase.server.ServiceChecker;
 import tigase.stats.StatisticsList;
 import tigase.sys.TigaseRuntime;
 import tigase.util.Algorithms;
+import tigase.util.ReflectionHelper;
 import tigase.util.TigaseStringprepException;
 import tigase.util.TimeUtils;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 
 import javax.script.Bindings;
+import java.lang.reflect.Type;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -183,6 +187,9 @@ public class ClusterConnectionManager
 	private int                                  nodesNo               = 0;
 	private int                                  per_node_conns =
 			CLUSTER_CONNECTIONS_PER_NODE_VAL;
+	@Inject
+	private DataSourceBean dataSourceBean = null;
+	@Inject
 	private ComponentRepository<ClusterRepoItem> repo                  = null;
 	private long                                 servConnectedTimeouts = 0;
 	private long                                 totalNodeDisconnects  = 0;
@@ -545,6 +552,10 @@ public class ClusterConnectionManager
 		}
 
 		return result;
+	}
+
+	public void setRepo(ComponentRepository<ClusterRepoItem> repo) {
+		this.repo = repo;
 	}
 
 	@Override
@@ -912,6 +923,8 @@ public class ClusterConnectionManager
 
 	@Override
 	protected int[] getDefPlainPorts() {
+		if (repo == null)
+			return new int[] { ClusterRepoItem.PORT_NO_PROP_VAL };
 		ClusterRepoItem item = repo.getItem(getDefHostName().getDomain());
 
 		return new int[] { item.getPortNo() };
@@ -1216,6 +1229,22 @@ public class ClusterConnectionManager
 			return System.currentTimeMillis() - lastTransfer;
 		}
 		
+	}
+
+	@Bean(name = "clConRepositoryBean", parent = ClusterConnectionManager.class)
+	public static class DefClConRepositoryBean extends AbstractMDComponentRepositoryBean<ClusterRepoItem> {
+
+		private ComponentRepository<ClusterRepoItem> repo = null;
+
+		private static DataSourceHelper.Matcher matcher = (Class clazz) -> {
+				return ReflectionHelper.classMatchesClassWithParameters(clazz, ComponentRepositoryDataSourceAware.class, new Type[] { ClusterRepoItem.class, DataSource.class });
+		};
+
+		@Override
+		protected Class<? extends ComponentRepositoryDataSourceAware<ClusterRepoItem, DataSource>> findClassForDataSource(DataSource dataSource) throws DBInitException {
+			Class cls = DataSourceHelper.getDefaultClass(ComponentRepository.class, dataSource.getResourceUri(), matcher);
+			return (Class<ComponentRepositoryDataSourceAware<ClusterRepoItem, DataSource>>) cls;
+		}
 	}
 }
 

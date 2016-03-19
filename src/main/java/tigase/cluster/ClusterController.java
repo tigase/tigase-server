@@ -58,7 +58,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = "cluster-contr", parent = Kernel.class, selectors = {BeanSelector.ClusterMode.class})
+@Bean(name = "cluster-contr", parent = Kernel.class, selectors = {BeanSelector.ClusterMode.class}, exportable = true)
 public class ClusterController
 				extends AbstractComponentRegistrator<ClusteredComponentIfc>
 				implements Configurable, ClusterControllerIfc {

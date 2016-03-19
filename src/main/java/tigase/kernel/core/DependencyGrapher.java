@@ -1,8 +1,8 @@
 package tigase.kernel.core;
 
-import java.util.HashSet;
-
 import tigase.kernel.core.Kernel.DelegatedBeanConfig;
+
+import java.util.HashSet;
 
 /**
  * Creates graph of beans dependency in <a href="www.graphviz.org">Graphviz</a>
@@ -98,7 +98,7 @@ public class DependencyGrapher {
 			}
 		}
 
-		for (BeanConfig kc : dependencyManager.getBeanConfigs(Kernel.class)) {
+		for (BeanConfig kc : dependencyManager.getBeanConfigs(Kernel.class, null)) {
 			Kernel ki = kernel.getInstance(kc.getBeanName());
 			structureSB.append("subgraph ").append("cluster_").append(ki.hashCode()).append(" {\n");
 			structureSB.append("label=").append("\"").append(ki.getName()).append("\"\n");

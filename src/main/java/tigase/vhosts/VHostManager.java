@@ -26,9 +26,15 @@ package tigase.vhosts;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.cluster.repo.ClusterRepoItem;
 import tigase.conf.ConfigurationException;
+import tigase.db.DBInitException;
+import tigase.db.DataSource;
+import tigase.db.DataSourceHelper;
 import tigase.db.TigaseDBException;
+import tigase.db.comp.AbstractMDComponentRepositoryBean;
 import tigase.db.comp.ComponentRepository;
+import tigase.db.comp.ComponentRepositoryDataSourceAware;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.RegistrarBean;
@@ -37,10 +43,12 @@ import tigase.server.AbstractComponentRegistrator;
 import tigase.server.ServerComponent;
 import tigase.stats.StatisticsContainer;
 import tigase.stats.StatisticsList;
+import tigase.util.ReflectionHelper;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
 import javax.script.Bindings;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
@@ -137,6 +145,16 @@ public class VHostManager
 	@Override
 	public void removeComponentDomain(String domain) {
 		registeredComponentDomains.remove(domain);
+	}
+
+	@Override
+	public void register(Kernel kernel) {
+
+	}
+
+	@Override
+	public void unregister(Kernel kernel) {
+
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -411,14 +429,20 @@ public class VHostManager
 		return repo;
 	}
 
-	@Override
-	public void register(Kernel kernel) {
-		kernel.registerBean("vhostRepository").asClass(VHostJDBCRepository.class).exec();
-	}
+	@Bean(name = "vhostRepository", parent = VHostManager.class)
+	public static class DefVHostRepositoryBean extends AbstractMDComponentRepositoryBean<VHostItem> {
 
-	@Override
-	public void unregister(Kernel kernel) {
+		private ComponentRepository<ClusterRepoItem> repo = null;
 
+		private static DataSourceHelper.Matcher matcher = (Class clazz) -> {
+			return ReflectionHelper.classMatchesClassWithParameters(clazz, ComponentRepositoryDataSourceAware.class, new Type[] { VHostItem.class, DataSource.class });
+		};
+
+		@Override
+		protected Class<? extends ComponentRepositoryDataSourceAware<VHostItem, DataSource>> findClassForDataSource(DataSource dataSource) throws DBInitException {
+			Class cls = DataSourceHelper.getDefaultClass(ComponentRepository.class, dataSource.getResourceUri(), matcher);
+			return (Class<ComponentRepositoryDataSourceAware<VHostItem, DataSource>>) cls;
+		}
 	}
 }
 

@@ -26,6 +26,7 @@ import tigase.kernel.KernelException;
 import tigase.kernel.beans.*;
 import tigase.kernel.beans.config.BeanConfigurator;
 import tigase.kernel.core.BeanConfig.State;
+import tigase.util.ReflectionHelper;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -264,7 +265,8 @@ public class Kernel {
 
 	@SuppressWarnings("unchecked")
 	protected <T> T getInstance(Class<T> beanClass, boolean allowNonExportable) {
-		final List<BeanConfig> bcs = dependencyManager.getBeanConfigs(beanClass, allowNonExportable);
+		//TODO - check if null should be passed here
+		final List<BeanConfig> bcs = dependencyManager.getBeanConfigs(beanClass, null, allowNonExportable);
 
 		if (bcs.size() > 1)
 			throw new KernelException("Too many beans implemented class " + beanClass);
@@ -346,7 +348,7 @@ public class Kernel {
 	 */
 	public Collection<String> getNamesOf(Class<?> beanType) {
 		ArrayList<String> result = new ArrayList<String>();
-		List<BeanConfig> bcs = dependencyManager.getBeanConfigs(beanType);
+		List<BeanConfig> bcs = dependencyManager.getBeanConfigs(beanType, null);
 		for (BeanConfig beanConfig : bcs) {
 			result.add(beanConfig.getBeanName());
 		}
@@ -454,7 +456,7 @@ public class Kernel {
 		} else if (dep.getType() != null) {
 			Class<?> type = dep.getType();
 			if (Collection.class.isAssignableFrom(type)) {
-				type = dep.getSubType();
+				type = ReflectionHelper.getCollectionParamter(dep.getGenericType());
 			}
 			Object[] z = (Object[]) Array.newInstance(type, 1);
 			d = dataToInject.toArray(z);
@@ -689,6 +691,9 @@ public class Kernel {
 		if (log.isLoggable(Level.FINER))
 			log.finer("[" + getName() + "] Unregistering bean " + beanName);
 		BeanConfig unregisteredBeanConfig = dependencyManager.getBeanConfig(beanName);
+		// bean can be unregistered already
+		if (unregisteredBeanConfig == null)
+			return;
 		if (unregisteredBeanConfig.getKernel() != this) {
 			unregisteredBeanConfig.getKernel().unregister(beanName);
 			return;

@@ -28,7 +28,6 @@ package tigase.cluster.repo;
 
 import tigase.db.DBInitException;
 import tigase.db.comp.ConfigRepository;
-
 import tigase.sys.ShutdownHook;
 import tigase.sys.TigaseRuntime;
 import tigase.util.DNSResolverFactory;

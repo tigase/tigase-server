@@ -21,14 +21,14 @@
  */
 package tigase.util;
 
+import tigase.kernel.BeanUtils;
+
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Collection;
-import tigase.kernel.BeanUtils;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Utility class with useful methods to work with reflections
@@ -80,6 +80,70 @@ public class ReflectionHelper {
 		
 		Type type = actualTypeArguments[0];
 		return (type instanceof Class) ? (Class) type : null;
+	}
+
+	public static Class getCollectionParamter(Type genericType) {
+		if (genericType instanceof ParameterizedType) {
+			return (Class) ((ParameterizedType) genericType).getActualTypeArguments()[0];
+		}
+		return null;
+	}
+
+	public static boolean classMatchesClassWithParameters(Class clazz, Class rt, Type[] ap) {
+		Map<TypeVariable<?>, Type> map = createGenericsTypeMap(clazz);
+		TypeVariable<?>[] tvs = rt.getTypeParameters();
+		boolean match = true;
+		for (int i = 0; i < tvs.length; i++) {
+			Type t = tvs[i];
+			while (map.containsKey(t)) {
+				t = map.get(t);
+			}
+			match &= ap[i].equals(t) || (ap[i] instanceof Class && t instanceof Class && ((Class) ap[i]).isAssignableFrom((Class) t));
+		}
+		return match;
+	}
+
+	public static boolean classMatchesType(Class clazz, Type required) {
+		if(required instanceof ParameterizedType) {
+			ParameterizedType pt = (ParameterizedType) required;
+			Class rt = (Class) pt.getRawType();
+			Type[] ap = pt.getActualTypeArguments();
+			return classMatchesClassWithParameters(clazz, rt, ap);
+		} else if (required instanceof Class) {
+			return ((Class) required).isAssignableFrom(clazz);
+		}
+		return false;
+	}
+
+	private static Map<TypeVariable<?>, Type> createGenericsTypeMap(Class<?> cls) {
+		Map<TypeVariable<?>, Type> map = new HashMap<>();
+		createGenericsTypeMap(map, cls.getGenericInterfaces());
+		Type genericType = cls.getGenericSuperclass();
+		Class<?> type = cls.getSuperclass();
+		while (type != null && !Object.class.equals(type)) {
+			if (genericType instanceof ParameterizedType)
+				createGenericsTypeMap(map, (ParameterizedType) genericType);
+			createGenericsTypeMap(map, type.getGenericInterfaces());
+			genericType = type.getGenericSuperclass();
+			type = type.getSuperclass();
+		}
+		return map;
+	}
+
+	private static void createGenericsTypeMap(Map<TypeVariable<?>, Type> map, Type[] ifcs) {
+		for (Type ifc : ifcs) {
+			if (ifc instanceof ParameterizedType)
+				createGenericsTypeMap(map, (ParameterizedType) ifc);
+		}
+	}
+
+
+	private static void createGenericsTypeMap(Map<TypeVariable<?>, Type> map, ParameterizedType type) {
+		TypeVariable<?>[] tvs = ((Class) type.getRawType()).getTypeParameters();
+		Type[] ap = type.getActualTypeArguments();
+		for (int i=0; i<tvs.length; i++) {
+			map.put(tvs[i], ap[i]);
+		}
 	}
 
 }

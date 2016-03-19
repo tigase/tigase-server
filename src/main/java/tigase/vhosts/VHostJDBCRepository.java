@@ -27,14 +27,15 @@ package tigase.vhosts;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.DBInitException;
+import tigase.db.DataSource;
+import tigase.db.Repository;
+import tigase.db.comp.ComponentRepositoryDataSourceAware;
 import tigase.db.comp.UserRepoRepository;
-
-import tigase.xmpp.BareJID;
-
 import tigase.util.DNSEntry;
 import tigase.util.DNSResolverFactory;
 import tigase.util.DNSResolverIfc;
 import tigase.util.TigaseStringprepException;
+import tigase.xmpp.BareJID;
 
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -61,8 +62,10 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @since Nov 29, 2008 2:32:48 PM
  */
+@Repository.Meta( supportedUris = { ".*" }, isDefault = true)
 public class VHostJDBCRepository
-				extends UserRepoRepository<VHostItem> {
+				extends UserRepoRepository<VHostItem>
+				implements ComponentRepositoryDataSourceAware<VHostItem,DataSource> {
 	/**
 	 * Configuration option allowing specify default IP to which VHost should resolve
 	 * vhost-man/dns-def-ip=
@@ -273,6 +276,11 @@ public class VHostJDBCRepository
 			Logger.getLogger(VHostJDBCRepository.class.getName()).log(Level.SEVERE, null, ex);
 		}
 		System.out.println("repo.validateItem( domain ) :: " + repo.validateItem(domain));
+	}
+
+	@Override
+	public void setDataSource(DataSource dataSource) {
+		// this is needed as it is required by interface
 	}
 }
 
