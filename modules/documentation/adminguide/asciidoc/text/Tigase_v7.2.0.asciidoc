@@ -1,0 +1,22 @@
+[[tigase720]]
+Tigase v7.2.0 announcement
+==========================
+:author: Daniel Wisnewski
+:date: 2015-25-08 22:09
+
+Tigase v7.2.0 Changenotes and announcement
+
+:toc:
+
+Major Changes
+-------------
+
+Cluster Node Shutdown Changes
+-----------------------------
+Starting with Tigase v7.2.0, users connected on clustered nodes will be able use a +see-other-host+ strategy when a node is being shutdown.  *Note: This may not be compatible with all clients.*
+The Ad-hoc command is designed for a graceful shutdown of cluster nodes as a groovy script Shutdown.groovy.
+This script also allows for the -timeout setting which will delay shutdown of the node, and alert all users (via a headline message) that the server will be shutdown after a time.  User clients that are compatible with the command will then detect other connected clusters and maintain their connections.
+
+If the command is being sent to shut down the whole cluster, no +see-other-host+ implementation will be sent, however -timeout settings may still be used.
+
+The script may be activated by an ad-hoc command, or sent using REST from remote or Tigase Admin UI.

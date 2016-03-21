@@ -1,6 +1,6 @@
 = Tigase Administration Guide
 Tigase Team <team@tigase.net>
-v7.0.0
+v7.2.0
 :numbered:
 :website: http://tigase.net
 :Date: 2014-07-10
@@ -10,7 +10,7 @@ Welcome to the Tigase Administration Guide.
 
 :leveloffset: 1
 
-include::text/Tigase_v7.1.0.asciidoc[]
+include::text/Tigase_v7.2.0.asciidoc[]
 
 include::text/Admin_Guide_01_-_About_Tigase_Jabber_XMPP_Server.asciidoc[]
 
