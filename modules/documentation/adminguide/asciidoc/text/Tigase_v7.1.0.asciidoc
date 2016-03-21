@@ -206,6 +206,10 @@ Cluster Map implemented
 ~~~~~~~~~~~~~~~~~~~~~~~
 Tigase can now generate cluster maps through a new API.  See the development guide for a description of the API.
 
+New Licensing Procedures
+~~~~~~~~~~~~~~~~~~~~~~~~
+With the release of Tigase XMPP server v7.1.0, our licensing procedures have changed.  For more information about how to obtain, retain, and install your license, please see xref:licenseserver[this section].
+
 Message Archive expanded to include non-body elements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Message Archive can now be configured to store messages that may not have body element, or other message types using the following line from init.properties:

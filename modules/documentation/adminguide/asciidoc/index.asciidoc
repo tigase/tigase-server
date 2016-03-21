@@ -288,3 +288,5 @@ include::text/Admin_Guide_97_-_Using_Tigase_-_L_-_Scripting_Support_in_Tigase_-_
 include::text/Admin_Guide_98_-_Using_Tigase_-_M_-_Configuration_Wizards.asciidoc[]
 
 include::text/Admin_Guide_99_-_Using_Tigase_-_N_-_Offline_Messages.asciidoc[]
+
+include::text/Admin_Guide_100_-_Using_Tigase_-_O_-_Licensing.asciidoc[]
