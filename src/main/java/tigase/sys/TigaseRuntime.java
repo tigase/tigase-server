@@ -2,7 +2,7 @@
  * TigaseRuntime.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
+ * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,38 +24,32 @@
 
 package tigase.sys;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.server.XMPPServer;
 import tigase.server.monitor.MonitorRuntime;
 
+import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
+import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.ThreadMXBean;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.xmpp.BareJID;
 
 /**
  * Created: Feb 19, 2009 12:15:02 PM
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
  */
 public abstract class TigaseRuntime {
-	/** Field description */
 	protected static final long SECOND = 1000;
 	private static final Logger log    = Logger.getLogger(TigaseRuntime.class.getName());
-
-	/** Field description */
 	protected static final long MINUTE = 60 * SECOND;
-
-	/** Field description */
 	protected static final long HOUR = 60 * MINUTE;
 
 	//~--- fields ---------------------------------------------------------------
@@ -68,95 +62,47 @@ public abstract class TigaseRuntime {
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 */
 	protected TigaseRuntime() {
 		List<MemoryPoolMXBean> memPools = ManagementFactory.getMemoryPoolMXBeans();
 
 		for (MemoryPoolMXBean memoryPoolMXBean : memPools) {
 			if (memoryPoolMXBean.getName().toLowerCase().contains("old")) {
 				oldMemPool = memoryPoolMXBean;
-				log.info("Using OldGen memory pool for reporting memory usage.");
+				log.log(Level.INFO, "Using {0} memory pool for reporting memory usage.", memoryPoolMXBean.getName());
 
 				break;
 			}
+		}
+		
+		List<GarbageCollectorMXBean> gcBeans = ManagementFactory.getGarbageCollectorMXBeans();
+		for ( GarbageCollectorMXBean gcBean : gcBeans ) {
+			log.log( Level.INFO, "Using GC: {0} for pools: {1}",
+							 new Object[] { gcBean.getName(), Arrays.asList( gcBean.getMemoryPoolNames() ) } );
 		}
 	}
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param cpuListener is a <code>CPULoadListener</code>
-	 */
 	public abstract void addCPULoadListener(CPULoadListener cpuListener);
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param memListener is a <code>MemoryChangeListener</code>
-	 */
 	public abstract void addMemoryChangeListener(MemoryChangeListener memListener);
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param onlineReporter is a <code>OnlineJidsReporter</code>
-	 */
 	public abstract void addOnlineJidsReporter(OnlineJidsReporter onlineReporter);
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param hook is a <code>ShutdownHook</code>
-	 */
 	public abstract void addShutdownHook(ShutdownHook hook);
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid is a <code>JID</code>
-	 *
-	 * @return a value of <code>JID[]</code>
-	 */
 	public abstract JID[] getConnectionIdsForJid(JID jid);
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	public int getCPUsNumber() {
 		return cpus;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>ResourceState</code>
-	 */
 	public ResourceState getCPUState() {
 		return ResourceState.GREEN;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	public float getCPUUsage() {
 		long currCputime = -1;
 		long elapsedCpu  = -1;
@@ -176,12 +122,6 @@ public abstract class TigaseRuntime {
 		return cpuUsage;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getDirectMemUsed() {
 		long                   result   = -1;
 		List<MemoryPoolMXBean> memPools = ManagementFactory.getMemoryPoolMXBeans();
@@ -214,12 +154,6 @@ public abstract class TigaseRuntime {
 		return ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getMax();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	public float getHeapMemUsage() {
 		return  getHeapMemMax() == -1 ? -1.0F : (getHeapMemUsed() * 100F) / getHeapMemMax();
 	}
@@ -241,62 +175,26 @@ public abstract class TigaseRuntime {
 		return ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>double</code>
-	 */
 	public double getLoadAverage() {
 		return ManagementFactory.getOperatingSystemMXBean().getSystemLoadAverage();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>ResourceState</code>
-	 */
 	public ResourceState getMemoryState() {
 		return ResourceState.GREEN;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getNonHeapMemMax() {
 		return ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage().getMax();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>float</code>
-	 */
 	public float getNonHeapMemUsage() {
 		return getNonHeapMemMax() == -1 ? -1.0F : (getNonHeapMemUsed() * 100F) / getNonHeapMemMax();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getNonHeapMemUsed() {
 		return ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage().getUsed();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getProcessCPUTime() {
 		long                  result   = 0;
 		OperatingSystemMXBean osMXBean = ManagementFactory.getOperatingSystemMXBean();
@@ -321,42 +219,18 @@ public abstract class TigaseRuntime {
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>int</code>
-	 */
 	public int getThreadsNumber() {
 		return ManagementFactory.getThreadMXBean().getThreadCount();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>TigaseRuntime</code>
-	 */
 	public static TigaseRuntime getTigaseRuntime() {
 		return MonitorRuntime.getMonitorRuntime();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>long</code>
-	 */
 	public long getUptime() {
 		return ManagementFactory.getRuntimeMXBean().getUptime();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	public String getUptimeString() {
 		long uptime  = ManagementFactory.getRuntimeMXBean().getUptime();
 		long days    = uptime / (24 * HOUR);
@@ -397,22 +271,8 @@ public abstract class TigaseRuntime {
 		return sb.toString();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	public abstract boolean hasCompleteJidsInfo();
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param jid is a <code>JID</code>
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	public abstract boolean isJidOnline(JID jid);
 	
 	public abstract boolean isJidOnlineLocally(BareJID jid);

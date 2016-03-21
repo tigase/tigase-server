@@ -16,20 +16,21 @@ Major Changes
 -------------
 Tigase has undergone a few major changes to our code and structure. To continue to use Tigase, a few changes may be needed to be made to your systems.  Please see them below:
 
+HTTP Component renamed
+~~~~~~~~~~~~~~~~~~~~~~
+The HTTP component has been renamed, if you still have the old tigase.rest.RestMessageReciever in your init.properties file, please update the component name to:
+[source,bash]
+-----
+tigase.http.HttpMessageReceiver
+-----
+
 New JDK v8 required
 ~~~~~~~~~~~~~~~~~~~
 As Oracle has dropped support for version 7 of it's Java runtime environment and developer kit, we have moved to version 8 of the JDK.  Furthermore, some new features and fixes for Tigase Server now require the use of JDK v8 or later. Please upgrade your Java packages from link:http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html[this link].
 
-Changes to Datbase Schema
-~~~~~~~~~~~~~~~~~~~~~~~~~
-Database Schema has changed to introduce primary keys column in tig_nodes and tig_pairs tables to help improve database performance.  As a result, the schema for your database will need to be upgraded if you are not starting with a fresh database.
-Please see the xref:tigaseServer71[Schema Upgrade] section for instructions on how to prepare and upgrade your database.  *This will affect all users using v7.1.0 b4129 and later.*
-
-Changes to Pubsub Schema
-~~~~~~~~~~~~~~~~~~~~~~~~
-The PubSub Schema has been streamlined for better resource use, this change affects all users of Tigase.
-To prepare your database for the new schema, first be sure to create a backup!  Then apply the appropriate pubsub schema to your MySQL and it will add the new storage procedure.
-Details on how to accomplish this are found xref:pubSub71[in the schema upgrade guide].
+Changes to Database Schemas
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+Tigase has undergone a number or database schema changes, the current versions being main database schema v7.1 and pubsub schema v3.2.0.  If you are upgrading to v7.1.0 from a previous version of tigase, it is recomended you visit xref:v710notice[this section] in the documentation to prepare your new installation.
 
 Presence Plugin Split
 ~~~~~~~~~~~~~~~~~~~~~
@@ -205,6 +206,10 @@ Cluster Map implemented
 ~~~~~~~~~~~~~~~~~~~~~~~
 Tigase can now generate cluster maps through a new API.  See the development guide for a description of the API.
 
+New Licensing Procedures
+~~~~~~~~~~~~~~~~~~~~~~~~
+With the release of Tigase XMPP server v7.1.0, our licensing procedures have changed.  For more information about how to obtain, retain, and install your license, please see xref:licenseserver[this section].
+
 Message Archive expanded to include non-body elements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Message Archive can now be configured to store messages that may not have body element, or other message types using the following line from init.properties:
@@ -259,6 +264,14 @@ Full XML of last available presence may be saved to repository
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 A more detailed last available presence can now be made from some configuration changes, along with a timestamp before the entire presence stanza is saved to the repository.  More information is available xref:storeFullXMLLastPresence[here].
 
+New Program Defaults
+~~~~~~~~~~~~~~~~~~~~
+Tigase has improved default settings to improve performance.  These include:
+- Increase the number of database connections in relation to the number of available CPUs (factor by 4 by default).
+- Plugins code has been revised.
+- Default thread pools have been increased for better performance.
+- New option added to globally increase thread pool counts +sess-man/sm-threads-factor[I]=1+. Setting increases thread factor by specified factor.
+
 New Minor Features & Behavior Changes
 -------------------------------------
 - Old monitor component depreciated and turned off.
@@ -297,8 +310,14 @@ New Minor Features & Behavior Changes
 - #3609 Added new configuration option for BOSH to disable hostname attribute. xref:tip_1_bosh_in_cluster_mode_without_load_balancer[Details here].
 - link:https://projects.tigase.org/issues/3670[#3670] Hardened mode now uses long DH keys (2048) by default.
 - link:https://projects.tigase.org/issues/3849[#3849] New Roster size limit configurable setting. See info xref:rosterLimit[Here].
-- link:https://projects.tigase.org/issues/3872[#3872] PostgreSQL driver updated to v9.4
+- link:https://projects.tigase.org/issues/3872[#3872] PostgreSQL driver updated to v9.4.
+- link:https://projects.tigase.org/issues/3908[#3908] Logs now print whether components or plugins are depreciated, and recommend configuration settings changes.
 - link:https://projects.tigase.org/issues/3937[#3937] Windows setup given one-click solution to file initialization.
+- link:https://projects.tigase.org/issues/3945[#3945] SSLContextContainer has been replaced with JDKv8 extension version now known as SNISSLContextContainer adding support for SNI of SSL/TLS.
+- link:https://projects.tigase.org/issues/3948[#3948] Tigase PubSub now responds to +disco#info+ requests in line with link:http://xmpp.org/extensions/xep-0060.html#entity-metadata[XEP-0060 - Discover Node Metadata].
+- link:https://projects.tigase.org/issues/3950[#3950] MongoDB driver updated to v2.14.1.
+- #3985 Improved disco#info to return extended results for MUC component as per link:http://xmpp.org/extensions/xep-0128.html[XEP-0128 Service Discovery Extensions].
+- #3986 Added new index for tig_nodes collection in MongoDB Databases.
 
 
 Fixes
@@ -458,6 +477,16 @@ Fixes
 - #3911 Fixed load distribution error between threads that could cause high CPU usage.
 
 - #3931 Fixed error caused by AMP running in clustered installations.
+
+- #3966 Changed type of msg & body columns in muc_history table for SQLServer to prevent loss of special characters.
+
+- #3973 Adjusted throttling settings for S2S and cluster connections.
+
+- #3977 Fixed MUC History to reflect messages from JID of room and not JID of original sender.
+
+- #3984 Fixed distinct usage on large data which causes errors on lookup of PubSub nodes in MongoDB.
+
+- link:https://projects.tigase.org/issues/3970[#3970] Fixed duplication of messages with AMP payload in cluster mode.
 
 - Patch added to fix ConcurrentModificationException in BlockingCommand plugin.
 

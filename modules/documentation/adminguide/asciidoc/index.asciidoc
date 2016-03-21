@@ -20,6 +20,7 @@ include::text/Admin_Guide_08_-_Latest_and_Nightly_Builds.asciidoc[]
 
 include::text/Admin_Guide_02_-_Quick_Start.asciidoc[]
 
+
 :leveloffset: 2
 
 include::text/Admin_Guide_03_-_Quick_Start_-_A_-_Installation_Using_GUI_Installer.asciidoc[]
@@ -101,6 +102,8 @@ include::text/Admin_Guide_28_-_Database_Management.asciidoc[]
 include::text/Admin_Guide_29_-_Database_Management_-_A_-_Database_Preparation.asciidoc[]
 
 :leveloffset: 3
+
+include::text/Admin_Guide_29_-_Database_Management_-_A_-_Database_Preperation_-_1_-_DbSchemaLoader.asciidoc[]
 
 include::text/Admin_Guide_30_-_Database_Management_-_A_-_Database_Preparation_-_1_-_Prepare_the_MySQL_Database_for_Tigase_Server.asciidoc[]
 
@@ -283,3 +286,7 @@ include::text/Admin_Guide_97_-_Using_Tigase_-_L_-_Scripting_Support_in_Tigase_-_
 :leveloffset: 2
 
 include::text/Admin_Guide_98_-_Using_Tigase_-_M_-_Configuration_Wizards.asciidoc[]
+
+include::text/Admin_Guide_99_-_Using_Tigase_-_N_-_Offline_Messages.asciidoc[]
+
+include::text/Admin_Guide_100_-_Using_Tigase_-_O_-_Licensing.asciidoc[]

@@ -69,35 +69,44 @@ And now you can update user permission changes in the database:
 -------------------------------------
 mysql> FLUSH PRIVILEGES;
 -------------------------------------
-. Load link:http://server.tigase.org/browser/trunk/database/mysql-schema.sql[database schema] to initialize the Tigase server database space.  First, switch to the database you have just created:
+. Load the proper mysql schema into the database.  Full installations of Tigase will have all the SQL file you need to create and update the database. First, switch to the database you have just created:
 +
 [source,sql]
 -------------------------------------
 mysql> use tigasedb;
 -------------------------------------
 +
-Assuming you run the mysql client in Linux from the Tigase installation directory. If you run the Tigase server all versions below 4.0:
+We are assuming you run the mysql client in Linux from the Tigase installation directory.
 +
 [source,sql]
 -------------------------------------
-mysql> source database/mysql-schema.sql;
+mysql> source database/mysql-7-1-schema.sql;
 -------------------------------------
 +
-For the Tigase server version 4.x you have to use proper schema version:
-+
-[source,sql]
--------------------------------------
-mysql> source database/mysql-schema-4.sql;
--------------------------------------
-+
-On Windows you have probably to enter the full path:
+For the Tigase server version v7.1.0 you have to use proper schema version which is 5.1.  You will also need to manually load the PubSub schema as well, current version is v3.2.0.  All modern versions will load previous schemas first so no need to do a manual upgrade.
 +
 [source,sql]
 -------------------------------------
-mysql> source c:/Program Files/Tigase/database/mysql-schema.sql;
+mysql> source database/mysql-pubsub-schema-3.2.0.sql;
 -------------------------------------
 +
-The initialization schema file should be also available locally in database/ directory of your Tigase installation.
+If you plan to use the Socks5 component, you will also need to add that schema as well.
++
+[source,sql]
+-------------------------------------
+mysql> source database/mysql-socks5-schema.sql;
+-------------------------------------
++
+On Windows you have probably to enter the full path, assuming Tigase is installed in C:\Program Files\Tigase:
++
+[source,sql]
+-------------------------------------
+mysql> source c:/Program Files/Tigase/database/mysql-7-1-schema.sql;
+mysql> source c:/Program Files/Tigase/database/mysql-pubsub-schema-3.2.0.sql;
+mysql> source c:/Program Files/Tigase/database/mysql-socks5-schema.sql;
+-------------------------------------
++
+
 
 Configuring From the Linux Shell Command Line
 ---------------------------------------------
@@ -131,17 +140,18 @@ echo "GRANT ALL ON tigasedb.* TO tigase_user \
             IDENTIFIED BY 'tigase_passwd'; \
             FLUSH PRIVILEGES;" | mysql -u root -pdbpass mysql
 -------------------------------------
-. Load link:http://server.tigase.org/browser/trunk/database/mysql-schema.sql[database schema] to initialize the Tigase server (version below 4.0) database space:
+. Load the proper mysql schema into the database.  Full installations of Tigase will have all the SQL file you need to create and update the database.
 [source,sql]
 -------------------------------------
-mysql -u dbuser -p tigasedb < mysql-schema.sql
+mysql -u dbuser -p tigasedb < mysql-schema-7-1.sql
+mysql -u dbuser -p tigasedb < mysql-pubsub-schema-3.2.0.sql
 -------------------------------------
-For the Tigase server version 4.0 and later:
+
+If you want to use the socks5 component, then oyu will need to include the following line as well:
 [source,sql]
 -------------------------------------
-mysql -u dbuser -p tigasedb < mysql-schema-4.sql
+mysql -u dbuser -p tigasedb < mysql-socks5-schema.sql
 -------------------------------------
-The initialization schema file should be also available locally in database/ directory of your Tigase installation.
 
 Configuring MySQL for UTF-8 Support
 -----------------------------------
