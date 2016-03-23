@@ -18,24 +18,23 @@
  */
 package tigase.server.xmppclient;
 
-import tigase.db.DBInitException;
-import tigase.db.DataRepository;
-import tigase.db.RepositoryFactory;
-import tigase.db.UserNotFoundException;
+import tigase.db.Repository;
 
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
+import tigase.osgi.ModulesManagerImpl;
 import tigase.util.TigaseStringprepException;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static tigase.server.xmppclient.SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_KEY;
 
 /**
  * Extended implementation of SeeOtherHost using redirect information from
@@ -46,36 +45,23 @@ public class SeeOtherHostDualIP extends SeeOtherHostHashed {
 
 	private static final Logger log = Logger.getLogger( SeeOtherHostDualIP.class.getName() );
 
-	public static final String CLUSTER_NODES_TABLE = "cluster_nodes";
 	public static final String SEE_OTHER_HOST_FALLBACK_REDIRECTION_KEY
 														 = CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "fallback-redirection-host";
-	public static final String SEE_OTHER_HOST_DB_URL_KEY
-														 = CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "db-url";
-	public static final String SEE_OTHER_HOST_DB_QUERY_KEY
-														 = CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "get-host-query";
-	public static final String DB_GET_ALL_DATA_DB_QUERY_KEY
-														 = CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "get-all-data-query";
-	public static final String GET_ALL_QUERY_TIMEOUT_QUERY_KEY
-														 = CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "get-all-query-timeout";
 
-	public static final String HOSTNAME_ID = "hostname";
-	public static final String SECONDARY_HOSTNAME_ID = "secondary";
-
-	public static final String DEF_DB_GET_HOST_QUERY = " select * from " + CLUSTER_NODES_TABLE
-																										 + " where " + CLUSTER_NODES_TABLE + "." + HOSTNAME_ID + " = ?";
-
-	private static final String DEF_DB_GET_ALL_DATA_QUERY = "select * from " + CLUSTER_NODES_TABLE;
-
-	private static final int DEF_QUERY_TIME_OUT = 10;
-
-	private String get_host_query = DEF_DB_GET_HOST_QUERY;
-	private String get_all_data_query = DEF_DB_GET_ALL_DATA_QUERY;
-	private String get_host_DB_url = "";
 	private BareJID fallback_host = null;
 
-	private int query_timeout = DEF_QUERY_TIME_OUT;
+	public static final String SEE_OTHER_HOST_DATA_SOURCE_KEY
+														 = CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "data-source";
+	public static final String SEE_OTHER_HOST_DATA_SOURCE_VALUE
+														 = SeeOtherHostDualIPSQLRepository.class.getName();
 
-	private DataRepository data_repo = null;
+	public static final String SEE_OTHER_HOST_DB_URL_KEY
+														 = CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "db-url";
+
+	protected String get_host_DB_url = "";
+
+	private DualIPRepository repo = null;
+
 	private final Map<BareJID, BareJID> redirectsMap = new ConcurrentSkipListMap<BareJID, BareJID>();
 
 	@Override
@@ -88,12 +74,8 @@ public class SeeOtherHostDualIP extends SeeOtherHostHashed {
 		BareJID redirection = redirectsMap.get( see_other_host );
 
 		if ( redirection == null ){
-			try {
-				// let's try querying the table again
-				queryDB( see_other_host );
-			} catch ( SQLException | TigaseStringprepException ex ) {
-				log.log( Level.SEVERE, "Redirection DB lookup failed", ex );
-			}
+			// let's try querying the table again
+			reloadRedirection();
 		}
 
 		if ( redirection == null && fallback_host != null ){
@@ -105,6 +87,14 @@ public class SeeOtherHostDualIP extends SeeOtherHostHashed {
 	}
 
 	@Override
+	public void setNodes( List<JID> connectedNodes ) {
+		super.setNodes( connectedNodes );
+
+		reloadRedirection();
+
+	}
+
+	@Override
 	public void getDefaults( Map<String, Object> defs, Map<String, Object> params ) {
 		super.getDefaults( defs, params );
 
@@ -113,17 +103,12 @@ public class SeeOtherHostDualIP extends SeeOtherHostHashed {
 		} else if ( params.containsKey( "--" + SEE_OTHER_HOST_DB_URL_KEY ) ){
 			get_host_DB_url = (String) params.get( "--" + SEE_OTHER_HOST_DB_URL_KEY );
 		}
+		defs.put( SEE_OTHER_HOST_DB_URL_KEY, get_host_DB_url );
 
-		if ( params.containsKey( "--" + SEE_OTHER_HOST_DB_QUERY_KEY ) ){
-			get_host_query = (String) params.get( "--" + SEE_OTHER_HOST_DB_QUERY_KEY );
-		}
-
-		if ( params.containsKey( "--" + DB_GET_ALL_DATA_DB_QUERY_KEY ) ){
-			get_all_data_query = (String) params.get( "--" + DB_GET_ALL_DATA_DB_QUERY_KEY );
-		}
-
-		if ( params.containsKey( "--" + GET_ALL_QUERY_TIMEOUT_QUERY_KEY ) ){
-			query_timeout = Integer.parseInt( (String) params.get( "--" + GET_ALL_QUERY_TIMEOUT_QUERY_KEY ) );
+		if ( params.containsKey( "--" + SEE_OTHER_HOST_DATA_SOURCE_KEY ) ){
+			defs.put( SEE_OTHER_HOST_DATA_SOURCE_KEY, params.get( "--" + SEE_OTHER_HOST_DATA_SOURCE_KEY ) );
+		} else {
+			defs.put( SEE_OTHER_HOST_DATA_SOURCE_KEY, SEE_OTHER_HOST_DATA_SOURCE_VALUE );
 		}
 
 		if ( params.containsKey( "--" + SEE_OTHER_HOST_FALLBACK_REDIRECTION_KEY ) ){
@@ -137,52 +122,11 @@ public class SeeOtherHostDualIP extends SeeOtherHostHashed {
 			}
 		}
 
-		defs.put( SEE_OTHER_HOST_DB_URL_KEY, get_host_DB_url );
-		defs.put( SEE_OTHER_HOST_DB_QUERY_KEY, get_host_query );
-		defs.put( DB_GET_ALL_DATA_DB_QUERY_KEY, get_all_data_query );
-		defs.put( GET_ALL_QUERY_TIMEOUT_QUERY_KEY, query_timeout );
-	}
-
-	@Override
-	public void setNodes( List<JID> connectedNodes ) {
-		super.setNodes( connectedNodes );
-
-		// reload redirections from
-		try {
-			queryAllDB();
-		} catch ( Exception ex ) {
-			log.log( Level.SEVERE, "Reloading redirection items failed: ", ex );
-		}
-
 	}
 
 	@Override
 	public void setProperties( Map<String, Object> props ) {
 		super.setProperties( props );
-
-		if ( ( props.containsKey( SEE_OTHER_HOST_DB_URL_KEY ) )
-				 && !props.get( SEE_OTHER_HOST_DB_URL_KEY ).toString().trim().isEmpty() ){
-			get_host_DB_url = props.get( SEE_OTHER_HOST_DB_URL_KEY ).toString().trim();
-		}
-		props.put( SEE_OTHER_HOST_DB_URL_KEY, get_host_DB_url );
-
-		if ( ( props.containsKey( SEE_OTHER_HOST_DB_QUERY_KEY ) )
-				 && !props.get( SEE_OTHER_HOST_DB_QUERY_KEY ).toString().trim().isEmpty() ){
-			get_host_query = props.get( SEE_OTHER_HOST_DB_QUERY_KEY ).toString().trim();
-		}
-		props.put( SEE_OTHER_HOST_DB_QUERY_KEY, get_host_query );
-
-		if ( ( props.containsKey( DB_GET_ALL_DATA_DB_QUERY_KEY ) )
-				 && !props.get( DB_GET_ALL_DATA_DB_QUERY_KEY ).toString().trim().isEmpty() ){
-			get_all_data_query = props.get( DB_GET_ALL_DATA_DB_QUERY_KEY ).toString().trim();
-		}
-		props.put( DB_GET_ALL_DATA_DB_QUERY_KEY, get_all_data_query );
-
-		if ( ( props.containsKey( GET_ALL_QUERY_TIMEOUT_QUERY_KEY ) )
-				 && !props.get( GET_ALL_QUERY_TIMEOUT_QUERY_KEY ).toString().trim().isEmpty() ){
-			query_timeout = Integer.parseInt( props.get( GET_ALL_QUERY_TIMEOUT_QUERY_KEY ).toString().trim() );
-		}
-		props.put( GET_ALL_QUERY_TIMEOUT_QUERY_KEY, query_timeout );
 
 		if ( ( props.containsKey( SEE_OTHER_HOST_FALLBACK_REDIRECTION_KEY ) )
 				 && !props.get( SEE_OTHER_HOST_FALLBACK_REDIRECTION_KEY ).toString().trim().isEmpty() ){
@@ -197,96 +141,43 @@ public class SeeOtherHostDualIP extends SeeOtherHostHashed {
 			}
 		}
 
+		if ( ( props.containsKey( SEE_OTHER_HOST_DB_URL_KEY ) )
+				 && !props.get( SEE_OTHER_HOST_DB_URL_KEY ).toString().trim().isEmpty() ){
+			get_host_DB_url = props.get( SEE_OTHER_HOST_DB_URL_KEY ).toString().trim();
+		}
+		props.put( SEE_OTHER_HOST_DB_URL_KEY, get_host_DB_url );
+
+		String repo_class = (String) props.getOrDefault( SEE_OTHER_HOST_DATA_SOURCE_KEY, SEE_OTHER_HOST_DATA_SOURCE_VALUE );
+
 		try {
-			initRepository( get_host_DB_url, null );
+			Class<?> cls = null;
+			if ( repo_class != null && "eventbus".equals( repo_class.trim().toLowerCase() ) ){
+			} else {
+				cls = ModulesManagerImpl.getInstance().forName( repo_class );
+			}
+
+			if ( null != cls ){
+
+				DualIPRepository repoTmp = (DualIPRepository) cls.newInstance();
+
+				if ( repo == null ){
+					repo = repoTmp;
+				}
+
+				repo.setProperties( props );
+
+				repo.initRepository( get_host_DB_url, null );
+
+				reloadRedirection();
+			} else {
+
+				// we are going to use eventbus!!!!
+//				register handler
+			}
+
 		} catch ( Exception ex ) {
 			log.log( Level.SEVERE, "Cannot initialize connection to database: ", ex );
 		}
-	}
-
-	public void initRepository( String conn_str, Map<String, String> map )
-			throws SQLException, ClassNotFoundException, IllegalAccessException,
-						 InstantiationException, DBInitException {
-
-		log.log( Level.INFO, "Initializing dbAccess for db connection url: {0}", conn_str );
-		data_repo = RepositoryFactory.getDataRepository( null, conn_str, map );
-
-		checkDB();
-
-		data_repo.initPreparedStatement( get_host_query, get_host_query );
-		data_repo.initPreparedStatement( get_all_data_query, get_all_data_query );
-		queryAllDB();
-	}
-
-	/**
-	 * Performs database check
-	 *
-	 * @throws SQLException
-	 */
-	private void checkDB() throws SQLException {
-		if ( !data_repo.checkTable( CLUSTER_NODES_TABLE ) ){
-			throw new SQLException( "Nodes redirection table doesn't exits!" );
-		}
-	}
-
-	private BareJID queryDB( BareJID hostname_jid ) throws SQLException,
-																												 TigaseStringprepException {
-
-		PreparedStatement get_host = data_repo.getPreparedStatement( hostname_jid, get_host_query );
-
-		ResultSet rs = null;
-
-		synchronized ( get_host ) {
-			try {
-				get_host.setString( 1, hostname_jid.toString() );
-
-				rs = get_host.executeQuery();
-
-				if ( rs.next() ){
-					final BareJID secondary_jid = BareJID.bareJIDInstance( rs.getString( SECONDARY_HOSTNAME_ID ) );
-					redirectsMap.put( hostname_jid, secondary_jid );
-					return secondary_jid;
-				} else {
-					return null;
-				}
-			} finally {
-				data_repo.release( null, rs );
-			}
-		}
-	}
-
-	private void queryAllDB() throws SQLException {
-
-		if ( data_repo == null ){
-			return;
-		}
-
-		PreparedStatement get_all = data_repo.getPreparedStatement( null, get_all_data_query );
-		get_all.setQueryTimeout( DEF_QUERY_TIME_OUT );
-
-		ResultSet rs = null;
-
-		synchronized ( get_all ) {
-			try {
-				rs = get_all.executeQuery();
-
-				while ( rs.next() ) {
-					String user_jid = rs.getString( HOSTNAME_ID );
-					String node_jid = rs.getString( SECONDARY_HOSTNAME_ID );
-					try {
-						BareJID hostname_hid = BareJID.bareJIDInstance( user_jid );
-						BareJID secondary = BareJID.bareJIDInstance( node_jid );
-						redirectsMap.put( hostname_hid, secondary );
-					} catch ( TigaseStringprepException ex ) {
-						log.warning( "Invalid host or secondary hostname JID: " + user_jid + ", " + node_jid );
-					}
-				}
-			} finally {
-				data_repo.release( null, rs );
-			}
-		}
-
-		log.info( "Loaded " + redirectsMap.size() + " redirect definitions from database." );
 	}
 
 	@Override
@@ -294,6 +185,36 @@ public class SeeOtherHostDualIP extends SeeOtherHostHashed {
 		return redirectsMap.get( defaultHost ) != null
 					 ? !redirectsMap.get( defaultHost ).equals( redirectionHost )
 					 : false;
+	}
+
+	protected void reloadRedirection() {
+		// reload redirections from
+		if ( null == repo ){
+			return;
+		}
+		try {
+			final Map<BareJID, BareJID> queryAllDB = repo.queryAllDB();
+			if ( null != queryAllDB ){
+				redirectsMap.clear();
+				redirectsMap.putAll( queryAllDB );
+				log.log( Level.ALL, "Reloaded redirection items: " + Arrays.asList( redirectsMap ) );
+			}
+		} catch ( Exception ex ) {
+			log.log( Level.SEVERE, "Reloading redirection items failed: ", ex );
+		}
+	}
+
+	public interface DualIPRepository extends Repository {
+
+		public static final String HOSTNAME_ID = "hostname";
+		public static final String SECONDARY_HOSTNAME_ID = "secondary";
+
+		Map<BareJID, BareJID> queryAllDB() throws SQLException;
+
+		void setProperties( Map<String, Object> props );
+
+		void getDefaults( Map<String, Object> defs, Map<String, Object> params );
+
 	}
 
 }
