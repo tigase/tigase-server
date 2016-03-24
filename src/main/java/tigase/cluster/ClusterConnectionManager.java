@@ -27,6 +27,7 @@ package tigase.cluster;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.cluster.api.ClusterConnectionHandler;
+
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -87,6 +88,9 @@ import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.XMPPIOService;
+
+import tigase.disteventbus.EventBus;
+import tigase.disteventbus.EventBusFactory;
 
 /**
  * Class ClusterConnectionManager
@@ -181,10 +185,25 @@ public class ClusterConnectionManager
 	private static final String SERVICE_CONNECTED_TASK_FUTURE =
 			"service-connected-task-future";
 
+	public final static String REPO_ITEM_EVENT_NAME = "repo-item-modified";
+	public final static String EVENTBUS_REPO_ITEM_EVENT_XMLNS = "tigase:system:cluster-update";
+	private EventBus eventBus = null;
+
+	public final static String EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_KEY = "eventbus-repository-notifications";
+	public final static boolean EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_VALUE = false;
+
+
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
 	private ClusterControllerIfc clusterController = null;
+
+	public static enum REPO_ITEM_UPDATE_TYPE {
+		ADDED,
+		UPDATED,
+		REMOVED
+	}
+
 
 	// private String cluster_controller_id = null;
 	private IOServiceStatisticsGetter                                ioStatsGetter =
@@ -314,15 +333,20 @@ public class ClusterConnectionManager
 				addWaitingTask(port_props);
 			}
 
+			sendEvent( REPO_ITEM_UPDATE_TYPE.ADDED, repoItem.getHostname(), repoItem.getSecondaryHostname() );
 			// reconnectService(port_props, connectionDelay);
 		}
 	}
 
 	@Override
-	public void itemRemoved(ClusterRepoItem item) {}
+	public void itemRemoved(ClusterRepoItem item) {
+		sendEvent( REPO_ITEM_UPDATE_TYPE.REMOVED, item.getHostname(), item.getSecondaryHostname() );
+	}
 
 	@Override
-	public void itemUpdated(ClusterRepoItem item) {}
+	public void itemUpdated(ClusterRepoItem item) {
+		sendEvent( REPO_ITEM_UPDATE_TYPE.UPDATED, item.getHostname(), item.getSecondaryHostname() );
+	}
 
 	@Override
 	public void nodeConnected(String node) {
@@ -724,6 +748,8 @@ public class ClusterConnectionManager
 		props.put(WATCHDOG_TIMEOUT, -1 * SECOND);
 		
 		props.put(CLUSTER_CONNECTIONS_SELECTOR_KEY, DEF_CLUSTER_CONNECTIONS_SELECTOR_VAL);
+
+		props.put(EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_KEY, EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_VALUE);
 		
 		if (getDefHostName().toString().equalsIgnoreCase( "localhost") ) {
 			TigaseRuntime.getTigaseRuntime().shutdownTigase( new String [] {
@@ -860,10 +886,45 @@ public class ClusterConnectionManager
 		if (props.get(ELEMENTS_NUMBER_LIMIT_PROP_KEY) != null) {
 			elements_number_limit = (Integer) props.get(ELEMENTS_NUMBER_LIMIT_PROP_KEY);
 		}
+
+		if (props.get(EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_KEY) != null) {
+			boolean eventbus_enabled = (Boolean) props.get(EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_KEY);
+			if (eventbus_enabled) {
+				eventBus = EventBusFactory.getInstance();
+			}
+		}
+
+
+
 		super.setProperties(props);
 	}
 
 	//~--- methods --------------------------------------------------------------
+	private void sendEvent( REPO_ITEM_UPDATE_TYPE action, String hostname, String secondary ) {
+
+		// either RepositoryItem was wrong or EventBus is not enabled - skiping broadcasting the event;
+		if ( eventBus == null || hostname == null ){
+			return;
+		}
+
+		Element event = new Element( REPO_ITEM_EVENT_NAME, new String[] { "xmlns" },
+																 new String[] { EVENTBUS_REPO_ITEM_EVENT_XMLNS } );
+		event.setAttribute( "local", "true" );
+		Element repoItem = new Element( "repo-item" );
+		{
+			repoItem.setAttribute( "action", action.name() );
+			repoItem.addAttribute( "hostname", hostname );
+			repoItem.addAttribute( "secondary", ( null != secondary ? secondary : "" ) );
+		}
+		event.addChild( repoItem );
+
+		if ( log.isLoggable( Level.FINEST ) ){
+			log.log( Level.FINEST, "Sending event: " + event );
+		}
+
+		eventBus.fire( event );
+
+	}
 
 	/**
 	 * Method description

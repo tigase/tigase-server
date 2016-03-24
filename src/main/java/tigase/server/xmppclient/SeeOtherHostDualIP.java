@@ -18,22 +18,32 @@
  */
 package tigase.server.xmppclient;
 
+import tigase.cluster.ClusterConnectionManager.REPO_ITEM_UPDATE_TYPE;
+
 import tigase.db.Repository;
+import tigase.db.RepositoryFactory;
 
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
+import tigase.disteventbus.EventBus;
+import tigase.disteventbus.EventBusFactory;
+import tigase.disteventbus.EventHandler;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.util.TigaseStringprepException;
+import tigase.xml.Element;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static tigase.cluster.ClusterConnectionManager.EVENTBUS_REPO_ITEM_EVENT_XMLNS;
+import static tigase.cluster.ClusterConnectionManager.REPO_ITEM_EVENT_NAME;
 import static tigase.server.xmppclient.SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_KEY;
 
 /**
@@ -41,7 +51,9 @@ import static tigase.server.xmppclient.SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_P
  * database based on cluster_nodes table.
  *
  */
-public class SeeOtherHostDualIP extends SeeOtherHostHashed {
+public class SeeOtherHostDualIP
+		extends SeeOtherHostHashed
+		implements EventHandler {
 
 	private static final Logger log = Logger.getLogger( SeeOtherHostDualIP.class.getName() );
 
@@ -62,7 +74,9 @@ public class SeeOtherHostDualIP extends SeeOtherHostHashed {
 
 	private DualIPRepository repo = null;
 
-	private final Map<BareJID, BareJID> redirectsMap = new ConcurrentSkipListMap<BareJID, BareJID>();
+	private final Map<BareJID, BareJID> redirectsMap = Collections.synchronizedMap(new HashMap());
+
+	private final EventBus eventBus = EventBusFactory.getInstance();
 
 	@Override
 	public BareJID findHostForJID( BareJID jid, BareJID host ) {
@@ -70,12 +84,14 @@ public class SeeOtherHostDualIP extends SeeOtherHostHashed {
 		// get default host identification
 		BareJID see_other_host = super.findHostForJID( jid, host );
 
-		// lookup resolutio nin redirection map
-		BareJID redirection = redirectsMap.get( see_other_host );
+		// lookup resolution in redirection map
+		BareJID redirection;
+		redirection = redirectsMap.get( see_other_host );
 
 		if ( redirection == null ){
 			// let's try querying the table again
 			reloadRedirection();
+			redirection = redirectsMap.get( see_other_host );
 		}
 
 		if ( redirection == null && fallback_host != null ){
@@ -87,11 +103,65 @@ public class SeeOtherHostDualIP extends SeeOtherHostHashed {
 	}
 
 	@Override
+	public void onEvent( String name, String xmlns, Element event ) {
+
+		Element child = event.getChild( "repo-item" );
+
+		String actionAttr = child.getAttributeStaticStr( "action" );
+		String hostnameStr = child.getAttributeStaticStr( "hostname" );
+		String secondaryStr = child.getAttributeStaticStr( "secondary" );
+
+		if ( log.isLoggable( Level.FINE ) ){
+			log.log( Level.FINE, "Procesing clusterItem event: {0} with action: {1}, hostname: {2}, secondary: {3}",
+							 new Object[] { event, actionAttr, hostnameStr, secondaryStr } );
+		}
+
+		REPO_ITEM_UPDATE_TYPE action;
+		if ( null != actionAttr ){
+			action = REPO_ITEM_UPDATE_TYPE.valueOf( actionAttr );
+		} else {
+			return;
+		}
+
+		BareJID hostname;
+		if ( null != hostnameStr ){
+			hostname = BareJID.bareJIDInstanceNS( hostnameStr );
+		} else {
+			return;
+		}
+
+		BareJID secondary = null;
+		if ( null != secondaryStr && !secondaryStr.trim().isEmpty() ){
+			secondary = BareJID.bareJIDInstanceNS( secondaryStr );
+		}
+
+		BareJID oldItem;
+		switch ( action ) {
+			case ADDED:
+			case UPDATED:
+				oldItem = redirectsMap.put( hostname, secondary );
+				if ( log.isLoggable( Level.FINE ) ){
+					log.log( Level.FINE, "Redirection item :: hostname: {0}, secondary: {1}, added/updated! Replaced: {2}",
+									 new Object[] { hostname, secondary, oldItem } );
+				}
+
+				break;
+
+			case REMOVED:
+				oldItem = redirectsMap.remove( hostname );
+				if ( log.isLoggable( Level.FINE ) ){
+					log.log( Level.FINE, "Redirection item :: hostname: {0}, {1}",
+									 new Object[] { hostname, ( oldItem != null ? "removed" : "was not present in redirection map" ) } );
+				}
+				break;
+		}
+	}
+
+	@Override
 	public void setNodes( List<JID> connectedNodes ) {
 		super.setNodes( connectedNodes );
 
 		reloadRedirection();
-
 	}
 
 	@Override
@@ -107,8 +177,6 @@ public class SeeOtherHostDualIP extends SeeOtherHostHashed {
 
 		if ( params.containsKey( "--" + SEE_OTHER_HOST_DATA_SOURCE_KEY ) ){
 			defs.put( SEE_OTHER_HOST_DATA_SOURCE_KEY, params.get( "--" + SEE_OTHER_HOST_DATA_SOURCE_KEY ) );
-		} else {
-			defs.put( SEE_OTHER_HOST_DATA_SOURCE_KEY, SEE_OTHER_HOST_DATA_SOURCE_VALUE );
 		}
 
 		if ( params.containsKey( "--" + SEE_OTHER_HOST_FALLBACK_REDIRECTION_KEY ) ){
@@ -147,17 +215,26 @@ public class SeeOtherHostDualIP extends SeeOtherHostHashed {
 		}
 		props.put( SEE_OTHER_HOST_DB_URL_KEY, get_host_DB_url );
 
-		String repo_class = (String) props.getOrDefault( SEE_OTHER_HOST_DATA_SOURCE_KEY, SEE_OTHER_HOST_DATA_SOURCE_VALUE );
+		String repo_class = (String) props.get( SEE_OTHER_HOST_DATA_SOURCE_KEY );
 
 		try {
 			Class<?> cls = null;
-			if ( repo_class != null && "eventbus".equals( repo_class.trim().toLowerCase() ) ){
+			if ( null == repo_class ){
+				cls = RepositoryFactory.getRepoClass( DualIPRepository.class, get_host_DB_url );
+			} else if ( "eventbus".equals( repo_class.trim().toLowerCase() ) ){
+				if ( log.isLoggable( Level.CONFIG ) ){
+					log.log( Level.CONFIG, "Using Evenbus as a source of DualIP data" );
+				}
+				eventBus.addHandler( REPO_ITEM_EVENT_NAME, EVENTBUS_REPO_ITEM_EVENT_XMLNS, this );
 			} else {
 				cls = ModulesManagerImpl.getInstance().forName( repo_class );
 			}
 
 			if ( null != cls ){
 
+				if ( log.isLoggable( Level.CONFIG ) ){
+					log.log( Level.CONFIG, "Using {0} class for DualIP repository", cls );
+				}
 				DualIPRepository repoTmp = (DualIPRepository) cls.newInstance();
 
 				if ( repo == null ){
@@ -169,10 +246,6 @@ public class SeeOtherHostDualIP extends SeeOtherHostHashed {
 				repo.initRepository( get_host_DB_url, null );
 
 				reloadRedirection();
-			} else {
-
-				// we are going to use eventbus!!!!
-//				register handler
 			}
 
 		} catch ( Exception ex ) {
@@ -197,7 +270,9 @@ public class SeeOtherHostDualIP extends SeeOtherHostHashed {
 			if ( null != queryAllDB ){
 				redirectsMap.clear();
 				redirectsMap.putAll( queryAllDB );
-				log.log( Level.ALL, "Reloaded redirection items: " + Arrays.asList( redirectsMap ) );
+				if ( log.isLoggable( Level.FINE ) ){
+					log.log( Level.FINE, "Reloaded redirection items: " + Arrays.asList( redirectsMap ) );
+				}
 			}
 		} catch ( Exception ex ) {
 			log.log( Level.SEVERE, "Reloading redirection items failed: ", ex );

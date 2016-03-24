@@ -60,7 +60,7 @@ For `SeeOtherHostDB` implementation there are additional options:
 
 === SeeOtherHostDualIP
 
-This mechanisms matches internal Tigase cluster nodes with against the lookup table to provide matching and relevant redirection hostname/IP.
+This mechanisms matches internal Tigase cluster nodes with against the lookup table to provide matching and relevant redirection hostname/IP. By default internal Tigase `cluster_nodes` table will be used (and appropriate repository implementation will be used).
 
 To enable this redirection mechanism following configuration / class should be used:
 
@@ -77,8 +77,8 @@ It's possible to configure it on per-connection-manager basis
 
 It offers following configuration options:
 
+- `data-source` - configuration of the source of redirection information - by default internal Tigase `cluster_nodes` table will be used (and appropriate repository implementation will be used); alternatively it's possible to use `eventbus` source;
 - `db-url` - a JDBC connection URI which should be used to query redirect information; if not configured `--user-db-uri` will be used;
-- `get-host-query` - a SQL query which should return redirection hostname;
 - `get-all-data-query` - a SQL helper query which should return all redirection data from database;
 - `get-all-query-timeout` - allows to set timeout for executed queries;
 - `fallback-redirection-host` - if there is no redirection information present (i.e. secondary hostname is not configured for the particular node) redirection won't be generated; with this it's possible to configure fallback redirection address.
@@ -88,7 +88,7 @@ All options can be configured either globally (without providing type parameter)
 [source,bash]
 ----
 --cm-see-other-host/db-url=jdbc:<database>://<uri>
---cm-see-other-host/get-host-query= select * from cluster_nodes where cluster_nodes.hostname = ?
+--cm-see-other-host/data-source=<class implementing tigase.server.xmppclient.SeeOtherHostDualIP.DualIPRepository>
 --cm-see-other-host/get-all-data-query=select * from cluster_nodes
 --cm-see-other-host/get-all-query-timeout=10
 --cm-see-other-host/fallback-redirection-host=<hostname>
@@ -98,10 +98,28 @@ or on per-component basis
 [source,bash]
 ----
 <connector>/cm-see-other-host/db-url[S]=jdbc:<database>://<uri>
-<connector>/cm-see-other-host/get-host-query[S]= select * from cluster_nodes where cluster_nodes.hostname = ?
+<connector>/cm-see-other-host/data-source[S]=<class implementing tigase.server.xmppclient.SeeOtherHostDualIP.DualIPRepository>
 <connector>/cm-see-other-host/get-all-data-query[S]=select * from cluster_nodes
 <connector>/cm-see-other-host/get-all-query-timeout[I]=10
 <connector>/cm-see-other-host/fallback-redirection-host[S]=<hostname>
+----
+
+==== EventBus as a source of information
+
+It's possible to utilize EventBus and internal Tigase events as a source of redirection data. In order to do that `eventbus` should be used as a value of `data-source` configuration option. In addition, EventBus events needs to be enabled in ClusterConnectionManager. Example configuration:
+
+[source,bash]
+----
+cl-comp/eventbus-repository-notifications[B]=true
+--cm-see-other-host/data-source=eventbus
+----
+
+or on per-component basis:
+
+[source,bash]
+----
+cl-comp/eventbus-repository-notifications[B]=true
+<connector>/cm-see-other-host/data-source[S]=eventbus
 ----
 
 == Auxiliary setup options
