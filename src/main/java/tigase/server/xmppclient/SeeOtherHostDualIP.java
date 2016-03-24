@@ -19,6 +19,8 @@
 package tigase.server.xmppclient;
 
 import tigase.cluster.ClusterConnectionManager.REPO_ITEM_UPDATE_TYPE;
+import tigase.cluster.repo.ClusterRepoItem;
+import tigase.cluster.repo.ClusterRepoItemEvent;
 
 import tigase.db.Repository;
 import tigase.db.RepositoryFactory;
@@ -26,12 +28,9 @@ import tigase.db.RepositoryFactory;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
-import tigase.disteventbus.EventBus;
-import tigase.disteventbus.EventBusFactory;
-import tigase.disteventbus.EventHandler;
+import tigase.eventbus.HandleEvent;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.util.TigaseStringprepException;
-import tigase.xml.Element;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -42,8 +41,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static tigase.cluster.ClusterConnectionManager.EVENTBUS_REPO_ITEM_EVENT_XMLNS;
-import static tigase.cluster.ClusterConnectionManager.REPO_ITEM_EVENT_NAME;
 import static tigase.server.xmppclient.SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_KEY;
 
 /**
@@ -52,8 +49,7 @@ import static tigase.server.xmppclient.SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_P
  *
  */
 public class SeeOtherHostDualIP
-		extends SeeOtherHostHashed
-		implements EventHandler {
+		extends SeeOtherHostHashed {
 
 	private static final Logger log = Logger.getLogger( SeeOtherHostDualIP.class.getName() );
 
@@ -75,8 +71,6 @@ public class SeeOtherHostDualIP
 	private DualIPRepository repo = null;
 
 	private final Map<BareJID, BareJID> redirectsMap = Collections.synchronizedMap(new HashMap());
-
-	private final EventBus eventBus = EventBusFactory.getInstance();
 
 	@Override
 	public BareJID findHostForJID( BareJID jid, BareJID host ) {
@@ -102,28 +96,19 @@ public class SeeOtherHostDualIP
 		return redirection;
 	}
 
-	@Override
-	public void onEvent( String name, String xmlns, Element event ) {
-
-		Element child = event.getChild( "repo-item" );
-
-		String actionAttr = child.getAttributeStaticStr( "action" );
-		String hostnameStr = child.getAttributeStaticStr( "hostname" );
-		String secondaryStr = child.getAttributeStaticStr( "secondary" );
+	@HandleEvent
+	public void clusterRepoItemEvent( ClusterRepoItemEvent event ) {
 
 		if ( log.isLoggable( Level.FINE ) ){
-			log.log( Level.FINE, "Procesing clusterItem event: {0} with action: {1}, hostname: {2}, secondary: {3}",
-							 new Object[] { event, actionAttr, hostnameStr, secondaryStr } );
+			log.log( Level.FINE, "Procesing ClusterRepoItemEvent: {0}", new Object[] { event } );
 		}
 
-		REPO_ITEM_UPDATE_TYPE action;
-		if ( null != actionAttr ){
-			action = REPO_ITEM_UPDATE_TYPE.valueOf( actionAttr );
-		} else {
-			return;
-		}
+		REPO_ITEM_UPDATE_TYPE action = event.getAction();
+
+		ClusterRepoItem item = event.getItem();
 
 		BareJID hostname;
+		String hostnameStr = item.getHostname();
 		if ( null != hostnameStr ){
 			hostname = BareJID.bareJIDInstanceNS( hostnameStr );
 		} else {
@@ -131,6 +116,7 @@ public class SeeOtherHostDualIP
 		}
 
 		BareJID secondary = null;
+		String secondaryStr = item.getSecondaryHostname();
 		if ( null != secondaryStr && !secondaryStr.trim().isEmpty() ){
 			secondary = BareJID.bareJIDInstanceNS( secondaryStr );
 		}
@@ -225,7 +211,6 @@ public class SeeOtherHostDualIP
 				if ( log.isLoggable( Level.CONFIG ) ){
 					log.log( Level.CONFIG, "Using Evenbus as a source of DualIP data" );
 				}
-				eventBus.addHandler( REPO_ITEM_EVENT_NAME, EVENTBUS_REPO_ITEM_EVENT_XMLNS, this );
 			} else {
 				cls = ModulesManagerImpl.getInstance().forName( repo_class );
 			}

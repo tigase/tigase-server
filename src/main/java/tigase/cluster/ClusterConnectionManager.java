@@ -59,6 +59,7 @@ import tigase.cluster.api.CommandListenerAbstract;
 import tigase.cluster.repo.ClConConfigRepository;
 import tigase.cluster.repo.ClusterRepoConstants;
 import tigase.cluster.repo.ClusterRepoItem;
+import tigase.cluster.repo.ClusterRepoItemEvent;
 
 import tigase.conf.ConfigurationException;
 
@@ -89,8 +90,8 @@ import tigase.xmpp.JID;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.XMPPIOService;
 
-import tigase.disteventbus.EventBus;
-import tigase.disteventbus.EventBusFactory;
+import tigase.eventbus.EventBus;
+import tigase.eventbus.EventBusFactory;
 
 /**
  * Class ClusterConnectionManager
@@ -185,8 +186,6 @@ public class ClusterConnectionManager
 	private static final String SERVICE_CONNECTED_TASK_FUTURE =
 			"service-connected-task-future";
 
-	public final static String REPO_ITEM_EVENT_NAME = "repo-item-modified";
-	public final static String EVENTBUS_REPO_ITEM_EVENT_XMLNS = "tigase:system:cluster-update";
 	private EventBus eventBus = null;
 
 	public final static String EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_KEY = "eventbus-repository-notifications";
@@ -333,19 +332,19 @@ public class ClusterConnectionManager
 				addWaitingTask(port_props);
 			}
 
-			sendEvent( REPO_ITEM_UPDATE_TYPE.ADDED, repoItem.getHostname(), repoItem.getSecondaryHostname() );
+			sendEvent( REPO_ITEM_UPDATE_TYPE.ADDED, repoItem );
 			// reconnectService(port_props, connectionDelay);
 		}
 	}
 
 	@Override
 	public void itemRemoved(ClusterRepoItem item) {
-		sendEvent( REPO_ITEM_UPDATE_TYPE.REMOVED, item.getHostname(), item.getSecondaryHostname() );
+		sendEvent( REPO_ITEM_UPDATE_TYPE.REMOVED, item );
 	}
 
 	@Override
 	public void itemUpdated(ClusterRepoItem item) {
-		sendEvent( REPO_ITEM_UPDATE_TYPE.UPDATED, item.getHostname(), item.getSecondaryHostname() );
+		sendEvent( REPO_ITEM_UPDATE_TYPE.UPDATED, item );
 	}
 
 	@Override
@@ -900,30 +899,15 @@ public class ClusterConnectionManager
 	}
 
 	//~--- methods --------------------------------------------------------------
-	private void sendEvent( REPO_ITEM_UPDATE_TYPE action, String hostname, String secondary ) {
+	private void sendEvent( REPO_ITEM_UPDATE_TYPE action, ClusterRepoItem item ) {
 
 		// either RepositoryItem was wrong or EventBus is not enabled - skiping broadcasting the event;
-		if ( eventBus == null || hostname == null ){
+		if ( eventBus == null || item == null ){
 			return;
 		}
 
-		Element event = new Element( REPO_ITEM_EVENT_NAME, new String[] { "xmlns" },
-																 new String[] { EVENTBUS_REPO_ITEM_EVENT_XMLNS } );
-		event.setAttribute( "local", "true" );
-		Element repoItem = new Element( "repo-item" );
-		{
-			repoItem.setAttribute( "action", action.name() );
-			repoItem.addAttribute( "hostname", hostname );
-			repoItem.addAttribute( "secondary", ( null != secondary ? secondary : "" ) );
-		}
-		event.addChild( repoItem );
-
-		if ( log.isLoggable( Level.FINEST ) ){
-			log.log( Level.FINEST, "Sending event: " + event );
-		}
-
+		ClusterRepoItemEvent event = new ClusterRepoItemEvent(item, action );
 		eventBus.fire( event );
-
 	}
 
 	/**
