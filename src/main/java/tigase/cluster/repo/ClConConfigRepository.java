@@ -34,6 +34,7 @@ import tigase.sys.TigaseRuntime;
 import tigase.util.DNSResolverFactory;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -128,6 +129,18 @@ public class ClConConfigRepository
 		item.setCpuUsage(TigaseRuntime.getTigaseRuntime().getCPUUsage());
 		item.setMemUsage(TigaseRuntime.getTigaseRuntime().getHeapMemUsage());
 		storeItem(item);
+
+
+		if (auto_remove_obsolete_items) {
+			Iterator<ClusterRepoItem> iterator = iterator();
+			while(iterator.hasNext()) {
+				ClusterRepoItem next = iterator.next();
+				if ( ( next.getLastUpdate() > 0 ) && System.currentTimeMillis() - next.getLastUpdate() > 5000 * autoreload_interval ){
+					removeItem( next.getHostname() );
+				}
+			}
+		}
+
 	}
 
 	public void itemLoaded(ClusterRepoItem item) {
