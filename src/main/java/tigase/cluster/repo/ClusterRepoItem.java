@@ -39,7 +39,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ClusterRepoItem
-		extends RepositoryItemAbstract {
+		extends RepositoryItemAbstract
+		implements Cloneable {
 
 	public static final String CPU_USAGE_ATTR = "cpu";
 
@@ -241,6 +242,11 @@ public class ClusterRepoItem
 
 	public int getPortNo() {
 		return portNo;
+	}
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		return super.clone();
 	}
 
 	protected void setCpuUsage( float cpuUsage ) {

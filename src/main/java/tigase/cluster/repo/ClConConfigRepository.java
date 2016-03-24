@@ -35,6 +35,7 @@ import tigase.util.DNSResolverFactory;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -110,6 +111,13 @@ public class ClConConfigRepository
 
 		String          host = DNSResolverFactory.getInstance().getDefaultHost();
 		ClusterRepoItem item = getItem(host);
+		try {
+			item = ( item != null ) ? (ClusterRepoItem)(item.clone()) : null;
+		} catch ( CloneNotSupportedException ex ) {
+			if ( log.isLoggable( Level.FINEST ) ){
+				log.log( Level.SEVERE, "Clonning of ClusterRepoItem has failed", ex );
+			}
+		}
 
 		if (item == null) {
 			item = getItemInstance();
@@ -146,9 +154,7 @@ public class ClConConfigRepository
 	public boolean itemChanged(ClusterRepoItem oldItem, ClusterRepoItem newItem) {
 		return !oldItem.getPassword().equals( newItem.getPassword() )
 					 || ( oldItem.getPortNo() != newItem.getPortNo() )
-					 || ( oldItem.getSecondaryHostname() != null
-								&& newItem.getSecondaryHostname() != null
-								&& !oldItem.getSecondaryHostname().equals( newItem.getSecondaryHostname() ) );
+					 || !Objects.equals( oldItem.getSecondaryHostname(), newItem.getSecondaryHostname() );
 	}
 
 	//~--- get methods ----------------------------------------------------------
