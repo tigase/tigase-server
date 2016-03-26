@@ -45,7 +45,7 @@ Session Manager connects to *DMZ* and receives all packets from external users. 
 Flexibility
 -----------
 
-There are many different XMPP server implementations. The most prevolant are:
+There are many different XMPP server implementations. The most prevalent are:
 
 - Used as a business communication platform in small and medium companies where the server is not under a heavy load. For such deployments security is a key feature.
 - For huge community websites or internet portal servers is, on the other hand, usually under very heavy load and has to support thousands or millions of simultaneous connections. For such a deployment we need a different level of security as most of the service is open to the public.

@@ -25,7 +25,7 @@ $ tar -xf tigase-server-7.0.0-SNAPSHOT-b3752-dist-max.tar.gz
 $ cd tigase-server-7.0.0-SNAPSHOT-b3752
 -------------------------------------
 
-Please do not run as root.
+TIP: Do not run as root user!
 
 Start the Server
 ----------------
