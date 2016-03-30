@@ -54,11 +54,7 @@ Tigase now comes with its own build-in web XMPP client!  It can be accessed from
 
 Added support for XEP-0334
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-Added support to store offline messages for messages without body content. See link:http://xmpp.org/extensions/xep-0334.html[XEP-0334] for protocol details.
-Support also added to set a list of paths and xmlns to trigger and place storage of offline messages using the following settings in init.properties:
------
-sess-man/plugins-conf/amp/msg-store-offline-paths[s]=/message/received[urn:xmpp:receipts],/message/store-offline
------
+XEP-0334 is now supported.  See xref:nonBodyElements[this section] for details.
 
 Kernel Bean Configurator has been Improved
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -75,7 +71,7 @@ component/property=value
 Maximum users setting for MUC
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Administrators can now set that maximum number of users allowed on specific MUCs.
-See xref:mucRoomConfig[MUC Room Configuration]
+See xref:mucRoomConfig[MUC Room Configuration].
 
 HTTP Rest API Support
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -123,23 +119,7 @@ link:https://projects.tigase.org/issues/3567[#3567]
 
 New Rest API added to obtain a JID login time
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+GetUserInfo+ command has been expanded to obtain user login and logout times in addition to standard information. To obtain the information, send a POST request to http://xmpp.domain.net:8080/rest/adhoc/sess-man@xmpp.domain.net?api-key=test-api-key with the following:
-[source,xml]
------
-<command>
-  <node>get-user-info</node>
-  <fields>
-    <item>
-      <var>accountjid</var>
-      <value>user@xmpp.domain.net</value>
-    </item>
-    <item>
-      <var>Show connected resources in table</var>
-      <value>true</value>
-    </item>
-  </fields>
-</command>
------
++GetUserInfo+ command has been expanded to obtain user login and logout times in addition to standard information. See xref:getUserInfoREST[this section] for full details.
 
 New init.properties property
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

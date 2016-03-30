@@ -115,6 +115,18 @@ Server response:
 </iq>
 -----
 
+[[nonBodyElements]]
+Storing offline messages without body content
+---------------------------------------------
+Tigase can now store offline messages without <body/> content.
+See link:http://xmpp.org/extensions/xep-0334.html[XEP-0334] for protocol details.
+
+Support also added to set a list of paths and xmlns to trigger and place storage of offline messages using the following settings in init.properties:
+-----
+sess-man/plugins-conf/amp/msg-store-offline-paths[s]=/message/received[urn:xmpp:receipts],/message/store-offline
+-----
+
+
 [[addOfflinePaths]]
 Adding Custom Storage Paths
 ---------------------------
