@@ -26,6 +26,9 @@ package tigase.server.websocket;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.server.Packet;
+import tigase.xmpp.XMPPIOService;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -34,14 +37,9 @@ import java.nio.charset.CoderResult;
 import java.nio.charset.MalformedInputException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.server.Packet;
-import tigase.xml.Element;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.XMPPIOService;
 
 /**
  * Class implements basic support for WebSocket protocol. It extends
@@ -66,7 +64,21 @@ public class WebSocketXMPPIOService<RefObject>
 		hybi,
 		xmpp
 	}
-	
+
+	public enum State {
+		// begining state - used when we retrieve data from
+		// connection to detect if connection is able to be
+		// upgraded to WebSocket
+		handshaking,
+		// after WebSocket handshake is completed - can send data
+		handshaked,
+		// when server sent close request
+		closing,
+		// when server sent close request and received
+		// close request from client
+		closed
+	}
+
 	/* static variables used by WebSocket protocol */
 	
 	//~--- fields ---------------------------------------------------------------
@@ -76,7 +88,8 @@ public class WebSocketXMPPIOService<RefObject>
 	private byte[] partialData = null;
 	
 	// internal properties
-	private boolean websocket = false;
+	//private boolean websocket = false;
+	private State state = State.handshaking;
 	private boolean started   = false;
 
 	private final WebSocketProtocolIfc[] protocols;
@@ -92,7 +105,15 @@ public class WebSocketXMPPIOService<RefObject>
 		protocol.closeConnection(this);
 		super.stop(); //To change body of generated methods, choose Tools | Templates.
 	}
-	
+
+	protected State getState() {
+		return state;
+	}
+
+	protected void setState(State state) {
+		this.state = state;
+	}
+
 	//~--- methods --------------------------------------------------------------
 
 	@Override
@@ -110,7 +131,16 @@ public class WebSocketXMPPIOService<RefObject>
 		}
 		super.addReceivedPacket(packet); //To change body of generated methods, choose Tools | Templates.
 	}
-	
+
+	@Override
+	protected void processSocketData() throws IOException {
+		State oldState = state;
+		super.processSocketData();
+		if (state != oldState && oldState == State.handshaked) {
+			protocol.closeConnection(this);
+		}
+	}
+
 	protected WebSocketXMPPSpec getWebSocketXMPPSpec() {
 		return webSocketXMPPSpec;
 	}
@@ -121,7 +151,7 @@ public class WebSocketXMPPIOService<RefObject>
 			return "</stream:stream>";
 		return "<close xmlns='urn:ietf:params:xml:ns:xmpp-framing' />";
 	}		
-	
+
 	@Override
 	protected char[] readData() throws IOException {
 		ByteBuffer cb = super.readBytes();
@@ -142,7 +172,7 @@ public class WebSocketXMPPIOService<RefObject>
 			partialData = null;
 		}
 		
-		if (websocket) {
+		if (state != State.handshaking) {
 
 			
 			// data needs to be decoded fully not just first frame!!
@@ -197,7 +227,9 @@ public class WebSocketXMPPIOService<RefObject>
 					 ((buf[pos - 9] == '\n') && (buf[pos - 9] == buf[pos - 11])))) {
 				started = true;
 				processWebSocketHandshake(buf);
-				websocket = true;
+				//websocket = true;
+				if (protocol != null)
+					state = State.handshaked;
 			}
 			else {
 				partialData = buf;
@@ -234,7 +266,7 @@ public class WebSocketXMPPIOService<RefObject>
 			writeInProgress.lock();
 		}
 		try {
-			if (websocket) {
+			if (state != State.handshaking) {
 				try {
 					if (data != null) {					
 						if (log.isLoggable(Level.FINEST)) {
