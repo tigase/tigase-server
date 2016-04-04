@@ -150,4 +150,6 @@ include::text/Properties_Guide_71_-_--watchdog_ping_type.asciidoc[]
 
 include::text/Properties_Guide_72_-_--watchdog_timeout.asciidoc[]
 
+include::text/Properties_Guide_74_-_--ws-allow-unmasked-frames.asciidoc[]
+
 include::text/Properties_Guide_73_-_-config-type.asciidoc[]
