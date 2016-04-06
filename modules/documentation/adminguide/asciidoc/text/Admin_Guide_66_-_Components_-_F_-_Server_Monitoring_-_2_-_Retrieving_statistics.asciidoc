@@ -1,12 +1,15 @@
 [[retrievingStatisticsFromTheServer]]
 Retrieving statistics from the server
 =====================================
-:author: unknown
-:version: v1.0
+:author: Daniel Wisnewski
+:version: v2.0
 :date: 2015-13-07 11:22
-:revision: v1.1
 
-By default we can retrieve server statistics using XMPP. After a successful setup of xref:setUpRemoteMonitoring[Remote Monitoring], we can enable additional configured methods (JMX, HTTP, etc).
+:toc:
+:numbered:
+:website: http://www.tigase.net
+
+By default we can retrieve server statistics using XMPP, no additional setup is necessary.
 
 Retrieving statistics using XMPP
 --------------------------------
@@ -65,3 +68,571 @@ $ groovy StatsDumper.groovy [hostname] [username] [password] [dir] [port] [delay
 * delay(ms) - initial delay in milliseconds after which statistics should be saved
 * interval(ms) - interval between each retrieval/saving of statistics
 * loadhistory(bool) - indicates whether or not load statistics history from server (if such is enabled in Tigase)
+
+Statistics description
+----------------------
+Statistics are divided between components and processors.  You may see the same statistics collected for multiple components which are defined in common components section.
+Note that statistics are defined by {$component}/statistic so if you wanted Max queue size on pubsub, you would look for +pubsub/Max queue size+.
+Statistics will not be provided by components that are not enabled.
+
+Statistics common to components
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- Last second packets: number of packets handled by component in the last second.
+- Last minute packets: number of packets handled by component in the last minute.
+- Last hour packets: number of packets handled by component in the last hour.
+- list-commands last hour: number of +list-commands+ requests to component in the last hour.
+- list-commands last minute: number of +list-commands+ requests to component in the last minute.
+- list-commands last second: number of +list-commands+ requests to component in the last second.
+- list-commands/Average processing time: Average time in ms process and respond to +list-commands+ request.
+- Max queue size: maximum number of items allowed in processing queue.
+- Packets received: number of packets received by component.
+- Packets sent: number of packets sent by component.
+- Processed packets thread: in_#-{$compname}: How many inbound packets processed by this thread. Each component will have a statistic for each thread specified for the component.
+- Processed packets thread: out_#-{$compname}: How many outbound packets processed by this thread. Each component will have a statistic for each thread specified for the component.
+- Processing threads: Number of threads available for this component.
+- del-script last hour: How many +del-script+ commands have been run on this component in the last hour.
+- del-script last minute: How many +del-script+ commands have been run on this component in the last minute.
+- del-script last second: How many +del-script+ commands have been run on this component in the last second.
+- del-script/Average processing time: Average time in ms to complete +del-script+ command.
+- add-script last hour: How many +add-script+ commands have been run on this component in the last hour.
+- add-script last minute: How many +add-script+ commands have been run on this component in the last minute.
+- add-script last second: How many +add-script+ commands have been run on this component in the last second.
+- add-script/Average processing time: Average time in ms to complete +add-script+ command.
+- Open connections: The number of many open connections between components and clients.
+- Waiting to send: Number of packets component is waiting to send.
+- Bytes sent: Total bytes sent by component.
+- Bytes received: Total bytes received by component.
+- Socket overflow: Number of times component socket has overflown.
+- Watchdog runs: Number of times watchdog has been run on this component.
+- Watchdog tests: Number of tests run by watchdog on this component.
+- Watchdog stops: Number of connections closed by watchdog on this component.
+- In queue wait: SYSTEM: Number of packets with SYSTEM priority in incoming queue.
+- In queue wait: CLUSTER: Number of packets with CLUSTER priority in incoming queue.
+- In queue wait: HIGH: Number of packets with HIGH priority in incoming queue.
+- In queue wait: NORMAL: Number of packets with NORMAL priority in incoming queue.
+- In queue wait: LOW: Number of packets with LOW priority in incoming queue.
+- In queue wait: PRESENCE: Number of packets with PRESENCE priority in incoming queue.
+- In queue wait: LOWEST: Number of packets with LOWEST priority in incoming queue.
+- Out queue wait: SYSTEM: Number of packets with SYSTEM priority in outgoing queue.
+- Out queue wait: CLUSTER: Number of packets with CLUSTER priority in outgoing queue.
+- Out queue wait: HIGH: Number of packets with HIGH priority in outgoing queue.
+- Out queue wait: NORMAL: Number of packets with NORMAL priority in outgoing queue.
+- Out queue wait: LOW: Number of packets with LOW priority in outgoing queue.
+- Out queue wait: PRESENCE: Number of packets with PRESENCE priority in outgoing queue.
+- Out queue wait: LOWEST: Number of packets with LOWEST priority in outgoing queue.
+- Total in queue wait: Total number of packets in incoming queue.
+- Total out queue wait: Total number of packets in outgoing queue.
+- Max queue size: Maximum packet queue size for this component.
+- IN Queue overflow: Number of times IN queue has overflowed on this component.
+- OUT Queue overflow: Number of times OUT queue has overflowed on this component.
+- Total queues overflow: Total queue overflows for this component:
+- Average processing time on last 100 runs [ms]: Average processing time for all commands and requests for this component.
+- IN_QUEUE processed messages: Number of message stanzas processed through In Queue through this component.
+- IN_QUEUE processed presences: Number of presence stanzas processed through In Queue through this component.
+- IN_QUEUE processed cluster: Number of cluster stanzas processed through In Queue through this component.
+- IN_QUEUE processed other: Number of other stanzas processed through In Queue through this component.
+- IN_QUEUE processed IQ no XMLNS: Number of IQ stanzas processed through In Queue through this component that do not contain XML Namespaces.
+- IN_QUEUE processed IQ http://jabber.org/protocol/disco#info: Number of IQ stanzas processed through In Queue through this component with disco#info request.
+- IN_QUEUE processed IQ http://jabber.org/protocol/disco#items: Number of IQ stanzas processed through In Queue through this component with disco#items request.
+- IN_QUEUE processed IQ command: Number of IQ stanzas processed through In Queue through this component with commands.
+- IN_QUEUE processed total IQ: Number of IQ stanzas processed through In Queue through this component.
+- OUT_QUEUE processed messages: Number of message stanzas processed through Out Queue through this component.
+- OUT_QUEUE processed presences: Number of presence stanzas processed through Out Queue through this component.
+- OUT_QUEUE processed cluster: Number of cluster stanzas processed through Out Queue through this component.
+- OUT_QUEUE processed other: Number of other stanzas processed through Out Queue through this component.
+- OUT_QUEUE processed IQ no XMLNS: Number of IQ stanzas processed through Out Queue through this component that do not contain XML Namespaces.
+- IN_QUEUE processed IQ http://jabber.org/protocol/disco#info: Number of IQ stanzas processed through Out Queue through this component with disco#info request.
+- IN_QUEUE processed IQ http://jabber.org/protocol/disco#items: Number of IQ stanzas processed through Out Queue through this component with disco#items request.
+- IN_QUEUE processed IQ command: Number of IQ stanzas processed through Out Queue through this component with commands.
+- OUT_QUEUE processed total IQ: Number of IQ stanzas processed through Out Queue through this component.
+
+AMP
+~~~
+No exclusive amp specific statistics
+
+bosh
+~~~~
+- bosh/pre-bind-session last hour: +pre-bind-session+ commands made in the last hour.
+- bosh/pre-bind-session last minute: +pre-bind-session+ commands made in the last minute.
+- bosh/pre-bind-session last second: +pre-bind-session+ commands made in the last second.
+- bosh/pre-bind-session/Average processing time: Average time in ms +pre-bind-session+ commands take to execute.
+- bosh/Bosh sessions: Number of currently open BOSH sessions.
+
+c2s
+~~~
+No exclusive c2s specific statistics
+
+cl-comp
+~~~~~~~
+- cl-comp/force-stop-service last hour: How many +force-stop-service+ commands have been run on this component in the last hour.
+- cl-comp/force-stop-service last minute: How many +force-stop-service+ commands have been run on this component in the last minute.
+- cl-comp/force-stop-service last second: How many +force-stop-service+ commands have been run on this component in the last second.
+- cl-comp/force-stop-service/Average processing time: Average time in ms +force-stop-service+ commands take to execute.
+- cl-comp/sim-serv-stopped last hour: How many +sim-serv-stopped+ commands have been run in the last hour.
+- cl-comp/sim-serv-stopped last minute: How many +sim-serv-stopped+ commands have been run in the last minute.
+- cl-comp/sim-serv-stopped last second: How many +sim-serv-stopped+ commands have been run in the last second.
+- cl-comp/sim-serv-stopped/Average processing time: Average time in ms +sim-serv-stopped+ commands take to execute.
+- cl-comp/cluster-nodes-list last hour: How many +cluster-nodes-list+ commands have been run in the last hour.
+- cl-comp/cluster-nodes-list last minute: How many +cluster-nodes-list+ commands have been run in the last minute.
+- cl-comp/cluster-nodes-list last second: How many +cluster-nodes-list+ commands have been run in the last second.
+- cl-comp/cluster-nodes-list/Average processing time: Average time in ms +cluster-nodes-list+ commands take to execute.
+- cl-comp/service-keys last hour: How many +service-keys+ commands have been run in the last hour.
+- cl-comp/service-keys last minute: How many +service-keys+ commands have been run in the last minute.
+- cl-comp/service-keys last second: How many +service-keys+ commands have been run in the last second.
+- cl-comp/service-keys/Average processing time: Average time in ms +service-keys+ commands take to execute.
+- cl-comp/Total disconnects: Total cluster disconnections.
+- cl-comp/Service connected time-outs: Number of cluster time-outs.
+- cl-comp/Last day disconnects: Cluster disconnections within the last 24 hours.
+- cl-comp/Last hour disconnects: Cluster disconnections within the last hour.
+- cl-comp/Average compression ratio: Average cluster compression ratio.
+- cl-comp/Average decompression ratio: Average cluster decompression ratio.
+
+eventbus
+~~~~~~~~
+No exclusive eventbus specific statistics
+
+message-archive
+~~~~~~~~~~~~~~~
+- message-archive/Removal time of expired messages (avg): Average time it takes to remove an expired message.
+
+message-router
+~~~~~~~~~~~~~~
+- message-router/Local hostname: The local hostname of the physical host server.
+- message-router/Uptime: How long the XMPP server has been running.
+- message-router/Load average: Average resource load for service instance.
+- message-router/CPUs no: Number of available CPUs in host machine.
+- message-router/Threads count: Total number of processing threads in use across all components.
+- message-router/CPU usage [%]: % of CPU power in use, float.
+- message-router/HEAP useage [%]: % of total heap memory in use.
+- message-router/NONHEAP usage [%]: % of total non-heap memory in use.
+- message-router/CPU usage: % of CPU power in use, human friendly single decimal with % sign.
+- message-router/MAX heap mem: Maximum amount of heap memory available (defined by JAVA_OPTIONS in tigase.conf)in Kb.
+- message-router/Used Heap: Amount of heap memory in use in Kb.
+- message-router/Free Heap: Amount of heap memory available in Kb.
+- message-router/MAX NonHeap mem: Maximum amount of non-heap memory available (defined by JAVA_Options in tigase.conf) in Kb.
+- message-router/Used NonHeap: Amount of non-heap memory in use in Kb.
+- message-router/Free NonHeap: Amount of non-heap memory available in Kb.
+
+monitor
+~~~~~~~
+- monitor/load-errors last hour: How many +load-errors+ commands have been run in the last hour.
+- monitor/load-errors last minute: How many +load-errors+ commands have been run in the last minute.
+- monitor/load-errors last second: How many +load-errors+ commands have been run in the last second.
+- monitor/load-errors/Average processing time: Average time in ms +load-errors+ command takes to execute.
+
+muc
+~~~
+- muc/Packets received: Number of packets received by MUC component.
+- muc/Packets sent: Number of packets sent by MUC component.
+- muc/IN_QUEUE processed IQ http://jabber.orgh/protocol/disco#info
+- muc/OUT_QUEUE processed IQ http://jabber.orgh/protocol/disco#info
+- muc/room-remove last hour: +remove-room+ commands run in the last hour.
+- muc/room-remove last minute: +remove-room+ commands run in the last minute.
+- muc/room-remove last second: +remove-room+ commands run in the last second.
+- muc/room-remove/Average processing time: Avergage time in ms to process +room-remove+ command.
+- muc/default-room-config last hour: +default-room-config+ commands run in the last hour.
+- muc/default-room-config last minute: +default-room-config+ commands run in the last minute.
+- muc/default-room-config last second: +default-room-config+ commands run in the last second.
+- muc/default-room-config/Average processing time: Average time in ms to process +default-room-config+ command.
+
+proxy
+~~~~~
+- proxy/Open streams: Number of currently open proxy streams.
+- proxy/KBytes transferred: Number of kilobytes transferred through proxy component.
+- proxy/Transfers completed: Number of specific transfers completed through proxy component.
+- proxy/Average transfer size in KB: Average size of information transferred through proxy component.
+
+pubsub
+~~~~~~
+- pubsub/delete-item last hour: Number of +delete-item+ commands run in the last hour.
+- pubsub/delete-item last minute: Number of +delete-item+ commands run in the last minute.
+- pubsub/delete-item last second: Number of +delete-item+ commands run in the last second.
+- pubsub/delete-item/Average processing time: Average time in ms to process +delete-item+ command.
+- pubsub/list-nodes last hour: Number of +list-nodes+ commands run in the last hour.
+- pubsub/list-nodes last minute: Number of +list-nodes+ commands run in the last minute.
+- pubsub/list-nodes last second: Number of +list-nodes+ commands run in the last second.
+- pubsub/list-nodes/Average processing time: Average time in ms to process +list-nodes+ command.
+- pubsub/publish-item last hour: Number of +publish-item+ commands run in the last hour.
+- pubsub/publish-item last minute: Number of +publish-item+ commands run in the last minute.
+- pubsub/publish-item last second: Number of +publish-item+ commands run in the last second.
+- pubsub/publish-item/Average processing time: Average time in ms to process +publish-item+ command.
+- pubsub/retrieve-item last hour: Number of +retrieve-item+ commands run in the last hour.
+- pubsub/retrieve-item last minute: Number of +retrieve-item+ commands run in the last minute.
+- pubsub/retrieve-item last second: Number of +retrieve-item+ commands run in the last second.
+- pubsub/retrieve-item/Average processing time: Average time in ms to process +retrieve-item+ command.
+- pubsub/delete-node last hour: Number of +delete-node+ commands run in the last hour.
+- pubsub/delete-node last minute: Number of +delete-node+ commands run in the last minute.
+- pubsub/delete-node last second: Number of +delete-node+ commands run in the last second.
+- pubsub/delete-node/Average processing time: Average time in ms to process +delete-node+ command.
+- pubsub/list-items last hour: Number of +list-items+ commands run in the last hour.
+- pubsub/list-items last minute: Number of +list-items+ commands run in the last minute.
+- pubsub/list-items last second: Number of +list-items+ commands run in the last second.
+- pubsub/list-items/Average processing time: Average time in ms to process +list-items+ command.
+- pubsub/CapsModule last hour: Number of +CapsModule+ commands run in the last hour.
+- pubsub/CapsModule last minute: Number of +CapsModule+ commands run in the last minute.
+- pubsub/CapsModule last second: Number of +CapsModule+ commands run in the last second.
+- pubsub/CapsModule/Average processing time: Average time in ms to process +CapsModule+ command.
+- pubsub/PresenceCollectorModule last hour: Number of times +PresenceCollectorModule+ command has been run in the last hour.
+- pubsub/PresenceCollectorModule last minute: Number of times +PresenceCollectorModule+ command has been run in the last minute.
+- pubsub/PresenceCollectorModule last second: Number of times +PresenceCollectorModule+ command has been run in the last second.
+- pubsub/PresenceCollectorModule/Average processing time: Average time in ms it takes to process +PresenceCollectorModule+ command.
+- pubsub/PublishItemModule last hour: Number of times +PublishItemModule+ command has been run in the last hour.
+- pubsub/PublishItemModule last minute: Number of times +PublishItemModule+ command has been run in the last minute.
+- pubsub/PublishItemModule last second: Number of times +PublishItemModule+ command has been run in the last second.
+- pubsub/PublishItemModule/Average processing time: Average time in ms it takes to process +PublishItemModule+ command.
+- pubsub/RetractItemModule last hour: Number of times +RetractItemModule+ command has been run in the last hour.
+- pubsub/RetractItemModule last minute: Number of times +RetractItemModule+ command has been run in the last minute.
+- pubsub/RetractItemModule last second: Number of times +RetractItemModule+ command has been run in the last second.
+- pubsub/RetractItemModule/Average processing time: Average time in ms it takes to process +RetractItemModule+ command.
+- pubsub/PendingSubscriptionModule last hour: Number of times +PendingSubscriptionModule+ command has been run in the last hour.
+- pubsub/PendingSubscriptionModule last minute: Number of times +PendingSubscriptionModule+ command has been run in the last minute.
+- pubsub/PendingSubscriptionModule last second: Number of times +PendingSubscriptionModule+ command has been run in the last second.
+- pubsub/PendingSubscriptionModule/Average Processing time: Average time in ms it takes to process +PendingSubscriptionModule+ command.
+- pubsub/ManageSubscriptionModule last hour: Number of times +ManageSubscriptionModule+ command has been run in the last hour.
+- pubsub/ManageSubscriptionModule last minute: Number of times +ManageSubscriptionModule+ command has been run in the last minute.
+- pubsub/ManageSubscriptionModule last second: Number of times +ManageSubscriptionModule+ command has been run in the last second.
+- pubsub/ManageSubscriptionModule/Average processing time: Average time in ms it takes to process +ManageSubscriptionModule+.
+- pubsub/SubscribeNodeModule last hour: Number of times +SubscribeNodeModule+ has been executed in the last hour.
+- pubsub/SubscribeNodeModule last minute: Number of times +SubscribeNodeModule+ has been executed in the last minute.
+- pubsub/SubscribeNodeModule last second: Number of times +SubscribeNodeModule+ has been executed in the last second.
+- pubsub/SubscribeNodeModule/Average processing time: Average time in ms it takes to execute +SubscribeNodeModule+.
+- pubsub/NodeCreateModule last hour: Number of times +NodeCreateModule+ has been executed in the last hour.
+- pubsub/NodeCreateModule last minute: Number of times +NodeCreateModule+ has been executed in the last minute.
+- pubsub/NodeCreateModule last second: Number of times +NodeCreateModule+ has been executed in the last second.
+- pubsub/NodeCreateModule/Average processing time: Average time in ms it takes to execute +NodeCreateModule+.
+- pubsub/NodeDeleteModule last hour: Number of times +NodeDeleteModule+ has been executed in the last hour.
+- pubsub/NodeDeleteModule last minute: Number of times +NodeDeleteModule+ has been executed in the last minute.
+- pubsub/NodeDeleteModule last second: Number of times +NodeDeleteModule+ has been executed in the last second.
+- pubsub/NodeDeleteModule/Average processing time: Average time in ms it takes to execute +NodeDeleteModule+.
+- pubsub/DefaultConfigModule last hour: Number of times +DefaultConfigModule+ has been executed in the last hour.
+- pubsub/DefaultConfigModule last minute: Number of times +DefaultConfigModule+ has been executed in the last minute.
+- pubsub/DefaultConfigModule last second: Number of times +DefaultConfigModule+ has been executed in the last second.
+- pubsub/DefaultConfigModule/Average processing time: Average time in ms it takes to execute +DefaultConfigModule+.
+- pubsub/NodeConfigModule last hour: Number of times +NodeConfigModule+ command has been run in the last hour.
+- pubsub/NodeConfigModule last minute: Number of times +NodeConfigModule+ command has been run in the last minute.
+- pubsub/NodeConfigModule last second: Number of times +NodeConfigModule+ command has been run in the last second.
+- pubsub/NodeConfigModule/Average processing time: Average time in ms it takes to execute +NodeConfigModule+ command.
+- pubsub/UnsubscribeNodeModule last hour: Number of times +UnsubscribeNodeModule+ has been run in the last hour.
+- pubsub/UnsubscribeNodeModule last minute: Number of times +UnsubscribeNodeModule+ has been run in the last minute.
+- pubsub/UnsubscribeNodeModule last second: Number of times +UnsubscribeNodeModule+ has been run in the last second.
+- pubsub/UnsubscribeNodeModule/Average processing time: Average time in ms it takes to execute +UnsubscribeNodeModule+.
+- pubsub/ManageAffiliationsModule last hour: Number of times +ManageAffiliationsModule+ has been run in the last hour.
+- pubsub/ManageAffiliationsModule last minute: Number of times +ManageAffiliationsModule+ has been run in the last minute.
+- pubsub/ManageAffiliationsModule last second: Number of times +ManageAffiliationsModule+ has been run in the last second.
+- pubsub/ManageAffiliationsModule/Average processing time: Average time in ms it takes to execute +ManageAffiliationsModule+.
+- pubsub/RetrieveItemsModule last hour: Number of times pubsub has conducted Retrieve Items command in the last hour.
+- pubsub/RetrieveItemsModule last minute: Number of times pubsub has conducted Retrieve Items command in the last minute.
+- pubsub/RetrieveItemsModule last second: Number of times pubsub has conducted Retrieve Items command in the last second.
+- pubsub/RetrieveItemsModule/Average processing time: Average time in ms it takes to execute Retrieve Items.
+- pubsub/PurgeItemsModule last hour: Number of times items have been purged from repository in the last hour.
+- pubsub/PurgeItemsModule last minute: Number of times items have been purged from repository in the last minute.
+- pubsub/PurgeItemsModule last second: Number of times items have been purged from repository in the last second.
+- pubsub/PurgeItemsModule/Average processing time: Average time in ms it takes to purge items.
+- pubsub/JabberVersionModule last hour: Number of times +JabberVersionModule+ has been run in the last hour.
+- pubsub/JabberVersionModule last minute: Number of times +JabberVersionModule+ has been run in the last minute.
+- pubsub/JabberVersionModule last second: Number of times +JabberVersionModule+ has been run in the last second.
+- pubsub/JabberVersionModule/Average processing time: Average time in ms it takes to execute +JabberVersionModule+.
+- pubsub/AdHocConfigCommandModule last hour: Number of times +AdHocConfigCommandModule+ has been run in the last hour.
+- pubsub/AdHocConfigCommandModule last minute: Number of times +AdHocConfigCommandModule+ has been run in the last minute.
+- pubsub/AdHocConfigCommandModule last second: Number of times +AdHocConfigCommandModule+ has been run in the last second.
+- pubsub/AdHocConfigCommandModule/Average processing time: Average time in ms it takes to execute +AdHocConfigCommandModule+.
+- pubsub/DiscoverInfoModule last hour: Number of times disco#info has been run in pubsub in the last hour.
+- pubsub/DiscoverInfoModule last minute: Number of times disco#info has been run in pubsub in the last minute.
+- pubsub/DiscoverInfoModule last second: Number of times disco#info has been run in pubsub in the last second.
+- pubsub/DiscoverInfoModule/Average processing time: Average time in ms it takes to execute disco#info.
+- pubsub/RetrieveAffiliationsModule last hour: Number of times +RetrieveAffiliationsModule+ has been run in the last hour.
+- pubsub/RetrieveAffiliationsModule last minute: Number of times +RetrieveAffiliationsModule+ has been run in the last minute.
+- pubsub/RetrieveAffiliationsModule last second: Number of times +RetrieveAffiliationsModule+ has been run in the last second.
+- pubsub/RetrieveAffiliationsModule/Average processing time: Average time in ms it takes to execute +RetrieveAffilationsModule+.
+- pubsub/RetrieveSubscriptionsModule last hour: Number of times +RetrieveSubscriptionsModule+ has been run in the last hour.
+- pubsub/RetrieveSubscriptionsModule last minute: Number of times +RetrieveSubscriptionsModule+ has been run in the last minute.
+- pubsub/RetrieveSubscriptionsModule last second: Number of times +RetrieveSubscriptionsModule+ has been run in the last second.
+- pubsub/RetrieveSubscriptionsModule/Average processing time: Average time in ms it takes to execute +RetrieveSubsriptionsModule+.
+- pubsub/XmppPingModule last hour: Number of times +XMPPPingModule+ has been run in the last hour.
+- pubsub/XmppPingModule last minute: Number of times +XMPPPingModule+ has been run in the last minute.
+- pubsub/XmppPingModule last second: Number of times +XMPPPingModule+ has been run in the last second.
+- pubsub/XmppPingModule/Average processing time: Average time in ms it takes to execute +XMPPPingModule+.
+- pubsub/PresenceNofitierModule last hour: Number of times +PresenceNotifierModule+ has been run in the last hour.
+- pubsub/PresenceNofitierModule last minute: Number of times +PresenceNotifierModule+ has been run in the last minute.
+- pubsub/PresenceNofitierModule last second: Number of times +PresenceNotifierModule+ has been run in the last second.
+- pubsub/PresenceNofitierModule/Average processing time: Average time in ms it takes to execute +PresenceNotifierModule+.
+- pubsub/Cashed nodes: Number of nodes cashed in repository.
+- pubsub/Update subscriptions calls: Number of times Subscriptions have been updated (this includes new, deleted, and edited).
+- pubsub/Subscription count (in cache): Number of currently active subscriptions.
+- pubsub/Affiliations count (in cache): Number of currently active affilations.
+- pubsub/Repository writes: Number of individual writes to Repository from pubsub component since startup.
+- pubsub/Added new nodes: The number of new nodes added since server startup.
+- pubsub/Total writing time: Total amount of time Pubsub component has written to repository, in ms.
+- pubsub/Average DB write time [ms]: Average amount of time repository writes take.
+- pubsub/cache/requests last hour: Number of requests of Pubsub Cache in the last hour.
+- pubsub/cache/requests last minute: Number of requests of Pubsub Cache in the last minute.
+- pubsub/cache/requests last second: Number of requests of Pubsub Cache in the last second.
+- pubsub/cache/hits last hour: Number of hits to PubSub cache in the last hour.
+- pubsub/cache/hits last minute: Number of hits to PubSub cache in the last minute.
+- pubsub/cache/hits last second: Number of hits to PubSub cache in the last second.
+- pubsub/cache/hits/hit-miss last hour: Number of hit-miss in the last hour.
+- pubsub/cache/hits/hit-miss last minute: Number of hit-miss in the last minute.
+- pubsub/cache/hits/hit-miss last second: Number of hit-miss in the last second.
+- pubsub/cache/hits/hit-miss ratio per minute: Ratio of hit-miss per minute.
+- pubsub/cache/hits/hit-miss ratio per second: Ratio of hit-miss per second.
+- pubsub/db/getNodeItems requests last hour: Number of +getNodeItems+ commands executed in the last hour.
+- pubsub/db/getNodeItems requests last minute: Number of +getNodeItems+ commands executed in the last minute.
+- pubsub/db/getNodeItems requests last second: Number of +getNodeItems+ commands executed in the last second.
+- pubsub/db/getNodeItems/Average processing time: Average time in ms it takes to execute +getNodeItems+ command.
+
+rest
+~~~~
+No exclusive rest specific statistics
+
+s2s
+~~~
+- s2s/del-script last hour: Number of times +del-script+ command has been run in pubsub in the last hour.
+- s2s/del-script last minute: Number of times +del-script+ command has been run in pubsub in the last minute.
+- s2s/del-scripts last second: Number of times +del-script+ command has been run in pubsub in the last second.
+- s2s/del-scripts/Average processing time: Average time in ms it takes to execute +del-script+ command.
+- s2s/get-cid-connection last hour: Number of times +get-cid-connection+ command has been run in pubsub in the last hour.
+- s2s/get-cid-connection last minute: Number of times +get-cid-connection+ command has been run in pubsub in the last minute.
+- s2s/get-cid-connection last second: Number of times +get-cid-connection+ command has been run in pubsub in the last second.
+- s2s/get-cid-connection/Average processing time: Average time in ms it takes to execute +get-cid-connection+ command.
+- s2s/s2s-bad-state-conns last hour: Number of times +s2s-bad-state-conns+ command has been run in pubsub in the last hour.
+- s2s/s2s-bad-state-conns last minute: Number of times +s2s-bad-state-conns+ command has been run in pubsub in the last minute.
+- s2s/s2s-bad-state-conns last second: Number of times +s2s-bad-state-conns+ command has been run in pubsub in the last second.
+- s2s/s2s-bad-state-conns/Average processing time: Average time in ms it takes to execute +s2s-bad-state-conns+ command.
+- s2s/s2s-reset-bad-state-conns last hour: Number of times +s2s-reset-bad-state-conns+ command has been run in the last hour.
+- s2s/s2s-reset-bad-state-conns last minute: Number of times +s2s-reset-bad-state-conns+ command has been run in the last minute.
+- s2s/s2s-reset-bad-state-conns last second: Number of times +s2s-reset-bad-state-conns+ command has been run in the last second.
+- s2s/s2s-reset-bad-state-conns/Average processing time: Average time in ms it takes to execute +s2s-reset-bad-state-conns+ command.
+- s2s/CIDs number: The server Client ID number.
+- s2s/Total outgoing: Total outgoing Server-to-server connections.
+- s2s/Total outgoing TLS: Total outgoing server-to-server connections using TLS.
+- s2s/Total outgoing handshaking: Total number of connections currently handshaking.
+- s2s/Total incoming: Total incoming server-to-server connections.
+- s2s/Total incoming TLS: Total incoming server-to-server connections using TLS.
+- s2s/Total DB keys: Total number of DB keys.
+- s2s/Total waiting: Total s2s connections waiting.
+- s2s/Total control waiting: Total s2s connections under controlled waiting.
+
+sess-man
+~~~~~~~~
+- sess-man/connection-time last hour: Number of times +connection-time+ has been run in the last hour.
+- sess-man/connection-time last minute: Number of times +connection-time+ has been run in the last minute.
+- sess-man/connection-time last second: Number of times +connection-time+ has been run in the last second.
+- sess-man/connection-time/Average processing time: Average time in ms it takes to run +connection-time+.
+- sess-man/http://jabber.org/protocol/admin#user-stats last hour: Number of times +user-stats+ command has been run in the last hour.
+- sess-man/http://jabber.org/protocol/admin#user-stats last minute: Number of times +user-stats+ command has been run in the last minute.
+- sess-man/http://jabber.org/protocol/admin#user-stats last second: Number of times +user-stats+ command has been run in the last second.
+- sess-man/http://jabber.org/protocol/admin#user-stats/Average processing time: Average time in ms it takes to run +user-stats+ command.
+- sess-man/http://jabber.org/protocol/admin#add-user last hour: Number of times +add-user+ command has been run in the last hour.
+- sess-man/http://jabber.org/protocol/admin#add-user last minute: Number of times +add-user+ command has been run in the last minute.
+- sess-man/http://jabber.org/protocol/admin#add-user last second: Number of times +add-user+ command has been run in the last second.
+- sess-man/http://jabber.org/protocol/admin#add-user/Average processing time: Average time in ms it takes to run +add-user+ command.
+- sess-man/modify-user last hour: Number of times +modify-user+ has been run in the last hour.
+- sess-man/modify-user last minute: Number of times +modify-user+ has been run in the last minute.
+- sess-man/modify-user last second: Number of times +modify-user+ has been run in the last second.
+- sess-man/modify-user/Average processing time: Average time in ms it takes to run +modify-user+.
+- sess-man/http://jabber.org/protocol/admin#get-idle-users last hour: Number of times +get-idle-users+ have been run in the last hour.
+- sess-man/http://jabber.org/protocol/admin#get-idle-users last minute: Number of times +get-idle-users+ have been run in the last minute.
+- sess-man/http://jabber.org/protocol/admin#get-idle-users last second: Number of times +get-idle-users+ have been run in the last second.
+- sess-man/http://jabber.org/protocol/admin#get-idle-users/Average processing time: Average time it takes to run +get-idle-users+.
+- sess-man/http://jabber.org/protocol/admin#get-idle-users-num last hour: Number of times +get-idle-users-num+ command has been run in the last hour.
+- sess-man/http://jabber.org/protocol/admin#get-idle-users-num last minute: Number of times +get-idle-users-num+ command has been run in the last minute.
+- sess-man/http://jabber.org/protocol/admin#get-idle-users-num last second: Number of times +get-idle-users-num+ command has been run in the last second.
+- sess-man/http://jabber.org/protocol/admin#get-idle-users-num/Average processing time: Average time it takes to run +get-idle-users-num+.
+- sess-man/http://jabber.org/protocol/admin#end-user-session last hour: Number of times +end-user-session+ command has been run in the last hour.
+- sess-man/http://jabber.org/protocol/admin#end-user-session last minute: Number of times +end-user-session+ command has been run in the last minute.
+- sess-man/http://jabber.org/protocol/admin#end-user-session last second: Number of times +end-user-session+ command has been run in the last second.
+- sess-man/http://jabber.org/protocol/admin#end-user-session/Average processing time: Average time it takes to run +end-user-session+.
+- sess-man/http://jabber.org/protocol/admin#get-registered-users-list last hour: Number of times +get-registered-users-list+ command has been run in the last hour.
+- sess-man/http://jabber.org/protocol/admin#get-registered-users-list last minute: Number of times +get-registered-users-list+ command has been run in the last minute.
+- sess-man/http://jabber.org/protocol/admin#get-registered-users-list last second: Number of times +get-registered-users-list+ command has been run in the last second.
+- sess-man/http://jabber.org/protocol/admin#get-registered-users-list/Average processing time: Average time it takes to run +get-registered-users-list+ command.
+- sess-man/user-domain-perm last hour: Number of times +user-domain-perm+ has been run in the last hour.
+- sess-man/user-domain-perm last minute: Number of times +user-domain-perm+ has been run in the last minute.
+- sess-man/user-domain-perm last second: Number of times +user-domain-perm+ has been run in the last second.
+- sess-man/user-domain-perm/Average processing time: Average time in ms it takes to run +user-domain-perm+.
+- sess-man/roster-fixer-cluster last hour: Number of times +roster-fixer-cluster+ has been run in the last hour.
+- sess-man/roster-fixer-cluster last minute: Number of times +roster-fixer-cluster+ has been run in the last minute.
+- sess-man/roster-fixer-cluster last second: Number of times +roster-fixer-cluster+ has been run in the last second.
+- sess-man/roster-fixer-cluster/Average processing time: Average time in ms it takes to run +roster-fixer-cluster+.
+- sess-man/http://jabber.org/protocol/admin#get-top-active-users last hour: Number of times +get-top-active-users+ command has been run in the last hour.
+- sess-man/http://jabber.org/protocol/admin#get-top-active-users last minute: Number of times +get-top-active-users+ command has been run in the last minute.
+- sess-man/http://jabber.org/protocol/admin#get-top-active-users last second: Number of times +get-top-active-users+ command has been run in the last second.
+- sess-man/http://jabber.org/protocol/admin#get-top-active-users/Average processing time: Average time in ms it takes to execute +get-top-active-users+.
+- sess-man/http://jabber.org/protocol/admin#get-online-users-list last hour: Number of times +get-online-users-list+ command has been run in the last hour.
+- sess-man/http://jabber.org/protocol/admin#get-online-users-list last minute: Number of times +get-online-users-list+ command has been run in the last minute.
+- sess-man/http://jabber.org/protocol/admin#get-online-users-list last second: Number of times +get-online-users-list+ command has been run in the last second.
+- sess-man/http://jabber.org/protocol/admin#get-online-users-list/Average processing time: Average time in ms it takes to execute +get-online-users-list+ command.
+- sess-man/http://jabber.org/protocol/admin#announce last hour: Number of times +announce+ command has been run in the last hour.
+- sess-man/http://jabber.org/protocol/admin#announce last minute: Number of times +announce+ command has been run in the last minute.
+- sess-man/http://jabber.org/protocol/admin#announce last second: Number of times +announce+ command has been run in the last second.
+- sess-man/http://jabber.org/protocol/admin#announce/Average processing time: Average time in ms it takes to execute +announce+ command.
+- sess-man/user-roster-management last hour: Number of times +user-roster-management+ command has been run in the last hour.
+- sess-man/user-roster-management last minute: Number of times +user-roster-management+ command has been run in the last minute.
+- sess-man/user-roster-management last second: Number of times +user-roster-management+ command has been run in the last second.
+- sess-man/user-roster-management/Average processing time: Average time in ms it takes to execute +user-roster-management+ command.
+- sess-man/http://jabber.org/protocol/admin#delete-user last hour: Number of times +delete-user+ command has been run in the last hour.
+- sess-man/http://jabber.org/protocol/admin#delete-user last minute: Number of times +delete-user+ command has been run in the last minute.
+- sess-man/http://jabber.org/protocol/admin#delete-user last second: Number of times +delete-user+ command has been run in the last second.
+- sess-man/http://jabber.org/protocol/admin#delete-user/Average processing time: Average time in ms it takes to execute +delete-user+ command.
+- sess-man/http://jabber.org/protocol/admin#remove-user last hour: Number of times +remove-user+ command has been run in the last hour.
+- sess-man/http://jabber.org/protocol/admin#remove-user last minute: Number of times +remove-user+ command has been run in the last minute.
+- sess-man/http://jabber.org/protocol/admin#remove-user last second: Number of times +remove-user+ command has been run in the last second.
+- sess-man/http://jabber.org/protocol/admin#remove-user/Average processing time: Average time in ms it takes to execute +remove-user+ command.
+- sess-man/user-roster-management-ext last hour: Number of times +user-roster-management-ext+ has been run in the last hour.
+- sess-man/user-roster-management-ext last minute: Number of times +user-roster-management-ext+ has been run in the last minute.
+- sess-man/user-roster-management-ext last second: Number of times +user-roster-management-ext+ has been run in the last second.
+- sess-man/user-roster-management-ext/Average processing time: Average time in ms it takes to execute +user-roster-management-ext+.
+- sess-man/oauth-credentials last hour: Number of times +oauth-credentials+ has been run in the last hour.
+- sess-man/oauth-credentials last minute: Number of times +oauth-credentials+ has been run in the last minute.
+- sess-man/oauth-credentials last second: Number of times +oauth-credentials+ has been run in the last second.
+- sess-man/oauth-credentials/Average processing time: Average time in ms it takes to execute +oauth-credentials+.
+- sess-man/http://jabber.org/protocol/admin#get-active-users last hour: Number of times +get-active-users-last-hour+ command has been run in the last hour.
+- sess-man/http://jabber.org/protocol/admin#get-active-users last second: Number of times +get-active-users-last-hour+ command has been run in the last second.
+- sess-man/http://jabber.org/protocol/admin#get-active-users last minute: Number of times +get-active-users-last-hour+ command has been run in the last minute.
+- sess-man/http://jabber.org/protocol/admin#get-active-users/Average processing time: Average time in ms it takes to execute +get-active-users-last-hour+ command.
+- sess-man/http://jabber.org/protocol/admin#get-user-password last hour: Number of times +get-user-password+ command has been run in the last hour.
+- sess-man/http://jabber.org/protocol/admin#get-user-password last second: Number of times +get-user-password+ command has been run in the last second.
+- sess-man/http://jabber.org/protocol/admin#get-user-password last minute: Number of times +get-user-password+ command has been run in the last minute.
+- sess-man/http://jabber.org/protocol/admin#get-user-password/Average processing time: Average time in ms it takes to execute +get-user-password+ command.
+- sess-man/get-user-info last hour: Number of times +get-user-info+ command has been run in the last hour.
+- sess-man/get-user-info last minute: Number of times +get-user-info+ command has been run in the last minute.
+- sess-man/get-user-info last second: Number of times +get-user-info+ command has been run in the last second.
+- sess-man/get-user-info last/Average processing time: Average time it in ms it takes to execute +get-user-info+ command.
+- sess-man/http://jabber.org/protocol/admin#add-user-tracker last hour: Number of times +add-user-tracker+ command has been run in the last hour.
+- sess-man/http://jabber.org/protocol/admin#add-user-tracker last minute: Number of times +add-user-tracker+ command has been run in the last minute.
+- sess-man/http://jabber.org/protocol/admin#add-user-tracker last second: Number of times +add-user-tracker+ command has been run in the last second.
+- sess-man/http://jabber.org/protocol/admin#add-user-tracker/Average processing time: Average time in ms it takes to execute +add-user-tracker+ command.
+- sess-man/roster-fixer last hour: Number of times +roster-fixer+ has been run in the last hour.
+- sess-man/roster-fixer last minute: Number of times +roster-fixer+ has been run in the last minute.
+- sess-man/roster-fixer last second: Number of times +roster-fixer+ has been run in the last second.
+- sess-man/roster-fixer last/Average processing time: Average time in ms it takes to execute +roster-fixer+.
+- sess-man/http://jabber.org/protocol/admin#get-user-roster last hour: Number of times +get-user-roster+ command has been run in the last hour.
+- sess-man/http://jabber.org/protocol/admin#get-user-roster last minute: Number of times +get-user-roster+ command has been run in the last minute.
+- sess-man/http://jabber.org/protocol/admin#get-user-roster last second: Number of times +get-user-roster+ command has been run in the last second.
+- sess-man/http://jabber.org/protocol/admin#get-user-roster/Average processing time: Average time in ms it takes to execute +get-user-roster+ command.
+- sess-man/http://jabber.org/protocol/admin#get-active-users last hour: Number of times +get-active-users+ command has been run in the last hour.
+- sess-man/http://jabber.org/protocol/admin#get-active-users last minute: Number of times +get-active-users+ command has been run in the last minute.
+- sess-man/http://jabber.org/protocol/admin#get-active-users last second: Number of times +get-active-users+ command has been run in the last second.
+- sess-man/http://jabber.org/protocol/admin#get-active-users/Average processing time: Average time in ms it takes to execute +get-active-users+ command.
+- sess-man/Registered accounts: Number of registered accounts.
+- sess-man/Open user connections: Number of currently open user connections.
+- sess-man/Maximum user connections: Maximum allowed user connections.
+- sess-man/Total user connections: Total number of user connections during the server instance.
+- sess-man/Active user connections: Number of currently active user connections to the server.
+- sess-man/Authentication timouts: Number of connection timeouts during authentication.
+- sess-man/Maximum user sessions today: Number of the most simultaneous sessions in the last 24 hours.
+- sess-man/Maximum user sessions yesterday: Number of the most simultaneous sessions in the previous 24 hours.
+- default-handler/Registered users: Number of registered users.
+- default-handler/Invalid registrations: Number of registration requests that were invalid.
+- presence/Users status changes: Number of presence changes all users have conducted.
+- presence-state/Users status changes: Number of presence changes all users have conducted.
+
+sess-man/Processor
+^^^^^^^^^^^^^^^^^^
+Processor statistics will result in a field of labels and values exclusive to that processor.
+The field shows as follows:
+[source,properties]
+-----
+, Queue: 0, AvTime: 0, Runs: 0, Lost: 0
+-----
+Where:
+Queue: Number of packets in process queue
+AvTime: Average time in ms processor takes to conduct it's operation.
+Runs: Number of times Processor has been run.
+Lost: Number of packets lost during processing.
+
+Statistics for the following properties are available:
+[source,list]
+-----
+sess-man/Processor: message carbons
+
+sess-man/Processor: http://jabber.org/protocol/stats
+
+sess-man/Processor: jabber:iq:auth
+
+sess-man/Processor: vcard-temp
+
+sess-man/Processor: amp
+
+sess-man/Processor: presence-subscription
+
+sess-man/Processor: disco
+
+sess-man/Processor: msgoffline
+
+sess-man/Processor: urn:xmpp:blocking
+
+sess-man/Processor: urn:xmpp:ping
+
+sess-man/Processor: jabber:iq:register
+
+sess-man/Processor: urn:ietf:params:xml:ns:xmpp-sasl
+
+sess-man/Processor: prp
+
+sess-man/Processor: presence
+
+sess-man/Processor: message-archive-xep-0136
+
+sess-man/Processor: default-handler
+
+sess-man/Processor: jabber:iq:roster
+
+sess-man/Processor: starttls
+
+sess-man/Processor: presence-state
+
+sess-man/Processor: jabber:iq:version
+
+sess-man/Processor: urn:xmpp:time
+
+sess-man/Processor: session-open
+
+sess-man/Processor: jabber:iq:privacy
+
+sess-man/Processor: urn:ietf:params:xml:ns:xmpp-bind
+
+sess-man/Processor: http://jabber.org/protocol/commands
+
+sess-man/Processor: vcard-xep0292
+
+sess-man/Processor: session-close
+
+sess-man/Processor: urn:ietf:params:xml:ns:xmpp-session
+
+sess-man/Processor: jabber:iq:private
+
+sess-man/Processor: Average amp on last 100 runs [ms]
+
+sess-man/Processor: Average msgoffline on last 100 runs[ms]
+
+These are example scripts included with Tigase for demonstration purposes, it is likely you will not encounter or need them.
+
+sess-man/groovy-example last hour
+
+sess-man/groovy-example last minute
+
+sess-man/groovy-example last second
+
+sess-man/groovy-example/Average processing time
+
+sess-man/hello last hour
+
+sess-man/hello last minute
+
+sess-man/hello last second
+
+sess-man/hello/Average processing time
+-----
+
+vhost-man
+~~~~~~~~~
+- vhost-man/Number of Vhosts: Number of configured Virtual Hosts.
+- vhost-man/Checks: is local domain: Number of local domain verification checks have been run.
+- vhost-man/Checks is anonymous domain: Number of anonymous domain checks have been run.
+- vhost-man/Get components for local domain: Number of components loaded for local domain.
+- vhost-man/Get components for non-local domain: Number of components loaded for non-local domains.
+
+ws2s
+~~~~
+No exclusive ws2s specific statistics

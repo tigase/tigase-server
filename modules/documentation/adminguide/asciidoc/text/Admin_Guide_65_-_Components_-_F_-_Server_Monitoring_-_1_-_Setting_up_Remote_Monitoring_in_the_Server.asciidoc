@@ -20,17 +20,15 @@ The monitoring itself causes very low overhead in terms of the resources and CPU
 
 What You Need.
 --------------
+Using v7.1.0 and later, statistics binaries are built-in dist-max and no extra files are needed.  If you have downloaded -dist file, you will need tigase-extras.
 
-If you use binary build for version 4.2.0 or later you can skip this section as all required libraries are included in the installation package: Extras pack. Please install the pack and you don't have to worry about libraries any more.
-
-If you run the server from sources or SVN continue reading:
-
-Remote monitoring requires an external library which is implemented in the tigase-extras package to comply with the basic rules - no third-party libraries are needed for the core Tigase server. But you will still need 2 more jar files to conduct remote monitoring activation:
+To ensure, two files are necessary to run monitoring:
 
 . link:https://projects.tigase.org/projects/tigase-extras/files[tigase-extras] or the link:https://projects.tigase.org/projects/tigase-server/repositoryr[current snapshot].
 . *jdmkrt.jar* file from link:https://opendmk.java.net/[OpenDMK] project version 5.1 or later. A copy of this jar file in also available in our maven repository: link:http://maven.tigase.org/openDMK/jdmkrt/1.0-b02/[jdmkrt.jar].
 
-Download both libraries and put them in the libs/ directory.
+Both files should be in the /jars directory.
+
 
 [[monitoring_activation]]
 Activation
@@ -103,3 +101,7 @@ acl = {
 -------------------------------------
 
 You might also need Tigase MIB definition: link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/resources/mib/JVM-MANAGEMENT-MIB.mib[TIGASE-MANAGEMENT-MIB.mib] for the server specific statistics. The MIB contains definition for all the server statistics exposed via SNMP.
+
+HTTP
+~~~~
+Access the server at example.com:9080 and you will be presented with an Agent View.
