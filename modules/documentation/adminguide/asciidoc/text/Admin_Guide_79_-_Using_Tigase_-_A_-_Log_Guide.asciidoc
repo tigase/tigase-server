@@ -75,7 +75,6 @@ By default, Tigase has a limit of 10000000 bytes or 10mb with a file rotation of
 -------------------------------------
 basic-conf/logging/java.util.logging.FileHandler.limit=20000000
 basic-conf/logging/java.util.logging.FileHandler.count=15
-basic-conf/logging/java.util.logging.FileHandler.pattern=/var/log/tigase/tigase.log
 -------------------------------------
 This code, if entered into the init.properties file increases the size of the files to 15, and enlarges the maximum size to 20mb.  Note the larger the collective log space is, the larger number of sectors on hard disk are active.  Large log blocks may impact system performance.
 
@@ -105,3 +104,13 @@ _Any component that may have a statistic, whether used or not, will place a valu
 This file can be handy if you are tracking issues in the server.
 
 tigase-console.log is appended during each run session of the server.
+
+Log File Location
+-----------------
+You can also change the location of log files if you have a specific directory you wish to use.  The configuration may be made by the following line in your init.properties file:
+[source,properties]
+-----
+basic-conf/logging/java.util.logging.FileHandler.pattern=/var/log/tigase/tigase.log
+-----
+
+This setting changes the log file location to /var/log/tigase/ where all log files will be made.  Files in the original location will be left.
