@@ -677,6 +677,10 @@ public abstract class IOService<RefObject>
 		return sessionData;
 	}
 
+	public int getSocketInputSize() {
+		return socketInputSize;
+	}
+
 	/**
 	 * Method
 	 * <code>getSocketChannel</code> is used to perform
