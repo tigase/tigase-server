@@ -22,6 +22,14 @@
 
 package tigase.io;
 
+import tigase.cert.CertCheckResult;
+import tigase.cert.CertificateUtil;
+import tigase.server.XMPPServer;
+
+import javax.net.ssl.*;
+import javax.net.ssl.SSLEngineResult.HandshakeStatus;
+import javax.net.ssl.SSLEngineResult.Status;
+import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
@@ -29,20 +37,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLEngineResult;
-import javax.net.ssl.SSLEngineResult.HandshakeStatus;
-import javax.net.ssl.SSLEngineResult.Status;
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLPeerUnverifiedException;
-
-import tigase.cert.CertCheckResult;
-import tigase.cert.CertificateUtil;
-import tigase.server.XMPPServer;
-
-import java.nio.ByteBuffer;
 
 /**
  * Describe class TLSWrapper here.
@@ -187,7 +181,7 @@ public class TLSWrapper {
 		}
 
 		netBuffSize = tlsEngine.getSession().getPacketBufferSize();
-		appBuffSize = tlsEngine.getSession().getApplicationBufferSize();
+		appBuffSize = Math.min(eventHandler.getSocketInputSize(), tlsEngine.getSession().getApplicationBufferSize());
 		this.eventHandler = eventHandler;
 
 		if (!clientMode && wantClientAuth) {

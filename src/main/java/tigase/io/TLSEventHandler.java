@@ -34,6 +34,7 @@ package tigase.io;
  */
 public interface TLSEventHandler {
 	void handshakeCompleted(TLSWrapper wrapper);
+	int getSocketInputSize();
 }
 
 
