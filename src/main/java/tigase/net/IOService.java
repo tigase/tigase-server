@@ -1369,7 +1369,10 @@ public abstract class IOService<RefObject>
 		if (netSize > socketInput.capacity() - socketInput.remaining()) {
 
 			// int newSize = netSize + socketInput.capacity();
-			int newSize = socketInput.capacity() + socketInputSize;
+			int newSize = socketInput.capacity() * 2;
+			if (bufferLimit > 0 && newSize > bufferLimit && socketInput.capacity() < bufferLimit) {
+				newSize = bufferLimit;
+			}
 			if (!checkBufferLimit(bufferLimit)) {
 				throw new IOException("Input buffer size limit exceeded");
 			}
