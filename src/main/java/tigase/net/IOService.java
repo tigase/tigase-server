@@ -26,6 +26,16 @@ package tigase.net;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.cert.CertCheckResult;
+import tigase.cert.CertificateUtil;
+import tigase.io.*;
+import tigase.stats.StatisticsList;
+import tigase.util.IOListener;
+import tigase.xmpp.JID;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.TrustManager;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -33,11 +43,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.CharBuffer;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.CoderResult;
-import java.nio.charset.MalformedInputException;
+import java.nio.charset.*;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Map;
@@ -47,15 +53,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLPeerUnverifiedException;
-import javax.net.ssl.TrustManager;
-import tigase.cert.CertCheckResult;
-import tigase.cert.CertificateUtil;
-import tigase.io.*;
-import tigase.stats.StatisticsList;
-import tigase.util.IOListener;
-import tigase.xmpp.JID;
 
 /**
  * <code>IOService</code> offers thread safe
@@ -1339,7 +1336,10 @@ public abstract class IOService<RefObject>
 		if (netSize > socketInput.capacity() - socketInput.remaining()) {
 
 			// int newSize = netSize + socketInput.capacity();
-			int newSize = socketInput.capacity() + socketInputSize;
+			int newSize = socketInput.capacity() * 2;
+			if (bufferLimit > 0 && newSize > bufferLimit && socketInput.capacity() < bufferLimit) {
+				newSize = bufferLimit;
+			}
 			if (!checkBufferLimit(bufferLimit)) {
 				throw new IOException("Input buffer size limit exceeded");
 			}

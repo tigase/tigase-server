@@ -444,11 +444,12 @@ public class TLSWrapper {
 		// }
 		//
 		// ByteBuffer bb = ByteBuffer.allocate(app.capacity() + appBuffSize);
+		int newSize = app.capacity() * 2;
 		if (log.isLoggable(Level.FINE)) {
-			log.log(Level.FINE, "Resizing tlsInput to {0} bytes, {1}", new Object[] { (2048 + app.capacity()), debugId });
+			log.log(Level.FINE, "Resizing tlsInput to {0} bytes, {1}", new Object[] { newSize, debugId });
 		}
 
-		ByteBuffer bb = ByteBuffer.allocate(app.capacity() + 2048);
+		ByteBuffer bb = ByteBuffer.allocate(newSize);
 
 		// bb.clear();
 		bb.order(app.order());
