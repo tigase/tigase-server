@@ -18,39 +18,22 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.UUID;
-
 import org.junit.After;
-
-import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
-
 import tigase.db.DBInitException;
 import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.UserNotFoundException;
-
 import tigase.server.Packet;
-
-import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
-
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.XMPPResourceConnection;
 
-import java.util.LinkedList;
+import java.util.*;
+
+import static org.junit.Assert.*;
 
 /**
  *
@@ -138,7 +121,7 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 		Queue<Packet> results = new ArrayDeque<Packet>();
 		offlineProcessor.postProcess(packet, session1, null, results, null);
 		assertTrue("generated result even than no result should be generated", results.isEmpty());
-		assertTrue("no message stored, while it should be stored", !msgRepo.getStored().isEmpty());
+		assertTrue("message stored, while it should not be stored", msgRepo.getStored().isEmpty());
 		
 		msgRepo.getStored().clear();
 		
@@ -146,7 +129,7 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 		results = new ArrayDeque<Packet>();
 		offlineProcessor.postProcess(packet, session1, null, results, null);
 		assertTrue("generated result even than no result should be generated", results.isEmpty());
-		assertTrue("no message stored, while it should be stored", !msgRepo.getStored().isEmpty());
+		assertTrue("message stored, while it should not be stored", msgRepo.getStored().isEmpty());
 		
 		msgRepo.getStored().clear();	
 		
@@ -154,7 +137,7 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 		results = new ArrayDeque<Packet>();
 		offlineProcessor.postProcess(packet, session1, null, results, null);
 		assertTrue("generated result even than no result should be generated", results.isEmpty());
-		assertTrue("message stored, while it should not be stored", msgRepo.getStored().isEmpty());		
+		assertTrue("message stored, while it should not be stored", msgRepo.getStored().isEmpty());
 		
 		msgRepo.getStored().clear();
 	}		
