@@ -197,6 +197,8 @@ include::text/Admin_Guide_65_-_Components_-_F_-_Server_Monitoring_-_1_-_Setting_
 
 include::text/Admin_Guide_66_-_Components_-_F_-_Server_Monitoring_-_2_-_Retrieving_statistics.asciidoc[]
 
+include::text/Admin_Guide_102_-_Statistics_Descriptions.asciidoc[]
+
 :leveloffset: 2
 
 include::text/Admin_Guide_67_-_Components_-_F_-_Server_Monitoring_-_3_-_EventBus.asciidoc[]
