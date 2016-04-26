@@ -7,7 +7,7 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 :website: http://tigase.net
 :Date: 2010-04-06 16:18
 
-*Tigase Jabber/XMPP Server* is *Open Source and Free (GPLv3)* Java based server. The goals behind the design and implementation of the server are:
+*Tigase Jabber/XMPP Server* is *Open Source and Free (AGPLv3)* Java based server. The goals behind the design and implementation of the server are:
 
 . Make the server robust and reliable.
 . Make the server secure communication platform.
@@ -66,4 +66,3 @@ Not all networks are so complex however. Most small companies have just a few se
 Tigase server is designed and implemented to allow dynamic reconfiguration at runtime so there is no need for restarting server each time you want to change a configuration settings.
 
 There are also interfaces and handlers available to make it easy to implement web user interface for server monitoring and configuring. Such user interface will included in one of future releases.
-
