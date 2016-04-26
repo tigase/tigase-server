@@ -101,6 +101,7 @@
 					<getRevisionOnlyOnce>true</getRevisionOnlyOnce>
 					<shortRevisionLength>8</shortRevisionLength>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<tagNameFormat>tigase-server-@{project.version}</tagNameFormat>
 				</configuration>
 				<executions>
 					<execution>
