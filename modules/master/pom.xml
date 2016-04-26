@@ -113,6 +113,7 @@
 					<doUpdate>false</doUpdate>
 					<getRevisionOnlyOnce>true</getRevisionOnlyOnce>
 					<shortRevisionLength>8</shortRevisionLength>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
 				</configuration>
 				<executions>
 					<execution>
