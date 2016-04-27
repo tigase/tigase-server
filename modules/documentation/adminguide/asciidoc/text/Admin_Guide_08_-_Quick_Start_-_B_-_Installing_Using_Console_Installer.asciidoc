@@ -8,7 +8,7 @@ v2.0, June 2014: Reformatted for AsciiDoc.
 :website: http://tigase.net
 :Date: 2010-04-06 21:18
 
-Installation Using the text-mode Installer 
+Installation Using the text-mode Installer
 ------------------------------------------
 
 When you install Tigase server on a desktop machine or a server having a graphical user interface - you can use the ////<<guiInstaller,////GUI installer. However servers are often administered using *SSH* text-mode connection because of low connection requirements or user preferences. Because of a popular users demand Tigase development team has decided to implement a console installer for the server.
@@ -40,15 +40,15 @@ java -jar nameOfTheDownloadedJarFile.jar -console
 Installation Steps
 ------------------
 
-Now you are ready to to install the server. 
+Now you are ready to to install the server.
 
 Some tips for working with the console installer:
 
-- Please remember to write down your JDK location because you will need to type it during the installation process. 
+- Please remember to write down your JDK location because you will need to type it during the installation process.
 - Installer consists of number of screens which relate to  different configuration aspects. Most of the panels end with a question whether you want to redisplay the panel or quit installer. When you make a mistake you will be probably asked later if you want re-enter the data
-again. 
-- To quit the installer use standard termination key specific to your platform. For example on a *Linux* system it is the Ctrl+C key combination. Keep in mind that if you quit the installer after it copied some files - it may leave them in the place and you might have to remove them manually. 
-- In current version the installer is of beta quality and using advanced configuration is not recommended. It might work, however it is not much tested and will be improved later. 
+again.
+- To quit the installer use standard termination key specific to your platform. For example on a *Linux* system it is the Ctrl+C key combination. Keep in mind that if you quit the installer after it copied some files - it may leave them in the place and you might have to remove them manually.
+- In current version the installer is of beta quality and using advanced configuration is not recommended. It might work, however it is not much tested and will be improved later.
 
 Initial Screen
 ~~~~~~~~~~~~~~
@@ -124,7 +124,7 @@ press 1 to continue, 2 to quit, 3 to redisplay
 Server Info
 ~~~~~~~~~~~
 
-If you don't know what exactly is Tigase server, you can find some basic introduction on this screen. 
+If you don't know what exactly is Tigase server, you can find some basic introduction on this screen.
 
 [source,bash]
 -------------------------------------
@@ -136,7 +136,7 @@ About
 Copyright (C) 2004 Tigase.org. <http://www.tigase.org/>
 
 Tigase Jabber/XMPP Server is
-Open Source and Free  (GPLv3)
+Open Source and Free  (AGPLv3)
 Java based server. The goals behind the design and
 implementation of the server are:
 
@@ -146,7 +146,7 @@ Make the server secure communication platform.
 Make flexible server which can be applied to different use
 cases.
 Make extensible server which takes full advantage of XMPP
-protocol extensibility.  
+protocol extensibility.
 
 --- Press ENTER to continue ---
 
@@ -193,7 +193,7 @@ Foundation (FSF)
 GNU GENERAL PUBLIC LICENSE
 Version 3, 29 June 2007
 
-Copyright (C) 2007 Free Software Foundation, Inc. 
+Copyright (C) 2007 Free Software Foundation, Inc.
  Everyone is permitted to copy and distribute verbatim copies
  of this license document, but changing it is not allowed.
 
@@ -207,10 +207,10 @@ Preamble
 You should also get your employer (if you work as a
 programmer) or school, if any, to sign a "copyright
 disclaimer" for the program, if necessary.  For more
-information on this, and how to apply and follow the GNU
-GPL, see --- Press ENTER to continue ---
+information on this, and how to apply and follow the
+AGPL, see --- Press ENTER to continue ---
 
-<http://www.gnu.org/licenses/>.
+<http://www.gnu.org/licenses/agpl-3.0.en.html>.
 
 The GNU General Public License does not permit incorporating
 your program into proprietary programs.  If your program is
@@ -220,13 +220,13 @@ If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please
 read
 
-<http://www.gnu.org/philosophy/why-not-lgpl.html>.  
+<http://www.gnu.org/philosophy/philosophy.html>.  
 
-1. I accept the terms of this license agreement.  
+1. I accept the terms of this license agreement.
 2. I do not accept the terms of this license agreement.
-Choose number (1-2): 
+Choose number (1-2):
 1
-press 1 to continue, 2 to quit, 3 to redisplay 
+press 1 to continue, 2 to quit, 3 to redisplay
 -------------------------------------
 
 Server Location Selection
@@ -236,10 +236,10 @@ Enter where do you want the server to be installed. If you have administrator ri
 
 [source,bash]
 -------------------------------------
-Select target path 
+Select target path
 [/home/user/tigase] /home/user/tigase-server
 
-press 1 to continue, 2 to quit, 3 to redisplay 1 
+press 1 to continue, 2 to quit, 3 to redisplay 1
 -------------------------------------
 
 Selection of Packs to be Installed
@@ -309,7 +309,7 @@ might be presented later on. After the configuration is
 complete init.properties file will be created.
 
 You can optionally restart the server at the end of the
-process if you like.  
+process if you like.
 
 
 
@@ -319,11 +319,11 @@ process if you like.
 3  [ ] Network connectivity only
 input selection:
 0
-Your XMPP (Jabber) domains [my-laptop] 
+Your XMPP (Jabber) domains [my-laptop]
 
-Server administrators [admin@my-laptop] 
+Server administrators [admin@my-laptop]
 
-Admin password [tigase] 
+Admin password [tigase]
 
 0  [x] Derby (built-in database)
 1  [ ] MySQL
@@ -350,11 +350,11 @@ press 1 to continue, 2 to quit, 3 to redisplay
 Database Configuration
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Depending on which database you did select, you will be presented  with related options to configure its connectivity options. As you will see, the parameters have default values. 
+Depending on which database you did select, you will be presented  with related options to configure its connectivity options. As you will see, the parameters have default values.
 
 [source,bash]
 -------------------------------------
-*** Database configuration: 
+*** Database configuration:
 
 You have selected MySQL database. This database needs
 additional configuration parameters. Please enter all
@@ -366,10 +366,10 @@ MySQL super user account will be used only to create and
 configure database for the Tigase server. It will not be
 used by the Tigase server later on.
 
-Super user account name: [root] 
+Super user account name: [root]
 
 WARNING: password will be visible while entering
-Super user password: mysecretpassword 
+Super user password: mysecretpassword
 WARNING: password will be visible while entering
 Retype password: mysecretpassword
 
@@ -378,15 +378,15 @@ Retype password: mysecretpassword
 MySQL database details. It will be created automatically if
 it does not exist.
 
-Database account: [tigase] 
+Database account: [tigase]
 
-Account password: [tigase12] 
+Account password: [tigase12]
 
-Database name: [tigasedb] 
+Database name: [tigasedb]
 
-Database host or IP: [localhost] 
+Database host or IP: [localhost]
 
-Additional database parameters: [] 
+Additional database parameters: []
 
 press 1 to continue, 2 to quit, 3 to redisplay
 -------------------------------------
@@ -400,15 +400,15 @@ After entering all database information an automatic test of connection and data
 -------------------------------------
 Performing DB tasks
 
-Checking connection to the database  
+Checking connection to the database
 Connection OK
-Checking if the database exists  
+Checking if the database exists
 Exists OK
-Checking the database schema  
+Checking the database schema
 New schema loaded OK
-Checking whether the database needs conversion  
+Checking whether the database needs conversion
 Conversion not needed
-Adding XMPP admin accounts  
+Adding XMPP admin accounts
 Added admins OK
 -------------------------------------
 
@@ -436,8 +436,7 @@ You can start the server using the tigase.sh file found in the scripts sub-direc
 
 Of course if you have a custom config file then change last command appropriately.  On a Windows platform you can use a bat file to run the server. There is a run.bat file in the Tigase root directory. Just double click it in Explorer or run it from command line to start the server. A window with server log output will pop-up.
 
-How to Check if the Server is Running 
+How to Check if the Server is Running
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Checking if the server is running is quite easy. Just try to connect to it by using one of may available XMPP clients.Application: Tigase Server  
-
+Checking if the server is running is quite easy. Just try to connect to it by using one of may available XMPP clients.Application: Tigase Server
