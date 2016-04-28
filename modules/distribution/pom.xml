@@ -15,7 +15,7 @@
 	<parent>
 		<groupId>tigase</groupId>
 		<artifactId>tigase-server-master</artifactId>
-		<version>7.0.4-SNAPSHOT</version>
+		<version>7.0.4</version>
 		<relativePath>../master</relativePath>
 	</parent>
 	
@@ -55,22 +55,22 @@
 								<configuration>
 									<target>
 										<exec executable="sed" output="README">
-											<arg value="-e"/>
-											<arg value="s/&lt;[^>]*>//g"/>
-											<arg value="-e"/>
-											<arg value="s/&#60;[^>]*>//g"/>
-											<arg value="-e"/>
-											<arg value="s/&amp;[^; ]*;//g"/>
-											<arg value="-e"/>
-											<arg value="s/${APP_VER}/${project.version}/g"/>
-											<arg value="${dist_path}/package.html"/>
+											<arg value="-e" />
+											<arg value="s/&lt;[^&gt;]*&gt;//g" />
+											<arg value="-e" />
+											<arg value="s/&lt;[^&gt;]*&gt;//g" />
+											<arg value="-e" />
+											<arg value="s/&amp;[^; ]*;//g" />
+											<arg value="-e" />
+											<arg value="s/${APP_VER}/${project.version}/g" />
+											<arg value="${dist_path}/package.html" />
 										</exec>
 										<exec executable="sed" output="package.html">
-											<arg value="s/${APP_VER}/${project.version}--b${gitVersion}/g"/>
-											<arg value="${dist_path}/package.html"/>
+											<arg value="s/${APP_VER}/${project.version}--b${gitVersion}/g" />
+											<arg value="${dist_path}/package.html" />
 										</exec>
-										<copy file="${dist_path}/License.html" tofile="License.html"/>
-										<!--<copy file="${dist_path}/ChangeLog" tofile="ChangeLog"/>-->
+										<copy file="${dist_path}/License.html" tofile="License.html" />
+										<!--<copy file="${dist_path}/ChangeLog" tofile="ChangeLog" />-->
 
 									</target>
 								</configuration>
@@ -254,7 +254,7 @@
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-server</artifactId>
-			<version>7.0.4-SNAPSHOT</version>
+			<version>7.0.4</version>
 		</dependency>
 		<dependency>
 			<groupId>tigase</groupId>
@@ -343,7 +343,7 @@
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-acs-pubsub</artifactId>
-			<version>1.1.1-SNAPSHOT</version>
+			<version>1.1.1</version>
 			<scope>runtime</scope>
 		</dependency>
 
