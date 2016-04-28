@@ -26,24 +26,20 @@ package tigase.db;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import tigase.osgi.ModulesManagerImpl;
+import tigase.stats.StatisticsContainerIfc;
+import tigase.stats.StatisticsProviderIfc;
+import tigase.stats.StatisticsList;
+import tigase.util.ClassUtil;
+
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-
-import tigase.osgi.ModulesManagerImpl;
-import tigase.util.ClassUtil;
-
-import java.util.Properties;
 
 /**
  * Describe class RepositoryFactory here.
@@ -284,6 +280,8 @@ public abstract class RepositoryFactory {
 
 	/** Field description */
 	public static final String DATABASE_TYPE_PROP_KEY = "database-type";
+
+	public static final StatisticsContainerIfc statistics = new RepositoryFactoryStatisticsContainer();
 
 	private static final Logger log = Logger.getLogger(RepositoryFactory.class.getCanonicalName());
 	
@@ -678,6 +676,26 @@ public abstract class RepositoryFactory {
 
 		return repo;
 	}
+
+	public static class RepositoryFactoryStatisticsContainer implements StatisticsContainerIfc {
+
+		@Override
+		public String getName() {
+			return "repo-factory";
+		}
+
+		@Override
+		public void getStatistics(StatisticsList list) {
+			list.add(getName(), "Number of data repositories", data_repos.size(), Level.FINE);
+			for (DataRepository dataRepository : data_repos.values()) {
+				if (dataRepository instanceof StatisticsProviderIfc) {
+					((StatisticsProviderIfc) dataRepository).getStatistics(getName(), list);
+				}
+			}
+		}
+
+	}
+
 }    // RepositoryFactory
 
 
