@@ -1,6 +1,6 @@
 = Tigase Administration Guide
 Tigase Team <team@tigase.net>
-v7.0.0
+v7.1.0
 :numbered:
 :website: http://tigase.net
 :Date: 2014-07-10
@@ -28,6 +28,8 @@ include::text/Admin_Guide_05_-_Quick_Start_-_C_-_Installing_Using_Console_Instal
 include::text/Admin_Guide_06_-_Quick_Start_-_D_-_Manual_Installation_in_Console_Mode.asciidoc[]
 
 include::text/Admin_Guide_07_-_Quick_Start_-_E_-_Windows_Installation.asciidoc[]
+
+include::text/Admin_Guide_07_-_Quick_Start_-_F_-_Setting_Up_Server.asciidoc[]
 
 :leveloffset: 1
 
