@@ -21,14 +21,15 @@
  */
 package tigase.server.websocket;
 
+import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
-import junit.framework.TestCase;
-import org.junit.Assert;
-import org.junit.Test;
 
 /**
  *
@@ -61,12 +62,33 @@ public class WebSocketHybiTest extends TestCase {
 			}
 
 		};
+		io.maskingKey = new byte[4];
 		impl.encodeFrameAndWrite(io, buf);
 		tmp.flip();
-		ByteBuffer decoded = impl.decodeFrame(io, tmp);
+		ByteBuffer tmp1 = maskFrame(tmp);
+		ByteBuffer decoded = impl.decodeFrame(io, tmp1);
 		Assert.assertArrayEquals("Data before encoding do not match data after decoding", input.getBytes(), decoded.array());
 	}
-	
+
+	private ByteBuffer maskFrame(ByteBuffer data) {
+		ByteBuffer tmp = ByteBuffer.allocate(1024);
+		byte[] header = new byte[2];
+		data.get(header);
+		header[header.length - 1] = (byte) (header[header.length - 1] | 0x80);
+		tmp.put(header);
+		byte[] mask = { 0x00, 0x00, 0x00, 0x00 };
+		tmp.put(mask);
+		byte b;
+		while (data.hasRemaining()) {
+			b = data.get();
+			b = (byte) (b ^ 0x00);
+			tmp.put(b);
+		}
+		tmp.flip();
+		return tmp;
+	}
+
+
 	@Test
 	public void testHandshakeFail() throws NoSuchAlgorithmException, IOException {
 		final ByteBuffer tmp = ByteBuffer.allocate(2048);
@@ -82,7 +104,7 @@ public class WebSocketHybiTest extends TestCase {
 				return 80;
 			}
 
-		};		
+		};
 		Map<String,String> params = new HashMap<String,String>();
 		params.put("Sec-WebSocket-Key1", "1C2J899_05  6  !  M 9    ^4");
 		params.put("Sec-WebSocket-Key2", "23 2ff0M_E0#.454X23");

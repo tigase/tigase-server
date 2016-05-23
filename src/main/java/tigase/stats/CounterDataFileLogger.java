@@ -99,6 +99,10 @@ public class CounterDataFileLogger
 				writer.write( entry.getValue() );
 				writer.newLine();
 			}
+			writer.write( "Statistics time: " + sdf.format( currTime ) );
+			writer.newLine();
+			writer.write( "Statistics time (linux): " + currTime.getTime() );
+			writer.newLine();
 		} catch ( IOException ex ) {
 			log.log( Level.SEVERE, "Error dumping server statistics to file", ex );
 		}

@@ -9,7 +9,27 @@ PubSub Schema Changes
 :numbered:
 :website: http://www.tigase.org
 
-Tigase PubSub Component is currently version 3.1.0 which is introduced in Tigase server v7.1.0
+Tigase PubSub Component is currently version 3.2.0 which is introduced in Tigase server v7.1.0
+
+[[Pubsub3.2.0Changes]]
+PubSub 3.2.0 Changes
+--------------------
+
+PubSub v 3.2.0 adds a new procedure TigPubSubGetNodeMeta which supports PubSub metadata retrieval while conducting a disco#info query on nodes.
+
+You will need to upgrade your database if you are not using v3.2.0 schema. Tigase will report being unable to load PubSub component if you do not have this schema version.
+
+The MySQL schema can be found link:https://projects.tigase.org/projects/tigase-pubsub/repository/revisions/master/entry/database/mysql-pubsub-schema-3.2.0.sql[Here].
+
+The Derby schema can be found link:https://projects.tigase.org/projects/tigase-pubsub/repository/changes/database/derby-pubsub-schema-3.2.0.sql[Here].
+
+The PostGRESQL schema can be found link:https://projects.tigase.org/projects/tigase-pubsub/repository/changes/database/postgresql-pubsub-schema-3.2.0.sql[Here].
+
+The MS SQL schema can be found link:https://projects.tigase.org/projects/tigase-pubsub/repository/changes/database/sqlserver-pubsub-schema-3.2.0.sql[Here].
+
+The same files are also included in all distributions of v7.1.0 in +[tigaseroot]/database/+ . All changes to database schema are meant to be backward compatible.
+
+For instructions how to manually upgrade the databases, please refer to xref:tigaseServer71[Tigase v7.1.0 Schema Updates section].
 
 [[Pubsub310change]]
 PubSub 3.1.0 Changes
@@ -26,37 +46,6 @@ The PostGRESQL schema can be found link:https://projects.tigase.org/projects/tig
 The MS SQL schema can be found link:https://projects.tigase.org/projects/tigase-pubsub/repository/changes/database/sqlserver-pubsub-schema-3.1.0.sql[Here].
 
 The same files are also included in all distributions of v7.1.0 in +[tigaseroot]/database/+ . All changes to database schema are meant to be backward compatible.
-
-
-You can use a utility in Tigase to update the schema using the following command from the Tigase root:
-Linux
------
-java -cp "jars/*" tigase.util.DBSchemaLoader
------
-or from a Windows environment
------
-java -cp jars/* tigase.util.DBSchemaLoader
------
-*NOTE: Some variation may be necessary depending on how your java build uses -cp option*
-
-Use the following options to customize. Options in bold are required.::
-* *[-dbType database_type {derby, mysql, postgresql, sqlserver}]*
-* [-schemaVersion schema version {4, 5, 5-1} ]
-* *[-dbName database name]*
-* [-dbHostname database hostname] (default is localhost)
-* *[-dbUser tigase username]*
-* *[-dbPass tigase user password]*
-* [-rootUser database root username]
-* [-rootPass database root password]
-* *[-file path to sql schema file]*
-* [-query sql query to execute]
-* [-logLevel java logger Level]
-* [-adminJID comma separated list of admin JIDs]
-* [-adminJIDpass password (one for all entered JIDs]
-
-*Arguments take following precedent: query, file, whole schema*
-
-
 
 PubSub v3.0.0 Changes
 ---------------------

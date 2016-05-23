@@ -21,6 +21,8 @@
  */
 package tigase.server.websocket;
 
+import tigase.net.SocketType;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
@@ -28,8 +30,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.net.SocketType;
-import static tigase.server.websocket.WebSocketHybi.ID;
 
 /**
  * Class implements Hixie-76 version of WebSocket protocol specification
@@ -177,7 +177,8 @@ public class WebSocketHixie76 implements WebSocketProtocolIfc {
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("closing connection due to client request");
 				}
-				service.forceStop();
+				service.setState(WebSocketXMPPIOService.State.closed);
+				//service.forceStop();
 
 				return null;				
 			}
@@ -202,6 +203,10 @@ public class WebSocketHixie76 implements WebSocketProtocolIfc {
 
 	@Override
 	public void closeConnection(WebSocketXMPPIOService service) {
+		if (!service.isConnected())
+			return;
+
+		service.setState(WebSocketXMPPIOService.State.closed);
 		service.writeBytes(ByteBuffer.wrap(new byte[] { (byte) 0xFF, (byte) 0x00 }));
 	}
 	

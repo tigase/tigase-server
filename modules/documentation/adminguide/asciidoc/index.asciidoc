@@ -33,6 +33,8 @@ include::text/Admin_Guide_06_-_Quick_Start_-_D_-_Manual_Installation_in_Console_
 
 include::text/Admin_Guide_07_-_Quick_Start_-_E_-_Windows_Installation.asciidoc[]
 
+include::text/Admin_Guide_07_-_Quick_Start_-_F_-_Setting_Up_Server.asciidoc[]
+
 :leveloffset: 1
 
 
@@ -197,6 +199,8 @@ include::text/Admin_Guide_65_-_Components_-_F_-_Server_Monitoring_-_1_-_Setting_
 
 include::text/Admin_Guide_66_-_Components_-_F_-_Server_Monitoring_-_2_-_Retrieving_statistics.asciidoc[]
 
+include::text/Admin_Guide_102_-_Statistics_Descriptions.asciidoc[]
+
 :leveloffset: 2
 
 include::text/Admin_Guide_67_-_Components_-_F_-_Server_Monitoring_-_3_-_EventBus.asciidoc[]
@@ -290,3 +294,5 @@ include::text/Admin_Guide_98_-_Using_Tigase_-_M_-_Configuration_Wizards.asciidoc
 include::text/Admin_Guide_99_-_Using_Tigase_-_N_-_Offline_Messages.asciidoc[]
 
 include::text/Admin_Guide_100_-_Using_Tigase_-_O_-_Licensing.asciidoc[]
+
+include::text/Admin_Guide_101_-_Using_Tigase_-_P_-_Advanced_Options.asciidoc[]

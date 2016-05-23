@@ -94,7 +94,7 @@ public abstract class AbstractScriptCommand extends StatisticHolderImpl implemen
 		this.description = description;
 		this.group = group;
 
-		setStatisticsPrefix(id);
+		setStatisticsPrefix("adhoc-command/" + id);
 	}
 
 	//~--- get methods ----------------------------------------------------------
