@@ -7,6 +7,12 @@
 		<packaging.type>bundle</packaging.type>
 		<dir>target</dir>
 		<maven.build.timestamp.format>yyyy-MM-dd/HH:mm:ss</maven.build.timestamp.format>
+
+		<sign-keystore>/path/to/jks.keystore</sign-keystore>
+		<sign-alias>alias</sign-alias>
+		<sign-storepass>storepass</sign-storepass>
+		<sign-keypass>keypass</sign-keypass>
+		<sign-skip>true</sign-skip>
 	</properties>
 
 	<modelVersion>4.0.0</modelVersion>
