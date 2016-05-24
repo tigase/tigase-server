@@ -322,6 +322,7 @@
 					<processAttachedArtifacts>false</processAttachedArtifacts>
 					<tsa>http://timestamp.comodoca.com/rfc3161</tsa>
 					<skip>${sign-skip}</skip>
+					<removeExistingSignatures>true</removeExistingSignatures>
 
 					<keystore>${sign-keystore}</keystore>
 					<alias>${sign-alias}</alias>
