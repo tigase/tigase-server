@@ -32,6 +32,8 @@ import tigase.db.comp.RepositoryChangeListenerIfc;
 import tigase.io.TLSUtil;
 import tigase.server.AbstractComponentRegistrator;
 import tigase.server.ServerComponent;
+import tigase.stats.StatisticsContainer;
+import tigase.stats.StatisticsList;
 import tigase.util.DNSResolverFactory;
 import tigase.util.DataTypes;
 import tigase.xmpp.BareJID;
@@ -56,7 +58,7 @@ import static tigase.io.SSLContextContainerIfc.*;
  */
 public abstract class ConfiguratorAbstract
 				extends AbstractComponentRegistrator<Configurable>
-				implements RepositoryChangeListenerIfc<ConfigItem> {
+				implements RepositoryChangeListenerIfc<ConfigItem>, StatisticsContainer {
 	/**
 	 * Field description
 	 * @deprecated moved to RepositoryFactory
@@ -731,6 +733,12 @@ public abstract class ConfiguratorAbstract
 	 */
 	public Map<String, Object> getProperties(String nodeId) throws ConfigurationException {
 		return configRepo.getProperties(nodeId);
+	}
+
+	@Override
+	public void getStatistics(StatisticsList list) {
+		super.getStatistics(list);
+		RepositoryFactory.statistics.getStatistics(list);
 	}
 
 	@Override

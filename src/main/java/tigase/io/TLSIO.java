@@ -26,18 +26,16 @@ package tigase.io;
 
 import tigase.stats.StatisticsList;
 
-//~--- JDK imports ------------------------------------------------------------
-
+import javax.net.ssl.SSLEngineResult;
 import java.io.EOFException;
 import java.io.IOException;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.SocketChannel;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.net.ssl.SSLEngineResult;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -208,6 +206,16 @@ public class TLSIO implements IOInterface {
 
 			return decodeData(tmpBuffer);
 		} else {
+			if (tlsInput.capacity() > tlsWrapper.getAppBuffSize() && tlsInput.capacity() == tlsInput.remaining()) {
+				if (log.isLoggable(Level.FINE)) {
+					log.log(Level.FINE, "Resizing tlsInput to {0} bytes, {1}", new Object[] { tlsWrapper.getAppBuffSize(), toString() });
+				}
+				ByteBuffer bb = ByteBuffer.allocate(tlsWrapper.getAppBuffSize());
+
+				bb.order(tlsInput.order());
+
+				tlsInput = bb;
+			}
 			return null;
 		} // end of else
 	}

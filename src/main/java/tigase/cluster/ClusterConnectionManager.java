@@ -30,6 +30,7 @@ import tigase.cluster.api.*;
 import tigase.cluster.repo.ClConConfigRepository;
 import tigase.cluster.repo.ClusterRepoConstants;
 import tigase.cluster.repo.ClusterRepoItem;
+import tigase.cluster.repo.ClusterRepoItemEvent;
 import tigase.conf.ConfigurationException;
 import tigase.db.*;
 import tigase.db.beans.DataSourceBean;
@@ -37,6 +38,8 @@ import tigase.db.comp.AbstractMDComponentRepositoryBean;
 import tigase.db.comp.ComponentRepository;
 import tigase.db.comp.ComponentRepositoryDataSourceAware;
 import tigase.db.comp.RepositoryChangeListenerIfc;
+import tigase.eventbus.EventBus;
+import tigase.eventbus.EventBusFactory;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.Inject;
@@ -165,11 +168,24 @@ public class ClusterConnectionManager
 	private static final String SERVICE_CONNECTED_TASK_FUTURE =
 			"service-connected-task-future";
 
+	private EventBus eventBus = null;
+
+	public final static String EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_KEY = "eventbus-repository-notifications";
+	public final static boolean EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_VALUE = false;
+
+
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
 	@Inject
 	private ClusterControllerIfc clusterController = null;
+
+	public static enum REPO_ITEM_UPDATE_TYPE {
+		ADDED,
+		UPDATED,
+		REMOVED
+	}
+
 
 	// private String cluster_controller_id = null;
 	private IOServiceStatisticsGetter                                ioStatsGetter =
@@ -302,15 +318,20 @@ public class ClusterConnectionManager
 				addWaitingTask(port_props);
 			}
 
+			sendEvent( REPO_ITEM_UPDATE_TYPE.ADDED, repoItem );
 			// reconnectService(port_props, connectionDelay);
 		}
 	}
 
 	@Override
-	public void itemRemoved(ClusterRepoItem item) {}
+	public void itemRemoved(ClusterRepoItem item) {
+		sendEvent( REPO_ITEM_UPDATE_TYPE.REMOVED, item );
+	}
 
 	@Override
-	public void itemUpdated(ClusterRepoItem item) {}
+	public void itemUpdated(ClusterRepoItem item) {
+		sendEvent( REPO_ITEM_UPDATE_TYPE.UPDATED, item );
+	}
 
 	@Override
 	public void nodeConnected(String node) {
@@ -716,6 +737,8 @@ public class ClusterConnectionManager
 		props.put(WATCHDOG_TIMEOUT, -1 * SECOND);
 		
 		props.put(CLUSTER_CONNECTIONS_SELECTOR_KEY, DEF_CLUSTER_CONNECTIONS_SELECTOR_VAL);
+
+		props.put(EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_KEY, EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_VALUE);
 		
 		if (getDefHostName().toString().equalsIgnoreCase( "localhost") ) {
 			TigaseRuntime.getTigaseRuntime().shutdownTigase( new String [] {
@@ -852,10 +875,30 @@ public class ClusterConnectionManager
 		if (props.get(ELEMENTS_NUMBER_LIMIT_PROP_KEY) != null) {
 			elements_number_limit = (Integer) props.get(ELEMENTS_NUMBER_LIMIT_PROP_KEY);
 		}
+
+		if (props.get(EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_KEY) != null) {
+			boolean eventbus_enabled = (Boolean) props.get(EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_KEY);
+			if (eventbus_enabled) {
+				eventBus = EventBusFactory.getInstance();
+			}
+		}
+
+
+
 		super.setProperties(props);
 	}
 
 	//~--- methods --------------------------------------------------------------
+	private void sendEvent( REPO_ITEM_UPDATE_TYPE action, ClusterRepoItem item ) {
+
+		// either RepositoryItem was wrong or EventBus is not enabled - skiping broadcasting the event;
+		if ( eventBus == null || item == null ){
+			return;
+		}
+
+		ClusterRepoItemEvent event = new ClusterRepoItemEvent(item, action );
+		eventBus.fire( event );
+	}
 
 	/**
 	 * Method description

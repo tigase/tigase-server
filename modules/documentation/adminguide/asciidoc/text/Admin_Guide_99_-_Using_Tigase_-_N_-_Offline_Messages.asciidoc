@@ -1,0 +1,179 @@
+[[offlineMessages]]
+Offline Messages
+================
+:author: Daniel Wisnewski
+:version: v1.0, March 2016
+:date: 2016-03-07 07:54
+
+:toc:
+:numbered:
+:website: http://www.tigase.net
+
+Tigase like any XMPP server supports storing of messages for users who are offline so that they may receive messages sent to them while they were not logged in.
+
+By default, Tigase +MessageAmp+ processor is responsible for storing offline messages, and will automatically store offline messages.  This guide has multiple sections for setting limits globally, per user, and others.
+
+Many of the features listed here require the use of the Advanced Message Processor Plugin which is turned on by default. To ensure AMP is turned on your system, view your init.properties file and be sure the following is there in your plugins line:
+[source,bash]
+-----
+--sm-plugins=+amp
+-----
+Messages will be delivered to intended recipients when they first login after roster exchange.
+
+
+[[offlineMessageLimits]]
+Offline Message Limits
+----------------------
+Support for limiting number of stored offline messages on a per-user basis has now been added to Tigase as of v7.1.0.  By default, Tigase comes with a limit of stored offline messages which is set for every user. This limit by default is 100 offline messages for barejid-barejid pair. This value can be changed by the +store-limit+ property. To change to 200 messages on barejid-barejid paid, add the following entries to the init.properties file:
+[source,properties]
+-----
+sess-man/plugins-conf/amp/store-limit[L]=200
+amp/store-limit[L]=200
+-----
+
+This setting applies to every user.
+
+User Limit
+~~~~~~~~~~
+Each user is able to configure the number of offline messages which should be stored for him. To enable this feature, the following lines need to be entered into the init.properties file:
+[source,properties]
+-----
+sess-man/plugins-conf/amp/user-store-limit-enable[B]=true
+amp/user-store-limit-enable[B]=true
+-----
+
+Values of user-specific limits will be stored in UserRepository under subnode of +offline-msgs+ and key +store-limit+. Data storage will be stored in +tig_pairs+ key with the value and a proper record from +tig_nodes+ points to this record.
+
+Handling of Offline Messages Exceeding Limits
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+There are two possible ways to handle offline messages that exceed the limitations:
+. +error+ sending message with error type back to sender.
+. +drop+ drop of message without notifications to sender.
+
+By default, Tigase sends a message back to the original sender with an error type of +service-unavailable+ with a proper description of error according to link:http://www.xmpp.org/extensions/xep-0160.html[XEP-0160].
+However, it is possible to change this behavior to better suit your needs. This is done by adding the following line to your init.properties file.
+[source,properties]
+-----
+sess-man/plugins-conf/amp/quota-exceeded=drop
+-----
+This will force Tigase to drop packets that exceed the offline message limit.
+
+Setting of Limits by User
+~~~~~~~~~~~~~~~~~~~~~~~~~
+Users wishing to set a custom limit of stored offline messages for barejid-barejid pairs needs to send the following XMPP stanza to the server:
+[source,xml]
+-----
+<iq type="set" id="${random-id}">
+  <msgoffline xmlns="msgoffline" limit="${limit}"/>
+</iq>
+-----
+Where:
+. ${random-id} is a random ID of the stanza (can be any string).
+. ${limit} is the integer value of the offline message limit. This can be set to +false+ to disable offline message limits.
+
+In response, the server will send back an +iq+ stanza with a result type:
+[source,xml]
+-----
+<iq type="result" id="${random-id}">
+  <msgoffline xmlns="msgoffline" limit="${limit}"/>
+</iq>
+-----
+
+Example of Setting Limit of Stored Offline Messages to 10
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+XMPP client sends the following to the server:
+[source,xml]
+-----
+<iq type="set" id="aabba">
+  <msgoffline xmlns="msgoffline" limit="10"/>
+</iq>
+-----
+
+Server response:
+[source,xml]
+-----
+<iq type="result" id="aabba">
+  <msgoffline xmlns="msgoffline" limit="10"/>
+</iq>
+-----
+
+Example of Disabling Offline Message Limit
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+XMPP client sends the following to the server:
+[source,xml]
+-----
+<iq type="set" id="aabbb">
+  <msgoffline xmlns="msgoffline" limit="false"/>
+</iq>
+-----
+
+Server response:
+[source,xml]
+-----
+<iq type="result" id="aabbb">
+  <msgoffline xmlns="msgoffline" limit="false"/>
+</iq>
+-----
+
+[[nonBodyElements]]
+Storing offline messages without body content
+---------------------------------------------
+Tigase can now store offline messages without <body/> content.
+See link:http://xmpp.org/extensions/xep-0334.html[XEP-0334] for protocol details.
+
+Support also added to set a list of paths and xmlns to trigger and place storage of offline messages using the following settings in init.properties:
+-----
+sess-man/plugins-conf/amp/msg-store-offline-paths[s]=/message/received[urn:xmpp:receipts],/message/store-offline
+-----
+
+
+[[addOfflinePaths]]
+Adding Custom Storage Paths
+---------------------------
+Support has been added to set a list of paths and xmlns to trigger and place storage of offline messages using the following settings in init.properties:
+-----
+sess-man/plugins-conf/amp/msg-store-offline-paths[s]=/message/received[urn:xmpp:receipts],/message/store-offline
+-----
+
+[[offlineMessageReceipts]]
+Message Receipts
+----------------
+Tigase AMP component has support for message receipts and storage.  By default, offline message delivery receipts will be sent to offline message storage.  Note this WILL count against the total number of stored offline messages as explored earlier.
+
+Offline Storage
+~~~~~~~~~~~~~~~
+It is possible to set storage of message receipts, and add other types to save:
+[source,properties]
+-----
+sess-man/plugins-conf/amp/msg-store-offline-paths[s]=/message/received[urn:xmpp:receipts],/message/store-offline,-/message/do-not-store
+-----
+The above setting in the init.properties file will do three things:
+- Messages with a <received> subelement of xmlns set to urn:xmpp:receipts will now be stored.
+- Messages with <store-offline> subelement will be stored without checking for associated xmlns.
+- Messages with <do-not-store> element *will not* be saved.
+
+Any of these can be adjusted for your installation, remember that a '-' will stop storage of messages with the indicated property.
+Messages will be checked by these matchers and if any of them result in a positive they will override default settings.
+Matcher logic uses left to right ordering, in that matches on the first statement will ignore/override later listed matchers.
+
+For example, if you wanted to store messages with <received> element, but not ones with <plain> element:
+*THIS STATEMENT WILL NOT WORK*
+[source,properties]
+-----
+sess-man/plugins-conf/amp/msg-store-offline-paths[s]=/message/received,-/message/plain
+-----
+
+As it will just store all messages with <receieved> subelement.  The below statement will properly filter your results.
+[source,properties]
+-----
+sess-man/plugins-conf/amp/msg-store-offline-paths[s]=-/message/plain,/message/received
+-----
+
+[[disableOfflineMessages]]
+Disabling Offline Messages
+--------------------------
+If you wish to disable the storing of offline messages, use the following line in your init.properties file.  This will not disable other features of the AMP plugin.
+[source,properties]
+-----
+sess-man/plugins-conf/amp/msg-offline=false
+-----

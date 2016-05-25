@@ -27,32 +27,17 @@ package tigase.stats;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.sys.TigaseRuntime;
-
 import tigase.util.AllHistoryCache;
 import tigase.util.FloatHistoryCache;
 import tigase.util.IntHistoryCache;
 import tigase.util.LongHistoryCache;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
+import javax.management.*;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import javax.management.MBeanAttributeInfo;
-import javax.management.MBeanInfo;
-import javax.management.MBeanNotificationInfo;
-import javax.management.MBeanOperationInfo;
-import javax.management.MBeanParameterInfo;
-import javax.management.NotCompliantMBeanException;
-import javax.management.StandardMBean;
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Class StatisticsProvider
@@ -85,14 +70,14 @@ public class StatisticsProvider
 	 * @throws NotCompliantMBeanException
 	 */
 	public StatisticsProvider(StatisticsCollector theRef, int historySize,
-			long updateInterval)
+			long updateInterval, int highMemoryLevel)
 					throws NotCompliantMBeanException {
 
 		// WARNING Uncomment the following call to super() to make this class
 		// compile (see BUG ID 122377)
 		super(StatisticsProviderMBean.class, false);
 		this.theRef = theRef;
-		cache       = new StatisticsCache(historySize, updateInterval);
+		cache       = new StatisticsCache(historySize, updateInterval, highMemoryLevel);
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -722,7 +707,7 @@ public class StatisticsProvider
 		//~--- constructors -------------------------------------------------------
 
 		// ~--- constructors -------------------------------------------------------
-		private StatisticsCache(int historySize, long cacheUpdate) {
+		private StatisticsCache(int historySize, long cacheUpdate, int highMemoryLevel) {
 			if (historySize > 0) {
 				smpacks_history      = new FloatHistoryCache(historySize);
 				server_conns_history = new IntHistoryCache(historySize);
@@ -731,7 +716,7 @@ public class StatisticsProvider
 				conns_history        = new IntHistoryCache(historySize);
 				clpacks_history      = new FloatHistoryCache(historySize);
 				direct_used_history  = new LongHistoryCache(historySize);
-				allHistory           = new AllHistoryCache(historySize);
+				allHistory           = new AllHistoryCache(historySize, highMemoryLevel);
 			}
 			updateTimer = new Timer("stats-cache", true);
 			updateTimer.scheduleAtFixedRate(new TimerTask() {

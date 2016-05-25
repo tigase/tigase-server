@@ -21,6 +21,8 @@
  */
 package tigase.server.websocket;
 
+import tigase.util.Base64;
+
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
@@ -29,7 +31,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.util.Base64;
+
+import static tigase.server.websocket.WebSocketXMPPIOService.State.closing;
 
 /**
  * Class implements Hybi (RFC compatible) version of WebSocket protocol specification
@@ -41,7 +44,7 @@ import tigase.util.Base64;
  * @author andrzej
  */
 public class WebSocketHybi implements WebSocketProtocolIfc {
-	
+
 	private static final Logger log = Logger.getLogger(WebSocketHybi.class.getCanonicalName());
 	
 	public static final String ID = "hybi";
@@ -57,7 +60,11 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 
 	private static final String WS_ACCEPT_KEY   = "Sec-WebSocket-Accept";
 	private static final String WS_KEY_KEY      = "Sec-WebSocket-Key";
-	
+
+	private static final String CLOSE_CODE = "close-code";
+	private static final boolean ALLOW_UNMASKED_FROM_CLIENT = Boolean.getBoolean("ws-allow-unmasked-frames");
+	private static final int PROTOCOL_ERROR = 1003;
+
 	@Override
 	public String getId() {
 		return ID;
@@ -120,7 +127,9 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 						log.log(Level.FINEST, "Socket: {0}, closing connection due to client request {1}", 
 								new Object[] { service, String.format("%02X ", type) });
 					}
-					service.forceStop();
+					service.setState(closing);
+					closeConnection(service, null);
+					//service.forceStop();
 
 					return null;
 				}
@@ -129,12 +138,21 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 
 				// check if content is masked
 				masked = (b2 & 0x80) == 0x80;
+				if (!masked && !ALLOW_UNMASKED_FROM_CLIENT) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Socket: {0}, closing connection due to protocol error - unmasked frame sent by client {1}",
+								new Object[] { service, String.format("%02X ", type) });
+					}
+					closeConnection(service, PROTOCOL_ERROR);
+					//service.forceStop();
+					return null;
+				}
+
 
 				// ignore sign bit
 				service.frameLength = (b2 & 0x7F);
 				if (service.frameLength > 125) {
-
-				// if frame length is bigger than 125 then
+					// if frame length is bigger than 125 then
 					// if is 126 - size is short (unsigned short)
 					// is is 127 - size is long
 					service.frameLength = (service.frameLength == 126)
@@ -203,7 +221,8 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 			unmasked = null;
 		}
 
-		return unmasked;	}
+		return unmasked;
+	}
 
 	@Override
 	public void encodeFrameAndWrite(WebSocketXMPPIOService service, ByteBuffer buf) throws IOException {
@@ -224,8 +243,42 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 	
 	@Override
 	public void closeConnection(WebSocketXMPPIOService service) {
-		ByteBuffer bbuf = createFrameHeader((byte) 0x88, 0);
+		if (!service.isConnected())
+			return;
+
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Socket: {0}, sending close frame", service);
+		}
+
+		service.setState(WebSocketXMPPIOService.State.closed);
+		Integer code = (Integer) service.getSessionData().get(CLOSE_CODE);
+		int len = 0;
+		if (code != null) {
+			len += 2;
+		}
+		ByteBuffer bbuf = createFrameHeader((byte) 0x88, len);
 		service.writeBytes(bbuf);
+		if (code != null) {
+			ByteBuffer buf = ByteBuffer.allocate(2);
+			buf.putShort(code.shortValue());
+			buf.flip();
+			service.writeBytes(buf);
+		}
+	}
+
+	private void closeConnection(WebSocketXMPPIOService service, Integer code) {
+		if (code != null)
+			service.getSessionData().put(CLOSE_CODE, code);
+		switch (service.getState()) {
+			case closing:
+				service.setState(WebSocketXMPPIOService.State.closed);
+				break;
+			case handshaked:
+				service.setState(WebSocketXMPPIOService.State.closing);
+				break;
+			default:
+				break;
+		}
 	}
 	
 	/**

@@ -33,7 +33,9 @@ import tigase.sys.TigaseRuntime;
 import tigase.util.DNSResolverFactory;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -109,6 +111,13 @@ public class ClConConfigRepository
 
 		String          host = DNSResolverFactory.getInstance().getDefaultHost();
 		ClusterRepoItem item = getItem(host);
+		try {
+			item = ( item != null ) ? (ClusterRepoItem)(item.clone()) : null;
+		} catch ( CloneNotSupportedException ex ) {
+			if ( log.isLoggable( Level.FINEST ) ){
+				log.log( Level.SEVERE, "Clonning of ClusterRepoItem has failed", ex );
+			}
+		}
 
 		if (item == null) {
 			item = getItemInstance();
@@ -119,6 +128,18 @@ public class ClConConfigRepository
 		item.setCpuUsage(TigaseRuntime.getTigaseRuntime().getCPUUsage());
 		item.setMemUsage(TigaseRuntime.getTigaseRuntime().getHeapMemUsage());
 		storeItem(item);
+
+
+		if (auto_remove_obsolete_items) {
+			Iterator<ClusterRepoItem> iterator = iterator();
+			while(iterator.hasNext()) {
+				ClusterRepoItem next = iterator.next();
+				if ( ( next.getLastUpdate() > 0 ) && System.currentTimeMillis() - next.getLastUpdate() > 5000 * autoreload_interval ){
+					removeItem( next.getHostname() );
+				}
+			}
+		}
+
 	}
 
 	public void itemLoaded(ClusterRepoItem item) {
@@ -145,9 +166,7 @@ public class ClConConfigRepository
 	public boolean itemChanged(ClusterRepoItem oldItem, ClusterRepoItem newItem) {
 		return !oldItem.getPassword().equals( newItem.getPassword() )
 					 || ( oldItem.getPortNo() != newItem.getPortNo() )
-					 || ( oldItem.getSecondaryHostname() != null
-								&& newItem.getSecondaryHostname() != null
-								&& !oldItem.getSecondaryHostname().equals( newItem.getSecondaryHostname() ) );
+					 || !Objects.equals( oldItem.getSecondaryHostname(), newItem.getSecondaryHostname() );
 	}
 
 	//~--- get methods ----------------------------------------------------------

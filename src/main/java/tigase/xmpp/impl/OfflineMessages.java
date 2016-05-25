@@ -194,6 +194,11 @@ public class OfflineMessages
 													 Map<String, Object> settings ) {
 		if ( conn == null || !message.hasConnectionForMessageDelivery(conn) ){
 			try {
+				if (packet.getElemName() == tigase.server.Message.ELEM_NAME
+						&& packet.getStanzaTo() != null && packet.getStanzaTo().getResource() != null) {
+					return;
+				}
+
 				if (conn != null && packet.getStanzaTo() != null && !conn.isUserId(packet.getStanzaTo().getBareJID()))
 					return;
 				OfflineMsgRepositoryIfc msg_repo = getMsgRepoImpl( repo, conn );

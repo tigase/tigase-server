@@ -604,10 +604,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				// Is it at all possible to happen???
 				// let's log it for now....
 				log.log(Level.FINE,
-						"{0}: Attempt to add different service with the same ID: {1}", new Object[] {
-						getName(),
-						service });
-
+						"{0}: Attempt to add different service with the same ID: {1}; old: {2} (stopped)", new Object[] {
+						getName(), service, serv });
 				// And stop the old service....
 				serv.stop();
 			}

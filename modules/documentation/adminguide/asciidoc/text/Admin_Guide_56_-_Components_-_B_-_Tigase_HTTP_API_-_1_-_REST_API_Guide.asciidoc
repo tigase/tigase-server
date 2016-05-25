@@ -338,6 +338,27 @@ Setting HTTP API Privacy Rules
 ------------------------------
 The HTTP API component has settings that allow you to specify who is allowed to use the HTTP API interface, keeping unauthorized users from accessing the feature. This feature is implemented using a Groovy admin ad-hoc stript for the Session Manager component. As a result of this method, it will be avaiulable to execution using the default GTTP API componene capability to execute the script. The actual work of filtering, however, will be conducted by the +DomainFilter+ plugin.
 
+[[getUserInfoREST]]
+New Rest API added to obtain a JID login time
+---------------------------------------------
++GetUserInfo+ command has been expanded to obtain user login and logout times in addition to standard information. To obtain the information, send a POST request to http://xmpp.domain.net:8080/rest/adhoc/sess-man@xmpp.domain.net?api-key=test-api-key with the following:
+[source,xml]
+-----
+<command>
+  <node>get-user-info</node>
+  <fields>
+    <item>
+      <var>accountjid</var>
+      <value>user@xmpp.domain.net</value>
+    </item>
+    <item>
+      <var>Show connected resources in table</var>
+      <value>true</value>
+    </item>
+  </fields>
+</command>
+-----
+
 Configuration
 ~~~~~~~~~~~~~
 The HTTP API privacy scipt is loaded automatically. +DomainFilter+ is a default plugin loaded by Tigase on startup. This means there is very little you need to do to have this running.
@@ -790,7 +811,7 @@ Server response:
 [source,xml]
 -----
 <result>
-<title>Retrive PubSub node item</title> 
+<title>Retrive PubSub node item</title>
 <node label="Node" type="text-single">
 <value>example</value>
 </node>

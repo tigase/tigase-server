@@ -120,7 +120,7 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 		Queue<Packet> results = new ArrayDeque<Packet>();
 		offlineProcessor.postProcess(packet, session1, null, results, null);
 		assertTrue("generated result even than no result should be generated", results.isEmpty());
-		assertTrue("no message stored, while it should be stored", !msgRepo.getStored().isEmpty());
+		assertTrue("message stored, while it should not be stored", msgRepo.getStored().isEmpty());
 		
 		msgRepo.getStored().clear();
 		
@@ -128,7 +128,7 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 		results = new ArrayDeque<Packet>();
 		offlineProcessor.postProcess(packet, session1, null, results, null);
 		assertTrue("generated result even than no result should be generated", results.isEmpty());
-		assertTrue("no message stored, while it should be stored", !msgRepo.getStored().isEmpty());
+		assertTrue("message stored, while it should not be stored", msgRepo.getStored().isEmpty());
 		
 		msgRepo.getStored().clear();	
 		
@@ -136,7 +136,7 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 		results = new ArrayDeque<Packet>();
 		offlineProcessor.postProcess(packet, session1, null, results, null);
 		assertTrue("generated result even than no result should be generated", results.isEmpty());
-		assertTrue("message stored, while it should not be stored", msgRepo.getStored().isEmpty());		
+		assertTrue("message stored, while it should not be stored", msgRepo.getStored().isEmpty());
 		
 		msgRepo.getStored().clear();
 	}		

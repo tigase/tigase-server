@@ -16,20 +16,21 @@ Major Changes
 -------------
 Tigase has undergone a few major changes to our code and structure. To continue to use Tigase, a few changes may be needed to be made to your systems.  Please see them below:
 
+HTTP Component renamed
+~~~~~~~~~~~~~~~~~~~~~~
+The HTTP component has been renamed, if you still have the old tigase.rest.RestMessageReciever in your init.properties file, please update the component name to:
+[source,bash]
+-----
+tigase.http.HttpMessageReceiver
+-----
+
 New JDK v8 required
 ~~~~~~~~~~~~~~~~~~~
 As Oracle has dropped support for version 7 of it's Java runtime environment and developer kit, we have moved to version 8 of the JDK.  Furthermore, some new features and fixes for Tigase Server now require the use of JDK v8 or later. Please upgrade your Java packages from link:http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html[this link].
 
-Changes to Datbase Schema
-~~~~~~~~~~~~~~~~~~~~~~~~~
-Database Schema has changed to introduce primary keys column in tig_nodes and tig_pairs tables to help improve database performance.  As a result, the schema for your database will need to be upgraded if you are not starting with a fresh database.
-Please see the xref:tigaseServer71[Schema Upgrade] section for instructions on how to prepare and upgrade your database.  *This will affect all users using v7.1.0 b4129 and later.*
-
-Changes to Pubsub Schema
-~~~~~~~~~~~~~~~~~~~~~~~~
-The PubSub Schema has been streamlined for better resource use, this change affects all users of Tigase.
-To prepare your database for the new schema, first be sure to create a backup!  Then apply the appropriate pubsub schema to your MySQL and it will add the new storage procedure.
-Details on how to accomplish this are found xref:pubSub71[in the schema upgrade guide].
+Changes to Database Schemas
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+Tigase has undergone a number or database schema changes, the current versions being main database schema v7.1 and pubsub schema v3.2.0.  If you are upgrading to v7.1.0 from a previous version of tigase, it is recomended you visit xref:v710notice[this section] in the documentation to prepare your new installation.
 
 Presence Plugin Split
 ~~~~~~~~~~~~~~~~~~~~~
@@ -53,11 +54,7 @@ Tigase now comes with its own build-in web XMPP client!  It can be accessed from
 
 Added support for XEP-0334
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-Added support to store offline messages for messages without body content. See link:http://xmpp.org/extensions/xep-0334.html[XEP-0334] for protocol details.
-Support also added to set a list of paths and xmlns to trigger and place storage of offline messages using the following settings in init.properties:
------
-sess-man/plugins-conf/amp/msg-store-offline-paths[s]=/message/received[urn:xmpp:receipts],/message/store-offline
------
+XEP-0334 is now supported.  See xref:nonBodyElements[this section] for details.
 
 Kernel Bean Configurator has been Improved
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -74,7 +71,7 @@ component/property=value
 Maximum users setting for MUC
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Administrators can now set that maximum number of users allowed on specific MUCs.
-See xref:mucRoomConfig[MUC Room Configuration]
+See xref:mucRoomConfig[MUC Room Configuration].
 
 HTTP Rest API Support
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -82,10 +79,7 @@ Tigase now supports REST commands via HTTP, they can be sent from ad-hoc command
 
 Empty Nicknames
 ~~~~~~~~~~~~~~~
-Tigase can now support users with empty nicknames so long as the following code is in init.properties.
-------
-sess-man/plugins-conf/jabber\:iq\:roster/empty_name_enabled=true
-------
+Tigase can now support users with empty nicknames.  See xref:emptyNicks[this] for details.
 
 Offline Message Limits
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -94,7 +88,7 @@ Tigase now has support to enable and change Offline Message Limits as handled by
 Offline Message Sink
 ~~~~~~~~~~~~~~~~~~~~
 A new way to store offline messages has been implemented, it may not replace standard offline messages, but can be used in other ways.
-xref:offlineMessageSink[Documentation here]
+xref:offlineMessageSink[Documentation here].
 
 Adding Components to trusted list
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -125,26 +119,13 @@ link:https://projects.tigase.org/issues/3567[#3567]
 
 New Rest API added to obtain a JID login time
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+GetUserInfo+ command has been expanded to obtain user login and logout times in addition to standard information. To obtain the information, send a POST request to http://xmpp.domain.net:8080/rest/adhoc/sess-man@xmpp.domain.net?api-key=test-api-key with the following:
-[source,xml]
------
-<command>
-  <node>get-user-info</node>
-  <fields>
-    <item>
-      <var>accountjid</var>
-      <value>user@xmpp.domain.net</value>
-    </item>
-    <item>
-      <var>Show connected resources in table</var>
-      <value>true</value>
-    </item>
-  </fields>
-</command>
------
++GetUserInfo+ command has been expanded to obtain user login and logout times in addition to standard information. See xref:getUserInfoREST[this section] for full details.
 
-New init.properties property
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+New init.properties properties
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++--ws-allow-unmasked-frames=false+
+Allows for unmasked frames to be sent to Tigase server VIA Websocket and not force-close the connection when set to true.  RFC 6455 specifies that all clients must mask frames that it sends to the server over Websocket connections.  If unmasked frames are sent, regardless of any encryption, the server must close the connection.  Some clients however, may not support masking frames, or you may wish to bypass this security measure for development purposes.
+
 +--vhost-disable-dns-check=true+
 Disables DNS checking for vhosts when changed or edited.
 When new vhosts are created, Tigase will automatically check for SRV records and proper DNS settings for the new vhosts to ensure connectivity for outside users, however if these validations fail, you will be unable to save those changes. This setting allows you to bypass that checking.
@@ -159,31 +140,11 @@ Admins may now configure Offline Message Receipts Storage to specify filters and
 
 Account Registration Limits
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In order to protect Tigase servers from DOS attacks, a limit on number of account registrations per second has been implemented.  This may be configured by adding the following line in the init.properties file:
------
-sess-man/plugins-conf/jabber\:iq\:register/registrations-per-second=10
------
-This setting allows for 10 registrations from a single IP per second.  If the limit exceeds that, a NOT_ALLOWED error will be returned.
+In order to protect Tigase servers from DOS attacks, a limit on number of account registrations per second has been implemented.  See xref:accountRegLimit[this link] for configuration settings.
 
 Enable Silent Ignore on Packets Delivered to Unavailable Resources
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-You can now have Tigase ignore packets delivered to unavailable resources to avoid having a packet bounce around and create unnecessary traffic.  You may set this globally, within standard message handling only, or within the AMP component using the following settings:
-
-Globally:
-[source]
------
-sess-man/plugins-conf/silently-ignore-message=true
------
-Message Processing Only:
-[source]
------
-sess-man/plugins-conf/message/silently-ignore-message=true
------
-AMP Component:
-[source]
------
-sess-man/plugins-conf/amp/silently-ignore-message=true
------
+You can now have Tigase ignore packets delivered to unavailable resources to avoid having a packet bounce around and create unnecessary traffic. Learn how xref:silentIgnore[here].
 
 Cluster Connections Improved
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -203,53 +164,31 @@ Watchdog has now been added to test cluster connections by default.  Watchdog se
 
 Cluster Map implemented
 ~~~~~~~~~~~~~~~~~~~~~~~
-Tigase can now generate cluster maps through a new API.  See the development guide for a description of the API.
+Tigase can now generate cluster maps through a new API.  See the link:http://docs.tigase.org/tigase-server/snapshot/Development_Guide/html/#clusterMapInterface[development guide] for a description of the API.
+
+New Licensing Procedures
+~~~~~~~~~~~~~~~~~~~~~~~~
+With the release of Tigase XMPP server v7.1.0, our licensing procedures have changed.  For more information about how to obtain, retain, and install your license, please see xref:licenseserver[this section].
 
 Message Archive expanded to include non-body elements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Message Archive can now be configured to store messages that may not have body element, or other message types using the following line from init.properties:
------
-sess-man/plugins-conf/unified-archive/msg-archive-paths[s]=/message/body,/message/subject
------
-Where above will set the archive to store messages with <body/> or <subject/> elements.
+Message Archive can now be configured to store messages that may not have body element, this option is explained in xref:nonBodyStore[this section].
 
 New Ability to Purge Data from Unified Archive
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-This feature allows for automatic removal of entries older than a configured number of days from the Unified Archive. It is designed to clean up database and keep its size within reasonable boundaries.
-
-There are 4 settings available for this feature:
-To enable the feature:
-+unified-archive/remove-expired-messages[B]=true+
-
-This setting changes the initial delay after the server is started to begin removing old entries.  In other words, UA purging will not take place until the specified time after the server starts.  Default setting is PT1H, or one hour.
-+unified-archive/remove-expired-messages-delay=PT2H+
-
-This setting sets how long UA purging will wait between passes to check for and remove old entries. Default setting is P1D which is once a day.
-+unified-archive/remove-expired-messages-period=PT2D+
-
-*NOTE* that these commands are also compatible with freely available tigase +message-archive+ component, just replace +unified+ with +message+.
-
-Configuration of number of days in VHost
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-VHost holds a setting that determines how long a message needs to be in archive for it to be considered old and removed.  This can be set independently per Vhost.  This setting can be modified by either using the HTTP admin, or the update item execution in adhoc command.
-
-Command-line utility
-Sets after how many days message should be removed - by default we use 24 hours. So if entry is older than 24 hours then it will be removed, ie. entry from yesterday from 10:11 will be removed after 10:11 after next execution of purge.
-This configuration is done by execution of Update item configuration adhoc command of vhost-man component, where you should select domain for which messages should be removed and then in field XEP-0136 - retention type select value Number of days and in field XEP-0136 - retention period (in days) enter number of days after which events should be removed from UA.
-
-In adhoc select domain for which messages should be removed and then in field XEP-0136 - retention type select value Number of days and in field XEP-0136 - retention period (in days) enter number of days after which events should be removed from UA.
-
-In HTTP UI select Other, then Update Item Configuration (Vhost-man), select the domain, and from there you can set XEP-0136 retention type, and set number of days at XEP-0136 retention period (in days).
-
-Value of +remove-expired-messages-delay+ and +remove-expired-messages-period+ is in format described at Duration.parse() in Java documentation.
+Data from Unified Archive or Message Archive can be automatically or manually purged depending on age or expired status.  Information on configuring this is available xref:maPurging[here].
 
 Force Redirection
 -----------------
 It's possible now to redirect connections on one port to be forced to connect to another port using the +force-redirect-to+ setting.  link:http://docs.tigase.org/tigase-server/snapshot/Administration_Guide/html/#_enforcing_redirection[Details here].
 
-SeeOtherHostDualIP
-------------------
+Dual IP installtions
+--------------------
 Tigase now has a Dual IP setup which can now use a separate internal and external IP and use a DNS resolver for the connection redirection.  Setup instructions are link:http://docs.tigase.org/tigase-server/snapshot/Administration_Guide/html/#_configuring_hostnames[Located here].
+
+Error counting
+--------------
+It is now possible to conduct error counting and collect it from statistics.  This feature is explained in more detail xref:errorCounting[here].
 
 New Documentation Structure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -259,12 +198,21 @@ Full XML of last available presence may be saved to repository
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 A more detailed last available presence can now be made from some configuration changes, along with a timestamp before the entire presence stanza is saved to the repository.  More information is available xref:storeFullXMLLastPresence[here].
 
+New Program Defaults
+~~~~~~~~~~~~~~~~~~~~
+Tigase has improved default settings to improve performance.  These include:
+- Increase the number of database connections in relation to the number of available CPUs (factor by 4 by default).
+- Plugins code has been revised.
+- Default thread pools have been increased for better performance.
+- New option added to globally increase thread pool counts +sess-man/sm-threads-factor[I]=1+. Setting increases thread factor by specified factor.
+
 New Minor Features & Behavior Changes
 -------------------------------------
 - Old monitor component depreciated and turned off.
 - JTDS MS SQL Server driver updated to v1.3.1.
 - +tigase-utils+ and +tigase-xmltools+ are now included in tigase-server builds.
 - Tigase Kernal has been updated and improved.
+- tigase.stats.CounterDataFileLogger file now includes timestamps.
 - Javadoc is no longer generated by installer as files are already included in distributions.
 - Node connection events to administrator have been improved and are more informative.
 - link:https://projects.tigase.org/issues/163[#163] link:http://xmpp.org/extensions/xep-0012.html[XEP-0012] User +LastActivity+ implemented
@@ -297,8 +245,17 @@ New Minor Features & Behavior Changes
 - #3609 Added new configuration option for BOSH to disable hostname attribute. xref:tip_1_bosh_in_cluster_mode_without_load_balancer[Details here].
 - link:https://projects.tigase.org/issues/3670[#3670] Hardened mode now uses long DH keys (2048) by default.
 - link:https://projects.tigase.org/issues/3849[#3849] New Roster size limit configurable setting. See info xref:rosterLimit[Here].
-- link:https://projects.tigase.org/issues/3872[#3872] PostgreSQL driver updated to v9.4
+- link:https://projects.tigase.org/issues/3872[#3872] PostgreSQL driver updated to v9.4.
+- #3892 PEP plugin now supports processing of http://jabber.org/protocol/pubsub#owner.
+- link:https://projects.tigase.org/issues/3908[#3908] Logs now print whether components or plugins are depreciated, and recommend configuration settings changes.
 - link:https://projects.tigase.org/issues/3937[#3937] Windows setup given one-click solution to file initialization.
+- link:https://projects.tigase.org/issues/3945[#3945] SSLContextContainer has been replaced with JDKv8 extension version now known as SNISSLContextContainer adding support for SNI of SSL/TLS.
+- link:https://projects.tigase.org/issues/3948[#3948] Tigase PubSub now responds to +disco#info+ requests in line with link:http://xmpp.org/extensions/xep-0060.html#entity-metadata[XEP-0060 - Discover Node Metadata].
+- link:https://projects.tigase.org/issues/3950[#3950] MongoDB driver updated to v2.14.1.
+- #3985 Improved disco#info to return extended results for MUC component as per link:http://xmpp.org/extensions/xep-0128.html[XEP-0128 Service Discovery Extensions].
+- #3986 Added new index for tig_nodes collection in MongoDB Databases.
+- #4020 SeeOtherHostSualIP implementation has been fixed to support MongoDB.
+- link:https://projects.tigase.org/issues/4120[#4120] Duplication of messages in offline storage when +Message+ and +OfflineMessage+ processors are used has been resolved.
 
 
 Fixes
@@ -458,6 +415,24 @@ Fixes
 - #3911 Fixed load distribution error between threads that could cause high CPU usage.
 
 - #3931 Fixed error caused by AMP running in clustered installations.
+
+- #3966 Changed type of msg & body columns in muc_history table for SQLServer to prevent loss of special characters.
+
+- #3973 Adjusted throttling settings for S2S and cluster connections.
+
+- #3977 Fixed MUC History to reflect messages from JID of room and not JID of original sender.
+
+- #3984 Fixed distinct usage on large data which causes errors on lookup of PubSub nodes in MongoDB.
+
+- link:https://projects.tigase.org/issues/3970[#3970] Fixed duplication of messages with AMP payload in cluster mode.
+
+- link:https://projects.tigase.org/issues/4044[#4044] Fixed various web installer issues.
+
+- #4051 Fixed NPE in java when processing message with no body.
+
+- link:https://projects.tigase.org/issues/4052[#4052] Fixed issue with ClusterRepoItem not properly resulting in +tigase.db.comp.RepositoryChangeListenerIfc.itemUpdated(Item)+ being executed.
+
+- link:https://projects.tigase.org/issues/4056[#4056] Items removed from cluster repository are not removed from memory correctly.
 
 - Patch added to fix ConcurrentModificationException in BlockingCommand plugin.
 

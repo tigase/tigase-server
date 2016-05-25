@@ -64,9 +64,10 @@ Import Schema
 
 From the File menu Select Open -> File (or use Ctrl+O) and then open following files:
 
-- sqlserver-schema-5-1-schema.sql
-- sqlserver-schema-5-1-sp.sql
-- sqlserver-schema-5-1-props.sql
+- sqlserver-schema-7-1-schema.sql
+- sqlserver-schema-7-1-sp.sql
+- sqlserver-schema-7-1-props.sql
+- sqlserver-pubsub-schema-3.2.0.sql
 
 Subsequently select created database from the list of Available Databases (Ctrl+U) available on the toolbar and execute each of the opened files in the order listed above.
 
@@ -80,9 +81,10 @@ Creation of the database and import of schema can be done from command line as w
 sqlcmd -S %servername% -U %root_user% -P %root_pass% -Q "CREATE DATABASE [%database%]"
 sqlcmd -S %servername% -U %root_user% -P %root_pass% -Q "CREATE LOGIN [%user%] WITH PASSWORD=N'%password%', DEFAULT_DATABASE=[%database%]"
 sqlcmd -S %servername% -U %root_user% -P %root_pass% -d %database% -Q "ALTER AUTHORIZATION ON DATABASE::%database% TO %user%;"
-sqlcmd -S %servername% -U %root_user% -P %root_pass% -d %database% -i database\sqlserver-schema-5-1-schema.sql
-sqlcmd -S %servername% -U %root_user% -P %root_pass% -d %database% -i database\sqlserver-schema-5-1-sp.sql
-sqlcmd -S %servername% -U %root_user% -P %root_pass% -d %database% -i database\sqlserver-schema-5-1-props.sql
+sqlcmd -S %servername% -U %root_user% -P %root_pass% -d %database% -i database\sqlserver-schema-7-1-schema.sql
+sqlcmd -S %servername% -U %root_user% -P %root_pass% -d %database% -i database\sqlserver-schema-7-1-sp.sql
+sqlcmd -S %servername% -U %root_user% -P %root_pass% -d %database% -i database\sqlserver-schema-7-1-props.sql
+sqlcmd -S %servername% -U %root_user% -P %root_pass% -d %database% -i database\sqlserver-pubsub-schema-3.2.0.sql
 -------------------------------------
 
 Above can be automatized with provided script %tigase-server%\scripts\db-create-sqlserver.cmd (note: it needs to be executed from main Tigase XMPP Server directory due to maintain correct paths):

@@ -23,6 +23,10 @@
 package tigase.util;
 
 import tigase.stats.StatisticsList;
+import tigase.sys.TigaseRuntime;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Artur Hefczyc
@@ -30,12 +34,16 @@ import tigase.stats.StatisticsList;
  */
 public class AllHistoryCache {
 
+	private static final Logger log = Logger.getLogger( AllHistoryCache.class.getName());
 	private StatisticsList[] buffer = null;
 	private int start = 0;
 	private int count = 0;
+	private int highMemoryLevel = 95;
+	private int highMemoryUsageCount = 0;
 
-	public AllHistoryCache(int limit) {
+	public AllHistoryCache(int limit, int highMemoryLevel) {
 		buffer = new StatisticsList[limit];
+		this.highMemoryLevel = highMemoryLevel;
 	}
 
 	public synchronized void addItem(StatisticsList item) {
@@ -46,6 +54,22 @@ public class AllHistoryCache {
 		} else {
 			start++;
 			start %= buffer.length;
+		}
+		if (isHighMemoryUsage()) {
+			highMemoryUsageCount++;
+			int minimalSize = count / 2;
+			if (minimalSize < 5)
+				minimalSize = 5;
+			if (count > minimalSize) {
+				for (int i=0; i<count-minimalSize; i++) {
+					buffer[(start + i) % buffer.length] = null;
+				}
+				start = (start + count) - minimalSize;
+				count = minimalSize;
+			}
+			log.log( Level.CONFIG, "Shrinking statistics to {0} items for {1} time", new Object[] { minimalSize, highMemoryUsageCount } );
+		} else {
+			highMemoryUsageCount = 0;
 		}
 	}
 
@@ -58,5 +82,8 @@ public class AllHistoryCache {
 		return result;
 	}
 
+	protected boolean isHighMemoryUsage() {
+		return TigaseRuntime.getTigaseRuntime().getHeapMemUsage() > highMemoryLevel;
+	}
 
 }

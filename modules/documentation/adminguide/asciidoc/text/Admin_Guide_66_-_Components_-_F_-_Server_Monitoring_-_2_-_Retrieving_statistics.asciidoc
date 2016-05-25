@@ -1,20 +1,20 @@
 [[retrievingStatisticsFromTheServer]]
-Retrieving statistics from the server
-=====================================
-:author: unknown
-:version: v1.0
+= Retrieving statistics from the server
+:author: Daniel Wisnewski
+:version: v2.0
 :date: 2015-13-07 11:22
-:revision: v1.1
 
-By default we can retrieve server statistics using XMPP. After a successful setup of xref:setUpRemoteMonitoring[Remote Monitoring], we can enable additional configured methods (JMX, HTTP, etc).
+:toc:
+:numbered:
+:website: http://www.tigase.net
 
-Retrieving statistics using XMPP
---------------------------------
+By default we can retrieve server statistics using XMPP, no additional setup is necessary.
+
+== Retrieving statistics using XMPP
 
 Accessing statistics over XMPP protocol requires any XMPP client capable of executing link:http://xmpp.org/extensions/xep-0050.html[XEP-0050: Ad-Hoc Commands]. It's essential to remember, that only administrator (a user whose JID is configured as administrative) can access the statistics.
 
-Psi XMPP Client
----------------
+== Psi XMPP Client
 
 For the purpose of this guide http://psi-im.org/[Psi] client will be used. After successfully configuring and connecting to account with administrative privileges we need to access _Service Discovery_, either from application menu or from context menu of the particular account account:
 
@@ -31,13 +31,11 @@ image:images/monitoring_xmpp_3.png[caption="Figure 3: ", title="Server statistic
 In this window, in addition to see the statistics, we can adjust _Stats level_ by selecting desired level from the list and confim by clicking _Finish_.
 
 
-Retrieving statistics using JMX
--------------------------------
+== Retrieving statistics using JMX
 
 In order to access statistics over JMX we need to enable support for it in Tigase - xref:monitoring_activation[Monitoring Activation]. Afterwards we can use a number of tools to get to the statistics, for example the following:
 
-JConsole
---------
+== JConsole
 
 After opening JConsole we either select local process or provide details of the remote process, including IP, port and credentials from *etc/jmx.** files:
 
@@ -47,8 +45,7 @@ Afterwards we navigate to the MBeans tab from where we can access the `tigase.st
 
 image:images/monitoring_jmx_jconsole_2.png[caption="Figure 5: JConsole", alt="jconsole", width="967"]
 
-StatsDumper.groovy
-------------------
+== StatsDumper.groovy
 
 In order to collect statistics over period of time following groovy script can be used: link:files/StatsDumper.groovy[StatsDumper.groovy]. It's a Simple JMX client that connects to Tigase and periodically saves all statistics to files.
 

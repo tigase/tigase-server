@@ -23,6 +23,8 @@ package tigase.db;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import tigase.stats.StatisticsProviderIfc;
+import tigase.stats.StatisticsList;
 import tigase.xmpp.BareJID;
 
 import java.sql.PreparedStatement;
@@ -43,7 +45,7 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 @Repository.Meta( supportedUris = { "jdbc:[^:]+:.*" } )
-public class DataRepositoryPool implements DataRepository, DataSourcePool<DataRepository> {
+public class DataRepositoryPool implements DataRepository, DataSourcePool<DataRepository>, StatisticsProviderIfc {
 	private static final Logger log = Logger.getLogger(DataRepositoryPool.class.getName());
 
 	// ~--- fields ---------------------------------------------------------------
@@ -153,6 +155,16 @@ public class DataRepositoryPool implements DataRepository, DataSourcePool<DataRe
 	@Override
 	public dbTypes getDatabaseType() {
 		return database;
+	}
+
+	@Override
+	public void getStatistics(String compName, StatisticsList list) {
+		list.add(compName, "repository " + getResourceUri() + " connections count", repoPool.size(), Level.FINE);
+		for (DataRepository repo : repoPool) {
+			if (repo instanceof StatisticsProviderIfc) {
+				((StatisticsProviderIfc) repo).getStatistics(compName, list);
+			}
+		}
 	}
 
 	// ~--- methods --------------------------------------------------------------

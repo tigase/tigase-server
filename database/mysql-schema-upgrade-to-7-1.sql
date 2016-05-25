@@ -98,7 +98,7 @@ select NOW(), 'altering tig_pairs table to add missing indexes';
 -- QUERY END:
 
 -- QUERY START:
-ALTER TABLE tig_pairs ADD `pid` INT NOT NULL AUTO_INCREMENT PRIMARY KEY
+ALTER TABLE tig_pairs ADD `pid` INT NOT NULL AUTO_INCREMENT PRIMARY KEY;
 -- QUERY END:
 
 

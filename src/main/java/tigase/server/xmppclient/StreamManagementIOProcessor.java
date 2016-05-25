@@ -21,25 +21,9 @@
  */
 package tigase.server.xmppclient;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import tigase.net.IOServiceListener;
 import tigase.net.SocketThread;
-import tigase.server.Command;
-import tigase.server.ConnectionManager;
-import tigase.server.Iq;
-import tigase.server.Message;
-import tigase.server.Packet;
+import tigase.server.*;
 import tigase.stats.StatisticsList;
 import tigase.util.TimerTask;
 import tigase.xml.Element;
@@ -47,6 +31,13 @@ import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.StreamError;
 import tigase.xmpp.XMPPIOService;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class implements XEP-0198 Stream Management
@@ -311,7 +302,12 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 					OutQueue outQueue = (OutQueue) newService.getSessionData().get(OUT_COUNTER_KEY);
 					List<OutQueue.Entry> packetsToResend = new ArrayList<OutQueue.Entry>(outQueue.getQueue());
 					for (OutQueue.Entry entry : packetsToResend) {
-						newService.addPacketToSend(entry.getPacketWithStamp());
+						Packet packetToResend = entry.getPacketWithStamp();
+						if (log.isLoggable(Level.FINE)) {
+							log.log(Level.FINE, "{0}, resuming stream with id = {1} resending unacked packet = {2}",
+									new Object[] { service, id, packetToResend });
+						}
+						newService.addPacketToSend(packetToResend);
 					}
 										
 					// if there is any packet waiting we need to write them to socket
@@ -509,6 +505,10 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 
 			// get old out queue
 			OutQueue outQueue = (OutQueue) oldService.getSessionData().get(OUT_COUNTER_KEY);
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "{0}, resuming stream with id = {1} with {2} packets waiting for ack and h = {3}",
+						new Object[] { service, id, outQueue.waitingForAck(), h });
+			}
 			outQueue.ack(h);
 
 			// move required data from old XMPPIOService session data to new service session data

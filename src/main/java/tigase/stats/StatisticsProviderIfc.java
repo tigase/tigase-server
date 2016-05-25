@@ -18,9 +18,14 @@
  * $Rev$
  * Last modified by $Author$
  * $Date$
- */package tigase.stats;
+ */
+package tigase.stats;
 
-import tigase.server.ServerComponent;
+/**
+ * Created by andrzej on 28.04.2016.
+ */
+public interface StatisticsProviderIfc {
 
-public interface StatisticsContainer extends StatisticsContainerIfc, ServerComponent {
+	void getStatistics(String compName, StatisticsList list);
+
 }

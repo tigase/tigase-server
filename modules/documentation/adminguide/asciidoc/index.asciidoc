@@ -1,6 +1,6 @@
 = Tigase Administration Guide
 Tigase Team <team@tigase.net>
-v7.0.0
+v7.2.0
 :numbered:
 :website: http://tigase.net
 :Date: 2014-07-10
@@ -10,7 +10,7 @@ Welcome to the Tigase Administration Guide.
 
 :leveloffset: 1
 
-include::text/Tigase_v7.1.0.asciidoc[]
+include::text/Tigase_v7.2.0.asciidoc[]
 
 include::text/Admin_Guide_01_-_About_Tigase_Jabber_XMPP_Server.asciidoc[]
 
@@ -19,6 +19,7 @@ include::text/Admin_Guide_02_-_Licensing_and_Open_Source.asciidoc[]
 include::text/Admin_Guide_08_-_Latest_and_Nightly_Builds.asciidoc[]
 
 include::text/Admin_Guide_02_-_Quick_Start.asciidoc[]
+
 
 :leveloffset: 2
 
@@ -31,6 +32,8 @@ include::text/Admin_Guide_05_-_Quick_Start_-_C_-_Installing_Using_Console_Instal
 include::text/Admin_Guide_06_-_Quick_Start_-_D_-_Manual_Installation_in_Console_Mode.asciidoc[]
 
 include::text/Admin_Guide_07_-_Quick_Start_-_E_-_Windows_Installation.asciidoc[]
+
+include::text/Admin_Guide_07_-_Quick_Start_-_F_-_Setting_Up_Server.asciidoc[]
 
 :leveloffset: 1
 
@@ -101,6 +104,8 @@ include::text/Admin_Guide_28_-_Database_Management.asciidoc[]
 include::text/Admin_Guide_29_-_Database_Management_-_A_-_Database_Preparation.asciidoc[]
 
 :leveloffset: 3
+
+include::text/Admin_Guide_29_-_Database_Management_-_A_-_Database_Preperation_-_1_-_DbSchemaLoader.asciidoc[]
 
 include::text/Admin_Guide_30_-_Database_Management_-_A_-_Database_Preparation_-_1_-_Prepare_the_MySQL_Database_for_Tigase_Server.asciidoc[]
 
@@ -194,6 +199,8 @@ include::text/Admin_Guide_65_-_Components_-_F_-_Server_Monitoring_-_1_-_Setting_
 
 include::text/Admin_Guide_66_-_Components_-_F_-_Server_Monitoring_-_2_-_Retrieving_statistics.asciidoc[]
 
+include::text/Admin_Guide_102_-_Statistics_Descriptions.asciidoc[]
+
 :leveloffset: 2
 
 include::text/Admin_Guide_67_-_Components_-_F_-_Server_Monitoring_-_3_-_EventBus.asciidoc[]
@@ -283,3 +290,9 @@ include::text/Admin_Guide_97_-_Using_Tigase_-_L_-_Scripting_Support_in_Tigase_-_
 :leveloffset: 2
 
 include::text/Admin_Guide_98_-_Using_Tigase_-_M_-_Configuration_Wizards.asciidoc[]
+
+include::text/Admin_Guide_99_-_Using_Tigase_-_N_-_Offline_Messages.asciidoc[]
+
+include::text/Admin_Guide_100_-_Using_Tigase_-_O_-_Licensing.asciidoc[]
+
+include::text/Admin_Guide_101_-_Using_Tigase_-_P_-_Advanced_Options.asciidoc[]
