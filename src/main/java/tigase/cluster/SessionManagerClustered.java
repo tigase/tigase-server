@@ -37,6 +37,7 @@ import tigase.eventbus.RouteEvent;
 import tigase.eventbus.component.stores.Subscription;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.BeanSelector;
+import tigase.kernel.beans.Inject;
 import tigase.kernel.core.Kernel;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.server.ComponentInfo;
@@ -103,6 +104,7 @@ public class SessionManagerClustered
 	private JID                   my_address        = null;
 	private JID                   my_hostname       = null;
 	private int                   nodesNo           = 0;
+	@Inject
 	private ClusteringStrategyIfc strategy          = null;
 
 	//~--- methods --------------------------------------------------------------
@@ -478,12 +480,11 @@ public class SessionManagerClustered
 					Class<?> cls = ModulesManagerImpl.getInstance().forName(strategy_class);
 					strategy_tmp = (ClusteringStrategyIfc) cls.newInstance();
 				}
-				strategy_tmp.setSessionManagerHandler(this);
+//				strategy_tmp.setSessionManagerHandler(this);
 				strategy_tmp.setProperties(props);
 
 				// strategy_tmp.init(getName());
 				strategy = strategy_tmp;
-				strategy.setSessionManagerHandler(this);
 				log.log(Level.CONFIG, "Loaded SM strategy: {0}", strategy_class);
 
 				if (clusterController != null) {

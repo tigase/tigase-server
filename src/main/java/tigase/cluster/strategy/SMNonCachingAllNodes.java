@@ -26,26 +26,19 @@ package tigase.cluster.strategy;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.cluster.api.SessionManagerClusteredIfc;
+import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
-import tigase.server.xmppsession.SessionManagerHandler;
-
 import tigase.stats.StatisticsList;
-
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.Collections;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import tigase.cluster.api.SessionManagerClusteredIfc;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: May 13, 2009 9:53:44 AM
@@ -62,7 +55,7 @@ public abstract class SMNonCachingAllNodes
 			.getName());
 
 	//~--- fields ---------------------------------------------------------------
-
+	@Inject
 	private SessionManagerClusteredIfc     sm            = null;
 
 	// Simple random generator, we do not need a strong randomization here.
@@ -232,17 +225,6 @@ public abstract class SMNonCachingAllNodes
 
 	@Override
 	public void setProperties(Map<String, Object> props) {}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param sm
-	 */
-	@Override
-	public void setSessionManagerHandler(SessionManagerClusteredIfc sm) {
-		this.sm = sm;
-	}
 
 	//~--- get methods ----------------------------------------------------------
 

@@ -26,47 +26,22 @@ package tigase.cluster.strategy;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.cluster.SessionManagerClustered;
 import tigase.cluster.api.ClusterCommandException;
-import tigase.cluster.api.ClusterControllerIfc;
-import tigase.cluster.api.CommandListener;
 import tigase.cluster.api.CommandListenerAbstract;
-import tigase.cluster.api.SessionManagerClusteredIfc;
-import tigase.cluster.strategy.cmd.PacketForwardCmd;
-
+import tigase.kernel.beans.Bean;
 import tigase.server.Command;
-import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.Presence;
-
-import tigase.stats.StatisticsList;
-
+import tigase.server.Priority;
 import tigase.xml.Element;
+import tigase.xmpp.*;
 
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.NoConnectionIdException;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.XMPPSession;
-
-import static tigase.cluster.api.SessionManagerClusteredIfc.SESSION_FOUND_KEY;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Random;
-import java.util.Set;
-import tigase.server.Priority;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: May 13, 2009 9:53:44 AM
@@ -76,6 +51,7 @@ import tigase.server.Priority;
  *
  * @param <E>
  */
+@Bean(name = "strategy", parent = SessionManagerClustered.class)
 public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 				extends DefaultClusteringStrategyAbstract<E> {
 	/** Field description */

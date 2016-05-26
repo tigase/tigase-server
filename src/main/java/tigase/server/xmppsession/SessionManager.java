@@ -318,7 +318,7 @@ public class SessionManager
 			if (allPlugins.add(proc)) {
 				if (conc == null) {
 					Map<String, Object> settings = new HashMap<>();
-					settings.put("sm-jid", getComponentId());
+					//settings.put("sm-jid", getComponentId());
 					proc.init(settings);
 				}
 				eventBus.registerAll(proc);
@@ -2420,7 +2420,7 @@ public class SessionManager
 				}
 			}
 		}
-		plugin_settings.put("sm-jid", getComponentId());
+		//plugin_settings.put("sm-jid", getComponentId());
 
 		return plugin_settings;
 	}

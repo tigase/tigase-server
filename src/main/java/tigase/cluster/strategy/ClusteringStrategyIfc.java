@@ -27,23 +27,18 @@ package tigase.cluster.strategy;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.cluster.api.ClusterControllerIfc;
-import tigase.cluster.api.SessionManagerClusteredIfc;
-
 import tigase.server.Packet;
-
 import tigase.stats.StatisticsList;
-
 import tigase.sys.OnlineJidsReporter;
-
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.XMPPResourceConnection;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Created: May 2, 2009 4:36:03 PM
@@ -252,15 +247,6 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 */
 	void setProperties(Map<String, Object> props);
 
-	/**
-	 * The method allows to obtain SessionManagerHandler object by the strategy.
-	 * The object is mainly used to access local VHosts configuration and check
-	 * the ID of the local session manager.
-	 *
-	 * @param sm
-	 *          is an instance of the SessionManagerHandler class.
-	 */
-	void setSessionManagerHandler(SessionManagerClusteredIfc sm);
 }
 
 
