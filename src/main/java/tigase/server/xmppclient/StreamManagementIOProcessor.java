@@ -511,8 +511,8 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 			// get old out queue
 			OutQueue outQueue = (OutQueue) oldService.getSessionData().get(OUT_COUNTER_KEY);
 			if (log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE, "{0}, resuming stream with id = {1} with {2} packets waiting for ack and h = {3}",
-						new Object[] { service, id, outQueue.waitingForAck(), h });
+				log.log(Level.FINE, "{0}, resuming stream with id = {1} with {2} packets waiting for ack, local h = {3} and remote h = {4}",
+						new Object[] { service, id, outQueue.waitingForAck(), outQueue.get(), h });
 			}
 			outQueue.ack(h);
 
