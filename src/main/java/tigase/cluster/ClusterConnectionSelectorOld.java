@@ -21,12 +21,14 @@
  */
 package tigase.cluster;
 
-import java.util.List;
-import java.util.Map;
 import tigase.cluster.api.ClusterConnectionHandler;
 import tigase.cluster.api.ClusterConnectionSelectorIfc;
+import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
 import tigase.xmpp.XMPPIOService;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * ClusterConnectionSelectorOld class implements old cluster connection selection
@@ -34,6 +36,7 @@ import tigase.xmpp.XMPPIOService;
  * 
  * @author andrzej
  */
+@Bean(name = "clusterConnectionSelector")
 public class ClusterConnectionSelectorOld implements ClusterConnectionSelectorIfc {
 
 	private ClusterConnectionHandler handler;

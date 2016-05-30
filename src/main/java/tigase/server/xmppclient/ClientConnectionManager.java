@@ -586,6 +586,7 @@ public class ClientConnectionManager
 		try {
 			see_other_host_strategy = (SeeOtherHostIfc) Class.forName(see_other_host_class)
 					.newInstance();
+			setSee_other_host_strategy(see_other_host_strategy);
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can not instantiate see_other_host strategy for class: " +
 					see_other_host_class, e);
@@ -595,6 +596,13 @@ public class ClientConnectionManager
 	}
 
 	//~--- set methods ----------------------------------------------------------
+
+	public void setSee_other_host_strategy(SeeOtherHostIfc see_other_host_strategy) {
+		if (see_other_host_strategy != null) {
+			this.see_other_host_strategy = see_other_host_strategy;
+			see_other_host_strategy.setNodes(getNodesConnectedWithLocal());
+		}
+	}
 
 	@Override
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {

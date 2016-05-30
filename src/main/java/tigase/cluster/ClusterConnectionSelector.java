@@ -21,13 +21,17 @@
  */
 package tigase.cluster;
 
-import java.util.List;
-import java.util.Map;
 import tigase.cluster.api.ClusterConnectionHandler;
 import tigase.cluster.api.ClusterConnectionSelectorIfc;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Packet;
 import tigase.server.Priority;
 import tigase.xmpp.XMPPIOService;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Advanced implementation of ClusterConnectionSelectorIfc which separates packets
@@ -36,12 +40,16 @@ import tigase.xmpp.XMPPIOService;
  * 
  * @author andrzej
  */
+@Bean(name = "clusterConnectionSelector", parent = ClusterConnectionManager.class)
 public class ClusterConnectionSelector implements ClusterConnectionSelectorIfc {
 
 	protected static final String CLUSTER_SYS_CONNECTIONS_PER_NODE_PROP_KEY = "cluster-sys-connections-per-node";
-	
+
+	@ConfigField(desc = "Number of cluster connetions per node", alias = "cluster-connections-per-node")
 	private int allConns = ClusterConnectionManager.CLUSTER_CONNECTIONS_PER_NODE_VAL;
+	@ConfigField(desc = "Number of system connections per node", alias = "cluster-sys-connections-per-node")
 	private int sysConns = 2;
+	@Inject(nullAllowed = true)
 	private ClusterConnectionHandler handler;
 	
 	@Override

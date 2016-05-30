@@ -24,6 +24,7 @@
 
 package tigase.cluster;
 
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.ComponentInfo;
 import tigase.server.DisableDisco;
 import tigase.server.Packet;
@@ -172,14 +173,23 @@ public class VirtualComponent
 	//~--- fields ---------------------------------------------------------------
 
 	protected VHostManagerIfc vHostManager  = null;
+
 	private JID               componentId   = null;
+	@ConfigField(desc = "Component category for discovery")
 	private String            discoCategory = null;
+	@ConfigField(desc = "Component features for discovery")
 	private String[]          discoFeatures = null;
+	@ConfigField(desc = "Component name for discovery")
 	private String            discoName     = null;
+	@ConfigField(desc = "Component node for discovery")
 	private String            discoNode     = null;
+	@ConfigField(desc = "Component type for discovery")
 	private String            discoType     = null;
+	@ConfigField(desc = "Fixed domain")
 	private String            fixedDomain   = null;
+	@ConfigField(desc = "Component name")
 	private String            name          = null;
+	@ConfigField(desc = "Redirect to")
 	private JID               redirectTo    = null;
 	private ServiceEntity     serviceEntity = null;
 	private ComponentInfo     cmpInfo				= null;

@@ -24,20 +24,21 @@ package tigase.server.xmppclient;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.eventbus.events.ShutdownEvent;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.BeanSelector;
+import tigase.xmpp.BareJID;
+import tigase.xmpp.JID;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
-import tigase.xmpp.BareJID;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.eventbus.events.ShutdownEvent;
-import tigase.xmpp.JID;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
@@ -47,7 +48,7 @@ import tigase.xmpp.JID;
  *
  * @author Wojtek
  */
-//public class SeeOtherHostHashed implements SeeOtherHostIfc {
+@Bean(name = "seeOtherHostHashed", parent = ClientConnectionManager.class, selectors = {BeanSelector.ClusterMode.class})
 public class SeeOtherHostHashed extends SeeOtherHost {
 
 //	protected List<BareJID> defaultHost = null;

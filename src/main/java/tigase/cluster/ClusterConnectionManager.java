@@ -43,6 +43,7 @@ import tigase.eventbus.EventBusFactory;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 import tigase.net.ConnectionType;
 import tigase.net.SocketType;
@@ -168,6 +169,7 @@ public class ClusterConnectionManager
 	private static final String SERVICE_CONNECTED_TASK_FUTURE =
 			"service-connected-task-future";
 
+	@Inject
 	private EventBus eventBus = null;
 
 	public final static String EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_KEY = "eventbus-repository-notifications";
@@ -194,13 +196,16 @@ public class ClusterConnectionManager
 			IDENTITY_TYPE_VAL;
 	private Map<String, ClusterConnection> connectionsPool =
 			new ConcurrentSkipListMap<>();
+	@ConfigField(desc = "Connect to all nodes")
 	private boolean                              connect_all = CONNECT_ALL_PROP_VAL;
+	@ConfigField(desc = "Compress stream")
 	private boolean                              compress_stream = COMPRESS_STREAM_PROP_VAL;
 	private long[]                               lastDay               = new long[24];
 	private int                                  lastDayIdx            = 0;
 	private long[]                               lastHour              = new long[60];
 	private int                                  lastHourIdx           = 0;
 	private int                                  nodesNo               = 0;
+	@ConfigField(desc = "Number of connections to open per node", alias = "cluster-connections-per-node")
 	private int                                  per_node_conns =
 			CLUSTER_CONNECTIONS_PER_NODE_VAL;
 	@Inject
@@ -212,6 +217,7 @@ public class ClusterConnectionManager
 
 	// private long packetsSent = 0;
 	// private long packetsReceived = 0;
+	@Inject
 	private ClusterConnectionSelectorIfc connectionSelector = null;
 	private CommandListener sendPacket = new SendPacket(ClusterControllerIfc
 			.DELIVER_CLUSTER_PACKET_CMD);

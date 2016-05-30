@@ -65,7 +65,7 @@ public class ClientConnectionClustered
 
 	//~--- fields ---------------------------------------------------------------
 
-	private SeeOtherHostIfc see_other_host_strategy = null;
+//	private SeeOtherHostIfc see_other_host_strategy = null;
 	@SuppressWarnings("serial")
 	private List<BareJID>   connectedNodes          = new CopyOnWriteArrayList<BareJID>() {
 		{
