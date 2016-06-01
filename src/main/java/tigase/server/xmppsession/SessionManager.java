@@ -26,11 +26,12 @@ package tigase.server.xmppsession;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.annotations.TigaseDeprecatedComponent;
 import tigase.auth.mechanisms.SaslEXTERNAL;
 import tigase.conf.Configurable;
-import tigase.conf.ConfigurationException;
-import tigase.db.*;
+import tigase.db.AuthRepository;
+import tigase.db.NonAuthUserRepository;
+import tigase.db.TigaseDBException;
+import tigase.db.UserRepository;
 import tigase.disco.XMPPService;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
@@ -39,6 +40,7 @@ import tigase.eventbus.events.ShutdownEvent;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 import tigase.server.*;
 import tigase.server.script.CommandIfc;
@@ -108,6 +110,7 @@ public class SessionManager
 	// annotated bean instance would be registered to eventbus?
 	//@Inject
 	private EventBus						 eventBus = EventBusFactory.getInstance();
+	@ConfigField(desc = "Force detail check of stale connections", alias = SessionManagerConfig.STALE_CONNECTION_CLOSER_QUEUE_SIZE_KEY)
 	private boolean                          forceDetailStaleConnectionCheck = true;
 	private int                              maxIdx                          = 100;
 	private int                              maxUserConnections              = 0;
@@ -128,10 +131,13 @@ public class SessionManager
 	private UserRepository                   user_repository                 = null;
 	private Map<String, XMPPStopListenerIfc> stopListeners = new ConcurrentHashMap<String,
 			XMPPStopListenerIfc>(10);
+	@ConfigField(desc = "Skip privacy check", alias = SessionManagerConfig.SKIP_PRIVACY_PROP_KEY)
 	private boolean          skipPrivacy = false;
+	@ConfigField(desc = "Factor for number of threads per plugin", alias = SessionManagerConfig.SM_THREADS_FACTOR_PROP_KEY)
 	private int          pluginsThreadFactor = 1;
 	@Inject
 	private ConcurrentSkipListSet<XMPPImplIfc> allPlugins  = new ConcurrentSkipListSet<XMPPImplIfc>();
+	@ConfigField(desc = "Authentication timeout", alias = SessionManagerConfig.AUTH_TIMEOUT_PROP_KEY)
 	private long authTimeout = 120;
 
 	/**
@@ -543,6 +549,9 @@ public class SessionManager
 	@Override
 	public void start() {
 		super.start();
+		if (!staleConnectionCloser.isScheduled()) {
+			addTimerTask(staleConnectionCloser, staleConnectionCloser.getTimeout());
+		}
 		eventBus.registerAll(this);
 	}
 	
@@ -574,20 +583,6 @@ public class SessionManager
 		}
 
 		return null;
-	}
-
-	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> props = super.getDefaults(params);
-
-		SessionManagerConfig.getDefaults(props, params);
-		props.put(FORCE_DETAIL_STALE_CONNECTION_CHECK, true);
-		props.put(STALE_CONNECTION_CLOSER_QUEUE_SIZE_KEY, StaleConnectionCloser
-				.DEF_QUEUE_SIZE);
-		props.put(AUTH_TIMEOUT_PROP_KEY, AUTH_TIMEOUT_PROP_VAL);
-		props.put(SM_THREADS_FACTOR_PROP_KEY, SM_THREADS_FACTOR_PROP_VAL);
-
-		return props;
 	}
 
 	@Override
@@ -782,205 +777,18 @@ public class SessionManager
 	}
 
 	@Override
-	public void setProperties(Map<String, Object> props) throws ConfigurationException {
-		super.setProperties(props);
-		if (props.get(SKIP_PRIVACY_PROP_KEY) != null) {
-			skipPrivacy = (Boolean) props.get(SKIP_PRIVACY_PROP_KEY);
-		}
-		if (props.get(FORCE_DETAIL_STALE_CONNECTION_CHECK) != null) {
-			forceDetailStaleConnectionCheck = (Boolean) props.get(
-					FORCE_DETAIL_STALE_CONNECTION_CHECK);
-			log.log(Level.CONFIG, "forced detailed stale connection checking is set to = {0}",
-					forceDetailStaleConnectionCheck);
-		}
-		if (props.get(SM_THREADS_FACTOR_PROP_KEY) != null) {
-			pluginsThreadFactor = (Integer) props.get(SM_THREADS_FACTOR_PROP_KEY);
-			log.log(Level.CONFIG, "plugins thread pool multiplication factor set to = {0}", pluginsThreadFactor);
-		}
-		if (props.get(STALE_CONNECTION_CLOSER_QUEUE_SIZE_KEY) != null) {
-			staleConnectionCloser.setMaxQueueSize((Integer) props.get(
-					STALE_CONNECTION_CLOSER_QUEUE_SIZE_KEY));
-			log.log(Level.CONFIG, "stale connection closer queue is set to = {0}",
-					staleConnectionCloser.getMaxQueueSize());
-		}
+	public void initialize() {
+		super.initialize();
+
+		smResourceConnection = new SMResourceConnection(null, user_repository, auth_repository, this);
+		registerNewSession(getComponentId().getBareJID(), smResourceConnection);
+	}
+
+	@Override
+	public void setSchedulerThreads_size(int size) {
+		super.setSchedulerThreads_size(size);
 		if (!staleConnectionCloser.isScheduled()) {
 			addTimerTask(staleConnectionCloser, staleConnectionCloser.getTimeout());
-		}
-
-		if (props.get(AUTH_TIMEOUT_PROP_KEY) != null) {
-			authTimeout = (Long)props.get(AUTH_TIMEOUT_PROP_KEY);
-		}
-
-		if (props.size() == 1) {
-
-			// If props.size() == 1, it means this is a single property update
-			// and this component does not support single property change for the rest
-			// of it's settings
-			return;
-		}
-		defPacketHandler = new PacketDefaultHandler();
-
-		// Is there shared user repository instance? If so I want to use it:
-		user_repository = (UserRepository) props.get(RepositoryFactory
-				.SHARED_USER_REPO_PROP_KEY);
-		if (user_repository != null) {
-			log.log(Level.CONFIG, "Using shared repository instance: {0}", user_repository
-					.getClass().getName());
-		} else {
-			Map<String, String> user_repo_params = new LinkedHashMap<String, String>(10);
-
-			for (Map.Entry<String, Object> entry : props.entrySet()) {
-				if (entry.getKey().startsWith(RepositoryFactory.USER_REPO_PARAMS_NODE)) {
-
-					// Split the key to configuration nodes separated with '/'
-					String[] nodes = entry.getKey().split("/");
-
-					// The plugin ID part may contain many IDs separated with comma ','
-					if (nodes.length > 1) {
-						user_repo_params.put(nodes[1], entry.getValue().toString());
-					}
-				}
-			}
-			try {
-
-				// String cls_name = (String) props.get(USER_REPO_CLASS_PROP_KEY);
-				String res_uri = (String) props.get(RepositoryFactory.USER_REPO_URL_PROP_KEY);
-
-				user_repository = RepositoryFactory.getUserRepository(null, res_uri,
-						user_repo_params);
-				log.log(Level.CONFIG, "Initialized {0} as user repository: {1}", new Object[] {
-						null,
-						res_uri });
-			} catch (Exception e) {
-				log.log(Level.SEVERE, "Can't initialize user repository: ", e);
-			}    // end of try-catch
-		}
-		auth_repository = (AuthRepository) props.get(RepositoryFactory
-				.SHARED_AUTH_REPO_PROP_KEY);
-		if (auth_repository != null) {
-			log.log(Level.CONFIG, "Using shared auth repository instance: {0}", auth_repository
-					.getClass().getName());
-		} else {
-			Map<String, String> auth_repo_params = new LinkedHashMap<String, String>(10);
-
-			for (Map.Entry<String, Object> entry : props.entrySet()) {
-				if (entry.getKey().startsWith(RepositoryFactory.AUTH_REPO_PARAMS_NODE)) {
-
-					// Split the key to configuration nodes separated with '/'
-					String[] nodes = entry.getKey().split("/");
-
-					// The plugin ID part may contain many IDs separated with comma ','
-					if (nodes.length > 1) {
-						auth_repo_params.put(nodes[1], entry.getValue().toString());
-					}
-				}
-			}
-			try {
-				String res_uri = (String) props.get(RepositoryFactory.AUTH_REPO_URL_PROP_KEY);
-
-				auth_repository = RepositoryFactory.getAuthRepository(null, res_uri,
-						auth_repo_params);
-				log.log(Level.CONFIG, "Initialized {0} as auth repository: {1}", new Object[] {
-						null,
-						res_uri });
-			} catch (Exception e) {
-				log.log(Level.SEVERE, "Can't initialize auth repository: ", e);
-			}    // end of try-catch
-		}
-		naUserRepository = new NonAuthUserRepositoryImpl(user_repository, getDefHostName(),
-				Boolean.parseBoolean((String) props.get(AUTO_CREATE_OFFLINE_USER_PROP_KEY)));
-		synchronized (this) {
-			LinkedHashMap<String, String> plugins_concurrency = new LinkedHashMap<String,
-					String>(20);
-			String[] plugins_conc = ((String) props.get(PLUGINS_CONCURRENCY_PROP_KEY)).split(
-					",");
-
-			log.log(Level.CONFIG, "Loading concurrency plugins list: {0}", Arrays.toString(
-					plugins_conc));
-			if ((plugins_conc != null) && (plugins_conc.length > 0)) {
-				for (String plugc : plugins_conc) {
-					log.log(Level.CONFIG, "Loading: {0}", plugc);
-					if (!plugc.trim().isEmpty()) {
-						String[] pc = plugc.split("=");
-						plugins_concurrency.put(pc[0], pc[1]);
-					}
-				}
-			}
-
-			Set<String> keys = new HashSet<String>(processors.keySet());
-
-			try {
-				if (!isInitializationComplete()) {
-					String sm_threads_pool = (String) props.get(SM_THREADS_POOL_PROP_KEY);
-
-					if (!sm_threads_pool.equals(SM_THREADS_POOL_PROP_VAL)) {
-						String[] threads_pool_params = sm_threads_pool.split(":");
-						int      def_pool_size       = 100;
-
-						if (threads_pool_params.length > 1) {
-							try {
-								def_pool_size = Integer.parseInt(threads_pool_params[1]);
-							} catch (Exception e) {
-								log.log(Level.WARNING,
-										"Incorrect threads pool size: {0}, setting default to 100",
-										threads_pool_params[1]);
-								def_pool_size = 100;
-							}
-						}
-
-						ProcessorWorkerThread                    worker = new ProcessorWorkerThread();
-						ProcessingThreads<ProcessorWorkerThread> pt =
-								new ProcessingThreads<ProcessorWorkerThread>(worker, def_pool_size,
-								maxQueueSize, defPluginsThreadsPool);
-
-						workerThreads.put(defPluginsThreadsPool, pt);
-						log.log(Level.CONFIG, "Created a default thread pool: {0}", def_pool_size);
-					}
-				}
-
-				String[] plugins = SessionManagerConfig.getActivePlugins(props);
-
-				log.log(Level.CONFIG, "Loaded plugins list: {0}", Arrays.toString(plugins));
-
-				// maxPluginsNo = plugins.length;
-				// processors.clear();
-				for (String plug_id : plugins) {
-					keys.remove(plug_id);
-					log.log(Level.CONFIG, "Loading and configuring plugin: {0}", plug_id);
-
-					XMPPImplIfc plugin = addPlugin(plug_id, plugins_concurrency.get(plug_id));
-
-					if (plugin != null) {
-						if (plugin.getClass().isAnnotationPresent(TigaseDeprecatedComponent.class)) {
-							TigaseDeprecatedComponent annotation = plugin.getClass().getAnnotation( TigaseDeprecatedComponent.class );
-							log.log( Level.WARNING, "Deprecated Plugin: " + plugin.id() + ", INFO: " + annotation.note() + "\n" );
-						}
-						Map<String, Object> plugin_settings = getPluginSettings(plug_id, props);
-
-						if (plugin_settings.size() > 0) {
-							if (log.isLoggable(Level.CONFIG)) {
-								log.log(Level.CONFIG, "Plugin configuration: {0}", plugin_settings);
-							}
-							plugin_config.put(plug_id, plugin_settings);
-						}
-						try {
-							plugin.init(plugin_settings);
-						} catch (TigaseDBException ex) {
-							log.log(Level.SEVERE, "Problem initializing plugin: " + plugin.id(), ex);
-						}
-					}
-				}    // end of for (String comp_id: plugins)
-			} catch (Exception e) {
-				log.log(Level.SEVERE, "Problem with component initialization: " + getName(), e);
-			}
-			for (String key : keys) {
-				removePlugin(key);
-			}
-		}
-		if (!isInitializationComplete()) {
-			smResourceConnection = new SMResourceConnection(null, user_repository,
-					auth_repository, this);
-			registerNewSession(getComponentId().getBareJID(), smResourceConnection);
 		}
 	}
 

@@ -22,6 +22,7 @@
 package tigase.kernel;
 
 import tigase.kernel.beans.Bean;
+import tigase.osgi.ModulesManagerImpl;
 import tigase.util.Base64;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.XMLUtils;
@@ -100,7 +101,7 @@ public class DefaultTypesConverter implements TypesConverter {
 
 			if (expectedType.equals(Class.class)) {
 				try {
-					return expectedType.cast(Class.forName(value.toString().trim()));
+					return expectedType.cast(ModulesManagerImpl.getInstance().forName(value.toString().trim()));
 				} catch (ClassNotFoundException e) {
 					throw new RuntimeException("Cannot convert to " + expectedType, e);
 				}
@@ -219,6 +220,18 @@ public class DefaultTypesConverter implements TypesConverter {
 					} catch (InstantiationException | IllegalAccessException ex) {
 						throw new RuntimeException("Unsupported conversion to " + expectedType, ex);
 					}
+				}
+			} else {
+				// here we try to assign instances of class passed as paramter if possible
+				try {
+					Class<?> cls = ModulesManagerImpl.getInstance().forName(value.toString());
+					if (expectedType.isAssignableFrom(cls)) {
+						return (T) cls.newInstance();
+					}
+				} catch (ClassNotFoundException ex) {
+					// ignoring this
+				} catch (InstantiationException | IllegalAccessException ex) {
+					throw new RuntimeException("Could not instantiate instance of " + value.toString());
 				}
 			}
 

@@ -83,6 +83,7 @@ public class BootstrapTest {
 		//props.put("userRepository/repo-uri", "jdbc:postgresql://127.0.0.1/tigase?user=test&password=test&autoCreateUser=true");
 		props.put("dataSource/repo-uri", "jdbc:postgresql://127.0.0.1/tigase?user=test&password=test&autoCreateUser=true");
 		props.put("sess-man/commands/ala-ma-kota", "DOMAIN");
+		props.put("c2s/incoming-filters", "tigase.server.filters.PacketCounter,tigase.server.filters.PacketCounter");
 
 		return props;
 	}

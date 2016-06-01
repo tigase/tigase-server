@@ -29,9 +29,8 @@ package tigase.server;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import tigase.annotations.TODO;
-import tigase.conf.ConfigurationException;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.server.filters.PacketCounter;
 import tigase.stats.StatisticType;
 import tigase.stats.StatisticsContainer;
 import tigase.stats.StatisticsList;
@@ -177,16 +176,19 @@ public abstract class AbstractMessageReceiver
 	private final long[]             processPacketTimings  = new long[100];
 	private ScheduledExecutorService receiverScheduler     = null;
 	private Timer                    receiverTasks         = null;
+	@ConfigField(desc = "Number of threads for scheduler", alias = SCHEDULER_THREADS_PROP_KEY)
 	private int                      schedulerThreads_size = 1;
 
 	// Array cache to speed processing up....
 	private final Priority[]                            pr_cache = Priority.values();
+	@ConfigField(desc = "Outgoing filters", alias = OUTGOING_FILTERS_PROP_KEY)
 	private final CopyOnWriteArrayList<PacketFilterIfc> outgoing_filters =
 			new CopyOnWriteArrayList<PacketFilterIfc>();
 	private final List<PriorityQueueAbstract<Packet>> out_queues =
 			new ArrayList<PriorityQueueAbstract<Packet>>(pr_cache.length);
 
 	// PriorityQueueAbstract.getPriorityQueue(pr_cache.length, maxQueueSize);
+	@ConfigField(desc = "Incoming filters", alias = INCOMING_FILTERS_PROP_KEY)
 	private final CopyOnWriteArrayList<PacketFilterIfc> incoming_filters =
 			new CopyOnWriteArrayList<PacketFilterIfc>();
 	private final List<PriorityQueueAbstract<Packet>> in_queues =
@@ -224,6 +226,15 @@ public abstract class AbstractMessageReceiver
 			new ConcurrentHashMap<String, PacketReceiverTask>(16, 0.75f, 4);
 	private final Set<Pattern> regexRoutings = new ConcurrentSkipListSet<Pattern>(
 			new PatternComparator());
+
+	public AbstractMessageReceiver() {
+		// initializing default value for incoming filters
+		PacketFilterIfc filter = new PacketCounter();
+		setIncomingFilters(Arrays.asList(filter));
+		// initializing default value for outgoing filters
+		filter = new PacketCounter();
+		setOutogingFilters(Arrays.asList(filter));
+	}
 
 	//~--- methods --------------------------------------------------------------
 
@@ -725,44 +736,6 @@ public abstract class AbstractMessageReceiver
 	// ~--- get methods ----------------------------------------------------------
 
 	/**
-	 * Returns default configuration settings for the component as a
-	 * <code>Map</code> with keys as configuration property IDs and values as the
-	 * configuration property values. All the default parameters returned from
-	 * this method are later passed to the <code>setProperties(...)</code> method.
-	 * Some of them may have changed value if they have been overwritten in the
-	 * server configuration. The configuration property value can be of any of the
-	 * basic types: <code>int</code>, <code>long</code>, <code>boolean</code>,
-	 * <code>String</code>.
-	 *
-	 * @param params
-	 *          is a <code>Map</code> with some initial properties set for the
-	 *          starting up server. These parameters can be used as a hints to
-	 *          generate component's default configuration.
-	 *
-	 * @return a <code>Map</code> with the component default configuration.
-	 */
-	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> defs         = super.getDefaults(params);
-		String              queueSize    = (String) params.get(GEN_MAX_QUEUE_SIZE);
-		int                 queueSizeInt = MAX_QUEUE_SIZE_PROP_VAL;
-
-		if (queueSize != null) {
-			try {
-				queueSizeInt = Integer.parseInt(queueSize);
-			} catch (NumberFormatException e) {
-				queueSizeInt = MAX_QUEUE_SIZE_PROP_VAL;
-			}
-		}
-		defs.put(MAX_QUEUE_SIZE_PROP_KEY, getMaxQueueSize(queueSizeInt));
-		defs.put(SCHEDULER_THREADS_PROP_KEY, schedulerThreads());
-		defs.put(INCOMING_FILTERS_PROP_KEY, INCOMING_FILTERS_PROP_VAL);
-		defs.put(OUTGOING_FILTERS_PROP_KEY, OUTGOING_FILTERS_PROP_VAL);
-
-		return defs;
-	}
-
-	/**
 	 * Method returns a <code>Set</code> with all component's routings as a
 	 * compiled regular expression patterns. The <code>Set</code> can be empty but
 	 * it can not be null.
@@ -915,6 +888,22 @@ public abstract class AbstractMessageReceiver
 
 	// ~--- set methods ----------------------------------------------------------
 
+	public void setIncomingFilters(List<PacketFilterIfc> filters) {
+		for (PacketFilterIfc filter : filters) {
+			filter.init(getName(), QueueType.IN_QUEUE);
+		}
+		incoming_filters.clear();
+		incoming_filters.addAll(filters);
+	}
+
+	public void setOutogingFilters(List<PacketFilterIfc> filters) {
+		for (PacketFilterIfc filter : filters) {
+			filter.init(getName(), QueueType.OUT_QUEUE);
+		}
+		outgoing_filters.clear();
+		outgoing_filters.addAll(filters);
+	}
+
 	/**
 	 * Method description
 	 *
@@ -976,70 +965,13 @@ public abstract class AbstractMessageReceiver
 		this.parent = parent;
 	}
 
-	@Override
-	@TODO(note = "Replace fixed filers loading with configurable options for that")
-	public void setProperties(Map<String, Object> props) throws ConfigurationException {
-		super.setProperties(props);
-		if (props.get(MAX_QUEUE_SIZE_PROP_KEY) != null) {
-			int queueSize = (Integer) props.get(MAX_QUEUE_SIZE_PROP_KEY);
+	public void setSchedulerThreads_size(int size) {
+		if (schedulerThreads_size != size) {
+			this.schedulerThreads_size = size;
 
-			setMaxQueueSize(queueSize);
-		}
-		if (props.get(SCHEDULER_THREADS_PROP_KEY) != null) {
-			int threads = (Integer) props.get(SCHEDULER_THREADS_PROP_KEY);
-
-			if (threads != schedulerThreads_size) {
-				schedulerThreads_size = threads;
-
-				ScheduledExecutorService scheduler = receiverScheduler;
-
-				receiverScheduler = Executors.newScheduledThreadPool(threads, threadFactory);
-				scheduler.shutdown();
-			}
-		}
-
-		String filters = (String) props.get(INCOMING_FILTERS_PROP_KEY);
-
-		if ((filters != null) &&!filters.trim().isEmpty()) {
-			incoming_filters.clear();
-
-			String[] incoming = filters.trim().split(",");
-
-			for (String inc : incoming) {
-				try {
-					PacketFilterIfc filter = (PacketFilterIfc) Class.forName(inc).newInstance();
-
-					filter.init(getName(), QueueType.IN_QUEUE);
-					incoming_filters.add(filter);
-					log.log(Level.CONFIG, "{0} loaded incoming filter: {1}", new Object[] {
-							getName(),
-							inc });
-				} catch (Exception e) {
-					log.log(Level.WARNING, "Problem loading filter: " + inc + " in component: " +
-							getName(), e);
-				}
-			}
-		}
-		filters = (String) props.get(OUTGOING_FILTERS_PROP_KEY);
-		if ((filters != null) &&!filters.trim().isEmpty()) {
-			outgoing_filters.clear();
-
-			String[] outgoing = filters.trim().split(",");
-
-			for (String out : outgoing) {
-				try {
-					PacketFilterIfc filter = (PacketFilterIfc) Class.forName(out).newInstance();
-
-					filter.init(getName(), QueueType.OUT_QUEUE);
-					outgoing_filters.add(filter);
-					log.log(Level.CONFIG, "{0} loaded outgoing filter: {1}", new Object[] {
-							getName(),
-							out });
-				} catch (Exception e) {
-					log.log(Level.WARNING, "Problem loading filter: " + out + " in component: " +
-							getName(), e);
-				}
-			}
+			ScheduledExecutorService scheduler = receiverScheduler;
+			receiverScheduler = Executors.newScheduledThreadPool(size, threadFactory);
+			scheduler.shutdown();
 		}
 	}
 

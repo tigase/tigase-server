@@ -27,7 +27,6 @@ package tigase.server.xmppclient;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.conf.ConfigurationException;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.HandleEvent;
 import tigase.eventbus.events.ShutdownEvent;
@@ -520,43 +519,6 @@ public class ClientConnectionManager
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> props = super.getDefaults(params);
-		Boolean             r_mode = (Boolean) params.get(getName() + "/" +
-				ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY);
-		String see_other_host_class = (String) params.get(SeeOtherHostIfc
-				.CM_SEE_OTHER_HOST_CLASS_PROPERTY);
-
-		SeeOtherHostIfc see_other_host_strategy = getSeeOtherHostInstance(see_other_host_class);
-		props.put(SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_KEY, see_other_host_class);
-		if (see_other_host_strategy != null) {
-			see_other_host_strategy.getDefaults(props, params);
-		}
-		if (r_mode == null) {
-			props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY, ROUTING_MODE_PROP_VAL);
-
-			// If the server is configured as connection manager only node then
-			// route packets to SM on remote host where is default routing
-			// for external component.
-			// Otherwise default routing is to SM on localhost
-			if (params.get("config-type").equals(GEN_CONFIG_CS) && (params.get(GEN_EXT_COMP) !=
-					null)) {
-				String[] comp_params = ((String) params.get(GEN_EXT_COMP)).split(",");
-
-				props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY, DEF_SM_NAME + "@" +
-						comp_params[1]);
-			} else {
-				props.put(ROUTINGS_PROP_KEY + "/" + ROUTING_ENTRY_PROP_KEY, DEF_SM_NAME + "@" +
-						DNSResolverFactory.getInstance().getDefaultHost());
-			}
-		}
-		props.put(SOCKET_CLOSE_WAIT_PROP_KEY, SOCKET_CLOSE_WAIT_PROP_DEF);
-		props.put(TLS_WANT_CLIENT_AUTH_ENABLED_KEY, TLS_WANT_CLIENT_AUTH_ENABLED_DEF);
-
-		return props;
-	}
-
-	@Override
 	public String getDiscoCategoryType() {
 		return "c2s";
 	}
@@ -601,58 +563,6 @@ public class ClientConnectionManager
 		if (see_other_host_strategy != null) {
 			this.see_other_host_strategy = see_other_host_strategy;
 			see_other_host_strategy.setNodes(getNodesConnectedWithLocal());
-		}
-	}
-
-	@Override
-	public void setProperties(Map<String, Object> props) throws ConfigurationException {
-		super.setProperties(props);
-		clientTrustManagerFactory.setProperties(props);
-		if (props.get(SOCKET_CLOSE_WAIT_PROP_KEY) != null) {
-			socket_close_wait_time = (Long) props.get(SOCKET_CLOSE_WAIT_PROP_KEY);
-		}
-		processors = XMPPIOProcessorsFactory.updateIOProcessors(this, processors, props);
-		if (props.size() == 1) {
-
-			// If props.size() == 1, it means this is a single property update
-			// and this component does not support single property change for
-			// the rest
-			// of it's settings
-			return;
-		}
-
-		String see_other_host_class = (String) props.get(SeeOtherHostIfc
-				.CM_SEE_OTHER_HOST_CLASS_PROP_KEY);
-
-		if (see_other_host_strategy != null) {
-			see_other_host_strategy.stop();
-		}
-		see_other_host_strategy = getSeeOtherHostInstance(see_other_host_class);
-		if (see_other_host_strategy != null) {
-			see_other_host_strategy.setProperties(props);
-			see_other_host_strategy.start();
-		}
-
-		boolean routing_mode = (Boolean) props.get(ROUTINGS_PROP_KEY + "/" +
-				ROUTING_MODE_PROP_KEY);
-
-		if (routing_mode) {
-			routings = new RoutingsContainer.MultiMode();
-		} else {
-			routings = new RoutingsContainer.SingleMode();
-		}
-
-
-		int idx = (ROUTINGS_PROP_KEY + "/").length();
-
-		for (Map.Entry<String, Object> entry : props.entrySet()) {
-			if (entry.getKey().startsWith(ROUTINGS_PROP_KEY + "/") &&!entry.getKey().equals(
-					ROUTINGS_PROP_KEY + "/" + ROUTING_MODE_PROP_KEY)) {
-				routings.addRouting(entry.getKey().substring(idx), (String) entry.getValue());
-			}    // end of if (entry.getKey().startsWith(ROUTINGS_PROP_KEY + "/"))
-		}      // end of for ()
-		if (props.containsKey(TLS_WANT_CLIENT_AUTH_ENABLED_KEY)) {
-			tlsWantClientAuthEnabled = (Boolean) props.get(TLS_WANT_CLIENT_AUTH_ENABLED_KEY);
 		}
 	}
 

@@ -26,51 +26,28 @@ package tigase.server.ext;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.TimerTask;
+import tigase.db.comp.ComponentRepository;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
+import tigase.net.ConnectionType;
+import tigase.net.SocketType;
+import tigase.server.ConnectionManager;
+import tigase.server.Packet;
+import tigase.server.ext.handlers.*;
+import tigase.server.ext.lb.LoadBalancerIfc;
+import tigase.stats.StatisticsList;
+import tigase.util.TigaseStringprepException;
+import tigase.xml.Element;
+import tigase.xmpp.Authorization;
+import tigase.xmpp.PacketErrorTypeException;
 
+import javax.script.Bindings;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.script.Bindings;
-
-import tigase.conf.ConfigurationException;
-
-import tigase.db.comp.ComponentRepository;
-
-import tigase.net.ConnectionType;
-import tigase.net.SocketType;
-
-import tigase.server.ConnectionManager;
-import tigase.server.Packet;
-import tigase.server.ext.handlers.BindProcessor;
-import tigase.server.ext.handlers.ComponentAcceptStreamOpenHandler;
-import tigase.server.ext.handlers.ComponentConnectStreamOpenHandler;
-import tigase.server.ext.handlers.HandshakeProcessor;
-import tigase.server.ext.handlers.JabberClientStreamOpenHandler;
-import tigase.server.ext.handlers.SASLProcessor;
-import tigase.server.ext.handlers.StartTLSProcessor;
-import tigase.server.ext.handlers.StreamFeaturesProcessor;
-import tigase.server.ext.handlers.UnknownXMLNSStreamOpenHandler;
-import tigase.server.ext.lb.LoadBalancerIfc;
-
-import tigase.stats.StatisticsList;
-import tigase.util.TigaseStringprepException;
-import tigase.xml.Element;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.PacketErrorTypeException;
-
-import java.text.MessageFormat;
 
 /**
  * Created: Sep 30, 2009 8:28:13 PM
@@ -125,10 +102,8 @@ public class ComponentProtocol
 
 	//~--- fields ---------------------------------------------------------------
 
-	/** Field description */
-	public boolean PACK_ROUTED_VAL = false;
-
 	// In seconds
+	@ConfigField(desc = "Authentication timeout", alias = AUTHENTICATION_TIMEOUT_PROP_KEY)
 	private long authenticationTimeOut = 15;
 
 	/**
@@ -138,8 +113,11 @@ public class ComponentProtocol
 	 */
 	private Map<String, CopyOnWriteArrayList<ComponentConnection>> connections =
 			new ConcurrentHashMap<String, CopyOnWriteArrayList<ComponentConnection>>();
-	private String[]                          hostnamesToBind           = null;
+	@ConfigField(desc = "Hostnames to bind", alias = HOSTNAMES_PROP_KEY)
+	private String[]                          hostnamesToBind           = new String[0];
+	@ConfigField(desc = "Max number of authentication attempts", alias = MAX_AUTH_ATTEMPTS_PROP_KEY)
 	private int                               maxAuthenticationAttempts = 1;
+	@Inject
 	private ComponentRepository<CompRepoItem> repo                      = null;
 	private Map<String, StreamOpenHandler>    streamOpenHandlers =
 			new LinkedHashMap<String, StreamOpenHandler>();
@@ -153,10 +131,13 @@ public class ComponentProtocol
 			10);
 	private UnknownXMLNSStreamOpenHandler unknownXMLNSHandler =
 			new UnknownXMLNSStreamOpenHandler();
+	@ConfigField(desc = "Identitiy type", alias = IDENTITY_TYPE_KEY)
 	private String  identity_type = IDENTITY_TYPE_VAL;
+	@ConfigField(desc = "Enable experimental features")
 	private boolean experimental  = false;
 
 	// private ServiceEntity serviceEntity = null;
+	@ConfigField(desc = "Close stream on sequence error", alias = CLOSE_ON_SEQUENCE_ERROR_PROP_KEY)
 	private boolean closeOnSequenceError = true;
 
 	//~--- constructors ---------------------------------------------------------
@@ -187,6 +168,20 @@ public class ComponentProtocol
 				streamOpenHandlers.put(xmlns, handler);
 			}
 		}
+
+		processors = new LinkedHashMap<String, ExtProcessor>();
+
+		ExtProcessor proc = new HandshakeProcessor();
+
+		processors.put(proc.getId(), proc);
+		proc = new StreamFeaturesProcessor();
+		processors.put(proc.getId(), proc);
+		proc = new StartTLSProcessor();
+		processors.put(proc.getId(), proc);
+		proc = new SASLProcessor();
+		processors.put(proc.getId(), proc);
+		proc = new BindProcessor();
+		processors.put(proc.getId(), proc);
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -283,44 +278,6 @@ public class ComponentProtocol
 	@Override
 	public CompRepoItem getCompRepoItem(String hostname) {
 		return repo.getItem(hostname);
-	}
-
-	@Override
-	@SuppressWarnings({ "unchecked" })
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> defs = super.getDefaults(params);
-
-		experimental = Boolean.parseBoolean((String) params.get("--experimental"));
-
-		String repo_class = (String) params.get(EXTCOMP_REPO_CLASS_PROPERTY);
-
-		if (repo_class == null) {
-			repo_class = EXTCOMP_REPO_CLASS_PROP_VAL;
-		}
-		defs.put(EXTCOMP_REPO_CLASS_PROP_KEY, repo_class);
-		try {
-			repo = (ComponentRepository<CompRepoItem>) Class.forName(repo_class).newInstance();
-			repo.getDefaults(defs, params);
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can not instantiate items repository for class: " +
-					repo_class, e);
-		}
-		defs.put(PACK_ROUTED_KEY, PACK_ROUTED_VAL);
-		defs.put(RETURN_SERVICE_DISCO_KEY, RETURN_SERVICE_DISCO_VAL);
-		defs.put(IDENTITY_TYPE_KEY, IDENTITY_TYPE_VAL);
-
-		String bind_hostnames = (String) params.get(EXTCOMP_BIND_HOSTNAMES);
-
-		if (bind_hostnames != null) {
-			defs.put(EXTCOMP_BIND_HOSTNAMES_PROP_KEY, bind_hostnames.split(","));
-		} else {
-			defs.put(EXTCOMP_BIND_HOSTNAMES_PROP_KEY, new String[] { "" });
-		}
-		defs.put(CLOSE_ON_SEQUENCE_ERROR_PROP_KEY, closeOnSequenceError);
-		defs.put(MAX_AUTH_ATTEMPTS_PROP_KEY, maxAuthenticationAttempts);
-		defs.put(AUTHENTICATION_TIMEOUT_PROP_KEY, authenticationTimeOut);
-
-		return defs;
 	}
 
 	@Override
@@ -536,37 +493,11 @@ public class ComponentProtocol
 		return result;
 	}
 
-	//~--- set methods ----------------------------------------------------------
+	//~--- methods --------------------------------------------------------------
 
 	@Override
-	@SuppressWarnings({ "unchecked" })
-	public void setProperties(Map<String, Object> properties) throws ConfigurationException {
-		if (properties.size() == 1) {
-
-			// If props.size() == 1, it means this is a single property update
-			// and this component does not support single property change for the rest
-			// of it's settings
-			return;
-		}
-		identity_type = (String) properties.get(IDENTITY_TYPE_KEY);
-		super.setProperties(properties);
-
-		String repo_class = (String) properties.get(EXTCOMP_REPO_CLASS_PROP_KEY);
-
-		try {
-			ComponentRepository<CompRepoItem> repo_tmp =
-					(ComponentRepository<CompRepoItem>) Class.forName(repo_class).newInstance();
-
-			repo_tmp.setProperties(properties);
-			ComponentRepository<CompRepoItem> old_repo = repo;
-			repo = repo_tmp;
-			if (old_repo != null) {
-				repo.destroy();
-			}
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can not create items repository instance for class: " +
-					repo_class, e);
-		}
+	public void start() {
+		super.start();
 
 		// Activate all connections for which parameters are defined in the
 		// repository
@@ -614,27 +545,8 @@ public class ComponentProtocol
 				}
 			}
 		}
-		hostnamesToBind = (String[]) properties.get(EXTCOMP_BIND_HOSTNAMES_PROP_KEY);
-		if ((hostnamesToBind.length == 1) && hostnamesToBind[0].isEmpty()) {
-			hostnamesToBind = null;
-		}
-		log.config("Hostnames to bind: " + Arrays.toString(hostnamesToBind));
-		processors = new LinkedHashMap<String, ExtProcessor>();
 
-		ExtProcessor proc = new HandshakeProcessor();
-
-		processors.put(proc.getId(), proc);
-		proc = new StreamFeaturesProcessor();
-		processors.put(proc.getId(), proc);
-		proc = new StartTLSProcessor();
-		processors.put(proc.getId(), proc);
-		proc = new SASLProcessor();
-		processors.put(proc.getId(), proc);
-		proc = new BindProcessor();
-		processors.put(proc.getId(), proc);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@Override
 	public void tlsHandshakeCompleted(ComponentIOService service) {}

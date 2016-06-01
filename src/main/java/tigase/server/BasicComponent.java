@@ -498,6 +498,7 @@ public class BasicComponent
 	}
 
 	@Override
+	@Deprecated
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> defs = new LinkedHashMap<String, Object>(50);
 
@@ -505,28 +506,6 @@ public class BasicComponent
 		DEF_HOSTNAME_PROP_VAL = DNSResolverFactory.getInstance().getDefaultHost();
 		defs.put(DEF_HOSTNAME_PROP_KEY, DEF_HOSTNAME_PROP_VAL);
 
-		String[] adm = null;
-
-		if (params.get(GEN_ADMINS) != null) {
-			adm = ((String) params.get(GEN_ADMINS)).split(",");
-		} else {
-			adm = new String[] { "admin@localhost" };
-		}
-		defs.put(ADMINS_PROP_KEY, adm);
-
-		String scripts_dir = (String) params.get(GEN_SCRIPT_DIR);
-
-		if (scripts_dir == null) {
-			scripts_dir = SCRIPTS_DIR_PROP_DEF;
-		}
-		defs.put(SCRIPTS_DIR_PROP_KEY, scripts_dir);
-		defs.put(COMMAND_PROP_NODE + "/" + ALL_PROP_KEY, CmdAcl.ADMIN.name());
-
-		String trusted_def = System.getProperty(TRUSTED_PROP_KEY);
-		if (trusted_def != null) {
-			defs.put(TRUSTED_PROP_KEY, trusted_def.split(","));
-		}
-		
 		return defs;
 	}
 
@@ -922,76 +901,8 @@ public class BasicComponent
 	}
 
 	@Override
+	@Deprecated
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
-		if (props.size() > 1) {
-			if (props.get(TRUSTED_PROP_KEY) != null) {
-				trustedProp = (String[]) props.get(TRUSTED_PROP_KEY);				
-			}
-		}
-		nodeConnected(defHostname.getDomain());
-		refreshTrustedJids();
-		if (isInitializationComplete()) {
-
-			// Do we really need to do this again?
-			return;
-		}
-		if (scriptEngineManager == null) {
-			scriptEngineManager = createScriptEngineManager();
-		}
-		if (props.get(COMPONENT_ID_PROP_KEY) != null) {
-			try {
-				compId = JID.jidInstance((String) props.get(COMPONENT_ID_PROP_KEY));
-			} catch (TigaseStringprepException ex) {
-				log.log(Level.WARNING, "Problem setting component ID: ", ex);
-			}
-		}
-		if (props.get(DEF_HOSTNAME_PROP_KEY) != null) {
-			defHostname = BareJID.bareJIDInstanceNS((String) props.get(DEF_HOSTNAME_PROP_KEY));
-		}
-
-		String[] admins_tmp = (String[]) props.get(ADMINS_PROP_KEY);
-
-		if (admins_tmp != null) {
-			for (String admin : admins_tmp) {
-				try {
-					admins.add(BareJID.bareJIDInstance(admin));
-				} catch (TigaseStringprepException ex) {
-					log.log(Level.CONFIG, "Incorrect admin JID: ", ex);
-				}
-			}
-		}
-		for (Map.Entry<String, Object> entry : props.entrySet()) {
-			if (entry.getKey().startsWith(COMMAND_PROP_NODE)) {
-				String          cmdId  = entry.getKey().substring(COMMAND_PROP_NODE.length() + 1);
-				String[]        cmdAcl = entry.getValue().toString().split(",");
-				EnumSet<CmdAcl> acl    = EnumSet.noneOf(CmdAcl.class);
-
-				for (String cmda : cmdAcl) {
-					CmdAcl acl_tmp = CmdAcl.valueof(cmda);
-
-					acl.add(acl_tmp);
-					if (acl_tmp != CmdAcl.ADMIN) {
-						nonAdminCommands = true;
-					}
-				}
-				commandsACL.put(cmdId, acl);
-			}
-		}
-		updateServiceEntity();
-
-		CommandIfc command = new AddScriptCommand();
-
-		command.init(CommandIfc.ADD_SCRIPT_CMD, "New command script", "Scripts");
-		scriptCommands.put(command.getCommandId(), command);
-		command = new RemoveScriptCommand();
-		command.init(CommandIfc.DEL_SCRIPT_CMD, "Remove command script", "Scripts");
-		scriptCommands.put(command.getCommandId(), command);
-		if (props.get(SCRIPTS_DIR_PROP_KEY) != null) {
-			scriptsBaseDir = (String) props.get(SCRIPTS_DIR_PROP_KEY);
-			scriptsCompDir = scriptsBaseDir + "/" + getName();
-			reloadScripts();
-		}
-		cmpInfo = new ComponentInfo(getName(), this.getClass());
 	}
 
 	public void setCommandsACL(ConcurrentHashMap<String,EnumSet<CmdAcl>> commandsACL) {

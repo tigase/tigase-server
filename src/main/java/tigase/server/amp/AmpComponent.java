@@ -33,7 +33,7 @@ import tigase.kernel.beans.Inject;
 import tigase.kernel.core.Kernel;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Packet;
-import tigase.server.amp.action.*;
+import tigase.server.amp.action.Broadcast;
 import tigase.server.amp.cond.Deliver;
 import tigase.server.amp.cond.ExpireAt;
 import tigase.server.amp.cond.MatchResource;
@@ -42,7 +42,6 @@ import tigase.xmpp.JID;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
@@ -69,9 +68,9 @@ public class AmpComponent
 	//~--- fields ---------------------------------------------------------------
 
 	// ~--- fields ---------------------------------------------------------------
-	private Map<String, ActionIfc> actions       = new ConcurrentSkipListMap<String,
+	private ConcurrentSkipListMap<String, ActionIfc> actions       = new ConcurrentSkipListMap<String,
 																									 ActionIfc>();
-	private Map<String, ConditionIfc> conditions = new ConcurrentSkipListMap<String,
+	private ConcurrentSkipListMap<String, ConditionIfc> conditions = new ConcurrentSkipListMap<String,
 																									 ConditionIfc>();
 
 	@Inject
@@ -216,7 +215,7 @@ public class AmpComponent
 	}
 
 	public void setAllActions(List<ActionIfc> actions) {
-		Map<String,ActionIfc> map = new ConcurrentSkipListMap<>();
+		ConcurrentSkipListMap<String,ActionIfc> map = new ConcurrentSkipListMap<>();
 		for (ActionIfc action : actions) {
 			action.setActionResultsHandler(this);
 			map.put(action.getName(), action);

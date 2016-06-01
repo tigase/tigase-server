@@ -22,6 +22,7 @@
 package tigase.server;
 
 import tigase.component.PropertiesBeanConfigurator;
+import tigase.component.PropertiesBeanConfiguratorWithBackwordCompatibility;
 import tigase.conf.ConfiguratorAbstract;
 import tigase.eventbus.EventBusFactory;
 import tigase.kernel.DefaultTypesConverter;
@@ -94,13 +95,13 @@ public class Bootstrap implements Lifecycle {
 		}
 		// register default types converter and properties bean configurator
 		kernel.registerBean(DefaultTypesConverter.class).exec();
-		kernel.registerBean(PropertiesBeanConfigurator.class).exec();
+		kernel.registerBean(PropertiesBeanConfiguratorWithBackwordCompatibility.class).exec();
 		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exportable().exec();
 
 		// moved to AbstractBeanConfigurator
 		//registerBeans();
 
-		BeanConfigurator configurator = kernel.getInstance(PropertiesBeanConfigurator.class);
+		BeanConfigurator configurator = kernel.getInstance(PropertiesBeanConfiguratorWithBackwordCompatibility.class);
 		if (configurator instanceof PropertiesBeanConfigurator) {
 			PropertiesBeanConfigurator propertiesBeanConfigurator = (PropertiesBeanConfigurator) configurator;
 			propertiesBeanConfigurator.setProperties(props);

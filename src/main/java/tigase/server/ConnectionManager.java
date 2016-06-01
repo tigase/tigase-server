@@ -28,7 +28,6 @@ package tigase.server;
 
 
 import tigase.annotations.TODO;
-import tigase.conf.ConfigurationException;
 import tigase.io.SSLContextContainerIfc;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.RegistrarBean;
@@ -217,7 +216,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	private long                            bytesSent         = 0;
 	private int                             services_size     = 0;
 	private long                            socketOverflow    = 0;
-	private Thread                          watchdog          = null;
+	private Watchdog                        watchdog          = null;
 	private long                            watchdogRuns      = 0;
 	private long                            watchdogStopped   = 0;
 	private long                            watchdogTests     = 0;
@@ -426,13 +425,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		}
 		super.initializationCompleted();
 		initializationCompleted = true;
-		for (Map<String, Object> params : waitingTasks) {
-			reconnectService(params, connectionDelay);
-		}
-		waitingTasks.clear();
-		if ( null != watchdog ){
-			watchdog.start();
-		}
 	}
 
 	@Override
@@ -670,10 +662,21 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	public void start() {
 		sslContextContainer.start();
 		super.start();
+		for (Map<String, Object> params : waitingTasks) {
+			reconnectService(params, connectionDelay);
+		}
+		waitingTasks.clear();
+		setupWatchdogThread();
+		if ( null != watchdog ){
+			watchdog.start();
+		}
 	}
 
 	@Override
 	public void stop() {
+		if ( null != watchdog ) {
+			watchdog.shutdown();
+		}
 		this.releaseListeners();
 
 		// when stopping connection manager we need to stop all active connections as well
@@ -802,131 +805,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		log.log(Level.CONFIG, "{0} defaults: {1}", new Object[] { getName(),
-				params.toString() });
-
-		Map<String, Object> props = super.getDefaults(params);
-
-		checkHighThroughputProperty(NET_BUFFER_HT_PROP_KEY, NET_BUFFER_HT_PROP_VAL,
-				NET_BUFFER_ST_PROP_KEY, NET_BUFFER_ST_PROP_VAL, NET_BUFFER_PROP_KEY,
-				Integer.class, params, props);
-		checkHighThroughputProperty(HT_TRAFFIC_THROTTLING_PROP_KEY,
-				getDefTrafficThrottling(), ST_TRAFFIC_THROTTLING_PROP_KEY,
-				getDefTrafficThrottling(), TRAFFIC_THROTTLING_PROP_KEY, String.class, params,
-				props);
-
-		props.put(NET_BUFFER_LIMIT_PROP_KEY, isHighThroughput()
-				? NET_BUFFER_LIMIT_HT_PROP_VAL : NET_BUFFER_LIMIT_ST_PROP_VAL);
-
-		if ( params.get( "--" + ELEMENTS_NUMBER_LIMIT_PROP_KEY ) != null ){
-			elements_number_limit = Integer.valueOf( (String)params.get( "--" + ELEMENTS_NUMBER_LIMIT_PROP_KEY ) );
-		} else {
-			elements_number_limit = ELEMENTS_NUMBER_LIMIT_PROP_VAL;
-		}
-		props.put( ELEMENTS_NUMBER_LIMIT_PROP_KEY, elements_number_limit );
-
-		if ( params.get( "--" + WATCHDOG_DELAY ) != null ){
-			watchdogDelay = Integer.valueOf( (String)params.get( "--" + WATCHDOG_DELAY ) );
-		}
-		props.put( WATCHDOG_DELAY, watchdogDelay);
-
-		if ( params.get( "--" + WATCHDOG_TIMEOUT ) != null ){
-			watchdogTimeout =  Integer.valueOf( (String)params.get( "--" + WATCHDOG_TIMEOUT ) );
-		}
-		props.put( WATCHDOG_TIMEOUT, watchdogTimeout);
-
-		WATCHDOG_PING_TYPE pingtype = WATCHDOG_PING_TYPE.WHITESPACE;
-		if ( params.get( "--" + WATCHDOG_PING_TYPE_KEY ) != null ){
-			String type = (String)params.get( "--" + WATCHDOG_PING_TYPE_KEY );
-			pingtype = WATCHDOG_PING_TYPE.valueOf( type.toUpperCase() );
-		}
-		props.put( WATCHDOG_PING_TYPE_KEY, pingtype);
-
-		int[]  ports     = null;
-		String ports_str = (String) params.get("--" + getName() + "-ports");
-
-		if (ports_str != null) {
-			String[] ports_stra = ports_str.split(",");
-
-			ports = new int[ports_stra.length];
-
-			int k = 0;
-
-			for (String p : ports_stra) {
-				try {
-					ports[k++] = Integer.parseInt(p);
-				} catch (NumberFormatException e) {
-					log.warning("Incorrect ports default settings: " + p);
-				}
-			}
-		}
-
-		int ports_size = 0;
-
-		if (ports != null) {
-			log.config("Port settings preset: " + Arrays.toString(ports));
-			for (int port : ports) {
-				putDefPortParams(props, port, SocketType.plain);
-			}        // end of for (int i = 0; i < idx; i++)
-			props.put(PORTS_PROP_KEY, ports);
-		} else {
-			int[] plains = getDefPlainPorts();
-
-			if (plains != null) {
-				ports_size += plains.length;
-			}        // end of if (plains != null)
-
-			int[] ssls = getDefSSLPorts();
-
-			if (ssls != null) {
-				ports_size += ssls.length;
-			}        // end of if (ssls != null)
-			if (ports_size > 0) {
-				ports = new int[ports_size];
-			}        // end of if (ports_size > 0)
-			if (ports != null) {
-				int idx = 0;
-
-				if (plains != null) {
-					idx = plains.length;
-					for (int i = 0; i < idx; i++) {
-						ports[i] = plains[i];
-						putDefPortParams(props, ports[i], SocketType.plain);
-					}    // end of for (int i = 0; i < idx; i++)
-				}      // end of if (plains != null)
-				if (ssls != null) {
-					for (int i = idx; i < idx + ssls.length; i++) {
-						ports[i] = ssls[i - idx];
-						putDefPortParams(props, ports[i], SocketType.ssl);
-					}    // end of for (int i = 0; i < idx + ssls.length; i++)
-				}      // end of if (ssls != null)
-				props.put(PORTS_PROP_KEY, ports);
-			}        // end of if (ports != null)
-		}
-
-		String acks = (String) params.get(XMPP_STANZA_ACK);
-
-		if (acks != null) {
-			String[] acks_arr = acks.split(",");
-
-			for (String ack_type : acks_arr) {
-				if (STANZA_WHITE_CHAR_ACK.equals(ack_type)) {
-					white_char_ack = true;
-				}
-				if (STANZA_XMPP_ACK.equals(ack_type)) {
-					xmpp_ack = true;
-				}
-			}
-		}
-		props.put(WHITE_CHAR_ACK_PROP_KEY, white_char_ack);
-		props.put(XMPP_ACK_PROP_KEY, xmpp_ack);
-		props.put(MAX_INACTIVITY_TIME, getMaxInactiveTime() / SECOND);
-
-		return props;
-	}
-
-	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
 		list.add(getName(), "Open connections", services_size, Level.INFO);
@@ -968,11 +846,11 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	@Override
 	public void setName(String name) {
 		super.setName(name);
-		setupWatchdogThread();
 	}
 
 	protected void setupWatchdogThread() {
-		watchdog = new Thread( newWatchdog(), "Watchdog - " + getName());
+		watchdog = newWatchdog();
+		watchdog.setName("Watchdog - " + getName());
 		watchdog.setDaemon(true);
 	}
 
@@ -1017,92 +895,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				log.warning(getName() + " total_bin_limit = " + total_bin_limit);
 			}
 		}
-	}
-
-	@Override
-	public void setProperties(Map<String, Object> props) throws ConfigurationException {
-		super.setProperties(props);
-		if (props.get(MAX_INACTIVITY_TIME) != null) {
-			maxInactivityTime = (Long) props.get(MAX_INACTIVITY_TIME) * SECOND;
-		}
-		if (props.get(WHITE_CHAR_ACK_PROP_KEY) != null) {
-			white_char_ack = (Boolean) props.get(WHITE_CHAR_ACK_PROP_KEY);
-		}
-		if (props.get(XMPP_ACK_PROP_KEY) != null) {
-			xmpp_ack = (Boolean) props.get(XMPP_ACK_PROP_KEY);
-		}
-		if (props.get(NET_BUFFER_PROP_KEY) != null) {
-			net_buffer = (Integer) props.get(NET_BUFFER_PROP_KEY);
-		}
-		if (props.get(NET_BUFFER_LIMIT_PROP_KEY) != null) {
-			net_buffer_limit = (Integer) props.get(NET_BUFFER_LIMIT_PROP_KEY);
-		}
-		if (props.get(TRAFFIC_THROTTLING_PROP_KEY) != null) {
-			String tmp = ((String) props.get(TRAFFIC_THROTTLING_PROP_KEY));
-			setTrafficThrottling(tmp);
-		}
-
-		if ( props.get (ELEMENTS_NUMBER_LIMIT_PROP_KEY ) != null ){
-			elements_number_limit = (int) props.get (ELEMENTS_NUMBER_LIMIT_PROP_KEY );
-		}
-
-		if ( props.get( WATCHDOG_DELAY ) != null ){
-			watchdogDelay =  (long) props.get( WATCHDOG_DELAY );
-		}
-		if ( props.get( WATCHDOG_TIMEOUT ) != null ){
-			watchdogTimeout =  (long) props.get( WATCHDOG_TIMEOUT );
-		}
-		if ( props.get( WATCHDOG_PING_TYPE_KEY ) != null ){
-			String value = String.valueOf( props.get( WATCHDOG_PING_TYPE_KEY ) );
-			watchdogPingType = WATCHDOG_PING_TYPE.valueOf( value.toUpperCase() );
-		}
-
-		if (props.size() == 1) {
-
-			// If props.size() == 1, it means this is a single property update and
-			// ConnectionManager does not support it yet.
-			return;
-		}
-		if (isInitializationComplete()) {
-
-			// Do we really need to do this again?
-			// Looks like reconfiguration for the port is not working correctly anyway
-			// so for now we do not want to do it.
-			return;
-		}
-		releaseListeners();
-
-		int[] ports = (int[]) props.get(PORTS_PROP_KEY);
-
-		if (ports != null) {
-			for (int i = 0; i < ports.length; i++) {
-				Map<String, Object> port_props = new LinkedHashMap<String, Object>(20);
-
-				for (Map.Entry<String, Object> entry : props.entrySet()) {
-					if (entry.getKey().startsWith(PROP_KEY + ports[i])) {
-						int    idx = entry.getKey().lastIndexOf('/');
-						String key = entry.getKey().substring(idx + 1);
-
-						log.log(Level.CONFIG, "Adding port property key: {0}={1}", new Object[] { key,
-								entry.getValue() });
-						port_props.put(key, entry.getValue());
-					}    // end of if (entry.getKey().startsWith())
-				}      // end of for ()
-				port_props.put(PORT_KEY, ports[i]);
-				if (port_props.containsKey(PORT_TYPE_PROP_KEY) 
-						&& !(port_props.get(PORT_TYPE_PROP_KEY) instanceof ConnectionType)) {
-					Object val = port_props.get(PORT_TYPE_PROP_KEY);
-					port_props.put(PORT_TYPE_PROP_KEY, ConnectionType.valueOf(val.toString()));
-				}
-				if (port_props.containsKey(PORT_SOCKET_PROP_KEY) 
-						&& !(port_props.get(PORT_SOCKET_PROP_KEY) instanceof SocketType)) {
-					Object val = port_props.get(PORT_SOCKET_PROP_KEY);
-					port_props.put(PORT_SOCKET_PROP_KEY, SocketType.valueOf(val.toString()));
-				}				
-				addWaitingTask(port_props);
-				// reconnectService(port_props, startDelay);
-			}        // end of for (int i = 0; i < ports.length; i++)
-		}          // end of if (ports != null)
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -1665,7 +1457,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 *
 	 */
 	protected class Watchdog
-					implements Runnable {
+					extends Thread {
+
+		private boolean shutdown = false;
 
 		Packet pingPacket;
 		
@@ -1686,7 +1480,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		
 		@Override
 		public void run() {
-			while (true) {
+			while (!shutdown) {
 				try {
 
 					// Sleep...
@@ -1773,6 +1567,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			}
 		}
 
+		public void shutdown() {
+			shutdown = true;
+		}
 	}
 
 	public static class PortConfigBean implements ConfigurationChangedAware {

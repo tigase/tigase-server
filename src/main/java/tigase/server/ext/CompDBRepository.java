@@ -24,11 +24,12 @@ package tigase.server.ext;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.Map;
 import tigase.db.DBInitException;
 import tigase.db.comp.UserRepoRepository;
-
+import tigase.kernel.beans.Bean;
 import tigase.xmpp.BareJID;
+
+import java.util.Map;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -37,6 +38,7 @@ import tigase.xmpp.BareJID;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
+@Bean(name = "compDBRepository", parent = ComponentProtocol.class)
 public class CompDBRepository extends UserRepoRepository<CompRepoItem> {
 
 	@Override

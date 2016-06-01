@@ -27,7 +27,6 @@ package tigase.vhosts;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.cluster.repo.ClusterRepoItem;
-import tigase.conf.ConfigurationException;
 import tigase.db.DBInitException;
 import tigase.db.DataSource;
 import tigase.db.DataSourceHelper;
@@ -69,15 +68,8 @@ import java.util.logging.Logger;
 public class VHostManager
 				extends AbstractComponentRegistrator<VHostListener>
 				implements VHostManagerIfc, StatisticsContainer, RegistrarBean {
-	/** Field description */
-	public static final String VHOSTS_REPO_CLASS_PROP_KEY = "repository-class";
 
 	/** Field description */
-	public static final String VHOSTS_REPO_CLASS_PROP_VAL =
-			"tigase.vhosts.VHostJDBCRepository";
-
-	/** Field description */
-	public static final String  VHOSTS_REPO_CLASS_PROPERTY = "--vhost-repo-class";
 	private static final Logger log = Logger.getLogger(VHostManager.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
@@ -249,29 +241,6 @@ public class VHostManager
 	}
 
 	@Override
-	@SuppressWarnings({ "unchecked" })
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> defs       = super.getDefaults(params);
-		String              repo_class = (String) params.get(VHOSTS_REPO_CLASS_PROPERTY);
-
-		if (repo_class == null) {
-			repo_class = VHOSTS_REPO_CLASS_PROP_VAL;
-		}
-		defs.put(VHOSTS_REPO_CLASS_PROP_KEY, repo_class);
-		try {
-			ComponentRepository<VHostItem> repo_tmp = (ComponentRepository<VHostItem>) Class
-					.forName(repo_class).newInstance();
-
-			repo_tmp.getDefaults(defs, params);
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can not instantiate VHosts repository for class: " +
-					repo_class, e);
-		}
-
-		return defs;
-	}
-
-	@Override
 	public BareJID getDefVHostItem() {
 		Iterator<VHostItem> vhosts = repo.iterator();
 
@@ -380,29 +349,6 @@ public class VHostManager
 	@Override
 	public void setName(String name) {
 		super.setName(name);
-	}
-
-	@Override
-	@SuppressWarnings({ "unchecked" })
-	public void setProperties(Map<String, Object> properties) throws ConfigurationException {
-		super.setProperties(properties);
-
-		String repo_class = (String) properties.get(VHOSTS_REPO_CLASS_PROP_KEY);
-
-		if (repo_class != null && !isInitializationComplete()) {
-			try {
-				ComponentRepository<VHostItem> repo_tmp = (ComponentRepository<VHostItem>) Class
-						.forName(repo_class).newInstance();
-
-				repo_tmp.setProperties(properties);
-				repo = repo_tmp;
-				log.warning(repo.toString());
-				initializeRepository();
-			} catch (Exception e) {
-				log.log(Level.SEVERE, "Can not create VHost repository instance for class: " +
-						repo_class, e);
-			}
-		}
 	}
 	
 	public void initializeRepository() throws TigaseDBException {
