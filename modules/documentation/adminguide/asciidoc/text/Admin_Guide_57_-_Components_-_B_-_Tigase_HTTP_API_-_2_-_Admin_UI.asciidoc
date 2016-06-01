@@ -19,7 +19,7 @@ Although REST uses HTTP to receive commands, REST itself is not intended for use
 
 Configuration
 -------------
-Allows you to list serve components and their configurations, as well as manage server components and plugins.
+Allows you to list server components and their configurations, as well as manage server components and plugins.
 
 List server/component configuration section covers all the component options including the basic-conf and will allow you to change each setting by changing the values in the field and clicking submit.  All settings are listed by the component name in the dropdown menu either as default, or as defined by --component-name property.
 

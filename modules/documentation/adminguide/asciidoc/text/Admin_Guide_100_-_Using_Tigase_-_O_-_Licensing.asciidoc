@@ -45,7 +45,7 @@ Tigase Team
 
 -----
 
-Once you have this E-mail, proceed to xref:licenseconfig[Lincense Configuration].
+Once you have this E-mail, proceed to xref:licenseconfig[License Configuration].
 
 [[licenseconfig]]
 Configuring Tigase XMPP Server License Registration

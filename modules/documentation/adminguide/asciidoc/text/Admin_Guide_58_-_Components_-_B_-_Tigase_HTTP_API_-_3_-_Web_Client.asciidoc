@@ -30,7 +30,7 @@ It will ask you for a login, any bare JID of users registered with the server wi
 
 Once you have logged in successfully, you will be presented with the following screen.
 
-image:images/admin-home.jpg[]
+image:images/WebUI-Home.jpg[]
 
 The commands are broken into categories shown here.  All changes made in these sections are instant and should be seen the same as if you were using an external XMPP client like Psi.
 
@@ -62,11 +62,9 @@ image:images/WebUI-Chat-Add-New.jpg[] adds a new user to your roster.
 
 image:images/WebUI-Chat-NewMUC.jpg[] creates a new Multi-user chatroom.
 
-image:images/WebUI-Chat-JoinMUC.jpg[] allows you to join a specific Multi-user chatroom.
+image:images/WebUI-Chat-Profile.jpg[] allows you to edit your user information such as picture and nickname.
 
 image:images/WebUI-Chat-CloseWindow.jpg[] closes the active chat window.
-
-image:images/WebUI-Chat-Cloud.jpg[] is...a cloud?
 
 image:images/WebUI-Chat-settings.jpg[] provides a place to change your password or publish changes to your user info. *NOTE: you are limited to changing the General fields*
 
