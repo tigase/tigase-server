@@ -795,6 +795,20 @@ The average compression ratio of data received from other clusters during the se
 cl-comp/Average decompression ratio
 -----
 
+=== Known cluster nodes
+
+The number of cluster nodes currently connected to the server.
+
+*Statistics Level*: INFO
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+cl-comp/Known cluster nodes
+-----
+
 === Last {interval} disconnects
 
 The number of cluster disconnections within the specified interval.
