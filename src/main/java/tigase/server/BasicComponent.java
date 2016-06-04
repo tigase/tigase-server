@@ -127,6 +127,11 @@ public class BasicComponent
 	private final CopyOnWriteArrayList<JID> connectedNodesWithLocal = new CopyOnWriteArrayList<JID>();
 	private final List<JID> connectedNodesWithLocal_ro = Collections.unmodifiableList(connectedNodesWithLocal);
 
+	public BasicComponent() {
+		DEF_HOSTNAME_PROP_VAL = DNSResolverFactory.getInstance().getDefaultHost();
+		defHostname = BareJID.bareJIDInstanceNS( DEF_HOSTNAME_PROP_VAL );
+	}
+
 	//~--- methods --------------------------------------------------------------
 
 	/**
@@ -889,9 +894,6 @@ public class BasicComponent
 	@Override
 	public void setName(String name) {
 		this.name = name;
-
-		DEF_HOSTNAME_PROP_VAL = DNSResolverFactory.getInstance().getDefaultHost();
-		defHostname = BareJID.bareJIDInstanceNS( DEF_HOSTNAME_PROP_VAL );
 
 		try {
 			compId = JID.jidInstance(name, defHostname.getDomain(), null);

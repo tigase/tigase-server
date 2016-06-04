@@ -27,19 +27,18 @@ package tigase.cluster;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.cluster.api.*;
-import tigase.cluster.repo.ClConConfigRepository;
-import tigase.cluster.repo.ClusterRepoConstants;
 import tigase.cluster.repo.ClusterRepoItem;
 import tigase.cluster.repo.ClusterRepoItemEvent;
-import tigase.conf.ConfigurationException;
-import tigase.db.*;
+import tigase.db.DBInitException;
+import tigase.db.DataSource;
+import tigase.db.DataSourceHelper;
+import tigase.db.TigaseDBException;
 import tigase.db.beans.DataSourceBean;
 import tigase.db.comp.AbstractMDComponentRepositoryBean;
 import tigase.db.comp.ComponentRepository;
 import tigase.db.comp.ComponentRepositoryDataSourceAware;
 import tigase.db.comp.RepositoryChangeListenerIfc;
 import tigase.eventbus.EventBus;
-import tigase.eventbus.EventBusFactory;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.Inject;
@@ -47,7 +46,6 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 import tigase.net.ConnectionType;
 import tigase.net.SocketType;
-import tigase.osgi.ModulesManagerImpl;
 import tigase.server.ConnectionManager;
 import tigase.server.Iq;
 import tigase.server.Packet;
@@ -59,7 +57,10 @@ import tigase.util.ReflectionHelper;
 import tigase.util.TigaseStringprepException;
 import tigase.util.TimeUtils;
 import tigase.xml.Element;
-import tigase.xmpp.*;
+import tigase.xmpp.Authorization;
+import tigase.xmpp.JID;
+import tigase.xmpp.PacketErrorTypeException;
+import tigase.xmpp.XMPPIOService;
 
 import javax.script.Bindings;
 import java.lang.reflect.Type;
@@ -221,7 +222,35 @@ public class ClusterConnectionManager
 	private ClusterConnectionSelectorIfc connectionSelector = null;
 	private CommandListener sendPacket = new SendPacket(ClusterControllerIfc
 			.DELIVER_CLUSTER_PACKET_CMD);
+	@ConfigField(desc = "Allow non cluster traffic over cluster connection", alias = NON_CLUSTER_TRAFFIC_ALLOWED_PROP_KEY)
 	private boolean nonClusterTrafficAllowed = true;
+
+	public ClusterConnectionManager() {
+		super();
+		if (getDefHostName().toString().equalsIgnoreCase( "localhost") ) {
+			TigaseRuntime.getTigaseRuntime().shutdownTigase( new String [] {
+					"",
+					"  ---------------------------------------------",
+					"  ERROR! Tigase is running in Clustered Mode yet the hostname",
+					"  of the machine was resolved to *localhost* which will cause",
+					"  malfunctioning of Tigase in clustered environment!",
+					"  ",
+					"  To prevent further issues with the clustering Tigase will be shutdown.",
+					"  ",
+					"  Please make sure that FQDN hostname of the machine is set correctly",
+					"  and restart the server.",
+					"  ---------------------------------------------",
+					"",
+					"",
+			} );
+		}
+
+		connectionDelay = 5 * SECOND;
+
+		watchdogPingType = WATCHDOG_PING_TYPE.XMPP;
+		watchdogDelay = 30 * SECOND;
+		watchdogTimeout = -1 * SECOND;
+	}
 
 	//~--- methods --------------------------------------------------------------
 
@@ -670,104 +699,6 @@ public class ClusterConnectionManager
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> defs       = new LinkedHashMap<String, Object>(50);
-		String              repo_class = (String) params.get(CLCON_REPO_CLASS_PROPERTY);
-		String				repo_uri   = (String) params.get(RepositoryFactory.GEN_USER_DB_URI);
-
-		if (repo_class != null) {
-			defs.put(CLCON_REPO_CLASS_PROP_KEY, repo_class);
-		}
-		
-		try {
-			Class<?> cls;
-			if (repo_class == null) {
-				cls = RepositoryFactory.getRepoClass(ClConConfigRepository.class, repo_uri);
-			} else {
-				cls = ModulesManagerImpl.getInstance().forName(repo_class);
-			}
-			ComponentRepository<ClusterRepoItem> repoTmp =
-					(ComponentRepository<ClusterRepoItem>) cls.newInstance();
-
-			repoTmp.getDefaults(defs, params);
-			if (repo == null) {
-				repo = repoTmp;
-			}
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can not instantiate items repository for class: " +
-					repo_class, e);
-		}
-
-		Map<String, Object> props = super.getDefaults(params);
-
-		props.putAll(defs);
-		props.put(RETURN_SERVICE_DISCO_KEY, RETURN_SERVICE_DISCO_VAL);
-		props.put(IDENTITY_TYPE_KEY, IDENTITY_TYPE_VAL);
-		if ((params.get(CONNECT_ALL_PAR) == null) ||!((String) params.get(CONNECT_ALL_PAR))
-				.equals("true")) {
-			props.put(CONNECT_ALL_PROP_KEY, false);
-		} else {
-			props.put(CONNECT_ALL_PROP_KEY, true);
-		}
-		if (params.get(CLUSTER_NODES) != null) {
-			String[] cl_nodes = ((String) params.get(CLUSTER_NODES)).split(",");
-
-			for (int i = 0; i < cl_nodes.length; i++) {
-				cl_nodes[i] = BareJID.parseJID(cl_nodes[i])[1];
-			}
-			nodesNo = cl_nodes.length;
-			props.put(CLUSTER_NODES_PROP_KEY, cl_nodes);
-		} else {
-			props.put(CLUSTER_NODES_PROP_KEY, new String[] { getDefHostName().getDomain() });
-		}
-		props.put(CLUSTER_CONTR_ID_PROP_KEY, DEF_CLUST_CONTR_NAME + "@" + getDefHostName());
-		props.put(COMPRESS_STREAM_PROP_KEY, COMPRESS_STREAM_PROP_VAL);
-		props.put(NON_CLUSTER_TRAFFIC_ALLOWED_PROP_KEY, NON_CLUSTER_TRAFFIC_ALLOWED_PROP_VAL);
-
-		String conns     = (String) params.get(CLUSTER_CONNECTIONS_PER_NODE_PAR);
-		int    conns_int = Runtime.getRuntime().availableProcessors();
-
-		if (conns != null) {
-			try {
-				conns_int = Integer.parseInt(conns);
-			} catch (NumberFormatException e) {
-				conns_int = CLUSTER_CONNECTIONS_PER_NODE_VAL;
-			}
-		}
-		props.put(CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY, conns_int);
-		props.put(ELEMENTS_NUMBER_LIMIT_PROP_KEY, ELEMENTS_NUMBER_LIMIT_CLUSTER_PROP_VAL);
-
-		props.put(WATCHDOG_PING_TYPE_KEY, WATCHDOG_PING_TYPE.XMPP);
-		props.put(WATCHDOG_DELAY, 30 * SECOND);
-		props.put(WATCHDOG_TIMEOUT, -1 * SECOND);
-		
-		props.put(CLUSTER_CONNECTIONS_SELECTOR_KEY, DEF_CLUSTER_CONNECTIONS_SELECTOR_VAL);
-
-		props.put(EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_KEY, EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_VALUE);
-		
-		if (getDefHostName().toString().equalsIgnoreCase( "localhost") ) {
-			TigaseRuntime.getTigaseRuntime().shutdownTigase( new String [] {
-				"",
-				"  ---------------------------------------------",
-				"  ERROR! Tigase is running in Clustered Mode yet the hostname",
-				"  of the machine was resolved to *localhost* which will cause",
-				"  malfunctioning of Tigase in clustered environment!",
-				"  ",
-				"  To prevent further issues with the clustering Tigase will be shutdown.",
-				"  ",
-				"  Please make sure that FQDN hostname of the machine is set correctly",
-				"  and restart the server.",
-				"  ---------------------------------------------",
-				"",
-				"",
-			} );
-		}
-
-		return props;
-	}
-
-	@Override
 	public String getDiscoCategoryType() {
 		return identity_type;
 	}
@@ -808,90 +739,6 @@ public class ClusterConnectionManager
 		clusterController = cl_controller;
 		clusterController.removeCommandListener(sendPacket);
 		clusterController.setCommandListener(sendPacket);
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public void setProperties(Map<String, Object> props) throws ConfigurationException {
-		if (props.get(IDENTITY_TYPE_KEY) != null) {
-			identity_type = (String) props.get(IDENTITY_TYPE_KEY);
-		}
-		if (props.get(COMPRESS_STREAM_PROP_KEY) != null) {
-			compress_stream = (Boolean) props.get(COMPRESS_STREAM_PROP_KEY);
-		}
-		if (props.get(CONNECT_ALL_PROP_KEY) != null) {
-			connect_all = (Boolean) props.get(CONNECT_ALL_PROP_KEY);
-		}
-
-		if (props.get(NON_CLUSTER_TRAFFIC_ALLOWED_PROP_KEY) != null) {
-			nonClusterTrafficAllowed = (Boolean)props.get(NON_CLUSTER_TRAFFIC_ALLOWED_PROP_KEY);
-		}
-
-		// cluster_controller_id = (String) props.get(CLUSTER_CONTR_ID_PROP_KEY);
-		if (props.get(CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY) != null) {
-			per_node_conns = (Integer) props.get(CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY);
-		}
-
-		if (props.containsKey(CLUSTER_CONNECTIONS_SELECTOR_KEY)) {
-			String selectorClsName = (String) props.get(CLUSTER_CONNECTIONS_SELECTOR_KEY);
-			try {
-				ClusterConnectionSelectorIfc tmp_selector = (ClusterConnectionSelectorIfc) ModulesManagerImpl.getInstance().forName(selectorClsName).newInstance();
-				tmp_selector.setClusterConnectionHandler(this);
-				tmp_selector.setProperties(props);
-				connectionSelector = tmp_selector;
-			} catch (InstantiationException|ClassNotFoundException|IllegalAccessException ex) {
-				log.log(Level.SEVERE, "Coulnd not create instance of cluster connection selector of class " + selectorClsName, ex);
-			}
-		}
-		
-		connectionDelay = 5 * SECOND;
-		if ((props.size() == 1) || isInitializationComplete()) {
-			super.setProperties(props);
-
-			// If props.size() == 1, it means this is a single property update
-			// and this component does not support single property change for the rest
-			// of it's settings
-			return;
-		}
-
-		String repo_class = (String) props.get(CLCON_REPO_CLASS_PROP_KEY);
-
-		try {
-			String repo_uri = (String) props.get(ClusterRepoConstants.REPO_URI_PROP_KEY);
-			Class<ClConConfigRepository> cls;
-			if (repo_class == null) {
-				cls = RepositoryFactory.getRepoClass(ClConConfigRepository.class, repo_uri);
-			} else {
-				cls = (Class<ClConConfigRepository>) ModulesManagerImpl.getInstance().forName(repo_class);
-			}
-			ComponentRepository<ClusterRepoItem> repo_tmp = cls.newInstance();
-
-			repo_tmp.addRepoChangeListener(this);
-			repo_tmp.setProperties(props);
-			repo_tmp.initRepository(repo_uri, new HashMap<String,String>());
-			ComponentRepository<ClusterRepoItem> old_repo = repo;
-			repo = repo_tmp;
-			if (old_repo != null) {
-				old_repo.destroy();
-			}
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can not create items repository instance for class: " +
-					repo_class, e);
-		}
-		if (props.get(ELEMENTS_NUMBER_LIMIT_PROP_KEY) != null) {
-			elements_number_limit = (Integer) props.get(ELEMENTS_NUMBER_LIMIT_PROP_KEY);
-		}
-
-		if (props.get(EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_KEY) != null) {
-			boolean eventbus_enabled = (Boolean) props.get(EVENTBUS_REPOSITORY_NOTIFICATIONS_ENABLED_KEY);
-			if (eventbus_enabled) {
-				eventBus = EventBusFactory.getInstance();
-			}
-		}
-
-
-
-		super.setProperties(props);
 	}
 
 	//~--- methods --------------------------------------------------------------

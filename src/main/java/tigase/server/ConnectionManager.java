@@ -238,7 +238,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 * of elements created within a single XMPP stanza.
 	 *
 	 */
-	@ConfigField(desc = "Limit of elements for single XMPP stanza")
+	@ConfigField(desc = "Limit of elements for single XMPP stanza", alias = ELEMENTS_NUMBER_LIMIT_PROP_KEY)
 	protected int elements_number_limit = ELEMENTS_NUMBER_LIMIT_PROP_VAL;
 	private ConcurrentHashMap<String, IO> services = new ConcurrentHashMap<String, IO>();
 	private Set<ConnectionListenerImpl>   pending_open = Collections.synchronizedSet(

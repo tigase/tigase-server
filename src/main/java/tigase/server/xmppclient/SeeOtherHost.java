@@ -22,6 +22,7 @@ import tigase.eventbus.EventBus;
 import tigase.eventbus.HandleEvent;
 import tigase.eventbus.events.ShutdownEvent;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.util.TigaseStringprepException;
@@ -43,7 +44,7 @@ import java.util.logging.Logger;
  *
  * @author Wojtek
  */
-@Bean(name = "seeOtherHost", parent = ClientConnectionManager.class)
+@Bean(name = "seeOtherHost", parent = ClientConnectionManager.class, selectors = {BeanSelector.NonClusterMode.class})
 public class SeeOtherHost implements SeeOtherHostIfc {
 
 	private static final Logger log = Logger.getLogger(SeeOtherHost.class.getName());

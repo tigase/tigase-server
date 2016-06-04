@@ -50,11 +50,16 @@ public class PropertiesBeanConfiguratorWithBackwordCompatibility extends Propert
 			if (bean instanceof Configurable) {
 				Configurable conf = (Configurable) bean;
 				Method getDefaultsMethod = bean.getClass().getMethod("getDefaults", Map.class);
-				if (getDefaultsMethod != null && getDefaultsMethod.getAnnotation(Deprecated.class) == null) {
-					log.log(Level.WARNING, "Class {0} is using deprecated configuration using methods getDefaults() and setProperties()", bean.getClass().getCanonicalName());
-				}
 				Map<String, Object> params = new HashMap<>(getProperties());
 				params.put("config-type", GEN_CONFIG_ALL);
+				if (getDefaultsMethod != null && getDefaultsMethod.getAnnotation(Deprecated.class) == null) {
+					log.log(Level.WARNING, "Class {0} is using deprecated configuration using methods getDefaults() and setProperties()", bean.getClass().getCanonicalName());
+
+					// Injecting default DB URI for backward compatibility
+					String dbUri = (String) this.getProperties().get("dataSource/repo-uri");
+					params.put(Configurable.USER_REPO_URL_PROP_KEY, dbUri);
+					params.put(Configurable.GEN_USER_DB_URI, dbUri);
+				}
 				Map<String, Object> props = conf.getDefaults(params);
 				fillProps(beanConfig, props);
 				((Configurable) bean).setProperties(props);
