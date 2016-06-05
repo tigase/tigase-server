@@ -22,6 +22,8 @@ package tigase.component;
 
 import tigase.conf.Configurable;
 import tigase.conf.ConfigurationException;
+import tigase.db.AuthRepository;
+import tigase.db.UserRepository;
 import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.Kernel;
 
@@ -32,7 +34,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static tigase.conf.Configurable.GEN_CONFIG_ALL;
+import static tigase.conf.Configurable.GEN_CONFIG_DEF;
 
 /**
  * Created by andrzej on 30.05.2016.
@@ -50,8 +52,7 @@ public class PropertiesBeanConfiguratorWithBackwordCompatibility extends Propert
 			if (bean instanceof Configurable) {
 				Configurable conf = (Configurable) bean;
 				Method getDefaultsMethod = bean.getClass().getMethod("getDefaults", Map.class);
-				Map<String, Object> params = new HashMap<>(getProperties());
-				params.put("config-type", GEN_CONFIG_ALL);
+				Map<String, Object> params = getDefConfigParams();
 				if (getDefaultsMethod != null && getDefaultsMethod.getAnnotation(Deprecated.class) == null) {
 					log.log(Level.WARNING, "Class {0} is using deprecated configuration using methods getDefaults() and setProperties()", bean.getClass().getCanonicalName());
 
@@ -59,6 +60,10 @@ public class PropertiesBeanConfiguratorWithBackwordCompatibility extends Propert
 					String dbUri = (String) this.getProperties().get("dataSource/repo-uri");
 					params.put(Configurable.USER_REPO_URL_PROP_KEY, dbUri);
 					params.put(Configurable.GEN_USER_DB_URI, dbUri);
+					UserRepository userRepo = getKernel().getInstance(UserRepository.class);
+					params.put(Configurable.SHARED_USER_REPO_PROP_KEY, userRepo);
+					AuthRepository authRepo = getKernel().getInstance(AuthRepository.class);
+					params.put(Configurable.SHARED_AUTH_REPO_PROP_KEY, authRepo);
 				}
 				Map<String, Object> props = conf.getDefaults(params);
 				fillProps(beanConfig, props);
@@ -105,5 +110,16 @@ public class PropertiesBeanConfiguratorWithBackwordCompatibility extends Propert
 		}
 
 		result.put("name", beanConfig.getBeanName());
+	}
+
+	protected Map<String, Object> getDefConfigParams() {
+		Map<String, Object> initProperties = new HashMap<>();
+		initProperties.put("config-type", getProperties().getOrDefault("config-type", GEN_CONFIG_DEF));
+		for (Map.Entry<String, Object> e : getProperties().entrySet()) {
+			if (e.getKey().startsWith("-")) {
+				initProperties.put(e.getKey(), e.getValue());
+			}
+		}
+		return initProperties;
 	}
 }
