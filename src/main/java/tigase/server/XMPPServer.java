@@ -24,7 +24,6 @@
 package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
-import tigase.conf.ConfigurationException;
 import tigase.conf.ConfiguratorAbstract;
 import tigase.util.ClassUtil;
 import tigase.xml.XMLUtils;
@@ -125,36 +124,17 @@ public final class XMPPServer {
 			ConfiguratorAbstract.loadLogManagerConfig( initial_config );
 		}
 
-		if (Boolean.valueOf(System.getProperty("experimental", "false"))) {
+		try {
 			Bootstrap bootstrap = new Bootstrap();
 			bootstrap.init(args);
 			bootstrap.start();
-			return;
-		}
-
-		try {
-			String config_class_name = System.getProperty( CONFIGURATOR_PROP_KEY,
-																										 DEF_CONFIGURATOR );
-
-			config = (ConfiguratorAbstract) Class.forName( config_class_name ).newInstance();
-			config.init( args );
-
-			// config = new ConfiguratorOld(config_file, args);
-			config.setName( "basic-conf" );
-
-			String mr_class_name = config.getMessageRouterClassName();
-			router = (MessageRouterIfc) Class.forName( mr_class_name ).newInstance();
-
-			router.setName( serverName );
-			router.setConfig( config );
-			router.start();
-		} catch ( ConfigurationException e ) {
-			System.err.println( "" );
-			System.err.println( "  --------------------------------------" );
-			System.err.println( "  ERROR! Terminating the server process." );
-			System.err.println( "  Invalid configuration data: " + e );
-			System.err.println( "  Please fix the problem and start the server again." );
-			System.exit( 1 );
+//		} catch ( ConfigurationException e ) {
+//			System.err.println( "" );
+//			System.err.println( "  --------------------------------------" );
+//			System.err.println( "  ERROR! Terminating the server process." );
+//			System.err.println( "  Invalid configuration data: " + e );
+//			System.err.println( "  Please fix the problem and start the server again." );
+//			System.exit( 1 );
 		} catch ( Exception e ) {
 			System.err.println( "" );
 			System.err.println( "  --------------------------------------" );

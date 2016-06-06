@@ -23,6 +23,8 @@ package tigase.server;
 
 import tigase.component.PropertiesBeanConfigurator;
 import tigase.component.PropertiesBeanConfiguratorWithBackwordCompatibility;
+import tigase.conf.ConfigReader;
+import tigase.conf.ConfigWriter;
 import tigase.conf.ConfiguratorAbstract;
 import tigase.eventbus.EventBusFactory;
 import tigase.kernel.DefaultTypesConverter;
@@ -30,11 +32,16 @@ import tigase.kernel.beans.config.BeanConfigurator;
 import tigase.kernel.core.DependencyGrapher;
 import tigase.kernel.core.Kernel;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static tigase.conf.ConfiguratorAbstract.PROPERTY_FILENAME_PROP_DEF;
+import static tigase.conf.ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY;
 
 /**
  * Bootstrap class is responsible for initialization of Kernel to start Tigase XMPP Server.
@@ -56,6 +63,72 @@ public class Bootstrap implements Lifecycle {
 		props = new LinkedHashMap<>();
 		List<String> settings = new LinkedList<>();
 		ConfiguratorAbstract.parseArgs(props, settings, args);
+		if (isDslConfig()) {
+			loadFromDSLFiles();
+		} else {
+			loadFromPropertiesFiles(settings);
+			dumpToDSLFile();
+		}
+	}
+
+	private boolean isDslConfig() {
+		String property_filenames = (String) props.get(PROPERTY_FILENAME_PROP_KEY);
+		if (property_filenames == null) {
+			property_filenames = PROPERTY_FILENAME_PROP_DEF;
+			props.put(PROPERTY_FILENAME_PROP_KEY, property_filenames);
+			log.log(Level.WARNING, "No property file not specified! Using default one {0}",
+					property_filenames);
+		}
+
+		if (property_filenames != null) {
+			String[] prop_files = property_filenames.split(",");
+
+			if (prop_files.length == 1) {
+				File f = new File(prop_files[0]);
+				if (!f.exists()) {
+					log.log(Level.WARNING, "Provided property file {0} does NOT EXISTS! Using default one {1}",
+							new String[]{f.getAbsolutePath(), PROPERTY_FILENAME_PROP_DEF});
+					prop_files[0] = PROPERTY_FILENAME_PROP_DEF;
+				}
+			}
+
+			for (String property_filename : prop_files) {
+				try (BufferedReader reader = new BufferedReader(new FileReader(property_filename))) {
+					if (reader.readLine().contains("{")) {
+						return true;
+					}
+				} catch (IOException e) {
+				   e.printStackTrace();
+				}
+			}
+		}
+		return false;
+	}
+
+	private void loadFromDSLFiles() {
+		String property_filenames = (String) props.get(PROPERTY_FILENAME_PROP_KEY);
+		for (String prop_file : property_filenames.split(",")) {
+			try {
+				Map<String, Object> loaded = new ConfigReader().read(new File(prop_file));
+				props.putAll(ConfigReader.flatTree(loaded));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private void dumpToDSLFile() {
+		File f = new File(PROPERTY_FILENAME_PROP_DEF+".new");
+		Map<String, Object> tree = ConfigWriter.buildTree(props);
+		try {
+			new ConfigWriter().write(f, tree);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void loadFromPropertiesFiles(List<String> settings) {
+		ConfiguratorAbstract.loadFromPropertiesFiles(props, settings);
 		loadFromPropertyStrings(settings);
 	}
 
@@ -78,6 +151,29 @@ public class Bootstrap implements Lifecycle {
 
 			props.put(key, val);
 		}
+
+		// converting old component configuration to new one
+		Map<String, Object> toAdd = new HashMap<>();
+
+		props.forEach((k,v) -> {
+			if (k.startsWith("--comp-name")) {
+				String suffix = k.replace("--comp-name-", "");
+				String name = ((String) v).trim();
+				String cls = ((String) props.get("--comp-class-" + suffix)).trim();
+				String active = "true";
+				toAdd.put(name + "/class", cls);
+				toAdd.put(name + "/active", active);
+			}
+		});
+
+		Iterator<Map.Entry<String, Object>> it = props.entrySet().iterator();
+		while (it.hasNext()) {
+			Map.Entry<String, Object> e = it.next();
+			if (e.getKey().startsWith("--comp-"))
+				it.remove();
+		}
+
+		props.putAll(toAdd);
 	}
 
 	public void setProperties(Map<String,Object> props) {

@@ -339,7 +339,7 @@ public abstract class ConfiguratorAbstract
 					key = args[i];
 					val = Boolean.TRUE;
 				}
-				if ((key == null) && args[i].startsWith("-") &&!args[i].startsWith(GEN_CONFIG)) {
+				if ((key == null) && args[i].startsWith("-") && !args[i].startsWith(GEN_CONFIG)) {
 					key = args[i];
 					val = args[++i];
 				}
@@ -348,12 +348,14 @@ public abstract class ConfiguratorAbstract
 
 					// System.out.println("Setting defaults: " + key + "=" +
 					// val.toString());
-					log.log(Level.CONFIG, "Setting defaults: {0} = {1}", new Object[] { key,
-							val.toString() });
+					log.log(Level.CONFIG, "Setting defaults: {0} = {1}", new Object[]{key,
+							val.toString()});
 				}    // end of if (key != null)
 			}      // end of for (int i = 0; i < args.length; i++)
 		}
+	}
 
+	public static void loadFromPropertiesFiles(Map<String, Object> initProperties, List<String> initSettings) {
 		String property_filenames = (String) initProperties.get(PROPERTY_FILENAME_PROP_KEY);
 
 		// if no property file was specified then use default one.
