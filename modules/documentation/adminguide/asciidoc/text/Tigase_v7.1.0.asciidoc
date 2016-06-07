@@ -1,6 +1,5 @@
 [[tigase710]]
-Tigase v7.1.0 announcement
-==========================
+= Tigase v7.1.0 announcement
 :author: Daniel Wisnewski
 :date: 2015-25-08 22:09
 
@@ -12,52 +11,49 @@ Please note that not all issues are accessible as notes and fixes may contain pr
 
 :toc:
 
-Major Changes
--------------
+
+== Major Changes
+
 Tigase has undergone a few major changes to our code and structure. To continue to use Tigase, a few changes may be needed to be made to your systems.  Please see them below:
 
-HTTP Component renamed
-~~~~~~~~~~~~~~~~~~~~~~
+
+=== HTTP Component renamed
 The HTTP component has been renamed, if you still have the old tigase.rest.RestMessageReciever in your init.properties file, please update the component name to:
 [source,bash]
 -----
 tigase.http.HttpMessageReceiver
 -----
 
-New JDK v8 required
-~~~~~~~~~~~~~~~~~~~
+=== New JDK v8 required
 As Oracle has dropped support for version 7 of it's Java runtime environment and developer kit, we have moved to version 8 of the JDK.  Furthermore, some new features and fixes for Tigase Server now require the use of JDK v8 or later. Please upgrade your Java packages from link:http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html[this link].
 
-Changes to Database Schemas
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Changes to Database Schemas
 Tigase has undergone a number or database schema changes, the current versions being main database schema v7.1 and pubsub schema v3.2.0.  If you are upgrading to v7.1.0 from a previous version of tigase, it is recomended you visit xref:v710notice[this section] in the documentation to prepare your new installation.
 
-Presence Plugin Split
-~~~~~~~~~~~~~~~~~~~~~
+=== Presence Plugin Split
 The plugin handling all presence processing has been split from one plugin (Presence.java) into separate plugins:
 - PresenceAbstract.java handles most common presence-related methods, and is also used by the following two plugins.
 - PresenceSubscription.java to handle subscription presence processing like for roster updates.
 - PresenceState.java to handle initial presences from new logins.
 
 
-New Features & Components
--------------------------
+== New Features & Components
 
-New HTTP API
-~~~~~~~~~~~~
+=== New HTTP API
+
 Tigase now features an HTTP API that not only allows web client chat, but administrators can change settings, manage users, and even write and run scripts all from the comfort of a browser window.   Furthermore, commands can be passed through this interface using REST to create and run custom scripts and commands.
 We plan on expanding on the look and feel of this interface as time goes on, but in the meantime enjoy the real-time XMPP experience now with a user-friendly GUI.
 
-New Admin HTTP interface
-~~~~~~~~~~~~~~~~~~~~~~~~
+=== New Admin HTTP interface
+
 Tigase now comes with its own build-in web XMPP client!  It can be accessed from http://yourhost.com:8080/ui/. For more details, see the Admin UI guide.
 
-Added support for XEP-0334
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Added support for XEP-0334
+
 XEP-0334 is now supported.  See xref:nonBodyElements[this section] for details.
 
-Kernel Bean Configurator has been Improved
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Kernel Bean Configurator has been Improved
+
 Added aliases for bean properties to allow for a 'high level' of configuration.
 Instead of using
 -----
@@ -68,47 +64,51 @@ The following easier to use method will work
 component/property=value
 -----
 
-Maximum users setting for MUC
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Maximum users setting for MUC
+
 Administrators can now set that maximum number of users allowed on specific MUCs.
 See xref:mucRoomConfig[MUC Room Configuration].
 
-HTTP Rest API Support
-~~~~~~~~~~~~~~~~~~~~~~
+=== HTTP Rest API Support
+
 Tigase now supports REST commands via HTTP, they can be sent from ad-hoc commands, a web interface, or other REST tools. See xref:tigase_http_api[documentation] for more.
 
-Empty Nicknames
-~~~~~~~~~~~~~~~
+=== Empty Nicknames
+
 Tigase can now support users with empty nicknames.  See xref:emptyNicks[this] for details.
 
-Offline Message Limits
-~~~~~~~~~~~~~~~~~~~~~~
+=== Offline Message Limits
+
 Tigase now has support to enable and change Offline Message Limits as handled by AMP. xref:offlineMessageLimits[Documentation here].
 
-Offline Message Sink
-~~~~~~~~~~~~~~~~~~~~
+=== Offline Message Sink
+
 A new way to store offline messages has been implemented, it may not replace standard offline messages, but can be used in other ways.
 xref:offlineMessageSink[Documentation here].
 
-Adding Components to trusted list
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Adding Components to trusted list
+
 Components can now be added to trusted list and will be shared with all clustered servers.
 link:https://projects.tigase.org/issues/3244[#3244]
 
-Tigase Mailer Extension now Included
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Tigase Mailer Extension now Included
+
 Tigase Mailer extension is now included in distributions of Tigase server. This extension enables the monitor component to deliver E-mails to and from specified e-mail addresses when monitor are triggered.  For more information see xref:monitorMailer[monitor mailer section].
 
-EventBus implemented
-~~~~~~~~~~~~~~~~~~~~
+=== EventBus implemented
+
 Tigase now has a simple PubSub component called EventBus to report tasks and triggers.  More details are available xref:eventBus[Here].
 
-XEP-0191 Blocking Command Support added
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== XEP-0191 Blocking Command Support added
+
 Blocking Command support has been added to Tigase, all functions of link:http://xmpp.org/extensnions/xep-0191/html[XEP-0191] should be implemented.  See xref:blockingCommand[Admin Guide] for details.
 
-JVM Default configuration updated
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Stream management now has new settings available for stream timeout
+
+Maximum stream timeout and default stream timtout times can now be set in init.properties. Details of these two settings can be found xref:streamResumptiontimeout[here].
+
+=== JVM Default configuration updated
+
 Default tigase.conf file has been updated with the following change in JVM options:
 -----
 PRODUCTION_HEAP_SETTINGS=" -Xms5G -Xmx5G " # heap memory settings must be adjusted on per deployment-base!
@@ -117,12 +117,12 @@ JAVA_OPTIONS="${GC} ${EX} ${ENC} ${DRV} ${JMX_REMOTE_IP} -server ${PRODUCTION_HE
 As the comment says, we recommend adjusting the heap memory settings for your specific installations.
 link:https://projects.tigase.org/issues/3567[#3567]
 
-New Rest API added to obtain a JID login time
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== New Rest API added to obtain a JID login time
+
 +GetUserInfo+ command has been expanded to obtain user login and logout times in addition to standard information. See xref:getUserInfoREST[this section] for full details.
 
-New init.properties properties
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== New init.properties properties
+
 +--ws-allow-unmasked-frames=false+
 Allows for unmasked frames to be sent to Tigase server VIA Websocket and not force-close the connection when set to true.  RFC 6455 specifies that all clients must mask frames that it sends to the server over Websocket connections.  If unmasked frames are sent, regardless of any encryption, the server must close the connection.  Some clients however, may not support masking frames, or you may wish to bypass this security measure for development purposes.
 
@@ -130,24 +130,24 @@ Allows for unmasked frames to be sent to Tigase server VIA Websocket and not for
 Disables DNS checking for vhosts when changed or edited.
 When new vhosts are created, Tigase will automatically check for SRV records and proper DNS settings for the new vhosts to ensure connectivity for outside users, however if these validations fail, you will be unable to save those changes. This setting allows you to bypass that checking.
 
-Connection Watchdog
-~~~~~~~~~~~~~~~~~~~
+=== Connection Watchdog
+
 A watchdog property is now available to monitor stale connections and sever them before they become a problem.  More details xref:watchdog[here].
 
-Offline Message Receipts Storage now Configurable
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Offline Message Receipts Storage now Configurable
+
 Admins may now configure Offline Message Receipts Storage to specify filters and controls as to what they want stored in offline messages. See xref:offlineMessageReceipts[more details here].
 
-Account Registration Limits
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Account Registration Limits
+
 In order to protect Tigase servers from DOS attacks, a limit on number of account registrations per second has been implemented.  See xref:accountRegLimit[this link] for configuration settings.
 
-Enable Silent Ignore on Packets Delivered to Unavailable Resources
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Enable Silent Ignore on Packets Delivered to Unavailable Resources
+
 You can now have Tigase ignore packets delivered to unavailable resources to avoid having a packet bounce around and create unnecessary traffic. Learn how xref:silentIgnore[here].
 
-Cluster Connections Improved
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Cluster Connections Improved
+
 Cluster commands now operate at CLUSTER priority, giving the packets higher status than HIGH which otherwise has caused issues during massive disconnects.
 New Configuration options come with this change.  The first being able to change the number of connections for CLUSTER packets using the following init.property setting:
 -----
@@ -158,56 +158,64 @@ Also a new class which implements the a new connection selection interface, but 
 cl-comp/connection-selector=tigase.cluster.ClusterConnectionSelectorOld
 -----
 
-Cluster Connections Testing Implemented
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Cluster Connections Testing Implemented
+
 Watchdog has now been added to test cluster connections by default.  Watchdog sends an XMPP ping to all cluster connections every 30 seconds and checks to see if a ping response has been received in the last 3 minutes. If not, the cluster connection will be dropped automatically. Global watchdog settings will not impact cluster testing feature.
 
-Cluster Map implemented
-~~~~~~~~~~~~~~~~~~~~~~~
+=== Cluster Map implemented
+
 Tigase can now generate cluster maps through a new API.  See the link:http://docs.tigase.org/tigase-server/snapshot/Development_Guide/html/#clusterMapInterface[development guide] for a description of the API.
 
-New Licensing Procedures
-~~~~~~~~~~~~~~~~~~~~~~~~
+=== New Licensing Procedures
+
 With the release of Tigase XMPP server v7.1.0, our licensing procedures have changed.  For more information about how to obtain, retain, and install your license, please see xref:licenseserver[this section].
 
-Message Archive expanded to include non-body elements
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Message Archive expanded to include non-body elements
+
 Message Archive can now be configured to store messages that may not have body element, this option is explained in xref:nonBodyStore[this section].
 
-New Ability to Purge Data from Unified Archive
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== New Ability to Purge Data from Unified Archive
+
 Data from Unified Archive or Message Archive can be automatically or manually purged depending on age or expired status.  Information on configuring this is available xref:maPurging[here].
 
-Force Redirection
------------------
+=== Force Redirection
+
 It's possible now to redirect connections on one port to be forced to connect to another port using the +force-redirect-to+ setting.  link:http://docs.tigase.org/tigase-server/snapshot/Administration_Guide/html/#_enforcing_redirection[Details here].
 
-Dual IP installtions
---------------------
+=== Dual IP installtions
+
 Tigase now has a Dual IP setup which can now use a separate internal and external IP and use a DNS resolver for the connection redirection.  Setup instructions are link:http://docs.tigase.org/tigase-server/snapshot/Administration_Guide/html/#_configuring_hostnames[Located here].
 
-Error counting
---------------
+=== Error counting
+
 It is now possible to conduct error counting and collect it from statistics.  This feature is explained in more detail xref:errorCounting[here].
 
-New Documentation Structure
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== New Database Disconnections Counter
+
+3 new statistics were added to +basic-conf+ to help monitor database connection stability, and how often the XMPP Server needs to reconnect to the database. The list of new statistics are listed xref:repo-factoryStatistics[here].
+
+=== New Known Cluster Statistic
+
+A new statistic has been added to cl-comp displaying the number of connected Cluster Nodes if there are more than one. Displayed as an INFO level statistic.
+
+=== New Documentation Structure
+
 There has been a lot of changes and fixes to our documentation over the last few months. If you have links to any of our documentation, please update them as the filenames may have changed.
 
-Full XML of last available presence may be saved to repository
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Full XML of last available presence may be saved to repository
+
 A more detailed last available presence can now be made from some configuration changes, along with a timestamp before the entire presence stanza is saved to the repository.  More information is available xref:storeFullXMLLastPresence[here].
 
-New Program Defaults
-~~~~~~~~~~~~~~~~~~~~
+=== New Program Defaults
+
 Tigase has improved default settings to improve performance.  These include:
 - Increase the number of database connections in relation to the number of available CPUs (factor by 4 by default).
 - Plugins code has been revised.
 - Default thread pools have been increased for better performance.
 - New option added to globally increase thread pool counts +sess-man/sm-threads-factor[I]=1+. Setting increases thread factor by specified factor.
 
-New Minor Features & Behavior Changes
--------------------------------------
+== New Minor Features & Behavior Changes
+
 - Old monitor component depreciated and turned off.
 - JTDS MS SQL Server driver updated to v1.3.1.
 - +tigase-utils+ and +tigase-xmltools+ are now included in tigase-server builds.
@@ -256,10 +264,11 @@ New Minor Features & Behavior Changes
 - #3986 Added new index for tig_nodes collection in MongoDB Databases.
 - #4020 SeeOtherHostSualIP implementation has been fixed to support MongoDB.
 - link:https://projects.tigase.org/issues/4120[#4120] Duplication of messages in offline storage when +Message+ and +OfflineMessage+ processors are used has been resolved.
+- #4162 xml:lang attribute is now supported in Tigase MUC component.
 
 
-Fixes
------
+== Fixes
+
 - link:https://projects.tigase.org/issues/8[#8] XML parser no longer passes malformed XML statements to server.
 
 - link:https://projects.tigase.org/issues/1396[#1396] & link:https://projects.tigase.org/issues/663[#663] User roster behaves correctly. Tigase now waits for user authorization before users are added to a Roster.
@@ -433,6 +442,8 @@ Fixes
 - link:https://projects.tigase.org/issues/4052[#4052] Fixed issue with ClusterRepoItem not properly resulting in +tigase.db.comp.RepositoryChangeListenerIfc.itemUpdated(Item)+ being executed.
 
 - link:https://projects.tigase.org/issues/4056[#4056] Items removed from cluster repository are not removed from memory correctly.
+
+- link:https://projects.tigase.org/issues/4142[#4142] Updated wrapper.conf file to match tigase.conf default settings.
 
 - Patch added to fix ConcurrentModificationException in BlockingCommand plugin.
 
