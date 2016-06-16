@@ -1,6 +1,6 @@
 [[guiinstall]]
-Installation Using GUI Installer
-================================
+= Installation Using GUI Installer
+
 :author: Mateusz Fiolka
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 21:18
@@ -12,18 +12,15 @@ Installation Using GUI Installer
 
 If you don't want to install Tigase using a manual method, you can use the GUI installer. It not only copies server files to preferred place, but also assists with configuration of the most important parameters and database setup. Therefore we recommend this as the way to install Tigase.
 
-Prerequisites
--------------
+== Prerequisites
 
 Before you can start the GUI installer you will need to have working Java environment. Although installer only requires *JRE* (Java Runtime Environment), server needs the *JDK* (Java Development Kit). Please do note that *currently minimal JDK version Tigase is capable to run on is 1.6*. If you don't have JDK installed it is the right moment to do it. Visit the link:http://java.sun.com/javase/downloads/index.jsp[Java downloads site] From the list of available packages select newest JDK version (if you don't have a specific need to use J2EE then choose a package without it). After configuring JDK you can download the Tigase GUI installer and start the server installation process.  It is also important to set the +JAVA_HOME+ environment correctly.
 
-Download the Installer
-----------------------
+== Download the Installer
 
 You can always find the newest Tigase packages in the link:https://projects.tigase.org/projects/tigase-server/files[download section].  When you enter the page, you will be presented a list of files to choose from.  You may be confused at the beginning as there are lot of choices, but all Tigase binary packages have conventional names, which help to differentiate them easily. They are of form *tigase-server-x.y.z-bv.ext* where 'x', 'y', 'z' and 'v' are version numbers and they change from a release to release. Ext is the file extension which in the case of our GUI installation program is *.jar*. We recommend you to download the latest version (highest version number) of the server as it contains latest functions and improvements
 
-Run the jar File
-----------------
+== Run the jar File
 
 On most systems installing JRE or JDK creates a default association which allows to run the *.jar* file by just double clicking on it. However if nothing happens when you do it there is a way to do it manually. Perform the steps in the following order:
 
@@ -34,57 +31,51 @@ If you are on a *Linux* system, you can use a terminal. It should be easily disc
 . Command prompt / terminal will appear. You will be able to check a whether your *Java* environment is working. To do it type the
 +
 [source,bash]
--------------------------------------
+-----
 java -version
--------------------------------------
+-----
 +
 command and press Enter. If the message says that the command is not recognized then your *Java* installation may be corrupt or not configured properly. For correctly setting up *JRE/JDK* including setting the *JAVA_HOME* environmental variable please check documentation provided on the JDK download site. Also when the command succeeds please check if the printed version number fulfills Tigase requirements. When many versions of *JDK/JRE* are installed on one machine *java* command will need to be invoked with the full path it is placed on.
 +
 . When you have no doubt that you can run the correct Java launcher, you may start the installer i.e. for the file *tigase-server-4.1.0-b1315.jar* downloaded to the *c:\download* directory type the following command:
 +
 [source,bash]
--------------------------------------
+-----
 java -jar c:\download\tigase-server-4.1.0-b1315.jar
--------------------------------------
+-----
 +
 This command should start the installer or print an error message explaining what is the cause of problem.
 
-Starting the Installation
--------------------------
+== Starting the Installation
 
 Please note that this tutorial covers only the basic installation mode. Some screens have been omitted because they contain advanced options which are not shown in simple installation mode. Others such as progress of copying files and summary info on the other hand are self explanatory and will also not described.
 
 
-JDK Selection
-~~~~~~~~~~~~~
+== JDK Selection
 
 image:images/winInstall2.gif[]
 
 This screen is only shown when JDK has not been selected automatically. When your JAVA_HOME path is properly set, it will be auto-detected saving you some configuration time. If you are reading this step and still don't have JDK installed, then go back to the xref:prerequisites[prerequisites] section where you can find some info on how to prepare your system for Tigase installation. Sometimes your system will be configured in a way that prevents detection of JDK path. This often happens when you install JRE after installing JDK. You will have to find JDK directory yourself.  It is by default installed in the *Program Files\Java* directory of your system drive.
 
-Installation Type Selection
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+== Installation Type Selection
 
 image:images/winInstall3.gif[]
 
 Recommended practice is to choose both installation and configuration of the server as manual configuration is more complicated, time consuming and error-prone.
 
-Introduction To the Server
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+== Introduction To the Server
 
 image:images/winInstall4.gif[]
 
 This screen shows some information about Tigase which may help you understand what it is and how it can help to take advantage of the *XMPP* protocol. It is important that you read all information's appearing on the installer screens, as they contain valuable hints and most recent information.
 
-Choice of Base Directory
-~~~~~~~~~~~~~~~~~~~~~~~~
+== Choice of Base Directory
 
 image:images/winInstall6.gif[]
 
 This is the point where you choose where do you want you server to be installed. Recommended path should not contain spaces, as it may be reason of some strange path problems. In the case of installation on Windows it should be installed on a short path because there is a limit of path lengths. Also note that on Windows Vista there may be some problems with making the server work while installed in the Program Files directory, related to the working of UAC mechanism, so better don't install it there.  If you don't want are unsure about where to place the server, you can always leave the default selection.
 
-Packages selection
-~~~~~~~~~~~~~~~~~~
+== Packages selection
 
 image:images/winInstall7.gif[]
 
@@ -96,8 +87,7 @@ If you have a working database platform that you want to use for storing all imp
 
 If you are a developer and you want to be able to check how the server is working or if you want to help with the development, you can install also the included source codes.
 
-Basic Server Configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+== Basic Server Configuration
 
 image:images/winInstall13.gif[]
 
@@ -120,8 +110,7 @@ You should also select a database which will be used for storing user info. Defa
 
 *Important notice: Tigase installer does not contain the actual databases, only drivers allowing db access. The only exception is Derby database, which is included in JDK. It is automatically configured by installer, in case of other databases you will need to configure them by yourself.*
 
-Verification of Database Connection and Performing DB Tasks
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+== Verification of Database Connection and Performing DB Tasks
 
 image:images/winInstall20.gif[]
 
@@ -134,29 +123,27 @@ What to do if any of the tests will fail?
 
 If you cannot go beyond this step after trying to resolve database problems you may try xref:manualinstall[manual installation] mode.
 
-Finishing Installation
-~~~~~~~~~~~~~~~~~~~~~~
+== Finishing Installation
 
 When you perform all those steps altogether with choosing Start Menu location and other basic actions you will be informed that installation process is complete. You can now use your Tigase server. There are some post installation actions you may want to perform. They are briefly presented below.
 
-Running the Server
-~~~~~~~~~~~~~~~~~~
+== Running the Server
 
 Part of the installation process is the selection of Tigase base directory. This is where you can find all important server files. The installer will create some configurable shortcuts in the *Start Menu*. You can navigate to the menu and use it to start the server.   To run the server manually:
 
 - On a *Linux* system you may start the server using the *tigase.sh* file found in the *scripts* sub-directory of Tigase server base directory. In the root server directory type the following command:
 
 [source,bash]
--------------------------------------
+-----
 ./scripts/tigase.sh start etc/tigase.conf
--------------------------------------
+-----
+
 - Of course if you have a custom config file then change last command appropriately.
 - On a *Windows* platform you can use a *bat* file to run the server. There is a *run.bat* file in the Tigase root directory. Just double click it in *Explorer* or run it from command line to start the server. A window with server log output will pop-up.
 
 image:images/winRun.gif[]
 
-Installation as a Service
-~~~~~~~~~~~~~~~~~~~~~~~~~
+== Installation as a Service
 
 On *Windows* you can install Tigase as a service. To do it use the *InstallTigaseService.bat* batch file found also in server root directory.
 
@@ -164,7 +151,6 @@ In this mode service will be running in background and will be controllable from
 
 To uninstall Tigase service use the *UninstallTigaseService.bat* file from Tigase server root directory.
 
-How to Check if the Server is Running
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+== How to Check if the Server is Running
 
 Checking if the server is running is quite easy. Just try to connect to it by using one of the many available *XMPP* clients.
