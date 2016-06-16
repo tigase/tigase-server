@@ -72,6 +72,10 @@ public class ConfigWriter {
 			indent--;
 			writeIndent(writer);
 			writer.write("]\n");
+		} else if (obj instanceof String) {
+			writer.write('\'');
+			writer.write((String) obj);
+			writer.write("\'\n");
 		} else {
 			writeString(writer, obj.toString());
 			writer.write('\n');

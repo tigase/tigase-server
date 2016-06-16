@@ -1,9 +1,5 @@
 package tigase.component.modules;
 
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import tigase.component.PacketWriter;
 import tigase.component.exceptions.ComponentException;
 import tigase.component.responses.ResponseManager;
@@ -17,12 +13,17 @@ import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.StanzaType;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 @Bean(name = "stanzaProcessor")
 public class StanzaProcessor {
 
 	private Logger log = Logger.getLogger(this.getClass().getName());
 
-	@Inject(type = Module.class)
+	@Inject(type = Module.class, nullAllowed = true)
 	private List<Module> modules;
 
 	@Inject
@@ -149,7 +150,7 @@ public class StanzaProcessor {
 	}
 
 	public void setModules(List<Module> modules) {
-		this.modules = modules;
+		this.modules = modules == null ? Collections.emptyList() : modules;
 	}
 
 	public void setResponseManager(ResponseManager responseManager) {

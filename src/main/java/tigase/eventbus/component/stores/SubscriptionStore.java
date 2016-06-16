@@ -21,16 +21,17 @@
 
 package tigase.eventbus.component.stores;
 
+import tigase.eventbus.component.EventBusComponent;
+import tigase.eventbus.impl.EventName;
+import tigase.eventbus.impl.EventsNameMap;
+import tigase.kernel.beans.Bean;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import tigase.eventbus.impl.EventName;
-import tigase.eventbus.impl.EventsNameMap;
-import tigase.kernel.beans.Bean;
-
-@Bean(name = "subscriptionStore")
+@Bean(name = "subscriptionStore", parent = EventBusComponent.class)
 public class SubscriptionStore {
 
 	protected final Logger log = Logger.getLogger(this.getClass().getName());

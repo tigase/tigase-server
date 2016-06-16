@@ -23,11 +23,15 @@ public class ConfigReaderTest {
 		root.put("test123", "2313");
 		root.put("tes22", "223");
 		List list = new ArrayList();
+		list.add(1);
+		list.add(3);
+		root.put("some-list", list);
+		list = new ArrayList();
 		list.add("1");
 		list.add("3");
-		root.put("some-list", list);
+		root.put("some-list-2", list);
 		Map<String, Object> map = new HashMap<>();
-		map.put("ala-ma-kota", "true");
+		map.put("ala-ma-kota", true);
 		map.put("test", "false");
 		root.put("some-map", map);
 
@@ -49,7 +53,7 @@ public class ConfigReaderTest {
 
 		// equals is not working when type is different - ie. bool true vs string "true"
 		Map<String, Object> props = new HashMap<>();
-		props.put("--cluster-mode","true");
+		props.put("--cluster-mode",true);
 		props.put("dataSource/repo-uri", "jdbc:postgresql://127.0.0.1/tigase?user=test&password=test&autoCreateUser=true");
 		props.put("sess-man/commands/ala-ma-kota", "DOMAIN");
 		props.put("c2s/incoming-filters", Arrays.asList("tigase.server.filters.PacketCounter", "tigase.server.filters.PacketCounter"));

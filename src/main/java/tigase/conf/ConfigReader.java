@@ -22,7 +22,12 @@
 package tigase.conf;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by andrzej on 05.06.2016.
@@ -143,13 +148,19 @@ public class ConfigReader {
 							if (holder.key == null || holder.key.isEmpty()) {
 								break;
 							}
-							holder.map.put(holder.key, holder.value != null ? holder.value : holder.sb.toString().trim());
+							holder.map.put(holder.key, holder.value != null ? holder.value : decodeValue(holder.sb.toString().trim()));
 							break;
 						case LIST:
-							if (holder.sb.toString().trim().isEmpty()) {
-								break;
+							if (holder.value == null) {
+								String valueStr = holder.sb.toString().trim();
+								if (valueStr.isEmpty()) {
+									break;
+								}
+								Object value = decodeValue(valueStr);
+								holder.list.add(value);
+							} else {
+								holder.list.add(holder.value);
 							}
-							holder.list.add(holder.sb.toString().trim());
 							break;
 					}
 					holder.key = null;
@@ -165,6 +176,47 @@ public class ConfigReader {
 			throw new IOException("Parsing error - invalid file structure");
 		}
 		return holder.map;
+	}
+
+	private static Pattern INTEGER_PATTERN = Pattern.compile("[0-9]+([lL]*)");
+	private static Pattern DOUBLE_PATTERN = Pattern.compile("[0-9]+\\.[0-9]+([dDfF]*)");
+
+	private static double x = 2.1f;
+
+	protected Object decodeValue(String string) {
+		// Decoding doubles and floats
+		Matcher matcher = DOUBLE_PATTERN.matcher(string);
+		if (matcher.matches()) {
+			String type = matcher.group(1);
+			if (type == null || "D".equals(type) || "d".equals(type) ) {
+				return Double.parseDouble(string);
+			} else {
+				return Float.parseFloat(string);
+			}
+		}
+
+		// Decoding integers and longs
+		matcher = INTEGER_PATTERN.matcher(string);
+		if (matcher.matches()) {
+			String type = matcher.group(1);
+			if ("l".equals(type) || "L".equals(type)) {
+				return Long.parseLong(string);
+			} else {
+				return Integer.parseInt(string);
+			}
+		}
+
+		// Decoding booleans
+		switch (string) {
+			case "true":
+				return true;
+			case "false":
+				return false;
+			default:
+				break;
+		}
+
+		return string;
 	}
 
 	public class StateHolder {

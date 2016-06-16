@@ -21,14 +21,15 @@
 
 package tigase.eventbus.component.stores;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
+import tigase.eventbus.component.EventBusComponent;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.xmpp.JID;
 
-@Bean(name = "affiliations")
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+@Bean(name = "affiliations", parent = EventBusComponent.class)
 public class AffiliationStore {
 
 	private final Map<JID, Affiliation> affiliations = new ConcurrentHashMap<JID, Affiliation>();

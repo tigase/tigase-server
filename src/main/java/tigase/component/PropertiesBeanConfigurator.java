@@ -47,18 +47,21 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 		// this map needs to be filled with name of fields or field aliases
 		// which implements Map
 		Set<String> mapFields = new HashSet<>();
+		Set<String> aliases = new HashSet<>();
 		Field[] fields = DependencyManager.getAllFields(beanConfig.getClazz());
 		for (Field field : fields) {
-			if (Map.class.isAssignableFrom(field.getType())) {
-				mapFields.add(field.getName());
-				ConfigField cf = field.getAnnotation(ConfigField.class);
-				if (cf != null && !cf.alias().isEmpty())
+			ConfigField cf = field.getAnnotation(ConfigField.class);
+			if (cf != null && !cf.alias().isEmpty()) {
+				if (Map.class.isAssignableFrom(field.getType())) {
+					mapFields.add(field.getName());
 					mapFields.add(cf.alias());
+				}
+				aliases.add(cf.alias());
 			}
 		}
 
 		if (props != null) {
-			StringBuilder sb = new StringBuilder();
+			List<String> path = new ArrayList<>();
 			ArrayDeque<Kernel> kernels = new ArrayDeque<>();
 			Kernel kernel = beanConfig.getKernel();
 			while (kernel.getParent() != null && kernel != this.kernel) {
@@ -66,37 +69,42 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 				kernel = kernel.getParent();
 			}
 			while((kernel = kernels.poll()) != null) {
-				if (sb.length() > 0)
-					sb.append("/");
-				sb.append(kernel.getName());
+				path.add(kernel.getName());
 			}
 
 			if (!beanConfig.getBeanName().equals(beanConfig.getKernel().getName())) {
-				if (sb.length() > 0)
-					sb.append("/");
-				sb.append(beanConfig.getBeanName());
+				path.add(beanConfig.getBeanName());
 			}
 
-			String prefix = sb.toString();
-			for (Map.Entry<String, Object> e : props.entrySet()) {
-				if (e.getKey().startsWith(prefix + "/")) {
-					String key = e.getKey().substring(prefix.length() + 1);
-					int idx = key.indexOf("/");
-					// if there is next / char and there is field or alias implementing Map for prefix of this key
-					// then we need to gather all key with this prefix and create map of values
-					if (idx > 0) {
-						String fname = key.substring(0, idx);
-						if (mapFields.contains(fname)) {
-							Map<String,Object> vals = (Map<String, Object>) result.get(fname);
-							if (vals == null) {
-								vals = new HashMap<>();
-								result.put(fname, vals);
+			for (int i=0; i<=path.size(); i++) {
+				StringBuilder sb = new StringBuilder();
+				for (int j=0; j<i; j++) {
+					if (sb.length() != 0)
+						sb.append("/");
+					sb.append(path.get(j));
+				}
+				String prefix = sb.toString();
+				for (Map.Entry<String, Object> e : props.entrySet()) {
+					if (prefix.isEmpty() || e.getKey().startsWith(prefix + "/")) {
+						String key = prefix.isEmpty() ? e.getKey() : e.getKey().substring(prefix.length() + 1);
+						int idx = key.indexOf("/");
+						// if there is next / char and there is field or alias implementing Map for prefix of this key
+						// then we need to gather all key with this prefix and create map of values
+						if (idx > 0) {
+							String fname = key.substring(0, idx);
+							if (mapFields.contains(fname)) {
+								Map<String, Object> vals = (Map<String, Object>) result.get(fname);
+								if (vals == null) {
+									vals = new HashMap<>();
+									result.put(fname, vals);
+								}
+								vals.put(key.substring(idx + 1), e.getValue());
+								continue;
 							}
-							vals.put(key.substring(idx+1), e.getValue());
-							continue;
+						} else if (i == path.size() || aliases.contains(key)) {
+							result.put(key, e.getValue());
 						}
 					}
-					result.put(key, e.getValue());
 				}
 			}
 		}

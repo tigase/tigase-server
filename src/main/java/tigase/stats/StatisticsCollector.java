@@ -30,6 +30,8 @@ import tigase.conf.ConfigurationException;
 import tigase.conf.ConfiguratorAbstract;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.core.Kernel;
 import tigase.server.*;
 import tigase.sys.ShutdownHook;
 import tigase.sys.TigaseRuntime;
@@ -56,6 +58,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name = "stats", parent = Kernel.class)
 public class StatisticsCollector
 				extends AbstractComponentRegistrator<StatisticsContainer>
 				implements ShutdownHook {

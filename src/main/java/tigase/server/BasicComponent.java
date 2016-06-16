@@ -110,9 +110,9 @@ public class BasicComponent
 	private ConcurrentHashMap<String, EnumSet<CmdAcl>> commandsACL = new ConcurrentHashMap<String,
 			EnumSet<CmdAcl>>(20);
 
-	@ConfigField(desc = "List of admins JIDs")
-	protected Set<BareJID>      admins = new ConcurrentSkipListSet<BareJID>();
-	protected Set<String>       trusted = new ConcurrentSkipListSet<String>();
+	@ConfigField(desc = "List of admins JIDs", alias = "admins")
+	protected ConcurrentSkipListSet<BareJID>      admins = new ConcurrentSkipListSet<BareJID>();
+	protected ConcurrentSkipListSet<String>       trusted = new ConcurrentSkipListSet<String>();
 	private ScriptEngineManager scriptEngineManager     = null;
 	@ConfigField(desc = "Base directory for scripts")
 	private String              scriptsBaseDir          = SCRIPTS_DIR_PROP_DEF;

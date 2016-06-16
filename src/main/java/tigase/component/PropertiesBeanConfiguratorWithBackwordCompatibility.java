@@ -28,9 +28,7 @@ import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.Kernel;
 
 import java.lang.reflect.Method;
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -87,7 +85,7 @@ public class PropertiesBeanConfiguratorWithBackwordCompatibility extends Propert
 				kernels.push(kernel);
 				kernel = kernel.getParent();
 			}
-			while((kernel = kernels.poll()) != null) {
+			while ((kernel = kernels.poll()) != null) {
 				if (sb.length() > 0)
 					sb.append("/");
 				sb.append(kernel.getName());
@@ -104,7 +102,15 @@ public class PropertiesBeanConfiguratorWithBackwordCompatibility extends Propert
 				if (e.getKey().startsWith(prefix + "/")) {
 					String key = e.getKey().substring(prefix.length() + 1);
 
-					result.put(key, e.getValue());
+					Object value = e.getValue();
+					if (value instanceof Collection) {
+						value = convertToArray((Collection) value);
+						if (value != null) {
+							result.put(key, value);
+						}
+					} else {
+						result.put(key, value);
+					}
 				}
 			}
 		}
@@ -122,4 +128,80 @@ public class PropertiesBeanConfiguratorWithBackwordCompatibility extends Propert
 		}
 		return initProperties;
 	}
+
+	protected Object convertToArray(Collection collection) {
+		Iterator iter = collection.iterator();
+		if (!iter.hasNext())
+			return null;
+
+		Class objCls = iter.next().getClass();
+		if (objCls == Integer.class) {
+			return convertToIntArray(collection);
+		} else if (objCls == Long.class) {
+			return convertToLongArray(collection);
+		} else if (objCls == Double.class) {
+			return convertToDoubleArray(collection);
+		} else if (objCls == Float.class) {
+			return convertToFloatArray(collection);
+		} else if (objCls == Boolean.class) {
+			return convertToBoolArray(collection);
+		}
+		return null;
+	}
+
+	protected Object convertToIntArray(Collection col) {
+		int[] arr = new int[col.size()];
+		int pos = 0;
+		Iterator iter = col.iterator();
+		while (iter.hasNext()) {
+			Number v = (Number) iter.next();
+			arr[pos++] = v.intValue();
+		}
+		return arr;
+	}
+
+	protected Object convertToLongArray(Collection col) {
+		long[] arr = new long[col.size()];
+		int pos = 0;
+		Iterator iter = col.iterator();
+		while (iter.hasNext()) {
+			Number v = (Number) iter.next();
+			arr[pos++] = v.longValue();
+		}
+		return arr;
+	}
+
+	protected Object convertToDoubleArray(Collection col) {
+		double[] arr = new double[col.size()];
+		int pos = 0;
+		Iterator iter = col.iterator();
+		while (iter.hasNext()) {
+			Number v = (Number) iter.next();
+			arr[pos++] = v.doubleValue();
+		}
+		return arr;
+	}
+
+	protected Object convertToFloatArray(Collection col) {
+		float[] arr = new float[col.size()];
+		int pos = 0;
+		Iterator iter = col.iterator();
+		while (iter.hasNext()) {
+			Number v = (Number) iter.next();
+			arr[pos++] = v.floatValue();
+		}
+		return arr;
+	}
+
+	protected Object convertToBoolArray(Collection col) {
+		boolean[] arr = new boolean[col.size()];
+		int pos = 0;
+		Iterator iter = col.iterator();
+		while (iter.hasNext()) {
+			Boolean v = (Boolean) iter.next();
+			arr[pos++] = v.booleanValue();
+		}
+		return arr;
+	}
+
 }

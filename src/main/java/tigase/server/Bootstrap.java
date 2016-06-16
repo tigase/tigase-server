@@ -31,6 +31,7 @@ import tigase.kernel.DefaultTypesConverter;
 import tigase.kernel.beans.config.BeanConfigurator;
 import tigase.kernel.core.DependencyGrapher;
 import tigase.kernel.core.Kernel;
+import tigase.util.DataTypes;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -145,8 +146,10 @@ public class Bootstrap implements Lifecycle {
 				char c = key.charAt(key.length() - 2);
 
 				key = key.substring(0, key.length() - 3);
-				// we do not need to decode value - this will be done by proper BeanConfigurator
-				//val = DataTypes.decodeValueType(c, prop[1]);
+				// decoding value for basckward compatibility
+				if (val != null) {
+					val = DataTypes.decodeValueType(c, val.toString());
+				}
 			}
 
 			props.put(key, val);
