@@ -98,7 +98,8 @@ public class ConfigReader {
 						holder.sb.append(c);
 						break;
 					}
-					holder.key = holder.sb.toString().trim();
+					holder.key = holder.value != null ? holder.value.toString() : holder.sb.toString().trim();
+					holder.value = null;
 					holder.sb = new StringBuilder();
 					break;
 
@@ -178,8 +179,8 @@ public class ConfigReader {
 		return holder.map;
 	}
 
-	private static Pattern INTEGER_PATTERN = Pattern.compile("[0-9]+([lL]*)");
-	private static Pattern DOUBLE_PATTERN = Pattern.compile("[0-9]+\\.[0-9]+([dDfF]*)");
+	private static Pattern INTEGER_PATTERN = Pattern.compile("([0-9]+)([lL]*)");
+	private static Pattern DOUBLE_PATTERN = Pattern.compile("([0-9]+\\.[0-9]+)([dDfF]*)");
 
 	private static double x = 2.1f;
 
@@ -187,22 +188,24 @@ public class ConfigReader {
 		// Decoding doubles and floats
 		Matcher matcher = DOUBLE_PATTERN.matcher(string);
 		if (matcher.matches()) {
-			String type = matcher.group(1);
-			if (type == null || "D".equals(type) || "d".equals(type) ) {
-				return Double.parseDouble(string);
+			String value = matcher.group(1);
+			String type = matcher.group(2);
+			if (type.isEmpty() || "D".equals(type) || "d".equals(type) ) {
+				return Double.parseDouble(value);
 			} else {
-				return Float.parseFloat(string);
+				return Float.parseFloat(value);
 			}
 		}
 
 		// Decoding integers and longs
 		matcher = INTEGER_PATTERN.matcher(string);
 		if (matcher.matches()) {
-			String type = matcher.group(1);
+			String value = matcher.group(1);
+			String type = matcher.group(2);
 			if ("l".equals(type) || "L".equals(type)) {
-				return Long.parseLong(string);
+				return Long.parseLong(value);
 			} else {
-				return Integer.parseInt(string);
+				return Integer.parseInt(value);
 			}
 		}
 

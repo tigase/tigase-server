@@ -78,6 +78,12 @@ public class ConfigWriter {
 			writer.write("\'\n");
 		} else {
 			writeString(writer, obj.toString());
+			if (obj instanceof Long) {
+				writeString(writer, "L");
+			}
+			if (obj instanceof Float) {
+				writeString(writer, "f");
+			}
 			writer.write('\n');
 		}
 	}

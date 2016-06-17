@@ -22,6 +22,7 @@ public class ConfigReaderTest {
 		Map<String, Object> root = new HashMap<>();
 		root.put("test123", "2313");
 		root.put("tes22", "223");
+		root.put("x-gy+=x",123);
 		List list = new ArrayList();
 		list.add(1);
 		list.add(3);
@@ -35,6 +36,25 @@ public class ConfigReaderTest {
 		map.put("test", "false");
 		root.put("some-map", map);
 
+		Map<String, Object> embeddedMap = new HashMap<>();
+		embeddedMap.put("test", 123);
+		embeddedMap.put("other", true);
+
+		map = new HashMap<>();
+		map.put("simple", "text");
+		map.put("integer", 1);
+		map.put("long", 2L);
+		map.put("double", (double) 2.0);
+		list = new ArrayList();
+
+		list.add(1);
+		list.add(embeddedMap);
+		list.add("3");
+
+		map.put("embedded-list", list);
+		map.put("embedded-map", embeddedMap);
+		root.put("another-map", map);
+
 		Map<String, Object> parsed = null;
 
 		File f = File.createTempFile("xx3232", "ccxx");
@@ -45,6 +65,17 @@ public class ConfigReaderTest {
 		} finally {
 			f.delete();
 		}
+
+		f = File.createTempFile("xx3232", "ccxx");
+		try {
+			new ConfigWriter().write(f, root);
+			displayFile(f);
+		} finally {
+			f.delete();
+		}
+
+		assertMapEquals(root, parsed, "/");
+
 		assertEquals(root, parsed);
 	}
 
@@ -80,6 +111,17 @@ public class ConfigReaderTest {
 		System.out.println("file content: " + f.getAbsolutePath());
 		while ((line = reader.readLine()) != null) {
 			System.out.println(line);
+		}
+	}
+
+	private void assertMapEquals(Map<String,Object> expected, Map actual, String prefix) {
+		for (Map.Entry e : expected.entrySet()) {
+			Object value = actual.get(e.getKey());
+			System.out.println("checking key = " + prefix + e.getKey());
+			if (value instanceof Map) {
+				assertMapEquals((Map<String, Object>) e.getValue(), (Map) value, prefix + e.getKey() + "/");
+			}
+			assertEquals(e.getValue(), value);
 		}
 	}
 }
