@@ -47,6 +47,8 @@ include::text/Admin_Guide_12_-_Configuration_-_C_-_Linux_Settings_for_High_Load_
 
 include::text/Admin_Guide_13_-_Configuration_-_D_-_Configuration_Storage_Options.asciidoc[]
 
+include::text/Admin_Guide_13_-_Configuration_-_E_-_JVM_settings.asciidoc[]
+
 :leveloffset: 1
 
 include::text/Admin_Guide_14_-_Security.asciidoc[]
