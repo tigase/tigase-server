@@ -23,21 +23,20 @@
 
 package tigase.xmpp.impl;
 
-import java.util.Map;
-import java.util.Queue;
-import java.util.logging.Level;
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
 import tigase.stats.CounterValue;
 import tigase.stats.StatisticsList;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPProcessorIfc;
+import tigase.xmpp.XMPPPacketFilterIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor;
 import tigase.xmpp.impl.annotation.HandleStanzaTypes;
 import tigase.xmpp.impl.annotation.Id;
+
+import java.util.Queue;
+import java.util.logging.Level;
 
 /**
  * ErrorCounter class is implementation of XMPPProcessor responsible for counting 
@@ -47,7 +46,7 @@ import tigase.xmpp.impl.annotation.Id;
  */
 @Id("error-counter")
 @HandleStanzaTypes(StanzaType.error)
-public class ErrorCounter extends AnnotatedXMPPProcessor implements XMPPProcessorIfc {
+public class ErrorCounter extends AnnotatedXMPPProcessor implements XMPPPacketFilterIfc {
 
 	private static final String SM_COMP = "sess-man";
 	
@@ -60,15 +59,24 @@ public class ErrorCounter extends AnnotatedXMPPProcessor implements XMPPProcesso
 	}
 
 	@Override
-	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings) throws XMPPException {
-		holder.count(packet);
-	}
-
-	@Override
 	public String[][] supElementNamePaths() {
 		return ALL_PATHS;
 	}
-	
+
+	@Override
+	public void filter(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo, Queue<Packet> results) {
+		//process(packet, session);
+		for (Packet r : results) {
+			process(r, session);
+		}
+	}
+
+	protected void process(Packet packet, XMPPResourceConnection session) {
+		if (super.canHandle(packet, session) == Authorization.AUTHORIZED) {
+			holder.count(packet);
+		}
+	}
+
 	public static class ErrorStatisticsHolder {
 		
 		private static final String[] ERROR_NAMES;
