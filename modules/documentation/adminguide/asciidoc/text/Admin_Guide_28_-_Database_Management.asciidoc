@@ -1,6 +1,5 @@
 [[databasemgnt]]
-Database Management
-===================
+= Database Management
 :author: daniel wisnewski
 :version: v1.0 July 2015
 :date: 2015-07-16 12:49
@@ -10,8 +9,7 @@ Database Management
 Tigase is coded to perform with multiple database types and numbers.
 Owing to it's versatile nature, there are some tools and procedures that may be of use to certain administrators.
 
-Recommended database versions
------------------------------
+== Recommended database versions
 As of v7.1.0 here are the minimum and recommended versions of databases for use with Tigase:
 
 
@@ -26,26 +24,20 @@ As of v7.1.0 here are the minimum and recommended versions of databases for use 
 
 Although Tigase may support other versions of databases, these are the ones we are most familiar with in offering support and advice.  Use of databases outside these guidelines may result in unforeseen errors.
 
-xref:databasePreperation[Database Preparation]
-----------------------------------------------
+== xref:databasePreperation[Database Preparation]
 Preparing new databases in case installer setup is not an option.
 
-xref:hashedPasswords[Hashed Passwords in User Database]
--------------------------------------------------------
+== xref:hashedPasswords[Hashed Passwords in User Database]
 Providing more secure password storage.
 
-xref:multidb[Multiple Databases in Tigase]
-------------------------------------------
+== xref:multidb[Multiple Databases in Tigase]
 Options for using multiple databases for different purposes in Tigase.
 
-xref:dbImportingData[Importing User Data]
------------------------------------------
+== xref:dbImportingData[Importing User Data]
 Tips to move data repositories from one to another database.
 
-xref:existingData[Import Existing Database]
--------------------------------------------
+== xref:existingData[Import Existing Database]
 This section has some depreciated information, however it may be handy to upgrade, or manually connect databases.
 
-xref:oldVerSchemas[Old Version Schemas and Updates]
----------------------------------------------------
+== xref:oldVerSchemas[Old Version Schemas and Updates]
 Contains our old Schema updates, if you have an old installation of Tigase and want to move to a more current version, see the guides revelant to you.

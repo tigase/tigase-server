@@ -1,6 +1,5 @@
 [[connectingTigaseToMysql]]
-Connecting the Tigase Server to MySQL Database
-==============================================
+= Connecting the Tigase Server to MySQL Database
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 21:16
@@ -26,7 +25,7 @@ Unfortunately these files are not included yet in the server version 3.x binary 
 . link:https://projects.tigase.org/projects/tigase-server/repository/changes/etc/init-mysql.properties[init-mysql.properties] - the file contains a few initial parameters which can/should be adjusted to your environment. Here is a content of the file with each line described:
 +
 [source,bash]
--------------------------------------
+-----
 # Load standard set of the server components.
 # Look at the http://www.tigase.org/configuration-wizards
 # document for other possible values. Normally you don't
@@ -52,7 +51,7 @@ config-type=--gen-config-def
 # The below setting is recommended for the initail setup and it is required
 # when asking for help with setting the server up
 --debug=server
--------------------------------------
+-----
 
 Download both files and put them to your +etc/+ directory.
 
@@ -63,8 +62,8 @@ Remove the XML configuration file.
 Start the server using following command:
 
 [source,sh]
--------------------------------------
+-----
 ./bin/tigase.sh start etc/tigase-mysql.conf
--------------------------------------
+-----
 
 _Ask more questions if you got stuck or need any help with this._

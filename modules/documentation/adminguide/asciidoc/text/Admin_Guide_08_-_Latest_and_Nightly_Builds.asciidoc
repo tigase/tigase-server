@@ -1,6 +1,5 @@
 [[TSBupdates]]
-Tigase Server Binary Updates
-============================
+= Tigase Server Binary Updates
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 21:18

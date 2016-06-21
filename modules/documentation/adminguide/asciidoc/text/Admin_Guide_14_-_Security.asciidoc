@@ -1,5 +1,4 @@
-Security
-========
+= Security
 :author: Daniel Wisnewski
 :version: v1.0 October, 2015
 :date: 2015-05-10 13:31
@@ -7,8 +6,8 @@ Security
 The articles here cover advanced security features built into to Tigase Server, and some options for adding your own levels of security.
 
 [[blockingCommand]]
-XEP-0191 Support
-----------------
+== XEP-0191 Support
+
 The simplest security feature, however, inside an XMPP server is the ability to block users and JIDS. link:http://xmpp.org/extensions/xep-0191[XEP-0191] specifies the parameters of simple blocking without using privacy lists. Below is a breakdown and some sample commands you may find helpful.
 To enable this feature, be sure the following is in your init.properties file:
 ----

@@ -1,6 +1,5 @@
 [[saslExternal]]
-Configuration of SASL EXTERNAL
-==============================
+= Configuration of SASL EXTERNAL
 :author: Bartosz Malkowski <bmalkowski@tigase.pl>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2013-11-27 13:34
@@ -13,9 +12,9 @@ Configuration of SASL EXTERNAL
 In order to enable SASL External add following line to the  +init.properties+ file
 
 [source,bash]
--------------------------------------
+-----
 c2s/clientCertCA=/path/to/cacert.pem
--------------------------------------
+-----
 
 File +cacert.pem+ contains Certificate Authority certificate which is used to sign clients certificate.
 
@@ -27,9 +26,9 @@ __________________________
 It is possible to make client certificate required:
 
 [source,bash]
--------------------------------------
+-----
 c2s/clientCertRequired[B]=true
--------------------------------------
+-----
 
 If this option will be enabled, then client must provide certificate. This certificate will be verified against +c2s/clientCertCA+. If client does not provide certificate or certificate will be invalid, TLS handshake will be interrupted and client will be disconnected.
 

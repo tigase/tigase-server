@@ -1,6 +1,5 @@
 [[windowsInstallation]]
-Windows Installation
-====================
+= Windows Installation
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 21:16
@@ -17,17 +16,16 @@ The Windows binary package is an executable file containing an installer. Run th
 If you are going to use the Tigase server with MySQL database have a look now in the directory where the Tigase server is installed. There is a directory +etc/+. Have a look inside and find file called +init.properties+. Open the file with a text editor and make sure you added there 2 following lines:
 
 [source,bash]
--------------------------------------
+-----
 --user-db=mysql
 --user-db-uri=jdbc:mysql://localhost/tigasedb?user=tigase_user&password=mypass
--------------------------------------
+-----
 
 The content of the file should look like the example screenshot below:
 
 image:images/init_properties1.jpg[]
 
-MySQL Database Installation
----------------------------
+== MySQL Database Installation
 
 The section describes installation and configuration of the MySQL database to work with Tigase server.
 
@@ -86,25 +84,25 @@ Now we have to setup Tigase database. From the Start menu run the MySQL console 
 . Create the database:
 +
 [source,sql]
--------------------------------------
+-----
 mysql>create database tigasedb;
--------------------------------------
+-----
 . Add database user:
 +
 [source,bash]
--------------------------------------
+-----
 mysql> GRANT ALL ON tigasedb.* TO tigase_user@'%' IDENTIFIED BY 'tigase_passwd';
 mysql> GRANT ALL ON tigasedb.* TO tigase_user@'localhost' IDENTIFIED BY 'tigase_passwd';
 mysql> GRANT ALL ON tigasedb.* TO tigase_user IDENTIFIED BY 'tigase_passwd';
 mysql> FLUSH PRIVILEGES;
--------------------------------------
+-----
 . Load Tigase database schema:
 +
 [source,bash]
--------------------------------------
+-----
 mysql> use tigasedb;
 mysql> source c:/Program Files/Tigase/database/mysql-schema.sql;
--------------------------------------
+-----
 
 There is a small configuration bug in the installation of Tigase version 3.x. If you look in the *run.bat* file in the Tigase directory you have to replace string *inital.propereties* with *init.properties*.
 

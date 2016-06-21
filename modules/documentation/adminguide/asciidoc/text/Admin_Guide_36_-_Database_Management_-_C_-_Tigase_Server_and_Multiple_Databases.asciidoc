@@ -1,6 +1,5 @@
 [[multidb]]
-Tigase Server and Multiple Databases
-====================================
+= Tigase Server and Multiple Databases
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2012-10-02 04:23
@@ -21,19 +20,19 @@ This is very easy to do through the Tigase's configuration file.
 Typically the well known lines:
 
 [source,sh]
--------------------------------------
+-----
 --auth-db=tigase-custom
 --auth-db-uri=jdbc:mysql://db1.tigase/dbname?user&password
 --user-db=mysql
 --user-db-uri=jdbc:mysql://db2.tigase/dbname?user&password
--------------------------------------
+-----
 
 Define just a default databases for both user repository and authentication repository. Default means it is used when there is no repository specified for a particular virtual domain. However, you can have a separate, both user and authentication repository for each virtual domain.
 
 Here is, how it works:
 
 [source,sh]
--------------------------------------
+-----
 # First, let's define our default database for all VHosts
 --auth-db=tigase-custom
 --auth-db-uri=jdbc:mysql://db1.tigase/dbname?user&password
@@ -88,7 +87,7 @@ basic-conf/auth-repo-params/domain4.com/user-logout-query={ call UserLogout(?) }
 basic-conf/auth-repo-params/domain4.com/sasl-mechs=PLAIN,DIGEST-MD5
 --user-db[domain4.com]=mysql
 --user-db-uri[domain4.com]=jdbc:mysql://db14.domain4.com/dbname?user&password
--------------------------------------
+-----
 
 As you can see, it requires some writing but flexibility is very extensive and you can setup as many separate databases as you need or want. If one database (recognized by the database connection string) is shared among different VHosts, Tigase still uses a single connection pool, so it won't create an excessive number of connections to the database.
 
