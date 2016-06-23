@@ -22,14 +22,6 @@
 
 package tigase.xmpp.impl;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.TimeZone;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import tigase.db.NonAuthUserRepository;
 import tigase.server.Packet;
 import tigase.xml.Element;
@@ -37,6 +29,12 @@ import tigase.xmpp.JID;
 import tigase.xmpp.NoConnectionIdException;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class implements static methods used to create packets to resend messages undelivered 
@@ -65,7 +63,7 @@ public class C2SDeliveryErrorProcessor {
 		for (Packet p : results) {
 			if (p.getElemName() != tigase.server.Message.ELEM_NAME)
 				continue;
-			
+
 			Element elem = p.getElement();
 			Element error = elem.getChildStaticStr(ELEM_NAME);
 			if (error != null && error.getXMLNS() == XMLNS) {
@@ -75,6 +73,14 @@ public class C2SDeliveryErrorProcessor {
 					elem.removeChild(error);
 				}
 			}
+		}
+	}
+
+	public static void filterErrorElement(Element messageElem) {
+		Element error = messageElem.getChildStaticStr(ELEM_NAME);
+		if (error != null && error.getXMLNS() == XMLNS) {
+			// removing error element
+			messageElem.removeChild(error);
 		}
 	}
 	

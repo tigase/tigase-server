@@ -27,52 +27,28 @@ package tigase.server.xmppclient;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.server.Command;
-import tigase.server.ConnectionManager;
-import tigase.server.Iq;
-import tigase.server.Message;
-import tigase.server.Packet;
-import tigase.server.Presence;
-import tigase.server.ReceiverTimeoutHandler;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.StreamError;
-import tigase.xmpp.XMPPIOService;
-import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
-
 import tigase.conf.ConfigurationException;
-import tigase.net.ConnectionType;
 import tigase.net.IOService;
 import tigase.net.SocketThread;
 import tigase.net.SocketType;
+import tigase.server.*;
 import tigase.util.Base64;
 import tigase.util.DNSResolverFactory;
 import tigase.util.RoutingsContainer;
 import tigase.util.TigaseStringprepException;
 import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
+import tigase.xmpp.*;
+import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
 
+import javax.net.ssl.TrustManager;
 import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentMap;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.Deflater;
-
-import javax.net.ssl.TrustManager;
 
 /**
  * Class ClientConnectionManager Created: Tue Nov 22 07:07:11 2005
@@ -925,6 +901,7 @@ public class ClientConnectionManager
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Sending stream close to the client: {0}", streamClose);
 					}
+					serv.getSessionData().put(XMPPIOService.STREAM_CLOSING, true);
 					serv.writeRawData(streamClose);
 					if (moreToSend) {
 

@@ -409,6 +409,13 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		// resumption but those clients are not compatible with XEP-0198 and 
 		// resumption so this should not happen
 		if (isResumptionEnabled(service)) {
+			if (service.getSessionData().getOrDefault(XMPPIOService.STREAM_CLOSING, false) == Boolean.TRUE) {
+				services.remove(id, service);
+				connectionManager.serviceStopped(service);
+				sendErrorsForQueuedPackets(service);
+				return false;
+			}
+
 			if (!services.containsKey(id)) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "{0}, service stopped - resumption enabled but service not available", new Object[] { service });
@@ -730,7 +737,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 				if (packet.getElemName() != Iq.ELEM_NAME && !packet.isXMLNSStaticStr(DELAY_PATH, DELAY_XMLNS)) {
 					String stamp = null;
 					synchronized (formatter) {
-						stamp = formatter.format(new Date());
+						stamp = formatter.format(this.stamp);
 					}
 					String from = packet.getStanzaTo() != null ? packet.getStanzaTo().getDomain() : packet.getPacketTo().getDomain();
 					Element x = new Element( "delay", new String[] {
