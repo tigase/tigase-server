@@ -1,6 +1,5 @@
 [[newElements]]
-Tigase Scripting Version 4.4.x Update for Administrators
-========================================================
+= Tigase Scripting Version 4.4.x Update for Administrators
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-01-06 20:18

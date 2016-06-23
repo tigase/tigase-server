@@ -1,6 +1,5 @@
 [[clConnRepoClass]]
---cl-conn-repo-class
-====================
+= --cl-conn-repo-class
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2013-03-28 14:02
@@ -31,9 +30,9 @@ It is recommended however, that the xref:clusterNode[--cluster-nodes] property i
 By default the same database as for the user repository is used for the cluster automatic cluster mode but, a different, separate database can be used as well. A DB URI for a different SQL database can be set using following configuration property:
 
 [source,bash]
-------------------------------
+-----
 cl-comp/repo-uri=jdbc:mysql://localhost/tigasedb?user=user&password=mypass
-------------------------------
+-----
 . *ClConDirRepository* an alternative way to synchronize information about cluster nodes on the installation through filesystem. This might be used in case where DB is not accessible by the clustering code for some reason or synchronization through DB is not desired.
 To make use of the filesystem based cluster nodes synchronization you need to mount a directory via some network filesystem mechanism (like NFS for example) and point Tigase to the directory. The rest works the same way as through the DB. However, instead of writing cluster node metadata to some DB table, each node writes it's metadata to a separate file in the given directory.
 This mode is also compatible with the manual nodes configuration through --cluster-nodes but the same precautions and suggestions as for DB based automatic node hold.
@@ -41,9 +40,9 @@ This mode is also compatible with the manual nodes configuration through --clust
 A default location of the directory is probably not very useful, as it points to etc/ directory, therefore, normally a correct location has to be set through the repo-uri property in a following way:
 +
 [source,bash]
-------------------------------
+-----
 cl-comp/repo-uri=/mount/tigase-cluster-repo
-------------------------------
+-----
 . *ClConConfigRepository* is an implementation which allows you to revert back to the previous and manual cluster configuration through cluster nodes. However, since version *5.2.0*  xref:clusterNodes[+--cluster-nodes+] has been extended with ability to set password and port number for each cluster node.
 
 *Available since:* 5.2.0

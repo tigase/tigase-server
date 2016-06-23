@@ -1,6 +1,5 @@
 [[cmSeeOtherHost]]
---cm-see-other-host
-===================
+= --cm-see-other-host
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2013-06-11 10:12

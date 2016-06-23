@@ -1,6 +1,5 @@
 [[external]]
---external
-==========
+= --external
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2013-02-09 22:40
@@ -21,31 +20,31 @@
 The component is loaded the same way as all other Tigase components. In your +init.properties+ file you need to add 2 lines:
 
 [source,bash]
-------------------------------
+-----
 --comp-name-1 = ext
 --comp-class-1 = tigase.server.ext.ComponentProtocol
-------------------------------
+-----
 
 This will load the component with an empty configuration and is practically useless. You have to tell the component on what port to listen to (or on what port to connect to) and external domains list with passwords.
 
 As a value you have to put comma separated list of external domains settings. Each domain settings consist of a few, colon separated parameters. For example:
 
 [source,bash]
-------------------------------
+-----
 --external = muc1.devel.tigase.org:passwd1,muc2.devel.tigase.org:passwd2
-------------------------------
+-----
 
 This sets passwords for 2 external domains but does not say anything about port number or connection. The above list is a simplified syntax. The full syntax looks like this:
 
 [source,bash]
-------------------------------
+-----
 --external = muc1.devel.tigase.org:passwd1:listen:5270
-------------------------------
+-----
 or
 [source,bash]
-------------------------------
+-----
 --external = muc1.devel.tigase.org:passwd1:connect:5270:devel.tigase.org:accept:lb-class
-------------------------------
+-----
 
 Definition of each colon separated part:
 
@@ -62,16 +61,16 @@ Only 2 first parts are mandatory, the rest is optional. The simplified form is u
 The settings on the server side may most likely looks like this:
 
 [source,bash]
-------------------------------
+-----
 --external=muc1.devel.tigase.org:passwd1:listen:5270,muc2.devel.tigase.org:passwd2,muc3.devel.tigase.org:passwd3
-------------------------------
+-----
 
 It specifies 3 domains with passwords and one TCP/IP port to listen to. On the other hand you can specify a configuration which would establish the connection to the server:
 
 [source,bash]
-------------------------------
+-----
 --external = muc1.devel.tigase.org:passwd1:connect:5270:devel.tigase.org:accept
-------------------------------
+-----
 
 We use one of the domains configured on the server side, the same port number and the server address. (Assuming the main server works at devel.tigase.org address).
 

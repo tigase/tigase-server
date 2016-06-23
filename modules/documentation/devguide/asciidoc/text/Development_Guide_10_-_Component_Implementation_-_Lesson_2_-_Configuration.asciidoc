@@ -1,6 +1,5 @@
 [[cil2]]
-Component Implementation - Lesson 2 - Configuration
-===================================================
+= Component Implementation - Lesson 2 - Configuration
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-01-06 20:22
@@ -19,21 +18,25 @@ To demonstrate how to implement component configuration let's say we want to con
 Let's create the following private variables in our component:
 
 [source,java]
+-----
 private String[] packetTypes = {"message", "presence", "iq"};
 private String prependText = "My packet: ";
 private boolean secureLogging = false;
+-----
 
 As the component configuration is maintained in a form of a _(key, value)_ map, we have to invent keys for each of our configuration entry:
 
 [source,java]
+-----
 private static final String PACKET_TYPES_KEY = "packet-types";
 private static final String PREPEND_TEXT_KEY = "log-prepend";
 private static final String SECURE_LOGGING_KEY = "secure-logging";
+-----
 
 There are two methods used to maintain the component configuration: +getDefaults(...)+ where the component provides some configuration defaults and +setProperties(...)+ which sets a working configuration for the component:
 
-[source,java,numbered]
---------------------------------------------------------------------
+[source,java]
+-----
 @Override
 public Map<String, Object> getDefaults(Map<String, Object> params) {
   Map<String, Object> defs = super.getDefaults(params);
@@ -56,7 +59,7 @@ public void setProperties(Map<String, Object> props) {
     secureLogging = (Boolean) props.get( SECURE_LOGGING_KEY );
   }
 }
---------------------------------------------------------------------
+-----
 
 You do not have to implement the +getDefaults(...)+ method and provide default settings for your configuration, but doing so gives you a few benefits.
 
@@ -73,16 +76,18 @@ Regardless, if you implemented the +getDefaults(...)+ method or not you can alwa
 The syntax in +init.properties+ file is very simple and is described in details in the _Admin Guide_. As it shows on the screenshot the configuration parameter name consists of: _component name, property key_. To set the configuration for your component in +init.properties+ file you have to append following lines to the file:
 
 [source,bash]
+-----
 test/log-prepend="My packet: "
 test/packet-types[s]=message,presence,iq
 test/secure-logging[B]=true
+-----
 
 The square brackets denote the property type, have a look at the _Admin Guide_ documentation for more details.
 
 And this is the complete code of the new component with a modified +processPacket(...)+ method taking advantage of configuration settings:
 
-[source,java,numbered]
----------------------------------------------------------------------
+[source,java]
+-----
 import java.util.Map;
 import java.util.logging.Logger;
 import tigase.server.AbstractMessageReceiver;
@@ -139,6 +144,6 @@ public class TestComponent extends AbstractMessageReceiver {
   }
 
 }
----------------------------------------------------------------------
+-----
 
 Of course we can do much more useful packet processing in the +processPacket(...)+ method. This is just an example code. Please note: comparing packet element name with our packet type by reference is intentional and allowed in this context. All *Element* names are processed with +String.intern()+ function to preserve memory and improve performance of string comparison.

@@ -1,5 +1,4 @@
-Jabber/XMPP introduction
-========================
+= Jabber/XMPP introduction
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2009-11-25 15:51
@@ -8,9 +7,7 @@ Jabber/XMPP introduction
 :numbered:
 :website: http://tigase.net
 
-Jabber/XMPP is Instant Messaging Technology
--------------------------------------------
-
+== Jabber/XMPP is Instant Messaging Technology
 All federated *XMPP* servers are connected in one global communications network allowing you to send messages to friends who have accounts on other Jabber servers.
 
 This is very much like sending e-mail but the difference between Jabber and e-mail is the same as the difference between sending a traditional mail and talking on the phone.

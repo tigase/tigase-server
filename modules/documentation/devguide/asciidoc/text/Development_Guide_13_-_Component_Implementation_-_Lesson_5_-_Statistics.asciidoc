@@ -1,6 +1,5 @@
 [[cil5]]
-Component Implementation - Lesson 5 - Statistics
-================================================
+= Component Implementation - Lesson 5 - Statistics
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-01-06 20:22
@@ -19,7 +18,7 @@ image:images/spam-statitics-small.png[]
 Your component from the very beginning generates some statistics by classes it inherits. Let's add a few statistics to our spam filtering component:
 
 [source,java]
-------------------------------------------------------------------
+-----
 @Override
 public void getStatistics(StatisticsList list) {
   super.getStatistics(list);
@@ -29,7 +28,7 @@ public void getStatistics(StatisticsList list) {
     // Some very expensive statistics generation code...
   }
 }
-------------------------------------------------------------------
+-----
 
 I think the code should be pretty much self-explanatory.
 
@@ -46,7 +45,7 @@ The *if* statement requires some explanation too. Normally adding a new statisti
 As you can see, the API for generating and presenting component statistics is very simple and straightforward. Just one method to overwrite and a simple way to pass your own counters. Below is the whole code of the example component:
 
 [source,java]
-------------------------------------------------------------------
+-----
 import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Level;
@@ -192,4 +191,4 @@ public class TestComponent extends AbstractMessageReceiver {
   }
 
 }
-------------------------------------------------------------------
+-----

@@ -1,6 +1,5 @@
 [[tigaseandPython]]
-Tigase and Python
-=================
+= Tigase and Python
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-01-06 20:22
@@ -18,9 +17,7 @@ This article describes how to get Python working as a scripting language for ad-
 
 _Please note, we are not a Python developer, and by no means this is Python development guide. All the code examples are used only to present the API available and there are certainly better ways to do it in the proper Python style. If you have any suggestions or have a better code examples I am happy to include them in the guide._
 
-Installation
-------------
-
+== Installation
 In short, installation is extremely simple: just copy the file attached to this article to your Tigase installation, to the +libs/+ directory. Restart the server and you are ready to start scripting and executing Python.
 
 In theory the Tigase offers scripting support defined in link:http://www.jcp.org/en/jsr/detail?id=223[JSR-223]. You can use any language for which there is such support for JVM. This includes also stand-alone python implementations and the JSR-223 plugins acts just as a bridge. This, however, does not make much sense as you are not able to interact with JVM code (Tigase API). Therefore you need a language which is executed within JVM and can easily exchange data between the main application (Tigase server) and the script.
@@ -37,9 +34,7 @@ The best way to check if the Jython is installed correctly and support for Pytho
 
 image:images/lang-list-with-python-small.png[]
 
-Writing Python Scripts
-----------------------
-
+== Writing Python Scripts
 Python scripts work in a similar way to Groovy or other languages scripts, except one significant difference. You cannot call "_return_" from the script itself. Hence you cannot simply pass script results by calling "_return_" statement directly from the script.
 
 To overcome the problem, Tigase offers another way to pass script execution results. It checks the value of a special variables on the script completion: "+result+" and "+packet+". By assigning value to one of these variables the Python (or any other language) can pass execution results back to the Tigase server.
@@ -56,7 +51,7 @@ For instructions how to load and execute the script, please refer to the xref:sc
 An example of a more advanced script asks the user for providing required parameters for the actual script execution:
 
 [source,java]
--------------------------------------
+-----
 from java.lang import *
 from tigase.server import *
 
@@ -71,7 +66,7 @@ if num1 is None or num2 is None:
   packet = res
 else:
   result = num1 + num2
--------------------------------------
+-----
 
 Except this minor difference, the rest part of scripting in Python for the Tigase administrator commands is the same as all other languages. As all languages can return execution results via these special variables, it could be argued there is no difference at all.
 

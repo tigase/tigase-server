@@ -1,6 +1,5 @@
 [[jetiMSN]]
-Jeti and MSN Transport on tigase.org
-====================================
+= Jeti and MSN Transport on tigase.org
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2009-11-25 15:51

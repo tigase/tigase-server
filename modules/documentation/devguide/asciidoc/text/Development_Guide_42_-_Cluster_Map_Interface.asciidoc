@@ -1,6 +1,5 @@
 [[clusterMapInterface]]
-Cluster Map Interface
-=====================
+= Cluster Map Interface
 
 :author: Bartosz Malkowski & Daniel Wisnewski
 :date: 2015-12-22 13:46
@@ -12,15 +11,13 @@ Cluster Map Interface
 
 Starting with v7.1.0, a cluster map interface has been implemented.  The cluster map is aided by use of the distributed event bus system to communicate between all clusters.
 
-Requirements
-------------
+== Requirements
 Any full distribution of Tigase will support the Cluster Map API so long as the eventbus component is not disabled.  JDK v1.8 is required for this feature, however since Tigase v1.7.0 requires this, you should already have it installed.
 
 The cluster map is stored in memory and follows the map.util.interface java standards can be used to improve cluster connections, and help clustered servers keep track of each other.
 
 
-Map creation
-------------
+== Map creation
 Map must be created with the following command:
 
 [source,java]
@@ -99,8 +96,7 @@ eventBus.addHandler(ElementRemove, tigase:clustered:map, new EventHandler() {
   });
 -----
 
-Map Destruction
----------------
+== Map Destruction
 Java Garbage Collector will normally remove a local map if it is no longer used.  Clustered maps however are not removed in this manner.
 These maps must be destroyed manually if they are no longer used:
 [source,java]

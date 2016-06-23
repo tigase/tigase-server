@@ -1,6 +1,5 @@
 [[setUpRemoteMonitoring]]
-Setting Up Remote Monitoring in the Server
-==========================================
+= Setting Up Remote Monitoring in the Server
 :author: unknown
 :version: v1.0
 :date: 2010-04-06 21:18
@@ -18,8 +17,7 @@ The monitoring itself causes very low overhead in terms of the resources and CPU
 
 *Note.* _This works with the Tigase server from version_ *4.2.0* _or SVN revision_ *1418*.
 
-What You Need.
---------------
+== What You Need
 Using v7.1.0 and later, statistics binaries are built-in dist-max and no extra files are needed.  If you have downloaded -dist file, you will need tigase-extras.
 
 To ensure, two files are necessary to run monitoring:
@@ -31,15 +29,14 @@ Both files should be in the /jars directory.
 
 
 [[monitoring_activation]]
-Activation
-----------
+== Activation
 
 You can either run the Tigase installer and use the configuration wizard to activate the monitoring or edit etc/init.properties file and add following line:
 
 [source,bash]
--------------------------------------
+-----
 --monitoring=jmx:9050,http:9080,snmp:9060
--------------------------------------
+-----
 
 As you see there is only a single line where you put list of monitoring servers you want to activate. Each server is responsible for activation of a different protocol and takes a single parameter - port number. There are following protocols supported right now:
 
@@ -49,43 +46,37 @@ As you see there is only a single line where you put list of monitoring servers 
 
 You can have all protocols active at the same time or any combination of them or none.
 
-Security
---------
+== Security
 
 Both JMX and SNMP offer security protection to limit access to monitoring data. The security configuration is a bit different for both.
 
 [[monitoring_jmx]]
-JMX
----
-
-
+== JMX
 After the server installation or in the SVN repository you can find 2 files in the *etc/* directory: *jmx.access* and *jmx.password*.
 
 - *jmx.access* is a user permission file. You can use it to specify whether the user can access the monitoring data for reading only 'readonly' or with read-write 'readwrite' access. There are example entries in the file already and the content may simply look like:
 +
 [source,bash]
--------------------------------------
+-----
 monitor readonly
 admin readwrite
--------------------------------------
+-----
 
 - *jmx.password* is a user password file. You can set user passwords here and the format again is very simple and the same as for jmx.access. There are example entries already provided for you convenience. Content of the file may look like the example below:
 +
 [source,bash]
--------------------------------------
+-----
 admin admin_pass
 monitor monitor_pass
--------------------------------------
+-----
 
 Using above to files you can control who and how can access the JMX monitoring services.
 
-SNMP
-~~~~
-
+=== SNMP
 Access to SNMP monitoring is controlled using ACL (access control lists) which can be configured in the file  *snmp.acl* located in *etc/* directory. It contains lots of detailed instructions how to setup ACL and restrict access per user, host and what kind access is allowed. The simplest possible configuration may look like this:
 
 [source,bash]
--------------------------------------
+-----
 acl = {
   {
     communities = public, private
@@ -98,10 +89,9 @@ acl = {
     managers = localhost, admin.host.com
   }
 }
--------------------------------------
+-----
 
 You might also need Tigase MIB definition: link:https://projects.tigase.org/projects/tigase-server/repository/changes/src/main/resources/mib/JVM-MANAGEMENT-MIB.mib[TIGASE-MANAGEMENT-MIB.mib] for the server specific statistics. The MIB contains definition for all the server statistics exposed via SNMP.
 
-HTTP
-~~~~
+=== HTTP
 Access the server at example.com:9080 and you will be presented with an Agent View.

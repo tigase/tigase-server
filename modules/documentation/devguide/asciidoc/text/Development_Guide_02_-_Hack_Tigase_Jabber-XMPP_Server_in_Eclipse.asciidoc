@@ -1,6 +1,5 @@
 [[hackingTigase]]
-Hack Tigase XMPP Server in Eclipse
-==================================
+= Hack Tigase XMPP Server in Eclipse
 :author: Daniel Wisnewski
 :version: v1.0 August 2015
 :date: 2015-18-08 10:07
@@ -11,29 +10,25 @@ Hack Tigase XMPP Server in Eclipse
 
 If you want to write code for *Tigase* server we recommend using link://https://eclipse.org/downloads/[Eclipse IDE].  Either the IDE for Java or Java EE developers will work.
 
-Requirements
-------------
+== Requirements
 Eclipse IDE currently requires the use of link:http://www.oracle.com/technetwork/java/javase/downloads/jre7-downloads-1880261.html[Java Runtime Environment 7].  Although this is an outdated version of Java (and Tigase requires JDK version 8) Eclipse has not yet moved to the latest Java Build so you will need both versions installed.
 
 You will also need the M2E plugin for Maven integration, however this can be done inside Elcipse now, so refer to the xref:m2EPlugin[Plugin Installation] section for that.
 
-Installation
-------------
+== Installation
 Eclipse does not come as an installer, but rather an archive.  Extract the directory to a working location wherever you would like.
 Now install the JRE 7 software, location is not important as Eclipse will find it autmoatically.
 
 Before we begin, we will need to clone the repository from git.
 
-Linux
-~~~~~
+=== Linux
 For linux operating systems, navigate to a directory where you want the repository to be cloned to and type the following into terminal.
 
 -----
 git clone https://repository.tigase.org/git/tigase-server.git
 -----
 
-Windows
-~~~~~~~
+=== Windows
 Please see the Windows coding guide for instructions on how to obtain source code from git.
 If you don't want to install git software specifically, you can use Eclipse's git plugin to obtain the repository without any new software.
 First click on File, then Import...
@@ -65,8 +60,7 @@ image:images/win-git5.jpg[]
 Once you click next Eclipse will download the repository and any branches you selected to that directory.  Note you will be unable to import this git directory since there are no git a project specific files downloaded.  However, once downloading is complete you may click cancel, and the git repository will remain in the directory you have chosen.
 
 [[m2EPlugin]]
-Setup
------
+== Setup
 Once you have the main window open and have established a workspace (where most of your working files will be stored), click on Help and then Install New Software...
 
 image:images/Eclipse-help.jpg[]

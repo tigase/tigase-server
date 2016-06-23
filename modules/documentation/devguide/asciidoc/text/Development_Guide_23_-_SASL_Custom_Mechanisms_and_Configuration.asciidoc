@@ -1,6 +1,5 @@
 [[saslcmac]]
-SASL Custom Mechanisms and Configuration
-========================================
+= SASL Custom Mechanisms and Configuration
 :author: Bartosz Malkowski <bmalkowski@tigase.pl>
 :version: 2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2013-01-23 03:54
@@ -14,9 +13,7 @@ SASL Custom Mechanisms and Configuration
 
 _Note that API is under active development. This description may be updated at any time._
 
-Basic SASL Configuration
-------------------------
-
+== Basic SASL Configuration
 SASL implementation in Tigase XMPP Server is compatible with Java API, the same exact interfaces are used.
 
 The SASL implementation consists of following parts:
@@ -36,9 +33,7 @@ Properties list for SASL plugin _(sess-man/plugins-conf/urn\:ietf\:params\:xml\:
 |=====================================================================
 
 [[mechconf]]
-Mechanisms Configuration
-~~~~~~~~~~~~~~~~~~~~~~~~
-
+=== Mechanisms Configuration
 To add a new mechanism, a new factory for the mechanism has to be registered. It can be done with a new line in the +init.properties+ file like this one:
 
 +sess-man/plugins-conf/urn\:ietf\:params\:xml\:ns\:xmpp-sasl/factory=com.example.OwnFactory+
@@ -48,9 +43,7 @@ The class must implement the +SaslServerFactory+ interface. All mechanisms retur
 The default factory that is available and registered by default is +tigase.auth.TigaseSaslServerFactory+ which provides +PLAIN+ and +ANONYMOUS+ mechanisms.
 
 [[cbconf]]
-CallbackHandler Configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+=== CallbackHandler Configuration
 The +CallbackHandler+ is a helper class used for loading/retrieving authentication data from data repository and providing them to a mechanism.
 
 To register a new callback handler a new line in the +init.properties+ file like this one has to be added:
@@ -66,9 +59,7 @@ It is also possible to register different callback handlers for different mechan
 During the authentication process, Tigase server always checks for a handler specific to selected mechanisms, and if there is no specific handler the default one is used.
 
 [[selmech]]
-Selecting Mechanisms Available in the Stream
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+=== Selecting Mechanisms Available in the Stream
 The +tigase.auth.MechanismSelector+ interface is used for selecting mechanisms available in a stream. Method +filterMechanisms()+ should return a collection with mechanisms available based on:
 
 . all registered SASL factories
@@ -80,8 +71,7 @@ It is possible to use a custom selector by specifying it's class int the +init.p
 
 +sess-man/plugins-conf/urn\:ietf\:params\:xml\:ns\:xmpp-sasl/mechanism-selector=com.example.OwnSelector+
 
-Logging/Authentication
-----------------------
+== Logging/Authentication
 After the XMPP stream is opened by a client, the server checks which SASL mechanisms are available for the XMPP session. Depending on whether the stream is encrypted or not, depending on the domain, the server can present different available authentication mechanisms. MechanismSelector is responsible for choosing mechanisms. List of allowed mechanisms is stored in the XMPP session object.
 
 When the client/user begins the authentication procedure it uses one particular mechanism. It must use one of the mechanisms provided by the server as available for this session. The server checks whether mechanisms used by the client is on the list of allowed mechanisms. It the check is successful, the server creates +SaslServer+ class instance and proceeds with exchanging authentication information. Authentication data is different depending on the mechanism used.
@@ -92,8 +82,7 @@ If, after a successful authentication, method call: +getNegotiatedProperty("IS_A
 
 More details about implementation can be found in the xref:cmd[custom mechanisms development] section.
 
-Built-in Mechanisms
-~~~~~~~~~~~~~~~~~~~
+== Built-in Mechanisms
 
 *PLAIN*
 
@@ -104,18 +93,14 @@ _TODO!_
 _TODO!_
 
 [[cmd]]
-Custom Mechanisms Development
------------------------------
-
-*Mechanism*
-~~~~~~~~~~~
+== Custom Mechanisms Development
+=== *Mechanism*
 
 +getAuthorizationID()+ method from +SaslServer+ class *should* return bare JID authorized user. In case that the method returns only user name such as *romeo* for example, the server automatically appends domain name to generate a valid BareJID: _romeo@example.com_. In case the method returns a full, valid BareJID, the server does not change anything.
 
 +handleLogin()+ method from +SessionManagerHandler+ will be called with user's Bare JID provided by +getAuthorizationID()+ (or created later using stream domain name).
 
-*CallbackHandler*
-~~~~~~~~~~~~~~~~~
+=== *CallbackHandler*
 
 For each session authorization, the server creates a new and separate empty handler. Factory which creates handler instance allows to inject different objects to the handler, depending on interfaces implemented by the handler class:
 
@@ -123,15 +108,13 @@ For each session authorization, the server creates a new and separate empty hand
 - +DomainAware+ - injects domain name within which the user attempts to authenticate
 - +NonAuthUserRepositoryAware+ - injects +NonAuthUserRepository+, although I have no idea what for...
 
-General Remarks
-~~~~~~~~~~~~~~~
+=== General Remarks
 
 +JabberIqAuth+ used for non-SASL authentication mechanisms uses the same callback as the SASL mechanisms.
 
 Methods +auth+ in +Repository+ interfaces will be deprecated. These interfaces will be treated as user details providers only. There will be new methods available which will allow for additional login operations on the database such as last successful login recording.
 
-Known Problems
-~~~~~~~~~~~~~~
+=== Known Problems
 
 Because +JabberIqAuth+ is initialized separately, we strongly recommend to use more general prefix in *+init.properties+*:
 

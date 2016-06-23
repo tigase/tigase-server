@@ -1,6 +1,5 @@
 [[smClusterStrategyClass]]
---sm-cluster-strategy-class
-===========================
+= --sm-cluster-strategy-class
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2013-08-06 11:20

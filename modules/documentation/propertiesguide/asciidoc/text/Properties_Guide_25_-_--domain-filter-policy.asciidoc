@@ -1,6 +1,5 @@
 [[domainFilterPolicy]]
---domain-filter-policy
-======================
+= --domain-filter-policy
 :author: not known
 :version: v1.0 initial release
 :date: 2015-07-15 17:08

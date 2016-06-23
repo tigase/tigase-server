@@ -1,5 +1,4 @@
-How to Use Tigase Service
-=========================
+= How to Use Tigase Service
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2009-11-25 15:51
@@ -9,19 +8,14 @@ How to Use Tigase Service
 :numbered:
 :website: http://tigase.net
 
-This Article Describes How to use *tigase.org* Service for Instant Communications
----------------------------------------------------------------------------------
-
+== This Article Describes How to use *tigase.org* Service for Instant Communications
 You have to install and run a Jabber client application to use the service.
 
-Short instructions:
-~~~~~~~~~~~~~~~~~~~
+=== Short instructions:
 
 Usually you just need to enter the user name of the form: user@tigase.org. Your XMPP client should take care of all other things as our service doesn't need any special settings.  If you don't have an account on tigase.org server yet just tick the option to register new account. That's it!
 
-Long Instructions:
-~~~~~~~~~~~~~~~~~~
-
+=== Long Instructions:
 The good news is that there are many programs to choose from which allow you to communicate through our server. So you can pick up your favorite application or use an existing one that is compatible and start using our service.
 
 All clients presented below support multiple accounts on Jabber or XMPP servers. What this means is that you can have a few Jabber accounts on different servers and you can still use just one program to connect to all of them at the same time.

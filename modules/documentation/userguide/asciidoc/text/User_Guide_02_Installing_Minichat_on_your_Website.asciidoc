@@ -1,5 +1,4 @@
-Installing Minichat on Your Website
-===================================
+= Installing Minichat on Your Website
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2009-11-25 15:51
@@ -19,9 +18,7 @@ First thing to know: Minichat will only work with the *tigase.org* XMPP server r
 
 Second thing to know: Minichat connects to the server as anonymous user. To avoid sending spam the anonymous user can only send messages to users within the XMPP server. It means that although you can configure Minichat to send messages to *user@jabber.org*, Tigase server won't deliver those messages.
 
-Instructions:
--------------
-
+== Instructions:
 1. link:http://www.tigase.org/user/register[Register an account] on the link:http://www.tigase.org[tigase.org] website. For purposes of this guide let's say the account name is: *your-account*. The Jabber ID will be: *your-account@tigase.org*.
 +
 *Note!* There seems to be some confusion so let me clarify this. You create an account on the link:http://tigase.org[www.tigase.org] website but your Jabber account domain is: *tigase.org*.
@@ -36,36 +33,36 @@ Instructions:
  - The first way described is to put the client in exactly the same way as it is on the link:http://tigase.org[www.tigase.org] website. The chat window is always visible but the client is not connected to the server until someone clicks on the Minichat title bar. Include in your page following code:
 +
 [source,html]
--------------
+-----
 <iframe
   src="http://minichat.tigase.org/MesComp.html?jid=your-account@tigase.org&name=YourName&domain=tigase.org"
   width="220px" height="250px" frameborder="0"></iframe>
--------------
+-----
  - By adding a single bit of code: +autologin=true+ the client automatically connects to the server and is ready for chatting without need to click on the title bar.
 +
 [source,html]
--------------
+-----
 <iframe
   src="http://minichat.tigase.org/MesComp.html?jid=your-account@tigase.org&name=YourName&domain=tigase.org&autologin=true"
   width="220px" height="250px" frameborder="0"></iframe>
--------------
+-----
  - A third option is the least intrusive but the most complex to install. It puts a small, clickable image with text on your page: *Click to chat with....* When the website visitor clicks a new window pops up with the Minichat which automatically connects to the server. You need to put some code in the web page header:
 +
 [source,html]
--------------
+-----
 <link rel="stylesheet" type="text/css"
   href="http://minichat.tigase.org/minichat.css"/>
 <link rel="stylesheet" type="text/css"
   href="http://minichat.tigase.org/mygwt-all.css" />
--------------
+-----
 +
 And similar to other configurations code in the web page body:
 +
 [source,html]
--------------
+-----
 <iframe
   src="http://minichat.tigase.org/Runner.html?jid=your-account@tigase.org&name=YourName&domain=tigase.org"
   width="220px" height="250px" frameborder="0"></iframe>
--------------
+-----
 
 _Enjoy and send us your comments..._

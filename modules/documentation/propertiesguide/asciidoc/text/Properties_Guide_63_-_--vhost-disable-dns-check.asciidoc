@@ -1,6 +1,5 @@
 [[vhostDisableDnsCheck]]
---vhost-disable-dns-check
-=========================
+= --vhost-disable-dns-check
 :author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
 :version: v1.0, October 2015
 :date: 2015-07-10

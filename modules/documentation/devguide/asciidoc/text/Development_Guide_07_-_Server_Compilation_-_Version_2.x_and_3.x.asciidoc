@@ -1,6 +1,5 @@
 [[scv23]]
-Server Compilation - version 2.x and 3.x
-========================================
+= Server Compilation - version 2.x and 3.x
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 21:22
@@ -28,38 +27,43 @@ Install all above in standard way, appropriate for your operating system. It is 
 . Get *tigase-utils* sources and compile them:
 +
 [source,bash]
-------------------------------------------------------------
+-----
 svn co https://svn.tigase.org/reps/tigase-utils/trunk/ utils
 cd utils
 ant clean jar
 cd ..
-------------------------------------------------------------
+-----
 . Get *tigase-xmltools* sources and compile them:
 +
 [source,bash]
-------------------------------------------------------------------
+-----
 svn co https://svn.tigase.org/reps/tigase-xmltools/trunk/ xmltools
 cd xmltools
 ant clean jar
 cd ..
-------------------------------------------------------------------
+-----
 . Get *tigase-server* sources and compile them:
 +
 [source,bash]
+-----
 svn co https://svn.tigase.org/reps/tigase-server/trunk/ server
 cp xmltools/jars/tigase-xmltools.jar server/libs/
 cp utils/jars/tigase-utils.jar server/libs/
 cd server
 ant clean jar
+-----
 
 Now you have *Tigase Server* compiled and ready to run. To check and make sure it is indeed compiled and can be executed you can try to start the server. Assuming you are in the directory where you executed the last compilation command for server sources run following command:
 
 [source,bash]
+-----
 java -cp libs/tigase-utils.jar:libs/tigase-xmltools.jar:jars/tigase-server.jar tigase.server.XMPPServer
+-----
 
 If it all worked correctly you should see output similar to presented below:
 
 [source,bash]
+-----
 2006-10-04 17:00:38  ConfigRepository.init()        WARNING:  Can not open existing configuration file
 2006-10-04 17:00:38  XMLDB.setupNewDB()                  INFO:     Create empty DB.
 2006-10-04 17:00:38  MessageRouter.addRegistrator()      INFO:     Adding registrator: Configurator
@@ -67,5 +71,6 @@ If it all worked correctly you should see output similar to presented below:
 2006-10-04 17:00:38  Configurator.setupLogManager()      WARNING:  DONE
 2006-10-04 17:00:38  Configurator.setupLogManager()      WARNING:  DONE
 2006-10-04 17:00:39  XMLRepository.()              WARNING:  Can not open existing user repository file
+-----
 
 Now you can proceed to configuration document to learn how to tweak server settings or you can just start hacking server code and do experiments.

@@ -1,6 +1,5 @@
 [[licenseserver]]
-Licensing
-=========
+== Licensing
 :author: Daniel Wisnewski
 :version: v1.0, March 2016
 :date: 2016-03-15 11:00
@@ -13,12 +12,10 @@ From release of v7.0.1, users and commercial clients alike may now be able to re
 This process helps us maintain licenses, and can allow for client installations of new servers without the need to wait for a license file.
 Users who do not wish to register will not be required too, Tigase XMPP Server will still be available free under AGPLv3. However, if you are a regular user of Tigase XMPP Server, you may wish to register for your own free version license.
 
-Registering for a License
--------------------------
+== Registering for a License
 To obtain a license from our licensing servers, you will first need to register with our server.  This may be done by using our web portal.
 
-Web Portal
-~~~~~~~~~~
+=== Web Portal
 Pointing your browser to link:http://license.tigase.net:8080/rest/licence/register[license.tigase.net:8080/rest/licence/register] will give you the following page:
 
 image::images/Licwebregform.png[Registation form]
@@ -48,8 +45,7 @@ Tigase Team
 Once you have this E-mail, proceed to xref:licenseconfig[License Configuration].
 
 [[licenseconfig]]
-Configuring Tigase XMPP Server License Registration
----------------------------------------------------
+== Configuring Tigase XMPP Server License Registration
 As seen earlier, you will need to include your +customer-id+ into the init.properties file on your installation by adding the line:
 [source,properties]
 -----

@@ -1,6 +1,5 @@
 [[clusterNodes]]
---cluster-nodes
-===============
+= --cluster-nodes
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2013-02-09 21:30
@@ -20,9 +19,9 @@
 The node is the full DNS name of the machine running the node. Please note the proper DNS configuration is critical for the cluster to work correctly. Make sure the 'hostname' command returns a full DNS name on each cluster node. Nodes don't have to be in the same network although good network connectivity is also a critical element for an effective cluster performance.
 
 [source,bash]
-------------------------------
+-----
 --cluster-nodes=host-a.domain.com:pass:port,host-b.domain.com:pass:port,host-c.domain.com:pass:port
-------------------------------
+-----
 
 All cluster nodes must be connected with each other to maintain user session synchronization and exchange packets between users connected to different nodes. Therefore each cluster node opens a 'cluster port' on which it is listening for connections from different cluster nodes. As there is only one connection between each two nodes Tigase server has to decide which nodes to connect to and which has to accept the connection. If you put the same list of cluster nodes in the configuration for all nodes this is not a problem. Tigase server has a way to find and void any conflicts that are found. If you however want to add a new node later on, without restarting and changing configuration on old nodes, there is no way the old nodes will try to establish a connection to the new node they don't know them. To solve this particular case the next parameter is used.
 

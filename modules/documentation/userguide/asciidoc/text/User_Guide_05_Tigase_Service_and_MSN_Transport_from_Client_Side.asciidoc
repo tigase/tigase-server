@@ -1,5 +1,4 @@
-Tigase Service and MSN Transport From Client Side
-=================================================
+= Tigase Service and MSN Transport From Client Side
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2009-11-25 15:51
@@ -34,14 +33,12 @@ All XMPP capable clients can use a MSN transport as it needs very basic XMPP pro
 Let's say we have already requested a *test* account on link:http://www.tigase.org/user/register[Tigase website] with password \*\** and we also have a MSN account:
 kobit12@hotmail.com with password: \*\*\*\*\*\*\***.
 
-Jeti
-----
+== Jeti
 Jeti is described as the first client because it might be needed for users of some other clients to initialize MSN transport for your account.
 
 Due to the number of images used in the Jeti guide it has been moved to a xref:jetiMSN[separate page].
 
-Pidgin
-------
+== Pidgin
 As mentioned earlier, Pidgin doesn't support all XMPP extensions needed for registering to MSN transport. So unfortunately you have to use a different client to add this transport to your roster. Ideally you should use one of the native XMPP stand-alone clients like link:http://psi-im.org/[Psi], or link:http://coccinella.im/[Coccinella]. However, If you don't want to install any other clients you can use http://jeti-im.org/[Jeti] which is available on Tigase's website preinstalled and preconfigured for use. Please refer to separate guide for details on how to use xref:jetiMSN[Jeti client] to get MSN transport working.
 
 Ok, now as you probably have MSN transport activated for you account you can start using link:http://www.pidgin.im/[Pidgin] to communicate with either Jabber users or MSN users.

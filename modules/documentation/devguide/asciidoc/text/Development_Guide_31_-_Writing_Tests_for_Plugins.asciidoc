@@ -1,6 +1,5 @@
 [[writingTests]]
-Writing Tests for Plugins
-=========================
+= Writing Tests for Plugins
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 21:22
@@ -23,7 +22,7 @@ Example 1. Client Stores Private Data
 *CLIENT:*
 
 [source,xml]
-------------------------------------------------------------------
+-----
 <iq type="set" id="1001">
   <query xmlns="jabber:iq:private">
     <exodus xmlns="exodus:prefs">
@@ -31,7 +30,7 @@ Example 1. Client Stores Private Data
     </exodus>
   </query>
 </iq>
-------------------------------------------------------------------
+-----
 
 *SERVER:*
 
@@ -41,7 +40,7 @@ Example 1. Client Stores Private Data
 This is enough for the first simple test. I have to create text file +JabberIqPrivate.test+ looking like this:
 
 [source,java]
-------------------------------------------------------------------
+-----
 send: {
 
 <iq type="set" id="1001">
@@ -56,12 +55,12 @@ send: {
 expect: {
 <iq type="result" id="1001"/>
 }
-------------------------------------------------------------------
+-----
 
 And now I can execute the test:
 
 [source,bash]
-------------------------------------------------------------------
+-----
 testsuite $ ./scripts/all-tests-runner.sh --single JabberIqPrivate.test
 
 Tigase server home directory: ../server
@@ -94,12 +93,12 @@ received:
 Total: 100ms
 Test time: 00:00:02
 Shutting down Tigase: 6751
-------------------------------------------------------------------
+-----
 
 If I just started working on this XEP and there is no code on the server side, the result is perfectly expected although maybe this is not what we want. After a while of working on the server code I can execute the test once again:
 
 [source,bash]
-------------------------------------------------------------------
+-----
 testsuite $ ./scripts/all-tests-runner.sh --single JabberIqPrivate.test
 
 Tigase server home directory: ../server
@@ -125,7 +124,7 @@ Common test:  Common test  ... success,  Total: 40ms
 Test time: 00:00:01
 
 Shutting down Tigase: 6984
-------------------------------------------------------------------
+-----
 
 This is it. The result we want in a simple and efficient way. We can repeat it as many times we want which is especially important in longer term trials. Every time we change the server code we can re-run tests to make sure we get correct responses from the server.
 

@@ -1,6 +1,5 @@
 [[compClass]]
---comp-class
-============
+= --comp-class
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2013-02-09 21:51
@@ -20,8 +19,8 @@
 Let's say you want to load the MUC component and the class name for the component is: +tigase.muc.MUCService+. The line in the properties file should look like:
 
 [source,bash]
-------------------------------
+-----
 --comp-class-1 = tigase.muc.MUCComponent
-------------------------------
+-----
 
 *Available since:* 3.0.0

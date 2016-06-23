@@ -1,6 +1,5 @@
 [[boshExtraHeadersFile]]
---bosh-extra-headers-file
-=========================
+= --bosh-extra-headers-file
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2013-03-20 01:00
@@ -21,12 +20,12 @@
 By default a file distributed with the installation contains following content:
 
 [source,bash]
-------------------------------
+-----
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET, POST, OPTIONS
 Access-Control-Allow-Headers: Content-Type
 Access-Control-Max-Age: 86400
-------------------------------
+-----
 
 This can be modified, removed or replaced with a different content on your installation.
 

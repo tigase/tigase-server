@@ -1,6 +1,5 @@
 [[tigaseMUC]]
-Tigase MUC Component
-====================
+= Tigase MUC Component
 :author: not known
 :version: v1.0 October 2015
 :date: 2015-10-01 15:00
@@ -16,8 +15,7 @@ Tigase MUC component is included in all Tigase distributions, to enable MUCs hav
 --comp-class-4 = tigase.muc.MUCComponent
 -----
 
-Configuration Options
----------------------
+== Configuration Options
 - *room-log-directory* +
 Directory to store chat logs
 -----
@@ -67,8 +65,7 @@ To disable joining from few resources to sinlge nickname:
 muc/muc-multi-item-allowed[B]=false
 -----
 
-History Providers Parameters
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== History Providers Parameters
 - *history-db* +
 Database type. By default the same what is used as User Repository in Server.
 Provided types: +derby+, +mysql+, +memory+, +pgsql+, +sqlserver+, +none+.
@@ -82,8 +79,7 @@ URI for database, if should be used different than default from Tigase Server:
 muc/history-db-uri=jdbc:derby:/database/tigasedbmuc
 -----
 
-Public log
-~~~~~~~~~~
+=== Public log
 - *muc-logger-class* +
 To set custom class for MUC logger:
 -----
@@ -91,9 +87,9 @@ muc/muc-logger-class=com.example.CustomLogger
 -----
 Class must implment interface +tigase.muc.logger.MucLogger+.
 
-Modules
-~~~~~~~
+=== Modules
 Each module can be configured to use custom implementation by including it in the init.properties, the defaults are as follows:
+[source,properties]
 -----
 muc/modules/jabber:iq:version[S]=tigase.component.modules.impl.JabberVersionModule
 muc/modules/owner[S]=tigase.muc.modules.RoomConfigurationModule
@@ -110,8 +106,7 @@ muc/modules/commands[S]=tigase.component.modules.impl.AdHocCommandModule
 -----
 
 [[mucRoomConfig]]
-Room Configuration options
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Room Configuration options
 In addition to the default Room configuration options defined in the MUC specification Tigase offers following as well:
 
 Tigase MUC Options::

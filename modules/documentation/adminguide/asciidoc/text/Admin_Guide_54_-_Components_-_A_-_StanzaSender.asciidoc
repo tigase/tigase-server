@@ -76,25 +76,25 @@ By default this component name is *ssend* and here is a content of the configura
 It is one of +msg-receivers+:
 
 [source,bash]
--------------------------------------
+-----
 <entry type="String[]" key="id-names">
   ...
   <item value="ssend"/>
 </entry>
--------------------------------------
+-----
 
 To activate the component and a specify class name for it following entries has been added:
 
 [source,bash]
--------------------------------------
+-----
 <entry value="true" type="Boolean" key="ssend.active"/>
 <entry value="tigase.server.ssender.StanzaSender" type="String" key="ssend.class"/>
--------------------------------------
+-----
 
 And the main settings section for the component:
 
 [source,bash]
--------------------------------------
+-----
 <component name="ssend">
   <map>
    <entry value="10" type="Long" key="default-interval"/>
@@ -123,7 +123,7 @@ And the main settings section for the component:
    </map>
   </node>
  </component>
--------------------------------------
+-----
 
 Most parameters should be pretty clear but some may need a little explanation.
 
