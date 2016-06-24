@@ -64,6 +64,10 @@ The following easier to use method will work
 component/property=value
 -----
 
+== One Certificate for multiple Vhosts
+
+Tigase now allows for wildcards in setting server certificate per Vhosts.  See more xref:onecertmultipledomain[in this section].
+
 === Maximum users setting for MUC
 
 Administrators can now set that maximum number of users allowed on specific MUCs.
@@ -442,6 +446,8 @@ Tigase has improved default settings to improve performance.  These include:
 - link:https://projects.tigase.org/issues/4052[#4052] Fixed issue with ClusterRepoItem not properly resulting in +tigase.db.comp.RepositoryChangeListenerIfc.itemUpdated(Item)+ being executed.
 
 - link:https://projects.tigase.org/issues/4056[#4056] Items removed from cluster repository are not removed from memory correctly.
+
+- link:https://projects.tigase.org/issues/4071[#4071] Updated groovy script to properly add owner to node creation VIA ad-hoc command.
 
 - link:https://projects.tigase.org/issues/4142[#4142] Updated wrapper.conf file to match tigase.conf default settings.
 

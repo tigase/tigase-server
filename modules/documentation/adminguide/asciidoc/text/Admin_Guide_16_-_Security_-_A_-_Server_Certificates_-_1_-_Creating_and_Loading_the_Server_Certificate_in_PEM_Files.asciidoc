@@ -136,6 +136,25 @@ There is number of certificate providers offering certificates either for free o
 
 To obtain certificate from a third party authority you have to go to its website and request the certificate using certificate request generated above. I cannot provide any instructions for this as each of the providers listed have different requirements and interfaces.
 
+[[onecertmultipledomain]]
+== Using one certificate for multiple domains
+By default, each virtual hosts will require it's own certificate.  However, if you choose to use one certificate for all virtual hosts, Tigase supports that option.
+For example, if you have host1.example.net, host2.example.net, and host3.example.net each vhost will need some configuration:
+[source,properties]
+-----
+basic-conf/virtual-hosts-cert-host1.example.net=/home/tigase/certs/host1.pem
+basic-conf/virtual-hosts-cert-host2.example.net=/home/tigase/certs/host2.pem
+basic-conf/virtual-hosts-cert-host3.example.net=/home/tigase/certs/host3.pem
+-----
+This may be time consuming if you have many Vhosts, or expect to generate many more.  The good news is, now one certificate can be used for ALL Vhosts using the following configuration line:
+[source,properties]
+-----
+basic-conf/virt-hosts-cert-*.example.net=/home/tigase/certs/certificate.pem
+-----
+
+Now any Vhosts created will use the same certificate located at /home/tigase/certs/certificate.pem. *NOTE:* This is an all or nothing option, if you wish to customize each Vhost, you will need to do so individually.
+
+
 == Tigase Server Configuration for 5.1.0 and older
 
 Starting from version 5.1.0 and newer it's not needed to use external libraries nor extra configuration in the init.properties file. With this version Tigase uses, loaded by default thus no need to configure it, following class:
