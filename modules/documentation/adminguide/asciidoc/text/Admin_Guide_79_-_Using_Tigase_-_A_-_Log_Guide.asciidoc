@@ -75,6 +75,9 @@ This code, if entered into the init.properties file increases the size of the fi
 
 _You may see a tigase.log.0.ick file in the directory while the server is running.  This is a temporary file only and is deleted once Tigase is cleanly shut down._
 
+== statistics.log.#
+Statistics log will duplicate any information that is related to sending of statistics to Tigase if you are using an unlicenced copy of Tigase XMPP server.  Mainly it will consist output of +LicenceChecker+.  The numbering logic will be the same as tigase.log.# files.
+
 == tigase.pid
 tigase.pid is a file that just contains the Process ID or PID for the current run of Tigase. It is only valid for the current or most recent run cycle and is overwritten every time Tigase starts.
 
