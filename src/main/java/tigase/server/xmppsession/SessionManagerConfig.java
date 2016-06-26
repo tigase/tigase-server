@@ -121,7 +121,8 @@ public abstract class SessionManagerConfig {
 		"presence-state", "presence-subscription",
 
 		// "basic-filter",
-		"disco", "domain-filter", "zlib", "amp", "message-carbons", "vcard-xep-0292", "urn:xmpp:time"
+		"disco", "domain-filter", "zlib", "amp", "message-carbons", "vcard-xep-0292", "urn:xmpp:time",
+		"urn:xmpp:csi:0"
 	};
 
 	/**
@@ -138,7 +139,8 @@ public abstract class SessionManagerConfig {
 		"presence-state", "presence-subscription",
 
 		// "basic-filter",
-		"disco", "domain-filter", "zlib", "amp", "message-carbons", "vcard-xep-0292", "urn:xmpp:time"
+		"disco", "domain-filter", "zlib", "amp", "message-carbons", "vcard-xep-0292", "urn:xmpp:time",
+		"urn:xmpp:csi:0"
 	};
 	private static final String[] PLUGINS_FULL_PROP_VAL = {
 		sessionCloseProcId, sessionOpenProcId, defaultHandlerProcId, "jabber:iq:register",
@@ -150,7 +152,8 @@ public abstract class SessionManagerConfig {
 		"presence-state", "presence-subscription",
 
 		// "basic-filter",
-		"disco", "domain-filter", "zlib", "amp", "message-carbons", "vcard-xep-0292", "urn:xmpp:time"
+		"disco", "domain-filter", "zlib", "amp", "message-carbons", "vcard-xep-0292", "urn:xmpp:time",
+		"urn:xmpp:csi:0"
 	};
 	private static String[]      TRUSTED_PROP_VAL = { "admin@localhost", "admin@hostname" };
 	private static final boolean SKIP_PRIVACY_PROP_VAL = false;
