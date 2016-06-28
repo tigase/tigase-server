@@ -958,6 +958,8 @@ public abstract class AbstractMessageReceiver
 		out_queues_size       = processingOutThreads();
 		schedulerThreads_size = schedulerThreads();
 		setMaxQueueSize(maxQueueSize);
+		setIncomingFilters(new ArrayList<>(incoming_filters));
+		setOutogingFilters(new ArrayList<>(outgoing_filters));
 	}
 
 	@Override
