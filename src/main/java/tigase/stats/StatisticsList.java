@@ -52,30 +52,12 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	// ~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 *
-	 * @param level
-	 */
 	public StatisticsList(Level level) {
 		this.statLevel = level;
 	}
 
 	// ~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 * @param description
-	 * @param value
-	 * @param recordLevel
-	 * @return 
-	 *
-	 *
-	 */
 	public boolean add(String comp, String description, long value, Level recordLevel) {
 		if (checkLevel(recordLevel, value)) {
 			LinkedHashMap<String, StatRecord> compStats = stats.get(comp);
@@ -93,18 +75,6 @@ public class StatisticsList implements Iterable<StatRecord> {
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 * @param description
-	 * @param value
-	 * @param recordLevel
-	 * @return 
-	 *
-	 *
-	 */
 	public boolean add(String comp, String description, int value, Level recordLevel) {
 		if (checkLevel(recordLevel, value)) {
 			LinkedHashMap<String, StatRecord> compStats = stats.get(comp);
@@ -122,18 +92,6 @@ public class StatisticsList implements Iterable<StatRecord> {
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 * @param description
-	 * @param value
-	 * @param recordLevel
-	 * @return 
-	 *
-	 *
-	 */
 	public boolean add(String comp, String description, String value, Level recordLevel) {
 		if (checkLevel(recordLevel)) {
 			LinkedHashMap<String, StatRecord> compStats = stats.get(comp);
@@ -151,18 +109,6 @@ public class StatisticsList implements Iterable<StatRecord> {
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 * @param description
-	 * @param value
-	 * @param recordLevel
-	 * @return 
-	 *
-	 *
-	 */
 	public boolean add(String comp, String description, float value, Level recordLevel) {
 		if (checkLevel(recordLevel)) {
 			LinkedHashMap<String, StatRecord> compStats = stats.get(comp);
@@ -180,15 +126,6 @@ public class StatisticsList implements Iterable<StatRecord> {
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 * @return 
-	 *
-	 *
-	 */
 	public LinkedHashMap<String, StatRecord> addCompStats(String comp) {
 		LinkedHashMap<String, StatRecord> compStats = new LinkedHashMap<String, StatRecord>();
 
@@ -197,29 +134,10 @@ public class StatisticsList implements Iterable<StatRecord> {
 		return compStats;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param recordLevel
-	 * @return 
-	 *
-	 *
-	 */
 	public boolean checkLevel(Level recordLevel) {
 		return recordLevel.intValue() >= statLevel.intValue();
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param recordLevel
-	 * @param value
-	 * @return 
-	 *
-	 *
-	 */
 	public boolean checkLevel(Level recordLevel, long value) {
 		if (checkLevel(recordLevel)) {
 			if (value == 0) {
@@ -232,16 +150,6 @@ public class StatisticsList implements Iterable<StatRecord> {
 		return false;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param recordLevel
-	 * @param value
-	 * @return 
-	 *
-	 *
-	 */
 	public boolean checkLevel(Level recordLevel, int value) {
 		if (checkLevel(recordLevel)) {
 			if (value == 0) {
@@ -256,54 +164,18 @@ public class StatisticsList implements Iterable<StatRecord> {
 
 	// ~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 * @return 
-	 *
-	 *
-	 */
 	public int getCompConnections(String comp) {
 		return getValue(comp, "Open connections", 0);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 * @return 
-	 *
-	 *
-	 */
 	public long getCompIq(String comp) {
 		return getCompIqSent(comp) + getCompIqReceived(comp);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 * @return 
-	 *
-	 *
-	 */
 	public long getCompIqReceived(String comp) {
 		return getValue(comp, QueueType.IN_QUEUE.name() + " processed IQ", 0L);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 * @return 
-	 *
-	 *
-	 */
 	public long getCompIqSent(String comp) {
 		return getValue(comp, QueueType.OUT_QUEUE.name() + " processed IQ", 0L);
 	}
@@ -317,147 +189,46 @@ public class StatisticsList implements Iterable<StatRecord> {
 		return stats.keySet();
 	}
 	
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 * @return 
-	 *
-	 *
-	 */
 	public long getCompMsg(String comp) {
 		return getCompMsgSent(comp) + getCompMsgReceived(comp);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 * @return 
-	 *
-	 *
-	 */
 	public long getCompMsgReceived(String comp) {
 		return getValue(comp, QueueType.IN_QUEUE.name() + " processed messages", 0L);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 * @return 
-	 *
-	 *
-	 */
 	public long getCompMsgSent(String comp) {
 		return getValue(comp, QueueType.OUT_QUEUE.name() + " processed messages", 0L);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 * @return 
-	 *
-	 *
-	 */
 	public long getCompPackets(String comp) {
 		return getCompSentPackets(comp) + getCompReceivedPackets(comp);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 * @return 
-	 *
-	 *
-	 */
 	public long getCompPres(String comp) {
 		return getCompPresSent(comp) + getCompPresReceived(comp);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 * @return 
-	 *
-	 *
-	 */
 	public long getCompPresReceived(String comp) {
 		return getValue(comp, QueueType.IN_QUEUE.name() + " processed presences", 0L);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 * @return 
-	 *
-	 *
-	 */
 	public long getCompPresSent(String comp) {
 		return getValue(comp, QueueType.OUT_QUEUE.name() + " processed presences", 0L);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 * @return 
-	 *
-	 *
-	 */
 	public long getCompReceivedPackets(String comp) {
 		return getValue(comp, StatisticType.MSG_RECEIVED_OK.getDescription(), 0L);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 * @return 
-	 *
-	 *
-	 */
 	public long getCompSentPackets(String comp) {
 		return getValue(comp, StatisticType.MSG_SENT_OK.getDescription(), 0L);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 * @return 
-	 *
-	 *
-	 */
 	public LinkedHashMap<String, StatRecord> getCompStats(String comp) {
 		return stats.get(comp);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 * @param description
-	 * @param def
-	 * @return 
-	 *
-	 *
-	 */
 	public long getValue(String comp, String description, long def) {
 		long result = def;
 		LinkedHashMap<String, StatRecord> compStats = stats.get(comp);
@@ -473,17 +244,6 @@ public class StatisticsList implements Iterable<StatRecord> {
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 * @param description
-	 * @param def
-	 * @return 
-	 *
-	 *
-	 */
 	public float getValue(String comp, String description, float def) {
 		float result = def;
 		LinkedHashMap<String, StatRecord> compStats = stats.get(comp);
@@ -499,17 +259,6 @@ public class StatisticsList implements Iterable<StatRecord> {
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 * @param description
-	 * @param def
-	 * @return 
-	 *
-	 *
-	 */
 	public int getValue(String comp, String description, int def) {
 		int result = def;
 		LinkedHashMap<String, StatRecord> compStats = stats.get(comp);
@@ -525,17 +274,6 @@ public class StatisticsList implements Iterable<StatRecord> {
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param comp
-	 * @param description
-	 * @param def
-	 * @return 
-	 *
-	 *
-	 */
 	public String getValue(String comp, String description, String def) {
 		String result = def;
 		LinkedHashMap<String, StatRecord> compStats = stats.get(comp);
