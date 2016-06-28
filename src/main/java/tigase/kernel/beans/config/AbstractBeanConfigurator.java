@@ -210,10 +210,15 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		if (values != null) {
 			Map<String, BeanPropConfig> beanPropConfigMap = new HashMap<>();
 
-			String beansProp = (String) values.get("beans");
+			List<String> beansProp = null;
+			Object beansValue = values.get("beans");
+			if (beansValue instanceof String) {
+				beansProp = Arrays.asList(((String) beansValue).split(","));
+			} else if (beansValue instanceof List) {
+				beansProp = (List<String>) beansValue;
+			}
 			if (beansProp != null) {
-				String[] beansPropArr = beansProp.split(",");
-				for (String beanStr : beansPropArr) {
+				for (String beanStr : beansProp) {
 					String beanName = beanStr;
 					boolean active = true;
 					if (beanStr.startsWith("-")) {
