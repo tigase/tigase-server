@@ -45,7 +45,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static tigase.conf.Configurable.GEN_SM_PLUGINS;
+import static tigase.conf.Configurable.*;
+import static tigase.conf.ConfiguratorAbstract.LOGGING_KEY;
 import static tigase.conf.ConfiguratorAbstract.PROPERTY_FILENAME_PROP_DEF;
 import static tigase.conf.ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY;
 
@@ -75,6 +76,7 @@ public class Bootstrap implements Lifecycle {
 			loadFromPropertiesFiles(settings);
 			dumpToDSLFile();
 		}
+		configureLogManager();
 	}
 
 	private boolean isDslConfig() {
@@ -317,5 +319,81 @@ public class Bootstrap implements Lifecycle {
 
 	protected Kernel getKernel() {
 		return kernel;
+	}
+
+	// Common logging setup
+	private Map<String, String> loggingSetup = new LinkedHashMap<String, String>(10);
+
+	private void configureLogManager() {
+		Map<String, Object> cfg = prepareLogManagerConfiguration(props);
+		setupLogManager(cfg);
+	}
+
+	private Map<String, Object> prepareLogManagerConfiguration(Map<String, Object> params) {
+		Map<String, Object> defaults = new HashMap<>();
+		String              levelStr = ".level";
+
+		if ((Boolean) params.get(GEN_TEST)) {
+			defaults.put(LOGGING_KEY + levelStr, "WARNING");
+		} else {
+			defaults.put(LOGGING_KEY + levelStr, "CONFIG");
+		}
+		defaults.put(LOGGING_KEY + "handlers",
+				"java.util.logging.ConsoleHandler java.util.logging.FileHandler");
+		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.formatter",
+				"tigase.util.LogFormatter");
+		defaults.put(LOGGING_KEY + "java.util.logging.ConsoleHandler.level", "WARNING");
+		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.append", "true");
+		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.count", "5");
+		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.formatter",
+				"tigase.util.LogFormatter");
+		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.limit", "10000000");
+		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.pattern",
+				"logs/tigase.log");
+		defaults.put(LOGGING_KEY + "tigase.useParentHandlers", "true");
+		defaults.put(LOGGING_KEY + "java.util.logging.FileHandler.level", "ALL");
+		if (params.get(GEN_DEBUG) != null) {
+			String[] packs = ((String) params.get(GEN_DEBUG)).split(",");
+
+			for (String pack : packs) {
+				defaults.put(LOGGING_KEY + "tigase." + pack + ".level", "ALL");
+			}    // end of for (String pack: packs)
+		}
+		if (params.get(GEN_DEBUG_PACKAGES) != null) {
+			String[] packs = ((String) params.get(GEN_DEBUG_PACKAGES)).split(",");
+
+			for (String pack : packs) {
+				defaults.put(LOGGING_KEY + pack + ".level", "ALL");
+			}    // end of for (String pack: packs)
+		}
+
+		return defaults;
+	}
+
+	private void setupLogManager( Map<String, Object> properties ) {
+		Set<Map.Entry<String, Object>> entries = properties.entrySet();
+		StringBuilder buff = new StringBuilder( 200 );
+
+		for ( Map.Entry<String, Object> entry : entries ) {
+			if ( entry.getKey().startsWith( LOGGING_KEY ) ){
+				String key = entry.getKey().substring( LOGGING_KEY.length() );
+				loggingSetup.put( key, entry.getValue().toString() );
+			}
+		}
+
+		for ( String key : loggingSetup.keySet() ) {
+			String entry = loggingSetup.get( key );
+			buff.append( key ).append( "=" ).append( entry ).append( "\n" );
+			if ( key.equals( "java.util.logging.FileHandler.pattern" ) ){
+				File log_path = new File( entry ).getParentFile();
+				if ( !log_path.exists() ){
+					log_path.mkdirs();
+				}
+			}    // end of if (key.equals())
+		}      // end of if (entry.getKey().startsWith(LOGGING_KEY))
+
+		// System.out.println("Setting logging: \n" + buff.toString());
+		ConfiguratorAbstract.loadLogManagerConfig(buff.toString());
+		log.config("DONE");
 	}
 }

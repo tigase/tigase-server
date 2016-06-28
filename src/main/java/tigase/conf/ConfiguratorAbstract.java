@@ -106,7 +106,7 @@ public abstract class ConfiguratorAbstract
 	@Deprecated
 	public static final String USER_DOMAIN_POOL_CLASS_PROP_VAL = RepositoryFactory
 			.USER_DOMAIN_POOL_CLASS_PROP_VAL;
-	private static final String LOGGING_KEY = "logging/";
+	public static final String LOGGING_KEY = "logging/";
 	private static final Logger log = Logger.getLogger(ConfiguratorAbstract.class
 			.getName());
 	private static MonitoringSetupIfc monitoring = null;
