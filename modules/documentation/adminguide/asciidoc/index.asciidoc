@@ -53,6 +53,8 @@ include::text/Admin_Guide_13_-_Configuration_-_D_-_Configuration_Storage_Options
 
 include::text/Admin_Guide_13_-_Configuration_-_E_-_JVM_settings.asciidoc[]
 
+include::text/Admin_Guide_105_-_Configuration_-_F_-_Sess-man.asciidoc[]
+
 :leveloffset: 1
 
 include::text/Admin_Guide_14_-_Security.asciidoc[]

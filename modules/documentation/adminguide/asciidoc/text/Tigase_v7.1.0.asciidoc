@@ -17,6 +17,7 @@ Please note that not all issues are accessible as notes and fixes may contain pr
 Tigase has undergone a few major changes to our code and structure. To continue to use Tigase, a few changes may be needed to be made to your systems.  Please see them below:
 
 
+
 === HTTP Component renamed
 The HTTP component has been renamed, if you still have the old tigase.rest.RestMessageReciever in your init.properties file, please update the component name to:
 [source,bash]
@@ -63,6 +64,9 @@ The following easier to use method will work
 -----
 component/property=value
 -----
+
+=== Support for XEP-0352
+Client State Indication is now enabled by default on Tigase XMPP Servers.  Details xref:sessManMobileOpts[here].
 
 == One Certificate for multiple Vhosts
 
@@ -450,6 +454,8 @@ Tigase has improved default settings to improve performance.  These include:
 - link:https://projects.tigase.org/issues/4071[#4071] Updated groovy script to properly add owner to node creation VIA ad-hoc command.
 
 - link:https://projects.tigase.org/issues/4142[#4142] Updated wrapper.conf file to match tigase.conf default settings.
+
+- link:https://projects.tigase.org/issues/4183[#4183] Fixed issue where objects monitored by Ghostbuster.java in MUC could not be removed by it.
 
 - Patch added to fix ConcurrentModificationException in BlockingCommand plugin.
 
