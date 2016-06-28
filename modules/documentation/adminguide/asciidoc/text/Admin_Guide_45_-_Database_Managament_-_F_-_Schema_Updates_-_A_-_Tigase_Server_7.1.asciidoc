@@ -1,6 +1,5 @@
 [[tigaseServer71]]
-Tigase Server Schema v7.1 Updates
-=================================
+= Tigase Server Schema v7.1 Updates
 :author: Daniel Wisnewski
 :version: v1.0 October 2015
 :Date: 2015-10-12 15:36
@@ -9,8 +8,7 @@ Tigase Server Schema v7.1 Updates
 :website: http://www.tigase.org
 
 [[v710notice]]
-*FOR ALL USERS UPGRADING TO v7.1.0 FROM A v7.0.2 INSTALLATION*
---------------------------------------------------------------
+== *FOR ALL USERS UPGRADING TO v7.1.0 FROM A v7.0.2 INSTALLATION*
 The schema has changed for the main database, and the pubsub repository.  In order to upgrade to the new schemas, you will need to do the following: +
 
 1. Upgrade the Main database schema to v7.1 using the database/${DB_TYPE}-schema-upgrade-to-7-1.sql file
@@ -22,8 +20,7 @@ The schema has changed for the main database, and the pubsub repository.  In ord
 All three commands may be done at the same time in that order, it is suggested you make a backup of your current database to prevent data loss.
 
 
-Tigase Schema Change for v7.1
------------------------------
+== Tigase Schema Change for v7.1
 Tigase has made changes to its database to include primary keys in the tig_pairs table to improve performance of the Tigase server.  This is an auto-incremented column for Primary Key items appended to the previous schema.
 
 *You MUST update your database to be compliant with the new v7.1 schema.  If you do not, Tigase will not function properly.*
@@ -71,8 +68,7 @@ Once this has successfully executed, you may restart you server.  Watch logs for
 
 
 [[pubSub71]]
-Changes to Pubsub Schema
-------------------------
+== Changes to Pubsub Schema
 Tigase has had a change to the PubSub Schema, to upgrade to PubSub Schema v7.1 without having to reform your databases, use this guide to update your databases to be compatible with the new version of Tigase.
 
 *NOTE* Current PubSub Schema is v3.2.0, you will need to repeat these instructions for v3.1.0 and then v3.2.0 before you run Tigase V7.1.0.

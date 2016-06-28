@@ -795,6 +795,20 @@ The average compression ratio of data received from other clusters during the se
 cl-comp/Average decompression ratio
 -----
 
+=== Known cluster nodes
+
+The number of cluster nodes currently connected to the server.
+
+*Statistics Level*: INFO
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+cl-comp/Known cluster nodes
+-----
+
 === Last {interval} disconnects
 
 The number of cluster disconnections within the specified interval.
@@ -2047,6 +2061,65 @@ pubsub/XmppPingModule last hour
 pubsub/XmppPingModule last minute
 pubsub/XmppPingModule last second
 pubsub/XmppPingModule/Average processing time
+-----
+
+[[repo-factoryStatistics]]
+== *repo-factory*
+
+=== repo-factory/Number of data repositories
+
+The number of data repositories setup for this XMPP server.
+
+*Statistics Level*: FINE
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+repo-factory/Number of data repositories
+-----
+
+=== repo-factory/repository {jdbclocation} connections count
+
+The number of connections made to this database.
+
+*Statistics Level*: FINE
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+repo-factory/repository {jdbclocation} connections count
+-----
+
+=== repo-factory/repository {jdbclocation} reconnections
+
+The number of reconnections made to this database.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+repo-factory/repository {jdbclocation} reconnections
+-----
+
+=== repo-factory/repository {jdbclocation} failed reconnections
+
+The number of reconnections that have failed to connect to this database.
+
+*Statistics Level*: FINEST
+
+*Result Format*: Integer
+
+*List of possible statistics*:
+[source,list]
+-----
+repo-factory/repository {jdbclocation} failed reconnections
 -----
 
 == *rest*

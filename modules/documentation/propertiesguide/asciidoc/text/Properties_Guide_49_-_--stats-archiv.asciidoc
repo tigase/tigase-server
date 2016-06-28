@@ -1,6 +1,5 @@
 [[statsArchiv]]
---stats-archiv
-==============
+= --stats-archiv
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2014-06-10 18:21
@@ -31,28 +30,28 @@ Currently following archivers classes are available:
 It's possible to configure each archiver by adding following entry to the +etc/init.properties+ file:
 
 [source,bash]
-------------------------------
+-----
 <statistics_component_name>/stats-archiv/<name>/<property>=<value>
-------------------------------
+-----
 
 For example, if we want to enable CounterDataFileLogger that stores statistics every 60 seconds:
 
 [source,bash]
-------------------------------
+-----
 --stats-archiv=tigase.stats.CounterDataFileLogger:stats-file-logger:60
-------------------------------
+-----
 
 We can configure it further with following options:
 
 [source,bash]
-------------------------------
+-----
 stats/stats-archiv/stats-file-logger/stats-directory=logs/server_statistics
 stats/stats-archiv/stats-file-logger/stats-filename=stat
 stats/stats-archiv/stats-file-logger/stats-unixtime=false
 stats/stats-archiv/stats-file-logger/stats-datetime=true
 stats/stats-archiv/stats-file-logger/stats-datetime-format=HH:mm:ss
 stats/stats-archiv/stats-file-logger/stats-level=FINE
-------------------------------
+-----
 
 which configures accordingly: directory to which files should be saved, filename prefix, whether to include or not unix timestamp in filename, whether to include or not datetime timestamp, control format of timestamp (using java DateFormat pattern) and also set level of the statistics we want to save (using java Logger.Level)
 

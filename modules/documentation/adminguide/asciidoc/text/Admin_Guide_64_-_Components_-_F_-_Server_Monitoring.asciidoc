@@ -1,6 +1,5 @@
 [[serverMonitoring]]
-Server Monitoring
-=================
+= Server Monitoring
 :author: Unknown
 :version: v1.0
 

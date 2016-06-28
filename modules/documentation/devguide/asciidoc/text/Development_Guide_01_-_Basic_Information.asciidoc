@@ -1,6 +1,5 @@
 [[basicInfo]]
-Basic Information
-=================
+= Basic Information
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 21:22
@@ -10,8 +9,7 @@ Basic Information
 :numbered:
 :website: http://tigase.net/
 
-Tigase Server Elements
-----------------------
+== Tigase Server Elements
 To make it easier to get into the code below are defined basic terms in the Tigase server world and there is a brief explanation how the server is designed and implemented. This document also points you to basic interfaces and implementations which can be used as example code reference.
 
 Logically all server code can be divided into 3 kinds of modules: *components*, *plug-ins* and *connectors*.
@@ -24,9 +22,7 @@ There is an API defined for each kind of above modules and all you have to do is
 
 Here is a brief list of all interfaces to look at and for more details you have to refer to the guide for specific kind of module.
 
-Components
-~~~~~~~~~~
-
+=== Components
 This is list of interfaces to look at when you work on a new component:
 
 . *tigase.server.ServerComponent* - This is the very basic interface for component. All components must implement it.
@@ -43,37 +39,34 @@ Instead of implementing above interfaces directly I would recommend to extend on
 +ServerComponent+, +MessageReceiver+, +Configurable+ and +StatisticsContainer+. AbstractMessageReceiver also manages internal data queues using it's own threads which prevents dead-locks from resource starvation. It offers even-driven data processing which means whenever packet arrives the +abstract void processPacket(Packet packet);+ method is called to process it. You have to implement this abstract method in your component, if your component wants to send a packet (in response to data it received for example).
 
 [source,java]
-----------------------------------
+-----
 boolean addOutPacket(Packet packet)
-----------------------------------
+-----
 
 
 - *tigase.server.ConnectionManager* - This is an extension of +AbstractMessageReceiver+ abstract class. As the name says this class takes care of all network connection management stuff. If your component needs to send and receive data directly from the network (like c2s connection, s2s connection or external component) you should use this implementation as a basic class. It takes care of all things related to networking, I/O, reconnecting, listening on socket, connecting and so on. If you extend this class you have to expect data coming from to sources: from the +MessageRouter+ and this is when the
 
 [source,java]
-----------------------------------
+-----
 abstract void processPacket(Packet packet);
-----------------------------------
+-----
 method is called and from network connection and then the
 [source,java]
-----------------------------------
+-----
 abstract Queue processSocketData(XMPPIOService serv);
-----------------------------------
+-----
 method is called.
 
-Plug-ins
-~~~~~~~~
+=== Plug-ins
 All Tigase plugins currently implemented are located in package: tigase.xmpp.impl. You can use this code as a sample code base. There are 3 types of plug-ins and they are defined in interfaces located in +tigase.xmpp+ package:
 
 . *XMPPProcessorIfc* - The most important and basic plug-in. This is the most common plug-in type which just processes stanzas in normal mode. It receives packets, processes them on behalf of the user and returns resulting stanzas.
 . *XMPPPreprocessorIfc* - This plugin performs pre-processing of the packet, intended for the pre-processors to setup for packet blocking.
 . *XMPPPostprocessorIfc* - This plugin performs processing of packets for which there was no specific processor.
 
-Connector
----------
+== Connector
 
-Data, Stanzas, Packets - Data Flow and Processing
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Data, Stanzas, Packets - Data Flow and Processing
 Data received from the network are read from the network sockets as bytes by code in the +tigase.io+ package. Bytes then are changed into characters in classes of +tigase.net+ package and as characters they are sent to the XML parser (+tigase.xml+) which turns them to XML DOM structures.
 
 All data inside the server is exchanged in XML DOM form as this is the format used by XMPP protocol. For basic XML data processing (parsing characters stream, building DOM, manipulate XML elements and attributes) we use link:https://projects.tigase.org/projects/tigase-xmltools[Tigase XML parser and DOM builder].

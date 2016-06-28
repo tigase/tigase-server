@@ -1,6 +1,5 @@
 [[tigase3xconfiguration]]
-Configuration Wizards
-=====================
+= Configuration Wizards
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 21:16
@@ -62,7 +61,7 @@ For each of above generators you can use additional parameters specifying other 
 *Note!* +tigase.conf+ _property file is NOT read by the tigase server. These properties are read by the bash shell to create a proper Tigase server startup command. It will not work on MS Windows unless you run it in bash (using CygWin for example). On windows however you can use configuration wizards too by preparing proper server startup command manually. For example command for the first below presented conf file would look like (all in single line):_
 
 [source,sh]
--------------------------------------
+-----
 java -Djdbc.drivers=org.postgresql.Driver
  -Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8
  -server -Xms100M -Xmx100M
@@ -71,55 +70,55 @@ java -Djdbc.drivers=org.postgresql.Driver
  -c "etc/tigase.xml"
  --gen-config-def --user-db pgsql
  --user-db-uri "jdbc:postgresql://localhost/tigase?user=tigase"
--------------------------------------
+-----
 
 So for example to take advantage of these options you can create tigase.conf and start Tigase server with usual command to generate ''tigase-config.xml'' configuration file:
 
 [source,sh]
--------------------------------------
+-----
 ./bin/tigase.sh run tigase.conf
--------------------------------------
+-----
 
 A few sample files are included below for your convenience:
 
 - +tigase-def-pgsql.conf+ - default installation with PostgreSQL database support:
 +
 [source,bash]
--------------------------------------
+-----
 ENC="-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8"
 DRV="-Djdbc.drivers=org.postgresql.Driver"
 JAVA_OPTIONS="${ENC} ${DRV} -server -Xms100M -Xmx100M "
 
 TIGASE_CONFIG="tigase-pgsql.xml"
 TIGASE_OPTIONS="--gen-config-def --user-db pgsql --user-db-uri jdbc:postgresql://localhost/tigase?user=tigase "
--------------------------------------
+-----
 +
 [source,bash]
--------------------------------------
+-----
 ENC="-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8"
 DRV="-Djdbc.drivers=org.postgresql.Driver"
 JAVA_OPTIONS="${ENC} ${DRV} -server -Xms100M -Xmx100M "
 
 TIGASE_CONFIG="tigase-pgsql.xml"
 TIGASE_OPTIONS="--gen-config-def --user-db pgsql "
--------------------------------------
+-----
 
 - +tigase-cs.conf+ - installation of network connections management components (no DB is used by this instance):
 +
 [source,bash]
--------------------------------------
+-----
 ENC="-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8"
 JAVA_OPTIONS="${ENC} -server -Xms100M -Xmx100M "
 
 TIGASE_CONFIG="etc/tigase-cs.xml"
 TIGASE_OPTIONS="--gen-config-cs --virt-hosts cs.tigase.org,tigase.org,sm.tigase.org \
   --ext-comp cs.tigase.org,sm.tigase.org,5678,very-secret,plain,connect"
--------------------------------------
+-----
 
 - +tigase-sm-mysql.conf+ - installation of session manager instance and resource connection string is the same as default so we can skip '--user-db-uri' parameter:
 +
 [source,bash]
--------------------------------------
+-----
 ENC="-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8"
 DRV="-Djdbc.drivers=com.mysql.jdbc.Driver"
 
@@ -127,4 +126,4 @@ JAVA_OPTIONS="${ENC} ${DRV} -server -Xms100M -Xmx100M "
 TIGASE_CONFIG="etc/tigase-sm-mysql.xml"
 TIGASE_OPTIONS="--gen-config-sm --user-db mysql --auth-db mysql --virt-hosts tigase.org,sm.tigase.org \
   --ext-comp sm.tigase.org,cs.tigase.org,5678,very-secret,plain,accept"
--------------------------------------
+-----

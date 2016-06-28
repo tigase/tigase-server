@@ -1,6 +1,5 @@
 [[cil3]]
-Component Implementation - Lesson 3 - Multi-Threading
-=====================================================
+= Component Implementation - Lesson 3 - Multi-Threading
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-01-06 20:22
@@ -19,6 +18,7 @@ Tigase API offers a very simple way to execute component's +processPacket(Packet
 If the packet processing is CPU bound only, you normally want to have as many threads as there are CPUs available:
 
 [source,java]
+-----
 @Override
 public int processingInThreads() {
   return Runtime.getRuntime().availableProcessors();
@@ -27,7 +27,7 @@ public int processingInThreads() {
 public int processingOutThreads() {
   return Runtime.getRuntime().availableProcessors();
 }
-
+-----
 
 If the processing is I/O bound (network or database) you probably want to have more threads to process requests. It is hard to guess the ideal number of threads right on the first try. Instead you should run a few tests to see how many threads is best for implementation of the component.
 
@@ -41,7 +41,7 @@ int thread_idx = hashCodeForPacket(packet) % threads_total;
 So the key here is using the +hashCodeForPacket(...)+ method. By overwriting it we can make sure that all packets addressed to the same user will always be processed by the same thread:
 
 [source,java]
------------------------------------------------------------------
+-----
 @Override
 public int hashCodeForPacket(Packet packet) {
   if (packet.getElemTo() != null) {
@@ -58,7 +58,7 @@ public int hashCodeForPacket(Packet packet) {
   // find a better way to calculate hashCode
   return 1;
 }
------------------------------------------------------------------
+-----
 
 The above two methods give control over the number of threads assigned to the packets processing in your component and to the packet distribution among threads. This is not all Tigase API has to offer in terms of multi-threading.
 
@@ -67,14 +67,16 @@ Sometimes you want to perform some periodic actions. You can of course create Ti
 First, you have three methods allowing your to perform some periodic actions:
 
 [source,java]
+-----
 public synchronized void everySecond();
 public synchronized void everyMinute();
 public synchronized void everyHour();
+-----
 
 An example implementation for periodic notifications sent to some address could look like this one:
 
 [source,java]
-------------------------------------------------------------------
+-----
 @Override
 public synchronized void everyMinute() {
   super.everyMinute();
@@ -86,23 +88,24 @@ public synchronized void everyMinute() {
     spamCounter = 0;
   }
 }
-------------------------------------------------------------------
+-----
 
 This method sends every *notificationFrequency* minute a message to *abuseAddress* reporting how many spam messages have been detected during last period. Please note, you have to call +super.everyMinute()+ to make sure other actions are executed as well and you have to also remember to keep processing in this method to minimum, especially if you overwrite +everySecond()+ method.
 
 There are also two methods which allow you to schedule tasks executed at certain time, they are very similar to the +java.util.Timer+ API with the only difference is that Timer is reused among all levels of Class hierarchy. There is a separate +Timer+ for each Class instance though, to avoid interferences between separate components:
 
 [source,java]
+-----
 addTimerTask(TimerTask task, long delay, TimeUnit unit);
 addTimerTask(TimerTask task, long delay);
-
+-----
 
 There is one more method which can be used which is not directly related to multi-threading, but might be very helpful for executing some actions at a very specific point of time. This is the point of time when the server has just been initialized, that is all components have been created and received their configuration for the first time. When this happens Tigase calls +void initializationCompleted()+ method for each server component. You can overwrite this method to execute some actions at the time when you are sure the Tigase has started and is fully functional.
 
 Here is a code of an example component which uses all the API discussed in this article:
 
 [source,java]
---------------------------------------------------------------------------
+-----
 import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -222,4 +225,4 @@ public class TestComponent extends AbstractMessageReceiver {
   }
 
 }
---------------------------------------------------------------------------
+-----

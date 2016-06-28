@@ -1,6 +1,5 @@
 [[customAuthentication]]
-Custom Authentication Connectors
-================================
+= Custom Authentication Connectors
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 21:18
@@ -34,33 +33,33 @@ If you happen to keep the user data in the same database as user authentication 
 '--auth-db-uri' stored a standard JDBC connection URL and is exactly the same as for all other settings. For example if you store authentication data in a 'drupal' database on 'localhost' the URL might look like:
 
 [source,bash]
--------------------------------------
+-----
 --auth-db-uri = jdbc:mysql://localhost/drupal?user=user&password=passwd
--------------------------------------
+-----
 
 '--auth-db' stored just a connector name or connector implementation class. For convenience Tigase has predefined short names for the most common connectors but you can always use the class name if you know it. You have to use a class name if you want to attach your own authentication connector. The following 2 settings are equal:
 
 [source,bash]
--------------------------------------
+-----
 --auth-db = tigase-auth
--------------------------------------
+-----
 
 [source,bash]
--------------------------------------
+-----
 --auth-db = tigase.db.jdbc.TigaseAuth
--------------------------------------
+-----
 
 In the same exact way you can setup connector for any different database type:
 
 [source,bash]
--------------------------------------
+-----
 --auth-db = drupal
--------------------------------------
+-----
 
 [source,bash]
--------------------------------------
+-----
 --auth-db = tigase-custom
--------------------------------------
+-----
 
 You can normally skip configuring connectors for the default Tigase database format: 'mysql', 'pgsql' and 'derby' as they are applied automatically if the parameter is missing.
 
@@ -71,9 +70,9 @@ To keep user accounts in sync between the authentication database and the main u
 For example:
 
 [source,bash]
--------------------------------------
+-----
 --user-db-uri=jdbc:mysql://localhost/tigasedb?user=nobody&password=pass&autoCreateUser=true
--------------------------------------
+-----
 
 If you are interested in even further customizing your authentication connector by writing your own queries or stored procedures, please have a look at 2 following guides:
 

@@ -1,6 +1,5 @@
 [[tipsAndTricks]]
-Tips and Tricks
-===============
+= Tips and Tricks
 :author: Daniel Wisnewski
 :version: v1.0
 :date: 2015-13-07 11:32

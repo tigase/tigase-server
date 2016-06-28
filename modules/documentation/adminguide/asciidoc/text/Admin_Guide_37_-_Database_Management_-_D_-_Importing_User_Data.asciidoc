@@ -1,6 +1,5 @@
 [[dbImportingData]]
-Importing User Data
-===================
+= Importing User Data
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 21:18
@@ -17,7 +16,7 @@ You can access repository utilities through command +./bin/repo.sh+ or +./script
 +-h+ parameter gives you a list of all possible parameters:
 
 [source,sh]
--------------------------------------
+-------------
 ./scripts/repo.sh -h
 
 Parameters:
@@ -51,18 +50,18 @@ Note! If you put UserAuthRepository implementation as a class name
       Have a look at UserAuthRepository to see what operations are
       possible or what operation does make sense.
       Alternatively look for admin tools guide on web site.
--------------------------------------
+-------------
 
 The most critical parameters are the source repository class name and the initialization string. Therefore there are a few example preset parameters which you can use and adjust for your system. If you look inside the +repo.sh+ script you can find at the end of the script following lines:
 
 [source,sh]
--------------------------------------
+-----
 XML_REP="-sc tigase.db.xml.XMLRepository -su ../testsuite/user-repository.xml_200k_backup"
 MYSQL_REP="-sc tigase.db.jdbc.JDBCRepository -su jdbc:mysql://localhost/tigase?user=root&password=mypass"
 PGSQL_REP="-sc tigase.db.jdbc.JDBCRepository -su jdbc:postgresql://localhost/tigase?user=tigase"
 
 java $D -cp $CP tigase.util.RepositoryUtils $MYSQL_REP $*
--------------------------------------
+-----
 
 You can see that the source repository has been set to MySQL database with +tigase+ as the database name, +root+ the database user and +mypass+ the user password.
 
@@ -71,25 +70,25 @@ You can adjust these settings for your system.
 Now to import data to your repository simply execute the command:
 
 [source,sh]
--------------------------------------
+-----
 ./bin/repo.sh -import import-file.txt
--------------------------------------
+-----
 
 _Note, the import function is available from_ *b895*
 
 The format of the import file is very simple. This is a flat file with comma separated values:
 
 [source,bash]
--------------------------------------
+-----
 jid,password,roster_jid,roster_nick,subscriptio,group
--------------------------------------
+-----
 
 To create such a file from MySQL database you will have to execute a command like this one:
 
 [source,sql]
--------------------------------------
+-----
 SELECT a, b, c, d INTO OUTFILE 'import-file.txt'
 FIELDS TERMINATED BY ','
 LINES TERMINATED BY '\n'
 FROM test_table;
--------------------------------------
+-----

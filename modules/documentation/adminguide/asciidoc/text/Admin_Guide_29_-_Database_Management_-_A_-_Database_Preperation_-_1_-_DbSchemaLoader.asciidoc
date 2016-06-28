@@ -1,6 +1,5 @@
 [[dbSchemaLoader]]
-+dbSchemaLoader+ Utility
-========================
+= +dbSchemaLoader+ Utility
 :author: Daniel Wisnewski
 :author: v1.0, March 2016: Reformatted for AsciiDoc.
 :date: 2016-03-14 14:30
@@ -14,8 +13,8 @@ In order to use this utility with any of the databases, you will need to first h
 
 IMPORTANT: All commands in this guide are required to be running from the Tigase installation directory.
 
-Operation & Variables
----------------------
+== Operation & Variables
+
 First, lets cover the DBSchemaLoader operation and variables:
 
 *Operation*
@@ -101,8 +100,8 @@ java -cp "jars/*" tigase.util.DBSchemaLoader -dbType mysql -dbName tigasedb -roo
 At this time you're finished setting up a database for use with Tigase!
 For other databases that are supported, the operations will be very similar with only the -dbType and perhaps the -dbHostname being different.
 
--Query function
----------------
+== -Query function
+
 Should you decide to customize your own functions, or have specific information you want to put into the database, you can use the -query function to perform a single query step.
 [source,cmd]
 -----

@@ -1,6 +1,5 @@
 [[webinstall]]
-Installation Using Web Installer
-================================
+= Installation Using Web Installer
 :author: Eric Dziewa
 :version: v1.0, January 2015: New Web Installer!
 :Date: 2015-01-15
@@ -13,35 +12,32 @@ Installation Using Web Installer
 When Tigase XMPP Server starts up, it looks for the default configuration file: *etc/init.properties*. If this file has not been modified you can run the web installer. Which will step you through the process of configuring Tigase.
 If you are installing Tigase in a Windows environment, please see the xref:winWebInstall[Windows Installation] section.
 
-Download and Extract
---------------------
+== Download and Extract
 
 First download Tigase XMPP Server and extract it. You can download the link:https://projects.tigase.org/projects/tigase-server/files[official binaries], or the latest and greatest link:http://build.xmpp-test.net/nightlies/dists/[nightly builds].
 
 [source,bash]
--------------------------------------
+-----
 $ wget http://build.xmpp-test.net/nightlies/dists/2015-01-12/tigase-server-7.0.0-SNAPSHOT-b3752-dist-max.tar.gz
 $ tar -xf tigase-server-7.0.0-SNAPSHOT-b3752-dist-max.tar.gz
 $ cd tigase-server-7.0.0-SNAPSHOT-b3752
--------------------------------------
+-----
 
 TIP: Do not run as root user!
 
-Start the Server
-----------------
+== Start the Server
 
 [source,bash]
--------------------------------------
+-----
 scripts/tigase.sh start
--------------------------------------
+-----
 
-Verify Tigase is Running
-------------------------
+== Verify Tigase is Running
 
 You should see a list of listening ports.
 
 [source,bash]
--------------------------------------
+-----
 $ lsof -i -P
 COMMAND   PID   USER   FD   TYPE   DEVICE SIZE/OFF NODE NAME
 java    18387 tigase  141u  IPv6 22185825      0t0  TCP *:8080 (LISTEN)
@@ -50,11 +46,10 @@ java    18387 tigase  149u  IPv6 22185835      0t0  TCP *:5223 (LISTEN)
 java    18387 tigase  150u  IPv6 22185836      0t0  TCP *:5290 (LISTEN)
 java    18387 tigase  151u  IPv6 22185837      0t0  TCP *:5280 (LISTEN)
 java    18387 tigase  152u  IPv6 22185838      0t0  TCP *:5269 (LISTEN)
--------------------------------------
+-----
 
 [[connecttoWebInstall]]
-Connect to the Web Installer
-----------------------------
+== Connect to the Web Installer
 
 Some points before you can connect:
 
@@ -65,8 +60,7 @@ Some points before you can connect:
 
 Point your browser to *http://localhost:8080/setup/* unless you are working remotely. Then you can use the domain name, or IP address. I used http://tpub.xmpp-test.net:8080/setup/ for this guide.
 
-Step Through the Installation Process
--------------------------------------
+== Step Through the Installation Process
 
 You will be greeted by the following "About software" page.
 
@@ -111,23 +105,23 @@ image:images/web-install-10.png[]
 Setup has finished. Go back into the installation directory and restart.
 
 [source,bash]
--------------------------------------
+-----
 $ scripts/tigase.sh stop
 $ scripts/tigase.sh start
--------------------------------------
+-----
 
 To further fine tune the server you should edit etc/tigase.conf. Ensure *JAVA_HOME* path is correct, and increase memory if needed using *JAVA_OPTIONS* -Xmx (max), and -Xms (initial). You will need to direct Tigase to read settings from this file on startup as follows.
 
 [source,bash]
--------------------------------------
+-----
 $ scripts/tigase.sh start etc/tigase.conf
--------------------------------------
+-----
 
 Everything should be running smooth at this point. Check the logfiles in logs/ if you experience any problems.
 
 [[winWebInstall]]
-Windows Instructions for using Web Installer
---------------------------------------------
+== Windows Instructions for using Web Installer
+
 There are a few steps involved with setting up Tigase with the web installer in a Windows environment.  Please follow this guide.
 
 First step is to extract the dist-max archive in it's entirety to the intended running directory.  Once there, run the Setup.bat file inside the win-stuff folder.  This will move the necessary files to the correct folders before Tigase begins operation.

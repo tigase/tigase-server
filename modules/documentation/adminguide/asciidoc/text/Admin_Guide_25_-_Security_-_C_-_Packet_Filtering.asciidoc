@@ -1,6 +1,5 @@
 [[tigase41packetFiltering]]
-Packet Filtering
-================
+= Packet Filtering
 :author: not known
 :version: v1.0 initial release
 :date: 2015-07-13 16:39

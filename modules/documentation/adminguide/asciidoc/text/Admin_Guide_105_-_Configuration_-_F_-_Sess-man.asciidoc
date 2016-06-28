@@ -1,0 +1,53 @@
+[[sessMan]]
+= Session Manager
+:author: Daniel Wisnewski
+:version: v1.0 June 2016
+:date: 24-06-2016 11:00
+
+Tigase Session Manager is where most of Tigase basic options can be configured, and where many operations are controlled from.
+Changes to session manager can effect operations throughout an entire XMPP installation, so care must be made when changing settings here.
+
+[[sessManMobileOpts]]
+== Mobile Optimizations
+By default, Tigase employs XEP-0352 Client State Indication which allows for a more streamlined mobile experiencing by allowing the XMPP server to suppress or reduce the number of updates sent to a client thereby reducing the number of stanzas sent to a mobile client that is inactive.
+This employment is contained within the processor +ClientStateIndication+ and is independent from the MobileV1, MobileV2, MobileV3 settings.
+
+However, this can be fine tuned by using mobile plugins from Tigase which can be used at the same time by adding the following line to the init.properties file:
+[source,properties]
+-----
+sess-man/plugins-conf/urn\:xmpp\:csi\:0/logic=tigase.xmpp.impl.MobileV1
+-----
+Options are:
+
+=== MobileV1
+Keeps all presence stanzas in queue until client is active.
+
+=== MobileV2
+This setting delays delivery of presences while client is in inactive state, but only keeps the last presence for each full jid.
+*This is the default setting for CSI logic*.
+
+=== MobileV3
+Keeps the same presence logic as MobileV2, but also queues Message Carbons.
+*Currently not supported by CSI processor, will cause issues*.
+
+=== Disabling CSI
+If you wish to not use the +ClientStateIndication+ processor, set the following in your init.properties file:
+[source,properties]
+-----
+--sm-plugins=-urn:xmpp:csi:0
+-----
+
+=== A note about Mobile Plugins
+Previously, you could enable Mobile optimization logic using +--sm-plugins=+Mobile_V1+.
+
+If you have used these in the past, it is recommended you change your system to use the CSI processor with the appropriate mobile processing logic.
+
+If you require v3 logic, or do not wish to use CSI, be sure to disable it using the above option.
+
+== Thread Pool Counts
+Session manager can control the number of available thread pools for each processor.  By adding the following line to the init.properties file, the global thread pool can be increased by a specified factor:
+[source,properties]
+-----
+sess-man/sm-threads-factor[I]=3
+-----
+In this case, the global thread pools is increased by a factor or 3.

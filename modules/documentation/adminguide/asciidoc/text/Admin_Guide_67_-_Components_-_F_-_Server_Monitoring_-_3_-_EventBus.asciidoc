@@ -1,6 +1,5 @@
 [[eventBus]]
-Eventbus
-========
+= Eventbus
 :author: Bartosz Malkowski
 :date: 2015-04-09 8:56
 :version: v1.0 September 2015
@@ -16,12 +15,10 @@ Eventbus is based on a limited http://www.xmpp.org/extensions/xep-0060.html[PubS
 
 Each component or client may subscribe for specific types of events. Only components on cluster nodes are allowed to publish events.
 
-Setup
------
+== Setup
 Eventbus is enabled by default on v7.1.0 b4001 and later, no setup needed!
 
-How it Works
-------------
+== How it Works
 Events in Eventbus are identified by two elements: name of event and its namespace:
 [source, xml]
 -------
@@ -44,8 +41,7 @@ If client is subscribed to /*|tigase:demo node, then events will not be sent fro
 ===============================
 
 [[availableTasks]]
-Available Tasks
----------------
+== Available Tasks
 Eventbus monitoring has several pre-defined tasks that can be monitored and set to trigger. What follows is the list of tasks with the options attributed to each task.
 
 - *disk-task* - Used to check disk usage. +
@@ -84,13 +80,11 @@ Available Options
 . +thresholdMinimal[I]+ - Minimal amount of disconnected users required to generate alarm.
 . +threshold[I]+ - Minimal percent of disconnected users required to generate alarm.
 
-Configuration
--------------
+== Configuration
 Configuration of the eventbus monitor can be done one of two ways; either by lines in init.properties file, or by sending XMPP stanzas to the server.  You may also send XMPP stanzas VIA HTTP REST.
 XMPP stanza configurations will override ones in init.properties, but they will only last until the server restarts.
 
-init.properties
-~~~~~~~~~~~~~~~
+=== init.properties
 Tasks can be configured in the init.properties file. See xref:availableTasks[available tasks] for the tasks that can be setup.
 
 To enable a specific monitor task, use the following line:
@@ -107,8 +101,7 @@ which sets the check period to 1000 milliseconds.
 
 *NOTE* Once triggers have been activated, they will become dormant.  Think of these as one-shot settings.
 
-Subscription Limitations
-^^^^^^^^^^^^^^^^^^^^^^^^
+==== Subscription Limitations
 To define list of JIDs allowed to subscribe for events:
 [source, bash]
 -----
@@ -116,8 +109,7 @@ eventbus/affiliations/allowedSubscribers=francisco@denmark.lit,bernardo@denmark.
 -----
 If this is left blank, all users can subscribe.
 
-Configuration via XMPP
-~~~~~~~~~~~~~~~~~~~~~~
+=== Configuration via XMPP
 We can also configure the eventbus monitor component using XMPP stanzas. This allows us to set and change configurations during server runtime. This is done using a series of +iq+ stanzas send to the monitor component.
 
 We can query each component for its current settings using the following stanza.
@@ -196,12 +188,10 @@ To set any other values, do not forget that certain parts may need to be changed
 - Your field type will be defined by the type of variable specified in the xref:availableTasks [Available Tasks] section. +
 - +var=x task#+ will be followed by the property value taken directly from the xref:availableTasks [Available Tasks] section, minus the data type parameter.
 
-Getting the Message
--------------------
+== Getting the Message
 Without a place to send messages to, eventbus will just trigger and shut down. There are two different methods that eventbus can deliver alarm messages and relevant data; XMPP messages and using the mailer extension.
 
-XMPP notification
-~~~~~~~~~~~~~~~~~
+=== XMPP notification
 In order to retrieve notifications, a subscription to the +eventbus@tigase.org+ user must be made.
 Keep in mind that subscriptions are not persistent across server restarts, or triggers. +
 The eventbus schema is very similar to most XMPP subscription requests but with a few tweaks to differentiate it if you wanted to subscribe to a certain task or all of them. Each task is considered a node, and each node has the following pattern: +eventName|eventXMLNS+. Since each monitoring task has the +tigase:monitor:event+ event XMLNS, we just need to pick the event name from the list of tasks.
@@ -238,8 +228,7 @@ Alternatively, you can also subscribe to all events within the eventbus by using
 </iq>
 -----
 
-Sample notification from Eventbus
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Sample notification from Eventbus
 [source, xml]
 -------
 <message from='eventbus.shakespeare.lit' to='francisco@denmark.lit' id='foo'>
@@ -255,10 +244,8 @@ Sample notification from Eventbus
 </message>
 -------
 
-
-
-Mailer Extension
-----------------
+[[monitorMailer]]
+== Mailer Extension
 Tigase Server Monitor Mailer Extension (TSMME) can send messages from the monitor component to a specified E-mail address so system administrators who are not logged into the XMPP server.
 
 For v7.1.0 versions and later, TSMME is already included in your distribution package and no extra installation is needed.
@@ -269,6 +256,7 @@ For versions older than 7.1.0 TSMME requires two files to operate:
 
 - javax.mail.jar file which may be downloaded from link:http://java.net/projects/javamail/downloads/download/javax.mail.jar[this link]. Also place this file in the /jars directory.
 
+[source,properties]
 -----
 monitor/mailer-smtp-host=mail.tigase.org
 monitor/mailer-smtp-port=587

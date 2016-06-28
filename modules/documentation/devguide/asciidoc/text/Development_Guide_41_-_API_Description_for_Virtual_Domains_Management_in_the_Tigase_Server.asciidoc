@@ -1,6 +1,5 @@
 [[apiVirtualDomain]]
-API Description for Virtual Domains Management in the Tigase Server
-===================================================================
+= API Description for Virtual Domains Management in the Tigase Server
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 21:22

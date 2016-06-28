@@ -1,6 +1,5 @@
 [[propertiesGuide]]
-Tigase Properties Guide
-=======================
+= Tigase Properties Guide
 :toc:
 :numbered:
 

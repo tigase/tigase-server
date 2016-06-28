@@ -36,17 +36,16 @@ import tigase.server.Presence;
 
 import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
-
 import tigase.xmpp.*;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Class responsible for queuing packets (usable in connections from mobile
@@ -57,7 +56,7 @@ import java.util.Queue;
 @Bean(name = MobileV1.ID, parent = SessionManager.class, active = false)
 public class MobileV1
 				extends XMPPProcessor
-				implements XMPPProcessorIfc, XMPPPacketFilterIfc {
+				implements XMPPProcessorIfc, ClientStateIndication.Logic {
 	// default values
 	private static final int        DEF_MAX_QUEUE_SIZE_VAL = 50;
 	private static final long       DEF_MAX_TIMEOUT_VAL    = 6 * 60 * 1000;
@@ -146,10 +145,13 @@ public class MobileV1
 
 					setTimeout(session, timeout);
 				}
-				if (session.getSessionData(QUEUE_KEY) == null) {
-					session.putSessionData(QUEUE_KEY, new LinkedBlockingQueue<Packet>());
+
+				if (value) {
+					activate(session, results);
+				} else {
+					deactivate(session, results);
 				}
-				session.putSessionData(XMLNS, value);
+
 				results.offer(packet.okResult((Element) null, 0));
 
 				break;
@@ -183,6 +185,21 @@ public class MobileV1
 		}
 
 		return SUP_FEATURES;
+	}
+
+	@Override
+	public void activate(XMPPResourceConnection session, Queue<Packet> results) {
+		if (session.getSessionData(QUEUE_KEY) == null) {
+			session.putSessionDataIfAbsent(QUEUE_KEY, new LinkedBlockingQueue<Packet>());
+		}
+		session.putSessionData(XMLNS, true);
+	}
+
+	@Override
+	public void deactivate(XMPPResourceConnection session, Queue<Packet> results) {
+		session.putSessionData(XMLNS, false);
+
+		flushQueue(session, results);
 	}
 
 	@Override
@@ -220,27 +237,18 @@ public class MobileV1
 				continue;
 			}
 
-			Queue<Packet> queue = (Queue<Packet>) session.getSessionData(QUEUE_KEY);
-
 			// if queue is not enabled we do nothing
 			if (!isQueueEnabled(session)) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("queue is no enabled");
 				}
-				if ((queue != null) &&!queue.isEmpty()) {
-					if (log.isLoggable(Level.FINEST)) {
-						log.finest("sending packets from queue (DISABLED)");
-					}
 
-					Packet p;
-
-					while ((p = queue.poll()) != null) {
-						results.offer(p);
-					}
-				}
+				flushQueue(session, results);
 
 				continue;
 			}
+
+			Queue<Packet> queue = (Queue<Packet>) session.getSessionData(QUEUE_KEY);
 
 			// lets check if packet should be queued
 			if (filter(session, res, queue)) {
@@ -256,9 +264,15 @@ public class MobileV1
 					Packet p;
 
 					while ((p = queue.poll()) != null) {
-						results.offer(p);
+						try {
+							// setting destination for packet in case if
+							// stream was resumed and connId changed
+							p.setPacketTo(session.getConnectionId());
+							results.offer(p);
+						} catch (NoConnectionIdException ex) {
+							log.log(Level.FINEST, "should not happen, as connection is ready", ex);
+						}
 					}
-					queue.clear();
 				}
 			}
 		}
@@ -302,6 +316,27 @@ public class MobileV1
 	}
 
 	//~--- get methods ----------------------------------------------------------
+
+	protected void flushQueue(XMPPResourceConnection session, Queue<Packet> results) {
+		Queue<Packet> queue = (Queue<Packet>) session.getSessionData(QUEUE_KEY);
+
+		if ((queue != null) &&!queue.isEmpty()) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("sending packets from queue (DISABLED)");
+			}
+			Packet p;
+			while ((p = queue.poll()) != null) {
+				try {
+					// setting destination for packet in case if
+					// stream was resumed and connId changed
+					p.setPacketTo(session.getConnectionId());
+					results.offer(p);
+				} catch (NoConnectionIdException ex) {
+					log.log(Level.FINEST, "should not happen, as connection is ready", ex);
+				}
+			}
+		}
+	}
 
 	/**
 	 * Check if queuing is enabled

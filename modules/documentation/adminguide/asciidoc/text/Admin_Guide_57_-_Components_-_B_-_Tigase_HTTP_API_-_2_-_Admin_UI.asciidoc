@@ -1,6 +1,5 @@
 [[adminUI]]
-Admin UI Guide
-==============
+= Admin UI Guide
 :author: Daniel Wisnewski
 :version: v2.0 Sept 2015
 :date: 2015-02-09 10:28
@@ -11,15 +10,13 @@ Admin UI Guide
 
 The Admin User Interface is an HTTP-based interface that sends REST commands to the server to update configurations, change settings, and retrieve statistics.
 
-A Note about REST
------------------
+== A Note about REST
 REST stands for REpresentational State Transfer which is a stateless communication method that in our case passes commands using HTTP GET, PUT, POST, and DELETE commands to resources within the Tigase server.
 Although REST uses HTTP to receive commands, REST itself is not intended for use in a browser.  For more information, please see the REST API guide.
 
 
-Configuration
--------------
-Allows you to list serve components and their configurations, as well as manage server components and plugins.
+== Configuration
+Allows you to list server components and their configurations, as well as manage server components and plugins.
 
 List server/component configuration section covers all the component options including the basic-conf and will allow you to change each setting by changing the values in the field and clicking submit.  All settings are listed by the component name in the dropdown menu either as default, or as defined by --component-name property.
 
@@ -39,53 +36,43 @@ Managing server plugins allows you to turn on or off plugins from this window VI
 
 image:images/admin-manageplugins.jpg[]
 
-Example Scripts
----------------
+== Example Scripts
 This is a list of script examples that can be run and do menial functions for each component.  They may not have particular value themselves, but are present to be used as reference when writing custom scripts.
 Get list of available commands is one script, that is present for every component that is active on the server, and as its title implies, will provide a list of all commands for that component.  Lastly, the two scripts from the xref:scriptingSupport[Scripting section] of this guide.  Generally, there is not much needed to see in this section.
 
-Notifications
--------------
+== Notifications
 This section has one simple command: to be able to send a mass message to all logged in users.
 There are three types of messages that can be sent from this section:
 - *normal* Messages will show as a pop-up in most clients.
 - *headline* Certain clients will take headline messages and insert them into MUC or chats between users, otherwise it will create a pop-up like normal messages.
 - *chat* Chat messages will open up a chat dialog with users.
 
-Other
------
+== Other
 This section contains a considerable list of options and settings affecting server functions.
 
-Activate log tracker for a user
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Activate log tracker for a user
 This allows you to set a log file to track a specific user.  Set the bare or full JID of the user you want to log, and a name of the files you wish the log to be written to. The files will be written in the root Tigase directory unless you give a directory like logs/filename. The log files will be named with a .0 extension and will be named .1, .2, .3 and so on as each file reaches 10MB by default. filename.0 will always be the most recent.
 Logging will start once the command has been issued, and cease once the server restarts.
 
-Add SSL certificate
-~~~~~~~~~~~~~~~~~~~
+=== Add SSL certificate
 Here you can add SSL certificates from PEM files to specific virtual hosts. Although Tigase can generate its own self-signed certificates, this will override any default certificates.
 The certificates cannot contain a passphrase, or be encrypted.  Be sure that the contents contain both the certificate and private key data.
 You also have the option to save the certificate to disk, making the change permanent.
 
-Add listener script
-~~~~~~~~~~~~~~~~~~~
+=== Add listener script
 This section allows you to create a custom function for the eventbus component.  These scripts can have the server conduct certain operations if set criteria are met. You may write the script in either Groovy or EMCAscript. Please see the xref:eventbus[eventbus section] for more details.
 
-Add Monitor Task
-~~~~~~~~~~~~~~~~
+=== Add Monitor Task
 You can write scripts for Groovy or ECMAScript to add to monitor tasks here. This only adds the script to available scripts however, you will need to run it from another prompt.
 Note that these scripts may only work with the monitor component.
 
-Add Monitor Timer Task
-~~~~~~~~~~~~~~~~~~~~~~
+=== Add Monitor Timer Task
 This section allows you to add monitor scripts in Groovy while using a delay setting which will delay the start of the script.
 
-Add New Item - ext
-~~~~~~~~~~~~~~~~~~
+=== Add New Item - ext
 Depending on whether you have any external components loaded or not, this may show.  This allows you to add additional external components to the running instance of Tigase.
 
-Add New Item - Vhost
-~~~~~~~~~~~~~~~~~~~~
+=== Add New Item - Vhost
 This allows you to add new virtual hosts to the XMPP server.  A breakdown of the fields is as follows:
 
 - Domain name: the full domain name of the new vhost.  Tigase will not add anything to this domain, so if it is ti be a subdomain of example.com, you will need to enter sub.domain.com.
@@ -114,17 +101,14 @@ This allows you to add new virtual hosts to the XMPP server.  A breakdown of the
 - see-other-host redirection enabled: in servers that have multiple clusters, this feature will help to automatically repopulate the cluster list if one goes down, however if this is unchecked, that list will not change and may attempt to send traffic to a down server.
 - XEP-0136 Default store method: The default section of messages that will be stored in the archive.
 
-Change user inter-domain communication permission
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Change user inter-domain communication permission
 Here you can restrict users to be able to communicate on specific domains, this works similar to the domain filtering policy using the same rule sets. For more details, see xref:domainBasedPacketFiltering[Domain Based Packet Filtering] section for rule details and specifics.
 Note that the changes may be made to mutiple JIDs at the same time.
 
-Connections Time
-~~~~~~~~~~~~~~~~
+=== Connections Time
 Lists the longest and average connection time from clients to servers.
 
-Create Node
-~~~~~~~~~~~
+=== Create Node
 This section allows you to create a new node for the pubsub component.  Here is a breakdown of the fields:
 
 - The node to create: this is the name of the node that will be created.
@@ -164,147 +148,113 @@ This section allows you to create a new node for the pubsub component.  Here is 
   * *byCreationDate* - Items will be sorted by the creation date, i.e. when the item was made.
   * *byUpdateTime* - Items will be sorted by the last update time, i.e. when the item was last edited/published/etc..
 
-DNS Query
-~~~~~~~~~
+=== DNS Query
 A basic DNS Query form.
 
-Default config - Pubsub
-~~~~~~~~~~~~~~~~~~~~~~~
+=== Default config - Pubsub
 Here you may set the default configuration for any new pubsub node.  These changes will be made for all future nodes, but will not affect currently active nodes.
 
-Default room config
-~~~~~~~~~~~~~~~~~~~
+=== Default room config
 This page allows admins to set the default configuration for any new MUC rooms that may be made on the server.
 
-Delete Monitor Task
-~~~~~~~~~~~~~~~~~~~
+=== Delete Monitor Task
 This removes a monitor task from the list of available monitor scripts. This action is not permanent as it will revert to inital settings on server restart.
 
-Delete Node
-~~~~~~~~~~~
+=== Delete Node
 Provides a space to remove a node from the server.  It must be the full name of the node, and only one node can be removed at a time.
 
-Deleting ALL Nodes
-~~~~~~~~~~~~~~~~~~
+=== Deleting ALL Nodes
 This page allows the logged in admin to delete all nodes from the associated vhost.  This change is irreversible, be sure to read and check the box before submitting the command.
 
-Fix User's Roster
-~~~~~~~~~~~~~~~~~
+=== Fix User's Roster
 You can fix a users roster from this prompt. Fill out the bare JID of the user and the names you wish to add or remove from the roster. This will NOT edit a user's roster, but rather compare client roster to database and fix any errors between them.
 
-Fix User's Roster on Tigase Cluster
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Fix User's Roster on Tigase Cluster
 This does the same as the Fix User's Roster, but can apply to users who may not be logged into the local vhost, but are logged into a clustered server.
 
-Get User Roster
-~~~~~~~~~~~~~~~
+=== Get User Roster
 As the title implies this gets a users' roster and displays it on screen. You can use a bare or full JID to get specific rosters.
 
-Get any file
-~~~~~~~~~~~~
+=== Get any file
 Enables you to see the contents of any file in the tigase directory. By default you are in the root directory, if you wish to go into directory use the following format:
 logs/tigase.log.0
 
-Get Configuration File
-~~~~~~~~~~~~~~~~~~~~~~
+=== Get Configuration File
 If you don't want to type in the location of a configuration file, you can use this prompt to bring up the contents of either tigase.conf or init.properties.
 
-Get init.properties File
-~~~~~~~~~~~~~~~~~~~~~~~~
+=== Get init.properties File
 Will output the current init.properties file, this includes any modifications made during the current server session.
 
-Get list available commands
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Get list available commands
 This may be listed multiple times for different components, but this will do as the section suggest and list available commands for that particular component.
 
-Load test
-~~~~~~~~~
+=== Load test
 Here you can run a test with the pubsub component on any node to test functionality and proper settings for the node.
 
-Load Errors
-~~~~~~~~~~~
+=== Load Errors
 Will display any errors the server encounters in loading and running. Can be useful if you need to address any issues.
 
-New command script
-~~~~~~~~~~~~~~~~~~
+=== New command script
 This space allows you to create a new command script that will work within the associated component.  Note that under the hyperlinked title, there is a listing of muc.server.org or pubsub.server.org, use these to determine where the new command will operate.
 
-OAuth Credentials
-~~~~~~~~~~~~~~~~~
+=== OAuth Credentials
 This allows the setting of new custom OAuth credentials for the server, and you can also require the use of OAuth tokens for users when they login.  This is a setting for the specific host you are logged into.  If you are logged into xmpp1.domain.com, it will not affect settings for xmpp2.domain.com.
 
-Pre-Bind BOSH user session
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Pre-Bind BOSH user session
 This allows a JID to be paired with a BOSH session before that user logs in, can reduce CPU use if you have a user that logs in via BOSH on a regular basis, or a web client that will regularly connect. You may also specify HOLD and WAIT integers to affect how BOSH operates with the associated JID.
 
-Publish item to node
-~~~~~~~~~~~~~~~~~~~~
+=== Publish item to node
 This window allows you to not only test, but publish an item to the specified node.  All fields must be filled in in order to avoid the server dropping an improperly formatted stanza.
 
-Read ALL nodes
-~~~~~~~~~~~~~~
+=== Read ALL nodes
 This will load a tree of pubsub nodes in memory, it will not output anything as it is mainly for developer use.
 
-Rebuild database
-~~~~~~~~~~~~~~~~
+=== Rebuild database
 This will force Tigase to rebuild databases for the pubsub component, this may be useful for pubsub subscribers who continue to get pushed events after they unsubscribe.
 
-Reload component repository
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Reload component repository
 This will reload any vhosts that the server is running.  This may be useful if one is disconnected or broken during runtime.
 
-Remove an item
-~~~~~~~~~~~~~~
+=== Remove an item
 This will remove a running vhost from the server, you will be presented with a list to pick from.
 
-Remove command script
-~~~~~~~~~~~~~~~~~~~~~
+=== Remove command script
 Like new command script, take a look at the subheading to determine which component you want to remove the script from.  Once there, select the command you wish to remove from the server.  If remove from disk is selected, then the change will be permanent.  Otherwise, the command will be removed until the next server restart.
 
-Remove listener script
-~~~~~~~~~~~~~~~~~~~~~~
+=== Remove listener script
 Select from a list the listener script you wish to remove.  This will only affect custom listener scripts added to the eventbus component.
 
-Remove room
-~~~~~~~~~~~
+=== Remove room
 This provides fields to remove a room from the MUC component. you may suggest an alternative room which will move occupants to the alternative room once the current one is removed.
 
-Retrieve items
-~~~~~~~~~~~~~~
+=== Retrieve items
 Here you can retrieve items from PubSub nodes, this simulates the get IQ stanza from the pubsub component.
 - Service name - The address of the pubsub component.
 - Node name - Item node to retrieve items from.
 - Item ID - The item ID of the item you wish to retrieve.
 - Items Since - UTC timestamp to start search from: YYYY-MM-DDTHH:MM:SSZ
 
-S2S Bad State Connections
-~~~~~~~~~~~~~~~~~~~~~~~~~
+=== S2S Bad State Connections
 This will list any connections to other servers that are considered bad or stale.  This will populate very rarely as Tigase automatically adjusts around clustered servers that go down.  In the event a connection stays bad, it is recommended to reset those connections in the next space.
 
-S2S Reset Bad State Connections
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== S2S Reset Bad State Connections
 This will reset the connections with other servers that are considered bad and have shown up in the S2S Bad State Connections page.
 
-S2S Get CID Connection State
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== S2S Get CID Connection State
 For internal developer use only.
 
-Subscribe to a node
-~~~~~~~~~~~~~~~~~~~
+=== Subscribe to a node
 This provides a space for an administrator to manually have a JID subscribe to a particular node.
 
-Unsubscribe from node
-~~~~~~~~~~~~~~~~~~~~~
+=== Unsubscribe from node
 Here you can unsubscribe users from a particular node.  Users can be a comma separated list.
 
-Update item configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Update item configuration
 Typically two entries will be seen for this entry, one for basic-conf and another for vhost-man. They each have their own sections, but provide for a plethora of server options.  Changes to the server are done in realtime, and may not be permanent.
 
-basic-conf
-^^^^^^^^^^
-This will prompt a list of nearly every component setting currently available in the Tigase installation.  They are broken down as follows: +
-*Component/catagory or setting/setting* +
+==== basic-conf
+This will prompt a list of nearly every component setting currently available in the Tigase installation.  They are broken down as follows:
+Component/catagory or setting/setting
 So for example, if you wanted to change admins for the eventbus component, you will select 'eventbus/admins'.
 
 Another example might be if you wanted to turn on or off a task in monitor component, lets say disk-checker-task, you would find 'monitor/disk-checker-task/enabled'.
@@ -312,8 +262,7 @@ Another example might be if you wanted to turn on or off a task in monitor compo
 Clicking Submit query will show current status and settings, and possible fields to change.  Most changes done in this manner will be reset to default or as written in init.properties file on server restart.
 
 
-vhost-man
-^^^^^^^^^
+==== vhost-man
 You will be presented with a list of domains that Tigase is currently hosting, you will be able to change settings for one domain at a time using this function.  Once a domain is selected, you will be able to set or change the following settings:
 
 - Domain name: the full domain name of the new vhost.  Tigase will not add anything to this domain, so if it is ti be a subdomain of example.com, you will need to enter sub.domain.com.
@@ -343,8 +292,7 @@ You will be presented with a list of domains that Tigase is currently hosting, y
 - XEP-0136 Default store method: The default section of messages that will be stored in the archive.
 
 
-Update user roster entry
-~~~~~~~~~~~~~~~~~~~~~~~~
+=== Update user roster entry
 This section allows admins to edit individual users rosters, although it provides similar functionality to fix users roster, this is designed for precision editing of a user roster.
 
 - Roster owner JID: The BareJID of the user roster you wish to edit.
@@ -359,8 +307,7 @@ This section allows admins to edit individual users rosters, although it provide
   * *To* - The JID to manipulate will not receive presence information from the Roster Owner, but the opposite will be true.
   * *Both* - Both JIDs will receive presence information about each other.
 
-Update user roster entry extended version
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Update user roster entry extended version
 This section is an expanded version of the previous one, all fields already specified are the same with these additions:
 
 - Roster owner name: A friendly name or nickname if you wish to change/create one. *not required*
@@ -374,12 +321,10 @@ This section is an expanded version of the previous one, all fields already spec
   * *Add/update both rosters* - Will add or update the item in both roster owner and roster item's roster.
   * *Remove from both rosters* - Will remove the item from both roster owner and roster item's roster.
 
-Scripts
--------
+== Scripts
 This section will enable administrators to custom write or enter their own scripts for specific components.  Each active component will have an entry for new and remove command scripts and scripts written there will be for that component.
 
-New Command Script
-~~~~~~~~~~~~~~~~~~
+=== New Command Script
 - Description: A friendly name of the script, will be the title of the link in the menu on the left.
 - Command ID: Internal command that Tigase will use when referencing this script.
 - Group: The group for the script, which may be any of the headings on the left (Configuration, Example scripts, Notifications, Other etc..) or your own.  If no group exists, a new one will be created.
@@ -387,70 +332,52 @@ New Command Script
 - Script text: the fulltext of the script.
 - Save to disk: Scripts that are saved to disk will be permanently stored in the server's directory /scripts/admin/[Component]/commandID.js *NOTE* Scripts that are NOT saved to disk will not survive a server restart.
 
-Remove Command Script
-~~~~~~~~~~~~~~~~~~~~~
+=== Remove Command Script
 As with New Command Script, there is an entry for each component.  This page will provide a space to remove commands for the selected component.
 You will be provided a list of scripts associated with that component.  You also have the open to remove from disk, which will permanently delete the script from the hard drive the server is on.  If this is unchecked, the script will be unavailable until the next restart.
 
-Statistics
-----------
+== Statistics
 This section is more useful to test statistics scripts and components, as many of them produce very small amounts of information, however these may be collected by other components or scripts for a better information display.
 
-Get User Statistics
-~~~~~~~~~~~~~~~~~~~
+=== Get User Statistics
 Provides a script output of user statistics including how many active sessions are in use, number of packets used, specific connections and their packet usage and location. All resources will return individual stats along with IP addresses.
 
-Get Active User List
-~~~~~~~~~~~~~~~~~~~~
+=== Get Active User List
 Provides a list of active users under the selected domain within the server.  An active user is considered a user currently logged into the XMPP server.
 
-Get list of idle users
-~~~~~~~~~~~~~~~~~~~~~~
+=== Get list of idle users
 Provides a list of users who are idle on the server.
 
-Get list of online users
-~~~~~~~~~~~~~~~~~~~~~~~~
+=== Get list of online users
 Provides a list of users who are currently online.
 
-Get number of active users
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Get number of active users
 Provides a list of active users, users who are not idle or away.
 
-Get number of idle users
-~~~~~~~~~~~~~~~~~~~~~~~~
+=== Get number of idle users
 Provides a number of idle users.
 
-Get top active users
-~~~~~~~~~~~~~~~~~~~~
+=== Get top active users
 Will produce a list of user-limited users who are considered most active in packets sent.
 
-
-
-Users
------
-Add User
-~~~~~~~~
+== Users
+=== Add User
 Here you can add new users to any domain handled by vHosts, users are added to database immediately and are able to login.  *NOTE: You cannot bestow admin status to these users in this section.*
 
-Change User Password
-~~~~~~~~~~~~~~~~~~~~
+=== Change User Password
 This enables you to change the password of any user in the database. Although changes will take effect immediately, users currently logged in will not know the password has been changed until they try to log in again.
 
-Delete User
-~~~~~~~~~~~
-This removes the user or users (comma seperated) from the database. The deleted users will be kicked from the server once submit is clicked.
+=== Delete User
+This removes the user or users (comma separated) from the database. The deleted users will be kicked from the server once submit is clicked.
 
-End user session
-~~~~~~~~~~~~~~~~
+=== End user session
+Disconnects the current selected user by ending their session with the server.
 
-Get User Info
-~~~~~~~~~~~~~
+=== Get User Info
 This section allows admins to get information about a specific user including current connections as well as offline and online messages awaiting delivery.
 
-Get registered user list
-~~~~~~~~~~~~~~~~~~~~~~~~
+=== Get registered user list
 This will display all registered users for the selected domain up to the number specified.
 
-Modify User
-~~~~~~~~~~~
+=== Modify User
 Allows you to modify some user details including E-mail and whether it is an active user.

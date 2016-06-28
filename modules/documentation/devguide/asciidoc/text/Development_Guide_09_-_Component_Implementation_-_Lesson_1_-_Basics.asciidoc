@@ -1,6 +1,5 @@
 [[cil1]]
-Component Implementation - Lesson 1 - Basics
-============================================
+= Component Implementation - Lesson 1 - Basics
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-01-06 20:22
@@ -18,8 +17,8 @@ This is just the first lesson of the series where I cover basics of the componen
 
 Let's get started and create the Tigase component:
 
-[source,java,numbered]
-------------------------------------------------------------------------------------
+[source,java]
+-----
 import java.util.logging.Logger;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Packet;
@@ -34,7 +33,7 @@ public class TestComponent extends AbstractMessageReceiver {
   }
 
 }
-------------------------------------------------------------------------------------
+-----
 
 The only element mandatory when you extend *AbstractMessageReceiver* is the implementation of *void processPacket(Packet packet)* method. This is actually logical as the main task for your component is processing packets. Class name for our new component is *TestComponent* and we have also initialized a separated logger for this class. Doing This is very useful as it allows us to easily find log entries created by our class.
 
@@ -43,7 +42,8 @@ With these a few lines of code you have a fully functional Tigase component whic
 Before we go any further with the implementation let's configure the component in Tigase server so it is loaded next time the server starts.
 Assuming our *init.properties* file looks like this one:
 
-[source,java,numbered]
+[source,java]
+-----
 config-type = --gen-config-def
 --debug = server
 --user-db = derby
@@ -54,12 +54,15 @@ config-type = --gen-config-def
 --comp-class-1 = tigase.muc.MUCComponent
 --comp-name-2 = pubsub
 --comp-class-2 = tigase.pubsub.PubSubComponent
+-----
 
 We can see that it already is configured to load two other components: *MUC* and *PubSub*. Let's add a third - our new component to the configuration file by appending two following lines in the properties file:
 
-[source,java,numbered]
+[source,java]
+-----
 --comp-name-3 = test
 --comp-class-3 = TestComponent
+-----
 
 Now we have to remove the *etc/tigase.xml* file and restart the server.
 
@@ -72,11 +75,13 @@ If everything goes well you should see an entry on the list similar to the highl
 Another way to find out if the component has been loaded is by looking at the log files. Getting yourself familiar with Tigase log files will be very useful thing if you plan on developing Tigase components. So let's look at the log file *logs/tigase.log.0*, if the component has been loaded you should find following lines in the log:
 
 [source,bash]
+-----
 MessageRouter.setProperties() FINER: Loading and registering message receiver: test
 MessageRouter.addRouter() INFO: Adding receiver: TestComponent
 MessageRouter.addComponent() INFO: Adding component: TestComponent
 MessageRouter.addComponent() FINER: Adding: test component to basic-conf registrator.
 Configurator.componentAdded() CONFIG:  component: test
+-----
 
 If your component did not load you should first check configuration files. Maybe you forgot to remove the *tigase.xml* file before restarting the server or alternatively the Tigase could not find your class at startup time. Make sure your class is in *CLASSPATH* or copy a JAR file with your class to Tigase *libs/* directory.
 
@@ -95,11 +100,13 @@ Now, the time has come to the most important question. Can our new component do 
 Let's try it out. Using you favorite client send a message to JID: *test@devel.tigase.org* (assuming your server is configured for *devel.tigase.org* domain). You can either use kind of XML console in your client or just send a plain message to the component JID. According to our code in *processPacket(...)* method it should log our message. For this test I have sent a message with subject: "_test message_" and body: "_this is a test_". The log file should contain following entry:
 
 [source,bash]
+-----
 TestComponent.processPacket() FINEST: My packet: to=null, from=null,
 data=<message from="admin@devel.tigase.org/devel"
   to="test@devel.tigase.org" id="abcaa" xmlns="jabber:client">
   <subject>test message</subject>
   <body>this is a test</body>
 </message>, XMLNS=jabber:client, priority=NORMAL
+-----
 
 If this is a case we can be sure that everything works as expected and all we now have to do is to fill the *processPacket(...)* method with some useful code.

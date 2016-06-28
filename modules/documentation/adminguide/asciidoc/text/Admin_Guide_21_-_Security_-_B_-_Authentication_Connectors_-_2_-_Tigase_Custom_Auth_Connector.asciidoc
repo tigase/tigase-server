@@ -1,6 +1,5 @@
 [[custonAuthConnector]]
-Tigase Custom Auth Connector
-============================
+= Tigase Custom Auth Connector
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 21:18
@@ -17,17 +16,17 @@ You can find more details how to setup a custom connector in the Custom Authenti
 The basic configuration is very simple:
 
 [source,bash]
--------------------------------------
+-----
 --auth-db = tigase-custom
 --auth-db-uri = jdbc:mysql://localhost/drupal?user=user&password=passwd
--------------------------------------
+-----
 
 That's it.
 
 The connector loads correctly and starts working using predefined, default list of queries. In most cases you also might want to define your own queries in the configuration file. The shortest possible description is the following example of the content from the +init.properties+ file:
 
 [source,bash]
--------------------------------------
+-----
 # This query is used to check connection to the database, whether it is still alive or not
 basic-conf/auth-repo-params/conn-valid-query=select 1
 
@@ -73,7 +72,7 @@ basic-conf/auth-repo-params/non-sasl-mechs=password,digest
 
 # This is configuration setting to specify what sasl authentication mechanisms expose to the client
 basic-conf/auth-repo-params/sasl-mechs=PLAIN,DIGEST-MD5
--------------------------------------
+-----
 
 Queries are defined in the configuration file and they can be either plain SQL queries or stored procedures. If the query starts with characters: '\{ call' then the server assumes this is a stored procedure call, otherwise it is executed as a plain SQL query. Each configuration value is stripped from white characters on both ends before processing.
 
@@ -84,16 +83,16 @@ Some queries can take arguments. Arguments are marked by question marks '?' in t
 The first example shows how to put a stored procedure as a query with 2 required parameters.
 
 [source,java]
--------------------------------------
+-----
 add-user-query={ call TigAddUserPlainPw(?, ?) }
--------------------------------------
+-----
 
 The same query with plain SQL parameters instead:
 
 [source,java]
--------------------------------------
+-----
 add-user-query=insert into users (user_id, password) values (?, ?)
--------------------------------------
+-----
 
 The order of the query arguments is important and must be exactly as described in specification for each parameter.
 

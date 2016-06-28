@@ -1,6 +1,5 @@
 [[tigaseTip_RuntimeEnvironment]]
-Tigase Tip: Checking the Runtime Environment
-============================================
+= Tigase Tip: Checking the Runtime Environment
 :author:  not known
 :version: v1.0 inital ver
 :date: not known
@@ -15,7 +14,7 @@ It turned out that due to specific environment settings on the target system, an
 The best way to check all the environment settings used to start the Tigase server is to use..... *check* command line parameter:
 
 [source,sh]
--------------------------------------
+-----
 ./scripts/tigase.sh check etc/tigase.conf
 Checking arguments to Tigase
 TIGASE_HOME = .
@@ -42,6 +41,6 @@ TIGASE_CMD = /System/Library/Frameworks/JavaVM.framework/Versions/1.6/Home/bin/j
     ./libs/tigase-utils.jar:./libs/tigase-xmltools.jar tigase.server.XMPPServer \
     -c etc/tigase.xml --property-file etc/init.properties
 TIGASE_CONSOLE_LOG = ./logs/tigase-console.log
--------------------------------------
+-----
 
 In our case *TIGASE_HOME* was set to a fixed location pointing to an old version of the server files. The quick *check* command may be a real time saver.

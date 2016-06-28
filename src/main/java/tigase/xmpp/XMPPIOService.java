@@ -27,31 +27,26 @@ package tigase.xmpp;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.net.IOService;
-
 import tigase.server.Packet;
 import tigase.server.xmppclient.XMPPIOProcessor;
-
 import tigase.util.TigaseStringprepException;
-
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collections;
-
+import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class XMPPIOService here.
@@ -90,6 +85,9 @@ public class XMPPIOService<RefObject>
 
 	/** Field description */
 	public static final String REQ_NAME            = "req";
+
+	public static final String STREAM_CLOSING        = "stream-closing";
+
 	private static String      cross_domain_policy = null;
 
 	/**

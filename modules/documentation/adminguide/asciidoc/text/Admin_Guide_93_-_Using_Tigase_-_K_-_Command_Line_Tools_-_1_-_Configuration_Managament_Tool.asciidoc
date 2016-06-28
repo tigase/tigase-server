@@ -1,6 +1,5 @@
 [[configurationManagement2]]
-Configuration Management Tool
-=============================
+= Configuration Management Tool
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 21:16
@@ -25,14 +24,14 @@ Configuration management tool is a Java class - link:http://server.tigase.org/br
 First thing you can do is running the script with +-h+ parameter:
 
 [source,sh]
--------------------------------------
+-----
 ./scripts/config.sh -h
--------------------------------------
+-----
 
 In response you get description of all available parameters:
 
 [source,sh]
--------------------------------------
+-----
 Parameters:
  -h             this help message
  -c file        configuration file
@@ -50,6 +49,6 @@ Samples:
 
 Note: adding -print option is useful always, even with -set or -add
       option as it prints set value afterwards.
--------------------------------------
+-----
 
 Let's assume configuration for your server is located in *tigase-config.xml* file. So the first thing you need to set when calling the tool is location of the configuration file.

@@ -1,6 +1,6 @@
 [[about]]
-About Tigase XMPP Server
-========================
+= About Tigase XMPP Server
+
 :Author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :Version: v2.0, June 2014: reformatted for AsciiDoc
 :Date:  2010-04-06 16:18
@@ -18,8 +18,7 @@ About Tigase XMPP Server
 . Make an extensible server which takes full advantage of XMPP protocol extensibility.
 . Make the server easy to setup and maintain.
 
-Robust and reliable
--------------------
+== Robust and reliable
 
 This means that the server can handle many concurrent requests/connections and can run for a long time reliably. The server is designed and implemented to handle millions of simultaneous connections.
 
@@ -29,8 +28,7 @@ It is not enough however to design and implement a high load server and hope it 
 . *Performance tests* - Checking whether the function performs well enough.
 . *Stability tests* - Checking whether the function behaves well in long term run. It must handle hundreds of requests a second in a several hour server run.
 
-Security
---------
+== Security
 
 There are a few elements of the security related to XMPP servers: secure data transmissions which is met by the implementation of *SSL* or *TLS* protocol, secure user authorization which is met by the implementation of *DIGEST* or *SASL* user authorization and secure deployment which is met by component architecture.
 
@@ -42,8 +40,7 @@ If the XMPP server is to provide an effective way of communication between compa
 
 Session Manager connects to *DMZ* and receives all packets from external users. Thus is can securely realize users authorization based on company authorization mechanisms.
 
-Flexibility
------------
+== Flexibility
 
 There are many different XMPP server implementations. The most prevalent are:
 
@@ -55,15 +52,13 @@ Architecture based on components provides the ability to run selected modules on
 
 For simple installation the server generates a config file which can be used straight away with very few modifications or none at all. For complex deployments though, you can tweak configurations to your needs and setup XMPP server on as many physical machines as you need.
 
-Extensibility
--------------
+== Extensibility
 
 The world changes all the time as does user's needs. The XMPP protocol has been designed to be extensible to make it easy to add new features and apply it to those different user's needs. As a result, XMPP is a very effective platform not only for sending messages to other users, it can also be extended for sending instant notifications about events, a useful platform for on-line customer service, voice communication, and other cases where sending information instantly to other people is needed.
 
 *Tigase server* has been designed to be extensible using a modular architecture. You can easily replace components which do not fulfill your requirements with others better fitting your needs. But that is not all, another factor of extensibility is how easy is to replace or add new extensions. A great deal of focus has been put into the server design API to make it easy for other software developers to create extensions and implement new features.
 
-Ease of Use
------------
+== Ease of Use
 
 Complex computer networks consisting of many servers with different services are hard to maintain. This requires employing professional staff to operate and maintain the network.
 

@@ -5,6 +5,7 @@ import java.util.Map;
 import javax.security.auth.callback.CallbackHandler;
 
 import tigase.auth.impl.AuthRepoPlainCallbackHandler;
+import tigase.auth.impl.ScramCallbackHandler;
 import tigase.db.NonAuthUserRepository;
 import tigase.xmpp.XMPPResourceConnection;
 
@@ -50,17 +51,16 @@ public class CallbackHandlerFactory {
 	}
 
 	private String getHandlerClassname(String mechanismName, XMPPResourceConnection session, NonAuthUserRepository repo,
-			Map<String, Object> settings) {
-		if (settings == null) {
-			return null;
-		} else if (settings.containsKey(CALLBACK_HANDLER_KEY + "-" + mechanismName)) {
+									   Map<String, Object> settings) {
+		if (settings != null && settings.containsKey(CALLBACK_HANDLER_KEY + "-" + mechanismName)) {
 			return (String) settings.get(CALLBACK_HANDLER_KEY + "-" + mechanismName);
-		} else if (settings.containsKey(CALLBACK_HANDLER_KEY)) {
+		} else if (settings != null && settings.containsKey(CALLBACK_HANDLER_KEY)) {
 			return (String) settings.get(CALLBACK_HANDLER_KEY);
+		} else if (mechanismName.equals("SCRAM-SHA-1")) {
+			return ScramCallbackHandler.class.getName();
 		} else {
 			return null;
 		}
-
 	}
 
 }

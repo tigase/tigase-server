@@ -184,7 +184,7 @@ public class MobileV3
 			Logger.getLogger(MobileV3.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
-	
+
 	@Override
 	public Element[] supStreamFeatures(XMPPResourceConnection session) {
 		if (session == null) {

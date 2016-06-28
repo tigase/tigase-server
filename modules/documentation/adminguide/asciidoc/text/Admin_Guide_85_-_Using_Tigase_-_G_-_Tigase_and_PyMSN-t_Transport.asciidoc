@@ -1,6 +1,5 @@
 [[Pymsn-t]]
-Tigase and PyMSN-t Transport
-============================
+= Tigase and PyMSN-t Transport
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 21:18
@@ -23,20 +22,19 @@ There are a few basic parameters to set for this protocol:
 Here is side by side configuration for both applications: PyMSN-t and Tigase to make them work together. Both services are setup with the hostname *test-d*. To make sure both *test-d* and *msn.test-d* resolve to correct IP address an entry to the +/etc/hosts+ file is added:
 
 [source,bash]
--------------------------------------
+-----
 ## In your case the IP address should be probably different.
 192.168.0.13    test-d            msn.test-d
--------------------------------------
+-----
 
 Tigase server connects to MySQL database (or built-in XMLBD for simpler configuration variant).
 
 I am not going to setup *PyMSN-t* to run in background as a system service. This is specific to the system you use and is covered in transport documentation and your operating system. Most systems have their own scripts to start services so I would recommend to use them. Here howeevr, it is run in the foreground with full logging switched on to the console to make it easier track what happens.
 
-PyMSN-t - /etc/jabber/pymsn-t.xml file
---------------------------------------
+== PyMSN-t - /etc/jabber/pymsn-t.xml file
 
 [source,bash]
--------------------------------------
+-----
 
 <pymsnt>
   <!-- The JabberID of the transport -->
@@ -83,24 +81,22 @@ PyMSN-t - /etc/jabber/pymsn-t.xml file
     for stdout -->
   <!-- <debugFile>debug.log</debugFile> -->
 </pymsnt>
--------------------------------------
+-----
 
-PyMSN-t - run command
----------------------
+== PyMSN-t - run command
 
 [source,sh]
--------------------------------------
+-----
 python /usr/lib/python2.4/site-packages/pymsn-t/pymsn-t.py \
   -c /etc/jabber/pymsn-t.xml
--------------------------------------
+-----
 
 *Note!* the full path to PyMSN-t config file is important.
 
-PyMSN-t - expected output
--------------------------
+== PyMSN-t - expected output
 
 [source,bash]
--------------------------------------
+-----
 A few last lines should look like:
 [2007-05-07 13:00:39] Starting factory
   <twisted.xish.xmlstream.XmlStreamFactory
@@ -126,26 +122,25 @@ A few last lines should look like:
 [2007-05-07 13:00:46] Stopping factory
   <twisted.xish.xmlstream.XmlStreamFactory
   instance at 0xb7ce80ac>
--------------------------------------
+-----
 
 And PyMSN should continue to print lines until it successfully connects to the Tigase server. When that happens, the following lines should be printed:
 
 [source,bash]
--------------------------------------
+-----
 [2007-05-07 13:29:04] Starting factory
   <twisted.xish.xmlstream.XmlStreamFactory instance at 0xb7cf00ac>
 [2007-05-07 13:29:04] INFO ::  ::  :: componentConnected
   :: PyTransport :: {'xmlstream': <twisted.xish.xmlstream.XmlStream
   instance at 0xb7d0feac>, 'self': 'instance'}
--------------------------------------
+-----
 
-Tigase - etc/tigase.conf file
------------------------------
+== Tigase - etc/tigase.conf file
 
 You may consider removing the last 2 lines from TIGASE_OPTIONS variable to avoid using MySQL for now. Tigase will then use internal XMLDB which doesn't need any special setup. (Just remember to leave closing double quotes...)
 
 [source,bash]
--------------------------------------
+-----
 ENC="-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8"
 DRV="-Djdbc.drivers=com.mysql.jdbc.Driver"
 CLASSPATH="${CLASSPATH}:libs/jdbc-mysql.jar"
@@ -158,30 +153,28 @@ TIGASE_OPTIONS="--gen-config-all --admins \"tus@test-d\"
  --ext-comp \"test-d,msn.test-d,5347,secret,plain,accept\"
  --user-db mysql --user-db-uri
  \"jdbc:mysql://localhost/tigase?user=tigase&password=mypass\" "
--------------------------------------
+-----
 
-Tigase - run command
---------------------
+== Tigase - run command
 
 [source,sh]
--------------------------------------
+-----
 ./bin/tigase.sh start etc/tigase.conf
--------------------------------------
+-----
 
-Tigase - expected output
-------------------------
+== Tigase - expected output
 
 To see the log output from Tigase server execute following command:
 
 [source,sh]
--------------------------------------
+-----
 tail -f logs/tigase-console.log
--------------------------------------
+-----
 
 After transport connects to Tigase server you should see lines like:
 
 [source,bash]
--------------------------------------
+-----
 2007-05-07 12:29:05
   ComponentConnectionManager.processHandshake() FINE:
   Connected to: msn.test-d
@@ -190,6 +183,6 @@ After transport connects to Tigase server you should see lines like:
   FINEST: Modifing service-discovery info:
   <item name="XEP-0114 connected"
   jid="msn.test-d"/>
--------------------------------------
+-----
 
 *Note!* There was a bug in the *jabber:iq:register* plugin which caused problems when registering account in transport. Please use build +432+ or later.

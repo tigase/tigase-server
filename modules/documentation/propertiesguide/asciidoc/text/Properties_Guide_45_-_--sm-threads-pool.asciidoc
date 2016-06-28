@@ -1,6 +1,5 @@
 [[smThreadsPool]]
---sm-threads-pool
-=================
+= --sm-threads-pool
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2013-02-10 01:06
@@ -23,9 +22,9 @@ If you really need or want to preserve the order for packets processed by differ
 We can even fine tune this packet processing. Let's say you want most of the plugins to be executed within a single thread pool to preserve packet ordering for them, but for some selected plugins that should execute within separate thread pools to improve performance.  Let's say, authentication packets and user registration can be actually executed in a separate thread pools as we do not worry about an order for them. Users cannot send or receive anything else before they authenticates anyway. The solution is to specify a number of threads for the selected plugins in the +--sm-plugins+ property as described above. For example, setting a common thread pool for all plugins but registration and authentication can be done with following configuration:
 
 [source,bash]
-------------------------------
+-----
 --sm-threads-pool=custom:100
 --sm-plugins=jabber:iq:register=8,jabber:iq:auth=16,urn:ietf:params:xml:ns:xmpp-sasl=16
-------------------------------
+-----
 
 Available since: 5.1.0

@@ -1,8 +1,6 @@
-Configuration Instructions for Psi
-==================================
+= Configuration Instructions for Psi
 
-Psi - Initial Configuration
----------------------------
+== Psi - Initial Configuration
 
 The first time you run Psi you see a screen like this:
 
@@ -53,8 +51,7 @@ Well, you are now connected but how to talk to other people? How to add friends 
 
 You can send a message to your friends stright away using the *Psi menu* option *New blank message*. It is much more convenient however, if you could see which of your friends is online and available for chatting and if you could start talking to your friend just by clicking on his name.
 
-Short Instructions How to Add Your First Contact
-------------------------------------------------
+== Short Instructions How to Add Your First Contact
 
 1. Click on Psi menu - the button next to the *Online* text. You will see something like this:
 +

@@ -1,6 +1,5 @@
 [[addManageDomain]]
-Add and Manage Domains
-======================
+= Add and Manage Domains
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2012-08-23 21:13
@@ -20,9 +19,7 @@ You can do everything from your XMPP client or you can use our web application t
 
 Secondly, you need an account on the server. This is because all the commands and features described here are available to local users only. Therefore, if you do not have a registered domain with us yet, please go ahead and register an account on the website either the link:http://jabber.me/[Jabber.Me] or link:http://www.tigase.im/[Tigase.IM].
 
-Adding a New Domain
--------------------
-
+== Adding a New Domain
 Once you register an account on one of the websites, connect to the XMPP server using the account on the Psi client. We will be using the following account: green@tigase.im which is this guide.
 
 When you are ready right click on the account name in Psi roster window to bring up context menu. Select *Service Discovery* element.
@@ -47,9 +44,7 @@ image:images/add_vhost_window.png[]
 
 When you are ready click the *Finish* button. All done, hopefully. You can get either a window confirming everything went well or a window printing an error message if something went wrong. What can be wrong? There are some restrictions I decided to put on the service to prevent abuse. One of the restrictions is the maximum number of domains a user can register for himself which is *25* right now. Another restriction is that the domain which you add must have a valid DNS entry pointing to our service. The XMPP guide describes all the details about DNS settings. Please refer to these instructions if you need more details.
 
-Adding a New User
------------------
-
+== Adding a New User
 Adding a new user process is quite similar, almost identical to adding a new domain. This time, however we have to select *Session Manager* in the service discovery window.
 
 image:images/service_disco_window_sm.png[]
@@ -64,9 +59,7 @@ image:images/add_user_window.png[]
 
 If everything went well you have just added a new user and you should get a window confirming successful operation. If something went wrong, a window with an error message should show up. Possible errors may be you tried to add a user which is already present, or you may have tried to add a user for a domain to which you do not have permission or to non-existen domain.
 
-SSSL Certificate Management
----------------------------
-
+== SSL Certificate Management
 SSL Certificate Management has been implemented.  Documentation forthcoming.
 
 //There are plans to add SSL certificates management for your domains. I want to also add more user administration commands but for this I am waiting for your suggestions. You are users, you tell me what you want.

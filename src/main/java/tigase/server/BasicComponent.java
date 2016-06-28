@@ -752,7 +752,7 @@ public class BasicComponent
 			comm.getStatistics(compName, list);
 		}
 		if (connectedNodes.size() > 0) {
-			list.add(getName(), "Known cluster nodes", connectedNodes.size(), Level.INFO);
+			list.add(getName(), "Known cluster nodes", connectedNodes.size(), Level.FINEST);
 		}
 	}
 	

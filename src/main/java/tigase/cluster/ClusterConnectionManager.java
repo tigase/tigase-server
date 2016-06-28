@@ -723,6 +723,11 @@ public class ClusterConnectionManager
 				.getAverageDecompressionRatio(), Level.FINE);
 		list.add(getName(), "Waiting to send", ioStatsGetter.getWaitingToSend(), Level.FINE);
 
+		if ((!list.checkLevel(Level.FINEST)) && getNodesConnected().size() > 0) {
+			// in FINEST level every component will provide this data
+			list.add(getName(), "Known cluster nodes", getNodesConnected().size(), Level.INFO);
+		}
+
 		// list.add(getName(), StatisticType.MSG_RECEIVED_OK.getDescription(),
 		// packetsReceived,
 		// Level.FINE);

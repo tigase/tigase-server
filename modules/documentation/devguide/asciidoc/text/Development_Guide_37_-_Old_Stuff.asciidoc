@@ -1,6 +1,5 @@
 [[oldStuff]]
-Old Stuff
-=========
+= Old Stuff
 :author: Daniel Wisnewski
 :version: v1.0 July 2015
 :date: 2015-27-07 19:43

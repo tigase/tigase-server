@@ -1,6 +1,5 @@
 [[virtHosts]]
---virt-hosts
-============
+= --virt-hosts
 :author: not known
 :version: v1.0 initial release
 :Date: 2013-02-10 01:53
@@ -18,11 +17,11 @@ Some metadata for vhosts can be also provided in the +init.properties+ configura
 Here is an example:
 
 [source,bash]
-------------------------------
+-----
 --virt-hosts=domain1:-anon:register:-tls-required:s2s-secret=s2spasswd:\
   domain-filter=LOCAL:max-users=1000,domain2,\
   domain3:c2s-ports-allowed=5222;5223;5280;5290
   domain3:domain-filter=LIST=whitedomain1;whitedomain2;whitedomain3
-------------------------------
+-----
 
 *Available since:* 4.3.0

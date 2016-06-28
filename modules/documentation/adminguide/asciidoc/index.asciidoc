@@ -51,6 +51,10 @@ include::text/Admin_Guide_12_-_Configuration_-_C_-_Linux_Settings_for_High_Load_
 
 include::text/Admin_Guide_13_-_Configuration_-_D_-_Configuration_Storage_Options.asciidoc[]
 
+include::text/Admin_Guide_13_-_Configuration_-_E_-_JVM_settings.asciidoc[]
+
+include::text/Admin_Guide_105_-_Configuration_-_F_-_Sess-man.asciidoc[]
+
 :leveloffset: 1
 
 include::text/Admin_Guide_14_-_Security.asciidoc[]
@@ -224,6 +228,8 @@ include::text/Admin_Guide_73_-_Components_-_J_-_External_Component_Configuration
 include::text/Admin_Guide_74_-_Components_-_J_-_External_Component_Configuration_-_3_-_Load_Balancing_External_Components_in_Cluster_Mode.asciidoc[]
 
 :leveloffset: 2
+
+include::text/Admin_Guide_103_-_Components_-_K_-_C2S.asciidoc[]
 
 include::text/Admin_Guide_75_-_Virtual_Hosts_in_the_Tigase_Server.asciidoc[]
 
