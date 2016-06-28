@@ -59,15 +59,15 @@ public class StatisticsList implements Iterable<StatRecord> {
 	// ~--- methods --------------------------------------------------------------
 
 	public boolean add(String comp, String description, long value, Level recordLevel) {
-		if (checkLevel(recordLevel, value)) {
+		description = description.intern();
+		if (checkLevel(recordLevel)) {
 			LinkedHashMap<String, StatRecord> compStats = stats.get(comp);
 
 			if (compStats == null) {
 				compStats = addCompStats(comp);
 			}
 
-			compStats.put(description, new StatRecord(comp, description, value,
-					recordLevel));
+			compStats.put(description, new StatRecord(comp, description, value, recordLevel));
 
 			return true;
 		}
@@ -76,15 +76,15 @@ public class StatisticsList implements Iterable<StatRecord> {
 	}
 
 	public boolean add(String comp, String description, int value, Level recordLevel) {
-		if (checkLevel(recordLevel, value)) {
+		description = description.intern();
+		if (checkLevel(recordLevel)) {
 			LinkedHashMap<String, StatRecord> compStats = stats.get(comp);
 
 			if (compStats == null) {
 				compStats = addCompStats(comp);
 			}
 
-			compStats.put(description, new StatRecord(comp, description, value,
-					recordLevel));
+			compStats.put(description, new StatRecord(comp, description, value, recordLevel));
 
 			return true;
 		}
@@ -93,6 +93,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	}
 
 	public boolean add(String comp, String description, String value, Level recordLevel) {
+		description = description.intern();
 		if (checkLevel(recordLevel)) {
 			LinkedHashMap<String, StatRecord> compStats = stats.get(comp);
 
@@ -100,8 +101,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 				compStats = addCompStats(comp);
 			}
 
-			compStats.put(description, new StatRecord(comp, description, value,
-					recordLevel));
+			compStats.put(description, new StatRecord(comp, description, value, recordLevel));
 
 			return true;
 		}
@@ -110,6 +110,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 	}
 
 	public boolean add(String comp, String description, float value, Level recordLevel) {
+		description = description.intern();
 		if (checkLevel(recordLevel)) {
 			LinkedHashMap<String, StatRecord> compStats = stats.get(comp);
 
@@ -117,8 +118,7 @@ public class StatisticsList implements Iterable<StatRecord> {
 				compStats = addCompStats(comp);
 			}
 
-			compStats.put(description, new StatRecord(comp, description, value,
-					recordLevel));
+			compStats.put(description, new StatRecord(comp, description, value, recordLevel));
 
 			return true;
 		}
