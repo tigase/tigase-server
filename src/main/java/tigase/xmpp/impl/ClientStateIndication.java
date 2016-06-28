@@ -2,8 +2,10 @@ package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
+import tigase.kernel.beans.Bean;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.server.Packet;
+import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.impl.annotation.*;
@@ -24,6 +26,7 @@ import java.util.logging.Logger;
 @StreamFeatures({
 		@StreamFeature(elem = "csi", xmlns = ClientStateIndication.XMLNS)
 })
+@Bean(name = ClientStateIndication.ID, parent = SessionManager.class)
 public class ClientStateIndication extends AnnotatedXMPPProcessor
 		implements XMPPProcessorIfc, XMPPPacketFilterIfc {
 
