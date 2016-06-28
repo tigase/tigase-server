@@ -21,9 +21,7 @@
  */
 package tigase.server.xmppclient;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.logging.Level;
+import tigase.kernel.beans.Bean;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.stats.CounterValue;
@@ -32,10 +30,15 @@ import tigase.xml.Element;
 import tigase.xmpp.StreamError;
 import tigase.xmpp.XMPPIOService;
 
+import java.io.IOException;
+import java.util.Map;
+import java.util.logging.Level;
+
 /**
  *
  * @author andrzej
  */
+@Bean(name = StreamErrorCounterIOProcessor.ID, parent = ClientConnectionManager.class, active = false)
 public class StreamErrorCounterIOProcessor implements XMPPIOProcessor {
 
 	public static final String ID = "stream-error-counter";

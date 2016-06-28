@@ -21,6 +21,7 @@
  */
 package tigase.server.xmppclient;
 
+import tigase.kernel.beans.Bean;
 import tigase.net.IOServiceListener;
 import tigase.net.SocketThread;
 import tigase.server.*;
@@ -44,6 +45,7 @@ import java.util.logging.Logger;
  * 
  * @author andrzej
  */
+@Bean(name = StreamManagementIOProcessor.XMLNS, parent = ClientConnectionManager.class, active = false)
 public class StreamManagementIOProcessor implements XMPPIOProcessor {
 
 	private static final Logger log = Logger.getLogger(StreamManagementIOProcessor.class.getCanonicalName());
