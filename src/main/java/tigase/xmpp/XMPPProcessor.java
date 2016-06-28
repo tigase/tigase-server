@@ -27,21 +27,19 @@ package tigase.xmpp;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.TigaseDBException;
-
+import tigase.kernel.beans.config.ConfigField;
+import tigase.server.ComponentInfo;
 import tigase.server.Packet;
-
 import tigase.stats.StatisticsList;
-
 import tigase.xml.Element;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.Collection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Set;
-import tigase.server.ComponentInfo;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * <code>XMPPProcessor</code> abstract class contains basic definition for
@@ -70,7 +68,7 @@ import tigase.server.ComponentInfo;
  * @version $Rev$
  */
 public abstract class XMPPProcessor
-				implements XMPPImplIfc {
+				implements XMPPImplIfc, XMPPProcessorConcurrencyAwareIfc {
 	/** Field description */
 	protected static final String ALL_NAMES = "*";
 
@@ -88,6 +86,12 @@ public abstract class XMPPProcessor
 	 * Variable <code>log</code> is a class logger.
 	 */
 	private static final Logger log = Logger.getLogger(XMPPProcessor.class.getName());
+
+	@ConfigField(desc = "Numbers of threads which should be used by processor")
+	private int threadsNo = concurrentQueuesNo();
+
+	@ConfigField(desc = "Queue size which should be used by processor")
+	private Integer queueSize = null;
 
 	//~--- constructors ---------------------------------------------------------
 
@@ -224,6 +228,16 @@ public abstract class XMPPProcessor
 		}        // end of if (impl_elements != null && impl_xmlns != null)
 
 		return false;
+	}
+
+	@Override
+	public int getThreadsNo() {
+		return threadsNo;
+	}
+
+	@Override
+	public Integer getQueueSize() {
+		return queueSize;
 	}
 
 	//~--- methods --------------------------------------------------------------

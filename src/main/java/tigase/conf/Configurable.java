@@ -237,6 +237,7 @@ public interface Configurable
 	public static final String GEN_SCRIPT_DIR = "--script-dir";
 
 	/** Field description */
+	@Deprecated
 	public static final String GEN_SM_PLUGINS = "--sm-plugins";
 
 	/** Field description */

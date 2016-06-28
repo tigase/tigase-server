@@ -40,6 +40,7 @@ import tigase.eventbus.events.ShutdownEvent;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.RegistrarBean;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 import tigase.server.*;
@@ -84,7 +85,7 @@ import static tigase.server.xmppsession.SessionManagerConfig.*;
 @Bean(name="sess-man", parent=Kernel.class, selectors = {BeanSelector.NonClusterMode.class})
 public class SessionManager
 				extends AbstractMessageReceiver
-				implements Configurable, SessionManagerHandler, OnlineJidsReporter {
+				implements Configurable, SessionManagerHandler, OnlineJidsReporter, RegistrarBean {
 	/** Field description */
 	protected static final String ADMIN_COMMAND_NODE = "http://jabber.org/protocol/admin";
 
@@ -196,29 +197,7 @@ public class SessionManager
 		return super.addOutPacket(packet);
 	}
 
-	public XMPPImplIfc addPlugin(String plug_id, String conc) throws InstantiationException, IllegalAccessException, ClassNotFoundException, TigaseDBException {
-		XMPPImplIfc proc = null;
-		if (plug_id.equals(sessionOpenProcId)) {
-			sessionOpenProc = new SessionOpenProc();
-			proc            = sessionOpenProc;
-		}
-		if (plug_id.equals(sessionCloseProcId)) {
-			sessionCloseProc = new SessionCloseProc();
-			proc             = sessionCloseProc;
-		}
-		if (plug_id.equals(defaultHandlerProcId)) {
-			defHandlerProc = new DefaultHandlerProc();
-			proc           = defHandlerProc;
-		}
-
-		if (proc == null) {
-			proc = SessionManagerConfig.getProcessor(plug_id);
-		}
-		return addPlugin(proc, conc == null ? "" : conc);
-	}
-
-
-	public XMPPImplIfc addPlugin(XMPPImplIfc proc, String conc)
+	public XMPPImplIfc addPlugin(XMPPImplIfc proc)
 					throws ClassNotFoundException, InstantiationException, IllegalAccessException, TigaseDBException {
 		String           version;
 
@@ -227,29 +206,26 @@ public class SessionManager
 		if (proc instanceof XMPPProcessorIfc) {
 			int threadsNo = proc.concurrentQueuesNo();
 			int queueSize = maxQueueSize / threadsNo;
-			if (conc != null && !conc.trim().isEmpty()) {
-					String[] plug_conc = conc.split(":");
-					try {
-						threadsNo = Integer.parseInt(plug_conc[0]);
-						queueSize = maxQueueSize / threadsNo;
-						log.log(Level.CONFIG, "Concurrency for plugin: {0} set to: {1}",
-										new Object[] { proc.id(),
-											threadsNo });
-					} catch (Exception e) {
-						log.log(Level.WARNING, "Plugin " + proc.id() + " concurrency parsing error for: " + conc, e);
-						threadsNo = proc.concurrentQueuesNo();
-					}
-					if (plug_conc.length > 1) {
-					try {
-						queueSize = Integer.parseInt(plug_conc[1]);
-						log.log(Level.CONFIG, "Queue for plugin: {0} set to: {1} per thread",
-										new Object[] { proc.id(),
-											queueSize });
-					} catch (Exception e) {
-						log.log(Level.WARNING, "Plugin " + proc.id() + " queueSize parsing error for: " + conc, e);
-						queueSize = maxQueueSize / threadsNo;
-					}
-					}
+
+			boolean requireNewPool = false;
+			if (proc instanceof XMPPProcessorConcurrencyAwareIfc) {
+				XMPPProcessorConcurrencyAwareIfc procca = (XMPPProcessorConcurrencyAwareIfc) proc;
+				if (threadsNo != procca.getThreadsNo()) {
+					threadsNo = procca.getThreadsNo();
+					log.log(Level.CONFIG, "Concurrency for plugin: {0} set to: {1}",
+							new Object[]{proc.id(),
+									threadsNo});
+					requireNewPool = true;
+				}
+				if (procca.getQueueSize() != null) {
+					queueSize = procca.getQueueSize();
+					log.log(Level.CONFIG, "Queue for plugin: {0} set to: {1} per thread",
+							new Object[]{proc.id(),
+									queueSize});
+					requireNewPool = true;
+				} else {
+					queueSize = maxQueueSize / threadsNo;
+				}
 			}
 
 			threadsNo = threadsNo * pluginsThreadFactor;
@@ -257,7 +233,7 @@ public class SessionManager
 			// If there is not default processors thread pool or the processor does
 			// have thread pool specific settings create a separate thread pool
 			// for the processor
-			if ((workerThreads.get(defPluginsThreadsPool) == null) || (conc != null)) {
+			if ((workerThreads.get(defPluginsThreadsPool) == null) || requireNewPool) {
 
 				// Added to make sure that there will be only one thread pool for plugin
 				// so if one exits we will keep it and not create another one
@@ -322,11 +298,9 @@ public class SessionManager
 		}    // end of if (!loaded)
 		if (proc != null) {
 			if (allPlugins.add(proc)) {
-				if (conc == null) {
-					Map<String, Object> settings = new HashMap<>();
-					//settings.put("sm-jid", getComponentId());
-					proc.init(settings);
-				}
+				Map<String, Object> settings = new HashMap<>();
+				//settings.put("sm-jid", getComponentId());
+				proc.init(settings);
 				eventBus.registerAll(proc);
 			}
 			if (proc instanceof PresenceCapabilitiesManager.PresenceCapabilitiesListener) {
@@ -769,7 +743,7 @@ public class SessionManager
 		added.removeAll(oldPlugins);
 		for (XMPPImplIfc proc : added) {
 			try {
-				addPlugin(proc, null);
+				addPlugin(proc);
 			} catch (ClassNotFoundException|InstantiationException|IllegalAccessException|TigaseDBException e) {
 				log.log(Level.SEVERE, "Failed initialization of processor " + proc.id(), e);
 			}
@@ -1938,7 +1912,15 @@ public class SessionManager
 		// other components will be aware that we are stopping this server
 		addTimerTask(nodeShutdownTask, event.getDelay() * SECOND, 1 * SECOND);
 	}
-	
+
+	public void register(Kernel kernel) {
+
+	}
+
+	public void unregister(Kernel kernel) {
+
+	}
+
 	//~--- get methods ----------------------------------------------------------
 
 	public Map<String, XMPPProcessorIfc> getProcessors() {

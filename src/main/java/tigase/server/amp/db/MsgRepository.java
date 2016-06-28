@@ -251,7 +251,7 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 	 * Bean used to provide MsgRepository implementations - for every domain default one
 	 * using backend configured for default domain.
 	 */
-	@Bean(name = "msgRepository", parent = Kernel.class)
+	@Bean(name = "msgRepository", parent = Kernel.class, exportable = true)
 	public static class MsgRepositorySDBean extends MsgRepositoryMDBean {
 
 		@Override

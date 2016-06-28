@@ -29,7 +29,7 @@ import tigase.kernel.core.Kernel;
 /**
  * Created by andrzej on 08.03.2016.
  */
-@Bean(name="authRepository", parent = Kernel.class)
+@Bean(name="authRepository", parent = Kernel.class, exportable = true)
 public class AuthRepositoryMDPoolBean extends AuthRepositoryMDImpl {
 
 	@Override

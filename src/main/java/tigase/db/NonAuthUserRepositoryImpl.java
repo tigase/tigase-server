@@ -45,7 +45,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-@Bean(name = "nonAuthUserRepository", parent = Kernel.class)
+@Bean(name = "nonAuthUserRepository", parent = Kernel.class, exportable = true)
 public class NonAuthUserRepositoryImpl implements NonAuthUserRepository {
 
 	/**

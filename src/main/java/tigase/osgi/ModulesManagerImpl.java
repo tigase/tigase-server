@@ -19,22 +19,21 @@
  */
 package tigase.osgi;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import tigase.conf.Configurable;
 import tigase.conf.Configurator;
 import tigase.server.ServerComponent;
 import tigase.server.XMPPServer;
 import tigase.util.ClassUtil;
 import tigase.xmpp.XMPPImplIfc;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -61,6 +60,10 @@ public class ModulesManagerImpl implements ModulesManager {
                 plugins = new ConcurrentHashMap<String, XMPPImplIfc>();
                 componentsClasses = new ConcurrentHashMap<String, Class<? extends Configurable>>();
 				classes = new ConcurrentHashMap<String, Class<?>>();
+        }
+
+        public Collection<Class<?>> getClasses() {
+        	return classes.values();
         }
 
         @Override

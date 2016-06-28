@@ -31,7 +31,11 @@ import tigase.kernel.DefaultTypesConverter;
 import tigase.kernel.beans.config.BeanConfigurator;
 import tigase.kernel.core.DependencyGrapher;
 import tigase.kernel.core.Kernel;
+import tigase.osgi.ModulesManagerImpl;
+import tigase.server.xmppsession.SessionManagerConfig;
 import tigase.util.DataTypes;
+import tigase.xmpp.ProcessorFactory;
+import tigase.xmpp.XMPPImplIfc;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -41,6 +45,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static tigase.conf.Configurable.GEN_SM_PLUGINS;
 import static tigase.conf.ConfiguratorAbstract.PROPERTY_FILENAME_PROP_DEF;
 import static tigase.conf.ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY;
 
@@ -177,6 +182,69 @@ public class Bootstrap implements Lifecycle {
 		}
 
 		props.putAll(toAdd);
+
+		// converting list of sess-man processors from --sm-plugins to sess-man/beans
+		// and converting concurrency settings as well
+		String plugins = (String) props.get(GEN_SM_PLUGINS);
+		if (plugins != null) {
+			StringBuilder smBeans = new StringBuilder();
+			Map<String,String> plugins_concurrency = new HashMap<>();
+			String[] parts = plugins.split(",");
+			for (String part : parts) {
+				String[] tmp = part.split("=");
+				String name = tmp[0];
+				if (name.charAt(0) == '+' || name.charAt(0) == '-') {
+					name = name.substring(1);
+				}
+				if (tmp.length > 1) {
+					plugins_concurrency.put(name, tmp[1]);
+				}
+				if (smBeans.length() != 0)
+					smBeans.append(",");
+				smBeans.append(tmp[0]);
+
+				try {
+					XMPPImplIfc proc = ModulesManagerImpl.getInstance().getPlugin(name);
+					if (proc == null) {
+						proc = ProcessorFactory.getImplementation(name);
+					}
+					if (proc != null) {
+						props.put("sess-man/" + name + "/class", proc.getClass().getCanonicalName());
+					} else {
+						log.log(Level.WARNING, "could not find class for processor " + name);
+					}
+				} catch (Exception ex) {
+					log.log(Level.WARNING, "not able to get instance of processor " + name, ex);
+				}
+			}
+			props.put("sess-man/beans", smBeans.toString());
+
+			String concurrency = (String) props.get(SessionManagerConfig.PLUGINS_CONCURRENCY_PROP_KEY);
+			if (concurrency != null) {
+				for (String part : concurrency.split(",")) {
+					String[] tmp = part.split("=");
+					plugins_concurrency.put(tmp[0], tmp[1]);
+				}
+			}
+
+			for (Map.Entry<String,String> e : plugins_concurrency.entrySet()) {
+				String prefix = "sess-man/" + e.getKey() + "/";
+				String[] tmp = e.getValue().split(":");
+				try {
+					props.put(prefix + "threadsNo", Integer.parseInt(tmp[0]));
+				} catch (Exception ex) {
+					log.log(Level.WARNING, "Plugin " + e.getKey() + " concurrency parsing error for: " + tmp[0], ex);
+				}
+				if (tmp.length > 1) {
+					try {
+						props.put(prefix + "queueSize", Integer.parseInt(tmp[1]));
+					} catch (Exception ex) {
+						log.log(Level.WARNING, "Plugin " + e.getKey() + " queueSize parsing error for: " + tmp[1], ex);
+					}
+				}
+			}
+		}
+
 	}
 
 	public void setProperties(Map<String,Object> props) {

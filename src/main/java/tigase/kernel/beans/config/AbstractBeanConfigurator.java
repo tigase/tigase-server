@@ -214,7 +214,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 			if (beansProp != null) {
 				String[] beansPropArr = beansProp.split(",");
 				for (String beanStr : beansPropArr) {
-					String beanName = null;
+					String beanName = beanStr;
 					boolean active = true;
 					if (beanStr.startsWith("-")) {
 						beanName = beanStr.substring(1);
@@ -299,6 +299,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		// TODO - needs to be adjusted to support OSGi
 		try {
 			Set<Class<?>> classes = ClassUtil.getClassesFromClassPath();
+			classes.addAll(ModulesManagerImpl.getInstance().getClasses());
 			registerBeansForBeanOfClass(kernel, cls, classes);
 		} catch (IOException |ClassNotFoundException ex) {
 			log.log(Level.WARNING, "could not load clases for bean registration", ex);

@@ -101,7 +101,8 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 								vals.put(key.substring(idx + 1), e.getValue());
 								continue;
 							}
-						} else if (i == path.size() || aliases.contains(key)) {
+						}
+						if (i == path.size() || aliases.contains(key)) {
 							result.put(key, e.getValue());
 						}
 					}
