@@ -1,6 +1,5 @@
 [[configuration]]
-Configuration
-=============
+= Configuration
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 12:28

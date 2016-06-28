@@ -1,6 +1,5 @@
 [[cil4]]
-Component Implementation - Lesson 4 - Service Discovery
-=======================================================
+= Component Implementation - Lesson 4 - Service Discovery
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-01-06 20:22
@@ -17,7 +16,7 @@ In this article I will show how to, in a simple way, change the basic component 
 Component description and category type can be changed by overriding two following methods:
 
 [source,java]
---------------------------------------
+-----
 @Override
 public String getDiscoDescription() {
   return "Spam filtering";
@@ -27,7 +26,7 @@ public String getDiscoDescription() {
 public String getDiscoCategoryType() {
   return "spam";
 }
---------------------------------------
+-----
 
 Please note, there is no such *\'spam'* category type defined in the link:http://xmpp.org/registrar/disco-categories.html[Service Discovery Identities registry]. It has been used here as a demonstration only. Please refer to the Service Discovery Identities registry document for a list of categories and types and pick the one most suitable for you.
 
@@ -42,11 +41,11 @@ One of the limitations of methods above is that you can not update or change com
 In our simple spam filtering component let's show how many messages have been checked out as part of the service discovery description string. Every time we receive a message we can to call:
 
 [source,java]
--------------------------------------------
+-----
 updateServiceDiscoveryItem(getName(), null,
   getDiscoDescription() + ": [" +
   (++messagesCounter) + "]", true);
--------------------------------------------
+-----
 
 _A small performance note, in some cases calling +updateServiceDiscoveryItem(...)+ might be an expensive operation so probably a better idea would be to call the method not every time we receive a message but maybe every 100 times or so._
 
@@ -59,7 +58,7 @@ The complete method code is presented below and the screenshot above shows how t
 Using the method we can also add submodes to our component element. The XMPP service discovery really is not for showing application counters, but this case it is good enough to demonstrate the API available in Tigase so we continue with presenting our counters via service discovery. This time, instead of using 'null' as a node we put some meaningful texts as in example below:
 
 [source,java]
-----------------------------------------------------------------
+-----
 // This is called whenever a message arrives
 // to the component
 updateServiceDiscoveryItem(getName(), "messages",
@@ -68,7 +67,7 @@ updateServiceDiscoveryItem(getName(), "messages",
 // spam message
 updateServiceDiscoveryItem(getName(), "spam", "Spam caught: [" +
   (++totalSpamCounter) + "]", true);
-----------------------------------------------------------------
+-----
 
 Again, have a look at the full method body below for a complete code example. Now if we send a few messages to the component and some of them are spam (contain words recognized as spam) we can browse the service discovery of the server. Your service discovery should show a list similar to the one presented on the screenshot on the left.
 
@@ -77,10 +76,10 @@ Of course depending on the implementation, initially there might be no sub-nodes
 Please note, the +updateServiceDiscoveryItem(...)+ method is used for adding a new item and updating existing one. There is a separate method though to remove the item:
 
 [source,java]
--------------------------------------------
+-----
 void removeServiceDiscoveryItem(String jid,
   String node, String description)
--------------------------------------------
+-----
 
 Actually only two first parameters are important: the *jid* and the *node* which must correspond to the existing, previously created service discovery item.
 
@@ -89,10 +88,10 @@ There are two additional variants of the _update_ method which give you more con
 The simpler is a variant which sets a set of features for the updated service discovery item. There is a link:http://xmpp.org/registrar/disco-features.html[document] describing existing, registered features. We are creating an example which is going to be a spam filter and there is no predefined feature for spam filtering but for purpose of this guide we can invent two feature identification strings and set it for our component. Let's call +update+ method with following parameters:
 
 [source,java]
-------------------------------------------------------------------
+-----
 updateServiceDiscoveryItem(getName(), null, getDiscoDescription(),
   true, "tigase:x:spam-filter", "tigase:x:spam-reporting");
-------------------------------------------------------------------
+-----
 
 The best place to call this method is the +setProperties(...)+ method so our component gets a proper service discovery settings at startup time. We have set two features for the component disco: _tigase:x:spam-filter_ and _tigase:x:spam-reporting_. This method accepts a variable set of arguments so we can pass to it as many features as we need or following Java spec we can just pass an array of *Strings*.
 
@@ -101,16 +100,16 @@ Update your code with call presented above, and restart the server. Have a look 
 The last functionality might be not very useful for our case of the spam filtering component, but it is for many other cases like MUC or PubSub for which it is setting proper category and type for the service discovery item. There is a document listing all currently registered service discovery identities (categories and types). Again there is entry for spam filtering. Let's use the _automation_ category and _spam-filter_ type and set it for our component:
 
 [source,java]
-------------------------------------------------------------------
+-----
 updateServiceDiscoveryItem(getName(), null, getDiscoDescription(),
   "automation", "spam-filtering", true,
   "tigase:x:spam-filter", "tigase:x:spam-reporting");
-------------------------------------------------------------------
+-----
 
 Of course all these setting can be applied to any service discovery create or update, including sub-nodes. And here is a complete code of the component:
 
 [source,java]
-------------------------------------------------------------------
+-----
 import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -244,4 +243,4 @@ public class TestComponent extends AbstractMessageReceiver {
   }
 
 }
-------------------------------------------------------------------
+-----

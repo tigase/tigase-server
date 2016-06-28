@@ -1,6 +1,5 @@
 [[packetProcess]]
-How Packets are Processed by the SM and Plugins
-===============================================
+= How Packets are Processed by the SM and Plugins
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 21:22
@@ -10,9 +9,7 @@ How Packets are Processed by the SM and Plugins
 
 For Tigase server plugin development it is important to understand how it all works. There are different kind of plugins responsible for processing packets at different stages of the data flow. Please read the introduction below before proceeding to the actual coding part.
 
-Introduction
-------------
-
+== Introduction
 In Tigase server *plugins* are pieces of code responsible for processing particular XMPP stanzas. A separate plugin might be responsible for processing messages, a different one for processing presences, a separate plugins responsible for iq roster, and a different one for iq version and so on.
 
 A plugin provides information about what exact XML element(s) name(s) with xmlns it is interested in. So you can create a plugin which is interested in all packets containing caps child.

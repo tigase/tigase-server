@@ -1,6 +1,5 @@
 [[presenceForwarding]]
-Presence Forwarding
-===================
+= Presence Forwarding
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2012-08-23 21:52
@@ -35,7 +34,7 @@ You should be able to find a few more code examples on the wiki page.
 
 
 [source,java]
--------------------------------------
+-----
 package jaxmppexample
 import tigase.jaxmpp.core.client.BareJID
 import tigase.jaxmpp.core.client.SessionObject
@@ -64,4 +63,4 @@ jaxmpp.login()
 println( "Waiting for the presence for 10 minutes" )
 Thread.sleep( 10 * 60 * 1000 )
 disconnect()
--------------------------------------
+-----

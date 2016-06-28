@@ -920,6 +920,7 @@ public class ClientConnectionManager
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Sending stream close to the client: {0}", streamClose);
 					}
+					serv.getSessionData().put(XMPPIOService.STREAM_CLOSING, true);
 					serv.writeRawData(streamClose);
 					if (moreToSend) {
 

@@ -1,6 +1,5 @@
 [[s2sEjabberdBugWorkaroundActive]]
---s2s-ejabberd-bug-workaround-active
-====================================
+= --s2s-ejabberd-bug-workaround-active
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2013-02-10 00:58

@@ -1,6 +1,5 @@
 [[stanzaLimitations]]
-Stanza Limitations
-==================
+= Stanza Limitations
 :author: Daniel Wisnewski <daniel.wisnewski@tigase.com>
 :version: v1.0, Janurary 2016
 :date: 2016-20-01
@@ -26,8 +25,7 @@ These values may be changed.
 *Note that these limitations are to elements and attributes that may be within a stanza, but do not limit the overall stanza length.*
 
 
-Escape Characters
------------------
+== Escape Characters
 There are special characters that need to be escaped if they are included in the stanza to avoid conflicts. The rules are similar to normal XML escaping.
 The following is a list of characters that need to be escaped and what to use to escape them:
 [source]

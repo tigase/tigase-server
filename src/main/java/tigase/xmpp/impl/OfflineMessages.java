@@ -413,8 +413,10 @@ public class OfflineMessages
 			}
 
 			Element elem = pac.getElement().clone();
-			String stamp = null;
 
+			C2SDeliveryErrorProcessor.filterErrorElement(elem);
+
+			String stamp = null;
 			synchronized ( formatter ) {
 				stamp = formatter.format( new Date() );
 			}

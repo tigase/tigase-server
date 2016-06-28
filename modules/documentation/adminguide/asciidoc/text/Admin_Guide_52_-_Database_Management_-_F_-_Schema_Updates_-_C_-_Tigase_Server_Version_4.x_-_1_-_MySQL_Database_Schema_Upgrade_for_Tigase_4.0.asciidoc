@@ -1,6 +1,5 @@
 [[tigase40schemaupgrade]]
-MySQL Database Schema Upgrade for Tigase 4.0
-============================================
+= MySQL Database Schema Upgrade for Tigase 4.0
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-01-06 20:18
@@ -27,14 +26,14 @@ _Please note. I have done a few schema upgrades already in a few different confi
 . _The following error may manifest itself in many ways from the NullPointerException in Tigase server log file to message like this:_ *User does not have access to metadata required to determine stored procedure parameter types. If rights can not be granted, configure connection with "noAccessToProcedureBodies=true" to have driver generate parameters that represent INOUT strings irregardless of actual parameter types.* _The best solution to this is to grant proper permissions to this user. Enter the MySQL command line mode as MySQL super user:_
 +
 [source,sql]
--------------------------------------
+-----
 $ mysql -u root -proot_passwd mysql
 mysql> GRANT SELECT, INSERT, UPDATE ON \`mysql\`.\`proc\` TO 'tigase_user'@'localhost';
 mysql> GRANT SELECT, INSERT, UPDATE ON \`mysql\`.\`proc\` TO 'tigase_user'@'%';
 mysql> GRANT SELECT, INSERT, UPDATE ON \`mysql\`.\`proc\` TO 'tigase_user';
 mysql> FLUSH PRIVILEGES;
 $
--------------------------------------
+-----
 
 Assumptions:
 
@@ -45,30 +44,30 @@ Assumptions:
 First things first - make a database backup:
 
 [source,sh]
--------------------------------------
+-----
 mysqldump -u tigase_user -pmypass tigasedb > tigasedb_dump.sql
--------------------------------------
+-----
 
 If you need to restore database for any reason execute following commands:
 
 [source,sh]
--------------------------------------
+-----
 msyqladmin -u tigase_user -pmypass drop tigasedb
 mysqladmin -u tigase_user -pmypass create tigasedb
 mysql -u tigase_user -pmypass tigasedb < tigasedb_dump.sql
--------------------------------------
+-----
 
 _Note! You may be required to use_ *root* _user and password to execute mysqladmin commands.  Ok we have the database backup and we know how to restore it. Now we can run schema upgrade script:_
 
 [source,sh]
--------------------------------------
+-----
 mysql -u tigase_user -pmypass tigasedb < database/mysql-schema-upgrade-to-4.sql
--------------------------------------
+-----
 
 _The script should generate output like this:_
 
 [source,sh]
--------------------------------------
+-----
 Droping index for user_id column
 Resizing user_id column to 2049 characters to comply with RFC
 Creating a new index for user_id column for first 765 bytes of the field
@@ -92,4 +91,4 @@ Converting database to a new format
 Creating a new index for sha1_user_id column
 Setting schema version to 4.0
 All done, database ready to use!
--------------------------------------
+-----

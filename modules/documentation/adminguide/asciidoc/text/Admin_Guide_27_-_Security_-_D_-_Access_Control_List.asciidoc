@@ -1,6 +1,5 @@
 [[accessControlList]]
-Access Control Lists in Tigase
-==============================
+= Access Control Lists in Tigase
 :author: Artur Hefczyc
 :version: v1.0 October 2015
 :date: 2015-10-26 08:51

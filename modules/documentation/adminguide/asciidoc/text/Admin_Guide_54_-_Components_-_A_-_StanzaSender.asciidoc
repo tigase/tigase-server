@@ -1,6 +1,6 @@
 [[stanzaSender]]
-StanzaSender
-============
+= StanzaSender
+
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 21:18
@@ -16,8 +16,7 @@ It simply allows you to send stanzas from your application without implementing 
 
 If you have a Web application for example for which you want to send notifications of an event to selected users you can install link:https://projects.tigase.org/projects/tigase-server/repository/revisions/master/show/src/main/java/tigase/server/ssender[StanzaSender] component on your Tigase server. It will help you to easily distribute your messages to end-users.
 
-How it Works
-------------
+== How it Works
 
 The module itself doesn't do anything, it just schedules tasks and sends stanzas which come from anywhere. To do the actual work of retrieving stanzas from data source the component uses *tasks*.
 
@@ -30,8 +29,7 @@ The tasks which are available are:
 - +FileTask+ retrieving stanzas from directory in file system.
 - +JDBCTask+ retrieving stanzas from SQL database.
 
-FileTask
-~~~~~~~~
+=== FileTask
 
 +FileTask+ implements tasks for cyclic retrieving stanzas from a directory and sending them to the StanzaHandler object.
 
@@ -52,8 +50,7 @@ Note the last forward slash '/' is required in such case if the last element of 
 
 *Please note! Tigase must have writing permissions for this directory, otherwise it may not function properly.*
 
-JDBCTask
-~~~~~~~~
+=== JDBCTask
 
 +JDBCTask+ implements tasks for cyclic retrieving stanzas from database and sending them to the StanzaHandler object.
 
@@ -70,8 +67,7 @@ By default it is looking for stanzas in +xmpp_stanza+ table, but you can specify
 
 Please note the last parameter which is specific to +JDBCTask+. You can specify the table name which stores stanzas for sending, if omitted default value is: +xmpp_stanza+.
 
-Configuration
--------------
+== Configuration
 
 StanzaSender is a Tigase component so the configuration is similar to that of all other components. The simplest way to get the settings for *StanzaSender* is by generating a configuration with all possible components. To do this you have to run Tigase server with +--gen-config-all+ parameter set.
 
@@ -80,25 +76,25 @@ By default this component name is *ssend* and here is a content of the configura
 It is one of +msg-receivers+:
 
 [source,bash]
--------------------------------------
+-----
 <entry type="String[]" key="id-names">
   ...
   <item value="ssend"/>
 </entry>
--------------------------------------
+-----
 
 To activate the component and a specify class name for it following entries has been added:
 
 [source,bash]
--------------------------------------
+-----
 <entry value="true" type="Boolean" key="ssend.active"/>
 <entry value="tigase.server.ssender.StanzaSender" type="String" key="ssend.class"/>
--------------------------------------
+-----
 
 And the main settings section for the component:
 
 [source,bash]
--------------------------------------
+-----
 <component name="ssend">
   <map>
    <entry value="10" type="Long" key="default-interval"/>
@@ -127,11 +123,11 @@ And the main settings section for the component:
    </map>
   </node>
  </component>
--------------------------------------
+-----
 
 Most parameters should be pretty clear but some may need a little explanation.
-General +StanzaSender+ parameters:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+=== General +StanzaSender+ parameters:
 
 - *default-interval* number which specifies in seconds how often should the task look in data source for new packets to send.
 - *max-queue-size* is a number which specifies internal packets queue size. This is used to prevent the component from consuming all the memory for data in case the component can not process them.

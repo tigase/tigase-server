@@ -36,6 +36,24 @@ $IZPACK_DIR/bin/compile \
      -h $IZPACK_DIR/ \
      -b . -o ./pack/tigase-server-$TIGVER.jar
 
+# we need to sign the installer to allow distribution of signed binaries
+# this will be executed only if keystore variable is set!
+if [ -f ~/.m2/settings.xml ] ; then
+
+	KEYSTORE_PATH=`export EL="sign-keystore" ; cat ~/.m2/settings.xml | grep -oE "<${EL}>(.*)<\/${EL}>" | sed "s/.*<${EL}>\(.*\)<\/${EL}>.*/\1/"`
+
+	if [ ! -z "${KEYSTORE_PATH}" ] ; then
+		SIGN_ALIAS=`export EL="sign-alias" ; cat ~/.m2/settings.xml | grep -oE "<${EL}>(.*)<\/${EL}>" | sed "s/.*<${EL}>\(.*\)<\/${EL}>.*/\1/"`
+		SIGN_STOREPASS=`export EL="sign-storepass" ; cat ~/.m2/settings.xml | grep -oE "<${EL}>(.*)<\/${EL}>" | sed "s/.*<${EL}>\(.*\)<\/${EL}>.*/\1/"`
+		SIGN_KEYPASS=`export EL="sign-keypass" ; cat ~/.m2/settings.xml | grep -oE "<${EL}>(.*)<\/${EL}>" | sed "s/.*<${EL}>\(.*\)<\/${EL}>.*/\1/"`
+
+		jarsigner -keystore $KEYSTORE_PATH -storepass $SIGN_STOREPASS -keypass $SIGN_KEYPASS -tsa http://timestamp.comodoca.com/rfc3161 ./pack/tigase-server-$TIGVER.jar ${SIGN_ALIAS}
+	fi
+else
+  echo "keystore path missing, skipping signing!"
+fi
+
+
 # create exe file, on Mac copy proper 7za binary to izpack directory
 
 if [[ "$(uname -s)" == "Darwin" && -f /usr/local/bin/7za ]] ; then

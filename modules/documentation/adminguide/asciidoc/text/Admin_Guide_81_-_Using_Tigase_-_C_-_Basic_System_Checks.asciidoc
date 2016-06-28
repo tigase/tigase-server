@@ -1,6 +1,5 @@
 [[systemchecks]]
-Basic System Checks
-===================
+= Basic System Checks
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-03-06 20:18
@@ -16,7 +15,7 @@ Of course, high load and high traffic systems require much more tuning and adjus
 
 In any case, there are some basic checks to do every time you deploy XMPP service to make sure it will function properly. I am trying to keep the article mentioned above up to date and add all the settings and parameters I discover while working with different installations. _If you have some suggestions for different values or different parameters to add, please let me know._
 
-The article, while helpful, seems to be not enough though.
+// The article, while helpful, seems to be not enough though.
 
 If you want to run a service on a few cluster nodes (5 or even 10), then manually checking every machine and adjusting these settings is time consuming and it is very easy to forget about.
 

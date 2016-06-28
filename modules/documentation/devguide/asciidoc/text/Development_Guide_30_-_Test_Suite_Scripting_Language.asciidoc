@@ -1,6 +1,5 @@
 [[testSuideScripts]]
-Test Suite Scripting Language
-=============================
+= Test Suite Scripting Language
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 21:22
@@ -14,8 +13,8 @@ The test suite contains scripting language which allows you to combine test case
 
 Let's look at the example test description.
 
-[source,java,numbered]
-------------------------------------------------------------------
+[source,java]
+-----
 Short name@test-id-1;test-id-2: Short description for the test case
 {
  -loop = 10
@@ -23,7 +22,7 @@ Short name@test-id-1;test-id-2: Short description for the test case
  # This is a comment which is ignored
 }
 >> Long, detailed description of the test case <<
-------------------------------------------------------------------
+-----
 
 Meaning of all elements:
 

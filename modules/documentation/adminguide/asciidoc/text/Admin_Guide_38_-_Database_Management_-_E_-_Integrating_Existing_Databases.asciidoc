@@ -1,6 +1,5 @@
 [[existingData]]
-Importing Existing Data
-=======================
+= Importing Existing Data
 :author: Daniel Wisnewski
 :version: v1.0 October, 2015
 :date: 2015-05-10 13:35

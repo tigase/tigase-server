@@ -1,6 +1,5 @@
 [[initPropertiesGuide]]
-Tigase XMPP Server init.properties Configuration
-================================================
+= Tigase XMPP Server init.properties Configuration
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2013-02-09 03:54
@@ -19,11 +18,11 @@ The key starts with first non-white space ASCII character and ends on either fir
 All examples below specify 'vhosts' as a key and 'test-a, test-b, test-c' as a value:
 
 [source,bash]
--------------------------------------
+-----
 vhosts=test-a, test-b, test-c
 vhosts : test-a, test-b, test-c
     vhosts     =     test-a, test-b, test-c
--------------------------------------
+-----
 
 Possible types are:
 

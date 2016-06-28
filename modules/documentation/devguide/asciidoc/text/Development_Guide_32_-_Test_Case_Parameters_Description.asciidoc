@@ -1,5 +1,4 @@
-Test Case Parameters Description
-================================
+= Test Case Parameters Description
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 21:22
@@ -11,9 +10,7 @@ Test Case Parameters Description
 
 There is long list of parameters which can be applied to any test case. Here is the description of all possible parameters which can be used to build test scenarios.
 
-Test Report Configuration
--------------------------
-
+== Test Report Configuration
 There are test report parameters which must be set in the main script file in order to generate HTML report from the test. These parameters have no effect is they are set inside the test case description.
 
 . *-version = 2.0.0* sets the test script version. This is used to easily detect incompatibility issues when the test suite loads a script created for more recent version of the suite and may not work properly for this version.
@@ -24,16 +21,14 @@ There are test report parameters which must be set in the main script file in or
 . *-output-cols = (5 | 7)* Only valid values are:
 +
 [source,bash]
-------------------------------------------------------------------
+-----
 5: "Test name", "Result", "Test time", "Description" [, "History" ]
 7: "Test name", "Result", "Total time", "OK", "Average", "Description" [, "History" ]
-------------------------------------------------------------------
+-----
 
 . *-title* = "The title of the report page" This parameter sets the test report title which is placed in the HTML page in the +<title/>+ element as well as in the first page header.
 
-Basic Test Parameters
----------------------
-
+== Basic Test Parameters
 These parameters can be set on per-test case basis but usually they are set in the main script file to apply them to all test cases.
 
 . *-base-ns = "jabber:client"* sets the XML name space used for the XML stream in the XMPP connection. Some test cases can be used to test client to server protocol as well as server to server protocol and possibly different protocols added in the future.
@@ -53,9 +48,7 @@ These parameters can be set on per-test case basis but usually they are set in t
 . *-user-pass = tester-password* sets the password for the user used for the XMPP connection between the test suite and the XMPP server.
 . *-user-resr = resource* sets the user JID resource part for the XMPP connection between the test suite and the XMPP server.
 
-Test Case Parameters
---------------------
-
+== Test Case Parameters
 Test parameters which are normally set on per-test case basis and apply only to the test they are set for and all inherited tests. Some of the parameters though are applied only to inherited test cases. Please look in the description below to find more details.
 
 . *-active-connection* is a similar parameter to *-on-one-socket* option. If set the suite doesn't close the network socket and if the test is run in loop each loop run re-uses the network connection. Unlike in the -on-one-socket mode the whole test is executed on each run including XMPP stream initialization and user authentication. This option is currently not recommended in a normal use. It is useful only to debug the server behavior in very special use cases.

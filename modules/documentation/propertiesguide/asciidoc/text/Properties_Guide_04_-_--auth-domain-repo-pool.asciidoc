@@ -1,6 +1,5 @@
 [[authDomainRepoPool]]
---auth-domain-repo-pool
-=======================
+= --auth-domain-repo-pool
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2013-02-09 21:01

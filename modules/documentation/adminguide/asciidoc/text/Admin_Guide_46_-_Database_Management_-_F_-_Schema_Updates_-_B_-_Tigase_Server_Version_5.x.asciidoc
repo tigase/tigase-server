@@ -1,6 +1,5 @@
 [[tigase51schemaupgrade]]
-Tigase 5.1 Database Schema Upgrade
-==================================
+= Tigase 5.1 Database Schema Upgrade
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2012-07-16 11:10

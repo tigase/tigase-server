@@ -1,6 +1,5 @@
 [[restAPI]]
-REST API & HTTP Guide
-=====================
+= REST API & HTTP Guide
 :author: many people
 :date: 2015-11-09 10:22
 :version: v1.0 September 2015
@@ -13,8 +12,7 @@ This component covers both REST API as well as basic HTTP component configuratio
 REST stands for REpresentational State Transfer which is a stateless communication method that in our case passes commands using HTTP GET, PUT, POST, and DELETE commands to resources within the Tigase server.
 Although REST uses HTTP to receive commands, REST itself is not intended for use in a browser.
 
-Setup & Configuration
----------------------
+== Setup & Configuration
 Tigase's REST component requires the following in classpath
 
 - +servlet-api-3.1.jar+
@@ -31,22 +29,20 @@ In this default configuration, Tigase will try to start a standalone Jetty HTTP 
 
 *NOTE:* Scripts that handle HTTP requests are available in the component repository in +src/scriopts/groovy/tigase/rest/+ directory.
 
-Component Properties
-~~~~~~~~~~~~~~~~~~~~
+=== Component Properties
 Here are some additional properties for the +HttpMessageReceiver+ component that can be set in the init.properties file.
 
-- +http/ports[i]=+ - Sets a comma separated list of ports on which the HTTP server will listen for connections. Default is 8080.
-- +http/*********/socket=ssl+ - Sets the port for SSL connections, replace ### with the port number of your choice.
-- +http/*********/domain=example.com+ - This sets the domain name of the SSL certificate from Tigase XMPP certificate store, also sets the port to ### to listen for HTTPS connections.
-- +http/server-class=+ - Sets the name of the class used to manage the HTTP server. Currently there are the following options:
+- +{compname}/http/ports[i]=+ - Sets a comma separated list of ports on which the HTTP server will listen for connections. Default is 8080.
+- +{compname}/*********/socket=ssl+ - Sets the port for SSL connections, replace ### with the port number of your choice.
+- +{compname}/*********/domain=example.com+ - This sets the domain name of the SSL certificate from Tigase XMPP certificate store, also sets the port to ### to listen for HTTPS connections.
+- +{compname}/server-class=+ - Sets the name of the class used to manage the HTTP server. Currently there are the following options:
 . +tigase.http.JettyStandaloneHttpServer+ - Starts standalone Jetty HTTP Server instance *(requires Tigase HTTP API - Jetty HTTP Server)*
 . +tigase.http.jetty.JettyOSGIHttpServer+ - Uses Jetty HTTP Server instance available as OSGi service (may be used only in OSGi envoirment) *(require Tigase HTTP API - Jetty HTTP Server)*
 . +tigase.http.java.JavaStandaloneHttpServer+ - Uses +HttpServer+ provided by Java JDK to start standalone HTTP server (may not work on JDK from every JDK provider).
-. +http/http/threads=+ - Sets the number of threads available for HTTP component. Default is 4.
-. +http/http/request-timeout=+ - Sets the timeout time in ms for threads to close on inactive connections. Default is 60 seconds.
+. +{compname}/http/threads=+ - Sets the number of threads available for HTTP component. Default is 4.
+. +{compname}/http/request-timeout=+ - Sets the timeout time in ms for threads to close on inactive connections. Default is 60 seconds.
 
-Modules
-~~~~~~~
+=== Modules
 Tigase's REST Component comes with two modules that can be enabled, disabled, and configured separately.
 Common settings for modules for component properties are used in the following format: +component_name/module_id/module_setting/+
 the following settings are available for both listed modules:
@@ -55,8 +51,7 @@ the following settings are available for both listed modules:
 - +context-path+ - Path of HTTP context under which the module should be available.
 - +vhosts[s]+ - Comma separated list of virtual hosts for which the module should be available. If not configured, the module will be available for all vhosts.
 
-Rest Module
-^^^^^^^^^^^
+==== Rest Module
 This is the Module that provides support for the REST API.
 Available properties:
 
@@ -71,16 +66,13 @@ http/rest/api-key[s]=a7D2dm3lps138w
 -----
 Requests made to the HTTP service must conclude with the same key: +http://localhost:8080/rest/adhoc/sess-man@domain.com?api-key=a7D2dm3lps138w+
 
-+dns-webservice+
-^^^^^^^^^^^^^^^^
+==== +dns-webservice+
 This module provides resolution of DNS names using HTTP protocol. This particular module might be useful for web applications that need to resolve the DNS address to a particular IP. For example to help discover the IP and port of WebSocket services used to connect to the XMPP server.
 
-Usage Examples
---------------
+== Usage Examples
 Here are some examples using the HTTP API using available scripts.
 
-Retrieving list of available ad-hoc commands
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Retrieving list of available ad-hoc commands
 To retrieve a list of available commands, REST needs to use the GET method from the following resource: +/rest/adhoc/sess-man@domain.com+. This provides a list of available adhoc commands from the sess-man@domain.com resource. This can be change to any bare JID that you wish to get commands from so it can be a MUC room, monitor component, or in this case, the Session manager.
 With the server running, lets connect to the address +http://localhost:8080/rest/+ and the following resource +/adhoc/sess-man@domain.com+ which will retrieve a list of all ad-hoc commands available at sess-man@domain.com. This particular action is protected by authentication using HTTP basic authentication so valid credentials are necessary. User credentials are available in the Tigase's user database installation, so use the bare JID and password of an admin-authorized account to conduct this activity.
 The result will be an XML format output of available commands, similar to an IQ stanza, below an example of that result.
@@ -131,8 +123,7 @@ There is also the ability to return a JSON formatted result. To achieve this, yo
 -----
 Again, either of these methods can be used on any component with available ad-hoc commands. Feel free to experiment and see what options are available for each component.
 
-Executing ad-hoc commands
-~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Executing ad-hoc commands
 Once you have found a command you wish to use, you can send that command using the HTTP POST method. In this example, lets request a list of active users as seen in the previous section. *NOTE:* like the previous example, these commands require basic HTTP authentication.
 
 The following command is sent to +http://localhost:8080/rest/adhoc/sess-man@domain.com+
@@ -217,20 +208,17 @@ The results will look quite similar to the XML results:
 
 [we should take another approach, and use something more permanent, like add or delete a user]
 
-Sending any XMPP Stanza
-~~~~~~~~~~~~~~~~~~~~~~~
+=== Sending any XMPP Stanza
 XMPP messages or any other XMPP stanza can be sent using this API by sending HTTP POST request on http://localhost:8080/rest/stream/api-key=API_KEY with a serialized XMPP stanza as content, where API_KEY is the API key specified in the init.properties file.
 Each request needs to be authorized by sending a valid administrator JID and password as a user/password of BASIC HTTP authorization method.  The content of the HTTP request should be encoded in UTF-8 and +Content-Type+ should be set to application/xml.
 
-Handling of request
-^^^^^^^^^^^^^^^^^^^
+==== Handling of request
 If no +from+ attribute is set in the stanza, the HTTP API component will supplant it's JID instead, however if one is set it will be preserved.  However, in iq stanzas, if no +from+ attribute is set the HTTP response content will be sent back as a response.  Successful requests will return a HTTP response code of 200.
 
 *Examples:*
 Any of these examples must be sent as an HTTP POST request to /rest/stream/?api-key=API_KEY of the HTTP API component.
 
-Sending XMPP message with +from+ set to HTTP API component a full JID
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+===== Sending XMPP message with +from+ set to HTTP API component a full JID
 [source,xml]
 -----
 <message xmlns="jabber:client" type="chat" to="test@example.com/resource-1">
@@ -238,8 +226,7 @@ Sending XMPP message with +from+ set to HTTP API component a full JID
 </message>
 -----
 
-Sending XMPP message with +from+ set to HTTP API component with a bare JID
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+===== Sending XMPP message with +from+ set to HTTP API component with a bare JID
 [source,xml]
 -----
 <message xmlns="jabber:client" type="chat" to="test@example.com">
@@ -247,8 +234,7 @@ Sending XMPP message with +from+ set to HTTP API component with a bare JID
 </message>
 -----
 
-Sending XMPP message with from set to a specified JID to a full JID
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+===== Sending XMPP message with from set to a specified JID to a full JID
 [source,xml]
 -----
 <message xmlns="jabber:client" type="chat" from="sender@example.com" to="test@example.com/resource-1">
@@ -256,8 +242,7 @@ Sending XMPP message with from set to a specified JID to a full JID
 </message>
 -----
 
-Sending messages through REST
------------------------------
+== Sending messages through REST
 You can also send messages, or really any XMPP stanza to users and components through REST API. Sending XMPP messages or stanzas using HTTP is realized as a groovy script bundled in the installation package from v7.0.2. If you want to be sure your current install supports this feature, check for the presence of +Stream.groovy+ file in the +scripts/rest/stream/+ directory.
 
 As in other examples, be sure that you have the following line in your init.properties:
@@ -267,15 +252,13 @@ http/rest/api-keys[s]=test_key
 -----
 You may also opt to have +open_access+ set to disable API key parameter.
 
-Usage
-~~~~~
+=== Usage
 Using the HTTP POST method, XMPP stanzas can be sent using the built in HTTP API. In a local installation, the request can be sent to +http://localhost:8080/rest/stream/?api-key=API_KEY+ with a seralized XMPP stanza as content, where API_KEY is the API key for HTTP API which is set in +etc/init.properties+ as +rest/api-keys[s]+.  In the case we laid out, it would be +test_key+. Because XMPP uses XML for formatting, all content in these requests *MUST* be encoded in UTF-8 and +Content-type+ must be set to +application/xml+.
 Lets take a look at some examples.
 
 _In all examples the data is sent as an HTTP POST request to /rest/stream/?api-key=test-key._
 
-Send XMPP stanza with from set to HTTP API component to bare JID
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==== Send XMPP stanza with from set to HTTP API component to bare JID
 [source,xml]
 -----
 <message xmlns="jabber:client" type="chat" to="test@example.com/resource-1">
@@ -291,8 +274,7 @@ Once this message is sent, the Groovy script adds the remaining information auto
 -----
 As you can see, the HTTP component is automatically populated as the sender.
 
-Send XMPP stanza with from set to HTTP API component to full JID
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==== Send XMPP stanza with from set to HTTP API component to full JID
 [source,xml]
 -----
 <message xmlns="jabber:client" type="chat" to="test@example.com">
@@ -307,8 +289,7 @@ The syntax and formatting is the same, with the recepiant messaging being exactl
 </message>
 -----
 
-Send XMPP stanza with from set to specified JID
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==== Send XMPP stanza with from set to specified JID
 You may specify any JID that is registered in the server to send the stanza, ones that use a name that is not registered will return an error.
 [source,xml]
 -----
@@ -325,8 +306,7 @@ Ends with the result being somewhat customized.
 -----
 
 [[avatarRetrievalRequests]]
-Avatar retrieval requests
-~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Avatar retrieval requests
 There are different formats for avatar retrieval depending on how they are stored, see below for the resources for each type of avatar.
 
 - +/rest/avatar/user@domain+ - which returns first avatar found (PEP, VCard4 or VCardTemp in this order)
@@ -334,13 +314,11 @@ There are different formats for avatar retrieval depending on how they are store
 - +/rest/avatar/user@domain/vcard4+ - which returns avatar from VCard4
 - +/rest/avatar/user@domain/vcard-temp+ - which returns avatar from VCardTemp
 
-Setting HTTP API Privacy Rules
-------------------------------
+== Setting HTTP API Privacy Rules
 The HTTP API component has settings that allow you to specify who is allowed to use the HTTP API interface, keeping unauthorized users from accessing the feature. This feature is implemented using a Groovy admin ad-hoc stript for the Session Manager component. As a result of this method, it will be avaiulable to execution using the default GTTP API componene capability to execute the script. The actual work of filtering, however, will be conducted by the +DomainFilter+ plugin.
 
 [[getUserInfoREST]]
-New Rest API added to obtain a JID login time
----------------------------------------------
+== New Rest API added to obtain a JID login time
 +GetUserInfo+ command has been expanded to obtain user login and logout times in addition to standard information. To obtain the information, send a POST request to http://xmpp.domain.net:8080/rest/adhoc/sess-man@xmpp.domain.net?api-key=test-api-key with the following:
 [source,xml]
 -----
@@ -359,16 +337,15 @@ New Rest API added to obtain a JID login time
 </command>
 -----
 
-Configuration
-~~~~~~~~~~~~~
+=== Configuration
 The HTTP API privacy scipt is loaded automatically. +DomainFilter+ is a default plugin loaded by Tigase on startup. This means there is very little you need to do to have this running.
 Again, you may define a custom API key to limit access using the following line in init.properties
+[source,properties]
 ------
 http/rest/api-keys[s]=test_key
 ------
 
-Usage
-~~~~~
+=== Usage
 Setting privacy rules can be done by sending a POST request to the session manager using this address: +http://localhost:8080/rest/sess-man@domain.com?api-key=test_key+
 [source,xml]
 -----
@@ -408,15 +385,13 @@ Here all parameters are passed to be excuted by ad-hot command.  Using the +user
 These ad-hoc commands replicate settings found in xref:domainBasedPacketFiltering[Domain Based Packet Filtering] in the admin guide. They may also be influenced by the link:http://docs.tigase.org/tigase-server-Properties_Guide/html?#domainFilterPolicy[--domain-filter-policy] property of init.properties.
 
 
-Scripting
----------
+== Scripting
 As you can see from the above commands, Tigase uses pre-defined scripts for processing of all requests in HTTP API.
 Although the list may be small for now, this does mean with a little bit of Groovy scripting, you can create your own scripts to interpret REST commands and send them to the server!
 
 All scripts for this purpose will be an implementation of class extending +tigase.http.rest.Handler+ class. The URI of the scripts will be inside the scripts folder. For example, if the script uses +TestHandler+ with a regular expression set to +/test+ and is placed inside the +scripts/rest/+ the handler will be called with this URI: +scripts/rest/test/+.
 
-Properties
-~~~~~~~~~~
+=== Properties
 When extending classes, you will need to set the following listed properties.
 regex::
   Regular expression which is used to match request URI and parse parameters embedded in URI, for example:
@@ -431,8 +406,7 @@ requiredRole::
 isAsync::
   If set to true, it will be possible to wait for results pending the arrival of IQ stanzas for instance.
 
-Properties containing closures
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==== Properties containing closures
 Extended class should also set for closures for one or more of the following properties: +execGet+, +execPut+, +execPost+, +execDelete+, depending on which HTTP action is needed to support the following URI. Each closure has a *dynamic arguments list* generated at runtime. Below is a list of arguments passed to closure which describe how and when the list of arguments change.
 
 service::
@@ -452,8 +426,7 @@ x::
 
 If a property for corresponding HTTP action is not set, the component will return an HTTP 404 error.
 
-Example Script
-~~~~~~~~~~~~~~
+=== Example Script
 
 Lets have a look at a script that is included with the install package to get a better idea of how these scripts work.
 This script will GET a list of all registered account and output them according to an HTML file we will look at later.
@@ -520,14 +493,12 @@ ${ util.include('footer') }
 -----
 This file builds a table using the user fields from the GET request. *NOTE:* Not all scripts need a matching HTML file, basic requests may not need special handling.
 
-REST API & PubSub
------------------
+== REST API & PubSub
 All PubSub Scripts are found within the +scripts/rest/pubsub+ directory of Tigase's installation directory.  All examples in this section are prepared for a PubSub component available at pubsub@example.com. To use these examples for your installation, that JID needs to be replaced with with your pubsub JID.
 
 All parameters passed in the content of HTTP request needs to be wrapped with +<data/>+ tag at the root of the XML document. Returned results will be wrapped within the +<result/>+ tag in the root of the XMl document.
 
-Create a Node
-~~~~~~~~~~~~~
+=== Create a Node
 HTTP URL: example.com/rest/pubsub/pubsub@example.com/create-node
 
 Available HTTP methods:
@@ -567,8 +538,7 @@ Server response:
 </result>
 -----
 
-Delete a node
-~~~~~~~~~~~~~
+=== Delete a node
 HTTP URL: example.com/rest/pubsub/pubsub@example.com/delete-node
 
 Available HTTP methods:
@@ -598,8 +568,7 @@ Server response
 </result>
 -----
 
-Subscribe to a node
-~~~~~~~~~~~~~~~~~~~
+=== Subscribe to a node
 HTTP URI: example.com/rest/pubsub/pubsub@example.com/subscribe-node
 
 Available HTTP methods:
@@ -636,8 +605,7 @@ Server response:
 </result>
 -----
 
-Unsubscribe from a node
-~~~~~~~~~~~~~~~~~~~~~~~
+=== Unsubscribe from a node
 HTTP URI: example.com/rest/pubsub/pubsub@example.com/unsubscribe-node
 
 Available HTTP methods:
@@ -674,8 +642,7 @@ Server response:
 </result>
 -----
 
-Publish an item to a node
-~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Publish an item to a node
 HTTP URI: example.com/rest/pubsub/pubsub@example.com/publish-item
 
 Available HTTP methods:
@@ -719,8 +686,7 @@ Server response:
 </result>
 -----
 
-List Available Nodes
-~~~~~~~~~~~~~~~~~~~~
+=== List Available Nodes
 HTTP URI: example.com/rest/pubsub/pubsub.example.com/list-nodes
 
 Available HTTP methods
@@ -742,8 +708,7 @@ Below is an example exchange between client and server for listing all nodes, th
 </result>
 -----
 
-List Published Items on Node
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== List Published Items on Node
 HTTP URI: example.com/rest/pubsub/pubsub.example.com/list-items
 
 Available HTTP methods
@@ -781,8 +746,7 @@ Server Response
 
 Items item-1 and item-2 are the listed items.
 
-Retrieve Published Item on Node
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Retrieve Published Item on Node
 HTTP URI: example.com/rest/pubsub/pubsub.example.com/retrieve-item
 
 Available HTTP methods
@@ -830,6 +794,5 @@ Server response:
 
 Node that inside the item element, there is an XML encoded element, this will be retrieved without any decoding.
 
-Other Example REST Commands and Documentation
----------------------------------------------
+== Other Example REST Commands and Documentation
 Other example REST commands, and accompanied documentation can be found at localhost:8080/rest/ on any server running Tigase and the HTTP component.

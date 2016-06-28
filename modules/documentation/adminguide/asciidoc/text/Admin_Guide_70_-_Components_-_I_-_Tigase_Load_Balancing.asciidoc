@@ -1,6 +1,5 @@
 [[loadBalancing]]
 = Tigase Load Balancing
-
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2013-06-10 15:49
@@ -13,7 +12,6 @@
 Starting with version 5.2.0 Tigase introduces a load balancing functionality allowing users to be redirected to the most suitable cluster node. Functionality relies on a see-other-host XMPP stream error message. The basic principle behind the mechanism is that user will get redirect if the host returned by the implementation differ from the host to which user currently tries to connect. It is required that the user JID to be known for the redirection to work correctly.
 
 == Available Implementations
-
 Tigase implementation is, as usual, extensible and allows for different, pluggable redirection strategies that implement the `SeeOtherHostIfc` interface.
 
 Currently there are three strategies available:
@@ -23,7 +21,6 @@ Currently there are three strategies available:
 - `SeeOtherHostDB` - extended implementation of SeeOtherHost using redirect information from database in the form of pairs user_id and node_id to which given user should be redirected.
 
 == Configuration Options
-
 The most basic configuration is related to the choice of actual redirection implementation:
 
 [source,bash]
@@ -50,7 +47,6 @@ All the remaining options are configured on a per-connection-manager basis, thus
 By default redirection is currently enabled only in the `OPEN` phase.
 
 === SeeOtherHostDB
-
 For `SeeOtherHostDB` implementation there are additional options:
 
 - `c2s/cm-see-other-host/db-url` - a JDBC connection URI which should be used to query redirect information; if not configured --user-db-uri will be used;
@@ -59,7 +55,6 @@ For `SeeOtherHostDB` implementation there are additional options:
 - `c2s/cm-see-other-host/get-all-query-timeout` - allows to set timeout for executed queries.
 
 === SeeOtherHostDualIP
-
 This mechanisms matches internal Tigase cluster nodes with against the lookup table to provide matching and relevant redirection hostname/IP. By default internal Tigase `cluster_nodes` table will be used (and appropriate repository implementation will be used).
 
 To enable this redirection mechanism following configuration / class should be used:
@@ -105,7 +100,6 @@ or on per-component basis
 ----
 
 ==== EventBus as a source of information
-
 It's possible to utilize EventBus and internal Tigase events as a source of redirection data. In order to do that `eventbus` should be used as a value of `data-source` configuration option. In addition, EventBus events needs to be enabled in ClusterConnectionManager. Example configuration:
 
 [source,bash]
@@ -123,9 +117,7 @@ cl-comp/eventbus-repository-notifications[B]=true
 ----
 
 == Auxiliary setup options
-
 === Enforcing redirection
-
 It's possible to enforce redirection of connections on the particular port of connection manager with `force-redirect-to` set to Integer with the following general setting option:
 [source,bash]
 ----
@@ -142,7 +134,6 @@ c2s/connections/5322/force-redirect-to[I]=5222
 ----
 
 === Configuring hostnames
-
 To fully utilize `SeeOtherHostDualIP` setup in automated fashion it's now possible to provide both primary (_internal_) and secondary (_external_) hostname/IP (they need to be correct, `InetAddress.getByName( property );` will be used to verify correctnes). It can be done via JVM properties `tigase-primary-address` and `tigase-secondary-address`. You can also utilize different implementation of DNS resolver by providing class implementing `tigase.util.DNSResolverIfc` interface as value to `resolver-class` property.
 Those properties can be set via `etc/tigase.conf` (uncommenting following lines, or manually exposing in environment):
 [source,bash]

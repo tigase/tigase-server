@@ -1,6 +1,5 @@
 [[scriptingintro]]
-Scripting Introduction - Hello World!
-=====================================
+= Scripting Introduction - Hello World!
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-01-06 20:18
@@ -28,9 +27,7 @@ The scripting utilizes only standard XMPP extensions and is by no means specific
 
 To follow the guide and run all the examples you need will need to have installed Tigase server version 4.3.1 or newer and you have to connect to the server as administrator.
 
-Loading Script at Run Time
---------------------------
-
+== Loading Script at Run Time
 All the scripting stuff is usually based on the service discovery and ad-hoc commands in the Tigase server.
 
 image:images/service-disco.png[]
@@ -69,18 +66,16 @@ It uses a basic scripting API which is described line by line below:
 The first, very simple version looks like this:
 
 [source,java]
--------------------------------------
+-----
 import tigase.server.*
 def p = (Packet)packet
 def res = p.commandResult(Command.DataType.result)
 Command.addTitle(res, "Hello World Script")
 Command.addInstructions(res, "Hello admin, how are you?")
 return res
--------------------------------------
+-----
 
-Executing Script
-----------------
-
+== Executing Script
 Once the script is successfully loaded you will have to reload/refresh the service discovery window which now should display one more element on the list.
 
 image:images/service-disco-with-new-hello.png[]
@@ -93,9 +88,7 @@ As a result you should see a simple window similar to the screenshot below displ
 
 image:images/hello1-result-small.png[]
 
-Interaction in Scripts
-----------------------
-
+== Interaction in Scripts
 Displaying just a message is very nice but is not very useful in most cases. Normally you need to ask the user for some more data or parameters before you can perform any real processing.
 
 Therefore in most cases the administrator script has to display a new window with input fields asking the user for some more data. In this document we present very simple examples, just an introduction so let's ask about the administrator name before displaying a greeting.
@@ -105,7 +98,7 @@ image:images/hello2-asking-for-name-small.png[]
 To ask the user for some more information we have to extend example above with some more code:
 
 [source,java]
--------------------------------------
+-----
 import tigase.server.*
 
 def p = (Packet)packet
@@ -126,7 +119,7 @@ Command.addTitle(res, "Hello World Script")
 Command.addInstructions(res, "Hello ${name}, how are you?")
 
 return res
--------------------------------------
+-----
 
 If you compare both scripts you see that they are quite similar. Before displaying greeting, however, the script tries to retrieve data from the \'+name+' input field. If the name had been provided the greeting is displayed, otherwise the script asks for the user name.
 
@@ -155,9 +148,7 @@ Or of course, you can enter a new command id to create a new command and make it
 
 When the script is loaded on the server, try to execute it. You should get a new dialog window asking for your name as in the screenshot at the beginning of this section. When you have entered your name and clicked the "Finish" button you will see another window with a greeting message along with your name.
 
-Automatic Scripts Loading at Startup Time
------------------------------------------
-
+== Automatic Scripts Loading at Startup Time
 The last thing described in this guide is how to automatically load your scripts when the Tigase server starts. The ability to load scripts at run time, update and remove remove them is very useful, especially in emergency cases if something wrong is going on and you want to act without affecting the service.
 
 If you, however have a few dozens scripts you don't want to manually load them every time the server restarts.
@@ -171,10 +162,10 @@ Language is simple. It is detected automatically by the script file extension. S
 The script description and command id needs a little bit more work. You have to include in your script following lines:
 
 [source,java]
--------------------------------------
+-----
 AS:Description: The command description
 AS:CommandId: command-id
 AS:Component: comp_name
--------------------------------------
+-----
 
 Please note, there must be at least a single space after the "+AS:Description:+" or "+AS:CommandId:+" string. Everything rest after that, until the end of the line, is treated as either the script description or command id. Put these in your script file and the loader will detect them and set correctly for your script.

@@ -1,6 +1,5 @@
 [[tlsJdkNssBugWorkaroundActive]]
---tls-jdk-nss-bug-workaround-active
-===================================
+= --tls-jdk-nss-bug-workaround-active
 :author: Andrzej Wojcik <andrzejw@tigase.org>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2013-02-09 03:57

@@ -26,26 +26,19 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayDeque;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.TimeZone;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.xml.Element;
-
 import tigase.xmpp.*;
 import tigase.xmpp.impl.annotation.*;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static tigase.xmpp.impl.MobileV3.*;
 
@@ -188,7 +181,7 @@ public class MobileV3
 			Logger.getLogger(MobileV3.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
-	
+
 	@Override
 	public Element[] supStreamFeatures(XMPPResourceConnection session) {
 		if (session == null) {

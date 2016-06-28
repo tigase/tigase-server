@@ -1,6 +1,5 @@
 [[offlineMessageSink]]
-Offline Message Sink
-====================
+= Offline Message Sink
 :author: Bartosz Malkowski
 :version: v1.0, October 2015
 :date: 2015-10-07 09:36
@@ -9,8 +8,7 @@ Offline Message Sink
 :numbered:
 :website: http://www.tigase.org
 
-Description
------------
+== Description
 
 Messages sent to offline users is published in PubSub node, from where that message is sent to all the node subscribers as a PubSub notification.
 
@@ -31,12 +29,10 @@ Messages sent to offline users is published in PubSub node, from where that mess
 </message>
 -----
 
-Configuration
--------------
+== Configuration
 The PubSub node must be created and configured beforehand:
 
-Create node
-~~~~~~~~~~~
+=== Create node
 [source.xml]
 -----
 <iq type='set'
@@ -50,8 +46,7 @@ Create node
 
 After that is done, you need to add SessionManager as a publisher:
 
-Add sess-man as publisher
-~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Add sess-man as publisher
 [source,xml]
 -----
 <iq type='set'
@@ -67,8 +62,7 @@ Add sess-man as publisher
 
 Finally, the AMP plugin must be configured as well
 
-init.properties configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== init.properties configuration
 [source,bash]
 -----
 sess-man/plugins-conf/amp/msg-pubsub-jid=pubsub.coffeebean.local
@@ -78,15 +72,12 @@ sess-man/plugins-conf/amp/msg-pubsub-publisher=sess-man@coffeebean.local
 
 Of course be sure that AMP plugin is in your +--sm-plugins+ line.
 
-Usage
------
+== Usage
 Because these sinks use a standard PubSub component, administration of the sink node is identical to any other PubSub node. link:http://www.xmpp.org/extensions/xep-0060[XEP-0060] defines standard PubSub usage and management.
 
-Managing Subscriptions
-~~~~~~~~~~~~~~~~~~~~~~
+=== Managing Subscriptions
 
-Add new Subscriber
-^^^^^^^^^^^^^^^^^^
+==== Add new Subscriber
 [source,xml]
 -----
 <iq type='set'
@@ -100,8 +91,7 @@ Add new Subscriber
 </iq>
 -----
 
-Remove Subscriber
-^^^^^^^^^^^^^^^^^
+==== Remove Subscriber
 [source,xml]
 -----
 <iq type='set'

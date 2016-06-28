@@ -1,6 +1,5 @@
 [[SchemaChange51]]
-Tigase Database Minor but Useful Schema Change in Version 5.1.0
-===============================================================
+= Tigase Database Minor but Useful Schema Change in Version 5.1.0
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2012-06-05 02:38
@@ -21,28 +20,28 @@ Along with the new field,  there are slight modifications to 2 other fields: +la
 Here is how it looks now:
 
 [source,sql]
--------------------------------------
+-----
 -- Time the account has been created
 acc_create_time timestamp DEFAULT CURRENT_TIMESTAMP,
 -- Time of the last user login
 last_login timestamp DEFAULT 0,
 -- Time of the last user logout
 last_logout timestamp DEFAULT 0,
--------------------------------------
+-----
 
 You can easily update your schema with above changes using a simple SQL query. Enter the MySQL shell and copy-paste following query:
 
 [source,sql]
--------------------------------------
+-----
 alter table tig_users
   modify last_login timestamp DEFAULT 0,
   modify last_logout timestamp DEFAULT 0,
   add acc_create_time timestamp DEFAULT CURRENT_TIMESTAMP;
--------------------------------------
+-----
 
 Please note, after executing query above the column +acc_create_time+ will have a null value. To populate the entry for existing records just copy +last_login+ value to +acc_create_time+:
 
 [source,sql]
--------------------------------------
+-----
 update tig_users set acc_create_time = last_login;
--------------------------------------
+-----

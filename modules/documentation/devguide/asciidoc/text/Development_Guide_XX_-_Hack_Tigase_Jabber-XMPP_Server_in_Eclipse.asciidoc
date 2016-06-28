@@ -1,6 +1,5 @@
 [[codingTigase]]
-Hack Tigase Jabber/XMPP Server in Eclipse
-=========================================
+= Hack Tigase Jabber/XMPP Server in Eclipse
 :author: Bartosz Malkowski <bmalkowski@tigase.pl>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 21:22
@@ -24,8 +23,7 @@ All you need to start is:
 . Installed and working link:http://subclipse.tigris.org/[Subclipse] plugin for Eclipse.
 
 
-JDK-1.6.0 Setup
----------------
+== JDK-1.6.0 Setup
 After installation JDK-1.6.0 in your operating system, run Eclipse and select Window/Preferences.
 
 image:images/preferences-jre.png[]
@@ -34,16 +32,14 @@ In section Java/Installed JREs press *Add* button. In the new opened window ente
 
 image:images/preferences-jre-add.png[]
 
-Subclipse Installation
-----------------------
+== Subclipse Installation
 As Eclipse doesn't contain built-in support for Subversion repositories you have to add the Subclipse plugin.  Detailed instruction for Subclipse installation is on page:
 
 link:http://subclipse.tigris.org/install.html[subclipse.tigris.org/install.html].
 
 Alternatively you may use the link:http://marketplace.eclipse.org/marketplace-client-intro[Eclipse Marketplace Client].
 
-Project Import
---------------
+== Project Import
 From menu File in Eclipse execute *Import*. Next, highlight section *Team/Team
 Project Set* and press *Next*.
 

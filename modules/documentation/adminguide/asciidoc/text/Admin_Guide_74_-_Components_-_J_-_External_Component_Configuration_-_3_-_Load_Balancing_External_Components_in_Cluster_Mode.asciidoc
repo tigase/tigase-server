@@ -1,6 +1,5 @@
 [[loadBalancingExternalComponent]]
-Load Balancing External Components in Cluster Mode
-==================================================
+= Load Balancing External Components in Cluster Mode
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2011-07-09 22:45
@@ -21,9 +20,7 @@ These are actually 2 separate topics:
 
 Here are step by step instructions and configuration examples teaching how to achieve both goals.
 
-Load Balancing External Component
----------------------------------
-
+== Load Balancing External Component
 The first, and most simple scenario is to connect multiple instances of an external component to a single Tigase XMPP Server to distribute load.
 
 There are at least 2 reasons why this would be an optimal solution: one would be to spread load over more instances/machines and the second is to improve reliability in case one component fails the other one can take over the work.
@@ -37,7 +34,7 @@ We have a single machine running Tigase XMPP Server and 2 instances of the MUC c
 The server configuration
 
 [source,bash]
--------------------------------------
+-----
 config-type = --gen-config-def
 --user-db = mysql
 --admins = admin@devel.tigase.org
@@ -48,12 +45,12 @@ config-type = --gen-config-def
 --comp-class-1 = tigase.server.ext.ComponentProtocol
 --external = muc.devel.tigase.org:muc-secret:listen:\
        5270:devel.tigase.org:accept:ReceiverBareJidLB
--------------------------------------
+-----
 
 And configuration for both instances of the MUC component (identical for both of them):
 
 [source,bash]
--------------------------------------
+-----
 config-type = --gen-config-comp
 --user-db = mysql
 --admins = admin@devel.tigase.org
@@ -64,7 +61,7 @@ config-type = --gen-config-comp
 --comp-class-1 = tigase.muc.MUCComponent
 --external = muc.devel.tigase.org:muc-secret:connect:\
        5270:devel.tigase.org:accept
--------------------------------------
+-----
 
 For those familiar with Tigase's configuration, this should be pretty basic. The difference is one small element in the server configuration. At the end of the component connection we have *ReceiverBareJidLB*.
 
@@ -74,9 +71,7 @@ This distribution strategy does not always work for all possible components howe
 
 This are two basic load distribution strategies available now. For some use cases none of them is good enough. If you have PubSub, then you probably want to distribute load based on the PubSub node. There is no plugin for that yet but it is easy enough to write one and put the class name in configuration.
 
-External Component and Cluster
-------------------------------
-
+== External Component and Cluster
 If you want to use Tigase's component in a cluster mode which does not have clustering implemented yet there is a way to make it kind of cluster-able. In the previous section we connected many MUC components to a single Tigase server. Now we want to connect a single MUC component to many Tigase servers (or many Tigase cluster nodes).
 
 Let's say we have Tigase XMPP Server working for domain: *xmpp-test.org* and the server is installed on three cluster nodes: *red.xmpp-test.org,* *green.xmpp-test.org* and *blue.xmpp-test.org.*
@@ -86,7 +81,7 @@ image:images/ExternalCompClustering003_0.png[]
 We want to make it possible to connect the MUC component to all nodes, so here is configuration for the server (for each node is the same):
 
 [source,bash]
--------------------------------------
+-----
 config-type=--gen-config-def
 --admins=admin@xmpp-test.org
 --virt-hosts = xmpp-test.org
@@ -102,12 +97,12 @@ config-type=--gen-config-def
 --comp-class-1 = tigase.server.ext.ComponentProtocol
 --external = muc.xmpp-test.org:muc-secret:listen:5270:\
        xmpp-test.org:accept:ReceiverBareJidLB
--------------------------------------
+-----
 
 As you can see there is nothing special here. The most interesting part comes on the MUC side.
 
 [source,bash]
--------------------------------------
+-----
 config-type = --gen-config-comp
 --user-db = mysql
 --admins = admin@xmpp-test.orgg
@@ -118,7 +113,7 @@ config-type = --gen-config-comp
 --comp-name-1 = muc
 --comp-class-1 = tigase.muc.MUCComponent
 --external = muc.xmpp-test.org:muc-secret:connect:5270:xmpp-test.org;blue.xmpp-test.org;green.xmpp-test.org,red.xmpp-test.org:accept
--------------------------------------
+-----
 
 As you can see remote host name is not a simple domain but a character string with a few comma separated parts. The first part is our remote domain and the rest are addresses of the host to connect to. This can be a list of domain names or IP addresses.
 

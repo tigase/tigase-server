@@ -1,6 +1,6 @@
 [[messageArchiving]]
-Message Archiving Component
-===========================
+= Message Archiving Component
+
 :author: Daniel Wisnewski
 :version: v1.0 Sept 2015
 :date: 2015-17-09 13:29
@@ -15,18 +15,19 @@ Message Archiving Component
 Tigase server supports many of the features in XEP-0136, however it is not yet in full compliance with the XEP. The reason for this is that it uses the archived message date as the thread id of message due to the face that some clients sens messages with no thread id (e.g. Psi, Psi+). Due to this fact it is also possible to query the component about messages without specifying thread ids. For now the component also stores bare JIDs of recipients.
 
 
-Installation
-------------
+== Installation
+
 The message archiving component is not included with the standard build of Tigase, and thus will need to be compiled or downloaded. Here are the two methods:
 
-Download
-~~~~~~~~
+=== Download
+
 The easiest way is to download the link:https://projects.tigase.org/attachments/download/3435/tigase-message-archiving-1.2.0-SNAPSHOT.jar[tigase-message-archiving-1.2.0-SNAPSHOT.jar] file into your /jars directory.
 
-Compile
-~~~~~~~
+=== Compile
+
 The Tigase Message Archive component is kept in a separate repository from Tigase-server. It will compile in a similar manner though. Be sure you have Maven 3.0 or later installed. (to check use +mvn version+)
 First, obtain a clone of the repository using the following command:
+[source,bash]
 -----
 $ git clone https://repository.tigase.org/git/message-archiving.git
 -----
@@ -37,9 +38,10 @@ $cd message-archiving
 -----
 Once Maven has finished compiling, go into the /target directory and you will find the required jar there. Move that to Tigase's /jars folder and your component is ready to run.
 
-Configuration
--------------
+== Configuration
+
 To activate message archiving, place the following lines in the init.properties file:
+[source,bash]
 -----
 --comp-name-3=message-archive
 --comp-class-3=tigase.archive.MessageArchiveComponent
@@ -58,13 +60,14 @@ Finally, this line specifies the name for the component, if left blank the compo
 
 *NOTE: Message tagging can take up considerable resources!*
 There are a high number of prepared statements which are used to process and archive messages as they go through the server, and you may experience an increase in resource use with the archive turned on. It is recommended to drecrease the repository connection pool to help balance server load from this component using the following line in init.properties:
+[source,bash]
 -----
 --data-repo-pool-size=5
 -----
 
 [[nonBodyStore]]
-Saving Options
-~~~~~~~~~~~~~~
+=== Saving Options
+
 By default, Tigase Message Archive will only store the message body with some metadata, this can exclude messages that are lacking a body.  If you decide you wish to save non-body elements within Message Archive, you can now can now configure this using the following line from init.properties:
 -----
 sess-man/plugins-conf/unified-archive/msg-archive-paths[s]=/message/body,/message/subject
@@ -73,8 +76,8 @@ Where above will set the archive to store messages with <body/> or <subject/> el
 
 TIP: Enabling this for elements such as iq, or presence will quickly load the archive.  Configure this setting carefully!
 
-Usage
------
+== Usage
+
 Now that we have the archive component running, how do we use it?  Currently, the only way to activate and modify the component is through XMPP stanzas.  Lets first begin by getting our default settings from the component:
 [source,xml]
 ----
@@ -97,8 +100,8 @@ It's a short stanza, but it will tell us what we need to know, Note that you do 
 ----
 See below for what these settings mean.
 
-XEP-0136 Field Values
-~~~~~~~~~~~~~~~~~~~~~
+=== XEP-0136 Field Values
+
 <auto/>::
   - *Required Attributes*
   * +save=+ Boolean turning archiving on or off
@@ -167,8 +170,8 @@ Now that we have established settings, lets send a stanza changing a few of them
 -----
 This now sets archiving by default for all users on the domain.com server, forbids OTR, and prefers auto save method for archiving.
 
-Manual Activation
------------------
+== Manual Activation
+
 Turning on archiving requires a simple stanza which will turn on archiving for the use sending the stanza and using default settings.
 [source,xml]
 ----
@@ -185,16 +188,16 @@ A sucessful result will yield this response from the server:
 ----
 Once this is turned on, incoming and outgoing messages from the user will be stored in +tig_ma_msgs+ table in the database.
 
-Automatic Activation of MUC messages
-------------------------------------
+== Automatic Activation of MUC messages
+
 Enabling this feature allows MUC messages to be stored in the Message Archive repository and are added in the same way as for any other message. For this setting consider the MUC room JID, this will be the "user" that the messages will be archived with.  This is the same JID used for retrevial as well as sending to storage.   Archived MUC messages will be in the same format as normal archival messages with one exception, each message will have a +<name>+ attribute attached which will be the room nick for the user that sent the message.
 This feature is disabled by default.
 
 *NOTE:* It is worth to mention that even if more than on user resources joins the same room and each resource will receive the same messages, then only a single message will be stored in Message Archiving repository.
 It is also important to note that MUC messages are archived to user messages archive only when user is joined to MUC room. For example, if message was sent to room but it was not sent to particular user, it will not be archived.
 
-Configuration
-~~~~~~~~~~~~~
+=== Configuration
+
 Enabling archiving of MUC messages is done by adding one more line to your init.properties file. Along with defining +comp-name+ and +comp-class+ add this line:
 [source,bash]
 -----
@@ -210,8 +213,8 @@ To configure this setting for individual vhosts, you will need to execute a conf
 - +true+ Enables feature for users of the configured domain. Users will be unable to disable this feature.
 - +false+ Disables feature for users of the configured domain. Users will be unable to disable this feature.
 
-Searching for Messages
-----------------------
+== Searching for Messages
+
 Tigase Message Archiving Component allows users to query for messages or collections that contain a string. A simple stanza sent to the message archive component will begin a search. For example, the following stanza requests a search for messages with "test failed" in the <body> element. *NOTE:* Searches can *ONLY* be conducted within <body> elements.
 [source,xml]
 -----
@@ -229,8 +232,8 @@ Search options include:
 - +end=+ Search until this time and date, Format: YYYY-MM-DDTHH:MM:SSZ Time is in 24h set to GMT
 
 
-Example queries
-~~~~~~~~~~~~~~~
+=== Example queries
+
 Retrieving messages with "test failed" string with user juliet@capulet.com between 2014-01-01 00:00:00 and 2014-05-01 00:00:00
 [source,xml]
 -----
@@ -261,8 +264,8 @@ Retrieving collections containing messages with "test failed" string with user j
 </iq>
 -----
 
-Message Tagging Support
------------------------
+== Message Tagging Support
+
 Tigase now is able to support querying message archives based on tags created for the query.  Currently, Tigase can support the following tags to help seach through message archives:
 - +hashtag+ Words prefixed by a hash (#) are stored with a prefix and used as a tag, for example #Tigase
 - +mention+ Words prefixed by an at (@) are stored with a prefix and used as a tag, for example @Tigase
@@ -271,8 +274,8 @@ Tigase now is able to support querying message archives based on tags created fo
 
 This feature allows users to query and retrieve messages or collections from the archive that only contain one or more tags.
 
-Activating Tagging
-~~~~~~~~~~~~~~~~~~
+=== Activating Tagging
+
 To enable this feature, the following line must be in the init.properties file (or may be added with Admin or Web UI)
 [source,bash]
 -----
@@ -312,8 +315,8 @@ This stanza is requesting to retrieve messages tagged with @User1 and #people fr
 
 You can add as many tags as you wish, but each one is an *AND* statement; so the more tags you include, the smaller the results.
 
-Tag Searching
-~~~~~~~~~~~~~
+=== Tag Searching
+
 You can also retrieve a list of Tags that have already been used and are stored in the message archive. You can search for exact or a partial of the tag or mention.  The following request is searching for tags that are 'like' #test, in this case any tags with #test present will show in a list.
 [source,xml]
 ----
@@ -342,8 +345,8 @@ The result will return tags with #test in them:
 You may retrieve a list of tags or mentions by using just the # or @ symbols in the +like=+ field.
 
 [[maPurging]]
-Purging Information from Message Archive
-----------------------------------------
+== Purging Information from Message Archive
+
 This feature allows for automatic removal of entries older than a configured number of days from the Message Archive. It is designed to clean up database and keep its size within reasonable boundaries.
 
 There are 4 settings available for this feature:
@@ -358,8 +361,8 @@ This setting sets how long MA purging will wait between passes to check for and 
 
 *NOTE* that these commands are also compatible with +unified-archive+ component, just replace +message+ with +unified+.
 
-Configuration of number of days in VHost
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+=== Configuration of number of days in VHost
+
 VHost holds a setting that determines how long a message needs to be in archive for it to be considered old and removed.  This can be set independently per Vhost.  This setting can be modified by either using the HTTP admin, or the update item execution in adhoc command.
 
 Command-line utility

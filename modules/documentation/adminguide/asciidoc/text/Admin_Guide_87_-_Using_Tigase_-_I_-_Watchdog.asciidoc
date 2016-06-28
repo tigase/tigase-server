@@ -1,6 +1,5 @@
 [[watchdog]]
-Watchdog
-========
+= Watchdog
 :author: Wojciech Kapcia
 :date: 2015-10-15 10:50
 :version: v1.0 October, 2015
@@ -12,12 +11,10 @@ Watchdog
 Tigase's Watchdog was implemented to help Tigase close connections that have become stale or inactive. Sometimes the connection is delayed, maybe dropped packets, or a service interruption.  After a time, if that connection is re-established, both server and client (or server and server) will continue on as if nothing happened. However, these gaps in connection can last longer, and some installations will rely on the operating system to detect and close stale connections. Some operating systems or environments can take up to 2 hours or more to determine whether a connection is bad and wait for a response from a foreign entity and may not be configured.
 This can not only slow down performance, but can lead to security issues as well.  To solve this problem, we have introduced Watchdog to monitor connections independent of operating system and environments to keep those broken connections from becoming a problem.
 
-Setup
------
+== Setup
 No extra setup is necessary, Watchdog is already included with your build of Tigase (as long as it's 7.1.0 or newer).  Follow the steps in the configuration section.
 
-Watchdog Configuration
-----------------------
+== Watchdog Configuration
 To configure watchdog, the following lines need to be present or edited in init.properties file:
 [source,bash]
 -----
@@ -40,8 +37,7 @@ If any settings are not set, the global or settings will be used.
 +watchdog_delay+ default is set to 10 min
 +watchdog_ping_type+ default is set to xmpp
 
-Logic
------
+== Logic
 Watchdog compares it's own pings, and records the time it takes for a round trip to different components, clustered connections, and if one variable is larger than the other, watchdog will commence closing that stale connection.
 Here is a breakdown:
 
@@ -98,8 +94,7 @@ ws2s/max-inactivity-time[L]=86400
 Again remember, for Watchdog to properly work, the +max-inactivity-time+ MUST be longer than the +watchdog_timeout+ setting
 
 
-Testing
--------
+== Testing
 The tigase.log.0 file can reveal some information about watchdog and how it is working (or how it might be fighting your settings). To do so, enter the following line into your init.properties file:
 -----
 --debug=server,xmpp.init

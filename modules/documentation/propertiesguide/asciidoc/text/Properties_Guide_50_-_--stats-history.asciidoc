@@ -1,6 +1,5 @@
 [[statsHistory]]
---stats-history
-===============
+= --stats-history
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2013-04-15 20:55

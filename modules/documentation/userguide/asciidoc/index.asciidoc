@@ -1,5 +1,4 @@
-Tigase User Guide
-=================
+= Tigase User Guide
 Tigase Team <team@tigase.com>
 :toc:
 :numbered:

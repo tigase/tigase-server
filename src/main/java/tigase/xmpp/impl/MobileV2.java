@@ -53,7 +53,7 @@ import java.util.Queue;
  */
 public class MobileV2
 				extends XMPPProcessor
-				implements XMPPProcessorIfc, XMPPPacketFilterIfc {
+				implements XMPPProcessorIfc, XMPPPacketFilterIfc, ClientStateIndication.Logic {
 	// default values
 	private static final int    DEF_MAX_QUEUE_SIZE_VAL = 50;
 	private static final String ID                     = "mobile_v2";
@@ -123,13 +123,12 @@ public class MobileV2
 				boolean value = (valueStr != null) && ("true".equals(valueStr) || "1".equals(
 						valueStr));
 
-				if (session.getSessionData(QUEUE_KEY) == null) {
-
-					// session.putSessionData(QUEUE_KEY, new
-					// LinkedBlockingQueue<Packet>());
-					session.putSessionData(QUEUE_KEY, new ConcurrentHashMap<JID, Packet>());
+				if (value) {
+					activate(session, results);
+				} else {
+					deactivate(session, results);
 				}
-				session.putSessionData(XMLNS, value);
+
 				results.offer(packet.okResult((Element) null, 0));
 
 				break;
@@ -163,6 +162,30 @@ public class MobileV2
 		}
 
 		return SUP_FEATURES;
+	}
+
+	@Override
+	public void activate(XMPPResourceConnection session, Queue<Packet> results) {
+		if (session.getSessionData(QUEUE_KEY) == null) {
+
+			// session.putSessionData(QUEUE_KEY, new
+			// LinkedBlockingQueue<Packet>());
+			session.putSessionData(QUEUE_KEY, new ConcurrentHashMap<JID, Packet>());
+		}
+		session.putSessionData(XMLNS, true);
+	}
+
+	@Override
+	public void deactivate(XMPPResourceConnection session, Queue<Packet> results) {
+		if (session.getSessionData(QUEUE_KEY) == null) {
+
+			// session.putSessionData(QUEUE_KEY, new
+			// LinkedBlockingQueue<Packet>());
+			session.putSessionData(QUEUE_KEY, new ConcurrentHashMap<JID, Packet>());
+		}
+		session.putSessionData(XMLNS, false);
+
+		flushQueue(session, results);
 	}
 
 	@Override
@@ -200,25 +223,17 @@ public class MobileV2
 				continue;
 			}
 
-			Map<JID, Packet> queue = (Map<JID, Packet>) session.getSessionData(QUEUE_KEY);
-
 			// if queue is not enabled we do nothing
 			if (!isQueueEnabled(session)) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("queue is no enabled");
 				}
-				if ((queue != null) &&!queue.isEmpty()) {
-					if (log.isLoggable(Level.FINEST)) {
-						log.finest("sending packets from queue (DISABLED)");
-					}
-					for (Packet p : queue.values()) {
-						results.offer(p);
-					}
-					queue.clear();
-				}
+				flushQueue(session, results);
 
 				continue;
 			}
+
+			Map<JID, Packet> queue = (Map<JID, Packet>) session.getSessionData(QUEUE_KEY);
 
 			// lets check if packet should be queued
 			if (filter(session, res, queue)) {
@@ -282,6 +297,27 @@ public class MobileV2
 	}
 
 	//~--- get methods ----------------------------------------------------------
+
+	protected void flushQueue(XMPPResourceConnection session, Queue<Packet> results) {
+		Map<JID, Packet> queue = (Map<JID, Packet>) session.getSessionData(QUEUE_KEY);
+
+		if ((queue != null) &&!queue.isEmpty()) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("sending packets from queue (DISABLED)");
+			}
+			for (Packet p : queue.values()) {
+				try {
+					// setting destination for packet in case if
+					// stream was resumed and connId changed
+					p.setPacketTo(session.getConnectionId());
+					results.offer(p);
+				} catch (NoConnectionIdException ex) {
+					log.log(Level.FINEST, "should not happen, as connection is ready", ex);
+				}
+			}
+			queue.clear();
+		}
+	}
 
 	/**
 	 * Check if queuing is enabled

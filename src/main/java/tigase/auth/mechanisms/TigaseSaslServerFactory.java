@@ -38,25 +38,24 @@ public class TigaseSaslServerFactory implements SaslServerFactory {
 
 	@Override
 	public SaslServer createSaslServer(final String mechanism, final String protocol, final String serverName,
-			final Map<String, ?> props, final CallbackHandler callbackHandler) throws SaslException {
-		if (mechanism.equals("SCRAM-SHA-1")) {
-			return new SaslSCRAM(props, callbackHandler);
-		} else if (mechanism.equals("PLAIN")) {
-			return new SaslPLAIN(props, callbackHandler);
-		} else if (mechanism.equals("ANONYMOUS")) {
-			return new SaslANONYMOUS(props, callbackHandler);
-		} else if (mechanism.equals("EXTERNAL")) {
-			return new SaslEXTERNAL(props, callbackHandler);
-		} else
-			// if (mechanism.equals("DIGEST-MD5")) {
-			// return new SaslDigestMD5(props, callbackHandler);
-			// }
-			throw new SaslException("Mechanism not supported yet.");
+									   final Map<String, ?> props, final CallbackHandler callbackHandler) throws SaslException {
+		switch (mechanism) {
+			case "SCRAM-SHA-1":
+				return new SaslSCRAM(props, callbackHandler);
+			case "PLAIN":
+				return new SaslPLAIN(props, callbackHandler);
+			case "ANONYMOUS":
+				return new SaslANONYMOUS(props, callbackHandler);
+			case "EXTERNAL":
+				return new SaslEXTERNAL(props, callbackHandler);
+			default:
+				throw new SaslException("Mechanism not supported yet.");
+		}
 	}
 
 	@Override
 	public String[] getMechanismNames(Map<String, ?> props) {
-		return new String[] { "PLAIN", "ANONYMOUS", "EXTERNAL" };
+		return new String[] { "SCRAM-SHA-1", "PLAIN", "ANONYMOUS", "EXTERNAL" };
 	}
 
 }

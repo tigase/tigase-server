@@ -1,6 +1,5 @@
 [[oldVerSchemas]]
-Schema Updates
-==============
+= Schema Updates
 :author: Daniel wisnewski
 :version: v1.0, October 2015
 :date: 2015-10-05 13:41

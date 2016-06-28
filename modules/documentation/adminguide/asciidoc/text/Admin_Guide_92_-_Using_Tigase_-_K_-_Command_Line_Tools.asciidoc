@@ -1,6 +1,5 @@
 [[commandLineTools2]]
-Command Line Admin Tools
-========================
+= Command Line Admin Tools
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :vesion: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 21:16

@@ -1,6 +1,5 @@
 [[eventBus]]
-EventBus API in Tigase
-======================
+= EventBus API in Tigase
 :author: Bartosz Małkowski <bmalkowski@tigase.pl>
 :version: v1.0, December 2015.
 :date: 2015-12-29
@@ -14,8 +13,7 @@ EventBus is a custom publish-subscribe mechanism which allows for the use of Eve
 Local EventBus is only concerned with local event listener, and will operate events locally.  Distributed EventBus is designed to distribute events among cluster nodes.
 For a more detailed overview of EventBus and it's features, please visit link:http://docs.tigase.org/tigase-server/snapshot/Administration_Guide/html/#eventBus[The Administration Guide].
 
-EventBus API
-------------
+== EventBus API
 To create instance of EventBus use the following code:
 [source, xml]
 -------
@@ -24,8 +22,7 @@ EventBus eventBus = EventBusFactory.getInstance();
 
 *NOTE:* Remember, that EventBus is asynchronous. All handlers are called in a different thread than the thread that initially fired the event.
 
-Distributed EventBus
---------------------
+== Distributed EventBus
 Distributed EventBus is designed to distribute events among cluster nodes.
 Events must extends `tigase.xml.Element`:
 
@@ -38,8 +35,7 @@ Events must extends `tigase.xml.Element`:
 Events are identified by two elements: name of event and namespace.
 
 
-Registering events handlers
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Registering events handlers
 To catch and handle an event published in any node of cluster, EventsHandler must be registered first.
 
 [source, java]
@@ -71,8 +67,7 @@ Events created on others cluster node, will have attribute `remote` set to `true
 </EventName>
 -------
 
-Publishing events
-~~~~~~~~~~~~~~~~~
+=== Publishing events
 
 The only limitation for events are the requirements of name and xmlns. Internal structure may be defined by programmer.
 
@@ -94,13 +89,11 @@ event.addChild(new Element("sample_value", "1"));
 eventBus.fire(event);
 -------
 
-Local EventBus
---------------
+== Local EventBus
 
 Local EventBus is the mechanism to distribute events to all listeners on the same instance of Tigase Server.  Local EventBus uses Java Objects as events and allows for the transmission instance of object (for example `Map` or `Set`).
 
-Defining events and handlers classes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Defining events and handlers classes
 Local EventBus uses own structures of events and handlers.
 
 [source, java]
@@ -121,8 +114,7 @@ public static class SampleEvent implements Event {
 }
 -------
 
-Registering events handlers
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Registering events handlers
 
 To catch an event, `EventHandler` must be registered in EventBus:
 
@@ -164,8 +156,7 @@ eventBus.registerAll(consumer);
 
 Once this is in place, EventBus will be added as the event handler for two different events.
 
-Publishing events
-~~~~~~~~~~~~~~~~~
+=== Publishing events
 Publishing events is simple:
 
 [source, java]

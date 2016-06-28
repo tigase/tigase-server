@@ -1,6 +1,5 @@
 [[consoleinstall]]
-Installing Using Console Installer
-==================================
+= Installing Using Console Installer
 :author: Mateusz Fiolka
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 21:18
@@ -11,37 +10,32 @@ Installing Using Console Installer
 :website: http://tigase.net
 
 
-Installation Using the text-mode Installer
-------------------------------------------
+== Installation Using the text-mode Installer
 
 When you install Tigase server on a desktop machine or a server having a graphical user interface - you can use the xref:guiinstall[GUI Installer]. However servers are often administered using *SSH* text-mode connection because of low bandwidth requirements or user preferences. Due to popular demand, the Tigase development team has decided to implement a console installer for the server.
 
 *Note! The console installer is only available for Tigase server version 4.1.5 and later*.
 
-Requirements and Important Notice
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Requirements and Important Notice
 
 Before trying the installer please keep in mind:
 
 - This is first - alpha rate version of the text-mode installation - meant to install the server and do some basic configuration. We will be very happy to see bug reports and overall feedback about this feature. Please send your remarks to mailto:artur.hefczyc@tigase.net[Artur Hefczyc] or Mateusz Fiolka.
 - You will still need to perform some additional steps before running the installer. The main requirement is to download and install *Java JDK v1.6 or newer*. This guide is aimed at advanced users - thus downloading and configuring JDK is left to the reader. You can find more info at the link:http://java.sun.com/javase/downloads/index.jsp[Java downloads site].
 
-Download the Installer
-----------------------
+== Download the Installer
 
 You can always find the newest Tigase packages in the link:https://projects.tigase.org/projects/tigase-server/files/[download section]. When you enter the page, you will be presented a list of files to choose from.   All Tigase binary packages have conventional names, which help to differentiate them easily. They are of form *tigase-server-x.y.z-bv.ext* where 'x', 'y', 'z' and 'v' are version numbers and they change from a release to release. Ext is the file extension which in the case of our console installation program is *.jar*. We recommend you download the latest version (highest version number) of the server as it contains latest functions and improvements.
 
-Run the jar File
-----------------
+== Run the jar File
 
 In terminal (SSH or Windows cmd prompt if you use on) type:
 [source,bash]
--------------------------------------
+-----
 java -jar nameOfTheDownloadedJarFile.jar -console
--------------------------------------
+-----
 
-Installation Steps
-------------------
+== Installation Steps
 
 Now you are ready to to install the server.
 
@@ -52,39 +46,36 @@ Some tips for working with the console installer:
 - To quit the installer use standard termination key specific to your platform. For example on a *Linux* system it is the Ctrl+C key combination. Keep in mind that if you quit the installer after it copied some files - it may leave them in the place and you might have to remove them manually.
 - In current version the installer is of beta quality and using advanced configuration is not recommended. It might work, however it is not much tested and will be improved later.
 
-Initial Screen
-~~~~~~~~~~~~~~
+=== Initial Screen
 
 On this screen you will find server version info which will be useful if you would to suggest something to Tigase developers.
 
 [source,bash]
--------------------------------------
+-----
 Welcome to the installation of Tigase XMPP (Jabber) Server X.Y.Z!
 
 The homepage is at: http://www.tigase.org/
 press 1 to continue, 2 to quit, 3 to redisplay
--------------------------------------
+-----
 
-JDK Selection
-~~~~~~~~~~~~~
+=== JDK Selection
 
 Your system may contain more then one JDK installation, thus you will have to make an explicit decision which one to use. Currently console mode installer doesn't contain any auto-detection code nor validation. You will have to enter the path correctly or you may have problems with running the server. For example on *Ubuntu Linux* you can find the JDK in the /lib/jvm/java-6-sun directory. For the current Tigase server JDK of version at least *1.6* is required.
 
 [source,bash]
--------------------------------------
+-----
 The installed application needs a JDK. A java run-time
 environment (JRE) will be not sufficient.
 
 Enter path: /lib/jvm/java-6-sun
--------------------------------------
+-----
 
-Actions Selection
-~~~~~~~~~~~~~~~~~
+=== Actions Selection
 
 Choose whether you want to configure the server in addition to install it.
 
 [source,bash]
--------------------------------------
+-----
 *** Select what you want to do next:
 
 On this panel you can specify whether you want to install
@@ -101,15 +92,14 @@ on
 Configuration of the Tigase Server
 [on, off]
 on
--------------------------------------
+-----
 
-Installer Info
-~~~~~~~~~~~~~~
+=== Installer Info
 
 Introduction to the installer.
 
 [source,bash]
--------------------------------------
+-----
 Please note!
 
 While the Tigase server is quite stable and well tested
@@ -121,15 +111,14 @@ If you notice any problems please report them to address:
 Artur Hefczyc
 
 press 1 to continue, 2 to quit, 3 to redisplay
--------------------------------------
+-----
 
-Server Info
-~~~~~~~~~~~
+=== Server Info
 
 If you don't know what exactly Tigase server is, you can find some basic introduction on this screen.
 
 [source,bash]
--------------------------------------
+-----
 Tigase XMPP (Jabber) server ver 4.1.5-bDEV
 
 
@@ -175,15 +164,14 @@ server.
 
 
 press 1 to continue, 2 to quit, 3 to redisplay
--------------------------------------
+-----
 
-Server Licence
-~~~~~~~~~~~~~~
+=== Server License
 
-This is a licence that you have to agree to use Tigase server. Please read it carefully. Take note, that in this manual only part is shown in order to decrease guide length.
+This is a license that you have to agree to use Tigase server. Please read it carefully. Take note, that in this manual only part is shown in order to decrease guide length.
 
 [source,bash]
--------------------------------------
+-----
 Please read the following license agreement carefully:
 
 
@@ -229,28 +217,26 @@ read
 Choose number (1-2):
 1
 press 1 to continue, 2 to quit, 3 to redisplay
--------------------------------------
+-----
 
-Server Location Selection
-~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Server Location Selection
 
 Enter where you want the server to be installed. If you have administrator rights you can place it in a standard location where all your applications reside. If you don't have write permissions for this place, you can always install the server in your home directory.
 
 [source,bash]
--------------------------------------
+-----
 Select target path
 [/home/user/tigase] /home/user/tigase-server
 
 press 1 to continue, 2 to quit, 3 to redisplay 1
--------------------------------------
+-----
 
-Selection of Packs to be Installed
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Selection of Packs to be Installed
 
 Some packs are optional and you can disable/enable them. In the following screen they have an [x] option before them. To switch their state enter item number and ENTER. When done press d and ENTER.
 
 [source,bash]
--------------------------------------
+-----
 Select the packs you want to install:
 
 1 => Base, The base files
@@ -271,15 +257,14 @@ d => Done
 
 Choose action: d
 press 1 to continue, 2 to quit, 3 to redisplay
--------------------------------------
+-----
 
-Installation
-~~~~~~~~~~~~
+=== Installation
 
 During extracting and copying server files to their target you will be presented with the process progress.
 
 [source,bash]
--------------------------------------
+-----
 [ Starting to unpack ]
 [ Processing package: Base (1/9) ]
 [ Processing package: Unix Files (2/9) ]
@@ -291,17 +276,16 @@ During extracting and copying server files to their target you will be presented
 [ Processing package: PostgreSQL Database (8/9) ]
 [ Processing package: SQL Server Database (9/9) ]
 [ Unpacking finished ]
--------------------------------------
+-----
 
-Basic Configuration
-~~~~~~~~~~~~~~~~~~~
+=== Basic Configuration
 
 This panel contains most important configuration options for the Tigase server. You can choose which components should be configured to be used when running server, add XMPP admin users and enter their password (many admins, comma separated, initially having the same password). Choose different password from the default one. Then select preferred database. If you don't have a standalone DB which you would like to use, you can choose the included Derby DB.
 
 *Important notice: Tigase installer doesn't contain the actual databases, only drivers allowing db access. One exception is Derby database, which is included in JDK. It is automatically configured by installer, in case of other databases you will need to configure them by yourself.*
 
 [source,bash]
--------------------------------------
+-----
 *** Basic Tigase server configuration
 On this panel you can specify basic configuration settings
 for the Tigase server.
@@ -334,28 +318,26 @@ Admin password [tigase]
 4  [ ] Other...
 input selection:
 1
--------------------------------------
+-----
 
-Advanced Configuration
-~~~~~~~~~~~~~~~~~~~~~~
+=== Advanced Configuration
 
 *Please note: in this version advanced configuration is not supported. Although it may work it has not been tested and thus is not recommended. Please enter off to not use it.*
 
 [source,bash]
--------------------------------------
+-----
 Advanced configuration options
 [on, off]
 off
 press 1 to continue, 2 to quit, 3 to redisplay
--------------------------------------
+-----
 
-Database Configuration
-~~~~~~~~~~~~~~~~~~~~~~
+=== Database Configuration
 
 Depending on which database you selected, you will be presented with related options to configure its connectivity options. As you will see, the parameters have default values.
 
 [source,bash]
--------------------------------------
+-----
 *** Database configuration:
 
 You have selected MySQL database. This database needs
@@ -391,15 +373,14 @@ Database host or IP: [localhost]
 Additional database parameters: []
 
 press 1 to continue, 2 to quit, 3 to redisplay
--------------------------------------
+-----
 
-Database Checking and Preparation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Database Checking and Preparation
 
 After entering all database information an automatic test of connection and database setup is performed. If everything is ok the installer will try to convert database schema to required version and finally adds XMPP administrators to it.
 
 [source,bash]
--------------------------------------
+-----
 Performing DB tasks
 
 Checking connection to the database
@@ -412,33 +393,30 @@ Checking whether the database needs conversion
 Conversion not needed
 Adding XMPP admin accounts
 Added admins OK
--------------------------------------
+-----
 
-Installation Complete
-~~~~~~~~~~~~~~~~~~~~~
+=== Installation Complete
 
 Now you can run the server and use it!
 
 [source,bash]
--------------------------------------
+-----
 Install was successful
 application installed on /home/user/tigase-server
 [ Console installation done ]
--------------------------------------
+-----
 
-Running the Sever
-~~~~~~~~~~~~~~~~~
+=== Running the Sever
 
 You can start the server using the tigase.sh file found in the scripts sub-directory of Tigase server base directory. In the root server directory type the following command:
 
 [source,bash]
--------------------------------------
+-----
 ./scripts/tigase.sh start etc/tigase.conf
--------------------------------------
+-----
 
 Of course if you have a custom config file then change last command appropriately.  On a Windows platform you can use a bat file to run the server. There is a run.bat file in the Tigase root directory. Just double click it in Explorer or run it from command line to start the server. A window with server log output will pop-up.
 
-How to Check if the Server is Running
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== How to Check if the Server is Running
 
 Checking to see if the server is running is quite easy. Just connect to it by using one of mnay available XMPP clients.

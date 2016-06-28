@@ -1,6 +1,5 @@
 [[elementsNumberLimit]]
---elements-number-limit
-=======================
+= --elements-number-limit
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2013-11-27 10:48
@@ -19,15 +18,15 @@
 *Description:* +elements-number-limit+ configuration property allows configuring a Denial of Service protection mechanism which limits number of elements sent in stanza. It can be configured on a per ConnectionManager basis with the following configuration:
 
 [source,bash]
-------------------------------
+-----
 <ConnectionManager component>/elements-number-limit[I]=integer_number
-------------------------------
+-----
 
 for example (for ClusterConnectionManager):
 
 [source,bash]
-------------------------------
+-----
 cl-comp/elements-number-limit[I]=100000
-------------------------------
+-----
 
 *Available since:* 5.2.0

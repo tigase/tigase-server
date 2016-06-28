@@ -1,6 +1,5 @@
 [[manualconfig]]
-Startup File for tigase.sh - tigase.conf
-========================================
+= Startup File for tigase.sh - tigase.conf
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 21:18
@@ -24,14 +23,14 @@ Config file for startup script simply sets number of environment variables with 
 Sample file to run *Tigase* with *PostgreSQL* database may look like:
 
 [source,bash]
--------------------------------------
+-----
 ENC="-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8"
 DRV="-Djdbc.drivers=org.postgresql.Driver"
 JAVA_OPTIONS="${ENC} ${DRV} -server -Xms100M -Xmx100M "
 CLASSPATH=""
 TIGASE_CONFIG="tigase-pgsql.xml"
 TIGASE_OPTIONS=" --property-file etc/init.properties "
--------------------------------------
+-----
 
 Please note encoding settings. JVM by default uses encoding set in operating system environment. XMPP protocol, however uses +UTF-8+ for all data processing. So the ENC settings enforces +UTF-8+ encoding for all operations.
 

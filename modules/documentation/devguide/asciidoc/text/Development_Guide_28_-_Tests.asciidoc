@@ -1,7 +1,5 @@
 [[tests]]
-Tests
-=====
-
+= Tests
 :author: Mateusz Fiolka
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-04-06 21:22
@@ -11,8 +9,7 @@ Tests
 :numbered:
 :website: http://tigase.net/
 
-Tests
------
+== Tests
 Tests are very important part of Tigase server development process.
 
 Each release goes through fully automated testing process. All server functions are considered implemented only when they pass the testing cycle. Tigase test suite is used for all our automatic tests which allows to define different test scenarios.
@@ -29,8 +26,7 @@ The server is tested in all supported environments:
 . *Distributed* - is a test for distributed installation where c2s and s2s components run on separated machine which connects using external an component protocol (link:http://www.xmpp.org/extensions/xep-0114.html[XEP-0114]) to another machine with SessionManager running.
 
 
-Functional Tests
-~~~~~~~~~~~~~~~~
+=== Functional Tests
 
 Basic checking to see if all the functions work at correctly. These tests are performed every time the code is sent to source repository.
 [width="90%"]
@@ -54,8 +50,7 @@ Basic checking to see if all the functions work at correctly. These tests are pe
 | 2.3.4-b226 | None | link:tests/functional-tests.html[00:00:48]| None| None
 |=====================================================================
 
-Performance Tests
-~~~~~~~~~~~~~~~~~
+=== Performance Tests
 Checking to see whether the function performs well enough.
 [width="90%"]
 |=====================================================================
@@ -78,8 +73,7 @@ Checking to see whether the function performs well enough.
 |2.3.4-b226 | None | link:tests/performance-tests.html[01:23:30]| None| None
 |=====================================================================
 
-Stability Tests
-~~~~~~~~~~~~~~~
+=== Stability Tests
 Checking to see whether the function behaves well in long term run. It must handle hundreds of requests a second in a several hour server run.
 [width="90%"]
 |=====================================================================

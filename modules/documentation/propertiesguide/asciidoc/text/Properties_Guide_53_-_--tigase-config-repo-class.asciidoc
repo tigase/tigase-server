@@ -1,6 +1,5 @@
 [[tigaseConfigRepoClass]]
---tigase-config-repo-class
-==========================
+= --tigase-config-repo-class
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2013-02-10 01:37

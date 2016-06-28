@@ -1,6 +1,5 @@
 [[cil6]]
-Component Implementation - Lesson 6 - Scripting Support
-=======================================================
+= Component Implementation - Lesson 6 - Scripting Support
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for AsciiDoc.
 :date: 2010-01-06 20:22
@@ -17,7 +16,7 @@ This guide shows how to extend existing scripting API with your component specif
 Integrating your component implementation with the scripting API is as simple as the code below:
 
 [source,java]
-------------------------------------------------------------------
+-----
 private static final String BAD_WORDS_VAR = "badWords";
 private static final String WHITE_LIST_VAR = "whiteList";
 
@@ -27,7 +26,7 @@ public void initBindings(Bindings binds) {
   binds.put(BAD_WORDS_VAR, badWords);
   binds.put(WHITE_LIST_VAR, whiteList);
 }
-------------------------------------------------------------------
+-----
 
 This way you expose two the component variables: +badWords+ and +whiteList+ to scripts under names the same names - two defined constants. You could use different names of course but it is always a good idea to keep things straightforward, hence we use the same variable names in the component and in the script.
 
@@ -48,12 +47,12 @@ Please refer to the Tigase scripting documentation for all the details how to ad
 The script to pull a list of current bad words can be as simple as the following Groovy code:
 
 [source,java]
-------------------------------------------------------------------
+-----
 def badw = (java.util.Set)badWords
 def result = ""
 for (s in badw) { result += s + "\n" }
 return result
-------------------------------------------------------------------
+-----
 
 As you see from the code, you have to reference your component variables to a variables in your script to make sure a correct type is used. The rest is very simple and is a pure scripting language stuff.
 
@@ -62,7 +61,7 @@ Load the script on to the server and execute it. You should receive a new window
 Below is another simple script which allows updating (adding/removing) bad words from the list.
 
 [source,java]
-------------------------------------------------------------------
+-----
 import tigase.server.Command
 import tigase.server.Packet
 
@@ -100,7 +99,7 @@ if (operation == REMOVE) {
 }
 
 return "Unknown operation: " + operation
-------------------------------------------------------------------
+-----
 
 These two scripts are just the beginning. The possibilities are endless and with the simple a few lines of code in your test component you can then extend your application at runtime with scripts doing various things; you can reload scripts, add and remove them, extending and modifying functionality as you need. No need to restart the server, no need to recompile the code and you can use whatever scripting language you like.
 
@@ -109,7 +108,7 @@ Of course, scripts for whitelist modifications would look exactly the same and i
 Here is a complete code of the test component with the new method described at the beginning and data structures changed from array of *String*s to Java *Set*:
 
 [source,java]
-------------------------------------------------------------------
+-----
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -284,4 +283,4 @@ public class TestComponent extends AbstractMessageReceiver {
   }
 
 }
-------------------------------------------------------------------
+-----
