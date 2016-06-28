@@ -102,8 +102,11 @@ public class Bootstrap implements Lifecycle {
 
 			for (String property_filename : prop_files) {
 				try (BufferedReader reader = new BufferedReader(new FileReader(property_filename))) {
-					if (reader.readLine().contains("{")) {
-						return true;
+					String line;
+					while ((line = reader.readLine()) != null) {
+						if (line.contains("{")) {
+							return true;
+						}
 					}
 				} catch (IOException e) {
 				   e.printStackTrace();
