@@ -90,19 +90,6 @@ public class JavaJMXProxyOpt
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 *
-	 * @param id
-	 * @param hostname
-	 * @param port
-	 * @param userName
-	 * @param password
-	 * @param delay
-	 * @param interval
-	 * @param loadHistory
-	 */
 	public JavaJMXProxyOpt(String id, String hostname, int port, String userName,
 			String password, long delay, long interval, boolean loadHistory) {
 		this.id          = id;
@@ -119,12 +106,6 @@ public class JavaJMXProxyOpt
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param listener is a <code>JMXProxyListenerOpt</code>
-	 */
 	public void addJMXProxyListener(JMXProxyListenerOpt listener) {
 		listeners.add(listener);
 
@@ -137,12 +118,6 @@ public class JavaJMXProxyOpt
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @throws Exception
-	 */
 	public void connect() throws Exception {
 		this.jmxUrl = new JMXServiceURL("rmi", "", 0, this.urlPath);
 
@@ -217,10 +192,6 @@ public class JavaJMXProxyOpt
 		System.out.println("Unsupported JMX notification: {notification.getType()}");
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
 	public void start() {
 		if (updater == null) {
 			updater = new StatisticsUpdater();
@@ -228,10 +199,6 @@ public class JavaJMXProxyOpt
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
 	public void update() {
 		if (tigBean != null) {
 
@@ -260,14 +227,6 @@ public class JavaJMXProxyOpt
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param level is a <code>int</code>
-	 *
-	 * @return a value of {@code Map<String,String>}
-	 */
 	public Map<String, String> getAllStats(int level) {
 		if (tigBean != null) {
 			return tigBean.getAllStats(level);
@@ -276,12 +235,6 @@ public class JavaJMXProxyOpt
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of {@code List<String>}
-	 */
 	public List<String> getComponentsNames() {
 		if (tigBean != null) {
 			return tigBean.getComponentsNames();
@@ -290,15 +243,6 @@ public class JavaJMXProxyOpt
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param compName is a <code>String</code>
-	 * @param level is a <code>int</code>
-	 *
-	 * @return a value of {@code Map<String,String>}
-	 */
 	public Map<String, String> getComponentStats(String compName, int level) {
 		if (tigBean != null) {
 			return tigBean.getComponentStats(compName, level);
@@ -307,34 +251,14 @@ public class JavaJMXProxyOpt
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	public String getHostname() {
 		return hostname;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	public String getId() {
 		return id;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param key is a <code>String</code>
-	 *
-	 * @return a value of <code>Object</code>
-	 */
 	public Object getMetricData(String key) {
 		LinkedList<Object> h = history.get(key);
 
@@ -345,14 +269,6 @@ public class JavaJMXProxyOpt
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param key is a <code>String</code>
-	 *
-	 * @return a value of <code>Object[]</code>
-	 */
 	public Object[] getMetricHistory(String key) {
 		List<Object> result = history.get(key);
 
@@ -378,32 +294,14 @@ public class JavaJMXProxyOpt
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>String</code>
-	 */
 	public String getSystemDetails() {
 		return sysDetails;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	public boolean isConnected() {
 		return tigBean != null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @return a value of <code>boolean</code>
-	 */
 	public boolean isInitialized() {
 		return isConnected() && initialized;
 	}

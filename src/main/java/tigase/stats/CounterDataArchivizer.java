@@ -53,16 +53,9 @@ import java.util.Map;
  */
 public class CounterDataArchivizer
 				implements StatisticsArchivizerIfc {
-	/** Field description */
 	public static final String DB_URL_PROP_KEY = "db-url";
-
-	/** Field description */
 	public static final String KEY_FIELD_PROP_KEY = "key-field";
-
-	/** Field description */
 	public static final String TABLE_NAME_PROP_KEY = "table-name";
-
-	/** Field description */
 	public static final String  VAL_FIELD_PROP_KEY   = "val-field";
 	private static final String CPU_USAGE_TEXT       = "Usage CPU [%]: ";
 	private static final String DEF_KEY_FIELD_NAME   = "counter_name";
@@ -147,13 +140,6 @@ public class CounterDataArchivizer
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param key
-	 * @param value
-	 */
 	public void initData(String key, String value) {
 		try {
 			PreparedStatement updateEntry = data_repo.getPreparedStatement(null,
@@ -177,19 +163,6 @@ public class CounterDataArchivizer
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param conn_str
-	 * @param params
-	 *
-	 * @throws SQLException
-	 * @throws ClassNotFoundException
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
-	 * @throws DBInitException
-	 */
 	public void initRepository(String conn_str, Map<String, String> params)
 					throws SQLException, ClassNotFoundException, InstantiationException,
 							IllegalAccessException, DBInitException {
@@ -205,13 +178,6 @@ public class CounterDataArchivizer
 		// Do nothing for now....
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param key
-	 * @param value
-	 */
 	public void updateData(String key, String value) {
 		try {
 			PreparedStatement updateEntry = data_repo.getPreparedStatement(null,
@@ -227,11 +193,6 @@ public class CounterDataArchivizer
 		}
 	}
 
-	/**
-	 * Performs database check, creates missing schema if necessary
-	 *
-	 * @throws SQLException
-	 */
 	private void checkDB() throws SQLException {
 		data_repo.checkTable(tableName, create_table_query);
 	}
