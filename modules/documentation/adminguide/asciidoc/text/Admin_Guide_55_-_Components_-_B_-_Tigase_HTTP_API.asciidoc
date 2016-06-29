@@ -36,6 +36,7 @@ RestModule will also load all groovy scripts located in scripts/rest/xxx directo
 === Advanced Configuration
 The HTTP component has a variety of configuration options, lets see them in detail here
 
+[[httpCompProp]]
 ==== Component Properties
 Please note, for settings mentioning {compname} replace them with the exact text found as --comp-name, which may be http, rest, or something you have set custom in init.properties.
 
@@ -56,6 +57,11 @@ Please note, for settings mentioning {compname} replace them with the exact text
 
 {compname}/http/port::
     An older version of the /ports[i] setting, it is still supported, but expect to be phased out.
+
+{compname}/setup/admin-credentials::
+    Sets a user and password combination that can access the web installer setup pages. By default administrator JIDs listed in --admins property are granted access, however you may specifiy a specific user and password to give access in addition to those JIDs. +
+    Format is [username:password] So for example, _http/setup/admin-credentials=admin:password_ +
+    Note that this stores the information in *plaintext on init.properties file*, and *this is an optional setting*.
 
 ==== Modules
 Tigase HTTP API component provides functionalities as modules which may be enabled or disabled and configured separately.

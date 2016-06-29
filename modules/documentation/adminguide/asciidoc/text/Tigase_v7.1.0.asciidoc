@@ -142,6 +142,10 @@ When new vhosts are created, Tigase will automatically check for SRV records and
 
 A watchdog property is now available to monitor stale connections and sever them before they become a problem.  More details xref:watchdog[here].
 
+=== Web Installer Setup Page now has restricted access
+
+The Web Installer Setup Page, available through http://yourserver.com/8080/setup/ now requires an admin level JID or a user/password combo specified in init.properties.  See the xref:webinstall[Web Installer] section for default settings.  See xref:httpCompProp[Component Properties] section for details on the new property.
+
 === Offline Message Receipts Storage now Configurable
 
 Admins may now configure Offline Message Receipts Storage to specify filters and controls as to what they want stored in offline messages. See xref:offlineMessageReceipts[more details here].
