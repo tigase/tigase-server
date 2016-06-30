@@ -269,8 +269,6 @@ include::text/Admin_Guide_88_-_Using_Tigase_-_J_-_Tips_and_Tricks.asciidoc[]
 
 include::text/Admin_Guide_89_-_Using_Tigase_-_J_-_Tips_and_Tricks_-_1_-_Tigase_Tip_Checking_the_Runtime_Environment.asciidoc[]
 
-include::text/Admin_Guide_90_-_Using_Tigase_-_J_-_Tips_and_Tricks_-_2_-_Tigase_Tip_Checking_Cluster_Connections.asciidoc[]
-
 include::text/Admin_Guide_91_-_Using_Tigase_-_J_-_Tips_and_Tricks_-_3_-_Best_Practices_for_Connecting_From_Web_Browser_to_Tigase_XMPP_Server.asciidoc[]
 
 :leveloffset: 2
@@ -302,3 +300,5 @@ include::text/Admin_Guide_99_-_Using_Tigase_-_N_-_Offline_Messages.asciidoc[]
 include::text/Admin_Guide_100_-_Using_Tigase_-_O_-_Licensing.asciidoc[]
 
 include::text/Admin_Guide_101_-_Using_Tigase_-_P_-_Advanced_Options.asciidoc[]
+
+include::text/Admin_Guide_104_-_Using_Tigase_-_Q_-_Clustering.asciidoc[]

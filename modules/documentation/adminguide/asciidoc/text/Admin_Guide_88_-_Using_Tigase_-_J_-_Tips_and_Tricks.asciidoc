@@ -9,4 +9,4 @@
 The section contains some short tricks and tips helping in different kinds of issues related to the server administration and maintenance.
 
 - xref:tigaseTip_RuntimeEnvironment[Runtime Environment Tip]
-- xref:tigaseTip_CheckingClusterConnections[Checking Cluster Connections]
+- xref:bestWebPrax [Best Practices for Connecting to Tigase XMPP server From Web Browser]
