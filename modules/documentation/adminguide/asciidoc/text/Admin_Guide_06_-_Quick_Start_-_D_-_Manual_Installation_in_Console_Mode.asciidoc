@@ -139,12 +139,13 @@ There will be lots of output but if there is no error at the end of the output i
 
 == Start the Server
 
-Starting the server is the easiest part. Simply execute following command:
+You can start the server using the tigase file found in the scripts sub-directory of Tigase server base directory. There, select the type of linux you have, debian, gentoo, mendriva or redhat.  In the root server directory type the following command:
 
-[source,sh]
+[source,bash]
 -----
- $ ./scripts/tigase.sh start etc/tigase.conf
+./scripts/{OS}/init.d/tigase start etc/tigase.conf
 -----
+Where {OS} is your *nix operating system.
 
 and you should get the output like this:
 

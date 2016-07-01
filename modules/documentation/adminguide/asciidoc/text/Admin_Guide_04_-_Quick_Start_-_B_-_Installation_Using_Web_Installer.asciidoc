@@ -119,18 +119,17 @@ image:images/web-install-12.png[]
 You have now finished the installation, proceed to the next step to restart the server.
 
 == Restart the Server
-
+It is recommended at this point to stop the server manually and restart it using the proper script for your OS.
+From the Tigase base directory enter
 [source,bash]
 -----
-$ scripts/tigase.sh restart
+./scripts/tigase.sh stop
+
+./scripts/{OS}/init.d/tigase start etc/tigase.conf
 -----
+where {OS} is your type of Linux, gentoo, debian, mandriva, or redhat
 
 To further fine tune the server you should edit etc/tigase.conf. Ensure *JAVA_HOME* path is correct, and increase memory if needed using *JAVA_OPTIONS* -Xmx (max), and -Xms (initial). You will need to direct Tigase to read settings from this file on startup as follows.
-
-[source,bash]
------
-$ scripts/tigase.sh start etc/tigase.conf
------
 
 Everything should be running smooth at this point. Check the logfiles in logs/ if you experience any problems.
 

@@ -408,12 +408,13 @@ application installed on /home/user/tigase-server
 
 === Running the Sever
 
-You can start the server using the tigase.sh file found in the scripts sub-directory of Tigase server base directory. In the root server directory type the following command:
+You can start the server using the tigase file found in the scripts sub-directory of Tigase server base directory. There, select the type of linux you have, debian, gentoo, mendriva or redhat.  In the root server directory type the following command:
 
 [source,bash]
 -----
-./scripts/tigase.sh start etc/tigase.conf
+./scripts/{OS}/init.d/tigase start etc/tigase.conf
 -----
+Where {OS} is your *nix operating system.
 
 Of course if you have a custom config file then change last command appropriately.  On a Windows platform you can use a bat file to run the server. There is a run.bat file in the Tigase root directory. Just double click it in Explorer or run it from command line to start the server. A window with server log output will pop-up.
 
