@@ -30,6 +30,25 @@ To enable Clustering on Tigase servers, use the following line in your init.prop
 
 That's it!
 
+=== Custom Ports
+You can customize ports for the cluster component, just be sure that each clustered server also has the same settings so they can communicate.
+[source,properties]
+-----
+--cl-comp-ports=4250,3540
+-----
+You can fine tune each port configuration, however this is not typically needed.
+
+==== Custom Port Configuration
+Each port has it's own details that can be manipulated VIA the following ports.  Again *THIS IS OPTIONAL*
+[source,properties]
+-----
+cl-comp/connections/4250/type[S]=accept
+cl-comp/connections/4250/socket[S]=plain
+cl-comp/connections/4250/ifc[s]=*
+cl-comp/connections/4250/remote-host[S]=localhost
+cl-comp/connections/4250/connections/tls/required[B]=false
+-----
+
 === Multi-node configuration
 Each node should have +--cluster-mode=true+ enabled that you wish to connect to the cluster.  They will automatically discover other nodes to connect to VIA Server to Server traffic.
 Nodes that are added or removed will be periodically updated.
