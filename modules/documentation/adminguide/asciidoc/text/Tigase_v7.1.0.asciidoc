@@ -194,6 +194,9 @@ Data from Unified Archive or Message Archive can be automatically or manually pu
 
 It's possible now to redirect connections on one port to be forced to connect to another port using the +force-redirect-to+ setting.  link:http://docs.tigase.org/tigase-server/snapshot/Administration_Guide/html/#_enforcing_redirection[Details here].
 
+=== SASL-SCRAM now enabled
+SASL-SCRAM is now enabled by default for available authentication methods.
+
 === Dual IP installtions
 
 Tigase now has a Dual IP setup which can now use a separate internal and external IP and use a DNS resolver for the connection redirection.  Setup instructions are link:http://docs.tigase.org/tigase-server/snapshot/Administration_Guide/html/#_configuring_hostnames[Located here].
@@ -277,6 +280,8 @@ Tigase has improved default settings to improve performance.  These include:
 - #4020 SeeOtherHostSualIP implementation has been fixed to support MongoDB.
 - link:https://projects.tigase.org/issues/4120[#4120] Duplication of messages in offline storage when +Message+ and +OfflineMessage+ processors are used has been resolved.
 - #4162 xml:lang attribute is now supported in Tigase MUC component.
+- #4248 Changed +ErrorCounter+ from +XMPPProcessorIFC+ to +XMPPPacketFilterIfc+ for more accurate functionality.
+- link:https://projects.tigase.org/issues/4256[#4256] Reduced Statistics memory usage by interning statistics labels and changing data types.
 
 
 == Fixes
@@ -460,6 +465,10 @@ Tigase has improved default settings to improve performance.  These include:
 - link:https://projects.tigase.org/issues/4142[#4142] Updated wrapper.conf file to match tigase.conf default settings.
 
 - link:https://projects.tigase.org/issues/4183[#4183] Fixed issue where objects monitored by Ghostbuster.java in MUC could not be removed by it.
+
+- link:https://projects.tigase.org/issues/4185[#4185] Fixed issue with +PacketCounter+ that caused duplicate messages to be sent on stream resumption.
+
+- link:https://projects.tigase.org/issues/4188[#4188] Standardized timestamp between +AbstractMessageArchiveRepository+ and +TimestampHelper+.
 
 - Patch added to fix ConcurrentModificationException in BlockingCommand plugin.
 
