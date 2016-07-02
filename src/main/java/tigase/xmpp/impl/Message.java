@@ -246,6 +246,11 @@ public class Message
 
 	private void processOfflineUser( Packet packet, Queue<Packet> results ) throws PacketErrorTypeException {
 		if (packet.getStanzaTo() != null && packet.getStanzaTo().getResource() != null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Processing message to offline user, packet: {0}, deliveryRules: {1}",
+						new Object[]{packet, deliveryRules});
+			}
+
 			if (deliveryRules != MessageDeliveryRules.strict) {
 				StanzaType type = packet.getType();
 				if (type == null) {
@@ -315,6 +320,11 @@ public class Message
 			if (conn.getPresence() != null &&  conn.getPriority() >= 0)
 				conns.add(conn);
 		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Out of: {0} total connections, only: {1} have non-negative priority",
+					new Object[]{session.getActiveSessions().size(), conns.size()});
+		}
+
 		return conns;
 	}
 

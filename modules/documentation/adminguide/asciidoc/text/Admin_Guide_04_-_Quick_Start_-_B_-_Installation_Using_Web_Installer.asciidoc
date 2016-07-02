@@ -53,12 +53,18 @@ java    18387 tigase  152u  IPv6 22185838      0t0  TCP *:5269 (LISTEN)
 
 Some points before you can connect:
 
-. If AuthRepository is not configured then access is allowed (initial installation).
-. If it is accessed on localhost then access is allowed.
-. If user is authenticated by jid and password as user from admins of Tigase XMPP Server then access is allowed.
-. In other case access is denied.
+This setup page is restricted access, however for first setup there is a default account set to setup Tigase:
+Username: admin
+Password: tigase
+
+This combination will only be valid once as it will be removed from init.properties file on compleation of setup process.  After this point the setup page will only be accessable using the following:
+
+. JID accounts listed as administrators in --admins line in init.properties
+. Username and password combinations added to init.properties file manually, or at the last page in this process.
 
 Point your browser to *http://localhost:8080/setup/* unless you are working remotely. Then you can use the domain name, or IP address. I used http://tpub.xmpp-test.net:8080/setup/ for this guide.
+
+Enter the username and password above to gain access.
 
 == Step Through the Installation Process
 
@@ -70,52 +76,60 @@ Read it and then click "Next"
 
 image:images/web-install-02.png[]
 
-Here we have the licensing page. Please read though the agreement, type your name and click "Next".
+Here is some information about our commercial products and licensing. Please read though the agreement, type your name or company and click "Next".
 
 image:images/web-install-03.png[]
 
-The software reads your current *etc/init.properties* file and presents it. Here we have a bare bones new installation. Click "Next".
+The software reads your current *etc/init.properties* file and presents it. It will look fairly sparce.  If you have a pre-configured init.properties file, you may load it here. If not, click "Next".
 
 image:images/web-install-04.png[]
 
-Here we have the domain, database type, and admin account configuration screen. I've chosen Derby. Possible options are MySQL, PostgresSQL, and SQLServer. Tick the advanced box if you think you want a non standard installation.
+This page will look over your default configuration settings, these include the type, Domains you wish to use, and gives you a chance to specify an administrator for the domain.  Also, you will be selecting what type of database Tigase server will be using.
 
 image:images/web-install-05.png[]
 
-The Advanced configuration page. Select what you need.
+The Advanced configuration page. Select what components and configurations you need.
 
 image:images/web-install-06.png[]
 
-Plugins which will be loaded by the server.
+Plugins which will be loaded by the server, most plugins are enabled by default.
 
 image:images/web-install-07.png[]
 
-This is where the database schema is installed.
+This is where the database schema is installed. *BE SURE TO SPECIFY SUPER USER ACCOUNT AND PASSWORD*
 
 image:images/web-install-08.png[]
 
-You should see a page like this after success.
+You should see a page like this after a successful database setup.  This page will reveal any issues with your database setup such as invalid URIs, passwords, and schemas.
 
 image:images/web-install-09.png[]
 
-The installation is complete and this is what the new *init.properties* will look like. Click "Save" to write the file to disk.
+Next a page asking if you'd like to provide an API Access Key to access HTTP REST commands.  It is highly recommended that you either specify an API key or block access.  Open API keys allow any REST command to be interpreted by the server.
 
 image:images/web-install-10.png[]
 
-Setup has finished. Go back into the installation directory and restart.
+The Setup Access Page will be locked from the admin/tigase user as specified above.  This is your chance to have the setup pages add a specific user in addition to admin accounts to re-access this setup process later.  If left blank, only JIDs listed in admin will be allowed to access.
 
+image:images/web-install-11.png[]
+
+The installation is complete and this is what the new *init.properties* will look like. Click "Save" to write the file to disk.
+
+image:images/web-install-12.png[]
+
+You have now finished the installation, proceed to the next step to restart the server.
+
+== Restart the Server
+It is recommended at this point to stop the server manually and restart it using the proper script for your OS.
+From the Tigase base directory enter
 [source,bash]
 -----
-$ scripts/tigase.sh stop
-$ scripts/tigase.sh start
+./scripts/tigase.sh stop
+
+./scripts/{OS}/init.d/tigase start etc/tigase.conf
 -----
+where {OS} is your type of Linux, gentoo, debian, mandriva, or redhat
 
 To further fine tune the server you should edit etc/tigase.conf. Ensure *JAVA_HOME* path is correct, and increase memory if needed using *JAVA_OPTIONS* -Xmx (max), and -Xms (initial). You will need to direct Tigase to read settings from this file on startup as follows.
-
-[source,bash]
------
-$ scripts/tigase.sh start etc/tigase.conf
------
 
 Everything should be running smooth at this point. Check the logfiles in logs/ if you experience any problems.
 

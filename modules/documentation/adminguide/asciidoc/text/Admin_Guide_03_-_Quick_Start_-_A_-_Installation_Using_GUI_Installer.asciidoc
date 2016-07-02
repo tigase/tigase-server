@@ -131,14 +131,16 @@ When you perform all those steps altogether with choosing Start Menu location an
 
 Part of the installation process is the selection of Tigase base directory. This is where you can find all important server files. The installer will create some configurable shortcuts in the *Start Menu*. You can navigate to the menu and use it to start the server.   To run the server manually:
 
-- On a *Linux* system you may start the server using the *tigase.sh* file found in the *scripts* sub-directory of Tigase server base directory. In the root server directory type the following command:
+- On a *Linux* system you may start the server using the *tigase* file found in the *scripts* sub-directory of Tigase server base directory.
+You will need to select the type of linux you have, debian, gentoo, mandirva, or redhat, and use the script located in the init.d folder.
+In the root server directory type the following command:
 
 [source,bash]
 -----
-./scripts/tigase.sh start etc/tigase.conf
+./scripts/{OS}/init.d/tigase start etc/tigase.conf
 -----
+Of course if you have a custom config file then change last command appropriately.
 
-- Of course if you have a custom config file then change last command appropriately.
 - On a *Windows* platform you can use a *bat* file to run the server. There is a *run.bat* file in the Tigase root directory. Just double click it in *Explorer* or run it from command line to start the server. A window with server log output will pop-up.
 
 image:images/winRun.gif[]

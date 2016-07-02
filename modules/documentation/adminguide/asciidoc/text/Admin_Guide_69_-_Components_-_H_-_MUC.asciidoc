@@ -28,6 +28,8 @@ To disable filter and allow MUC transfer all subelements in <message/> set:
 muc/message-filter-enabled[B]=false
 -----
 
+For example, this allows users to send XHTML stanzas through MUC chatrooms on your server.
+
 - *presence-filter-enabled* +
 To disable filter and allow MUC transfer all subelements in <presence/> set:
 -----
@@ -47,7 +49,7 @@ muc/ghostbuster-enabled[B]=false
 -----
 
 - *muc-allow-chat-states* +
-To allow transfet chat-states in MUC messages:
+To allow transfer of chat-states in MUC messages:
 -----
 muc/muc-allow-chat-states[B]=true
 -----

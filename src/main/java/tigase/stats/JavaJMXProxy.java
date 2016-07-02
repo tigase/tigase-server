@@ -118,19 +118,6 @@ public class JavaJMXProxy
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 *
-	 * @param id
-	 * @param hostname
-	 * @param port
-	 * @param userName
-	 * @param password
-	 * @param delay
-	 * @param interval
-	 * @param loadHistory
-	 */
 	public JavaJMXProxy(String id, String hostname, int port, String userName,
 			String password, long delay, long interval, boolean loadHistory) {
 		this.id          = id;
@@ -147,22 +134,10 @@ public class JavaJMXProxy
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param listener
-	 */
 	public void addJMXProxyListener(JMXProxyListener listener) {
 		listeners.add(listener);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @throws Exception
-	 */
 	public void connect() throws Exception {
 		this.jmxUrl = new JMXServiceURL("rmi", "", 0, this.urlPath);
 
@@ -235,10 +210,6 @@ public class JavaJMXProxy
 		System.out.println("Unsupported JMX notification: {notification.getType()}");
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
 	public void start() {
 		if (updater == null) {
 			updater = new StatisticsUpdater();
@@ -246,10 +217,6 @@ public class JavaJMXProxy
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 */
 	public void update() {
 		if (tigBean != null) {
 

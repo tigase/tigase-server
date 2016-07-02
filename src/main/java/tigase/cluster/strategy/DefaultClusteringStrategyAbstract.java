@@ -155,6 +155,11 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	}
 
 	@Override
+	public void handleLocalUserChangedConnId(BareJID userId, XMPPResourceConnection conn, JID oldConnId, JID newConnId) {
+		// Do nothing
+	}
+
+	@Override
 	public boolean processPacket(Packet packet, XMPPResourceConnection conn) {
 		List<JID> toNodes = getNodesForPacketForward(sm.getComponentId(), null, packet);
 		boolean   result  = (toNodes != null) && (toNodes.size() > 0);

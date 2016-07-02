@@ -62,33 +62,21 @@ import java.util.logging.Logger;
 public class StatisticsCollector
 				extends AbstractComponentRegistrator<StatisticsContainer>
 				implements ShutdownHook {
-	/** Field description */
 	public static final String ERRORS_STATISTICS_MBEAN_NAME =
 			"tigase.stats:type=ErrorStatistics";
-	/** Field description */
 	public static final String STATISTICS_MBEAN_NAME =
 			"tigase.stats:type=StatisticsProvider";
 
-	/**
-	 *
-	 */
 	public static final String STATS_ARCHIVIZERS = "--stats-archiv";
 
-	/**
-	 *
-	 */
 	public static final String STATS_ARCHIVIZERS_PROP_KEY = "stats-archiv";
 
-	/** Field description */
 	public static final String STATS_HISTORY = "--stats-history";
 
-	/** Field description */
 	public static final String STATS_HISTORY_SIZE_PROP_KEY = "stats-history-size";
 
-	/** Field description */
 	public static final int STATS_HISTORY_SIZE_PROP_VAL = 8640;
 
-	/** Field description */
 	public static final String STATS_UPDATE_INTERVAL_PROP_KEY = "stats-update-interval";
 
 	public static final String STATS_HIGH_MEMORY_LEVEL_KEY = "stats-high-memory-level";
@@ -331,14 +319,6 @@ public class StatisticsCollector
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of <code>StatisticsList</code>
-	 */
 	public StatisticsList getAllStats() {
 		StatisticsList list = new StatisticsList(Level.ALL);
 
@@ -347,12 +327,6 @@ public class StatisticsCollector
 		return list;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param list
-	 */
 	public void getAllStats(StatisticsList list) {
 		for (StatisticsContainer comp : components.values()) {
 			getComponentStats(comp.getName(), list);
@@ -369,25 +343,10 @@ public class StatisticsCollector
 		list.add("total", "Total queues overflow", totalQueuesOverflow, Level.INFO);
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 *
-	 *
-	 * @return a value of {@code List<String>}
-	 */
 	public List<String> getComponentsNames() {
 		return new ArrayList<String>(components.keySet());
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param name
-	 * @param list
-	 */
 	public void getComponentStats(String name, StatisticsList list) {
 		StatisticsContainer stats = components.get(name);
 
@@ -530,10 +489,6 @@ public class StatisticsCollector
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 */
 	protected void statsUpdated() {
 		synchronized (arch_runner) {
 			arch_runner.notifyAll();

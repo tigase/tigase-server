@@ -1474,15 +1474,7 @@ public class SessionManager
 					// this connection will be used with other already authenticated connection
 					sessionsByNodeId.get(oldConn.getBareJID()).removeResourceConnection(connection);
 
-					Packet cmd = Command.STREAM_MOVED.getPacket(getComponentId(), oldConnJid,
-							StanzaType.set, "moved");
-
-					Command.addFieldValue(cmd, "cmd", "stream-moved");
-					Command.addFieldValue(cmd, "new-conn-jid", oldConn.getConnectionId()
-							.toString());
-					cmd.setPacketFrom(getComponentId());
-					cmd.setPacketTo(oldConnJid);
-					addOutPacket(cmd);
+					xmppStreamMoved(oldConn, oldConnJid, oldConn.getConnectionId());
 				} catch (XMPPException ex) {
 					log.log(Level.SEVERE, "exception while replacing old connection id = " +
 							oldConnJid + " with new connection id = " + pc.getPacketFrom().toString(),
@@ -1919,6 +1911,17 @@ public class SessionManager
 
 	public void unregister(Kernel kernel) {
 
+	}
+
+	protected void xmppStreamMoved(XMPPResourceConnection conn, JID oldConnId, JID newConnId) {
+		Packet cmd = Command.STREAM_MOVED.getPacket(getComponentId(), oldConnId,
+				StanzaType.set, "moved");
+
+		Command.addFieldValue(cmd, "cmd", "stream-moved");
+		Command.addFieldValue(cmd, "new-conn-jid", newConnId.toString());
+		cmd.setPacketFrom(getComponentId());
+		cmd.setPacketTo(oldConnId);
+		addOutPacket(cmd);
 	}
 
 	//~--- get methods ----------------------------------------------------------

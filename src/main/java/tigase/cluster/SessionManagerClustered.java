@@ -555,6 +555,16 @@ public class SessionManagerClustered
 		}
 	}
 
+	@Override
+	protected void xmppStreamMoved(XMPPResourceConnection conn, JID oldConnId, JID newConnId) {
+		try {
+			strategy.handleLocalUserChangedConnId(conn.getBareJID(), conn, oldConnId, newConnId);
+		} catch (Exception ex) {
+			log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
+		}
+		super.xmppStreamMoved(conn, oldConnId, newConnId);
+	}
+
 	private void sendAdminNotification(String node, STATUS stat) {
 		String message = "Cluster ";
 		String subject = null;

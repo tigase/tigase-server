@@ -59,16 +59,6 @@ public class StatisticsProvider
 
 	// ~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 *
-	 * @param theRef
-	 * @param historySize
-	 * @param updateInterval
-	 *
-	 * @throws NotCompliantMBeanException
-	 */
 	public StatisticsProvider(StatisticsCollector theRef, int historySize,
 			long updateInterval, int highMemoryLevel)
 					throws NotCompliantMBeanException {
@@ -82,10 +72,6 @@ public class StatisticsProvider
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 */
 	public void stop() {
 		if (cache != null) {
 			cache.stop();
@@ -439,28 +425,11 @@ public class StatisticsProvider
 		return TigaseRuntime.getTigaseRuntime().getUptime();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <br><br>
-	 *
-	 * Override customization hook: You can supply a customized description for
-	 * MBeanInfo.getDescription()
-	 *
-	 */
 	@Override
 	protected String getDescription(MBeanInfo info) {
 		return "Provides the Tigase server statistics";
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <br><br>
-	 *
-	 * Override customization hook: You can supply a customized description for
-	 * MBeanAttributeInfo.getDescription()
-	 */
 	@Override
 	protected String getDescription(MBeanAttributeInfo info) {
 		String description = null;
@@ -489,14 +458,6 @@ public class StatisticsProvider
 		return description;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <br><br>
-	 *
-	 * Override customization hook: You can supply a customized description for
-	 * MBeanParameterInfo.getDescription()
-	 */
 	@Override
 	protected String getDescription(MBeanOperationInfo op, MBeanParameterInfo param,
 			int sequence) {
@@ -526,14 +487,6 @@ public class StatisticsProvider
 		return null;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <br><br>
-	 *
-	 * Override customization hook: You can supply a customized description for
-	 * MBeanOperationInfo.getDescription()
-	 */
 	@Override
 	protected String getDescription(MBeanOperationInfo info) {
 		String               description = null;
@@ -562,15 +515,6 @@ public class StatisticsProvider
 		return description;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <br><br>
-	 *
-	 * Override customization hook: You can supply a customized description for
-	 * MBeanParameterInfo.getName()
-	 *
-	 */
 	@Override
 	protected String getParameterName(MBeanOperationInfo op, MBeanParameterInfo param,
 			int sequence) {
@@ -735,10 +679,6 @@ public class StatisticsProvider
 
 		//~--- methods ------------------------------------------------------------
 
-		/**
-		 * Method description
-		 *
-		 */
 		public void stop() {
 			updateTimer.cancel();
 		}
