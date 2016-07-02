@@ -29,26 +29,23 @@ package tigase.cluster.strategy;
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.CommandListener;
 import tigase.cluster.api.SessionManagerClusteredIfc;
-import static tigase.cluster.api.SessionManagerClusteredIfc.SESSION_FOUND_KEY;
 import tigase.cluster.strategy.cmd.PacketForwardCmd;
-
+import tigase.server.Iq;
 import tigase.server.Message;
 import tigase.server.Packet;
-
+import tigase.stats.StatisticsList;
 import tigase.xml.Element;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 
-import tigase.stats.StatisticsList;
-
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tigase.server.Iq;
+
+import static tigase.cluster.api.SessionManagerClusteredIfc.SESSION_FOUND_KEY;
 
 /**
  * Created: May 13, 2009 9:53:44 AM
@@ -150,6 +147,11 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	@Override
 	public void handleLocalUserLogout(BareJID userId, XMPPResourceConnection conn) {
 
+		// Do nothing
+	}
+
+	@Override
+	public void handleLocalUserChangedConnId(BareJID userId, XMPPResourceConnection conn, JID oldConnId, JID newConnId) {
 		// Do nothing
 	}
 

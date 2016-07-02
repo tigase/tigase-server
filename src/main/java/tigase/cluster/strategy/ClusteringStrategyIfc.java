@@ -90,6 +90,8 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 */
 	public void handleLocalUserLogout(BareJID userId, XMPPResourceConnection conn);
 
+	public void handleLocalUserChangedConnId(BareJID userId, XMPPResourceConnection conn, JID oldConnId, JID newConnId);
+
 	//~--- get methods ----------------------------------------------------------
 
 	/**

@@ -30,34 +30,26 @@ import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.cluster.api.SessionManagerClusteredIfc;
 import tigase.cluster.strategy.ClusteringStrategyIfc;
-
+import tigase.conf.ConfigurationException;
+import tigase.osgi.ModulesManagerImpl;
 import tigase.server.ComponentInfo;
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.server.XMPPServer;
 import tigase.server.xmppsession.SessionManager;
-
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.XMPPSession;
-
-import tigase.conf.ConfigurationException;
-import tigase.osgi.ModulesManagerImpl;
 import tigase.stats.StatisticsList;
 import tigase.util.DNSResolverFactory;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
+import tigase.xmpp.*;
 
+import javax.script.Bindings;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.script.Bindings;
 
 /**
  * Class SessionManagerClusteredOld
@@ -506,6 +498,16 @@ public class SessionManagerClustered
 		} catch (Exception ex) {
 			log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
 		}
+	}
+
+	@Override
+	protected void xmppStreamMoved(XMPPResourceConnection conn, JID oldConnId, JID newConnId) {
+		try {
+			strategy.handleLocalUserChangedConnId(conn.getBareJID(), conn, oldConnId, newConnId);
+		} catch (Exception ex) {
+			log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
+		}
+		super.xmppStreamMoved(conn, oldConnId, newConnId);
 	}
 
 	private void sendAdminNotification(String node, STATUS stat) {

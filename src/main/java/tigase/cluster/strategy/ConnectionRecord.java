@@ -131,6 +131,10 @@ public class ConnectionRecord
 
 	//~--- set methods ----------------------------------------------------------
 
+	public void setConnectionId(JID connectionId) {
+		this.connectionId = connectionId;
+	}
+
 	@Override
 	public void setElement(Element elem) {
 		this.node         = JID.jidInstanceNS(elem.getChild(NODE_ELEMENT).getCData());

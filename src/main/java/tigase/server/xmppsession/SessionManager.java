@@ -24,87 +24,37 @@
 
 package tigase.server.xmppsession;
 
-import tigase.db.AuthRepository;
-import tigase.db.NonAuthUserRepository;
-import tigase.db.NonAuthUserRepositoryImpl;
-import tigase.db.RepositoryFactory;
-import tigase.db.TigaseDBException;
-import tigase.db.UserRepository;
-
-import tigase.server.AbstractMessageReceiver;
-import tigase.server.Command;
-import tigase.server.Iq;
-import tigase.server.Message;
-import tigase.server.Packet;
-import tigase.server.Permissions;
-import tigase.server.ReceiverTimeoutHandler;
-import tigase.server.XMPPServer;
-import tigase.server.script.CommandIfc;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.NoConnectionIdException;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPImplIfc;
-import tigase.xmpp.XMPPPacketFilterIfc;
-import tigase.xmpp.XMPPPostprocessorIfc;
-import tigase.xmpp.XMPPPreprocessorIfc;
-import tigase.xmpp.XMPPPresenceUpdateProcessorIfc;
-import tigase.xmpp.XMPPProcessor;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.XMPPSession;
-import tigase.xmpp.XMPPStopListenerIfc;
-import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
-import tigase.xmpp.impl.JabberIqRegister;
-import tigase.xmpp.impl.PresenceCapabilitiesManager;
-
 import tigase.annotations.TigaseDeprecatedComponent;
 import tigase.auth.mechanisms.SaslEXTERNAL;
 import tigase.conf.Configurable;
 import tigase.conf.ConfigurationException;
+import tigase.db.*;
 import tigase.disco.XMPPService;
+import tigase.server.*;
+import tigase.server.script.CommandIfc;
 import tigase.stats.StatisticsList;
 import tigase.sys.OnlineJidsReporter;
 import tigase.sys.TigaseRuntime;
 import tigase.util.Base64;
-import tigase.util.ProcessingThreads;
-import tigase.util.QueueItem;
-import tigase.util.TigaseStringprepException;
-import tigase.util.WorkerThread;
+import tigase.util.*;
 import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
+import tigase.xmpp.*;
+import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
+import tigase.xmpp.impl.JabberIqRegister;
+import tigase.xmpp.impl.PresenceCapabilitiesManager;
 
+import javax.script.Bindings;
 import java.io.ByteArrayInputStream;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
-import java.util.AbstractQueue;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.script.Bindings;
 
 import static tigase.server.xmppsession.SessionManagerConfig.*;
 
@@ -1696,15 +1646,7 @@ public class SessionManager
 					// this connection will be used with other already authenticated connection
 					sessionsByNodeId.get(oldConn.getBareJID()).removeResourceConnection(connection);
 
-					Packet cmd = Command.STREAM_MOVED.getPacket(getComponentId(), oldConnJid,
-							StanzaType.set, "moved");
-
-					Command.addFieldValue(cmd, "cmd", "stream-moved");
-					Command.addFieldValue(cmd, "new-conn-jid", oldConn.getConnectionId()
-							.toString());
-					cmd.setPacketFrom(getComponentId());
-					cmd.setPacketTo(oldConnJid);
-					addOutPacket(cmd);
+					xmppStreamMoved(oldConn, oldConnJid, oldConn.getConnectionId());
 				} catch (XMPPException ex) {
 					log.log(Level.SEVERE, "exception while replacing old connection id = " +
 							oldConnJid + " with new connection id = " + pc.getPacketFrom().toString(),
@@ -2116,6 +2058,17 @@ public class SessionManager
 			admin_pac.initVars(packet.getStanzaFrom(), JID.jidInstance(admin));
 			processPacket(admin_pac);
 		}
+	}
+
+	protected void xmppStreamMoved(XMPPResourceConnection conn, JID oldConnId, JID newConnId) {
+		Packet cmd = Command.STREAM_MOVED.getPacket(getComponentId(), oldConnId,
+				StanzaType.set, "moved");
+
+		Command.addFieldValue(cmd, "cmd", "stream-moved");
+		Command.addFieldValue(cmd, "new-conn-jid", newConnId.toString());
+		cmd.setPacketFrom(getComponentId());
+		cmd.setPacketTo(oldConnId);
+		addOutPacket(cmd);
 	}
 
 	//~--- get methods ----------------------------------------------------------
