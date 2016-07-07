@@ -470,7 +470,7 @@ public class Kernel {
 
 	}
 
-	void injectIfRequired(final BeanConfig beanConfig) {
+	public void injectIfRequired(final BeanConfig beanConfig) {
 		try {
 			Collection<Dependency> dps = dependencyManager.getDependenciesTo(beanConfig);
 			for (Dependency dep : dps) {

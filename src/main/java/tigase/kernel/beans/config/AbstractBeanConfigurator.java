@@ -285,12 +285,18 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 				if (cfg.getClazzName() == null && !kernel.isBeanClassRegistered(cfg.getBeanName()))
 					continue;
 
-				if (kernel.isBeanClassRegistered(cfg.getBeanName())) {
-					kernel.setBeanActive(cfg.getBeanName(), cfg.isActive());
-				} else {
+				boolean register = !kernel.isBeanClassRegistered(cfg.getBeanName());
+				if (!register) {
+					if (kernel.getClass() != null && cfg.getClazzName() != null && !kernel.getClass().getCanonicalName().equals(cfg.getClazzName())) {
+					 	register = true;
+					} else{
+						kernel.setBeanActive(cfg.getBeanName(), cfg.isActive());
+					}
+				}
+				if (register) {
 					try {
 						Class<?> cls = ModulesManagerImpl.getInstance().forName(cfg.getClazzName());
-						kernel.registerBean(cfg.getBeanName()).asClass(cls).setActive(cfg.isActive()).exec();
+						kernel.registerBean(cfg.getBeanName()).asClass(cls).setActive(cfg.isActive()).execWithoutInject();
 					} catch (ClassNotFoundException ex) {
 						log.log(Level.FINER, "could not register bean '" + cfg.getBeanName() + "' as class '" +
 								cfg.getClazzName() + "' is not available", ex);
@@ -312,12 +318,20 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 	}
 
 	protected void registerBeansForBeanOfClass(Kernel kernel, Class<?> requiredClass, Set<Class<?>> classes) {
+		List<BeanConfig> registered = new ArrayList<>();
 		for (Class<?> cls : classes) {
 			Bean annotation = registerBeansForBeanOfClassShouldRegister(kernel, requiredClass, cls);
 			if (annotation != null) {
-				kernel.registerBean(cls).exec();
+				BeanConfig beanConfig = kernel.registerBean(cls).execWithoutInject();
+				if (beanConfig != null) {
+					registered.add(beanConfig);
+				}
 			}
 		}
+
+//		for (BeanConfig beanConfig : registered) {
+//			kernel.injectIfRequired(beanConfig);
+//		}
 	}
 
 	protected Bean registerBeansForBeanOfClassShouldRegister(Kernel kernel, Class<?> requiredClass, Class<?> cls) {

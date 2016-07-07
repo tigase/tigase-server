@@ -99,9 +99,14 @@ public class BeanConfigBuilder {
 	 * Finishing registration of bean.
 	 */
 	public void exec() {
+		execWithoutInject();
+		kernel.injectIfRequired(beanConfig);
+	}
+
+	public BeanConfig execWithoutInject() {
 		if (beanConfig == null) {
 			log.warning("Bean " + clazz + " cannot be registered, because Kernel cannot create configuration for this bean.");
-			return;
+			return null;
 		}
 
 		if (factoryBeanConfig != null) {
@@ -118,7 +123,8 @@ public class BeanConfigBuilder {
 		}
 
 		kernel.currentlyUsedConfigBuilder = null;
-		kernel.injectIfRequired(beanConfig);
+
+		return  beanConfig;
 	}
 
 	/**
