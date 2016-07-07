@@ -213,6 +213,8 @@ public interface DataRepository extends DataSource {
 	 */
 	dbTypes getDatabaseType();
 
+	int getPoolSize();
+
 	// ~--- get methods ----------------------------------------------------------
 
 	/**
@@ -229,6 +231,20 @@ public interface DataRepository extends DataSource {
 	 */
 	PreparedStatement getPreparedStatement(BareJID user_id, String stIdKey)
 					throws SQLException;
+
+	/**
+	 * Returns a prepared statement for a given key.
+	 *
+	 * @param hashCode user for selection of connection to use. It is used mainly
+	 * to group queries for the same user on the same DB connection.
+	 * @param stIdKey
+	 *          is a statement identification key.
+	 * @return a <code>PreparedStatement</code> for the given id key or null if
+	 *         such a statement does not exist.
+	 * @throws SQLException
+	 */
+	PreparedStatement getPreparedStatement(int hashCode, String stIdKey)
+			throws SQLException;
 
 	/**
 	 * Returns a DB connection string or DB connection URI.

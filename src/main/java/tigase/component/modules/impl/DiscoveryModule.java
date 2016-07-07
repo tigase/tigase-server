@@ -17,10 +17,6 @@
  */
 package tigase.component.modules.impl;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import tigase.component.exceptions.ComponentException;
 import tigase.component.exceptions.RepositoryException;
 import tigase.component.modules.AbstractModule;
@@ -37,6 +33,10 @@ import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 @Bean(name = DiscoveryModule.ID)
 public class DiscoveryModule extends AbstractModule {
 
@@ -46,7 +46,7 @@ public class DiscoveryModule extends AbstractModule {
 
 	public final static String ID = "disco";
 
-	@Inject
+	@Inject(nullAllowed = true)
 	private AdHocCommandModule adHocCommandModule;
 
 	@Inject(bean = "component")

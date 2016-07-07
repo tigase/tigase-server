@@ -55,7 +55,7 @@ public class ConfiguratorCommand implements AdHocCommand {
 	protected final Logger log = Logger.getLogger(this.getClass().getName());
 	@Inject(bean = "defaultTypesConverter")
 	protected TypesConverter defaultTypesConverter;
-	@Inject
+	@Inject(bean = "kernel")
 	private Kernel kernel;
 	@Inject(bean = BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)
 	private AbstractBeanConfigurator beanConfigurator;

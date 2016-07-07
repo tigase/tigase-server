@@ -26,6 +26,8 @@ package tigase.db;
 
 import tigase.db.beans.MDPoolBean;
 import tigase.db.beans.UserRepositoryMDPoolBean;
+import tigase.eventbus.EventBus;
+import tigase.kernel.beans.Inject;
 import tigase.xmpp.BareJID;
 
 import java.util.ArrayList;
@@ -47,6 +49,9 @@ import java.util.logging.Logger;
  */
 public abstract class UserRepositoryMDImpl extends MDPoolBean<UserRepository,UserRepositoryMDPoolBean.UserRepositoryConfigBean> implements UserRepository {
 	private static final Logger log = Logger.getLogger(UserRepositoryMDImpl.class.getName());
+
+	@Inject
+	private EventBus eventBus;
 
 	//~--- fields ---------------------------------------------------------------
 
@@ -368,6 +373,8 @@ public abstract class UserRepositoryMDImpl extends MDPoolBean<UserRepository,Use
 
 		if (repo != null) {
 			repo.removeUser(user);
+
+			eventBus.fire(new UserRemovedEvent(user));
 		} else {
 			log.log(Level.WARNING,
 					"Couldn't obtain user repository for domain: " + user.getDomain()

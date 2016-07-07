@@ -191,6 +191,18 @@ public class DataRepositoryImpl implements DataRepository, StatisticsProviderIfc
 	}
 
 	@Override
+	public PreparedStatement getPreparedStatement(int hashCode, String stIdKey)
+			throws SQLException {
+		checkConnection();
+
+		// This synchronization is used to prevent call when the connection and
+		// all prepared statements are being recreated.
+		synchronized (db_statements) {
+			return db_statements.get(stIdKey);
+		}
+	}
+
+	@Override
 	public String getResourceUri() {
 		return db_conn;
 	}
@@ -506,6 +518,11 @@ public class DataRepositoryImpl implements DataRepository, StatisticsProviderIfc
 		list.add(compName, reconnectionCounter.getName(), reconnections, Level.FINER);
 		long failedReconnections = list.getValue(compName, reconnectionFailedCounter.getName(), 0L) + reconnectionFailedCounter.getValue();
 		list.add(compName, reconnectionFailedCounter.getName(),failedReconnections, Level.FINER);
+	}
+
+	@Override
+	public int getPoolSize() {
+		return 1;
 	}
 	
 	private class DBQuery {

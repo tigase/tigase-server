@@ -84,6 +84,17 @@ public class DataRepositoryPool implements DataRepository, DataSourcePool<DataRe
 		return result;
 	}
 
+	public DataRepository takeRepo(int hashCode) {
+		int idx = Math.abs(hashCode % repoPool.size());
+		DataRepository result = null;
+		try {
+			result = repoPool.get(idx);
+		} catch (IndexOutOfBoundsException ioobe) {
+			result = repoPool.get(0);
+		}
+		return result;
+	}
+
 	@Override
 	public DataRepository takeRepoHandle(BareJID user_id) {
 		return takeRepo(user_id);
@@ -139,6 +150,19 @@ public class DataRepositoryPool implements DataRepository, DataSourcePool<DataRe
 
 		if (repo != null) {
 			return repo.getPreparedStatement(user_id, stIdKey);
+		} else {
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+		}
+
+		return null;
+	}
+
+	@Override
+	public PreparedStatement getPreparedStatement(int hashCode, String stIdKey) throws SQLException {
+		DataRepository repo = takeRepo(hashCode);
+
+		if (repo != null) {
+			return repo.getPreparedStatement(hashCode, stIdKey);
 		} else {
 			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
 		}
@@ -246,4 +270,8 @@ public class DataRepositoryPool implements DataRepository, DataSourcePool<DataRe
 
 	}
 
+	@Override
+	public int getPoolSize() {
+		return repoPool.size();
+	}
 }

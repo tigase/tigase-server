@@ -23,8 +23,8 @@
 package tigase.db;
 
 import tigase.xmpp.BareJID;
+
 import java.util.List;
-import java.util.Map;
 
 /**
  * <code>UserRepository</code> interface defines all functionalities required
@@ -415,4 +415,14 @@ public interface UserRepository extends Repository {
 	 * @return a <code>boolean</code> value
 	 */
 	boolean userExists(BareJID user);
+
+	public static class UserRemovedEvent {
+
+		public final BareJID jid;
+
+		public UserRemovedEvent(BareJID jid) {
+			this.jid = jid;
+		}
+
+	}
 }    // UserRepository

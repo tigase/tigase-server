@@ -98,7 +98,34 @@ public class ReflectionHelper {
 			while (map.containsKey(t)) {
 				t = map.get(t);
 			}
-			match &= ap[i].equals(t) || (ap[i] instanceof Class && t instanceof Class && ((Class) ap[i]).isAssignableFrom((Class) t));
+			match &= ap[i].equals(t)
+					|| (ap[i] instanceof WildcardType)
+					|| ((t instanceof TypeVariable) && (
+							((ap[i] instanceof TypeVariable) && boundMatch((TypeVariable) ap[i], (TypeVariable) t))
+							|| (ap[i] instanceof Class) && boundMatch((Class) ap[i], (TypeVariable) t))
+						)
+					|| (ap[i] instanceof Class && t instanceof Class && ((Class) ap[i]).isAssignableFrom((Class) t));
+		}
+		return match;
+	}
+
+	public static boolean boundMatch(Class c1, TypeVariable t2) {
+		Type[] b2 = t2.getBounds();
+		if (b2.length != 1)
+			return false;
+
+		return (b2[0] instanceof Class) && ((Class) b2[0]).isAssignableFrom(c1);
+	}
+
+	public static boolean boundMatch(TypeVariable t1, TypeVariable t2) {
+		Type[] b1 = t1.getBounds();
+		Type[] b2 = t2.getBounds();
+		if (b1.length != b2.length)
+			return false;
+
+		boolean match = true;
+		for (int i=0; i<b1.length; i++) {
+			match &= b1[i].equals(b2[i]) || ((b1[i] instanceof Class) && (b2[i] instanceof Class) && ((Class) b1[i]).isAssignableFrom((Class) b2[i]));
 		}
 		return match;
 	}
