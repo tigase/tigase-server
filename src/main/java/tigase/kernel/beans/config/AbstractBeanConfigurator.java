@@ -205,7 +205,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 	public void registerBeans(BeanConfig beanConfig, Map<String, Object> values) {
 		Kernel kernel = beanConfig == null ? this.getKernel() : beanConfig.getKernel();
 
-		registerBeansForBeanOfClass(kernel, beanConfig == null ? Kernel.class : beanConfig.getClazz());
+		List<BeanConfig> registeredBeans = registerBeansForBeanOfClass(kernel, beanConfig == null ? Kernel.class : beanConfig.getClazz());
 
 		if (values != null) {
 			Map<String, BeanPropConfig> beanPropConfigMap = new HashMap<>();
@@ -296,7 +296,10 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 				if (register) {
 					try {
 						Class<?> cls = ModulesManagerImpl.getInstance().forName(cfg.getClazzName());
-						kernel.registerBean(cfg.getBeanName()).asClass(cls).setActive(cfg.isActive()).execWithoutInject();
+						BeanConfig registeredBeanConfig = kernel.registerBean(cfg.getBeanName()).asClass(cls).setActive(cfg.isActive()).execWithoutInject();
+						if (registeredBeanConfig != null) {
+							registeredBeans.add(registeredBeanConfig);
+						}
 					} catch (ClassNotFoundException ex) {
 						log.log(Level.FINER, "could not register bean '" + cfg.getBeanName() + "' as class '" +
 								cfg.getClazzName() + "' is not available", ex);
@@ -306,18 +309,19 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		}
 	}
 
-	protected void registerBeansForBeanOfClass(Kernel kernel, Class<?> cls) {
+	protected List<BeanConfig> registerBeansForBeanOfClass(Kernel kernel, Class<?> cls) {
 		// TODO - needs to be adjusted to support OSGi
 		try {
 			Set<Class<?>> classes = ClassUtil.getClassesFromClassPath();
 			classes.addAll(ModulesManagerImpl.getInstance().getClasses());
-			registerBeansForBeanOfClass(kernel, cls, classes);
+			return registerBeansForBeanOfClass(kernel, cls, classes);
 		} catch (IOException |ClassNotFoundException ex) {
 			log.log(Level.WARNING, "could not load clases for bean registration", ex);
+			return new ArrayList<>();
 		}
 	}
 
-	protected void registerBeansForBeanOfClass(Kernel kernel, Class<?> requiredClass, Set<Class<?>> classes) {
+	protected List<BeanConfig> registerBeansForBeanOfClass(Kernel kernel, Class<?> requiredClass, Set<Class<?>> classes) {
 		List<BeanConfig> registered = new ArrayList<>();
 		for (Class<?> cls : classes) {
 			Bean annotation = registerBeansForBeanOfClassShouldRegister(kernel, requiredClass, cls);
@@ -332,6 +336,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 //		for (BeanConfig beanConfig : registered) {
 //			kernel.injectIfRequired(beanConfig);
 //		}
+		return registered;
 	}
 
 	protected Bean registerBeansForBeanOfClassShouldRegister(Kernel kernel, Class<?> requiredClass, Class<?> cls) {
