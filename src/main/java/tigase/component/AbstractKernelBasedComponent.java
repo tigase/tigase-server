@@ -37,6 +37,7 @@ import tigase.server.AbstractMessageReceiver;
 import tigase.server.DisableDisco;
 import tigase.server.Packet;
 
+import javax.script.Bindings;
 import javax.script.ScriptEngineManager;
 import java.util.Collection;
 import java.util.logging.Level;
@@ -64,6 +65,12 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 
 	public Kernel getKernel() {
 		return this.kernel;
+	}
+
+	@Override
+	public void initBindings(Bindings binds) {
+		super.initBindings(binds);
+		binds.put("kernel", kernel);
 	}
 
 	/**

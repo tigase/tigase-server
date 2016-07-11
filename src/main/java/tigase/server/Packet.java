@@ -22,14 +22,14 @@
 
 package tigase.server;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
+
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Objects of this class carry a single XMPP packet (stanza).
@@ -116,7 +116,7 @@ public class Packet {
 	/**
 	 *
 	 */
-	private static final String ERROR_NS = "urn:ietf:params:xml:ns:xmpp-stanzas";
+	public static final String ERROR_NS = "urn:ietf:params:xml:ns:xmpp-stanzas";
 
 	/**
 	 * The variable control whether the toStringSecure() hides all the CData information
