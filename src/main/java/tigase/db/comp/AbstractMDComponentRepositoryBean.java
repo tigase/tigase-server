@@ -47,8 +47,12 @@ public abstract class AbstractMDComponentRepositoryBean<Item extends RepositoryI
 		if (!dataSourceBean.getDefaultAlias().equals(domain))
 			return;
 
+		ComponentRepositoryDataSourceAware<Item,DataSource> repo_old = repo;
 		super.updateDataSource(domain, newDS, oldDS);
 		repo = getRepository(dataSourceBean.getDefaultAlias());
+		if (repo_old != repo && repo_old != null) {
+			repo_old.destroy();
+		}
 	}
 
 
@@ -91,7 +95,7 @@ public abstract class AbstractMDComponentRepositoryBean<Item extends RepositoryI
 
 	@Override
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
-		repo.getDefaults(defs, params);
+		//repo.getDefaults(defs, params);
 	}
 
 	@Override
@@ -116,7 +120,7 @@ public abstract class AbstractMDComponentRepositoryBean<Item extends RepositoryI
 
 	@Override
 	public void setProperties(Map<String, Object> properties) {
-		repo.setProperties(properties);
+		//repo.setProperties(properties);
 	}
 
 	@Override
@@ -136,7 +140,7 @@ public abstract class AbstractMDComponentRepositoryBean<Item extends RepositoryI
 
 	@Override
 	public void setAutoloadTimer(long delay) {
-		repo.setAutoloadTimer(delay);
+		//repo.setAutoloadTimer(delay);
 	}
 
 	@Override

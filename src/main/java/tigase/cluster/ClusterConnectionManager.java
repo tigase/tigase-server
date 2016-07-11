@@ -611,7 +611,13 @@ public class ClusterConnectionManager
 	}
 
 	public void setRepo(ComponentRepository<ClusterRepoItem> repo) {
+		if (this.repo != null) {
+			this.repo.removeRepoChangeListener(this);
+		}
 		this.repo = repo;
+		if (this.repo != null) {
+			this.repo.addRepoChangeListener(this);
+		}
 	}
 
 	@Override

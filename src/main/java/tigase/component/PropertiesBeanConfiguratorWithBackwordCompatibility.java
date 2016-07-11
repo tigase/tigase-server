@@ -24,6 +24,7 @@ import tigase.conf.Configurable;
 import tigase.conf.ConfigurationException;
 import tigase.db.AuthRepository;
 import tigase.db.UserRepository;
+import tigase.db.comp.ComponentRepository;
 import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.Kernel;
 
@@ -66,6 +67,27 @@ public class PropertiesBeanConfiguratorWithBackwordCompatibility extends Propert
 				Map<String, Object> props = conf.getDefaults(params);
 				fillProps(beanConfig, props);
 				((Configurable) bean).setProperties(props);
+			}
+			if (bean instanceof ComponentRepository) {
+				ComponentRepository conf = (ComponentRepository) bean;
+				Method getDefaultsMethod = bean.getClass().getMethod("getDefaults", Map.class, Map.class);
+				Map<String, Object> params = getDefConfigParams();
+				if (getDefaultsMethod != null && getDefaultsMethod.getAnnotation(Deprecated.class) == null) {
+					log.log(Level.WARNING, "Class {0} is using deprecated configuration using methods getDefaults() and setProperties()", bean.getClass().getCanonicalName());
+
+					// Injecting default DB URI for backward compatibility
+					String dbUri = (String) this.getProperties().get("dataSource/repo-uri");
+					params.put(Configurable.USER_REPO_URL_PROP_KEY, dbUri);
+					params.put(Configurable.GEN_USER_DB_URI, dbUri);
+					UserRepository userRepo = getKernel().getInstance(UserRepository.class);
+					params.put(Configurable.SHARED_USER_REPO_PROP_KEY, userRepo);
+					AuthRepository authRepo = getKernel().getInstance(AuthRepository.class);
+					params.put(Configurable.SHARED_AUTH_REPO_PROP_KEY, authRepo);
+				}
+				Map<String, Object> props = new HashMap<>();
+				conf.getDefaults(props, params);
+				fillProps(beanConfig, props);
+				((ComponentRepository) bean).setProperties(props);
 			}
 		} catch (NoSuchMethodException ex) {
 			// method getDefaults() not found - this should not happen

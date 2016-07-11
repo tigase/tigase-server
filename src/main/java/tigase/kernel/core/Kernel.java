@@ -306,7 +306,7 @@ public class Kernel {
 	public <T> T getInstance(String beanName) {
 		BeanConfig bc = dependencyManager.getBeanConfig(beanName);
 
-		if (bc == null && parent != null && parent.getDependencyManager().isBeanClassRegistered(beanName)) {
+		if (bc == null && parent != null && parent.isBeanClassRegistered(beanName)) {
 			return parent.getInstance(beanName);
 		}
 

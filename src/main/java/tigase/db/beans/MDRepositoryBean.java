@@ -119,6 +119,8 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 				log.log(Level.SEVERE, "could not initialize instance of MsgPository = " + repoClass + " for dataSource " + newDS);
 				repo = null;
 			}
+		} else {
+			kernel.unregister(domain);
 		}
 		if (repo == null)
 			repositories.remove(domain);

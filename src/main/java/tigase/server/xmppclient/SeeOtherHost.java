@@ -23,6 +23,7 @@ import tigase.eventbus.HandleEvent;
 import tigase.eventbus.events.ShutdownEvent;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.BeanSelector;
+import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.util.TigaseStringprepException;
@@ -45,7 +46,7 @@ import java.util.logging.Logger;
  * @author Wojtek
  */
 @Bean(name = "seeOtherHost", parent = ClientConnectionManager.class, selectors = {BeanSelector.NonClusterMode.class})
-public class SeeOtherHost implements SeeOtherHostIfc {
+public class SeeOtherHost implements SeeOtherHostIfc, Initializable {
 
 	private static final Logger log = Logger.getLogger(SeeOtherHost.class.getName());
 	public static final String REDIRECTION_ENABLED = "see-other-host-redirect-enabled";
@@ -71,9 +72,13 @@ public class SeeOtherHost implements SeeOtherHostIfc {
 
 	@Override
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
+	}
+
+	@Override
+	public void initialize() {
 		List<VHostItem.DataType> types = new ArrayList<VHostItem.DataType>();
 		types.add(new VHostItem.DataType( REDIRECTION_ENABLED, "see-other-host redirection enabled",
-																			 Boolean.class, Boolean.TRUE ) );
+				Boolean.class, Boolean.TRUE ) );
 		VHostItem.registerData( types );
 	}
 
