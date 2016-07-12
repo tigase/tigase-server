@@ -167,6 +167,8 @@ public class PropertiesBeanConfiguratorWithBackwordCompatibility extends Propert
 			return convertToFloatArray(collection);
 		} else if (objCls == Boolean.class) {
 			return convertToBoolArray(collection);
+		} else if (objCls == String.class) {
+			return convertToStringArray(collection);
 		}
 		return null;
 	}
@@ -226,4 +228,14 @@ public class PropertiesBeanConfiguratorWithBackwordCompatibility extends Propert
 		return arr;
 	}
 
+	protected Object convertToStringArray(Collection col) {
+		String[] arr = new String[col.size()];
+		int pos = 0;
+		Iterator iter = col.iterator();
+		while (iter.hasNext()) {
+			String v = (String) iter.next();
+			arr[pos++] = v;
+		}
+		return arr;
+	}
 }

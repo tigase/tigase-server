@@ -113,6 +113,9 @@ public class ConfigReader {
 				}
 				case ']': {
 					List val = holder.list;
+					if (holder.value != null) {
+						val.add(holder.value instanceof String ? decodeValue((String) holder.value) : holder.value);
+					}
 					holder = holder.parent;
 					holder.value = val;
 					break;

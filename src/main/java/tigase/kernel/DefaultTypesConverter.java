@@ -164,12 +164,25 @@ public class DefaultTypesConverter implements TypesConverter {
 			} else if (expectedType.equals(char[].class) && value.toString().startsWith("base64:")) {
 				return (T) (new String(Base64.decode(value.toString().substring(7)))).toCharArray();
 			} else if (expectedType.isArray()) {
-				String[] a_str = value.toString().split(regex);
-				Object result = Array.newInstance(expectedType.getComponentType(), a_str.length);
-				for (int i = 0; i < a_str.length; i++) {
-					Array.set(result, i, convert(unescape(a_str[i]), expectedType.getComponentType()));
+				if (value instanceof Collection) {
+					Collection col = (Collection) value;
+					Object result = Array.newInstance(expectedType.getComponentType(), col.size());
+					Iterator it = col.iterator();
+					int i = 0;
+					while (it.hasNext()) {
+						Object v = it.next();
+						Array.set(result, i, (v instanceof String) ? convert(unescape((String) v), expectedType.getComponentType()) : v);
+						i++;
+					}
+					return (T) result;
+				} else {
+					String[] a_str = value.toString().split(regex);
+					Object result = Array.newInstance(expectedType.getComponentType(), a_str.length);
+					for (int i = 0; i < a_str.length; i++) {
+						Array.set(result, i, convert(unescape(a_str[i]), expectedType.getComponentType()));
+					}
+					return (T) result;
 				}
-				return (T) result;
 			} else if (EnumSet.class.isAssignableFrom(expectedType) && genericType instanceof ParameterizedType) {
 				ParameterizedType pt = (ParameterizedType) genericType;
 				Type[] actualTypes = pt.getActualTypeArguments();
