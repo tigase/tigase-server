@@ -118,7 +118,7 @@ public class ConfigWriter {
 		if (str == null)
 			return;
 
-		if (str.contains("=") || str.contains(":") || str.contains(",") || str.contains("[") || str.contains("]")) {
+		if (str.contains("=") || str.contains(":") || str.contains(",") || str.contains("[") || str.contains("]") || str.contains("#")) {
 			writer.append('\'');
 			writer.write(str);
 			writer.append('\'');

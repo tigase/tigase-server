@@ -106,8 +106,8 @@ public class MessageRouter
 		for (ServerComponent comp : removeComponents) {
 			if (comp instanceof ComponentRegistrator) {
 				removeRegistrator((ComponentRegistrator) comp);
-			} else if (comp instanceof MessageRouter) {
-				removeRouter((MessageRouter) comp);
+			} else if (comp instanceof MessageReceiver) {
+				removeRouter((MessageReceiver) comp);
 			} else {
 				removeComponent(comp);
 			}
@@ -130,8 +130,8 @@ public class MessageRouter
 					connectionManagerNames.add(comp.getName());
 				if (comp instanceof ComponentRegistrator) {
 					addRegistrator((ComponentRegistrator) comp);
-				} else if (comp instanceof MessageRouter) {
-					addRouter((MessageRouter) comp);
+				} else if (comp instanceof MessageReceiver) {
+					addRouter((MessageReceiver) comp);
 				} else {
 					addComponent(comp);
 				}

@@ -90,8 +90,20 @@ public class ConfigReader {
 				}
 				continue;
 			}
+			if (holder.state == State.COMMENT) {
+				if (c != '\n')
+					continue;
+				holder = holder.parent;
+			}
 
 			switch (c) {
+				case '#': {
+					StateHolder tmp = new StateHolder();
+					tmp.state = State.COMMENT;
+					tmp.parent = holder;
+					holder = tmp;
+					continue;
+				}
 				case ':':
 				case '=':
 					if (holder.key != null) {
@@ -239,6 +251,7 @@ public class ConfigReader {
 	public static enum State {
 		MAP,
 		QUOTE,
-		LIST
+		LIST,
+		COMMENT
 	}
 }
