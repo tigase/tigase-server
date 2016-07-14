@@ -26,10 +26,10 @@ package tigase.server.websocket;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import tigase.conf.ConfigurationException;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.BeanSelector;
+import tigase.kernel.core.Kernel;
 import tigase.net.SocketType;
 import tigase.server.xmppclient.XMPPIOProcessor;
 import tigase.xml.Element;
@@ -37,12 +37,17 @@ import tigase.xmpp.BareJID;
 import tigase.xmpp.StreamError;
 import tigase.xmpp.XMPPIOService;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Class implements basic support allowing clients to connect using WebSocket
  * protocol
  *
  * @author andrzej
  */
+@Bean(name="ws2s", parent=Kernel.class, selectors = {BeanSelector.NonClusterMode.class})
 public class WebSocketClientConnectionManager
 				extends tigase.server.xmppclient.ClientConnectionManager {
 	

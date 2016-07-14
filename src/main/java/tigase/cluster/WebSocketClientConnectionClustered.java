@@ -26,24 +26,21 @@ package tigase.cluster;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
-
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.BeanSelector;
+import tigase.kernel.core.Kernel;
 import tigase.server.ServiceChecker;
 import tigase.server.websocket.WebSocketClientConnectionManager;
 import tigase.server.xmppclient.SeeOtherHostIfc;
-
-import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.XMPPIOService;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.Arrays;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class WebSocketClientConnectionClustered here.
@@ -53,6 +50,7 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
+@Bean(name="ws2s", parent=Kernel.class, selectors = {BeanSelector.ClusterMode.class})
 public class WebSocketClientConnectionClustered
 				extends WebSocketClientConnectionManager
 				implements ClusteredComponentIfc {

@@ -52,6 +52,7 @@ public class PropertiesBeanConfiguratorWithBackwordCompatibility extends Propert
 				Configurable conf = (Configurable) bean;
 				Method getDefaultsMethod = bean.getClass().getMethod("getDefaults", Map.class);
 				Map<String, Object> params = getDefConfigParams();
+				Map<String, Object> props = new HashMap<>();
 				if (getDefaultsMethod != null && getDefaultsMethod.getAnnotation(Deprecated.class) == null) {
 					log.log(Level.WARNING, "Class {0} is using deprecated configuration using methods getDefaults() and setProperties()", bean.getClass().getCanonicalName());
 
@@ -61,10 +62,12 @@ public class PropertiesBeanConfiguratorWithBackwordCompatibility extends Propert
 					params.put(Configurable.GEN_USER_DB_URI, dbUri);
 					UserRepository userRepo = getKernel().getInstance(UserRepository.class);
 					params.put(Configurable.SHARED_USER_REPO_PROP_KEY, userRepo);
+					props.put(Configurable.SHARED_USER_REPO_PROP_KEY, userRepo);
 					AuthRepository authRepo = getKernel().getInstance(AuthRepository.class);
 					params.put(Configurable.SHARED_AUTH_REPO_PROP_KEY, authRepo);
+					props.put(Configurable.SHARED_AUTH_REPO_PROP_KEY, authRepo);
 				}
-				Map<String, Object> props = conf.getDefaults(params);
+				props.putAll( conf.getDefaults(params) );
 				fillProps(beanConfig, props);
 				((Configurable) bean).setProperties(props);
 			}

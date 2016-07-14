@@ -26,29 +26,27 @@ package tigase.cluster;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
-
-import tigase.server.bosh.BoshConnectionManager;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.BeanSelector;
+import tigase.kernel.core.Kernel;
 import tigase.server.ServiceChecker;
+import tigase.server.bosh.BoshConnectionManager;
 import tigase.server.xmppclient.SeeOtherHostIfc;
-
-import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.XMPPIOService;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.Arrays;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  *
  * @author andrzej
  */
+@Bean(name="bosh", parent=Kernel.class, selectors = {BeanSelector.ClusterMode.class})
 public class BoshConnectionClustered
 				extends BoshConnectionManager
 				implements ClusteredComponentIfc {

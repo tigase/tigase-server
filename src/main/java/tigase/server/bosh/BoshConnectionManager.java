@@ -26,45 +26,29 @@ package tigase.server.bosh;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.conf.ConfigurationException;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.BeanSelector;
+import tigase.kernel.core.Kernel;
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.ReceiverTimeoutHandler;
 import tigase.server.xmppclient.ClientConnectionManager;
 import tigase.server.xmppclient.SeeOtherHostIfc.Phase;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPIOService;
-
-import tigase.conf.ConfigurationException;
 import tigase.stats.StatisticsList;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
-
-import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.FileHandler;
-import java.util.logging.Filter;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import tigase.xmpp.*;
 
 import javax.script.Bindings;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.*;
 
 import static tigase.server.bosh.Constants.*;
-import tigase.xmpp.StreamError;
 
 /**
  * Describe class BoshConnectionManager here.
@@ -75,6 +59,7 @@ import tigase.xmpp.StreamError;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
+@Bean(name="bosh", parent=Kernel.class, selectors = {BeanSelector.NonClusterMode.class})
 public class BoshConnectionManager
 				extends ClientConnectionManager
 				implements BoshSessionTaskHandler {
