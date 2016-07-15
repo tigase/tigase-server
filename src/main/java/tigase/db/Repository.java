@@ -59,6 +59,7 @@ public interface Repository {
 	 * is a problem with the underlying repository it may not be signaled through this method
 	 * call.
 	 */
+	@Deprecated
 	void initRepository(String resource_uri, Map<String, String> params) throws DBInitException;	
 	
 }

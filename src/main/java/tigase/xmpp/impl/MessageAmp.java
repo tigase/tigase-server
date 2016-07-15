@@ -26,18 +26,18 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.*;
+import tigase.db.MsgRepositoryIfc;
+import tigase.db.NonAuthUserRepository;
+import tigase.db.TigaseDBException;
+import tigase.db.UserNotFoundException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
-import tigase.server.amp.AmpFeatureIfc;
-import tigase.server.amp.db.MsgRepository;
 import tigase.server.xmppsession.SessionManager;
 import tigase.util.DNSResolverFactory;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
@@ -124,37 +124,6 @@ public class MessageAmp
 		}
 		
 		quotaExceededRule = QuotaRule.valueof((String) settings.get("quota-exceeded"));
-
-		String msg_repo_uri = (String) settings.get(AmpFeatureIfc.AMP_MSG_REPO_URI_PROP_KEY);
-		String msg_repo_cls = (String) settings.get(AmpFeatureIfc.AMP_MSG_REPO_CLASS_PROP_KEY);
-		
-		if (msg_repo_uri == null) {
-			msg_repo_uri = System.getProperty(AmpFeatureIfc.AMP_MSG_REPO_URI_PROP_KEY);
-			if (msg_repo_uri == null) {
-				msg_repo_uri = System.getProperty(RepositoryFactory.GEN_USER_DB_URI_PROP_KEY);
-			}
-		}
-		if (msg_repo_cls == null) {
-			msg_repo_cls = System.getProperty(AmpFeatureIfc.AMP_MSG_REPO_CLASS_PROP_KEY);
-		}
-		if (msg_repo_uri != null) {
-			Map<String, String> db_props = new HashMap<String, String>(4);
-
-			for (Map.Entry<String, Object> entry : settings.entrySet()) {
-				db_props.put(entry.getKey(), entry.getValue().toString());
-			}
-
-			// Initialization of repository can be done here and in Store
-			// class so repository related parameters for JDBCMsgRepository
-			// should be specified for AMP plugin and AMP component
-			try {
-				msg_repo = MsgRepository.getInstance(msg_repo_cls, msg_repo_uri);
-				msg_repo.initRepository(msg_repo_uri, db_props);
-			} catch (TigaseDBException ex) {
-				msg_repo = null;
-				log.log(Level.WARNING, "Problem initializing connection to DB: ", ex);
-			}
-		}
 	}
 
 	@Override

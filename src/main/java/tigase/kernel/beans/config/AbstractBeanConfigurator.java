@@ -74,13 +74,25 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 
 				final Field field = BeanUtils.getField(beanConfig, property);
 				if (field == null) {
-					log.warning(
-							"Field '" + property + "' does not exists in bean '" + beanConfig.getBeanName() + "'. Ignoring!");
+					switch (property) {
+						case "name":
+						case "class":
+						case "beans":
+							// ignoring as this properties are handled by configurator and kernel
+							break;
+						default:
+							// ignoring if property contains "/" as this mean it is configuration property for subbean
+							if (!property.contains("/")) {
+								log.warning(
+										"Field '" + property + "' does not exists in bean '" + beanConfig.getBeanName() + "'. Ignoring!");
+							}
+							break;
+					}
 					continue;
 				}
 				ConfigField cf = field.getAnnotation(ConfigField.class);
 				if (!accessToAllFields && cf == null) {
-					log.warning("Field '" + property + "' of bean '" + beanConfig.getBeanName()
+					log.fine("Field '" + property + "' of bean '" + beanConfig.getBeanName()
 							+ "' Can't be configured (missing @ConfigField). Ignoring!");
 					continue;
 				}

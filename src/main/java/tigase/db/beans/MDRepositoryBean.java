@@ -35,8 +35,10 @@ import tigase.kernel.core.Kernel;
 import tigase.osgi.ModulesManagerImpl;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,7 +59,16 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 	private EventBus eventBus;
 
 	@ConfigField(desc = "Map of classes for data sources")
-	ConcurrentHashMap<String,String> customClasses = new ConcurrentHashMap<>();
+	protected ConcurrentHashMap<String,String> customClasses = new ConcurrentHashMap<>();
+
+	@ConfigField(desc = "Use repository per domain")
+	protected SelectorType domainSelection = SelectorType.MainOnly;
+
+	@ConfigField(desc = "Default data source to use")
+	protected String defaultDataSourceName = "default";
+
+	@ConfigField(desc = "List of domains for which we create separate instances")
+	protected CopyOnWriteArrayList<String> domains = new CopyOnWriteArrayList<>();
 
 	private final Map<String,T> repositories = new ConcurrentHashMap<>();
 	private Kernel kernel;
@@ -71,7 +82,7 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 	protected T getRepository(String domain) {
 		T repo = repositories.get(domain);
 		if (repo == null) {
-			repo = repositories.get(dataSourceBean.getDefaultAlias());
+			repo = repositories.get(defaultDataSourceName);
 		}
 		return repo;
 	}
@@ -85,9 +96,41 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 	}
 
 	public void setDataSourceBean(DataSourceBean dataSourceBean) {
+		Map<String, DataSource> oldDataSources = new HashMap<>();
+		String defAlias = defaultDataSourceName;
+		if (this.dataSourceBean != null) {
+			oldDataSources.put(defAlias, this.dataSourceBean.getRepository(defAlias));
+			for (String domain : this.dataSourceBean.getDomains()) {
+				oldDataSources.put(domain, this.dataSourceBean.getRepository(domain));
+			}
+		}
+
 		this.dataSourceBean = dataSourceBean;
-		for (String name : dataSourceBean.getDataSourceNames()) {
-			updateDataSource(name, dataSourceBean.getRepository(name), null);
+
+		if (this.dataSourceBean != null) {
+			switch (domainSelection) {
+				case MainOnly:
+					updateDataSource(defAlias, dataSourceBean.getRepository(defAlias), oldDataSources.get(defAlias));
+					break;
+				case EveryDataSource:
+					for (String name : dataSourceBean.getDataSourceNames()) {
+						updateDataSource(name, dataSourceBean.getRepository(name), oldDataSources.get(name));
+					}
+					break;
+				case EveryUserRepository:
+					updateDataSource(defAlias, dataSourceBean.getRepository(defAlias), oldDataSources.get(defAlias));
+
+					UserRepositoryMDPoolBean userRepositoryPool = kernel.getInstance(UserRepositoryMDPoolBean.class);
+					for (String name : userRepositoryPool.getDomains()) {
+						updateDataSource(defAlias, dataSourceBean.getRepository(name), oldDataSources.get(name));
+					}
+					break;
+				case List:
+					for (String name : domains) {
+						updateDataSource(name, dataSourceBean.getRepository(name), oldDataSources.get(name));
+					}
+					break;
+			}
 		}
 	}
 
@@ -149,4 +192,10 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 		eventBus.unregisterAll(this);
 	}
 
+	public static enum SelectorType {
+		MainOnly,
+		EveryDataSource,
+		EveryUserRepository,
+		List
+	}
 }

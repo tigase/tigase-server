@@ -21,27 +21,25 @@ package tigase.server.xmppclient;
 import tigase.cluster.ClusterConnectionManager.REPO_ITEM_UPDATE_TYPE;
 import tigase.cluster.repo.ClusterRepoItem;
 import tigase.cluster.repo.ClusterRepoItemEvent;
-
-import tigase.db.Repository;
-import tigase.db.RepositoryFactory;
-
+import tigase.db.DBInitException;
+import tigase.db.DataSource;
+import tigase.db.DataSourceAware;
+import tigase.db.DataSourceHelper;
+import tigase.db.beans.MDRepositoryBean;
+import tigase.eventbus.EventBus;
+import tigase.eventbus.HandleEvent;
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.UnregisterAware;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
-import tigase.eventbus.HandleEvent;
-import tigase.osgi.ModulesManagerImpl;
-import tigase.util.TigaseStringprepException;
-
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static tigase.server.xmppclient.SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_KEY;
 
 /**
  * Extended implementation of SeeOtherHost using redirect information from
@@ -49,14 +47,12 @@ import static tigase.server.xmppclient.SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_P
  *
  */
 public class SeeOtherHostDualIP
-		extends SeeOtherHostHashed {
+		extends SeeOtherHostHashed implements Initializable, UnregisterAware {
 
 	private static final Logger log = Logger.getLogger( SeeOtherHostDualIP.class.getName() );
 
 	public static final String SEE_OTHER_HOST_FALLBACK_REDIRECTION_KEY
 														 = CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "fallback-redirection-host";
-
-	private BareJID fallback_host = null;
 
 	public static final String SEE_OTHER_HOST_DATA_SOURCE_KEY
 														 = CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "data-source";
@@ -66,8 +62,13 @@ public class SeeOtherHostDualIP
 	public static final String SEE_OTHER_HOST_DB_URL_KEY
 														 = CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "db-url";
 
-	protected String get_host_DB_url = "";
+	@ConfigField(desc = "Failback host", alias = "failbackHost")
+	private BareJID fallback_host = null;
 
+	@Inject
+	private EventBus eventBus;
+
+	@Inject(bean = "dualIPRepository")
 	private DualIPRepository repo = null;
 
 	private final Map<BareJID, BareJID> redirectsMap = Collections.synchronizedMap(new HashMap());
@@ -151,94 +152,6 @@ public class SeeOtherHostDualIP
 	}
 
 	@Override
-	public void getDefaults( Map<String, Object> defs, Map<String, Object> params ) {
-		super.getDefaults( defs, params );
-
-		if ( params.containsKey( "--user-db-uri" ) ){
-			get_host_DB_url = (String) params.get( "--user-db-uri" );
-		} else if ( params.containsKey( "--" + SEE_OTHER_HOST_DB_URL_KEY ) ){
-			get_host_DB_url = (String) params.get( "--" + SEE_OTHER_HOST_DB_URL_KEY );
-		}
-		defs.put( SEE_OTHER_HOST_DB_URL_KEY, get_host_DB_url );
-
-		if ( params.containsKey( "--" + SEE_OTHER_HOST_DATA_SOURCE_KEY ) ){
-			defs.put( SEE_OTHER_HOST_DATA_SOURCE_KEY, params.get( "--" + SEE_OTHER_HOST_DATA_SOURCE_KEY ) );
-		}
-
-		if ( params.containsKey( "--" + SEE_OTHER_HOST_FALLBACK_REDIRECTION_KEY ) ){
-			BareJID bareJIDInstance;
-			try {
-				bareJIDInstance = BareJID.bareJIDInstance( (String) params.get( "--" + SEE_OTHER_HOST_FALLBACK_REDIRECTION_KEY ) );
-				fallback_host = bareJIDInstance;
-				defs.put( SEE_OTHER_HOST_FALLBACK_REDIRECTION_KEY, fallback_host );
-			} catch ( TigaseStringprepException ex ) {
-				log.log( Level.SEVERE, "Problem creating default redirection JID", ex );
-			}
-		}
-
-	}
-
-	@Override
-	public void setProperties( Map<String, Object> props ) {
-		super.setProperties( props );
-
-		if ( ( props.containsKey( SEE_OTHER_HOST_FALLBACK_REDIRECTION_KEY ) )
-				 && !props.get( SEE_OTHER_HOST_FALLBACK_REDIRECTION_KEY ).toString().trim().isEmpty() ){
-
-			BareJID bareJIDInstance;
-			try {
-				bareJIDInstance = BareJID.bareJIDInstance( (String) props.get( SEE_OTHER_HOST_FALLBACK_REDIRECTION_KEY ).toString().trim() );
-				fallback_host = bareJIDInstance;
-				props.put( SEE_OTHER_HOST_FALLBACK_REDIRECTION_KEY, fallback_host );
-			} catch ( TigaseStringprepException ex ) {
-				log.log( Level.SEVERE, "Problem creating default redirection JID", ex );
-			}
-		}
-
-		if ( ( props.containsKey( SEE_OTHER_HOST_DB_URL_KEY ) )
-				 && !props.get( SEE_OTHER_HOST_DB_URL_KEY ).toString().trim().isEmpty() ){
-			get_host_DB_url = props.get( SEE_OTHER_HOST_DB_URL_KEY ).toString().trim();
-		}
-		props.put( SEE_OTHER_HOST_DB_URL_KEY, get_host_DB_url );
-
-		String repo_class = (String) props.get( SEE_OTHER_HOST_DATA_SOURCE_KEY );
-
-		try {
-			Class<?> cls = null;
-			if ( null == repo_class ){
-				cls = RepositoryFactory.getRepoClass( DualIPRepository.class, get_host_DB_url );
-			} else if ( "eventbus".equals( repo_class.trim().toLowerCase() ) ){
-				if ( log.isLoggable( Level.CONFIG ) ){
-					log.log( Level.CONFIG, "Using Evenbus as a source of DualIP data" );
-				}
-			} else {
-				cls = ModulesManagerImpl.getInstance().forName( repo_class );
-			}
-
-			if ( null != cls ){
-
-				if ( log.isLoggable( Level.CONFIG ) ){
-					log.log( Level.CONFIG, "Using {0} class for DualIP repository", cls );
-				}
-				DualIPRepository repoTmp = (DualIPRepository) cls.newInstance();
-
-				if ( repo == null ){
-					repo = repoTmp;
-				}
-
-				repo.setProperties( props );
-
-				repo.initRepository( get_host_DB_url, null );
-
-				reloadRedirection();
-			}
-
-		} catch ( Exception ex ) {
-			log.log( Level.SEVERE, "Cannot initialize connection to database: ", ex );
-		}
-	}
-
-	@Override
 	public boolean isRedirectionRequired( BareJID defaultHost, BareJID redirectionHost ) {
 		return redirectsMap.get( defaultHost ) != null
 					 ? !redirectsMap.get( defaultHost ).equals( redirectionHost )
@@ -264,17 +177,65 @@ public class SeeOtherHostDualIP
 		}
 	}
 
-	public interface DualIPRepository extends Repository {
+	@Override
+	public void initialize() {
+		super.initialize();
+
+		eventBus.registerAll(this);
+
+		reloadRedirection();
+	}
+
+	@Override
+	public void beforeUnregister() {
+		eventBus.unregisterAll(this);
+	}
+
+	public interface DualIPRepository<T extends DataSource> extends DataSourceAware<T> {
 
 		public static final String HOSTNAME_ID = "hostname";
 		public static final String SECONDARY_HOSTNAME_ID = "secondary";
 
 		Map<BareJID, BareJID> queryAllDB() throws SQLException;
 
-		void setProperties( Map<String, Object> props );
+	}
 
-		void getDefaults( Map<String, Object> defs, Map<String, Object> params );
+	@Bean(name = "dualIPRepository", parent = SeeOtherHostDualIP.class)
+	public static class DualIPRepositoryWrapper extends MDRepositoryBean<DualIPRepository> implements  DualIPRepository<DataSource> {
 
+		@ConfigField(desc = "Name of data source to use")
+		protected String dataSourceName = "default";
+
+		public DualIPRepositoryWrapper() {
+
+		}
+
+		public Map<BareJID, BareJID> queryAllDB() throws SQLException {
+			return getRepository("").queryAllDB();
+		}
+
+		@Override
+		protected void updateDataSource(String domain, DataSource newDS, DataSource oldDS) {
+			if (!dataSourceName.equals(domain))
+				return;
+
+			super.updateDataSource(domain, newDS, oldDS);
+		}
+
+		@Override
+		protected Class<? extends DualIPRepository> findClassForDataSource(DataSource dataSource) throws DBInitException {
+			return DataSourceHelper.getDefaultClass(DualIPRepository.class, dataSource.getResourceUri());
+		}
+
+		@Override
+		public void setDataSource(DataSource dataSource) {
+			// nothing to do
+		}
+
+		public void setDataSourceName(String dataSourceName) {
+			this.dataSourceName = dataSourceName;
+			this.defaultDataSourceName = dataSourceName;
+		}
 	}
 
 }

@@ -72,11 +72,14 @@ public abstract class MDPoolBean<S extends Repository,T extends MDPoolConfigBean
 		this.kernel = null;
 	}
 
+	public String[] getDomains() {
+		return this.domains;
+	}
+
 	public void setDomains(String[] domains) {
 		updateDomains(this.domains, domains);
 		this.domains = domains;
 	}
-
 
 	@Override
 	public void beanConfigurationChanged(Collection<String> changedFields) {

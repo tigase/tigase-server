@@ -20,37 +20,20 @@
 package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
-import tigase.db.RepositoryFactory;
-import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
-
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
 import tigase.server.Command;
 import tigase.server.DataForm;
 import tigase.server.Iq;
 import tigase.server.Packet;
-import tigase.server.amp.AmpFeatureIfc;
 import tigase.server.amp.db.MsgRepository;
-
 import tigase.server.xmppsession.SessionManager;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.JID;
-import tigase.xmpp.NoConnectionIdException;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.XMPPProcessorAbstract;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
-
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
+import tigase.xmpp.*;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -94,6 +77,7 @@ public class FlexibleOfflineMessageRetrieval
 	private static final String form_type = "FORM_TYPE";
 	private static final String NUMBER_OF_ = "number_of_";
 
+	@Inject
 	private MsgRepository msg_repo = null;
 	private final OfflineMessages offlineProcessor = new OfflineMessages();
 	private final MsgRepository.OfflineMessagesProcessor offlineMessagesStamper = new MsgStamper();
@@ -110,41 +94,6 @@ public class FlexibleOfflineMessageRetrieval
 		}
 		return super.canHandle(packet, conn);
 	}	
-	
-	@Override
-	public void init( Map<String, Object> settings ) throws TigaseDBException {
-
-		String msg_repo_uri = (String) settings.get( AmpFeatureIfc.AMP_MSG_REPO_URI_PROP_KEY );
-		String msg_repo_cls = (String) settings.get( AmpFeatureIfc.AMP_MSG_REPO_CLASS_PROP_KEY );
-
-		if ( msg_repo_uri == null ){
-			msg_repo_uri = System.getProperty( AmpFeatureIfc.AMP_MSG_REPO_URI_PROP_KEY );
-			if ( msg_repo_uri == null ){
-				msg_repo_uri = System.getProperty( RepositoryFactory.GEN_USER_DB_URI_PROP_KEY );
-			}
-		}
-		if ( msg_repo_cls == null ){
-			msg_repo_cls = System.getProperty( AmpFeatureIfc.AMP_MSG_REPO_CLASS_PROP_KEY );
-		}
-		if ( msg_repo_uri != null ){
-			Map<String, String> db_props = new HashMap<String, String>( 4 );
-
-			for ( Map.Entry<String, Object> entry : settings.entrySet() ) {
-				db_props.put( entry.getKey(), entry.getValue().toString() );
-			}
-
-			// Initialization of repository can be done here and in Store
-			// class so repository related parameters for JDBCMsgRepository
-			// should be specified for AMP plugin and AMP component
-			try {
-				msg_repo = (MsgRepository) MsgRepository.getInstance( msg_repo_cls, msg_repo_uri );
-				msg_repo.initRepository( msg_repo_uri, db_props );
-			} catch ( TigaseDBException ex ) {
-				msg_repo = null;
-				log.log( Level.WARNING, "Problem initializing connection to DB: ", ex );
-			}
-		}
-	}
 
 	private enum ACTION {
 

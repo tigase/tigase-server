@@ -18,21 +18,17 @@
  */
 package tigase.server.xmppclient;
 
-import tigase.db.DBInitException;
 import tigase.db.DataRepository;
 import tigase.db.Repository;
-import tigase.db.RepositoryFactory;
-
-import tigase.xmpp.BareJID;
-
+import tigase.kernel.beans.config.ConfigField;
 import tigase.util.TigaseStringprepException;
+import tigase.xmpp.BareJID;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -40,40 +36,29 @@ import java.util.logging.Logger;
  * @author Wojtek
  */
 @Repository.Meta( supportedUris = { "jdbc:[^:]+:.*" } )
-class SeeOtherHostDualIPSQLRepository implements SeeOtherHostDualIP.DualIPRepository {
+public class SeeOtherHostDualIPSQLRepository implements SeeOtherHostDualIP.DualIPRepository<DataRepository> {
 
 	public static final String CLUSTER_NODES_TABLE = "cluster_nodes";
 	public static final String DB_GET_ALL_DATA_DB_QUERY_KEY = SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "get-all-data-query";
 	public static final String GET_ALL_QUERY_TIMEOUT_QUERY_KEY = SeeOtherHostIfc.CM_SEE_OTHER_HOST_CLASS_PROP_KEY + "/" + "get-all-query-timeout";
 	private static final String DEF_DB_GET_ALL_DATA_QUERY = "select * from " + CLUSTER_NODES_TABLE;
 	private static final int DEF_QUERY_TIME_OUT = 10;
+	@ConfigField(desc = "SQL query to retrieve data")
 	private String get_all_data_query = DEF_DB_GET_ALL_DATA_QUERY;
+	@ConfigField(desc = "SQL query timeout")
 	private int query_timeout = DEF_QUERY_TIME_OUT;
 	private DataRepository data_repo = null;
 
 	private static final Logger log = Logger.getLogger(SeeOtherHostDualIPSQLRepository.class.getName() );
 
 	@Override
-	public void getDefaults( Map<String, Object> defs, Map<String, Object> params ) {
-		if ( params.containsKey( "--" + DB_GET_ALL_DATA_DB_QUERY_KEY ) ){
-			get_all_data_query = (String) params.get( "--" + DB_GET_ALL_DATA_DB_QUERY_KEY );
-		}
-		defs.put( DB_GET_ALL_DATA_DB_QUERY_KEY, get_all_data_query );
-		if ( params.containsKey( "--" + GET_ALL_QUERY_TIMEOUT_QUERY_KEY ) ){
-			query_timeout = Integer.parseInt( (String) params.get( "--" + GET_ALL_QUERY_TIMEOUT_QUERY_KEY ) );
-		}
-		defs.put( GET_ALL_QUERY_TIMEOUT_QUERY_KEY, query_timeout );
-	}
-
-	@Override
-	public void initRepository( String conn_str, Map<String, String> map ) throws DBInitException {
+	public void setDataSource(DataRepository dataSource) {
+		data_repo = dataSource;
 		try {
-			log.log( Level.INFO, "Initializing dbAccess for db connection url: {0}", conn_str );
-			data_repo = RepositoryFactory.getDataRepository( null, conn_str, map );
 			checkDB();
-			data_repo.initPreparedStatement( get_all_data_query, get_all_data_query );
-		} catch ( ClassNotFoundException | InstantiationException | IllegalAccessException | SQLException ex ) {
-			throw new DBInitException( "Repository initialization failed", ex );
+			data_repo.initPreparedStatement(get_all_data_query, get_all_data_query);
+		} catch (SQLException ex) {
+			throw new RuntimeException( "Repository initialization failed", ex );
 		}
 	}
 
@@ -117,18 +102,6 @@ class SeeOtherHostDualIPSQLRepository implements SeeOtherHostDualIP.DualIPReposi
 		}
 		log.info( "Loaded " + result.size() + " redirect definitions from database." );
 		return result;
-	}
-
-	@Override
-	public void setProperties( Map<String, Object> props ) {
-		if ( ( props.containsKey( DB_GET_ALL_DATA_DB_QUERY_KEY ) ) && !props.get( DB_GET_ALL_DATA_DB_QUERY_KEY ).toString().trim().isEmpty() ){
-			get_all_data_query = props.get( DB_GET_ALL_DATA_DB_QUERY_KEY ).toString().trim();
-		}
-		props.put( DB_GET_ALL_DATA_DB_QUERY_KEY, get_all_data_query );
-		if ( ( props.containsKey( GET_ALL_QUERY_TIMEOUT_QUERY_KEY ) ) && !props.get( GET_ALL_QUERY_TIMEOUT_QUERY_KEY ).toString().trim().isEmpty() ){
-			query_timeout = Integer.parseInt( props.get( GET_ALL_QUERY_TIMEOUT_QUERY_KEY ).toString().trim() );
-		}
-		props.put( GET_ALL_QUERY_TIMEOUT_QUERY_KEY, query_timeout );
 	}
 
 }

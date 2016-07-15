@@ -275,6 +275,10 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 		private final transient ReentrantLock lock = new ReentrantLock();
 		private final Condition expiredMessagesCondition = lock.newCondition();
 
+		public MsgRepositoryMDBean() {
+			domainSelection = SelectorType.EveryUserRepository;
+		}
+
 		@Override
 		protected Class<? extends MsgRepositoryIfc> findClassForDataSource(DataSource dataSource) throws DBInitException {
 			return DataSourceHelper.getDefaultClass(MsgRepository.class, dataSource.getResourceUri());
