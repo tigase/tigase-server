@@ -1,13 +1,13 @@
 package tigase.monitor;
 
-import java.util.Map;
-
 import tigase.db.DBInitException;
 import tigase.db.comp.UserRepoRepository;
 import tigase.kernel.beans.Bean;
 import tigase.xmpp.BareJID;
 
-@Bean(name = "configItemRepository")
+import java.util.Map;
+
+@Bean(name = "configItemRepository", parent = MonitorComponent.class)
 public class TaskConfigItemJDBCRepository extends UserRepoRepository<TaskConfigItem> {
 
 	private final static String CONFIG_KEY = "monitor-tasks";

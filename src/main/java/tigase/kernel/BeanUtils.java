@@ -1,14 +1,14 @@
 package tigase.kernel;
 
+import tigase.kernel.core.BeanConfig;
+import tigase.kernel.core.DependencyManager;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import tigase.kernel.core.BeanConfig;
-import tigase.kernel.core.DependencyManager;
 
 public class BeanUtils {
 
@@ -95,6 +95,10 @@ public class BeanUtils {
 	}
 
 	public static Method prepareSetterMethod(Field f) {
+		return prepareSetterMethod(f, f.getType());
+	}
+
+	public static Method prepareSetterMethod(Field f, Class type) {
 		String t = prepareAccessorMainPartName(f.getName());
 		String sm;
 		@SuppressWarnings("unused")
@@ -108,7 +112,7 @@ public class BeanUtils {
 		}
 
 		try {
-			Method m = f.getDeclaringClass().getMethod(sm, f.getType());
+			Method m = f.getDeclaringClass().getMethod(sm, type);
 			return m;
 		} catch (NoSuchMethodException e) {
 			return null;
@@ -116,6 +120,17 @@ public class BeanUtils {
 			// f.getDeclaringClass().getName() + " has no setter of field " +
 			// f.getName(), e);
 		}
+	}
+
+	public static Class getGetterSetterMethodsParameterType(Field f) {
+		Method getter = prepareGetterMethod(f);
+		if (getter == null) {
+			return null;
+		}
+		Class rt = getter.getReturnType();
+		Method setter = prepareSetterMethod(f, rt);
+
+		return (setter == null) ? null : rt;
 	}
 
 	public static ArrayList<Method> prepareSetterMethods(Class<?> destination, String fieldName) {
@@ -136,6 +151,9 @@ public class BeanUtils {
 	public static void setValue(Object toBean, Field field, Object valueToSet)
 			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		Method setter = BeanUtils.prepareSetterMethod(field);
+		if (valueToSet != null && setter == null) {
+			setter = BeanUtils.prepareSetterMethod(field, valueToSet.getClass());
+		}
 		if (setter != null) {
 			setter.invoke(toBean, valueToSet);
 		} else {

@@ -26,6 +26,10 @@ package tigase.db.comp;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.UnregisterAware;
+import tigase.kernel.beans.config.ConfigField;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
@@ -39,16 +43,38 @@ import java.util.logging.Logger;
  * @version $Rev$
  */
 public abstract class ConfigRepository<Item extends RepositoryItem>
-				implements ComponentRepository<Item> {
+				implements ComponentRepository<Item>, Initializable, UnregisterAware {
 	private static final Logger log = Logger.getLogger(ConfigRepository.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
 	/** Field description */
+	@ConfigField(desc = "Automatic items load interval")
+	protected long autoReloadInterval = 0;
+	@ConfigField(desc = "Items in repository")
 	protected Map<String, Item> items = new ConcurrentSkipListMap<String, Item>( String.CASE_INSENSITIVE_ORDER );
 	protected int itemsHash = 0;
+
 	private Timer                             autoLoadTimer  = null;
 	private RepositoryChangeListenerIfc<Item> repoChangeList = null;
+
+	public ConfigRepository() {
+		String[] items = getDefaultPropetyItems();
+		String propKey = getPropertyKey();
+		if (propKey != null) {
+			if (propKey.startsWith("--"))
+				propKey = propKey.substring(2);
+
+			String value = System.getProperty(propKey);
+			if (value != null) {
+				items = value.split(",");
+				for (int i=0; i<items.length; i++) {
+					items[i] = items[i].trim();
+				}
+			}
+		}
+		this.setItems(items);
+	}
 
 	//~--- set methods ----------------------------------------------------------
 
@@ -73,6 +99,11 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 				}
 			}, interval, interval);
 		}
+	}
+
+	public void setAutoReloadInterval(long autoLoadInterval) {
+		this.autoReloadInterval = autoLoadInterval;
+		setAutoloadTimer(autoLoadInterval);
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -195,6 +226,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 	//~--- get methods ----------------------------------------------------------
 
+	@Deprecated
 	@Override
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
 		initItemsMap();
@@ -216,6 +248,14 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 		}
 
 		return items.get(key);
+	}
+
+	public String[] getItems() {
+		List<String> itemsStrs = new ArrayList<>();
+		for (Item item : items.values()) {
+			itemsStrs.add(item.toPropertyString());
+		}
+		return  itemsStrs.toArray(new String[itemsStrs.size()]);
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -245,13 +285,9 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 	//~--- set methods ----------------------------------------------------------
 
-	@Override
-	public void setProperties(Map<String, Object> properties) {
-		initItemsMap();
-		String[] items_arr = (String[]) properties.get(getConfigKey());
-
-		if ((items_arr != null) && (items_arr.length > 0)) {
-			items.clear();
+	public void setItems(String[] items_arr) {
+		items.clear();
+		if (items_arr != null) {
 			for (String it : items_arr) {
 				log.log(Level.CONFIG, "Loading config item: {0}", it);
 
@@ -261,6 +297,17 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 				addItem(item);
 				log.log(Level.CONFIG, "Loaded config item: {0}", item);
 			}
+		}
+	}
+
+	@Deprecated
+	@Override
+	public void setProperties(Map<String, Object> properties) {
+		initItemsMap();
+		String[] items_arr = (String[]) properties.get(getConfigKey());
+
+		if ((items_arr != null) && (items_arr.length > 0)) {
+			setItems(items_arr);
 		} else {
 			log.warning("Items list is not set in the configuration file!!");
 		}
@@ -280,4 +327,15 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 	public String validateItem(Item item) {
 		return null;
 	}
+
+	@Override
+	public void beforeUnregister() {
+		setAutoloadTimer(0);
+	}
+
+	@Override
+	public void initialize() {
+		setAutoReloadInterval(autoReloadInterval);
+	}
+
 }

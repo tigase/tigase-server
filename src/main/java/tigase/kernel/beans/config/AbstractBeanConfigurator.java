@@ -102,9 +102,16 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 				if (cAnn != null) {
 					converter = kernel.getInstance(cAnn.converter());
 				}
-				Object v = converter.convert(value, field.getType(), field.getGenericType());
 
-				valuesToSet.put(field, v);
+				Class expType = BeanUtils.getGetterSetterMethodsParameterType(field);
+
+				if (expType != null) {
+					Object v = converter.convert(value, expType);
+					valuesToSet.put(field, v);
+				} else {
+					Object v = converter.convert(value, field.getType(), field.getGenericType());
+					valuesToSet.put(field, v);
+				}
 
 			} catch (Exception e) {
 				log.log(Level.WARNING, "Can't prepare value of property '" + property + "' of bean '" + beanConfig.getBeanName()

@@ -31,6 +31,7 @@ import tigase.db.DataSource;
 import tigase.db.Repository;
 import tigase.db.comp.ComponentRepositoryDataSourceAware;
 import tigase.db.comp.UserRepoRepository;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.util.DNSEntry;
 import tigase.util.DNSResolverFactory;
 import tigase.util.DNSResolverIfc;
@@ -98,10 +99,26 @@ public class VHostJDBCRepository
 		Logger.getLogger(VHostJDBCRepository.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
-
+	@ConfigField(desc = "Default IP address")
 	private String def_ip_address    = null;
+	@ConfigField(desc = "Default SRV address")
 	private String def_srv_address   = null;
+	@ConfigField(desc = "Max allowed number of domains per user")
 	private int max_domains_per_user = DOMAINS_PER_USER_LIMIT_PROP_VAL;
+
+	public VHostJDBCRepository() {
+		DNSResolverIfc resolver = DNSResolverFactory.getInstance();
+		DNS_SRV_DEF_ADDR_PROP_VAL = resolver.getDefaultHost();
+		try {
+			DNS_DEF_IP_PROP_VAL = resolver.getHostIP(resolver.getDefaultHost());
+		} catch (Exception e) {
+			DNS_DEF_IP_PROP_VAL = resolver.getDefaultHost();
+		}
+
+		def_ip_address = DNS_DEF_IP_PROP_VAL;
+		def_srv_address = DNS_SRV_DEF_ADDR_PROP_VAL;
+		autoReloadInterval = 60;
+	}
 
 	@Override
 	public void destroy() {
@@ -120,6 +137,7 @@ public class VHostJDBCRepository
 		return VHostRepoDefaults.getDefaultPropetyItems();
 	}
 
+	@Deprecated
 	@Override
 	@SuppressWarnings("deprecation")
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
@@ -127,13 +145,6 @@ public class VHostJDBCRepository
 		// Something to initialize database with, in case it is empty
 		// Otherwise the server would not work at all with empty Items database
 		super.getDefaults(defs, params);
-		DNSResolverIfc resolver = DNSResolverFactory.getInstance();
-		DNS_SRV_DEF_ADDR_PROP_VAL = resolver.getDefaultHost();
-		try {
-			DNS_DEF_IP_PROP_VAL = resolver.getHostIP(resolver.getDefaultHost());
-		} catch (Exception e) {
-			DNS_DEF_IP_PROP_VAL = resolver.getDefaultHost();
-		}
 		defs.put(DNS_SRV_DEF_ADDR_PROP_KEY, DNS_SRV_DEF_ADDR_PROP_VAL);
 		defs.put(DNS_DEF_IP_PROP_KEY, DNS_DEF_IP_PROP_VAL);
 		defs.put(DOMAINS_PER_USER_LIMIT_PROP_KEY, DOMAINS_PER_USER_LIMIT_PROP_VAL);
@@ -159,6 +170,7 @@ public class VHostJDBCRepository
 		return VHostRepoDefaults.getRepoUser();
 	}
 
+	@Deprecated
 	@Override
 	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
 		// Nothing to do
@@ -166,6 +178,7 @@ public class VHostJDBCRepository
 	
 	//~--- set methods ----------------------------------------------------------
 
+	@Deprecated
 	@Override
 	public void setProperties(Map<String, Object> properties) {
 
@@ -282,6 +295,7 @@ public class VHostJDBCRepository
 	public void setDataSource(DataSource dataSource) {
 		// this is needed as it is required by interface
 	}
+
 }
 
 

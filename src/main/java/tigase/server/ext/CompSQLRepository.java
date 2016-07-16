@@ -26,28 +26,27 @@ package tigase.server.ext;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import tigase.db.DBInitException;
-import tigase.db.DataRepository;
-import tigase.db.RepositoryFactory;
+import tigase.db.*;
+import tigase.db.beans.DataSourceBean;
 import tigase.db.comp.ComponentRepository;
 import tigase.db.comp.RepositoryChangeListenerIfc;
+import tigase.eventbus.EventBus;
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.UnregisterAware;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created: Nov 7, 2009 11:26:10 AM
@@ -56,7 +55,7 @@ import tigase.xml.SingletonFactory;
  * @version $Rev$
  */
 public class CompSQLRepository
-				implements ComponentRepository<CompRepoItem> {
+				implements ComponentRepository<CompRepoItem>, DataSourceAware<DataRepository>, Initializable, UnregisterAware {
 	/** Field description */
 	public static final String REPO_URI_PROP_KEY = "repo-uri";
 
@@ -94,10 +93,48 @@ public class CompSQLRepository
 
 	//~--- fields ---------------------------------------------------------------
 
+	@ConfigField(desc = "Name of data source to use")
+	private String dataSourceName = "default";
+	@Inject
+	private DataSourceBean dataSourceBean;
 	private DataRepository data_repo = null;
+	@Inject
+	private EventBus eventBus;
 
 	private String               tableName  = TABLE_NAME;
 	private CompConfigRepository configRepo = new CompConfigRepository();
+
+	public void setDataSourceBean(DataSourceBean dataSourceBean) {
+		this.dataSourceBean = dataSourceBean;
+		DataSource ds = dataSourceBean.getRepository(dataSourceName);
+		if (ds != null && ds instanceof DataRepository) {
+			setDataSource((DataRepository) ds);
+		} else {
+			log.log(Level.WARNING, "Could not retrieve data source named '{0}'", new Object[]{dataSourceName});
+		}
+	}
+
+	@Override
+	public void initialize() {
+		eventBus.registerAll(this);
+	}
+
+	@Override
+	public void beforeUnregister() {
+		eventBus.unregisterAll(this);
+	}
+
+	public void onDataSourceChange(DataSourceBean.DataSourceChangedEvent event) {
+		if (!event.isCorrectSender(dataSourceBean))
+			return;
+
+		DataSource ds = event.getNewDataSource();
+		if (ds != null && ds instanceof DataRepository) {
+			setDataSource((DataRepository) ds);
+		} else {
+			log.log(Level.WARNING, "Could not retrieve data source named '{0}'", new Object[]{dataSourceName});
+		}
+	}
 
 	//~--- methods --------------------------------------------------------------
 
@@ -214,6 +251,7 @@ public class CompSQLRepository
 	
 	//~--- get methods ----------------------------------------------------------
 
+	@Deprecated
 	@Override
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
 		configRepo.getDefaults(defs, params);
@@ -262,17 +300,26 @@ public class CompSQLRepository
 
 	//~--- methods --------------------------------------------------------------
 
-	@Override
-	public void initRepository(String conn_str, Map<String, String> params)
-					throws DBInitException {
+	public void setDataSource(DataRepository data_repo) {
 		try {
-			data_repo = RepositoryFactory.getDataRepository(null, conn_str, params);
 			checkDB();
 			data_repo.initPreparedStatement(CHECK_TABLE_QUERY, CHECK_TABLE_QUERY);
 			data_repo.initPreparedStatement(GET_ITEM_QUERY, GET_ITEM_QUERY);
 			data_repo.initPreparedStatement(GET_ALL_ITEMS_QUERY, GET_ALL_ITEMS_QUERY);
 			data_repo.initPreparedStatement(ADD_ITEM_QUERY, ADD_ITEM_QUERY);
 			data_repo.initPreparedStatement(DELETE_ITEM_QUERY, DELETE_ITEM_QUERY);
+		} catch (SQLException e) {
+			throw new RuntimeException("Could not initialize database: ", e);
+		}
+	}
+
+	@Deprecated
+	@Override
+	public void initRepository(String conn_str, Map<String, String> params)
+					throws DBInitException {
+		try {
+			data_repo = RepositoryFactory.getDataRepository(null, conn_str, params);
+			setDataSource(data_repo);
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Problem initializing database: ", e);
 		} finally {
@@ -310,6 +357,7 @@ public class CompSQLRepository
 
 	//~--- set methods ----------------------------------------------------------
 
+	@Deprecated
 	@Override
 	public void setProperties(Map<String, Object> properties) {
 		configRepo.setProperties(properties);

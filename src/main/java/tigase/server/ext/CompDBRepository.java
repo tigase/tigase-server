@@ -70,7 +70,8 @@ public class CompDBRepository extends UserRepoRepository<CompRepoItem> {
 	public BareJID getRepoUser() {
 		return CompRepoDefaults.getRepoUser();
 	}
-	
+
+	@Deprecated
 	@Override
 	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
 		// Nothing to do here

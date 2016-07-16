@@ -51,6 +51,7 @@ public class PropertiesBeanConfiguratorWithBackwordCompatibility extends Propert
 			if (bean instanceof Configurable) {
 				Configurable conf = (Configurable) bean;
 				Method getDefaultsMethod = bean.getClass().getMethod("getDefaults", Map.class);
+				Method setPropertiesMethod = bean.getClass().getMethod("setProperties", Map.class);
 				Map<String, Object> params = getDefConfigParams();
 				Map<String, Object> props = new HashMap<>();
 				if (getDefaultsMethod != null && getDefaultsMethod.getAnnotation(Deprecated.class) == null) {
@@ -67,13 +68,16 @@ public class PropertiesBeanConfiguratorWithBackwordCompatibility extends Propert
 					params.put(Configurable.SHARED_AUTH_REPO_PROP_KEY, authRepo);
 					props.put(Configurable.SHARED_AUTH_REPO_PROP_KEY, authRepo);
 				}
-				props.putAll( conf.getDefaults(params) );
-				fillProps(beanConfig, props);
-				((Configurable) bean).setProperties(props);
+				if (setPropertiesMethod != null && setPropertiesMethod.getAnnotation(Deprecated.class) == null) {
+					props.putAll( conf.getDefaults(params) );
+					fillProps(beanConfig, props);
+					((Configurable) bean).setProperties(props);
+				}
 			}
 			if (bean instanceof ComponentRepository) {
 				ComponentRepository conf = (ComponentRepository) bean;
 				Method getDefaultsMethod = bean.getClass().getMethod("getDefaults", Map.class, Map.class);
+				Method setPropertiesMethod = bean.getClass().getMethod("setProperties", Map.class);
 				Map<String, Object> params = getDefConfigParams();
 				if (getDefaultsMethod != null && getDefaultsMethod.getAnnotation(Deprecated.class) == null) {
 					log.log(Level.WARNING, "Class {0} is using deprecated configuration using methods getDefaults() and setProperties()", bean.getClass().getCanonicalName());
@@ -87,10 +91,12 @@ public class PropertiesBeanConfiguratorWithBackwordCompatibility extends Propert
 					AuthRepository authRepo = getKernel().getInstance(AuthRepository.class);
 					params.put(Configurable.SHARED_AUTH_REPO_PROP_KEY, authRepo);
 				}
-				Map<String, Object> props = new HashMap<>();
-				conf.getDefaults(props, params);
-				fillProps(beanConfig, props);
-				((ComponentRepository) bean).setProperties(props);
+				if (setPropertiesMethod != null && setPropertiesMethod.getAnnotation(Deprecated.class) == null) {
+					Map<String, Object> props = new HashMap<>();
+					conf.getDefaults(props, params);
+					fillProps(beanConfig, props);
+					((ComponentRepository) bean).setProperties(props);
+				}
 			}
 		} catch (NoSuchMethodException ex) {
 			// method getDefaults() not found - this should not happen

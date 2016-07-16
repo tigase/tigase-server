@@ -161,6 +161,11 @@ public class MonitorRuntime extends TigaseRuntime {
 		return null;
 	}
 
+	@Override
+	public synchronized void removeShutdownHook(ShutdownHook hook) {
+		shutdownHooks.remove(hook);
+	}
+
 	private class ShutdownHandlerThread extends Thread {
 
 		private ShutdownHook hook = null;

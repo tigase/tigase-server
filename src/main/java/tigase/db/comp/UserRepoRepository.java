@@ -79,6 +79,7 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 	 */
 	public abstract BareJID getRepoUser();
 
+	@Deprecated
 	@Override
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
 
@@ -165,6 +166,7 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 	 *
 	 * @param properties
 	 */
+	@Deprecated
 	@Override
 	public void setProperties(Map<String, Object> properties) {
 
@@ -216,6 +218,22 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 
 	public void setRepo(UserRepository userRepository) {
 		this.repo = userRepository;
+		try {
+			if (!repo.userExists(getRepoUser())) {
+				repo.addUser(getRepoUser());
+			}
+			repo.addUser(getRepoUser());
+		} catch (UserExistsException e) {
+
+			// This is expected when the Items repository has been already running on
+			// this databaseso and can be ignored.
+		} catch (Exception e) {
+
+			// This is not expected so let's signal an error:
+			log.log(Level.SEVERE,
+					"Problem with adding '" + getRepoUser() + "' user to the database", e);
+		}
+
 		reload();
 	}
 

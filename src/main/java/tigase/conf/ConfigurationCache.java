@@ -29,6 +29,7 @@ package tigase.conf;
 import tigase.db.comp.RepositoryChangeListenerIfc;
 import tigase.db.TigaseDBException;
 
+import tigase.kernel.beans.config.ConfigField;
 import tigase.util.DataTypes;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -77,6 +78,7 @@ public class ConfigurationCache
 	 */
 	private Map<String, Set<ConfigItem>> config = new LinkedHashMap<String,
 																									Set<ConfigItem>>();
+	@ConfigField(desc = "File to dump configuration to")
 	private String configDumpFileName                              =
 		CONFIG_DUMP_FILE_PROP_DEF;
 	private String hostname                                        = null;
@@ -410,6 +412,7 @@ public class ConfigurationCache
 		this.hostname = hostname;
 	}
 
+	@Deprecated
 	@Override
 	public void setProperties(Map<String, Object> properties) {
 		configDumpFileName = (String) properties.get(CONFIG_DUMP_FILE_PROP_KEY);

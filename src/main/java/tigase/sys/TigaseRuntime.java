@@ -279,6 +279,8 @@ public abstract class TigaseRuntime {
 	
 	public abstract boolean isJidOnlineLocally(JID jid);
 
+	public abstract void removeShutdownHook(ShutdownHook hook);
+
 	public void shutdownTigase(String[] msg) {
 			if (XMPPServer.isOSGi()) {
 				// for some reason System.out.println is not working in OSGi

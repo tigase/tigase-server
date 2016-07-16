@@ -28,6 +28,9 @@ package tigase.cluster.repo;
 
 import tigase.db.DBInitException;
 import tigase.db.comp.ConfigRepository;
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.UnregisterAware;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.sys.ShutdownHook;
 import tigase.sys.TigaseRuntime;
 import tigase.util.DNSResolverFactory;
@@ -48,7 +51,7 @@ import java.util.logging.Logger;
  */
 public class ClConConfigRepository
 		extends ConfigRepository<ClusterRepoItem>
-		implements ShutdownHook {
+		implements ShutdownHook, Initializable, UnregisterAware {
 
 	private static final Logger log = Logger.getLogger(ClConConfigRepository.class.getName());
 
@@ -61,10 +64,21 @@ public class ClConConfigRepository
 
 	//~--- fields ---------------------------------------------------------------
 
-	protected long autoreload_interval = AUTORELOAD_INTERVAL_PROP_VAL;
+	@ConfigField(desc = "Automatically remove obsolote items")
 	protected boolean auto_remove_obsolete_items = true;
 	protected long lastReloadTime = 0;
 	protected long lastReloadTimeFactor = 10;
+
+	public ClConConfigRepository() {
+		autoReloadInterval = AUTORELOAD_INTERVAL_PROP_VAL;
+
+		if (getItem(DNSResolverFactory.getInstance().getDefaultHost()) == null) {
+			ClusterRepoItem item = getItemInstance();
+
+			item.initFromPropertyString(DNSResolverFactory.getInstance().getDefaultHost());
+			addItem(item);
+		}
+	}
 
 	@Override
 	public void destroy() {
@@ -100,6 +114,7 @@ public class ClConConfigRepository
 
 	//~--- methods --------------------------------------------------------------
 
+	@Deprecated
 	@Override
 	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
 		// Nothing to do
@@ -134,7 +149,7 @@ public class ClConConfigRepository
 			Iterator<ClusterRepoItem> iterator = iterator();
 			while(iterator.hasNext()) {
 				ClusterRepoItem next = iterator.next();
-				if ( ( next.getLastUpdate() > 0 ) && System.currentTimeMillis() - next.getLastUpdate() > 5000 * autoreload_interval ){
+				if ( ( next.getLastUpdate() > 0 ) && System.currentTimeMillis() - next.getLastUpdate() > 5000 * autoReloadInterval ){
 					removeItem( next.getHostname() );
 				}
 			}
@@ -146,7 +161,7 @@ public class ClConConfigRepository
 		if ( log.isLoggable( Level.FINEST ) ){
 			log.log( Level.FINEST, "Item loaded: {0}", item );
 		}
-		if (System.currentTimeMillis() - item.getLastUpdate() <= 5000 * autoreload_interval && clusterRecordValid(item)) {
+		if (System.currentTimeMillis() - item.getLastUpdate() <= 5000 * autoReloadInterval && clusterRecordValid(item)) {
 			addItem(item);
 		} else {
 			if ( log.isLoggable( Level.FINEST ) ){
@@ -154,7 +169,7 @@ public class ClConConfigRepository
 								 "Removing stale item: {0}; current time: {1}, last update: {2} ({3}), diff: {4}, autoreload {5}",
 								 new Object[] { item, System.currentTimeMillis(), item.getLastUpdate(),
 																new Date( item.getLastUpdate() ), System.currentTimeMillis() - item.getLastUpdate(),
-																5000 * autoreload_interval } );
+																5000 * autoReloadInterval } );
 			}
 			if ( auto_remove_obsolete_items ){
 				removeItem( item.getHostname() );
@@ -171,6 +186,9 @@ public class ClConConfigRepository
 
 	//~--- get methods ----------------------------------------------------------
 
+
+
+	@Deprecated
 	@Override
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
 		super.getDefaults(defs, params);
@@ -195,13 +213,14 @@ public class ClConConfigRepository
 
 	//~--- set methods ----------------------------------------------------------
 
+	@Deprecated
 	@Override
 	public void setProperties(Map<String, Object> props) {
 		super.setProperties(props);
-		autoreload_interval = (Long) props.get(AUTORELOAD_INTERVAL_PROP_KEY);
+		Long autoreload_interval = (Long) props.get(AUTORELOAD_INTERVAL_PROP_KEY);
 		auto_remove_obsolete_items = (boolean) props.get(AUTO_REMOVE_OBSOLETE_ITEMS_PROP_KEY);
 
-		setAutoloadTimer(autoreload_interval);
+		setAutoReloadInterval(autoreload_interval);
 		TigaseRuntime.getTigaseRuntime().addShutdownHook(this);
 	}
 
@@ -225,5 +244,17 @@ public class ClConConfigRepository
 			log.log( Level.FINE, "Incorrect entry in cluster table, skipping: {0}", item );
 		}
 		return isCorrect;
+	}
+
+	@Override
+	public void initialize() {
+		super.initialize();
+		TigaseRuntime.getTigaseRuntime().addShutdownHook(this);
+	}
+
+	@Override
+	public void beforeUnregister() {
+		TigaseRuntime.getTigaseRuntime().removeShutdownHook(this);
+		super.beforeUnregister();
 	}
 }

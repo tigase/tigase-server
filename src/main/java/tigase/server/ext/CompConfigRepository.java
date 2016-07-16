@@ -22,9 +22,10 @@
 
 package tigase.server.ext;
 
-import java.util.Map;
 import tigase.db.DBInitException;
 import tigase.db.comp.ConfigRepository;
+
+import java.util.Map;
 
 /**
  * Created: Oct 3, 2009 2:00:30 PM
@@ -59,6 +60,7 @@ public class CompConfigRepository extends ConfigRepository<CompRepoItem> {
 		return CompRepoDefaults.getItemInstance();
 	}
 
+	@Deprecated
 	@Override
 	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
 		// Nothing to do

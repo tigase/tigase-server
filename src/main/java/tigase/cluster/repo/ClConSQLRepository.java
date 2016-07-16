@@ -155,6 +155,7 @@ public class ClConSQLRepository
 	
 	//~--- get methods ----------------------------------------------------------
 
+	@Deprecated
 	@Override
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
 		super.getDefaults(defs, params);
@@ -187,6 +188,7 @@ public class ClConSQLRepository
 		}
 	}
 
+	@Deprecated
 	@Override
 	public void initRepository(String conn_str, Map<String, String> params)
 					throws DBInitException {
@@ -266,7 +268,7 @@ public class ClConSQLRepository
 			log.log( Level.FINEST, "Reloading items" );
 		}
 
-		if ( ( System.currentTimeMillis() - lastReloadTime ) <= ( autoreload_interval * lastReloadTimeFactor ) ){
+		if ( ( System.currentTimeMillis() - lastReloadTime ) <= ( autoReloadInterval * lastReloadTimeFactor ) ){
 			if ( log.isLoggable( Level.FINE ) ){
 				log.log( Level.FINE, "Last reload performed in {0}, skipping: ", ( System.currentTimeMillis() - lastReloadTime ) );
 			}
@@ -307,6 +309,7 @@ public class ClConSQLRepository
 
 	//~--- set methods ----------------------------------------------------------
 
+	@Deprecated
 	@Override
 	public void setProperties(Map<String, Object> properties) {
 		super.setProperties(properties);

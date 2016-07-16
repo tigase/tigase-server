@@ -1,23 +1,14 @@
 package tigase.monitor;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-
-import javax.script.ScriptEngineManager;
-
 import tigase.component.AbstractKernelBasedComponent;
 import tigase.component.modules.impl.JabberVersionModule;
 import tigase.component.modules.impl.XmppPingModule;
-import tigase.conf.ConfigurationException;
-import tigase.db.comp.ComponentRepository;
-import tigase.kernel.beans.Bean;
 import tigase.kernel.core.Kernel;
 import tigase.monitor.modules.*;
 import tigase.server.monitor.MonitorRuntime;
-import tigase.util.ClassUtil;
 import tigase.util.TimerTask;
+
+import javax.script.ScriptEngineManager;
 
 public class MonitorComponent extends AbstractKernelBasedComponent {
 
@@ -62,12 +53,13 @@ public class MonitorComponent extends AbstractKernelBasedComponent {
 
 	@Override
 	protected void registerModules(Kernel kernel) {
+		kernel.registerBean("runtime").asInstance(MonitorRuntime.getMonitorRuntime()).exec();
+		kernel.registerBean(TasksScriptRegistrar.class).exec();
+
 		kernel.registerBean(XmppPingModule.class).exec();
 		kernel.registerBean(JabberVersionModule.class).exec();
 		kernel.registerBean(AdHocCommandMonitorModule.class).exec();
 		kernel.registerBean(DiscoveryMonitorModule.class).exec();
-
-		kernel.registerBean(TasksScriptRegistrar.class).exec();
 
 		kernel.registerBean(AddScriptTaskCommand.class).exec();
 		kernel.registerBean(AddTimerScriptTaskCommand.class).exec();
@@ -78,72 +70,11 @@ public class MonitorComponent extends AbstractKernelBasedComponent {
 		kernel.registerBean("bindings").asInstance(scriptEngineManager.getBindings()).exec();
 
 		kernel.registerBean("timerTaskService").asInstance(timerTaskService).exec();
-		kernel.registerBean("runtime").asInstance(MonitorRuntime.getMonitorRuntime()).exec();
 	}
 
 	@Override
-	public void setProperties(Map<String, Object> props) throws ConfigurationException {
-		if (props.size() <= 1)
-			return;
-
-		String repoClass = TaskConfigItemJDBCRepository.class.getName();
-		try {
-			ComponentRepository<TaskConfigItem> repo_tmp = (ComponentRepository<TaskConfigItem>) Class.forName(
-					repoClass).newInstance();
-
-			repo_tmp.setProperties(props);
-			log.log(Level.WARNING, "Monitoring Tasks: {0} with items: {1}", new Object[] { repo_tmp, repo_tmp.toString() });
-			repo_tmp.reload();
-
-			kernel.registerBean("tasksRepo").asInstance(repo_tmp).exec();
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can not create T repository instance for class: " + repoClass, e);
-		}
-
-		super.setProperties(props);
-
-		try {
-			Set<Class<MonitorTask>> classes = ClassUtil.getClassesImplementing(MonitorTask.class);
-			if (log.isLoggable(Level.FINER))
-				log.finer("Found monitor tasks classes: " + classes.toString());
-
-			for (Class<MonitorTask> class1 : classes) {
-				if (class1.getAnnotation(Bean.class) != null)
-					kernel.registerBean(class1).exec();
-			}
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			Set<Class<MonitorExtension>> classes = ClassUtil.getClassesImplementing(MonitorExtension.class);
-			if (log.isLoggable(Level.FINER))
-				log.finer("Found monitor ext classes: " + classes.toString());
-
-			for (Class<MonitorExtension> class1 : classes) {
-				if (class1.getAnnotation(Bean.class) != null)
-					kernel.registerBean(class1).exec();
-			}
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		if (kernel.isBeanClassRegistered("monitor-mailer")) {
-			Object mailerExt = kernel.getInstance("monitor-mailer");
-			if (mailerExt instanceof MonitorExtension) {
-				((MonitorExtension) mailerExt).setProperties(props);
-			}
-		}
-
-		// initialization
+	public void initialize() {
+		super.initialize();
 		((TasksScriptRegistrar) kernel.getInstance(TasksScriptRegistrar.ID)).load();
-
-		// ((BeanConfigurator)
-		// kernel.getInstance(BeanConfigurator.NAME)).configureBeans(props);
 	}
-
 }
