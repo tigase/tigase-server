@@ -3,14 +3,11 @@ package tigase.component.modules;
 import tigase.component.PacketWriter;
 import tigase.component.exceptions.ComponentException;
 import tigase.component.responses.ResponseManager;
-import tigase.criteria.Criteria;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
 import tigase.util.TigaseStringprepException;
-import tigase.xml.Element;
 import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
 import tigase.xmpp.StanzaType;
 
 import java.util.Collections;
@@ -51,8 +48,7 @@ public class StanzaProcessor {
 		}
 
 		for (Module module : this.modules) {
-			Criteria criteria = module.getModuleCriteria();
-			if (criteria != null && criteria.match(packet.getElement())) {
+			if (module.canHandle(packet)) {
 				handled = true;
 				if (log.isLoggable(Level.FINER)) {
 					log.finer("Handled by module " + module.getClass());
@@ -61,7 +57,6 @@ public class StanzaProcessor {
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Finished " + module.getClass());
 				}
-				break;
 			}
 		}
 		return handled;
@@ -101,7 +96,7 @@ public class StanzaProcessor {
 			sendException(packet, new ComponentException(Authorization.JID_MALFORMED));
 		} catch (ComponentException e) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, e.getMessageWithPosition() + " when processing " + packet.toString());
+				log.log(Level.FINEST, e.getMessageWithPosition() + " when processing " + packet.toString(), e);
 			}
 			sendException(packet, e);
 		} catch (Exception e) {
@@ -135,9 +130,10 @@ public class StanzaProcessor {
 			}
 
 			Packet result = e.makeElement(packet, true);
-			Element el = result.getElement();
-
-			el.setAttribute("from", BareJID.bareJIDInstance(el.getAttributeStaticStr(Packet.FROM_ATT)).toString());
+			// Why do we need this? Make error should return proper from/to values
+//			Element el = result.getElement();
+//
+//			el.setAttribute("from", BareJID.bareJIDInstance(el.getAttributeStaticStr(Packet.FROM_ATT)).toString());
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Sending back: " + result.toString());
 			}

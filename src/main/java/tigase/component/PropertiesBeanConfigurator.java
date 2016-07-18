@@ -51,12 +51,16 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 		Field[] fields = DependencyManager.getAllFields(beanConfig.getClazz());
 		for (Field field : fields) {
 			ConfigField cf = field.getAnnotation(ConfigField.class);
-			if (cf != null && !cf.alias().isEmpty()) {
+			if (cf != null) {
 				if (Map.class.isAssignableFrom(field.getType())) {
 					mapFields.add(field.getName());
-					mapFields.add(cf.alias());
 				}
-				aliases.add(cf.alias());
+				if (!cf.alias().isEmpty()) {
+					aliases.add(cf.alias());
+					if (Map.class.isAssignableFrom(field.getType())) {
+						mapFields.add(cf.alias());
+					}
+				}
 			}
 		}
 

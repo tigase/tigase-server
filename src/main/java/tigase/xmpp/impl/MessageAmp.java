@@ -32,6 +32,9 @@ import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.RegistrarBean;
+import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.core.Kernel;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
 import tigase.util.DNSResolverFactory;
@@ -55,7 +58,7 @@ import static tigase.server.amp.AmpFeatureIfc.*;
 public class MessageAmp
 				extends XMPPProcessor
 				implements XMPPPacketFilterIfc, XMPPPostprocessorIfc, 
-						XMPPPreprocessorIfc, XMPPProcessorIfc {
+						XMPPPreprocessorIfc, XMPPProcessorIfc, RegistrarBean {
 	private static final String     AMP_JID_PROP_KEY     = "amp-jid";
 	private static final String     STATUS_ATTRIBUTE_NAME = "status";
 	private static final String[][] ELEMENTS             = {
@@ -77,8 +80,11 @@ public class MessageAmp
 	private JID             ampJID           = null;
 	@Inject
 	private MsgRepositoryIfc   msg_repo         = null;
-	private OfflineMessages offlineProcessor = new OfflineMessages();
-	private Message         messageProcessor = new Message();
+	@Inject(nullAllowed = true)
+	private OfflineMessages offlineProcessor;
+	@Inject(nullAllowed = true)
+	private Message         messageProcessor;
+	@ConfigField(desc = "", alias = "quota-exceeded")
 	private QuotaRule quotaExceededRule = QuotaRule.error;
 
 	//~--- methods --------------------------------------------------------------
@@ -123,7 +129,6 @@ public class MessageAmp
 					new String[] { XMLNS }) };
 		}
 		
-		quotaExceededRule = QuotaRule.valueof((String) settings.get("quota-exceeded"));
 	}
 
 	@Override
@@ -331,7 +336,22 @@ public class MessageAmp
 	public String[] supNamespaces() {
 		return XMLNSS;
 	}
-	
+
+	@Override
+	public void register(Kernel kernel) {
+		if (!kernel.isBeanClassRegistered("messages", false)) {
+			kernel.registerBean(Message.class).setActive(true).exec();
+		}
+		if (!kernel.isBeanClassRegistered(OfflineMessages.ID, false)) {
+			kernel.registerBean(OfflineMessages.class).setActive(true).exec();
+		}
+	}
+
+	@Override
+	public void unregister(Kernel kernel) {
+
+	}
+
 	private enum QuotaRule {
 		error,
 		drop;

@@ -301,14 +301,14 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 
 			for (BeanPropConfig cfg : beanPropConfigMap.values()) {
 				// TODO configuration is not as it should be - unknown class for bean!
-				if (cfg.getClazzName() == null && !kernel.isBeanClassRegistered(cfg.getBeanName()))
+				if (cfg.getClazzName() == null && !kernel.isBeanClassRegistered(cfg.getBeanName(), false))
 					continue;
 
-				boolean register = !kernel.isBeanClassRegistered(cfg.getBeanName());
+				boolean register = !kernel.isBeanClassRegistered(cfg.getBeanName(), false);
 				if (!register) {
 					if (kernel.getClass() != null && cfg.getClazzName() != null && !kernel.getClass().getCanonicalName().equals(cfg.getClazzName())) {
 					 	register = true;
-					} else{
+					} else {
 						kernel.setBeanActive(cfg.getBeanName(), cfg.isActive());
 					}
 				}
@@ -342,12 +342,25 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 
 	protected List<BeanConfig> registerBeansForBeanOfClass(Kernel kernel, Class<?> requiredClass, Set<Class<?>> classes) {
 		List<BeanConfig> registered = new ArrayList<>();
-		for (Class<?> cls : classes) {
-			Bean annotation = registerBeansForBeanOfClassShouldRegister(kernel, requiredClass, cls);
+		List<Class<?>> toRegister = registerBeansForBeanOfClassGetBeansToRegister(kernel, requiredClass, classes);
+		for (Class<?> cls : toRegister) {
+			Bean annotation = cls.getAnnotation(Bean.class);
 			if (annotation != null) {
-				BeanConfig beanConfig = kernel.registerBean(cls).execWithoutInject();
-				if (beanConfig != null) {
-					registered.add(beanConfig);
+				BeanConfig existingBeanConfig = kernel.getDependencyManager().getBeanConfig(annotation.name());
+				boolean register = true;
+				if (existingBeanConfig == null) {
+					register = true;
+				} else if (cls.equals(existingBeanConfig.getClazz())) {
+					register = false;
+				} else {
+					registered.remove(existingBeanConfig);
+				}
+
+				if (register) {
+					BeanConfig beanConfig = kernel.registerBean(cls).execWithoutInject();
+					if (beanConfig != null) {
+						registered.add(beanConfig);
+					}
 				}
 			}
 		}
@@ -356,6 +369,31 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 //			kernel.injectIfRequired(beanConfig);
 //		}
 		return registered;
+	}
+
+	protected List<Class<?>> registerBeansForBeanOfClassGetBeansToRegister(Kernel kernel, Class<?> requiredClass, Set<Class<?>> classes) {
+		Map<Class<?>,Bean> matching = new HashMap<>();
+		for (Class<?> cls : classes) {
+			Bean bean = registerBeansForBeanOfClassShouldRegister(kernel, requiredClass, cls);
+			if (bean  != null) {
+				matching.put(cls, bean);
+			}
+		}
+
+		List<Class<?>> toRegister = new ArrayList<>();
+		Class<?> req = requiredClass;
+		do {
+			Iterator<Map.Entry<Class<?>,Bean>> it = matching.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry<Class<?>,Bean> e = it.next();
+				Class expParent = e.getValue().parent();
+				if (expParent.equals(req)) {
+					toRegister.add(0, e.getKey());
+					it.remove();
+				}
+			}
+		} while ((req = req.getSuperclass()) != null && !matching.isEmpty());
+		return toRegister;
 	}
 
 	protected Bean registerBeansForBeanOfClassShouldRegister(Kernel kernel, Class<?> requiredClass, Class<?> cls) {

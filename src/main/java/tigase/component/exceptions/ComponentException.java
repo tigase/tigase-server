@@ -43,6 +43,9 @@ public class ComponentException extends Exception {
 		this(errorCondition, text, (String) null);
 	}
 
+	public ComponentException(Authorization errorCondition, String text, Throwable cause) {
+		this(errorCondition, text, (String) null, cause);
+	}
 	/**
 	 *
 	 * @param errorCondition
@@ -52,7 +55,11 @@ public class ComponentException extends Exception {
 	 *            human readable message will be send to client
 	 */
 	public ComponentException(Authorization errorCondition, String text, String message) {
-		super(message);
+		this(errorCondition, text, message, null);
+	}
+
+	public ComponentException(Authorization errorCondition, String text, String message, Throwable cause) {
+		super(message, cause);
 		this.errorCondition = errorCondition;
 		this.text = text;
 	}

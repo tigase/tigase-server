@@ -24,6 +24,7 @@ import org.junit.Test;
 import tigase.db.DBInitException;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.UserNotFoundException;
+import tigase.kernel.core.Kernel;
 import tigase.server.Packet;
 import tigase.xml.Element;
 import tigase.xmpp.BareJID;
@@ -39,20 +40,20 @@ import static org.junit.Assert.*;
  * @author andrzej
  */
 public class OfflineMessagesTest extends ProcessorTestCase {
-	
-	private OfflineMessages offlineProcessor;
+
+	private Kernel kernel;
+	private OfflineMessagesTestImpl offlineProcessor;
 	private MsgRepositoryIfcImpl msgRepo;
 	
 	@Before
 	@Override
 	public void setUp() throws Exception {
+		kernel = new Kernel();
 		msgRepo = new MsgRepositoryIfcImpl();
-		offlineProcessor = new OfflineMessages() {
-			@Override
-			protected OfflineMessages.OfflineMsgRepositoryIfc getMsgRepoImpl(NonAuthUserRepository repo, XMPPResourceConnection conn) {
-				return msgRepo;
-			}
-		};
+		kernel.registerBean(tigase.xmpp.impl.Message.class).setActive(true).exec();
+		kernel.registerBean(OfflineMessagesTestImpl.class).setActive(true).exec();
+		offlineProcessor = kernel.getInstance(OfflineMessagesTestImpl.class);
+		offlineProcessor.msgRepo = msgRepo;
 		offlineProcessor.init(new HashMap<String,Object>());
 		super.setUp();
 	}
@@ -205,13 +206,11 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 		
 		assertFalse(offlineProcessor.isAllowedForOfflineStorage(packet));
 		
-		Map<String,Object> settings = new HashMap<>();
-		settings.put("msg-store-offline-paths", new String[] {
-			"/message/storeMe1[custom_xmlns]",
-			"/message/storeMe2",
-			"-/message/noStore1"
+		offlineProcessor.setOfflineStorageMatchers(new String[] {
+				"/message/storeMe1[custom_xmlns]",
+				"/message/storeMe2",
+				"-/message/noStore1"
 		});
-		offlineProcessor.init(settings);	
 
 		assertTrue(offlineProcessor.isAllowedForOfflineStorage(packet));
 
@@ -284,5 +283,16 @@ public class OfflineMessagesTest extends ProcessorTestCase {
 
 		}
 	}
-	
+
+	public static class OfflineMessagesTestImpl extends OfflineMessages {
+
+		private MsgRepositoryIfcImpl msgRepo;
+
+		@Override
+		protected OfflineMessages.OfflineMsgRepositoryIfc getMsgRepoImpl(NonAuthUserRepository repo, XMPPResourceConnection conn) {
+			return msgRepo;
+		}
+
+	}
+
 }

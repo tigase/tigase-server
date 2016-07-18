@@ -28,6 +28,8 @@ import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
 
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.amp.db.MsgRepository;
@@ -135,11 +137,17 @@ public class OfflineMessages
 	/** Field holds class for formatting and parsing dates in a locale-sensitive
 	 * manner */
 	private final SimpleDateFormat formatter;
+	@ConfigField(desc = "Offline message implementation repository class", alias = MSG_REPO_CLASS_KEY)
 	private String msgRepoCls = null;
-	private Message message = new Message();
+	@Inject
+	private Message message;
+	@ConfigField(desc = "PubSub component JID", alias = MSG_PUBSUB_JID)
 	private String pubSubJID;
+	@ConfigField(desc = "PubSub node for offline messages", alias = MSG_PUBSUB_NODE)
 	private String pubSubNode;
+	@ConfigField(desc = "PubSub offline message publisher", alias = MSG_PUBSUB_PUBLISHER)
 	private String defaultPublisher;
+	@ConfigField(desc = "Store offline messages with mathing paths", alias = MSG_OFFLINE_STORAGE_PATHS)
 	private ElementMatcher[] offlineStorageMatchers = new ElementMatcher[0];
 	
 	{
@@ -158,26 +166,6 @@ public class OfflineMessages
 	public void init(Map<String, Object> settings) throws TigaseDBException {
 		super.init(settings);
 		defHost = DNSResolverFactory.getInstance().getDefaultHost();
-		msgRepoCls = (String) settings.get(MSG_REPO_CLASS_KEY);
-		if (settings.containsKey(MSG_PUBSUB_JID))
-			this.pubSubJID = (String) settings.get(MSG_PUBSUB_JID);
-		if (settings.containsKey(MSG_PUBSUB_NODE))
-			this.pubSubNode = (String) settings.get(MSG_PUBSUB_NODE);
-		if (settings.containsKey(MSG_PUBSUB_NODE))
-			this.pubSubNode = (String) settings.get(MSG_PUBSUB_NODE);
-		if (settings.containsKey(MSG_PUBSUB_PUBLISHER))
-			this.defaultPublisher = (String) settings.get(MSG_PUBSUB_PUBLISHER);
-		if (settings.containsKey(MSG_OFFLINE_STORAGE_PATHS)) {
-			String[] matcherStrs = (String[]) settings.get(MSG_OFFLINE_STORAGE_PATHS);
-			List<ElementMatcher> matchers = new ArrayList<>();
-			for (String matcherStr : matcherStrs) {
-				ElementMatcher matcher = ElementMatcher.create(matcherStr);
-				if (matcher != null) {
-					matchers.add(matcher);
-				}
-			}
-			offlineStorageMatchers = matchers.toArray(new ElementMatcher[0]);
-		}
 	}
 	
 	/**
@@ -445,6 +433,25 @@ public class OfflineMessages
 		}
 
 		return Authorization.FEATURE_NOT_IMPLEMENTED;
+	}
+
+	public String[] getOfflineStorageMatchers() {
+		String[] result = new String[offlineStorageMatchers.length];
+		for (int i=0; i<offlineStorageMatchers.length; i++) {
+			result[i] = offlineStorageMatchers[i].toString();
+		}
+		return result;
+	}
+
+	public void setOfflineStorageMatchers(String[] matcherStrs) {
+		List<ElementMatcher> matchers = new ArrayList<>();
+		for (String matcherStr : matcherStrs) {
+			ElementMatcher matcher = ElementMatcher.create(matcherStr);
+			if (matcher != null) {
+				matchers.add(matcher);
+			}
+		}
+		offlineStorageMatchers = matchers.toArray(new ElementMatcher[0]);
 	}
 
 	@Override

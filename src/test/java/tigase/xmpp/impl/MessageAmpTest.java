@@ -18,27 +18,22 @@
  */
 package tigase.xmpp.impl;
 
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
-import java.util.UUID;
-
 import org.junit.After;
 import org.junit.Before;
-
-import static org.junit.Assert.*;
-
 import org.junit.Test;
-
+import tigase.db.MsgRepositoryIfc;
+import tigase.kernel.core.Kernel;
 import tigase.server.Packet;
-
+import tigase.server.amp.db.MsgRepository;
 import tigase.xml.Element;
-
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
+
+import java.util.*;
+
+import static org.junit.Assert.*;
 
 /**
  *
@@ -49,12 +44,18 @@ public class MessageAmpTest extends ProcessorTestCase {
 	private static final String XMLNS = "http://jabber.org/protocol/amp";
 
 	private JID ampJid;
+	private Kernel kernel;
 	private MessageAmp messageAmp;
 	
 	@Before
 	@Override
 	public void setUp() throws Exception {
-		messageAmp = new MessageAmp();
+		kernel = new Kernel();
+		kernel.setForceAllowNull(true);
+		MsgRepositoryIfc msgRepo = new MsgRepository.MsgRepositorySDBean();
+		kernel.registerBean("msgRepository").asInstance(msgRepo).exportable().exec();
+		kernel.registerBean(MessageAmp.class).exec();
+		messageAmp = kernel.getInstance(MessageAmp.class);
 		Map<String,Object> settings = new HashMap<String,Object>();
 		ampJid = JID.jidInstance("amp@example1.com");
 		settings.put("amp-jid", ampJid.toString());

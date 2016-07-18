@@ -21,10 +21,11 @@
  */
 package tigase.xmpp;
 
-import java.util.ArrayList;
-import java.util.List;
 import tigase.server.Packet;
 import tigase.xml.Element;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -96,5 +97,22 @@ public class ElementMatcher {
 
 	public boolean getValue() {
 		return value;
+	}
+
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		if (!value) {
+			sb.append('-');
+		}
+		for (String p : path) {
+			sb.append('/');
+			sb.append(p);
+		}
+		if (xmlns != null) {
+			sb.append("[");
+			sb.append(xmlns);
+			sb.append("]");
+		}
+		return sb.toString();
 	}
 }

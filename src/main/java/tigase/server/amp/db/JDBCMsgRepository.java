@@ -227,7 +227,7 @@ public class JDBCMsgRepository extends MsgRepository<Long,DataRepository> {
 
 	// ~--- fields ---------------------------------------------------------------
 
-	private DataRepository data_repo = null;
+	protected DataRepository data_repo = null;
 	private String uid_query = GET_USER_UID_DEF_QUERY;
 	@ConfigField(desc = "Query to count messages for limit")
 	private String msg_count_for_limit_query = MSG_COUNT_FOR_TO_AND_FROM_QUERY_DEF;

@@ -49,6 +49,18 @@ public interface Module {
 	Criteria getModuleCriteria();
 
 	/**
+	 * Returns true if Packet can be procesed by module.
+	 * Default implementation uses Criteria.
+	 *
+	 * @param packet
+	 * @return
+	 */
+	default boolean canHandle(Packet packet) {
+		Criteria criteria = getModuleCriteria();
+		return criteria != null && criteria.match(packet.getElement());
+	}
+
+	/**
 	 * Process incoming stanza.
 	 *
 	 * @param packet

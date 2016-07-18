@@ -499,6 +499,10 @@ public class Kernel {
 	 * initialized!).
 	 */
 	public boolean isBeanClassRegistered(final String beanName) {
+		return isBeanClassRegistered(beanName, true);
+	}
+
+	public boolean isBeanClassRegistered(final String beanName, boolean checkInParent) {
 		boolean x = dependencyManager.isBeanClassRegistered(beanName);
 		if (x == false && parent != null) {
 			x = parent.isBeanClassRegistered(beanName);
