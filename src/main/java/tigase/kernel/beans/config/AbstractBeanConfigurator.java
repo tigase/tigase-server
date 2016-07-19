@@ -346,14 +346,29 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		for (Class<?> cls : toRegister) {
 			Bean annotation = cls.getAnnotation(Bean.class);
 			if (annotation != null) {
-				BeanConfig existingBeanConfig = kernel.getDependencyManager().getBeanConfig(annotation.name());
+				BeanConfig existingBeanConfig = null;
+				Kernel tmpKernel = kernel;
+
+				do {
+					existingBeanConfig = tmpKernel.getDependencyManager().getBeanConfig(annotation.name());
+					tmpKernel = tmpKernel.getParent();
+				}
+				while (existingBeanConfig == null && tmpKernel != null);
+
 				boolean register = true;
 				if (existingBeanConfig == null) {
 					register = true;
 				} else if (cls.equals(existingBeanConfig.getClazz())) {
 					register = false;
 				} else {
-					registered.remove(existingBeanConfig);
+					for (Class<?> ifc : cls.getInterfaces()) {
+						if (ifc.isAssignableFrom(existingBeanConfig.getClazz())) {
+							register = false;
+							break;
+						}
+					}
+					if (register)
+						registered.remove(existingBeanConfig);
 				}
 
 				if (register) {
