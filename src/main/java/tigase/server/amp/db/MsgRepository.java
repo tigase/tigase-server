@@ -276,7 +276,7 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 		private final Condition expiredMessagesCondition = lock.newCondition();
 
 		public MsgRepositoryMDBean() {
-			domainSelection = SelectorType.EveryUserRepository;
+			dataSourceSelection = SelectorType.EveryUserRepository;
 		}
 
 		@Override

@@ -58,11 +58,14 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 	@Inject
 	private EventBus eventBus;
 
+	@ConfigField(desc = "Map of aliases for data sources to use")
+	protected ConcurrentHashMap<String, String> aliases = new ConcurrentHashMap<>();
+
 	@ConfigField(desc = "Map of classes for data sources")
 	protected ConcurrentHashMap<String,String> customClasses = new ConcurrentHashMap<>();
 
-	@ConfigField(desc = "Use repository per domain")
-	protected SelectorType domainSelection = SelectorType.MainOnly;
+	@ConfigField(desc = "Create repositories for: Main only data source, every UserRepository, every data source, listed data sources")
+	protected SelectorType dataSourceSelection = SelectorType.MainOnly;
 
 	@ConfigField(desc = "Default data source to use")
 	protected String defaultDataSourceName = "default";
@@ -80,7 +83,7 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 	}
 
 	protected T getRepository(String domain) {
-		T repo = repositories.get(domain);
+		T repo = repositories.get(aliases.getOrDefault(domain, domain));
 		if (repo == null) {
 			repo = repositories.get(defaultDataSourceName);
 		}
@@ -108,7 +111,7 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 		this.dataSourceBean = dataSourceBean;
 
 		if (this.dataSourceBean != null) {
-			switch (domainSelection) {
+			switch (dataSourceSelection) {
 				case MainOnly:
 					updateDataSource(defAlias, dataSourceBean.getRepository(defAlias), oldDataSources.get(defAlias));
 					break;
