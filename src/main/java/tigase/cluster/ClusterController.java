@@ -28,7 +28,6 @@ package tigase.cluster;
 
 import tigase.cluster.api.*;
 import tigase.conf.Configurable;
-import tigase.conf.ConfigurationException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.core.Kernel;
@@ -230,13 +229,6 @@ public class ClusterController
 	}
 
 	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> defs = super.getDefaults(params);
-
-		return defs;
-	}
-
-	@Override
 	public String getDiscoCategoryType() {
 		return "load";
 	}
@@ -259,11 +251,6 @@ public class ClusterController
 	@Override
 	public void setName(String name) {
 		super.setName(name);
-	}
-
-	@Override
-	public void setProperties(Map<String, Object> properties) throws ConfigurationException {
-		super.setProperties(properties);
 	}
 
 	//~--- methods --------------------------------------------------------------

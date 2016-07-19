@@ -21,26 +21,21 @@
  */
 package tigase.server.xmppserver.proc;
 
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
-import java.util.UUID;
 import junit.framework.TestCase;
 import org.junit.Test;
-import static tigase.net.IOService.PORT_TYPE_PROP_KEY;
+import tigase.component.PropertiesBeanConfiguratorWithBackwordCompatibility;
+import tigase.io.SSLContextContainer;
+import tigase.kernel.DefaultTypesConverter;
+import tigase.kernel.core.Kernel;
 import tigase.server.Packet;
-import tigase.server.xmppserver.CID;
-import tigase.server.xmppserver.CIDConnections;
-import tigase.server.xmppserver.LocalhostException;
-import tigase.server.xmppserver.NotLocalhostException;
-import tigase.server.xmppserver.S2SConnectionHandlerIfc;
-import tigase.server.xmppserver.S2SConnectionManager;
-import tigase.server.xmppserver.S2SIOService;
-import tigase.server.xmppserver.S2SRandomSelector;
+import tigase.server.xmppserver.*;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
+
+import java.util.*;
+
+import static tigase.net.IOService.PORT_TYPE_PROP_KEY;
 
 /**
  *
@@ -48,29 +43,39 @@ import tigase.xmpp.StanzaType;
  */
 public class DialbackTest extends TestCase {
 	
-	private Dialback dialback = new Dialback() {
-
-		@Override
-		public boolean skipTLSForHost(String hostname) {
-			return true;
-		}
-
-		@Override
-		protected boolean wasVerifyRequested(S2SIOService serv, String domain) {
-			return true;
-		}
-		
-	};
-	private S2SConnectionHandlerIfc<S2SIOService> handler = null;
+	private Dialback dialback;
+	private S2SConnectionHandlerImpl handler = null;
+	private Kernel kernel;
 	
 	private String remote1 = "remote1.com";
 	private String remote2 = "remote2.com";
 	private String local = "local.com";
-	
+
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+		Map<String, Object> props = new HashMap<>();
+		props.put("name", "s2s");
+
+		kernel = new Kernel();
+		kernel.setForceAllowNull(true);
+		kernel.registerBean(DefaultTypesConverter.class).exec();
+		kernel.registerBean(PropertiesBeanConfiguratorWithBackwordCompatibility.class).exec();
+		kernel.getInstance(PropertiesBeanConfiguratorWithBackwordCompatibility.class).setProperties(props);
+		kernel.registerBean(S2SConnectionManager.DomainServerNameMapper.class).exportable().exec();
+		kernel.registerBean(CIDConnections.CIDConnectionsOpenerService.class).exportable().exec();
+		kernel.registerBean(S2SRandomSelector.class).exportable().exec();
+		kernel.registerBean(DialbackImpl.class).exportable().exec();
+		kernel.registerBean(SSLContextContainer.class).exportable().exec();
+		kernel.registerBean(S2SConnectionHandlerImpl.class).setActive(true).exec();
+		handler = kernel.getInstance(S2SConnectionHandlerImpl.class);
+		dialback = kernel.getInstance(Dialback.class);
+	}
+
 	@Test
 	public void testAuthorizationForSingleDomain() throws TigaseStringprepException {
 		Queue<Packet> results = new ArrayDeque<>();
-		handler = new S2SConnectionHandlerImpl(results);
+		handler.setResults(results);
 		dialback.init(handler, new HashMap());
 		
 		String key = UUID.randomUUID().toString();
@@ -110,7 +115,7 @@ public class DialbackTest extends TestCase {
 	@Test
 	public void testAuthorizationForSingleDomainFailure() throws TigaseStringprepException {
 		Queue<Packet> results = new ArrayDeque<>();
-		handler = new S2SConnectionHandlerImpl(results);
+		handler.setResults(results);
 		dialback.init(handler, new HashMap());
 		
 		String key = UUID.randomUUID().toString();
@@ -150,7 +155,7 @@ public class DialbackTest extends TestCase {
 	@Test
 	public void testAuthorizationWithMultiplexing() throws TigaseStringprepException {
 		Queue<Packet> results = new ArrayDeque<>();
-		handler = new S2SConnectionHandlerImpl(results);
+		handler.setResults(results);
 		dialback.init(handler, new HashMap());
 		
 		String key = UUID.randomUUID().toString();
@@ -214,7 +219,7 @@ public class DialbackTest extends TestCase {
 	@Test
 	public void testAuthorizationWithMultiplexingWithFailure() throws TigaseStringprepException {
 		Queue<Packet> results = new ArrayDeque<>();
-		handler = new S2SConnectionHandlerImpl(results);
+		handler.setResults(results);
 		dialback.init(handler, new HashMap());
 		
 		String key = UUID.randomUUID().toString();
@@ -276,11 +281,13 @@ public class DialbackTest extends TestCase {
 	}
 
 	
-	private static class S2SConnectionHandlerImpl extends S2SConnectionManager {
+	public static class S2SConnectionHandlerImpl extends S2SConnectionManager {
 
 		private Queue<Packet> results;
 		
-		public S2SConnectionHandlerImpl(Queue<Packet> results) {
+		public S2SConnectionHandlerImpl() { }
+
+		public void setResults(Queue<Packet> results) {
 			this.results = results;
 		}
 
@@ -317,6 +324,18 @@ public class DialbackTest extends TestCase {
 			return false;
 		}
 	}
-	
-	
+
+	public static class DialbackImpl extends Dialback {
+
+		@Override
+		public boolean skipTLSForHost(String hostname) {
+			return true;
+		}
+
+		@Override
+		protected boolean wasVerifyRequested(S2SIOService serv, String domain) {
+			return true;
+		}
+
+	}
 }

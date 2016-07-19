@@ -31,19 +31,17 @@ import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.cluster.api.SessionManagerClusteredIfc;
 import tigase.cluster.strategy.ClusteringStrategyIfc;
 import tigase.cluster.strategy.ConnectionRecordIfc;
-import tigase.conf.ConfigurationException;
 import tigase.eventbus.FillRoutedEvent;
 import tigase.eventbus.RouteEvent;
 import tigase.eventbus.component.stores.Subscription;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
-import tigase.osgi.ModulesManagerImpl;
 import tigase.server.ComponentInfo;
 import tigase.server.Message;
 import tigase.server.Packet;
-import tigase.server.XMPPServer;
 import tigase.server.xmppsession.SessionManager;
 import tigase.server.xmppsession.UserSessionEvent;
 import tigase.stats.StatisticsList;
@@ -101,13 +99,31 @@ public class SessionManagerClustered
 
 	private ClusterControllerIfc  clusterController = null;
 	private ComponentInfo         cmpInfo           = null;
-	private JID                   my_address        = null;
-	private JID                   my_hostname       = null;
+	@ConfigField(desc = "Component own internal JID")
+	private JID                   my_address;
+	@ConfigField(desc = "Server domain name")
+	private JID                   my_hostname;
 	private int                   nodesNo           = 0;
 	@Inject
 	private ClusteringStrategyIfc strategy          = null;
 
 	//~--- methods --------------------------------------------------------------
+
+	public SessionManagerClustered() {
+		String[] local_domains = DNSResolverFactory.getInstance().getDefaultHosts();
+
+		String my_domain = local_domains[0];
+
+		try {
+			my_hostname = JID.jidInstance(my_domain);
+			my_address = JID.jidInstance(getName(), my_domain, null);
+		} catch (TigaseStringprepException e) {
+			log.log(Level.WARNING,
+					"Creating component source address failed stringprep processing: {0}@{1}",
+					new Object[] { getName(),
+							my_hostname });
+		}
+	}
 
 	@Override
 	public boolean containsJid(BareJID jid) {
@@ -304,45 +320,6 @@ public class SessionManagerClustered
 	}
 
 	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> props          = super.getDefaults(params);
-		String              strategy_class = (String) params.get(STRATEGY_CLASS_PROPERTY);
-
-		if (strategy_class == null) {
-			strategy_class = STRATEGY_CLASS_PROP_VAL;
-		}
-		props.put(STRATEGY_CLASS_PROP_KEY, strategy_class);
-		try {
-			ClusteringStrategyIfc strat_tmp = (ClusteringStrategyIfc) ModulesManagerImpl.getInstance().forName(
-					strategy_class).newInstance();
-			Map<String, Object> strat_defs = strat_tmp.getDefaults(params);
-
-			if (strat_defs != null) {
-				props.putAll(strat_defs);
-			}
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Can not instantiate clustering strategy for class: " +
-					strategy_class, e);
-		}
-
-		String[] local_domains = DNSResolverFactory.getInstance().getDefaultHosts();
-
-		if (params.get(GEN_VIRT_HOSTS) != null) {
-			local_domains = ((String) params.get(GEN_VIRT_HOSTS)).split(",");
-		}
-
-		// defs.put(LOCAL_DOMAINS_PROP_KEY, LOCAL_DOMAINS_PROP_VAL);
-		props.put(MY_DOMAIN_NAME_PROP_KEY, local_domains[0]);
-		if (params.get(CLUSTER_NODES) != null) {
-			String[] cl_nodes = ((String) params.get(CLUSTER_NODES)).split(",");
-
-			nodesNo = cl_nodes.length;
-		}
-
-		return props;
-	}
-
-	@Override
 	public String getDiscoDescription() {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "disco description from SM Clustered");
@@ -465,54 +442,6 @@ public class SessionManagerClustered
 //  clusterController.setCommandListener(USER_PRESENCE_CMD, userPresence);
 //  clusterController.setCommandListener(REQUEST_SYNCONLINE_CMD, requestSyncOnline);
 //  clusterController.setCommandListener(RESPOND_SYNCONLINE_CMD, respondSyncOnline);
-	}
-
-	@Override
-	public void setProperties(Map<String, Object> props) throws ConfigurationException {
-		if (props.get(STRATEGY_CLASS_PROP_KEY) != null) {
-			String strategy_class = (String) props.get(STRATEGY_CLASS_PROP_KEY);
-
-			try {
-				// we should not replace instance of ClusteringStrategyIfc if it
-				// is not required as instance may contain data!!
-				ClusteringStrategyIfc strategy_tmp = strategy;
-				if (strategy == null || !strategy_class.equals(strategy.getClass().getCanonicalName())) {
-					Class<?> cls = ModulesManagerImpl.getInstance().forName(strategy_class);
-					strategy_tmp = (ClusteringStrategyIfc) cls.newInstance();
-				}
-//				strategy_tmp.setSessionManagerHandler(this);
-				strategy_tmp.setProperties(props);
-
-				// strategy_tmp.init(getName());
-				strategy = strategy_tmp;
-				log.log(Level.CONFIG, "Loaded SM strategy: {0}", strategy_class);
-
-				if (clusterController != null) {
-					strategy.setClusterController(clusterController);
-				}
-			} catch (Exception e) {
-				if (!XMPPServer.isOSGi()) {
-					log.log(Level.SEVERE, "Cannot instance clustering strategy class: " +
-							strategy_class, e);
-				}
-				throw new ConfigurationException("Can not instantiate clustering strategy for class: " +
-					strategy_class);		
-			}
-		}
-		super.setProperties(props);
-		updateServiceEntity();
-		try {
-			if (props.get(MY_DOMAIN_NAME_PROP_KEY) != null) {
-				my_hostname = JID.jidInstance((String) props.get(MY_DOMAIN_NAME_PROP_KEY));
-				my_address = JID.jidInstance(getName(), (String) props.get(
-						MY_DOMAIN_NAME_PROP_KEY), null);
-			}
-		} catch (TigaseStringprepException ex) {
-			log.log(Level.WARNING,
-					"Creating component source address failed stringprep processing: {0}@{1}",
-					new Object[] { getName(),
-					my_hostname });
-		}
 	}
 
 	//~--- methods --------------------------------------------------------------

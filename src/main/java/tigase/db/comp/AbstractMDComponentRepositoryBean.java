@@ -93,6 +93,7 @@ public abstract class AbstractMDComponentRepositoryBean<Item extends RepositoryI
 		repo.destroy();
 	}
 
+	@Deprecated
 	@Override
 	public void getDefaults(Map<String, Object> defs, Map<String, Object> params) {
 		//repo.getDefaults(defs, params);
@@ -118,6 +119,7 @@ public abstract class AbstractMDComponentRepositoryBean<Item extends RepositoryI
 		repo.removeItem(key);
 	}
 
+	@Deprecated
 	@Override
 	public void setProperties(Map<String, Object> properties) {
 		//repo.setProperties(properties);

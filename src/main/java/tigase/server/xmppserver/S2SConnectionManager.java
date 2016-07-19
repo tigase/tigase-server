@@ -27,14 +27,13 @@ package tigase.server.xmppserver;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.cert.CertificateUtil;
-import tigase.conf.ConfigurationException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.server.Permissions;
-import tigase.server.xmppserver.proc.*;
 import tigase.stats.StatisticsList;
 import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
@@ -140,7 +139,7 @@ public class S2SConnectionManager
 
 	// ~--- fields ---------------------------------------------------------------
 	@Inject
-	private S2SConnectionSelector connSelector = null;
+	private S2SConnectionSelector connSelector;
 
 	/**
 	 * <code>maxPacketWaitingTime</code> keeps the maximum time packets can wait
@@ -173,7 +172,8 @@ public class S2SConnectionManager
 	 * Holds list of manually entered mappings which provide substitutions for domains
 	 * matching pattens with names of servers to which we should connect.
 	 */
-	private DomainServerNameMapper domainServerNameMapper = new DomainServerNameMapper();
+	@Inject
+	private DomainServerNameMapper domainServerNameMapper;
 
 	/**
 	 * List of processors which should handle all traffic incoming from the
@@ -565,24 +565,6 @@ public class S2SConnectionManager
 	}
 
 	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String, Object> props = super.getDefaults(params);
-
-		props.put(MAX_PACKET_WAITING_TIME_PROP_KEY, MAX_PACKET_WAITING_TIME_PROP_VAL /
-				SECOND);
-		props.put(MAX_CONNECTION_INACTIVITY_TIME_PROP_KEY,
-				MAX_CONNECTION_INACTIVITY_TIME_PROP_VAL / SECOND);
-		props.put(MAX_INCOMING_CONNECTIONS_PROP_KEY, MAX_INCOMING_CONNECTIONS_PROP_VAL);
-		props.put(MAX_OUT_TOTAL_CONNECTIONS_PROP_KEY, MAX_OUT_TOTAL_CONNECTIONS_PROP_VAL);
-		props.put(MAX_OUT_PER_IP_CONNECTIONS_PROP_KEY, MAX_OUT_PER_IP_CONNECTIONS_PROP_VAL);
-		props.put(S2S_CONNECTION_SELECTOR_PROP_KEY, S2S_CONNECTION_SELECTOR_PROP_VAL);
-		props.put(CID_CONNECTIONS_TASKS_THREADS_KEY, CID_CONNECTIONS_TASKS_THREADS_VAL);
-		props.put(S2S_DOMAIN_MAPPING_PROP_KEY, S2S_DOMAIN_MAPPING_PROP_VAL);
-
-		return props;
-	}
-        
-	@Override
 	public String getDiscoCategoryType() {
 		return "s2s";
 	}
@@ -721,86 +703,6 @@ public class S2SConnectionManager
 		this.processors = Collections.unmodifiableList(tmp_processors);
 	}
 
-	@Override
-	public void setProperties(Map<String, Object> props) throws ConfigurationException {
-		super.setProperties(props);
-		if (cidConnectionsOpenerService == null)
-			cidConnectionsOpenerService = new CIDConnections.CIDConnectionsOpenerService();
-		if (props.containsKey(CID_CONNECTIONS_TASKS_THREADS_KEY)) {
-			cidConnectionsOpenerService.setOutgoingOpenThreads((Integer) props.get(
-					CID_CONNECTIONS_TASKS_THREADS_KEY));
-		}
-		if (props.size() == 1) {
-
-			// If props.size() == 1, it means this is a single property update
-			// and this component does not support single property change for the rest
-			// of it's settings
-			return;
-		}
-
-		// it needs to be here as we need properties for plugins
-		// TODO: Make used processors list a configurable thing
-		Map<String, S2SProcessor> processorsMap = new LinkedHashMap<String, S2SProcessor>(10);
-		processorsMap.clear();
-		processorsMap.put(Dialback.class.getSimpleName(), new Dialback());
-		processorsMap.put(StartTLS.class.getSimpleName(), new StartTLS());
-		processorsMap.put(StartZlib.class.getSimpleName(), new StartZlib());
-		processorsMap.put(StreamError.class.getSimpleName(), new StreamError());
-		processorsMap.put(StreamFeatures.class.getSimpleName(), new StreamFeatures());
-		processorsMap.put(StreamOpen.class.getSimpleName(), new StreamOpen());
-		processorsMap.put(PacketChecker.class.getSimpleName(), new PacketChecker());
-		for (S2SProcessor proc : processorsMap.values()) {
-			Map<String, Object> proc_props = new ConcurrentHashMap<String, Object>(4);
-
-			for (Map.Entry<String, Object> entry : props.entrySet()) {
-				if (entry.getKey().startsWith(PROCESSORS_CONF_PROP_KEY)) {
-					String[] nodes = entry.getKey().split("/");
-
-					if (nodes.length > 2) {
-						String[] ids = nodes[1].split(",");
-
-						if (Arrays.binarySearch(ids, proc.getClass().getSimpleName()) >= 0) {
-							proc_props.put(nodes[2], entry.getValue());
-						}
-					}
-				}
-			}
-			proc.init(this, proc_props);
-		}
-		List<S2SProcessor> tmp_processors = new ArrayList<>(processorsMap.values());
-		Collections.sort(tmp_processors);
-		this.processors = Collections.unmodifiableList(tmp_processors);
-		
-		maxPacketWaitingTime = (Long) props.get(MAX_PACKET_WAITING_TIME_PROP_KEY) * SECOND;
-		maxInactivityTime = (Long) props.get(MAX_CONNECTION_INACTIVITY_TIME_PROP_KEY) *
-				SECOND;
-		maxOUTTotalConnections = (Integer) props.get(MAX_OUT_TOTAL_CONNECTIONS_PROP_KEY);
-		maxOUTPerIPConnections = (Integer) props.get(MAX_OUT_PER_IP_CONNECTIONS_PROP_KEY);
-		maxINConnections       = (Integer) props.get(MAX_INCOMING_CONNECTIONS_PROP_KEY);
-
-		String selector_str = (String) props.get(S2S_CONNECTION_SELECTOR_PROP_KEY);
-
-		try {
-			connSelector = (S2SConnectionSelector) Class.forName(selector_str).newInstance();
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Incorrect s2s connection selector class provided: {0}",
-					selector_str);
-			log.log(Level.SEVERE, "Selector initialization exception: ", e);
-		}
-		
-		String tmp = (String) props.get(S2S_DOMAIN_MAPPING_PROP_KEY);
-		DomainServerNameMapper tmp_domainServerNameMapper = new DomainServerNameMapper();
-		if (tmp != null) {
-			for(String part : tmp.split(",")) {
-				String[] kv = part.split("=");
-				if (kv.length >= 2) {
-					tmp_domainServerNameMapper.addEntry(kv[0], kv[1]);
-				} 
-			}
-		}
-		domainServerNameMapper = tmp_domainServerNameMapper;
-	}
-
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
@@ -890,8 +792,9 @@ public class S2SConnectionManager
 
 		return result;
 	}
-	
-	protected static class DomainServerNameMapper {
+
+	@Bean(name = "domainServerNameMapper", parent = S2SConnectionManager.class)
+	public static class DomainServerNameMapper {
 		
 		private class Entry implements Comparable<Entry>{
 			private final String pattern;
@@ -941,9 +844,10 @@ public class S2SConnectionManager
 				return o.pattern.length() - pattern.length();
 			}
 		}
-		
+
+		@ConfigField(desc = "Rules for mapping domains")
 		private List<Entry> entries = new ArrayList<Entry>();
-		
+
 		public DomainServerNameMapper() {}
 		
 		protected void addEntry(String pattern, String serverName) {
@@ -965,6 +869,21 @@ public class S2SConnectionManager
 					return e.getServerName();
 			}
 			return domain;
+		}
+
+		public Map<String, String> getEntries() {
+			Map<String, String> result = new HashMap<>();
+			for (Entry e : entries) {
+				result.put(e.pattern, e.getServerName());
+			}
+			return result;
+		}
+
+		public void setEntries(Map<String, String> entries) {
+			entries.clear();
+			for (Map.Entry<String, String> e : entries.entrySet()) {
+				addEntry(e.getKey(), e.getValue());
+			}
 		}
 
 		@Override

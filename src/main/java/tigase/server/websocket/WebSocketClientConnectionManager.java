@@ -26,9 +26,9 @@ package tigase.server.websocket;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.conf.ConfigurationException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.BeanSelector;
+import tigase.kernel.beans.Inject;
 import tigase.kernel.core.Kernel;
 import tigase.net.SocketType;
 import tigase.server.xmppclient.XMPPIOProcessor;
@@ -37,9 +37,7 @@ import tigase.xmpp.BareJID;
 import tigase.xmpp.StreamError;
 import tigase.xmpp.XMPPIOService;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Class implements basic support allowing clients to connect using WebSocket
@@ -52,42 +50,15 @@ public class WebSocketClientConnectionManager
 				extends tigase.server.xmppclient.ClientConnectionManager {
 	
 	private static final String XMLNS_FRAMING = "urn:ietf:params:xml:ns:xmpp-framing";
-	private static final String PROTOCOL_VERSIONS_KEY = "protocol-versions";
-	private static final String[] PROTOCOL_VERSIONS_DEF = { WebSocketHybi.ID };
-	
-	private static final WebSocketProtocolIfc[] SUPPORTED_PROTOCOL_VERSIONS = { new WebSocketHybi(), new WebSocketHixie76() };
-	
-	private WebSocketProtocolIfc[] enabledProtocolVersions = null;
-	
-	@Override
-	public Map<String, Object> getDefaults(Map<String, Object> params) {
-		Map<String,Object> defs = super.getDefaults(params);
-		defs.put(PROTOCOL_VERSIONS_KEY, PROTOCOL_VERSIONS_DEF);
-		return defs;
-	}
-	
+
+	@Inject
+	private WebSocketProtocolIfc[] enabledProtocolVersions;
+
 	@Override
 	public String getDiscoDescription() {
 		return "Websocket connection manager";
 	}
 
-	@Override
-	public void setProperties(Map<String, Object> props) throws ConfigurationException {
-		if (props.containsKey(PROTOCOL_VERSIONS_KEY)) {
-			String[] versions = (String[]) props.get(PROTOCOL_VERSIONS_KEY);
-			List<WebSocketProtocolIfc> value = new ArrayList<WebSocketProtocolIfc>();
-			for (String version : versions) {
-				for (WebSocketProtocolIfc v : SUPPORTED_PROTOCOL_VERSIONS) {
-					if (version.equals(v.getId())) {
-						value.add(v);
-					}
-				}
-			}
-			enabledProtocolVersions = value.toArray(new WebSocketProtocolIfc[value.size()]);
-		}
-		super.setProperties(props);
-	}
-	
 	@Override
 	protected int[] getDefPlainPorts() {
 		return new int[] { 5290 };

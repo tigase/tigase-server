@@ -21,6 +21,7 @@
  */
 package tigase.server.websocket;
 
+import tigase.kernel.beans.Bean;
 import tigase.util.Base64;
 
 import java.io.IOException;
@@ -43,6 +44,7 @@ import static tigase.server.websocket.WebSocketXMPPIOService.State.closing;
  * 
  * @author andrzej
  */
+@Bean(name = "hybiProtocol", parent = WebSocketClientConnectionManager.class)
 public class WebSocketHybi implements WebSocketProtocolIfc {
 
 	private static final Logger log = Logger.getLogger(WebSocketHybi.class.getCanonicalName());

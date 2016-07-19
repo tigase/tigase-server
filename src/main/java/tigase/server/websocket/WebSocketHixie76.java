@@ -21,6 +21,7 @@
  */
 package tigase.server.websocket;
 
+import tigase.kernel.beans.Bean;
 import tigase.net.SocketType;
 
 import java.io.IOException;
@@ -40,6 +41,7 @@ import java.util.logging.Logger;
  *
  * @author andrzej
  */
+@Bean(name = "hyxie76Protocol", parent = WebSocketClientConnectionManager.class, active = false)
 public class WebSocketHixie76 implements WebSocketProtocolIfc {
 	
 	private static final Logger log = Logger.getLogger(WebSocketHixie76.class.getCanonicalName());
