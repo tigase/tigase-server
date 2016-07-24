@@ -405,9 +405,18 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 				if (expParent.equals(req)) {
 					toRegister.add(0, e.getKey());
 					it.remove();
+					continue;
+				}
+				Class[] exParents = e.getValue().parents();
+				for (Class exp : exParents) {
+					if (exp.equals(req)) {
+						toRegister.add(0, e.getKey());
+						it.remove();
+						break;
+					}
 				}
 			}
-		} while ((req = req.getSuperclass()) != null && !matching.isEmpty());
+		} while ((req = req.getSuperclass()) != null && !req.equals(Object.class) && !matching.isEmpty());
 		return toRegister;
 	}
 
@@ -417,11 +426,20 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 			return null;
 
 		Class parent = annotation.parent();
-		if (parent == Object.class)
-			return null;
+		if (parent == Object.class) {
+			Class[] parents = annotation.parents();
+			boolean matches = false;
 
-		if (!parent.isAssignableFrom(requiredClass))
+			for (Class p : parents) {
+				matches |= !p.isAssignableFrom(requiredClass);
+			}
+
+			if (!matches)
+				return null;
+
+		} else if (!parent.isAssignableFrom(requiredClass)) {
 			return null;
+		}
 
 		Class<? extends BeanSelector>[] selectors = annotation.selectors();
 		if (selectors.length == 0)

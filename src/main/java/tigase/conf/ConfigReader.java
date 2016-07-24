@@ -142,7 +142,7 @@ public class ConfigReader {
 					break;
 				}
 				case '{': {
-					holder.key = holder.sb.toString().trim();
+					holder.key = (holder.value != null && holder.value instanceof String) ? ((String) holder.value).trim() : holder.sb.toString().trim();
 					holder.sb = new StringBuilder();
 					StateHolder tmp = new StateHolder();
 					tmp.state = State.MAP;

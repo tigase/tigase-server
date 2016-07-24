@@ -32,6 +32,8 @@ public @interface Bean {
 
 	Class parent() default Object.class;
 
+	Class[] parents() default {};
+
 	Class<? extends BeanSelector>[] selectors() default { };
 
 }
