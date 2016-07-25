@@ -38,7 +38,7 @@ import tigase.conf.Configurator;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.server.*
 
-class DelayedReloadTask extends Thread {
+class DelayedReloadTaskPlugMan extends Thread {
 	void run() {
 		Thread.sleep(5000);
 	    ((Configurator) XMPPServer.getConfigurator()).updateMessageRouter();
@@ -150,7 +150,7 @@ else {
         props[tigase.server.xmppsession.SessionManagerConfig.PLUGINS_PROP_KEY] = (pluginsEnabled as String[]);
         conf.putProperties("sess-man", props);
                 
-		new DelayedReloadTask().start();
+		new DelayedReloadTaskPlugMan().start();
 		
         def res = (Iq)p.commandResult(Command.DataType.result)
 

@@ -25,6 +25,7 @@
 package tigase.server.xmppsession;
 
 import tigase.annotations.TigaseDeprecatedComponent;
+import tigase.auth.mechanisms.AbstractSaslSCRAM;
 import tigase.auth.mechanisms.SaslEXTERNAL;
 import tigase.conf.Configurable;
 import tigase.conf.ConfigurationException;
@@ -1607,25 +1608,44 @@ public class SessionManager
 
 			break;
 
-		case CLIENT_AUTH :
-			if (connection != null) {
-				try {
+			case TLS_HANDSHAKE_COMPLETE:
+				if (connection != null) {
+					String tlsUniqueId = Command.getFieldValue(pc, "tls-unique-id");
+					if (tlsUniqueId != null) {
+						byte[] bytes = Base64.decode(tlsUniqueId);
+						connection.putSessionData(AbstractSaslSCRAM.TLS_UNIQUE_ID_KEY, bytes);
+					}
 					String encodedCertificate = Command.getFieldValue(pc, "peer-certificate");
+					if (encodedCertificate != null) {
+						try {
+							byte[] bytes = Base64.decode(encodedCertificate);
 
-					byte[] bytes = Base64.decode(encodedCertificate);
+							ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+							CertificateFactory cf = CertificateFactory.getInstance("X.509");
+							Certificate certificate = cf.generateCertificate(bais);
 
-					ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-					CertificateFactory cf = CertificateFactory.getInstance("X.509");
-					Certificate certificate = cf.generateCertificate(bais);
+							connection.putSessionData(SaslEXTERNAL.PEER_CERTIFICATE_KEY, certificate);
+						} catch (Exception ex) {
+							log.log(Level.FINEST, "could not decode peer certificate", ex);
+						}
+					}
+					 encodedCertificate = Command.getFieldValue(pc, "local-certificate");
+					if (encodedCertificate != null) {
+						try {
+							byte[] bytes = Base64.decode(encodedCertificate);
 
-					connection.putSessionData(SaslEXTERNAL.PEER_CERTIFICATE_KEY, certificate);
-				} catch (Exception ex) {
-					log.log(Level.FINEST, "could not decode peer certificate", ex);
+							ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+							CertificateFactory cf = CertificateFactory.getInstance("X.509");
+							Certificate certificate = cf.generateCertificate(bais);
+
+							connection.putSessionData(AbstractSaslSCRAM.LOCAL_CERTIFICATE_KEY, certificate);
+						} catch (Exception ex) {
+							log.log(Level.FINEST, "could not decode local certificate", ex);
+						}
+					}
 				}
-			}
-			processing_result = true;
-
-			break;
+				processing_result = true;
+				break;
 
 		case STREAM_MOVED :
 			if (connection != null) {

@@ -1,18 +1,9 @@
 package tigase.auth.impl;
 
-import java.io.IOException;
-import java.security.SecureRandom;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.sasl.AuthorizeCallback;
-
 import tigase.auth.AuthRepositoryAware;
 import tigase.auth.DomainAware;
+import tigase.auth.SessionAware;
+import tigase.auth.callbacks.ChannelBindingCallback;
 import tigase.auth.callbacks.PBKDIterationsCallback;
 import tigase.auth.callbacks.SaltCallback;
 import tigase.auth.callbacks.SaltedPasswordCallback;
@@ -20,22 +11,30 @@ import tigase.auth.mechanisms.AbstractSasl;
 import tigase.auth.mechanisms.AbstractSaslSCRAM;
 import tigase.db.AuthRepository;
 import tigase.xmpp.BareJID;
+import tigase.xmpp.XMPPResourceConnection;
 
-public class ScramCallbackHandler implements CallbackHandler, AuthRepositoryAware, DomainAware {
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.security.sasl.AuthorizeCallback;
+import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
+import java.security.cert.Certificate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-	private String domain;
-
-	protected BareJID jid = null;
-
-	protected Logger log = Logger.getLogger(this.getClass().getName());
-
-	private int pbkd2Iterations = 4096;
+public class ScramCallbackHandler implements CallbackHandler, AuthRepositoryAware, SessionAware, DomainAware {
 
 	private final SecureRandom random = new SecureRandom();
-
-	private AuthRepository repo;
-
 	private final byte[] salt;
+	protected BareJID jid = null;
+	protected Logger log = Logger.getLogger(this.getClass().getName());
+	private String domain;
+	private int pbkd2Iterations = 4096;
+	private AuthRepository repo;
+	private XMPPResourceConnection session;
 
 	public ScramCallbackHandler() {
 		this.salt = new byte[10];
@@ -70,7 +69,9 @@ public class ScramCallbackHandler implements CallbackHandler, AuthRepositoryAwar
 	}
 
 	protected void handleCallback(Callback callback) throws UnsupportedCallbackException, IOException {
-		if (callback instanceof PBKDIterationsCallback) {
+		if (callback instanceof ChannelBindingCallback) {
+			handleChannelBindingCallback((ChannelBindingCallback) callback);
+		} else if (callback instanceof PBKDIterationsCallback) {
 			handlePBKDIterationsCallback((PBKDIterationsCallback) callback);
 		} else if (callback instanceof SaltedPasswordCallback) {
 			handleSaltedPasswordCallbackCallback((SaltedPasswordCallback) callback);
@@ -83,7 +84,29 @@ public class ScramCallbackHandler implements CallbackHandler, AuthRepositoryAwar
 		} else {
 			throw new UnsupportedCallbackException(callback, "Unrecognized Callback " + callback);
 		}
+	}
 
+	private void handleChannelBindingCallback(ChannelBindingCallback callback) {
+		if (callback.getRequestedBindType() == AbstractSaslSCRAM.BindType.tls_unique) {
+			callback.setBindingData((byte[]) session.getSessionData(AbstractSaslSCRAM.TLS_UNIQUE_ID_KEY));
+		} else if (callback.getRequestedBindType() == AbstractSaslSCRAM.BindType.tls_server_end_point) {
+			try {
+				Certificate cert = (Certificate) session.getSessionData(AbstractSaslSCRAM.LOCAL_CERTIFICATE_KEY);
+				final String usealgo;
+				final String algo = cert.getPublicKey().getAlgorithm();
+				if (algo.equals("MD5") || algo.equals("SHA-1")) {
+					usealgo = "SHA-256";
+				} else {
+					usealgo = algo;
+				}
+				final MessageDigest md = MessageDigest.getInstance(usealgo);
+				final byte[] der = cert.getEncoded();
+				md.update(der);
+				callback.setBindingData(md.digest());
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 
 	protected void handleNameCallback(NameCallback nc) throws IOException {
@@ -119,7 +142,7 @@ public class ScramCallbackHandler implements CallbackHandler, AuthRepositoryAwar
 			String pwd = repo.getPassword(jid);
 
 			if (pwd == null) {
-				callback.setSaltedPassword(new byte[] {});
+				callback.setSaltedPassword(new byte[]{});
 			} else {
 
 				byte[] saltedPassword = AbstractSaslSCRAM.hi("SHA1", AbstractSaslSCRAM.normalize(pwd), salt, pbkd2Iterations);
@@ -142,4 +165,8 @@ public class ScramCallbackHandler implements CallbackHandler, AuthRepositoryAwar
 		this.domain = domain;
 	}
 
+	@Override
+	public void setSession(XMPPResourceConnection session) {
+		this.session = session;
+	}
 }

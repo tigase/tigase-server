@@ -313,27 +313,48 @@ public class ClientConnectionManager
 
 	@Override
 	public void tlsHandshakeCompleted(XMPPIOService<Object> serv) {
-		sendClientAuthToSessionManager(serv);
+		sendTlsHandshakeCompletedToSessionManager(serv);
 	}
 
-	private void sendClientAuthToSessionManager(XMPPIOService<Object> serv) {
-		if ((serv.getPeerCertificate() != null)) {
-			final String id = (String) serv.getSessionData().get(IOService.SESSION_ID_KEY);
-			if (id != null) {
-				Packet clientAuthCommand = Command.CLIENT_AUTH.getPacket(serv.getConnectionId(), serv.getDataReceiver(),
-						StanzaType.set, this.newPacketId("c2s-"), Command.DataType.submit);
+	private void sendTlsHandshakeCompletedToSessionManager(XMPPIOService<Object> serv) {
+		final String id = (String) serv.getSessionData().get(IOService.SESSION_ID_KEY);
 
-				Command.addFieldValue(clientAuthCommand, "session-id", id);
+		if (id == null) return;
 
-				try {
-					String encodedPeerCertificate = Base64.encode(serv.getPeerCertificate().getEncoded());
-					Command.addFieldValue(clientAuthCommand, "peer-certificate", encodedPeerCertificate);
-				} catch (CertificateEncodingException e) {
-					log.log(Level.WARNING, "Can't encode certificate", e);
-				}
-				addOutPacket(clientAuthCommand);
+		boolean send = false;
+
+		Packet command = Command.TLS_HANDSHAKE_COMPLETE.getPacket(serv.getConnectionId(), serv.getDataReceiver(),
+				StanzaType.set, this.newPacketId("c2s-"), Command.DataType.submit);
+
+		Command.addFieldValue(command, "session-id", id);
+
+		if ((serv.getLocalCertificate() != null)) {
+			try {
+				String encodedLocalCertificate = Base64.encode(serv.getLocalCertificate().getEncoded());
+				Command.addFieldValue(command, "local-certificate", encodedLocalCertificate);
+				send = true;
+			} catch (CertificateEncodingException e) {
+				log.log(Level.WARNING, "Can't encode certificate", e);
 			}
 		}
+
+		if (serv.getTlsUniqueId() != null) {
+			String data = Base64.encode(serv.getTlsUniqueId());
+			Command.addFieldValue(command, "tls-unique-id", data);
+			send = true;
+		}
+
+		if ((serv.getPeerCertificate() != null)) {
+			try {
+				String encodedPeerCertificate = Base64.encode(serv.getPeerCertificate().getEncoded());
+				Command.addFieldValue(command, "peer-certificate", encodedPeerCertificate);
+				send = true;
+			} catch (CertificateEncodingException e) {
+				log.log(Level.WARNING, "Can't encode certificate", e);
+			}
+		}
+		if (send)
+			addOutPacket(command);
 	}
 	
 	@Override
@@ -472,7 +493,7 @@ public class ClientConnectionManager
 			}
 			addOutPacketWithTimeout(streamOpen, startedHandler, 45l, TimeUnit.SECONDS);
 
-			sendClientAuthToSessionManager(serv);			
+			sendTlsHandshakeCompletedToSessionManager(serv);
 			log.log(Level.FINER, "DONE 2");
 		} else {
 			if (log.isLoggable(Level.FINER)) {

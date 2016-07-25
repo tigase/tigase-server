@@ -68,7 +68,7 @@ public enum Command {
 	 * Command sent from connection manager to the session manager after TLS handshake if
 	 * client sent certificate.
 	 */
-	CLIENT_AUTH(Priority.SYSTEM),
+	TLS_HANDSHAKE_COMPLETE(Priority.SYSTEM),
 
 	/**
 	 * Command sent from session manager to the connection manager after successful
