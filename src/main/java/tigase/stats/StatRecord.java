@@ -113,6 +113,14 @@ public class StatRecord {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(component).append('/').append(description);
+
+		sb.append('[');
+		if (longValue > -1) { sb.append('L');
+		} else if (intValue > -1) { sb.append('I');
+		} else if (floatValue > -1f) { sb.append('F');
+		} else { sb.append('S'); }
+		sb.append(']');
+
 		sb.append(" = ").append(value);
 		return sb.toString();
 	}

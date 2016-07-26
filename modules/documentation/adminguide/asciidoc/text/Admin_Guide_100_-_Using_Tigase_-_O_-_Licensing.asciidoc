@@ -1,5 +1,5 @@
 [[licenseserver]]
-== Licensing
+= Licensing
 :author: Daniel Wisnewski
 :version: v1.0, March 2016
 :date: 2016-03-15 11:00

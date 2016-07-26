@@ -74,8 +74,11 @@ public class BindResource
 	private static final Element[] DISCO_FEATURES = { new Element("feature", new String[] {
 			"var" }, new String[] { XMLNS }) };
 
+	private static final String RESOURCE_PREFIX_DEF = "tigase-";
+
+
 	//~--- fields ---------------------------------------------------------------
-	private String resourceDefPrefix = "tigase-";
+	private String resourceDefPrefix = RESOURCE_PREFIX_DEF;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -88,13 +91,10 @@ public class BindResource
 	public void init(Map<String, Object> settings) throws TigaseDBException {
 
 		int hostnameHash = Math.abs( DNSResolverFactory.getInstance().getDefaultHost().hashCode() );
-		
+
 		// Init plugin configuration
-		if (settings.get(DEF_RESOURCE_PREFIX_PROP_KEY) != null) {
-			resourceDefPrefix = hostnameHash + "-" + settings.get(DEF_RESOURCE_PREFIX_PROP_KEY).toString();
-		} else {
-			resourceDefPrefix = hostnameHash + "-" + resourceDefPrefix;
-		}
+		resourceDefPrefix = hostnameHash + "-" + settings.getOrDefault(DEF_RESOURCE_PREFIX_PROP_KEY, RESOURCE_PREFIX_DEF);
+
 	}
 
 	@Override

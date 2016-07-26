@@ -304,48 +304,8 @@ public class WebSocketXMPPIOService<RefObject>
 	 */
 	private void processWebSocketHandshake(byte[] buf) throws NoSuchAlgorithmException, IOException {
 		HashMap<String, String> headers = new HashMap<String, String>();
-		int i                           = 0;
+		int i = parseHttpHeaders(buf, headers);
 
-		while (buf[i] != '\n') {
-			i++;
-		}
-		i++;
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "parsing request = \n{0}", new String(buf));
-		}
-
-		StringBuilder builder = new StringBuilder(64);
-		String key            = null;
-
-		for (; i < buf.length; i++) {
-			switch (buf[i]) {
-			case ':' :
-				if (key == null) {
-					key     = builder.toString();
-					builder = new StringBuilder(64);
-					i++;
-				} else {
-					builder.append((char) buf[i]);
-				}
-
-				break;
-
-			case '\r' :
-				headers.put(key, builder.toString());
-				key     = null;
-				builder = new StringBuilder(64);
-				if (buf[i + 2] == '\r') {
-					i += 3;
-				} else {
-					i++;
-				}
-
-				break;
-
-			default :
-				builder.append((char) buf[i]);
-			}
-		}
 		if (!headers.containsKey(CONNECTION_KEY) ||
 				!headers.get(CONNECTION_KEY).contains("Upgrade")) {
 			writeRawData(BAD_REQUEST);
@@ -379,6 +339,61 @@ public class WebSocketXMPPIOService<RefObject>
 			dumpHeaders(headers);
 			forceStop();
 		}
+	}
+
+	protected int parseHttpHeaders(byte[] buf, Map<String, String> headers) {
+		int i                           = 0;
+
+		while (buf[i] != '\n') {
+			i++;
+		}
+		i++;
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "parsing request = \n{0}", new String(buf));
+		}
+
+		StringBuilder builder = new StringBuilder(64);
+		String key            = null;
+
+		boolean skipWhitespace = false;
+		for (; i < buf.length; i++) {
+			switch (buf[i]) {
+				case ':':
+					if (key == null) {
+						key = builder.toString().trim();
+						builder = new StringBuilder(64);
+						skipWhitespace = true;
+					} else {
+						builder.append((char) buf[i]);
+					}
+
+					break;
+
+				case '\r':
+					headers.put(key, builder.toString().trim());
+					key = null;
+					builder = new StringBuilder(64);
+					if (buf[i + 2] == '\r') {
+						i += 3;
+					} else {
+						i++;
+					}
+
+					break;
+
+				case ' ':
+				case '\t':
+					if (!skipWhitespace) {
+						builder.append((char) buf[i]);
+					}
+					break;
+
+				default:
+					skipWhitespace = false;
+					builder.append((char) buf[i]);
+			}
+		}
+		return i;
 	}
 	
 	@Override

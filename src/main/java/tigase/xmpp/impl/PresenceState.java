@@ -608,8 +608,8 @@ public class PresenceState extends PresenceAbstract implements XMPPStopListenerI
 								 new Object[] { packet.getStanzaFrom(),
 																online } );
 			}
-			updatePresenceChange(packet, session, results);
 		}
+		updatePresenceChange(packet, session, results);
 	}
 
 	/**

@@ -16,8 +16,6 @@ Please note that not all issues are accessible as notes and fixes may contain pr
 
 Tigase has undergone a few major changes to our code and structure. To continue to use Tigase, a few changes may be needed to be made to your systems.  Please see them below:
 
-
-
 === HTTP Component renamed
 The HTTP component has been renamed, if you still have the old tigase.rest.RestMessageReciever in your init.properties file, please update the component name to:
 [source,bash]

@@ -22,12 +22,11 @@
 
 package tigase.auth.mechanisms;
 
-import java.util.Map;
-
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
 import javax.security.sasl.SaslServerFactory;
+import java.util.Map;
 
 public class TigaseSaslServerFactory implements SaslServerFactory {
 
@@ -42,6 +41,8 @@ public class TigaseSaslServerFactory implements SaslServerFactory {
 		switch (mechanism) {
 			case "SCRAM-SHA-1":
 				return new SaslSCRAM(props, callbackHandler);
+			case "SCRAM-SHA-1-PLUS":
+				return new SaslSCRAMPlus(props, callbackHandler);
 			case "PLAIN":
 				return new SaslPLAIN(props, callbackHandler);
 			case "ANONYMOUS":
@@ -55,7 +56,13 @@ public class TigaseSaslServerFactory implements SaslServerFactory {
 
 	@Override
 	public String[] getMechanismNames(Map<String, ?> props) {
-		return new String[] { "SCRAM-SHA-1", "PLAIN", "ANONYMOUS", "EXTERNAL" };
+		return new String[]{
+				"SCRAM-SHA-1-PLUS",
+				"SCRAM-SHA-1",
+				"PLAIN",
+				"EXTERNAL",
+				"ANONYMOUS",
+		};
 	}
 
 }

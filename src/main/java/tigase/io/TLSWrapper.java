@@ -212,6 +212,10 @@ public class TLSWrapper {
 		return tlsEngineResult.bytesConsumed();
 	}
 
+	public byte[] getSessionId(){
+		return tlsEngine.getSession().getId();
+	}
+
 	/**
 	 * Method description
 	 * 

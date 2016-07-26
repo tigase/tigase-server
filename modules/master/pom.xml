@@ -13,6 +13,7 @@
 		<sign-storepass>storepass</sign-storepass>
 		<sign-keypass>keypass</sign-keypass>
 		<sign-skip>true</sign-skip>
+		<verbose-log>false</verbose-log>
 	</properties>
 
 	<modelVersion>4.0.0</modelVersion>

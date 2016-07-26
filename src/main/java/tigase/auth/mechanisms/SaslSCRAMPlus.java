@@ -4,16 +4,16 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.sasl.SaslException;
 import java.util.Map;
 
-public class SaslSCRAM extends AbstractSaslSCRAM {
+public class SaslSCRAMPlus extends AbstractSaslSCRAM {
 
-	protected final static String NAME = "SCRAM-SHA-1";
+	protected final static String NAME = "SCRAM-SHA-1-PLUS";
 	protected final static String ALGO = "SHA1";
 
-	public SaslSCRAM(Map<? super String, ?> props, CallbackHandler callbackHandler) {
+	public SaslSCRAMPlus(Map<? super String, ?> props, CallbackHandler callbackHandler) {
 		super(NAME, ALGO, DEFAULT_CLIENT_KEY, DEFAULT_SERVER_KEY, props, callbackHandler);
 	}
 
-	SaslSCRAM(Map<? super String, ?> props, CallbackHandler callbackHandler, String once) {
+	SaslSCRAMPlus(Map<? super String, ?> props, CallbackHandler callbackHandler, String once) {
 		super(NAME, ALGO, DEFAULT_CLIENT_KEY, DEFAULT_SERVER_KEY, props, callbackHandler, once);
 	}
 
@@ -21,12 +21,12 @@ public class SaslSCRAM extends AbstractSaslSCRAM {
 	protected void checkRequestedBindType(BindType requestedBindType) throws SaslException {
 		switch (requestedBindType) {
 			case n:
-				break;
+				throw new SaslException("Invalid request for " + NAME);
 			case y:
 				throw new SaslException("Server supports PLUS. Please use 'p'");
 			case tls_server_end_point:
 			case tls_unique:
-				throw new SaslException("Invalid request for "+NAME);
+				break;
 		}
 	}
 }

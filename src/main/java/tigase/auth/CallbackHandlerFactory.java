@@ -58,6 +58,8 @@ public class CallbackHandlerFactory {
 			return (String) settings.get(CALLBACK_HANDLER_KEY);
 		} else if (mechanismName.equals("SCRAM-SHA-1")) {
 			return ScramCallbackHandler.class.getName();
+		} else if (mechanismName.equals("SCRAM-SHA-1-PLUS")) {
+			return ScramCallbackHandler.class.getName();
 		} else {
 			return null;
 		}

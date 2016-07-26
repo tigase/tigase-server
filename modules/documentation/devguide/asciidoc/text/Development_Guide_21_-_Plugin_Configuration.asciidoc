@@ -46,7 +46,7 @@ private static final String[] PLUGINS_FULL_PROP_VAL =
    "http://jabber.org/protocol/stats", "starttls", "msgoffline",
    "vcard-temp", "http://jabber.org/protocol/commands", "jabber:iq:private",
    "urn:xmpp:ping", "basic-filter", "domain-filter"};
-   -----
+-----
 
 
 In you wish to load a plugin outside these defaults, you have to edit the list and add your plugin IDs as a value to the plugin list property. Let's say our plugin ID is *message* as in our all examples:
