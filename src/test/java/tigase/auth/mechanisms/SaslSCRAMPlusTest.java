@@ -26,10 +26,44 @@ public class SaslSCRAMPlusTest extends TestCase {
 	@Before
 	public void setUp() throws Exception {
 		m = new SaslSCRAMPlus(null,
-				new TestCallbackHandler(), "5kLrhitKUHVoSOmzdR") {
+				new TestCallbackHandler("Ey6OJnGx7JEJAIJp", new byte[]{'D', 'P', 'I'}), "5kLrhitKUHVoSOmzdR") {
 		};
 	}
 
+	@Test
+	public void testInvalidBinding() {
+		SaslSCRAMPlus m = new SaslSCRAMPlus(null,
+				new TestCallbackHandler("AecUfGKyBAbZjjXW", new byte[]{'D', 'P', 'I'}), "k5m3fXaEqPQ0zxIjpl") {
+		};
+
+		try {
+			byte[] r = m.evaluateResponse("p=tls-unique,,n=bmalkow,r=mnKBtk4+09BtRQM3AkSsjsE5".getBytes());
+			Assert.assertEquals("r=mnKBtk4+09BtRQM3AkSsjsE5k5m3fXaEqPQ0zxIjpl,s=AecUfGKyBAbZjjXW,i=4096", new String(r));
+
+			r = m.evaluateResponse("c=cD10bHMtdW5pcXVlLCxEVVBB,r=mnKBtk4+09BtRQM3AkSsjsE5k5m3fXaEqPQ0zxIjpl,p=BatbnZpQ+UolSyWBozXyvS8Yl78=".getBytes());
+			fail();
+
+		} catch (SaslException e) {
+			Assert.assertEquals("Channel bindings dont match", e.getMessage());
+		}
+	}
+
+	@Test
+	public void testModifiedBinding() {
+		final SaslSCRAMPlus m = new SaslSCRAMPlus(null,
+				new TestCallbackHandler("AecUfGKyBAbZjjXW", new byte[]{'D', 'P', 'I'}), "k5m3fXaEqPQ0zxIjpl");
+
+		try {
+			byte[] r = m.evaluateResponse("p=tls-unique,,n=bmalkow,r=mnKBtk4+09BtRQM3AkSsjsE5".getBytes());
+			Assert.assertEquals("r=mnKBtk4+09BtRQM3AkSsjsE5k5m3fXaEqPQ0zxIjpl,s=AecUfGKyBAbZjjXW,i=4096", new String(r));
+
+			// Channel binding data modified by Mallet to value expected by server
+			r = m.evaluateResponse("c=cD10bHMtdW5pcXVlLCxEUEk=,r=mnKBtk4+09BtRQM3AkSsjsE5k5m3fXaEqPQ0zxIjpl,p=BatbnZpQ+UolSyWBozXyvS8Yl78=".getBytes());
+			fail();
+		} catch (SaslException e) {
+			Assert.assertEquals("Password not verified", e.getMessage());
+		}
+	}
 
 	@Test
 	public void testServerFirstMessageFail_1() {
@@ -52,8 +86,6 @@ public class SaslSCRAMPlusTest extends TestCase {
 		}
 	}
 
-
-
 	@Test
 	public void testServerFirstMessageWithBinding() {
 		try {
@@ -74,17 +106,26 @@ public class SaslSCRAMPlusTest extends TestCase {
 
 	private class TestCallbackHandler implements CallbackHandler {
 
+		private final byte[] bindingData;
+
+		private final String salt;
+
+		public TestCallbackHandler(String salt, byte[] bindingData) {
+			this.bindingData = bindingData;
+			this.salt = salt;
+		}
+
 		@Override
 		public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
 			for (Callback callback : callbacks) {
 				if (callback instanceof ChannelBindingCallback) {
 					if (((ChannelBindingCallback) callback).getRequestedBindType() == AbstractSaslSCRAM.BindType.tls_unique)
-						((ChannelBindingCallback) callback).setBindingData(new byte[]{'D', 'P', 'I'});
+						((ChannelBindingCallback) callback).setBindingData(bindingData);
 				} else if (callback instanceof PBKDIterationsCallback) {
 					((PBKDIterationsCallback) callback).setInterations(4096);
 				} else if (callback instanceof SaltedPasswordCallback) {
 					try {
-						byte[] r = AbstractSaslSCRAM.hi("SHA1", "123456".getBytes(), Base64.decode("Ey6OJnGx7JEJAIJp"), 4096);
+						byte[] r = AbstractSaslSCRAM.hi("SHA1", "123456".getBytes(), Base64.decode(salt), 4096);
 						((SaltedPasswordCallback) callback).setSaltedPassword(r);
 					} catch (Exception e) {
 						throw new RuntimeException(e);
@@ -92,7 +133,7 @@ public class SaslSCRAMPlusTest extends TestCase {
 				} else if (callback instanceof NameCallback) {
 					((NameCallback) callback).setName("user@domain.com");
 				} else if (callback instanceof SaltCallback) {
-					((SaltCallback) callback).setSalt(Base64.decode("Ey6OJnGx7JEJAIJp"));
+					((SaltCallback) callback).setSalt(Base64.decode(salt));
 				} else if (callback instanceof AuthorizeCallback) {
 					((AuthorizeCallback) callback).setAuthorized(true);
 					((AuthorizeCallback) callback).setAuthorizedID("user@domain.com");

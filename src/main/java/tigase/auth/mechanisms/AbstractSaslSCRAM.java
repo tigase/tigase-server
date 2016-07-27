@@ -233,7 +233,7 @@ public abstract class AbstractSaslSCRAM extends AbstractSasl {
 		final String clmProof = r.group("proof");
 
 		String calculatedCb = calculateC();
-		if (!clmCb.startsWith(calculatedCb)) {
+		if (!clmCb.startsWith(cfmGs2header)) {
 			throw new XmppSaslException(SaslError.not_authorized, "Invalid GS2 header");
 		} else if (!clmCb.equals(calculatedCb)) {
 			throw new XmppSaslException(SaslError.not_authorized, "Channel bindings dont match");
