@@ -120,15 +120,16 @@ The database connection URL for the socks5 repository.
 proxy/repo-params=
 -----
 
-Comma separated parameters for +LimitsVerifier+ which will override the defaults.
+Comma separated parameters for +LimitsVerifier+ which will override the defaults.  All of these limits are on a per calendar month basis.
+For example, a user is limited to 10MB for all transfers.  If he transfers 8MB between the 1st and the 22nd, he only has 2MB left in his limit.  On the 1st of the following month, his limit is reset to 10MB.
 
 Available parameters:
 
-- +global-limit+ - Transfer limit for all domains in MB.
-- +instance-limit+ - Transfer limit for server instance in MB.
-- +default-domain-limit+ - The Default transfer limit per domain in MB.
-- +default-user-limit+ - The default transfer limit per user in MB.
-- +default-file-limit+ - The default transfer limit per file in MB.
+- +global-limit+ - Transfer limit for all domains in MB per month.
+- +instance-limit+ - Transfer limit for server instance in MB per month.
+- +default-domain-limit+ - The Default transfer limit per domain in MB per month.
+- +default-user-limit+ - The default transfer limit per user in MB per month.
+- +default-file-limit+ - The default transfer limit per file in MB per month.
 
 === *+remote-addresses+*
 [source,properties]
