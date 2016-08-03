@@ -231,6 +231,8 @@ include::text/Admin_Guide_74_-_Components_-_J_-_External_Component_Configuration
 
 include::text/Admin_Guide_103_-_Components_-_K_-_C2S.asciidoc[]
 
+include::text/Admin_Guide_106_-_Components_-_L_-_Socks5.asciidoc[]
+
 include::text/Admin_Guide_75_-_Virtual_Hosts_in_the_Tigase_Server.asciidoc[]
 
 :leveloffset: 3
