@@ -42,7 +42,7 @@ import java.text.ParseException;
 @Bean(name = "mamQueryParser")
 public class MAMQueryParser implements QueryParser<Query> {
 
-	private static final String MAM_XMLNS = "urn:xmpp:mam:1";
+	protected static final String MAM_XMLNS = "urn:xmpp:mam:1";
 
 	private final TimestampHelper timestampHelper = new TimestampHelper();
 
@@ -95,14 +95,18 @@ public class MAMQueryParser implements QueryParser<Query> {
 		Element x = DataForm.addDataForm(elem, Command.DataType.form);
 		DataForm.addHiddenField(elem, "FORM_TYPE", MAM_XMLNS);
 
-		addField(x, "with", "jid-single");
-		addField(x, "start", "jid-single");
-		addField(x, "end", "jid-single");
+		addField(x, "with", "jid-single", "With");
+		addField(x, "start", "jid-single", "Start");
+		addField(x, "end", "jid-single", "End");
 
 		return elem;
 	}
 
-	private void addField(Element x, String var, String type) {
-		x.addChild(new Element("field", new String[] { "type", "var" }, new String[] { type, var }));
+	protected void addField(Element x, String var, String type, String label) {
+		Element field = new Element("field", new String[] { "type", "var" }, new String[] { type, var });
+		if (label != null) {
+			field.setAttribute("label", label);
+		}
+		x.addChild(field);
 	}
 }
