@@ -57,6 +57,7 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 	
 	private static final Map<String, MsgRepositoryIfc> repos =
 			new ConcurrentSkipListMap<String, MsgRepositoryIfc>();
+	private ReentrantLock expiredMessagesLock;
 	private Condition expiredMessagesCondition;
 
 	public enum MSG_TYPES { none(0), message(1), presence(2);
@@ -109,9 +110,15 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 	protected DelayQueue<MsgDBItem<T>> expiredQueue = new DelayQueue<MsgDBItem<T>>() {
 		@Override
 		public boolean offer(MsgDBItem msgDBItem) {
-			boolean result = super.offer(msgDBItem);
-			if (result && expiredMessagesCondition != null)
-				expiredMessagesCondition.signal();
+			expiredMessagesLock.lock();
+			boolean result = false;;
+			try {
+				result =  super.offer(msgDBItem);
+				if (result && expiredMessagesCondition != null)
+					expiredMessagesCondition.signal();
+			} finally {
+				expiredMessagesLock.unlock();
+			}
 			return result;
 		}
 	};
@@ -208,7 +215,8 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 	}
 
 	@Override
-	public void setCondition(Condition condition) {
+	public void setCondition(ReentrantLock lock, Condition condition) {
+		this.expiredMessagesLock = lock;
 		this.expiredMessagesCondition = condition;
 	}
 
@@ -286,6 +294,7 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 
 		@Override
 		public Element getMessageExpired(long time, boolean delete) {
+			lock.lock();
 			try {
 				for (MsgRepositoryIfc repo : getRepositories()) {
 					Element el = repo.getMessageExpired(time, delete);
@@ -295,6 +304,8 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 				expiredMessagesCondition.await();
 			} catch (InterruptedException e) {
 				log.log(Level.FINER, "awaiting for expired messages interrupted");
+			} finally {
+				lock.unlock();
 			}
 
 			return null;
@@ -321,7 +332,7 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 		@Override
 		protected void initializeRepository(String domain, MsgRepositoryIfc repo) {
 			super.initializeRepository(domain, repo);
-			repo.setCondition(expiredMessagesCondition);
+			repo.setCondition(lock, expiredMessagesCondition);
 		}
 
 		protected <T> T getValueForDomain(Map<String,T> map, String domain) {
@@ -337,7 +348,7 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 		}
 
 		@Override
-		public void setCondition(Condition condition) {
+		public void setCondition(ReentrantLock lock, Condition condition) {
 
 		}
 

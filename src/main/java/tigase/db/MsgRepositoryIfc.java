@@ -22,12 +22,13 @@
 package tigase.db;
 
 import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by andrzej on 13.03.2016.
  */
 public interface MsgRepositoryIfc<T extends DataSource> extends OfflineMsgRepositoryIfc, DataSourceAware<T> {
 
-	void setCondition(Condition condition);
+	void setCondition(ReentrantLock lock, Condition condition);
 
 }
