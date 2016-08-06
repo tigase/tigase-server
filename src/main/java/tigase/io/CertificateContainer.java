@@ -69,7 +69,7 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 	private KeyStore trustKeyStore = null;
 
 	@ConfigField(desc = "Alias for default certificate")
-	private String def_cert_alias = null;
+	private String def_cert_alias = DEFAULT_DOMAIN_CERT_VAL;
 	private File[] certsDirs = null;
 	private char[] emptyPass = new char[0];
 

@@ -125,9 +125,18 @@ public class ConfigReader {
 				}
 				case ']': {
 					List val = holder.list;
-					if (holder.value != null) {
-						val.add(holder.value instanceof String ? decodeValue((String) holder.value) : holder.value);
+					if (holder.value == null) {
+						String valueStr = holder.sb.toString().trim();
+						if (!valueStr.isEmpty()) {
+							Object value = decodeValue(valueStr);
+							holder.list.add(value);
+						}
+					} else {
+						holder.list.add(holder.value);
 					}
+//					if (holder.value != null) {
+//						val.add(holder.value instanceof String ? decodeValue((String) holder.value) : holder.value);
+//					}
 					holder = holder.parent;
 					holder.value = val;
 					break;
@@ -189,7 +198,7 @@ public class ConfigReader {
 			}
 		}
 		if (holder.state != State.MAP || holder.parent != null) {
-			throw new IOException("Parsing error - invalid file structure");
+			throw new IOException("Parsing error - invalid file structure, state = " + holder.state + ", parent = " + holder.parent);
 		}
 		return holder.map;
 	}

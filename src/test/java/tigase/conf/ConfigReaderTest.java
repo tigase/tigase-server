@@ -120,8 +120,19 @@ public class ConfigReaderTest {
 			System.out.println("checking key = " + prefix + e.getKey());
 			if (value instanceof Map) {
 				assertMapEquals((Map<String, Object>) e.getValue(), (Map) value, prefix + e.getKey() + "/");
+			} else if(value instanceof List) {
+				assertListEquals((List) e.getValue(), (List) value);
+			} else {
+				assertEquals(e.getValue(), value);
 			}
-			assertEquals(e.getValue(), value);
+		}
+	}
+
+	private void assertListEquals(List expected, List actual) {
+		assertEquals(expected.size(), actual.size());
+
+		for (int i=0; i<expected.size(); i++) {
+			assertEquals(expected.get(i), actual.get(i));
 		}
 	}
 }

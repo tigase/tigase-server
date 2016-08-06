@@ -23,9 +23,7 @@ package tigase.component;
 
 import tigase.kernel.BeanUtils;
 import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.config.AbstractBeanConfigurator;
-import tigase.kernel.beans.config.BeanConfigurator;
-import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.beans.config.*;
 import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.DependencyManager;
 import tigase.kernel.core.Kernel;
@@ -44,6 +42,8 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 	private HashMap<String, Object> getBeanProps(BeanConfig beanConfig) {
 		HashMap<String, Object> result = new HashMap<>();
 
+		Map<String, String> configAliasses = getConfigAliasses(beanConfig);
+
 		// this map needs to be filled with name of fields or field aliases
 		// which implements Map
 		Set<String> mapFields = new HashSet<>();
@@ -55,10 +55,13 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 				if (Map.class.isAssignableFrom(field.getType())) {
 					mapFields.add(field.getName());
 				}
-				if (!cf.alias().isEmpty()) {
-					aliases.add(cf.alias());
+				String alias = configAliasses.get(field.getName());
+				if  (alias == null)
+					alias = cf.alias();
+				if (!alias.isEmpty()) {
+					aliases.add(alias);
 					if (Map.class.isAssignableFrom(field.getType())) {
-						mapFields.add(cf.alias());
+						mapFields.add(alias);
 					}
 				}
 			}
@@ -119,6 +122,22 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 		return result;
 	}
 
+	protected Map<String, String> getConfigAliasses(BeanConfig beanConfig) {
+		Map<String, String> configAliasses = new HashMap<>();
+		Class<?> cls = beanConfig.getClass();
+		do {
+			ConfigAliases ca = cls.getAnnotation(ConfigAliases.class);
+			if (ca != null) {
+				for (ConfigAlias a : ca.value()) {
+					configAliasses.put(a.field(), a.alias());
+				}
+			} else {
+				break;
+			}
+		} while ((cls = cls.getSuperclass()) != null);
+		return configAliasses;
+	}
+
 	@Override
 	protected Map<String, Object> getConfiguration(BeanConfig beanConfig) {
 		final HashMap<String, Object> valuesToSet = new HashMap<>();
@@ -141,6 +160,7 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 	protected void resolveAliases(BeanConfig beanConfig, Map<String, Object> props, Map<String, Object> valuesToSet) {
 		// Preparing set of properties based on @ConfigField annotation and
 		// aliases
+		Map<String,String> configAliasses = getConfigAliasses(beanConfig);
 		Field[] fields = DependencyManager.getAllFields(beanConfig.getClazz());
 		for (Field field : fields) {
 			final ConfigField cf = field.getAnnotation(ConfigField.class);
@@ -156,6 +176,13 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 					log.config("Using alias '" + cf.alias() + "' for property " + beanConfig.getBeanName() + "." + field.getName());
 
 				valuesToSet.put(field.getName(), value);
+			}
+			if (cf != null && configAliasses.containsKey(field.getName())) {
+				String alias = configAliasses.get(field.getName());
+				final Object value = props.get(alias);
+				if (value != null) {
+					valuesToSet.put(field.getName(), value);
+				}
 			}
 		}
 	}

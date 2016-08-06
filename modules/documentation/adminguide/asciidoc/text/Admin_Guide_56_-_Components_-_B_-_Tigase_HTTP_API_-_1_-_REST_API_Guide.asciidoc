@@ -36,7 +36,7 @@ Here are some additional properties for the +HttpMessageReceiver+ component that
 - +{compname}/*********/socket=ssl+ - Sets the port for SSL connections, replace ### with the port number of your choice.
 - +{compname}/*********/domain=example.com+ - This sets the domain name of the SSL certificate from Tigase XMPP certificate store, also sets the port to ### to listen for HTTPS connections.
 - +{compname}/server-class=+ - Sets the name of the class used to manage the HTTP server. Currently there are the following options:
-. +tigase.http.JettyStandaloneHttpServer+ - Starts standalone Jetty HTTP Server instance *(requires Tigase HTTP API - Jetty HTTP Server)*
+. +tigase.http.jetty.JettyStandaloneHttpServer+ - Starts standalone Jetty HTTP Server instance *(requires Tigase HTTP API - Jetty HTTP Server)*
 . +tigase.http.jetty.JettyOSGIHttpServer+ - Uses Jetty HTTP Server instance available as OSGi service (may be used only in OSGi envoirment) *(require Tigase HTTP API - Jetty HTTP Server)*
 . +tigase.http.java.JavaStandaloneHttpServer+ - Uses +HttpServer+ provided by Java JDK to start standalone HTTP server (may not work on JDK from every JDK provider).
 . +{compname}/http/threads=+ - Sets the number of threads available for HTTP component. Default is 4.

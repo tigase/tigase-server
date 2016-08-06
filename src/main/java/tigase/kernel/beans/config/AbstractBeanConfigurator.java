@@ -29,6 +29,7 @@ import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.Converter;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.core.BeanConfig;
+import tigase.kernel.core.BeanConfigBuilder;
 import tigase.kernel.core.DependencyManager;
 import tigase.kernel.core.Kernel;
 import tigase.osgi.ModulesManagerImpl;
@@ -313,9 +314,14 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 					}
 				}
 				if (register) {
+					BeanConfig oldCfg = kernel.getDependencyManager().getBeanConfig(cfg.getBeanName());
 					try {
 						Class<?> cls = ModulesManagerImpl.getInstance().forName(cfg.getClazzName());
-						BeanConfig registeredBeanConfig = kernel.registerBean(cfg.getBeanName()).asClass(cls).setActive(cfg.isActive()).execWithoutInject();
+						BeanConfigBuilder cfgBuilder = kernel.registerBean(cfg.getBeanName()).asClass(cls).setActive(cfg.isActive());
+						if (oldCfg != null && oldCfg.isExportable()) {
+							cfgBuilder.exportable();
+						}
+						BeanConfig registeredBeanConfig = cfgBuilder.execWithoutInject();
 						if (registeredBeanConfig != null) {
 							registeredBeans.add(registeredBeanConfig);
 						}

@@ -58,6 +58,10 @@ public class ConfigWriter {
 	}
 
 	private void writeObject(Writer writer, Object obj) throws IOException {
+		writeObject(writer, obj, "\n");
+	}
+
+	private void writeObject(Writer writer, Object obj, String newLine) throws IOException {
 		if (obj instanceof Map) {
 			writer.write("{\n");
 			indent++;
@@ -65,17 +69,30 @@ public class ConfigWriter {
 			indent--;
 			writeIndent(writer);
 			writer.write("}\n");
-		} else if (obj instanceof List) {
-			writer.write("[\n");
-			indent++;
-			writeList(writer, (List) obj);
-			indent--;
-			writeIndent(writer);
-			writer.write("]\n");
+		} else if (obj instanceof Collection) {
+			List list = (obj instanceof List) ? (List) obj : new ArrayList((Collection) obj);
+			boolean simple = true;
+			for (Object o : list) {
+				simple &= (o instanceof Number) || (o instanceof String);
+			}
+			if (simple) {
+				writer.write("[ ");
+				writeListSimple(writer, list);
+				writer.write(" ]\n");
+			} else {
+				writer.write("[\n");
+				indent++;
+				writeList(writer, list);
+				indent--;
+				writeIndent(writer);
+				writer.write("]\n");
+			}
 		} else if (obj instanceof String) {
 			writer.write('\'');
 			writer.write((String) obj);
-			writer.write("\'\n");
+			writer.write("\'");
+			if (newLine != null)
+				writer.write(newLine);
 		} else {
 			writeString(writer, obj.toString());
 			if (obj instanceof Long) {
@@ -84,7 +101,8 @@ public class ConfigWriter {
 			if (obj instanceof Float) {
 				writeString(writer, "f");
 			}
-			writer.write('\n');
+			if (newLine != null)
+				writer.write(newLine);
 		}
 	}
 
@@ -111,6 +129,18 @@ public class ConfigWriter {
 		for (Object obj : list) {
 			writeIndent(writer);
 			writeObject(writer, obj);
+		}
+	}
+
+	private void writeListSimple(Writer writer, List list) throws IOException {
+		boolean first = true;
+		for (Object obj : list) {
+			if (!first) {
+				writer.write(", ");
+			} else {
+				first = false;
+			}
+			writeObject(writer, obj, null);
 		}
 	}
 
