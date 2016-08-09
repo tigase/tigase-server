@@ -123,6 +123,12 @@ JAVA_OPTIONS="${GC} ${EX} ${ENC} ${DRV} ${JMX_REMOTE_IP} -server ${PRODUCTION_HE
 As the comment says, we recommend adjusting the heap memory settings for your specific installations.
 link:https://projects.tigase.org/issues/3567[#3567]
 
+==== Java Garbage Collection Settings have been improved
+After significant testing and investigation, we have improved the Java GC settings to keep memory usage from becoming too high on systems.
+link:https://projects.tigase.org/issues/3248[#3248]
+
+For more information about JVM defaults and changes to settings, see link:http://docs.tigase.org/tigase-server/snapshot/Administration_Guide/html/#jvm_settings[our Documentation].
+
 === New Rest API added to obtain a JID login time
 
 +GetUserInfo+ command has been expanded to obtain user login and logout times in addition to standard information. See xref:getUserInfoREST[this section] for full details.
@@ -226,6 +232,8 @@ Tigase has improved default settings to improve performance.  These include:
 - Plugins code has been revised.
 - Default thread pools have been increased for better performance.
 - New option added to globally increase thread pool counts +sess-man/sm-threads-factor[I]=1+. Setting increases thread factor by specified factor.
+- Improved JVM default settings.
+- Improved JVM Garbage Collection.
 
 == New Minor Features & Behavior Changes
 
@@ -280,6 +288,9 @@ Tigase has improved default settings to improve performance.  These include:
 - #4162 xml:lang attribute is now supported in Tigase MUC component.
 - #4248 Changed +ErrorCounter+ from +XMPPProcessorIFC+ to +XMPPPacketFilterIfc+ for more accurate functionality.
 - link:https://projects.tigase.org/issues/4256[#4256] Reduced Statistics memory usage by interning statistics labels and changing data types.
+- link:https://projects.tigase.org/issues/4356[#4356] Message Archive component has been converted to kernel and beans.
+- link:https://projects.tigase.org/issues/4352[#4352] Websocket implementation has been changed to properly parse HTTP headers with omitted spaces for HTTP 1.1 protocol.
+- link:https://projects.tigase.org/issues/4358[#4358] Several methods have been renamed or removed to prepare for v7.2.0 Kernel setup.
 
 
 == Fixes
@@ -467,6 +478,10 @@ Tigase has improved default settings to improve performance.  These include:
 - link:https://projects.tigase.org/issues/4185[#4185] Fixed issue with +PacketCounter+ that caused duplicate messages to be sent on stream resumption.
 
 - link:https://projects.tigase.org/issues/4188[#4188] Standardized timestamp between +AbstractMessageArchiveRepository+ and +TimestampHelper+.
+
+- link:https://projects.tigase.org/issues/4262[#4262] Fixed messages getting lost when StreamResumption is used when a disconnected user reconnects to the server.  This issue is also fixed on servers using ACS component.
+
+- link:https://projects.tigase.org/issues/4365[#4365] Fixed direct presence not working with non-roster elements using barejid.
 
 - Patch added to fix ConcurrentModificationException in BlockingCommand plugin.
 
