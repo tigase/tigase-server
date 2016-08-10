@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class SaslSCRAM extends AbstractSaslSCRAM {
 
-	protected final static String NAME = "SCRAM-SHA-1";
+	public final static String NAME = "SCRAM-SHA-1";
 	protected final static String ALGO = "SHA1";
 
 	public SaslSCRAM(Map<? super String, ?> props, CallbackHandler callbackHandler) {
@@ -29,4 +29,5 @@ public class SaslSCRAM extends AbstractSaslSCRAM {
 				throw new SaslException("Invalid request for "+NAME);
 		}
 	}
+
 }

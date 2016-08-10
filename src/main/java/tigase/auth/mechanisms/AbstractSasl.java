@@ -1,19 +1,30 @@
 package tigase.auth.mechanisms;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
 
 public abstract class AbstractSasl implements SaslServer {
 
 	public static final String SASL_STRICT_MODE_KEY = "sasl-strict";
+	protected final Logger log = Logger.getLogger(this.getClass().getName());
+	protected final CallbackHandler callbackHandler;
+	protected final Map<String, Object> negotiatedProperty = new HashMap<String, Object>();
+	protected final Map<? super String, ?> props;
+	protected String authorizedId = null;
+	protected boolean complete = false;
+
+	protected AbstractSasl(Map<? super String, ?> props, CallbackHandler callbackHandler) {
+		this.props = props;
+		this.callbackHandler = callbackHandler;
+	}
 
 	public static boolean isAuthzIDIgnored() {
 		String x = System.getProperty(SASL_STRICT_MODE_KEY, "false");
@@ -22,21 +33,6 @@ public abstract class AbstractSasl implements SaslServer {
 
 	protected static final boolean isEmpty(Object x) {
 		return x == null || x.toString().length() == 0;
-	}
-
-	protected String authorizedId = null;
-
-	protected final CallbackHandler callbackHandler;
-
-	protected boolean complete = false;
-
-	protected final Map<String, Object> negotiatedProperty = new HashMap<String, Object>();
-
-	protected final Map<? super String, ?> props;
-
-	protected AbstractSasl(Map<? super String, ?> props, CallbackHandler callbackHandler) {
-		this.props = props;
-		this.callbackHandler = callbackHandler;
 	}
 
 	@Override
@@ -68,7 +64,7 @@ public abstract class AbstractSasl implements SaslServer {
 
 	protected String[] split(final byte[] byteArray, final String defaultValue) {
 		if (byteArray == null)
-			return new String[] {};
+			return new String[]{};
 		ArrayList<String> result = new ArrayList<String>();
 
 		int pi = 0;
@@ -92,6 +88,6 @@ public abstract class AbstractSasl implements SaslServer {
 		} else
 			result.add(defaultValue);
 
-		return result.toArray(new String[] {});
+		return result.toArray(new String[]{});
 	}
 }

@@ -23,6 +23,7 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -204,7 +205,9 @@ public abstract class AbstractSaslSCRAM extends AbstractSasl {
 		if (pc.getSaltedPassword() == null)
 			throw new SaslException("Unknown user");
 
+		validateBindingsData(requestedBindType, cc.getBindingData());
 		this.bindingData = cc.getBindingData();
+
 
 		this.sfmNonce = cfmNonce + serverNonce;
 
@@ -236,7 +239,9 @@ public abstract class AbstractSaslSCRAM extends AbstractSasl {
 		if (!clmCb.startsWith(cfmGs2header)) {
 			throw new XmppSaslException(SaslError.not_authorized, "Invalid GS2 header");
 		} else if (!clmCb.equals(calculatedCb)) {
-			throw new XmppSaslException(SaslError.not_authorized, "Channel bindings dont match");
+			if (log.isLoggable(Level.FINEST))
+				log.finest("Channel bindings does not match. expected: " + calculatedCb + "; received: " + clmCb);
+			throw new XmppSaslException(SaslError.not_authorized, "Channel bindings does not match");
 		}
 
 		if (!clmNonce.equals(sfmNonce)) {
@@ -287,6 +292,14 @@ public abstract class AbstractSaslSCRAM extends AbstractSasl {
 	@Override
 	public byte[] unwrap(byte[] incoming, int offset, int len) throws SaslException {
 		return null;
+	}
+
+	protected void validateBindingsData(BindType requestedBindType, byte[] bindingData) throws SaslException {
+		if (requestedBindType == BindType.tls_server_end_point && bindingData == null) {
+			throw new RuntimeException("Binding data not found!");
+		} else if (requestedBindType == BindType.tls_unique && bindingData == null) {
+			throw new RuntimeException("Binding data not found!");
+		}
 	}
 
 	@Override

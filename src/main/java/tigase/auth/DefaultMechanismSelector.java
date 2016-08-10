@@ -1,24 +1,16 @@
 package tigase.auth;
 
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.security.sasl.SaslServerFactory;
-
 import tigase.auth.mechanisms.SaslEXTERNAL;
+import tigase.auth.mechanisms.SaslSCRAMPlus;
 import tigase.auth.mechanisms.TigaseSaslServerFactory;
 import tigase.cert.CertificateUtil;
 import tigase.vhosts.VHostItem;
 import tigase.xmpp.XMPPResourceConnection;
+
+import javax.security.sasl.SaslServerFactory;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.*;
 
 public class DefaultMechanismSelector implements MechanismSelector {
 
@@ -84,6 +76,8 @@ public class DefaultMechanismSelector implements MechanismSelector {
 			if (!session.getDomain().isAnonymousEnabled() && "ANONYMOUS".equals(mechanismName))
 				return false;
 			if ("EXTERNAL".equals(mechanismName) && !isJIDInCertificate(session))
+				return false;
+			if (SaslSCRAMPlus.NAME.equals(mechanismName) && !SaslSCRAMPlus.isAvailable(session))
 				return false;
 			return true;
 		}

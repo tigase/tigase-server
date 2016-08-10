@@ -39,9 +39,9 @@ public class TigaseSaslServerFactory implements SaslServerFactory {
 	public SaslServer createSaslServer(final String mechanism, final String protocol, final String serverName,
 									   final Map<String, ?> props, final CallbackHandler callbackHandler) throws SaslException {
 		switch (mechanism) {
-			case "SCRAM-SHA-1":
+			case SaslSCRAM.NAME:
 				return new SaslSCRAM(props, callbackHandler);
-			case "SCRAM-SHA-1-PLUS":
+			case SaslSCRAMPlus.NAME:
 				return new SaslSCRAMPlus(props, callbackHandler);
 			case "PLAIN":
 				return new SaslPLAIN(props, callbackHandler);
@@ -57,8 +57,8 @@ public class TigaseSaslServerFactory implements SaslServerFactory {
 	@Override
 	public String[] getMechanismNames(Map<String, ?> props) {
 		return new String[]{
-				"SCRAM-SHA-1-PLUS",
-				"SCRAM-SHA-1",
+				SaslSCRAMPlus.NAME,
+				SaslSCRAM.NAME,
 				"PLAIN",
 				"EXTERNAL",
 				"ANONYMOUS",
