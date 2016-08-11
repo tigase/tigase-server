@@ -40,6 +40,7 @@ import tigase.server.Packet;
 import javax.script.Bindings;
 import javax.script.ScriptEngineManager;
 import java.util.Collection;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,6 +52,10 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 	 */
 	protected final Logger log = Logger.getLogger(this.getClass().getName());
 	protected final EventBus eventBus = EventBusFactory.getInstance();
+
+	@Inject(nullAllowed = true)
+	private Set<ScheduledTask> scheduledTasks;
+
 	@Inject
 	private StanzaProcessor stanzaProcessor;
 
@@ -71,6 +76,17 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 	public void initBindings(Bindings binds) {
 		super.initBindings(binds);
 		binds.put("kernel", kernel);
+	}
+
+	@Override
+	public void start() {
+		super.start();
+
+		if (scheduledTasks != null) {
+			for (ScheduledTask task : scheduledTasks) {
+				task.initialize();
+			}
+		}
 	}
 
 	/**

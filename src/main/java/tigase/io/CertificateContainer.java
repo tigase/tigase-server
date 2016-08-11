@@ -566,6 +566,10 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 			if (alias == null)
 				alias = def_cert_alias;
 			KeyManagerFactory kmf = SSLContextContainerAbstract.find(kmfs, alias);
+			if (kmf == null) {
+				alias = def_cert_alias;
+				kmf = SSLContextContainer.find(kmfs, alias);
+			}
 			return ((X509KeyManager) kmf.getKeyManagers()[0]).getCertificateChain(alias);
 		}
 
@@ -581,6 +585,10 @@ public class CertificateContainer implements CertificateContainerIfc, Initializa
 			if (alias == null)
 				alias = def_cert_alias;
 			KeyManagerFactory kmf = SSLContextContainerAbstract.find(kmfs, alias);
+			if (kmf == null) {
+				alias = def_cert_alias;
+				kmf = SSLContextContainer.find(kmfs, alias);
+			}
 			return ((X509KeyManager) kmf.getKeyManagers()[0]).getPrivateKey(alias);
 		}
 

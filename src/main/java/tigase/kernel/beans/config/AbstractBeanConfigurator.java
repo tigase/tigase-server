@@ -321,6 +321,12 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 						if (oldCfg != null && oldCfg.isExportable()) {
 							cfgBuilder.exportable();
 						}
+						Bean ba = cls.getAnnotation(Bean.class);
+						if (ba != null) {
+							if (ba.exportable()) {
+								cfgBuilder.exportable();
+							}
+						}
 						BeanConfig registeredBeanConfig = cfgBuilder.execWithoutInject();
 						if (registeredBeanConfig != null) {
 							registeredBeans.add(registeredBeanConfig);

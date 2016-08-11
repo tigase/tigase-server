@@ -134,6 +134,11 @@ public class DiscoveryModule extends AbstractModule {
 
 	protected void processDiscoInfo(Packet packet, JID jid, String node, JID senderJID)
 			throws ComponentException, RepositoryException {
+		Packet resultIq = prepareDiscoInfoReponse(packet, jid, node, senderJID);
+		write(resultIq);
+	}
+
+	protected Packet prepareDiscoInfoReponse(Packet packet, JID jid, String node, JID senderJID) {
 		Element resultQuery = new Element("query", new String[] { "xmlns" }, new String[] { DISCO_INFO_XMLNS });
 		Packet resultIq = packet.okResult(resultQuery, 0);
 
@@ -142,8 +147,7 @@ public class DiscoveryModule extends AbstractModule {
 		for (String f : getAvailableFeatures()) {
 			resultQuery.addChild(new Element("feature", new String[] { "var" }, new String[] { f }));
 		}
-
-		write(resultIq);
+		return resultIq;
 	}
 
 	protected void processDiscoItems(Packet packet, JID jid, String node, JID senderJID)
