@@ -30,6 +30,7 @@ import tigase.disco.XMPPService;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.RegistrarBean;
 import tigase.kernel.core.Kernel;
 import tigase.server.AbstractMessageReceiver;
 import tigase.server.Packet;
@@ -56,7 +57,7 @@ import java.util.logging.Logger;
 @Bean(name="amp", parent=Kernel.class, selectors = {BeanSelector.NonClusterMode.class})
 public class AmpComponent
 				extends AbstractMessageReceiver
-				implements ActionResultsHandlerIfc {
+				implements ActionResultsHandlerIfc, RegistrarBean {
 	private static final String AMP_NODE     = "http://jabber.org/protocol/amp";
 	private static final Logger log          =
 		Logger.getLogger(AmpComponent.class.getName());
@@ -272,6 +273,16 @@ public class AmpComponent
 		}
 
 		return false;
+	}
+
+	@Override
+	public void register(Kernel kernel) {
+
+	}
+
+	@Override
+	public void unregister(Kernel kernel) {
+
 	}
 }
 

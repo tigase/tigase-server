@@ -36,7 +36,6 @@ import java.util.logging.Level;
 @Bean(name = BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)
 public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 
-
 	private Map<String, Object> props;
 
 	private HashMap<String, Object> getBeanProps(BeanConfig beanConfig) {
@@ -138,6 +137,7 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 		return configAliasses;
 	}
 
+
 	@Override
 	protected Map<String, Object> getConfiguration(BeanConfig beanConfig) {
 		final HashMap<String, Object> valuesToSet = new HashMap<>();
@@ -185,6 +185,54 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 				}
 			}
 		}
+	}
+
+	@Override
+	protected Map<String, BeanDefinition> getBeanDefinitions(Map<String, Object> values) {
+		Map<String, BeanDefinition> beanPropConfigMap = super.getBeanDefinitions(values);
+
+		List<String> keys = new ArrayList<>(values.keySet());
+		Collections.sort(keys);
+		for (String key : keys) {
+			String[] keyParts = key.split("/");
+			if (keyParts.length != 2)
+				continue;
+
+			String beanName = keyParts[0];
+			String action = keyParts[1];
+			Object value = values.get(key);
+
+			BeanDefinition cfg = beanPropConfigMap.get(beanName);
+			switch (action) {
+				case "active":
+				case "class":
+					if (cfg == null) {
+						cfg = new BeanDefinition();
+						cfg.setBeanName(beanName);
+						beanPropConfigMap.put(beanName, cfg);
+					}
+					break;
+				default:
+					if (kernel.isBeanClassRegistered(beanName) && cfg == null) {
+						cfg = new BeanDefinition();
+						cfg.setBeanName(beanName);
+						beanPropConfigMap.put(beanName, cfg);
+					}
+					break;
+			}
+			switch (action) {
+				case "active":
+					cfg.setActive(Boolean.parseBoolean(value.toString()));
+					break;
+				case "class":
+					cfg.setClazzName(value.toString());
+					break;
+				default:
+					break;
+			}
+		}
+
+		return beanPropConfigMap;
 	}
 
 	public Map<String, Object> getCurrentConfigurations() {

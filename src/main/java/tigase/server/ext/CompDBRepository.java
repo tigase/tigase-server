@@ -38,7 +38,7 @@ import java.util.Map;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
-@Bean(name = "compDBRepository", parent = ComponentProtocol.class)
+@Bean(name = "repository", parent = ComponentProtocol.class)
 public class CompDBRepository extends UserRepoRepository<CompRepoItem> {
 
 	@Override

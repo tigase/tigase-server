@@ -21,10 +21,13 @@
  */
 package tigase.conf;
 
+import tigase.kernel.beans.config.AbstractBeanConfigurator;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -41,11 +44,42 @@ public class ConfigWriter {
 		props.forEach((k, v) -> {
 			String[] parts = k.split("/");
 			Map<String, Object> map = result;
+			Map<String, Object> parent = null;
 			for (int i=0; i<parts.length-1; i++) {
+				parent = map;
 				map = (Map<String, Object>) map.computeIfAbsent(parts[i], (String key) -> { return new HashMap<String, Object>(); });
 			}
 			String key = parts[parts.length-1];
-			map.put(key, v);
+			AbstractBeanConfigurator.BeanDefinition beanDefinition;
+			switch (key) {
+				case "active":
+					if (map instanceof AbstractBeanConfigurator.BeanDefinition) {
+						beanDefinition = (AbstractBeanConfigurator.BeanDefinition) map;
+					} else {
+						beanDefinition = new AbstractBeanConfigurator.BeanDefinition();
+						beanDefinition.setBeanName(parts[parts.length-2]);
+						beanDefinition.putAll(map);
+						parent.put(beanDefinition.getBeanName(), beanDefinition);
+					}
+
+					beanDefinition.setActive((v instanceof Boolean) ? ((Boolean) v) : "true".equals(v.toString()));
+					break;
+				case "class":
+					if (map instanceof AbstractBeanConfigurator.BeanDefinition) {
+						beanDefinition = (AbstractBeanConfigurator.BeanDefinition) map;
+					} else {
+						beanDefinition = new AbstractBeanConfigurator.BeanDefinition();
+						beanDefinition.setBeanName(parts[parts.length-2]);
+						beanDefinition.putAll(map);
+						parent.put(beanDefinition.getBeanName(), beanDefinition);
+					}
+
+					beanDefinition.setClazzName((String) v);
+					break;
+				default:
+					map.put(key, v);
+					break;
+			}
 		});
 
 		return result;
@@ -62,31 +96,91 @@ public class ConfigWriter {
 	}
 
 	private void writeObject(Writer writer, Object obj, String newLine) throws IOException {
-		if (obj instanceof Map) {
-			writer.write("{\n");
+		if (obj instanceof AbstractBeanConfigurator.BeanDefinition) {
+			AbstractBeanConfigurator.BeanDefinition def = (AbstractBeanConfigurator.BeanDefinition) obj;
+			writer.write("(");
 			indent++;
-			writeMap(writer, (Map<String, Object>) obj);
+			boolean first = true;
+			if (def.getClazzName() != null) {
+				writer.write("class: ");
+				writer.write(def.getClazzName());
+				first = false;
+			}
+			if (!def.isActive()) {
+				if (!first) {
+					writer.write(",");
+					writer.write("\n");
+					writeIndent(writer);
+				}
+				writer.write("active: false");
+			}
+			if (def.isExportable()) {
+				if (!first) {
+					writer.write(",");
+					writer.write("\n");
+					writeIndent(writer);
+				}
+				writer.write("exportable: true");
+			}
 			indent--;
-			writeIndent(writer);
-			writer.write("}\n");
+			if (def.isEmpty()) {
+				writer.write(") {}");
+			} else {
+				writer.write(") {\n");
+				indent++;
+				writeMap(writer, (Map<String, Object>) obj);
+				indent--;
+				writeIndent(writer);
+				writer.write("}");
+			}
+			if (newLine != null) {
+				writer.write(newLine);
+			}
+		} else if (obj instanceof Map) {
+			Map<String, Object> map = (Map<String, Object>) obj;
+			if (map.isEmpty()) {
+				writer.write("{}");
+			} else {
+				writer.write("{\n");
+				indent++;
+				writeMap(writer, map);
+				indent--;
+				writeIndent(writer);
+				writer.write("}");
+			}
+			if (newLine != null) {
+				writer.write(newLine);
+			}
 		} else if (obj instanceof Collection) {
 			List list = (obj instanceof List) ? (List) obj : new ArrayList((Collection) obj);
 			boolean simple = true;
 			for (Object o : list) {
 				simple &= (o instanceof Number) || (o instanceof String);
 			}
-			if (simple) {
+			if (simple && list.size() < 6) {
 				writer.write("[ ");
 				writeListSimple(writer, list);
-				writer.write(" ]\n");
+				writer.write(" ]");
+				if (newLine != null) {
+					writer.write(newLine);
+				}
 			} else {
 				writer.write("[\n");
 				indent++;
 				writeList(writer, list);
 				indent--;
 				writeIndent(writer);
-				writer.write("]\n");
+				writer.write("]");
+				if (newLine != null) {
+					writer.write(newLine);
+				}
 			}
+		} else if ( obj.getClass().isArray() ) {
+			List tmp = new ArrayList();
+			for (int i = 0; i< Array.getLength(obj); i++) {
+				tmp.add(Array.get(obj, i));
+			}
+			writeObject(writer, tmp);
 		} else if (obj instanceof String) {
 			writer.write('\'');
 			writer.write((String) obj);
@@ -107,15 +201,68 @@ public class ConfigWriter {
 	}
 
 	private void writeMap(Writer writer, Map<String, Object> map) throws IOException {
-		for (Map.Entry<String, Object> e : map.entrySet()) {
+		List<Map.Entry<String, Object>> items = new ArrayList<>(map.entrySet());
+
+		items.sort((a,b) -> {
+			boolean a_ = a.getKey().startsWith("--");
+			boolean b_ = b.getKey().startsWith("--");
+
+			if (a_ && !b_) {
+				return -1;
+			}
+			if (!b_ && a_) {
+				return 1;
+			}
+
+			if ((a.getValue() instanceof Map) && !(b.getValue() instanceof Map)) {
+				return 1;
+			}
+			if (!(a.getValue() instanceof Map) && (b.getValue() instanceof Map)) {
+				return -1;
+			}
+
+			if ((a.getValue() instanceof Map) && (b.getValue() instanceof Map)) {
+				if ("dataSource".equals(a.getKey())) {
+					return -1;
+				}
+				if ("dataSource".equals(b.getKey())) {
+					return 1;
+				}
+				if ("userRepository".equals(a.getKey())) {
+					return -1;
+				}
+				if ("userRepository".equals(b.getKey())) {
+					return 1;
+				}
+				if ("authRepository".equals(a.getKey())) {
+					return -1;
+				}
+				if ("authRepository".equals(b.getKey())) {
+					return 1;
+				}
+			}
+
+			return a.getKey().compareTo(b.getKey());
+		});
+
+		for (Map.Entry<String, Object> e : items) {
 			writeIndent(writer);
-			writeString(writer, e.getKey());
+			if (indent == 0 && e.getKey().startsWith("--")) {
+				writer.write(e.getKey());
+			} else {
+				writeString(writer, e.getKey());
+			}
 			if (e.getValue() instanceof Map) {
 				writer.write(" ");
 			} else {
 				writer.write(" = ");
 			}
-			writeObject(writer, e.getValue());
+			if (indent == 0 && e.getKey().startsWith("--") && (e.getValue() instanceof String)) {
+				writer.write((String) e.getValue());
+				writer.write("\n");
+			} else {
+				writeObject(writer, e.getValue());
+			}
 		}
 	}
 
@@ -126,9 +273,18 @@ public class ConfigWriter {
 	}
 
 	private void writeList(Writer writer, List list) throws IOException {
+		boolean first = true;
 		for (Object obj : list) {
+			if (!first) {
+				writer.write(",\n");
+			} else {
+				first = false;
+			}
 			writeIndent(writer);
-			writeObject(writer, obj);
+			writeObject(writer, obj, null);
+		}
+		if (!list.isEmpty()) {
+			writer.write("\n");
 		}
 	}
 

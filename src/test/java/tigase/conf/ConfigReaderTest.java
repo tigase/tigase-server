@@ -1,6 +1,7 @@
 package tigase.conf;
 
 import org.junit.Test;
+import tigase.kernel.beans.config.AbstractBeanConfigurator;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -55,6 +56,31 @@ public class ConfigReaderTest {
 		map.put("embedded-map", embeddedMap);
 		root.put("another-map", map);
 
+		AbstractBeanConfigurator.BeanDefinition b1 = new AbstractBeanConfigurator.BeanDefinition();
+		b1.setBeanName("s2s");
+		b1.setClazzName(tigase.server.xmppserver.S2SConnectionManager.class.getCanonicalName());
+
+		b1.put("list", new ArrayList(list));
+		b1.put("map", new HashMap(embeddedMap));
+		b1.put("some", true);
+		b1.put("other", 123);
+		b1.put("ala", "kot");
+
+		root.put(b1.getBeanName(), b1);
+
+		AbstractBeanConfigurator.BeanDefinition b2 = new AbstractBeanConfigurator.BeanDefinition();
+		b2.setBeanName("c2s");
+		b2.setClazzName(tigase.server.xmppclient.ClientConnectionManager.class.getCanonicalName());
+		b2.setActive(true);
+		b2.setExportable(true);
+
+		root.put(b2.getBeanName(), b2);
+
+		AbstractBeanConfigurator.BeanDefinition b3 = new AbstractBeanConfigurator.BeanDefinition();
+		b3.setBeanName("upload");
+
+		root.put(b3.getBeanName(), b3);
+
 		Map<String, Object> parsed = null;
 
 		File f = File.createTempFile("xx3232", "ccxx");
@@ -88,6 +114,7 @@ public class ConfigReaderTest {
 		props.put("dataSource/repo-uri", "jdbc:postgresql://127.0.0.1/tigase?user=test&password=test&autoCreateUser=true");
 		props.put("sess-man/commands/ala-ma-kota", "DOMAIN");
 		props.put("c2s/incoming-filters", Arrays.asList("tigase.server.filters.PacketCounter", "tigase.server.filters.PacketCounter"));
+		props.put("http/active", "true");
 		Map<String, Object> root = ConfigWriter.buildTree(props);
 
 		Map<String, Object> parsed = null;
@@ -118,6 +145,15 @@ public class ConfigReaderTest {
 		for (Map.Entry e : expected.entrySet()) {
 			Object value = actual.get(e.getKey());
 			System.out.println("checking key = " + prefix + e.getKey());
+			assertEquals(e.getValue().getClass(), value.getClass());
+			if (value instanceof AbstractBeanConfigurator.BeanDefinition) {
+				AbstractBeanConfigurator.BeanDefinition av = (AbstractBeanConfigurator.BeanDefinition) value;
+				AbstractBeanConfigurator.BeanDefinition ev = (AbstractBeanConfigurator.BeanDefinition) e.getValue();
+				assertEquals(ev.getClazzName(), av.getClazzName());
+				assertEquals(ev.getBeanName(), av.getBeanName());
+				assertEquals(ev.isActive(), av.isActive());
+				assertEquals(ev.isExportable(), av.isExportable());
+			}
 			if (value instanceof Map) {
 				assertMapEquals((Map<String, Object>) e.getValue(), (Map) value, prefix + e.getKey() + "/");
 			} else if(value instanceof List) {

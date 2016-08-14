@@ -203,11 +203,22 @@ public class DefaultTypesConverter implements TypesConverter {
 					ParameterizedType pt = (ParameterizedType) genericType;
 					Type[] actualTypes = pt.getActualTypeArguments();
 					if (actualTypes[0] instanceof Class) {
+						if (value != null && value.getClass().isArray()) {
+							try {
+								Collection result = (Collection) expectedType.newInstance();
+								for (int i=0; i<Array.getLength(value); i++) {
+									result.add(convert(Array.get(value, i), (Class<?>) actualTypes[0]));
+								}
+								return (T) result;
+							} catch (InstantiationException | IllegalAccessException ex) {
+								throw new RuntimeException("Unsupported conversion to " + expectedType, ex);
+							}
+						}
 						if (value instanceof Collection) {
 							try {
 								Collection result = (Collection) expectedType.newInstance();
 								for (Object c : ((Collection) value)) {
-									result.add(c);
+									result.add(convert(c, (Class<?>) actualTypes[0]));
 								}
 								return (T) result;
 							} catch (InstantiationException | IllegalAccessException ex) {

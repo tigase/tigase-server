@@ -21,17 +21,22 @@
 
 package tigase.server;
 
+import tigase.component.DSLBeanConfigurator;
+import tigase.component.DSLBeanConfiguratorWithBackwardCompatibility;
 import tigase.component.PropertiesBeanConfigurator;
-import tigase.component.PropertiesBeanConfiguratorWithBackwordCompatibility;
+import tigase.component.PropertiesBeanConfiguratorWithBackwardCompatibility;
 import tigase.conf.ConfigReader;
 import tigase.conf.ConfigWriter;
 import tigase.conf.ConfiguratorAbstract;
+import tigase.db.RepositoryFactory;
 import tigase.eventbus.EventBusFactory;
 import tigase.kernel.DefaultTypesConverter;
+import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.BeanConfigurator;
 import tigase.kernel.core.DependencyGrapher;
 import tigase.kernel.core.Kernel;
 import tigase.osgi.ModulesManagerImpl;
+import tigase.server.ext.ComponentProtocol;
 import tigase.server.xmppsession.SessionManagerConfig;
 import tigase.util.DataTypes;
 import tigase.xmpp.ProcessorFactory;
@@ -62,6 +67,8 @@ public class Bootstrap implements Lifecycle {
 	private final Kernel kernel;
 	private Map<String, Object> props;
 
+	private boolean isDsl = true;
+
 	public Bootstrap() {
 		kernel = new Kernel("root");
 	}
@@ -70,7 +77,8 @@ public class Bootstrap implements Lifecycle {
 		props = new LinkedHashMap<>();
 		List<String> settings = new LinkedList<>();
 		ConfiguratorAbstract.parseArgs(props, settings, args);
-		if (isDslConfig()) {
+		isDsl = isDslConfig();
+		if (isDsl) {
 			loadFromDSLFiles();
 		} else {
 			loadFromPropertiesFiles(settings);
@@ -104,7 +112,7 @@ public class Bootstrap implements Lifecycle {
 				try (BufferedReader reader = new BufferedReader(new FileReader(property_filename))) {
 					String line;
 					while ((line = reader.readLine()) != null) {
-						if (line.contains("{")) {
+						if (line.contains("{") && !line.contains("{clusterNode}")) {
 							return true;
 						}
 					}
@@ -121,7 +129,7 @@ public class Bootstrap implements Lifecycle {
 		for (String prop_file : property_filenames.split(",")) {
 			try {
 				Map<String, Object> loaded = new ConfigReader().read(new File(prop_file));
-				props.putAll(ConfigReader.flatTree(loaded));
+				props.putAll(loaded);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -167,6 +175,10 @@ public class Bootstrap implements Lifecycle {
 
 		// converting old component configuration to new one
 		Map<String, Object> toAdd = new HashMap<>();
+		List<String> toRemove = new ArrayList<>();
+
+		List<String> dataSourceNames = new ArrayList<>();
+		Map<String, Map<String,String>> dataSources = new HashMap<>();
 
 		props.forEach((k,v) -> {
 			if (k.startsWith("--comp-name")) {
@@ -177,7 +189,106 @@ public class Bootstrap implements Lifecycle {
 				toAdd.put(name + "/class", cls);
 				toAdd.put(name + "/active", active);
 			}
+			if (k.endsWith("/processors")) {
+				toAdd.put(k.replace("/processors", "/beans"), v);
+				toRemove.add(k);
+			}
+			if (k.startsWith("--user-db") || k.startsWith("--auth-db")) {
+				String domain = "default";
+				if (k.endsWith("]")) {
+					domain = k.substring(k.indexOf('[') + 1, k.length() - 1);
+				}
+				toRemove.add(k);
+
+				Map<String,String> ds = dataSources.computeIfAbsent(domain, key -> new HashMap<>());
+				if (k.startsWith("--user-db-uri"))  {
+					ds.put("user-uri", (String) v);
+				} else if (k.startsWith("--user-db")) {
+					ds.put("user-type", (String) v);
+				}
+				if (k.startsWith("--auth-db-uri"))  {
+					ds.put("auth-uri", (String) v);
+				} else if (k.startsWith("--auth-db")) {
+					ds.put("auth-type", (String) v);
+				}
+			}
+			if (k.contains("pubsub-repo-url")) {
+				props.put("dataSource/pubsub/uri", v);
+				dataSourceNames.add("pubsub");
+				toRemove.add(k);
+			}
 		});
+
+		List<String> userDbDomains = new ArrayList<>();
+		List<String> authDbDomains = new ArrayList<>();
+		dataSources.forEach((domain, cfg) -> {
+			String userType = cfg.get("user-type");
+			String userUri = cfg.get("user-uri");
+			String authType = cfg.get("auth-type");
+			String authUri = cfg.get("auth-uri");
+
+			if (userUri != null) {
+				if (!domain.equals("default")) {
+					userDbDomains.add(domain);
+					authDbDomains.add(domain);
+					dataSourceNames.add(domain);
+					props.put("dataSource/" + domain + "/uri", userUri);
+				}
+				else {
+					props.put("dataSource/uri", userUri);
+				}
+			}
+
+			if ((authUri != null) && (userUri == null || !userUri.contains(authUri))) {
+				if (!authDbDomains.contains(domain))
+					authDbDomains.add(domain);
+				dataSourceNames.add(domain + "-auth");
+				props.put("dataSource/" + domain + "-auth/uri", authUri);
+				props.put("authRepository/" + domain + "/uri", "dataSource:" + domain + "-auth");
+			}
+
+			if (userType != null && !userType.equals("mysql") && !userType.equals("pgsql") && !userType.equals("derby")
+					&& !userType.equals("sqlserver")) {
+				String cls = RepositoryFactory.getRepoClass(userType);
+				if (!domain.equals("default")) {
+					props.put("userRepository/" + domain + "/cls", cls);
+				} else {
+					props.put("userRepository/cls", cls);
+				}
+			}
+			if (authType != null && !authType.equals("tigase-custom-auth")) {
+				String cls = RepositoryFactory.getRepoClass(userType);
+				if (!domain.equals("default")) {
+					props.put("authRepository/" + domain + "/cls", cls);
+				} else {
+					props.put("authRepository/cls", cls);
+				}
+			}
+		});
+
+		if (!dataSourceNames.isEmpty()) {
+			props.put("dataSource/domains", dataSourceNames);
+		}
+		if (!userDbDomains.isEmpty()) {
+			props.put("userRepository/domains", userDbDomains);
+		}
+		if (!authDbDomains.isEmpty()) {
+			props.put("authRepository/domains", authDbDomains);
+		}
+
+		String external = (String) props.remove("--external");
+		if (external != null) {
+			props.forEach((k,v) -> {
+				if (k.endsWith("/class") && v.equals(ComponentProtocol.class.getCanonicalName())) {
+					toAdd.put(k.replace("/class", "/repository/items"), v);
+				}
+			});
+		}
+
+		String admins = (String) props.remove("--admins");
+		if (admins != null) {
+			props.put("admins", admins.split(","));
+		}
 
 		Iterator<Map.Entry<String, Object>> it = props.entrySet().iterator();
 		while (it.hasNext()) {
@@ -186,11 +297,15 @@ public class Bootstrap implements Lifecycle {
 				it.remove();
 		}
 
+		for (String k : toRemove) {
+			props.remove(k);
+		}
+
 		props.putAll(toAdd);
 
 		// converting list of sess-man processors from --sm-plugins to sess-man/beans
 		// and converting concurrency settings as well
-		String plugins = (String) props.get(GEN_SM_PLUGINS);
+		String plugins = (String) props.remove(GEN_SM_PLUGINS);
 		if (plugins != null) {
 			StringBuilder smBeans = new StringBuilder();
 			Map<String,String> plugins_concurrency = new HashMap<>();
@@ -214,7 +329,10 @@ public class Bootstrap implements Lifecycle {
 						proc = ProcessorFactory.getImplementation(name);
 					}
 					if (proc != null) {
-						props.put("sess-man/" + name + "/class", proc.getClass().getCanonicalName());
+						Bean ann = proc.getClass().getAnnotation(Bean.class);
+						if (ann == null) {
+							props.put("sess-man/" + name + "/class", proc.getClass().getCanonicalName());
+						}
 					} else {
 						log.log(Level.WARNING, "could not find class for processor " + name);
 					}
@@ -267,16 +385,20 @@ public class Bootstrap implements Lifecycle {
 		}
 		// register default types converter and properties bean configurator
 		kernel.registerBean(DefaultTypesConverter.class).exec();
-		kernel.registerBean(PropertiesBeanConfiguratorWithBackwordCompatibility.class).exec();
+		if (isDsl) {
+		 	kernel.registerBean(DSLBeanConfiguratorWithBackwardCompatibility.class).exec();
+		} else {
+			kernel.registerBean(PropertiesBeanConfiguratorWithBackwardCompatibility.class).exec();
+		}
 		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exportable().exec();
 
-		// moved to AbstractBeanConfigurator
-		//registerBeans();
-
-		BeanConfigurator configurator = kernel.getInstance(PropertiesBeanConfiguratorWithBackwordCompatibility.class);
+		BeanConfigurator configurator = kernel.getInstance(BeanConfigurator.class);
 		if (configurator instanceof PropertiesBeanConfigurator) {
 			PropertiesBeanConfigurator propertiesBeanConfigurator = (PropertiesBeanConfigurator) configurator;
 			propertiesBeanConfigurator.setProperties(props);
+		} else if (configurator instanceof DSLBeanConfigurator) {
+			DSLBeanConfigurator dslBeanConfigurator = (DSLBeanConfigurator) configurator;
+			dslBeanConfigurator.setProperties(props);
 		}
 		// if null then we register global subbeans
 		configurator.registerBeans(null, props);

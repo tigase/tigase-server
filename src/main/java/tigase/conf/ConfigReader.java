@@ -21,6 +21,8 @@
  */
 package tigase.conf;
 
+import tigase.kernel.beans.config.AbstractBeanConfigurator;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,6 +54,17 @@ public class ConfigReader {
 	private static void flatTree(Map<String, Object> result, String prefix, Map<String, Object> props) {
 		props.forEach((k,v) -> {
 			String key = prefix == null ? k : (prefix + "/" + k);
+			if (v instanceof AbstractBeanConfigurator.BeanDefinition) {
+				AbstractBeanConfigurator.BeanDefinition beanDefinition = (AbstractBeanConfigurator.BeanDefinition) v;
+				if (beanDefinition.getClazzName() != null) {
+					result.put(key + "/class", beanDefinition.getClazzName());
+				}
+				if (beanDefinition.isActive()) {
+					result.put(key + "/active", "true");
+				} else {
+					result.put(key + "/active", "false");
+				}
+			}
 			if (v instanceof Map) {
 				flatTree(result, key, (Map<String, Object>) v);
 			} else {
@@ -156,12 +169,46 @@ public class ConfigReader {
 					StateHolder tmp = new StateHolder();
 					tmp.state = State.MAP;
 					tmp.parent = holder;
-					tmp.map = new HashMap();
+					tmp.map = (holder.value instanceof AbstractBeanConfigurator.BeanDefinition) ? ((Map) holder.value) : new HashMap();
 					holder = tmp;
 					break;
 				}
 				case '}': {
 					Map val = holder.map;
+					holder = holder.parent;
+					// special use case to convert maps with active or class into bean definition
+					if (val != null && (val.containsKey("active") || val.containsKey("class"))) {
+						AbstractBeanConfigurator.BeanDefinition bean = new AbstractBeanConfigurator.BeanDefinition();
+						bean.setBeanName(holder.key);
+						Object v = val.remove("class");
+						if (v != null) {
+							bean.setClazzName((String) v);
+						}
+						v = val.remove("active");
+						if (v != null) {
+							bean.setActive((Boolean) v);
+						}
+						bean.putAll(val);
+						holder.value = bean;
+					} else {
+						holder.value = val;
+					}
+					break;
+				}
+				case '(': {
+					holder.key = (holder.value != null && holder.value instanceof String) ? ((String) holder.value).trim() : holder.sb.toString().trim();
+					StateHolder tmp = new StateHolder();
+					tmp.state = State.BEAN;
+					tmp.bean = new AbstractBeanConfigurator.BeanDefinition();
+					tmp.bean.setBeanName(holder.key);
+					tmp.parent = holder;
+					holder = tmp;
+					break;
+				}
+				case ')': {
+					AbstractBeanConfigurator.BeanDefinition val = holder.bean;
+					Object val1 = holder.value != null ? holder.value : decodeValue(holder.sb.toString().trim());
+					setBeanDefinitionValue(val1);
 					holder = holder.parent;
 					holder.value = val;
 					break;
@@ -186,6 +233,10 @@ public class ConfigReader {
 							} else {
 								holder.list.add(holder.value);
 							}
+							break;
+						case BEAN:
+							Object val = holder.value != null ? holder.value : decodeValue(holder.sb.toString().trim());
+							setBeanDefinitionValue(val);
 							break;
 					}
 					holder.key = null;
@@ -246,12 +297,34 @@ public class ConfigReader {
 		return string;
 	}
 
+	protected void setBeanDefinitionValue(Object val) {
+		if (holder.key == null || holder.key.isEmpty()) {
+			return;
+		}
+
+		switch (holder.key) {
+			case "class":
+				holder.bean.setClazzName((String) val);
+				break;
+			case "active":
+				holder.bean.setActive((Boolean) val);
+				break;
+			case "exportable":
+				holder.bean.setExportable((Boolean) val);
+				break;
+			default:
+				throw new RuntimeException("Error in configuration file - unknown bean definition field: " + holder.key);
+		}
+
+	}
+
 	public class StateHolder {
 		public State state = State.MAP;
 		public StringBuilder sb = new StringBuilder();
 		public String key;
 		public List list;
 		public Map<String, Object> map;
+		public AbstractBeanConfigurator.BeanDefinition bean;
 		public StateHolder parent = null;
 		public char quoteChar = '\'';
 		public Object value;
@@ -261,6 +334,7 @@ public class ConfigReader {
 		MAP,
 		QUOTE,
 		LIST,
-		COMMENT
+		COMMENT,
+		BEAN
 	}
 }

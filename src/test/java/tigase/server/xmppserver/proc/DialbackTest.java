@@ -23,7 +23,7 @@ package tigase.server.xmppserver.proc;
 
 import junit.framework.TestCase;
 import org.junit.Test;
-import tigase.component.PropertiesBeanConfiguratorWithBackwordCompatibility;
+import tigase.component.PropertiesBeanConfiguratorWithBackwardCompatibility;
 import tigase.io.SSLContextContainer;
 import tigase.kernel.DefaultTypesConverter;
 import tigase.kernel.core.Kernel;
@@ -60,8 +60,8 @@ public class DialbackTest extends TestCase {
 		kernel = new Kernel();
 		kernel.setForceAllowNull(true);
 		kernel.registerBean(DefaultTypesConverter.class).exec();
-		kernel.registerBean(PropertiesBeanConfiguratorWithBackwordCompatibility.class).exec();
-		kernel.getInstance(PropertiesBeanConfiguratorWithBackwordCompatibility.class).setProperties(props);
+		kernel.registerBean(PropertiesBeanConfiguratorWithBackwardCompatibility.class).exec();
+		kernel.getInstance(PropertiesBeanConfiguratorWithBackwardCompatibility.class).setProperties(props);
 		kernel.registerBean(S2SConnectionManager.DomainServerNameMapper.class).exportable().exec();
 		kernel.registerBean(CIDConnections.CIDConnectionsOpenerService.class).exportable().exec();
 		kernel.registerBean(S2SRandomSelector.class).exportable().exec();

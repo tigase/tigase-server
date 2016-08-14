@@ -24,10 +24,7 @@ package tigase.kernel.beans.config;
 import tigase.kernel.BeanUtils;
 import tigase.kernel.KernelException;
 import tigase.kernel.TypesConverter;
-import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.BeanSelector;
-import tigase.kernel.beans.Converter;
-import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.*;
 import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.BeanConfigBuilder;
 import tigase.kernel.core.DependencyManager;
@@ -83,7 +80,10 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 							break;
 						default:
 							// ignoring if property contains "/" as this mean it is configuration property for subbean
-							if (!property.contains("/")) {
+							if (!property.contains("/")
+									&& !(value instanceof BeanDefinition)
+									&& kernel.getDependencyManager().getBeanConfig(property) == null
+									&& (!(bean instanceof RegistrarBean) || ((Kernel) kernel.getInstance(beanConfig.getBeanName() + "#KERNEL")).getDependencyManager().getBeanConfig(property) == null)) {
 								log.warning(
 										"Field '" + property + "' does not exists in bean '" + beanConfig.getBeanName() + "'. Ignoring!");
 							}
@@ -221,6 +221,10 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		this.accessToAllFields = accessToAllFields;
 	}
 
+	protected Map<String, BeanDefinition> getBeanDefinitions(Map<String, Object> values) {
+		return new HashMap<>();
+	}
+
 	@Override
 	public void registerBeans(BeanConfig beanConfig, Map<String, Object> values) {
 		Kernel kernel = beanConfig == null ? this.getKernel() : beanConfig.getKernel();
@@ -228,7 +232,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		List<BeanConfig> registeredBeans = registerBeansForBeanOfClass(kernel, beanConfig == null ? Kernel.class : beanConfig.getClazz());
 
 		if (values != null) {
-			Map<String, BeanPropConfig> beanPropConfigMap = new HashMap<>();
+			Map<String, BeanDefinition> beanPropConfigMap = getBeanDefinitions(values);
 
 			List<String> beansProp = null;
 			Object beansValue = values.get("beans");
@@ -252,55 +256,14 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 						throw new RuntimeException("Invalid 'beans' property value - duplicated entry for bean " +
 								beanName + "! in " + beansProp);
 					}
-					BeanPropConfig cfg = new BeanPropConfig();
+					BeanDefinition cfg = new BeanDefinition();
 					cfg.setBeanName(beanName);
 					cfg.setActive(active);
 					beanPropConfigMap.put(beanName, cfg);
 				}
 			}
 
-			List<String> keys = new ArrayList<>(values.keySet());
-			Collections.sort(keys);
-			for (String key : keys) {
-				String[] keyParts = key.split("/");
-				if (keyParts.length != 2)
-					continue;
-
-				String beanName = keyParts[0];
-				String action = keyParts[1];
-				Object value = values.get(key);
-
-				BeanPropConfig cfg = beanPropConfigMap.get(beanName);
-				switch (action) {
-					case "active":
-					case "class":
-						if (cfg == null) {
-							cfg = new BeanPropConfig();
-							cfg.setBeanName(beanName);
-							beanPropConfigMap.put(beanName, cfg);
-						}
-						break;
-					default:
-						if (kernel.isBeanClassRegistered(beanName) && cfg == null) {
-							cfg = new BeanPropConfig();
-							cfg.setBeanName(beanName);
-							beanPropConfigMap.put(beanName, cfg);
-						}
-						break;
-				}
-				switch (action) {
-					case "active":
-						cfg.setActive(Boolean.parseBoolean(value.toString()));
-						break;
-					case "class":
-						cfg.setClazzName(value.toString());
-						break;
-					default:
-						break;
-				}
-			}
-
-			for (BeanPropConfig cfg : beanPropConfigMap.values()) {
+			for (BeanDefinition cfg : beanPropConfigMap.values()) {
 				// TODO configuration is not as it should be - unknown class for bean!
 				if (cfg.getClazzName() == null && !kernel.isBeanClassRegistered(cfg.getBeanName(), false))
 					continue;
@@ -503,13 +466,18 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 
 	}
 
-	private class BeanPropConfig {
+	public static class BeanDefinition extends HashMap {
 
 		private String beanName;
 
 		private String clazzName;
 
 		private boolean active = true;
+
+		private boolean exportable = false;
+
+		public BeanDefinition() {
+		}
 
 		public String getBeanName() {
 			return beanName;
@@ -533,6 +501,14 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 
 		public void setActive(boolean active) {
 			this.active = active;
+		}
+
+		public boolean isExportable() {
+			return exportable;
+		}
+
+		public void setExportable(boolean exportable) {
+			this.exportable = exportable;
 		}
 	}
 
