@@ -34,7 +34,7 @@ import tigase.db.DataSource;
 import tigase.db.DataSourceHelper;
 import tigase.db.TigaseDBException;
 import tigase.db.beans.DataSourceBean;
-import tigase.db.comp.AbstractMDComponentRepositoryBean;
+import tigase.db.comp.AbstractSDComponentRepositoryBean;
 import tigase.db.comp.ComponentRepository;
 import tigase.db.comp.ComponentRepositoryDataSourceAware;
 import tigase.db.comp.RepositoryChangeListenerIfc;
@@ -1139,7 +1139,7 @@ public class ClusterConnectionManager
 	}
 
 	@Bean(name = "clConRepositoryBean", parent = ClusterConnectionManager.class)
-	public static class DefClConRepositoryBean extends AbstractMDComponentRepositoryBean<ClusterRepoItem> {
+	public static class DefClConRepositoryBean extends AbstractSDComponentRepositoryBean<ClusterRepoItem> {
 
 		private ComponentRepository<ClusterRepoItem> repo = null;
 
@@ -1152,6 +1152,7 @@ public class ClusterConnectionManager
 			Class cls = DataSourceHelper.getDefaultClass(ComponentRepository.class, dataSource.getResourceUri(), matcher);
 			return (Class<ComponentRepositoryDataSourceAware<ClusterRepoItem, DataSource>>) cls;
 		}
+
 	}
 }
 

@@ -203,23 +203,12 @@ public class SeeOtherHostDualIP
 	@Bean(name = "dualIPRepository", parent = SeeOtherHostDualIP.class)
 	public static class DualIPRepositoryWrapper extends MDRepositoryBean<DualIPRepository> implements  DualIPRepository<DataSource> {
 
-		@ConfigField(desc = "Name of data source to use")
-		protected String dataSourceName = "default";
-
 		public DualIPRepositoryWrapper() {
 
 		}
 
 		public Map<BareJID, BareJID> queryAllDB() throws SQLException {
 			return getRepository("").queryAllDB();
-		}
-
-		@Override
-		protected void updateDataSource(String domain, DataSource newDS, DataSource oldDS) {
-			if (!dataSourceName.equals(domain))
-				return;
-
-			super.updateDataSource(domain, newDS, oldDS);
 		}
 
 		@Override
@@ -232,9 +221,13 @@ public class SeeOtherHostDualIP
 			// nothing to do
 		}
 
-		public void setDataSourceName(String dataSourceName) {
-			this.dataSourceName = dataSourceName;
-			this.defaultDataSourceName = dataSourceName;
+		@Override
+		public Class<?> getDefaultBeanClass() {
+			return DualIPRepositoryWrapperConfigBean.class;
+		}
+
+		public static class DualIPRepositoryWrapperConfigBean extends MDRepositoryConfigBean<DualIPRepository> {
+
 		}
 	}
 

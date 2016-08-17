@@ -78,13 +78,14 @@ public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBea
 		// here we do nothing
 	}
 
-	protected void updateConfigForDefault(DataSourceMDConfigBean defaultBean) {
-		super.updateConfigForDefault(defaultBean);
-	}
-
 	private void fire(Object event) {
 		if (eventBus != null)
 			eventBus.fire(event);
+	}
+
+	@Override
+	public Class<?> getDefaultBeanClass() {
+		return DataSourceMDConfigBean.class;
 	}
 
 	public static class DataSourceMDConfigBean extends MDPoolConfigBean<DataSource, DataSourceMDConfigBean> {
@@ -102,6 +103,7 @@ public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBea
 			Class<? extends DataSourcePool> poolClass = DataSourceHelper.getDefaultClass(DataSourcePool.class, uri);
 			return poolClass == null ? null : poolClass.getCanonicalName();
 		}
+
 	}
 
 	public static class DataSourceChangedEvent {

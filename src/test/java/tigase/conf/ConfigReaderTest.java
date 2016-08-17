@@ -66,6 +66,13 @@ public class ConfigReaderTest {
 		b1.put("other", 123);
 		b1.put("ala", "kot");
 
+		AbstractBeanConfigurator.BeanDefinition conns = new AbstractBeanConfigurator.BeanDefinition();
+		conns.setBeanName("connections");
+		AbstractBeanConfigurator.BeanDefinition port = new AbstractBeanConfigurator.BeanDefinition();
+		port.setBeanName("5269");
+		conns.put(port.getBeanName(), port);
+		b1.put(conns.getBeanName(), conns);
+
 		root.put(b1.getBeanName(), b1);
 
 		AbstractBeanConfigurator.BeanDefinition b2 = new AbstractBeanConfigurator.BeanDefinition();

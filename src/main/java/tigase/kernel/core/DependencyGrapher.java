@@ -98,7 +98,7 @@ public class DependencyGrapher {
 			}
 		}
 
-		for (BeanConfig kc : dependencyManager.getBeanConfigs(Kernel.class, null)) {
+		for (BeanConfig kc : dependencyManager.getBeanConfigs(Kernel.class, null, null)) {
 			Kernel ki = kernel.getInstance(kc.getBeanName());
 			structureSB.append("subgraph ").append("cluster_").append(ki.hashCode()).append(" {\n");
 			structureSB.append("label=").append("\"").append(ki.getName()).append("\"\n");

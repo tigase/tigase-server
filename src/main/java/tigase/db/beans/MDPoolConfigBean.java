@@ -21,24 +21,41 @@
  */
 package tigase.db.beans;
 
-import tigase.db.*;
+import tigase.db.DBInitException;
+import tigase.db.Repository;
+import tigase.db.RepositoryFactory;
+import tigase.db.RepositoryPool;
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.RegistrarBean;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.config.ConfigurationChangedAware;
+import tigase.kernel.core.Kernel;
 import tigase.osgi.ModulesManagerImpl;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static tigase.db.beans.MDPoolBean.*;
 
 /**
  * Created by andrzej on 08.03.2016.
  */
-public abstract class MDPoolConfigBean<A extends Repository,B extends MDPoolConfigBean<A,B>> implements ConfigurationChangedAware {
+public abstract class MDPoolConfigBean<A extends Repository,B extends MDPoolConfigBean<A,B>> implements Initializable, ConfigurationChangedAware, RegistrarBean {
 
+	@Inject
 	protected MDPoolBean<A,B> mdPool;
-	protected String domain;
+
+	@Inject(bean = "instance", nullAllowed = true)
+	private A repository;
+
+	@Inject(nullAllowed = true)
+	private Set<A> instances;
+
+	@Inject
+	private Kernel kernel;
+
+	@ConfigField(desc = "Name (ie. domain)")
+	protected String name;
 
 	@ConfigField(alias = REPO_URI, desc = "URI for repository", allowAliasFromParent = false)
 	protected String uri;
@@ -51,14 +68,6 @@ public abstract class MDPoolConfigBean<A extends Repository,B extends MDPoolConf
 
 	@ConfigField(alias = POOL_CLASS, desc = "Class implementing repository pool", allowAliasFromParent = false)
 	protected String poolCls;
-
-	protected void setDomain(String domain) {
-		this.domain = domain;
-	}
-
-	protected void setMDPool(MDPoolBean<A, B> mdPool) {
-		this.mdPool = mdPool;
-	}
 
 	protected abstract Class<? extends A> getRepositoryIfc();
 	protected abstract String getRepositoryPoolClassName() throws DBInitException;
@@ -75,50 +84,105 @@ public abstract class MDPoolConfigBean<A extends Repository,B extends MDPoolConf
 
 	@Override
 	public void beanConfigurationChanged(Collection<String> changedFields) {
-		// domain not set yet - skip initialization
-		if (domain == null || getUri() == null)
+		// name not set yet - skip initialization
+		if (name == null || getUri() == null || kernel == null)
 			return;
 
 		try {
 			String cls = getRepositoryClassName();
+			if (cls == null)
+				return;
 
-			Map<String, String> params = new HashMap<>();
+			Class<?> repoClass = ModulesManagerImpl.getInstance().forName(cls);
 			String poolCls = getRepositoryPoolClassName();
 
 			if (poolCls == null) {
-				A repo = initRepository(cls, params);
-				setRepository(repo);
+				kernel.registerBean("instance").asClass(repoClass).exec();
 			} else {
-				RepositoryPool<A> pool;
+				Class<?> poolClass = ModulesManagerImpl.getInstance().forName(poolCls);
 
-				pool = (RepositoryPool<A>) ModulesManagerImpl.getInstance().forName(poolCls).newInstance();
-				pool.initRepository(getUri(), params);
+				kernel.registerBean("instance").asClass(poolClass).exec();
+
 				for (int i = 0; i < poolSize; i++) {
-					A repo = initRepository(cls, params);
-					pool.addRepo(repo);
+					kernel.registerBean("repo-" + i).asClass(repoClass).exec();
 				}
-				setRepository((A) pool);
 			}
-		} catch (DBInitException|ClassNotFoundException|IllegalAccessException|InstantiationException ex) {
-			throw new RuntimeException("Could not initialize " + getRepositoryIfc().getCanonicalName() + " for domain '" + domain + "'", ex);
+		} catch (DBInitException|ClassNotFoundException ex) {
+			throw new RuntimeException("Could not initialize " + getRepositoryIfc().getCanonicalName() + " for name '" + name + "'", ex);
 		}
 	}
 
-	protected A initRepository(String cls, Map<String, String> params) throws ClassNotFoundException, IllegalAccessException, InstantiationException, DBInitException {
-		A repo = newRepositoryInstance(cls);
-		repo.initRepository(getUri(), params);
-		return repo;
+	@Override
+	public void initialize() {
+		beanConfigurationChanged(Collections.singletonList("uri"));
 	}
 
-	protected A newRepositoryInstance(String cls) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-		return (A) ModulesManagerImpl.getInstance().forName(cls).newInstance();
+	@Override
+	public void register(Kernel kernel) {
+		this.kernel = kernel;
 	}
 
-	protected void setRepository(A repo) {
-		mdPool.addRepo(domain, repo);
-		if ("default".equals(domain)) {
-			mdPool.setDefault((A) repo);
+	@Override
+	public void unregister(Kernel kernel) {
+
+	}
+
+	public void setInstances(Set<A> instances) {
+		if (instances != null) {
+			for (Iterator<A> iter = instances.iterator(); iter.hasNext(); ) {
+				A it = iter.next();
+				if (it instanceof MDPoolBean)
+					iter.remove();
+			}
+		}
+		HashSet<A> toInitialize = new HashSet<A>(instances);
+		if (this.instances != null) {
+			toInitialize.removeAll(this.instances);
+		}
+		for (A repo :  toInitialize) {
+			try {
+				initRepository(repo);
+			} catch (DBInitException ex) {
+				throw new RuntimeException("Could not initialize " + repo.getClass().getCanonicalName() + " for name '" + name + "'", ex);
+			}
+
+			if (repository instanceof RepositoryPool && !(repo instanceof RepositoryPool)) {
+				((RepositoryPool<A>) repository).addRepo(repo);
+			}
+		}
+
+		this.instances = instances;
+	}
+
+	protected void initRepository(A repo) throws DBInitException {
+		repo.initRepository(getUri(), Collections.EMPTY_MAP);
+	}
+
+	public void setRepository(A repo) {
+		this.repository = repo;
+		if (instances != null) {
+			for (A instance : instances) {
+				if (repository instanceof RepositoryPool && !(instance instanceof RepositoryPool)) {
+					((RepositoryPool<A>) repository).addRepo(instance);
+				}
+			}
+		}
+
+		if (mdPool != null) {
+			mdPool.addRepo(name, repo);
+			if ("default".equals(name)) {
+				mdPool.setDefault(repo);
+			}
 		}
 	}
 
+	public void setMdPool(MDPoolBean<A,B> mdPool) {
+		if (mdPool != null && this.repository != null) {
+			mdPool.addRepo(name, this.repository);
+			if ("default".equals(name)) {
+				mdPool.setDefault(this.repository);
+			}
+		}
+		this.mdPool = mdPool;
+	}
 }

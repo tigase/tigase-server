@@ -22,40 +22,28 @@
 package tigase.db.beans;
 
 import tigase.db.Repository;
-import tigase.db.RepositoryFactory;
-import tigase.kernel.beans.RegistrarBean;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.RegistrarBeanWithDefaultBeanClass;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
-
-import java.util.*;
 
 /**
  * Created by andrzej on 08.03.2016.
  */
-public abstract class MDPoolBean<S extends Repository,T extends MDPoolConfigBean<S,T>> implements tigase.kernel.beans.config.ConfigurationChangedAware, RegistrarBean {
+public abstract class MDPoolBean<S extends Repository,T extends MDPoolConfigBean<S,T>> implements RegistrarBeanWithDefaultBeanClass {
 
 	public static final String REPO_URI = "repo-uri";
 	public static final String REPO_CLASS = "repo-class";
 	public static final String POOL_CLASS = "pool-class";
 	public static final String POOL_SIZE = "pool-size";
 
-	@ConfigField(alias = REPO_URI, desc = "URI for repository", allowAliasFromParent = false)
-	protected String uri;
-
-	@ConfigField(alias = REPO_CLASS, desc = "Class implementing repository", allowAliasFromParent = false)
-	private String cls;
-
-
-	@ConfigField(alias = POOL_SIZE, desc = "Pool size", allowAliasFromParent = false)
-	private int poolSize = RepositoryFactory.USER_REPO_POOL_SIZE_PROP_VAL;
-
-	@ConfigField(alias = POOL_CLASS, desc = "Class implementing repository pool", allowAliasFromParent = false)
-	protected String poolCls;
-
 	@ConfigField(desc = "Domains")
 	private String[] domains = {};
 
-	Kernel kernel;
+	private Kernel kernel;
+
+	@Inject(nullAllowed = true)
+	private MDPoolConfigBean[] configBeans;
 
 	@Override
 	public void register(Kernel kernel) {
@@ -72,62 +60,8 @@ public abstract class MDPoolBean<S extends Repository,T extends MDPoolConfigBean
 		this.kernel = null;
 	}
 
-	public String[] getDomains() {
-		return this.domains;
-	}
-
-	public void setDomains(String[] domains) {
-		updateDomains(this.domains, domains);
-		this.domains = domains;
-	}
-
-	@Override
-	public void beanConfigurationChanged(Collection<String> changedFields) {
-		if (kernel != null) {
-			if (changedFields.contains("uri") || changedFields.contains("cls") || changedFields.contains("poolSize")) {
-				T defaultBean = kernel.getInstance("default");
-				updateConfigForDefault(defaultBean);
-				defaultBean.beanConfigurationChanged(changedFields);
-			}
-		}
-	}
-
 	protected void registerConfigBean(String domain) {
 		kernel.registerBean(domain).asClass(getConfigClass()).exec();
-		T configBean = kernel.getInstance(domain);
-		configBean.setDomain(domain);
-		configBean.setMDPool(this);
-		if ("default".equals(domain)) {
-			updateConfigForDefault(configBean);
-		}
-		configBean.beanConfigurationChanged(Collections.singleton("domain"));
-	}
-
-	protected void updateConfigForDefault(T defaultBean) {
-		defaultBean.uri = uri;
-		defaultBean.cls = cls;
-		defaultBean.poolCls = poolCls;
-		defaultBean.poolSize = poolSize;
-	}
-
-	protected void updateDomains(String[] oldDomains, String[] newDomains) {
-		// in this case register method will take over
-		if (kernel == null)
-			return;
-
-		Set<String> removed = new HashSet<>(Arrays.asList(oldDomains));
-		removed.remove(Arrays.asList(newDomains));
-		Set<String> added = new HashSet<>(Arrays.asList(newDomains));
-		added.remove(Arrays.asList(oldDomains));
-
-		for (String domain : removed) {
-			kernel.unregister(domain);
-			this.removeRepo(domain);
-		}
-		for (String domain : added) {
-			registerConfigBean(domain);
-		}
-
 	}
 
 	public String getDefaultAlias() {

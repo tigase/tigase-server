@@ -29,8 +29,7 @@ package tigase.server;
 
 import tigase.annotations.TODO;
 import tigase.io.SSLContextContainerIfc;
-import tigase.kernel.beans.Inject;
-import tigase.kernel.beans.RegistrarBean;
+import tigase.kernel.beans.*;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.config.ConfigurationChangedAware;
 import tigase.kernel.core.Kernel;
@@ -255,8 +254,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	private int net_buffer_limit = 0;
 	private IOServiceStatisticsGetter ioStatsGetter = new IOServiceStatisticsGetter();
 	private boolean                   initializationCompleted = false;
-	@ConfigField(desc = "Ports for listening")
-	protected HashSet<Integer> ports = getDefPorts();
+	@Inject
+	private PortsConfigBean           portsConfigBean;
 	@Inject(nullAllowed = true)
 	protected XMPPIOProcessor[]       processors              = new XMPPIOProcessor[0];
 	@Inject(bean = "sslContextContainer")
@@ -500,40 +499,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		return result;
 	}
 
-	public void setPorts(HashSet<Integer> ports) {
-		if (ports == null)
-			ports = new HashSet<>();
-
-		Set<Integer> oldPorts = new HashSet<Integer>(this.ports);
-		Set<Integer> newPorts = new HashSet<Integer>(ports);
-		newPorts.removeAll(this.ports);
-		oldPorts.removeAll(ports);
-
-		this.ports = ports;
-		if (kernel == null) {
-			return;
-		}
-
-		for (int port : oldPorts) {
-			unregisterPortConfigBean(port);
-		}
-		for (int port : newPorts) {
-			registerPortConfigBean(port, null);
-		}
-	}
-
 	@Override
 	public void register(Kernel kernel) {
 		this.kernel = kernel;
-
-		HashSet<Integer> sslPorts = new HashSet<>();
-		if (getDefSSLPorts() != null) {
-			for (int port : getDefSSLPorts())
-				sslPorts.add(port);
-		}
-		for (int port : ports) {
-			registerPortConfigBean(port, sslPorts.contains(port) ? SocketType.ssl : SocketType.plain);
-		}
 	}
 
 	@Override
@@ -541,21 +509,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		this.kernel = null;
 	}
 
-	public void registerPortConfigBean(int port, SocketType defSocketType) {
-		String name = "connections/" + port;
-		kernel.registerBean(name).asClass(PortConfigBean.class).exec();
-		PortConfigBean config = kernel.getInstance(name);
-		config.connectionManager = this;
-		config.port = port;
-		if (defSocketType != null && config.socket == null) {
-			config.socket = defSocketType;
-		}
-		config.beanConfigurationChanged(Collections.singleton("port"));
-	}
-
-	public void unregisterPortConfigBean(int port) {
-		kernel.unregister("connections/" + port);
-	}
 
 	@Override
 	public void release() {
@@ -1200,23 +1153,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	protected void socketAccepted(IO serv, SocketType type) {
 	}
-	
-	private void putDefPortParams(Map<String, Object> props, int port, SocketType sock) {
-		log.log(Level.CONFIG, "Generating defaults for port: {0,number,#}", port);
-		props.put(PROP_KEY + port + "/" + PORT_TYPE_PROP_KEY, ConnectionType.accept);
-		props.put(PROP_KEY + port + "/" + PORT_SOCKET_PROP_KEY, sock);
-		props.put(PROP_KEY + port + "/" + PORT_IFC_PROP_KEY, PORT_IFC_PROP_VAL);
-		props.put(PROP_KEY + port + "/" + PORT_REMOTE_HOST_PROP_KEY,
-				PORT_REMOTE_HOST_PROP_VAL);
-
-		Map<String, Object> extra = getParamsForPort(port);
-
-		if (extra != null) {
-			for (Map.Entry<String, Object> entry : extra.entrySet()) {
-				props.put(PROP_KEY + port + "/" + entry.getKey(), entry.getValue());
-			}    // end of for ()
-		}      // end of if (extra != null)
-	}
 
 	private void reconnectService(final Map<String, Object> port_props, long delay) {
 		if (log.isLoggable(Level.FINER)) {
@@ -1575,42 +1511,42 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		}
 	}
 
-	public static class PortConfigBean implements ConfigurationChangedAware {
+	public static class PortConfigBean implements ConfigurationChangedAware, Initializable {
 
+		@Inject
 		private ConnectionManager connectionManager;
 		private ConnectionOpenListener connectionOpenListener = null;
-		private Integer port;
 
-		public PortConfigBean() {
-
-		}
+		@ConfigField(desc = "Port")
+		private Integer name;
 
 		@ConfigField(desc = "Port type")
 		protected ConnectionType type = ConnectionType.accept;
 
 		@ConfigField(desc = "Socket type")
-		protected SocketType socket;
+		protected SocketType socket = SocketType.plain;
 
 		@ConfigField(desc = "Interface to listen on")
-		protected String[] ifc;
+		protected String[] ifc = null;
+
+		public PortConfigBean() {
+
+		}
 
 		@Override
 		public void beanConfigurationChanged(Collection<String> changedFields) {
-			if (socket == null)
-				socket = SocketType.plain;
+			if (connectionManager == null)
+				return;
 
 			if (connectionOpenListener != null)
 				connectionManager.releaseListener(connectionOpenListener);
-
-			if (port == null)
-				return;
 
 			connectionOpenListener = connectionManager.startService(getProps());
 		}
 
 		protected Map<String, Object> getProps() {
 			Map<String, Object> props = new HashMap<>();
-			props.put(PORT_KEY, port);
+			props.put(PORT_KEY, name);
 			props.put(PORT_TYPE_PROP_KEY, type);
 			props.put(PORT_SOCKET_PROP_KEY, socket);
 			if (ifc == null)
@@ -1620,6 +1556,79 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			props.put(PORT_REMOTE_HOST_PROP_KEY, PORT_REMOTE_HOST_PROP_VAL);
 //			props.put(TLS_REQUIRED_PROP_KEY, TLS_REQUIRED_PROP_VAL);
 			return props;
+		}
+
+		@Override
+		public void initialize() {
+			beanConfigurationChanged(Collections.emptyList());
+		}
+	}
+
+	public static class SecPortConfigBean extends PortConfigBean {
+
+		public SecPortConfigBean() {
+			socket = SocketType.ssl;
+		}
+
+	}
+
+	@Bean(name = "connections", parent = ConnectionManager.class, exportable = true)
+	public static class PortsConfigBean implements RegistrarBeanWithDefaultBeanClass, Initializable {
+
+		@Inject
+		private ConnectionManager connectionManager;
+
+		@Inject(nullAllowed = true)
+		private PortConfigBean[] portsBeans;
+
+		@ConfigField(desc = "Ports to enable", alias = "ports")
+		private HashSet<Integer> ports;
+
+		private Kernel kernel;
+
+		public PortsConfigBean() {
+
+		}
+
+		@Override
+		public Class<?> getDefaultBeanClass() {
+			return PortConfigBean.class;
+		}
+
+		@Override
+		public void register(Kernel kernel) {
+			this.kernel = kernel;
+			String connManagerBean = kernel.getParent().getName();
+			this.kernel.getParent().ln("service", kernel, connManagerBean);
+		}
+
+		@Override
+		public void unregister(Kernel kernel) {
+			this.kernel = null;
+		}
+
+		@Override
+		public void initialize() {
+			if (ports == null) {
+				ports = connectionManager.getDefPorts();
+			}
+
+			HashSet<Integer> sslPorts = new HashSet<>();
+			if (connectionManager.getDefSSLPorts() != null) {
+				for (int port : connectionManager.getDefSSLPorts())
+					sslPorts.add(port);
+			}
+
+			for (Integer port : ports) {
+				String name = String.valueOf(port);
+				if (kernel.getDependencyManager().getBeanConfig(name) == null) {
+					Class cls = sslPorts.contains(port.intValue()) ? SecPortConfigBean.class : PortConfigBean.class;
+					kernel.registerBean(name).asClass(cls).exec();
+				}
+			}
+
+
+			register(kernel);
 		}
 	}
 }    // ConnectionManager

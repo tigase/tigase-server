@@ -34,6 +34,6 @@ public interface BeanConfigurator {
 	 */
 	void configure(BeanConfig beanConfig, Object bean);
 
-	void registerBeans(BeanConfig beanConfig, Map<String, Object> valeus);
+	void registerBeans(BeanConfig beanConfig, Object bean, Map<String, Object> valeus);
 
 }

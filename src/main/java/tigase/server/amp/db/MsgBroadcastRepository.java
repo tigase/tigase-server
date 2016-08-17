@@ -135,35 +135,36 @@ public abstract class MsgBroadcastRepository<T,S extends DataSource> implements 
 
 		@Override
 		public void loadMessagesToBroadcast() {
-			getRepository(dataSourceBean.getDefaultAlias()).loadMessagesToBroadcast();
+			getRepository("default").loadMessagesToBroadcast();
 		}
 
 		@Override
 		public MsgBroadcastRepository.BroadcastMsg getBroadcastMsg(String id) {
-			return getRepository(dataSourceBean.getDefaultAlias()).getBroadcastMsg(id);
+			return getRepository("default").getBroadcastMsg(id);
 		}
 
 		@Override
 		public String dumpBroadcastMessageKeys() {
-			return getRepository(dataSourceBean.getDefaultAlias()).dumpBroadcastMessageKeys();
+			return getRepository("default").dumpBroadcastMessageKeys();
 		}
 
 		@Override
 		public Collection<MsgBroadcastRepository.BroadcastMsg> getBroadcastMessages() {
-			return getRepository(dataSourceBean.getDefaultAlias()).getBroadcastMessages();
+			return getRepository("default").getBroadcastMessages();
 		}
 
 		@Override
 		public boolean updateBroadcastMessage(String id, Element msg, Date expire, BareJID recipient) {
-			return getRepository(dataSourceBean.getDefaultAlias()).updateBroadcastMessage(id, msg, expire, recipient);
+			return getRepository("default").updateBroadcastMessage(id, msg, expire, recipient);
 		}
 
 		@Override
-		protected void updateDataSource(String domain, DataSource newDS, DataSource oldDS) {
-			if (!dataSourceBean.getDefaultAlias().equals(domain))
-				return;
+		public Class<?> getDefaultBeanClass() {
+			return MsgBroadcastRepositoryConfigBean.class;
+		}
 
-			super.updateDataSource(domain, newDS, oldDS);
+		public static class MsgBroadcastRepositoryConfigBean extends MDRepositoryConfigBean<MsgBroadcastRepository> {
+
 		}
 	}
 

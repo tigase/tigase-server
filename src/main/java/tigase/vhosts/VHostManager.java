@@ -26,12 +26,11 @@ package tigase.vhosts;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.cluster.repo.ClusterRepoItem;
 import tigase.db.DBInitException;
 import tigase.db.DataSource;
 import tigase.db.DataSourceHelper;
 import tigase.db.TigaseDBException;
-import tigase.db.comp.AbstractMDComponentRepositoryBean;
+import tigase.db.comp.AbstractSDComponentRepositoryBean;
 import tigase.db.comp.ComponentRepository;
 import tigase.db.comp.ComponentRepositoryDataSourceAware;
 import tigase.kernel.beans.Bean;
@@ -376,9 +375,9 @@ public class VHostManager
 	}
 
 	@Bean(name = "vhostRepository", parent = VHostManager.class)
-	public static class DefVHostRepositoryBean extends AbstractMDComponentRepositoryBean<VHostItem> {
+	public static class DefVHostRepositoryBean extends AbstractSDComponentRepositoryBean<VHostItem> {
 
-		private ComponentRepository<ClusterRepoItem> repo = null;
+		private ComponentRepository<VHostItem> repo = null;
 
 		private static DataSourceHelper.Matcher matcher = (Class clazz) -> {
 			return ReflectionHelper.classMatchesClassWithParameters(clazz, ComponentRepositoryDataSourceAware.class, new Type[] { VHostItem.class, DataSource.class });
@@ -389,6 +388,7 @@ public class VHostManager
 			Class cls = DataSourceHelper.getDefaultClass(ComponentRepository.class, dataSource.getResourceUri(), matcher);
 			return (Class<ComponentRepositoryDataSourceAware<VHostItem, DataSource>>) cls;
 		}
+
 	}
 }
 

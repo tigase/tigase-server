@@ -58,7 +58,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		if (log.isLoggable(Level.CONFIG))
 			log.config("Configuring bean '" + beanConfig.getBeanName() + "'...");
 
-		registerBeans(beanConfig, values);
+		registerBeans(beanConfig, bean, values);
 
 		final HashMap<Field, Object> valuesToSet = new HashMap<>();
 
@@ -226,7 +226,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 	}
 
 	@Override
-	public void registerBeans(BeanConfig beanConfig, Map<String, Object> values) {
+	public void registerBeans(BeanConfig beanConfig, Object bean, Map<String, Object> values) {
 		Kernel kernel = beanConfig == null ? this.getKernel() : beanConfig.getKernel();
 
 		List<BeanConfig> registeredBeans = registerBeansForBeanOfClass(kernel, beanConfig == null ? Kernel.class : beanConfig.getClazz());
@@ -265,39 +265,48 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 
 			for (BeanDefinition cfg : beanPropConfigMap.values()) {
 				// TODO configuration is not as it should be - unknown class for bean!
-				if (cfg.getClazzName() == null && !kernel.isBeanClassRegistered(cfg.getBeanName(), false))
-					continue;
-
-				boolean register = !kernel.isBeanClassRegistered(cfg.getBeanName(), false);
-				if (!register) {
-					if (kernel.getClass() != null && cfg.getClazzName() != null && !kernel.getClass().getCanonicalName().equals(cfg.getClazzName())) {
-					 	register = true;
-					} else {
-						kernel.setBeanActive(cfg.getBeanName(), cfg.isActive());
+				try {
+					Class<?> clazz = cfg.getClazzName() == null ? null : ModulesManagerImpl.getInstance().forName(cfg.getClazzName());
+					if (clazz == null && !kernel.isBeanClassRegistered(cfg.getBeanName(), false)) {
+						if (bean != null && bean instanceof RegistrarBeanWithDefaultBeanClass) {
+							clazz = ((RegistrarBeanWithDefaultBeanClass) bean).getDefaultBeanClass();
+						}
+						if (clazz == null) {
+							continue;
+						}
 					}
-				}
-				if (register) {
-					BeanConfig oldCfg = kernel.getDependencyManager().getBeanConfig(cfg.getBeanName());
-					try {
-						Class<?> cls = ModulesManagerImpl.getInstance().forName(cfg.getClazzName());
-						BeanConfigBuilder cfgBuilder = kernel.registerBean(cfg.getBeanName()).asClass(cls).setActive(cfg.isActive());
+
+					boolean register = !kernel.isBeanClassRegistered(cfg.getBeanName(), false);
+					if (!register) {
+						if (kernel.getClass() != null && clazz != null && !kernel.getClass().equals(clazz)) {
+							register = true;
+						} else {
+							kernel.setBeanActive(cfg.getBeanName(), cfg.isActive());
+						}
+					}
+					if (register) {
+						BeanConfig oldCfg = kernel.getDependencyManager().getBeanConfig(cfg.getBeanName());
+						BeanConfigBuilder cfgBuilder = kernel.registerBean(cfg.getBeanName()).asClass(clazz).setActive(cfg.isActive());
 						if (oldCfg != null && oldCfg.isExportable()) {
 							cfgBuilder.exportable();
 						}
-						Bean ba = cls.getAnnotation(Bean.class);
+						Bean ba = clazz.getAnnotation(Bean.class);
 						if (ba != null) {
 							if (ba.exportable()) {
 								cfgBuilder.exportable();
 							}
 						}
+						if (cfg.isExportable()) {
+							cfgBuilder.exportable();
+						}
 						BeanConfig registeredBeanConfig = cfgBuilder.execWithoutInject();
 						if (registeredBeanConfig != null) {
 							registeredBeans.add(registeredBeanConfig);
 						}
-					} catch (ClassNotFoundException ex) {
-						log.log(Level.FINER, "could not register bean '" + cfg.getBeanName() + "' as class '" +
-								cfg.getClazzName() + "' is not available", ex);
 					}
+				} catch (ClassNotFoundException ex) {
+					log.log(Level.FINER, "could not register bean '" + cfg.getBeanName() + "' as class '" +
+							cfg.getClazzName() + "' is not available", ex);
 				}
 			}
 		}

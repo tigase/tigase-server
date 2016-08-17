@@ -26,34 +26,37 @@ import tigase.db.DataSource;
 import tigase.db.DataSourceAware;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.HandleEvent;
-import tigase.kernel.beans.Initializable;
-import tigase.kernel.beans.Inject;
-import tigase.kernel.beans.RegistrarBean;
-import tigase.kernel.beans.UnregisterAware;
+import tigase.kernel.beans.*;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.beans.config.ConfigurationChangedAware;
 import tigase.kernel.core.Kernel;
 import tigase.osgi.ModulesManagerImpl;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static tigase.db.beans.MDPoolBean.REPO_CLASS;
+
 /**
- * Abstract class implementing bean to which should be used to create domain aware repository pool.
+ * Abstract class implementing bean to which should be used to create name aware repository pool.
  * This class is resposible for creation of correct repository instances for every DataSource configured.
  *
  * Created by andrzej on 15.03.2016.
  */
-public abstract class MDRepositoryBean<T extends DataSourceAware> implements Initializable, UnregisterAware, RegistrarBean {
+public abstract class MDRepositoryBean<T extends DataSourceAware> implements Initializable, UnregisterAware, RegistrarBeanWithDefaultBeanClass {
 
 	private static final Logger log = Logger.getLogger(MDRepositoryBean.class.getCanonicalName());
 
+	@Inject(nullAllowed = true)
+	private MDRepositoryConfigBean[] configBeans;
+
 	@Inject
-	protected DataSourceBean dataSourceBean;
+	private DataSourceBean dataSourceBean;
 
 	@Inject
 	private EventBus eventBus;
@@ -61,14 +64,8 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 	@ConfigField(desc = "Map of aliases for data sources to use")
 	protected ConcurrentHashMap<String, String> aliases = new ConcurrentHashMap<>();
 
-	@ConfigField(desc = "Map of classes for data sources")
-	protected ConcurrentHashMap<String,String> customClasses = new ConcurrentHashMap<>();
-
-	@ConfigField(desc = "Create repositories for: Main only data source, every UserRepository, every data source, listed data sources")
-	protected SelectorType dataSourceSelection = SelectorType.MainOnly;
-
-	@ConfigField(desc = "Default data source to use")
-	protected String defaultDataSourceName = "default";
+	@ConfigField(desc = "Create repositories for: every UserRepository, every data source, listed data sources")
+	protected SelectorType dataSourceSelection = SelectorType.List;
 
 	@ConfigField(desc = "List of domains for which we create separate instances")
 	protected CopyOnWriteArrayList<String> domains = new CopyOnWriteArrayList<>();
@@ -85,7 +82,7 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 	protected T getRepository(String domain) {
 		T repo = repositories.get(aliases.getOrDefault(domain, domain));
 		if (repo == null) {
-			repo = repositories.get(defaultDataSourceName);
+			repo = repositories.get("default");
 		}
 		return repo;
 	}
@@ -95,15 +92,21 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 		if (!event.isCorrectSender(dataSourceBean))
 			return;
 
-		updateDataSource(event.getDomain(), event.getNewDataSource(), event.getOldDataSource());
+		if (dataSourceSelection == SelectorType.EveryDataSource) {
+			if (event.getNewDataSource() == null) {
+				kernel.unregister(event.getDomain());
+			} else {
+				registerIfNotExists(event.getDomain());
+			}
+		}
 	}
 
 	public void setDataSourceBean(DataSourceBean dataSourceBean) {
 		Map<String, DataSource> oldDataSources = new HashMap<>();
-		String defAlias = defaultDataSourceName;
+		String defAlias = "default";
 		if (this.dataSourceBean != null) {
 			oldDataSources.put(defAlias, this.dataSourceBean.getRepository(defAlias));
-			for (String domain : this.dataSourceBean.getDomains()) {
+			for (String domain : this.dataSourceBean.getDataSourceNames()) {
 				oldDataSources.put(domain, this.dataSourceBean.getRepository(domain));
 			}
 		}
@@ -112,34 +115,41 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 
 		if (this.dataSourceBean != null) {
 			switch (dataSourceSelection) {
-				case MainOnly:
-					updateDataSource(defAlias, dataSourceBean.getRepository(defAlias), oldDataSources.get(defAlias));
-					break;
 				case EveryDataSource:
 					for (String name : dataSourceBean.getDataSourceNames()) {
-						updateDataSource(name, dataSourceBean.getRepository(name), oldDataSources.get(name));
+						registerIfNotExists(name);
 					}
 					break;
 				case EveryUserRepository:
-					updateDataSource(defAlias, dataSourceBean.getRepository(defAlias), oldDataSources.get(defAlias));
+					registerIfNotExists("default");
 
 					UserRepositoryMDPoolBean userRepositoryPool = kernel.getInstance(UserRepositoryMDPoolBean.class);
-					for (String name : userRepositoryPool.getDomains()) {
-						updateDataSource(defAlias, dataSourceBean.getRepository(name), oldDataSources.get(name));
+					for (String name : userRepositoryPool.getDomainsList()) {
+						registerIfNotExists(name);
 					}
 					break;
 				case List:
+					registerIfNotExists("default");
+
 					for (String name : domains) {
-						updateDataSource(name, dataSourceBean.getRepository(name), oldDataSources.get(name));
+						registerIfNotExists(name);
 					}
 					break;
 			}
 		}
 	}
 
+	public void registerIfNotExists(String name) {
+		if (!kernel.isBeanClassRegistered("default")) {
+			Class<?> cls = getDefaultBeanClass();
+			kernel.registerBean(name).asClass(cls).exec();
+		}
+	}
+
 	@Override
 	public void register(Kernel kernel) {
 		this.kernel = kernel;
+		registerIfNotExists("default");
 	}
 
 	@Override
@@ -147,47 +157,12 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 		this.kernel = null;
 	}
 
-	protected void updateDataSource(String domain, DataSource newDS, DataSource oldDS) {
-		T repo = null;
-		if (newDS != null) {
-			Class<? extends T> repoClass = null;
-			try {
-				repoClass = getClassForDomain(domain);
-				if (repoClass == null)
-					repoClass = findClassForDataSource(newDS);
-
-				kernel.registerBean(domain).asClass(repoClass).exec();
-				repo = kernel.getInstance(domain);
-				initializeRepository(domain, repo);
-				repo.setDataSource(newDS);
-			} catch (DBInitException|ClassNotFoundException e) {
-//				} catch (DBInitException|InstantiationException|IllegalAccessException|ClassNotFoundException e) {
-				log.log(Level.SEVERE, "could not initialize instance of MsgPository = " + repoClass + " for dataSource " + newDS);
-				repo = null;
-			}
-		} else {
-			kernel.unregister(domain);
-		}
-		if (repo == null)
-			repositories.remove(domain);
-		else
-			repositories.put(domain, repo);
-	}
-
-	protected Class<? extends T> getClassForDomain(String domain) throws ClassNotFoundException {
-		String className = customClasses.get(domain);
-		if (className == null)
-			return null;
-		return (Class<? extends T>) ModulesManagerImpl.getInstance().forName(className);
-	}
-
-	@Override
-	public void initialize() {
-		eventBus.registerAll(this);
-	}
-
 	protected void initializeRepository(String domain, T repo) {
 
+	}
+
+	public void initialize() {
+		eventBus.registerAll(this);
 	}
 
 	@Override
@@ -195,10 +170,126 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 		eventBus.unregisterAll(this);
 	}
 
+
+	protected void updateDataSourceAware(String domain, T newRepo, T oldRepo) {
+		if (newRepo != null) {
+			this.repositories.put(domain, newRepo);
+		} else {
+			this.repositories.remove(domain, oldRepo);
+		}
+	}
+
 	public static enum SelectorType {
-		MainOnly,
+		List,
 		EveryDataSource,
 		EveryUserRepository,
-		List
+	}
+
+	public abstract static class MDRepositoryConfigBean<A extends DataSourceAware> implements Initializable, UnregisterAware, ConfigurationChangedAware, RegistrarBean {
+
+		@Inject
+		protected DataSourceBean dataSourceBean;
+
+		@Inject
+		private EventBus eventBus;
+
+		@Inject
+		private MDRepositoryBean<A> mdRepositoryBean;
+
+		private Kernel kernel;
+
+		@Inject(bean = "instance", nullAllowed = true)
+		private A dataSourceAware;
+
+		@ConfigField(desc = "Name (ie. domain)")
+		private String name;
+
+		@ConfigField(alias = REPO_CLASS, desc = "Class implementing repository", allowAliasFromParent = false)
+		private String cls;
+
+		@ConfigField(desc = "Name of data source", alias = "data-source")
+		private String dataSourceName;
+
+		private DataSource dataSource;
+
+		protected Class<?> getRepositoryClassName() throws DBInitException, ClassNotFoundException {
+			if (cls == null) {
+				return mdRepositoryBean.findClassForDataSource(dataSource);
+			}
+			return ModulesManagerImpl.getInstance().forName(cls);
+		}
+
+		@Override
+		public void beanConfigurationChanged(Collection<String> changedFields) {
+			if (name == null || mdRepositoryBean == null || dataSourceBean == null)
+				return;
+
+			String name = this.name;
+			if (dataSourceName != null && !dataSourceName.isEmpty())
+				name = dataSourceName;
+
+			dataSource = dataSourceBean.getRepository(name);
+
+			if (dataSource != null) {
+				try {
+					Class<?> repoClass = getRepositoryClassName();
+
+					kernel.registerBean("instance").asClass(repoClass).exec();
+				} catch (DBInitException | ClassNotFoundException ex) {
+					throw new RuntimeException("Could not initialize bean '" + name + "'", ex);
+				}
+			} else {
+				if (kernel.isBeanClassRegistered("instance")) {
+					kernel.unregister("instance");
+				}
+			}
+		}
+
+		@HandleEvent
+		protected void onDataSourceChange(DataSourceBean.DataSourceChangedEvent event) {
+			if (!event.isCorrectSender(dataSourceBean))
+				return;
+
+			if (!event.getDomain().equals(name) && !event.getDomain().equals(dataSourceName))
+				return;
+
+			beanConfigurationChanged(Collections.singleton("uri"));
+		}
+
+		public void setDataSourceAware(A dataSourceAware) {
+			if (mdRepositoryBean == null && dataSourceAware == null)
+				return;
+
+			if (dataSourceAware != null) {
+				this.mdRepositoryBean.initializeRepository(name, dataSourceAware);
+				dataSourceAware.setDataSource(dataSource);
+			}
+			mdRepositoryBean.updateDataSourceAware(name, dataSourceAware, this.dataSourceAware);
+			this.dataSourceAware = dataSourceAware;
+		}
+
+		@Override
+		public void register(Kernel kernel) {
+			this.kernel = kernel;
+			String rootBean = kernel.getParent().getName();
+			this.kernel.getParent().ln("service", kernel, rootBean);
+		}
+
+		@Override
+		public void unregister(Kernel kernel) {
+			kernel.unregister("instance");
+		}
+
+		@Override
+		public void initialize() {
+			eventBus.registerAll(this);
+			beanConfigurationChanged(Collections.singleton("uri"));
+		}
+
+		@Override
+		public void beforeUnregister() {
+			eventBus.unregisterAll(this);
+			kernel.unregister("instance");
+		}
 	}
 }

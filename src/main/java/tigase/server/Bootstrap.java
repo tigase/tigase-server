@@ -232,11 +232,8 @@ public class Bootstrap implements Lifecycle {
 					userDbDomains.add(domain);
 					authDbDomains.add(domain);
 					dataSourceNames.add(domain);
-					props.put("dataSource/" + domain + "/uri", userUri);
 				}
-				else {
-					props.put("dataSource/uri", userUri);
-				}
+				props.put("dataSource/" + domain + "/uri", userUri);
 			}
 
 			if ((authUri != null) && (userUri == null || !userUri.contains(authUri))) {
@@ -250,19 +247,11 @@ public class Bootstrap implements Lifecycle {
 			if (userType != null && !userType.equals("mysql") && !userType.equals("pgsql") && !userType.equals("derby")
 					&& !userType.equals("sqlserver")) {
 				String cls = RepositoryFactory.getRepoClass(userType);
-				if (!domain.equals("default")) {
-					props.put("userRepository/" + domain + "/cls", cls);
-				} else {
-					props.put("userRepository/cls", cls);
-				}
+				props.put("userRepository/" + domain + "/cls", cls);
 			}
 			if (authType != null && !authType.equals("tigase-custom-auth")) {
 				String cls = RepositoryFactory.getRepoClass(userType);
-				if (!domain.equals("default")) {
-					props.put("authRepository/" + domain + "/cls", cls);
-				} else {
-					props.put("authRepository/cls", cls);
-				}
+				props.put("authRepository/" + domain + "/cls", cls);
 			}
 		});
 
@@ -401,7 +390,7 @@ public class Bootstrap implements Lifecycle {
 			dslBeanConfigurator.setProperties(props);
 		}
 		// if null then we register global subbeans
-		configurator.registerBeans(null, props);
+		configurator.registerBeans(null, null, props);
 
 		DependencyGrapher dg = new DependencyGrapher();
 		dg.setKernel(kernel);

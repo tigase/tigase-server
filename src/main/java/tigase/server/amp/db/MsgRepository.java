@@ -256,26 +256,9 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 	}
 
 	/**
-	 * Bean used to provide MsgRepository implementations - for every domain default one
-	 * using backend configured for default domain.
+	 * Bean used to provide MsgRepository implementations
 	 */
 	@Bean(name = "msgRepository", parent = Kernel.class, exportable = true)
-	public static class MsgRepositorySDBean extends MsgRepositoryMDBean {
-
-		@Override
-		protected void updateDataSource(String domain, DataSource newDS, DataSource oldDS) {
-			if (!dataSourceBean.getDefaultAlias().equals(domain))
-				return;
-
-			super.updateDataSource(domain, newDS, oldDS);
-		}
-	}
-
-	/**
-	 * Bean used to provide MsgRepository implementations - for every domain for which
-	 * there is defined data source it will create proper MsgRepository instance
-	 * and return it when needed
-	 */
 	public static class MsgRepositoryMDBean extends MDRepositoryBean<MsgRepositoryIfc> implements MsgRepositoryIfc {
 
 		private static final Logger log = Logger.getLogger(MsgRepositoryMDBean.class.getCanonicalName());
@@ -284,7 +267,6 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 		private final Condition expiredMessagesCondition = lock.newCondition();
 
 		public MsgRepositoryMDBean() {
-			dataSourceSelection = SelectorType.EveryUserRepository;
 		}
 
 		@Override
@@ -338,7 +320,7 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 		protected <T> T getValueForDomain(Map<String,T> map, String domain) {
 			T value = map.get(domain);
 			if (value == null)
-				value = map.get(dataSourceBean.getDefaultAlias());
+				value = map.get("default");
 			return value;
 		}
 
@@ -354,6 +336,15 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 
 		@Override
 		public void setDataSource(DataSource dataSource) {
+
+		}
+
+		@Override
+		public Class<?> getDefaultBeanClass() {
+			return MsgRepositoryConfigBean.class;
+		}
+
+		public static class MsgRepositoryConfigBean extends MDRepositoryConfigBean<MsgRepositoryIfc> {
 
 		}
 	}

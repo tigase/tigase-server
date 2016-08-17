@@ -37,6 +37,11 @@ public class UserRepositoryMDPoolBean extends UserRepositoryMDImpl {
 		return UserRepositoryConfigBean.class;
 	}
 
+	@Override
+	public Class<?> getDefaultBeanClass() {
+		return UserRepositoryConfigBean.class;
+	}
+
 	public static class UserRepositoryConfigBean extends AuthUserRepositoryConfigBean<UserRepository, UserRepositoryConfigBean> {
 
 		@Override

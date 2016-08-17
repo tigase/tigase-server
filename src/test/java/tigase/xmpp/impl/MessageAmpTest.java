@@ -52,7 +52,7 @@ public class MessageAmpTest extends ProcessorTestCase {
 	public void setUp() throws Exception {
 		kernel = new Kernel();
 		kernel.setForceAllowNull(true);
-		MsgRepositoryIfc msgRepo = new MsgRepository.MsgRepositorySDBean();
+		MsgRepositoryIfc msgRepo = new MsgRepository.MsgRepositoryMDBean();
 		kernel.registerBean("msgRepository").asInstance(msgRepo).exportable().exec();
 		kernel.registerBean(MessageAmp.class).exec();
 		messageAmp = kernel.getInstance(MessageAmp.class);

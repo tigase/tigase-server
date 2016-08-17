@@ -82,9 +82,17 @@ public class ReflectionHelper {
 		return (type instanceof Class) ? (Class) type : null;
 	}
 
-	public static Class getCollectionParamter(Type genericType) {
+	public static Class getCollectionParamter(Type genericType, Class clazz) {
 		if (genericType instanceof ParameterizedType) {
-			return (Class) ((ParameterizedType) genericType).getActualTypeArguments()[0];
+			Type type = ((ParameterizedType) genericType).getActualTypeArguments()[0];
+			if (!(type instanceof Class)) {
+				Map<TypeVariable<?>, Type> map = createGenericsTypeMap(clazz);
+				while (type instanceof TypeVariable) {
+					type = map.get((TypeVariable<?>) type);
+				}
+			}
+
+			return (Class) type;
 		}
 		return null;
 	}
@@ -92,19 +100,82 @@ public class ReflectionHelper {
 	public static boolean classMatchesClassWithParameters(Class clazz, Class rt, Type[] ap) {
 		Map<TypeVariable<?>, Type> map = createGenericsTypeMap(clazz);
 		TypeVariable<?>[] tvs = rt.getTypeParameters();
-		boolean match = true;
+		boolean match = rt.isAssignableFrom(clazz);
+		if (!match)
+			return false;
+
 		for (int i = 0; i < tvs.length; i++) {
 			Type t = tvs[i];
 			while (map.containsKey(t)) {
 				t = map.get(t);
 			}
-			match &= ap[i].equals(t)
-					|| (ap[i] instanceof WildcardType)
-					|| ((t instanceof TypeVariable) && (
-							((ap[i] instanceof TypeVariable) && boundMatch((TypeVariable) ap[i], (TypeVariable) t))
-							|| (ap[i] instanceof Class) && boundMatch((Class) ap[i], (TypeVariable) t))
-						)
-					|| (ap[i] instanceof Class && t instanceof Class && ((Class) ap[i]).isAssignableFrom((Class) t));
+
+			if (ap[i].equals(t))
+				continue;
+
+			if (ap[i] instanceof WildcardType)
+				continue;
+
+			if ((ap[i] instanceof TypeVariable) && (t instanceof TypeVariable) && boundMatch((TypeVariable) ap[i], (TypeVariable) t))
+				continue;
+
+			if (ap[i] instanceof Class) {
+				if (t instanceof Class && ((Class) ap[i]).isAssignableFrom((Class) t))
+					continue;
+				if (t instanceof ParameterizedType && ((Class) ap[i]).isAssignableFrom((Class) ((ParameterizedType)t).getRawType()))
+					continue;
+				if (t instanceof TypeVariable && boundMatch((Class) ap[i], (TypeVariable) t))
+					continue;
+			}
+
+			if (ap[i] instanceof ParameterizedType) {
+				ParameterizedType apt = (ParameterizedType) ap[i];
+				if (t instanceof TypeVariable) {
+					Type[] bounds = ((TypeVariable) t).getBounds();
+					if (bounds.length == 1) {
+						t = bounds[0];
+					}
+				}
+
+				if (t instanceof Class && apt.getRawType() instanceof Class) {
+					if (classMatchesClassWithParameters((Class) t, (Class) apt.getRawType(), apt.getActualTypeArguments()))
+						continue;
+				}
+				if (t instanceof ParameterizedType) {
+					ParameterizedType tpt = (ParameterizedType) t;
+					if (apt.getRawType() instanceof Class && tpt.getRawType() instanceof Class) {
+						if (((Class) apt.getRawType()).isAssignableFrom((Class) tpt.getRawType())) {
+							Type[] apta = apt.getActualTypeArguments();
+							Type[] tpta = tpt.getActualTypeArguments();
+							if (apta.length == tpta.length) {
+								boolean ptMatch = true;
+								for (int j=0; j<apta.length; j++) {
+									Type at = apta[j];
+									Type tt = tpta[j];
+									while (tt instanceof TypeVariable && map.containsKey(tt)) {
+										tt = map.get(tt);
+									}
+									if (tt instanceof TypeVariable) {
+										Type[] bounds = ((TypeVariable) tt).getBounds();
+										if (bounds.length == 1) {
+											tt = bounds[0];
+										}
+									}
+									if (at instanceof Class && tt instanceof Class) {
+										if (((Class) at).isAssignableFrom((Class) tt))
+											continue;
+									}
+									ptMatch = false;
+								}
+								if (ptMatch)
+									continue;
+							}
+						}
+					}
+				}
+			}
+
+			match &= false;
 		}
 		return match;
 	}
@@ -142,7 +213,7 @@ public class ReflectionHelper {
 		return false;
 	}
 
-	private static Map<TypeVariable<?>, Type> createGenericsTypeMap(Class<?> cls) {
+	public static Map<TypeVariable<?>, Type> createGenericsTypeMap(Class<?> cls) {
 		Map<TypeVariable<?>, Type> map = new HashMap<>();
 		createGenericsTypeMap(map, cls.getGenericInterfaces());
 		Type genericType = cls.getGenericSuperclass();

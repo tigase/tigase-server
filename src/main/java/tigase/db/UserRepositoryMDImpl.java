@@ -30,9 +30,7 @@ import tigase.eventbus.EventBus;
 import tigase.kernel.beans.Inject;
 import tigase.xmpp.BareJID;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -100,6 +98,10 @@ public abstract class UserRepositoryMDImpl extends MDPoolBean<UserRepository,Use
 	}
 
 	//~--- get methods ----------------------------------------------------------
+
+	public Collection<String> getDomainsList() {
+		return Collections.unmodifiableCollection(repos.keySet());
+	}
 
 	@Override
 	public String getData(BareJID user, String subnode, String key, String def)

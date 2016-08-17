@@ -27,6 +27,7 @@ import tigase.eventbus.HandleEvent;
 import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.UnregisterAware;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.config.ConfigurationChangedAware;
 
 import java.util.Collection;
@@ -41,6 +42,9 @@ public abstract class AuthUserRepositoryConfigBean<T extends Repository, U exten
 	private EventBus eventBus;
 	@Inject
 	private DataSourceBean dataSourceBean;
+
+	@ConfigField(desc = "Name of data source to use", alias = "data-source")
+	private String dataSourceName;
 
 	private DataSource dataSource;
 	private String repositoryUri;
@@ -58,33 +62,25 @@ public abstract class AuthUserRepositoryConfigBean<T extends Repository, U exten
 	}
 
 	@Override
-	protected T newRepositoryInstance(String cls) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-		T repository = super.newRepositoryInstance(cls);
-		if (repository instanceof DataSourceAware)
+	protected void initRepository(T repository) throws DBInitException {
+		if (repository instanceof DataSourceAware) {
 			((DataSourceAware) repository).setDataSource(dataSource);
-		return repository;
+		}
+		super.initRepository(repository);
 	}
 
 	@Override
 	public void beanConfigurationChanged(Collection<String> changedFields) {
 		if (dataSourceBean != null) {
 			if (uri == null) {
-				repositoryUri = domain;
-				dataSource = dataSourceBean.getRepository(domain);
+				repositoryUri = dataSourceName != null ? dataSourceName : name;
+				dataSource = dataSourceBean.getRepository(repositoryUri);
 				if (dataSource != null)
 					repositoryUri = dataSource.getResourceUri();
 			} else {
 				repositoryUri = uri;
-
-				if (repositoryUri.startsWith("dataSource:")) {
-					String dataSourceName = repositoryUri.substring("dataSource:".length());
-					dataSource = dataSourceBean.getRepository(dataSourceName);
-					if (dataSource != null)
-						repositoryUri = dataSource.getResourceUri();
-				}
 			}
 		}
-
 		super.beanConfigurationChanged(changedFields);
 	}
 
@@ -98,7 +94,7 @@ public abstract class AuthUserRepositoryConfigBean<T extends Repository, U exten
 		if (!event.isCorrectSender(dataSourceBean))
 			return;
 
-		if (uri != null || !event.getDomain().equals(domain))
+		if (uri != null || (!event.getDomain().equals(name) && !event.getDomain().equals(dataSourceName)))
 			return;
 
 		beanConfigurationChanged(Collections.singleton("uri"));
@@ -107,6 +103,7 @@ public abstract class AuthUserRepositoryConfigBean<T extends Repository, U exten
 	@Override
 	public void initialize() {
 		eventBus.registerAll(this);
+		super.initialize();
 	}
 
 	@Override

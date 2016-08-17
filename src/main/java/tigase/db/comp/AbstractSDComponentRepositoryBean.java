@@ -1,5 +1,5 @@
 /*
- * AbstractMDComponentRepositoryBean.java
+ * AbstractSDComponentRepositoryBean.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
@@ -24,73 +24,65 @@ package tigase.db.comp;
 import tigase.db.DBInitException;
 import tigase.db.DataSource;
 import tigase.db.TigaseDBException;
-import tigase.db.beans.MDRepositoryBean;
+import tigase.db.beans.SDRepositoryBean;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Class implements ComponentRepository interfaces and extends MDRepositoryBean
+ * Class implements ComponentRepository interfaces and extends SDRepositoryBean
  * and is designed to be based bean used by other classes responsible for loading
  * proper implementation of ComponentRepository depending on used implementation
  * of DataSource.
  *
  * Created by andrzej on 18.03.2016.
  */
-public abstract class AbstractMDComponentRepositoryBean<Item extends RepositoryItem> extends MDRepositoryBean<ComponentRepositoryDataSourceAware<Item, DataSource>> implements ComponentRepository<Item> {
-
-	protected ComponentRepositoryDataSourceAware<Item,DataSource> repo = null;
+public abstract class AbstractSDComponentRepositoryBean<Item extends RepositoryItem> extends SDRepositoryBean<ComponentRepositoryDataSourceAware<Item, DataSource>> implements ComponentRepository<Item> {
 
 	@Override
-	protected void updateDataSource(String domain, DataSource newDS, DataSource oldDS) {
-		if (!dataSourceBean.getDefaultAlias().equals(domain))
-			return;
-
-		ComponentRepositoryDataSourceAware<Item,DataSource> repo_old = repo;
-		super.updateDataSource(domain, newDS, oldDS);
-		repo = getRepository(dataSourceBean.getDefaultAlias());
-		if (repo_old != repo && repo_old != null) {
-			repo_old.destroy();
+	public void setRepository(ComponentRepositoryDataSourceAware<Item, DataSource> repository) {
+		ComponentRepositoryDataSourceAware<Item, DataSource> oldRepo = getRepository();
+		super.setRepository(repository);
+		if (oldRepo != getRepository() && oldRepo != null) {
+			oldRepo.destroy();
 		}
 	}
 
-
 	@Override
 	public void addRepoChangeListener(RepositoryChangeListenerIfc<Item> repoChangeListener) {
-		repo.addRepoChangeListener(repoChangeListener);
+		getRepository().addRepoChangeListener(repoChangeListener);
 	}
 
 	@Override
 	public void removeRepoChangeListener(RepositoryChangeListenerIfc<Item> repoChangeListener) {
-		repo.removeRepoChangeListener(repoChangeListener);
+		getRepository().removeRepoChangeListener(repoChangeListener);
 
 	}
 
 	@Override
 	public void addItem(Item item) throws TigaseDBException {
-		repo.addItem(item);
-
+		getRepository().addItem(item);
 	}
 
 	@Override
 	public void addItemNoStore(Item item) {
-		repo.addItemNoStore(item);
+		getRepository().addItemNoStore(item);
 	}
 
 	@Override
 	public Collection<Item> allItems() throws TigaseDBException {
-		return repo.allItems();
+		return getRepository().allItems();
 	}
 
 	@Override
 	public boolean contains(String key) {
-		return repo.contains(key);
+		return getRepository().contains(key);
 	}
 
 	@Override
 	public void destroy() {
-		repo.destroy();
+		getRepository().destroy();
 	}
 
 	@Deprecated
@@ -101,22 +93,22 @@ public abstract class AbstractMDComponentRepositoryBean<Item extends RepositoryI
 
 	@Override
 	public Item getItem(String key) {
-		return repo.getItem(key);
+		return getRepository().getItem(key);
 	}
 
 	@Override
 	public Item getItemInstance() {
-		return repo.getItemInstance();
+		return getRepository().getItemInstance();
 	}
 
 	@Override
 	public void reload() throws TigaseDBException {
-		repo.reload();
+		getRepository().reload();
 	}
 
 	@Override
 	public void removeItem(String key) throws TigaseDBException {
-		repo.removeItem(key);
+		getRepository().removeItem(key);
 	}
 
 	@Deprecated
@@ -127,17 +119,17 @@ public abstract class AbstractMDComponentRepositoryBean<Item extends RepositoryI
 
 	@Override
 	public int size() {
-		return repo.size();
+		return getRepository().size();
 	}
 
 	@Override
 	public void store() throws TigaseDBException {
-		repo.store();
+		getRepository().store();
 	}
 
 	@Override
 	public String validateItem(Item item) {
-		return repo.validateItem(item);
+		return getRepository().validateItem(item);
 	}
 
 	@Override
@@ -147,12 +139,12 @@ public abstract class AbstractMDComponentRepositoryBean<Item extends RepositoryI
 
 	@Override
 	public Iterator<Item> iterator() {
-		return repo.iterator();
+		return getRepository().iterator();
 	}
 
 	@Override
 	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
-		repo.initRepository(resource_uri, params);
+		getRepository().initRepository(resource_uri, params);
 	}
 
 }

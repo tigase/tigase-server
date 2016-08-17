@@ -28,7 +28,7 @@ import tigase.db.DataSourceAware;
  * Interface should be implemented by <code>ComponentRepository</code> which are using
  * <code>DataSource</code> to load/store entries.
  *
- * Interface created mainly for use by <code>AbstractMDComponentRepositoryBean</code>.
+ * Interface created mainly for use by <code>AbstractSDComponentRepositoryBean</code>.
  *
  * Created by andrzej on 18.03.2016.
  */

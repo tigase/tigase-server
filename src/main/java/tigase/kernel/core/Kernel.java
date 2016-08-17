@@ -240,12 +240,10 @@ public class Kernel {
 	 * @return bean or <code>null</code> if instance of bean is not created.
 	 */
 	<T> T getInstance(BeanConfig beanConfig) {
-		if (beanConfig instanceof DelegatedBeanConfig) {
-			BeanConfig b = ((DelegatedBeanConfig) beanConfig).original;
-			return (T) beanConfig.getKernel().beanInstances.get(b);
-		} else {
-			return (T) beanConfig.getKernel().beanInstances.get(beanConfig);
+		while (beanConfig instanceof DelegatedBeanConfig) {
+			beanConfig = ((DelegatedBeanConfig) beanConfig).original;
 		}
+		return (T) beanConfig.getKernel().beanInstances.get(beanConfig);
 	}
 
 	/**
@@ -266,7 +264,7 @@ public class Kernel {
 	@SuppressWarnings("unchecked")
 	protected <T> T getInstance(Class<T> beanClass, boolean allowNonExportable) {
 		//TODO - check if null should be passed here
-		final List<BeanConfig> bcs = dependencyManager.getBeanConfigs(beanClass, null, allowNonExportable);
+		final List<BeanConfig> bcs = dependencyManager.getBeanConfigs(beanClass, null, null, allowNonExportable);
 
 		if (bcs.size() > 1)
 			throw new KernelException("Too many beans implemented class " + beanClass);
@@ -348,7 +346,7 @@ public class Kernel {
 	 */
 	public Collection<String> getNamesOf(Class<?> beanType) {
 		ArrayList<String> result = new ArrayList<String>();
-		List<BeanConfig> bcs = dependencyManager.getBeanConfigs(beanType, null);
+		List<BeanConfig> bcs = dependencyManager.getBeanConfigs(beanType, null, null);
 		for (BeanConfig beanConfig : bcs) {
 			result.add(beanConfig.getBeanName());
 		}
@@ -456,7 +454,7 @@ public class Kernel {
 		} else if (dep.getType() != null) {
 			Class<?> type = dep.getType();
 			if (Collection.class.isAssignableFrom(type)) {
-				type = ReflectionHelper.getCollectionParamter(dep.getGenericType());
+				type = ReflectionHelper.getCollectionParamter(dep.getGenericType(), dep.getBeanConfig().getClazz());
 			}
 			Object[] z = (Object[]) Array.newInstance(type, 1);
 			d = dataToInject.toArray(z);

@@ -27,6 +27,7 @@ import tigase.component.PropertiesBeanConfiguratorWithBackwardCompatibility;
 import tigase.io.SSLContextContainer;
 import tigase.kernel.DefaultTypesConverter;
 import tigase.kernel.core.Kernel;
+import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.server.xmppserver.*;
 import tigase.util.TigaseStringprepException;
@@ -58,16 +59,19 @@ public class DialbackTest extends TestCase {
 		props.put("name", "s2s");
 
 		kernel = new Kernel();
+		kernel.setName("s2s");
 		kernel.setForceAllowNull(true);
 		kernel.registerBean(DefaultTypesConverter.class).exec();
 		kernel.registerBean(PropertiesBeanConfiguratorWithBackwardCompatibility.class).exec();
 		kernel.getInstance(PropertiesBeanConfiguratorWithBackwardCompatibility.class).setProperties(props);
+		kernel.registerBean(ConnectionManager.PortsConfigBean.class).exec();
 		kernel.registerBean(S2SConnectionManager.DomainServerNameMapper.class).exportable().exec();
 		kernel.registerBean(CIDConnections.CIDConnectionsOpenerService.class).exportable().exec();
 		kernel.registerBean(S2SRandomSelector.class).exportable().exec();
 		kernel.registerBean(DialbackImpl.class).exportable().exec();
 		kernel.registerBean(SSLContextContainer.class).exportable().exec();
-		kernel.registerBean(S2SConnectionHandlerImpl.class).setActive(true).exec();
+		kernel.registerBean("service").asClass(S2SConnectionHandlerImpl.class).setActive(true).exec();
+
 		handler = kernel.getInstance(S2SConnectionHandlerImpl.class);
 		dialback = kernel.getInstance(Dialback.class);
 	}
@@ -322,6 +326,11 @@ public class DialbackTest extends TestCase {
 		@Override
 		public boolean isTlsRequired(String domain) {
 			return false;
+		}
+
+		@Override
+		public HashSet<Integer> getDefPorts() {
+			return new HashSet<>();
 		}
 	}
 
