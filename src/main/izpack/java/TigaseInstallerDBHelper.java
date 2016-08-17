@@ -175,9 +175,9 @@ class TigaseInstallerDBHelper {
                 throws Exception {
 
             ArrayList<String> queries = new ArrayList<String>();
-            queries.addAll(loadSQLQueries(res_prefix + "-schema-5-1-schema", res_prefix, variables));
-            queries.addAll(loadSQLQueries(res_prefix + "-schema-5-1-sp", res_prefix, variables));
-            queries.addAll(loadSQLQueries(res_prefix + "-schema-5-1-props", res_prefix, variables));
+            queries.addAll(loadSQLQueries(res_prefix + "-schema-7-1-schema", res_prefix, variables));
+            queries.addAll(loadSQLQueries(res_prefix + "-schema-7-1-sp", res_prefix, variables));
+            queries.addAll(loadSQLQueries(res_prefix + "-schema-7-1-props", res_prefix, variables));
 
 //			System.out.println( "Socks5component variable: " + variablesSource.getVariable(TigaseConfigConst.SOCKS5_COMP) );
 
