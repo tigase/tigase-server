@@ -28,32 +28,17 @@ package tigase.stats;
 
 import tigase.util.DataTypes;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.io.IOException;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import javax.management.MBeanServerConnection;
-import javax.management.MBeanServerInvocationHandler;
-import javax.management.Notification;
-import javax.management.NotificationListener;
-import javax.management.ObjectName;
+import javax.management.*;
 import javax.management.remote.JMXConnectionNotification;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
+import java.io.IOException;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * @author Artur Hefczyc Created Jun 3, 2011
@@ -210,6 +195,9 @@ public class JavaJMXProxyOpt
 			Map<String, Object> curMetrics = tigBean.getCurStats(metrics.toArray(
 					new String[metrics.size()]));
 
+			if (null == history) {
+				return;
+			}
 			for (Map.Entry<String, Object> e : curMetrics.entrySet()) {
 				LinkedList<Object> list = history.get(e.getKey());
 
@@ -260,9 +248,12 @@ public class JavaJMXProxyOpt
 	}
 
 	public Object getMetricData(String key) {
+		if (null == history) {
+			return null;
+		}
 		LinkedList<Object> h = history.get(key);
 
-		if (h != null) {
+		if (h != null && h.size() > 0) {
 			return h.getLast();
 		}
 
@@ -270,6 +261,9 @@ public class JavaJMXProxyOpt
 	}
 
 	public Object[] getMetricHistory(String key) {
+		if (null == history) {
+			return null;
+		}
 		List<Object> result = history.get(key);
 
 		if (result != null) {

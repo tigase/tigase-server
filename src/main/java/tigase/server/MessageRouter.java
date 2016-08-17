@@ -26,7 +26,9 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -87,6 +89,11 @@ public class MessageRouter
 			new ConcurrentSkipListSet<>();
 	private Map<JID, ServerComponent>         components_byId = new ConcurrentHashMap<>();
 	private Map<String, ServerComponent>      components      = new ConcurrentHashMap<>();
+
+	private static final String JVM_STATS_GC_STATISTICS = "JVM/GC-statistics";
+	private static final String JVM_STATS_HEAP_TOTAL = "JVM/HEAP Total ";
+	private static final String JVM_STATS_HEAP_POOLS = "JVM/MemoryPools/HeapMemory/";
+
 
 	//~--- methods --------------------------------------------------------------
 
@@ -586,6 +593,46 @@ public class MessageRouter
 				.FINE);
 		list.add(getName(), "Free NonHeap", format.format( runtime.getNonHeapMemMax() == -1 ? -1.0 :
 				(runtime.getNonHeapMemMax() - runtime.getNonHeapMemUsed()) / 1024), Level.FINE);
+
+
+		// general JVM/GC info
+		list.add(getName(), "Heap region name", runtime.getOldGenName(), Level.FINE);
+		list.add(getName(), JVM_STATS_GC_STATISTICS, runtime.getGcStatistics(), Level.FINER);
+
+		// Total HEAP usage
+		Level statLevel = Level.FINER;
+		MemoryUsage heapMemoryUsage = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
+		String JVM_STATS_USED = "Used [KB]";
+		String JVM_STATS_FREE = "Free [KB]";
+		String JVM_STATS_MAX = "Max [KB]";
+		int factor = 1024;
+		list.add(getName(), JVM_STATS_HEAP_TOTAL + JVM_STATS_USED, heapMemoryUsage.getUsed() / factor, statLevel);
+		list.add(getName(), JVM_STATS_HEAP_TOTAL + JVM_STATS_MAX, heapMemoryUsage.getMax() / factor, statLevel);
+		list.add(getName(), JVM_STATS_HEAP_TOTAL + JVM_STATS_FREE,
+				(heapMemoryUsage.getMax() - heapMemoryUsage.getUsed())/factor, statLevel);
+		list.add(getName(), JVM_STATS_HEAP_TOTAL + "Usage [%]",
+				heapMemoryUsage.getUsed() * 100F / heapMemoryUsage.getMax(), statLevel);
+
+
+		// per-heap-pool metrics
+		for (Map.Entry<String, MemoryPoolMXBean> entry : runtime.getMemoryPoolMXBeans().entrySet()) {
+			list.add(getName(), JVM_STATS_HEAP_POOLS + entry.getKey() + "/Name", entry.getValue().getName(), statLevel);
+			list.add(getName(), JVM_STATS_HEAP_POOLS + entry.getKey() + "/Usage/" + JVM_STATS_USED,
+					entry.getValue().getUsage().getUsed() / factor, statLevel);
+			list.add(getName(), JVM_STATS_HEAP_POOLS + entry.getKey() + "/Usage/" + JVM_STATS_MAX,
+					entry.getValue().getUsage().getMax() / factor, statLevel);
+
+			list.add(getName(), JVM_STATS_HEAP_POOLS + entry.getKey() + "/Peak Usage/" + JVM_STATS_USED,
+					entry.getValue().getPeakUsage().getUsed() / factor, statLevel);
+			list.add(getName(), JVM_STATS_HEAP_POOLS + entry.getKey() + "/Peak Usage/" + JVM_STATS_MAX,
+					entry.getValue().getPeakUsage().getMax() / factor, statLevel);
+
+			list.add(getName(), JVM_STATS_HEAP_POOLS + entry.getKey() + "/Collection Usage/" + JVM_STATS_USED,
+					entry.getValue().getCollectionUsage().getUsed() / factor, statLevel);
+			list.add(getName(), JVM_STATS_HEAP_POOLS + entry.getKey() + "/Collection Usage/" + JVM_STATS_MAX,
+					entry.getValue().getCollectionUsage().getMax() / factor, statLevel);
+
+		}
 	}
 
 	//~--- set methods ----------------------------------------------------------
