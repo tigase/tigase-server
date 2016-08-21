@@ -217,6 +217,10 @@ public class Bootstrap implements Lifecycle {
 				dataSourceNames.add("pubsub");
 				toRemove.add(k);
 			}
+			if (k.startsWith("http/port/")) {
+				toRemove.add(k);
+				toAdd.put(k.replace("http/port/", "httpServer/connections/"), v);
+			}
 		});
 
 		List<String> userDbDomains = new ArrayList<>();
