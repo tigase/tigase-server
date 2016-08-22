@@ -588,7 +588,7 @@ class TigaseInstallerDBHelper {
 						Statement stmt = conn.createStatement();
 
 						ArrayList<String> queries;
-											queries = loadSQLQueries(res_prefix + "-pubsub-schema-3-1", res_prefix, variables);
+											queries = loadSQLQueries(res_prefix + "-pubsub-schema-3-2", res_prefix, variables);
 //						queries.addAll( loadSQLQueries(res_prefix + "-pubsub-schema-3-1", res_prefix, variables) );
 						for (String query : queries) {
 							if (!query.isEmpty()) {
@@ -664,6 +664,7 @@ class TigaseInstallerDBHelper {
 
 		try {
 			Debug.trace("RepositoryFactory.getAuthRepository(" + className + ", " + resource + ",  + null)" );
+			System.setProperty( RepositoryFactory.DATA_REPO_POOL_SIZE_PROP_KEY, "1" );
 			AuthRepository repo = RepositoryFactory.getAuthRepository(
 					className, resource, null);
 

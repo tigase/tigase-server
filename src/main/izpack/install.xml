@@ -259,13 +259,17 @@ $Date: 2008-10-22 14:32:10 +0100 (Wed, 22 Oct 2008) $
 
 		<!-- PubSub component schema files -->
 		<res id="derby-pubsub-schema-3.0.0" src="database/derby-pubsub-schema-3.0.0.sql"/>
-		<res id="derby-pubsub-schema-3-1" src="database/derby-pubsub-schema-3.1.0.sql"/>
+		<res id="derby-pubsub-schema-3.1.0" src="database/derby-pubsub-schema-3.1.0.sql"/>
+		<res id="derby-pubsub-schema-3-2" src="database/derby-pubsub-schema-3.2.0.sql"/>
 		<res id="mysql-pubsub-schema-3.0.0" src="database/mysql-pubsub-schema-3.0.0.sql"/>
-		<res id="mysql-pubsub-schema-3-1" src="database/mysql-pubsub-schema-3.1.0.sql"/>
+		<res id="mysql-pubsub-schema-3.1.0" src="database/mysql-pubsub-schema-3.1.0.sql"/>
+		<res id="mysql-pubsub-schema-3-2" src="database/mysql-pubsub-schema-3.2.0.sql"/>
 		<res id="sqlserver-pubsub-schema-3.0.0" src="database/sqlserver-pubsub-schema-3.0.0.sql"/>
-		<res id="sqlserver-pubsub-schema-3-1" src="database/sqlserver-pubsub-schema-3.1.0.sql"/>
+		<res id="sqlserver-pubsub-schema-3.1.0" src="database/sqlserver-pubsub-schema-3.1.0.sql"/>
+		<res id="sqlserver-pubsub-schema-3-2" src="database/sqlserver-pubsub-schema-3.2.0.sql"/>
 		<res id="postgresql-pubsub-schema-3.0.0" src="database/postgresql-pubsub-schema-3.0.0.sql"/>
-		<res id="postgresql-pubsub-schema-3-1" src="database/postgresql-pubsub-schema-3.1.0.sql"/>
+		<res id="postgresql-pubsub-schema-3.1.0" src="database/postgresql-pubsub-schema-3.1.0.sql"/>
+		<res id="postgresql-pubsub-schema-3-2" src="database/postgresql-pubsub-schema-3.2.0.sql"/>
 
 
 	</resources>
