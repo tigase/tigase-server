@@ -93,6 +93,9 @@ public class DefaultTypesConverter implements TypesConverter {
 			if (value == null)
 				return null;
 
+			if ("null".equals(value))
+				return null;
+
 			final Class<?> currentType = value.getClass();
 
 			if (expectedType.isAssignableFrom(currentType) && genericType == null) {

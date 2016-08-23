@@ -96,6 +96,13 @@ public class ConfigWriter {
 	}
 
 	private void writeObject(Writer writer, Object obj, String newLine) throws IOException {
+		if (obj == null) {
+			writer.write("null");
+			if (newLine != null)
+				writer.write(newLine);
+			return;
+		}
+
 		if (obj instanceof AbstractBeanConfigurator.BeanDefinition) {
 			AbstractBeanConfigurator.BeanDefinition def = (AbstractBeanConfigurator.BeanDefinition) obj;
 			writer.write("(");

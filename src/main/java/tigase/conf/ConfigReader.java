@@ -292,6 +292,8 @@ public class ConfigReader {
 				return true;
 			case "false":
 				return false;
+			case "null":
+				return null;
 			default:
 				break;
 		}

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * Created by andrzej on 05.06.2016.
@@ -36,6 +37,7 @@ public class ConfigReaderTest {
 		map.put("ala-ma-kota", true);
 		map.put("test", "false");
 		root.put("some-map", map);
+		root.put("for-null", null);
 
 		Map<String, Object> embeddedMap = new HashMap<>();
 		embeddedMap.put("test", 123);
@@ -152,6 +154,10 @@ public class ConfigReaderTest {
 		for (Map.Entry e : expected.entrySet()) {
 			Object value = actual.get(e.getKey());
 			System.out.println("checking key = " + prefix + e.getKey());
+			if (e.getValue() == null) {
+				assertNull(value);
+				continue;
+			}
 			assertEquals(e.getValue().getClass(), value.getClass());
 			if (value instanceof AbstractBeanConfigurator.BeanDefinition) {
 				AbstractBeanConfigurator.BeanDefinition av = (AbstractBeanConfigurator.BeanDefinition) value;
