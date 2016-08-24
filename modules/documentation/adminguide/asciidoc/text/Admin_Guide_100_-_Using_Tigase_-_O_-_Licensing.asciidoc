@@ -8,12 +8,14 @@
 :website: http://tigase.net
 :toc:
 
-From release of v7.0.1, users and commercial clients alike may now be able to register and request a license file from our servers on thier own.
+From release of v7.1.0, users and commercial clients alike may now be able to register and request a license file from our servers on their own.
 This process helps us maintain licenses, and can allow for client installations of new servers without the need to wait for a license file.
-Users who do not wish to register will not be required too, Tigase XMPP Server will still be available free under AGPLv3. However, if you are a regular user of Tigase XMPP Server, you may wish to register for your own free version license.
+Users who do not wish to register will not be required to register.  However, If you are using Tigase ACS or other commercial pieces of software, you will be required to register.
+
+*Again, Tigase XMPP Server will still be available free under AGPLv3, and free users will not need to register.*
 
 == Registering for a License
-To obtain a license from our licensing servers, you will first need to register with our server.  This may be done by using our web portal.
+To obtain a license from our licensing servers, you will first need to register with us.  This may be done in a few methods.  The easiest method, and recommended is VIA use of our web portal.
 
 === Web Portal
 Pointing your browser to link:http://license.tigase.net:8080/rest/licence/register[license.tigase.net:8080/rest/licence/register] will give you the following page:
@@ -43,6 +45,153 @@ Tigase Team
 -----
 
 Once you have this E-mail, proceed to xref:licenseconfig[License Configuration].
+
+=== AdHoc Commands
+The new license server can now accept adHoc commands to be sent and received using XMPP stanzas.  This is more complicated, but it may help you use scripts or automate the server registration process:
+
+These Ad-Hoc commands may be used to manually start the following operations:
+
+==== +create-customer-id+
+Creates a new customer-id.
+
+Returns a blank form containing the following fields to be filled:
+- +name+ - full name of the user
+- +email+ - the email address user
+
+
+[source,xml]
+----
+<iq type="set" to="licenceserver@coffeebean.local" id="aad3a">
+    <command xmlns="http://jabber.org/protocol/commands" node="create-customer-id"/>
+</iq>
+----
+
+The server sends in response:
+
+Registration Form
+[source,xml]
+----
+<iq from="licenceserver@coffeebean.local" type="result" id="aad3a" to="bob@coffeebean.local/Psi+">
+	<command xmlns="http://jabber.org/protocol/commands"
+		status="executing" node="create-customer-id" sessionid="87ed39f9-d29c-405c-b1fa-a541958968aa">
+        <x xmlns="jabber:x:data" type="form">
+			<title>Customer Registration</title>
+			<instructions>Please fill all fields</instructions>
+			<field type="text-single" label="Name" var="name">
+				<required/>
+				<value/>
+			</field>
+			<field type="text-single" label="e-mail" var="email">
+				<required/>
+				<value/>
+			</field>
+        </x>
+	</command>
+</iq>
+----
+
+The user now sends the completed form:
+
+Registration form response
+[source,xml]
+----
+<iq type="set" to="licenceserver@coffeebean.local" id="aad4a">
+	<command xmlns="http://jabber.org/protocol/commands" node="create-customer-id"
+		sessionid="87ed39f9-d29c-405c-b1fa-a541958968aa">
+		<x xmlns="jabber:x:data" type="submit">
+			<field type="text-single" var="name">
+				<value>Bob Bobowsky</value>
+			</field>
+			<field type="text-single" var="email">
+				<value>bob@somewhere.gov</value>
+			</field>
+		</x>
+	</command>
+</iq>
+----
+
+After sending the filled form, a new +customer-id+ will be generated and sent to the E-mail listed in the form.
+If you are already registered, it will be sent to the following address existing +customer-id+
+
+==== +retrieve-license+
+
+To obtain a license from the server must send a form containing a +customer-id+:
+
+Start-up Command +retrieve-license+
+[source,xml]
+----
+<iq type="set" to="licenceserver@coffeebean.local" id="aad8a">
+	<command xmlns="http://jabber.org/protocol/commands" node="retrieve-licence"/>
+</iq>
+----
+
+In response, the server will send a form asking for +customer-id+.
+If the server's found his JabberID, it sent the form will automatically be filled in:
+
+Asking for +customer-id+
+[source,xml]
+----
+<iq from="licenceserver@coffeebean.local" type="result" id="aad8a" to="bob@coffeebean.local/Psi+">
+	<command xmlns="http://jabber.org/protocol/commands" status="executing"
+		node="retrieve-licence" sessionid="b7aa7ffb-5cda-4c67-aeb4-04094764ec9e">
+		<x xmlns="jabber:x:data" type="form">
+			<title>Retrieve licence</title>
+			<instructions>Please fill all fields</instructions>
+			<field type="text-single" label="customer-id" var="customer-id">
+				<value></value>
+			</field>
+	</x>
+	</command>
+</iq>
+----
+
+The user sends the completed form:
+
+Filled Form license generation
+[source,xml]
+----
+<iq type="set" to="licenceserver@coffeebean.local" id="aad9a">
+	<command xmlns="http://jabber.org/protocol/commands" node="retrieve-licence"
+		sessionid="b7aa7ffb-5cda-4c67-aeb4-04094764ec9e">
+		<x xmlns="jabber:x:data" type="submit">
+			<field type="text-single" var="customer-id">
+				<value>6if49ogdd9qbenat2t1461f1kf</value>
+			</field>
+			<field type="list-single" var="component">
+				<value>acs</value>
+			</field>
+		</x>
+	</command>
+</iq>
+----
+
+The server sends a form containing the license.
+
+NOTE: Warning! The license may be in plain-text or Base64 encoded!
+
+.Generated license
+[source,xml]
+----
+<iq from="licenceserver@coffeebean.local" type="result" id="aad9a" to="bob@coffeebean.local/Psi+">
+	<command xmlns="http://jabber.org/protocol/commands" status="completed" node="retrieve-licence"
+		sessionid="b7aa7ffb-5cda-4c67-aeb4-04094764ec9e">
+		<x xmlns="jabber:x:data" type="result">
+			<field type="text-multi" label="Licence" var="licence">
+				<value>max-costam=9</value>
+				<value>comment=Licencja całkowicie domyślna</value>
+				<value>licence-nr=1</value>
+				<value>licence-id=de54488e-13d0-38a4-8614-1b624cc73ac0</value>
+				<value>customer-name=Bob Bobowsky</value>
+				<value>customer-jid=bob@coffeebean.local</value>
+				<value>template-id=fb9971738214b50c5700673956ade0fa0b8169d0</value>
+				<value>valid-since=2015-07-17</value>
+				<value>valid-until=2015-10-17</value>
+				<value>signature=2bca48ad20b63dd76be08b1a6…374dab308</value>
+			</field>
+		</x>
+	</command>
+</iq>
+----
 
 [[licenseconfig]]
 == Configuring Tigase XMPP Server License Registration

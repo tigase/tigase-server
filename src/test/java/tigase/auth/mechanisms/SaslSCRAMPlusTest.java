@@ -44,7 +44,7 @@ public class SaslSCRAMPlusTest extends TestCase {
 			fail();
 
 		} catch (SaslException e) {
-			Assert.assertEquals("Channel bindings dont match", e.getMessage());
+			Assert.assertEquals("Channel bindings does not match", e.getMessage());
 		}
 	}
 
