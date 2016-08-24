@@ -43,6 +43,8 @@ include::text/Admin_Guide_09_-_Configuration.asciidoc[]
 
 :leveloffset: 2
 
+include::text/DSL_configuration.asciidoc[]
+
 include::text/Admin_Guide_10_-_Configuration_-_A_-_Tigase_XMPP_Server_init.properties_Configuration.asciidoc[]
 
 include::text/Admin_Guide_11_-_Configuration_-_B_-_Startup_Files_tigase.sh_and_tigase.asciidoc[]
