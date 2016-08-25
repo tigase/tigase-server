@@ -151,11 +151,14 @@ If value equals -1 proxy will forbid any transfer for this user.
 It there is no value for user in this table, a new row will be created during first transfer and limits for domain or global limits will be used.
 
 Socks5 database is setup in this manner:
-.tig_socks5_users
-[options="header,footer"]
-|======================================
-|uid|user_id|sha1_user_id|domain|sha1|domain|filesize_limit|transfer_limit_per_user|transfer_limit_per_domain
-|======================================
+
+[width="100%",frame="topbot",options="header"]
+|=================================
+|uid  |user_id              |sha1_user_id     |domain     |sha1       |domain       |filesize_limit |transfer_limit_per_user  |transfer_limit_per_domain
+|1    |user@domain.com      |c35f2956d804...  |domain.com |1          |domain.com    |0             |0                        |0
+|2    |domain.com           |e1000db219f3...  |           |2          |              |500           |0                        |0
+|=================================
+
 
 This table will populate as users transfer files using the SOCKS5 proxy, once it begins population, you may edit it as necessary.
 A second database is setup tig_socks5_connections that records the connections and transmissions being made, however it does not need to be edited.

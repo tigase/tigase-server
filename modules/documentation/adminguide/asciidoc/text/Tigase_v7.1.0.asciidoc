@@ -271,6 +271,7 @@ Tigase has improved default settings to improve performance.  These include:
 - #3463 +offline-roster-last-seen+ feature as a part of presence probe is now disabled by default.
 - link:https://projects.tigase.org/issues/3496[#3496] TigUserLogout has been improved to use +sha1_user_id = sha1(lower(_user_id))+ instead of "_user_id".
 - link:https://projects.tigase.org/issues/3511[#3511] Stream closing mechanism in SessionManager, new STREAM_CLOSED command has been added to organize shutdown of XMPP streams.
+- #3569 Fixed error occuring when attempting to remove offline users from roster.
 - #3609 Added new configuration option for BOSH to disable hostname attribute. xref:tip_1_bosh_in_cluster_mode_without_load_balancer[Details here].
 - link:https://projects.tigase.org/issues/3670[#3670] Hardened mode now uses long DH keys (2048) by default.
 - link:https://projects.tigase.org/issues/3849[#3849] New Roster size limit configurable setting. See info xref:rosterLimit[Here].
