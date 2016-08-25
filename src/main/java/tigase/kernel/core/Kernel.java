@@ -24,6 +24,7 @@ package tigase.kernel.core;
 import tigase.kernel.BeanUtils;
 import tigase.kernel.KernelException;
 import tigase.kernel.beans.*;
+import tigase.kernel.beans.config.AbstractBeanConfigurator;
 import tigase.kernel.beans.config.BeanConfigurator;
 import tigase.kernel.core.BeanConfig.State;
 import tigase.util.ReflectionHelper;
@@ -120,6 +121,8 @@ public class Kernel {
 
 		if (beanConfigurator != null) {
 			beanConfigurator.configure(beanConfig, bean);
+		} else {
+			AbstractBeanConfigurator.registerBeansForBeanOfClass(beanConfig.getKernel(), bean.getClass());
 		}
 
 		if (bean instanceof RegistrarBean) {

@@ -41,7 +41,7 @@ import java.util.logging.Logger;
 
 public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 
-	protected final Logger log = Logger.getLogger(this.getClass().getName());
+	private static final Logger log = Logger.getLogger(AbstractBeanConfigurator.class.getCanonicalName());
 
 	private final ConcurrentHashMap<BeanConfig, HashMap<Field, Object>> defaultFieldValues = new ConcurrentHashMap<BeanConfig, HashMap<Field, Object>>();
 
@@ -312,7 +312,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		}
 	}
 
-	protected List<BeanConfig> registerBeansForBeanOfClass(Kernel kernel, Class<?> cls) {
+	public static List<BeanConfig> registerBeansForBeanOfClass(Kernel kernel, Class<?> cls) {
 		// TODO - needs to be adjusted to support OSGi
 		try {
 			Set<Class<?>> classes = ClassUtil.getClassesFromClassPath();
@@ -324,7 +324,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		}
 	}
 
-	protected List<BeanConfig> registerBeansForBeanOfClass(Kernel kernel, Class<?> requiredClass, Set<Class<?>> classes) {
+	protected static List<BeanConfig> registerBeansForBeanOfClass(Kernel kernel, Class<?> requiredClass, Set<Class<?>> classes) {
 		List<BeanConfig> registered = new ArrayList<>();
 		List<Class<?>> toRegister = registerBeansForBeanOfClassGetBeansToRegister(kernel, requiredClass, classes);
 		for (Class<?> cls : toRegister) {
@@ -346,7 +346,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 					register = false;
 				} else {
 					for (Class<?> ifc : cls.getInterfaces()) {
-						if (ifc.isAssignableFrom(existingBeanConfig.getClazz())) {
+						if (ifc.isAssignableFrom(existingBeanConfig.getClazz()) && !ifc.equals(RegistrarBean.class)) {
 							register = false;
 							break;
 						}
@@ -370,7 +370,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		return registered;
 	}
 
-	protected List<Class<?>> registerBeansForBeanOfClassGetBeansToRegister(Kernel kernel, Class<?> requiredClass, Set<Class<?>> classes) {
+	protected static List<Class<?>> registerBeansForBeanOfClassGetBeansToRegister(Kernel kernel, Class<?> requiredClass, Set<Class<?>> classes) {
 		Map<Class<?>,Bean> matching = new HashMap<>();
 		for (Class<?> cls : classes) {
 			Bean bean = registerBeansForBeanOfClassShouldRegister(kernel, requiredClass, cls);
@@ -404,7 +404,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		return toRegister;
 	}
 
-	protected Bean registerBeansForBeanOfClassShouldRegister(Kernel kernel, Class<?> requiredClass, Class<?> cls) {
+	protected static Bean registerBeansForBeanOfClassShouldRegister(Kernel kernel, Class<?> requiredClass, Class<?> cls) {
 		Bean annotation = cls.getDeclaredAnnotation(Bean.class);
 		if (annotation == null)
 			return null;

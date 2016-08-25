@@ -32,9 +32,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Bean(name = BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)
 public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
+
+	private static final Logger log = Logger.getLogger(PropertiesBeanConfigurator.class.getCanonicalName());
 
 	private Map<String, Object> props;
 

@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static tigase.component.BackwardCompatibilityHelper.getDefConfigParams;
 import static tigase.conf.Configurable.GEN_CONFIG_DEF;
@@ -38,6 +39,8 @@ import static tigase.conf.Configurable.GEN_CONFIG_DEF;
  * Created by andrzej on 12.08.2016.
  */
 public class DSLBeanConfiguratorWithBackwardCompatibility extends DSLBeanConfigurator {
+
+	private static final Logger log = Logger.getLogger(DSLBeanConfiguratorWithBackwardCompatibility.class.getCanonicalName());
 
 	@Override
 	public void configure(BeanConfig beanConfig, Object bean, Map<String, Object> values) {

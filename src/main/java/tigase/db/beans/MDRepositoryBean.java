@@ -219,6 +219,10 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 			return ModulesManagerImpl.getInstance().forName(cls);
 		}
 
+		protected String getCls() {
+			return cls;
+		}
+
 		@Override
 		public void beanConfigurationChanged(Collection<String> changedFields) {
 			if (name == null || mdRepositoryBean == null || dataSourceBean == null)
