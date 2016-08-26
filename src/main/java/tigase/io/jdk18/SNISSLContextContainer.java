@@ -125,7 +125,12 @@ public class SNISSLContextContainer extends SSLContextContainer {
 		public X509Certificate[] getCertificateChain(String alias) {
 			if (alias == null) 
 				alias = def_cert_alias;
-			KeyManagerFactory kmf = find(kmfs, alias);
+			KeyManagerFactory kmf = find( kmfs, alias );
+			if ( kmf == null ){
+				alias = def_cert_alias;
+				kmf = SSLContextContainer.find( kmfs, alias );
+			}
+
 			return ((X509KeyManager) kmf.getKeyManagers()[0]).getCertificateChain(alias);
 		}
 
@@ -141,6 +146,11 @@ public class SNISSLContextContainer extends SSLContextContainer {
 			if (alias == null) 
 				alias = def_cert_alias;			
 			KeyManagerFactory kmf = find(kmfs, alias);
+			if ( kmf == null ){
+				alias = def_cert_alias;
+				kmf = SSLContextContainer.find( kmfs, alias );
+			}
+
 			return ((X509KeyManager) kmf.getKeyManagers()[0]).getPrivateKey(alias);
 		}
 		
