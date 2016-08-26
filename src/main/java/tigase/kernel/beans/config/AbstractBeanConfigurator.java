@@ -347,8 +347,11 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 				} else {
 					for (Class<?> ifc : cls.getInterfaces()) {
 						if (ifc.isAssignableFrom(existingBeanConfig.getClazz()) && !ifc.equals(RegistrarBean.class)) {
-							register = false;
-							break;
+							Bean existingBeanAnnotation = existingBeanConfig.getClazz().getAnnotation(Bean.class);
+							if (existingBeanAnnotation == null || annotation.parent().isAssignableFrom(existingBeanAnnotation.parent())) {
+								register = false;
+								break;
+							}
 						}
 					}
 					if (register)
