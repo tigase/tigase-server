@@ -135,7 +135,7 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 	public final static String PER_DOMAIN_CERTIFICATE_KEY = "virt-hosts-cert-";
 	private ArrayList<X509Certificate> acceptedIssuers = new ArrayList<X509Certificate>(200);
 	private File[] certsDirs = null;
-	protected String def_cert_alias = null;
+	protected String def_cert_alias = DEFAULT_DOMAIN_CERT_VAL;
 	private String email = "admin@tigase.org";
 	private char[] emptyPass = new char[0];
 	protected Map<String, KeyManagerFactory> kmfs = new ConcurrentSkipListMap<String, KeyManagerFactory>();
