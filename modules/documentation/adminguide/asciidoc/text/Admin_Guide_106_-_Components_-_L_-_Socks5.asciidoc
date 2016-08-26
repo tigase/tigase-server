@@ -154,9 +154,9 @@ Socks5 database is setup in this manner:
 
 [width="100%",frame="topbot",options="header"]
 |=================================
-|uid  |user_id              |sha1_user_id     |domain     |sha1       |domain       |filesize_limit |transfer_limit_per_user  |transfer_limit_per_domain
-|1    |user@domain.com      |c35f2956d804...  |domain.com |1          |domain.com    |0             |0                        |0
-|2    |domain.com           |e1000db219f3...  |           |2          |              |500           |0                        |0
+|uid  |user_id              |sha1_user_id                              |domain     |sha1_domain                              |filesize_limit |transfer_limit_per_user  |transfer_limit_per_domain
+|1    |user@domain.com      |c35f2956d804e01ef2dec392ef3adae36289123f  |domain.com |e1000db219f3268b0f02735342fe8005fd5a257a |0              |0                        |0
+|2    |domain.com           |e1000db219f3268b0f02735342fe8005fd5a257a  |domain.com |e1000db219f3268b0f02735342fe8005fd5a257a |500            |0                        |0
 |=================================
 
 
