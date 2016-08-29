@@ -78,10 +78,6 @@ image:images/web-install-02.png[]
 
 Here is some information about our commercial products and licensing. Please read though the agreement, type your name or company and click "Next".
 
-image:images/web-install-03.png[]
-
-The software reads your current *etc/init.properties* file and presents it. It will look fairly sparce.  If you have a pre-configured init.properties file, you may load it here. If not, click "Next".
-
 image:images/web-install-04.png[]
 
 This page will look over your default configuration settings, these include the type, Domains you wish to use, and gives you a chance to specify an administrator for the domain.  Also, you will be selecting what type of database Tigase server will be using.
@@ -112,7 +108,9 @@ The Setup Access Page will be locked from the admin/tigase user as specified abo
 
 image:images/web-install-11.png[]
 
-The installation is complete and this is what the new *init.properties* will look like. Click "Save" to write the file to disk.
+The installation is complete and this is what the *init.properties* file will look like.
+If you have a custom setup, or would like to put your own settings in, you may copy and past the contents here to edit the current init.properties file.
+Click "Save" to write the file to disk.
 
 image:images/web-install-12.png[]
 
