@@ -14,7 +14,7 @@ where `c2s/ports` was name of property, `[i]` defined that type of value is arra
 This format worked but in fact `c2s/ports` was not name of property you configured but key which was later split on `/` char to parts which defined by names path to property which name was in last part.
 From that you can see that it was domain based setting of properties.
 
-Except from this multi part keys we also used properties starting with `--` which were global properties accessible for every part of application, ie. to add new component and set some properties you needed to write:
+Except from this multi-part keys we also used properties starting with `--` which were global properties accessible for every part of application, i.e.: to add new component and set some properties you needed to write:
 ----
 --comp-name-1=pubsub
 --comp-class-1=tigase.pubsub.PubSubComponent
@@ -23,16 +23,16 @@ pubsub/pubsub-repo-url="jdbc:XXXX:XXXX/db_name"
 ----
 This lead to mistakes like duplicated definition of name and class for same number of component or redefined property value in other place of a configuration file - especially in cases where configuration was big.
 
-It this configuration structure it was hard to tell where is configuration for particular component or what databases this installation uses. This could be defined all over the file.
+In this configuration structure it was hard to tell where is configuration for particular component or what databases this installation uses. This could be defined all over the file.
 
-As in this release we introduce Tigase Kernel Framework, which allows to configure beans in configuration file and even define usage of new beans loaded from external jars which can modify behavior of Tigase components, this would make configuration file even more complex, difficult and less readable.
+In this release we are introducing Tigase Kernel Framework, which allows to configure beans in configuration file and even define usage of new beans loaded from external jars which can modify behavior of Tigase components. This would make configuration file even more complex, difficult and less readable.
 
 == What is DSL?
 DSL stands for domain-specific language - in this case language created for storage of configuration.
 
 Now we use domain based configuration which means that our configuration file is not a flat key=value storage but it defines objects, it's properties and assigned values.
 
-To make you better understand what I mean let's start with simple example. In properties file to configure PubSub component named `pubsub` you could use following properties:
+To illustrate it better let's start with a simple example. In properties file in order to configure PubSub component named `pubsub` you would use following properties:
 ----
 --comp-name-1=pubsub
 --comp-class-1=tigase.pubsub.PubSubComponent
@@ -57,7 +57,7 @@ test=true
 ----
 
 === Setting global property
-Like in properties file it is still possible to use property names starting with `--` without any context or any other properties at global scope. Format is the same as in case of setting property but there are defined without scope (in global scope).
+Like in properties file it is still possible to use property names starting with `--` without any context or any other properties at global scope. Format is the same as in case of setting property but they are defined without scope (in global scope).
 
 === Defining bean
 You can configure bean by using following format:
@@ -69,9 +69,9 @@ beanName (class: className, active: activeValue, exportable: exportableValue) {
 where `beanName` is name under which you want to configure bean.
 Inside block between `(` and `)` you can define:
 
-* `class` for use as bean, in example we set class as `className`. *_(default: if you try to configure bean under name which has default class assigned with it in Tigase framework then this assigned class will be used. In other case you need to pass name of class to use as a bean)_*
-* `active` whether you want bean to be active or not (beans with `active` set to `false` are not loaded). *_(default: true)_*
-* `exportable` defines if this bean should be exported and available for use for beans in inner scopes. This is advanced option in most cases it is recommended to omit this field in configuration. *_(default: false)_*
+* `class` which will be used as a bean, in example above we set class as `className`. *_(default: if you try to configure bean under name which has default class assigned with it in Tigase framework then this assigned class will be used. In other case you need to pass name of class to use as a bean)_*
+* `active` (boolean) whether you want the bean to be active or not (beans with `active` set to `false` are not loaded). *_(default: true)_*
+* `exportable` (boolean) defines if this bean should be exported and available for use for beans in inner scopes. This is advanced option in most cases it is recommended to omit this field in configuration. *_(default: false)_*
 
 === Configuring bean
 If you know that bean is defined and you do not want to change it's activity or class then you can just pass properties to configure bean in following way:
