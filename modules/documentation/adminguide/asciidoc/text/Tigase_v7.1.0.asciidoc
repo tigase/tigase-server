@@ -225,6 +225,9 @@ There has been a lot of changes and fixes to our documentation over the last few
 
 A more detailed last available presence can now be made from some configuration changes, along with a timestamp before the entire presence stanza is saved to the repository.  More information is available xref:storeFullXMLLastPresence[here].
 
+=== Setting available to enable automatic subscriptions
+Tigase supports enabling automatic presence subscriptions and roster authorizations.  For more information on these settings, check the xref:autoSub[Automatic Subscriptions] section.
+
 === New Program Defaults
 
 Tigase has improved default settings to improve performance.  These include:

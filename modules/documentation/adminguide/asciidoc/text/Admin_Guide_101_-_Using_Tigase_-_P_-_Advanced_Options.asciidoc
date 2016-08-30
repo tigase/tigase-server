@@ -94,3 +94,17 @@ The above setting in init.properties file will change the default timeout period
 c2s/processors/urn\:xmpp\:sm\:3/max-resumption-timeout[I]=900
 -----
 This setting will set the maximum time allowed for stream resumption to 900 seconds.  This can be handy if you expect a number of mobile phones to connect to your server and want to avoid duplicate messages being sent back and forth.
+
+[[autoSub]]
+You may setup a server to automatically approve presence subscriptions or roster authorizations for all users.  Say you were hosting bots and wanted to automate the process.  This can be done with the following settings:
+[source,properties]
+-----
+sess-man/plugins-conf/jabber\:iq\:roster/auto-authorize=true
+sess-man/plugins-conf/presence/auto-authorize=true
+-----
+Both of these settings are false by default, and you may use them together or separately.
+The following behavior is followed when they are both activated:
+
+- Upon sending a subscription request - Both contacts will each others' subscription and be added to each others' roster.  Presence information will immediately be exchanged between both parties.
+- Upon sending presence with type either unsubscribe or unsubscribed follows the rules defined in RFC regarding processing of these stanzas (i.e. adjusting subscription type of user/contact), but without forwarding those stanzas to the receiving entity to avoid any notifications to the client. However, a roster push is generated to reflect changes to presence in user roster in a seamless manner.
+- Simply adding an item to the roster (i.e. with <iq/> stanza with correct semantics) will also cause an automatic subscription between the user and the contact in a matter explained above.
