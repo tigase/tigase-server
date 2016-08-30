@@ -1610,10 +1610,14 @@ public class SessionManager
 
 			case TLS_HANDSHAKE_COMPLETE:
 				if (connection != null) {
+					if (log.isLoggable(Level.FINEST))
+						log.log(Level.FINEST, "Handshake details received. connection: {0}", connection);
 					String tlsUniqueId = Command.getFieldValue(pc, "tls-unique-id");
 					if (tlsUniqueId != null) {
 						byte[] bytes = Base64.decode(tlsUniqueId);
 						connection.putSessionData(AbstractSaslSCRAM.TLS_UNIQUE_ID_KEY, bytes);
+						if (log.isLoggable(Level.FINEST))
+							log.log(Level.FINEST, "tls-unique-id {0} stored in session-data. connection: {1}", new Object[]{tlsUniqueId, connection});
 					}
 					String encodedCertificate = Command.getFieldValue(pc, "peer-certificate");
 					if (encodedCertificate != null) {
@@ -1625,11 +1629,14 @@ public class SessionManager
 							Certificate certificate = cf.generateCertificate(bais);
 
 							connection.putSessionData(SaslEXTERNAL.PEER_CERTIFICATE_KEY, certificate);
+							if (log.isLoggable(Level.FINEST))
+								log.log(Level.FINEST, "peer-certificate {0} stored in session-data. connection: {1}", new Object[]{certificate, connection});
+
 						} catch (Exception ex) {
 							log.log(Level.FINEST, "could not decode peer certificate", ex);
 						}
 					}
-					 encodedCertificate = Command.getFieldValue(pc, "local-certificate");
+					encodedCertificate = Command.getFieldValue(pc, "local-certificate");
 					if (encodedCertificate != null) {
 						try {
 							byte[] bytes = Base64.decode(encodedCertificate);
@@ -1639,15 +1646,19 @@ public class SessionManager
 							Certificate certificate = cf.generateCertificate(bais);
 
 							connection.putSessionData(AbstractSaslSCRAM.LOCAL_CERTIFICATE_KEY, certificate);
+							if (log.isLoggable(Level.FINEST))
+								log.log(Level.FINEST, "local-certificate {0} stored in session-data. connection: {1}", new Object[]{certificate, connection});
 						} catch (Exception ex) {
 							log.log(Level.FINEST, "could not decode local certificate", ex);
 						}
 					}
+				} else if (log.isLoggable(Level.FINEST)) {
+					log.finest("Handshake details received, but no connection is related.");
 				}
 				processing_result = true;
 				break;
 
-		case STREAM_MOVED :
+			case STREAM_MOVED :
 			if (connection != null) {
 				String oldConnectionJidStr = Command.getFieldValue(pc, "old-conn-jid");
 				JID    oldConnJid          = JID.jidInstanceNS(oldConnectionJidStr);

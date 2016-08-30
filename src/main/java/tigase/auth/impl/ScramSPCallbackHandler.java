@@ -3,10 +3,7 @@ package tigase.auth.impl;
 import tigase.auth.AuthRepositoryAware;
 import tigase.auth.DomainAware;
 import tigase.auth.SessionAware;
-import tigase.auth.callbacks.ChannelBindingCallback;
-import tigase.auth.callbacks.PBKDIterationsCallback;
-import tigase.auth.callbacks.SaltCallback;
-import tigase.auth.callbacks.SaltedPasswordCallback;
+import tigase.auth.callbacks.*;
 import tigase.auth.mechanisms.AbstractSasl;
 import tigase.auth.mechanisms.AbstractSaslSCRAM;
 import tigase.db.AuthRepository;
@@ -85,7 +82,9 @@ public class ScramSPCallbackHandler implements CallbackHandler, AuthRepositoryAw
 	}
 
 	protected void handleCallback(Callback callback) throws UnsupportedCallbackException, IOException {
-		if (callback instanceof ChannelBindingCallback) {
+		if (callback instanceof XMPPSessionCallback) {
+			((XMPPSessionCallback) callback).setSession(session);
+		} else if (callback instanceof ChannelBindingCallback) {
 			handleChannelBindingCallback((ChannelBindingCallback) callback);
 		} else if (callback instanceof PBKDIterationsCallback) {
 			handlePBKDIterationsCallback((PBKDIterationsCallback) callback);
@@ -123,6 +122,8 @@ public class ScramSPCallbackHandler implements CallbackHandler, AuthRepositoryAw
 				throw new RuntimeException(e);
 			}
 		}
+		if (log.isLoggable(Level.FINEST))
+			log.log(Level.FINEST, "Channel binding {0}: {1}", new Object[]{callback.getRequestedBindType(), Base64.encode(callback.getBindingData())});
 	}
 
 	protected void handleNameCallback(NameCallback nc) throws IOException {

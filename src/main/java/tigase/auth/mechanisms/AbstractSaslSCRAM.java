@@ -15,6 +15,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
 import javax.security.sasl.AuthorizeCallback;
 import javax.security.sasl.SaslException;
+import java.io.ByteArrayOutputStream;
 import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -114,15 +115,20 @@ public abstract class AbstractSaslSCRAM extends AbstractSasl {
 		return str.getBytes(CHARSET);
 	}
 
-	protected String calculateC() {
-		String result = this.cfmGs2header;
+	protected byte[] calculateC() {
+		try {
+			final ByteArrayOutputStream result = new ByteArrayOutputStream();
 
-		if (this.requestedBindType == BindType.tls_unique
-				|| this.requestedBindType == BindType.tls_server_end_point) {
-			result += (bindingData == null ? "" : new String(bindingData));
+			result.write(this.cfmGs2header.getBytes());
+
+			if (this.requestedBindType == BindType.tls_unique
+					|| this.requestedBindType == BindType.tls_server_end_point) {
+				result.write(bindingData);
+			}
+			return result.toByteArray();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
-
-		return result;
 	}
 
 	protected abstract void checkRequestedBindType(BindType requestedBindType) throws SaslException;
@@ -176,7 +182,7 @@ public abstract class AbstractSaslSCRAM extends AbstractSasl {
 	}
 
 	protected byte[] processClientFirstMessage(byte[] data) throws SaslException, InvalidKeyException, NoSuchAlgorithmException {
-		Matcher r = CLIENT_FIRST_MESSAGE.matcher(new String(data));
+		Matcher r = CLIENT_FIRST_MESSAGE.matcher(new String(data, CHARSET));
 		if (!r.matches())
 			throw new SaslException("Bad challenge syntax");
 
@@ -226,21 +232,22 @@ public abstract class AbstractSaslSCRAM extends AbstractSasl {
 	}
 
 	protected byte[] processClientLastMessage(byte[] data) throws SaslException, InvalidKeyException, NoSuchAlgorithmException {
-		Matcher r = CLIENT_LAST_MESSAGE.matcher(new String(data));
+		Matcher r = CLIENT_LAST_MESSAGE.matcher(new String(data, CHARSET));
 		if (!r.matches())
 			throw new SaslException("Bad challenge syntax");
 
 		final String clmWithoutProof = r.group("withoutProof");
-		final String clmCb = new String(Base64.decode(r.group("cb")));
+		final byte[] clmCb = Base64.decode(r.group("cb"));
 		final String clmNonce = r.group("nonce");
 		final String clmProof = r.group("proof");
 
-		String calculatedCb = calculateC();
-		if (!clmCb.startsWith(cfmGs2header)) {
+		byte[] calculatedCb = calculateC();
+		if (!(new String(clmCb, CHARSET)).startsWith(cfmGs2header)) {
 			throw new XmppSaslException(SaslError.not_authorized, "Invalid GS2 header");
-		} else if (!clmCb.equals(calculatedCb)) {
+		} else if (!Arrays.equals(clmCb, calculatedCb)) {
 			if (log.isLoggable(Level.FINEST))
-				log.finest("Channel bindings does not match. expected: " + calculatedCb + "; received: " + clmCb);
+				log.log(Level.FINEST, "Channel bindings does not match. expected: {0}; received: {1}",
+						new Object[]{calculatedCb, clmCb});
 			throw new XmppSaslException(SaslError.not_authorized, "Channel bindings does not match");
 		}
 
