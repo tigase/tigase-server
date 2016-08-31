@@ -108,7 +108,7 @@ public class ScramCallbackHandler implements CallbackHandler, AuthRepositoryAwar
 			}
 		}
 		if (log.isLoggable(Level.FINEST))
-			log.log(Level.FINEST, "Channel binding {0}: {1} in session-id {2}", new Object[]{callback.getRequestedBindType(), Base64.encode(callback.getBindingData()), session});
+			log.log(Level.FINEST, "Channel binding {0}: {1} in session-id {2}", new Object[]{callback.getRequestedBindType(), callback.getBindingData() == null ? "null" : Base64.encode(callback.getBindingData()), session});
 	}
 
 	protected void handleNameCallback(NameCallback nc) throws IOException {
