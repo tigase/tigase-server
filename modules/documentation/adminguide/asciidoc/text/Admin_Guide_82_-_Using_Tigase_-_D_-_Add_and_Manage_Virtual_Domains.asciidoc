@@ -60,10 +60,4 @@ image:images/add_user_window.png[]
 If everything went well you have just added a new user and you should get a window confirming successful operation. If something went wrong, a window with an error message should show up. Possible errors may be you tried to add a user which is already present, or you may have tried to add a user for a domain to which you do not have permission or to non-existen domain.
 
 == SSL Certificate Management
-SSL Certificate Management has been implemented.  Documentation forthcoming.
-
-//There are plans to add SSL certificates management for your domains. I want to also add more user administration commands but for this I am waiting for your suggestions. You are users, you tell me what you want.
-
-//One more thing.
-
-//There are quite a few domains already registered by an administrators for people who asked for it using website form. These people cannot control their domains right now. Everybody who is interested in taking control over his domain, please send me an e-mail with his domain details and account for which the ownership should be granted and I will update domain configuration. To make sure the correct person asks for this I require you to send the request as a response to the e-mail I sent you after the domain has been registered in our service.
+SSL Certificate Management has been implemented, and certificates can be manipulated when in a .pem form. For more details, see xref:certspem[Creating and Loading the Server Certificate in pem Files] section of documentation for more information.
