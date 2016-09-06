@@ -225,6 +225,9 @@ There has been a lot of changes and fixes to our documentation over the last few
 
 A more detailed last available presence can now be made from some configuration changes, along with a timestamp before the entire presence stanza is saved to the repository.  More information is available xref:storeFullXMLLastPresence[here].
 
+=== Setting available to enable automatic subscriptions
+Tigase supports enabling automatic presence subscriptions and roster authorizations.  For more information on these settings, check the xref:autoSub[Automatic Subscriptions] section.
+
 === New Program Defaults
 
 Tigase has improved default settings to improve performance.  These include:
@@ -271,6 +274,7 @@ Tigase has improved default settings to improve performance.  These include:
 - #3463 +offline-roster-last-seen+ feature as a part of presence probe is now disabled by default.
 - link:https://projects.tigase.org/issues/3496[#3496] TigUserLogout has been improved to use +sha1_user_id = sha1(lower(_user_id))+ instead of "_user_id".
 - link:https://projects.tigase.org/issues/3511[#3511] Stream closing mechanism in SessionManager, new STREAM_CLOSED command has been added to organize shutdown of XMPP streams.
+- #3569 Fixed error occuring when attempting to remove offline users from roster.
 - #3609 Added new configuration option for BOSH to disable hostname attribute. xref:tip_1_bosh_in_cluster_mode_without_load_balancer[Details here].
 - link:https://projects.tigase.org/issues/3670[#3670] Hardened mode now uses long DH keys (2048) by default.
 - link:https://projects.tigase.org/issues/3849[#3849] New Roster size limit configurable setting. See info xref:rosterLimit[Here].
@@ -291,6 +295,7 @@ Tigase has improved default settings to improve performance.  These include:
 - link:https://projects.tigase.org/issues/4356[#4356] Message Archive component has been converted to kernel and beans.
 - link:https://projects.tigase.org/issues/4352[#4352] Websocket implementation has been changed to properly parse HTTP headers with omitted spaces for HTTP 1.1 protocol.
 - link:https://projects.tigase.org/issues/4358[#4358] Several methods have been renamed or removed to prepare for v7.2.0 Kernel setup.
+- #4385 Minor tweak to web-installer to skip unnecessary showing of blank init.properties file & enabled post-setup editing and saving.
 
 
 == Fixes

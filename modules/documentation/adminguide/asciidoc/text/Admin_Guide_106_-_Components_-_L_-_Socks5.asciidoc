@@ -14,8 +14,8 @@ Tigase SOCKS5 component allows for file transfers to be made over a SOCKS5 proxy
 Tigase SOCKS5 component comes built into the dist-max archives for Tigase XMPP server, and requires the component to be listed in init.properties file:
 [source,properties]
 -----
---comp-name-#=proxy
---comp-class-#=tigase.socks5.Socks5ProxyComponent
+--comp-name-3=proxy
+--comp-class-3=tigase.socks5.Socks5ProxyComponent
 -----
 
 You will also need to decide if you wish to use database-based features or not.  If you wish to simply run the socks5 proxy without features such as quotas, limits add the following line:
@@ -142,23 +142,27 @@ A comma separated list of IP addresses that will be accessible VIA the Socks5 Pr
 == Database usage for specific settings
 The above configuration allows for global settings, however you may also define specifics for users and the scopes of those limitations by editing the database information directly.
 
-- +user_id+ field denotes the scope of the limitation.
-- +domain_name+ defines limits for users which JIDs are within that domain.
-- +JID+ of the user defines limit for this exact user.
+The +user_id+ field denotes the scope of the limitation.
+
+. Using a +domain_name+ defines limits for all users whose JIDs are within that domain.
+. Using a +JID+ of a user defines limit for this exact user.
+
 If the value set is larger than 0, that is the specific limit.
 If value is equal to 0 the limit is not overridden and the global limit is used.
 If value equals -1 proxy will forbid any transfer for this user.
 It there is no value for user in this table, a new row will be created during first transfer and limits for domain or global limits will be used.
 
 Socks5 database is setup in this manner:
+
 .tig_socks5_users
 [width="100%",frame="topbot",options="header"]
 |=================================
 |uid  |user_id              |sha1_user_id                              |domain     |sha1_domain                              |filesize_limit |transfer_limit_per_user  |transfer_limit_per_domain
-|1    |user@domain.com      |c35f2956d804e01ef2dec392ef3adae36289123f  |domain.com |e1000db219f3268b0f02735342fe8005fd5a257a |0              |0                        |0
+|1    |user@domain.com      |c35f2956d804e01ef2dec392ef3adae36289123f  |domain.com |e1000db219f3268b0f02735342fe8005fd5a257a |0              |3000                     |0
 |2    |domain.com           |e1000db219f3268b0f02735342fe8005fd5a257a  |domain.com |e1000db219f3268b0f02735342fe8005fd5a257a |500            |0                        |0
 |=================================
 
+This example table shows that user@domain.com is limited to 3000MB per transfer whereas all users of domain.com are limited to a max file size of 500MB.
 This table will populate as users transfer files using the SOCKS5 proxy, once it begins population, you may edit it as necessary.
 A second database is setup tig_socks5_connections that records the connections and transmissions being made, however it does not need to be edited.
 

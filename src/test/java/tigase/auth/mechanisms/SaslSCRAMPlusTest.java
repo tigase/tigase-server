@@ -4,10 +4,7 @@ import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import tigase.auth.callbacks.ChannelBindingCallback;
-import tigase.auth.callbacks.PBKDIterationsCallback;
-import tigase.auth.callbacks.SaltCallback;
-import tigase.auth.callbacks.SaltedPasswordCallback;
+import tigase.auth.callbacks.*;
 import tigase.util.Base64;
 
 import javax.security.auth.callback.Callback;
@@ -28,6 +25,31 @@ public class SaslSCRAMPlusTest extends TestCase {
 		m = new SaslSCRAMPlus(null,
 				new TestCallbackHandler("Ey6OJnGx7JEJAIJp", new byte[]{'D', 'P', 'I'}), "5kLrhitKUHVoSOmzdR") {
 		};
+	}
+
+
+	@Test
+	public void testChannelBindingEncodingEncoding() throws SaslException {
+		String CFM = "cD10bHMtdW5pcXVlLCxuPWJtYWxrb3cscj1TanF1Y3NIdmkzQjR0c1lrTkpCS0lJdHM=";
+		String SFM = "cj1TanF1Y3NIdmkzQjR0c1lrTkpCS0lJdHNjdUVZWGMvU210dWtTUjIycVoscz1NZzRxWVlUckh6VkUyUUdZLGk9NDA5Ng==";
+		String CSM = "Yz1jRDEwYkhNdGRXNXBjWFZsTEN4WHhZRFpldWFPU01qWTE3cG5QZXE2K2FDaUdIODg1dW9PVlFKMm5rQlk4dz09LHI9U2pxdWNzSHZpM0I0dHNZa05KQktJSXRzY3VFWVhjL1NtdHVrU1IyMnFaLHA9NC9ZeHptOUZsV24xT1duaUJVQ08yeC9jMXo4PQ==";
+
+
+		SaslSCRAMPlus m = new SaslSCRAMPlus(null,
+				new TestCallbackHandler("Mg4qYYTrHzVE2QGY", Base64.decode("V8WA2XrmjkjI2Ne6Zz3quvmgohh/PObqDlUCdp5AWPM=")), "cuEYXc/SmtukSR22qZ") {
+		};
+
+		byte[] req;
+		byte[] rsp;
+
+		req = Base64.decode(CFM);
+		rsp = m.evaluateResponse(req);
+
+		System.out.println(new String(rsp));
+		System.out.println(new String(Base64.decode(SFM)));
+
+		req = Base64.decode(CSM);
+		rsp = m.evaluateResponse(req);
 	}
 
 	@Test
@@ -118,7 +140,8 @@ public class SaslSCRAMPlusTest extends TestCase {
 		@Override
 		public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
 			for (Callback callback : callbacks) {
-				if (callback instanceof ChannelBindingCallback) {
+				if (callback instanceof XMPPSessionCallback) {
+				} else if (callback instanceof ChannelBindingCallback) {
 					if (((ChannelBindingCallback) callback).getRequestedBindType() == AbstractSaslSCRAM.BindType.tls_unique)
 						((ChannelBindingCallback) callback).setBindingData(bindingData);
 				} else if (callback instanceof PBKDIterationsCallback) {

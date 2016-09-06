@@ -5,10 +5,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import tigase.auth.callbacks.ChannelBindingCallback;
-import tigase.auth.callbacks.PBKDIterationsCallback;
-import tigase.auth.callbacks.SaltCallback;
-import tigase.auth.callbacks.SaltedPasswordCallback;
+import tigase.auth.callbacks.*;
 import tigase.util.Base64;
 
 import javax.security.auth.callback.Callback;
@@ -97,6 +94,25 @@ public class SaslSCRAMTest extends TestCase {
 	}
 
 	@Test
+	public void testServerFirstMessage() {
+		try {
+			byte[] r = m.evaluateResponse("n,,n=user,r=fyko+d2lbbFgONRv9qkxdawL".getBytes());
+			Assert.assertEquals("r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,s=QSXCR+Q6sek8bf92,i=4096", new String(r));
+
+			r = m.evaluateResponse("c=biws,r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,p=v0X8v3Bz2T0CJGbJQyF0X+HI4Ts=".getBytes());
+			Assert.assertEquals("v=rmF9pqV8S7suAoZWja4dJRkFsKQ=", new String(r));
+
+		} catch (SaslException e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+
+		assertTrue(m.isComplete());
+		assertEquals("user@domain.com", m.getAuthorizationID());
+
+	}
+
+	@Test
 	public void testServerFirstMessageFail_1() {
 		try {
 			byte[] r = m.evaluateResponse("p=tls-unique,,n=bmalkow,r=SpiXKmhi57DBp5sdE5G3H3ms".getBytes());
@@ -118,31 +134,13 @@ public class SaslSCRAMTest extends TestCase {
 		}
 	}
 
-	@Test
-	public void testServerFirstMessage() {
-		try {
-			byte[] r = m.evaluateResponse("n,,n=user,r=fyko+d2lbbFgONRv9qkxdawL".getBytes());
-			Assert.assertEquals("r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,s=QSXCR+Q6sek8bf92,i=4096", new String(r));
-
-			r = m.evaluateResponse("c=biws,r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,p=v0X8v3Bz2T0CJGbJQyF0X+HI4Ts=".getBytes());
-			Assert.assertEquals("v=rmF9pqV8S7suAoZWja4dJRkFsKQ=", new String(r));
-
-		} catch (SaslException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
-
-		assertTrue(m.isComplete());
-		assertEquals("user@domain.com", m.getAuthorizationID());
-
-	}
-
 	private class TestCallbackHandler implements CallbackHandler {
 
 		@Override
 		public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
 			for (Callback callback : callbacks) {
-				if (callback instanceof ChannelBindingCallback) {
+				if (callback instanceof XMPPSessionCallback) {
+				} else if (callback instanceof ChannelBindingCallback) {
 					((ChannelBindingCallback) callback).setBindingData(new byte[]{'D', 'P', 'I'});
 				} else if (callback instanceof PBKDIterationsCallback) {
 					((PBKDIterationsCallback) callback).setInterations(4096);
