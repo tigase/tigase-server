@@ -1,0 +1,70 @@
+= Tigase External Service Discovery
+:author: Andrzej Wójcik
+:date: 2016-09-07 16:00
+
+:toc:
+:numbered:
+:website: http://www.tigase.org
+
+Welcome to the Tigase External Service Discovery component user guide.
+Component provides support for http://xmpp.org/extensions/xep-0215.html[XEP-0215: External Service Discovery] which allows discovery of external services which are not accessible using XMPP protocol.
+
+== Setup & Configuration
+Component (which is implemented in class `tigase.server.extdisco.ExternalServiceDiscoveryComponent`) is by default registered under name `ext-disco` and disabled. To enable it you need to enable it in configuration.
+Example:
+
+* in DSL format:
+[source,DSL]
+----
+ext-disco () { }
+----
+* as properties:
+[source,properties]
+----
+ext-disco/active=true
+----
+
+Additionally you need to activate `urn:xmpp:extdisco:2` XMPP processor in `SessionManager` by:
+
+* in DSL - enable subbean of @sess-man@:
+[source,DSL]
+----
+sess-man {
+    'urn:xmpp:extdisco:2'() {}
+}
+----
+* properties file - add it's id to `sess-man/beans` property:
+[source,properties]
+----
+sess-man/beans=urn:xmpp:extdisco:2
+----
+
+List of external services returned by server is configurable in configuration file or using adhoc commands provided for this component.
+AdHoc commands are accessible only for server administrator using XMPP client with support for AdHoc commands or using Tigase Admin UI.
+Usage of AdHoc commands provides easiest and flexible way to add, modify or remove entries for services which will be returned by discovery.
+
+=== Example
+Example of custom configuration with 2 services being registered in configuration file.
+Each service entry consists of internal id followed by `:` separated list of properties, in form `name=value`. Allowed properties are listed with description in http://xmpp.org/extensions/xep-0215.html#protocol[XEP-0215: External Service Discovery - Section 2. Protocol in Table 1: Attributes] :
+
+* in DSL:
+[source,DSL]
+----
+sess-man {
+    'urn:xmpp:extdisco:2'() {}
+}
+
+ext-disco () {
+    externalServiceDiscoveryRepository {
+        items = [
+            "TURN server (TCP):host=turn.example.com:type=turn:name=TURN Server:transport=tcp",
+            "FTP server:host=ftp.example.com:port=21:type=ftp:name=FTP Server:transport=tcp"
+        ]
+    }
+}
+----
+* as properties _(should be in single line)_:
+[source,properties]
+----
+ext-disco/externalServiceDiscoveryRepository/items=TURN server (TCP):host=turn.example.com:type=turn:name=TURN Server:transport=tcp,FTP server:host=ftp.example.com:port=21:type=ftp:name=FTP Server:transport=tcp
+----

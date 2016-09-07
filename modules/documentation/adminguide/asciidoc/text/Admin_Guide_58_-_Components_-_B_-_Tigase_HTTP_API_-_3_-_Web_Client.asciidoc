@@ -80,7 +80,6 @@ image:images/WebUI-Browse-Comp.jpg[]
 == Management
 This is an advanced window for settings and management for the XMPP server.
 
-=======
 === Configuration
 ==== List server/component configuration
 From a drop-down menu you can view all the active components, or the server configuration (basic-conf). This is a read-only list of the current settings.
@@ -283,7 +282,6 @@ Allows for admins to change the password of a specific user without needing to k
 Provides a text window for admins to input the bare JID of the user they wish to remove from the server.
 
 ==== Get User Info
->>>>>>> release
 This section allows admins to get information about a specific user including current connections as well as offline and online messages awaiting delivery.
 
 ==== Get registered user list

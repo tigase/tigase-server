@@ -243,6 +243,10 @@ include::text/Admin_Guide_76_-_Virtual_Hosts_in_the_Tigase_Server_-_A_-_Specific
 
 include::text/Admin_Guide_77_-_Virtual_Hosts_in_the_Tigase_Server_-_B_-_Virtual_Components_for_Cluster_Mode.asciidoc[]
 
+:leveloffset: 2
+
+include::text/Components/External_Service_Discovery_Component.asciidoc[]
+
 :leveloffset: 1
 
 include::text/Admin_Guide_78_-_Using_Tigase.asciidoc[]
