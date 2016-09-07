@@ -28,15 +28,16 @@ Works only for some components which actually use the repository that way.
 
 AS:Description: Remove an item
 AS:CommandId: comp-repo-item-remove
-AS:Component: vhost-man,ext
+AS:Component: vhost-man,ext,ext-disco
 AS:ComponentClass: tigase.server.ext.ComponentProtocol
  */
 
 package tigase.admin
 
-import tigase.db.*
-import tigase.db.comp.*
-import tigase.server.*
+import tigase.db.comp.ComponentRepository
+import tigase.server.Command
+import tigase.server.Packet
+import tigase.server.Permissions
 
 def ITEMS = "item-list"
 

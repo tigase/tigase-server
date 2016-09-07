@@ -28,15 +28,16 @@ Works only for some components which actually use the repository that way.
 
 AS:Description: Add new item
 AS:CommandId: comp-repo-item-add
-AS:Component: vhost-man,ext
+AS:Component: vhost-man,ext,ext-disco
 AS:ComponentClass: tigase.server.ext.ComponentProtocol
  */
 
 package tigase.admin
 
-import tigase.db.*
-import tigase.db.comp.*
-import tigase.server.*
+import tigase.db.comp.ComponentRepository
+import tigase.server.Command
+import tigase.server.Iq
+import tigase.server.Permissions
 
 def MARKER = "command-marker"
 

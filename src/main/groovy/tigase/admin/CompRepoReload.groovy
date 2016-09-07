@@ -28,13 +28,12 @@ Works only for some components which actually use the repository that way.
 
 AS:Description: Reload component repository
 AS:CommandId: comp-repo-reload
-AS:Component: vhost-man,ext
+AS:Component: vhost-man,ext,ext-disco
 */
 
 package tigase.admin
 
-import tigase.db.*
-import tigase.db.comp.*
+import tigase.db.comp.ComponentRepository
 
 def repo = (ComponentRepository)comp_repo
 repo.reload()

@@ -25,15 +25,16 @@ Works only for some components which actually use the repository that way.
 
 AS:Description: Update item configuration
 AS:CommandId: comp-repo-item-update
-AS:Component: vhost-man,ext,basic-conf
+AS:Component: vhost-man,ext,basic-conf,ext-disco
 AS:ComponentClass: tigase.server.ext.ComponentProtocol
  */
 
 package tigase.admin
 
-import tigase.db.*
-import tigase.db.comp.*
-import tigase.server.*
+import tigase.db.comp.ComponentRepository
+import tigase.server.Command
+import tigase.server.Packet
+import tigase.server.Permissions
 
 def MARKER = "command-marker"
 def ITEMS = "item-list"

@@ -131,7 +131,7 @@ public class Bootstrap implements Lifecycle {
 				Map<String, Object> loaded = new ConfigReader().read(new File(prop_file));
 				props.putAll(loaded);
 			} catch (IOException e) {
-				e.printStackTrace();
+				throw new RuntimeException("Failed to load configuration from file " + prop_file, e);
 			}
 		}
 	}
