@@ -27,11 +27,15 @@ package tigase.xmpp.impl;
 //~--- non-JDK imports --------------------------------------------------------
 
 import java.util.ArrayDeque;
+
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
+
 import tigase.server.Iq;
 import tigase.server.Packet;
+
 import tigase.xml.Element;
+
 import tigase.xmpp.Authorization;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.impl.roster.RosterAbstract;
@@ -46,6 +50,7 @@ import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPProcessor;
 import tigase.xmpp.XMPPProcessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
+
 import static tigase.xmpp.impl.Privacy.*;
 
 import java.util.Collections;
@@ -57,7 +62,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
+
 import tigase.xmpp.PacketErrorTypeException;
+
+import tigase.util.TigaseStringprepException;
 
 /**
  * Describe class JabberIqPrivacy here.
@@ -290,7 +298,11 @@ public class JabberIqPrivacy
 						if (jid != null) {
 							switch (type) {
 							case jid :
-								type_matched = jid.toString().contains(value);
+								try {
+									type_matched = jid.equals( JID.jidInstance( value ) );
+								} catch ( TigaseStringprepException ex ) {
+									log.log(Level.FINEST, "Exception while creating jid instance for value: " + value, ex);
+								}
 
 								break;
 
