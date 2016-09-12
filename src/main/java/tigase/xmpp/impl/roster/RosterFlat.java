@@ -487,7 +487,7 @@ public class RosterFlat
 		String roster_str = session.getData(null, ROSTER, null);
 
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Loaded user roster: {0}", roster_str);
+			log.log(Level.FINEST, "Loaded user {1} roster: {0}", new Object[] {roster_str, session.getjid()});
 		}
 		if ((roster_str != null) &&!roster_str.isEmpty()) {
 			updateRosterHash(roster_str, session);
