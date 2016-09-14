@@ -26,17 +26,9 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import tigase.conf.ConfiguratorAbstract;
-import tigase.db.DataSourceHelper;
-import tigase.db.Repository;
-import tigase.db.RepositoryFactory;
-import tigase.osgi.util.ClassUtil;
 import tigase.server.XMPPServer;
-import tigase.xmpp.XMPPImplIfc;
 
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,32 +49,32 @@ public class Activator implements BundleActivator {
                         
                         XMPPServer.setOSGi(true);
                         
-                        try {
-                                Set<Class<XMPPImplIfc>> procs = ClassUtil.getClassesImplementing(XMPPImplIfc.class);
-                                ArrayList<String> elems = new ArrayList<String>(32);
-                                
-                                for (Class<XMPPImplIfc> cproc : procs) {
-                                        if (!Modifier.isPublic(cproc.getModifiers())) {
-                                                continue;
-                                        }
-
-                                        if (cproc != null) {
-                                                ModulesManagerImpl.getInstance().registerPluginClass(cproc);
-                                        }
-                                }
-                        }
-                        catch (Exception e) {
-                                log.log(Level.SEVERE, "Plugin loading excepton", e);
-                        }
-                        
-						try {
-								Set<Class<Repository>> repos = ClassUtil.getClassesImplementing(Repository.class);
-								RepositoryFactory.initialize(repos);
-                                Set<Class<?>> annotated = ClassUtil.getClassesAnnotated(bundle, Repository.Meta.class);
-                                DataSourceHelper.initialize(annotated);
-						} catch (Exception e) {
-								log.log(Level.SEVERE, "Could not initialize properly ResourceFactory", e);
-						}
+//                        try {
+//                                Set<Class<XMPPImplIfc>> procs = ClassUtil.getClassesImplementing(XMPPImplIfc.class);
+//                                ArrayList<String> elems = new ArrayList<String>(32);
+//
+//                                for (Class<XMPPImplIfc> cproc : procs) {
+//                                        if (!Modifier.isPublic(cproc.getModifiers())) {
+//                                                continue;
+//                                        }
+//
+//                                        if (cproc != null) {
+//                                                ModulesManagerImpl.getInstance().registerPluginClass(cproc);
+//                                        }
+//                                }
+//                        }
+//                        catch (Exception e) {
+//                                log.log(Level.SEVERE, "Plugin loading excepton", e);
+//                        }
+//
+//						try {
+//								Set<Class<Repository>> repos = ClassUtil.getClassesImplementing(Repository.class);
+//								RepositoryFactory.initialize(repos);
+//                                Set<Class<?>> annotated = ClassUtil.getClassesAnnotated(bundle, Repository.Meta.class);
+//                                DataSourceHelper.initialize(annotated);
+//						} catch (Exception e) {
+//								log.log(Level.SEVERE, "Could not initialize properly ResourceFactory", e);
+//						}
 						
 						// we need to export this before we start, so if start will fail due to missing
 						// dependencies we would be able to add them later and recorver from this

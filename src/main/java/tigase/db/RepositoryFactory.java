@@ -28,15 +28,17 @@ package tigase.db;
 
 import tigase.osgi.ModulesManagerImpl;
 import tigase.stats.StatisticsContainerIfc;
-import tigase.stats.StatisticsProviderIfc;
 import tigase.stats.StatisticsList;
-import tigase.util.ClassUtil;
+import tigase.stats.StatisticsProviderIfc;
+import tigase.util.ClassUtilBean;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -294,19 +296,6 @@ public abstract class RepositoryFactory {
 	private static final ConcurrentMap<String, AuthRepository> auth_repos =
 			new ConcurrentHashMap<String, AuthRepository>(AUTH_REPO_POOL_SIZE_PROP_VAL);
 
-	private static final CopyOnWriteArraySet<Class> internalRepositoryClasses = new CopyOnWriteArraySet<Class>();
-	
-	static {
-		try {
-			Set<Class<Repository>> classes = ClassUtil.getClassesImplementing(Repository.class);
-			initialize(classes);
-		} catch (Exception ex) {
-		}
-	}
-	
-	public static void initialize(Collection<Class<Repository>> classes) {
-		internalRepositoryClasses.addAll(classes);
-	}
 	//~--- get methods ----------------------------------------------------------
 
 	/**
@@ -482,11 +471,10 @@ public abstract class RepositoryFactory {
 	 * 
 	 */
 	public static <T extends Class<? extends Repository>> T getRepoClass(T cls, String uri) throws DBInitException {
-		Set<T> classes = ModulesManagerImpl.getInstance().getImplementations(cls);
-		classes.addAll(getRepoInternalClasses(cls));
+		Set<T> classes = getRepoInternalClasses(cls);
 		Set<T> supported = new HashSet<T>();
 		for (T clazz : classes) {
-			Repository.Meta annotation = (Repository.Meta) clazz.getAnnotation(Repository.Meta.class);
+			Repository.Meta annotation = clazz.getAnnotation(Repository.Meta.class);
 			if (annotation != null) {
 				String[] supportedUris = annotation.supportedUris();
 				if (supportedUris != null) {
@@ -546,7 +534,7 @@ public abstract class RepositoryFactory {
 	 */
 	private static <T extends Class<? extends Repository>> Set<T> getRepoInternalClasses(T cls) {
 		HashSet<T> result = new HashSet<T>();
-		for (Class<Repository> clazz : internalRepositoryClasses) {
+		for (Class<?> clazz : ClassUtilBean.getInstance().getAllClasses()) {
 			if (cls.isAssignableFrom(clazz))
 				result.add((T) clazz);
 		}

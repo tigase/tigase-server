@@ -10,10 +10,6 @@ import tigase.kernel.core.Kernel;
 import tigase.kernel.core.RegistrarKernel;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created by andrzej on 05.03.2016.
@@ -21,16 +17,16 @@ import java.util.logging.Logger;
 public class RegistrarBeanKernelTest {
 
 	public RegistrarBeanKernelTest() {
-		Logger logger = Logger.getLogger("tigase.kernel");
-
-		// create a ConsoleHandler
-		Handler handler = new ConsoleHandler();
-		handler.setLevel(Level.ALL);
-		logger.addHandler(handler);
-		logger.setLevel(Level.ALL);
-
-		if (logger.isLoggable(Level.CONFIG))
-			logger.config("Logger successfully initialized");
+//		Logger logger = Logger.getLogger("tigase.kernel");
+//
+//		// create a ConsoleHandler
+//		Handler handler = new ConsoleHandler();
+//		handler.setLevel(Level.ALL);
+//		logger.addHandler(handler);
+//		logger.setLevel(Level.ALL);
+//
+//		if (logger.isLoggable(Level.CONFIG))
+//			logger.config("Logger successfully initialized");
 	}
 
 	@Test

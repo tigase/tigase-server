@@ -30,7 +30,10 @@ AS:Component: sess-man
 
 package tigase.admin
 
+import tigase.kernel.KernelException
 import tigase.server.*
+import tigase.xmpp.Authorization
+import tigase.xmpp.impl.JabberIqRegister
 
 def p = (Packet)packet
 
@@ -47,12 +50,17 @@ if (signedFormRequired == null) {
 	Command.addFieldValue(res, "signedFormRequired", Boolean.toString(JabberIqRegister.isSignedFormRequired()), "boolean", "Signed Form required to registration") 
 	return res
 } else {
-	JabberIqRegister.setOAuthCredentials(oauthTokenKey, oauthTokenSecret)
-	JabberIqRegister.setSignedFormRequired(signedFormRequired.equals("1") || signedFormRequired.equals("true"))
-	
-	def res = p.commandResult(Command.DataType.result)
-	Command.addTitle(res, "OAuth Credentials")
-	Command.addInstructions(res, "Credentials set.")
-	return res
+	try {
+		JabberIqRegister jabberIqRegister = kernel.getInstance(JabberIqRegister.class);
+		jabberIqRegister.setOAuthCredentials(oauthTokenKey, oauthTokenSecret)
+		jabberIqRegister.setSignedFormRequired(signedFormRequired.equals("1") || signedFormRequired.equals("true"))
+
+		def res = p.commandResult(Command.DataType.result)
+		Command.addTitle(res, "OAuth Credentials")
+		Command.addInstructions(res, "Credentials set.")
+		return res
+	} catch (KernelException ex) {
+		return Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(p, "JabberIqRegister processor is not loaded", false);
+	}
 }
 

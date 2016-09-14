@@ -25,6 +25,11 @@ public interface BeanConfigurator {
 	String DEFAULT_CONFIGURATOR_NAME = "defaultBeanConfigurator";
 
 	/**
+	 * Notify bean configurator that configuration was changed and beans needs to be reconfigured
+	 */
+	void configurationChanged();
+
+	/**
 	 * Configure bean.
 	 * 
 	 * @param beanConfig

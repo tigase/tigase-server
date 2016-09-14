@@ -30,6 +30,7 @@ import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.RegistrarBean;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.config.ConfigurationChangedAware;
+import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.Kernel;
 import tigase.osgi.ModulesManagerImpl;
 
@@ -51,7 +52,6 @@ public abstract class MDPoolConfigBean<A extends Repository,B extends MDPoolConf
 	@Inject(nullAllowed = true)
 	private Set<A> instances;
 
-	@Inject
 	private Kernel kernel;
 
 	@ConfigField(desc = "Name (ie. domain)")
@@ -96,19 +96,42 @@ public abstract class MDPoolConfigBean<A extends Repository,B extends MDPoolConf
 			Class<?> repoClass = ModulesManagerImpl.getInstance().forName(cls);
 			String poolCls = getRepositoryPoolClassName();
 
+			Kernel.DelayedDependencyInjectionQueue queue = kernel.beginDependencyDelayedInjection();
+
 			if (poolCls == null) {
-				kernel.registerBean("instance").asClass(repoClass).exec();
+				if (repository == null || changedFields.contains("poolCls"))
+					kernel.registerBean("instance").asClass(repoClass).exec();
 			} else {
-				Class<?> poolClass = ModulesManagerImpl.getInstance().forName(poolCls);
+				if (repository == null || changedFields.contains("poolCls") || changedFields.contains("poolSize")) {
+					Class<?> poolClass = ModulesManagerImpl.getInstance().forName(poolCls);
 
-				kernel.registerBean("instance").asClass(poolClass).exec();
+					for (int i = 0; i < poolSize; i++) {
+						kernel.registerBean("repo-" + i).asClass(repoClass).exec();
+					}
 
-				for (int i = 0; i < poolSize; i++) {
-					kernel.registerBean("repo-" + i).asClass(repoClass).exec();
+					kernel.registerBean("instance").asClass(poolClass).exec();
 				}
 			}
+			kernel.finishDependecyDelayedInjection(queue);
+			unloadOldBeans();
 		} catch (DBInitException|ClassNotFoundException ex) {
 			throw new RuntimeException("Could not initialize " + getRepositoryIfc().getCanonicalName() + " for name '" + name + "'", ex);
+		}
+	}
+
+	public void unloadOldBeans() {
+		List<BeanConfig> beanConfigs = new ArrayList<>(kernel.getDependencyManager().getBeanConfigs());
+		for (BeanConfig bc : beanConfigs) {
+			if (bc.getBeanName().startsWith("repo-")) {
+				try {
+					Integer pos = Integer.parseInt(bc.getBeanName().replace("repo-", ""));
+					if (poolCls == null || pos >= poolSize) {
+						kernel.unregister(bc.getBeanName());
+					}
+				} catch (NumberFormatException ex) {
+					// this is not instance create by us, ignoring
+				}
+			}
 		}
 	}
 

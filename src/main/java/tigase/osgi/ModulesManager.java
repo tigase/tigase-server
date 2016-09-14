@@ -23,25 +23,28 @@ import tigase.conf.Configurable;
 import tigase.xmpp.XMPPImplIfc;
 
 /**
- *
  * @author andrzej
  */
 public interface ModulesManager {
 
-		void registerClass(Class<?> cls);
-		
-		void unregisterClass(Class<?> cls);
-		
-        void registerPluginClass(Class<? extends XMPPImplIfc> pluginCls);
+	void registerClass(Class<?> cls);
 
-        void unregisterPluginClass(Class<? extends XMPPImplIfc> pluginCls);
+	void unregisterClass(Class<?> cls);
 
-        void registerServerComponentClass(Class<? extends Configurable> compCls);
+	@Deprecated
+	void registerPluginClass(Class<? extends XMPPImplIfc> pluginCls);
 
-        void unregisterServerComponentClass(Class<? extends Configurable> compCls);
+	@Deprecated
+	void unregisterPluginClass(Class<? extends XMPPImplIfc> pluginCls);
 
-        void update();
-        
-		Class<?> forName(String className) throws ClassNotFoundException;
-		
+	@Deprecated
+	void registerServerComponentClass(Class<? extends Configurable> compCls);
+
+	@Deprecated
+	void unregisterServerComponentClass(Class<? extends Configurable> compCls);
+
+	void update();
+
+	Class<?> forName(String className) throws ClassNotFoundException;
+
 }

@@ -35,6 +35,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Main class of Kernel.
@@ -42,6 +43,8 @@ import java.util.logging.Logger;
 public class Kernel {
 
 	protected final Logger log = Logger.getLogger(this.getClass().getName());
+
+	private static final ThreadLocal<DelayedDependencyInjectionQueue> DELAYED_DEPENDENCY_INJECTION = new ThreadLocal<>();
 
 	private final Map<BeanConfig, Object> beanInstances = new HashMap<BeanConfig, Object>();
 
@@ -74,6 +77,7 @@ public class Kernel {
 		bc.setPinned(true);
 		dependencyManager.register(bc);
 		putBeanInstance(bc, this);
+		bc.setState(State.initialized);
 	}
 
 	protected static void initBean(BeanConfig tmpBC, Set<BeanConfig> createdBeansConfig, int deep)
@@ -82,6 +86,8 @@ public class Kernel {
 
 		if (beanConfig.getState() == State.initialized)
 			return;
+
+		DelayedDependencyInjectionQueue queue = beanConfig.getKernel().beginDependencyDelayedInjection();
 
 		Object bean;
 		if (beanConfig.getState() == State.registered) {
@@ -129,6 +135,9 @@ public class Kernel {
 			((RegistrarBean) bean).register(beanConfig.getKernel());
 		}
 
+		beanConfig.getKernel().finishDependecyDelayedInjection(queue);
+
+
 		for (final Dependency dep : beanConfig.getFieldDependencies().values()) {
 			beanConfig.getKernel().injectDependencies(bean, dep, createdBeansConfig, deep);
 		}
@@ -136,8 +145,8 @@ public class Kernel {
 		// there is no need to wait to initialize parent beans, it there any?
 		if (bean instanceof Initializable) {
 			((Initializable) bean).initialize();
-			tmpBC.setState(State.initialized);
 		}
+		tmpBC.setState(State.initialized);
 //		if (deep == 0) {
 //			for (BeanConfig bc : createdBeansConfig) {
 //				Object bi = bc.getKernel().getInstance(bc);
@@ -437,13 +446,23 @@ public class Kernel {
 
 		for (BeanConfig b : dependentBeansConfigs) {
 			if (b == null) {
-				dataToInject.add(null);
+//				if (dep.getType() != null && (Collection.class.isAssignableFrom(dep.getType()) || dep.getType().isArray()))
+					continue;
+
+//				dataToInject.add(null);
 			} else {
-				if (!b.getKernel().beanInstances.containsKey(b)) {
-					initBean(b, createdBeansConfig, deep + 1);
-				}
 				Object beanToInject = b.getKernel().getInstance(b);
-				// if (beanToInject != null)
+				if (beanToInject == null) {
+					try {
+						initBean(b, createdBeansConfig, deep + 1);
+					} catch (KernelException ex) {
+						log.log(Level.WARNING, "Could not initialize bean " + b.getBeanName() + ", skipping injection of this bean", ex);
+						continue;
+					}
+					beanToInject = b.getKernel().getInstance(b);
+				}
+				if (beanToInject == null) // && dep.getType() != null && (Collection.class.isAssignableFrom(dep.getType()) || dep.getType().isArray()))
+					continue;
 				// it may happen that we create link in parent kernel to bean in subkernel and both are marked
 				// as exportable - then we have 2 bean configs pointing to same instance - so we need it to
 				// detect this - remove duplicated instances from dataToInject list
@@ -492,6 +511,35 @@ public class Kernel {
 		}
 	}
 
+	void injectDependencies(Collection<Dependency> dps) {
+		for (Dependency dep : dps) {
+			BeanConfig depbc = dep.getBeanConfig();
+
+			try {
+				if (depbc.getState() == State.initialized || depbc.getState() == State.instanceCreated) {
+					Object bean = depbc.getKernel().getInstance(depbc);
+					if (bean == null) {
+						log.log(Level.FINEST, "skipping injection of dependencies to " + dep + " as there is no bean instance");
+						continue;
+					}
+
+					injectDependencies(bean, dep, new HashSet<BeanConfig>(), 0);
+				}
+			} catch (Exception e) {
+				log.log(Level.WARNING, "Can't inject dependency to bean " + depbc.getBeanName() + " unloading bean " + depbc.getBeanName(), e);
+				try {
+					Object i = depbc.getKernel().beanInstances.remove(depbc);
+					depbc.setState(State.registered);
+					if (depbc.getState() == State.initialized)
+						fireUnregisterAware(i);
+					unloadInjectedBean(depbc);
+				} catch (Exception ex) {
+					throw new KernelException("Can't unload bean " + depbc.getBeanName(), ex);
+				}
+			}
+		}
+	}
+
 	/**
 	 * Checks if bean with given name is registered in Kernel.
 	 *
@@ -528,11 +576,14 @@ public class Kernel {
 	}
 
 	void putBeanInstance(BeanConfig beanConfig, Object beanInstance) {
-		this.beanInstances.put(beanConfig, beanInstance);
+		Object oldBeanInstance = this.beanInstances.put(beanConfig, beanInstance);
+		if (oldBeanInstance instanceof UnregisterAware && oldBeanInstance != beanInstance) {
+			((UnregisterAware) oldBeanInstance).beforeUnregister();
+		}
 		if (beanInstance instanceof Kernel && beanInstance != this) {
 			((Kernel) beanInstance).setParent(this);
 		}
-		beanConfig.setState(State.initialized);
+		//beanConfig.setState(State.initialized);
 	}
 
 	/**
@@ -603,6 +654,88 @@ public class Kernel {
 		return builder;
 	}
 
+	protected BeanConfig registerBean(BeanConfig beanConfig, BeanConfig factoryBeanConfig, Object beanInstance) {
+		BeanConfig parent = null;
+		if (beanConfig.getSource() == BeanConfig.Source.annotation && !beanConfig.getRegisteredBy().isEmpty()) {
+			BeanConfig bc = dependencyManager.getBeanConfig(beanConfig.getBeanName());
+			parent = beanConfig.getRegisteredBy().iterator().next();
+			if (bc != null && bc.getClazz().equals(beanConfig.getClazz())) {
+				bc.addRegisteredBy(parent);
+				parent.addRegisteredBean(bc);
+				currentlyUsedConfigBuilder = null;
+				return bc;
+			}
+		}
+
+		if (factoryBeanConfig != null) {
+			factoryBeanConfig.setPinned(beanConfig.isPinned());
+			factoryBeanConfig.setState(beanConfig.getState());
+			unregisterInt(factoryBeanConfig.getBeanName());
+			dependencyManager.register(factoryBeanConfig);
+		}
+
+		BeanConfig oldBeanConfig = dependencyManager.getBeanConfig(beanConfig.getBeanName());
+		Collection<Dependency> oldDeps = oldBeanConfig == null ? null : dependencyManager.getDependenciesTo(oldBeanConfig);
+
+		unregisterInt(beanConfig.getBeanName());
+		dependencyManager.register(beanConfig);
+		if (parent != null) {
+			parent.addRegisteredBean(beanConfig);
+		}
+
+		if (beanInstance != null) {
+			putBeanInstance(beanConfig, beanInstance);
+			beanConfig.setState(State.initialized);
+		}
+
+		Collection<Dependency> deps = dependencyManager.getDependenciesTo(beanConfig);
+		if (oldDeps != null) {
+			deps.addAll(oldDeps.stream().filter(od -> {
+				Field f = od.getField();
+				return !deps.stream().anyMatch(nd -> nd.getField().equals(f));
+			}).collect(Collectors.toSet()));
+		}
+
+		currentlyUsedConfigBuilder = null;
+
+		if (!queueForDelayedDependencyInjection(deps)) {
+			injectDependencies(deps);
+		}
+
+		return beanConfig;
+	}
+
+	private boolean queueForDelayedDependencyInjection(Collection<Dependency> deps) {
+		DelayedDependencyInjectionQueue queue = DELAYED_DEPENDENCY_INJECTION.get();
+		if (queue == null) {
+			return false;
+		}
+
+		queue.offer(new DelayedDependenciesInjection(deps));
+		return true;
+	}
+
+	public DelayedDependencyInjectionQueue beginDependencyDelayedInjection() {
+		DelayedDependencyInjectionQueue queue = DELAYED_DEPENDENCY_INJECTION.get();
+		if (queue == null) {
+			queue = new DelayedDependencyInjectionQueue();
+			DELAYED_DEPENDENCY_INJECTION.set(queue);
+			return queue;
+		}
+		return null;
+	}
+
+	public void finishDependecyDelayedInjection(DelayedDependencyInjectionQueue queue) {
+		if (queue == null) {
+			return;
+		}
+		DELAYED_DEPENDENCY_INJECTION.remove();
+
+		for (DelayedDependenciesInjection item : queue.getQueue()) {
+			item.inject();
+		}
+	}
+
 
 	public void setBeanActive(String beanName, boolean value) {
 		BeanConfig beanConfig = dependencyManager.getBeanConfig(beanName);
@@ -665,22 +798,31 @@ public class Kernel {
 			if (bc.getState() != State.initialized)
 				continue;
 			Object ob = bc.getKernel().getInstance(bc);
+			if (ob == null)
+				continue;
+
 			for (Dependency d : bc.getFieldDependencies().values()) {
 				if (DependencyManager.match(d, beanConfig)) {
-					BeanConfig[] cbcs = dependencyManager.getBeanConfig(d);
-					if (cbcs.length == 0) {
-						inject(null, d, ob);
-					} else if (cbcs.length == 1) {// Clearing single-instance
-						// dependency. Like single field.
-						// BeanConfig cbc = cbcs[0];
-						// if (cbc != null && cbc.equals(removingBC)) {
-						inject(null, d, ob);
-						// }
-					} else if (cbcs.length > 1) { // Clearing multi-instance
-						// dependiency. Like
-						// collections and arrays.
+					try {
+						BeanConfig[] cbcs = dependencyManager.getBeanConfig(d);
+						if (cbcs.length == 0) {
+							inject(null, d, ob);
+//						} else if (cbcs.length == 1) {// Clearing single-instance
+//							// dependency. Like single field.
+//							// BeanConfig cbc = cbcs[0];
+//							// if (cbc != null && cbc.equals(removingBC)) {
+//							inject(null, d, ob);
+//							// }
+//						} else if (cbcs.length > 1) { // Clearing multi-instance
+						} else {
+							// dependiency. Like
+							// collections and arrays.
 
-						injectDependencies(ob, d, new HashSet<BeanConfig>(), 0);
+							injectDependencies(ob, d, new HashSet<BeanConfig>(), 0);
+						}
+					} catch (KernelException ex) {
+						log.log(Level.WARNING, "Can't set null to " + d + " unloading bean " + d.getBeanName(), ex);
+						unloadInjectedBean(d.getBeanConfig());
 					}
 				}
 			}
@@ -700,8 +842,10 @@ public class Kernel {
 		if (unregisteredBeanConfig == null)
 			return;
 		if (unregisteredBeanConfig.getKernel() != this) {
-			unregisteredBeanConfig.getKernel().unregister(beanName);
-			return;
+			if (!RegistrarBean.class.isAssignableFrom(unregisteredBeanConfig.getClazz())) {
+				unregisteredBeanConfig.getKernel().unregister(beanName);
+				return;
+			}
 		}
 
 		unregisterInt(beanName);
@@ -723,11 +867,21 @@ public class Kernel {
 
 			BeanConfig oldBeanConfig = dependencyManager.unregister(beanName);
 			Object i = oldBeanConfig.getKernel().beanInstances.remove(oldBeanConfig);
-			fireUnregisterAware(i);
+			if (oldBeanConfig.getState() == State.initialized)
+				fireUnregisterAware(i);
+
+			for (BeanConfig bc : oldBeanConfig.getRegisteredBeans()) {
+				if (bc.removeRegisteredBy(oldBeanConfig)) {
+					bc.getKernel().unregisterInt(bc.getBeanName());
+				}
+			}
+			if (RegistrarBean.class.isAssignableFrom(oldBeanConfig.getClazz())) {
+				oldBeanConfig.getKernel().getParent().unregister(oldBeanConfig.getBeanName() + "#KERNEL");
+			}
 		}
 	}
 
-	static class DelegatedBeanConfig extends BeanConfig {
+	public static class DelegatedBeanConfig extends BeanConfig {
 
 		private final BeanConfig original;
 
@@ -776,4 +930,32 @@ public class Kernel {
 		}
 	}
 
+	public class DelayedDependencyInjectionQueue {
+		private final Queue<DelayedDependenciesInjection> queue = new ArrayDeque<>();
+
+		public boolean offer(DelayedDependenciesInjection item) {
+			return queue.offer(item);
+		}
+
+		public Queue<DelayedDependenciesInjection> getQueue() {
+			return queue;
+		}
+
+		public boolean checkStartingKernel(Kernel kernel) {
+			return Kernel.this == kernel;
+		}
+	}
+
+	private class DelayedDependenciesInjection {
+
+		private final Collection<Dependency> dependencies;
+
+		public DelayedDependenciesInjection(Collection<Dependency> deps) {
+			this.dependencies = deps;
+		}
+
+		public void inject() {
+			Kernel.this.injectDependencies(dependencies);
+		}
+	}
 }

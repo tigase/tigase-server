@@ -22,23 +22,20 @@
 package tigase.osgi.util;
 
 //~--- JDK imports ------------------------------------------------------------
+import org.osgi.framework.Bundle;
+import tigase.osgi.Activator;
+import tigase.util.ClassComparator;
+import tigase.util.ObjectComparator;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.net.URL;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Logger;
-import org.osgi.framework.Bundle;
-import tigase.osgi.Activator;
-import tigase.util.ClassComparator;
-import tigase.util.ObjectComparator;
 
 //~--- classes ----------------------------------------------------------------
 /**
@@ -355,6 +352,51 @@ public class ClassUtil {
                 }
                 return classes_set;
                 //return ClassUtil.getClassesImplementing(classes, cls);
+        }
+
+        public static Set<Class<?>> getClassesFromBundle(Bundle bundle) {
+                Set<Class<?>> classes_set = new TreeSet<>(new ClassComparator());
+                Enumeration e = bundle.findEntries("/", "*.class", true);
+                if (e != null) {
+                        while (e.hasMoreElements()) {
+                                URL clsUrl = (URL) e.nextElement();
+                                String clsName = getClassNameFromFileName(clsUrl.getPath());
+
+                                boolean skip_class = false;
+                                for (String prefix : SKIP_STARTS) {
+                                        if (clsName.startsWith(prefix)) {
+                                                skip_class = true;
+                                                break;
+                                        }
+                                }
+                                if (skip_class) {
+                                        continue;
+                                }
+
+                                for (String part : SKIP_CONTAINS) {
+                                        if (clsName.contains(part)) {
+                                                skip_class = true;
+                                                break;
+                                        }
+                                }
+                                if (skip_class) {
+                                        continue;
+                                }
+
+
+                                try {
+                                        Class c = bundle.loadClass(clsName);
+                                        int mod = c.getModifiers();
+                                        if (!Modifier.isAbstract(mod) && !Modifier.isInterface(mod)) {
+                                                classes_set.add(c);
+                                        } // end of if (!Modifier.isAbstract(mod) && !Modifier.isInterface(mod))
+                                }
+                                catch (ClassNotFoundException ex) {
+                                        Logger.getLogger(ClassUtil.class.getCanonicalName()).warning("Could not find class = " + clsName);
+                                }
+                        }
+                }
+                return classes_set;
         }
 
         /**

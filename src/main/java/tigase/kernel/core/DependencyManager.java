@@ -61,7 +61,11 @@ public class DependencyManager {
 		if (dependency.getBeanName() != null) {
 			return beanConfig.getBeanName().equals(dependency.getBeanName());
 		} else if (dependency.getType() != null) {
-			return dependency.getType().isAssignableFrom(beanConfig.getClazz());
+			Class<?> type = dependency.getType();
+			if (Collection.class.isAssignableFrom(type)) {
+				type = ReflectionHelper.getCollectionParamter(dependency.getGenericType(), dependency.getBeanConfig().getClazz());
+			}
+			return type.isAssignableFrom(beanConfig.getClazz());
 		} else
 			throw new RuntimeException("Unsupported dependecy type.");
 	}

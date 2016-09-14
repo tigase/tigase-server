@@ -1,5 +1,5 @@
 /*
- * RegistrarKernel.java
+ * ClassUtilBean.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2016 "Tigase, Inc." <office@tigase.com>
@@ -18,18 +18,28 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  */
+package tigase.osgi.util;
 
-package tigase.kernel.core;
+import tigase.osgi.Activator;
+import tigase.osgi.ModulesManagerImpl;
 
-import tigase.kernel.beans.UnregisterAware;
+import java.util.HashSet;
+import java.util.Set;
 
-public class RegistrarKernel extends Kernel implements UnregisterAware {
+/**
+ * Created by andrzej on 08.09.2016.
+ */
+public class ClassUtilBean extends tigase.util.ClassUtilBean {
 
+	public ClassUtilBean() {
+		classes.addAll(ClassUtil.getClassesFromBundle(Activator.getBundle()));
+	}
 
 	@Override
-	public void beforeUnregister() {
-		for (BeanConfig bc : this.getDependencyManager().getBeanConfigs()) {
-			unregisterInt(bc.getBeanName());
-		}
+	public Set<Class<?>> getAllClasses() {
+		ModulesManagerImpl modulesManager = ModulesManagerImpl.getInstance();
+		Set<Class<?>> classes = new HashSet<>(super.getAllClasses());
+		classes.addAll(modulesManager.getClasses());
+		return classes;
 	}
 }

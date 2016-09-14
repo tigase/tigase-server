@@ -55,7 +55,6 @@ import tigase.vhosts.VHostItem;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
-import tigase.xmpp.impl.JabberIqRegister;
 import tigase.xmpp.impl.PresenceCapabilitiesManager;
 
 import javax.script.Bindings;
@@ -439,10 +438,6 @@ public class SessionManager
 		binds.put(CommandIfc.USER_CONN, connectionsByFrom);
 		binds.put(CommandIfc.USER_REPO, user_repository);
 		binds.put(CommandIfc.USER_SESS, sessionsByNodeId);
-		XMPPProcessorIfc registerModule = getProcessor(JabberIqRegister.ID);
-		if (registerModule != null)
-			binds.put("JabberIqRegister", registerModule);
-
 	}
 
 	@Override

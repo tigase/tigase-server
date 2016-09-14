@@ -23,7 +23,9 @@ package tigase.kernel.core;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This is internal configuration of each bean. It stores name of bean,
@@ -38,7 +40,11 @@ public class BeanConfig {
 	private boolean pinned = true;
 	private BeanConfig factory;
 	private Kernel kernel;
+	private Source source = Source.hardcoded;
 	private State state;
+
+	private Set<BeanConfig> registeredBeans = new HashSet<>();
+	private Set<BeanConfig> registeredBy = new HashSet<>();
 
 	BeanConfig(String id, Class<?> clazz) {
 		super();
@@ -161,9 +167,42 @@ public class BeanConfig {
 		this.pinned = pinned;
 	}
 
+	public Source getSource() {
+		return source;
+	}
+
+	void setSource(Source source) {
+		this.source = source;
+	}
+
 	@Override
 	public String toString() {
 		return beanName + ":" + clazz.getName();
+	}
+
+	public Set<BeanConfig> getRegisteredBeans() {
+		return registeredBeans;
+	}
+
+	public void addRegisteredBean(BeanConfig beanConfig) {
+		registeredBeans.add(beanConfig);
+	}
+
+	public void removeRegisteredBean(BeanConfig beanConfig) {
+		registeredBeans.remove(beanConfig);
+	}
+
+	public void addRegisteredBy(BeanConfig beanConfig) {
+		registeredBy.add(beanConfig);
+	}
+
+	public boolean removeRegisteredBy(BeanConfig beanConfig) {
+		registeredBy.remove(beanConfig);
+		return registeredBy.isEmpty();
+	}
+
+	public Set<BeanConfig> getRegisteredBy() {
+		return registeredBy;
 	}
 
 	/**
@@ -188,4 +227,9 @@ public class BeanConfig {
 		inactive,
 	}
 
+	public enum Source {
+		hardcoded,
+		annotation,
+		configuration
+	}
 }

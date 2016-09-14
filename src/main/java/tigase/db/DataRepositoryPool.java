@@ -172,6 +172,9 @@ public class DataRepositoryPool implements DataRepository, DataSourcePool<DataRe
 
 	@Override
 	public String getResourceUri() {
+		if (resource_uri == null && !repoPool.isEmpty()) {
+			return takeRepo(null).getResourceUri();
+		}
 		return resource_uri;
 	}
 

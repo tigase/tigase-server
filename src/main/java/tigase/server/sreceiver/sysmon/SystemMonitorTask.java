@@ -29,28 +29,21 @@ import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.server.sreceiver.PropertyItem;
 import tigase.server.sreceiver.RepoRosterTask;
-
 import tigase.stats.StatisticsList;
-
 import tigase.util.ClassUtil;
-
+import tigase.util.ClassUtilBean;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
+
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static tigase.server.sreceiver.PropertyConstants.*;
 import static tigase.server.sreceiver.sysmon.ResourceMonitorIfc.*;
 
 //~--- JDK imports ------------------------------------------------------------
-
-import java.util.ArrayDeque;
-import java.util.LinkedHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created: Dec 6, 2008 8:12:41 PM
@@ -91,7 +84,13 @@ public class SystemMonitorTask
 	public SystemMonitorTask() {
 		try {
 			Set<ResourceMonitorIfc> mons =
-				ClassUtil.getImplementations(ResourceMonitorIfc.class);
+				ClassUtil.getClassesImplementing(ClassUtilBean.getInstance().getAllClasses(), ResourceMonitorIfc.class).stream().map(cls -> {
+					try {
+						return cls.newInstance();
+					} catch (InstantiationException|IllegalAccessException e) {
+						throw new RuntimeException("Failed to instantiate class:" + cls.getCanonicalName(), e);
+					}
+				}).collect(Collectors.toSet());
 
 			all_monitors = new String[mons.size()];
 

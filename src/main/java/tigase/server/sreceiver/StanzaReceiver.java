@@ -37,6 +37,7 @@ import tigase.server.sreceiver.PropertyConstants.MessageType;
 import tigase.server.sreceiver.PropertyConstants.SenderAddress;
 import tigase.server.sreceiver.PropertyConstants.SenderRestrictions;
 
+import tigase.util.ClassUtilBean;
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
@@ -233,7 +234,7 @@ public class StanzaReceiver extends AbstractMessageReceiver implements Configura
 	public StanzaReceiver() {
 		try {
 			Set<Class<ReceiverTaskIfc>> ctasks =
-					ClassUtil.getClassesImplementing(ReceiverTaskIfc.class);
+					ClassUtil.getClassesImplementing(ClassUtilBean.getInstance().getAllClasses(), ReceiverTaskIfc.class);
 
 			for (Class<ReceiverTaskIfc> ctask : ctasks) {
 				ReceiverTaskIfc itask = ctask.newInstance();

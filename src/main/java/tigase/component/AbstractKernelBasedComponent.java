@@ -108,7 +108,8 @@ public abstract class AbstractKernelBasedComponent extends AbstractMessageReceiv
 	public void register(Kernel kernel) {
 		this.kernel = kernel;
 
-		kernel.registerBean("component").asInstance(this).exec();
+		//kernel.registerBean("component").asInstance(this).exec();
+		kernel.ln("service", kernel, "component");
 		kernel.registerBean("adHocCommandManager").asClass(AdHocCommandManager.class).exec();
 		kernel.registerBean("scriptCommandProcessor").asClass(ComponenScriptCommandProcessor.class).exec();
 		kernel.registerBean("writer").asClass(DefaultPacketWriter.class).exec();

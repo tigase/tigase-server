@@ -21,13 +21,10 @@
  */
 package tigase.db;
 
-import tigase.osgi.ModulesManagerImpl;
-import tigase.util.ClassUtil;
+import tigase.util.ClassUtilBean;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -38,24 +35,6 @@ import java.util.regex.Pattern;
 public class DataSourceHelper {
 
 	private static final Logger log = Logger.getLogger(DataSourceHelper.class.getCanonicalName());
-	private static final CopyOnWriteArraySet<Class> annotatedClasses = new CopyOnWriteArraySet<Class>();
-
-	static {
-		try {
-			Set<Class<?>> classes = ClassUtil.getClassesFromClassPath();
-			initialize(classes);
-		} catch (Exception ex) {
-		}
-	}
-
-	public static void initialize(Collection<Class<?>> classes) {
-		for (Class<?> clazz : classes) {
-			Repository.Meta annotation = clazz.getAnnotation(Repository.Meta.class);
-			if (annotation == null)
-				continue;
-			annotatedClasses.add(clazz);
-		}
-	}
 
 	public static String getDefaultClassName(Class cls, String uri) throws DBInitException {
 		Class result = getDefaultClass(cls, uri);
@@ -77,8 +56,7 @@ public class DataSourceHelper {
 	}
 
 	public static <T extends Class<?>> T getDefaultClass(T cls, String uri, Matcher matcher) throws DBInitException {
-		Set<T> classes = ModulesManagerImpl.getInstance().getImplementations(cls);
-		classes.addAll(getAnnotatedClasses(cls));
+		Set<T> classes = getAnnotatedClasses(cls);
 		Set<T> supported = new HashSet<T>();
 		for (T clazz : classes) {
 			if (matcher != null && !matcher.matches(clazz))
@@ -124,7 +102,11 @@ public class DataSourceHelper {
 
 	public static <T extends Class<?>> Set<T> getAnnotatedClasses(T cls) {
 		Set<T> classes = new HashSet<>();
-		for (Class<?> clazz : annotatedClasses) {
+		for (Class<?> clazz : ClassUtilBean.getInstance().getAllClasses()) {
+			Repository.Meta annotation = clazz.getAnnotation(Repository.Meta.class);
+			if (annotation == null)
+				continue;
+
 			if (cls.isAssignableFrom(clazz))
 				classes.add((T) clazz);
 		}

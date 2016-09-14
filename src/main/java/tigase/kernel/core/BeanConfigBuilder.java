@@ -100,7 +100,7 @@ public class BeanConfigBuilder {
 	 */
 	public void exec() {
 		execWithoutInject();
-		kernel.injectIfRequired(beanConfig);
+		//kernel.injectIfRequired(beanConfig);
 	}
 
 	public BeanConfig execWithoutInject() {
@@ -109,22 +109,9 @@ public class BeanConfigBuilder {
 			return null;
 		}
 
-		if (factoryBeanConfig != null) {
-			factoryBeanConfig.setPinned(beanConfig.isPinned());
-			factoryBeanConfig.setState(beanConfig.getState());
-			kernel.unregisterInt(factoryBeanConfig.getBeanName());
-			dependencyManager.register(factoryBeanConfig);
-		}
-		kernel.unregisterInt(beanConfig.getBeanName());
-		dependencyManager.register(beanConfig);
+		beanConfig = kernel.registerBean(beanConfig, factoryBeanConfig, beanInstance);
 
-		if (beanInstance != null) {
-			kernel.putBeanInstance(beanConfig, beanInstance);
-		}
-
-		kernel.currentlyUsedConfigBuilder = null;
-
-		return  beanConfig;
+		return beanConfig;
 	}
 
 	/**
@@ -156,6 +143,18 @@ public class BeanConfigBuilder {
 
 	public BeanConfigBuilder setPinned(boolean pinned) {
 		beanConfig.setPinned(pinned);
+		return this;
+	}
+
+	public BeanConfigBuilder setSource(BeanConfig.Source source) {
+		beanConfig.setSource(source);
+		return this;
+	}
+
+	public BeanConfigBuilder registeredBy(BeanConfig parent) {
+		if (parent != null) {
+			beanConfig.addRegisteredBy(parent);
+		}
 		return this;
 	}
 

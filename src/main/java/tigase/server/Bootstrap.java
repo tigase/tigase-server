@@ -32,28 +32,33 @@ import tigase.db.RepositoryFactory;
 import tigase.eventbus.EventBusFactory;
 import tigase.kernel.DefaultTypesConverter;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.config.AbstractBeanConfigurator;
 import tigase.kernel.beans.config.BeanConfigurator;
 import tigase.kernel.core.DependencyGrapher;
 import tigase.kernel.core.Kernel;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.server.ext.ComponentProtocol;
 import tigase.server.xmppsession.SessionManagerConfig;
+import tigase.util.ClassUtilBean;
 import tigase.util.DataTypes;
-import tigase.xmpp.ProcessorFactory;
 import tigase.xmpp.XMPPImplIfc;
+import tigase.xmpp.XMPPProcessor;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
-import static tigase.conf.Configurable.*;
-import static tigase.conf.ConfiguratorAbstract.LOGGING_KEY;
-import static tigase.conf.ConfiguratorAbstract.PROPERTY_FILENAME_PROP_DEF;
-import static tigase.conf.ConfiguratorAbstract.PROPERTY_FILENAME_PROP_KEY;
+import static tigase.conf.Configurable.GEN_DEBUG;
+import static tigase.conf.Configurable.GEN_DEBUG_PACKAGES;
+import static tigase.conf.Configurable.GEN_SM_PLUGINS;
+import static tigase.conf.Configurable.GEN_TEST;
+import static tigase.conf.ConfiguratorAbstract.*;
 
 /**
  * Bootstrap class is responsible for initialization of Kernel to start Tigase XMPP Server.
@@ -300,15 +305,25 @@ public class Bootstrap implements Lifecycle {
 		// and converting concurrency settings as well
 		String plugins = (String) props.remove(GEN_SM_PLUGINS);
 		if (plugins != null) {
+			Set<XMPPProcessor> knownProcessors = ClassUtilBean.getInstance().getAllClasses().stream()
+					.filter(cls -> XMPPProcessor.class.isAssignableFrom(cls) && !(Modifier.isAbstract(cls.getModifiers()) || Modifier.isInterface(cls.getModifiers())))
+					.map(cls -> {
+						try {
+							return (XMPPProcessor) cls.newInstance();
+						} catch (InstantiationException|IllegalAccessException e) {
+							log.log(Level.WARNING, "Failed to instanticate");
+							return null;
+						}
+					})
+					.collect(Collectors.toSet());
+
 			StringBuilder smBeans = new StringBuilder();
 			Map<String,String> plugins_concurrency = new HashMap<>();
 			String[] parts = plugins.split(",");
 			for (String part : parts) {
 				String[] tmp = part.split("=");
-				String name = tmp[0];
-				if (name.charAt(0) == '+' || name.charAt(0) == '-') {
-					name = name.substring(1);
-				}
+				final String name = (tmp[0].charAt(0) == '+' || tmp[0].charAt(0) == '-') ? tmp[0].substring(1) : tmp[0];
+
 				if (tmp.length > 1) {
 					plugins_concurrency.put(name, tmp[1]);
 				}
@@ -317,10 +332,9 @@ public class Bootstrap implements Lifecycle {
 				smBeans.append(tmp[0]);
 
 				try {
-					XMPPImplIfc proc = ModulesManagerImpl.getInstance().getPlugin(name);
-					if (proc == null) {
-						proc = ProcessorFactory.getImplementation(name);
-					}
+
+					XMPPImplIfc proc = knownProcessors.stream().filter(p -> p != null && name.equals(p.id())).findFirst().orElse(null);
+
 					if (proc != null) {
 						Bean ann = proc.getClass().getAnnotation(Bean.class);
 						if (ann == null) {
@@ -376,12 +390,23 @@ public class Bootstrap implements Lifecycle {
 				System.setProperty(key, e.getValue().toString());
 			}
 		}
+
+		try {
+			if (XMPPServer.isOSGi()) {
+				kernel.registerBean("classUtilBean").asInstance(Class.forName("tigase.osgi.util.ClassUtilBean").newInstance()).exportable().exec();
+			} else {
+				kernel.registerBean("classUtilBean").asInstance(Class.forName("tigase.util.ClassUtilBean").newInstance()).exportable().exec();
+			}
+		} catch (ClassNotFoundException|InstantiationException|IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+
 		// register default types converter and properties bean configurator
-		kernel.registerBean(DefaultTypesConverter.class).exec();
+		kernel.registerBean(DefaultTypesConverter.class).exportable().exec();
 		if (isDsl) {
-		 	kernel.registerBean(DSLBeanConfiguratorWithBackwardCompatibility.class).exec();
+		 	kernel.registerBean(DSLBeanConfiguratorWithBackwardCompatibility.class).exportable().exec();
 		} else {
-			kernel.registerBean(PropertiesBeanConfiguratorWithBackwardCompatibility.class).exec();
+			kernel.registerBean(PropertiesBeanConfiguratorWithBackwardCompatibility.class).exportable().exec();
 		}
 		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exportable().exec();
 
@@ -392,6 +417,9 @@ public class Bootstrap implements Lifecycle {
 		} else if (configurator instanceof DSLBeanConfigurator) {
 			DSLBeanConfigurator dslBeanConfigurator = (DSLBeanConfigurator) configurator;
 			dslBeanConfigurator.setProperties(props);
+		}
+		if (configurator instanceof AbstractBeanConfigurator) {
+			ModulesManagerImpl.getInstance().setBeanConfigurator((AbstractBeanConfigurator) configurator);
 		}
 		// if null then we register global subbeans
 		configurator.registerBeans(null, null, props);

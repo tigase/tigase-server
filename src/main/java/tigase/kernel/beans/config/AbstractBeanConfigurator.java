@@ -30,14 +30,14 @@ import tigase.kernel.core.BeanConfigBuilder;
 import tigase.kernel.core.DependencyManager;
 import tigase.kernel.core.Kernel;
 import tigase.osgi.ModulesManagerImpl;
-import tigase.util.ClassUtil;
+import tigase.osgi.util.ClassUtilBean;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 
@@ -52,6 +52,8 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 	protected TypesConverter defaultTypesConverter;
 
 	private boolean accessToAllFields = false;
+
+	public abstract Map<String, Object> getProperties();
 
 	public void configure(final BeanConfig beanConfig, final Object bean, final Map<String, Object> values) {
 		if (values == null) return;
@@ -227,150 +229,175 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 
 	@Override
 	public void registerBeans(BeanConfig beanConfig, Object bean, Map<String, Object> values) {
+		if (beanConfig != null && Kernel.class.isAssignableFrom(beanConfig.getClazz()))
+			return;
+
 		Kernel kernel = beanConfig == null ? this.getKernel() : beanConfig.getKernel();
 
-		List<BeanConfig> registeredBeans = registerBeansForBeanOfClass(kernel, beanConfig == null ? Kernel.class : beanConfig.getClazz());
+		Set<String> toUnregister = new ArrayList<>(kernel.getDependencyManager().getBeanConfigs()).stream()
+				.filter(bc -> bc.getSource() == BeanConfig.Source.configuration)
+				.filter(bc -> beanConfig == null || bc.getRegisteredBy().contains(beanConfig))
+				.map(bc -> bc.getBeanName()).collect(Collectors.toSet());
 
-		if (values != null) {
-			Map<String, BeanDefinition> beanPropConfigMap = getBeanDefinitions(values);
+		final Map<String, Class<?>> beansFromAnnotations = getBeanClassesFromAnnotations(kernel, beanConfig == null ? Kernel.class : beanConfig.getClazz());
+		final Map<String, BeanDefinition> beanDefinitionsFromConfig = values == null ? new HashMap<>() : mergeWithBeansPropertyValue(getBeanDefinitions(values), values);
 
-			List<String> beansProp = null;
-			Object beansValue = values.get("beans");
-			if (beansValue instanceof String) {
-				beansProp = Arrays.asList(((String) beansValue).split(","));
-			} else if (beansValue instanceof List) {
-				beansProp = (List<String>) beansValue;
+		beansFromAnnotations.forEach( (name, cls) -> {
+			if (beanDefinitionsFromConfig != null) {
+				BeanDefinition definition = beanDefinitionsFromConfig.get(name);
+				if (definition != null)
+					return;
 			}
-			if (beansProp != null) {
-				for (String beanStr : beansProp) {
-					String beanName = beanStr;
-					boolean active = true;
-					if (beanStr.startsWith("-")) {
-						beanName = beanStr.substring(1);
-						active = false;
-					} else if (beanStr.startsWith("+")) {
-						beanName = beanStr.substring(1);
-					}
 
-					if (beanPropConfigMap.get(beanName) != null) {
-						throw new RuntimeException("Invalid 'beans' property value - duplicated entry for bean " +
-								beanName + "! in " + beansProp);
+			if (isBeanClassRegisteredInParentKernel(kernel.getParent(), name, cls))
+				return;
+
+			BeanConfig bc = kernel.getDependencyManager().getBeanConfig(name);
+			if (bc != null && bc.getSource() == BeanConfig.Source.annotation && bc.getClazz().equals(cls)) {
+				return;
+			}
+
+			if (beanConfig != null && beanConfig.getState() == BeanConfig.State.initialized) {
+				kernel.registerBean(cls).setSource(BeanConfig.Source.annotation).registeredBy(beanConfig).exec();
+			} else {
+				kernel.registerBean(cls).setSource(BeanConfig.Source.annotation).registeredBy(beanConfig).execWithoutInject();
+			}
+		});
+
+
+		for (BeanDefinition cfg : beanDefinitionsFromConfig.values()) {
+			try {
+				Class<?> clazz = cfg.getClazzName() == null ? beansFromAnnotations.get(cfg.getBeanName()) : ModulesManagerImpl.getInstance().forName(cfg.getClazzName());
+				if (clazz == null) {
+					if (bean != null && bean instanceof RegistrarBeanWithDefaultBeanClass) {
+						clazz = ((RegistrarBeanWithDefaultBeanClass) bean).getDefaultBeanClass();
 					}
-					BeanDefinition cfg = new BeanDefinition();
-					cfg.setBeanName(beanName);
-					cfg.setActive(active);
-					beanPropConfigMap.put(beanName, cfg);
+					if (clazz == null) {
+						continue;
+					}
 				}
+
+				if (!tigase.util.ClassUtilBean.getInstance().getAllClasses().contains(clazz))
+					continue;
+
+				toUnregister.remove(cfg.getBeanName());
+
+				BeanConfig oldBc = kernel.getDependencyManager().getBeanConfig(cfg.getBeanName());
+				if (oldBc != null && oldBc.getClazz().equals(clazz) && (oldBc.isExportable() || cfg.isExportable() == oldBc.isExportable())) {
+					kernel.setBeanActive(cfg.getBeanName(), cfg.isActive());
+				} else {
+					Bean ba = clazz.getAnnotation(Bean.class);
+					BeanConfigBuilder cfgBuilder = kernel.registerBean(cfg.getBeanName()).asClass(clazz);
+					cfgBuilder.setActive(cfg.isActive()).setSource(BeanConfig.Source.configuration);
+					if (cfg.isExportable()) {
+						cfgBuilder.exportable();
+					}
+					if (ba != null) {
+						if (ba.exportable())
+							cfgBuilder.exportable();
+					}
+
+					cfgBuilder.registeredBy(beanConfig);
+
+					if (beanConfig != null && beanConfig.getState() == BeanConfig.State.initialized) {
+						cfgBuilder.exec();
+					} else {
+						cfgBuilder.execWithoutInject();
+					}
+				}
+			} catch (ClassNotFoundException ex) {
+				log.log(Level.FINER, "could not register bean '" + cfg.getBeanName() + "' as class '" +
+						cfg.getClazzName() + "' is not available", ex);
 			}
+		}
 
-			for (BeanDefinition cfg : beanPropConfigMap.values()) {
-				// TODO configuration is not as it should be - unknown class for bean!
-				try {
-					Class<?> clazz = cfg.getClazzName() == null ? null : ModulesManagerImpl.getInstance().forName(cfg.getClazzName());
-					if (clazz == null && !kernel.isBeanClassRegistered(cfg.getBeanName(), false)) {
-						if (bean != null && bean instanceof RegistrarBeanWithDefaultBeanClass) {
-							clazz = ((RegistrarBeanWithDefaultBeanClass) bean).getDefaultBeanClass();
-						}
-						if (clazz == null) {
-							continue;
-						}
-					}
+		toUnregister.forEach(beanName -> kernel.unregister(beanName));
+	}
 
-					boolean register = !kernel.isBeanClassRegistered(cfg.getBeanName(), false);
-					if (!register) {
-						if (kernel.getClass() != null && clazz != null && !kernel.getClass().equals(clazz)) {
-							register = true;
-						} else {
-							kernel.setBeanActive(cfg.getBeanName(), cfg.isActive());
-						}
-					}
-					if (register) {
-						BeanConfig oldCfg = kernel.getDependencyManager().getBeanConfig(cfg.getBeanName());
-						BeanConfigBuilder cfgBuilder = kernel.registerBean(cfg.getBeanName()).asClass(clazz).setActive(cfg.isActive());
-						if (oldCfg != null && oldCfg.isExportable()) {
-							cfgBuilder.exportable();
-						}
-						Bean ba = clazz.getAnnotation(Bean.class);
-						if (ba != null) {
-							if (ba.exportable()) {
-								cfgBuilder.exportable();
-							}
-						}
-						if (cfg.isExportable()) {
-							cfgBuilder.exportable();
-						}
-						BeanConfig registeredBeanConfig = cfgBuilder.execWithoutInject();
-						if (registeredBeanConfig != null) {
-							registeredBeans.add(registeredBeanConfig);
-						}
-					}
-				} catch (ClassNotFoundException ex) {
-					log.log(Level.FINER, "could not register bean '" + cfg.getBeanName() + "' as class '" +
-							cfg.getClazzName() + "' is not available", ex);
+	private static Map<String, BeanDefinition> mergeWithBeansPropertyValue(Map<String, BeanDefinition> beanPropConfigMap, Map<String, Object> values) {
+		List<String> beansProp = null;
+		Object beansValue = values.get("beans");
+		if (beansValue instanceof String) {
+			beansProp = Arrays.asList(((String) beansValue).split(","));
+		} else if (beansValue instanceof List) {
+			beansProp = (List<String>) beansValue;
+		}
+		if (beansProp != null) {
+			for (String beanStr : beansProp) {
+				String beanName = beanStr;
+				boolean active = true;
+				if (beanStr.startsWith("-")) {
+					beanName = beanStr.substring(1);
+					active = false;
+				} else if (beanStr.startsWith("+")) {
+					beanName = beanStr.substring(1);
+				}
+
+				if (beanPropConfigMap.get(beanName) != null) {
+					throw new RuntimeException("Invalid 'beans' property value - duplicated entry for bean " +
+							beanName + "! in " + beansProp);
+				}
+				BeanDefinition cfg = new BeanDefinition();
+				cfg.setBeanName(beanName);
+				cfg.setActive(active);
+				beanPropConfigMap.put(beanName, cfg);
+			}
+		}
+		return beanPropConfigMap;
+	}
+
+	public static Map<String, Class<?>> getBeanClassesFromAnnotations(Kernel kernel, Class<?> requiredClass) {
+		Set<Class<?>> classes = ClassUtilBean.getInstance().getAllClasses();
+		List<Class<?>> toRegister = registerBeansForBeanOfClassGetBeansToRegister(kernel, requiredClass, classes);
+
+		Map<String, Class<?>> result = new HashMap<>();
+		for (Class<?> cls : toRegister) {
+			Bean annotation = cls.getAnnotation(Bean.class);
+			result.put(annotation.name(), cls);
+		}
+
+		return result;
+	}
+
+	public static void registerBeansForBeanOfClass(Kernel kernel, Class<?> cls) {
+		Set<Class<?>> classes = ClassUtilBean.getInstance().getAllClasses();
+		registerBeansForBeanOfClass(kernel, cls, classes);
+	}
+
+	protected static boolean isBeanClassRegisteredInParentKernel(Kernel kernel, String name, Class<?> clazz) {
+		if (kernel == null)
+			return false;
+
+		BeanConfig bc = kernel.getDependencyManager().getBeanConfig(name);
+		if (bc == null) {
+			return isBeanClassRegisteredInParentKernel(kernel.getParent(), name, clazz);
+		}
+
+		if (bc.getClazz().equals(clazz))
+			return true;
+
+		Bean annotation = clazz.getAnnotation(Bean.class);
+		for (Class<?> ifc : clazz.getInterfaces()) {
+			if (ifc.isAssignableFrom(bc.getClazz()) && !ifc.equals(RegistrarBean.class)) {
+				Bean existingBeanAnnotation = bc.getClazz().getAnnotation(Bean.class);
+				if (existingBeanAnnotation == null || annotation.parent().isAssignableFrom(existingBeanAnnotation.parent())) {
+					return true;
 				}
 			}
 		}
+
+		return false;
 	}
 
-	public static List<BeanConfig> registerBeansForBeanOfClass(Kernel kernel, Class<?> cls) {
-		// TODO - needs to be adjusted to support OSGi
-		try {
-			Set<Class<?>> classes = ClassUtil.getClassesFromClassPath();
-			classes.addAll(ModulesManagerImpl.getInstance().getClasses());
-			return registerBeansForBeanOfClass(kernel, cls, classes);
-		} catch (IOException |ClassNotFoundException ex) {
-			log.log(Level.WARNING, "could not load clases for bean registration", ex);
-			return new ArrayList<>();
-		}
-	}
-
-	protected static List<BeanConfig> registerBeansForBeanOfClass(Kernel kernel, Class<?> requiredClass, Set<Class<?>> classes) {
-		List<BeanConfig> registered = new ArrayList<>();
+	protected static void registerBeansForBeanOfClass(Kernel kernel, Class<?> requiredClass, Set<Class<?>> classes) {
 		List<Class<?>> toRegister = registerBeansForBeanOfClassGetBeansToRegister(kernel, requiredClass, classes);
 		for (Class<?> cls : toRegister) {
 			Bean annotation = cls.getAnnotation(Bean.class);
-			if (annotation != null) {
-				BeanConfig existingBeanConfig = null;
-				Kernel tmpKernel = kernel;
+			if (isBeanClassRegisteredInParentKernel(kernel.getParent(), annotation.name(), cls))
+				continue;
 
-				do {
-					existingBeanConfig = tmpKernel.getDependencyManager().getBeanConfig(annotation.name());
-					tmpKernel = tmpKernel.getParent();
-				}
-				while (existingBeanConfig == null && tmpKernel != null);
-
-				boolean register = true;
-				if (existingBeanConfig == null) {
-					register = true;
-				} else if (cls.equals(existingBeanConfig.getClazz())) {
-					register = false;
-				} else {
-					for (Class<?> ifc : cls.getInterfaces()) {
-						if (ifc.isAssignableFrom(existingBeanConfig.getClazz()) && !ifc.equals(RegistrarBean.class)) {
-							Bean existingBeanAnnotation = existingBeanConfig.getClazz().getAnnotation(Bean.class);
-							if (existingBeanAnnotation == null || annotation.parent().isAssignableFrom(existingBeanAnnotation.parent())) {
-								register = false;
-								break;
-							}
-						}
-					}
-					if (register)
-						registered.remove(existingBeanConfig);
-				}
-
-				if (register) {
-					BeanConfig beanConfig = kernel.registerBean(cls).execWithoutInject();
-					if (beanConfig != null) {
-						registered.add(beanConfig);
-					}
-				}
-			}
+			BeanConfig beanConfig = kernel.registerBean(cls).execWithoutInject();
 		}
-
-//		for (BeanConfig beanConfig : registered) {
-//			kernel.injectIfRequired(beanConfig);
-//		}
-		return registered;
 	}
 
 	protected static List<Class<?>> registerBeansForBeanOfClassGetBeansToRegister(Kernel kernel, Class<?> requiredClass, Set<Class<?>> classes) {
@@ -445,6 +472,55 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		return annotation;
 	}
 
+	public void configurationChanged() {
+		refreshConfiguration(kernel);
+	}
+
+	protected void refreshConfiguration(final Kernel kernel) {
+		// TODO
+		//kernel.beginDelayedInjection();
+		refreshConfiguration_removeUndefinedBeans(kernel);
+		registerBeans(null, null, getProperties());
+		refreshConfiguration_updateConfiguration(kernel);
+		// TODO
+		//kernel.finishDelayedInjection();
+	}
+
+	protected void refreshConfiguration_removeUndefinedBeans(Kernel kernel) {
+		Set<Class<?>> classes = tigase.util.ClassUtilBean.getInstance().getAllClasses();
+		Set<BeanConfig> toRemove = kernel.getDependencyManager().getBeanConfigs().stream()
+				.filter(bc -> !classes.contains(bc.getClazz()))
+				.filter(bc -> {
+					String name = bc.getClazz().getCanonicalName();
+					return (!name.startsWith("java.")) && (!name.startsWith("javax.")) && (!name.startsWith("com.sun."));
+				})
+				.collect(Collectors.toSet());
+		toRemove.forEach(bc -> kernel.unregister(bc.getBeanName()));
+
+		for (String name : kernel.getNamesOf(Kernel.class)) {
+			Kernel subkernel = kernel.getInstance(name);
+			if (subkernel == null || subkernel == kernel)
+				continue;
+
+			refreshConfiguration_removeUndefinedBeans(subkernel);
+		}
+	}
+
+	protected void refreshConfiguration_updateConfiguration(Kernel kernel) {
+		Set<BeanConfig> toReconfigure = kernel.getDependencyManager().getBeanConfigs().stream()
+				.filter(bc -> bc.getState() == BeanConfig.State.initialized)
+				.filter(bc -> !(bc instanceof Kernel.DelegatedBeanConfig))
+				.collect(Collectors.toSet());
+		toReconfigure.forEach(bc -> AbstractBeanConfigurator.this.configure(bc, kernel.getInstance(bc.getBeanName())));
+
+		for (String name : kernel.getNamesOf(Kernel.class)) {
+			Kernel subkernel = kernel.getInstance(name);
+			if (subkernel == null || subkernel == kernel)
+				continue;
+
+			refreshConfiguration_updateConfiguration(subkernel);
+		}
+	}
 
 	public void restoreDefaults(String beanName) {
 		BeanConfig beanConfig = kernel.getDependencyManager().getBeanConfig(beanName);
