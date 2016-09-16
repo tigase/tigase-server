@@ -57,3 +57,11 @@ Both ports should be setup to use TCP only.  Remember, if you set custom ports f
 . If you are planning to use STUN or TURN over TLS, forward 5349 under TCP.
 
 If you have a cell phone on a separate network with an XMPP client, you can now try to login to test the server.  If that is not handy, you can use an online tool to check proper DNS records such as kingant's: link:https://kingant.net/check_xmpp_dns/[https://kingant.net/check_xmpp_dns/] and it will tell you if anything is missing.
+Other ports you may need to forward to the server are:
+- 5222
+- 5223
+- 5269
+- 5277
+- 5280
+- 5290
+- 8080

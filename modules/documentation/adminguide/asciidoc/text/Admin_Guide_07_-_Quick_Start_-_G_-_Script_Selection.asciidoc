@@ -1,0 +1,50 @@
+[[tigaseScriptStart]]
+= Tigase Script Selection
+:author: Daniel Wisnewski <daniel@mail.tigase.org>
+:version: v1.0, May 2016: Reformatted for AsciiDoc.
+:date: 2016-09-14 10:30
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+As mentioned in each of the quick start sections, each distribution of Tigase XMPP server comes with a number of scripts that are customized for different versions of Linux.
+
+init.d chart
+[grid="rows",format="csv"]
+[options="header",cols="^,<"]
+|===========================
+init.d file,Types of Operating Systems
+Debian,"Good for Knoppix, Ubuntu, Raspbian, or Duvian."
+Gentoo,"Good for CoreOS, Tin Hat Linux, or other *too based systems."
+Mandiva,"Specific init.d file for Mandriva Linux."
+Redhat,"For Redhat and other RPM based linux derivities like openSUSE, Fedora, and of course, RedHat."
+|===========================
+
+A wider array of liux distros here link:https://en.wikipedia.org/wiki/List_of_Linux_distributions[at Wikipedia].
+
+== For Redhat, Mandriva, & Gentoo linux distributions
+
+Once you've located the appropriate distribution scripts, take the tigase file in your distribution's folder and move it to your system's init.d folder (/scripts/$distro/init.d).
+Also copy the tigase file in the conf.d folder to your /etc/conf.d folder if applicable.
+You will also need to make it executable, and provide privileges.
+[source,bash]
+-----
+sudo chmod 755 /etc/init.d/tigase
+sudo chown root:root /etc/init.d/tigase
+-----
+
+== For Debian distributions
+We have included an installation script for Debian distributions, simply run tigase-install.sh script with sudo.  This should setup tigase as a system service.
+
+== Running Tigase as a system service
+There are a number of benefits to running Tigase as a service, one of which is to ensure that the program will run even in the event of a power outage or accidental server restart, Tigase will always be up and running.
+
+Once installation is complete, you should be able to start Tigase using the following command:
+[source,bash]
+-----
+service tigase start
+-----
+Tigase should begin running in the background.  Since Tigase is now installed as a service, it can be controlled with any of the service commands, such as:
+- service tigase stop
+- service tigase restart
