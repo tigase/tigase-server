@@ -405,6 +405,11 @@ public class KernelTest {
 	public static class TestBeanConfigurationProvider extends AbstractBeanConfigurator {
 
 		@Override
+		public Map<String, Object> getProperties() {
+			return new HashMap<>();
+		}
+
+		@Override
 		public Map<String, Object> getConfiguration(BeanConfig beanConfig) {
 			if (beanConfig.getBeanName().equals("bean5")) {
 				HashMap<String, Object> result = new HashMap<String, Object>();

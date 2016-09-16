@@ -320,7 +320,7 @@
 					</includes>
 					<processMainArtifact>false</processMainArtifact>
 					<processAttachedArtifacts>false</processAttachedArtifacts>
-					<tsa>http://timestamp.comodoca.com/rfc3161</tsa>
+					<tsa>${tsa-uri}</tsa>
 					<skip>${sign-skip}</skip>
 					<removeExistingSignatures>true</removeExistingSignatures>
 

@@ -32,6 +32,7 @@ import tigase.kernel.beans.Bean;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
+import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.impl.roster.RosterAbstract;
@@ -275,7 +276,11 @@ public class JabberIqPrivacy
 						if (jid != null) {
 							switch (type) {
 							case jid :
-								type_matched = jid.toString().contains(value);
+								try {
+									type_matched = jid.equals( JID.jidInstance( value ) );
+								} catch ( TigaseStringprepException ex ) {
+									log.log(Level.FINEST, "Exception while creating jid instance for value: " + value, ex);
+								}
 
 								break;
 

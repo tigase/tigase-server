@@ -172,4 +172,49 @@ public class JabberIqPrivacyTest extends ProcessorTestCase {
 			
 			assertTrue(privacyFilter.allowed(presence, session));
 		}
+
+	@Test
+	public void testFilterJidCase() throws Exception {
+		JID jid = JID.jidInstance( "test@example/res-1" );
+		JID connId = JID.jidInstance( "c2s@example.com/asdasd" );
+		XMPPResourceConnection session = getSession( connId, jid );
+
+		String blockedJID = "CapitalisedJID@test.domain.com";
+
+		Element list = new Element( "list", new String[] { "name" }, new String[] { "default" } );
+		list.addChild( new Element( "item", new String[] { "type", "value", "action", "order" },
+																new String[] { "jid", blockedJID.toLowerCase(), "deny", "100" } ) );
+		list.addChild( new Element( "item", new String[] { "action", "order" },
+																new String[] { "allow", "110" } ) );
+
+		session.putSessionData( "active-list", list );
+
+		Packet presence = Packet.packetInstance( new Element( "presence",
+																													new String[] { "from", "to" },
+																													new String[] { blockedJID, jid.toString() } ) );
+
+		assertFalse( privacyFilter.allowed( presence, session ) );
+
+		presence = Packet.packetInstance( new Element( "presence",
+																													new String[] { "from", "to" },
+																													new String[] { blockedJID.toLowerCase(), jid.toString() } ) );
+
+
+		assertFalse( privacyFilter.allowed( presence, session ) );
+
+		presence = Packet.packetInstance( new Element( "presence",
+																													new String[] { "from", "to" },
+																													new String[] { jid.toString(), blockedJID } ) );
+
+		assertFalse( privacyFilter.allowed( presence, session ) );
+
+		presence = Packet.packetInstance( new Element( "presence",
+																													new String[] { "from", "to" },
+																													new String[] { jid.toString(), blockedJID.toLowerCase() } ) );
+
+
+		assertFalse( privacyFilter.allowed( presence, session ) );
+
+
+	}
 }
