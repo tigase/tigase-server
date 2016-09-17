@@ -339,12 +339,8 @@ public class MessageAmp
 
 	@Override
 	public void register(Kernel kernel) {
-		if (!kernel.isBeanClassRegistered("messages", false)) {
-			kernel.registerBean(Message.class).setActive(true).exec();
-		}
-		if (!kernel.isBeanClassRegistered(OfflineMessages.ID, false)) {
-			kernel.registerBean(OfflineMessages.class).setActive(true).exec();
-		}
+		kernel.registerBean(Message.class).setActive(true).exec();
+		kernel.registerBean(OfflineMessages.class).setActive(true).exec();
 	}
 
 	@Override
