@@ -33,6 +33,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -333,6 +334,24 @@ public class Kernel {
 		}
 
 		Object result = bc.getKernel().getInstance(bc);
+
+		return (T) result;
+	}
+
+	public <T> T getInstanceIfExistsOr(String beanName, Function<BeanConfig, T> function) {
+		BeanConfig bc = dependencyManager.getBeanConfig(beanName);
+
+		if (bc == null && parent != null && parent.isBeanClassRegistered(beanName)) {
+			return parent.getInstanceIfExistsOr(beanName, function);
+		}
+
+		if (bc == null)
+			throw new KernelException("Unknown bean '" + beanName + "'.");
+
+		Object result = bc.getKernel().getInstance(bc);
+		if (result == null) {
+			result = function.apply(bc);
+		}
 
 		return (T) result;
 	}

@@ -40,7 +40,7 @@ public class ConfigWriter {
 	public ConfigWriter() {}
 
 	public static Map<String, Object> buildTree(Map<String, Object> props) {
-		Map<String, Object> result = new HashMap<>();
+		Map<String, Object> result = new LinkedHashMap<>();
 		props.forEach((k, v) -> {
 			String[] parts = k.split("/");
 			Map<String, Object> map = result;

@@ -189,7 +189,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		this.kernel = kernel;
 	}
 
-	protected void grabDefaultConfig(final BeanConfig beanConfig, final Object bean) {
+	protected Map<Field, Object> grabDefaultConfig(final BeanConfig beanConfig, final Object bean) {
 		try {
 			HashMap<Field, Object> defaultConfig = defaultFieldValues.get(beanConfig);
 			if (defaultConfig == null) {
@@ -210,9 +210,41 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 					}
 				}
 			}
+			return defaultConfig;
 		} catch (Exception e) {
 			throw new KernelException("Cannot grab default values of bean " + beanConfig.getBeanName(), e);
 		}
+	}
+
+	protected Map<Field, Object> grabCurrentConfig(final BeanConfig beanConfig) {
+		Map<Field, Object> config = new HashMap<>();
+		try {
+			Object bean = beanConfig.getKernel().getInstanceIfExistsOr(beanConfig.getBeanName(), bc -> {
+				try {
+					bc.getClazz().newInstance();
+				} catch (InstantiationException | IllegalAccessException e) {
+					log.log(Level.FINEST, "failed to instantiate class for retrieval of default configuration");
+				}
+				return null;
+			});
+			final Field[] fields = DependencyManager.getAllFields(beanConfig.getClazz());
+			for (Field field : fields) {
+
+				ConfigField configField = field.getAnnotation(ConfigField.class);
+
+				if (configField == null) {
+					continue;
+				} else {
+					Object currentValue = BeanUtils.getValue(bean, field);
+					if (!config.containsKey(field)) {
+						config.put(field, currentValue);
+					}
+				}
+			}
+		} catch (Exception ex) {
+			log.log(Level.FINEST, "retrieval of configuration for bean " + beanConfig.getBeanName() + " failed", ex);
+		}
+		return config;
 	}
 
 	public boolean isAccessToAllFields() {

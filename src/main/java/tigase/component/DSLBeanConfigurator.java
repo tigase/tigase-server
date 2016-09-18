@@ -20,20 +20,28 @@
  */
 package tigase.component;
 
+import tigase.conf.ConfigWriter;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.*;
 import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.DependencyManager;
 import tigase.kernel.core.Kernel;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Created by andrzej on 11.08.2016.
  */
 @Bean(name = BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)
 public class DSLBeanConfigurator extends AbstractBeanConfigurator {
+
+	private static final Logger log = Logger.getLogger(DSLBeanConfigurator.class.getCanonicalName());
 
 	private Map<String, Object> props;
 
@@ -149,4 +157,74 @@ public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 		this.props = props;
 	}
 
+	public void dumpConfiguration(File f) throws IOException {
+		Map<String, Object> dump = new LinkedHashMap<>(props);
+		dumpConfiguration(dump, kernel);
+
+		new ConfigWriter().write(f, dump);
+	}
+
+	private void dumpConfiguration(Map<String, Object> dump, Kernel kernel) {
+		List<BeanConfig> beansToDump = kernel.getDependencyManager().getBeanConfigs().stream()
+				.filter(bc -> !Kernel.class.isAssignableFrom(bc.getClazz()) && !(bc instanceof Kernel.DelegatedBeanConfig))
+				.collect(Collectors.toList());
+
+		for(BeanConfig bc : beansToDump) {
+			BeanDefinition forBean = getBeanDefinitionFromDump(dump, bc.getBeanName());
+
+			if (forBean.getClazzName() == null) {
+				forBean.setClazzName(bc.getClazz().getCanonicalName());
+			}
+			forBean.setActive(bc.getState() != BeanConfig.State.inactive);
+			forBean.setExportable(bc.isExportable());
+
+			try {
+				Map<Field, Object> defaults = grabCurrentConfig(bc);
+				Map<String, Object> cfg = bc.getState() != BeanConfig.State.initialized ? getConfiguration(bc) : null;
+				if (defaults != null) {
+					defaults.forEach((field,v) -> {
+						ConfigField cf = field.getAnnotation(ConfigField.class);
+//						if (forBean.containsKey(field.getName()) || (cf != null && !cf.alias().isEmpty() && forBean.containsKey(cf.alias()))) {
+//							return;
+//						}
+						Object v1 = cfg.get(field.getName());
+						if (v1 == null && cf != null && !cf.alias().isEmpty()) {
+							v1 = cfg.get(cf.alias());
+						}
+						String prop = (cf == null || cf.alias().isEmpty()) ? field.getName() : cf.alias();
+						forBean.put(prop, v1 == null ? v : v1);
+					});
+				}
+			} catch (Exception ex) {
+				log.log(Level.FINEST, "failed to retrieve default values for bean " + bc.getBeanName() + ", class = " + bc.getClazz(), ex);
+			}
+		}
+
+		List<BeanConfig> kernelBeans = kernel.getDependencyManager().getBeanConfigs().stream()
+				.filter(bc -> Kernel.class.isAssignableFrom(bc.getClazz()))
+				.filter(bc -> bc.getState() == BeanConfig.State.initialized)
+				.collect(Collectors.toList());
+		for (BeanConfig bc : kernelBeans) {
+			Kernel subkernel = kernel.getInstance(bc.getBeanName());
+			if (subkernel == kernel)
+				continue;
+			BeanDefinition forKernel = getBeanDefinitionFromDump(dump, subkernel.getName());
+			dumpConfiguration(forKernel, subkernel);
+		}
+	}
+
+	private BeanDefinition getBeanDefinitionFromDump(Map<String, Object> dump, String name) {
+		Map<String, Object> tmp = (Map<String, Object>) dump.get(name);
+
+		if (tmp == null || (!(tmp instanceof BeanDefinition))) {
+			BeanDefinition def = new BeanDefinition();
+			def.setBeanName(name);
+			if (tmp != null)
+				def.putAll(tmp);
+			dump.put(name, def);
+			tmp = def;
+		}
+
+		return (BeanDefinition) tmp;
+	}
 }

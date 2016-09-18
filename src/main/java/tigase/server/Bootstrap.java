@@ -23,42 +23,25 @@ package tigase.server;
 
 import tigase.component.DSLBeanConfigurator;
 import tigase.component.DSLBeanConfiguratorWithBackwardCompatibility;
-import tigase.component.PropertiesBeanConfigurator;
-import tigase.component.PropertiesBeanConfiguratorWithBackwardCompatibility;
-import tigase.conf.ConfigReader;
-import tigase.conf.ConfigWriter;
+import tigase.conf.ConfigHolder;
 import tigase.conf.ConfiguratorAbstract;
-import tigase.db.RepositoryFactory;
 import tigase.eventbus.EventBusFactory;
 import tigase.kernel.DefaultTypesConverter;
-import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.config.AbstractBeanConfigurator;
-import tigase.kernel.beans.config.BeanConfigurator;
 import tigase.kernel.core.DependencyGrapher;
 import tigase.kernel.core.Kernel;
 import tigase.osgi.ModulesManagerImpl;
-import tigase.server.ext.ComponentProtocol;
-import tigase.server.xmppsession.SessionManagerConfig;
-import tigase.util.ClassUtilBean;
-import tigase.util.DataTypes;
-import tigase.xmpp.XMPPImplIfc;
-import tigase.xmpp.XMPPProcessor;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
-import static tigase.conf.Configurable.GEN_DEBUG;
-import static tigase.conf.Configurable.GEN_DEBUG_PACKAGES;
-import static tigase.conf.Configurable.GEN_SM_PLUGINS;
-import static tigase.conf.Configurable.GEN_TEST;
-import static tigase.conf.ConfiguratorAbstract.*;
+import static tigase.conf.Configurable.*;
+import static tigase.conf.ConfiguratorAbstract.LOGGING_KEY;
 
 /**
  * Bootstrap class is responsible for initialization of Kernel to start Tigase XMPP Server.
@@ -70,325 +53,25 @@ public class Bootstrap implements Lifecycle {
 	private static final Logger log = Logger.getLogger(Bootstrap.class.getCanonicalName());
 
 	private final Kernel kernel;
-	private Map<String, Object> props;
-
-	private boolean isDsl = true;
+	private ConfigHolder config = new ConfigHolder();
 
 	public Bootstrap() {
 		kernel = new Kernel("root");
 	}
 
 	public void init(String[] args) {
-		props = new LinkedHashMap<>();
-		List<String> settings = new LinkedList<>();
-		ConfiguratorAbstract.parseArgs(props, settings, args);
-		isDsl = isDslConfig();
-		if (isDsl) {
-			loadFromDSLFiles();
-		} else {
-			loadFromPropertiesFiles(settings);
-			dumpToDSLFile();
-		}
+		config.loadConfiguration(args);
 		configureLogManager();
 	}
 
-	private boolean isDslConfig() {
-		String property_filenames = (String) props.get(PROPERTY_FILENAME_PROP_KEY);
-		if (property_filenames == null) {
-			property_filenames = PROPERTY_FILENAME_PROP_DEF;
-			props.put(PROPERTY_FILENAME_PROP_KEY, property_filenames);
-			log.log(Level.WARNING, "No property file not specified! Using default one {0}",
-					property_filenames);
-		}
-
-		if (property_filenames != null) {
-			String[] prop_files = property_filenames.split(",");
-
-			if (prop_files.length == 1) {
-				File f = new File(prop_files[0]);
-				if (!f.exists()) {
-					log.log(Level.WARNING, "Provided property file {0} does NOT EXISTS! Using default one {1}",
-							new String[]{f.getAbsolutePath(), PROPERTY_FILENAME_PROP_DEF});
-					prop_files[0] = PROPERTY_FILENAME_PROP_DEF;
-				}
-			}
-
-			for (String property_filename : prop_files) {
-				try (BufferedReader reader = new BufferedReader(new FileReader(property_filename))) {
-					String line;
-					while ((line = reader.readLine()) != null) {
-						if (line.contains("{") && !line.contains("{clusterNode}")) {
-							return true;
-						}
-					}
-				} catch (IOException e) {
-				   e.printStackTrace();
-				}
-			}
-		}
-		return false;
-	}
-
-	private void loadFromDSLFiles() {
-		String property_filenames = (String) props.get(PROPERTY_FILENAME_PROP_KEY);
-		for (String prop_file : property_filenames.split(",")) {
-			try {
-				Map<String, Object> loaded = new ConfigReader().read(new File(prop_file));
-				props.putAll(loaded);
-			} catch (IOException e) {
-				throw new RuntimeException("Failed to load configuration from file " + prop_file, e);
-			}
-		}
-	}
-
-	private void dumpToDSLFile() {
-		File f = new File(PROPERTY_FILENAME_PROP_DEF+".new");
-		Map<String, Object> tree = ConfigWriter.buildTree(props);
-		try {
-			new ConfigWriter().write(f, tree);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void loadFromPropertiesFiles(List<String> settings) {
-		ConfiguratorAbstract.loadFromPropertiesFiles(props, settings);
-		loadFromPropertyStrings(settings);
-	}
-
-	private void loadFromPropertyStrings(List<String> settings) {
-		for (String propString : settings) {
-			int idx_eq    = propString.indexOf('=');
-
-			// String key = prop[0].trim();
-			// Object val = prop[1];
-			String key = propString.substring(0, idx_eq);
-			Object val = propString.substring(idx_eq + 1);
-
-			if (key.matches(".*\\[[LISBlisb]\\]$")) {
-				char c = key.charAt(key.length() - 2);
-
-				key = key.substring(0, key.length() - 3);
-				// decoding value for basckward compatibility
-				if (val != null) {
-					val = DataTypes.decodeValueType(c, val.toString());
-				}
-			}
-
-			props.put(key, val);
-		}
-
-		// converting old component configuration to new one
-		Map<String, Object> toAdd = new HashMap<>();
-		List<String> toRemove = new ArrayList<>();
-
-		List<String> dataSourceNames = new ArrayList<>();
-		Map<String, Map<String,String>> dataSources = new HashMap<>();
-
-		props.forEach((k,v) -> {
-			if (k.startsWith("--comp-name")) {
-				String suffix = k.replace("--comp-name-", "");
-				String name = ((String) v).trim();
-				String cls = ((String) props.get("--comp-class-" + suffix)).trim();
-				String active = "true";
-				toAdd.put(name + "/class", cls);
-				toAdd.put(name + "/active", active);
-			}
-			if (k.endsWith("/processors")) {
-				toAdd.put(k.replace("/processors", "/beans"), v);
-				toRemove.add(k);
-			}
-			if (k.startsWith("--user-db") || k.startsWith("--auth-db")) {
-				String domain = "default";
-				if (k.endsWith("]")) {
-					domain = k.substring(k.indexOf('[') + 1, k.length() - 1);
-				}
-				toRemove.add(k);
-
-				Map<String,String> ds = dataSources.computeIfAbsent(domain, key -> new HashMap<>());
-				if (k.startsWith("--user-db-uri"))  {
-					ds.put("user-uri", (String) v);
-				} else if (k.startsWith("--user-db")) {
-					ds.put("user-type", (String) v);
-				}
-				if (k.startsWith("--auth-db-uri"))  {
-					ds.put("auth-uri", (String) v);
-				} else if (k.startsWith("--auth-db")) {
-					ds.put("auth-type", (String) v);
-				}
-			}
-			if (k.contains("pubsub-repo-url")) {
-				props.put("dataSource/pubsub/uri", v);
-				dataSourceNames.add("pubsub");
-				toRemove.add(k);
-			}
-			if (k.startsWith("http/port/")) {
-				toRemove.add(k);
-				toAdd.put(k.replace("http/port/", "httpServer/connections/"), v);
-			}
-			if (k.startsWith("sess-man/plugins-conf/")) {
-				toRemove.add(k);
-				toAdd.put(k.replace("/plugins-conf/", "/"), v);
-			}
-		});
-
-		List<String> userDbDomains = new ArrayList<>();
-		List<String> authDbDomains = new ArrayList<>();
-		dataSources.forEach((domain, cfg) -> {
-			String userType = cfg.get("user-type");
-			String userUri = cfg.get("user-uri");
-			String authType = cfg.get("auth-type");
-			String authUri = cfg.get("auth-uri");
-
-			if (userUri != null) {
-				if (!domain.equals("default")) {
-					userDbDomains.add(domain);
-					authDbDomains.add(domain);
-					dataSourceNames.add(domain);
-				}
-				props.put("dataSource/" + domain + "/uri", userUri);
-			}
-
-			if ((authUri != null) && (userUri == null || !userUri.contains(authUri))) {
-				if (!authDbDomains.contains(domain))
-					authDbDomains.add(domain);
-				dataSourceNames.add(domain + "-auth");
-				props.put("dataSource/" + domain + "-auth/uri", authUri);
-				props.put("authRepository/" + domain + "/uri", "dataSource:" + domain + "-auth");
-			}
-
-			if (userType != null && !userType.equals("mysql") && !userType.equals("pgsql") && !userType.equals("derby")
-					&& !userType.equals("sqlserver")) {
-				String cls = RepositoryFactory.getRepoClass(userType);
-				props.put("userRepository/" + domain + "/cls", cls);
-			}
-			if (authType != null && !authType.equals("tigase-custom-auth")) {
-				String cls = RepositoryFactory.getRepoClass(userType);
-				props.put("authRepository/" + domain + "/cls", cls);
-			}
-		});
-
-		if (!dataSourceNames.isEmpty()) {
-			props.put("dataSource/domains", dataSourceNames);
-		}
-		if (!userDbDomains.isEmpty()) {
-			props.put("userRepository/domains", userDbDomains);
-		}
-		if (!authDbDomains.isEmpty()) {
-			props.put("authRepository/domains", authDbDomains);
-		}
-
-		String external = (String) props.remove("--external");
-		if (external != null) {
-			props.forEach((k,v) -> {
-				if (k.endsWith("/class") && v.equals(ComponentProtocol.class.getCanonicalName())) {
-					toAdd.put(k.replace("/class", "/repository/items"), v);
-				}
-			});
-		}
-
-		String admins = (String) props.remove("--admins");
-		if (admins != null) {
-			props.put("admins", admins.split(","));
-		}
-
-		Iterator<Map.Entry<String, Object>> it = props.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry<String, Object> e = it.next();
-			if (e.getKey().startsWith("--comp-"))
-				it.remove();
-		}
-
-		for (String k : toRemove) {
-			props.remove(k);
-		}
-
-		props.putAll(toAdd);
-
-		// converting list of sess-man processors from --sm-plugins to sess-man/beans
-		// and converting concurrency settings as well
-		String plugins = (String) props.remove(GEN_SM_PLUGINS);
-		if (plugins != null) {
-			Set<XMPPProcessor> knownProcessors = ClassUtilBean.getInstance().getAllClasses().stream()
-					.filter(cls -> XMPPProcessor.class.isAssignableFrom(cls) && !(Modifier.isAbstract(cls.getModifiers()) || Modifier.isInterface(cls.getModifiers())))
-					.map(cls -> {
-						try {
-							return (XMPPProcessor) cls.newInstance();
-						} catch (InstantiationException|IllegalAccessException e) {
-							log.log(Level.WARNING, "Failed to instanticate");
-							return null;
-						}
-					})
-					.collect(Collectors.toSet());
-
-			StringBuilder smBeans = new StringBuilder();
-			Map<String,String> plugins_concurrency = new HashMap<>();
-			String[] parts = plugins.split(",");
-			for (String part : parts) {
-				String[] tmp = part.split("=");
-				final String name = (tmp[0].charAt(0) == '+' || tmp[0].charAt(0) == '-') ? tmp[0].substring(1) : tmp[0];
-
-				if (tmp.length > 1) {
-					plugins_concurrency.put(name, tmp[1]);
-				}
-				if (smBeans.length() != 0)
-					smBeans.append(",");
-				smBeans.append(tmp[0]);
-
-				try {
-
-					XMPPImplIfc proc = knownProcessors.stream().filter(p -> p != null && name.equals(p.id())).findFirst().orElse(null);
-
-					if (proc != null) {
-						Bean ann = proc.getClass().getAnnotation(Bean.class);
-						if (ann == null) {
-							props.put("sess-man/" + name + "/class", proc.getClass().getCanonicalName());
-						}
-					} else {
-						log.log(Level.WARNING, "could not find class for processor " + name);
-					}
-				} catch (Exception ex) {
-					log.log(Level.WARNING, "not able to get instance of processor " + name, ex);
-				}
-			}
-			props.put("sess-man/beans", smBeans.toString());
-
-			String concurrency = (String) props.get(SessionManagerConfig.PLUGINS_CONCURRENCY_PROP_KEY);
-			if (concurrency != null) {
-				for (String part : concurrency.split(",")) {
-					String[] tmp = part.split("=");
-					plugins_concurrency.put(tmp[0], tmp[1]);
-				}
-			}
-
-			for (Map.Entry<String,String> e : plugins_concurrency.entrySet()) {
-				String prefix = "sess-man/" + e.getKey() + "/";
-				String[] tmp = e.getValue().split(":");
-				try {
-					props.put(prefix + "threadsNo", Integer.parseInt(tmp[0]));
-				} catch (Exception ex) {
-					log.log(Level.WARNING, "Plugin " + e.getKey() + " concurrency parsing error for: " + tmp[0], ex);
-				}
-				if (tmp.length > 1) {
-					try {
-						props.put(prefix + "queueSize", Integer.parseInt(tmp[1]));
-					} catch (Exception ex) {
-						log.log(Level.WARNING, "Plugin " + e.getKey() + " queueSize parsing error for: " + tmp[1], ex);
-					}
-				}
-			}
-		}
-
-	}
-
 	public void setProperties(Map<String,Object> props) {
-		this.props = props;
+		this.config.setProperties(props);
 	}
 
 
 	@Override
 	public void start() {
-		for (Map.Entry<String, Object> e : props.entrySet()) {
+		for (Map.Entry<String, Object> e : config.getProperties().entrySet()) {
 			if (e.getKey().startsWith("--")) {
 				String key = e.getKey().substring(2);
 				System.setProperty(key, e.getValue().toString());
@@ -407,26 +90,15 @@ public class Bootstrap implements Lifecycle {
 
 		// register default types converter and properties bean configurator
 		kernel.registerBean(DefaultTypesConverter.class).exportable().exec();
-		if (isDsl) {
-		 	kernel.registerBean(DSLBeanConfiguratorWithBackwardCompatibility.class).exportable().exec();
-		} else {
-			kernel.registerBean(PropertiesBeanConfiguratorWithBackwardCompatibility.class).exportable().exec();
-		}
+		kernel.registerBean(DSLBeanConfiguratorWithBackwardCompatibility.class).exportable().exec();
 		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exportable().exec();
 
-		BeanConfigurator configurator = kernel.getInstance(BeanConfigurator.class);
-		if (configurator instanceof PropertiesBeanConfigurator) {
-			PropertiesBeanConfigurator propertiesBeanConfigurator = (PropertiesBeanConfigurator) configurator;
-			propertiesBeanConfigurator.setProperties(props);
-		} else if (configurator instanceof DSLBeanConfigurator) {
-			DSLBeanConfigurator dslBeanConfigurator = (DSLBeanConfigurator) configurator;
-			dslBeanConfigurator.setProperties(props);
-		}
-		if (configurator instanceof AbstractBeanConfigurator) {
-			ModulesManagerImpl.getInstance().setBeanConfigurator((AbstractBeanConfigurator) configurator);
-		}
+		DSLBeanConfigurator configurator = kernel.getInstance(DSLBeanConfigurator.class);
+		configurator.setProperties(config.getProperties());
+		ModulesManagerImpl.getInstance().setBeanConfigurator(configurator);
+
 		// if null then we register global subbeans
-		configurator.registerBeans(null, null, props);
+		configurator.registerBeans(null, null, config.getProperties());
 
 		DependencyGrapher dg = new DependencyGrapher();
 		dg.setKernel(kernel);
@@ -434,6 +106,16 @@ public class Bootstrap implements Lifecycle {
 
 		MessageRouter mr = kernel.getInstance("message-router");
 		mr.start();
+
+		try {
+			File f = new File("etc/config-dump.properties");
+			if (f.exists()) {
+				f.delete();
+			}
+			configurator.dumpConfiguration(f);
+		} catch (IOException ex) {
+			log.log(Level.FINE, "failed to dump configuration to file etc/config-dump.properties");
+		}
 	}
 
 	@Override
@@ -475,7 +157,7 @@ public class Bootstrap implements Lifecycle {
 	private Map<String, String> loggingSetup = new LinkedHashMap<String, String>(10);
 
 	private void configureLogManager() {
-		Map<String, Object> cfg = prepareLogManagerConfiguration(props);
+		Map<String, Object> cfg = prepareLogManagerConfiguration(config.getProperties());
 		setupLogManager(cfg);
 	}
 
