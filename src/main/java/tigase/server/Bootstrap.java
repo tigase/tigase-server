@@ -226,6 +226,10 @@ public class Bootstrap implements Lifecycle {
 				toRemove.add(k);
 				toAdd.put(k.replace("http/port/", "httpServer/connections/"), v);
 			}
+			if (k.startsWith("sess-man/plugins-conf/")) {
+				toRemove.add(k);
+				toAdd.put(k.replace("/plugins-conf/", "/"), v);
+			}
 		});
 
 		List<String> userDbDomains = new ArrayList<>();

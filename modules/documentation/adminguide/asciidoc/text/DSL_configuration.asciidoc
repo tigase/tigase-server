@@ -55,9 +55,13 @@ To set property you just write property name followed by `=` and value to set. T
 ----
 test=true
 ----
+It is also possible to set property in main context by placing property outside of any context.
+This sets property which value is available to access by any bean.
 
 === Setting global property
-Like in properties file it is still possible to use property names starting with `--` without any context or any other properties at global scope. Format is the same as in case of setting property but they are defined without scope (in global scope).
+Like in properties file it is still possible to use property names starting with `--` without any context or any other properties at global scope.
+Format is the same as in case of setting property but they are defined without scope (in global scope).
+This properties are global and accessible by any bean but also set as system property in JVM.
 
 === Defining bean
 You can configure bean by using following format:
@@ -67,11 +71,16 @@ beanName (class: className, active: activeValue, exportable: exportableValue) {
 }
 ----
 where `beanName` is name under which you want to configure bean.
+`beanName` must be wrapped in `''`, if `beanName` contains characters like `=,:/` and is recommended, if `beanName` is numeric only.
+
 Inside block between `(` and `)` you can define:
 
 * `class` which will be used as a bean, in example above we set class as `className`. *_(default: if you try to configure bean under name which has default class assigned with it in Tigase framework then this assigned class will be used. In other case you need to pass name of class to use as a bean)_*
 * `active` (boolean) whether you want the bean to be active or not (beans with `active` set to `false` are not loaded). *_(default: true)_*
 * `exportable` (boolean) defines if this bean should be exported and available for use for beans in inner scopes. This is advanced option in most cases it is recommended to omit this field in configuration. *_(default: false)_*
+
+Spaces between `beanName` and block between `()` is optional as well as space between block `()` and block `{}`.
+It is recommended that properties of bean would be placed in separate lines with indentation and first property will be placed in new line.
 
 === Configuring bean
 If you know that bean is defined and you do not want to change it's activity or class then you can just pass properties to configure bean in following way:
@@ -87,27 +96,60 @@ where `beanName` is name of bean to configure and `test` is name of property to 
 In properties based configuration file every property was defined as a string and only by defining expected format it was properly converted to expected value.
 In DSL it is possible to set values in two ways:
 
-as a plain string::
-Very similar to properties based configuration, in fact values are passed in same format and later are converted to correct type by checking type expected by bean. _(Not recommended)_
-
 as an object::
 Using this format you set list as a list and integer is set as an integer.
-string::: Wrap it in `''`, ie. to set `test` as string you use `'test'`
-integer::: Just put value, ie. to set `543` use `543`
-long::: Put value and follow it with `L`, ie. to set `23645434` as long use `23645434L`
-float::: Put value and follow it with `f`, ie. to set `231.342` use `231.342f`
-boolean::: To set value just use `true` or `false`
-list::: Lists can be of many types and to make it simple we decided to use as a comma separated list of values in proper format wrapped in `[]`. _(You can write it in multiple lines if you want)_
+[cols="1s,6a", options="header"]
+|=============================================
+| Type | Description
+| string | Wrap it in `''`, ie. to set `test` as string you use `'test'`
+| integer | Just put value, ie. to set `543` use `543`
+| long | Put value and follow it with `L`, ie. to set `23645434` as long use `23645434L`
+| float | Put value and follow it with `f`, ie. to set `231.342` use `231.342f`
+| boolean | To set value just use `true` or `false`
+| list | Lists can be of many types and to make it simple we decided to use as a comma separated list of values in proper format wrapped in `[]`.
+
 * of strings - `[ 'alfa', 'beta', 'gamma' ]`
 * of integers - `[ 1, 2, 3, 4]`
-map::: Maps can be written as a block of properties wrapped in `{}`
+
+You can write it in multiple lines if you want:
+----
+[
+    'alfa'
+    'beta'
+    'gamma'
+]
+----
+| map | Maps can be written as a block of properties wrapped in `{}`.
+  This format of map is the same as used for passing configuration to bean properties.
+Keys and values can be written in separate lines _(recommended)_:
 ----
 {
-  test = true
-  ssl = false
-  ssl-certificate = '/test/cert.pem'
+    test = true
+    ssl = false
+    ssl-certificate = '/test/cert.pem'
+    another-map = {
+        key = 'value'
+    }
 }
 ----
+or in single line _(separation with spaces is not required)_:
+----
+{ test = true, ssl = false, ssl-certificate = '/test/cert.pem' }
+|=============================================
+
+as a plain string::
+Very similar to properties based configuration, in fact values are passed in same format and later are converted to correct type by checking type expected by bean. _(Not recommended)_
+[cols="1s,6a", options="header"]
+|=============================================
+| Type | Description
+| string | Just put value, ie. to set `test` use `test`
+| integer | Just put value, ie. to set `543` use `543`
+| long | Put value, ie. to set `23645434` as long use `23645434`
+| float | Put value, ie. to set `231.342` use `231.342`
+| boolean | To set value just use `true` or `false`
+| list | List needs to be written as comma separated list of values, ie. `test,abc,efg` or `1,2,3`
+| map | Not possible
+|=============================================
 
 == Example configuration file in DSL
 ----
@@ -144,18 +186,19 @@ c2s {
     # Register tigase.server.xmppclient.SeeOtherHostDualIP as seeOtherHost bean
     seeOtherHost (class: tigase.server.xmppclient.SeeOtherHostDualIP) {}
 
-    # Add additional port 5224 which is SSL port
+    # Add additional port 5224 which is SSL port and disable port 5223
     connections () {
         '5224' () {
 	         socket = ssl
 	      }
+        '5223' (active: false) {}
     }
 }
 
 # Configure HTTP API component
 http {
     # Set list of API keys
-    api-keys = [ 'test1234' ]
+    api-keys = [ 'test1234', 'test2356' ]
 }
 
 # Register pubsub-2 (class is passed as pubsub-2 name do not have default class assigned)
