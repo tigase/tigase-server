@@ -31,7 +31,7 @@ include::text/Admin_Guide_07_-_Quick_Start_-_E_-_Windows_Installation.asciidoc[]
 
 include::text/Admin_Guide_07_-_Quick_Start_-_F_-_Setting_Up_Server.asciidoc[]
 
-include::text/Admin_Guide_07_-_Quick_Start_G_-_Script_Selection.asciidoc[]
+include::text/Admin_Guide_07_-_Quick_Start_-_G_-_Script_Selection.asciidoc[]
 
 :leveloffset: 1
 

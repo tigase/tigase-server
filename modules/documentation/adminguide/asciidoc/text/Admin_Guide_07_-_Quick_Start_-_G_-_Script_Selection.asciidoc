@@ -17,25 +17,216 @@ init.d chart
 init.d file,Types of Operating Systems
 Debian,"Good for Knoppix, Ubuntu, Raspbian, or Duvian."
 Gentoo,"Good for CoreOS, Tin Hat Linux, or other *too based systems."
-Mandiva,"Specific init.d file for Mandriva Linux."
-Redhat,"For Redhat and other RPM based linux derivities like openSUSE, Fedora, and of course, RedHat."
+Mandriva,"Specific init.d file for Mandriva Linux."
+Redhat,"For Redhat and other RPM based linux derivities like openSUSE, CentOS, Fedora, and of course, RedHat."
 |===========================
 
-A wider array of liux distros here link:https://en.wikipedia.org/wiki/List_of_Linux_distributions[at Wikipedia].
+A wider array of liux distributions can be found here link:https://en.wikipedia.org/wiki/List_of_Linux_distributions[at Wikipedia].
 
-== For Redhat, Mandriva, & Gentoo linux distributions
+== Configuration: For All Linux Distributions
 
 Once you've located the appropriate distribution scripts, take the tigase file in your distribution's folder and move it to your system's init.d folder (/scripts/$distro/init.d).
 Also copy the tigase file in the conf.d folder to your /etc/conf.d folder if applicable.
-You will also need to make it executable, and provide privileges.
+
+You may also need to make it executable, and provide privileges like below:
 [source,bash]
 -----
 sudo chmod 755 /etc/init.d/tigase
 sudo chown root:root /etc/init.d/tigase
 -----
 
-== For Debian distributions
-We have included an installation script for Debian distributions, simply run tigase-install.sh script with sudo.  This should setup tigase as a system service.
+It is recommended that you open the script files or configuration files as some have some parameters that you will need to specify.
+
+=== Gentoo
+The conf.d script must contain the following parameters:
+[source,conf]
+-----
+TIGASE_HOME="/home/tigase/tigase-server"
+TIGASE_USER=tigase
+TIGASE_CONF="etc/tigase.conf"
+-----
+
+The following should be configured:
+
+- *TIGASE_HOME* - Specifies the Tigase Server installation directory.
+- *TIGASE_USER* - Specifies the user that will run the program. This should be a user with SU permissions.
+- *TIGASE_CONF* - The location of tigase.conf file, relative to the *TIGASE_HOME* directory.
+
+=== Mandriva
+Mandriva has a single init.d file, however it should be configured:
+[source,java]
+-----
+#!/bin/bash
+#
+# Startup script for SER
+#
+# chkconfig: 345 85 15
+# description: Ser is a fast SIP Proxy.
+#
+# processname: ser
+# pidfile: /var/run/ser.pid
+# config: /etc/ser/ser.cfg
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+export JAVA_HOME=/usr/java/jdk1.8.0
+export TIGASE_DIR=/opt/tigase/server/
+tigase=$TIGASE_DIR/scripts/tigase.sh
+prog=tigase
+config=$TIGASE_DIR/etc/tigase.conf
+RETVAL=0
+
+...
+-----
+The following should be configured:
+
+- *JAVA_HOME* - The location of your JDK Installation.
+- *TIGASE_DIR* - Tigase Server installation directory.
+- *tigase* - The location of your tigase.sh script.  This should not need adjusting if you maintain the default file structure.
+- *config* - The location of your tigase.conf file. This should not need adjusting if you maintain the default file structure.
+
+=== Redhat
+Similar to Mandriva, you will need to configure the init.d file:
+[source,java]
+-----
+...
+
+# Settings paths and other variables
+
+JAVA_HOME=/usr/lib/jvm/java/
+
+USERNAME=tigase
+USERGROUP=tigase
+NAME=tigase
+DESC="Tigase XMPP server"
+
+TIGASE_HOME=/home/tigase/tigase-server
+TIGASE_LIB=${TIGASE_HOME}/jars
+TIGASE_CONFIG=/etc/tigase.conf
+TIGASE_OPTIONS=
+TIGASE_PARAMS=
+
+PIDFILE=
+TIGASE_CONSOLE_LOG=
+
+USER=$USERNAME
+eval HOME="~$USER"
+...
+-----
+
+- *USERNAME* - Username running Tigase, should have su permissions.
+- *USERGROUP* - The usergroup of the username.
+- *NAME* - OS name for Tigase program.
+- *DESC* - Optional description.
+
+- *TIGASE_HOME* - The location of your Tigase Server installation directory.
+- *TIGASE_LIB* - The location of your Tigase Jars folder, you should not need to adjust this if you set *TIGASE_HOME* properly, and maintain the default file structure.
+- *TIGASE_CONFIG* - The location of your tigase.conf file relative to *TIGASE_HOME*
+- *TIGASE_OPTIONS* - Legacy options for Tigase, most are now handled in init.properties or tigase.conf.
+- *TIGASE_PARAMS* - Parameters passed to command line when launching Tigase.
+
+- *PIDFILE* - Location of Tigase PID file if you wish to use custom directory.  Default will be located in /logs or /var/temp directory.
+- *TIGASE_CONSOLE_LOG* - Location of Tigase Server console log file if you wish to use a custom directory.  Default will be located in /logs directory, failing that /dev/null.
+
+
+=== Debian
+Debian takes some more file moving than just one file, so here is a walkthrough.
+
+1. Create the following folders from root:
+- /usr/share/tigase
+- /etc/tigase
+- /var/log/tigase
+- /var/lib/tigase
+- /var/lib/tigase/tigase-derbydb
+- /var/lib/tigase/jars/
+
+2. Copy the following
+- Contents of tigase/jars to /var/lib/tigase/jars
+- Folder tigase/certs to /usr/share/tigase
+- Folder tigase/database to /usr/share/tigase
+- Folder tigase/scripts to /usr/share/tigase
+
+. Set user permissions on /usr/share/tigase
+[source,bash]
+-----
+chown -R tigase:tigase /usr/share/tigase
+chmod -R o-rwx /usr/share/tigase
+-----
+
+3. Copy the following files from the debian folder:
+- /tigase/scripts/debian/init-debian.properties to /etc/tigase
+- /tigase/scripts/debian/tigase-debian.conf to /etc/default/tigase
+- /tigase/scripts/debian/tigase.init.d /etc/init.d/tigase
+
+4. Set the following permissions
+[source,properties]
+-----
+chown -R tigase:tigase /etc/tigase
+chown -R tigase:tigase /var/log/tigase
+chown -R tigase:tigase /var/lib/tigase
+chmod -R o-rwx /etc/tigase
+chmod -R o-rwx /var/log/tigase
+chmod -R o-rwx /var/lib/tigase
+chmod 755 /etc/init.d/tigase
+-----
+
+5. Update defaults
+[source,bash]
+-----
+update-rc.d tigase defaults
+-----
+
+With that done, you'll need to edit and configure the tigase.init.d folder:
+[source,d]
+-----
+...
+
+USERNAME=tigase
+USERGROUP=tigase
+NAME=tigase
+DESC="Tigase XMPP server"
+
+TIGASE_HOME=/usr/share/tigase
+TIGASE_CONFIG=/etc/tigase/tigase.config
+TIGASE_OPTIONS=
+TIGASE_PARAMS=
+
+PIDFILE=
+TIGASE_CONSOLE_LOG=
+
+USER=$USERNAME
+eval HOME="~$USER"
+...
+-----
+
+- *USERNAME* - Username running Tigase, should have su permissions.
+- *USERGROUP* - The usergroup of the username.
+- *NAME* - OS name for Tigase program.
+- *DESC* - Optional description.
+
+- *TIGASE_HOME* - The location of your Tigase Server installation directory.
+- *TIGASE_CONFIG* - The location of your tigase.conf file relative to *TIGASE_HOME*
+- *TIGASE_OPTIONS* - Legacy options for Tigase, most are now handled in init.properties or tigase.conf.
+- *TIGASE_PARAMS* - Parameters passed to command line when launching Tigase.
+
+- *PIDFILE* - Location of Tigase PID file if you wish to use custom directory.  Default will be located in /logs or /var/temp directory.
+- *TIGASE_CONSOLE_LOG* - Location of Tigase Server console log file if you wish to use a custom directory.  Default will be located in /logs directory, failing that /dev/null.
+
+You may also need to edit the init.debian.properties file as well:
+[source,properties]
+-----
+config-type = --gen-config-def
+--admins = admin@$HOST_NAME
+--virt-hosts = $HOST_NAME
+--debug=server
+--user-db-uri = jdbc:derby:/var/lib/tigase/tigase-derbydb
+basic-conf/logging/java.util.logging.FileHandler.pattern = /var/log/tigase/tigase.log
+vhost-man/vhost-repo-uri = jdbc:derby:/var/lib/tigase/tigase-derbydb
+-----
+
+Note that some of these MAY duplicate settings in tigase.config file.
+
 
 == Running Tigase as a system service
 There are a number of benefits to running Tigase as a service, one of which is to ensure that the program will run even in the event of a power outage or accidental server restart, Tigase will always be up and running.
@@ -45,6 +236,6 @@ Once installation is complete, you should be able to start Tigase using the foll
 -----
 service tigase start
 -----
-Tigase should begin running in the background.  Since Tigase is now installed as a service, it can be controlled with any of the service commands, such as:
-- service tigase stop
-- service tigase restart
+Tigase should begin running in the background.  Since Tigase is now installed as a service, it can be controlled with any of the service commands, such as: +
+- service tigase stop +
+- service tigase restart +
