@@ -31,6 +31,7 @@ import tigase.kernel.beans.config.BeanConfigurator;
 import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.DependencyGrapher;
 import tigase.kernel.core.Kernel;
+import tigase.kernel.core.PlantUMLGrapher;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
@@ -316,6 +317,9 @@ public class KernelTest {
 		krnl.registerBean("bean3").asClass(Bean3.class).setPinned(false).exec();
 		krnl.registerBean("bean4").asClass(Bean4.class).setPinned(false).exec();
 		krnl.registerBean("bean5").asClass(Bean5.class).setPinned(false).withFactory(Bean5Factory.class).exec();
+
+		PlantUMLGrapher g = new PlantUMLGrapher(krnl);
+		System.out.println(g.getDependencyGraph());
 
 		Assert.assertEquals(1, krnl.getDependencyManager().getBeanConfigs().stream().filter(bc -> bc.getState() == BeanConfig.State.initialized).count());
 

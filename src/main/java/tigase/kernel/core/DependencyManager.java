@@ -88,6 +88,14 @@ public class DependencyManager {
 		}
 	}
 
+	BeanConfig[] findDelegationTo(final BeanConfig beanConfig) {
+		return beanConfigs.values()
+				.stream()
+				.filter(beanConfig1 -> beanConfig1 instanceof Kernel.DelegatedBeanConfig &&
+						((Kernel.DelegatedBeanConfig) beanConfig1).getOriginal().equals(beanConfig))
+				.toArray(BeanConfig[]::new);
+	}
+
 	private Map<Field, Inject> createFieldsDependencyList(final Class<?> cls) {
 		Map<Field, Inject> deps = new HashMap<Field, Inject>();
 		for (Field field : getAllFields(cls)) {

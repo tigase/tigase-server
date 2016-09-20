@@ -176,7 +176,7 @@ public class RegistrarBeanKernelTest {
 		Assert.assertNotNull(((DummyBean3User) rb1k.getInstance("DummyBean3User")).dummyBean);
 		Assert.assertNotNull(((DummyBean34User) rb1k.getInstance("DummyBean34User")).dummyBean3User);
 
-		krnl.unregister("DummyBean");
+		krnl.unregister("DummyBean3");
 
 		try {
 			// maybe it should still be there but in unresolved state?
@@ -199,9 +199,10 @@ public class RegistrarBeanKernelTest {
 		Assert.assertNull(((DummyBean34User) rb1k.getInstance("DummyBean34User")).dummyBean3User);
 
 		krnl.registerBean(DummyBean3.class).exec();
+		krnl.ln("DummyBean3", rb1k, "dummy");
 
-		Assert.assertNotNull(((DummyBean34User) rb1k.getInstance("DummyBean34User")).dummyBean3User);
 		Assert.assertNotNull(((DummyBean3User) rb1k.getInstance("DummyBean3User")).dummyBean);
+		Assert.assertNotNull(((DummyBean34User) rb1k.getInstance("DummyBean34User")).dummyBean3User);
 
 		dg = new DependencyGrapher(krnl);
 		System.out.println(dg.getDependencyGraph());
@@ -211,6 +212,7 @@ public class RegistrarBeanKernelTest {
 	public void test05() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
 		final RegistrarKernel krnl = new RegistrarKernel();
+		krnl.registerBean(DefaultTypesConverter.class).exportable().exec();
 		krnl.setName("root");
 		krnl.registerBean(PropertiesBeanConfigurator.class).exec();
 		krnl.registerBean(DummyBean4.class).exec();
@@ -254,7 +256,7 @@ public class RegistrarBeanKernelTest {
 		krnl.registerBean(DummyBean4.class).exec();
 
 		Assert.assertNotNull(((DummyBean34User) rb1k.getInstance("DummyBean34User")).dummyBean4User);
-		Assert.assertNotNull(((DummyBean3User) rb1k.getInstance("DummyBean3User")).dummyBean);
+		Assert.assertNotNull(((DummyBean4User) rb1k.getInstance("DummyBean4User")).dummyBean);
 
 
 		dg = new DependencyGrapher(krnl);

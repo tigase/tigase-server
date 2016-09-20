@@ -100,7 +100,8 @@ public class BeanConfigBuilder {
 	 */
 	public void exec() {
 		execWithoutInject();
-		//kernel.injectIfRequired(beanConfig);
+		kernel.registerLinks(beanName);
+		kernel.injectIfRequired(beanConfig);
 	}
 
 	public BeanConfig execWithoutInject() {
