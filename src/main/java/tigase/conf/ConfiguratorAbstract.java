@@ -256,6 +256,9 @@ public abstract class ConfiguratorAbstract
 		} catch (TigaseDBException ex) {
 			log.log(Level.WARNING, "Cannot store configuration.", ex);
 		}
+
+		System.out.println("==\nServer finished starting up and (if there wasn't any error) is ready to use\n==");
+
 	}
 
 	@Override
