@@ -139,6 +139,13 @@ proxy/remote-addresses=
 
 A comma separated list of IP addresses that will be accessible VIA the Socks5 Proxy.  This can be useful if you want to specify a specific router address to allow external traffic to transfer files using the proxy to users on an internal network.
 
+=== Port settings
+If socks5 is being used as a proxy, you may configure a specific ports for the proxy using the following line in init.properties:
+[source,properties]
+-----
+proxy/connections/ports[i]=1080
+-----
+
 == Database usage for specific settings
 The above configuration allows for global settings, however you may also define specifics for users and the scopes of those limitations by editing the database information directly.
 
