@@ -1175,7 +1175,9 @@ public class Kernel {
 				}
 			}
 			if (RegistrarBean.class.isAssignableFrom(oldBeanConfig.getClazz())) {
-				oldBeanConfig.getKernel().getParent().unregister(oldBeanConfig.getBeanName() + "#KERNEL");
+				if (oldBeanConfig.getKernel().getParent() != null) {
+					oldBeanConfig.getKernel().getParent().unregister(oldBeanConfig.getBeanName() + "#KERNEL");
+				}
 			}
 		}
 	}
