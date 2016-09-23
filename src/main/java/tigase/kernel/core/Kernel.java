@@ -640,14 +640,18 @@ public class Kernel {
 			for (Dependency dep : dps) {
 				BeanConfig depbc = dep.getBeanConfig();
 
-				if (depbc.getState() != State.initialized) {
-					try {
-						initBean(depbc, new HashSet<BeanConfig>(), 0);
-						injectIfRequired(depbc);
-					} catch (Exception e) {
-						//	e.printStackTrace();
-					}
-
+				if (depbc.getState() != State.initialized && depbc.getState() != State.inactive) {
+					//depbc.getState() != State.inactive && depbc.getState() != State.instanceCreated
+					//if (isThereSomethingWaitingFor(depbc)) {
+						try {
+							if (depbc.getState() != State.instanceCreated) {
+								initBean(depbc, new HashSet<BeanConfig>(), 0);
+							}
+							injectIfRequired(depbc);
+						} catch (Exception e) {
+							//	e.printStackTrace();
+						}
+					//}
 				}
 
 				if (depbc.getState() == State.initialized) {
@@ -745,7 +749,7 @@ public class Kernel {
 		this.registeredLinks.put(exportingBeanName, link);
 
 		BeanConfig dbc = lnInternal(exportingBeanName, destinationKernel, destinationName);
-		destinationKernel.injectIfRequired(dbc);
+		//destinationKernel.injectIfRequired(dbc);
 	}
 
 	BeanConfig lnInternal(String exportingBeanName, Kernel destinationKernel, String destinationName){
