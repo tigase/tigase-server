@@ -544,6 +544,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		Set<BeanConfig> toReconfigure = kernel.getDependencyManager().getBeanConfigs().stream()
 				.filter(bc -> bc.getState() == BeanConfig.State.initialized)
 				.filter(bc -> !(bc instanceof Kernel.DelegatedBeanConfig))
+				.filter(bc -> !Kernel.class.isAssignableFrom(bc.getClazz()))
 				.collect(Collectors.toSet());
 		toReconfigure.forEach(bc -> AbstractBeanConfigurator.this.configure(bc, kernel.getInstance(bc.getBeanName())));
 
