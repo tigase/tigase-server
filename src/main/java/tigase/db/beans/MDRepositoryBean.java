@@ -261,7 +261,7 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 		}
 
 		public void setDataSourceAware(A dataSourceAware) {
-			if (mdRepositoryBean == null && dataSourceAware == null)
+			if (mdRepositoryBean == null)// && dataSourceAware == null)
 				return;
 
 			if (dataSourceAware != null) {

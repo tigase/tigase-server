@@ -546,7 +546,11 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 				.filter(bc -> !(bc instanceof Kernel.DelegatedBeanConfig))
 				.filter(bc -> !Kernel.class.isAssignableFrom(bc.getClazz()))
 				.collect(Collectors.toSet());
-		toReconfigure.forEach(bc -> AbstractBeanConfigurator.this.configure(bc, kernel.getInstance(bc.getBeanName())));
+		toReconfigure.forEach(bc -> {
+			if (kernel.isBeanClassRegistered(bc.getBeanName())) {
+				AbstractBeanConfigurator.this.configure(bc, kernel.getInstance(bc.getBeanName()));
+			}
+		});
 
 		for (String name : kernel.getNamesOf(Kernel.class)) {
 			Kernel subkernel = kernel.getInstance(name);

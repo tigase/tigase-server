@@ -537,6 +537,8 @@ public class Kernel {
 						initBean(b, createdBeansConfig, deep + 1);
 					} catch (KernelException ex) {
 						log.log(Level.WARNING, "Could not initialize bean " + b.getBeanName() + ", skipping injection of this bean", ex);
+						Object i = b.getKernel().beanInstances.remove(b);
+						b.setState(State.registered);
 						continue;
 					}
 					beanToInject = b.getKernel().getInstance(b);
@@ -704,12 +706,15 @@ public class Kernel {
 				log.log(Level.WARNING, "Can't inject dependency to bean " + depbc.getBeanName() + " unloading bean " + depbc.getBeanName(), e);
 				try {
 					Object i = depbc.getKernel().beanInstances.remove(depbc);
-					depbc.setState(State.registered);
-					if (depbc.getState() == State.initialized)
+					State oldState = depbc.getState();
+					depbc.setState(State.inactive);
+					if (oldState == State.initialized)
 						fireUnregisterAware(i);
 					unloadInjectedBean(depbc);
 				} catch (Exception ex) {
 					throw new KernelException("Can't unload bean " + depbc.getBeanName(), ex);
+				} finally {
+					depbc.setState(State.registered);
 				}
 			}
 		}
@@ -755,6 +760,8 @@ public class Kernel {
 	BeanConfig lnInternal(String exportingBeanName, Kernel destinationKernel, String destinationName){
 		final BeanConfig sbc = dependencyManager.getBeanConfig(exportingBeanName);
 		// Object bean = getInstance(sbc.getBeanName());
+		if (sbc == null)
+			throw new KernelException("Can't export bean " + exportingBeanName + " as there is no such bean");
 
 		BeanConfig dbc = new DelegatedBeanConfig(destinationName, sbc);
 
@@ -1043,11 +1050,15 @@ public class Kernel {
 
 		for (BeanConfig config : beansToRemove) {
 			log.log(Level.INFO, "Removing " + config.getBeanName() + " because of dependency violation");
-			setBeanActive(config.getBeanName(), false);
+			if (dependencyManager.getBeanConfig(config.getBeanName()) != null) {
+				setBeanActive(config.getBeanName(), false);
+			}
 //			setBeanActive(config.getBeanName(), true);
 		}
 		for (BeanConfig config : beansToRemove) {
-			setBeanActive(config.getBeanName(), true);
+			if (dependencyManager.getBeanConfig(config.getBeanName()) != null) {
+				setBeanActive(config.getBeanName(), true);
+			}
 		}
 
 	}
