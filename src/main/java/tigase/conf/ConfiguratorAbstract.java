@@ -361,10 +361,13 @@ public abstract class ConfiguratorAbstract
 		// if no property file was specified then use default one.
 		if (property_filenames == null) {
 			property_filenames = PROPERTY_FILENAME_PROP_DEF;
-				log.log(Level.WARNING, "No property file not specified! Using default one {0}",
-						property_filenames);
+			log.log(Level.WARNING, "No property file not specified! Using default one {0}", property_filenames);
 		}
 
+		loadFromPropertiesFiles(property_filenames, initProperties, initSettings);
+	}
+
+	public static void loadFromPropertiesFiles(String property_filenames, Map<String, Object> initProperties, List<String> initSettings) {
 		if (property_filenames != null) {
 			String[] prop_files = property_filenames.split(",");
 

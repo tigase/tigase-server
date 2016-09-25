@@ -60,12 +60,13 @@ public class ConfigHolder {
 
 	private Format format = null;
 	private Map<String, Object> props = new LinkedHashMap<>();
+	private Path initPropertiesPath;
 
 	public void loadConfiguration(String[] args) {
 		List<String> settings = new LinkedList<>();
 		ConfiguratorAbstract.parseArgs(props, settings, args);
 
-		detectFormat();
+		detectPathAndFormat();
 
 		switch (format) {
 			case dsl:
@@ -73,17 +74,19 @@ public class ConfigHolder {
 				break;
 			case properties:
 				loadFromPropertiesFiles();
-				Path initPropsFile = Paths.get(PROPERTY_FILENAME_PROP_DEF);
-				Path initPropsFileOld = Paths.get(PROPERTY_FILENAME_PROP_DEF + ".old");
+				Path initPropsFile = initPropertiesPath;
+				Path initPropsFileOld = initPropsFile.resolveSibling(initPropertiesPath.getFileName() + ".old");
+				props = ConfigWriter.buildTree(props);
 				try {
+					Files.deleteIfExists(initPropsFileOld);
 					Files.move(initPropsFile, initPropsFileOld);
+					saveToDSLFile(initPropsFile.toFile());
 				} catch (IOException ex) {
 					log.log(Level.SEVERE, "could not replace configuration file with file in DSL format", ex);
 					throw new RuntimeException(ex);
 				}
-				saveToDSLFile((String) null);
 
-				props = ConfigWriter.buildTree(props);
+
 				break;
 		}
 	}
@@ -100,11 +103,10 @@ public class ConfigHolder {
 		new ConfigWriter().write(f, props);
 	}
 
-	protected void detectFormat() {
-		String property_filenames = (String) props.get(PROPERTY_FILENAME_PROP_KEY);
+	protected void detectPathAndFormat() {
+		String property_filenames = (String) props.remove(PROPERTY_FILENAME_PROP_KEY);
 		if (property_filenames == null) {
 			property_filenames = PROPERTY_FILENAME_PROP_DEF;
-			props.put(PROPERTY_FILENAME_PROP_KEY, property_filenames);
 			log.log(Level.WARNING, "No property file not specified! Using default one {0}",
 					property_filenames);
 		}
@@ -121,6 +123,7 @@ public class ConfigHolder {
 				}
 			}
 
+			initPropertiesPath = Paths.get(prop_files[0]);
 			for (String property_filename : prop_files) {
 				try (BufferedReader reader = new BufferedReader(new FileReader(property_filename))) {
 					String line;
@@ -139,29 +142,16 @@ public class ConfigHolder {
 	}
 
 	private void loadFromDSLFiles() {
-		String property_filenames = (String) props.get(PROPERTY_FILENAME_PROP_KEY);
-		for (String prop_file : property_filenames.split(",")) {
-			try {
-				Map<String, Object> loaded = new ConfigReader().read(new File(prop_file));
-				props.putAll(loaded);
-			} catch (IOException e) {
-				throw new RuntimeException("Failed to load configuration from file " + prop_file, e);
-			}
-		}
-	}
-
-	private void saveToDSLFile(String suffix) {
-		File f = new File(suffix == null ? PROPERTY_FILENAME_PROP_DEF : (PROPERTY_FILENAME_PROP_DEF + "." + suffix));
-		Map<String, Object> tree = ConfigWriter.buildTree(props);
 		try {
-			new ConfigWriter().write(f, tree);
+			Map<String, Object> loaded = new ConfigReader().read(initPropertiesPath.toFile());
+			props.putAll(loaded);
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException("Failed to load configuration from file " + initPropertiesPath, e);
 		}
 	}
 
 	private void loadFromPropertiesFiles() {
-		props.putAll(new PropertiesConfigReader().read());
+		props.putAll(new PropertiesConfigReader().read(initPropertiesPath));
 	}
 
 	public static class PropertiesConfigReader {
@@ -172,9 +162,9 @@ public class ConfigHolder {
 			props = new LinkedHashMap<>();
 		}
 
-		public Map read() {
+		public Map read(Path path) {
 			LinkedList<String> settings = new LinkedList<>();
-			ConfiguratorAbstract.loadFromPropertiesFiles(props, settings);
+			ConfiguratorAbstract.loadFromPropertiesFiles(path.toString(), props, settings);
 			loadFromPropertyStrings(settings);
 			convertFromOldFormat();
 			return props;
