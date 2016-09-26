@@ -202,7 +202,7 @@ public interface Configurable
 	/**
 	 * Constant <code>GEN_CONFIG_DEF</code> keeps parameter name for the most
 	 * typical configuration: SessionManager, ClientConnectionManager and
-	 * ServerConnectionManager loaded.
+	 * S2SConnectionManager loaded.
 	 */
 	public static final String GEN_CONFIG_DEF = GEN_CONFIG + "-default";
 
