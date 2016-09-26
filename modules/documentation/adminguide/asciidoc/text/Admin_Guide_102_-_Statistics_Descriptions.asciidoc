@@ -408,22 +408,18 @@ amp, bosh, c2s, cl-comp, eventbus, message-archive, message-router, monitor, muc
 {compname}/Packets sent
 -----
 
-=== Processed packets thread: {in|out}_{#}
+=== Processed packets thread: {in|out}
 
-How many packets have been processed in and out by each processing thread.  Statistics will provide a list with each processing thread, and each thread having an in and an out counter.
+How many packets have been processed in and out by each processing thread.  Statistics will provide an array for each processor, listed from 0, 1, 2, 3 etc..
 Let's say that we have 4 threads set for ws2s, a list will be seen like this:
 [source,list]
 -----
-ws2s/Processed packets thread: in_0-ws2s
-ws2s/Processed packets thread: in_2-ws2s
-ws2s/Processed packets thread: in_3-ws2s
-ws2s/Processed packets thread: in_4-ws2s
-ws2s/Processed packets thread: out_0-ws2s
-ws2s/Processed packets thread: out_1-ws2s
-ws2s/Processed packets thread: out_2-ws2s
-ws2s/Processed packets thread: out_3-ws2s
+ws2s/Processed packets thread: IN=[2, 6, 4, 2]
+ws2s/Processed packets thread: OUT=[8, 0, 1, 3]
+ws2s/Processed packets thread (outliers) IN=mean: 79.0, deviation: 441, outliers: [in_10-ws2s: 2359]
+ws2s/Processed packets thread (outliers) OUT=mean: 16.5, deviation: 23.2058941, outliers: [out_ws2s: 80]
 -----
-Note that the processor counter starts with 0 and will count for as many threads as the component has as defined in xref:processingthreadsstat[{compname}/Processing threads].
+Note that the processor arrray will only have as many threads as the component has as defined in xref:processingthreadsstat[{compname}/Processing threads].
 
 *Statistics Level*: FINEST
 
@@ -438,19 +434,10 @@ amp, bosh, c2s, cl-comp, eventbus, message-archive, message-router, monitor, muc
 *List of possible statistics*:
 [source,list]
 -----
-{compname}/Processed packets thread: in_0-{compname}
-{compname}/Processed packets thread: out_0-{compname}
-{compname}/Processed packets thread: in_1-{compname}
-{compname}/Processed packets thread: out_1-{compname}
-{compname}/Processed packets thread: in_2-{compname}
-{compname}/Processed packets thread: out_2-{compname}
-{compname}/Processed packets thread: in_3-{compname}
-{compname}/Processed packets thread: out_3-{compname}
-{compname}/Processed packets thread: in_4-{compname}
-{compname}/Processed packets thread: out_4-{compname}
-{compname}/Processed packets thread: in_5-{compname}
-{compname}/Processed packets thread: out_5-{compname}
-...
+{compname}/Processed packets thread: IN
+{compname}/Processed packets thread: OUT
+{compname}/Processed packets thread (outliers) IN
+{compname}/Processed packets thread (outliers) OUT
 -----
 
 [[processingthreadsstat]]
