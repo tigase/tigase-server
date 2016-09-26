@@ -66,7 +66,7 @@ component/property=value
 === Support for XEP-0352
 Client State Indication is now enabled by default on Tigase XMPP Servers.  Details xref:sessManMobileOpts[here].
 
-== One Certificate for multiple Vhosts
+=== One Certificate for multiple Vhosts
 
 Tigase now allows for wildcards in setting server certificate per Vhosts.  See more xref:onecertmultipledomain[in this section].
 
@@ -123,7 +123,7 @@ JAVA_OPTIONS="${GC} ${EX} ${ENC} ${DRV} ${JMX_REMOTE_IP} -server ${PRODUCTION_HE
 As the comment says, we recommend adjusting the heap memory settings for your specific installations.
 link:https://projects.tigase.org/issues/3567[#3567]
 
-==== Java Garbage Collection Settings have been improved
+=== Java Garbage Collection Settings have been improved
 After significant testing and investigation, we have improved the Java GC settings to keep memory usage from becoming too high on systems.
 link:https://projects.tigase.org/issues/3248[#3248]
 
@@ -198,8 +198,10 @@ Data from Unified Archive or Message Archive can be automatically or manually pu
 
 It's possible now to redirect connections on one port to be forced to connect to another port using the +force-redirect-to+ setting.  link:http://docs.tigase.org/tigase-server/snapshot/Administration_Guide/html/#_enforcing_redirection[Details here].
 
-=== SASL-SCRAM now enabled
-SASL-SCRAM is now enabled by default for available authentication methods.
+=== Authentication methods have been improved.
+SASL-SCRAM is now enabled by default for available authentication methods.  We have also added:
+- SCRAM-SHA-1
+- SCRAM-SHA-1-PLUS
 
 === Dual IP installtions
 
@@ -287,6 +289,7 @@ Tigase has improved default settings to improve performance.  These include:
 - link:https://projects.tigase.org/issues/3950[#3950] MongoDB driver updated to v2.14.1.
 - #3985 Improved disco#info to return extended results for MUC component as per link:http://xmpp.org/extensions/xep-0128.html[XEP-0128 Service Discovery Extensions].
 - #3986 Added new index for tig_nodes collection in MongoDB Databases.
+- link:https://projects.tigase.org/issues/4003[#4003] VisualVM and statistics gathering has been improved and refactored for a lower footprint, and a number of new windows and features for program monitoring.
 - #4020 SeeOtherHostSualIP implementation has been fixed to support MongoDB.
 - link:https://projects.tigase.org/issues/4120[#4120] Duplication of messages in offline storage when +Message+ and +OfflineMessage+ processors are used has been resolved.
 - #4162 xml:lang attribute is now supported in Tigase MUC component.
@@ -486,6 +489,8 @@ Tigase has improved default settings to improve performance.  These include:
 
 - link:https://projects.tigase.org/issues/4262[#4262] Fixed messages getting lost when StreamResumption is used when a disconnected user reconnects to the server.  This issue is also fixed on servers using ACS component.
 
+- link:https://projects.tigase.org/issues/4298[#4298] ACS - Fixed messages getting dropped when sent to users offline or on unstable connections.
+
 - link:https://projects.tigase.org/issues/4365[#4365] Fixed direct presence not working with non-roster elements using barejid.
 
 - Patch added to fix ConcurrentModificationException in BlockingCommand plugin.
@@ -493,6 +498,8 @@ Tigase has improved default settings to improve performance.  These include:
 - Fixed negation in SASL mechanism selector.
 
 - Fixed checking for user session without localpart in to address.
+
+- Fixed +resourceDefPrefix+ from accumulating resource names when components are added or removed in web console.
 
 - Distributed EventBus improved to allow POJO based events to be fired locally.
 
@@ -505,3 +512,5 @@ Tigase has improved default settings to improve performance.  These include:
 - Fixed responding to same hostname as sender as "to" in stream-error stanza.
 
 - Fixed issue where attempts to delete empty MUC room would create and then destroy room.
+
+- Added startup information to log to indicate when server is ready.

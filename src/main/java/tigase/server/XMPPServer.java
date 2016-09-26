@@ -128,6 +128,7 @@ public final class XMPPServer {
 			Bootstrap bootstrap = new Bootstrap();
 			bootstrap.init(args);
 			bootstrap.start();
+			System.out.println("==\nServer finished starting up and (if there wasn't any error) is ready to use\n==");
 //		} catch ( ConfigurationException e ) {
 //			System.err.println( "" );
 //			System.err.println( "  --------------------------------------" );

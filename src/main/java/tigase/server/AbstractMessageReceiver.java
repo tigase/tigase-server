@@ -204,11 +204,11 @@ public abstract class AbstractMessageReceiver
 	 * Variable <code>statAddedMessagesOk</code> keeps counter of successfuly
 	 * added messages to queue.
 	 */
-	private long                                                statReceivedPacketsOk = 0;
-	private long                                                statSentPacketsEr     = 0;
-	private long                                                statSentPacketsOk     = 0;
-	private ArrayDeque<QueueListener>                           threadsQueue          =
-			null;
+	private long statReceivedPacketsOk = 0;
+	private long statSentPacketsEr = 0;
+	private long statSentPacketsOk = 0;
+	private ArrayDeque<QueueListener> threadsQueueIn = null;
+	private ArrayDeque<QueueListener> threadsQueueOut = null;
 	private final ThreadFactory									threadFactory		  =
 			new ThreadFactory() {
 
@@ -475,6 +475,49 @@ public abstract class AbstractMessageReceiver
 	@Deprecated
 	public void addTimerTask(TimerTask task, long delay) {
 		receiverTasks.schedule(task, delay);
+	}
+
+	/**
+	 * Helper method used in statistics to find uneven distribution of packet processing
+	 * across processing threads
+	 *
+	 * @param array is an resizable array of {@code QueueListener} containing all processing threads
+	 * @return string containing average value, variance as well as comma separated list of
+	 * outlier threads and number of processed packets; returns empty string if passed array is empty or null
+	 */
+	private static String calculateOutliers(ArrayDeque<AbstractMessageReceiver.QueueListener> array) {
+
+		if (array == null || array.size() == 0)
+			return "";
+
+		long[] allNumbers = new long[array.size()];
+		int idx = 0;
+		long sum = 0;
+		for (QueueListener queueListener : array) {
+			sum += queueListener.packetCounter;
+			allNumbers[idx++] = queueListener.packetCounter;
+		}
+
+		double mean = sum / allNumbers.length;
+
+		double tmp_sum_variance = 0;
+		for (long allNumber : allNumbers) {
+			tmp_sum_variance += Math.pow(allNumber - mean, 2);
+		}
+
+		double deviation = Math.sqrt(tmp_sum_variance / allNumbers.length);
+
+		List<String> outliers = new ArrayList<>();
+		for (QueueListener queueListener : array) {
+			if (Math.abs(queueListener.packetCounter - mean) > (2 * deviation)) {
+				outliers.add(queueListener.getName()+":"+queueListener.packetCounter);
+			}
+		}
+
+		return "mean: " + mean + ", deviation: " + deviation
+				+ (!outliers.isEmpty()
+					? ", outliers: " + outliers.toString()
+					: "");
 	}
 
 	/**
@@ -856,10 +899,10 @@ public abstract class AbstractMessageReceiver
 			packetFilter.getStatistics(list);
 		}
 		if (list.checkLevel(Level.FINEST)) {
-			for (QueueListener thread : threadsQueue) {
-				list.add(getName(), "Processed packets thread: " + thread.getName(), thread
-						.packetCounter, Level.FINEST);
-			}
+			list.add(getName(), "Processed packets thread IN", threadsQueueIn.toString(), Level.FINEST);
+			list.add(getName(), "Processed packets thread OUT", threadsQueueOut.toString(), Level.FINEST);
+			list.add(getName(), "Processed packets thread (outliers) IN", calculateOutliers(threadsQueueIn), Level.FINEST);
+			list.add(getName(), "Processed packets thread (outliers) OUT", calculateOutliers(threadsQueueOut), Level.FINEST);
 		}
 		super.getStatistics(list);
 	}
@@ -1141,22 +1184,24 @@ public abstract class AbstractMessageReceiver
 	}
 
 	private void startThreads() {
-		if (threadsQueue == null) {
-			threadsQueue = new ArrayDeque<QueueListener>(8);
+		if (threadsQueueIn == null) {
+			threadsQueueIn = new ArrayDeque<>(8);
 			for (int i = 0; i < in_queues_size; i++) {
 				QueueListener in_thread = new QueueListener(in_queues.get(i), QueueType.IN_QUEUE);
 
 				in_thread.setName("in_" + i + "-" + getName());
 				in_thread.start();
-				threadsQueue.add(in_thread);
+				threadsQueueIn.add(in_thread);
 			}
+		}
+		if (threadsQueueOut == null) {
+			threadsQueueOut = new ArrayDeque<>(8);
 			for (int i = 0; i < out_queues_size; i++) {
-				QueueListener out_thread = new QueueListener(out_queues.get(i), QueueType
-						.OUT_QUEUE);
+				QueueListener out_thread = new QueueListener(out_queues.get(i), QueueType.OUT_QUEUE);
 
 				out_thread.setName("out_" + i + "-" + getName());
 				out_thread.start();
-				threadsQueue.add(out_thread);
+				threadsQueueOut.add(out_thread);
 			}
 		}    // end of if (thread == null || ! thread.isAlive())
 
@@ -1191,15 +1236,9 @@ public abstract class AbstractMessageReceiver
 
 		// stopped = true;
 		try {
-			if (threadsQueue != null) {
-				for (QueueListener in_thread : threadsQueue) {
-					in_thread.threadStopped = true;
-					in_thread.interrupt();
-					while (in_thread.isAlive()) {
-						Thread.sleep(100);
-					}
-				}
-			}
+			stopThread(threadsQueueIn);
+			stopThread(threadsQueueOut);
+
 			if (out_thread != null) {
 				out_thread.threadStopped = true;
 				out_thread.interrupt();
@@ -1208,7 +1247,8 @@ public abstract class AbstractMessageReceiver
 				}
 			}
 		} catch (InterruptedException e) {}
-		threadsQueue = null;
+		threadsQueueIn = null;
+		threadsQueueOut = null;
 		out_thread   = null;
 		if (receiverTasks != null) {
 			receiverTasks.cancel();
@@ -1218,6 +1258,18 @@ public abstract class AbstractMessageReceiver
 			receiverScheduler.shutdownNow();
 			receiverScheduler = null;
 		}
+	}
+
+	private void stopThread(ArrayDeque<QueueListener> threadsQueue) throws InterruptedException {
+		if (threadsQueue != null) {
+            for (QueueListener in_thread : threadsQueue) {
+                in_thread.threadStopped = true;
+                in_thread.interrupt();
+                while (in_thread.isAlive()) {
+                    Thread.sleep(100);
+                }
+            }
+        }
 	}
 
 	//~--- inner classes --------------------------------------------------------
@@ -1397,8 +1449,10 @@ public abstract class AbstractMessageReceiver
 				}    // end of try-catch
 			}      // end of while (! threadStopped)
 		}
+
+		@Override
+		public String toString() {
+			return String.valueOf(packetCounter);
+		}
 	}
 }    // AbstractMessageReceiver
-
-
-//~ Formatted in Tigase Code Convention on 13/09/21

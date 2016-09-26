@@ -64,7 +64,10 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
+ *
+ * @deprecated was replaced by {@link S2SConnectionManager}, will be removed in 7.2.0
  */
+@Deprecated
 public class ServerConnectionManager extends ConnectionManager<XMPPIOService<Object>>
 		implements ConnectionHandlerIfc<XMPPIOService<Object>> {
 	private static final String DB_RESULT_EL_NAME = "db:result";

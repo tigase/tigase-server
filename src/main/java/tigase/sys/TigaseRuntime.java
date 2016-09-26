@@ -37,7 +37,9 @@ import java.lang.management.MemoryUsage;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.ThreadMXBean;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,27 +59,41 @@ public abstract class TigaseRuntime {
 	private int              cpus        = Runtime.getRuntime().availableProcessors();
 	private float            cpuUsage    = 0F;
 	private MemoryPoolMXBean oldMemPool  = null;
+	private Map<String,MemoryPoolMXBean> memoryPoolMXBeans  = null;
 	private long             prevCputime = 0;
 	private long             prevUptime  = 0;
 
 	//~--- constructors ---------------------------------------------------------
 
+
+	public Map<String, MemoryPoolMXBean> getMemoryPoolMXBeans() {
+		return memoryPoolMXBeans;
+	}
+
+	public MemoryPoolMXBean getOldMemPool() {
+		return oldMemPool;
+	}
+
 	protected TigaseRuntime() {
 		List<MemoryPoolMXBean> memPools = ManagementFactory.getMemoryPoolMXBeans();
+
+		memoryPoolMXBeans = new LinkedHashMap<>(3);
 
 		for (MemoryPoolMXBean memoryPoolMXBean : memPools) {
 			if (memoryPoolMXBean.getName().toLowerCase().contains("old")) {
 				oldMemPool = memoryPoolMXBean;
-				log.log(Level.INFO, "Using {0} memory pool for reporting memory usage.", memoryPoolMXBean.getName());
 
-				break;
+				memoryPoolMXBeans.put("old",memoryPoolMXBean);
+				log.log(Level.INFO, "Using {0} memory pool for reporting (old) memory usage.", memoryPoolMXBean.getName());
 			}
-		}
-		
-		List<GarbageCollectorMXBean> gcBeans = ManagementFactory.getGarbageCollectorMXBeans();
-		for ( GarbageCollectorMXBean gcBean : gcBeans ) {
-			log.log( Level.INFO, "Using GC: {0} for pools: {1}",
-							 new Object[] { gcBean.getName(), Arrays.asList( gcBean.getMemoryPoolNames() ) } );
+			if (memoryPoolMXBean.getName().toLowerCase().contains("survivor")) {
+				memoryPoolMXBeans.put("survivor",memoryPoolMXBean);
+				log.log(Level.INFO, "Using {0} memory pool for reporting survivor memory usage.", memoryPoolMXBean.getName());
+			}
+			if (memoryPoolMXBean.getName().toLowerCase().contains("eden")) {
+				memoryPoolMXBeans.put("eden",memoryPoolMXBean);
+				log.log(Level.INFO, "Using {0} memory pool for reporting eden memory usage.", memoryPoolMXBean.getName());
+			}
 		}
 	}
 
@@ -135,6 +151,29 @@ public abstract class TigaseRuntime {
 		}
 
 		return result;
+	}
+
+	public String getGcStatistics() {
+
+		// As this is variable and the collectors may change over time we
+		// need to re-do it each time
+		StringBuilder sb = new StringBuilder();
+		List<GarbageCollectorMXBean> gcBeans = ManagementFactory.getGarbageCollectorMXBeans();
+		for ( GarbageCollectorMXBean gcBean : gcBeans ) {
+			if (sb.length() > 0 ){
+				sb.append('|');
+			}
+			sb.append('{');
+			sb.append("name=");
+			sb.append(gcBean.getName()).append(';');
+			sb.append("count=").append(gcBean.getCollectionCount()).append(';');
+			sb.append("time=").append(gcBean.getCollectionTime()).append(';');
+			sb.append("avgTime=").append(gcBean.getCollectionTime() / gcBean.getCollectionCount()).append(';');
+			sb.append("pools=").append(Arrays.asList(gcBean.getMemoryPoolNames()));
+			sb.append('}');
+		}
+		return sb.toString();
+
 	}
 
 	/**
@@ -280,6 +319,10 @@ public abstract class TigaseRuntime {
 	public abstract boolean isJidOnlineLocally(JID jid);
 
 	public abstract void removeShutdownHook(ShutdownHook hook);
+
+	public String getOldGenName() {
+		return (oldMemPool != null ? oldMemPool.getName() : "n/a");
+	}
 
 	public void shutdownTigase(String[] msg) {
 			if (XMPPServer.isOSGi()) {
