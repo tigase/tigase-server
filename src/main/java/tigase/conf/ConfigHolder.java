@@ -85,7 +85,10 @@ public class ConfigHolder {
 					log.log(Level.SEVERE, "could not replace configuration file with file in DSL format", ex);
 					throw new RuntimeException(ex);
 				}
-
+				log.log(Level.WARNING,
+						"Configuration file {0} was a properties file and was converted to new DSL configuration format." +
+								" Previous version of configuration file was saved at {1}",
+						new Object[]{initPropsFile, initPropsFileOld});
 
 				break;
 		}
