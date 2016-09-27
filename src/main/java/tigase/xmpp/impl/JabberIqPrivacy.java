@@ -299,7 +299,25 @@ public class JabberIqPrivacy
 							switch (type) {
 							case jid :
 								try {
-									type_matched = jid.equals( JID.jidInstance( value ) );
+
+//									<user@domain/resource> (only that resource matches)
+//									<user@domain> (any resource matches)
+//									<domain/resource> (only that resource matches)
+//									<domain> (the domain itself matches, as does any user@domain or domain/resource)
+									JID jidFromList = JID.jidInstance(value);
+									if (jidFromList.getLocalpart() != null) {
+										if (jidFromList.getResource() != null ) {
+											type_matched = jid.equals(jidFromList);
+										} else if (jidFromList.getResource() == null ) {
+											type_matched = jid.getBareJID().equals(jidFromList.getBareJID());
+										}
+									} else {
+										if (jidFromList.getResource() != null ) {
+											type_matched = jid.equals(jidFromList);
+										} else if (jidFromList.getResource() == null ) {
+											type_matched = jid.getDomain().equals(jidFromList.getDomain());
+										}
+									}
 								} catch ( TigaseStringprepException ex ) {
 									log.log(Level.FINEST, "Exception while creating jid instance for value: " + value, ex);
 								}
