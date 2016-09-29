@@ -106,6 +106,8 @@ public class ClusterConnectionManager
 	/** Field description */
 	public static final String CLUSTER_CONTR_ID_PROP_KEY = "cluster-controller-id";
 
+    public static final String CLUSTER_INITIATED_EVENT = "cluster-initiated";
+
 	/** Field description */
 	public static final String COMPRESS_STREAM_PROP_KEY = "compress-stream";
 
@@ -204,6 +206,7 @@ public class ClusterConnectionManager
 	private ClusterConnectionSelectorIfc connectionSelector = null;
 	private CommandListener sendPacket = new SendPacket(ClusterControllerIfc
 			.DELIVER_CLUSTER_PACKET_CMD);
+	private boolean initialClusterConnectedDone = false;
 	private boolean nonClusterTrafficAllowed = true;
 
 	private final TimerTask repoReloadTimerTask = new TimerTask() {
@@ -876,6 +879,8 @@ public class ClusterConnectionManager
 			if (old_repo != null) {
 				old_repo.destroy();
 			}
+			repo.reload();
+
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can not create items repository instance for class: " +
 					repo_class, e);
@@ -956,6 +961,28 @@ public class ClusterConnectionManager
 			log.log(Level.INFO, "Connected to: {0}", addr);
 			updateServiceDiscoveryItem(addr, addr, XMLNS + " connected", true);
 			clusterController.nodeConnected(addr);
+		}
+
+		try {
+            // initial cluster connection done
+            int connectedSize = getNodesConnected().size();
+            int repoSize = repo.allItems().size();
+            if (log.isLoggable(Level.FINEST)) {
+                log.log(Level.FINEST, "All repo nodes connected! Connected: {0}, repo size: {1}, initialClusterConnectedDone: {2}",
+                        new Object[]{connectedSize, repoSize, initialClusterConnectedDone});
+            }
+
+			if (!initialClusterConnectedDone &&
+                    (repoSize <= 1 || repoSize > 1 && connectedSize >= repoSize - 1)) {
+                initialClusterConnectedDone = true;
+
+				Element event = new Element(CLUSTER_INITIATED_EVENT);
+                event.setXMLNS(CLUSTER_INITIATED_EVENT);
+                event.setAttribute( "local", "true" );
+				EventBusFactory.getInstance().fire(event);
+			}
+		} catch (TigaseDBException e) {
+            log.log(Level.WARNING, "There was an error while reading size of cluster repository", e);
 		}
 
 		ServiceConnectedTimerTask task = (ServiceConnectedTimerTask) serv.getSessionData()

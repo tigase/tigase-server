@@ -26,24 +26,28 @@ package tigase.cluster;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
 
+import tigase.conf.ConfigurationException;
+import tigase.disteventbus.EventBusFactory;
+import tigase.disteventbus.EventHandler;
 import tigase.server.bosh.BoshConnectionManager;
 import tigase.server.ServiceChecker;
 import tigase.server.xmppclient.SeeOtherHostIfc;
 
-import tigase.xmpp.BareJID;
+import tigase.util.TimerTask;
+import tigase.xml.Element;
 import tigase.xmpp.JID;
 import tigase.xmpp.XMPPIOService;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.Arrays;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Map;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static tigase.cluster.ClusterConnectionManager.CLUSTER_INITIATED_EVENT;
 
 /**
  *
@@ -122,4 +126,36 @@ public class BoshConnectionClustered
 		return see_other_host_strategy;
 	}
 
+    @Override
+    public Map<String, Object> getDefaults(Map<String, Object> params) {
+        delayPortListening = true;
+        log.log(Level.WARNING, "Delaying opening ports of component: {0}", getName());
+
+        EventBusFactory.getInstance().addHandler(CLUSTER_INITIATED_EVENT, CLUSTER_INITIATED_EVENT,
+                new EventHandler() {
+                    @Override
+                    public void onEvent(String name, String xmlns, Element event) {
+                        BoshConnectionClustered.this.connectWaitingTasks();
+                        log.log(Level.WARNING, "Starting listening on ports of component: {0}", BoshConnectionClustered.this.getName());
+                        EventBusFactory.getInstance().removeHandler(CLUSTER_INITIATED_EVENT, CLUSTER_INITIATED_EVENT, this);
+                    }
+                }
+        );
+
+        return super.getDefaults(params);
+    }
+
+
+    @Override
+    public void initializationCompleted() {
+        super.initializationCompleted();
+
+        addTimerTask(new TimerTask() {
+            @Override
+            public void run() {
+                log.log(Level.FINE, "Cluster synchronization timed-out, starting pending connections for " + getName());
+                BoshConnectionClustered.this.connectWaitingTasks();
+            }
+        }, connectionDelay * 60);
+    }
 }

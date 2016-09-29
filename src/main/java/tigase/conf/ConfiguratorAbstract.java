@@ -257,7 +257,7 @@ public abstract class ConfiguratorAbstract
 			log.log(Level.WARNING, "Cannot store configuration.", ex);
 		}
 
-		System.out.println("==\nServer finished starting up and (if there wasn't any error) is ready to use\n==");
+		System.out.println("== " + new Date() + " Server finished starting up and (if there wasn't any error) is ready to use\n");
 
 	}
 

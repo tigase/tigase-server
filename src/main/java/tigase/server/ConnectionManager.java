@@ -35,7 +35,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.net.ssl.TrustManager;
 import javax.script.Bindings;
 
 import tigase.annotations.TODO;
@@ -43,8 +42,6 @@ import tigase.conf.ConfigurationException;
 import tigase.net.*;
 
 import tigase.server.script.CommandIfc;
-import tigase.server.xmppclient.ClientConnectionManager;
-import tigase.server.xmppclient.ClientTrustManagerFactory;
 import tigase.server.xmppclient.XMPPIOProcessor;
 import tigase.stats.StatisticsList;
 import tigase.util.DataTypes;
@@ -257,9 +254,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	protected int net_buffer = NET_BUFFER_ST_PROP_VAL;
 
 	/** Field description */
-	protected long       connectionDelay = 2 * SECOND;
-	private LIMIT_ACTION xmppLimitAction = LIMIT_ACTION.DISCONNECT;
-	protected WATCHDOG_PING_TYPE watchdogPingType = WATCHDOG_PING_TYPE.WHITESPACE;
+    protected long connectionDelay = 2 * SECOND;
+    private LIMIT_ACTION xmppLimitAction = LIMIT_ACTION.DISCONNECT;
+    protected WATCHDOG_PING_TYPE watchdogPingType = WATCHDOG_PING_TYPE.WHITESPACE;
+    protected boolean delayPortListening = false;
 
 	//~--- constant enums -------------------------------------------------------
 
@@ -403,16 +401,29 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		}
 		super.initializationCompleted();
 		initializationCompleted = true;
-		for (Map<String, Object> params : waitingTasks) {
-			reconnectService(params, connectionDelay);
-		}
-		waitingTasks.clear();
-		if ( null != watchdog ){
-			watchdog.start();
-		}
-	}
 
-	@Override
+        if (!delayPortListening) {
+            connectWaitingTasks();
+        }
+    }
+
+    protected void connectWaitingTasks() {
+        if (log.isLoggable(Level.FINER)) {
+            log.log(Level.FINER, "Connecting waitingTasks: {0}",
+                    new Object[]{waitingTasks});
+        }
+
+        for (Map<String, Object> params : waitingTasks) {
+            reconnectService(params, connectionDelay);
+        }
+        waitingTasks.clear();
+        if (null != watchdog && Thread.State.NEW.equals(watchdog.getState())) {
+            watchdog.start();
+        }
+        delayPortListening = false;
+    }
+
+    @Override
 	public void packetsReady(IO serv) throws IOException {
 
 		// Under a high load data, especially lots of packets on a single
@@ -962,8 +973,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 		if (ports != null) {
 			for (int i = 0; i < ports.length; i++) {
-				Map<String, Object> port_props = new LinkedHashMap<String, Object>(20);
 
+				Map<String, Object> port_props = new LinkedHashMap<>(20);
 				for (Map.Entry<String, Object> entry : props.entrySet()) {
 					if (entry.getKey().startsWith(PROP_KEY + ports[i])) {
 						int    idx = entry.getKey().lastIndexOf('/');
@@ -975,17 +986,17 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 					}    // end of if (entry.getKey().startsWith())
 				}      // end of for ()
 				port_props.put(PORT_KEY, ports[i]);
-				if (port_props.containsKey(PORT_TYPE_PROP_KEY) 
+				if (port_props.containsKey(PORT_TYPE_PROP_KEY)
 						&& !(port_props.get(PORT_TYPE_PROP_KEY) instanceof ConnectionType)) {
 					Object val = port_props.get(PORT_TYPE_PROP_KEY);
 					port_props.put(PORT_TYPE_PROP_KEY, ConnectionType.valueOf(val.toString()));
 				}
-				if (port_props.containsKey(PORT_SOCKET_PROP_KEY) 
+				if (port_props.containsKey(PORT_SOCKET_PROP_KEY)
 						&& !(port_props.get(PORT_SOCKET_PROP_KEY) instanceof SocketType)) {
 					Object val = port_props.get(PORT_SOCKET_PROP_KEY);
 					port_props.put(PORT_SOCKET_PROP_KEY, SocketType.valueOf(val.toString()));
-				}				
-				addWaitingTask(port_props);
+				}
+                addWaitingTask(port_props);
 				// reconnectService(port_props, startDelay);
 			}        // end of for (int i = 0; i < ports.length; i++)
 		}          // end of if (ports != null)
@@ -1000,12 +1011,18 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 * @param conn
 	 */
 	protected void addWaitingTask(Map<String, Object> conn) {
-		if (initializationCompleted) {
-			reconnectService(conn, connectionDelay);
-		} else {
-			waitingTasks.add(conn);
-		}
-	}
+
+        if (log.isLoggable(Level.FINER)) {
+            log.log(Level.FINER, "Adding waiting task: {0}, initializationCompleted: {1}, delayPortListening: {2}, to: {3}",
+                    new Object[]{conn, initializationCompleted, delayPortListening, waitingTasks});
+        }
+
+        if (initializationCompleted && !delayPortListening) {
+            reconnectService(conn, connectionDelay);
+        } else {
+            waitingTasks.add(conn);
+        }
+    }
 
 	/**
 	 * Method description
