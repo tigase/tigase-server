@@ -39,7 +39,8 @@ import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 @Bean(name = "defaultTypesConverter")
-public class DefaultTypesConverter implements TypesConverter {
+public class DefaultTypesConverter
+		implements TypesConverter {
 
 	private static final String[] decoded = {","};
 	private static final String[] encoded = {"\\,"};
@@ -67,9 +68,10 @@ public class DefaultTypesConverter implements TypesConverter {
 	/**
 	 * Converts value to expected type.
 	 *
-	 * @param value        value to be converted.
+	 * @param value value to be converted.
 	 * @param expectedType class of expected type.
-	 * @param <T>          expected type.
+	 * @param <T> expected type.
+	 *
 	 * @return converted value.
 	 */
 	public <T> T convert(final Object value, final Class<T> expectedType) {
@@ -77,12 +79,14 @@ public class DefaultTypesConverter implements TypesConverter {
 	}
 
 	public <T> T convert(final Object value, final Type type) {
-		if (type instanceof Class)
+		if (type instanceof Class) {
 			return convert(value, (Class<T>) type);
+		}
 		if (type instanceof ParameterizedType) {
 			ParameterizedType pt = (ParameterizedType) type;
-			if (pt.getRawType() instanceof Class)
+			if (pt.getRawType() instanceof Class) {
 				return convert(value, (Class<T>) pt.getRawType(), pt);
+			}
 		}
 
 		throw new RuntimeException("Cannot convert to " + type);
@@ -90,11 +94,13 @@ public class DefaultTypesConverter implements TypesConverter {
 
 	public <T> T convert(final Object value, final Class<T> expectedType, Type genericType) {
 		try {
-			if (value == null)
+			if (value == null) {
 				return null;
+			}
 
-			if ("null".equals(value))
+			if ("null".equals(value)) {
 				return null;
+			}
 
 			final Class<?> currentType = value.getClass();
 
@@ -102,7 +108,10 @@ public class DefaultTypesConverter implements TypesConverter {
 				return expectedType.cast(value);
 			}
 
-			if (expectedType.equals(Class.class)) {
+			T customResult = customConversion(value, expectedType, genericType);
+			if (customResult != null) {
+				return customResult;
+			} else if (expectedType.equals(Class.class)) {
 				try {
 					return expectedType.cast(ModulesManagerImpl.getInstance().forName(value.toString().trim()));
 				} catch (ClassNotFoundException e) {
@@ -128,8 +137,8 @@ public class DefaultTypesConverter implements TypesConverter {
 				return expectedType.cast(Integer.valueOf(value.toString().trim()));
 			} else if (expectedType.equals(Boolean.class)) {
 				String val = value.toString().trim();
-				boolean b = (val.equalsIgnoreCase("yes") || val.equalsIgnoreCase("true") || val.equalsIgnoreCase("on")
-						|| val.equals("1"));
+				boolean b = (val.equalsIgnoreCase("yes") || val.equalsIgnoreCase("true") ||
+						val.equalsIgnoreCase("on") || val.equals("1"));
 				return expectedType.cast(Boolean.valueOf(b));
 			} else if (expectedType.equals(Float.class)) {
 				return expectedType.cast(Float.valueOf(value.toString().trim()));
@@ -137,10 +146,11 @@ public class DefaultTypesConverter implements TypesConverter {
 				return expectedType.cast(Double.valueOf(value.toString().trim()));
 			} else if (expectedType.equals(char.class)) {
 				String v = value.toString().trim();
-				if (v.length() == 1)
+				if (v.length() == 1) {
 					return (T) Character.valueOf(v.charAt(0));
-				else
+				} else {
 					throw new RuntimeException("Cannot convert '" + v + "' to char.");
+				}
 			} else if (expectedType.equals(int.class)) {
 				return (T) Integer.valueOf(value.toString().trim());
 			} else if (expectedType.equals(byte.class)) {
@@ -155,8 +165,8 @@ public class DefaultTypesConverter implements TypesConverter {
 				return (T) Float.valueOf(value.toString().trim());
 			} else if (expectedType.equals(boolean.class)) {
 				String val = value.toString().trim();
-				boolean b = (val.equalsIgnoreCase("yes") || val.equalsIgnoreCase("true") || val.equalsIgnoreCase("on")
-						|| val.equals("1"));
+				boolean b = (val.equalsIgnoreCase("yes") || val.equalsIgnoreCase("true") ||
+						val.equalsIgnoreCase("on") || val.equals("1"));
 				return (T) Boolean.valueOf(b);
 			} else if (expectedType.equals(byte[].class) && value.toString().startsWith("string:")) {
 				return (T) value.toString().substring(7).getBytes();
@@ -174,7 +184,9 @@ public class DefaultTypesConverter implements TypesConverter {
 					int i = 0;
 					while (it.hasNext()) {
 						Object v = it.next();
-						Array.set(result, i, (v instanceof String) ? convert(unescape((String) v), expectedType.getComponentType()) : v);
+						Array.set(result, i, (v instanceof String)
+											 ? convert(unescape((String) v), expectedType.getComponentType())
+											 : v);
 						i++;
 					}
 					return (T) result;
@@ -202,14 +214,15 @@ public class DefaultTypesConverter implements TypesConverter {
 				return (T) Pattern.compile(value.toString());
 			} else if (Collection.class.isAssignableFrom(expectedType) && genericType != null) {
 				int mod = expectedType.getModifiers();
-				if (!Modifier.isAbstract(mod) && !Modifier.isInterface(mod) && genericType instanceof ParameterizedType) {
+				if (!Modifier.isAbstract(mod) && !Modifier.isInterface(mod) &&
+						genericType instanceof ParameterizedType) {
 					ParameterizedType pt = (ParameterizedType) genericType;
 					Type[] actualTypes = pt.getActualTypeArguments();
 					if (actualTypes[0] instanceof Class) {
 						if (value != null && value.getClass().isArray()) {
 							try {
 								Collection result = (Collection) expectedType.newInstance();
-								for (int i=0; i<Array.getLength(value); i++) {
+								for (int i = 0; i < Array.getLength(value); i++) {
 									result.add(convert(Array.get(value, i), (Class<?>) actualTypes[0]));
 								}
 								return (T) result;
@@ -241,7 +254,8 @@ public class DefaultTypesConverter implements TypesConverter {
 						}
 					}
 				}
-			} else if (Map.class.isAssignableFrom(expectedType) && genericType instanceof ParameterizedType && value instanceof Map) {
+			} else if (Map.class.isAssignableFrom(expectedType) && genericType instanceof ParameterizedType &&
+					value instanceof Map) {
 				// this is additional support for convertion to type of Map, however value needs to be instance of Map
 				// Added mainly for BeanConfigurators to be able to configure Map fields
 				int mod = expectedType.getModifiers();
@@ -282,15 +296,21 @@ public class DefaultTypesConverter implements TypesConverter {
 		}
 	}
 
+	protected <T> T customConversion(final Object value, final Class<T> expectedType, Type genericType) {
+		return null;
+	}
+
 	/**
 	 * Converts object to String.
 	 *
 	 * @param value object to convert.
+	 *
 	 * @return text representation of value.
 	 */
 	public String toString(final Object value) {
-		if (value == null)
+		if (value == null) {
 			return null;
+		}
 		if (value.getClass().isEnum()) {
 			return ((Enum) value).name();
 		} else if (value instanceof Collection) {
@@ -298,8 +318,9 @@ public class DefaultTypesConverter implements TypesConverter {
 			Iterator it = ((Collection) value).iterator();
 			while (it.hasNext()) {
 				sb.append(escape(toString(it.next())));
-				if (it.hasNext())
+				if (it.hasNext()) {
 					sb.append(',');
+				}
 			}
 			return sb.toString();
 		} else if (value.getClass().isArray()) {
@@ -308,13 +329,15 @@ public class DefaultTypesConverter implements TypesConverter {
 			for (int i = 0; i < l; i++) {
 				Object o = Array.get(value, i);
 				sb.append(escape(toString(o)));
-				if (i + 1 < l)
+				if (i + 1 < l) {
 					sb.append(',');
+				}
 
 			}
 			return sb.toString();
-		} else
+		} else {
 			return value.toString();
+		}
 	}
 
 }
