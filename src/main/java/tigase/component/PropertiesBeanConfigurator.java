@@ -35,11 +35,65 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Bean(name = BeanConfigurator.DEFAULT_CONFIGURATOR_NAME)
-public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
+public class PropertiesBeanConfigurator
+		extends AbstractBeanConfigurator {
 
 	private static final Logger log = Logger.getLogger(PropertiesBeanConfigurator.class.getCanonicalName());
 
 	private Map<String, Object> props;
+
+	public Collection<ConfigEntry> getAllConfigOptions() {
+		return getCurrentConfigurations(false);
+	}
+
+	@Override
+	protected Map<String, BeanDefinition> getBeanDefinitions(Map<String, Object> values) {
+		Map<String, BeanDefinition> beanPropConfigMap = super.getBeanDefinitions(values);
+
+		List<String> keys = new ArrayList<>(values.keySet());
+		Collections.sort(keys);
+		for (String key : keys) {
+			String[] keyParts = key.split("/");
+			if (keyParts.length != 2) {
+				continue;
+			}
+
+			String beanName = keyParts[0];
+			String action = keyParts[1];
+			Object value = values.get(key);
+
+			BeanDefinition cfg = beanPropConfigMap.get(beanName);
+			switch (action) {
+				case "active":
+				case "class":
+					if (cfg == null) {
+						cfg = new BeanDefinition();
+						cfg.setBeanName(beanName);
+						beanPropConfigMap.put(beanName, cfg);
+					}
+					break;
+				default:
+					if (kernel.isBeanClassRegistered(beanName) && cfg == null) {
+						cfg = new BeanDefinition();
+						cfg.setBeanName(beanName);
+						beanPropConfigMap.put(beanName, cfg);
+					}
+					break;
+			}
+			switch (action) {
+				case "active":
+					cfg.setActive(Boolean.parseBoolean(value.toString()));
+					break;
+				case "class":
+					cfg.setClazzName(value.toString());
+					break;
+				default:
+					break;
+			}
+		}
+
+		return beanPropConfigMap;
+	}
 
 	private HashMap<String, Object> getBeanProps(BeanConfig beanConfig) {
 		HashMap<String, Object> result = new HashMap<>();
@@ -58,8 +112,9 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 					mapFields.add(field.getName());
 				}
 				String alias = configAliasses.get(field.getName());
-				if  (alias == null)
+				if (alias == null) {
 					alias = cf.alias();
+				}
 				if (!alias.isEmpty()) {
 					aliases.add(alias);
 					if (Map.class.isAssignableFrom(field.getType())) {
@@ -77,7 +132,7 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 				kernels.push(kernel);
 				kernel = kernel.getParent();
 			}
-			while((kernel = kernels.poll()) != null) {
+			while ((kernel = kernels.poll()) != null) {
 				path.add(kernel.getName());
 			}
 
@@ -85,11 +140,12 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 				path.add(beanConfig.getBeanName());
 			}
 
-			for (int i=0; i<=path.size(); i++) {
+			for (int i = 0; i <= path.size(); i++) {
 				StringBuilder sb = new StringBuilder();
-				for (int j=0; j<i; j++) {
-					if (sb.length() != 0)
+				for (int j = 0; j < i; j++) {
+					if (sb.length() != 0) {
 						sb.append("/");
+					}
 					sb.append(path.get(j));
 				}
 				String prefix = sb.toString();
@@ -140,7 +196,6 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 		return configAliasses;
 	}
 
-
 	@Override
 	protected Map<String, Object> getConfiguration(BeanConfig beanConfig) {
 		final HashMap<String, Object> valuesToSet = new HashMap<>();
@@ -160,89 +215,21 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 		return valuesToSet;
 	}
 
-	protected void resolveAliases(BeanConfig beanConfig, Map<String, Object> props, Map<String, Object> valuesToSet) {
-		// Preparing set of properties based on @ConfigField annotation and
-		// aliases
-		Map<String,String> configAliasses = getConfigAliasses(beanConfig);
-		Field[] fields = DependencyManager.getAllFields(beanConfig.getClazz());
-		for (Field field : fields) {
-			final ConfigField cf = field.getAnnotation(ConfigField.class);
-			if (cf != null && !cf.alias().isEmpty() && props.containsKey(cf.alias()) && (this.props != props || cf.allowAliasFromParent())) {
-				final Object value = props.get(cf.alias());
-
-				if (props.containsKey(field)) {
-					if (log.isLoggable(Level.CONFIG))
-						log.config("Alias '" + cf.alias() + "' for property " + beanConfig.getBeanName() + "." + field.getName() + " will not be used, because there is configuration for this property already.");
-					continue;
-				}
-				if (log.isLoggable(Level.CONFIG))
-					log.config("Using alias '" + cf.alias() + "' for property " + beanConfig.getBeanName() + "." + field.getName());
-
-				valuesToSet.put(field.getName(), value);
-			}
-			if (cf != null && configAliasses.containsKey(field.getName())) {
-				String alias = configAliasses.get(field.getName());
-				final Object value = props.get(alias);
-				if (value != null) {
-					valuesToSet.put(field.getName(), value);
-				}
-			}
-		}
+	public Collection<ConfigEntry> getCurrentConfigurations() {
+		return getCurrentConfigurations(true);
 	}
 
-	@Override
-	protected Map<String, BeanDefinition> getBeanDefinitions(Map<String, Object> values) {
-		Map<String, BeanDefinition> beanPropConfigMap = super.getBeanDefinitions(values);
-
-		List<String> keys = new ArrayList<>(values.keySet());
-		Collections.sort(keys);
-		for (String key : keys) {
-			String[] keyParts = key.split("/");
-			if (keyParts.length != 2)
-				continue;
-
-			String beanName = keyParts[0];
-			String action = keyParts[1];
-			Object value = values.get(key);
-
-			BeanDefinition cfg = beanPropConfigMap.get(beanName);
-			switch (action) {
-				case "active":
-				case "class":
-					if (cfg == null) {
-						cfg = new BeanDefinition();
-						cfg.setBeanName(beanName);
-						beanPropConfigMap.put(beanName, cfg);
-					}
-					break;
-				default:
-					if (kernel.isBeanClassRegistered(beanName) && cfg == null) {
-						cfg = new BeanDefinition();
-						cfg.setBeanName(beanName);
-						beanPropConfigMap.put(beanName, cfg);
-					}
-					break;
-			}
-			switch (action) {
-				case "active":
-					cfg.setActive(Boolean.parseBoolean(value.toString()));
-					break;
-				case "class":
-					cfg.setClazzName(value.toString());
-					break;
-				default:
-					break;
-			}
-		}
-
-		return beanPropConfigMap;
-	}
-
-	public Map<String, Object> getCurrentConfigurations() {
-		HashMap<String, Object> result = new HashMap<>();
+	private Collection<ConfigEntry> getCurrentConfigurations(boolean forceInit) {
+		HashSet<ConfigEntry> result = new HashSet<>();
 
 		for (BeanConfig bc : kernel.getDependencyManager().getBeanConfigs()) {
-			final Object bean = kernel.getInstance(bc.getBeanName());
+
+			final Object bean;
+			if (forceInit || bc.getState() == BeanConfig.State.initialized) {
+				bean = kernel.getInstance(bc.getBeanName());
+			} else {
+				bean = null;
+			}
 			final Class<?> cl = bc.getClazz();
 			java.lang.reflect.Field[] fields = DependencyManager.getAllFields(cl);
 			for (java.lang.reflect.Field field : fields) {
@@ -250,9 +237,14 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 				if (cf != null) {
 					String key = bc.getBeanName() + "/" + field.getName();
 					try {
-						Object currentValue = BeanUtils.getValue(bean, field);
+						Object currentValue = bean == null ? null : BeanUtils.getValue(bean, field);
 
-						result.put(key, currentValue);
+						ConfigEntry entry = new ConfigEntry();
+						entry.property = key;
+						entry.value = currentValue;
+						entry.details = cf;
+
+						result.add(entry);
 					} catch (IllegalAccessException | InvocationTargetException e) {
 						e.printStackTrace();
 					}
@@ -269,6 +261,81 @@ public class PropertiesBeanConfigurator extends AbstractBeanConfigurator {
 
 	public void setProperties(Map<String, Object> props) {
 		this.props = props;
+	}
+
+	protected void resolveAliases(BeanConfig beanConfig, Map<String, Object> props, Map<String, Object> valuesToSet) {
+		// Preparing set of properties based on @ConfigField annotation and
+		// aliases
+		Map<String, String> configAliasses = getConfigAliasses(beanConfig);
+		Field[] fields = DependencyManager.getAllFields(beanConfig.getClazz());
+		for (Field field : fields) {
+			final ConfigField cf = field.getAnnotation(ConfigField.class);
+			if (cf != null && !cf.alias().isEmpty() && props.containsKey(cf.alias()) &&
+					(this.props != props || cf.allowAliasFromParent())) {
+				final Object value = props.get(cf.alias());
+
+				if (props.containsKey(field)) {
+					if (log.isLoggable(Level.CONFIG)) {
+						log.config("Alias '" + cf.alias() + "' for property " + beanConfig.getBeanName() + "." +
+										   field.getName() +
+										   " will not be used, because there is configuration for this property already.");
+					}
+					continue;
+				}
+				if (log.isLoggable(Level.CONFIG)) {
+					log.config("Using alias '" + cf.alias() + "' for property " + beanConfig.getBeanName() + "." +
+									   field.getName());
+				}
+
+				valuesToSet.put(field.getName(), value);
+			}
+			if (cf != null && configAliasses.containsKey(field.getName())) {
+				String alias = configAliasses.get(field.getName());
+				final Object value = props.get(alias);
+				if (value != null) {
+					valuesToSet.put(field.getName(), value);
+				}
+			}
+		}
+	}
+
+	public static class ConfigEntry {
+
+		private ConfigField details;
+		private String property;
+		private Object value;
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) {
+				return true;
+			}
+			if (o == null || getClass() != o.getClass()) {
+				return false;
+			}
+
+			ConfigEntry that = (ConfigEntry) o;
+
+			return property.equals(that.property);
+
+		}
+
+		public ConfigField getDetails() {
+			return details;
+		}
+
+		public String getProperty() {
+			return property;
+		}
+
+		public Object getValue() {
+			return value;
+		}
+
+		@Override
+		public int hashCode() {
+			return property.hashCode();
+		}
 	}
 
 }
