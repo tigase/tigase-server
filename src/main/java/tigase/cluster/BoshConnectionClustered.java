@@ -62,8 +62,9 @@ public class BoshConnectionClustered
 	private static final Logger log = Logger.getLogger(BoshConnectionClustered.class
 			.getName());
 
-	//~--- fields ---------------------------------------------------------------
-	
+    private EventHandler clusterEventHandler = null;
+
+
 	@Override
 	protected void onNodeConnected(JID jid) {
 		super.onNodeConnected(jid);
@@ -131,18 +132,32 @@ public class BoshConnectionClustered
         delayPortListening = true;
         log.log(Level.WARNING, "Delaying opening ports of component: {0}", getName());
 
-        EventBusFactory.getInstance().addHandler(CLUSTER_INITIATED_EVENT, CLUSTER_INITIATED_EVENT,
-                new EventHandler() {
-                    @Override
-                    public void onEvent(String name, String xmlns, Element event) {
-                        BoshConnectionClustered.this.connectWaitingTasks();
-                        log.log(Level.WARNING, "Starting listening on ports of component: {0}", BoshConnectionClustered.this.getName());
-                        EventBusFactory.getInstance().removeHandler(CLUSTER_INITIATED_EVENT, CLUSTER_INITIATED_EVENT, this);
-                    }
-                }
-        );
-
         return super.getDefaults(params);
+    }
+
+    @Override
+    public void start() {
+        super.start();
+
+        if (clusterEventHandler == null) {
+            clusterEventHandler = new EventHandler() {
+                @Override
+                public void onEvent(String name, String xmlns, Element event) {
+                    BoshConnectionClustered.this.connectWaitingTasks();
+                    log.log(Level.WARNING, "Starting listening on ports of component: {0}", BoshConnectionClustered.this.getName());
+                    EventBusFactory.getInstance().removeHandler(CLUSTER_INITIATED_EVENT, CLUSTER_INITIATED_EVENT, this);
+                }
+            };
+        }
+
+        EventBusFactory.getInstance().addHandler(CLUSTER_INITIATED_EVENT, CLUSTER_INITIATED_EVENT, clusterEventHandler);
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        EventBusFactory.getInstance().removeHandler(CLUSTER_INITIATED_EVENT,CLUSTER_INITIATED_EVENT, clusterEventHandler);
+        clusterEventHandler = null;
     }
 
 
@@ -156,6 +171,6 @@ public class BoshConnectionClustered
                 log.log(Level.FINE, "Cluster synchronization timed-out, starting pending connections for " + getName());
                 BoshConnectionClustered.this.connectWaitingTasks();
             }
-        }, connectionDelay * 60);
+        }, connectionDelay * 30);
     }
 }

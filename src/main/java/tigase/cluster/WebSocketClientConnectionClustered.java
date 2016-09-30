@@ -69,6 +69,7 @@ public class WebSocketClientConnectionClustered
 	//~--- fields ---------------------------------------------------------------
 
 	private SeeOtherHostIfc see_other_host_strategy = null;
+    private EventHandler clusterEventHandler = null;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -141,19 +142,35 @@ public class WebSocketClientConnectionClustered
         delayPortListening = true;
         log.log(Level.WARNING, "Delaying opening ports of component: {0}", getName());
 
-        EventBusFactory.getInstance().addHandler(CLUSTER_INITIATED_EVENT, CLUSTER_INITIATED_EVENT,
-                new EventHandler() {
-                    @Override
-                    public void onEvent(String name, String xmlns, Element event) {
-                        WebSocketClientConnectionClustered.this.connectWaitingTasks();
-                        log.log(Level.WARNING, "Starting listening on ports of component: {0}",
-                                WebSocketClientConnectionClustered.this.getName());
-                        EventBusFactory.getInstance().removeHandler(CLUSTER_INITIATED_EVENT,CLUSTER_INITIATED_EVENT,this);
-                    }
-                }
-        );
-
         return super.getDefaults(params);
+    }
+
+    @Override
+    public void start() {
+        super.start();
+
+        if (clusterEventHandler == null) {
+            clusterEventHandler = new EventHandler() {
+                @Override
+                public void onEvent(String name, String xmlns, Element event) {
+                    WebSocketClientConnectionClustered.this.connectWaitingTasks();
+                    log.log(Level.WARNING, "Starting listening on ports of component: {0}",
+                            WebSocketClientConnectionClustered.this.getName());
+                    EventBusFactory.getInstance().removeHandler(CLUSTER_INITIATED_EVENT, CLUSTER_INITIATED_EVENT, this);
+                }
+            };
+        }
+
+
+
+        EventBusFactory.getInstance().addHandler(CLUSTER_INITIATED_EVENT, CLUSTER_INITIATED_EVENT, clusterEventHandler);
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        EventBusFactory.getInstance().removeHandler(CLUSTER_INITIATED_EVENT,CLUSTER_INITIATED_EVENT, clusterEventHandler);
+        clusterEventHandler = null;
     }
 
     @Override
@@ -166,6 +183,6 @@ public class WebSocketClientConnectionClustered
                 log.log(Level.FINE, "Cluster synchronization timed-out, starting pending connections for " + getName());
                 WebSocketClientConnectionClustered.this.connectWaitingTasks();
             }
-        }, connectionDelay * 60);
+        }, connectionDelay * 30);
     }
 }

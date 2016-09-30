@@ -26,12 +26,12 @@ package tigase.cluster;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
 
 import tigase.conf.ConfigurationException;
 import tigase.disteventbus.EventBusFactory;
 import tigase.disteventbus.EventHandler;
+import tigase.server.ConnectionManager;
 import tigase.server.ServiceChecker;
 import tigase.server.xmppclient.ClientConnectionManager;
 import tigase.server.xmppclient.SeeOtherHostIfc;
@@ -79,6 +79,8 @@ public class ClientConnectionClustered
 			add(getDefHostName());
 		}
 	};
+
+    private EventHandler clusterEventHandler = null;
 
 	//~--- methods --------------------------------------------------------------
 
@@ -148,18 +150,32 @@ public class ClientConnectionClustered
         delayPortListening = true;
         log.log(Level.WARNING, "Delaying opening ports of component: {0}", getName());
 
-        EventBusFactory.getInstance().addHandler(CLUSTER_INITIATED_EVENT, CLUSTER_INITIATED_EVENT,
-                new EventHandler() {
-                    @Override
-                    public void onEvent(String name, String xmlns, Element event) {
-                        ClientConnectionClustered.this.connectWaitingTasks();
-                        log.log(Level.WARNING, "Starting listening on ports of component: {0}", ClientConnectionClustered.this.getName());
-                        EventBusFactory.getInstance().removeHandler(CLUSTER_INITIATED_EVENT,CLUSTER_INITIATED_EVENT,this);
-                    }
-                }
-        );
-
         return super.getDefaults(params);
+    }
+
+    @Override
+    public void start() {
+        super.start();
+
+        if (clusterEventHandler == null) {
+            clusterEventHandler = new EventHandler() {
+                @Override
+                public void onEvent(String name, String xmlns, Element event) {
+                    ClientConnectionClustered.this.connectWaitingTasks();
+                    log.log(Level.WARNING, "Starting listening on ports of component: {0}", ClientConnectionClustered.this.getName());
+                    EventBusFactory.getInstance().removeHandler(CLUSTER_INITIATED_EVENT, CLUSTER_INITIATED_EVENT, this);
+                }
+            };
+        }
+
+        EventBusFactory.getInstance().addHandler(CLUSTER_INITIATED_EVENT, CLUSTER_INITIATED_EVENT, clusterEventHandler);
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        EventBusFactory.getInstance().removeHandler(CLUSTER_INITIATED_EVENT,CLUSTER_INITIATED_EVENT, clusterEventHandler);
+        clusterEventHandler = null;
     }
 
     @Override
@@ -172,7 +188,7 @@ public class ClientConnectionClustered
                 log.log(Level.FINE, "Cluster synchronization timed-out, starting pending connections for " + getName());
                 ClientConnectionClustered.this.connectWaitingTasks();
             }
-        }, connectionDelay * 60);
+        }, connectionDelay * 30);
 
     }
 }
