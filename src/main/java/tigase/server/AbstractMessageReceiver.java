@@ -29,19 +29,6 @@ package tigase.server;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
-
 import tigase.annotations.TODO;
 import tigase.conf.ConfigurationException;
 import tigase.stats.StatisticType;
@@ -49,6 +36,12 @@ import tigase.stats.StatisticsContainer;
 import tigase.stats.StatisticsList;
 import tigase.util.PatternComparator;
 import tigase.util.PriorityQueueAbstract;
+
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  * This is an archetype for all classes processing user-level packets. The
@@ -450,7 +443,7 @@ public abstract class AbstractMessageReceiver
 	public void addTimerTask(tigase.util.TimerTask task, long delay) {
 		ScheduledFuture<?> future = receiverScheduler.schedule(task, delay, TimeUnit
 				.MILLISECONDS);
-
+		
 		task.setScheduledFuture(future);
 	}
 	
@@ -470,6 +463,58 @@ public abstract class AbstractMessageReceiver
 	public void addTimerTask(TimerTask task, long delay) {
 		receiverTasks.schedule(task, delay);
 	}
+
+	/**
+	 * Method queues and executes timer tasks using ScheduledExecutorService
+	 * which allows using more than one thread for executing tasks. It allows to set
+	 * a timeout to cancel long running tasks
+	 *
+	 * @param task a task implementing {@link tigase.util.TimerTask}
+	 * @param delay in milliseconds delay after which task will be started
+	 * @param timeout in milliseconds after which task will be cancelled disregarding whether it has finished or not
+	 */
+	public void addTimerTaskWithTimeout( final tigase.util.TimerTask task, long delay, long timeout ) {
+		receiverScheduler.schedule( new tigase.util.TimerTask() {
+			@Override
+			public void run() {
+				if ( log.isLoggable( Level.FINEST ) ){
+					log.log( Level.FINEST, "Cancelling tigase task (timeout): " + task );
+				}
+				if ( task != null ){
+					task.cancel( true );
+				}
+			}
+		}, timeout, TimeUnit.MILLISECONDS );
+
+		addTimerTask( task, delay );
+	}
+
+	/**
+	 * Creates and executes a periodic action that becomes enabled first after the given initial delay, and subsequently
+	 * with the given period; please refer to {@link ScheduledExecutorService#scheduleAtFixedRate} javadoc for details.
+	 * It utilizes Tigase {@link tigase.util.TimerTask} and allows setting a timeout to cancel long running tasks
+	 *
+	 * @param task a task implementing {@link tigase.util.TimerTask}
+	 * @param delay in milliseconds, the time to delay first execution
+	 * @param period in milliseconds, the period between successive executions
+	 * @param timeout in milliseconds after which task will be cancelled disregarding whether it has finished or not
+	 */
+	public void addTimerTaskWithTimeout( final tigase.util.TimerTask task, long delay, long period, long timeout ) {
+		receiverScheduler.schedule( new tigase.util.TimerTask() {
+			@Override
+			public void run() {
+				if ( log.isLoggable( Level.FINEST ) ){
+					log.log( Level.FINEST, "Cancelling tigase task (timeout): " + task );
+				}
+				if ( task != null ){
+					task.cancel( true );
+				}
+			}
+		}, timeout, TimeUnit.MILLISECONDS );
+
+		addTimerTask( task, delay, period );
+	}
+
 
 	/**
 	 * Helper method used in statistics to find uneven distribution of packet processing
@@ -746,7 +791,7 @@ public abstract class AbstractMessageReceiver
 	 * @return a value of <code>int</code>
 	 */
 	public int schedulerThreads() {
-		return 1;
+		return 2;
 	}
 
 	@Override

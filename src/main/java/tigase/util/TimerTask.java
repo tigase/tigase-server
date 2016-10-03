@@ -21,6 +21,8 @@
 package tigase.util;
 
 import java.util.concurrent.ScheduledFuture;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * TimerTask class is basic implementation of java.util.TimerTask class which
@@ -29,7 +31,10 @@ import java.util.concurrent.ScheduledFuture;
 public abstract class TimerTask implements Runnable {
 
 	private ScheduledFuture<?> future = null;
-	
+
+	private static final Logger log = Logger.getLogger(TimerTask.class.getName());
+
+
 	public void setScheduledFuture(ScheduledFuture<?> future) {
 		this.future = future;
 	}
@@ -39,9 +44,17 @@ public abstract class TimerTask implements Runnable {
 	}
 	
 	public void cancel() {
-		if (future != null) {
-			future.cancel(false);
+		cancel(false);
+	}
+
+	public void cancel(boolean mayInterruptIfRunning) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Cancelling tigase task, mayInterruptIfRunning: {0}, done: {1}, cancelled: {2}, future: {3}",
+					new Object[] {mayInterruptIfRunning, future.isDone(), future.isCancelled(), future});
+		}
+
+		if (future != null && !future.isDone()) {
+			future.cancel(mayInterruptIfRunning);
 		}
 	}
-	
 }

@@ -49,6 +49,7 @@ import tigase.sys.TigaseRuntime;
 import tigase.util.Algorithms;
 import tigase.util.TigaseStringprepException;
 import tigase.util.TimeUtils;
+import tigase.util.TimerTask;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 
@@ -204,6 +205,20 @@ public class ClusterConnectionManager
 	private CommandListener sendPacket = new SendPacket(ClusterControllerIfc
 			.DELIVER_CLUSTER_PACKET_CMD);
 	private boolean nonClusterTrafficAllowed = true;
+
+	private final TimerTask repoReloadTimerTask = new TimerTask() {
+		@Override
+		public void run() {
+			try {
+				if (repo != null ) {
+					repo.reload();
+				}
+			} catch (TigaseDBException ex) {
+				log.log(Level.WARNING, "Items reloading failed", ex);
+			}
+		}
+	};
+
 
 	//~--- methods --------------------------------------------------------------
 
@@ -457,13 +472,17 @@ public class ClusterConnectionManager
 		// TODO: handle this somehow
 	}
 
-	@Override
-	public void serviceStarted(XMPPIOService<Object> serv) {
-		try {
-			repo.reload();
-		} catch ( TigaseDBException ex ) {
-			log.log( Level.WARNING, "Items reloading failed", ex );
+
+	public int schedulerThreads() {
+		return 4;
+	}
+
+    @Override
+    public void serviceStarted(XMPPIOService<Object> serv) {
+		if (!repoReloadTimerTask.isScheduled()) {
+			addTimerTaskWithTimeout(repoReloadTimerTask, 0, 15);
 		}
+
 		ServiceConnectedTimerTask task = new ServiceConnectedTimerTask(serv);
 
 		serv.getSessionData().put(SERVICE_CONNECTED_TASK_FUTURE, task);
