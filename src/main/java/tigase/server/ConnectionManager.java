@@ -26,7 +26,17 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.annotations.TODO;
+import tigase.conf.ConfigurationException;
+import tigase.net.*;
+import tigase.server.script.CommandIfc;
+import tigase.server.xmppclient.XMPPIOProcessor;
+import tigase.stats.StatisticsList;
+import tigase.util.DataTypes;
+import tigase.xml.Element;
+import tigase.xmpp.*;
 
+import javax.script.Bindings;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
@@ -35,26 +45,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.script.Bindings;
-
-import tigase.annotations.TODO;
-import tigase.conf.ConfigurationException;
-import tigase.net.*;
-
-import tigase.server.script.CommandIfc;
-import tigase.server.xmppclient.XMPPIOProcessor;
-import tigase.stats.StatisticsList;
-import tigase.util.DataTypes;
-import tigase.xml.Element;
-
-import tigase.xmpp.JID;
-import tigase.xmpp.StreamError;
-import tigase.xmpp.XMPPDomBuilderHandler;
-import tigase.xmpp.XMPPIOService;
-
 import static tigase.xmpp.XMPPIOService.DOM_HANDLER;
-
-import tigase.xmpp.XMPPIOServiceListener;
 
 
 /**
@@ -143,6 +134,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	/** Field description */
 	protected static final String PORT_IFC_PROP_KEY = "ifc";
+
+	protected static final String PORT_LISTENING_DELAY_KEY = "port-delay-listening";
+	protected static final boolean PORT_LISTENING_DELAY_DEF = false;
 
 	/** Field description */
 	protected static final String PORT_KEY = "port-no";
@@ -832,6 +826,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		props.put(XMPP_ACK_PROP_KEY, xmpp_ack);
 		props.put(MAX_INACTIVITY_TIME, getMaxInactiveTime() / SECOND);
 
+		props.put(PORT_LISTENING_DELAY_KEY,PORT_LISTENING_DELAY_DEF);
+
 		return props;
 	}
 
@@ -952,6 +948,15 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		if ( props.get( WATCHDOG_PING_TYPE_KEY ) != null ){
 			String value = String.valueOf( props.get( WATCHDOG_PING_TYPE_KEY ) );
 			watchdogPingType = WATCHDOG_PING_TYPE.valueOf( value.toUpperCase() );
+		}
+		if (props.get(PORT_LISTENING_DELAY_KEY) != null) {
+			log.log(Level.CONFIG, "Setting delaying opening ports of component: {0} to: {1} (was: {2})",
+					new Object[]{getName(), props.get(PORT_LISTENING_DELAY_KEY), delayPortListening});
+			delayPortListening = (Boolean) props.get(PORT_LISTENING_DELAY_KEY);
+
+			if (delayPortListening) {
+				log.log(Level.WARNING, "Delaying opening ports of component: {0}", getName());
+			}
 		}
 
 		if (props.size() == 1) {

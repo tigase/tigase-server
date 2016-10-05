@@ -27,23 +27,21 @@ package tigase.cluster;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.cluster.api.ClusteredComponentIfc;
-
+import tigase.conf.Configurable;
 import tigase.conf.ConfigurationException;
 import tigase.disteventbus.EventBusFactory;
 import tigase.disteventbus.EventHandler;
-import tigase.server.bosh.BoshConnectionManager;
 import tigase.server.ServiceChecker;
+import tigase.server.XMPPServer;
+import tigase.server.bosh.BoshConnectionManager;
 import tigase.server.xmppclient.SeeOtherHostIfc;
-
 import tigase.util.TimerTask;
 import tigase.xml.Element;
 import tigase.xmpp.JID;
 import tigase.xmpp.XMPPIOService;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -127,13 +125,34 @@ public class BoshConnectionClustered
 		return see_other_host_strategy;
 	}
 
-    @Override
-    public Map<String, Object> getDefaults(Map<String, Object> params) {
-        delayPortListening = true;
-        log.log(Level.WARNING, "Delaying opening ports of component: {0}", getName());
+	@Override
+	public Map<String, Object> getDefaults(Map<String, Object> params) {
+		Map<String, Object> props = super.getDefaults(params);
 
-        return super.getDefaults(params);
-    }
+		String delayPortListeningPorp = System.getProperty("client-" + PORT_LISTENING_DELAY_KEY);
+		if (delayPortListeningPorp != null) {
+			props.put(PORT_LISTENING_DELAY_KEY, Boolean.parseBoolean(delayPortListeningPorp));
+		} else {
+			props.put(PORT_LISTENING_DELAY_KEY, true);
+		}
+
+		return props;
+	}
+
+	@Override
+	public void setProperties(Map<String, Object> props) throws ConfigurationException {
+
+		Configurable component = XMPPServer.getConfigurator().getComponent("cl-comp");
+		if (component != null && component instanceof ClusterConnectionManager) {
+			ClusterConnectionManager clusterConnectionManager = (ClusterConnectionManager)component;
+			if (clusterConnectionManager.isInitialClusterConnectedDone()) {
+				props.put(PORT_LISTENING_DELAY_KEY,false);
+				log.log(Level.WARNING, "Skip delaying opening ports of component: {0} - clustering is already established", getName());
+			}
+		}
+
+		super.setProperties(props);
+	}
 
     @Override
     public void start() {
@@ -165,12 +184,14 @@ public class BoshConnectionClustered
     public void initializationCompleted() {
         super.initializationCompleted();
 
-        addTimerTask(new TimerTask() {
-            @Override
-            public void run() {
-                log.log(Level.FINE, "Cluster synchronization timed-out, starting pending connections for " + getName());
-                BoshConnectionClustered.this.connectWaitingTasks();
-            }
-        }, connectionDelay * 30);
+		if (delayPortListening) {
+			addTimerTask(new TimerTask() {
+				@Override
+				public void run() {
+					log.log(Level.FINE, "Cluster synchronization timed-out, starting pending connections for " + getName());
+					BoshConnectionClustered.this.connectWaitingTasks();
+				}
+			}, connectionDelay * 30);
+		}
     }
 }

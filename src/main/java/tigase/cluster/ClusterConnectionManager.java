@@ -37,6 +37,7 @@ import tigase.db.comp.ComponentRepository;
 import tigase.db.comp.RepositoryChangeListenerIfc;
 import tigase.disteventbus.EventBus;
 import tigase.disteventbus.EventBusFactory;
+import tigase.disteventbus.EventHandler;
 import tigase.net.ConnectionType;
 import tigase.net.SocketType;
 import tigase.osgi.ModulesManagerImpl;
@@ -209,6 +210,8 @@ public class ClusterConnectionManager
 	private boolean initialClusterConnectedDone = false;
 	private boolean nonClusterTrafficAllowed = true;
 
+	private EventHandler clusterEventHandler = null;
+
 	private final TimerTask repoReloadTimerTask = new TimerTask() {
 		@Override
 		public void run() {
@@ -285,6 +288,10 @@ public class ClusterConnectionManager
 		super.initBindings(binds);
 		binds.put("clusterCM", this);
 		binds.put(ComponentRepository.COMP_REPO_BIND, repo);
+	}
+
+	boolean isInitialClusterConnectedDone() {
+		return initialClusterConnectedDone;
 	}
 
 	@Override
@@ -899,6 +906,35 @@ public class ClusterConnectionManager
 
 
 		super.setProperties(props);
+	}
+
+
+	@Override
+	public void start() {
+		super.start();
+
+		if (clusterEventHandler == null) {
+			clusterEventHandler = new EventHandler() {
+				@Override
+				public void onEvent(String name, String xmlns, Element event) {
+					if (log.isLoggable(Level.FINE)) {
+						log.log(Level.FINE, "Setting initialClusterConnectedDone to true (was: {0})", initialClusterConnectedDone);
+					}
+
+					initialClusterConnectedDone = true;
+					EventBusFactory.getInstance().removeHandler(CLUSTER_INITIATED_EVENT, CLUSTER_INITIATED_EVENT, this);
+				}
+			};
+		}
+
+		EventBusFactory.getInstance().addHandler(CLUSTER_INITIATED_EVENT, CLUSTER_INITIATED_EVENT, clusterEventHandler);
+	}
+
+	@Override
+	public void stop() {
+		super.stop();
+		EventBusFactory.getInstance().removeHandler(CLUSTER_INITIATED_EVENT,CLUSTER_INITIATED_EVENT, clusterEventHandler);
+		clusterEventHandler = null;
 	}
 
 	//~--- methods --------------------------------------------------------------
