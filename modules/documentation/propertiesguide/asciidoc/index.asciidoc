@@ -152,3 +152,5 @@ include::text/Properties_Guide_72_-_--watchdog_timeout.asciidoc[]
 include::text/Properties_Guide_74_-_--ws-allow-unmasked-frames.asciidoc[]
 
 include::text/Properties_Guide_73_-_-config-type.asciidoc[]
+
+include::text/Properties_Guide_75_-_--client-port-delay-listening.asciidoc[]
