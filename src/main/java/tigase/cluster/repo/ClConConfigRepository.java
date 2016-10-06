@@ -26,9 +26,12 @@ package tigase.cluster.repo;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import tigase.cluster.ClusterConnectionManager;
 import tigase.db.DBInitException;
 import tigase.db.comp.ConfigRepository;
+import tigase.eventbus.EventBus;
 import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.UnregisterAware;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.sys.ShutdownHook;
@@ -55,11 +58,8 @@ public class ClConConfigRepository
 
 	private static final Logger log = Logger.getLogger(ClConConfigRepository.class.getName());
 
-	/** Field description */
 	public static final String AUTORELOAD_INTERVAL_PROP_KEY = "repo-autoreload-interval";
 	public static final String AUTO_REMOVE_OBSOLETE_ITEMS_PROP_KEY = "repo-auto-remove-obsolete-items";
-
-	/** Field description */
 	public static final long AUTORELOAD_INTERVAL_PROP_VAL = 15;
 
 	//~--- fields ---------------------------------------------------------------
@@ -68,6 +68,9 @@ public class ClConConfigRepository
 	protected boolean auto_remove_obsolete_items = true;
 	protected long lastReloadTime = 0;
 	protected long lastReloadTimeFactor = 10;
+
+	@Inject
+	private EventBus eventBus;
 
 	public ClConConfigRepository() {
 		autoReloadInterval = AUTORELOAD_INTERVAL_PROP_VAL;
@@ -79,6 +82,8 @@ public class ClConConfigRepository
 			addItem(item);
 		}
 	}
+
+    protected boolean firstLoadDone = false;
 
 	@Override
 	public void destroy() {
@@ -119,18 +124,38 @@ public class ClConConfigRepository
 	public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
 		// Nothing to do
 	}
-	
+
 	@Override
 	public void reload() {
 		super.reload();
 
-		String          host = DNSResolverFactory.getInstance().getDefaultHost();
+        String host = DNSResolverFactory.getInstance().getDefaultHost();
+
+        // we check if we already realoded repo from repository and have all items (own item will have
+        // correct update time), if so we set flag that first load was made and if there was only one item
+        // we send even that cluster was initiated
+        if (!firstLoadDone) {
+            if (log.isLoggable(Level.FINEST)) {
+                log.log(Level.FINEST, "First Cluster repository reload done: {0}, items size: {1}, last updated own item: {2}",
+                        new Object[]{firstLoadDone, items.size(), items.get(host).getLastUpdate()});
+            }
+
+            if (items.get(host) != null && items.get(host).getLastUpdate() > 0 ) {
+                firstLoadDone = true;
+
+                if (items.size() == 1) {
+                    eventBus.fire(new ClusterConnectionManager.ClusterInitializedEvent());
+                }
+
+            }
+        }
+
 		ClusterRepoItem item = getItem(host);
 		try {
 			item = ( item != null ) ? (ClusterRepoItem)(item.clone()) : null;
 		} catch ( CloneNotSupportedException ex ) {
 			if ( log.isLoggable( Level.FINEST ) ){
-				log.log( Level.SEVERE, "Clonning of ClusterRepoItem has failed", ex );
+				log.log( Level.SEVERE, "Cloning of ClusterRepoItem has failed", ex );
 			}
 		}
 
@@ -257,4 +282,5 @@ public class ClConConfigRepository
 		TigaseRuntime.getTigaseRuntime().removeShutdownHook(this);
 		super.beforeUnregister();
 	}
+
 }

@@ -77,7 +77,7 @@ public class SeeOtherHostDB extends SeeOtherHostHashed {
 					+ " where tig_users.uid = " + SEE_OTHER_HOST_TABLE + "." + USER_ID;
 
 	private static final String CREATE_STATS_TABLE = "create table " + SEE_OTHER_HOST_TABLE
-			+ " ( " + SERIAL_ID + " serial," + USER_ID + " bigint NOT NULL, "
+			+ " ( " + SERIAL_ID + " serial," + USER_ID + " bigint unsigned NOT NULL, "
 			+ NODE_ID + " varchar(2049) NOT NULL, " + " primary key (" + SERIAL_ID + "), "
 			+ " constraint tig_see_other_host_constr foreign key (" + USER_ID
 			+ ") references tig_users (" + USER_ID + ")" + ")";

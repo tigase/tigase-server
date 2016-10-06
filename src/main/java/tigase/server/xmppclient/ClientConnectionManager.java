@@ -110,7 +110,7 @@ public class ClientConnectionManager
 	private final ClientTrustManagerFactory clientTrustManagerFactory =
 			new ClientTrustManagerFactory();
 	@Inject
-	private EventBus eventBus;
+	protected EventBus eventBus;
 	private boolean tlsWantClientAuthEnabled = TLS_WANT_CLIENT_AUTH_ENABLED_DEF;
 	private final ShutdownTask shutdownTask = new ShutdownTask();
 

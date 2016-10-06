@@ -27,12 +27,14 @@ package tigase.cluster;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.cluster.api.ClusteredComponentIfc;
+import tigase.eventbus.EventListener;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.BeanSelector;
 import tigase.kernel.core.Kernel;
 import tigase.server.ServiceChecker;
 import tigase.server.xmppclient.ClientConnectionManager;
 import tigase.server.xmppclient.SeeOtherHostIfc;
+import tigase.util.TimerTask;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.XMPPIOService;
@@ -41,8 +43,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Describe class ClientConnectionClustered here.
@@ -72,6 +72,12 @@ public class ClientConnectionClustered
 			add(getDefHostName());
 		}
 	};
+
+    private EventListener<ClusterConnectionManager.ClusterInitializedEvent> clusterEventHandler = null;
+
+	public ClientConnectionClustered() {
+		delayPortListening = System.getProperty("client-" + PORT_LISTENING_DELAY_KEY) == null ? true : Boolean.getBoolean("client-" + PORT_LISTENING_DELAY_KEY);
+	}
 
 	//~--- methods --------------------------------------------------------------
 
@@ -136,4 +142,41 @@ public class ClientConnectionClustered
 		return see_other_host_strategy;
 	}
 
+    @Override
+    public void start() {
+        super.start();
+
+        if (clusterEventHandler == null) {
+            clusterEventHandler = (ClusterConnectionManager.ClusterInitializedEvent event) -> {
+				ClientConnectionClustered.this.connectWaitingTasks();
+				log.log(Level.WARNING, "Starting listening on ports of component: {0}", ClientConnectionClustered.this.getName());
+				eventBus.removeListener(clusterEventHandler);
+            };
+        }
+
+        eventBus.addListener(ClusterConnectionManager.ClusterInitializedEvent.class, clusterEventHandler);
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+		eventBus.removeListener(clusterEventHandler);
+        clusterEventHandler = null;
+    }
+
+    @Override
+    public void initializationCompleted() {
+        super.initializationCompleted();
+
+		if (delayPortListening) {
+			addTimerTask(new TimerTask() {
+				@Override
+				public void run() {
+					log.log(Level.FINE, "Cluster synchronization timed-out, starting pending connections for " + getName());
+					ClientConnectionClustered.this.connectWaitingTasks();
+				}
+			}, connectionDelay * 30);
+		}
+
+    }
 }

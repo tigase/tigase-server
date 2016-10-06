@@ -21,6 +21,9 @@
 
 package tigase.eventbus.impl;
 
+import tigase.eventbus.*;
+import tigase.xml.Element;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -28,9 +31,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import tigase.eventbus.*;
-import tigase.xml.Element;
 
 public class EventBusImplementation implements EventBus {
 
@@ -303,6 +303,8 @@ public class EventBusImplementation implements EventBus {
 	}
 
 	public <T> void removeListener(tigase.eventbus.EventListener<T> listener) {
+		if (listener == null)
+			return;
 		AbstractListenerHandler handler = new ObjectEventsListenerHandler(null, null, listener);
 		removeHandler(handler);
 	}

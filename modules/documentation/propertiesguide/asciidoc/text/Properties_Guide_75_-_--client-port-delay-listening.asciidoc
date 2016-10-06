@@ -1,0 +1,34 @@
+[[clusterPortDelayListening]]
+= --client-port-delay-listening
+:date: 2016-10-05 10:30
+
+:toc:
+:numbered:
+:website: http://tigase.net/
+
+*Default value:* `true`
+
+*Example:* `--client-port-delay-listening=true`
+
+*Possible values:* `true`, `false`
+
+*Description:* The property allows to enabled or disable delaying of listening for client connections *in cluster mode* until the cluster is correctly connected.
+
+In cluster mode, in order to ensure correct user status broadcast, we are delaying opening client ports (components: `c2s`, `ws2s`, `bosh`) and enable those only after cluster is fully and correctly connected (i.e. either there is only single node or in case of multiple nodes all nodes connected correctly).
+
+It's possible to enable/disable this on per-component basis with the following configuration:
+[code,bosh]
+------
+bosh/port-delay-listening[B]=true
+c2s/port-delay-listening[B]=true
+ws2s/port-delay-listening[B]=true
+------
+
+Maximum delay time depends on the component and it's multiplication of `ConnectionManager` default connection delay times `30s` - in case of client connection manager this delay equals 60s
+
+[NOTE]
+====
+Only applicable in *Cluster Mode*!
+====
+
+*Available since:* 7.1.0

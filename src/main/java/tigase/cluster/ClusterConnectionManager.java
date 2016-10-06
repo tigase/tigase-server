@@ -56,6 +56,7 @@ import tigase.util.Algorithms;
 import tigase.util.ReflectionHelper;
 import tigase.util.TigaseStringprepException;
 import tigase.util.TimeUtils;
+import tigase.util.TimerTask;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.JID;
@@ -224,6 +225,22 @@ public class ClusterConnectionManager
 			.DELIVER_CLUSTER_PACKET_CMD);
 	@ConfigField(desc = "Allow non cluster traffic over cluster connection", alias = NON_CLUSTER_TRAFFIC_ALLOWED_PROP_KEY)
 	private boolean nonClusterTrafficAllowed = true;
+	private boolean initialClusterConnectedDone = false;
+
+	private tigase.eventbus.EventListener<ClusterInitializedEvent> clusterEventHandler = null;
+
+	private final TimerTask repoReloadTimerTask = new TimerTask() {
+		@Override
+		public void run() {
+			try {
+				if (repo != null ) {
+					repo.reload();
+				}
+			} catch (TigaseDBException ex) {
+				log.log(Level.WARNING, "Items reloading failed", ex);
+			}
+		}
+	};
 
 	public ClusterConnectionManager() {
 		super();
@@ -314,6 +331,10 @@ public class ClusterConnectionManager
 		super.initBindings(binds);
 		binds.put("clusterCM", this);
 		binds.put(ComponentRepository.COMP_REPO_BIND, repo);
+	}
+
+	boolean isInitialClusterConnectedDone() {
+		return initialClusterConnectedDone;
 	}
 
 	@Override
@@ -504,13 +525,17 @@ public class ClusterConnectionManager
 		// TODO: handle this somehow
 	}
 
-	@Override
-	public void serviceStarted(XMPPIOService<Object> serv) {
-		try {
-			repo.reload();
-		} catch ( TigaseDBException ex ) {
-			log.log( Level.WARNING, "Items reloading failed", ex );
+
+	public int schedulerThreads() {
+		return 4;
+	}
+
+    @Override
+    public void serviceStarted(XMPPIOService<Object> serv) {
+		if (!repoReloadTimerTask.isScheduled()) {
+			addTimerTaskWithTimeout(repoReloadTimerTask, 0, 15);
 		}
+
 		ServiceConnectedTimerTask task = new ServiceConnectedTimerTask(serv);
 
 		serv.getSessionData().put(SERVICE_CONNECTED_TASK_FUTURE, task);
@@ -752,6 +777,30 @@ public class ClusterConnectionManager
 		clusterController.setCommandListener(sendPacket);
 	}
 
+	@Override
+	public void start() {
+		super.start();
+
+		if (clusterEventHandler == null) {
+			clusterEventHandler = (ClusterInitializedEvent event) -> {
+				if (log.isLoggable(Level.FINE)) {
+					log.log(Level.FINE, "Setting initialClusterConnectedDone to true (was: {0})", initialClusterConnectedDone);
+				}
+				initialClusterConnectedDone = true;
+				eventBus.removeListener(clusterEventHandler);
+			};
+		}
+
+		eventBus.addListener(ClusterInitializedEvent.class, clusterEventHandler);
+	}
+
+	@Override
+	public void stop() {
+		super.stop();
+		eventBus.removeListener(clusterEventHandler);
+		clusterEventHandler = null;
+	}
+
 	//~--- methods --------------------------------------------------------------
 	private void sendEvent( REPO_ITEM_UPDATE_TYPE action, ClusterRepoItem item ) {
 
@@ -797,6 +846,25 @@ public class ClusterConnectionManager
 			log.log(Level.INFO, "Connected to: {0}", addr);
 			updateServiceDiscoveryItem(addr, addr, XMLNS + " connected", true);
 			clusterController.nodeConnected(addr);
+		}
+
+		try {
+            // initial cluster connection done
+            int connectedSize = getNodesConnected().size();
+            int repoSize = repo.allItems().size();
+            if (log.isLoggable(Level.FINEST)) {
+                log.log(Level.FINEST, "All repo nodes connected! Connected: {0}, repo size: {1}, initialClusterConnectedDone: {2}",
+                        new Object[]{connectedSize, repoSize, initialClusterConnectedDone});
+            }
+
+			if (!initialClusterConnectedDone &&
+                    (repoSize <= 1 || repoSize > 1 && connectedSize >= repoSize - 1)) {
+                initialClusterConnectedDone = true;
+
+				eventBus.fire(new ClusterInitializedEvent());
+			}
+		} catch (TigaseDBException e) {
+            log.log(Level.WARNING, "There was an error while reading size of cluster repository", e);
 		}
 
 		ServiceConnectedTimerTask task = (ServiceConnectedTimerTask) serv.getSessionData()
@@ -1136,6 +1204,14 @@ public class ClusterConnectionManager
 			return System.currentTimeMillis() - lastTransfer;
 		}
 		
+	}
+
+	public static class ClusterInitializedEvent {
+
+		public ClusterInitializedEvent() {
+
+		}
+
 	}
 
 	@Bean(name = "clConRepositoryBean", parent = ClusterConnectionManager.class)

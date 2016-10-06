@@ -168,7 +168,11 @@ public abstract class TigaseRuntime {
 			sb.append(gcBean.getName()).append(';');
 			sb.append("count=").append(gcBean.getCollectionCount()).append(';');
 			sb.append("time=").append(gcBean.getCollectionTime()).append(';');
-			sb.append("avgTime=").append(gcBean.getCollectionTime() / gcBean.getCollectionCount()).append(';');
+			if (gcBean.getCollectionCount() > 0) {
+				sb.append("avgTime=").append(gcBean.getCollectionTime() / gcBean.getCollectionCount()).append(';');
+			} else {
+				sb.append("avgTime=").append(0).append(';');
+			}
 			sb.append("pools=").append(Arrays.asList(gcBean.getMemoryPoolNames()));
 			sb.append('}');
 		}

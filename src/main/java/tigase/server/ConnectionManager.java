@@ -26,7 +26,6 @@ package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-
 import tigase.annotations.TODO;
 import tigase.io.SSLContextContainerIfc;
 import tigase.kernel.beans.*;
@@ -139,6 +138,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	/** Field description */
 	protected static final String PORT_IFC_PROP_KEY = "ifc";
+
+	protected static final String PORT_LISTENING_DELAY_KEY = "port-delay-listening";
+	protected static final boolean PORT_LISTENING_DELAY_DEF = false;
 
 	/** Field description */
 	protected static final String PORT_KEY = "port-no";
@@ -271,6 +273,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	private LIMIT_ACTION xmppLimitAction = LIMIT_ACTION.DISCONNECT;
 	@ConfigField(desc = "Watchdog ping type")
 	protected WATCHDOG_PING_TYPE watchdogPingType = WATCHDOG_PING_TYPE.WHITESPACE;
+    protected boolean delayPortListening = PORT_LISTENING_DELAY_DEF;
 
 	@ConfigField(desc = "Traffic throttling")
 	protected String trafficThrottling = ST_TRAFFIC_THROTTLING_PROP_VAL;
@@ -424,9 +427,29 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		}
 		super.initializationCompleted();
 		initializationCompleted = true;
-	}
 
-	@Override
+        if (!delayPortListening) {
+            connectWaitingTasks();
+        }
+    }
+
+    protected void connectWaitingTasks() {
+        if (log.isLoggable(Level.FINER)) {
+            log.log(Level.FINER, "Connecting waitingTasks: {0}",
+                    new Object[]{waitingTasks});
+        }
+
+        for (Map<String, Object> params : waitingTasks) {
+            reconnectService(params, connectionDelay);
+        }
+        waitingTasks.clear();
+        if (null != watchdog && Thread.State.NEW.equals(watchdog.getState())) {
+            watchdog.start();
+        }
+        delayPortListening = false;
+    }
+
+    @Override
 	public void packetsReady(IO serv) throws IOException {
 
 		// Under a high load data, especially lots of packets on a single
@@ -862,12 +885,18 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	 * @param conn
 	 */
 	protected void addWaitingTask(Map<String, Object> conn) {
-		if (initializationCompleted) {
-			reconnectService(conn, connectionDelay);
-		} else {
-			waitingTasks.add(conn);
-		}
-	}
+
+        if (log.isLoggable(Level.FINER)) {
+            log.log(Level.FINER, "Adding waiting task: {0}, initializationCompleted: {1}, delayPortListening: {2}, to: {3}",
+                    new Object[]{conn, initializationCompleted, delayPortListening, waitingTasks});
+        }
+
+        if (initializationCompleted && !delayPortListening) {
+            reconnectService(conn, connectionDelay);
+        } else {
+            waitingTasks.add(conn);
+        }
+    }
 
 	/**
 	 * Method description

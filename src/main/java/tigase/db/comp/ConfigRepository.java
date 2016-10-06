@@ -97,7 +97,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 						log.log(Level.SEVERE, "exception during reload of config repository items", ex);
 					}
 				}
-			}, interval, interval);
+			}, 5 * 1000, interval);
 		}
 	}
 
