@@ -311,7 +311,9 @@ public class DefaultTypesConverter
 		if (value == null) {
 			return null;
 		}
-		if (value.getClass().isEnum()) {
+		if (value instanceof Class<?>) {
+			return ((Class<?>) value).getName();
+		} else if (value.getClass().isEnum()) {
 			return ((Enum) value).name();
 		} else if (value instanceof Collection) {
 			StringBuilder sb = new StringBuilder();
