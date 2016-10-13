@@ -28,6 +28,7 @@ package tigase.server;
 
 import tigase.conf.ConfigurationException;
 import tigase.conf.ConfiguratorAbstract;
+import tigase.conf.MonitoringBeanIfc;
 import tigase.disco.XMPPService;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
@@ -103,6 +104,9 @@ public class MessageRouter
 
 	@Inject
 	private Set<ServerComponent> componentsAll;
+
+	@Inject(nullAllowed = true)
+	private MonitoringBeanIfc monitoringBean;
 
 	public void setComponentsAll(Set<ServerComponent> components) {
 		if (components == null)

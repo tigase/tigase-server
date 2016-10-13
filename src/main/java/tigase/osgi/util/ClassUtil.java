@@ -391,7 +391,7 @@ public class ClassUtil {
                                                 classes_set.add(c);
                                         } // end of if (!Modifier.isAbstract(mod) && !Modifier.isInterface(mod))
                                 }
-                                catch (ClassNotFoundException ex) {
+                                catch (ClassNotFoundException|NoClassDefFoundError ex) {
                                         Logger.getLogger(ClassUtil.class.getCanonicalName()).warning("Could not find class = " + clsName);
                                 }
                         }

@@ -28,6 +28,8 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import tigase.conf.ConfiguratorAbstract;
 import tigase.server.XMPPServer;
 
+import javax.management.MBeanServer;
+import java.lang.management.ManagementFactory;
 import java.util.Hashtable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,6 +43,9 @@ public class Activator implements BundleActivator {
         @Override
         public void start(BundleContext bc) throws Exception {
                 try {
+                        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+                        bc.registerService(MBeanServer.class.getName(), mbs, null);
+
                         bundle = bc.getBundle();
                         
                         if (!SLF4JBridgeHandler.isInstalled()) {

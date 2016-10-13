@@ -155,18 +155,6 @@ public class ClientConnectionClustered
         }
 
         eventBus.addListener(ClusterConnectionManager.ClusterInitializedEvent.class, clusterEventHandler);
-    }
-
-    @Override
-    public void stop() {
-        super.stop();
-		eventBus.removeListener(clusterEventHandler);
-        clusterEventHandler = null;
-    }
-
-    @Override
-    public void initializationCompleted() {
-        super.initializationCompleted();
 
 		if (delayPortListening) {
 			addTimerTask(new TimerTask() {
@@ -177,6 +165,12 @@ public class ClientConnectionClustered
 				}
 			}, connectionDelay * 30);
 		}
+    }
 
+    @Override
+    public void stop() {
+        super.stop();
+		eventBus.removeListener(clusterEventHandler);
+        clusterEventHandler = null;
     }
 }
