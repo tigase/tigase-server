@@ -57,5 +57,9 @@ public class CounterValue {
 	public long getValue() {
 		return counter;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "CounterValue{" + "name='" + name + '\'' + ", counter=" + counter + '}';
+	}
 }
