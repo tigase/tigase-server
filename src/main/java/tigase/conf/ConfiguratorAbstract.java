@@ -284,8 +284,8 @@ public abstract class ConfiguratorAbstract
 		Configurable component = getComponent(item.getCompName());
 
 		if (component != null) {
-			Map<String, Object> prop = Collections.singletonMap(item.getConfigKey(), item
-					.getConfigVal());
+			Map<String, Object> prop = new HashMap<>();
+			prop.put(item.getConfigKey(), item.getConfigVal());
 
 			try {
 				component.setProperties(prop);
