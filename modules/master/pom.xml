@@ -212,31 +212,18 @@
 				</executions>
 			</plugin>
 		</plugins>
-
-		<extensions>
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-ssh-external</artifactId>
-				<version>2.10</version>
-			</extension>
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-ssh</artifactId>
-				<version>2.10</version>
-			</extension>
-		</extensions>
 	</build>
 
 	<repositories>
 		<repository>
 			<id>tigase</id>
 			<name>Tigase repository</name>
-			<url>http://maven.tigase.org</url>
+			<url>http://maven-repo.tigase.org/repository/release</url>
 		</repository>
 		<repository>
 			<id>tigase-snapshot</id>
 			<name>Tigase repository</name>
-			<url>http://build.xmpp-test.net/maven/</url>
+			<url>http://maven-repo.tigase.org/repository/snapshot</url>
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
@@ -246,12 +233,12 @@
 		<repository>
 			<id>tigase</id>
 			<name>Tigase repository</name>
-			<url>scp://maven.tigase.org:/home/webapp/maven-repository</url>
+			<url>http://maven-repo.tigase.org/repository/release</url>
 		</repository>
 		<snapshotRepository>
 			<id>tigase-snapshot</id>
 			<name>Tigase snapshot repository</name>
-			<url>scp://build.xmpp-test.net:/home/maven/repository</url>
+			<url>http://maven-repo.tigase.org/repository/snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
 </project>

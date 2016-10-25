@@ -439,13 +439,12 @@ public class DataRepositoryImpl implements DataRepository, StatisticsProviderIfc
 	 */
 	private void initRepo() throws SQLException {
 
-		// Statement stmt = null;
-//		ResultSet rs = null;
 
 		boolean failure = true;
 		try {
 			if (conn != null) {
 				reconnectionCounter.inc();
+				log.log(Level.INFO, "Reconnecting connection: {0}", reconnectionCounter);
 			}
 			synchronized (db_statements) {
 				db_statements.clear();
@@ -463,6 +462,7 @@ public class DataRepositoryImpl implements DataRepository, StatisticsProviderIfc
 
 			if (failure) {
 				reconnectionFailedCounter.inc();
+				log.log(Level.INFO, "Reconnecting connection failed: {0}", reconnectionFailedCounter);
 			}
 			// release(stmt, rs);
 			// stmt = null;
