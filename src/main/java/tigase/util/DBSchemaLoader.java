@@ -855,7 +855,12 @@ class DBSchemaLoader extends SchemaLoader {
 				for ( String query : queries ) {
 					if ( !query.isEmpty() ){
 						log.log( Level.FINEST, "Executing query: " + query );
-						stmt.execute( query );
+						try {
+							stmt.execute(query);
+						} catch (SQLException ex) {
+							log.log(Level.SEVERE, "Failed to execute query: " + query);
+							throw ex;
+						}
 					}
 				}
 			}

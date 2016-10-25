@@ -253,6 +253,11 @@ public class ConfigReader {
 		if (holder.state != State.MAP || holder.parent != null) {
 			throw new IOException("Parsing error - invalid file structure, state = " + holder.state + ", parent = " + holder.parent);
 		}
+
+		if (holder.key != null && !holder.key.isEmpty()) {
+			holder.map.put(holder.key, holder.value != null ? holder.value : decodeValue(holder.sb.toString().trim()));
+		}
+
 		return holder.map;
 	}
 
