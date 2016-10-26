@@ -311,6 +311,19 @@ public class ConfigHolder {
 				props.put("admins", admins.split(","));
 			}
 
+			String monitoring = (String) props.remove("--monitoring");
+			if (monitoring != null) {
+				props.put("monitoring/active", "true");
+				String[] entries = monitoring.split(",");
+				for (String e : entries) {
+					String[] tmp = e.split(":");
+					if (tmp.length == 2) {
+						props.put("monitoring/" + tmp[0] + "/active", "true");
+						props.put("monitoring/" + tmp[0] + "/port", tmp[1]);
+					}
+				}
+			}
+
 			Iterator<Map.Entry<String, Object>> it = props.entrySet().iterator();
 			while (it.hasNext()) {
 				Map.Entry<String, Object> e = it.next();

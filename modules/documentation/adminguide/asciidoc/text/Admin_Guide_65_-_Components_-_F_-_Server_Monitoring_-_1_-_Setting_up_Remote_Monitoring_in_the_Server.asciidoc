@@ -18,27 +18,35 @@ The monitoring itself causes very low overhead in terms of the resources and CPU
 *Note.* _This works with the Tigase server from version_ *4.2.0* _or SVN revision_ *1418*.
 
 == What You Need
-Using v7.1.0 and later, statistics binaries are built-in dist-max and no extra files are needed.  If you have downloaded -dist file, you will need tigase-extras.
+Using v7.2.0 and later, statistics binaries are built-in dist-max and no extra files are needed.  If you have downloaded -dist file, you will need tigase-extras.
 
-To ensure, two files are necessary to run monitoring:
+To ensure, one files is necessary to run monitoring:
 
 . link:https://projects.tigase.org/projects/tigase-extras/files[tigase-extras] or the link:https://projects.tigase.org/projects/tigase-server/repositoryr[current snapshot].
-. *jdmkrt.jar* file from link:https://opendmk.java.net/[OpenDMK] project version 5.1 or later. A copy of this jar file in also available in our maven repository: link:http://maven.tigase.org/openDMK/jdmkrt/1.0-b02/[jdmkrt.jar].
 
-Both files should be in the /jars directory.
+File should be in the /jars directory.
 
 
 [[monitoring_activation]]
 == Activation
 
-You can either run the Tigase installer and use the configuration wizard to activate the monitoring or edit etc/init.properties file and add following line:
+You can either run the Tigase installer and use the configuration wizard to activate the monitoring or edit etc/init.properties file and add following lines:
 
-[source,bash]
 -----
---monitoring=jmx:9050,http:9080,snmp:9060
+monitoring() {
+  jmx() {
+    port = 9050
+  }
+  http() {
+    port = 9080
+  }
+  snmp() {
+    port = 9060
+  }
+}
 -----
 
-As you see there is only a single line where you put list of monitoring servers you want to activate. Each server is responsible for activation of a different protocol and takes a single parameter - port number. There are following protocols supported right now:
+As you see there is a separate block for each monitoring server you want to activate. Each server is responsible for activation of a different protocol and takes a single parameter - port number. There are following protocols supported right now:
 
 - *jmx* - activating monitoring via JMX/RMI
 - *http* - activating monitoring over HTTP protocol
