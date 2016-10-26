@@ -7,6 +7,7 @@ import tigase.util.Algorithms;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.BufferedReader;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 
 import java.sql.*;
@@ -25,6 +26,8 @@ import java.util.logging.Logger;
  */
 public class StoredProcedures {
 	private static final Logger log = Logger.getLogger(StoredProcedures.class.getName());
+
+	private static final Charset UTF8 = Charset.forName("UTF-8");
 
 	//~--- methods --------------------------------------------------------------
 
@@ -836,7 +839,7 @@ public class StoredProcedures {
 			MessageDigest md = MessageDigest.getInstance("MD5");
 
 			if (data != null) {
-				md.update(data.getBytes());
+				md.update(data.getBytes(UTF8));
 			}
 
 			byte[] digest = md.digest();
