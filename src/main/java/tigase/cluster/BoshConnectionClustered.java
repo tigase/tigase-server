@@ -145,7 +145,7 @@ public class BoshConnectionClustered
 		Configurable component = XMPPServer.getConfigurator().getComponent("cl-comp");
 		if (component != null && component instanceof ClusterConnectionManager) {
 			ClusterConnectionManager clusterConnectionManager = (ClusterConnectionManager)component;
-			if (clusterConnectionManager.isInitialClusterConnectedDone()) {
+			if (clusterConnectionManager.isInitialClusterConnectedDone() && props.containsKey(PORT_LISTENING_DELAY_KEY)) {
 				props.put(PORT_LISTENING_DELAY_KEY,false);
 				log.log(Level.WARNING, "Skip delaying opening ports of component: {0} - clustering is already established", getName());
 			}
