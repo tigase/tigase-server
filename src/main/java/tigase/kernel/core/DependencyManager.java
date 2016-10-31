@@ -126,9 +126,17 @@ public class DependencyManager {
 			Class<?> type = dependency.getType();
 			if (Collection.class.isAssignableFrom(type)) {
 				type = ReflectionHelper.getCollectionParamter(dependency.getGenericType(), dependency.getBeanConfig().getClazz());
+				Type genericType = dependency.getGenericType();
+				if (genericType instanceof ParameterizedType) {
+					ParameterizedType pt = (ParameterizedType) genericType;
+					if (pt.getActualTypeArguments().length == 1 && pt.getActualTypeArguments()[0] instanceof Class) {
+						genericType = pt.getActualTypeArguments()[0];
+					}
+				}
+				bcs.addAll(getBeanConfigs(type, genericType, dependency.getBeanConfig().getClazz()));
+			} else {
+				bcs.addAll(getBeanConfigs(type, dependency.getGenericType(), dependency.getBeanConfig().getClazz()));
 			}
-			// TODO - FIXME
-			bcs.addAll(getBeanConfigs(type, dependency.getGenericType(), dependency.getBeanConfig().getClazz()));
 		} else
 			throw new RuntimeException("Unsupported dependecy type.");
 		return bcs.toArray(new BeanConfig[]{});
