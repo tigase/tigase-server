@@ -976,7 +976,7 @@ public class ClientConnectionManager
 				}
 
 				// In case of mass-disconnects, adjust the timeout properly
-				addOutPacketWithTimeout(command, stoppedHandler, 120l, TimeUnit.SECONDS);
+				addOutPacketWithTimeout(command, stoppedHandler, 120L, TimeUnit.SECONDS);
 				log.log(Level.FINE, "Service stopped, sending packet: {0}", command);
 
 				//// For testing only.
@@ -1164,9 +1164,9 @@ public class ClientConnectionManager
 
 			// Ups, doesn't look good, the server is either oveloaded or lost
 			// a packet.
-			log.log(Level.INFO, "No response within time limit received for a packet: {0}",
+			log.log(Level.INFO, "No response within time limit received for a packet: {0}; RETRYING",
 					packet.toStringSecure());
-			addOutPacketWithTimeout(packet, stoppedHandler, 60l, TimeUnit.SECONDS);
+			addOutPacketWithTimeout(packet, stoppedHandler, 60L, TimeUnit.SECONDS);
 		}
 	}
 }

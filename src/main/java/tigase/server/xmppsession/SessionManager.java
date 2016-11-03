@@ -2496,9 +2496,7 @@ public class SessionManager
 		@Override
 		public void timeOutExpired(Packet packet) {
 			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER,
-						"Connection checker timeout expired, closing connection: {0}", packet
-						.getTo());
+				log.log(Level.FINER, "Connection checker timeout expired, closing connection: {0}", packet.getTo());
 			}
 
 			String userJid = Command.getFieldValue(packet, "user-jid");
