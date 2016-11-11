@@ -8,15 +8,607 @@ Tigase Team <team@tigase.com>
 :no title:
 :no author:
 
-include::text/User_Guide_01_Jabber_XMPP_Introduction.asciidoc[]
+include::text/Tigase_v7.2.0.asciidoc[]
 
-include::text/User_Guide_02_Installing_Minichat_on_your_Website.asciidoc[]
+include::text/user/User_Guide_01_Jabber_XMPP_Introduction.asciidoc[]
 
-include::text/User_Guide_03_How_to_use_Tigase_Service.asciidoc[]
+include::text/user/User_Guide_02_Installing_Minichat_on_your_Website.asciidoc[]
 
-include::text/User_Guide_04_Psi_Initial_Configuration.asciidoc[]
+include::text/user/User_Guide_03_How_to_use_Tigase_Service.asciidoc[]
+
+include::text/user/User_Guide_04_Psi_Initial_Configuration.asciidoc[]
 
 //MSNTransport removed due to JETI missing from website, is this still supported?
-//include::text/User_Guide_05_Tigase_Service_and_MSN_Transport_from_Client_Side.asciidoc[]
+//include::text/user/User_Guide_05_Tigase_Service_and_MSN_Transport_from_Client_Side.asciidoc[]
 
-//include::text/User_Guide_06_Jeti_and_MSN_Transport_on_tigase.org.asciidoc[]
+//include::text/user/User_Guide_06_Jeti_and_MSN_Transport_on_tigase.org.asciidoc[]
+
+Welcome to the Tigase Administration Guide.
+
+:leveloffset: 1
+
+include::text/admin/Admin_Guide_01_-_About_Tigase_Jabber_XMPP_Server.asciidoc[]
+
+include::text/admin/Admin_Guide_02_-_Licensing_and_Open_Source.asciidoc[]
+
+include::text/admin/Admin_Guide_08_-_Latest_and_Nightly_Builds.asciidoc[]
+
+include::text/admin/Admin_Guide_02_-_Quick_Start.asciidoc[]
+
+
+:leveloffset: 2
+
+include::text/admin/Admin_Guide_03_-_Quick_Start_-_A_-_Installation_Using_GUI_Installer.asciidoc[]
+
+include::text/admin/Admin_Guide_04_-_Quick_Start_-_B_-_Installation_Using_Web_Installer.asciidoc[]
+
+include::text/admin/Admin_Guide_05_-_Quick_Start_-_C_-_Installing_Using_Console_Installer.asciidoc[]
+
+include::text/admin/Admin_Guide_06_-_Quick_Start_-_D_-_Manual_Installation_in_Console_Mode.asciidoc[]
+
+include::text/admin/Admin_Guide_07_-_Quick_Start_-_E_-_Windows_Installation.asciidoc[]
+
+include::text/admin/Admin_Guide_07_-_Quick_Start_-_F_-_Setting_Up_Server.asciidoc[]
+
+include::text/admin/Admin_Guide_07_-_Quick_Start_-_G_-_Script_Selection.asciidoc[]
+
+:leveloffset: 1
+
+
+
+include::text/admin/Admin_Guide_09_-_Configuration.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/DSL_configuration.asciidoc[]
+
+include::text/admin/Admin_Guide_10_-_Configuration_-_A_-_Tigase_XMPP_Server_init.properties_Configuration.asciidoc[]
+
+include::text/admin/Admin_Guide_11_-_Configuration_-_B_-_Startup_Files_tigase.sh_and_tigase.asciidoc[]
+
+include::text/admin/Admin_Guide_12_-_Configuration_-_C_-_Linux_Settings_for_High_Load_Systems.asciidoc[]
+
+include::text/admin/Admin_Guide_13_-_Configuration_-_D_-_Configuration_Storage_Options.asciidoc[]
+
+include::text/admin/Admin_Guide_13_-_Configuration_-_E_-_JVM_settings.asciidoc[]
+
+include::text/admin/Admin_Guide_105_-_Configuration_-_F_-_Sess-man.asciidoc[]
+
+:leveloffset: 1
+
+include::text/admin/Admin_Guide_14_-_Security.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Admin_Guide_15_-_Security_-_A_-_Server_Certificates.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Admin_Guide_16_-_Security_-_A_-_Server_Certificates_-_1_-_Creating_and_Loading_the_Server_Certificate_in_PEM_Files.asciidoc[]
+
+include::text/admin/Admin_Guide_17_-_Security_-_A_-_Server_Certificates_-_2_-_Installing_StartCom_Certificate_in_your_Linux_System.asciidoc[]
+
+//include::text/admin/Admin_Guide_18_-_Security_-_A_-_Server_Certificates_-_3_-_Server_Certificate_Using_Keytool_and_Keystore.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Admin_Guide_19_-_Security_-_B_-_Authentication_Connectors.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Admin_Guide_20_-_Security_-_B_-_Authentication_Connectors_-_1_-_Tigase_Auth_Connector.asciidoc[]
+
+include::text/admin/Admin_Guide_21_-_Security_-_B_-_Authentication_Connectors_-_2_-_Tigase_Custom_Auth_Connector.asciidoc[]
+
+include::text/admin/Admin_Guide_22_-_Security_-_B_-_Authentication_Connectors_-_3_-_Drupal_Authentication_Added.asciidoc[]
+
+include::text/admin/Admin_Guide_23_-_Security_-_B_-_Authentication_Connectors_-_4_-_LDAP_Authentication_Connector.asciidoc[]
+
+include::text/admin/Admin_Guide_24_-_Security_-_B_-_Authentication_Connectors_-_5_-_Configuration_of_SASL_EXTERNAL.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Admin_Guide_25_-_Security_-_C_-_Packet_Filtering.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Admin_Guide_26_-_Security_-_C_-_Packet_Filtering_-_1_-_Domain_Based_Packet_Filtering.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Admin_Guide_27_-_Security_-_D_-_Access_Control_List.asciidoc[]
+
+:leveloffset: 1
+
+include::text/admin/Admin_Guide_28_-_Database_Management.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Admin_Guide_29_-_Database_Management_-_A_-_Database_Preparation.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Admin_Guide_29_-_Database_Management_-_A_-_Database_Preperation_-_1_-_DbSchemaLoader.asciidoc[]
+
+include::text/admin/Admin_Guide_30_-_Database_Management_-_A_-_Database_Preparation_-_1_-_Prepare_the_MySQL_Database_for_Tigase_Server.asciidoc[]
+
+include::text/admin/Admin_Guide_31_-_Database_Management_-_A_-_Database_Preparation_-_2_-_Prepare_the_Derby_Database_for_Tigase_Server.asciidoc[]
+
+include::text/admin/Admin_Guide_32_-_Database_Management_-_A_-_Database_Preparation_-_3_-_Prepare_the_MS_SQL_Server_Database_for_Tigase_Server.asciidoc[]
+
+include::text/admin/Admin_Guide_33_-_Database_Management_-_A_-_Database_Preparation_-_4_-_Prepare_the_PostgreSQL_Database_for_Tigase_Server.asciidoc[]
+
+include::text/admin/Admin_Guide_34_-_Database_Management_-_A_-_Database_Preperation_-_5_-_Prepare_Tigase_for_MongoDB.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Admin_Guide_35_-_Database_Management_-_B_-_Hashed_User_Passwords_in_Database.asciidoc[]
+
+include::text/admin/Admin_Guide_36_-_Database_Management_-_C_-_Tigase_Server_and_Multiple_Databases.asciidoc[]
+
+include::text/admin/Admin_Guide_37_-_Database_Management_-_D_-_Importing_User_Data.asciidoc[]
+
+include::text/admin/Admin_Guide_38_-_Database_Management_-_E_-_Integrating_Existing_Databases.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Admin_Guide_39_-_Database_Management_-_E_-_Integrating_Existing_Databases_-_1_-_Connecting_Tigase_Server_to_MySQL_Database.asciidoc[]
+
+include::text/admin/Admin_Guide_40_-_Database_Management_-_E_-_Integrating_Existing_Databases_-_2_-_Integrating_Tigase_Server_with_Drupal.asciidoc[]
+
+include::text/admin/Admin_Guide_41_-_Database_Management_-_E_-_Integrating_Existing_Databases_-_3_-_Integrating_Tigase_Server_with_LibreSource.asciidoc[]
+
+include::text/admin/Admin_Guide_42_-_Database_Management_-_E_-_Integrating_Existing_Databases_-_4_-_MySQL_Database_Use.asciidoc[]
+
+include::text/admin/Admin_Guide_43_-_Database_Management_-_E_-_Integrating_Existing_Databases_-_5_-_PostgreSQL_Database.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Admin_Guide_44_-_Database_Management_-_F_-_Schema_Updates.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Admin_Guide_45_-_Database_Managament_-_F_-_Schema_Updates_-_A_-_Tigase_Server_7.1.asciidoc[]
+
+include::text/admin/Admin_Guide_46_-_Database_Management_-_F_-_Schema_Updates_-_B_-_Tigase_Server_Version_5.x.asciidoc[]
+
+include::text/admin/Admin_Guide_47_-_Database_Management_-_F_-_Schema_Updates_-_B_-_Tigase_Server_Version_5.x_-_1_-_Derby.asciidoc[]
+
+include::text/admin/Admin_Guide_48_-_Database_Management_-_F_-_Schema_Updates_-_B_-_Tigase_Server_Version_5.x_-_2_-_MySQL_Database_Schema_Upgrade_for_Tigase_5.1.asciidoc[]
+
+include::text/admin/Admin_Guide_49_-_Database_Management_-_F_-_Schema_Updates_-_B_-_Tigase_Server_Version_5.x_-_3_-_PostgreSQL_Database_Schema_Upgrade_for_Tigase_5.1.asciidoc[]
+
+include::text/admin/Admin_Guide_50_-_Database_Management_-_F_-_Schema_Updates_-_B_-_Tigase_Server_Version_5.x_-_4_-_Tigase_Database_Minor_but_Useful_Schema_Change_in_Version_5.1.asciidoc[]
+
+include::text/admin/Admin_Guide_51_-_Database_Management_-_F_-_Schema_Updates_-_C_-_Tigase_Server_Version_4.x.asciidoc[]
+
+include::text/admin/Admin_Guide_52_-_Database_Management_-_F_-_Schema_Updates_-_C_-_Tigase_Server_Version_4.x_-_1_-_MySQL_Database_Schema_Upgrade_for_Tigase_4.0.asciidoc[]
+
+:leveloffset: 1
+
+include::text/admin/Admin_Guide_53_-_Components.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Admin_Guide_54_-_Components_-_A_-_StanzaSender.asciidoc[]
+
+include::text/admin/Admin_Guide_56_-_Components_-_B_-_Tigase_HTTP_API_-_1_-_REST_API_Guide.asciidoc[]
+
+include::text/admin/Admin_Guide_57_-_Components_-_B_-_Tigase_HTTP_API_-_2_-_Admin_UI.asciidoc[]
+
+include::text/admin/Admin_Guide_58_-_Components_-_B_-_Tigase_HTTP_API_-_3_-_Web_Client.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Admin_Guide_59_-_Components_-_C_-_Message_Archiving.asciidoc[]
+
+include::text/admin/Admin_Guide_60_-_Components_-_D_-_Advanced_Message_Processing_-_AMP_XEP-0079.asciidoc[]
+
+include::text/admin/Admin_Guide_61_-_Components_-_E_-_PubSub.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Admin_Guide_62_-_Components_-_E_-_PubSub_-_1_-_Offline_Message_Sink.asciidoc[]
+
+include::text/admin/Admin_Guide_63_-_Components_-_E_-_PubSub_-_2_-_PubSub_Schema_Changes.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Admin_Guide_64_-_Components_-_F_-_Server_Monitoring.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Admin_Guide_65_-_Components_-_F_-_Server_Monitoring_-_1_-_Setting_up_Remote_Monitoring_in_the_Server.asciidoc[]
+
+include::text/admin/Admin_Guide_66_-_Components_-_F_-_Server_Monitoring_-_2_-_Retrieving_statistics.asciidoc[]
+
+include::text/admin/Admin_Guide_102_-_Statistics_Descriptions.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Admin_Guide_67_-_Components_-_F_-_Server_Monitoring_-_3_-_EventBus.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Admin_Guide_68_-_Components_-_G_-_Server_to_Server_Protocol.asciidoc[]
+
+include::text/admin/Admin_Guide_69_-_Components_-_H_-_MUC.asciidoc[]
+
+include::text/admin/Admin_Guide_70_-_Components_-_I_-_Tigase_Load_Balancing.asciidoc[]
+
+include::text/admin/Admin_Guide_71_-_Components_-_J_-_External_Component_Configuration.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Admin_Guide_72_-_Components_-_J_-_External_Component_Configuration_-_1_-_Basic_Configuration_Options_(external_component).asciidoc[]
+
+include::text/admin/Admin_Guide_73_-_Components_-_J_-_External_Component_Configuration_-_2_-_Tigase_as_External_Component.asciidoc[]
+
+include::text/admin/Admin_Guide_74_-_Components_-_J_-_External_Component_Configuration_-_3_-_Load_Balancing_External_Components_in_Cluster_Mode.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Admin_Guide_103_-_Components_-_K_-_C2S.asciidoc[]
+
+include::text/admin/Admin_Guide_106_-_Components_-_L_-_Socks5.asciidoc[]
+
+include::text/admin/Admin_Guide_75_-_Virtual_Hosts_in_the_Tigase_Server.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Admin_Guide_76_-_Virtual_Hosts_in_the_Tigase_Server_-_A_-_Specification_for_ad-hoc_Commands_Used_to_Manage_Virtual_Domains.asciidoc[]
+
+include::text/admin/Admin_Guide_77_-_Virtual_Hosts_in_the_Tigase_Server_-_B_-_Virtual_Components_for_Cluster_Mode.asciidoc[]
+
+:leveloffset: 2
+
+include::text/Components/External_Service_Discovery_Component.asciidoc[]
+
+:leveloffset: 1
+
+include::text/admin/Admin_Guide_78_-_Using_Tigase.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Admin_Guide_79_-_Using_Tigase_-_A_-_Log_Guide.asciidoc[]
+
+include::text/admin/Admin_Guide_80_-_Using_Tigase_-_B_-_Debugging_Tigase.asciidoc[]
+
+include::text/admin/Admin_Guide_81_-_Using_Tigase_-_C_-_Basic_System_Checks.asciidoc[]
+
+include::text/admin/Admin_Guide_82_-_Using_Tigase_-_D_-_Add_and_Manage_Virtual_Domains.asciidoc[]
+
+include::text/admin/Admin_Guide_83_-_Using_Tigase_-_E_-_Presence_Forwarding.asciidoc[]
+
+include::text/admin/Admin_Guide_84_-_Using_Tigase_-_F_-_Register_Own_XMPP_Domain.asciidoc[]
+
+include::text/admin/Admin_Guide_85_-_Using_Tigase_-_G_-_Tigase_and_PyMSN-t_Transport.asciidoc[]
+
+include::text/admin/Admin_Guide_86_-_Using_Tigase_-_H_-_Two_or_more_SessionManagers.asciidoc[]
+
+include::text/admin/Admin_Guide_87_-_Using_Tigase_-_I_-_Watchdog.asciidoc[]
+
+include::text/admin/Admin_Guide_88_-_Using_Tigase_-_J_-_Tips_and_Tricks.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Admin_Guide_89_-_Using_Tigase_-_J_-_Tips_and_Tricks_-_1_-_Tigase_Tip_Checking_the_Runtime_Environment.asciidoc[]
+
+include::text/admin/Admin_Guide_91_-_Using_Tigase_-_J_-_Tips_and_Tricks_-_3_-_Best_Practices_for_Connecting_From_Web_Browser_to_Tigase_XMPP_Server.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Admin_Guide_92_-_Using_Tigase_-_K_-_Command_Line_Tools.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Admin_Guide_93_-_Using_Tigase_-_K_-_Command_Line_Tools_-_1_-_Configuration_Managament_Tool.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Admin_Guide_94_-_Using_Tigase_-_L_-_Scripting_Support_in_Tigase.asciidoc[]
+
+:leveloffset: 3
+
+include::text/admin/Admin_Guide_95_-_Using_Tigase_-_L_-_Scripting_Support_in_Tigase_-_1_-_Scripting_Introduction_-_Hello_World.asciidoc[]
+
+include::text/admin/Admin_Guide_96_-_Using_Tigase_-_L_-_Scripting_Support_in_Tigase_-_2_-_Tigase_Scripting_Version_4.4.x_Update_for_Administrators.asciidoc[]
+
+include::text/admin/Admin_Guide_97_-_Using_Tigase_-_L_-_Scripting_Support_in_Tigase_-_3_-_Tigase_and_Python.asciidoc[]
+
+:leveloffset: 2
+
+include::text/admin/Admin_Guide_98_-_Using_Tigase_-_M_-_Configuration_Wizards.asciidoc[]
+
+include::text/admin/Admin_Guide_99_-_Using_Tigase_-_N_-_Offline_Messages.asciidoc[]
+
+include::text/admin/Admin_Guide_100_-_Using_Tigase_-_O_-_Licensing.asciidoc[]
+
+include::text/admin/Admin_Guide_101_-_Using_Tigase_-_P_-_Advanced_Options.asciidoc[]
+
+include::text/admin/Admin_Guide_104_-_Using_Tigase_-_Q_-_Clustering.asciidoc[]
+
+
+Appendix I - Properties Guide
+
+:leveloffset: 1
+
+include::text/properties/Properties_Guide_01_-_--admins.asciidoc[]
+
+include::text/properties/Properties_Guide_02_-_--auth-db.asciidoc[]
+
+include::text/properties/Properties_Guide_03_-_--auth-db-uri.asciidoc[]
+
+include::text/properties/Properties_Guide_04_-_--auth-domain-repo-pool.asciidoc[]
+
+include::text/properties/Properties_Guide_05_-_--auth-repo-pool.asciidoc[]
+
+include::text/properties/Properties_Guide_06_-_--auth-repo-pool-size.asciidoc[]
+
+include::text/properties/Properties_Guide_07_-_--bind-ext-hostnames.asciidoc[]
+
+include::text/properties/Properties_Guide_08_-_--bosh-close-connection.asciidoc[]
+
+include::text/properties/Properties_Guide_09_-_--bosh-extra-headers-file.asciidoc[]
+
+include::text/properties/Properties_Guide_10_-_--cl-conn-repo-class.asciidoc[]
+
+include::text/properties/Properties_Guide_11_-_--client-access-policy-file.asciidoc[]
+
+include::text/properties/Properties_Guide_12_-_--cluster-connect-all.asciidoc[]
+
+include::text/properties/Properties_Guide_13_-_--cluster-mode.asciidoc[]
+
+include::text/properties/Properties_Guide_14_-_--cluster-nodes.asciidoc[]
+
+include::text/properties/Properties_Guide_15_-_--cm-ht-traffic-throttling.asciidoc[]
+
+include::text/properties/Properties_Guide_16_-_--cm-see-other-host.asciidoc[]
+
+include::text/properties/Properties_Guide_17_-_--cm-traffic-throttling.asciidoc[]
+
+include::text/properties/Properties_Guide_18_-_--cmpname-ports.asciidoc[]
+
+include::text/properties/Properties_Guide_19_-_--comp-class.asciidoc[]
+
+include::text/properties/Properties_Guide_20_-_--comp-name.asciidoc[]
+
+include::text/properties/Properties_Guide_21_-_--cross-domain-policy-file.asciidoc[]
+
+include::text/properties/Properties_Guide_22_-_--data-repo-pool-size.asciidoc[]
+
+include::text/properties/Properties_Guide_23_-_--debug.asciidoc[]
+
+include::text/properties/Properties_Guide_24_-_--debug-packages.asciidoc[]
+
+include::text/properties/Properties_Guide_25_-_--domain-filter-policy.asciidoc[]
+
+include::text/properties/Properties_Guide_26_-_--elements-number-limit.asciidoc[]
+
+include::text/properties/Properties_Guide_27_-_--ext-comp.asciidoc[]
+
+include::text/properties/Properties_Guide_28_-_--extcomp-repo-class.asciidoc[]
+
+include::text/properties/Properties_Guide_29_-_--external.asciidoc[]
+
+include::text/properties/Properties_Guide_30_-_--hardened-mode.asciidoc[]
+
+include::text/properties/Properties_Guide_31_-_--max-queue-size.asciidoc[]
+
+include::text/properties/Properties_Guide_32_-_--monitoring.asciidoc[]
+
+include::text/properties/Properties_Guide_33_-_--net-buff-high-throughput.asciidoc[]
+
+include::text/properties/Properties_Guide_34_-_--net-buff-standard.asciidoc[]
+
+include::text/properties/Properties_Guide_35_-_--new-connections-throttling.asciidoc[]
+
+include::text/properties/Properties_Guide_36_-_--nonpriority-queue.asciidoc[]
+
+include::text/properties/Properties_Guide_37_-_--queue-implementation.asciidoc[]
+
+include::text/properties/Properties_Guide_38_-_--roster-implementation.asciidoc[]
+
+include::text/properties/Properties_Guide_39_-_--s2s-ejabberd-bug-workaround-active.asciidoc[]
+
+include::text/properties/Properties_Guide_40_-_--s2s-secret.asciidoc[]
+
+include::text/properties/Properties_Guide_41_-_--s2s-skip-tls-hostnames.asciidoc[]
+
+include::text/properties/Properties_Guide_42_-_--script-dir.asciidoc[]
+
+include::text/properties/Properties_Guide_43_-_--sm-cluster-strategy-class.asciidoc[]
+
+include::text/properties/Properties_Guide_44_-_--sm-plugins.asciidoc[]
+
+include::text/properties/Properties_Guide_45_-_--sm-threads-pool.asciidoc[]
+
+include::text/properties/Properties_Guide_46_-_--ssl-certs-location.asciidoc[]
+
+include::text/properties/Properties_Guide_47_-_--ssl-container-class.asciidoc[]
+
+include::text/properties/Properties_Guide_48_-_--ssl-def-cert-domain.asciidoc[]
+
+include::text/properties/Properties_Guide_49_-_--stats-archiv.asciidoc[]
+
+include::text/properties/Properties_Guide_50_-_--stats-history.asciidoc[]
+
+include::text/properties/Properties_Guide_51_-_--stringprep-processor.asciidoc[]
+
+include::text/properties/Properties_Guide_52_-_--test.asciidoc[]
+
+include::text/properties/Properties_Guide_53_-_--tigase-config-repo-class.asciidoc[]
+
+include::text/properties/Properties_Guide_54_-_--tigase-config-repo-uri.asciidoc[]
+
+include::text/properties/Properties_Guide_55_-_--tls-jdk-nss-bug-workaround-active.asciidoc[]
+
+include::text/properties/Properties_Guide_56_-_--trusted.asciidoc[]
+
+include::text/properties/Properties_Guide_57_-_--user-db.asciidoc[]
+
+include::text/properties/Properties_Guide_58_-_--user-db-uri.asciidoc[]
+
+include::text/properties/Properties_Guide_59_-_--user-domain-repo-pool.asciidoc[]
+
+include::text/properties/Properties_Guide_60_-_--user-repo-pool.asciidoc[]
+
+include::text/properties/Properties_Guide_61_-_--user-repo-pool-size.asciidoc[]
+
+include::text/properties/Properties_Guide_62_-_--vhost-anonymous-enabled.asciidoc[]
+
+include::text/properties/Properties_Guide_63_-_--vhost-disable-dns-check.asciidoc[]
+
+include::text/properties/Properties_Guide_64_-_--vhost-max-users.asciidoc[]
+
+include::text/properties/Properties_Guide_65_-_--vhost-message-forward-jid.asciidoc[]
+
+include::text/properties/Properties_Guide_66_-_--vhost-presence-forward-jid.asciidoc[]
+
+include::text/properties/Properties_Guide_67_-_--vhost-register-enabled.asciidoc[]
+
+include::text/properties/Properties_Guide_68_-_--vhost-tls-required.asciidoc[]
+
+include::text/properties/Properties_Guide_69_-_--virt-hosts.asciidoc[]
+
+include::text/properties/Properties_Guide_70_-_--watchdog_delay.asciidoc[]
+
+include::text/properties/Properties_Guide_71_-_--watchdog_ping_type.asciidoc[]
+
+include::text/properties/Properties_Guide_72_-_--watchdog_timeout.asciidoc[]
+
+include::text/properties/Properties_Guide_74_-_--ws-allow-unmasked-frames.asciidoc[]
+
+include::text/properties/Properties_Guide_73_-_-config-type.asciidoc[]
+
+include::text/properties/Properties_Guide_75_-_--client-port-delay-listening.asciidoc[]
+
+Appendix II: Development Guide
+
+//intro
+include::text/dev/Development_Guide_01_-_Basic_Information.asciidoc[]
+
+//writing for Tigase
+include::text/dev/Development_Guide_02_-_Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.asciidoc[]
+
+:leveloffset: 2
+
+include::text/dev/Development_Guide_03_-_API_Changes_in_Tigase_Server_5.x.asciidoc[]
+
+:leveloffset: 1
+
+//compiling
+include::text/dev/Development_Guide_04_-_Server_Compilation.asciidoc[]
+
+:leveloffset: 2
+
+include::text/dev/Development_Guide_05_-_Tigase_XMPP_Server_5.2.0_and_Later_-_Compilation_and_Generating_Distribution_Packages.asciidoc[]
+
+include::text/dev/Development_Guide_06_-_Tigase_Packages_Dependency_Change_-_Server_Compilation_Version_4.x_or_Later.asciidoc[]
+
+//removed is outdate?
+//include::text/dev/Development_Guide_07_-_Server_Compilation_-_Version_2.x_and_3.x.asciidoc[]
+
+:leveloffset: 1
+
+//components
+include::text/dev/Development_Guide_08_-_Component_Development.asciidoc[]
+
+:leveloffset: 2
+
+include::text/dev/Development_Guide_09_-_Component_Implementation_-_Lesson_1_-_Basics.asciidoc[]
+
+include::text/dev/Development_Guide_10_-_Component_Implementation_-_Lesson_2_-_Configuration.asciidoc[]
+
+include::text/dev/Development_Guide_11_-_Component_Implementation_-_Lesson_3_-_Multi-threading.asciidoc[]
+
+include::text/dev/Development_Guide_12_-_Component_Implementation_-_Lesson_4_-_Service_Discovery.asciidoc[]
+
+include::text/dev/Development_Guide_13_-_Component_Implementation_-_Lesson_5_-_Statistics.asciidoc[]
+
+include::text/dev/Development_Guide_14_-_Component_Implementation_-_Lesson_6_-_Scripting_Support.asciidoc[]
+
+include::text/dev/Development_Guide_15_-_Component_Implementation_-_Lesson_7_-_Data_Repository.asciidoc[]
+
+include::text/dev/Development_Guide_16_-_Component_Implementation_-_Lesson_8_-_Startup_Time.asciidoc[]
+
+include::text/dev/Development_Guide_17_-_Configuration_API.asciidoc[]
+
+include::text/dev/Development_Guide_18_-_Packet_Filtering_in_Component.asciidoc[]
+
+include::text/dev/Development_Guide_43_-_EventBus_API.asciidoc[]
+
+include::text/dev/Development_Guide_42_-_Cluster_Map_Interface.asciidoc[]
+
+:leveloffset: 1
+
+//plugins
+include::text/dev/Development_Guide_19_-_Plugin_Development.asciidoc[]
+
+:leveloffset: 2
+
+include::text/dev/Development_Guide_20_-_Writing_Plugin_Code.asciidoc[]
+
+include::text/dev/Development_Guide_21_-_Plugin_Configuration.asciidoc[]
+
+include::text/dev/Development_Guide_22_-_How_Packets_are_Processed_by_the_SM_and_Plugins.asciidoc[]
+
+include::text/dev/Development_Guide_23_-_SASL_Custom_Mechanisms_and_Configuration.asciidoc[]
+
+:leveloffset: 1
+
+//maven
+
+include::text/dev/Development_Guide_24_-_Using_Maven.asciidoc[]
+
+:leveloffset: 2
+
+include::text/dev/Development_Guide_25_-_Setting_Up_Maven_In_Windows.asciidoc[]
+
+include::text/dev/Development_Guide_26_-_A_Very_Short_Maven_Guide.asciidoc[]
+
+include::text/dev/Development_Guide_27_-_Maven_2.x_Support.asciidoc[]
+
+:leveloffset: 1
+
+//Tests
+
+include::text/dev/Development_Guide_28_-_Tests.asciidoc[]
+
+:leveloffset: 2
+
+include::text/dev/Development_Guide_29_-_Tigase_Test_Suite.asciidoc[]
+
+include::text/dev/Development_Guide_30_-_Test_Suite_Scripting_Language.asciidoc[]
+
+include::text/dev/Development_Guide_31_-_Writing_Tests_for_Plugins.asciidoc[]
+
+include::text/dev/Development_Guide_32_-_Test_Case_Parameters_Description.asciidoc[]
+
+:leveloffset: 1
+
+//experimental
+include::text/dev/Development_Guide_33_-_Experimental.asciidoc[]
+
+:leveloffset: 2
+
+include::text/dev/Development_Guide_34_-_Dynamic_Rosters.asciidoc[]
+
+include::text/dev/Development_Guide_35_-_Mobile_Optimizations.asciidoc[]
+
+include::text/dev/Development_Guide_36_-_Bosh_Session_Cache.asciidoc[]
+//Old
+
+:leveloffset: 1
+
+include::text/dev/Development_Guide_37_-_Old_Stuff.asciidoc[]
+
+include::text/dev/Development_Guide_38_-_Tigase_DB_Schema_Explained.asciidoc[]
+
+include::text/dev/Development_Guide_39_-_Why_the_Most_Recent_JDK.asciidoc[]
+
+include::text/dev/Development_Guide_40_-_Generating_Tigase_Installer.asciidoc[]
+
+include::text/dev/Development_Guide_41_-_API_Description_for_Virtual_Domains_Management_in_the_Tigase_Server.asciidoc[]
+
+include::text/dev/Development_Guide_44_-_Stanza_Limitations.asciidoc[]

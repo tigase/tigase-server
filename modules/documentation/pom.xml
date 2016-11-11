@@ -5,6 +5,7 @@
 		<dist_path>../..</dist_path>
 		<guide_path>${dist_path}/docs/${guide_name}_Guide</guide_path>
 		<guide_filename>index</guide_filename>
+		<guide_name>User</guide_name>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 
@@ -22,9 +23,6 @@
 	</parent>
 
 	<modules>
-		<module>adminguide</module>
-		<module>devguide</module>
-		<module>propertiesguide</module>
 		<module>userguide</module>
 	</modules>
 
