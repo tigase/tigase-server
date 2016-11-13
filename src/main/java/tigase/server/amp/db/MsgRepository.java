@@ -123,9 +123,9 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 		}
 	};
 
-	@ConfigField(desc = "Limit of offline messages")
+	@ConfigField(desc = "Limit of offline messages", alias = "store-limit")
 	private long msgs_store_limit = MSGS_STORE_LIMIT_VAL;
-	@ConfigField(desc = "Support limits of offline messages set by users")
+	@ConfigField(desc = "Support limits of offline messages set by users", alias = "user-store-limit-enable")
 	private boolean msgs_user_store_limit = false;
 	
 	protected abstract void loadExpiredQueue(int max);

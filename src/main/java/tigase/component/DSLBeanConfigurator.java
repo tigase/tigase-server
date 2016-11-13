@@ -94,7 +94,13 @@ public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 		while ((props = configPath.poll()) != null) {
 			for (Map.Entry<String, Object> e : props.entrySet()) {
 				if (configPath.isEmpty()) {
-					result.put(e.getKey(), e.getValue());
+					String fieldName = aliasesToFields.get(e.getKey());
+					if (fieldName != null) {
+						result.put(fieldName, e.getValue());
+					} else {
+						result.put(e.getKey(), e.getValue());
+					}
+
 				} else {
 					String fieldName = aliasesToFields.get(e.getKey());
 					if (fieldName != null) {
