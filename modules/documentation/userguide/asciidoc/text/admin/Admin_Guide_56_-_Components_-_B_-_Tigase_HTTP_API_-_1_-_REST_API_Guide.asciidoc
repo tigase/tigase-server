@@ -382,7 +382,7 @@ Here all parameters are passed to be excuted by ad-hot command.  Using the +user
   - +UID_type+ is the User ID Type, can be +jid+, +domain+, or +all+.
   - +UID+ is the user JID affected. If +UID_type+ is set to +all+ then this will be ignored.
 
-These ad-hoc commands replicate settings found in xref:domainBasedPacketFiltering[Domain Based Packet Filtering] in the admin guide. They may also be influenced by the link:http://docs.tigase.org/tigase-server-Properties_Guide/html?#domainFilterPolicy[--domain-filter-policy] property of init.properties.
+These ad-hoc commands replicate settings found in xref:domainBasedPacketFiltering[Domain Based Packet Filtering] in the admin guide. They may also be influenced by the xref:domainFilterPolicy[--domain-filter-policy] property of init.properties.
 
 
 == Scripting

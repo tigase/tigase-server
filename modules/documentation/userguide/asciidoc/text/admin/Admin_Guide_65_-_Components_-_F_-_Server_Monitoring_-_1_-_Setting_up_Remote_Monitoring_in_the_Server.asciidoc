@@ -22,7 +22,7 @@ Using v7.2.0 and later, statistics binaries are built-in dist-max and no extra f
 
 To ensure, one files is necessary to run monitoring:
 
-. link:https://projects.tigase.org/projects/tigase-extras/files[tigase-extras] or the link:https://projects.tigase.org/projects/tigase-server/repositoryr[current snapshot].
+. link:https://projects.tigase.org/projects/tigase-extras/files[tigase-extras] or the link:https://projects.tigase.org/projects/tigase-server/repository[current snapshot].
 
 File should be in the /jars directory.
 
