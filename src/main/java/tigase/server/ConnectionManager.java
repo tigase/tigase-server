@@ -837,9 +837,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	public void setProcessors(XMPPIOProcessor[] processors) {
 		if (processors == null)
 			processors = new XMPPIOProcessor[0];
-		for (XMPPIOProcessor processor : processors) {
-			processor.setConnectionManager(this);
-		}
 		this.processors = processors;
 	}
 

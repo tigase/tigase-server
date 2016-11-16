@@ -22,6 +22,8 @@
 package tigase.server.xmppclient;
 
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.net.IOServiceListener;
 import tigase.net.SocketThread;
 import tigase.server.*;
@@ -72,7 +74,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 	private static final int DEF_ACK_REQUEST_COUNT_VAL = 10;
 	private static final String[] DELAY_PATH = { Message.ELEM_NAME, "delay" };
 	private static final String DELAY_XMLNS = "urn:xmpp:delay";
-	private static final String INGORE_UNDELIVERED_PRESENCE_KEY = "ignore-undelivered-presence";
+	private static final String IGNORE_UNDELIVERED_PRESENCE_KEY = "ignore-undelivered-presence";
 	private static final String IN_COUNTER_KEY = XMLNS + "_in";
 	private static final String MAX_RESUMPTION_TIMEOUT_KEY = XMLNS + "_resumption-timeout";
 	private static final String MAX_RESUMPTION_TIMEOUT_PROP_KEY = "max-resumption-timeout";
@@ -87,12 +89,17 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 	
 	private static final SimpleDateFormat formatter;
 	private final ConcurrentHashMap<String,XMPPIOService> services = new ConcurrentHashMap<String,XMPPIOService>();
-	
+
+	@ConfigField(desc = "Ignore undelivered presence packets", alias = IGNORE_UNDELIVERED_PRESENCE_KEY)
 	private boolean ignoreUndeliveredPresence = true;
+	@ConfigField(desc = "Maximal allowed time for session resumption", alias = MAX_RESUMPTION_TIMEOUT_PROP_KEY)
 	private int max_resumption_timeout = 15 * 60;
+	@ConfigField(desc = "Default resumption timeout", alias = RESUMPTION_TIMEOUT_PROP_KEY)
 	private int resumption_timeout = 60;
+	@ConfigField(desc = "Number of sent packets after should ask for confirmation of delivery", alias = ACK_REQUEST_COUNT_KEY)
 	private int ack_request_count = DEF_ACK_REQUEST_COUNT_VAL;
-	
+
+	@Inject(bean = "service")
 	private ConnectionManager connectionManager;
 		
 	static {
@@ -121,12 +128,7 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 	public String getId() {
 		return XMLNS;
 	}
-	
-	@Override
-	public void setConnectionManager(ConnectionManager connectionManager) {
-		this.connectionManager = connectionManager;
-	}	
-	
+
 	@Override
 	public Element[] supStreamFeatures(XMPPIOService service) {
 		// user jid may not be set yet because is is set during resource binding
@@ -465,22 +467,6 @@ public class StreamManagementIOProcessor implements XMPPIOProcessor {
 		return false;
 	}
 
-	@Override
-	public void setProperties(Map<String,Object> props) {
-		if (props.containsKey(MAX_RESUMPTION_TIMEOUT_PROP_KEY)) {
-			this.max_resumption_timeout = (Integer) props.get(MAX_RESUMPTION_TIMEOUT_PROP_KEY);
-		}
-		if (props.containsKey(RESUMPTION_TIMEOUT_PROP_KEY)) {
-			this.resumption_timeout = (Integer) props.get(RESUMPTION_TIMEOUT_PROP_KEY);
-		}
-		if (props.containsKey(INGORE_UNDELIVERED_PRESENCE_KEY)) {
-			this.ignoreUndeliveredPresence = (Boolean) props.get(INGORE_UNDELIVERED_PRESENCE_KEY);
-		}
-		if (props.containsKey(ACK_REQUEST_COUNT_KEY)) {
-			this.ack_request_count = (Integer) props.get(ACK_REQUEST_COUNT_KEY);
-		}
-	}
-	
 	/**
 	 * Method responsible for starting process of stream resumption
 	 * 

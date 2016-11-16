@@ -102,21 +102,6 @@ public interface XMPPIOProcessor {
 	 *				of this service
 	 */
 	boolean serviceStopped(XMPPIOService service, boolean streamClosed);
-	
-	/**
-	 * Sets connection manager instance for which this XMPPIOProcessor is used
-	 * 
-	 * @param connectionManager 
-	 */
-	void setConnectionManager(ConnectionManager connectionManager);
-
-	/**
-	 * Method used for setting properties
-	 *
-	 * @param props
-	 */
-	@Deprecated
-	void setProperties(Map<String,Object> props);
 
 	/** 
 	 * Method called when XMPP stream error is about to be sent

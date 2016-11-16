@@ -22,6 +22,8 @@
 package tigase.server.xmppclient;
 
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.UnregisterAware;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.server.ConnectionManager;
 import tigase.server.Iq;
@@ -43,7 +45,7 @@ import java.util.logging.Logger;
  */
 @Bean(name = RegistrationThrottlingProcessor.ID, parent = ClientConnectionManager.class, active = false)
 public class RegistrationThrottlingProcessor
-		implements XMPPIOProcessor {
+		implements XMPPIOProcessor, UnregisterAware {
 
 	private static final Logger log = Logger.getLogger(RegistrationThrottlingProcessor.class.getCanonicalName());
 
@@ -53,6 +55,7 @@ public class RegistrationThrottlingProcessor
 	private static final String[] USERNAME_PATH = new String[]{Iq.ELEM_NAME, Iq.QUERY_NAME, "username"};
 	private static final String XMLNS = "jabber:iq:register";
 
+	@Inject(bean = "service")
 	private ConnectionManager connectionManager;
 
 	private Timer timer = new Timer("registration-timer", true);
@@ -136,13 +139,13 @@ public class RegistrationThrottlingProcessor
 	}
 
 	@Override
-	public void setConnectionManager(ConnectionManager connectionManager) {
-		this.connectionManager = connectionManager;
+	public void streamError(XMPPIOService service, StreamError streamError) {
+
 	}
 
 	@Override
-	public void streamError(XMPPIOService service, StreamError streamError) {
-
+	public void beforeUnregister() {
+		timer.cancel();
 	}
 
 	protected void cleanUpFromTimer() {
