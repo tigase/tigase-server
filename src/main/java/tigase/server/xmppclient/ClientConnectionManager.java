@@ -1155,9 +1155,9 @@ public class ClientConnectionManager
 
 			// Ups, doesn't look good, the server is either oveloaded or lost
 			// a packet.
-			log.log(Level.INFO, "No response within time limit received for a packet: {0}",
+			log.log(Level.INFO, "No response within time limit received for a packet: {0}; RETRYING",
 					packet.toStringSecure());
-			addOutPacketWithTimeout(packet, stoppedHandler, 60l, TimeUnit.SECONDS);
+			addOutPacketWithTimeout(packet, stoppedHandler, 60L, TimeUnit.SECONDS);
 		}
 	}
 
