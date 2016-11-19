@@ -277,7 +277,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	@ConfigField(desc = "Traffic throttling")
 	protected String trafficThrottling = ST_TRAFFIC_THROTTLING_PROP_VAL;
-	private Kernel kernel;
+	protected Kernel kernel;
 
 	//~--- constant enums -------------------------------------------------------
 

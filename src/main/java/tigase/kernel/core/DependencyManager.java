@@ -118,8 +118,11 @@ public class DependencyManager {
 		}
 		if (dependency.getBeanName() != null) {
 			BeanConfig b = beanConfigs.get(dependency.getBeanName());
-			if (b != null && b.getState() != State.inactive)
+			if (b != null && b.getState() != State.inactive) {
+				// if there is a named bean in a parent kernel we need to override it!
+				bcs.clear();
 				bcs.add(b);
+			}
 			if (bcs.isEmpty())
 				bcs.add(null);
 		} else if (dependency.getType() != null) {

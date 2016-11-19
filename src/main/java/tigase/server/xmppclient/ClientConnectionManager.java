@@ -111,6 +111,8 @@ public class ClientConnectionManager
 			new ClientTrustManagerFactory();
 	@Inject
 	protected EventBus eventBus;
+	@Inject(bean = RegistrationThrottling.ID, nullAllowed = true)
+	private RegistrationThrottling registrationThrottling;
 	private boolean tlsWantClientAuthEnabled = TLS_WANT_CLIENT_AUTH_ENABLED_DEF;
 	private final ShutdownTask shutdownTask = new ShutdownTask();
 
@@ -317,6 +319,16 @@ public class ClientConnectionManager
 		xmppStreamClosed(service);
 
 		return result;
+	}
+
+	public void setRegistrationThrottling(RegistrationThrottling throttling) {
+		if (registrationThrottling != null) {
+			this.registrationThrottling.stopFor(kernel);
+		}
+		if (throttling != null) {
+			throttling.startFor(kernel);
+		}
+		this.registrationThrottling = throttling;
 	}
 	
 	@Override

@@ -23,9 +23,6 @@ package tigase.server.xmppclient;
 
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
-import tigase.kernel.beans.UnregisterAware;
-import tigase.kernel.beans.config.ConfigField;
-import tigase.server.ConnectionManager;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.stats.StatisticsList;
@@ -33,38 +30,31 @@ import tigase.xml.Element;
 import tigase.xmpp.*;
 
 import java.io.IOException;
-import java.time.Duration;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * Created by andrzej on 16.11.2016.
  */
-@Bean(name = RegistrationThrottlingProcessor.ID, parent = ClientConnectionManager.class, active = false)
+@Bean(name = RegistrationThrottlingProcessor.ID)
 public class RegistrationThrottlingProcessor
-		implements XMPPIOProcessor, UnregisterAware {
+		implements XMPPIOProcessor {
 
 	private static final Logger log = Logger.getLogger(RegistrationThrottlingProcessor.class.getCanonicalName());
 
-	public static final String ID = "registration-throttling";
+	public static final String ID = RegistrationThrottling.ID + "-processor";
+
 	private static final String[] REGISTER_PATH = Iq.IQ_QUERY_PATH;
 	private static final String[] REMOVE_PATH = new String[]{Iq.ELEM_NAME, Iq.QUERY_NAME, "remove"};
 	private static final String[] USERNAME_PATH = new String[]{Iq.ELEM_NAME, Iq.QUERY_NAME, "username"};
 	private static final String XMLNS = "jabber:iq:register";
 
 	@Inject(bean = "service")
-	private ConnectionManager connectionManager;
+	private ClientConnectionManager connectionManager;
 
-	private Timer timer = new Timer("registration-timer", true);
-	private ConcurrentHashMap<String, List<Long>> registrations = new ConcurrentHashMap<>();
-	@ConfigField(desc = "Limit of allowed account registrations for IP in specified period")
-	private Integer limit = 4;
-	@ConfigField(desc = "Period for which limit is set")
-	private Duration period = Duration.ofDays(1);
-	private AtomicBoolean cleanUpScheduled = new AtomicBoolean(false);
+	@Inject(bean = RegistrationThrottling.ID)
+	private RegistrationThrottling throttler;
 
 	@Override
 	public String getId() {
@@ -96,7 +86,7 @@ public class RegistrationThrottlingProcessor
 			return false;
 		}
 
-		if (checkLimits(service, packet)) {
+		if (throttler.checkLimits(service, packet)) {
 			return false;
 		}
 
@@ -143,69 +133,4 @@ public class RegistrationThrottlingProcessor
 
 	}
 
-	@Override
-	public void beforeUnregister() {
-		timer.cancel();
-	}
-
-	protected void cleanUpFromTimer() {
-		Iterator<Map.Entry<String, List<Long>>> it = registrations.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry<String, List<Long>> e = it.next();
-			List<Long> registrationTimes = e.getValue();
-			synchronized (registrationTimes) {
-				cleanUp(registrationTimes);
-				if (registrationTimes.isEmpty()) {
-					it.remove();
-				}
-			}
-		}
-		Optional<Long> earliest = registrations.values().stream().flatMap(times -> times.stream()).min(Long::compare);
-		if (earliest.isPresent()) {
-			timer.schedule(new CleanUpTask(), System.currentTimeMillis() - earliest.get());
-		} else {
-			cleanUpScheduled.compareAndSet(true, false);
-		}
-	}
-
-	protected boolean checkLimits(XMPPIOService service, Packet packet) {
-		boolean result = checkLimits(service);
-		scheduleCleanUpIfNeeded();
-		return result;
-	}
-
-	protected boolean checkLimits(XMPPIOService service) {
-		List<Long> registrationTimes = registrations.computeIfAbsent(service.getRemoteAddress(),
-																	 (k) -> new ArrayList<Long>());
-		synchronized (registrationTimes) {
-			cleanUp(registrationTimes);
-
-			if (registrationTimes.size() <= limit) {
-				registrationTimes.add(System.currentTimeMillis());
-			}
-
-			return registrationTimes.size() <= limit;
-		}
-	}
-
-	protected void cleanUp(List<Long> registrationTimes) {
-		// Five seconds added to improve performance
-		long oldestAllowed = (System.currentTimeMillis() - period.toMillis()) + 5000;
-		registrationTimes.removeIf((ts) -> ts < oldestAllowed);
-	}
-
-	protected void scheduleCleanUpIfNeeded() {
-		if (cleanUpScheduled.compareAndSet(false, true)) {
-			timer.schedule(new CleanUpTask(), period.toMillis());
-		}
-	}
-
-	protected class CleanUpTask
-			extends TimerTask {
-
-		@Override
-		public void run() {
-			RegistrationThrottlingProcessor.this.cleanUpFromTimer();
-		}
-	}
 }
