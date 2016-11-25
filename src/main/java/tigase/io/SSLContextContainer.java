@@ -378,7 +378,11 @@ public class SSLContextContainer implements SSLContextContainerIfc {
 
 			for (String pemDir : pemDirs) {
 				log.log(Level.CONFIG, "Loading server certificates from PEM directory: {0}", pemDir);
-				certsDirs[++certsDirsIdx] = new File(pemDir);
+				final File directory = new File(pemDir);
+				if (!directory.exists()) {
+					continue;
+				}
+				certsDirs[++certsDirsIdx] = directory;
 
 				for (File file : certsDirs[certsDirsIdx].listFiles(new PEMFileFilter())) {
 					try {
