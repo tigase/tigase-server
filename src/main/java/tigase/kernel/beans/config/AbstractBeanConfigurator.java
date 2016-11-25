@@ -259,6 +259,24 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 		return new HashMap<>();
 	}
 
+	protected ArrayDeque<String> getBeanConfigPath(BeanConfig beanConfig) {
+		Kernel kernel = beanConfig.getKernel();
+		ArrayDeque<String> path = new ArrayDeque<>();
+
+		if (!beanConfig.getBeanName().equals(beanConfig.getKernel().getName())) {
+			path.push(beanConfig.getBeanName());
+		}
+
+		while (kernel.getParent() != null && kernel != this.kernel) {
+			path.push(kernel.getName());
+			kernel = kernel.getParent();
+		}
+
+		return path;
+	}
+
+	protected abstract boolean hasDirectConfiguration(BeanConfig bc);
+
 	@Override
 	public void registerBeans(BeanConfig beanConfig, Object bean, Map<String, Object> values) {
 		if (beanConfig != null && Kernel.class.isAssignableFrom(beanConfig.getClazz()))
@@ -293,6 +311,11 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 				kernel.registerBean(cls).setSource(BeanConfig.Source.annotation).registeredBy(beanConfig).exec();
 			} else {
 				kernel.registerBean(cls).setSource(BeanConfig.Source.annotation).registeredBy(beanConfig).execWithoutInject();
+			}
+
+			bc = kernel.getDependencyManager().getBeanConfig(name);
+			if (bc.getState() == BeanConfig.State.inactive && hasDirectConfiguration(bc)) {
+				log.log(Level.CONFIG, "bean " + bc.getBeanName() + " is disabled but configuration is specified");
 			}
 		});
 

@@ -82,6 +82,13 @@ Inside block between `(` and `)` you can define:
 Spaces between `beanName` and block between `()` is optional as well as space between block `()` and block `{}`.
 It is recommended that properties of bean would be placed in separate lines with indentation and first property will be placed in new line.
 
+[IMPORTANT]
+====
+Usage of `()` block is very important. When this block is used in configuration it automatically sets `active` property of bean definition for bean for which it is used to to `true`. This is done due to fact that default value of `active` is `true`.
+
+If you omit it in configuration, you will set bean configuration but it may remain `inactive`. In this state bean will not be loaded and as a result will not be used by Tigase XMPP Server.
+====
+
 === Configuring bean
 If you know that bean is defined and you do not want to change it's activity or class then you can just pass properties to configure bean in following way:
 ----

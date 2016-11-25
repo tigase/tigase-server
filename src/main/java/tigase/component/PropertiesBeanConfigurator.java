@@ -26,7 +26,6 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.*;
 import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.DependencyManager;
-import tigase.kernel.core.Kernel;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -125,20 +124,7 @@ public class PropertiesBeanConfigurator
 		}
 
 		if (props != null) {
-			List<String> path = new ArrayList<>();
-			ArrayDeque<Kernel> kernels = new ArrayDeque<>();
-			Kernel kernel = beanConfig.getKernel();
-			while (kernel.getParent() != null && kernel != this.kernel) {
-				kernels.push(kernel);
-				kernel = kernel.getParent();
-			}
-			while ((kernel = kernels.poll()) != null) {
-				path.add(kernel.getName());
-			}
-
-			if (!beanConfig.getBeanName().equals(beanConfig.getKernel().getName())) {
-				path.add(beanConfig.getBeanName());
-			}
+			List<String> path = new ArrayList<>(getBeanConfigPath(beanConfig));
 
 			for (int i = 0; i <= path.size(); i++) {
 				StringBuilder sb = new StringBuilder();
@@ -178,6 +164,29 @@ public class PropertiesBeanConfigurator
 		result.put("name", beanConfig.getBeanName());
 
 		return result;
+	}
+
+	protected boolean hasDirectConfiguration(BeanConfig beanConfig) {
+		ArrayDeque<String> path = getBeanConfigPath(beanConfig);
+		StringBuilder sb = new StringBuilder();
+
+		String name;
+		while ((name = path.poll()) != null) {
+			sb.append(name);
+			sb.append('/');
+		}
+
+		String prefix = sb.toString();
+
+		for (Map.Entry<String, Object> e : props.entrySet()) {
+			if (e.getKey().startsWith(prefix)) {
+				if (e.getKey().substring(prefix.length()).indexOf('/') == -1) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	protected Map<String, String> getConfigAliasses(BeanConfig beanConfig) {
