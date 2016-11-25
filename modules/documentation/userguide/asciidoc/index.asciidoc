@@ -617,6 +617,6 @@ include::text/dev/Development_Guide_44_-_Stanza_Limitations.asciidoc[]
 
 :leveloffset: 1
 
-include::text/components/pubsub/text/documentation/index.asciidoc[]
+include::text/components/pubsub/documentation/index.asciidoc[]
 
-include::text/components/http-api/text/documentation/index.asciidoc[]
+include::text/components/http-api/documentation/index.asciidoc[]
