@@ -414,6 +414,11 @@ public class KernelTest {
 		}
 
 		@Override
+		protected boolean hasDirectConfiguration(BeanConfig bc) {
+			return false;
+		}
+
+		@Override
 		public Map<String, Object> getConfiguration(BeanConfig beanConfig) {
 			if (beanConfig.getBeanName().equals("bean5")) {
 				HashMap<String, Object> result = new HashMap<String, Object>();

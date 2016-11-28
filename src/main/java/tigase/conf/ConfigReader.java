@@ -73,11 +73,17 @@ public class ConfigReader {
 		});
 	}
 
-	public Map<String, Object> read(File f) throws IOException {
-		Map<String, Object> props = new HashMap<>();
+	public Map<String, Object> read(Reader reader) throws IOException {
+		BufferedReader buffReader = new BufferedReader(reader);
+		Map<String, Object> props = process(buffReader);
+		return props;
+	}
 
-		try (BufferedReader reader = new BufferedReader(new FileReader(f))) {
-			props = process(reader);
+	public Map<String, Object> read(File f) throws IOException {
+		Map<String, Object> props;
+
+		try (FileReader reader = new FileReader(f)) {
+			props = read(reader);
 		}
 
 		return props;

@@ -82,8 +82,12 @@ public class EventBusImplementation implements EventBus {
 	}
 
 	private void checkIfEventIsRegistered(final String eventName) throws EventBusException {
-		if (this.acceptOnlyRegisteredEvents && !registrar.isRegistered(eventName)) {
-			throw new EventBusException("Event " + eventName + " is not registered.");
+		if (!registrar.isRegistered(eventName)) {
+			if (this.acceptOnlyRegisteredEvents) {
+				throw new EventBusException("Event " + eventName + " is not registered.");
+			} else {
+				log.log(Level.FINEST, "Event " + eventName + " in not registered.");
+			}
 		}
 	}
 

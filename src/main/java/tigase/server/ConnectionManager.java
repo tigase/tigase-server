@@ -277,7 +277,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	@ConfigField(desc = "Traffic throttling")
 	protected String trafficThrottling = ST_TRAFFIC_THROTTLING_PROP_VAL;
-	private Kernel kernel;
+	protected Kernel kernel;
 
 	//~--- constant enums -------------------------------------------------------
 
@@ -837,9 +837,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	public void setProcessors(XMPPIOProcessor[] processors) {
 		if (processors == null)
 			processors = new XMPPIOProcessor[0];
-		for (XMPPIOProcessor processor : processors) {
-			processor.setConnectionManager(this);
-		}
 		this.processors = processors;
 	}
 

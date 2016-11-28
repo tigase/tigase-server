@@ -86,7 +86,7 @@ include::text/admin/Admin_Guide_15_-_Security_-_A_-_Server_Certificates.asciidoc
 
 include::text/admin/Admin_Guide_16_-_Security_-_A_-_Server_Certificates_-_1_-_Creating_and_Loading_the_Server_Certificate_in_PEM_Files.asciidoc[]
 
-include::text/admin/Admin_Guide_17_-_Security_-_A_-_Server_Certificates_-_2_-_Installing_StartCom_Certificate_in_your_Linux_System.asciidoc[]
+include::text/admin/Admin_Guide_17_-_Security_-_A_-_Server_Certificates_-_2_-_Installing_LetsEncrypt_Certificate_in_your_Linux_System.asciidoc[]
 
 //include::text/admin/Admin_Guide_18_-_Security_-_A_-_Server_Certificates_-_3_-_Server_Certificate_Using_Keytool_and_Keystore.asciidoc[]
 

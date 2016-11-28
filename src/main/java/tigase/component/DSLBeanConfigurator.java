@@ -55,22 +55,27 @@ public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 		return getBeanConfigurationProperties(beanConfig, aliassesToFields);
 	}
 
-	protected Map<String, Object> getBeanConfigurationProperties(BeanConfig beanConfig, Map<String, String> aliasesToFields) {
-		HashMap<String, Object> result = new HashMap<>();
-		ArrayDeque<Kernel> kernels = new ArrayDeque<>();
-		Kernel kernel = beanConfig.getKernel();
-		while (kernel.getParent() != null && kernel != this.kernel) {
-			kernels.push(kernel);
-			kernel = kernel.getParent();
+	protected boolean hasDirectConfiguration(BeanConfig beanConfig) {
+		ArrayDeque<String> kernels = getBeanConfigPath(beanConfig);
+		Map<String, Object> result = props;
+
+		String name;
+		while (result != null && (name = kernels.poll()) != null) {
+			result = (Map<String, Object>) result.get(name);
 		}
 
+		return result != null;
+	}
+
+	protected Map<String, Object> getBeanConfigurationProperties(BeanConfig beanConfig, Map<String, String> aliasesToFields) {
+		HashMap<String, Object> result = new HashMap<>();
+		ArrayDeque<String> path = getBeanConfigPath(beanConfig);
 		Queue<Map<String, Object>> configPath = new ArrayDeque<>();
 		Map<String, Object> props = this.props;
 		configPath.add(props);
 
-		while((kernel = kernels.poll()) != null) {
-			String name = kernel.getName();
-
+		String name;
+		while((name = path.poll()) != null) {
 			props = (Map<String, Object>) props.get(name);
 			if (props == null) {
 				configPath.offer(Collections.emptyMap());
@@ -80,21 +85,16 @@ public class DSLBeanConfigurator extends AbstractBeanConfigurator {
 			configPath.offer(props);
 		}
 
-		if (!beanConfig.getBeanName().equals(beanConfig.getKernel().getName())) {
-			if (props != null) {
-				props = (Map<String, Object>) props.get(beanConfig.getBeanName());
-				if (props != null) {
-					configPath.offer(props);
-				} else {
-					configPath.offer(Collections.emptyMap());
-				}
-			}
-		}
-
 		while ((props = configPath.poll()) != null) {
 			for (Map.Entry<String, Object> e : props.entrySet()) {
 				if (configPath.isEmpty()) {
-					result.put(e.getKey(), e.getValue());
+					String fieldName = aliasesToFields.get(e.getKey());
+					if (fieldName != null) {
+						result.put(fieldName, e.getValue());
+					} else {
+						result.put(e.getKey(), e.getValue());
+					}
+
 				} else {
 					String fieldName = aliasesToFields.get(e.getKey());
 					if (fieldName != null) {

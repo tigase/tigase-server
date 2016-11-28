@@ -111,6 +111,8 @@ public class ClientConnectionManager
 			new ClientTrustManagerFactory();
 	@Inject
 	protected EventBus eventBus;
+	@Inject(bean = RegistrationThrottling.ID, nullAllowed = true)
+	private RegistrationThrottling registrationThrottling;
 	private boolean tlsWantClientAuthEnabled = TLS_WANT_CLIENT_AUTH_ENABLED_DEF;
 	private final ShutdownTask shutdownTask = new ShutdownTask();
 
@@ -317,6 +319,16 @@ public class ClientConnectionManager
 		xmppStreamClosed(service);
 
 		return result;
+	}
+
+	public void setRegistrationThrottling(RegistrationThrottling throttling) {
+		if (registrationThrottling != null) {
+			this.registrationThrottling.stopFor(kernel);
+		}
+		if (throttling != null) {
+			throttling.startFor(kernel);
+		}
+		this.registrationThrottling = throttling;
 	}
 	
 	@Override
@@ -1155,9 +1167,9 @@ public class ClientConnectionManager
 
 			// Ups, doesn't look good, the server is either oveloaded or lost
 			// a packet.
-			log.log(Level.INFO, "No response within time limit received for a packet: {0}",
+			log.log(Level.INFO, "No response within time limit received for a packet: {0}; RETRYING",
 					packet.toStringSecure());
-			addOutPacketWithTimeout(packet, stoppedHandler, 60l, TimeUnit.SECONDS);
+			addOutPacketWithTimeout(packet, stoppedHandler, 60L, TimeUnit.SECONDS);
 		}
 	}
 

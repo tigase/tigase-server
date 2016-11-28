@@ -22,7 +22,6 @@
 package tigase.server.xmppclient;
 
 import tigase.kernel.beans.Bean;
-import tigase.server.ConnectionManager;
 import tigase.server.Packet;
 import tigase.stats.CounterValue;
 import tigase.stats.StatisticsList;
@@ -31,7 +30,6 @@ import tigase.xmpp.StreamError;
 import tigase.xmpp.XMPPIOService;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.logging.Level;
 
 /**
@@ -82,15 +80,6 @@ public class StreamErrorCounterIOProcessor implements XMPPIOProcessor {
 	@Override
 	public boolean serviceStopped(XMPPIOService service, boolean streamClosed) {
 		return false;
-	}
-
-	@Override
-	public void setConnectionManager(ConnectionManager connectionManager) {
-		compName = connectionManager.getName();
-	}
-
-	@Override
-	public void setProperties(Map<String, Object> props) {
 	}
 
 	@Override

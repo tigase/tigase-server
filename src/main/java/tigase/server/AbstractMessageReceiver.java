@@ -36,6 +36,7 @@ import tigase.stats.StatisticsContainer;
 import tigase.stats.StatisticsList;
 import tigase.util.PatternComparator;
 import tigase.util.PriorityQueueAbstract;
+import tigase.util.TigaseStringprepException;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -121,6 +122,8 @@ public abstract class AbstractMessageReceiver
 	public static final String OUTGOING_FILTERS_PROP_VAL =
 			"tigase.server.filters.PacketCounter";
 
+	public static final String PACKET_DELIVERY_RETRY_COUNT_PROP_KEY = "packet-delivery-retry-count";
+
 	/**
 	 * Configuration property key for setting number of threads used by component
 	 * ScheduledExecutorService.
@@ -178,6 +181,8 @@ public abstract class AbstractMessageReceiver
 	private Timer                    receiverTasks         = null;
 	@ConfigField(desc = "Number of threads for scheduler", alias = SCHEDULER_THREADS_PROP_KEY)
 	private int                      schedulerThreads_size = 1;
+	@ConfigField(desc = "Packet delivery retry count", alias = PACKET_DELIVERY_RETRY_COUNT_PROP_KEY)
+	private int                      packetDeliveryRetryCount = 15;
 
 	// Array cache to speed processing up....
 	private final Priority[]                            pr_cache = Priority.values();
@@ -1330,20 +1335,57 @@ public abstract class AbstractMessageReceiver
 					extends tigase.util.TimerTask {
 		private ReceiverTimeoutHandler handler = null;
 		private String                 id      = null;
+		private int                    retryCount = packetDeliveryRetryCount;
 		private Packet                 packet  = null;
 
 		//~--- constructors -------------------------------------------------------
 
-		private PacketReceiverTask(ReceiverTimeoutHandler handler, long delay, TimeUnit unit,
-				Packet packet) {
+		private PacketReceiverTask(ReceiverTimeoutHandler handler, long delay, TimeUnit unit, Packet packet) {
 			super();
 			this.handler = handler;
-			this.packet  = packet;
-			id           = packet.getFrom().toString() + packet.getStanzaId();
+			this.packet = packet;
+			this.id = packet.getFrom().toString() + packet.getStanzaId();
+
+			String countStr = packet.getElement().getAttributeStaticStr("retryCount");
+			if (countStr != null) {
+				retryCount = Byte.valueOf(countStr);
+				retryCount--;
+			}
+			this.packet.getElement().setAttribute("retryCount", Integer.toString(retryCount));
+
+			if ( retryCount < 0 ) {
+				if (log.isLoggable(Level.WARNING)) {
+					log.log(Level.WARNING,
+							"Dropping command packet! Retry limit reached for packet with ID: {0}, retryCount: {1}, packet: {2}",
+							new Object[]{id, retryCount, this.packet});
+				}
+				PacketReceiverTask remove = waitingTasks.remove(id);
+				remove.cancel();
+				return;
+			}
+
+			String delayStr = packet.getElement().getAttributeStaticStr("delay");
+			if (delayStr != null ) {
+				delay = (long)(Long.valueOf(delayStr) * 1.5);
+			}
+
+			this.packet.getElement().setAttribute("delay", Long.toString(delay));
+
 			waitingTasks.put(id, this);
+
 			addTimerTask(this, delay, unit);
 
-			// log.finest("[" + getName() + "]  " + "Added timeout task for: " + id);
+			try {
+				this.packet.initVars();
+			} catch (TigaseStringprepException e) {
+				log.log(Level.WARNING, "Reinitializing packet failed", e);
+			}
+
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST,
+						"[{0}] Added timeout task for ID: {1}, delay: {2}, retryCount: {3}, packet: {4}",
+						new Object[]{getName(), id, delay, retryCount, this.packet});
+			}
 		}
 
 		//~--- methods ------------------------------------------------------------
@@ -1355,12 +1397,11 @@ public abstract class AbstractMessageReceiver
 		 * @param response
 		 */
 		public void handleResponse(Packet response) {
-
-			// waitingTasks.remove(packet.getFrom() + packet.getId());
 			this.cancel();
 
-			// log.finest("[" + getName() + "]  " + "Response received for id: " +
-			// id);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "[{0}] Response received for id: {1}", new Object[]{getName(), id});
+			}
 			handler.responseReceived(packet, response);
 		}
 
@@ -1370,7 +1411,9 @@ public abstract class AbstractMessageReceiver
 		 */
 		public void handleTimeout() {
 
-			// log.finest("[" + getName() + "]  " + "Fired timeout for id: " + id);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "[{0}] Fired timeout for id: {1}", new Object[]{getName(), id});
+			}
 			waitingTasks.remove(id);
 			handler.timeOutExpired(packet);
 		}
