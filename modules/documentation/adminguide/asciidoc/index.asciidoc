@@ -33,6 +33,8 @@ include::text/Admin_Guide_07_-_Quick_Start_-_F_-_Setting_Up_Server.asciidoc[]
 
 include::text/Admin_Guide_07_-_Quick_Start_-_G_-_Script_Selection.asciidoc[]
 
+include::text/Admin_Guide_07_-_Quick_Start_-_H_-_Shutting_Down.asciidoc[]
+
 :leveloffset: 1
 
 include::text/Admin_Guide_08_-_Latest_and_Nightly_Builds.asciidoc[]

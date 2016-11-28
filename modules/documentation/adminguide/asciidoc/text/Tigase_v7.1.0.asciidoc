@@ -308,6 +308,7 @@ Tigase has improved default settings to improve performance.  These include:
 - link:https://projects.tigase.org/issues/4352[#4352] Websocket implementation has been changed to properly parse HTTP headers with omitted spaces for HTTP 1.1 protocol.
 - link:https://projects.tigase.org/issues/4358[#4358] Several methods have been renamed or removed to prepare for v7.2.0 Kernel setup.
 - #4385 Minor tweak to web-installer to skip unnecessary showing of blank init.properties file & enabled post-setup editing and saving.
+- link:https://projects.tigase.org/issues/4665[#4665] Full Stacktrace will be dumped to log file by default, see xref:shutDownStackTrace[this section] for more details.
 
 
 == Fixes

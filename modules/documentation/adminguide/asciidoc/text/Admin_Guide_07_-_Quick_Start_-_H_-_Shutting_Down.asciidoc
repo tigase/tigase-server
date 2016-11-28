@@ -1,0 +1,46 @@
+[[shuttingDown]]
+= Shutting Down Tigase
+:author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
+:version: v1.0 November, 2016
+:date: 22-11-2016 11:30
+
+:toc:
+:numbered:
+:website: http://www.tigase.net
+
+Although Tigase XMPP Server can be terminated by ending the process, it is preferred and recommended to use it's own shutdown scripts instead.  Not only does this allow for a proper purge of Tigase form the system, but allows for all shutdown functions to operate, such as ammending logs and completing statistics.
+To trigger a shutdown of Tigase server, the following command can be used from the tigase directory:
+
+[source,bash]
+-----
+./scripts/tigase.sh stop
+-----
+You may specify the config file if you want, but it will make no differences
+
+This will:
+
+- Begin shutdown thread
+- Stop accepting new connections
+- Close all current connections
+- Collect runtime statistics
+- Write statistics to log
+- Dump full stacktrace to a file
+- Run GC and clear from memory
+
+// Ad-hoc?
+
+[[shutDownStats]]
+== Shutdown statistics
+Upon shutdown, statistics for the server's runtime will be appended to the log file.  For a description of the statsitics and what they mean, refer to the xref:statsticsDescription[Statistics Description] portion of the documentation.
+
+
+[[shutDownStackTrace]]
+== Shutdown StackTrace Dump
+To aid with troubleshooting purposes, the full stacktrace will be dumped to a seperate file located at $serverdir/logs/threads-dump.log.#
+Stacktrace logs will follow the same log file numbering scheme described in xref:logs[Log file description].
+
+This feature is enabled by default, however you may disable this by adding the following to your init.properties file:
+[source,properties]
+-----
+--shutdown-thread-dump=false
+-----
