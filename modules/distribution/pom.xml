@@ -220,7 +220,7 @@
 									<version>1.3.0-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>true</overWrite>
-									<outputDirectory>${project.basedir}/../../modules/documentation/userguide/asciidoc/text/components/http-api</outputDirectory>
+									<outputDirectory>${project.basedir}/../../modules/documentation/text/components/http-api</outputDirectory>
 									<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
 
@@ -290,7 +290,7 @@
 									<version>3.3.0-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
-									<outputDirectory>${project.basedir}/../../modules/documentation/userguide/asciidoc/text/components/pubsub</outputDirectory>
+									<outputDirectory>${project.basedir}/../../modules/documentation/text/components/pubsub</outputDirectory>
 									<includes>**/*.asciidoc,**/*.css</includes>
 								</artifactItem>
 

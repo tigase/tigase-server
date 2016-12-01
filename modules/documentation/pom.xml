@@ -3,7 +3,7 @@
 	<properties>
 		<packaging.type>pom</packaging.type>
 		<dist_path>../..</dist_path>
-		<guide_path>${dist_path}/docs/${guide_name}_Guide</guide_path>
+		<guide_path>${dist_path}/docs/User_Guide</guide_path>
 		<guide_filename>index</guide_filename>
 		<guide_name>User</guide_name>
 	</properties>
@@ -21,10 +21,6 @@
 		<version>7.2.0-SNAPSHOT</version>
 		<relativePath>../master</relativePath>
 	</parent>
-
-	<modules>
-		<module>userguide</module>
-	</modules>
 
 	<build>
 		<pluginManagement>
@@ -71,8 +67,8 @@
 					</executions>
 					<configuration>
 						<gemPath>gems-provided</gemPath>
-						<sourceDirectory>./asciidoc</sourceDirectory>
-						<sourceDocumentName>${guide_filename}.asciidoc</sourceDocumentName>
+						<sourceDirectory>./</sourceDirectory>
+						<sourceDocumentName>index.asciidoc</sourceDocumentName>
 						<attributes>
 							<endpoint-url>http://docs.tigase.org</endpoint-url>
 						</attributes>
@@ -118,13 +114,13 @@
 								<ignoreImageScaling>true</ignoreImageScaling>
 								<postProcess>
 									<copy todir="${guide_path}/webhelp/css">
-										<fileset dir="asciidoc/css"></fileset>
+										<fileset dir="css"></fileset>
 									</copy>
 									<copy todir="${guide_path}/webhelp/images">
-										<fileset dir="asciidoc/images"></fileset>
+										<fileset dir="images"></fileset>
 									</copy>
 									<copy todir="${guide_path}/webhelp/files">
-										<fileset dir="asciidoc/files"></fileset>
+										<fileset dir="files"></fileset>
 									</copy>
 								</postProcess>
 
@@ -162,13 +158,13 @@
 								<htmlStylesheet>css/docbook-xsl.css</htmlStylesheet>
 								<postProcess>
 									<copy todir="${guide_path}/html_chunk/css">
-										<fileset dir="asciidoc/css"></fileset>
+										<fileset dir="css"></fileset>
 									</copy>
 									<copy todir="${guide_path}/html_chunk/images">
-										<fileset dir="asciidoc/images"></fileset>
+										<fileset dir="images"></fileset>
 									</copy>
 									<copy todir="${guide_path}/html_chunk/files">
-										<fileset dir="asciidoc/files"></fileset>
+										<fileset dir="files"></fileset>
 									</copy>
 								</postProcess>
 							</configuration>
@@ -186,13 +182,13 @@
 								<annotationCss>true</annotationCss>
 								<preProcess>
 									<copy todir="${project.build.directory}/epub3/css">
-										<fileset dir="asciidoc/css"></fileset>
+										<fileset dir="css"></fileset>
 									</copy>
 									<copy todir="${project.build.directory}/epub3/images">
-										<fileset dir="asciidoc/images"></fileset>
+										<fileset dir="images"></fileset>
 									</copy>
 									<copy todir="${project.build.directory}/epub3/files">
-										<fileset dir="asciidoc/files"></fileset>
+										<fileset dir="files"></fileset>
 									</copy>
 								</preProcess>
 								<postProcess>
@@ -275,8 +271,58 @@
 					<skip>true</skip>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.asciidoctor</groupId>
+				<artifactId>asciidoctor-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>output-html</id>
+						<phase>generate-resources</phase>
+					</execution>
+					<execution>
+						<id>output-docbook</id>
+						<phase>generate-resources</phase>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>com.agilejava.docbkx</groupId>
+				<artifactId>docbkx-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate-pdf</id>
+						<phase>generate-resources</phase>
+					</execution>
+					<execution>
+						<id>generate-html</id>
+						<phase>generate-resources</phase>
+					</execution>
+					<execution>
+						<phase>generate-resources</phase>
+						<id>generate-webhelp</id>
+					</execution>
+					<execution>
+						<phase>generate-resources</phase>
+						<id>generate-epub3</id>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>Remove *.fo file</id>
+						<phase>package</phase>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
+		
 	</build>
+	
+	
 
 	<pluginRepositories>
 		<pluginRepository>
