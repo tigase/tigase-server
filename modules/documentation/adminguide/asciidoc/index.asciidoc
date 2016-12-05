@@ -308,3 +308,5 @@ include::text/Admin_Guide_100_-_Using_Tigase_-_O_-_Licensing.asciidoc[]
 include::text/Admin_Guide_101_-_Using_Tigase_-_P_-_Advanced_Options.asciidoc[]
 
 include::text/Admin_Guide_104_-_Using_Tigase_-_Q_-_Clustering.asciidoc[]
+
+include::text/Admin_Guide_107_-_Using_Tigase_-_R_-_Anonymous_Users.asciidoc[]
