@@ -45,6 +45,7 @@ import tigase.server.ConnectionManager;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.ServiceChecker;
+import tigase.stats.MaxDailyCounterQueue;
 import tigase.stats.StatisticsList;
 import tigase.sys.TigaseRuntime;
 import tigase.util.Algorithms;
@@ -195,6 +196,8 @@ public class ClusterConnectionManager
 	private int                                  lastDayIdx            = 0;
 	private long[]                               lastHour              = new long[60];
 	private int                                  lastHourIdx           = 0;
+	private MaxDailyCounterQueue<Integer> maxNodes = new MaxDailyCounterQueue<>(31);
+	private int maxNodesWithinLastWeek = 0;
 	private int                                  nodesNo               = 0;
 	private int                                  per_node_conns =
 			CLUSTER_CONNECTIONS_PER_NODE_VAL;
@@ -349,11 +352,25 @@ public class ClusterConnectionManager
 	@Override
 	public void nodeConnected(String node) {
 		super.nodeConnected(node);
+
+        maxNodes.add(getNodesConnectedWithLocal().size());
+        maxNodesWithinLastWeek = maxNodes.getMaxValueInRange(7);
+	}
+
+	@Override
+	public synchronized void everyHour() {
+		super.everyHour();
+
+        maxNodes.add(getNodesConnectedWithLocal().size());
+        maxNodesWithinLastWeek = maxNodes.getMaxValueInRange(7);
 	}
 
 	@Override
 	public void nodeDisconnected(String node) {
 		super.nodeDisconnected(node);
+
+        maxNodes.add(getNodesConnectedWithLocal().size());
+        maxNodesWithinLastWeek = maxNodes.getMaxValueInRange(7);
 	}
 
 	@Override
@@ -798,6 +815,9 @@ public class ClusterConnectionManager
 		list.add(getName(), "Average decompression ratio", ioStatsGetter
 				.getAverageDecompressionRatio(), Level.FINE);
 		list.add(getName(), "Waiting to send", ioStatsGetter.getWaitingToSend(), Level.FINE);
+
+		list.add(getName(), "Max daily cluster nodes count in last month", maxNodes.toString(), Level.INFO);
+		list.add(getName(), "Max nodes count within last week", maxNodesWithinLastWeek, Level.INFO);
 
 		if ((!list.checkLevel(Level.FINEST)) && getNodesConnected().size() > 0) {
 			// in FINEST level every component will provide this data

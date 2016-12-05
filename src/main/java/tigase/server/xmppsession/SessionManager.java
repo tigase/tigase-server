@@ -33,6 +33,7 @@ import tigase.db.*;
 import tigase.disco.XMPPService;
 import tigase.server.*;
 import tigase.server.script.CommandIfc;
+import tigase.stats.MaxDailyCounterQueue;
 import tigase.stats.StatisticsList;
 import tigase.sys.OnlineJidsReporter;
 import tigase.sys.TigaseRuntime;
@@ -95,6 +96,9 @@ public class SessionManager
 	private int                              maxUserSessions                 = 0;
 	private int                              maxUserSessionsDaily            = 0;
 	private int                              maxUserSessionsYesterday        = 0;
+    private MaxDailyCounterQueue<Integer> maxDailyUsersSessions = new MaxDailyCounterQueue<>(31);
+    private int maxDailyUsersConnectionsWithinLastWeek = 0;
+
 	private NonAuthUserRepository            naUserRepository                = null;
 	private SessionCloseProc                 sessionCloseProc                = null;
 	private SessionOpenProc                  sessionOpenProc                 = null;
@@ -708,6 +712,9 @@ public class SessionManager
 		}
 		list.add(getName(), "Maximum user sessions today", maxUserSessionsDaily, Level.INFO);
 		list.add(getName(), "Maximum user sessions yesterday", maxUserSessionsYesterday, Level.INFO);
+
+        list.add(getName(), "Max daily users sessions count last month", maxDailyUsersSessions.toString(), Level.INFO);
+        list.add(getName(), "Max users sessions within last week", maxDailyUsersConnectionsWithinLastWeek, Level.INFO);
 
 		for (XMPPImplIfc plugin : allPlugins) {
 			plugin.getStatistics(list);
@@ -2290,6 +2297,13 @@ public class SessionManager
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
+	public synchronized void everySecond() {
+		super.everySecond();
+		maxDailyUsersSessions.add(maxUserSessionsDaily);
+		maxDailyUsersConnectionsWithinLastWeek = maxDailyUsersSessions.getMaxValueInRange(7);
+	}
+
+	@Override
 	public synchronized void everyMinute() {
 		super.everyMinute();
 		int count = 0;
@@ -2321,6 +2335,9 @@ public class SessionManager
 			maxUserSessionsYesterday = maxUserSessionsDaily;
 			maxUserSessionsDaily = sessionsByNodeId.size();
 		}
+
+        maxDailyUsersSessions.add(maxUserSessionsDaily);
+        maxDailyUsersConnectionsWithinLastWeek = maxDailyUsersSessions.getMaxValueInRange(7);
 	}
 
 	/*

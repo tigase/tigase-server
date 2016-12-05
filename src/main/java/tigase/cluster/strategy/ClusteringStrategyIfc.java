@@ -31,6 +31,7 @@ import tigase.cluster.api.SessionManagerClusteredIfc;
 
 import tigase.server.Packet;
 
+import tigase.stats.StatisticHolder;
 import tigase.stats.StatisticsList;
 
 import tigase.sys.OnlineJidsReporter;
@@ -54,7 +55,7 @@ import java.util.Set;
  * @param <E>
  */
 public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
-				extends OnlineJidsReporter {
+				extends OnlineJidsReporter, StatisticHolder {
 	
 	/**
 	 * Method description
