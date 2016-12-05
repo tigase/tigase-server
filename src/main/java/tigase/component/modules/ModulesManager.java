@@ -17,29 +17,24 @@
  */
 package tigase.component.modules;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import tigase.component.Context;
 import tigase.component.exceptions.ComponentException;
 import tigase.criteria.Criteria;
 import tigase.server.Packet;
 import tigase.util.TigaseStringprepException;
 
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Implementation of modules provider. It keeps all registered modules and
  * decides what modules may handle incoming stanza.
- * 
+ *
  * @author bmalkow
- * 
+ *
  */
 public class ModulesManager implements ModuleProvider {
 
@@ -78,6 +73,16 @@ public class ModulesManager implements ModuleProvider {
 	public <T extends Module> T getModule(String id) {
 		initIfRequired();
 		return (T) this.modulesById.get(id);
+	}
+
+	@Override
+	public List<Module> getModules() {
+		return Collections.unmodifiableList(this.modules);
+	}
+
+	@Override
+	public Collection<String> getModulesId() {
+		return Collections.unmodifiableCollection(this.modulesById.keySet());
 	}
 
 	public void initIfRequired() {

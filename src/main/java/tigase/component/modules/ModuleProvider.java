@@ -17,24 +17,40 @@
  */
 package tigase.component.modules;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 public interface ModuleProvider {
 
 	/**
 	 * Returns features offered by registered modules.
-	 * 
+	 *
 	 * @return collection of available features.
 	 */
-	public Set<String> getAvailableFeatures();
+	Set<String> getAvailableFeatures();
 
 	/**
 	 * Return module implementation by module identifier.
-	 * 
-	 * @param id
-	 *            identifier
+	 *
+	 * @param id identifier
+	 *
 	 * @return module implementation.
 	 */
-	public <T extends Module> T getModule(String id);
+	<T extends Module> T getModule(String id);
+
+	/**
+	 * Returns list of all registered {@link Module modules} in current component.
+	 *
+	 * @return list of modules.
+	 */
+	List<Module> getModules();
+
+	/**
+	 * Returns collection of identifiers of registered {@link Module modules}.
+	 *
+	 * @return list of modules ID.
+	 */
+	Collection<String> getModulesId();
 
 }
