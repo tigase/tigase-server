@@ -125,6 +125,10 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 		try {
 
 			// It is now time to load all Items' settings from the database:
+			if (repo == null) {
+				log.log(Level.SEVERE, "Repository is not initialised - skipping reload");
+				return;
+			}
 			String items_list = repo.getData(getRepoUser(), getItemsListPKey());
 
 			if ( items_list != null ){
