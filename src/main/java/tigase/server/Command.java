@@ -28,16 +28,13 @@ package tigase.server;
 
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
-
 import tigase.xmpp.JID;
 import tigase.xmpp.StanzaType;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Helper enum to make it easier to operate on packets with ad-hoc commands. It
@@ -346,6 +343,14 @@ public enum Command {
 		Element iq      = packet.getElement();
 		Element command = iq.getChild(COMMAND_EL);
 		DataForm.addFieldMultiValue( command, f_name, f_value);
+
+	}
+
+	public static void addFieldMultiValue(final Packet packet, final String f_name,
+										  final List<String> f_value, String label) {
+		Element iq      = packet.getElement();
+		Element command = iq.getChild(COMMAND_EL);
+		DataForm.addFieldMultiValue( command, f_name, f_value, label);
 
 	}
 

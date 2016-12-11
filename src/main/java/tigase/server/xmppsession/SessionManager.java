@@ -113,6 +113,7 @@ public class SessionManager
 	private EventBus						 eventBus = EventBusFactory.getInstance();
 	@ConfigField(desc = "Force detail check of stale connections", alias = SessionManagerConfig.STALE_CONNECTION_CLOSER_QUEUE_SIZE_KEY)
 	private boolean                          forceDetailStaleConnectionCheck = true;
+	private Kernel kernel = null;
 	private int                              maxIdx                          = 100;
 	private int                              maxUserConnections              = 0;
 	private int                              maxUserSessions                 = 0;
@@ -438,6 +439,8 @@ public class SessionManager
 		binds.put(CommandIfc.USER_CONN, connectionsByFrom);
 		binds.put(CommandIfc.USER_REPO, user_repository);
 		binds.put(CommandIfc.USER_SESS, sessionsByNodeId);
+		binds.put("kernel", kernel);
+		binds.put("eventBus", eventBus);
 	}
 
 	@Override
@@ -1931,11 +1934,11 @@ public class SessionManager
 	}
 
 	public void register(Kernel kernel) {
-
+		this.kernel = kernel;
 	}
 
 	public void unregister(Kernel kernel) {
-
+		this.kernel = null;
 	}
 
 	protected void xmppStreamMoved(XMPPResourceConnection conn, JID oldConnId, JID newConnId) {
