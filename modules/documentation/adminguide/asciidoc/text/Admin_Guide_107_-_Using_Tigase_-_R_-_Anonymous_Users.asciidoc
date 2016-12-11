@@ -1,0 +1,43 @@
+[[anonymousUsers]]
+= Anonymous Users & Authentication
+
+:author: Daniel Wisnewski <daniel.wisnewski@tigase.net>
+:version: v1.0, October, 2016
+:date: 2016-10-20 11:38
+
+:toc:
+:numbered:
+:website: http://tigase.net
+
+To support anonymous users, you must first enable anonymous authentication on your server.
+
+== Anonymous Authentication
+Tigase Sevrer can support anonymous logins VIA SASL-ANONYMOUS in certain scenarios.  This can be enabled by using the following setting in init.properties file: _--vhost-anonymous-enabled=true_
+This setting is false by default as SASL-ANONYMOUS may not be totally secure as users can connect without prior permission (username and password).
+This is a *global* setting and will affect all vhosts unless they are set individually.  If you wish to allow only certain hosts to allow anonymous login, then use the --virt-hosts configuration like below:
+[source,properties]
+-----
+--virt-hosts=domain1:-anon, domain2:c2s-ports-allowed=5032:-tls-required
+-----
+Where domain1 now has anonymous access allowed, and domain2 does not.
+
+
+
+== Anonymous User Features
+To connect to your server anonymously, you must use a client that supports anonymous authentication and users.  Connect to the server with the name of the server as the username, and no password.
+For example, to connect anonymously to xmpp.example.com use the following credentials,
+
+Username: xmpp.example.com
+Password:
+
+In this mode all login information is stored in memory, and cannot be retrieved at a later date.
+
+Other features of Anonymous Authentication
+- Temporary Jid is assigned and destroyed the moment of login/logout.
+- Anonymous users cannot access the database
+- Anonymous users cannot communicate outside the server (use s2s connections)
+- Anonymous users have a default limit on traffic generated per user.
+
+=== Reconnection on Anonymous
+On products such as our JaXMPP Server, users connected using SASL-ANONYMOUS can reconnect to existing sessions using cookie management.
+However, reconnection can be improved and extended using link:http://docs.tigase.org/tigase-server/snapshot/Development_Guide/html/#boshsessioncache[Bosh Session Cache] which allows for session storage in memory rather than using client-side data for reconnection.

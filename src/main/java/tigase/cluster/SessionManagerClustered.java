@@ -135,6 +135,30 @@ public class SessionManagerClustered
 	}
 
 	@Override
+	public synchronized void everySecond() {
+		super.everySecond();
+		if (strategy != null) {
+			strategy.everySecond();
+		}
+	}
+
+	@Override
+	public synchronized void everyMinute() {
+		super.everyMinute();
+		if (strategy != null) {
+			strategy.everyMinute();
+		}
+	}
+
+	@Override
+	public synchronized void everyHour() {
+		super.everyHour();
+		if (strategy != null) {
+			strategy.everyHour();
+		}
+	}
+
+	@Override
 	public boolean fastAddOutPacket(Packet packet) {
 		return super.fastAddOutPacket(packet);
 	}

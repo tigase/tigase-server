@@ -67,6 +67,8 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 	private static final boolean ALLOW_UNMASKED_FROM_CLIENT = Boolean.getBoolean("ws-allow-unmasked-frames");
 	private static final int PROTOCOL_ERROR = 1003;
 
+	private static byte[] EMPTY = new byte[0];
+
 	@Override
 	public String getId() {
 		return ID;
@@ -196,7 +198,8 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Socket: {0}, ignoring pong frame", new Object[] { service });
 					}
-					unmasked = null;
+					// We are returning empty byte buffer to make sure other frames remaining in buffer will be processed
+					unmasked = ByteBuffer.wrap(EMPTY);
 				} // if it ping request send pong response
 				else if ((type & 0x09) == 0x09) {
 					if (log.isLoggable(Level.FINEST)) {
@@ -212,7 +215,8 @@ public class WebSocketHybi implements WebSocketProtocolIfc {
 					} finally {
 						service.writeInProgress.unlock();
 					}
-					unmasked = null;
+					// We are returning empty byte buffer to make sure other frames remaining in buffer will be processed
+					unmasked = ByteBuffer.wrap(EMPTY);
 				}
 			}
 		} catch (BufferUnderflowException ex) {
