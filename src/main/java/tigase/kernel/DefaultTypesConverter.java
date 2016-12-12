@@ -21,6 +21,7 @@
 
 package tigase.kernel;
 
+import tigase.conf.ConfigReader;
 import tigase.kernel.beans.Bean;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.util.Base64;
@@ -92,7 +93,7 @@ public class DefaultTypesConverter
 		throw new RuntimeException("Cannot convert to " + type);
 	}
 
-	public <T> T convert(final Object value, final Class<T> expectedType, Type genericType) {
+	public <T> T convert(Object value, final Class<T> expectedType, Type genericType) {
 		try {
 			if (value == null) {
 				return null;
@@ -100,6 +101,10 @@ public class DefaultTypesConverter
 
 			if ("null".equals(value)) {
 				return null;
+			}
+
+			if (value instanceof ConfigReader.Variable) {
+				value = ((ConfigReader.Variable) value).calculateValue();
 			}
 
 			final Class<?> currentType = value.getClass();
@@ -184,6 +189,9 @@ public class DefaultTypesConverter
 					int i = 0;
 					while (it.hasNext()) {
 						Object v = it.next();
+						if (v instanceof ConfigReader.Variable) {
+							v = ((ConfigReader.Variable) v).calculateValue();
+						}
 						Array.set(result, i, (v instanceof String)
 											 ? convert(unescape((String) v), expectedType.getComponentType())
 											 : v);
@@ -337,6 +345,8 @@ public class DefaultTypesConverter
 
 			}
 			return sb.toString();
+		} else if (value instanceof ConfigReader.Variable) {
+			return toString(((ConfigReader.Variable) value).calculateValue());
 		} else {
 			return value.toString();
 		}

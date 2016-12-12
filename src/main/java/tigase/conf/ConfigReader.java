@@ -24,12 +24,10 @@ package tigase.conf;
 import tigase.kernel.beans.config.AbstractBeanConfigurator;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Created by andrzej on 05.06.2016.
@@ -102,7 +100,7 @@ public class ConfigReader {
 
 			if (holder.state == State.QUOTE) {
 				if (holder.quoteChar == c) {
-					holder.parent.value = holder.sb.toString().trim();
+					holder.parent.value = holder.sb.toString();
 					holder = holder.parent;
 				} else {
 					holder.sb.append(c);
@@ -204,25 +202,69 @@ public class ConfigReader {
 					break;
 				}
 				case '(': {
-					holder.key = (holder.value != null && holder.value instanceof String) ? ((String) holder.value).trim() : holder.sb.toString().trim();
+					String key = (holder.value != null && holder.value instanceof String) ? ((String) holder.value).trim() : holder.sb.toString().trim();
 					StateHolder tmp = new StateHolder();
-					tmp.state = State.BEAN;
-					tmp.bean = new AbstractBeanConfigurator.BeanDefinition();
-					tmp.bean.setBeanName(holder.key);
+					switch (key) {
+						case "env":
+							tmp.state = State.ENVIRONMENT;
+							tmp.variable = new ConfigReader.EnvironmentVariable();
+							break;
+						case "prop":
+							tmp.state = State.PROPERTY;
+							tmp.variable = new ConfigReader.PropertyVariable();
+							break;
+						default:
+							holder.key = key;
+							tmp.state = State.BEAN;
+							tmp.bean = new AbstractBeanConfigurator.BeanDefinition();
+							tmp.bean.setBeanName(holder.key);
+							break;
+					}
 					tmp.parent = holder;
 					holder = tmp;
 					break;
 				}
 				case ')': {
-					AbstractBeanConfigurator.BeanDefinition val = holder.bean;
-					Object val1 = holder.value != null ? holder.value : decodeValue(holder.sb.toString().trim());
-					setBeanDefinitionValue(val1);
+					Object val = null;
+					switch (holder.state) {
+						case ENVIRONMENT:
+							((EnvironmentVariable) holder.variable).setName(holder == null ? "" : holder.value.toString().trim());
+							val = holder.variable;
+							break;
+						case PROPERTY:
+							PropertyVariable prop = (PropertyVariable) holder.variable;
+							String value = holder.value.toString().trim();
+							if (prop.getName() == null) {
+								prop.setName(value);
+							} else {
+								prop.setDefValue(value);
+							}
+							val = holder.variable;
+							break;
+						case BEAN:
+							val = holder.bean;
+							Object val1 = holder.value != null ? holder.value : decodeValue(holder.sb.toString().trim());
+							setBeanDefinitionValue(val1);
+							break;
+					}
 					holder = holder.parent;
 					holder.value = val;
 					break;
 				}
 				case ',':
 				case '\n':
+					if (holder.variable != null && holder.state != State.PROPERTY) {
+						if (holder.variable instanceof CompositeVariable) {
+							Object value = holder.value;
+							if (value == null) {
+								value = decodeValue(holder.sb.toString());
+							}
+
+							((CompositeVariable) holder.variable).add(value);
+						}
+						holder.value = holder.variable;
+						holder.variable = null;
+					}
 					switch (holder.state) {
 						case MAP:
 							if (holder.key == null || holder.key.isEmpty()) {
@@ -246,11 +288,33 @@ public class ConfigReader {
 							Object val = holder.value != null ? holder.value : decodeValue(holder.sb.toString().trim());
 							setBeanDefinitionValue(val);
 							break;
+						case PROPERTY:
+							((PropertyVariable) holder.variable).setName(holder.value.toString().trim());
+							holder.value = holder.variable;
+							break;
 					}
 					holder.key = null;
 					holder.sb = new StringBuilder();
 					holder.value = null;
 					break;
+				case '+':
+				case '-':
+				case '/':
+				case '*':
+					Object value = holder.value;
+					if (value == null) {
+						value = decodeValue(holder.sb.toString());
+					}
+					if (holder.key != null && value != null) {
+						holder.value = null;
+						holder.sb = new StringBuilder();
+						if (holder.variable == null) {
+							CompositeVariable var = new CompositeVariable();
+							holder.variable = var;
+						}
+						((CompositeVariable) holder.variable).add(c, value);
+						break;
+					}
 				default:
 					holder.sb.append(c);
 					break;
@@ -272,7 +336,8 @@ public class ConfigReader {
 
 	private static double x = 2.1f;
 
-	protected Object decodeValue(String string) {
+	protected Object decodeValue(String string_in) {
+		String string = string_in.trim();
 		// Decoding doubles and floats
 		Matcher matcher = DOUBLE_PATTERN.matcher(string);
 		if (matcher.matches()) {
@@ -309,7 +374,7 @@ public class ConfigReader {
 				break;
 		}
 
-		return string;
+		return string_in;
 	}
 
 	protected void setBeanDefinitionValue(Object val) {
@@ -340,6 +405,7 @@ public class ConfigReader {
 		public List list;
 		public Map<String, Object> map;
 		public AbstractBeanConfigurator.BeanDefinition bean;
+		public Variable variable;
 		public StateHolder parent = null;
 		public char quoteChar = '\'';
 		public Object value;
@@ -350,6 +416,276 @@ public class ConfigReader {
 		QUOTE,
 		LIST,
 		COMMENT,
-		BEAN
+		BEAN,
+		ENVIRONMENT,
+		PROPERTY
+	}
+
+	public interface Variable {
+
+		Object calculateValue();
+
+	}
+
+	public static class EnvironmentVariable implements Variable {
+
+		private String name;
+
+		public EnvironmentVariable() {
+		}
+
+		public EnvironmentVariable(String name) {
+			this.setName(name);
+		}
+
+		protected String getName() {
+			return name;
+		}
+
+		protected void setName(String name) {
+			this.name = name;
+		}
+
+		@Override
+		public Object calculateValue() {
+			return System.getenv(name);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof EnvironmentVariable) {
+				EnvironmentVariable v = (EnvironmentVariable) obj;
+				if (v.name == this.name || (v.name != null && v.name.equals(this.name))) {
+					return true;
+				}
+			}
+			return false;
+		}
+	}
+
+	public static class PropertyVariable implements Variable {
+
+		private String name;
+		private String defValue;
+
+		public PropertyVariable() {
+		}
+
+		public PropertyVariable(String name, String defValue) {
+			this.setName(name);
+			this.setDefValue(defValue);
+		}
+
+		protected String getName() {
+			return this.name;
+		}
+
+		protected void setName(String name) {
+			this.name = name;
+		}
+
+		protected String getDefValue() {
+			return defValue;
+		}
+
+		protected void setDefValue(String defValue) {
+			this.defValue = defValue;
+		}
+
+		@Override
+		public Object calculateValue() {
+			return System.getProperty(name, defValue);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof PropertyVariable) {
+				PropertyVariable v = (PropertyVariable) obj;
+
+				if (v.name == this.name || (v.name != null && v.name.equals(this.name))) {
+					if (v.defValue == this.defValue || (v.defValue != null && v.defValue.equals(this.defValue))) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+	}
+
+	public static class CompositeVariable implements Variable {
+
+		private final List<Object> values = new ArrayList<>();
+		private final List<Operation> operations = new ArrayList<>();
+
+		@Override
+		public Object calculateValue() {
+			if (values.isEmpty())
+				return null;
+
+			List<Object> values = this.values.stream()
+					.map(val -> (val instanceof Variable) ? ((Variable) val).calculateValue() : val)
+					.collect(Collectors.toList());
+
+			Object first = values.get(0);
+			if (first instanceof String) {
+				if (!operations.stream().allMatch(o -> o == Operation.add)) {
+					throw new UnsupportedOperationException("Invalid operation for String!");
+				}
+				return ((List<String>) (List) values).stream().collect(Collectors.joining());
+			} else if (first instanceof Number) {
+				List<Operation> operations = new ArrayList<>(this.operations);
+				for (Operation operation : Operation.values()) {
+					Iterator<Operation> it = operations.iterator();
+					int pos = 0;
+					while (it.hasNext()) {
+						Operation o = it.next();
+						if (!operation.equals(o)) {
+							pos++;
+							continue;
+						}
+
+						Number arg1 = (Number) values.remove(pos);
+						Number arg2 = (Number) values.remove(pos);
+
+						Number result = operation.execute(arg1, arg2);
+						values.add(pos, result);
+						it.remove();
+					}
+				}
+
+				if (values.size() > 1) {
+					throw new RuntimeException("Variable calculation exception");
+				}
+
+				return values.stream().findFirst().get();
+			} else {
+				throw new UnsupportedOperationException("Cannot calculate composite variable!");
+			}
+		}
+
+		public void add(Object value) {
+			values.add(value);
+		}
+
+		public void add(char operation, Object value) {
+			Operation o = null;
+			switch (operation) {
+				case '+':
+					o = Operation.add;
+					break;
+				case '-':
+					o = Operation.substract;
+					break;
+				case '*':
+					o = Operation.multiply;
+					break;
+				case '/':
+					o = Operation.divide;
+					break;
+				default:
+					throw new UnsupportedOperationException();
+			}
+			operations.add(o);
+			values.add(value);
+		}
+
+		public enum Operation {
+			multiply,
+			divide,
+			add,
+			substract;
+
+			public Number execute(Number arg1, Number arg2) {
+				if (arg1 instanceof Double || arg2 instanceof Double) {
+					double a1 = arg1.doubleValue();
+					double a2 = arg2.doubleValue();
+					switch (this) {
+						case multiply:
+							return a1 * a2;
+						case divide:
+							return a1 / a2;
+						case add:
+							return a1 + a2;
+						case substract:
+							return a1 - a2;
+					}
+				} else if (arg1 instanceof Float || arg2 instanceof Float) {
+					float a1 = arg1.floatValue();
+					float a2 = arg2.floatValue();
+					switch (this) {
+						case multiply:
+							return a1 * a2;
+						case divide:
+							return a1 / a2;
+						case add:
+							return a1 + a2;
+						case substract:
+							return a1 - a2;
+					}
+				} else if (arg1 instanceof Long || arg2 instanceof Long) {
+					long a1 = arg1.longValue();
+					long a2 = arg2.longValue();
+					switch (this) {
+						case multiply:
+							return a1 * a2;
+						case divide:
+							return a1 / a2;
+						case add:
+							return a1 + a2;
+						case substract:
+							return a1 - a2;
+					}
+				} else if (arg1 instanceof Integer || arg2 instanceof Integer) {
+					int a1 = arg1.intValue();
+					int a2 = arg2.intValue();
+					switch (this) {
+						case multiply:
+							return a1 * a2;
+						case divide:
+							return a1 / a2;
+						case add:
+							return a1 + a2;
+						case substract:
+							return a1 - a2;
+					}
+				}
+				throw new RuntimeException("Invalid argument exception");
+			}
+		}
+
+		public List<Object> getArguments() {
+			return values;
+		}
+
+		public List<Operation> getOperations() {
+			return operations;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof CompositeVariable) {
+				CompositeVariable v = (CompositeVariable) obj;
+				if (v.values.size() != values.size()) {
+					return false;
+				}
+				if (v.operations.size() != operations.size()) {
+					return false;
+				}
+
+				for (int i=0; i<values.size(); i++) {
+					if (!values.get(i).equals(v.values.get(i))) {
+						return false;
+					}
+				}
+
+				for (int i=0; i<operations.size(); i++) {
+					if (!operations.get(i).equals(v.operations.get(i))) {
+						return false;
+					}
+				}
+				return true;
+			}
+			return false;
+		}
 	}
 }

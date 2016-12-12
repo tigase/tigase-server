@@ -158,6 +158,44 @@ Very similar to properties based configuration, in fact values are passed in sam
 | map | Not possible
 |=============================================
 
+=== Using values from System Properties and Environment Variables
+Now it is possible to use values of system properties and environment variables and assign them to bean properties.
+For this purpose we added functions which can be used in DSL and which will return values of:
+
+system property:: `prop('property-name')` or `prop('property-name','default value')`
+environment variable:: `env('variable-name')`
+
+.Example of setting value of system property and environment variable to bean `user`
+----
+user {
+  name = env('USER')
+  home = prop('user.home')
+  paths = [ prop('user.home'), prop('user.dir') ]
+}
+----
+
+=== Computed values
+With DSL configuration format we introduce support for computable values for properties. It is now possible to set value which is result of a computation, ie. concatenation of a strings or very simple mathematical expression.
+We currently support only following mathematical operations:
+
+* add
+* subtract
+* multiply
+* divide
+
+.Example of setting environment variable related path and computed timeout
+----
+bean {
+  # setting path to `some-subdirectory` of user home directory
+  path = prop('user.home') + '/some-subdirectory/'
+
+  # setting timeout to 5 minutes (setting value in milliseconds)
+  timeout = 5L * 60 * 1000
+  # previously it would need to be configured in following way:
+  # timeout = 300000L
+}
+----
+
 == Example configuration file in DSL
 ----
 # Enable cluster mode
@@ -206,6 +244,10 @@ c2s {
 http {
     # Set list of API keys
     api-keys = [ 'test1234', 'test2356' ]
+    rest {
+        # Set value of environment property as a path to look for REST scripts
+        rest-scripts-dir = env('TIGASE_REST_SCRIPTS_DIR')
+    }
 }
 
 # Register pubsub-2 (class is passed as pubsub-2 name do not have default class assigned)
