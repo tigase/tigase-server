@@ -41,6 +41,7 @@ import static tigase.server.amp.db.JDBCMsgRepository.*;
 /**
  * Created by andrzej on 15.03.2016.
  */
+@Meta( isDefault=true, supportedUris = { "jdbc:[^:]+:.*" } )
 public class JDBCMsgBroadcastRepository extends MsgBroadcastRepository<Long,DataRepository> {
 
 	private static final Logger log = Logger.getLogger(JDBCMsgBroadcastRepository.class.getCanonicalName());

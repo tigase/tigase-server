@@ -22,11 +22,13 @@
 package tigase.server.amp.db;
 
 import tigase.db.*;
-import tigase.db.beans.MDRepositoryBean;
+import tigase.db.beans.MDRepositoryBeanWithStatistics;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 import tigase.osgi.ModulesManagerImpl;
+import tigase.server.BasicComponent;
+import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
@@ -35,8 +37,14 @@ import tigase.xmpp.JID;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.DelayQueue;
+import java.util.concurrent.Delayed;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
@@ -259,7 +267,8 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 	 * Bean used to provide MsgRepository implementations
 	 */
 	@Bean(name = "msgRepository", parent = Kernel.class, exportable = true)
-	public static class MsgRepositoryMDBean extends MDRepositoryBean<MsgRepositoryIfc> implements MsgRepositoryIfc {
+	public static class MsgRepositoryMDBean extends MDRepositoryBeanWithStatistics<MsgRepositoryIfc>
+			implements MsgRepositoryIfc {
 
 		private static final Logger log = Logger.getLogger(MsgRepositoryMDBean.class.getCanonicalName());
 
@@ -267,6 +276,12 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 		private final Condition expiredMessagesCondition = lock.newCondition();
 
 		public MsgRepositoryMDBean() {
+			super(MsgRepositoryIfc.class);
+		}
+
+		@Override
+		public boolean belongsTo(Class<? extends BasicComponent> component) {
+			return SessionManager.class.isAssignableFrom(component);
 		}
 
 		@Override
@@ -278,7 +293,7 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 		public Element getMessageExpired(long time, boolean delete) {
 			lock.lock();
 			try {
-				for (MsgRepositoryIfc repo : getRepositories()) {
+				for (MsgRepositoryIfc repo : getRepositories().values()) {
 					Element el = repo.getMessageExpired(time, delete);
 					if (el != null)
 						return el;

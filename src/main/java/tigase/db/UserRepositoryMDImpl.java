@@ -24,16 +24,17 @@ package tigase.db;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.db.beans.MDPoolBean;
+import tigase.db.beans.MDPoolBeanWithStatistics;
 import tigase.db.beans.UserRepositoryMDPoolBean;
 import tigase.eventbus.EventBus;
 import tigase.kernel.beans.Inject;
 import tigase.xmpp.BareJID;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -45,7 +46,8 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class UserRepositoryMDImpl extends MDPoolBean<UserRepository,UserRepositoryMDPoolBean.UserRepositoryConfigBean> implements UserRepository {
+public abstract class UserRepositoryMDImpl extends MDPoolBeanWithStatistics<UserRepository,UserRepositoryMDPoolBean.UserRepositoryConfigBean>
+		implements UserRepository {
 	private static final Logger log = Logger.getLogger(UserRepositoryMDImpl.class.getName());
 
 	@Inject
@@ -53,9 +55,9 @@ public abstract class UserRepositoryMDImpl extends MDPoolBean<UserRepository,Use
 
 	//~--- fields ---------------------------------------------------------------
 
-	private UserRepository def = null;
-	private ConcurrentSkipListMap<String, UserRepository> repos =
-		new ConcurrentSkipListMap<String, UserRepository>();
+	public UserRepositoryMDImpl() {
+		super(UserRepository.class);
+	}
 
 	//~--- methods --------------------------------------------------------------
 
@@ -73,17 +75,6 @@ public abstract class UserRepositoryMDImpl extends MDPoolBean<UserRepository,Use
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 * @param repo
-	 */
-	public void addRepo(String domain, UserRepository repo) {
-		repos.put(domain, repo);
-	}
-
 	@Override
 	public void addUser(BareJID user) throws UserExistsException, TigaseDBException {
 		UserRepository repo = getRepo(user.getDomain());
@@ -98,10 +89,6 @@ public abstract class UserRepositoryMDImpl extends MDPoolBean<UserRepository,Use
 	}
 
 	//~--- get methods ----------------------------------------------------------
-
-	public Collection<String> getDomainsList() {
-		return Collections.unmodifiableCollection(repos.keySet());
-	}
 
 	@Override
 	public String getData(BareJID user, String subnode, String key, String def)
@@ -198,30 +185,9 @@ public abstract class UserRepositoryMDImpl extends MDPoolBean<UserRepository,Use
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 *
-	 * 
-	 */
-	public UserRepository getRepo(String domain) {
-		if (domain == null ) {
-			return def;
-		}
-		UserRepository result = repos.get(domain);
-
-		if (result == null) {
-			result = def;
-		}
-
-		return result;
-	}
-
 	@Override
 	public String getResourceUri() {
-		return def.getResourceUri();
+		return getDefaultRepository().getResourceUri();
 	}
 
 	@Override
@@ -272,24 +238,26 @@ public abstract class UserRepositoryMDImpl extends MDPoolBean<UserRepository,Use
 
 	@Override
 	public List<BareJID> getUsers() throws TigaseDBException {
-		List<BareJID> result = new ArrayList<BareJID>();
-
-		for (UserRepository repo : repos.values()) {
-			result.addAll(repo.getUsers());
+		try {
+			return repositoriesStream().sequential().flatMap(userRepository -> {
+				try {
+					return userRepository.getUsers().stream();
+				} catch (TigaseDBException e) {
+					throw new RuntimeException(e);
+				}
+			}).collect(Collectors.toList());
+		} catch (RuntimeException ex) {
+			Throwable cause = ex.getCause();
+			if (cause instanceof TigaseDBException) {
+				throw new TigaseDBException("Could not retrieve list of users", cause);
+			}
+			throw ex;
 		}
-
-		return result;
 	}
 
 	@Override
 	public long getUsersCount() {
-		long result = 0;
-
-		for (UserRepository repo : repos.values()) {
-			result += repo.getUsersCount();
-		}
-
-		return result;
+		return repositoriesStream().mapToLong(UserRepository::getUsersCount).sum();
 	}
 
 	@Override
@@ -341,18 +309,6 @@ public abstract class UserRepositoryMDImpl extends MDPoolBean<UserRepository,Use
 					"Couldn't obtain user repository for domain: " + user.getDomain()
 						+ ", not even default one!");
 		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 *
-	 * 
-	 */
-	public UserRepository removeRepo(String domain) {
-		return repos.remove(domain);
 	}
 
 	@Override
@@ -426,16 +382,6 @@ public abstract class UserRepositoryMDImpl extends MDPoolBean<UserRepository,Use
 					"Couldn't obtain user repository for domain: " + user.getDomain()
 						+ ", not even default one!");
 		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param repo
-	 */
-	public void setDefault(UserRepository repo) {
-		def = repo;
 	}
 
 	//~--- methods --------------------------------------------------------------

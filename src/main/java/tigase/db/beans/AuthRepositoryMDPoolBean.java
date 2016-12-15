@@ -25,12 +25,25 @@ import tigase.db.AuthRepository;
 import tigase.db.AuthRepositoryMDImpl;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.core.Kernel;
+import tigase.server.BasicComponent;
+import tigase.stats.StatisticsCollector;
+import tigase.stats.StatisticsList;
 
 /**
  * Created by andrzej on 08.03.2016.
  */
 @Bean(name="authRepository", parent = Kernel.class, exportable = true)
 public class AuthRepositoryMDPoolBean extends AuthRepositoryMDImpl {
+
+	@Override
+	public boolean belongsTo(Class<? extends BasicComponent> component) {
+		return StatisticsCollector.class.isAssignableFrom(component);
+	}
+
+	@Override
+	public void getStatistics(String compName, StatisticsList list) {
+		super.getStatistics(getName(), list);
+	}
 
 	@Override
 	public Class<? extends AuthRepositoryConfigBean> getConfigClass() {

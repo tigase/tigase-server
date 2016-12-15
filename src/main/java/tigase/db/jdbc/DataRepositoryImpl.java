@@ -301,8 +301,8 @@ public class DataRepositoryImpl implements DataRepository, StatisticsProviderIfc
 							 new Object[] { table_schema, database.toString(), driverClass } );
 		}
 		try {
-			reconnectionCounter = new CounterValue("repository " + getResourceUri() + " reconnections", Level.FINER);
-			reconnectionFailedCounter = new CounterValue("repository " + getResourceUri() + " failed reconnections", Level.FINER);
+			reconnectionCounter = new CounterValue("reconnections", Level.FINER);
+			reconnectionFailedCounter = new CounterValue("failed reconnections", Level.FINER);
 			initRepo();
 
 			if (!check_table_query.isEmpty()) {

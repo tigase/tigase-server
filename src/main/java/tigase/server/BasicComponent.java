@@ -43,6 +43,7 @@ import tigase.osgi.OSGiScriptEngineManager;
 import tigase.server.script.AddScriptCommand;
 import tigase.server.script.CommandIfc;
 import tigase.server.script.RemoveScriptCommand;
+import tigase.stats.ComponentStatisticsProvider;
 import tigase.stats.StatisticsList;
 import tigase.util.DNSResolverFactory;
 import tigase.util.TigaseStringprepException;
@@ -121,7 +122,10 @@ public class BasicComponent
 	private boolean             initializationCompleted = false;
 	@ConfigField(alias = "trusted", desc = "List of trusted JIDs")
 	private String[]		    trustedProp = null;
-	
+
+	@Inject(nullAllowed = true)
+	private List<ComponentStatisticsProvider> statisticsProviders;
+
 	private final CopyOnWriteArrayList<JID> connectedNodes = new CopyOnWriteArrayList<JID>();
 	private final List<JID> connectedNodes_ro = Collections.unmodifiableList(connectedNodes);
 	private final CopyOnWriteArrayList<JID> connectedNodesWithLocal = new CopyOnWriteArrayList<JID>();
@@ -233,20 +237,29 @@ public class BasicComponent
 	public void everyHour() {
 		for (CommandIfc comm : scriptCommands.values()) {
 			comm.everyHour();
-		}		
+		}
+		if (statisticsProviders != null) {
+			statisticsProviders.forEach(ComponentStatisticsProvider::everyHour);
+		}
 	}
 	
 	public void everyMinute() {
 		for (CommandIfc comm : scriptCommands.values()) {
 			comm.everyMinute();
-		}		
+		}
+		if (statisticsProviders != null) {
+			statisticsProviders.forEach(ComponentStatisticsProvider::everyMinute);
+		}
 	}
 	
 	public void everySecond() {
 		for (CommandIfc comm : scriptCommands.values()) {
 			comm.everySecond();
-		}		
-	}	
+		}
+		if (statisticsProviders != null) {
+			statisticsProviders.forEach(ComponentStatisticsProvider::everySecond);
+		}
+	}
 	
 	/**
 	 * Method description
@@ -753,6 +766,12 @@ public class BasicComponent
 		}
 		if (connectedNodes.size() > 0) {
 			list.add(getName(), "Known cluster nodes", connectedNodes.size(), Level.FINEST);
+		}
+
+		if (statisticsProviders != null) {
+			statisticsProviders.stream()
+					.filter(provider -> provider.belongsTo(this.getClass()))
+					.forEach(provider -> provider.getStatistics(compName, list));
 		}
 	}
 	

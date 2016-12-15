@@ -21,16 +21,22 @@
  */
 package tigase.db.beans;
 
-import tigase.db.*;
+import tigase.db.DBInitException;
+import tigase.db.DataSource;
+import tigase.db.DataSourceHelper;
+import tigase.db.DataSourcePool;
 import tigase.eventbus.EventBus;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.core.Kernel;
+import tigase.server.BasicComponent;
+import tigase.stats.*;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 
 import static tigase.db.beans.DataSourceBean.DataSourceMDConfigBean;
 
@@ -38,7 +44,8 @@ import static tigase.db.beans.DataSourceBean.DataSourceMDConfigBean;
  * Created by andrzej on 09.03.2016.
  */
 @Bean(name="dataSource", parent = Kernel.class, exportable = true)
-public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBean> {
+public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBean> implements
+																				   ComponentStatisticsProvider {
 
 	private final Map<String, DataSource> repositories = new ConcurrentHashMap<>();
 
@@ -76,6 +83,36 @@ public class DataSourceBean extends MDPoolBean<DataSource, DataSourceMDConfigBea
 	@Override
 	public void setDefault(DataSource repo) {
 		// here we do nothing
+	}
+
+	@Override
+	public boolean belongsTo(Class<? extends BasicComponent> component) {
+		return StatisticsCollector.class.isAssignableFrom(component);
+	}
+
+	@Override
+	public void everyHour() {
+
+	}
+
+	@Override
+	public void everyMinute() {
+
+	}
+
+	@Override
+	public void everySecond() {
+
+	}
+
+	@Override
+	public void getStatistics(String compName, StatisticsList list) {
+		String name = getName();
+		list.add(name, "Number of data sources", repositories.size(), Level.FINE);
+		repositories.entrySet()
+				.stream()
+				.filter(e -> e.getValue() instanceof StatisticsProviderIfc)
+				.forEach(e -> ((StatisticsProviderIfc) e.getValue()).getStatistics(name + "/" + e.getKey(), list));
 	}
 
 	private void fire(Object event) {

@@ -746,7 +746,6 @@ public abstract class ConfiguratorAbstract
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
-		RepositoryFactory.statistics.getStatistics(list);
 	}
 
 	@Override

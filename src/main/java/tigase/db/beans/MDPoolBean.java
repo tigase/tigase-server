@@ -40,10 +40,17 @@ public abstract class MDPoolBean<S extends Repository,T extends MDPoolConfigBean
 	@ConfigField(desc = "Domains")
 	private String[] domains = {};
 
+	@ConfigField(desc = "Bean name")
+	private String name;
+
 	private Kernel kernel;
 
 	@Inject(nullAllowed = true)
 	private MDPoolConfigBean[] configBeans;
+
+	public String getName() {
+		return name;
+	}
 
 	@Override
 	public void register(Kernel kernel) {
