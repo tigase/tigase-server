@@ -128,15 +128,26 @@ public class DependencyManager {
 		} else if (dependency.getType() != null) {
 			Class<?> type = dependency.getType();
 			if (Collection.class.isAssignableFrom(type)) {
-				type = ReflectionHelper.getCollectionParamter(dependency.getGenericType(), dependency.getBeanConfig().getClazz());
-				Type genericType = dependency.getGenericType();
-				if (genericType instanceof ParameterizedType) {
-					ParameterizedType pt = (ParameterizedType) genericType;
-					if (pt.getActualTypeArguments().length == 1 && pt.getActualTypeArguments()[0] instanceof Class) {
-						genericType = pt.getActualTypeArguments()[0];
+				Type fieldGenericType = dependency.getGenericType();
+				if (fieldGenericType instanceof ParameterizedType) {
+					ParameterizedType pt = (ParameterizedType) fieldGenericType;
+					if (pt.getActualTypeArguments().length == 1) {
+						fieldGenericType = pt.getActualTypeArguments()[0];
 					}
 				}
-				bcs.addAll(getBeanConfigs(type, genericType, dependency.getBeanConfig().getClazz()));
+				if (fieldGenericType instanceof Class) {
+					type = (Class<?>) fieldGenericType;
+				} else if (fieldGenericType instanceof ParameterizedType) {
+					type = (Class<?>) ((ParameterizedType) fieldGenericType).getRawType();
+				} else if (fieldGenericType instanceof TypeVariable) {
+					TypeVariable tv = (TypeVariable) fieldGenericType;
+					if (tv.getBounds().length == 1) {
+						type = (Class<?>) tv.getBounds()[0];
+					} else {
+						type = Object.class;
+					}
+				}
+				bcs.addAll(getBeanConfigs(type, fieldGenericType, dependency.getBeanConfig().getClazz()));
 			} else {
 				bcs.addAll(getBeanConfigs(type, dependency.getGenericType(), dependency.getBeanConfig().getClazz()));
 			}
@@ -166,37 +177,10 @@ public class DependencyManager {
 					continue;
 				}
 
-				if (genericType instanceof Class) {
-					if (((Class) genericType).isAssignableFrom(bc.getClazz())) {
-						result.add(bc);
-						continue;
-					}
+				Map<TypeVariable<?>, Type> map = ReflectionHelper.createGenericsTypeMap(ownerClass);
+				if (ReflectionHelper.compareTypes(genericType, bc.getClazz(), map, null)) {
+					result.add(bc);
 				}
-
-				if (genericType instanceof ParameterizedType) {
-					ParameterizedType pt = (ParameterizedType) genericType;
-					Type[] types = pt.getActualTypeArguments();
-					types = Arrays.copyOf(types, types.length);
-
-					Map<TypeVariable<?>, Type> map = ReflectionHelper.createGenericsTypeMap(ownerClass);
-					for (int i=0; i<types.length; i++) {
-						Type t = types[i];
-						while (t instanceof TypeVariable && map.containsKey(t)) {
-							t = map.get((TypeVariable<?>) t);
-						}
-						if (t instanceof TypeVariable && ((TypeVariable) t).getBounds() != null && ((TypeVariable) t).getBounds().length > 0) {
-							t = ((TypeVariable) t).getBounds()[0];
-						}
-						types[i] = t;
-					}
-
-					if (ReflectionHelper.classMatchesClassWithParameters(bc.getClazz(), type, types)) {
-						result.add(bc);
-						continue;
-					}
-				}
-//				if (genericType == null || (genericType instanceof ParameterizedType && Collection.class.isAssignableFrom((Class) ((ParameterizedType) genericType).getRawType())) || ReflectionHelper.classMatchesType(bc.getClazz(), genericType))
-//					result.add(bc);
 			}
 		}
 		return result;

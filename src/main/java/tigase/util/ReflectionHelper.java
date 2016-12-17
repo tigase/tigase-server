@@ -25,10 +25,7 @@ import tigase.kernel.BeanUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Utility class with useful methods to work with reflections
@@ -97,87 +94,24 @@ public class ReflectionHelper {
 		return null;
 	}
 
-	public static boolean classMatchesClassWithParameters(Class clazz, Class rt, Type[] ap) {
-		Map<TypeVariable<?>, Type> map = createGenericsTypeMap(clazz);
-		TypeVariable<?>[] tvs = rt.getTypeParameters();
-		boolean match = rt.isAssignableFrom(clazz);
-		if (!match)
-			return false;
-
-		for (int i = 0; i < tvs.length; i++) {
-			Type t = tvs[i];
-			while (map.containsKey(t)) {
-				t = map.get(t);
+	public static boolean classMatchesClassWithParameters(Class clazz, Class requiredType, Type[] requiredTypeParams) {
+		ParameterizedType pt = new ParameterizedType() {
+			@Override
+			public Type[] getActualTypeArguments() {
+				return requiredTypeParams;
 			}
 
-			if (ap[i].equals(t))
-				continue;
-
-			if (ap[i] instanceof WildcardType)
-				continue;
-
-			if ((ap[i] instanceof TypeVariable) && (t instanceof TypeVariable) && boundMatch((TypeVariable) ap[i], (TypeVariable) t))
-				continue;
-
-			if (ap[i] instanceof Class) {
-				if (t instanceof Class && ((Class) ap[i]).isAssignableFrom((Class) t))
-					continue;
-				if (t instanceof ParameterizedType && ((Class) ap[i]).isAssignableFrom((Class) ((ParameterizedType)t).getRawType()))
-					continue;
-				if (t instanceof TypeVariable && boundMatch((Class) ap[i], (TypeVariable) t))
-					continue;
+			@Override
+			public Type getRawType() {
+				return requiredType;
 			}
 
-			if (ap[i] instanceof ParameterizedType) {
-				ParameterizedType apt = (ParameterizedType) ap[i];
-				if (t instanceof TypeVariable) {
-					Type[] bounds = ((TypeVariable) t).getBounds();
-					if (bounds.length == 1) {
-						t = bounds[0];
-					}
-				}
-
-				if (t instanceof Class && apt.getRawType() instanceof Class) {
-					if (classMatchesClassWithParameters((Class) t, (Class) apt.getRawType(), apt.getActualTypeArguments()))
-						continue;
-				}
-				if (t instanceof ParameterizedType) {
-					ParameterizedType tpt = (ParameterizedType) t;
-					if (apt.getRawType() instanceof Class && tpt.getRawType() instanceof Class) {
-						if (((Class) apt.getRawType()).isAssignableFrom((Class) tpt.getRawType())) {
-							Type[] apta = apt.getActualTypeArguments();
-							Type[] tpta = tpt.getActualTypeArguments();
-							if (apta.length == tpta.length) {
-								boolean ptMatch = true;
-								for (int j=0; j<apta.length; j++) {
-									Type at = apta[j];
-									Type tt = tpta[j];
-									while (tt instanceof TypeVariable && map.containsKey(tt)) {
-										tt = map.get(tt);
-									}
-									if (tt instanceof TypeVariable) {
-										Type[] bounds = ((TypeVariable) tt).getBounds();
-										if (bounds.length == 1) {
-											tt = bounds[0];
-										}
-									}
-									if (at instanceof Class && tt instanceof Class) {
-										if (((Class) at).isAssignableFrom((Class) tt))
-											continue;
-									}
-									ptMatch = false;
-								}
-								if (ptMatch)
-									continue;
-							}
-						}
-					}
-				}
+			@Override
+			public Type getOwnerType() {
+				return null;
 			}
-
-			match &= false;
-		}
-		return match;
+		};
+		return compareTypes(pt, clazz, null, null);
 	}
 
 	public static boolean boundMatch(Class c1, TypeVariable t2) {
@@ -236,12 +170,144 @@ public class ReflectionHelper {
 	}
 
 
-	private static void createGenericsTypeMap(Map<TypeVariable<?>, Type> map, ParameterizedType type) {
+	private static Map<TypeVariable<?>, Type> createGenericsTypeMap(Map<TypeVariable<?>, Type> map, ParameterizedType type) {
 		TypeVariable<?>[] tvs = ((Class) type.getRawType()).getTypeParameters();
 		Type[] ap = type.getActualTypeArguments();
 		for (int i=0; i<tvs.length; i++) {
 			map.put(tvs[i], ap[i]);
 		}
+		return map;
 	}
 
+	public static boolean compareTypes(Type expectedType, Type actualType, Map<TypeVariable<?>, Type> ownerExpectedTypesMap, Map<TypeVariable<?>, Type> ownerActualTypesMap) {
+		if (expectedType.equals(actualType))
+			return true;
+
+		if (expectedType instanceof WildcardType)
+			return true;
+
+		if (expectedType instanceof TypeVariable) {
+			expectedType = ReflectionHelper.resolveType(expectedType, ownerExpectedTypesMap);
+			if (expectedType instanceof TypeVariable) {
+				if (actualType instanceof TypeVariable) {
+					return ReflectionHelper.boundMatch((TypeVariable) expectedType, (TypeVariable) actualType);
+				} else if (actualType instanceof Class) {
+					Type expectedBound = ((TypeVariable) expectedType).getBounds()[0];
+					return compareTypes(expectedBound, actualType, ownerExpectedTypesMap, ownerActualTypesMap);
+				}
+			}
+			else {
+				return compareTypes(expectedType, actualType, ownerExpectedTypesMap, ownerActualTypesMap);
+			}
+		}
+
+		if (expectedType instanceof Class) {
+			if (actualType instanceof Class) {
+				return (((Class) expectedType).isAssignableFrom((Class) actualType));
+			} else if (actualType instanceof ParameterizedType) {
+				return expectedType.equals(((ParameterizedType) actualType).getRawType());
+			} else if (actualType instanceof TypeVariable) {
+				return ReflectionHelper.boundMatch((Class) expectedType, (TypeVariable) actualType);
+			} else {
+				return false;
+			}
+		} else if (expectedType instanceof ParameterizedType) {
+			if (actualType instanceof ParameterizedType) {
+				return compareParameterizedTypes((ParameterizedType) expectedType, (ParameterizedType) actualType, ownerExpectedTypesMap, ownerActualTypesMap);
+			} else if (actualType instanceof Class) {
+				Type tmp = actualType;
+				if (ownerActualTypesMap == null) {
+					ownerActualTypesMap = ReflectionHelper.createGenericsTypeMap((Class) actualType);
+				}
+				Class expectedClass = (Class) ((ParameterizedType) expectedType).getRawType();
+				Class classToCheck;
+				while (tmp != null) {
+					if (tmp instanceof ParameterizedType) {
+						ParameterizedType pt = (ParameterizedType) tmp;
+						if (compareParameterizedTypes((ParameterizedType) expectedType, pt, ownerExpectedTypesMap, ownerActualTypesMap)) {
+							return true;
+						}
+						classToCheck = (Class) pt.getRawType();
+					} else if (tmp instanceof Class) {
+						classToCheck = (Class) tmp;
+					} else {
+						classToCheck = null;
+					}
+					if (classToCheck != null) {
+						Type[] ifcs = classToCheck.getGenericInterfaces();
+						for (Type ifc : ifcs) {
+							if (ifc instanceof ParameterizedType) {
+								if (compareParameterizedTypes((ParameterizedType) expectedType, (ParameterizedType) ifc, ownerExpectedTypesMap, ownerActualTypesMap)) {
+									return true;
+								}
+							}
+						}
+
+						if (expectedClass.equals(classToCheck)) {
+							if (compareParameterizedTypes((ParameterizedType) expectedType, (ParameterizedType) tmp, ownerExpectedTypesMap, ownerActualTypesMap)) {
+								return true;
+							}
+						}
+
+						tmp = classToCheck.getGenericSuperclass();
+					} else {
+						tmp = null;
+					}
+				}
+
+				return false;
+			}
+
+		}
+
+		return false;
+	}
+
+	private static boolean compareParameterizedTypes(ParameterizedType expected, ParameterizedType actual, Map<TypeVariable<?>,Type> ownerExpectedTypesMap, Map<TypeVariable<?>, Type> ownerActualTypesMap) {
+		Class expectedRawType = (Class) expected.getRawType();
+		Class actualRawType = (Class) actual.getRawType();
+		if (!expectedRawType.isAssignableFrom(actualRawType)) {
+			return false;
+		}
+
+		boolean result = true;
+		Type[] actualTypes = actual.getActualTypeArguments();
+		Type[] expectedTypes = expected.getActualTypeArguments();
+		if (actualTypes.length == expectedTypes.length) {
+			for (int i = 0; i < expectedTypes.length; i++) {
+				Type expectedType = resolveType(expectedTypes[i], ownerExpectedTypesMap);
+				Type actualType = resolveType(actualTypes[i], ownerActualTypesMap);
+
+				if (!compareTypes(expectedType, actualType, ownerExpectedTypesMap, ownerActualTypesMap)) {
+					result = false;
+				}
+			}
+			if (result) {
+				return true;
+			}
+		} else {
+			if (actualRawType.isInterface()) {
+				for (Type ifc : actualRawType.getGenericInterfaces()) {
+					if (compareTypes(expected, ifc, ownerExpectedTypesMap, ownerActualTypesMap)) {
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private static Type resolveType(Type t, Map<TypeVariable<?>,Type> ownerMap) {
+		if (ownerMap == null) {
+			return t;
+		}
+		while (t instanceof TypeVariable && ownerMap.containsKey(t)) {
+			t = ownerMap.get(t);
+		}
+		if (t instanceof TypeVariable && ((TypeVariable) t).getBounds() != null && ((TypeVariable) t).getBounds().length > 0) {
+			t = ((TypeVariable) t).getBounds()[0];
+		}
+		return t;
+	}
 }
