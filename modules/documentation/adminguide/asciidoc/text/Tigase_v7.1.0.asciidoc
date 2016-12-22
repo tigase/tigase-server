@@ -234,6 +234,15 @@ A more detailed last available presence can now be made from some configuration 
 === Setting available to enable automatic subscriptions
 Tigase supports enabling automatic presence subscriptions and roster authorizations.  For more information on these settings, check the xref:autoSub[Automatic Subscriptions] section.
 
+=== Stacktrace on Shutdown
+Tigase will now dump the stacktrace upon shutdown by default.  For more information, check xref:shutDownStackTrace[this description].
+
+=== New logic handling re-delivery of packets
+Previously, Tigase would retry deliverying command packets that failed to send after a brief delay of 60 seconds.  This new method can provide relief in sutations where command packet queues can get full.
+The new logic works like this:
+The delay for retries, after the first delay of 60 seconds will increase by a factor of 1.5, so the 2nd retry will then be 90 seconds, and then 135 and so on, until the retry limit has been reached (default is 15).
+Included in this is a new setting for setting the retry count, available xref:PacketRedelivery[here].
+
 === New Program Defaults
 
 Tigase has improved default settings to improve performance.  These include:
@@ -255,6 +264,7 @@ Tigase has improved default settings to improve performance.  These include:
 - Node connection events to administrator have been improved and are more informative.
 - +ServerConnectionManager+ has officially been depreciated from use in s2s.
 - Logs now include information about respository reconnections.
+- WebSocket PONG frams are now supported.
 - link:https://projects.tigase.org/issues/163[#163] link:http://xmpp.org/extensions/xep-0012.html[XEP-0012] User +LastActivity+ implemented
 - link:https://projects.tigase.org/issues/593[#593] link:http://xmpp.org/extensions/xep-0202.html[XEP-0202 Entity Time] has been implemented.
 - link:https://projects.tigase.org/issues/788[#788] End User Session from link:http://xmpp.org/extensions/xep-0133.html[XEP-0133 Service Administration] implemented.
@@ -309,6 +319,7 @@ Tigase has improved default settings to improve performance.  These include:
 - link:https://projects.tigase.org/issues/4358[#4358] Several methods have been renamed or removed to prepare for v7.2.0 Kernel setup.
 - #4385 Minor tweak to web-installer to skip unnecessary showing of blank init.properties file & enabled post-setup editing and saving.
 - link:https://projects.tigase.org/issues/4665[#4665] Full Stacktrace will be dumped to log file by default, see xref:shutDownStackTrace[this section] for more details.
+- link:https://projects.tigase.org/issues/4752[#4752] New methods added to Tigase: _tigase.component.modules.Moduleprovider#getModules_ and _tigase.component.modules.ModuleProvider#getModulesId_ allowing for hooking of component modules.
 
 
 == Fixes
@@ -503,7 +514,13 @@ Tigase has improved default settings to improve performance.  These include:
 
 - link:https://projects.tigase.org/issues/4365[#4365] Fixed direct presence not working with non-roster elements using barejid.
 
+- #4524 Fixed NPE during startup causd by Cluster Connection Manager.
+
 - #4672 Fixed `UnsupportedOperationException` error occuring during configuration change of `WebSocketClientConnectionClustered`.
+
+- link:https://projects.tigase.org/issues/4747[#4747] converter.groovy script is now depcreciated.
+
+- #4762 Fixed delayed processing of WebSocket data frame if frame is both TCP and ping frame.
 
 - Patch added to fix ConcurrentModificationException in BlockingCommand plugin.
 
@@ -530,3 +547,9 @@ Tigase has improved default settings to improve performance.  These include:
 - Fixed a divide by zero error in Java Garbage Collection.
 
 - Fixed +-see-other-host+ causing 'Foreign key constraint is incorrectly formed' error while using +SeeOtherHostDB+.
+
+- Fixed NPE occuring when attempting to load from repository that has not been initilized yet.
+
+- Fixed NPE in CounterDataFileLogger by implementing Stringbuilder to create statistics.
+
+- Certificate directories from old or improper installations will now be ignored if empty.
