@@ -914,6 +914,9 @@ public class Kernel {
 			return false;
 		}
 
+		if (deps.isEmpty())
+			return true;
+
 		queue.offer(new DelayedDependenciesInjection(deps));
 		return true;
 	}

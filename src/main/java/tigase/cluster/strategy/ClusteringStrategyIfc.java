@@ -28,6 +28,7 @@ package tigase.cluster.strategy;
 
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.server.Packet;
+import tigase.stats.StatisticHolder;
 import tigase.stats.StatisticsList;
 import tigase.sys.OnlineJidsReporter;
 import tigase.xmpp.BareJID;
@@ -49,7 +50,7 @@ import java.util.Set;
  * @param <E>
  */
 public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
-				extends OnlineJidsReporter {
+				extends OnlineJidsReporter, StatisticHolder {
 	
 	/**
 	 * Method description

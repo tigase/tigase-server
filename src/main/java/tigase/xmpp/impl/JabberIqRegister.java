@@ -26,12 +26,16 @@ package tigase.xmpp.impl;
 
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
+import tigase.db.UserRepository;
+import tigase.eventbus.EventBus;
+import tigase.eventbus.HandleEvent;
 import tigase.form.*;
 import tigase.kernel.beans.Bean;
-import tigase.server.Command;
-import tigase.server.Iq;
-import tigase.server.Packet;
-import tigase.server.Priority;
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.UnregisterAware;
+import tigase.server.*;
+import tigase.server.Message;
 import tigase.server.xmppsession.SessionManager;
 import tigase.stats.StatisticsList;
 import tigase.util.TigaseStringprepException;
@@ -39,6 +43,7 @@ import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 import tigase.xmpp.*;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,7 +60,7 @@ import java.util.regex.Pattern;
  * @version $Rev$
  */
 @Bean(name = JabberIqRegister.ID, parent = SessionManager.class)
-public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc {
+public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc, Initializable, UnregisterAware {
 	public static final String ID = "jabber:iq:register";
 	public static final String REGISTRATION_PER_SECOND_PROP_KEY = "registrations-per-second";
 	public static final String REGISTRATION_BLACKLIST_PROP_KEY = "registration-blacklist";
@@ -82,13 +87,20 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 	 * Private logger for class instances.
 	 */
 	private static Logger log = Logger.getLogger(JabberIqRegister.class.getName());
+	private static final BareJID smJid = BareJID.bareJIDInstanceNS("sess-man");
 	/**
 	 * Whitelist properties
 	 */
 
+	@Inject
+	private EventBus eventBus;
+	@Inject
+	private UserRepository userRepository;
+
 	private TokenBucketPool tokenBucket = new TokenBucketPool();
 	private List<CIDRAddress> registrationWhitelist = new LinkedList<CIDRAddress>();
 	private List<CIDRAddress> registrationBlacklist = new LinkedList<CIDRAddress>();
+	private String welcomeMessage = null;
 	private boolean whitelistRegistrationOnly = false;
 	private String oauthConsumerKey;
 	private String oauthConsumerSecret;
@@ -98,6 +110,11 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 
 	// ~--- methods
 	// --------------------------------------------------------------
+
+	@Override
+	public void beforeUnregister() {
+		eventBus.unregisterAll(this);
+	}
 
 	private static String parseRemoteAddressFromJid(JID from) {
 		try {
@@ -136,6 +153,16 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 	@Override
 	public String id() {
 		return ID;
+	}
+
+	@Override
+	public void initialize() {
+		eventBus.registerAll(this);
+		try {
+			welcomeMessage = userRepository.getData(smJid, ID, "welcome-message");
+		} catch (TigaseDBException ex) {
+			log.log(Level.WARNING, "failed to read current welcome message from user repository", ex);
+		}
 	}
 
 	/**{@inheritDoc}
@@ -329,6 +356,14 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 						}
 						result = session.register(user_name, pass_enc, reg_params);
 						if (result == Authorization.AUTHORIZED) {
+							String localPart = BareJID.parseJID(user_name)[0];
+							if (localPart == null || localPart.isEmpty()) {
+								localPart = user_name;
+							}
+							tigase.server.Message msg = createWelcomeMessage(localPart, session);
+							if (msg != null) {
+								results.offer(msg);
+							}
 							results.offer(result.getResponseMessage(packet, null, false));
 						} else {
 							++statsInvalidRegistrations;
@@ -468,6 +503,31 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 
 	}
 
+	private tigase.server.Message createWelcomeMessage(String username, XMPPResourceConnection session)
+			throws TigaseStringprepException {
+		if (welcomeMessage == null) {
+			return null;
+		}
+
+		JID jid = JID.jidInstance(username, session.getDomainAsJID().getDomain());
+
+		Element messageEl = new Element("message");
+		messageEl.setXMLNS(Message.CLIENT_XMLNS);
+		messageEl.addChild(new Element("body", welcomeMessage));
+
+		return new Message(messageEl, session.getDomainAsJID(), jid);
+	}
+
+	public void setWelcomeMessage(String message) throws TigaseDBException {
+		userRepository.setData(smJid, ID, "welcome-message", message);
+		eventBus.fire(new WelcomeMessageChangedEvent(message));
+	}
+
+	@HandleEvent
+	public void onWelcomeMessageChange(WelcomeMessageChangedEvent event) {
+		this.welcomeMessage = event.getMessage();
+	}
+
 	@Override
 	public Element[] supDiscoFeatures(XMPPResourceConnection session) {
 		if (log.isLoggable(Level.FINEST) && (session != null)) {
@@ -578,5 +638,23 @@ public class JabberIqRegister extends XMPPProcessor implements XMPPProcessorIfc 
 			int diff = toInteger(address) - low;
 			return diff >= 0 && (diff <= (high - low));
 		}
+	}
+
+	public static class WelcomeMessageChangedEvent
+			implements Serializable {
+
+		private String message;
+
+		public WelcomeMessageChangedEvent() {
+		}
+
+		public WelcomeMessageChangedEvent(String message) {
+			this.message = message;
+		}
+
+		public String getMessage() {
+			return message;
+		}
+
 	}
 } // JabberIqRegister

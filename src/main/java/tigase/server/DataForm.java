@@ -59,7 +59,12 @@ public class DataForm {
 	}
 
 	public static void addFieldMultiValue( final Element el, final String f_name,
-																				 final List<String> f_value ) {
+										   final List<String> f_value ) {
+		addFieldMultiValue(el, f_name, f_value, null);
+	}
+
+	public static void addFieldMultiValue( final Element el, final String f_name,
+																				 final List<String> f_value, final String label ) {
 		Element x = el.getChild( "x", "jabber:x:data" );
 
 		if ( x == null ){
@@ -69,6 +74,10 @@ public class DataForm {
 			Element field = new Element( FIELD_EL, new String[] { "var", "type" },
 																	 new String[] { XMLUtils.escape( f_name ),
 																									"text-multi" } );
+
+			if (label != null) {
+				field.addAttribute("label", label);
+			}
 
 			for ( String val : f_value ) {
 				if ( val != null ){

@@ -24,14 +24,13 @@ package tigase.db;
 //~--- non-JDK imports --------------------------------------------------------
 
 import tigase.db.beans.AuthRepositoryMDPoolBean;
-import tigase.db.beans.MDPoolBean;
+import tigase.db.beans.MDPoolBeanWithStatistics;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
 import tigase.xml.Element;
 import tigase.xmpp.BareJID;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,28 +44,19 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public abstract class AuthRepositoryMDImpl extends MDPoolBean<AuthRepository,AuthRepositoryMDPoolBean.AuthRepositoryConfigBean> implements AuthRepository {
+public abstract class AuthRepositoryMDImpl extends MDPoolBeanWithStatistics<AuthRepository,AuthRepositoryMDPoolBean.AuthRepositoryConfigBean>
+		implements AuthRepository {
 	private static final Logger log = Logger.getLogger(AuthRepositoryMDImpl.class.getName());
 
 	//~--- fields ---------------------------------------------------------------
 
-	private AuthRepository def = null;
 	private EventBus eventBus = EventBusFactory.getInstance();
-	private ConcurrentSkipListMap<String, AuthRepository> repos =
-		new ConcurrentSkipListMap<String, AuthRepository>();
+
+	public AuthRepositoryMDImpl() {
+		super(AuthRepository.class);
+	}
 
 	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 * @param repo
-	 */
-	public void addRepo(String domain, AuthRepository repo) {
-		repos.put(domain, repo);
-	}
 
 	@Override
 	public void addUser(BareJID user, String password)
@@ -114,38 +104,14 @@ public abstract class AuthRepositoryMDImpl extends MDPoolBean<AuthRepository,Aut
 		}
 	}
 
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 *
-	 *
-	 */
-	public AuthRepository getRepo(String domain) {
-		AuthRepository result = repos.get(domain);
-
-		if (result == null) {
-			result = def;
-		}
-
-		return result;
-	}
-
 	@Override
 	public String getResourceUri() {
-		return def.getResourceUri();
+		return getDefaultRepository().getResourceUri();
 	}
 
 	@Override
 	public long getUsersCount() {
-		long result = 0;
-
-		for (AuthRepository repo : repos.values()) {
-			result += repo.getUsersCount();
-		}
-
-		return result;
+		return repositoriesStream().mapToLong(AuthRepository::getUsersCount).sum();
 	}
 
 	@Override
@@ -243,21 +209,6 @@ public abstract class AuthRepositoryMDImpl extends MDPoolBean<AuthRepository,Aut
 		}
 	}
 
-	// ~--- set methods
-	// ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param domain
-	 *
-	 *
-	 */
-	public AuthRepository removeRepo(String domain) {
-		return repos.remove(domain);
-	}
-
 	// ~--- methods
 	// --------------------------------------------------------------
 
@@ -277,16 +228,6 @@ public abstract class AuthRepositoryMDImpl extends MDPoolBean<AuthRepository,Aut
 					"Couldn't obtain user repository for domain: " + user.getDomain()
 						+ ", not even default one!");
 		}
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param repo
-	 */
-	public void setDefault(AuthRepository repo) {
-		def = repo;
 	}
 
 	@Override

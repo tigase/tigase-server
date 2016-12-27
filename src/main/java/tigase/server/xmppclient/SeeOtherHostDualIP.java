@@ -25,7 +25,7 @@ import tigase.db.DBInitException;
 import tigase.db.DataSource;
 import tigase.db.DataSourceAware;
 import tigase.db.DataSourceHelper;
-import tigase.db.beans.MDRepositoryBean;
+import tigase.db.beans.MDRepositoryBeanWithStatistics;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.HandleEvent;
 import tigase.kernel.beans.Bean;
@@ -201,10 +201,11 @@ public class SeeOtherHostDualIP
 	}
 
 	@Bean(name = "dualIPRepository", parent = SeeOtherHostDualIP.class)
-	public static class DualIPRepositoryWrapper extends MDRepositoryBean<DualIPRepository> implements  DualIPRepository<DataSource> {
+	public static class DualIPRepositoryWrapper extends MDRepositoryBeanWithStatistics<DualIPRepository>
+			implements DualIPRepository<DataSource> {
 
 		public DualIPRepositoryWrapper() {
-
+			super(DualIPRepository.class);
 		}
 
 		public Map<BareJID, BareJID> queryAllDB() throws SQLException {

@@ -25,7 +25,28 @@ public class ConfigReaderTest {
 		root.put("test123", "2313");
 		root.put("tes22", "223");
 		root.put("x-gy+=x",123);
+		root.put("env-1", new ConfigReader.EnvironmentVariable("PATH"));
+		root.put("prop-1", new ConfigReader.PropertyVariable("java.vendor", null));
+		root.put("prop-2", new ConfigReader.PropertyVariable("java.version", "-1"));
+
+		ConfigReader.CompositeVariable compositeVariable = new ConfigReader.CompositeVariable();
+		compositeVariable.add("Java: ");
+		compositeVariable.add('+', new ConfigReader.PropertyVariable("java.vendor", null));
+		compositeVariable.add('+', " ");
+		compositeVariable.add('+', new ConfigReader.PropertyVariable("java.version", null));
+		root.put("comp-prop1", compositeVariable);
+
+		compositeVariable = new ConfigReader.CompositeVariable();
+		compositeVariable.add(5);
+		compositeVariable.add('-', 2);
+		compositeVariable.add('*', 60);
+		compositeVariable.add('*', 1000);
+		root.put("comp-prop2", compositeVariable);
+
 		List list = new ArrayList();
+		list.add(new ConfigReader.EnvironmentVariable("USER"));
+		root.put("env-list", list);
+		list = new ArrayList();
 		list.add(1);
 		list.add(3);
 		root.put("some-list", list);

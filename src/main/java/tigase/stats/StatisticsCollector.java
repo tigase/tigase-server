@@ -100,6 +100,7 @@ public class StatisticsCollector
 	// private ServiceEntity stats_modules = null;
 	private Level statsLevel       = Level.INFO;
 	private final Timer statsArchivTasks = new Timer("stats-archivizer-tasks", true);
+	private final Timer everyX = new Timer("stats-timer", true);
 	private long  updateInterval   = 10;
 	private int   highMemoryLevel  = 95;
 
@@ -153,6 +154,24 @@ public class StatisticsCollector
 		if (initializationCompletedTask != null) {
 			initializationCompletedTask.run();
 		}
+		everyX.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				everySecond();
+			}
+		}, 1000,1000);
+		everyX.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				everyMinute();
+			}
+		}, 1000 * 60,1000 * 60);
+		everyX.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				everyHour();
+			}
+		}, 1000 * 60 * 60,1000 * 60 * 60);
 	}
 
 	@Override
@@ -331,6 +350,8 @@ public class StatisticsCollector
 		for (StatisticsContainer comp : components.values()) {
 			getComponentStats(comp.getName(), list);
 		}
+
+		getStatistics(list);
 
 		int  totalQueuesWait     = 0;
 		long totalQueuesOverflow = 0;

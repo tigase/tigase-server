@@ -67,8 +67,39 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	private static final Logger log = Logger.getLogger(
 			DefaultClusteringStrategyAbstract.class.getName());
 	private static final String PACKET_FORWARD_CMD = "packet-forward-sm-cmd";
+	protected String prefix = "sess-man/strategy/" + this.getClass().getSimpleName();
 	
 	//~--- fields ---------------------------------------------------------------
+
+	@Override
+	public void statisticExecutedIn(long executionTime) {
+
+	}
+
+	@Override
+	public void everyHour() {
+
+	}
+
+	@Override
+	public void everyMinute() {
+
+	}
+
+	@Override
+	public void everySecond() {
+
+	}
+
+	@Override
+	public void getStatistics(String compName, StatisticsList list) {
+
+	}
+
+	@Override
+	public void setStatisticsPrefix(String prefix) {
+		this.prefix = prefix;
+	}
 
 	/** Field description */
 	@Inject
@@ -100,6 +131,7 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	public DefaultClusteringStrategyAbstract() {
 		super();
 		addCommandListener(new PacketForwardCmd(PACKET_FORWARD_CMD, this));
+		setStatisticsPrefix("sess-man/strategy/" + this.getClass().getSimpleName());
 	}
 
 	//~--- methods --------------------------------------------------------------
@@ -128,7 +160,6 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	public boolean containsJidLocally(JID jid) {
 		return false;
 	}
-	
 	@Override
 	public void handleLocalPacket(Packet packet, XMPPResourceConnection conn) {}
 
@@ -334,6 +365,7 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 		for (CommandListener cmd : commands) {
 			cmd.getStatistics(list);
 		}
+		getStatistics("sess-man/",list);
 	}
 
 	@Override

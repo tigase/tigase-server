@@ -386,10 +386,10 @@ public abstract class ConfiguratorAbstract
 			for (String property_filename : prop_files) {
 				log.log(Level.CONFIG, "Loading initial properties from property file: {0}",
 						property_filename);
-				try {
+				try (FileReader fileReader = new FileReader(property_filename)) {
 					Properties defProps = new Properties();
 
-					defProps.load(new FileReader(property_filename));
+					defProps.load(fileReader);
 
 					Set<String> prop_keys = defProps.stringPropertyNames();
 
@@ -746,7 +746,6 @@ public abstract class ConfiguratorAbstract
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
-		RepositoryFactory.statistics.getStatistics(list);
 	}
 
 	@Override

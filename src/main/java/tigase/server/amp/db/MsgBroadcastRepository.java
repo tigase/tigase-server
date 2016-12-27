@@ -21,8 +21,11 @@
  */
 package tigase.server.amp.db;
 
-import tigase.db.*;
-import tigase.db.beans.MDRepositoryBean;
+import tigase.db.DBInitException;
+import tigase.db.DataSource;
+import tigase.db.DataSourceAware;
+import tigase.db.DataSourceHelper;
+import tigase.db.beans.MDRepositoryBeanWithStatistics;
 import tigase.kernel.beans.Bean;
 import tigase.server.amp.AmpComponent;
 import tigase.server.amp.JidResourceMap;
@@ -126,7 +129,17 @@ public abstract class MsgBroadcastRepository<T,S extends DataSource> implements 
 	}
 
 	@Bean(name = "msgBroadcastRepository", parent = AmpComponent.class)
-	public static class MsgBroadcastRepositoryBean extends MDRepositoryBean<MsgBroadcastRepository> implements MsgBroadcastRepositoryIfc {
+	public static class MsgBroadcastRepositoryBean extends MDRepositoryBeanWithStatistics<MsgBroadcastRepository>
+			implements MsgBroadcastRepositoryIfc {
+
+		public MsgBroadcastRepositoryBean() {
+			super(MsgBroadcastRepositoryIfc.class);
+		}
+
+		@Override
+		public void setDataSource(DataSource dataSource) {
+			// Nothing to do
+		}
 
 		@Override
 		protected Class<? extends MsgBroadcastRepository> findClassForDataSource(DataSource dataSource) throws DBInitException {

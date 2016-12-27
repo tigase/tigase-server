@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import static tigase.db.beans.MDPoolBean.REPO_CLASS;
 
@@ -64,6 +65,9 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 	@ConfigField(desc = "Map of aliases for data sources to use")
 	protected ConcurrentHashMap<String, String> aliases = new ConcurrentHashMap<>();
 
+	@ConfigField(desc = "Bean name")
+	private String name;
+
 	@ConfigField(desc = "Create repositories for: every UserRepository, every data source, listed data sources")
 	protected SelectorType dataSourceSelection = SelectorType.List;
 
@@ -75,8 +79,16 @@ public abstract class MDRepositoryBean<T extends DataSourceAware> implements Ini
 
 	protected abstract Class<? extends T> findClassForDataSource(DataSource dataSource) throws DBInitException;
 
-	protected Collection<T> getRepositories() {
-		return repositories.values();
+	protected Stream<T> repositoriesStream() {
+		return getRepositories().values().stream();
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	protected Map<String,T> getRepositories() {
+		return Collections.unmodifiableMap(repositories);
 	}
 
 	protected T getRepository(String domain) {

@@ -21,6 +21,8 @@
  */
 package tigase.server.amp.db;
 
+import tigase.db.DataSource;
+import tigase.db.DataSourceAware;
 import tigase.xml.Element;
 import tigase.xmpp.BareJID;
 
@@ -30,7 +32,7 @@ import java.util.Date;
 /**
  * Created by andrzej on 15.03.2016.
  */
-public interface MsgBroadcastRepositoryIfc {
+public interface MsgBroadcastRepositoryIfc<T extends DataSource> extends DataSourceAware<T> {
 
 	void loadMessagesToBroadcast();
 	MsgBroadcastRepository.BroadcastMsg getBroadcastMsg(String id);

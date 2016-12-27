@@ -186,7 +186,8 @@ public class DataRepositoryPool implements DataRepository, DataSourcePool<DataRe
 
 	@Override
 	public void getStatistics(String compName, StatisticsList list) {
-		list.add(compName, "repository " + getResourceUri() + " connections count", repoPool.size(), Level.FINE);
+		list.add(compName, "uri", getResourceUri(), Level.FINE);
+		list.add(compName, "connections count", repoPool.size(), Level.FINE);
 		for (DataRepository repo : repoPool) {
 			if (repo instanceof StatisticsProviderIfc) {
 				((StatisticsProviderIfc) repo).getStatistics(compName, list);

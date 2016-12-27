@@ -57,6 +57,9 @@ public abstract class SDRepositoryBean <A extends DataSourceAware> implements In
 	@ConfigField(alias = REPO_CLASS, desc = "Class implementing repository", allowAliasFromParent = false)
 	private String cls;
 
+	@ConfigField(desc = "Bean name")
+	private String name;
+
 	@ConfigField(desc = "Name of data source", alias = "data-source")
 	private String dataSourceName;
 
@@ -67,6 +70,17 @@ public abstract class SDRepositoryBean <A extends DataSourceAware> implements In
 	protected abstract Class<?> findClassForDataSource(DataSource dataSource) throws DBInitException;
 
 	protected void initializeRepository(A repository) {}
+
+	public String getDataSourceName() {
+		if (dataSourceName == null) {
+			return "default";
+		}
+		return dataSourceName;
+	}
+
+	public String getName() {
+		return name;
+	}
 
 	protected A getRepository() {
 		return repository;

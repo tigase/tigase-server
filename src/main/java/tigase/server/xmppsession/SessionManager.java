@@ -46,6 +46,7 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 import tigase.server.*;
 import tigase.server.script.CommandIfc;
+import tigase.stats.MaxDailyCounterQueue;
 import tigase.stats.StatisticsList;
 import tigase.sys.OnlineJidsReporter;
 import tigase.sys.TigaseRuntime;
@@ -113,6 +114,7 @@ public class SessionManager
 	private EventBus						 eventBus = EventBusFactory.getInstance();
 	@ConfigField(desc = "Force detail check of stale connections", alias = SessionManagerConfig.STALE_CONNECTION_CLOSER_QUEUE_SIZE_KEY)
 	private boolean                          forceDetailStaleConnectionCheck = true;
+	private Kernel kernel = null;
 	private int                              maxIdx                          = 100;
 	private int                              maxUserConnections              = 0;
 	private int                              maxUserSessions                 = 0;
@@ -120,6 +122,8 @@ public class SessionManager
 	private int                              maxUserSessionsYesterday        = 0;
 	@Inject
 	private NonAuthUserRepository            naUserRepository;
+    private MaxDailyCounterQueue<Integer> maxDailyUsersSessions = new MaxDailyCounterQueue<>(31);
+    private int maxDailyUsersConnectionsWithinLastWeek = 0;
 	@Inject
 	private SessionCloseProc                 sessionCloseProc                = null;
 	@Inject
@@ -438,6 +442,8 @@ public class SessionManager
 		binds.put(CommandIfc.USER_CONN, connectionsByFrom);
 		binds.put(CommandIfc.USER_REPO, user_repository);
 		binds.put(CommandIfc.USER_SESS, sessionsByNodeId);
+		binds.put("kernel", kernel);
+		binds.put("eventBus", eventBus);
 	}
 
 	@Override
@@ -701,6 +707,9 @@ public class SessionManager
 		}
 		list.add(getName(), "Maximum user sessions today", maxUserSessionsDaily, Level.INFO);
 		list.add(getName(), "Maximum user sessions yesterday", maxUserSessionsYesterday, Level.INFO);
+
+        list.add(getName(), "Max daily users sessions count last month", maxDailyUsersSessions.toString(), Level.INFO);
+        list.add(getName(), "Max users sessions within last week", maxDailyUsersConnectionsWithinLastWeek, Level.INFO);
 
 		for (XMPPImplIfc plugin : allPlugins) {
 			plugin.getStatistics(list);
@@ -1931,11 +1940,11 @@ public class SessionManager
 	}
 
 	public void register(Kernel kernel) {
-
+		this.kernel = kernel;
 	}
 
 	public void unregister(Kernel kernel) {
-
+		this.kernel = null;
 	}
 
 	protected void xmppStreamMoved(XMPPResourceConnection conn, JID oldConnId, JID newConnId) {
@@ -2135,6 +2144,13 @@ public class SessionManager
 	//~--- get methods ----------------------------------------------------------
 
 	@Override
+	public synchronized void everySecond() {
+		super.everySecond();
+		maxDailyUsersSessions.add(maxUserSessionsDaily);
+		maxDailyUsersConnectionsWithinLastWeek = maxDailyUsersSessions.getMaxValueInRange(7);
+	}
+
+	@Override
 	public synchronized void everyMinute() {
 		super.everyMinute();
 		int count = 0;
@@ -2166,6 +2182,9 @@ public class SessionManager
 			maxUserSessionsYesterday = maxUserSessionsDaily;
 			maxUserSessionsDaily = sessionsByNodeId.size();
 		}
+
+        maxDailyUsersSessions.add(maxUserSessionsDaily);
+        maxDailyUsersConnectionsWithinLastWeek = maxDailyUsersSessions.getMaxValueInRange(7);
 	}
 
 	/*

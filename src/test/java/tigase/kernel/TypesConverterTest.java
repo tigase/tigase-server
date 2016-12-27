@@ -23,6 +23,7 @@ package tigase.kernel;
 
 import org.junit.Assert;
 import org.junit.Test;
+import tigase.conf.ConfigReader;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
@@ -109,6 +110,28 @@ public class TypesConverterTest {
 		mapEnumSetField = converter.convert(values, HashMap.class, this.getClass().getDeclaredField("mapEnumSetField").getGenericType());
 		assertEquals(EnumSet.of(XT.a1, XT.b2), mapEnumSetField.get("t1"));
 		assertEquals(EnumSet.of(XT.b2, XT.c3), mapEnumSetField.get("t2"));
+
+		assertEquals(System.getProperty("java.home"), converter.convert(new ConfigReader.PropertyVariable("java.home", null), String.class));
+
+		ConfigReader.CompositeVariable compositeVariable = new ConfigReader.CompositeVariable();
+		compositeVariable.add("Java: ");
+		compositeVariable.add('+', new ConfigReader.PropertyVariable("java.vendor", null));
+		compositeVariable.add('+', " ");
+		compositeVariable.add('+', new ConfigReader.PropertyVariable("java.version", null));
+		assertEquals("Java: " + System.getProperty("java.vendor") + " " + System.getProperty("java.version"), converter.convert(compositeVariable, String.class));
+
+		compositeVariable = new ConfigReader.CompositeVariable();
+		compositeVariable.add(5);
+		compositeVariable.add('-', 2);
+		compositeVariable.add('*', 60);
+		compositeVariable.add('*', 1000);
+		assertEquals(new Integer(-119995), converter.convert(compositeVariable, Integer.class));
+
+		compositeVariable = new ConfigReader.CompositeVariable();
+		compositeVariable.add(5);
+		compositeVariable.add('*', 60.0);
+		compositeVariable.add('*', 1000);
+		assertEquals(new Double(300000.0), converter.convert(compositeVariable, Double.class));
 	}
 
 	@Test
@@ -123,6 +146,27 @@ public class TypesConverterTest {
 		Assert.assertEquals("1,2,3", converter.toString(new byte[]{1, 2, 3}));
 		Assert.assertEquals("1@b.c/a,2@b.c/a,3@b.c/a", converter.toString(
 				new JID[]{JID.jidInstanceNS("1@b.c/a"), JID.jidInstanceNS("2@b.c/a"), JID.jidInstanceNS("3@b.c/a")}));
+		Assert.assertEquals(System.getProperty("java.home"), converter.toString(new ConfigReader.PropertyVariable("java.home", null)));
+
+		ConfigReader.CompositeVariable compositeVariable = new ConfigReader.CompositeVariable();
+		compositeVariable.add("Java: ");
+		compositeVariable.add('+', new ConfigReader.PropertyVariable("java.vendor", null));
+		compositeVariable.add('+', " ");
+		compositeVariable.add('+', new ConfigReader.PropertyVariable("java.version", null));
+		assertEquals("Java: " + System.getProperty("java.vendor") + " " + System.getProperty("java.version"), converter.toString(compositeVariable));
+
+		compositeVariable = new ConfigReader.CompositeVariable();
+		compositeVariable.add(5);
+		compositeVariable.add('-', 2);
+		compositeVariable.add('*', 60);
+		compositeVariable.add('*', 1000);
+		assertEquals("-119995", converter.toString(compositeVariable));
+
+		compositeVariable = new ConfigReader.CompositeVariable();
+		compositeVariable.add(5);
+		compositeVariable.add('*', 60.0);
+		compositeVariable.add('*', 1000);
+		assertEquals("300000.0", converter.toString(compositeVariable));
 	}
 
 	public enum XT {

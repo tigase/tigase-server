@@ -21,14 +21,15 @@
  */
 package tigase.server.websocket;
 
+import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
-import junit.framework.TestCase;
-import org.junit.Assert;
-import org.junit.Test;
 
 /**
  *
@@ -116,5 +117,5 @@ public class WebSocketHixie76Test extends TestCase {
 		bytes[0] = '\r';
 		bytes[1] = '\n';
 		Assert.assertFalse("Handshake succeeded", impl.handshake(io, params, bytes));
-	}	
+	}
 }

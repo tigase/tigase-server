@@ -143,6 +143,54 @@ public class ConfigWriter {
 			if (newLine != null) {
 				writer.write(newLine);
 			}
+		} else if (obj instanceof ConfigReader.Variable) {
+			if (obj instanceof ConfigReader.EnvironmentVariable) {
+				ConfigReader.EnvironmentVariable variable = (ConfigReader.EnvironmentVariable) obj;
+				writer.write("env('");
+				writer.write(variable.getName());
+				writer.write("')");
+				if (newLine != null) {
+					writer.write(newLine);
+				}
+			} else if (obj instanceof ConfigReader.PropertyVariable) {
+				ConfigReader.PropertyVariable variable = (ConfigReader.PropertyVariable) obj;
+				writer.write("prop('");
+				writer.write(variable.getName());
+				if (variable.getDefValue() != null) {
+					writer.write("', '");
+					writer.write(variable.getDefValue());
+				}
+				writer.write("')");
+				if (newLine != null) {
+					writer.write(newLine);
+				}
+			} else if (obj instanceof ConfigReader.CompositeVariable) {
+				ConfigReader.CompositeVariable variable = (ConfigReader.CompositeVariable) obj;
+				List<Object> arguments = variable.getArguments();
+				List<ConfigReader.CompositeVariable.Operation> operations = variable.getOperations();
+				writeObject(writer,arguments.get(0), null);
+				for (int i=0; i<operations.size(); i++) {
+					ConfigReader.CompositeVariable.Operation o = operations.get(i);
+					switch (o) {
+						case multiply:
+							writer.write(" * ");
+							break;
+						case divide:
+							writer.write(" / ");
+							break;
+						case add:
+							writer.write(" + ");
+							break;
+						case substract:
+							writer.write(" - ");
+							break;
+					}
+					writeObject(writer,arguments.get(i + 1), null);
+				}
+				if (newLine != null) {
+					writer.write(newLine);
+				}
+			}
 		} else if (obj instanceof Map) {
 			Map<String, Object> map = (Map<String, Object>) obj;
 			if (map.isEmpty()) {
