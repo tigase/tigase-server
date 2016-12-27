@@ -52,6 +52,8 @@ include::text/admin/Admin_Guide_07_-_Quick_Start_-_F_-_Setting_Up_Server.asciido
 
 include::text/admin/Admin_Guide_07_-_Quick_Start_-_G_-_Script_Selection.asciidoc[]
 
+include::text/admin/Admin_Guide_07_-_Quick_Start_-_H_-_Shutting_Down.asciidoc[]
+
 :leveloffset: 1
 
 
@@ -328,6 +330,7 @@ include::text/admin/Admin_Guide_101_-_Using_Tigase_-_P_-_Advanced_Options.asciid
 
 include::text/admin/Admin_Guide_104_-_Using_Tigase_-_Q_-_Clustering.asciidoc[]
 
+include::text/admin/Admin_Guide_107_-_Using_Tigase_-_R_-_Anonymous_Users.asciidoc[]
 
 Appendix I - Properties Guide
 
