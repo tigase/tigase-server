@@ -201,17 +201,7 @@
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.basedir}/../..</outputDirectory>
-									<includes>*.xml</includes>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>tigase</groupId>
-									<artifactId>tigase-http-api</artifactId>
-									<version>1.2.0-SNAPSHOT</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.basedir}/../..</outputDirectory>
-									<includes>**/*.groovy, **/*.html</includes>
+									<includes>*.xml, **/*.groovy, **/*.html</includes>
 								</artifactItem>
 
 								<artifactItem>
@@ -221,17 +211,7 @@
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.basedir}/../..</outputDirectory>
-									<includes>*.xml</includes>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>tigase</groupId>
-									<artifactId>tigase-http-api-jetty</artifactId>
-									<version>1.1.0-SNAPSHOT</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.basedir}/../..</outputDirectory>
-									<includes>**/*.groovy</includes>
+									<includes>*.xml, **/*.groovy</includes>
 								</artifactItem>
 
 								<artifactItem>
@@ -250,38 +230,28 @@
 									<version>1.2.0-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
-									<outputDirectory>${project.basedir}/../../database</outputDirectory>
-									<includes>**/*.sql</includes>
-								</artifactItem>
+                                    <outputDirectory>${project.basedir}/../../database</outputDirectory>
+                                    <includes>**/*.sql</includes>
+                                </artifactItem>
 
-								<artifactItem>
-									<groupId>tigase</groupId>
-									<artifactId>tigase-pubsub</artifactId>
-									<version>3.2.0-SNAPSHOT</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.basedir}/../..</outputDirectory>
-									<includes>**/*.sql,**/*.sh,**/*.cmd,**/*.txt</includes>
-								</artifactItem>
+                                <artifactItem>
+                                    <groupId>tigase</groupId>
+                                    <artifactId>tigase-pubsub</artifactId>
+                                    <version>3.2.0-SNAPSHOT</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.basedir}/../..</outputDirectory>
+                                    <includes>**/*.sql,**/*.sh,**/*.cmd,**/*.txt, **/*.groovy</includes>
+                                </artifactItem>
 
-								<artifactItem>
-									<groupId>tigase</groupId>
-									<artifactId>tigase-pubsub</artifactId>
-									<version>3.2.0-SNAPSHOT</version>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.basedir}/../..</outputDirectory>
-									<includes>**/*.groovy</includes>
-								</artifactItem>
-
-								<artifactItem>
+                                <artifactItem>
 									<groupId>tigase</groupId>
 									<artifactId>licence-lib</artifactId>
 									<version>1.2.0-SNAPSHOT</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.basedir}/../..</outputDirectory>
-									<includes>**/*.groovy</includes>
+									<includes>**/*.groovy,**/keystore-letsencrypt</includes>
 								</artifactItem>
 
 							</artifactItems>
