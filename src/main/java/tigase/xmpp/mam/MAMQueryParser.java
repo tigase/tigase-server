@@ -40,7 +40,7 @@ import java.text.ParseException;
  * Created by andrzej on 19.07.2016.
  */
 @Bean(name = "mamQueryParser")
-public class MAMQueryParser implements QueryParser<Query> {
+public class MAMQueryParser<Query extends tigase.xmpp.mam.Query> implements QueryParser<Query> {
 
 	protected static final String MAM_XMLNS = "urn:xmpp:mam:1";
 

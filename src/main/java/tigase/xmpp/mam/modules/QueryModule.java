@@ -23,9 +23,9 @@ package tigase.xmpp.mam.modules;
 
 import tigase.component.PacketWriter;
 import tigase.component.exceptions.ComponentException;
+import tigase.component.exceptions.RepositoryException;
 import tigase.component.modules.Module;
 import tigase.criteria.Criteria;
-import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
@@ -81,7 +81,7 @@ public class QueryModule implements Module {
 		query = queryParser.parseQuery(query, packet);
 		try {
 			mamRepository.queryItems(query, itemHandler);
-		} catch (TigaseDBException ex) {
+		} catch (RepositoryException ex) {
 			throw new RuntimeException("Error retrieving messages from database", ex);
 		}
 

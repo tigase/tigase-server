@@ -22,7 +22,7 @@
 package tigase.xmpp.mam;
 
 import tigase.component.exceptions.ComponentException;
-import tigase.db.TigaseDBException;
+import tigase.component.exceptions.RepositoryException;
 import tigase.xml.Element;
 
 import java.util.Date;
@@ -38,7 +38,7 @@ public interface MAMRepository<Q extends Query, I extends MAMRepository.Item> {
 
 //	int countItems(Q query);
 
-	void queryItems(Q query, ItemHandler<Q, I> itemHandler) throws TigaseDBException, ComponentException;
+	void queryItems(Q query, ItemHandler<Q, I> itemHandler) throws RepositoryException, ComponentException;
 
 	Q newQuery();
 

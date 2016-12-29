@@ -21,6 +21,8 @@
  */
 package tigase.db;
 
+import tigase.component.exceptions.RepositoryException;
+
 /**
  * Describe class TigaseDBException here.
  *
@@ -30,7 +32,7 @@ package tigase.db;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class TigaseDBException extends Exception {
+public class TigaseDBException extends RepositoryException {
 
   private static final long serialVersionUID = 1L;
 
