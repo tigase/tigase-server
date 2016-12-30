@@ -89,7 +89,7 @@ public class ClientStateIndication extends AnnotatedXMPPProcessor
 
 	@Override
 	public Element[] supStreamFeatures(XMPPResourceConnection session) {
-		if (!session.isAuthorized())
+		if (session == null || !session.isAuthorized())
 			return null;
 		return super.supStreamFeatures(session);
 	}
