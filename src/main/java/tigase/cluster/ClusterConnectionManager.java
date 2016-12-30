@@ -507,7 +507,7 @@ public class ClusterConnectionManager
     @Override
     public void serviceStarted(XMPPIOService<Object> serv) {
 		if (!repoReloadTimerTask.isScheduled()) {
-			addTimerTaskWithTimeout(repoReloadTimerTask, 0, 15);
+			addTimerTaskWithTimeout(repoReloadTimerTask, 0, 15 * SECOND);
 		}
 
 		ServiceConnectedTimerTask task = new ServiceConnectedTimerTask(serv);
