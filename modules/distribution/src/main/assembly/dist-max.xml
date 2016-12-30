@@ -24,6 +24,7 @@
 				<include>dummy.cer</include>
 				<include>rsa-keystore</include>
 				<include>truststore</include>
+				<include>keystore-letsencrypt</include>
 			</includes>
 		</fileSet>
 		<fileSet>

@@ -93,16 +93,15 @@ public class CounterDataFileLogger
 		Map<String, String> stats = sp.getAllStats( statsLevel.intValue() );
 
 		try (BufferedWriter writer = Files.newBufferedWriter(p, StandardCharsets.UTF_8)) {
-			for ( Map.Entry<String,String> entry : stats.entrySet() ) {
-				writer.write( entry.getKey() );
-				writer.write( "\t" );
-				writer.write( entry.getValue() );
-				writer.newLine();
+			StringBuilder sb = new StringBuilder();
+			for (Map.Entry<String, String> entry : stats.entrySet()) {
+				sb.append(entry.getKey()).append("\t");
+				sb.append(entry.getValue()).append("\n");
 			}
-			writer.write( "Statistics time: " + sdf.format( currTime ) );
-			writer.newLine();
-			writer.write( "Statistics time (linux): " + currTime.getTime() );
-			writer.newLine();
+			sb.append("Statistics time: ").append(sdf.format(currTime)).append("\n");
+			sb.append("Statistics time (linux): ").append(currTime.getTime()).append("\n");
+
+			writer.write(sb.toString());
 		} catch ( IOException ex ) {
 			log.log( Level.SEVERE, "Error dumping server statistics to file", ex );
 		}

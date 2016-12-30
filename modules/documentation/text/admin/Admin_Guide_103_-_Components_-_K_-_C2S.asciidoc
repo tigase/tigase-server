@@ -26,3 +26,12 @@ c2s/processors/urn\:xmpp\:sm\:3/max-resumption-timeout[I]=900
 NOTE: If the max-resumption-timeout is not set, it will always equal the resumption-timeout number, or default is none is set.
 
 Available since v7.1.0
+
+[[packetRedelivery]]
+== Packet Redelivery
+Normally packets are handled by C2S and are typically processed in the first run, however if that fails to send, a retry of sending that packet will occur after 60 seconds.  If that second try fails, the delay will increase by a factor of 1.5.  This means that the next retry will occur at 90, 135, and so on until the retry count is reached.  By default this count is 15, however it can be changed by using the following setting:
+[source,properties]
+-----
+c2s/packet-delivery-retry-count[I]=5
+-----
+This setting prevents packet redelivery attempts from continuing into infinity (or when the host machine runs out of memory).
