@@ -65,8 +65,9 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	private static final Logger log = Logger.getLogger(
 			DefaultClusteringStrategyAbstract.class.getName());
 	private static final String PACKET_FORWARD_CMD = "packet-forward-sm-cmd";
-	protected String prefix = "sess-man/strategy/" + this.getClass().getSimpleName();
-	
+	protected String comp = "sess-man";
+	protected String prefix = "strategy/" + this.getClass().getSimpleName() + "/";
+
 	//~--- fields ---------------------------------------------------------------
 
 	@Override
@@ -127,7 +128,6 @@ public abstract class DefaultClusteringStrategyAbstract<E extends ConnectionReco
 	public DefaultClusteringStrategyAbstract() {
 		super();
 		addCommandListener(new PacketForwardCmd(PACKET_FORWARD_CMD, this));
-		setStatisticsPrefix("sess-man/strategy/" + this.getClass().getSimpleName());
 	}
 
 	//~--- methods --------------------------------------------------------------
