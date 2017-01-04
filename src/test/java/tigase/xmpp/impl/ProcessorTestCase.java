@@ -18,22 +18,19 @@
  */
 package tigase.xmpp.impl;
 
+import tigase.db.AuthRepository;
+import tigase.db.UserRepository;
+import tigase.db.xml.XMLRepository;
+import tigase.kernel.core.Kernel;
+import tigase.server.xmppsession.SessionManagerHandler;
+import tigase.util.TigaseStringprepException;
+import tigase.vhosts.VHostItem;
+import tigase.xmpp.*;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import junit.framework.TestCase;
-import tigase.db.AuthRepository;
-import tigase.db.UserRepository;
-import tigase.db.xml.XMLRepository;
-import tigase.server.xmppsession.SessionManagerHandler;
-import tigase.util.TigaseStringprepException;
-import tigase.vhosts.VHostItem;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.XMPPResourceConnection;
-import tigase.xmpp.XMPPSession;
 
 /**
  *
@@ -44,24 +41,38 @@ public abstract class ProcessorTestCase  {
 	private static Logger log;
 	
 	private SessionManagerHandler loginHandler;
+	private Kernel kernel;
+	private XMLRepository repository;
 	
 	//@Override
 	public void setUp() throws Exception {
+		kernel = new Kernel();
+		String xmlRepositoryURI = "memory://xmlRepo?autoCreateUser=true";
+		repository = new XMLRepository();
+		repository.initRepository( xmlRepositoryURI, null );
+		registerBeans(kernel);
 		loginHandler = new SessionManagerHandlerImpl();
 	}
 	
 	//@Override
 	public void tearDown() throws Exception {
 		loginHandler = null;
-	}	
+	}
+
+	protected <T> T getInstance(Class<T> clazz) {
+		return kernel.getInstance(clazz);
+	}
+
+	protected <T> T getInstance(String name) {
+		return kernel.getInstance(name);
+	}
+
+	protected void registerBeans(Kernel kernel) {
+		kernel.registerBean("repository").asInstance(repository).exec();
+	}
 	
 	protected XMPPResourceConnection getSession( JID connId, JID userJid) throws NotAuthorizedException, TigaseStringprepException {
-
-		String xmlRepositoryURI = "memory://xmlRepo?autoCreateUser=true";
-		XMLRepository xmlRepository = new XMLRepository();
-		xmlRepository.initRepository( xmlRepositoryURI, null );
-
-		XMPPResourceConnection conn = new XMPPResourceConnection( connId, (UserRepository) xmlRepository, (AuthRepository) xmlRepository, loginHandler );
+		XMPPResourceConnection conn = new XMPPResourceConnection( connId, (UserRepository) repository, (AuthRepository) repository, loginHandler );
 		VHostItem vhost = new VHostItem();
 		vhost.setVHost( userJid.getDomain() );
 		conn.setDomain( vhost );

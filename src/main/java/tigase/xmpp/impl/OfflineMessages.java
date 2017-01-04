@@ -26,45 +26,24 @@ import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
-
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.osgi.ModulesManagerImpl;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.amp.db.MsgRepository;
-
 import tigase.server.xmppsession.SessionManager;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.ElementMatcher;
-import tigase.xmpp.JID;
-import tigase.xmpp.NoConnectionIdException;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPPostprocessorIfc;
-import tigase.xmpp.XMPPProcessor;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
-
-import tigase.osgi.ModulesManagerImpl;
 import tigase.util.DNSResolverFactory;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
+import tigase.xmpp.*;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -141,12 +120,8 @@ public class OfflineMessages
 	private String msgRepoCls = null;
 	@Inject
 	private Message message;
-	@ConfigField(desc = "PubSub component JID", alias = MSG_PUBSUB_JID)
-	private String pubSubJID;
-	@ConfigField(desc = "PubSub node for offline messages", alias = MSG_PUBSUB_NODE)
-	private String pubSubNode;
-	@ConfigField(desc = "PubSub offline message publisher", alias = MSG_PUBSUB_PUBLISHER)
-	private String defaultPublisher;
+	@Inject(nullAllowed = true)
+	private List<Notifier> notifiers;
 	@ConfigField(desc = "Store offline messages with mathing paths", alias = MSG_OFFLINE_STORAGE_PATHS)
 	private ElementMatcher[] offlineStorageMatchers = new ElementMatcher[0];
 	
@@ -191,11 +166,11 @@ public class OfflineMessages
 					return;
 				OfflineMsgRepositoryIfc msg_repo = getMsgRepoImpl( repo, conn );
 
-				publishInPubSub(packet, conn, queue, settings);
-				
 				Authorization saveResult = savePacketForOffLineUser( packet, msg_repo, repo );
 				Packet result = null;
-				
+
+				notify(packet, conn, queue, settings);
+
 				switch (saveResult) {
 					case SERVICE_UNAVAILABLE:
 						result = saveResult.getResponseMessage(packet, "Offline messages queue is full", true);
@@ -606,53 +581,9 @@ public class OfflineMessages
 		return false;
 	}
 
-	public void publishInPubSub(final Packet packet, final XMPPResourceConnection conn, final Queue<Packet> queue,
-			Map<String, Object> settings) {
-		if (pubSubJID == null || pubSubNode == null)
-			return;
-		final StanzaType type = packet.getType();
-		if ((packet.getElemName().equals("message")
-				&& ((packet.getElemCDataStaticStr(tigase.server.Message.MESSAGE_BODY_PATH) != null)
-						|| (packet.getElemChildrenStaticStr(MESSAGE_EVENT_PATH) != null) || (packet.getElemChildrenStaticStr(MESSAGE_HEADER_PATH) != null)) && ((type == null)
-				|| (type == StanzaType.normal) || (type == StanzaType.chat)))
-				|| (packet.getElemName().equals("presence") && ((type == StanzaType.subscribe)
-						|| (type == StanzaType.subscribed) || (type == StanzaType.unsubscribe) || (type == StanzaType.unsubscribed)))) {
-			String tmpNode = packet.getElement().getAttributeStaticStr(PUBSUB_NODE_PATH, PUBSUB_NODE_KEY);
-			if (tmpNode != null && tmpNode.equals(this.pubSubNode)) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Publishing skipped to prevent loops: {0}", packet);
-				}
-				return;
-			}
-
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Publishing packet in pubsub: {0}", packet);
-			}
-			try {
-				if (defaultPublisher != null) {
-					Element iq = new Element("iq", new String[] { "type", "id", "to", "from" }, new String[] { "set",
-							"" + System.nanoTime(), pubSubJID, defaultPublisher });
-					Element pubsub = new Element("pubsub", new String[] { "xmlns" },
-							new String[] { "http://jabber.org/protocol/pubsub" });
-					iq.addChild(pubsub);
-					Element publish = new Element("publish", new String[] { "node" }, new String[] { this.pubSubNode });
-					pubsub.addChild(publish);
-					Element item = new Element("item");
-					publish.addChild(item);
-
-					item.addChild(packet.getElement());
-
-					Packet out = Packet.packetInstance(iq);
-					out.setXMLNS(Packet.CLIENT_XMLNS);
-					queue.add(out);
-				} else if (log.isLoggable(Level.WARNING))
-					log.log(Level.WARNING,
-							"Cannot publish message in PubSub, because cannot determine publisher. Please define default publisher JID.",
-							packet);
-			} catch (Exception e) {
-				log.log(Level.WARNING, "Problem during publish packet in pubsub", e);
-				e.printStackTrace();
-			}
+	protected void notify(Packet packet, XMPPResourceConnection conn, Queue<Packet> queue, Map<String, Object> settings) {
+		if (notifiers != null) {
+			notifiers.forEach(notirier -> notirier.notify(packet, conn, queue, settings));
 		}
 	}
 
@@ -793,4 +724,72 @@ public class OfflineMessages
 			return stamp1.compareTo( stamp2 );
 		}
 	}
+
+	public interface Notifier {
+
+		void notify(Packet packet, XMPPResourceConnection conn, Queue<Packet> queue, Map<String, Object> settings);
+
+	}
+
+	@Bean(name = "pubsub-publisher-notifier", parent = OfflineMessages.class, active = false)
+	public static class PubSubPublisherNotifier implements Notifier {
+		@ConfigField(desc = "PubSub component JID", alias = MSG_PUBSUB_JID)
+		private String pubSubJID;
+		@ConfigField(desc = "PubSub node for offline messages", alias = MSG_PUBSUB_NODE)
+		private String pubSubNode;
+		@ConfigField(desc = "PubSub offline message publisher", alias = MSG_PUBSUB_PUBLISHER)
+		private String defaultPublisher;
+
+		public void notify(final Packet packet, final XMPPResourceConnection conn, final Queue<Packet> queue,
+									Map<String, Object> settings) {
+			if (pubSubJID == null || pubSubNode == null)
+				return;
+			final StanzaType type = packet.getType();
+			if ((packet.getElemName().equals("message")
+					&& ((packet.getElemCDataStaticStr(tigase.server.Message.MESSAGE_BODY_PATH) != null)
+					|| (packet.getElemChildrenStaticStr(MESSAGE_EVENT_PATH) != null) || (packet.getElemChildrenStaticStr(MESSAGE_HEADER_PATH) != null)) && ((type == null)
+					|| (type == StanzaType.normal) || (type == StanzaType.chat)))
+					|| (packet.getElemName().equals("presence") && ((type == StanzaType.subscribe)
+					|| (type == StanzaType.subscribed) || (type == StanzaType.unsubscribe) || (type == StanzaType.unsubscribed)))) {
+				String tmpNode = packet.getElement().getAttributeStaticStr(PUBSUB_NODE_PATH, PUBSUB_NODE_KEY);
+				if (tmpNode != null && tmpNode.equals(this.pubSubNode)) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Publishing skipped to prevent loops: {0}", packet);
+					}
+					return;
+				}
+
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Publishing packet in pubsub: {0}", packet);
+				}
+				try {
+					if (defaultPublisher != null) {
+						Element iq = new Element("iq", new String[] { "type", "id", "to", "from" }, new String[] { "set",
+																												   "" + System.nanoTime(), pubSubJID, defaultPublisher });
+						Element pubsub = new Element("pubsub", new String[] { "xmlns" },
+													 new String[] { "http://jabber.org/protocol/pubsub" });
+						iq.addChild(pubsub);
+						Element publish = new Element("publish", new String[] { "node" }, new String[] { this.pubSubNode });
+						pubsub.addChild(publish);
+						Element item = new Element("item");
+						publish.addChild(item);
+
+						item.addChild(packet.getElement());
+
+						Packet out = Packet.packetInstance(iq);
+						out.setXMLNS(Packet.CLIENT_XMLNS);
+						queue.add(out);
+					} else if (log.isLoggable(Level.WARNING))
+						log.log(Level.WARNING,
+								"Cannot publish message in PubSub, because cannot determine publisher. Please define default publisher JID.",
+								packet);
+				} catch (Exception e) {
+					log.log(Level.WARNING, "Problem during publish packet in pubsub", e);
+					e.printStackTrace();
+				}
+			}
+		}
+
+	}
+
 }    // OfflineMessages

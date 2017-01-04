@@ -49,6 +49,10 @@ public class AdhHocRequest {
 		return action;
 	}
 
+	public boolean isAction(String action) {
+		return this.action != null && this.action.equals(action);
+	}
+
 	public Element getCommand() {
 		return command;
 	}
@@ -64,6 +68,8 @@ public class AdhHocRequest {
 	public JID getSender() {
 		return sender;
 	}
+
+	public JID getRecipient() { return iq.getStanzaTo(); }
 
 	public String getSessionId() {
 		return sessionId;

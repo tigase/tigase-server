@@ -41,23 +41,26 @@ import static org.junit.Assert.*;
  */
 public class OfflineMessagesTest extends ProcessorTestCase {
 
-	private Kernel kernel;
 	private OfflineMessagesTestImpl offlineProcessor;
 	private MsgRepositoryIfcImpl msgRepo;
 	
 	@Before
 	@Override
 	public void setUp() throws Exception {
-		kernel = new Kernel();
 		msgRepo = new MsgRepositoryIfcImpl();
-		kernel.registerBean(tigase.xmpp.impl.Message.class).setActive(true).exec();
-		kernel.registerBean(OfflineMessagesTestImpl.class).setActive(true).exec();
-		offlineProcessor = kernel.getInstance(OfflineMessagesTestImpl.class);
+		super.setUp();
+		offlineProcessor = getInstance(OfflineMessagesTestImpl.class);
 		offlineProcessor.msgRepo = msgRepo;
 		offlineProcessor.init(new HashMap<String,Object>());
-		super.setUp();
 	}
-	
+
+	@Override
+	protected void registerBeans(Kernel kernel) {
+		super.registerBeans(kernel);
+		kernel.registerBean(tigase.xmpp.impl.Message.class).setActive(true).exec();
+		kernel.registerBean(OfflineMessagesTestImpl.class).setActive(true).exec();
+	}
+
 	@After
 	@Override
 	public void tearDown() throws Exception {

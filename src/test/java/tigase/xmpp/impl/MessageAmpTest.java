@@ -44,32 +44,35 @@ public class MessageAmpTest extends ProcessorTestCase {
 	private static final String XMLNS = "http://jabber.org/protocol/amp";
 
 	private JID ampJid;
-	private Kernel kernel;
 	private MessageAmp messageAmp;
 	
 	@Before
 	@Override
 	public void setUp() throws Exception {
-		kernel = new Kernel();
-		kernel.setForceAllowNull(true);
-		MsgRepositoryIfc msgRepo = new MsgRepository.MsgRepositoryMDBean();
-		kernel.registerBean("msgRepository").asInstance(msgRepo).exportable().exec();
-		kernel.registerBean(MessageAmp.class).exec();
-		messageAmp = kernel.getInstance(MessageAmp.class);
+		super.setUp();
+		messageAmp = getInstance(MessageAmp.class);
 		Map<String,Object> settings = new HashMap<String,Object>();
 		ampJid = JID.jidInstance("amp@example1.com");
 		settings.put("amp-jid", ampJid.toString());
 		messageAmp.init(settings);
-		super.setUp();
-	}	
+	}
 	
 	@After
 	@Override
 	public void tearDown() throws Exception {
 		messageAmp = null;
 		super.tearDown();
-	}		
-	
+	}
+
+	@Override
+	protected void registerBeans(Kernel kernel) {
+		kernel.setForceAllowNull(true);
+		super.registerBeans(kernel);
+		MsgRepositoryIfc msgRepo = new MsgRepository.MsgRepositoryMDBean();
+		kernel.registerBean("msgRepository").asInstance(msgRepo).exportable().exec();
+		kernel.registerBean(MessageAmp.class).exec();
+	}
+
 	@Test
 	public void testMessageProcessingWithAmp() throws Exception {
 		JID senderJid = JID.jidInstance("sender@example.com/res-1");

@@ -157,9 +157,10 @@ public class MessageAmp
 							&& (packet.getStanzaTo().getLocalpart() == null || !session.isUserId(packet.getStanzaTo().getBareJID())) )
 						return;
 					
-					offlineProcessor.publishInPubSub(packet, session, results, settings);
 					Authorization saveResult = offlineProcessor.savePacketForOffLineUser(packet, msg_repo, repo);
 					Packet result = null;
+
+					offlineProcessor.notify(packet, session, results, settings);
 
 					switch (saveResult) {
 						case SERVICE_UNAVAILABLE:
