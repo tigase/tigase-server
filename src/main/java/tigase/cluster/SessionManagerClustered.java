@@ -38,6 +38,7 @@ import tigase.server.Packet;
 import tigase.server.XMPPServer;
 import tigase.server.xmppsession.SessionManager;
 import tigase.stats.StatisticsList;
+import tigase.sys.TigaseRuntime;
 import tigase.util.DNSResolverFactory;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
@@ -328,12 +329,34 @@ public class SessionManagerClustered
 		}
 		props.put(STRATEGY_CLASS_PROP_KEY, strategy_class);
 		try {
-			ClusteringStrategyIfc strat_tmp = (ClusteringStrategyIfc) ModulesManagerImpl.getInstance().forName(
-					strategy_class).newInstance();
+			ClusteringStrategyIfc strat_tmp = (ClusteringStrategyIfc) ModulesManagerImpl.getInstance()
+					.forName(strategy_class)
+					.newInstance();
 			Map<String, Object> strat_defs = strat_tmp.getDefaults(params);
 
 			if (strat_defs != null) {
 				props.putAll(strat_defs);
+			}
+		} catch (NoClassDefFoundError e) {
+			log.log(Level.SEVERE, "Can't instantiate clustering strategy for class: " + strategy_class);
+			if (e.getMessage().contains("licence")) {
+				final String[] msg = {"",
+				                      "  ---------------------------------------------",
+				                      "  ERROR! ACS strategy was enabled with following class configuration",
+				                      "  --sm-cluster-strategy-class=tigase.server.cluster.strategy.OnlineUsersCachingStrategy",
+				                      "  but required libraries are missing!",
+				                      "  ",
+				                      "  Please make sure that all tigase-acs*.jar and licence-lib.jar",
+				                      "  files are available in the classpath or disable ACS strategy!",
+				                      "  (by commenting out above line)",
+				                      "  ",
+				                      "  For more information please peruse ACS documentation.",
+				                      "  ---------------------------------------------",
+				                      "",
+				                      "",};
+				TigaseRuntime.getTigaseRuntime().shutdownTigase(msg);
+			} else {
+				throw new NoClassDefFoundError("Can not instantiate clustering strategy for class");
 			}
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Can not instantiate clustering strategy for class: " +
@@ -377,8 +400,9 @@ public class SessionManagerClustered
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
-		strategy.getStatistics(list);
-
+		if (strategy != null ) {
+			strategy.getStatistics(list);
+		}
 	}
 
 	/**
@@ -458,6 +482,27 @@ public class SessionManagerClustered
 
 				if (clusterController != null) {
 					strategy.setClusterController(clusterController);
+				}
+			} catch (NoClassDefFoundError e) {
+				log.log(Level.SEVERE, "Can't instantiate clustering strategy for class: " + strategy_class);
+				if (e.getMessage().contains("licence")) {
+					final String[] msg = {"",
+					                      "  ---------------------------------------------",
+					                      "  ERROR! ACS strategy was enabled with following class configuration",
+					                      "  --sm-cluster-strategy-class=tigase.server.cluster.strategy.OnlineUsersCachingStrategy",
+					                      "  but required libraries are missing!",
+					                      "  ",
+					                      "  Please make sure that all tigase-acs*.jar and licence-lib.jar",
+					                      "  files are available in the classpath or disable ACS strategy!",
+					                      "  (by commenting out above line)",
+					                      "  ",
+					                      "  For more information please peruse ACS documentation.",
+					                      "  ---------------------------------------------",
+					                      "",
+					                      "",};
+					TigaseRuntime.getTigaseRuntime().shutdownTigase(msg);
+				} else {
+					throw new NoClassDefFoundError("Can not instantiate clustering strategy for class");
 				}
 			} catch (Exception e) {
 				if (!XMPPServer.isOSGi()) {
