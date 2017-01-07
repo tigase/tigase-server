@@ -2146,7 +2146,7 @@ public class SessionManager
 	@Override
 	public synchronized void everySecond() {
 		super.everySecond();
-		maxDailyUsersSessions.add(maxUserSessionsDaily);
+		maxDailyUsersSessions.add(maxUserSessionsDaily-1);
 		maxDailyUsersConnectionsWithinLastWeek = maxDailyUsersSessions.getMaxValueInRange(7);
 	}
 
@@ -2183,7 +2183,7 @@ public class SessionManager
 			maxUserSessionsDaily = sessionsByNodeId.size();
 		}
 
-        maxDailyUsersSessions.add(maxUserSessionsDaily);
+        maxDailyUsersSessions.add(maxUserSessionsDaily-1);
         maxDailyUsersConnectionsWithinLastWeek = maxDailyUsersSessions.getMaxValueInRange(7);
 	}
 

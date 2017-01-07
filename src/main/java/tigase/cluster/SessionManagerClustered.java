@@ -45,6 +45,7 @@ import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
 import tigase.server.xmppsession.UserSessionEvent;
 import tigase.stats.StatisticsList;
+import tigase.sys.TigaseRuntime;
 import tigase.util.DNSResolverFactory;
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
@@ -363,8 +364,9 @@ public class SessionManagerClustered
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
-		strategy.getStatistics(list);
-
+		if (strategy != null ) {
+			strategy.getStatistics(list);
+		}
 	}
 
 	/**
