@@ -140,8 +140,6 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 	protected abstract void loadExpiredQueue(Date expired);
 	protected abstract void deleteMessage(T db_id);
 
-	public abstract Map<Enum,Long> getMessagesCount(JID to)  throws UserNotFoundException;
-	public abstract List<Element> getMessagesList(JID to)  throws UserNotFoundException;
 	public abstract	Queue<Element> loadMessagesToJID(List<String> db_ids,  XMPPResourceConnection session, boolean delete,
 																		OfflineMessagesProcessor proc ) throws UserNotFoundException;
 	public abstract	int deleteMessagesToJID( List<String> db_ids, XMPPResourceConnection session) throws UserNotFoundException;
@@ -342,6 +340,16 @@ public abstract class MsgRepository<T,S extends DataSource> implements MsgReposi
 		@Override
 		public void initRepository(String resource_uri, Map<String, String> params) throws DBInitException {
 
+		}
+
+		@Override
+		public Map<Enum, Long> getMessagesCount(JID to) throws UserNotFoundException {
+			return getRepository(to.getDomain()).getMessagesCount(to);
+		}
+
+		@Override
+		public List<Element> getMessagesList(JID to) throws UserNotFoundException {
+			return getRepository(to.getDomain()).getMessagesList(to);
 		}
 
 		@Override
