@@ -224,9 +224,19 @@ public class MobileV3
 				continue;
 			}
 
+			// get parent session to look up for connection for destination
+			XMPPSession parentSession = sessionFromSM.getParentSession();
+			if (parentSession == null) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "no session for destination {0} for packet {1} - missing parent session",
+							new Object[] { res.getPacketTo().toString(),
+										   res.toString() });
+				}
+				continue;
+			}
+
 			// get resource connection for destination
-			XMPPResourceConnection session = sessionFromSM.getParentSession()
-					.getResourceForConnectionId(res.getPacketTo());
+			XMPPResourceConnection session = parentSession.getResourceForConnectionId(res.getPacketTo());
 
 			if (session == null) {
 				if (log.isLoggable(Level.FINEST)) {
@@ -329,7 +339,8 @@ public class MobileV3
 			switch (e.getValue()) {
 				case need_flush:
 					try {
-						session = sessionFromSM.getParentSession().getResourceForConnectionId(e.getKey());
+						XMPPSession parentSession = sessionFromSM.getParentSession();
+						session = (parentSession == null) ? null : parentSession.getResourceForConnectionId(e.getKey());
 						if (session != null) {
 							Map<JID, Packet> presenceQueue = (Map<JID, Packet>) session.getSessionData(PRESENCE_QUEUE_KEY);
 							synchronized (presenceQueue) {
@@ -349,8 +360,10 @@ public class MobileV3
 					}
 				case need_packet_flush:
 					try {
-						if (session == null)
-							session = sessionFromSM.getParentSession().getResourceForConnectionId(e.getKey());
+						if (session == null) {
+							XMPPSession parentSession = sessionFromSM.getParentSession();
+							session = (parentSession == null) ? null : parentSession.getResourceForConnectionId(e.getKey());
+						}
 						if (session != null) {
 							Queue<Packet> packetQueue = (Queue<Packet>) session.getSessionData(PACKET_QUEUE_KEY);
 							synchronized (packetQueue) {

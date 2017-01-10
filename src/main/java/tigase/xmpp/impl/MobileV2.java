@@ -35,17 +35,16 @@ import tigase.server.Packet;
 
 import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
-
 import tigase.xmpp.*;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Class responsible for queuing packets (usable in connections from mobile
@@ -211,10 +210,19 @@ public class MobileV2
 				continue;
 			}
 
-			// get resource connection for destination
-			XMPPResourceConnection session = sessionFromSM.getParentSession()
-					.getResourceForConnectionId(res.getPacketTo());
+			// get parent session to look up for connection for destination
+			XMPPSession parentSession = sessionFromSM.getParentSession();
+			if (parentSession == null) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "no session for destination {0} for packet {1} - missing parent session",
+							new Object[] { res.getPacketTo().toString(),
+										   res.toString() });
+				}
+				continue;
+			}
 
+			// get resource connection for destination
+			XMPPResourceConnection session = parentSession.getResourceForConnectionId(res.getPacketTo());
 			if (session == null) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "no session for destination {0} for packet {1}",

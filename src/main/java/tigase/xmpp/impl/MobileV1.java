@@ -222,9 +222,19 @@ public class MobileV1
 				continue;
 			}
 
+			// get parent session to look up for connection for destination
+			XMPPSession parentSession = sessionFromSM.getParentSession();
+			if (parentSession == null) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "no session for destination {0} for packet {1} - missing parent session",
+							new Object[] { res.getPacketTo().toString(),
+										   res.toString() });
+				}
+				continue;
+			}
+
 			// get resource connection for destination
-			XMPPResourceConnection session = sessionFromSM.getParentSession()
-					.getResourceForConnectionId(res.getPacketTo());
+			XMPPResourceConnection session = parentSession.getResourceForConnectionId(res.getPacketTo());
 
 			if (session == null) {
 				if (log.isLoggable(Level.FINEST)) {

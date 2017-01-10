@@ -182,6 +182,9 @@ public class JabberIqPrivacy
 		if (session == null) {
 			return;
 		}    // end of if (session == null)
+		if (session.isAnonymous()) {
+			return;
+		}
 		try {
 			StanzaType type = packet.getType();
 
@@ -209,7 +212,7 @@ public class JabberIqPrivacy
 				break;
 			}    // end of switch (type)
 		} catch (NotAuthorizedException e) {
-			log.log(Level.WARNING,
+			log.log(Level.FINEST,
 					"Received privacy request but user session is not authorized yet: {0}", packet);
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));

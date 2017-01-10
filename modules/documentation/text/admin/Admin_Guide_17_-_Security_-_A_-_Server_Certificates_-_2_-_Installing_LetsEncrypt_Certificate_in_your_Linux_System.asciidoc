@@ -43,7 +43,7 @@ cd /etc/letsencrypt/live/$domain
 
 ls
 
-cert.pem  chain.pem fullchain.pem privkey.pem
+cert.pem chain.pem fullchain.pem privkey.pem
 -----
 
 In that directory, you will find four certificates:
@@ -98,3 +98,13 @@ Place that certificate into your /certs folder of Tigase, and installation of th
 You will need to do this for all subdomains you wish to have a certificate for, however, you may be able to import the root and intermediate certificates to your keystore to avoid having to paste the chain certificates for each subdomain.
 
 WARNING: LetsEncrypt certificates expire 90 days from issue and need to be renewed in order for them to remain valid!
+
+== Including letsencrypt cert.pem
+For some installations, you may need to also include the cert.pem contents into your certificate chain to avoid handshake errors.  You will then have 4 certificates in your domain.com.pem file.
+Be sure the order is as follows: cert.pem, privkey.pem, isgrootx1.pem, then letsencryptauthorityx3.pem
+
+If you moved all certs to a single directry, you may combine them using the following command in a *nix operating system.
+[source,bash]
+-----
+cat ./cert.pem ./privkey.pem ./letsencryptauthorityx3.pem ./isrgrootx1.pem > mydomain.com.pem
+-----

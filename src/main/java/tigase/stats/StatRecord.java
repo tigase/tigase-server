@@ -44,10 +44,11 @@ public class StatRecord {
 	private String value = null;
 	private String component = null;
 
-	public StatRecord(String comp, String description,	String value,
-		Level level) {
+	public StatRecord(String comp, String description, String value, Level level) {
 		this.description = description.intern();
-		this.value = value.intern();
+		if (value != null) {
+			this.value = value.intern();
+		}
 		this.level = level;
 		this.component = comp.intern();
 	}
