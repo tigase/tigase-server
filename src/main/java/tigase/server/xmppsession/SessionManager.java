@@ -708,7 +708,7 @@ public class SessionManager
 		list.add(getName(), "Maximum user sessions today", maxUserSessionsDaily, Level.INFO);
 		list.add(getName(), "Maximum user sessions yesterday", maxUserSessionsYesterday, Level.INFO);
 
-        list.add(getName(), "Max daily users sessions count last month", maxDailyUsersSessions.toString(), Level.INFO);
+        list.add(getName(), "Max daily users sessions count last month", maxDailyUsersSessions, Level.INFO);
         list.add(getName(), "Max users sessions within last week", maxDailyUsersConnectionsWithinLastWeek, Level.INFO);
 
 		for (XMPPImplIfc plugin : allPlugins) {

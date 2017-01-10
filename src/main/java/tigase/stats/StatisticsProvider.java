@@ -831,38 +831,38 @@ public class StatisticsProvider
 				sb.append(",      Temp: ").append(cpu_temp).append(" C");
 			}
 
-			String cpu_freq = allStats.getValue("cpu-mon", "CPU freq", null);
+			String cpu_freq = allStats.getValue("cpu-mon", "CPU freq", "");
 
-			if (cpu_freq != null) {
+			if (cpu_freq != null && !cpu_freq.isEmpty()) {
 				sb.append("\nFreq: ").append(cpu_freq);
 			}
 
-			String cpu_throt = allStats.getValue("cpu-mon", "CPU throt", null);
+			String cpu_throt = allStats.getValue("cpu-mon", "CPU throt", "");
 
-			if (cpu_throt != null) {
+			if (cpu_throt != null && !cpu_throt.isEmpty()) {
 				sb.append("\nThrott: ").append(cpu_throt);
 			}
 			sb.append("\nTop threads:");
 
-			String cpu_thread = allStats.getValue("cpu-mon", "1st max CPU thread", null);
+			String cpu_thread = allStats.getValue("cpu-mon", "1st max CPU thread", "");
 
-			if (cpu_thread != null) {
+			if (cpu_thread != null && !cpu_thread.isEmpty()) {
 				sb.append("\n   ").append(cpu_thread);
 			}
-			cpu_thread = allStats.getValue("cpu-mon", "2nd max CPU thread", null);
-			if (cpu_thread != null) {
+			cpu_thread = allStats.getValue("cpu-mon", "2nd max CPU thread", "");
+			if (cpu_thread != null && !cpu_thread.isEmpty()) {
 				sb.append("\n   ").append(cpu_thread);
 			}
-			cpu_thread = allStats.getValue("cpu-mon", "3rd max CPU thread", null);
-			if (cpu_thread != null) {
+			cpu_thread = allStats.getValue("cpu-mon", "3rd max CPU thread", "");
+			if (cpu_thread != null && !cpu_thread.isEmpty()) {
 				sb.append("\n   ").append(cpu_thread);
 			}
-			cpu_thread = allStats.getValue("cpu-mon", "4th max CPU thread", null);
-			if (cpu_thread != null) {
+			cpu_thread = allStats.getValue("cpu-mon", "4th max CPU thread", "");
+			if (cpu_thread != null && !cpu_thread.isEmpty()) {
 				sb.append("\n   ").append(cpu_thread);
 			}
-			cpu_thread = allStats.getValue("cpu-mon", "5th max CPU thread", null);
-			if (cpu_thread != null) {
+			cpu_thread = allStats.getValue("cpu-mon", "5th max CPU thread", "");
+			if (cpu_thread != null && !cpu_thread.isEmpty()) {
 				sb.append("\n   ").append(cpu_thread);
 			}
 

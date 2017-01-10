@@ -771,7 +771,7 @@ public class ClusterConnectionManager
 				.getAverageDecompressionRatio(), Level.FINE);
 		list.add(getName(), "Waiting to send", ioStatsGetter.getWaitingToSend(), Level.FINE);
 
-		list.add(getName(), "Max daily cluster nodes count in last month", maxNodes.toString(), Level.INFO);
+		list.add(getName(), "Max daily cluster nodes count in last month", maxNodes, Level.INFO);
 		list.add(getName(), "Max nodes count within last week", maxNodesWithinLastWeek, Level.INFO);
 
 		if ((!list.checkLevel(Level.FINEST)) && getNodesConnected().size() > 0) {
