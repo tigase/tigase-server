@@ -30,21 +30,30 @@ import java.util.concurrent.ThreadLocalRandom;
  *
  * @param <E>
  */
-public class MaxDailyCounterQueue<E extends Comparable<E>>
+public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 		extends ArrayDeque<E> {
 
-	private LocalDate lastDailyStatsReset = LocalDate.now();
 	private final int limit;
+	private LocalDate lastDailyStatsReset = LocalDate.now();
 	private String toString = "[]";
 
 	public static void main(String[] args) {
 
-		MaxDailyCounterQueue<Integer> lq = new MaxDailyCounterQueue<>(5);
+		MaxDailyCounterQueue<Integer> lq = new MaxDailyCounterQueue<Integer>(15) {
+			int i = 0;
+
+			@Override
+			protected boolean isNextItem() {
+				return (i++) % 4 == 0;
+			}
+		};
+
 		for (int i = 0; i < 200; i++) {
 			final int rand = ThreadLocalRandom.current().nextInt(0, 100);
 			lq.add(rand);
 			System.out.print(lq.toString());
 			System.out.print("       max: " + lq.getMaxValueInRange(3));
+			System.out.print("       sup-limit: " + lq.isLimitSurpassedAllItems(3, 50));
 			System.out.println();
 		}
 	}
@@ -64,7 +73,7 @@ public class MaxDailyCounterQueue<E extends Comparable<E>>
 		while (size() > limit) {
 			super.remove();
 		}
-		toString = toStringReversed();
+		toString = super.toString();
 		return true;
 	}
 
@@ -72,11 +81,11 @@ public class MaxDailyCounterQueue<E extends Comparable<E>>
 		range = Math.min(range, this.limit);
 
 		E result = null;
-		final Iterator<E> iter = this.descendingIterator();
-		while (iter.hasNext() && range > 0) {
+		final Iterator<E> iterator = this.descendingIterator();
+		while (iterator.hasNext() && range > 0) {
 			range--;
 
-			final E next = iter.next();
+			final E next = iterator.next();
 			if (result == null || next.compareTo(result) > 0) {
 				result = next;
 			}
@@ -84,7 +93,35 @@ public class MaxDailyCounterQueue<E extends Comparable<E>>
 		return result;
 	}
 
-	private boolean isNextItem() {
+	public boolean isLimitSurpassedAllItems(int range, long limit) {
+		boolean result = true;
+		range = Math.min(range, this.limit);
+
+		final Iterator<E> iter = this.descendingIterator();
+		while (iter.hasNext() && range > 0) {
+			range--;
+
+			final E next = iter.next();
+			if (next.longValue() <= limit) {
+				result &= false;
+			}
+		}
+		return result;
+	}
+
+	public ArrayDeque<E> subQueue(int range) {
+		final ArrayDeque<E> result = new ArrayDeque<E>(range);
+		range = Math.min(range, this.limit);
+
+		final Iterator<E> iter = this.descendingIterator();
+		while (iter.hasNext() && range > 0) {
+			range--;
+			result.add(iter.next());
+		}
+		return result;
+	}
+
+	protected boolean isNextItem() {
 		LocalDate now = LocalDate.now();
 		if (now.getYear() != lastDailyStatsReset.getYear() ||
 				now.getDayOfYear() != lastDailyStatsReset.getDayOfYear()) {
@@ -100,21 +137,21 @@ public class MaxDailyCounterQueue<E extends Comparable<E>>
 		return toString;
 	}
 
-	private String toStringReversed() {
-		Iterator<E> it = descendingIterator();
-		if (!it.hasNext()) {
-			return "[]";
-		}
-
-		StringBuilder sb = new StringBuilder();
-		sb.append('[');
-		for (; ; ) {
-			E e = it.next();
-			sb.append(e == this ? "(this Collection)" : e);
-			if (!it.hasNext()) {
-				return sb.append(']').toString();
-			}
-			sb.append(',').append(' ');
-		}
-	}
+//	private String toStringReversed() {
+//		Iterator<E> it = descendingIterator();
+//		if (!it.hasNext()) {
+//			return "[]";
+//		}
+//
+//		StringBuilder sb = new StringBuilder();
+//		sb.append('[');
+//		for (; ; ) {
+//			E e = it.next();
+//			sb.append(e == this ? "(this Collection)" : e);
+//			if (!it.hasNext()) {
+//				return sb.append(']').toString();
+//			}
+//			sb.append(',').append(' ');
+//		}
+//	}
 }

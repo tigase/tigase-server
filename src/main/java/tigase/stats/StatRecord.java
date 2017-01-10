@@ -21,6 +21,7 @@
  */
 package tigase.stats;
 
+import java.util.Collection;
 import java.util.logging.Level;
 
 /**
@@ -39,6 +40,7 @@ public class StatRecord {
 	private long longValue = -1;
  	private int intValue = -1;
 	private float floatValue = -1f;
+	private Collection collection = null;
 
 	private String description = null;
 	private String value = null;
@@ -82,6 +84,11 @@ public class StatRecord {
 		this.floatValue = value;
 	}
 
+	StatRecord(String comp, String description, Collection value, Level level) {
+		this(comp, description, (value != null ? value.toString() : ""), level);
+		this.collection = value;
+	}
+
 	public String getDescription() {
 		return description;
 	}
@@ -110,6 +117,8 @@ public class StatRecord {
 		return this.intValue;
 	}
 
+	public <E> Collection<E> getCollection() { return this.collection; };
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -119,6 +128,7 @@ public class StatRecord {
 		if (longValue > -1) { sb.append('L');
 		} else if (intValue > -1) { sb.append('I');
 		} else if (floatValue > -1f) { sb.append('F');
+		} else if (collection != null) { sb.append('C');
 		} else { sb.append('S'); }
 		sb.append(']');
 
