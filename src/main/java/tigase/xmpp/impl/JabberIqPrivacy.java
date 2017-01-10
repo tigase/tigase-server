@@ -26,46 +26,21 @@ package tigase.xmpp.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.ArrayDeque;
-
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
-
 import tigase.server.Iq;
 import tigase.server.Packet;
-
+import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.BareJID;
+import tigase.xmpp.*;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterFactory;
-import tigase.xmpp.JID;
-import tigase.xmpp.NoConnectionIdException;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPException;
-import tigase.xmpp.XMPPPacketFilterIfc;
-import tigase.xmpp.XMPPPreprocessorIfc;
-import tigase.xmpp.XMPPProcessor;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
 
-import static tigase.xmpp.impl.Privacy.*;
-
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Queue;
 
-import tigase.xmpp.PacketErrorTypeException;
-
-import tigase.util.TigaseStringprepException;
+import static tigase.xmpp.impl.Privacy.*;
 
 /**
  * Describe class JabberIqPrivacy here.
@@ -204,6 +179,9 @@ public class JabberIqPrivacy
 		if (session == null) {
 			return;
 		}    // end of if (session == null)
+		if (session.isAnonymous()) {
+			return;
+		}
 		try {
 			StanzaType type = packet.getType();
 
@@ -231,7 +209,7 @@ public class JabberIqPrivacy
 				break;
 			}    // end of switch (type)
 		} catch (NotAuthorizedException e) {
-			log.log(Level.WARNING,
+			log.log(Level.FINEST,
 					"Received privacy request but user session is not authorized yet: {0}", packet);
 			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 					"You must authorize session first.", true));
