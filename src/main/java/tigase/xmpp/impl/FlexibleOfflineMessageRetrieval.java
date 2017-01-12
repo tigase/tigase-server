@@ -280,7 +280,7 @@ public class FlexibleOfflineMessageRetrieval
 				}
 			}    // end of while (elem = elems.poll() != null)
 			try {
-				Collections.sort( pacs, offlineProcessor.new StampComparator() );
+				Collections.sort( pacs, new OfflineMessages.StampComparator() );
 			} catch ( NullPointerException e ) {
 				try {
 					log.warning( "Can not sort off line messages: " + pacs + ",\n" + e );

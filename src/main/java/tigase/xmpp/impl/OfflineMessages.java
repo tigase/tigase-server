@@ -2,7 +2,7 @@
  * OfflineMessages.java
  *
  * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2013 "Tigase, Inc." <office@tigase.com>
+ * Copyright (C) 2004-2017 "Tigase, Inc." <office@tigase.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -689,36 +689,43 @@ public class OfflineMessages
 	 * Elements retrieved from the repository by the timestamp stored in
 	 * {@code delay} element.
 	 */
-	public class StampComparator
+	public static class StampComparator
 			implements Comparator<Packet> {
 
 		@Override
 		public int compare( Packet p1, Packet p2 ) {
-			String stamp1 = "";
-			String stamp2 = "";
-
 			// Try XEP-0203 - the new XEP...
 			Element stamp_el1 = p1.getElement().getChild( "delay", "urn:xmpp:delay" );
+			Element stamp_el2 = p2.getElement().getChild( "delay", "urn:xmpp:delay" );
+			boolean isStamp1New = (stamp_el1 != null);
+			boolean isStamp2New = (stamp_el2 != null);
 
-			if ( stamp_el1 == null ){
-
-				// XEP-0091 support - the old one...
-				stamp_el1 = p1.getElement().getChild( "x", "jabber:x:delay" );
-				if ( stamp_el1 != null ){
-					stamp1 = stamp_el1.getAttributeStaticStr( "stamp" );
-				}
+			// if both entries are stamped with XEP-0203 then just compare stamps
+			if (isStamp1New && isStamp2New) {
+				String stamp1 = stamp_el1.getAttributeStaticStr("stamp");
+				String stamp2 = stamp_el2.getAttributeStaticStr("stamp");
+				return stamp1.compareTo(stamp2);
 			}
 
-			// Try XEP-0203 - the new XEP...
-			Element stamp_el2 = p2.getElement().getChild( "delay", "urn:xmpp:delay" );
-
-			if ( stamp_el2 == null ){
-
+			// retrieve XEP-0091 if there is no XEP-0203 stamp
+			if (!isStamp1New) {
+				// XEP-0091 support - the old one...
+				stamp_el1 = p1.getElement().getChild( "x", "jabber:x:delay" );
+			}
+			if (!isStamp2New) {
 				// XEP-0091 support - the old one...
 				stamp_el2 = p2.getElement().getChild( "x", "jabber:x:delay" );
-				if ( stamp_el2 != null ){
-					stamp2 = stamp_el2.getAttributeStaticStr( "stamp" );
-				}
+			}
+
+			// retrive stamps
+			String stamp1 = stamp_el1 == null ? "" : stamp_el1.getAttributeStaticStr("stamp");
+			String stamp2 = stamp_el2 == null ? "" : stamp_el2.getAttributeStaticStr("stamp");
+
+			// convert XEP-0203 stamp to XEP-0091 stamp, simple removal of '-' should work
+			if (isStamp1New) {
+				stamp1 = stamp1.replace("-", "");
+			} else if (isStamp2New) {
+				stamp2 = stamp2.replace("-", "");
 			}
 
 			return stamp1.compareTo( stamp2 );
