@@ -23,32 +23,17 @@ import tigase.db.NonAuthUserRepository;
 import tigase.db.RepositoryFactory;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
-
 import tigase.server.Command;
 import tigase.server.DataForm;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.amp.AmpFeatureIfc;
 import tigase.server.amp.MsgRepository;
-
-import tigase.xmpp.Authorization;
-import tigase.xmpp.JID;
-import tigase.xmpp.NoConnectionIdException;
-import tigase.xmpp.NotAuthorizedException;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.XMPPProcessorAbstract;
-import tigase.xmpp.XMPPProcessorIfc;
-import tigase.xmpp.XMPPResourceConnection;
-
 import tigase.util.TigaseStringprepException;
 import tigase.xml.Element;
+import tigase.xmpp.*;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -328,7 +313,7 @@ public class FlexibleOfflineMessageRetrieval
 				}
 			}    // end of while (elem = elems.poll() != null)
 			try {
-				Collections.sort( pacs, offlineProcessor.new StampComparator() );
+				Collections.sort( pacs, new OfflineMessages.StampComparator() );
 			} catch ( NullPointerException e ) {
 				try {
 					log.warning( "Can not sort off line messages: " + pacs + ",\n" + e );
