@@ -340,20 +340,17 @@ public class SessionManagerClustered
 		} catch (NoClassDefFoundError e) {
 			log.log(Level.SEVERE, "Can't instantiate clustering strategy for class: " + strategy_class);
 			if (e.getMessage().contains("licence")) {
-				final String[] msg = {"",
-				                      "  ---------------------------------------------",
-				                      "  ERROR! ACS strategy was enabled with following class configuration",
-				                      "  --sm-cluster-strategy-class=tigase.server.cluster.strategy.OnlineUsersCachingStrategy",
-				                      "  but required libraries are missing!",
-				                      "  ",
-				                      "  Please make sure that all tigase-acs*.jar and licence-lib.jar",
-				                      "  files are available in the classpath or disable ACS strategy!",
-				                      "  (by commenting out above line)",
-				                      "  ",
-				                      "  For more information please peruse ACS documentation.",
-				                      "  ---------------------------------------------",
+				final String[] msg = {
+				                      "ERROR! ACS strategy was enabled with following class configuration",
+				                      "--sm-cluster-strategy-class=tigase.server.cluster.strategy.OnlineUsersCachingStrategy",
+				                      "but required libraries are missing!",
 				                      "",
-				                      "",};
+				                      "Please make sure that all tigase-acs*.jar and licence-lib.jar",
+				                      "files are available in the classpath or disable ACS strategy!",
+				                      "(by commenting out above line)",
+				                      "",
+				                      "For more information please peruse ACS documentation.",
+				                      };
 				TigaseRuntime.getTigaseRuntime().shutdownTigase(msg);
 			} else {
 				throw new NoClassDefFoundError("Can not instantiate clustering strategy for class");
@@ -486,20 +483,16 @@ public class SessionManagerClustered
 			} catch (NoClassDefFoundError e) {
 				log.log(Level.SEVERE, "Can't instantiate clustering strategy for class: " + strategy_class);
 				if (e.getMessage().contains("licence")) {
-					final String[] msg = {"",
-					                      "  ---------------------------------------------",
-					                      "  ERROR! ACS strategy was enabled with following class configuration",
-					                      "  --sm-cluster-strategy-class=tigase.server.cluster.strategy.OnlineUsersCachingStrategy",
-					                      "  but required libraries are missing!",
-					                      "  ",
-					                      "  Please make sure that all tigase-acs*.jar and licence-lib.jar",
-					                      "  files are available in the classpath or disable ACS strategy!",
-					                      "  (by commenting out above line)",
-					                      "  ",
-					                      "  For more information please peruse ACS documentation.",
-					                      "  ---------------------------------------------",
+					final String[] msg = {"ERROR! ACS strategy was enabled with following class configuration",
+					                      "--sm-cluster-strategy-class=tigase.server.cluster.strategy.OnlineUsersCachingStrategy",
+					                      "but required libraries are missing!",
 					                      "",
-					                      "",};
+					                      "Please make sure that all tigase-acs*.jar and licence-lib.jar",
+					                      "files are available in the classpath or disable ACS strategy!",
+					                      "(by commenting out above line)",
+					                      "",
+					                      "For more information please peruse ACS documentation.",
+					                      };
 					TigaseRuntime.getTigaseRuntime().shutdownTigase(msg);
 				} else {
 					throw new NoClassDefFoundError("Can not instantiate clustering strategy for class");

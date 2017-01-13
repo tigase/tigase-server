@@ -772,19 +772,14 @@ public class ClusterConnectionManager
 		
 		if (getDefHostName().toString().equalsIgnoreCase( "localhost") ) {
 			TigaseRuntime.getTigaseRuntime().shutdownTigase( new String [] {
+				"ERROR! Tigase is running in Clustered Mode yet the hostname",
+				"of the machine was resolved to *localhost* which will cause",
+				"malfunctioning of Tigase in clustered environment!",
 				"",
-				"  ---------------------------------------------",
-				"  ERROR! Tigase is running in Clustered Mode yet the hostname",
-				"  of the machine was resolved to *localhost* which will cause",
-				"  malfunctioning of Tigase in clustered environment!",
-				"  ",
-				"  To prevent further issues with the clustering Tigase will be shutdown.",
-				"  ",
-				"  Please make sure that FQDN hostname of the machine is set correctly",
-				"  and restart the server.",
-				"  ---------------------------------------------",
+				"To prevent further issues with the clustering Tigase will be shutdown.",
 				"",
-				"",
+				"Please make sure that FQDN hostname of the machine is set correctly",
+				"and restart the server."
 			} );
 		}
 

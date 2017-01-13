@@ -26,16 +26,10 @@ package tigase.sys;
 
 import tigase.server.XMPPServer;
 import tigase.server.monitor.MonitorRuntime;
-
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 
-import java.lang.management.GarbageCollectorMXBean;
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryPoolMXBean;
-import java.lang.management.MemoryUsage;
-import java.lang.management.OperatingSystemMXBean;
-import java.lang.management.ThreadMXBean;
+import java.lang.management.*;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -327,19 +321,34 @@ public abstract class TigaseRuntime {
 	}
 
 	public void shutdownTigase(String[] msg) {
-			if (XMPPServer.isOSGi()) {
-				// for some reason System.out.println is not working in OSGi
-				for (String line : msg) {
-					log.log(Level.SEVERE, line);
-				}
-			}
-			else {
-				for (String line : msg) {
-					System.out.println(line);
-				}
-			}
+		StringBuilder sb = new StringBuilder();
+		sb.append("\n");
+		sb.append("\n");
+		sb.append("\n");
+		sb.append("\n");
+		sb.append("  --------------------------------------------------------------------").append("\n");
+		for (String line : msg) {
+			sb.append("  ").append(line).append("\n");
+		}
+		sb.append("  --------------------------------------------------------------------").append("\n");
+		sb.append("\n");
+		sb.append("\n");
+		sb.append("\n");
+		sb.append("\n");
 
-			System.exit(1);
+		if (XMPPServer.isOSGi()) {
+			// for some reason System.out.println is not working in OSGi
+			log.log(Level.SEVERE, sb.toString());
+		} else {
+			System.out.println(sb.toString());
+		}
+
+		System.exit(1);
+	}
+
+	public static void main(String[] args) {
+		final TigaseRuntime tigaseRuntime = getTigaseRuntime();
+		tigaseRuntime.shutdownTigase(new String[] {"there", "was", "an", "error"});
 	}
 
 }
