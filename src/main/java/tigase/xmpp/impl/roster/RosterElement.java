@@ -270,8 +270,10 @@ public class RosterElement {
 			for (int i = 0; i < groups.length; i++) {
 				this.groups[i] = XMLUtils.unescape(groups[i]);
 			}
-			modified = true;
+		} else {
+			this.groups = null;
 		}
+		modified = true;
 	}
 
 	public final void setName(final String name) {
