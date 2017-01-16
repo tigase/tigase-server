@@ -79,17 +79,21 @@ public class ReflectionHelper {
 		return (type instanceof Class) ? (Class) type : null;
 	}
 
-	public static Class getCollectionParamter(Type genericType, Class clazz) {
+	public static Type getCollectionParamter(Type genericType, Class clazz) {
 		if (genericType instanceof ParameterizedType) {
-			Type type = ((ParameterizedType) genericType).getActualTypeArguments()[0];
-			if (!(type instanceof Class)) {
-				Map<TypeVariable<?>, Type> map = createGenericsTypeMap(clazz);
-				while (type instanceof TypeVariable) {
-					type = map.get((TypeVariable<?>) type);
-				}
-			}
-
-			return (Class) type;
+			return ((ParameterizedType) genericType).getActualTypeArguments()[0];
+//			Type type = ((ParameterizedType) genericType).getActualTypeArguments()[0];
+//			if (!(type instanceof Class)) {
+//				Map<TypeVariable<?>, Type> map = createGenericsTypeMap(clazz);
+//				while (type instanceof TypeVariable) {
+//					type = map.get((TypeVariable<?>) type);
+//				}
+//			}
+//
+//			if (!(type instanceof Class)) {
+//
+//			}
+//			return (Class) type;
 		}
 		return null;
 	}

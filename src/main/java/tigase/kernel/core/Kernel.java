@@ -29,9 +29,7 @@ import tigase.kernel.beans.config.BeanConfigurator;
 import tigase.kernel.core.BeanConfig.State;
 import tigase.util.ReflectionHelper;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -558,7 +556,14 @@ public class Kernel {
 		} else if (dep.getType() != null) {
 			Class<?> type = dep.getType();
 			if (Collection.class.isAssignableFrom(type)) {
-				type = ReflectionHelper.getCollectionParamter(dep.getGenericType(), dep.getBeanConfig().getClazz());
+				Type t = ReflectionHelper.getCollectionParamter(dep.getGenericType(), dep.getBeanConfig().getClazz());
+				if (t instanceof ParameterizedType) {
+					type = (Class) ((ParameterizedType) t).getRawType();
+				} else if (t instanceof TypeVariable) {
+					type = (Class) ((TypeVariable) t).getBounds()[0];
+				} else {
+					type = (Class) t;
+				}
 			}
 			Object[] z = (Object[]) Array.newInstance(type, 1);
 			d = dataToInject.toArray(z);

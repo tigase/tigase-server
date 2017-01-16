@@ -63,7 +63,12 @@ public class DependencyManager {
 		} else if (dependency.getType() != null) {
 			Class<?> type = dependency.getType();
 			if (Collection.class.isAssignableFrom(type)) {
-				type = ReflectionHelper.getCollectionParamter(dependency.getGenericType(), dependency.getBeanConfig().getClazz());
+				Map<TypeVariable<?>, Type> expectedTypes = ReflectionHelper.createGenericsTypeMap(dependency.getBeanConfig().getClazz());
+				return ReflectionHelper.compareTypes(
+						ReflectionHelper.getCollectionParamter(dependency.getGenericType(), dependency.getBeanConfig().getClazz()),
+						beanConfig.getClazz(),
+						expectedTypes, null);
+				//type = ReflectionHelper.getCollectionParamter(dependency.getGenericType(), dependency.getBeanConfig().getClazz());
 			}
 			return type.isAssignableFrom(beanConfig.getClazz());
 		} else
