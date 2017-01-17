@@ -321,16 +321,20 @@ public abstract class TigaseRuntime {
 	}
 
 	public void shutdownTigase(String[] msg) {
+		shutdownTigase(msg,1);
+	}
+
+	public void shutdownTigase(String[] msg, int exitCode) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("\n");
 		sb.append("\n");
 		sb.append("\n");
 		sb.append("\n");
-		sb.append("  --------------------------------------------------------------------").append("\n");
+		sb.append("  =============================================================================").append("\n");
 		for (String line : msg) {
 			sb.append("  ").append(line).append("\n");
 		}
-		sb.append("  --------------------------------------------------------------------").append("\n");
+		sb.append("  =============================================================================").append("\n");
 		sb.append("\n");
 		sb.append("\n");
 		sb.append("\n");
@@ -343,7 +347,7 @@ public abstract class TigaseRuntime {
 			System.out.println(sb.toString());
 		}
 
-		System.exit(1);
+		System.exit(exitCode);
 	}
 
 	public static void main(String[] args) {
