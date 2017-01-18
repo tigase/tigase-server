@@ -525,7 +525,13 @@ Tigase has improved default settings to improve performance.  These include:
 
 - link:https://projects.tigase.org/issues/4787[#4787] Fixed possible NPE in ClientStateIndication when GETFEATURES command is executed before session is confirmed not null.
 
-- link:https://projects.tigase.org/issues/4793[#4793] Fixed NPE in statistics occuring when certain values are null
+- link:https://projects.tigase.org/issues/4793[#4793] Fixed NPE in statistics occuring when certain values are null.
+
+- link:https://projects.tigase.org/issues/4812[#4812] Fixed possible NPE in ClientStateIndication and mobile optimizations if packets are processed before resource binding is finished.
+
+- link:https://projects.tigase.org/issues/4818[#4818] Fixed StampComparitor not comparing packets stamped with XEP-0203 Delayed Delivery instructions.
+
+- link:https://projects.tigase.org/issues/4820[#4820] Now fixed issue where it was impossible to remove user from all groups.
 
 - Patch added to fix ConcurrentModificationException in BlockingCommand plugin.
 
