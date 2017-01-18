@@ -8,7 +8,7 @@
 :website: http://tigase.net
 :toc:
 
-From release of v7.1.0, users and commercial clients alike may now be able to register and request a license file from our servers on their own.
+With the release of v7.1.0, users and commercial clients alike may now be able to register and request a license file from our servers on their own.
 This process helps us maintain licenses, and can allow for client installations of new servers without the need to wait for a license file.
 Users who do not wish to register will not be required to register.  However, If you are using Tigase ACS or other commercial pieces of software, you will be required to register.
 
@@ -24,7 +24,7 @@ There are currently 2 ways for registering for a license with Tigase commercial 
 
 === Automatic Registration
 
-Once a commercial component is activated on Tigase XMPP Server, the program will then retrieve and/or generate an Installation ID from our servers, and make a file called installation-id in your _/etc_ directory including the installation ID for your instance.  Note that installation IDs cannot be moved from server to server and should remain individual to the machine and cluster they are running.
+Once a commercial component is activated on Tigase XMPP Server, the program will then retrieve an Installation ID from our servers, and make a file called installation-id in your _/etc_ directory including the installation ID for your instance.  An installation ID is generated using the complete cluster map and all machines wthin the same cluster should have the same installation ID.
 This installation-id will then be sent along with server details to a license server, and appropiate licenses will be made in your _tigasedir/etc_ directory.
 
 === Web Portal
@@ -40,7 +40,7 @@ Data Fields:
 
 - Customer name: Company or user name used to identify machines.  Multiple clusters or servers can have the same customer name.
 - VHosts: Comma seperated list of Vhosts you will be using on this node.  NOTE: these fields are case sensetive!
-- Legacy license hashes: Copy the hash section of your acs.license file into this field to update your license from the old format into the new one.
+- Legacy license hashes: Copy the signature section of your acs.license file into this field to update your license from the old format into the new one.
 - Capcha question: Enter the basic math answer for this form to prove you are not a robot.
 
 The next page will provide you with an installation ID like the following:
@@ -53,7 +53,7 @@ Edit your init.properties file and add your installation-id
 --installation-id=1TCICGG7K8AS2JSSEVMDA9QOLR4NVLJSR
 -----
 
-If you wish, you may create a backup of the installation-id by creating a file named installation-id in the _tigasedir/etc_ and enter only the provided installation-id.
+Note that the instllation-id file will be made automatically once the license file is installed and verified by the server.
 
 ==== Obtaining a Server Code
 
@@ -228,6 +228,9 @@ Open a new browser and navigate to this address: link:https://license.tigase.net
 // 	</command>
 // </iq>
 // ----
+
+== Unauthorized use
+If Tigase XMPP server does not have a valid license file, or cannot contact the licensing server to obtain installation id and attached licences, the server will initiate retries.  If these retries are not sucessfull after a random amount of time and 10 tries, the server will then shutdown.  If you are experienceing this in error, please contact Tigase.
 
 == Statistics Sent
 Statistics of your server may be sent to Tigase server's if the all of following happens:
