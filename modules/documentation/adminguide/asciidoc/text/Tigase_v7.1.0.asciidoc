@@ -202,11 +202,6 @@ Server Statistics for Tigase XMPP Server have been expanded, and now will print 
 
 It's possible now to redirect connections on one port to be forced to connect to another port using the +force-redirect-to+ setting.  link:http://docs.tigase.org/tigase-server/snapshot/Administration_Guide/html/#_enforcing_redirection[Details here].
 
-=== Authentication methods have been improved.
-SASL-SCRAM is now enabled by default for available authentication methods.  We have also added:
-- SCRAM-SHA-1
-- SCRAM-SHA-1-PLUS
-
 === Dual IP installtions
 
 Tigase now has a Dual IP setup which can now use a separate internal and external IP and use a DNS resolver for the connection redirection.  Setup instructions are link:http://docs.tigase.org/tigase-server/snapshot/Administration_Guide/html/#_configuring_hostnames[Located here].
@@ -319,7 +314,9 @@ Tigase has improved default settings to improve performance.  These include:
 - link:https://projects.tigase.org/issues/4358[#4358] Several methods have been renamed or removed to prepare for v7.2.0 Kernel setup.
 - #4385 Minor tweak to web-installer to skip unnecessary showing of blank init.properties file & enabled post-setup editing and saving.
 - link:https://projects.tigase.org/issues/4665[#4665] Full Stacktrace will be dumped to log file by default, see xref:shutDownStackTrace[this section] for more details.
+- #4739 LetsEncrypt certficates are now included in dedicated keystore.
 - link:https://projects.tigase.org/issues/4752[#4752] New methods added to Tigase: _tigase.component.modules.Moduleprovider#getModules_ and _tigase.component.modules.ModuleProvider#getModulesId_ allowing for hooking of component modules.
+
 
 
 == Fixes
@@ -520,7 +517,15 @@ Tigase has improved default settings to improve performance.  These include:
 
 - link:https://projects.tigase.org/issues/4747[#4747] converter.groovy script is now depcreciated.
 
+- link:https://projects.tigase.org/issues/4760[#4760] Fixed NPE upon anonymous user conection, changed log notification to reduce clutter.
+
 - #4762 Fixed delayed processing of WebSocket data frame if frame is both TCP and ping frame.
+
+- link:https://projects.tigase.org/issues/4786[#4786] Changed timeout for cluster repository connection during acceptence of incoming cluster connection from 15ms to 15s.
+
+- link:https://projects.tigase.org/issues/4787[#4787] Fixed possible NPE in ClientStateIndication when GETFEATURES command is executed before session is confirmed not null.
+
+- link:https://projects.tigase.org/issues/4793[#4793] Fixed NPE in statistics occuring when certain values are null
 
 - Patch added to fix ConcurrentModificationException in BlockingCommand plugin.
 
@@ -529,6 +534,8 @@ Tigase has improved default settings to improve performance.  These include:
 - Fixed checking for user session without localpart in to address.
 
 - Fixed +resourceDefPrefix+ from accumulating resource names when components are added or removed in web console.
+
+- Fixed [F] property not converting to float.
 
 - Distributed EventBus improved to allow POJO based events to be fired locally.
 
