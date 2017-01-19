@@ -9,10 +9,10 @@
 :toc:
 
 With the release of v7.1.0, users and commercial clients alike may now be able to register and request a license file from our servers on their own.
-This process helps us maintain licenses, and can allow for client installations of new servers without the need to wait for a license file.
+This process makes it easier for everyone to obtain valid licence file when needed.
 Users who do not wish to register will not be required to register.  However, If you are using Tigase ACS or other commercial pieces of software, you will be required to register.
 
-WARNING: Tigase XMPP Server will shut down during license check if no installation-id is retrived or generated within a givin period of time.
+WARNING: Tigase XMPP Server will shut down during license check if no installation-id or licence is received within a given period of time.
 
 *Again, Tigase XMPP Server will still be available free under AGPLv3, and free users will not need to register.*
 
@@ -20,28 +20,28 @@ WARNING: Tigase XMPP Server will shut down during license check if no installati
 
 == Registering for a License
 
-There are currently 2 ways for registering for a license with Tigase commercial products.  The easiest and recommended method is using the built in automatic registration function.  However, you may also register via a web portal for offline installations.
+There are currently two ways for registering for a license with Tigase commercial products.  The easiest and recommended method is using the built in automatic registration function.  However, you may also register via a web portal if your installation has limitations on network connectivity.
 
 === Automatic Registration
 
-Once a commercial component is activated on Tigase XMPP Server, the program will then retrieve an Installation ID from our servers, and make a file called installation-id in your _/etc_ directory including the installation ID for your instance.  An installation ID is generated using the complete cluster map and all machines wthin the same cluster should have the same installation ID.
-This installation-id will then be sent along with server details to a license server, and appropiate licenses will be made in your _tigasedir/etc_ directory.
+Once a commercial component is activated on Tigase XMPP Server, the program will then retrieve an _Installation ID_ from our servers, and make a file called `installation-id` in your `etc/` directory including the _Installation ID_ for your instance.  An installation ID is generated using the complete cluster map and all machines within the same cluster should have the same _Installation ID_.
+This _Installation ID_ will then be sent along with server details to a license server, and appropriate licence files will be made in your _tigasedir/etc_ directory. When the licence is due to be expired, this mechanism will update your licence file automatically.
 
 === Web Portal
 
-If you do not wish to use the automatic method, you may decide to generate a license using our web portal.
-Offline installaions may obtain installation IDs from our web portal in a three-step process, generation, hashing, and obtaining.
+If you do not wish to use the automatic method, you may decide to generate a licence file using our web portal.
+Offline installation may obtain _Installation IDs_ from our web portal in a three-step process: registration, generating hash, and obtaining licence file.
 
-==== Generating Installtion ID
+==== Generating Installation ID
 
-For offline installations, you may obtain an installation ID from this address: link:https://license.tigase.net/register[https://license.tigase.net/register].
+For offline installations, you may obtain an _Installation ID_ from this address: link:https://license.tigase.net/register[https://license.tigase.net/register].
 
 Data Fields:
 
-- Customer name: Company or user name used to identify machines.  Multiple clusters or servers can have the same customer name.
-- VHosts: Comma seperated list of Vhosts you will be using on this node.  NOTE: these fields are case sensetive!
-- Legacy license hashes: Copy the signature section of your acs.license file into this field to update your license from the old format into the new one.
-- Capcha question: Enter the basic math answer for this form to prove you are not a robot.
+- `Customer name`: Company or user name used to identify machines.  Multiple clusters or servers can have the same customer name.
+- `VHosts`: Comma separated list of VHosts you will be using on this node.  NOTE: these fields are case sensitive!
+- `Legacy license hashes`: Copy the digest hash generated for all legacy licences - it's available in the `etc/tigase-console.log` after startup (if such licences are present).
+- `Captcha question`: Enter the basic math answer for this form to prove you are not a robot.
 
 The next page will provide you with an installation ID like the following:
 
@@ -53,16 +53,15 @@ Edit your init.properties file and add your installation-id
 --installation-id=1TCICGG7K8AS2JSSEVMDA9QOLR4NVLJSR
 -----
 
-Note that the instllation-id file will be made automatically once the license file is installed and verified by the server.
+Note that the `installation-id` file will be made automatically once the license file is installed and verified by the server.
 
 ==== Obtaining a Server Code
 
-Once you have the installation ID, you will need to generate a server code.  This can be done by accessing the admin UI page and navigating to the Licence section.  Once there, click on Retrieve code for licence.
-Select the component you wish to generate a code for and click Submit.  You will see a fields with installation-id, module, vhosts filled out based on your server's configuation.  Copy the contents of the Code field and proceed to the next section.
+Once you have the _Installation ID_, you will need to generate a server code.  This can be done by accessing the admin UI page and navigating to the Licence section. Once there, click on Retrieve code for licence. Select the component you wish to generate a code for and click Submit.  You will see a fields with installation-id, module, VHosts filled out based on your server's configuration.  Copy the contents of the Code field and proceed to the next section.
 
 ==== Obtaining license file
 
-Open a new browser and navigate to this address: link:https://license.tigase.net/retrieve[https://license.tigase.net/retrieve]  once there, paste the generated code from the last step in the field and click submit.  Once that happens, you will be prompted to download a license file, place this file in your _/etc_ folder and restart your server, your license is now activated and installed on your server.
+Open a new browser and navigate to this address: link:https://license.tigase.net/retrieve[https://license.tigase.net/retrieve] once there, paste the generated code from the last step in the field and click submit.  Afterwards you will be prompted to download a license file, place this file in your _etc/_ folder and restart your server, your license is now activated and installed on your server.
 
 // ad-hoc commands removed as they may not properly work, but may be enabled at a future time
 //
@@ -230,7 +229,7 @@ Open a new browser and navigate to this address: link:https://license.tigase.net
 // ----
 
 == Unauthorized use
-If Tigase XMPP server does not have a valid license file, or cannot contact the licensing server to obtain installation id and attached licences, the server will initiate retries.  If these retries are not sucessfull after a random amount of time and 10 tries, the server will then shutdown.  If you are experienceing this in error, please contact Tigase.
+If Tigase XMPP server does not have a valid license file, or cannot contact the licensing server to obtain installation id and attached licences, the server will initiate retries.  If these retries are not successful after a random amount of time and 10 tries, the server will then shutdown.  If you are experiencing this in error, please contact Tigase.
 
 == Statistics Sent
 Statistics of your server may be sent to Tigase server's if the all of following happens:
