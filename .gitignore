@@ -77,3 +77,5 @@ src/main/groovy/tigase/admin/DeleteItem.groovy
 src/main/groovy/tigase/admin/ListItems.groovy
 src/main/groovy/tigase/admin/ListNodes.groovy
 src/main/groovy/tigase/admin/RetrieveItem.groovy
+etc/installation-id
+etc/*.licence*

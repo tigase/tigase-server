@@ -8,217 +8,237 @@
 :website: http://tigase.net
 :toc:
 
-From release of v7.1.0, users and commercial clients alike may now be able to register and request a license file from our servers on their own.
-This process helps us maintain licenses, and can allow for client installations of new servers without the need to wait for a license file.
+With the release of v7.1.0, users and commercial clients alike may now be able to register and request a license file from our servers on their own.
+This process makes it easier for everyone to obtain valid licence file when needed.
 Users who do not wish to register will not be required to register.  However, If you are using Tigase ACS or other commercial pieces of software, you will be required to register.
+
+WARNING: Tigase XMPP Server will shut down during license check if no installation-id or licence is received within a given period of time.
 
 *Again, Tigase XMPP Server will still be available free under AGPLv3, and free users will not need to register.*
 
 
 
 == Registering for a License
-There are currently 3 ways for registering for a license with Tigase commercial products.  The easiest and recommended method is using the built in automatic registration function.  However, you may also register via a web portal, and finally, and perhaps the most time-intensive is to use ad-hoc commands.
+
+There are currently two ways for registering for a license with Tigase commercial products.  The easiest and recommended method is using the built in automatic registration function.  However, you may also register via a web portal if your installation has limitations on network connectivity.
 
 === Automatic Registration
 
-Once a commercial component is activated on Tigase XMPP Server, the program will then retrieve and/or generate an Installation ID from our servers, and make a file called installation-id in your _/etc_ directory including the installation ID for your instance.  Note that installation IDs cannot be moved from server to server and should remain individual to the machine and cluster they are running.
-
+Once a commercial component is activated on Tigase XMPP Server, the program will then retrieve an _Installation ID_ from our servers, and make a file called `installation-id` in your `etc/` directory including the _Installation ID_ for your instance.  An installation ID is generated using the complete cluster map and all machines within the same cluster should have the same _Installation ID_.
+This _Installation ID_ will then be sent along with server details to a license server, and appropriate licence files will be made in your _tigasedir/etc_ directory. When the licence is due to be expired, this mechanism will update your licence file automatically.
 
 === Web Portal
 
-If you do not wish to use the automatic method, you may decide to generate a license using our web portal.
-Offline installaions may obtain installation IDs from our web portal in a three-step process, generation, hashing, and obtaining.
+If you do not wish to use the automatic method, you may decide to generate a licence file using our web portal.
+Offline installation may obtain _Installation IDs_ from our web portal in a three-step process: registration, generating hash, and obtaining licence file.
 
-==== Generating Installtion ID
+==== Generating Installation ID
 
-For offline installations, you may obtain an installation ID from this address: link:https://license.tigase.net/register[https://license.tigase.net/register].
+For offline installations, you may obtain an _Installation ID_ from this address: link:https://license.tigase.net/register[https://license.tigase.net/register].
 
 Data Fields:
 
-- Customer name: Company or user name used to identify machines.  Multiple clusters or servers can have the same customer name.
-- VHosts: Comma seperated list of Vhosts you will be using on this node.  NOTE: these fields are case sensetive!
-- Legacy license hashes: Copy the contents of your acs.license file into this field to update your license from the old format into the new one.
-- Capcha question: Enter the basic math answer for this form to prove you are not a robot.
+- `Customer name`: Company or user name used to identify machines.  Multiple clusters or servers can have the same customer name.
+- `VHosts`: Comma separated list of VHosts you will be using on this node.  NOTE: these fields are case sensitive!
+- `Legacy license hashes`: Copy the digest hash generated for all legacy licences - it's available in the `etc/tigase-console.log` after startup (if such licences are present).
+- `Captcha question`: Enter the basic math answer for this form to prove you are not a robot.
 
 The next page will provide you with an installation ID like the following:
 
 +1TCICGG7K8AS2JSSEVMDA9QOLR4NVLJSR+
 
-Create a blank file in the _/etc_ called installation-id and place the text in the file un modified.
+Edit your init.properties file and add your installation-id
+[source,properties]
+-----
+--installation-id=1TCICGG7K8AS2JSSEVMDA9QOLR4NVLJSR
+-----
 
-==== Obtaining a License Hash
+Note that the `installation-id` file will be made automatically once the license file is installed and verified by the server.
 
-Once you have the installation ID, you will need to generate a license hash.  This can be done by accessing the admin UI page and navigating to the Licence section.  Once there, click on Retrieve code for licence.
-Select the component you wish to generate a code for and click Submit.  You will see a fields with installation-id, module, vhosts filled out based on your server's configuation.  Copy the contents of the Code field and proceed to the next section.
+==== Obtaining a Server Code
+
+Once you have the _Installation ID_, you will need to generate a server code.  This can be done by accessing the admin UI page and navigating to the Licence section. Once there, click on Retrieve code for licence. Select the component you wish to generate a code for and click Submit.  You will see a fields with installation-id, module, VHosts filled out based on your server's configuration.  Copy the contents of the Code field and proceed to the next section.
 
 ==== Obtaining license file
 
-Open a new browser and navigate to this address: link:https://license.tigase.net/retrieve[https://license.tigase.net/retrieve]  once there, paste the generated code from the last step in the field and click submit.  Once that happens, you will be prompted to download a license file, place this file in your _/etc_ folder and restart your server, your license is now activated and installed on your server.
+Open a new browser and navigate to this address: link:https://license.tigase.net/retrieve[https://license.tigase.net/retrieve] once there, paste the generated code from the last step in the field and click submit.  Afterwards you will be prompted to download a license file, place this file in your _etc/_ folder and restart your server, your license is now activated and installed on your server.
 
-=== AdHoc Commands
-The new license server can now accept adHoc commands to be sent and received using XMPP stanzas.  This is more complicated, but it may help you use scripts or automate the server registration process:
+// ad-hoc commands removed as they may not properly work, but may be enabled at a future time
+//
+// === Ad-Hoc Commands
+// The new license server can now accept ad-Hoc commands to be sent and received using XMPP stanzas.  This is more complicated, but it may help you use scripts or automate the server registration process:
+//
+// These Ad-Hoc commands may be used to manually start the following operations:
+//
+// ==== +create-customer-id+
+// Creates a new customer-id.
+//
+// Returns a blank form containing the following fields to be filled:
+//
+// - +name+ - full name of the user
+// - +email+ - the email address user
+//
+//
+// [source,xml]
+// ----
+// <iq type="set" to="licenceserver@localserver" id="aad3a">
+//     <command xmlns="http://jabber.org/protocol/commands" node="create-customer-id"/>
+// </iq>
+// ----
+//
+// The server sends in response:
+//
+// Registration Form
+// [source,xml]
+// ----
+// <iq from="licenceserver@localhost" type="result" id="aad3a" to="bob@localhost/Psi">
+// <command xmlns="http://jabber.org/protocol/commands"
+// 		status="executing" node="create-customer-id" sessionid="87ed39f9-d29c-405c-b1fa-a541958968aa">
+//         <x xmlns="jabber:x:data" type="form">
+// 			<title>Customer Registration</title>
+// 			<instructions>Please fill all fields</instructions>
+// 			<field type="text-single" label="Name" var="name">
+// 				<value/>
+// 				<required/>
+// 			</field>
+// 			<field type="text-single" label="e-mail" var="email">
+// 				<required/>
+// 				<value/>
+// 			</field>
+//         </x>
+// 	</command>
+// </iq>
+// ----
+//
+// The user now sends the completed form:
+//
+// Registration form response
+// [source,xml]
+// ----
+// <iq type="set" to="licenceserver@localhost" id="aad4a">
+// <command xmlns="http://jabber.org/protocol/commands" node="create-customer-id"
+// 		sessionid="87ed39f9-d29c-405c-b1fa-a541958968aa">
+// 		<x xmlns="jabber:x:data" type="submit">
+// 			<field type="text-single" var="name">
+// 				<value>Bob Bobowsky</value>
+// 			</field>
+// 			<field type="text-single" var="email">
+// 				<value>bob@somewhere.gov</value>
+// 			</field>
+// 		</x>
+// 	</command>
+// </iq>
+// ----
+//
+// After sending the filled form, a new +customer-id+ will be generated and sent to the E-mail listed in the form.
+// If you are already registered, it will be sent to the following address existing +customer-id+
+//
+// ==== +retrieve-license+
+//
+// To obtain a license from the server must send a form containing a +customer-id+:
+//
+// Start-up Command +retrieve-license+
+// [source,xml]
+// ----
+// <iq type="set" to="licenceserver@localhost" id="aad8a">
+// 	<command xmlns="http://jabber.org/protocol/commands" node="retrieve-licence"/>
+// </iq>
+// ----
+//
+// In response, the server will send a form asking for +customer-id+.
+// If the server's found his JabberID, it sent the form will automatically be filled in:
+//
+// Asking for +customer-id+
+// [source,xml]
+// ----
+// <iq from="licenceserver@localhost" type="result" id="aad8a" to="bob@localhost/Psi+">
+// 	<command xmlns="http://jabber.org/protocol/commands" status="executing"
+// 		node="retrieve-licence" sessionid="b7aa7ffb-5cda-4c67-aeb4-04094764ec9e">
+// 		<x xmlns="jabber:x:data" type="form">
+// 			<title>Retrieve licence</title>
+// 			<instructions>Please fill all fields</instructions>
+// 			<field type="text-single" label="customer-id" var="customer-id">
+// 				<value></value>
+// 			</field>
+//       <field type="jid-multi" var="vhosts">
+//        <value></value>
+//       </field>
+//       <field type="text-multi" var="legacy-hash">
+//        <value></value>
+//       </field>
+//       <field type="text-single" var="totp">
+//        <value></value>
+//       </field>
+// 	</x>
+// 	</command>
+// </iq>
+// ----
+//
+// The user sends the completed form:
+//
+// Filled Form license generation
+// [source,xml]
+// ----
+// <iq type="set" to="licenceserver@localhost" id="aae0a">
+//  <command xmlns="http://jabber.org/protocol/commands" node="retrieve-installation-id">
+//  <x xmlns="jabber:x:data" type="submit">
+//   <field type="text-single" var="customer">
+// <value>Very Important Company</value>
+//   </field>
+//   <field type="jid-multi" var="vhosts">
+//    <value>im.company.com</value>
+//    <value>important.com</value>
+//   </field>
+//   <field type="text-multi" var="legacy-hash">
+//    <value>38a5dfa3ec07f08e8e1788d1d567359a7ed95b0e354953cf0222e0fea1872a7e</value>
+//   </field>
+//   <field type="text-single" var="totp">
+// <value>4C70HD9F4JOM0UBB03OBR399B6PF6OSB</value>
+//   </field>
+//   </x>
+//  </command>
+// </iq>
+// ----
+//
+// The server sends a form containing the license.
+//
+// NOTE: Warning! The license may be in plain-text or Base64 encoded!
+//
+// .Generated license
+// [source,xml]
+// ----
+// <iq from="licenceserver@localhost" type="result" id="aad9a" to="bob@localhost/Psi+">
+// 	<command xmlns="http://jabber.org/protocol/commands" status="completed" node="retrieve-licence"
+// 		sessionid="b7aa7ffb-5cda-4c67-aeb4-04094764ec9e">
+// 		<x xmlns="jabber:x:data" type="result">
+// 			<field type="text-multi" label="Licence" var="licence">
+// 				<value>max-costam=9</value>
+// 				<value>comment=Licencja całkowicie domyślna</value>
+// 				<value>licence-nr=1</value>
+// 				<value>licence-id=de54488e-13d0-38a4-8614-1b624cc73ac0</value>
+// 				<value>customer-name=Bob Bobowsky</value>
+// 				<value>customer-jid=bob@localhost</value>
+// 				<value>template-id=fb9971738214b50c5700673956ade0fa0b8169d0</value>
+// 				<value>valid-since=2015-07-17</value>
+// 				<value>valid-until=2015-10-17</value>
+// 				<value>signature=2bca48ad20b63dd76be08b1a6…374dab308</value>
+// 			</field>
+// 		</x>
+// 	</command>
+// </iq>
+// ----
 
-These Ad-Hoc commands may be used to manually start the following operations:
-
-==== +create-customer-id+
-Creates a new customer-id.
-
-Returns a blank form containing the following fields to be filled:
-- +name+ - full name of the user
-- +email+ - the email address user
-
-
-[source,xml]
-----
-<iq type="set" to="licenceserver@localserver" id="aad3a">
-    <command xmlns="http://jabber.org/protocol/commands" node="create-customer-id"/>
-</iq>
-----
-
-The server sends in response:
-
-Registration Form
-[source,xml]
-----
-<iq from="licenceserver@localhost" type="result" id="aad3a" to="bob@localhost/Psi">
-	<command xmlns="http://jabber.org/protocol/commands"
-		status="executing" node="create-customer-id" sessionid="87ed39f9-d29c-405c-b1fa-a541958968aa">
-        <x xmlns="jabber:x:data" type="form">
-			<title>Customer Registration</title>
-			<instructions>Please fill all fields</instructions>
-			<field type="text-single" label="Name" var="name">
-				<required/>
-				<value/>
-			</field>
-			<field type="text-single" label="e-mail" var="email">
-				<required/>
-				<value/>
-			</field>
-        </x>
-	</command>
-</iq>
-----
-
-The user now sends the completed form:
-
-Registration form response
-[source,xml]
-----
-<iq type="set" to="licenceserver@localhost" id="aad4a">
-	<command xmlns="http://jabber.org/protocol/commands" node="create-customer-id"
-		sessionid="87ed39f9-d29c-405c-b1fa-a541958968aa">
-		<x xmlns="jabber:x:data" type="submit">
-			<field type="text-single" var="name">
-				<value>Bob Bobowsky</value>
-			</field>
-			<field type="text-single" var="email">
-				<value>bob@somewhere.gov</value>
-			</field>
-		</x>
-	</command>
-</iq>
-----
-
-After sending the filled form, a new +customer-id+ will be generated and sent to the E-mail listed in the form.
-If you are already registered, it will be sent to the following address existing +customer-id+
-
-==== +retrieve-license+
-
-To obtain a license from the server must send a form containing a +customer-id+:
-
-Start-up Command +retrieve-license+
-[source,xml]
-----
-<iq type="set" to="licenceserver@localhost" id="aad8a">
-	<command xmlns="http://jabber.org/protocol/commands" node="retrieve-licence"/>
-</iq>
-----
-
-In response, the server will send a form asking for +customer-id+.
-If the server's found his JabberID, it sent the form will automatically be filled in:
-
-Asking for +customer-id+
-[source,xml]
-----
-<iq from="licenceserver@localhost" type="result" id="aad8a" to="bob@localhost/Psi+">
-	<command xmlns="http://jabber.org/protocol/commands" status="executing"
-		node="retrieve-licence" sessionid="b7aa7ffb-5cda-4c67-aeb4-04094764ec9e">
-		<x xmlns="jabber:x:data" type="form">
-			<title>Retrieve licence</title>
-			<instructions>Please fill all fields</instructions>
-			<field type="text-single" label="customer-id" var="customer-id">
-				<value></value>
-			</field>
-      <field type="jid-multi" var="vhosts">
-       <value></value>
-      </field>
-      <field type="text-multi" var="legacy-hash">
-       <value></value>
-      </field>
-      <field type="text-single" var="totp">
-       <value></value>
-      </field>
-	</x>
-	</command>
-</iq>
-----
-
-The user sends the completed form:
-
-Filled Form license generation
-[source,xml]
-----
-<iq type="set" to="licenceserver@localhost" id="aae0a">
- <command xmlns="http://jabber.org/protocol/commands" node="retrieve-installation-id">
- <x xmlns="jabber:x:data" type="submit">
-  <field type="text-single" var="customer">
-   <value>Very Important Company</value>
-  </field>
-  <field type="jid-multi" var="vhosts">
-   <value>im.company.com</value>
-   <value>important.com</value>
-  </field>
-  <field type="text-multi" var="legacy-hash">
-   <value>38a5dfa3ec07f08e8e1788d1d567359a7ed95b0e354953cf0222e0fea1872a7e</value>
-  </field>
-  <field type="text-single" var="totp">
-   <value>4C70HD9F4JOM0UBB03OBR399B6PF6OSB</value>
-  </field>
-  </x>
- </command>
-</iq>
-----
-
-The server sends a form containing the license.
-
-NOTE: Warning! The license may be in plain-text or Base64 encoded!
-
-.Generated license
-[source,xml]
-----
-<iq from="licenceserver@localhost" type="result" id="aad9a" to="bob@localhost/Psi+">
-	<command xmlns="http://jabber.org/protocol/commands" status="completed" node="retrieve-licence"
-		sessionid="b7aa7ffb-5cda-4c67-aeb4-04094764ec9e">
-		<x xmlns="jabber:x:data" type="result">
-			<field type="text-multi" label="Licence" var="licence">
-				<value>max-costam=9</value>
-				<value>comment=Licencja całkowicie domyślna</value>
-				<value>licence-nr=1</value>
-				<value>licence-id=de54488e-13d0-38a4-8614-1b624cc73ac0</value>
-				<value>customer-name=Bob Bobowsky</value>
-				<value>customer-jid=bob@localhost</value>
-				<value>template-id=fb9971738214b50c5700673956ade0fa0b8169d0</value>
-				<value>valid-since=2015-07-17</value>
-				<value>valid-until=2015-10-17</value>
-				<value>signature=2bca48ad20b63dd76be08b1a6…374dab308</value>
-			</field>
-		</x>
-	</command>
-</iq>
-----
+== Unauthorized use
+If Tigase XMPP server does not have a valid license file, or cannot contact the licensing server to obtain installation id and attached licences, the server will initiate retries.  If these retries are not successful after a random amount of time and 10 tries, the server will then shutdown.  If you are experiencing this in error, please contact Tigase.
 
 == Statistics Sent
-If you are using Tigase without a customer ID, you will be given a warning that statistics will be sent to Tigase.  Below is a breakdown of what is sent to the server.
+Statistics of your server may be sent to Tigase server's if the all of following happens:
+
+- You are using commercial Tigase components.
+- You have registered an installation-id.
+- You do not have a current license to run Tigase commercial components.
+
+If these conditions exist, statistics will be sent to our servers and a warning will be posted in your logs.  The following is an example of what information will be sent.
 
 NOTE: The text below has been better formatted for readability, but does not reflect the actual text being sent to Tigase.
 
