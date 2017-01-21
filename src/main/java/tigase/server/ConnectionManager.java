@@ -1595,84 +1595,89 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 					Thread.sleep(watchdogDelay);
 					++watchdogRuns;
 
-					/** Walk through all connections and check whether they are really
-					 * alive. Depending on the configuration send either whitespace or
-					 * XMPP ping if the service is inactive for the configured period of
-					 * time
-					 */
-					doForAllServices(new ServiceChecker<IO>() {
-						@Override
-						public void check(final XMPPIOService service) {
-							try {
-								if ( null != service ){
-									if ( log.isLoggable( Level.FINEST ) ){
-										log.log( Level.FINEST,
-														 "Testing service: {0}, sinceLastTransfer: {1}, maxInactivityTime: {2}, watchdogTimeout: {3}, watchdogDelay: {4}, watchdogPingType: {5} ",
-														 new Object[] { service, getDurationSinceLastTransfer( service ), maxInactivityTime, watchdogTimeout, watchdogDelay, watchdogPingType } );
-									}
-									long sinceLastTransfer = getDurationSinceLastTransfer(service);
-									if ( sinceLastTransfer >= maxInactivityTime ){
+					executeWatchdog();
+				} catch (InterruptedException e) {    /* Do nothing here */
+				}
+			}
 
-										// Stop the service if max keep-alive time is exceeded
-										// for non-active connections.
-										if ( log.isLoggable( Level.INFO ) ){
-											log.log( Level.INFO,
-															 "{0}: Max inactive time exceeded, stopping: {1} ( sinceLastTransfer: {2}, maxInactivityTime: {3}, watchdogTimeout: {4}, watchdogDelay: {5}, watchdogPingType: {6} )",
-															 new Object[] { getName(), service, getDurationSinceLastTransfer( service ),
-																							maxInactivityTime, watchdogTimeout, watchdogDelay, watchdogPingType } );
-										}
-										++watchdogStopped;
-										service.stop();
-									} else {
-										if ( sinceLastTransfer >= ( watchdogTimeout ) ){
+		}
 
-											/** At least once every configured timings check if the
-											 * connection is still alive with the use of configured
-											 * ping type. */
-											switch ( watchdogPingType ) {
-												case XMPP:
-													pingPacket = Iq.packetInstance( pingElement.clone(),
-														JID.jidInstanceNS( (String) service.getSessionData().get( XMPPIOService.HOSTNAME_KEY ) ),
-														JID.jidInstanceNS( service.getUserJid() ) );
-													if (log.isLoggable(Level.FINEST)) {
-														log.log(Level.FINEST, "{0}, sending XMPP ping {1}", new Object[] { service, pingPacket });
-													}
-													if ( !writePacketToSocket( (IO) service, pingPacket ) ){
-														// writing failed, stopp service
-														++watchdogStopped;
-														service.stop();
-													}
-													break;
+		private void executeWatchdog() {
+			/** Walk through all connections and check whether they are really
+			 * alive. Depending on the configuration send either whitespace or
+			 * XMPP ping if the service is inactive for the configured period of
+			 * time
+			 */
+			doForAllServices(new ServiceChecker<IO>() {
+				@Override
+				public void check(final XMPPIOService service) {
+					try {
+						if ( null != service ){
+							if ( log.isLoggable( Level.FINEST ) ){
+								log.log( Level.FINEST,
+										 "Testing service: {0}, sinceLastTransfer: {1}, maxInactivityTime: {2}, watchdogTimeout: {3}, watchdogDelay: {4}, watchdogPingType: {5} ",
+										 new Object[] { service, getDurationSinceLastTransfer( service ), maxInactivityTime, watchdogTimeout, watchdogDelay, watchdogPingType } );
+							}
+							long sinceLastTransfer = getDurationSinceLastTransfer(service);
+							if ( sinceLastTransfer >= maxInactivityTime ){
 
-												case WHITESPACE:
-													if (log.isLoggable(Level.FINEST)) {
-														log.log(Level.FINEST, "Sending whitespace ping for service {0}", new Object[] { service });
-													}
-													service.writeRawData( " " );
-													break;
-											}
-											++watchdogTests;
-										}
-									}
+								// Stop the service if max keep-alive time is exceeded
+								// for non-active connections.
+								if ( log.isLoggable( Level.INFO ) ){
+									log.log( Level.INFO,
+											 "{0}: Max inactive time exceeded, stopping: {1} ( sinceLastTransfer: {2}, maxInactivityTime: {3}, watchdogTimeout: {4}, watchdogDelay: {5}, watchdogPingType: {6} )",
+											 new Object[] { getName(), service, getDurationSinceLastTransfer( service ),
+															maxInactivityTime, watchdogTimeout, watchdogDelay, watchdogPingType } );
 								}
-							} catch ( IOException e ) {
+								++watchdogStopped;
+								service.forceStop();
+							} else {
+								if ( sinceLastTransfer >= ( watchdogTimeout ) ){
 
-								// Close the service
-								try {
-									if ( service != null ){
-										log.info( getName() + "Found dead connection, stopping: " + service );
-										++watchdogStopped;
-										service.forceStop();
+									/** At least once every configured timings check if the
+									 * connection is still alive with the use of configured
+									 * ping type. */
+									switch ( watchdogPingType ) {
+										case XMPP:
+											pingPacket = Iq.packetInstance( pingElement.clone(),
+																			JID.jidInstanceNS( (String) service.getSessionData().get( XMPPIOService.HOSTNAME_KEY ) ),
+																			JID.jidInstanceNS( service.getUserJid() ) );
+											if (log.isLoggable(Level.FINEST)) {
+												log.log(Level.FINEST, "{0}, sending XMPP ping {1}", new Object[] { service, pingPacket });
+											}
+											if ( !writePacketToSocket( (IO) service, pingPacket ) ){
+												// writing failed, stopp service
+												++watchdogStopped;
+												service.forceStop();
+											}
+											break;
+
+										case WHITESPACE:
+											if (log.isLoggable(Level.FINEST)) {
+												log.log(Level.FINEST, "Sending whitespace ping for service {0}", new Object[] { service });
+											}
+											service.writeRawData( " " );
+											break;
 									}
-								} catch ( Exception ignore ) {
-									// Do nothing here as we expect Exception to be thrown here...
+									++watchdogTests;
 								}
 							}
 						}
-					} );
-				} catch ( InterruptedException e ) {    /* Do nothing here */
+					} catch ( IOException e ) {
+
+						// Close the service
+						try {
+							if ( service != null ){
+								log.info( getName() + "Found dead connection, stopping: " + service );
+								++watchdogStopped;
+								service.forceStop();
+							}
+						} catch ( Exception ignore ) {
+							// Do nothing here as we expect Exception to be thrown here...
+						}
+					}
 				}
-			}
+			} );
 		}
 
 	}
