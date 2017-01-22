@@ -124,6 +124,14 @@ public class Bootstrap implements Lifecycle {
 		mr.stop();
 	}
 
+	public <T> T getInstance(String beanName) {
+		return kernel.getInstance(beanName);
+	}
+
+	public <T> T getInstance(Class<T> clazz) {
+		return kernel.getInstance(clazz);
+	}
+	
 	// moved to AbstractBeanConfigurator
 //	public void registerBeans() {
 //	}

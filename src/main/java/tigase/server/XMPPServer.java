@@ -24,9 +24,16 @@
 package tigase.server;
 
 //~--- non-JDK imports --------------------------------------------------------
+
 import tigase.conf.ConfiguratorAbstract;
+import tigase.kernel.KernelException;
+import tigase.kernel.core.BeanConfig;
 import tigase.util.ClassUtil;
 import tigase.xml.XMLUtils;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 //~--- classes ----------------------------------------------------------------
 /**
@@ -61,8 +68,7 @@ public final class XMPPServer {
 	public static final String NAME = "Tigase";
 	private static String serverName = "message-router";
 
-	private static MessageRouterIfc router = null;
-	private static ConfiguratorAbstract config = null;
+	private static Bootstrap bootstrap;
 	private static boolean inOSGi = false;
 
 	//~--- constructors ---------------------------------------------------------
@@ -125,7 +131,7 @@ public final class XMPPServer {
 		}
 
 		try {
-			Bootstrap bootstrap = new Bootstrap();
+			bootstrap = new Bootstrap();
 			bootstrap.init(args);
 			bootstrap.start();
 			System.out.println("==\nServer finished starting up and (if there wasn't any error) is ready to use\n==");
@@ -156,7 +162,7 @@ public final class XMPPServer {
 	}
 
 	public static void stop() {
-		( (AbstractMessageReceiver) router ).stop();
+		( (AbstractMessageReceiver) bootstrap.getInstance(MessageRouterIfc.class) ).stop();
 	}
 
 	/**
@@ -166,12 +172,38 @@ public final class XMPPServer {
 	 * @return implementation of {@link tigase.conf.ConfiguratorAbstract}
 	 *         interface.
 	 */
-	public static ConfiguratorAbstract getConfigurator() {
-		return config;
+	@Deprecated
+//	public static ConfiguratorAbstract getConfigurator() {
+//		return config;
+//	}
+
+	public static <T> T getComponent(String name) {
+		try {
+			return bootstrap.getInstance(name);
+		} catch (KernelException ex) {
+			Logger.getLogger(XMPPServer.class.getCanonicalName())
+					.log(Level.FINEST, "failed to retrieve instance of " + name, ex);
+			return null;
+		}
 	}
 
-	public static MessageReceiver getComponent( String name ) {
-		return (MessageReceiver) config.getComponent( name );
+	public static <T> T getComponent(Class<T> clazz) {
+		try {
+			return bootstrap.getInstance(clazz);
+		} catch (KernelException ex) {
+			Logger.getLogger(XMPPServer.class.getCanonicalName())
+					.log(Level.FINEST, "failed to retrieve instance of " + clazz, ex);
+			return null;
+		}
+	}
+
+	public static <T> Stream<T> getComponents(Class<T> clazz) {
+		return bootstrap.getKernel()
+				.getDependencyManager()
+				.getBeanConfigs()
+				.stream()
+				.filter(bc -> clazz.isAssignableFrom(bc.getClazz()) && bc.getState() == BeanConfig.State.initialized)
+				.map(bc -> (T) bootstrap.getInstance(bc.getBeanName()));
 	}
 
 	/**

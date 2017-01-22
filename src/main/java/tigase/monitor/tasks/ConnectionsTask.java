@@ -1,10 +1,5 @@
 package tigase.monitor.tasks;
 
-import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import tigase.conf.ConfiguratorAbstract;
 import tigase.eventbus.EventBus;
 import tigase.form.Field;
 import tigase.form.Form;
@@ -18,6 +13,10 @@ import tigase.server.XMPPServer;
 import tigase.server.xmppsession.SessionManager;
 import tigase.util.DateTimeFormatter;
 import tigase.xml.Element;
+
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Bean(name = "connections-task")
 public class ConnectionsTask extends AbstractConfigurableTimerTask implements InfoTask, Initializable {
@@ -113,8 +112,7 @@ public class ConnectionsTask extends AbstractConfigurableTimerTask implements In
 		if (log.isLoggable(Level.FINEST))
 			log.finest("Running task...");
 
-		ConfiguratorAbstract configurator = XMPPServer.getConfigurator();
-		SessionManager sess = (SessionManager) configurator.getComponent("sess-man");
+		SessionManager sess = (SessionManager) XMPPServer.getComponent(SessionManager.class);
 
 		final int currentOnlineUsers = sess.getOpenUsersConnectionsAmount();
 
