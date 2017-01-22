@@ -27,6 +27,7 @@ import tigase.kernel.beans.*;
 import tigase.kernel.beans.config.AbstractBeanConfigurator;
 import tigase.kernel.beans.config.BeanConfigurator;
 import tigase.kernel.core.BeanConfig.State;
+import tigase.sys.TigaseRuntime;
 import tigase.util.ReflectionHelper;
 
 import java.lang.reflect.*;
@@ -176,6 +177,20 @@ public class Kernel {
 
 				return clz.newInstance();
 			}
+		} catch (NoClassDefFoundError e) {
+			if (e.getMessage() != null && e.getMessage().contains("licence")) {
+				final String[] msg = {"ERROR! ACS strategy was enabled with following class configuration",
+									  "--sm-cluster-strategy-class=tigase.server.cluster.strategy.OnlineUsersCachingStrategy",
+									  "but required libraries are missing!",
+									  "",
+									  "Please make sure that all tigase-acs*.jar and licence-lib.jar",
+									  "files are available in the classpath or disable ACS strategy!",
+									  "(by commenting out above line)",
+									  "",
+									  "For more information please peruse ACS documentation.",};
+				TigaseRuntime.getTigaseRuntime().shutdownTigase(msg);
+			}
+			throw new KernelException("Can't create instance of bean '" + beanConfig.getBeanName() + "'", e);
 		} catch (Exception e) {
 			throw new KernelException("Can't create instance of bean '" + beanConfig.getBeanName() + "'", e);
 		}

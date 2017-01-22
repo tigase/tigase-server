@@ -328,7 +328,7 @@ public abstract class AbstractBeanConfigurator implements BeanConfigurator {
 						clazz = ((RegistrarBeanWithDefaultBeanClass) bean).getDefaultBeanClass();
 					}
 					if (clazz == null) {
-						log.log(Level.WARNING, "unknown class {0} for bean {1}, skipping registration of bean",
+						log.log(Level.WARNING, "unknown class {0} for bean {1}, skipping registration of a bean",
 								new Object[] { cfg.getClazzName(), cfg.getBeanName() });
 						continue;
 					}
