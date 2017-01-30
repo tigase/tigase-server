@@ -316,7 +316,7 @@ Tigase has improved default settings to improve performance.  These include:
 - link:https://projects.tigase.org/issues/4665[#4665] Full Stacktrace will be dumped to log file by default, see xref:shutDownStackTrace[this section] for more details.
 - #4739 LetsEncrypt certficates are now included in dedicated keystore.
 - link:https://projects.tigase.org/issues/4752[#4752] New methods added to Tigase: _tigase.component.modules.Moduleprovider#getModules_ and _tigase.component.modules.ModuleProvider#getModulesId_ allowing for hooking of component modules.
-
+- #4752 Fixed issue with reconnection of cluster nodes after a network lag.
 
 
 == Fixes

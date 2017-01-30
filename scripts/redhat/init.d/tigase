@@ -209,23 +209,31 @@ case "$1" in
 	echo "Starting $DESC"
 	if start; then
 		success
+		echo
+		exit 0
 	else
 		failure
+		echo
+		exit 1
 	fi
 	echo
-	exit 1
 	;;
+
 
 	stop)
 	echo "Stopping $DESC"
 	if stop; then
 		success
+		echo
+		exit 0
 	else
 		failure
+		echo
+		exit 1
 	fi
 	echo
-	exit 1
 	;;
+
 
 	restart|force-reload)
 	echo "Restarting $DESC"
@@ -233,11 +241,14 @@ case "$1" in
 	sleep 10
 	if start; then
 		success
+		echo
+		exit 0
 	else
 		failure
+		echo
+		exit 1
 	fi
 	echo
-	exit 1
 	;;
 
   clearrestart)

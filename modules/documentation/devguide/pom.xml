@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<properties>
+		<packaging.type>pom</packaging.type>
+		<dist_path>../../..</dist_path>
+		<guide_name>Development</guide_name>
+	</properties>
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>tigase</groupId>
+	<artifactId>tigase-server-docs-devel</artifactId>
+	<name>Tigase XMPP Server Documentation - ${guide_name} Guide</name>
+
+	<packaging>pom</packaging>
+
+	<parent>
+		<groupId>tigase</groupId>
+		<artifactId>tigase-server-docs</artifactId>
+		<version>7.2.0-SNAPSHOT</version>
+	</parent>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.asciidoctor</groupId>
+				<artifactId>asciidoctor-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>output-html</id>
+						<phase>generate-resources</phase>
+					</execution>
+					<execution>
+						<id>output-docbook</id>
+						<phase>generate-resources</phase>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>com.agilejava.docbkx</groupId>
+				<artifactId>docbkx-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate-pdf</id>
+						<phase>generate-resources</phase>
+					</execution>
+					<execution>
+						<id>generate-html</id>
+						<phase>generate-resources</phase>
+					</execution>
+					<execution>
+						<phase>generate-resources</phase>
+						<id>generate-webhelp</id>
+					</execution>
+					<execution>
+						<phase>generate-resources</phase>
+						<id>generate-epub3</id>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>Remove *.fo file</id>
+						<phase>package</phase>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
